@@ -351,7 +351,7 @@ class SpeciesController extends Controller
         else 
 		if ($this->rHasVal('action', 'get_media_info') && !empty($this->requestData['id'])) {
             
-			$return=json_encode($this->getTaxonMedia(null, $this->requestData['id']));
+			$return=json_encode($this->getTaxonMedia(array('id'=>$this->requestData['id'])));
 
         }
         
@@ -686,7 +686,6 @@ class SpeciesController extends Controller
 
     private function getCategories($p=null)
     {
-		
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
 		$showAlways = isset($p['showAlways']) ? $p['showAlways'] : null;
@@ -798,7 +797,7 @@ class SpeciesController extends Controller
                 );
             }
             
-            $m = $this->getTaxonMedia($taxon, null);
+            $m = $this->getTaxonMediaCount($taxon);
 			
             $stdCats[] = array(
                 'id' => CTAB_MEDIA, 
@@ -891,98 +890,81 @@ class SpeciesController extends Controller
     }
 
 
-	private function _collectChildIds($id)
-	{
-		foreach((array)$this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id'=>$this->getCurrentProjectId(),
-					'parent_id'=>$id
-				),
-				'columns'=>'id'
-			)
-		) as $val) {
-			
-			$this->tmp[]=$val['id'];
-			$this->_collectChildIds($val['id']);
-
-		}
-	}
-
-    private function getCollectedHigherTaxonMedia($id)
+    private function getCollectedHigherTaxonMedia($p)
     {
-	
-		$this->tmp=array();
+		$id=isset($p['id']) ? $p['id'] : null;
+		$limit=isset($p['limit']) ? $p['limit'] : null;
+		$offset=isset($p['offset']) ? $p['offset'] : null;
+		
+		if (empty($id))
+			return;
 
-		$this->_collectChildIds($id);
-
-        $media=$this->models->MediaTaxon->freeQuery("
+		$data=$this->models->Taxon->freeQuery("		
 			select
-				_a.id,
-				_a.file_name,
-				_a.thumb_name,
-				_a.original_name,
-				_a.taxon_id,
-				_b.description,
-				_k.name,
-				trim(
-					ifnull(
-						concat(_e.uninomial,' ',_e.specific_epithet,' ',_e.infra_specific_epithet),
-						replace(_e.name,_e.authorship,'')
-					) 
-				) as taxon
-			from
-				%PRE%media_taxon _a
 			
-			left join %PRE%media_descriptions_taxon _b
-				on _a.project_id = _b.project_id
-				and _a.id=_b.media_id
-				and _b.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%names _k
-				on _a.taxon_id=_k.taxon_id
-				and _a.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _k.language_id=".LANGUAGE_ID_DUTCH."
-
-			left join %PRE%names _e
-				on _a.taxon_id=_e.taxon_id
-				and _a.project_id=_e.project_id
-				and _e.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
-				and _e.language_id=".LANGUAGE_ID_SCIENTIFIC."
+				SQL_CALC_FOUND_ROWS
+				_q.taxon_id,
+				file_name,
+				thumb_name,
+				_x.description,
+				_k.taxon,
+				_z.name,
+				_meta1.meta_data as meta_datum,
+				_meta2.meta_data as meta_short_desc
+			
+			from  %PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+				and _m.id = (select id from %PRE%media_taxon where taxon_id = _q.taxon_id and project_id=".$this->getCurrentProjectId()." limit 1)
+			
+			left join %PRE%media_descriptions_taxon _x
+				on _m.id=_x.media_id
+				and _m.project_id=_x.project_id
+			
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
 				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
+			left join %PRE%names _z
+				on _q.taxon_id=_z.taxon_id
+				and _q.project_id=_z.project_id
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.language_id=".LANGUAGE_ID_DUTCH."
+				
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
+			left join %PRE%media_meta _meta2
+				on _m.id=_meta2.media_id
+				and _m.project_id=_meta2.project_id
+				and _meta2.sys_label='beeldbankOmschrijvingKort'
+			
 			where
-				_a.project_id=".$this->getCurrentProjectId()." and 
-				_a.taxon_id in (".implode(',',$this->tmp).")
-			limit 100" 
+				_q.project_id=".$this->getCurrentProjectId()."
+				and _f.lower_taxon=1
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+			
+			order by _k.taxon
+			".(isset($offset) ? "offset ".$offset : "")."
+			".(isset($limit) ? "limit ".$limit : "")."
+			"
 		);
 		
-		//q($this->models->MediaTaxon->q(),1);
-		//q($media,1);
+		return $data;
 
-		/*
-		foreach((array)$media as $key => $val) {
+		//$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		//return array('count'=>$count[0]['total'],'data'=>$data,'ancestor'=>$taxon);
 
-			$d=$this->models->MediaMeta->_get(
-				array(
-					'id'=>array(
-						'project_id' => $this->getCurrentProjectId(),
-						'media_id'=> $val['id']
-					),
-					'columns'=>'sys_label,meta_data'
-				)
-			);
+	}
 
-			foreach((array)$d as $metaVal) {
-				$media[$key]['meta'][$metaVal['sys_label']]=$metaVal['meta_data'];
-			}
-					
-		}
-		*/
-
-		return $media;
-
-    }
 
     private function getTaxonContent($p=null)
     {
@@ -998,10 +980,10 @@ class SpeciesController extends Controller
         switch ($category) {
 
             case CTAB_MEDIA:
-                $content=$this->getTaxonMedia($taxon,null,$incOverviewImage);
+                $content=$this->getTaxonMedia(array('taxon'=>$taxon,'incOverviewImage'=>$incOverviewImage,'isLower'=>$isLower));
 
 				if (empty($content) && !$isLower) {
-					$content=$this->getCollectedHigherTaxonMedia($taxon);
+					$content=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
 				}
 				
                 break;
@@ -1057,72 +1039,72 @@ class SpeciesController extends Controller
     }
 
 
-    private function getTaxonMedia($taxon=null,$id=null,$inclOverviewImage=false)
+    private function getTaxonMedia($p)
     {
+		
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		$id=isset($p['id']) ? $p['id'] : null;
+		$inclOverviewImage=isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 
         if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
             return $mt;
-        
-        $d = array(
-            'project_id' => $this->getCurrentProjectId()
-        );
-        
-        if (isset($taxon))
-            $d['taxon_id']=$taxon;
+			
+		$d = array('project_id' => $this->getCurrentProjectId());
+		
+		if (isset($taxon)) $d['taxon_id']=$taxon;
 
-        if (isset($id))
-            $d['id']=$id;
-        
+		if (isset($id)) $d['id']=$id;
+		
 		if (!$inclOverviewImage)
 			$d['overview_image']='0';
-        
-        $mt = $this->models->MediaTaxon->_get(
-        array(
-            'id' => $d, 
-            'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime', 
-            'order' => 'mime, sort_order'
-        ));
+		
+		$mt = $this->models->MediaTaxon->_get(
+		array(
+			'id' => $d, 
+			'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime', 
+			'order' => 'mime, sort_order'
+		));
 
-        $this->loadControllerConfig('species');
-        
-        foreach ((array) $mt as $key => $val) {
-            
-            $mdt = $this->models->MediaDescriptionsTaxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->getCurrentLanguageId(), 
-                    'media_id' => $val['id']
-                ), 
-                'columns' => 'description'
-            ));
+		$this->loadControllerConfig('species');
+		
+		foreach ((array) $mt as $key => $val) {
+			
+			$mdt = $this->models->MediaDescriptionsTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->getCurrentLanguageId(), 
+					'media_id' => $val['id']
+				), 
+				'columns' => 'description'
+			));
   
-            
+			
 //            $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
 			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
-            
-            $t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ? $this->controllerSettings['mime_types'][$val['mime_type']] : null;
+			
+			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ? $this->controllerSettings['mime_types'][$val['mime_type']] : null;
 
-            $mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
-            $mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
-            $mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
-            $mt[$key]['full_path'] = $this->getProjectUrl('uploadedMedia').$mt[$key]['file_name'];
-        }
-        
-        $this->loadControllerConfig();
-        
-        $sortBy = array(
-            'key' => array(
-                'mime_show_order', 
-                'sort_order'
-            ), 
-            'dir' => 'asc', 
-            'case' => 'i'
-        );
-        
-        $this->customSortArray($mt, $sortBy);
-        
-        $this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
+			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
+			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
+			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
+			$mt[$key]['full_path'] = $this->getProjectUrl('uploadedMedia').$mt[$key]['file_name'];
+		}
+		
+		$this->loadControllerConfig();
+		
+		$sortBy = array(
+			'key' => array(
+				'mime_show_order', 
+				'sort_order'
+			), 
+			'dir' => 'asc', 
+			'case' => 'i'
+		);
+		
+		$this->customSortArray($mt, $sortBy);
+		
+		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
 
         return $mt;
     }
@@ -1394,30 +1376,71 @@ class SpeciesController extends Controller
 
     private function getTaxonOverviewImage($id)
     {
-        $mt = $this->models->MediaTaxon->_get(
-        array(
-            'id' => array(
-                'taxon_id' => $id, 
-                'overview_image' => 1, 
-                'project_id' => $this->getCurrentProjectId()
-            )
-        ));
+		
+		if (empty($id))
+			return;
 
-        if ($mt) {
+		$data=$this->models->Taxon->freeQuery("		
+			select
 			
-            $mdt = $this->models->MediaDescriptionsTaxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->getCurrentLanguageId(), 
-                    'media_id' => $mt[0]['id']
-                ), 
-                'columns' => 'description'
-            ));			
+				_m.taxon_id,
+				file_name,
+				thumb_name,
+				_x.description,
+				_k.taxon,
+				_z.name,
+				_meta1.meta_data as meta_datum,
+				_meta2.meta_data as meta_short_desc
 			
-            return array('image' => $mt[0]['file_name'],'label' => $mdt[0]['description']);
-		} else
-            return null;
+			from  %PRE%media_taxon _m
+			
+			left join %PRE%media_descriptions_taxon _x
+				on _m.id=_x.media_id
+				and _m.project_id=_x.project_id
+			
+			left join %PRE%taxa _k
+				on _m.taxon_id=_k.id
+				and _m.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
+			left join %PRE%names _z
+				on _m.taxon_id=_z.taxon_id
+				and _m.project_id=_z.project_id
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.language_id=".LANGUAGE_ID_DUTCH."
+				
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
+			left join %PRE%media_meta _meta2
+				on _m.id=_meta2.media_id
+				and _m.project_id=_meta2.project_id
+				and _meta2.sys_label='beeldbankOmschrijvingKort'
+			
+			where
+				_m.project_id=".$this->getCurrentProjectId()."
+				and _m.taxon_id=".$id."
+				and _m.overview_image=1
+			
+			"
+		);
+		
+		setlocale(LC_TIME,'nl_NL.UTF-8');
+
+		$photographer=implode(' ',array_reverse(explode(',',$data[0]['description'])));
+
+		return array(
+			'image' => $data[0]['file_name'],
+			'photographer' => $photographer,
+			'label' => $photographer.', '.date('j F Y',strtotime($data[0]['meta_datum'])).', '.$data[0]['meta_short_desc']
+		);
+		//return $data;
+
     }
 
 

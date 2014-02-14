@@ -12,43 +12,19 @@
 				Gezocht op "{$search.search}": <span id="resultcount-header">{$results|@count}</span>
 				</h2>
 
-{if $type=='extended'}
-<a href="?search={$search.search}&type=concise" style="color:#F3C">versie 1</a>
-versie 2
-{else}
-versie 1
-<a href="?search={$search.search}&type=extended" style="color:#F3C">versie 2</a>
-{/if}
-
 			</p>
 			<p>
 				{if $results}
 
-				{if $type=='extended'}
+				{foreach from=$results item=res}
+				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
+					<img src="{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
 					
-					{foreach from=$results item=res}
-					<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
-						<img src="{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
-						
-						<strong><a href="../species/taxon.php?id={$v.taxon_id}">{$res.taxon}</a></strong><br />
-						{$res.dutch_name}<br /><br />
-						Status voorkomen: {$res.presence_information_index_label} {$res.presence_information_title}
-					</div>
-					{/foreach}
-					
-				{else}
-
-					<ol>
-						{foreach from=$results item=res}
-						<li style="margin-bottom:5px">
-						<a class="result" style="font-weight:bold" href="../species/taxon.php?id={$res.taxon_id}">{$res.taxon}</a> {* $res.match_percentage *}
-						{if $res.dutch_name}<br />{$res.dutch_name}{/if}
-						</li>
-						{/foreach}
-					</ol>
-					
-				{/if}
-
+					<strong><a href="../species/taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
+					{$res.dutch_name}<br /><br />
+					Status voorkomen: {$res.presence_information_index_label} {$res.presence_information_title}
+				</div>
+				{/foreach}
 				
 				{else}
 				Niets gevonden.
