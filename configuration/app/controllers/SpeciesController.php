@@ -1430,7 +1430,7 @@ class SpeciesController extends Controller
 			"
 		);
 		
-		setlocale(LC_TIME,'nl_NL');
+		//setlocale(LC_TIME,'nl_NL');
 
 		$photographer=implode(' ',array_reverse(explode(',',$data[0]['description'])));
 
