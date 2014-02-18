@@ -42,28 +42,32 @@
 
 		<div>
 
-		<form method="post" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
-			<h2 class="search">Zoeken naar soorten</h2>
+		<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+
+		<input type="hidden" id="name_id" name="name_id" value="{$search.name_id}">
+		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
+
+			<h2 class="search">Zoeken naar afbeeldingen</h2>
 			<fieldset class="block" style="width:450px">
 				<div class="formrow">
-					<label accesskey="g" for="taxon">Soortnaam</label>
-					<input type="text" class="field" value="{$search.taxon}" id="taxon" name="taxon" autocomplete="off">
-					<div id="taxon_auto_complete" class="auto_complete" style="display: none;"></div>
+					<label accesskey="g" for="name">Soortnaam</label>
+					<input type="text" class="field" value="{$search.name}" id="name" name="name" autocomplete="off">
+					<div id="name_suggestion" match="start" class="auto_complete" style="display: none;"></div>
 				</div>
 				<div class="formrow">
-					<label accesskey="g" for="higherTaxon">Soortgroep</label>
-					<input type="text" size="60" class="field" value="{$search.higherTaxon}" id="higherTaxon" name="higherTaxon" autocomplete="off">
-					<div id="higherTaxon_auto_complete" class="auto_complete" style="display: none;"></div>
+					<label accesskey="g" for="group">Soortgroep</label>
+					<input type="text" size="60" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
+					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 				<div class="formrow">
 					<label accesskey="g" for="photographer">Fotograaf</label>
 					<input type="text" size="60" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">
-					<div id="photographer_auto_complete" class="auto_complete" style="display: none;"></div>
+					<div id="photographer_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 				<div class="formrow">
 					<label accesskey="g" for="validator">Validator</label>
 					<input disabled="disabled" type="text" size="60" class="field" value="nog niet weten te exporteren uit de beeldbankdump" "{$search.validator}" id="validator" name="validator" autocomplete="off">
-					<div id="validator_auto_complete" class="auto_complete" style="display: none;"></div>
+					<div id="validator_suggestion" match="start" class="auto_complete" style="display: none;"></div>
 				</div>
 			</fieldset>
 
@@ -89,8 +93,8 @@
 					{assign var=photograhper_name value=", "|explode:$v.photographer_name} 
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
-							<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$v.file_name}" pTitle="foto {$photograhper_name[1]} {$photograhper_name[0]}">
-								<img class="speciesimage" alt="Foto {$photograhper_name[1]} {$photograhper_name[0]}" title="Foto {$photograhper_name[1]} {$photograhper_name[0]}" src="{$v.thumb_name}" />
+							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.ncbnaturalis.nl/comping/{$v.file_name}" pTitle="foto {$photograhper_name[1]} {$photograhper_name[0]}">
+								<img class="speciesimage" alt="Foto {$photograhper_name[1]} {$photograhper_name[0]}" title="Foto {$photograhper_name[1]} {$photograhper_name[0]}" src="http://images.ncbnaturalis.nl/160x100/{$v.thumb_name}" />
 							</a>
 						</div>
 						<h3><i>{$v.taxon}</i></h3>
@@ -123,6 +127,8 @@ $(document).ready(function(){
 	 		social_tools: false
 	 	});
 	}
+	bindKeys();
+});
 </script>
 {/literal}
 

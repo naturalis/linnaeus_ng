@@ -18,7 +18,7 @@
 
 				{foreach from=$results item=res}
 				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
-					<img src="{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
+					<img src="http://images.ncbnaturalis.nl/160x100/{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
 					
 					<strong><a href="../species/taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
 					{$res.dutch_name}<br /><br />

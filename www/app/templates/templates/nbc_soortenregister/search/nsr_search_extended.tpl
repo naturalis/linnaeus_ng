@@ -1,141 +1,4 @@
 {include file="../shared/header.tpl"}
-{literal}
-<style>
-#name_suggestion,#author_suggestion {
-	background-color:#fff;
-	border:1px solid #ddd;
-	width:325px;
-	max-height:250px;
-	height:auto;
-	overflow:hidden;
-	z-index:999;
-	position:absolute;
-	left:100px;
-	top:20px;
-	padding:2px;
-}
-
-#formSearchFacetsSpecies fieldset.block .formrow {
-	position:relative;
-}
-
-.formrow input.field {
-    left: 100px;
-}
-
-div.auto_complete ul li {
-    cursor: pointer;
-    display: block;
-    list-style-type: none;
-    margin: 0;
-    padding: 2px;
-    z-index: 1;
-}
-
-div.auto_complete ul li:hover {
-    background-color: #FFDDBB;
-    z-index: 1;
-}
-
-</style>
-<script>
-
-var search,dosearch,listdata,list;
-
-function setList(l)
-{
-	list=l;
-}
-
-function hideSuggestions(ele)
-{
-	if (ele)
-		$(ele).hide();
-	else
-		$('div[id*=suggestion]').hide();
-}
-
-function validateSearch()
-{
-	dosearch=false;
-	if (search.length>=2) dosearch=true;
-}
-
-function doHtSuggestions()
-{
-	$('#taxon_id').val('');
-	search=$('#name').val();
-	setList('name_suggestion');
-
-	hideSuggestions();
-	validateSearch();
-
-	if (!dosearch) return;
-
-	$.ajax({
-		url : 'nsr_ajax_interface.php',
-		type: "POST",
-		data : ({
-			action : 'get_ht_suggestions',
-			name : search,
-			match: 'start',
-			time : allGetTimestamp()
-		}),
-		success : function (data) {
-			listdata=$.parseJSON(data);
-			console.dir(listdata);
-			showSuggestions();
-			buildSuggestions();
-		}
-	});	
-	
-}
-
-function setSuggestion(ele)
-{
-	$('#taxon_id').val($(ele).attr('taxon'));
-	$('#name').val($(ele).html());
-	hideSuggestions();
-}
-
-function showSuggestions()
-{
-	if (listdata.length>0) $('#'+list).show();
-}
-
-function buildSuggestions()
-{
-	var d=Array();
-	for(var i in listdata) {
-		var l=listdata[i];
-		//d.push('<li onclick="window.open(\'nsr_search_extended.php?name='+l.taxon_id+'\',\'_self\');">'+l.name+(l.dutch_name ? ' ['+l.dutch_name+']' : '')+'</li>');
-		d.push('<li taxon="'+l.taxon_id+'" onclick="setSuggestion(this);">'+l.name+(l.dutch_name ? ' ['+l.dutch_name+']' : '')+'</li>');
-	}
-	$('#'+list).html('<ul>'+d.join('')+'</ul>');
-}
-
-function bindKeys() {
-
-	$('#name').keyup(function(e) {
-
-		if (e.keyCode==38) { // up
-			return
-		} else
-		if (e.keyCode==40) { // down
-			return
-		} else
-		if (e.keyCode==13) { // enter
-			return
-		} else {
-			doHtSuggestions();
-		}
-	});
-		
-
-}
-
-</script>
-{/literal}
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -145,18 +8,21 @@ function bindKeys() {
 		<div>
 
 		<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
-		<input type="hidden" id="taxon_id" name="taxon_id" value="{$search.taxon_id}">
+
+		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
+		<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}">
+
 			<h2 class="search">Zoeken naar soorten</h2>
 			<fieldset class="block">
 				<div class="formrow">
 					<label accesskey="g" for="search">Soortgroep</label>
-					<input type="text" size="60" class="field" id="name" name="name" autocomplete="off" value="{$search.name}">
-					<div id="name_suggestion" class="auto_complete" style="display:none;"></div>
+					<input type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
+					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 				<div class="formrow">
 					<label accesskey="g" for="author">Auteur</label>
 					<input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
-					<div id="author_suggestion" class="auto_complete" style="display:none;"></div>
+					<div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 			</fieldset>
 
@@ -242,7 +108,7 @@ function bindKeys() {
 			<h4>{$results|@count}{if $results|@count<$result_count} van {$result_count}{/if} resultaten</h4>
 			{foreach from=$results item=v}
 				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
-					<img src="{$v.overview_image}" style="width:140px;height:auto;float:right"/>
+					<img src="http://images.ncbnaturalis.nl/comping/{$v.overview_image}" style="width:140px;height:auto;float:right"/>
 					<strong><a href="../species/taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong><br />
 					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
 					Status voorkomen: {$v.presence_information_index_label} {$v.presence_information_title}
@@ -276,6 +142,7 @@ $('#togglePresenceStatusNietGevestigd').bind('click',function() {
 	});
 	$('#formSearchFacetsSpecies').submit();
 })
+
 
 bindKeys();
 

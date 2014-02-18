@@ -55,8 +55,10 @@ class SearchControllerNSR extends SearchController
     public function searchExtendedAction ()
     {
 		if (
-			$this->rHasVal('name') ||
+			$this->rHasVal('group') ||
+			$this->rHasVal('group_id') ||
 			$this->rHasVal('author') ||
+			$this->rHasVal('author_id') ||
 			$this->rHasVal('presence') ||
 			$this->rHasVal('images') ||
 			$this->rHasVal('distribution') ||
@@ -66,14 +68,14 @@ class SearchControllerNSR extends SearchController
 		) {
 	
 			$search=$this->requestData;
-		
+
 			$d=$this->doExtendedSearch($search);
 
 			$this->smarty->assign('results',$d['data']);
 			$this->smarty->assign('result_count',$d['count']);
 
-			if (is_numeric($search['name']))
-				$search['name']=$d['ancestor']['name'].(!empty($d['ancestor']['dutch_name']) ? ' ['.$d['ancestor']['dutch_name'].']' : '');
+//			if (is_numeric($search['group']))
+//				$search['name']=$d['ancestor']['name'].(!empty($d['ancestor']['dutch_name']) ? ' ['.$d['ancestor']['dutch_name'].']' : '');
 
 		}
 
@@ -91,13 +93,25 @@ class SearchControllerNSR extends SearchController
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','get_ht_suggestions')) {
-
-	        if (!$this->rHasVal('name')) return;
-    
-	        $data=$this->getHtSuggestions($this->requestData);
-			$this->smarty->assign('returnText',json_encode($data));
-
+        if ($this->rHasVal('action','group_suggestions'))
+		{
+	        if (!$this->rHasVal('search')) return;
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsGroup($this->requestData)));
+        } else
+        if ($this->rHasVal('action','author_suggestions'))
+		{
+	        if (!$this->rHasVal('search')) return;
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsAuthor($this->requestData)));
+        } else
+        if ($this->rHasVal('action','photographer_suggestions'))
+		{
+	        if (!$this->rHasVal('search')) return;
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsPhotographer($this->requestData)));
+        } else
+        if ($this->rHasVal('action','name_suggestions'))
+		{
+	        if (!$this->rHasVal('search')) return;
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsName($this->requestData)));
         }
 
         $this->printPage();
@@ -224,10 +238,10 @@ class SearchControllerNSR extends SearchController
 
 	private function doExtendedSearch($search)
 	{
-		if (isset($search['taxon_id'])) {
-			$d=$this->getHtSuggestions(array('id'=>(int)trim($search['taxon_id']),'match'=>'id'));
+		if (isset($search['group_id'])) {
+			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($search['group_id']),'match'=>'id'));
 		} else {
-			$d=$this->getHtSuggestions(array('name'=>$search,'match'=>'exact'));
+			$d=$this->getSuggestionsGroup(array('name'=>$search,'match'=>'exact'));
 		}
 
 		if ($d) 
@@ -272,14 +286,16 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
 				and _k.language_id=".LANGUAGE_ID_DUTCH."
 
 			". (isset($auth) ? "
 				left join %PRE%names _m
 					on _a.id=_m.taxon_id
 					and _a.project_id=_m.project_id
-					and _m.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+					and _m.type_id=(select id from %PRE%name_types where project_id = ".
+						$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
 					and _m.language_id=".LANGUAGE_ID_SCIENTIFIC : "" 
 				)."
 
@@ -322,7 +338,7 @@ class SearchControllerNSR extends SearchController
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.lower_taxon=1
-				and MATCH(_q.parentage) AGAINST ('".$ancestor['taxon_id']."' in boolean mode)
+				and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)
 			".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
 			".(isset($auth) ? "and _m.name_author like '". mysql_real_escape_string($auth)."%'" : "")."
 			".($img ? "and number_of_images > 0" : "")."
@@ -414,7 +430,7 @@ class SearchControllerNSR extends SearchController
 					on _a.project_id=_b.project_id
 					and _a.id=_b.media_id
 					and _b.sys_label='beeldbankFotograaf'
-					and _b.meta_data like '%".mysql_real_escape_string($search['photographer'])."%'"
+					and _b.meta_data like '".mysql_real_escape_string($search['photographer'])."%'"
 					: ""
 			).
 			(!empty($search['taxon']) || !empty($search['higherTaxon']) ? "
@@ -445,45 +461,46 @@ class SearchControllerNSR extends SearchController
 			where
 				_a.project_id=".$this->getCurrentProjectId()."
 
-				".(!empty($search['taxon']) ? "and (_d.name like '%".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
-				".(!empty($search['higherTaxon']) ? "and (_d.name like '%".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
+				".(!empty($search['taxon']) ? "and (_d.name like '".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
+				".(!empty($search['higherTaxon']) ? "and (_d.name like '".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
 				
 			order by ".($search['sort']=='photographer' ? "photographer_name" : "taxon" )."
 
 			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
 		);
 	
-		//q($this->models->MediaTaxon->q());
-		//q($d,1);
+//		q($this->models->MediaTaxon->q());
+//		q($d,1);
 		return $d;
 		
 	}
 
 
-	private function getHtSuggestions($search)
+	private function getSuggestionsGroup($p)
 	{
 		
 		$clause=null;
 		
-		if ($search['match']=='start')
-			$clause="_a.name like '".mysql_real_escape_string($search['name'])."%'";
+		if ($p['match']=='start')
+			$clause="_a.name like '".mysql_real_escape_string($p['search'])."%'";
 		else
-		if ($search['match']=='exact')
-			$clause="_a.name = '".mysql_real_escape_string($search['name'])."'";
+		if ($p['match']=='exact')
+			$clause="_a.name = '".mysql_real_escape_string($p['search'])."'";
 		else
-		if ($search['match']=='id')
-			$clause="_a.taxon_id = ".(int)$search['id'];
+		if ($p['match']=='id')
+			$clause="_a.taxon_id = ".(int)$p['id'];
 
 		if (empty($clause)) return;
 		
 		$d=$this->models->Taxon->freeQuery("
 			select
 
-				_a.taxon_id,
+				_a.taxon_id as id,
 				_a.name,
 				_b.nametype,
 				_g.label as rank,
-				_k.name as dutch_name
+				_k.name as dutch_name,
+				concat(_a.name,if(_k.name is null,'a',concat(' [',_k.name,']'))) as label
 
 			from %PRE%names _a
 			
@@ -535,6 +552,134 @@ class SearchControllerNSR extends SearchController
 		);
 		return $d;
 	}
+
+
+	private function getSuggestionsAuthor($p)
+	{
+		
+		$clause=null;
+		
+		if ($p['match']=='start')
+			$clause="name_author like '".mysql_real_escape_string($p['search'])."%'";
+		else
+		if ($p['match']=='exact')
+			$clause="name_author = '".mysql_real_escape_string($p['search'])."'";
+
+		if (empty($clause)) return;
+		
+		$d=$this->models->Taxon->freeQuery("
+			select
+				distinct name_author as label
+			from %PRE%names
+			where 
+				project_id =".$this->getCurrentProjectId()."
+				and ".$clause."
+			order by name_author
+			"
+		);
+		return $d;
+	}
+
+
+	private function getSuggestionsPhotographer($p)
+	{
+		$clause=null;
+		
+		if ($p['match']=='start')
+			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
+		else
+		if ($p['match']=='exact')
+			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
+
+		if (empty($clause)) return;
+		
+
+		$d=$this->models->MediaTaxon->freeQuery("
+			select 
+				distinct meta_data as label
+			from %PRE%media_meta
+			where
+				project_id=".$this->getCurrentProjectId()."
+				and sys_label = 'beeldbankFotograaf'
+				and ".$clause."
+			order by meta_data
+		");
+
+		return $d;
+		
+	}
+
+
+	private function getSuggestionsName($p)
+	{
+
+		$d=$this->models->MediaTaxon->freeQuery("
+			select 
+				_a.file_name,
+				_a.thumb_name,
+				_a.taxon_id,
+				_c.meta_data as photographer_name,
+				_d.name,
+				trim(
+					ifnull(
+						concat(_j.uninomial,' ',_j.specific_epithet,' ',_j.infra_specific_epithet),
+						replace(_j.name,_j.authorship,'')
+					) 
+				)  as taxon
+			from %PRE%media_taxon _a ".
+			(!empty($search['photographer']) ? "
+				right join %PRE%media_meta _b
+					on _a.project_id=_b.project_id
+					and _a.id=_b.media_id
+					and _b.sys_label='beeldbankFotograaf'
+					and _b.meta_data like '".mysql_real_escape_string($search['photographer'])."%'"
+					: ""
+			).
+			(!empty($search['taxon']) || !empty($search['higherTaxon']) ? "
+				right join %PRE%names _d
+					on _a.project_id=_d.project_id
+					and _a.taxon_id=_d.taxon_id"
+				: ""
+			)."
+			left join %PRE%media_meta _c
+				on _a.project_id=_c.project_id
+				and _a.id = _c.media_id
+				and _c.sys_label = 'beeldbankFotograaf'
+
+			left join %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
+
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%names _j
+				on _a.taxon_id=_j.taxon_id
+				and _a.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			where
+				_a.project_id=".$this->getCurrentProjectId()."
+
+				".(!empty($search['taxon']) ? "and (_d.name like '".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
+				".(!empty($search['higherTaxon']) ? "and (_d.name like '".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
+				
+			order by ".($search['sort']=='photographer' ? "photographer_name" : "taxon" )."
+
+			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
+		);
+	
+//		q($this->models->MediaTaxon->q());
+//		q($d,1);
+		return $d;
+		
+			
+	}
+
+
+
 
 
     public function searchPicturesAction ()
