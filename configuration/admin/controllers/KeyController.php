@@ -134,8 +134,6 @@ class KeyController extends Controller
 
 		if ($step) {
             
-            $this->cleanUpChoices();
-
             // move choices up and down
             if ($this->rHasVal('move') && $this->rHasVal('direction') && !$this->isFormResubmit()) {
                 $this->moveKeystepChoice($this->requestData['move'], $this->requestData['direction']);
@@ -714,6 +712,7 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+
     public function storeAction ()
     {
         $this->checkAuthorisation();
@@ -749,9 +748,28 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+
+    public function cleanUpAction ()
+    {
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Clean up'));
+        
+        if ($this->rHasVal('action', 'clean') && !$this->isFormResubmit()) {
+            
+            $this->cleanUpChoices();
+	        $this->smarty->assign('processed', true);
+			$this->addMessage($this->translate('Clean up done'));
+        }
+        
+        $this->printPage();
+    }
+
     public function typeAction ()
     {
         $this->checkAuthorisation();
+		
+		$this->setPageName($this->translate('Set runtime key type'));
         
         if ($this->rHasVal('keytype') && !$this->isFormResubmit()) {
             
@@ -765,7 +783,7 @@ class KeyController extends Controller
         
         $this->smarty->assign('keytype', $this->getSetting('keytype'));
         
-        $this->setPageName($this->translate('Set runtime key type'));
+       
         
         $this->printPage();
     }
@@ -773,7 +791,9 @@ class KeyController extends Controller
     public function contentsAction ()
     {
         $this->checkAuthorisation();
-        
+
+		$this->setPageName($this->translate('Contents'));
+
         $list = $this->getLookupList();
         
         $pagination = $this->getPagination($list, 25);

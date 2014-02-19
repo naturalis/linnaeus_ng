@@ -4,7 +4,7 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
-<form method="post" action="step_edit.php" id="theForm">
+<form method="get" action="step_edit.php" id="theForm">
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="id" id="id" value="{$step.id}" />
 <input type="hidden" name="ref_choice" id="ref_choice" value="" />
@@ -27,7 +27,7 @@
 
 </form>
 <br />
-<form method="post" action="choice_edit.php" id="choiceForm">
+<form method="get" action="choice_edit.php" id="choiceForm">
 <input type="hidden" name="id" id="id2" value="" />
 <input type="hidden" name="step" value="{$step.id}" />
 <fieldset>
@@ -120,19 +120,19 @@
 </form>
 </div>
 
-<form method="post" action="step_show.php" id="nextForm">
+<form method="get" action="step_show.php" id="nextForm">
 <input type="hidden" name="id" id="next" value="" />
 <input type="hidden" name="choice" id="choice" value="" />
 </form>
 
-<form method="post" action="" id="moveForm">
+<form method="get" action="" id="moveForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$step.id}" />
 <input type="hidden" name="move" id="move" value="" />
 <input type="hidden" name="direction" id="direction" value="" />
 </form>
 
-<form method="post" action="choice_edit.php" id="delChoiceForm">
+<form method="get" action="choice_edit.php" id="delChoiceForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" id="id3" value="" />
 <input type="hidden" name="action" value="delete" />

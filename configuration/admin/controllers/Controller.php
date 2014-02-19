@@ -2039,10 +2039,10 @@ class Controller extends BaseClass
             
             $d = $this->getSetting($name);
             
-            if ($d['value'] == $value)
+            if (isset($d['value']) && $d['value']==$value)
                 return;
             
-            if ($d == null) {
+            if (is_null($d)) {
                 
                 $s = $this->models->Settings->save(array(
                     'id' => null, 
