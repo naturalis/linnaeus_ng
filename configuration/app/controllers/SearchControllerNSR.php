@@ -234,7 +234,7 @@ class SearchControllerNSR extends SearchController
 			limit ".(!empty($search['limit']) ? intval($search['limit']) : "1000" )."
 			"
 		);
-q($this->models->Names->q(),1);
+
 		return $d;
 	}
 
@@ -414,9 +414,7 @@ q($this->models->Names->q(),1);
 
 	private function doPictureSearch($p)
 	{
-		
-		q($p);
-		
+
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
 				_a.file_name,
@@ -475,7 +473,7 @@ q($this->models->Names->q(),1);
 			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
 		);
 	
-		q($this->models->MediaTaxon->q(),1);
+//		q($this->models->MediaTaxon->q(),1);
 //		q($d,1);
 		return $d;
 		
