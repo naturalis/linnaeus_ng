@@ -34,7 +34,7 @@ function retrieveSuggestions()
 			time : allGetTimestamp()
 		}),
 		success : function (data) {
-			console.log(data);
+			//console.log(data);
 			if (!data) return;
 			setListData($.parseJSON(data));
 			showSuggestions();

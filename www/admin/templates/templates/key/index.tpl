@@ -15,6 +15,7 @@
 	<li><a href="map.php">{t}Key map{/t}</a></li>
 	<li><a href="store.php">{t}Compute taxon division{/t}</a></li>
 	<li><a href="insert.php?action=renumber">{t}Renumber steps{/t}</a></li>
+	<li><a href="cleanup.php">{t}Clean up empty steps, orphaned choices and ghostly targets{/t}</a></li>
 </ul>
 <ul class="admin-list">
 	<li><a href="orphans.php">{t}Taxa not part of the key{/t}</a></li>
