@@ -6,12 +6,15 @@ include_once ('SearchController.php');
 class SearchControllerNSR extends SearchController
 {
 
+	private $_suggestionListItemMax=50;
+
     public $usedModels = array(
 		'taxa',
 		'presence',
 		'presence_labels',
 		'media_meta',
-		'media_taxon'
+		'media_taxon',
+		'name_types'
     );
 
     public $controllerPublicName = 'Search';
@@ -231,7 +234,7 @@ class SearchControllerNSR extends SearchController
 			limit ".(!empty($search['limit']) ? intval($search['limit']) : "1000" )."
 			"
 		);
-
+q($this->models->Names->q(),1);
 		return $d;
 	}
 
@@ -409,8 +412,11 @@ class SearchControllerNSR extends SearchController
 	}
 
 
-	private function doPictureSearch($search)
+	private function doPictureSearch($p)
 	{
+		
+		q($p);
+		
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
 				_a.file_name,
@@ -425,15 +431,15 @@ class SearchControllerNSR extends SearchController
 					) 
 				)  as taxon
 			from %PRE%media_taxon _a ".
-			(!empty($search['photographer']) ? "
+			(!empty($p['photographer']) ? "
 				right join %PRE%media_meta _b
 					on _a.project_id=_b.project_id
 					and _a.id=_b.media_id
 					and _b.sys_label='beeldbankFotograaf'
-					and _b.meta_data like '".mysql_real_escape_string($search['photographer'])."%'"
+					and _b.meta_data like '".mysql_real_escape_string($p['photographer'])."%'"
 					: ""
 			).
-			(!empty($search['taxon']) || !empty($search['higherTaxon']) ? "
+			((!empty($p['name']) && empty($p['name_id'])) || (!empty($search['group']) && !empty($search['group_id'])) ? "
 				right join %PRE%names _d
 					on _a.project_id=_d.project_id
 					and _a.taxon_id=_d.taxon_id"
@@ -469,7 +475,7 @@ class SearchControllerNSR extends SearchController
 			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
 		);
 	
-//		q($this->models->MediaTaxon->q());
+		q($this->models->MediaTaxon->q(),1);
 //		q($d,1);
 		return $d;
 		
@@ -478,7 +484,6 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsGroup($p)
 	{
-		
 		$clause=null;
 		
 		if ($p['match']=='start')
@@ -547,8 +552,7 @@ class SearchControllerNSR extends SearchController
 						)
 					)
 			order by name
-			limit 100
-			"
+			limit ".$this->_suggestionListItemMax
 		);
 		return $d;
 	}
@@ -575,7 +579,7 @@ class SearchControllerNSR extends SearchController
 				project_id =".$this->getCurrentProjectId()."
 				and ".$clause."
 			order by name_author
-			"
+			limit ".$this->_suggestionListItemMax
 		);
 		return $d;
 	}
@@ -603,7 +607,8 @@ class SearchControllerNSR extends SearchController
 				and sys_label = 'beeldbankFotograaf'
 				and ".$clause."
 			order by meta_data
-		");
+			limit ".$this->_suggestionListItemMax
+		);
 
 		return $d;
 		
@@ -612,70 +617,56 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName($p)
 	{
+		$d=$this->models->NameTypes->_get(
+			array(
+				'id'=>array(
+				 	'project_id' => $this->getCurrentProjectId(),
+					'nametype' => PREDICATE_PREFERRED_NAME,
+					'language_id' => LANGUAGE_ID_DUTCH
+				),
+				'columns'=>'id'
+			)
+		);
+		
+		$typeId=$d[0]['id'];
+
 
 		$d=$this->models->MediaTaxon->freeQuery("
-			select 
-				_a.file_name,
-				_a.thumb_name,
-				_a.taxon_id,
-				_c.meta_data as photographer_name,
-				_d.name,
-				trim(
-					ifnull(
-						concat(_j.uninomial,' ',_j.specific_epithet,' ',_j.infra_specific_epithet),
-						replace(_j.name,_j.authorship,'')
-					) 
-				)  as taxon
-			from %PRE%media_taxon _a ".
-			(!empty($search['photographer']) ? "
-				right join %PRE%media_meta _b
-					on _a.project_id=_b.project_id
-					and _a.id=_b.media_id
-					and _b.sys_label='beeldbankFotograaf'
-					and _b.meta_data like '".mysql_real_escape_string($search['photographer'])."%'"
-					: ""
-			).
-			(!empty($search['taxon']) || !empty($search['higherTaxon']) ? "
-				right join %PRE%names _d
-					on _a.project_id=_d.project_id
-					and _a.taxon_id=_d.taxon_id"
-				: ""
-			)."
-			left join %PRE%media_meta _c
-				on _a.project_id=_c.project_id
-				and _a.id = _c.media_id
-				and _c.sys_label = 'beeldbankFotograaf'
-
-			left join %PRE%taxa _e
+			select
+				distinct 
+				_a.taxon_id as id,
+				if (_a.type_id=".$typeId.",_a.name,concat(_a.name,if(_c.name is null,'',concat(' - [',_c.name,']')))) as label
+			from %PRE%names _a
+			
+			right join %PRE%media_taxon _b
+				on _a.taxon_id = _b.taxon_id
+				and _a.project_id = _b.project_id
+			
+			left join %PRE%names _c
+				on _a.taxon_id=_c.taxon_id
+				and _a.project_id=_c.project_id
+				and _c.type_id=".$typeId."
+				and _c.language_id=".LANGUAGE_ID_DUTCH."
+			
+			left join lng_nsr_taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
-
-			left join %PRE%projects_ranks _f
+			
+			left join lng_nsr_projects_ranks _f
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
-
-			left join %PRE%names _j
-				on _a.taxon_id=_j.taxon_id
-				and _a.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-
-			where
-				_a.project_id=".$this->getCurrentProjectId()."
-
-				".(!empty($search['taxon']) ? "and (_d.name like '".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
-				".(!empty($search['higherTaxon']) ? "and (_d.name like '".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
 				
-			order by ".($search['sort']=='photographer' ? "photographer_name" : "taxon" )."
-
-			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _f.lower_taxon=1
+				and _a.name like '". mysql_real_escape_string($p['search']) ."%'
+				and (_a.language_id=".LANGUAGE_ID_DUTCH." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")
+				order by label
+			limit ".$this->_suggestionListItemMax
 		);
-	
-//		q($this->models->MediaTaxon->q());
-//		q($d,1);
+
 		return $d;
 		
-			
 	}
 
 
