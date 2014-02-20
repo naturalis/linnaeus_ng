@@ -9,5 +9,5 @@
 &nbsp;
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
-<a href="../search/search_index.php">Extensive search</a>
+<a href="../search/index.php">Extensive search</a>
 <span id="message-container" style="float:right"></span>

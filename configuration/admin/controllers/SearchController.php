@@ -164,10 +164,10 @@ class SearchController extends Controller
     public function searchResetAction ()
     {
 		unset($_SESSION['admin']['user']['search']);
-		$this->redirect('search_index.php');
+		$this->redirect('index.php');
 	}
 
-    public function searchIndexAction ()
+    public function indexAction ()
     {
 
 		$this->checkAuthorisation();

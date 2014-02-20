@@ -23,6 +23,9 @@ $(document).ready(function(){
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();
 	}
+	$('img').bind('contextmenu',function(e){
+		e.preventDefault();
+	});	
 })
 </script>
 <script type="text/javascript">
