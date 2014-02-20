@@ -7,7 +7,7 @@
 &nbsp;
 <a href="edit.php?action=new" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
-<a href="../search/search_index.php">Extensive search</a>
+<a href="../search/index.php">Extensive search</a>
 <span id="message-container" style="float:right"></span>
 <p>
 {if $alpha|@count==0}

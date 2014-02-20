@@ -8,7 +8,7 @@
 		{$replacementResultCounters.skipped} match(es) skipped.<br />
 		{$replacementResultCounters.mismatched} unchanged (mismatch: changes made between search and replace?).
 	</p>
-	<input type="button" value="{t}back{/t}" onclick="window.open('search_index.php','_self')" />
+	<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
 	</div>
 </div>
 

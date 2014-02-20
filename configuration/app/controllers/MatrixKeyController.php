@@ -2299,7 +2299,6 @@ class MatrixKeyController extends Controller
 
     private function createDatasetEntry ($p)
     {
-		
         $val = isset($p['val']) ? $p['val'] : null;
         $nbc = isset($p['nbc']) ? $p['nbc'] : null;
         $label = isset($p['label']) ? $p['label'] : null;
@@ -2338,7 +2337,7 @@ class MatrixKeyController extends Controller
             'n' => isset($image),
 			'x' => isset($image) ? null : $this->_nbcImageRoot.'noimage.gif',
             'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
-            'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
+            'p' => isset($nbc['photographer']) ? $nbc['photographer']['value'] : null, 
             'u' => $urlExternalPage, 
 			'v' => $this->_externalSpeciesUrlTarget,  // default _blank
             'r' => count((array) $related), 

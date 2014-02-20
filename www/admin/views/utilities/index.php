@@ -1,4 +1,4 @@
 <?php
 
-header('Location:search_index.php');
+header('Location:index.php');
 

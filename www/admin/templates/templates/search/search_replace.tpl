@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<form method="post" id="backForm" action="search_index.php"><input type="hidden" name="action" value="repeat" /></form>
+<form method="post" id="backForm" action="index.php"><input type="hidden" name="action" value="repeat" /></form>
 	<div id="results">
 		<div id="replaceResultHeader">
 			<p>

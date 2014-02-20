@@ -235,9 +235,11 @@ function nbcFormatResult(data) {
 	}
 
 	var photoLabel = 
+		'<div style="margin-left:130px">'+
 		(data.s==data.l || !data.s ? '<i>'+(data.l)+'</i>' : data.l)+
 		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.e+'" />' : '' )+
-		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')
+		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')+
+		(data.p ? '<br />('+_('foto')+' &copy; '+(data.p)+')' : '')+'</div>';
 	
 	var id = data.y+'-'+data.i;
 
@@ -284,7 +286,7 @@ function nbcFormatResult(data) {
         <div class="result-result"> \
 			<div class="result-image-container">'+
 				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
-				'<img class="result-image" src="'+data.m+'" />' +
+				'<img class="result-image" src="'+data.m+'" title="'+(data.p ? _('foto')+' &copy;'+data.p : '')+'" />' +
 				(data.n ? '</a>' : '' )+
             '</div> \
 			<div class="result-labels">'+

@@ -5,4 +5,4 @@
 {*&nbsp;&nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />*}
 &nbsp;&nbsp;
-<a href="../search/search_index.php">Extensive search</a>
+<a href="../search/index.php">Extensive search</a>
