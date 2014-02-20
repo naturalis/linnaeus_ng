@@ -8,7 +8,7 @@
 
 <p>
 
-	<input type="button" onclick="window.open('search_index.php','_self');" value="modify search"> <input type="button" onclick="window.open('search_reset.php','_self');" value="new search">
+	<input type="button" onclick="window.open('index.php','_self');" value="modify search"> <input type="button" onclick="window.open('search_reset.php','_self');" value="new search">
 
 	<h2>Results ({$results.count})</h2>
 
