@@ -464,7 +464,7 @@ function nbcRefreshGroupMenu() {
 				var c = data.groups[i].chars[j];
 	
 				if (c.disabled===true)
-					s=s+"<li>"+c.label+(c.value?c.value:"");
+					s=s+"<li class='key-disabled'>"+c.label+(c.value?c.value:"");
 				else
 					s=s+"<li><a href='#' onclick='nbcShowStates("+c.id+");return false;'>"+c.label+(c.value?c.value:"")+"</a>";
 					
