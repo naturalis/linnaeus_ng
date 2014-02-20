@@ -244,7 +244,7 @@ class SearchControllerNSR extends SearchController
 		if (isset($search['group_id'])) {
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($search['group_id']),'match'=>'id'));
 		} else {
-			$d=$this->getSuggestionsGroup(array('name'=>$search,'match'=>'exact'));
+			$d=$this->getSuggestionsGroup(array('name'=>$search['group'],'match'=>'exact'));
 		}
 
 		if ($d) 
@@ -414,6 +414,34 @@ class SearchControllerNSR extends SearchController
 
 	private function doPictureSearch($p)
 	{
+		
+/*
+
+array(7) {
+  ["name_id"]=>
+  string(0) ""
+  ["group_id"]=>
+  string(0) ""
+  ["name"]=>
+  string(9) "Soortnaam"
+  ["group"]=>
+  string(10) "Soortgroep"
+
+  ["sort"]=>
+  string(9) "validName"
+  
+*/
+
+		if (isset($p['group_id'])) {
+			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
+		} else {
+			$d=$this->getSuggestionsGroup(array('name'=>$search,'match'=>'exact'));
+		}
+
+		if ($d) 
+			$ancestor=$d[0];
+		else
+			return null;
 
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
@@ -473,7 +501,7 @@ class SearchControllerNSR extends SearchController
 			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
 		);
 	
-//		q($this->models->MediaTaxon->q(),1);
+		q($this->models->MediaTaxon->q(),1);
 //		q($d,1);
 		return $d;
 		
