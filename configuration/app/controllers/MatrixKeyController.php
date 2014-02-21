@@ -17,6 +17,7 @@ class MatrixKeyController extends Controller
 	private $_nbcImageRoot = null;
 	private $_externalSpeciesUrlPrefix = null;
 	private $_matrix_use_emerging_characters = null;
+	private $__matrix_calc_char_h_val=true;
 
     public $usedModels = array(
         'matrix', 
@@ -1021,6 +1022,8 @@ class MatrixKeyController extends Controller
         $this->_matrixSuppressDetails = $this->getSetting('matrix_suppress_details','0')=='1';
 		$this->_externalSpeciesUrlPrefix = $this->getSetting('external_species_url_prefix');
 		$this->_matrix_use_emerging_characters = $this->getSetting('matrix_use_emerging_characters',true);
+		$this->_matrix_calc_char_h_val = $this->getSetting('matrix_calc_char_h_val',true);
+
 
         if ($this->_matrixType == 'nbc') {
 			$_SESSION['app']['system']['urls']['nbcImageRoot']=$this->_nbcImageRoot = $this->getSetting('nbc_image_root');
@@ -1364,7 +1367,7 @@ class MatrixKeyController extends Controller
 
 			where 
 				_a.project_id=".$this->getCurrentProjectId()." 
-				and _a.characteristic_id=".$id." 
+				".($id=='*' ? "" : "and _a.characteristic_id=".$id)." 
 
 			order by 
 				_a.show_order
@@ -1733,15 +1736,18 @@ class MatrixKeyController extends Controller
         return ($a['s'] > $b['s']) ? -1 : 1;
     }
 
-    private function getCharacteristicHValue ($charId, $states = null)
+    private function getCharacteristicHValue ($charId,$states=null)
     {
-        $states = is_null($states) ? $this->getCharacteristicStates($charId) : $states;
+		
+		if (!$this->_matrix_calc_char_h_val)
+			return null;
+		
+        $states=is_null($states) ? $this->getCharacteristicStates($charId) : $states;
         
-        $taxa = array();
-        
-        $tot = 0;
-        
-        foreach ((array) $states as $key => $val) {
+        $taxa=array();
+        $tot=0;
+			        
+        foreach((array)$states as $key=>$val) {
             
             $states[$key]['n'] = 0;
             
@@ -1763,7 +1769,7 @@ class MatrixKeyController extends Controller
                 $tot++;
             }
         }
-        
+		
         if ($tot == 0)
             return 0;
         
@@ -1787,35 +1793,53 @@ class MatrixKeyController extends Controller
 
     private function getCharacteristics ()
     {
-        $mc = $this->models->CharacteristicMatrix->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id' => $this->getCurrentMatrixId()
-            ), 
-            'columns' => 'characteristic_id,show_order', 
-            'order' => 'show_order'
-        ));
-        
+
+        $mc = $this->models->CharacteristicMatrix->freeQuery("
+			select
+				_a.characteristic_id as id,
+				_b.type,
+				_c.label,
+				if (_b.type='media'||_b.type='text','c','f') as prefix,
+				_a.show_order
+
+			from 
+				%PRE%characteristics_matrices _a
+				
+			right join %PRE%characteristics _b
+				on _a.project_id = _b.project_id
+				and _a.characteristic_id = _b.id
+
+			left join %PRE%characteristics_labels _c
+				on _a.project_id=_c.project_id
+				and _a.characteristic_id=_c.characteristic_id
+				and _c.language_id=".$this->getCurrentLanguageId()."
+				
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.matrix_id = ".$this->getCurrentMatrixId()." 
+			order by 
+				_a.show_order
+		");
+
+		$allStates=array();
+
+		foreach((array)$this->getCharacteristicStates('*') as $val)
+			$allStates[$val['characteristic_id']][]=$val;
+		
         foreach ((array) $mc as $key => $val) {
-            
-            $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
-	
-            if ($d) {
-				$d['prefix'] = ($d['type'] == 'media' || $d['type'] == 'text' ? 'c' : 'f');
-                $states = $this->getCharacteristicStates($val['characteristic_id']);
-                $d['sort_by']['alphabet'] = isset($d['label']) ? strtolower(preg_replace('/[^A-Za-z0-9]/', '', $d['label'])) : '';
-                $d['sort_by']['separationCoefficient'] = -1 * $this->getCharacteristicHValue($val['characteristic_id'], $states); // -1 to avoid asc/desc hassles in JS-sorting
-                $d['sort_by']['characterType'] = strtolower(
-                preg_replace('/[^A-Za-z0-9]/', '', $d['type']['name']));
-                $d['sort_by']['numberOfStates'] = -1 * count((array) $states); // -1 to avoid asc/desc hassles in JS-sorting
-                $d['sort_by']['entryOrder'] = intval($val['show_order']);
-                $d['states'] = $states;
-                $c[] = $d;
-            }
+                $mc[$key]['states']=$allStates[$val['id']];
+                $mc[$key]['sort_by'] = array(
+					'alphabet' => isset($val['label']) ? strtolower(preg_replace('/[^A-Za-z0-9]/', '', $val['label'])) : '',
+					'characterType' => strtolower(preg_replace('/[^A-Za-z0-9]/', '', $val['type'])),
+					'numberOfStates' => -1 * count((array)$mc[$key]['states']), // -1 to avoid asc/desc hassles in JS-sorting
+					'entryOrder' => intval($val['show_order']),
+					'separationCoefficient' => -1 * $this->getCharacteristicHValue($val['id'],$mc[$key]['states']) // -1 to avoid asc/desc hassles in JS-sorting
+				);
+
         }
-        
-        return isset($c) ? $c : null;
+
+        return isset($mc) ? $mc : null;
+
     }
 
     private function getCharacteristic ($p)
@@ -3008,7 +3032,7 @@ class MatrixKeyController extends Controller
     private function nbcGetTaxaScores ($selectedStates = null)
     {
         $states = array();
-        
+
         $d = isset($selectedStates) ? $selectedStates : $this->stateMemoryRecall();
         
         // get all stored selected states
@@ -3129,7 +3153,7 @@ class MatrixKeyController extends Controller
                 }
             }
         }
-die();
+
         if (count((array)$res)==1) {
             
             $res[0]['d'] =
@@ -3149,7 +3173,7 @@ die();
 		
 		if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-die();
+
         return $res;
     }
 
