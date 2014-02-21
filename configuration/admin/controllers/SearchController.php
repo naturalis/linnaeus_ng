@@ -1002,7 +1002,7 @@ class SearchController extends Controller
 					//'%LITERAL%' => "MATCH(title,content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
 					'%LITERAL%' => $this->makeLikeClause($p[S_LIKETEXT_STRING],array('title','content')),
 				),
-				'columns' => 'id,keystep_id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__
+				'columns' => 'keystep_id as id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__
 			)
 		);
 

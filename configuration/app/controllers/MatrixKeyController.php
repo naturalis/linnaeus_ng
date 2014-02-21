@@ -1335,32 +1335,44 @@ class MatrixKeyController extends Controller
         if (!isset($id))
             return;
 
-        $cs = $this->models->CharacteristicState->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'characteristic_id' => $id
-            ), 
-            'order' => 'show_order', 
-            'columns' => 'id,characteristic_id,file_name,file_dimensions,lower,upper,mean,sd,got_labels,show_order'
-        ));
-
-		$d = $this->getCharacteristic(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id' => $id
-			)
-		);
-		
-        foreach ((array) $cs as $key => $val) {
-            $cs[$key]['type'] = $d['type'];
-            $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
-            $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
-            $cs[$key]['img_dimensions']=explode(':',$val['file_dimensions']);
+        $cs=$this->models->CharacteristicState->freeQuery("
+			select 
+				_a.id,
+				_a.characteristic_id,
+				_a.file_name,
+				_a.file_dimensions,
+				_a.lower,
+				_a.upper,
+				_a.mean,
+				_a.sd,
+				_a.got_labels,
+				_a.show_order,
+				_b.type,
+				_c.label,
+				_c.text
+				
+			from %PRE%characteristics_states _a
 			
-//            $cs[$key]['img_dimensions'] = empty($val['file_dimensions']) ? null : $this->scaleDimensions(explode(':',$val['file_dimensions'])); // gives w, h // should be done through project specific stylesheet
+			left join %PRE%characteristics _b
+				on _a.characteristic_id = _b.id
+				and _a.project_id=_b.project_id
 
-        }
+			left join %PRE%characteristics_labels_states _c
+				on _a.id = _c.state_id
+				and _a.project_id=_c.project_id
+				and _c.language_id=".$this->getCurrentLanguageId()."
+
+			where 
+				_a.project_id=".$this->getCurrentProjectId()." 
+				and _a.characteristic_id=".$id." 
+
+			order by 
+				_a.show_order
+			"
+		);
+
+        foreach ((array) $cs as $key => $val)
+            $cs[$key]['img_dimensions']=explode(':',$val['file_dimensions']);
 
         return $cs;
     }
@@ -1876,8 +1888,74 @@ class MatrixKeyController extends Controller
         return $char;
     }
 
-    private function getEntityStates ($id, $type)
+    private function getEntityStates($id,$type)
     {
+		$mts=$this->models->MatrixTaxonState->freeQuery("
+		select 
+			_c.label as characteristic,
+			_b.type,
+			_b.type,
+			_a.project_id,
+			_a.state_id,
+			_d.characteristic_id,
+			_d.file_name,
+			_d.lower,
+			_d.upper,
+			_d.mean,
+			_d.sd,
+			_d.got_labels,
+			_e.label
+			
+		from %PRE%matrices_taxa_states _a
+		
+		left join %PRE%characteristics_states _d
+			on _a.project_id=_d.project_id
+			and _a.state_id=_d.id
+
+		left join %PRE%characteristics _b
+			on _a.project_id=_b.project_id
+			and _a.characteristic_id=_b.id
+
+		left join %PRE%characteristics_labels _c
+			on _a.project_id=_c.project_id
+			and _a.characteristic_id=_c.characteristic_id
+			and _c.language_id=".$this->getCurrentLanguageId()."
+
+		left join %PRE%characteristics_labels_states _e
+			on _a.state_id = _e.state_id
+			and _a.project_id=_e.project_id
+			and _e.language_id=".$this->getCurrentLanguageId()."
+
+		
+		where 
+			_a.project_id = ".$this->getCurrentProjectId()." 
+			and _a.matrix_id = ".$this->getCurrentMatrixId()." 
+			and _a.".($type=="variation" ? "variation_id" : ($type=="matrix" ? "ref_matrix_id" : "taxon_id"))."=".$id
+		);		
+		
+		$res=array();
+		foreach((array)$mts as $val) {
+
+			$d=explode('|',$val['characteristic']);
+			$res[$val['characteristic_id']]['characteristic']=$d[0];
+			//$res[$val['characteristic_id']]['explanation']=$d[1];
+			$res[$val['characteristic_id']]['type'] = $val['type'];
+			$res[$val['characteristic_id']]['states'][$val['state_id']] = array(
+				'characteristic_id'=>$val['characteristic_id'],
+				'id'=>$val['state_id'],
+				'file_name'=>$val['file_name'],
+				'lower'=>$val['lower'],
+				'upper'=>$val['upper'],
+				'mean'=>$val['mean'],
+				'sd'=>$val['sd'],
+				'got_labels'=>$val['got_labels'],
+				'label'=>$val['label']
+			);
+		}
+		
+		//q($res,1);
+		return $res;
+		
 
 		$d = array(
 			'project_id' => $this->getCurrentProjectId(), 
@@ -1897,7 +1975,7 @@ class MatrixKeyController extends Controller
 			'id' => $d, 
 			'columns' => 'characteristic_id,state_id'
 		));
-		
+
 		$res = array();
 			
         foreach ((array) $mts as $key => $val) {
@@ -1909,25 +1987,27 @@ class MatrixKeyController extends Controller
 			
         }
 
-		return $res;        
+		q($res,1);
+
+		return $res;
     }
 
-    private function getTaxonStates ($id)
+    private function getTaxonStates($id)
     {
         return $this->getEntityStates ($id,'taxon');
     }
 
-    private function getVariationStates ($id)
+    private function getVariationStates($id)
     {
         return $this->getEntityStates ($id,'variation');
     }
     
-    private function getMatrixStates ($id)
+    private function getMatrixStates($id)
     {
         return $this->getEntityStates ($id,'matrix');
     }
 
-    private function getTaxonComparison ($id)
+    private function getTaxonComparison($id)
     {
         if (empty($id[0]) || empty($id[1]))
             return;
@@ -2717,7 +2797,7 @@ class MatrixKeyController extends Controller
     private function nbcGetCompleteDataset ($p = null)
     {
 
-        $res = false;//$this->getCache('matrix-nbc-data-'.$this->getCurrentMatrixId());
+        $res = $this->getCache('matrix-nbc-data-'.$this->getCurrentMatrixId());
 
         if (!$res) {
 
@@ -2911,6 +2991,7 @@ class MatrixKeyController extends Controller
             else {
                 
                 $taxon = $this->getTaxonById($val['relation_id']);
+
                 $val['l'] = $taxon['label'];
                 
                 $c = $this->models->Commonname->_get(
@@ -2986,7 +3067,7 @@ class MatrixKeyController extends Controller
             if ($match['s'] == 100) {
 
                 if ($match['type'] == 'variation') {
-
+continue;
                     $val = $this->getVariation($match['id']);
 
                     $nbc = $this->models->NbcExtras->_get(
@@ -3103,6 +3184,9 @@ class MatrixKeyController extends Controller
 		
 		if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
+
+
+
 
         return $res;
     }
@@ -3288,7 +3372,6 @@ class MatrixKeyController extends Controller
  
  	private function nbcHandleOverlappingItemsFromDetails($p)
 	{
-		
 		//return $p['data'];
 
         $data = isset($p['data']) ? $p['data'] : null;
