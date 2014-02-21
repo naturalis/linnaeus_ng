@@ -293,8 +293,6 @@ class SpeciesController extends Controller
 					$content = $this->matchHotwords($content);
 				}
 				
-//q($content,1);
-            
                 $this->smarty->assign('content', $content);
 
                 $this->smarty->assign('rdf', $rdf);
@@ -310,6 +308,7 @@ class SpeciesController extends Controller
             $this->smarty->assign('activeCategory', $activeCategory);
 
             $this->smarty->assign('categorySysList', $categories['categorySysList']);
+
             $this->smarty->assign('headerTitles', array('title' => $taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
             
             //$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
