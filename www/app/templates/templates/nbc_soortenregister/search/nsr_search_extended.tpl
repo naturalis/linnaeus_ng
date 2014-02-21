@@ -108,7 +108,9 @@
 			<h4>{$results|@count}{if $results|@count<$result_count} van {$result_count}{/if} resultaten</h4>
 			{foreach from=$results item=v}
 				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
+					{if $v.overview_image}
 					<img src="http://images.ncbnaturalis.nl/comping/{$v.overview_image}" style="width:140px;height:auto;float:right"/>
+					{/if}
 					<strong><a href="../species/taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong><br />
 					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
 					Status voorkomen: {$v.presence_information_index_label} {$v.presence_information_title}
