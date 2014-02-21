@@ -1955,41 +1955,6 @@ class MatrixKeyController extends Controller
 		
 		//q($res,1);
 		return $res;
-		
-
-		$d = array(
-			'project_id' => $this->getCurrentProjectId(), 
-			'matrix_id' => $this->getCurrentMatrixId()
-		);
-		
-		if ($type == 'variation')
-			$d['variation_id'] = $id;
-		else
-		if ($type == 'matrix')
-			$d['ref_matrix_id'] = $id;
-		else
-			$d['taxon_id'] = $id;
-
-		$mts = $this->models->MatrixTaxonState->_get(
-		array(
-			'id' => $d, 
-			'columns' => 'characteristic_id,state_id'
-		));
-
-		$res = array();
-			
-        foreach ((array) $mts as $key => $val) {
-            
-            $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
-			$res[$val['characteristic_id']]['characteristic'] = $d['label'];
-			$res[$val['characteristic_id']]['type'] = $d['type'];
-			$res[$val['characteristic_id']]['states'][$val['state_id']] = $this->getCharacteristicState($val['state_id']);
-			
-        }
-
-		q($res,1);
-
-		return $res;
     }
 
     private function getTaxonStates($id)
@@ -3067,7 +3032,7 @@ class MatrixKeyController extends Controller
             if ($match['s'] == 100) {
 
                 if ($match['type'] == 'variation') {
-continue;
+
                     $val = $this->getVariation($match['id']);
 
                     $nbc = $this->models->NbcExtras->_get(
@@ -3184,9 +3149,6 @@ continue;
 		
 		if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-
-
-
 
         return $res;
     }
