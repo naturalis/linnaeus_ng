@@ -122,6 +122,34 @@ class SearchControllerNSR extends SearchController
     }
 
 
+    public function searchPicturesAction ()
+    {
+
+		if (
+			$this->rHasVal('name') ||
+			$this->rHasVal('name_id')||
+			$this->rHasVal('group')||
+			$this->rHasVal('group_id') ||
+			$this->rHasVal('photographer') ||
+			$this->rHasVal('photographer')||
+			$this->rHasVal('validator')
+		)
+		{
+			
+			$this->smarty->assign('search',$this->requestData);	
+			$results = $this->doPictureSearch($this->requestData);
+			$this->smarty->assign('results',$results);	
+			
+		}
+
+		//$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+
+        $this->printPage();
+  
+    }
+
+
+
 	private function getPresenceStatuses()
 	{
 		
@@ -414,94 +442,85 @@ class SearchControllerNSR extends SearchController
 
 	private function doPictureSearch($p)
 	{
-		
-/*
 
-array(7) {
-  ["name_id"]=>
-  string(0) ""
-  ["group_id"]=>
-  string(0) ""
-  ["name"]=>
-  string(9) "Soortnaam"
-  ["group"]=>
-  string(10) "Soortgroep"
+		$group_id=null;
 
-  ["sort"]=>
-  string(9) "validName"
-  
-*/
-
-		if (isset($p['group_id'])) {
-			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
-		} else {
-			$d=$this->getSuggestionsGroup(array('name'=>$search,'match'=>'exact'));
+		if (empty($p['group_id']) && !empty($p['group'])) {
+			$d=$this->getSuggestionsGroup(array('name'=>$p['group'],'match'=>'exact'));
+			if ($d) 
+				$group_id=$d[0];
+		} else
+		if (!empty($p['group_id'])) {
+			$group_id=intval($p['group_id']);
 		}
-
-		if ($d) 
-			$ancestor=$d[0];
-		else
-			return null;
 
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
+			
+				_a.id,
+				_a.taxon_id,
 				_a.file_name,
 				_a.thumb_name,
-				_a.taxon_id,
 				_c.meta_data as photographer_name,
-				_d.name,
-				trim(
-					ifnull(
-						concat(_j.uninomial,' ',_j.specific_epithet,' ',_j.infra_specific_epithet),
-						replace(_j.name,_j.authorship,'')
-					) 
-				)  as taxon
-			from %PRE%media_taxon _a ".
-			(!empty($p['photographer']) ? "
-				right join %PRE%media_meta _b
-					on _a.project_id=_b.project_id
-					and _a.id=_b.media_id
-					and _b.sys_label='beeldbankFotograaf'
-					and _b.meta_data like '".mysql_real_escape_string($p['photographer'])."%'"
-					: ""
-			).
-			((!empty($p['name']) && empty($p['name_id'])) || (!empty($search['group']) && !empty($search['group_id'])) ? "
-				right join %PRE%names _d
-					on _a.project_id=_d.project_id
-					and _a.taxon_id=_d.taxon_id"
-				: ""
-			)."
+				_f.lower_taxon,
+				_q.parentage,
+				_j.name,
+				_b.taxon,
+
+				_meta1.meta_data as meta_datum,
+				_meta2.meta_data as meta_short_desc
+				
+			from  %PRE%media_taxon _a 
+			
 			left join %PRE%media_meta _c
 				on _a.project_id=_c.project_id
 				and _a.id = _c.media_id
 				and _c.sys_label = 'beeldbankFotograaf'
 
-			left join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
 
+			left join %PRE%media_meta _meta1
+				on _a.id=_meta1.media_id
+				and _a.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
+			left join %PRE%media_meta _meta2
+				on _a.id=_meta2.media_id
+				and _a.project_id=_meta2.project_id
+				and _meta2.sys_label='beeldbankOmschrijvingKort'
+			
+
+			
+			left join %PRE%taxa _b
+				on _a.taxon_id = _b.id
+				and _a.project_id = _b.project_id
+			
 			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
+				on _b.rank_id=_f.id
+				and _b.project_id = _f.project_id
+			
+			left join %PRE%taxon_quick_parentage _q
+				on _a.taxon_id=_q.taxon_id
+				and _a.project_id=_q.project_id
+			
 			left join %PRE%names _j
 				on _a.taxon_id=_j.taxon_id
 				and _a.project_id=_j.project_id
 				and _j.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+			
+			where _a.project_id = ".$this->getCurrentProjectId()."
+			
+				".(!empty($p['name_id']) ? "and _a.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
+				".(!empty($p['name']) && empty($p['name']) ? "and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.lower_taxon=1"  : "")." 		
+				".(!empty($p['photographer'])  ? "and _c.meta_data like '". mysql_real_escape_string($p['photographer'])."%'"  : "")." 		
+				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")." 		
 
-			where
-				_a.project_id=".$this->getCurrentProjectId()."
+			order by ".($p['sort']=='photographer' ?  "_c.meta_data" : "_b.taxon")."
+			".(isset($offset) ? "offset ".$offset : "")."
+			".(isset($limit) ? "limit ".$limit : "")
+			);
 
-				".(!empty($search['taxon']) ? "and (_d.name like '".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
-				".(!empty($search['higherTaxon']) ? "and (_d.name like '".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
-				
-			order by ".($search['sort']=='photographer' ? "photographer_name" : "taxon" )."
-
-			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
-		);
-	
-		q($this->models->MediaTaxon->q(),1);
+//		q($this->models->MediaTaxon->q(),1);
 //		q($d,1);
 		return $d;
 		
@@ -694,75 +713,6 @@ array(7) {
 		return $d;
 		
 	}
-
-
-
-
-
-    public function searchPicturesAction ()
-    {
-
-		if (
-			$this->rHasVal('taxon') ||
-			$this->rHasVal('higherTaxon')||
-			$this->rHasVal('photographer')||
-			$this->rHasVal('validator')
-		)
-		{
-			
-			$search=$this->requestData;
-
-			$this->smarty->assign('search',$search);	
-
-			//q($this->doPictureSearch($search),1);	
-			$this->smarty->assign('results',$this->doPictureSearch($search));	
-			
-			
-			
-
-/*
-			$_SESSION['app'][$this->spid()]['search_picture'] = array(
-				'taxon' => $this->requestData['taxon'],
-				'higherTaxon' => $this->requestData['higherTaxon'],
-				'photographer' => $this->requestData['photographer'],
-				'validator' => $this->requestData['validator']
-				);
-
-*/
-
-
-/*
-select _a.meta_data, _b.original_name, _c.taxon
-from %PRE%media_meta _a
-
-left join %PRE%media_taxon _b
-	on _a.project_id=_b.project_id
-	and _a.media_id=_b.id 
-
-left join %PRE%taxa _c
-	on _a.project_id=_c.project_id
-	and _b.taxon_id=_c.id
-
-	where
-	_a.project_id=1 and
-	(sys_label = 'beeldbankFotograaf' and meta_data like '%De Vos%') 
-*/
-
-		
-//			if ($this->validateSearchString($this->requestData['search'])) {
-	
-				
-//			}
-			
-		}
-
-		//$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
-
-		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
-
-        $this->printPage();
-  
-    }
 
 
 
