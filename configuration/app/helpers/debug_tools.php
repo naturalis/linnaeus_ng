@@ -2,6 +2,9 @@
 
 class DebugTools {}
 
+//q(timeTaken(),1);
+
+
 function q ($v,$d=false)
 {
 	echo '<pre>';
@@ -56,4 +59,10 @@ function getTime(&$list,$output=true)
 	if ($output) echo chr(10).'<!--'.chr(10).$b;
 	if ($output) echo chr(10).'-->'.chr(10);
 
+}
+
+function timeTaken()
+{
+	global $excStartMicroTime;
+	return microtime(true)-$excStartMicroTime;
 }

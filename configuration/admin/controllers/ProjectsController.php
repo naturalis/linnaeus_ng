@@ -60,6 +60,7 @@ class ProjectsController extends Controller
 		array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
 		array('matrix_use_emerging_characters','bool',0,'treat characters that are specified for only some species as "emerging" (default=true)'),  // nbc only
 		array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
+		array('matrix_calc_char_h_val','bool',0,'false: do not calculate characters H-value; enhances performance'),
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
 		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
