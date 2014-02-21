@@ -19,7 +19,7 @@
 		{foreach name=taxonloop from=$taxa key=k item=v}
 		<tr class="highlight">
 			<td>
-				<a href="../{if $taxonType=='higher'}highertaxa{else}species{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+				<a href="../species/taxon.php?id={$v.id}">{$v.label}</a>
 			</td>
 			<td>({$ranks[$v.rank_id].rank})</td>
 		</tr>

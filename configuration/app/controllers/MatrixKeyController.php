@@ -3129,7 +3129,7 @@ class MatrixKeyController extends Controller
                 }
             }
         }
-
+die();
         if (count((array)$res)==1) {
             
             $res[0]['d'] =
@@ -3149,7 +3149,7 @@ class MatrixKeyController extends Controller
 		
 		if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-
+die();
         return $res;
     }
 
