@@ -32,7 +32,7 @@
             <h2>Indeling</h2>
 			
 			<table>
-			{math equation="(x-3)" x=$classification|@count assign=start}
+			{math equation="(x-4)" x=$classification|@count assign=start}
 			{section name=taxon loop=$classification start=$start}
 				{math equation="x-y" x=$smarty.section.taxon.index y=$start assign=buffercount}
 				{if $classification[taxon].parent_id!=null}
@@ -43,17 +43,15 @@
 					{/if}
 					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{/if}">
 					<a href="taxon.php?id={$classification[taxon].id}">
-						{if $classification[taxon].specificEpithet}
-							{$classification[taxon].specificEpithet}
-						{elseif $classification[taxon].uninomial}
-							{$classification[taxon].uninomial}
+						{if $classification[taxon].lower_taxon==1}
+						{$classification[taxon].specific_epithet} {$classification[taxon].infra_specific_epithet}
 						{else}
-							{$classification[taxon].taxon}
+						{$classification[taxon].taxon}
 						{/if}
 					</a>
 					</span>
 					{assign var=rank_id value=$classification[taxon].rank_id}
-					<span class="classification-rank">[{$ranks[$rank_id].rank}]</span>
+					<span class="classification-rank">[{$classification[taxon].rank}]</span>
 				</td></tr>
 				{/if}
 			{/section}

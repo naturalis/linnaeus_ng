@@ -142,6 +142,67 @@ class SpeciesController extends Controller
     }
 
 
+	private function _getTaxonClassificationNSR($id)
+	{
+
+		$taxon=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon,
+				_a.parent_id,
+				_m.uninomial,
+				_m.specific_epithet,
+				_m.infra_specific_epithet,
+				_m.authorship,
+				_f.rank_id,
+				_f.lower_taxon,
+				_g.label as rank
+			
+			from %PRE%taxa _a
+
+			left join %PRE%names _m
+				on _a.id=_m.taxon_id
+				and _a.project_id=_m.project_id
+				and _m.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _m.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id=_f.project_id
+
+			left join %PRE%labels_projects_ranks _g
+				on _a.rank_id=_g.project_rank_id
+				and _a.project_id = _g.project_id
+				and _g.language_id=". LANGUAGE_ID_SCIENTIFIC ."
+
+			where
+				_a.project_id =".$this->getCurrentProjectId()."
+				and _a.id=".$id."
+			"
+		);
+
+		array_unshift($this->tmp,$taxon[0]);
+	
+		if (!empty($taxon[0]['parent_id'])) {
+			$this->_getTaxonClassificationNSR($taxon[0]['parent_id']);
+		}
+	
+	}
+		
+	private function getTaxonClassificationNSR($id)
+	{
+
+		$this->tmp = array();
+
+		$this->_getTaxonClassificationNSR($id);
+
+		return $this->tmp;
+
+	}
+
+
+
     public function taxonAction ()
     {
         if ($this->rHasId()) {
@@ -231,40 +292,13 @@ class SpeciesController extends Controller
 				*/
 				if (isset($this->models->Names) && $this->getSetting('taxon_page_ext_classification',0)) {
 
-					/*
-						must redesign this, as the original method refuses empty categories as active ones,
-						whereas the NSR has several automatically generated pages that are empty in the
-						database.
-					*/
-	
 					$names=$this->getNames($taxon['id']);
-					$classification=$this->getTaxonClassification($taxon['id']);
-					
+
 					$this->smarty->assign('names',$names);
-
-					foreach((array)$classification as $key=>$val) {
-
-						$d=$this->getName(array(
-								'taxonId' => $val['id'],
-								'languageId' => $this->getCurrentLanguageId(),
-								'predicateType' => PREDICATE_PREFERRED_NAME
-						));
-
-						$classification[$key]['preferredName']=$d[0]['name'];
-
-						$d=$this->getName(array(
-								'taxonId' => $val['id'],
-								'languageId' => $this->getCurrentLanguageId(),
-								'predicateType' => PREDICATE_VALID_NAME
-						));
-
-						$classification[$key]['uninomial']=$d[0]['uninomial'];
-						$classification[$key]['specificEpithet']=$d[0]['specific_epithet'];
-
-					}
+	
+					$classification=$this->getTaxonClassificationNSR($taxon['id']);
 
 					$this->smarty->assign('classification',$classification);
-					$this->smarty->assign('ranks',$this->getProjectRanks());
 					
 					// verspreiding
 					if ($activeCategory==TAB_DISTRIBUTION) {
@@ -1625,62 +1659,59 @@ class SpeciesController extends Controller
 	
 		if (empty($nameId) && (empty($taxonId) || empty($languageId) || empty($predicateType))) return;
 
-		return $this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.taxon_id,
-						_a.name,
-						_a.uninomial,
-						_a.specific_epithet,
-						_a.name_author,
-						_a.authorship_year,
-						_a.reference,
-						_a.reference_id,
-						_a.expert,
-						_a.expert_id,
-						_a.organisation,
-						_a.organisation_id,
-						_b.nametype,
-						_a.language_id,
-						_c.language,
-						_d.label as language_label,
-						_e.name as expert_name,
-						_f.name as organisation_name,
-						_g.label as reference_label,
-						_g.author as reference_author,
-						_g.date as reference_date
-					from %PRE%names _a
+		return $this->models->Names->freeQuery("
+			select
+				_a.taxon_id,
+				_a.name,
+				_a.uninomial,
+				_a.specific_epithet,
+				_a.name_author,
+				_a.authorship_year,
+				_a.reference,
+				_a.reference_id,
+				_a.expert,
+				_a.expert_id,
+				_a.organisation,
+				_a.organisation_id,
+				_b.nametype,
+				_a.language_id,
+				_c.language,
+				_d.label as language_label,
+				_e.name as expert_name,
+				_f.name as organisation_name,
+				_g.label as reference_label,
+				_g.author as reference_author,
+				_g.date as reference_date
+			from %PRE%names _a
 
-					left join %PRE%name_types _b 
-						on _a.type_id=_b.id 
-						and _a.project_id = _b.project_id
-						
-					left join %PRE%languages _c 
-						on _a.language_id=_c.id
-						
-					left join %PRE%labels_languages _d 
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id 
-						and _d.label_language_id=".$languageId."
+			left join %PRE%name_types _b 
+				on _a.type_id=_b.id 
+				and _a.project_id = _b.project_id
+				
+			left join %PRE%languages _c 
+				on _a.language_id=_c.id
+				
+			left join %PRE%labels_languages _d 
+				on _a.language_id=_d.language_id
+				and _a.project_id=_d.project_id 
+				and _d.label_language_id=".$languageId."
 
-					left join %PRE%actors _e
-						on _a.expert_id = _e.id 
-						and _a.project_id=_e.project_id
+			left join %PRE%actors _e
+				on _a.expert_id = _e.id 
+				and _a.project_id=_e.project_id
 
-					left join %PRE%actors _f
-						on _a.organisation_id = _f.id 
-						and _a.project_id=_f.project_id
+			left join %PRE%actors _f
+				on _a.organisation_id = _f.id 
+				and _a.project_id=_f.project_id
 
-					left join %PRE%literature2 _g
-						on _a.reference_id = _g.id 
-						and _a.project_id=_g.project_id
-			
-					where _a.project_id = ".$this->getCurrentProjectId().
-					(!empty($nameId) ? " and _a.id=".$nameId : "").				
-					(!empty($taxonId) ? " and _a.taxon_id=".$taxonId : "").				
-					(!empty($predicateType) ? " and _b.nametype=".$predicateType : "")
-			)
+			left join %PRE%literature2 _g
+				on _a.reference_id = _g.id 
+				and _a.project_id=_g.project_id
+	
+			where _a.project_id = ".$this->getCurrentProjectId().
+			(!empty($nameId) ? " and _a.id=".$nameId : "").				
+			(!empty($taxonId) ? " and _a.taxon_id=".$taxonId : "").				
+			(!empty($predicateType) ? " and _b.nametype=".$predicateType : "")
 		);
 		
 	}
