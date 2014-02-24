@@ -98,7 +98,13 @@ class ProjectDeleteController extends Controller
     {
 		
 		set_time_limit(600);
+		$this->doDeleteAllButProjectItself($projectId);
+		$this->doDeleteProjectItself($projectId);
 		
+	}
+		
+    public function doDeleteAllButProjectItself ($projectId)
+    {
         $this->deleteNBCKeydata($projectId);
         $this->deleteIntroduction($projectId);
         $this->deleteGeoData($projectId);
@@ -115,13 +121,18 @@ class ProjectDeleteController extends Controller
         $this->deleteSpecies($projectId);
         $this->deleteFreeModules($projectId);
         $this->deleteProjectRanks($projectId);
+        $this->deleteModulesFromProject($projectId);
+        $this->deleteOtherStuff($projectId);
+
+    }
+
+    public function doDeleteProjectItself ($projectId)
+    {
         $this->deleteProjectUsers($projectId);
         $this->deleteProjectLanguage($projectId);
-        $this->deleteModulesFromProject($projectId);
         $this->deleteProjectCssFile($projectId);
         $this->deleteProjectSettings($projectId);
         $this->deleteProjectDirectories($projectId);
-        $this->deleteOtherStuff($projectId);
         $this->deleteProject($projectId);
     }
 

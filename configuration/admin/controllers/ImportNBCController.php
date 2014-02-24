@@ -358,13 +358,7 @@ class ImportNBCController extends ImportController
 
 					if ($this->rHasVal('action','replace_data')) {
 
-						$pDel->deleteNBCKeydata($pId);
-						$pDel->deleteCommonnames($pId);
-						$pDel->deleteSynonyms($pId);
-						$pDel->deleteSpeciesMedia($pId,true);
-						$pDel->deleteSpeciesContent($pId,false);
-						$pDel->deleteSpecies($pId);
-						$pDel->deleteProjectRanks($pId);
+						$pDel->doDeleteAllButProjectItself($pId);
 						
 					} else
 					if ($this->rHasVal('action','replace_species_data')) {
@@ -691,22 +685,20 @@ class ImportNBCController extends ImportController
 			$this->addMessage('Existing project, skipping settings.');
 			
 		}
-
+		
         $this->printPage();
 
     }
 
-
     public function nbcDeterminatie7Action ()
     {
+		$this->emptyCacheFolder($this->getNewProjectId());
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
         $this->reInitUserRolesAndRights();
         $this->setCurrentUserRoleId();
-
-        $this->emptyCacheFolder($this->getCurrentProjectId());  // does this even work?
-		
+	
         unset($_SESSION['admin']['system']['import']);
         unset($_SESSION['admin']['project']['ranks']);
         
@@ -1530,6 +1522,7 @@ class ImportNBCController extends ImportController
 
 	}
 
+
     private function storeSpeciesAndVariationsAndMatrices ($data)
     {
 
@@ -1891,6 +1884,7 @@ class ImportNBCController extends ImportController
         return $species;
     }
 
+
 	private function getExistingMatrixId($name)
 	{
 
@@ -1907,6 +1901,7 @@ class ImportNBCController extends ImportController
 		return isset($d[0]['matrix_id']) ? $d[0]['matrix_id'] : null;
 
 	}
+
 
     private function createMatrixIfNotExists($name)
     {
