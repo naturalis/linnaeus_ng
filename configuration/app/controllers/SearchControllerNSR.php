@@ -124,7 +124,6 @@ class SearchControllerNSR extends SearchController
 
     public function searchPicturesAction ()
     {
-
 		if (
 			$this->rHasVal('name') ||
 			$this->rHasVal('name_id')||
@@ -142,10 +141,9 @@ class SearchControllerNSR extends SearchController
 			
 		}
 
-		//$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
 
         $this->printPage();
-  
     }
 
 
