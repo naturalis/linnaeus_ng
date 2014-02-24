@@ -25,16 +25,20 @@
 	<b>Classification</b><br />
 	{foreach from=$content.classification key=k item=v name=classification}
 	{if $v.do_display}
-		{if $smarty.foreach.classification.last || $v.is_empty==1}
+	
+		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+
+		{* if $smarty.foreach.classification.last || $v.is_empty==1}
 			{$v.label}
 		{else}
 			<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
-		{/if}
+		{/if *}
 		<br />
 	{/if}
 	{/foreach}
 	</p>
 
+	{if $content.taxonlist|@count>0}
 	<p>
 	<b>{$taxon.label} {t}contains the following taxa{/t}:</b><br/>
 	{foreach from=$content.taxonlist key=k item=v name=list}
@@ -43,24 +47,10 @@
 		<br />
 	{/foreach}
 	</p>
+	{/if}
 
 	
 </div>
-{*
-	{elseif $activeCategory=='list'}
-	<div id="list">
-		<p>{$headerTitles.title} {t}contains the following taxa{/t}:</p>
-		{foreach from=$content key=k item=v name=list}
-			{if $useJavascriptLinks}			
-			<span class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})">{$v.label}</span>
-			{else}
-			<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
-		{/if}
-		{if $v.commonname} ({$v.commonname}){/if}
-		<br />
-		{/foreach}
-	</div>
-*}
 {elseif $activeCategory=='literature'}
 {if $contentCount.literature>0}
 <div id="literature">
@@ -183,6 +173,8 @@ $(document).ready(function(){
 {if $dispUrl && $dispName}
 	showMedia('{$dispUrl}','{$dispName}'); 
 {/if}
+
+	allLookupSetListMax(0);
 
 {literal}
 	/* $(".group1").colorbox({rel:'group1'}); */
