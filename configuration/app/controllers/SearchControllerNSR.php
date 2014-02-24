@@ -6,7 +6,7 @@ include_once ('SearchController.php');
 class SearchControllerNSR extends SearchController
 {
 
-	private $_suggestionListItemMax=50;
+	private $_suggestionListItemMax=25;
 
     public $usedModels = array(
 		'taxa',
@@ -463,20 +463,18 @@ class SearchControllerNSR extends SearchController
 				_a.thumb_name,
 				_c.meta_data as photographer_name,
 				_f.lower_taxon,
-				_q.parentage,
 				_j.name,
 				_b.taxon,
-
+				_k.name as dutch_name,
 				_meta1.meta_data as meta_datum,
 				_meta2.meta_data as meta_short_desc
 				
-			from  %PRE%media_taxon _a 
-			
+			from  %PRE%media_taxon _a 		
+
 			left join %PRE%media_meta _c
 				on _a.project_id=_c.project_id
 				and _a.id = _c.media_id
 				and _c.sys_label = 'beeldbankFotograaf'
-
 
 			left join %PRE%media_meta _meta1
 				on _a.id=_meta1.media_id
@@ -487,8 +485,13 @@ class SearchControllerNSR extends SearchController
 				on _a.id=_meta2.media_id
 				and _a.project_id=_meta2.project_id
 				and _meta2.sys_label='beeldbankOmschrijvingKort'
-			
 
+			left join %PRE%names _k
+				on _a.taxon_id=_k.taxon_id
+				and _a.project_id=_k.project_id
+				and _k.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.language_id=".LANGUAGE_ID_DUTCH."
 			
 			left join %PRE%taxa _b
 				on _a.taxon_id = _b.id
@@ -497,10 +500,11 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%projects_ranks _f
 				on _b.rank_id=_f.id
 				and _b.project_id = _f.project_id
-			
-			left join %PRE%taxon_quick_parentage _q
+
+			".(!empty($group_id) ? "left join %PRE%taxon_quick_parentage _q
 				on _a.taxon_id=_q.taxon_id
 				and _a.project_id=_q.project_id
+				" : "" )."
 			
 			left join %PRE%names _j
 				on _a.taxon_id=_j.taxon_id
@@ -522,6 +526,15 @@ class SearchControllerNSR extends SearchController
 
 //		q($this->models->MediaTaxon->q(),1);
 //		q($d,1);
+
+		setlocale(LC_ALL, 'nl_NL.utf8');
+		
+		foreach((array)$d as $key=>$val) {
+			$d[$key]['photographer']=implode(' ',array_reverse(explode(',',$val['photographer_name'])));
+			$d[$key]['meta_datum']=strftime('%e %B %Y',strtotime($val['meta_datum']));
+		};
+
+
 		return $d;
 		
 	}

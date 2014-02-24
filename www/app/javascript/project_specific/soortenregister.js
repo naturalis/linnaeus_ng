@@ -1,3 +1,8 @@
+var suggestionMinInputLength=1;
+var search,dosearch,listdata,suggestiontype,matchtype;
+var activesuggestion=-1;
+
+
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
@@ -11,8 +16,6 @@ function nbcPrettyPhotoInit() {
 
 }
 
-var search,dosearch,listdata,suggestiontype,matchtype;
-var activesuggestion=-1;
 
 function retrieveSuggestions()
 {
@@ -85,7 +88,7 @@ function hideSuggestions(ele)
 function validateSearch()
 {
 	dosearch=false;
-	if (search.length>=2) dosearch=true;
+	if (search.length>=suggestionMinInputLength) dosearch=true;
 }
 
 function showSuggestions()
