@@ -33,7 +33,7 @@
 
           <div class='control' onClick="$('#similarSpeciesNav').addClass('hidden');nbcClearSearchTerm();nbcClearStateValue();">
             <span class='icon icon-reload'></span>
-              <a href="">{t}Opnieuw beginnen{/t}</a>
+              <a name="restart">{t}Opnieuw beginnen{/t}</a>
           </div>
 
 		{if $master_matrix_id}

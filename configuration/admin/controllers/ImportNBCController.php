@@ -140,7 +140,7 @@ class ImportNBCController extends ImportController
      *
      * @access    public
      */
-    public function indexAction ()
+    public function indexAction()
     {
         $this->setPageName($this->translate('Data import options'));
         
@@ -148,7 +148,7 @@ class ImportNBCController extends ImportController
     }
 
 
-    public function nbcDeterminatie1Action ()
+    public function nbcDeterminatie1Action()
     {
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_determinatie_2.php');
@@ -198,7 +198,7 @@ class ImportNBCController extends ImportController
     }
 
 
-    public function nbcDeterminatie2Action ()
+    public function nbcDeterminatie2Action()
     {
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('nbc_determinatie_1.php');
@@ -270,7 +270,7 @@ class ImportNBCController extends ImportController
     }
 
 
-    public function nbcDeterminatie3Action ()
+    public function nbcDeterminatie3Action()
     {
 
         if (!isset($_SESSION['admin']['system']['import']['data']))
@@ -400,7 +400,7 @@ class ImportNBCController extends ImportController
     }
 
 
-    public function nbcDeterminatie4Action ()
+    public function nbcDeterminatie4Action()
     {
 		
         if (!isset($_SESSION['admin']['system']['import']['project']))
@@ -447,7 +447,7 @@ class ImportNBCController extends ImportController
     }
 
 
-    public function nbcDeterminatie5Action ()
+    public function nbcDeterminatie5Action()
     {
         if (!isset($_SESSION['admin']['system']['import']['species_data']))
             $this->redirect('nbc_determinatie_4.php');
@@ -615,7 +615,7 @@ class ImportNBCController extends ImportController
     }
 
 
-    public function nbcDeterminatie6Action ()
+    public function nbcDeterminatie6Action()
     {
 	
 		if ($this->rHasVal('action','download')) {
@@ -690,7 +690,7 @@ class ImportNBCController extends ImportController
 
     }
 
-    public function nbcDeterminatie7Action ()
+    public function nbcDeterminatie7Action()
     {
 		$this->emptyCacheFolder($this->getNewProjectId());
         $this->unsetProjectSessionData();
