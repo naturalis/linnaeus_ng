@@ -89,6 +89,13 @@ class SpeciesController extends Controller
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
 
+		$this->_overrideShowTab_NAMES=$this->getSetting('species_show_auto_tab_names',1)==1;
+		$this->_overrideShowTab_CLASSIFICATION=$this->getSetting('species_show_auto_tab_classification',1)==1;
+		$this->_overrideShowTab_LITERATURE=$this->getSetting('species_show_auto_tab_literature',1)==1;
+		$this->_overrideShowTab_MEDIA=$this->getSetting('species_show_auto_tab_media',1)==1;
+		$this->_overrideShowTab_DNA_BARCODES=$this->getSetting('species_show_auto_tab_dna_barcodes',1)==1;
+
+
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
         $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
 		$this->_defaultSpeciesTab=$this->getSetting('species_default_tab',CTAB_CLASSIFICATION);
@@ -722,6 +729,8 @@ class SpeciesController extends Controller
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
 		$showAlways = isset($p['showAlways']) ? $p['showAlways'] : null;
+		
+		$stdCats=array();
 
 		// get the defined categories (just the page definitions, no content yet)
 		$tp = $this->models->PageTaxon->_get(
@@ -749,15 +758,20 @@ class SpeciesController extends Controller
          
    
             $defCat = $this->_defaultSpeciesTab;
+			
+			if ($this->_overrideShowTab_NAMES!=false)
+			{
             
-            $n = $this->getTaxonNames($taxon);
-            
-            $stdCats[] = array(
-                'id' => CTAB_NAMES, 
-                'title' => $this->translate('Names'), 
-                'is_empty' => (count((array) $n['synonyms']) == 0 && count((array) $n['common']) == 0 ? 1 : 0),
-				'tabname' => 'CTAB_NAMES'
-            );
+				$n = $this->getTaxonNames($taxon);
+				
+				$stdCats[] = array(
+					'id' => CTAB_NAMES, 
+					'title' => $this->translate('Names'), 
+					'is_empty' => (count((array) $n['synonyms']) == 0 && count((array) $n['common']) == 0 ? 1 : 0),
+					'tabname' => 'CTAB_NAMES'
+				);
+				
+			}
 
 			/*
             $stdCats[] = array(
@@ -793,13 +807,23 @@ class SpeciesController extends Controller
                 if ($ct[0]['page_id'] == $_SESSION['app'][$this->spid()]['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
                     $defCat = $_SESSION['app'][$this->spid()]['species']['defaultCategory'];
             }
+			
+			foreach ((array) $d as $key => $val) {
+				$categoryList[$key] = $val['title'];
+				$categorySysList[$key] = $val['page'];
+			}
+			
+			if ($this->_overrideShowTab_CLASSIFICATION!=false)
+			{
 
-            $stdCats[] = array(
-                'id' => CTAB_CLASSIFICATION, 
-                'title' => $this->translate('Classification'), 
-                'is_empty' => 0,
-				'tabname' => 'CTAB_CLASSIFICATION'
-            );
+				$stdCats[] = array(
+					'id' => CTAB_CLASSIFICATION, 
+					'title' => $this->translate('Classification'), 
+					'is_empty' => 0,
+					'tabname' => 'CTAB_CLASSIFICATION'
+				);
+
+			}
             
 			/*
             if ($this->getTaxonType() == 'higher')
@@ -816,10 +840,10 @@ class SpeciesController extends Controller
 	            
             }
 			*/
-            
-             if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE))
+
+             if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE) && $this->_overrideShowTab_LITERATURE!=false)
 			 {
-                
+
                 $l = $this->getTaxonLiterature($taxon);
                 
                 $stdCats[] = array(
@@ -829,23 +853,22 @@ class SpeciesController extends Controller
 					'tabname' => 'CTAB_LITERATURE'
                 );
             }
-            
-            $m = $this->getTaxonMediaCount($taxon);
 			
-            $stdCats[] = array(
-                'id' => CTAB_MEDIA, 
-                'title' => $this->translate('Media'), 
-                'is_empty' => (count((array) $m) > 0 ? 0 : 1),
-				'tabname' => 'CTAB_MEDIA'
-            );
-
-            foreach ((array) $d as $key => $val) {
-                $categoryList[$key] = $val['title'];
-                $categorySysList[$key] = $val['page'];
+			
+			if ($this->_overrideShowTab_MEDIA!=false) {
+            
+				$m = $this->getTaxonMediaCount($taxon);
+				
+				$stdCats[] = array(
+					'id' => CTAB_MEDIA, 
+					'title' => $this->translate('Media'), 
+					'is_empty' => (count((array) $m) > 0 ? 0 : 1),
+					'tabname' => 'CTAB_MEDIA'
+				);
+			
 			}
 
-
-			if (isset($this->models->DnaBarcodes))
+			if (isset($this->models->DnaBarcodes) && $this->_overrideShowTab_DNA_BARCODES!=false)
 			{			
 		
 				$dna = $this->models->DnaBarcodes->_get(
@@ -1484,6 +1507,7 @@ class SpeciesController extends Controller
         $search = isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start'] == '1' : false;
         $getAll = isset($p['get_all']) ? $p['get_all'] == '1' : false;
+		$listMax = isset($p['list_max']) ? ($p['list_max']=='0' ? null : intval($p['list_max'])) : $this->_lookupListMaxResults;
 
         if (empty($search) && !$getAll)
             return;
@@ -1499,7 +1523,7 @@ class SpeciesController extends Controller
 					where _a.project_id = ".$this->getCurrentProjectId()."
 					and _b.lower_taxon = ".($this->getTaxonType() == 'higher' ? 0 : 1)."
 					".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
-					limit ".$this->_lookupListMaxResults
+					".(!empty($listMax) ? "limit ".$listMax : "")
 			));
 
         foreach ((array) $taxa as $key => $val) {

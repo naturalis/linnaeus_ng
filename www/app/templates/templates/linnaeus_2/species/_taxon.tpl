@@ -207,6 +207,8 @@ $(document).ready(function(){
 	showMedia('{$dispUrl}','{$dispName}'); 
 {/if}
 
+	allLookupSetListMax(0);
+
 {literal}
 	/* $(".group1").colorbox({rel:'group1'}); */
 

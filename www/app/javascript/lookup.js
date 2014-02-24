@@ -21,6 +21,8 @@
 	
 	(the droplist div is in the footer file: <div id="allLookupList" class="allLookupListInvisible"></div>)
 
+	deault max for a list is 100 items; set "allLookupSetListMax(n);" in the page-ready section to change (with 0 = no limit)
+
 */
 
 var allLookupDialogTitle = 'Contents';
@@ -43,6 +45,7 @@ var allLookupSelectedId = null;
 var allLookupIndicateSelectedId = false;
 var allLookupSelectedElement = null;
 var allLookupAlwaysFetch=false; // suppresses local storage of initial results
+var allListMax=null;
 
 function allLookupGetData(text,getAll) {
 
@@ -67,6 +70,7 @@ function allLookupGetData(text,getAll) {
 				search : (getAll==true ? '*' : text) ,
 				match_start : (allLookupMatchStartOnly ? '1' : '0') ,
 				get_all : (getAll==true ? '1' : '0') ,
+				list_max : allListMax,
 				vars : allLookupExtraVars,
 				time : allGetTimestamp()
 			}),
@@ -465,4 +469,6 @@ $(document).ready(function(){
 });
 
 
-
+function allLookupSetListMax(n) {
+	allListMax=n;
+}
