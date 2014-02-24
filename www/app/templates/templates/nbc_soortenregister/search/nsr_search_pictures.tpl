@@ -97,14 +97,14 @@
 								<img class="speciesimage" alt="Foto {$photograhper_name[1]} {$photograhper_name[0]}" title="Foto {$photograhper_name[1]} {$photograhper_name[0]}" src="http://images.ncbnaturalis.nl/160x100/{$v.thumb_name}" />
 							</a>
 						</div>
-						<h3><i>{$v.taxon}</i></h3>
+						
+						<h3>{$v.dutch_name}</h3>
+						<span class="wetenschappelijkenaam"><i>{$v.taxon}</i></span>
 						<dl>
-							<dt>Foto</dt><dd>{$photograhper_name[1]} {$photograhper_name[0]}</dd>
-							<dt>Geplaatst op</dt><dd>...</dd>
+							<dt>Foto</dt><dd>{$v.photographer}</dd>
+							<dt>Geplaatst op</dt><dd>{$v.meta_datum}</dd>
 						</dl>
-						<div style="clear: both;">
-							<a href="../species/taxon.php?id={$v.taxon_id}">Naar deze soort</a>
-						</div>
+						<div style="clear: both;"><a href="../species/taxon.php?id={$v.taxon_id}">Naar deze soort</a></div>
 					</div>
 				{/foreach}
 			</div>
