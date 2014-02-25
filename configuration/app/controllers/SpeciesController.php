@@ -892,7 +892,7 @@ class SpeciesController extends Controller
 			$this->customSortArray($tp,array('key' => array('show_order')));
 		
 		}
-
+var_dump($tp,1);
 		return array(
             'categories' => $tp, 
 			'defaultCategory' => isset($defCat) ? $defCat : $_SESSION['app'][$this->spid()]['species']['defaultCategory'], 
