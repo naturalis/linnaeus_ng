@@ -629,7 +629,9 @@ class ImportNBCController extends ImportController
 
         $this->setPageName($this->translate('Import finished'));
 
+		/*
 		if (!$_SESSION['admin']['system']['import']['projectExists']) {
+		*/
 
 			/*
 			$this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
@@ -647,48 +649,31 @@ class ImportNBCController extends ImportController
 				'matrix_allow_empty_species' => true,
 				'matrix_use_character_groups' => true,
 				'taxa_use_variations' => true,
+				'start_page' => '../../../app/views/matrixkey/identify.php', 
+				'suppress_splash' => '1',
+				'skin' => $this->_defaultSkinName
 			);
 			
-			foreach((array)$settings as $key => $val) {
-				
-				if (!empty($val))
-					$this->saveSetting(array(
-						'name' => $key, 
-						'value' => $val, 
-						'pId' => $this->getNewProjectId()
-					));			
-			}
+			foreach((array)$settings as $key => $val)
+				$this->saveSetting(array('name' => $key, 'value' => $val, 'pId' => $this->getNewProjectId()));			
 	
 			foreach((array)$this->requestData['settings'] as $key => $val) {
-				
 				if (!empty($val))
-					$this->saveSetting(array(
-						'name' => $key, 
-						'value' => $val, 
-						'pId' => $this->getNewProjectId()
-					));			
+					$this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));			
 			}
-			
-			
-			if (empty($this->requestData['settings']['skin'])) {
-	
-				$this->saveSetting(array(
-					'name' => 'skin', 
-					'value' => $this->_defaultSkinName, 
-					'pId' => $this->getNewProjectId()
-				));
-				
-			}
-			
+
+		/*			
 		} else  {
 			
 			$this->addMessage('Existing project, skipping settings.');
 			
 		}
+		*/
 		
         $this->printPage();
 
     }
+
 
     public function nbcDeterminatie7Action()
     {
