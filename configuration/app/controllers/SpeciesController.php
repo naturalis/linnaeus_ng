@@ -89,11 +89,11 @@ class SpeciesController extends Controller
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
-		$this->_overrideShowTab_NAMES=$this->getSetting('species_suppress_autotab_names',0)==0;
-		$this->_overrideShowTab_CLASSIFICATION=$this->getSetting('species_suppress_autotab_classification',01)==0;
-		$this->_overrideShowTab_LITERATURE=$this->getSetting('species_suppress_autotab_literature',0)==0;
-		$this->_overrideShowTab_MEDIA=$this->getSetting('species_suppress_autotab_media',0)==0;
-		$this->_overrideShowTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==0;
+		$this->_suppressTab_NAMES=$this->getSetting('species_suppress_autotab_names',0)==1;
+		$this->_suppressTab_CLASSIFICATION=$this->getSetting('species_suppress_autotab_classification',0)==1;
+		$this->_suppressTab_LITERATURE=$this->getSetting('species_suppress_autotab_literature',0)==1;
+		$this->_suppressTab_MEDIA=$this->getSetting('species_suppress_autotab_media',0)==1;
+		$this->_suppressTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
 
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
         $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
@@ -756,7 +756,7 @@ class SpeciesController extends Controller
 		{
             $defCat = $this->_defaultSpeciesTab;
 			
-			if ($this->_overrideShowTab_NAMES!=false)
+			if ($this->_suppressTab_NAMES==false)
 			{
             
 				$n = $this->getTaxonNames($taxon);
@@ -801,7 +801,7 @@ class SpeciesController extends Controller
 				$categorySysList[$key] = $val['page'];
 			}
 			
-			if ($this->_overrideShowTab_CLASSIFICATION!=false)
+			if ($this->_suppressTab_CLASSIFICATION==false)
 			{
 			
 				$stdCats[] = array(
@@ -813,7 +813,7 @@ class SpeciesController extends Controller
 			
 			}
 			
-			if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE) && $this->_overrideShowTab_LITERATURE!=false)
+			if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE) && $this->_suppressTab_LITERATURE==false)
 			{
 			
 				$l = $this->getTaxonLiterature($taxon);
@@ -826,7 +826,7 @@ class SpeciesController extends Controller
 				);
 			}
 			
-			if ($this->_overrideShowTab_MEDIA!=false)
+			if ($this->_suppressTab_MEDIA==false)
 			{
             
 				$m = $this->getTaxonMediaCount($taxon);
@@ -840,7 +840,7 @@ class SpeciesController extends Controller
 			
 			}
 
-			if (isset($this->models->DnaBarcodes) && $this->_overrideShowTab_DNA_BARCODES!=false)
+			if (isset($this->models->DnaBarcodes) && $this->_suppressTab_DNA_BARCODES==false)
 			{			
 				$dna = $this->models->DnaBarcodes->_get(
 				array(
