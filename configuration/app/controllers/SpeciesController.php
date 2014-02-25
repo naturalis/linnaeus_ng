@@ -89,13 +89,11 @@ class SpeciesController extends Controller
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
-
-		$this->_overrideShowTab_NAMES=$this->getSetting('species_show_auto_tab_names',1)==1;
-		$this->_overrideShowTab_CLASSIFICATION=$this->getSetting('species_show_auto_tab_classification',1)==1;
-		$this->_overrideShowTab_LITERATURE=$this->getSetting('species_show_auto_tab_literature',1)==1;
-		$this->_overrideShowTab_MEDIA=$this->getSetting('species_show_auto_tab_media',1)==1;
-		$this->_overrideShowTab_DNA_BARCODES=$this->getSetting('species_show_auto_tab_dna_barcodes',1)==1;
-
+		$this->_overrideShowTab_NAMES=$this->getSetting('species_suppress_autotab_names',0)==0;
+		$this->_overrideShowTab_CLASSIFICATION=$this->getSetting('species_suppress_autotab_classification',01)==0;
+		$this->_overrideShowTab_LITERATURE=$this->getSetting('species_suppress_autotab_literature',0)==0;
+		$this->_overrideShowTab_MEDIA=$this->getSetting('species_suppress_autotab_media',0)==0;
+		$this->_overrideShowTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==0;
 
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
         $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
@@ -889,7 +887,7 @@ class SpeciesController extends Controller
 					$start=$val['id'];
 				}
 			}
-			$defCat=!is_null($start) ? $start : $defCat;
+			$defCat=!is_null($start) ? $start : $defCat	;
 
 			$this->customSortArray($tp,array('key' => array('show_order')));
 		

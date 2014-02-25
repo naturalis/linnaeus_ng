@@ -67,11 +67,11 @@ class ProjectsController extends Controller
 
 		array('species_default_tab','[id]',-1,'id of the tab ("page") to open with by default'),
 		array('species_tab_translate','{a:b},{c:d}',null,'automatically changes tab id a into b etc.'), // to change TAB_MEDIA to default category 'media' etc
-		array('species_show_auto_tab_names','bool',0,'show automatically generated tab "names" in runtime (deault true)'),
-		array('species_show_auto_tab_classification','bool',0,'show automatically generated tab "classification" in runtime (deault true)'),
-		array('species_show_auto_tab_literature','bool',0,'show automatically generated tab "literature" in runtime (deault true)'),
-		array('species_show_auto_tab_media','bool',0,'show automatically generated tab "media" in runtime (deault true)'),
-		array('species_show_auto_tab_dna_barcodes','bool',0,'show automatically generated tab "dna_barcodes" in runtime (deault true)'),
+		array('species_suppress_autotab_names','bool',1,'suppress automatically generated tab "names" in runtime'),
+		array('species_suppress_autotab_classification','bool',1,'suppress automatically generated tab "classification" in runtime'),
+		array('species_suppress_autotab_literature','bool',1,'suppress automatically generated tab "literature" in runtime'),
+		array('species_suppress_autotab_media','bool',1,'suppress automatically generated tab "media" in runtime'),
+		array('species_suppress_autotab_dna_barcodes','bool',1,'suppress automatically generated tab "dna_barcodes" in runtime'),
 
 		array('include_overview_in_media','bool',0,'show overview image in species media'),
 		array('app_search_result_sort','alpha / token_count','token_count','variable to sort search results by'),
