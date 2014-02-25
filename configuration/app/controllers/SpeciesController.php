@@ -31,7 +31,8 @@ class SpeciesController extends Controller
 		'actors',
 		'dna_barcodes',
 		'presence_taxa',
-		'media_meta'
+		'media_meta',
+		'tab_order'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -755,8 +756,6 @@ class SpeciesController extends Controller
 
         if ($taxon)
 		{
-         
-   
             $defCat = $this->_defaultSpeciesTab;
 			
 			if ($this->_overrideShowTab_NAMES!=false)
@@ -773,19 +772,10 @@ class SpeciesController extends Controller
 				
 			}
 
-			/*
-            $stdCats[] = array(
-                'id' => CTAB_NOMENCLATURE, 
-                'title' => $this->translate('Nomenclature'), 
-                'is_empty' => false,
-				'tabname' => 'CTAB_NOMENCLATURE'
-            );
-			*/
-            
             $d = array();
             
-            foreach ((array) $tp as $key => $val) {
-                
+            foreach ((array) $tp as $key => $val)
+			{
                 $val['is_empty'] = 1;
                 
                 $ct = $this->models->ContentTaxon->_get(
@@ -804,7 +794,7 @@ class SpeciesController extends Controller
                 
                 $d[$key] = $val;
                 
-                if ($ct[0]['page_id'] == $_SESSION['app'][$this->spid()]['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
+                if ($ct[0]['page_id'] == $_SESSION['app'][$this->spid()]['species']['defaultCategory'])
                     $defCat = $_SESSION['app'][$this->spid()]['species']['defaultCategory'];
             }
 			
@@ -815,47 +805,31 @@ class SpeciesController extends Controller
 			
 			if ($this->_overrideShowTab_CLASSIFICATION!=false)
 			{
-
+			
 				$stdCats[] = array(
 					'id' => CTAB_CLASSIFICATION, 
 					'title' => $this->translate('Classification'), 
 					'is_empty' => 0,
 					'tabname' => 'CTAB_CLASSIFICATION'
 				);
-
+			
 			}
-            
-			/*
-            if ($this->getTaxonType() == 'higher')
+			
+			if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE) && $this->_overrideShowTab_LITERATURE!=false)
 			{
-            
-	            $tnl = $this->getTaxonNextLevel($taxon);
-	            
-	            $stdCats[] = array(
-	                'id' => CTAB_TAXON_LIST, 
-	                'title' => $this->translate('Taxon list'), 
-	                'is_empty' => (count((array) $tnl) > 0 ? 0 : 1),
-					'tabname' => 'CTAB_TAXON_LIST'
-	            );
-	            
-            }
-			*/
-
-             if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE) && $this->_overrideShowTab_LITERATURE!=false)
-			 {
-
-                $l = $this->getTaxonLiterature($taxon);
-                
-                $stdCats[] = array(
-                    'id' => CTAB_LITERATURE, 
-                    'title' => $this->translate('Literature'), 
-                    'is_empty' => (count((array) $l) > 0 ? 0 : 1),
+			
+				$l = $this->getTaxonLiterature($taxon);
+				
+				$stdCats[] = array(
+					'id' => CTAB_LITERATURE, 
+					'title' => $this->translate('Literature'), 
+					'is_empty' => (count((array) $l) > 0 ? 0 : 1),
 					'tabname' => 'CTAB_LITERATURE'
-                );
-            }
+				);
+			}
 			
-			
-			if ($this->_overrideShowTab_MEDIA!=false) {
+			if ($this->_overrideShowTab_MEDIA!=false)
+			{
             
 				$m = $this->getTaxonMediaCount($taxon);
 				
@@ -870,7 +844,6 @@ class SpeciesController extends Controller
 
 			if (isset($this->models->DnaBarcodes) && $this->_overrideShowTab_DNA_BARCODES!=false)
 			{			
-		
 				$dna = $this->models->DnaBarcodes->_get(
 				array(
 					'id' => array(
@@ -888,25 +861,48 @@ class SpeciesController extends Controller
 				);
 			}
 
-            $d = array_merge($d, $stdCats);
+            $tp=array_merge($d, $stdCats);
 
-            foreach ((array) $d as $val)
+            foreach ((array) $tp as $val)
                 $emptinessList[$val['id']] = $val['is_empty'];
-            
-            return array(
-                'categories' => $d, 
-                'defaultCategory' => $defCat, 
-                'categoryList' => isset($categoryList) ? $categoryList : null,
-                'categorySysList' => isset($categorySysList) ? $categorySysList : null,
-                'emptinessList' => $emptinessList,
-            );
-        }
-        
 
-        return array(
+        }
+
+
+		if (isset($this->models->TabOrder))
+		{
+
+			$tab=$this->models->TabOrder->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'columns'=>'tabname,show_order,start_order',
+				'fieldAsIndex'=>'tabname',
+				'order'=>'start_order'
+			));
+
+			$start=null;
+			foreach((array)$tp as $key=>$val) {
+				$tp[$key]['show_order']=isset($tab[$val['tabname']]) ? $tab[$val['tabname']]['show_order'] : 99;
+				if (is_null($start) && !empty($tab[$val['tabname']]['start_order']) && $emptinessList[$val['id']]==0) {
+					$start=$val['id'];
+				}
+			}
+			$defCat=!is_null($start) ? $start : $defCat;
+
+			$this->customSortArray($tp,array('key' => array('show_order')));
+		
+		}
+
+		return array(
             'categories' => $tp, 
-            'defaultCategory' => $_SESSION['app'][$this->spid()]['species']['defaultCategory']
-        );
+			'defaultCategory' => isset($defCat) ? $defCat : $_SESSION['app'][$this->spid()]['species']['defaultCategory'], 
+			'categoryList' => isset($categoryList) ? $categoryList : null,
+			'categorySysList' => isset($categorySysList) ? $categorySysList : null,
+			'emptinessList' => isset($emptinessList) ? $emptinessList : null
+		);
+
     }
 
 
