@@ -368,7 +368,7 @@ class ProjectsController extends Controller
 					
 					$val = trim($val);
 					
-					if (empty($val)) {
+					if (empty($val) && $val!=='0') {
 						
 						$c += $this->saveSetting(array('name' => $key,'delete' => true));
 						
