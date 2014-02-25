@@ -296,7 +296,7 @@ class SpeciesController extends Controller
 				/*
 					NSR add on
 				*/
-				if (isset($this->models->Names) && $this->getSetting('taxon_page_ext_classification',0)) {
+				if ($this->models->Names->getTableExists() && $this->getSetting('taxon_page_ext_classification',0)) {
 
 					$names=$this->getNames($taxon['id']);
 
@@ -840,7 +840,7 @@ class SpeciesController extends Controller
 				
 			}
 
-			if (isset($this->models->DnaBarcodes) && $this->_suppressTab_DNA_BARCODES==false)
+			if ($this->models->DnaBarcodes->getTableExists() && $this->_suppressTab_DNA_BARCODES==false)
 			{			
 				$dna = $this->models->DnaBarcodes->_get(
 				array(
@@ -867,7 +867,7 @@ class SpeciesController extends Controller
         }
 
 
-		if (isset($this->models->TabOrder))
+		if ($this->models->TabOrder->getTableExists())
 		{
 
 			$tab=$this->models->TabOrder->_get(
@@ -1424,7 +1424,48 @@ class SpeciesController extends Controller
     }
 
 
-    private function getTaxonOverviewImage($id)
+	private function getTaxonOverviewImage($id)
+	{
+		if ($this->models->Names->getTableExists() && $this->models->MediaMeta->getTableExists()) {
+			return $this->getTaxonOverviewImageExtended($id);
+		} else {
+			return $this->getTaxonOverviewImageSimple($id);
+		}
+	}
+
+
+	private function getTaxonOverviewImageSimple($id)
+    {
+        $mt = $this->models->MediaTaxon->_get(
+        array(
+            'id' => array(
+                'taxon_id' => $id, 
+                'overview_image' => 1, 
+                'project_id' => $this->getCurrentProjectId()
+            )
+        ));
+
+        if ($mt) {
+			
+            $mdt = $this->models->MediaDescriptionsTaxon->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'language_id' => $this->getCurrentLanguageId(), 
+                    'media_id' => $mt[0]['id']
+                ), 
+                'columns' => 'description'
+            ));			
+			
+            return array('image' => $mt[0]['file_name'],'label' => $mdt[0]['description']);
+		} else
+            return null;
+    }
+
+
+
+
+    private function getTaxonOverviewImageExtended($id)
     {
 		
 		if (empty($id))

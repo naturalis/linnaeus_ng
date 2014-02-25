@@ -41,7 +41,8 @@ class HotwordController extends Controller
 		'glossary_synonym',
 		'content_keystep',
 		'literature',
-		'content_free_module'
+		'content_free_module',
+		'commonname'
     );
    
     public $controllerPublicName = 'Hotwords';
@@ -131,6 +132,7 @@ class HotwordController extends Controller
 			$this->addMessage('Added '.$this->updateGlossary().' hotwords from Glossary.');
 			$this->addMessage('Added '.$this->updateLiterature().' hotwords from Literature.');
 			$this->addMessage('Added '.$this->updateSpecies().' hotwords from Species.');
+			$this->addMessage('Added '.$this->updateCommonNames().' hotwords from Common names.');
 			$this->addMessage('Added '.$this->updateKey().' hotwords from Dichotomous key.');
 			$this->addMessage('Added '.$this->updateFreeModules().' hotwords from free modules.');
 		
@@ -219,7 +221,7 @@ class HotwordController extends Controller
 	
 		$p['hotword'] = trim($p['hotword']);
 	
-		if (is_numeric($p['hotword'])) return;
+		if (is_numeric($p['hotword']) || empty($p['hotword'])) return;
 	
 		return @$this->models->Hotword->save(
 			array(
@@ -398,6 +400,48 @@ class HotwordController extends Controller
 		return $res;
 
 	}
+
+
+	private function updateCommonNames()
+	{
+
+		$res = 0;
+	
+		$c = $this->models->Commonname->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+		
+		foreach((array)$c as $key => $val) {
+
+			if ($this->saveHotword(
+				array(
+					'project_id' => $val['project_id'],
+					'language_id' => 0,
+					'hotword' => $val['commonname'],
+					'controller' => 'species',
+					'view' => 'taxon',
+					'params' => 'cat=names&id='.$val['taxon_id']
+				)
+			)===true) $res++;
+
+			if ($this->saveHotword(
+				array(
+					'project_id' => $val['project_id'],
+					'language_id' => 0,
+					'hotword' => $val['transliteration'],
+					'controller' => 'species',
+					'view' => 'taxon',
+					'params' => 'cat=names&id='.$val['taxon_id']
+				)
+			)===true) $res++;
+
+		}
+		
+		return $res;
+
+	}
+
+
+
+
 
 	private function updateKey()
 	{

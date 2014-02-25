@@ -32,7 +32,7 @@ class RdfController extends Controller
 
 	public function getRdfValues($subjectId)
 	{
-		if (isset($this->models->Rdf)) {
+		if ($this->models->Rdf->getTableExists()) {
 
             $rdf=$this->models->Rdf->_get(array(
                 'id' => array(
