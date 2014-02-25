@@ -8,7 +8,7 @@ The application will collect the following hotwords:
 	<li>Introduction: topics</li>
 	<li>Glossary: words and synonyms</li>
 	<li>Literature: complete references, in two forms:  "Henk & Henk, 2005" and "Henk & Henk (2005)"</li>
-	<li>Species & Higher Taxa: taxa's formal names</li>
+	<li>Species & Higher Taxa: accepted names & common names</li>
 	<li>Dichotomous Key: step titles</li>
 	<li>Free modules: topics</li>
 </ul>

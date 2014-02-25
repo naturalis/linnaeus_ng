@@ -707,7 +707,7 @@ class SearchControllerGeneral extends SearchController
 		$commonnames = $this->sortResultsByMostTokensFound($commonnames);
 		
 		
-		if (isset($this->models->Names)) {
+		if ($this->models->Names->getTableExists()) {
 			
 			$nameTypes = $this->models->NameTypes->_get(
 				array(

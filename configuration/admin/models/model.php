@@ -22,6 +22,7 @@ abstract class Model extends BaseClass
 	public $doLog = true;
 	private $_affectedRows = 0;
 	private $_currentWhereArray=null;
+    private $tableExists=true;
 	
     public function __construct ($tableBaseName = false)
     {
@@ -63,6 +64,16 @@ abstract class Model extends BaseClass
     
     }
 	
+    public function setTableExists($state)
+	{
+		$this->tableExists=$state;
+	}
+
+    public function getTableExists()
+	{
+		return $this->tableExists;
+	}
+
 	public function setLogger($logger)
 	{
 
@@ -748,7 +759,10 @@ abstract class Model extends BaseClass
 		
 		$this->logQueryResult($r,$query,'table col info');
 
-		if (!$r) return;
+		if (!$r) {
+			$this->setTableExists(false);
+			return;
+		}
         
         $i = 0;
        

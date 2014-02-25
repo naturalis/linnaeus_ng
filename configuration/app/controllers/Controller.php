@@ -1266,7 +1266,7 @@ class Controller extends BaseClass
 
 	public function matchHotwords ($text, $forceLookup = false)
 	{
-		
+
         if (empty($text) || !is_string($text))
             return $text;
 
@@ -1297,13 +1297,16 @@ class Controller extends BaseClass
 		
 		}
 		*/
-		
+
 		$currUrl = $this->getCurrentPathWithProjectlessQuery();
 	
 		// loop through wordlist
         foreach ((array) $wordlist as $key => $val) {
             
             if ($val['hotword'] == '')
+                continue;
+
+            if (strpos($processed,$val['hotword'])===false)
                 continue;
                 
             // replace hotwords that are already linked words with a unique string
@@ -1312,6 +1315,16 @@ class Controller extends BaseClass
                 $this, 
                 'embedNoLink'
             ), $processed);
+
+
+            $expr = '|(<[^>]*(onclick)(.*)>)(' . $val['hotword'] . ')(<\/(.*?)>)+|is';
+            $processed = preg_replace_callback($expr, array(
+                $this, 
+                'embedNoLink'
+            ), $processed);
+
+
+
             
 			// compile the link for the given hotword
             $this->_currentHotwordLink = '../' . $val['controller'] . '/' . $val['view'] . '.php' . (!empty($val['params']) ? '?' . $val['params'] : '');
@@ -2410,6 +2423,8 @@ class Controller extends BaseClass
                 if (class_exists($t)) {
                     
                     $this->models->$t = new $t();
+					
+					
                     
                     if (isset($this->helpers->LoggingHelper))
                         $this->models->$t->setLogger($this->helpers->LoggingHelper);
