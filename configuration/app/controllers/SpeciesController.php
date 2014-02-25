@@ -830,14 +830,14 @@ class SpeciesController extends Controller
 			{
             
 				$m = $this->getTaxonMediaCount($taxon);
-				
+
 				$stdCats[] = array(
 					'id' => CTAB_MEDIA, 
 					'title' => $this->translate('Media'), 
-					'is_empty' => (count((array) $m) > 0 ? 0 : 1),
+					'is_empty' => $m>0?0:1,
 					'tabname' => 'CTAB_MEDIA'
 				);
-			
+				
 			}
 
 			if (isset($this->models->DnaBarcodes) && $this->_suppressTab_DNA_BARCODES==false)
