@@ -123,7 +123,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						<span class="classification-connector">&lfloor;</span>
 						{/if}
 						<span class="classification-preffered-name"><a href="?id={$v.id}">{$v.taxon}</a></span>
-						<span class="classification-rank">[{$ranks[$v.rank_id].rank}]</span>
+						<span class="classification-rank">[{$v.rank}]</span>
 						{if $v.preferredName}<br />
 						{if $x>1}
 						{'&nbsp;'|str_repeat:$buffercount}
