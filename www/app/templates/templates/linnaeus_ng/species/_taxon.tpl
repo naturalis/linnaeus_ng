@@ -4,11 +4,7 @@
 <ul>
 	{foreach from=$categories key=k item=v}
 		<li id="ctb-{$v.id}">
-		{if $useJavascriptLinks}	
-		    <a href="javascript:goTaxon({$taxon.id},\'{$v.id}\');" class="{$v.className}">{$v.title}</a>
-		{else}
 			<a {if $v.is_empty==0}href="../species/taxon.php?id={$taxon.id}&cat={$v.id}"{/if} class="{$v.className}">{$v.title}</a>	
-		{/if}
 		</li>
 		{if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
 	{/foreach}
