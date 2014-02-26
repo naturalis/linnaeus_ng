@@ -2,8 +2,8 @@
 	<div id="categories">
 	<p>
 	{literal}
-		<a href="#" onclick="$('.taxon-links').each(function(){$(this).html($(this).attr('name_sci'));});">wetenschappelijke namen</a>
-		<a href="#" onclick="$('.taxon-links').each(function(){$(this).html($(this).attr('name_common').length>0 ? $(this).attr('name_common') : $(this).attr('name_sci'));});">gewone namen</a>
+		<a href="#" onclick="keyNameswitch()">wetenschappelijke namen</a>
+		<a href="#" onclick="keyNameswitch()">gewone namen</a>
 	{/literal}
 	</p>
 	<ul>
