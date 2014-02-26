@@ -17,7 +17,7 @@
 		{if $l==$letter}
 		<span class="alphabet-active-letter">{$l|upper}</span>
 		{elseif $alpha[$l]}
-		<span class="alphabet-letter" onclick="$('#letter').val('{$l}');$('#theForm').submit();">{$l|upper}</span>
+			<a class="alphabet-letter" href="common.php?letter={$l}">{$l|upper}</a>
 		{else}
 		<span class="alphabet-letter-ghosted">{$l|upper}</span>
 		{/if}
@@ -26,11 +26,7 @@
 
 	<div id="commonname-languages">
 		{t}Language:{/t}
-		<select id="nameLanguage" onchange="
-			$('#activeLanguage').val($('#nameLanguage').val());
-			$('#letter').val('');
-			$('#theForm').submit();"
-		>
+		<select id="nameLanguage" onchange="window.open('common.php?activeLanguage='+$('#nameLanguage').val()+'&letter=','_self');">
 		<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}Show all{/t}</option>
 		<option disabled="disabled">-----------------------</option>
 		{foreach name=languageloop from=$nameLanguages key=k item=v}
