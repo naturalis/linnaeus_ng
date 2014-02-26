@@ -64,8 +64,6 @@ function showExcluded() {
 
 }
 
-
-
 var keyListAttr='name_sci';
 
 function keyCompare(a,b)
@@ -91,10 +89,9 @@ function keyListsort(list)
 		$('#'+list).append('<li>'+items[i]+'</li>');
 }
 
-function keyNameswitch()
+function keyNameswitch(type)
 {
-
-	keyListAttr=(keyListAttr=='name_sci'?'name_common':'name_sci');
+	keyListAttr=type;
 
 	$('.taxon-links').each(function(){
 		if ($(this).attr(keyListAttr).length>0)
