@@ -2,8 +2,8 @@
 	<div id="categories">
 	<p>
 	{literal}
-		<a href="#" onclick="keyNameswitch()">wetenschappelijke namen</a>
-		<a href="#" onclick="keyNameswitch()">gewone namen</a>
+		<a href="#" onclick="keyNameswitch('name_sci')">wetenschappelijke namen</a>
+		<a href="#" onclick="keyNameswitch('name_common')">gewone namen</a>
 	{/literal}
 	</p>
 	<ul>
