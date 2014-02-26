@@ -64,3 +64,44 @@ function showExcluded() {
 
 }
 
+
+
+var keyListAttr='name_sci';
+
+function keyCompare(a,b)
+{
+	var x=$(a).attr(keyListAttr).replace( /<.*?>/g,'').toLowerCase();
+	var y=$(b).attr(keyListAttr).replace( /<.*?>/g,'').toLowerCase();
+	return x<y ? -1 : x>y ? 1 : 0;
+}
+
+function keyListsort(list)
+{
+	var items=[];
+
+	$('#'+list+' li').each(function() {
+		items.push($(this).html());
+	});
+
+	items.sort(keyCompare);
+	
+	$('#'+list+' li').remove();
+	
+	for(var i in items)
+		$('#'+list).append('<li>'+items[i]+'</li>');
+}
+
+function keyNameswitch()
+{
+
+	keyListAttr=(keyListAttr=='name_sci'?'name_common':'name_sci');
+
+	$('.taxon-links').each(function(){
+		if ($(this).attr(keyListAttr).length>0)
+			$(this).html($(this).attr(keyListAttr));
+	});
+	
+	keyListsort('ul-remaining');
+	keyListsort('ul-excluded');
+
+}
