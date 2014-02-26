@@ -81,7 +81,6 @@
 
 {literal}
 <script>
-
   $(document).ready(function(){
 	$(".inline-image").click(function (e) {
 	    e.stopPropagation();
@@ -96,8 +95,8 @@
 		//alert(panelTop);  
 		$('#panel').offset({top: panelTop});
 	  });	
+	  
   });
-
 </script>
 {/literal}
 
