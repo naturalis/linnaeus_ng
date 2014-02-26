@@ -75,6 +75,7 @@ function keyCompare(a,b)
 
 function keyListsort(list)
 {
+	
 	var items=[];
 
 	$('#'+list+' li').each(function() {
@@ -84,9 +85,11 @@ function keyListsort(list)
 	items.sort(keyCompare);
 	
 	$('#'+list+' li').remove();
-	
 	for(var i in items)
 		$('#'+list).append('<li>'+items[i]+'</li>');
+
+	$('#'+list).html('<li>'+items.join('</li><li>')+'</li>');
+	
 }
 
 function keyNameswitch(type)
