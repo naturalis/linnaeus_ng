@@ -816,12 +816,20 @@ class KeyController extends Controller
 
 		foreach((array)$div['remaining'] as $key => $val) {
 
-			$d = $tree[$key];
+			$d=$tree[$key];
+			$commonname=null;
+			foreach((array)$d['commonnames'] as $name) {
+				if ($name['language_id']==$this->getCurrentLanguageId()) {
+					$commonname=$name['commonname'];
+					break;
+				}
+			}
 
 			$includedTaxa[$val] = 
 				array(
 					'id' => $d['id'],
 					'taxon' => $this->formatTaxon($d),
+					'commonname' => $commonname,
 					'is_hybrid' => $d['is_hybrid']
 				);
 		
@@ -830,19 +838,27 @@ class KeyController extends Controller
 		foreach((array)$div['excluded'] as $key => $val) {
 
 			$d = $tree[$key];
+			$commonname=null;
+			foreach((array)$d['commonnames'] as $name) {
+				if ($name['language_id']==$this->getCurrentLanguageId()) {
+					$commonname=$name['commonname'];
+					break;
+				}
+			}
 
 			$excludedTaxa[$key] = 
 				array(
 					'id' => $d['id'],
 					'taxon' => $this->formatTaxon($d),
+					'commonname' => $commonname,
 					'is_hybrid' => $d['is_hybrid']
 				);
 		
 		}
-		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
 
+		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
 		$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
-		
+
 		return array(
 				'remaining' => $includedTaxa,
 				'excluded' => $excludedTaxa
@@ -860,7 +876,7 @@ class KeyController extends Controller
 	*/
 	public function originalGetTaxonDivision($step)
 	{
-
+die();
 		$div = $this->getCache('key-taxonDivision-'.$step);
 		
 		if (!$div) {

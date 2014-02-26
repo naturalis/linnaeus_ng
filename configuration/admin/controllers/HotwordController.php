@@ -401,10 +401,8 @@ class HotwordController extends Controller
 
 	}
 
-
 	private function updateCommonNames()
 	{
-
 		$res = 0;
 	
 		$c = $this->models->Commonname->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
@@ -418,7 +416,7 @@ class HotwordController extends Controller
 					'hotword' => $val['commonname'],
 					'controller' => 'species',
 					'view' => 'taxon',
-					'params' => 'cat=names&id='.$val['taxon_id']
+					'params' => 'id='.$val['taxon_id']
 				)
 			)===true) $res++;
 
@@ -429,7 +427,7 @@ class HotwordController extends Controller
 					'hotword' => $val['transliteration'],
 					'controller' => 'species',
 					'view' => 'taxon',
-					'params' => 'cat=names&id='.$val['taxon_id']
+					'params' => 'id='.$val['taxon_id']
 				)
 			)===true) $res++;
 
@@ -438,10 +436,6 @@ class HotwordController extends Controller
 		return $res;
 
 	}
-
-
-
-
 
 	private function updateKey()
 	{
