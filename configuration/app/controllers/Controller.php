@@ -3291,21 +3291,36 @@ class Controller extends BaseClass
     private function getTaxonChildren ($id)
     {
         if (is_null($this->_tmpTree)) {
-            
-            $d = $this->models->Taxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author'
-            ));
-      
+       
+            $d = $this->models->Taxon->freeQuery("
+				select
+					_a.id,
+					_a.taxon,
+					_a.parent_id,
+					_a.rank_id,
+					_a.taxon_order,
+					_a.is_hybrid,
+					_a.list_level,
+					_a.is_empty,
+					_a.author
+				from %PRE%taxa _a
+				where
+					_a.project_id = ".$this->getCurrentProjectId()
+            );
+
             foreach ((array) $d as $val) {
-                
+
+				$val['commonnames']=$this->models->Taxon->freeQuery("
+					select language_id, commonname, transliteration
+					from %PRE%commonnames 
+					where project_id = ".$this->getCurrentProjectId()."
+					and taxon_id=".$val['id']
+				);
+			                
                 $this->_tmpTree[$val['parent_id']][$val['id']] = $val;
             }
         }
-        
+
         return isset($this->_tmpTree[$id]) ? $this->_tmpTree[$id] : null;
     }
 
