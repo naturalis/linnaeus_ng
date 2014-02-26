@@ -1316,14 +1316,11 @@ class Controller extends BaseClass
                 'embedNoLink'
             ), $processed);
 
-
-            $expr = '|(<[^>]*(onclick)(.*)>)(' . $val['hotword'] . ')(<\/(.*?)>)+|is';
+			$expr='|(<span[^>]*onclick[^>]*>)('.$val['hotword'].')(.*?)(<\/span>)|is';
             $processed = preg_replace_callback($expr, array(
                 $this, 
                 'embedNoLink'
             ), $processed);
-
-
 
             
 			// compile the link for the given hotword
