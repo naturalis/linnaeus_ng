@@ -57,6 +57,7 @@ class SearchControllerNSR extends SearchController
 
     public function searchExtendedAction ()
     {
+		
 		if (
 			$this->rHasVal('group') ||
 			$this->rHasVal('group_id') ||
@@ -87,7 +88,9 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
 
         $this->printPage();
-  
+
+q($this->requestData);
+
     }
 
 
@@ -267,12 +270,12 @@ class SearchControllerNSR extends SearchController
 
 	private function doExtendedSearch($search)
 	{
-		if (isset($search['group_id'])) {
+		if (!empty($search['group_id'])) {
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($search['group_id']),'match'=>'id'));
 		} else {
-			$d=$this->getSuggestionsGroup(array('name'=>$search['group'],'match'=>'exact'));
+			$d=$this->getSuggestionsGroup(array('search'=>$search['group'],'match'=>'exact'));
 		}
-
+		
 		if ($d) 
 			$ancestor=$d[0];
 		else
@@ -378,6 +381,9 @@ class SearchControllerNSR extends SearchController
 			".(isset($limit) ? "limit ".$limit : "")."
 			"
 		);
+		
+		
+		//q($this->models->Taxon->q());
 
 		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 
@@ -444,7 +450,7 @@ class SearchControllerNSR extends SearchController
 		$group_id=null;
 
 		if (empty($p['group_id']) && !empty($p['group'])) {
-			$d=$this->getSuggestionsGroup(array('name'=>$p['group'],'match'=>'exact'));
+			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
 			if ($d) 
 				$group_id=$d[0];
 		} else
@@ -541,7 +547,7 @@ class SearchControllerNSR extends SearchController
 	private function getSuggestionsGroup($p)
 	{
 		$clause=null;
-		
+
 		if ($p['match']=='start')
 			$clause="_a.name like '".mysql_real_escape_string($p['search'])."%'";
 		else
