@@ -42,7 +42,7 @@
 				<div class="thumbholder">
 					<div class="thumbnail">
 						<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$v.file_name}" pTitle="foto {$photograhper_name[1]} {$photograhper_name[0]}">
-							<img src="http://images.ncbnaturalis.nl/160x100/{$v.thumb_name}" title="foto {$photograhper_name[1]} {$photograhper_name[0]}" alt="foto {$photograhper_name[1]} {$photograhper_name[0]}">
+							<img src="http://images.naturalis.nl/160x100/{$v.thumb_name}" title="foto {$photograhper_name[1]} {$photograhper_name[0]}" alt="foto {$photograhper_name[1]} {$photograhper_name[0]}">
 						</a>
 					</div>
 					<p class="author">
