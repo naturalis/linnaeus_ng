@@ -2142,7 +2142,8 @@ b, .title {
   border-bottom: 0px;
   margin-right: 0.5em;
   color: #009ee0;
-  background: none !important; }
+  background: none !important;
+  cursor: pointer; }
   .inline-video:before {
     font-family: 'naturalis-lng-icons';
     content: "\e613";
