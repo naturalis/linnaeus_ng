@@ -144,7 +144,15 @@ q($this->requestData);
 			
 		}
 
-		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+		$p=$this->requestData;
+
+		if ($this->rHasVal('show','photographers'))
+		{
+			$this->smarty->assign('show','photographers');
+			$p['limit']='*';
+		}
+
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount($p));
 
         $this->printPage();
     }
@@ -393,53 +401,66 @@ q($this->requestData);
 
 	private function getPhotographersPictureCount($p=null)
 	{
-		$id=isset($p['name']) ? $p['name'] : null;
-		$limit=isset($p['limit']) ? $p['limit'] : 5;
+
+		$photographers=$this->getCache('search-photographer-count');
 		
-		$where=
-			array(
-				'project_id'=>$this->getCurrentProjectId(),
-				'sys_label' => 'beeldbankFotograaf'
-			);
-
-		if (isset($id)) $d['meta_data']=$name;
+		if (!$photographers)
+		{
+        
+			$tCount=$this->models->Taxon->freeQuery(array(
+				'query'=>
+					"select 
+						count(distinct _a.taxon_id) as taxon_count,
+						_b.meta_data
+					from 
+						%PRE%media_taxon _a
 		
-		$params=
-			array(
-				'id'=> $where,
-				'columns'=>'count(*) as total, meta_data',
-				'group'=>'meta_data',
-				'order'=>'count(*) desc',
-				'limit'=>5
-			);
-
-
-		if (isset($limit)) $params['limit']=$limit;
-
-		$mm=$this->models->MediaMeta->_get($params);
-
-		foreach((array)$mm as $key=>$val) {
-
-			$d=$this->models->Taxon->freeQuery("
-				select 
-					count(distinct _a.taxon_id) as taxon_count
-				from 
-					%PRE%media_taxon _a
-	
-				right join %PRE%media_meta _b
-					on _a.project_id=_b.project_id
-					and _a.id = _b.media_id
-					and _b.sys_label = 'beeldbankFotograaf'
-					and _b.meta_data = '". mysql_real_escape_string($val['meta_data'])."'
-				
-				where
-					_a.project_id=".$this->getCurrentProjectId()
+					right join %PRE%media_meta _b
+						on _a.project_id=_b.project_id
+						and _a.id = _b.media_id
+						and _b.sys_label = 'beeldbankFotograaf'
+					
+					where
+						_a.project_id=".$this->getCurrentProjectId()."
+					group by _b.meta_data",
+				'fieldAsIndex'=>'meta_data'
+				)
 			);
 			
-			$mm[$key]['taxon_count']=$d[0]['taxon_count'];
+			$photographers=$this->models->MediaMeta->_get(
+				array(
+					'id'=>array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'sys_label' => 'beeldbankFotograaf'
+					),
+					'columns'=>'count(*) as total, meta_data',
+					'group'=>'meta_data',
+					'order'=>'count(*) desc, meta_data desc',
+					'fieldAsIndex'=>'meta_data'
+				)
+			);
+			
+			foreach((array)$photographers as $key=>$val) {
+				
+				$photographers[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
+				
+			}
+			
+			$this->saveCache('search-photographer-count',$photographers);
+			
+		}
+
+		if (!empty($p['name'])) {
+			$photographers=$photographers[$p['name']];
 		}
 		
-		return $mm;
+		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
+
+		if (!empty($limit) && $limit<count((array)$photographers)) {
+			$photographers=array_slice($photographers,0,$limit);
+		}
+		
+		return $photographers;
 		
 	}
 
@@ -523,7 +544,7 @@ q($this->requestData);
 				".(!empty($p['photographer'])  ? "and _c.meta_data like '". mysql_real_escape_string($p['photographer'])."%'"  : "")." 		
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")." 		
 
-			order by ".($p['sort']=='photographer' ?  "_c.meta_data" : "_b.taxon")."
+			order by ".(isset($p['sort']) && $p['sort']=='photographer' ?  "_c.meta_data" : "_b.taxon")."
 			".(isset($offset) ? "offset ".$offset : "")."
 			".(isset($limit) ? "limit ".$limit : "")
 			);
