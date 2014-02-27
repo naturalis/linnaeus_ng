@@ -2140,7 +2140,9 @@ b, .title {
 
 .inline-video {
   border-bottom: 0px;
-  margin-right: 0.5em; }
+  margin-right: 0.5em;
+  colour: #009ee0;
+  background: none !important; }
   .inline-video:before {
     font-family: 'naturalis-lng-icons';
     content: "\e613";

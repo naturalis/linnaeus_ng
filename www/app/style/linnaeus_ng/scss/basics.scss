@@ -741,6 +741,8 @@
 			.inline-video{
 				border-bottom: 0px;
 				margin-right: 0.5em;
+				colour: $blauw;
+				background: none !important;
 
 				&:before{
 					font-family: 'naturalis-lng-icons';
