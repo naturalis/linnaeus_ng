@@ -58,7 +58,7 @@ class SearchControllerNSR extends SearchController
     public function searchExtendedAction ()
     {
 		
-		if (
+		if (1==1||
 			$this->rHasVal('group') ||
 			$this->rHasVal('group_id') ||
 			$this->rHasVal('author') ||
@@ -88,8 +88,6 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
 
         $this->printPage();
-
-q($this->requestData);
 
     }
 
@@ -278,16 +276,17 @@ q($this->requestData);
 
 	private function doExtendedSearch($search)
 	{
-		if (!empty($search['group_id'])) {
+		$d=null;
+		if (!empty($search['group_id']))
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($search['group_id']),'match'=>'id'));
-		} else {
+		else
+		if (!empty($search['group']))
 			$d=$this->getSuggestionsGroup(array('search'=>$search['group'],'match'=>'exact'));
-		}
-		
+
 		if ($d) 
 			$ancestor=$d[0];
-		else
-			return null;
+//		else
+//			return null;
 
 		$img=!empty($search['images']);
 
@@ -304,9 +303,10 @@ q($this->requestData);
 			}
 		}
 
-		if (!empty($search['limit'])) $limit=$search['limit'];
+		$this->resSpeciesPerPage=50;
 
-		if (!empty($search['offset'])) $offset=$search['offset'];
+		$limit=!empty($search['limit']) ? $search['limit'] : $this->resSpeciesPerPage;
+		$offset=!empty($search['offset']) ? $search['offset'] : null;
 
 
 		$data=$this->models->Taxon->freeQuery("
@@ -378,7 +378,7 @@ q($this->requestData);
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.lower_taxon=1
-				and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)
+			".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)" : "")."
 			".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
 			".(isset($auth) ? "and _m.name_author like '". mysql_real_escape_string($auth)."%'" : "")."
 			".($img ? "and number_of_images > 0" : "")."
@@ -395,7 +395,7 @@ q($this->requestData);
 
 		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 
-		return array('count'=>$count[0]['total'],'data'=>$data,'ancestor'=>$ancestor);
+		return array('count'=>$count[0]['total'],'data'=>$data,'ancestor'=>isset($ancestor) ? $ancestor : null);
 	}
 
 
@@ -467,6 +467,8 @@ q($this->requestData);
 
 	private function doPictureSearch($p)
 	{
+		
+		$this->resPicsPerPage=33;
 
 		$group_id=null;
 
@@ -479,9 +481,13 @@ q($this->requestData);
 			$group_id=intval($p['group_id']);
 		}
 
+		$limit=!empty($search['limit']) ? $search['limit'] : $this->resPicsPerPage;
+		$offset=!empty($search['offset']) ? $search['offset'] : null;
+
+
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
-			
+				SQL_CALC_FOUND_ROWS
 				_a.id,
 				_a.taxon_id,
 				_a.file_name,
@@ -545,8 +551,8 @@ q($this->requestData);
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")." 		
 
 			order by ".(isset($p['sort']) && $p['sort']=='photographer' ?  "_c.meta_data" : "_b.taxon")."
-			".(isset($offset) ? "offset ".$offset : "")."
-			".(isset($limit) ? "limit ".$limit : "")
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 			);
 
 //		q($this->models->MediaTaxon->q(),1);
@@ -559,8 +565,9 @@ q($this->requestData);
 			$d[$key]['meta_datum']=strftime('%e %B %Y',strtotime($val['meta_datum']));
 		};
 
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
-		return $d;
+		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->resPicsPerPage);
 		
 	}
 

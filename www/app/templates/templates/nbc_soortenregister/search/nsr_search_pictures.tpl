@@ -101,11 +101,23 @@
 				</fieldset>
 			</form>
 			</div>
-		
+
+
+{*		
+{math equation="ceil(x/y)" assign=pages x=$results.count y=$results.perpage}
+{$pages}
+
+<ul>
+{for $foo=1 to 3}
+    <li>{$foo}</li>
+{/for}
+</ul>
+*}
+
 			<div>
-				<h4>{$results|@count} resultaten</h4>
+				<h4>{$results.count} resultaten</h4>
 				<div>
-					{foreach from=$results item=v}
+					{foreach from=$results.data item=v}
 						{assign var=photograhper_name value=", "|explode:$v.photographer_name} 
 						<div class="imageInGrid3">
 							<div class="thumbContainer">
@@ -125,6 +137,9 @@
 					{/foreach}
 				</div>
 			</div>
+			
+			
+			
 		{/if}
 	</div>
 
