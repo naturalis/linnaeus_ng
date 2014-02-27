@@ -166,7 +166,7 @@ function getInitialValues() {
 		}),
 		success : function (data) {
 			initData = $.parseJSON(data);
-			console.dir(initData);
+			//console.dir(initData);
 		}
 	});
 }
