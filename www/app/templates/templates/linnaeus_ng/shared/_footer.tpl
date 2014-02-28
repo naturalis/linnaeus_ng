@@ -53,8 +53,8 @@ $(document).ready(function(){
 	 	});
 	}
 
-	if( jQuery().fitText ){
-		$("#title h1").fitText(1.5);
+	if( jQuery().shrinkText ){
+		$("#title a").shrinkText();
 	}
 {/literal}
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
