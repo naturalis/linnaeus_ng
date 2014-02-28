@@ -1,4 +1,4 @@
-	<div id="left">
+	<div id="right">
 
         <div id="quicksearch">
             <h2>{t}Zoek op naam{/t}</h2>

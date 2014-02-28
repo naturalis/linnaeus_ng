@@ -36,7 +36,7 @@ class SearchController extends Controller
 
         parent::__construct();
 
-		$this->initialize();
+		$this->initialise();
 
     }
 
@@ -45,7 +45,7 @@ class SearchController extends Controller
         parent::__destruct();
     }
 
-	private function initialize()
+	private function initialise()
 	{
 		$this->_minSearchLength = isset($this->controllerSettings['minSearchLength']) ? $this->controllerSettings['minSearchLength'] : $this->_minSearchLength;
 		$this->_maxSearchLength = isset($this->controllerSettings['maxSearchLength']) ? $this->controllerSettings['maxSearchLength'] : $this->_maxSearchLength;

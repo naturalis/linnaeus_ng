@@ -11,6 +11,7 @@
 	{include file="_left_column.tpl"}
 
 	<div id="content">
+
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="">
 				<h1>
@@ -55,6 +56,13 @@
 				{/foreach}
 			</div>
 
+			{assign var=pgnResultCount value=$content|@count}
+			{assign var=pgnResultsPerPage value=12}
+			{assign var=pgnCurrPage value=$search.page}
+			{assign var=pgnURL value=$smarty.server.PHP_SELF}
+			{assign var=pgnQuerystring value=$querystring}
+			{include file="../shared/_paginator.tpl"}
+			
 		{elseif $activeCategory==$smarty.const.CTAB_DNA_BARCODES}
 
 			<div>

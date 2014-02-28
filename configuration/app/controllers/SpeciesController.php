@@ -1,6 +1,7 @@
 <?php
 
 include_once ('Controller.php');
+
 class SpeciesController extends Controller
 {
 	private $_lookupListMaxResults=100;
@@ -335,21 +336,15 @@ class SpeciesController extends Controller
 				}
 				
                 $this->smarty->assign('content', $content);
-
                 $this->smarty->assign('rdf', $rdf);
-
                 $this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
-                
                 $this->smarty->assign('adjacentItems', $this->getAdjacentTaxa($taxon['id']));
            
             }
             
             $this->smarty->assign('categories', $categories['categories']);
-
             $this->smarty->assign('activeCategory', $activeCategory);
-
             $this->smarty->assign('categorySysList', $categories['categorySysList']);
-
             $this->smarty->assign('headerTitles', array('title' => $taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
             
             //$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);

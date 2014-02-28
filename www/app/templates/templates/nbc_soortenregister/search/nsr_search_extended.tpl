@@ -105,8 +105,10 @@
 		</div>
 		
 		<div>
-			<h4>{$results|@count}{if $results|@count<$result_count} van {$result_count}{/if} resultaten</h4>
-			{foreach from=$results item=v}
+			<p>
+				<h4><span id="resultcount-header">{$results.count}</span></h4>
+			</p>
+			{foreach from=$results.data item=v}
 				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
 					{if $v.overview_image}
 					<img src="http://images.ncbnaturalis.nl/comping/{$v.overview_image}" style="width:140px;height:auto;float:right"/>
@@ -117,6 +119,14 @@
 				</div>
 			{/foreach}
 		</div>
+
+		{assign var=pgnResultCount value=$results.count}
+		{assign var=pgnResultsPerPage value=$results.perpage}
+		{assign var=pgnCurrPage value=$search.page}
+		{assign var=pgnURL value=$smarty.server.PHP_SELF}
+		{assign var=pgnQuerystring value=$querystring}
+		{include file="../shared/_paginator.tpl"}
+				
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
