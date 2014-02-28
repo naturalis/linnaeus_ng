@@ -202,8 +202,6 @@
     content: " …"; }
 
 .map_controls {
-  position: absolute;
-  bottom: 0;
   right: 10px;
   text-align: right; }
   .map_controls input {
