@@ -135,6 +135,10 @@
 			}
 		}
 
+		.module-mapkey #theForm{
+			padding-left: 2px; /* Realy just a hack */
+		}
+
 		#mapTable  {
 			outline: 1px solid #000;
 			visibility: hidden;
@@ -146,7 +150,7 @@
 		    margin: 0;
 		    border: 1px solid rgba(0,0,0,0.1);
 		    opacity: .7;
-			filter: alpha(opacity=80);
+			filter: alpha(opacity=80); 
 			&.nogrid{
 				border-color: rgba(0,0,0,0);
 			}
