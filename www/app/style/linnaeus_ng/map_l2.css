@@ -1,16 +1,13 @@
 @charset "UTF-8";
 /* STYLING */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\000037}}
 #grid-header {
   height: 48px;
   vertical-align: top; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000312}}
 #mapGrid {
   width: 100%;
   background-color: #f9f9f7; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000317}}
 #mapName {
   height: 0;
   overflow: display;
@@ -19,55 +16,44 @@
   width: 200px;
   font-family: Arial, sans-serif; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000329}}
 #grid-header td {
   padding-top: 0.5em; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000333}}
 #taxonName {
   font-size: 24px;
   color: #009ee0;
   border-bottom: 1px dotted #009ee0;
   font-weight: normal;
   margin-left: 0.5em; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000340}}
   #taxonName:hover {
     text-decoration: none;
     color: #e3004a;
     border-bottom-color: #e3004a; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000347}}
 #legendCell {
   font-family: Arial, sans-serif;
   font-size: 12px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000352}}
 #legend {
   padding-left: 1em;
   padding-right: 1em; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000358}}
   #legend label {
     padding-left: 30px;
     text-indent: -30px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000363}}
   #legend .opacity {
     position: relative;
     top: -1px;
     margin-right: 3px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000370}}
 #grid-footer {
   font-size: 12px;
   font-family: Arial, sans-serif; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000377}}
 #legendCell {
   vertical-align: top; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000379}}
   #legendCell p {
     margin-top: 0.5em;
     margin-left: 1em; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000383}}
     #legendCell p a {
       -moz-user-select: none;
       background-color: #009ee0;
@@ -78,28 +64,23 @@
       position: relative;
       text-align: center;
       font-family: Arial, sans-serif; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\0000396}}
   #legendCell #toggleGrid {
     background-color: white;
     border: 1px solid #cccccc;
     color: #666666; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003104}}
 .mapPCheckbox, .mapPCheckbox label {
   font-size: 12px;
   font-family: Arial, sans-serif; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003110}}
 .cellwrapper {
   position: relative; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003114}}
 #mapName {
   padding: 0.5em 1em;
   position: absolute;
   top: 0;
   left: 0; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003120}}
   #mapName span {
     display: block;
     border: 1px solid #cccccc;
@@ -108,99 +89,84 @@
     padding: 0em 0.5em;
     font-size: 12px;
     color: black; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003129}}
     #mapName span:after {
       content: "▼";
       display: block;
       float: right;
       color: #cccccc; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003138}}
+.module-mapkey #theForm {
+  padding-left: 2px;
+  /* Realy just a hack */ }
+
 #mapTable {
   outline: 1px solid #000;
   visibility: hidden; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003144}}
 #mapTable td {
   padding: 0;
   margin: 0;
   border: 1px solid rgba(0, 0, 0, 0.1);
   opacity: .7;
   filter: alpha(opacity=80); }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003150}}
   #mapTable td.nogrid {
     border-color: rgba(0, 0, 0, 0); }
 
 /* --- MAP CELL LEGEND -- */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003157}}
 .mapCellLegend {
   cursor: pointer;
   margin-right: 4px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003162}}
 .mapCellDiversity {
   cursor: pointer; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity1 {
   font-family: 10%;
   background-color: #ffe5e5; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity2 {
   font-family: 20%;
   background-color: #ffcccc; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity3 {
   font-family: 30.0%;
   background-color: #ffb2b2; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity4 {
   font-family: 40%;
   background-color: #ff9999; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity5 {
   font-family: 50%;
   background-color: #ff7f7f; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity6 {
   font-family: 60.0%;
   background-color: #ff6565; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity7 {
   font-family: 70%;
   background-color: #ff4c4c; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity8 {
   font-family: 80%;
   background-color: #ff3232; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity9 {
   font-family: 90%;
   background-color: #ff1919; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003169}}
 .mapCellDiversity10 {
   font-family: 100%;
   background-color: red; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003175}}
 #legendCell .cellwrapper {
   padding-bottom: 50px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003179}}
 #gridMapCell {
   vertical-align: top; }
 
 /* --- MAP CELL TAGED (COMPARE)--- */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003185}}
 .mapCellTagged {
   filter: alpha(opacity=60);
   -moz-opacity: .60;
@@ -208,44 +174,35 @@
   opacity: .60;
   background-color: #e3004a; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003193}}
 .mapCellA {
   background-color: #e3004a; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003197}}
 .mapCellB {
   background-color: #009ee0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003201}}
 .mapCellAB {
   background-color: #714f95; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003206}}
 .mapCellSelected {
   border: 0;
   background-color: #f00; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003211}}
 #speciesNameA, #speciesNameB {
   font-family: Arial, sans-serif;
   font-size: 12px;
   margin-right: 2em; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003217}}
 .selectIcon {
   color: #009ee0;
   border-bottom: 1px solid dotted;
   cursor: pointer; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003221}}
   .selectIcon:after {
     content: " …"; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003226}}
 .map_controls {
   position: absolute;
   bottom: 0;
   right: 10px;
   text-align: right; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/map_l2\.scss}line{font-family:\00003231}}
   .map_controls input {
     margin: 5px; }
