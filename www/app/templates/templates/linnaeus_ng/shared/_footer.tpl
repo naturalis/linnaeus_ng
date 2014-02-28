@@ -43,7 +43,7 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-	if(jQuery().prettyPhoto) {
+	if( jQuery().prettyPhoto ) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
 	 		opacity: 0.70, 
 			animation_speed:50,
@@ -51,6 +51,10 @@ $(document).ready(function(){
 	 		overlay_gallery: false,
 	 		social_tools: false
 	 	});
+	}
+
+	if( jQuery().fitText ){
+		$("#title h1").fitText(1.5);
 	}
 {/literal}
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
