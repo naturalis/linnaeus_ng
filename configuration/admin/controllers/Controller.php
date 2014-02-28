@@ -1179,7 +1179,6 @@ class Controller extends BaseClass
      */
     public function smartyTranslate ($params, $content, &$smarty, &$repeat)
     {
-		
         if (empty($content))
             return;
         
@@ -2937,11 +2936,16 @@ class Controller extends BaseClass
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
-        
-        $this->smarty->register_block('t', array(
-            &$this, 
-            'smartyTranslate'
-        ));
+		$this->smarty->registerPlugin("block","t", array($this,"smartyTranslate"));
+		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;        
+
+		/*
+				$this->smarty->register_block('t', array(
+					&$this, 
+					'smartyTranslate'
+				));
+		*/
+
     }
 
 

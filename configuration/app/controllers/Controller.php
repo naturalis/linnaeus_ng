@@ -2449,31 +2449,22 @@ class Controller extends BaseClass
      */
     private function setSmartySettings ()
     {
-        
         // this is now done in $this->loadSmartyConfig(); because some settings are needed earlier in the bootstrap
         //$this->_smartySettings = $this->config->getSmartySettings();
         $this->smarty = new Smarty();
         
         /* DEBUG */
         $this->smarty->force_compile = true;
-        
+
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . $this->getSkinName() . '/' . $this->getControllerBaseName() . '/';
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
-       
-        $this->smarty->register_block('t', array(
-            &$this, 
-            'smartyTranslate'
-        ));
-
-        $this->smarty->register_block('snippet', array(
-            &$this, 
-            'smartyTranslateGetSnippet'
-        ));
-
+		$this->smarty->registerPlugin("block","t", array($this,"smartyTranslate"));
+		$this->smarty->registerPlugin("block","snippet", array($this,"smartyTranslateGetSnippet"));
+		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;        
     }
 
 
@@ -2527,6 +2518,7 @@ class Controller extends BaseClass
                 $this->requestDataFiles[] = $val;
             }
         }
+		
     }
 
 
@@ -3107,7 +3099,7 @@ class Controller extends BaseClass
             
             foreach ((array) $_SESSION['app']['user']['states'][$this->getControllerBaseName()] as $key => $val) {
                 
-                if (!isset($this->requestData[$key]))
+                if (!isset($this->requestData[$key]) && $key!='lastPage')
                     $this->requestData[$key] = $val;
             }
         }

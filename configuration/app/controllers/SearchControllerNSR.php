@@ -5,8 +5,9 @@ include_once ('SearchController.php');
 
 class SearchControllerNSR extends SearchController
 {
-
 	private $_suggestionListItemMax=25;
+	private $_resPicsPerPage=12;
+	private $_resSpeciesPerPage=50;
 
     public $usedModels = array(
 		'taxa',
@@ -48,6 +49,7 @@ class SearchControllerNSR extends SearchController
 		
 		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
 
+		$this->smarty->assign('querystring',$this->reconstructQueryString());
 		$this->smarty->assign('type',$searchType);
 		$this->smarty->assign('search',$search);
 
@@ -57,38 +59,10 @@ class SearchControllerNSR extends SearchController
 
     public function searchExtendedAction ()
     {
-		
-		if (1==1||
-			$this->rHasVal('group') ||
-			$this->rHasVal('group_id') ||
-			$this->rHasVal('author') ||
-			$this->rHasVal('author_id') ||
-			$this->rHasVal('presence') ||
-			$this->rHasVal('images') ||
-			$this->rHasVal('distribution') ||
-			$this->rHasVal('trend') ||
-			$this->rHasVal('dna') ||
-			$this->rHasVal('dna_insuff')
-		) {
-	
-			$search=$this->requestData;
-
-			$d=$this->doExtendedSearch($search);
-
-			$this->smarty->assign('results',$d['data']);
-			$this->smarty->assign('result_count',$d['count']);
-
-//			if (is_numeric($search['group']))
-//				$search['name']=$d['ancestor']['name'].(!empty($d['ancestor']['dutch_name']) ? ' ['.$d['ancestor']['dutch_name'].']' : '');
-
-		}
-
-		$this->smarty->assign('search',isset($search) ? $search : $this->requestData);	
-
+		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
+		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-
         $this->printPage();
-
     }
 
 
@@ -123,25 +97,20 @@ class SearchControllerNSR extends SearchController
     }
 
 
+    public function photographersAction ()
+    {
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount(array('limit'=>'*')));
+        $this->printPage();
+    }
+
+
     public function searchPicturesAction ()
     {
-		if (
-			$this->rHasVal('name') ||
-			$this->rHasVal('name_id')||
-			$this->rHasVal('group')||
-			$this->rHasVal('group_id') ||
-			$this->rHasVal('photographer') ||
-			$this->rHasVal('photographer')||
-			$this->rHasVal('validator')
-		)
-		{
+		$results = $this->doPictureSearch($this->requestData);
+		$this->smarty->assign('search',$this->requestData);	
+		$this->smarty->assign('querystring',$this->reconstructQueryString());
+		$this->smarty->assign('results',$results);	
 			
-			$this->smarty->assign('search',$this->requestData);	
-			$results = $this->doPictureSearch($this->requestData);
-			$this->smarty->assign('results',$results);	
-			
-		}
-
 		$p=$this->requestData;
 
 		if ($this->rHasVal('show','photographers'))
@@ -154,7 +123,6 @@ class SearchControllerNSR extends SearchController
 
         $this->printPage();
     }
-
 
 
 	private function getPresenceStatuses()
@@ -189,10 +157,15 @@ class SearchControllerNSR extends SearchController
 	}
 
 
-	private function doSearch($search)
+	private function doSearch($p)
 	{
+
+		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
+		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
+
 		$d=$this->models->Names->freeQuery("
 			select
+				SQL_CALC_FOUND_ROWS	
 				_a.taxon_id,
 				_a.name,
 				_a.uninomial,
@@ -217,10 +190,10 @@ class SearchControllerNSR extends SearchController
 			_l.file_name as overview_image,
 
 				case
-					when _a.name REGEXP '^".mysql_real_escape_string($search['search'])."$' = 1 then 100
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search['search'])."[[:>:]](.*)$' = 1 then 90
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search['search'])."(.*)$' = 1 then 80
-					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search['search'])."(.*)$' = 1 then 70
+					when _a.name REGEXP '^".mysql_real_escape_string($p['search'])."$' = 1 then 100
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($p['search'])."[[:>:]](.*)$' = 1 then 90
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($p['search'])."(.*)$' = 1 then 80
+					when _a.name REGEXP '^(.*)".mysql_real_escape_string($p['search'])."(.*)$' = 1 then 70
 					else 60
 				end as match_percentage
 			
@@ -261,53 +234,54 @@ class SearchControllerNSR extends SearchController
 			where _a.project_id =".$this->getCurrentProjectId()."
 			and _f.lower_taxon=1
 			and _a.language_id =".LANGUAGE_ID_DUTCH."
-			and _a.name like '%".mysql_real_escape_string($search['search'])."%'
+			and _a.name like '%".mysql_real_escape_string($p['search'])."%'
 			and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."')
 			order by 
 				match_percentage desc, ".
-				(!empty($search['sort']) && $search['sort']=='preferredNameNl' ? "dutch_name" : "taxon" )."
-			limit ".(!empty($search['limit']) ? intval($search['limit']) : "1000" )."
-			"
+				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "dutch_name" : "taxon" )."
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 
-		return $d;
+		//SQL_CALC_FOUND_ROWS
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+
+		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resSpeciesPerPage);
+
 	}
 
 
-	private function doExtendedSearch($search)
+	private function doExtendedSearch($p)
 	{
 		$d=null;
-		if (!empty($search['group_id']))
-			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($search['group_id']),'match'=>'id'));
+		if (!empty($p['group_id']))
+			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
 		else
-		if (!empty($search['group']))
-			$d=$this->getSuggestionsGroup(array('search'=>$search['group'],'match'=>'exact'));
+		if (!empty($p['group']))
+			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
 
 		if ($d) 
 			$ancestor=$d[0];
 //		else
 //			return null;
 
-		$img=!empty($search['images']);
+		$img=!empty($p['images']);
 
-		$dna=(!empty($search['dna']) || !empty($search['dna_insuff']));
+		$dna=(!empty($p['dna']) || !empty($p['dna_insuff']));
 
-		$dna_insuff=!empty($search['dna_insuff']);
+		$dna_insuff=!empty($p['dna_insuff']);
 
-		if (!empty($search['author'])) $auth=$search['author'];
+		if (!empty($p['author'])) $auth=$p['author'];
 
-		if (!empty($search['presence'])) {
+		if (!empty($p['presence'])) {
 			$pres=array();
-			foreach((array)$search['presence'] as $key=>$val) {
+			foreach((array)$p['presence'] as $key=>$val) {
 				if ($val=='on') $pres[]=intval($key);
 			}
 		}
 
-		$this->resSpeciesPerPage=50;
-
-		$limit=!empty($search['limit']) ? $search['limit'] : $this->resSpeciesPerPage;
-		$offset=!empty($search['offset']) ? $search['offset'] : null;
-
+		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
+		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
 
 		$data=$this->models->Taxon->freeQuery("
 			select
@@ -384,18 +358,17 @@ class SearchControllerNSR extends SearchController
 			".($img ? "and number_of_images > 0" : "")."
 			".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
 
-			order by ".($search['sort']=='name-pref-nl' ? "dutch_name" : "_a.taxon")."
-			".(isset($offset) ? "offset ".$offset : "")."
+			order by ".(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "dutch_name" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
-			"
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
-		
-		
+
+	
 		//q($this->models->Taxon->q());
 
-		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
-		return array('count'=>$count[0]['total'],'data'=>$data,'ancestor'=>isset($ancestor) ? $ancestor : null);
+		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resSpeciesPerPage,'ancestor'=>isset($ancestor) ? $ancestor : null);
 	}
 
 
@@ -468,8 +441,6 @@ class SearchControllerNSR extends SearchController
 	private function doPictureSearch($p)
 	{
 		
-		$this->resPicsPerPage=33;
-
 		$group_id=null;
 
 		if (empty($p['group_id']) && !empty($p['group'])) {
@@ -481,9 +452,8 @@ class SearchControllerNSR extends SearchController
 			$group_id=intval($p['group_id']);
 		}
 
-		$limit=!empty($search['limit']) ? $search['limit'] : $this->resPicsPerPage;
-		$offset=!empty($search['offset']) ? $search['offset'] : null;
-
+		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
+		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
@@ -555,8 +525,8 @@ class SearchControllerNSR extends SearchController
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 			);
 
-//		q($this->models->MediaTaxon->q(),1);
-//		q($d,1);
+		//q($this->models->MediaTaxon->q(),1);
+		//q($d,1);
 
 		setlocale(LC_ALL, 'nl_NL.utf8');
 		
@@ -567,7 +537,7 @@ class SearchControllerNSR extends SearchController
 
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
-		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->resPicsPerPage);
+		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resPicsPerPage);
 		
 	}
 
@@ -759,6 +729,18 @@ class SearchControllerNSR extends SearchController
 		
 	}
 
+
+	private function reconstructQueryString()
+	{
+		$querystring=null;
+		foreach((array)$this->requestData as $key=>$val) {
+			if ($key=='page') continue;
+			$querystring.=$key.'='.$val.'&';
+		}
+		return $querystring;
+	}
+
+			
 
 
 

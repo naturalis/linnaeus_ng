@@ -7,17 +7,15 @@
 	<div id="content">
 	
 		<div id="results">
-			<p>
-				<h2>
-				Gezocht op "{$search.search}": <span id="resultcount-header">{$results|@count}</span>
-				</h2>
+			<h2>
+			Gezocht op "{$search.search}": <span id="resultcount-header">{$results.count}</span>
+			</h2>
 
-			</p>
 			<p>
-				{if $results}
+				{if $results.data}
 
-				{foreach from=$results item=res}
-				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
+				{foreach from=$results.data item=res}
+				<div class="result">
 					{if $res.overview_image}
 					<img src="http://images.naturalis.nl/160x100/{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
 					{/if}
@@ -27,6 +25,13 @@
 					Status voorkomen: {$res.presence_information_index_label} {$res.presence_information_title}
 				</div>
 				{/foreach}
+
+				{assign var=pgnResultCount value=$results.count}
+				{assign var=pgnResultsPerPage value=$results.perpage}
+				{assign var=pgnCurrPage value=$search.page}
+				{assign var=pgnURL value=$smarty.server.PHP_SELF}
+				{assign var=pgnQuerystring value=$querystring}
+				{include file="../shared/_paginator.tpl"}
 				
 				{else}
 				Niets gevonden.
@@ -43,16 +48,5 @@
 	{include file="../shared/_right_column.tpl"}
 
 </div>
-
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-	var n=parseInt($('#resultcount-header').html());
-	$('#resultcount-header').html($('#resultcount-header').html()+' '+(n==1 ? 'resultaat' : 'resultaten'));
-{literal}
-});
-</script>
-{/literal}
 
 {include file="../shared/footer.tpl"}
