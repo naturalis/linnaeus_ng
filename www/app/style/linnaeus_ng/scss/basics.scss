@@ -1,15 +1,3 @@
-// TODO:
-// Kleine verspringing in vergrootglas tussen verschillende pagina's
-// 'search'
-
-// 
-// Needs HTML:
-// - frontpage withOUT thumbnails
-// - frontpage with graphic
-// - andere pijltjes in matrixes
-// - verwijder referentie naar jQeury dialogue
-// - rethinking matrix keys
-// - Zwarte balk onderin
 
 /*
  _     _                                   _   _  ____ 
@@ -363,7 +351,6 @@
 
 			#title, #mini-header-title {
 				font-size: 32px;
-				margin: 0 auto;
 				line-height: 50px;
 				@media screen and (max-width:$page-width ){ margin-left: 0.25em; font-size: 24px;}
 
@@ -968,11 +955,17 @@
 		/* --- --- GENERAL --- */
 
 			#title{
+				margin: 0 auto;
 				width: $page-width;
 
 				@media (max-width: $medium-width){
 				}
 
+				h1{
+					margin: 0;
+					display: block;
+					width: 60%;
+				}
 			}
 
 			html{ 
@@ -982,6 +975,7 @@
 			body {
 				background-color: $grijs-7;
 			}
+
 
 			#container{
 				background-color: $wit;
@@ -1033,7 +1027,7 @@
 
 				@media (max-width: $medium-width){
 					clear: both;
-					float: none;
+					float: none; 
 					width: 100%;
 					display: none;
 				}
