@@ -17,7 +17,7 @@
 {else}
 <form method="post" id="theForm" action="">
 <table id="mapGrid">
-    <tr id="grid-header">
+    <tr>
         <td colspan="2">&nbsp;
             
     	</td>
