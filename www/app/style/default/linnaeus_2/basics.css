@@ -492,9 +492,9 @@ table#media-grid td:first-child {
 }
 
 #page-main ul {
-    list-style: disc inside none;
+    -list-style: disc inside none;
 }
 
 #page-main li {
-	padding:0 0 0 10px;
+	-padding:0 0 0 10px;
 }
