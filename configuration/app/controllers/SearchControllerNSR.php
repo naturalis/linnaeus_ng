@@ -455,89 +455,140 @@ class SearchControllerNSR extends SearchController
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 
-		$d=$this->models->MediaTaxon->freeQuery("
-			select 
+		$data=$this->models->MediaTaxon->freeQuery("		
+			select
 				SQL_CALC_FOUND_ROWS
-				_a.id,
-				_a.taxon_id,
-				_a.file_name,
-				_a.thumb_name,
-				_c.meta_data as photographer_name,
-				_f.lower_taxon,
+				_m.id,
+				_m.taxon_id,
+				file_name as image,
+				thumb_name as thumb,
+				_c.meta_data as photographer,
+				_k.taxon,
+				_z.name as dutch_name,
 				_j.name,
-				_b.taxon,
-				_k.name as dutch_name,
-				_meta1.meta_data as meta_datum,
-				_meta2.meta_data as meta_short_desc
+
+				_j.uninomial,
+				_j.specific_epithet,
+				_j.infra_specific_epithet,
+				_j.authorship,			
 				
-			from  %PRE%media_taxon _a 		
-
+				_meta1.meta_data as meta_datum,
+				_meta2.meta_data as meta_short_desc,
+				_meta3.meta_data as meta_geografie,
+				_meta4.meta_data as meta_datum_plaatsing,
+				_meta5.meta_data as meta_copyrights
+			
+			from  %PRE%media_taxon _m
+			
 			left join %PRE%media_meta _c
-				on _a.project_id=_c.project_id
-				and _a.id = _c.media_id
+				on _m.project_id=_c.project_id
+				and _m.id = _c.media_id
 				and _c.sys_label = 'beeldbankFotograaf'
+		
+			left join %PRE%taxa _k
+				on _m.taxon_id=_k.id
+				and _m.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
 
+			left join %PRE%names _z
+				on _m.taxon_id=_z.taxon_id
+				and _m.project_id=_z.project_id
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _j
+				on _m.taxon_id=_j.taxon_id
+				and _m.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+				
 			left join %PRE%media_meta _meta1
-				on _a.id=_meta1.media_id
-				and _a.project_id=_meta1.project_id
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
 				and _meta1.sys_label='beeldbankDatumVervaardiging'
 
 			left join %PRE%media_meta _meta2
-				on _a.id=_meta2.media_id
-				and _a.project_id=_meta2.project_id
+				on _m.id=_meta2.media_id
+				and _m.project_id=_meta2.project_id
 				and _meta2.sys_label='beeldbankOmschrijvingKort'
-
-			left join %PRE%names _k
-				on _a.taxon_id=_k.taxon_id
-				and _a.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _k.language_id=".LANGUAGE_ID_DUTCH."
 			
-			left join %PRE%taxa _b
-				on _a.taxon_id = _b.id
-				and _a.project_id = _b.project_id
+			left join %PRE%media_meta _meta3
+				on _m.id=_meta3.media_id
+				and _m.project_id=_meta3.project_id
+				and _meta3.sys_label='beeldbankGeografie'
 			
-			left join %PRE%projects_ranks _f
-				on _b.rank_id=_f.id
-				and _b.project_id = _f.project_id
+			left join %PRE%media_meta _meta4
+				on _m.id=_meta4.media_id
+				and _m.project_id=_meta4.project_id
+				and _meta4.sys_label='beeldbankDatumAanmaak'
+			
+			left join %PRE%media_meta _meta5
+				on _m.id=_meta5.media_id
+				and _m.project_id=_meta5.project_id
+				and _meta5.sys_label='beeldbankCopyrights'
 
 			".(!empty($group_id) ? "left join %PRE%taxon_quick_parentage _q
-				on _a.taxon_id=_q.taxon_id
-				and _a.project_id=_q.project_id
+				on _m.taxon_id=_q.taxon_id
+				and _m.project_id=_q.project_id
 				" : "" )."
 			
-			left join %PRE%names _j
-				on _a.taxon_id=_j.taxon_id
-				and _a.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+			where _m.project_id = ".$this->getCurrentProjectId()."
 			
-			where _a.project_id = ".$this->getCurrentProjectId()."
-			
-				".(!empty($p['name_id']) ? "and _a.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
-				".(!empty($p['name']) && empty($p['name']) ? "and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.lower_taxon=1"  : "")." 		
+				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
+				".(!empty($p['name']) && empty($p['name']) ?
+					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.lower_taxon=1"  : "")." 		
 				".(!empty($p['photographer'])  ? "and _c.meta_data like '". mysql_real_escape_string($p['photographer'])."%'"  : "")." 		
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")." 		
 
-			order by ".(isset($p['sort']) && $p['sort']=='photographer' ?  "_c.meta_data" : "_b.taxon")."
+			order by ".(isset($p['sort']) && $p['sort']=='photographer' ?  "_c.meta_data" : "_k.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
-			);
+		);
 
 		//q($this->models->MediaTaxon->q(),1);
-		//q($d,1);
+		//q($data,1);
 
-		setlocale(LC_ALL, 'nl_NL.utf8');
+		$isWin=$this->helpers->Functions->serverIsWindows();
+
+		if (!$isWin) setlocale(LC_ALL, 'nl_NL.utf8');
 		
-		foreach((array)$d as $key=>$val) {
-			$d[$key]['photographer']=implode(' ',array_reverse(explode(',',$val['photographer_name'])));
-			$d[$key]['meta_datum']=strftime('%e %B %Y',strtotime($val['meta_datum']));
-		};
-
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
-		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resPicsPerPage);
+		foreach((array)$data as $key=>$val) {
+
+			$photographer=implode(' ',array_reverse(explode(',',$val['photographer'])));
+			$copyrighter=($val['meta_copyrights']==$val['photographer'] ? $photographer : $val['meta_copyrights']);
+	
+			$metaData=array(
+				'' => '<h3><i>'.
+					(!empty($val['uninomial']) ? $val['uninomial'].' ' : '' ).
+					(!empty($val['specific_epithet']) ? $val['specific_epithet'].' ' : '' ).
+					$val['infra_specific_epithet'].'</i>'.
+					(!empty($val['authorship']) ? ' '.$val['authorship'] : '').'</h3>' ,
+				'Fotograaf' => $photographer,
+				'Datum' => $isWin ? $val['meta_datum'] : strftime('%e %B %Y',strtotime($val['meta_datum'])),
+				'Locatie' => $val['meta_geografie'],
+				//'Validator' => '...',
+				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%e %B %Y',strtotime($val['meta_datum_plaatsing'])),
+				'Copyright' => $copyrighter,
+				//'Contactadres fotograaf' => '...'
+			);
+
+			$data[$key]['photographer']=$photographer;
+			$data[$key]['label']=
+				$photographer.', '.
+				($isWin ? $val['meta_datum'] : strftime('%e %B %Y',strtotime($val['meta_datum']))).', '.
+				$val['meta_geografie'];
+			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
+
+		}
+
+		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
 		
 	}
 

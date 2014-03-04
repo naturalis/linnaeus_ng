@@ -210,13 +210,15 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$data=$this->models->Taxon->freeQuery("		
 			select
+				SQL_CALC_FOUND_ROWS
 				_m.id,
 				_m.taxon_id,
-				file_name,
-				thumb_name,
-				_x.description,
+				file_name as image,
+				thumb_name as thumb,
+				_c.meta_data as photographer,
 				_k.taxon,
-				_z.name,
+				_z.name as dutch_name,
+				_j.name,
 				_meta1.meta_data as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
@@ -225,9 +227,10 @@ class SpeciesControllerNSR extends SpeciesController
 			
 			from  %PRE%media_taxon _m
 			
-			left join %PRE%media_descriptions_taxon _x
-				on _m.id=_x.media_id
-				and _m.project_id=_x.project_id
+			left join %PRE%media_meta _c
+				on _m.project_id=_c.project_id
+				and _m.id = _c.media_id
+				and _c.sys_label = 'beeldbankFotograaf'
 			
 			left join %PRE%taxa _k
 				on _m.taxon_id=_k.id
@@ -240,8 +243,16 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%names _z
 				on _m.taxon_id=_z.taxon_id
 				and _m.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
 				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _j
+				on _m.taxon_id=_j.taxon_id
+				and _m.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 				
 			left join %PRE%media_meta _meta1
 				on _m.id=_meta1.media_id
@@ -275,37 +286,35 @@ class SpeciesControllerNSR extends SpeciesController
 			"
 		);
 
-		setlocale(LC_ALL, 'nl_NL.utf8');
-		
-		$results=array();
-		
-		foreach((array)$data as $val) {
+		$isWin=$this->helpers->Functions->serverIsWindows();
 
-			$photographer=implode(' ',array_reverse(explode(',',$val['description'])));
+		if (!$isWin) setlocale(LC_ALL, 'nl_NL.utf8');
+		
+		foreach((array)$data as $key=>$val) {
+
+			$photographer=implode(' ',array_reverse(explode(',',$val['photographer'])));
+			$copyrighter=($val['meta_copyrights']==$val['photographer'] ? $photographer : $val['meta_copyrights']);
 	
 			$metaData=array(
 				'Fotograaf' => $photographer,
-				'Datum' => strftime('%e %B %Y',strtotime($val['meta_datum'])),
+				'Datum' => $isWin ? $val['meta_datum'] : strftime('%e %B %Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
-				'Validator' => '...',
-				'Datum plaatsing' => strftime('%e %B %Y',strtotime($val['meta_datum_plaatsing'])),
-				'Copyright' => $val['meta_copyrights'],
-				'Contactadres fotograaf' => '...'
+				//'Validator' => '...',
+				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%e %B %Y',strtotime($val['meta_datum_plaatsing'])),
+				'Copyright' => $copyrighter,
+				//'Contactadres fotograaf' => '...'
 			);
 
-			array_push(
-				$results,
-				array(
-					'image' => $val['file_name'],
-					'thumb' => $val['thumb_name'],
-					'photographer' => $photographer,
-					'label' => $photographer.', '.strftime('%e %B %Y',strtotime($val['meta_datum'])).', '.$val['meta_geografie'],
-					'meta_data'=> $this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true)	
-				)
-			);
+			$data[$key]['photographer']=$photographer;
+			$data[$key]['label']=
+				$photographer.', '.
+				($isWin ? $val['meta_datum'] : strftime('%e %B %Y',strtotime($val['meta_datum']))).', '.
+				$val['meta_geografie'];
+			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
+			
 			
 		}
-		return $results;
+		return $data;
     }
 
 

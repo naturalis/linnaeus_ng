@@ -42,7 +42,7 @@
 				<div class="thumbholder">
 					<div class="thumbnail">
 						<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-							<img src="http://images.naturalis.nl/160x100/{$v.thumb}" title="foto {$v.photographer}" alt="foto {$v.photographer}">
+							<img src="http://images.naturalis.nl/160x100/{$v.thumb}" title="Foto {$v.photographer}" alt="Foto {$v.photographer}">
 						</a>
 					</div>
 					<p class="author">

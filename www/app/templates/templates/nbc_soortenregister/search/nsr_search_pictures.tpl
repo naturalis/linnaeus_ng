@@ -95,11 +95,15 @@
 					{assign var=photograhper_name value=", "|explode:$v.photographer_name} 
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
-							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.file_name}" pTitle="foto {$photograhper_name[1]} {$photograhper_name[0]}">
-								<img class="speciesimage" alt="Foto {$photograhper_name[1]} {$photograhper_name[0]}" title="Foto {$photograhper_name[1]} {$photograhper_name[0]}" src="http://images.naturalis.nl/160x100/{$v.thumb_name}" />
+							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
 							</a>
 						</div>
-						
+
+
+
+					
+											
 						<h3>{$v.dutch_name}</h3>
 						<span class="wetenschappelijkenaam"><i>{$v.taxon}</i></span>
 						<dl>
