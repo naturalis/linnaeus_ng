@@ -622,10 +622,6 @@ class SpeciesControllerNSR extends SpeciesController
                 $content=$this->getTaxonLiterature($taxon);
                 break;
             
-            case CTAB_NAMES:
-                $content=$this->getTaxonNames($taxon);
-                break;
-            
             case CTAB_DNA_BARCODES:
                 $content=$this->getDNABarcodes($taxon);
                 break;
