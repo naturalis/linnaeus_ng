@@ -39,18 +39,15 @@
 			<div>
 			
 				{foreach from=$content item=v}
-				{assign var=photograhper_name value=", "|explode:$v.description} 
 				<div class="thumbholder">
 					<div class="thumbnail">
-						<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$v.file_name}" pTitle="foto {$photograhper_name[1]} {$photograhper_name[0]}">
-							<img src="http://images.naturalis.nl/160x100/{$v.thumb_name}" title="foto {$photograhper_name[1]} {$photograhper_name[0]}" alt="foto {$photograhper_name[1]} {$photograhper_name[0]}">
+						<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+							<img src="http://images.naturalis.nl/160x100/{$v.thumb}" title="foto {$v.photographer}" alt="foto {$v.photographer}">
 						</a>
 					</div>
 					<p class="author">
-						<span class="photographer-title" style="display:inline">Foto</span>
-						{$photograhper_name[1]} {$photograhper_name[0]}<br />
-						{if $v.name}{$v.name}<br />{/if}
-						{if $v.taxon}<a href="taxon.php?id={$v.taxon_id}"><i>{$v.taxon}</i></a><br />{/if}
+						<span class="photographer-title" style="display:inline">Foto</span><br />
+						{$v.photographer}
 					</p>
 				</div>
 				{/foreach}
@@ -149,7 +146,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			{if $content|@is_array}
 			<ul>
 			{foreach from=$content item=v key=k}
-			{if $k>0}<li><a href="taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
+			{if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
 			{/foreach}
 			</ul>
 			{else}

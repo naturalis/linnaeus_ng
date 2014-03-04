@@ -4,4 +4,4 @@ require_once ('../../../../configuration/app/controllers/SpeciesControllerNSR.ph
 
 $c = new SpeciesControllerNSR();
 
-$c->nameAction();
+$c->indexAction();

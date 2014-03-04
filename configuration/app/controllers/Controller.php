@@ -186,7 +186,8 @@ class Controller extends BaseClass
     private $usedHelpersBase = array(
         'logging_helper', 
         'debug_tools',
-		'user_agent'
+		'user_agent',
+		'functions'
     );
     public $cssToLoadBase = array(
         'basics.css', 
