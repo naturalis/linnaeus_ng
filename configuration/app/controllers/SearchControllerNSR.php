@@ -452,8 +452,24 @@ class SearchControllerNSR extends SearchController
 			$group_id=intval($p['group_id']);
 		}
 
+		if (!empty($p['photographer'])) {
+			$photographer="concat(
+					trim(substring(_c.meta_data, locate(',',_c.meta_data)+1)),' ',
+					trim(substring(_c.meta_data, 1, locate(',',_c.meta_data)-1))
+				)='".mysql_real_escape_string($p['photographer'])."'";
+		}
+
+
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
+		
+		$sort="_k.taxon asc";
+		if (isset($p['sort']) && $p['sort']=='photographer')
+			$sort="_c.meta_data asc";
+		else
+		if (!empty($p['photographer']))
+			$sort="_meta4.meta_data desc";
+
 
 		$data=$this->models->MediaTaxon->freeQuery("		
 			select
@@ -469,8 +485,10 @@ class SearchControllerNSR extends SearchController
 				_j.specific_epithet,
 				_j.infra_specific_epithet,
 				_j.authorship,		
-				concat(_j.uninomial,' ',_j.specific_epithet,
-					if(_j.infra_specific_epithet is null,'',concat(' ',_j.infra_specific_epithet))
+				concat(
+					if(_j.uninomial is null,'',concat(_j.uninomial,' ')),
+					if(_j.specific_epithet is null,'',concat(_j.specific_epithet,' ')),
+					if(_j.infra_specific_epithet is null,'',_j.infra_specific_epithet)
 				) as name,
 				_meta1.meta_data as meta_datum,
 				_meta2.meta_data as meta_short_desc,
@@ -541,11 +559,11 @@ class SearchControllerNSR extends SearchController
 			
 				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
 				".(!empty($p['name']) && empty($p['name']) ?
-					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.lower_taxon=1"  : "")." 		
-				".(!empty($p['photographer'])  ? "and _c.meta_data like '". mysql_real_escape_string($p['photographer'])."%'"  : "")." 		
-				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")." 		
+					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.lower_taxon=1"  : "")."
+				".(isset($photographer)  ? "and ".$photographer : "")." 		
+				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
 
-			order by ".(isset($p['sort']) && $p['sort']=='photographer' ?  "_c.meta_data" : "_k.taxon")."
+			".(isset($sort) ? "order by ".$sort : "")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
@@ -571,23 +589,23 @@ class SearchControllerNSR extends SearchController
 					$val['infra_specific_epithet'].'</i>'.
 					(!empty($val['authorship']) ? ' '.$val['authorship'] : '').'</h3>' ,
 				'Fotograaf' => $photographer,
-				'Datum' => $isWin ? $val['meta_datum'] : strftime('%e %B %Y',strtotime($val['meta_datum'])),
+				'Datum' => $isWin ? $val['meta_datum'] : strftime('%e-%m-%Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
 				//'Validator' => '...',
-				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%e %B %Y',strtotime($val['meta_datum_plaatsing'])),
+				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%e-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
 				'Copyright' => $copyrighter,
 				//'Contactadres fotograaf' => '...'
 			);
 
 			if (!$isWin) {
-				$data[$key]['meta_datum']=strftime('%e %B %Y',strtotime($val['meta_datum']));
-				$data[$key]['meta_datum_plaatsing']=strftime('%e %B %Y',strtotime($val['meta_datum_plaatsing']));
+				$data[$key]['meta_datum']=strftime('%e-%m-%Y',strtotime($val['meta_datum']));
+				$data[$key]['meta_datum_plaatsing']=strftime('%e-%m-%Y',strtotime($val['meta_datum_plaatsing']));
 			}
 
 			$data[$key]['photographer']=$photographer;
 			$data[$key]['label']=
 				$photographer.', '.
-				($isWin ? $val['meta_datum'] : strftime('%e %B %Y',strtotime($val['meta_datum']))).', '.
+				($isWin ? $val['meta_datum'] : strftime('%e-%m-%Y',strtotime($val['meta_datum']))).', '.
 				$val['meta_geografie'];
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 
@@ -705,18 +723,36 @@ class SearchControllerNSR extends SearchController
 	{
 		$clause=null;
 		
+		/*		
 		if ($p['match']=='start')
 			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
 		else
 		if ($p['match']=='exact')
 			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
+		*/
+
+		if ($p['match']=='start')
+			$clause="concat(
+					trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+					trim(substring(meta_data, 1, locate(',',meta_data)-1))
+				) like '".mysql_real_escape_string($p['search'])."%'";
+		else
+		if ($p['match']=='exact')
+			$clause="concat(
+					trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+					trim(substring(meta_data, 1, locate(',',meta_data)-1))
+				) = '".mysql_real_escape_string($p['search'])."'";
 
 		if (empty($clause)) return;
-		
 
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
-				distinct meta_data as label
+				distinct
+				concat(
+					trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+					trim(substring(meta_data, 1, locate(',',meta_data)-1))
+				)
+				as label
 			from %PRE%media_meta
 			where
 				project_id=".$this->getCurrentProjectId()."

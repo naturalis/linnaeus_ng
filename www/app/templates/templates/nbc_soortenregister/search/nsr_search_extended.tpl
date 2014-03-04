@@ -3,7 +3,7 @@
 
 	{include file="_left_column.tpl"}
 
-	<div id="content">
+	<div id="content" class="simple-search">
 
 		<div>
 

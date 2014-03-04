@@ -11,21 +11,6 @@
 		<div id="treebranchContainer">
 
 			<div class="top5">
-				<h2>Top 5 fotografen</h2>
-				<h4>Fotograaf (foto’s/soorten)</h4>
-				<ul>
-				{foreach from=$photographers item=v name=foo}
-					{if $smarty.foreach.foo.index < 5}
-					{assign var=photograhper_name value=", "|explode:$v.meta_data} 
-					<li>
-						<a href="nsr_search_pictures.php?photographer={$v.meta_data}">{$photograhper_name[1]} {$photograhper_name[0]} ({$v.total} / {$v.taxon_count})</a>
-					</li>
-					{/if}
-				{/foreach}
-				</ul>
-				<p>
-					<a href="nsr_search_pictures.php?show=photographers"><i>Bekijk volledige lijst</i></a>
-				</p>
 			</div>
 			
 			<br />
@@ -42,8 +27,9 @@
 
 	<div id="content">
 
-		<div>
-		
+		<h2>Overzicht fotografen</h2>
+		<h4>Fotograaf (foto’s/soorten)</h4>
+		<br>
 			<ol>
 			{foreach from=$photographers item=v}
 				{assign var=photograhper_name value=", "|explode:$v.meta_data} 
