@@ -465,13 +465,13 @@ class SearchControllerNSR extends SearchController
 				_c.meta_data as photographer,
 				_k.taxon,
 				_z.name as dutch_name,
-				_j.name,
-
 				_j.uninomial,
 				_j.specific_epithet,
 				_j.infra_specific_epithet,
-				_j.authorship,			
-				
+				_j.authorship,		
+				concat(_j.uninomial,' ',_j.specific_epithet,
+					if(_j.infra_specific_epithet is null,'',concat(' ',_j.infra_specific_epithet))
+				) as name,
 				_meta1.meta_data as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,

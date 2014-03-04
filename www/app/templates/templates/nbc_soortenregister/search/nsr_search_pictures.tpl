@@ -99,13 +99,9 @@
 								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
 							</a>
 						</div>
-
-
-
-					
-											
+									
 						<h3>{$v.dutch_name}</h3>
-						<span class="wetenschappelijkenaam"><i>{$v.taxon}</i></span>
+						<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>
 						<dl>
 							<dt>Foto</dt><dd>{$v.photographer}</dd>
 							<dt>Geplaatst op</dt><dd>{$v.meta_datum}</dd>
