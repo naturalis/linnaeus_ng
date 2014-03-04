@@ -38,7 +38,6 @@
 	{/literal}
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_conceptcard.css">
     <!--[if lte IE 7]>
 	    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_conceptcardIeOnly.css" />
     <![endif]-->
