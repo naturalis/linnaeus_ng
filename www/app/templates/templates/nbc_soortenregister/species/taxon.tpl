@@ -10,7 +10,7 @@
 
 	{include file="_left_column.tpl"}
 
-	<div id="content">
+	<div id="content" class="taxon-detail">
 
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="">
