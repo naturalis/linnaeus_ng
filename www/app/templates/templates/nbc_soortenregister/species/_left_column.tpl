@@ -31,12 +31,12 @@
 		<div id="treebranchContainer">
             <h2>Indeling</h2>
 			
-			<table>
+			<div>
 			{math equation="(x-4)" x=$classification|@count assign=start}
 			{section name=taxon loop=$classification start=$start}
 				{math equation="x-y" x=$smarty.section.taxon.index y=$start assign=buffercount}
 				{if $classification[taxon].parent_id!=null}
-				<tr><td>
+				<div>
 					{if $buffercount>0}
 					{'&nbsp;'|str_repeat:$buffercount}
 					<span class="classification-connector-smaller">&lfloor;</span>
@@ -52,10 +52,10 @@
 					</span>
 					{assign var=rank_id value=$classification[taxon].rank_id}
 					<span class="classification-rank">[{$classification[taxon].rank}]</span>
-				</td></tr>
+				</div>
 				{/if}
 			{/section}
-			</table>			
+			</div>			
 		</div>  
 
 	</div>
