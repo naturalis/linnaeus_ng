@@ -106,7 +106,7 @@
 							<dt>Foto</dt><dd>{$v.photographer}</dd>
 							<dt>Geplaatst op</dt><dd>{$v.meta_datum}</dd>
 						</dl>
-						<div style="clear: both;"><a href="../species/taxon.php?id={$v.taxon_id}">Naar deze soort</a></div>
+						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">Naar deze soort</a></div>
 					</div>
 				{/foreach}
 			</div>

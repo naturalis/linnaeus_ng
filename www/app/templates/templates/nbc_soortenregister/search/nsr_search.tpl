@@ -20,7 +20,7 @@
 					<img src="http://images.naturalis.nl/160x100/{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
 					{/if}
 					
-					<strong><a href="../species/taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
+					<strong><a href="../species/nsr_taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
 					{$res.dutch_name}<br /><br />
 					Status voorkomen: {$res.presence_information_index_label} {$res.presence_information_title}
 				</div>

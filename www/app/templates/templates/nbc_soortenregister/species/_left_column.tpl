@@ -14,7 +14,7 @@
 						{if $activeCategory==$v.id}
 						{$v.title}
 						{else}
-						<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">{$v.title}</a>	
+						<a href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">{$v.title}</a>	
 						{/if}
 					</li>
 					{/if}
@@ -42,7 +42,7 @@
 					<span class="classification-connector-smaller">&lfloor;</span>
 					{/if}
 					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{/if}">
-					<a href="taxon.php?id={$classification[taxon].id}">
+					<a href="nsr_taxon.php?id={$classification[taxon].id}">
 						{if $classification[taxon].lower_taxon==1}
 						{$classification[taxon].specific_epithet} {$classification[taxon].infra_specific_epithet}
 						{else}
