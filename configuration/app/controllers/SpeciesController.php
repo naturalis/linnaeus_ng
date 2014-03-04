@@ -291,7 +291,7 @@ class SpeciesController extends Controller
             if (isset($taxon)) {
                 
                 $this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-                $this->smarty->assign('overviewSound', $this->getTaxonOverviewSound($taxon['id']));
+                //$this->smarty->assign('overviewSound', $this->getTaxonOverviewSound($taxon['id']));
 
                 $this->smarty->assign('taxon',$taxon);
 
@@ -1469,7 +1469,7 @@ class SpeciesController extends Controller
 
 		$data=$this->models->Taxon->freeQuery("		
 			select
-			
+				_m.id,
 				_m.taxon_id,
 				file_name,
 				thumb_name,
@@ -1477,7 +1477,8 @@ class SpeciesController extends Controller
 				_k.taxon,
 				_z.name,
 				_meta1.meta_data as meta_datum,
-				_meta2.meta_data as meta_short_desc
+				_meta2.meta_data as meta_short_desc,
+				_meta3.meta_data as meta_geografie
 			
 			from  %PRE%media_taxon _m
 			
@@ -1509,6 +1510,11 @@ class SpeciesController extends Controller
 				and _m.project_id=_meta2.project_id
 				and _meta2.sys_label='beeldbankOmschrijvingKort'
 			
+			left join %PRE%media_meta _meta3
+				on _m.id=_meta3.media_id
+				and _m.project_id=_meta3.project_id
+				and _meta3.sys_label='beeldbankGeografie'
+			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
 				and _m.taxon_id=".$id."
@@ -1516,8 +1522,7 @@ class SpeciesController extends Controller
 			
 			"
 		);
-		
-		
+
 		setlocale(LC_ALL, 'nl_NL.utf8');
 
 		$photographer=implode(' ',array_reverse(explode(',',$data[0]['description'])));
@@ -1525,7 +1530,7 @@ class SpeciesController extends Controller
 		return array(
 			'image' => $data[0]['file_name'],
 			'photographer' => $photographer,
-			'label' => $data[0]['description'].', '.strftime('%e %B %Y',strtotime($data[0]['meta_datum'])).', '.$data[0]['meta_short_desc']
+			'label' => $photographer.', '.strftime('%e %B %Y',strtotime($data[0]['meta_datum'])).', '.$data[0]['meta_geografie']
 		);
 		//return $data;
 
