@@ -7,7 +7,7 @@ class Functions
 	
 	private function fission($v,$k)
 	{ 
-		return $k.$this->_keyValueGlue.$v;
+		return (!empty($k) ? $k.$this->_keyValueGlue : '').$v;
 	}
 	
 	public function nuclearImplode($keyValueGlue,$elementGlue,$array,$skipEmptyValues=false)
@@ -24,6 +24,11 @@ class Functions
 
 		return implode($elementGlue,array_map(array($this,'fission'), $array, array_keys($array)));
 
+	}
+
+	public function serverIsWindows()
+	{
+		return (strtolower(substr(PHP_OS,0,3))==='win');
 	}
 
 }
