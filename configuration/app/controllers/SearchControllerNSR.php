@@ -589,23 +589,23 @@ class SearchControllerNSR extends SearchController
 					$val['infra_specific_epithet'].'</i>'.
 					(!empty($val['authorship']) ? ' '.$val['authorship'] : '').'</h3>' ,
 				'Fotograaf' => $photographer,
-				'Datum' => $isWin ? $val['meta_datum'] : strftime('%e-%m-%Y',strtotime($val['meta_datum'])),
+				'Datum' => $isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
 				//'Validator' => '...',
-				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%e-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
+				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
 				'Copyright' => $copyrighter,
 				//'Contactadres fotograaf' => '...'
 			);
 
 			if (!$isWin) {
-				$data[$key]['meta_datum']=strftime('%e-%m-%Y',strtotime($val['meta_datum']));
-				$data[$key]['meta_datum_plaatsing']=strftime('%e-%m-%Y',strtotime($val['meta_datum_plaatsing']));
+				$data[$key]['meta_datum']=strftime('%d-%m-%Y',strtotime($val['meta_datum']));
+				$data[$key]['meta_datum_plaatsing']=strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing']));
 			}
 
 			$data[$key]['photographer']=$photographer;
 			$data[$key]['label']=
 				$photographer.', '.
-				($isWin ? $val['meta_datum'] : strftime('%e-%m-%Y',strtotime($val['meta_datum']))).', '.
+				($isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum']))).', '.
 				$val['meta_geografie'];
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 
