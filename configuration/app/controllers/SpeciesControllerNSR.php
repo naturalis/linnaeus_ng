@@ -220,8 +220,8 @@ class SpeciesControllerNSR extends SpeciesController
 				_meta1.meta_data as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
-				_meta1.meta_data as meta_datum_plaatsing,
-				_meta1.meta_data as meta_copyrights
+				_meta4.meta_data as meta_datum_plaatsing,
+				_meta5.meta_data as meta_copyrights
 			
 			from  %PRE%media_taxon _m
 			
