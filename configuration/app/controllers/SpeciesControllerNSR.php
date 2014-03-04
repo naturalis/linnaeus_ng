@@ -305,6 +305,11 @@ class SpeciesControllerNSR extends SpeciesController
 				//'Contactadres fotograaf' => '...'
 			);
 
+			if (!$isWin) {
+				$val['meta_datum']=strftime('%e %B %Y',strtotime($val['meta_datum']));
+				$val['meta_datum_plaatsing']=strftime('%e %B %Y',strtotime($val['meta_datum_plaatsing']));
+			}
+
 			$data[$key]['photographer']=$photographer;
 			$data[$key]['label']=
 				$photographer.', '.
