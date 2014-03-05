@@ -13,14 +13,13 @@
 	<div id="content" class="taxon-detail">
 
 		<div id="taxonHeader" class="hasImage">
-			<div id="titles" class="">
-				<h1>
-				{$taxon_display_name}
-				</h1>
+			<div id="titles" class="full">
 				{if $names.list[$names.prefId] && $names.list[$names.sciId]}
+					<h1><i>{$taxon_display_name}</i></h1>
 					<h2 style="width:510px"><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
 				{else}
-					<h2 style="width:510px">&nbsp;</h2>
+					<h1 class="no-subtitle"><i>{$taxon_display_name}</i></h1>
+					<h2></h2>
 				{/if}
 			</div>
 			{if $overviewImage.image}
@@ -35,30 +34,41 @@
 
 		{if $activeCategory==$smarty.const.TAB_MEDIA || $activeCategory==$smarty.const.CTAB_MEDIA}
 
-			<h4>Afbeelding{if $content|@count!=1}en{/if}: {$content|@count}</h4>
 			<div>
-			
-				{foreach from=$content item=v}
-				<div class="thumbholder">
-					<div class="thumbnail">
-						<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-							<img src="http://images.naturalis.nl/160x100/{$v.thumb}" title="Foto {$v.photographer}" alt="Foto {$v.photographer}">
-						</a>
-					</div>
-					<p class="author">
-						<span class="photographer-title" style="display:inline">Foto</span><br />
-						{$v.photographer}
-					</p>
-				</div>
-				{/foreach}
-			</div>
 
-			{assign var=pgnResultCount value=$content|@count}
-			{assign var=pgnResultsPerPage value=12}
-			{assign var=pgnCurrPage value=$search.page}
-			{assign var=pgnURL value=$smarty.server.PHP_SELF}
-			{assign var=pgnQuerystring value=$querystring}
-			{include file="../shared/_paginator.tpl"}
+				<h4>Afbeelding{if $content|@count!=1}en{/if}: {if $content|@count==0}{t}geen{/t}{else}{$content|@count}{/if}</h4>
+				<div>
+					{foreach from=$content item=v}
+						<div class="imageInGrid3 taxon-page">
+							<div class="thumbContainer">
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+								</a>
+							</div>
+							<dl>
+								<dt>Foto</dt><dd>{$v.photographer}</dd>
+								<!-- dt>Geplaatst op</dt><dd>{$v.meta_datum}</dd -->
+							</dl>
+						</div>
+					{/foreach}
+				</div>
+
+				{assign var=pgnResultCount value=$content|@count}
+				{assign var=pgnResultsPerPage value=12}
+				{assign var=pgnCurrPage value=$search.page}
+				{assign var=pgnURL value=$smarty.server.PHP_SELF}
+				{assign var=pgnQuerystring value=$querystring}
+				{include file="../shared/_paginator.tpl"}
+
+				{if showMediaUploadLink}			
+				<p>&nbsp;</p>
+				<p>
+					Bij deze soort kunnen beelden worden toegevoegd, voor aanbieding klik <a href="">hier</a>.
+					<!-- a href="http://www.naturalisbeeldbibliotheek.nl/get?alias=nbb&amp;page_alias=afbeeldingenaanbieden&amp;conceptId=0AHCYFOOGKTT&amp;conceptName=Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)&amp;comments=soort: Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)" title="beeld aanbieden" target="_blank" -->
+				</p>
+				{/if}
+			
+			</div>
 			
 		{elseif $activeCategory==$smarty.const.CTAB_DNA_BARCODES}
 
@@ -70,10 +80,8 @@ Naturalis is een project gestart om van zoveel mogelijk Nederlandse planten, die
 Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld voor barcodering. Gegevens bijgewerkt tot 26 augustus 2013.
 				</p>
 				<p>
-<!-- NB: de hierboven vermelde wetenschappelijke naam kan afwijken van de naam in het Soortenregister.-->
+					<!-- NB: de hierboven vermelde wetenschappelijke naam kan afwijken van de naam in het Soortenregister.-->
 				</p>
-				
-				
 				
 				<table class="taxon-dna-table">
 					<tr><th>Registratienummer</th><th>Verzameldatum, plaats</th><th>Verzamelaar</th><th>Soort</th></tr>
@@ -81,6 +89,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					<tr><td>{$v.barcode}</td><td>{$v.date}, {$v.location}</td><td>{$v.specialist}</td><td>{$taxon_display_name}</td></tr>
 					{/foreach}
 				</table>
+
 			</div>
 
 		{elseif $activeCategory==$smarty.const.TAB_DISTRIBUTION}
@@ -88,19 +97,31 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			<div>
 				<h2>Voorkomen</h2>
 				
-				{$content}
+				<p>
+					<table>
+						{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" onmouseover="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</span>){/if}</td></tr>{/if}
+						{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
+						{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
+						{if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if}
+						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
+					</table>
+				</p>
+
+				<!-- p>
+					<h2>Trend</h2>
+				</p>
+				<p>
+					<h2>Waarnemingen</h2>
+				</p -->
+
+				<p>
+					{$content}
+				</p>
 				
-				<table>
-					{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<a href="#" onclick="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</a>){/if}</td></tr>{/if}
-					{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
-					{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
-					{if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if}
-					{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
-				</table>
 			</div>
 
-		{elseif $activeCategory==$smarty.const.CTAB_NAMES}{*CTAB_NOMENCLATURE*}
-
+		{elseif $activeCategory==$smarty.const.CTAB_NAMES}
+					
 			<p>
 				<h2>Naamgeving</h2>
 				<table>
@@ -108,7 +129,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					{if $v.expert.name}
 						{assign var=expert value=$v.expert.name}
 					{/if}
-						<tr><td>{$v.nametype|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+						<tr><td>{$v.nametype|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.label}</a></td></tr>
 					{/foreach}
 					{if $expert}
 					<tr><td>Expert</td><td colspan="2">{$expert}</td></tr>
@@ -117,7 +138,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			</p>
 
 			<p>
-			<h2>Indeling</h2>
+				<h2>Indeling</h2>
 				<table id="name-tree">
 					{foreach from=$classification item=v key=x}
 					{if $v.parent_id!=null}{* skipping top most level "life" *}
@@ -129,12 +150,12 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{/if}
 						<span class="classification-preffered-name"><a href="?id={$v.id}">{$v.taxon}</a></span>
 						<span class="classification-rank">[{$v.rank}]</span>
-						{if $v.preferredName}<br />
+						{if $v.dutch_name}<br />
 						{if $x>1}
 						{'&nbsp;'|str_repeat:$buffercount}
 						<span class="classification-connector-invisible">&lfloor;</span>
 						{/if}
-						<span class="classification-preffered-name">{$v.preferredName}</span>{/if}
+						<span class="classification-accepted-name">{$v.dutch_name}</span>{/if}
 					</td></tr>
 					{/if }
 					{/foreach}			
@@ -142,41 +163,41 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			</p>
 
 		{else}
-		
+
 			{if $content|@is_array}
 			<ul>
-			{foreach from=$content item=v key=k}
-			{if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
-			{/foreach}
+				{foreach from=$content item=v key=k}
+				{if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
+				{/foreach}
 			</ul>
 			{else}
 			<p>
-			{$content}
+				{$content}
 			</p>
 			{/if}
-		</p>
 		
-		{if $rdf}
-		<h2>Bron</h2>
-		<p>
-			<h4 class="source">Auteur(s)</h4>
-			{foreach from=$rdf item=v}
-			{if $v.predicate=='hasAuthor'}
-			{$v.data.name}
+			{if $rdf}
+			<h2>Bron</h2>
+			<p>
+				<h4 class="source">Auteur(s)</h4>
+				{foreach from=$rdf item=v}
+				{if $v.predicate=='hasAuthor'}
+				{$v.data.name}
+				{/if}
+				{/foreach}
+			</p>
+			<p>
+				<h4 class="source">Publicatie</h4>
+				<ul class="reference">
+				{foreach from=$rdf item=v}
+				{if $v.predicate=='hasReference'}
+				<li>{$v.data.citation}</li>
+				{/if}
+				{/foreach}
+				</ul>
+			</p>
 			{/if}
-			{/foreach}
-		</p>
-		<p>
-			<h4 class="source">Publicatie</h4>
-			<ul class="reference">
-			{foreach from=$rdf item=v}
-			{if $v.predicate=='hasReference'}
-			<li>{$v.data.citation}</li>
-			{/if}
-			{/foreach}
-			</ul>
-		</p>
-		{/if}
+
 		{/if}
 	</div>
 

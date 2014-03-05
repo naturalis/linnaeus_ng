@@ -106,6 +106,7 @@ class SearchControllerNSR extends SearchController
 
     public function searchPicturesAction ()
     {
+
 		$results = $this->doPictureSearch($this->requestData);
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString());
@@ -376,7 +377,7 @@ class SearchControllerNSR extends SearchController
 	{
 
 		$photographers=$this->getCache('search-photographer-count');
-		
+
 		if (!$photographers)
 		{
         
@@ -406,8 +407,12 @@ class SearchControllerNSR extends SearchController
 						'project_id'=>$this->getCurrentProjectId(),
 						'sys_label' => 'beeldbankFotograaf'
 					),
-					'columns'=>'count(*) as total, meta_data',
-					'group'=>'meta_data',
+					'columns'=>"count(*) as total, meta_data,
+						concat(
+							trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+							trim(substring(meta_data, 1, locate(',',meta_data)-1))
+						) as photographer",
+					'group'=>'meta_data, photographer',
 					'order'=>'count(*) desc, meta_data desc',
 					'fieldAsIndex'=>'meta_data'
 				)
@@ -423,10 +428,6 @@ class SearchControllerNSR extends SearchController
 			
 		}
 
-		if (!empty($p['name'])) {
-			$photographers=$photographers[$p['name']];
-		}
-		
 		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
 
 		if (!empty($limit) && $limit<count((array)$photographers)) {

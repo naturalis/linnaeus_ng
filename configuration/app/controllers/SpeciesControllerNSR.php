@@ -1,6 +1,7 @@
 <?php
 
 include_once ('SpeciesController.php');
+include_once ('RdfController.php');
 
 class SpeciesControllerNSR extends SpeciesController
 {
@@ -10,16 +11,13 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->initialise();
 	}
 
-
     public function __destruct ()
     {
         parent::__destruct();
     }
 
-
     private function initialise ()
     {
-		include_once ('RdfController.php');
 		$this->Rdf = new RdfController;
     }
 
@@ -35,7 +33,6 @@ class SpeciesControllerNSR extends SpeciesController
         $this->redirect('nsr_taxon.php?id=' . $id);
     }
 
-
     public function taxonAction ()
     {
 
@@ -44,81 +41,58 @@ class SpeciesControllerNSR extends SpeciesController
 
         if (!empty($taxon)) {
 
-            // get categories
-            $categories = $this->getCategories(
-				array(
-					'taxon' => $taxon['id'], 
-					'allowUnpublished' => $this->isLoggedInAdmin()
-				)
-            );
-			
-            // determine the page_id the page will open in
-			$requestedCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
+			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
-			if (isset($requestedCat) && isset($this->_automaticTabTranslation[$this->requestData['cat']])) {
-				$requestedCat=$this->_automaticTabTranslation[$this->requestData['cat']];
+			if (isset($reqCat) && isset($this->_automaticTabTranslation[$reqCat])) {
+				$reqCat=$this->_automaticTabTranslation[$reqCat];
 			}
 
-            $activeCategory = 
-            	!empty($requestedCat) ? 
-	            	(isset($categories['emptinessList'][$requestedCat]) && $categories['emptinessList'][$requestedCat]==0 ? 
-	            		$requestedCat : 
-	            		$categories['defaultCategory']
-	            	) : 
-           		$categories['defaultCategory'];
-
-			$activeCategory = !empty($requestedCat) ? $requestedCat : $categories['defaultCategory'];
-
-			$this->setPageName($taxon['label']);
-
-			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-			$this->smarty->assign('taxon',$taxon);
+            $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 			$names=$this->getNames($taxon['id']);
-
-			$this->smarty->assign('names',$names);
-
 			$classification=$this->getTaxonClassification($taxon['id']);
-
-			$this->smarty->assign('classification',$classification);
 			
-			// verspreiding
-			if ($activeCategory==TAB_DISTRIBUTION) {
-
-				$presenceData=$this->getPresence($taxon['id']);
-				$this->smarty->assign('presenceData', $presenceData);
-
-			}
-	
-			$d=$this->getTaxonContent(
+			$content=$this->getTaxonContent(
 				array(
 					'taxon' => $taxon['id'], 
-					'category' => $activeCategory, 
+					'category' => $categories['start'], 
 					'allowUnpublished' => $this->isLoggedInAdmin(),
 					'isLower' =>  $taxon['lower_taxon']
 				)
 			);
 
-			$content=$d['content'];
-			$rdf=$d['rdf'];
-
-			if ($activeCategory!=CTAB_MEDIA && $activeCategory!=CTAB_DNA_BARCODES) {
-				$content = $this->matchGlossaryTerms($content);
-				$content = $this->matchHotwords($content);
+			/*
+				distribution can have 'regular' data - fetched above
+				as well as specifically structured distribution data, 
+				which is fetched below
+			*/
+			if ($categories['start']==TAB_DISTRIBUTION)
+			{
+				$presenceData=$this->getPresenceData($taxon['id']);
+				$this->smarty->assign('presenceData', $presenceData);
 			}
-			
-			$this->smarty->assign('content', $content);
-			$this->smarty->assign('rdf', $rdf);
-           
 
-            $this->smarty->assign('categories', $categories['categories']);
-            $this->smarty->assign('activeCategory', $activeCategory);
-            $this->smarty->assign('categorySysList', $categories['categorySysList']);
+			if ($categories['start']!=CTAB_MEDIA && $categories['start']!=CTAB_DNA_BARCODES)
+			{
+				$content['content'] = $this->matchGlossaryTerms($content['content']);
+				$content['content'] = $this->matchHotwords($content['content']);
+			}
+
+			$this->setPageName($taxon['label']);
+
+            $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
+            $this->smarty->assign('categories',$categories['categories']);
+            $this->smarty->assign('activeCategory',$categories['start']);
+			$this->smarty->assign('taxon',$taxon);
+			$this->smarty->assign('classification',$classification);
+			$this->smarty->assign('names',$names);
+			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
+			$this->smarty->assign('content',$content['content']);
+			$this->smarty->assign('rdf',$content['rdf']);
             $this->smarty->assign('headerTitles', array('title' => $taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
+
         } else {
             
             $this->addError($this->translate('No or unknown taxon ID specified.'));
-            
-            $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
         }
         
         $this->printPage('taxon');
@@ -139,22 +113,194 @@ class SpeciesControllerNSR extends SpeciesController
     }
 
 
+    private function getCategories($p=null)
+    {
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
+		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
+		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
+
+		$categories=$this->models->PageTaxon->freeQuery("
+			select
+				_a.id,
+				ifnull(_b.title,_a.page) as title,
+				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
+				_a.show_order,
+				".(isset($taxon) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
+				_a.def_page
+
+			from 
+				%PRE%pages_taxa _a
+				
+			left join %PRE%pages_taxa_titles _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.page_id
+				and _b.language_id = ". $this->getCurrentLanguageId() ."
+				
+			".(isset($taxon) ? "
+				left join %PRE%content_taxa _c
+					on _a.project_id=_c.project_id
+					and _a.id=_c.page_id
+					and _c.taxon_id =".$taxon."
+					and _c.language_id = ". $this->getCurrentLanguageId() ."
+				
+				" : "")."
+
+			where 
+				_a.project_id=".$this->getCurrentProjectId()."
+
+			order by 
+				_a.show_order
+		");
+		
+		if (!$categories) $categories=array();
+
+		if (isset($taxon))
+		{
+		
+			if (!is_null($this->getPresenceData($taxon)))
+			{
+				foreach((array)$categories as $key=>$val)
+				{
+					if ($val['id']==TAB_DISTRIBUTION) {
+						$categories[$key]['is_empty']=false;
+						break;
+					}
+				}
+			}
+			
+			if (!$this->_suppressTab_NAMES)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_NAMES, 
+						'title' => $this->translate('Naamgeving'), 
+						'is_empty' => false,
+						'tabname' => 'CTAB_NAMES'
+					)
+				);
+			}
+
+			if (!$this->_suppressTab_LITERATURE)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_LITERATURE, 
+						'title' => $this->translate('Literature'), 
+						'is_empty' => !$this->hasTaxonLiterature($taxon),
+						'tabname' => 'CTAB_LITERATURE'
+					)
+				);
+			}
+
+			if (!$this->_suppressTab_MEDIA)
+			{
+				
+				/*
+					species & lower should always show the media tab, even
+					if there is no media, to be able to show the upload link
+				*/
+				if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
+					$isEmpty=false;
+				else
+					$isEmpty=!$this->hasTaxonMedia($taxon);	
+				
+				array_push($categories,
+					array(
+						'id' => CTAB_MEDIA, 
+						'title' => $this->translate('Media'), 
+						'is_empty' => $isEmpty,
+						'tabname' => 'CTAB_MEDIA'
+					)
+				);
+			}
+
+			if (!$this->_suppressTab_DNA_BARCODES)
+			{			
+				array_push($categories,
+					array(
+						'id' => CTAB_DNA_BARCODES, 
+						'title' => $this->translate('DNA barcodes'), 
+						'is_empty' =>! $this->hasTaxonBarcodes($taxon),
+						'tabname' => 'CTAB_DNA_BARCODES'
+					)
+				);
+			}
+									
+		}
+
+		$order=$this->models->TabOrder->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			),
+			'columns'=>'tabname,show_order,start_order',
+			'fieldAsIndex'=>'tabname',
+			'order'=>'start_order'
+		));
+
+		$start=null;
+		$firstNonEmpty=null;
+
+		foreach((array)$categories as $key=>$val)
+		{
+			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
+			
+			if (is_null($firstNonEmpty) && empty($val['is_empty']))
+				$firstNonEmpty=$val['id'];
+
+			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty'])) {
+				$start=$val['id'];
+			} else
+			if (is_null($start) && !empty($order[$val['tabname']]['start_order']) && empty($val['is_empty'])) {
+				$start=$val['id'];
+			}
+		}
+
+		$this->customSortArray($categories,array('key' => 'show_order'));
+
+		if (is_null($start)) $start=$firstNonEmpty;
+
+		return array('start'=>$start,'categories'=>$categories);
+
+    }
+
 	private function getNames($id)
 	{
 
         $names=$this->models->Names->freeQuery(
 			array(
 				'query' => '
-					select _a.id, _a.name,_a.uninomial,_a.specific_epithet,_a.name_author,_a.authorship_year,_a.reference,
-					_a.reference_id,_a.reference_id,_a.expert,_a.expert_id,_a.organisation,_a.organisation_id, _b.nametype,
-					_a.language_id,_c.language,_d.label as language_label
+					select
+						_a.id,
+						_a.name,
+						_a.uninomial,
+						_a.specific_epithet,
+						_a.infra_specific_epithet,
+						_a.authorship,
+						_a.name_author,
+						_a.authorship_year,
+						_a.reference,
+						_a.reference_id,
+						_a.expert,
+						_a.expert_id,
+						_a.organisation,
+						_a.organisation_id,
+						_b.nametype,
+						_a.language_id,
+						_c.language,
+						_d.label as language_label
 					from %PRE%names _a 
-					left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id = _b.project_id
-					left join %PRE%languages _c on _a.language_id=_c.id
-					left join %PRE%labels_languages _d on _a.language_id=_d.language_id
+					left join %PRE%name_types _b
+						on _a.type_id=_b.id 
+						and _a.project_id=_b.project_id
+					left join %PRE%languages _c
+						on _a.language_id=_c.id
+					left join %PRE%labels_languages _d
+						on _a.language_id=_d.language_id
 						and _d.label_language_id='.$this->getDefaultLanguageId().'
-					where _a.project_id = '.$this->getCurrentProjectId().'
-					and _a.taxon_id='.$id,
+					where
+						_a.project_id = '.$this->getCurrentProjectId().'
+						and _a.taxon_id='.$id,
 				'fieldAsIndex' => 'id'
 			)
 		);
@@ -172,6 +318,12 @@ class SpeciesControllerNSR extends SpeciesController
 				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
 
 			$names[$key]['nametype']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
+			
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && strlen($val['uninomial'].$val['specific_epithet'].$val['infra_specific_epithet'].$val['authorship'])>0) {
+				$names[$key]['label']='<i>'.trim(str_replace('  ',' ',$val['uninomial'].' '.$val['specific_epithet'].' '.$val['infra_specific_epithet'])).'</i> '.$val['authorship'];
+			} else {
+				$names[$key]['label']=$names[$key]['name'];
+			}
 						
 		}
 
@@ -194,10 +346,10 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data[0];
 	}
 
-
     private function getTaxonOverviewImage($id)
 	{
-		return array_shift($this->getTaxonMedia(array('id'=>$id,'overview'=>true)));
+		$d=(array)$this->getTaxonMedia(array('id'=>$id,'overview'=>true));
+		return array_shift($d);
 	}
 
     private function getTaxonMedia($p)
@@ -322,10 +474,8 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data;
     }
 
-
 	private function _getTaxonClassification($id)
 	{
-
 		$taxon=$this->models->Taxon->freeQuery("
 			select
 				_a.id,
@@ -337,7 +487,8 @@ class SpeciesControllerNSR extends SpeciesController
 				_m.authorship,
 				_f.rank_id,
 				_f.lower_taxon,
-				_g.label as rank
+				_g.label as rank,
+				_k.name as dutch_name
 			
 			from %PRE%taxa _a
 
@@ -347,6 +498,12 @@ class SpeciesControllerNSR extends SpeciesController
 				and _m.type_id=(select id from %PRE%name_types where project_id = ".
 					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
 				and _m.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			left join %PRE%names _k
+				on _a.id=_k.taxon_id
+				and _a.project_id=_k.project_id
+				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.language_id=".LANGUAGE_ID_DUTCH."
 
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
@@ -460,7 +617,7 @@ class SpeciesControllerNSR extends SpeciesController
 			));		
 	}
 
-	private function getPresence($id)
+	private function getPresenceData($id)
 	{
 		$data=$this->models->PresenceTaxa->freeQuery(
 			"select
@@ -649,6 +806,46 @@ class SpeciesControllerNSR extends SpeciesController
         }
 		
 		return array('content'=>$content,'rdf'=>$rdf);
+    }
+
+    private function hasTaxonLiterature($id)
+    {
+        $d=$this->models->LiteratureTaxon->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'taxon_id' => $id
+            ),
+			'columns' => 'count(*) as total'
+        ));
+        
+        return $d[0]['total']>1;
+    }
+
+    private function hasTaxonMedia($id)
+    {
+        $d=$this->models->MediaTaxon->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'taxon_id' => $id
+            ),
+			'columns' => 'count(*) as total'
+        ));
+        
+        return $d[0]['total']>1;
+    }
+
+    private function hasTaxonBarcodes($id)
+    {
+		$d=$this->models->DnaBarcodes->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id
+			),
+			'columns' => 'count(*) as total'
+		));
+        
+        return $d[0]['total']>1;
     }
 
 
