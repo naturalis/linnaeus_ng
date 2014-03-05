@@ -577,13 +577,14 @@ function hint(caller,txt) {
 
 	if (!$('#hint-box')) return;
 
+	$('#hint-box').toggle();
+
 	if (caller) {
 		var pos = $(caller).offset();
-		$('#hint-box').offset({left:pos.left+10,top:pos.top+25});
+		$('#hint-box').offset({left:pos.left,top:pos.top+15});
 	}
 	if (txt) $('#hint-box').html(txt);
 
-	$('#hint-box').toggle();
 	$('#hint-box').bind('click', function() {
 		hint();
 	});

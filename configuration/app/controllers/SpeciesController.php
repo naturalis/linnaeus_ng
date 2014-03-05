@@ -614,7 +614,7 @@ class SpeciesController extends Controller
     }
 
 
-    public function getCategories($p=null)
+    private function getCategories($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;

@@ -32,9 +32,8 @@
 		<br>
 			<ol>
 			{foreach from=$photographers item=v}
-				{assign var=photograhper_name value=", "|explode:$v.meta_data} 
 				<li>
-					<a href="nsr_search_pictures.php?photographer={$v.meta_data}">{$photograhper_name[1]} {$photograhper_name[0]} ({$v.total} / {$v.taxon_count})</a>
+					<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total} / {$v.taxon_count})</a>
 				</li>
 			{/foreach}
 			</ol>

@@ -30,16 +30,18 @@ table tr td {
 	visibility:hidden;
 }
 .classification-rank {
-	font-size:9px;
+	font-size:10px;
 	padding-left:2px;
 }
 .classification-rank .smaller{
-	font-size:9px;
+	font-size:10px;
 }
 .classification-preffered-name {
+	font-size:12px;
+}
+.classification-accepted-name {
 	font-size:11px;
 }
-
 #paginator {
 	width:510px;
 	-border-top:1px dotted #aaa;

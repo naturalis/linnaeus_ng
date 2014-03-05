@@ -547,7 +547,8 @@ class Controller extends BaseClass
 				_a.list_level,
 				_a.is_empty,
 				_b.lower_taxon,
-				_c.commonname
+				_c.commonname,
+				_b.rank_id as base_rank_id
 			from %PRE%taxa _a
 
 			left join %PRE%projects_ranks _b
@@ -574,7 +575,7 @@ class Controller extends BaseClass
 		
 		$taxon=$t[0];
 		
-		$taxon['label'] = $this->formatTaxon($taxon);
+		if ($taxon) $taxon['label']=$this->formatTaxon($taxon);
 
         return $taxon;
     }

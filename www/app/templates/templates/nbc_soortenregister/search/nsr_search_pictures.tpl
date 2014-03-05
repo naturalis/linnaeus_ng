@@ -16,9 +16,8 @@
 				<ul>
 				{foreach from=$photographers item=v name=foo}
 					{if $smarty.foreach.foo.index < 5}
-					{assign var=photograhper_name value=", "|explode:$v.meta_data} 
 					<li>
-						<a href="nsr_search_pictures.php?photographer={$v.meta_data}">{$photograhper_name[1]} {$photograhper_name[0]} ({$v.total} / {$v.taxon_count})</a>
+						<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total} / {$v.taxon_count})</a>
 					</li>
 					{/if}
 				{/foreach}
@@ -95,7 +94,6 @@
 			<h4><span id="resultcount-header">{$results.count}</span></h4>
 			<div>
 				{foreach from=$results.data item=v}
-					{assign var=photograhper_name value=", "|explode:$v.photographer_name} 
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
 							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
