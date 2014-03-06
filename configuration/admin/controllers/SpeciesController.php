@@ -778,7 +778,8 @@ class SpeciesController extends Controller
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
             
             // save
-            if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
+            if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save') && !$this->isFormResubmit())
+			{
                 
                 $isHybrid = $this->requestData['is_hybrid'];
                 
@@ -811,7 +812,8 @@ class SpeciesController extends Controller
                     )
                 ));
 
-                if ($dummy[0]['rank_id'] >= GENUS_RANK_ID && $data['taxon'] != $newName) {
+                if ($dummy[0]['rank_id'] >= GENUS_RANK_ID && $data['taxon'] != $newName)
+				{
 
                     $this->getTaxonTree(array('pId' => $this->requestData['id']));
                     
@@ -974,16 +976,18 @@ class SpeciesController extends Controller
                     }
                     
                     $this->smarty->assign('hasErrorButCanSave', $hasErrorButCanSave);
-                    
+
                     $this->smarty->assign('data', $this->requestData);
+					
                 }
             } // save
             
 
             $this->smarty->assign('allowed', true);
             
-            if (isset($this->treeList))
-                $this->smarty->assign('taxa', $this->treeList);
+			$this->newGetTaxonTree();
+
+			$this->smarty->assign('taxa', $this->treeList);
 
             $s = $this->getProjectIdRankByname('Subgenus');
             if ($s)
