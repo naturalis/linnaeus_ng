@@ -98,7 +98,6 @@ class SpeciesControllerNSR extends SpeciesController
         $this->printPage('taxon');
     }
 
-
     public function nameAction ()
     {
         //if (!$this->rHasId())
@@ -290,14 +289,18 @@ class SpeciesControllerNSR extends SpeciesController
 						_c.language,
 						_d.label as language_label
 					from %PRE%names _a 
+
 					left join %PRE%name_types _b
 						on _a.type_id=_b.id 
 						and _a.project_id=_b.project_id
+
 					left join %PRE%languages _c
 						on _a.language_id=_c.id
+
 					left join %PRE%labels_languages _d
 						on _a.language_id=_d.language_id
 						and _d.label_language_id='.$this->getDefaultLanguageId().'
+
 					where
 						_a.project_id = '.$this->getCurrentProjectId().'
 						and _a.taxon_id='.$id,
@@ -307,13 +310,18 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$sci=$pref=null;
 
-		foreach((array)$names as $key=>$val) {
+		foreach((array)$names as $key=>$val)
+		{
+
 			if ($val['nametype']==PREDICATE_VALID_NAME)
 				$sci=$key;
+
 			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
 				$pref=$key;
+
 			if (!empty($val['expert_id']))
 				$names[$key]['expert']=$this->getActor($val['expert_id']);
+
 			if (!empty($val['organisation_id']))
 				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
 

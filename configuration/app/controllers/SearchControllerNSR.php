@@ -503,6 +503,7 @@ class SearchControllerNSR extends SearchController
 				on _m.project_id=_c.project_id
 				and _m.id = _c.media_id
 				and _c.sys_label = 'beeldbankFotograaf'
+				and _c.language_id=".$this->getCurrentLanguageId()."
 		
 			left join %PRE%taxa _k
 				on _m.taxon_id=_k.id
@@ -530,28 +531,33 @@ class SearchControllerNSR extends SearchController
 				on _m.id=_meta1.media_id
 				and _m.project_id=_meta1.project_id
 				and _meta1.sys_label='beeldbankDatumVervaardiging'
+				and _meta1.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%media_meta _meta2
 				on _m.id=_meta2.media_id
 				and _m.project_id=_meta2.project_id
 				and _meta2.sys_label='beeldbankOmschrijvingKort'
+				and _meta2.language_id=".$this->getCurrentLanguageId()."
 			
 			left join %PRE%media_meta _meta3
 				on _m.id=_meta3.media_id
 				and _m.project_id=_meta3.project_id
 				and _meta3.sys_label='beeldbankGeografie'
+				and _meta3.language_id=".$this->getCurrentLanguageId()."
 			
 			left join %PRE%media_meta _meta4
 				on _m.id=_meta4.media_id
 				and _m.project_id=_meta4.project_id
 				and _meta4.sys_label='beeldbankDatumAanmaak'
+				and _meta4.language_id=".$this->getCurrentLanguageId()."
 			
 			left join %PRE%media_meta _meta5
 				on _m.id=_meta5.media_id
 				and _m.project_id=_meta5.project_id
 				and _meta5.sys_label='beeldbankCopyrights'
+				and _meta5.language_id=".$this->getCurrentLanguageId()."
 
-			".(!empty($group_id) ? "left join %PRE%taxon_quick_parentage _q
+			".(!empty($group_id) ? "right join %PRE%taxon_quick_parentage _q
 				on _m.taxon_id=_q.taxon_id
 				and _m.project_id=_q.project_id
 				" : "" )."
