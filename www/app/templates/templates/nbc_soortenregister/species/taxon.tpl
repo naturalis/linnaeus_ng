@@ -126,13 +126,16 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				<h2>Naamgeving</h2>
 				<table>
 					{foreach from=$names.list item=v}
-					{if $v.expert.name}
-						{assign var=expert value=$v.expert.name}
-					{/if}
+					{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
+					{if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
 						<tr><td>{$v.nametype|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.label}</a></td></tr>
 					{/foreach}
-					{if $expert}
-					<tr><td>Expert</td><td colspan="2">{$expert}</td></tr>
+					{if $expert || $organisation}
+						{if $expert}
+						<tr><td>Expert</td><td colspan="2">{$expert}{if $organisation} ({$organisation}){/if}</td></tr>
+						{else}
+						<tr><td>Organisatie</td><td colspan="2">{$organisation}</td></tr>
+						{/if}
 					{/if}
 				</table>
 			</p>
