@@ -21,8 +21,12 @@
 					{/if}
 					
 					<strong><a href="../species/nsr_taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
-					{$res.dutch_name}<br /><br />
+					{$res.dutch_name}
+
+					{if $res.presence_information_index_label || $res.presence_information_title}
+					<br /><br />
 					Status voorkomen: {$res.presence_information_index_label} {$res.presence_information_title}
+					{/if}
 				</div>
 				{/foreach}
 

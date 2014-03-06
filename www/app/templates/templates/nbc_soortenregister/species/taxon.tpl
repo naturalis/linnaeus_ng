@@ -61,11 +61,13 @@
 				{include file="../shared/_paginator.tpl"}
 
 				{if showMediaUploadLink}			
-				<p>&nbsp;</p>
-				<p>
-					Bij deze soort kunnen beelden worden toegevoegd, voor aanbieding klik <a href="">hier</a>.
-					<!-- a href="http://www.naturalisbeeldbibliotheek.nl/get?alias=nbb&amp;page_alias=afbeeldingenaanbieden&amp;conceptId=0AHCYFOOGKTT&amp;conceptName=Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)&amp;comments=soort: Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)" title="beeld aanbieden" target="_blank" -->
-				</p>
+				<div>
+					<p>&nbsp;</p>
+					<p>
+						Bij deze soort kunnen beelden worden toegevoegd, voor aanbieding klik <a href="">hier</a>.
+						<!-- a href="http://www.naturalisbeeldbibliotheek.nl/get?alias=nbb&amp;page_alias=afbeeldingenaanbieden&amp;conceptId=0AHCYFOOGKTT&amp;conceptName=Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)&amp;comments=soort: Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)" title="beeld aanbieden" target="_blank" -->
+					</p>
+				</div>
 				{/if}
 			
 			</div>

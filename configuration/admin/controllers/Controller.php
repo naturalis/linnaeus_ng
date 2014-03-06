@@ -2773,7 +2773,7 @@ class Controller extends BaseClass
         
         if (isset($this->jsToLoad))
             $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
-        
+
         $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->template_dir . '_menu.tpl'));
         
         if (isset($_SESSION['admin']['user']) && !$_SESSION['admin']['user']['_said_welcome']) {
