@@ -161,8 +161,14 @@ class SearchControllerNSR extends SearchController
 	private function doSearch($p)
 	{
 
+		$search=!empty($p['search']) ? $p['search'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
+		
+		$search=trim($search);
+		
+		if (empty($search))
+			return null;
 
 		$d=$this->models->Names->freeQuery("
 			select
@@ -191,10 +197,10 @@ class SearchControllerNSR extends SearchController
 			_l.file_name as overview_image,
 
 				case
-					when _a.name REGEXP '^".mysql_real_escape_string($p['search'])."$' = 1 then 100
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($p['search'])."[[:>:]](.*)$' = 1 then 90
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($p['search'])."(.*)$' = 1 then 80
-					when _a.name REGEXP '^(.*)".mysql_real_escape_string($p['search'])."(.*)$' = 1 then 70
+					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 90
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 then 80
+					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 then 70
 					else 60
 				end as match_percentage
 			
@@ -233,16 +239,21 @@ class SearchControllerNSR extends SearchController
 				and _l.overview_image=1
 
 			where _a.project_id =".$this->getCurrentProjectId()."
-			and _f.lower_taxon=1
-			and _a.language_id =".LANGUAGE_ID_DUTCH."
-			and _a.name like '%".mysql_real_escape_string($p['search'])."%'
-			and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."')
+				and _f.lower_taxon=1
+				and _a.language_id =".LANGUAGE_ID_DUTCH."
+				and _a.name like '%".mysql_real_escape_string($search)."%'
+				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
+			
+			group by _a.taxon_id
+
 			order by 
 				match_percentage desc, ".
 				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "dutch_name" : "taxon" )."
-			".(isset($limit) ? "limit ".$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+			".(isset($limit) ? "limit ".(int)$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
+		
+		//q($this->models->Names->q(),1);
 
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
