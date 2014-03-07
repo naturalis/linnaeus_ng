@@ -40,7 +40,7 @@
 					<ul id="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
 						<li>
-							<input type="checkbox" class="list" id="presence{$v.id}" name="presence[{$v.id}]" settled="{$v.settled_species}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
+							<input type="checkbox" class="list" id="presence{$v.id}" name="presence[{$v.id}]" indigenous="{$v.indigenous}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
 							<label for="presence{$v.id}">
 								<div class="presenceStatusCode">{$v.index_label}</div>
 								<div class="presenceStatusDescription">{$v.information_short}</div>
@@ -111,7 +111,7 @@
 			{foreach from=$results.data item=v}
 				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
 					{if $v.overview_image}
-					<img src="http://images.ncbnaturalis.nl/comping/{$v.overview_image}" style="width:140px;height:auto;float:right"/>
+					<img src="http://images.ncbnaturalis.nl/160x100/{$v.overview_image}" style="width:140px;height:auto;float:right"/>
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong><br />
 					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
@@ -143,14 +143,14 @@ $(document).ready(function(){
 	
 $('#togglePresenceStatusGevestigd').bind('click',function() {
 	$('input:checkbox[settled]').each(function() {
-		$(this).prop('checked', ($(this).attr('settled')=='1'));
+		$(this).prop('checked', ($(this).attr('indigenous')=='1'));
 	});
 	$('#formSearchFacetsSpecies').submit();
 })
 
 $('#togglePresenceStatusNietGevestigd').bind('click',function() {
 	$('input:checkbox[settled]').each(function() {
-		$(this).prop('checked', ($(this).attr('settled')=='0'));
+		$(this).prop('checked', ($(this).attr('indigenous')=='0'));
 	});
 	$('#formSearchFacetsSpecies').submit();
 })
