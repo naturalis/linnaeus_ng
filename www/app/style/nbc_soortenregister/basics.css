@@ -20,18 +20,22 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 table tr td {
 	padding-right:25px;
 }
+.classification-name {
+	font-size: 13px;
+}
 .classification-name.smaller {
-	font-size:10px;
+	font-size: 0.95em;
+	font-weight: normal;
 }
 .classification-connector {
-	color:#666;
+	color:#777;
 }
 .classification-connector-invisible {
 	visibility:hidden;
 }
 .classification-rank {
-	font-size:10px;
-	padding-left:2px;
+	font-size:0.75em;
+	padding-left:0px;
 }
 .classification-rank .smaller{
 	font-size:10px;
@@ -42,6 +46,11 @@ table tr td {
 .classification-accepted-name {
 	font-size:11px;
 }
+.classification-count {
+	font-size:10px;
+	color:#FA7001;
+}
+
 #paginator {
 	width:510px;
 	-border-top:1px dotted #aaa;

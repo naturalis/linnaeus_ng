@@ -2,7 +2,7 @@
 {if $names.list[$names.prefId]}
 {assign var=taxon_display_name value=$names.list[$names.prefId].name}
 {elseif $names.list[$names.sciId]}
-{assign var=taxon_display_name value="`$names.list[$names.sciId].uninomial` `$names.list[$names.sciId].specific_epithet`"}
+{assign var=taxon_display_name value="<i>`$names.list[$names.sciId].uninomial` `$names.list[$names.sciId].specific_epithet`</i>"}
 {else}
 {assign var=taxon_display_name value=$taxon.label}
 {/if}
@@ -15,10 +15,10 @@
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
 				{if $names.list[$names.prefId] && $names.list[$names.sciId]}
-					<h1><i>{$taxon_display_name}</i></h1>
+					<h1>{$taxon_display_name}</h1>
 					<h2 style="width:510px"><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
 				{else}
-					<h1 class="no-subtitle"><i>{$taxon_display_name}</i></h1>
+					<h1 class="no-subtitle">{$taxon_display_name}</h1>
 					<h2></h2>
 				{/if}
 			</div>
@@ -82,19 +82,24 @@ Naturalis is een project gestart om van zoveel mogelijk Nederlandse planten, die
 Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld voor barcodering. Gegevens bijgewerkt tot 26 augustus 2013.
 				</p>
 				<p>
-					<!-- NB: de hierboven vermelde wetenschappelijke naam kan afwijken van de naam in het Soortenregister.-->
+					NB: de hieronder vermelde wetenschappelijke naam kan afwijken van de naam in het Soortenregister.
 				</p>
 				
 				<table class="taxon-dna-table">
-					<tr><th>Registratienummer</th><th>Verzameldatum, plaats</th><th>Verzamelaar</th><th>Soort</th></tr>
+					<tr>
+						<th>Registratienummer</th>
+						<th>Verzameldatum, plaats</th>
+						<th>Verzamelaar</th>
+						<th>Soort</th>
+					</tr>
 					{foreach from=$content item=v}
-					<tr><td>{$v.barcode}</td><td>{$v.date}, {$v.location}</td><td>{$v.specialist}</td><td>{$taxon_display_name}</td></tr>
+					<tr><td>{$v.barcode}</td><td>{$v.date_literal}, {$v.location}</td><td>{$v.specialist}</td><td>{$v.taxon_literal}</td></tr>
 					{/foreach}
 				</table>
 
 			</div>
 
-		{elseif $activeCategory==$smarty.const.TAB_DISTRIBUTION}
+		{elseif $activeCategory==$smarty.const.TAB_DISTRIBUTION ||  $activeCategory==$smarty.const.TAB_PRESENCE}
 
 			<div>
 				<h2>Voorkomen</h2>
@@ -104,7 +109,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" onmouseover="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</span>){/if}</td></tr>{/if}
 						{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
 						{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
-						{if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if}
+						{* if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
 						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 					</table>
 				</p>
@@ -119,10 +124,19 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				<p>
 					{$content}
 				</p>
+
+				{literal}
+				<script type="text/JavaScript">
+				$(document).ready(function(){
+					// removes inherited html-embedded (and ouddated) status
+					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
+				});
+				</script>
+				{/literal}
 				
 			</div>
 
-		{elseif $activeCategory==$smarty.const.CTAB_NAMES}
+		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NOMENCLATURE}
 					
 			<p>
 				<h2>Naamgeving</h2>
@@ -167,6 +181,10 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				</table>
 			</p>
 
+			<p>
+				{$content}
+			</p>
+
 		{else}
 
 			{if $content|@is_array}
@@ -180,29 +198,34 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				{$content}
 			</p>
 			{/if}
+
+		{/if}
+
+		{if $rdf}
 		
-			{if $rdf}
-			<h2>Bron</h2>
-			<p>
-				<h4 class="source">Auteur(s)</h4>
-				{foreach from=$rdf item=v}
-				{if $v.predicate=='hasAuthor'}
-				{$v.data.name}
-				{/if}
-				{/foreach}
-			</p>
-			<p>
-				<h4 class="source">Publicatie</h4>
-				<ul class="reference">
-				{foreach from=$rdf item=v}
-				{if $v.predicate=='hasReference'}
-				<li>{$v.data.citation}</li>
-				{/if}
-				{/foreach}
-				</ul>
-			</p>
+		<h2>Bron</h2>
+		<p>
+			<h4 class="source">Auteur(s)</h4>
+			{foreach from=$rdf item=v}
+			{if $v.predicate=='hasAuthor'}
+			{$v.data.name}
+			{/if}
+			{/foreach}
+		</p>
+		<p>
+			<h4 class="source">Publicatie</h4>
+			<ul class="reference">
+			{foreach from=$rdf item=v}
+
+			{if $v.predicate=='hasReference'}
+			<li>{$v.data.citation}</li>
+			{elseif $v.object_type=='reference'}
+			<li>{$v.data.source}, {$v.data.label}</li>
 			{/if}
 
+			{/foreach}
+			</ul>
+		</p>
 		{/if}
 	</div>
 
