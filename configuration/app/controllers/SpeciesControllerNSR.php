@@ -141,14 +141,21 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function nameAction()
     {
-        //if (!$this->rHasId())
-		$name=$this->getName(array('nameId'=>$this->requestData['id']));
-		$name=$name[0];
-		$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
-		
-		$taxon=$this->getTaxonById($name['taxon_id']);
-		$this->smarty->assign('name',$name);
-		$this->smarty->assign('taxon',$taxon);
+        if ($this->rHasId())
+		{
+			$d=$this->getName(array('nameId'=>$this->requestData['id']));
+			$taxon=$d[0];
+			$name['nametype']=sprintf($this->Rdf->translatePredicate($taxon['nametype']),$taxon['language_label']);
+			
+			$taxon=$this->getTaxonById($taxon['taxon_id']);
+	
+			$classification=$this->getTaxonClassification($taxon['id']);
+			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
+			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
+	
+			$this->smarty->assign('name',$name);
+			$this->smarty->assign('taxon',$taxon);
+		}
         $this->printPage();
     }
 
