@@ -56,7 +56,13 @@
 					{assign var=rank_id value=$classification[taxon].rank_id}
 					<span class="classification-rank">[{$classification[taxon].rank}]</span>
 					{if $classification[taxon].species_count.total>0}
-					<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.indigenous})</span>
+					
+					{if $smarty.section.taxon.index==$start}
+						<br /><span class="classification-count">({$classification[taxon].species_count.total} soorten in totaal / {$classification[taxon].species_count.indigenous} inheems)</span>
+					{else}
+						<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.indigenous})</span>
+					{/if}
+					
 					{/if}
 				</td></tr>
 				{/if}
