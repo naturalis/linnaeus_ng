@@ -678,11 +678,23 @@ class SpeciesControllerNSR extends SpeciesController
 			select
 				_a.id,
 				_a.taxon,
-				trim(
-					concat(
-						if(_k.uninomial is null,'',concat(_k.uninomial,' ')),
-						if(_k.specific_epithet is null,'',concat(_k.specific_epithet,' ')),
-						if(_k.infra_specific_epithet is null,'',concat(_k.infra_specific_epithet,' '))
+				if (
+					length(
+						trim(
+							concat(
+								if(_k.uninomial is null,'',concat(_k.uninomial,' ')),
+								if(_k.specific_epithet is null,'',concat(_k.specific_epithet,' ')),
+								if(_k.infra_specific_epithet is null,'',concat(_k.infra_specific_epithet,' '))
+							)
+						)
+					)=0,
+					_k.name,
+					trim(
+						concat(
+							if(_k.uninomial is null,'',concat(_k.uninomial,' ')),
+							if(_k.specific_epithet is null,'',concat(_k.specific_epithet,' ')),
+							if(_k.infra_specific_epithet is null,'',concat(_k.infra_specific_epithet,' '))
+						)
 					)
 				) as name,
 				_g.label as rank
