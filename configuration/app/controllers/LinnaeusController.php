@@ -165,13 +165,13 @@ class LinnaeusController extends Controller
     public function rootIndexAction()
 	{
 
+		if (defined('FIXED_PROJECT_ID'))
+			$this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
+
 		$id = $this->resolveProjectShortName();
 		
-		if ($id) {
-
+		if ($id)
 			$this->redirect('app/views/linnaeus/set_project.php?p='.$id);
-			
-		}
 		
 		$projects = $this->models->Project->_get(
 			array(
