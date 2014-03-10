@@ -17,7 +17,7 @@
 				{foreach from=$results.data item=res}
 				<div class="result">
 					{if $res.overview_image}
-					<img src="http://images.naturalis.nl/160x100/{$res.overview_image}" style="height:100px;max-width:140px;float:right"/>
+					<img src="http://images.naturalis.nl/120x75/{$res.overview_image}"/>
 					{/if}
 					
 					<strong><a href="../species/nsr_taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />

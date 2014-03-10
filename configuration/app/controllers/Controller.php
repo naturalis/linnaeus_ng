@@ -1136,7 +1136,10 @@ class Controller extends BaseClass
      */
     public function getCurrentProjectId ()
     {
-        return isset($_SESSION['app']['project']['id']) ? $_SESSION['app']['project']['id'] : null;
+		if (defined('FIXED_PROJECT_ID'))
+			return FIXED_PROJECT_ID;
+		else
+        	return isset($_SESSION['app']['project']['id']) ? $_SESSION['app']['project']['id'] : null;
     }
 
 

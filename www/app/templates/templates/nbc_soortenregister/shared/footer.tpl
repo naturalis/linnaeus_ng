@@ -19,13 +19,6 @@
 <div id="hint-box"></div>
 
 {literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-	if(jQuery().prettyPhoto) {
-		nbcPrettyPhotoInit();
-	}
-})
-</script>
 <script type="text/javascript">
 
   var _gaq = _gaq || [];

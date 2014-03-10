@@ -123,6 +123,11 @@
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
+	
+	<!-- div>
+		tijdelijke link t.b.v. test:<br />
+		<a href="nsr_recent_pictures.php">Recente afbeeldingen</a>
+	</div -->
 
 </div>
 
@@ -135,7 +140,8 @@ $(document).ready(function(){
 			animation_speed:50,
 			show_title: false,
 	 		overlay_gallery: false,
-	 		social_tools: false
+	 		social_tools: false,
+			changepicturecallback:function(){ prettyPhotoCycle() }
 	 	});
 	}
 	bindKeys();

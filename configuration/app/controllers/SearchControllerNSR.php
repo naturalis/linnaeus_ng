@@ -31,12 +31,12 @@ class SearchControllerNSR extends SearchController
         parent::__construct();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
 
-    public function searchAction ()
+    public function searchAction()
     {
 		if ($this->rHasVal('search')) {
 
@@ -57,7 +57,7 @@ class SearchControllerNSR extends SearchController
 	}
 
 
-    public function searchExtendedAction ()
+    public function searchExtendedAction()
     {
 		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
 		$this->smarty->assign('search',$this->requestData);	
@@ -66,7 +66,7 @@ class SearchControllerNSR extends SearchController
     }
 
 
-    public function ajaxInterfaceAction ()
+    public function ajaxInterfaceAction()
     {
 
         if (!$this->rHasVal('action')) return;
@@ -97,16 +97,15 @@ class SearchControllerNSR extends SearchController
     }
 
 
-    public function photographersAction ()
+    public function photographersAction()
     {
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount(array('limit'=>'*')));
         $this->printPage();
     }
 
 
-    public function searchPicturesAction ()
+    public function searchPicturesAction()
     {
-
 		$results = $this->doPictureSearch($this->requestData);
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString());
@@ -126,6 +125,17 @@ class SearchControllerNSR extends SearchController
     }
 
 
+    public function recentPicturesAction()
+    {
+		$results = $this->doPictureSearch($this->requestData);
+		$this->smarty->assign('querystring',$this->reconstructQueryString());
+		$this->smarty->assign('results',$results);	
+		$this->smarty->assign('show','photographers');
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+        $this->printPage();
+    }
+
+
 	private function getPresenceStatuses()
 	{
 		
@@ -134,7 +144,7 @@ class SearchControllerNSR extends SearchController
 			
 				_a.id,
 				_a.sys_label,
-				_a.settled_species,
+				_a.indigenous,
 				ifnull(_b.label,_a.sys_label) as label,
 				_b.information,
 				_b.information_short,
@@ -160,7 +170,6 @@ class SearchControllerNSR extends SearchController
 
 	private function doSearch($p)
 	{
-
 		$search=!empty($p['search']) ? $p['search'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
@@ -240,7 +249,7 @@ class SearchControllerNSR extends SearchController
 
 			where _a.project_id =".$this->getCurrentProjectId()."
 				and _f.lower_taxon=1
-				and _a.language_id =".LANGUAGE_ID_DUTCH."
+				and (_a.language_id =".LANGUAGE_ID_DUTCH." or _a.language_id =".LANGUAGE_ID_SCIENTIFIC.")
 				and _a.name like '%".mysql_real_escape_string($search)."%'
 				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
 			
@@ -452,7 +461,6 @@ class SearchControllerNSR extends SearchController
 
 	private function doPictureSearch($p)
 	{
-		
 		$group_id=null;
 
 		if (empty($p['group_id']) && !empty($p['group'])) {
@@ -481,7 +489,6 @@ class SearchControllerNSR extends SearchController
 		else
 		if (!empty($p['photographer']))
 			$sort="_meta4.meta_data desc";
-
 
 		$data=$this->models->MediaTaxon->freeQuery("		
 			select
@@ -595,7 +602,8 @@ class SearchControllerNSR extends SearchController
 		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
-		foreach((array)$data as $key=>$val) {
+		foreach((array)$data as $key=>$val)
+		{
 
 			$photographer=implode(' ',array_reverse(explode(',',$val['photographer'])));
 			$copyrighter=($val['meta_copyrights']==$val['photographer'] ? $photographer : $val['meta_copyrights']);
@@ -657,7 +665,8 @@ class SearchControllerNSR extends SearchController
 				_b.nametype,
 				_g.label as rank,
 				_k.name as dutch_name,
-				concat(_a.name,if(_k.name is null,'a',concat(' [',_k.name,']'))) as label
+				concat(_a.name,if(_k.name is null,'a',concat(' [',_k.name,']'))) as label_konijn,
+				concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',_g.label,']') as label
 
 			from %PRE%names _a
 			
@@ -672,7 +681,7 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%labels_projects_ranks _g
 				on _e.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
-				and _g.language_id=".LANGUAGE_ID_DUTCH."
+				and _g.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
 			left join %PRE%name_types _b 
 				on _a.type_id=_b.id 
@@ -849,9 +858,5 @@ class SearchControllerNSR extends SearchController
 		}
 		return $querystring;
 	}
-
-			
-
-
 
 }
