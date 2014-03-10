@@ -1,6 +1,6 @@
 <?php
 
-	define('FIXED_PROJECT_ID',1);
+	//define('FIXED_PROJECT_ID',1);
 
 	if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
 	if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
