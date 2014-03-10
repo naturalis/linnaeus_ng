@@ -14,7 +14,7 @@
 
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
-				{if $names.list[$names.prefId] && $names.list[$names.sciId]}
+				{if $names.list[$names.prefId].uninomial && $names.list[$names.sciId].specific_epithet}
 					<h1>{$taxon_display_name}</h1>
 					<h2 style="width:510px"><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
 				{else}
