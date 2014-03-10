@@ -1,6 +1,5 @@
 	<div id="right">
 
-
 		<div id="quicksearch">
 			<h2>Zoek op naam</h2>
 	
@@ -13,10 +12,10 @@
 				</fieldset>
 				<ul>
 					<li class="searchdb">
-						<a href="../search/nsr_search_extended.php"><b>Uitgebreid zoeken</a>
+						<a href="../search/nsr_search_extended.php"><b>Uitgebreid zoeken</b></a>
 					</li>
 					<li class="level2">
-						<a href="../search/nsr_search_pictures.php"><b>Foto's zoeken</a>
+						<a href="../search/nsr_search_pictures.php"><b>Foto's zoeken</b></a>
 					</li>
 				</ul>
 				</form>

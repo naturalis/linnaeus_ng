@@ -34,13 +34,13 @@
 						&nbsp;<a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/i000335.html" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
 					</label>
 					<p>
-						<a id="togglePresenceStatusGevestigd" href="#gevestigd">Gevestigde soorten</a> / 
-						<a id="togglePresenceStatusNietGevestigd" href="#nietgevestigd">Niet gevestigde soorten</a>
+						<a id="togglePresenceStatusGevestigd" href="#">Gevestigde soorten</a> / 
+						<a id="togglePresenceStatusNietGevestigd" href="#">Niet gevestigde soorten</a>
 					</p>
 					<ul id="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
 						<li>
-							<input type="checkbox" class="list" id="presence{$v.id}" name="presence[{$v.id}]" indigenous="{$v.indigenous}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
+							<input type="checkbox" class="list" id="indigenous{$v.id}" name="presence[{$v.id}]" indigenous="{$v.indigenous}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
 							<label for="presence{$v.id}">
 								<div class="presenceStatusCode">{$v.index_label}</div>
 								<div class="presenceStatusDescription">{$v.information_short}</div>
@@ -104,14 +104,14 @@
 		</form>
 		</div>
 		
-		<div>
+		<div id="results">
 			<p>
 				<h4><span id="resultcount-header">{$results.count}</span></h4>
 			</p>
 			{foreach from=$results.data item=v}
-				<div style="vertical-align:top;width:500px;border-bottom:1px solid #999;padding-bottom:10px;margin-bottom:10px">
+				<div class="result">
 					{if $v.overview_image}
-					<img src="http://images.ncbnaturalis.nl/160x100/{$v.overview_image}" style="width:140px;height:auto;float:right"/>
+					<img src="http://images.ncbnaturalis.nl/120x75/{$v.overview_image}" />
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong><br />
 					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
@@ -142,14 +142,14 @@
 $(document).ready(function(){
 	
 $('#togglePresenceStatusGevestigd').bind('click',function() {
-	$('input:checkbox[settled]').each(function() {
+	$('input:checkbox[indigenous]').each(function() {
 		$(this).prop('checked', ($(this).attr('indigenous')=='1'));
 	});
 	$('#formSearchFacetsSpecies').submit();
 })
 
 $('#togglePresenceStatusNietGevestigd').bind('click',function() {
-	$('input:checkbox[settled]').each(function() {
+	$('input:checkbox[indigenous]').each(function() {
 		$(this).prop('checked', ($(this).attr('indigenous')=='0'));
 	});
 	$('#formSearchFacetsSpecies').submit();

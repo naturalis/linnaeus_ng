@@ -7,7 +7,7 @@ class SpeciesController extends Controller
 	private $_lookupListMaxResults=100;
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
-	private $_automaticTabTranslation=array();
+	public $automaticTabTranslation=array();
 
     public $usedModels = array(
         'content_taxon', 
@@ -104,8 +104,9 @@ class SpeciesController extends Controller
 		foreach($d as $val) {
 			$val=explode(':',trim($val,'{}'));
 			if (!$val[0]||!$val[1]) continue;
-			$this->_automaticTabTranslation[$val[0]]=$val[1];
+			$this->automaticTabTranslation[$val[0]]=$val[1];
 		}
+		
     }
 
 
@@ -171,8 +172,8 @@ class SpeciesController extends Controller
             // determine the page_id the page will open in
 			$requestedCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
-			if (isset($requestedCat) && isset($this->_automaticTabTranslation[$this->requestData['cat']])) {
-				$requestedCat=$this->_automaticTabTranslation[$this->requestData['cat']];
+			if (isset($requestedCat) && isset($this->automaticTabTranslation[$this->requestData['cat']])) {
+				$requestedCat=$this->automaticTabTranslation[$this->requestData['cat']];
 			}
 
             $activeCategory = 

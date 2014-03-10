@@ -16,10 +16,11 @@
 {assign var=buffer value=3}
 {if !$pgnCurrPage}{assign var=currPage value=1}{else}{assign var=currPage value=$pgnCurrPage}{/if}
 <div id="paginator">
+	<input type="hidden" id="results-per-page" value="{$results.perpage}" />
 	<ul>
 		<li class="no-border">{t}pagina:{/t}</li>
 		{if $pgnCurrPage>1}
-		<li><a href="{$pgnURL}?{$pgnQuerystring}page={$currPage-1}"><<</a></li>
+		<li><a id="paginator-prev-link" href="{$pgnURL}?{$pgnQuerystring}page={$currPage-1}"><<</a></li>
 		{/if}
 		{for $foo=1 to $pages}
 		{if !($currPage<=(2*$buffer) && ($foo<=(2*$buffer))) && $foo==$currPage-$buffer}
@@ -39,7 +40,7 @@
 		{/if}
 		{/for}
 		{if $pgnCurrPage<$pages}
-		<li class="no-border"><a href="{$pgnURL}?{$pgnQuerystring}page={$currPage+1}">>></a></li>
+		<li class="no-border"><a id="paginator-next-link" href="{$pgnURL}?{$pgnQuerystring}page={$currPage+1}">>></a></li>
 		{/if}
 	</ul>
 </div>

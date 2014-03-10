@@ -5,23 +5,25 @@ include_once ('RdfController.php');
 
 class SpeciesControllerNSR extends SpeciesController
 {
-    public function __construct ()
+	private $_resPicsPerPage=12;
+
+    public function __construct()
     {
         parent::__construct();
 		$this->initialise();
 	}
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
 
-    private function initialise ()
+    private function initialise()
     {
 		$this->Rdf = new RdfController;
     }
 
-    public function indexAction ()
+    public function indexAction()
     {
         if (!$this->rHasVal('id'))
 			$id = $this->getFirstTaxonId();
@@ -33,7 +35,7 @@ class SpeciesControllerNSR extends SpeciesController
         $this->redirect('nsr_taxon.php?id=' . $id);
     }
 
-    public function taxonAction ()
+    public function taxonAction()
     {
 
         if ($this->rHasId())
@@ -43,22 +45,34 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
-			if (isset($reqCat) && isset($this->_automaticTabTranslation[$reqCat])) {
-				$reqCat=$this->_automaticTabTranslation[$reqCat];
-			}
+			if (isset($reqCat) && isset($this->automaticTabTranslation[$reqCat]))
+				$reqCat=$this->automaticTabTranslation[$reqCat];
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 			$names=$this->getNames($taxon['id']);
 			$classification=$this->getTaxonClassification($taxon['id']);
-			
-			$content=$this->getTaxonContent(
-				array(
-					'taxon' => $taxon['id'], 
-					'category' => $categories['start'], 
-					'allowUnpublished' => $this->isLoggedInAdmin(),
-					'isLower' =>  $taxon['lower_taxon']
-				)
-			);
+			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
+			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
+
+			if ($categories['start']==CTAB_MEDIA)
+			{
+				
+				$this->smarty->assign('search',$this->requestData);	
+				$this->smarty->assign('querystring',$this->reconstructQueryString());
+				$this->smarty->assign('results',$this->getTaxonMedia($this->requestData));	
+
+			} else {
+
+				$content=$this->getTaxonContent(
+					array(
+						'taxon' => $taxon['id'], 
+						'category' => $categories['start'], 
+						'allowUnpublished' => $this->isLoggedInAdmin(),
+						'isLower' =>  $taxon['lower_taxon']
+					)
+				);
+				
+			}
 
 			/*
 				distribution can have 'regular' data - fetched above
@@ -69,6 +83,29 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$presenceData=$this->getPresenceData($taxon['id']);
 				$this->smarty->assign('presenceData', $presenceData);
+
+				$content=$this->getTaxonContent(
+					array(
+						'taxon' => $taxon['id'], 
+						'category' =>  TAB_PRESENCE, 
+						'allowUnpublished' => $this->isLoggedInAdmin(),
+						'isLower' =>  $taxon['lower_taxon']
+					)
+				);
+
+			}
+
+			if ($categories['start']== CTAB_NAMES)
+			{
+				$content=$this->getTaxonContent(
+					array(
+						'taxon' => $taxon['id'], 
+						'category' =>  TAB_NOMENCLATURE, 
+						'allowUnpublished' => $this->isLoggedInAdmin(),
+						'isLower' =>  $taxon['lower_taxon']
+					)
+				);
+
 			}
 
 			if ($categories['start']!=CTAB_MEDIA && $categories['start']!=CTAB_DNA_BARCODES)
@@ -79,15 +116,19 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$this->setPageName($taxon['label']);
 
+			if (isset($content))
+			{
+				$this->smarty->assign('content',$content['content']);
+				$this->smarty->assign('rdf',$content['rdf']);
+			}
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',$categories['categories']);
             $this->smarty->assign('activeCategory',$categories['start']);
 			$this->smarty->assign('taxon',$taxon);
 			$this->smarty->assign('classification',$classification);
+			$this->smarty->assign('children',$children);
 			$this->smarty->assign('names',$names);
 			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-			$this->smarty->assign('content',$content['content']);
-			$this->smarty->assign('rdf',$content['rdf']);
             $this->smarty->assign('headerTitles', array('title' => $taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
 
         } else {
@@ -98,7 +139,7 @@ class SpeciesControllerNSR extends SpeciesController
         $this->printPage('taxon');
     }
 
-    public function nameAction ()
+    public function nameAction()
     {
         //if (!$this->rHasId())
 		$name=$this->getName(array('nameId'=>$this->requestData['id']));
@@ -110,7 +151,6 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->smarty->assign('taxon',$taxon);
         $this->printPage();
     }
-
 
     private function getCategories($p=null)
     {
@@ -155,8 +195,10 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if (isset($taxon))
 		{
-		
-			if (!is_null($this->getPresenceData($taxon)))
+
+			$d=$this->getTaxonContent(array('category'=>TAB_PRESENCE,'taxon'=>$taxon));
+
+			if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
 			{
 				foreach((array)$categories as $key=>$val)
 				{
@@ -166,7 +208,8 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 				}
 			}
-			
+			 
+							
 			if (!$this->_suppressTab_NAMES)
 			{
 				array_push($categories,
@@ -178,6 +221,21 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
+
+
+
+			foreach((array)$categories as $key=>$val)
+			{
+				if ($val['id']==TAB_PRESENCE)
+					$categories[$key]['is_empty']=true;
+
+				if ($val['id']==TAB_NOMENCLATURE)
+					$categories[$key]['is_empty']=true;
+			}
+			
+
+
+
 
 			if (!$this->_suppressTab_LITERATURE)
 			{
@@ -254,8 +312,10 @@ class SpeciesControllerNSR extends SpeciesController
 				$start=$val['id'];
 			}
 		}
-
+		
 		$this->customSortArray($categories,array('key' => 'show_order'));
+
+//		q($categories,1);
 
 		if (is_null($start)) $start=$firstNonEmpty;
 
@@ -357,7 +417,7 @@ class SpeciesControllerNSR extends SpeciesController
     private function getTaxonOverviewImage($id)
 	{
 		$d=(array)$this->getTaxonMedia(array('id'=>$id,'overview'=>true));
-		return array_shift($d);
+		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 
     private function getTaxonMedia($p)
@@ -367,6 +427,10 @@ class SpeciesControllerNSR extends SpeciesController
 		
 		if (empty($id))
 			return;
+
+		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
+		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
+		$sort=!empty($p['sort']) ? $p['sort'] : 'meta_datum_plaatsing';
 
 		$data=$this->models->Taxon->freeQuery("		
 			select
@@ -443,14 +507,20 @@ class SpeciesControllerNSR extends SpeciesController
 				_m.project_id=".$this->getCurrentProjectId()."
 				and _m.taxon_id=".$id."
 				".($overview ? "and _m.overview_image=1" : "")."
-			"
-		);
 
+			".(isset($sort) ? "order by ".$sort : "")."
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+		);
+		
 		$isWin=$this->helpers->Functions->serverIsWindows();
 
 		if (!$isWin) setlocale(LC_ALL, 'nl_NL.utf8');
 		
-		foreach((array)$data as $key=>$val) {
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		
+		foreach((array)$data as $key=>$val)
+		{
 
 			$photographer=implode(' ',array_reverse(explode(',',$val['photographer'])));
 			$copyrighter=($val['meta_copyrights']==$val['photographer'] ? $photographer : $val['meta_copyrights']);
@@ -477,9 +547,10 @@ class SpeciesControllerNSR extends SpeciesController
 				$val['meta_geografie'];
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 			
-			
 		}
-		return $data;
+
+		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
+
     }
 
 	private function _getTaxonClassification($id)
@@ -489,6 +560,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_a.id,
 				_a.taxon,
 				_a.parent_id,
+				trim(if(_m.authorship is null,_m.name,replace(_m.name,_m.authorship,''))) as name,
 				_m.uninomial,
 				_m.specific_epithet,
 				_m.infra_specific_epithet,
@@ -521,7 +593,8 @@ class SpeciesControllerNSR extends SpeciesController
 				on _a.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
 				and _g.language_id=". LANGUAGE_ID_SCIENTIFIC ."
-
+			
+				
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _a.id=".$id."
@@ -538,13 +611,154 @@ class SpeciesControllerNSR extends SpeciesController
 		
 	public function getTaxonClassification($id)
 	{
-
 		$this->tmp = array();
 
 		$this->_getTaxonClassification($id);
 
 		return $this->tmp;
+	}
 
+	private function getSpeciesCount($id)
+	{
+		if (is_null($id))
+			return;
+			
+		/*
+			'undefined' are the taxa that DO HAVE a presence_id (so they must be
+			species or below) but have a presence that has a null-value
+			for indigenous
+		*/
+		
+		$data=$this->models->Taxon->freeQuery(array(
+			'query'=>"
+				select
+					count(_sq.taxon_id) as total,
+					_sq.taxon_id,
+					_sp.presence_id,
+					ifnull(_sr.indigenous,'undefined') as indigenous
+				from 
+					%PRE%taxon_quick_parentage _sq
+				
+				left join %PRE%presence_taxa _sp
+					on _sq.project_id=_sp.project_id
+					and _sq.taxon_id=_sp.taxon_id
+				
+				left join %PRE%presence _sr
+					on _sp.project_id=_sr.project_id
+					and _sp.presence_id=_sr.id
+				
+				where
+					_sq.project_id=".$this->getCurrentProjectId()."
+					and MATCH(_sq.parentage) AGAINST ('".$id."' in boolean mode)
+					and _sp.presence_id is not null
+				group by _sr.indigenous",
+			'fieldAsIndex'=>'indigenous'
+		));
+			
+		return			
+			array(
+				'total'=>
+					(int)
+						(isset($data['undefined']['total'])?$data['undefined']['total']:0)+
+						(isset($data[0]['total'])?$data[0]['total']:0)+
+						(isset($data[1]['total'])?$data[1]['total']:0),
+				'indigenous'=>
+						(int)(isset($data[1]['total'])?$data[1]['total']:0),
+				'not_indigenous'=>
+						(int)(isset($data[0]['total'])?$data[0]['total']:0)
+			);
+	}
+
+	private function getTaxonChildren($p)
+	{
+		$include_count=isset($p['include_count']) ? $p['include_count'] : false;
+		$id=isset($p['taxon']) ? $p['taxon'] : null;
+
+		$data=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon,
+				trim(
+					concat(
+						if(_k.uninomial is null,'',concat(_k.uninomial,' ')),
+						if(_k.specific_epithet is null,'',concat(_k.specific_epithet,' ')),
+						if(_k.infra_specific_epithet is null,'',concat(_k.infra_specific_epithet,' '))
+					)
+				) as name,
+				_g.label as rank
+			
+			from %PRE%taxa _a
+
+			left join %PRE%names _k
+				on _a.id=_k.taxon_id
+				and _a.project_id=_k.project_id
+				and _k.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _k.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id=_f.project_id
+
+			left join %PRE%labels_projects_ranks _g
+				on _a.rank_id=_g.project_rank_id
+				and _a.project_id = _g.project_id
+				and _g.language_id=". LANGUAGE_ID_SCIENTIFIC ."
+
+			where
+				_a.project_id =".$this->getCurrentProjectId()."
+				and _a.parent_id = ".$id."
+			order by _a.taxon
+		");
+
+		//q($this->models->MediaTaxon->q(),1);
+		//q($data,1);
+
+		if ($include_count) {
+		
+			foreach((array)$data as $key=>$val)
+			{
+				$data[$key]['species_count']=$this->getSpeciesCount($val['id']);
+			}		
+
+		}
+
+		return $data;
+	}
+	
+	private function getClassificationSpeciesCount($p)
+	{
+		$classification=isset($p['classification']) ? $p['classification'] : null;
+		$current_taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		
+		if (is_null($classification))
+			return;
+		
+		/*
+			get the key of the taxon above the one being displayed (unless no current 
+			taxon has been specified, in which case we will calculate number of
+			children for all members of the classification)
+		*/
+		$prev=null;	
+		
+		if (!is_null($current_taxon)) {
+		
+			foreach((array)$classification as $key=>$val)
+			{
+				if ($val['id']==$current_taxon)
+					break;
+				$prev=$key;
+			}
+			
+		}
+
+		foreach((array)$classification as $key=>$val)
+		{
+			if (is_null($prev) || $key==$prev || $val['id']==$current_taxon)
+				$classification[$key]['species_count']=$this->getSpeciesCount($val['id']);
+		}
+
+		return $classification;
 	}
 
 	private function getName($p)
@@ -621,7 +835,9 @@ class SpeciesControllerNSR extends SpeciesController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'taxon_id' => $id
-				)
+				),
+				'columns' => 'taxon_literal,barcode,location,date_literal,specialist',
+				'order' => 'date desc'
 			));		
 	}
 
@@ -790,24 +1006,25 @@ class SpeciesControllerNSR extends SpeciesController
             case CTAB_DNA_BARCODES:
                 $content=$this->getDNABarcodes($taxon);
                 break;
-            
+
             default:
+
                 $d = array(
                     'taxon_id' => $taxon, 
                     'project_id' => $this->getCurrentProjectId(), 
                     'language_id' => $this->getCurrentLanguageId(), 
                     'page_id' => $category
                 );
-                
+
                 if (!$allowUnpublished)
                     $d['publish'] = '1';
                 
                 $ct = $this->models->ContentTaxon->_get(array(
                     'id' => $d, 
                 ));
-				
+
 				$content = isset($ct) ? $ct[0] : null;
-				
+
 				$rdf=$this->Rdf->getRdfValues($content['id']);
 
                 $content=$content['content'];
@@ -850,15 +1067,21 @@ class SpeciesControllerNSR extends SpeciesController
 				'project_id' => $this->getCurrentProjectId(), 
 				'taxon_id' => $id
 			),
-			'columns' => 'count(*) as total'
+			'columns' => 'count(*) as total',
+			'order'=> 'date'
 		));
         
         return $d[0]['total']>1;
     }
 
-
-
-
-
+	private function reconstructQueryString()
+	{
+		$querystring=null;
+		foreach((array)$this->requestData as $key=>$val) {
+			if ($key=='page') continue;
+			$querystring.=$key.'='.$val.'&';
+		}
+		return $querystring;
+	}
 
 }

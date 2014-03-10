@@ -35,26 +35,25 @@
 		{if $activeCategory==$smarty.const.TAB_MEDIA || $activeCategory==$smarty.const.CTAB_MEDIA}
 
 			<div>
-
-				<h4>Afbeelding{if $content|@count!=1}en{/if}: {if $content|@count==0}{t}geen{/t}{else}{$content|@count}{/if}</h4>
+				<h4>Afbeelding{if $results.count!=1}en{/if}: {$results.count}</h4>
 				<div>
-					{foreach from=$content item=v}
-						<div class="imageInGrid3 taxon-page">
-							<div class="thumbContainer">
-								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
-								</a>
-							</div>
-							<dl>
-								<dt>Foto</dt><dd>{$v.photographer}</dd>
-								<!-- dt>Geplaatst op</dt><dd>{$v.meta_datum}</dd -->
-							</dl>
+
+				{foreach from=$results.data item=v}
+					<div class="imageInGrid3 taxon-page">
+						<div class="thumbContainer">
+							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+							</a>
 						</div>
-					{/foreach}
+						<dl>
+							<dt>Foto</dt><dd>{$v.photographer}</dd>
+						</dl>
+					</div>
+				{/foreach}
 				</div>
 
-				{assign var=pgnResultCount value=$content|@count}
-				{assign var=pgnResultsPerPage value=12}
+				{assign var=pgnResultCount value=$results.count}
+				{assign var=pgnResultsPerPage value=$results.perpage}
 				{assign var=pgnCurrPage value=$search.page}
 				{assign var=pgnURL value=$smarty.server.PHP_SELF}
 				{assign var=pgnQuerystring value=$querystring}
@@ -243,7 +242,8 @@ $(document).ready(function(){
 			animation_speed:50,
 			show_title: false,
 	 		overlay_gallery: false,
-	 		social_tools: false
+	 		social_tools: false,
+			changepicturecallback:function(){prettyPhotoCycle();}
 	 	});
 	}
 });

@@ -82,7 +82,163 @@ table tr td {
 #results .result {
 	vertical-align:top;
 	width:500px;
-	border-bottom:1px solid #999;
+	border-bottom:1px solid #E5E5E5;
 	padding-bottom:10px;
 	margin-bottom:10px;
 }
+
+
+
+#results .result img {
+	width:140px;
+	height:auto;
+	float:right;
+}
+
+
+
+
+.taxon-image-table {
+	font-size:9px;
+	color:#666;
+}
+.taxon-dna-table {
+	font-size:11px;
+}
+
+.taxon-dna-table th, td {
+	min-width:50px;
+	vertical-align:top;
+}
+
+#hint-box {
+	background-color:#FFD;
+	padding:2px;
+	border:1px solid #ccc;
+	display:none;
+	width:350px;
+	position:absolute;
+	text-align:left;
+	font-weight:normal;
+}
+
+#titles {
+	width:417px;
+}
+
+.formrow input.field {
+	left:325px;	
+	width:325px;
+    right:auto;
+}
+
+.auto_complete {
+	background-color:#fff;
+	border:1px solid #ddd;
+	width:325px;
+	max-height:250px;
+	height:auto;
+	overflow:hidden;
+	z-index:999;
+	position:absolute;
+	left:100px;
+	top:20px;
+	padding:2px;
+}
+
+#formSearchFacetsSpecies fieldset.block .formrow {
+	position:relative;
+}
+
+.formrow input.field {
+    left: 100px;
+}
+
+div.auto_complete ul li {
+    cursor: pointer;
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 2px;
+    z-index: 1;
+}
+
+div.auto_complete ul li:hover {
+    background-color: #FFDDBB;
+    z-index: 1;
+}
+
+div.auto_complete ul li.selected {
+    background-color: #FFDDBB;
+    z-index: 1;
+}
+
+
+#body #dialogRidge #left {
+}
+
+#body #dialogRidge #content {
+    margin-top:0px;
+ 	padding-top:0px;
+}
+
+#content h2 {
+    font-size: 18px;
+}
+
+#body #dialogRidge #right {
+
+}
+
+#body #dialogRidge #content.taxon-detail {
+	margin-top:-33px;
+}
+
+#body #dialogRidge #content.image-search, #body #dialogRidge #content.simple-search {
+	margin-top:-17px;
+}
+
+#body #dialogRidge #content.literature {
+	margin-top:-17px;
+}
+
+
+h4 {
+    font-weight: normal;
+}
+
+#body #dialogRidge #content #taxonHeader #titles .no-subtitle {
+	margin-top:17px;
+}
+
+.imageInGrid3.taxon-page {
+    height: 120px;
+}
+
+.link {
+    color: #FA7001;
+    text-decoration: none;
+	cursor:pointer;
+}
+.link:hover {
+    text-decoration:underline;
+}
+
+
+div.pp_default .pp_description {
+	font-weight:bold;
+}
+
+#content h2 {
+    margin-bottom: 9px;
+    padding-bottom: 2px;
+}
+
+.panel {
+    font-size:100%;
+}
+
+.panel th {
+	width:100px;!important
+}
+
