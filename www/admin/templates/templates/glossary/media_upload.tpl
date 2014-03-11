@@ -38,13 +38,13 @@
 </div>
 {/if}
 
-{literal}
+
 <script type="text/JavaScript">
 $(document).ready(function(){
 allLookupNavigateOverrideUrl('media_upload.php?id=%s');
 });
 </script>
-{/literal}
+
 
 
 {include file="../shared/admin-footer.tpl"}

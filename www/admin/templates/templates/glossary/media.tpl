@@ -189,23 +189,20 @@
 </div>
 {/if}
 
-{literal}
+
 <script type="text/JavaScript">
 $(document).ready(function(){
-{/literal}
 	allShowLoadingDiv();
-{section name=i loop=$languages}
+	{section name=i loop=$languages}
 	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
-
+	{/section}
 	allActiveLanguage = {$defaultLanguage};
 	glossDrawLanguages('glossMediaChangeLanguage',true);
 	allHideLoadingDiv();
 	allLookupNavigateOverrideUrl('media.php?id=%s');
-{literal}	
-	/* $(".group1").colorbox({rel:'group1'}); */
+
 });
 </script>
-{/literal}
+
 
 {include file="../shared/admin-footer.tpl"}

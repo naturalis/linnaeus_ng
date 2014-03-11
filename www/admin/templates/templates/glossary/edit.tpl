@@ -75,24 +75,20 @@
 </form>
 </div>
 
-{literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-{/literal}
-{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
-{if $gloss.synonyms}
-{section name=i loop=$gloss.synonyms}
-glossAddSynonymToList('{$gloss.synonyms[i].synonym|@addslashes}');
-{/section}
-{else}
-glossUpdateSynonyms();
-{/if}
-glossThisTerm = '{$gloss.term|@addslashes}';
-{literal}
-initTinyMce(false,false);
+	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
+	{if $gloss.synonyms}
+		{section name=i loop=$gloss.synonyms}
+		glossAddSynonymToList('{$gloss.synonyms[i].synonym|@addslashes}');
+		{/section}
+	{else}
+		glossUpdateSynonyms();
+	{/if}
+	glossThisTerm = '{$gloss.term|@addslashes}';
+	initTinyMce(false,false);
 });
 </script>
-{/literal}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
