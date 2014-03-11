@@ -2774,7 +2774,7 @@ class Controller extends BaseClass
         if (isset($this->jsToLoad))
             $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
 
-        $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->template_dir . '_menu.tpl'));
+        $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
         
         if (isset($_SESSION['admin']['user']) && !$_SESSION['admin']['user']['_said_welcome']) {
             
@@ -2924,12 +2924,12 @@ class Controller extends BaseClass
         $this->_smartySettings = $this->config->getSmartySettings();
         
         $this->smarty = new Smarty();
-        
+
         /* DEBUG */
         $this->smarty->force_compile = true;
         
         $cbn = $this->getControllerBaseName();
-        
+
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . (isset($cbn) ? $cbn . '/' : '');
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];

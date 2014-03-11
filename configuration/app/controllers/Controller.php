@@ -2183,7 +2183,7 @@ class Controller extends BaseClass
         
         $this->smarty->assign('currentLanguageId', $this->getCurrentLanguageId());
         $this->smarty->assign('menu', $this->getMainMenu());
-        $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->template_dir . '_menu.tpl'));
+        $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
         $this->smarty->assign('customTemplatePaths', $this->getProjectDependentTemplates());
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
         $this->smarty->assign('session', $_SESSION);
@@ -2200,12 +2200,8 @@ class Controller extends BaseClass
         $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
         $this->smarty->assign('addedProjectIDParam', $this->generalSettings['addedProjectIDParam']);
         $this->smarty->assign('searchResultIndexActive', $this->getSearchResultIndexActive());
-
         $this->smarty->assign('spid', $this->spid());
-		
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
-		
-		
     }
 
 
