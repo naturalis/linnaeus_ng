@@ -248,8 +248,6 @@ class SearchControllerNSR extends SearchController
 				and _l.overview_image=1
 
 			where _a.project_id =".$this->getCurrentProjectId()."
-				and _f.lower_taxon=1
-				and (_a.language_id =".LANGUAGE_ID_DUTCH." or _a.language_id =".LANGUAGE_ID_SCIENTIFIC.")
 				and _a.name like '%".mysql_real_escape_string($search)."%'
 				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
 			

@@ -24,8 +24,8 @@
 					{$res.dutch_name}
 
 					{if $res.presence_information_index_label || $res.presence_information_title}
-					<br /><br />
-					Status voorkomen: {$res.presence_information_index_label} {$res.presence_information_title}
+					<br />
+					{t}Status voorkomen:{/t} {$res.presence_information_index_label} {$res.presence_information_title}
 					{/if}
 				</div>
 				{/foreach}
@@ -38,7 +38,7 @@
 				{include file="../shared/_paginator.tpl"}
 				
 				{else}
-				Niets gevonden.
+				{t}Niets gevonden.{/t}
 				{/if}
 
 
