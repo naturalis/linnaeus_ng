@@ -1,11 +1,12 @@
 {include file="../shared/header.tpl"}
 {if $names.list[$names.prefId]}
-{assign var=taxon_display_name value=$names.list[$names.prefId].name}
+	{assign var=taxon_display_name value=$names.list[$names.prefId].name}
 {elseif $names.list[$names.sciId]}
-{assign var=taxon_display_name value="<i>`$names.list[$names.sciId].uninomial` `$names.list[$names.sciId].specific_epithet`</i>"}
+	{assign var=taxon_display_name value="<i>`$names.list[$names.sciId].uninomial` `$names.list[$names.sciId].specific_epithet`</i>"}
 {else}
-{assign var=taxon_display_name value=$taxon.label}
+	{assign var=taxon_display_name value=$taxon.label}
 {/if}
+
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -14,7 +15,7 @@
 
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
-				{if $names.list[$names.prefId].uninomial && $names.list[$names.sciId].specific_epithet}
+				{if $names.list[$names.sciId].uninomial && $names.list[$names.sciId].specific_epithet}
 					<h1>{$taxon_display_name}</h1>
 					<h2 style="width:510px"><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
 				{else}
@@ -32,7 +33,7 @@
 			{/if}
 		</div>
 
-		{if $activeCategory==$smarty.const.TAB_MEDIA || $activeCategory==$smarty.const.CTAB_MEDIA}
+		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
 
 			<div>
 				<h4>Afbeelding{if $results.count!=1}en{/if}: {$results.count}</h4>
@@ -98,7 +99,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 			</div>
 
-		{elseif $activeCategory==$smarty.const.TAB_DISTRIBUTION ||  $activeCategory==$smarty.const.TAB_PRESENCE}
+		{elseif $activeCategory==$smarty.const.TAB_VOORKOMEN ||  $activeCategory==$smarty.const.TAB_VERSPREIDING}
 
 			<div>
 				<h2>Voorkomen</h2>
@@ -135,7 +136,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				
 			</div>
 
-		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NOMENCLATURE}
+		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NAAMGEVING}
 					
 			<p>
 				<h2>Naamgeving</h2>

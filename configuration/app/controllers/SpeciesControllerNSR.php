@@ -1,5 +1,23 @@
 <?php
 
+/*
+
+automatische tabs
+CTAB_NAMES
+CTAB_MEDIA
+CTAB_CLASSIFICATION
+CTAB_TAXON_LIST
+CTAB_LITERATURE
+CTAB_DNA_BARCODES
+				
+TAB_VOORKOMEN wordt omgeleid naar TAB_VERSPREIDING
+  TAB_VERSPREIDING: auto presence data, data TAB_VERSPREIDING, data TAB_VOORKOMEN (?)
+  
+TAB_NAAMGEVING wordt omgeleid naar CTAB_NAMES
+  CTAB_NAMES: auto naamgeving, classificatieboom, data TAB_NAAMGEVING
+
+*/
+
 include_once ('SpeciesController.php');
 include_once ('RdfController.php');
 
@@ -45,9 +63,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
-			if (isset($reqCat) && isset($this->automaticTabTranslation[$reqCat]))
-				$reqCat=$this->automaticTabTranslation[$reqCat];
-
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 			$names=$this->getNames($taxon['id']);
 			$classification=$this->getTaxonClassification($taxon['id']);
@@ -73,34 +88,25 @@ class SpeciesControllerNSR extends SpeciesController
 				);
 				
 			}
-
+			
 			/*
 				distribution can have 'regular' data - fetched above
 				as well as specifically structured distribution data, 
 				which is fetched below
 			*/
-			if ($categories['start']==TAB_DISTRIBUTION)
+			if ($categories['start']==TAB_VOORKOMEN || $categories['start']==TAB_VERSPREIDING)
 			{
 				$presenceData=$this->getPresenceData($taxon['id']);
 				$this->smarty->assign('presenceData', $presenceData);
 
-				$content=$this->getTaxonContent(
-					array(
-						'taxon' => $taxon['id'], 
-						'category' =>  TAB_PRESENCE, 
-						'allowUnpublished' => $this->isLoggedInAdmin(),
-						'isLower' =>  $taxon['lower_taxon']
-					)
-				);
-
 			}
 
-			if ($categories['start']== CTAB_NAMES)
+			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
 			{
 				$content=$this->getTaxonContent(
 					array(
 						'taxon' => $taxon['id'], 
-						'category' =>  TAB_NOMENCLATURE, 
+						'category' =>  TAB_NAAMGEVING, 
 						'allowUnpublished' => $this->isLoggedInAdmin(),
 						'isLower' =>  $taxon['lower_taxon']
 					)
@@ -108,16 +114,19 @@ class SpeciesControllerNSR extends SpeciesController
 
 			}
 
+			/*
 			if ($categories['start']!=CTAB_MEDIA && $categories['start']!=CTAB_DNA_BARCODES)
 			{
 				$content['content'] = $this->matchGlossaryTerms($content['content']);
 				$content['content'] = $this->matchHotwords($content['content']);
 			}
+			*/
 
 			$this->setPageName($taxon['label']);
 
 			if (isset($content))
 			{
+
 				$this->smarty->assign('content',$content['content']);
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
@@ -144,17 +153,11 @@ class SpeciesControllerNSR extends SpeciesController
         if ($this->rHasId())
 		{
 			$d=$this->getName(array('nameId'=>$this->requestData['id']));
-			$taxon=$d[0];
-			$name['nametype']=sprintf($this->Rdf->translatePredicate($taxon['nametype']),$taxon['language_label']);
-			
-			$taxon=$this->getTaxonById($taxon['taxon_id']);
-	
-			$classification=$this->getTaxonClassification($taxon['id']);
-			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
-			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
-	
+			$name=$d[0];
+			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 			$this->smarty->assign('name',$name);
-			$this->smarty->assign('taxon',$taxon);
+			$this->smarty->assign('taxon',$this->getTaxonById($name['taxon_id']));
+
 		}
         $this->printPage();
     }
@@ -203,13 +206,13 @@ class SpeciesControllerNSR extends SpeciesController
 		if (isset($taxon))
 		{
 
-			$d=$this->getTaxonContent(array('category'=>TAB_PRESENCE,'taxon'=>$taxon));
+			$d=$this->getTaxonContent(array('category'=>TAB_VOORKOMEN,'taxon'=>$taxon));
 
 			if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
 			{
 				foreach((array)$categories as $key=>$val)
 				{
-					if ($val['id']==TAB_DISTRIBUTION) {
+					if ($val['id']==TAB_VERSPREIDING) {
 						$categories[$key]['is_empty']=false;
 						break;
 					}
@@ -233,10 +236,10 @@ class SpeciesControllerNSR extends SpeciesController
 
 			foreach((array)$categories as $key=>$val)
 			{
-				if ($val['id']==TAB_PRESENCE)
+				if ($val['id']==TAB_VOORKOMEN)
 					$categories[$key]['is_empty']=true;
 
-				if ($val['id']==TAB_NOMENCLATURE)
+				if ($val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
 			}
 			
