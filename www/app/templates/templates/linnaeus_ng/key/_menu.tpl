@@ -27,14 +27,14 @@
     decisionPath = decisionPath + '</div>';
 </script>
 
-<span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon" />
+<span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon icon-book" />
 {t}Contents{/t}</span>
 
 {if $useJavascriptLinks}
     {if $totalSteps > 1}
-        <a class="navigation-icon" id="first-icon" onclick="keyDoStep($keypath.0.id);" title="{t}Return to first step{/t}">{t}First{/t}</a>
+        <a class="navigation-icon icon-nav-first" id="first-icon" onclick="keyDoStep($keypath.0.id);" title="{t}Return to first step{/t}">{t}First{/t}</a>
     {else}
-        <span class="navigation-icon" id="first-icon-inactive"  title="{t}Return to first step{/t}">{t}First{/t}</span>
+        <span class="navigation-icon icon-nav-first icon-inactive" id="first-icon-inactive"  title="{t}Return to first step{/t}">{t}First{/t}</span>
     {/if} 
     <span
     {if $totalSteps > 1}
@@ -43,28 +43,28 @@
     {else}
         id="previous-icon-inactive"
     {/if} 
-    class="navigation-icon" />{t}Previous{/t}</span>
+    class="navigation-icon icon-book" />{t}Previous{/t}</span>
 {else}
     {if $totalSteps > 1}
-        <a class="navigation-icon" id="first-icon" href="../key/index.php?step={$keypath.0.id}" title="{t}Return to first step{/t}">{t}First{/t}</a>
-        <a class="navigation-icon" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
+        <a class="navigation-icon icon-nav-first" id="first-icon" href="../key/index.php?step={$keypath.0.id}" title="{t}Return to first step{/t}">{t}First{/t}</a>
+        <a class="navigation-icon icon-nav-prev" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
         title="{t}Previous{/t} {t}step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
         {t}Previous{/t}</a>
     {else}
-        <span class="navigation-icon" id="first-icon-inactive">{t}First{/t}</span>
-        <span class="navigation-icon" id="previous-icon-inactive">{t}Previous{/t}</span>
+        <span class="navigation-icon icon-nav-first icon-inactive" id="first-icon-inactive">{t}First{/t}</span>
+        <span class="navigation-icon icon-nav-prev icon-inactive" id="previous-icon-inactive">{t}Previous{/t}</span>
     {/if}
 {/if}
 
 {if $backlink}
-    <a class="navigation-icon" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
+    <a class="navigation-icon icon-nav-back" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
 {else}
-    <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
+    <span class="navigation-icon icon-nav-back icon-inactive" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 
     {include file="../shared/_back-to-search.tpl"}
     
-    <a class="navigation-icon" id="decision-path-icon"
+    <a class="navigation-icon icon-hierarchy" id="decision-path-icon"
     	href='javascript:showDialog("{t}Decision path{/t}",decisionPath);' 
     	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
 </div>
