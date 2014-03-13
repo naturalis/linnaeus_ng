@@ -488,12 +488,6 @@
 
 			}
 
-			.inline-image{
-				color: $theme-color;
-				cursor: pointer;
-				border-bottom: 1px dashed $theme-color;
-			}
-
 		/* --- --- CATEGORIES (tabs) --- */
 			
 			#categories{
@@ -697,34 +691,29 @@
 
 		/* --- --- MEDIA --- */
 
-			.inline-image{
-				border-bottom: 0px;
+			.inline-image, .inline-video{
 				margin-right: 0.5em;
-
-				&:before{
-					font-family: 'naturalis-lng-icons';
-					content: "\e615";
-					margin-right:  0.5em;
-					margin-left: 0.5em;
-					color: $grijs-3;
-				}
-			}
-
-			.inline-video{
+				border-bottom: 1px dashed $theme-color;
 				border-bottom: 0px;
-				margin-right: 0.5em;
-				color: $blauw;
-				background: none !important;
+				color: $grijs-3;
+				font-size: 16px;
 				cursor: pointer;
 
-				&:before{
-					font-family: 'naturalis-lng-icons';
-					content: "\e613";
+				&:before {
 					margin-right:  0.5em;
 					margin-left: 0.5em;
-					color: $grijs-3;
+					color: $theme-color;
+					font-family: 'naturalis-lng-icons';
 				}
 			}
+
+			.inline-image{	&:before{
+					content: "\e615";
+			} }
+
+			.inline-video{ &:before{
+					content: "\e613";
+			} }
 
 	/* --- FORM-ELEMENTS --- */
 
