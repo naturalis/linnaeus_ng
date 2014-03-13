@@ -201,29 +201,7 @@
 			}
 
 	/* --- FONT */
-
-		// /* --- --- PLATFORM --- */
-
-			// @font-face {
-			//     font-family: 'Platform Alternate';
-			//     src: url('fonts/platform-medium-alternate-webfont.eot');
-			//     src: url('fonts/platform-medium-alternate-webfont.eot?#iefix') format('embedded-opentype'),
-			//          url('fonts/platform-medium-alternate-webfont.woff') format('woff'),
-			//          url('fonts/platform-medium-alternate-webfont.ttf?5') format('truetype');
-			//     font-weight: bold;
-			//     font-style: normal;
-			// }
-
-			// @font-face {
-			//     font-family: 'Platform Alternate';
-			//     src: url('fonts/platform-regular-alternate-webfont.eot');
-			//     src: url('fonts/platform-regular-alternate-webfont.eot?#iefix') format('embedded-opentype'),
-			//          url('fonts/platform-regular-alternate-webfont.woff') format('woff'),
-			//          url('fonts/platform-regular-alternate-webfont.ttf?5') format('truetype');
-			//     font-weight: normal;
-			//     font-style: normal;
-			// }
-			
+	
 		/* --- --- ICON FONTS --- */
 
 			@font-face {
@@ -484,7 +462,14 @@
 					}
 				}
 
+				ul{
+					    list-style: disc outside none;
+					    padding: 0 0 0 20px;
+				}
+
 			}
+
+
 
 
 
