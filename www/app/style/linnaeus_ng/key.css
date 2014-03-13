@@ -1,41 +1,32 @@
 /* LAYOUT */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\000037}}
 #page-container {
   background-color: #bbb; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000311}}
 #page-main {
   background-color: #f9f9f7; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000315}}
 #step-image {
   border: 1px solid #666;
   float: right;
   margin: 0px 35px 0 0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000321}}
 #choice-grid, .wrapper-choice-picture {
   width: 560px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000325}}
 .wrapper-choice {
   width: 355px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000329}}
 .wrapper-choice-picture td.text-cell, .wrapper-choice-picture td.target-cell {
   width: 370px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000333}}
 #step td.target-cell {
   vertical-align: bottom; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000337}}
 #choice-grid td {
   width: 50%;
   vertical-align: top;
   padding-right: 8px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000343}}
 .image-cell {
   text-align: center;
   vertical-align: middle;
@@ -44,49 +35,38 @@
   border-top: 1px solid #000;
   border-bottom: 1px solid #000; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000352}}
 #choice-table .text, #choice-table .target {
   margin-right: 10px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000356}}
 #choice-table td.separator {
   height: 10px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000360}}
 #decision-path-icon {
   margin-left: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000364}}
 #back-to-search-icon {
   margin-right: -8px; }
 
 /* step */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000370}}
 #step {
   text-align: justify; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000378}}
 #step #question #head {
   font-size: 14px;
   color: #0303b2; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000387}}
 #step-title {
   color: #0303b2; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000391}}
 #step #question #content {
   margin-bottom: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000399}}
 #step #choices {
   margin-bottom: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003103}}
 #step #img-choices {
   position: relative; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003107}}
 .l2_choice {
   cursor: pointer;
   width: 270px;
@@ -97,75 +77,68 @@
   margin: 5px;
   font-size: 90%; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003120}}
 #choice-table .choice-picture {
   width: auto; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003125}}
 #step .choice-image-div {
   float: left; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003129}}
 #step .choice-image {
   max-width: 180px;
   max-height: 115px;
   cursor: pointer;
   border: 1px solid #666; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003136}}
 #step .choice-img-wrapper {
   cursor: pointer; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003141}}
 .choice-img-wrapper img {
   border: 1px solid #000; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003146}}
 #step .marker {
   font-weight: bold; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003150}}
 .l2_text {
   min-height: 120px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003154}}
 #step .text-choice-img {
   font-family: Arial, sans-serif;
   text-align: center;
   font-size: 11px;
   margin-top: 3px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003161}}
 #step .text-choice-img p {
   line-height: 130%;
   text-align: center; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003166}}
 #step .target {
   margin-top: 15px;
   font-style: italic;
   cursor: pointer; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003172}}
 #step .arrow {
   font-family: "Times New Roman", Times, serif;
   font-size: 16px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003177}}
 #step .target-step, #step .target-taxon {
   color: #006; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003181}}
 #step .target-step:hover, .target-taxon:hover {
   text-decoration: underline; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003185}}
 #step .hr-choice {
   height: 1px;
   color: #ddd; }
 
 /* remaining taxa */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003194}}
+#panel {
+  width: 240px;
+  float: right; }
+  #panel #categories {
+    left: 0; }
+    #panel #categories a {
+      border-width: 0; }
+
 #taxa {
   width: 240px;
   overflow: auto;
@@ -175,56 +148,44 @@
   margin-bottom: 10px;
   max-height: 500px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003207}}
 #taxa #header {
   font-weight: bold;
   margin-bottom: 8px;
   padding: 5px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003213}}
 #taxa a {
   display: block;
   width: 240px;
   text-align: left;
   padding: 0 4px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003220}}
 #taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
   color: #000;
   text-decoration: none;
   border: 1px solid transparent; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003226}}
 #taxa p {
   margin-bottom: 0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003230}}
 #taxa a:hover, #taxa p.a:hover {
   color: #009ee0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003234}}
 #taxa p:last-child {
   margin-bottom: 10px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003238}}
 #categories {
   position: relative;
   left: 570px;
   top: 10px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003244}}
   #categories a.category-active {
     background-color: #eeede9 !important; }
 
 /* Decision path */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003253}}
 .module-key #lookup-DialogContent a {
   border-bottom: none; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003257}}
 .module-key #lookup-DialogContent a b {
   border-bottom: 1px dotted #e3004a; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003261}}
 .module-key #lookup-DialogContent a:hover b {
   border-bottom: 1px dotted #009ee0; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003265}}
 .module-key #lookup-DialogContent .row {
   margin-bottom: 1em; }
