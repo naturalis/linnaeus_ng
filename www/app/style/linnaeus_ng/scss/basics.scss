@@ -563,32 +563,6 @@
 				color: $grijs-4;
 			}
 			
-			// #back-icon, #back-icon-inactive{ &:before {
-			// 		content: "\e607";
-			// } }
-
-			// #next-icon, #next-icon-inactive { &:before {
-			// 		content: "\e60b";
-			// } }			
-			
-			// #contents-icon, #contents-icon-inactive{ &:before {
-			// 		content: "\e603";
-			// } }
-			
-			// #previous-icon, #previous-icon-inactive{ &:before {
-			// 		content: "\e60a";
-			// } }
-
-			// #decision-path-icon, #decision-path-icon-inactive{ &:before {
-			// 		content: "\e60f";
-			// 		margin-right: 0.5em;
-			// } }
-
-			// #first-icon, #first-icon-inactive{ &:before {
-			// 		content: "\e60a\e60a";
-			// 		margin-right: 0.5em;
-			// } }
-
 			[id$=icon-inactive]{
 				&:before {
 					cursor: default;
@@ -720,11 +694,11 @@
 			}
 
 			.inline-image{	&:before{
-					content: "\e615";
+					content: "\e613";
 			} }
 
 			.inline-video{ &:before{
-					content: "\e613";
+					content: "\e607";
 			} }
 
 	/* --- FORM-ELEMENTS --- */

@@ -2136,10 +2136,10 @@ b, .title {
     font-family: 'lng-icons'; }
 
 .inline-image:before {
-  content: "\e615"; }
+  content: "\e613"; }
 
 .inline-video:before {
-  content: "\e613"; }
+  content: "\e607"; }
 
 /* --- FORM-ELEMENTS --- */
 /* --- --- FORM-ELEMENTS: GENERAL --- */
