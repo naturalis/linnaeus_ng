@@ -600,8 +600,9 @@ class ExportAppController extends Controller
       exportId:'".$exportId."'
     },
     
-    projectId : ".$this->getCurrentProjectId().",
-    speciesRankId : ".SPECIES_RANK_ID."
+    PROJECT_ID : ".$this->getCurrentProjectId().",
+    SPECIES_RANK_ID : ".SPECIES_RANK_ID.",
+    FAMILY_RANK_ID : ".FAMILY_RANK_ID."
 
 
     // to add the project data to your PhoneGap app:
