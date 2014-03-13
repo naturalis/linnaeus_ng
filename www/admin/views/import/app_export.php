@@ -4,4 +4,4 @@ require_once ('../../../../configuration/admin/controllers/ExportAppController.p
 
 $c = new ExportAppController();
 
-$c->matrixAppExportAction();
+$c->appExportAction();

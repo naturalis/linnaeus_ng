@@ -76,9 +76,7 @@ NOTICES
 <ul>
 	<li><a href="../import/export.php">{t}Generic export{/t}</a></li>
 	<li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
-    
-    
-    
+	<li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
     
 </ul>
 {/if}
