@@ -34,7 +34,7 @@
     {if $totalSteps > 1}
         <a class="navigation-icon" id="first-icon" onclick="keyDoStep($keypath.0.id);" title="{t}Return to first step{/t}">{t}First{/t}</a>
     {else}
-        <span class="navigation-icon" id="first-icon-inactive">{t}First{/t}</span>
+        <span class="navigation-icon" id="first-icon-inactive"  title="{t}Return to first step{/t}">{t}First{/t}</span>
     {/if} 
     <span
     {if $totalSteps > 1}
@@ -61,13 +61,14 @@
 {else}
     <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
+    {include file="../shared/_back-to-search.tpl"}
+    
+    <a class="navigation-icon" id="decision-path-icon"
+    	href='javascript:showDialog("{t}Decision path{/t}",decisionPath);' 
+    	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
+
 </div>
 
 
-{include file="../shared/_back-to-search.tpl"}
-<a class="navigation-icon" id="decision-path-icon" 
-	
-	href='javascript:showDialog("{t}Decision path{/t}",decisionPath);' 
-	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
 	
 </div>
