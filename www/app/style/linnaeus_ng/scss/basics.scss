@@ -577,6 +577,11 @@
 					margin-right: 0.5em;
 			} }
 
+			#first-icon, #first-icon-inactive{ &:before {
+					content: "\e60a\e60a";
+					margin-right: 0.5em;
+			} }
+
 			[id$=icon-inactive]{
 				&:before {
 					cursor: default;

@@ -113,8 +113,6 @@
 		padding: 5px;
 		margin: 5px;
 		font-size: 90%;
-
-
 	}
 
 	#choice-table .choice-picture {
@@ -189,7 +187,17 @@
 
 	/* remaining taxa */
 	#panel {
+		width: 240px;
+		float: right;
+		#categories{
+			left: 0;
+
+			a{
+				border-width: 0;
+			}
+		}
 	}
+
 
 	#taxa {
 		width: 240px;
