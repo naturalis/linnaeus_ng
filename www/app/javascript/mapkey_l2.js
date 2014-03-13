@@ -3,6 +3,23 @@ var l2MapPxHeight = -1;
 var l2MapPxWidth = -1;
 var l2DataColours = Array();
 
+$(document).ready(function(){
+	fixOpacity();
+
+	function fixOpacity(){
+		
+		$('td[id^=cell-]').each(function(){
+			str_my_color = $(this).css("background-color");
+			if (str_my_color != "transparent"){
+				str_my_color = str_my_color.replace("rgb","rgba");
+				str_my_color = str_my_color.replace(")",",0.6)");
+				$(this).css("background-color", str_my_color);
+			}
+		});
+	}
+
+});
+
 function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized) {
 
 	l2MapPxWidth = mapW;
@@ -74,7 +91,6 @@ function l2ToggleDatatype(ele) {
 		l2DataColours[$(ele).val()] = $('td[datatype='+$(ele).val()+']').css('background-color');
 
 		$('td[datatype='+$(ele).val()+']').css('background-color','transparent');
-
 	}
 }
 
@@ -329,6 +345,7 @@ function l2DiversityCellMouseOver(ele) {
 
 function l2MapIEFix() {
 
+
 	if (($.browser.msie && $.browser.version<=9)){
 	
 		$('td[id^=cell-]').removeClass('mapCell').addClass('mapCell-IElt9compat');
@@ -337,7 +354,8 @@ function l2MapIEFix() {
 
 }
 
-function l2ToggleGrid(caller) {
+function l2ToggleGrid(caller) {	
 	$('td[id^=cell-]').toggleClass('nogrid');
 	$(caller).children().each(function(){$(this).css('display',($(this).css('display')=='block'?'none':'block'));});
+
 }
