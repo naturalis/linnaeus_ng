@@ -5,6 +5,8 @@
     var $_me = this;
     var $_parent = $_me.parent();
 
+    $_me.css("white-space","nowrap");
+
     var int_my_width = $_me.width();
     var int_parent_width = $_parent.width();
 
@@ -20,6 +22,9 @@
       $_me.css("font-size", int_my_fontSize + "px");
 
     }
+
+    return $_me;
+  
   };
 
 })( jQuery );
