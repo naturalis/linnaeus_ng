@@ -85,6 +85,8 @@ class ExportAppController extends Controller
         
         parent::__construct();
 
+		define('APP_SUMMARY_TAB_NAME','APP_SUMMARY');
+
     }
 
     /**
@@ -198,8 +200,11 @@ class ExportAppController extends Controller
 			$this->_projectName = $_SESSION['admin']['project']['sys_name'];
 
 			$this->makeSpeciesDump($languageId);
+
 			if ($this->_makeImageList) $this->makeImageList();
+
 			$this->_appType = 'completeLNGApp';
+
 			$this->convertDumpToSQLite();
 			$output = $this->downloadSQLite();
 
@@ -294,16 +299,16 @@ class ExportAppController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'page' => 'APP_SUMMARY'
+					'page' => APP_SUMMARY_TAB_NAME
 				)
 			)
 		);
-		
-		$pageId=$tp[0]['id'];
+	
+		$this->_summaryTabId = $tp[0]['id'];
 		
 		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
 		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
-		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$pageId))));
+		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
 		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
 
 		if ($this->_reduceURLs) {
@@ -604,7 +609,8 @@ class ExportAppController extends Controller
     
     PROJECT_ID : ".$this->getCurrentProjectId().",
     SPECIES_RANK_ID : ".SPECIES_RANK_ID.",
-    FAMILY_RANK_ID : ".FAMILY_RANK_ID."
+    FAMILY_RANK_ID : ".FAMILY_RANK_ID.",
+    SUMMARY_PAGE_ID : ".$this->_summaryTabId."
 
 
     // to add the project data to your PhoneGap app:
