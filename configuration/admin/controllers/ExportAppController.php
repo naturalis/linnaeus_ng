@@ -53,7 +53,8 @@ class ExportAppController extends Controller
 		'chargroup',
 		'characteristic_chargroup',
 		'chargroup_label',
-		'gui_menu_order'
+		'gui_menu_order',
+		'taxon_quick_parentage'
     );
    
     public $controllerPublicName = 'Export';
@@ -287,6 +288,7 @@ class ExportAppController extends Controller
 
 		$this->_exportDump->ProjectRank = $this->models->ProjectRank->_get(array('id' => $where));
 		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
+		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
 
 		$tp = $this->models->PageTaxon->_get(
 			array(
