@@ -305,7 +305,7 @@ class ExportAppController extends Controller
 		);
 	
 		$this->_summaryTabId = $tp[0]['id'];
-		
+	q($this->_summaryTabId,1);	
 		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
 		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
 		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
