@@ -185,6 +185,8 @@ class ExportAppController extends Controller
 		$dbSettings = $config->getDatabaseSettings();
 
 		if ($this->rHasVal('action','export')) {
+			
+
 
 			$languageId=$_SESSION['admin']['project']['default_language_id'];
 			$name=$_SESSION['admin']['project']['sys_name'].' '.$_SESSION['admin']['project']['languageList'][$languageId]['language'];
@@ -198,13 +200,11 @@ class ExportAppController extends Controller
 			$this->_filename = $this->makeFileName($name,'sql');
 			$this->_dbname = $this->makeDatabaseName($name);
 			$this->_projectName = $_SESSION['admin']['project']['sys_name'];
+			$this->_summaryTabId = isset($this->requestData['taxonTab']) ? $this->requestData['taxonTab'] : null;
 
 			$this->makeSpeciesDump($languageId);
-
 			if ($this->_makeImageList) $this->makeImageList();
-
 			$this->_appType = 'completeLNGApp';
-
 			$this->convertDumpToSQLite();
 			$output = $this->downloadSQLite();
 
@@ -213,6 +213,7 @@ class ExportAppController extends Controller
 			
 		}
 
+		$this->smarty->assign('getTaxonTabs',$this->getTaxonTabs());
 		$this->smarty->assign('dbSettings',$dbSettings);
 		$this->smarty->assign('default_langauge',$this->getDefaultProjectLanguage());
 		
@@ -294,18 +295,6 @@ class ExportAppController extends Controller
 		$this->_exportDump->ProjectRank = $this->models->ProjectRank->_get(array('id' => $where));
 		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
 		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
-
-		$tp = $this->models->PageTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'page' => APP_SUMMARY_TAB_NAME
-				)
-			)
-		);
-	
-		$this->_summaryTabId = $tp[0]['id'];
-	q($tp,1);	
 		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
 		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
 		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
@@ -488,6 +477,22 @@ class ExportAppController extends Controller
 		return strtolower(preg_replace(array('/\W/','/[aeiouy]/i'),array('_',''),$projectName));
 
 	}
+
+    private function getTaxonTabs()
+    {
+		return $this->models->PageTaxon->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			), 
+			'order' => 'show_order', 
+			'fieldAsIndex' => 'page_id'
+		));
+
+    }
+
+
+
 	
 	private function downloadSQLite()
 	{
@@ -610,7 +615,7 @@ class ExportAppController extends Controller
     PROJECT_ID : ".$this->getCurrentProjectId().",
     SPECIES_RANK_ID : ".SPECIES_RANK_ID.",
     FAMILY_RANK_ID : ".FAMILY_RANK_ID.",
-    SUMMARY_PAGE_ID : ".$this->_summaryTabId."
+    CONTENT_TAB_ID : ".$this->_summaryTabId."
 
 
     // to add the project data to your PhoneGap app:
