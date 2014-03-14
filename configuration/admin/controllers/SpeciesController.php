@@ -83,6 +83,7 @@ class SpeciesController extends Controller
 		'l2_occurrence_taxon_combi',
         'matrix_taxon', 
         'matrix_taxon_state', 
+		'taxon_quick_parentage'
     );
     public $usedHelpers = array(
         'col_loader_helper', 
@@ -325,6 +326,95 @@ class SpeciesController extends Controller
 		$this->listAction();
 	}
 	
+
+    public function parentageAction ()
+    {
+        $this->checkAuthorisation();
+        $this->setPageName($this->translate('Generate parentage table'));
+
+        if ($this->rHasVal('action','generate')){// && !$this->isFormResubmit()) {
+			$i=$this->saveParentage();
+	        $this->smarty->assign('cleared', true);
+			$this->addMessage('Generated parentage for '.$i.' taxa');
+		}
+
+		$this->printPage();
+    }
+
+
+	private function getProgeny($parent,$level,$family)
+	{
+		$result = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'parent_id' => $parent
+				), 
+				'columns' => 'id,parent_id,taxon,'.$level.' as level'
+			)
+		);
+		
+		$family[]=$parent;
+
+		foreach((array)$result as $row)
+		{
+			$row['parentage']=$family;
+			$this->tmp[]=$row;
+			$this->getProgeny($row['id'],$level+1,$family);
+		}
+	}
+
+
+	private function saveParentage($id=null)
+	{
+
+		$t = $this->models->Taxon->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'parent_id is' => null
+			), 
+			'columns' => 'id'
+		));
+		
+		if (empty($t[0]['id']))
+			die('no top!?');
+
+		if (count((array)$t)>1)
+			die('multiple tops!?');
+			
+		$this->tmp=array();
+	
+		$this->getProgeny($t[0]['id'],0,array());
+
+		$d=array('project_id' => $this->getCurrentProjectId());
+
+		if (!is_null($id)) $d['taxon_id']=$id;
+	
+		$this->models->TaxonQuickParentage->delete($d);
+	
+		$i=0;
+		foreach((array)$this->tmp as $key=>$val) {
+
+			if (!is_null($id) && $val['id']!=$id)
+				continue;
+
+			$this->models->TaxonQuickParentage->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $val['id'],
+				'parentage' => implode(' ',$val['parentage'])
+
+			));
+
+			$i++;
+		}
+		
+		return $i;
+
+	}
+
 	private function getTreeRoots()
 	{
 		
@@ -932,6 +1022,8 @@ class SpeciesController extends Controller
                         'is_hybrid' => $isHybrid
                     ));
 					
+					$this->saveParentage($this->requestData['id']);
+					
                     if (!empty($children)) {
                         
                         foreach ($children as $child) {
@@ -1140,6 +1232,8 @@ class SpeciesController extends Controller
                     ));
                     
                     $newId = $this->models->Taxon->getNewId();
+					
+					$this->saveParentage($newId);
                     
                     if (empty($parentId))
                         $this->doAssignUserTaxon($this->getCurrentUserId(), $newId);
@@ -1946,6 +2040,8 @@ class SpeciesController extends Controller
                         $this->doAssignUserTaxon($this->getCurrentUserId(), $newId);
                     }
                 }
+				
+				$this->saveParentage();
                 
                 unset($_SESSION['admin']['system']['csv_data']);
                 
@@ -3575,8 +3671,8 @@ class SpeciesController extends Controller
 		$save_type = isset($p['save_type']) ? $p['save_type'] : 'auto';
 
         // new taxon
-        if (empty($id)) {
-            
+        if (empty($id))
+		{
             $d = $this->models->Taxon->save(
             array(
                 'id' => null, 
@@ -3586,8 +3682,10 @@ class SpeciesController extends Controller
             
             $taxonId = $this->models->Taxon->getNewId();
             $new = true;
+			$this->saveParentage($taxonId);
         }
-        else {
+        else
+		{
             // existing taxon 
             $d = true;
             $taxonId = $id;
@@ -3598,12 +3696,15 @@ class SpeciesController extends Controller
             // save of new taxon succeeded, or existing taxon
 
             // must have a language
-            if (!empty($language)) {
+            if (!empty($language))
+			{
                 
                 // must have a page name
-                if (!empty($page)) {
+                if (!empty($page))
+				{
                     
-                    if (empty($name) && empty($content)) {
+                    if (empty($name) && empty($content))
+					{
                         
                         $this->models->ContentTaxon->setRetainBeforeAlter();
                         
@@ -3625,7 +3726,8 @@ class SpeciesController extends Controller
                             'id' => $taxonId
                         ));
                     }
-                    else {
+                    else
+					{
                         
                         // see if such content already exists
                         $ct = $this->models->ContentTaxon->_get(
