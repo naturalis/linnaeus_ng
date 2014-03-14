@@ -55,6 +55,12 @@ $(document).ready(function(){
 
 	if( jQuery().shrinkText ){
 		$("#title a").shrinkText();
+		$("#header-title").shrinkText();
+	
+		$( window ).resize(function(){
+			$("#title a").shrinkText();
+			$("#header-title").shrinkText();
+		});
 	}
 {/literal}
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
