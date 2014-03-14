@@ -26,6 +26,16 @@ Output:
     <label><input type="checkbox" name="includeCode" value="y" checked="checked"/>make PhoneGap/javascript include file</label><br />
     <label><input type="checkbox" name="downloadFile" value="y" checked="checked"/>download as file (rather than display in browser)</label><br />
     </p>
+	<p>
+	Select the Species-tabs to export:
+	<select name="taxonTab">
+	{foreach from=$getTaxonTabs item=v}
+		<option value="{$v.id}">{$v.page}</option>
+	{/foreach}
+	</select>
+	
+	
+	</p>
     <input type="submit" value="export" />
     </form>
 {/if}
