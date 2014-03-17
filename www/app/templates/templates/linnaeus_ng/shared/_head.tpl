@@ -9,7 +9,6 @@
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
-    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
@@ -25,10 +24,12 @@
         <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7.css" />
     <![endif]-->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>
+ 	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+ 	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script -->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.shrinkText.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
 
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
