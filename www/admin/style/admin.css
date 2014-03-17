@@ -77,7 +77,7 @@ a:hover, .a:hover {
 
 #header-container {
   background-color: #eeede9;
-  height: 200px;
+  height: 150px;
   width: 100%;
   margin: 0px;
   padding: 0;
@@ -87,7 +87,7 @@ a:hover, .a:hover {
     display: block;
     float: left; }
   #header-container img {
-    height: 200px;
+    height: 150px;
     background-color: #009ee0; }
 
 .header-branding {
