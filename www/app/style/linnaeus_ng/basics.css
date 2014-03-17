@@ -2220,12 +2220,12 @@ button, input, select, textarea {
   width: 25px;
   font-weight: normal;
   text-align: center;
-  font-family: 'naturalis-lng-icons';
+  font-family: 'lng-icons';
   font-size: 24px;
   line-height: 24px;
   margin-top: -2px; }
   #dialog-close:after {
-    content: "\e60c"; }
+    content: "\e609"; }
 
 #dialog-content {
   display: block;
@@ -2304,6 +2304,63 @@ button, input, select, textarea {
 
 .promptbutton:hover {
   text-decoration: underline; }
+
+/* jQuery prettyDialog */
+/* --- jQUERY DIALOGUE --- */
+.dialog {
+  position: fixed;
+  padding: 0;
+  z-index: 5200;
+  max-height: 400px;
+  max-width: 600px;
+  top: 50px;
+  left: 50px;
+  display: table;
+  border: 2px solid #eeede9;
+  background-color: white; }
+
+.dialog-closed {
+  display: none; }
+
+.dialog-header {
+  background: #009ee0;
+  display: block;
+  position: relative;
+  padding: 5px;
+  height: 2em;
+  font-weight: bold;
+  color: white;
+  width: 100%; }
+
+.dialog-title {
+  float: left;
+  margin: 0;
+  overflow: hidden; }
+
+.dialog-close {
+  float: right;
+  cursor: pointer;
+  height: 20px;
+  width: 25px;
+  font-weight: normal;
+  text-align: center;
+  font-family: 'lng-icons';
+  font-size: 24px;
+  line-height: 24px;
+  margin-top: -2px; }
+  .dialog-close:after {
+    content: "\e609"; }
+
+.dialog-content {
+  display: block;
+  padding: 1em;
+  min-height: 160px;
+  background: white;
+  display: table-cell img;
+    display-max-width: 600px; }
+
+.dialog-content-inner {
+  min-height: 128px; }
 
 /* --- LAYOUT --- */
 /* --- --- GENERAL --- */

@@ -799,13 +799,13 @@
 				width: 25px;
 				font-weight: normal;
 				text-align: center;
-				font-family:  'naturalis-lng-icons';
+				font-family:  'lng-icons';
 				font-size: 24px;
 				line-height: 24px;
 				margin-top: -2px;
 				&:after{
 					
-					content: "\e60c";
+					content: "\e609";
 				}
 			}
 
@@ -902,6 +902,80 @@
 			.promptbutton:hover {
 				text-decoration: underline;
 			}
+
+		/* jQuery prettyDialog */
+
+	/* --- jQUERY DIALOGUE --- */
+			.dialog {
+				position: fixed;
+				padding: 0;
+				z-index: 5200;
+				max-height: 400px;
+				max-width: 600px;
+				top: 50px;
+				left: 50px;
+				display: table;
+				border: 2px solid $grijs-7;
+				background-color: $wit;
+			}
+
+			.dialog-closed{
+				display: none;
+			}
+
+			.dialog-header {
+				background: $blauw;
+				display: block;
+				position: relative;
+				padding: 5px;
+				height: 2em;
+				font-weight: bold;
+				color: $wit;
+				width: 100%;
+			}
+
+			.dialog-title {
+				float: left;
+				margin: 0;
+				overflow: hidden;
+
+			}
+
+			.dialog-close {
+				float: right;
+				cursor: pointer;
+				height: 20px;
+				width: 25px;
+				font-weight: normal;
+				text-align: center;
+				font-family:  'lng-icons';
+				font-size: 24px;
+				line-height: 24px;
+				margin-top: -2px;
+				&:after{
+					content: "\e609";
+				}
+			}
+
+			.dialog-content {
+				display: block;
+				padding: 1em;
+				min-height: 160px;
+				background: $wit;
+				display: table-cell
+
+				img{
+					max-width: 600px;
+				}
+			}
+
+			.dialog-content-inner {
+				min-height: 128px;
+			}
+
+
+
+
 
 	/* --- LAYOUT --- */
 
