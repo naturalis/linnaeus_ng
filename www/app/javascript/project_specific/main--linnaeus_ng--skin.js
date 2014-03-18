@@ -132,13 +132,6 @@ function getCurrentProjectId()
 	return $('meta[name="lng-project-id"]').attr("content");	
 }
 
-
-
-
-function showMedia(url,name) {
-	$.prettyPhoto.open(url,'',name);
-}
-
 function showVideo(url,name) {
 
 	var content =
