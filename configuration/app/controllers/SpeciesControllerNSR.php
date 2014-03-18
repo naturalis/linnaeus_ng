@@ -635,7 +635,7 @@ class SpeciesControllerNSR extends SpeciesController
 		/*
 			'undefined' are the taxa that DO HAVE a presence_id (so they must be
 			species or below) but have a presence that has a null-value
-			for 'established'
+			for indigenous
 		*/
 		
 		$data=$this->models->Taxon->freeQuery(array(
@@ -643,28 +643,25 @@ class SpeciesControllerNSR extends SpeciesController
 				select
 					count(_sq.taxon_id) as total,
 					_sq.taxon_id,
-					ifnull(_sp.is_indigeneous,'0') as is_indigeneous
+					_sp.presence_id,
+					ifnull(_sr.established,'undefined') as established
 				from 
 					%PRE%taxon_quick_parentage _sq
-
-				left join %PRE%taxa _a
-					on _sq.project_id=_a.project_id
-					and _sq.taxon_id=_a.id
-
+				
 				left join %PRE%presence_taxa _sp
 					on _sq.project_id=_sp.project_id
 					and _sq.taxon_id=_sp.taxon_id
-
-				left join %PRE%projects_ranks _e
-					on _a.rank_id=_e.id 
-					and _a.project_id=_e.project_id
+				
+				left join %PRE%presence _sr
+					on _sp.project_id=_sr.project_id
+					and _sp.presence_id=_sr.id
 				
 				where
 					_sq.project_id=".$this->getCurrentProjectId()."
 					and MATCH(_sq.parentage) AGAINST ('".$id."' in boolean mode)
-					and _e.rank_id >= ".SPECIES_RANK_ID."
-
-				group by is_indigeneous"
+					and _sp.presence_id is not null
+				group by _sr.established",
+			'fieldAsIndex'=>'established'
 		));
 
 		$d=
@@ -674,9 +671,9 @@ class SpeciesControllerNSR extends SpeciesController
 						(isset($data['undefined']['total'])?$data['undefined']['total']:0)+
 						(isset($data[0]['total'])?$data[0]['total']:0)+
 						(isset($data[1]['total'])?$data[1]['total']:0),
-				'indigenous'=>
+				'established'=>
 						(int)(isset($data[1]['total'])?$data[1]['total']:0),
-				'not_indigenous'=>
+				'not_established'=>
 						(int)(isset($data[0]['total'])?$data[0]['total']:0)
 			);
 
@@ -871,7 +868,7 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$data=$this->models->PresenceTaxa->freeQuery(
 			"select
-				ifnull(_a.is_indigeneous,0) as is_indigeneous,
+				ifnull(_a.is_indigenous,0) as is_indigenous,
 				_a.presence_id,
 				_a.presence82_id,
 				_a.reference_id,
