@@ -32,7 +32,6 @@ class RdfController extends Controller
 
 	public function getRdfValues($subjectId)
 	{
-		
 		$rdf=$this->models->Rdf->_get(array(
 			'id' => array(
 				'project_id'=>$this->getCurrentProjectId(),
@@ -75,8 +74,6 @@ class RdfController extends Controller
 			
 		}
 
-//		q($rdf,1);
-		
 		return $rdf;
 	}
 	

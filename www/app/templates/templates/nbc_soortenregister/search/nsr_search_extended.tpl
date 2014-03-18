@@ -40,7 +40,7 @@
 					<ul id="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
 						<li>
-							<input type="checkbox" class="list" id="indigenous{$v.id}" name="presence[{$v.id}]" indigenous="{$v.indigenous}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
+							<input type="checkbox" class="list" id="established{$v.id}" name="presence[{$v.id}]" established="{$v.established}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
 							<label for="presence{$v.id}">
 								<div class="presenceStatusCode">{$v.index_label}</div>
 								<div class="presenceStatusDescription">{$v.information_short}</div>
@@ -142,15 +142,15 @@
 $(document).ready(function(){
 	
 $('#togglePresenceStatusGevestigd').bind('click',function() {
-	$('input:checkbox[indigenous]').each(function() {
-		$(this).prop('checked', ($(this).attr('indigenous')=='1'));
+	$('input:checkbox[established]').each(function() {
+		$(this).prop('checked', ($(this).attr('established')=='1'));
 	});
 	$('#formSearchFacetsSpecies').submit();
 })
 
 $('#togglePresenceStatusNietGevestigd').bind('click',function() {
-	$('input:checkbox[indigenous]').each(function() {
-		$(this).prop('checked', ($(this).attr('indigenous')=='0'));
+	$('input:checkbox[established]').each(function() {
+		$(this).prop('checked', ($(this).attr('established')=='0'));
 	});
 	$('#formSearchFacetsSpecies').submit();
 })
