@@ -74,6 +74,8 @@ class RdfController extends Controller
 			$rdf[$key]['data']=$data[0];
 			
 		}
+
+//		q($rdf,1);
 		
 		return $rdf;
 	}

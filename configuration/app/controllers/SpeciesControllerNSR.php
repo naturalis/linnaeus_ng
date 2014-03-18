@@ -126,7 +126,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (isset($content))
 			{
-q($content['rdf'],1);
 				$this->smarty->assign('content',$content['content']);
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
@@ -1050,6 +1049,7 @@ q($content['rdf'],1);
         }
 
 		$rdf=$this->Rdf->getRdfValues($content['id']);
+
 		$content=$content['content'];
 
 		return array('content'=>$content,'rdf'=>$rdf);
