@@ -58,9 +58,9 @@
 					{if $classification[taxon].species_count.total>0}
 					
 					{if $smarty.section.taxon.index==$start}
-						<br /><span class="classification-count">({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.indigenous} {t}inheems{/t})</span>
+						<br /><span class="classification-count">({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})</span>
 					{else}
-						<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.indigenous})</span>
+						<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})</span>
 					{/if}
 					{/if}
 				</td></tr>
@@ -74,7 +74,7 @@
 						<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name|replace:$lastname:''}</a></span>
 						<span class="classification-rank">[{$v.rank}]</span>
 						{if $v.species_count.total>0}
-						<span class="classification-count">({$v.species_count.total}/{$v.species_count.indigenous})</span>
+						<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
 						{/if}
 					</td></tr>
 					{/foreach}			
