@@ -59,7 +59,8 @@ class SpeciesControllerNSR extends SpeciesController
         if ($this->rHasId())
             $taxon = $this->getTaxonById($this->requestData['id']);
 
-        if (!empty($taxon)) {
+        if (!empty($taxon))
+		{
 
 			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
@@ -627,8 +628,12 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->tmp;
 	}
 
-	private function getSpeciesCount($id)
+	private function getSpeciesCount($p)
 	{
+		
+		$id=isset($p['id']) ? $p['id'] : null;
+		$rank=isset($p['rank']) ? $p['rank'] : null;
+		
 		if (is_null($id))
 			return;
 			
@@ -655,11 +660,21 @@ class SpeciesControllerNSR extends SpeciesController
 				left join %PRE%presence _sr
 					on _sp.project_id=_sr.project_id
 					and _sp.presence_id=_sr.id
+
+				left join %PRE%taxa _e
+					on _sq.taxon_id = _e.id
+					and _sq.project_id = _e.project_id
+				
+				left join %PRE%projects_ranks _f
+					on _e.rank_id=_f.id
+					and _e.project_id = _f.project_id
 				
 				where
 					_sq.project_id=".$this->getCurrentProjectId()."
 					and MATCH(_sq.parentage) AGAINST ('".$id."' in boolean mode)
 					and _sp.presence_id is not null
+					and _f.rank_id".($rank>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
+					
 				group by _sr.established",
 			'fieldAsIndex'=>'established'
 		));
@@ -708,6 +723,7 @@ class SpeciesControllerNSR extends SpeciesController
 						)
 					)
 				) as name,
+				_f.rank_id,
 				_g.label as rank
 			
 			from %PRE%taxa _a
@@ -741,7 +757,7 @@ class SpeciesControllerNSR extends SpeciesController
 		
 			foreach((array)$data as $key=>$val)
 			{
-				$data[$key]['species_count']=$this->getSpeciesCount($val['id']);
+				$data[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
 			}		
 
 		}
@@ -778,7 +794,7 @@ class SpeciesControllerNSR extends SpeciesController
 		foreach((array)$classification as $key=>$val)
 		{
 			if (is_null($prev) || $key==$prev || $val['id']==$current_taxon)
-				$classification[$key]['species_count']=$this->getSpeciesCount($val['id']);
+				$classification[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
 		}
 
 		return $classification;
