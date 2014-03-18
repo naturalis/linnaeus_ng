@@ -665,7 +665,7 @@ class SearchControllerNSR extends SearchController
 				_k.name as dutch_name,
 				if (_b.nametype='".PREDICATE_VALID_NAME."',
 						concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',_g.label,']'),
-						concat(_a.name,' [',_g.label,']')
+						concat(_a.name,'',' [',_g.label,']')
 					)  as label
 
 			from %PRE%names _a
@@ -809,14 +809,18 @@ class SearchControllerNSR extends SearchController
 		
 		$typeId=$d[0]['id'];
 
-
 		$d=$this->models->MediaTaxon->freeQuery("
 			select
 				distinct 
 				_a.taxon_id as id,
-				if (_a.type_id=".$typeId.",_a.name,concat(_a.name,if(_c.name is null,'',concat(' - [',_c.name,']')))) as label
+				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',_g.rank,']') as label
+				
 			from %PRE%names _a
 			
+			right join %PRE%taxa _d
+				on _a.taxon_id = _d.id
+				and _a.project_id = _d.project_id
+
 			right join %PRE%media_taxon _b
 				on _a.taxon_id = _b.taxon_id
 				and _a.project_id = _b.project_id
@@ -827,20 +831,24 @@ class SearchControllerNSR extends SearchController
 				and _c.type_id=".$typeId."
 				and _c.language_id=".LANGUAGE_ID_DUTCH."
 			
-			left join lng_nsr_taxa _e
+			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
 			
-			left join lng_nsr_projects_ranks _f
+			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
+
+			left join %PRE%ranks _g
+				on _f.rank_id=_g.id
 				
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()."
-				and _f.lower_taxon=1
+				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and _a.name like '". mysql_real_escape_string($p['search']) ."%'
 				and (_a.language_id=".LANGUAGE_ID_DUTCH." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")
 				order by label
+
 			limit ".$this->_suggestionListItemMax
 		);
 
