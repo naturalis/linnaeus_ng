@@ -46,36 +46,36 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 
-	var splashWidth = $('#splash').width() + 12;
+	// var splashWidth = $('#splash').width() + 12;
 
-	showDialog(
-		'{/literal}{$session.app.project.title}{literal}',
-		'<div id="splash"></div>', 
-		vars={width:{/literal}splashWidth{literal}});
+	// showDialog(
+	// 	'{/literal}{$session.app.project.title}{literal}',
+	// 	'<div id="splash"></div>', 
+	// 	vars={width:{/literal}splashWidth{literal}});
 	
-	$('#dialog').click(function () {
-        return false;
- 	});
+	// $('#dialog').click(function () {
+ //        return false;
+ // 	});
  	
-	$('#dialog-mask').click(function () {
-        return false;
- 	});
+	// $('#dialog-mask').click(function () {
+ //        return false;
+ // 	});
 
-	$('#dialog-header').click(function () {
-        return false;
- 	});
+	// $('#dialog-header').click(function () {
+ //        return false;
+ // 	});
 
-	$('#dialog-button-container').html('{/literal}{t}Loading application{/t}{literal}...');
+	// $('#dialog-button-container').html('{/literal}{t}Loading application{/t}{literal}...');
 
-	$('#dialog').load('?go=load', function(response,status,xhr) {
-		if (status=='error') {
-			$('#status').html('<a href="{/literal}{$startUrl}{literal}">'+_('Continue to ')+'{/literal}{$session.app.project.title}{literal}</a>');
-		} else {
-			$('#dialog').fadeOut(200, function() {
-				window.location.href='{/literal}{$startUrl}{literal}';
-			});
-		}
-	});
+	// $('#dialog').load('?go=load', function(response,status,xhr) {
+	// 	if (status=='error') {
+	// 		$('#status').html('<a href="{/literal}{$startUrl}{literal}">'+_('Continue to ')+'{/literal}{$session.app.project.title}{literal}</a>');
+	// 	} else {
+	// 		$('#dialog').fadeOut(200, function() {
+	// 			window.location.href='{/literal}{$startUrl}{literal}';
+	// 		});
+	// 	}
+	// });
 });
 </script>
 {/literal}

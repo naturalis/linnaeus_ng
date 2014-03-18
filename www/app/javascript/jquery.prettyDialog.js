@@ -21,8 +21,10 @@
       var $_me = $(this);
       var str_url = $_me.attr("href");
       var str_title = $_me.attr("title");
-      var x = Math.round(Math.random()*150);
-      var y = Math.round(Math.random()*150);
+      var x = 50*Math.round(Math.random()*5);
+      var y = 50*Math.round(Math.random()*5);
+
+      $_me.css("color", "green !important");
 
       var $_target = 
         $(str_html)
@@ -34,8 +36,7 @@
             .find(".dialog-content-inner")
               .append("<img src='" + str_url + "'>")
               .end();
-
-     // console.log($_target);
+    
      $_target.draggable();
 
       $('.dialog-close', $_target).click(function(){

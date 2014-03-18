@@ -2323,6 +2323,7 @@ button, input, select, textarea {
   display: none; }
 
 .dialog-header {
+  cursor: move;
   background: #009ee0;
   display: block;
   position: relative;
