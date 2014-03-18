@@ -32,54 +32,50 @@ class RdfController extends Controller
 
 	public function getRdfValues($subjectId)
 	{
-		if ($this->models->Rdf->getTableExists()) {
+		
+		$rdf=$this->models->Rdf->_get(array(
+			'id' => array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'subject_id'=>$subjectId
+			),
+			'columns'=>'id,project_id,subject_id,subject_type,predicate,object_id,object_type'
+		));
+		
+		foreach((array)$rdf as $key=>$val) {
 
-            $rdf=$this->models->Rdf->_get(array(
-                'id' => array(
-					'project_id'=>$this->getCurrentProjectId(),
-					'subject_id'=>$subjectId
-				),
-				'columns'=>'id,project_id,subject_id,subject_type,predicate,object_id,object_type'
-            ));
-			
-			foreach((array)$rdf as $key=>$val) {
-
-				switch ($val['object_type']) {
-					case 'actor' :
-						$data=$this->models->Actors->_get(array(
-							'id' => array(
-								'project_id'=>$this->getCurrentProjectId(),
-								'id'=>$val['object_id']
-							)
-						));
-						break;
-					case 'taxon' :
-						$data=$this->models->Taxon->_get(array(
-							'id' => array(
-								'project_id'=>$this->getCurrentProjectId(),
-								'id'=>$val['object_id']
-							)
-						));
-						break;
-					case 'reference' :
-						$data=$this->models->Literature2->_get(array(
-							'id' => array(
-								'project_id'=>$this->getCurrentProjectId(),
-								'id'=>$val['object_id']
-							)
-						));
-						break;
-					default : $data=null;
-				}
-				
-				$rdf[$key]['data']=$data[0];
-				
+			switch ($val['object_type']) {
+				case 'actor' :
+					$data=$this->models->Actors->_get(array(
+						'id' => array(
+							'project_id'=>$this->getCurrentProjectId(),
+							'id'=>$val['object_id']
+						)
+					));
+					break;
+				case 'taxon' :
+					$data=$this->models->Taxon->_get(array(
+						'id' => array(
+							'project_id'=>$this->getCurrentProjectId(),
+							'id'=>$val['object_id']
+						)
+					));
+					break;
+				case 'reference' :
+					$data=$this->models->Literature2->_get(array(
+						'id' => array(
+							'project_id'=>$this->getCurrentProjectId(),
+							'id'=>$val['object_id']
+						)
+					));
+					break;
+				default : $data=null;
 			}
 			
-			return $rdf;
+			$rdf[$key]['data']=$data[0];
 			
 		}
-
+		
+		return $rdf;
 	}
 	
 	public function translatePredicate($predicate)
