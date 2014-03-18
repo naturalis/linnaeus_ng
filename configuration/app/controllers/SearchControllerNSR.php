@@ -144,7 +144,7 @@ class SearchControllerNSR extends SearchController
 			
 				_a.id,
 				_a.sys_label,
-				_a.indigenous,
+				_a.established,
 				ifnull(_b.label,_a.sys_label) as label,
 				_b.information,
 				_b.information_short,
@@ -663,8 +663,10 @@ class SearchControllerNSR extends SearchController
 				_b.nametype,
 				_g.label as rank,
 				_k.name as dutch_name,
-				concat(_a.name,if(_k.name is null,'a',concat(' [',_k.name,']'))) as label_konijn,
-				concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',_g.label,']') as label
+				if (_b.nametype='".PREDICATE_VALID_NAME."',
+						concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',_g.label,']'),
+						concat(_a.name,' [',_g.label,']')
+					)  as label
 
 			from %PRE%names _a
 			
