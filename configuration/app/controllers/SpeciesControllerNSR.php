@@ -126,7 +126,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (isset($content))
 			{
-
+q($content['rdf'],1);
 				$this->smarty->assign('content',$content['content']);
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
@@ -1047,11 +1047,11 @@ class SpeciesControllerNSR extends SpeciesController
 
 				$content = isset($ct) ? $ct[0] : null;
 
-				$rdf=$this->Rdf->getRdfValues($content['id']);
-
-                $content=$content['content'];
         }
-		
+
+		$rdf=$this->Rdf->getRdfValues($content['id']);
+		$content=$content['content'];
+
 		return array('content'=>$content,'rdf'=>$rdf);
     }
 

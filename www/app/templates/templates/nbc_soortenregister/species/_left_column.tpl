@@ -62,7 +62,6 @@
 					{else}
 						<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.indigenous})</span>
 					{/if}
-					
 					{/if}
 				</td></tr>
 				{/if}
@@ -72,7 +71,7 @@
 					<tr><td>
 						{'&nbsp;'|str_repeat:($buffercount+2)}
 						<span class="classification-connector">&lfloor;</span>
-						<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name}</a></span>
+						<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name|replace:$lastname:''}</a></span>
 						<span class="classification-rank">[{$v.rank}]</span>
 						{if $v.species_count.total>0}
 						<span class="classification-count">({$v.species_count.total}/{$v.species_count.indigenous})</span>

@@ -17,8 +17,12 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 	margin-bottom:25px;
 }
 
-table tr td {
-	padding-right:25px;
+#treebranchContainer #name-tree {
+	border-collapse:collapse;
+}
+
+#content table tr td {
+	padding-right:15px;
 }
 .classification-name {
 	font-size: 13px;
