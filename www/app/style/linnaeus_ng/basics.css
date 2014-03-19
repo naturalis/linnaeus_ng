@@ -2644,25 +2644,6 @@ body {
       float: left;
       width: 62.5%; } }
 
-/* --- PRINT OVERRIDES --- */
-@media print {
-  #main-menu,
-  #search-main,
-  #search-main-no-tabs,
-  #categories,
-  #allNavigationPane,
-  #top-strip {
-    display: none; }
-
-  #header-title {
-    font-size: 32pt;
-    margin-left: 4.16667%;
-    font-weight: 300;
-    color: black !important; }
-
-  #title {
-    font-size: 16pt;
-    color: silver; } }
 /* OVERRIDES (to be taken into customstyles.php) */
 #main-menu {
   background-color: #009ee0; }

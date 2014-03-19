@@ -1,0 +1,65 @@
+// SETTINGS 
+			@import "settings";
+
+/* --- PRINT OVERRIDES --- */
+		body{
+			font-family: $font-family-humanist;
+			line-height: 1.6em;
+		}
+
+		@media print {
+			#main-menu,
+			#search-main,
+			#search,
+			.search-icon,
+			#categories,
+			#allNavigationPane,
+			#footer-container,
+			#bottombar,
+			#preview-overlay,
+			#top-strip {
+				display: none;
+			}
+
+			#header-title{
+				font-size: 16pt !important;
+				margin-left: 0 !important;
+				font-weight: 300;
+				color: black !important;
+			}
+
+			#title {
+				font-size: 16pt !important;
+				margin: 0 !important;
+				color: black !important;
+			}
+
+			a{
+				color: $grijs-2;
+				text-decoration: none;
+				border-bottom: 0.3pt dashed $grijs-3;
+			}
+
+			a[href*="glossary"]{
+				border: none;
+			}
+
+			#content{
+				width: 100%; 
+				max-width: 14cm;
+				margin: 0; 
+				float: none;
+				font-size: 12pt;					
+				width: 18cm;
+				text-align: justify;
+
+				&:after{
+					display: block;
+					border-top: 1pt solid #888;
+					font-weight: bold;
+					font-size: 8pt;
+					content: "Powered by Linnæus Next Generation™ — © Naturalis Biodiversity Center ";
+				}
+			}
+
+		}
