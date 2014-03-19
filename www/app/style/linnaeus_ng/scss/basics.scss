@@ -1076,7 +1076,6 @@
 				}
 			}
 
-
 		/* --- --- PAGE CONTENT --- */
 			#page-container{
 				clear: both;
@@ -1186,7 +1185,7 @@
 				}
 
 				#header-titles-small{
-					@include cols(17);
+					@include cols(14);
 					@include margin-left(1);
 				}
 			}

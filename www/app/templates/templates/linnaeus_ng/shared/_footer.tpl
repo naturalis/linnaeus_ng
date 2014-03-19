@@ -49,9 +49,7 @@
 
 	$(document).ready(function(){
 
-		// Dirty trick, rework items with "on-click" into 
-		// href's with "rel"-attribute, so they'll be picked uo
-		// by jQuery prettyDialog-plugin.
+		// Apply prettyDialog behaviour to items with inline-image class
 		$(".inline-image").each(function(){
 			$_me = $(this);
 			
