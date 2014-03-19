@@ -1,7 +1,11 @@
 {include file="../shared/header.tpl"}
 <div id="dialogRidge">
 
-	{include file="_left_column.tpl"}
+	<div id="left">
+	
+	{include file="_toolbox.tpl"}
+	
+	</div>
 
 	<div id="content" class="simple-search">
 
@@ -96,8 +100,8 @@
 				<div class="formrow">
 					<label accesskey="g" for="">Resultaten sorteren op</label>
 					<select name="sort">
-						<option value="name-valid">Wetenschappelijk naam</option>
-						<option value="name-pref-nl">Nederlandse naam</option>
+						<option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>Wetenschappelijk naam</option>
+						<option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>Nederlandse naam</option>
 					</select>
 				</div>
 

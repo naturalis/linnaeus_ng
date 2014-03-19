@@ -1,5 +1,3 @@
-	<div id="left">
-
 		<div id="toolbox">
             <h2>Toolbox</h2>
 			<ul>
@@ -11,8 +9,3 @@
 				</li>
 			</ul>
 		</div>  
-
-		<div id="treebranchContainer">
-		</div>  
-
-	</div>

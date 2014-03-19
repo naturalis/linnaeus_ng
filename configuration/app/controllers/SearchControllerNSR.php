@@ -52,8 +52,10 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('type',$searchType);
 		$this->smarty->assign('search',$search);
+		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
+		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 
-        $this->printPage();
+        $this->printPage($this->rHasVal('action','export') ? 'export' : null);
 	}
 
 
@@ -62,9 +64,47 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('search',$this->requestData);	
-		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-        $this->printPage($this->rHasVal('action','export') ? 'nsr_search_extended_export' : null);
+		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
+		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+
+        $this->printPage($this->rHasVal('action','export') ? 'export' : null);
+    }
+
+
+    public function searchPicturesAction()
+    {
+		$results = $this->doPictureSearch($this->requestData);
+	
+		$this->smarty->assign('search',$this->requestData);	
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
+		$this->smarty->assign('results',$results);	
+			
+		$p=$this->requestData;
+
+		if ($this->rHasVal('show','photographers'))
+		{
+			$this->smarty->assign('show','photographers');
+			$p['limit']='*';
+		}
+
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount($p));
+		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
+		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+		$this->smarty->assign('imageExport',true);
+
+        $this->printPage($this->rHasVal('action','export') ? 'export' : null);
+    }
+
+
+    public function recentPicturesAction()
+    {
+		$results = $this->doPictureSearch($this->requestData);
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
+		$this->smarty->assign('results',$results);	
+		$this->smarty->assign('show','photographers');
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+        $this->printPage();
     }
 
 
@@ -102,38 +142,6 @@ class SearchControllerNSR extends SearchController
     public function photographersAction()
     {
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount(array('limit'=>'*')));
-        $this->printPage();
-    }
-
-
-    public function searchPicturesAction()
-    {
-		$results = $this->doPictureSearch($this->requestData);
-		$this->smarty->assign('search',$this->requestData);	
-		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
-		$this->smarty->assign('results',$results);	
-			
-		$p=$this->requestData;
-
-		if ($this->rHasVal('show','photographers'))
-		{
-			$this->smarty->assign('show','photographers');
-			$p['limit']='*';
-		}
-
-		$this->smarty->assign('photographers',$this->getPhotographersPictureCount($p));
-
-        $this->printPage();
-    }
-
-
-    public function recentPicturesAction()
-    {
-		$results = $this->doPictureSearch($this->requestData);
-		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
-		$this->smarty->assign('results',$results);	
-		$this->smarty->assign('show','photographers');
-		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
         $this->printPage();
     }
 
@@ -209,6 +217,7 @@ class SearchControllerNSR extends SearchController
 			_h.information_title as presence_information_title,
 			_h.index_label as presence_information_index_label,
 			_l.file_name as overview_image,
+			ifnull(_j.number_of_barcodes,0) as number_of_barcodes,
 
 				case
 					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
@@ -240,7 +249,12 @@ class SearchControllerNSR extends SearchController
 				on _g.presence_id = _h.presence_id 
 				and _g.project_id=_h.project_id 
 				and _h.language_id=".$this->getCurrentLanguageId()."
-				
+
+			left join
+				(select project_id,taxon_id,count(*) as number_of_barcodes from %PRE%dna_barcodes group by project_id,taxon_id) as _j
+				on _a.taxon_id=_j.taxon_id
+				and _j.project_id=_a.project_id
+									
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
 				and _e.project_id=_k.project_id
@@ -311,6 +325,7 @@ class SearchControllerNSR extends SearchController
 			select
 				SQL_CALC_FOUND_ROWS
 				_a.id,
+				_a.id as taxon_id,
 				_a.taxon,
 				_k.name as dutch_name,
 				".($img ? "ifnull(_i.number_of_images,0) as number_of_images," : "" )."
