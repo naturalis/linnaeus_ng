@@ -664,7 +664,7 @@ class KeyController extends Controller
         
         $this->setPageName($this->translate('Taxa not part of the key'));
         
-        $this->smarty->assign('taxa', $this->getRemainingTaxa('rank_id,taxon'));
+        $this->smarty->assign('taxa', $this->getRemainingTaxa('rank'));
         
         $this->printPage();
     }
@@ -958,22 +958,36 @@ class KeyController extends Controller
         }
     }
 
-    private function getRemainingTaxa ($sort='taxon')
+    private function getRemainingTaxa($sort='taxon')
     {
 		
         $q = "
-				select distinct _a.id, _a.taxon, _a.rank_id, _b.res_taxon_id, _d.rank, _c.lower_taxon, _c.keypath_endpoint
-					from %PRE%taxa _a
-					left join %PRE%choices_keysteps _b
-						on _a.id = _b.res_taxon_id
-						and _a.project_id = _b.project_id 
-					left join %PRE%projects_ranks _c
-						on _a.rank_id = _c.id
-						and _a.project_id = _c.project_id 
-					left join %PRE%ranks _d
-						on _c.rank_id = _d.id
-					where _a.project_id = " . $this->getCurrentProjectId() . "
-					order by ".$sort;
+				select
+
+					distinct _a.id, 
+					_a.taxon, 
+					_a.rank_id, 
+					_b.res_taxon_id, 
+					_d.rank, 
+					_c.lower_taxon, 
+					_c.keypath_endpoint
+
+				from %PRE%taxa _a
+
+				left join %PRE%choices_keysteps _b
+					on _a.id = _b.res_taxon_id
+					and _a.project_id = _b.project_id 
+
+				left join %PRE%projects_ranks _c
+					on _a.rank_id = _c.id
+					and _a.project_id = _c.project_id 
+
+				left join %PRE%ranks _d
+					on _c.rank_id = _d.id
+
+				where _a.project_id = " . $this->getCurrentProjectId() . "
+
+				order by ".($sort=='rank' ? '_c.rank_id,_a.taxon' : '_a.taxon');
 
         return $this->models->Taxon->freeQuery($q);	
 
