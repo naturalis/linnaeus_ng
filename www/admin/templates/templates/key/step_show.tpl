@@ -1,6 +1,6 @@
 {include file="../shared/admin-header.tpl"}
-
-{include file="_keypath.tpl"}
+        
+{if !suppressPath}{include file="_keypath.tpl"}{/if}
 {include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
@@ -23,6 +23,12 @@
 [<span onclick="keyDeleteKeyStep();" class="a">{t}delete{/t}</span>]
 [<span onclick="window.open('preview.php?step={$step.id}','_self');" class="a">{t}preview{/t}</span>]
 </p>
+<span style="color:#888">
+	Steps leading to this one:<br />
+	{foreach from=$stepsLeadingToThisOne item=v}
+	<a href="step_show.php?id={$v.id}">Step {$v.number}{if $v.title}: {$v.title}{/if}</a><br />
+	{/foreach}
+</span>
 </fieldset>
 
 </form>
