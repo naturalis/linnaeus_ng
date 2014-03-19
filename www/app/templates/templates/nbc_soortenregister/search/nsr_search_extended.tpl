@@ -29,13 +29,15 @@
 
 			<fieldset>
 				<div class="formrow">
+					<p>
 					<label>
 						<strong>Status voorkomen</strong>
 						&nbsp;<a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/i000335.html" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
 					</label>
-					<p>
-						<a id="togglePresenceStatusGevestigd" href="#">Gevestigde soorten</a> / 
-						<a id="togglePresenceStatusNietGevestigd" href="#">Niet gevestigde soorten</a>
+					<span style="float:right">
+						<a id="togglePresenceStatusGevestigd" href="#">gevestigde soorten</a> / 
+						<a id="togglePresenceStatusNietGevestigd" href="#">niet gevestigde soorten</a>
+					</span>
 					</p>
 					<ul id="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
@@ -103,10 +105,12 @@
 			</fieldset>
 		</form>
 		</div>
-		
+
+
+
 		<div id="results">
 			<p>
-				<h4><span id="resultcount-header">{$results.count}</span></h4>
+				<h4><span id="resultcount-header">{$results.count}</span> voor '{$searchHR}'</h4>
 			</p>
 			{foreach from=$results.data item=v}
 				<div class="result">

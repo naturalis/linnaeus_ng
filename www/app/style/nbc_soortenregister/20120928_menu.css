@@ -72,31 +72,6 @@
 	padding-left: 16px !important;
 }
 
-/* menu toolbox
-----------------------------------*/
-#toolbox
-{
-	width: 100%;
-	margin-bottom: 10px;
-	padding-bottom: 5px;
-	background: url(images/stippellijn.gif) no-repeat left bottom;
-}
-
-#toolbox li.print
-{
-	background-image: url(images/icon_print.gif);
-}
-
-#toolbox li.export
-{
-	background-image: url(images/icon_excel.gif);
-}
-
-#toolbox li.sendasmail
-{
-	background-image: url(images/icon_email.gif);
-}
-
 /* Menu indeling (tree)
 ----------------------------------*/
 #taxonomie
