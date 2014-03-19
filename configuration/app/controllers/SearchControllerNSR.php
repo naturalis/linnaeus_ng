@@ -49,7 +49,7 @@ class SearchControllerNSR extends SearchController
 		
 		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
 
-		$this->smarty->assign('querystring',$this->reconstructQueryString());
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('type',$searchType);
 		$this->smarty->assign('search',$search);
 
@@ -60,6 +60,7 @@ class SearchControllerNSR extends SearchController
     public function searchExtendedAction()
     {
 		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
         $this->printPage();
@@ -108,7 +109,7 @@ class SearchControllerNSR extends SearchController
     {
 		$results = $this->doPictureSearch($this->requestData);
 		$this->smarty->assign('search',$this->requestData);	
-		$this->smarty->assign('querystring',$this->reconstructQueryString());
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
 			
 		$p=$this->requestData;
@@ -128,7 +129,7 @@ class SearchControllerNSR extends SearchController
     public function recentPicturesAction()
     {
 		$results = $this->doPictureSearch($this->requestData);
-		$this->smarty->assign('querystring',$this->reconstructQueryString());
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
 		$this->smarty->assign('show','photographers');
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
@@ -857,13 +858,26 @@ class SearchControllerNSR extends SearchController
 	}
 
 
-	private function reconstructQueryString()
+	private function reconstructQueryString($ignore)
 	{
 		$querystring=null;
-		foreach((array)$this->requestData as $key=>$val) {
-			if ($key=='page') continue;
-			$querystring.=$key.'='.$val.'&';
+
+		foreach((array)$this->requestData as $key=>$val)
+		{
+			if (in_array($key,$ignore)) continue;
+
+			if (is_array($val))
+			{
+				foreach((array)$val as $k2=>$v2)
+				{
+					$querystring.=$key.'['.$k2.']='.$v2.'&';
+				}
+
+			} else {
+				$querystring.=$key.'='.$val.'&';
+			}
 		}
+		
 		return $querystring;
 	}
 
