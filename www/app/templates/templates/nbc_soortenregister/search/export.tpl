@@ -4,14 +4,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-
-Resultaten 1-{$results.count} van {$results.count} voor '{$searchHR}'
+Resultaten 1-{$results.count} van {$results.count}{if $searchHR} voor '{$searchHR}'{/if}
 <table>
 <tr>
 	<td><b>wetenschappelijke naam</b></td>
 	<td><b>nederlandse naam</b></td>
+{if $imageExport}	
+	<td><b>fotograaf</b></td>
+	<td><b>validator</b></td>
+{else}
 	<td><b>status voorkomen</b></td>
-	<td><b>barcode exemplaren</b></td>
+	<td><b>barcode exemplaren</b></td>	
+{/if}
 	<td><b>link naar soortenregister</b></td>
 	<td><b>link naar afbeelding</b></td>
 </tr>
@@ -20,10 +24,17 @@ Resultaten 1-{$results.count} van {$results.count} voor '{$searchHR}'
 <tr>
 	<td>{$v.taxon}</td>
 	<td>{$v.dutch_name}</td>
+{if $imageExport}
+	<td>{$v.photographer}</td>
+	<td>{$v.validator}</td>
+	<td>{$url_taxon_detail}{$v.taxon_id}</td>
+	<td>http://images.ncbnaturalis.nl/comping/{$v.taxon_id}</td>
+{else}
 	<td>{$v.presence_information_index_label} {$v.presence_information_title}</td>
 	<td>{$v.number_of_barcodes}</td>
-	<td>http://localhost/linnaeus_ng/app/views/species/nsr_taxon.php?id={$v.id}</td>
-	<td>{$v.overview_image}</td>
+	<td>{$url_taxon_detail}{$v.taxon_id}</td>
+	<td>{if $v.overview_image}http://images.ncbnaturalis.nl/thumb/{$v.overview_image}{/if}</td>
+{/if}
 </tr>
 {/foreach}
 </tbody>

@@ -2,7 +2,11 @@
 
 <div id="dialogRidge">
 
-	{include file="_left_column.tpl"}
+	<div id="left">
+
+	{include file="_toolbox.tpl"}
+
+	</div>
     
 	<div id="content">
 	

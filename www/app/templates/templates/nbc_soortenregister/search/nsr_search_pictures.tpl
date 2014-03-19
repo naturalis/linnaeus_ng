@@ -4,6 +4,8 @@
 
 	<div id="left">
 
+		{include file="_toolbox.tpl"}
+
 		<div id="treebranchContainer">
 
 			<div class="top5">
