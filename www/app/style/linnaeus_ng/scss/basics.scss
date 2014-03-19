@@ -975,9 +975,6 @@
 			}
 
 
-
-
-
 	/* --- LAYOUT --- */
 
 		/* --- --- GENERAL --- */
@@ -1290,30 +1287,7 @@
 				@include make-sm-column(15);				
 			}
 
-	/* --- PRINT OVERRIDES --- */
-			@media print {
-				#main-menu,
-				#search-main,
-				#search-main-no-tabs,
-				#categories,
-				#allNavigationPane,
-				#top-strip {
-					display: none;
-				}
 
-				#header-title{
-					font-size: 32pt;
-					margin-left: percentage(1/24);
-					font-weight: 300;
-					color: black !important;
-				}
-
-				#title {
-					font-size: 16pt;
-					color: silver;
-				}
-
-			}
 
 /* OVERRIDES (to be taken into customstyles.php) */
 

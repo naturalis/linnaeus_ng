@@ -7,13 +7,15 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
-	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
-	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
-	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
+	<link rel="stylesheet" type="text/css" media="screen" href="{$cssToLoad[i]}" />
 {/section}
 {/if}
+	<link rel="stylesheet" type="text/css" media="print" href="{$projectUrls.projectCSS}print.css" />
+    
     <!--[if IE]>
         <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie.css" />
     <![endif]-->
