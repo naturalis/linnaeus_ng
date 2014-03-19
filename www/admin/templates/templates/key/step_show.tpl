@@ -23,11 +23,13 @@
 [<span onclick="keyDeleteKeyStep();" class="a">{t}delete{/t}</span>]
 [<span onclick="window.open('preview.php?step={$step.id}','_self');" class="a">{t}preview{/t}</span>]
 </p>
-<span style="color:#888">
+<span style="color:#888;font-size:0.8em">
 	Steps leading to this one:<br />
+	<ul style="list-style-position:inside;padding:0;margin-top:0">
 	{foreach from=$stepsLeadingToThisOne item=v}
-	<a href="step_show.php?id={$v.id}">Step {$v.number}{if $v.title}: {$v.title}{/if}</a><br />
+	<li><a href="step_show.php?id={$v.id}">Step {$v.number}{if $v.title}: {$v.title}{/if}</a></li>
 	{/foreach}
+	</ul>
 </span>
 </fieldset>
 
