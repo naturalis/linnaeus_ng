@@ -664,7 +664,7 @@ class KeyController extends Controller
         
         $this->setPageName($this->translate('Taxa not part of the key'));
         
-        $this->smarty->assign('taxa', $this->getRemainingTaxa());
+        $this->smarty->assign('taxa', $this->getRemainingTaxa('rank_id,taxon'));
         
         $this->printPage();
     }
@@ -958,7 +958,7 @@ class KeyController extends Controller
         }
     }
 
-    private function getRemainingTaxa ()
+    private function getRemainingTaxa ($sort='taxon')
     {
 		
         $q = "
@@ -973,9 +973,7 @@ class KeyController extends Controller
 					left join %PRE%ranks _d
 						on _c.rank_id = _d.id
 					where _a.project_id = " . $this->getCurrentProjectId() . "
-					order by _a.taxon
-			";
-
+					order by ".$sort;
 
         return $this->models->Taxon->freeQuery($q);	
 

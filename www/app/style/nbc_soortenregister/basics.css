@@ -13,6 +13,40 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
     padding-left: 0px;
     position: relative;
 }
+
+/* menu toolbox
+----------------------------------*/
+#toolbox
+{
+	width: 100%;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	background: url(images/stippellijn.gif) no-repeat left bottom;
+}
+
+#toolbox li
+{
+    padding-left:15px;
+}
+
+#toolbox li.print
+{
+	background: url(images/icon_print.gif) no-repeat scroll 0 2px rgba(0, 0, 0, 0);
+}
+
+#toolbox li.export
+{
+	background: url(images/icon_excel.gif) no-repeat scroll 0 2px rgba(0, 0, 0, 0);
+}
+
+#toolbox li.sendasmail
+{
+	background: url(images/icon_email.gif) no-repeat scroll 0 2px rgba(0, 0, 0, 0);
+}
+
+
+
+
 #left #categories {
 	margin-bottom:25px;
 }
@@ -249,3 +283,4 @@ div.pp_default .pp_description {
 #taxonImage {
 	margin-top:0px;
 }
+

@@ -62,8 +62,9 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('search',$this->requestData);	
+		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-        $this->printPage();
+        $this->printPage($this->rHasVal('action','export') ? 'nsr_search_extended_export' : null);
     }
 
 
@@ -139,32 +140,35 @@ class SearchControllerNSR extends SearchController
 
 	private function getPresenceStatuses()
 	{
-		
-		return $this->models->Presence->freeQuery('
-			select 
-			
-				_a.id,
-				_a.sys_label,
-				_a.established,
-				ifnull(_b.label,_a.sys_label) as label,
-				_b.information,
-				_b.information_short,
-				_b.information_title,
-				_b.index_label
-			
-			from %PRE%presence _a
-			
-			left join %PRE%presence_labels _b
-				on _a.project_id=_b.project_id
-				and _a.id=_b.presence_id 
-				and _b.language_id = '.$this->getCurrentLanguageId().'
-			
-			where
-				_a.project_id='.$this->getCurrentProjectId().'
-				and _b.index_label is not null
-			order by 
-				_b.index_label
-		');
+		return
+			$this->models->Presence->freeQuery(array(
+				'query'=>'
+					select 
+					
+						_a.id,
+						_a.sys_label,
+						_a.established,
+						ifnull(_b.label,_a.sys_label) as label,
+						_b.information,
+						_b.information_short,
+						_b.information_title,
+						_b.index_label
+					
+					from %PRE%presence _a
+					
+					left join %PRE%presence_labels _b
+						on _a.project_id=_b.project_id
+						and _a.id=_b.presence_id 
+						and _b.language_id = '.$this->getCurrentLanguageId().'
+					
+					where
+						_a.project_id='.$this->getCurrentProjectId().'
+						and _b.index_label is not null
+					order by 
+						_b.index_label',
+				'fieldAsIndex'=>'id'
+				)
+			);
 		
 	}
 
@@ -374,7 +378,7 @@ class SearchControllerNSR extends SearchController
 				and _f.lower_taxon=1
 			".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)" : "")."
 			".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
-			".(isset($auth) ? "and _m.name_author like '". mysql_real_escape_string($auth)."%'" : "")."
+			".(isset($auth) ? "and _m.authorship like '". mysql_real_escape_string($auth)."%'" : "")."
 			".($img ? "and number_of_images > 0" : "")."
 			".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
 
@@ -382,9 +386,8 @@ class SearchControllerNSR extends SearchController
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
-
 	
-		//q($this->models->Taxon->q());
+		//q($this->models->Taxon->q(),1);
 
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
@@ -721,26 +724,25 @@ class SearchControllerNSR extends SearchController
 
 
 	private function getSuggestionsAuthor($p)
-	{
-		
+	{	
 		$clause=null;
 		
 		if ($p['match']=='start')
-			$clause="name_author like '".mysql_real_escape_string($p['search'])."%'";
+			$clause="authorship like '".mysql_real_escape_string($p['search'])."%'";
 		else
 		if ($p['match']=='exact')
-			$clause="name_author = '".mysql_real_escape_string($p['search'])."'";
+			$clause="authorship = '".mysql_real_escape_string($p['search'])."'";
 
 		if (empty($clause)) return;
 		
 		$d=$this->models->Taxon->freeQuery("
 			select
-				distinct name_author as label
+				distinct authorship as label
 			from %PRE%names
 			where 
 				project_id =".$this->getCurrentProjectId()."
 				and ".$clause."
-			order by name_author
+			order by authorship
 			limit ".$this->_suggestionListItemMax
 		);
 		return $d;
@@ -879,6 +881,33 @@ class SearchControllerNSR extends SearchController
 		}
 		
 		return $querystring;
+	}
+
+	private function makeReadableQueryString()
+	{
+		$querystring=null;
+		
+		if ($this->rHasVal('group')) $querystring.='Soortgroep="'.$this->requestData['group'].'"; ';
+		if ($this->rHasVal('author')) $querystring.='Auteur="'.$this->requestData['author'].'"; ';
+		
+		if ($this->rHasVal('presence'))
+		{
+			$statuses=$this->getPresenceStatuses();
+			$querystring.='Status voorkomen="';
+		
+			foreach((array)$this->requestData['presence'] as $key=>$val)
+			{
+				$querystring.=$statuses[$key]['index_label'].', ';
+			}
+			$querystring=rtrim($querystring,' ,').'; ';
+		}
+					
+		if ($this->rHasVal('images','on')) $querystring.='met foto\'s; ';
+		if ($this->rHasVal('dna','on')) $querystring.='met DNA-exemplaren verzameld; ';
+		if ($this->rHasVal('dna_insuff','on')) $querystring.='met nog DNA-exemplaren te verzamelen; ';
+		
+		
+		return trim($querystring);
 	}
 
 }
