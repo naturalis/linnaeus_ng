@@ -126,16 +126,10 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 }
 
 
-
 #results .result img {
-	width:140px;
 	height:auto;
 	float:right;
 }
-
-
-
-
 .taxon-image-table {
 	font-size:9px;
 	color:#666;
@@ -260,11 +254,6 @@ h4 {
 }
 .link:hover {
     text-decoration:underline;
-}
-
-
-div.pp_default .pp_description {
-	font-weight:bold;
 }
 
 #content h2 {

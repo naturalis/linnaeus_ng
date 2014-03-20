@@ -32,7 +32,8 @@ class SpeciesController extends Controller
 		'dna_barcodes',
 		'presence_taxa',
 		'media_meta',
-		'tab_order'
+		'tab_order',
+		'nsr_ids'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';

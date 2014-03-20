@@ -53,9 +53,42 @@ class SpeciesControllerNSR extends SpeciesController
         $this->redirect('nsr_taxon.php?id=' . $id);
     }
 
-    public function taxonAction()
+    private function getNSRId($p)
     {
 
+		$id=isset($p['id']) ? $p['id'] : null;
+		$item_type=isset($p['item_type']) ? $p['item_type'] : 'taxon';
+		$rdf_nsr=isset($p['rdf_nsr']) ? $p['rdf_nsr'] : 'nsr';
+		$strip=isset($p['strip']) ? $p['strip'] : true;
+
+		if (empty($id))
+			return;
+
+		$t=$this->models->NsrIds->_get(
+			array('id'=>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'lng_id' => $id, 
+					'item_type' => $item_type
+					)
+				)
+			);
+			
+		
+		if (!$t) return;
+		
+		if ($strip) {
+			return str_replace(($item_type=='rdf' ?'http://data.nederlandsesoorten.nl/' : 'tn.nlsr.concept/'),'',($rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id']));
+		} else {
+			return $rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'];
+		}
+			
+    }
+
+
+
+    public function taxonAction()
+    {
         if ($this->rHasId())
             $taxon = $this->getTaxonById($this->requestData['id']);
 
@@ -146,6 +179,15 @@ class SpeciesControllerNSR extends SpeciesController
         }
         
         $this->printPage('taxon');
+
+		/*
+		$nsrId=$this->getNSRId(array('id'=>$taxon['id']));
+		q($nsrId);
+		//$ezData=file_get_contents('http://ez-development-001.cloud.naturalis.nl/webservice/nsr_view?nsr_id='.$nsrId);
+		//q($ezData,1);
+		*/
+
+
     }
 
     public function nameAction()
@@ -540,7 +582,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'Datum' => $isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
 				//'Validator' => '...',
-				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
+				'Geplaatst op' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
 				'Copyright' => $copyrighter,
 				//'Contactadres fotograaf' => '...'
 			);
