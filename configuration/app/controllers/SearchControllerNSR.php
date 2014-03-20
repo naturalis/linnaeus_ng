@@ -631,11 +631,12 @@ class SearchControllerNSR extends SearchController
 					(!empty($val['specific_epithet']) ? $val['specific_epithet'].' ' : '' ).
 					$val['infra_specific_epithet'].'</i>'.
 					(!empty($val['authorship']) ? ' '.$val['authorship'] : '').'</h3>' ,
+				'Beschrijving' => $val['meta_short_desc'],
 				'Fotograaf' => $photographer,
 				'Datum' => $isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
 				//'Validator' => '...',
-				'Datum plaatsing' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
+				'Geplaatst op' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
 				'Copyright' => $copyrighter,
 				//'Contactadres fotograaf' => '...'
 			);
