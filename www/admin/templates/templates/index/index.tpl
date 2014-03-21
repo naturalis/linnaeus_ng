@@ -14,6 +14,7 @@
 </div>
 
 <div id="page-main">
+
 	<div id="index">
 		<table>
 		{foreach name=taxonloop from=$taxa key=k item=v}

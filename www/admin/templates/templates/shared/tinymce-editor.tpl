@@ -6,8 +6,6 @@
 {/section}
 <!-- script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script -->
 <script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce_3.5.8/tiny_mce.js" ></script>
-
-
 <script type="text/javascript">
 var mediaPath = '{$session.admin.project.urls.project_media|@addslashes}';
 {literal}

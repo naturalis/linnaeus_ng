@@ -75,7 +75,7 @@ function allLookupGetData(text) {
 			type: "POST",
 			data : ({
 				'action' : 'get_lookup_list' ,
-				'search' : text ,
+				'search' : '"'+text+'"' ,
 				'get_all' : (text.length==0 && allNavigateStartWithAll ? '1' : '0') ,
 				'match_start' : (allNavigateMatchStartOnly ? '1' : '0'),
 				'time' : allGetTimestamp()

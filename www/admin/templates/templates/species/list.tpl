@@ -7,15 +7,9 @@
         {if $isHigherTaxa}
             {t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
         {/if}
-        {if $isHigherTaxa}
-			<a href="sp_list.php">{t}Switch to taxon list{/t}</a> |
-       	{else}
-			<a href="ht_list.php">{t}Switch to higher taxa list{/t}</a> |
-        {/if}
-        {if !$isHigherTaxa}
-        <a href="#" onclick="$('tr[isHigher=1]').css('display',$('tr[isHigher=1]').css('display')=='none' ? '' : 'none');">Toggle higher taxa</a> | 
-        {/if}
-        <a href="#" onclick="$('[class=indent-dots]').css('display',$('[class=indent-dots]').css('display')=='none' ? 'inline' : 'none');">Toggle indentation</a>
+
+		<a href="#" onclick="$('tr[isHigher=1]').toggle();allSetSomething('list-show-higher',$('tr[isHigher=1]:first').css('display')!='none' ? 'on' : 'off');">Toggle higher taxa</a> | 
+		<a href="#" onclick="$('[class=indent-dots]').toggle();allSetSomething('list-show-indent',$('[class=indent-dots]:first').css('display')!='none' ? 'on' : 'off');">Toggle indentation</a>
     </p>
     
 <!-- table id="drag-list" class="grid" -->
@@ -89,9 +83,11 @@ $(document).ready(function(){
 	$('a[type="literature"]').each(function(i){$(this).html($(this).html()+' ref'+($(this).html()!=1 ? 's' : '')+'.')});
 	$('a[type="synonyms"]').each(function(i){$(this).html($(this).html()+' syn'+($(this).html()!=1 ? 's' : '')+'.')});
 	$('a[type="common"]').each(function(i){$(this).html($(this).html()+' name'+($(this).html()!=1 ? 's' : ''))});
-
-//	allInitDragtable();
-
+	
+	allGetSomething('list-show-higher',function(state){$('tr[isHigher=1]').toggle(state=='on');});
+	allGetSomething('list-show-indent',function(state){$('[class=indent-dots]').toggle(state=='on');});		
+	allGetSomething('list-scroll-pos',function(scroll){$('html').scrollTop(scroll)});		
+	
 })
 </script>
 {/literal}

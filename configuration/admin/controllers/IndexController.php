@@ -245,20 +245,23 @@ class IndexController extends Controller
 		
 		*/
 
-		$g = $this->getGlossaryLookupList($search);
-		$l = $this->getLiteratureLookupList($search);
+		//$g = $this->getGlossaryLookupList($search);
+		//$l = $this->getLiteratureLookupList($search);
 		$s = $this->getSpeciesLookupList($search);
-		$m = $this->getModuleLookupList($search);
+		//$m = $this->getModuleLookupList($search);
 
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
+				(array)$s
+				/*
 				array_merge(
 					(array)$g,
 					(array)$l,
 					(array)$s,
 					(array)$m
-				),
+				)
+				*/,
 				$this->controllerBaseName,
 				null,
 				true
@@ -382,7 +385,7 @@ class IndexController extends Controller
 		$t = $this->models->Taxon->_get(
 			array(
 				'id' => $d,
-				'columns' => 'id,taxon as label,\'taxon\' as source, concat(\'views/species/taxon.php?id=\',id) as url,rank_id'
+				'columns' => 'id,taxon as label,\'taxon\' as source, concat(\'../species/taxon.php?id=\',id) as url,rank_id'
 			)
 		);
 		
@@ -406,7 +409,7 @@ class IndexController extends Controller
 		return $this->models->Synonym->_get(
 			array(
 				'id' => $d,
-				'columns' => 'taxon_id as id,synonym as label,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
+				'columns' => 'taxon_id as id,synonym as label,\'synonym\' as source, concat(\'../species/synonyms.php?id=\',taxon_id) as url'
 			)
 		);
 
@@ -434,7 +437,7 @@ class IndexController extends Controller
 						'ifnull(commonname,transliteration)' ) .' as label,
 						transliteration,
 					\'common name\' as source, 
-					concat(\'views/species/common.php?id=\',taxon_id) as url,
+					concat(\'../species/common.php?id=\',taxon_id) as url,
 					language_id'
 			)
 		);

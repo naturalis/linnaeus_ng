@@ -24,6 +24,9 @@ include_once ('RdfController.php');
 class SpeciesControllerNSR extends SpeciesController
 {
 	private $_resPicsPerPage=12;
+	private $_eZlinkWebservice='http://ez-development-001.cloud.naturalis.nl/webservice/nsr_view?nsr_id=%s';
+	private $_eZlink='http://ez-development-001.cloud.naturalis.nl/node/%s';
+	
 
     public function __construct()
     {
@@ -53,39 +56,6 @@ class SpeciesControllerNSR extends SpeciesController
         $this->redirect('nsr_taxon.php?id=' . $id);
     }
 
-    private function getNSRId($p)
-    {
-
-		$id=isset($p['id']) ? $p['id'] : null;
-		$item_type=isset($p['item_type']) ? $p['item_type'] : 'taxon';
-		$rdf_nsr=isset($p['rdf_nsr']) ? $p['rdf_nsr'] : 'nsr';
-		$strip=isset($p['strip']) ? $p['strip'] : true;
-
-		if (empty($id))
-			return;
-
-		$t=$this->models->NsrIds->_get(
-			array('id'=>
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'lng_id' => $id, 
-					'item_type' => $item_type
-					)
-				)
-			);
-			
-		
-		if (!$t) return;
-		
-		if ($strip) {
-			return str_replace(($item_type=='rdf' ?'http://data.nederlandsesoorten.nl/' : 'tn.nlsr.concept/'),'',($rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id']));
-		} else {
-			return $rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'];
-		}
-			
-    }
-
-
 
     public function taxonAction()
     {
@@ -99,6 +69,7 @@ class SpeciesControllerNSR extends SpeciesController
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 			$names=$this->getNames($taxon['id']);
+			
 			$classification=$this->getTaxonClassification($taxon['id']);
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
@@ -122,6 +93,33 @@ class SpeciesControllerNSR extends SpeciesController
 				);
 				
 			}
+
+			$nsrId=$this->getNSRId(array('id'=>$taxon['id']));
+			$ezData=json_decode(file_get_contents(sprintf($this->_eZlinkWebservice,$nsrId)));
+
+			if(isset($ezData[0]))
+			{
+				if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
+				{
+					foreach($ezData as $key=>$val)
+					{
+						$content['content'][$val->wetenschappelijke_naam]['wetten']
+							[$val->wet][]=array('categorie'=>$val->categorie,'publicatie'=>strip_tags($val->publicatie));
+						$content['content'][$val->wetenschappelijke_naam]['url']=sprintf($this->_eZlink,$val->soort_id);
+					}
+				}
+				
+			} else 
+			{
+				foreach((array)$categories['categories'] as $key=>$val)
+				{
+					if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+						$categories['categories'][$key]['is_empty']=true;
+				}
+			}
+	
+
+
 			
 			/*
 				distribution can have 'regular' data - fetched above
@@ -133,8 +131,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$presenceData=$this->getPresenceData($taxon['id']);
 				$this->smarty->assign('presenceData', $presenceData);
 
-			}
-
+			} else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
 			{
 				$content=$this->getTaxonContent(
@@ -171,7 +168,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('children',$children);
 			$this->smarty->assign('names',$names);
 			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-            $this->smarty->assign('headerTitles', array('title' => $taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
+            $this->smarty->assign('headerTitles', array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
 
         } else {
             
@@ -179,14 +176,6 @@ class SpeciesControllerNSR extends SpeciesController
         }
         
         $this->printPage('taxon');
-
-		/*
-		$nsrId=$this->getNSRId(array('id'=>$taxon['id']));
-		q($nsrId);
-		//$ezData=file_get_contents('http://ez-development-001.cloud.naturalis.nl/webservice/nsr_view?nsr_id='.$nsrId);
-		//q($ezData,1);
-		*/
-
 
     }
 
@@ -242,7 +231,7 @@ class SpeciesControllerNSR extends SpeciesController
 			order by 
 				_a.show_order
 		");
-		
+
 		if (!$categories) $categories=array();
 
 		if (isset($taxon))
@@ -334,6 +323,16 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
+			
+			/*
+				this is the tab with the information from the ministry,
+				which is queried live to see whether it has any data
+			*/
+			foreach((array)$categories as $key=>$val)
+			{
+				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+					$categories[$key]['is_empty']=false;
+			}
 									
 		}
 
@@ -424,7 +423,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$names as $key=>$val)
 		{
-
 			if ($val['nametype']==PREDICATE_VALID_NAME)
 				$sci=$key;
 
@@ -439,12 +437,15 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$names[$key]['nametype']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 			
-			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && strlen($val['uninomial'].$val['specific_epithet'].$val['infra_specific_epithet'].$val['authorship'])>0) {
-				$names[$key]['label']='<i>'.trim(str_replace('  ',' ',$val['uninomial'].' '.$val['specific_epithet'].' '.$val['infra_specific_epithet'])).'</i> '.$val['authorship'];
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && strlen($val['uninomial'].$val['specific_epithet'].$val['infra_specific_epithet'].$val['authorship'])>0)
+			{
+				$names[$key]['concat']=	
+					trim(str_replace('  ',' ',$val['uninomial'].' '.$val['specific_epithet'].' '.$val['infra_specific_epithet']));
+				$names[$key]['label']=
+					'<i>'.trim(str_replace('  ',' ',$val['uninomial'].' '.$val['specific_epithet'].' '.$val['infra_specific_epithet'])).'</i> '.$val['authorship'];
 			} else {
 				$names[$key]['label']=$names[$key]['name'];
 			}
-						
 		}
 
 		return array(
@@ -452,7 +453,6 @@ class SpeciesControllerNSR extends SpeciesController
 			'prefId'=>$pref,
 			'list'=>$names
 		);
-		
 	}
 
 	private function getActor($id)
@@ -672,7 +672,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getSpeciesCount($p)
 	{
-		
 		$id=isset($p['id']) ? $p['id'] : null;
 		$rank=isset($p['rank']) ? $p['rank'] : null;
 		
@@ -1165,5 +1164,35 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 		return $querystring;
 	}
+
+    private function getNSRId($p)
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		$item_type=isset($p['item_type']) ? $p['item_type'] : 'taxon';
+		$rdf_nsr=isset($p['rdf_nsr']) ? $p['rdf_nsr'] : 'nsr';
+		$strip=isset($p['strip']) ? $p['strip'] : true;
+
+		if (empty($id))
+			return;
+
+		$t=$this->models->NsrIds->_get(
+			array('id'=>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'lng_id' => $id, 
+					'item_type' => $item_type
+					)
+				)
+			);
+			
+		
+		if (!$t) return;
+		
+		if ($strip) {
+			return ltrim(str_replace(($item_type=='rdf' ?'http://data.nederlandsesoorten.nl/' : 'tn.nlsr.concept/'),'',($rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'])),' 0');
+		} else {
+			return $rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'];
+		}
+    }
 
 }
