@@ -144,7 +144,8 @@ class SpeciesController extends Controller
             // get taxon
             $taxon = $this->getTaxonById($this->requestData['id']);
 		}
-        if (!empty($taxon)) {
+        if (!empty($taxon))
+		{
 
             $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
 

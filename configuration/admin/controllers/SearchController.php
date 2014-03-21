@@ -179,7 +179,7 @@ class SearchController extends Controller
 		if ($this->rHasVal('search')) {
 			
 			$_SESSION['admin']['user']['search'] = array(
-				'term' => $this->requestData['search'],
+				'search' => $this->requestData['search'],
 				'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
 				'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
 				);
@@ -214,7 +214,8 @@ class SearchController extends Controller
 			
 		}
 
-		if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
+		if (isset($_SESSION['admin']['user']['search']))
+			$this->smarty->assign('search',$_SESSION['admin']['user']['search']);
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 
@@ -1011,7 +1012,7 @@ class SearchController extends Controller
 		$steps = $this->sortResultsByMostTokensFound($steps);
 
 		foreach((array)$steps as $key => $val)
-			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['keystep_id']]['number']);
+			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['id']]['number']);
 
 
 		return array(

@@ -1,4 +1,6 @@
 {include file="../shared/header.tpl"}
+
+
 {if $names.list[$names.prefId]}
 	{assign var=taxon_display_name value=$names.list[$names.prefId].name}
 {elseif $names.list[$names.sciId]}
@@ -6,6 +8,8 @@
 {else}
 	{assign var=taxon_display_name value=$taxon.label}
 {/if}
+
+{assign var=name_scientific_no_author value=$names.list[$names.sciId].concat}
 
 <div id="dialogRidge">
 
@@ -184,6 +188,46 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			<p>
 				{$content}
 			</p>
+
+		{elseif $activeCategory==$smarty.const.TAB_BEDREIGING_EN_BESCHERMING}
+
+			<div>
+			
+				<h2>Beschermingsstatus</h2>
+
+				{foreach from=$content item=soort key=naam}
+				<p>
+					{if $naam!=$name_scientific_no_author || $content.count>1}
+					<h3><i>{$naam}</i></h3><br />
+					{/if}
+				
+					{*Zie ook: <a href="{$soort.url}">EL&I soortgegevens</a><br />*}
+					
+					<ul>
+						{foreach from=$soort.wetten item=v key=wet}
+						<li>
+							<b>{$wet}</b>
+							<ul>
+								{foreach from=$v item=w}
+								<li>
+									{$w.categorie}<br />
+									{$w.publicatie}
+								</li>
+								{/foreach}
+							</ul>
+						</li>
+						{/foreach}
+					</ul>
+					<br />
+					
+					Zie ook: <a href="{$soort.url}">EL&I wettelijke bescherming, beleid en signalering</a><br /><br />
+		
+				</p>
+				{/foreach}
+
+
+			</div>
+
 
 		{else}
 
