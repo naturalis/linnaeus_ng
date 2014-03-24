@@ -29,11 +29,17 @@ class SearchControllerNSR extends SearchController
     public function __construct ()
     {
         parent::__construct();
+		$this->initialise();
     }
 
     public function __destruct()
     {
         parent::__destruct();
+    }
+	
+    private function initialise()
+    {
+		$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
     }
 
     public function searchAction()
@@ -513,7 +519,7 @@ class SearchControllerNSR extends SearchController
 				_m.id,
 				_m.taxon_id,
 				file_name as image,
-				thumb_name as thumb,
+				file_name as thumb,
 				_c.meta_data as photographer,
 				_k.taxon,
 				_z.name as dutch_name,
@@ -526,10 +532,10 @@ class SearchControllerNSR extends SearchController
 					if(_j.specific_epithet is null,'',concat(_j.specific_epithet,' ')),
 					if(_j.infra_specific_epithet is null,'',_j.infra_specific_epithet)
 				) as name,
-				_meta1.meta_data as meta_datum,
+				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
-				_meta4.meta_data as meta_datum_plaatsing,
+				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
 				_meta5.meta_data as meta_copyrights
 			
 			from  %PRE%media_taxon _m
@@ -571,13 +577,13 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%media_meta _meta2
 				on _m.id=_meta2.media_id
 				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijvingKort'
+				and _meta2.sys_label='beeldbankOmschrijving'
 				and _meta2.language_id=".$this->getCurrentLanguageId()."
 			
 			left join %PRE%media_meta _meta3
 				on _m.id=_meta3.media_id
 				and _m.project_id=_meta3.project_id
-				and _meta3.sys_label='beeldbankGeografie'
+				and _meta3.sys_label='beeldbankLokatie'
 				and _meta3.language_id=".$this->getCurrentLanguageId()."
 			
 			left join %PRE%media_meta _meta4
@@ -589,7 +595,7 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%media_meta _meta5
 				on _m.id=_meta5.media_id
 				and _m.project_id=_meta5.project_id
-				and _meta5.sys_label='beeldbankCopyrights'
+				and _meta5.sys_label='beeldbankCopyright'
 				and _meta5.language_id=".$this->getCurrentLanguageId()."
 
 			".(!empty($group_id) ? "right join %PRE%taxon_quick_parentage _q
