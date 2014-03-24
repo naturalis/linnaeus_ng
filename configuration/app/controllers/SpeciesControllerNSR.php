@@ -41,6 +41,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function initialise()
     {
+		$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
 		$this->Rdf = new RdfController;
     }
 
@@ -468,7 +469,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonOverviewImage($id)
 	{
-		$d=(array)$this->getTaxonMedia(array('id'=>$id,'overview'=>true));
+		$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta1.meta_date desc','limit'=>1));
 		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 
@@ -490,15 +491,15 @@ class SpeciesControllerNSR extends SpeciesController
 				_m.id,
 				_m.taxon_id,
 				file_name as image,
-				thumb_name as thumb,
+				file_name as thumb,
 				_c.meta_data as photographer,
 				_k.taxon,
 				_z.name as dutch_name,
 				_j.name,
-				_meta1.meta_data as meta_datum,
+				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
-				_meta4.meta_data as meta_datum_plaatsing,
+				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
 				_meta5.meta_data as meta_copyrights
 			
 			from  %PRE%media_taxon _m
@@ -538,12 +539,12 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%media_meta _meta2
 				on _m.id=_meta2.media_id
 				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijvingKort'
+				and _meta2.sys_label='beeldbankOmschrijving'
 			
 			left join %PRE%media_meta _meta3
 				on _m.id=_meta3.media_id
 				and _m.project_id=_meta3.project_id
-				and _meta3.sys_label='beeldbankGeografie'
+				and _meta3.sys_label='beeldbankLokatie'
 			
 			left join %PRE%media_meta _meta4
 				on _m.id=_meta4.media_id
@@ -553,7 +554,7 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%media_meta _meta5
 				on _m.id=_meta5.media_id
 				and _m.project_id=_meta5.project_id
-				and _meta5.sys_label='beeldbankCopyrights'
+				and _meta5.sys_label='beeldbankCopyright'
 			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
@@ -565,9 +566,11 @@ class SpeciesControllerNSR extends SpeciesController
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 		
+		/*
 		$isWin=$this->helpers->Functions->serverIsWindows();
 
 		if (!$isWin) setlocale(LC_ALL, 'nl_NL.utf8');
+		*/
 		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 		
@@ -579,23 +582,25 @@ class SpeciesControllerNSR extends SpeciesController
 	
 			$metaData=array(
 				'Fotograaf' => $photographer,
-				'Datum' => $isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
+				'Datum' => $val['meta_datum'],//$isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
 				//'Validator' => '...',
-				'Geplaatst op' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
+				'Geplaatst op' => $val['meta_datum_plaatsing'],//$isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
 				'Copyright' => $copyrighter,
 				//'Contactadres fotograaf' => '...'
 			);
 
+			/*
 			if (!$isWin) {
 				$data[$key]['meta_datum']=strftime('%d-%m-%Y',strtotime($val['meta_datum']));
 				$data[$key]['meta_datum_plaatsing']=strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing']));
 			}
+			*/
 
 			$data[$key]['photographer']=$photographer;
 			$data[$key]['label']=
 				$photographer.', '.
-				($isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum']))).', '.
+				$val['meta_datum'].', './/($isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum']))).', '.
 				$val['meta_geografie'];
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 			
@@ -984,7 +989,7 @@ class SpeciesControllerNSR extends SpeciesController
 				SQL_CALC_FOUND_ROWS
 				_q.taxon_id,
 				file_name,
-				thumb_name,
+				file_name as thumb_name,
 				_x.description,
 				_k.taxon,
 				_z.name,
@@ -1024,7 +1029,7 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%media_meta _meta2
 				on _m.id=_meta2.media_id
 				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijvingKort'
+				and _meta2.sys_label='beeldbankOmschrijving'
 			
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
