@@ -160,7 +160,6 @@ class SpeciesController extends Controller
 
 
 	/* public */
-
     public function indexAction ()
     {
         $this->setActiveTaxonId(null);
@@ -172,7 +171,6 @@ class SpeciesController extends Controller
 		else
 			$this->redirect('taxon.php?id='.$id);
     }
-
 
     public function taxonAction()
     {
@@ -290,7 +288,7 @@ class SpeciesController extends Controller
 			
 			$this->smarty->assign('activePage',$startPage);
 
-			$this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+			$this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
 
 		}
 		
@@ -326,13 +324,12 @@ class SpeciesController extends Controller
 		$this->listAction();
 	}
 	
-
     public function parentageAction ()
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Generate parentage table'));
 
-        if ($this->rHasVal('action','generate')){// && !$this->isFormResubmit()) {
+        if ($this->rHasVal('action','generate')) {
 			$i=$this->saveParentage();
 	        $this->smarty->assign('cleared', true);
 			$this->addMessage('Generated parentage for '.$i.' taxa');
@@ -340,7 +337,6 @@ class SpeciesController extends Controller
 
 		$this->printPage();
     }
-
 
 	private function getProgeny($parent,$level,$family)
 	{
@@ -363,7 +359,6 @@ class SpeciesController extends Controller
 			$this->getProgeny($row['id'],$level+1,$family);
 		}
 	}
-
 
 	private function saveParentage($id=null)
 	{
@@ -1096,8 +1091,8 @@ class SpeciesController extends Controller
         }
 
         $this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($data)));
-       
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($data['id']));
+
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($data));
         
         $this->printPage();
     }
@@ -1502,7 +1497,7 @@ class SpeciesController extends Controller
             if (isset($taxon))
                 $this->smarty->assign('taxon', $taxon);
             
-            $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+            $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
         }
         else {
             
@@ -1592,7 +1587,7 @@ class SpeciesController extends Controller
         
         if (isset($taxon)) {
             $this->smarty->assign('taxon', $taxon);
-	        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+	        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
 		}
         $this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
         $this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
@@ -3112,7 +3107,7 @@ class SpeciesController extends Controller
 */
         }
         
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
         
         //		$this->smarty->assign('literature', $literature);
         
@@ -3273,7 +3268,7 @@ class SpeciesController extends Controller
             }
         }
         
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
         
         $this->smarty->assign('id', $this->requestData['id']);
         
@@ -3333,7 +3328,7 @@ class SpeciesController extends Controller
         
         $variations = $this->getVariations($taxon['id']);
         
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
         
         $this->smarty->assign('id', $taxon['id']);
         
@@ -3362,7 +3357,7 @@ class SpeciesController extends Controller
         
         $related = $this->getRelatedEntities($taxon['id']);
         
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
         
         $this->smarty->assign('id', $taxon['id']);
         
@@ -3418,7 +3413,7 @@ class SpeciesController extends Controller
             ));
         }
         
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
         
         $this->smarty->assign('id', $taxon['id']);
         
@@ -5766,31 +5761,30 @@ class SpeciesController extends Controller
 
 
 
-	private function getTaxonBrowseOrderIndex()
-	{
-		return $this->getIsHigherTaxa()?'higher':'species';
-	}
-
-	private function setTaxonBrowseOrder($order=null)
+	private function setTaxonBrowseOrder($order=null,$higher)
 	{
 		if (is_null($order))
-			unset($_SESSION['admin']['system']['species']['browse_order'][$this->getTaxonBrowseOrderIndex()]);
+			unset($_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower']);
 		else
-			$_SESSION['admin']['system']['species']['browse_order'][$this->getTaxonBrowseOrderIndex()]=$order;
+			$_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower']=$order;
 	}
 
-	private function getTaxonBrowseOrder()
+	private function getTaxonBrowseOrder($higher)
 	{
-		return isset($_SESSION['admin']['system']['species']['browse_order'][$this->getTaxonBrowseOrderIndex()]) ?
-			$_SESSION['admin']['system']['species']['browse_order'][$this->getTaxonBrowseOrderIndex()] : null;
+		return isset($_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower']) ?
+			$_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower'] : null;
 	}
 
-	private function getAdjacentTaxa($id)
+	private function getAdjacentTaxa($taxon)
     {
-		$order=$this->getTaxonBrowseOrder();
+		
+		$id = $taxon['id'];
+		$higher = $taxon['lower_taxon']==0;
+		
+		$order=$this->getTaxonBrowseOrder($higher);
 
-		if (empty($order)) {
-
+		if (empty($order))
+		{
 			$order=
 				$this->models->Taxon->freeQuery(
 					array(
@@ -5799,20 +5793,21 @@ class SpeciesController extends Controller
 							from %PRE%taxa _a 
 							left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
 							where _a.project_id = '.$this->getCurrentProjectId().'
-							and _b.lower_taxon = '.($this->getIsHigherTaxa() ? 0 : 1).'
+							and _b.lower_taxon = '.($higher ? 0 : 1).'
 							order by _a.taxon_order, _a.taxon
 							'
 					));
 					
-			$this->setTaxonBrowseOrder($order);
-
+			$this->setTaxonBrowseOrder($order,$higher);
 		}
 
 		$prev=$next=false;
 
-		while (list ($key, $val) = each($order)) {
+		while (list ($key, $val) = each($order))
+		{
 
-			if ($val['id']==$id) {
+			if ($val['id']==$id)
+			{
 
 				// current = next because the pointer has already shifted forward
 				$next = current($order);
@@ -5835,9 +5830,6 @@ class SpeciesController extends Controller
 
         return null;
     }
-
-
-
 
     private function getLookupList($p)
     {
@@ -5884,70 +5876,5 @@ class SpeciesController extends Controller
 			);
 
     }
-
-
-
-
-	
 	
 }
-
-/*
-
-	//BURN TREES!
-
-    public function indexAction ()
-    {
-		
-        unset($_SESSION['admin']['system']['activeTaxon']);
-        
-        if ($this->rHasVal('higher', '1')) {
-
-
-            $d = $this->newGetUserAssignedTaxonTreeList(array(
-                'higherOnly' => true
-            ));
-            
-			$this->setIsHigherTaxa(true);
-			$this->setHigherTaxaControllerMask();
-            
-            foreach ((array) $d as $val) {
-                
-                if ($val['lower_taxon'] == 0) {
-                    
-                    $d = $val;
-                    
-                    break;
-                }
-            }
-        }
-        else {
-            
-            $this->setIsHigherTaxa(false);
-            $d = $this->newGetUserAssignedTaxonTreeList();
-            foreach ((array) $d as $val) {
-                
-                if ($val['lower_taxon'] == 1) {
-                    
-                    $d = $val;
-                    
-                    break;
-                }
-            }
-        }
-        
-
-        if (!isset($d['id']) || !$this->userHasTaxon($d['id'])) {
-            
-            // not sure why this was here...
-
-            $this->redirect('collaborators.php');
-        }
-        else {
-
-            $this->redirect('taxon.php?id=' . $d['id']);
-        }
-    }
-	
-
-*/
