@@ -29,7 +29,7 @@
 	</div>
 
 </div>
-<form name="theForm" id="theForm" method="post" action="">
+<form name="theForm" id="theForm" method="get" action="">
 <input type="hidden" id="letter" name="letter" value="{$letter}" />
 </form>
 
