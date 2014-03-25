@@ -57,7 +57,7 @@
 	</div>
 {/if}
 </div>
-<form name="theForm" id="theForm" method="post" action="">
+<form name="theForm" id="theForm" method="get" action="">
 <input type="hidden" id="letter" name="letter" value="{$letter}" />
 <input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
 </form>
