@@ -143,7 +143,10 @@ class IndexController extends Controller
 
 		$names = $this->getCommonnameLookupList();
 
-		foreach((array)$names as $key => $val) {
+		$l=array();
+
+		foreach((array)$names as $key => $val)
+		{
 		
 			if ($this->rHasVal('activeLanguage')) {
 
@@ -199,7 +202,7 @@ class IndexController extends Controller
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
-		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : (isset($d['alpha'][0]) ? $d['alpha'][0] : null));
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
@@ -498,7 +501,7 @@ class IndexController extends Controller
 	private function makeAlphabetFromArray($names,$field,$letter=null)
 	{
 
-		$a = array();
+		$a=$n=array();
 		
 		if (!is_null($letter)) $letter = strtolower($letter);
 
@@ -520,7 +523,8 @@ class IndexController extends Controller
 
 		sort($a);
 
-		if (is_null($letter)) {
+		if (is_null($letter) && isset($a[0]))
+		{
 
 			$letter = $a[0];
 
