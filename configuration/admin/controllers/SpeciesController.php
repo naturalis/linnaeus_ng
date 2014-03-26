@@ -5450,9 +5450,6 @@ class SpeciesController extends Controller
         }
     }
 
-
-
-
     private function deleteVariation ($id)
     {
         $this->models->TaxaRelations->delete(array(
@@ -5758,9 +5755,6 @@ class SpeciesController extends Controller
         }
     }
 
-
-
-
 	private function setTaxonBrowseOrder($order=null,$higher)
 	{
 		if (is_null($order))
@@ -5876,5 +5870,252 @@ class SpeciesController extends Controller
 			);
 
     }
+	
+	private function getCommonCommonName($id)
+	{
+		$d=$this->models->Commonname->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id,
+				'language_id'=>$this->getDefaultProjectLanguage()
+			), 
+			'columns'=>'commonname',
+			'limit' => '1'
+		));
+		return isset($d) ? $d[0]['commonname'] : null;
+	}
+	
+	public function branchesAction()
+	{
+
+		$this->checkAuthorisation();
+				
+		$this->setPageName('Browse taxon tree');
+		
+		if ($this->rHasVal('newOrder'))
+		{
+			foreach((array)$this->requestData['newOrder'] as $key=>$val)
+			{
+				$this->models->Taxon->update(
+					array('taxon_order'=>$key),
+					array('project_id'=>$this->getCurrentProjectId(),'id'=>$val)
+				);
+			}
+			$this->addMessage('new order saved');
+		}
+
+		if ($this->rHasVal('p'))
+		{
+			$p=$this->requestData['p'];
+		}
+		else 
+		{
+			/*
+				if no id requested, get the top taxon (no parent)
+				"_r.id < 10" added as there might be orphans, which are ususally low-level
+			*/
+			$p=$this->models->Taxon->freeQuery("
+				select
+					_a.id,
+					_a.taxon,
+					_r.rank
+				from
+					%PRE%taxa _a
+						
+				left join %PRE%projects_ranks _p
+					on _a.project_id=_p.project_id
+					and _a.rank_id=_p.id
+
+				left join %PRE%ranks _r
+					on _p.rank_id=_r.id
+
+				where 
+					_a.project_id = ".$this->getCurrentProjectId()." 
+					and _a.parent_id is null
+					and _r.id < 10
+
+			");
+
+			if ($p && count((array)$p)==1)
+			{
+				$p=$p[0]['id'];
+			} 
+			else
+			{
+				$p=null;
+			}
+
+			if (count((array)$p)>1)
+			{
+				$this->addError('Detected multiple high-order taxa without a parent. Unable to determine which is the top of the tree.');
+			}
+		}
+		
+		if ($p)
+		{
+			
+			$taxon=$this->getTaxonById($p);
+			
+			$parent=isset($taxon['parent_id']) ? $this->getTaxonById($taxon['parent_id']) : null;
+			$parent['commonname']=$this->getCommonCommonName($parent['id']);
+
+			$peers=$this->models->Taxon->freeQuery("
+				select
+					_a.id,
+					_a.taxon,
+					_a.rank_id,
+					_r.rank,
+					ifnull(_b.child_count,0) as child_count					
+
+				from
+					%PRE%taxa _a
+						
+				left join %PRE%projects_ranks _p
+					on _a.project_id=_p.project_id
+					and _a.rank_id=_p.id
+
+				left join %PRE%ranks _r
+					on _p.rank_id=_r.id
+
+				left join
+					(select project_id,parent_id,count(*) as child_count from %PRE%taxa group by project_id,parent_id) as _b
+						on _a.id=_b.parent_id
+						and _b.project_id=_a.project_id
+				where 
+					_a.project_id = ".$this->getCurrentProjectId()." 
+					and _a.rank_id = ".$taxon['rank_id']."
+					and _a.parent_id = ".$taxon['parent_id']."
+
+				order by
+					_a.taxon_order
+			");
+			
+			foreach((array)$peers as $key=>$val)
+			{
+				$peers[$key]['commonname']=$this->getCommonCommonName($val['id']);
+			}
+
+			$progeny=$this->models->Taxon->freeQuery("
+				select
+					_a.id,
+					_a.taxon,
+					_p.rank_id,
+					_r.rank,
+					_b.child_count,
+					ifnull(_i.number_of_images,0) as number_of_images,
+					ifnull(_s.number_of_synonyms,0) as number_of_synonyms,
+					ifnull(_c.number_of_commonnames,0) as number_of_commonnames,
+					ifnull(_n.number_of_pages,0) as number_of_pages
+
+				from
+					%PRE%taxa _a
+								
+				left join
+					(select project_id,parent_id,count(*) as child_count from %PRE%taxa group by project_id,parent_id) as _b
+						on _a.id=_b.parent_id
+						and _b.project_id=_a.project_id
+
+				left join
+					(select project_id,taxon_id,count(*) as number_of_images from %PRE%media_taxon group by project_id,taxon_id) as _i
+						on _a.id=_i.taxon_id
+						and _i.project_id=_a.project_id
+						
+				left join
+					(select project_id,taxon_id,count(*) as number_of_synonyms from %PRE%synonyms group by project_id,taxon_id) as _s
+						on _a.id=_s.taxon_id
+						and _s.project_id=_a.project_id
+
+				left join
+					(select project_id,taxon_id,count(*) as number_of_commonnames from %PRE%commonnames group by project_id,taxon_id) as _c
+						on _a.id=_c.taxon_id
+						and _c.project_id=_a.project_id
+
+				left join
+					(select project_id,taxon_id,count(*) as number_of_pages from %PRE%content_taxa group by project_id,taxon_id) as _n
+						on _a.id=_n.taxon_id
+						and _n.project_id=_a.project_id
+
+				left join %PRE%projects_ranks _p
+					on _a.project_id=_p.project_id
+					and _a.rank_id=_p.id
+
+				left join %PRE%ranks _r
+					on _p.rank_id=_r.id
+
+				where 
+					_a.project_id = ".$this->getCurrentProjectId()." 
+					and _a.parent_id = ".$p."
+
+				order by
+					_a.taxon_order
+			");
+
+			foreach((array)$progeny as $key=>$val)
+			{
+				$progeny[$key]['commonname']=$this->getCommonCommonName($val['id']);
+			}
+
+			$this->smarty->assign('parent',$parent);
+			$this->smarty->assign('taxon',$taxon);
+			$this->smarty->assign('progeny',$progeny);
+			$this->smarty->assign('peers',$peers);
+			
+		}
+
+		$toggle=$this->rHasVal('toggle')?$this->requestData['toggle']:'list-item';
+		$this->smarty->assign('toggle',$toggle);
+		
+		$this->printPage();
+		
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 }
