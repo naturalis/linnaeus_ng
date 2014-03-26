@@ -5732,13 +5732,16 @@ class SpeciesController extends Controller
 				on _a.project_id=_p.project_id
 				and _a.rank_id=_p.id
 
+			left join %PRE%ranks _r
+				on _p.rank_id=_r.id
+
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.parent_id ".(is_null($id) ? "is null" : "= ".$id)."
+				and _a.parent_id ".(is_null($id) ? "is null and _r.id < 10" : "= ".$id)."
 			order by
 				_a.taxon_order
 		");
-		
+							
 		foreach((array)$p as $val)
 		{
 			array_push($this->tmp,$val);
@@ -5769,9 +5772,11 @@ class SpeciesController extends Controller
 						'next'=>isset($next) ? array('id'=>$next['id'],'label'=>$next['taxon']) : null
 					);
 
-				if ($val['lower_taxon']==$taxon['lower_taxon'])
-					$prev=$val;
 			}
+
+		if ($val['lower_taxon']==$taxon['lower_taxon'])
+			$prev=$val;
+
 		}
 
 	}
@@ -5871,6 +5876,9 @@ class SpeciesController extends Controller
 				);
 			}
 			$this->addMessage('new order saved');
+			$this->clearCache('species-adjacency-tree');
+			
+			
 		}
 
 		if ($this->rHasVal('p'))
