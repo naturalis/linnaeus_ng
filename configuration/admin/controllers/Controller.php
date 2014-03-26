@@ -11,6 +11,7 @@ class Controller extends BaseClass
     private $_helpTexts;
     private $_prevTreeId = null;
     private $_breadcrumbRootName = null;
+	public $useCache = true;
     public $useVariations = false;
     public $useRelated = false;
     public $tmp;
@@ -3675,6 +3676,41 @@ class Controller extends BaseClass
             }
         }
     }
+
+	protected function saveCache ($key, $data)
+	{
+		if ($this->useCache == false)
+		return;
+		
+		$cacheFile=$_SESSION['admin']['project']['paths']['cache'].$key;
+		
+		if (!file_put_contents($cacheFile, serialize($data))) {
+			die('Cannot write to cache folder '.$_SESSION['admin']['project']['paths']['cache']);
+		}
+	}
+
+    // Timeout in seconds
+    // Key something like path in session, e.g. 'species-tree'
+    protected function getCache ($key, $timeOut = false)
+    {
+        if ($this->useCache == false)
+            return false;
+
+        $cacheFile=$_SESSION['admin']['project']['paths']['cache'].$key;
+
+        if (file_exists($cacheFile)) {
+            // Timeout provided and expired
+            if ($timeOut && time() - $timeOut >= filemtime($cacheFile)) {
+                // Delete from cache
+                unlink($cacheFile);
+                return false;
+            }
+            return unserialize(file_get_contents($cacheFile));
+        }
+        return false;
+    }
+
+
 
     protected function clearCache ($files)
     {

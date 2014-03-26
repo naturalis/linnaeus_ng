@@ -95,7 +95,8 @@ class SpeciesController extends Controller
     public $cacheFiles = array(
         'key-keyTaxa', 
         'key-taxonDivision*', 
-        'tree-KeyTree', 
+        'tree-KeyTree',
+		'species-adjacency-tree',
         'list' => 'species-treeList'
     );
     public $cssToLoad = array(
@@ -337,113 +338,6 @@ class SpeciesController extends Controller
 
 		$this->printPage();
     }
-
-	private function getProgeny($parent,$level,$family)
-	{
-		$result = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'parent_id' => $parent
-				), 
-				'columns' => 'id,parent_id,taxon,'.$level.' as level'
-			)
-		);
-		
-		$family[]=$parent;
-
-		foreach((array)$result as $row)
-		{
-			$row['parentage']=$family;
-			$this->tmp[]=$row;
-			$this->getProgeny($row['id'],$level+1,$family);
-		}
-	}
-
-	private function saveParentage($id=null)
-	{
-
-		$t = $this->models->Taxon->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'parent_id is' => null
-			), 
-			'columns' => 'id'
-		));
-		
-		if (empty($t[0]['id']))
-			die('no top!?');
-
-		if (count((array)$t)>1)
-			die('multiple tops!?');
-			
-		$this->tmp=array();
-	
-		$this->getProgeny($t[0]['id'],0,array());
-
-		$d=array('project_id' => $this->getCurrentProjectId());
-
-		if (!is_null($id)) $d['taxon_id']=$id;
-	
-		$this->models->TaxonQuickParentage->delete($d);
-	
-		$i=0;
-		foreach((array)$this->tmp as $key=>$val) {
-
-			if (!is_null($id) && $val['id']!=$id)
-				continue;
-
-			$this->models->TaxonQuickParentage->save(
-			array(
-				'id' => null, 
-				'project_id' => $this->getCurrentProjectId(), 
-				'taxon_id' => $val['id'],
-				'parentage' => implode(' ',$val['parentage'])
-
-			));
-
-			$i++;
-		}
-		
-		return $i;
-
-	}
-
-	private function getTreeRoots()
-	{
-		
-		$q='
-			select _a.id,_a.taxon,_a.parent_id,_a.rank_id,_a.taxon_order,_a.is_hybrid,_a.list_level,_b.rank_id as base_level
-			from %staxa _a
-			left join %sprojects_ranks _b on _a.rank_id = _b.id and _a.project_id =_b.project_id
-			where _a.project_id = '.$this->getCurrentProjectId().'
-			and _a.parent_id %s
-			order by _a.taxon_order,base_level,_a.taxon
-			limit %s
-		';
-		
-		$list=array();
-
-		$d0=$this->models->Taxon->freeQuery(sprintf($q,'%PRE%','%PRE%','is null',1));
-		$d0[0]['list_level']=0;
-		$list[]=$d0[0];
-		foreach((array)$d0 as $val0) {
-			$d1=$this->models->Taxon->freeQuery(sprintf($q,'%PRE%','%PRE%','='.$val0['id'],1000));
-			foreach((array)$d1 as $val1) {
-				$val1['list_level']=1;
-				$list[]=$val1;
-				$d2=$this->models->Taxon->freeQuery(sprintf($q,'%PRE%','%PRE%','='.$val1['id'],1000));
-				foreach((array)$d2 as $val2) {
-					$val2['list_level']=2;
-					$list[]=$val2;
-				}
-			}
-		}
-		
-		return $list;
-		
-	}
 
     public function listAction ()
     {
@@ -719,56 +613,10 @@ class SpeciesController extends Controller
 
 		$this->clearCache('tree-KeyTree');
 		$this->clearCache('species-treeList');
-		$this->setTaxonBrowseOrder(null);
-		
+
 		$this->redirect('list.php');
 				
 	}
-
-
-
-	/* private set/get */
-
-    private function setIsHigherTaxa($state=true)
-	{
-		if (!is_bool($state)) return;
-		$_SESSION['admin']['system']['highertaxa']=$state;
-	}
-
-    private function getIsHigherTaxa()
-    {
-        if (!isset($_SESSION['admin']['system']['highertaxa'])) return false;
-		return $_SESSION['admin']['system']['highertaxa'];
-    }
-	
-	private function setHigherTaxaControllerMask()
-	{
-		if ($this->getIsHigherTaxa())
-			$this->setControllerMask('highertaxa', 'Higher taxa');
-	}
-
-    private function getFirstTaxonId()
-    {
-        $t = $this->models->Taxon->freeQuery(
-        array(
-			'query' => '
-				select _a.id
-				from %PRE%taxa _a 
-				left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-				left join %PRE%ranks _c on _b.rank_id=_c.id
-				where _a.project_id = '.$this->getCurrentProjectId().'
-				and _b.lower_taxon = '.($this->getIsHigherTaxa() ? 0 : 1).'
-				order by _a.taxon_order, _a.taxon
-				limit 1'
-        ));
-
-		return isset($t) ? $t[0]['id'] : null;
-    }
-	
-
-	
-
-
 
     public function pageAction ()
     {
@@ -829,7 +677,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
 
     public function editAction ()
     {
@@ -1097,7 +944,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
     public function newAction ()
     {
         $this->checkAuthorisation();
@@ -1281,7 +1127,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
     public function deleteAction ()
     {
         $this->checkAuthorisation();
@@ -1366,7 +1211,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
     public function orphansAction ()
     {
         $this->checkAuthorisation();
@@ -1433,7 +1277,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
 
     public function literatureAction ()
     {
@@ -1506,7 +1349,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
 
     public function mediaAction ()
     {
@@ -1594,7 +1436,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
 
     public function mediaUploadAction ()
     {
@@ -1708,7 +1549,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
 
     public function fileAction ()
     {
@@ -2051,7 +1891,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
     public function importAction ()
     {
 		
@@ -2258,52 +2097,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-	private function resolveTaxonByIdOrname($whatisit)
-	{
-		
-		$tId=null;
-		
-		
-		if (!empty($whatisit)) {
-
-			if (is_numeric($whatisit)) {
-			
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'id' => (int)$whatisit
-						)
-					));
-		
-				if ($t[0]['id']!=$whatisit)
-					$tId = null;
-			
-			} else {
-		
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'taxon' => trim($whatisit)
-						)
-					));
-		
-				if (empty($t[0]['id']))
-					$tId = null;
-				else
-					$tId = $t[0]['id'];
-		
-			}
-			
-		}
-		
-		return $tId;
-										
-	}
-
-
     public function remoteImgFileAction ()
     {
 		
@@ -2446,7 +2239,6 @@ class SpeciesController extends Controller
        
         $this->printPage();
     }
-
 
     public function ajaxInterfaceAction ()
     {
@@ -2644,13 +2436,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Interface for getting taxon data from the Catalogue Of Life webservice (which is somewhat unreliable)
-     *
-     * @access    public
-     */
     public function colAction ()
     {
         $this->checkAuthorisation();
@@ -3284,8 +3069,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
     public function variationsAction ()
     {
         $this->checkAuthorisation();
@@ -3339,8 +3122,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
     public function relatedAction ()
     {
         if (!$this->useRelated)
@@ -3367,8 +3148,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
-
 
     public function nbcExtrasAction ()
     {
@@ -3431,8 +3210,192 @@ class SpeciesController extends Controller
         $this->redirect('../../../app/views/species/taxon.php?p=' . $this->getCurrentProjectId() . '&id=' . $this->requestData['taxon_id'] . '&cat=' . $this->requestData['activePage'] . '&lan=' . $this->getDefaultProjectLanguage());
     }
 
+	private function getProgeny($parent,$level,$family)
+	{
+		$result = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'parent_id' => $parent
+				), 
+				'columns' => 'id,parent_id,taxon,'.$level.' as level'
+			)
+		);
+		
+		$family[]=$parent;
 
+		foreach((array)$result as $row)
+		{
+			$row['parentage']=$family;
+			$this->tmp[]=$row;
+			$this->getProgeny($row['id'],$level+1,$family);
+		}
+	}
 
+	private function saveParentage($id=null)
+	{
+
+		$t = $this->models->Taxon->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'parent_id is' => null
+			), 
+			'columns' => 'id'
+		));
+		
+		if (empty($t[0]['id']))
+			die('no top!?');
+
+		if (count((array)$t)>1)
+			die('multiple tops!?');
+			
+		$this->tmp=array();
+	
+		$this->getProgeny($t[0]['id'],0,array());
+
+		$d=array('project_id' => $this->getCurrentProjectId());
+
+		if (!is_null($id)) $d['taxon_id']=$id;
+	
+		$this->models->TaxonQuickParentage->delete($d);
+	
+		$i=0;
+		foreach((array)$this->tmp as $key=>$val) {
+
+			if (!is_null($id) && $val['id']!=$id)
+				continue;
+
+			$this->models->TaxonQuickParentage->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $val['id'],
+				'parentage' => implode(' ',$val['parentage'])
+
+			));
+
+			$i++;
+		}
+		
+		return $i;
+
+	}
+
+	private function getTreeRoots()
+	{
+		
+		$q='
+			select _a.id,_a.taxon,_a.parent_id,_a.rank_id,_a.taxon_order,_a.is_hybrid,_a.list_level,_b.rank_id as base_level
+			from %staxa _a
+			left join %sprojects_ranks _b on _a.rank_id = _b.id and _a.project_id =_b.project_id
+			where _a.project_id = '.$this->getCurrentProjectId().'
+			and _a.parent_id %s
+			order by _a.taxon_order,base_level,_a.taxon
+			limit %s
+		';
+		
+		$list=array();
+
+		$d0=$this->models->Taxon->freeQuery(sprintf($q,'%PRE%','%PRE%','is null',1));
+		$d0[0]['list_level']=0;
+		$list[]=$d0[0];
+		foreach((array)$d0 as $val0) {
+			$d1=$this->models->Taxon->freeQuery(sprintf($q,'%PRE%','%PRE%','='.$val0['id'],1000));
+			foreach((array)$d1 as $val1) {
+				$val1['list_level']=1;
+				$list[]=$val1;
+				$d2=$this->models->Taxon->freeQuery(sprintf($q,'%PRE%','%PRE%','='.$val1['id'],1000));
+				foreach((array)$d2 as $val2) {
+					$val2['list_level']=2;
+					$list[]=$val2;
+				}
+			}
+		}
+		
+		return $list;
+		
+	}
+
+    private function setIsHigherTaxa($state=true)
+	{
+		if (!is_bool($state)) return;
+		$_SESSION['admin']['system']['highertaxa']=$state;
+	}
+
+    private function getIsHigherTaxa()
+    {
+        if (!isset($_SESSION['admin']['system']['highertaxa'])) return false;
+		return $_SESSION['admin']['system']['highertaxa'];
+    }
+	
+	private function setHigherTaxaControllerMask()
+	{
+		if ($this->getIsHigherTaxa())
+			$this->setControllerMask('highertaxa', 'Higher taxa');
+	}
+
+    private function getFirstTaxonId()
+    {
+        $t = $this->models->Taxon->freeQuery(
+        array(
+			'query' => '
+				select _a.id
+				from %PRE%taxa _a 
+				left join %PRE%projects_ranks _b on _a.rank_id=_b.id
+				left join %PRE%ranks _c on _b.rank_id=_c.id
+				where _a.project_id = '.$this->getCurrentProjectId().'
+				and _b.lower_taxon = '.($this->getIsHigherTaxa() ? 0 : 1).'
+				order by _a.taxon_order, _a.taxon
+				limit 1'
+        ));
+
+		return isset($t) ? $t[0]['id'] : null;
+    }
+
+	private function resolveTaxonByIdOrname($whatisit)
+	{
+		
+		$tId=null;
+		
+		
+		if (!empty($whatisit)) {
+
+			if (is_numeric($whatisit)) {
+			
+				$t = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'id' => (int)$whatisit
+						)
+					));
+		
+				if ($t[0]['id']!=$whatisit)
+					$tId = null;
+			
+			} else {
+		
+				$t = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'taxon' => trim($whatisit)
+						)
+					));
+		
+				if (empty($t[0]['id']))
+					$tId = null;
+				else
+					$tId = $t[0]['id'];
+		
+			}
+			
+		}
+		
+		return $tId;
+										
+	}
 
     private function getRankList ()
     {
@@ -5755,75 +5718,80 @@ class SpeciesController extends Controller
         }
     }
 
-	private function setTaxonBrowseOrder($order=null,$higher)
+	private function getAdjacencyTreeBranch($id)
 	{
-		if (is_null($order))
-			unset($_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower']);
-		else
-			$_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower']=$order;
-	}
+		$p=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon,
+				_p.lower_taxon
+			from
+				%PRE%taxa _a
+					
+			left join %PRE%projects_ranks _p
+				on _a.project_id=_p.project_id
+				and _a.rank_id=_p.id
 
-	private function getTaxonBrowseOrder($higher)
-	{
-		return isset($_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower']) ?
-			$_SESSION['admin']['system']['species']['browse_order'][$higher?'higher':'lower'] : null;
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.parent_id ".(is_null($id) ? "is null" : "= ".$id)."
+			order by
+				_a.taxon_order
+		");
+		
+		foreach((array)$p as $val)
+		{
+			array_push($this->tmp,$val);
+			$this->getAdjacencyTreeBranch($val['id']);
+		}
 	}
 
 	private function getAdjacentTaxa($taxon)
-    {
-		
-		$id = $taxon['id'];
-		$higher = $taxon['lower_taxon']==0;
-		
-		$order=$this->getTaxonBrowseOrder($higher);
-
-		if (empty($order))
+	{
+		$tree=$this->getAdjacencyTree();
+		$prev=$next=null;
+		foreach((array)$tree as $key=>$val)
 		{
-			$order=
-				$this->models->Taxon->freeQuery(
-					array(
-						'query' => '
-							select _a.id,_a.taxon
-							from %PRE%taxa _a 
-							left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
-							where _a.project_id = '.$this->getCurrentProjectId().'
-							and _b.lower_taxon = '.($higher ? 0 : 1).'
-							order by _a.taxon_order, _a.taxon
-							'
-					));
-					
-			$this->setTaxonBrowseOrder($order,$higher);
-		}
-
-		$prev=$next=false;
-
-		while (list ($key, $val) = each($order))
-		{
-
-			if ($val['id']==$id)
+			if ($val['id']==$taxon['id'])
 			{
+				for ($i=$key+1;$i<count($tree);$i++)
+				{
+					if ($tree[$i]['lower_taxon']==$taxon['lower_taxon'])
+					{
+						$next=$tree[$i];
+						break;
+					}
+				}
+				
+				return 
+					array(
+						'prev'=>isset($prev) ? array('id'=>$prev['id'],'label'=>$prev['taxon']) : null,
+						'next'=>isset($next) ? array('id'=>$next['id'],'label'=>$next['taxon']) : null
+					);
 
-				// current = next because the pointer has already shifted forward
-				$next = current($order);
-
-				return array(
-					'prev' => $prev!==false ? array(
-						'id' => $prev['id'], 
-						'label' => $prev['taxon']
-					) : null, 
-					'next' => $next!==false ? array(
-						'id' => $next['id'], 
-						'label' => $next['taxon']
-					) : null
-				);
+				if ($val['lower_taxon']==$taxon['lower_taxon'])
+					$prev=$val;
 			}
-			
-			$prev=$val;
-            
 		}
 
-        return null;
-    }
+	}
+
+	private function getAdjacencyTree()
+    {
+
+		$tree=$this->getCache('species-adjacency-tree');
+
+		if (!$tree)
+		{
+			$this->tmp=array();
+			$this->getAdjacencyTreeBranch(null);			
+			$this->saveCache('species-adjacency-tree',$this->tmp);
+			$tree=$this->tmp;
+		}
+
+		return $tree;
+		
+	}
 
     private function getLookupList($p)
     {
@@ -5885,7 +5853,7 @@ class SpeciesController extends Controller
 		));
 		return isset($d) ? $d[0]['commonname'] : null;
 	}
-	
+
 	public function branchesAction()
 	{
 
@@ -6070,52 +6038,4 @@ class SpeciesController extends Controller
 		
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
 }
