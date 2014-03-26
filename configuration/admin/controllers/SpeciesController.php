@@ -175,7 +175,6 @@ class SpeciesController extends Controller
 
     public function taxonAction()
     {
-		
 		$this->checkAuthorisation();
 	
 		$this->smarty->assign('taxon',null);
@@ -2445,13 +2444,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Enables the user to choose taxon ranks for the project
-     *
-     * @access    public
-     */
     public function ranksAction ()
     {
         $this->checkAuthorisation();
@@ -2582,13 +2574,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Enables the user to provide labels in all defined project languages
-     *
-     * @access    public
-     */
     public function ranklabelsAction ()
     {
         $this->checkAuthorisation();
@@ -2606,13 +2591,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Create standard sections for taxon content pages
-     *
-     * @access    public
-     */
     public function sectionsAction ()
     {
         $this->checkAuthorisation();
@@ -2682,13 +2660,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Assign parts of the taxon tree to specific collaborators so they can edit only those
-     *
-     * @access    public
-     */
     public function collaboratorsAction ()
     {
         $this->checkAuthorisation();
@@ -2745,13 +2716,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Create synonyms for a taxon
-     *
-     * @access    public
-     */
     public function synonymsAction ()
     {
         $this->checkAuthorisation();
@@ -2908,13 +2872,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-     * Create common names for a taxon
-     *
-     * @access    public
-     */
     public function commonAction ()
     {
         $this->checkAuthorisation();
@@ -5932,6 +5889,8 @@ class SpeciesController extends Controller
 		{
 			
 			$taxon=$this->getTaxonById($p);
+
+			$this->setPageName('Browse taxon tree - '.$taxon['taxon']);
 			
 			$parent=isset($taxon['parent_id']) ? $this->getTaxonById($taxon['parent_id']) : null;
 			$parent['commonname']=$this->getCommonCommonName($parent['id']);
