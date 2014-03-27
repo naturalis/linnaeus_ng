@@ -6,30 +6,11 @@
 
 		<div id="treebranchContainer">
 
-			<div class="top5">
-				<h2>Top 5 fotografen</h2>
-				<h4>Fotograaf (foto’s/soorten)</h4>
-				<ul>
-				{foreach from=$photographers item=v name=foo}
-					{if $smarty.foreach.foo.index < 5}
-					<li>
-						<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total} / {$v.taxon_count})</a>
-					</li>
-					{/if}
-				{/foreach}
-				</ul>
-				<p>
-					<a href="nsr_photographers.php"><i>Bekijk volledige lijst</i></a>
-				</p>
-			</div>
+			{include file="_photographers.tpl"}
 			
 			<br />
 
-			<div class="top5">
-				<h2>Top 5 validatoren</h2>
-				<h4>Validator (foto’s/soorten)</h4>
-				<i>nog niet weten te exporteren uit de beeldbankdump</i>
-			</div>
+			{include file="_validators.tpl"}
 
 		</div>  
 
@@ -55,7 +36,6 @@
 
 
 		<div>
-			<h4><span id="resultcount-header">{$results.count}</span></h4>
 			<div>
 				{foreach from=$results.data item=v}
 					<div class="imageInGrid3">

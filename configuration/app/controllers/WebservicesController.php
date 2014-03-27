@@ -15,11 +15,14 @@ class WebservicesController extends Controller
 	
 
     public $usedModels = array(
+		'taxon',
 		'commonname',
 		'synonym',
 		'names',
 		'media_taxon',
-		'nsr_ids'
+		'nsr_ids',
+		'media_meta',
+		'literature2'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -315,8 +318,6 @@ parameters:
   nsr".chr(9)." : NSR-id of the taxon to retrieve (mandatory)
 ";
 
-		// pid is mandatory, now checked in initialise()
-		
 		if (is_null($this->getCurrentProjectId())) {
 			$this->sendErrors();
 			return;
@@ -379,6 +380,215 @@ parameters:
 		$this->printPage('template');
 	}
 
+	public function lastImageAction()
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+";
+
+		// pid is mandatory, now checked in initialise()
+
+		if (is_null($this->getCurrentProjectId())) {
+			$this->sendErrors();
+			return;
+		}
+
+        $media=$this->models->MediaMeta->freeQuery("
+			select
+				media_id,max(meta_date)
+			from 
+				%PRE%media_meta
+			where 
+				sys_label = 'beeldbankDatumAanmaak'
+				and project_id = ".$this->getCurrentProjectId()."
+		");
+
+        $media=$this->models->MediaTaxon->freeQuery("
+			select
+				_a.taxon_id,
+				_a.id as media_id,
+				concat('".$this->_thumbBaseUrl."',_a.file_name) as url_image,
+				_b.meta_data as copyright,
+				_d.meta_data as fotograaf,
+				date_format(_e.meta_date,'%e %M %Y') as date_created,
+				_f.meta_data as lokatie,
+				_g.meta_data as validator,
+				_k.name as dutch_name,
+				trim(replace(_m.name,_m.authorship,'')) as scientific_name
+
+			from %PRE%media_taxon _a
+			
+			left join %PRE%names _k
+				on _a.taxon_id=_k.taxon_id
+				and _a.project_id=_k.project_id
+				and _k.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _m
+				on _a.taxon_id=_m.taxon_id
+				and _a.project_id=_m.project_id
+				and _m.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _m.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			left join %PRE%media_meta _b
+				on _a.id=_b.media_id and _a.project_id=_b.project_id and _b.sys_label = 'beeldbankCopyright'
+			left join %PRE%media_meta _d
+				on _a.id=_d.media_id and _a.project_id=_d.project_id and _d.sys_label = 'beeldbankFotograaf'
+			left join %PRE%media_meta _e
+				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumAanmaak'
+			left join %PRE%media_meta _f
+				on _a.id=_f.media_id and _a.project_id=_f.project_id and _f.sys_label = 'beeldbankLokatie'
+			left join %PRE%media_meta _g
+				on _a.id=_g.media_id and _a.project_id=_g.project_id and _g.sys_label = 'beeldbankValidator'
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.id = ".$media[0]['media_id']."
+
+			limit 1
+		");
+		
+		$this->setTaxonId($media[0]['taxon_id']);
+
+		$result=array('pId'=>$this->getCurrentProjectId());
+
+		$p=$this->getProject();
+
+		$result['project']=$p['title'];
+		$result['exported']=date('c');
+		$result['url_recent_images']=$this->makeNsrRecentImagesLink();
+		$result['image']=$media[0];
+		$result['image']['url_taxon']=$this->makeNsrLink();
+
+		$this->smarty->assign('json',json_encode($result));
+		
+		$this->printPage('template');
+	}
+
+	public function statisticsAction()
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+";
+
+		if (is_null($this->getCurrentProjectId())) {
+			$this->sendErrors();
+			return;
+		}
+
+        $d=$this->models->Taxon->freeQuery("
+			select
+				count(*) as total
+
+			from
+				%PRE%taxa _a
+
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id=_f.project_id
+
+			where
+				_a.project_id =".$this->getCurrentProjectId()."
+				and _f.rank_id = ".SPECIES_RANK_ID
+		);
+		
+		$result['count_species']=$d[0]['total'];
+
+        $d=$this->models->MediaTaxon->freeQuery("
+			select
+				count(distinct taxon_id) as total
+
+			from %PRE%media_taxon _a
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()
+		);
+		
+		$result['count_species_with_image']=$d[0]['total'];
+
+        $d=$this->models->MediaTaxon->freeQuery("
+			select
+				count(id) as total
+			from %PRE%media_taxon _a
+			where
+				_a.project_id = ".$this->getCurrentProjectId()
+		);
+		
+		$result['count_image']=$d[0]['total'];
+		
+		$d=$this->models->Names->freeQuery("
+				select
+					count(_a.id) as total,
+					_b.nametype,
+					_a.language_id
+				
+				from %PRE%names _a
+				
+				left join %PRE%name_types _b
+					on _a.project_id = _b.project_id
+					and _a.type_id = _b.id
+				
+				where
+					_a.project_id = ".$this->getCurrentProjectId()."
+				group by _a.language_id,_b.nametype"
+		);
+
+		$result['count_name_accepted']=$result['count_name_dutch']=$result['count_name_english']=0;
+		
+		foreach((array)$d as $key => $val)
+		{
+			if ($val['nametype']=='isValidNameOf')
+				$result['count_name_accepted']+=$val['total'];
+
+			if ($val['language_id']==LANGUAGE_ID_DUTCH)
+				$result['count_name_dutch']+=$val['total'];
+
+			if ($val['language_id']==LANGUAGE_ID_ENGLISH)
+				$result['count_name_english']+=$val['total'];
+		}
+		
+
+        $d=$this->models->Literature2->_get(array(
+			'id'=> array('project_id' => $this->getCurrentProjectId()),
+			'columns'=>'count(*) as total'
+		));
+		
+		$result['count_literature']=$d[0]['total'];
+
+
+		$result['count_specialist']='(coming)';
+		$result['count_distribution_map']='(coming)';
+
+
+/*
+
+Aantal soorten in Nederland
+36852
+Het soortenregister bevat
+7928	Soorten met foto's
+58080	Foto's
+40485	Geaccepteerde soortnamen
+17380	Nederlandse namen
+1237	Engelse namen
+113		Specialisten
+1715	Literatuurbronnen
+757		Verspreidingskaarten
+
+*/
+		$this->smarty->assign('json',json_encode($result));
+		
+		$this->printPage('template');
+	}
+
+
+
+
     private function initialise()
     {
 		$this->useCache=false;
@@ -402,6 +612,8 @@ parameters:
 	{
 		if (!$this->rHasVal('pid')) {
 
+			$this->setProject(null);
+			$this->setCurrentProjectId(null);
 			$this->addError('no project id specified.');
 
 		} else {
@@ -431,6 +643,7 @@ parameters:
 		return $this->_project;
 	}
 	
+
 
 	private function checkFromDate()
 	{
@@ -573,9 +786,7 @@ parameters:
 	}
 
 	/*
-	
 		NSR project specific, should be changed once NSR migration is complete
-	
 	*/
 	private function makeNsrLink()
 	{
@@ -607,6 +818,19 @@ parameters:
 		else
 			return $this->makeNsrLink().'/imagesAndSounds';
 	}
+
+	private function makeNsrRecentImagesLink()
+	{
+		if (!$this->_useOldNsrLinks)
+			return 'http://'.$_SERVER['HTTP_HOST'].'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
+		else
+			return 'http://www.nederlandsesoorten.nl/nsr/nsr/recentImages.html';
+	}
+
+
+
+
+
 
 
 }

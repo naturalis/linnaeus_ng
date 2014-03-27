@@ -6,7 +6,7 @@
 
 		<div id="treebranchContainer">
 
-			{include file="_validators.tpl"}
+			{include file="_photographers.tpl"}
 
 		</div>  
 
@@ -14,13 +14,13 @@
 
 	<div id="content">
 
-		<h2>Overzicht fotografen</h2>
-		<h4>Fotograaf (foto’s/soorten)</h4>
+		<h2>Overzicht validatoren</h2>
+		<h4>Validator (foto’s/soorten)</h4>
 		<br>
 			<ol>
-			{foreach from=$photographers item=v}
+			{foreach from=$validators item=v}
 				<li>
-					<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total} / {$v.taxon_count})</a>
+					<a href="nsr_search_pictures.php?validator={$v.validator}">{$v.validator} ({$v.total} / {$v.taxon_count})</a>
 				</li>
 			{/foreach}
 			</ol>
