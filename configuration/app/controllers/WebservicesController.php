@@ -11,12 +11,15 @@ class WebservicesController extends Controller
 	private $_matchType=null;
 	private $_useOldNsrLinks=false;
 	private $_taxonUrl=null;
+	private $_thumbBaseUrl = 'http://images.naturalis.nl/160x100/';
+	
 
     public $usedModels = array(
 		'commonname',
 		'synonym',
 		'names',
-		'media_taxon'
+		'media_taxon',
+		'nsr_ids'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -257,11 +260,12 @@ parameters:
 				_b.meta_data as copyright,
 				_c.meta_data as caption,
 				_d.meta_data as creator,
-				_e.meta_data as date_created
+				date_format(_e.meta_date,'%e %M %Y') as date_created
+
 			from %PRE%media_taxon _a
 
 			left join %PRE%media_meta _b
-				on _a.id=_b.media_id and _a.project_id=_b.project_id and _b.sys_label = 'beeldbankCopyrights'
+				on _a.id=_b.media_id and _a.project_id=_b.project_id and _b.sys_label = 'beeldbankCopyright'
 			left join %PRE%media_meta _c
 				on _a.id=_c.media_id and _a.project_id=_c.project_id and _c.sys_label = 'beeldbankCaption'
 			left join %PRE%media_meta _d
@@ -269,8 +273,11 @@ parameters:
 			left join %PRE%media_meta _e
 				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumVervaardiging'
 
-			where _a.project_id = ".$this->getCurrentProjectId()."
-			and _a.taxon_id = ".$this->getTaxonId()."
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.taxon_id = ".$this->getTaxonId()."
+			order by
+				_e.meta_date desc
 			");
 
 		$result=array(
@@ -299,6 +306,79 @@ parameters:
 		$this->printPage('template');
 	}
 
+	public function ezAction()
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>&nsr=<id>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+  nsr".chr(9)." : NSR-id of the taxon to retrieve (mandatory)
+";
+
+		// pid is mandatory, now checked in initialise()
+		
+		if (is_null($this->getCurrentProjectId())) {
+			$this->sendErrors();
+			return;
+		}
+
+		$this->checkNsrId();
+		
+		if (is_null($this->getTaxonId())) {
+			$this->sendErrors();
+			return;
+		}
+
+		$taxon=$this->getTaxonById($this->getTaxonId());
+
+        $media=$this->models->MediaTaxon->freeQuery("
+			select
+				_a.id as media_id,
+				concat('".$this->_thumbBaseUrl."',_a.file_name) as url,
+				_b.meta_data as copyright,
+				_d.meta_data as creator,
+				date_format(_e.meta_date,'%e %M %Y') as date_created
+
+			from %PRE%media_taxon _a
+
+			left join %PRE%media_meta _b
+				on _a.id=_b.media_id and _a.project_id=_b.project_id and _b.sys_label = 'beeldbankCopyright'
+			left join %PRE%media_meta _d
+				on _a.id=_d.media_id and _a.project_id=_d.project_id and _d.sys_label = 'beeldbankFotograaf'
+			left join %PRE%media_meta _e
+				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumVervaardiging'
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.taxon_id = ".$this->getTaxonId()."
+			order by
+				_e.meta_date desc
+			limit 4
+		");
+
+		$result=array(
+			'pId'=>$this->getCurrentProjectId(),
+			'search'=>$this->requestData['nsr']
+		);
+		
+		$p=$this->getProject();
+
+		$result['project']=$p['title'];
+		$result['exported']=date('c');
+		
+		$result['taxon']=array(
+			'id'=>$taxon['id'],
+			'scientific_name'=>$taxon['taxon'],
+			'url'=>$this->makeNsrLink(),
+			'url_media'=>$this->makeNsrMediaLink(),
+			'media'=>$media
+		);
+
+		$this->smarty->assign('json',json_encode($result));
+		
+		$this->printPage('template');
+	}
+
     private function initialise()
     {
 		$this->useCache=false;
@@ -316,6 +396,7 @@ parameters:
 		}
 
     }
+
 
 	private function checkProject()
 	{
@@ -350,6 +431,7 @@ parameters:
 		return $this->_project;
 	}
 	
+
 	private function checkFromDate()
 	{
 		if (!$this->rHasVal('from')) {
@@ -380,6 +462,8 @@ parameters:
 		return $this->_fromDate;
 	}
 	
+
+
 	private function checkTaxonId()
 	{
 		if (!$this->rHasVal('taxon')) {
@@ -427,6 +511,39 @@ parameters:
 		return false;
 	}
 
+	private function checkNsrId()
+	{
+		if (!$this->rHasVal('nsr')) {
+
+			$this->addError('no NSR-id specified.');
+
+		} else {
+			
+			$nsr=trim($this->requestData['nsr']);
+			
+			$this->setMatchType('literal');
+
+			$t = $this->models->NsrIds->_get(array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'nsr_id' => 'tn.nlsr.concept/'.str_pad(mysql_real_escape_string($nsr),12,'0',STR_PAD_LEFT),
+					'item_type' => 'taxon'
+				)
+			));
+			
+		
+			if (!$t) {
+				$this->addError('NSR-id "'.$this->requestData['nsr'].'" not found in this project.');
+			} else {
+				$this->setTaxonId($t[0]['lng_id']);
+				return $t;
+			}
+		}
+		return false;
+	}
+
+
+
 	private function setTaxonId($id)
 	{
 		$this->_taxonId=$id;
@@ -437,6 +554,7 @@ parameters:
 		return $this->_taxonId;
 	}
 	
+
 	private function setMatchType($t)
 	{
 		$this->_matchType=$t;
@@ -447,6 +565,7 @@ parameters:
 		return $this->_matchType;
 	}
 	
+
 	private function sendErrors()
 	{
 		$this->smarty->assign('json',json_encode(array('errors'=>$this->errors,'usage'=>$this->_usage)));
@@ -460,26 +579,34 @@ parameters:
 	*/
 	private function makeNsrLink()
 	{
-
 		if (!$this->_useOldNsrLinks) {
 
 			return sprintf($this->_taxonUrl,$this->getTaxonId());
 
 		} else {
 
-			$query="
-				select *
-				from %PRE%ids _a
-				where _a.project_id=".$this->getCurrentProjectId()."
-				and _a.lng_id =".$this->getTaxonId()."
-				and _a.item_type='taxon'"
-				;
-				
-			$ids = $this->models->Names->freeQuery($query);
-		
+			$ids = $this->models->NsrIds->_get(
+				array('id'=>
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'lng_id' => $this->getTaxonId(),
+						'item_type' => 'taxon'
+					)
+				)
+			);
+
 			return 'http://www.nederlandsesoorten.nl/'.str_replace('tn.nlsr.','nsr/',$ids[0]['nsr_id']);
 		}
 
 	}
+
+	private function makeNsrMediaLink()
+	{
+		if (!$this->_useOldNsrLinks)
+			return $this->makeNsrLink().'&cat=media';
+		else
+			return $this->makeNsrLink().'/imagesAndSounds';
+	}
+
 
 }
