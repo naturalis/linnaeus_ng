@@ -95,6 +95,7 @@ class SearchControllerNSR extends SearchController
 		}
 
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount($p));
+		$this->smarty->assign('validators',$this->getValidatorPictureCount($p));
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 		$this->smarty->assign('imageExport',true);
@@ -110,6 +111,23 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('results',$results);	
 		$this->smarty->assign('show','photographers');
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+		$this->smarty->assign('validators',$this->getValidatorPictureCount());
+        $this->printPage();
+    }
+
+
+    public function photographersAction()
+    {
+		$this->smarty->assign('validators',$this->getValidatorPictureCount());
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount(array('limit'=>'*')));
+        $this->printPage();
+    }
+
+
+    public function validatorsAction()
+    {
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
+		$this->smarty->assign('validators',$this->getValidatorPictureCount(array('limit'=>'*')));
         $this->printPage();
     }
 
@@ -134,6 +152,11 @@ class SearchControllerNSR extends SearchController
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsPhotographer($this->requestData)));
         } else
+        if ($this->rHasVal('action','validator_suggestions'))
+		{
+	        if (!$this->rHasVal('search')) return;
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsValidator($this->requestData)));
+        } else
         if ($this->rHasVal('action','name_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
@@ -144,12 +167,6 @@ class SearchControllerNSR extends SearchController
     
     }
 
-
-    public function photographersAction()
-    {
-		$this->smarty->assign('photographers',$this->getPhotographersPictureCount(array('limit'=>'*')));
-        $this->printPage();
-    }
 
 
 	private function getPresenceStatuses()
@@ -418,13 +435,12 @@ class SearchControllerNSR extends SearchController
 
 	private function getPhotographersPictureCount($p=null)
 	{
-
 		$photographers=$this->getCache('search-photographer-count');
 
 		if (!$photographers)
 		{
         
-			$tCount=$this->models->Taxon->freeQuery(array(
+			$tCount=$this->models->MediaTaxon->freeQuery(array(
 				'query'=>
 					"select 
 						count(distinct _a.taxon_id) as taxon_count,
@@ -451,10 +467,10 @@ class SearchControllerNSR extends SearchController
 						'sys_label' => 'beeldbankFotograaf'
 					),
 					'columns'=>"count(*) as total, meta_data,
-						concat(
+						trim(concat(
 							trim(substring(meta_data, locate(',',meta_data)+1)),' ',
 							trim(substring(meta_data, 1, locate(',',meta_data)-1))
-						) as photographer",
+						)) as photographer",
 					'group'=>'meta_data, photographer',
 					'order'=>'count(*) desc, meta_data desc',
 					'fieldAsIndex'=>'meta_data'
@@ -482,6 +498,71 @@ class SearchControllerNSR extends SearchController
 	}
 
 
+	private function getValidatorPictureCount($p=null)
+	{
+
+		$validators=$this->getCache('search-validator-count');
+
+		if (!$validators)
+		{
+        
+			$tCount=$this->models->MediaTaxon->freeQuery(array(
+				'query'=>
+					"select 
+						count(distinct _a.taxon_id) as taxon_count,
+						_b.meta_data
+					from 
+						%PRE%media_taxon _a
+		
+					right join %PRE%media_meta _b
+						on _a.project_id=_b.project_id
+						and _a.id = _b.media_id
+						and _b.sys_label = 'beeldbankValidator'
+					
+					where
+						_a.project_id=".$this->getCurrentProjectId()."
+					group by _b.meta_data",
+				'fieldAsIndex'=>'meta_data'
+				)
+			);
+			
+			$validators=$this->models->MediaMeta->_get(
+				array(
+					'id'=>array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'sys_label' => 'beeldbankValidator'
+					),
+					'columns'=>"count(*) as total, meta_data,
+						trim(concat(
+							trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+							trim(substring(meta_data, 1, locate(',',meta_data)-1))
+						)) as validator",
+					'group'=>'meta_data, validator',
+					'order'=>'count(*) desc, meta_data desc',
+					'fieldAsIndex'=>'meta_data'
+				)
+			);
+			
+			foreach((array)$validators as $key=>$val) {
+				
+				$validators[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
+				
+			}
+			
+			$this->saveCache('search-validator-count',$validators);
+			
+		}
+
+		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
+
+		if (!empty($limit) && $limit<count((array)$validators)) {
+			$validators=array_slice($validators,0,$limit);
+		}
+
+		return $validators;		
+	}
+
+
 	private function doPictureSearch($p)
 	{
 		$group_id=null;
@@ -496,12 +577,12 @@ class SearchControllerNSR extends SearchController
 		}
 
 		if (!empty($p['photographer'])) {
-			$photographer="concat(
-					trim(substring(_c.meta_data, locate(',',_c.meta_data)+1)),' ',
-					trim(substring(_c.meta_data, 1, locate(',',_c.meta_data)-1))
-				)='".mysql_real_escape_string($p['photographer'])."'";
+			$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
 		}
 
+		if (!empty($p['validator'])) {
+			$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
+		}
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
@@ -510,8 +591,8 @@ class SearchControllerNSR extends SearchController
 		if (isset($p['sort']) && $p['sort']=='photographer')
 			$sort="_c.meta_data asc";
 		else
-		if (!empty($p['photographer']))
-			$sort="_meta4.meta_data desc";
+		if (!empty($p['photographer']) || !empty($p['validator']))
+			$sort="_meta4.meta_data desc, _k.taxon";
 
 		$data=$this->models->MediaTaxon->freeQuery("		
 			select
@@ -536,7 +617,9 @@ class SearchControllerNSR extends SearchController
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
 				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
-				_meta5.meta_data as meta_copyrights
+				_meta5.meta_data as meta_copyrights,
+				_meta6.meta_data as meta_validator,
+				_meta7.meta_data as meta_adres_maker
 			
 			from  %PRE%media_taxon _m
 			
@@ -598,6 +681,18 @@ class SearchControllerNSR extends SearchController
 				and _meta5.sys_label='beeldbankCopyright'
 				and _meta5.language_id=".$this->getCurrentLanguageId()."
 
+			left join %PRE%media_meta _meta6
+				on _m.id=_meta6.media_id
+				and _m.project_id=_meta6.project_id
+				and _meta6.sys_label='beeldbankValidator'
+				and _meta6.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%media_meta _meta7
+				on _m.id=_meta7.media_id
+				and _m.project_id=_meta7.project_id
+				and _meta7.sys_label='beeldbankAdresMaker'
+				and _meta7.language_id=".$this->getCurrentLanguageId()."
+
 			".(!empty($group_id) ? "right join %PRE%taxon_quick_parentage _q
 				on _m.taxon_id=_q.taxon_id
 				and _m.project_id=_q.project_id
@@ -641,10 +736,10 @@ class SearchControllerNSR extends SearchController
 				'Fotograaf' => $photographer,
 				'Datum' => $isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
 				'Locatie' => $val['meta_geografie'],
-				//'Validator' => '...',
+				'Validator' => $val['meta_validator'],
 				'Geplaatst op' => $isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
 				'Copyright' => $copyrighter,
-				//'Contactadres fotograaf' => '...'
+				'Contactadres fotograaf' => $val['meta_adres_maker']
 			);
 
 			if (!$isWin) {
@@ -771,6 +866,35 @@ class SearchControllerNSR extends SearchController
 	}
 
 
+	private function getSuggestionsValidator($p)
+	{
+		$clause=null;
+		if ($p['match']=='start')
+			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
+		else
+		if ($p['match']=='exact')
+			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
+
+		if (empty($clause)) return;
+
+		$d=$this->models->MediaTaxon->freeQuery("
+			select 
+				distinct
+				meta_data as label
+			from %PRE%media_meta
+			where
+				project_id=".$this->getCurrentProjectId()."
+				and sys_label = 'beeldbankValidator'
+				and ".$clause."
+			order by meta_data
+			limit ".$this->_suggestionListItemMax
+		);
+
+		return $d;
+		
+	}
+
+
 	private function getSuggestionsPhotographer($p)
 	{
 		$clause=null;
@@ -784,27 +908,17 @@ class SearchControllerNSR extends SearchController
 		*/
 
 		if ($p['match']=='start')
-			$clause="concat(
-					trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-					trim(substring(meta_data, 1, locate(',',meta_data)-1))
-				) like '".mysql_real_escape_string($p['search'])."%'";
+			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
 		else
 		if ($p['match']=='exact')
-			$clause="concat(
-					trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-					trim(substring(meta_data, 1, locate(',',meta_data)-1))
-				) = '".mysql_real_escape_string($p['search'])."'";
+			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
 
 		if (empty($clause)) return;
 
 		$d=$this->models->MediaTaxon->freeQuery("
 			select 
 				distinct
-				concat(
-					trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-					trim(substring(meta_data, 1, locate(',',meta_data)-1))
-				)
-				as label
+				meta_data as label
 			from %PRE%media_meta
 			where
 				project_id=".$this->getCurrentProjectId()."

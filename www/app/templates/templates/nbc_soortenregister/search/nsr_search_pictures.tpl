@@ -8,32 +8,19 @@
 
 		<div id="treebranchContainer">
 
-			<div class="top5">
-				<h2>Top 5 fotografen</h2>
-				<h4>Fotograaf (foto’s/soorten)</h4>
-				<ul>
-				{foreach from=$photographers item=v name=foo}
-					{if $smarty.foreach.foo.index < 5}
-					<li>
-						<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total} / {$v.taxon_count})</a>
-					</li>
-					{/if}
-				{/foreach}
-				</ul>
-				<p>
-					<a href="nsr_photographers.php"><i>Bekijk volledige lijst</i></a>
-				</p>
-			</div>
+			{include file="_photographers.tpl"}
 			
 			<br />
 
-			<div class="top5">
-				<h2>Top 5 validatoren</h2>
-				<h4>Validator (foto’s/soorten)</h4>
-				<i>nog niet weten te exporteren uit de beeldbankdump</i>
-			</div>
+			{include file="_validators.tpl"}
 
 		</div>  
+		
+		<p style="margin-top:25px;padding-top:5px;border-top:1px solid black">
+		<a href="nsr_recent_pictures.php">Meer recente afbeeldingen</a><br />
+		<a href="../webservices/statistics.php?pid=1" target="_new">Statistieken</a>
+		</p>
+
 
 	</div>
 
@@ -65,7 +52,7 @@
 				</div>
 				<div class="formrow">
 					<label accesskey="g" for="validator">Validator</label>
-					<input disabled="disabled" type="text" size="60" class="field" value="nog niet weten te exporteren uit de beeldbankdump" "{$search.validator}" id="validator" name="validator" autocomplete="off">
+					<input type="text" size="60" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
 					<div id="validator_suggestion" match="start" class="auto_complete" style="display: none;"></div>
 				</div>
 			</fieldset>
