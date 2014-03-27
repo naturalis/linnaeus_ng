@@ -1994,7 +1994,7 @@ class Controller extends BaseClass
 
     public function makeCustomCssFileName ($incProjectName = true, $p = null)
     {
-        if ($incProjectName)
+        if ($incProjectName && isset($_SESSION['app']['project']['filesys_name']))
             return $this->baseUrl . $this->getAppName() . '/style/custom/' . $this->getProjectFSCode($p) . '--' . $_SESSION['app']['project']['filesys_name'] . '.css';
         else
             return $this->baseUrl . $this->getAppName() . '/style/custom/' . $this->getProjectFSCode($p) . '.css';
