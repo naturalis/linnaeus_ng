@@ -493,12 +493,28 @@ parameters:
 				on _a.rank_id=_f.id
 				and _a.project_id=_f.project_id
 
+			left join %PRE%presence_taxa _g
+				on _a.id=_g.taxon_id
+				and _a.project_id=_g.project_id
+
+			left join %PRE%presence _h
+				on _g.presence_id=_h.id
+				and _g.project_id=_h.project_id
+
+
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
-				and _f.rank_id = ".SPECIES_RANK_ID
+				and _f.rank_id = ".SPECIES_RANK_ID."
+				and _h.established=1"
 		);
-		
-		$result['count_species']=$d[0]['total'];
+
+		$result['species']=
+			array(
+				'count'=>$d[0]['total'],
+				'label'=>$this->translate('Aantal soorten in Nederland'),
+				'description'=>$this->translate('Aantal soorten in Nederland met status voorkomen 1, 1a, 2, 2a of 2b.')
+			);
+
 
         $d=$this->models->MediaTaxon->freeQuery("
 			select
@@ -510,7 +526,11 @@ parameters:
 				_a.project_id = ".$this->getCurrentProjectId()
 		);
 		
-		$result['count_species_with_image']=$d[0]['total'];
+		$result['species_with_image']=
+			array(
+				'count'=>$d[0]['total'],
+				'label'=>$this->translate('Soorten met foto\'s')
+			);
 
         $d=$this->models->MediaTaxon->freeQuery("
 			select
@@ -520,7 +540,11 @@ parameters:
 				_a.project_id = ".$this->getCurrentProjectId()
 		);
 		
-		$result['count_image']=$d[0]['total'];
+		$result['images']=
+			array(
+				'count'=>$d[0]['total'],
+				'label'=>$this->translate('Foto\'s')
+			);
 		
 		$d=$this->models->Names->freeQuery("
 				select
@@ -539,48 +563,76 @@ parameters:
 				group by _a.language_id,_b.nametype"
 		);
 
-		$result['count_name_accepted']=$result['count_name_dutch']=$result['count_name_english']=0;
+		$t['count_name_accepted']=$t['count_name_dutch']=$t['count_name_english']=0;
 		
 		foreach((array)$d as $key => $val)
 		{
 			if ($val['nametype']=='isValidNameOf')
-				$result['count_name_accepted']+=$val['total'];
+				$t['count_name_accepted']+=$val['total'];
 
 			if ($val['language_id']==LANGUAGE_ID_DUTCH)
-				$result['count_name_dutch']+=$val['total'];
+				$t['count_name_dutch']+=$val['total'];
 
 			if ($val['language_id']==LANGUAGE_ID_ENGLISH)
-				$result['count_name_english']+=$val['total'];
+				$t['count_name_english']+=$val['total'];
 		}
+
+		$result['accepted_names']=
+			array(
+				'count'=>$t['count_name_accepted'],
+				'label'=>$this->translate('Geaccepteerde soortnamen')
+			);
+
+		$result['dutch_names']=
+			array(
+				'count'=>$t['count_name_dutch'],
+				'label'=>$this->translate('Nederlandse namen')
+			);
+
+		$result['english_names']=
+			array(
+				'count'=>$t['count_name_english'],
+				'label'=>$this->translate('Engelse namen')
+			);
+	
+
+		$d=$this->models->Taxon->freeQuery("
+				select
+					count(distinct actor_id) as total
+				
+				from %PRE%presence_taxa _a
+				
+				where
+					_a.project_id = ".$this->getCurrentProjectId()
+
+		);
+
+		$result['specialist']=
+			array(
+				'count'=>$d[0]['total'],
+				'label'=>$this->translate('Specialisten')
+			);
 		
+
 
         $d=$this->models->Literature2->_get(array(
 			'id'=> array('project_id' => $this->getCurrentProjectId()),
 			'columns'=>'count(*) as total'
 		));
+
+		$result['literature']=
+			array(
+				'count'=>$d[0]['total'],
+				'label'=>$this->translate('Literatuurbronnen')
+			);
 		
-		$result['count_literature']=$d[0]['total'];
 
-
-		$result['count_specialist']='(coming)';
 		$result['count_distribution_map']='(coming)';
 
 
-/*
 
-Aantal soorten in Nederland
-36852
-Het soortenregister bevat
-7928	Soorten met foto's
-58080	Foto's
-40485	Geaccepteerde soortnamen
-17380	Nederlandse namen
-1237	Engelse namen
-113		Specialisten
-1715	Literatuurbronnen
-757		Verspreidingskaarten
+		echo '<pre>';print_r($result);die();
 
-*/
 		$this->smarty->assign('json',json_encode($result));
 		
 		$this->printPage('template');
