@@ -597,13 +597,28 @@ parameters:
 	
 
 		$d=$this->models->Taxon->freeQuery("
+			select count(distinct id) as total from
+			(
 				select
-					count(distinct actor_id) as total
-				
-				from %PRE%presence_taxa _a
+					actor_id as id
+				from %PRE%presence_taxa
 				
 				where
-					_a.project_id = ".$this->getCurrentProjectId()
+					project_id = ".$this->getCurrentProjectId()."
+					and actor_id is not null
+					
+				union
+
+				select
+					expert_id as id
+				
+				from %PRE%names
+				
+				where
+					project_id = ".$this->getCurrentProjectId()."
+					and expert_id is not null
+				) as unification"
+
 
 		);
 
