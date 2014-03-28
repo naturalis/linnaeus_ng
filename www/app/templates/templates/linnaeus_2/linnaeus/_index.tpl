@@ -41,7 +41,8 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-	allLookupContentOverrideUrl('../search/ajax_interface.php');
+//	allLookupContentOverrideUrl('../search/ajax_interface.php');
+allLookupAlwaysFetch=true;
 });
 </script>
 {/literal}

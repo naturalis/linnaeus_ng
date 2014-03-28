@@ -476,7 +476,7 @@ class LiteratureController extends Controller
 
 	}
 
-	private function getLookupList($p)
+	public function getLookupList($p)
 	{
 
 		$search = isset($p['search']) ? $p['search'] : null;
@@ -544,6 +544,8 @@ class LiteratureController extends Controller
 				'../literature/reference.php?id=%s'
 			)
 		);
+		
+		return $l;
 		
 	}
 

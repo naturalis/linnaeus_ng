@@ -22,11 +22,12 @@
 		</div>
 		
 	<div id="taxonImage">
-		<a href="http://www.nederlandsesoorten.nl/get?site=nsr&amp;view=nsr&amp;page_alias=imageview&amp;version=popup&amp;cid=0AHCYFCKDGPR&amp;image=248242.jpg" class="zoomimage">
-			<img src="http://images.ncbnaturalis.nl/510x272/248242.jpg" title="Foto Anneke van der Veen" alt="Foto Anneke van der Veen" class="speciesimage">
+		{assign var=v value=$results.data[0]}
+		<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+			<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/510x272/{$v.thumb}" />
 		</a>
 		<div id="taxonImageCredits">
-			<span class="photographer-title">Foto</span>&nbsp;Anneke van der Veen, 9&nbsp;mei&nbsp;2012, Opende, Groningen
+			<span class="photographer-title">Foto</span>&nbsp;{$v.photographer}, {$v.meta_datum}, {$v.meta_geografie}
 		</div>
 	</div>
 </div>
@@ -53,7 +54,7 @@
 						{/if}
 						<dl>
 							<dt>Foto</dt><dd>{$v.photographer}</dd>
-							<dt>Geplaatst op</dt><dd>{$v.meta_datum}</dd>
+							<dt>Geplaatst op</dt><dd>{$v.meta_datum_plaatsing}</dd>
 						</dl>
 						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">Naar deze soort</a></div>
 					</div>

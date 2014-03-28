@@ -18,8 +18,39 @@ class LinnaeusController extends Controller
 {
 
     public $usedModels = array(
-		'content'
-    );
+		'content',
+        'content_taxon', 
+		'content_free_module',
+
+/*
+        'page_taxon', 
+        'page_taxon_title', 
+        'media_taxon',
+        'media_descriptions_taxon',
+		'synonym',
+		'commonname',
+		'content_introduction',
+		'literature',
+		
+		'choice_content_keystep',
+		'content_keystep',
+		'choice_keystep',
+		'keystep',
+		'literature',
+		'glossary_media',
+		'matrix',
+		'matrix_name',
+		'matrix_taxon_state',
+		'characteristic',
+		'characteristic_label',
+		'characteristic_label_state',
+		'characteristic_matrix',
+		'characteristic_label_state',
+		'characteristic_state',
+		'occurrence_taxon',
+		'names'
+*/	
+		    );
 
     public $usedHelpers = array(
     );
@@ -137,7 +168,6 @@ class LinnaeusController extends Controller
      */
     public function contentAction ()
     {
-
 		if (!$this->rHasVal('sub') && !$this->rHasVal('id')) {
 
 			$d = $this->getContent('Welcome');
@@ -235,7 +265,6 @@ class LinnaeusController extends Controller
 	
 	}
 
-
 	private function resolveProjectShortName()
 	{
 		$path = explode('/',$this->getfullPath());
@@ -265,5 +294,138 @@ class LinnaeusController extends Controller
 		
 	}
 
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData);
+
+        }
+
+		$this->allowEditPageOverlay = false;
+		
+        $this->printPage();
+    
+    }
+
+	// general
+	public function getLookupList($p)
+	{
+		
+		$search=isset($p['search']) ? $p['search'] : null;
+		$match_start=isset($p['match_start']) ? $p['match_start']==1 : false;
+
+		$taxa=$this->models->Taxon->freeQuery("
+			select * from
+			(
+				select
+					id,taxon as label,'species' as source, concat('../species/taxon.php?id=',id) as url
+				from
+					%PRE%taxa
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and taxon like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+					
+			union
+	
+				select
+					taxon_id as id,commonname as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+				from
+					%PRE%commonnames
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and commonname like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+	
+				select
+					taxon_id as id,synonym as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+				from
+					%PRE%synonyms
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+	
+				select
+					id,term as label,'glossary' as source, concat('../glossary/term.php?id=',id) as url
+				from
+					%PRE%glossary
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and term like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+	
+				select
+					glossary_id as id,synonym as label,'glossary' as source, concat('../glossary/term.php?id=',glossary_id) as url
+				from
+					%PRE%glossary_synonyms
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+			
+				select
+					id,concat(
+						author_first,
+						if(multiple_authors=1,
+							' et al.',
+							if(author_second!='',concat(' & ',author_second),'')
+						),
+						', ',
+						year,
+						ifnull(suffix,'')
+					) as label,'literature' as source, concat('../literature/reference.php?id=',id) as url
+				from %PRE%literature
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "
+						and (
+							author_first like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%' or
+							author_second like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%' or
+							year like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'
+						)
+					")."
+					
+			union
+
+				select 
+					id,topic as label,'introduction' as source, concat('../introduction/topic.php?id=',id) as url
+				from
+					%PRE%content_introduction
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and topic like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+
+			) as unification
+			order by label
+			limit 100
+		");
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$taxa,
+				$this->controllerBaseName,
+				null,
+				true
+			)
+		); 
+			
+//		q($t);
+
+
+//die();
+	}
+
+
+	
 
 }
