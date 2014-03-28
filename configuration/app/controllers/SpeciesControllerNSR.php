@@ -500,7 +500,9 @@ class SpeciesControllerNSR extends SpeciesController
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
 				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
-				_meta5.meta_data as meta_copyrights
+				_meta5.meta_data as meta_copyrights,
+				_meta6.meta_data as meta_validator,
+				_meta7.meta_data as meta_adres_maker
 			
 			from  %PRE%media_taxon _m
 			
@@ -555,6 +557,18 @@ class SpeciesControllerNSR extends SpeciesController
 				on _m.id=_meta5.media_id
 				and _m.project_id=_meta5.project_id
 				and _meta5.sys_label='beeldbankCopyright'
+
+			left join %PRE%media_meta _meta6
+				on _m.id=_meta6.media_id
+				and _m.project_id=_meta6.project_id
+				and _meta6.sys_label='beeldbankValidator'
+				and _meta6.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%media_meta _meta7
+				on _m.id=_meta7.media_id
+				and _m.project_id=_meta7.project_id
+				and _meta7.sys_label='beeldbankAdresMaker'
+				and _meta7.language_id=".$this->getCurrentLanguageId()."
 			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
@@ -566,41 +580,25 @@ class SpeciesControllerNSR extends SpeciesController
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 		
-		/*
-		$isWin=$this->helpers->Functions->serverIsWindows();
-
-		if (!$isWin) setlocale(LC_ALL, 'nl_NL.utf8');
-		*/
-		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 		
 		foreach((array)$data as $key=>$val)
 		{
 
-			$photographer=implode(' ',array_reverse(explode(',',$val['photographer'])));
-			$copyrighter=($val['meta_copyrights']==$val['photographer'] ? $photographer : $val['meta_copyrights']);
-	
 			$metaData=array(
-				'Fotograaf' => $photographer,
-				'Datum' => $val['meta_datum'],//$isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum'])),
+				'Fotograaf' => $val['photographer'],
+				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],
-				//'Validator' => '...',
-				'Geplaatst op' => $val['meta_datum_plaatsing'],//$isWin ? $val['meta_datum_plaatsing'] : strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing'])),
-				'Copyright' => $copyrighter,
-				//'Contactadres fotograaf' => '...'
+				'Validator' => $val['meta_validator'],
+				'Geplaatst op' => $val['meta_datum_plaatsing'],
+				'Copyright' => $val['meta_copyrights'],
+				'Contactadres fotograaf' => $val['meta_adres_maker']
 			);
 
-			/*
-			if (!$isWin) {
-				$data[$key]['meta_datum']=strftime('%d-%m-%Y',strtotime($val['meta_datum']));
-				$data[$key]['meta_datum_plaatsing']=strftime('%d-%m-%Y',strtotime($val['meta_datum_plaatsing']));
-			}
-			*/
-
-			$data[$key]['photographer']=$photographer;
+			$data[$key]['photographer']=$val['photographer'];
 			$data[$key]['label']=
-				$photographer.', '.
-				$val['meta_datum'].', './/($isWin ? $val['meta_datum'] : strftime('%d-%m-%Y',strtotime($val['meta_datum']))).', '.
+				$val['photographer'].', '.
+				$val['meta_datum'].', '.
 				$val['meta_geografie'];
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 			

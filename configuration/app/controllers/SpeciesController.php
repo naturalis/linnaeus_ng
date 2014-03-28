@@ -272,6 +272,7 @@ class SpeciesController extends Controller
 		if ($this->rHasVal('action', 'get_media_info') && !empty($this->requestData['id'])) {
             
 			$return=json_encode($this->getTaxonMedia(array('id'=>$this->requestData['id'])));
+			
 
         }
         
@@ -1275,7 +1276,7 @@ class SpeciesController extends Controller
             return null;
     }
 
-    private function getLookupList($p)
+    public function getLookupList($p)
     {
 
         $search = isset($p['search']) ? $p['search'] : null;

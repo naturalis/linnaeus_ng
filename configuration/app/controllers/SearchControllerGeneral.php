@@ -80,7 +80,7 @@ class SearchControllerGeneral extends SearchController
 	private $_excerptPrePostMatchString = '...';
 	private $_moduleNames;
 
-    public $usedModels = array(
+	public $usedModels = array(
 		'content',
         'content_taxon', 
         'page_taxon', 
@@ -471,8 +471,7 @@ class SearchControllerGeneral extends SearchController
 	}
 
 	private function sortResultsByMostTokensFound($data)
-	{	
-	
+	{
 		if (count((array)$data)<2)
 			return $data;
 	
@@ -926,7 +925,7 @@ class SearchControllerGeneral extends SearchController
 	
 	private function searchGlossary($p)
 	{
-
+		
 		// glossary items
 		$gloss = $this->models->Glossary->_get(
 			array(
@@ -1329,6 +1328,31 @@ class SearchControllerGeneral extends SearchController
 		return $r;
 	
 	}
+
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_search_result_index')) {
+
+			$this->smarty->assign(
+				'returnText',
+				$this->makeLookupList(
+					(array)$this->getSearchResultIndex(),
+					$this->controllerBaseName,
+					null,
+					false
+				)
+			);
+
+        }
+
+		$this->allowEditPageOverlay = false;
+		
+        $this->printPage();
+    
+    }
 
 
 }
