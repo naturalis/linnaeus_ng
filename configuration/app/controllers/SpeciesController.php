@@ -33,19 +33,24 @@ class SpeciesController extends Controller
 		'presence_taxa',
 		'media_meta',
 		'tab_order',
-		'nsr_ids'
+		'nsr_ids',
+		'taxon_trend_years',
+		'taxon_trends'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
     public $cssToLoad = array(
-        'species.css'
+        'species.css',
+		'morris.css'
     );
     public $jsToLoad = array(
         'all' => array(
             'main.js', 
             'prettyPhoto/jquery.prettyPhoto.js', 
             'lookup.js', 
-            'dialog/jquery.modaldialog.js'
+            'dialog/jquery.modaldialog.js',
+			'raphael/raphael-min.js',
+			'morris.js-0.4.3/morris.min.js'
         ), 
         'IE' => array()
     );
