@@ -57,7 +57,6 @@ class SpeciesControllerNSR extends SpeciesController
         $this->redirect('nsr_taxon.php?id=' . $id);
     }
 
-
     public function taxonAction()
     {
         if ($this->rHasId())
@@ -654,8 +653,33 @@ class SpeciesControllerNSR extends SpeciesController
 			right join %PRE%media_taxon _m
 				on _q.taxon_id=_m.taxon_id
 				and _q.project_id=_m.project_id
-				and _m.id = (select id from %PRE%media_taxon where taxon_id = _q.taxon_id and project_id=".$this->getCurrentProjectId()." limit 1)
-			
+				and _m.id = (
+					select 
+						_m.id
+					from
+						%PRE%media_taxon _m
+
+					left join %PRE%media_meta _meta4
+						on _m.id=_meta4.media_id
+						and _m.project_id=_meta4.project_id
+						and _meta4.sys_label='beeldbankDatumAanmaak'
+						
+					where 
+						_m.taxon_id = _q.taxon_id 
+						and _m.project_id=".$this->getCurrentProjectId()." 
+					order by
+						_meta4.meta_date desc
+					limit 1
+				)
+
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
 			left join %PRE%names _z
 				on _q.taxon_id=_z.taxon_id
 				and _q.project_id=_z.project_id
@@ -676,8 +700,9 @@ class SpeciesControllerNSR extends SpeciesController
 			
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
+				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-			
+
 			order by taxon
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
@@ -696,8 +721,17 @@ class SpeciesControllerNSR extends SpeciesController
 				on _q.taxon_id=_m.taxon_id
 				and _q.project_id=_m.project_id
 
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
+				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 			"
 		);
@@ -713,8 +747,17 @@ class SpeciesControllerNSR extends SpeciesController
 				on _q.taxon_id=_m.taxon_id
 				and _q.project_id=_m.project_id
 
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
+				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 			"
 		);
