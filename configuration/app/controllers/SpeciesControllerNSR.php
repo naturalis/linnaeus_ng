@@ -69,6 +69,8 @@ class SpeciesControllerNSR extends SpeciesController
 			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
+
+
 			$names=$this->getNames($taxon['id']);
 			
 			$classification=$this->getTaxonClassification($taxon['id']);
@@ -77,10 +79,19 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if ($categories['start']==CTAB_MEDIA)
 			{
-				
 				$this->smarty->assign('search',$this->requestData);	
 				$this->smarty->assign('querystring',$this->reconstructQueryString());
-				$this->smarty->assign('results',$this->getTaxonMedia($this->requestData));	
+
+				if($taxon['base_rank_id']>=SPECIES_RANK_ID)
+				{
+					$this->smarty->assign('results',$this->getTaxonMedia($this->requestData));	
+					$this->smarty->assign('mediaType','taxon');
+				}
+				else
+				{
+					$this->smarty->assign('results',$this->getCollectedHigherTaxonMedia($this->requestData));	
+					$this->smarty->assign('mediaType','collected');
+				}
 
 			} else {
 
@@ -132,6 +143,9 @@ class SpeciesControllerNSR extends SpeciesController
 				$presenceData=$this->getPresenceData($taxon['id']);
 				$this->smarty->assign('presenceData', $presenceData);
 
+				$trendData=$this->getTrendData($taxon['id']);
+				$this->smarty->assign('trendData', $trendData);
+
 			} else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
 			{
@@ -161,6 +175,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('content',$content['content']);
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
+			
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',$categories['categories']);
             $this->smarty->assign('activeCategory',$categories['start']);
@@ -274,9 +289,6 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
 			}
-			
-
-
 
 
 			if (!$this->_suppressTab_LITERATURE)
@@ -293,15 +305,21 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (!$this->_suppressTab_MEDIA)
 			{
-				
 				/*
 					species & lower should always show the media tab, even
 					if there is no media, to be able to show the upload link
 				*/
+
 				if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
+				{
 					$isEmpty=false;
+				}
 				else
-					$isEmpty=!$this->hasTaxonMedia($taxon);	
+				{
+					$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
+					$isEmpty=$d['count']==0;
+				}
+
 				
 				array_push($categories,
 					array(
@@ -366,8 +384,6 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 		
 		$this->customSortArray($categories,array('key' => 'show_order'));
-
-//		q($categories,1);
 
 		if (is_null($start)) $start=$firstNonEmpty;
 
@@ -492,7 +508,6 @@ class SpeciesControllerNSR extends SpeciesController
 				_m.taxon_id,
 				file_name as image,
 				file_name as thumb,
-				_c.meta_data as photographer,
 				_k.taxon,
 				_z.name as dutch_name,
 				_j.name,
@@ -502,7 +517,8 @@ class SpeciesControllerNSR extends SpeciesController
 				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
-				_meta7.meta_data as meta_adres_maker
+				_meta7.meta_data as meta_adres_maker,
+				_meta8.meta_data as photographer
 			
 			from  %PRE%media_taxon _m
 			
@@ -569,6 +585,11 @@ class SpeciesControllerNSR extends SpeciesController
 				and _m.project_id=_meta7.project_id
 				and _meta7.sys_label='beeldbankAdresMaker'
 				and _meta7.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%media_meta _meta8
+				on _m.id=_meta8.media_id
+				and _m.project_id=_meta8.project_id
+				and _meta8.sys_label='beeldbankFotograaf'
 			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
@@ -607,6 +628,107 @@ class SpeciesControllerNSR extends SpeciesController
 		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
 
     }
+
+    private function getCollectedHigherTaxonMedia($p)
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
+		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
+
+		if (empty($id))
+			return;
+
+		$data=$this->models->Taxon->freeQuery("		
+			select
+				SQL_CALC_FOUND_ROWS
+				_q.taxon_id,
+				_m.file_name as image,
+				_m.file_name as thumb,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
+				_z.name,
+				_meta8.meta_data as photographer
+			
+			from
+				%PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+				and _m.id = (select id from %PRE%media_taxon where taxon_id = _q.taxon_id and project_id=".$this->getCurrentProjectId()." limit 1)
+			
+			left join %PRE%names _z
+				on _q.taxon_id=_z.taxon_id
+				and _q.project_id=_z.project_id
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _j
+				on _m.taxon_id=_j.taxon_id
+				and _m.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			left join %PRE%media_meta _meta8
+				on _m.id=_meta8.media_id
+				and _m.project_id=_meta8.project_id
+				and _meta8.sys_label='beeldbankFotograaf'
+			
+			where
+				_q.project_id=".$this->getCurrentProjectId()."
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+			
+			order by taxon
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+			);
+		
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+
+		$totalCount=$this->models->Taxon->freeQuery("		
+			select
+				count(*) as total
+			
+			from
+				%PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+
+			where
+				_q.project_id=".$this->getCurrentProjectId()."
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+			"
+		);
+
+		$species=$this->models->Taxon->freeQuery("		
+			select
+				count(distinct _m.taxon_id) as total
+			
+			from
+				%PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+
+			where
+				_q.project_id=".$this->getCurrentProjectId()."
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+			"
+		);
+
+		return 
+			array(
+				'count'=>$count[0]['total'],
+				'totalCount'=>$totalCount[0]['total'],
+				'species'=>$species[0]['total'],
+				'data'=>$data,
+				'perpage'=>$this->_resPicsPerPage
+			);
+		
+	}
 
 	private function _getTaxonClassification($id)
 	{
@@ -846,7 +968,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getName($p)
 	{
-
 		$nameId=isset($p['nameId']) ? $p['nameId'] : null;
 		$taxonId=isset($p['taxonId']) ? $p['taxonId'] : null;
 		$languageId=isset($p['languageId']) ? $p['languageId'] : $this->getCurrentLanguageId();
@@ -972,79 +1093,29 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data[0];
 	}
 
-    private function getCollectedHigherTaxonMedia($p)
-    {
-		$id=isset($p['id']) ? $p['id'] : null;
-		$limit=isset($p['limit']) ? $p['limit'] : null;
-		$offset=isset($p['offset']) ? $p['offset'] : null;
+	private function getTrendData($id)
+	{
+		$byYear=$this->models->TaxonTrendYears->_get(array(
+			'id'=>array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id
+			),
+			'columns'=>'trend_year,trend',
+			'order'=>'trend_year'
+		));
+
+		$byTrend=$this->models->TaxonTrends->_get(array(
+			'id'=>array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id
+			),
+			'columns'=>'trend_label,trend'
+		));
 		
-		if (empty($id))
-			return;
-
-		$data=$this->models->Taxon->freeQuery("		
-			select
-			
-				SQL_CALC_FOUND_ROWS
-				_q.taxon_id,
-				file_name,
-				file_name as thumb_name,
-				_x.description,
-				_k.taxon,
-				_z.name,
-				_meta1.meta_data as meta_datum,
-				_meta2.meta_data as meta_short_desc
-			
-			from  %PRE%taxon_quick_parentage _q
-			
-			right join %PRE%media_taxon _m
-				on _q.taxon_id=_m.taxon_id
-				and _q.project_id=_m.project_id
-				and _m.id = (select id from %PRE%media_taxon where taxon_id = _q.taxon_id and project_id=".$this->getCurrentProjectId()." limit 1)
-			
-			left join %PRE%media_descriptions_taxon _x
-				on _m.id=_x.media_id
-				and _m.project_id=_x.project_id
-			
-			left join %PRE%taxa _k
-				on _q.taxon_id=_k.id
-				and _q.project_id=_k.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			left join %PRE%names _z
-				on _q.taxon_id=_z.taxon_id
-				and _q.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
-				
-			left join %PRE%media_meta _meta1
-				on _m.id=_meta1.media_id
-				and _m.project_id=_meta1.project_id
-				and _meta1.sys_label='beeldbankDatumVervaardiging'
-
-			left join %PRE%media_meta _meta2
-				on _m.id=_meta2.media_id
-				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijving'
-			
-			where
-				_q.project_id=".$this->getCurrentProjectId()."
-				and _f.lower_taxon=1
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-			
-			order by _k.taxon
-			".(isset($offset) ? "offset ".$offset : "")."
-			".(isset($limit) ? "limit ".$limit : "")."
-			"
+		return array(
+			'byYear'=>$byYear,
+			'byTrend'=>$byTrend
 		);
-		
-		return $data;
-
-		//$count=$this->models->Taxon->freeQuery('select found_rows() as total');
-		//return array('count'=>$count[0]['total'],'data'=>$data,'ancestor'=>$taxon);
-
 	}
 
     private function getTaxonContent($p=null)
@@ -1059,16 +1130,15 @@ class SpeciesControllerNSR extends SpeciesController
 		$content=$rdf=null;
 
         switch ($category) {
-
+			/*
             case CTAB_MEDIA:
                 $content=$this->getTaxonMedia(array('id'=>$taxon,'limit'=>$limit,'offset'=>$offset));
-                break;
 
 				if (empty($content) && !$isLower)
 					$content=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
 				
                 break;
-				            
+			*/            
             case CTAB_CLASSIFICATION:
                 //$content=$this->getTaxonClassification($taxon);
                 $content=

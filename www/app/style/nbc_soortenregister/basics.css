@@ -247,6 +247,10 @@ h4 {
     height: 120px;
 }
 
+.imageInGrid3.taxon-page.collected {
+    height: 130px;
+}
+
 .link {
     color: #FA7001;
     text-decoration: none;

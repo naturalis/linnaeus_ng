@@ -40,21 +40,47 @@
 		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
 
 			<div>
-				<h4>Afbeelding{if $results.count!=1}en{/if}: {$results.count}</h4>
-				<div>
+			
+				{if $mediaType=='collected'}
+					<h4>
+						Afbeelding{if $results.totalCount!=1}en{/if}: {$results.totalCount} /
+						soorten met afbeelding: {$results.species}
+						</h4>
+					<div>
 
-				{foreach from=$results.data item=v}
-					<div class="imageInGrid3 taxon-page">
-						<div class="thumbContainer">
-							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
-							</a>
+					{foreach from=$results.data item=v}
+						<div class="imageInGrid3 taxon-page collected">
+							<div class="thumbContainer">
+								<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+								</a>
+							</div>
+							<dl>
+								{if $v.name}<dd>{$v.name}</dd>{/if}
+								<dd><i>{$v.taxon}</i></dd>
+							</dl>
 						</div>
-						<dl>
-							<dt>Foto</dt><dd>{$v.photographer}</dd>
-						</dl>
-					</div>
-				{/foreach}
+					{/foreach}
+
+				{else}
+
+					<h4>Afbeelding{if $results.count!=1}en{/if}: {$results.count}</h4>
+					<div>
+
+					{foreach from=$results.data item=v}
+						<div class="imageInGrid3 taxon-page">
+							<div class="thumbContainer">
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+								</a>
+							</div>
+							<dl>
+								<dt>Foto</dt><dd>{$v.photographer}</dd>
+							</dl>
+						</div>
+					{/foreach}
+					
+				{/if}
 				</div>
 
 				{assign var=pgnResultCount value=$results.count}
@@ -64,7 +90,7 @@
 				{assign var=pgnQuerystring value=$querystring}
 				{include file="../shared/_paginator.tpl"}
 
-				{if showMediaUploadLink}			
+				{if $showMediaUploadLink}			
 				<div>
 					<p>&nbsp;</p>
 					<p>
@@ -103,7 +129,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 			</div>
 
-		{elseif $activeCategory==$smarty.const.TAB_VOORKOMEN ||  $activeCategory==$smarty.const.TAB_VERSPREIDING}
+		{elseif $activeCategory==$smarty.const.TAB_VOORKOMEN || $activeCategory==$smarty.const.TAB_VERSPREIDING}
 
 			<div>
 				<h2>Voorkomen</h2>
@@ -117,11 +143,27 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 					</table>
 				</p>
+				
+				{assign var=trendByYear value=$trendData.byYear|@count>0}
+				{assign var=trendByTrend value=$trendData.byTrend|@count>0}
 
-				<!-- p>
-					<h2>Trend</h2>
-				</p>
+				{if $trendByYear || $trendByTrend}
+
 				<p>
+					<h2>Trend</h2>
+					{if $trendByYear}
+					<div id="graph" style="height:300px;"></div>
+					{/if}
+					{if $trendByTrend}
+					{foreach from=$trendData.byTrend item=v}
+					{$v.trend_label}: {$v.trend}<br />
+					{/foreach}
+					{/if}
+				</p>
+				
+				{/if}
+				
+				<!-- p>
 					<h2>Waarnemingen</h2>
 				</p -->
 
@@ -129,14 +171,31 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					{$content}
 				</p>
 
-				{literal}
 				<script type="text/JavaScript">
 				$(document).ready(function(){
 					// removes inherited html-embedded (and ouddated) status
 					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
+
+					{if $trendByYear}
+					
+					Morris.Bar({
+					  element: 'graph',
+					  data: [
+					  {foreach from=$trendData.byYear item=v}
+						{ y: '{$v.trend_year}', a: {$v.trend} },
+					  {/foreach}
+					  ],
+					  xkey: 'y',
+					  ykeys: ['a'],
+					  labels: [''],
+					  hideHover: true
+					});
+						  
+					{/if}
+
 				});
 				</script>
-				{/literal}
+
 				
 			</div>
 
