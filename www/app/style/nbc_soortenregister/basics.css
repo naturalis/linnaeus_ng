@@ -1,7 +1,7 @@
 html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertical scrollbar/ when page content changes through JS without reload */
 body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 #content {float:left;padding-top:10px}
-#content div {float:left; clear:none; }
+#content div {float:left; clear:none; width:100%;}
 .searchResultMatch {background-color:#ffa;}
 
 #left li {
@@ -277,3 +277,27 @@ h4 {
 	margin-top:0px;
 }
 
+#taxonHeader .full {
+    width: 510px !important;
+}
+
+
+html, body {
+	height: 100%;
+}
+
+#container {
+	min-height: 90%;
+	height: auto !important;
+	height: 70%;
+	margin: 0 auto; /* the bottom margin is the negative value of the footer's height */
+}
+
+#footer {
+	height:7%;
+	margin:0;
+}
+
+#footer #footerInfo a, #footerInfo {
+    color: #FA7001;
+}

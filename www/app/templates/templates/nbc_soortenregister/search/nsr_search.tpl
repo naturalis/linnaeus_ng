@@ -25,10 +25,8 @@
 					{/if}
 					
 					<strong><a href="../species/nsr_taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
-					{$res.dutch_name}
-
+					{if $res.dutch_name}{$res.dutch_name}<br />{/if}
 					{if $res.presence_information_index_label || $res.presence_information_title}
-					<br />
 					{t}Status voorkomen:{/t} {$res.presence_information_index_label} {$res.presence_information_title}
 					{/if}
 				</div>

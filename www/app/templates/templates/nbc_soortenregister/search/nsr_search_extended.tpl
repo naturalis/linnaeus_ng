@@ -18,7 +18,7 @@
 		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
 		<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}">
 
-			<h2 class="search" style="width:500px">{if $search.header}{$search.header}{else}Zoeken naar soorten{/if}</h2>
+			<h2 style="width:510px">{if $search.header}{$search.header}{else}Zoeken naar soorten{/if}</h2>
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
