@@ -1,7 +1,7 @@
 html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertical scrollbar/ when page content changes through JS without reload */
 body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 #content {float:left;padding-top:10px}
-#content div {float:left; clear:none; width:100%;}
+#content div {float:left; clear:none; }
 .searchResultMatch {background-color:#ffa;}
 
 #left li {
