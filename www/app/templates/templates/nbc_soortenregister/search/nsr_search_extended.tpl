@@ -9,6 +9,8 @@
 
 	<div id="content" class="simple-search">
 
+		
+
 		<div>
 
 		<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
@@ -16,7 +18,8 @@
 		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
 		<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}">
 
-			<h2 class="search">Zoeken naar soorten</h2>
+			<h2 class="search" style="width:500px">{if $search.header}{$search.header}{else}Zoeken naar soorten{/if}</h2>
+			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
 					<label accesskey="g" for="search">Soortgroep</label>
@@ -29,7 +32,6 @@
 					<div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 			</fieldset>
-
 
 			<fieldset>
 				<div class="formrow">
@@ -107,6 +109,7 @@
 
 				<input type="submit" class="zoekknop" value="zoek">
 			</fieldset>
+			</div>
 		</form>
 		</div>
 
@@ -114,7 +117,7 @@
 
 		<div id="results">
 			<p>
-				<h4><span id="resultcount-header">{$results.count}</span> voor '{$searchHR}'</h4>
+				<h4><span id="resultcount-header">{$results.count}</span>{if $searchHR} voor '{$searchHR}'{/if}</h4>
 			</p>
 			{foreach from=$results.data item=v}
 				<div class="result">
