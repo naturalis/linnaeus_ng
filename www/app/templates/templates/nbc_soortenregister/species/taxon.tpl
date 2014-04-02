@@ -1,16 +1,5 @@
 {include file="../shared/header.tpl"}
 
-
-{if $names.list[$names.prefId]}
-	{assign var=taxon_display_name value=$names.list[$names.prefId].name}
-{elseif $names.list[$names.sciId]}
-	{assign var=taxon_display_name value="<i>`$names.list[$names.sciId].uninomial` `$names.list[$names.sciId].specific_epithet`</i>"}
-{else}
-	{assign var=taxon_display_name value=$taxon.label}
-{/if}
-
-{assign var=name_scientific_no_author value=$names.list[$names.sciId].concat}
-
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -19,11 +8,11 @@
 
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
-				{if $names.list[$names.sciId].uninomial && $names.list[$names.sciId].specific_epithet}
-					<h1>{$taxon_display_name}</h1>
-					<h2 style="width:510px"><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
+				{if $names.preffered_name}
+					<h1>{$names.preffered_name}</h1>
+					<h2>{$names.nomen}</h2>
 				{else}
-					<h1 class="no-subtitle">{$taxon_display_name}</h1>
+					<h1 class="no-subtitle">{$names.nomen}</h1>
 					<h2></h2>
 				{/if}
 			</div>
@@ -205,9 +194,13 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				<h2>Naamgeving</h2>
 				<table>
 					{foreach from=$names.list item=v}
-					{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
-					{if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
-						<tr><td>{$v.nametype|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.label}</a></td></tr>
+						{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
+						{if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
+						{if $v.nametype=='isValidNameOf' && $taxon.base_rank_id<$smarty.const.SPECIES_RANK_ID}
+							<tr><td>{$v.nametype_label|@ucfirst}</td><td><b>{$v.name}</b></td></tr>
+						{else}
+							<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+						{/if}
 					{/foreach}
 					{if $expert || $organisation}
 						{if $expert}
@@ -306,29 +299,47 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 		{if $rdf}
 		
-		<h2>Bron</h2>
-		<p>
-			<h4 class="source">Auteur(s)</h4>
+			{assign var=hasAuthor value=false}
+			{capture name=authors}
 			{foreach from=$rdf item=v}
-			{if $v.predicate=='hasAuthor'}
-			{$v.data.name}
-			{/if}
-			{/foreach}
-		</p>
-		<p>
-			<h4 class="source">Publicatie</h4>
-			<ul class="reference">
-			{foreach from=$rdf item=v}
-
-			{if $v.predicate=='hasReference'}
-			<li>{$v.data.citation}</li>
-			{elseif $v.object_type=='reference'}
-			<li>{$v.data.source}, {$v.data.label}</li>
+				{if $v.predicate=='hasAuthor'}
+				{assign var=hasAuthor value=true}
+				{$v.data.name}
+				{/if}
+			{/foreach}		
+			{/capture}
+	
+			{if $hasAuthor}			
+			<h2>Bron</h2>
+			<p>
+				<h4 class="source">Auteur(s)</h4>
+				{$smarty.capture.authors}
+			</p>
 			{/if}
 
+
+			{assign var=hasReferences value=false}
+			{capture name=references}
+			{foreach from=$rdf item=v}
+				{if $v.predicate=='hasReference'}
+				{assign var=hasReferences value=true}
+				<li>{$v.data.citation}</li>
+				{elseif $v.object_type=='reference'}
+				{assign var=hasReferences value=true}
+				<li>{$v.data.source}, {$v.data.label}</li>
+				{/if}
 			{/foreach}
-			</ul>
-		</p>
+			{/capture}
+				
+			{if $hasReferences}			
+			<p>
+				<h4 class="source">Publicatie</h4>
+				<ul class="reference">
+				{$smarty.capture.references}
+				</ul>
+			</p>
+			{/if}
+
 		{/if}
 	</div>
 

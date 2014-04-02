@@ -35,11 +35,12 @@ class RdfController extends Controller
 		$rdf=$this->models->Rdf->_get(array(
 			'id' => array(
 				'project_id'=>$this->getCurrentProjectId(),
-				'subject_id'=>$subjectId
+				'subject_id'=>$subjectId,
+				'predicate !='=> ''
 			),
 			'columns'=>'id,project_id,subject_id,subject_type,predicate,object_id,object_type'
 		));
-		
+
 		foreach((array)$rdf as $key=>$val) {
 
 			switch ($val['object_type']) {

@@ -1,5 +1,4 @@
 <?php
-
 /*
 
 automatische tabs
@@ -69,8 +68,7 @@ class SpeciesControllerNSR extends SpeciesController
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 
-
-			$names=$this->getNames($taxon['id']);
+			$names=$this->getNames($taxon);
 			
 			$classification=$this->getTaxonClassification($taxon['id']);
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
@@ -390,8 +388,11 @@ class SpeciesControllerNSR extends SpeciesController
 
     }
 
-	private function getNames($id)
+	private function getNames($p)
 	{
+		
+		$id=isset($p['id']) ? $p['id'] : null;
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
         $names=$this->models->Names->freeQuery(
 			array(
@@ -435,15 +436,14 @@ class SpeciesControllerNSR extends SpeciesController
 			)
 		);
 
-		$sci=$pref=null;
+		$prefferedname=null;
 
 		foreach((array)$names as $key=>$val)
 		{
-			if ($val['nametype']==PREDICATE_VALID_NAME)
-				$sci=$key;
-
 			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
-				$pref=$key;
+			{
+				$prefferedname=$val['name'];
+			}
 
 			if (!empty($val['expert_id']))
 				$names[$key]['expert']=$this->getActor($val['expert_id']);
@@ -451,24 +451,35 @@ class SpeciesControllerNSR extends SpeciesController
 			if (!empty($val['organisation_id']))
 				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
 
-			$names[$key]['nametype']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
-			
-			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && strlen($val['uninomial'].$val['specific_epithet'].$val['infra_specific_epithet'].$val['authorship'])>0)
+			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
+
+
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
-				$names[$key]['concat']=	
-					trim(str_replace('  ',' ',$val['uninomial'].' '.$val['specific_epithet'].' '.$val['infra_specific_epithet']));
-				$names[$key]['label']=
-					'<i>'.trim(str_replace('  ',' ',$val['uninomial'].' '.$val['specific_epithet'].' '.$val['infra_specific_epithet'])).'</i> '.$val['authorship'];
-			} else {
-				$names[$key]['label']=$names[$key]['name'];
+				$nomen=trim($val['uninomial']).' '.trim($val['specific_epithet']).' '.trim($val['infra_specific_epithet']);
+				
+				if (strlen(trim($nomen))==0)
+					$nomen=trim(str_replace($val['authorship'],'',$val['name']));
+				
+				if ($base_rank_id>=GENUS_RANK_ID)
+				{
+					$nomen='<i>'.$nomen.'</i>';
+					$names[$key]['name']=$scientific_name=$nomen.' '.$val['authorship'];
+				}
+				else
+				{
+					$scientific_name=trim($val['name']);
+				}
 			}
 		}
 
-		return array(
-			'sciId'=>$sci,
-			'prefId'=>$pref,
-			'list'=>$names
-		);
+		return
+			array(
+				'scientific_name'=>$scientific_name,
+				'nomen'=>$nomen,
+				'preffered_name'=>$prefferedname,
+				'list'=>$names
+			);
 	}
 
 	private function getActor($id)
