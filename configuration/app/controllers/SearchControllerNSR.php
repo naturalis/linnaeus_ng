@@ -81,7 +81,7 @@ class SearchControllerNSR extends SearchController
     public function searchPicturesAction()
     {
 		$results = $this->doPictureSearch($this->requestData);
-	
+
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
@@ -606,6 +606,7 @@ class SearchControllerNSR extends SearchController
 				file_name as thumb,
 				_c.meta_data as photographer,
 				_k.taxon,
+				_k.taxon as validName,
 				_z.name as dutch_name,
 				_j.uninomial,
 				_j.specific_epithet,
@@ -713,7 +714,7 @@ class SearchControllerNSR extends SearchController
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
-
+		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 		
 		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
