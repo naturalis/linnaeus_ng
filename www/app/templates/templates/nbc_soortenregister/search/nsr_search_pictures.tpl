@@ -28,50 +28,52 @@
 
 		<div>
 		
-		<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
-
-		<input type="hidden" id="name_id" name="name_id" value="{$search.name_id}">
-		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
-
-			<h2 class="search">Zoeken naar afbeeldingen</h2>
-			<fieldset class="block" style="width:450px">
-				<div class="formrow">
-					<label accesskey="g" for="name">Soortnaam</label>
-					<input type="text" class="field" value="{$search.name}" id="name" name="name" autocomplete="off">
-					<div id="name_suggestion" match="start" class="auto_complete" style="display: none;"></div>
+			<h2 class="search">{if $search.header}{$search.header}{else}Zoeken naar afbeeldingen{/if}</h2>
+			<div{if $search.display=='plain'} style="display:none;"{/if}>
+				<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+			
+					<input type="hidden" id="name_id" name="name_id" value="{$search.name_id}">
+					<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
+			
+					<fieldset class="block">
+						<div class="formrow">
+							<label accesskey="g" for="name">Soortnaam</label>
+							<input type="text" class="field" value="{$search.name}" id="name" name="name" autocomplete="off">
+							<div id="name_suggestion" match="start" class="auto_complete" style="display: none;"></div>
+						</div>
+						<div class="formrow">
+							<label accesskey="g" for="group">Soortgroep</label>
+							<input type="text" size="60" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
+							<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+						</div>
+						<div class="formrow">
+							<label accesskey="g" for="photographer">Fotograaf</label>
+							<input type="text" size="60" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">
+							<div id="photographer_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+						</div>
+						<div class="formrow">
+							<label accesskey="g" for="validator">Validator</label>
+							<input type="text" size="60" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
+							<div id="validator_suggestion" match="start" class="auto_complete" style="display: none;"></div>
+						</div>
+					</fieldset>
+	
+					<fieldset>
+						<div class="formrow">
+							<label for="" accesskey="g">Resultaten sorteren op:</label>
+							<select name="sort">
+								<!-- option value="dateModified desc" selected="selected">Datum plaatsing</option -->
+								<option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>Wetenschappelijk naam</option>
+								<option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>Fotograaf</option>
+							</select>
+						</div>
+		
+						<div class="lineBreak" style="width:510px">&nbsp;</div>
+		
+						<input type="submit" class="zoekknop" value="zoek">
+					</fieldset>
+				</form>
 				</div>
-				<div class="formrow">
-					<label accesskey="g" for="group">Soortgroep</label>
-					<input type="text" size="60" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
-					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
-				</div>
-				<div class="formrow">
-					<label accesskey="g" for="photographer">Fotograaf</label>
-					<input type="text" size="60" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">
-					<div id="photographer_suggestion" match="start" class="auto_complete" style="display:none;"></div>
-				</div>
-				<div class="formrow">
-					<label accesskey="g" for="validator">Validator</label>
-					<input type="text" size="60" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
-					<div id="validator_suggestion" match="start" class="auto_complete" style="display: none;"></div>
-				</div>
-			</fieldset>
-
-			<fieldset>
-				<div class="formrow">
-					<label for="" accesskey="g">Resultaten sorteren op:</label>
-					<select name="sort">
-						<!-- option value="dateModified desc" selected="selected">Datum plaatsing</option -->
-						<option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>Wetenschappelijk naam</option>
-						<option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>Fotograaf</option>
-					</select>
-				</div>
-
-				<div class="lineBreak" style="width:100%">&nbsp;</div>
-
-				<input type="submit" class="zoekknop" value="zoek">
-			</fieldset>
-		</form>
 		</div>
 		
 

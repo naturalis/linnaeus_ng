@@ -706,7 +706,7 @@ class SearchControllerNSR extends SearchController
 			
 				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
 				".(!empty($p['name']) && empty($p['name']) ?
-					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.lower_taxon=1"  : "")."
+					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
 

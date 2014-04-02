@@ -2,6 +2,7 @@ html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertica
 body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 #content {float:left;padding-top:10px}
 #content div {float:left; clear:none; }
+#content h2 {width:510px;}
 .searchResultMatch {background-color:#ffa;}
 
 #left li {
@@ -176,6 +177,9 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 	left:100px;
 	top:20px;
 	padding:2px;
+}
+
+#formSearchFacetsSpecies fieldset {
 }
 
 #formSearchFacetsSpecies fieldset.block .formrow {
