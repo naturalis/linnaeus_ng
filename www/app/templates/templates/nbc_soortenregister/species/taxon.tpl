@@ -321,10 +321,10 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			{foreach from=$rdf item=v}
 				{if $v.predicate=='hasReference'}
 				{assign var=hasReferences value=true}
-				{$v.data.citation}<br />
+				{$v.data.citation}</li>
 				{elseif $v.object_type=='reference'}
 				{assign var=hasReferences value=true}
-				{$v.data.source}, {$v.data.label}<br />
+				<li>{$v.data.source}, {$v.data.label}</li>
 				{/if}
 			{/foreach}
 			{/capture}
@@ -332,7 +332,9 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			{if $hasReferences}			
 			<p>
 				<h4 class="source">Publicatie</h4>
+				<ul class="reference">
 				{$smarty.capture.references}
+				</ul>
 			</p>
 			{/if}
 
