@@ -321,7 +321,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			{foreach from=$rdf item=v}
 				{if $v.predicate=='hasReference'}
 				{assign var=hasReferences value=true}
-				{$v.data.citation}</li>
+				<li>{$v.data.citation}</li>
 				{elseif $v.object_type=='reference'}
 				{assign var=hasReferences value=true}
 				<li>{$v.data.source}, {$v.data.label}</li>

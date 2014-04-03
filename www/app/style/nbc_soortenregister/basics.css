@@ -78,7 +78,11 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 .classification-rank {
 	font-size:0.75em;
 	padding-left:0px;
+	display:inline-block;
+	vertical-align:bottom;
+	padding-bottom:1px;
 }
+
 .classification-rank .smaller{
 	font-size:10px;
 }
