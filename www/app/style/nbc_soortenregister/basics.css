@@ -68,6 +68,9 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 }
 .classification-connector {
 	color:#777;
+	display:inline;
+	background:url(../../style/nbc_soortenregister/images/taxon_connect.gif) no-repeat scroll left top rgba(0, 0, 0, 0);
+	padding-left:8px;
 }
 .classification-connector-invisible {
 	visibility:hidden;
@@ -304,4 +307,22 @@ html, body {
 
 #footer #footerInfo a, #footerInfo {
     color: #FA7001;
+}
+
+.taxonoverzicht
+{
+	list-style: none;
+}
+
+.taxonoverzicht li
+{
+	margin-left: 10px;
+	padding-left: 8px; /* afstand naar stippellijn */
+	background:url(../../style/nbc_soortenregister/images/taxon_connect.gif) no-repeat scroll left top;
+}
+
+.taxonoverzicht li.root
+{
+	margin-left: -8px !important;
+	background:none;
 }
