@@ -20,7 +20,7 @@
 			<div id="taxonImage">
 				<img src="http://images.naturalis.nl/510x272/{$overviewImage.image}" />
 				<div id="taxonImageCredits">
-					<span class="photographer-title">Foto</span> {$overviewImage.label} 
+					<span class="photographer-title">{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - foto</span> {$overviewImage.label} 
 				</div>
 			</div>
 			{/if}
@@ -214,27 +214,25 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 			<p>
 				<h2>Indeling</h2>
-				<table id="name-tree">
+				<ul class="taxonoverzicht">
+					<li class="root">
 					{foreach from=$classification item=v key=x}
 					{if $v.parent_id!=null}{* skipping top most level "life" *}
-					{math equation="((x-2) * 5)" x=$x assign=buffercount}
-					<tr><td>
-						{if $x>1}
-						{'&nbsp;'|str_repeat:$buffercount}
-						<span class="classification-connector">&lfloor;</span>
-						{/if}
 						<span class="classification-preffered-name"><a href="?id={$v.id}">{$v.taxon}</a></span>
 						<span class="classification-rank">[{$v.rank}]</span>
 						{if $v.dutch_name}<br />
-						{if $x>1}
-						{'&nbsp;'|str_repeat:$buffercount}
-						<span class="classification-connector-invisible">&lfloor;</span>
-						{/if}
 						<span class="classification-accepted-name">{$v.dutch_name}</span>{/if}
-					</td></tr>
-					{/if }
-					{/foreach}			
-				</table>
+						<ul class="taxonoverzicht">
+							<li>
+					{/if}
+					{/foreach}
+					{foreach from=$classification item=v key=x}
+					{if $v.parent_id!=null}{* skipping top most level "life" *}
+					</li></ul>
+					{/if}
+					{/foreach}
+					</li>				
+				</ul>
 			</p>
 
 			<p>
@@ -323,10 +321,10 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			{foreach from=$rdf item=v}
 				{if $v.predicate=='hasReference'}
 				{assign var=hasReferences value=true}
-				<li>{$v.data.citation}</li>
+				{$v.data.citation}<br />
 				{elseif $v.object_type=='reference'}
 				{assign var=hasReferences value=true}
-				<li>{$v.data.source}, {$v.data.label}</li>
+				{$v.data.source}, {$v.data.label}<br />
 				{/if}
 			{/foreach}
 			{/capture}
@@ -334,9 +332,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			{if $hasReferences}			
 			<p>
 				<h4 class="source">Publicatie</h4>
-				<ul class="reference">
 				{$smarty.capture.references}
-				</ul>
 			</p>
 			{/if}
 

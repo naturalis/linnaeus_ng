@@ -389,8 +389,7 @@ class SpeciesControllerNSR extends SpeciesController
     }
 
 	private function getNames($p)
-	{
-		
+	{	
 		$id=isset($p['id']) ? $p['id'] : null;
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
@@ -463,8 +462,8 @@ class SpeciesControllerNSR extends SpeciesController
 				
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
-					$nomen='<i>'.$nomen.'</i>';
-					$names[$key]['name']=$scientific_name=$nomen.' '.$val['authorship'];
+					$nomen='<i>'.trim($nomen).'</i>';
+					$names[$key]['name']=trim($scientific_name=$nomen.' '.$val['authorship']);
 				}
 				else
 				{
@@ -495,7 +494,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonOverviewImage($id)
 	{
-		$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta1.meta_date desc','limit'=>1));
+		$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'meta_datum_plaatsing','limit'=>1));
 		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 
@@ -521,6 +520,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_k.taxon,
 				_z.name as dutch_name,
 				_j.name,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
@@ -617,6 +617,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 
 			$metaData=array(
+				'' => (!empty($val['dutch_name']) ? $val['dutch_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
 				'Fotograaf' => $val['photographer'],
 				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],

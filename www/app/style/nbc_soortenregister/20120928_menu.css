@@ -124,26 +124,6 @@
 	font-size: .9em;
 }
 
-/* Menu indeling 
-----------------------------------*/
-
-.taxonoverzicht, .taxonoverzicht ul, .taxonoverzicht li
-{
-	list-style: none;
-}
-
-.taxonoverzicht ul li
-{
-	margin-left: 10px;
-	padding-left: 8px; /* afstand naar stippellijn */
-	background: url(images/taxon_connect.gif) no-repeat left top;
-}
-
-.taxonoverzicht li#root 
-{
-	margin-left: 0 !important;
-}
-
 /* Breadcrumbs (pad) 
 ----------------------------------*/
 #breadcrumb

@@ -35,12 +35,12 @@
 			<table id="name-tree">
 			{math equation="(x-2)" x=$classification|@count assign=start}
 			{section name=taxon loop=$classification start=$start}
-				{math equation="(x-y)*2" x=$smarty.section.taxon.index y=$start assign=buffercount}
+				{math equation="(x-y)*3" x=$smarty.section.taxon.index y=$start assign=buffercount}
 				{if $classification[taxon].parent_id!=null}
 				<tr><td>
 					{if $buffercount>0}
 					{'&nbsp;'|str_repeat:$buffercount}
-					<span class="classification-connector">&lfloor;</span>
+					<span class="classification-connector"></span>
 					{/if}
 					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{/if}">
 					<a href="nsr_taxon.php?id={$classification[taxon].id}">
@@ -67,22 +67,19 @@
 				{/if}
 			{/section}
 
-					{foreach from=$children item=v key=x}
-					<tr><td>
-						{'&nbsp;'|str_repeat:($buffercount+2)}
-						<span class="classification-connector">&lfloor;</span>
-						<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name|replace:$lastname:''}</a></span>
-						<span class="classification-rank">[{$v.rank}]</span>
-						{if $v.species_count.total>0}
-						<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
-						{/if}
-					</td></tr>
-					{/foreach}			
-
-			
-			
-			
+			{foreach from=$children item=v key=x}
+			<tr><td>
+				{'&nbsp;'|str_repeat:($buffercount+4)}
+				<span class="classification-connector"></span>
+				<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name|replace:$lastname:''}</a></span>
+				<span class="classification-rank">[{$v.rank}]</span>
+				{if $v.species_count.total>0}
+				<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
+				{/if}
+			</td></tr>
+			{/foreach}			
 			</table>
+
 		</div>  
 
 	</div>

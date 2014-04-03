@@ -2,27 +2,30 @@
 
 <div id="dialogRidge">
 
-	{include file="_left_column.tpl"}
+	<div id="left">
+        <div>
+            <h2>&nbsp;</h2>
+        </div>
+	</div>
 	
 	<div id="content" class="literature">
 
 		<h2 style="margin-top: 17px; margin-bottom: 6px">{$ref.label}</h2>
 
-			<table id="refdata" class="panel" border="0" cellpadding="0" cellspacing="0">
-				<tbody id="refdata_body">
-				{if $ref.publication_type}<tr ><th>Type</th><td>{$ref.publication_type}</td></tr>{/if}
+			<table>
+				{if $ref.publication_type}<tr><td>Type</td><td>{$ref.publication_type}</td></tr>{/if}
 
-				{if $ref.actor_name}<tr><th>Auteur(s)</th><td>{$ref.actor_name}</td></tr>
-				{elseif $ref.author}<tr><th>Auteur(s)</th><td>{$ref.author}</td></tr>{/if}
+				{if $ref.actor_name}<tr><td>Auteur(s)</td><td>{$ref.actor_name}</td></tr>
+				{elseif $ref.author}<tr><td>Auteur(s)</td><td>{$ref.author}</td></tr>{/if}
 
-				{if $ref.date}<tr><th>Jaar</th><td>{$ref.date}</td></tr>{/if}
-				{if $ref.label}<tr><th>Titel</th><td>{$ref.label}</td></tr>{/if}
-				{if $ref.publishedin_actor_name}<tr><th>Uitgever</th><td>{$ref.publishedin_actor_name}</td></tr>{/if}
+				{if $ref.date}<tr><td>Jaar</td><td>{$ref.date}</td></tr>{/if}
+				{if $ref.label}<tr><td>Titel</td><td>{$ref.label}</td></tr>{/if}
+				{if $ref.publishedin_actor_name}<tr><td>Uitgever</td><td>{$ref.publishedin_actor_name}</td></tr>{/if}
 
-				{if $ref.volume}<tr><th>Volume</th><td>{$ref.volume}</td></tr>{/if}
-				{if $ref.pages}<tr><th>Pagina's</th><td>{$ref.pages}</td></tr>{/if}
-				{if $ref.presence_label}<tr><th>Status</th><td>{$ref.presence_label}</td></tr>{/if}
-				{if $ref.external_link}<tr><th>Status</th><td>{$ref.external_link}</td></tr>{/if}
+				{if $ref.volume}<tr><td>Volume</td><td>{$ref.volume}</td></tr>{/if}
+				{if $ref.pages}<tr><td>Pagina's</td><td>{$ref.pages}</td></tr>{/if}
+				{if $ref.presence_label}<tr><td>Status</td><td>{$ref.presence_label}</td></tr>{/if}
+				{if $ref.external_link}<tr><td>Status</td><td>{$ref.external_link}</td></tr>{/if}
 				</tbody>
 			</table>
 		</div>
