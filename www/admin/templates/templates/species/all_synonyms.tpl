@@ -1,11 +1,17 @@
 {include file="../shared/admin-header.tpl"}
 
 <style>
+.toggler {
+	cursor:pointer;
+}
 .identical {
 	color:red;
 }
 .similar{
 	color:orange;
+}
+.head{
+	color:black;
 }
 </style>
 
@@ -15,12 +21,13 @@
 {t}No synonyms have been defined.{/t}
 {else}
 <p class="instruction-text">
-<span class="similar" onclick="$('tr.similar').toggle();">Orange synonyms</span> are identical to the one before, but have a different author. <span class="identical" onclick="$('tr.identical').toggle();">Red ones</span> are identical in both synonym and author.<br />
+<span class="similar toggler" onclick="$('tr:not(\'[class=similar]\')').toggle();">Orange synonyms</span> are identical to the one before, but have a different author.
+<span class="identical toggler" onclick="$('tr:not(\'[class=identical]\')').toggle();">Red ones</span> are identical in both synonym and author.<br />
 Double-click a synonym or author (of the empty cell where the author should be) to edit. When editing, Enter saves the new entry, Escape cancels the edit.
 <span class="message-error">Be aware: clicking the delete button immediately deletes the synonym, without confirmation.</span>
 </p>
 <table>
-	<tr>
+	<tr class='similar identical head'>
 		<th style="width:10px" title="{t}corresponding taxon{/t}">taxon</th>
 		<th style="width:450px">{t}synonym{/t}</th>
 		<th style="width:250px">{t}author{/t}</th>
