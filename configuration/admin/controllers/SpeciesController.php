@@ -338,65 +338,6 @@ class SpeciesController extends Controller
 		$this->printPage();
     }
 
-    public function listAction ()
-    {
-
-        $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Taxon list'));
-        
-		$this->setActiveTaxonId(null);
-		
-		$projectLanguages = $this->getProjectLanguages();
-		$pageCount = $this->getPageTaxonCount();
-		$contentCount = $this->getContentTaxaCount();
-
-		$treeType=$this->getSetting('taxon_tree_type','recursive');
-
-		if ($treeType=='recursive') {
-
-			$this->newGetTaxonTree();
-			$taxa=isset($this->treeList) ? $this->treeList : null;
-			foreach((array)$contentCount as $key => $val)
-				$contentCount[$key]['pctFinished'] = round(($val['total'] / (count((array) $projectLanguages) * $pageCount)) * 100);
-			
-			$this->smarty->assign('contentCount', $contentCount);
-			$this->smarty->assign('synonymsCount', $this->getSynonymCount());
-			$this->smarty->assign('commonnameCount', $this->getCommonnameCount());
-			$this->smarty->assign('mediaCount', $this->getMediaTaxonCount());
-			$this->smarty->assign('literatureCount', $this->getLiteratureTaxonCount());
-			
-			if ($this->getIsHigherTaxa()) {
-				
-				$ranks = $this->getProjectRanks(array(
-					'includeLanguageLabels' => true, 
-					'idsAsIndex' => true
-				));
-				
-				$this->smarty->assign('higherOnly', true);	
-	
-			}
-	
-			if (isset($ranks)) $this->smarty->assign('ranks', $ranks);		
-			if (isset($projectLanguages)) $this->smarty->assign('languages', $projectLanguages);
-			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
-
-			$tpl='list';
-
-		} else
-		if ($treeType=='unfolding') {
-
-			$taxa=$this->getTreeRoots();
-    	    $tpl='list-unfolding';
-
-		}
-
-		if (count((array)$taxa)==0)	$this->addMessage($this->translate('There are no taxa for you to edit.'));
-		$this->smarty->assign('taxa', $taxa);
-   	    $this->printPage($tpl);
-
-    }
-
     public function allSynonymsAction ()
     {
         
