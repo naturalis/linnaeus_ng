@@ -61,7 +61,7 @@ function allLookupGetData(text,getAll) {
 	allLookupDataShowLoading();
 
 	if (allLookupData==null || allLookupAlwaysFetch) {
-
+console.dir(allLookupContentUrl);
 		$.ajax({
 			url : allLookupContentUrl,
 			type: "POST",
@@ -75,7 +75,7 @@ function allLookupGetData(text,getAll) {
 				time : allGetTimestamp()
 			}),
 			success : function (data) {
-				console.log(data);
+				//console.log(data);
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
