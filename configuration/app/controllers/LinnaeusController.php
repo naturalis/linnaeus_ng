@@ -318,7 +318,7 @@ class LinnaeusController extends Controller
 		$search=isset($p['search']) ? $p['search'] : null;
 		$match_start=isset($p['match_start']) ? $p['match_start']==1 : false;
 
-		$taxa=$this->models->Taxon->freeQuery("
+		$data=$this->models->Taxon->freeQuery("
 			select * from
 			(
 				select
@@ -369,10 +369,10 @@ class LinnaeusController extends Controller
 			limit 100
 		");
 		
-		foreach((array)$taxa as $key=>$val)
+		foreach((array)$data as $key=>$val)
 		{
 			if ($val['source']=='species')
-				$taxa[$key]['label']=$this->formatTaxon(array('taxon'=>$val['label'],'rank_id'=>$val['rank_id'],'rankpos'=>'post'));
+				$taxa[$key]['label']='?'.$this->formatTaxon(array('taxon'=>$val['label'],'rank_id'=>$val['rank_id'],'rankpos'=>'post'));
 		}
 		
 		
@@ -422,7 +422,7 @@ class LinnaeusController extends Controller
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
-				$taxa,
+				$data,
 				$this->controllerBaseName,
 				null,
 				true
