@@ -1391,7 +1391,7 @@ class Controller extends BaseClass
     }
 	
     public function formatTaxon($p=null) //($taxon,$ranks=null)
-    {var_dump($p);
+    {
 		
 		if (is_null($p))
 			return;
@@ -1410,7 +1410,7 @@ class Controller extends BaseClass
 			$rankpos='pre';
 
 		}
-
+var_dump($rankpos);
 		if (empty($taxon))
 			return;
 
