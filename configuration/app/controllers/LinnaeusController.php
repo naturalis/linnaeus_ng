@@ -322,7 +322,7 @@ class LinnaeusController extends Controller
 			select * from
 			(
 				select
-					id,taxon as label,'species' as source, concat('../species/taxon.php?id=',id) as url
+					id,taxon as label,'species A' as source, concat('../species/taxon.php?id=',id) as url
 				from
 					%PRE%taxa
 				where
@@ -332,7 +332,7 @@ class LinnaeusController extends Controller
 			union
 	
 				select
-					taxon_id as id,commonname as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+					taxon_id as id,commonname as label,'species B' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
 				from
 					%PRE%commonnames
 				where
@@ -342,7 +342,7 @@ class LinnaeusController extends Controller
 			union
 	
 				select
-					taxon_id as id,synonym as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+					taxon_id as id,synonym as label,'species C' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
 				from
 					%PRE%synonyms
 				where
