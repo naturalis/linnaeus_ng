@@ -1439,6 +1439,7 @@ class Controller extends BaseClass
         if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
 			$name = ($rankpos=='post' ? ('<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName) : ($rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>'));
             //$name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
+var_dump($rankpos);
 			die($name);
 			return $name;
         }
