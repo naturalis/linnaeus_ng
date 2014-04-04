@@ -322,52 +322,12 @@ class LinnaeusController extends Controller
 			select * from
 			(
 				select
-					id,taxon as label,'species A' as source, concat('../species/taxon.php?id=',id) as url
+					id,taxon as label,'species' as source, concat('../species/taxon.php?id=',id) as url, rank_id
 				from
 					%PRE%taxa
 				where
 					project_id = ".$this->getCurrentProjectId() ."
 					".($search=='*' ? "" : "and taxon like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-					
-			union
-	
-				select
-					taxon_id as id,commonname as label,'species B' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
-				from
-					%PRE%commonnames
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and commonname like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-			union
-	
-				select
-					taxon_id as id,synonym as label,'species C' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
-				from
-					%PRE%synonyms
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-			union
-	
-				select
-					id,term as label,'glossary' as source, concat('../glossary/term.php?id=',id) as url
-				from
-					%PRE%glossary
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and term like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-			union
-	
-				select
-					glossary_id as id,synonym as label,'glossary' as source, concat('../glossary/term.php?id=',glossary_id) as url
-				from
-					%PRE%glossary_synonyms
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
 
 			union
 			
@@ -381,7 +341,7 @@ class LinnaeusController extends Controller
 						', ',
 						year,
 						ifnull(suffix,'')
-					) as label,'literature' as source, concat('../literature/reference.php?id=',id) as url
+					) as label,'literature' as source, concat('../literature/reference.php?id=',id) as url, null as rank_id
 				from %PRE%literature
 				where
 					project_id = ".$this->getCurrentProjectId() ."
@@ -396,7 +356,7 @@ class LinnaeusController extends Controller
 			union
 
 				select 
-					id,topic as label,'introduction' as source, concat('../introduction/topic.php?id=',id) as url
+					id,topic as label,'introduction' as source, concat('../introduction/topic.php?id=',id) as url, null as rank_id
 				from
 					%PRE%content_introduction
 				where
@@ -408,7 +368,57 @@ class LinnaeusController extends Controller
 			order by label
 			limit 100
 		");
+		
+		foreach((array)$taxa as $key=>$val)
+		{
+			if ($val['source']=='species')
+				$taxa[$key]['label']=$this->formatTaxon(array('taxon'=>$val['label'],'rank_id'=>$val['rank_id']));
+		}
+		
+		
+/*
 
+			union
+	
+				select
+					id,term as label,'glossary' as source, concat('../glossary/term.php?id=',id) as url
+				from
+					%PRE%glossary
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and term like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+	
+				select
+					taxon_id as id,commonname as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+				from
+					%PRE%commonnames
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and commonname like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+	
+				select
+					taxon_id as id,synonym as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+				from
+					%PRE%synonyms
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+	
+				select
+					glossary_id as id,synonym as label,'glossary' as source, concat('../glossary/term.php?id=',glossary_id) as url
+				from
+					%PRE%glossary_synonyms
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+*/
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
@@ -419,10 +429,6 @@ class LinnaeusController extends Controller
 			)
 		); 
 			
-//		q($t);
-
-
-//die();
 	}
 
 
