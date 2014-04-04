@@ -1402,7 +1402,7 @@ class Controller extends BaseClass
 			$taxon=$p['taxon'];
 			$ranks=isset($p['ranks']) ? $p['ranks'] : null;
 			$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post')) ? $p['rankpos'] : 'pre');
-var_dump($p['rankpos']);var_dump(in_array($p['rankpos'],array('pre','post')));
+
 		} else {
 
 			$taxon=$p;
