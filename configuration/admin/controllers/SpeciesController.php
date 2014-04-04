@@ -5755,6 +5755,7 @@ class SpeciesController extends Controller
 		
 	}
 
+
     private function getLookupList($p)
     {
 
@@ -5767,17 +5768,21 @@ class SpeciesController extends Controller
 
 		$regexp = ($matchStartOnly?'^':'').preg_quote($search);
         
-        $taxa = $this->models->Taxon->freeQuery(
-			array(
-				'query' => "
-					select _a.id, _a.taxon, _a.rank_id, _a.is_hybrid
-					from %PRE%taxa _a 
-					left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
-					where _a.project_id = ".$this->getCurrentProjectId()."
-					and _b.lower_taxon = ".($this->getIsHigherTaxa() ? 0 : 1)."
-					".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
-					limit ".$this->_lookupListMaxResults
-			));
+        $taxa = $this->models->Taxon->freeQuery("
+			select
+				_a.id, _a.taxon, _a.rank_id, _a.is_hybrid
+			from
+				%PRE%taxa _a 
+			left join %PRE%projects_ranks _b
+				on _a.project_id=_b.project_id 
+				and _a.rank_id=_b.id 
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _b.lower_taxon = ".($this->getIsHigherTaxa() ? 0 : 1)."
+			".($getAll ? "" : "and _a.taxon like '%".$regexp."%'")."
+			limit ".$this->_lookupListMaxResults
+		);
+		
 
         foreach ((array) $taxa as $key => $val) {
 			$taxa[$key]['label'] = $this->formatTaxon($val);
@@ -5789,8 +5794,6 @@ class SpeciesController extends Controller
             'dir' => 'asc', 
             'case' => 'i'
 		));
-
-
 
 		return
 			$this->makeLookupList(
