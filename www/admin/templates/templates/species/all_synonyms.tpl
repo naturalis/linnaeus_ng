@@ -29,8 +29,8 @@ Double-click a synonym or author (of the empty cell where the author should be) 
 <table>
 	<tr class='similar identical head'>
 		<th style="width:10px" title="{t}corresponding taxon{/t}">taxon</th>
-		<th style="width:450px">{t}synonym{/t}</th>
-		<th style="width:250px">{t}author{/t}</th>
+		<th style="width:400px">{t}synonym{/t}</th>
+		<th style="width:300px">{t}author{/t}</th>
 		<th title="{t}delete synonym{/t}">delete</th>
 	</tr>
 	{foreach from=$synonyms item=v}
