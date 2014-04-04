@@ -1025,7 +1025,6 @@ class MapKeyController extends Controller
 
 		}
 		
-		
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
