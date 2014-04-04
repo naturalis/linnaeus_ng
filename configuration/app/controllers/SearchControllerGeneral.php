@@ -895,6 +895,7 @@ class SearchControllerGeneral extends SearchController
 		$content = $this->models->ContentIntroduction->_get(
 			array(
 				'id' => array(
+					
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','content')),
@@ -903,7 +904,7 @@ class SearchControllerGeneral extends SearchController
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 			)
 		);
-
+		
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 		$content = $this->sortResultsByMostTokensFound($content);
