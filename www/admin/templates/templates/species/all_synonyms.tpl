@@ -6,6 +6,7 @@
 {t}No synonyms have been defined.{/t}
 {else}
 <p class="instruction-text">
+Orange synonyms are identical to the one before, but have a different author. Red ones are identical in both synonym and author.<br />
 Double-click a synonym or author (of the empty cell where the author should be) to edit. When editing, Enter saves the new entry, Escape cancels the edit.
 <span class="message-error">Be aware: clicking the delete button immediately deletes the synonym, without confirmation.</span>
 </p>
@@ -17,12 +18,15 @@ Double-click a synonym or author (of the empty cell where the author should be) 
 		<th title="{t}delete synonym{/t}">delete</th>
 	</tr>
 	{foreach from=$synonyms item=v}
-	<tr class="tr-highlight" id="syn-{$v.id}">
+	<tr class="tr-highlight" style="vertical-align:top" id="syn-{$v.id}">
 		<td style="white-space:nowrap"><a href="synonyms.php?id={$v.taxon_id}" style="color:#777">{$v.taxon}</a></td>
-		<td ondblclick="taxonSynonymEditSyn(this,{$v.id});">{$v.synonym}</td>
-		<td ondblclick="taxonSynonymEditAuth(this,{$v.id});">{$v.author}</td>
+		<td ondblclick="taxonSynonymEditSyn(this,{$v.id});"{if $prevz==$v.taxon_id && $v.synonym==$preva && $v.author==$prevb}style="color:red;"{else if $prevz==$v.taxon_id && $v.synonym==$preva}style="color:orange;"{/if}>{$v.synonym}</td>
+		<td ondblclick="taxonSynonymEditAuth(this,{$v.id});"{if $prevz==$v.taxon_id && $v.synonym==$preva && $v.author==$prevb}style="color:red;"{/if}>{$v.author}</td>
 		<td style="text-align:center" class="a" onclick="taxonEasySynonymDelete({$v.id});">x</td>
 	</tr>
+	{assign var=prevz value=$v.taxon_id}
+	{assign var=preva value=$v.synonym}
+	{assign var=prevb value=$v.author}
 	{/foreach}
 </table>
 {/if}
