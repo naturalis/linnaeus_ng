@@ -75,7 +75,7 @@ function allLookupGetData(text,getAll) {
 				time : allGetTimestamp()
 			}),
 			success : function (data) {
-				//console.log(data);
+				console.log(data);
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
