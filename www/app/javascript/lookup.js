@@ -61,7 +61,7 @@ function allLookupGetData(text,getAll) {
 	allLookupDataShowLoading();
 
 	if (allLookupData==null || allLookupAlwaysFetch) {
-console.log(allLookupContentUrl);
+
 		$.ajax({
 			url : allLookupContentUrl,
 			type: "POST",

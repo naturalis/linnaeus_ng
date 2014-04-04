@@ -372,7 +372,7 @@ class LinnaeusController extends Controller
 		foreach((array)$data as $key=>$val)
 		{
 			if ($val['source']=='species')
-				$taxa[$key]['label']=$this->formatTaxon(array('taxon'=>$val['label'],'rank_id'=>$val['rank_id'],'rankpos'=>'post'));
+				$data[$key]['label']=$this->formatTaxon(array('taxon'=>$val['label'],'rank_id'=>$val['rank_id'],'rankpos'=>'post'));
 		}
 		
 		
