@@ -5,13 +5,7 @@
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
-<a href="list.php" class="allLookupLink">{t}Taxon list{/t}</a>
-<a href="branches.php" class="allLookupLink">Taxon list v2</a>
-{*if $isHigherTaxa}
-<a href="ht_list.php" class="allLookupLink">{t}Higher taxa list{/t}</a>
-{else}
-<a href="sp_list.php" class="allLookupLink">{t}Taxon list{/t}</a>
-{/if*}
+<a href="branches.php" class="allLookupLink">Taxon list</a>
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
 <a href="../search/index.php">Extensive search</a>
