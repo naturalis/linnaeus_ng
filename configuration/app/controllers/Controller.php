@@ -1431,13 +1431,13 @@ class Controller extends BaseClass
         
         // Rank level is above genus; no formatting
         if ($rankId < GENUS_RANK_ID) {
-			return ($rankpos=='post' ? $taxon['taxon'].', '.$rankName : $rankName . ' ' . $taxon['taxon']);
+			return '1'.($rankpos=='post' ? ($taxon['taxon'].', '.$rankName) : ($rankName . ' ' . $taxon['taxon']));
             //return $rankName . ' ' . $taxon['taxon'];
         }
         
         // Genus or subgenus; add italics
         if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
-			$name = ($rankpos=='post' ? '<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName : $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>');
+			$name = '2'.($rankpos=='post' ? ('<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName) : ($rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>'));
             //$name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
 
