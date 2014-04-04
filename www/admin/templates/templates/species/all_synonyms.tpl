@@ -33,8 +33,18 @@ Double-click a synonym or author (of the empty cell where the author should be) 
 		<th style="width:300px">{t}author{/t}</th>
 		<th title="{t}delete synonym{/t}">delete</th>
 	</tr>
-	{foreach from=$synonyms item=v}
-	<tr class="tr-highlight{if $prevz==$v.taxon_id && $v.synonym==$preva && $v.author==$prevb} identical{else if $prevz==$v.taxon_id && $v.synonym==$preva} similar{/if}" style="vertical-align:top" id="syn-{$v.id}">
+	{foreach from=$synonyms item=v key=k}
+	<tr class="tr-highlight
+		{if $v.taxon==$synonyms[$k+1].taxon && $v.synonym==$synonyms[$k+1].synonym && $v.author!=$synonyms[$k+1].author}
+		prev-similar
+		{/if}
+		{if $prevz==$v.taxon_id && $v.synonym==$preva && $v.author==$prevb}
+		identical
+		{else if $prevz==$v.taxon_id && $v.synonym==$preva}
+		similar
+		{/if}" 
+		style="vertical-align:top" id="syn-{$v.id}">
+
 		<td style="white-space:nowrap"><a href="synonyms.php?id={$v.taxon_id}" style="color:#777">{$v.taxon}</a></td>
 		<td ondblclick="taxonSynonymEditSyn(this,{$v.id});">{$v.synonym}</td>
 		<td ondblclick="taxonSynonymEditAuth(this,{$v.id});">{$v.author}</td>
