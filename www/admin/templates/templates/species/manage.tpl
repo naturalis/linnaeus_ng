@@ -7,7 +7,7 @@
 {if $errors|@count ==0}
 {t}Editing taxa:{/t}
 <ul class="admin-list">
-	<li><a href="list.php">{t}Taxon list{/t}</a></li>
+	<li><a href="branches.php">{t}Taxon list{/t}</a></li>
 	<li><a href="orphans.php">{t}Orphans (taxa outside of the main taxon tree){/t}</a></li>
 </ul>
 <ul class="admin-list">
