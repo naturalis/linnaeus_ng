@@ -1150,26 +1150,52 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getTrendData($id)
 	{
-		$byYear=$this->models->TaxonTrendYears->_get(array(
-			'id'=>array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $id
-			),
-			'columns'=>'trend_year,trend',
-			'order'=>'trend_year'
-		));
+		$byYear=$this->models->TaxonTrendYears->freeQuery("
+			select 
+				_a.trend_year,
+				_a.trend,
+				_b.source
+			from %PRE%taxon_trend_years _a
+			
+			left join %PRE%trend_sources _b
+				on _a.project_id=_b.project_id
+				and _a.source_id=_b.id
+			
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.taxon_id = ".$id." 
+			order by _a.trend_year
+		");
 
-		$byTrend=$this->models->TaxonTrends->_get(array(
-			'id'=>array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $id
-			),
-			'columns'=>'trend_label,trend'
-		));
-		
+
+		$byTrend=$this->models->TaxonTrends->freeQuery("
+			select 
+				_a.trend_label,
+				_a.trend,
+				_b.source
+			from %PRE%taxon_trends _a
+			
+			left join %PRE%trend_sources _b
+				on _a.project_id=_b.project_id
+				and _a.source_id=_b.id
+			
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.taxon_id = ".$id." 
+			order by _a.trend_label
+		");		
+
+		$sources=array();
+
+		foreach(array_merge($byYear,$byTrend) as $val)
+			$sources[$val['source']]=$val['source'];
+
+		sort($sources);
+			
 		return array(
 			'byYear'=>$byYear,
-			'byTrend'=>$byTrend
+			'byTrend'=>$byTrend,
+			'sources'=>$sources
 		);
 	}
 
