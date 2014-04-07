@@ -135,6 +135,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				
 				{assign var=trendByYear value=$trendData.byYear|@count>0}
 				{assign var=trendByTrend value=$trendData.byTrend|@count>0}
+				{assign var=trendSources value=$trendData.sources|@count>0}
 
 				{if $trendByYear || $trendByTrend}
 
@@ -147,6 +148,14 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					{foreach from=$trendData.byTrend item=v}
 					{$v.trend_label}: {$v.trend}<br />
 					{/foreach}
+					{/if}
+					{if $trendSources}
+					<br />
+					Bron:
+					{foreach from=$trendData.sources item=v key=k}
+					{if $k>0}, {/if}{$v}
+					{/foreach}
+					(via <a href="http://www.netwerkecologischemonitoring.nl" target="_blank">Netwerk Ecologische Monitoring</a>)
 					{/if}
 				</p>
 				
