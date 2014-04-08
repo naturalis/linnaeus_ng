@@ -63,6 +63,8 @@ class SpeciesControllerNSR extends SpeciesController
 
         if (!empty($taxon))
 		{
+			
+			$sideBarLogos=array();
 
 			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
 
@@ -147,6 +149,18 @@ class SpeciesControllerNSR extends SpeciesController
 				$atlasData['content']=file_get_contents($atlasData['service_url']);
 				
 				$this->smarty->assign('atlasData',$atlasData);
+				
+				if (!empty($atlasData['logo']))
+				{
+					array_push(
+						$sideBarLogos,
+						array(
+							'organisation'=>$atlasData['organisation'],
+							'logo'=>$atlasData['logo'],
+							'url'=>$atlasData['organisation_url']
+						)
+					);
+				}
 
 			} else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
@@ -178,6 +192,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
 			
+            $this->smarty->assign('sideBarLogos',$sideBarLogos);
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',$categories['categories']);
             $this->smarty->assign('activeCategory',$categories['start']);
@@ -1365,6 +1380,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$t=$this->models->ExternalOrgs->freeQuery("
 			select
 				name,
+				organisation_url,
 				general_url,
 				service_url,
 				external_id
@@ -1382,8 +1398,24 @@ class SpeciesControllerNSR extends SpeciesController
 		
 		if ($t)
 		{
+			$name=$t[0]['name'];
+			
+			if (file_exists($this->getProjectUrl('projectMedia').$name.'.png'))
+			{
+				$logo=$this->getProjectUrl('projectMedia').$name.'.png';
+			} 
+			else
+			if (file_exists($this->getProjectUrl('projectMedia').$name.'.jpg'))
+			{
+				$logo=$this->getProjectUrl('projectMedia').$name.'.jpg';
+			} 
+			else
+				$logo=null;
+
 			return array(
-				'organisation' => $t[0]['name'],
+				'organisation' => $name,
+				'logo'=> $logo,
+				'organisation_url' => $t[0]['organisation_url'],
 				'general_url' => sprintf($t[0]['general_url'],$t[0]['external_id']),
 				'service_url' => sprintf($t[0]['service_url'],$t[0]['external_id']),
 				'id' => $t[0]['external_id']

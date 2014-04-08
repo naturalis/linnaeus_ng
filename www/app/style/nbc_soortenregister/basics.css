@@ -330,3 +330,7 @@ html, body {
 	margin-left: -8px !important;
 	background:none;
 }
+
+#sideBarLogos {
+	margin-top:25px;
+}
