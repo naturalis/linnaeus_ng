@@ -57,7 +57,6 @@ class SearchControllerNSR extends SearchController
 
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('type',$searchType);
-		$this->smarty->assign('search',$search);
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 
@@ -297,7 +296,7 @@ class SearchControllerNSR extends SearchController
 			group by _a.taxon_id
 
 			order by 
-				match_percentage desc, ".
+				match_percentage desc, _f.rank_id, ".
 				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "dutch_name" : "taxon" )."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
