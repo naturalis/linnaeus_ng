@@ -483,6 +483,13 @@ parameters:
 			return;
 		}
 
+		$result['labels']=array(
+			'title'=>'Stand van zaken',
+			'main'=>'Aantal soorten in Nederland',
+			'sub'=>'Het soortenregister bevat'
+		);
+
+
         $d=$this->models->Taxon->freeQuery("
 			select
 				count(*) as total
@@ -509,7 +516,7 @@ parameters:
 				and _h.established=1"
 		);
 
-		$result['species']=
+		$result['statistics']['species']=
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Aantal soorten in Nederland'),
@@ -527,7 +534,7 @@ parameters:
 				_a.project_id = ".$this->getCurrentProjectId()
 		);
 		
-		$result['species_with_image']=
+		$result['statistics']['species_with_image']=
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Soorten met foto\'s')
@@ -541,7 +548,7 @@ parameters:
 				_a.project_id = ".$this->getCurrentProjectId()
 		);
 		
-		$result['images']=
+		$result['statistics']['images']=
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Foto\'s')
@@ -578,19 +585,19 @@ parameters:
 				$t['count_name_english']+=$val['total'];
 		}
 
-		$result['accepted_names']=
+		$result['statistics']['accepted_names']=
 			array(
 				'count'=>$t['count_name_accepted'],
 				'label'=>$this->translate('Geaccepteerde soortnamen')
 			);
 
-		$result['dutch_names']=
+		$result['statistics']['dutch_names']=
 			array(
 				'count'=>$t['count_name_dutch'],
 				'label'=>$this->translate('Nederlandse namen')
 			);
 
-		$result['english_names']=
+		$result['statistics']['english_names']=
 			array(
 				'count'=>$t['count_name_english'],
 				'label'=>$this->translate('Engelse namen')
@@ -623,7 +630,7 @@ parameters:
 
 		);
 
-		$result['specialist']=
+		$result['statistics']['specialist']=
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Specialisten')
@@ -636,14 +643,14 @@ parameters:
 			'columns'=>'count(*) as total'
 		));
 
-		$result['literature']=
+		$result['statistics']['literature']=
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Literatuurbronnen')
 			);
 		
 
-		$result['count_distribution_map']='(coming)';
+		$result['statistics']['count_distribution_map']='(coming)';
 
 		$this->smarty->assign('json',json_encode($result));
 		
