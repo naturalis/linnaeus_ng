@@ -407,9 +407,6 @@ parameters:
 			)
 		");
 		
-		var_dump($this->models->MediaMeta->q(),1);
-		var_dump($media,1);
-
         $media=$this->models->MediaTaxon->freeQuery("
 			select
 				_a.taxon_id,
@@ -456,6 +453,11 @@ parameters:
 
 			limit 1
 		");
+		
+		var_dump($this->models->MediaTaxon->q());
+		var_dump($media,1);
+
+		
 		
 		$this->setTaxonId($media[0]['taxon_id']);
 
