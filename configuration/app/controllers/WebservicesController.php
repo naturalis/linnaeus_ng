@@ -463,11 +463,11 @@ parameters:
 
 		$result['url_recent_images']=$this->makeNsrRecentImagesLink();
 
-		// to be done!
-		$result['url_image_popup']=$this->makeNsrRecentImagesLink();
-		
+	
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
+		// to be done!
+		$result['image']['url_image_popup']=$this->makeNsrRecentImagesLink();
 
 		$result['labels']=array(
 			'taxon_link'=>$this->translate('Bekijk alle gegevens'),
@@ -694,6 +694,7 @@ parameters:
 
 			$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
 			$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
+			$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
 
 		}
 
