@@ -406,6 +406,9 @@ parameters:
 				and project_id = ".$this->getCurrentProjectId()."
 			)
 		");
+		
+		var_dump($this->models->MediaMeta->q(),1);
+		var_dump($media,1);
 
         $media=$this->models->MediaTaxon->freeQuery("
 			select
