@@ -105,36 +105,28 @@ class SpeciesControllerNSR extends SpeciesController
 				
 			}
 
-			$nsrId=$this->getNSRId(array('id'=>$taxon['id']));
-			$ezData=json_decode(file_get_contents(sprintf($this->_eZlinkWebservice,$nsrId)));
-
-			if(isset($ezData[0]))
+			if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
 			{
-				if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
+				$ezData=$this->getEzData($taxon['id']);
+
+				if(!empty($ezData))
 				{
-					$content['content']=array();
+					$wetten=array();
+
 					foreach($ezData as $key=>$val)
 					{
-						$content['content'][$val->wetenschappelijke_naam]['wetten'][$val->wet][]=
+						$wetten[$val->wetenschappelijke_naam]['wetten'][$val->wet][]=
 							array(
 								'categorie'=>$val->categorie,
 								'publicatie'=>strip_tags($val->publicatie)
 							);
-						$content['content'][$val->wetenschappelijke_naam]['url']=sprintf($this->_eZlink,$val->soort_id);
+						$wetten[$val->wetenschappelijke_naam]['url']=sprintf($this->_eZlink,$val->soort_id);
 					}
+
+					$this->smarty->assign('wetten',$wetten);
 				}
-				
-			} else 
-			{
-				foreach((array)$categories['categories'] as $key=>$val)
-				{
-					if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
-						$categories['categories'][$key]['is_empty']=true;
-				}
+
 			}
-	
-
-
 			
 			/*
 				distribution can have 'regular' data - fetched above
@@ -302,8 +294,6 @@ class SpeciesControllerNSR extends SpeciesController
 				);
 			}
 
-
-
 			foreach((array)$categories as $key=>$val)
 			{
 				if ($val['id']==TAB_VOORKOMEN)
@@ -311,8 +301,17 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ($val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
+					
+				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+					$dummy=$key;
 			}
 
+			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
+			if ($categories[$dummy]['is_empty']==1)
+			{
+				$dummy=$this->getEzData($taxon);
+				$categories[$dummy]['is_empty']=empty($dummy);
+			}
 
 			if (!$this->_suppressTab_LITERATURE)
 			{
@@ -365,7 +364,9 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-			
+
+
+
 			/*
 				this is the tab with the information from the ministry,
 				which is queried live to see whether it has any data
@@ -1429,5 +1430,10 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 
     }
+
+	private function getEzData($id)
+	{
+		return json_decode(file_get_contents(sprintf($this->_eZlinkWebservice,$this->getNSRId(array('id'=>$id)))));
+	}
 
 }

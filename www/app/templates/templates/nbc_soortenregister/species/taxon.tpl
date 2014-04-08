@@ -184,7 +184,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				<script type="text/JavaScript">
 				$(document).ready(function()
 				{
-					// removes inherited html-embedded (and ouddated) status
+					// remove inherited html-embedded (and ouddated) status
 					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
 
 					{if $atlasData.content}
@@ -290,38 +290,51 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 			<div>
 			
-				<h2>Beschermingsstatus</h2>
+				{if $wetten}
+			
+					<h2>Beschermingsstatus</h2>
+	
+					{foreach from=$wetten item=soort key=naam}
+					<p>
+						{if $naam!=$name_scientific_no_author || $content.count>1}
+						<h3><i>{$naam}</i></h3><br />
+						{/if}
+						
+						<ul>
+							{foreach from=$wetten.wetten item=v key=wet}
+							<li>
+								<b>{$wet}</b>
+								<ul>
+									{foreach from=$v item=w}
+									<li>
+										{$w.categorie}<br />
+										{$w.publicatie}
+									</li>
+									{/foreach}
+								</ul>
+							</li>
+							{/foreach}
+						</ul>
+						<br />
+						
+						Zie ook: <a href="{$soort.url}">EL&I wettelijke bescherming, beleid en signalering</a><br /><br />
+			
+					</p>
+					{/foreach}
+					
+				{/if}
 
-				{foreach from=$content item=soort key=naam}
 				<p>
-					{if $naam!=$name_scientific_no_author || $content.count>1}
-					<h3><i>{$naam}</i></h3><br />
-					{/if}
-				
-					{*Zie ook: <a href="{$soort.url}">EL&I soortgegevens</a><br />*}
-					
-					<ul>
-						{foreach from=$soort.wetten item=v key=wet}
-						<li>
-							<b>{$wet}</b>
-							<ul>
-								{foreach from=$v item=w}
-								<li>
-									{$w.categorie}<br />
-									{$w.publicatie}
-								</li>
-								{/foreach}
-							</ul>
-						</li>
-						{/foreach}
-					</ul>
-					<br />
-					
-					Zie ook: <a href="{$soort.url}">EL&I wettelijke bescherming, beleid en signalering</a><br /><br />
-		
+					{$content}
 				</p>
-				{/foreach}
 
+				<script type="text/JavaScript">
+				$(document).ready(function()
+				{
+					// remove inherited html-embedded (and ouddated) status
+//					$('#lnv').remove();
+				});
+				</script>
 
 			</div>
 
