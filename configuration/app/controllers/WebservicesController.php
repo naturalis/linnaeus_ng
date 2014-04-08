@@ -11,7 +11,7 @@ class WebservicesController extends Controller
 	private $_matchType=null;
 	private $_useOldNsrLinks=false;
 	private $_taxonUrl=null;
-	private $_thumbBaseUrl = 'http://images.naturalis.nl/160x100/';
+	private $_thumbBaseUrl = 'http://images.naturalis.nl/thumb/';
 	
 
     public $usedModels = array(
@@ -477,7 +477,8 @@ parameters:
   pid".chr(9)." : project id (mandatory)
 ";
 
-		if (is_null($this->getCurrentProjectId())) {
+		if (is_null($this->getCurrentProjectId()))
+		{
 			$this->sendErrors();
 			return;
 		}
@@ -644,10 +645,6 @@ parameters:
 
 		$result['count_distribution_map']='(coming)';
 
-
-
-		echo '<pre>';print_r($result);die();
-
 		$this->smarty->assign('json',json_encode($result));
 		
 		$this->printPage('template');
@@ -661,11 +658,14 @@ parameters:
 		$this->useCache=false;
 		$this->checkProject();
 
-		if (is_null($this->getCurrentProjectId())) {
+		if (is_null($this->getCurrentProjectId()))
+		{
 
 			$this->addError('cannot get project settings.');
 
-		} else {
+		} 
+		else 
+		{
 
 			$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
 			$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
@@ -677,21 +677,29 @@ parameters:
 
 	private function checkProject()
 	{
-		if (!$this->rHasVal('pid')) {
+		if (!$this->rHasVal('pid'))
+		{
 
 			$this->setProject(null);
 			$this->setCurrentProjectId(null);
 			$this->addError('no project id specified.');
 
-		} else {
+		}
+		else
+		 {
 
 			$p = $this->models->Project->_get(array(
 				'id' => $this->requestData['pid']
 			));
 		
-			if (!$p) {
+			if (!$p)
+			{
+				$this->setProject(null);
+				$this->setCurrentProjectId(null);
 				$this->addError('illegal project id. there is no project with id '.$this->requestData['pid'].'.');
-			} else {
+			} 
+			else 
+			{
 				$this->setProject($p);
 				$this->setCurrentProjectId($p['id']);
 				return $p;
