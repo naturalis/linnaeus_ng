@@ -652,7 +652,7 @@ parameters:
 
 		$result['statistics']['distribution_map']=
 			array(
-				'count'=>'(coming)',
+				'count'=>'(...)',
 				'label'=>$this->translate('Verspreidingskaarten')
 			);
 
