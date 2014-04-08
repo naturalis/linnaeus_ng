@@ -188,7 +188,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
 
 					// removes superfluous data
-					$('#atlasdata').html(($('#atlasdata #soortTab2 content').html()));
+					$('#atlasdata').html($('#atlasdata #soortTab2 content').html().replace(/(\<br\>)*$/ig,''));
 
 					{if $trendByYear}
 					
