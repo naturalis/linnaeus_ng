@@ -396,13 +396,15 @@ parameters:
 		}
 
         $media=$this->models->MediaMeta->freeQuery("
-			select
-				media_id,max(meta_date)
+			select media_id from %PRE%media_meta where meta_date = 
+			(select
+				max(meta_date)
 			from 
 				%PRE%media_meta
 			where 
 				sys_label = 'beeldbankDatumAanmaak'
 				and project_id = ".$this->getCurrentProjectId()."
+			)
 		");
 
         $media=$this->models->MediaTaxon->freeQuery("
