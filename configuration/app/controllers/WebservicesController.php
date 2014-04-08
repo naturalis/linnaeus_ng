@@ -454,11 +454,6 @@ parameters:
 			limit 1
 		");
 		
-		var_dump($this->models->MediaTaxon->q());
-		var_dump($media,1);
-
-		
-		
 		$this->setTaxonId($media[0]['taxon_id']);
 
 		$result=array('pId'=>$this->getCurrentProjectId());
