@@ -132,6 +132,18 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 					</table>
 				</p>
+
+				{if $atlasData.content}
+				<p id="atlasdata">
+				{$atlasData.content}
+				</p>
+				<p>
+				{if $atlasData.general_url}
+				<a href="{$atlasData.general_url}" target="_blank">Meer over deze soort in de verspreidingsatlas</a>
+				{/if}
+				</p>
+				{/if}
+				
 				
 				{assign var=trendByYear value=$trendData.byYear|@count>0}
 				{assign var=trendByTrend value=$trendData.byTrend|@count>0}
@@ -170,9 +182,13 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				</p>
 
 				<script type="text/JavaScript">
-				$(document).ready(function(){
+				$(document).ready(function()
+				{
 					// removes inherited html-embedded (and ouddated) status
 					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
+
+					// removes superfluous data
+					$('#atlasdata').html(($('#atlasdata #soortTab2 content').html()));
 
 					{if $trendByYear}
 					
@@ -308,12 +324,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 		
 			{assign var=hasAuthor value=false}
 			{capture name=authors}
-			{foreach from=$rdf item=v}
-				{if $v.predicate=='hasAuthor'}
-				{assign var=hasAuthor value=true}
-				{$v.data.name}
-				{/if}
-			{/foreach}		
+			{foreach from=$rdf item=v}{if $v.predicate=='hasAuthor'}{if $hasAuthor}, {/if}{$v.data.name}{assign var=hasAuthor value=true}{/if}{/foreach}		
 			{/capture}
 	
 			{if $hasAuthor}			

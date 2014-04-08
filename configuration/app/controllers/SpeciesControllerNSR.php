@@ -135,13 +135,18 @@ class SpeciesControllerNSR extends SpeciesController
 				as well as specifically structured distribution data, 
 				which is fetched below
 			*/
-			if ($categories['start']==TAB_VOORKOMEN || $categories['start']==TAB_VERSPREIDING)
+			if ($categories['start']==TAB_VERSPREIDING)  // || $categories['start']==TAB_VOORKOMEN
 			{
 				$presenceData=$this->getPresenceData($taxon['id']);
 				$this->smarty->assign('presenceData', $presenceData);
 
 				$trendData=$this->getTrendData($taxon['id']);
 				$this->smarty->assign('trendData', $trendData);
+
+				$atlasData=$this->getExternalId(array('id'=>$taxon['id'],'org'=>'Verspreidingsatlas'));
+				$atlasData['content']=file_get_contents($atlasData['service_url']);
+				
+				$this->smarty->assign('atlasData',$atlasData);
 
 			} else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
@@ -1187,7 +1192,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$sources=array();
 
-		foreach(array_merge($byYear,$byTrend) as $val)
+		foreach(array_merge((array)$byYear,(array)$byTrend) as $val)
 			$sources[$val['source']]=$val['source'];
 
 		sort($sources);
@@ -1347,6 +1352,44 @@ class SpeciesControllerNSR extends SpeciesController
 		} else {
 			return $rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'];
 		}
+    }
+
+    private function getExternalId($p)
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		$org=isset($p['org']) ? $p['org'] : null;
+
+		if (empty($id)||empty($org))
+			return;
+
+		$t=$this->models->ExternalOrgs->freeQuery("
+			select
+				name,
+				general_url,
+				service_url,
+				external_id
+			from %PRE%external_orgs _a
+
+			right join %PRE%external_ids _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.org_id
+				and _b.taxon_id=".$id."
+
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and lower(_a.name) = '". mysql_real_escape_string($org) ."'
+		");
+		
+		if ($t)
+		{
+			return array(
+				'organisation' => $t[0]['name'],
+				'general_url' => sprintf($t[0]['general_url'],$t[0]['external_id']),
+				'service_url' => sprintf($t[0]['service_url'],$t[0]['external_id']),
+				'id' => $t[0]['external_id']
+			);
+		}
+
     }
 
 }

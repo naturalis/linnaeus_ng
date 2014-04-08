@@ -35,7 +35,9 @@ class SpeciesController extends Controller
 		'tab_order',
 		'nsr_ids',
 		'taxon_trend_years',
-		'taxon_trends'
+		'taxon_trends',
+		'external_orgs',
+		'external_ids'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
