@@ -652,8 +652,8 @@ parameters:
 
 		$result['statistics']['distribution_map']=
 			array(
-				'count'=>'?',
-				'label'=>'(coming)'
+				'count'=>'(coming)',
+				'label'=>$this->translate('Verspreidingskaarten')
 			);
 
 		$this->smarty->assign('json',json_encode($result));
