@@ -460,9 +460,23 @@ parameters:
 
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
+
 		$result['url_recent_images']=$this->makeNsrRecentImagesLink();
+
+		// to be done!
+		$result['url_image_popup']=$this->makeNsrRecentImagesLink();
+		
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
+
+		$result['labels']=array(
+			'taxon_link'=>$this->translate('Bekijk alle gegevens'),
+			'more_recent_link'=>$this->translate('Meer recente afbeeldingen'),
+			'lokatie'=>$this->translate('Locatie'),
+			'fotograaf'=>$this->translate('Fotograaf'),
+			'validator'=>$this->translate('Validator'),
+			'date_created'=>$this->translate('Datum plaatsing'),
+		);
 
 		$this->smarty->assign('json',json_encode($result));
 		
