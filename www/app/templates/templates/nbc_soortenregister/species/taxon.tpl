@@ -139,7 +139,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				</p>
 				<p>
 				{if $atlasData.general_url}
-				<a href="{$atlasData.general_url}" target="_blank">Meer over deze soort in de verspreidingsatlas</a>
+				<a href="{$atlasData.general_url}" target="_blank">Meer over deze soort in de BLWG Verspreidingsatlas</a>
 				{/if}
 				</p>
 				{/if}
