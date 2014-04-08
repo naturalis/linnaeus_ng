@@ -187,8 +187,30 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					// removes inherited html-embedded (and ouddated) status
 					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
 
-					// removes superfluous data
-					$('#atlasdata').html($('#atlasdata #soortTab2 content').html().replace(/(\<br\>)*$ /ig,''));
+					{if $atlasData.content}
+					var  xml=$('#atlasdata').html();
+					try {
+						xmlDoc=$.parseXML( xml );
+						xml=$(xmlDoc);
+						content=xml.find("content").text();
+						author=xml.find("author").text();
+						/*
+						sourcedocument=xml.find("author").text();
+						distributionmap=xml.find("distributionmap").text();
+						pubdate=xml.find("pubdate").text();
+						copyright=xml.find("copyright").text();
+						*/
+						$('#atlasdata').html('<p>'+content+'</p>');
+						if (author)
+							$('#atlasdata').html($('#atlasdata').html()+'<h2>Bron</h2><p><h4 class="source">Auteur(s)</h4>'+author+'</p>');
+
+					} catch (err) {
+						//console.log(err);
+						// in case of corrupt xml
+						$('#atlasdata').html($('#atlasdata #soortTab2 content').html().replace(/(\<br\>)*$ /ig,''));
+					}
+				
+					{/if}
 
 					{if $trendByYear}
 					

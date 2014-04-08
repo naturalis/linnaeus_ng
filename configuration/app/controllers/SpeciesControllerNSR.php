@@ -112,10 +112,14 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
 				{
+					$content['content']=array();
 					foreach($ezData as $key=>$val)
 					{
-						$content['content'][$val->wetenschappelijke_naam]['wetten']
-							[$val->wet][]=array('categorie'=>$val->categorie,'publicatie'=>strip_tags($val->publicatie));
+						$content['content'][$val->wetenschappelijke_naam]['wetten'][$val->wet][]=
+							array(
+								'categorie'=>$val->categorie,
+								'publicatie'=>strip_tags($val->publicatie)
+							);
 						$content['content'][$val->wetenschappelijke_naam]['url']=sprintf($this->_eZlink,$val->soort_id);
 					}
 				}
@@ -146,9 +150,11 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('trendData', $trendData);
 
 				$atlasData=$this->getExternalId(array('id'=>$taxon['id'],'org'=>'Verspreidingsatlas'));
-				$atlasData['content']=file_get_contents($atlasData['service_url']);
-				
-				$this->smarty->assign('atlasData',$atlasData);
+				if ($atlasData)
+				{
+					$atlasData['content']=file_get_contents($atlasData['service_url']);
+					$this->smarty->assign('atlasData',$atlasData);
+				}
 				
 				if (!empty($atlasData['logo']))
 				{
