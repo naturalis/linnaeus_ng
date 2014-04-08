@@ -650,7 +650,11 @@ parameters:
 			);
 		
 
-		$result['statistics']['count_distribution_map']='(coming)';
+		$result['statistics']['distribution_map']=
+			array(
+				'count'=>'?',
+				'label'=>'(coming)'
+			);
 
 		$this->smarty->assign('json',json_encode($result));
 		
