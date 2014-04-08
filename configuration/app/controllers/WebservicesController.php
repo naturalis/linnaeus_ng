@@ -467,7 +467,7 @@ parameters:
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
 		// to be done!
-		$result['image']['url_image_popup']=$this->makeNsrRecentImagesLink();
+		$result['image']['url_image_popup']=$result['image']['url_taxon'];
 
 		$result['labels']=array(
 			'taxon_link'=>$this->translate('Bekijk alle gegevens'),
@@ -699,7 +699,6 @@ parameters:
 		}
 
     }
-
 
 	private function checkProject()
 	{
