@@ -12,7 +12,8 @@ class WebservicesController extends Controller
 	private $_useOldNsrLinks=false;
 	private $_taxonUrl=null;
 	private $_thumbBaseUrl = 'http://images.naturalis.nl/thumb/';
-	
+	private $_190x100BaseUrl = 'http://images.naturalis.nl/190x100/';
+
 
     public $usedModels = array(
 		'taxon',
@@ -411,7 +412,7 @@ parameters:
 			select
 				_a.taxon_id,
 				_a.id as media_id,
-				concat('".$this->_thumbBaseUrl."',_a.file_name) as url_image,
+				concat('".$this->_190x100BaseUrl."',_a.file_name) as url_image,
 				_b.meta_data as copyright,
 				_d.meta_data as fotograaf,
 				date_format(_e.meta_date,'%e %M %Y') as date_created,
