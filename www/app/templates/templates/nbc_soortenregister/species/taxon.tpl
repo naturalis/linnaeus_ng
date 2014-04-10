@@ -287,15 +287,16 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				{if $wetten}
 			
 					<h2>Beschermingsstatus</h2>
-	
+
 					{foreach from=$wetten item=soort key=naam}
+
 					<p>
-						{if $naam!=$name_scientific_no_author || $content.count>1}
+						{if $naam!=$names.nomen_no_tags}
 						<h3><i>{$naam}</i></h3><br />
 						{/if}
 						
 						<ul>
-							{foreach from=$wetten.wetten item=v key=wet}
+							{foreach from=$soort.wetten item=v key=wet}
 							<li>
 								<b>{$wet}</b>
 								<ul>
