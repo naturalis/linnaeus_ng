@@ -134,16 +134,37 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				</p>
 
 				{if $atlasData.content}
-				<p id="atlasdata">
-				{$atlasData.content}
-				</p>
-				<p>
-				{if $atlasData.general_url}
-				<a href="{$atlasData.general_url}" target="_blank">Meer over deze soort in de BLWG Verspreidingsatlas</a>
+
+				<div id="atlasdata">
+					<p>
+					{$atlasData.content}
+					</p>
+
+					{if $atlasData.distributionmap}
+					<h2>Verspreidingskaart</h2>
+					<p>
+						<img src="{$atlasData.distributionmap}" />
+					</p>
+					{/if}
+	
+					{if $atlasData.author}
+					<h2>Bron</h2>
+					<p>
+						<h4 class="source">Auteur(s)</h4>
+						{$atlasData.author}
+					</p>
+					{/if}
+					
+					{if $atlasData.general_url}
+					<p>
+					<a href="{$atlasData.general_url}" target="_blank">Meer over deze soort in de BLWG Verspreidingsatlas</a>
+					</p>
+					{/if}
+	
+				</div>
+			
 				{/if}
-				</p>
-				{/if}
-				
+			
 				
 				{assign var=trendByYear value=$trendData.byYear|@count>0}
 				{assign var=trendByTrend value=$trendData.byTrend|@count>0}
@@ -187,33 +208,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					// remove inherited html-embedded (and ouddated) status
 					$('div.nsr[params*="template=presence"]').closest('div.mceTmpl').remove();
 
-					{if $atlasData.content}
-					var  xml=$('#atlasdata').html();
-					try {
-						xmlDoc=$.parseXML( xml );
-						xml=$(xmlDoc);
-						content=xml.find("content").text();
-						author=xml.find("author").text();
-						/*
-						sourcedocument=xml.find("author").text();
-						distributionmap=xml.find("distributionmap").text();
-						pubdate=xml.find("pubdate").text();
-						copyright=xml.find("copyright").text();
-						*/
-						$('#atlasdata').html('<p>'+content+'</p>');
-						if (author)
-							$('#atlasdata').html($('#atlasdata').html()+'<h2>Bron</h2><p><h4 class="source">Auteur(s)</h4>'+author+'</p>');
-
-					} catch (err) {
-						//console.log(err);
-						// in case of corrupt xml
-						$('#atlasdata').html($('#atlasdata #soortTab2 content').html().replace(/(\<br\>)*$ /ig,''));
-					}
-				
-					{/if}
-
 					{if $trendByYear}
-					
 					Morris.Bar({
 					  element: 'graph',
 					  data: [
@@ -226,7 +221,6 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					  labels: [''],
 					  hideHover: true
 					});
-						  
 					{/if}
 
 				});
