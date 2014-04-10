@@ -143,7 +143,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					{if $atlasData.distributionmap}
 					<h2>Verspreidingskaart</h2>
 					<p>
-						<img src="{$atlasData.distributionmap}" />
+						<img class="verspreidingskaart" src="{$atlasData.distributionmap}" />
 					</p>
 					{/if}
 	
