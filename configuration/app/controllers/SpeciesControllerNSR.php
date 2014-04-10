@@ -124,6 +124,7 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 
 					$this->smarty->assign('wetten',$wetten);
+
 				}
 
 			}
@@ -163,20 +164,21 @@ class SpeciesControllerNSR extends SpeciesController
 							$this->smarty->assign('atlasData',$atlasData);
 						}
 					}
+	
+					if (!empty($atlasData['logo']))
+					{
+						array_push(
+							$sideBarLogos,
+							array(
+								'organisation'=>$atlasData['organisation'],
+								'logo'=>$atlasData['logo'],
+								'url'=>$atlasData['organisation_url']
+							)
+						);
+					}
+					
 				}
-
-				if (!empty($atlasData['logo']))
-				{
-					array_push(
-						$sideBarLogos,
-						array(
-							'organisation'=>$atlasData['organisation'],
-							'logo'=>$atlasData['logo'],
-							'url'=>$atlasData['organisation_url']
-						)
-					);
-				}
-
+	
 			} else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
 			{
@@ -520,6 +522,7 @@ class SpeciesControllerNSR extends SpeciesController
 			array(
 				'scientific_name'=>$scientific_name,
 				'nomen'=>$nomen,
+				'nomen_no_tags'=>trim(strip_tags($nomen)),
 				'preffered_name'=>$prefferedname,
 				'list'=>$names
 			);
