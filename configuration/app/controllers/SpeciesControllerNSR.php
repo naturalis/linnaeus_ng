@@ -127,7 +127,8 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 
 			}
-			
+
+
 			/*
 				distribution can have 'regular' data - fetched above
 				as well as specifically structured distribution data, 
@@ -142,12 +143,28 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('trendData', $trendData);
 
 				$atlasData=$this->getExternalId(array('id'=>$taxon['id'],'org'=>'Verspreidingsatlas'));
+
 				if ($atlasData)
 				{
-					$atlasData['content']=file_get_contents($atlasData['service_url']);
-					$this->smarty->assign('atlasData',$atlasData);
+					$dummy=file_get_contents($atlasData['service_url']);
+
+					if ($dummy)
+					{
+						$xml = simplexml_load_string($dummy);
+						if ($xml)
+						{
+							$atlasData['content'] = (string)$xml->tab->content;
+							$atlasData['author'] = (string)$xml->tab->author;
+							$atlasData['pubdate'] = (string)$xml->tab->pubdate;
+							$atlasData['copyright'] = (string)$xml->tab->copyright;
+							$atlasData['sourcedocument'] = (string)$xml->tab->sourcedocument;
+							$atlasData['distributionmap'] = (string)$xml->tab->distributionmap;
+
+							$this->smarty->assign('atlasData',$atlasData);
+						}
+					}
 				}
-				
+
 				if (!empty($atlasData['logo']))
 				{
 					array_push(
@@ -305,12 +322,12 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
 					$dummy=$key;
 			}
-
+			
 			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
 			if ($categories[$dummy]['is_empty']==1)
 			{
-				$dummy=$this->getEzData($taxon);
-				$categories[$dummy]['is_empty']=empty($dummy);
+				$ezData=$this->getEzData($taxon);
+				$categories[$dummy]['is_empty']=empty($ezData);
 			}
 
 			if (!$this->_suppressTab_LITERATURE)
