@@ -22,6 +22,15 @@
 				{if $ref.label}<tr><td>Titel</td><td>{$ref.label}</td></tr>{/if}
 				{if $ref.publishedin_actor_name}<tr><td>Uitgever</td><td>{$ref.publishedin_actor_name}</td></tr>{/if}
 
+				{if $ref.periodical}<tr><td>Periodiek</td><td>{$ref.periodical}</td></tr>{/if}
+
+{*
+				_a.periodical,
+				_a.periodical_actor_id,
+				_d.name as periodical_actor_name,
+*}
+
+
 				{if $ref.volume}<tr><td>Volume</td><td>{$ref.volume}</td></tr>{/if}
 				{if $ref.pages}<tr><td>Pagina's</td><td>{$ref.pages}</td></tr>{/if}
 				{if $ref.presence_label}<tr><td>Status</td><td>{$ref.presence_label}</td></tr>{/if}
