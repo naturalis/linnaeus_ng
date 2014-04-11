@@ -251,7 +251,12 @@ class UsersController extends Controller
 
 		$zones = $this->models->Timezone->_get(array('id'=>'*'));
 
-        $roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
+		if ($this->isCurrentUserSysAdmin())
+			$d = array('id !=' => ID_ROLE_SYS_ADMIN);
+		else
+			$d = array('assignable' => 'y');
+
+        $roles = $this->models->Role->_get(array('id'=>$d));
 
 		$this->smarty->assign('maxLengths', $maxLengths);
 
