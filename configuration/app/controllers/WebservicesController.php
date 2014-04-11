@@ -346,8 +346,10 @@ parameters:
 
 			left join %PRE%media_meta _b
 				on _a.id=_b.media_id and _a.project_id=_b.project_id and _b.sys_label = 'beeldbankCopyright'
+
 			left join %PRE%media_meta _d
 				on _a.id=_d.media_id and _a.project_id=_d.project_id and _d.sys_label = 'beeldbankFotograaf'
+
 			left join %PRE%media_meta _e
 				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumVervaardiging'
 

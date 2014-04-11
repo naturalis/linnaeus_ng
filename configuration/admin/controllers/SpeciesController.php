@@ -142,10 +142,9 @@ class SpeciesController extends Controller
         $this->createStandardCategories();
         $this->createStandardCoLRanks();
         $this->verifyProjectRanksRelations();
-		
-		$this->setIsHigherTaxa($this->rHasVal('higher', '1'));
-		$this->setHigherTaxaControllerMask();
 
+		$this->setHigherTaxaControllerMask();
+		
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
         $this->smarty->assign('useNBCExtras', $this->_useNBCExtras);
         $this->smarty->assign('useRelated', $this->useRelated);
@@ -161,8 +160,20 @@ class SpeciesController extends Controller
 
 
 	/* public */
+    public function indexHtAction ()
+    {
+        $this->setIsHigherTaxa(true);
+		$this->doIndex();
+    }
+
     public function indexAction ()
     {
+        $this->setIsHigherTaxa(false);
+		$this->doIndex();
+    }
+	
+	private function doIndex()
+	{
         $this->setActiveTaxonId(null);
         
 		$id=$this->getFirstTaxonId();
@@ -171,66 +182,55 @@ class SpeciesController extends Controller
 			$this->redirect('collaborators.php');
 		else
 			$this->redirect('taxon.php?id='.$id);
-    }
+	}
+
 
     public function taxonAction()
     {
 		$this->checkAuthorisation();
-	
-		$this->smarty->assign('taxon',null);
-	
-        if (!$this->rHasId()) {
-            
-            $this->addError($this->translate('No taxon ID specified.'));
 
-		} else
-        if (!$this->userHasTaxon($this->requestData['id'])) {
+		$taxon=$this->getTaxonById($this->rGetVal('id'));
 
-            $this->addError($this->translate('You are not authorised to edit this taxon.'));
-
-		} else 
-        if ($this->getTaxonById()==null) {
-
-            $this->addError($this->translate('Unknown taxon ID.'));
-
-		} else 
-        if ($this->doLockOutUser($this->requestData['id'])) {
-			
+        if (!$taxon)
+		{
+            $this->addError($this->translate('No or illegal taxon ID'));
+		}
+		else
+        if ($this->doLockOutUser($taxon['id']))
+		{
             $this->addError($this->translate('Taxon is already being edited by another editor.'));
-
-		} else {
-		
-			if ($this->rHasVal('action','save_and_preview')) {
-
-				$p['id'] = $this->requestData['id'];
-				$p['page'] = $this->requestData['activePage'];
-				$p['language'] = $this->requestData['language-default'];
-				$p['content'] = $this->requestData['content-default'];
+		}	
+		else
+		{
+			if ($this->rHasVal('action','save_and_preview'))
+			{
+				$p['id'] = $this->rGetVal('id');
+				$p['page'] = $this->rGetVal('activePage');
+				$p['language'] = $this->rGetVal('language-default');
+				$p['content'] = $this->rGetVal('content-default');
 
 				$this->saveTaxon($p);
 				
-				if ($this->rHasVal('language-other') && $this->rHasVal('content-other')) {
-					$p['language'] = $this->requestData['language-other'];
-					$p['content'] = $this->requestData['content-other'];
+				if ($this->rHasVal('language-other') && $this->rHasVal('content-other'))
+				{
+					$p['language'] = $this->rGetVal('language-other');
+					$p['content'] = $this->rGetVal('content-other');
 					$this->saveTaxon($p);
 				}
 
 				$this->previewAction();
 
 			 }
-               
-            // replace possible [new litref] and [new media] tags with links to newly created reference of media
-            $this->filterInternalTags($this->requestData['id']);
 
-            $taxon=$this->getTaxonById();
-          
+            // replace possible [new litref] and [new media] tags with links to newly created reference of media
+            $this->filterInternalTags($this->rGetVal('id'));
+//            $taxon=$this->getTaxonById();
+         
 			$this->setActiveTaxonId($taxon['id']);
-				
 			$this->setPageName(sprintf($this->translate('Editing "%s"'),$this->formatTaxon($taxon)));
 				
-			$projectLanguages=$this->getProjectLanguages();
-					
 			// determine the language the page will open in
+			$projectLanguages=$this->getProjectLanguages();
 			$startLanguage = $this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultProjectLanguage();
 					
 			// get the defined categories (just the page definitions, no content yet)
@@ -242,9 +242,11 @@ class SpeciesController extends Controller
 				'order' => 'show_order'
 			));
 					
-			foreach ((array)$taxonPages as $key => $val) {
+			foreach ((array)$taxonPages as $key => $val)
+			{
 
-				foreach ((array) $projectLanguages as $k => $language) {
+				foreach ((array) $projectLanguages as $k => $language)
+				{
 					
 					// for each category in each language, get the category title
 					$tpt = $this->models->PageTaxonTitle->_get(
@@ -273,32 +275,20 @@ class SpeciesController extends Controller
 					);
 					
 			$this->smarty->assign('taxon',$taxon);
-				
 			$this->smarty->assign('media',addslashes(json_encode($this->getTaxonMedia($taxon['id']))));
-			
 			$this->smarty->assign('literature',addslashes(json_encode($this->getTaxonLiterature($taxon['id']))));
-
 			$this->smarty->assign('pages',$taxonPages);
-			
 			$this->smarty->assign('languages',$projectLanguages);
-			
 			$this->smarty->assign('includeHtmlEditor',true);
-			
 			$this->smarty->assign('activeLanguage',$startLanguage);
-			
 			$this->smarty->assign('activePage',$startPage);
-
 			$this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
-
 		}
-		
 		$this->printPage();
-
     }
 
     public function manageAction ()
     {
-        
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Species module overview'));
@@ -309,21 +299,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function spListAction ()
-    {
-		$this->setIsHigherTaxa(false);
-		$this->initialize();
-		$this->listAction();
-	}
 
-    public function htListAction ()
-    {		
-		$this->setIsHigherTaxa();
-		$this->setHigherTaxaControllerMask();
-		$this->initialize();
-		$this->listAction();
-	}
-	
     public function parentageAction ()
     {
         $this->checkAuthorisation();
