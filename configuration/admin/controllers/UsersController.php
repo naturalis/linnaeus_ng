@@ -2220,6 +2220,9 @@ MUST CHECK
 	
 	private function isRoleAssignable($roleId)
 	{
+		
+		if ($this->isCurrentUserSysAdmin())
+			return true;
 
 		// make sure an unassignable role (like system admin) wasn't injected
 		$r = $this->models->Role->_get(array('id'=>$roleId));
