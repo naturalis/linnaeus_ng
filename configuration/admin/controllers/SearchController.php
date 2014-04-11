@@ -726,11 +726,11 @@ class SearchController extends Controller
 
 		foreach((array)$media as $key => $val) {
 
+			$media[$key]['id'] = $d[$val['media_id']]['taxon_id'];
 			$media[$key]['taxon_id'] = $d[$val['media_id']]['taxon_id'];
 			$media[$key]['label'] = $d[$val['media_id']]['file_name'];
 
 		}
-
 
 		return array(
 			'results' => array(

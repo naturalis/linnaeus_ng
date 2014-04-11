@@ -4,7 +4,6 @@ include_once ('Controller.php');
 
 class LiteratureController extends Controller
 {
-    
 
     public $usedModels = array(
 		'literature',
@@ -52,7 +51,7 @@ class LiteratureController extends Controller
 
     public function indexAction()
     {
-      
+
 		$this->setActiveTaxonId(null);
     
 		$this->clearTempValues();

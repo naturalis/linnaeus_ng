@@ -2659,14 +2659,14 @@ class Controller extends BaseClass
         return isset($_SESSION['admin']['project']['default_language_id']) ? $_SESSION['admin']['project']['default_language_id'] : null;
     }
 
-    public function rHasVar ($var)
+    public function rHasVar($var)
     {
 
 		return isset($this->requestData[$var]);
 
     }
 
-    public function rHasVal ($var, $val = null)
+    public function rHasVal($var, $val = null)
     {
         if ($val !== null) {
             
@@ -2676,6 +2676,11 @@ class Controller extends BaseClass
             
             return isset($this->requestData[$var]) && $this->requestData[$var] !== '';
         }
+    }
+
+    public function rGetVal($var)
+    {
+		return isset($this->requestData[$var]) ? $this->requestData[$var] : null;
     }
 
 
