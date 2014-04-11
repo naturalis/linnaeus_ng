@@ -1308,9 +1308,11 @@ class SpeciesControllerNSR extends SpeciesController
 
         }
 
-		$rdf=$this->Rdf->getRdfValues($content['id']);
+		if (isset($content['id']))
+			$rdf=$this->Rdf->getRdfValues($content['id']);
 
-		$content=$content['content'];
+		if (isset($content['content']))
+			$content=$content['content'];
 
 		return array('content'=>$content,'rdf'=>$rdf);
     }

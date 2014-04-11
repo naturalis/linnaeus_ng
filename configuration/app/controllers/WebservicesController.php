@@ -335,6 +335,7 @@ parameters:
 
         $media=$this->models->MediaTaxon->freeQuery("
 			select
+				distinct
 				_a.id as media_id,
 				concat('".$this->_thumbBaseUrl."',_a.file_name) as url,
 				_b.meta_data as copyright,
@@ -357,7 +358,7 @@ parameters:
 				_e.meta_date desc
 			limit 4
 		");
-
+		
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
 			'search'=>$this->requestData['nsr']
