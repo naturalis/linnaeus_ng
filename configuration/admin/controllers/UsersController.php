@@ -706,8 +706,13 @@ class UsersController extends Controller
 			$canDelete = (isset($user['created_by']) && $user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
 	
 			$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
+
+			if ($this->isCurrentUserSysAdmin())
+				$d = array('id !=' => ID_ROLE_SYS_ADMIN);
+			else
+				$d = array('assignable' => 'y');
 			
-			$roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
+			$roles = $this->models->Role->_get(array('id'=>$d));
 	
 			$zones = $this->models->Timezone->_get(array('id' => '*'));
 	
