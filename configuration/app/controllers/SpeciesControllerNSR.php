@@ -1209,32 +1209,40 @@ class SpeciesControllerNSR extends SpeciesController
 				_g.label as reference_label,
 				_g.author as reference_author,
 				_g.date as reference_date
+				
 			from %PRE%presence_taxa _a
+
 			left join %PRE%presence_labels _b
 				on _a.presence_id = _b.presence_id 
 				and _a.project_id=_b.project_id 
 				and _b.language_id=".$this->getCurrentLanguageId()."
+
 			left join %PRE%presence_labels _c
 				on _a.presence82_id = _c.presence_id 
 				and _a.project_id=_c.project_id 
 				and _c.language_id=".$this->getCurrentLanguageId()."
+
 			left join %PRE%habitat_labels _d
 				on _a.habitat_id = _d.habitat_id 
 				and _a.project_id=_d.project_id 
 				and _d.language_id=".$this->getCurrentLanguageId()."
+
 			left join %PRE%actors _e
 				on _a.actor_id = _e.id 
 				and _a.project_id=_e.project_id
+
 			left join %PRE%actors _f
 				on _a.actor_org_id = _f.id 
 				and _a.project_id=_f.project_id
+
 			left join %PRE%literature2 _g
 				on _a.reference_id = _g.id 
 				and _a.project_id=_g.project_id
+
 			where _a.project_id = ".$this->getCurrentProjectId()."
-			and _a.taxon_id =".$id
+				and _a.taxon_id =".$id
 		);	
-		
+
 		return $data[0];
 	}
 

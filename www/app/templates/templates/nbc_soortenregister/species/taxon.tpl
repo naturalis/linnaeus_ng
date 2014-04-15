@@ -121,7 +121,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 			<div>
 				<h2>Voorkomen</h2>
-				
+			
 				<p>
 					<table>
 						{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" onmouseover="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</span>){/if}</td></tr>{/if}
