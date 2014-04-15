@@ -7,6 +7,93 @@
 <input type="hidden" name="id" id="id" value="{$ref.id}" />
 <input type="hidden" name="action" id="action" value="" />
 
+
+<p>
+<input type="text" id="fuck" />
+<div id="fuck_list" style="
+background-color:#FFC;
+border:1px solid #666;
+width:250px;
+height:400px;
+overflow-y:scroll;
+overflow-x:hidden;
+"></div>
+
+<script>
+$(document).ready(function(){
+
+	function species_lookup_list(data) 
+	{
+		if (typeof(data.data.callback)=='function')
+		{
+			var callback=data.data.callback;
+		}
+		
+		var text=$(this).val();
+
+		/*
+			search			<string>
+			match_start		[1,0]
+			get_all			[1,0]
+			concise			[1,0]
+			formatted		[1,0]
+			ignore_rank		[1,0]
+			force_rank		[highertaxa,species]
+			max_results		int > 0
+		
+			mandatory: search || get_all
+		
+		*/
+		$.ajax({
+			url : "../species/ajax_interface.php",
+			type: "POST",
+			data : ({
+				'action' : 'get_lookup_list' ,
+				'search' : text,
+				'get_all' : 0,
+				'match_start' : 0,
+				'concise': 1,
+				'ignore_rank': 1,
+				'max_results': 25,
+				'formatted': 0,
+				'force_rank': 'species',
+				'time' : allGetTimestamp()
+			}),
+			success : function (data)
+			{
+				if (typeof(callback)=='function')
+				{
+					callback($.parseJSON(data));
+				}
+			}
+		});
+
+	}
+	
+	function build_list(data)
+	{
+		var d=Array();
+		for(var i in data.results)
+		{
+			var t=data.results[i];
+			if (t.label)
+				d.push('<label><input type=checkbox value='+t.id+'>'+t.label+'</label>');
+		}
+
+		d.push('<a href="">all</a>');  // MAAR DABN GEPREPEND
+		d.push('<hr>');
+
+		$('#fuck_list').html(d.join('<br />'));
+	}
+	
+	$('#fuck').bind('keyup', { callback:build_list } ,species_lookup_list);
+
+});
+
+</script>
+
+	
+	
 {if $ref.multiple_authors==0 && $ref.author_second!=''}
 {assign var=num value=2}
 {elseif $ref.multiple_authors==1}
@@ -152,16 +239,17 @@
         {t}Taxa this reference pertains to:{/t}<br />
         (you can drag and drop selected taxa to put them in the desired order)
     </p>
-    </p>
+
     <p>
         <div id="selected-taxa"></div>
     </p>
     <p>
+
         <select id="taxa" multiple="multiple" size="20" style="width:300px" ondblclick="litAddTaxon();">
         {foreach from=$taxa key=k item=v}
-        {if $v.id && (($isHigherTaxa && $v.lower_taxon==0) || !$isHigherTaxa)}
+        {*if $v.id && (($isHigherTaxa && $v.lower_taxon==0) || !$isHigherTaxa)*}
         <option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>{'&nbsp;&nbsp;'|str_repeat:$v.level-$taxa[0].level}{$v.taxon}</option>
-        {/if}
+        {*/if*}
         {/foreach}
         </select>
     </p>

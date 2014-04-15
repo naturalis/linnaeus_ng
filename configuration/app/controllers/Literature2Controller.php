@@ -67,13 +67,13 @@ class Literature2Controller extends Controller
 				_a.citation,
 				_a.source,
 				_a.publishedin,
-				_a.publishedin_actor_id,
-				_c.name as publishedin_actor_name,
+	_a.publishedin_id,
+	_c.name as publishedin_actor_name,
 				_a.pages,
 				_a.volume,
 				_a.periodical,
-				_a.periodical_actor_id,
-				_d.name as periodical_actor_name,
+	_a.periodical_id,
+	_d.name as periodical_actor_name,
 				_a.language_id,
 				_e.label as language_name
 			from %PRE%literature2 _a
@@ -82,13 +82,13 @@ class Literature2Controller extends Controller
 				on _a.actor_id = _b.id 
 				and _a.project_id=_b.project_id
 
-			left join %PRE%actors _c
-				on _a.publishedin_actor_id = _c.id 
-				and _a.project_id=_c.project_id
-				
-			left join %PRE%actors _d
-				on _a.periodical_actor_id = _d.id 
-				and _a.project_id=_d.project_id
+	left join %PRE%actors _c
+		on _a.publishedin_id = _c.id 
+		and _a.project_id=_c.project_id
+		
+	left join %PRE%actors _d
+		on _a.periodical_id = _d.id 
+		and _a.project_id=_d.project_id
 				
 			left join %PRE%labels_languages _e
 				on _a.language_id = _e.language_id 
@@ -107,10 +107,9 @@ class Literature2Controller extends Controller
 
     public function referenceAction()
     {
-
 		if (!$this->rHasId()) $this->redirect('index.php');
 
-		$ref = $this->getReference($this->requestData['id']);
+		$ref=$this->getReference($this->requestData['id']);
 
 		if (!$ref) $this->redirect('index.php');
 		
@@ -122,69 +121,13 @@ class Literature2Controller extends Controller
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     public function indexAction()
     {
- 
- 		die('index');
- 
- 		if (!$this->rHasVal('id')) {
-
-			$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
-
-			$id = (isset($d['id']) ? $d['id'] : null);
-			
-		} else {
-			
-			$id = $this->requestData['id'];
-				
-		}
-		
- 		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
-		
-		$this->setStoreHistory(false);
-		
-		if (isset($id)) $this->redirect('reference.php?id='.$id);
-
- 		/*
- 		$alpha = $this->getLiteratureAlphabet();
-
-		if (!$this->rHasVal('letter')) $this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : null;
-
-		if ($this->rHasVal('letter')) {
-		
-			$this->requestData['letter'] = strtolower($this->requestData['letter']);
-
-			$refs = $this->getReferences(array('author_first like' => $this->requestData['letter'].'%'));
-
-			$this->setPageName(sprintf($this->translate('Literature Index: %s'),strtoupper($this->requestData['letter'])));
-
-		}
-
-		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
-
-		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
-
-		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-
-		if (isset($refs)) $this->smarty->assign('refs',$refs);
-
-		*/
-   
         $this->printPage();
-
     }
+
+
+
 
     public function ajaxInterfaceAction ()
     {
