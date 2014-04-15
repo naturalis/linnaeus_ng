@@ -9,8 +9,7 @@ CTAB_TAXON_LIST
 CTAB_LITERATURE
 CTAB_DNA_BARCODES
 				
-TAB_VOORKOMEN wordt omgeleid naar TAB_VERSPREIDING
-  TAB_VERSPREIDING: auto presence data, data TAB_VERSPREIDING, data TAB_VOORKOMEN (?)
+TAB_VERSPREIDING: auto presence data, data TAB_VERSPREIDING (TAB_VOORKOMEN omgebracht bij import)
   
 TAB_NAAMGEVING wordt omgeleid naar CTAB_NAMES
   CTAB_NAMES: auto naamgeving, classificatieboom, data TAB_NAAMGEVING
@@ -102,7 +101,6 @@ class SpeciesControllerNSR extends SpeciesController
 						'isLower' =>  $taxon['lower_taxon']
 					)
 				);
-				
 			}
 
 			if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
@@ -130,18 +128,16 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 
 
-			/*
-				distribution can have 'regular' data - fetched above
-				as well as specifically structured distribution data, 
-				which is fetched below
-			*/
-			if ($categories['start']==TAB_VERSPREIDING)  // || $categories['start']==TAB_VOORKOMEN
+			if ($categories['start']==TAB_VERSPREIDING)
 			{
+				$distributionMaps=$this->getDistributionMaps($taxon['id']);
+				$this->smarty->assign('distributionMaps',$distributionMaps);
+
 				$presenceData=$this->getPresenceData($taxon['id']);
-				$this->smarty->assign('presenceData', $presenceData);
+				$this->smarty->assign('presenceData',$presenceData);
 
 				$trendData=$this->getTrendData($taxon['id']);
-				$this->smarty->assign('trendData', $trendData);
+				$this->smarty->assign('trendData',$trendData);
 
 				$atlasData=$this->getExternalId(array('id'=>$taxon['id'],'org'=>'Verspreidingsatlas'));
 
@@ -178,6 +174,7 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 					
 				}
+
 	
 			} else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
@@ -243,6 +240,17 @@ class SpeciesControllerNSR extends SpeciesController
         $this->printPage();
     }
 
+	public function getTaxonClassification($id)
+	{
+		$this->tmp = array();
+
+		$this->_getTaxonClassification($id);
+
+		return $this->tmp;
+	}
+
+
+
     private function getCategories($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -287,7 +295,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if (isset($taxon))
 		{
 
-			$d=$this->getTaxonContent(array('category'=>TAB_VOORKOMEN,'taxon'=>$taxon));
+			$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
 
 			if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
 			{
@@ -315,9 +323,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 			foreach((array)$categories as $key=>$val)
 			{
-				if ($val['id']==TAB_VOORKOMEN)
-					$categories[$key]['is_empty']=true;
-
 				if ($val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
 					
@@ -383,18 +388,6 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-
-
-
-			/*
-				this is the tab with the information from the ministry,
-				which is queried live to see whether it has any data
-			*/
-			foreach((array)$categories as $key=>$val)
-			{
-				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
-					$categories[$key]['is_empty']=false;
-			}
 									
 		}
 
@@ -441,7 +434,7 @@ class SpeciesControllerNSR extends SpeciesController
 
         $names=$this->models->Names->freeQuery(
 			array(
-				'query' => '
+				'query' => "
 					select
 						_a.id,
 						_a.name,
@@ -460,7 +453,20 @@ class SpeciesControllerNSR extends SpeciesController
 						_b.nametype,
 						_a.language_id,
 						_c.language,
-						_d.label as language_label
+						_d.label as language_label,
+						case
+							when _b.nametype = '".PREDICATE_PREFERRED_NAME."' then 10
+							when _b.nametype = '".PREDICATE_ALTERNATIVE_NAME."' then 9
+							when _b.nametype = '".PREDICATE_VALID_NAME."' then 8
+							when _b.nametype = '".PREDICATE_SYNONYM."' then 7
+							when _b.nametype = '".PREDICATE_SYNONYM_SL."' then 6
+
+							when _b.nametype = '".PREDICATE_HOMONYM."' then 5
+							when _b.nametype = '".PREDICATE_MISSPELLED_NAME."' then 4
+							when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
+							else 0
+						end as sort_criterium
+
 					from %PRE%names _a 
 
 					left join %PRE%name_types _b
@@ -472,11 +478,14 @@ class SpeciesControllerNSR extends SpeciesController
 
 					left join %PRE%labels_languages _d
 						on _a.language_id=_d.language_id
-						and _d.label_language_id='.$this->getDefaultLanguageId().'
+						and _d.label_language_id=".$this->getDefaultLanguageId()."
 
 					where
-						_a.project_id = '.$this->getCurrentProjectId().'
-						and _a.taxon_id='.$id,
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.taxon_id=".$id."
+					order by 
+						sort_criterium desc
+						",
 				'fieldAsIndex' => 'id'
 			)
 		);
@@ -548,11 +557,12 @@ class SpeciesControllerNSR extends SpeciesController
     private function getTaxonMedia($p)
     {
 		$id=isset($p['id']) ? $p['id'] : null;
-		$overview=isset($p['overview']) ? $p['overview'] : false;
-		
+
 		if (empty($id))
 			return;
 
+		$overview=isset($p['overview']) ? $p['overview'] : false;
+		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : 'meta_datum_plaatsing';
@@ -568,6 +578,9 @@ class SpeciesControllerNSR extends SpeciesController
 				_z.name as dutch_name,
 				_j.name,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
+				".($distributionMaps?
+					"_map1.meta_data as meta_map_source,
+					 _map2.meta_data as meta_map_description,": "")."
 				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
@@ -576,6 +589,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
 				_meta8.meta_data as photographer
+
 			
 			from  %PRE%media_taxon _m
 			
@@ -606,6 +620,19 @@ class SpeciesControllerNSR extends SpeciesController
 					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 				
+
+			left join %PRE%media_meta _map1
+				on _m.id=_map1.media_id
+				and _m.project_id=_map1.project_id
+				and _map1.sys_label='verspreidingsKaartBron'
+
+			left join %PRE%media_meta _map2
+				on _m.id=_map2.media_id
+				and _m.project_id=_map2.project_id
+				and _map2.sys_label='verspreidingsKaartTitel'
+
+
+
 			left join %PRE%media_meta _meta1
 				on _m.id=_meta1.media_id
 				and _m.project_id=_meta1.project_id
@@ -648,10 +675,17 @@ class SpeciesControllerNSR extends SpeciesController
 				and _m.project_id=_meta8.project_id
 				and _meta8.sys_label='beeldbankFotograaf'
 			
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
 				and _m.taxon_id=".$id."
+				and ifnull(_meta9.meta_data,0)!=".($distributionMaps?'0':'1')."
 				".($overview ? "and _m.overview_image=1" : "")."
+
 
 			".(isset($sort) ? "order by ".$sort : "")."
 			".(isset($limit) ? "limit ".$limit : "")."
@@ -722,9 +756,15 @@ class SpeciesControllerNSR extends SpeciesController
 						on _m.id=_meta4.media_id
 						and _m.project_id=_meta4.project_id
 						and _meta4.sys_label='beeldbankDatumAanmaak'
+
+					left join %PRE%media_meta _meta9
+						on _m.id=_meta9.media_id
+						and _m.project_id=_meta9.project_id
+						and _meta9.sys_label='verspreidingsKaart'
 						
 					where 
 						_m.taxon_id = _q.taxon_id 
+						and ifnull(_meta9.meta_data,0)!=1
 						and _m.project_id=".$this->getCurrentProjectId()." 
 					order by
 						_meta4.meta_date desc
@@ -756,7 +796,7 @@ class SpeciesControllerNSR extends SpeciesController
 				on _m.id=_meta8.media_id
 				and _m.project_id=_meta8.project_id
 				and _meta8.sys_label='beeldbankFotograaf'
-			
+		
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and _f.rank_id >= ".SPECIES_RANK_ID."
@@ -780,6 +820,11 @@ class SpeciesControllerNSR extends SpeciesController
 				on _q.taxon_id=_m.taxon_id
 				and _q.project_id=_m.project_id
 
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+
 			left join %PRE%taxa _k
 				on _q.taxon_id=_k.id
 				and _q.project_id=_k.project_id
@@ -790,6 +835,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
 				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 			"
@@ -806,6 +852,11 @@ class SpeciesControllerNSR extends SpeciesController
 				on _q.taxon_id=_m.taxon_id
 				and _q.project_id=_m.project_id
 
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+
 			left join %PRE%taxa _k
 				on _q.taxon_id=_k.id
 				and _q.project_id=_k.project_id
@@ -816,6 +867,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
 				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 			"
@@ -888,15 +940,6 @@ class SpeciesControllerNSR extends SpeciesController
 	
 	}
 		
-	public function getTaxonClassification($id)
-	{
-		$this->tmp = array();
-
-		$this->_getTaxonClassification($id);
-
-		return $this->tmp;
-	}
-
 	private function getSpeciesCount($p)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -1330,19 +1373,6 @@ class SpeciesControllerNSR extends SpeciesController
         return $d[0]['total']>1;
     }
 
-    private function hasTaxonMedia($id)
-    {
-        $d=$this->models->MediaTaxon->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $id
-            ),
-			'columns' => 'count(*) as total'
-        ));
-        
-        return $d[0]['total']>1;
-    }
-
     private function hasTaxonBarcodes($id)
     {
 		$d=$this->models->DnaBarcodes->_get(
@@ -1457,5 +1487,11 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		return json_decode(file_get_contents(sprintf($this->_eZlinkWebservice,$this->getNSRId(array('id'=>$id)))));
 	}
+
+    private function getDistributionMaps($id)
+	{
+		return $this->getTaxonMedia(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing','limit'=>1));
+	}
+
 
 }

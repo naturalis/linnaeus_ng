@@ -84,7 +84,6 @@
 					<p>&nbsp;</p>
 					<p>
 						Bij deze soort kunnen beelden worden toegevoegd, voor aanbieding klik <a href="">hier</a>.
-						<!-- a href="http://www.naturalisbeeldbibliotheek.nl/get?alias=nbb&amp;page_alias=afbeeldingenaanbieden&amp;conceptId=0AHCYFOOGKTT&amp;conceptName=Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)&amp;comments=soort: Abacoproeces%20saltuum%20(L.%20Koch%2C%201872)" title="beeld aanbieden" target="_blank" -->
 					</p>
 				</div>
 				{/if}
@@ -118,7 +117,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 			</div>
 
-		{elseif $activeCategory==$smarty.const.TAB_VOORKOMEN || $activeCategory==$smarty.const.TAB_VERSPREIDING}
+		{elseif $activeCategory==$smarty.const.TAB_VERSPREIDING}
 
 			<div>
 				<h2>Voorkomen</h2>
@@ -132,6 +131,19 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 					</table>
 				</p>
+
+				{if $distributionMaps}
+				<h2>Verspreiding</h2>
+				{foreach from=$distributionMaps.data item=v}
+
+				<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
+				{if $v.meta_map_source && $v.meta_map_description}<br />{/if}{if $v.meta_map_source}Bron: {$v.meta_map_source}{/if}">
+					<img class="speciesimage" title="Foto {$v.photographer}" src="http://images.naturalis.nl/240/{$v.image}" />
+				</a>
+				{if $v.meta_map_description}<br />{$v.meta_map_description|@ucfirst}{/if}
+				{if $v.meta_map_source}<br />Bron: {$v.meta_map_source}{/if}
+				{/foreach}
+				{/if}
 
 				{if $atlasData.content}
 
@@ -233,6 +245,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					
 			<p>
 				<h2>Naamgeving</h2>
+				
 				<table>
 					{foreach from=$names.list item=v}
 						{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
@@ -365,16 +378,15 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			</p>
 			{/if}
 
-
 			{assign var=hasReferences value=false}
 			{capture name=references}
 			{foreach from=$rdf item=v}
 				{if $v.predicate=='hasReference'}
 				{assign var=hasReferences value=true}
-				<li>{$v.data.citation}</li>
+				<li><a href="../literature2/reference.php?id={$v.data.id}">{$v.data.citation}</a></li>
 				{elseif $v.object_type=='reference'}
 				{assign var=hasReferences value=true}
-				<li>{$v.data.source}, {$v.data.label}</li>
+				<li><a href="../literature2/reference.php?id={$v.data.id}">{$v.data.source}, {$v.data.label}</a></li>
 				{/if}
 			{/foreach}
 			{/capture}

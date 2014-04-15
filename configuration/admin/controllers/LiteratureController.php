@@ -64,38 +64,30 @@ class LiteratureController extends Controller
 
     public function editAction()
     {
-
+		
         $this->checkAuthorisation();
 
 		if ($this->rHasVal('add','hoc') && !isset($_SESSION['admin']['system']['literature']['newRef'])) {
 		// referred from the taxon content editing page
-
 			$_SESSION['admin']['system']['literature']['newRef'] = '<new>';
-
 		}
 
-
 		if ($this->rHasVal('letter')) {
-
-			$ref = $this->getFirstReference($this->requestData['letter']);
-		
+			$ref = $this->getFirstReference($this->rGetVal('letter'));
 		} else
 		if ($this->rHasId()) {
-
-			$ref = $this->getReference($this->requestData['id']);
-
+			$ref = $this->getReference($this->rGetVal('id'));
 		} else
 		if (!$this->rHasVal('action','new')) {
-
 			$ref = $this->getFirstReference();
-			
 		}
 
 		$alpha = $this->getActualAlphabet();
 
 		$navList = $this->getReferencesNavList();
 
-		if (isset($ref)) {
+		if (isset($ref))
+		{
 
     	    $this->setPageName(
 				sprintf(
@@ -106,7 +98,9 @@ class LiteratureController extends Controller
 				)
 			);
 		
-		} else {
+		} 
+		else 
+		{
 
     	    $this->setPageName($this->translate('New reference'));
 			
@@ -123,7 +117,8 @@ class LiteratureController extends Controller
 
 		}
 
-		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
+		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit())
+		{
 
 			$this->clearCache($this->cacheFiles);
 			
@@ -137,16 +132,15 @@ class LiteratureController extends Controller
 
 			$this->redirect('index.php');
 
-			//$this->redirect('browse.php');
-
 		} else
-		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text') && !$this->isFormResubmit())
+		{
 
 			$data = $this->requestData;
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
-			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : null;
+			$data['id'] =  $this->rHasId() ? $this->rGetVal('id') : null;
 
 			$data['multiple_authors'] = $data['auths']=='n' ? 1 : 0;
 
@@ -174,7 +168,8 @@ class LiteratureController extends Controller
 				$test['id'] = 'null';
 
 
-			if ($this->getReferences($test)) {
+			if ($this->getReferences($test))
+			{
 
 				$this->addError($this->translate('A reference with the same author(s), year and suffix already exists.'));
 
@@ -183,7 +178,8 @@ class LiteratureController extends Controller
 				if ($this->rHasVal('selectedTaxa')) $ref['taxa'] = $this->requestData['selectedTaxa'];
 
 			} else
-			if ($this->models->Literature->save($data)) {
+			if ($this->models->Literature->save($data))
+			{
 
 				$this->clearCache($this->cacheFiles);
 				
@@ -244,9 +240,11 @@ class LiteratureController extends Controller
 
 		}
 
-		$this->getTaxonTree();
 
-		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+
+//		$this->getTaxonTree();
+
+//		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 

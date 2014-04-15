@@ -63,7 +63,6 @@ class SearchControllerNSR extends SearchController
         $this->printPage($this->rHasVal('action','export') ? 'export' : null);
 	}
 
-
     public function searchExtendedAction()
     {
 		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
@@ -75,7 +74,6 @@ class SearchControllerNSR extends SearchController
 
         $this->printPage($this->rHasVal('action','export') ? 'export' : null);
     }
-
 
     public function searchPicturesAction()
     {
@@ -102,7 +100,6 @@ class SearchControllerNSR extends SearchController
         $this->printPage($this->rHasVal('action','export') ? 'export' : null);
     }
 
-
     public function recentPicturesAction()
     {
 		$results = $this->doRecentPictureSearch($this->requestData);
@@ -115,7 +112,6 @@ class SearchControllerNSR extends SearchController
         $this->printPage();
     }
 
-
     public function photographersAction()
     {
 		$this->smarty->assign('validators',$this->getValidatorPictureCount());
@@ -123,14 +119,12 @@ class SearchControllerNSR extends SearchController
         $this->printPage();
     }
 
-
     public function validatorsAction()
     {
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
 		$this->smarty->assign('validators',$this->getValidatorPictureCount(array('limit'=>'*')));
         $this->printPage();
     }
-
 
     public function ajaxInterfaceAction()
     {
@@ -167,8 +161,6 @@ class SearchControllerNSR extends SearchController
     
     }
 
-
-
 	private function getPresenceStatuses()
 	{
 		return
@@ -202,7 +194,6 @@ class SearchControllerNSR extends SearchController
 			);
 		
 	}
-
 
 	private function doSearch($p)
 	{
@@ -311,7 +302,6 @@ class SearchControllerNSR extends SearchController
 
 	}
 
-
 	private function doExtendedSearch($p)
 	{
 		$d=null;
@@ -377,9 +367,25 @@ class SearchControllerNSR extends SearchController
 
 			". ($img ? "
 				left join
-					(select project_id,taxon_id,count(*) as number_of_images from %PRE%media_taxon group by project_id,taxon_id) as _i
-						on _a.id=_i.taxon_id
-						and _i.project_id=_a.project_id" :  "" 
+					(
+						select 
+							_sub1.project_id,taxon_id,count(*) as number_of_images 
+						from
+							%PRE%media_taxon as _sub1
+
+						left join %PRE%media_meta _meta9
+							on _sub1.id=_meta9.media_id
+							and _sub1.project_id=_meta9.project_id
+							and _meta9.sys_label='verspreidingsKaart'
+
+						where
+							ifnull(_meta9.meta_data,0)!=1
+
+						group by
+							_sub1.project_id,taxon_id
+					) as _i
+					on _a.id=_i.taxon_id
+					and _i.project_id=_a.project_id" :  "" 
 				)."
 			
 			". ($dna ? "
@@ -431,7 +437,6 @@ class SearchControllerNSR extends SearchController
 
 		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resSpeciesPerPage,'ancestor'=>isset($ancestor) ? $ancestor : null);
 	}
-
 
 	private function getPhotographersPictureCount($p=null)
 	{
@@ -497,7 +502,6 @@ class SearchControllerNSR extends SearchController
 		
 	}
 
-
 	private function getValidatorPictureCount($p=null)
 	{
 
@@ -561,7 +565,6 @@ class SearchControllerNSR extends SearchController
 
 		return $validators;		
 	}
-
 
 	private function doPictureSearch($p)
 	{
@@ -696,12 +699,19 @@ class SearchControllerNSR extends SearchController
 				and _meta7.sys_label='beeldbankAdresMaker'
 				and _meta7.language_id=".$this->getCurrentLanguageId()."
 
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+			
 			".(!empty($group_id) ? "right join %PRE%taxon_quick_parentage _q
 				on _m.taxon_id=_q.taxon_id
 				and _m.project_id=_q.project_id
 				" : "" )."
 			
 			where _m.project_id = ".$this->getCurrentProjectId()."
+
+				and ifnull(_meta9.meta_data,0)!=1
 			
 				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
 				".(!empty($p['name']) && empty($p['name']) ?
@@ -719,7 +729,6 @@ class SearchControllerNSR extends SearchController
 		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
 		
 	}
-
 
 	private function doRecentPictureSearch($p)
 	{
@@ -834,8 +843,16 @@ class SearchControllerNSR extends SearchController
 				and _m.project_id=_meta4.project_id
 				and _meta4.sys_label='beeldbankDatumAanmaak'
 				and _meta4.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
 			
 			where _m.project_id =".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
+			
+
 		) 
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
@@ -845,7 +862,6 @@ class SearchControllerNSR extends SearchController
 		
 		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
 	}
-	
 
 	private function formatPictureResults($data)
 	{
@@ -874,7 +890,6 @@ class SearchControllerNSR extends SearchController
 		return  $data;
 	
 	}
-
 
 	private function getSuggestionsGroup($p)
 	{
@@ -954,7 +969,6 @@ class SearchControllerNSR extends SearchController
 		return $d;
 	}
 
-
 	private function getSuggestionsAuthor($p)
 	{	
 		$clause=null;
@@ -979,7 +993,6 @@ class SearchControllerNSR extends SearchController
 		);
 		return $d;
 	}
-
 
 	private function getSuggestionsValidator($p)
 	{
@@ -1008,7 +1021,6 @@ class SearchControllerNSR extends SearchController
 		return $d;
 		
 	}
-
 
 	private function getSuggestionsPhotographer($p)
 	{
@@ -1046,7 +1058,6 @@ class SearchControllerNSR extends SearchController
 		return $d;
 		
 	}
-
 
 	private function getSuggestionsName($p)
 	{
@@ -1110,7 +1121,6 @@ class SearchControllerNSR extends SearchController
 		
 	}
 
-
 	private function reconstructQueryString($ignore)
 	{
 		$querystring=null;
@@ -1133,7 +1143,6 @@ class SearchControllerNSR extends SearchController
 		
 		return $querystring;
 	}
-
 
 	private function makeReadableQueryString()
 	{

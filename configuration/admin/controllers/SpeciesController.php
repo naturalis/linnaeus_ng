@@ -5675,35 +5675,56 @@ class SpeciesController extends Controller
 
     private function getLookupList($p)
     {
-
-        $search = isset($p['search']) ? $p['search'] : null;
-        $matchStartOnly = isset($p['match_start']) ? $p['match_start'] == '1' : false;
-        $getAll = isset($p['get_all']) ? $p['get_all'] == '1' : false;
+        $search=isset($p['search']) ? $p['search'] : null;
+        $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
+        $getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
+        $concise=isset($p['concise']) ? $p['concise']==1 : false;
+        $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
+        $ignoreRank=isset($p['ignore_rank']) ? $p['ignore_rank']==1 : false;
+        $forceRank=isset($p['force_rank']) && in_array($p['force_rank'],array('highertaxa','species')) ? $p['force_rank'] : null;
+        $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
 
         if (empty($search) && !$getAll)
             return;
+			
+		$rankage=(!is_null($forceRank) ? $forceRank : ($this->getIsHigherTaxa() ? 'highertaxa' : 'species'));
 
-		$regexp = ($matchStartOnly?'^':'').preg_quote($search);
-        
         $taxa = $this->models->Taxon->freeQuery("
 			select
-				_a.id, _a.taxon, _a.rank_id, _a.is_hybrid
+				_a.id,
+				_a.taxon,
+				_a.rank_id,
+				_a.is_hybrid
+
 			from
 				%PRE%taxa _a 
-			left join %PRE%projects_ranks _b
+
+			".(!$ignoreRank ? "left join %PRE%projects_ranks _b
 				on _a.project_id=_b.project_id 
-				and _a.rank_id=_b.id 
+				and _a.rank_id=_b.id "  : "")."
+
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
-				and _b.lower_taxon = ".($this->getIsHigherTaxa() ? 0 : 1)."
-			".($getAll ? "" : "and _a.taxon like '%".$regexp."%'")."
-			limit ".$this->_lookupListMaxResults
+				".(!$ignoreRank ? "and _b.lower_taxon = ".($rankage=='highertaxa' ? 0 : 1) : "")."
+				".($getAll ? "" : "and _a.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'")."
+			limit ".$maxResults
 		);
-		
 
-        foreach ((array) $taxa as $key => $val) {
-			$taxa[$key]['label'] = $this->formatTaxon($val);
+
+        foreach ((array) $taxa as $key => $val)
+		{
+			if ($formatted)
+				$taxa[$key]['label']=$this->formatTaxon($val);
+			else
+				$taxa[$key]['label']=$taxa[$key]['taxon'];
+
 			unset($taxa[$key]['taxon']);
+
+			if ($concise)
+			{
+				unset($taxa[$key]['rank_id']);
+				unset($taxa[$key]['is_hybrid']);
+			}
 		}
 
         $this->customSortArray($taxa, array(

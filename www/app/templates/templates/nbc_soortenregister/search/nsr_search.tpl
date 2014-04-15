@@ -18,16 +18,16 @@
 			<p>
 				{if $results.data}
 
-				{foreach from=$results.data item=res}
+				{foreach from=$results.data item=v}
 				<div class="result">
-					{if $res.overview_image}
-					<img src="http://images.naturalis.nl/120x75/{$res.overview_image}"/>
+					{if $v.overview_image}
+					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
 					{/if}
 					
-					<strong><a href="../species/nsr_taxon.php?id={$res.taxon_id}">{$res.taxon}</a></strong><br />
-					{if $res.dutch_name}{$res.dutch_name}<br />{/if}
-					{if $res.presence_information_index_label || $res.presence_information_title}
-					{t}Status voorkomen:{/t} {$res.presence_information_index_label} {$res.presence_information_title}
+					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong><br />
+					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
+					{if $v.presence_information_index_label || $v.presence_information_title}
+					{t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
 					{/if}
 				</div>
 				{/foreach}

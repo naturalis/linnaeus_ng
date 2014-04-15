@@ -90,7 +90,7 @@ class RdfController extends Controller
 				PREDICATE_SYNONYM_SL=>'synoniem',
 				PREDICATE_MISSPELLED_NAME=>'fout gespelde naam',
 				PREDICATE_INVALID_NAME=>'ongeldige naam',
-				PREDICATE_ALTERNATIVE_NAME=>'alternatieve naam'
+				PREDICATE_ALTERNATIVE_NAME=>'alternatieve %se naam'
 			)
 		);
 
