@@ -597,7 +597,7 @@ class SearchControllerNSR extends SearchController
 		if (isset($p['sort']))
 			$sort=$p['sort'];
 		if (!empty($p['photographer']) || !empty($p['validator']))
-			$sort="_meta4.meta_data desc, _k.taxon";
+			$sort="_meta4.meta_date desc, _k.taxon";
 
 		$data=$this->models->MediaTaxon->freeQuery("		
 			select
