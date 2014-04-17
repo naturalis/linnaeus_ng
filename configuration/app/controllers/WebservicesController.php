@@ -361,8 +361,6 @@ parameters:
 			limit 4
 		");
 		
-var_dump($this->models->MediaTaxon->q());
-		
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
 			'search'=>$this->requestData['nsr']
