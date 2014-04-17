@@ -23,6 +23,7 @@
 
 */
 
+var allLookupAlwaysLookup = true;
 var allLookupActiveRow = false;
 var allLookupRowCount = 0;
 var allLookupListName = 'allLookupList'; 
@@ -68,7 +69,7 @@ function allLookupGetData(text) {
 
 	}
 
-	if (allLookupData==null) {
+	if (allLookupAlwaysLookup || allLookupData==null) {
 		
 		$.ajax({
 			url : "ajax_interface.php",
@@ -81,7 +82,7 @@ function allLookupGetData(text) {
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-				//console.log(data);
+				console.log(data);
 				allLookupData = $.parseJSON(data);
 				if (data) allLookupBuildList(allLookupData,text);
 
