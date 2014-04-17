@@ -249,157 +249,163 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->tmp;
 	}
 
-
-
     private function getCategories($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 
-		$categories=$this->models->PageTaxon->freeQuery("
-			select
-				_a.id,
-				ifnull(_b.title,_a.page) as title,
-				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
-				_a.show_order,
-				".(isset($taxon) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
-				_a.def_page
+		$categories=$this->getSessionVar(array('categories-taxon',$p['taxon']));
 
-			from 
-				%PRE%pages_taxa _a
-				
-			left join %PRE%pages_taxa_titles _b
-				on _a.project_id=_b.project_id
-				and _a.id=_b.page_id
-				and _b.language_id = ". $this->getCurrentLanguageId() ."
-				
-			".(isset($taxon) ? "
-				left join %PRE%content_taxa _c
-					on _a.project_id=_c.project_id
-					and _a.id=_c.page_id
-					and _c.taxon_id =".$taxon."
-					and _c.language_id = ". $this->getCurrentLanguageId() ."
-				
-				" : "")."
-
-			where 
-				_a.project_id=".$this->getCurrentProjectId()."
-
-			order by 
-				_a.show_order
-		");
-
-		if (!$categories) $categories=array();
-
-		if (isset($taxon))
+		if (is_null($categories))
 		{
-
-			$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
-
-			if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
+			$categories=$this->models->PageTaxon->freeQuery("
+				select
+					_a.id,
+					ifnull(_b.title,_a.page) as title,
+					concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
+					_a.show_order,
+					".(isset($taxon) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
+					_a.def_page
+	
+				from 
+					%PRE%pages_taxa _a
+					
+				left join %PRE%pages_taxa_titles _b
+					on _a.project_id=_b.project_id
+					and _a.id=_b.page_id
+					and _b.language_id = ". $this->getCurrentLanguageId() ."
+					
+				".(isset($taxon) ? "
+					left join %PRE%content_taxa _c
+						on _a.project_id=_c.project_id
+						and _a.id=_c.page_id
+						and _c.taxon_id =".$taxon."
+						and _c.language_id = ". $this->getCurrentLanguageId() ."
+					
+					" : "")."
+	
+				where 
+					_a.project_id=".$this->getCurrentProjectId()."
+	
+				order by 
+					_a.show_order
+			");
+	
+			if (!$categories) $categories=array();
+	
+			if (isset($taxon))
 			{
-				foreach((array)$categories as $key=>$val)
+	
+				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
+	
+				if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
 				{
-					if ($val['id']==TAB_VERSPREIDING) {
-						$categories[$key]['is_empty']=false;
-						break;
+					foreach((array)$categories as $key=>$val)
+					{
+						if ($val['id']==TAB_VERSPREIDING) {
+							$categories[$key]['is_empty']=false;
+							break;
+						}
 					}
 				}
-			}
-			 
-							
-			if (!$this->_suppressTab_NAMES)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_NAMES, 
-						'title' => $this->translate('Naamgeving'), 
-						'is_empty' => false,
-						'tabname' => 'CTAB_NAMES'
-					)
-				);
-			}
-
-			foreach((array)$categories as $key=>$val)
-			{
-				if ($val['id']==TAB_NAAMGEVING)
-					$categories[$key]['is_empty']=true;
-					
-				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
-					$dummy=$key;
-			}
-			
-			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
-			if ($categories[$dummy]['is_empty']==1)
-			{
-				$ezData=$this->getEzData($taxon);
-				$categories[$dummy]['is_empty']=empty($ezData);
-			}
-
-			if (!$this->_suppressTab_LITERATURE)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_LITERATURE, 
-						'title' => $this->translate('Literature'), 
-						'is_empty' => !$this->hasTaxonLiterature($taxon),
-						'tabname' => 'CTAB_LITERATURE'
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_MEDIA)
-			{
-				/*
-					species & lower should always show the media tab, even
-					if there is no media, to be able to show the upload link
-				*/
-
-				if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
+				 
+								
+				if (!$this->_suppressTab_NAMES)
 				{
-					$isEmpty=false;
+					array_push($categories,
+						array(
+							'id' => CTAB_NAMES, 
+							'title' => $this->translate('Naamgeving'), 
+							'is_empty' => false,
+							'tabname' => 'CTAB_NAMES'
+						)
+					);
 				}
-				else
+	
+				foreach((array)$categories as $key=>$val)
 				{
-					$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
-					$isEmpty=$d['count']==0;
+					if ($val['id']==TAB_NAAMGEVING)
+						$categories[$key]['is_empty']=true;
+						
+					if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+						$dummy=$key;
 				}
-
 				
-				array_push($categories,
-					array(
-						'id' => CTAB_MEDIA, 
-						'title' => $this->translate('Media'), 
-						'is_empty' => $isEmpty,
-						'tabname' => 'CTAB_MEDIA'
-					)
-				);
+				// TAB_BEDREIGING_EN_BESCHERMING check at EZ
+				if ($categories[$dummy]['is_empty']==1)
+				{
+					$ezData=$this->getEzData($taxon);
+					$categories[$dummy]['is_empty']=empty($ezData);
+				}
+	
+				if (!$this->_suppressTab_LITERATURE)
+				{
+					array_push($categories,
+						array(
+							'id' => CTAB_LITERATURE, 
+							'title' => $this->translate('Literature'), 
+							'is_empty' => !$this->hasTaxonLiterature($taxon),
+							'tabname' => 'CTAB_LITERATURE'
+						)
+					);
+				}
+	
+				if (!$this->_suppressTab_MEDIA)
+				{
+					/*
+						species & lower should always show the media tab, even
+						if there is no media, to be able to show the upload link
+					*/
+	
+					if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
+					{
+						$isEmpty=false;
+					}
+					else
+					{
+						$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
+						$isEmpty=$d['count']==0;
+					}
+	
+					
+					array_push($categories,
+						array(
+							'id' => CTAB_MEDIA, 
+							'title' => $this->translate('Media'), 
+							'is_empty' => $isEmpty,
+							'tabname' => 'CTAB_MEDIA'
+						)
+					);
+				}
+	
+				if (!$this->_suppressTab_DNA_BARCODES)
+				{			
+					array_push($categories,
+						array(
+							'id' => CTAB_DNA_BARCODES, 
+							'title' => $this->translate('DNA barcodes'), 
+							'is_empty' =>! $this->hasTaxonBarcodes($taxon),
+							'tabname' => 'CTAB_DNA_BARCODES'
+						)
+					);
+				}
+										
 			}
-
-			if (!$this->_suppressTab_DNA_BARCODES)
-			{			
-				array_push($categories,
-					array(
-						'id' => CTAB_DNA_BARCODES, 
-						'title' => $this->translate('DNA barcodes'), 
-						'is_empty' =>! $this->hasTaxonBarcodes($taxon),
-						'tabname' => 'CTAB_DNA_BARCODES'
-					)
-				);
-			}
-									
+	
+			$order=$this->models->TabOrder->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'columns'=>'tabname,show_order,start_order',
+				'fieldAsIndex'=>'tabname',
+				'order'=>'start_order'
+			));
+			
 		}
-
-		$order=$this->models->TabOrder->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			),
-			'columns'=>'tabname,show_order,start_order',
-			'fieldAsIndex'=>'tabname',
-			'order'=>'start_order'
-		));
+		
+		$this->setSessionVar(array('categories-taxon',$p['taxon']),$categories);
 
 		$start=null;
 		$firstNonEmpty=null;
@@ -422,6 +428,8 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->customSortArray($categories,array('key' => 'show_order'));
 
 		if (is_null($start)) $start=$firstNonEmpty;
+		
+
 
 		return array('start'=>$start,'categories'=>$categories);
 

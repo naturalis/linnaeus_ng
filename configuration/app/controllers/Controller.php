@@ -3332,4 +3332,47 @@ class Controller extends BaseClass
 	}
 
 
+	public function setSessionVar($name,$value=null)
+	{
+		if (is_null($name))
+			return;
+		
+		if (is_null($value))
+		{
+			if (!is_array($name))
+				unset($_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name]);
+			else
+				unset($_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name[0]][$name[1]]);
+		}
+			
+		if (!is_array($name))
+			$_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name]=$value;
+		else
+			$_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name[0]][$name[1]]=$value;
+	}
+
+	public function getSessionVar($name)
+	{
+		if (is_null($name))
+			return;		
+
+		if (!is_array($name))
+		{
+			if (!isset($_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name]))
+				return null;
+			else
+				return $_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name];
+		}
+		else
+		{
+			if (!isset($_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name[0]][$name[1]]))
+				return null;
+			else
+				return $_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name[0]][$name[1]];
+		}
+		
+	}
+
+
+
 }
