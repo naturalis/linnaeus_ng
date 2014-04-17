@@ -22,9 +22,6 @@ include_once ('RdfController.php');
 class SpeciesControllerNSR extends SpeciesController
 {
 	private $_resPicsPerPage=12;
-	private $_eZlinkWebservice='http://ez-development-001.cloud.naturalis.nl/webservice/nsr_view?nsr_id=%s';
-	private $_eZlink='http://ez-development-001.cloud.naturalis.nl/node/%s';
-	
 
     public function __construct()
     {
@@ -105,31 +102,13 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
 			{
-				$ezData=$this->getEzData($taxon['id']);
-
-				if(!empty($ezData))
-				{
-					$wetten=array();
-
-					foreach($ezData as $key=>$val)
-					{
-						$wetten[$val->wetenschappelijke_naam]['wetten'][$val->wet][]=
-							array(
-								'categorie'=>$val->categorie,
-								'publicatie'=>strip_tags($val->publicatie)
-							);
-						$wetten[$val->wetenschappelijke_naam]['url']=sprintf($this->_eZlink,$val->soort_id);
-					}
-
-					$this->smarty->assign('wetten',$wetten);
-
-				}
-
-			}
-
-
+				$wetten=$this->getEzData($taxon['id']);
+				$this->smarty->assign('wetten',$wetten);
+			} 
+			else
 			if ($categories['start']==TAB_VERSPREIDING)
 			{
+				
 				$distributionMaps=$this->getDistributionMaps($taxon['id']);
 				$this->smarty->assign('distributionMaps',$distributionMaps);
 
@@ -139,44 +118,25 @@ class SpeciesControllerNSR extends SpeciesController
 				$trendData=$this->getTrendData($taxon['id']);
 				$this->smarty->assign('trendData',$trendData);
 
-				$atlasData=$this->getExternalId(array('id'=>$taxon['id'],'org'=>'Verspreidingsatlas'));
+				$statusRodeLijst=$this->getEzStatusRodeLijst($taxon['id']);
+				$this->smarty->assign('statusRodeLijst',$statusRodeLijst);
 
-				if ($atlasData)
+				$atlasData=$this->getVerspreidingsatlasData($taxon['id']);
+				if (!empty($atlasData['logo']))
 				{
-					$dummy=file_get_contents($atlasData['service_url']);
-
-					if ($dummy)
-					{
-						$xml = simplexml_load_string($dummy);
-						if ($xml)
-						{
-							$atlasData['content'] = (string)$xml->tab->content;
-							$atlasData['author'] = (string)$xml->tab->author;
-							$atlasData['pubdate'] = (string)$xml->tab->pubdate;
-							$atlasData['copyright'] = (string)$xml->tab->copyright;
-							$atlasData['sourcedocument'] = (string)$xml->tab->sourcedocument;
-							$atlasData['distributionmap'] = (string)$xml->tab->distributionmap;
-
-							$this->smarty->assign('atlasData',$atlasData);
-						}
-					}
+					array_push(
+						$sideBarLogos,
+						array(
+							'organisation'=>$atlasData['organisation'],
+							'logo'=>$atlasData['logo'],
+							'url'=>$atlasData['organisation_url']
+						)
+					);
+				}				
+				$this->smarty->assign('atlasData',$atlasData);
 	
-					if (!empty($atlasData['logo']))
-					{
-						array_push(
-							$sideBarLogos,
-							array(
-								'organisation'=>$atlasData['organisation'],
-								'logo'=>$atlasData['logo'],
-								'url'=>$atlasData['organisation_url']
-							)
-						);
-					}
-					
-				}
-
-	
-			} else
+			} 
+			else
 			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
 			{
 				$content=$this->getTaxonContent(
@@ -255,158 +215,150 @@ class SpeciesControllerNSR extends SpeciesController
 		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 
-		$categories=$this->getSessionVar(array('categories-taxon',$p['taxon']));
+		$categories=$this->models->PageTaxon->freeQuery("
+			select
+				_a.id,
+				ifnull(_b.title,_a.page) as title,
+				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
+				_a.show_order,
+				".(isset($taxon) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
+				_a.def_page
 
-		if (is_null($categories))
+			from 
+				%PRE%pages_taxa _a
+				
+			left join %PRE%pages_taxa_titles _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.page_id
+				and _b.language_id = ". $this->getCurrentLanguageId() ."
+				
+			".(isset($taxon) ? "
+				left join %PRE%content_taxa _c
+					on _a.project_id=_c.project_id
+					and _a.id=_c.page_id
+					and _c.taxon_id =".$taxon."
+					and _c.language_id = ". $this->getCurrentLanguageId() ."
+				
+				" : "")."
+
+			where 
+				_a.project_id=".$this->getCurrentProjectId()."
+
+			order by 
+				_a.show_order
+		");
+
+		if (!$categories) $categories=array();
+
+		if (isset($taxon))
 		{
-			$categories=$this->models->PageTaxon->freeQuery("
-				select
-					_a.id,
-					ifnull(_b.title,_a.page) as title,
-					concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
-					_a.show_order,
-					".(isset($taxon) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
-					_a.def_page
-	
-				from 
-					%PRE%pages_taxa _a
-					
-				left join %PRE%pages_taxa_titles _b
-					on _a.project_id=_b.project_id
-					and _a.id=_b.page_id
-					and _b.language_id = ". $this->getCurrentLanguageId() ."
-					
-				".(isset($taxon) ? "
-					left join %PRE%content_taxa _c
-						on _a.project_id=_c.project_id
-						and _a.id=_c.page_id
-						and _c.taxon_id =".$taxon."
-						and _c.language_id = ". $this->getCurrentLanguageId() ."
-					
-					" : "")."
-	
-				where 
-					_a.project_id=".$this->getCurrentProjectId()."
-	
-				order by 
-					_a.show_order
-			");
-	
-			if (!$categories) $categories=array();
-	
-			if (isset($taxon))
+
+			$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
+
+			if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
 			{
-	
-				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
-	
-				if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
-				{
-					foreach((array)$categories as $key=>$val)
-					{
-						if ($val['id']==TAB_VERSPREIDING) {
-							$categories[$key]['is_empty']=false;
-							break;
-						}
-					}
-				}
-				 
-								
-				if (!$this->_suppressTab_NAMES)
-				{
-					array_push($categories,
-						array(
-							'id' => CTAB_NAMES, 
-							'title' => $this->translate('Naamgeving'), 
-							'is_empty' => false,
-							'tabname' => 'CTAB_NAMES'
-						)
-					);
-				}
-	
 				foreach((array)$categories as $key=>$val)
 				{
-					if ($val['id']==TAB_NAAMGEVING)
-						$categories[$key]['is_empty']=true;
-						
-					if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
-						$dummy=$key;
-				}
-				
-				// TAB_BEDREIGING_EN_BESCHERMING check at EZ
-				if ($categories[$dummy]['is_empty']==1)
-				{
-					$ezData=$this->getEzData($taxon);
-					$categories[$dummy]['is_empty']=empty($ezData);
-				}
-	
-				if (!$this->_suppressTab_LITERATURE)
-				{
-					array_push($categories,
-						array(
-							'id' => CTAB_LITERATURE, 
-							'title' => $this->translate('Literature'), 
-							'is_empty' => !$this->hasTaxonLiterature($taxon),
-							'tabname' => 'CTAB_LITERATURE'
-						)
-					);
-				}
-	
-				if (!$this->_suppressTab_MEDIA)
-				{
-					/*
-						species & lower should always show the media tab, even
-						if there is no media, to be able to show the upload link
-					*/
-	
-					if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
-					{
-						$isEmpty=false;
+					if ($val['id']==TAB_VERSPREIDING) {
+						$categories[$key]['is_empty']=false;
+						break;
 					}
-					else
-					{
-						$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
-						$isEmpty=$d['count']==0;
-					}
-	
-					
-					array_push($categories,
-						array(
-							'id' => CTAB_MEDIA, 
-							'title' => $this->translate('Media'), 
-							'is_empty' => $isEmpty,
-							'tabname' => 'CTAB_MEDIA'
-						)
-					);
 				}
-	
-				if (!$this->_suppressTab_DNA_BARCODES)
-				{			
-					array_push($categories,
-						array(
-							'id' => CTAB_DNA_BARCODES, 
-							'title' => $this->translate('DNA barcodes'), 
-							'is_empty' =>! $this->hasTaxonBarcodes($taxon),
-							'tabname' => 'CTAB_DNA_BARCODES'
-						)
-					);
-				}
-										
 			}
-	
-			$order=$this->models->TabOrder->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'columns'=>'tabname,show_order,start_order',
-				'fieldAsIndex'=>'tabname',
-				'order'=>'start_order'
-			));
-			
-		}
-		
-		$this->setSessionVar(array('categories-taxon',$p['taxon']),$categories);
+			 
+							
+			if (!$this->_suppressTab_NAMES)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_NAMES, 
+						'title' => $this->translate('Naamgeving'), 
+						'is_empty' => false,
+						'tabname' => 'CTAB_NAMES'
+					)
+				);
+			}
 
+			foreach((array)$categories as $key=>$val)
+			{
+				if ($val['id']==TAB_NAAMGEVING)
+					$categories[$key]['is_empty']=true;
+					
+				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+					$dummy=$key;
+			}
+			
+			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
+			if ($categories[$dummy]['is_empty']==1)
+			{
+				$ezData=$this->getEzData($taxon);
+				$categories[$dummy]['is_empty']=empty($ezData);
+			}
+
+			if (!$this->_suppressTab_LITERATURE)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_LITERATURE, 
+						'title' => $this->translate('Literature'), 
+						'is_empty' => !$this->hasTaxonLiterature($taxon),
+						'tabname' => 'CTAB_LITERATURE'
+					)
+				);
+			}
+
+			if (!$this->_suppressTab_MEDIA)
+			{
+				/*
+					species & lower should always show the media tab, even
+					if there is no media, to be able to show the upload link
+				*/
+
+				if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
+				{
+					$isEmpty=false;
+				}
+				else
+				{
+					$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
+					$isEmpty=$d['count']==0;
+				}
+
+				
+				array_push($categories,
+					array(
+						'id' => CTAB_MEDIA, 
+						'title' => $this->translate('Media'), 
+						'is_empty' => $isEmpty,
+						'tabname' => 'CTAB_MEDIA'
+					)
+				);
+			}
+
+			if (!$this->_suppressTab_DNA_BARCODES)
+			{			
+				array_push($categories,
+					array(
+						'id' => CTAB_DNA_BARCODES, 
+						'title' => $this->translate('DNA barcodes'), 
+						'is_empty' =>! $this->hasTaxonBarcodes($taxon),
+						'tabname' => 'CTAB_DNA_BARCODES'
+					)
+				);
+			}
+									
+		}
+
+		$order=$this->models->TabOrder->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			),
+			'columns'=>'tabname,show_order,start_order',
+			'fieldAsIndex'=>'tabname',
+			'order'=>'start_order'
+		));
+		
 		$start=null;
 		$firstNonEmpty=null;
 
@@ -428,8 +380,6 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->customSortArray($categories,array('key' => 'show_order'));
 
 		if (is_null($start)) $start=$firstNonEmpty;
-		
-
 
 		return array('start'=>$start,'categories'=>$categories);
 
@@ -738,158 +688,168 @@ class SpeciesControllerNSR extends SpeciesController
 		if (empty($id))
 			return;
 
-		$data=$this->models->Taxon->freeQuery("		
-			select
-				SQL_CALC_FOUND_ROWS
-				_q.taxon_id,
-				_m.file_name as image,
-				_m.file_name as thumb,
-				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
-				_z.name,
-				_meta8.meta_data as photographer
-			
-			from
-				%PRE%taxon_quick_parentage _q
-			
-			right join %PRE%media_taxon _m
-				on _q.taxon_id=_m.taxon_id
-				and _q.project_id=_m.project_id
-				and _m.id = (
-					select 
-						_m.id
-					from
-						%PRE%media_taxon _m
-
-					left join %PRE%media_meta _meta4
-						on _m.id=_meta4.media_id
-						and _m.project_id=_meta4.project_id
-						and _meta4.sys_label='beeldbankDatumAanmaak'
-
-					left join %PRE%media_meta _meta9
-						on _m.id=_meta9.media_id
-						and _m.project_id=_meta9.project_id
-						and _meta9.sys_label='verspreidingsKaart'
-						
-					where 
-						_m.taxon_id = _q.taxon_id 
-						and ifnull(_meta9.meta_data,0)!=1
-						and _m.project_id=".$this->getCurrentProjectId()." 
-					order by
-						_meta4.meta_date desc
-					limit 1
-				)
-
-			left join %PRE%taxa _k
-				on _q.taxon_id=_k.id
-				and _q.project_id=_k.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			left join %PRE%names _z
-				on _q.taxon_id=_z.taxon_id
-				and _q.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
-
-			left join %PRE%names _j
-				on _m.taxon_id=_j.taxon_id
-				and _m.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-
-			left join %PRE%media_meta _meta8
-				on _m.id=_meta8.media_id
-				and _m.project_id=_meta8.project_id
-				and _meta8.sys_label='beeldbankFotograaf'
+		$data=$this->getSessionVar(array('collected-higher-taxa-media',$id));
 		
-			where
-				_q.project_id=".$this->getCurrentProjectId()."
-				and _f.rank_id >= ".SPECIES_RANK_ID."
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-
-			order by taxon
-			".(isset($limit) ? "limit ".$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+		if (is_null($data)) 
+		{
+	
+			$data=$this->models->Taxon->freeQuery("		
+				select
+					SQL_CALC_FOUND_ROWS
+					_q.taxon_id,
+					_m.file_name as image,
+					_m.file_name as thumb,
+					trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
+					_z.name,
+					_meta8.meta_data as photographer
+				
+				from
+					%PRE%taxon_quick_parentage _q
+				
+				right join %PRE%media_taxon _m
+					on _q.taxon_id=_m.taxon_id
+					and _q.project_id=_m.project_id
+					and _m.id = (
+						select 
+							_m.id
+						from
+							%PRE%media_taxon _m
+	
+						left join %PRE%media_meta _meta4
+							on _m.id=_meta4.media_id
+							and _m.project_id=_meta4.project_id
+							and _meta4.sys_label='beeldbankDatumAanmaak'
+	
+						left join %PRE%media_meta _meta9
+							on _m.id=_meta9.media_id
+							and _m.project_id=_meta9.project_id
+							and _meta9.sys_label='verspreidingsKaart'
+							
+						where 
+							_m.taxon_id = _q.taxon_id 
+							and ifnull(_meta9.meta_data,0)!=1
+							and _m.project_id=".$this->getCurrentProjectId()." 
+						order by
+							_meta4.meta_date desc
+						limit 1
+					)
+	
+				left join %PRE%taxa _k
+					on _q.taxon_id=_k.id
+					and _q.project_id=_k.project_id
+					
+				left join %PRE%projects_ranks _f
+					on _k.rank_id=_f.id
+					and _k.project_id=_f.project_id
+	
+				left join %PRE%names _z
+					on _q.taxon_id=_z.taxon_id
+					and _q.project_id=_z.project_id
+					and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+					and _z.language_id=".LANGUAGE_ID_DUTCH."
+	
+				left join %PRE%names _j
+					on _m.taxon_id=_j.taxon_id
+					and _m.project_id=_j.project_id
+					and _j.type_id=(select id from %PRE%name_types where project_id = ".
+						$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+					and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+	
+				left join %PRE%media_meta _meta8
+					on _m.id=_meta8.media_id
+					and _m.project_id=_meta8.project_id
+					and _meta8.sys_label='beeldbankFotograaf'
+			
+				where
+					_q.project_id=".$this->getCurrentProjectId()."
+					and _f.rank_id >= ".SPECIES_RANK_ID."
+					and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+	
+				order by taxon
+				".(isset($limit) ? "limit ".$limit : "")."
+				".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+				);
+			
+			$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+	
+			$totalCount=$this->models->Taxon->freeQuery("		
+				select
+					count(*) as total
+				
+				from
+					%PRE%taxon_quick_parentage _q
+				
+				right join %PRE%media_taxon _m
+					on _q.taxon_id=_m.taxon_id
+					and _q.project_id=_m.project_id
+	
+				left join %PRE%media_meta _meta9
+					on _m.id=_meta9.media_id
+					and _m.project_id=_meta9.project_id
+					and _meta9.sys_label='verspreidingsKaart'
+	
+				left join %PRE%taxa _k
+					on _q.taxon_id=_k.id
+					and _q.project_id=_k.project_id
+					
+				left join %PRE%projects_ranks _f
+					on _k.rank_id=_f.id
+					and _k.project_id=_f.project_id
+	
+				where
+					_q.project_id=".$this->getCurrentProjectId()."
+					and ifnull(_meta9.meta_data,0)!=1
+					and _f.rank_id >= ".SPECIES_RANK_ID."
+					and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+				"
 			);
-		
-		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
-
-		$totalCount=$this->models->Taxon->freeQuery("		
-			select
-				count(*) as total
-			
-			from
-				%PRE%taxon_quick_parentage _q
-			
-			right join %PRE%media_taxon _m
-				on _q.taxon_id=_m.taxon_id
-				and _q.project_id=_m.project_id
-
-			left join %PRE%media_meta _meta9
-				on _m.id=_meta9.media_id
-				and _m.project_id=_meta9.project_id
-				and _meta9.sys_label='verspreidingsKaart'
-
-			left join %PRE%taxa _k
-				on _q.taxon_id=_k.id
-				and _q.project_id=_k.project_id
+	
+			$species=$this->models->Taxon->freeQuery("		
+				select
+					count(distinct _m.taxon_id) as total
 				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			where
-				_q.project_id=".$this->getCurrentProjectId()."
-				and ifnull(_meta9.meta_data,0)!=1
-				and _f.rank_id >= ".SPECIES_RANK_ID."
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-			"
-		);
-
-		$species=$this->models->Taxon->freeQuery("		
-			select
-				count(distinct _m.taxon_id) as total
-			
-			from
-				%PRE%taxon_quick_parentage _q
-			
-			right join %PRE%media_taxon _m
-				on _q.taxon_id=_m.taxon_id
-				and _q.project_id=_m.project_id
-
-			left join %PRE%media_meta _meta9
-				on _m.id=_meta9.media_id
-				and _m.project_id=_meta9.project_id
-				and _meta9.sys_label='verspreidingsKaart'
-
-			left join %PRE%taxa _k
-				on _q.taxon_id=_k.id
-				and _q.project_id=_k.project_id
+				from
+					%PRE%taxon_quick_parentage _q
 				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			where
-				_q.project_id=".$this->getCurrentProjectId()."
-				and ifnull(_meta9.meta_data,0)!=1
-				and _f.rank_id >= ".SPECIES_RANK_ID."
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-			"
-		);
-
-		return 
-			array(
-				'count'=>$count[0]['total'],
-				'totalCount'=>$totalCount[0]['total'],
-				'species'=>$species[0]['total'],
-				'data'=>$data,
-				'perpage'=>$this->_resPicsPerPage
+				right join %PRE%media_taxon _m
+					on _q.taxon_id=_m.taxon_id
+					and _q.project_id=_m.project_id
+	
+				left join %PRE%media_meta _meta9
+					on _m.id=_meta9.media_id
+					and _m.project_id=_meta9.project_id
+					and _meta9.sys_label='verspreidingsKaart'
+	
+				left join %PRE%taxa _k
+					on _q.taxon_id=_k.id
+					and _q.project_id=_k.project_id
+					
+				left join %PRE%projects_ranks _f
+					on _k.rank_id=_f.id
+					and _k.project_id=_f.project_id
+	
+				where
+					_q.project_id=".$this->getCurrentProjectId()."
+					and ifnull(_meta9.meta_data,0)!=1
+					and _f.rank_id >= ".SPECIES_RANK_ID."
+					and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+				"
 			);
-		
+			
+			$data= 
+				array(
+					'count'=>$count[0]['total'],
+					'totalCount'=>$totalCount[0]['total'],
+					'species'=>$species[0]['total'],
+					'data'=>$data,
+					'perpage'=>$this->_resPicsPerPage
+				);
+				
+			$this->setSessionVar(array('collected-higher-taxa-media',$id),$data);
+		}
+
+		return $data;
+	
 	}
 
 	private function _getTaxonClassification($id)
@@ -1499,14 +1459,176 @@ class SpeciesControllerNSR extends SpeciesController
 
     }
 
+    private function getExternalOrg($org)
+    {
+		if (empty($org))
+			return;
+
+		$t=$this->models->ExternalOrgs->freeQuery("
+			select
+				name,
+				organisation_url,
+				general_url,
+				service_url
+			from %PRE%external_orgs
+			where 
+				project_id = ".$this->getCurrentProjectId()." 
+				and lower(name) = '". mysql_real_escape_string($org) ."'
+		");
+
+		if ($t)
+		{
+			$name=$t[0]['name'];
+			
+			if (file_exists($this->getProjectUrl('projectMedia').$name.'.png'))
+			{
+				$logo=$this->getProjectUrl('projectMedia').$name.'.png';
+			} 
+			else
+			if (file_exists($this->getProjectUrl('projectMedia').$name.'.jpg'))
+			{
+				$logo=$this->getProjectUrl('projectMedia').$name.'.jpg';
+			} 
+			else
+				$logo=null;
+
+			return array(
+				'organisation' => $name,
+				'logo'=> $logo,
+				'organisation_url' => $t[0]['organisation_url'],
+				'general_url' => $t[0]['general_url'],
+				'service_url' => $t[0]['service_url'],
+			);
+		}
+
+    }
+
 	private function getEzData($id)
 	{
-		return json_decode(file_get_contents(sprintf($this->_eZlinkWebservice,$this->getNSRId(array('id'=>$id)))));
+		$checked=$this->getSessionVar(array('ez-data-checked',$id));
+
+		if ($checked!==true)
+		{
+			$org=$this->getExternalOrg('Ministerie EZ');
+			$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
+
+			if (isset($data))
+			{
+				$wetten=array();
+
+				foreach($data as $key=>$val)
+				{
+					$wetten[$val->wetenschappelijke_naam]['wetten'][$val->wet][]=
+						array(
+							'categorie'=>$val->categorie,
+							'publicatie'=>strip_tags($val->publicatie)
+						);
+					$wetten[$val->wetenschappelijke_naam]['url']=sprintf($org['general_url'],$val->soort_id);
+				}
+
+				$this->setSessionVar(array('ez-data',$id),$wetten);
+			}
+			else
+			{
+				$wetten=null;
+			}
+
+			$this->setSessionVar(array('ez-data-checked',$id),true);
+			
+			return $wetten;
+		}
+		else
+		{
+			return $this->getSessionVar(array('ez-data',$id));
+		}
+		
+	}
+
+	private function getEzStatusRodeLijst($id)
+	{
+		$checked=$this->getSessionVar(array('ez-data-rl-checked',$id));
+
+		if ($checked!==true)
+		{
+			$org=$this->getExternalOrg('Ministerie EZ: Rode Lijst');
+			$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
+
+			if (isset($data[0]->subcategorie))
+			{
+				$data = array('status'=>$data[0]->subcategorie,'url'=>sprintf($org['general_url'],$data[0]->soort_id));
+				$this->setSessionVar(array('ez-data-rl',$id),$data);
+			}
+			else
+			{
+				$data=null;
+			}
+
+			$this->setSessionVar(array('ez-data-rl-checked',$id),true);
+			
+			return $data;
+		}
+		else
+		{
+			return $this->getSessionVar(array('ez-data-rl',$id));
+		}
+		
 	}
 
     private function getDistributionMaps($id)
 	{
 		return $this->getTaxonMedia(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing','limit'=>1));
+	}
+
+	private function getVerspreidingsatlasData($id)
+	{
+
+		$data=$this->getSessionVar(array('atlas-data-checked',$id));
+
+		if (is_null($data))
+		{
+
+			$data=$this->getSessionVar(array('atlas-data',$id));
+			
+			if (is_null($data))
+			{
+
+				$data=$this->getExternalId(array('id'=>$id,'org'=>'Verspreidingsatlas'));
+
+				if ($data)
+				{
+					$dummy=file_get_contents($data['service_url']);
+			
+					if ($dummy)
+					{
+						$xml = simplexml_load_string($dummy);
+
+						if ($xml)
+						{
+							$data['content'] = (string)$xml->tab->content;
+							$data['author'] = (string)$xml->tab->author;
+							$data['pubdate'] = (string)$xml->tab->pubdate;
+							$data['copyright'] = (string)$xml->tab->copyright;
+							$data['sourcedocument'] = (string)$xml->tab->sourcedocument;
+							$data['distributionmap'] = (string)$xml->tab->distributionmap;
+			
+						}
+					}
+			
+				}
+
+				$this->setSessionVar(array('atlas-data',$id),$data);
+			}
+			
+			$this->setSessionVar(array('atlas-data-checked',$id),true);
+
+		}
+		else
+		{
+			$data=$this->getSessionVar(array('atlas-data',$id));
+		}
+		
+		return $data;
+
 	}
 
 

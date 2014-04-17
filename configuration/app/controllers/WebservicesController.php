@@ -392,6 +392,11 @@ parameters:
   pid".chr(9)." : project id (mandatory)
 ";
 
+		$poolSize=20;
+
+		// returns 1 of the last $poolSize images
+
+
 		// pid is mandatory, now checked in initialise()
 
 		if (is_null($this->getCurrentProjectId())) {
@@ -399,6 +404,8 @@ parameters:
 			return;
 		}
 
+		/*
+		// just the very last image
         $media=$this->models->MediaMeta->freeQuery("
 			select media_id from %PRE%media_meta where meta_date = 
 			(select
@@ -410,7 +417,28 @@ parameters:
 				and project_id = ".$this->getCurrentProjectId()."
 			)
 		");
+		*/		
+
+        $media=$this->models->MediaMeta->freeQuery("
+			select 
+				media_id 
+			from
+				%PRE%media_meta
+			where 
+				sys_label = 'beeldbankDatumAanmaak'
+				and project_id = ".$this->getCurrentProjectId()."
+			order by 
+				meta_date desc
+			limit ".$poolSize."
+		");
 		
+		$ids=array();
+		foreach((array)$media as $val)
+		{
+			$ids[]=$val['media_id'];
+		}
+		
+		$ids=implode(',',$ids);
         $media=$this->models->MediaTaxon->freeQuery("
 			select
 				_a.taxon_id,
@@ -453,11 +481,12 @@ parameters:
 
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.id = ".$media[0]['media_id']."
+				and _a.id in (".$ids.")
 
-			limit 1
-		");
+			order by rand() limit 0,1
 		
+		");
+
 		$this->setTaxonId($media[0]['taxon_id']);
 
 		$result=array('pId'=>$this->getCurrentProjectId());

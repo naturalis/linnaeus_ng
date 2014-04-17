@@ -129,10 +129,11 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
 						{* if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
 						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
+						{if $statusRodeLijst}<tr><td>Status rode lijst</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
 					</table>
 				</p>
 
-				{if $distributionMaps}
+				{if $distributionMaps.count>0}
 				<h2>Verspreiding</h2>
 				{foreach from=$distributionMaps.data item=v}
 
