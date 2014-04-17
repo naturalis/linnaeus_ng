@@ -31,9 +31,13 @@
 
 		<div id="treebranchContainer">
             <h2>Indeling</h2>
-
 			<table id="name-tree">
+			{if $children|@count >0}
 			{math equation="(x-2)" x=$classification|@count assign=start}
+			{else}
+			{math equation="(x-3)" x=$classification|@count assign=start}
+			{/if}
+
 			{section name=taxon loop=$classification start=$start}
 				{math equation="(x-y)*3" x=$smarty.section.taxon.index y=$start assign=buffercount}
 				{if $classification[taxon].parent_id!=null}
