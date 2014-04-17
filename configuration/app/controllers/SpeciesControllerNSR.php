@@ -1276,16 +1276,8 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$content=$rdf=null;
 
-        switch ($category) {
-			/*
-            case CTAB_MEDIA:
-                $content=$this->getTaxonMedia(array('id'=>$taxon,'limit'=>$limit,'offset'=>$offset));
-
-				if (empty($content) && !$isLower)
-					$content=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
-				
-                break;
-			*/            
+        switch ($category)
+		{
             case CTAB_CLASSIFICATION:
                 //$content=$this->getTaxonClassification($taxon);
                 $content=
