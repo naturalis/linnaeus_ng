@@ -621,8 +621,8 @@ class SpeciesController extends Controller
 	        
 	        $this->smarty->assign('projectRanks', $pr);
 
-	        
-//            $this->newGetTaxonTree();
+if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
+	$this->newGetTaxonTree();
             
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
             
@@ -836,7 +836,8 @@ class SpeciesController extends Controller
 
             $this->smarty->assign('allowed', true);
             
-//			$this->newGetTaxonTree();
+if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
+	$this->newGetTaxonTree();
 
 			$this->smarty->assign('taxa', $this->treeList);
 
