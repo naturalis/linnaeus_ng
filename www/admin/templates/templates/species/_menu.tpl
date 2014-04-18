@@ -6,6 +6,7 @@
 {t}Find species:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
 <a href="branches.php" class="allLookupLink">Taxon list</a>
+&nbsp;
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
 <a href="../search/index.php">Extensive search</a>

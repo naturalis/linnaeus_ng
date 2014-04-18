@@ -37,8 +37,6 @@ $(document).ready(function(){
 			get_all			[1,0]
 			concise			[1,0]
 			formatted		[1,0]
-			ignore_rank		[1,0]
-			force_rank		[highertaxa,species]
 			max_results		int > 0
 		
 			mandatory: search || get_all
@@ -53,10 +51,8 @@ $(document).ready(function(){
 				'get_all' : 0,
 				'match_start' : 0,
 				'concise': 1,
-				'ignore_rank': 1,
 				'max_results': 25,
 				'formatted': 0,
-				'force_rank': 'species',
 				'time' : allGetTimestamp()
 			}),
 			success : function (data)

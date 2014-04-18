@@ -106,8 +106,6 @@
 	</tr>
 </table>
 </form>
-{else}
-hoer!
 {/if}
 </div>
 

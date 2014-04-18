@@ -296,7 +296,7 @@ class SearchControllerNSR extends SearchController
 		//q($this->models->Names->q(),1);
 
 		//SQL_CALC_FOUND_ROWS
-		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		$count=$this->models->Names->freeQuery('select found_rows() as total');
 
 		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resSpeciesPerPage);
 

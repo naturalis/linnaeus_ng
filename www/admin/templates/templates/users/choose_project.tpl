@@ -43,6 +43,7 @@
         <li>
             <a href="?project_id={$projects[i].id}">{if $projects[i].title!=''}{$projects[i].title}{else}{$projects[i].name}{/if}</a>
             {if $session.admin.project.id==$projects[i].id}<span title="current active project">{t}(current){/t}</span>{/if}
+            <a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px">view</a>
         </li>
         {/if}
     {/section}
