@@ -50,7 +50,7 @@ include_once ('Controller.php');
 class SpeciesController extends Controller
 {
     private $_useNBCExtras = false;
-	private $_lookupListMaxResults=100;
+	private $_lookupListMaxResults=50;
     public $usedModels = array(
         'user', 
         'user_taxon', 
@@ -83,7 +83,9 @@ class SpeciesController extends Controller
 		'l2_occurrence_taxon_combi',
         'matrix_taxon', 
         'matrix_taxon_state', 
-		'taxon_quick_parentage'
+		'taxon_quick_parentage',
+		'names',
+		'name_types'
     );
     public $usedHelpers = array(
         'col_loader_helper', 
@@ -119,6 +121,7 @@ class SpeciesController extends Controller
     );
     public $controllerPublicName = 'Species module';
     public $includeLocalMenu = false;
+	private $_nameTypeIds;
 
 
 	/* initialise */
@@ -155,6 +158,15 @@ class SpeciesController extends Controller
         // variations & related are only shown for NBC matrix projects
         $this->_useNBCExtras = $this->useRelated = $this->useVariations = ($this->getSetting('matrixtype')=='nbc');
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
+
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
+
     }
 
 
@@ -202,6 +214,8 @@ class SpeciesController extends Controller
 		}	
 		else
 		{
+//			$this->setIsHigherTaxa($taxon['lower_taxon']?false:true);
+			
 			if ($this->rHasVal('action','save_and_preview'))
 			{
 				$p['id'] = $this->rGetVal('id');
@@ -298,7 +312,6 @@ class SpeciesController extends Controller
         
         $this->printPage();
     }
-
 
     public function parentageAction ()
     {
@@ -1268,206 +1281,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
         $this->printPage();
     }
 
-    public function mediaAction ()
-    {
-        $this->checkAuthorisation();
-        
-        $this->setBreadcrumbIncludeReferer(array(
-            'name' => $this->translate('Taxon list'), 
-            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
-        ));
-        
-        if ($this->rHasId()) {
-            // get existing taxon name
-            
-
-
-
-            $taxon = $this->getTaxonById();
-            
-            if ($this->getIsHigherTaxa()) {
-                
-                $ranks = $this->getProjectRanks(array(
-                    'includeLanguageLabels' => true, 
-                    'idsAsIndex' => true
-                ));
-                
-                $this->setPageName(sprintf($this->translate('Media for %s "%s"'), strtolower($ranks[$taxon['rank_id']]['rank']), $taxon['taxon']));
-            }
-            else {
-                
-                $this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
-            }
-            
-            $this->smarty->assign('id', $this->requestData['id']);
-            
-
-            if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
-                
-                $this->changeMediaSortOrder($this->requestData['id'], $this->requestData['mId'], $this->requestData['move']);
-            }
-            
-            $media = $this->getTaxonMedia($this->requestData['id']);
-            
-            foreach ((array) $this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-                
-                $d[$val['mime']] = $val['media_type'];
-            }
-            
-            foreach ((array) $media as $key => $val) {
-                
-                $mdt = $this->models->MediaDescriptionsTaxon->_get(
-                array(
-                    'id' => array(
-                        'media_id' => $val['id'], 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->getDefaultProjectLanguage()
-                    )
-                ));
-                
-                $val['description'] = $mdt[0]['description'];
-                
-                if (isset($d[$val['mime_type']]))
-                    $r[$d[$val['mime_type']]][] = $val;
-            }
-            
-            if (isset($r))
-                $this->smarty->assign('media', $r);
-            
-            $this->smarty->assign('languages', $this->getProjectLanguages());
-            
-            $this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
-            
-            $this->smarty->assign('allowedFormats', $this->controllerSettings['media']['allowedFormats']);
-        }
-        else {
-            
-            $this->addError($this->translate('No taxon specified.'));
-        }
-        
-        if (isset($taxon)) {
-            $this->smarty->assign('taxon', $taxon);
-	        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
-		}
-        $this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
-        $this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
-        
-        $this->printPage();
-    }
-
-    public function mediaUploadAction ()
-    {
-        $this->checkAuthorisation();
-        
-        $this->includeLocalMenu = false;
-        
-        $this->setBreadcrumbIncludeReferer(array(
-            'name' => $this->translate('Taxon list'), 
-            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
-        ));
-        
-		// referred from the taxon content editing page
-        if ($this->rHasVal('add', 'hoc') && !isset($_SESSION['admin']['system']['media']['newRef'])) {
-
-            $_SESSION['admin']['system']['media']['newRef'] = '<new>';
-            
-            $this->requestData['id']=$this->getActiveTaxonId();
-        }
-        
-		// get existing taxon name
-        if ($this->rHasId()) {
-            $taxon = $this->getTaxonById();
-            
-            if ($taxon['id']) {
-                
-                $this->setPageName(sprintf($this->translate('New media for "%s"'), $taxon['taxon']));
-                
-                if ($this->requestDataFiles && !$this->isFormResubmit()) {
-                    
-                    $filesToSave = $this->getUploadedMediaFiles();
-
-                    $firstInsert = false;
-                    
-                    if ($filesToSave) {
-                        
-                        foreach ((array) $filesToSave as $key => $file) {
-                            
-                            $thumb = false;
-                            
-                            if ($this->helpers->ImageThumberHelper->canResize($file['mime_type']) && $this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir() . $file['name'])) {
-                                
-                                $pi = pathinfo($file['name']);
-                                $this->helpers->ImageThumberHelper->size_width(150);
-                                
-                                if ($this->helpers->ImageThumberHelper->save($this->getProjectsThumbsStorageDir() . $pi['filename'] . '-thumb.' . $pi['extension'])) {
-                                    
-                                    $thumb = $pi['filename'] . '-thumb.' . $pi['extension'];
-                                }
-                            }
-                            
-                            $mt = $this->models->MediaTaxon->save(
-                            array(
-                                'id' => null, 
-                                'project_id' => $this->getCurrentProjectId(), 
-                                'taxon_id' => $this->requestData['id'], 
-                                'file_name' => $file['name'], 
-                                'original_name' => $file['original_name'], 
-                                'mime_type' => $file['mime_type'], 
-                                'file_size' => $file['size'], 
-                                'thumb_name' => $thumb ? $thumb : null, 
-                                'sort_order' => $this->getNextMediaSortOrder($this->requestData['id'])
-                            ));
-                            
-                            if (!$firstInsert) {
-                                
-                                $firstInsert = array(
-                                    'id' => $this->models->MediaTaxon->getNewId(), 
-                                    'name' => $file['name']
-                                );
-                            }
-                            
-                            if ($mt) {
-                                
-                                $this->addMessage(sprintf($this->translate('Saved: %s (%s)'), $file['original_name'], $file['media_name']));
-                            }
-                            else {
-                                
-                                $this->addError($this->translate('Failed writing uploaded file to database.'), 1);
-                            }
-                        }
-                        
-                        if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>') {
-                            
-                            $_SESSION['admin']['system']['media']['newRef'] = '<span class="inline-' . substr($file['mime_type'], 0, strpos($file['mime_type'], '/')) . '" onclick="showMedia(\'' .
-                             addslashes($_SESSION['admin']['project']['urls']['project_media'] . $file['name']) . '\',\'' . addslashes($file['name']) . '\');">' . $firstInsert['name'] . '</span>';
-                            
-                            $this->redirect('../species/taxon.php?id='.$this->getActiveTaxonId());
-                        }
-                    }
-                }
-            }
-            else {
-                
-                $this->addError($this->translate('Unknown taxon.'));
-            }
-            
-            $this->smarty->assign('id', $this->requestData['id']);
-            
-            $this->smarty->assign('allowedFormats', $this->controllerSettings['media']['allowedFormats']);
-            
-            $this->smarty->assign('iniSettings', array(
-                'upload_max_filesize' => ini_get('upload_max_filesize'), 
-                'post_max_size' => ini_get('post_max_size')
-            ));
-        }
-        else {
-            
-            $this->addError($this->translate('No taxon specified.'));
-        }
-        
-        $this->printPage();
-    }
-
     public function fileAction ()
     {
         $this->checkAuthorisation();
@@ -2222,22 +2035,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
             
             $this->ajaxActionSaveTaxonName();
         }
-        else if ($this->requestData['action'] == 'save_media_desc') {
-            
-            $this->ajaxActionSaveMediaDescription();
-        }
-        else if ($this->requestData['action'] == 'get_media_desc') {
-            
-            $this->ajaxActionGetMediaDescription();
-        }
-        else if ($this->requestData['action'] == 'get_media_descs') {
-            
-            $this->ajaxActionGetMediaDescriptions();
-        }
-        else if ($this->requestData['action'] == 'delete_media') {
-            
-            $this->deleteTaxonMedia();
-        }
         else if ($this->requestData['action'] == 'save_rank_label') {
             
             $this->ajaxActionSaveRankLabel();
@@ -2294,11 +2091,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
                 'parent_id' => $this->requestData['parent_id'], 
                 'is_hybrid' => $this->requestData['is_hybrid']
             )));
-        }
-        else if ($this->requestData['action'] == 'set_overview') {
-            
-			$r = $this->setOverviewImageState($this->requestData['taxon_id'], $this->requestData['id'], $this->requestData['state']);
-            $this->smarty->assign('returnText', $r ? '<ok>' : 'error' );
         }
         else if ($this->requestData['action'] == 'delete_variation') {
             
@@ -4226,107 +4018,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
         }
     }
 
-    private function ajaxActionSaveMediaDescription ()
-    {
-        if (!$this->rHasId() || !$this->rHasVal('language')) {
-            
-            return;
-        }
-        else {
-            
-            if (!$this->rHasVal('description')) {
-                
-                $this->models->MediaDescriptionsTaxon->delete(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'media_id' => $this->requestData['id']
-                ));
-            }
-            else {
-                
-                $mdt = $this->models->MediaDescriptionsTaxon->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->requestData['language'], 
-                        'media_id' => $this->requestData['id']
-                    )
-                ));
-                
-                $d = $this->filterContent(trim($this->requestData['description']));
-                
-                $this->models->MediaDescriptionsTaxon->save(
-                array(
-                    'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null, 
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'media_id' => $this->requestData['id'], 
-                    'description' => $d['content']
-                ));
-            }
-            
-            $this->smarty->assign('returnText', '<ok>');
-        }
-    }
-
-    private function ajaxActionGetMediaDescription ()
-    {
-        if (!$this->rHasId() || !$this->rHasVal('language')) {
-            
-            return;
-        }
-        else {
-            
-            $mdt = $this->models->MediaDescriptionsTaxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'media_id' => $this->requestData['id']
-                )
-            ));
-            
-            $this->smarty->assign('returnText', $mdt[0]['description']);
-        }
-    }
-
-    private function ajaxActionGetMediaDescriptions ()
-    {
-        if (!$this->rHasVal('language')) {
-            
-            return;
-        }
-        else {
-            
-            $mt = $this->models->MediaTaxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'taxon_id' => $this->requestData['id']
-                ), 
-                'columns' => 'id'
-            ));
-            
-            foreach ((array) $mt as $key => $val) {
-                
-                $mdt = $this->models->MediaDescriptionsTaxon->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->requestData['language'], 
-                        'media_id' => $val['id']
-                    ), 
-                    'columns' => 'description'
-                ));
-                
-                $mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
-            }
-            
-            $this->smarty->assign('returnText', json_encode($mt));
-        }
-    }
-
     private function ajaxActionSaveRankLabel ()
     {
         if (!$this->rHasId() || !$this->rHasVal('language')) {
@@ -4592,114 +4283,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
         }
     }
 
-    private function getPageTaxonCount ()
-    {
-
-		$tp = $this->models->PageTaxon->_get(array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			), 
-			'columns' => 'count(*) as total'
-		));
-		
-		return $tp[0]['total'];
-
-    }
-
-    private function getContentTaxaCount ()
-    {
-
-		$ct = $this->models->ContentTaxon->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'publish' => 1
-			), 
-			'columns' => 'count(*) as total,taxon_id', 
-			'group' => 'taxon_id',
-			'fieldAsIndex' => 'taxon_id'
-		));
-		
-		return $ct;
-
-    }
-
-    private function getSynonymCount ()
-    {
-
-		$s = $this->models->Synonym->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			), 
-			'columns' => 'count(*) as total,taxon_id', 
-			'group' => 'taxon_id'
-		));
-		
-		foreach ((array) $s as $key => $val)
-			$d[$val['taxon_id']] = $val['total'];
-		
-		return isset($d) ? $d : 0;
-
-    }
-
-    private function getCommonnameCount ()
-    {
-
-		$c = $this->models->Commonname->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			), 
-			'columns' => 'count(*) as total,taxon_id', 
-			'group' => 'taxon_id'
-		));
-		
-		foreach ((array) $c as $key => $val)
-			$d[$val['taxon_id']] = $val['total'];
-		
-		return isset($d) ? $d : 0;
-
-    }
-
-    private function getMediaTaxonCount ()
-    {
-
-		$mt = $this->models->MediaTaxon->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			), 
-			'columns' => 'count(*) as total, taxon_id', 
-			'group' => 'taxon_id'
-		));
-		
-		foreach ((array) $mt as $key => $val)
-			$d[$val['taxon_id']] = $val['total'];
-		
-		return isset($d) ? $d : 0;
-
-    }
-
-    private function getLiteratureTaxonCount ()
-    {
-
-		$lt = $this->models->LiteratureTaxon->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			), 
-			'columns' => 'count(*) as total, taxon_id', 
-			'group' => 'taxon_id'
-		));
-		
-		foreach ((array) $lt as $key => $val)
-			$d[$val['taxon_id']] = $val['total'];
-		
-		return isset($d) ? $d : 0;
-
-    }
-
     private function getTaxonSynonymsById ($id = false)
     {
         $id = $id ? $id : ($this->rHasId() ? $this->requestData['id'] : false);
@@ -4895,30 +4478,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
 		);
     }
 
-    private function setOverviewImageState ($taxon, $id, $state)
-    {
-        $mt = $this->models->MediaTaxon->update(array(
-            'overview_image' => 0
-        ), array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $taxon
-        ));
-
-        if ($state==1) {
-
-            return $this->models->MediaTaxon->update(array(
-                'overview_image' => 1
-            ), array(
-                'id' => $id, 
-                'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $taxon
-            ));
-        }
-		
-		return true;		
-		
-    }
-
     private function doAssignUserTaxon ($userId, $taxonId)
     {
         if (empty($userId) || empty($taxonId))
@@ -4932,85 +4491,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
         ));
         
         return $this->models->UserTaxon->getNewId();
-    }
-
-    private function getNextMediaSortOrder ($taxon)
-    {
-        $d = $this->models->MediaTaxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $taxon
-            ), 
-            'columns' => '(max(sort_order) + 1) as next'
-        ));
-        
-        return $d[0]['next'];
-    }
-
-    private function reOrderMediaSortOrder ($taxon)
-    {
-        $tm = $this->getTaxonMedia($taxon);
-        
-        $prevMime = null;
-        
-        foreach ((array) $tm as $val) {
-            
-            if ($prevMime != $val['mime'])
-                $i = 0;
-            
-            $this->models->MediaTaxon->update(array(
-                'sort_order' => $i++
-            ), array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'id' => $val['id']
-            ));
-            
-            $prevMime = $val['mime'];
-        }
-    }
-
-    private function changeMediaSortOrder ($taxon, $id, $dir)
-    {
-        $this->reOrderMediaSortOrder($taxon);
-        
-        $tm = $this->getTaxonMedia($taxon);
-        
-        foreach ((array) $tm as $key => $val) {
-            
-            if ($val['id'] == $id && $dir == 'down' && $key != (count((array) $tm) - 1)) {
-                
-                $this->models->MediaTaxon->update(array(
-                    'sort_order' => $val['sort_order'] + 1
-                ), array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                ));
-                
-                $this->models->MediaTaxon->update(array(
-                    'sort_order' => $val['sort_order']
-                ), array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $tm[$key + 1]['id']
-                ));
-            }
-            else if ($val['id'] == $id && $dir == 'up' && $key != 0) {
-                
-                $this->models->MediaTaxon->update(array(
-                    'sort_order' => $val['sort_order'] - 1
-                ), array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                ));
-                
-                $this->models->MediaTaxon->update(array(
-                    'sort_order' => $val['sort_order']
-                ), array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $tm[$key - 1]['id']
-                ));
-            }
-        }
     }
 
     private function createStandardCoLRanks ()
@@ -5539,141 +5019,53 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
         
     }
 
-    private function deleteTaxonMedia ($id=false,$output=true)
-    {
-        if ($id === false) {
-            
-            $id = $this->requestData['id'];
-        }
-        
-        if (empty($id)) {
-            
-            return;
-        }
-        else {
-            
-            $mt = $this->models->MediaTaxon->_get(array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                )
-            ));
-            
-            $delRecords = true;
-            
-            if (file_exists($_SESSION['admin']['project']['paths']['project_media'] . $mt[0]['file_name'])) {
-                
-                $delRecords = unlink($_SESSION['admin']['project']['paths']['project_media'] . $mt[0]['file_name']);
-            }
-            
-            if ($delRecords) {
-                
-                if ($mt[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'] . $mt[0]['thumb_name'])) {
-                    unlink($_SESSION['admin']['project']['paths']['project_thumbs'] . $mt[0]['thumb_name']);
-                }
-                
-                $this->models->MediaDescriptionsTaxon->delete(array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'media_id' => $id
-                ));
-                
-
-                $this->models->MediaTaxon->delete(array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                ));
-                
-                if ($output)
-                    $this->smarty->assign('returnText', '<ok>');
-            }
-            else {
-                
-                if ($output)
-                    $this->addError(sprintf($this->translate('Could not delete file: %s'), $mt[0]['file_name']));
-            }
-        }
-    }
-
-	private function getAdjacencyTreeBranch($id)
-	{
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_p.lower_taxon
-			from
-				%PRE%taxa _a
-					
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
-
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.parent_id ".(is_null($id) ? "is null and _r.id < 10" : "= ".$id)."
-			order by
-				_a.taxon_order
-		");
-							
-		foreach((array)$p as $val)
-		{
-			array_push($this->tmp,$val);
-			$this->getAdjacencyTreeBranch($val['id']);
-		}
-	}
-
 	private function getAdjacentTaxa($taxon)
-	{
-		$tree=$this->getAdjacencyTree();
-		$prev=$next=null;
-		foreach((array)$tree as $key=>$val)
-		{
-			if ($val['id']==$taxon['id'])
-			{
-				for ($i=$key+1;$i<count($tree);$i++)
-				{
-					if ($tree[$i]['lower_taxon']==$taxon['lower_taxon'])
-					{
-						$next=$tree[$i];
-						break;
-					}
-				}
-				
-				return 
-					array(
-						'prev'=>isset($prev) ? array('id'=>$prev['id'],'label'=>$prev['taxon']) : null,
-						'next'=>isset($next) ? array('id'=>$next['id'],'label'=>$next['taxon']) : null
-					);
-
-			}
-
-		if ($val['lower_taxon']==$taxon['lower_taxon'])
-			$prev=$val;
-
-		}
-
-	}
-
-	private function getAdjacencyTree()
     {
+		$type=$taxon['lower_taxon']?'lower':'higher';
 
-		$tree=$this->getCache('species-adjacency-tree');
+		if (!isset($_SESSION['admin']['species']['browse_order'][$type])) {
 
-		if (!$tree)
-		{
-			$this->tmp=array();
-			$this->getAdjacencyTreeBranch(null);			
-			$this->saveCache('species-adjacency-tree',$this->tmp);
-			$tree=$this->tmp;
+			$_SESSION['admin']['species']['browse_order'][$type]=
+				$this->models->Taxon->freeQuery(
+					array(
+						'query' => '
+							select _a.id,_a.taxon
+							from %PRE%taxa _a 
+							left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
+							where _a.project_id = '.$this->getCurrentProjectId().'
+							and _b.lower_taxon = '.($type=='higher' ? 0 : 1).'
+							order by _a.taxon_order, _a.taxon
+							'
+					));
+
 		}
 
-		return $tree;
-		
-	}
+		$prev=$next=false;
+		while (list ($key, $val) = each($_SESSION['admin']['species']['browse_order'][$type])) {
 
+			if ($val['id']==$taxon['id']) {
+
+				// current = next because the pointer has already shifted forward
+				$next = current($_SESSION['admin']['species']['browse_order'][$type]);
+
+				return array(
+					'prev' => $prev!==false ? array(
+						'id' => $prev['id'], 
+						'label' => $prev['taxon']
+					) : null, 
+					'next' => $next!==false ? array(
+						'id' => $next['id'], 
+						'label' => $next['taxon']
+					) : null
+				);
+			}
+			
+			$prev=$val;
+            
+		}
+
+        return null;
+    }
 
     private function getLookupList($p)
     {
@@ -5682,64 +5074,90 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
         $getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
         $concise=isset($p['concise']) ? $p['concise']==1 : false;
         $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
-        $ignoreRank=isset($p['ignore_rank']) ? $p['ignore_rank']==1 : false;
-        $forceRank=isset($p['force_rank']) && in_array($p['force_rank'],array('highertaxa','species')) ? $p['force_rank'] : null;
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
+        $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
+        $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
 
         if (empty($search) && !$getAll)
             return;
 			
-		$rankage=(!is_null($forceRank) ? $forceRank : ($this->getIsHigherTaxa() ? 'highertaxa' : 'species'));
-
         $taxa = $this->models->Taxon->freeQuery("
+			select * from
+			(
+			". ($taxaOnly ? "" : "
+			
+				select
+					_a.taxon_id as id,_a.name as label, _b.rank_id, _c.rank_id as base_rank_id, _b.taxon as taxon, 'names' as source
+				from
+					%PRE%names _a
+	
+				left join
+					%PRE%taxa _b 
+						on _a.project_id=_b.project_id
+						and _a.taxon_id=_b.id
+	
+				left join
+					%PRE%projects_ranks _c
+						on _b.project_id=_c.project_id
+						and _b.rank_id=_c.id
+				
+				where
+					_a.project_id =  ".$this->getCurrentProjectId()."
+					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+					and _a.type_id != ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+	
+	
+				union
+
+			")."
+			
 			select
-				_a.id,
-				_a.taxon,
-				_a.rank_id,
-				_a.is_hybrid
-
+				_b.id, _b.taxon as label, _b.rank_id, _d.rank_id as base_rank_id, _b.taxon as taxon, 'taxa' as source
 			from
-				%PRE%taxa _a 
+				%PRE%taxa _b
 
-			".(!$ignoreRank ? "left join %PRE%projects_ranks _b
-				on _a.project_id=_b.project_id 
-				and _a.rank_id=_b.id "  : "")."
+			left join
+				%PRE%projects_ranks _d
+					on _b.project_id=_d.project_id
+					and _b.rank_id=_d.id
 
 			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-				".(!$ignoreRank ? "and _b.lower_taxon = ".($rankage=='highertaxa' ? 0 : 1) : "")."
-				".($getAll ? "" : "and _a.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'")."
+				_b.project_id = ".$this->getCurrentProjectId()."
+				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+
+			) as unification
+			".($rankAbove ? "where base_rank_id < ".$rankAbove : "")."
+			order by label
 			limit ".$maxResults
 		);
 
-
         foreach ((array) $taxa as $key => $val)
 		{
-			if ($formatted)
-				$taxa[$key]['label']=$this->formatTaxon($val);
+			if ($val['source']=='taxa')
+			{
+				if ($formatted)
+					$taxa[$key]['label']=$this->formatTaxon($val);
+			}
 			else
-				$taxa[$key]['label']=$taxa[$key]['taxon'];
+			{
+				if ($formatted)
+					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$this->formatTaxon($val).')';
+				else
+					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$val['taxon'].')';
+			}
 
 			unset($taxa[$key]['taxon']);
-
-			if ($concise)
-			{
-				unset($taxa[$key]['rank_id']);
-				unset($taxa[$key]['is_hybrid']);
-			}
+			unset($taxa[$key]['source']);
 		}
-
-        $this->customSortArray($taxa, array(
-            'key' => 'label', 
-            'dir' => 'asc', 
-            'case' => 'i'
-		));
 
 		return
 			$this->makeLookupList(
 				$taxa, 
-				($this->getIsHigherTaxa() ? 'highertaxa' : 'species'),
-				'../' . ($this->getIsHigherTaxa() ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
+				'species',
+				'../species/taxon.php?id=%s',
+				false,
+				true,
+				count($taxa)<$maxResults
 			);
 
     }
@@ -5947,5 +5365,6 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
 		$this->printPage();
 		
 	}
+
 
 }

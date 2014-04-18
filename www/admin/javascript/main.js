@@ -482,3 +482,24 @@ function allGetSomething(name,callback) {
 	}).success(function(data){callback($.parseJSON(data));});
 	
 }
+
+function allStickElementUnderElement(ele1,ele2,resize)
+{
+	var inputField = $('#'+ele1);
+	var fieldDiv = $('#'+ele2);
+	var sf_pos    = inputField.offset();
+	var sf_top    = sf_pos.top;
+	var sf_left   = sf_pos.left;
+	var sf_height = inputField.height();
+
+	fieldDiv.css("position","absolute");
+	fieldDiv.css("left", sf_left);
+	fieldDiv.css("top", sf_top + sf_height + 6);
+	
+	if (resize===true)
+	{
+		var sf_width  = inputField.width();
+		fieldDiv.css("width", sf_width);
+	}
+	
+}

@@ -1319,6 +1319,7 @@ class Controller extends BaseClass
 		));
 		
 		$t[0]['lower_taxon'] = $pr[0]['lower_taxon'];
+		$t[0]['base_rank'] = $pr[0]['rank_id'];
 		
 		return $t[0];
 
@@ -1593,7 +1594,7 @@ class Controller extends BaseClass
 
 
 
-    public function makeLookupList ($data, $module, $url, $sortData = false, $encode = true)
+    public function makeLookupList($data,$module,$url,$sortData=false,$encode=true,$fullset=true)
     {
         $sortBy = array(
             'key' => 'label', 
@@ -1607,7 +1608,8 @@ class Controller extends BaseClass
         $d = array(
             'module' => $module, 
             'url' => $url, 
-            'results' => $data
+            'results' => $data,
+			'fullset'=>$fullset
         );
         
         return $encode ? json_encode($d) : $d;

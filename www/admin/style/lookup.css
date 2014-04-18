@@ -1,5 +1,4 @@
 .allLookupList {
-
 	position:absolute;
 	top:0px;
 	left:0px;
@@ -13,56 +12,25 @@
 	z-index: 50000;
 	display:none;
 	padding:2px;
-
 }
 
-.allLookupListHighlight {
 
-	font-weight:bold;
-
+.allLookupList ul {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;	
 }
 
-#allLookupListTable {
-
-	width:350px;
-	background-color:#CC6633;
-
+.allLookupList a {
+	text-decoration:none;
 }
 
-.allLookupListRow, .allLookupListActiveRow {
-
-	cursor:pointer;
-
+.allLookupList li {
+	white-space:nowrap;
+	font-size:0.9em;
+	overflow-x:hidden;
 }
 
-.allLookupListRow:hover {
-
+.allLookupList li:hover {
 	background-color:#eee;
-
 }
-
-.allLookupListActiveRow {
-
-	background-color:#eee;
-
-}
-
-.allLookupListCell {
-
-	width:500px;
-
-}
-
-.allLookupListSource {
-
-	color:#666;
-
-}
-
-.allLookupButton {
-}
-
-.allLookupLink {
-	margin-right:10px;
-}
-

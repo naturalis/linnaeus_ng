@@ -23,53 +23,64 @@
 
 */
 
-var allLookupAlwaysLookup = true;
-var allLookupActiveRow = false;
-var allLookupRowCount = 0;
-var allLookupListName = 'allLookupList'; 
-var allLookupBoxName = 'allLookupBox'; 
-var allLookupTargetUrl = false;
-var allLookupData = null;
-var allLookupLastString = null;
-var allNavigateDefaultUrl = 'edit.php?id=%s';
-var allNavigateTargetUrl = null;
-var allNavigateStartWithAll = false;
-var allNavigateMatchStartOnly = false;
+var allLookupForceLookup=true;
+var allLookupActiveRow=false;
+var allLookupRowCount=0;
+var allLookupListName='allLookupList'; 
+var allLookupBoxName='allLookupBox'; 
+var allLookupTargetUrl=false;
+var allLookupData=null;
+var allLookupLastString=String;
+var allNavigateDefaultUrl='edit.php?id=%s';
+var allNavigateTargetUrl=null;
+var allNavigateStartWithAll=false;
+var allNavigateMatchStartOnly=false;
 
-function allLookupNavigateOverrideUrl(url) {
-
+function allLookupNavigateOverrideUrl(url)
+{
 	allLookupTargetUrl = allNavigateTargetUrl = url;
-
 }
 
-function allLookup() {
-
+function allLookup()
+{
 	var text = $('#'+allLookupBoxName).val();
 
 	if (text == allLookupLastString) return;
 	
-	if (allLookupGetData(text)) {
+	if (allLookupGetData(text))
+	{
 		allLookupPositionDiv();
 		allLookupShowDiv();
 	}
 
 	allLookupLastString = text;
-	
+
 }
 
 
-function allLookupGetData(text) {
+function allLookupGetData(text)
+{
+	
+	if (text.length<=allLookupLastString.length)
+	{
+		allLookupForceLookup=true;
+	}
 
-	if (text.length==0 && !allNavigateStartWithAll) {
-
+	if (text.length==0 && !allNavigateStartWithAll)
+	{
 		allLookupClearDiv();
 		allLookupData = null;
 		allLookupHideDiv();
 		return false;
-
 	}
 
-	if (allLookupAlwaysLookup || allLookupData==null) {
+	if (text.length<3)
+	{
+		return false;
+	}
+
+	if (allLookupForceLookup || allLookupData==null)
+	{
 		
 		$.ajax({
 			url : "ajax_interface.php",
@@ -82,8 +93,10 @@ function allLookupGetData(text) {
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-				console.log(data);
+				//console.log(data);
 				allLookupData = $.parseJSON(data);
+				//console.dir(allLookupData);
+				allLookupForceLookup=(allLookupData.fullset==false);
 				if (data) allLookupBuildList(allLookupData,text);
 
 			}
@@ -119,7 +132,48 @@ function allLookupGetData(text) {
 
 }
 
-function allLookupBuildList(obj,txt) {
+
+
+function allLookupBuildList(obj,txt)
+{
+
+	allLookupRowCount = 0;
+	allLookupClearDiv();
+	var buffer=Array();
+
+	if (obj.results)
+	{
+		
+		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
+
+		for(var i=0;i<obj.results.length;i++) {
+			
+			var d = obj.results[i];
+			
+			if (d.id && d.label)
+			{
+				buffer.push(
+					'<li><a href="'+(d.url ? d.url : url.replace('%s',d.id))+'">'+
+					d.label+
+					(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
+					'</a></li>'
+				);
+				
+				allLookupRowCount++;
+
+			}
+
+		}
+
+		$('#'+allLookupListName).append('<ul>'+buffer.join('')+'</ul>');
+
+	}
+
+}
+
+
+
+function allLookupBuildListORG(obj,txt) {
 
 	allLookupRowCount = 0;
 	

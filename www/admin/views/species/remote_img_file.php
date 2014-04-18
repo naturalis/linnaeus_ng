@@ -1,8 +1,8 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/SpeciesController.php');
+require_once ('../../../../configuration/admin/controllers/SpeciesMediaController.php');
 
-$c = new SpeciesController();
+$c = new SpeciesMediaController();
 
 $c->remoteImgFileAction();
 
