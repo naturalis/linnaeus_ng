@@ -21,6 +21,7 @@ class SpeciesTaxonomyController extends Controller
         'all' => array(
             'taxon.js', 
             'lookup.js',
+			'taxon_extra.js'
         )
     );
     public $controllerPublicName = 'Species module';
@@ -313,9 +314,20 @@ class SpeciesTaxonomyController extends Controller
 			$current=$this->getName(PREDICATE_VALID_NAME);
 			$parts=$this->rGetVal('valid_name');
 			$parts['id']=$current['id'];
+			
+			if ($this->rHasVar('new_parent_id'))
+			{
+				$parts['parent_id']=$this->rGetVal('new_parent_id');
+			}
 
 			/*
-				need checks!
+				need checks:
+				
+				- does parent_id exist?
+				- is parent legal:
+					- can it have children of the proposed rank?
+					- do the names match?
+				- count spaces
 			*/
 
 			$res=$this->updateName($parts);
@@ -341,6 +353,8 @@ class SpeciesTaxonomyController extends Controller
 
 			$this->setTaxonConcept();	
 		}
+
+		$this->addError('Please note: this function is still under development. As yet, no checks are performed on name or parent - data is saved <i>as is</i>, including errors.');
 
 		$concept=$this->getTaxonConcept();
 

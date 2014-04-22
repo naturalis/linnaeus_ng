@@ -74,7 +74,7 @@ ul {
 		<input type="hidden" name="toggle" id="toggle" value="{$toggle}" />
 		<input type="hidden" name="rnd" value="{$rnd}" />
 		<input type="button" value="{t}save new order{/t}" onclick="reOrder()" />
-		<a href="#" onclick="$('.peer').toggle();$('#toggle').val($('.peer:first').css('display'));">toggle peers</a>
+		<!-- a href="#" onclick="$('.peer').toggle();$('#toggle').val($('.peer:first').css('display'));">toggle peers</a -->
 		</form>
 	</p>
 	<ul>
@@ -130,8 +130,10 @@ function reOrder() {
 
 }
 
-$(function() {
-	
+$(document).ready(function()
+{
+	allLookupNavigateOverrideUrl('branches.php?p=%s');
+
 	$( "#sortable" ).sortable({
 		opacity: 0.6, 
 		cursor: 'move',

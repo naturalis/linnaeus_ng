@@ -111,7 +111,8 @@ class SpeciesController extends Controller
     );
     public $jsToLoad = array(
         'all' => array(
-            'taxon.js', 
+            'taxon.js',
+			'taxon_extra.js',
             'prettyPhoto/jquery.prettyPhoto.js', 
             'int-link.js', 
             'dialog/jquery.modaldialog.js', 
