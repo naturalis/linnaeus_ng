@@ -609,6 +609,9 @@ class SpeciesController extends Controller
 
     public function editAction ()
     {
+		if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
+			$this->redirect('taxonomy.php?id='.$this->rGetVal('id'));
+
         $this->checkAuthorisation();
 
         if (!$this->rHasId())
@@ -625,20 +628,19 @@ class SpeciesController extends Controller
             
             $this->addMessage($this->translate('No ranks have been defined.'));
         }
-        
+
         else 
         if (!$this->doLockOutUser($this->requestData['id'], true)) {
 
 	        if (isset($data))
 	            $this->smarty->assign('data', $data);
-	        
+
 	        $this->smarty->assign('projectRanks', $pr);
 
-if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
-	$this->newGetTaxonTree();
-            
+			$this->newGetTaxonTree();
+
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
-            
+
             // save
             if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save') && !$this->isFormResubmit())
 			{
@@ -848,30 +850,29 @@ if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
             
 
             $this->smarty->assign('allowed', true);
-            
-if ($_SESSION['admin']['project']['sys_name']!='Nederlands Soortenregister')
-	$this->newGetTaxonTree();
+
+			$this->newGetTaxonTree();
 
 			$this->smarty->assign('taxa', $this->treeList);
 
             $s = $this->getProjectIdRankByname('Subgenus');
             if ($s)
                 $this->smarty->assign('rankIdSubgenus', $s);
-            
+
         }
         else {
-            
+
             $this->smarty->assign('taxon', array(
                 'id' => -1
             ));
-            
+
             $this->addError($this->translate('Taxon is already being edited by another editor.'));
         }
 
         $this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($data)));
 
         $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($data));
-        
+
         $this->printPage();
     }
 
