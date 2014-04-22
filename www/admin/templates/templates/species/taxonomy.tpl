@@ -79,7 +79,7 @@ ul.names-list {
 	function taxonomyEditParent()
 	{
 		$( '#parent' ).html('<input type="text" id="parent-list-input">');
-		$( '#parent-list-input' ).bind('keyup', { callback:build_list } ,species_lookup_list);
+		$( '#parent-list-input' ).bind('keyup', function(e) { species_lookup_list(e); } );
 		$( '#parent-list-input' ).focus();
 	}
 	
@@ -111,14 +111,16 @@ ul.names-list {
 		$( '#new_parent_id' ).val(prevnew.id);
 	}
 
-	function species_lookup_list(data) 
+	function species_lookup_list(e) 
 	{
-		if (typeof(data.data.callback)=='function')
-		{
-			var callback=data.data.callback;
+		if (e.keyCode == 27)
+		{ 
+			taxonomySetPreviousChoice();
+			taxonomyCloseList();
+			return;
 		}
 		
-		var text=$(this).val();
+		var text=$('#parent-list-input').val();
 
 		$.ajax({
 			url : "../species/ajax_interface.php",
@@ -135,11 +137,8 @@ ul.names-list {
 				'time' : allGetTimestamp()
 			}),
 			success : function (data)
-			{
-				if (typeof(callback)=='function')
-				{
-					callback($.parseJSON(data));
-				}
+			{	
+				build_list($.parseJSON(data));
 			}
 		});
 
@@ -252,7 +251,7 @@ $(document).ready(function()
 	prevnew = parent = { id: {$parent.id} ,taxon: '{$parent.taxon}' };
 	currentrank = {$concept.base_rank};
 	taxonomyCollectRanks();
-	$( "#authorship" ).keyup(function() { taxonomyAuthorshipSplit() } );
+	$( "#authorship" ).keyup(function() { taxonomyAuthorshipSplit(e) } );
 });
 </script>
 

@@ -342,8 +342,9 @@ class SpeciesTaxonomyController extends Controller
 			$this->setTaxonConcept();	
 		}
 
-
 		$concept=$this->getTaxonConcept();
+
+		$this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($concept)));
 
 		$this->smarty->assign('ranks',$this->newGetProjectRanks());
 		$this->smarty->assign('concept',$concept);
