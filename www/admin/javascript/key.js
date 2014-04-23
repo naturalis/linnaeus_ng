@@ -284,18 +284,38 @@ function keySaveChoiceContent(type,postFunction) {
 
 function keyGetChoiceContent(language) {
 	
-	allGeneralGetLabels(language,'get_key_choice_content','keySetChoiceContent',keyChoiceId);
+	allShowLoadingDiv();
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_key_choice_content' ,
+			'language' : language ,
+			'id' : (keyChoiceId ? keyChoiceId : false) , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			//alert(language);
+			obj = $.parseJSON(data);
+			keySetChoiceContent(obj,language);
+			allHideLoadingDiv();
+		}
+	})
+		
 	
 }
 
 function keySetChoiceContent(obj,language) {
 	
 	if (language==allDefaultLanguage)
-		//$('#contentDefault').val(obj ? obj.choice_txt : '');
-		tinyMCE.get('contentDefault').setContent(obj ? obj.choice_txt : '');
+		var editor='contentDefault';
 	else
-		//$('#contentOther').val(obj ? obj.choice_txt : '');
-		tinyMCE.get('contentOther').setContent(obj ? obj.choice_txt : '');
+		var editor='contentOther';
+
+	tinyMCE.get(editor).setContent(obj ? obj.choice_txt : '');
+	tMCEFirstUndoPurge(editor);
 
 }
 
