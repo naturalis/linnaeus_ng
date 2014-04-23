@@ -184,6 +184,22 @@ function initTinyMce(litRefs,mediaRefs) {
 
 }
 
+
+var tMCEEditorFirstLoad=Array();
+
+function tMCEFirstUndoPurge(editorname)
+{
+	for(var i in tinyMCE.editors) 
+	{
+		if(tinyMCE.editors[i].editorId==editorname && tMCEEditorFirstLoad[editorname]!==false)
+		{
+			tinyMCE.editors[i].undoManager.clear()
+			tMCEEditorFirstLoad[editorname]=false;
+
+		}
+	}
+}
+
 // function called after tMCE init
 function tMCEOnInit() {
 

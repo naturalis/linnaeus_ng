@@ -73,6 +73,7 @@ function freemodGetContent(language,type) {
 				if (obj.content) tinyMCE.get('content-'+type).setContent(obj.content);
 			}
 			allHideLoadingDiv();
+			tMCEFirstUndoPurge('content-'+type);
 		}
 	});
 

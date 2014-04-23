@@ -60,9 +60,11 @@ function contentGetContent(language,editorName) {
 			'language' : language ,
 			'time' : allGetTimestamp()			
 		}),
-		success : function (data) {
+		success : function (data)
+		{
 			tinyMCE.get(editorName).setContent(data ? data : '');
 			allHideLoadingDiv();
+			tMCEFirstUndoPurge(editorName);
 		}
 	});
 

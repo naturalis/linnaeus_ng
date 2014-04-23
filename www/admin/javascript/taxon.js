@@ -349,7 +349,7 @@ function taxonGetData(id,language,page,editorName,updateInterface) {
 			'time' : allGetTimestamp()			
 		}),
 		success : function (data) {
-			//alert(data);
+
 			obj = $.parseJSON(data);
 
 			$('#taxon-name-input').val(obj.title ? obj.title : '');
@@ -366,6 +366,7 @@ function taxonGetData(id,language,page,editorName,updateInterface) {
 			if (updateInterface) {
 				taxonUpdateInterface();
 			}
+			tMCEFirstUndoPurge(editorName);
 		}
 	});
 
