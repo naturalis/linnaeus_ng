@@ -1,0 +1,53 @@
+.taxonomy input[name*=valid_name]{
+	width:135px;
+	margin-right:5px;
+}
+.taxonomy input[type=text].lighter{
+	color:#999;
+}
+.taxonomy input[type=text].year{
+	width: 40px;
+}
+.taxonomy tr.info-row td{
+	color:#999;
+	font-size:0.9em;
+	font-style:italic;
+}
+ul.names-list {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+.taxonomy a.inline-href {
+	display:inline;
+	margin-left:5px;
+	color:#999;
+	font-size:0.8em;
+}
+
+#parent-list {
+	background-color:#fff;
+	border:1px solid #666;
+	width:350px;
+	height:400px;
+	position:absolute;
+	display:none;
+	overflow-y:scroll;
+	overflow-x:hidden;
+}
+
+#parent-list ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#parent-list li {
+    font-size: 0.9em;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
+#parent-list li:hover {
+	background-color:#eee;
+}

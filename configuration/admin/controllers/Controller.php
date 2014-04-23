@@ -1303,7 +1303,7 @@ class Controller extends BaseClass
 			), 
 			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
 		));
-		
+
 
         if (empty($t))
             return;
@@ -2171,7 +2171,7 @@ class Controller extends BaseClass
         $e = explode(' ', $taxon['taxon']);
         $r = is_null($ranks) ? $this->newGetProjectRanks() : $ranks;
 
-		if (!isset($taxon['rank_id'])) // shouldn't happen!
+		if (!isset($taxon['rank_id'])||$taxon['rank_id']==0) // shouldn't happen!
 			 return $taxon['taxon'];
 
         if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))

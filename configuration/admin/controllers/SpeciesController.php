@@ -107,7 +107,7 @@ class SpeciesController extends Controller
         'rank-list.css', 
         'dialog/jquery.modaldialog.css', 
         'lookup.css',
-		'../javascript/jqTree/jqtree.css', 
+		'../javascript/jqTree/jqtree.css'
     );
     public $jsToLoad = array(
         'all' => array(
@@ -610,8 +610,8 @@ class SpeciesController extends Controller
 
     public function editAction ()
     {
-		if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
-			$this->redirect('taxonomy.php?id='.$this->rGetVal('id'));
+if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
+	$this->redirect('taxonomy.php?id='.$this->rGetVal('id'));
 
         $this->checkAuthorisation();
 
@@ -879,6 +879,9 @@ class SpeciesController extends Controller
 
     public function newAction ()
     {
+if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
+	$this->redirect('taxonomy.php');
+
         $this->checkAuthorisation();
         
         if ($this->getIsHigherTaxa()) {
@@ -2431,6 +2434,10 @@ class SpeciesController extends Controller
 
     public function synonymsAction ()
     {
+		
+if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
+	$this->redirect('names.php?id='.$this->rGetVal('id'));
+		
         $this->checkAuthorisation();
         
         if ($this->rHasId()) {
@@ -2587,6 +2594,10 @@ class SpeciesController extends Controller
 
     public function commonAction ()
     {
+
+if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
+	$this->redirect('names.php?id='.$this->rGetVal('id'));
+		
         $this->checkAuthorisation();
         
         if ($this->rHasId()) {
