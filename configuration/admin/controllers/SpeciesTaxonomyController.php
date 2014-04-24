@@ -335,7 +335,55 @@ class SpeciesTaxonomyController extends Controller
 		);
 	}
 
-	private function updateName($p)
+	private function createName($p)
+	{
+		$id=$this->getTaxonId();
+		
+		if (is_null($id))
+			return;
+				
+		$res=$this->models->Names->save(
+			array(
+				'id'=>isset($p['id']) ? $p['id'] : null,
+				'name'=>!empty($p['name']) ? $p['name'] : 'null',
+				'uninomial'=>!empty($p['uninomial']) ? $p['uninomial'] : 'null',
+				'specific_epithet'=>!empty($p['specific_epithet']) ? $p['specific_epithet'] : 'null',
+				'infra_specific_epithet'=>!empty($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : 'null',
+				'authorship'=>!empty($p['authorship']) ? $p['authorship'] : 'null',
+				'name_author'=>!empty($p['name_author']) ? $p['name_author'] : 'null',
+				'authorship_year'=>!empty($p['authorship_year']) ? $p['authorship_year'] : 'null',
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$id,
+				'type_id'=>$p['type_id'],
+				'language_id'=>!empty($p['language_id']) ? $p['language_id'] : 'null',
+				'expert_id'=>!empty($p['expert_id']) ? $p['expert_id'] : 'null',
+				'organisation_id'=>!empty($p['organisation_id']) ? $p['organisation_id'] : 'null',
+				'reference_id'=>!empty($p['reference_id']) ? $p['reference_id'] : 'null',
+			)
+		);
+
+		return $res;
+	}
+
+	private function deleteName($p)
+	{
+		$id=$this->getTaxonId();
+		
+		if (is_null($id) || is_null($p['id']))
+			return;
+				
+		$res=$this->models->Names->delete(
+			array(
+				'id'=>$p['id'],
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$id
+			)
+		);
+
+		return $res;
+	}
+
+	private function updateValidName($p)
 	{
 		$id=$this->getTaxonId();
 		
@@ -367,32 +415,6 @@ class SpeciesTaxonomyController extends Controller
 				'taxon_id'=>$id,
 				'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
 				'id'=>$p['id']
-			)
-		);
-
-		return $res;
-	}
-
-	private function createName($p)
-	{
-		$id=$this->getTaxonId();
-		
-		if (is_null($id))
-			return;
-				
-		$res=$this->models->Names->save(
-			array(
-				'name'=>$this->constructTaxonConceptName($p),
-				'uninomial'=>$p['uninomial'],
-				'specific_epithet'=>$p['specific_epithet'],
-				'infra_specific_epithet'=>$p['infra_specific_epithet'],
-				'authorship'=>$p['authorship'],
-				'name_author'=>$p['name_author'],
-				'authorship_year'=>$p['authorship_year'],
-				'project_id'=>$this->getCurrentProjectId(),
-				'taxon_id'=>$id,
-				'type_id'=>$p['type_id'],
-				'language_id'=>$p['language_id'],
 			)
 		);
 
@@ -437,9 +459,6 @@ class SpeciesTaxonomyController extends Controller
 		return $res;
 	}
 
-
-
-
     public function taxonomyAction ()
     {
         $this->checkAuthorisation();
@@ -463,7 +482,7 @@ class SpeciesTaxonomyController extends Controller
 
 				$p['id']=$currentValidName['id'];
 	
-				$res=$this->updateName($p);
+				$res=$this->updateValidName($p);
 				
 				if ($res)
 				{	
@@ -477,7 +496,7 @@ class SpeciesTaxonomyController extends Controller
 					else
 					{
 						$this->addError('Could not update taxon concept.');
-						$res=$this->updateName($current);
+						$res=$this->updateValidName($current);
 					}
 				}
 				else 
@@ -501,6 +520,7 @@ class SpeciesTaxonomyController extends Controller
 
 						$p['type_id']=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'];
 						$p['language_id']=LANGUAGE_ID_SCIENTIFIC;
+						$p['name']=$this->constructTaxonConceptName($p);
 				
 						$res=$this->createName($p);
 							
@@ -576,6 +596,44 @@ class SpeciesTaxonomyController extends Controller
     public function namesEditAction ()
     {
         $this->checkAuthorisation();
+		
+        if ($this->rHasVal('action','save')  && !$this->isFormResubmit())
+		{
+			$p=$this->requestData;
+
+			if ($this->rHasVar('name_id'))
+			{
+				$p['id']=$this->rGetVal('name_id');
+				unset($p['name_id']);
+			}
+
+			$res=$this->createName($p);
+
+			if ($res)
+			{	
+				$this->redirect('names.php?id='.$this->getTaxonId());
+			}
+			else 
+			{
+				$this->addError('Could not create name.');
+			}
+
+		}
+		else
+        if ($this->rHasVal('action','delete')  && $this->rHasVar('name_id') && !$this->isFormResubmit())
+		{
+			$p['id']=$this->rGetVal('name_id');
+			$res=$this->deleteName($p);
+
+			if ($res)
+			{	
+				$this->redirect('names.php?id='.$this->getTaxonId());
+			}
+			else 
+			{
+				$this->addError('Could not delete name.');
+			}
+		}
 
 		$concept=$this->getTaxonConcept();
 

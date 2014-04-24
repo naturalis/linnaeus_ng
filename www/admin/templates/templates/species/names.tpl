@@ -12,8 +12,8 @@
 			<td>{$v.nametype_label}</td>
 			<td>{$v.expert_name}</td>
 			<td>{$v.organisation_name}</td>
-			<td>{$v.reference_label}</td>
-			<td>{$v.reference_author}</td>
+			<td style="max-width:100px;overflow:hidden;white-space:nowrap">{$v.reference_label}</td>
+			<td style="max-width:100px;overflow:hidden;white-space:nowrap">{$v.reference_author}</td>
 			<td><a class="inline-href" href="names_edit.php?id={$concept.id}&name_id={$v.id}">edit</a></td>
 		</tr>
 		{/if}
@@ -21,15 +21,10 @@
 	</table>
 	
 	<p>
-		<a href="names_edit.php?id={$concept.id}">add a name</a>
+		<a href="names_edit.php?id={$concept.id}">add a name</a><br />
+		<a href="taxon.php?id={$concept.id}">main page</a>
 	</p>
 </div>
-
-<script type="text/JavaScript">
-$(document).ready(function()
-});
-</script>
-
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

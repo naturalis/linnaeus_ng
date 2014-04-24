@@ -4,11 +4,14 @@
 
 <p>
 				
-<form method=post>
+<h2>{$concept.taxon}</h2>				
+				
+<form id="theForm" method=post>
 <input type="hidden" name="id" value="{$concept.id}">
-<input type="hidden" name="action" value="save">
+<input type="hidden" name="name_id" value="{$name.id}">
+<input type="hidden" name="action" id="action" value="save">
 <input type="hidden" name="rnd" value="{$rnd}">
-Add a name:			
+{if $name.id}Change name:{else}Add a name:{/if}
 <table>
 	<tr>
 		<td>Name:</td>
@@ -42,7 +45,7 @@ Add a name:
 	<tr>
 		<td>Type:</td>
 		<td>
-			<select>
+			<select name="type_id">
 			{foreach from=$types item=v}
 			{if $v.nametype!='isValidNameOf'}
 			<option value="{$v.id}"{if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype}</option>
@@ -54,7 +57,7 @@ Add a name:
 	<tr>
 		<td>Language:</td>
 		<td>
-			<select>
+			<select name="language_id">
 			<option value=""></option>
 			{assign var=first value=true}
 			{foreach from=$languages item=v key=k}
@@ -71,7 +74,7 @@ Add a name:
 	<tr>
 		<td>Expert:</td>
 		<td>
-			<select>
+			<select name="expert_id">
 			<option value=""></option>
 			{foreach from=$actors item=v}
 			{if $v.is_company!='1'}
@@ -84,7 +87,7 @@ Add a name:
 	<tr>
 		<td>Institute:</td>
 		<td>
-			<select>
+			<select name="organisation_id">
 			<option value=""></option>
 			{foreach from=$actors item=v}
 			{if $v.is_company=='1'}
@@ -98,7 +101,7 @@ Add a name:
 	<tr>
 		<td>Reference:</td>
 		<td>
-			<select>
+			<select name="reference_id">
 			<option value=""></option>
 			{foreach from=$references item=v}
 			<option value="{$v.id}"{if $v.id==$name.reference_id} selected="selected"{/if}>{$v.label}{if $v.author} ({$v.author}){/if}</option>
@@ -109,15 +112,16 @@ Add a name:
 </table>
 
 <input type="submit" value="save" />
+{if $name.id}&nbsp;<input type="button" value="delete" onclick="if (confirm('Are you sure?')) { $('#action').val('delete');$('#theForm').submit(); } " />{/if}
 </form>
 </p>
+
+	<p>
+		<a href="names.php?id={$concept.id}">names</a><br />
+		<a href="taxon.php?id={$concept.id}">main page</a>
+	</p>
+
 </div>
-
-<script type="text/JavaScript">
-$(document).ready(function()
-});
-</script>
-
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
