@@ -1,5 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-<div id="parent-list"></div>
+<div id="result-list"></div>
 
 <div id="page-main" class="taxonomy">
 

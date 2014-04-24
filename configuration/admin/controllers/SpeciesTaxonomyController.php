@@ -64,25 +64,197 @@ class SpeciesTaxonomyController extends Controller
 		$this->setTaxonConcept();
 	}
 
-    public function setTaxonId($id)
+    public function taxonomyAction ()
     {
-        $this->_taxonId=$id;
+        $this->checkAuthorisation();
+
+        if ($this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+
+			$p=$this->rGetVal('valid_name');
+			$p['rank_id']=$this->rGetVal('rank_id');
+			if ($this->rHasVar('new_parent_id'))
+			{
+				$p['parent_id']=$this->rGetVal('new_parent_id');
+			}
+			
+			// update
+			if ($this->rHasVal('id')) 
+			{
+				$this->updateTaxon($p);
+
+				$currentValidName=$this->getName(array('type'=>PREDICATE_VALID_NAME));
+
+				$p['id']=$currentValidName['id'];
+	
+				$res=$this->updateValidName($p);
+				
+				if ($res)
+				{	
+					$this->addMessage('Valid name updated.');
+					$res=$this->updateTaxon($p);
+						
+					if ($res)
+					{
+						$this->addMessage('Taxon concept updated.');
+					}
+					else
+					{
+						$this->addError('Could not update taxon concept.');
+						$res=$this->updateValidName($current);
+					}
+				}
+				else 
+				{
+					$this->addError('Could not update valid name.');
+				}
+				
+			}
+			// new
+			else 
+			{
+				if ($this->rHasVar('new_parent_id'))
+				{
+					$res=$this->createTaxon($p);
+	
+					if ($res)
+					{	
+						$this->addMessage('Created taxon concept.');
+						
+						$this->setTaxonId($res);
+
+						$p['type_id']=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'];
+						$p['language_id']=LANGUAGE_ID_SCIENTIFIC;
+						$p['name']=$this->constructTaxonConceptName($p);
+				
+						$res=$this->createName($p);
+							
+						if ($res)
+						{
+							$this->addMessage('Created valid name.');
+						}
+						else
+						{
+							$this->addError('Could not create valid name.');
+							
+						}
+					}
+					else 
+					{
+						$this->addError('Could not create taxon concept.');
+					}
+
+				}
+				else
+				{
+					$this->addError('Cannot save taxon without parent.');
+				}
+	
+			}
+	
+			$this->setTaxonConcept();	
+
+		}
+
+		$this->addError('Please note: this function is still under development. As yet, no checks are performed on name or parent - data is saved <i>as is</i>, including errors.');
+		
+		if (!is_null($this->getTaxonId()))
+		{
+			$concept=$this->getTaxonConcept();
+			$names=$this->getNames();
+
+			$this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($concept)));
+			$this->smarty->assign('parent',$this->getTaxonById($concept['parent_id']));
+			$this->smarty->assign('ranks',$this->newGetProjectRanks());
+			$this->smarty->assign('concept',$concept);
+			$this->smarty->assign('names',$names);
+		}
+		else 
+		{
+			$this->setPageName(sprintf($this->translate('New taxon concept')));
+			$this->smarty->assign('ranks',$this->newGetProjectRanks());
+		}
+
+		$this->printPage();
+       
     }
 
-    public function getTaxonId()
+    public function namesAction ()
     {
-        return $this->_taxonId;
+        $this->checkAuthorisation();
+
+		$concept=$this->getTaxonConcept();
+		$names=$this->getNames();
+
+		$this->setPageName(sprintf($this->translate('Names for "%s"'), $this->formatTaxon($concept)));
+		$this->smarty->assign('concept',$this->getTaxonConcept());
+		$this->smarty->assign('names',$names);
+		$this->smarty->assign('types',$this->getNameTypes());
+		$this->smarty->assign('actors',$this->getActors());
+		$this->smarty->assign('languages',$this->getLanguages());
+
+
+		$this->printPage();
+       
     }
 
-    public function setTaxonConcept()
+    public function namesEditAction ()
     {
-        $this->_taxonConcept=$this->getTaxonById($this->getTaxonId());
+        $this->checkAuthorisation();
+		
+        if ($this->rHasVal('action','save')  && !$this->isFormResubmit())
+		{
+			$p=$this->requestData;
+
+			if ($this->rHasVar('name_id'))
+			{
+				$p['id']=$this->rGetVal('name_id');
+				unset($p['name_id']);
+			}
+
+			$res=$this->createName($p);
+
+			if ($res)
+			{	
+				$this->redirect('names.php?id='.$this->getTaxonId());
+			}
+			else 
+			{
+				$this->addError('Could not create name.');
+			}
+
+		}
+		else
+        if ($this->rHasVal('action','delete')  && $this->rHasVar('name_id') && !$this->isFormResubmit())
+		{
+			$p['id']=$this->rGetVal('name_id');
+			$res=$this->deleteName($p);
+
+			if ($res)
+			{	
+				$this->redirect('names.php?id='.$this->getTaxonId());
+			}
+			else 
+			{
+				$this->addError('Could not delete name.');
+			}
+		}
+
+		$concept=$this->getTaxonConcept();
+
+		$this->setPageName(sprintf($this->translate('Names for "%s"'), $this->formatTaxon($concept)));
+
+		$this->smarty->assign('concept',$this->getTaxonConcept());
+		if ($this->rHasVal('name_id'))
+			$this->smarty->assign('name',$this->getName(array('id'=>$this->rGetVal('name_id'))));
+		$this->smarty->assign('types',$this->getNameTypes());
+		$this->smarty->assign('actors',$this->getActors());
+		$this->smarty->assign('languages',$this->getLanguages());
+		$this->smarty->assign('references',$this->getReferences());
+		$this->printPage();
+       
     }
 
-    public function getTaxonConcept($id=null)
-    {
-        return $this->_taxonConcept;
-    }
 
 	private function getActor()
 	{
@@ -114,7 +286,25 @@ class SpeciesTaxonomyController extends Controller
         return $rank;
     }
 
+    private function setTaxonId($id)
+    {
+        $this->_taxonId=$id;
+    }
 
+    private function getTaxonId()
+    {
+        return $this->_taxonId;
+    }
+
+    private function setTaxonConcept()
+    {
+        $this->_taxonConcept=$this->getTaxonById($this->getTaxonId());
+    }
+
+    private function getTaxonConcept($id=null)
+    {
+        return $this->_taxonConcept;
+    }
 
 	private function getNames()
 	{
@@ -459,198 +649,15 @@ class SpeciesTaxonomyController extends Controller
 		return $res;
 	}
 
-    public function taxonomyAction ()
+
+    public function literature2Action()
     {
-        $this->checkAuthorisation();
-
-        if ($this->rHasVal('action','save') && !$this->isFormResubmit())
-		{
-
-			$p=$this->rGetVal('valid_name');
-			$p['rank_id']=$this->rGetVal('rank_id');
-			if ($this->rHasVar('new_parent_id'))
-			{
-				$p['parent_id']=$this->rGetVal('new_parent_id');
-			}
-			
-			// update
-			if ($this->rHasVal('id')) 
-			{
-				$this->updateTaxon($p);
-
-				$currentValidName=$this->getName(array('type'=>PREDICATE_VALID_NAME));
-
-				$p['id']=$currentValidName['id'];
-	
-				$res=$this->updateValidName($p);
-				
-				if ($res)
-				{	
-					$this->addMessage('Valid name updated.');
-					$res=$this->updateTaxon($p);
-						
-					if ($res)
-					{
-						$this->addMessage('Taxon concept updated.');
-					}
-					else
-					{
-						$this->addError('Could not update taxon concept.');
-						$res=$this->updateValidName($current);
-					}
-				}
-				else 
-				{
-					$this->addError('Could not update valid name.');
-				}
-				
-			}
-			// new
-			else 
-			{
-				if ($this->rHasVar('new_parent_id'))
-				{
-					$res=$this->createTaxon($p);
-	
-					if ($res)
-					{	
-						$this->addMessage('Created taxon concept.');
-						
-						$this->setTaxonId($res);
-
-						$p['type_id']=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'];
-						$p['language_id']=LANGUAGE_ID_SCIENTIFIC;
-						$p['name']=$this->constructTaxonConceptName($p);
-				
-						$res=$this->createName($p);
-							
-						if ($res)
-						{
-							$this->addMessage('Created valid name.');
-						}
-						else
-						{
-							$this->addError('Could not create valid name.');
-							
-						}
-					}
-					else 
-					{
-						$this->addError('Could not create taxon concept.');
-					}
-
-				}
-				else
-				{
-					$this->addError('Cannot save taxon without parent.');
-				}
-	
-			}
-	
-			$this->setTaxonConcept();	
-
-		}
-
-		$this->addError('Please note: this function is still under development. As yet, no checks are performed on name or parent - data is saved <i>as is</i>, including errors.');
 		
-		if (!is_null($this->getTaxonId()))
-		{
-			$concept=$this->getTaxonConcept();
-			$names=$this->getNames();
-
-			$this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($concept)));
-			$this->smarty->assign('parent',$this->getTaxonById($concept['parent_id']));
-			$this->smarty->assign('ranks',$this->newGetProjectRanks());
-			$this->smarty->assign('concept',$concept);
-			$this->smarty->assign('names',$names);
-		}
-		else 
-		{
-			$this->setPageName(sprintf($this->translate('New taxon concept')));
-			$this->smarty->assign('ranks',$this->newGetProjectRanks());
-		}
-
-		$this->printPage();
-       
-    }
-
-    public function namesAction ()
-    {
-        $this->checkAuthorisation();
-
-		$concept=$this->getTaxonConcept();
-		$names=$this->getNames();
-
-		$this->setPageName(sprintf($this->translate('Names for "%s"'), $this->formatTaxon($concept)));
-		$this->smarty->assign('concept',$this->getTaxonConcept());
-		$this->smarty->assign('names',$names);
-		$this->smarty->assign('types',$this->getNameTypes());
-		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('languages',$this->getLanguages());
-
-
-		$this->printPage();
-       
-    }
-
-    public function namesEditAction ()
-    {
-        $this->checkAuthorisation();
 		
-        if ($this->rHasVal('action','save')  && !$this->isFormResubmit())
-		{
-			$p=$this->requestData;
 
-			if ($this->rHasVar('name_id'))
-			{
-				$p['id']=$this->rGetVal('name_id');
-				unset($p['name_id']);
-			}
+		
+	}
 
-			$res=$this->createName($p);
-
-			if ($res)
-			{	
-				$this->redirect('names.php?id='.$this->getTaxonId());
-			}
-			else 
-			{
-				$this->addError('Could not create name.');
-			}
-
-		}
-		else
-        if ($this->rHasVal('action','delete')  && $this->rHasVar('name_id') && !$this->isFormResubmit())
-		{
-			$p['id']=$this->rGetVal('name_id');
-			$res=$this->deleteName($p);
-
-			if ($res)
-			{	
-				$this->redirect('names.php?id='.$this->getTaxonId());
-			}
-			else 
-			{
-				$this->addError('Could not delete name.');
-			}
-		}
-
-		$concept=$this->getTaxonConcept();
-
-		$this->setPageName(sprintf($this->translate('Names for "%s"'), $this->formatTaxon($concept)));
-
-		$this->smarty->assign('concept',$this->getTaxonConcept());
-		if ($this->rHasVal('name_id'))
-			$this->smarty->assign('name',$this->getName(array('id'=>$this->rGetVal('name_id'))));
-		$this->smarty->assign('types',$this->getNameTypes());
-		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('languages',$this->getLanguages());
-		$this->smarty->assign('references',$this->getReferences());
-
-
-		$this->printPage();
-       
-    }
 
 
 

@@ -1216,6 +1216,9 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     public function literatureAction ()
     {
+if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
+	$this->redirect('literature2.php?id='.$this->rGetVal('id'));
+
         $this->checkAuthorisation();
         
         $this->setBreadcrumbIncludeReferer(array(

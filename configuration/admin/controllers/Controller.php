@@ -2692,6 +2692,12 @@ class Controller extends BaseClass
         return $this->rHasVal('id');
     }
 
+    public function rGetId ()
+    {
+        return $this->rGetVal('id');
+    }
+
+
 
 
     /**
