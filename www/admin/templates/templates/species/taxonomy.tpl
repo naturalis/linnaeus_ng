@@ -59,6 +59,11 @@
 </table>
 <input type="submit" value="save" />
 </form>
+
+<p>
+	<a href="taxon.php?id={$concept.id}">main page</a>
+</p>
+
 </div>
 
 <script type="text/JavaScript">
