@@ -25,7 +25,7 @@ ul.names-list {
 	font-size:0.8em;
 }
 
-#parent-list {
+#result-list {
 	background-color:#fff;
 	border:1px solid #666;
 	width:350px;
@@ -36,18 +36,18 @@ ul.names-list {
 	overflow-x:hidden;
 }
 
-#parent-list ul {
+#result-list ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-#parent-list li {
+#result-list li {
     font-size: 0.9em;
     overflow-x: hidden;
     white-space: nowrap;
 }
 
-#parent-list li:hover {
+#result-list li:hover {
 	background-color:#eee;
 }

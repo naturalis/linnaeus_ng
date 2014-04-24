@@ -64,6 +64,9 @@ function species_lookup_list(e)
 	
 	var text=$('#parent-list-input').val();
 
+	if (text.length<3)
+		return;
+
 	$.ajax({
 		url : "../species/ajax_interface.php",
 		type: "POST",
