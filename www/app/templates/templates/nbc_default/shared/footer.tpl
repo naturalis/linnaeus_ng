@@ -30,7 +30,7 @@ $(document).ready(function(){
 </script>
 {/literal}
 
-{snippet}google_analytics.html{/snippet}
+{snippet}{"google_analytics-`$smarty.server.SERVER_NAME`.html"}{/snippet}
 
 </body>
 </html>
