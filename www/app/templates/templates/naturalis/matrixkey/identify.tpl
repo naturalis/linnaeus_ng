@@ -100,6 +100,8 @@
     </div>
 
 	{include file="../shared/footerbar.tpl"}
+	
+	{snippet}google_analytics.html{/snippet}
 
   </body>
 

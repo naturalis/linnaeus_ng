@@ -14,5 +14,3 @@
         </p>
       </div>
     </div>
-
-	{snippet}google_analytics.html{/snippet}
