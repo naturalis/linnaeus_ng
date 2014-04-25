@@ -83,7 +83,7 @@
 				<div>
 					<p>&nbsp;</p>
 					<p>
-						Bij deze soort kunnen beelden worden toegevoegd, voor aanbieding klik <a href="">hier</a>.
+						Heeft u mooie foto's van deze soort? Voeg ze dan <a href="">hier</a> toe en draag zo bij aan het Soortenregister..
 					</p>
 				</div>
 				{/if}
