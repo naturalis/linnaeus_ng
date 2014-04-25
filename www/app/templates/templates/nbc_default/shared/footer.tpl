@@ -28,9 +28,9 @@ $(document).ready(function(){
 	});	
 })
 </script>
+{/literal}
 
 {snippet}google_analytics.html{/snippet}
 
-{/literal}
 </body>
 </html>
