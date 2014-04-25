@@ -325,7 +325,7 @@ class MergeController extends Controller
 			array('project_id' => $p['s'])
 		);
 
-		// fuck the undo
+		// to hell with the undo
         $this->models->ContentTaxonUndo->delete(array(
             'project_id' => $p['s']
         ));

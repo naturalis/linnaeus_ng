@@ -50,7 +50,7 @@ include_once ('Controller.php');
 class SpeciesController extends Controller
 {
     private $_useNBCExtras = false;
-	private $_lookupListMaxResults=50;
+	private $_lookupListMaxResults=99999;
     public $usedModels = array(
         'user', 
         'user_taxon', 
@@ -200,6 +200,7 @@ class SpeciesController extends Controller
 
     public function taxonAction()
     {
+
 		$this->checkAuthorisation();
 
 		$taxon=$this->getTaxonById($this->rGetVal('id'));
@@ -299,6 +300,7 @@ class SpeciesController extends Controller
 			$this->smarty->assign('activePage',$startPage);
 			$this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
 		}
+
 		$this->printPage();
     }
 
@@ -797,6 +799,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         'is_hybrid' => $isHybrid
                     ));
 					
+					$this->logChange($this->models->Taxon->getDataDelta());
+					
 					$this->saveParentage($this->requestData['id']);
 					
                     if (!empty($children)) {
@@ -809,6 +813,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                                 'project_id' => $this->getCurrentProjectId(), 
                                 'taxon' => preg_replace('/^('.$data['taxon'].')\b/', $newName, $child['taxon'])
                             ));
+							
+							$this->logChange($this->models->Taxon->getDataDelta());
                             
                         }
                         
@@ -1007,6 +1013,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         'rank_id' => $this->requestData['rank_id'], 
                         'is_hybrid' => $isHybrid
                     ));
+					
+					$this->logChange($this->models->Taxon->getDataDelta());
                     
                     $newId = $this->models->Taxon->getNewId();
 					
@@ -1605,6 +1613,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 								'commonname' => $common
 							));
 							
+							$this->logChange($this->models->Commonname->getDataDelta());
+							
 						}
 
 					}
@@ -1752,6 +1762,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 									'language_id' => $lId,
 									'page_id' => $catId
 								));
+								
+								$this->logChange($this->models->ContentTaxon->getDataDelta());
 
 							}
 	
@@ -1766,6 +1778,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 								'title' => '', 
 								'publish' => 1
 							));
+							
+							$this->logChange($this->models->ContentTaxon->getDataDelta());
 
 							if ($d) {
 
@@ -1952,6 +1966,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 								'sort_order' => $this->getNextMediaSortOrder($tId)
 							));
 							
+							$this->logChange($this->models->MediaTaxon->getDataDelta());
+							
 							if ($mt)
 								$saved++;
 							else
@@ -2022,10 +2038,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         else if ($this->requestData['action'] == 'publish_content') {
             
             $this->ajaxActionPublishContent();
-        }
-        else if ($this->requestData['action'] == 'get_taxon_undo') {
-            
-            $this->ajaxActionGetTaxonUndo();
         }
         else if ($this->requestData['action'] == 'get_col') {
             
@@ -2139,13 +2151,15 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 			else
 				$what = null;
 		
-			if (isset($what)) {
+			if (isset($what))
+			{
 				$d = $this->models->Synonym->update(
 					$what, 
 					array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'id' => $this->requestData['id']
 				));
+				$this->logChange($this->models->Synonym->getDataDelta());
 				$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );         
 			}
 
@@ -2200,7 +2214,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 							'parent_id' => $parent, 
 							'lower_taxon' => $isLowerTaxon ? '1' : '0'
 						));
-
+						
                     $parent = $d[0]['id'];
 					
                 }
@@ -2214,6 +2228,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 							'parent_id' => $parent, 
 							'lower_taxon' => $isLowerTaxon ? '1' : '0'
 						));
+					
+					$this->logChange($this->models->ProjectRank->getDataDelta());
                     
                     $parent = $this->models->ProjectRank->getNewId();
                 }
@@ -2341,6 +2357,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'section' => $val,
                     'show_order' => $d
                 ));
+				
+				$this->logChange($this->models->Section->getDataDelta());
             }
         }
       
@@ -2493,6 +2511,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         'project_id' => $this->getCurrentProjectId(), 
                         'show_order' => $key
                     ));
+					
+					$this->logChange($this->models->Synonym->getDataDelta());
                     
                     $synonyms[$key]['show_order'] = $key;
                 }
@@ -2545,6 +2565,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'author' => $this->rHasVal('author') ? $this->requestData['author'] : null, 
                     'show_order' => $show_order
                 ));
+				
+				$this->logChange($this->models->Synonym->getDataDelta());
                 
                 //				echo $this->models->Synonym->getLastQuery();die();
             }
@@ -2653,6 +2675,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         'project_id' => $this->getCurrentProjectId(), 
                         'show_order' => $key
                     ));
+					
+					$this->logChange($this->models->Commonname->getDataDelta());
                     
                     $commonnames[$key]['show_order'] = $key;
                 }
@@ -2706,6 +2730,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'transliteration' => $this->requestData['transliteration'], 
                     'show_order' => $show_order
                 ));
+				
+				$this->logChange($this->models->Commonname->getDataDelta());
                 
                 $this->smarty->assign('lastLanguage', $this->requestData['language_id']);
             }
@@ -2776,6 +2802,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 'taxon_id' => $this->requestData['id'], 
                 'label' => trim($this->requestData['variation'])
             ));
+			
+			$this->logChange($this->models->TaxonVariation->getDataDelta());
             
             if ($v) {
                 
@@ -2790,6 +2818,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'label' => trim($this->requestData['variation']), 
                     'label_type' => 'alternative'
                 ));
+
+				$this->logChange($this->models->VariationLabel->getDataDelta());
             }
         }
         
@@ -2945,7 +2975,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 		$this->models->TaxonQuickParentage->delete($d);
 	
 		$i=0;
-		foreach((array)$this->tmp as $key=>$val) {
+		foreach((array)$this->tmp as $key=>$val)
+		{
 
 			if (!is_null($id) && $val['id']!=$id)
 				continue;
@@ -3213,7 +3244,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
     {
-        return $this->models->PageTaxon->save(
+        $d=$this->models->PageTaxon->save(
         array(
             'id' => null, 
             'page' => $name, 
@@ -3221,6 +3252,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             'project_id' => $this->getCurrentProjectId(), 
             'def_page' => $isDefault ? '1' : '0'
         ));
+		$this->logChange($this->models->PageTaxon->getDataDelta());
+		return $d;
     }
 
 
@@ -3237,6 +3270,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 'section' => $val, 
                 'show_order' => $key
             ));
+			
+			$this->logChange($this->models->Section->getDataDelta());
         }
     }
 
@@ -3299,7 +3334,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             $d['content_last_change'] = $d['last_change'];
         unset($d['last_change']);
         
-        $this->models->ContentTaxonUndo->save($d);
     }
 
     private function saveTaxon($p=null)
@@ -3322,6 +3356,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 'taxon' => !empty($name) ? $name : '?'
             ));
             
+			$this->logChange($this->models->Taxon->getDataDelta());
             $taxonId = $this->models->Taxon->getNewId();
             $new = true;
 			$this->saveParentage($taxonId);
@@ -3348,8 +3383,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     if (empty($name) && empty($content))
 					{
                         
-                        $this->models->ContentTaxon->setRetainBeforeAlter();
-                        
                         // no page title and no content equals an empty page: delete
                         $ct = $this->models->ContentTaxon->delete(
                         array(
@@ -3358,8 +3391,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                             'language_id' => $language, 
                             'page_id' => $page
                         ));
-                        
-                        $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $save_type);
                         
                         // Mark taxon as 'empty'
                         $this->models->Taxon->update(array(
@@ -3384,9 +3415,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         
                         $oldId = count((array) $ct) != 0 ? $ct[0]['id'] : null;
                         
-                        if ($oldId != null)
-                            $this->models->ContentTaxon->setRetainBeforeAlter();
-                        
                         $filteredContent = $this->filterContent($content);
                         
                         $newdata = array(
@@ -3401,6 +3429,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         
                         // save content
                         $d = $this->models->ContentTaxon->save($newdata);
+						
+						$this->logChange($this->models->ContentTaxon->getDataDelta());
                         
                         // Mark taxon as 'empty/not empty' depending on presence of contents
                         $this->models->Taxon->update(array(
@@ -3408,9 +3438,9 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         ), array(
                             'id' => $taxonId
                         ));
-                        
-                        if ($oldId != null)
-                            $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), $newdata, $save_type);
+						
+						$this->logChange($this->models->Taxon->getDataDelta());
+
                     }
                     
                     if ($d) {
@@ -3570,6 +3600,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 'rank_id' => $rankId, 
                 'is_hybrid' => isset($taxon['hybrid']) && $taxon['hybrid']===true && $this->canRankBeHybrid($rankId) ? 1 : 0
             ));
+			
+			$this->logChange($this->models->Taxon->getDataDelta());
             
             return $this->models->Taxon->getNewId();
         }
@@ -3605,6 +3637,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'rank_id' => $rankId, 
                     'is_hybrid' => isset($taxon['hybrid']) && $taxon['hybrid']===true && $this->canRankBeHybrid($rankId) ? 1 : 0
                 ));
+				
+				$this->logChange($this->models->Taxon->getDataDelta());
                 
 
 
@@ -3804,6 +3838,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'page_id' => $this->requestData['id'], 
                     'title' => trim($this->requestData['label'])
                 ));
+				
+				$this->logChange($this->models->PageTaxonTitle->getDataDelta());
             }
             
             $this->smarty->assign('returnText', 'saved');
@@ -3933,6 +3969,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'language_id' => $this->requestData['language'], 
                     'page_id' => $this->requestData['page']
                 ));
+				
+				$this->logChange($this->models->ContentTaxon->getDataDelta());
                 
                 if ($d) {
                     
@@ -3946,44 +3984,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             else {
                 
                 $this->smarty->assign('returnText', $this->translate('Content not found.'));
-            }
-        }
-    }
-
-    private function ajaxActionGetTaxonUndo ()
-    {
-        if (!$this->rHasId()) {
-            
-            return;
-        }
-        else {
-            
-            $ctu = $this->models->ContentTaxonUndo->_get(
-            array(
-                'id' => array(
-                    'taxon_id' => $this->requestData['id'], 
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'order' => 'content_last_change desc', 
-                'limit' => 1
-            ));
-            
-            if ($ctu) {
-                
-                $d = $ctu[0];
-                
-                $this->models->ContentTaxonUndo->delete($d['id']);
-                
-                $d['id'] = $d['content_taxa_id'];
-                unset($d['content_taxa_id']);
-                
-                $d['created'] = $d['content_taxa_created'];
-                unset($d['content_taxa_created']);
-                
-                $d['last_change'] = $d['content_last_change'];
-                unset($d['content_last_change']);
-                
-                $this->smarty->assign('returnText', json_encode($ctu[0]));
             }
         }
     }
@@ -4008,6 +4008,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 'id' => $this->requestData['taxon_id'], 
                 'taxon' => trim($this->requestData['taxon_name'])
             ));
+
+			$this->logChange($this->models->Taxon->getDataDelta());
             
             if ($d)
                 $this->smarty->assign('returnText', '<ok>');
@@ -4070,6 +4072,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'project_rank_id' => $this->requestData['id'], 
                     'label' => trim($this->requestData['label'])
                 ));
+				
+				$this->logChange($this->models->LabelProjectRank->getDataDelta());
             }
             
             $this->smarty->assign('returnText', 'saved');
@@ -4196,6 +4200,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'language_id' => $this->requestData['language'], 
                     'label' => trim($this->requestData['label'])
                 ));
+				
+				$this->logChange($this->models->LabelSection->getDataDelta());
             }
             
             $this->smarty->assign('returnText', 'saved');
@@ -4293,6 +4299,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     'label_language_id' => $this->requestData['id'], 
                     'label' => trim($this->requestData['label'])
                 ));
+				
+				$this->logChange($this->models->LabelLanguage->getDataDelta());
             }
             
             $this->smarty->assign('returnText', 'saved');
@@ -4505,6 +4513,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             'user_id' => $userId, 
             'taxon_id' => $taxonId
         ));
+		
+		$this->logChange($this->models->UserTaxon->getDataDelta());
         
         return $this->models->UserTaxon->getNewId();
     }
@@ -4540,6 +4550,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 'parent_id' => $parent, 
                 'lower_taxon' => ($key >= (count((array) $r) - 1) ? 1 : 0)
             ));
+			
+			$this->logChange($this->models->ProjectRank->getDataDelta());
             
             $parent = $this->models->ProjectRank->getNewId();
         }
@@ -4664,7 +4676,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     private function checkCharacters ($name)
     {
-        
         // 3. Names should not contain special characters (except -) or digits. 
         return (preg_match('/([^A-Za-z\s\(\)\-]+)/', $name) === 0);
     }
@@ -4729,7 +4740,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     private function getCorrectedProjectRankByParentProjectRank ($rankId)
     {
-        
         /*
 	    8. when choosing a parent, default rank of new taxon should be the parent rank's child, with two exceptions:
 	    
@@ -4792,26 +4802,38 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             'relation_id' => $id, 
             'ref_type' => 'variation'
         ));
+		$this->logChange($this->models->TaxaRelations->getDataDelta());
+
         $this->models->VariationRelations->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'variation_id' => $id
         ));
+		$this->logChange($this->models->VariationRelations->getDataDelta());
+
         $this->models->VariationLabel->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'variation_id' => $id
         ));
+		$this->logChange($this->models->VariationLabel->getDataDelta());
+
         $this->models->TaxonVariation->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'id' => $id
         ));
+		$this->logChange($this->models->TaxonVariation->getDataDelta());
+
         $this->models->MatrixTaxonState->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'variation_id' => $id
         ));
+		$this->logChange($this->models->MatrixTaxonState->getDataDelta());
+
         $this->models->MatrixVariation->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'variation_id' => $id
         ));
+		$this->logChange($this->models->MatrixVariation->getDataDelta());
+		
     }
 
     private function getRelatedEntities ($tId)
@@ -4891,7 +4913,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 		
 	}
         
-    public function deleteTaxon ($id,$pId=null)
+    public function deleteTaxon($id,$pId=null)
     {
         if (!$id)
             return;
@@ -5028,10 +5050,18 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         ));
         
         // delete taxon
+        $this->models->Names->delete(array(
+            'project_id' => $pId,
+            'id' => $id, 
+        ));
+		
+        // delete taxon
         $this->models->Taxon->delete(array(
             'project_id' => $pId,
             'id' => $id, 
         ));
+		
+		$this->logChange($this->models->Taxon->getDataDelta());
         
     }
 

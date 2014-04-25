@@ -45,6 +45,7 @@ class Controller extends BaseClass
     public $printBreadcrumbs = true;
     private $usedModelsBase = array(
 		'dump', // debug!
+		'activity_log',
         'free_module_project', 
         'free_module_project_user', 
         'interface_text', 
@@ -70,7 +71,8 @@ class Controller extends BaseClass
     );
     private $usedHelpersBase = array(
         'logging_helper', 
-        'email_helper'
+        'email_helper',
+		'log_changes'
     );
 
 
@@ -85,8 +87,6 @@ class Controller extends BaseClass
     public function __construct ()
     {
         parent::__construct();
-
-
 
         $this->setTimeZone();
         
@@ -1751,6 +1751,33 @@ class Controller extends BaseClass
         if (file_exists($cachePath))
 			array_map('unlink', glob($cachePath.'/*'));
     }	
+
+
+	public function logChange($p)
+	{
+		if ($p['changed']!==true)
+			return;
+
+		if (!$this->models->ActivityLog->getTableExists())
+			return;
+
+		$this->models->ActivityLog->insert(
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'user_id'=>$this->getCurrentUserId(),
+				'user'=> 
+					@$_SESSION['admin']['user']['first_name'].' '.
+					@$_SESSION['admin']['user']['last_name'].' ('.
+					@$_SESSION['admin']['user']['username'].' - '.
+					@$_SESSION['admin']['user']['email_address'].')',
+				'controller'=>$this->getControllerBaseName(),
+				'view'=>$this->getViewName(),
+				'data_before'=> !empty($p['before']) ? serialize($p['before']) : null,
+				'data_after'=> !empty($p['after']) ? serialize($p['after']) : null,
+			)
+		);
+	}
+
 
     private function getTaxonChildren($id,$alphabeticalTree)
     {
@@ -3889,7 +3916,7 @@ class Controller extends BaseClass
         }
         
     }
-
+	
 	// DEBUG!!!!!
 	// $this->dump($this->getNewProjectId(),null,'waypoint COMMON',$indexName);
 	public function dump($pId,$int=null,$var=null,$txt=null)
