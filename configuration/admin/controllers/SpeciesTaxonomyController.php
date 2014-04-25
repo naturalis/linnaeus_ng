@@ -127,7 +127,7 @@ class SpeciesTaxonomyController extends Controller
 						$p['language_id']=LANGUAGE_ID_SCIENTIFIC;
 						$p['name']=$this->constructTaxonConceptName($p);
 				
-						$res=$this->createName($p);
+						$res=$this->saveName($p);
 							
 						if ($res)
 						{
@@ -212,7 +212,7 @@ class SpeciesTaxonomyController extends Controller
 				unset($p['name_id']);
 			}
 
-			$res=$this->createName($p);
+			$res=$this->saveName($p);
 
 			if ($res)
 			{	
@@ -244,17 +244,17 @@ class SpeciesTaxonomyController extends Controller
 
 		$this->setPageName(sprintf($this->translate('Names for "%s"'), $this->formatTaxon($concept)));
 
-		$this->smarty->assign('concept',$this->getTaxonConcept());
 		if ($this->rHasVal('name_id'))
 			$this->smarty->assign('name',$this->getName(array('id'=>$this->rGetVal('name_id'))));
+		$this->smarty->assign('concept',$this->getTaxonConcept());
 		$this->smarty->assign('types',$this->getNameTypes());
 		$this->smarty->assign('actors',$this->getActors());
+		$this->smarty->assign('default_language',$this->getDefaultProjectLanguage());
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('references',$this->getReferences());
 		$this->printPage();
        
     }
-
 
 	private function getActor()
 	{
@@ -525,7 +525,7 @@ class SpeciesTaxonomyController extends Controller
 		);
 	}
 
-	private function createName($p)
+	private function saveName($p)
 	{
 		$id=$this->getTaxonId();
 		
@@ -534,23 +534,25 @@ class SpeciesTaxonomyController extends Controller
 				
 		$res=$this->models->Names->save(
 			array(
-				'id'=>isset($p['id']) ? $p['id'] : null,
-				'name'=>!empty($p['name']) ? $p['name'] : 'null',
-				'uninomial'=>!empty($p['uninomial']) ? $p['uninomial'] : 'null',
-				'specific_epithet'=>!empty($p['specific_epithet']) ? $p['specific_epithet'] : 'null',
-				'infra_specific_epithet'=>!empty($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : 'null',
-				'authorship'=>!empty($p['authorship']) ? $p['authorship'] : 'null',
-				'name_author'=>!empty($p['name_author']) ? $p['name_author'] : 'null',
-				'authorship_year'=>!empty($p['authorship_year']) ? $p['authorship_year'] : 'null',
+				'id'=>isset($p['id']) ? $p['id'] : "null",
+				'name'=>!empty($p['name']) ? $p['name'] : "null",
+				'uninomial'=>!empty($p['uninomial']) ? $p['uninomial'] : "null",
+				'specific_epithet'=>!empty($p['specific_epithet']) ? $p['specific_epithet'] : "null",
+				'infra_specific_epithet'=>!empty($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : "null",
+				'authorship'=>!empty($p['authorship']) ? $p['authorship'] : "null",
+				'name_author'=>!empty($p['name_author']) ? $p['name_author'] : "null",
+				'authorship_year'=>!empty($p['authorship_year']) ? $p['authorship_year'] : "null",
 				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$id,
 				'type_id'=>$p['type_id'],
-				'language_id'=>!empty($p['language_id']) ? $p['language_id'] : 'null',
-				'expert_id'=>!empty($p['expert_id']) ? $p['expert_id'] : 'null',
-				'organisation_id'=>!empty($p['organisation_id']) ? $p['organisation_id'] : 'null',
-				'reference_id'=>!empty($p['reference_id']) ? $p['reference_id'] : 'null',
+				'language_id'=>!empty($p['language_id']) ? $p['language_id'] : "null",
+				'expert_id'=>!empty($p['expert_id']) ? $p['expert_id'] : "null",
+				'organisation_id'=>!empty($p['organisation_id']) ? $p['organisation_id'] : "null",
+				'reference_id'=>!empty($p['reference_id']) ? $p['reference_id'] : "null",
 			)
 		);
+
+		$this->logChange($this->models->Names->getDataDelta());
 
 		return $res;
 	}
@@ -569,6 +571,8 @@ class SpeciesTaxonomyController extends Controller
 				'taxon_id'=>$id
 			)
 		);
+		
+		$this->logChange($this->models->Names->getDataDelta());
 
 		return $res;
 	}
@@ -607,6 +611,8 @@ class SpeciesTaxonomyController extends Controller
 				'id'=>$p['id']
 			)
 		);
+		
+		$this->logChange($this->models->Names->getDataDelta());
 
 		return $res;
 	}
@@ -622,7 +628,10 @@ class SpeciesTaxonomyController extends Controller
 		);
 		
 		if ($res)
+		{
+			$this->logChange($this->models->Taxon->getDataDelta());
 			return $this->models->Taxon->getNewId();
+		}
 	}
 	
 	private function updateTaxon($p)
@@ -637,7 +646,7 @@ class SpeciesTaxonomyController extends Controller
 		{
 			$p['taxon']=$taxon;
 		}
-
+		
 		$res=$this->models->Taxon->update(
 			$p,
 			array(
@@ -645,7 +654,9 @@ class SpeciesTaxonomyController extends Controller
 				'id' => $id
 			)
 		);
-
+		
+		$this->logChange($this->models->Taxon->getDataDelta());
+		
 		return $res;
 	}
 

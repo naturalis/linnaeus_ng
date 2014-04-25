@@ -317,6 +317,8 @@ class SearchControllerNSR extends SearchController
 //			return null;
 
 		$img=!empty($p['images']);
+		$distribution=!empty($p['distribution']);
+		$trend=!empty($p['trend']);
 
 		$dna=(!empty($p['dna']) || !empty($p['dna_insuff']));
 
@@ -343,6 +345,8 @@ class SearchControllerNSR extends SearchController
 				_k.name as dutch_name,
 				".($img ? "ifnull(_i.number_of_images,0) as number_of_images," : "" )."
 				".($dna ? "ifnull(_j.number_of_barcodes,0) as number_of_barcodes," : "" )."
+				".($trend ? "ifnull(_trnd.number_of_trend_years,0) as number_of_trend_years," : "" )."
+				".($distribution ? "ifnull(_ii.number_of_maps,0) as number_of_maps," : "" )."
 				_h.information_title as presence_information_title,
 				_h.index_label as presence_information_index_label,
 				_l.file_name as overview_image
@@ -395,6 +399,36 @@ class SearchControllerNSR extends SearchController
 					and _j.project_id=_a.project_id" :  "" 
 				)."
 
+			". ($trend ? "
+				left join
+				(select project_id,taxon_id,count(*) as number_of_trend_years from %PRE%taxon_trend_years group by project_id,taxon_id) as _trnd
+					on _a.id=_trnd.taxon_id
+					and _trnd.project_id=_a.project_id" :  "" 
+				)."
+
+			". ($distribution ? "
+				left join
+					(
+						select 
+							_sub2.project_id,taxon_id,count(*) as number_of_maps
+						from
+							%PRE%media_taxon as _sub2
+
+						left join %PRE%media_meta _meta19
+							on _sub2.id=_meta19.media_id
+							and _sub2.project_id=_meta19.project_id
+							and _meta19.sys_label='verspreidingsKaart'
+
+						where
+							_meta19.meta_data=1
+
+						group by
+							_sub2.project_id,taxon_id
+					) as _ii
+					on _a.id=_ii.taxon_id
+					and _ii.project_id=_a.project_id" :  "" 
+				)."
+
 			right join %PRE%taxon_quick_parentage _q
 				on _a.id=_q.taxon_id
 				and _a.project_id=_q.project_id
@@ -425,6 +459,8 @@ class SearchControllerNSR extends SearchController
 			".(isset($auth) ? "and _m.authorship like '". mysql_real_escape_string($auth)."%'" : "")."
 			".($img ? "and number_of_images > 0" : "")."
 			".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
+			".($trend ? "and number_of_trend_years > 0" : "")."
+			".($distribution ? "and number_of_maps > 0" : "")."
 
 			order by ".(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "dutch_name" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."

@@ -219,20 +219,21 @@ class KeyController extends Controller
         $this->checkAuthorisation();
         
         // create a new step when no id is specified
-        if (!$this->rHasId()) {
-
+        if (!$this->rHasId())
+		{
             $id = $this->createNewKeystep();
             
             $this->renumberKeySteps(array(
                 0 => $this->getKeyTree()
             ));
             
-            if ($this->rHasVal('insert')) {
-                
+            if ($this->rHasVal('insert'))
+			{
                 $this->insertKeyStep($id, $this->requestData['insert']);
             }
             
-            if ($this->rHasVal('ref_choice')) {
+            if ($this->rHasVal('ref_choice'))
+			{
                 // url was called from the 'new step' option of a choice: set
                 // the new referring step id
 
@@ -251,55 +252,47 @@ class KeyController extends Controller
             $this->redirect('step_show.php?id=' . $id . ($this->rHasVal('insert') ? '&insert=' . $this->requestData['insert'] : ''));
         }
         // id has been specified
-        else {
-
+        else
+		{
             // delete L2-legacy image
-            if ($this->rHasVal('action', 'deleteImage') || $this->rHasVal('action', 'deleteAllImages')) {
-            
+            if ($this->rHasVal('action', 'deleteImage') || $this->rHasVal('action', 'deleteAllImages'))
+			{
                 $step = $this->getKeystep($this->requestData['id']);
-
                 $this->deleteLegacyImage($this->rHasVal('action', 'deleteImage') ? $step : 'all');
-                
                 $this->redirect('step_show.php?id='.$step['id']);
                                  
             } else
 			// delete step
-            if ($this->rHasVal('action', 'delete')) {
-
+            if ($this->rHasVal('action', 'delete'))
+			{
                 $this->deleteKeystep($this->requestData['id']);
-                
                 $entry = $this->getPreviousKeypathEntry($this->requestData['id']);
-                
                 $this->redirect($entry ? 'step_show.php?id=' . $entry['id'] : 'index.php');
             }
             
-            
             // get step data
             $step = $this->getKeystep($this->requestData['id']);
-            
             $this->setPageName(sprintf($this->translate('Edit step %s'), $step['number']));
             
             //// saving the number (all the rest is done through ajax)
             // number can now no longer be edited
-            if ($this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
-            
+            if ($this->rHasVal('action', 'save') && !$this->isFormResubmit())
+			{
             	//$this->redirect('step_show.php?id=' . $this->requestData['id']);
-                
             	// no number specified
-                if (empty($this->requestData['number'])) {
-
+                if (empty($this->requestData['number']))
+				{
                     $next = $this->getNextLowestStepNumber();
-                    
                     $this->addError(sprintf($this->translate('Step number is required. The saved number for this step is %s. The lowest unused number is %s.'), $step['number'], $next));
                 }
                 // non-numeric number specified
-                elseif (!is_numeric($this->requestData['number'])) {
-
+                elseif (!is_numeric($this->requestData['number']))
+				{
                     $this->addError(sprintf($this->translate('"%s" is not a number.'), $this->requestData['number']));
                 }
                 // existing number specified
-                else {
-
+                else
+				{
                     $k = $this->models->Keystep->_get(
                     array(
                         'id' => array(
@@ -310,16 +303,17 @@ class KeyController extends Controller
                         'columns' => 'count(*) as total'
                     ));
                     
-                    if ($k[0]['total'] != 0) {
+                    if ($k[0]['total'] != 0)
+					{
                         // doublure
-
                         $this->addError(sprintf($this->translate('A step with number %s already exists. The lowest unused number is %s.'), $this->requestData['number'], $this->getNextLowestStepNumber()));
                     }
                     // unique numeric number
-                    else {
+                    else
+					{
 						// don't update if unchanged
-                        if ($this->requestData['number'] != $step['number']) {
-
+                        if ($this->requestData['number'] != $step['number'])
+						{
                             $this->models->Keystep->update(
                             array(
                                 'number' => $this->requestData['number']
@@ -328,7 +322,7 @@ class KeyController extends Controller
                                 'id' => $this->requestData['id'], 
                                 'project_id' => $this->getCurrentProjectId(), 
                             ));
-                            
+							
                             // two steps below unnecessary because of redirect
                             // to step_show
                             $step['number'] = $this->requestData['number'];
@@ -839,10 +833,6 @@ class KeyController extends Controller
             
             $this->saveKeystepContent($this->requestData);
         }
-        elseif ($this->requestData['action'] == 'get_keystep_undo') {
-            
-            $this->getKeystepUndo($this->requestData);
-        }
         elseif ($this->requestData['action'] == 'get_key_choice_content') {
             
             $this->getKeystepChoiceContent();
@@ -852,10 +842,6 @@ class KeyController extends Controller
             $this->clearCache($this->cacheFiles);
             
             $this->saveKeystepChoiceContent($this->requestData);
-        }
-        elseif ($this->requestData['action'] == 'get_key_choice_undo') {
-            
-            $this->getKeystepChoiceUndo($this->requestData);
         }
         
         $this->printPage();
@@ -1244,14 +1230,8 @@ class KeyController extends Controller
                 'content' => $newContent
             );
             
-            // initiate save to undo buffer
-            $this->models->ContentKeystep->setRetainBeforeAlter();
-            
             // save step
             $this->models->ContentKeystep->save($d);
-            
-            // save to undo buffer
-            $this->saveOldKeyData($this->models->ContentKeystep->getRetainedData(), $d, 'manual');
             
             $this->smarty->assign('returnText', $this->models->ContentKeystep->getAffectedRows() > 0 ? $this->translate('saved') : '');
         }
@@ -1551,14 +1531,8 @@ class KeyController extends Controller
                 'choice_txt' => trim($data['content'][1])
             );
             
-            // initiate save to undo buffer
-            $this->models->ChoiceContentKeystep->setRetainBeforeAlter();
-            
             // save choice
             $this->models->ChoiceContentKeystep->save($d);
-            
-            // save to undo buffer
-            $this->saveOldKeyChoiceData($this->models->ChoiceContentKeystep->getRetainedData(), $d, 'manual');
             
             $this->smarty->assign('returnText', $this->models->ChoiceContentKeystep->getAffectedRows() > 0 ? $this->translate('saved') : '');
         }
@@ -1640,129 +1614,6 @@ class KeyController extends Controller
                 'show_order' => $key + 1
             ));
         }
-    }
-
-    private function saveOldKeyChoiceData ($data, $newdata = false, $mode = 'auto')
-    {
-        
-        // if there is no "old" data, there's nothing to undo
-        if ($data === false)
-            return;
-        
-        $d = $data[0];
-        
-        if ($newdata !== false && (isset($d['choice_txt']) && isset($newdata['choice_txt']) && $d['choice_txt'] == $newdata['choice_txt']))
-            return;
-        
-        $d['save_type'] = $mode;
-        
-        $d['choice_content_id'] = $d['id'];
-        
-        $d['id'] = null;
-        
-        $d['choice_content_created'] = $d['created'];
-        unset($d['created']);
-        
-        $d['choice_last_change'] = $d['last_change'];
-        unset($d['last_change']);
-        
-        $this->models->ChoiceContentKeystepUndo->save($d);
-    }
-
-    private function saveOldKeyData ($data, $newdata = false, $mode = 'auto')
-    {
-        // if there is no "old" data, there's nothing to undo
-        if ($data === false)
-            return;
-        
-        $d = $data[0];
-        
-        if ($newdata !== false && ((isset($d['title']) && isset($newdata['title']) && $d['title'] == $newdata['title']) && (isset($d['content']) && isset($newdata['content']) && $d['content'] == $newdata['content'])))
-            return;
-        
-        $d['save_type'] = $mode;
-        
-        $d['keystep_content_id'] = $d['id'];
-        
-        $d['id'] = null;
-        
-        $d['keystep_content_created'] = $d['created'];
-        unset($d['created']);
-        
-        $d['keystep_content_last_change'] = $d['last_change'];
-        unset($d['last_change']);
-        
-        $this->models->ContentKeystepUndo->save($d);
-    }
-
-    private function getKeystepUndo ($data)
-    {
-        if (!isset($data['id']))
-            return;
-            
-            // determine last insert
-        $d = $this->models->ContentKeystepUndo->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'keystep_id' => $data['id']
-            ), 
-            'columns' => ' max(created) as last'
-        ));
-        
-        // retrieve data
-        $d = $this->models->ContentKeystepUndo->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'keystep_id' => $data['id'], 
-                'created' => $d[0]['last']
-            )
-        ));
-        
-        // delete from undo buffer
-        $this->models->ContentKeystepUndo->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'keystep_id' => $data['id'], 
-            'id' => $d[0]['id']
-        ));
-        
-        $this->smarty->assign('returnText', json_encode($d[0]));
-    }
-
-    private function getKeystepChoiceUndo ($data)
-    {
-        if (!isset($data['id']))
-            return;
-            
-            // determine last insert
-        $d = $this->models->ChoiceContentKeystepUndo->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'choice_id' => $data['id']
-            ), 
-            'columns' => ' max(created) as last'
-        ));
-        
-        // retrieve data
-        $d = $this->models->ChoiceContentKeystepUndo->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'choice_id' => $data['id'], 
-                'created' => $d[0]['last']
-            )
-        ));
-        
-        // delete from undo buffer
-        $this->models->ChoiceContentKeystepUndo->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'choice_id' => $data['id'], 
-            'id' => $d[0]['id']
-        ));
-        
-        $this->smarty->assign('returnText', json_encode($d[0]));
     }
 
     private function showOrderToMarker ($showOrder)

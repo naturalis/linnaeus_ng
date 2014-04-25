@@ -85,7 +85,6 @@
 					keySaveStepContent('default','$(\'#theForm\').submit()');"
 					value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
-			<input type="button" onclick="keyStepUndo();"  value="{t}undo last save{/t}" />
 		</td>
 	</tr>
 </table>
