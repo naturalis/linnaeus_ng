@@ -1,8 +1,8 @@
 {include file="../shared/head.tpl"}
 
   <body style='cursor: default;'>
-    
-{include file="../shared/navbar.tpl"}
+
+	{include file="../shared/navbar.tpl"}
 	
     <div id='container'>
       <a name='top'></a>
@@ -101,7 +101,7 @@
 
 	{include file="../shared/footerbar.tpl"}
 	
-	{snippet}google_analytics.html{/snippet}
+	{snippet}{"google_analytics-`$smarty.server.SERVER_NAME`.html"}{/snippet}
 
   </body>
 

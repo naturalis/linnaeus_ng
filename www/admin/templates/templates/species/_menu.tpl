@@ -3,7 +3,7 @@
 <input type="button" value="{t}next >{/t}" {if $adjacentTaxa.next.id}onclick="allNavigate({$adjacentTaxa.next.id});" title="{$adjacentTaxa.next.label}"{else}disabled="disabled"{/if} class="allLookupButton" />
 {/if}
 &nbsp;
-{t}Find species:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
+{t}Find taxa:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
 <a href="branches.php" class="allLookupLink">Taxon list</a>
 &nbsp;

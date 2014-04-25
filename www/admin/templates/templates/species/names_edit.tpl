@@ -57,6 +57,14 @@
 	<tr>
 		<td>Language:</td>
 		<td>
+
+			{if $name.id}
+			{assign var=dummy value=$name.language_id}
+			{else}
+			{assign var=dummy value=$default_language}
+			{/if}
+
+		
 			<select name="language_id">
 			<option value=""></option>
 			{assign var=first value=true}
@@ -65,7 +73,7 @@
 			<option value="" disabled="disabled"></option>
 				{assign var=first value=false}
 			{/if}
-			<option value="{$v.id}"{if $v.id==$name.language_id} selected="selected"{/if}>{$v.language}</option>
+			<option value="{$v.id}"{if $v.id==$dummy} selected="selected"{/if}>{$v.language}</option>
 			{if $k==0}<option value="" disabled="disabled"></option>{/if}
 			{/foreach}				
 			</select>
