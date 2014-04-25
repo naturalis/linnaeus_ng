@@ -68,15 +68,12 @@
 								<input type="checkbox" class="list" id="images" name="images"{if $search.images=='on'} checked="checked"{/if}>
 								<label for="images">met foto('s)</label>
 							</li>
-
-							<br /><i>nog niet geïmplementeerd, in afwachting externe koppeling:</i>
-
 							<li>
-								<input disabled="disabled" type="checkbox" class="list" id="distribution" name="distribution"{if $search.distribution=='on'} checked="checked"{/if}>
+								<input type="checkbox" class="list" id="distribution" name="distribution"{if $search.distribution=='on'} checked="checked"{/if}>
 								<label for="distribution">met verspreidingskaart</label>
 							</li>
 							<li>
-								<input disabled="disabled" type="checkbox" class="list" id="trend" name="trend"{if $search.trend=='on'} checked="checked"{/if}>
+								<input type="checkbox" class="list" id="trend" name="trend"{if $search.trend=='on'} checked="checked"{/if}>
 								<label for="trend">met trendgrafiek</label>
 							</li>
 						</ul>
