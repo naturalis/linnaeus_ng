@@ -23,7 +23,8 @@ class WebservicesController extends Controller
 		'media_taxon',
 		'nsr_ids',
 		'media_meta',
-		'literature2'
+		'literature2',
+		'taxon_trend_years'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -730,6 +731,20 @@ parameters:
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Verspreidingskaarten')
+			);
+
+
+        $d=$this->models->TaxonTrendYears->_get(array(
+			'id'=> array(
+				'project_id' => $this->getCurrentProjectId()
+			),
+			'columns'=>'count(distinct taxon_id) as total'
+		));
+
+		$result['statistics']['trend_graph']=
+			array(
+				'count'=>$d[0]['total'],
+				'label'=>$this->translate('Trendgrafieken')
 			);
 
 		$this->smarty->assign('json',json_encode($result));
