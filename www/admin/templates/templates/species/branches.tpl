@@ -5,13 +5,18 @@
 		{foreach from=$progeny item=progen}
 			{if $progen.child_count==0}
 			<li id="progen-{$progen.id}" class="progen childless">
-				<span class="grip">&#9617;</span>{if $progen.rank_id<$smarty.const.SPECIES_RANK_ID}{$progen.rank}{/if} {$progen.taxon}
-				{if $progen.commonname}<span class="common">{$progen.commonname}</span>{/if}
+				<span class="grip">&#9617;</span>
+				<span class="{if $highlight && $highlight==$progen.id} taxon-highlight{/if}">
+					{if $progen.rank_id<$smarty.const.SPECIES_RANK_ID}{$progen.rank}{/if} {$progen.taxon}
+					{if $progen.commonname}<span class="common">{$progen.commonname}</span>{/if}
+				</span>
 			{else}
 			<li id="progen-{$progen.id}" class="progen">
-				<span class="grip">&#9617;</span> <a href="?p={$progen.id}">{$progen.rank} {$progen.taxon}</a>
-				{if $progen.commonname}<span class="common">{$progen.commonname}</span>{/if}
-
+				<span class="grip">&#9617;</span>
+				<span class="{if $highlight && $highlight==$progen.id} taxon-highlight{/if}">
+					<a href="?p={$progen.id}">{$progen.rank} {$progen.taxon}</a>
+					{if $progen.commonname}<span class="common">{$progen.commonname}</span>{/if}
+				</span>
 				<span class="childcount">
 					{$progen.child_count}
 				</span>
@@ -64,6 +69,9 @@ ul {
 .editors a {
 	color:#888;
 }
+.taxon-highlight {
+	background-color:#9CF;
+}
 </style>
 
 <div id="page-main">
@@ -74,7 +82,7 @@ ul {
 		<input type="hidden" name="toggle" id="toggle" value="{$toggle}" />
 		<input type="hidden" name="rnd" value="{$rnd}" />
 		<input type="button" value="{t}save new order{/t}" onclick="reOrder()" />
-		<!-- a href="#" onclick="$('.peer').toggle();$('#toggle').val($('.peer:first').css('display'));">toggle peers</a -->
+		<a href="#" onclick="$('.peer').toggle();$('#toggle').val($('.peer:first').css('display'));">toggle peers</a>
 		</form>
 	</p>
 	<ul>
