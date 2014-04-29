@@ -386,13 +386,24 @@ parameters:
 
 	public function lastImageAction()
 	{
+		$poolSize=20;
+
 		$this->_usage=
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>
 parameters:
   pid".chr(9)." : project id (mandatory)
+  size".chr(9)." : size of pool from which random image is selected (optional, max. 1000; default ".$poolSize.")
 ";
 
-		$poolSize=20;
+		if (
+			$this->rHasVar('size') && 
+			is_numeric($this->rGetVal('size')) && 
+			$this->rGetVal('size')>0 && 
+			$this->rGetVal('size')<1000
+		)
+		{
+			$poolSize=$this->rGetVal('size');
+		}
 
 		// returns 1 of the last $poolSize images
 
@@ -421,14 +432,24 @@ parameters:
 
         $media=$this->models->MediaMeta->freeQuery("
 			select 
-				media_id 
+				_a.media_id
+
 			from
-				%PRE%media_meta
+				%PRE%media_meta _a
+
+			left join %PRE%media_meta _meta9
+				on _a.id=_meta9.media_id
+				and _a.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+
 			where 
-				sys_label = 'beeldbankDatumAanmaak'
-				and project_id = ".$this->getCurrentProjectId()."
+				_a.sys_label = 'beeldbankDatumAanmaak'
+				and _a.project_id = ".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
+
 			order by 
-				meta_date desc
+				_a.meta_date desc
+
 			limit ".$poolSize."
 		");
 		
@@ -675,8 +696,6 @@ parameters:
 					project_id = ".$this->getCurrentProjectId()."
 					and expert_id is not null
 				) as unification"
-
-
 		);
 
 		$result['statistics']['specialist']=
@@ -697,11 +716,19 @@ parameters:
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Literatuurbronnen')
 			);
-		
+
+        $d=$this->models->MediaMeta->_get(array(
+			'id'=> array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sys_label' => 'verspreidingsKaart',
+				'meta_data' => 1
+			),
+			'columns'=>'count(*) as total'
+		));
 
 		$result['statistics']['distribution_map']=
 			array(
-				'count'=>'(...)',
+				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Verspreidingskaarten')
 			);
 
