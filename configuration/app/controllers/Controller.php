@@ -1186,12 +1186,23 @@ class Controller extends BaseClass
         }
     }
 
+    public function rGetVal($var)
+    {
+		return isset($this->requestData[$var]) ? $this->requestData[$var] : null;
+    }
+
 
 
     public function rHasId ()
     {
         return $this->rHasVal('id');
     }
+
+    public function rGetId ()
+    {
+        return $this->rGetVal('id');
+    }
+
 
 	public function getCommonname($tId)
 	{
