@@ -587,13 +587,14 @@ parameters:
 				and _h.established=1"
 		);
 
-
+		/*
 		$result['statistics']['species']=
 			array(
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Aantal soorten in Nederland'),
 				'description'=>$this->translate('Aantal soorten in Nederland met status voorkomen 1, 1a, 2, 2a of 2b.')
 			);
+		*/
 
 
 		$result['main_count']=$d[0]['total'];
