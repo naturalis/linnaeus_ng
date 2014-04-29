@@ -5225,7 +5225,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
 	public function branchesAction()
 	{
-
 		$this->checkAuthorisation();
 				
 		$this->setPageName('Browse taxon tree');
@@ -5297,47 +5296,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 			
 			$taxon=$this->getTaxonById($p);
 
-			$this->setPageName('Browse taxon tree - '.$taxon['taxon']);
-			
-			$parent=isset($taxon['parent_id']) ? $this->getTaxonById($taxon['parent_id']) : null;
-			$parent['commonname']=$this->getCommonCommonName($parent['id']);
-
-			$peers=$this->models->Taxon->freeQuery("
-				select
-					_a.id,
-					_a.taxon,
-					_a.rank_id,
-					_r.rank,
-					ifnull(_b.child_count,0) as child_count					
-
-				from
-					%PRE%taxa _a
-						
-				left join %PRE%projects_ranks _p
-					on _a.project_id=_p.project_id
-					and _a.rank_id=_p.id
-
-				left join %PRE%ranks _r
-					on _p.rank_id=_r.id
-
-				left join
-					(select project_id,parent_id,count(*) as child_count from %PRE%taxa group by project_id,parent_id) as _b
-						on _a.id=_b.parent_id
-						and _b.project_id=_a.project_id
-				where 
-					_a.project_id = ".$this->getCurrentProjectId()." 
-					and _a.rank_id = ".$taxon['rank_id']."
-					and _a.parent_id = ".$taxon['parent_id']."
-
-				order by
-					_a.taxon_order
-			");
-			
-			foreach((array)$peers as $key=>$val)
-			{
-				$peers[$key]['commonname']=$this->getCommonCommonName($val['id']);
-			}
-
 			$progeny=$this->models->Taxon->freeQuery("
 				select
 					_a.id,
@@ -5398,6 +5356,54 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 				$progeny[$key]['commonname']=$this->getCommonCommonName($val['id']);
 			}
 
+			if (count((array)$progeny)==0)
+			{
+				$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
+			}
+
+			$this->setPageName('Browse taxon tree - '.$taxon['taxon']);
+			
+			$parent=isset($taxon['parent_id']) ? $this->getTaxonById($taxon['parent_id']) : null;
+			$parent['commonname']=$this->getCommonCommonName($parent['id']);
+
+			$peers=$this->models->Taxon->freeQuery("
+				select
+					_a.id,
+					_a.taxon,
+					_a.rank_id,
+					_r.rank,
+					ifnull(_b.child_count,0) as child_count					
+
+				from
+					%PRE%taxa _a
+						
+				left join %PRE%projects_ranks _p
+					on _a.project_id=_p.project_id
+					and _a.rank_id=_p.id
+
+				left join %PRE%ranks _r
+					on _p.rank_id=_r.id
+
+				left join
+					(select project_id,parent_id,count(*) as child_count from %PRE%taxa group by project_id,parent_id) as _b
+						on _a.id=_b.parent_id
+						and _b.project_id=_a.project_id
+				where 
+					_a.project_id = ".$this->getCurrentProjectId()." 
+					and _a.rank_id = ".$taxon['rank_id']."
+					and _a.parent_id = ".$taxon['parent_id']."
+
+				order by
+					_a.taxon_order
+			");
+			
+			foreach((array)$peers as $key=>$val)
+			{
+				$peers[$key]['commonname']=$this->getCommonCommonName($val['id']);
+			}
+
+
+			$this->smarty->assign('highlight',$this->rGetVal('h'));
 			$this->smarty->assign('parent',$parent);
 			$this->smarty->assign('taxon',$taxon);
 			$this->smarty->assign('progeny',$progeny);
