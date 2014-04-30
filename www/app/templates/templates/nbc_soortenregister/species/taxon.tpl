@@ -275,8 +275,8 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					{if $v.parent_id!=null}{* skipping top most level "life" *}
 						<span class="classification-preffered-name"><a href="?id={$v.id}">{$v.taxon}</a></span>
 						<span class="classification-rank">[{$v.rank}]</span>
-						{if $v.dutch_name}<br />
-						<span class="classification-accepted-name">{$v.dutch_name}</span>{/if}
+						{if $v.common_name}<br />
+						<span class="classification-accepted-name">{$v.common_name}</span>{/if}
 						<ul class="taxonoverzicht">
 							<li>
 					{/if}

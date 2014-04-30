@@ -200,7 +200,7 @@ class SearchControllerNSR extends SearchController
 		$search=!empty($p['search']) ? $p['search'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
-		
+
 		$search=trim($search);
 		
 		if (empty($search))
@@ -225,12 +225,12 @@ class SearchControllerNSR extends SearchController
 				_e.taxon,
 				_e.rank_id,
 				_f.lower_taxon,
-				_k.name as dutch_name,
+				_k.name as common_name,
+				_q.label as common_rank,
 
 			_g.presence_id,
 			_h.information_title as presence_information_title,
 			_h.index_label as presence_information_index_label,
-			_l.file_name as overview_image,
 			ifnull(_j.number_of_barcodes,0) as number_of_barcodes,
 
 				case
@@ -250,7 +250,12 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
-				
+
+			left join %PRE%labels_projects_ranks _q
+				on _e.rank_id=_q.project_rank_id
+				and _a.project_id = _q.project_id
+				and _q.language_id=".$this->getCurrentLanguageId()."
+			
 			left join %PRE%name_types _b 
 				on _a.type_id=_b.id 
 				and _a.project_id = _b.project_id
@@ -272,13 +277,9 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
 				and _e.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _k.language_id=".LANGUAGE_ID_DUTCH."
-
-			left join %PRE%media_taxon _l
-				on _a.taxon_id = _l.taxon_id
-				and _a.project_id = _l.project_id
-				and _l.overview_image=1
+				and _k.type_id=
+					(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.language_id=".$this->getCurrentLanguageId()."
 
 			where _a.project_id =".$this->getCurrentProjectId()."
 				and _a.name like '%".mysql_real_escape_string($search)."%'
@@ -288,7 +289,7 @@ class SearchControllerNSR extends SearchController
 
 			order by 
 				match_percentage desc, _f.rank_id, ".
-				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "dutch_name" : "taxon" )."
+				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
@@ -297,6 +298,25 @@ class SearchControllerNSR extends SearchController
 
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->models->Names->freeQuery('select found_rows() as total');
+
+		foreach((array)$d as $key=>$val)
+		{
+			$img=$this->models->MediaTaxon->freeQuery("
+				select
+					_a.file_name
+				from
+					%PRE%media_taxon _a, %PRE%media_meta _b
+				where
+					_a.project_id=".$this->getCurrentProjectId()."
+					and _a.taxon_id=".$val['taxon_id']."
+					and _a.id=_b.media_id
+					and _a.project_id=_b.project_id
+					and _b.sys_label='beeldbankDatumAanmaak'
+					order by meta_date desc
+				limit 1
+			");
+			$d[$key]['overview_image']=$img[0]['file_name'];
+		}
 
 		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resSpeciesPerPage);
 
@@ -342,7 +362,7 @@ class SearchControllerNSR extends SearchController
 				_a.id,
 				_a.id as taxon_id,
 				_a.taxon,
-				_k.name as dutch_name,
+				_k.name as common_name,
 				".($img ? "ifnull(_i.number_of_images,0) as number_of_images," : "" )."
 				".($dna ? "ifnull(_j.number_of_barcodes,0) as number_of_barcodes," : "" )."
 				".($trend ? "ifnull(_trnd.number_of_trend_years,0) as number_of_trend_years," : "" )."
@@ -358,7 +378,7 @@ class SearchControllerNSR extends SearchController
 				and _a.project_id=_k.project_id
 				and _k.type_id=(select id from %PRE%name_types where project_id = ".
 					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _k.language_id=".LANGUAGE_ID_DUTCH."
+				and _k.language_id=".$this->getCurrentLanguageId()."
 
 			". (isset($auth) ? "
 				left join %PRE%names _m
@@ -462,7 +482,7 @@ class SearchControllerNSR extends SearchController
 			".($trend ? "and number_of_trend_years > 0" : "")."
 			".($distribution ? "and number_of_maps > 0" : "")."
 
-			order by ".(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "dutch_name" : "_a.taxon")."
+			order by ".(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
@@ -470,6 +490,25 @@ class SearchControllerNSR extends SearchController
 		//q($this->models->Taxon->q(),1);
 
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+
+		foreach((array)$data as $key=>$val)
+		{
+			$img=$this->models->MediaTaxon->freeQuery("
+				select
+					_a.file_name
+				from
+					%PRE%media_taxon _a, %PRE%media_meta _b
+				where
+					_a.project_id=".$this->getCurrentProjectId()."
+					and _a.taxon_id=".$val['taxon_id']."
+					and _a.id=_b.media_id
+					and _a.project_id=_b.project_id
+					and _b.sys_label='beeldbankDatumAanmaak'
+					order by meta_date desc
+				limit 1
+			");
+			$data[$key]['overview_image']=$img[0]['file_name'];
+		}
 
 		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resSpeciesPerPage,'ancestor'=>isset($ancestor) ? $ancestor : null);
 	}
@@ -645,7 +684,7 @@ class SearchControllerNSR extends SearchController
 				_c.meta_data as photographer,
 				_k.taxon,
 				_k.taxon as validName,
-				_z.name as dutch_name,
+				_z.name as common_name,
 				_j.uninomial,
 				_j.specific_epithet,
 				_j.infra_specific_epithet,
@@ -655,6 +694,7 @@ class SearchControllerNSR extends SearchController
 					if(_j.specific_epithet is null,'',concat(_j.specific_epithet,' ')),
 					if(_j.infra_specific_epithet is null,'',_j.infra_specific_epithet)
 				) as name,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
@@ -684,7 +724,7 @@ class SearchControllerNSR extends SearchController
 				and _m.project_id=_z.project_id
 				and _z.type_id=(select id from %PRE%name_types where project_id = ".
 					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
+				and _z.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
@@ -740,10 +780,11 @@ class SearchControllerNSR extends SearchController
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
 			
-			".(!empty($group_id) ? "right join %PRE%taxon_quick_parentage _q
-				on _m.taxon_id=_q.taxon_id
-				and _m.project_id=_q.project_id
-				" : "" )."
+			".(!empty($group_id) ? 
+				"right join %PRE%taxon_quick_parentage _q
+					on _m.taxon_id=_q.taxon_id
+					and _m.project_id=_q.project_id
+					" : "" )."
 			
 			where _m.project_id = ".$this->getCurrentProjectId()."
 
@@ -779,7 +820,7 @@ class SearchControllerNSR extends SearchController
 				file_name as thumb,
 				_c.meta_data as photographer,
 				_k.taxon,
-				_z.name as dutch_name,
+				_z.name as common_name,
 				_j.uninomial,
 				_j.specific_epithet,
 				_j.infra_specific_epithet,
@@ -789,6 +830,7 @@ class SearchControllerNSR extends SearchController
 					if(_j.specific_epithet is null,'',concat(_j.specific_epithet,' ')),
 					if(_j.infra_specific_epithet is null,'',_j.infra_specific_epithet)
 				) as name,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
@@ -817,7 +859,7 @@ class SearchControllerNSR extends SearchController
 				on _m.taxon_id=_z.taxon_id
 				and _m.project_id=_z.project_id
 				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
+				and _z.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
@@ -901,11 +943,10 @@ class SearchControllerNSR extends SearchController
 
 	private function formatPictureResults($data)
 	{
-		
 		foreach((array)$data as $key=>$val)
 		{
 			$metaData=array(
-				'Fotograaf' => $val['photographer'],
+				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
 				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],
 				'Validator' => $val['meta_validator'],
@@ -968,7 +1009,7 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%labels_projects_ranks _g
 				on _e.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
-				and _g.language_id=".LANGUAGE_ID_SCIENTIFIC."
+				and _g.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%name_types _b 
 				on _a.type_id=_b.id 
@@ -984,7 +1025,7 @@ class SearchControllerNSR extends SearchController
 						where project_id = ".$this->getCurrentProjectId()." 
 						and nametype='".PREDICATE_PREFERRED_NAME."'
 					)
-				and _k.language_id=".LANGUAGE_ID_DUTCH."
+				and _k.language_id=".$this->getCurrentLanguageId()."
 
 			where 
 				_a.project_id =".$this->getCurrentProjectId()."
@@ -996,7 +1037,7 @@ class SearchControllerNSR extends SearchController
 					or
 						(
 							_b.nametype='".PREDICATE_PREFERRED_NAME."' and
-							_a.language_id=".LANGUAGE_ID_DUTCH."
+							_a.language_id=".$this->getCurrentLanguageId()."
 						)
 					)
 			order by name
@@ -1102,7 +1143,7 @@ class SearchControllerNSR extends SearchController
 				'id'=>array(
 				 	'project_id' => $this->getCurrentProjectId(),
 					'nametype' => PREDICATE_PREFERRED_NAME,
-					'language_id' => LANGUAGE_ID_DUTCH
+					'language_id' => $this->getCurrentLanguageId()
 				),
 				'columns'=>'id'
 			)
@@ -1130,7 +1171,7 @@ class SearchControllerNSR extends SearchController
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
 				and _c.type_id=".$typeId."
-				and _c.language_id=".LANGUAGE_ID_DUTCH."
+				and _c.language_id=".$this->getCurrentLanguageId()."
 			
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
@@ -1147,7 +1188,7 @@ class SearchControllerNSR extends SearchController
 				_a.project_id = ".$this->getCurrentProjectId()."
 				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and _a.name like '". mysql_real_escape_string($p['search']) ."%'
-				and (_a.language_id=".LANGUAGE_ID_DUTCH." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")
+				and (_a.language_id=".$this->getCurrentLanguageId()." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")
 				order by label
 
 			limit ".$this->_suggestionListItemMax

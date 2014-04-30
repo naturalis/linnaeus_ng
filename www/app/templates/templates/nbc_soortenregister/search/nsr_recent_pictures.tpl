@@ -46,8 +46,8 @@
 							</a>
 						</div>
 							
-						{if $v.dutch_name}		
-						<h3>{$v.dutch_name}</h3>
+						{if $v.common_name}		
+						<h3>{$v.common_name}</h3>
 						<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>
 						{else}
 						<h3 class="wetenschappelijkenaam"><i>{$v.name}</i></h3>

@@ -528,7 +528,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonOverviewImage($id)
 	{
-		$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'meta_datum_plaatsing','limit'=>1));
+		$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
 		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 
@@ -543,7 +543,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : 'meta_datum_plaatsing';
+		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc';
 
 		$data=$this->models->Taxon->freeQuery("		
 			select
@@ -553,7 +553,7 @@ class SpeciesControllerNSR extends SpeciesController
 				file_name as image,
 				file_name as thumb,
 				_k.taxon,
-				_z.name as dutch_name,
+				_z.name as common_name,
 				_j.name,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				".($distributionMaps?
@@ -567,7 +567,6 @@ class SpeciesControllerNSR extends SpeciesController
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
 				_meta8.meta_data as photographer
-
 			
 			from  %PRE%media_taxon _m
 			
@@ -608,8 +607,6 @@ class SpeciesControllerNSR extends SpeciesController
 				on _m.id=_map2.media_id
 				and _m.project_id=_map2.project_id
 				and _map2.sys_label='verspreidingsKaartTitel'
-
-
 
 			left join %PRE%media_meta _meta1
 				on _m.id=_meta1.media_id
@@ -676,7 +673,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 
 			$metaData=array(
-				'' => (!empty($val['dutch_name']) ? $val['dutch_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
+				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
 				'Fotograaf' => $val['photographer'],
 				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],
@@ -887,7 +884,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_f.rank_id,
 				_f.lower_taxon,
 				_g.label as rank,
-				_k.name as dutch_name
+				_k.name as common_name
 			
 			from %PRE%taxa _a
 

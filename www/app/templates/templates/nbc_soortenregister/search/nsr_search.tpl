@@ -11,9 +11,14 @@
 	<div id="content">
 	
 		<div id="results">
-			<h2>
+			<h1>Zoekresultaten </h1>
+			<!-- h2>
 			Gezocht op "{$search.search}": <span id="resultcount-header">{$results.count}</span>
-			</h2>
+			</h2 -->
+
+<h4>
+			Gezocht op "{$search.search}": <span id="resultcount-header">{$results.count}</span>
+</h4>
 
 			<p>
 				{if $results.data}
@@ -22,10 +27,10 @@
 				<div class="result">
 					{if $v.overview_image}
 					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
-					{/if}
-					
-					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong><br />
-					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
+					{/if}				
+					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong>
+					{if $v.common_rank} ({$v.common_rank}){/if}<br />
+					{if $v.common_name}{$v.common_name}<br />{/if}
 					{if $v.presence_information_index_label || $v.presence_information_title}
 					{t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
 					{/if}

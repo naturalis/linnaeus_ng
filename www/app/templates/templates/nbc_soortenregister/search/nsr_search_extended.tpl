@@ -122,7 +122,7 @@
 					<img src="http://images.ncbnaturalis.nl/120x75/{$v.overview_image}" />
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
-					{if $v.dutch_name}{$v.dutch_name}<br />{/if}
+					{if $v.common_name}{$v.common_name}<br />{/if}
 					Status voorkomen: {$v.presence_information_index_label} {$v.presence_information_title}
 				</div>
 			{/foreach}

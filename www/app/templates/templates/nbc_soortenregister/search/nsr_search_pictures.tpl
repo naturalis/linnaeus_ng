@@ -28,7 +28,7 @@
 
 		<div>
 		
-			<h2 class="search">{if $search.header}{$search.header}{else}Zoeken naar afbeeldingen{/if}</h2>
+			<h1 class="big-header">{if $search.header}{$search.header}{else}Zoeken naar afbeeldingen{/if}</h1>
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 				<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
 			
@@ -88,8 +88,8 @@
 							</a>
 						</div>
 							
-						{if $v.dutch_name}		
-						<h3>{$v.dutch_name}</h3>
+						{if $v.common_name}		
+						<h3>{$v.common_name}</h3>
 						<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>
 						{else}
 						<h3 class="wetenschappelijkenaam"><i>{$v.name}</i></h3>
