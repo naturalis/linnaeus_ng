@@ -18,7 +18,7 @@
 
 	<div id="content">
 		<div class="hasImage" id="taxonHeader">
-			<div id="titles" style="border-bottom: 1px solid #666666;margin-top:-13px"><h1>Recente afbeeldingen</h1>
+			<div id="titles" style="border-bottom: 1px solid #666666;margin-top:-13px;margin-bottom:5px;width:510px;"><h1>Recente afbeeldingen</h1>
 		</div>
 		
 	<div id="taxonImage">

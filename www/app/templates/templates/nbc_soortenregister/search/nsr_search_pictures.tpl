@@ -30,7 +30,6 @@
 		
 			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:4px;border-bottom:1px solid #666666;margin-bottom:5px;">{if $search.header}{$search.header}{else}Foto's zoeken{/if}</h1>
 			
-			
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 				<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
 			
