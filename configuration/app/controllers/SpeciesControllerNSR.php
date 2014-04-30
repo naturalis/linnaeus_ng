@@ -162,6 +162,26 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (isset($content))
 			{
+				$name=$url=null;	
+				foreach((array)$content['rdf'] as $val)
+				{
+					if ($val['predicate']=='hasPublisher')
+					{
+						$name=isset($val['data']['name']) ? $val['data']['name'] : null;
+						$url=isset($val['data']['homepage']) ? $val['data']['homepage'] : null;
+					}
+				}
+				
+				array_push(
+					$sideBarLogos,
+					array(
+						'organisation'=>$name,
+						'logo'=>$this->getOrganisationLogoUrl($name),
+						'url'=>$url
+					)
+				);
+						
+				
 				$this->smarty->assign('content',$content['content']);
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
@@ -1396,6 +1416,30 @@ class SpeciesControllerNSR extends SpeciesController
 		}
     }
 
+	private function getOrganisationLogoUrl($name)
+	{
+		$exts=array('png','jpg','PNG','JPG');
+		$d=array();
+		
+		foreach($exts as $ext)
+		{
+			array_push($d,$name.'.'.$ext,strtolower($name).'.'.$ext,$name.'-logo.'.$ext,strtolower($name).'-logo.'.$ext);
+		}
+		
+		$logo=null;
+
+		foreach((array)$d as $val)
+		{
+			if (file_exists($this->getProjectUrl('projectMedia').$val))
+			{
+				$logo=$this->getProjectUrl('projectMedia').$val;
+				break;
+			} 
+		}
+			
+		return $logo;
+	}
+
     private function getExternalId($p)
     {
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -1427,21 +1471,9 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$name=$t[0]['name'];
 			
-			if (file_exists($this->getProjectUrl('projectMedia').$name.'.png'))
-			{
-				$logo=$this->getProjectUrl('projectMedia').$name.'.png';
-			} 
-			else
-			if (file_exists($this->getProjectUrl('projectMedia').$name.'.jpg'))
-			{
-				$logo=$this->getProjectUrl('projectMedia').$name.'.jpg';
-			} 
-			else
-				$logo=null;
-
 			return array(
 				'organisation' => $name,
-				'logo'=> $logo,
+				'logo'=> $this->getOrganisationLogoUrl($name),
 				'organisation_url' => $t[0]['organisation_url'],
 				'general_url' => sprintf($t[0]['general_url'],$t[0]['external_id']),
 				'service_url' => sprintf($t[0]['service_url'],$t[0]['external_id']),
@@ -1471,22 +1503,10 @@ class SpeciesControllerNSR extends SpeciesController
 		if ($t)
 		{
 			$name=$t[0]['name'];
-			
-			if (file_exists($this->getProjectUrl('projectMedia').$name.'.png'))
-			{
-				$logo=$this->getProjectUrl('projectMedia').$name.'.png';
-			} 
-			else
-			if (file_exists($this->getProjectUrl('projectMedia').$name.'.jpg'))
-			{
-				$logo=$this->getProjectUrl('projectMedia').$name.'.jpg';
-			} 
-			else
-				$logo=null;
 
 			return array(
 				'organisation' => $name,
-				'logo'=> $logo,
+				'logo'=> $this->getOrganisationLogoUrl($name),
 				'organisation_url' => $t[0]['organisation_url'],
 				'general_url' => $t[0]['general_url'],
 				'service_url' => $t[0]['service_url'],
