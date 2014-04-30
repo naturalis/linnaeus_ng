@@ -88,7 +88,7 @@
 		<div id="sideBarLogos">
 			{foreach from=$sideBarLogos item=v}
 			{if $v.url}<a href="{$v.url}" target="_blank">{/if}
-			<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if}/>
+			{if $v.logo}<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if}/>{/if}
 			{if $v.url}</a>{/if}
 			{/foreach}
 		</div>
