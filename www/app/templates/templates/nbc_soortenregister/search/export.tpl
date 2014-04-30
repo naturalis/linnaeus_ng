@@ -23,7 +23,7 @@ Resultaten 1-{$results.count} van {$results.count}{if $searchHR} voor '{$searchH
 {foreach from=$results.data item=v}
 <tr>
 	<td>{$v.taxon}</td>
-	<td>{$v.dutch_name}</td>
+	<td>{$v.common_name}</td>
 {if $imageExport}
 	<td>{$v.photographer}</td>
 	<td>{$v.validator}</td>
