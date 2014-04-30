@@ -422,6 +422,9 @@ $(document).ready(function(){
 			changepicturecallback:function(){prettyPhotoCycle();}
 	 	});
 	}
+	
+	$('img[class=intern]').each(function(){$(this).remove();})
+	
 });
 </script>
 {/literal}

@@ -1155,7 +1155,7 @@ class SearchControllerNSR extends SearchController
 			select
 				distinct 
 				_a.taxon_id as id,
-				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',_g.rank,']') as label
+				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',_g.label,']') as label
 				
 			from %PRE%names _a
 			
@@ -1181,15 +1181,18 @@ class SearchControllerNSR extends SearchController
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
 
-			left join %PRE%ranks _g
-				on _f.rank_id=_g.id
-				
+			left join %PRE%labels_projects_ranks _g
+				on _e.rank_id=_g.project_rank_id
+				and _e.project_id = _g.project_id
+				and _g.language_id=".$this->getCurrentLanguageId()."
+
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()."
 				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and _a.name like '". mysql_real_escape_string($p['search']) ."%'
 				and (_a.language_id=".$this->getCurrentLanguageId()." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")
-				order by label
+				and ifnull(label,'') != ''
+			order by label
 
 			limit ".$this->_suggestionListItemMax
 		);
