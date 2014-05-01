@@ -1227,7 +1227,9 @@ class SpeciesControllerNSR extends SpeciesController
 			where _a.project_id = ".$this->getCurrentProjectId()."
 				and _a.taxon_id =".$id
 		);	
-
+		
+		$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
+		
 		return $data[0];
 	}
 

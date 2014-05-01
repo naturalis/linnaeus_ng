@@ -75,7 +75,9 @@ class Literature2Controller extends Controller
 	_a.periodical_id,
 	_d.name as periodical_actor_name,
 				_a.language_id,
-				_e.label as language_name
+				_e.label as language_name,
+				_a.external_link
+
 			from %PRE%literature2 _a
 
 			left join %PRE%actors _b
