@@ -51,8 +51,8 @@
 					<ul id="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
 						<li>
-							<input type="checkbox" class="list" id="established{$v.id}" name="presence[{$v.id}]" established="{$v.established}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
-							<label for="presence{$v.id}">
+							<label>
+								<input type="checkbox" class="list" id="established{$v.id}" name="presence[{$v.id}]" established="{$v.established}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
 								<div class="presenceStatusCode">{$v.index_label}</div>
 								<div class="presenceStatusDescription">{$v.information_short}</div>
 							</label>
