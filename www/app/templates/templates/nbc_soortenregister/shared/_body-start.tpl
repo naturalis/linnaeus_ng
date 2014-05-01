@@ -1,4 +1,3 @@
-
 <body id="body" class="conceptcard">
 
     <div id="container">
@@ -18,6 +17,9 @@
             </h2>
 
             <div id="menucontainer">
+
+				{include file="../shared/nsr_main_menu.tpl"}
+
            </div>
 
             <div id="logo-container">
