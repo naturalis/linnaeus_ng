@@ -4556,8 +4556,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         }
     }
 
-
-
     private function fixSubgenusParentheses ($name, $rankId)
     {
         if ($rankId == $this->getProjectIdRankByname('Subgenus'))
@@ -4912,158 +4910,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 		
 	}
         
-    public function deleteTaxon($id,$pId=null)
-    {
-        if (!$id)
-            return;
-			
-		$pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
-
-        $this->models->L2OccurrenceTaxon->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        $this->models->L2OccurrenceTaxonCombi->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        $this->models->MatrixTaxonState->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        $this->models->MatrixTaxon->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        $this->models->OccurrenceTaxon->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        $this->models->TaxaRelations->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        $tv = $this->models->TaxonVariation->delete(
-			array('id' =>
-					array(
-						'project_id' => $pId,
-						'taxon_id' => $id
-					)
-				)
-		);
-		
-		foreach((array)$tv as $key => $val) {
-
-			$this->models->VariationLabel->delete(array(
-				'project_id' => $pId,
-				'variation_id' => $val['id']
-			));
-			$this->models->VariationRelations->delete(array(
-				'project_id' => $pId,
-				'variation_id' => $val['id']
-			));
-			$this->models->MatrixVariation->delete(array(
-				'project_id' => $pId,
-				'variation_id' => $val['id']
-			));
-			$this->models->NbcExtras->delete(array(
-				'project_id' => $pId,
-				'ref_type' => 'variation',
-				'ref_id' => $val['id']
-			));
-			$this->models->TaxonVariation->delete(array(
-				'project_id' => $pId,
-				'id' => $val['id']
-			));
-		}
-
-		$this->models->NbcExtras->delete(array(
-			'project_id' => $pId,
-			'ref_type' => 'taxon',
-			'ref_id' => $id
-		));
-           
-        // delete literary references
-        $this->models->LiteratureTaxon->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        
-        // reset keychoice end-points
-        $this->models->ChoiceKeystep->update(array(
-            'res_taxon_id' => 'null'
-        ), array(
-            'project_id' => $pId,
-            'res_taxon_id' => $id
-        ));
-        
-        // delete commonnames
-        $this->models->Commonname->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        
-        // delete synonyms
-        $this->models->Synonym->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        
-        // purge undo
-        $this->models->ContentTaxonUndo->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        
-        // delete taxon tree branch rights
-        $this->models->UserTaxon->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id
-        ));
-        
-        // detele media
-        $mt = $this->models->MediaTaxon->_get(array(
-            'id' => array(
-                'project_id' => $pId,
-                'taxon_id' => $id
-            )
-        ));
-        
-		foreach ((array) $mt as $key => $val) {
-			
-			$this->deleteTaxonMedia($val['id'], false);
-		}
-        
-        // reset parentage
-        $this->models->Taxon->update(array(
-            'parent_id' => 'null'
-        ), array(
-            'project_id' => $pId,
-            'parent_id' => $id
-        ));
-        
-        // delete content
-        $this->models->ContentTaxon->delete(array(
-            'project_id' => $pId,
-            'taxon_id' => $id, 
-        ));
-        
-        // delete taxon
-        $this->models->Names->delete(array(
-            'project_id' => $pId,
-            'id' => $id, 
-        ));
-		
-        // delete taxon
-        $this->models->Taxon->delete(array(
-            'project_id' => $pId,
-            'id' => $id, 
-        ));
-		
-		$this->logChange($this->models->Taxon->getDataDelta());
-        
-    }
-
 	private function getAdjacentTaxa($taxon)
     {
 		$type=$taxon['lower_taxon']?'lower':'higher';
@@ -5132,7 +4978,13 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 			". ($taxaOnly ? "" : "
 			
 				select
-					_a.taxon_id as id,_a.name as label, _b.rank_id, _c.rank_id as base_rank_id, _b.taxon as taxon, 'names' as source
+					_a.taxon_id as id,
+					_a.name as label, 
+					_b.rank_id, 
+					_c.rank_id as base_rank_id, 
+					_b.taxon as taxon, 
+					'names' as source,
+					_d.rank
 				from
 					%PRE%names _a
 	
@@ -5145,7 +4997,12 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 					%PRE%projects_ranks _c
 						on _b.project_id=_c.project_id
 						and _b.rank_id=_c.id
-				
+						
+				left join
+					%PRE%ranks _d 
+					on _c.rank_id=_d.id
+
+
 				where
 					_a.project_id =  ".$this->getCurrentProjectId()."
 					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
@@ -5157,7 +5014,13 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 			")."
 			
 			select
-				_b.id, _b.taxon as label, _b.rank_id, _d.rank_id as base_rank_id, _b.taxon as taxon, 'taxa' as source
+				_b.id,
+				_b.taxon as label, 
+				_b.rank_id, 
+				_d.rank_id as base_rank_id, 
+				_b.taxon as taxon, 
+				'taxa' as source,
+				_e.rank
 			from
 				%PRE%taxa _b
 
@@ -5166,13 +5029,17 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 					on _b.project_id=_d.project_id
 					and _b.rank_id=_d.id
 
+				left join
+					%PRE%ranks _e
+					on _d.rank_id=_e.id
+
 			where
 				_b.project_id = ".$this->getCurrentProjectId()."
 				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 
 			) as unification
 			".($rankAbove ? "where base_rank_id < ".$rankAbove : "")."
-			order by label
+			order by base_rank_id, label
 			limit ".$maxResults
 		);
 
@@ -5190,6 +5057,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 				else
 					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$val['taxon'].')';
 			}
+			
+			$taxa[$key]['label']=$taxa[$key]['label'].' ['.$val['rank'].']';
 
 			unset($taxa[$key]['taxon']);
 			unset($taxa[$key]['source']);
@@ -5416,6 +5285,158 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 		$this->printPage();
 		
 	}
+
+    public function deleteTaxon($id,$pId=null)
+    {
+        if (!$id)
+            return;
+			
+		$pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
+
+        $this->models->L2OccurrenceTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->L2OccurrenceTaxonCombi->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->MatrixTaxonState->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->MatrixTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->OccurrenceTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->TaxaRelations->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $tv = $this->models->TaxonVariation->delete(
+			array('id' =>
+					array(
+						'project_id' => $pId,
+						'taxon_id' => $id
+					)
+				)
+		);
+		
+		foreach((array)$tv as $key => $val) {
+
+			$this->models->VariationLabel->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->VariationRelations->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->MatrixVariation->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->NbcExtras->delete(array(
+				'project_id' => $pId,
+				'ref_type' => 'variation',
+				'ref_id' => $val['id']
+			));
+			$this->models->TaxonVariation->delete(array(
+				'project_id' => $pId,
+				'id' => $val['id']
+			));
+		}
+
+		$this->models->NbcExtras->delete(array(
+			'project_id' => $pId,
+			'ref_type' => 'taxon',
+			'ref_id' => $id
+		));
+           
+        // delete literary references
+        $this->models->LiteratureTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // reset keychoice end-points
+        $this->models->ChoiceKeystep->update(array(
+            'res_taxon_id' => 'null'
+        ), array(
+            'project_id' => $pId,
+            'res_taxon_id' => $id
+        ));
+        
+        // delete commonnames
+        $this->models->Commonname->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // delete synonyms
+        $this->models->Synonym->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // purge undo
+        $this->models->ContentTaxonUndo->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // delete taxon tree branch rights
+        $this->models->UserTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // detele media
+        $mt = $this->models->MediaTaxon->_get(array(
+            'id' => array(
+                'project_id' => $pId,
+                'taxon_id' => $id
+            )
+        ));
+        
+		foreach ((array) $mt as $key => $val) {
+			
+			$this->deleteTaxonMedia($val['id'], false);
+		}
+        
+        // reset parentage
+        $this->models->Taxon->update(array(
+            'parent_id' => 'null'
+        ), array(
+            'project_id' => $pId,
+            'parent_id' => $id
+        ));
+        
+        // delete content
+        $this->models->ContentTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id, 
+        ));
+        
+        // delete taxon
+        $this->models->Names->delete(array(
+            'project_id' => $pId,
+            'id' => $id, 
+        ));
+		
+        // delete taxon
+        $this->models->Taxon->delete(array(
+            'project_id' => $pId,
+            'id' => $id, 
+        ));
+		
+		$this->logChange($this->models->Taxon->getDataDelta());
+        
+    }
 
 
 }
