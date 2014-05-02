@@ -230,7 +230,6 @@ class SpeciesMediaController extends Controller
 
     public function remoteImgFileAction()
     {
-		
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Remote image file file upload'));
@@ -679,5 +678,50 @@ class SpeciesMediaController extends Controller
             }
         }
     }
+	
+	private function resolveTaxonByIdOrname($whatisit)
+	{
+		
+		$tId=null;
+		
+		
+		if (!empty($whatisit)) {
+
+			if (is_numeric($whatisit)) {
+			
+				$t = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'id' => (int)$whatisit
+						)
+					));
+		
+				if ($t[0]['id']!=$whatisit)
+					$tId = null;
+			
+			} else {
+		
+				$t = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'taxon' => trim($whatisit)
+						)
+					));
+		
+				if (empty($t[0]['id']))
+					$tId = null;
+				else
+					$tId = $t[0]['id'];
+		
+			}
+			
+		}
+		
+		return $tId;
+										
+	}
+	
 
 }

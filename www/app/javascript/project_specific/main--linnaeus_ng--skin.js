@@ -68,7 +68,8 @@ function stripSlashes(str) {
 }
 
 function stripTags(str) {
-	return str.replace(/(<([^>]+)>)/ig,"");
+	if (str)
+		return str.replace(/(<([^>]+)>)/ig,"");
 }
 
 function allGetTimestamp() {
