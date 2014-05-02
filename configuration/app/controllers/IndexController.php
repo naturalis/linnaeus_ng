@@ -202,14 +202,25 @@ class IndexController extends Controller
 
 			$list=$this->models->Taxon->freeQuery("
 				select 
-					taxon_id,commonname,transliteration
+					_a.taxon_id,_a.commonname,_a.transliteration
 				from
-					%PRE%commonnames
+					%PRE%commonnames _a
+
+				left join
+					%PRE%languages _c
+					on _a.language_id = _c.id
+	
+				left join
+					%PRE%labels_languages _b
+					on _a.project_id = _b.project_id
+					and _a.language_id = _b.language_id
+					and _b.label_language_id = ".$this->getCurrentLanguageId()."
+					
 				where
-					project_id = ".$this->getCurrentProjectId()."
-					".(!empty($language) ? " and language_id=".$language : "" )."
-					".(!empty($letter) ? "and commonname like '".mysql_real_escape_string($letter)."%'" : null)."
-				order by commonname
+					_a.project_id = ".$this->getCurrentProjectId()."
+					".(!empty($language) ? " and _a.language_id=".$language : "" )."
+					".(!empty($letter) ? "and _a.commonname like '".mysql_real_escape_string($letter)."%'" : null)."
+				order by _a.commonname
 			");
 			
 		} 
