@@ -36,8 +36,6 @@
 	{/if}
 </div>
 
-{$alphaNav|@var_dump}
-
 {include file="../shared/_search-main.tpl"}
 
 <div id="alphabet" class="test">
