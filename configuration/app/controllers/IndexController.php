@@ -202,7 +202,7 @@ class IndexController extends Controller
 
 			$list=$this->models->Taxon->freeQuery("
 				select 
-					_a.taxon_id,_a.commonname,_a.transliteration, ifnull(_b.label,_c.language) as language
+					_a.taxon_id,_a.commonname,_a.transliteration, concat(ifnull(_b.label,_c.language),':',_a.language_id) as language
 
 				from
 					%PRE%commonnames _a
