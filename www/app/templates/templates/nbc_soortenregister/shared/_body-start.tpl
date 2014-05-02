@@ -23,6 +23,9 @@
            </div>
 
             <div id="logo-container">
+
+				{include file="../shared/nsr_small_menu.tpl"}
+			
             </div>
 
         </div>

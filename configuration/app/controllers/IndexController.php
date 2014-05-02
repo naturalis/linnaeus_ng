@@ -14,14 +14,9 @@ class IndexController extends Controller
     );
     public $jsToLoad = array(
         'all' => array(
-            'main.js', 
-            'lookup.js', 
-            'dialog/jquery.modaldialog.js'
+            'main.js',
         )
     );
-    private $_usePagination = false;
-
-
 
     /**
      * Constructor, calls parent's constructor
@@ -31,13 +26,9 @@ class IndexController extends Controller
     public function __construct ($p = null)
     {
         parent::__construct($p);
-        
         $this->setIndexTabs();
 		$this->smarty->assign('hasNameTypes', $_SESSION['app'][$this->spid()]['indexModule']);
-		
     }
-
-
 
     /**
      * Destroys
@@ -49,397 +40,278 @@ class IndexController extends Controller
         parent::__destruct();
     }
 
-
-
-    public function indexAction ()
-    {
-        $this->setPageName($this->translate('Index: Species and lower taxa'));
-        
-        $this->setTaxonType('lower');
-        
-        $this->_speciesIndexAction();
-    }
-
-
-
     /**
-     * Index of the index module (ha); shows species
+     * Index of the index module (ha); shows names
      *
      * @access    public
      */
+    public function indexAction ()
+    {
+		$type=$this->rHasVar('type') ? $this->requestData['type'] : 'lower';
+		$language=$this->rHasVar('language') ? $this->requestData['language'] : null;
+
+		$alpha=$this->getAlphabet($type,$language);
+
+		$letter=($this->rHasVar('letter') && $this->rGetVal('letter')!=''? $this->rGetVal('letter') : key($alpha['alphabet']));
+
+		$d=$prev=$next=null;		
+		foreach((array)$alpha['alphabet'] as $key => $val)
+		{
+			$alphaNav['next']=$key;
+			if ($d===true) break;
+			if ($key==$letter)
+			{
+				$d=true;
+				$alphaNav['prev']=$prev;
+			}
+			$prev=$key;
+		}
+		
+		$alphaNav['next']=($alphaNav['next']==$letter?null:$alphaNav['next']);
+		
+
+        $this->setPageName($this->translate('Index: '.($type=='higher' ? 'Higher taxa' : ($type=='common' ? 'Common names' : 'Species and lower taxa'))));
+
+		if ($type=='common')
+		{
+			$this->smarty->assign('nameLanguages',$this->getCommonLanguages());
+		}
+
+		$this->smarty->assign('alphaNav', $alphaNav);
+		$this->smarty->assign('language',$language);
+		$this->smarty->assign('type',$type);
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('letter','p')));
+		$this->smarty->assign('alpha',$alpha);
+		$this->smarty->assign('letter',$letter);
+		$this->smarty->assign('list',$this->getList($type,$letter,$language));
+
+		$this->printPage();
+    }
+
     public function higherAction ()
     {
-        $this->setPageName($this->translate('Index: Higher taxa'));
-        
-        $this->setTaxonType('higher');
-        
-        $this->_speciesIndexAction();
+        $this->redirect('index.php?type=higher');
     }
 
     public function commonAction ()
     {
-        $this->setPageName($this->translate('Index: Common names'));
-        
-        $languages = $this->models->Language->_get(array(
-            'id' => '*', 
-            'fieldAsIndex' => 'id'
-        ));
-        
-        $names = $this->searchCommonNames();
-        
-        foreach ((array) $names as $key => $val) {
-            
-            if ($this->rHasVal('activeLanguage')) {
-                
-                if ($this->requestData['activeLanguage'] == $val['language_id'] || $this->requestData['activeLanguage'] == '*') {
-                    
-                    $n[$key] = $val;
-                    $n[$key]['language'] = $languages[$val['language_id']]['language'];
-                }
-            }
-            else {
-                
-                $names[$key]['language'] = $languages[$val['language_id']]['language'];
-            }
-            
-            $l[$val['language_id']] = $languages[$val['language_id']];
-        }
-        
-        $this->customSortArray($l, array(
-            'key' => 'language', 
-            'maintainKeys' => true
-        ));
-        
-        if ($this->rHasVal('activeLanguage')) {
-            
-            $activeLanguage = $this->requestData['activeLanguage'];
-        }
-        else {
-            
-            $d = current($l);
-            
-            $activeLanguage = $d['id'];
-            
-            foreach ((array) $names as $key => $val) {
-                
-                if ($activeLanguage == $val['language_id'])
-                    $n[$key] = $val;
-            }
-        }
-        
-        $this->customSortArray($n, array(
-            'key' => 'label'
-        ));
-        
-        $letterToShow = $this->getFirstUsefulLetter($n, 'label');
-        
-        $d = $this->makeAlphabetFromArray(array(
-            'names' => $n, 
-            'field' => 'label', 
-            'letter' => $letterToShow,
-        	'taxonType' => null
-        ));
-        
-        $this->smarty->assign('usePagination', $this->_usePagination);
-        
-        if ($this->_usePagination) {
-            
-            $pagination = $this->getPagination($d['names']);
-            
-            $this->smarty->assign('prevStart', $pagination['prevStart']);
-            
-            $this->smarty->assign('nextStart', $pagination['nextStart']);
-            
-            $this->smarty->assign('taxa', $pagination['items']);
-        }
-        else {
-            
-            $this->smarty->assign('taxa', $d['names']);
-            
-            $this->smarty->assign('alphaNav', $d['alphaNav']);
-        }
-        
-        $this->smarty->assign('showSpeciesIndexMenu', true);
-        
-        $this->smarty->assign('alpha', $d['alpha']);
-        
-        $this->smarty->assign('letter', $letterToShow);
-        
-        $this->smarty->assign('nameLanguages', $l);
-        
-        $d = current($l);
-        
-        $this->smarty->assign('activeLanguage', $activeLanguage);
-        
-        $this->smarty->assign('taxonType', 'common');
-        
-        $this->smarty->assign('common', true);
-		
-		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']);
-        
-        $this->printPage();
+		$this->redirect('index.php?type=common');
     }
 
-    private function setTaxonType ($type)
-    {
-        $this->_taxonType = ($type == 'higher') ? 'higher' : 'lower';
-    }
+	private function reconstructQueryString($ignore=null)
+	{
+		$querystring=null;
 
-    private function _speciesIndexAction ()
-    {
-        $ranks = $this->getProjectRanks();
-        
-        foreach ((array) $ranks as $key => $val) {
-            
-            if ($val['lower_taxon'] == 1 && $this->getTaxonType() == 'lower')
-                $d[] = $val['id'];
-            if ($val['lower_taxon'] == 0 && $this->getTaxonType() == 'higher')
-                $d[] = $val['id'];
-        }
-        
-        $taxa = $this->buildTaxonTree(array('includeEmpty'=>true));
+		foreach((array)$this->requestData as $key=>$val)
+		{
+			if (isset($ignore) && in_array($key,$ignore)) continue;
 
-		$d = array();
-		
-		foreach((array)$taxa as $key => $val) {
-			
-			if(
-				($this->getTaxonType() == 'lower' && $val["lower_taxon"]==0) ||
-				($this->getTaxonType() == 'higher' && $val["lower_taxon"]==1)
-			) continue;
-			
-			if ($this->getTaxonType() == 'higher' && !empty($val['parent_id'])) {
-			    
-			    list($rank) = explode(' ', $val['label']);
-			    $taxon = $val['taxon'];
-			    if (strpos($val['label'], '"italics"') !== false) {
-			        $taxon = '<span class="italics">' . $taxon . '</span>';
-			    }
-			    $val['label'] = $taxon . ', '. strtolower($rank);
+			if (is_array($val))
+			{
+				foreach((array)$val as $k2=>$v2)
+				{
+					$querystring.=$key.'['.$k2.']='.$v2.'&';
+				}
 
+			} else {
+				$querystring.=$key.'='.$val.'&';
 			}
-			
-			$d[$key] = $val;
-
 		}
 		
-		$names = $taxa = $d;
-        
-        $syn = $this->searchSynonyms();
+		return $querystring;
+	}
 
-        $taxa = array_merge((array) $taxa, (array) $syn);
-        
-        $this->customSortArray($taxa, array(
-            'key' => 'taxon'
-        ));
-        
-        $letterToShow = $this->getFirstUsefulLetter($taxa, 'taxon');
-        
-        $d = $this->makeAlphabetFromArray(array(
-            'names' => $taxa, 
-            'field' => 'taxon', 
-            'letter' => $letterToShow,
-        	'taxonType' => $this->getTaxonType()
-        ));
-        
+    private function getAlphabet($type,$language=null)
+    {
+		if ($type=='common')
+		{
 
-        $this->smarty->assign('usePagination', $this->_usePagination);
-        
-        if ($this->_usePagination) {
-            
-            $pagination = $this->getPagination($d['names']);
-            
-            $this->smarty->assign('prevStart', $pagination['prevStart']);
-            
-            $this->smarty->assign('nextStart', $pagination['nextStart']);
-            
-            $this->smarty->assign('taxa', $pagination['items']);
-        }
-        else {
-            
-            $this->smarty->assign('taxa', $d['names']);
-            
-            $this->smarty->assign('alphaNav', $d['alphaNav']);
-        }
-        
-		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']);
+			$alpha=$this->models->Taxon->freeQuery("
+				select 
+					distinct lower(substr(commonname,1,1)) as letter
+				from
+					%PRE%commonnames
+				where
+					project_id = ".$this->getCurrentProjectId()."
+				".(!empty($language) ? " and language_id=".$language : "" )."
+				order by letter
+			
+			");
+
+		} 
+		else 
+		{
+
+			$alpha=$this->models->Taxon->freeQuery("
+				select distinct unionized.letter, _f.lower_taxon from (
+					select 
+						distinct lower(substr(taxon,1,1)) as letter,
+						project_id,
+						rank_id
+					from
+						%PRE%taxa
+					where
+						project_id = ".$this->getCurrentProjectId()."
 		
-        $this->smarty->assign('showSpeciesIndexMenu', true);
-        
-        $this->smarty->assign('alpha', $d['alpha']);
-        
-        $this->smarty->assign('hasNonAlpha', $d['hasNonAlpha']);
-        
-        $this->smarty->assign('letter', $letterToShow);
-        
-        $this->smarty->assign('names', $names);
-        
-        $this->smarty->assign('taxonType', $this->getTaxonType());
-        
-        $this->printPage('species_index');
+					union
+		
+					select 
+						distinct lower(substr(_a.synonym,1,1)) as letter,
+						_a.project_id,
+						_b.rank_id as rank_id
+					from
+						%PRE%synonyms _a
+		
+					right join %PRE%taxa _b
+						on _a.project_id = _b.project_id
+						and _a.taxon_id = _b.id
+		
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+				) as unionized
+	
+				left join %PRE%projects_ranks _f
+					on unionized.rank_id=_f.id
+					and unionized.project_id = _f.project_id
+	
+				where
+					unionized.project_id = ".$this->getCurrentProjectId()."
+					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
+				order by letter
+			
+			");
+			
+		}
+
+		$result=array();
+		$result['hasNonAlpha']=false;
+
+		foreach((array)$alpha as $val)
+		{	
+			$result['hasNonAlpha']=$result['hasNonAlpha'] || (ord($val['letter'])<97 || ord($val['letter'])>122);
+			$result['alphabet'][$val['letter']]=true;
+		}
+
+		return $result;
     }
 
-    private function getTaxonType ()
+    private function getList($type,$letter,$language=null)
     {
-        return isset($this->_taxonType) ? $this->_taxonType : 'lower';
+		if ($type=='common')
+		{
+
+			$list=$this->models->Taxon->freeQuery("
+				select 
+					taxon_id,commonname,transliteration
+				from
+					%PRE%commonnames
+				where
+					project_id = ".$this->getCurrentProjectId()."
+					".(!empty($language) ? " and language_id=".$language : "" )."
+					".(!empty($letter) ? "and commonname like '".mysql_real_escape_string($letter)."%'" : null)."
+				order by commonname
+			");
+			
+		} 
+		else 
+		{
+			$list=$this->models->Taxon->freeQuery("
+				select unionized.*, _f.lower_taxon from (
+					select 
+						project_id,
+						id as taxon_id,
+						taxon as label, 
+						null as author,
+						null as ref_taxon,
+						author as ref_author,
+						rank_id,
+						parent_id,
+						is_empty,
+						'taxon' as source
+					from
+						%PRE%taxa
+					where
+						project_id = ".$this->getCurrentProjectId()."
+		
+					union
+		
+					select 
+						_a.project_id,
+						_a.taxon_id, 
+						_a.synonym as label, 
+						_a.author,
+						_b.taxon as ref_taxon,
+						_b.author as ref_author,
+						_b.rank_id as rank_id, 
+						_b.parent_id as parent_id, 
+						_b.is_empty as is_empty, 
+						'synonym' as source
+					from
+						%PRE%synonyms _a
+		
+					right join %PRE%taxa _b
+						on _a.project_id = _b.project_id
+						and _a.taxon_id = _b.id
+		
+		
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+				) as unionized
+	
+				left join %PRE%projects_ranks _f
+					on unionized.rank_id=_f.id
+					and unionized.project_id = _f.project_id
+	
+				where
+					unionized.project_id = ".$this->getCurrentProjectId()."
+					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
+					".(!empty($letter) ? "and label like '".mysql_real_escape_string($letter)."%'" : null)."
+				order by label
+			");
+			
+			foreach((array)$list as $key=>$val)
+			{
+				if ($val['source']!='synonym')
+					$list[$key]['label']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['label'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),'rankpos'=>'post'));
+				if (!empty($val['ref_taxon']))
+					$list[$key]['ref_taxon']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['ref_taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),'rankpos'=>'post'));
+			}
+			
+		}
+		//q($list);
+		return $list;
+		
     }
 
-    private function searchSynonyms ($search = null)
+    private function getCommonLanguages()
     {
-        $d['project_id'] = $this->getCurrentProjectId();
-        
-        if ($search)
-            $d['synonym regexp'] = $this->makeRegExpCompatSearchString($search);
-        
-        $s = $this->models->Synonym->_get(array(
-            'id' => $d, 
-            'columns' => 'taxon_id as id,synonym as label,synonym as taxon,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url,author'
-        ));
-        
-        foreach ((array) $s as $key => $val) {
-            
-            $d = $this->getTaxonById($val['id']);
-            
-            if (($d['lower_taxon'] == '0' && $this->getTaxonType() == 'higher') || ($d['lower_taxon'] == '1' && $this->getTaxonType() == 'lower')) {
-                
-                //$s[$key]['label'] = $this->formatSynonym($val['label']);
-                $s[$key]['label'] = $this->formatSynonym($val['label']);
+		$list=$this->models->Taxon->freeQuery("
+			select 
+				distinct _a.language_id, ifnull(_b.label,_c.language) as language, _a.language_id as id
 
-            }
-            else {
-                
-                unset($s[$key]);
-            }
-        }
-        
-        return $s;
+			from
+				%PRE%commonnames _a
+
+			left join
+				%PRE%languages _c
+				on _a.language_id = _c.id
+
+			left join
+				%PRE%labels_languages _b
+				on _a.project_id = _b.project_id
+				and _a.language_id = _b.language_id
+				and _b.label_language_id = ".$this->getCurrentLanguageId()."
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+		");
+
+		return $list;
     }
-
-
-
-    private function searchCommonNames ($search = null)
-    {
-        return $this->models->Commonname->_get(
-        array(
-            'where' => 'project_id  = ' . $this->getCurrentProjectId() . ($search ? ' and
-							(
-								commonname regexp \'' . $this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)) . '\' or
-								transliteration regexp \'' . $this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)) . '\'
-							)' : ''), 
-            'columns' => 'taxon_id as id,' . ($search ? '
-						if(commonname regexp \'' . $this->makeRegExpCompatSearchString($search) . '\',commonname,transliteration) ' : 'commonname') . ' as label,
-						transliteration,
-					\'common name\' as source, 
-					concat(\'views/species/common.php?id=\',taxon_id) as url,
-					language_id'
-        ));
-    }
-
-
-
-    private function makeAlphabetFromArray ($p)
-    {
-        $names = isset($p['names']) ? $p['names'] : null;
-        $field = isset($p['field']) ? $p['field'] : null;
-        $letter = isset($p['letter']) ? $p['letter'] : null;
-        $taxonType = isset($p['taxonType']) ? $p['taxonType'] : null;
-
-        $a = array();
-        
-        $hasNonAlpha = false;
-        
-        $letter = strtolower($letter);
-        
-        foreach ((array) $names as $key => $val) {
-            
-            if (
-            	($taxonType=='higher' && isset($val['lower_taxon']) && $val['lower_taxon']=='1') ||
-            	($taxonType=='lower' && isset($val['lower_taxon']) && $val['lower_taxon']=='0')
-            ) continue;
-
-            $x = strtolower(substr(strip_tags($val[$field]), 0, 1));
-            
-            $a[$x] = $x;
-            
-            $hasNonAlpha = $hasNonAlpha || (ord($x) < 97 || ord($x) > 122);
-            
-            if (!is_null($letter) && ($x == $letter || ($letter == '#' && (ord($x) < 97 || ord($x) > 122)))) {
-                
-                $n[$key] = $val;
-            }
-        }
-        
-        if (!is_null($letter) && empty($n))
-            $letter = null;
-        
-        asort($a);
-        
-        $stopNext = $prev = $next = null;
-        
-        $i = 0;
-        
-        foreach ((array) $a as $key => $val) {
-            
-            if ($stopNext === true) {
-                
-                $next = $val;
-                
-                break;
-            }
-            
-            if ($val == $letter || ($letter == '#' && $i == 0))
-                $stopNext = true;
-            
-            if ($stopNext !== true)
-                $prev = $val;
-            
-            $i++;
-        }
-        
-        $prev = ((ord($prev) < 97 || ord($prev) > 122) && !is_null($prev) ? '#' : $prev);
-        
-        return array(
-            'alpha' => isset($a) ? $a : null, 
-            'names' => isset($n) ? $n : null, 
-            'hasNonAlpha' => $hasNonAlpha, 
-            'alphaNav' => array(
-                'prev' => $prev, 
-                'next' => $next
-            )
-        );
-    }
-
-
-
-    private function getFirstUsefulLetter ($list, $field)
-    {
-        if (empty($list))
-            return;
-
-        if ($this->rHasVal('letter')) {
-            
-            if ($this->requestData['letter'] == '#')
-                return '#';
-            
-            $l = strtolower($this->requestData['letter']);
-            
-            foreach ((array) $list as $val) {
-               
-                if (strtolower(substr($val[$field], 0, 1)) == $l)
-                    return $l;
-            }
-        }
-        
-        $d = array_slice($list, 0, 1);
-        
-        return strtolower(substr($d[0][$field], 0, 1));
-    }
-
-
 
     private function setIndexTabs()
     {
-		
+
         // Check if results have been stored in session; if so return
         if (isset($_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']) &&
 			isset($_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa']) &&

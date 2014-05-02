@@ -7,6 +7,7 @@
 <input type="hidden" id="action" name="action" value="save" />
 <input type="hidden" id="next" name="next" value="new" />
 <table>
+	{*
 	<tr>
 		<td>
 			{t}Parent taxon: {/t}
@@ -56,6 +57,48 @@
 			</select>
 		</td>
 	</tr>
+	*}
+	
+	<tr>
+		<td>
+			{t}Parent taxon: {/t}
+		</td>
+		<td>				
+			{assign var=prev value=null}
+			{assign var=prevLevel value=-1}
+			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent();taxonBlankOutRanks();" style="width:300px">
+			<option value="-1">{t}No parent{/t}</option>
+			{foreach from=$taxa key=k item=v}
+			<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
+			{section name=foo loop=$v.level-$taxa[0].level}
+			&nbsp;
+			{/section}		
+			{$v.taxon_formatted}
+			</option>
+			{if $prevLevel!=$v.level}
+			{assign var=prev value=$v.id}
+			{/if}
+			{assign var=prevLevel value=$v.level}
+			{/foreach}
+			</select>
+		</td>
+		<td>
+			<span id="rank-message" class=""></span> 
+		</td>
+	</tr>
+	<tr>
+		<td>
+			{t}Rank:{/t}
+		</td>
+		<td colspan="2">
+			<select name="rank_id" id="rank-id" onchange="taxonChangeSubmitButtonLabel();taxonGetFormattedPreview();">
+			{assign var=firstLower value=true}
+			{foreach item=v from=$projectRanks}
+				<option value="{$v.id}" root_rank_id="{$v.rank_id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
+			{/foreach}
+			</select>
+		</td>
+	</tr>
 	<tr>
 		<td>
 			{t}Taxon name:{/t}
@@ -88,8 +131,6 @@
 		<td>
 		</td>
 	</tr>
-	
-	
 	<tr>
 		<td>
 			{t}Author:{/t}
@@ -142,14 +183,14 @@ taxonStoreCopyableTaxa('{$prev}');
 {/if}
 {assign var=prev value=$v.id}
 {/foreach}
-taxonGetRankByParent();
-taxonBlankOutRanks();
+//taxonGetRankByParent();
+//taxonBlankOutRanks();
+
 
 {literal}
 });
 </script>
 {/literal}
-
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

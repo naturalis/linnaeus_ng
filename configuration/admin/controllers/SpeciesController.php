@@ -889,29 +889,28 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
         $this->checkAuthorisation();
         
-        if ($this->getIsHigherTaxa()) {
-            
-            $this->setPageName($this->translate('New higher taxon'));
-        }
-        else {
-            
-            $this->setPageName($this->translate('New taxon'));
-        }
+		$this->setPageName($this->translate('New taxon'));
         
         $pr = $this->newGetProjectRanks();
 
         $this->newGetTaxonTree();
         
-        if (count((array) $pr) == 0) {
+        if (count((array) $pr)==0)
+		{
             
             $this->addMessage($this->translate('No ranks have been defined.'));
         }
-        else {
+        else
+		{
             
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
             
             // save
-            if ($this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
+            if ($this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save')
+			
+			)
+//			 && !$this->isFormResubmit())
+			{
                 
                 $isHybrid = $this->requestData['is_hybrid'];
                 
@@ -927,7 +926,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 $newName = $this->fixSubgenusParentheses($newName, $this->requestData['rank_id']);
                 // first letter is capitalized & subgenus parantheses are removed (changed silently)
                 $newName = $this->fixNameCasting($newName);
-                
+
                 $hasErrorButCanSave = null;
                 
                 //checks
@@ -996,8 +995,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                 }
                 
                 // save as requested
-                if (is_null($hasErrorButCanSave) || $this->rHasVal('override', '1')) {
-                    
+                if (is_null($hasErrorButCanSave) || $this->rHasVal('override', '1'))
+				{
                     $this->clearErrors();
                     
                     $this->clearCache($this->cacheFiles);
@@ -1034,10 +1033,10 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     $this->smarty->assign('data', array('parent_id' => $d['parent_id']));
                 
                 }
-                else {
-                    
+                else
+				{
                     $this->requestData['taxon'] = $newName;
-                    
+
                     if ($hasErrorButCanSave) {
                         $this->addMessage(
                         '
@@ -1055,9 +1054,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             } // save
         } // no ranks defined
         
-
-
-
         $this->smarty->assign('projectRanks', $pr);
         
         if (isset($this->treeList))
@@ -1069,6 +1065,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         
         $this->printPage();
     }
+
+
 
     public function deleteAction ()
     {
@@ -1084,12 +1082,13 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
             foreach ((array) $this->requestData['child'] as $key => $val) {
                 
-                if ($val == 'delete') {
-
+                if ($val == 'delete')
+				{
                     $this->deleteTaxonBranch($key);
                 }
-                elseif ($val == 'orphan') {
-                    
+                else
+				if ($val == 'orphan')
+				{
                     // kill off the parent_id and turn it into a orphan
                     $this->models->Taxon->update(array(
                         'parent_id' => 'null'
@@ -1098,7 +1097,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                         'id' => $key
                     ));
                 }
-                elseif ($val == 'attach') {
+                else
+				if ($val == 'attach') {
                     
                     // reacttach to the parent_id of the to-be-deleted taxon
                     $this->models->Taxon->update(array(
@@ -1846,151 +1846,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
        
         $this->smarty->assign('categories', $this->getCategories());
         
-        $this->printPage();
-    }
-
-    public function remoteImgFileAction ()
-    {
-		
-        $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Remote image file file upload'));
-        
-        if ($this->requestDataFiles && !$this->isFormResubmit()) {
-			
-			set_time_limit(2400);
-
-			$raw = array();
-
-			$saved = $failed = $odd = $skipped = 0;
-	
-			if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
-				$i = 0;
-				while (($dummy = fgetcsv($handle)) !== FALSE) {
-					foreach ((array) $dummy as $val) {
-						$raw[$i][] = $val;
-					}
-					$i++;
-				}
-				fclose($handle);
-			}
-
-			$clearedTaxa = array();
-
-			foreach ((array) $raw as $key => $line) {
-				
-				$d = implode('',$line);
-				
-				if (empty($d))
-					continue;
-					
-				foreach((array)$line as $fKey => $fVal) {
-					
-					$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
-					
-					if (empty($fVal))
-						continue;
-						
-					if ($fKey==0) {
-
-						$tIdOrName=$fVal;
-						$tId = $this->resolveTaxonByIdOrname($tIdOrName);
-
-					} else {
-
-						if (empty($tId)) {
-							
-							if (empty($tId))
-								$this->addError(sprintf('Could not resolve taxon "%s".',$tIdOrName));
-							$skipped++;
-							continue;
-						}
-
-						if($this->rHasVal('del_existing','1') && !isset($clearedTaxa[$tId])) {
-
-							$this->models->MediaTaxon->delete(array(
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId,
-								'file_name like' => 'http://%'
-							));
-
-							$this->models->MediaTaxon->delete(array(
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId,
-								'file_name like' => 'https://%'
-							));
-							
-							$clearedTaxa[$tId] = true;
-							
-						}
-						
-						$images=array_map('trim',explode(';',$fVal));
-
-						foreach((array)$images as $iKey => $iVal) {
-							
-							if (empty($iVal)) continue;
-							
-							$mime=null;
-							
-							/*
-							$headers = get_headers($iVal);
-							
-							if ($headers!==false) {
-								foreach((array)$headers as $hVal) {
-									if (stripos($hVal,'Content-Type:')!==false)
-										$mime=trim(str_ireplace('Content-Type:','',$hVal));
-								}
-							}
-							
-							*/
-
-							if ($mime==null) {
-								$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
-								$d=pathinfo($iVal);
-								$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : '?';
-								//$odd++;
-							}
-
-
-							$mt = $this->models->MediaTaxon->save(
-							array(
-								'id' => null, 
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId, 
-								'file_name' => $iVal, 
-								'original_name' => $iVal, 
-								'mime_type' => $mime, 
-								'file_size' => 0, 
-								'thumb_name' => null, 
-								'sort_order' => $this->getNextMediaSortOrder($tId)
-							));
-							
-							$this->logChange($this->models->MediaTaxon->getDataDelta());
-							
-							if ($mt)
-								$saved++;
-							else
-								$failed++;
-							
-						}
-						
-					}
-					
-				}
-				
-            }
-			
-			$this->addMessage(sprintf('Saved %s images, skipped %s line, failed %s image.',$saved,$skipped,$failed));
-
-			if ($skipped)
-				$this->addMessage('Skipped lines are due to missing or incorrect taxon id.');
-			if ($failed)
-				$this->addMessage('Failed pages are due to botched inserts.');
-			if ($odd>0)
-				$this->addError(sprintf('%s images could not be resolved, but were saved anyway.',$odd));
-
-        }
-       
         $this->printPage();
     }
 
@@ -2948,6 +2803,9 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 	private function saveParentage($id=null)
 	{
 
+		if (!$this->models->TaxonQuickParentage->getTableExists())
+			return;
+
 		$t = $this->models->Taxon->_get(
 		array(
 			'id' => array(
@@ -3066,50 +2924,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
 		return isset($t) ? $t[0]['id'] : null;
     }
-
-	private function resolveTaxonByIdOrname($whatisit)
-	{
-		
-		$tId=null;
-		
-		
-		if (!empty($whatisit)) {
-
-			if (is_numeric($whatisit)) {
-			
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'id' => (int)$whatisit
-						)
-					));
-		
-				if ($t[0]['id']!=$whatisit)
-					$tId = null;
-			
-			} else {
-		
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'taxon' => trim($whatisit)
-						)
-					));
-		
-				if (empty($t[0]['id']))
-					$tId = null;
-				else
-					$tId = $t[0]['id'];
-		
-			}
-			
-		}
-		
-		return $tId;
-										
-	}
 
     private function getRankList ()
     {

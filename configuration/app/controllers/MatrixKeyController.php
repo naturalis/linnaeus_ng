@@ -194,7 +194,7 @@ class MatrixKeyController extends Controller
 						'checkImages'=>true
 					)
 				);
-
+				
             $this->smarty->assign('taxaJSON', json_encode(
             array(
                 'results' => $taxa, 
@@ -1373,7 +1373,7 @@ class MatrixKeyController extends Controller
 				_a.show_order
 			"
 		);
-
+		
         foreach ((array) $cs as $key => $val)
             $cs[$key]['img_dimensions']=explode(':',$val['file_dimensions']);
 
@@ -1800,7 +1800,9 @@ class MatrixKeyController extends Controller
 				_b.type,
 				_c.label,
 				if (_b.type='media'||_b.type='text','c','f') as prefix,
-				_a.show_order
+				_a.show_order,
+				if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label_short,
+				if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description
 
 			from 
 				%PRE%characteristics_matrices _a
@@ -1825,7 +1827,7 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$this->getCharacteristicStates('*') as $val)
 			$allStates[$val['characteristic_id']][]=$val;
-		
+	
         foreach ((array) $mc as $key => $val) {
                 $mc[$key]['states']=$allStates[$val['id']];
                 $mc[$key]['sort_by'] = array(

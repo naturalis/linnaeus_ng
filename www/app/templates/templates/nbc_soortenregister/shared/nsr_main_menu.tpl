@@ -1,4 +1,5 @@
 {assign var=server value="http://162.13.180.73"}
+
 <div class="content">
 	<ul class="menu clearfix"><li class="first leaf"><a class="active" href="{$server}/">Home</a></li>
 	<li class="expanded"><a title="" href="{$server}/node/12">Over het Soortenregister</a><ul class="menu clearfix"><li class="first leaf"><a href="{$server}/node/13">Doel en uitgangspunten</a></li>

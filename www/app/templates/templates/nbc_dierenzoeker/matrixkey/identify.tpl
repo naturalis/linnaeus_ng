@@ -28,7 +28,7 @@
                                         <img src="{$projectUrls.projectMedia}{$v.icon}" class="grid-icon" alt="" />
                                     </div>
                                     <div class="grid-labelbox ">
-                                        {$v.label}
+                                        {if $v.label_short}{$v.label_short}{else}{$v.label}{/if}
                                     </div>
                                 </a>
                             </div>
@@ -116,12 +116,12 @@
 
         </div>
        
-                   
+
 		<div class="facetgrouppage-wrapper">  
 
         {foreach from=$guiMenu item=v key=k}
-
-            <div id="facetgrouppage{$k}" class="facetgrouppage">
+            <div id="facetgrouppage{$k}" class="">
+            <!-- div id="facetgrouppage{$k}" class="facetgrouppage" -->
 				<img class="facetpage-puntje" alt="" src="{$session.app.system.urls.systemMedia}facet-puntje.png">
 				<a class="no-text facetgrouppage-close-btn" href="#">Sluiten</a>
                 
@@ -160,8 +160,7 @@
                 {/foreach}
 
 				{else}
-
-
+				
 				<div class="facetgrouppage-inner">
 					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$v.info}</h4>
 					<div class="facetgrouppage-icons">
