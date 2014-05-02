@@ -208,8 +208,12 @@ class IndexController extends Controller
 					%PRE%commonnames _a
 
 				left join
+					%PRE%languages_projects _d
+					on _a.language_id = _d.id
+
+				left join
 					%PRE%languages _c
-					on _a.language_id = _c.id
+					on _d.language_id = _c.id
 	
 				left join
 					%PRE%labels_languages _b
