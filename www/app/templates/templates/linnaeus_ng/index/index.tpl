@@ -82,7 +82,7 @@
         <p>
             <a class="internal-link" href="../species/taxon.php?id={$v.taxon_id}">
             {if $v.commonname}{$v.commonname}{else}{$v.transliteration}{/if}</a>
-            {if $activeLanguage==''} ({$v.language}){/if}
+            {if $language==''} ({$v.language}){/if}
         </p>
         {/foreach}
 	
