@@ -387,24 +387,13 @@ function addRequestVar(key,val) {
 }
 
 function doLanguageChange(languageId) {
-
-	if (languageId) {
-		
-		addFormVal('languageId',languageId);
-	
-	} else {
-		
-		addFormVal('languageId',$('#languageSelect').val());
+	if (!languageId)
+	{
+		languageId=$('#languageSelect').val();
 	}
-
-	for(var i=0;i<requestVars.length;i++) {
-
-		addFormVal(requestVars[i][0],requestVars[i][1]);
-
-	}
-
-	goForm();
-
+	var f=$('<form action="" method="post"></form>');
+	f.append('<input type="hidden" name="languageId" value="'+languageId+'" />');
+	f.appendTo('body').submit();
 }
 
 function goIntLink(controller,url,params) {
