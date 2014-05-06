@@ -312,8 +312,8 @@ class IndexController extends Controller
 			left join
 				%PRE%labels_languages _b
 				on _a.project_id = _b.project_id
-				and _a.language_id = _b.language_id
-				and _b.label_language_id = ".$this->getCurrentLanguageId()."
+				and _a.language_id = _b.label_language_id
+				and _b.language_id = ".$this->getCurrentLanguageId()."
 
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
