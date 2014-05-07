@@ -881,7 +881,7 @@ parameters:
 		$result['count']=count((array)$taxa);
 		$result['results']=$taxa;
 
-		$this->smarty->assign('json','['.json_encode($result).']');
+		$this->smarty->assign('json',json_encode($result));
 		
 		$this->printPage('template');
 	}
