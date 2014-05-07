@@ -781,7 +781,7 @@ class ExportController extends Controller
 
 				foreach ((array)$d as $dKey => $dVal) {
 				
-					$trans2['translation'.$sKey] = array(
+					$trans2['translation'.$dKey] = array(
 						'text' => $dVal['choice_txt'],
 						'language' => $_SESSION['admin']['export']['languages'][$dVal['language_id']]['language']
 					);

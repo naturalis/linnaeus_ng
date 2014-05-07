@@ -76,10 +76,10 @@ class SpeciesController extends Controller
 
     private function initialise ()
     {
-		
+
 		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
 		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
-			
+	
 			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
 		
 			if (!defined('TAB_'.$p)) {
