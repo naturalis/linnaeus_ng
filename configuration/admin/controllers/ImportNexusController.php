@@ -61,7 +61,8 @@ class ImportNexusController extends Controller
 
 				$matrixname = ucwords(basename(strtolower($this->requestDataFiles[0]["name"]),'.nex'));
 				
-				$d=preg_split('/(BEGIN DATA;)(.*)/',$buffer); // 0: header block, 1 data
+				$d=preg_split('/(BEGIN DATA;)/s',$buffer); // 0: header block, 1 data
+				
 				$data=trim($d[1]);
 				$h=preg_split('/\n/',$data);
 				$dimensions=$format=null;
@@ -77,7 +78,7 @@ class ImportNexusController extends Controller
 						$format='not implemented';
 					}
 				}
-				
+
 				//charlabels
 				preg_match('/(CHARLABELS)(.+?)(;)/s',$data,$matches);
 				$d=$matches[0];

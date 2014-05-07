@@ -1,7 +1,7 @@
 <?php
 
 include_once ('Controller.php');
-
+include_once ('RdfController.php');
 class WebservicesController extends Controller
 {
     private $_usage=null;
@@ -44,7 +44,7 @@ class WebservicesController extends Controller
 	public function namesAction()
 	{
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>&from=<YYYYMMDD>[&rows=<n>[&offset=<n>]][&count=1]
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&from=<YYYYMMDD>[&rows=<n>[&offset=<n>]][&count=1]
 parameters:
   pid".chr(9)." : project id (mandatory)
   from".chr(9)." : date of start of retrieval window, based on last change. format: <YYYYMMDD> (mandatory)
@@ -165,7 +165,7 @@ parameters:
 	public function taxonAction()
 	{
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>&taxon=<scientific name>
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>
 parameters:
   pid".chr(9)." : project id (mandatory)
   taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
@@ -314,7 +314,7 @@ parameters:
 	public function ezAction()
 	{
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>&nsr=<id>
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&nsr=<id>
 parameters:
   pid".chr(9)." : project id (mandatory)
   nsr".chr(9)." : NSR-id of the taxon to retrieve (mandatory)
@@ -390,7 +390,7 @@ parameters:
 		$poolSize=20;
 
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&size=<int>
 parameters:
   pid".chr(9)." : project id (mandatory)
   size".chr(9)." : size of pool from which random image is selected (optional, max. 1000; default ".$poolSize.")
@@ -543,7 +543,7 @@ parameters:
 	public function statisticsAction()
 	{
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>
 parameters:
   pid".chr(9)." : project id (mandatory)
 ";
@@ -751,6 +751,135 @@ parameters:
 				'count'=>$d[0]['total'],
 				'label'=>$this->translate('Trendgrafieken')
 			);
+
+		$this->smarty->assign('json',json_encode($result));
+		
+		$this->printPage('template');
+	}
+
+	public function searchAction()
+	{
+		$minStrLen=3;
+		$this->setMatchType('match_all');
+		$max=50;
+
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&text=<(part of) scientific name>&start=1
+parameters:
+  pid".chr(9)." : project id (mandatory)
+  text".chr(9)." : (part of a) scientific name (mandatory; minimum ".$minStrLen." characters)
+  start".chr(9)." : 1 for match start only, or 0 for match everywhere (default) (optional)
+  max".chr(9)." : maximum returned number of rows (optional; default 50; maximum 1000)
+";
+
+		if (is_null($this->getCurrentProjectId())) {
+			$this->sendErrors();
+			return;
+		}
+		if (empty($this->requestData['text'])) {
+			$this->addError('no search text.');
+			$this->sendErrors();
+			return;
+		}
+		
+		$search=$this->requestData['text'];
+
+		if (strlen($search)<$minStrLen) {
+			$this->addError('search text too short (min '.$minStrLen.' characters).');
+			$this->sendErrors();
+			return;
+		}
+
+		$this->Rdf = new RdfController;
+		
+		if (isset($this->requestData['start']) && $this->requestData['start']=='1')
+			$this->setMatchType('match_start');
+
+		$max=
+			isset($this->requestData['max']) && 
+			is_numeric($this->requestData['max']) &&
+			(int)$this->requestData['max']>0  &&
+			(int)$this->requestData['max']<=1000  ? 
+				(int)$this->requestData['max'] : 
+				$max;
+
+		$taxa=$this->models->Taxon->freeQuery("
+			select
+				_a.name,
+				_b.nametype,
+				_e.taxon,
+				_q.label as common_rank,
+				replace(_r.nsr_id,'tn.nlsr.concept/','') as nsr_id,
+				_d.label as language_label
+			
+			from %PRE%names _a
+
+			left join %PRE%labels_languages _d
+				on _a.language_id=_d.language_id
+				and _d.label_language_id=".$this->getCurrentLanguageId()."
+			
+			left join %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%labels_projects_ranks _q
+				on _e.rank_id=_q.project_rank_id
+				and _a.project_id = _q.project_id
+				and _q.language_id=".$this->getCurrentLanguageId()."
+			
+			left join %PRE%name_types _b 
+				on _a.type_id=_b.id 
+				and _a.project_id = _b.project_id
+
+			left join %PRE%nsr_ids _r
+				on _a.project_id = _r.project_id
+				and _a.taxon_id=_r.lng_id
+				and _r.item_type = 'taxon'
+
+			where _a.project_id =".$this->getCurrentProjectId()."
+			". ($this->getMatchType()=='match_start' ? 
+					"and _a.name like '".mysql_real_escape_string($search)."%'" :
+					"and _a.name like '%".mysql_real_escape_string($search)."%'" 
+			)."
+				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
+			
+			group by _a.taxon_id
+			order by _a.name
+			limit ".$max."
+
+		"		
+		);
+
+		foreach((array)$taxa as $key => $val)
+		{
+			$taxa[$key]['label']=
+				$val['name'].
+				' ('.sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']).
+					($val['name']!=$val['taxon']?' van '.$val['taxon']:'').
+				')'.
+				' ['.$val['common_rank'].']';
+			unset($taxa[$key]['language_label']);
+			unset($taxa[$key]['common_rank']);
+			unset($taxa[$key]['nametype']);
+		}
+
+		$result=array(
+			'pId'=>$this->getCurrentProjectId(),
+			'search'=>$search,
+			'match'=>$this->getMatchType(),
+			'max'=>$max
+		);
+
+		$p=$this->getProject();
+
+		$result['project']=$p['title'];
+		$result['exported']=date('c');
+		$result['count']=count((array)$taxa);
+		$result['results']=$taxa;
 
 		$this->smarty->assign('json',json_encode($result));
 		
