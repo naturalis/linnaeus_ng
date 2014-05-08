@@ -30,7 +30,7 @@ class TreeController extends Controller
         
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
-			$return=json_encode($this->getTreeNode(array('node'=>$this->requestData['node'])));
+			$return=json_encode($this->getTreeNode(array('node'=>$this->requestData['node'],'count'=>$this->requestData['count'])));
         }
 		else
 		if ($this->rHasVal('action', 'store_tree'))
@@ -104,7 +104,8 @@ class TreeController extends Controller
 	private function getTreeNode($p)
 	{
 		$node=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
-		
+		$count=isset($p['count']) && in_array($p['count'],array('none','taxon','species')) ? $p['count'] : 'none';
+
 		if (is_null($node))
 			return;
 
@@ -163,56 +164,59 @@ class TreeController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-			/*
-			$d=$this->models->Taxon->freeQuery("
-				select
-					count(*) as total
-				from
-					%PRE%taxon_quick_parentage
-				where 
-					project_id = ".$this->getCurrentProjectId()." 
-					and MATCH(parentage) AGAINST ('".$val['id']."' in boolean mode)
-				");
-				
-			$val['child_total']=$d[0]['total'];
-			*/
-
-
-			$d=$this->models->Taxon->freeQuery("
-				select
-					count(_sq.taxon_id) as total,
-					_sq.taxon_id,
-					_sp.presence_id,
-					ifnull(_sr.established,'undefined') as established
-				from 
-					%PRE%taxon_quick_parentage _sq
-				
-				left join %PRE%presence_taxa _sp
-					on _sq.project_id=_sp.project_id
-					and _sq.taxon_id=_sp.taxon_id
-				
-				left join %PRE%presence _sr
-					on _sp.project_id=_sr.project_id
-					and _sp.presence_id=_sr.id
-
-				left join %PRE%taxa _e
-					on _sq.taxon_id = _e.id
-					and _sq.project_id = _e.project_id
-				
-				left join %PRE%projects_ranks _f
-					on _e.rank_id=_f.id
-					and _e.project_id = _f.project_id
-				
-				where
-					_sq.project_id=".$this->getCurrentProjectId()."
-					and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
-					and _sp.presence_id is not null
-					and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
+			if ($count=='taxon') 
+			{
+				$d=$this->models->Taxon->freeQuery("
+					select
+						count(*) as total
+					from
+						%PRE%taxon_quick_parentage
+					where 
+						project_id = ".$this->getCurrentProjectId()." 
+						and MATCH(parentage) AGAINST ('".$val['id']."' in boolean mode)
+					");
 					
-				group by _sr.established
-				");
-
-				$val['count']=
+				$val['child_count']['taxon']=$d[0]['total'];
+			}
+			else
+			if ($count=='species') 
+			{
+	
+				$d=$this->models->Taxon->freeQuery("
+					select
+						count(_sq.taxon_id) as total,
+						_sq.taxon_id,
+						_sp.presence_id,
+						ifnull(_sr.established,'undefined') as established
+					from 
+						%PRE%taxon_quick_parentage _sq
+					
+					left join %PRE%presence_taxa _sp
+						on _sq.project_id=_sp.project_id
+						and _sq.taxon_id=_sp.taxon_id
+					
+					left join %PRE%presence _sr
+						on _sp.project_id=_sr.project_id
+						and _sp.presence_id=_sr.id
+	
+					left join %PRE%taxa _e
+						on _sq.taxon_id = _e.id
+						and _sq.project_id = _e.project_id
+					
+					left join %PRE%projects_ranks _f
+						on _e.rank_id=_f.id
+						and _e.project_id = _f.project_id
+					
+					where
+						_sq.project_id=".$this->getCurrentProjectId()."
+						and _sp.presence_id is not null
+						and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
+						and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
+						
+					group by _sr.established
+					");
+	
+				$val['child_count']=
 					array(
 						'total'=>
 							(int)
@@ -224,19 +228,10 @@ class TreeController extends Controller
 						'not_established'=>
 								(int)(isset($d[0]['total'])?$d[0]['total']:0)
 					);
-
-
-
-
-
-
-
-
-
-
-
-
-				
+			} else
+			{
+				$val['child_count']=null;
+			}
 			
 			
 			if ($val['base_rank']>=SPECIES_RANK_ID)
@@ -267,7 +262,7 @@ class TreeController extends Controller
 						and parent_id = ".$val['id']
 					);
 					
-				$val['child_count']=$d[0]['total'];
+				$val['has_children']=$d[0]['total']>0;
 				$progeny[]=$val;
 			}
 		}
@@ -285,7 +280,6 @@ class TreeController extends Controller
 				'node'=>$taxon,
 				'progeny'=>$progeny
 			);
-
 		
 	}
 
