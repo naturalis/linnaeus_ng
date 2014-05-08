@@ -15,12 +15,13 @@ function buildtree(node)
 		data : ({
 			action : 'get_tree_node' ,
 			node : node ,
+			count : 'species', // species, taxon, none
 			time : allGetTimestamp()
 		}),
 		success : function (data)
 		{
-			console.log(data);
 			var data=$.parseJSON(data);
+			//console.dir(data);
 			growbranches(data);
 			storetree();
 		}
@@ -37,10 +38,13 @@ function growbranches(data)
 	{
 		var d=data.progeny[i];
 		progeny+=
-			'<li class="child '+(d.child_count==0?'no-expand':'')+'" id="node-'+d.id+'">'+
-				(d.child_count>0 ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
+			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
+				(d.has_children ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
-				(d.child_total && d.child_total>0 ? '<span class="child-count">'+d.child_total+'</span>' : '' )+
+				(d.child_count && d.child_count.total>0 ?
+					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' :
+					'' 
+				)+
 				'<a href="nsr_taxon.php?id='+d.id+'" class="detail-link">&rarr;</a> \
 			</li>';
 	}
@@ -58,8 +62,12 @@ function growbranches(data)
 					'<span class="rank">'+data.node.rank_label+'</span>' : 
 					'' 
 				)+
-				(data.node.child_total && data.node.child_total>0 ? 
-					'<span class="child-count">'+data.node.child_total+'</span>' : 
+				(data.node.child_count && data.node.child_count.total>0 && !activeNode ?
+					'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
+					'' 
+				)+
+				(data.node.child_count && data.node.child_count.total>0 && activeNode ?
+					'<span class="child-count">'+data.node.child_count.total+'/'+data.node.child_count.established+'</span>' :
 					'' 
 				)+
 				(!activeNode ?
