@@ -39,7 +39,8 @@ function growbranches(data)
 		progeny+=
 			'<li class="child '+(d.child_count==0?'no-expand':'')+'" id="node-'+d.id+'">'+
 				(d.child_count>0 ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
-				(d.rank_label ? '<span class="rank">['+d.rank_label+']</span>' : '' )+
+				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
+				(d.child_total && d.child_total>0 ? '<span class="child-count">'+d.child_total+'</span>' : '' )+
 				'<a href="nsr_taxon.php?id='+d.id+'" class="detail-link">&rarr;</a> \
 			</li>';
 	}
@@ -54,7 +55,11 @@ function growbranches(data)
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
 				(data.node.rank_label ? 
-					'<span class="rank">['+data.node.rank_label+']</span>' : 
+					'<span class="rank">'+data.node.rank_label+'</span>' : 
+					'' 
+				)+
+				(data.node.child_total && data.node.child_total>0 ? 
+					'<span class="child-count">'+data.node.child_total+'</span>' : 
 					'' 
 				)+
 				(!activeNode ?
@@ -122,7 +127,7 @@ ul.top {
 }
 li.child {
 	list-style:square;
-	margin-left:10px;
+	margin-left:12px;
 }
 li.child.no-expand {
 	list-style:circle;
@@ -132,8 +137,25 @@ li.child.no-expand {
 	font-weight:bold;
 	font-size:1.1em;
 }
-#tree-container .rank {
+#tree-container .rank, .child-count {
 	margin-left:3px;
+	font-size:0.87em;
+}
+#tree-container .child-count {
+	margin-left:5px;
+	color:#666;
+}
+#tree-container .rank:before {
+  content: "[";
+}
+#tree-container .rank:after {
+  content:"]";
+}
+#tree-container .child-count:before {
+  content: "(";
+}
+#tree-container .child-count:after {
+  content: ")";
 }
 #tree-container .italics {
 	font-style:italic;
