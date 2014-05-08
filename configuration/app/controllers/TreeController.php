@@ -182,39 +182,42 @@ class TreeController extends Controller
 			if ($count=='species') 
 			{
 	
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(_sq.taxon_id) as total,
-						_sq.taxon_id,
-						_sp.presence_id,
-						ifnull(_sr.established,'undefined') as established
-					from 
-						%PRE%taxon_quick_parentage _sq
-					
-					left join %PRE%presence_taxa _sp
-						on _sq.project_id=_sp.project_id
-						and _sq.taxon_id=_sp.taxon_id
-					
-					left join %PRE%presence _sr
-						on _sp.project_id=_sr.project_id
-						and _sp.presence_id=_sr.id
-	
-					left join %PRE%taxa _e
-						on _sq.taxon_id = _e.id
-						and _sq.project_id = _e.project_id
-					
-					left join %PRE%projects_ranks _f
-						on _e.rank_id=_f.id
-						and _e.project_id = _f.project_id
-					
-					where
-						_sq.project_id=".$this->getCurrentProjectId()."
-						and _sp.presence_id is not null
-						and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-						and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
+				$d=$this->models->Taxon->freeQuery(array(
+					'query'=> "
+						select
+							count(_sq.taxon_id) as total,
+							_sq.taxon_id,
+							_sp.presence_id,
+							ifnull(_sr.established,'undefined') as established
+						from 
+							%PRE%taxon_quick_parentage _sq
 						
-					group by _sr.established
-					");
+						left join %PRE%presence_taxa _sp
+							on _sq.project_id=_sp.project_id
+							and _sq.taxon_id=_sp.taxon_id
+						
+						left join %PRE%presence _sr
+							on _sp.project_id=_sr.project_id
+							and _sp.presence_id=_sr.id
+		
+						left join %PRE%taxa _e
+							on _sq.taxon_id = _e.id
+							and _sq.project_id = _e.project_id
+						
+						left join %PRE%projects_ranks _f
+							on _e.rank_id=_f.id
+							and _e.project_id = _f.project_id
+						
+						where
+							_sq.project_id=".$this->getCurrentProjectId()."
+							and _sp.presence_id is not null
+							and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
+							and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
+							
+						group by _sr.established",
+					'fieldAsIndex' =>"established"
+					)
+				);
 	
 				$val['child_count']=
 					array(
