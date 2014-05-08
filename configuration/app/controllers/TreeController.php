@@ -56,7 +56,6 @@ class TreeController extends Controller
         $this->printPage('ajax_interface');
     }
 
-
 	private function treeGetTop()
 	{
 		/*
@@ -161,13 +160,28 @@ class TreeController extends Controller
 			");
 		
 		$taxon=$progeny=array();
+
 		foreach((array)$taxa as $key=>$val)
 		{
+			$d=$this->models->Taxon->freeQuery("
+				select
+					count(*) as total
+				from
+					%PRE%taxon_quick_parentage
+				where 
+					project_id = ".$this->getCurrentProjectId()." 
+					and MATCH(parentage) AGAINST ('".$val['id']."' in boolean mode)
+				");
+				
+			$val['child_total']=$d[0]['total'];
+			
 			if ($val['base_rank']>=SPECIES_RANK_ID)
 			{
 				$val['taxon']=$this->formatTaxon($val);
 			}
+
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
+
 			unset($val['parent_id']);
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
@@ -194,7 +208,13 @@ class TreeController extends Controller
 			}
 		}
 		
-		usort($progeny,function($a,$b) { return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); });
+		usort(
+			$progeny,
+			function($a,$b)
+			{
+				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
+			}
+		);
 
 		return
 			array(
@@ -204,7 +224,5 @@ class TreeController extends Controller
 
 		
 	}
-
-
 
 }
