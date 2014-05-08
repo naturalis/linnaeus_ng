@@ -100,13 +100,13 @@ class SpeciesControllerNSR extends SpeciesController
 				);
 			}
 
-			if ($categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
+			if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
 			{
 				$wetten=$this->getEzData($taxon['id']);
 				$this->smarty->assign('wetten',$wetten);
 			} 
 			else
-			if ($categories['start']==TAB_VERSPREIDING)
+			if (defined('TAB_VERSPREIDING') && $categories['start']==TAB_VERSPREIDING)
 			{
 				
 				$distributionMaps=$this->getDistributionMaps($taxon['id']);
@@ -137,7 +137,7 @@ class SpeciesControllerNSR extends SpeciesController
 	
 			} 
 			else
-			if ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING)
+			if (defined('TAB_NAAMGEVING') && ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING))
 			{
 				$content=$this->getTaxonContent(
 					array(
@@ -229,6 +229,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->tmp;
 	}
 
+
     private function getCategories($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -273,19 +274,21 @@ class SpeciesControllerNSR extends SpeciesController
 		if (isset($taxon))
 		{
 
-			$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
-
-			if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
+			if (defined('TAB_VERSPREIDING'))
 			{
-				foreach((array)$categories as $key=>$val)
+				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
+	
+				if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
 				{
-					if ($val['id']==TAB_VERSPREIDING) {
-						$categories[$key]['is_empty']=false;
-						break;
+					foreach((array)$categories as $key=>$val)
+					{
+						if ($val['id']==TAB_VERSPREIDING) {
+							$categories[$key]['is_empty']=false;
+							break;
+						}
 					}
 				}
 			}
-			 
 							
 			if (!$this->_suppressTab_NAMES)
 			{
@@ -301,15 +304,15 @@ class SpeciesControllerNSR extends SpeciesController
 
 			foreach((array)$categories as $key=>$val)
 			{
-				if ($val['id']==TAB_NAAMGEVING)
+				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
 					
-				if ($val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
 					$dummy=$key;
 			}
 			
 			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
-			if ($categories[$dummy]['is_empty']==1)
+			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1)
 			{
 				$ezData=$this->getEzData($taxon);
 				$categories[$dummy]['is_empty']=empty($ezData);
@@ -1641,6 +1644,5 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data;
 
 	}
-
 
 }

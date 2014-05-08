@@ -282,7 +282,7 @@ class SpeciesController extends Controller
 			
 
         }
-        
+
         $this->allowEditPageOverlay = false;
 		
 		$this->smarty->assign('returnText',$return);
