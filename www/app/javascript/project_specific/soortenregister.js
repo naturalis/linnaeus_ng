@@ -2,7 +2,6 @@ var suggestionMinInputLength=1;
 var search,dosearch,listdata,suggestiontype,matchtype;
 var activesuggestion=-1;
 
-
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
