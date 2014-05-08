@@ -11,9 +11,10 @@ class WebservicesController extends Controller
 	private $_matchType=null;
 	private $_useOldNsrLinks=false;
 	private $_taxonUrl=null;
-	private $_thumbBaseUrl = 'http://images.naturalis.nl/thumb/';
-	private $_190x100BaseUrl = 'http://images.naturalis.nl/190x100/';
-
+	private $_thumbBaseUrl='http://images.naturalis.nl/thumb/';
+	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
+	private $_JSONPCallback=false;
+	private $_JSON=null;
 
     public $usedModels = array(
 		'taxon',
@@ -32,7 +33,6 @@ class WebservicesController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
-
 		$this->initialise();
     }
 
@@ -156,10 +156,8 @@ parameters:
 			$result['names']=$names;
 		}
 
-		$this->smarty->assign('json',json_encode($result));
-		
-		$this->printPage('template');
-
+		$this->setJSON(json_encode($result));
+		$this->printOutput();
 	}
 
 	public function taxonAction()
@@ -306,9 +304,9 @@ parameters:
 			'media'=>$media
 		);
 
-		$this->smarty->assign('json',json_encode($result));
+		$this->setJSON(json_encode($result));
 		
-		$this->printPage('template');
+		$this->printOutput();
 	}
 
 	public function ezAction()
@@ -380,9 +378,9 @@ parameters:
 			'media'=>$media
 		);
 
-		$this->smarty->assign('json',json_encode($result));
+		$this->setJSON(json_encode($result));
 		
-		$this->printPage('template');
+		$this->printOutput();
 	}
 
 	public function lastImageAction()
@@ -535,9 +533,9 @@ parameters:
 			'date_created'=>$this->translate('Datum plaatsing'),
 		);
 
-		$this->smarty->assign('json',json_encode($result));
+		$this->setJSON(json_encode($result));
 		
-		$this->printPage('template');
+		$this->printOutput();
 	}
 
 	public function statisticsAction()
@@ -752,9 +750,9 @@ parameters:
 				'label'=>$this->translate('Trendgrafieken')
 			);
 
-		$this->smarty->assign('json',json_encode($result));
+		$this->setJSON(json_encode($result));
 		
-		$this->printPage('template');
+		$this->printOutput();
 	}
 
 	public function searchAction()
@@ -881,14 +879,12 @@ parameters:
 		$result['count']=count((array)$taxa);
 		$result['results']=$taxa;
 
-		$this->smarty->assign('json',json_encode($result));
-		
-		$this->printPage('template');
+		$this->setJSON(json_encode($result));
+		$this->printOutput();
 	}
-
-
-
-
+	
+	
+	
     private function initialise()
     {
 		$this->useCache=false;
@@ -902,13 +898,11 @@ parameters:
 		} 
 		else 
 		{
-
 			$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
 			$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
 			$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
-
+			$this->checkJSONPCallback();
 		}
-
     }
 
 	private function checkProject()
@@ -1090,11 +1084,70 @@ parameters:
 	}
 	
 
+	private function setJSON($json)
+	{
+		$this->_JSON=$json;
+	}
+
+	private function getJSON()
+	{
+		return $this->_JSON;
+	}
+	
+
+	private function checkJSONPCallback()
+	{
+		if ($this->rHasVal('callback'))
+		{
+			$this->setJSONPCallback($this->rGetVal('callback'));
+		}
+	}
+	
+	private function setJSONPCallback($callback)
+	{
+		$this->_JSONPCallback=$callback;
+	}
+
+	private function getJSONPCallback()
+	{
+		return $this->_JSONPCallback;
+	}
+	
+	private function hasJSONPCallback()
+	{
+		return $this->getJSONPCallback()!=false;
+	}
+	
+
 	private function sendErrors()
 	{
-		$this->smarty->assign('json',json_encode(array('errors'=>$this->errors,'usage'=>$this->_usage)));
+		$this->_usage = $this->_usage."  
+function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with the appropriate function name.
+";
+		$this->setJSON(json_encode(array('errors'=>$this->errors,'usage'=>$this->_usage)));
+		$this->printOutput(true);
+	}
+
+
+	private function printOutput($suppressJSONP=false)
+	{
+		/*
+		JSON looks like this:
+			{ "name": "value" }
+		Whereas JSONP looks like this:
+			functionName({ "name": "value" });
+		*/
+
+		if ($this->hasJSONPCallback() && !$suppressJSONP)
+		{
+			$this->_JSON = $this->getJSONPCallback() . '(' . $this->_JSON .');';
+		}
+
+		$this->smarty->assign('json',$this->_JSON);
 		$this->printPage('template');
 	}
+
+
 
 	/*
 		NSR project specific, should be changed once NSR migration is complete
