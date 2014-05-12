@@ -1,4 +1,5 @@
 {include file="../shared/header.tpl"}
+
 {literal}
 <script>
 var activeNode=false;
@@ -16,11 +17,13 @@ function buildtree(node)
 			action : 'get_tree_node' ,
 			node : node ,
 			count : 'species', // species, taxon, none
-			time : allGetTimestamp()
+			time : Date.now()
 		}),
 		success : function (data)
 		{
+			//console.log(data);
 			var data=$.parseJSON(data);
+			//console.dir(data);
 			growbranches(data);
 			storetree();
 		}
@@ -96,7 +99,7 @@ function storetree()
 		data : ({
 			action : 'store_tree' ,
 			tree : tree ,
-			time : allGetTimestamp()
+			time : Date.now()
 		})
 	});
 }
@@ -108,7 +111,7 @@ function restoretree()
 		type: "POST",
 		data : ({
 			action : 'restore_tree' ,
-			time : allGetTimestamp()
+			time : Date.now()
 		}),
 		success : function (data)
 		{
@@ -171,8 +174,6 @@ li.child.no-expand {
 {/literal}
 <div id="dialogRidge">
 
-	{include file="_left_column.tpl"}
-
 	<div id="content" class="taxon-detail">
 
 		<div id="taxonHeader" class="hasImage">
@@ -184,8 +185,6 @@ li.child.no-expand {
 		</div>
 
 	</div>
-
-	{include file="../shared/_right_column.tpl"}
 
 </div>
 
@@ -199,4 +198,3 @@ $(document).ready(function(){
 </script>
 {/literal}
 
-{include file="../shared/footer.tpl"}

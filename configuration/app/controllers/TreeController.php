@@ -117,7 +117,7 @@ class TreeController extends Controller
 					_a.is_hybrid,
 					_a.rank_id,
 					_a.taxon,
-					_k.name,
+					ifnull(_k.name,_l.commonname) as name,
 					_r.rank,
 					_q.label as rank_label,
 					_p.rank_id as base_rank
@@ -136,6 +136,11 @@ class TreeController extends Controller
 
 				left join %PRE%ranks _r
 					on _p.rank_id=_r.id
+
+				left join %PRE%commonnames _l
+					on _a.id=_l.taxon_id
+					and _a.project_id=_l.project_id
+					and _l.language_id=".$this->getCurrentLanguageId()."
 
 				left join %PRE%names _k
 					on _a.id=_k.taxon_id
@@ -159,6 +164,8 @@ class TreeController extends Controller
 				order by
 					label
 			");
+			
+			//q($taxa,1);
 		
 		$taxon=$progeny=array();
 
