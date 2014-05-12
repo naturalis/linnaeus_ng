@@ -54,7 +54,8 @@ function growbranches(data)
 		'<ul>'+
 			'<li class="child">'+
 				(!activeNode ?
-					'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
+					//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
+					'<a href="#" onclick="buildtree(false);return false">Nederlands Soortenregister</a>' :
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
 				(data.node.rank_label ? 
@@ -189,14 +190,19 @@ li.child.no-expand {
 
 </div>
 
-
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-	//buildtree(false);
-	restoretree();
+$(document).ready(function() {
+	{if $tree}
+		$( "#"+container ).html( {$tree} );
+	{elseif $nodes}
+		growbranches( {$nodes} );
+		storetree();	
+	{else}
+		buildtree(false);
+		//restoretree();
+	{/if}
+	
 });
 </script>
-{/literal}
 
 {include file="../shared/footer.tpl"}

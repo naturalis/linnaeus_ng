@@ -21,6 +21,13 @@ class TreeController extends Controller
 
 	public function treeAction()
 	{
+		$tree=$this->restoreTree();
+
+		if (is_null($tree))
+			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
+		else
+			$this->smarty->assign('tree',json_encode($tree));
+	
 		$this->printPage('tree');
 	}
 	
@@ -41,12 +48,7 @@ class TreeController extends Controller
 		else
 		if ($this->rHasVal('action', 'restore_tree'))
 		{
-	        $return=
-				json_encode(
-					isset($_SESSION['app'][$this->spid()]['species']['tree']) ? 
-						$_SESSION['app'][$this->spid()]['species']['tree'] : 
-						null
-				);
+	        $return=json_encode($this->restoreTree());
         }
         
         $this->allowEditPageOverlay = false;
@@ -55,6 +57,11 @@ class TreeController extends Controller
 
         $this->printPage('ajax_interface');
     }
+	
+	private function restoreTree()
+	{
+		return isset($_SESSION['app'][$this->spid()]['species']['tree']) ?  $_SESSION['app'][$this->spid()]['species']['tree'] : null;
+	}
 
 	private function treeGetTop()
 	{
