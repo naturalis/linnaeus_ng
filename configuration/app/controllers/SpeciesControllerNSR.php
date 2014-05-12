@@ -364,7 +364,7 @@ class SpeciesControllerNSR extends SpeciesController
 					array(
 						'id' => CTAB_DNA_BARCODES, 
 						'title' => $this->translate('DNA barcodes'), 
-						'is_empty' => $this->hasTaxonBarcodes($taxon),
+						'is_empty' => !$this->hasTaxonBarcodes($taxon),
 						'tabname' => 'CTAB_DNA_BARCODES'
 					)
 				);
@@ -1374,8 +1374,8 @@ class SpeciesControllerNSR extends SpeciesController
 			'columns' => 'count(*) as total',
 			'order'=> 'date'
 		));
-
-        return $d[0]['total']>1;
+		
+        return $d[0]['total']>0;
     }
 
 	private function reconstructQueryString()
