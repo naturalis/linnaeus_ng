@@ -49,7 +49,11 @@
 					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{/if}">
 					<a href="nsr_taxon.php?id={$classification[taxon].id}">
 						{if $classification[taxon].lower_taxon==1}
-							{$classification[taxon].specific_epithet} {$classification[taxon].infra_specific_epithet}
+							{if $classification[taxon].infra_specific_epithet}
+								{$classification[taxon].infra_specific_epithet}
+							{else}
+								{$classification[taxon].specific_epithet}
+							{/if}
 							{assign var=lastname value="`$classification[taxon].uninomial` `$classification[taxon].specific_epithet`"}
 						{else}
 							{$classification[taxon].name}
