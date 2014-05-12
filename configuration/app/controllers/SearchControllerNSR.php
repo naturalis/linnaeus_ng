@@ -102,7 +102,7 @@ class SearchControllerNSR extends SearchController
 
     public function recentPicturesAction()
     {
-		$results = $this->doRecentPictureSearch($this->requestData);
+		$results = $this->doPictureSearch(null);
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
@@ -665,7 +665,9 @@ class SearchControllerNSR extends SearchController
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		
-		$sort="_k.taxon asc";
+
+		$sort="_meta4.meta_date desc";
+		
 		if (isset($p['sort']) && $p['sort']=='photographer')
 			$sort="_c.meta_data asc";
 		else
@@ -800,145 +802,11 @@ class SearchControllerNSR extends SearchController
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
-		
+
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 		
 		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
 		
-	}
-
-	private function doRecentPictureSearch($p)
-	{
-		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
-		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-
-		$data=$this->models->MediaTaxon->freeQuery("		
-			select
-				_m.id,
-				_m.taxon_id,
-				file_name as image,
-				file_name as thumb,
-				_c.meta_data as photographer,
-				_k.taxon,
-				_z.name as common_name,
-				_j.uninomial,
-				_j.specific_epithet,
-				_j.infra_specific_epithet,
-				_j.authorship,		
-				concat(
-					if(_j.uninomial is null,'',concat(_j.uninomial,' ')),
-					if(_j.specific_epithet is null,'',concat(_j.specific_epithet,' ')),
-					if(_j.infra_specific_epithet is null,'',_j.infra_specific_epithet)
-				) as name,
-				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
-				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
-				_meta2.meta_data as meta_short_desc,
-				_meta3.meta_data as meta_geografie,
-				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
-				_meta5.meta_data as meta_copyrights,
-				_meta6.meta_data as meta_validator,
-				_meta7.meta_data as meta_adres_maker
-			
-			from  %PRE%media_taxon _m
-			
-			left join %PRE%media_meta _c
-				on _m.project_id=_c.project_id
-				and _m.id = _c.media_id
-				and _c.sys_label = 'beeldbankFotograaf'
-				and _c.language_id=".$this->getCurrentLanguageId()."
-		
-			left join %PRE%taxa _k
-				on _m.taxon_id=_k.id
-				and _m.project_id=_k.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			left join %PRE%names _z
-				on _m.taxon_id=_z.taxon_id
-				and _m.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-				and _z.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%names _j
-				on _m.taxon_id=_j.taxon_id
-				and _m.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-				
-			left join %PRE%media_meta _meta1
-				on _m.id=_meta1.media_id
-				and _m.project_id=_meta1.project_id
-				and _meta1.sys_label='beeldbankDatumVervaardiging'
-				and _meta1.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta2
-				on _m.id=_meta2.media_id
-				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijving'
-				and _meta2.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta3
-				on _m.id=_meta3.media_id
-				and _m.project_id=_meta3.project_id
-				and _meta3.sys_label='beeldbankLokatie'
-				and _meta3.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta4
-				on _m.id=_meta4.media_id
-				and _m.project_id=_meta4.project_id
-				and _meta4.sys_label='beeldbankDatumAanmaak'
-				and _meta4.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta5
-				on _m.id=_meta5.media_id
-				and _m.project_id=_meta5.project_id
-				and _meta5.sys_label='beeldbankCopyright'
-				and _meta5.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta6
-				on _m.id=_meta6.media_id
-				and _m.project_id=_meta6.project_id
-				and _meta6.sys_label='beeldbankValidator'
-				and _meta6.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta7
-				on _m.id=_meta7.media_id
-				and _m.project_id=_meta7.project_id
-				and _meta7.sys_label='beeldbankAdresMaker'
-				and _meta7.language_id=".$this->getCurrentLanguageId()."
-
-		where _m.id	in (
-
-			select
-				_m.id
-			
-			from  %PRE%media_taxon _m
-
-			left join %PRE%media_meta _meta4
-				on _m.id=_meta4.media_id
-				and _m.project_id=_meta4.project_id
-				and _meta4.sys_label='beeldbankDatumAanmaak'
-				and _meta4.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta9
-				on _m.id=_meta9.media_id
-				and _m.project_id=_meta9.project_id
-				and _meta9.sys_label='verspreidingsKaart'
-			
-			where _m.project_id =".$this->getCurrentProjectId()."
-				and ifnull(_meta9.meta_data,0)!=1
-			
-
-		) 
-			".(isset($limit) ? "limit ".$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
-		);
-		
-		$count=$this->models->MediaTaxon->freeQuery("select count(*) as total from %PRE%media_taxon where project_id =".$this->getCurrentProjectId());
-		
-		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
 	}
 
 	private function formatPictureResults($data)
