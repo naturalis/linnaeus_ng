@@ -50,7 +50,7 @@
 					<a href="nsr_taxon.php?id={$classification[taxon].id}">
 						{if $classification[taxon].lower_taxon==1}
 							{$classification[taxon].specific_epithet} {$classification[taxon].infra_specific_epithet}
-							{assign var=lastname value="`$classification[taxon].specific_epithet` `$classification[taxon].infra_specific_epithet`"}
+							{assign var=lastname value="`$classification[taxon].uninomial` `$classification[taxon].specific_epithet`"}
 						{else}
 							{$classification[taxon].name}
 							{assign var=lastname value=$classification[taxon].name}
