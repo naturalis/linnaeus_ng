@@ -336,6 +336,10 @@ html, body {
 	margin-top:25px;
 }
 
+#sideBarLogos img {
+	max-width:100px;
+}
+
 .verspreidingskaart {
 	margin-bottom:40px;
 }

@@ -67,6 +67,17 @@ class RdfController extends Controller
 							'id'=>$val['object_id']
 						)
 					));
+					
+					if (isset($data[0]['actor_id']))
+					{
+						$actor=$this->models->Actors->_get(array(
+							'id' => array(
+								'project_id'=>$this->getCurrentProjectId(),
+								'id'=>$data[0]['actor_id']
+							)
+						));
+						$data[0]['actor']=$actor[0];
+					}
 					break;
 				default : $data=null;
 			}

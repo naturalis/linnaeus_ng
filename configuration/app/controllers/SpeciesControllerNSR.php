@@ -87,9 +87,9 @@ class SpeciesControllerNSR extends SpeciesController
 					$this->smarty->assign('results',$this->getCollectedHigherTaxonMedia($this->requestData));	
 					$this->smarty->assign('mediaType','collected');
 				}
-
-			} else {
-
+			}
+			else
+			{
 				$content=$this->getTaxonContent(
 					array(
 						'taxon' => $taxon['id'], 
@@ -336,7 +336,6 @@ class SpeciesControllerNSR extends SpeciesController
 					species & lower should always show the media tab, even
 					if there is no media, to be able to show the upload link
 				*/
-
 				if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
 				{
 					$isEmpty=false;
@@ -347,7 +346,6 @@ class SpeciesControllerNSR extends SpeciesController
 					$isEmpty=$d['count']==0;
 				}
 
-				
 				array_push($categories,
 					array(
 						'id' => CTAB_MEDIA, 
@@ -688,9 +686,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$data[$key]['photographer']=$val['photographer'];
 			$data[$key]['label']=
-				$val['photographer'].', '.
-				$val['meta_datum'].', '.
-				$val['meta_geografie'];
+				trim(
+					(isset($val['photographer']) ? $val['photographer'].', ' : '' ).
+					(isset($val['meta_datum']) ? $val['meta_datum'].', ' : '' ).
+					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
+					', '
+				);
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 			
 		}
@@ -1422,7 +1423,7 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$exts=array('png','jpg','PNG','JPG','gif','GIF');
 		$d=array();
-		
+//		q($name,1);
 		foreach($exts as $ext)
 		{
 			array_push($d,$name.'.'.$ext,strtolower($name).'.'.$ext,$name.'-logo.'.$ext,strtolower($name).'-logo.'.$ext);
@@ -1438,7 +1439,7 @@ class SpeciesControllerNSR extends SpeciesController
 				break;
 			} 
 		}
-			
+
 		return $logo;
 	}
 
