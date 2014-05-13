@@ -312,12 +312,13 @@ class Controller extends BaseClass
         if ($this->rHasVal('p')) {
             $this->resolveProjectId();
         }
-        elseif ($this->rHasVal($this->generalSettings['addedProjectIDParam'])) {
-
+        else
+		if ($this->rHasVal($this->generalSettings['addedProjectIDParam']))
+		{
             $this->requestData['p'] = $this->requestData[$this->generalSettings['addedProjectIDParam']];
-
             $this->resolveProjectId();
         }
+
         $d = $this->getCurrentProjectId();
 
         if ($d == null)
@@ -3019,16 +3020,14 @@ class Controller extends BaseClass
 
 
 
-    private function getProjectFSCode ($p = null)
+    public function getProjectFSCode($p = null)
     {
         $p = is_null($p) ? $this->getCurrentProjectId() : $p;
-        
         return sprintf('%04s', $p);
     }
 
 
-
-    public function setStoreHistory ($state)
+    public function setStoreHistory($state)
     {
         $this->storeHistory = $state;
     }
@@ -3085,7 +3084,9 @@ class Controller extends BaseClass
 	*/
     private function restoreState ()
     {
-		
+		if ($this->getSetting('suppress_restore_state')==1)
+			return;
+			
 		if ($this->getControllerBaseName() == 'mapkey')
 			return;
 		

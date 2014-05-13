@@ -83,7 +83,7 @@
 				<div>
 					<p>&nbsp;</p>
 					<p>
-						Heeft u mooie foto's van deze soort? Voeg ze dan <a href="">hier</a> toe en draag zo bij aan het Soortenregister..
+						<!-- Heeft u mooie foto's van deze soort? Voeg ze dan <a href="">hier</a> toe en draag zo bij aan het Soortenregister.. -->
 					</p>
 				</div>
 				{/if}
@@ -126,7 +126,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					<table>
 						{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" onmouseover="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information_one_line|@escape}</p>');">{$presenceData.presence_index_label}</span>){/if}</td></tr>{/if}
 						{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
-						{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
+						{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label}</a></td></tr>{/if}
 						{* if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
 						{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 						{if $statusRodeLijst}<tr><td>Status rode lijst</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
@@ -254,7 +254,16 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{if $v.nametype=='isValidNameOf' && $taxon.base_rank_id<$smarty.const.SPECIES_RANK_ID}
 							<tr><td>{$v.nametype_label|@ucfirst}</td><td><b>{$v.name}</b></td></tr>
 						{else}
+							{if $v.language_id==$smarty.const.LANGUAGE_ID_SCIENTIFIC && $v.nametype!='isValidNameOf'}
+							{assign var=another_name value="`$v.uninomial` `$v.specific_epithet` `$v.infra_specific_epithet`"}
+							{if $another_name!=''}
+								<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>
+							{else}
+								<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+							{/if}
+							{else}
 							<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+							{/if}
 						{/if}
 					{/foreach}
 					{if $expert || $organisation}
@@ -378,16 +387,15 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				{$smarty.capture.authors}
 			</p>
 			{/if}
-
 			{assign var=hasReferences value=false}
 			{capture name=references}
 			{foreach from=$rdf item=v}
-				{if $v.predicate=='hasReference'}
+				{if $v.predicate=='hasReference' && $v.data.citation!=''}
 				{assign var=hasReferences value=true}
 				<li><a href="../literature2/reference.php?id={$v.data.id}">{$v.data.citation}</a></li>
-				{elseif $v.object_type=='reference'}
+				{elseif $v.object_type=='reference' && $v.data.label!=''}
 				{assign var=hasReferences value=true}
-				<li><a href="../literature2/reference.php?id={$v.data.id}">{$v.data.source}, {$v.data.label}</a></li>
+				<li>{if $v.data.actor.name}{$v.data.actor.name} {$v.data.date}{else}{$v.data.source}{/if}. <a href="../literature2/reference.php?id={$v.data.id}">{$v.data.label}</a></li>
 				{/if}
 			{/foreach}
 			{/capture}

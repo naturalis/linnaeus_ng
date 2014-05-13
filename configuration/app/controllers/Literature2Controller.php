@@ -67,13 +67,13 @@ class Literature2Controller extends Controller
 				_a.citation,
 				_a.source,
 				_a.publishedin,
-	_a.publishedin_id,
-	_c.name as publishedin_actor_name,
+				_a.publishedin_id,
+				_c.label as publishedin_name,
 				_a.pages,
 				_a.volume,
 				_a.periodical,
-	_a.periodical_id,
-	_d.name as periodical_actor_name,
+				_a.periodical_id,
+				_d.label as periodical_name,
 				_a.language_id,
 				_e.label as language_name,
 				_a.external_link
@@ -84,13 +84,13 @@ class Literature2Controller extends Controller
 				on _a.actor_id = _b.id 
 				and _a.project_id=_b.project_id
 
-	left join %PRE%actors _c
-		on _a.publishedin_id = _c.id 
-		and _a.project_id=_c.project_id
-		
-	left join %PRE%actors _d
-		on _a.periodical_id = _d.id 
-		and _a.project_id=_d.project_id
+			left join %PRE%literature2 _c
+				on _a.publishedin_id = _c.id 
+				and _a.project_id=_c.project_id
+				
+			left join %PRE%literature2 _d
+				on _a.periodical_id = _d.id 
+				and _a.project_id=_d.project_id
 				
 			left join %PRE%labels_languages _e
 				on _a.language_id = _e.language_id 

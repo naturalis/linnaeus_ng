@@ -20,16 +20,26 @@
 
 				{if $ref.date}<tr><td>Jaar</td><td>{$ref.date}</td></tr>{/if}
 				{if $ref.label}<tr><td>Titel</td><td>{$ref.label}</td></tr>{/if}
-				{if $ref.publishedin_actor_name}<tr><td>Uitgever</td><td>{$ref.publishedin_actor_name}</td></tr>{/if}
 
-				{if $ref.periodical}<tr><td>Periodiek</td><td>{$ref.periodical}</td></tr>{/if}
+				{if $ref.publishedin || $ref.publishedin_name}
+				<tr>
+					<td>Gepubliceerd in</td>
+					<td>{if $ref.publishedin_id}<a href="?id={$ref.publishedin_id}">{/if}
+						{if $ref.publishedin}{$ref.publishedin}{else}{$ref.publishedin_name}{/if}
+						{if $ref.publishedin_id}</a>{/if}
+					</td>
+				</tr>
+				{/if}
 
-{*
-				_a.periodical,
-				_a.periodical_actor_id,
-				_d.name as periodical_actor_name,
-*}
-
+				{if $ref.periodical || $ref.periodical_name}
+				<tr>
+					<td>Periodiek</td>
+					<td>{if $ref.periodical_id}<a href="?id={$ref.periodical_id}">{/if}
+						{if $ref.periodical}{$ref.periodical}{else}{$ref.periodical_name}{/if}
+						{if $ref.periodical_id}</a>{/if}
+					</td>
+				</tr>
+				{/if}
 
 				{if $ref.volume}<tr><td>Volume</td><td>{$ref.volume}</td></tr>{/if}
 				{if $ref.pages}<tr><td>Pagina's</td><td>{$ref.pages}</td></tr>{/if}
@@ -38,8 +48,6 @@
 				</tbody>
 			</table>
 		</div>
-
-
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
