@@ -11,7 +11,7 @@
 	<div id="content">
 	
 		<div id="results">
-			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:-13px;border-bottom:1px solid #666666;margin-bottom:5px;">Zoekresultaten</h1>
+			<h1 style="width:500px;color:#FA7001;font-size:30px;font-weight:normal;margin-top:-13px;border-bottom:1px solid #666666;margin-bottom:5px;">Zoekresultaten</h1>
 			<h4>
 				Gezocht op "{$search.search}": <span id="resultcount-header">{$results.count}</span>
 			</h4>
