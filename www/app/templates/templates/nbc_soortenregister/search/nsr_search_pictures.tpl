@@ -15,12 +15,6 @@
 			{include file="_validators.tpl"}
 
 		</div>  
-		
-		<p style="margin-top:25px;padding-top:5px;border-top:1px solid black">
-		<a href="nsr_recent_pictures.php">Meer recente afbeeldingen</a><br />
-		<a href="../webservices/statistics.php?pid=1" target="_new">Statistieken</a>
-		</p>
-
 
 	</div>
 
