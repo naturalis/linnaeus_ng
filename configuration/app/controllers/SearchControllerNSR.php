@@ -102,7 +102,7 @@ class SearchControllerNSR extends SearchController
 
     public function recentPicturesAction()
     {
-		$results = $this->doPictureSearch();
+		$results = $this->doPictureSearch(null);
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
@@ -641,7 +641,7 @@ class SearchControllerNSR extends SearchController
 		return $validators;		
 	}
 
-	private function doPictureSearch()
+	private function doPictureSearch($p)
 	{
 		$group_id=null;
 
