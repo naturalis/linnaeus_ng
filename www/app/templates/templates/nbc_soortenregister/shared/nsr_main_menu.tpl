@@ -1,4 +1,4 @@
-{assign var=server value="http://162.13.180.73"}
+{assign var=server value=""}
 
 <div class="content">
 	<ul class="menu clearfix"><li class="first leaf"><a class="active" href="{$server}/">Home</a></li>

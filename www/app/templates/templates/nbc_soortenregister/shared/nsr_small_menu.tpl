@@ -1,4 +1,4 @@
-{assign var=server value="http://162.13.180.73"}
+{assign var=server value=""}
 
 {literal}
 <style>
