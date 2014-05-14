@@ -9,11 +9,6 @@
 
 	<title>Nederlands Soortenregister - {$session.app.project.title|@strip_tags:false}</title>
 
-    <!-- link rel="home" title="Homepage" href="http://www.nederlandsesoorten.nl/nsr/nsr/i000000.html" />
-    <link rel="help" title="Help" href="http://www.nederlandsesoorten.nl/nsr/nsr/help.html" />
-    <link rel="copyright" title="Copyright statement" href="http://www.nederlandsesoorten.nl/nsr/nsr/copyright.html" />
-    <link rel="search" title="Zoeken" href="http://www.nederlandsesoorten.nl/nsr/nsr/zoeken.html" / -->
-
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
 
     <link rel="stylesheet" type="text/css" media="print" title="default" href="{$projectUrls.projectCSS}20120928_print.css" />
