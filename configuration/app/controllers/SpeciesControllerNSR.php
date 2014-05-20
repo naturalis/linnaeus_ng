@@ -711,169 +711,160 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if (empty($id))
 			return;
+	
+		$data=$this->models->Taxon->freeQuery("		
+			select
+				SQL_CALC_FOUND_ROWS
+				_q.taxon_id,
+				_m.file_name as image,
+				_m.file_name as thumb,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
+				_z.name,
+				_meta8.meta_data as photographer
+			
+			from
+				%PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+				and _m.id = (
+					select 
+						_m.id
+					from
+						%PRE%media_taxon _m
 
-		$data=$this->getSessionVar(array('collected-higher-taxa-media',$id));
+					left join %PRE%media_meta _meta4
+						on _m.id=_meta4.media_id
+						and _m.project_id=_meta4.project_id
+						and _meta4.sys_label='beeldbankDatumAanmaak'
+
+					left join %PRE%media_meta _meta9
+						on _m.id=_meta9.media_id
+						and _m.project_id=_meta9.project_id
+						and _meta9.sys_label='verspreidingsKaart'
+						
+					where 
+						_m.taxon_id = _q.taxon_id 
+						and ifnull(_meta9.meta_data,0)!=1
+						and _m.project_id=".$this->getCurrentProjectId()." 
+					order by
+						_meta4.meta_date desc
+					limit 1
+				)
+
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
+			left join %PRE%names _z
+				on _q.taxon_id=_z.taxon_id
+				and _q.project_id=_z.project_id
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _j
+				on _m.taxon_id=_j.taxon_id
+				and _m.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
+			left join %PRE%media_meta _meta8
+				on _m.id=_meta8.media_id
+				and _m.project_id=_meta8.project_id
+				and _meta8.sys_label='beeldbankFotograaf'
 		
-		if (is_null($data)) 
-		{
-	
-			$data=$this->models->Taxon->freeQuery("		
-				select
-					SQL_CALC_FOUND_ROWS
-					_q.taxon_id,
-					_m.file_name as image,
-					_m.file_name as thumb,
-					trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
-					_z.name,
-					_meta8.meta_data as photographer
-				
-				from
-					%PRE%taxon_quick_parentage _q
-				
-				right join %PRE%media_taxon _m
-					on _q.taxon_id=_m.taxon_id
-					and _q.project_id=_m.project_id
-					and _m.id = (
-						select 
-							_m.id
-						from
-							%PRE%media_taxon _m
-	
-						left join %PRE%media_meta _meta4
-							on _m.id=_meta4.media_id
-							and _m.project_id=_meta4.project_id
-							and _meta4.sys_label='beeldbankDatumAanmaak'
-	
-						left join %PRE%media_meta _meta9
-							on _m.id=_meta9.media_id
-							and _m.project_id=_meta9.project_id
-							and _meta9.sys_label='verspreidingsKaart'
-							
-						where 
-							_m.taxon_id = _q.taxon_id 
-							and ifnull(_meta9.meta_data,0)!=1
-							and _m.project_id=".$this->getCurrentProjectId()." 
-						order by
-							_meta4.meta_date desc
-						limit 1
-					)
-	
-				left join %PRE%taxa _k
-					on _q.taxon_id=_k.id
-					and _q.project_id=_k.project_id
-					
-				left join %PRE%projects_ranks _f
-					on _k.rank_id=_f.id
-					and _k.project_id=_f.project_id
-	
-				left join %PRE%names _z
-					on _q.taxon_id=_z.taxon_id
-					and _q.project_id=_z.project_id
-					and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
-					and _z.language_id=".LANGUAGE_ID_DUTCH."
-	
-				left join %PRE%names _j
-					on _m.taxon_id=_j.taxon_id
-					and _m.project_id=_j.project_id
-					and _j.type_id=(select id from %PRE%name_types where project_id = ".
-						$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
-					and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-	
-				left join %PRE%media_meta _meta8
-					on _m.id=_meta8.media_id
-					and _m.project_id=_meta8.project_id
-					and _meta8.sys_label='beeldbankFotograaf'
-			
-				where
-					_q.project_id=".$this->getCurrentProjectId()."
-					and _f.rank_id >= ".SPECIES_RANK_ID."
-					and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-	
-				order by taxon
-				".(isset($limit) ? "limit ".$limit : "")."
-				".(isset($offset) & isset($limit) ? "offset ".$offset : "")
-				);
-			
-			$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
-	
-			$totalCount=$this->models->Taxon->freeQuery("		
-				select
-					count(*) as total
-				
-				from
-					%PRE%taxon_quick_parentage _q
-				
-				right join %PRE%media_taxon _m
-					on _q.taxon_id=_m.taxon_id
-					and _q.project_id=_m.project_id
-	
-				left join %PRE%media_meta _meta9
-					on _m.id=_meta9.media_id
-					and _m.project_id=_meta9.project_id
-					and _meta9.sys_label='verspreidingsKaart'
-	
-				left join %PRE%taxa _k
-					on _q.taxon_id=_k.id
-					and _q.project_id=_k.project_id
-					
-				left join %PRE%projects_ranks _f
-					on _k.rank_id=_f.id
-					and _k.project_id=_f.project_id
-	
-				where
-					_q.project_id=".$this->getCurrentProjectId()."
-					and ifnull(_meta9.meta_data,0)!=1
-					and _f.rank_id >= ".SPECIES_RANK_ID."
-					and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-				"
+			where
+				_q.project_id=".$this->getCurrentProjectId()."
+				and _f.rank_id >= ".SPECIES_RANK_ID."
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+
+			order by taxon
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 			);
-	
-			$species=$this->models->Taxon->freeQuery("		
-				select
-					count(distinct _m.taxon_id) as total
-				
-				from
-					%PRE%taxon_quick_parentage _q
-				
-				right join %PRE%media_taxon _m
-					on _q.taxon_id=_m.taxon_id
-					and _q.project_id=_m.project_id
-	
-				left join %PRE%media_meta _meta9
-					on _m.id=_meta9.media_id
-					and _m.project_id=_meta9.project_id
-					and _meta9.sys_label='verspreidingsKaart'
-	
-				left join %PRE%taxa _k
-					on _q.taxon_id=_k.id
-					and _q.project_id=_k.project_id
-					
-				left join %PRE%projects_ranks _f
-					on _k.rank_id=_f.id
-					and _k.project_id=_f.project_id
-	
-				where
-					_q.project_id=".$this->getCurrentProjectId()."
-					and ifnull(_meta9.meta_data,0)!=1
-					and _f.rank_id >= ".SPECIES_RANK_ID."
-					and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
-				"
-			);
+		
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+
+		$totalCount=$this->models->Taxon->freeQuery("		
+			select
+				count(*) as total
 			
-			$data= 
-				array(
-					'count'=>$count[0]['total'],
-					'totalCount'=>$totalCount[0]['total'],
-					'species'=>$species[0]['total'],
-					'data'=>$data,
-					'perpage'=>$this->_resPicsPerPage
-				);
+			from
+				%PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
 				
-			$this->setSessionVar(array('collected-higher-taxa-media',$id),$data);
-		}
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
+			where
+				_q.project_id=".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
+				and _f.rank_id >= ".SPECIES_RANK_ID."
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+			"
+		);
+
+		$species=$this->models->Taxon->freeQuery("		
+			select
+				count(distinct _m.taxon_id) as total
+			
+			from
+				%PRE%taxon_quick_parentage _q
+			
+			right join %PRE%media_taxon _m
+				on _q.taxon_id=_m.taxon_id
+				and _q.project_id=_m.project_id
+
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+
+			left join %PRE%taxa _k
+				on _q.taxon_id=_k.id
+				and _q.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
+			where
+				_q.project_id=".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
+				and _f.rank_id >= ".SPECIES_RANK_ID."
+				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+			"
+		);
+		
+		$data= 
+			array(
+				'count'=>$count[0]['total'],
+				'totalCount'=>$totalCount[0]['total'],
+				'species'=>$species[0]['total'],
+				'data'=>$data,
+				'perpage'=>$this->_resPicsPerPage
+			);
 
 		return $data;
-	
 	}
 
 	private function _getTaxonClassification($id)
