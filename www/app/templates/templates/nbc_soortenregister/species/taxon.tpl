@@ -71,11 +71,16 @@
 							</dl>
 						</div>
 					{/foreach}
-					
+
 				{/if}
 				</div>
 
+				{if $mediaType=='collected'}
+				{assign var=pgnResultCount value=$results.totalCount}
+				{else}
 				{assign var=pgnResultCount value=$results.count}
+				{/if}
+
 				{assign var=pgnResultsPerPage value=$results.perpage}
 				{assign var=pgnCurrPage value=$search.page}
 				{assign var=pgnURL value=$smarty.server.PHP_SELF}
