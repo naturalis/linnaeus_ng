@@ -16,20 +16,20 @@ function nbcPrettyPhotoInit() {
 }
 
 function prettyPhotoCycle()
-			{
-				var id_last=$('#results-per-page').val() ? $('#results-per-page').val()-1 : 0;
-				var link_prev=$('#paginator-prev-link').attr('href') ? $('#paginator-prev-link').attr('href')+'#prettyPhoto[gallery]/'+id_last+'/' : null;
-				var link_next=$('#paginator-next-link').attr('href') ? $('#paginator-next-link').attr('href')+'#prettyPhoto[gallery]/0/' : null;
-				
-				if (set_position==0 && link_prev)
-				{
-					$('.pp_previous').unbind().bind('click',function(){window.open(link_prev,'_self')});
-				} else
-				if (set_position==$(pp_images).size()-1 && link_next)
-				{
-					$('.pp_next').unbind().bind('click',function(){window.open(link_next,'_self')});
-				}
-			}
+{
+	var id_last=$('#results-per-page').val() ? $('#results-per-page').val()-1 : 0;
+	var link_prev=$('#paginator-prev-link').attr('href') ? $('#paginator-prev-link').attr('href')+'#prettyPhoto[gallery]/'+id_last+'/' : null;
+	var link_next=$('#paginator-next-link').attr('href') ? $('#paginator-next-link').attr('href')+'#prettyPhoto[gallery]/0/' : null;
+	
+	if (set_position==0 && link_prev)
+	{
+		$('.pp_previous').unbind().bind('click',function(){window.open(link_prev,'_self')});
+	} else
+	if (set_position==$(pp_images).size()-1 && link_next)
+	{
+		$('.pp_next').unbind().bind('click',function(){window.open(link_next,'_self')});
+	}
+}
 
 
 function retrieveSuggestions()

@@ -57,6 +57,9 @@
 					<div>
 
 					{foreach from=$results.data item=v}
+						{if $search.img && $search.img==$v.image}
+							{$pp_popup=[{$v.image},{$v.meta_data}]}
+						{/if}
 						<div class="imageInGrid3 taxon-page">
 							<div class="thumbContainer">
 								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
@@ -417,24 +420,26 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 </div>
 
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
+$(document).ready(function() {
 	if(jQuery().prettyPhoto) {
-	 	$("a[rel^='prettyPhoto']").prettyPhoto({
+	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 
 	 		opacity: 0.70, 
 			animation_speed:50,
 			show_title: false,
 	 		overlay_gallery: false,
 	 		social_tools: false,
-			changepicturecallback:function(){prettyPhotoCycle();}
-	 	});
+			changepicturecallback:function() { prettyPhotoCycle(); }
+	 	} );
 	}
 	
-	$('img[class=intern]').each(function(){$(this).remove();})
+	$('img[class=intern]').each(function() { $(this).remove(); } )
 	
-});
+	{if $pp_popup}
+	$.prettyPhoto.open('http://images.naturalis.nl/comping/{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
+	{/if}
+} );
 </script>
-{/literal}
+
 
 {include file="../shared/footer.tpl"}
