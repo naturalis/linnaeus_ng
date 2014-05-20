@@ -4,11 +4,44 @@ include_once ('SpeciesController.php');
 
 class TreeController extends Controller
 {
+    public $usedModels = array(
+		'name_types'
+    );
+	
+	private $_idPreferredName=0;
+	private $_idValidName=0;
+		
     public function __construct()
     {
         parent::__construct();
+		$this->initialise();
 	}
+	
+	private function initialise()
+	{
+		$d=$this->models->NameTypes->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'nametype' => PREDICATE_PREFERRED_NAME,
+				'language_id' => $this->getCurrentLanguageId()
+			)
+		));
+		
+		if ($d) $this->_idPreferredName=$d[0]['id'];
+		
+		$d=$this->models->NameTypes->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'nametype' => PREDICATE_VALID_NAME,
+				'language_id' => LANGUAGE_ID_SCIENTIFIC
+			)
+		));
+		
+		if ($d) $this->_idValidName=$d[0]['id'];
 
+	}
+					
+					
     public function __destruct()
     {
         parent::__destruct();
@@ -125,6 +158,7 @@ class TreeController extends Controller
 					_a.rank_id,
 					_a.taxon,
 					ifnull(_k.name,_l.commonname) as name,
+					_m.authorship,
 					_r.rank,
 					_q.label as rank_label,
 					_p.rank_id as base_rank
@@ -152,17 +186,12 @@ class TreeController extends Controller
 				left join %PRE%names _k
 					on _a.id=_k.taxon_id
 					and _a.project_id=_k.project_id
-					and _k.type_id=
-					(
-						select 
-							id 
-						from 
-							%PRE%name_types 
-						where 
-							project_id = ".$this->getCurrentProjectId()." 
-							and nametype='".PREDICATE_PREFERRED_NAME."'
-					)
-					and _k.language_id=".$this->getCurrentLanguageId()."
+					and _k.type_id=".$this->_idPreferredName."
+	
+				left join %PRE%names _m
+					on _a.id=_m.taxon_id
+					and _a.project_id=_m.project_id
+					and _m.type_id=".$this->_idValidName."
 	
 				where 
 					_a.project_id = ".$this->getCurrentProjectId()." 
@@ -172,8 +201,6 @@ class TreeController extends Controller
 					label
 			");
 			
-			//q($taxa,1);
-		
 		$taxon=$progeny=array();
 
 		foreach((array)$taxa as $key=>$val)
@@ -250,10 +277,19 @@ class TreeController extends Controller
 				$val['child_count']=null;
 			}
 			
-			
 			if ($val['base_rank']>=SPECIES_RANK_ID)
 			{
-				$val['taxon']=$this->formatTaxon($val);
+				if ($val['authorship']!='')
+				{
+					$val['taxon']=
+						'<i>'.
+						str_replace($val['authorship'],'',$val['taxon']).
+						'</i>'.' '.$val['authorship'];
+				}
+				else
+				{
+					$val['taxon']=$this->formatTaxon($val);
+				}
 			}
 
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
