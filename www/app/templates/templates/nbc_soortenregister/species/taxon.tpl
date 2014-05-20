@@ -248,24 +248,24 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NAAMGEVING}
 					
 			<p>
-				<h2>Naamgeving</h2>
+				<h2 id="name-header">Naamgeving</h2>
 				
-				<table>
+				<table id="names-table">
 					{foreach from=$names.list item=v}
 						{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
 						{if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
 						{if $v.nametype=='isValidNameOf' && $taxon.base_rank_id<$smarty.const.SPECIES_RANK_ID}
-							<tr><td>{$v.nametype_label|@ucfirst}</td><td><b>{$v.name}</b></td></tr>
+							<tr><td style="white-space:nowrap">{$v.nametype_label|@ucfirst}</td><td><b>{$v.name}</b></td></tr>
 						{else}
 							{if $v.language_id==$smarty.const.LANGUAGE_ID_SCIENTIFIC && $v.nametype!='isValidNameOf'}
 							{assign var=another_name value="`$v.uninomial` `$v.specific_epithet` `$v.infra_specific_epithet`"}
 							{if $another_name!=''}
-								<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>
+								<tr><td style="white-space:nowrap">{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>
 							{else}
-								<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+								<tr><td style="white-space:nowrap">{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
 							{/if}
 							{else}
-							<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+							<tr><td style="white-space:nowrap">{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
 							{/if}
 						{/if}
 					{/foreach}
@@ -434,6 +434,21 @@ $(document).ready(function() {
 	}
 	
 	$('img[class=intern]').each(function() { $(this).remove(); } )
+
+	{if $taxon.NsrId!=''}
+	$('#name-header').on( 'click' , function(event) { 
+	
+		if ($('#nsr-id-row').html()==undefined)
+		{
+			if (event.altKey!==true) return;
+			$('#names-table').append('<tr id="nsr-id-row"><td>NSR ID</td><td>{$taxon.NsrId}</td></tr>');
+		}
+		else
+		{
+			$('#nsr-id-row').toggle();
+		}
+	});
+	{/if}
 	
 	{if $pp_popup}
 	$.prettyPhoto.open('http://images.naturalis.nl/comping/{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
