@@ -55,14 +55,17 @@ class SpeciesControllerNSR extends SpeciesController
     public function taxonAction()
     {
         if ($this->rHasId())
-            $taxon = $this->getTaxonById($this->requestData['id']);
+		{
+            $taxon = $this->getTaxonById($this->rGetVal('id'));
+			$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
+		}
 
         if (!empty($taxon))
 		{
 			
 			$sideBarLogos=array();
 
-			$reqCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
+			$reqCat=$this->rHasVal('cat') ? $this->rGetVal('cat') : null;
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 
