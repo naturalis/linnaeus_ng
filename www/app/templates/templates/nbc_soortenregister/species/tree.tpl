@@ -172,7 +172,12 @@ li.child.no-expand {
 {/literal}
 <div id="dialogRidge">
 
-	{include file="_left_column.tpl"}
+	<div id="left">
+        <div>
+            <h2>&nbsp;</h2>
+        </div>
+	</div>
+
 
 	<div id="content" class="taxon-detail">
 
