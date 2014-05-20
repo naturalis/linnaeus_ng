@@ -9,8 +9,7 @@ class WebservicesController extends Controller
 	private $_taxonId=null;
 	private $_project=null;
 	private $_matchType=null;
-	private $_useOldNsrLinks=false;
-	private $_taxonUrl=null;
+	private $_taxonUrl='/linnaeus_ng_nsr/app/views/species/nsr_taxon.php?epi=1&id=%s';
 	private $_thumbBaseUrl='http://images.naturalis.nl/thumb/';
 	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
 	private $_JSONPCallback=false;
@@ -100,12 +99,8 @@ parameters:
 					_b.nametype,
 					_a.taxon_id, 
 					_d.taxon, 
-					_f.default_label as rank,".
-				($this->_useOldNsrLinks ?
-					"concat('http://www.nederlandsesoorten.nl/',replace(_i.nsr_id,'tn.nlsr.','nsr/'))" :
-					"concat('".$url."',_a.taxon_id)"
-				)."
-					 as url,
+					_f.default_label as rank,
+					concat('".$url."',_a.taxon_id) as url,
 					_h.id as taxon_valid_name_id
 				from %PRE%names _a
 				
@@ -118,7 +113,7 @@ parameters:
 				left join %PRE%name_types _g on _a.project_id=_g.project_id and _g.nametype='isValidNameOf'
 				left join %PRE%names _h on _h.taxon_id=_a.taxon_id and _h.type_id=_g.id and _a.project_id=_h.project_id
 
-				left join %PRE%ids _i on _a.project_id=_i.project_id and _a.taxon_id=_i.lng_id and _i.item_type='taxon'
+				left join %PRE%nsr_ids _i on _a.project_id=_i.project_id and _a.taxon_id=_i.lng_id and _i.item_type='taxon'
 
 				where _a.project_id=".$this->getCurrentProjectId()."
 				and (
@@ -133,6 +128,7 @@ parameters:
 		}
 
 		$names = $this->models->Names->freeQuery($query);
+		if (is_null($names)) $names=array();
 
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
@@ -160,7 +156,7 @@ parameters:
 		$this->printOutput();
 	}
 
-	public function taxonAction()
+	public function taxonAction()	
 	{
 		$this->_usage=
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>
@@ -385,6 +381,7 @@ parameters:
 
 	public function lastImageAction()
 	{
+		// returns 1 of the last $poolSize images
 		$poolSize=20;
 
 		$this->_usage=
@@ -403,11 +400,6 @@ parameters:
 		{
 			$poolSize=$this->rGetVal('size');
 		}
-
-		// returns 1 of the last $poolSize images
-
-
-		// pid is mandatory, now checked in initialise()
 
 		if (is_null($this->getCurrentProjectId())) {
 			$this->sendErrors();
@@ -464,6 +456,7 @@ parameters:
 				_a.taxon_id,
 				_a.id as media_id,
 				concat('".$this->_190x100BaseUrl."',_a.file_name) as url_image,
+				_a.file_name,
 				_b.meta_data as copyright,
 				_d.meta_data as fotograaf,
 				date_format(_e.meta_date,'%e %M %Y') as date_created,
@@ -516,13 +509,11 @@ parameters:
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
 
-		$result['url_recent_images']=$this->makeNsrRecentImagesLink();
-
+		$result['url_recent_images']='http://'.$_SERVER['HTTP_HOST'].'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
 	
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
-		// to be done!
-		$result['image']['url_image_popup']=$result['image']['url_taxon'];
+		$result['image']['url_image_popup']=$this->makeNsrMediaLink()."&img=".$media[0]['file_name'];
 
 		$result['labels']=array(
 			'taxon_link'=>$this->translate('Bekijk alle gegevens'),
@@ -883,8 +874,7 @@ parameters:
 		$this->printOutput();
 	}
 	
-	
-	
+
     private function initialise()
     {
 		$this->useCache=false;
@@ -892,14 +882,10 @@ parameters:
 
 		if (is_null($this->getCurrentProjectId()))
 		{
-
 			$this->addError('cannot get project settings.');
-
 		} 
 		else 
 		{
-			$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
-			$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
 			$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
 			$this->checkJSONPCallback();
 		}
@@ -1119,6 +1105,17 @@ parameters:
 	}
 	
 
+	private function makeNsrLink()
+	{
+		return sprintf($this->_taxonUrl,$this->getTaxonId());
+	}
+
+	private function makeNsrMediaLink()
+	{
+		return $this->makeNsrLink().'&cat=media';
+	}
+
+
 	private function sendErrors()
 	{
 		$this->_usage = $this->_usage."  
@@ -1127,7 +1124,6 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 		$this->setJSON(json_encode(array('errors'=>$this->errors,'usage'=>$this->_usage)));
 		$this->printOutput(true);
 	}
-
 
 	private function printOutput($suppressJSONP=false)
 	{
@@ -1146,55 +1142,5 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 		$this->smarty->assign('json',$this->_JSON);
 		$this->printPage('template');
 	}
-
-
-
-	/*
-		NSR project specific, should be changed once NSR migration is complete
-	*/
-	private function makeNsrLink()
-	{
-		if (!$this->_useOldNsrLinks) {
-
-			return sprintf($this->_taxonUrl,$this->getTaxonId());
-
-		} else {
-
-			$ids = $this->models->NsrIds->_get(
-				array('id'=>
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'lng_id' => $this->getTaxonId(),
-						'item_type' => 'taxon'
-					)
-				)
-			);
-
-			return 'http://www.nederlandsesoorten.nl/'.str_replace('tn.nlsr.','nsr/',$ids[0]['nsr_id']);
-		}
-
-	}
-
-	private function makeNsrMediaLink()
-	{
-		if (!$this->_useOldNsrLinks)
-			return $this->makeNsrLink().'&cat=media';
-		else
-			return $this->makeNsrLink().'/imagesAndSounds';
-	}
-
-	private function makeNsrRecentImagesLink()
-	{
-		if (!$this->_useOldNsrLinks)
-			return 'http://'.$_SERVER['HTTP_HOST'].'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
-		else
-			return 'http://www.nederlandsesoorten.nl/nsr/nsr/recentImages.html';
-	}
-
-
-
-
-
-
 
 }
