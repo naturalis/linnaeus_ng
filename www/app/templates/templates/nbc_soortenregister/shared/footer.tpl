@@ -12,7 +12,6 @@
     </div>
 </div>
 
-
 <!-- div id="allLookupList" class="allLookupListInvisible"></div -->
 
 <div id="jDialog" title="" class="ui-helper-hidden"></div>
