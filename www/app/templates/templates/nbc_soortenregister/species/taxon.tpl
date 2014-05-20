@@ -80,7 +80,6 @@
 				{else}
 				{assign var=pgnResultCount value=$results.count}
 				{/if}
-
 				{assign var=pgnResultsPerPage value=$results.perpage}
 				{assign var=pgnCurrPage value=$search.page}
 				{assign var=pgnURL value=$smarty.server.PHP_SELF}
