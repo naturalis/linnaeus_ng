@@ -657,9 +657,12 @@ class ImportNBCController extends ImportController
 			foreach((array)$settings as $key => $val)
 				$this->saveSetting(array('name' => $key, 'value' => $val, 'pId' => $this->getNewProjectId()));			
 	
-			foreach((array)$this->requestData['settings'] as $key => $val) {
-				if (!empty($val))
-					$this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));			
+			if (isset($this->requestData['settings']))
+			{
+				foreach((array)$this->requestData['settings'] as $key => $val) {
+					if (!empty($val))
+						$this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));			
+				}
 			}
 
 		/*			
@@ -816,7 +819,7 @@ class ImportNBCController extends ImportController
 
 				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
 					
-					if (empty($val[0])||empty($val[1]))
+					if (empty($val[1]))
 						continue;
 
 					// get the character that matches the 'kenmerk'-label (col 2; col 1 is the group, which is ignored here)
@@ -1567,7 +1570,8 @@ class ImportNBCController extends ImportController
 				// find parent by sci name
 				$d = $this->getTaxonByName($val['parent_name']);
 					
-				if ($d) { 
+				if ($d[0]['id'])
+				{ 
 
 					$parent = $d[0]['id'];
 				

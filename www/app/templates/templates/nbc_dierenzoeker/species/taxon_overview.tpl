@@ -1,5 +1,6 @@
 <h1>{$headerTitles.title}</h1>
 <h2>{$headerTitles.subtitle}</h2> 
+
 {if $overviewImage}
 <div class="illustratie-wrapper">
     <div class="illustratie">
@@ -10,14 +11,42 @@
 </div>
 {/if}
 
-{foreach from=$content item=v key=k}{if $categoryList[$k]}
+{if $taxon.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
 <p>
-{if $categoryList[$k]!='Description'}
-    <span class="label">{$categoryList[$k]}:</span>
-{/if}
-    {$v}
+    <span class="label">{$categoryList[855]}:</span>
+    {$content[855]}
 </p>
-{/if}{/foreach}
+<p>
+    <span class="label">{$categoryList[856]}:</span>
+    {$content[856]}
+</p>
+<p>
+    <span class="label">{$categoryList[857]}:</span>
+    {$content[857]}
+</p>
+<p>
+    <span class="label">{$content[858]}</span>
+    {$content[848]}
+</p>
+{else}
+<p>
+    <span class="label">{$categoryList[860]|replace:'%s':$headerTitles.title|lower}</span>
+    {$content[860]}
+</p>
+<p>
+    <span class="label">{$categoryList[861]}:</span>
+    {$content[861]}
+</p>
+<p>
+    <span class="label">{$categoryList[862]}:</span>
+    {$content[862]}
+</p>
+<p>
+    <span class="label">{$categoryList[863]}:</span>
+    {$content[863]}
+</p>
+
+{/if}
 
 <div>
 
@@ -35,8 +64,8 @@
 	<div class="clearer"></div>
 
 </div>
-{if $freePageContent}
-<a href="#" onclick="openDiergroep({$freePageContent.page_id},{$taxon.id},'{$type}');return false;" class="grouplink group-container">{$freePageContent.topic|@ucfirst}</a>   
+{if $parent.commonname && $parent.id}
+<a class="grouplink group-container" href="#" onclick="toonDier({$parent.id});return false;" style="">{$parent.commonname}</a>
 {/if}
 {if $related}
 <div class="related">

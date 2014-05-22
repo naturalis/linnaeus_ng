@@ -528,8 +528,14 @@ a img {
 	height:22px;
 }
 .facetgrouppage .facetgrouppage-icons {		
-	padding: 9px;	
+	padding: 0px;	
 }
+
+.facetgrouppage .helper-div {		
+	padding:9px;
+}
+
+
 .facetgrouppage a {
 	color: white;
 	text-decoration: none;

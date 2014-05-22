@@ -545,7 +545,7 @@ class SpeciesController extends Controller
 		$this->clearCache('tree-KeyTree');
 		$this->clearCache('species-treeList');
 
-		$this->redirect('list.php');
+		$this->redirect('branches.php');
 				
 	}
 
@@ -771,7 +771,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     
                     if (!$this->doNameAndParentMatch($newName, $parent['taxon'])) {
                         $this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'), $parent['taxon'], $newName));
-                        $hasErrorButCanSave = false;
+                        $hasErrorButCanSave = true;
                     }
                 }
                 
@@ -859,7 +859,8 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
 			$this->newGetTaxonTree();
 
-			$this->smarty->assign('taxa', $this->treeList);
+			if (isset($this->treeList))
+				$this->smarty->assign('taxa', $this->treeList);
 
             $s = $this->getProjectIdRankByname('Subgenus');
             if ($s)
@@ -1113,7 +1114,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
             // delete the taxon
             $this->deleteTaxon($this->requestData['id']);
             
-            $this->redirect('list.php');
+            $this->redirect('branches.php');
         }
         elseif ($this->rHasId()) {
             
@@ -1148,7 +1149,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         }
         else {
             
-            $this->redirect('list.php');
+            $this->redirect('branches.php');
         }
         
         $this->printPage();
@@ -1230,7 +1231,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         
         $this->setBreadcrumbIncludeReferer(array(
             'name' => $this->translate('Taxon list'), 
-            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/branches.php'
         ));
         
         if ($this->rHasId()) {

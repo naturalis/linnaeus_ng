@@ -120,8 +120,7 @@
 		<div class="facetgrouppage-wrapper">  
 
         {foreach from=$guiMenu item=v key=k}
-            <div id="facetgrouppage{$k}" class="">
-            <!-- div id="facetgrouppage{$k}" class="facetgrouppage" -->
+            <div id="facetgrouppage{$k}" class="facetgrouppage">
 				<img class="facetpage-puntje" alt="" src="{$session.app.system.urls.systemMedia}facet-puntje.png">
 				<a class="no-text facetgrouppage-close-btn" href="#">Sluiten</a>
                 
@@ -131,30 +130,34 @@
 				<div class="facetgrouppage-inner">
 					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$vC.info}</h4>
 					<div class="facetgrouppage-icons">
-
-						<div class="ui-grid-c">
-                        
-                            {foreach from=$vC.states item=sV key=sK}
-                            {if $sV.file_name && $sV.file_exists}                            
-                       
-                            <div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
-                                <a href="#" onClick="nbcSetStateValue('c:{$vC.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
-                                <div class="grid-iconbox">
-                                    <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$sV.file_name}">
-                                </div>
-                                <div class="grid-labelbox ">
-                                    {$sV.label}
-                                </div>
-                                </a>
-                            </div>
-                            {/if}
-                            {/foreach}
-
+						<div class="helper-div">
+							<div class="ui-grid-c">
+							
+								{foreach from=$vC.states item=sV key=sK}
+								{if $sV.file_name && $sV.file_exists}                            
+						   
+								<div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
+									<a href="#" onClick="nbcSetStateValue('c:{$vC.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
+									<div class="grid-iconbox">
+										<img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$sV.file_name}">
+									</div>
+									<div class="grid-labelbox ">
+										{$sV.label}
+									</div>
+									</a>
+								</div>
+								{/if}
+								{/foreach}
+	
+							</div>
 						</div>
 						<div class="clearer"></div>
 						<div class="facetgrouppage-bottom-shade"></div>
 
-					</div>  
+					</div>
+
+
+ 
 				</div>
                 
                 {/foreach}
@@ -164,8 +167,8 @@
 				<div class="facetgrouppage-inner">
 					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$v.info}</h4>
 					<div class="facetgrouppage-icons">
-
-						<div class="ui-grid-c">
+						<div class="helper-div">
+							<div class="ui-grid-c">
                 
                             {foreach from=$v.states item=sV key=sK}
                             {if $sV.file_name && $sV.file_exists}                            
@@ -183,6 +186,7 @@
                             {/if}
                             {/foreach}
 
+						</div>
 						</div>
 						<div class="clearer"></div>
 						<div class="facetgrouppage-bottom-shade"></div>

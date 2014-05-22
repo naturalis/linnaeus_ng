@@ -882,6 +882,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_f.rank_id,
 				_f.lower_taxon,
 				_g.label as rank,
+				_q.label as rank_label,
 				_k.name as common_name
 			
 			from %PRE%taxa _a
@@ -907,8 +908,12 @@ class SpeciesControllerNSR extends SpeciesController
 				on _a.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
 				and _g.language_id=". LANGUAGE_ID_SCIENTIFIC ."
-			
-				
+
+			left join %PRE%labels_projects_ranks _q
+				on _a.rank_id=_q.project_rank_id
+				and _a.project_id = _q.project_id
+				and _q.language_id=".$this->getCurrentLanguageId()."
+
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _a.id=".$id."
@@ -1018,7 +1023,7 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				) as name,
 				_f.rank_id,
-				_g.label as rank
+				_g.label as rank_label
 			
 			from %PRE%taxa _a
 
@@ -1036,7 +1041,7 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%labels_projects_ranks _g
 				on _a.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
-				and _g.language_id=". LANGUAGE_ID_SCIENTIFIC ."
+				and _g.language_id=". LANGUAGE_ID_DUTCH."
 
 			where
 				_a.project_id =".$this->getCurrentProjectId()."

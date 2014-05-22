@@ -66,6 +66,10 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 	font-size: 0.95em;
 	font-weight: normal;
 }
+.classification-name.current {
+	font-size: 1em;
+	font-weight: bold;
+}
 .classification-connector {
 	color:#777;
 	display:inline;
