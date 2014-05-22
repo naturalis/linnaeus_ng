@@ -48,7 +48,7 @@ class SpeciesMediaController extends Controller
         
         $this->setBreadcrumbIncludeReferer(array(
             'name' => $this->translate('Taxon list'), 
-            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/branches.php'
         ));
         
         if ($this->rHasId()) {
@@ -122,7 +122,7 @@ class SpeciesMediaController extends Controller
         
         $this->setBreadcrumbIncludeReferer(array(
             'name' => $this->translate('Taxon list'), 
-            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/branches.php'
         ));
         
 		// referred from the taxon content editing page
@@ -722,6 +722,101 @@ class SpeciesMediaController extends Controller
 		return $tId;
 										
 	}
+
+	public function tempNsr1Action()
+	{
+        $this->checkAuthorisation();
+        
+        $this->setPageName('NSR image re-something');
+
+		if ($this->rHasVar('id') && $this->rHasVar('image_id') && $this->rHasVar('new_taxon_id'))
+		{
+			$mdt = $this->models->MediaTaxon->freeQuery("
+				update %table% set taxon_id = ".(int)$this->rGetVal('new_taxon_id')." 
+				where id = ".(int)$this->rGetVal('image_id')."
+				and project_id = ".$this->getCurrentProjectId()." 
+				limit 1"
+			);
+			
+			$this->addMessage('Saved!');
+
+		} else
+		if ($this->rHasVar('id'))
+		{
+		
+			$mdt = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'file_name like' => $this->rGetVal('id').'%'
+				)
+			));
+			
+			if ($mdt)
+			{
+				$this->smarty->assign('image_id', $mdt[0]['id']);
+
+				$current=$this->getTaxonById($mdt[0]['taxon_id']);
+				$d=$this->models->Taxon->freeQuery("select * from  %PRE%nsr_ids where lng_id = ".$current['id']." and item_type = 'taxon'");
+				if ($d)
+					$current['nsr_id']=str_replace('tn.nlsr.concept/','',$d[0]['nsr_id']);
+				else
+					$current['nsr_id']='?';
+				
+				$this->smarty->assign('current', $current);
+				
+				if ($this->rHasVar('newid'))
+				{
+					$d=$this->models->Taxon->freeQuery(
+						"select * from  %PRE%nsr_ids where nsr_id = 'tn.nlsr.concept/".
+						str_pad(mysql_real_escape_string($this->rGetVal('newid')),12,'0',STR_PAD_LEFT)."' and item_type = 'taxon'"
+					);
+
+					if ($d)
+					{
+						$new=$this->getTaxonById($d[0]['lng_id']);
+						if ($new)
+						{
+							$this->smarty->assign('new', $new);
+						}
+					}
+					
+				}
+
+				
+			}
+			
+			
+		}
+
+		$this->smarty->assign('newid', $this->rGetVal('newid'));
+		$this->smarty->assign('id', $this->rGetVal('id'));
+        
+        $this->printPage();
+	}
 	
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
