@@ -68,7 +68,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="#" onclick="toonDier('+data.i+',\''+data.y+'\');return false;" style=""><img alt="" src="'+data.b+'">'+data.l+'</a></li>';
+			s = s + '<li class="result0"><a href="#" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><img alt="" src="'+data.b+'">'+data.l+'</a></li>';
 		}
 	}
 
@@ -214,14 +214,15 @@ function updateStates(id) {
 
 }
 
-function toonDier(id,type) {
+function toonDier(p) {
 
 	allAjaxHandle = $.ajax({
 		url : '../species/taxon_overview.php',
 		type: 'POST',
 		data : ({
-			id : id,
-			type : type,
+			id : p.id,
+			type : p.type,
+			back : p.back,
 			hotwords: false,
 			navigation: false,
 			time : getTimestamp()

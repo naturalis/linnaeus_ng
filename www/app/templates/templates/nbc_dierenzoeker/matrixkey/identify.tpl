@@ -10,8 +10,8 @@
                     
                     <ul class="menu">
                         <li><a id="home-btn" class="no-text" href="">Home</a></li>
-                        <li><a id="tv-btn" class="no-text" href="../introduction/topic.php?id=46" "673">Dierenzoeker op TV</a></li>
-                        <li><a id="onderwijs-btn" class="no-text" href="../introduction/topic.php?id=47" "674">Onderwijs</a></li>
+                        <li><a id="tv-btn" class="no-text" href="../../templates/templates/nbc_dierenzoeker/_static/tv.php">Dierenzoeker op TV</a></li>
+                        <li><a id="onderwijs-btn" class="no-text" href="../../templates/templates/nbc_dierenzoeker/_static/onderwijs.php">Onderwijs</a></li>
                     </ul>
                     <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='border:0px solid black;display:block;position:absolute;left:890px;top:2px;width:70px;height:90px;'>Naturalis</a>
                     <a href='http://www.hetklokhuis.nl' class="no-text"  target="_blank" style='border:0px solid black;display:block;position:absolute;left:818px;top:2px;width:67px;height:62px;'>Klokhuis</a>
@@ -99,9 +99,9 @@
             <div class="footer">
                 <div class="footer-inner">
                     <ul>
-                        <li><a href="../introduction/topic.php?id=48" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
-                        <li><a href="../introduction/topic.php?id=49" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
-                        <li><a href="../introduction/topic.php?id=50" class="no-text" id="colofon-btn">Colofon</a></li>
+                        <li><a href="../../templates/templates/nbc_dierenzoeker/_static/mobiel.php" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
+                        <li><a href="../../templates/templates/nbc_dierenzoeker/_static/faq.php" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
+                        <li><a href="../../templates/templates/nbc_dierenzoeker/_static/colofon.php" class="no-text" id="colofon-btn">Colofon</a></li>
                     </ul>
                     <div class="clearer"></div>               
                     <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='display:block;position:absolute;left:373px;top:30px;width:79px;height:83px;border: 0px solid black;'>Naturalis</a>

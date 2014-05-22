@@ -291,165 +291,42 @@ class SpeciesController extends Controller
     }
 
 	
+	//sec overview of taxon without header, menu's etc (created for dierenzoeker, fetched through ajax)
     public function taxonOverviewAction ()
     {
-		
-		//sec overview of taxon without header, menu's etc (created for dierenzoeker, fetched through ajax)
+		$related=$this->getRelatedEntities(array('tId' => $this->rGetVal('id')));
+		foreach((array)$related as $key => $val)
+		{
+			$d = $this->getCommonname($val['relation_id']);
+			$related[$key]['label'] = $d;
+			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
+		}
+		$taxon = $this->getTaxonById($this->rGetVal('id'));
+		$parent = $this->getTaxonById($taxon['parent_id']);
+		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
+		$content = $this->models->ContentTaxon->_get(array(
+			'id' =>  array(
+				'taxon_id' => $this->rGetVal('id'), 
+				'project_id' => $this->getCurrentProjectId(), 
+				'language_id' => $this->getCurrentLanguageId()
+			),
+			'columns'=>'page_id,content',
+			'fieldAsIndex'=>'page_id'
+			)
+		);
+		$nbc=$this->getNbcExtras(array('id'=>$this->rGetVal('id')));
+		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
 
-        if ($this->rHasId()) {
-			
-			if ($this->rHasVal('type','v')) {
-			
-				$tv = $this->models->TaxonVariation->_get(array(
-					'id' => array('project_id'=>$this->getCurrentProjectId(),'id'=> $this->requestData['id']),
-					'columns' => 'taxon_id,label'
-				));
-				
-				$taxonVariation = $tv[0];
-				
-				$tId = $taxonVariation['taxon_id'];
+		$this->smarty->assign('taxon',$taxon);
+		$this->smarty->assign('parent',$parent);
+		$this->smarty->assign('categoryList', $categories['categoryList']);
+		$this->smarty->assign('content',$content);
+		$this->smarty->assign('nbc',$nbc);
+		$this->smarty->assign('related', $related);
+		$this->smarty->assign('media', $media);
+		$this->smarty->assign('back',$this->rGetVal('back'));
 
-				$related = $this->getRelatedEntities(array(
-					'vId' => $tId
-				));
-
-				$freePageId = $this->getNbcExtras(array('id'=>$this->requestData['id'],'name' => 'free_page_id','type'=>'variation'));
-							
-			} else {
-
-				$tId = $this->requestData['id'];
-
-				$related = $this->getRelatedEntities(array(
-					'tId' => $tId 
-				));
-				
-
-				$freePageId = $this->getNbcExtras(array('id'=>$this->requestData['id'],'name' => 'free_page_id'));
-
-			}
-
-			foreach((array)$related as $key => $val) {
-
-				if($val['ref_type']=='variation'){
-					$d = $this->getVariation($val['relation_id']);
-					$related[$key]['label'] = $d['label'];
-					$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image','type'=>'variation'));
-				} else {
-					$d = $this->getCommonname($val['relation_id']);
-					$related[$key]['label'] = $d;
-					$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
-				}
-					
-			}
-			
-			if (!empty($freePageId)) {
-
-				$cfm = $this->models->ContentFreeModule->_get(array(
-					'id' => array(
-						'page_id' => $freePageId, 
-						'project_id' => $this->getCurrentProjectId()
-					)
-				));
-				
-				$freePageContent = $cfm[0];
-				
-			}
-
-            // get taxon
-            $taxon = $this->getTaxonById($tId);
-            $parent = $this->getTaxonById($taxon['parent_id']);
-
-            $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
-            
-            $this->setControllerBaseName();
-            
-            if (isset($this->requestData['lan']))
-                $this->setCurrentLanguageId($this->requestData['lan']);
-                
-            // get categories
-            $categories = $this->getCategories(
-				array(
-					'taxon' => $this->requestData['id'], 
-					'allowUnpublished' => $this->isLoggedInAdmin()
-				)
-            );
-
-			foreach((array)$categories['categories'] as $val) {
-
-	            $d=$this->getTaxonContent(
-					array(
-						'taxon' => $taxon['id'], 
-						'category' => $val['id'], 
-						'allowUnpublished' => $this->isLoggedInAdmin(),
-						'incOverviewImage' => true
-					)
-				);
-				
-				$content[$val['id']]=$d['content'];
-
-				if (!$this->rHasVal('hotwords',false)) {
-					$content = $this->matchGlossaryTerms($content);
-					$content = $this->matchHotwords($content);
-				}
-			
-			}
-
-            if ($taxon['lower_taxon'] == 1) {
-                
-                $this->setPageName(sprintf($this->translate('Species module: "%s"'), $taxon['label']));
-                
-                $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
-            }
-            else {
-                
-                $this->setPageName(sprintf($this->translate('Higher taxa: "%s"'), $taxon['label']));
-            }
-            
-			$this->smarty->assign('taxon', $taxon);
-			$this->smarty->assign('parent', $parent);
-			$this->smarty->assign('content', $content);
-			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-                
-			if (!$this->rHasVal('navigation',false))
-				$this->smarty->assign('adjacentItems', $this->getAdjacentTaxa($taxon['id']));
-           
-            $this->smarty->assign('categoryList', $categories['categoryList']);
-
-			if (isset($freePageContent))
-				$this->smarty->assign('freePageContent', $freePageContent);
-
-			if (isset($related))
-				$this->smarty->assign('related', $related);
-
-			$this->smarty->assign('type', ($this->rHasVal('type') ? $this->requestData['type'] : 't' ));
-
-			if ($this->rHasVal('type','v')) {
-				
-				$this->smarty->assign('headerTitles', 
-					array(
-						'title' => $taxonVariation['label'],
-						'subtitle' => $taxon['label']
-					));
-
-			} else { 
-
-				$this->smarty->assign('headerTitles', 
-					array(
-						'title' => $content['names']['common'][0]['commonname'],
-						'subtitle' => ($taxon['base_rank_id']>=SPECIES_RANK_ID ? $taxon['label'] : $taxon['taxon'])
-					));
-
-			}
-            
-        }
-        else {
-            
-            $this->addError($this->translate('No taxon ID specified.'));
-            
-            $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
-        }
-        
-        $this->printPage();
+		$this->printPage();
     }
 
 

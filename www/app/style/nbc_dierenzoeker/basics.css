@@ -354,15 +354,11 @@ a img {
     text-overflow: 		ellipsis;
     -o-text-overflow: 	ellipsis;   
 }
-/* TODO maak hier een :hover pseudo element van */
-.list-item-over {
-    background-color: black !important;
-    color: white !important;
+.result-list-body a:hover, .related a:hover {					
+	color:#25AAD5;
 }
-	
-
 .related ul li a {
-	width: 268px;			
+	width: 268px;
 }
 
 .result-list-body ul li a img, .related ul li a img {
