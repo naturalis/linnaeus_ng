@@ -46,7 +46,7 @@
 					{'&nbsp;'|str_repeat:$buffercount}
 					<span class="classification-connector"></span>
 					{/if}
-					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{/if}">
+					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{else} current{/if}">
 					<a href="nsr_taxon.php?id={$classification[taxon].id}">
 						{if $classification[taxon].lower_taxon==1}
 							{if $classification[taxon].infra_specific_epithet}
@@ -62,7 +62,7 @@
 					</a>
 					</span>
 					{assign var=rank_id value=$classification[taxon].rank_id}
-					<span class="classification-rank">[{$classification[taxon].rank}]</span>
+					<span class="classification-rank">[{$classification[taxon].rank_label}]</span>
 					{if $classification[taxon].species_count.total>0}
 					
 					{if $smarty.section.taxon.index==$start}
@@ -80,7 +80,7 @@
 				{'&nbsp;'|str_repeat:($buffercount+4)}
 				<span class="classification-connector"></span>
 				<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name|replace:$lastname:''}</a></span>
-				<span class="classification-rank">[{$v.rank}]</span>
+				<span class="classification-rank">[{$v.rank_label}]</span>
 				{if $v.species_count.total>0}
 				<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
 				{/if}

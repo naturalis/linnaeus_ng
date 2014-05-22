@@ -357,6 +357,7 @@ class SpeciesController extends Controller
 
             // get taxon
             $taxon = $this->getTaxonById($tId);
+            $parent = $this->getTaxonById($taxon['parent_id']);
 
             $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
             
@@ -405,9 +406,8 @@ class SpeciesController extends Controller
             }
             
 			$this->smarty->assign('taxon', $taxon);
-		
+			$this->smarty->assign('parent', $parent);
 			$this->smarty->assign('content', $content);
-
 			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
                 
 			if (!$this->rHasVal('navigation',false))
@@ -436,7 +436,7 @@ class SpeciesController extends Controller
 				$this->smarty->assign('headerTitles', 
 					array(
 						'title' => $content['names']['common'][0]['commonname'],
-						'subtitle' => $taxon['label']
+						'subtitle' => ($taxon['base_rank_id']>=SPECIES_RANK_ID ? $taxon['label'] : $taxon['taxon'])
 					));
 
 			}

@@ -82,12 +82,12 @@
 </table>
 <p>
 <input type="submit" value="{t}save{/t}" />&nbsp;
-<input type="button" value="{t}back{/t}" onclick="window.open('list.php','_self');"
+<input type="button" value="{t}back{/t}" onclick="window.open('branches.php','_self');"
 </form>
 </p>
 {else}
 {t}There are currently no orphaned taxa in your database.{/t}<br />
-<a href="list.php">{t}Back{/t}</a>
+<a href="branches.php">{t}Back{/t}</a>
 {/if}
 </div>
 

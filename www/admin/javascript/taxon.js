@@ -302,7 +302,7 @@ function taxonSaveDataManual() {
 function taxonClose() {
 
 	taxonSaveDataActive();
-	taxonExecAfterSave = "window.open('list.php','_self');";
+	taxonExecAfterSave = "window.open('branches.php','_self');";
 	taxonSaveDataDefault();
 
 }
