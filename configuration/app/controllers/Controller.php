@@ -631,10 +631,11 @@ class Controller extends BaseClass
 		if (isset($name))
 			return $extras[0]['value'];
 			
+		$d=array();
 		foreach((array)$extras as $val)
-			$extras[$val['name']] = $val['value'];
+			$d[$val['name']] = $val['value'];
 			
-		return $extras;
+		return $d;
 		
 	}
 
