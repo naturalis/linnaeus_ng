@@ -7,9 +7,9 @@
 <table>
 <tr><td>image ID:</td><td><input type="text" name="id" value="{$id}" /></td></tr>
 {if $current}
-<tr><td>current:</td><td>{$current.taxon} ({$current.nsr_id})</td></tr>
+<tr><td>current:</td><td>{$current.taxon} ({$current.nsr_id}) <a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$current.id}&cat=media" target="_blank">link</a></td></tr>
 <tr><td>new:</td><td><input type="text" name="newid" value="{$newid}" /></td></tr>
-{if $new}<tr><td></td><td>{$new.taxon}{/if}</td></tr>
+{if $new}<tr><td></td><td>{$new.taxon}{/if} <a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$new.id}&cat=media" target="_blank">link</a></td></tr>
 {/if}
 <tr><td colspan="2">
 {if $new}
