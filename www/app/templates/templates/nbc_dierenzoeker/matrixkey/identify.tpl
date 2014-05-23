@@ -233,6 +233,8 @@ nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 		return false;           
 	});
 
+	$.backstretch("../../media/system/skins/nbc_dierenzoeker/background.jpg");
+
 });
 </script>
 {/literal}
