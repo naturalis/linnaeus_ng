@@ -684,7 +684,9 @@ class SpeciesControllerNSR extends SpeciesController
 				'Validator' => $val['meta_validator'],
 				'Geplaatst op' => $val['meta_datum_plaatsing'],
 				'Copyright' => $val['meta_copyrights'],
-				'Contactadres fotograaf' => $val['meta_adres_maker']
+				'Contactadres fotograaf' => $val['meta_adres_maker'],
+				'Omschrijving' => $val['meta_short_desc'],
+				
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
