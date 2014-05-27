@@ -186,6 +186,8 @@ class MatrixKeyController extends Controller
 
 			$countPerCharacter = $this->getRemainingCharacterCount();
 
+//			q($characters,1);
+
 			$menu = $this->getGUIMenu(
 					array(
 						'groups'=>$groups,

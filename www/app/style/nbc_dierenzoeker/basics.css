@@ -355,6 +355,9 @@ a img {
     -o-text-overflow: 	ellipsis;   
 }
 .result-list-body a:hover, .related a:hover {					
+	color:#000000;
+}
+.result-list-body a:active, .related a:active {					
 	color:#25AAD5;
 }
 .related ul li a {

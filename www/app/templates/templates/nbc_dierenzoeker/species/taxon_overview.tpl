@@ -28,24 +28,24 @@
     {$content[857].content}
 </p>
 <p>
-    <span class="label">{$content[858]}</span>
+    <span class="label">{$content[858].content}</span>
     {$content[848].content}
 </p>
 {else}
 <p>
-    <span class="label">{$categoryList[860]|replace:'%s':($headerTitles.title|lower)}</span>
+    <span class="label">{$categoryList[860]|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[860].content}
 </p>
 <p>
-    <span class="label">{$categoryList[861]|replace:'%s':($headerTitles.title|lower)}</span>
+    <span class="label">{$categoryList[861]|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[861].content}
 </p>
 <p>
-    <span class="label">{$categoryList[862]|replace:'%s':($headerTitles.title|lower)}</span>
+    <span class="label">{$categoryList[862]|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[862].content}
 </p>
 <p>
-    <span class="label">{$categoryList[863]|replace:'%s':($headerTitles.title|lower)}</span>
+    <span class="label">{$categoryList[863]|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[863].content}
 </p>
 
@@ -67,7 +67,7 @@
 	<div class="clearer"></div>
 
 </div>
-{if $parent.commonname && $parent.id}
+{if $parent.commonname && $parent.id && $parent.hasContent}
 <a class="grouplink group-container" href="#" onclick="toonDier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
 {/if}
 {if $related}

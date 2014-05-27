@@ -1553,7 +1553,8 @@ class ImportNBCController extends ImportController
         $i = 1;
 
 		// save all taxa
-        foreach ((array) $species as $key => $val) {
+        foreach ((array) $species as $key => $val)
+		{
 			
 			if ($val['isMatrix']==true) {
 				
@@ -1565,23 +1566,25 @@ class ImportNBCController extends ImportController
 				
 			}
 			
-			if (isset($val['parent_name'])) {
+			if (isset($val['parent_name']))
+			{
 
 				// find parent by sci name
 				$d = $this->getTaxonByName($val['parent_name']);
 					
-				if ($d[0]['id'])
+				if (isset($d[0]['id']))
 				{ 
-
 					$parent = $d[0]['id'];
 				
-				} else {
+				} 
+				else
+				{
 
 					// find taxon by common name
 					$d = $this->models->Commonname->_get(array('id' =>
 					array(
 						'project_id' => $this->getNewProjectId(), 
-						'language_id' => $this->getNewDefaultLanguageId(), 
+						//'language_id' => $this->getNewDefaultLanguageId(), 
 						'commonname' => $val['parent_name']
 					)));					
 					
