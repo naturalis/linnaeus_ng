@@ -6,7 +6,7 @@
 				<form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
 				<fieldset>
 					<label accesskey="t" for="searchString">Zoek op naam</label>
-					<input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" value="" />
+					<input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" value="{$search.search}" />
 					<input id="inlineformsearchButton" type="submit" value="{t}zoek{/t}" class="zoekknop" /><br>
 					<div id="suggestList"></div>
 				</fieldset>
@@ -25,3 +25,8 @@
 		</div>
 
 	</div>
+<script type="text/JavaScript">
+$(document).ready(function() {
+	$( '#inlineformsearchInput' ).focus();
+});
+</script>
