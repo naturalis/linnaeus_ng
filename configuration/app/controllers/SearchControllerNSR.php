@@ -227,19 +227,25 @@ class SearchControllerNSR extends SearchController
 				_f.lower_taxon,
 				_k.name as common_name,
 				_q.label as common_rank,
-
-			_g.presence_id,
-			_h.information_title as presence_information_title,
-			_h.index_label as presence_information_index_label,
-			ifnull(_j.number_of_barcodes,0) as number_of_barcodes,
-
+				_g.presence_id,
+				_h.information_title as presence_information_title,
+				_h.index_label as presence_information_index_label,
+				ifnull(_j.number_of_barcodes,0) as number_of_barcodes,
+	
 				case
 					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
+					when _a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 95
 					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 90
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 then 80
-					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 then 70
-					else 60
-				end as match_percentage
+					when _a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 then 80
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 then 70
+					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 then 60
+					else 50
+				end as match_percentage,
+	
+				case
+					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
+					else 50
+				end as adjusted_rank
 			
 			from %PRE%names _a
 			
@@ -288,7 +294,7 @@ class SearchControllerNSR extends SearchController
 			group by _a.taxon_id
 
 			order by 
-				match_percentage desc, _f.rank_id, ".
+				adjusted_rank desc, match_percentage desc, _a.name asc, _f.rank_id asc, ".
 				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
