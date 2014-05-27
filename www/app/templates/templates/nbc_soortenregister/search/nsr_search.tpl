@@ -15,12 +15,23 @@
 			<h4>
 				Gezocht op "{$search.search}": <span id="resultcount-header">{$results.count}</span>
 			</h4>
-
+			
+			<p>
+			</p>
+			<p>
+				<label for="" accesskey="g">Resultaten sorteren op:</label>
+				<select name="sort" onchange="sortResults(this);">
+					<option value="sort_relevance"selected="selected">Relevantie</option>
+					<option value="sort_name">Wetenschappelijke naam</option>
+					<option value="sort_common">Nederlandse naam</option>
+				</select>
+			</p>
+			
 			<p>
 				{if $results.data}
-
+				{assign var=i value=0}
 				{foreach from=$results.data item=v}
-				<div class="result">
+				<div class="result" sort_name="{$v.taxon}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
 					{if $v.overview_image}
 					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
 					{/if}				
@@ -53,6 +64,7 @@
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
+
 
 </div>
 

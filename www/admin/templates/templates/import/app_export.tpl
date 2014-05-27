@@ -27,12 +27,21 @@ Output:
     <label><input type="checkbox" name="downloadFile" value="y" checked="checked"/>download as file (rather than display in browser)</label><br />
     </p>
 	<p>
-	Select the Species-tabs to export:
+	Species-tabs to export:
 	<select name="taxonTab">
 	{foreach from=$getTaxonTabs item=v}
 		<option value="{$v.id}">{$v.page}</option>
 	{/foreach}
 	</select>
+	</p>	
+	<p>
+	Language to export:
+	<select name="projectLanguage">
+	{foreach from=$getProjectLanguages item=v}
+		<option value="{$v.language_id}">{$v.language}</option>
+	{/foreach}
+	</select>
+	
 	
 	
 	</p>

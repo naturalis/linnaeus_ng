@@ -68,6 +68,7 @@ class ExportAppController extends Controller
 	private $_sqliteQueriesDDL=null;
 	private $_sqliteQueriesDML=null;
 	private $_sqliteDropQueries=null;
+	private $_projectLanguage=null;
 	private $_removePrefix=false;
 	private $_includeCode=true;
 	private $_dataSize=0;
@@ -169,58 +170,6 @@ class ExportAppController extends Controller
 		
 	}
 
-
-	public function appExportAction()
-	{
-
-        $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Export database for Linnaeus Mobile'));
-		
-		$pModules = $this->getProjectModules();
-		
-		$matrices = $this->getMatrices();
-
-		$config = new configuration;
-		$dbSettings = $config->getDatabaseSettings();
-
-		if ($this->rHasVal('action','export')) {
-			
-
-
-			$languageId=$_SESSION['admin']['project']['default_language_id'];
-			$name=$_SESSION['admin']['project']['sys_name'].' '.$_SESSION['admin']['project']['languageList'][$languageId]['language'];
-								
-			$this->_removePrefix = isset($this->requestData['removePrefix']) && $this->requestData['removePrefix']=='y' ? $dbSettings['tablePrefix'] : false;
-			$this->_includeCode = isset($this->requestData['includeCode']) && $this->requestData['includeCode']=='y' ? true : false;
-			$this->_downloadFile = isset($this->requestData['downloadFile']) && $this->requestData['downloadFile']=='y' ? true : false;
-			$this->_separateDrop = isset($this->requestData['separateDrop']) && $this->requestData['separateDrop']=='y' ? true : false;
-			$this->_reduceURLs = isset($this->requestData['reduceURLs']) && $this->requestData['reduceURLs']=='y' ? true : false;
-			$this->_makeImageList = isset($this->requestData['imageList']) && $this->requestData['imageList']=='y' ? true : false;
-			$this->_filename = $this->makeFileName($name,'sql');
-			$this->_dbname = $this->makeDatabaseName($name);
-			$this->_projectName = $_SESSION['admin']['project']['sys_name'];
-			$this->_summaryTabId = isset($this->requestData['taxonTab']) ? $this->requestData['taxonTab'] : null;
-
-			$this->makeSpeciesDump($languageId);
-			if ($this->_makeImageList) $this->makeImageList();
-			$this->_appType = 'completeLNGApp';
-			$this->convertDumpToSQLite();
-			$output = $this->downloadSQLite();
-
-			if (!$this->_downloadFile)
-				$this->smarty->assign('output',$output);
-			
-		}
-
-		$this->smarty->assign('getTaxonTabs',$this->getTaxonTabs());
-		$this->smarty->assign('dbSettings',$dbSettings);
-		$this->smarty->assign('default_langauge',$this->getDefaultProjectLanguage());
-		
-        $this->printPage();
-		
-	}
-
     private function getMatrices ()
     {
 		$m = $this->models->Matrix->_get(
@@ -255,67 +204,6 @@ class ExportAppController extends Controller
 
         return $m;
     }
-
-	private function makeFileName($projectName,$ext='xml')
-	{
-
-		return strtolower(preg_replace('/\W/','_',$projectName)).(is_null($ext) ? null : '.'.$ext);
-
-	}
-
-	private function removeUnwantedColumns($s)
-	{
-		$d = explode(chr(10),$s);
-		foreach((array)$d as $key => $val) {
-			if (preg_match('/^(\s*)(`?)('.implode('|',$this->_appExpSkipCols).')(`?)/',$val)==1)
-				unset($d[$key]);
-		}
-		return implode(chr(10),$d);
-	}
-	
-	private function fixTablePrefix($s,$table=null)
-	{
-		if ($this->_removePrefix===false) return $s;
-		
-		if (is_null($table))
-			return str_ireplace($this->_removePrefix,'',$s);
-		else
-			return preg_replace('/(`'.$table.'`)/','`'.str_ireplace($this->_removePrefix,'',$table).'`',$s);
-	}
-
-    private function makeSpeciesDump ($languageId)
-	{
-
-		$where = 
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'language_id' => $languageId
-			);
-
-		$this->_exportDump->ProjectRank = $this->models->ProjectRank->_get(array('id' => $where));
-		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
-		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
-		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
-		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
-		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
-		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
-
-		if ($this->_reduceURLs) {
-			foreach((array)$this->_exportDump->MediaTaxon as $key => $val) {
-				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false) {
-					$d=pathinfo($val['file_name']);
-					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
-				}
-			}
-		}
-
-	}
-	
-
-
-
-
-
 
     private function makeStandAloneMatrixDump ($matrixId,$languageId)
 	{
@@ -387,22 +275,225 @@ class ExportAppController extends Controller
 		
 	}
 	
+
+
+
+
+
+	public function appExportAction()
+	{
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Export database for Linnaeus Mobile'));
+		
+//		$pModules = $this->getProjectModules();
+		
+		$config = new configuration;
+		$dbSettings = $config->getDatabaseSettings();
+
+		if ($this->rHasVal('action','export'))
+		{
+			$this->_removePrefix = $this->rGetVal('removePrefix')=='y' ? $dbSettings['tablePrefix'] : false;
+			$this->_includeCode = $this->rGetVal('includeCode')=='y';
+			$this->_downloadFile = $this->rGetVal('downloadFile')=='y';
+			$this->_separateDrop = $this->rGetVal('separateDrop')=='y';
+			$this->_reduceURLs = $this->rGetVal('reduceURLs')=='y';
+			$this->_makeImageList =  $this->rGetVal('imageList')=='y';
+			$this->_summaryTabId = $this->rGetVal('taxonTab');
+			$this->_projectLanguage = $this->rGetVal('projectLanguage');
+			
+			$this->_appType = 'completeLNGApp';
+			$this->_projectName = $_SESSION['admin']['project']['sys_name'];
+			$name=$_SESSION['admin']['project']['sys_name'].' '.$_SESSION['admin']['project']['languageList'][$this->_projectLanguage]['language'];
+
+			$this->_filename = $this->makeFileName($name,'sql');
+			$this->_dbname = $this->makeDatabaseName($name);
+
+			$this->makeSpeciesDump();
+			$this->makeMatrixDump();
+			$this->makeKeyDump();
+	
+			if ($this->_makeImageList) $this->makeImageList();
+
+			$this->convertDumpToSQLite();
+			$output=$this->downloadSQLite();
+
+			if (!$this->_downloadFile)
+				$this->smarty->assign('output',$output);
+			
+		}
+
+		$this->smarty->assign('getTaxonTabs',$this->getTaxonTabs());
+		$this->smarty->assign('getProjectLanguages',$this->getProjectLanguages());
+		$this->smarty->assign('dbSettings',$dbSettings);
+		$this->smarty->assign('default_langauge',$this->getDefaultProjectLanguage());
+		
+        $this->printPage();
+		
+	}
+
+	private function makeFileName($projectName,$ext='xml')
+	{
+
+		return strtolower(preg_replace('/\W/','_',$projectName)).(is_null($ext) ? null : '.'.$ext);
+
+	}
+
+	private function removeUnwantedColumns($s)
+	{
+		$d = explode(chr(10),$s);
+		foreach((array)$d as $key => $val) {
+			if (preg_match('/^(\s*)(`?)('.implode('|',$this->_appExpSkipCols).')(`?)/',$val)==1)
+				unset($d[$key]);
+		}
+		return implode(chr(10),$d);
+	}
+	
+	private function fixTablePrefix($s,$table=null)
+	{
+		if ($this->_removePrefix===false) return $s;
+		
+		if (is_null($table))
+			return str_ireplace($this->_removePrefix,'',$s);
+		else
+			return preg_replace('/(`'.$table.'`)/','`'.str_ireplace($this->_removePrefix,'',$table).'`',$s);
+	}
+
+
+    private function makeSpeciesDump()
+	{
+		$where = 
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->_projectLanguage
+			);
+
+		$this->_exportDump->ProjectRank = $this->models->ProjectRank->_get(array('id' => $where));
+		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
+		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
+		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
+		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
+		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
+		//$this->_exportDump->PageTaxon = $this->models->PageTaxon->_get(array('id' => $where));  // exporting a single tab
+		//$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
+		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
+		$this->_exportDump->NbcExtras = $this->models->NbcExtras->_get(array('id' => $where));
+		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
+		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
+		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
+		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where));
+
+		if ($this->_reduceURLs)
+		{
+			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
+			{
+				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false)
+				{
+					$d=pathinfo($val['file_name']);
+					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
+				}
+			}
+
+			foreach((array)$this->_exportDump->NbcExtras as $key => $val)
+			{
+				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && 
+					(stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false))
+				{
+					$d=pathinfo($val['value']);
+					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
+				}
+			}
+		}
+
+	}
+	
+    private function makeMatrixDump()
+	{
+		$where = 
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->_projectLanguage
+			);
+
+		$this->_exportDump->Matrix = $this->models->Matrix->_get(array('id' => $where));
+		$this->_exportDump->MatrixName = $this->models->MatrixName->_get(array('id' => $where));
+		$this->_exportDump->Characteristic = $this->models->Characteristic->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicLabel = $this->models->CharacteristicLabel->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicState = $this->models->CharacteristicState->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicLabelState = $this->models->CharacteristicLabelState->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicMatrix = $this->models->CharacteristicMatrix->_get(array('id' => $where));
+		$this->_exportDump->Chargroup = $this->models->Chargroup->_get(array('id' => $where));
+		$this->_exportDump->ChargroupLabel = $this->models->ChargroupLabel->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicChargroup = $this->models->CharacteristicChargroup->_get(array('id' => $where));
+		$this->_exportDump->MatrixTaxon = $this->models->MatrixTaxon->_get(array('id' => $where));
+		$this->_exportDump->MatrixVariation = $this->models->MatrixVariation->_get(array('id' => $where));
+		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $where));
+		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $where));
+
+	}
+
+    private function makeKeyDump()
+	{
+		$where = 
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->_projectLanguage
+			);
+				
+		$this->_exportDump->Keystep = $this->models->Keystep->_get(array('id' => $where));
+		$this->_exportDump->ContentKeystep = $this->models->ContentKeystep->_get(array('id' => $where));
+		$this->_exportDump->ChoiceKeystep = $this->models->ChoiceKeystep->_get(array('id' => $where));
+		$this->_exportDump->ChoiceContentKeystep = $this->models->ChoiceContentKeystep->_get(array('id' => $where));
+		//$this->_exportDump->Keytree = $this->models->Keytree->_get(array('id' => $where));
+	}
+
+	
+
 	private function makeImageList()
 	{
-		
-		if (isset($this->_exportDump->MediaTaxon)) {
-			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
+		if (isset($this->_exportDump->MediaTaxon))
+		{
+			foreach((array)$this->_exportDump->MediaTaxon as $val)
 				$this->_imageList[]=$val['file_name'];
 		}
 
-		if (isset($this->_exportDump->CharacteristicState)) {
-			foreach((array)$this->_exportDump->CharacteristicState as $key => $val)
+		if (isset($this->_exportDump->CharacteristicState))
+		{
+			foreach((array)$this->_exportDump->CharacteristicState as $val)
 				if (!empty($val['file_name'])) $this->_imageList[]=$val['file_name'];
 		}
-		
-		if (isset($this->_exportDump->NbcExtras)) {
-			foreach((array)$this->_exportDump->NbcExtras as $key => $val) {
+
+		if (isset($this->_exportDump->NbcExtras))
+		{
+			foreach((array)$this->_exportDump->NbcExtras as $val)
+			{
 				if ($val['name']=='url_thumbnail'||$val['name']=='url_image')
+					$this->_imageList[]=$val['value'];
+			}
+		}		
+		if (isset($this->_exportDump->NbcExtras))
+		{
+			foreach((array)$this->_exportDump->NbcExtras as $val)
+			{
+				if ($val['name']=='url_thumbnail'||$val['name']=='url_image')
+					$this->_imageList[]=$val['value'];
+			}
+		}		
+
+		if (isset($this->_exportDump->Keystep))
+		{
+			foreach((array)$this->_exportDump->Keystep as $val)
+			{
+				if ($val['name']=='image')
+					$this->_imageList[]=$val['value'];
+			}
+		}		
+
+		if (isset($this->_exportDump->ChoiceKeystep))
+		{
+			foreach((array)$this->_exportDump->ChoiceKeystep as $val)
+			{
+				if ($val['name']=='choice_img')
 					$this->_imageList[]=$val['value'];
 			}
 		}		
@@ -416,7 +507,8 @@ class ExportAppController extends Controller
 		
 		$this->helpers->Mysql2Sqlite->setRemoveUniqueConstraints(true);
 		
-		foreach((array)$this->_exportDump as $class => $data) {
+		foreach((array)$this->_exportDump as $class => $data)
+		{
 
 			$table = $this->models->$class->getTableName();
 			$inserts = array();
@@ -429,32 +521,35 @@ class ExportAppController extends Controller
 			$this->_sqliteQueriesDDL[] = $this->helpers->Mysql2Sqlite->getSqlTable();
 			$this->_sqliteQueriesDDL = array_merge($this->_sqliteQueriesDDL,$this->helpers->Mysql2Sqlite->getSqlKeys());
 
-			if ($this->_separateDrop) {
+			if ($this->_separateDrop)
+			{
 				$this->_sqliteDropQueries[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();			
 				$this->_sqliteDropQueries = array_merge($this->_sqliteDropQueries,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
 			}
 			
 			$this->dataCount[$this->fixTablePrefix($table)] = count((array)$data);
 
-			foreach((array)$data as $row) {
-
-				foreach((array)$row as $column => $value) {
+			foreach((array)$data as $row)
+			{
+				foreach((array)$row as $column => $value)
+				{
 					if (in_array($column,$this->_appExpSkipCols))
 						unset($row[$column]);
 				}
 				
 				$inserts[] = "('".implode("','",array_map(function($str){return trim(preg_replace(array('/\\\'/','/\\\"/'),array("''",'"'), $str));},$row))."')";
 				
-				if (count((array)$inserts)>=$setsPerInsert) {
+				if (count((array)$inserts)>=$setsPerInsert)
+				{
 					$d = implode(',',$inserts);
 					$this->_sqliteQueriesDML[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
 					$this->_dataSize += strlen($d);
 					$inserts = array();
 				}
-
 			}
 
-			if (count((array)$inserts)!=0) {
+			if (count((array)$inserts)!=0)
+			{
 				$d = implode(',',$inserts);
 				$this->_sqliteQueriesDML[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
 				$this->_dataSize += strlen($d);
@@ -471,11 +566,9 @@ class ExportAppController extends Controller
 		
 	}
 
-	private function makeDatabaseName($projectName,$ext='xml')
+	private function makeDatabaseName($projectName)
 	{
-
 		return strtolower(preg_replace(array('/\W/','/[aeiouy]/i'),array('_',''),$projectName));
-
 	}
 
     private function getTaxonTabs()
@@ -496,7 +589,7 @@ class ExportAppController extends Controller
 	
 	private function downloadSQLite()
 	{
-		
+
 		$output = '';
 		$exportId = md5(time());
 		
@@ -507,8 +600,8 @@ class ExportAppController extends Controller
 
 		array_walk($this->_sqliteQueriesDML, 'entitizeThis');
 
-		if ($this->_downloadFile) {
-
+		if ($this->_downloadFile)
+		{
 			header('Cache-Control: public');
 			header('Content-Description: File Transfer');
 			header('Content-Disposition: attachment; filename='.$this->_dbname.'-app-installer.js');
@@ -516,32 +609,41 @@ class ExportAppController extends Controller
 
 		}
 
-		if (!$this->_includeCode) {
+		if (!$this->_includeCode)
+		{
 
 			if ($this->_separateDrop)
 				$output .= implode(chr(10),$this->_sqliteDropQueries).chr(10).chr(10);
 
 			$output .= implode(chr(10),$this->_sqliteQueriesDDL) . implode(chr(10),$this->_sqliteQueriesDML);
+			
+			$output = "begin transaction;\n\n".$output."\nend transaction;";
 
-		} else {
+		}
+		else
+		{
 			
 			$bufferDDL='';
-			foreach ((array)$this->_sqliteQueriesDDL as $val) {
+			foreach ((array)$this->_sqliteQueriesDDL as $val)
+			{
 				$bufferDDL.=$val.chr(10);
 			}
 			$bufferDDL=base64_encode(bzcompress($bufferDDL));
 
 			$bufferDML='';
-			foreach ((array)$this->_sqliteQueriesDML as $val) {
+			foreach ((array)$this->_sqliteQueriesDML as $val)
+			{
 				$bufferDML.=$val.chr(10);
 			}
 			$bufferDML=base64_encode(bzcompress($bufferDML));
 
 
 
-			if ($this->_separateDrop) {
+			if ($this->_separateDrop)
+			{
 				$drop='';
-				foreach ((array)$this->_sqliteDropQueries as $val) {
+				foreach ((array)$this->_sqliteDropQueries as $val)
+				{
 					$drop.=$val.chr(10);
 				}
 				$drop=base64_encode(bzcompress($drop));
@@ -550,7 +652,7 @@ class ExportAppController extends Controller
 		
 	/*
 		please note: "dbEstimatedSize" is used when opening the database, and is required to be as large
-		or larger than the acrtual database, at least on android. if not, the installer will fail, but
+		or larger than the actual database, at least on android. if not, the installer will fail, but
 		most likely succeed the next time around, as android-apps seem to remember lack of storage space
 		in previous sessions, and in response make available more space to the application (1mb at a
 		time).
@@ -596,11 +698,10 @@ class ExportAppController extends Controller
     // always has a new value (you can force a re-install of the same file by manually
     // altering the value of exportID IN THE CONTROLLER, not the data file)
     ";
-
-	} else
+	} 
+	else
 	if ($this->_appType=='completeLNGApp')
 	{
-
 		$output = "/*
     // cut the block below & paste into app-config.js ----------------------------------
     
@@ -613,9 +714,10 @@ class ExportAppController extends Controller
     },
     
     PROJECT_ID : ".$this->getCurrentProjectId().",
+    LANGUAGE_ID : ".$this->_projectLanguage.",
     SPECIES_RANK_ID : ".SPECIES_RANK_ID.",
     FAMILY_RANK_ID : ".FAMILY_RANK_ID.",
-    CONTENT_TAB_ID : ".$this->_summaryTabId."
+    CONTENT_TAB_ID : ".$this->_summaryTabId.", // copy this to 'modules.species.contentTabId' below
 
 
     // to add the project data to your PhoneGap app:
@@ -628,7 +730,6 @@ class ExportAppController extends Controller
     // always has a new value (you can force a re-install of the same file by manually
     // altering the value of exportID in the credentials in /js/data/app-config.js
 ";
-
 	}
 
 	$output .= 
@@ -665,14 +766,13 @@ var installConfig = {
 ";
 		}
 
-		if (!$this->_downloadFile) {
-
+		if (!$this->_downloadFile)
+		{
 			return $output;
-
-		} else {
-			
+		} 
+		else
+		{
 			echo $output;
-			
 			die();
 		}
 	
