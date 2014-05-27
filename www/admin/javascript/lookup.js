@@ -102,30 +102,27 @@ function allLookupGetData(text)
 			}
 		});
 		
-	} else {
+	} 
+	else 
+	{
 
-		if (allLookupData && allLookupData.results) {
-
+		if (allLookupData && allLookupData.results)
+		{
 			//var d = eval(allLookupData.toSource());
 			var d = jQuery.extend(true, {}, allLookupData);
 			r = new Array();
 
-			for(var i=0;i<allLookupData.results.length;i++) {
-				
-				if (allLookupData.results[i].label.match(eval('/'+addSlashes(text)+'/ig'))) {
-					
+			for(var i=0;i<allLookupData.results.length;i++)
+			{
+				if (allLookupData.results[i].label.match(eval('/'+addSlashes(text)+'/ig')))
+				{
 					r[r.length] = allLookupData.results[i]
-					
 				}
-
 			}
 
 			d.results = r;
-
 		}
-	
 		allLookupBuildList(d,text);
-
 	}
 
 	return true;

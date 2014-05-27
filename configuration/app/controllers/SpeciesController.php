@@ -316,7 +316,17 @@ class SpeciesController extends Controller
 		);
 		$nbc=$this->getNbcExtras(array('id'=>$this->rGetVal('id')));
 		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
-
+		$contentparent = $this->models->ContentTaxon->_get(array(
+			'id' =>  array(
+				'taxon_id' => $parent['id'],
+				'project_id' => $this->getCurrentProjectId(), 
+				'language_id' => $this->getCurrentLanguageId()
+			),
+			'columns'=>'count(*) as total'
+			)
+		);
+		$parent['hasContent']=$contentparent[0]['total']>0;
+		
 		$this->smarty->assign('taxon',$taxon);
 		$this->smarty->assign('parent',$parent);
 		$this->smarty->assign('categoryList', $categories['categoryList']);

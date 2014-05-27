@@ -4821,9 +4821,11 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 				where
 					_a.project_id =  ".$this->getCurrentProjectId()."
 					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-					and _a.type_id != ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-	
-	
+					and _a.type_id != ".
+						(
+							isset($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ? 
+								$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1
+						)."
 				union
 
 			")."
