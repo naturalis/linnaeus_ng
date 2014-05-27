@@ -3495,7 +3495,7 @@ class MatrixKeyController extends Controller
 			'columns' => 'ref_id,ref_type,show_order',
 			'order' => 'show_order'
 		));
-		
+
 		if (!$m) {
 			$i=0;
 			foreach((array)$g as $val)

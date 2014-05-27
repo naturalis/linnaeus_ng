@@ -162,3 +162,11 @@ function bindKeys()
 */			
 
 }
+
+function sortResults(ele)
+{
+	sortAttr=$(ele).val();
+	$('div .result').sortElements(function(a, b){
+		return ($(a).attr(sortAttr) > $(b).attr(sortAttr) ? 1 : -1);
+	});
+}
