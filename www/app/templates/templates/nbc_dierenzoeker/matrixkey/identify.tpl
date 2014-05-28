@@ -58,7 +58,6 @@
                 <div class="result-list-wrapper">
                     <div class="result-list-header">
                         <ul>
-
                             <li id="prev-button-container-top" style="visibility:hidden"><a href="#" class="no-text prev-btn" onClick="navigeren('vorige');">Vorige 16</a></li>
                             <li class="num-found" style="margin-top:-2px;"><span class="num" id="result-count-container">0</span> dieren gevonden</li>
                             <li id="next-button-container-top" style="position:relative;left:84px;visibility:visible;"><a href="#" class="no-text next-btn last-child" onClick="navigeren('volgende');">Volgende 16</a></li>
@@ -73,7 +72,6 @@
                     </div>
                     <div class="result-list-footer">
                          <ul>
-
                             <li id="prev-button-container-bottom" style="visibility:hidden"><a href="#" class="no-text prev-btn" onClick="navigeren('vorige');">Vorige 16</a></li>
                             <li>&nbsp;</li>
                             <li  id="next-button-container-bottom" style="position:relative;left:261px;visibility:visible;"><a href="#" class="no-text next-btn last-child" onClick="navigeren('volgende');">Volgende 16</a></li>
@@ -165,7 +163,7 @@
 				{else}
 				
 				<div class="facetgrouppage-inner">
-					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$v.info}</h4>
+					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$v.description}</h4>
 					<div class="facetgrouppage-icons">
 						<div class="helper-div">
 							<div class="ui-grid-c">
