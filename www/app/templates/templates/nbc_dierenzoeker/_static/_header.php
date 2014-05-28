@@ -8,8 +8,8 @@
 		<link rel="stylesheet" type="text/css" href="../../../../../app/style/nbc_dierenzoeker/jquery-ui-1.10.0.custom.min.css" />
 		<link rel="stylesheet" type="text/css" href="../../../../../app/style/nbc_dierenzoeker/prettyPhoto/prettyPhoto.css" />
 
-	<link href="../../../app/media/system/skins/nbc_dierenzoeker/favicon.ico" type="image/x-icon" rel="icon" />
-    <link href="../../../app/media/system/skins/nbc_dierenzoeker/favicon.ico" type="image/x-icon" rel="shortcut icon" />        
+	<link href="../../../../media/system/skins/nbc_dierenzoeker/favicon.ico" type="image/x-icon" rel="icon" />
+    <link href="../../../../media/system/skins/nbc_dierenzoeker/favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 
 		<script type="text/javascript" src="../../../../../app/javascript/jquery-1.9.1.min.js"></script>
 		<script type="text/javascript" src="../../../../../app/javascript/project_specific/backstretch.js"></script>
