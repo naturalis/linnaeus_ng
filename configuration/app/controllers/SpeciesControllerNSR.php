@@ -345,8 +345,17 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 				else
 				{
-					$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
-					$isEmpty=$d['count']==0;
+
+					$d=$this->getTaxonMedia(array('id'=>$taxon,'limit'=>1));
+					if ($d['count']>0)
+					{
+						$isEmpty=0;
+					}
+					else
+					{
+						$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
+						$isEmpty=$d['count']==0;
+					}
 				}
 
 				array_push($categories,
@@ -783,13 +792,13 @@ class SpeciesControllerNSR extends SpeciesController
 		
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
-				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 
 			order by taxon
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 			);
+//				and _f.rank_id >= ".SPECIES_RANK_ID."
 		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 
@@ -820,10 +829,10 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
-				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 			"
 		);
+//				and _f.rank_id >= ".SPECIES_RANK_ID."
 
 		$species=$this->models->Taxon->freeQuery("		
 			select
@@ -852,10 +861,10 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
-				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
 			"
 		);
+//				and _f.rank_id >= ".SPECIES_RANK_ID."
 		
 		$data= 
 			array(
