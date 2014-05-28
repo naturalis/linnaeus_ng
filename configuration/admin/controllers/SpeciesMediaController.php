@@ -6,6 +6,7 @@ class SpeciesMediaController extends Controller
     public $usedModels = array(
         'media_taxon', 
         'media_descriptions_taxon', 
+        'media_meta'
     );
 
     public $usedHelpers = array(
@@ -729,6 +730,29 @@ class SpeciesMediaController extends Controller
         
         $this->setPageName('NSR image re-something');
 
+		if ($this->rHasVar('del') && $this->rHasVar('action','delete'))
+		{
+			$this->models->MediaMeta->freeQuery("
+				delete from %table%
+				where media_id = ".(int)$this->rGetVal('del')."
+				and project_id = ".$this->getCurrentProjectId()
+			);
+			$this->models->MediaDescriptionsTaxon->freeQuery("
+				delete from %table%
+				where media_id = ".(int)$this->rGetVal('del')."
+				and project_id = ".$this->getCurrentProjectId()." 
+				limit 1"
+			);
+			$this->models->MediaTaxon->freeQuery("
+				delete from %table%
+				where id = ".(int)$this->rGetVal('del')."
+				and project_id = ".$this->getCurrentProjectId()." 
+				limit 1"
+			);
+			
+			$this->addMessage('deleted');
+
+		} else
 		if ($this->rHasVar('id') && $this->rHasVar('image_id') && $this->rHasVar('new_taxon_id'))
 		{
 			$mdt = $this->models->MediaTaxon->freeQuery("
@@ -738,7 +762,7 @@ class SpeciesMediaController extends Controller
 				limit 1"
 			);
 			
-			$this->addMessage('Saved!');
+			$this->addMessage('saved');
 
 		} else
 		if ($this->rHasVar('id'))
