@@ -10,8 +10,8 @@
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}basics.css" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
     <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
-	<link href="{$projectUrls.projectMedia}favicon.ico" type="image/x-icon" rel="icon" />
-    <link href="{$projectUrls.projectMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
+	<link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon" />
+    <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierenzoeker.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/backstretch.js"></script>
