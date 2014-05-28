@@ -821,12 +821,14 @@ class SearchControllerNSR extends SearchController
 		{
 			$metaData=array(
 				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
+				'Fotograaf' => $val['photographer'],
 				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],
 				'Validator' => $val['meta_validator'],
 				'Geplaatst op' => $val['meta_datum_plaatsing'],
 				'Copyright' => $val['meta_copyrights'],
-				'Contactadres fotograaf' => $val['meta_adres_maker']
+				'Contactadres fotograaf' => $val['meta_adres_maker'],
+				'Omschrijving' => $val['meta_short_desc'],
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
