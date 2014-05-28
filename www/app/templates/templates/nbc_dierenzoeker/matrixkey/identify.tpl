@@ -111,7 +111,7 @@
                     <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" style='display:block;position:absolute;left:722px;top:30px;width:153px;height:68px;border: 0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
 
                     <div class="social-media">
-                    <a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="/app/webroot/img/facebook.png" alt="" /></a><a href="http://dierenzoeker.hyves.nl" target="_blank"><img src="/app/webroot/img/hyves.png" alt="" /></a></div>                </div>
+                    <a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/nbc_dierenzoeker/facebook.png" alt="" /></a></div>                </div>
                 </div>
 
         </div>
@@ -240,5 +240,3 @@ nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 {/literal}
 
 </body>
-    
-    
