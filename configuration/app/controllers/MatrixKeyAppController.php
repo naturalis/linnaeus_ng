@@ -94,7 +94,7 @@ class MatrixKeyAppController extends Controller
 			select distinct -1 as can_select, state_id
 			from %TABLE%
 			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']." 
-			and taxon_id not in (".(count($resTaxa)!=0 ? implode(',',$resTaxa) : "" ).") 
+			".(count($resTaxa)!=0 ? " and taxon_id not in (".implode(',',$resTaxa).")" : "" )."
 			and state_id not in (
 				select state_id from %TABLE%
 				where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
@@ -109,7 +109,7 @@ class MatrixKeyAppController extends Controller
 				'fieldAsIndex' => 'state_id'
 			)
 		);
-//q($this->models->MatrixTaxonState->q());
+
 		$menu = $this->models->GuiMenuOrder->freeQuery(
 			"select 
 				_a.ref_id as id,'character' as type,_a.show_order as show_order,
