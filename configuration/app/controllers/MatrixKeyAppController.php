@@ -94,7 +94,7 @@ class MatrixKeyAppController extends Controller
 			select distinct -1 as can_select, state_id
 			from %TABLE%
 			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']." 
-			".(count($resTaxa)!=0 ? " and taxon_id not in (".implode(',',$resTaxa).")" : "" )."
+			".(count($resTaxa)!=0 ? " and taxon_id not in (".implode(',',$resTaxa).") " : "" ). "
 			and state_id not in (
 				select state_id from %TABLE%
 				where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
