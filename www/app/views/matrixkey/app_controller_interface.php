@@ -1,9 +1,9 @@
 <?php
 
-require_once ('../../../../configuration/app/controllers/MatrixKeyController.php');
+require_once ('../../../../configuration/app/controllers/MatrixKeyAppController.php');
 //require_once ('../../../../configuration/app/controllers/MatrixKeyControllerWeb.php');
 
-$c = new MatrixKeyController();
+$c = new MatrixKeyAppController();
 //$c = new MatrixKeyControllerWeb();
 
 $c->setStoreHistory(false);
