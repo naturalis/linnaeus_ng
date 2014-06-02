@@ -41,7 +41,6 @@ class TreeController extends Controller
 
 	}
 					
-					
     public function __destruct()
     {
         parent::__destruct();
@@ -187,6 +186,7 @@ class TreeController extends Controller
 					on _a.id=_k.taxon_id
 					and _a.project_id=_k.project_id
 					and _k.type_id=".$this->_idPreferredName."
+					and _k.language_id=".$this->getCurrentLanguageId()."
 	
 				left join %PRE%names _m
 					on _a.id=_m.taxon_id
