@@ -109,7 +109,7 @@ class MatrixKeyAppController extends Controller
 				'fieldAsIndex' => 'state_id'
 			)
 		);
-
+q($this->models->MatrixTaxonState->q());
 		$menu = $this->models->GuiMenuOrder->freeQuery(
 			"select 
 				_a.ref_id as id,'character' as type,_a.show_order as show_order,
