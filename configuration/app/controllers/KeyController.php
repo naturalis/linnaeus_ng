@@ -814,14 +814,19 @@ class KeyController extends Controller
 
 		$tree = $this->getTreeList(array('includeEmpty'=>true));
 
-		foreach((array)$div['remaining'] as $key => $val) {
+		foreach((array)$div['remaining'] as $key => $val)
+		{
 
 			$d=$tree[$key];
 			$commonname=null;
-			foreach((array)$d['commonnames'] as $name) {
-				if ($name['language_id']==$this->getCurrentLanguageId()) {
-					$commonname=$name['commonname'];
-					break;
+			if (isset($d['commonnames']))
+			{
+				foreach((array)$d['commonnames'] as $name)
+				{
+					if ($name['language_id']==$this->getCurrentLanguageId()) {
+						$commonname=$name['commonname'];
+						break;
+					}
 				}
 			}
 
