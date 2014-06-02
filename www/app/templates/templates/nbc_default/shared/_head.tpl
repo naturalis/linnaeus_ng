@@ -14,11 +14,11 @@
     <link rel="Shortcut Icon" href="http://www.nederlandsesoorten.nl/sites/nsr/images/favicon.ico" type="image/x-icon" />
 
 	<title>{t}Nederlands Soortenregister{/t} - {$session.app.project.title|@strip_tags:false}</title>
-    
-    <link rel="stylesheet" type="text/css" media="print" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_print.css" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_default.css" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_menu.css" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_layout.css" />
+
+    <link rel="stylesheet" type="text/css" media="print" title="default" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/style/nbc_soortenregister/20120928_print.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/style/nbc_soortenregister/20120928_default.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/style/nbc_soortenregister/20120928_menu.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/style/nbc_soortenregister/20120928_layout.css" />
 
     <!--[if lte IE 7]>
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_ie7.css" />
