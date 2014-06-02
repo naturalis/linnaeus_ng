@@ -169,7 +169,7 @@ var appController = (function() {
 				'time' : new Date().getTime()
 			}),
 			success : function (data) {
-				console.clear();console.log(data);
+				//console.clear();console.log(data);
 				callback($.parseJSON(data),index);
 			}
 		});
