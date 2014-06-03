@@ -34,7 +34,7 @@ class MatrixKeyAppController extends Controller
 			action: action to execute (query)
 			query: query to execute (states)
 			language: language ID for labels (24)
-			matrix: active matrix ID (542
+			matrix: active matrix ID (542)
 			states: imploded list of state ID's (28037,28062,28267)
 			force: force states to have images, discard them if not (1|0)
 			time: timestamp against caching of Ajax-calls
@@ -44,13 +44,18 @@ class MatrixKeyAppController extends Controller
 		$res=null;
 
 	
-		if (!$this->rHasVal('action')) {
-			
+		if (!$this->rHasVal('action'))
+		{
             $res='error (request lacks an action)';
-	
         }
-        else if ($this->rHasVal('action', 'query')) {
-			
+        else
+		if (!$this->rHasVal('matrix'))
+		{
+            $res='error (request lacks a matrix id)';
+        }
+        else
+		if ($this->rHasVal('action', 'query'))
+		{
 			$data = $this->requestData;
   			
 			$functions = array(
@@ -58,13 +63,13 @@ class MatrixKeyAppController extends Controller
 				'results' => '_appControllerGetResults',
 				'detail' => '_appControllerGetDetail'
 			);
+			
+			if (!isset($data['language']))
+				$data['language']=$this->getDefaultLanguageId();
 
 			$res=$this->$functions[$data['query']]($data);
-			
 		}
-		
 		echo json_encode($res);
-	
 	}
 
 	private function _appControllerGetStates($data)
@@ -110,55 +115,62 @@ class MatrixKeyAppController extends Controller
 			)
 		);
 
-		$menu = $this->models->GuiMenuOrder->freeQuery(
-			"select 
-				_a.ref_id as id,'character' as type,_a.show_order as show_order,
-				if(locate('|',_b.label)=0,_b.label,substring(_b.label,1,locate('|',_b.label)-1)) as label,
-			if(locate('|',_b.label)=0,_b.label,substring(_b.label,locate('|',_b.label)+1)) as description
-			from %TABLE% _a
-			left join %PRE%characteristics_labels _b on _b.characteristic_id = _a.ref_id and _b.language_id = ".$data['language']."
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.matrix_id = ".$data['matrix']."
-				and _a.ref_type='char'
-			union all
-			select 
-				_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %TABLE% _a
-			left join %PRE%chargroups_labels _c on _c.chargroup_id = _a.ref_id and _c.language_id = ".$data['language']."
-			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.matrix_id = ".$data['matrix']."
-				and _a.ref_type='group'
-			order by show_order,label"
-		);
-		
-		foreach((array)$menu as $key=>$val) {
+		$menu=$this->getGuiMenuOrder($data['matrix'],$data['language']);
 
+		foreach((array)$menu as $key=>$val)
+		{
 			unset($menu[$key]['show_order']);
 
 			$menu[$key]['img']=makeCharacterIconName($val['label']);
 
-			if ($val['type']=='character') {
+			if ($val['type']=='character')
+			{
 
-				$menu[$key]['img']=makeCharacterIconName($val['label']);
+				//$menu[$key]['img']=makeCharacterIconName($val['label']);
 	
 				$menu[$key]['states']=$this->models->CharacteristicState->freeQuery(
-					"select _a.id,_c.label,_a.file_name as img,'0' as select_state, _a.show_order
+					"select
+						_a.id,
+						_c.label,
+						_a.file_name as img,
+						'0' as select_state, 
+						_a.show_order
 					from %TABLE% _a
-					left join %PRE%characteristics_labels_states _c on _a.id = _c.state_id and _c.language_id = ".$data['language']." and _c.project_id = ".$this->getCurrentProjectId()."
-					where _a.characteristic_id = ".$val['id']." and _a.project_id = ".$this->getCurrentProjectId()."
-					order by _a.show_order,_c.label"
+					left join %PRE%characteristics_labels_states _c 
+						on _a.id = _c.state_id 
+						and _c.language_id = ".$data['language']." 
+						and _c.project_id = ".$this->getCurrentProjectId()."
+					where
+						_a.characteristic_id = ".$val['id']." 
+						and _a.project_id = ".$this->getCurrentProjectId()."
+					order by 
+						_a.show_order,
+						_c.label"
 				);
 
 				$hasSelected=false;
-				foreach((array)$menu[$key]['states'] as $sKey => $sVal) {
+				foreach((array)$menu[$key]['states'] as $sKey => $sVal)
+				{
 					unset($menu[$key]['states'][$sKey]['show_order']);
-					$menu[$key]['states'][$sKey]['select_state']=isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
+
+					$menu[$key]['states'][$sKey]['select_state']=
+						isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
+
 					if ($menu[$key]['states'][$sKey]['select_state']=='1') $hasSelected=true;
+
 					if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
 						unset($menu[$key]['states'][$sKey]);
-					if (in_array($sVal['id'],$selStates)) {
-						array_push($stateList,array_merge($sVal,array('character'=>array('id'=>$val['id'],'label'=>$val['label']))));
+
+					if (in_array($sVal['id'],$selStates))
+					{
+						$stateList[]=
+							array_merge(
+								$sVal,
+								array(
+									'display'=>array_search($sVal['id'],$selStates),
+									'character'=>array('id'=>$val['id'],'label'=>$val['label'])
+								)
+							);
 					}
 				}
 				
@@ -166,42 +178,81 @@ class MatrixKeyAppController extends Controller
 				$menu[$key]['hasSelected']=$hasSelected;
 
 			} else
-			if ($val['type']=='c_group') {
+			if ($val['type']=='c_group')
+			{
 				
 				$c = $this->models->CharacteristicChargroup->freeQuery(
-					"select _a.characteristic_id as id,'character' as type,_a.show_order as show_order,
-					if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label,
-					if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description					
+					"select
+						_a.characteristic_id as id,
+						'character' as type,
+						_a.show_order as show_order,
+						if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label,
+						if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description					
 					from %TABLE% _a
-					left join %PRE%characteristics _b on _a.characteristic_id = _b.id
-					left join %PRE%characteristics_labels _c on _a.characteristic_id = _c.characteristic_id and _c.language_id = ".$data['language']." and _c.project_id = ".$this->getCurrentProjectId()."
-					where _a.chargroup_id = ".$val['id']. " and _a.project_id = ".$this->getCurrentProjectId()."
-					order by label"
+					left join %PRE%characteristics _b 
+						on _a.characteristic_id = _b.id
+					left join %PRE%characteristics_labels _c 
+						on _a.characteristic_id = _c.characteristic_id 
+						and _c.language_id = ".$data['language']." 
+						and _c.project_id = ".$this->getCurrentProjectId()."
+					where
+						_a.chargroup_id = ".$val['id']. " 
+						and _a.project_id = ".$this->getCurrentProjectId()."
+					order by 
+						label"
 				);
 
 				$hasSelectedGroup=false;
 
-				foreach((array)$c as $cKey=>$cVal) {
+				foreach((array)$c as $cKey=>$cVal)
+				{
 					
 					$c[$cKey]['img']=makeCharacterIconName($val['label']);
 
 					$c[$cKey]['states']=$this->models->CharacteristicState->freeQuery(
-						"select _a.id,_c.label,_a.file_name as img,'0' as select_state, _a.show_order
+						"select
+							_a.id,
+							_c.label,
+							_a.file_name as img,
+							'0' as select_state, 
+							_a.show_order
 						from %TABLE% _a
-						left join %PRE%characteristics_labels_states _c on _a.id = _c.state_id and _c.language_id = ".$data['language']." and _c.project_id = ".$this->getCurrentProjectId()."
-						where _a.characteristic_id = ".$cVal['id']." and _a.project_id = ".$this->getCurrentProjectId()."
-						order by _a.show_order,_c.label"
+						left join %PRE%characteristics_labels_states _c 
+							on _a.id = _c.state_id 
+							and _c.language_id = ".$data['language']." 
+							and _c.project_id = ".$this->getCurrentProjectId()."
+						where 
+							_a.characteristic_id = ".$cVal['id']." 
+							and _a.project_id = ".$this->getCurrentProjectId()."
+						order by 
+							_a.show_order,_c.label"
 					);
 					
 					$hasSelected=false;
-					foreach((array)$c[$cKey]['states'] as $sKey => $sVal) {
+					foreach((array)$c[$cKey]['states'] as $sKey => $sVal)
+					{
 						unset($c[$cKey]['states'][$sKey]['show_order']);
-						$c[$cKey]['states'][$sKey]['select_state']=isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
+
+						$c[$cKey]['states'][$sKey]['select_state']=
+							isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
+
 						if ($c[$cKey]['states'][$sKey]['select_state']=='1') $hasSelected=true;
+
 						if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
 							unset($c[$cKey]['states'][$sKey]);
+
 						if (in_array($sVal['id'],$selStates))
-							array_push($stateList,array_merge($sVal,array('character'=>array('id'=>$val['id'],'label'=>$val['label']))));
+						{
+							$stateList[]=
+								array_merge(
+									$sVal,
+									array(
+										'display'=>array_search($sVal['id'],$selStates),
+										'character'=>
+											array('id'=>$val['id'],'label'=>$cVal['label'])
+										)
+									);
+						}
 					}
 					
 					$c[$cKey]['hasStates']=count((array)$c[$cKey]['states'])>0;
@@ -218,9 +269,9 @@ class MatrixKeyAppController extends Controller
 			}
 		
 		}
+		usort($stateList,function ($a,$b) {return $a['display']>$b['display'] ? 1 : -1;});
 
 		return array('all'=>$menu,'active'=>$stateList);
-
 	}
 
 	private function _appControllerGetResults($data)
@@ -379,6 +430,42 @@ class MatrixKeyAppController extends Controller
 		return $res;
 					
 	}
+	
+	private function getGuiMenuOrder($mId,$lId)
+	{
+		if (!isset($_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']))
+		{
+			
+			$_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']=
+				$this->models->GuiMenuOrder->freeQuery(
+					"select 
+						_a.ref_id as id,'character' as type,_a.show_order as show_order,
+						if(locate('|',_b.label)=0,_b.label,substring(_b.label,1,locate('|',_b.label)-1)) as label,
+					if(locate('|',_b.label)=0,_b.label,substring(_b.label,locate('|',_b.label)+1)) as description
+					from %TABLE% _a
+					left join %PRE%characteristics_labels _b on _b.characteristic_id = _a.ref_id and _b.language_id = ".$lId."
+					where 
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.matrix_id = ".$mId."
+						and _a.ref_type='char'
+					union all
+					select 
+						_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %TABLE% _a
+					left join %PRE%chargroups_labels _c on _c.chargroup_id = _a.ref_id and _c.language_id = ".$lId."
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.matrix_id = ".$mId."
+						and _a.ref_type='group'
+					order by show_order,label"
+				);
+				
+		}
+		
+		return $_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder'];
+			
+	}
+			
+	
 			
 
 }	
