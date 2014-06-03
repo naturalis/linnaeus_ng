@@ -54,12 +54,12 @@ function resultlist(results)
 		).replace('%n%',i).replace('%style%',(i>initialrows-1 ? 'display:none' : '')));
 	}
 
-	document.getElementById('resultsListView').innerHTML = buffer.join('');
-
-	document.getElementById('num-of-results-top').innerHTML = 
-		document.getElementById('num-of-results-bottom').innerHTML = results.length;
-	document.getElementById('num-of-results-label-top').innerHTML = 
-		document.getElementById('num-of-results-label-bottom').innerHTML = ' '+(results.length==1 ? 'dier' : 'dieren')+' gevonden';
+	$('#resultsListView').html(buffer.join(''));
+	$('#num-of-results-top').html(results.length);
+	$('#num-of-results-bottom').html(results.length);
+	var d=' '+(results.length==1 ? 'dier' : 'dieren')+' gevonden';
+	$('#num-of-results-label-top').html(d);
+	$('#num-of-results-label-bottom').html(d);
 		
 	appController.states(activePage);
 }
@@ -295,7 +295,8 @@ function detailback()
 
 function loadpage(page)
 {
-	if (page) $('#secondary-content').load('../introduction/topic.php?p='+appController.getproject()+'&id='+page+'&lan='+appController.getlanguage());
+//	if (page) $('#secondary-content').load('../introduction/topic.php?p='+appController.getproject()+'&id='+page+'&lan='+appController.getlanguage());
+	if (page) $('#secondary-content').load(page);
 
 	$('#secondary').toggle(page);
 	$('#main').toggle(!page);	

@@ -47,7 +47,7 @@
 
 			<div role="banner" class="ui-header ui-bar-a" data-role="header" id="mainheader">
 				<img src="{$projectUrls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" style="display:block" id="mainlogo">
-				<a data-theme="a" id="infobutton" href="#" onClick="loadpage('colofon');" data-role="button" data-inline="true" data-transition="none" class="ui-btn-left ui-btn ui-btn-inline ui-btn-corner-all ui-shadow ui-btn-up-a" style="top:50%;margin-top:-17px;height:24px;">
+				<a data-theme="a" id="infobutton" href="#" onClick="loadpage('../../templates/templates/nbc_dierenzoeker_mobiel/_static/colofon.php')" data-role="button" data-inline="true" data-transition="slide" class="ui-btn-left ui-btn ui-btn-inline ui-btn-corner-all ui-shadow ui-btn-up-a" style="top:50%;margin-top:-17px;height:24px;">
 				<span aria-hidden="true" class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">
 					<img src="{$projectUrls.systemMedia}info.png" alt="">
 				</span></span></a>
@@ -93,10 +93,9 @@
 		<div class="block-container middle-block-container" style="margin-bottom: 60px;">
 
 			<a id="result-top" name="result-top"></a>
-			<h4 style="margin-left:9px;margin: 0px;margin-left:9px;padding-top: 10px;">
+			<!-- h4 style="margin-left:9px;margin: 0px;margin-left:9px;padding-top: 10px;">
 			<span class="ie-rounded num-of-results" id="num-of-results-top"></span><span class="num-of-results-label" id="num-of-results-label-top"></span>
-			</h4>
-
+			</h4 -->
 
 			<ul data-role="listview" data-inset="true" id="resultsListView" class="resultlist ui-listview ui-listview-inset ui-corner-all ui-shadow">
 			<!-- results -->
@@ -110,7 +109,7 @@
 					</span>
 				</a>
 
-				<a data-theme="c" href="#" onClick="loadpage('faq')" data-role="button" id="askNaturalis" class="simplebutton ie-rounded ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow" style="background-color:#5a5c5f;color:white;border:none;" -->
+				<a data-theme="c" href="#" onClick="loadpage('../../templates/templates/nbc_dierenzoeker_mobiel/_static/faq.php')" data-transition="slide" data-role="button" id="askNaturalis" class="simplebutton ie-rounded ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow" style="background-color:#5a5c5f;color:white;border:none;">
 					<span aria-hidden="true" class="ui-btn-inner ui-btn-corner-all">
 						<span class="ui-btn-text">Vragen?</span>
 					</span>
