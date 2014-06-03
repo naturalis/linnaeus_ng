@@ -1,7 +1,5 @@
 <div id="main-show" class="show-page" data-role="page">
     <!-- TODO: move inline styles to site stylesheet for clean separation of html/css -->
-    <div data-role="header" class="header">
-        <img src="../../../../media/system/skins/nbc_dierenzoeker_mobiel/header-show.png" alt="Dierenzoeker" class="logo" />        <img src="../../../../media/system/skins/nbc_dierenzoeker_mobiel/back.png" class="info-button" style="position:absolute;left:5px;top:2px;" onclick="history.go(-1);" alt="" />    </div> 
     <div data-role="content" class="soortpagina">
         
         <div style="padding:10px;">
