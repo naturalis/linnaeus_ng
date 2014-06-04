@@ -10,7 +10,9 @@
 <div class="illustratie-wrapper">
     <div class="illustratie">
         <!-- a id="lightbox905" href="{$nbc.url_image}" title="" -->
+       	<a rel="prettyPhoto[gallery]" href="{$nbc.url_image_large}" title="{$v.description}">
             <img style="width:280px" title="" src="{$nbc.url_image}" alt="">
+		</a>
         <!-- /a -->
     </div>
 </div>
