@@ -246,6 +246,16 @@ ga('send', 'pageview');
 
 </script>
 
+<!-- Begin CMC v.1.0.1 -->
+<script type="text/javascript">
+// <![CDATA[
+function sitestat(u){var d=document,l=d.location;ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_c="+((d.characterSet)?d.characterSet:d.defaultCharset)+"&ns_ti="+escape(d.title)+"&ns_jspageurl="+escape(l&&l.href?l.href:d.URL)+"&ns_referrer="+escape(d.referrer);(d.images)?new Image().src=u:d.write('<'+'p><img src="'+u+'" height="1" width="1" alt="*"/><'+'/p>');};
+sitestat("//nl.sitestat.com/klo/ntr/s?ntr.hetklokhuis.dierenzoeker&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd");
+// ]]>
+</script>
+<noscript><p><img src="//nl.sitestat.com/klo/ntr/s?ntr.hetklokhuis.dierenzoeker&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd" height="1" width="1" alt="*"/></p></noscript>
+<!-- End CMC -->
+
 {/literal}
 
 </body>
