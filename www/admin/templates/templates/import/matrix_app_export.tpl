@@ -37,6 +37,7 @@ Output:
     <label><input type="checkbox" name="separateDrop" value="y" />include separate set of drop-queries</label><br />
     <label><input type="checkbox" name="includeCode" value="y" checked="checked"/>make PhoneGap/javascript include file</label><br />
     <label><input type="checkbox" name="downloadFile" value="y" checked="checked"/>download as file (rather than display in browser)</label><br />
+	db version: <input type="text" value="{$version}" name="version" style="width:30px" /><br />
     </p>
     <input type="submit" value="export" />
     </form>
