@@ -204,6 +204,19 @@ ga('create', 'UA-27823424-2', 'dierenzoeker.nl');
 ga('send', 'pageview');
 
 </script>
+<!-- Begin Sitestat ECMA -->
+<script type="text/ecmascript">
+// <![CDATA[
+function sitestat(u){var d=document,l=location,ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_ti="+encodeURIComponent(d.title)+"&ns_jspageurl="+encodeURIComponent(l.href)+"&ns_referrer="+encodeURIComponent(d.referrer);(d.images)?new Image().src=u:d.write('<img src="'+u+'" height=1 width=1 alt="*">');};
+sitestat("http://nl.sitestat.com/klo/ntr-mobiel/s?ntr.hetklokhuis.dierenzoeker.home&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd&pom_context=web&pom_appver=1.00&pom_appname=dierenzoeker&ns_t=1401874745");
+// ]]>
+</script>
+<noscript>
+<img src="http://nl.sitestat.com/klo/ntr-mobiel/s?ntr.hetklokhuis.dierenzoeker.home&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd&pom_context=web&pom_appver=1.00&pom_appname=dierenzoeker&ns_t=1401874745" height=1 width=1 alt="*" />
+</noscript>
+<!-- End Sitestat ECMA -->
+
+
 </body>
 </html>
 
