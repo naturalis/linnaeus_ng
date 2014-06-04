@@ -117,14 +117,15 @@ class ExportAppController extends Controller
 		$config = new configuration;
 		$dbSettings = $config->getDatabaseSettings();
 
-		if ($this->rHasVal('action','export')) {
-			
+		if ($this->rHasVal('action','export'))
+		{
 			$this->_removePrefix = isset($this->requestData['removePrefix']) && $this->requestData['removePrefix']=='y' ? $dbSettings['tablePrefix'] : false;
 			$this->_includeCode = isset($this->requestData['includeCode']) && $this->requestData['includeCode']=='y' ? true : false;
 			$this->_downloadFile = isset($this->requestData['downloadFile']) && $this->requestData['downloadFile']=='y' ? true : false;
 			$this->_separateDrop = isset($this->requestData['separateDrop']) && $this->requestData['separateDrop']=='y' ? true : false;
 			$this->_reduceURLs = isset($this->requestData['reduceURLs']) && $this->requestData['reduceURLs']=='y' ? true : false;
 			$this->_makeImageList = isset($this->requestData['imageList']) && $this->requestData['imageList']=='y' ? true : false;
+			$this->_projectVersion = $this->rHasVar('version') ? $this->rGetVal('version') : $this->_projectVersion;
 			
 			$d = explode('-',$this->requestData['id']);
 			$matrixId = $d[0];
@@ -155,16 +156,18 @@ class ExportAppController extends Controller
 				'columns' => 'id'
 			));
 			
-		if ($d[0]['id']) {
-
+		if ($d[0]['id'])
+		{
 			$this->smarty->assign('dbSettings',$dbSettings);
 			$this->smarty->assign('matrices',$matrices);
 			$this->smarty->assign('default_langauge',$this->getDefaultProjectLanguage());
-			
-		} else {
-
+		} 
+		else
+		{
 			$this->smarty->assign('matrices',false);
 		}
+
+		$this->smarty->assign('version', $this->_projectVersion);
 		
         $this->printPage();
 		
