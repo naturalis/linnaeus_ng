@@ -315,6 +315,10 @@ class SpeciesController extends Controller
 			)
 		);
 		$nbc=$this->getNbcExtras(array('id'=>$this->rGetVal('id')));
+
+		// hardcoding....
+		if (isset($nbc["url_image"])) $nbc["url_image_large"]=str_replace('280x190','original',$nbc["url_image"]);
+
 		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
 		$contentparent = $this->models->ContentTaxon->_get(array(
 			'id' =>  array(
