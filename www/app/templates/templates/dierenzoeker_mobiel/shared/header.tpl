@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Dierenzoeker</title>
-  <meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker.">
+  <meta name="description" property="og:description" content="Zie je een dier in je huis of tuin en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker! Beschikbaar als website en app.">
   <link rel="image_src" href="img/dierenzoeker-logo.png">
   <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon">
   <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon">
