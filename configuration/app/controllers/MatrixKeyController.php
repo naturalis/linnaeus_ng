@@ -254,13 +254,9 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('taxa', $taxa);
 
         $this->smarty->assign('matrix', $matrix);
-
         $this->smarty->assign('projectId', $this->getCurrentProjectId());
-
         $this->smarty->assign('function', 'Identify');
-
         $this->smarty->assign('characteristics', $characters);
-
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
 		
         $this->printPage('identify');

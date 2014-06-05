@@ -300,6 +300,7 @@ class SpeciesController extends Controller
 			$d = $this->getCommonname($val['relation_id']);
 			$related[$key]['label'] = $d;
 			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
+			$related[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_thumbnail'));
 		}
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 		$parent = $this->getTaxonById($taxon['parent_id']);
@@ -320,6 +321,7 @@ class SpeciesController extends Controller
 		if (isset($nbc["url_image"])) $nbc["url_image_large"]=str_replace('280x190','original',$nbc["url_image"]);
 
 		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
+
 		$contentparent = $this->models->ContentTaxon->_get(array(
 			'id' =>  array(
 				'taxon_id' => $parent['id'],
@@ -805,7 +807,8 @@ class SpeciesController extends Controller
 		array(
 			'id' => $d, 
 			'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime', 
-			'order' => 'mime, sort_order'
+			'order' => 'mime, sort_order',
+			'fieldAsIndex'=>'file_name'
 		));
 
 		$this->loadControllerConfig('species');

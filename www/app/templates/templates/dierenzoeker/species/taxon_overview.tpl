@@ -6,6 +6,9 @@
 <h2>{$taxon.taxon}</h2> 
 
 {if $taxon.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
+<script>
+	$("#dier-header").html('Dier');
+</script>
 {if $nbc.url_image}
 <div class="illustratie-wrapper">
     <div class="illustratie">
@@ -34,6 +37,10 @@
     {$content[848].content}
 </p>
 {else}
+<script>
+	$("#dier-header").html('Diergroep');
+</script>
+
 <p>
     <span class="label">{$categoryList[860]|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[860].content}
@@ -79,7 +86,7 @@
         {foreach from=$related item=v}
             <li class="">
                 <a href="#" onclick="toonDier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
-                <img src="{$v.url_image}" style="padding-top:10px">
+                <img src="{$v.url_thumbnail}">
                 {$v.label}                    
                 </a>
             </li>

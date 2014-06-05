@@ -5,7 +5,7 @@ body {
    height:100%;
 }
 body {	
-	background: url("../../media/system/skins/nbc_dierenzoeker/background.jpg");
+	background: url("../../media/system/skins/dierenzoeker/background.jpg");
 	background-size: 100%;
 	background-position-y: 185px;	
 	font-family: Arial, Helvetica, sans-serif;	
@@ -53,7 +53,7 @@ a img {
 	padding-top: 	1px;
 	width: 			100%;
 	height: 		200px;
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/bg_wittestreep.jpg");
+	background: 	url("../../media/system/skins/dierenzoeker/bg_wittestreep.jpg");
 	margin-top:		-10px;
 	padding-bottom: 10px;
 }
@@ -61,7 +61,7 @@ a img {
 .header .header-inner {
 	width: 			955px;
 	height: 		108px;
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/header.png") top left no-repeat;
+	background: 	url("../../media/system/skins/dierenzoeker/header.png") top left no-repeat;
 	position: 		relative;
 	left: 			50%;
 	margin-left: 	-478px;
@@ -119,76 +119,76 @@ a img {
 	position:relative;
 	top:-25px;
 	height:100px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/subheader-lijn.png") no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/subheader-lijn.png") no-repeat;	
 	background-position: 11px top;	
 }
 
 #home-btn {
 	width: 64px;
 	height: 22px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/home.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/home.png") top left no-repeat;
 	
 }
 #home-btn:hover {
-	background: url("../../media/system/skins/nbc_dierenzoeker/home-over.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/home-over.png") top left no-repeat;
 }
 
 #tv-btn {
 	width: 161px;
 	height: 22px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/op-tv.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/op-tv.png") top left no-repeat;	
 }
 #tv-btn:hover {
-	background: url("../../media/system/skins/nbc_dierenzoeker/op-tv-over.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/op-tv-over.png") top left no-repeat;
 }
 
 #onderwijs-btn {
 	width: 93px;
 	height: 22px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/onderwijs.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/onderwijs.png") top left no-repeat;	
 }
 #onderwijs-btn:hover {
-	background: url("../../media/system/skins/nbc_dierenzoeker/onderwijs-over.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/onderwijs-over.png") top left no-repeat;
 }
 #mobiel-btn {
 	width:110px;
 	height:27px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/mobiel.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/mobiel.png") top left no-repeat;	
 }
 #mobiel-btn:hover {	
-	background: url("../../media/system/skins/nbc_dierenzoeker/mobiel-over.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/mobiel-over.png") top left no-repeat;	
 }
 #faq-btn {
 	width:178px;
 	height:27px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/faq.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/faq.png") top left no-repeat;	
 }
 #faq-btn:hover {	
-	background: url("../../media/system/skins/nbc_dierenzoeker/faq-over.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/faq-over.png") top left no-repeat;	
 }
 #colofon-btn {
 	width:69px;
 	height:27px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/colofon.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/colofon.png") top left no-repeat;	
 }
 #colofon-btn:hover {	
-	background: url("../../media/system/skins/nbc_dierenzoeker/colofon-over.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/colofon-over.png") top left no-repeat;	
 }
 .prev-btn {
 	width: 63px;
 	height: 13px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/vorige.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/vorige.png") top left no-repeat;
 } 
 .prev-btn:hover {
-	background: url("../../media/system/skins/nbc_dierenzoeker/vorige-over.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/vorige-over.png") top left no-repeat;
 }
 .next-btn {
 	width: 81px;
 	height: 13px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/volgende.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/volgende.png") top left no-repeat;
 } 
 .next-btn:hover {
-	background: url("../../media/system/skins/nbc_dierenzoeker/volgende-over.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/volgende-over.png") top left no-repeat;
 }
 
 .wat-weet-je-list {
@@ -204,14 +204,14 @@ a img {
 	padding-left: 0px;
 	width: 	106px;
 	height: 56px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/wat-weet-je-van-het-dier.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/wat-weet-je-van-het-dier.png") top left no-repeat;
 	margin-top: 5px;
 }
 .dit-weet-je-arrow {	
 	margin-left: 1px;		
 	width: 	115px;
 	height: 56px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/wat-weet-je-van-het-dier.png") top left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/wat-weet-je-van-het-dier.png") top left no-repeat;
 	margin-top: 10px;
 	float:left;
 }
@@ -226,7 +226,7 @@ a img {
 }
 
 .dit-weet-je-arrow {	
-	background: url("../../media/system/skins/nbc_dierenzoeker/dit-weet-je-van-het-dier.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/dit-weet-je-van-het-dier.png") top left no-repeat;	
 }
 
 .grid-labelbox {
@@ -250,7 +250,7 @@ a img {
 }
 
 .result-list-header {
-	background: url("../../media/system/skins/nbc_dierenzoeker/list-top.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/list-top.png") top left no-repeat;	
 	height: 31px;
 }
 .result-list-header ul, .result-list-footer ul {
@@ -291,7 +291,7 @@ a img {
 	margin-top:-16px;
 	width:32px;
 	height:32px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/ajax-loader.gif") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/ajax-loader.gif") top left no-repeat;	
 }
 
 
@@ -353,7 +353,21 @@ a img {
     overflow: 			hidden;
     text-overflow: 		ellipsis;
     -o-text-overflow: 	ellipsis;   
+
+padding:15px 0px 5px 82px;
+height:80px;
+font-size:14.5px;
+white-space:normal;
+vertical-align:middle;
+  
 }
+
+.bla {
+vertical-align:middle;
+
+
+}
+
 .result-list-body a:hover, .related a:hover {					
 	color:#000000;
 }
@@ -370,12 +384,13 @@ a img {
 	top: 6px;
 	max-height: 80px;
 	max-width: 80px;
+height: 80px;
 }
 
 
 .result-list-footer {
 	margin-top: -21px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/list-bottom.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/list-bottom.png") top left no-repeat;	
 	height: 37px;
 }
 
@@ -387,7 +402,7 @@ a img {
 .dier-header {
 	padding-top:5px;
 	
-	background: url("../../media/system/skins/nbc_dierenzoeker/dier-top.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/dier-top.png") top left no-repeat;	
 	height: 26px;
 	font-weight:bold;
 	font-size:18px;
@@ -399,7 +414,7 @@ a img {
 	background-color:white;
 	font-family: arial, helvetica;
 	font-size:13px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/bg_wittestreep.jpg");
+	background: url("../../media/system/skins/dierenzoeker/bg_wittestreep.jpg");
 	
 	margin-bottom: 30px;	
 }
@@ -438,7 +453,7 @@ a img {
 	text-decoration: none;
 	
 	background-color: black;
-	background-image: url("../../media/system/skins/nbc_dierenzoeker/diergroep-header.png");
+	background-image: url("../../media/system/skins/dierenzoeker/diergroep-header.png");
 	background-repeat: no-repeat;
 	color: #fff;
 	font-size: 18px;
@@ -475,7 +490,7 @@ a img {
 .footer-inner {
 	position: relative;
 	width: 915px;
-	background: url("../../media/system/skins/nbc_dierenzoeker/footer.png") bottom left no-repeat;
+	background: url("../../media/system/skins/dierenzoeker/footer.png") bottom left no-repeat;
 	margin-left:auto;
 	margin-right:auto;
 	height:122px
@@ -519,11 +534,11 @@ a img {
 	background-color: #0d5f79;
 }
 .facetgrouppage-inner {
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/facet-background-top.png") 0 34px no-repeat;
+	background: 	url("../../media/system/skins/dierenzoeker/facet-background-top.png") 0 34px no-repeat;
 }
 
 .facetgrouppage-bottom-shade {	
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/facet-background-bottom.png") bottom no-repeat;
+	background: 	url("../../media/system/skins/dierenzoeker/facet-background-bottom.png") bottom no-repeat;
 	height:22px;
 }
 .facetgrouppage .facetgrouppage-icons {		
@@ -543,7 +558,7 @@ a img {
 }
 
 .facetgrouppage h4 {
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/facet-header-background.png") no-repeat;
+	background: 	url("../../media/system/skins/dierenzoeker/facet-header-background.png") no-repeat;
 	font-size: 		14px;
 	font-weight: 	bold;
 	
@@ -562,10 +577,10 @@ a img {
 	left:			305px;
 	width: 			34px;
 	height:			34px;
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/facet-close.png") no-repeat;
+	background: 	url("../../media/system/skins/dierenzoeker/facet-close.png") no-repeat;
 }
 .facetgrouppage-close-btn:hover {
-	background: 	url("../../media/system/skins/nbc_dierenzoeker/facet-close-over.png") no-repeat;
+	background: 	url("../../media/system/skins/dierenzoeker/facet-close-over.png") no-repeat;
 }
 .facetpage-puntje {
 	position: absolute;
@@ -613,7 +628,7 @@ a img {
 	margin-left: -70px;
 }
 .related {
-	background: url("../../media/system/skins/nbc_dierenzoeker/bg_donkergrijzestreep.jpg");
+	background: url("../../media/system/skins/dierenzoeker/bg_donkergrijzestreep.jpg");
 }
 .terug-naar-het-dier {
 	margin-bottom: -15px;
@@ -621,7 +636,7 @@ a img {
 	width: 	385px;
 	height: 48px;
 	background-color: black;
-	background-image: url("../../media/system/skins/nbc_dierenzoeker/terug-naar-het-dier.png");
+	background-image: url("../../media/system/skins/dierenzoeker/terug-naar-het-dier.png");
 	background-position: top left;
 	background-repeat: no-repeat;	
 }
@@ -632,7 +647,7 @@ a img {
 	margin-bottom:10px;	
 	font-size: 17pt;
 	font-weight:bold;	
-	background: url("../../media/system/skins/nbc_dierenzoeker/veel-gestelde-vragen-question-background.png") top left no-repeat;	
+	background: url("../../media/system/skins/dierenzoeker/veel-gestelde-vragen-question-background.png") top left no-repeat;	
 }
 
 .faq-question, .faq-answer {
@@ -668,10 +683,10 @@ a img {
 	display: 	block;
 	width: 		96px;
 	height:		19px;
-	background: url(../../media/system/skins/nbc_dierenzoeker/alles-wissen.png);
+	background: url(../../media/system/skins/dierenzoeker/alles-wissen.png);
 }
 .alles-wissen:hover {
-	background: url(../../media/system/skins/nbc_dierenzoeker/alles-wissen-over.png);
+	background: url(../../media/system/skins/dierenzoeker/alles-wissen-over.png);
 }
 
 .extra-inner h1 {
