@@ -1,3 +1,7 @@
+<div id="header-titles">
+    <span id="header-title"></span>
+</div>
+
 <div id="categories">
 <ul>
 <li>
