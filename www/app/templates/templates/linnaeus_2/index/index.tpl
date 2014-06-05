@@ -2,40 +2,6 @@
 {include file="_header-titles.tpl"}
 {include file="../shared/_search-main.tpl"}
 
-<div id="categories">
-	<ul>
-		<li>
-			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasNameTypes.hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
-			{t}Species and lower taxa{/t}</a>
-		</li>
-		<li>
-			<a class="category{if $type=='higher'}-active{/if}{if $hasNameTypes.hasHigherTaxa==1}" href="index.php?type=higher"{else} category-no-content"{/if}>
-			{t}Higher taxa{/t}</a>
-		</li>
-		<li>
-			<a class="category{if $type=='common'}-active{/if} category-last{if $hasNameTypes.hasCommonNames==1}" href="index.php?type=common"{else} category-no-content"{/if}>
-			{t}Common names{/t}</a>
-		</li>
-	</ul>
-
-    {if $type=='common'}
-	<div style="float:right">
-		{t}Language:{/t}
-		<select id="nameLanguage" onchange="window.open('index.php?type=common&language='+$('#nameLanguage').val()+'&letter=','_self');">
-		<option value=""{if $activeLanguage==''} selected="selected"{/if}>{t}Show all{/t}</option>
-		<option disabled="disabled">-----------------------</option>
-		{foreach name=languageloop from=$nameLanguages key=k item=v}
-		<option value="{$v.id}"{if $v.id==$language} selected="selected"{/if}>{$v.language}</option>
-		{/foreach}
-		</select>
-		<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
-		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
-	</div>
-	{/if}
-</div>
-
-{include file="../shared/_search-main.tpl"}
-
 <div id="alphabet" class="test">
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />
 	{if $alpha.hasNonAlpha}
