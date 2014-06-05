@@ -1,8 +1,6 @@
 {include file="../shared/header.tpl"}
-
-<div id="header-titles">
-	<span id="header-title">{t}Index{/t}</span>
-</div>
+{include file="_header-titles.tpl"}
+{include file="../shared/_search-main.tpl"}
 
 <div id="categories">
 	<ul>
