@@ -47,7 +47,7 @@
 
 			<div role="banner" class="ui-header ui-bar-a" data-role="header" id="mainheader">
 				<img src="{$projectUrls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" style="display:block" id="mainlogo">
-				<a data-theme="a" id="infobutton" href="#" onClick="loadpage('../../templates/templates/nbc_dierenzoeker_mobiel/_static/colofon.php')" data-role="button" data-inline="true" data-transition="slide" class="ui-btn-left ui-btn ui-btn-inline ui-btn-corner-all ui-shadow ui-btn-up-a" style="top:50%;margin-top:-17px;height:24px;">
+				<a data-theme="a" id="infobutton" href="#" onClick="loadpage('../../static/dierenzoeker_mobiel/colofon.php')" data-role="button" data-inline="true" data-transition="slide" class="ui-btn-left ui-btn ui-btn-inline ui-btn-corner-all ui-shadow ui-btn-up-a" style="top:50%;margin-top:-17px;height:24px;">
 				<span aria-hidden="true" class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">
 					<img src="{$projectUrls.systemMedia}info.png" alt="">
 				</span></span></a>
@@ -109,7 +109,7 @@
 					</span>
 				</a>
 
-				<a data-theme="c" href="#" onClick="loadpage('../../templates/templates/nbc_dierenzoeker_mobiel/_static/faq.php')" data-transition="slide" data-role="button" id="askNaturalis" class="simplebutton ie-rounded ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow" style="background-color:#5a5c5f;color:white;border:none;">
+				<a data-theme="c" href="#" onClick="loadpage('../../static/dierenzoeker_mobiel/faq.php')" data-transition="slide" data-role="button" id="askNaturalis" class="simplebutton ie-rounded ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow" style="background-color:#5a5c5f;color:white;border:none;">
 					<span aria-hidden="true" class="ui-btn-inner ui-btn-corner-all">
 						<span class="ui-btn-text">Vragen?</span>
 					</span>
@@ -196,9 +196,9 @@ var templates = {
 {/literal}
 </script>
 <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)}},i[r].l=1*new Date();a=s.createElement(o),
+(function(i,s,o,g,r,a,m) { i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() { (i[r].q=i[r].q||[]).push(arguments)}},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+} )(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 ga('create', 'UA-27823424-2', 'dierenzoeker.nl');
 ga('send', 'pageview');
@@ -207,7 +207,7 @@ ga('send', 'pageview');
 <!-- Begin Sitestat ECMA -->
 <script type="text/ecmascript">
 // <![CDATA[
-function sitestat(u){var d=document,l=location,ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_ti="+encodeURIComponent(d.title)+"&ns_jspageurl="+encodeURIComponent(l.href)+"&ns_referrer="+encodeURIComponent(d.referrer);(d.images)?new Image().src=u:d.write('<img src="'+u+'" height=1 width=1 alt="*">');};
+function sitestat(u) { var d=document,l=location,ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_ti="+encodeURIComponent(d.title)+"&ns_jspageurl="+encodeURIComponent(l.href)+"&ns_referrer="+encodeURIComponent(d.referrer);(d.images)?new Image().src=u:d.write('<img src="'+u+'" height=1 width=1 alt="*">');};
 sitestat("http://nl.sitestat.com/klo/ntr-mobiel/s?ntr.hetklokhuis.dierenzoeker.home&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd&pom_context=web&pom_appver=1.00&pom_appname=dierenzoeker&ns_t=1401874745");
 // ]]>
 </script>

@@ -64,7 +64,7 @@ h4.tagline {
 
 #filter {
 	background-color: #1aacdb;
-	background-image: url('../../media/system/skins/nbc_dierenzoeker_mobiel/bg_blauwestreep.jpg');
+	background-image: url('../../media/system/skins/dierenzoeker_mobiel/bg_blauwestreep.jpg');
 	padding-top: 0px;
 	padding-bottom:10px;
 }
@@ -112,7 +112,7 @@ div.selectedfacets {
 
 /* custom i icon */
 .ui-icon-dierenzoeker-info {
-	background-image: url("../../media/system/skins/nbc_dierenzoeker_mobiel/info_button.png");
+	background-image: url("../../media/system/skins/dierenzoeker_mobiel/info_button.png");
 }
 
 
@@ -172,15 +172,15 @@ div.selectedfacets {
 }
 .soortpagina {
 	margin-top: -18px;
-	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/bg_wittestreep.jpg");
+	background: url("../../media/system/skins/dierenzoeker_mobiel/bg_wittestreep.jpg");
 	color: black;
 }
 .soortpagina .soortpagina-inner {
-	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/soort-white-background.png") top repeat-x;
+	background: url("../../media/system/skins/dierenzoeker_mobiel/soort-white-background.png") top repeat-x;
 	padding: 0 14px;
 }
 .soortpagina .soortpagina-list {
-	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/bg_donkergrijzestreep.jpg");
+	background: url("../../media/system/skins/dierenzoeker_mobiel/bg_donkergrijzestreep.jpg");
 	padding: 0 14px 14px 14px;
 }
 .soortpagina h4 {
@@ -239,7 +239,7 @@ a img {
 
 #colofon-content {	
 	color:black;
-	background: url(../../media/system/skins/nbc_dierenzoeker_mobiel/bg_wittestreep.jpg);	
+	background: url(../../media/system/skins/dierenzoeker_mobiel/bg_wittestreep.jpg);	
 }
 .stippellijn {
 	height:	6px;
@@ -247,7 +247,7 @@ a img {
 	background: url(stippellijn.png);
 }
 .keuze-content .ui-collapsible-content {	
-	background: url(../../media/system/skins/nbc_dierenzoeker_mobiel/keuze-collapsable-background.png) bottom repeat-x;
+	background: url(../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-background.png) bottom repeat-x;
 }
 .keuze-content h4 a {
 	height:30px;
@@ -255,7 +255,7 @@ a img {
 	font-family: Helvetica,Arial,sans-serif;
 	font-size: 16px;
 	background-color: #1aacdb !important;
-	background-image: url(../../media/system/skins/nbc_dierenzoeker_mobiel/collapsable-arrow.png) !important;
+	background-image: url(../../media/system/skins/dierenzoeker_mobiel/collapsable-arrow.png) !important;
 	background-repeat: no-repeat !important;
 	background-position-x: 16px !important;
 	background-position-y: 10px !important; 

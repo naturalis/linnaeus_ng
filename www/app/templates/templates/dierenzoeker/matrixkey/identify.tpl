@@ -1,7 +1,6 @@
 {include file="../shared/header.tpl"}
 
 <body> 
-      
         <div class="main-wrapper">
             
             <div class="header">
@@ -10,8 +9,8 @@
                     
                     <ul class="menu">
                         <li><a id="home-btn" class="no-text" href="">Home</a></li>
-                        <li><a id="tv-btn" class="no-text" href="../../templates/templates/nbc_dierenzoeker/_static/tv.php">Dierenzoeker op TV</a></li>
-                        <li><a id="onderwijs-btn" class="no-text" href="../../templates/templates/nbc_dierenzoeker/_static/onderwijs.php">Onderwijs</a></li>
+                        <li><a id="tv-btn" class="no-text" href="../../static/dierenzoeker/tv.php">Dierenzoeker op TV</a></li>
+                        <li><a id="onderwijs-btn" class="no-text" href="../../static/dierenzoeker/onderwijs.php">Onderwijs</a></li>
                     </ul>
                     <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='border:0px solid black;display:block;position:absolute;left:890px;top:2px;width:70px;height:90px;'>Naturalis</a>
                     <a href='http://www.hetklokhuis.nl' class="no-text"  target="_blank" style='border:0px solid black;display:block;position:absolute;left:818px;top:2px;width:67px;height:62px;'>Klokhuis</a>
@@ -81,7 +80,7 @@
                 </div>
                 
                 <div class="dier-wrapper" id="dier-content-wrapper" style="visibility:hidden">
-                    <div class="dier-header">
+                    <div id="dier-header" class="dier-header">
                         Dier
                     </div><div class="dier-content" id="dier-content">
                         <!-- Placeholder for pretty first-time loading. -->
@@ -97,19 +96,26 @@
             <div class="footer">
                 <div class="footer-inner">
                     <ul>
-                        <li><a href="../../templates/templates/nbc_dierenzoeker/_static/mobiel.php" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
-                        <li><a href="../../templates/templates/nbc_dierenzoeker/_static/faq.php" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
-                        <li><a href="../../templates/templates/nbc_dierenzoeker/_static/colofon.php" class="no-text" id="colofon-btn">Colofon</a></li>
+                        <li><a href="../../static/dierenzoeker/mobiel.php" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
+                        <li><a href="../../static/dierenzoeker/faq.php" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
+                        <li><a href="../../static/dierenzoeker/colofon.php" class="no-text" id="colofon-btn">Colofon</a></li>
                     </ul>
                     <div class="clearer"></div>               
-                    <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='display:block;position:absolute;left:373px;top:30px;width:79px;height:83px;border: 0px solid black;'>Naturalis</a>
-                    <a href='http://www.hetklokhuis.nl' class="no-text"  target="_blank"      style='display:block;position:absolute;left:458px;top:30px;width:67px;height:62px;border: 0px solid red;'>Klokhuis</a>
-                    <a href='http://www.eis-nederland.nl' class="no-text" target="_blank"   style='display:block;position:absolute;left:535px;top:30px;width:101px;height:68px;border: 0px solid orange;'>EIS</a>
-                    <a href='http://www.cultuurfonds.nl' class="no-text"  target="_blank"   style='display:block;position:absolute;left:646px;top:30px;width:53px;height:68px;border:0px solid purple;'>Prins Bernhard fonds</a>
-                    <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" style='display:block;position:absolute;left:722px;top:30px;width:153px;height:68px;border: 0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
+                    <a href='http://www.naturalis.nl' class="no-text" target="_blank" 
+						style='display:block;position:absolute;left:373px;top:30px;width:79px;height:83px;border:0px solid black;'>Naturalis</a>
+                    <a href='http://www.hetklokhuis.nl' class="no-text"  target="_blank"      
+						style='display:block;position:absolute;left:458px;top:30px;width:67px;height:62px;border:0px solid red;'>Klokhuis</a>
+                    <a href='http://www.eis-nederland.nl' class="no-text" target="_blank"   
+						style='display:block;position:absolute;left:535px;top:30px;width:91px;height:82px;border:0px solid orange;'>EIS</a>
+                    <a href='http://www.cultuurfonds.nl' class="no-text"  target="_blank"   
+						style='display:block;position:absolute;left:640px;top:30px;width:126px;height:42px;border:0px solid purple;'>Prins Bernhard fonds</a>
+                    <a href='http://www.nationaalgroenfonds.nl' class="no-text"  target="_blank"   
+						style='display:block;position:absolute;left:631px;top:74px;width:140px;height:33px;border:0px solid green;'>Nationaal Groen Fonds</a>
+                    <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" 
+						style='display:block;position:absolute;left:779px;top:41px;width:150px;height:55px;border:0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
 
                     <div class="social-media">
-                    <a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/nbc_dierenzoeker/facebook.png" alt="" /></a></div>                </div>
+                    <a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a></div>                </div>
                 </div>
 
         </div>
@@ -200,14 +206,18 @@
 		</div>
        
 
-{literal}
+
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function() {
+
 matrixId={$matrix.id};
 projectId={$projectId};
 nbcUseEmergingCharacters={$matrix_use_emerging_characters};
-{literal}
+
+	{if $requestData.dier}
+	startDier='{$requestData.dier|@escape}';
+	{/if}
+
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();
 	}
@@ -231,13 +241,13 @@ nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 		return false;           
 	});
 
-	$.backstretch("../../media/system/skins/nbc_dierenzoeker/background.jpg");
+	$.backstretch("../../media/system/skins/dierenzoeker/background.jpg");
 
 });
 </script>
 
 <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+(function(i,s,o,g,r,a,m) { i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
@@ -249,13 +259,12 @@ ga('send', 'pageview');
 <!-- Begin CMC v.1.0.1 -->
 <script type="text/javascript">
 // <![CDATA[
-function sitestat(u){var d=document,l=d.location;ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_c="+((d.characterSet)?d.characterSet:d.defaultCharset)+"&ns_ti="+escape(d.title)+"&ns_jspageurl="+escape(l&&l.href?l.href:d.URL)+"&ns_referrer="+escape(d.referrer);(d.images)?new Image().src=u:d.write('<'+'p><img src="'+u+'" height="1" width="1" alt="*"/><'+'/p>');};
+function sitestat(u) { var d=document,l=d.location;ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_c="+((d.characterSet)?d.characterSet:d.defaultCharset)+"&ns_ti="+escape(d.title)+"&ns_jspageurl="+escape(l&&l.href?l.href:d.URL)+"&ns_referrer="+escape(d.referrer);(d.images)?new Image().src=u:d.write('<'+'p><img src="'+u+'" height="1" width="1" alt="*"/><'+'/p>');};
 sitestat("//nl.sitestat.com/klo/ntr/s?ntr.hetklokhuis.dierenzoeker&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd");
 // ]]>
 </script>
 <noscript><p><img src="//nl.sitestat.com/klo/ntr/s?ntr.hetklokhuis.dierenzoeker&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd" height="1" width="1" alt="*"/></p></noscript>
 <!-- End CMC -->
 
-{/literal}
 
 </body>

@@ -12,7 +12,7 @@
 														
 						$(".onderwijs-popup-link").attr("target", "_blank");
 						
-						$.backstretch("../../../../../app/media/system/skins/nbc_dierenzoeker/background_blurry.jpg");
+						$.backstretch("../../media/system/skins/dierenzoeker/background_blurry.jpg");
 					});
 					
 					//Copied from hetklokhuis.nl:
@@ -51,7 +51,7 @@
 <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" style='display:block;position:absolute;left:722px;top:30px;width:153px;height:68px;border: 0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
 
 <div class="social-media">
-<a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../../../../app/media/system/skins/nbc_dierenzoeker/facebook.png" alt="" /></a></div>                
+<a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a></div>                
                 </div>
             </div>
 

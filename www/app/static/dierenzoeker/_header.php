@@ -4,28 +4,24 @@
 		<title>Dierenzoeker</title>
 		<meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker."/>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="../../../../../app/style/nbc_dierenzoeker/basics.css" />
-		<link rel="stylesheet" type="text/css" href="../../../../../app/style/nbc_dierenzoeker/jquery-ui-1.10.0.custom.min.css" />
-		<link rel="stylesheet" type="text/css" href="../../../../../app/style/nbc_dierenzoeker/prettyPhoto/prettyPhoto.css" />
+		<link rel="stylesheet" type="text/css" href="../../style/dierenzoeker/basics.css" />
+		<link rel="stylesheet" type="text/css" href="../../style/dierenzoeker/jquery-ui-1.10.0.custom.min.css" />
+		<link rel="stylesheet" type="text/css" href="../../style/dierenzoeker/prettyPhoto/prettyPhoto.css" />
 
-	<link href="/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker/favicon.ico" type="image/x-icon" rel="icon" />
-    <link href="/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker/favicon.ico" type="image/x-icon" rel="shortcut icon" />        
+	<link href="/linnaeus_ng/app/media/system/skins/dierenzoeker/favicon.ico" type="image/x-icon" rel="icon" />
+    <link href="/linnaeus_ng/app/media/system/skins/dierenzoeker/favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 
-		<script type="text/javascript" src="../../../../../app/javascript/jquery-1.9.1.min.js"></script>
-		<script type="text/javascript" src="../../../../../app/javascript/project_specific/backstretch.js"></script>
-
-
-		<script type="text/javascript" src=".js"></script>
-
+		<script type="text/javascript" src="../../javascript/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="../../javascript/project_specific/backstretch.js"></script>
 		</head>
-    <body style="background-position-y:115px;background: url('../../../../../app/media/system/skins/nbc_dierenzoeker/background_blurry.jpg');">       
+    <body style="background-position-y:115px;background: url('../../media/system/skins/dierenzoeker/background_blurry.jpg');">       
         <div class="main-wrapper">
             
             <div class="header" style="height:115px;">
                 <div class="header-inner">
                     <a class="no-text" style="width:465px;height:90px;display:block;position:absolute;" href="/">Home</a>
                     <ul class="menu">
-                        <li><a href="../../../../../app/views/matrixkey/identify.php" class="no-text" id="home-btn">Home</a></li>
+                        <li><a href="../../views/matrixkey/identify.php" class="no-text" id="home-btn">Home</a></li>
                         <li><a href="tv.php" class="no-text" id="tv-btn">Dierenzoeker op TV</a></li>
                         <li><a href="onderwijs.php" class="no-text" id="onderwijs-btn">Onderwijs</a></li>                        
                     </ul>                             

@@ -5,6 +5,7 @@ var nbcPerLine = 2;		// default, reset in identify.php
 var initData;
 var matrixId=null;
 var projectId=null;
+var startDier=null;
 
 function nbcPrettyPhotoInit() {
 
@@ -43,7 +44,8 @@ function nbcGetResults(p) {
 			nbcDoResults();
 			setCursor();
 			updateChoicesMade();
-		   $('.facetgrouppage-close-btn').click();
+		   	$('.facetgrouppage-close-btn').click();
+		  	openDierLink();
 		}
 	});
 	
@@ -68,7 +70,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="#" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><img alt="" src="'+data.b+'">'+data.l+'</a></li>';
+			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><img alt="" src="'+data.b+'"><span class="bla">'+data.l+'</span></a></li>';
 		}
 	}
 
@@ -268,3 +270,54 @@ function openDiergroep(pId,tId,type) {
 	});
 
 }
+
+function openDierLink()
+{
+	if (!startDier) return
+	startDier=$('<textarea />').html(startDier).text(); // convert entities to characters
+	var n=null;
+	for(var i in nbcData.results)
+	{
+		if (nbcData.results[i].l.toLowerCase()==startDier.toLowerCase())
+		{
+			n=nbcData.results[i];
+			break;
+		}
+	}
+
+	if (n)
+	{
+		toonDier({id:n.i,type:n.y});
+		for (var j=0;j<Math.floor(i/nbcPerPage);j++)
+		{
+			navigeren('volgende');
+		}
+	}
+		
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
