@@ -174,7 +174,20 @@ a img {
 #colofon-btn:hover {	
 	background: url("../../media/system/skins/dierenzoeker/colofon-over.png") top left no-repeat;	
 }
+
+.first-btn {
+	display:inline-block;
+	left:5px;
+	width: 13px;
+	height: 13px;
+	background: url("../../media/system/skins/dierenzoeker/eerste.png") top left no-repeat;
+} 
+.first-btn:hover {
+	background: url("../../media/system/skins/dierenzoeker/eerste-over.png") top left no-repeat;
+}
 .prev-btn {
+	display:inline-block;
+	margin-left:7px;
 	width: 63px;
 	height: 13px;
 	background: url("../../media/system/skins/dierenzoeker/vorige.png") top left no-repeat;
@@ -183,12 +196,23 @@ a img {
 	background: url("../../media/system/skins/dierenzoeker/vorige-over.png") top left no-repeat;
 }
 .next-btn {
-	width: 81px;
+	display:inline-block;
+	width: 63px;
 	height: 13px;
 	background: url("../../media/system/skins/dierenzoeker/volgende.png") top left no-repeat;
 } 
 .next-btn:hover {
 	background: url("../../media/system/skins/dierenzoeker/volgende-over.png") top left no-repeat;
+}
+.last-btn {
+	display:inline-block;
+	margin-left:5px;
+	width: 13px;
+	height: 13px;
+	background: url("../../media/system/skins/dierenzoeker/laatste.png") top left no-repeat;
+} 
+.last-btn:hover {
+	background: url("../../media/system/skins/dierenzoeker/laatste-over.png") top left no-repeat;
 }
 
 .wat-weet-je-list {
@@ -263,12 +287,12 @@ a img {
 }
 .result-list-header ul li a {
 	position: relative;
-	top: 4px;
+	top: 0px;
 }
 
 .result-list-header ul .last-child, .result-list-footer ul .last-child {
 	position: relative;
-	left: 77px;	
+	left: 47px;	
 }
 .result-list-body {
 	background-color: #25aad5;
@@ -354,24 +378,30 @@ a img {
     text-overflow: 		ellipsis;
     -o-text-overflow: 	ellipsis;   
 
-padding:15px 0px 5px 82px;
-height:80px;
-font-size:14.5px;
-white-space:normal;
-vertical-align:middle;
-  
+
+	font-size:14.1px;
+	letter-spacing:-0.1px;
 }
 
-.bla {
-vertical-align:middle;
-
-
+.result-list-body ul li a {					
+	padding:			0px 0px 5px 80px;
+	width: 				170px;
 }
 
-.result-list-body a:hover, .related a:hover {					
+.result-list-body ul li a table td, .related ul li a table td {
+	color: #838687;
+	height:80px;
+	padding-top:4px;
+	white-space:normal;
+	vertical-align:middle;
+	font-size:14.1px;
+	letter-spacing:-0.1px;
+}
+
+.result-list-body a table td:hover, .related a table td:hover {					
 	color:#000000;
 }
-.result-list-body a:active, .related a:active {					
+.result-list-body a table td:active, .related a table td:active {					
 	color:#25AAD5;
 }
 .related ul li a {

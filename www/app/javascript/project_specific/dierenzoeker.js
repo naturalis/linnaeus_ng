@@ -70,7 +70,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><img alt="" src="'+data.b+'"><span class="bla">'+data.l+'</span></a></li>';
+			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><table><tr><td><img alt="" src="'+data.b+'"></td><td>'+data.l+'</td></tr></table></a></li>';
 		}
 	}
 
@@ -83,6 +83,12 @@ function nbcPrintResults() {
 
 function navigeren(dir) {
 
+	if (dir=='eerste')
+		nbcStart = 0;
+	else
+	if (dir=='laatste')
+		nbcStart = Math.floor(nbcData.count.results/nbcPerPage)*nbcPerPage;
+	else
 	if (dir=='vorige')
 		nbcStart = nbcStart-nbcPerPage;
 	else

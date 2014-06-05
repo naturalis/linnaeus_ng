@@ -57,9 +57,15 @@
                 <div class="result-list-wrapper">
                     <div class="result-list-header">
                         <ul>
-                            <li id="prev-button-container-top" style="visibility:hidden"><a href="#" class="no-text prev-btn" onClick="navigeren('vorige');">Vorige 16</a></li>
+                            <li id="prev-button-container-top" style="visibility:hidden">
+								<a href="#" class="first-btn" onClick="navigeren('eerste');"></a>
+								<a href="#" class="prev-btn" onClick="navigeren('vorige');"></a>
+							</li>
                             <li class="num-found" style="margin-top:-2px;"><span class="num" id="result-count-container">0</span> dieren gevonden</li>
-                            <li id="next-button-container-top" style="position:relative;left:84px;visibility:visible;"><a href="#" class="no-text next-btn last-child" onClick="navigeren('volgende');">Volgende 16</a></li>
+                            <li id="next-button-container-top" style="position:relative;left:84px;visibility:visible;">
+								<a href="#" class="next-btn last-child" onClick="navigeren('volgende');"></a>
+								<a href="#" class="last-btn last-child" onClick="navigeren('laatste');"></a>
+							</li>
 
                         </ul>
                         <div class="clearer"></div>
@@ -112,10 +118,13 @@
                     <a href='http://www.nationaalgroenfonds.nl' class="no-text"  target="_blank"   
 						style='display:block;position:absolute;left:631px;top:74px;width:140px;height:33px;border:0px solid green;'>Nationaal Groen Fonds</a>
                     <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" 
-						style='display:block;position:absolute;left:779px;top:41px;width:150px;height:55px;border:0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
+						style='display:block;position:absolute;left:779px;top:41px;width:150px;height:55px;border:0px solid blue;'>Ministerie voor landbouw en innovatie</a>
 
-                    <div class="social-media">
-                    <a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a></div>                </div>
+				<div class="social-media">
+					<a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a>
+					<a href="http://twitter.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/twitter.png" alt="" style="width:32px;height:32px;" /></a>
+				</div>
+					</div>
                 </div>
 
         </div>
