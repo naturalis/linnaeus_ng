@@ -12,7 +12,7 @@ class configuration
     public function __construct ()
     {
 
-		$this->_setConstants();	
+		$this->_setConstants();
         $d = $this->getGeneralSettings();
         $this->_appFileRoot = dirname(__FILE__);
         $this->_appFileRoot = str_replace('\\','/',
@@ -24,41 +24,41 @@ class configuration
 
     public function getDatabaseSettings ()
     {
-        
+
         return array(
-            'host' => 'localhost', 
-            'user' => 'linnaeus_user', 
-            'password' => 'car0lu5', 
-            'database' => 'linnaeus_ng', 
-            'tablePrefix' => 'dev_', 
+            'host' => 'localhost',
+            'user' => 'linnaeus_user',
+            'password' => 'car0lu5',
+            'database' => 'linnaeus_ng',
+            'tablePrefix' => 'dev_',
             'characterSet' => 'utf8'
         );
-    
+
     }
 
     public function getSmartySettings ()
     {
 
         return array(
-            'dir_template' => $this->_appFileRoot . 'www/app/templates/templates/', 
-            'dir_compile' => $this->_appFileRoot . 'www/app/templates/templates_c', 
-            'dir_cache' => $this->_appFileRoot . 'www/app/templates/cache', 
-            'dir_config' => $this->_appFileRoot . 'www/app/templates/configs', 
+            'dir_template' => $this->_appFileRoot . 'www/app/templates/templates/',
+            'dir_compile' => $this->_appFileRoot . 'www/app/templates/templates_c',
+            'dir_cache' => $this->_appFileRoot . 'www/app/templates/cache',
+            'dir_config' => $this->_appFileRoot . 'www/app/templates/configs',
             'caching' => 1,  // 1,
             'compile_check' => true
         );
-    
+
     }
 
     public function getGeneralSettings ()
     {
 
         return array(
-            'debugMode' => false, 
+            'debugMode' => false,
             'app' => array(
-				'name' => 'Linnaeus NG', 
-				'version' => '0.1-dev.r001', 
-				'versionTimestamp' => date('r'), 
+				'name' => 'Linnaeus NG',
+				'version' => '0.1-dev.r001',
+				'versionTimestamp' => date('r'),
 				'pathName' => 'app',
 				'fileRoot' => $this->_appFileRoot.'www/app/',
 				//'skinName' => 'original_skin'
@@ -73,13 +73,14 @@ class configuration
 			'urlUploadedProjectMedia' => '../../../shared/media/project/',
 			'urlSplashScreen' => '../../../app/views/linnaeus/splash.php',
 			'lngFileRoot' => $this->_appFileRoot,
-            'maxSessionHistorySteps' => 10, 
+            'maxSessionHistorySteps' => 10,
             'paths' => array(
-            ), 
+            ),
             'directories' => array(
 				'log' => $this->_appFileRoot . 'log',
 				'cache' => $this->_appFileRoot . 'www/shared/cache',
-          	     'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project'
+         	    'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project',
+                'customStyle' => $this->_appFileRoot . 'www/app/style/custom'
             ),
 			'maxBackSteps' => 100,
 			'urlsToAdminEdit' => array(
@@ -101,7 +102,7 @@ class configuration
 			'addedProjectIDParam' => 'epi',
 			'splashDelay' => 3 //seconds
         );
-    
+
     }
 
     public function getControllerSettingsLinnaeus()
@@ -110,7 +111,7 @@ class configuration
         return array(
             'minimumSearchStringLength' => 3,
             'visibleSearchResultsPerCategory' => 10,
-			'contentAboutETI' => 
+			'contentAboutETI' =>
 				array(
 					'sub' => 'About ETI',
 					'projectID' => -10
@@ -139,27 +140,27 @@ class configuration
 					'type' => 'image',
 				),
 				'image/jpg' => array(
-					'label' => 'Images', 
+					'label' => 'Images',
 					'type' => 'image',
 				),
 				'image/jpeg' => array(
-					'label' => 'Images', 
+					'label' => 'Images',
 					'type' => 'image',
 				),
 				'image/gif' => array(
-					'label' => 'Images', 
+					'label' => 'Images',
 					'type' => 'image',
 				),
 				'video/h264' => array(
-					'label' => 'Videos', 
+					'label' => 'Videos',
 					'type' => 'video',
 				),
 				'video/quicktime' => array(
-					'label' => 'Videos', 
+					'label' => 'Videos',
 					'type' => 'video',
 				),
 				'audio/mpeg' => array(
-					'label' => 'Sounds', 
+					'label' => 'Sounds',
 					'type' => 'audio',
 				),
 			),
@@ -217,7 +218,7 @@ class configuration
 		if (!defined('PREDICATE_VALID_NAME')) define('PREDICATE_VALID_NAME','isValidNameOf');
 		if (!defined('PREDICATE_PREFERRED_NAME')) define('PREDICATE_PREFERRED_NAME','isPreferredNameOf');
 
-		
+
 	}
 
 
