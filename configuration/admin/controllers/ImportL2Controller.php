@@ -540,16 +540,16 @@ class ImportL2Controller extends ImportController
 				$this->rHasVal('taxon_synonym', 'on') || 
 				!$this->rHasVal('syn_vern_description', 'off')) {
 
-                if ($this->rHasVal('taxon_overview', 'on')) {
-                    
+                if ($this->rHasVal('taxon_overview', 'on'))
+				{
                     $_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = true;
-                    $_SESSION['admin']['system']['import']['speciesOverviewCatId'] = $this->createCategory();
-                    $_SESSION['admin']['system']['import']['speciesNomenclatureCatId'] = $this->createCategory('Nomenclature');
+                    $_SESSION['admin']['system']['import']['speciesOverviewCatId'] = $this->createCategory(null,0);
+                    $_SESSION['admin']['system']['import']['speciesNomenclatureCatId'] = $this->createCategory('Nomenclature',1);
                     $_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved'] = 0;
                     $_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] = array();
                 }
-                else {
-                    
+                else 
+				{
                     $_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = false;
                 }
                 
@@ -2242,7 +2242,7 @@ class ImportL2Controller extends ImportController
     }
 
 
-    private function createCategory ($name='Description')
+    private function createCategory ($name='Description',$showOrder=0)
     {
         $pt = $this->models->PageTaxon->_get(array(
             'id' => array(
@@ -2260,7 +2260,7 @@ class ImportL2Controller extends ImportController
             'id' => null, 
             'project_id' => $this->getNewProjectId(), 
             'page' => $name, 
-            'show_order' => 0, 
+            'show_order' => $showOrder, 
             'def_page' => ($name=='Description')
         ));
         
