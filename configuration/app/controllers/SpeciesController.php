@@ -807,8 +807,7 @@ class SpeciesController extends Controller
 		array(
 			'id' => $d, 
 			'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime', 
-			'order' => 'mime, sort_order',
-			'fieldAsIndex'=>'file_name'
+			'order' => 'mime, sort_order'
 		));
 
 		$this->loadControllerConfig('species');
