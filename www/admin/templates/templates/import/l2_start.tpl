@@ -3,8 +3,8 @@
 <div id="page-main">
 	<form method="post" action="" id="theForm" enctype="multipart/form-data">
 		<p>
-			This module allows you to import data from an existing Linnaeus 2-project. In order to do so, export the data of the project as a standard 
-			Linnaeus 2 XML export file and upload that file in the form below. If you wish to import media files as well, save them to a location that 
+			This module allows you to import data from an existing Linnaeus 2-project. In order to do so, export the data of the project as a standard
+			Linnaeus 2 XML export file and upload that file in the form below. If you wish to import media files as well, save them to a location that
 			can be accessed by this webserver.
 		</p>
 		<fieldset>
@@ -25,7 +25,7 @@
 		<fieldset>
 			<legend>MEDIA</legend>
 			<p>
-				Set the paths below where the media files and, if they exist, thumbnails can be found.<br />
+				Set the paths below where the media files can be found.<br />
 				These paths should be fully qualified and be <b>writable</b> by the <i>webserver</i> (not the client from which you are viewing this page).<br />
 				Please check the corresponding checkboxes if you do not wish to import images and/or thumbnails.
 			</p>
@@ -62,8 +62,8 @@
 			</p>
 			{/if *}
 		</fieldset>
-		
-		
+
+
 		<p>
 		<input type="hidden" name="clear" id="clear" value="" />
 		<input type="hidden" name="process" id="process" value="0" />
