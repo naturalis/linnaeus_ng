@@ -427,6 +427,18 @@ class MatrixKeyAppController extends Controller
 		);
 		$res['similar']=$t;
 
+		$t=$this->models->Taxon->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id'=>$data['id'])));
+		foreach((array)$t as $key => $val)
+		{
+			$t[$key]['label']=$this->getCommonname($val['id']);
+			$t[$key]['img']=$this->getNbcExtras(array('id'=>$val['id'],'name'=>'url_thumbnail'));
+		}
+		if ($t)
+		{
+			usort($t,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
+			$res['children']=$t;
+		}
+
 		return $res;
 					
 	}
