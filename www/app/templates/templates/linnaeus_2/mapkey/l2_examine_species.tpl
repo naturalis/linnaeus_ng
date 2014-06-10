@@ -69,7 +69,7 @@
 			{/foreach}
 		</div>
         <p>
-	    	<a href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Show grid{/t}</span><span style="display:none">{t}Hide grid{/t}</span></a>
+	    	<a href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Hide grid{/t}</span><span style="display:none">{t}Show grid{/t}</span></a>
         </p>
 		</td>
 	</tr>
