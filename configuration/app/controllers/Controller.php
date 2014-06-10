@@ -3217,7 +3217,7 @@ class Controller extends BaseClass
 
         }
 
-        if (isset($fixPaths)) {
+        if (1==2 && isset($fixPaths)) {
 
         	echo '<p>Some required paths do not exist or are not writeable.
         	    Linnaeus NG cannot proceed until this has been corrected:</p>';
