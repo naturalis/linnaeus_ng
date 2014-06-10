@@ -21,15 +21,15 @@
 		<td>
 	        <a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}"
 	        	title="{t}Go to this taxon{/t}">
-	        {$taxon.taxon}</a> 
+	        {$taxon.taxon}</a>
 
 	    </td>
 
 	    <td id="push"></td>
 	</tr>
 	<tr>
-	<td id="gridMapCell">	
-        
+	<td id="gridMapCell">
+
 		<div class="cellwrapper">
 
 			{if $map.mapExists}
@@ -38,7 +38,7 @@
 				{section name=rows start=1 loop=$map.rows+1 step=1}
 					<tr>
 					{section name=cols start=1 loop=$map.cols+1 step=1}
-						<td 
+						<td
 							id="cell-{$cellNo}"
 							{if $occurrences[$cellNo].type_id}datatype="{$occurrences[$cellNo].type_id}"{/if}
 							{if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}
@@ -64,7 +64,7 @@
 		        {/if}
 	        </div>
 
-	    </div>  
+	    </div>
 
 	</td>
 	<td id="legendCell">
@@ -79,7 +79,7 @@
 			{/foreach}
 		</div>
         <p>
-	    	<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Grid verbergen{/t}</span><span style="display:none">{t}Grid tonen{/t}</span></a>
+	    	<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Show grid{/t}</span><span style="display:none">{t}Hide grid{/t}</span></a>
         </p>
 		</td>
 	</tr>

@@ -21,7 +21,7 @@
 $(document).ready(function(){
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
-	 		opacity: 0.70, 
+	 		opacity: 0.70,
 			animation_speed:50,
 			show_title: false,
 	 		overlay_gallery: false,
@@ -37,7 +37,7 @@ $(document).ready(function(){
 	{if $searchResultIndexActive}
 	searchResultIndexActive = {$searchResultIndexActive};
 	{/if}
-				
+
 })
 {literal}
 </script>

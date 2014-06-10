@@ -71,8 +71,8 @@
         {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search' && $v.module!=''}
         <label>
             <input
-                type="checkbox" 
-                name="modules[{$v.id}]" 
+                type="checkbox"
+                name="modules[{$v.id}]"
                 value="{$v.controller}" {if $search.modules[$v.id]==$v.controller || $search.modules==null || $search.modules=='*'}checked="checked"{/if}
              />
              {if $v.module=='Species module'} {t}Species module{/t} / {t}Higher taxa{/t}{elseif $v.module=='Additional texts'}{t}Navigator{/t}{else}{t}{$v.module}{/t}{/if}
@@ -90,9 +90,9 @@
 	<input type="submit" id="searchButton" value="{t}search{/t}" />
 	</form>
 
-{/if}   
+{/if}
 
-</div>
+
 
 
 
