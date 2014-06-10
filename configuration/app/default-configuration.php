@@ -79,8 +79,8 @@ class configuration
             'directories' => array(
 				'log' => $this->_appFileRoot . 'log',
 				'cache' => $this->_appFileRoot . 'www/shared/cache',
-         	    'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project',
-                'customStyle' => $this->_appFileRoot . 'www/app/style/custom'
+				'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project',
+				'customStyle' => $this->_appFileRoot . 'www/app/style/custom'
             ),
 			'maxBackSteps' => 100,
 			'urlsToAdminEdit' => array(
