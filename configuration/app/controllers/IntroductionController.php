@@ -10,7 +10,7 @@ class IntroductionController extends Controller
 		'introduction_page',
 		'introduction_media'
     );
-   
+
     public $controllerPublicName = 'Introduction';
 
 	public $cssToLoad = array(
@@ -48,9 +48,9 @@ class IntroductionController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
-    
+
     }
 
     /**
@@ -62,7 +62,7 @@ class IntroductionController extends Controller
 	{
 
 		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
-		
+
 		$this->setStoreHistory(false);
 
 		if (!$this->rHasVal('page') && !$this->rHasVal('id')) {
@@ -70,7 +70,7 @@ class IntroductionController extends Controller
 			$this->redirect('topic.php?id='.$this->getFirstPageId());
 
 		} else {
-		
+
 			$id = $this->rHasVal('page') ? $this->requestData['page'] : $this->requestData['id'];
 
 			$this->redirect('topic.php?id='.$id);
@@ -86,7 +86,7 @@ class IntroductionController extends Controller
 		$d =  $this->models->ContentIntroduction->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $languageId,
 					'topic' => $name
 				)
@@ -105,7 +105,7 @@ class IntroductionController extends Controller
      */
     public function topicAction()
     {
-		
+
 		if (!$this->rHasId()) {
 
 			$page = array(
@@ -114,7 +114,7 @@ class IntroductionController extends Controller
 			$this->smarty->assign('page', $page);
 
 		} else {
-			
+
 			if (!is_numeric($this->requestData['id'])) {
 				$id = $this->resolvePageName(
 					$this->requestData['id'],
@@ -141,7 +141,7 @@ class IntroductionController extends Controller
 		}
 
         $this->printPage();
-    
+
     }
 
 
@@ -149,16 +149,16 @@ class IntroductionController extends Controller
 	{
 
 		$refs = $this->getPageHeaders();
-	
+
 		$this->setPageName($this->translate('Introduction contents'));
-		
+
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
-	
+
 		$this->printPage();
-	
+
 	}
-	
-	
+
+
 	/**
 	* General interface for all AJAX-calls
 	*
@@ -168,16 +168,16 @@ class IntroductionController extends Controller
     {
 
         if (!$this->rHasVal('action')) return;
-        
+
         if ($this->requestData['action'] == 'save_content') {
-            
+
             $this->ajaxActionSaveContent();
-        
+
         } else
         if ($this->requestData['action'] == 'get_content') {
-            
+
             $this->ajaxActionGetContent();
-        
+
         }
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
@@ -186,9 +186,9 @@ class IntroductionController extends Controller
         }
 
 		$this->allowEditPageOverlay = false;
-		
+
         $this->printPage();
-    
+
     }
 
 	private function getPageHeaders()
@@ -210,18 +210,18 @@ class IntroductionController extends Controller
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getDefaultLanguageId(),
 						'page_id' => $val['id']
 					),
 					'columns' => 'topic',
 				)
 			);
-			
+
 			$ip[$key]['topic'] = $ip[$key]['label'] = $cfm[0]['topic'];
 
 		}
-		
+
 		return $ip;
 
 	}
@@ -230,7 +230,7 @@ class IntroductionController extends Controller
 	{
 
 		$id = isset($id) ? $id : $this->requestData['id'];
-		
+
 		if (!isset($id)) return;
 
 		$pfm = $this->models->IntroductionPage->_get(
@@ -244,13 +244,13 @@ class IntroductionController extends Controller
 		);
 
 		if ($pfm) {
-		
+
 			$page =  $pfm[0];
 
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getCurrentLanguageId(),
 						'page_id' => $id
 					)
@@ -264,7 +264,7 @@ class IntroductionController extends Controller
 				$page['content'] = $cfm[0]['content'];
 
 			}
-			
+
 
 			$fmm = $this->models->IntroductionMedia->_get(
 				array(
@@ -274,7 +274,7 @@ class IntroductionController extends Controller
 					)
 				)
 			);
-			
+
 			if ($fmm) {
 
 				$page['image']['file_name'] = $fmm[0]['file_name'];
@@ -284,7 +284,7 @@ class IntroductionController extends Controller
 			}
 
 			return $page;
-		
+
 		} else {
 
 			return null;
@@ -310,7 +310,7 @@ class IntroductionController extends Controller
 
 
 		return isset($ip[0]['id']) ? $ip[0]['id'] : null;
-		
+
 	}
 
 	private function getAdjacentPages($id)
@@ -319,7 +319,7 @@ class IntroductionController extends Controller
 		$ip = $this->models->IntroductionPage->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
 					'got_content' => 1
 				),
@@ -330,7 +330,7 @@ class IntroductionController extends Controller
 		foreach((array)$ip as $key => $val) {
 
 			if ($val['id']==$id) {
-			
+
 				return array(
 					'prev' => isset($ip[$key-1]) ? $ip[$key-1] : null,
 					'next' => isset($ip[$key+1]) ? $ip[$key+1] : null
@@ -339,9 +339,9 @@ class IntroductionController extends Controller
 			}
 
 		}
-		
+
 		return null;
-		
+
 	}
 
 	private function getLookupList($p)
@@ -376,7 +376,7 @@ class IntroductionController extends Controller
 					'order' => 'label asc'
 				)
 			);
-			
+
 		} else {
 
 			$pages = $this->getPageHeaders();
@@ -392,7 +392,7 @@ class IntroductionController extends Controller
 				'../introduction/topic.php?id=%s'
 			)
 		);
-		
+
 	}
 
 }
