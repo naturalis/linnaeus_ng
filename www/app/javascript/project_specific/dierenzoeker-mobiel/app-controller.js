@@ -237,7 +237,8 @@ var appController = (function() {
 		};
 
 
-		if (data.content) {
+		if (data.content)
+		{
 			var content='';
 			var DescriptionTitle='';
 			for (var i=0; i<data.content.length; i++) {
@@ -252,8 +253,8 @@ var appController = (function() {
 			res.text='<p>'+content.replace('%descriptiontitle%',DescriptionTitle)+'</p>';
 		}
 
-
-		if (data.img_main) {
+		if (data.img_main)
+		{
 			var imgMain={};
 			for (var i=0; i<data.img_main.length; i++) {
 				var row = data.img_main[i];
@@ -266,7 +267,8 @@ var appController = (function() {
 		}
 
 		
-		if (data.img_other) {
+		if (data.img_other)
+		{
 			var imgAdd={};
 			for (var i=0; i<data.img_other.length; i++) {
 				var row = data.img_other[i];
@@ -276,7 +278,8 @@ var appController = (function() {
 		}
 
 
-		if (data.similar) {
+		if (data.similar)
+		{
 			var similar={};
 			for (var i=0; i<data.similar.length; i++) {
 				var row = data.similar[i];
@@ -285,6 +288,16 @@ var appController = (function() {
 			res.similar=similar;
 		}
 
+
+		if (data.children)
+		{
+			var children={};
+			for (var i=0; i<data.children.length; i++) {
+				var row = data.children[i];
+				children[Object.size(children)] = {id:row.id,label:row.label,img:row.img};
+			}
+			res.children=children;
+		}
 
 		var c=getCallback(index);
 		if (c) c(res);

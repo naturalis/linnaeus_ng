@@ -220,10 +220,14 @@ function detail(data)
 	
 	var group='';
 	if (data.group.id && data.group.name_nl)
-		group=templates.speciesgroup.replace('%onclick%','appController.detail(%id%,false,detail);').replace('%label%',data.group.name_nl).replace(/\%id\%/g,data.group.id);
+		group=templates.speciesgroup.
+			replace('%onclick%','appController.detail(%id%,false,detail);').
+			replace('%label%',data.group.name_nl).
+			replace(/\%id\%/g,data.group.id);
 
 	var similar='';
-	if (Object.size(data.similar)) {
+	if (Object.size(data.similar))
+	{
 		var buffer=Array();
 		for (var i in data.similar) {
 			var element=data.similar[i];
@@ -232,7 +236,14 @@ function detail(data)
 			if (Object.size(data.similar)==1)
 				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_single);
 			else
-				tpl=(i==0?tpl.replace('%class%',templates.speciessimilaritem.class_0):(i<Object.size(data.similar)-1?tpl.replace('%class%',templates.speciessimilaritem.class_1):tpl.replace('%class%',templates.speciessimilaritem.class_n)));
+				tpl=
+					(i==0?
+						tpl.replace('%class%',templates.speciessimilaritem.class_0):
+							(i<Object.size(data.similar)-1?
+								tpl.replace('%class%',templates.speciessimilaritem.class_1):
+								tpl.replace('%class%',templates.speciessimilaritem.class_n)
+							)
+					);
 
 			buffer.push(tpl.
 				replace('%onclick%','appController.detail(%id%,false,detail);').
@@ -241,7 +252,30 @@ function detail(data)
 			);
 		}
 		similar=templates.speciessimilar.replace('%specieslist%',buffer.join('')).replace('%title%','Lijkt op:');
-	} else {
+	} 
+	else
+	if (Object.size(data.children))
+	{
+		var buffer=Array();
+		for (var i in data.children) {
+			var element=data.children[i];
+			var tpl=templates.speciessimilaritem.tpl;
+			
+			if (Object.size(data.children)==1)
+				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_single);
+			else
+				tpl=(i==0?tpl.replace('%class%',templates.speciessimilaritem.class_0):(i<Object.size(data.children)-1?tpl.replace('%class%',templates.speciessimilaritem.class_1):tpl.replace('%class%',templates.speciessimilaritem.class_n)));
+
+			buffer.push(tpl.
+				replace('%onclick%','appController.detail(%id%,false,detail);').
+				replace('%image%',element.img).
+				replace('%label%',element.label).replace(/\%id\%/g,element.id)
+			);
+		}
+		similar=templates.speciessimilar.replace('%specieslist%',buffer.join('')).replace('%title%','Soorten in deze groep:');
+	}
+	else
+	{
 		similar=templates.speciessimilar.replace('%specieslist%','').replace('%title%','');
 	}
 	
@@ -282,6 +316,7 @@ function detail(data)
 	scrolltop();
 
 	stackadd(data.id);
+
 }
 
 function detailback()
