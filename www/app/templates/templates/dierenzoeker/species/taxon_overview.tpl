@@ -94,6 +94,22 @@
         </ul>
         <div class="clearer"></div>
 </div>    
-                    
+{/if}
+
+{if $children}
+<div class="related">
+        <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Soorten in deze groep</span>
+        <ul>
+        {foreach from=$children item=v}
+            <li class="">
+                <a href="#" onclick="toonDier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
+                <img src="{$v.url_thumbnail}">
+                {$v.label}                    
+                </a>
+            </li>
+		{/foreach}
+        </ul>
+        <div class="clearer"></div>
+</div>    
 {/if}
 
