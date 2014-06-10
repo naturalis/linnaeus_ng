@@ -243,10 +243,11 @@ nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 	$('[data-facetgrouppageid^="facetgrouppage"]').click(function(e){
 		e.preventDefault();
 		updateStates($(this).attr('characters'));
+		var currentstate=$("#"+$(this).attr('data-facetgrouppageid')).css("display");
 		// Close all facet group pages (cleanup):
 		$(".facetgrouppage").css("display", "none");
 		// Show facet group page:
-		$("#"+$(this).attr('data-facetgrouppageid')).css("display", "block");
+		$("#"+$(this).attr('data-facetgrouppageid')).css("display", currentstate=="none"?"block":"none");
 		return false;           
 	});
 

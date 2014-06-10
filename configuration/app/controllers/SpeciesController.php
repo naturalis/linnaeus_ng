@@ -299,6 +299,17 @@ class SpeciesController extends Controller
 			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
 			$related[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_thumbnail'));
 		}
+		$children=$this->models->Taxon->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+		foreach((array)$children as $key => $val)
+		{
+			$d = $this->getCommonname($val['id']);
+			$children[$key]['label'] = $d;
+			$children[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['id'],'name' => 'url_image'));
+			$children[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['id'],'name' => 'url_thumbnail'));
+		}
+		if ($children)
+			usort($children,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
+
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 		$parent = $this->getTaxonById($taxon['parent_id']);
 		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
@@ -335,6 +346,7 @@ class SpeciesController extends Controller
 		$this->smarty->assign('categoryList', $categories['categoryList']);
 		$this->smarty->assign('content',$content);
 		$this->smarty->assign('nbc',$nbc);
+		$this->smarty->assign('children', $children);
 		$this->smarty->assign('related', $related);
 		$this->smarty->assign('media', $media);
 		$this->smarty->assign('back',$this->rGetVal('back'));
