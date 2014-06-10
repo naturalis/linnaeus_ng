@@ -42,17 +42,14 @@ class SpeciesController extends Controller
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
     public $cssToLoad = array(
-        'species.css',
-		'morris.css'
+        'species.css'
     );
     public $jsToLoad = array(
         'all' => array(
             'main.js', 
             'prettyPhoto/jquery.prettyPhoto.js', 
             'lookup.js', 
-            'dialog/jquery.modaldialog.js',
-			'raphael/raphael-min.js',
-			'morris.js-0.4.3/morris.min.js'
+            'dialog/jquery.modaldialog.js'
         ), 
         'IE' => array()
     );
