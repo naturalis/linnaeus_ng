@@ -4,7 +4,7 @@
 <ul>
 	{foreach from=$categories key=k item=v}
 		<li id="ctb-{$v.id}">
-			<a {if $v.is_empty==0}href="../species/taxon.php?id={$taxon.id}&cat={$v.id}"{/if} class="{$v.className}">{$v.title}</a>	
+			<a {if $v.is_empty==0}href="../species/taxon.php?id={$taxon.id}&cat={$v.id}"{/if} class="{$v.className}">{$v.title}</a>
 		</li>
 		{if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
 	{/foreach}
@@ -21,7 +21,7 @@
 	<b>Classification</b><br />
 	{foreach from=$content.classification key=k item=v name=classification}
 	{if $v.do_display}
-	
+
 		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
 
 		{* if $smarty.foreach.classification.last || $v.is_empty==1}
@@ -45,7 +45,7 @@
 	</p>
 	{/if}
 
-	
+
 </div>
 {elseif $activeCategory=='literature'}
 {if $contentCount.literature>0}
@@ -98,35 +98,35 @@
 							{if $v.thumb_name != ''}
 								<img
 									id="media-{$k}"
-									alt="{$v.description}" 
-									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
 									src="{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}"
 									class="image-thumb" />
 							{else}
 								<img
 									id="media-{$k}"
-									alt="{$v.description}" 
-									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
 									src="{$projectUrls.uploadedMedia}{$v.file_name}"
 									class="image-full" />
 							{/if}
 						</div>
 					{elseif $v.category=='video'}
-							<img 
+							<img
 								id="media-{$k}"
 								alt="{$v.description}"
-								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
-								src="{$projectUrls.systemMedia}video.png" 
-								onclick="showMedia('{$projectUrls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+								src="{$projectUrls.systemMedia}video.png"
+								onclick="showMedia('{$projectUrls.uploadedMedia}{$v.file_name}','{$v.original_name}');"
 								class="media-video-icon" />
 					{elseif $v.category=='audio'}
-							<object 
+							<object
 								id="media-{$k}"
-								alt="{$v.description}" 
-								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
-								type="application/x-shockwave-flash" 
-								data="{$soundPlayerPath}{$soundPlayerName}" 
-								width="130" 
+								alt="{$v.description}"
+								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+								type="application/x-shockwave-flash"
+								data="{$soundPlayerPath}{$soundPlayerName}"
+								width="130"
 								height="20">
 								<param name="movie" value="{$soundPlayerName}" />
 								<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
@@ -139,13 +139,13 @@
 
 			</div><!-- /.media-cell -->
 		{/foreach}
-					
+
 	</div><!-- /#media-grid -->
 </div><!-- /#media -->
 {/if}
 {else}
 
-<div id="content" class="proze" >	
+<div id="content" class="proze" >
 
 	{if $isTaxonStartPage && $overviewImage}
 		<div id="overview-image" style="background: url('{$projectUrls.uploadedMedia}{$overviewImage.image}');"></div>
@@ -167,7 +167,7 @@ $(document).ready(function(){
 {/literal}
 
 {if $dispUrl && $dispName}
-	showMedia('{$dispUrl}','{$dispName}'); 
+	showMedia('{$dispUrl}','{$dispName}');
 {/if}
 
 	allLookupSetListMax(0);
@@ -178,7 +178,7 @@ $(document).ready(function(){
 	// $('[id^=media-]').each(function(e){
 	// 	$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
 	// });
-	
+
 });
 </script>
 {/literal}
