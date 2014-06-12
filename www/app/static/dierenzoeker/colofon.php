@@ -3,8 +3,6 @@
 ?>
 <h1>Colofon</h1>
 
-<p>Dierenzoeker</p>
-
 <p>
 	<strong>Mede mogelijk gemaakt door</strong><br/>
 	<a href="http://www.rijksoverheid.nl/ministeries/ez" target="_blank">Regeling Draagvlak Natuur (Ministerie van EZ)</a><br/>
