@@ -152,10 +152,6 @@ class SearchControllerGeneral extends SearchController
 		$this->_searchResultSort = $this->getSetting('app_search_result_sort','alpha');
 	}
 
-
-
-
-
     public function searchResetAction ()
     {
 		unset($_SESSION['app'][$this->spid()]['search']);
@@ -237,10 +233,6 @@ class SearchControllerGeneral extends SearchController
         $this->printPage();
   
     }
-
-
-
-
 
 	private function tokenizeSearchString($s)
 	{
