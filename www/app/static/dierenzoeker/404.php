@@ -4,17 +4,17 @@
 		<title>Dierenzoeker</title>
 		<meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker."/>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="../../style/dierenzoeker/basics.css" />
-		<link rel="stylesheet" type="text/css" href="../../style/dierenzoeker/jquery-ui-1.10.0.custom.min.css" />
-		<link rel="stylesheet" type="text/css" href="../../style/dierenzoeker/prettyPhoto/prettyPhoto.css" />
+		<link rel="stylesheet" type="text/css" href="/linnaeus_ng/app/style/dierenzoeker/basics.css" />
+		<link rel="stylesheet" type="text/css" href="/linnaeus_ng/app/style/dierenzoeker/jquery-ui-1.10.0.custom.min.css" />
+		<link rel="stylesheet" type="text/css" href="/linnaeus_ng/app/style/dierenzoeker/prettyPhoto/prettyPhoto.css" />
 
 	<link href="/linnaeus_ng/app/media/system/skins/dierenzoeker/favicon.ico" type="image/x-icon" rel="icon" />
     <link href="/linnaeus_ng/app/media/system/skins/dierenzoeker/favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 
-		<script type="text/javascript" src="../../javascript/jquery-1.9.1.min.js"></script>
-		<script type="text/javascript" src="../../javascript/project_specific/backstretch.js"></script>
+		<script type="text/javascript" src="/linnaeus_ng/app/javascript/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="/linnaeus_ng/app/javascript/project_specific/backstretch.js"></script>
 		</head>
-    <body style="background-position-y:115px;background: url('../../media/system/skins/dierenzoeker/background_blurry.jpg');">       
+    <body style="background-position-y:115px;background: url('/linnaeus_ng/app/media/system/skins/dierenzoeker/background_blurry.jpg');">       
         <div class="main-wrapper">
             
             <div class="header" style="height:115px;">
@@ -57,7 +57,7 @@ $(document).ready(function(){
 														
 						$(".onderwijs-popup-link").attr("target", "_blank");
 						
-						$.backstretch("../../media/system/skins/dierenzoeker/background_blurry.jpg");
+						$.backstretch("/linnaeus_ng/app/media/system/skins/dierenzoeker/background_blurry.jpg");
 					});
 					
 					//Copied from hetklokhuis.nl:
@@ -96,8 +96,8 @@ $(document).ready(function(){
 <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" style='display:block;position:absolute;left:722px;top:30px;width:153px;height:68px;border: 0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
 
 <div class="social-media">
-<a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a>
-<a href="http://twitter.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/twitter.png" alt="" style="width:32px;height:32px;" /></a>
+<a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="/linnaeus_ng/app/media/system/skins/dierenzoeker/facebook.png" alt="" /></a>
+<a href="http://twitter.com/dierenzoeker" target="_blank"><img src="/linnaeus_ng/app/media/system/skins/dierenzoeker/twitter.png" alt="" style="width:32px;height:32px;" /></a>
 </div>                
                 </div>
             </div>
