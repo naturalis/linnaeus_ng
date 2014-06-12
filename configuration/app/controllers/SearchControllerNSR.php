@@ -294,7 +294,10 @@ class SearchControllerNSR extends SearchController
 					'".PREDICATE_VALID_NAME."',
 					'".PREDICATE_ALTERNATIVE_NAME."',
 					'".PREDICATE_SYNONYM."',
-					'".PREDICATE_SYNONYM_SL."'
+					'".PREDICATE_SYNONYM_SL."',
+					'".PREDICATE_HOMONYM."',
+					'".PREDICATE_BASIONYM."',
+					'".PREDICATE_MISSPELLED_NAME."'
 				)
 			
 			group by _a.taxon_id
