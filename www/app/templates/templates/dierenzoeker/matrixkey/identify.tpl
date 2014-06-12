@@ -169,8 +169,6 @@
 
 					</div>
 
-
- 
 				</div>
                 
                 {/foreach}
