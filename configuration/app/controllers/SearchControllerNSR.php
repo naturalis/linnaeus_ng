@@ -289,7 +289,13 @@ class SearchControllerNSR extends SearchController
 
 			where _a.project_id =".$this->getCurrentProjectId()."
 				and _a.name like '%".mysql_real_escape_string($search)."%'
-				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
+				and _b.nametype in (
+					'".PREDICATE_PREFERRED_NAME."',
+					'".PREDICATE_VALID_NAME."',
+					'".PREDICATE_ALTERNATIVE_NAME."',
+					'".PREDICATE_SYNONYM."',
+					'".PREDICATE_SYNONYM_SL."'
+				)
 			
 			group by _a.taxon_id
 

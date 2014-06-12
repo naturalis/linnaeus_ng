@@ -232,7 +232,6 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->tmp;
 	}
 
-
     private function getCategories($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -792,7 +791,7 @@ class SpeciesControllerNSR extends SpeciesController
 		
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode) or _m.taxon_id=".$id.")
 
 			order by taxon
 			".(isset($limit) ? "limit ".$limit : "")."
@@ -829,7 +828,7 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode) or _m.taxon_id=".$id.")
 			"
 		);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
@@ -861,7 +860,7 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
-				and MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode)
+				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode) or _m.taxon_id=".$id.")
 			"
 		);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
