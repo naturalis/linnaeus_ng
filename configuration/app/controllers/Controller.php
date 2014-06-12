@@ -2335,19 +2335,28 @@ class Controller extends BaseClass
 
 				if ($force || $this->helpers->UserAgent->isMobileDevice()) {
 
-					$d = $this->getSetting('skin_mobile');
+					$d=$this->getSetting('skin_gsm');
 
-					if (isset($d))
-						$d = $this->doesSkinExist($d) ? $d : null;
+					if ($this->helpers->UserAgent->isGSM() && isset($d))
+					{
+						$skin = $d;
+					}
+					else 
+					{
+						$skin = $this->getSetting('skin_mobile');
+					}
+
+					if (isset($skin))
+						$skin = $this->doesSkinExist($skin) ? $skin : null;
 
 				}
 
 			}
 
-			$d = empty($d) ? $this->getSetting('skin') : $d;
+			$skin = empty($skin) ? $this->getSetting('skin') : $skin;
 
-			if (isset($d) && $this->doesSkinExist($d)) {
-				$_SESSION['app']['system']['skinName'] = $d;
+			if (isset($skin) && $this->doesSkinExist($skin)) {
+				$_SESSION['app']['system']['skinName'] = $skin;
 			} else {
 				$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
 			}
