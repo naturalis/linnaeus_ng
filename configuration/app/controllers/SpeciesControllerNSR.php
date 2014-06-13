@@ -728,8 +728,16 @@ class SpeciesControllerNSR extends SpeciesController
 				_q.taxon_id,
 				_m.file_name as image,
 				_m.file_name as thumb,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
 				_z.name,
+				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
+				_meta2.meta_data as meta_short_desc,
+				_meta3.meta_data as meta_geografie,
+				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
+				_meta5.meta_data as meta_copyrights,
+				_meta6.meta_data as meta_validator,
+				_meta7.meta_data as meta_adres_maker,
 				_meta8.meta_data as photographer
 			
 			from
@@ -784,10 +792,52 @@ class SpeciesControllerNSR extends SpeciesController
 					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
+			left join %PRE%media_meta _meta2
+				on _m.id=_meta2.media_id
+				and _m.project_id=_meta2.project_id
+				and _meta2.sys_label='beeldbankOmschrijving'
+			
+			left join %PRE%media_meta _meta3
+				on _m.id=_meta3.media_id
+				and _m.project_id=_meta3.project_id
+				and _meta3.sys_label='beeldbankLokatie'
+			
+			left join %PRE%media_meta _meta4
+				on _m.id=_meta4.media_id
+				and _m.project_id=_meta4.project_id
+				and _meta4.sys_label='beeldbankDatumAanmaak'
+			
+			left join %PRE%media_meta _meta5
+				on _m.id=_meta5.media_id
+				and _m.project_id=_meta5.project_id
+				and _meta5.sys_label='beeldbankCopyright'
+
+			left join %PRE%media_meta _meta6
+				on _m.id=_meta6.media_id
+				and _m.project_id=_meta6.project_id
+				and _meta6.sys_label='beeldbankValidator'
+				and _meta6.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%media_meta _meta7
+				on _m.id=_meta7.media_id
+				and _m.project_id=_meta7.project_id
+				and _meta7.sys_label='beeldbankAdresMaker'
+				and _meta7.language_id=".$this->getCurrentLanguageId()."
+
 			left join %PRE%media_meta _meta8
 				on _m.id=_meta8.media_id
 				and _m.project_id=_meta8.project_id
 				and _meta8.sys_label='beeldbankFotograaf'
+			
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
 		
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
@@ -798,8 +848,36 @@ class SpeciesControllerNSR extends SpeciesController
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 			);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
+
+
+		foreach((array)$data as $key=>$val)
+		{
+			$metaData=array(
+				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
+				'Fotograaf' => $val['photographer'],
+				'Datum' => $val['meta_datum'],
+				'Locatie' => $val['meta_geografie'],
+				'Validator' => $val['meta_validator'],
+				'Geplaatst op' => $val['meta_datum_plaatsing'],
+				'Copyright' => $val['meta_copyrights'],
+				'Contactadres fotograaf' => $val['meta_adres_maker'],
+				'Omschrijving' => $val['meta_short_desc'],
+				
+			);
+
+			$data[$key]['photographer']=$val['photographer'];
+			$data[$key]['label']=
+				trim(
+					(isset($val['photographer']) ? $val['photographer'].', ' : '' ).
+					(isset($val['meta_datum']) ? $val['meta_datum'].', ' : '' ).
+					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
+					', '
+				);
+			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
+			
+		}
 		
-		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 
 		$totalCount=$this->models->Taxon->freeQuery("		
 			select
@@ -867,9 +945,9 @@ class SpeciesControllerNSR extends SpeciesController
 		
 		$data= 
 			array(
-				'count'=>$count[0]['total'],
-				'totalCount'=>$totalCount[0]['total'],
-				'species'=>$species[0]['total'],
+				'count'=>$count[0]['total'], // number of images, one per taxon in this branch
+				'totalCount'=>$totalCount[0]['total'], // all images in this branch
+				'species'=>$species[0]['total'], // number taxa in this branch
 				'data'=>$data,
 				'perpage'=>$this->_resPicsPerPage
 			);
@@ -1432,12 +1510,21 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$exts=array('png','jpg','PNG','JPG','gif','GIF');
 		$d=array();
-//		q($name,1);
+
 		foreach($exts as $ext)
 		{
 			array_push($d,$name.'.'.$ext,strtolower($name).'.'.$ext,$name.'-logo.'.$ext,strtolower($name).'-logo.'.$ext);
 		}
-		
+
+		if (strpos($name,' ')!==false)
+		{
+			$shortname=array_shift(explode(' ',$name));
+			foreach($exts as $ext)
+			{
+				array_push($d,$shortname.'.'.$ext,strtolower($shortname).'.'.$ext,$name.'-logo.'.$ext,strtolower($shortname).'-logo.'.$ext);
+			}
+		}
+
 		$logo=null;
 
 		foreach((array)$d as $val)
