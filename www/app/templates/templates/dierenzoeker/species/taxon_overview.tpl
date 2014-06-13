@@ -98,7 +98,7 @@
 
 {if $children}
 <div class="related">
-        <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Soorten in deze groep</span>
+        <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Dieren in deze groep</span>
         <ul>
         {foreach from=$children item=v}
             <li class="">

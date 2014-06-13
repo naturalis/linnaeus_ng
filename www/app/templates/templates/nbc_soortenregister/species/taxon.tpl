@@ -40,7 +40,11 @@
 					{foreach from=$results.data item=v}
 						<div class="imageInGrid3 taxon-page collected">
 							<div class="thumbContainer">
+								{if $v.taxon_id==$taxon.id}
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+								{else}
 								<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
+								{/if}
 									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
 								</a>
 							</div>

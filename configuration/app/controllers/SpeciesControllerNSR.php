@@ -1510,7 +1510,7 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$exts=array('png','jpg','PNG','JPG','gif','GIF');
 		$d=array();
-
+echo '<!-- TEST::',$name,'-->';
 		foreach($exts as $ext)
 		{
 			array_push($d,$name.'.'.$ext,strtolower($name).'.'.$ext,$name.'-logo.'.$ext,strtolower($name).'-logo.'.$ext);
