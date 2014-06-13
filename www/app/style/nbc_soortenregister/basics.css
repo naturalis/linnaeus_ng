@@ -292,7 +292,10 @@ h4 {
 #taxonImage {
 	margin-top:0px;
 }
-
+#taxonImage img {
+	width:510px;
+	height:272px;
+}
 #taxonHeader .full {
     width: 510px !important;
 }
@@ -346,4 +349,8 @@ html, body {
 
 .verspreidingskaart {
 	margin-bottom:40px;
+}
+
+.pic-meta-label {
+	font-weight:bold;
 }

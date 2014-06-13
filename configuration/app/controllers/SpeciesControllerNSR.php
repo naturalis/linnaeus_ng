@@ -685,7 +685,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 
 			$metaData=array(
-				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
+				'' => '<span class="pic-meta-label">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
 				'Fotograaf' => $val['photographer'],
 				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],
@@ -705,7 +705,9 @@ class SpeciesControllerNSR extends SpeciesController
 					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
 					', '
 				);
-			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
+				
+				
+			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: ','<br /><span class="pic-meta-label">',$metaData,true);
 			
 		}
 

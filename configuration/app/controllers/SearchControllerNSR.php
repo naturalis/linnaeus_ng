@@ -829,7 +829,7 @@ class SearchControllerNSR extends SearchController
 		foreach((array)$data as $key=>$val)
 		{
 			$metaData=array(
-				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
+				'' => '<span class="pic-meta-label">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
 				'Fotograaf' => $val['photographer'],
 				'Datum' => $val['meta_datum'],
 				'Locatie' => $val['meta_geografie'],
@@ -845,7 +845,7 @@ class SearchControllerNSR extends SearchController
 				$val['photographer'].', '.
 				$val['meta_datum'].', '.
 				$val['meta_geografie'];
-			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
+			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: ','<br /><span class="pic-meta-label">',$metaData,true);
 			
 		}
 		
