@@ -272,7 +272,7 @@ function detail(data)
 				replace('%label%',element.label).replace(/\%id\%/g,element.id)
 			);
 		}
-		similar=templates.speciessimilar.replace('%specieslist%',buffer.join('')).replace('%title%','Soorten in deze groep:');
+		similar=templates.speciessimilar.replace('%specieslist%',buffer.join('')).replace('%title%','Dieren in deze groep:');
 	}
 	else
 	{
