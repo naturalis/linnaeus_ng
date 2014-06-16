@@ -730,6 +730,7 @@ class SpeciesControllerNSR extends SpeciesController
 	
 		$data=$this->models->Taxon->freeQuery("		
 			select
+				SQL_CALC_FOUND_ROWS
 				_q.taxon_id,
 				_m.file_name as image,
 				_m.file_name as thumb,
@@ -882,8 +883,7 @@ class SpeciesControllerNSR extends SpeciesController
 			
 		}
 
-		//		SQL_CALC_FOUND_ROWS
-		//$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 		
 		/*
 		$totalCount=$this->models->Taxon->freeQuery("		
@@ -953,7 +953,7 @@ class SpeciesControllerNSR extends SpeciesController
 		
 		$data= 
 			array(
-//				'count'=>$count[0]['total'], // number of images, one per taxon in this branch
+				'count'=>$count[0]['total'], // number of images, one per taxon in this branch
 //				'totalCount'=>$totalCount[0]['total'], // all images in this branch
 				'species'=>$species[0]['total'], // number taxa in this branch
 				'data'=>$data,

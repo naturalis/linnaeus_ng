@@ -51,8 +51,9 @@
 			
 			</div>
 			
-			
 			{if $mediaOwn.data && $mediaCollected.data}
+			{assign var=results value=$mediaCollected}
+			{else if $mediaCollected.data}
 			{assign var=results value=$mediaCollected}
 			{else}
 			{assign var=results value=$mediaOwn}
