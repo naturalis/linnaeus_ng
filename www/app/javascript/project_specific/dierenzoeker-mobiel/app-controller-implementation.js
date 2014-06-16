@@ -216,6 +216,7 @@ function state(id)
 
 function detail(data)
 {
+
 	setactivetaxon([data.id,data.type]);
 	
 	var group='';
@@ -287,9 +288,13 @@ function detail(data)
 		var buffer2=Array();
 		for (var i in data.img_add) {
 			var element=data.img_add[i];
+			var thumb=element.file.replace('w800','130x130');
 			var tpl=templates.extraimage.tpl;
 			tpl=(i==0?tpl.replace('%style%',templates.extraimage.style_0):tpl.replace('%style%',templates.extraimage.style_n));
-			if (element.file) buffer.push(tpl.replace(/\%image\%/g,element.file));
+			if (element.file)
+			{
+				buffer.push(tpl.replace(/\%image\%/g,thumb));
+			}
 			if (element.copyright) buffer2.push(element.copyright);
 		}
 		var credits='';

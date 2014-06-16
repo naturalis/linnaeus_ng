@@ -1,36 +1,12 @@
 		<div>
 		
-			{if $mediaType=='collected'}
+			{if $mediaOwn.data}
 				<h4>
-					Afbeelding{if $results.totalCount!=1}en{/if}: {$results.totalCount} /
-					soorten met afbeelding: {$results.species}
-					</h4>
+					Afbeelding{if $mediaOwn.count!=1}en{/if}: {$mediaOwn.count}
+				</h4>
 				<div>
 
-				{foreach from=$results.data item=v}
-					<div class="imageInGrid3 taxon-page collected">
-						<div class="thumbContainer">
-							{if $v.taxon_id==$taxon.id}
-							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-							{else}
-							<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
-							{/if}
-								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
-							</a>
-						</div>
-						<dl>
-							{if $v.name}<dd>{$v.name}</dd>{/if}
-							<dd><i>{$v.taxon}</i></dd>
-						</dl>
-					</div>
-				{/foreach}
-
-			{else}
-
-				<h4>Afbeelding{if $results.count!=1}en{/if}: {$results.count}</h4>
-				<div>
-
-				{foreach from=$results.data item=v}
+				{foreach from=$mediaOwn.data item=v}
 					{if $search.img && $search.img==$v.image}
 						{$pp_popup=[{$v.image},{$v.meta_data}]}
 					{/if}
@@ -45,9 +21,42 @@
 						</dl>
 					</div>
 				{/foreach}
+			{/if}
+
+			{if $mediaOwn.data && $mediaCollected.data}
+			<p>&nbsp;</p>
+			{/if}			
+		
+			{if $mediaCollected.data}
+				<h4>
+					Soorten/taxa met afbeelding(en): {$mediaCollected.species}
+				</h4>
+				<div>
+				{foreach from=$mediaCollected.data item=v}
+					<div class="imageInGrid3 taxon-page collected">
+						<div class="thumbContainer">
+							<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
+								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+							</a>
+						</div>
+						<dl>
+							{if $v.name}<dd>{$v.name}</dd>{/if}
+							<dd><i>{$v.taxon}</i></dd>
+						</dl>
+					</div>
+				{/foreach}
+				</div>
 
 			{/if}
+			
 			</div>
+			
+			
+			{if $mediaOwn.data && $mediaCollected.data}
+			{assign var=results value=$mediaCollected}
+			{else}
+			{assign var=results value=$mediaOwn}
+			{/if}
 
 			{assign var=pgnResultCount value=$results.count}
 			{assign var=pgnResultsPerPage value=$results.perpage}

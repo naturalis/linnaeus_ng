@@ -80,15 +80,19 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('search',$this->requestData);	
 				$this->smarty->assign('querystring',$this->reconstructQueryString());
 
-				if($taxon['base_rank_id']>=SPECIES_RANK_ID)
+
+//q($this->getTaxonMedia($this->requestData),1);
+
+
+//				if($taxon['base_rank_id']>=SPECIES_RANK_ID)
 				{
-					$this->smarty->assign('results',$this->getTaxonMedia($this->requestData));	
-					$this->smarty->assign('mediaType','taxon');
+					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));	
+					//$this->smarty->assign('mediaType','taxon');
 				}
-				else
+//				else
 				{
-					$this->smarty->assign('results',$this->getCollectedHigherTaxonMedia($this->requestData));	
-					$this->smarty->assign('mediaType','collected');
+					$this->smarty->assign('mediaCollected',$this->getCollectedHigherTaxonMedia($this->requestData));	
+					//$this->smarty->assign('mediaType','collected');
 				}
 			}
 			else
@@ -726,7 +730,6 @@ class SpeciesControllerNSR extends SpeciesController
 	
 		$data=$this->models->Taxon->freeQuery("		
 			select
-				SQL_CALC_FOUND_ROWS
 				_q.taxon_id,
 				_m.file_name as image,
 				_m.file_name as thumb,
@@ -843,12 +846,12 @@ class SpeciesControllerNSR extends SpeciesController
 		
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
-				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode) or _m.taxon_id=".$id.")
+				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode))
 
 			order by taxon
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
-			);
+		);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
 
 
@@ -878,9 +881,11 @@ class SpeciesControllerNSR extends SpeciesController
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
 			
 		}
-		
-		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 
+		//		SQL_CALC_FOUND_ROWS
+		//$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		
+		/*
 		$totalCount=$this->models->Taxon->freeQuery("		
 			select
 				count(*) as total
@@ -908,10 +913,11 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
-				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode) or _m.taxon_id=".$id.")
+				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode))
 			"
 		);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
+		*/
 
 		$species=$this->models->Taxon->freeQuery("		
 			select
@@ -940,15 +946,15 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
-				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode) or _m.taxon_id=".$id.")
+				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode))
 			"
 		);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
 		
 		$data= 
 			array(
-				'count'=>$count[0]['total'], // number of images, one per taxon in this branch
-				'totalCount'=>$totalCount[0]['total'], // all images in this branch
+//				'count'=>$count[0]['total'], // number of images, one per taxon in this branch
+//				'totalCount'=>$totalCount[0]['total'], // all images in this branch
 				'species'=>$species[0]['total'], // number taxa in this branch
 				'data'=>$data,
 				'perpage'=>$this->_resPicsPerPage
