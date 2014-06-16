@@ -1,3 +1,9 @@
+<style>
+div.pp_default .pp_description {
+    font-weight:normal;
+}
+</style>
+
 {if $back}
 <a class="no-text terug-naar-het-dier" href="#" onclick="toonDier( { id:{$back} } );return false;">Terug naar het dier</a>
 {/if}
@@ -13,7 +19,7 @@
 <div class="illustratie-wrapper">
     <div class="illustratie">
         <!-- a id="lightbox905" href="{$nbc.url_image}" title="" -->
-       	<a rel="prettyPhoto[gallery]" href="{$nbc.url_image_large}" title="{$v.description}">
+       	<a rel="prettyPhoto[gallery]" href="{$nbc.url_image_large}" title="{$v.description}" id="overview-picture">
             <img style="width:280px" title="" src="{$nbc.url_image}" alt="">
 		</a>
         <!-- /a -->
@@ -64,9 +70,10 @@
 
 <div class="fotos">
 	<ul>
+	
 	{foreach from=$media item=v}
     	<li>
-        	<a rel="prettyPhoto[gallery]" href="{$v.file_name}" title="{$v.description}">
+        	<a rel="prettyPhoto[gallery]" href="{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
             	<img style="width:130px" title="{$v.description}" src="{$v.file_name|@replace:'w800':'130x130'}" alt="">
            	</a>
 		</li>
@@ -113,3 +120,42 @@
 </div>    
 {/if}
 
+
+<script type="text/JavaScript">
+$(document).ready(function() {
+function getremotemetadata(p)
+{
+	$.ajax({
+		url : '../../static/dierenzoeker/getremotemetadata.php',
+		type: 'GET',
+		data : ({
+			image_id :p.name
+		}),
+		success : function (data) {
+			var data=$.parseJSON(data);
+			if (data)
+			{
+				$('#'+p.id).attr('title',
+					(data.description? '"'+data.description+'" ' : '')+(data.copyright ? '&copy; '+data.copyright : '') +
+					(data.copyright && data.maker ? ' - ' : '') +(data.maker ? 'Maker: '+data.maker : '')
+				);
+			}
+		}
+	});	
+}
+
+
+{if $nbc.url_image}
+	var url = '{$nbc.url_image}';
+	getremotemetadata( { id: 'overview-picture' , name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
+{/if}
+{foreach from=$media item=v}
+	var url = '{$v.file_name}';
+	getremotemetadata( { id: 'img-'+ {$v.id} , name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
+{/foreach}
+
+
+
+
+});
+</script>
