@@ -67,7 +67,7 @@
 	{foreach from=$media item=v}
     	<li>
         	<a rel="prettyPhoto[gallery]" href="{$v.file_name}" title="{$v.description}">
-            	<img style="width:130px" title="{$v.description}" src="{$v.file_name}" alt="">
+            	<img style="width:130px" title="{$v.description}" src="{$v.file_name|@replace:'w800':'130x130'}" alt="">
            	</a>
 		</li>
 	{/foreach}
