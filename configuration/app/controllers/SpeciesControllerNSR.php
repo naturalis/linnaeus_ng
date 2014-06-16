@@ -357,7 +357,7 @@ class SpeciesControllerNSR extends SpeciesController
 					else
 					{
 						$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
-						$isEmpty=$d['count']==0;
+						$isEmpty=(count((array)$d['data'])==0);
 					}
 				}
 
