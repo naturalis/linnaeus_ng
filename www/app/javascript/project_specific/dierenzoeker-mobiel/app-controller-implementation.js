@@ -470,19 +470,11 @@ function getremotemetadata(p) {
 			{
 				var str=$('#imageCreditsNames').html()+', '+data.maker;
 				$('#imageCreditsNames').html(str.replace(/(^,)|(,$)/g, ""));
-				/*
-				$('#'+p.id).attr('title',
-					(data.description? '"'+data.description+'" ' : '')+(data.copyright ? '&copy; '+data.copyright : '') +
-					(data.copyright && data.maker ? ' - ' : '') +(data.maker ? 'Maker: '+data.maker : '')
-				);
-				*/
 			}
 		}
 	});	
 
 }
-
-//imageCreditsNames 
 
 function addremotemetadata(data) {
 
