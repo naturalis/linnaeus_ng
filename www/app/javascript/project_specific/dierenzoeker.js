@@ -54,11 +54,9 @@ function nbcGetResults(p) {
 function nbcDoResults(p) {
 
 	if (nbcData.results) {
-
 		verbergDier();
 		nbcResetNavigation();
 		nbcPrintResults();
-
 	}
 
 }
@@ -70,7 +68,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><table><tr><td><img alt="" src="'+data.b+'"></td><td>'+data.l+'</td></tr></table></a></li>';
+			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><table><tr><td><img alt="" src="'+data.b+'"></td><td style="width:100%">'+data.l+'</td></tr></table></a></li>';
 		}
 	}
 
