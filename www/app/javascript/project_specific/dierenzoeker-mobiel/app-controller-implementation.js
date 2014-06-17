@@ -297,10 +297,11 @@ function detail(data)
 			}
 			if (element.copyright) buffer2.push(element.copyright);
 		}
-		var credits='';
-		if (buffer2.length>0) credits=templates.extraimagescredits.replace('%credits%',buffer2.join(', '));
-	
-		extraimages = templates.extraimages.replace('%images%',buffer.join('')).replace('%credits%',credits);
+
+		//var credits='';
+		//if (buffer2.length>0) credits=templates.extraimagescredits.replace('%credits%',buffer2.join(', '));
+		//extraimages = templates.extraimages.replace('%images%',buffer.join('')).replace('%credits%',credits);
+		extraimages = templates.extraimages.replace('%images%',buffer.join(''));
 	}
 
 	$('#species-detail-content').html(templates.speciesdetail.
@@ -321,6 +322,8 @@ function detail(data)
 	scrolltop();
 
 	stackadd(data.id);
+	
+	addremotemetadata(data);
 
 }
 
@@ -453,3 +456,42 @@ function rprt(msg)
 }
 
 
+function getremotemetadata(p) {
+
+	$.ajax({
+		url : '../../static/dierenzoeker/getremotemetadata.php',
+		type: 'GET',
+		data : ({
+			image_id : p.name
+		}),
+		success : function (data) {
+			var data=$.parseJSON(data);
+			if (data)
+			{
+				var str=$('#imageCreditsNames').html()+', '+data.maker;
+				$('#imageCreditsNames').html(str.replace(/(^,)|(,$)/g, ""));
+				/*
+				$('#'+p.id).attr('title',
+					(data.description? '"'+data.description+'" ' : '')+(data.copyright ? '&copy; '+data.copyright : '') +
+					(data.copyright && data.maker ? ' - ' : '') +(data.maker ? 'Maker: '+data.maker : '')
+				);
+				*/
+			}
+		}
+	});	
+
+}
+
+//imageCreditsNames 
+
+function addremotemetadata(data) {
+
+	var url=data.img_main.file;
+	getremotemetadata( { name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
+
+	for (var i in data.img_add) {
+		var url=data.img_add[i].file;
+		getremotemetadata( { name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
+	}
+
+}

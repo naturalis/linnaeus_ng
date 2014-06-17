@@ -66,7 +66,6 @@
 								<a href="#" class="next-btn last-child" onClick="navigeren('volgende');"></a>
 								<a href="#" class="last-btn last-child" onClick="navigeren('laatste');"></a>
 							</li>
-
                         </ul>
                         <div class="clearer"></div>
                     </div>
@@ -77,10 +76,15 @@
                     </div>
                     <div class="result-list-footer">
                          <ul>
-                            <li id="prev-button-container-bottom" style="visibility:hidden"><a href="#" class="no-text prev-btn" onClick="navigeren('vorige');">Vorige 16</a></li>
-                            <li>&nbsp;</li>
-                            <li  id="next-button-container-bottom" style="position:relative;left:261px;visibility:visible;"><a href="#" class="no-text next-btn last-child" onClick="navigeren('volgende');">Volgende 16</a></li>
-
+                            <li id="prev-button-container-bottom" style="visibility:hidden">
+								<a href="#" class="first-btn" onClick="navigeren('eerste');" style="margin-left:5px"></a>
+								<a href="#" class="prev-btn" onClick="navigeren('vorige');" style="margin-left:1px"></a>
+							</li>
+                            <li style="width:184px;">&nbsp;</li>
+                            <li id="next-button-container-bottom" style="position:relative;left:84px;visibility:visible;">
+								<a href="#" class="next-btn last-child" onClick="navigeren('volgende');"></a>
+								<a href="#" class="last-btn last-child" onClick="navigeren('laatste');"></a>
+							</li>
                         </ul>
                     </div>
                 </div>
