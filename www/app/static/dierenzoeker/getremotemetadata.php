@@ -5,4 +5,7 @@
 	$xml=@simplexml_load_string($raw);
 	if (!$xml) return;
 	//var_dump($xml);
-	echo json_encode(array('description'=>(string)$xml->record->description,'maker'=>(string)$xml->record->maker,'copyright'=>(string)$xml->record->copyright));
+	if ((string)$xml->record->description!='' ||(string)$xml->record->maker!='' ||(string)$xml->record->copyright!='')
+	{
+		echo json_encode(array('description'=>(string)$xml->record->description,'maker'=>(string)$xml->record->maker,'copyright'=>(string)$xml->record->copyright));
+	}

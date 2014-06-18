@@ -468,9 +468,13 @@ function getremotemetadata(p) {
 			var data=$.parseJSON(data);
 			if (data)
 			{
-				var str=$('#imageCreditsNames').html()+', '+data.maker;
-				$('#imageCreditsNames').html(str.replace(/(^,)|(,$)/g, ""));
+				if($('#imageCreditsNames').html().replace(/\s/g, "").length==0)
+				{
+					$('#imageCredits').html(templates.imagecreditlabel+$('#imageCredits').html());
+				}
+				$('#imageCreditsNames').html(($('#imageCreditsNames').html()+', '+data.maker).replace(/(^,)|(,$)/g, ""));
 			}
+			
 		}
 	});	
 

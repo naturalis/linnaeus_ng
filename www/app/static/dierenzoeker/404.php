@@ -93,7 +93,7 @@ $(document).ready(function(){
 <a href='http://www.hetklokhuis.nl' class="no-text" target="_blank" style='display:block;position:absolute;left:458px;top:30px;width:67px;height:62px;border: 0px solid red;'>Klokhuis</a>
 <a href='http://www.eis-nederland.nl' class="no-text" target="_blank" style='display:block;position:absolute;left:535px;top:30px;width:101px;height:68px;border: 0px solid orange;'>EIS</a>
 <a href='http://www.cultuurfonds.nl' class="no-text" target="_blank" style='display:block;position:absolute;left:646px;top:30px;width:53px;height:68px;border:0px solid purple;'>Prins Bernhard fonds</a>
-<a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" style='display:block;position:absolute;left:722px;top:30px;width:153px;height:68px;border: 0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
+<a href='http://www.rijksoverheid.nl/ministeries/ez' target="_blank" class="no-text" style='display:block;position:absolute;left:722px;top:30px;width:153px;height:68px;border: 0px solid blue;'>Ministerie voor landbouw en innovatie.</a>
 
 <div class="social-media">
 <a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="/linnaeus_ng/app/media/system/skins/dierenzoeker/facebook.png" alt="" /></a>

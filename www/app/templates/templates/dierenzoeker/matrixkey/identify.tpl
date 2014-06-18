@@ -121,7 +121,7 @@
 						style='display:block;position:absolute;left:640px;top:30px;width:126px;height:42px;border:0px solid purple;'>Prins Bernhard fonds</a>
                     <a href='http://www.nationaalgroenfonds.nl' class="no-text"  target="_blank"   
 						style='display:block;position:absolute;left:631px;top:74px;width:140px;height:33px;border:0px solid green;'>Nationaal Groen Fonds</a>
-                    <a href='http://www.rijksoverheid.nl/ministeries/eleni' target="_blank" class="no-text" 
+                    <a href='http://www.rijksoverheid.nl/ministeries/ez' target="_blank" class="no-text" 
 						style='display:block;position:absolute;left:779px;top:41px;width:150px;height:55px;border:0px solid blue;'>Ministerie voor landbouw en innovatie</a>
 
 				<div class="social-media">

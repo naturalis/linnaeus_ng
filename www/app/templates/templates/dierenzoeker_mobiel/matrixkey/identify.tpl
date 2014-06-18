@@ -131,7 +131,7 @@
     <div class="content keuze-content ui-content">
 
 		<div>
-			<div data-role="header" class="header" style="background-color:black">
+			<div data-role="header" class="header" style="background-color:black;height:67px;">
 				<img src="{$projectUrls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;loadpage();">
 				<a href="#" onClick="loadpage()" data-transition="slide" data-direction="reverse" data-role="none">
 					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
@@ -175,15 +175,16 @@ var templates = {
 		class_n : 'ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-corner-bottom'
 	{literal}}{/literal},
 	selectedstate : '<div class="ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%" facetlabel="%label%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;padding-top:5px;font-style:italic">%charlabel%</div><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" style="top:25px;" alt=""><img src="{$projectUrls.projectMedia}button-close-shadow-overlay.png" style="position:relative;top:0px;left:-5px;" alt=""></div><div class="grid-labelbox" style="padding-top:23px;">%label%</div></span></span></a></div>',
-	speciesdetail : '<div role="main" data-role="content" class="soortpagina ui-content" id="species-default"><div class="soortpagina-inner"><h2>%title%</h2><h3>%subtitle%</h3>%image% %text% %extra_images% <p id="imageCredits" style="font-style:italic;color:#6d6d6d;">Beeldmateriaal van:<br /><span id="imageCreditsNames"></span>.</p></div></div>%group% %similar%</div>',
+	speciesdetail : '<div role="main" data-role="content" class="soortpagina ui-content" id="species-default"><div class="soortpagina-inner"><h2>%title%</h2><h3>%subtitle%</h3>%image% %text% %extra_images% <p id="imageCredits" style="font-style:italic;color:#6d6d6d;"><span id="imageCreditsNames"></span>.</p></div></div>%group% %similar%</div>',
 	speciesdetailimage : '<div class="illustratie" style="margin-left:auto;margin-right:auto;"><img src="%image%" alt=""></div>',
+	imagecreditlabel : 'Beeldmateriaal van:<br />',
 	extraimages: '<div class="fotos">%images%</div>',
 	extraimage: {literal}{{/literal}
 		tpl : '<img style="%style%" src="%image%" alt="">',
 		style_0 : 'padding-right:20px;padding-bottom:20px;',
 		style_n : 'padding-bottom:20px;',
 	{literal}}{/literal},
-	extraimagescredits: '<p style="font-style:italic;color:#6d6d6d;">Beeldmateriaal van:<br />%credits%</p>',
+	//extraimagescredits: '<p style="font-style:italic;color:#6d6d6d;"><span>Beeldmateriaal van:<br />%credits%</p>',
 	speciesgroup : '<div class="soortpagina-list" style="margin-bottom:-18px;"><h4 style="padding-top:10px;">Hoort bij de diergroep:</h4><ul data-role="listview" data-inset="true" class="resultlist ui-listview ui-listview-inset ui-corner-all ui-shadow"><li data-theme="c" class="similar-species-list-item ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-corner-top ui-corner-bottom ui-btn-up-c"><div aria-hidden="true" class="ui-btn-inner ui-li ui-corner-top"><div class="ui-btn-text"><a href="#" onclick="%onclick%" class="result-link ui-link-inherit">%label%</a></div><span class="pijltje"></span></div></li></ul></div>',
 	speciessimilar : '<div class="soortpagina-list"><h4 style="padding-top:10px;">%title%</h4><ul data-role="listview" data-inset="true" class="resultlist ui-listview ui-listview-inset ui-corner-all ui-shadow">%specieslist%</ul><a id="go-to-top-link" data-theme="c" href="#" onclick="scrolltop();" data-role="button" class="simplebutton ie-rounded to-top ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow" style="background-color:#5a5c5f;color:white;border:none;"><span aria-hidden="true" class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">Naar boven</span></span></a><br /><br /><br /></div>',
 	speciessimilaritem : {literal}{{/literal}
