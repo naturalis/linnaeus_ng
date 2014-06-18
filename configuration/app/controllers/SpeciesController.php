@@ -311,6 +311,7 @@ class SpeciesController extends Controller
 			usort($children,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
 
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
+		$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
 		$parent = $this->getTaxonById($taxon['parent_id']);
 		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
 		$content = $this->models->ContentTaxon->_get(array(
