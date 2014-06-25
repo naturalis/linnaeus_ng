@@ -31,10 +31,22 @@
 <div class="faq-answer">De Dierenzoeker is als Android app beschikbaar in Google Play (<a href="https://play.google.com/store/apps/details?id=nl.naturalis.dierenzoeker">klik hier</a>) en als iPhone/iPad app in de App Store (<a href="https://itunes.apple.com/nl/app/id699543364">klik hier</a>). Of zoek in de app stores op Dierenzoeker.</div>
 
 <div class="faq-question">9. De Dierenzoeker werkt niet goed op mijn smartphone. Hoe kan dat?</div>
-<div class="faq-answer">De Dierenzoeker is geoptimaliseerd voor smartphones met een aanraakscherm (touch screen). De Dierenzoeker is getest en werkend bevonden op de iPhone van Apple en enkele telefoons van Samsung en HTC met het Android besturingssysteem. De Dierenzoeker is niet geoptimaliseerd voor telefoons met een Symbian, Windows Mobile of Blackberry OS besturingssysteem.</div>
+<div class="faq-answer">De Dierenzoeker is geoptimaliseerd voor smartphones met een aanraakscherm (touch screen). De Dierenzoeker is getest en werkend bevonden op de iPhone van Apple en enkele telefoons van Samsung en HTC met het Android besturingssysteem. De Dierenzoeker is niet geoptimaliseerd voor telefoons met een Symbian, Windows Mobile of Blackberry OS besturingssysteem.</div></body>        </div>
 
-<script>
+
+<a href="mailto:dierenzoeker@naturalis.nl?subject=Dierenzoeker vraag" data-role="button" id="askNaturalis" class="simplebutton ie-rounded ui-btn ui-btn-corner-all ui-shadow ui-btn-hover-c" style="background-color:#5a5c5f;color:white;border:none;" data-theme="c"><span class="ui-btn-inner ui-btn-corner-all" aria-hidden="true"><span class="ui-btn-text">Staat je vraag er niet tussen? <br>Mail Naturalis</span></span></a>						
+
+                
+<script language="JavaScript">
 $(document).ready(function(e) {
+
+        $(function() {
+            $(".to-top").click(function(e) {    
+                e.preventDefault(); 
+                window.scrollTo(0,0);
+                return false;
+            });            
+        });
 
 	$('.faq-question').each(function() {
 		$(this).bind('click',function() {
@@ -45,12 +57,16 @@ $(document).ready(function(e) {
 });
 </script>
 
-</body>        </div>
-                        <a href='mailto:dierenzoeker@naturalis.nl?subject=Dierenzoeker vraag' data-role='button' id='askNaturalis' class="simplebutton ie-rounded"  style="background-color:#5a5c5f;color:white;border:none;">Staat je vraag er niet tussen? <br />Mail Naturalis</a>        
-              
+<strong><a href="#top" data-role="button" class="simplebutton ie-rounded to-top ui-btn ui-btn-corner-all ui-shadow ui-btn-up-c" style="background-color:#5a5c5f;color:white;border:none;" data-theme="c"><span class="ui-btn-inner ui-btn-corner-all" aria-hidden="true"><span class="ui-btn-text">Naar boven</span></span></a>
 
-    </div>
+
+</strong>    </div>
 </div>
 
-  
-</div>
+
+
+
+
+
+
+

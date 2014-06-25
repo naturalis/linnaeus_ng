@@ -34,7 +34,7 @@
 
     	<div class="collapsible-set-wrapper">
 
-			<div class="ui-collapsible" data-icon-pos="right" style="border-bottom:3px solid #323232;" id="expanded-characters">
+			<div class="ui-collapsible" data-icon-pos="right" style="border-bottom:0px solid #323232;" id="expanded-characters">
 			</div>
 
         </div>
