@@ -248,7 +248,7 @@ a img {
 	background: url(stippellijn.png);
 }
 .keuze-content .ui-collapsible-content {	
-	background: url(../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-background.png) bottom repeat-x;
+/*	background: url(../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-background.png) bottom repeat-x;*/
 }
 .keuze-content h4 a {
 	height:30px;

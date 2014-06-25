@@ -2337,7 +2337,7 @@ class Controller extends BaseClass
 
 					$d=$this->getSetting('skin_gsm');
 
-					if ($this->helpers->UserAgent->isGSM() && isset($d))
+					if ($force || $this->helpers->UserAgent->isGSM() && isset($d))
 					{
 						$skin = $d;
 					}
