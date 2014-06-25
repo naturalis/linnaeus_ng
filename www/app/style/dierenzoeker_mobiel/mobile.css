@@ -208,7 +208,7 @@
 	background: url("../../media/system/skins/dierenzoeker_mobiel/bg_blauwestreep.jpg");
 }
 .ui-collapsible-content-wrapper {
-	background: url("../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;
+	/*background: url("../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;*/
 }
 .block-container ul {
 	margin-top:15px;
