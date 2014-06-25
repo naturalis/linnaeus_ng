@@ -23,7 +23,7 @@
 
 		<div id="x-menu-header-back">
 
-			<div data-role="header" class="header">
+			<div data-role="header" class="header" style="background-color:black;height:48px;">
 				<img src="{$projectUrls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="appController.states(selection);" data-transition="slide" data-direction="reverse" data-role="none">
 					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
@@ -58,10 +58,10 @@
 		<div id="x-menu-characters">
 
 			<div class="facetheadercontainer">
-				<h4 class="tagline left-tagline ie-rounded" style="position: absolute;top: 26px;left:20px;padding-top:5px;">Wat weet je over het dier?</h4>
+<h4 class="tagline left-tagline ie-rounded keuze-tagline ui-collapsible-heading"><span class="ui-btn-inner ui-corner-top ui-corner-bottom" aria-hidden="true"><span class="ui-btn-text"> Wat weet je over het dier?</h4>
 			</div>
 
-			<div id="filter" class="filterset">
+			<div id="filter" class="filterset" style="padding-top:27px;">
 				<div id="filtergrid" class="ui-grid-c">
 				<!-- groups,characters,states -->
 				</div>
@@ -88,7 +88,7 @@
 
 	</div>
 
-    <div id="resultcontent" style="display:none">
+    <div id="resultcontent" style="display:none;margin-top:1px">
 
 		<div class="block-container middle-block-container" style="margin-bottom: 60px;">
 
