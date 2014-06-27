@@ -6,7 +6,12 @@
 	display:block;
 	margin-bottom:1em;	
 }
-
 .ui-mobile [data-role="page"], .ui-mobile [data-role="dialog"], .ui-page {
     display:block;
+}
+h4:first-child > span {
+	border-top:none;
+}
+.ui-collapsible-content-wrapper  {
+	/*background: url("../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;*/
 }

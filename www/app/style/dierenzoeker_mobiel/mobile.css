@@ -207,9 +207,6 @@
 .keuze-content {
 	background: url("../../media/system/skins/dierenzoeker_mobiel/bg_blauwestreep.jpg");
 }
-.ui-collapsible-content-wrapper {
-	/*background: url("../../media/system/skins/dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;*/
-}
 .block-container ul {
 	margin-top:15px;
 	margin-top:0px;
@@ -221,8 +218,6 @@ h3 {
 	font-weight:normal;
 	color: #25aad5;
 }
-
-
 .faq-question {
 	text-align:left;
 	min-height: 30px;
@@ -234,10 +229,13 @@ h3 {
 	color: white;
 	padding-left: 35px;	
 	background-color: #1AACDB !important;
-	background-image: url(collapsable-arrow.png) !important;
+	/*
+	background-image: url(../../media/system/skins/dierenzoeker_mobiel/collapsable-arrow.png) !important;
 	background-repeat: no-repeat !important;
 	background-position-x: 16px !important;
-	background-position-y: 10px !important;
+	background-position-y: 10px !important;	
+	*/
+	
 }
 .faq-answer {
 	display:none;
