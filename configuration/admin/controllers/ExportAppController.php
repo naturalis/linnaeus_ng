@@ -277,10 +277,6 @@ class ExportAppController extends Controller
 		$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
 		
 	}
-	
-
-
-
 
 
 	public function appExportAction()

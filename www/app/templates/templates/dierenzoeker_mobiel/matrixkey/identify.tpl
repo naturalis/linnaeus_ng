@@ -1,4 +1,5 @@
 {include file="../shared/header.tpl"}
+
 <title>{$projectUrls.systemMedia}</title>
 <body class="ui-mobile-viewport">
 <div tabindex="0" data-url="main" id="main" class="main-page ui-page ui-body-c ui-page-active" data-role="page" style="background-image: none; min-height: 920px;">
