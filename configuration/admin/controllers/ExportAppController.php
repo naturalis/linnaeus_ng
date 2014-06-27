@@ -40,8 +40,11 @@ class ExportAppController extends Controller
 		'free_module_media',
 		'content_free_module',
 		'occurrence_taxon',
-		'geodata_type',
-		'geodata_type_title',
+		'l2_occurrence_taxon_combi',
+		'l2_diversity_index',
+		'l2_map',
+		//'geodata_type',
+		//'geodata_type_title',
 		'content_introduction',
 		'introduction_page',
 		'introduction_media',
@@ -311,6 +314,8 @@ class ExportAppController extends Controller
 			$this->makeSpeciesDump();
 			$this->makeMatrixDump();
 			$this->makeKeyDump();
+			$this->makeMapDump();
+			//$this->makeIntroductionDump();
 	
 			if ($this->_makeImageList) $this->makeImageList();
 
@@ -444,6 +449,33 @@ class ExportAppController extends Controller
 		$this->_exportDump->ChoiceKeystep = $this->models->ChoiceKeystep->_get(array('id' => $where));
 		$this->_exportDump->ChoiceContentKeystep = $this->models->ChoiceContentKeystep->_get(array('id' => $where));
 		//$this->_exportDump->Keytree = $this->models->Keytree->_get(array('id' => $where));
+	}
+
+	
+    private function makeMapDump()
+	{
+		$where = 
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->_projectLanguage
+			);
+				
+		$this->_exportDump->L2Map = $this->models->L2Map->_get(array('id' => $where));
+		$this->_exportDump->L2OccurrenceTaxonCombi = $this->models->L2OccurrenceTaxonCombi->_get(array('id' => $where));
+		$this->_exportDump->GeodataType = $this->models->GeodataType->_get(array('id' => $where));
+		$this->_exportDump->GeodataTypeTitle = $this->models->GeodataTypeTitle->_get(array('id' => $where));
+
+		if ($this->_reduceURLs)
+		{
+			foreach((array)$this->_exportDump->L2Map as $key => $val)
+			{
+				if (stripos($val['image'],'http://')!==false || stripos($val['image'],'https://')!==false)
+				{
+					$d=pathinfo($val['image']);
+					$this->_exportDump->L2Map[$key]['image']=$d['basename'];
+				}
+			}
+		}
 	}
 
 	

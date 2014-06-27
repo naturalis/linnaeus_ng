@@ -1202,7 +1202,7 @@ class MapKeyController extends Controller
 				
 				foreach((array)$ot as $key => $val) {
 				
-					$ot[$key]['total'] = count((array)explode(',',$val['square_numbers']));
+					$ot[$key]['total'] = count((array)explode(' ',$val['square_numbers']));
 						
 				}
 
@@ -1618,7 +1618,7 @@ class MapKeyController extends Controller
 		
 		foreach((array)$combi as $key => $val) {
 		
-			$x = explode(',',$val['square_numbers']);
+			$x = explode(' ',$val['square_numbers']);
 			
 			foreach((array)$x as $val2) {
 			
