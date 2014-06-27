@@ -1962,7 +1962,7 @@ class MapKeyController extends Controller
 								'taxon_id' => $prevTaxon,
 								'map_id' => $mVal['id'],
 								'type_id' => $tVal['id'],
-								'square_numbers' => trim($b,',')
+								'square_numbers' => trim($b)
 							)
 						);			
 					
@@ -1970,7 +1970,7 @@ class MapKeyController extends Controller
 					
 					}
 		
-					$b .= $val['square_number'].',';
+					$b .= $val['square_number'].' ';
 					
 					$prevTaxon = $val['taxon_id'];
 			
@@ -1983,7 +1983,7 @@ class MapKeyController extends Controller
 						'taxon_id' => $prevTaxon,
 						'map_id' => $mVal['id'],
 						'type_id' => $tVal['id'],
-						'square_numbers' => trim($b,',')
+						'square_numbers' => trim($b)
 					)
 				);
 	
