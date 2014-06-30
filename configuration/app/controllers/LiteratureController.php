@@ -59,7 +59,8 @@ class LiteratureController extends Controller
     public function indexAction()
     {
  
- 		if (!$this->rHasVal('id')) {
+ 		if (!$this->rHasVal('id'))
+		{
 
 			$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 
@@ -193,7 +194,6 @@ class LiteratureController extends Controller
 
 	}
 
-
     public function ajaxInterfaceAction ()
     {
 
@@ -210,7 +210,6 @@ class LiteratureController extends Controller
         $this->printPage();
     
     }
-
 
 	private function getLiteratureAlphabet($forceLookup=false)
 	{

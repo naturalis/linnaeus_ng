@@ -18,7 +18,7 @@
 
 <div id="classification">
 	<p>
-	<b>Classification</b><br />
+	<b>{t}Classification{/t}</b><br />
 	{foreach from=$content.classification key=k item=v name=classification}
 	{if $v.do_display}
 
