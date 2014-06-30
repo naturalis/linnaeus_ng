@@ -85,7 +85,7 @@ class InterfaceController extends Controller
             'untranslatedOnly' => $untranslatedOnly
         ));
         
-        $pagination = $this->getPagination($texts, 25);
+        $pagination = $this->getPagination($texts,2500);
 
         $this->smarty->assign('prevStart', $pagination['prevStart']);
         $this->smarty->assign('currStart', $pagination['currStart']);

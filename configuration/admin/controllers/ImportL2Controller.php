@@ -1224,8 +1224,8 @@ class ImportL2Controller extends ImportController
         
         $project = $this->getProjects($this->getNewProjectId());
         
-        $this->setPageName($this->translate('Additional data for "' . $project['title'] . '"'));
-        
+        $this->setPageName(sprintf($this->translate('Additional data for "%s"'),$project['title']));
+		
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
             if ($this->rHasVal('modules')) {
