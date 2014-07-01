@@ -47,12 +47,22 @@ class UtilitiesController extends Controller
         
         if (!isset($this->requestData['action'])) return;
         
-		if ($this->requestData['action'] == 'translate') {
-			
+		if ($this->requestData['action'] == 'translate')
+		{
 			$this->smarty->assign('returnText',json_encode($this->javascriptTranslate($this->requestData['text'])));
 
+        } 
+		else
+		if ($this->requestData['action'] == 'set_session')
+		{
+			$this->setSessionVar($this->requestData['var'],@$this->requestData['val']);
         }
-        
+		else
+		if ($this->requestData['action'] == 'get_session')
+		{
+			$this->getSessionVar($this->requestData['var']);
+        }
+		
 		$this->allowEditPageOverlay = false;
 		
         $this->printPage();
@@ -165,6 +175,20 @@ class UtilitiesController extends Controller
 
 		$this->printPage('dynamic-css');
 	
+	}
+
+	private function setSessionVar($var,$val)
+	{
+		if (!empty($val))
+			$_SESSION['app']['user']['utilities']['session_vars'][$var]=$val;
+		else
+			unset($_SESSION['app']['user']['utilities']['session_vars'][$var]);
+	
+	}
+
+	private function getSessionVar($var)
+	{
+		return isset($_SESSION['app']['user']['utilities']['session_vars'][$var]) ? $_SESSION['app']['user']['utilities']['session_vars'][$var] : null;
 	}
 
 
