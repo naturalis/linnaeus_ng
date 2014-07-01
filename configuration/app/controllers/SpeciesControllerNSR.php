@@ -1516,6 +1516,8 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getOrganisationLogoUrl($name)
 	{
+		if (empty($name)) return;
+
 		$exts=array('png','jpg','PNG','JPG','gif','GIF');
 		$d=array();
 
