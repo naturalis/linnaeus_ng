@@ -39,7 +39,7 @@
 			<li class="root">
 			{foreach from=$classification item=v key=x}
 			{if $v.parent_id!=null}{* skipping top most level "life" *}
-				<span class="classification-preffered-name"><a href="">{$v.taxon}</a></span>
+				<span class="classification-preffered-name"><a href="nsr_taxon.php?id={$v.id}">{$v.taxon}</a></span>
 				<span class="classification-rank">[{$v.rank_label}]</span>
 				{if $v.common_name}<br />
 				<span class="classification-accepted-name">{$v.common_name}</span>{/if}
