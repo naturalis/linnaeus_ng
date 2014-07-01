@@ -178,7 +178,7 @@ class SpeciesControllerNSR extends SpeciesController
 						$url=isset($val['data']['homepage']) ? $val['data']['homepage'] : null;
 					}
 				}
-				
+
 				array_push(
 					$sideBarLogos,
 					array(
@@ -1526,10 +1526,20 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if (strpos($name,' ')!==false)
 		{
-			$shortname=array_shift(explode(' ',$name));
+			$a=str_replace(' ','_',$name);
+			$b=str_replace(' ','-',$name);
 			foreach($exts as $ext)
 			{
-				array_push($d,$shortname.'.'.$ext,strtolower($shortname).'.'.$ext,$name.'-logo.'.$ext,strtolower($shortname).'-logo.'.$ext);
+				array_push($d,
+					$a.'.'.$ext,
+					strtolower($a).'.'.$ext,
+					$a.'_logo.'.$ext,
+					strtolower($a).'_logo.'.$ext,
+					$b.'.'.$ext,
+					strtolower($b).'.'.$ext,
+					$b.'-logo.'.$ext,
+					strtolower($b).'-logo.'.$ext
+				);
 			}
 		}
 
@@ -1537,6 +1547,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$d as $val)
 		{
+
 			if (file_exists($this->getProjectUrl('projectMedia').$val))
 			{
 				$logo=$this->getProjectUrl('projectMedia').$val;
