@@ -106,8 +106,11 @@ function keyNameswitch(ele)
 	
 	$("[data-type=name_common]").toggle(true);
 	$("[data-type=name_sci]").toggle(true);
-
 	$("[data-type="+keyListAttr+"]").toggle(false);
-	
+
+	//setSessionVar(variable,value);
+	//getSessionVar(variable,callback);
 
 }
+
+

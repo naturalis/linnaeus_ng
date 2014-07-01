@@ -68,7 +68,8 @@ function stripSlashes(str) {
 }
 
 function stripTags(str) {
-	return str.replace(/(<([^>]+)>)/ig,"");
+	if (str)
+		return str.replace(/(<([^>]+)>)/ig,"");
 }
 
 function allGetTimestamp() {
@@ -588,4 +589,39 @@ function hint(caller,txt) {
 	$('#hint-box').bind('click', function() {
 		hint();
 	});
+}
+
+
+function setSessionVar(variable,value) {
+
+	$.ajax({
+		url : '../utilities/ajax_interface.php',
+		type: "POST",
+		data : ({
+			'action' : 'set_session' ,
+			'var' : variable,
+			'val' : value,
+			'time' : allGetTimestamp()
+		})
+	});	
+
+}
+
+
+function getSessionVar(variable,callback) {
+
+	$.ajax({
+		url : '../utilities/ajax_interface.php',
+		type: "POST",
+		data : ({
+			'action' : 'get_session' ,
+			'var' : variable,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data)
+		{
+			if (callback) callback(data);
+		}
+	});	
+
 }
