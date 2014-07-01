@@ -37,12 +37,12 @@
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
 {if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}
-{if $javascriptsToLoad.all[i]!='main.js'}
+{* if $javascriptsToLoad.all[i]!='main.js' *}
 	<script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.all[i]}"></script>
-{else}
+{* else}
+	<!-- don't think this is actually necessary -->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/main--linnaeus_ng--skin.js"></script>
-
-{/if}
+{/if *}
 {else}
 	<script type="text/javascript" src="{$javascriptsToLoad.all[i]}"></script>
 {/if}

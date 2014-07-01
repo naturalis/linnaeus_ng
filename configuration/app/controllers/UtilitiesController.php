@@ -60,6 +60,7 @@ class UtilitiesController extends Controller
 		else
 		if ($this->requestData['action'] == 'get_session')
 		{
+			echo 'hoer';return;
 			$this->getSessionVar($this->requestData['var']);
         }
 		
@@ -176,20 +177,5 @@ class UtilitiesController extends Controller
 		$this->printPage('dynamic-css');
 	
 	}
-
-	private function setSessionVar($var,$val)
-	{
-		if (!empty($val))
-			$_SESSION['app']['user']['utilities']['session_vars'][$var]=$val;
-		else
-			unset($_SESSION['app']['user']['utilities']['session_vars'][$var]);
-	
-	}
-
-	private function getSessionVar($var)
-	{
-		return isset($_SESSION['app']['user']['utilities']['session_vars'][$var]) ? $_SESSION['app']['user']['utilities']['session_vars'][$var] : null;
-	}
-
 
 }
