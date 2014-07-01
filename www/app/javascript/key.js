@@ -92,9 +92,9 @@ function keyListsort(list)
 	
 }
 
-function keyNameswitch(type)
+function keyNameswitch(ele)
 {
-	keyListAttr=type;
+	keyListAttr=$(ele).attr('data-type');
 
 	$('.taxon-links').each(function(){
 		if ($(this).attr(keyListAttr).length>0)
@@ -103,5 +103,11 @@ function keyNameswitch(type)
 	
 	keyListsort('ul-remaining');
 	keyListsort('ul-excluded');
+	
+	$("[data-type=name_common]").toggle(true);
+	$("[data-type=name_sci]").toggle(true);
+
+	$("[data-type="+keyListAttr+"]").toggle(false);
+	
 
 }
