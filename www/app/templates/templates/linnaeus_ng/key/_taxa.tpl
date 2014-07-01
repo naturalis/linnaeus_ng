@@ -34,7 +34,7 @@
 		<div id="excluded" style="display: {if $taxaState=='remaining' || $excluded|@count==0}none{else}block{/if};">
 		{if $excluded|@count==1}{assign var=w value=taxon}{else}{assign var=w value=taxa}{/if}
 		<p id="header">
-			{t _s1=$excluded|@count _s2=$w}%s %s excluded:{/t}
+			{t _s1=$excluded|@count _s2=$w}%s %s excluded:{/t}<br />
 			<a href="#" class="name_switch" data-type="name_sci" style="display:none" onclick="keyNameswitch(this)";>{t}show scientific names{/t}</a>
 			<a href="#" class="name_switch" data-type="name_common" style="display:inline" onclick="keyNameswitch(this);">{t}show common names{/t}</a>
 		</p>
