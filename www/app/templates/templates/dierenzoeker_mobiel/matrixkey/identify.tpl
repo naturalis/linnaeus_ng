@@ -10,7 +10,7 @@
 			<div data-role="header" class="header">
 				<img src="{$projectUrls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="detailback()" data-transition="slide" data-direction="reverse" data-role="none">
-					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
+					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
 				</a>
 			</div>
 
@@ -27,7 +27,7 @@
 			<div data-role="header" class="header" style="background-color:black;height:48px;">
 				<img src="{$projectUrls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="appController.states(selection);" data-transition="slide" data-direction="reverse" data-role="none">
-					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
+					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
 				</a>
 			</div>
 
@@ -89,7 +89,7 @@
 
 	</div>
 
-    <div id="resultcontent" style="display:none;margin-top:1px">
+    <div id="resultcontent" style="display:none;margin-top:2px">
 
 		<div class="block-container middle-block-container" style="margin-bottom: 60px;">
 
@@ -176,7 +176,7 @@ var templates = {
 		class_n : 'ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-corner-bottom'
 	{literal}}{/literal},
 	selectedstate : '<div class="ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%" facetlabel="%label%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;padding-top:5px;font-style:italic">%charlabel%</div><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" style="top:25px;" alt=""><img src="{$projectUrls.projectMedia}button-close-shadow-overlay.png" style="position:relative;top:0px;left:-5px;" alt=""></div><div class="grid-labelbox" style="padding-top:23px;">%label%</div></span></span></a></div>',
-	speciesdetail : '<div role="main" data-role="content" class="soortpagina ui-content" id="species-default"><div class="soortpagina-inner"><h2>%title%</h2><h3>%subtitle%</h3>%image% %text% %extra_images% <p id="imageCredits" style="font-style:italic;color:#6d6d6d;"><span id="imageCreditsNames"></span>.</p></div></div>%group% %similar%</div>',
+	speciesdetail : '<div role="main" data-role="content" class="soortpagina ui-content" id="species-default"><div class="soortpagina-inner"><h2>%title%</h2><h3>%subtitle%</h3>%image% %text% %extra_images% <p id="imageCredits" style="font-style:italic;color:#6d6d6d;"><span id="imageCreditsNames"></span></p></div></div>%group% %similar%</div>',
 	speciesdetailimage : '<div class="illustratie" style="margin-left:auto;margin-right:auto;"><img src="%image%" alt=""></div>',
 	imagecreditlabel : 'Beeldmateriaal van:<br />',
 	extraimages: '<div class="fotos">%images%</div>',
