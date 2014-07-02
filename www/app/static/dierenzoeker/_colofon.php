@@ -34,13 +34,13 @@
 <p>
 	<strong>Determinatiesleutel</strong><br/>
 	<a href="http://www.naturalis.nl" target="_blank">Naturalis Biodiversity Center</a><br/>
-	<a href="http://www.eis-nederland.nl" target="_blank">EIS-Nederland</a>
+	<a href="http://www.eis-nederland.nl" target="_blank">EIS Kenniscentrum Insecten en andere ongwervelden</a>
 </p>
 
 <p>
 	<strong>Dierteksten</strong><br/>
 	<a href="http://www.naturalis.nl" target="_blank">Naturalis Biodiversity Center</a><br/>
-	<a href="http://www.eis-nederland.nl" target="_blank">EIS-Nederland</a>
+	<a href="http://www.eis-nederland.nl" target="_blank">EIS Kenniscentrum Insecten en andere ongwervelden</a>
 </p>
 
 <p>
@@ -59,65 +59,71 @@
 
 <p>
 	<strong>Foto's</strong><br/>
-	Jan van Asselt<br/>
-	Madeleine Assink-Kleve<br/>
-	Ab H. Baas<br/>
-	Marlies Bakker<br/>
-	Aat Bender<br/>
-	Herman Berkhoudt<br/>
-	Martin Bonte<br/>
-	Karen Bosma<br/>
-	Han Bouwmeester<br/>
-	Christophe Brochard<br/>
-	Wilbert van der Broek<br/>
-	Annelies Buijs<br/>
-	Wijnand van Buuren<br/>
-	Gert-Jan Cromwijk<br/>
-	Menno van Duijn<br/>
-	Henny van Egdom<br/>
-	Tim Faasen<br/>
-	Petra Fleurbaaij<br/>
-	Wanda Floor-Zwart<br/>
-	Ben Hamers<br/>
-	Antonia Hens<br/>
-	Jelger Herder<br/>
-	Chris Herzog<br/>
-	Theodoor Heijerman<br/>
-	Marcel Holtjer<br/>
-	Luc Hoogenstein<br/>
-	Annemieke Hoozemans<br/>
-	Dirk Huitzing<br/>
-	Sytze Jongma<br/>
-	Hans Jonkman<br/>
-	Hannie Joziasse<br/>
-	Guido Keijl<br/>
-	Jan Kersten<br/>
-	Michel Klemann<br/>
-	Roy Kleukers<br/>
-	René Krekels<br/>
-	Susanne Kuijpers<br/>
-	Sandra Lamberts<br/>
-	Hans van der Meulen<br/>
-	Susan Meijnders<br/>
-	Ans Molenkamp<br/>
-	Jinze Noordijk<br/>
-	Peter Notenbomer<br/>
-	Henk Olieman<br/>
-	Jeroen van Ophoven<br/>
-	Hans Osinga<br/>
-	Jan Piet Oudwater<br/>
-	Jan Paul<br/>
-	Bauke de Ruiter<br/>
-	Ron Schoone<br/>
-	Jankees Schwiebbe<br/>
-	John T. Smit<br/>
-	Pieter Smit<br/>
-	Frank Stokvis<br/>
-	Kees Venneker<br/>
-	Nick Upton<br/>
-	Hans Vink<br/>
-	Jan Westgeest<br/>
-	Albert de Wilde<br/>
-	Frank de Winter<br/>
-	Dick Witteveen<br/>
+	Jan van Asselt<br />
+Madeleine Assink-Kleve<br />
+Ab H. Baas<br />
+Marlies Bakker<br />
+Agnes Bax<br />
+Dick Belgers<br />
+Aat Bender<br />
+Herman Berkhoudt<br />
+Martin Bonte<br />
+Karen Bosma<br />
+Han Bouwmeester<br />
+Christophe Brochard<br />
+Wilbert van der Broek<br />
+Annelies Buijs<br />
+Wijnand van Buuren<br />
+Gert-Jan Cromwijk<br />
+Menno van Duijn<br />
+Henny van Egdom<br />
+Tim Faasen<br />
+Petra Fleurbaaij<br />
+Wanda Floor-Zwart<br />
+Ben Hamers<br />
+Antonia Hens<br />
+Jelger Herder<br />
+Chris Herzog<br />
+Theodoor Heijerman<br />
+Marcel Holtjer<br />
+Luc Hoogenstein<br />
+Annemieke Hoozemans<br />
+Dirk Huitzing<br />
+Sytze Jongma<br />
+Hans Jonkman<br />
+Hannie Joziasse<br />
+Guido Keijl<br />
+Jan Kersten<br />
+Michel Klemann<br />
+Roy Kleukers<br />
+René Krekels<br />
+Susanne Kuijpers<br />
+Sandra Lamberts<br />
+Hans van der Meulen<br />
+Susan Meijnders<br />
+Ans Molenkamp<br />
+Jinze Noordijk<br />
+Peter Notenbomer<br />
+Henk Olieman<br />
+Astra Ooms<br />
+Jeroen van Ophoven<br />
+Hans Osinga<br />
+Jan Piet Oudwater<br />
+Jan Paul<br />
+Bauke de Ruiter<br />
+Ron Schoone<br />
+Jankees Schwiebbe<br />
+John T. Smit<br />
+Pieter Smit<br />
+Frank Stokvis<br />
+Rob Strijker<br />
+Kees Venneker<br />
+Nick Upton<br />
+Hans Vink<br />
+Silvia Waajen<br />
+Sharon Wegh<br />
+Jan Westgeest<br />
+Albert de Wilde<br />
+Frank de Winter<br />
+Dick Witteveen<br />
 </p>
