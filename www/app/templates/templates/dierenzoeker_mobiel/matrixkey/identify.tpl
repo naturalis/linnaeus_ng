@@ -7,7 +7,7 @@
     <div id="speciescontent" class="content keuze-content ui-content" style="display:none">
 
 		<div>
-			<div data-role="header" class="header">
+			<div data-role="header" class="header" style="background-color:black;height:67px;">
 				<img src="{$projectUrls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="detailback()" data-transition="slide" data-direction="reverse" data-role="none">
 					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
@@ -165,7 +165,7 @@ var templates = {
 	state : '<div class="facet-btn ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" alt=""></div><div class="grid-labelbox">%label%</div></span></span></a></div>',
 	stateselected : '<div class="facet-btn ui-block-%letter% ui-selected"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$projectUrls.projectMedia}selected-background.png" class="selected-icon-overlay-border" alt=""><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" alt=""><img src="{$projectUrls.projectMedia}selected-badge.png" class="selected-icon-overlay-check" alt=""></div><div class="grid-labelbox selected">%label%</div></span></span></a></div>',
 	statedisabled : '<div class="facet-btn ui-block-%letter% ui-selected"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-disabled ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" alt=""></div><div class="grid-labelbox ">%label%</div></span></span></a></div>',
-	resultcontent : '<div class="ui-btn-text"><a class="resultlink ui-link-inherit" onclick="%onclick%"><img src="%image%" class="result ui-li-thumb ui-corner-tl" alt="">%label%</a></div><span class="pijltje"></span>',
+	resultcontent : '<div class="ui-btn-text"><a class="resultlink ui-link-inherit" onclick="%onclick%"><img src="%image%" class="result ui-li-thumb ui-corner-tl" alt="">%label%</a></div><span class="pijltje"><!-- span class="ui-icon ui-icon-arrow-r ui-icon-shadow"></span --></span>',
 	resultfirst : '<li data-theme="c" class="result%n% ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-corner-top ui-btn-up-c"><div aria-hidden="true" class="ui-btn-inner ui-li ui-corner-top">%content%</div></li>',
 	resultrest : '<li data-theme="c" class="result%n% ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb"><div aria-hidden="true" class="ui-btn-inner ui-li">%content%</div></li>',
 	resultlast : '<li data-theme="c" class="result%n% ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-corner-bottom"><div aria-hidden="true" class="ui-btn-inner ui-li">%content%</div></li>',

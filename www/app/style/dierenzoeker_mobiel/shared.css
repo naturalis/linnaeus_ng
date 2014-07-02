@@ -179,6 +179,7 @@ div.selectedfacets {
 .soortpagina .soortpagina-inner {
 	background: url("../../media/system/skins/dierenzoeker_mobiel/soort-white-background.png") top repeat-x;
 	padding: 0 14px;
+	margin-top:-20px;
 }
 .soortpagina .soortpagina-list {
 	background: url("../../media/system/skins/dierenzoeker_mobiel/bg_donkergrijzestreep.jpg");
