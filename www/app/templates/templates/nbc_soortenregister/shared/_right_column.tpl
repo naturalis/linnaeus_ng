@@ -34,7 +34,7 @@
 		<div id="boxes-box-aside_contribute" class="boxes-box">
 		<div class="boxes-box-content">
 		<p>
-		<a href="/content/fotos-bijdragen">
+		<a href="/content/fotosysteem-wordt-vernieuwd">
 		<img src="/sites/all/modules/nlsoort_aside_contribute/banner.jpg">
 		</a>
 		</p>
