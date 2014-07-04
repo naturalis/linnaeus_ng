@@ -97,5 +97,12 @@ $(document).ready(function(){
 });
 {/literal}
 </script>
+<!-- 
+
+{foreach from=$projectRanks item=v}
+	{$v.rank}:{$v.rank_id}:{$v.id}
+{/foreach}
+
+-->
 
 {include file="../shared/admin-footer.tpl"}

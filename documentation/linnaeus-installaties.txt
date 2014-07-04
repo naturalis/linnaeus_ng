@@ -1,0 +1,41 @@
+local maarten
+local ruud
+
+dev2.etibioinformatics.nl	132.229.167.132
+	/var/www/linnaeus_ng
+	/var/www/nouvelle_flore
+	/var/www/linnaeus_ng_app			(projecten gemigreerd uit de "OKE")
+
+linnaeus.etibioinformatics.nl		132.229.167.135
+linnaeusdemo.etibioinformatics.nl	132.229.167.139
+linnaeuslegacy.etibioinformatics.nl	132.229.167.154
+	/var/www/linnaeus_ng				(linnaeus.etibioinformatics.nl)
+	/var/www/linnaeus_ng_demo			(linnaeusdemo.etibioinformatics.nl)
+	/var/www/linnaeus_ng_cd_producties	(linnaeuslegacy.etibioinformatics.nl)
+
+linnaeustest.etibioinformatics.nl	132.229.167.136
+	/var/www/linnaeus_ng
+
+162.13.155.159	(nouvelle_flore development)
+	/var/www/linnaeusng
+
+determineren-development-001.openstack.naturalis.nl	10.42.1.48
+(vincents sleutels test, maar bleek niet zichtbaar van buiten. wordt niet gebruikt)
+	/var/www/linnaeusng
+
+soortenregister-development-001.cloud.naturalis.nl
+(in misbruik als test vincents sleutels)
+	/var/www/linnaeusng
+
+134.213.48.249
+(dierenzoeker productie-to-be)
+	/var/www/dierenzoeker
+
+etivm1.naturalis.nl		132.229.34.105 (10.21.1.149)
+etivm1.naturalis.nl/linnaeus_ng/			admin
+determineren.nederlandsesoorten.nl/xxxx/	keys (boktorren, rivierkreeften etc)
+	/var/www/linnaeus_ng
+
+162.13.138.109
+www.nederlandsesoorten.nl/linnaeus_ng		soortenregister
+	/var/www/linnaeusng
