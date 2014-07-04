@@ -1618,7 +1618,8 @@ class KeyController extends Controller
 
     private function showOrderToMarker ($showOrder)
     {
-        return chr($showOrder + 96);
+		return $showOrder;
+        //return chr($showOrder + 96);
     }
 
     private function checkEndPointsExist ()
