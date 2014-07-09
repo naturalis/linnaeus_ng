@@ -3016,17 +3016,20 @@ class Controller extends BaseClass
                             foreach ((array) $val2 as $key3 => $val3) {
 
                                 $this->requestData[$key][$key2][$key3] = get_magic_quotes_gpc() ? stripslashes($val3) : $val3;
+								array_walk($this->requestData[$key][$key2],function(&$n){$n=($n=='false'?false:($n=='true'?true:$n));});
                             }
                         }
                         else {
 
                             $this->requestData[$key][$key2] = get_magic_quotes_gpc() ? stripslashes($val2) : $val2;
+							array_walk($this->requestData[$key],function(&$n){$n=($n=='false'?false:($n=='true'?true:$n));});
                         }
                     }
                 }
                 else {
 
                     $this->requestData[$key] = get_magic_quotes_gpc() ? stripslashes($val) : $val;
+					array_walk($this->requestData,function(&$n){$n=($n=='false'?false:($n=='true'?true:$n));});
                 }
             }
         }
