@@ -485,6 +485,8 @@ class SpeciesControllerNSR extends SpeciesController
 		);
 
 		$prefferedname=null;
+		$scientific_name=null;
+		$nomen=null;
 
 		foreach((array)$names as $key=>$val)
 		{
@@ -512,7 +514,7 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
 					$nomen='<i>'.trim($nomen).'</i>';
-					$names[$key]['name']=trim($scientific_name=$nomen.' '.$val['authorship']);
+					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 				else
 				{

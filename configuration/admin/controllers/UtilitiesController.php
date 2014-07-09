@@ -118,8 +118,8 @@ class UtilitiesController extends Controller
             'order' => 'module_id asc'
         ));
 
-        foreach ((array) $modules as $key => $val) {
-            
+        foreach ((array) $modules as $key => $val)
+		{
             // get info per module
             $mp = $this->models->Module->_get(array(
                 'id' => $val['module_id']

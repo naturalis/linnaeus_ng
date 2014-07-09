@@ -53,7 +53,8 @@ class ExportController extends Controller
 		'chargroup',
 		'characteristic_chargroup',
 		'chargroup_label',
-		'gui_menu_order'
+		'gui_menu_order',
+		'names'
     );
    
     public $controllerPublicName = 'Export';
@@ -180,6 +181,123 @@ class ExportController extends Controller
 		}
 
 		$this->smarty->assign('modules',$pModules);
+
+        $this->printPage();
+    
+    }
+	
+    public function exportNSRAction()
+    {
+    
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Select modules to export'));
+		
+		//$pModules = $this->getProjectModules();
+
+		if ($this->rHasVal('action','export'))
+		{
+
+			$taxa=$this->models->Taxon->freeQuery("
+				select
+					_t.id,
+					_t.parent_id,
+					_t.taxon as taxon_concept,
+					_r.rank,
+					concat(_h.index_label,' ',_h.label) as status_voorkomen,
+					replace(_rr.nsr_id,'tn.nlsr.concept/','') as nsr_id,
+					concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url
+				from
+					%PRE%taxa _t
+				left join %PRE%projects_ranks _f
+					on _t.rank_id=_f.id
+					and _t.project_id=_f.project_id
+				left join %PRE%ranks _r
+					on _f.rank_id=_r.id
+				left join %PRE%nsr_ids _rr
+					on _t.id=_rr.lng_id
+					and _rr.item_type='taxon'
+				left join %PRE%presence_taxa _g
+					on _t.id=_g.taxon_id
+					and _t.project_id=_g.project_id
+				left join %PRE%presence_labels _h
+					on _g.presence_id = _h.presence_id 
+					and _g.project_id=_h.project_id 
+					and _h.language_id=".$this->getDefaultProjectLanguage()."
+				where _t.project_id = ".$this->getCurrentProjectId()."
+				
+and _t.id in (139499,139500,119843,126431,126429,138867)
+
+			");
+	
+
+			$data=array();
+			foreach((array)$taxa as $key=>$val)
+			{
+
+				$content=$this->models->Taxon->freeQuery("
+					select
+						_x2.title,_x1.content as text
+					from
+						%PRE%content_taxa _x1
+					left join %PRE%pages_taxa_titles _x2
+						on _x1.project_id=_x2.project_id
+						and  _x1.page_id=_x2.page_id
+					where
+						_x1.project_id =".$this->getCurrentProjectId()."
+						and _x1.taxon_id = ". $val['id']
+					);
+
+				$names=$this->models->Names->freeQuery("
+					select
+						_a.name,
+						_a.uninomial,
+						_a.specific_epithet,
+						_a.name_author,
+						_a.authorship_year,
+						_a.reference,
+						_a.expert,
+						_a.organisation,
+						_b.nametype,
+						_e.name as expert_name,
+						_f.name as organisation_name,
+						_g.label as reference_label,
+						_g.author as reference_author,
+						_g.date as reference_date,
+						_lan.language
+					from %PRE%names _a
+					left join %PRE%name_types _b 
+						on _a.type_id=_b.id 
+						and _a.project_id = _b.project_id
+					left join %PRE%actors _e
+						on _a.expert_id = _e.id 
+						and _a.project_id=_e.project_id
+					left join %PRE%actors _f
+						on _a.organisation_id = _f.id 
+						and _a.project_id=_f.project_id
+					left join %PRE%literature2 _g
+						on _a.reference_id = _g.id 
+						and _a.project_id=_g.project_id
+
+					left join %PRE%languages _lan
+						on _a.language_id=_lan.id
+
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.taxon_id = ". $val['id']
+				);
+				
+				$val['content']=$content;
+				$val['name']=$names;
+
+				$data['taxon'][]=$val;
+
+			}
+//q($data,1);
+			$this->exportData($data,'bla.xml');
+
+
+		}
 
         $this->printPage();
     
@@ -1132,6 +1250,59 @@ class ExportController extends Controller
 	
 	}
 
+function array_to_xml($array, $level=1) {
+        $xml = '';
+    if ($level==1) {
+        $xml .= '<?xml version="1.0" encoding="ISO-8859-1"?>'.
+                "\n<nederlands_soorten_register>\n";
+    }
+    foreach ($array as $key=>$value) {
+        $key = strtolower($key);
+        if (is_array($value)) {
+            $multi_tags = false;
+            foreach($value as $key2=>$value2) {
+                if (is_array($value2)) {
+                    $xml .= str_repeat("\t",$level)."<$key>\n";
+                    $xml .= $this->array_to_xml($value2, $level+1);
+                    $xml .= str_repeat("\t",$level)."</$key>\n";
+                    $multi_tags = true;
+                } else {
+                    if (trim($value2)!='') {
+                        if (htmlspecialchars($value2)!=$value2) {
+                            $xml .= str_repeat("\t",$level).
+                                    "<$key><![CDATA[$value2]]>".
+                                    "</$key>\n";
+                        } else {
+                            $xml .= str_repeat("\t",$level).
+                                    "<$key>$value2</$key>\n";
+                        }
+                    }
+                    $multi_tags = true;
+                }
+            }
+            if (!$multi_tags and count($value)>0) {
+                $xml .= str_repeat("\t",$level)."<$key>\n";
+                $xml .= $this->array_to_xml($value, $level+1);
+                $xml .= str_repeat("\t",$level)."</$key>\n";
+            }
+        } else {
+            if (trim($value)!='') {
+                if (htmlspecialchars($value)!=$value) {
+                    $xml .= str_repeat("\t",$level)."<$key>".
+                            "<![CDATA[$value]]></$key>\n";
+                } else {
+                    $xml .= str_repeat("\t",$level).
+                            "<$key>$value</$key>\n";
+                }
+            }
+        }
+    }
+    if ($level==1) {
+        $xml .= "</nederlands_soorten_register>\n";
+    }
+    return $xml;
+}
+
 	private function exportData($data,$filename)
 	{
 
@@ -1139,7 +1310,12 @@ class ExportController extends Controller
 		//q($data,1);
 
 		header('Content-disposition:attachment;filename='.$filename);
-		header('Content-type:text/xml');
+		header('Content-type:text/xml; charset=utf-8');
+
+		//echo '<pre>';
+
+		print $this->array_to_xml($data);
+		die();
 
 		echo $this->helpers->ArrayToXml->toXml($data);
 		

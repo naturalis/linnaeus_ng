@@ -4787,6 +4787,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
         $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
         $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
+        $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
 
         if (empty($search) && !$getAll)
             return;
@@ -4859,7 +4860,10 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 
 			) as unification
-			".($rankAbove ? "where base_rank_id < ".$rankAbove : "")."
+			where 1
+			".($rankAbove ? "and base_rank_id < ".$rankAbove : "")."
+			".($rankEqualAbove ? "and base_rank_id <= ".$rankEqualAbove : "")."
+
 			order by base_rank_id, label
 			limit ".$maxResults
 		);
