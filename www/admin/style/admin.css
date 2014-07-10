@@ -190,16 +190,26 @@ a:hover, .a:hover {
 .crumb-arrow {
   font-size: 18px; }
 
-#page-block-messages, #page-block-errors {
+#page-block-messages, #page-block-errors, #page-block-warnings {
   margin-left: 10px;
   margin-top: 10px;
   padding: 5px 5px 5px 5px;
   border: 1px dotted black;
   width: 550px;
-  background-color: #f6f6f6; }
+  background-color: #efe; }
 
 #page-block-errors {
   background-color: #fee; }
+
+#page-block-warnings {
+	color: black;
+	background-color: #f6f6f6; }
+
+#page-block-warnings.message {
+	color: black;
+}
+
+
 
 .message-error {
   color: red; }

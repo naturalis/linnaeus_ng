@@ -23,6 +23,7 @@ class Controller extends BaseClass
     public $breadcrumbIncludeReferer;
     public $errors;
     public $messages;
+	public $warnings;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
     public $pageName;
@@ -342,6 +343,17 @@ class Controller extends BaseClass
     public function getMessages ()
     {
         return $this->messages;
+    }
+
+
+    public function addWarning($message)
+    {
+        $this->warnings[] = $message;
+    }
+
+    public function getWarnings()
+    {
+        return $this->warnings;
     }
 
 
@@ -1594,7 +1606,7 @@ class Controller extends BaseClass
 
 
 
-    public function makeLookupList($data,$module,$url,$sortData=false,$encode=true,$fullset=true)
+    public function makeLookupList($data,$module,$url,$sortData=false,$doJSONencode=true,$isFullSet=true)
     {
         $sortBy = array(
             'key' => 'label',
@@ -1609,10 +1621,10 @@ class Controller extends BaseClass
             'module' => $module,
             'url' => $url,
             'results' => $data,
-			'fullset'=>$fullset
+			'fullset'=> $isFullSet
         );
 
-        return $encode ? json_encode($d) : $d;
+        return $doJSONencode ? json_encode($d) : $d;
     }
 
 
@@ -2793,6 +2805,7 @@ class Controller extends BaseClass
         $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
+        $this->smarty->assign('warnings', $this->getWarnings());
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());

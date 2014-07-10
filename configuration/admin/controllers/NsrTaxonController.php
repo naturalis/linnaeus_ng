@@ -18,6 +18,7 @@ class NsrTaxonController extends Controller
 		'name_types',
 		'presence_taxa',
 		'actors',
+		'literature2',
 		'rdf',
 		'nsr_ids'
     );
@@ -27,15 +28,21 @@ class NsrTaxonController extends Controller
     );
     public $cssToLoad = array(
         'lookup.css',
+		'nsr_taxon_beheer.css'
     );
     public $jsToLoad = array(
         'all' => array(
             'lookup.js',
+			'nsr_taxon_beheer.js'
         )
     );
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
+	
+	private $conceptId=null;
+	private $nameId=null;
+	
 
     public function __construct ()
     {
@@ -60,6 +67,338 @@ class NsrTaxonController extends Controller
 		));
     }
 
+
+
+    public function indexAction()
+    {
+		
+		$this->checkAuthorisation();
+		
+		if ($this->rHasId() && $this->rHasVal('action','save'))
+		{
+			$this->setConceptId($this->rGetId());
+
+			if ($this->rHasVar('concept_rank_id'))
+			{
+				if ($this->updateConceptRankId($this->rGetVal('concept_rank_id')))
+				{
+					$this->addMessage('Rang opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Rang niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('parent_taxon_id'))
+			{
+				if ($this->updateParentId($this->rGetVal('parent_taxon_id')))
+				{
+					$this->addMessage('Ouder opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Ouder niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('presence_presence_id'))
+			{
+				if ($this->updateConceptPresenceId($this->rGetVal('presence_presence_id')))
+				{
+					$this->addMessage('Voorkomensstatus opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Voorkomensstatus niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('presence_is_indigenous'))
+			{
+				if ($this->updateConceptIsIndigeous($this->rGetVal('presence_is_indigenous')))
+				{
+					$this->addMessage('Status endemisch opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Status endemisch niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('presence_habitat_id'))
+			{
+				if ($this->updateConceptHabitatId($this->rGetVal('presence_habitat_id')))
+				{
+					$this->addMessage('Habitat opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Habitat niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('presence_expert_id'))
+			{
+				if ($this->updatePresenceExpertId($this->rGetVal('presence_expert_id')))
+				{
+					$this->addMessage('Expert opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Expert niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('presence_organisation_id'))
+			{
+				if ($this->updatePresenceOrganisationId($this->rGetVal('presence_organisation_id')))
+				{
+					$this->addMessage('Organisatie opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Organisatie niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('presence_reference_id'))
+			{
+				if ($this->updatePresenceReferenceId($this->rGetVal('presence_reference_id')))
+				{
+					$this->addMessage('Publicatie opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Publicatie niet opgeslagen.');
+				}
+			}
+			
+			/*
+			// for revert:
+			$data=$this->requestData;
+			unset($data['id']);
+			unset($data['action']);
+			$this->smarty->assign('data',$data);
+			*/
+		}
+		
+		
+		if ($this->rHasId())
+		{
+			$concept=$this->getConcept($this->rGetId());
+			$this->smarty->assign('concept',$concept);
+			$this->smarty->assign('names',$this->getNames($concept));
+			$this->smarty->assign('presence',$this->getPresenceData($this->rGetId()));
+			$this->smarty->assign('ranks',$this->newGetProjectRanks());
+			$this->smarty->assign('statuses',$this->getStatuses());
+			$this->smarty->assign('habitats',$this->getHabitats());
+
+		}
+		else
+		{
+			$this->addError('No id');
+		}
+		$this->printPage();
+    }
+
+
+
+
+
+    public function nameAction()
+    {
+		
+		$this->checkAuthorisation();
+
+		if ($this->rHasId() && $this->rHasVal('action','save'))
+		{
+			$name=$this->getName(array('id'=>$this->rGetId()));
+			$this->setNameId($this->rGetId());
+			$this->setConceptId($name['taxon_id']);
+
+			if ($this->rHasVar('name_name'))
+			{
+				if ($this->updateNameName($this->rGetVal('name_name')))
+				{
+					$this->addMessage('Naam opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Naam niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('name_uninomial'))
+			{
+				if ($this->updateNameUninomial($this->rGetVal('name_uninomial')))
+				{
+					$this->addMessage('Uninomiaal opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Uninomiaal niet opgeslagen.');
+				}
+			}
+			
+			if ($this->rHasVar('name_specific_epithet'))
+			{
+				if ($this->updateNameSpecificEpithet($this->rGetVal('name_specific_epithet')))
+				{
+					$this->addMessage('Specifiek epithet opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Specifiek epithet niet opgeslagen.');
+				}
+			}
+
+			if ($this->rHasVar('name_infra_specific_epithet'))
+			{
+				if ($this->updateNameInfraSpecificEpithet($this->rGetVal('name_infra_specific_epithet')))
+				{
+					$this->addMessage('Infra-specifiek epithet opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Infra specifiek epithet niet opgeslagen.');
+				}
+			}
+			
+			if ($this->rHasVar('name_authorship'))
+			{
+				if ($this->updateNameAuthorship($this->rGetVal('name_authorship')))
+				{
+					$this->addMessage('"Authorship" opgeslagen.');
+				}
+				else
+				{
+					$this->addError('"Authorship" niet opgeslagen.');
+				}
+			}
+			
+			if ($this->rHasVar('name_name_author'))
+			{
+				if ($this->updateNameAuthor($this->rGetVal('name_name_author')))
+				{
+					$this->addMessage('Naam auteur opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Naam auteur niet opgeslagen.');
+				}
+			}
+			
+			if ($this->rHasVar('name_authorship_year'))
+			{
+				if ($this->updateNameAuthorshipYear($this->rGetVal('name_authorship_year')))
+				{
+					$this->addMessage('Jaar opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Jaar niet opgeslagen.');
+				}
+			}
+			
+			if ($this->rHasVar('name_type_id'))
+			{
+				if ($this->updateNameTypeId($this->rGetVal('name_type_id')))
+				{
+					$this->addMessage('Type opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Type niet opgeslagen.');
+				}
+			}
+			
+			if ($this->rHasVar('name_language_id'))
+			{
+				if ($this->updateNameLanguageId($this->rGetVal('name_language_id')))
+				{
+					$this->addMessage('Taal opgeslagen.');
+				}
+				else
+				{
+					$this->addError('Taal niet opgeslagen.');
+				}
+			}
+
+			/*
+			// for revert:
+			$data=$this->requestData;
+			unset($data['id']);
+			unset($data['action']);
+			$this->smarty->assign('data',$data);
+			*/
+		}
+		
+		if ($this->rHasId())
+		{
+			$name=$this->getName(array('id'=>$this->rGetId()));
+
+			$concept=$this->getConcept($name['taxon_id']);
+			$this->smarty->assign('concept',$concept);
+			$this->smarty->assign('name',$name);
+			$this->smarty->assign('nametypes',$this->getNameTypes());
+			$this->smarty->assign('languages',$this->getLanguages());
+
+			$this->doNameChecks($name);
+
+		}
+		else
+		{
+			$this->addError('No id');
+		}
+		$this->printPage();
+    }
+
+    public function ajaxInterfaceAction ()
+    {
+        if (!$this->rHasVal('action'))
+            return;
+
+		if ($this->rHasVal('action', 'get_lookup_list') || $this->rHasVal('action', 'species_lookup'))
+		{
+            $return=$this->getSpeciesLookupList($this->requestData);
+        } 
+		else
+		if ($this->rHasVal('action', 'expert_lookup'))
+		{
+            $return=$this->getExpertsLookupList($this->requestData);
+        } 
+		else
+		if ($this->rHasVal('action', 'reference_lookup'))
+		{
+            $return=$this->getReferenceLookupList($this->requestData);
+        } 
+		else
+		if ($this->rHasVal('action', 'get_tree_node'))
+		{
+			$return=json_encode($this->getTreeNode($this->requestData));
+        }
+		else
+		if ($this->rHasVal('action', 'store_tree'))
+		{	
+	        $_SESSION['admin']['user']['species']['tree']=$this->requestData['tree'];
+			$return='saved';
+        }
+		else
+		if ($this->rHasVal('action', 'restore_tree'))
+		{
+	        $return=json_encode($this->restoreTree());
+        }
+        
+        $this->allowEditPageOverlay = false;
+
+		$this->smarty->assign('returnText',$return);
+
+        $this->printPage();
+    }
+
+
+
 	private function setConceptId($id)
 	{
 		$this->conceptId=$id;
@@ -70,111 +409,16 @@ class NsrTaxonController extends Controller
 		return $this->conceptId;
 	}
 
-
-	private function updateConceptRankId($values)
+	private function setNameId($id)
 	{
-		$this->models->Taxon->update(
-			array('rank_id'=>$values['new']),
-			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
-		);
+		$this->nameId=$id;
 	}
 
-	private function updateParentId($values)
+	private function getNameId()
 	{
-		$this->models->Taxon->update(
-			array('parent_id'=>$values['new']),
-			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
-		);
+		return $this->nameId;
 	}
 
-	private function updateConceptPresenceId($values)
-	{
-		$this->models->PresenceTaxa->update(
-			array('presence_id'=>$values['new']),
-			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
-		);
-	}
-
-	private function updateConceptIsIndigeous($values)
-	{
-		$this->models->PresenceTaxa->update(
-			array('is_indigenous'=>$values['new']=='-1' ? 'null' : $values['new']),
-			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
-		);
-	}
-
-	private function updateConceptHabitatId($values)
-	{
-		$this->models->PresenceTaxa->update(
-			array('habitat_id'=>$values['new']),
-			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
-		);
-	}
-
-    public function indexAction()
-    {
-		
-		// need authorization!
-		
-		if ($this->rHasId() && $this->rHasVal('action','save'))
-		{
-			$this->setConceptId($this->rGetVal('id'));
-
-			if ($this->rHasVar('concept_rank_id'))
-			{
-				$this->updateConceptRankId($this->rGetVal('concept_rank_id'));
-			}
-
-			if ($this->rHasVar('parent_taxon_id'))
-			{
-				$this->updateParentId($this->rGetVal('parent_taxon_id'));
-			}
-
-			if ($this->rHasVar('presence_presence_id'))
-			{
-				$this->updateConceptPresenceId($this->rGetVal('presence_presence_id'));
-			}
-
-			if ($this->rHasVar('presence_is_indigenous'))
-			{
-				$this->updateConceptIsIndigeous($this->rGetVal('presence_is_indigenous'));
-			}
-
-			if ($this->rHasVar('presence_habitat_id'))
-			{
-				$this->updateConceptHabitatId($this->rGetVal('presence_habitat_id'));
-			}
-			/*
-			$data=$this->requestData;
-			unset($data['id']);
-			unset($data['action']);
-			$this->smarty->assign('data',$data);
-			*/
-		}
-		
-		
-		
-		
-		if ($this->rHasId())
-		{
-			$concept=$this->getConcept($this->rGetId());
-			$this->smarty->assign('concept',$concept);
-			$this->smarty->assign('names',$this->getNames($concept));
-			$this->smarty->assign('presence',$this->getPresenceData($this->rGetId()));
-			$this->smarty->assign('ranks',$this->newGetProjectRanks());
-
-			$this->smarty->assign('statuses',$this->getStatuses());
-			$this->smarty->assign('habitats',$this->getHabitats());
-
-
-
-		}
-		else
-		{
-			$this->addError('No id');
-		}
-		$this->printPage();
-    }
 
 	private function getNsrId($p)
 	{
@@ -195,6 +439,79 @@ class NsrTaxonController extends Controller
 		$c['nsr_id']=$this->getNsrId(array('id'=>$c['id'],'item_type'=>'taxon'));
 		$c['parent']=$this->getTaxonById($c['parent_id']);
 		return $c;
+	}
+
+	private function getName($p)
+	{
+		$id=isset($p['id']) ? $p['id'] : null;
+		$taxonId=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$typeId=isset($p['type_id']) ? $p['type_id'] : null;
+		$languageId=isset($p['language_id']) ? $p['language_id'] : null;
+		
+        $name=$this->models->Names->freeQuery(
+			array(
+				'query' => "
+					select
+						_a.id,
+						_a.taxon_id,
+						_a.name,
+						_a.uninomial,
+						_a.specific_epithet,
+						_a.infra_specific_epithet,
+						_a.authorship,
+						_a.name_author,
+						_a.authorship_year,
+						_a.reference,
+						_a.reference_id,
+						_h.label as reference_name,
+						_a.expert,
+						_a.expert_id,
+						_f.name as expert_name,
+						_a.organisation,
+						_a.organisation_id,
+						_g.name as organisation_name,
+						_a.type_id,
+						_b.nametype,
+						_a.language_id,
+						_c.language,
+						_d.label as language_label
+
+					from %PRE%names _a 
+
+					left join %PRE%name_types _b
+						on _a.type_id=_b.id 
+						and _a.project_id=_b.project_id
+
+					left join %PRE%languages _c
+						on _a.language_id=_c.id
+
+					left join %PRE%labels_languages _d
+						on _a.language_id=_d.language_id
+						and _a.project_id=_d.project_id
+						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%actors _f
+						on _a.expert_id = _f.id 
+						and _a.project_id=_f.project_id
+		
+					left join %PRE%actors _g
+						on _a.organisation_id = _g.id 
+						and _a.project_id=_g.project_id
+		
+					left join  %PRE%literature2 _h
+						on _a.reference_id = _h.id 
+						and _a.project_id=_h.project_id
+
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						".(isset($taxonId) ? "and _a.taxon_id=".$taxonId: "" )."
+						".(isset($languageId) ? "and _a.language_id=".$languageId: "" )."
+						".(isset($typeId) ? "and _a.type_id=".$typeId: "" )."
+						".(isset($id) ? "and _a.id=".$id: "" )
+			)
+		);
+
+		return $name[0];
 	}
 
 	private function getNames($p)
@@ -248,6 +565,7 @@ class NsrTaxonController extends Controller
 
 					left join %PRE%labels_languages _d
 						on _a.language_id=_d.language_id
+						and _a.project_id=_d.project_id
 						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
 
 					where
@@ -425,50 +743,63 @@ class NsrTaxonController extends Controller
 		return $data;
 	}
 
+	private function getNameTypes()
+	{
+        $types=$this->models->NameTypes->_get(array('id'=>
+			array(
+				'project_id'=>$this->getCurrentProjectId()
+			)
+		));
+		
+		return $types;
+	}
 
-
-	
-	
-	
-
-    public function ajaxInterfaceAction ()
-    {
-        if (!$this->rHasVal('action'))
-            return;
-
-		if ($this->rHasVal('action', 'species_lookup'))
+	private function getLanguages()
+	{
+        $used=$this->models->Names->freeQuery("
+				select count(id) as `count`, language_id
+				from %PRE%names
+				where project_id=".$this->getCurrentProjectId()."
+				group by language_id
+				order by `count` asc
+		");
+		
+		$stuff=null;
+		foreach((array)$used as $key => $val)
 		{
-            $return=$this->getSpeciesLookupList($this->requestData);
-        } 
-		else
-		if ($this->rHasVal('action', 'get_tree_node'))
+			$stuff .= "when _c.id = ".$val['language_id']." then ".($key+1)."\n";
+		}
+		
+		if (!empty($stuff))
 		{
-			$return=json_encode($this->getTreeNode($this->requestData));
-        }
-		else
-		if ($this->rHasVal('action', 'store_tree'))
-		{	
-	        $_SESSION['admin']['user']['species']['tree']=$this->requestData['tree'];
-			$return='saved';
-        }
-		else
-		if ($this->rHasVal('action', 'restore_tree'))
-		{
-	        $return=json_encode($this->restoreTree());
-        }
-        
-        $this->allowEditPageOverlay = false;
+			$stuff = ", case ".$stuff." else 0 end as sort_criterium\n";
+		}
 
-		$this->smarty->assign('returnText',$return);
+        $languages=$this->models->Language->freeQuery("
+			select
+				_c.id,
+				_c.language,
+				ifnull(_d.label,_c.language) as label
+				".$stuff."
+			from %PRE%languages _c
 
-        $this->printPage();
-    }
+			left join %PRE%labels_languages _d
+				on _c.id=_d.language_id
+				and _d.project_id = ".$this->getCurrentProjectId()."
+				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
+				order by ".(!empty($stuff) ? "sort_criterium desc, " : "")."label asc
+			");
+
+		return $languages;
+	}
+
+
 
     private function getSpeciesLookupList($p)
     {
         $search=isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        $getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
+        //$getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
         $concise=isset($p['concise']) ? $p['concise']==1 : false;
         $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
@@ -476,8 +807,8 @@ class NsrTaxonController extends Controller
         $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
         $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
 
-        if (empty($search) && !$getAll)
-            return;
+        //if (empty($search) && !$getAll)
+        if (empty($search)) return;
 
         $taxa = $this->models->Taxon->freeQuery("
 			select * from
@@ -592,125 +923,257 @@ class NsrTaxonController extends Controller
     {
         $search=isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        $getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
-        $concise=isset($p['concise']) ? $p['concise']==1 : false;
-        $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
+        //$getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
-        $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
-        $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
-        $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
 
-        if (empty($search) && !$getAll)
+        //if (empty($search) && !$getAll)
+        if (empty($search))
             return;
 
-        $taxa = $this->models->Taxon->freeQuery("
-			select * from
-			(
-			". ($taxaOnly ? "" : "
+		$data=$this->models->Actors->freeQuery(
+			"select
+				_e.id,
+				_e.name as label,
+				_e.name_alt,
+				_e.homepage,
+				_e.gender,
+				_e.is_company,
+				_e.employee_of_id,
+				_f.name as company_of_name,
+				_f.name_alt as company_of_name_alt,
+				_f.homepage as company_of_homepage
 
-				select
-					_a.taxon_id as id,
-					_a.name as label,
-					_b.rank_id,
-					_c.rank_id as base_rank_id,
-					_b.taxon as taxon,
-					'names' as source,
-					_d.rank
-				from
-					%PRE%names _a
+			from %PRE%actors _e
 
-				left join
-					%PRE%taxa _b
-						on _a.project_id=_b.project_id
-						and _a.taxon_id=_b.id
-
-				left join
-					%PRE%projects_ranks _c
-						on _b.project_id=_c.project_id
-						and _b.rank_id=_c.id
-
-				left join
-					%PRE%ranks _d
-					on _c.rank_id=_d.id
-
-
-				where
-					_a.project_id =  ".$this->getCurrentProjectId()."
-					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-					and _a.type_id != ".
-						(
-							isset($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ?
-								$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1
-						)."
-				union
-
-			")."
-
-			select
-				_b.id,
-				_b.taxon as label,
-				_b.rank_id,
-				_d.rank_id as base_rank_id,
-				_b.taxon as taxon,
-				'taxa' as source,
-				_e.rank
-			from
-				%PRE%taxa _b
-
-			left join
-				%PRE%projects_ranks _d
-					on _b.project_id=_d.project_id
-					and _b.rank_id=_d.id
-
-				left join
-					%PRE%ranks _e
-					on _d.rank_id=_e.id
+			left join %PRE%actors _f
+				on _e.employee_of_id = _f.id 
+				and _e.project_id=_f.project_id
 
 			where
-				_b.project_id = ".$this->getCurrentProjectId()."
-				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+				_e.project_id = ".$this->getCurrentProjectId()."
+				and _e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 
-			) as unification
-			where 1
-			".($rankAbove ? "and base_rank_id < ".$rankAbove : "")."
-			".($rankEqualAbove ? "and base_rank_id <= ".$rankEqualAbove : "")."
-
-			order by base_rank_id, label
-			limit ".$maxResults
-		);
-
-        foreach ((array) $taxa as $key => $val)
-		{
-			if ($val['source']=='taxa')
-			{
-				if ($formatted)
-					$taxa[$key]['label']=$this->formatTaxon($val);
-			}
-			else
-			{
-				if ($formatted)
-					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$this->formatTaxon($val).')';
-				else
-					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$val['taxon'].')';
-			}
-
-			$taxa[$key]['label']=$taxa[$key]['label'].' ['.$val['rank'].']';
-
-			unset($taxa[$key]['taxon']);
-			unset($taxa[$key]['source']);
-		}
+			order by
+				_e.is_company, _e.name
+		");	
 
 		return
 			$this->makeLookupList(
-				$taxa,
-				'species',
-				'../species/taxon.php?id=%s',
+				$data,
+				'actors',
+				'actor.php?id=%s',
 				false,
 				true,
-				count($taxa)<$maxResults
+				count($data)<$maxResults
 			);
 
     }
+
+    private function getReferenceLookupList($p)
+    {
+        $search=isset($p['search']) ? $p['search'] : null;
+        $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
+        //$getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
+        $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
+
+        //if (empty($search) && !$getAll)
+        if (empty($search))
+            return;
+
+		$data=$this->models->Literature2->freeQuery(
+			"select
+				_a.id,
+				_a.language_id,
+				_a.label,
+				_a.date,
+				ifnull(_a.author,ifnull(_e.name,'-')) as author,
+				_a.publication_type,
+				_a.citation,
+				_a.source,
+				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
+				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
+				_a.pages,
+				_a.volume,
+				_a.external_link
+				
+			from %PRE%literature2 _a
+
+			left join %PRE%actors _e
+				on _a.actor_id = _e.id 
+				and _a.project_id=_e.project_id
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id 
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i 
+				on _a.periodical_id = _i.id 
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and (
+					_a.label like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
+					_a.author like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
+					_e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+				)
+
+			order by
+				_a.label
+		");	
+
+		return
+			$this->makeLookupList(
+				$data,
+				'reference',
+				'reference.php?id=%s',
+				false,
+				true,
+				count($data)<$maxResults
+			);
+
+    }
+
+
+
+	private function updateConceptRankId($values)
+	{
+		return $this->models->Taxon->update(
+			array('rank_id'=>$values['new']),
+			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateParentId($values)
+	{
+		return $this->models->Taxon->update(
+			array('parent_id'=>$values['new']),
+			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateConceptPresenceId($values)
+	{
+		return $this->models->PresenceTaxa->update(
+			array('presence_id'=>$values['new']),
+			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateConceptIsIndigeous($values)
+	{
+		return $this->models->PresenceTaxa->update(
+			array('is_indigenous'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateConceptHabitatId($values)
+	{
+		return $this->models->PresenceTaxa->update(
+			array('habitat_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updatePresenceExpertId($values)
+	{
+		return $this->models->PresenceTaxa->update(
+			array('actor_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updatePresenceOrganisationId($values)
+	{
+		return $this->models->PresenceTaxa->update(
+			array('actor_org_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updatePresenceReferenceId($values)
+	{
+		return $this->models->PresenceTaxa->update(
+			array('reference_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameName($values)
+	{
+		// to delete, call deleteName()
+		return $this->models->Names->update(
+			array('name'=>$values['new']),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameUninomial($values)
+	{
+		return $this->models->Names->update(
+			array('uninomial'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameSpecificEpithet($values)
+	{
+		return $this->models->Names->update(
+			array('specific_epithet'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameInfraSpecificEpithet($values)
+	{
+		return $this->models->Names->update(
+			array('infra_specific_epithet'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameAuthorship($values)
+	{
+		return $this->models->Names->update(
+			array('authorship'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameAuthor($values)
+	{
+		return $this->models->Names->update(
+			array('name_author'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameAuthorshipYear($values)
+	{
+		return $this->models->Names->update(
+			array('authorship_year'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameTypeId($values)
+	{
+		return $this->models->Names->update(
+			array('type_id'=>$values['new']),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameLanguageId($values)
+	{
+		return $this->models->Names->update(
+			array('language_id'=>$values['new']),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+
 
 	private function restoreTree()
 	{
@@ -959,5 +1422,91 @@ class NsrTaxonController extends Controller
 			);
 		
 	}
+
+
+
+	private function doNameChecks($name)
+	{
+		if (!$this->checkNameParts($name))
+		{
+			$this->addWarning("Samengevoegde naamdelen komen niet overeen met de naam.");
+		}
+		if (!$this->checkAuthorshipYear($name))
+		{
+			$this->addWarning("'Authorship year' wijkt af van 'Authorship' + 'Year'.");
+		}
+		if (!$this->checkYear($name))
+		{
+			$this->addWarning("Geen geldig jaar.");
+		}
+		if (!$this->checkIfConceptRetainsScientificName($name))
+		{
+			$this->addWarning("Aan concept is geen wetenschappelijke naam meer gekoppeld.");
+		}
+		if (!$this->checkIfConceptRetainsDutchName($name))
+		{
+			$this->addWarning("Aan concept is geen Nederlandse 'preferred name' naam meer gekoppeld.");
+		}
+	}
+
+
+	private function checkNameParts($name)
+	{
+		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
+		
+		if (
+			trim(str_replace('  ',' ',
+				$name['uninomial'].' '.
+				$name['specific_epithet'].' '.
+				$name['infra_specific_epithet'].' '.
+				$name['authorship']
+		)) != $name['name'])
+			return false;
+
+		return true;
+	}
+
+	private function checkAuthorshipYear($name)
+	{
+		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
+
+		if (
+			trim(
+				$name['name_author'].', '.
+				$name['authorship_year']
+			) != trim($name['authorship'],')('))
+			return false;
+
+		return true;
+	}
+
+	private function checkYear($name)
+	{
+		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
+		return is_numeric($name['authorship_year']) && $name['authorship_year'] > 1000 && $name['authorship_year'] <= date('Y');
+	}
+
+	private function checkIfConceptRetainsScientificName($name)
+	{
+		$d=$this->getName(array(
+			'taxon_id'=>$name['taxon_id'],
+			'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			'language_id'=>LANGUAGE_ID_SCIENTIFIC
+		));
+		
+		return count((array)$d)>0;
+	}
+
+	private function checkIfConceptRetainsDutchName($name)
+	{
+		$d=$this->getName(array(
+			'taxon_id'=>$name['taxon_id'],
+			'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
+			'language_id'=>$this->getDefaultProjectLanguage()
+		));
+		
+		return count((array)$d)>0;
+	}
+
 
 }
