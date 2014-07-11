@@ -307,13 +307,13 @@ function editorganisation(ele)
 				data : {
 					action : 'expert_lookup' ,
 					search : $(this).val(),
-					get_all : 0,
+					get_all : 1,
 					match_start : 1,
 					max_results: 100,
 				},
 				callback: buildorganisationlist ,
 				targetvar: targetvar
-			} )
+			} );
 		} );
 		$( '#expert-list-input' ).focus();
 		

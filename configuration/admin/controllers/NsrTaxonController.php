@@ -73,16 +73,36 @@ class NsrTaxonController extends Controller
 		));
     }
 
-
     public function taxonAction()
     {
 		$this->checkAuthorisation();
 		
+		if ($this->rHasId() && $this->rHasVal('action','delete'))
+		{
+			//$this->setConceptId($this->rGetId());
+			//$this->deleteVanAllesEnNogWat();
+			//$this->deleteConcept();
+			//$this->setMessage('Concept verwijderd.');
+			//$this->redirect('index.php');
+		} 
+		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
+			$this->setConceptId($this->rGetId());
 			$this->updateConcept();
 
 		}
+		else
+		if (!$this->rHasId() && $this->rHasVal('action','save'))
+		{
+			$this->saveConcept();
+			$this->redirect('taxon.php?id='.$this->getConceptId());
+		} 
+		else
+		{
+			$this->setConceptId($this->rGetId());
+		}
+	
 
 		if ($this->rHasId())
 		{
@@ -97,7 +117,9 @@ class NsrTaxonController extends Controller
 		}
 		else
 		{
-			$this->addError('No id');
+			$this->smarty->assign('ranks',$this->newGetProjectRanks());
+			$this->smarty->assign('statuses',$this->getStatuses());
+			$this->smarty->assign('habitats',$this->getHabitats());
 		}
 
 		$this->checkMessage();
@@ -143,6 +165,7 @@ class NsrTaxonController extends Controller
 			$this->smarty->assign('name',$name);
 			$this->smarty->assign('nametypes',$this->getNameTypes());
 			$this->smarty->assign('languages',$this->getLanguages());
+			$this->smarty->assign('actors',$this->getActors());
 
 			$this->doNameChecks($name);
 
@@ -154,6 +177,7 @@ class NsrTaxonController extends Controller
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('nametypes',$this->getNameTypes());
 			$this->smarty->assign('languages',$this->getLanguages());
+			$this->smarty->assign('actors',$this->getActors());
 			$this->smarty->assign('newname',true);
 		}
 		else
@@ -508,6 +532,35 @@ class NsrTaxonController extends Controller
 		return $data[0];
 	}
 
+	private function getActors()
+	{
+		return $this->models->Actors->freeQuery(
+			"select
+				_e.id,
+				_e.name as label,
+				_e.name_alt,
+				_e.homepage,
+				_e.gender,
+				_e.is_company,
+				_e.employee_of_id,
+				_f.name as company_of_name,
+				_f.name_alt as company_of_name_alt,
+				_f.homepage as company_of_homepage
+
+			from %PRE%actors _e
+
+			left join %PRE%actors _f
+				on _e.employee_of_id = _f.id 
+				and _e.project_id=_f.project_id
+
+			where
+				_e.project_id = ".$this->getCurrentProjectId()."
+
+			order by
+				_e.is_company, _e.name
+		");	
+	}
+		
 	private function getStatuses()
 	{
 		$data=$this->models->PresenceTaxa->freeQuery(
@@ -733,7 +786,7 @@ class NsrTaxonController extends Controller
     {
         $search=isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        //$getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
+        $getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
 
         //if (empty($search) && !$getAll)
@@ -761,7 +814,7 @@ class NsrTaxonController extends Controller
 
 			where
 				_e.project_id = ".$this->getCurrentProjectId()."
-				and _e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+				".(!$getAll ? "and _e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'" : "")."
 
 			order by
 				_e.is_company, _e.name
@@ -846,9 +899,48 @@ class NsrTaxonController extends Controller
 
 
 
+	private function saveConcept()
+	{
+		$name=$this->rGetVal('concept_taxon');
+		$rank=$this->rGetVal('concept_rank_id');
+
+		$d=$this->models->Taxon->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'is_empty' =>'0',
+			'rank_id' => trim($rank['new']),
+			'taxon' => trim($name['new']),
+		));
+		
+		if ($d)
+		{
+			$this->setConceptId($this->models->Taxon->getNewId());
+			$this->addMessage('Nieuw concept aangemaakt.');
+			$this->updateConcept();
+		}
+		else 
+		{
+			$this->addError('Aanmaak nieuw concept mislukt.');
+		}
+	}
+
 	private function updateConcept()
 	{
-		$this->setConceptId($this->rGetId());
+		
+		$this->createConceptNsrIds();
+		$this->createConceptPresence();
+
+		if ($this->rHasVar('concept_taxon'))
+		{
+			if ($this->updateConceptTaxon($this->rGetVal('concept_taxon')))
+			{
+				$this->addMessage('Naam opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Naam niet opgeslagen.');
+			}
+		}
 
 		if ($this->rHasVar('concept_rank_id'))
 		{
@@ -948,6 +1040,14 @@ class NsrTaxonController extends Controller
 		
 	}
 
+	private function updateConceptTaxon($values)
+	{
+		return $this->models->Taxon->update(
+			array('taxon'=>trim($values['new'])),
+			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
 	private function updateConceptRankId($values)
 	{
 		return $this->models->Taxon->update(
@@ -964,6 +1064,28 @@ class NsrTaxonController extends Controller
 		);
 	}
 
+	private function createConceptPresence()
+	{
+		$d=$this->models->PresenceTaxa->_get(array(
+			'id'=>
+				array(
+					'project_id'=>$this->getCurrentProjectId(), 
+					'taxon_id'=>$this->getConceptId()
+				),
+			'columns'=>'count(*) as total'
+			));
+
+		if ($d[0]['total']>0) return;
+
+		$this->models->PresenceTaxa->insert(
+			array(
+				'project_id'=>$this->getCurrentProjectId(), 
+				'taxon_id'=>$this->getConceptId()
+			));
+
+		return $this->models->PresenceTaxa->getNewId();
+	}
+	
 	private function updateConceptPresenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
@@ -1014,6 +1136,140 @@ class NsrTaxonController extends Controller
 
 
 
+	private function generateNsrCode()
+	{
+		$c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$r='';
+		while(strlen($r)<11)
+		{
+			$r.=substr($c,rand(0,35),1);
+		}
+		return str_pad($r,12,'0',STR_PAD_LEFT);
+	}
+	
+	private function createConceptNsrCode()
+	{
+		$exists=true;
+		$i=0;
+		$code=null;
+		while($exists)
+		{
+			$code=$this->generateNsrCode();
+			$d=$this->models->NsrIds->freeQuery("
+				select count(*) as total
+				from %PRE%nsr_ids
+				where
+					project_id = ".$this->getCurrentProjectId()."
+					and (
+						nsr_id = '.concept/'".$code."' or
+						nsr_id = 'tn.nlsr.concept/'".$code."'
+					)
+			");
+			
+			if ($d[0]['total']==0)
+			{
+				$exists=false;
+			}
+			if ($i>=100)
+			{
+				$this->addError('Kon geen nieuw uniek NSR ID creëren.');
+				return;
+			}
+			$i++;
+		}
+		
+		
+		return $code;
+	}
+
+	private function generateRdfId()
+	{
+		$c='abcdefghijklmnopqrstuvwxyz0123456789';
+		$r='';
+		while(strlen($r)<32)
+		{
+			$r.=substr($c,rand(0,35),1);
+		}
+
+		return substr($r,0,8).'-'.substr($r,8,4).'-'.substr($r,12,4).'-'.substr($r,16,4).'-'.substr($r,20);
+	}
+	
+	private function createConceptRdfId()
+	{
+		$exists=true;
+		$i=0;
+		$code=null;
+		while($exists)
+		{
+			$code=$this->generateRdfId();
+			$d=$this->models->NsrIds->freeQuery("
+				select count(*) as total
+				from %PRE%nsr_ids
+				where
+					project_id = ".$this->getCurrentProjectId()."
+					and rdf_id = 'http://data.nederlandsesoorten.nl/".$code."'"
+			);
+			
+			if ($d[0]['total']==0)
+			{
+				$exists=false;
+			}
+			if ($i>=100)
+			{
+				$this->addError('Kon geen nieuw uniek Rdf ID creëren.');
+				return;
+			}
+			$i++;
+		}
+		
+		return $code;
+	}
+
+	private function createConceptNsrIds()
+	{
+		$d=$this->models->NsrIds->_get(array('id'=>
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'lng_id'=>$this->getConceptId(),
+				'item_type'=>'taxon',
+			)));
+
+		$rdf=$nsr=null;
+
+		if (empty($d[0]['rdf_id'])) $rdf=$this->createConceptRdfId();
+		if (empty($d[0]['nsr_id'])) $nsr=$this->createConceptNsrCode();
+		
+		if (empty($rdf) && empty($nsr)) return;
+		
+		if (!empty($rdf) && !empty($nsr))
+		{
+			$this->models->NsrIds->insert(
+				array(
+					'project_id'=>$this->getCurrentProjectId(), 
+					'rdf_id'=>$rdf,
+					'nsr_id'=>$nsr,
+					'lng_id'=>$this->getConceptId(),
+					'item_type'=>'taxon',
+				)); 
+		}
+		else
+		if (!empty($rdf))
+		{
+			$this->models->NsrIds->update(
+				array('rdf_id'=>$rdf),
+				array('lng_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId(),'item_type'=>'taxon')
+			);
+		}
+		else
+		if (!empty($nsr))
+		{
+			$this->models->NsrIds->update(
+				array('nsr_id'=>$nsr),
+				array('lng_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId(),'item_type'=>'taxon')
+			);
+		}
+
+	}
 
 	private function saveName()
 	{
@@ -1034,7 +1290,7 @@ class NsrTaxonController extends Controller
 		{
 			$this->setNameId($this->models->Names->getNewId());
 
-			$this->addError('Nieuwe naam aangemaakt.');
+			$this->addMessage('Nieuwe naam aangemaakt.');
 			$this->updateName();
 		}
 		else 
@@ -1046,7 +1302,6 @@ class NsrTaxonController extends Controller
 
 	private function updateName()
 	{
-
 		$name=$this->getName(array('id'=>$this->getNameId()));
 
 		$this->setConceptId($name['taxon_id']);

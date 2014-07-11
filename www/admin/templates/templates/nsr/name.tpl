@@ -27,7 +27,7 @@
 	<tr><th>taal:</th><td>
 		<select id="name_language_id" mandatory="mandatory">
 			{assign var=first value=true}
-			<option value="" {if !$name.language_id && $k==0} selected="selected"{/if}>n.v.t.</option>
+			<option value="" {if !$name.language_id} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$languages item=v key=k}
 			{if $v.sort_criterium==0 && $first==true}
 			<option value="" disabled="disabled">&nbsp;</option>
@@ -47,7 +47,7 @@
 		<input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 	</td></tr>
 	
-	<tr><th>expert:</th><td>
+	{*<!--tr><th>expert:</th><td>
 		{if $name.expert_id!=''}
 			{$name.expert_name}
 		{else}n.v.t.{/if}	
@@ -55,9 +55,20 @@
 		<span class="editspan" id="expert">
 		</span>
 		<input type="hidden" id="name_expert_id" value="{$name.expert_id}" />
+	</td></tr-->*}
+
+	<tr><th>expert:</th><td>
+		<select id="name_expert_id">
+			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.v.t.</option>
+		{foreach from=$actors item=v key=k}
+		{if $v.is_company=='0'}
+			<option value="{$v.id}" {if $v.id==$name.expert_id} selected="selected"{/if}>{$v.label}</option>
+		{/if}
+		{/foreach}
+		</select> 
 	</td></tr>
 
-	<tr><th>organisatie:</th><td>
+	{*<!-- tr><th>organisatie:</th><td>
 		{if $name.organisation_id!=''}
 			{$name.organisation_name}
 		{else}n.v.t.{/if}	
@@ -65,7 +76,19 @@
 		<span class="editspan" id="organisation">
 		</span>
 		<input type="hidden" id="name_organisation_id" value="{$name.organisation_id}" />
+	</td></tr -->*}
+
+	<tr><th>organisatie:</th><td>
+		<select id="name_organisation_id">
+			<option value="" {if !$name.organisation_id} selected="selected"{/if}>n.v.t.</option>
+		{foreach from=$actors item=v key=k}
+		{if $v.is_company=='1'}
+			<option value="{$v.id}" {if $v.id==$name.organisation_id} selected="selected"{/if}>{$v.label}</option>
+		{/if}
+		{/foreach}
+		</select> 
 	</td></tr>
+	
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>
 		{if $name.reference}<tr><th>literatuur (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
@@ -106,7 +129,7 @@ $(document).ready(function()
 		values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
 		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
-	console.dir(values);
+	//console.dir(values);
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
 });
 </script>
