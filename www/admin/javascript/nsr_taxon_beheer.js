@@ -1,4 +1,5 @@
 var dataid=null;
+var parentid=null;
 var taxonrank=null;
 var values=new Array();
 
@@ -20,6 +21,7 @@ function dolookuplist(p)
 	callback=p.callback;
 	minlength=p.minlength ? p.minlength : 3;
 	data=p.data;
+	targetvar=p.targetvar;
 
 	if (e.keyCode == 27)
 	{ 
@@ -39,7 +41,7 @@ function dolookuplist(p)
 		success : function (data)
 		{
 			//console.log(data);
-			callback($.parseJSON(data));
+			callback($.parseJSON(data),targetvar);
 		}
 	});
 
@@ -62,15 +64,14 @@ function toggleedit(ele)
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
 	$(ele).html(mode=='edit' ? 'cancel' : 'edit');
 	$(ele).next().toggle();
-
-	if (mode=='cancel')
-	{
-		setnewvalue($(ele).attr('rel'));
-	}
 }
 
-function setnewvalue(name,value)
+function setnewvalue(p)
 {
+	name=p.name;
+	value=p.value;
+	revert=p.revert;
+	
 	for (i in values)
 	{
 		if (values[i].name==name)
@@ -78,6 +79,12 @@ function setnewvalue(name,value)
 			delete values[i].new;
 			delete values[i].delete;
 
+			if (revert)
+			{	
+				// do nothing
+				//values[i].current=values[i].current;
+			}
+			else
 			if (value && value!=values[i].current)
 			{	
 				values[i].new=value;
@@ -89,19 +96,51 @@ function setnewvalue(name,value)
 			}
 		}
 	}
-	console.dir(values);
+	//console.dir(values);
 }
 
 function storedata(ele)
 {
-	setnewvalue($(ele).attr('id'),$(ele).val());
+	setnewvalue({name:$(ele).attr('id'),value:$(ele).val()});
 }
+
+function checkmandatory()
+{
+	for (i in values)
+	{
+		var val=values[i];
+		if (
+			val.mandatory && 
+			(
+				(val.new && val.new.length==0) ||
+				(!val.new && val.current.length==0) ||
+				(val.delete))
+			) 
+		{
+			alert('Vul alle verplichte velden in.');
+			return false;
+		}
+	}
+	return true;
+}
+
 
 function savedataform()
 {
+	if (!checkmandatory())
+		return;
+	
 	form = $("<form method=post></form>");
-	form.append('<input type="hidden" name="id" value="'+dataid+'" />');
 	form.append('<input type="hidden" name="action" value="save" />');
+
+	if (dataid)
+	{
+		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
+	}
+	if (parentid)
+	{
+		form.append('<input type="hidden" name="parentid" value="'+parentid+'" />');
+	}
 
 	for (i in values)
 	{
@@ -127,12 +166,13 @@ function savedataform()
 function editparent(ele)
 {
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
+	var targetvar=$(ele).attr('rel');
 
 	if (mode=='edit')
 	{
 		$( '#parent' ).html('');
 		closedropdownlist();
-		setnewvalue($(ele).attr('rel'));
+		setnewvalue({name:$(ele).attr('rel'),revert:true});
 	}
 	else
 	{
@@ -150,7 +190,8 @@ function editparent(ele)
 					'formatted': 0,
 					'rank_above': taxonrank
 				},
-				callback : buildparentlist 
+				callback: buildparentlist,
+				targetvar: targetvar
 			} )
 		} );
 		$( '#parent-list-input' ).focus();
@@ -176,22 +217,22 @@ function buildparentlist(data)
 
 function setparent(ele)
 {
-	setnewvalue('parent_taxon_id',$(ele).attr('id'));
+	setnewvalue({name:'parent_taxon_id',value:$(ele).attr('id')});
 	$( '#parent' ).html($(ele).text());
 }
-
 
 
 
 function editexpert(ele)
 {
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
+	var targetvar=$(ele).attr('rel');
 
 	if (mode=='edit')
 	{
 		$( '#expert' ).html('');
 		closedropdownlist();
-		setnewvalue($(ele).attr('rel'));
+		setnewvalue({name:$(ele).attr('rel'),revert:true});
 	}
 	else
 	{
@@ -201,13 +242,14 @@ function editexpert(ele)
 				e:e,
 				minlength: 1,
 				data : {
-					action : 'expert_lookup' ,
+					action : 'expert_lookup',
 					search : $(this).val(),
 					get_all : 0,
 					match_start : 1,
 					max_results: 100,
 				},
-				callback : buildexpertlist 
+				callback : buildexpertlist,
+				targetvar: targetvar
 			} )
 		} );
 		$( '#expert-list-input' ).focus();
@@ -215,18 +257,18 @@ function editexpert(ele)
 	}
 }
 
-function buildexpertlist(data)
+function buildexpertlist(data,targetvar)
 {
 	var buffer=Array();
 
-	buffer.push('<li><a href="#" onclick="setexpert(this);closedropdownlist();return false;" id="-1">n.v.t.</a></li>');
+	buffer.push('<li><a href="#" onclick="setexpert(this,\''+targetvar+'\');closedropdownlist();return false;" id="-1">n.v.t.</a></li>');
 
 	for(var i in data.results)
 	{
 		var t=data.results[i];
 		if (t.label && t.id && t.is_company!='1')
 		{
-			buffer.push('<li><a href="#" onclick="setexpert(this);closedropdownlist();return false;" id="'+t.id+'">'+t.label+'</a></li>');
+			buffer.push('<li><a href="#" onclick="setexpert(this,\''+targetvar+'\');closedropdownlist();return false;" id="'+t.id+'">'+t.label+'</a></li>');
 		}
 	}
 
@@ -236,27 +278,28 @@ function buildexpertlist(data)
 	
 }
 
-function setexpert(ele)
+function setexpert(ele,targetvar)
 {
-	setnewvalue('presence_expert_id',$(ele).attr('id'));
+	setnewvalue({name:targetvar,value:$(ele).attr('id')});
 	$( '#expert' ).html($(ele).text());
 }
 
 
 
-function editpresenceorg(ele)
+function editorganisation(ele)
 {
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
+	var targetvar=$(ele).attr('rel');
 
 	if (mode=='edit')
 	{
-		$( '#presenceorg' ).html('');
+		$( '#presence' ).html('');
 		closedropdownlist();
-		setnewvalue($(ele).attr('rel'));
+		setnewvalue({name:$(ele).attr('rel'),revert:true});
 	}
 	else
 	{
-		$( '#presenceorg' ).html('<input type="text" id="organisation-list-input" value="" placeholder="type to find"/>');
+		$( '#organisation' ).html('<input type="text" id="organisation-list-input" value="" placeholder="type to find"/>');
 		$( '#organisation-list-input' ).bind('keyup', function(e) { 
 			dolookuplist({
 				e:e,
@@ -268,7 +311,8 @@ function editpresenceorg(ele)
 					match_start : 1,
 					max_results: 100,
 				},
-				callback : buildorganisationlist 
+				callback: buildorganisationlist ,
+				targetvar: targetvar
 			} )
 		} );
 		$( '#expert-list-input' ).focus();
@@ -276,31 +320,31 @@ function editpresenceorg(ele)
 	}
 }
 
-function buildorganisationlist(data)
+function buildorganisationlist(data,targetvar)
 {
 	var buffer=Array();
 
-	buffer.push('<li><a href="#" onclick="setpresenceorg(this);closedropdownlist();return false;" id="-1">n.v.t.</a></li>');
+	buffer.push('<li><a href="#" onclick="setorganisation(this,\''+targetvar+'\');closedropdownlist();return false;" id="-1">n.v.t.</a></li>');
 
 	for(var i in data.results)
 	{
 		var t=data.results[i];
 		if (t.label && t.id && t.is_company=='1')
 		{
-			buffer.push('<li><a href="#" onclick="setpresenceorg(this);closedropdownlist();return false;" id="'+t.id+'">'+t.label+'</a></li>');
+			buffer.push('<li><a href="#" onclick="setorganisation(this,\''+targetvar+'\');closedropdownlist();return false;" id="'+t.id+'">'+t.label+'</a></li>');
 		}
 	}
 
 	$('#dropdown-list-content').html('<ul>'+buffer.join('')+'</ul>');
 	
-	showdropdownlist('presenceorg');
+	showdropdownlist('organisation');
 	
 }
 
-function setpresenceorg(ele)
+function setorganisation(ele,targetvar)
 {
-	setnewvalue('presence_organisation_id',$(ele).attr('id'));
-	$( '#presenceorg' ).html($(ele).text());
+	setnewvalue({name:targetvar,value:$(ele).attr('id')});
+	$( '#organisation' ).html($(ele).text());
 }
 
 
@@ -308,12 +352,13 @@ function setpresenceorg(ele)
 function editreference(ele)
 {
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
+	var targetvar=$(ele).attr('rel');
 
 	if (mode=='edit')
 	{
 		$( '#reference' ).html('');
 		closedropdownlist();
-		setnewvalue($(ele).attr('rel'));
+		setnewvalue({name:$(ele).attr('rel'),revert:true});
 	}
 	else
 	{
@@ -321,7 +366,7 @@ function editreference(ele)
 		$( '#reference-list-input' ).bind('keyup', function(e) { 
 			dolookuplist({
 				e:e,
-				minlength: 3,
+				minlength: 1,
 				data : {
 					action : 'reference_lookup' ,
 					search : $(this).val(),
@@ -329,7 +374,8 @@ function editreference(ele)
 					match_start : 1,
 					max_results: 100,
 				},
-				callback : buildreferencelist 
+				callback: buildreferencelist,
+				targetvar: targetvar 
 			} )
 		} );
 		$( '#reference-list-input' ).focus();
@@ -337,20 +383,18 @@ function editreference(ele)
 	}
 }
 
-function buildreferencelist(data)
+function buildreferencelist(data,targetvar)
 {
-	console.dir(data);
-
 	var buffer=Array();
 
-	buffer.push('<li><a href="#" onclick="setreference(this);closedropdownlist();return false;" id="-1">n.v.t.</a></li>');
+	buffer.push('<li><a href="#" onclick="setreference(this,\''+targetvar+'\');closedropdownlist();return false;" id="-1">n.v.t.</a></li>');
 
 	for(var i in data.results)
 	{
 		var t=data.results[i];
 		if (t.label && t.id)
 		{
-			buffer.push('<li><a href="#" onclick="setreference(this);closedropdownlist();return false;" id="'+t.id+'">'+
+			buffer.push('<li><a href="#" onclick="setreference(this,\''+targetvar+'\');closedropdownlist();return false;" id="'+t.id+'">'+
 				'"'+t.label+'"'+(t.author ? ", "+t.author : "")+(t.date ? " ("+t.date+")" : "")+
 			'</a></li>');
 		}
@@ -362,8 +406,24 @@ function buildreferencelist(data)
 	
 }
 
-function setreference(ele)
+function setreference(ele,targetvar)
 {
-	setnewvalue('presence_reference_id',$(ele).attr('id'));
+	setnewvalue({name:targetvar,value:$(ele).attr('id')});
 	$( '#reference' ).html($(ele).text());
+}
+
+
+function deleteform()
+{
+	if (!dataid) return;
+
+	if (confirm('Weet u het zeker?'))
+	{
+		form = $("<form method=post></form>");
+		form.append('<input type="hidden" name="action" value="delete" />');
+		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
+		$(window).unbind('beforeunload');
+		$('body').append(form);
+		form.submit();
+	}
 }

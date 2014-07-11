@@ -3,7 +3,7 @@
 <div id="page-main">
 
 <form>
-	<input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="type to find"/>
+		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam"/>
 </form>
 
 <h2>{$concept.taxon}</h2>
@@ -105,8 +105,8 @@
 	{if $presence.organisation_id!=''}
 		{$presence.organisation_name}
 	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);editpresenceorg(this);return false;" rel="presence_organisation_id">edit</a>
-	<span class="editspan" id="presenceorg">
+	<a class="edit" href="#" onclick="toggleedit(this);editorganisation(this);return false;" rel="presence_organisation_id">edit</a>
+	<span class="editspan" id="organisation">
 	</span>
 	<input type="hidden" id="presence_organisation_id" value="{$presence.organisation_id}" />
 
@@ -132,18 +132,22 @@
 		{$v.name} ({$v.language_label}) <i>{$v.nametype}</i> <a href="name.php?id={$v.id}" class="edit">edit</a>
 		</li>
 	{/foreach}
-		<li><a href="" class="edit" style="margin:0">nieuwe naam toevoegen</a></li>
+		<li><a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">nieuwe naam toevoegen</a></li>
 	</ul>
 
 
 </p>
 
-<input type="button" value="save" onclick="savedataform();" />
+<input type="button" value="opslaan" onclick="savedataform();" />
 </form>
 
 <p>
-	<a href="taxon.php?id={$concept.id}">soortsbeschrijving</a>
+	<a href="index.php">terug</a>
 </p>
+
+<!-- p>
+	<a href="taxon.php?id={$concept.id}">soortsbeschrijvingen bewerken</a>
+</p -->
 
 </div>
 

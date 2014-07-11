@@ -196,14 +196,14 @@ a:hover, .a:hover {
   padding: 5px 5px 5px 5px;
   border: 1px dotted black;
   width: 550px;
-  background-color: #efe; }
+  background-color: #f6f6f6; }
 
 #page-block-errors {
-  background-color: #fee; }
+  -background-color: #fee; }
 
 #page-block-warnings {
 	color: black;
-	background-color: #f6f6f6; }
+	background-color: #fea; }
 
 #page-block-warnings.message {
 	color: black;
