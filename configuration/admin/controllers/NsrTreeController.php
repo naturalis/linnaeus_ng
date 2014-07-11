@@ -14,10 +14,12 @@ class NsrTreeController extends Controller
     );
     public $cssToLoad = array(
         'lookup.css',
+		'nsr_taxon_tree.css'
     );
     public $jsToLoad = array(
         'all' => array(
             'lookup.js',
+			'nsr_taxon_tree.js'
         )
     );
     public $controllerPublicName = 'Soortenregister beheer';

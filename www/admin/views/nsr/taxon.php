@@ -4,4 +4,4 @@ require_once ('../../../../configuration/admin/controllers/NsrTaxonController.ph
 
 $c = new NsrTaxonController();
 
-$c->indexAction();
+$c->taxonAction();

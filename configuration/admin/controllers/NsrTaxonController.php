@@ -5,6 +5,12 @@
 	to do:
 	implement revert
 
+			// for revert:
+			$data=$this->requestData;
+			unset($data['id']);
+			unset($data['action']);
+			$this->smarty->assign('data',$data);
+
 */
 
 include_once ('Controller.php');
@@ -68,122 +74,16 @@ class NsrTaxonController extends Controller
     }
 
 
-
-    public function indexAction()
+    public function taxonAction()
     {
-		
 		$this->checkAuthorisation();
 		
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$this->setConceptId($this->rGetId());
+			$this->updateConcept();
 
-			if ($this->rHasVar('concept_rank_id'))
-			{
-				if ($this->updateConceptRankId($this->rGetVal('concept_rank_id')))
-				{
-					$this->addMessage('Rang opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Rang niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('parent_taxon_id'))
-			{
-				if ($this->updateParentId($this->rGetVal('parent_taxon_id')))
-				{
-					$this->addMessage('Ouder opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Ouder niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('presence_presence_id'))
-			{
-				if ($this->updateConceptPresenceId($this->rGetVal('presence_presence_id')))
-				{
-					$this->addMessage('Voorkomensstatus opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Voorkomensstatus niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('presence_is_indigenous'))
-			{
-				if ($this->updateConceptIsIndigeous($this->rGetVal('presence_is_indigenous')))
-				{
-					$this->addMessage('Status endemisch opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Status endemisch niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('presence_habitat_id'))
-			{
-				if ($this->updateConceptHabitatId($this->rGetVal('presence_habitat_id')))
-				{
-					$this->addMessage('Habitat opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Habitat niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('presence_expert_id'))
-			{
-				if ($this->updatePresenceExpertId($this->rGetVal('presence_expert_id')))
-				{
-					$this->addMessage('Expert opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Expert niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('presence_organisation_id'))
-			{
-				if ($this->updatePresenceOrganisationId($this->rGetVal('presence_organisation_id')))
-				{
-					$this->addMessage('Organisatie opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Organisatie niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('presence_reference_id'))
-			{
-				if ($this->updatePresenceReferenceId($this->rGetVal('presence_reference_id')))
-				{
-					$this->addMessage('Publicatie opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Publicatie niet opgeslagen.');
-				}
-			}
-			
-			/*
-			// for revert:
-			$data=$this->requestData;
-			unset($data['id']);
-			unset($data['action']);
-			$this->smarty->assign('data',$data);
-			*/
 		}
-		
-		
+
 		if ($this->rHasId())
 		{
 			$concept=$this->getConcept($this->rGetId());
@@ -199,145 +99,45 @@ class NsrTaxonController extends Controller
 		{
 			$this->addError('No id');
 		}
+
+		$this->checkMessage();
 		$this->printPage();
     }
 
 
-
-
-
     public function nameAction()
     {
-		
+
 		$this->checkAuthorisation();
 
+		if ($this->rHasId() && $this->rHasVal('action','delete'))
+		{
+			$this->setNameId($this->rGetId());
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$this->deleteName();
+			$this->setMessage('Naam verwijderd.');
+			$this->redirect('taxon.php?id='.$name['taxon_id']);
+		} 
+		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$name=$this->getName(array('id'=>$this->rGetId()));
 			$this->setNameId($this->rGetId());
-			$this->setConceptId($name['taxon_id']);
-
-			if ($this->rHasVar('name_name'))
-			{
-				if ($this->updateNameName($this->rGetVal('name_name')))
-				{
-					$this->addMessage('Naam opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Naam niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('name_uninomial'))
-			{
-				if ($this->updateNameUninomial($this->rGetVal('name_uninomial')))
-				{
-					$this->addMessage('Uninomiaal opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Uninomiaal niet opgeslagen.');
-				}
-			}
-			
-			if ($this->rHasVar('name_specific_epithet'))
-			{
-				if ($this->updateNameSpecificEpithet($this->rGetVal('name_specific_epithet')))
-				{
-					$this->addMessage('Specifiek epithet opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Specifiek epithet niet opgeslagen.');
-				}
-			}
-
-			if ($this->rHasVar('name_infra_specific_epithet'))
-			{
-				if ($this->updateNameInfraSpecificEpithet($this->rGetVal('name_infra_specific_epithet')))
-				{
-					$this->addMessage('Infra-specifiek epithet opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Infra specifiek epithet niet opgeslagen.');
-				}
-			}
-			
-			if ($this->rHasVar('name_authorship'))
-			{
-				if ($this->updateNameAuthorship($this->rGetVal('name_authorship')))
-				{
-					$this->addMessage('"Authorship" opgeslagen.');
-				}
-				else
-				{
-					$this->addError('"Authorship" niet opgeslagen.');
-				}
-			}
-			
-			if ($this->rHasVar('name_name_author'))
-			{
-				if ($this->updateNameAuthor($this->rGetVal('name_name_author')))
-				{
-					$this->addMessage('Naam auteur opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Naam auteur niet opgeslagen.');
-				}
-			}
-			
-			if ($this->rHasVar('name_authorship_year'))
-			{
-				if ($this->updateNameAuthorshipYear($this->rGetVal('name_authorship_year')))
-				{
-					$this->addMessage('Jaar opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Jaar niet opgeslagen.');
-				}
-			}
-			
-			if ($this->rHasVar('name_type_id'))
-			{
-				if ($this->updateNameTypeId($this->rGetVal('name_type_id')))
-				{
-					$this->addMessage('Type opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Type niet opgeslagen.');
-				}
-			}
-			
-			if ($this->rHasVar('name_language_id'))
-			{
-				if ($this->updateNameLanguageId($this->rGetVal('name_language_id')))
-				{
-					$this->addMessage('Taal opgeslagen.');
-				}
-				else
-				{
-					$this->addError('Taal niet opgeslagen.');
-				}
-			}
-
-			/*
-			// for revert:
-			$data=$this->requestData;
-			unset($data['id']);
-			unset($data['action']);
-			$this->smarty->assign('data',$data);
-			*/
-		}
-		
-		if ($this->rHasId())
+			$this->updateName();
+		} 
+		else
+		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$name=$this->getName(array('id'=>$this->rGetId()));
-
+			$this->saveName();
+		} 
+		else
+		{
+			$this->setNameId($this->rGetId());
+		}
+	
+		
+		if ($this->getNameId())
+		{
+			$name=$this->getName(array('id'=>$this->getNameId()));
 			$concept=$this->getConcept($name['taxon_id']);
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('name',$name);
@@ -348,9 +148,19 @@ class NsrTaxonController extends Controller
 
 		}
 		else
+		if ($this->rHasVal('taxon'))
 		{
-			$this->addError('No id');
+			$concept=$this->getConcept($this->rGetVal('taxon'));
+			$this->smarty->assign('concept',$concept);
+			$this->smarty->assign('nametypes',$this->getNameTypes());
+			$this->smarty->assign('languages',$this->getLanguages());
+			$this->smarty->assign('newname',true);
 		}
+		else
+		{
+			$this->addError('Geen ID.');
+		}
+
 		$this->printPage();
     }
 
@@ -540,7 +350,7 @@ class NsrTaxonController extends Controller
 						_b.nametype,
 						_a.language_id,
 						_c.language,
-						_d.label as language_label,
+						ifnull(_d.label,_c.language) as language_label,
 						case
 							when _b.nametype = '".PREDICATE_VALID_NAME."' then 11
 							when _b.nametype = '".PREDICATE_PREFERRED_NAME."' then 10
@@ -1036,10 +846,112 @@ class NsrTaxonController extends Controller
 
 
 
+	private function updateConcept()
+	{
+		$this->setConceptId($this->rGetId());
+
+		if ($this->rHasVar('concept_rank_id'))
+		{
+			if ($this->updateConceptRankId($this->rGetVal('concept_rank_id')))
+			{
+				$this->addMessage('Rang opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Rang niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('parent_taxon_id'))
+		{
+			if ($this->updateParentId($this->rGetVal('parent_taxon_id')))
+			{
+				$this->addMessage('Ouder opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Ouder niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('presence_presence_id'))
+		{
+			if ($this->updateConceptPresenceId($this->rGetVal('presence_presence_id')))
+			{
+				$this->addMessage('Voorkomensstatus opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Voorkomensstatus niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('presence_is_indigenous'))
+		{
+			if ($this->updateConceptIsIndigeous($this->rGetVal('presence_is_indigenous')))
+			{
+				$this->addMessage('Status endemisch opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Status endemisch niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('presence_habitat_id'))
+		{
+			if ($this->updateConceptHabitatId($this->rGetVal('presence_habitat_id')))
+			{
+				$this->addMessage('Habitat opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Habitat niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('presence_expert_id'))
+		{
+			if ($this->updatePresenceExpertId($this->rGetVal('presence_expert_id')))
+			{
+				$this->addMessage('Expert opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Expert niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('presence_organisation_id'))
+		{
+			if ($this->updatePresenceOrganisationId($this->rGetVal('presence_organisation_id')))
+			{
+				$this->addMessage('Organisatie opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Organisatie niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('presence_reference_id'))
+		{
+			if ($this->updatePresenceReferenceId($this->rGetVal('presence_reference_id')))
+			{
+				$this->addMessage('Publicatie opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Publicatie niet opgeslagen.');
+			}
+		}
+		
+	}
+
 	private function updateConceptRankId($values)
 	{
 		return $this->models->Taxon->update(
-			array('rank_id'=>$values['new']),
+			array('rank_id'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1047,7 +959,7 @@ class NsrTaxonController extends Controller
 	private function updateParentId($values)
 	{
 		return $this->models->Taxon->update(
-			array('parent_id'=>$values['new']),
+			array('parent_id'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1055,7 +967,7 @@ class NsrTaxonController extends Controller
 	private function updateConceptPresenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('presence_id'=>$values['new']),
+			array('presence_id'=>trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1063,7 +975,7 @@ class NsrTaxonController extends Controller
 	private function updateConceptIsIndigeous($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('is_indigenous'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('is_indigenous'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1071,7 +983,7 @@ class NsrTaxonController extends Controller
 	private function updateConceptHabitatId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('habitat_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('habitat_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1079,7 +991,7 @@ class NsrTaxonController extends Controller
 	private function updatePresenceExpertId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('actor_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('actor_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1087,7 +999,7 @@ class NsrTaxonController extends Controller
 	private function updatePresenceOrganisationId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('actor_org_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('actor_org_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1095,16 +1007,210 @@ class NsrTaxonController extends Controller
 	private function updatePresenceReferenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('reference_id'=>$values['new']=='-1' ? 'null' : $values['new']),
+			array('reference_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
+	}
+
+
+
+
+	private function saveName()
+	{
+
+		$type=$this->rGetVal('name_type_id');
+		$language=$this->rGetVal('name_language_id');
+
+		$d=$this->models->Names->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $this->rGetVal('parentid'),
+			'language_id' => trim($language['new']),
+			'type_id' => trim($type['new'])
+		));
+		
+		
+		if ($d)
+		{
+			$this->setNameId($this->models->Names->getNewId());
+
+			$this->addError('Nieuwe naam aangemaakt.');
+			$this->updateName();
+		}
+		else 
+		{
+			$this->addError('Aanmaak nieuwe naam mislukt.');
+		}
+			
+	}
+
+	private function updateName()
+	{
+
+		$name=$this->getName(array('id'=>$this->getNameId()));
+
+		$this->setConceptId($name['taxon_id']);
+
+		if ($this->rHasVar('name_name'))
+		{
+			if ($this->updateNameName($this->rGetVal('name_name')))
+			{
+				$this->addMessage('Naam opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Naam niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('name_uninomial'))
+		{
+			if ($this->updateNameUninomial($this->rGetVal('name_uninomial')))
+			{
+				$this->addMessage('Uninomiaal opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Uninomiaal niet opgeslagen.');
+			}
+		}
+		
+		if ($this->rHasVar('name_specific_epithet'))
+		{
+			if ($this->updateNameSpecificEpithet($this->rGetVal('name_specific_epithet')))
+			{
+				$this->addMessage('Specifiek epithet opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Specifiek epithet niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('name_infra_specific_epithet'))
+		{
+			if ($this->updateNameInfraSpecificEpithet($this->rGetVal('name_infra_specific_epithet')))
+			{
+				$this->addMessage('Infra-specifiek epithet opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Infra specifiek epithet niet opgeslagen.');
+			}
+		}
+		
+		if ($this->rHasVar('name_authorship'))
+		{
+			if ($this->updateNameAuthorship($this->rGetVal('name_authorship')))
+			{
+				$this->addMessage('"Authorship" opgeslagen.');
+			}
+			else
+			{
+				$this->addError('"Authorship" niet opgeslagen.');
+			}
+		}
+		
+		if ($this->rHasVar('name_name_author'))
+		{
+			if ($this->updateNameAuthor($this->rGetVal('name_name_author')))
+			{
+				$this->addMessage('Naam auteur opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Naam auteur niet opgeslagen.');
+			}
+		}
+		
+		if ($this->rHasVar('name_authorship_year'))
+		{
+			if ($this->updateNameAuthorshipYear($this->rGetVal('name_authorship_year')))
+			{
+				$this->addMessage('Jaar opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Jaar niet opgeslagen.');
+			}
+		}
+		
+		if ($this->rHasVar('name_type_id'))
+		{
+			if ($this->updateNameTypeId($this->rGetVal('name_type_id')))
+			{
+				$this->addMessage('Type opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Type niet opgeslagen.');
+			}
+		}
+		
+		if ($this->rHasVar('name_language_id'))
+		{
+			if ($this->updateNameLanguageId($this->rGetVal('name_language_id')))
+			{
+				$this->addMessage('Taal opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Taal niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('name_reference_id'))
+		{
+			if ($this->updateNameReferenceId($this->rGetVal('name_reference_id')))
+			{
+				$this->addMessage('Referentie opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Referentie niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('name_expert_id'))
+		{
+			if ($this->updateNameExpertId($this->rGetVal('name_expert_id')))
+			{
+				$this->addMessage('Expert opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Expert niet opgeslagen.');
+			}
+		}
+
+		if ($this->rHasVar('name_organisation_id'))
+		{
+			if ($this->updateNameOrganisationId($this->rGetVal('name_organisation_id')))
+			{
+				$this->addMessage('Organisatie opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Organisatie niet opgeslagen.');
+			}
+		}
+			
+	}
+
+	private function deleteName()
+	{
+		$this->models->Names->delete(
+		array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'id'=>$this->getNameId()
+		));
 	}
 
 	private function updateNameName($values)
 	{
 		// to delete, call deleteName()
 		return $this->models->Names->update(
-			array('name'=>$values['new']),
+			array('name'=>trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1112,7 +1218,7 @@ class NsrTaxonController extends Controller
 	private function updateNameUninomial($values)
 	{
 		return $this->models->Names->update(
-			array('uninomial'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('uninomial'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : trim($values['new']))),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1120,7 +1226,7 @@ class NsrTaxonController extends Controller
 	private function updateNameSpecificEpithet($values)
 	{
 		return $this->models->Names->update(
-			array('specific_epithet'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('specific_epithet'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : trim($values['new']))),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1128,7 +1234,7 @@ class NsrTaxonController extends Controller
 	private function updateNameInfraSpecificEpithet($values)
 	{
 		return $this->models->Names->update(
-			array('infra_specific_epithet'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('infra_specific_epithet'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : trim($values['new']))),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1136,7 +1242,7 @@ class NsrTaxonController extends Controller
 	private function updateNameAuthorship($values)
 	{
 		return $this->models->Names->update(
-			array('authorship'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('authorship'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : trim($values['new']))),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1144,7 +1250,7 @@ class NsrTaxonController extends Controller
 	private function updateNameAuthor($values)
 	{
 		return $this->models->Names->update(
-			array('name_author'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('name_author'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : trim($values['new']))),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1152,7 +1258,7 @@ class NsrTaxonController extends Controller
 	private function updateNameAuthorshipYear($values)
 	{
 		return $this->models->Names->update(
-			array('authorship_year'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : $values['new'])),
+			array('authorship_year'=>(isset($values['delete']) && $values['delete']=='1' ? 'null' : trim($values['new']))),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1160,7 +1266,7 @@ class NsrTaxonController extends Controller
 	private function updateNameTypeId($values)
 	{
 		return $this->models->Names->update(
-			array('type_id'=>$values['new']),
+			array('type_id'=>trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1168,10 +1274,35 @@ class NsrTaxonController extends Controller
 	private function updateNameLanguageId($values)
 	{
 		return $this->models->Names->update(
-			array('language_id'=>$values['new']),
+			array('language_id'=>trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
+
+	private function updateNameReferenceId($values)
+	{
+		return $this->models->Names->update(
+			array('reference_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameExpertId($values)
+	{
+		return $this->models->Names->update(
+			array('expert_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameOrganisationId($values)
+	{
+		return $this->models->Names->update(
+			array('organisation_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
 
 
 
@@ -1507,6 +1638,25 @@ class NsrTaxonController extends Controller
 		
 		return count((array)$d)>0;
 	}
+	
+	private function setMessage($m=null)
+	{
+		if (empty($m))
+			unset($_SESSION['admin']['user']['species']['message']);
+		else
+			$_SESSION['admin']['user']['species']['message']=$m;
+	}
 
+	private function getMessage()
+	{
+		return @$_SESSION['admin']['user']['species']['message'];
+	}
+
+	private function checkMessage()
+	{
+		$m=$this->getMessage();
+		if ($m) $this->addMessage($m);
+		$this->setMessage();
+	}
 
 }

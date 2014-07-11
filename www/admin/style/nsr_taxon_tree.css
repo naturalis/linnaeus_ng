@@ -1,0 +1,42 @@
+ul{
+	padding-left:5px;
+}
+ul.top {
+	padding-left:0px;
+}
+li.child {
+	list-style:square;
+	margin-left:12px;
+}
+li.child.no-expand {
+	list-style:circle;
+}
+.detail-link {
+	margin-left:8px;
+	font-weight:bold;
+	font-size:1.1em;
+}
+#tree-container .rank, .child-count {
+	margin-left:3px;
+	font-size:0.87em;
+}
+#tree-container .child-count {
+	margin-left:5px;
+	color:#666;
+}
+#tree-container .rank:before {
+  content: "[";
+}
+#tree-container .rank:after {
+  content:"]";
+}
+#tree-container .child-count:before {
+  content: "(";
+}
+#tree-container .child-count:after {
+  content: ")";
+}
+#tree-container .italics {
+	font-style:italic;
+}
+
