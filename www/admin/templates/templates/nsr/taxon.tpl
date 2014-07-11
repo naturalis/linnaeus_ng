@@ -2,18 +2,32 @@
 
 <div id="page-main">
 
-<form>
+<!-- form>
 		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam"/>
-</form>
-
+</form -->
+{if $concept}
 <h2>{$concept.taxon}</h2>
 <h3>{$names.preffered_name}</h3>
+{else}
+<h2>nieuw concept</h2>
+{/if}
 
 <form id="data" onsubmit="return false;">
 
 <p>
 	<h4>concept</h4>
-	nsr id: {$concept.nsr_id}<br />
+	nsr id: {if $concept}{$concept.nsr_id}{else}(auto){/if}
+	
+	<br />
+
+	naam: {$concept.taxon}
+	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
+	<span class="editspan" id="taxon">
+	<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" /> *
+	</span>
+	<input type="hidden" id="concept_taxon" value="{$concept.taxon.id}" />
+
+	<br />
 
 	ouder: {$concept.parent.taxon}
 	<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
@@ -38,6 +52,7 @@
 <p>
 
 	<h4>voorkomen</h4>
+
 	status:
 	{if $presence.presence_id}
 		<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
@@ -45,6 +60,7 @@
 	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">edit</a>
 	<span class="editspan">
 		<select id="presence_presence_id" onchange="storedata(this);" >
+		<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
 		{assign var=first value=true}
 		{foreach from=$statuses item=v}
 			{if $v.index_label==99 && $first==true}
@@ -66,11 +82,10 @@
 	<span class="editspan">
 		<select id="presence_is_indigenous" onchange="storedata(this);" >
 			<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
-			<option value="1" {if $presence.is_indigenous==1} selected="selected"{/if}>ja</option>
-			<option value="0" {if $presence.is_indigenous==0} selected="selected"{/if}>nee</option>
+			<option value="1" {if $presence.is_indigenous=='1'} selected="selected"{/if}>ja</option>
+			<option value="0" {if $presence.is_indigenous=='0'} selected="selected"{/if}>nee</option>
 		</select>
 	</span>
-	
 
 <br />
 
@@ -123,6 +138,7 @@
 
 </p>
 
+{if $concept}
 <p>
 
 	<h4>namen</h4>
@@ -137,6 +153,7 @@
 
 
 </p>
+{/if}
 
 <input type="button" value="opslaan" onclick="savedataform();" />
 </form>
@@ -164,19 +181,20 @@
 	{/foreach}
 *}
 
-
-
 <script>
 $(document).ready(function()
 {
 	allLookupNavigateOverrideUrl('taxon.php?id=%s');
+	{if $concept}
 	dataid={$concept.id};
 	taxonrank={$concept.base_rank};
+	{/if}
 	$('#data :input[type!=button]').each(function(key,value) {
-		values.push( { name:$(this).attr('id'),current:$(this).val() } );
+		values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
+		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
-	console.dir(values);
+	//console.dir(values);
 });
 </script>
 
