@@ -3,6 +3,11 @@ var l2MapPxHeight = -1;
 var l2MapPxWidth = -1;
 var l2DataColours = Array();
 
+var eastLabel='E';
+var westLabel='W';
+var northLabel='N';
+var southLabel='S';
+
 $(document).ready(function(){
 	fixOpacity();
 
@@ -17,6 +22,11 @@ $(document).ready(function(){
 			}
 		});
 	}
+
+	eastLabel=_('E');
+	westLabel=_('W');
+	northLabel=_('N');
+	southLabel=_('S');
 
 });
 
@@ -73,8 +83,8 @@ function l2MapMouseOver(x,y) {
 	posY = Math.round(posY);
 	posX = Math.round(posX);
 
-	var labX = (posX>0 ? _('E') : _('W'));
-	var labY = (posY>=0 ? _('N') : _('S'));
+	var labX = (posX>0 ? eastLabel : westLabel);
+	var labY = (posY>=0 ? northLabel : southLabel);
 
 	$("#coordinates").html(Math.abs(posY)+'&deg;'+labY+', '+Math.abs(posX)+'&deg;'+labX);
 
@@ -166,12 +176,6 @@ function l2DoSearchMap() {
 
 	});
 	
-	var types = false;
-
-	$('[name^=dataTypes]').each(function() {
-		if ($(this).attr('checked')==true) types = true;
-	});
-	
 	if (!squares) {
 		
 		alert(_('Please select at least one square'));
@@ -180,6 +184,13 @@ function l2DoSearchMap() {
 		
 	} 
 
+
+	var types = false;
+
+	$('[name^=dataTypes]').each(function() {
+		if ($(this).is(':checked')) types = true;
+	});
+	
 	if (!types) {
 		
 		alert(_('Please select at least one datatype'));
