@@ -933,13 +933,21 @@
 				font-weight: bold;
 				color: $wit;
 				width: 100%;
+				position:absolute;
+				left:0; 
+				right:0;
 			}
 
 			.dialog-title {
 				float: left;
 				margin: 0;
 				overflow: hidden;
-
+				position:absolute;
+				left:5px; 
+				right:40px;
+				text-overflow:ellipsis;
+				height:40px;
+				white-space:nowrap;
 			}
 
 			.dialog-close {
@@ -963,7 +971,8 @@
 				padding: 1em;
 				min-height: 160px;
 				background: $wit;
-				display: table-cell
+				display: table-cell;
+				padding-top: 47px;
 
 				img{
 					max-width: 600px;
