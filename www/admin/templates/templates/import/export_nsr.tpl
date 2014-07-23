@@ -5,8 +5,9 @@
 <form method="post">
 <input type="hidden" name="action" value="export" />
 <input type="hidden" name="rnd" value="{$rnd}" />
-
+<p>
 {t}Export project data to XML-file.{/t}
+</p>
 <table>
 {foreach from=$modules.modules item=v}
 {if $v.controller!='utilities' && $v.controller!='index' && $v.controller!='highertaxa'}

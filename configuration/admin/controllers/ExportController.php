@@ -174,7 +174,7 @@ class ExportController extends Controller
 				
 			}		
 
-			$this->exportData($data,$this->makeFileName($data['project']['system_name']));
+			$this->exportDataDownload($data,$this->makeFileName($data['project']['system_name']));
 			
 			unset($_SESSION['admin']['export']);
 			
@@ -191,13 +191,28 @@ class ExportController extends Controller
     
         $this->checkAuthorisation();
         
-        $this->setPageName($this->translate('Select modules to export'));
+        $this->setPageName($this->translate('Export NSR taxa with content and names'));
 		
-		//$pModules = $this->getProjectModules();
-
 		if ($this->rHasVal('action','export'))
 		{
+			
+			set_time_limit(2400); // RIGHT!
 
+$numberOfRecords=3000;
+$recordsPerFile=101;
+$forceWriteToFile=true;
+$filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
+$exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whem multiple
+
+			if ($numberOfRecords!='*')
+			{
+				// random export for ayco
+				$q=$this->models->Taxon->freeQuery("select rand() as r,id from taxa order by r limit ".$numberOfRecords);
+				$ids=array();
+				foreach($q as $val) array_push($ids,$val['id']);
+			}
+			
+			
 			$taxa=$this->models->Taxon->freeQuery("
 				select
 					_t.id,
@@ -217,6 +232,7 @@ class ExportController extends Controller
 				left join %PRE%nsr_ids _rr
 					on _t.id=_rr.lng_id
 					and _rr.item_type='taxon'
+					and _t.project_id=_rr.project_id
 				left join %PRE%presence_taxa _g
 					on _t.id=_g.taxon_id
 					and _t.project_id=_g.project_id
@@ -225,11 +241,10 @@ class ExportController extends Controller
 					and _g.project_id=_h.project_id 
 					and _h.language_id=".$this->getDefaultProjectLanguage()."
 				where _t.project_id = ".$this->getCurrentProjectId()."
-				
-and _t.id in (139499,139500,119843,126431,126429,138867)
+
+				".($numberOfRecords!='*' ? "and _t.id in (".implode(',',$ids).")" : "" )."
 
 			");
-	
 
 			$data=array();
 			foreach((array)$taxa as $key=>$val)
@@ -289,13 +304,34 @@ and _t.id in (139499,139500,119843,126431,126429,138867)
 				
 				$val['content']=$content;
 				$val['name']=$names;
-
 				$data['taxon'][]=$val;
 
 			}
-//q($data,1);
-			$this->exportData($data,'bla.xml');
-
+			
+			
+			if ($recordsPerFile < count((array)$data['taxon']))
+			{
+				$chunks=array_chunk($data['taxon'],$recordsPerFile);
+				foreach($chunks as $key=>$chunk)
+				{
+					$f=sprintf($filename,'-'.str_pad($key,3,"0",STR_PAD_LEFT));
+					$this->exportDataToFile(array('taxon'=>$chunk),$f,$exportfolder);
+					$this->addMessage('Wrote '.(count($chunk)).' records to '.$exportfolder.$f);
+				}
+			}
+			else
+			{
+				$f=sprintf($filename,'');
+				if ($forceWriteToFile)
+				{
+					$this->exportDataToFile($data,$f,$exportfolder);
+					$this->addMessage('Wrote '.$exportfolder.$f);
+				}
+				else
+				{
+					$this->exportDataDownload($data,$f);
+				}
+			}
 
 		}
 
@@ -1250,62 +1286,61 @@ and _t.id in (139499,139500,119843,126431,126429,138867)
 	
 	}
 
-function array_to_xml($array, $level=1) {
-        $xml = '';
-    if ($level==1) {
-        $xml .= '<?xml version="1.0" encoding="ISO-8859-1"?>'.
-                "\n<nederlands_soorten_register>\n";
-    }
-    foreach ($array as $key=>$value) {
-        $key = strtolower($key);
-        if (is_array($value)) {
-            $multi_tags = false;
-            foreach($value as $key2=>$value2) {
-                if (is_array($value2)) {
-                    $xml .= str_repeat("\t",$level)."<$key>\n";
-                    $xml .= $this->array_to_xml($value2, $level+1);
-                    $xml .= str_repeat("\t",$level)."</$key>\n";
-                    $multi_tags = true;
-                } else {
-                    if (trim($value2)!='') {
-                        if (htmlspecialchars($value2)!=$value2) {
-                            $xml .= str_repeat("\t",$level).
-                                    "<$key><![CDATA[$value2]]>".
-                                    "</$key>\n";
-                        } else {
-                            $xml .= str_repeat("\t",$level).
-                                    "<$key>$value2</$key>\n";
-                        }
-                    }
-                    $multi_tags = true;
-                }
-            }
-            if (!$multi_tags and count($value)>0) {
-                $xml .= str_repeat("\t",$level)."<$key>\n";
-                $xml .= $this->array_to_xml($value, $level+1);
-                $xml .= str_repeat("\t",$level)."</$key>\n";
-            }
-        } else {
-            if (trim($value)!='') {
-                if (htmlspecialchars($value)!=$value) {
-                    $xml .= str_repeat("\t",$level)."<$key>".
-                            "<![CDATA[$value]]></$key>\n";
-                } else {
-                    $xml .= str_repeat("\t",$level).
-                            "<$key>$value</$key>\n";
-                }
-            }
-        }
-    }
-    if ($level==1) {
-        $xml .= "</nederlands_soorten_register>\n";
-    }
-    return $xml;
-}
+	function array_to_xml($array, $level=1) {
+			$xml = '';
+		if ($level==1) {
+			$xml .= '<?xml version="1.0" encoding="ISO-8859-1"?>'.
+					"\n<nederlands_soorten_register>\n";
+		}
+		foreach ($array as $key=>$value) {
+			$key = strtolower($key);
+			if (is_array($value)) {
+				$multi_tags = false;
+				foreach($value as $key2=>$value2) {
+					if (is_array($value2)) {
+						$xml .= str_repeat("\t",$level)."<$key>\n";
+						$xml .= $this->array_to_xml($value2, $level+1);
+						$xml .= str_repeat("\t",$level)."</$key>\n";
+						$multi_tags = true;
+					} else {
+						if (trim($value2)!='') {
+							if (htmlspecialchars($value2)!=$value2) {
+								$xml .= str_repeat("\t",$level).
+										"<$key><![CDATA[$value2]]>".
+										"</$key>\n";
+							} else {
+								$xml .= str_repeat("\t",$level).
+										"<$key>$value2</$key>\n";
+							}
+						}
+						$multi_tags = true;
+					}
+				}
+				if (!$multi_tags and count($value)>0) {
+					$xml .= str_repeat("\t",$level)."<$key>\n";
+					$xml .= $this->array_to_xml($value, $level+1);
+					$xml .= str_repeat("\t",$level)."</$key>\n";
+				}
+			} else {
+				if (trim($value)!='') {
+					if (htmlspecialchars($value)!=$value) {
+						$xml .= str_repeat("\t",$level)."<$key>".
+								"<![CDATA[$value]]></$key>\n";
+					} else {
+						$xml .= str_repeat("\t",$level).
+								"<$key>$value</$key>\n";
+					}
+				}
+			}
+		}
+		if ($level==1) {
+			$xml .= "</nederlands_soorten_register>\n";
+		}
+		return $xml;
+	}
 
-	private function exportData($data,$filename)
+	private function exportDataDownload($data,$filename)
 	{
-
 		//return;
 		//q($data,1);
 
@@ -1317,9 +1352,13 @@ function array_to_xml($array, $level=1) {
 		print $this->array_to_xml($data);
 		die();
 
-		echo $this->helpers->ArrayToXml->toXml($data);
-		
-		die();
-	
+		//echo $this->helpers->ArrayToXml->toXml($data);
+		//die();
 	}
+
+	private function exportDataToFile($data,$filename,$folder)
+	{
+		file_put_contents($folder.$filename,$this->array_to_xml($data));
+	}
+
 }

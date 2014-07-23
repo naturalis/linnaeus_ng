@@ -453,7 +453,7 @@ class MatrixKeyController extends Controller
                 $results = $this->nbcGetSimilar($this->requestData['params']);
             else                
                 $results = $this->nbcGetTaxaScores($states);
-				
+		
 			if ($includeActiveChars) {
 
 				$d = array();
@@ -2467,7 +2467,7 @@ class MatrixKeyController extends Controller
                     )), 
                     'type' => 'v', 
                     'inclRelated' => $inclRelated,
-					'details' => $this->getVariationStates($val['id'])
+					'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['id'])
                 ));
                 
                 $tmp[$val['taxon_id']] = true;
@@ -2521,7 +2521,7 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 't', 
                         'inclRelated' => $inclRelated,
-						'details' => $this->getTaxonStates($val['id'])
+						'details' => $this->_matrixSuppressDetails ? null : $this->getTaxonStates($val['id'])
                     ));
                 }
             }
@@ -2541,7 +2541,7 @@ class MatrixKeyController extends Controller
                     'label' => $val['l'], 
                     'type' => 'm', 
                     'inclRelated' => false,
-					'details' => $this->getMatrixStates($val['id']),
+					'details' => $this->_matrixSuppressDetails ? null : $this->getMatrixStates($val['id']),
 					'image' => file_exists($this->getProjectUrl('projectMedia').$image) ? $image : null,
                 ));
                 
@@ -2613,7 +2613,7 @@ class MatrixKeyController extends Controller
                     'gender' => array($d['gender'], $d['gender_label']),
                     'type' => 'v', 
                     'highlight' => $val['id'] == $p['id'], 
-                    'details' => $this->getVariationStates($val['relation_id'])
+                    'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['relation_id'])
                 ));
             }
             else {
@@ -2658,7 +2658,7 @@ class MatrixKeyController extends Controller
                     'label' => $common, 
                     'type' => 't', 
                     'highlight' => $val['relation_id'] == $p['id'], 
-                    'details' => $this->getTaxonStates($taxon['id'])
+                    'details' => $this->_matrixSuppressDetails ? null : $this->getTaxonStates($taxon['id'])
                 ));
             }
         }
