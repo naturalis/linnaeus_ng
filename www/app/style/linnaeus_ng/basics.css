@@ -2331,12 +2331,21 @@ button, input, select, textarea {
   height: 2em;
   font-weight: bold;
   color: white;
-  width: 100%; }
+  width: 100%;
+  position:absolute;
+  left:0; 
+  right:0; }
 
 .dialog-title {
   float: left;
   margin: 0;
-  overflow: hidden; }
+  overflow: hidden;
+  position:absolute;
+  left:5px; 
+  right:40px;
+  text-overflow:ellipsis;
+  height:40px;
+  white-space:nowrap; }
 
 .dialog-close {
   float: right;
@@ -2358,7 +2367,10 @@ button, input, select, textarea {
   min-height: 160px;
   background: white;
   display: table-cell img;
-    display-max-width: 600px; }
+  display-max-width: 600px; 
+  padding-top: 47px;	
+	
+	}
 
 .dialog-content-inner {
   min-height: 128px; }
