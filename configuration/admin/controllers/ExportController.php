@@ -198,8 +198,8 @@ class ExportController extends Controller
 			
 			set_time_limit(2400); // RIGHT!
 
-$numberOfRecords=3000;
-$recordsPerFile=101;
+$numberOfRecords=5000;
+$recordsPerFile=5000;
 $forceWriteToFile=true;
 $filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
 $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whem multiple
@@ -268,6 +268,7 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 						_a.name,
 						_a.uninomial,
 						_a.specific_epithet,
+						_a.infra_specific_epithet,
 						_a.name_author,
 						_a.authorship_year,
 						_a.reference,
