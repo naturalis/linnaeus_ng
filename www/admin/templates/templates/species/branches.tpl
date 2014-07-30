@@ -1,6 +1,6 @@
 {function name=printCurrentItem}
 	<li class="current">
-		{$taxon.label}
+		{$taxon.label} <span class="editors"><a href="edit.php?id={$parent.id}">{t}edit{/t}</a></span>
 		<ul id="sortable">
 		{foreach from=$progeny item=progen}
 			{if $progen.child_count==0}
@@ -94,7 +94,7 @@ ul {
 			{$parent.label}
 			{/if}
 			{if $parent.commonname}<span class="common">{$parent.commonname}</span>{/if}
-			<span class="editors"><a href="edit.php?id={$parent.id}">{t}edit{/t}</a></span>
+			
 			<span class="childcount">
 				{$peers|@count}
 			</span>
@@ -108,7 +108,6 @@ ul {
 					{else}
 						<li class="peer"><a href="?p={$peer.id}">{$peer.rank} {$peer.taxon}</a>
 						{if $peer.commonname}<span class="common">{$peer.commonname}</span>{/if}
-						<span class="editors"><a href="edit.php?id={$peer.id}">{t}edit{/t}</a></span>
 						<span class="childcount">
 							{$peer.child_count}
 						</span>
