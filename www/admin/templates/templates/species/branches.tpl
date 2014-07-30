@@ -1,6 +1,6 @@
 {function name=printCurrentItem}
 	<li class="current">
-		{$taxon.label} <span class="editors"><a href="edit.php?id={$parent.id}">{t}edit{/t}</a></span>
+		{$taxon.label} <span class="editors"><a href="edit.php?id={$taxon.id}">{t}edit{/t}</a></span>
 		<ul id="sortable">
 		{foreach from=$progeny item=progen}
 			{if $progen.child_count==0}
