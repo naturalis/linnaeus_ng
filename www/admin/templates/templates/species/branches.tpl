@@ -95,7 +95,6 @@ ul {
 			{/if}
 			{if $parent.commonname}<span class="common">{$parent.commonname}</span>{/if}
 			<span class="editors"><a href="edit.php?id={$parent.id}">{t}edit{/t}</a></span>
-			
 			<span class="childcount">
 				{$peers|@count}
 			</span>
@@ -109,6 +108,7 @@ ul {
 					{else}
 						<li class="peer"><a href="?p={$peer.id}">{$peer.rank} {$peer.taxon}</a>
 						{if $peer.commonname}<span class="common">{$peer.commonname}</span>{/if}
+						<span class="editors"><a href="edit.php?id={$peer.id}">{t}edit{/t}</a></span>
 						<span class="childcount">
 							{$peer.child_count}
 						</span>
