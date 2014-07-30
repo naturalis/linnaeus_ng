@@ -1,7 +1,6 @@
 <?php
 
 /*
-
 	to do:
 	implement revert
 
@@ -10,7 +9,6 @@
 			unset($data['id']);
 			unset($data['action']);
 			$this->smarty->assign('data',$data);
-
 */
 
 include_once ('Controller.php');
