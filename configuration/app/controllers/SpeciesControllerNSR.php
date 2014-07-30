@@ -43,13 +43,21 @@ class SpeciesControllerNSR extends SpeciesController
     public function indexAction()
     {
         if (!$this->rHasVal('id'))
-			$id = $this->getFirstTaxonId();
+			$id = $this->getFirstTaxonIdNsr();
         else
 			$id = $this->requestData['id'];
 
         $this->setStoreHistory(false);
-		
-        $this->redirect('nsr_taxon.php?id=' . $id);
+
+		if (isset($id))
+		{
+			$this->redirect('nsr_taxon.php?id=' . $id);
+		}
+		else
+		{
+			$this->smarty->assign('message','Geen taxon ID gevonden.');	
+			$this->printPage('../shared/generic-error');
+		}
     }
 
     public function taxonAction()
@@ -58,6 +66,10 @@ class SpeciesControllerNSR extends SpeciesController
 		{
             $taxon = $this->getTaxonById($this->rGetVal('id'));
 			$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
+		}
+		else 
+		{
+			$this->redirect('nsr_index.php');
 		}
 
         if (!empty($taxon))
@@ -234,6 +246,26 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->_getTaxonClassification($id);
 
 		return $this->tmp;
+	}
+	
+	private function getFirstTaxonIdNsr()
+	{
+
+		$data=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon
+			
+			from %PRE%taxa _a
+
+			where
+				_a.project_id =".$this->getCurrentProjectId()."
+			order by _a.taxon
+			limit 1"
+		);
+		
+		return $data[0]['id'];
+
 	}
 
     private function getCategories($p=null)
