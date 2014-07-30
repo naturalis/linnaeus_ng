@@ -44,6 +44,16 @@
 
 	moduleDrawFreeModuleBlock();
 
+var altKeyDown=false;
+
+$("span.a").click(function(evt) {
+  if (evt.altKey)
+    altKeyDown=true;
+  else
+    altKeyDown=false;
+});
+
+
 </script>
 
 {include file="../shared/admin-messages.tpl"}
