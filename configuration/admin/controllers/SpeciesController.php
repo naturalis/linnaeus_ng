@@ -5048,9 +5048,9 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 				$progeny[$key]['commonname']=$this->getCommonCommonName($val['id']);
 			}
 
-			if (count((array)$progeny)==0)
+			if (count((array)$progeny)==0 && isset($taxon['parent_id']) && $taxon['parent_id']!=$taxon['id'])
 			{
-				//$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
+				$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
 			}
 
 			$this->setPageName('Browse taxon tree - '.$taxon['taxon']);
