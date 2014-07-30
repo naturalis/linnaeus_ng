@@ -615,9 +615,6 @@ class SpeciesController extends Controller
 
     public function editAction ()
     {
-if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
-	$this->redirect('taxonomy.php?id='.$this->rGetVal('id'));
-
         $this->checkAuthorisation();
 
         if (!$this->rHasId())
@@ -889,9 +886,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     public function newAction ()
     {
-if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
-	$this->redirect('taxonomy.php');
-
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('New taxon'));
@@ -1029,7 +1023,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
                     if ($this->rHasVal('next', 'main'))
                         $this->redirect('taxon.php?id=' . $newId);
 
-                    $this->newGetTaxonTree();
+					$this->newGetTaxonTree();
 
                     $d = $this->getTaxonById($newId);
 
@@ -1228,9 +1222,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     public function literatureAction ()
     {
-if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
-	$this->redirect('literature2.php?id='.$this->rGetVal('id'));
-
         $this->checkAuthorisation();
 
         $this->setBreadcrumbIncludeReferer(array(
@@ -2314,10 +2305,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     public function synonymsAction ()
     {
-
-if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
-	$this->redirect('names.php?id='.$this->rGetVal('id'));
-
         $this->checkAuthorisation();
 
         if ($this->rHasId()) {
@@ -2478,10 +2465,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
     public function commonAction ()
     {
-
-if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
-	$this->redirect('names.php?id='.$this->rGetVal('id'));
-
         $this->checkAuthorisation();
 
         if ($this->rHasId()) {
