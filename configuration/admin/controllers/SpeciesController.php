@@ -5042,15 +5042,16 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 				order by
 					_a.taxon_order
 			");
+var_dump($progeny);die();
+			if (count((array)$progeny)==0)
+			{
+				//$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
+			}
+
 
 			foreach((array)$progeny as $key=>$val)
 			{
 				$progeny[$key]['commonname']=$this->getCommonCommonName($val['id']);
-			}
-
-			if (count((array)$progeny)==0)
-			{
-				//$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
 			}
 
 			$this->setPageName('Browse taxon tree - '.$taxon['taxon']);
