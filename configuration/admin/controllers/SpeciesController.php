@@ -4918,7 +4918,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
 	public function branchesAction()
 	{
-		//$this->checkAuthorisation();
+		$this->checkAuthorisation();
 
 		$this->setPageName('Browse taxon tree');
 
@@ -4933,7 +4933,6 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 			}
 			$this->addMessage('new order saved');
 			$this->clearCache('species-adjacency-tree');
-
 
 		}
 
@@ -4984,7 +4983,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 			}
 		}
 
-		if ($p)
+		if (!is_null($p))
 		{
 
 			$taxon=$this->getTaxonById($p);
@@ -5051,7 +5050,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
 			if (count((array)$progeny)==0)
 			{
-				$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
+				//$this->redirect('branches.php?p='.$taxon['parent_id'].'&h='.$taxon['id']);
 			}
 
 			$this->setPageName('Browse taxon tree - '.$taxon['taxon']);
