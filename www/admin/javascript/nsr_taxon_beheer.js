@@ -61,9 +61,17 @@ function closedropdownlist()
 
 function toggleedit(ele)
 {
-	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
-	$(ele).html(mode=='edit' ? 'cancel' : 'edit');
-	$(ele).next().toggle();
+	if (dataid) {
+		var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
+		$(ele).html(mode=='edit' ? 'cancel' : 'edit');
+		$(ele).next().toggle();
+	}
+	else 
+	{
+		$(ele).html('');
+		$(ele).next().toggle(true);
+	}
+	
 }
 
 function setnewvalue(p)
@@ -413,6 +421,7 @@ function setreference(ele,targetvar)
 }
 
 
+
 function deleteform()
 {
 	if (!dataid) return;
@@ -427,3 +436,52 @@ function deleteform()
 		form.submit();
 	}
 }
+
+function partstoname()
+{
+
+	var taxon=
+		$('#name_uninomial').val()+' '+
+		$('#name_specific_epithet').val()+' '+
+		$('#name_infra_specific_epithet').val();
+
+	taxon=taxon.trim();
+	
+	var author=$('#name_authorship').val();
+	str.lastIndexOf(" "); <-- year
+	author=author.replace(/^\(+|\)+$/gm,'');
+	
+	
+/*
+	name_authorship
+		<tr><th>auteur:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_authorship" value="" mandatory/> *</td></tr>	
+		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_year_authorship" value="" mandatory/> *</td></tr>	
+*/	
+	$('#name_name_authorship').val(author);
+	$('#concept_taxon').val(taxon);
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

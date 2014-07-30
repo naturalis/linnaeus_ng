@@ -5,6 +5,7 @@
 <h2>{$concept.taxon}</h2>
 <h3>{if $newname}nieuwe naam{else}{$name.name}{/if}</h3>
 
+
 <form id="data" onsubmit="return false;">
 
 <table>

@@ -127,7 +127,7 @@ class NsrTaxonController extends Controller
 
     public function nameAction()
     {
-
+	
 		$this->checkAuthorisation();
 
 		if ($this->rHasId() && $this->rHasVal('action','delete'))

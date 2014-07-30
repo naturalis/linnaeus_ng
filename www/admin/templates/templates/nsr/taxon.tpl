@@ -15,127 +15,149 @@
 <form id="data" onsubmit="return false;">
 
 <p>
-	<h4>concept</h4>
-	nsr id: {if $concept}{$concept.nsr_id}{else}(auto){/if}
 	
-	<br />
 
-	naam: {$concept.taxon}
-	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
-	<span class="editspan" id="taxon">
-	<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" /> *
-	</span>
-	<input type="hidden" id="concept_taxon" value="{$concept.taxon.id}" />
+	<table>
+		<tr><th><h4>concept</h4></td><td></td></tr>
+		<tr><th>nsr id:</th><td>{if $concept}{$concept.nsr_id}{else}(auto){/if}</td></tr>
 
-	<br />
+		<tr><th>ouder:</th>
+			<td>
+				{$concept.parent.taxon}
+				<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
+				<span class="editspan" id="parent">
+				</span>
+				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" />
+			</td>
+		</tr>
 
-	ouder: {$concept.parent.taxon}
-	<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
-	<span class="editspan" id="parent">
-	</span>
-	<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" />
+	{if !$concept}
+		<tr><th>genus:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="" mandatory="mandatory" /> *</td></tr>
+		<tr><th>soort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_specific_epithet" value="" /></td></tr>
+		<tr><th>ondersoort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="" /></td></tr>
+		<tr><th>auteurschap:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" mandatory/> *</td></tr>	
+		<tr><th>auteur:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_authorship" value="" mandatory/> *</td></tr>	
+		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_year_authorship" value="" mandatory/> *</td></tr>	
+	{/if}
 
-	<br />
+		<tr><th>naam:</th>
+			<td>
+				{$concept.taxon}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
+				<span class="editspan" id="taxon">
+				<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" /> *
+				</span>
+				<input type="hidden" id="concept_taxon" value="{$concept.taxon.id}" />
+			</td>
+		</tr>
+		<tr><th>rang:</th>
+			<td>
+				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach} 
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">edit</a>
+				<span class="editspan">
+				<select id="concept_rank_id" onchange="storedata(this);" >
+				{foreach from=$ranks item=v}
+				<option value="{$v.id}" {if $v.id==$concept.rank_id} selected="selected"{/if}>{$v.rank}</option>
+				{/foreach}
+				</select>
+				</span>
+			</td>
+		</tr>
 
-	rang: 	{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach} 
-	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">edit</a>
-	<span class="editspan">
-		<select id="concept_rank_id" onchange="storedata(this);" >
-		{foreach from=$ranks item=v}
-			<option value="{$v.id}" {if $v.id==$concept.rank_id} selected="selected"{/if}>{$v.rank}</option>
-		{/foreach}
-		</select>
-	</span>
+		<tr><th>&nbsp;</td></tr>
 
-</p>
+		<tr><th><h4>voorkomen</h4></td><td></td></tr>
+		<tr><th>status:</th>
+			<td>
+				{if $presence.presence_id}
+					<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
+				{else}{if $concept}n.v.t.{/if}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">edit</a>
+				<span class="editspan">
+					<select id="presence_presence_id" onchange="storedata(this);" >
+					<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
+					{assign var=first value=true}
+					{foreach from=$statuses item=v}
+						{if $v.index_label==99 && $first==true}
+						<option value="" disabled="disabled">&nbsp;</option>
+						{assign var=first value=false}
+						{/if}
+						<option value="{$v.id}" {if $v.id==$presence.presence_id} selected="selected"{/if}>{$v.index_label}. {$v.label}</option>
+					{/foreach}
+					</select>
+				</span>
+			</td>
+		</tr>
 
-<p>
+		<tr><th>endemisch:</th>
+			<td>
+				{if $presence.presence_id!=''}
+					{if $presence.is_indigenous=='1'}ja{else if $presence.is_indigenous=='0'}nee{else}n.v.t.{/if}
+				{else}{if $concept}n.v.t.{/if}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_is_indigenous">edit</a>
+				<span class="editspan">
+					<select id="presence_is_indigenous" onchange="storedata(this);" >
+						<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
+						<option value="1" {if $presence.is_indigenous=='1'} selected="selected"{/if}>ja</option>
+						<option value="0" {if $presence.is_indigenous=='0'} selected="selected"{/if}>nee</option>
+					</select>
+				</span>
+			</td>
+		</tr>
 
-	<h4>voorkomen</h4>
+		<tr><th>habitat:</th>
+			<td>
+				{if $presence.habitat_id!=''}
+					{$presence.habitat_label}
+				{else}{if $concept}n.v.t.{/if}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_habitat_id">edit</a>
+				<span class="editspan">
+					<select id="presence_habitat_id" onchange="storedata(this);" >
+						<option value="-1" {if $presence.habitat_id==''} selected="selected"{/if}>n.v.t.</option>
+					{foreach from=$habitats item=v}
+						<option value="{$v.id}" {if $v.id==$presence.habitat_id} selected="selected"{/if}>{$v.label}</option>
+					{/foreach}
+					</select>
+				</span>
+			</td>
+		</tr>
 
-	status:
-	{if $presence.presence_id}
-		<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
-	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">edit</a>
-	<span class="editspan">
-		<select id="presence_presence_id" onchange="storedata(this);" >
-		<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
-		{assign var=first value=true}
-		{foreach from=$statuses item=v}
-			{if $v.index_label==99 && $first==true}
-			<option value="" disabled="disabled">&nbsp;</option>
-			{assign var=first value=false}
-			{/if}
-			<option value="{$v.id}" {if $v.id==$presence.presence_id} selected="selected"{/if}>{$v.index_label}. {$v.label}</option>
-		{/foreach}
-		</select>
-	</span>
+		<tr><th>expert:</th>
+			<td>
+				{if $presence.expert_id!=''}
+					{$presence.expert_name}
+				{else}{if $concept}n.v.t.{/if}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);editexpert(this);return false;" rel="presence_expert_id">edit</a>
+				<span class="editspan" id="expert">
+				</span>
+				<input type="hidden" id="presence_expert_id" value="{$presence.expert_id}" />
+			</td>
+		</tr>
 
-<br />
+		<tr><th>organisatie:</th>
+			<td>
+				{if $presence.organisation_id!=''}
+					{$presence.organisation_name}
+				{else}{if $concept}n.v.t.{/if}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);editorganisation(this);return false;" rel="presence_organisation_id">edit</a>
+				<span class="editspan" id="organisation">
+				</span>
+				<input type="hidden" id="presence_organisation_id" value="{$presence.organisation_id}" />
+			</td>
+		</tr>
 
-	endemisch: 
-	{if $presence.presence_id!=''}
-		{if $presence.is_indigenous=='1'}ja{else if $presence.is_indigenous=='0'}nee{else}n.v.t.{/if}
-	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_is_indigenous">edit</a>
-	<span class="editspan">
-		<select id="presence_is_indigenous" onchange="storedata(this);" >
-			<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
-			<option value="1" {if $presence.is_indigenous=='1'} selected="selected"{/if}>ja</option>
-			<option value="0" {if $presence.is_indigenous=='0'} selected="selected"{/if}>nee</option>
-		</select>
-	</span>
-
-<br />
-
-	habitat: 
-	{if $presence.habitat_id!=''}
-		{$presence.habitat_label}
-	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_habitat_id">edit</a>
-	<span class="editspan">
-		<select id="presence_habitat_id" onchange="storedata(this);" >
-			<option value="-1" {if $presence.habitat_id==''} selected="selected"{/if}>n.v.t.</option>
-		{foreach from=$habitats item=v}
-			<option value="{$v.id}" {if $v.id==$presence.habitat_id} selected="selected"{/if}>{$v.label}</option>
-		{/foreach}
-		</select>
-	</span>
-
-<br />
-
-	expert:
-	{if $presence.expert_id!=''}
-		{$presence.expert_name}
-	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);editexpert(this);return false;" rel="presence_expert_id">edit</a>
-	<span class="editspan" id="expert">
-	</span>
-	<input type="hidden" id="presence_expert_id" value="{$presence.expert_id}" />
-
-<br />
-
-	organisatie:
-	{if $presence.organisation_id!=''}
-		{$presence.organisation_name}
-	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);editorganisation(this);return false;" rel="presence_organisation_id">edit</a>
-	<span class="editspan" id="organisation">
-	</span>
-	<input type="hidden" id="presence_organisation_id" value="{$presence.organisation_id}" />
-
-<br />
-
-	publicatie:
-	{if $presence.reference_id!=''}
-		"{$presence.reference_label}"{if $presence.reference_author}, {$presence.reference_author}{/if}{if $presence.reference_date} ({$presence.reference_date}){/if}
-	{else}n.v.t.{/if}
-	<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="presence_reference_id">edit</a>
-	<span class="editspan" id="reference">
-	</span><br />
-	<input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
-
+		<tr><th>publicatie:</th>
+			<td>
+				{if $presence.reference_id!=''}
+					"{$presence.reference_label}"{if $presence.reference_author}, {$presence.reference_author}{/if}{if $presence.reference_date} ({$presence.reference_date}){/if}
+				{else}{if $concept}n.v.t.{/if}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="presence_reference_id">edit</a>
+				<span class="editspan" id="reference">
+				</span><br />
+				<input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
+			</td>
+		</tr>
+		</table>
 </p>
 
 {if $concept}
@@ -195,6 +217,18 @@ $(document).ready(function()
 	});
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
 	//console.dir(values);
+
+	{if !$concept}
+	// if new concept, trigger all edit-clicks
+	$('a.edit').each(function() {
+		$(this).trigger('click'); 
+		$(this).remove(); 
+	} );
+	$('span.editspan').each(function() {
+		$(this).removeClass('editspan'); 
+	} );
+	{/if}
+
 });
 </script>
 
