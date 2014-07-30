@@ -94,6 +94,7 @@ ul {
 			{$parent.label}
 			{/if}
 			{if $parent.commonname}<span class="common">{$parent.commonname}</span>{/if}
+			<span class="editors"><a href="edit.php?id={$parent.id}">{t}edit{/t}</a></span>
 			
 			<span class="childcount">
 				{$peers|@count}
