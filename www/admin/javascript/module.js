@@ -152,7 +152,10 @@ function moduleChangeStatus(id,action,type) {
 
 		}
 
-		if (!allDoubleDeleteConfirm('the module',n)) return;
+		if (!altKeyDown)
+		{
+			if (!allDoubleDeleteConfirm('the module',n)) return;
+		}
 
 	}
 
