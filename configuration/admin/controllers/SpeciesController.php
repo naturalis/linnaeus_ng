@@ -4918,7 +4918,7 @@ if ($_SESSION['admin']['project']['sys_name']=='Nederlands Soortenregister')
 
 	public function branchesAction()
 	{
-		$this->checkAuthorisation();
+		//$this->checkAuthorisation();
 
 		$this->setPageName('Browse taxon tree');
 
