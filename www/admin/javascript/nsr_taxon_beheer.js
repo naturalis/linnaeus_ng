@@ -448,8 +448,8 @@ function partstoname()
 	taxon=taxon.trim();
 	
 	var author=$('#name_authorship').val();
-	str.lastIndexOf(" "); <-- year
-	author=author.replace(/^\(+|\)+$/gm,'');
+//	str.lastIndexOf(" "); <-- year
+//	author=author.replace(/^\(+|\)+$/gm,'');
 	
 	
 /*
