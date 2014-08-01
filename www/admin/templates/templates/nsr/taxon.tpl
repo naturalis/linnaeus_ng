@@ -5,12 +5,8 @@
 <!-- form>
 		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam"/>
 </form -->
-{if $concept}
 <h2>{$concept.taxon}</h2>
 <h3>{$names.preffered_name}</h3>
-{else}
-<h2>nieuw concept</h2>
-{/if}
 
 <form id="data" onsubmit="return false;">
 
@@ -19,35 +15,14 @@
 
 	<table>
 		<tr><th><h4>concept</h4></td><td></td></tr>
-		<tr><th>nsr id:</th><td>{if $concept}{$concept.nsr_id}{else}(auto){/if}</td></tr>
-
-		<tr><th>ouder:</th>
-			<td>
-				{$concept.parent.taxon}
-				<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
-				<span class="editspan" id="parent">
-				</span>
-				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" />
-			</td>
-		</tr>
-
-	{if !$concept}
-		<tr><th>genus:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="" mandatory="mandatory" /> *</td></tr>
-		<tr><th>soort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_specific_epithet" value="" /></td></tr>
-		<tr><th>ondersoort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="" /></td></tr>
-		<tr><th>auteurschap:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" mandatory/> *</td></tr>	
-		<tr><th>auteur:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_authorship" value="" mandatory/> *</td></tr>	
-		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_year_authorship" value="" mandatory/> *</td></tr>	
-	{/if}
-
 		<tr><th>naam:</th>
 			<td>
 				{$concept.taxon}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
 				<span class="editspan" id="taxon">
-				<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" /> *
-				</span>
-				<input type="hidden" id="concept_taxon" value="{$concept.taxon.id}" />
+				<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" />
+				</span> *
+				<input type="hidden" id="concept_taxon_id" value="{$concept.taxon.id}" />
 			</td>
 		</tr>
 		<tr><th>rang:</th>
@@ -60,9 +35,21 @@
 				<option value="{$v.id}" {if $v.id==$concept.rank_id} selected="selected"{/if}>{$v.rank}</option>
 				{/foreach}
 				</select>
-				</span>
+				</span> *
 			</td>
 		</tr>
+		<tr><th>ouder:</th>
+			<td>
+				{$concept.parent.taxon}
+				<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
+				<span class="editspan" id="parent">
+				</span> *
+				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory" />
+			</td>
+		</tr>
+
+		<tr><th>nsr id:</th><td>{if $concept}{$concept.nsr_id}{else}(auto){/if}</td></tr>
+
 
 		<tr><th>&nbsp;</td></tr>
 
@@ -71,11 +58,11 @@
 			<td>
 				{if $presence.presence_id}
 					<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
-				{else}{if $concept}n.v.t.{/if}{/if}
+				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">edit</a>
 				<span class="editspan">
 					<select id="presence_presence_id" onchange="storedata(this);" >
-					<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
+					<option value="-1" {if $presence.presence_id==''} selected="selected"{/if}>n.v.t.</option>
 					{assign var=first value=true}
 					{foreach from=$statuses item=v}
 						{if $v.index_label==99 && $first==true}
@@ -93,7 +80,7 @@
 			<td>
 				{if $presence.presence_id!=''}
 					{if $presence.is_indigenous=='1'}ja{else if $presence.is_indigenous=='0'}nee{else}n.v.t.{/if}
-				{else}{if $concept}n.v.t.{/if}{/if}
+				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_is_indigenous">edit</a>
 				<span class="editspan">
 					<select id="presence_is_indigenous" onchange="storedata(this);" >
@@ -109,7 +96,7 @@
 			<td>
 				{if $presence.habitat_id!=''}
 					{$presence.habitat_label}
-				{else}{if $concept}n.v.t.{/if}{/if}
+				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_habitat_id">edit</a>
 				<span class="editspan">
 					<select id="presence_habitat_id" onchange="storedata(this);" >
@@ -126,7 +113,7 @@
 			<td>
 				{if $presence.expert_id!=''}
 					{$presence.expert_name}
-				{else}{if $concept}n.v.t.{/if}{/if}
+				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);editexpert(this);return false;" rel="presence_expert_id">edit</a>
 				<span class="editspan" id="expert">
 				</span>
@@ -138,7 +125,7 @@
 			<td>
 				{if $presence.organisation_id!=''}
 					{$presence.organisation_name}
-				{else}{if $concept}n.v.t.{/if}{/if}
+				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);editorganisation(this);return false;" rel="presence_organisation_id">edit</a>
 				<span class="editspan" id="organisation">
 				</span>
@@ -150,7 +137,7 @@
 			<td>
 				{if $presence.reference_id!=''}
 					"{$presence.reference_label}"{if $presence.reference_author}, {$presence.reference_author}{/if}{if $presence.reference_date} ({$presence.reference_date}){/if}
-				{else}{if $concept}n.v.t.{/if}{/if}
+				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="presence_reference_id">edit</a>
 				<span class="editspan" id="reference">
 				</span><br />
@@ -191,7 +178,6 @@
 </div>
 
 <div id="dropdown-list">
-	<div id="dropdown-list-close"><a href="#" onclick="closedropdownlist();return false;" />X</a></div>
 	<div id="dropdown-list-content"></div>
 </div>
 
@@ -222,10 +208,10 @@ $(document).ready(function()
 	// if new concept, trigger all edit-clicks
 	$('a.edit').each(function() {
 		$(this).trigger('click'); 
-		$(this).remove(); 
+		//$(this).remove(); 
 	} );
 	$('span.editspan').each(function() {
-		$(this).removeClass('editspan'); 
+		//$(this).removeClass('editspan'); 
 	} );
 	{/if}
 

@@ -1,7 +1,50 @@
+var timerinit={timer:null,ms:0,callbacktimer:null};
+var timer=timerinit;
+
+function timedCount() {
+    timer.ms++;
+    timer.timer=setTimeout(function(){timedCount()}, 1);
+}
+
+function getTimedCount() {
+	return timer.ms;
+}
+
+function startTimedCount() {
+	var c=timer.ms;
+	timer.ms=0;
+	timedCount();
+}
+
+function stopTimedCount() {
+    clearTimeout(timer.timer);
+	timer=timerinit;
+}
+
+function registerCallbackTimer(interval,callback,parameters) {
+	clearCallbackTimer();
+    timer.callbacktimer=setTimeout(function(){callback(parameters)},interval+1);
+}
+
+function clearCallbackTimer() {
+	clearTimeout(timer.callbacktimer);
+}
+
+
 var dataid=null;
-var parentid=null;
+var nameownerid=null;
 var taxonrank=null;
+var inheritablename=null;
 var values=new Array();
+var searchdata=
+	{
+		action: null,
+		search: null,
+		get_all : 0,
+		match_start : 1,
+		max_results: 100,
+		buffer_keys: false
+	};
 
 function checkunsavedvalues()
 {
@@ -14,8 +57,24 @@ function checkunsavedvalues()
 	}
 
 }
-	
+
+
+var keyInterval=50;
+
 function dolookuplist(p) 
+{
+	if (p.buffer_keys) 
+	{
+		registerCallbackTimer(keyInterval,__dolookuplist,p);
+		var t=getTimedCount();
+		startTimedCount();
+		if (t<keyInterval) return;
+		clearCallbackTimer();
+	}
+	__dolookuplist(p);
+}
+
+function __dolookuplist(p) 
 {
 	e=p.e;
 	callback=p.callback;
@@ -61,17 +120,9 @@ function closedropdownlist()
 
 function toggleedit(ele)
 {
-	if (dataid) {
-		var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
-		$(ele).html(mode=='edit' ? 'cancel' : 'edit');
-		$(ele).next().toggle();
-	}
-	else 
-	{
-		$(ele).html('');
-		$(ele).next().toggle(true);
-	}
-	
+	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
+	$(ele).html(mode=='edit' ? 'cancel' : 'edit');
+	$(ele).next().toggle();
 }
 
 function setnewvalue(p)
@@ -114,9 +165,13 @@ function storedata(ele)
 
 function checkmandatory()
 {
+
+	//console.dir(values);
+	
 	for (i in values)
 	{
 		var val=values[i];
+		if (val.name.substr(0,2)=='__') continue;
 		if (
 			val.mandatory && 
 			(
@@ -145,14 +200,17 @@ function savedataform()
 	{
 		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
 	}
-	if (parentid)
+	if (nameownerid)
 	{
-		form.append('<input type="hidden" name="parentid" value="'+parentid+'" />');
+		form.append('<input type="hidden" name="nameownerid" value="'+nameownerid+'" />');
 	}
 
 	for (i in values)
 	{
 		var val=values[i];
+
+		if (val.name.substr(0,2)=='__') continue;
+
 		if ((val.new && val.new!=val.current) || val.delete)
 		{
 			form.append('<input type="hidden" name="'+val.name+'[current]" value="'+val.current+'" />');
@@ -167,9 +225,6 @@ function savedataform()
 	$('body').append(form);
 	form.submit();
 }
-
-
-
 
 function editparent(ele)
 {
@@ -186,18 +241,16 @@ function editparent(ele)
 	{
 		$( '#parent' ).html('<input type="text" id="parent-list-input" value="" placeholder="type to find"/>');
 		$( '#parent-list-input' ).bind('keyup', function(e) { 
+
+			searchdata.action='species_lookup';
+			searchdata.search=$(this).val();
+			searchdata.taxa_only=1;
+			searchdata.formatted=0;
+			searchdata.rank_above=taxonrank;
+		
 			dolookuplist({
 				e:e,
-				data : {
-					'action' : 'species_lookup' ,
-					'search' : $(this).val(),
-					'get_all' : 0,
-					'match_start' : 1,
-					'taxa_only': 1,
-					'max_results': 100,
-					'formatted': 0,
-					'rank_above': taxonrank
-				},
+				data :searchdata,
 				callback: buildparentlist,
 				targetvar: targetvar
 			} )
@@ -212,9 +265,10 @@ function buildparentlist(data)
 	for(var i in data.results)
 	{
 		var t=data.results[i];
+
 		if (t.label && t.id)
 		{
-			buffer.push('<li><a href="#" onclick="setparent(this);closedropdownlist();return false;" id="'+t.id+'">'+t.label+'</a></li>');
+			buffer.push('<li><a href="#" onclick="setparent(this);closedropdownlist();return false;" id="'+t.id+'" inheritable_name="'+t.inheritable_name+'">'+t.label+'</a></li>');
 		}
 	}
 
@@ -227,6 +281,8 @@ function setparent(ele)
 {
 	setnewvalue({name:'parent_taxon_id',value:$(ele).attr('id')});
 	$( '#parent' ).html($(ele).text());
+	inheritablename=$(ele).attr('inheritable_name');
+	partstoname();
 }
 
 
@@ -246,16 +302,14 @@ function editexpert(ele)
 	{
 		$( '#expert' ).html('<input type="text" id="expert-list-input" value="" placeholder="type to find"/>');
 		$( '#expert-list-input' ).bind('keyup', function(e) { 
+		
+			searchdata.action='expert_lookup';
+			searchdata.search=$(this).val();
+		
 			dolookuplist({
 				e:e,
 				minlength: 1,
-				data : {
-					action : 'expert_lookup',
-					search : $(this).val(),
-					get_all : 0,
-					match_start : 1,
-					max_results: 100,
-				},
+				data : searchdata,
 				callback : buildexpertlist,
 				targetvar: targetvar
 			} )
@@ -309,16 +363,14 @@ function editorganisation(ele)
 	{
 		$( '#organisation' ).html('<input type="text" id="organisation-list-input" value="" placeholder="type to find"/>');
 		$( '#organisation-list-input' ).bind('keyup', function(e) { 
+			
+			searchdata.action='expert_lookup' ;
+			searchdata.search=$(this).val();
+		
 			dolookuplist({
 				e:e,
 				minlength: 1,
-				data : {
-					action : 'expert_lookup' ,
-					search : $(this).val(),
-					get_all : 1,
-					match_start : 1,
-					max_results: 100,
-				},
+				data : searchdata,
 				callback: buildorganisationlist ,
 				targetvar: targetvar
 			} );
@@ -372,16 +424,14 @@ function editreference(ele)
 	{
 		$( '#reference' ).html('<input type="text" id="reference-list-input" value="" placeholder="type to find"/>');
 		$( '#reference-list-input' ).bind('keyup', function(e) { 
+		
+			searchdata.action='reference_lookup';
+			searchdata.search=$(this).val();
+		
 			dolookuplist({
 				e:e,
 				minlength: 1,
-				data : {
-					action : 'reference_lookup' ,
-					search : $(this).val(),
-					get_all : 0,
-					match_start : 1,
-					max_results: 100,
-				},
+				data : searchdata,
 				callback: buildreferencelist,
 				targetvar: targetvar 
 			} )
@@ -439,31 +489,65 @@ function deleteform()
 
 function partstoname()
 {
+	
+	if (dataid) return;
+
+	if (inheritablename && $('#name_uninomial').val().length==0 && !$('#name_uninomial').is(":focus"))
+	{
+		if (inheritablename.indexOf(" ")==-1)
+		{
+			$('#name_uninomial').val(inheritablename).trigger('change'); 
+		}
+		else
+		{
+			var d=inheritablename.split(" ");
+			$('#name_uninomial').val(d[0]).trigger('change'); 
+			$('#name_specific_epithet').val(d[1]).trigger('change'); 
+		}
+	}
+	
+	var author=$('#name_authorship').val();
+	author=author.replace(/^\(+|\)+$/gm,'');
+	var year="";
+	var yearstart=author.lastIndexOf(" ");
+	if (yearstart!=-1) {
+		year=author.substr(yearstart);
+		if (isNaN(year))
+		{
+			year="";
+		}
+		else
+		{
+			author=author.substr(0,yearstart).replace(/[,\s]+$/gm,'');
+		}
+	}
+	
+	if (!$('#name_name_author').is(":focus"))
+		$('#name_name_author').val(author).trigger('change'); 
+	if (!$('#name_authorship_year').is(":focus"))
+		$('#name_authorship_year').val(year).trigger('change'); 
 
 	var taxon=
 		$('#name_uninomial').val()+' '+
 		$('#name_specific_epithet').val()+' '+
-		$('#name_infra_specific_epithet').val();
+		$('#name_infra_specific_epithet').val()+' '+
+		$('#name_authorship').val()
+		;
 
 	taxon=taxon.trim();
-	
-	var author=$('#name_authorship').val();
-//	str.lastIndexOf(" "); <-- year
-//	author=author.replace(/^\(+|\)+$/gm,'');
-	
-	
-/*
-	name_authorship
-		<tr><th>auteur:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_authorship" value="" mandatory/> *</td></tr>	
-		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_year_authorship" value="" mandatory/> *</td></tr>	
-*/	
-	$('#name_name_authorship').val(author);
-	$('#concept_taxon').val(taxon);
+
+	$('#concept_taxon').val(taxon).trigger('change'); 
 	
 }
 
 
+$(document).ready(function(){
 
+	$('body').click(function() {
+		closedropdownlist();
+	});
+
+});
 
 
 
