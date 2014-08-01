@@ -192,9 +192,11 @@ class ExportController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Export NSR taxa with content and names'));
-		
+
 		if ($this->rHasVal('action','export'))
 		{
+			
+			$this->smarty->assign('requestData',$this->requestData);
 			
 			set_time_limit(2400); // RIGHT!
 
@@ -207,19 +209,19 @@ $filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
 $forceWriteToFile=true;
 $idsToSuppressInClassification=array(116297); // top of the tree ("life") which is somewhat unofficial
 
-			if ($numberOfRecords!='*')
+			/*
+			if ($numberOfRecords=='?')
 			{
 				// random export for ayco
 				$q=$this->models->Taxon->freeQuery("select rand() as r,id from taxa order by r limit ".$numberOfRecords);
 				$ids=array();
 				foreach($q as $val) array_push($ids,$val['id']);
 			}
+			*/
 			
-			//$ids=array(139498,139499);
-
 			$taxa=$this->models->Taxon->freeQuery("
 				select
-					_t.taxon,
+					_t.taxon as name,
 					_r.rank,
 					_t.id,
 					replace(_rr.nsr_id,'tn.nlsr.concept/','') as nsr_id,
@@ -272,33 +274,53 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 
 				where _t.project_id = ".$this->getCurrentProjectId()."
 
-				".($numberOfRecords!='*' ? "and _t.id in (".implode(',',$ids).")" : "" )."
+				".(isset($ids) ? "and _t.id in (".implode(',',$ids).")" : "" )."
+				".($numberOfRecords!='?' && $numberOfRecords!='*'  ? "limit ".$numberOfRecords : "" )."
 
 			");
+			
 
 			$data=array();
 			$lookuplist=array();
 			
+
+			// get all content
+			$c=$this->models->Taxon->freeQuery("
+				select
+					_x1.id,_x1.taxon_id,_x2.title,_x1.content as text
+				from
+					%PRE%content_taxa _x1
+				left join %PRE%pages_taxa_titles _x2
+					on _x1.project_id=_x2.project_id
+					and  _x1.page_id=_x2.page_id
+				where
+					_x1.project_id =".$this->getCurrentProjectId()
+				);
+				
+			$allpages=array();
+			foreach((array)$c as $val)
+			{
+				if (!isset($allpages[$val['taxon_id']]))
+				{
+					$allpages[$val['taxon_id']]=array();
+				}
+				array_push($allpages[$val['taxon_id']],array('title'=>$val['title'],'text'=>$val['text']));
+			}
+			
+			
+
 			foreach((array)$taxa as $key=>$val)
 			{
 				
-				$lookuplist[$val['id']]=array('taxon'=>$val['taxon'],'rank'=>$val['rank']);
+				$lookuplist[$val['id']]=array('taxon'=>$val['name'],'rank'=>$val['rank']);
+	
 
 				$description=array();
-				$c=$this->models->Taxon->freeQuery("
-					select
-						_x2.title,_x1.content as text
-					from
-						%PRE%content_taxa _x1
-					left join %PRE%pages_taxa_titles _x2
-						on _x1.project_id=_x2.project_id
-						and  _x1.page_id=_x2.page_id
-					where
-						_x1.project_id =".$this->getCurrentProjectId()."
-						and _x1.taxon_id = ". $val['id']
-					);
-				foreach((array)$c as $vdsdvsdfs) $description['page__'.count((array)$description)]=$vdsdvsdfs;
-
+				if (isset($allpages[$val['id']]))
+				{
+					foreach((array)$allpages[$val['id']] as $sdsr) $description['page__'.count((array)$description)]=$sdsr;
+				}
+				
 				$names=array();
 				$c=$this->models->Names->freeQuery("
 					select
@@ -364,6 +386,10 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				$data['taxon__'.count((array)$data)]=$val;
 
 			}
+			
+			$taxonCount=count($taxa);
+			unset($taxa);
+			unset($allpages);
 
 			foreach($data as $key=>$val)
 			{
@@ -394,7 +420,7 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 						);
 						$t=$t[0];
 
-						$this->addError($pId." not in classification lookup list!?");
+						//$this->addError($pId." not in classification lookup list!?");
 
 					}
 					$class['taxon__'.count((array)$class)]=@array('name'=>$t['taxon'],'rank'=>$t['rank']);
@@ -403,25 +429,29 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				$data[$key]['classification']=$class;
 			}
 
-			$data=array('taxa'=>$data);
-
-			if ($recordsPerFile < count((array)$data))
+			if ($recordsPerFile < $taxonCount)
 			{
-				$chunks=array_chunk($data['taxon'],$recordsPerFile);
+				$chunks=array_chunk($data,$recordsPerFile);
 				foreach($chunks as $key=>$chunk)
 				{
+					$d=array();
+					foreach((array)$chunk as $dftgyhj)
+						$d['taxon__'.count((array)$d)]=$dftgyhj;
+					
+					$d=array('taxa'=>$d);
 					$f=sprintf($filename,'-'.str_pad($key,3,"0",STR_PAD_LEFT));
-					$this->exportDataToFile(array('data'=>array('taxon'=>$chunk),'filename'=>$f,'savefolder'=>$exportfolder,'rootelement'=>$rootelement));
+					$this->exportDataToFile(array('data'=>$d,'filename'=>$f,'savefolder'=>$exportfolder,'rootelement'=>$rootelement));
 					$this->addMessage('Wrote '.(count($chunk)).' records to '.$exportfolder.$f);
 				}
 			}
 			else
 			{
+				$d=array('taxa'=>$data);
 				$f=sprintf($filename,'');
 				if ($forceWriteToFile)
 				{
-					$this->exportDataToFile(array('data'=>$data,'filename'=>$f,'savefolder'=>$exportfolder,'rootelement'=>$rootelement));
-					$this->addMessage('Wrote '.$exportfolder.$f);
+					$this->exportDataToFile(array('data'=>$d,'filename'=>$f,'savefolder'=>$exportfolder,'rootelement'=>$rootelement));
+					$this->addMessage('Wrote '.(count($data)).' records to '.$exportfolder.$f);
 				}
 				else
 				{
@@ -1430,7 +1460,6 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 
 	private function exportDataToFile($p)
 	{
-		
 		$data=isset($p['data']) ? $p['data'] : null;
 		$filename=isset($p['filename']) ? $p['filename'] : null;
 		$savefolder=isset($p['savefolder']) ? $p['savefolder'] : null;
@@ -1439,11 +1468,7 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 		$addexportdate=isset($p['addexportdate']) ? $p['addexportdate'] : true;
 
 		$xml=
-			'<?xml version="1.0"?><'.
-				$rootelement.
-				($addexportdate ? ' exportdate="'.date('c').'"' : '' ).
-				' taxoncount="'.count((array)$data).'"'.
-				'></'.$rootelement.'>';
+			'<?xml version="1.0"?><'.$rootelement.($addexportdate ? ' exportdate="'.date('c').'"' : '' ).'></'.$rootelement.'>';
 
 		$simpleXmlObject = new SimpleXMLElement($xml);
 
