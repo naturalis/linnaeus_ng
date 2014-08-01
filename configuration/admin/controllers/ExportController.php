@@ -198,11 +198,14 @@ class ExportController extends Controller
 			
 			set_time_limit(2400); // RIGHT!
 
-$numberOfRecords=5000;
-$recordsPerFile=5000;
-$forceWriteToFile=true;
+$numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRecords') : 500;
+$recordsPerFile=$this->rHasVar('recordsPerFile') ? $this->rGetVal('recordsPerFile') : 10000;
+$exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
+
+$rootelement='nederlands_soortenregister';
 $filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
-$exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whem multiple
+$forceWriteToFile=true;
+$idsToSuppressInClassification=array(116297); // top of the tree ("life") which is somewhat unofficial
 
 			if ($numberOfRecords!='*')
 			{
@@ -212,34 +215,61 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 				foreach($q as $val) array_push($ids,$val['id']);
 			}
 			
-			
+			//$ids=array(139498,139499);
+
 			$taxa=$this->models->Taxon->freeQuery("
 				select
-					_t.id,
-					_t.parent_id,
-					_t.taxon as taxon_concept,
+					_t.taxon,
 					_r.rank,
-					concat(_h.index_label,' ',_h.label) as status_voorkomen,
+					_t.id,
 					replace(_rr.nsr_id,'tn.nlsr.concept/','') as nsr_id,
-					concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url
+					concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
+					concat(_h.index_label,' ',_h.label) as status_status,
+					_l2.label as status_reference_title,
+					_e1.name as status_expert_name,
+					_e2.name as status_organisation_name,
+					_q.parentage as classification
+
 				from
 					%PRE%taxa _t
+
 				left join %PRE%projects_ranks _f
 					on _t.rank_id=_f.id
 					and _t.project_id=_f.project_id
+					
 				left join %PRE%ranks _r
 					on _f.rank_id=_r.id
+					
 				left join %PRE%nsr_ids _rr
 					on _t.id=_rr.lng_id
 					and _rr.item_type='taxon'
 					and _t.project_id=_rr.project_id
+					
 				left join %PRE%presence_taxa _g
 					on _t.id=_g.taxon_id
 					and _t.project_id=_g.project_id
+					
 				left join %PRE%presence_labels _h
 					on _g.presence_id = _h.presence_id 
 					and _g.project_id=_h.project_id 
 					and _h.language_id=".$this->getDefaultProjectLanguage()."
+
+				left join %PRE%literature2 _l2
+					on _g.reference_id = _l2.id 
+					and _g.project_id=_l2.project_id
+
+				left join %PRE%actors _e1
+					on _g.actor_id = _e1.id 
+					and _g.project_id=_e1.project_id
+
+				left join %PRE%actors _e2
+					on _g.actor_org_id = _e2.id 
+					and _g.project_id=_e2.project_id
+
+				left join %PRE%taxon_quick_parentage _q
+					on _t.id=_q.taxon_id
+					and _t.project_id=_q.project_id
+
 				where _t.project_id = ".$this->getCurrentProjectId()."
 
 				".($numberOfRecords!='*' ? "and _t.id in (".implode(',',$ids).")" : "" )."
@@ -247,10 +277,15 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 			");
 
 			$data=array();
+			$lookuplist=array();
+			
 			foreach((array)$taxa as $key=>$val)
 			{
+				
+				$lookuplist[$val['id']]=array('taxon'=>$val['taxon'],'rank'=>$val['rank']);
 
-				$content=$this->models->Taxon->freeQuery("
+				$description=array();
+				$c=$this->models->Taxon->freeQuery("
 					select
 						_x2.title,_x1.content as text
 					from
@@ -262,10 +297,12 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 						_x1.project_id =".$this->getCurrentProjectId()."
 						and _x1.taxon_id = ". $val['id']
 					);
+				foreach((array)$c as $vdsdvsdfs) $description['page__'.count((array)$description)]=$vdsdvsdfs;
 
-				$names=$this->models->Names->freeQuery("
+				$names=array();
+				$c=$this->models->Names->freeQuery("
 					select
-						_a.name,
+						_a.name as fullname,
 						_a.uninomial,
 						_a.specific_epithet,
 						_a.infra_specific_epithet,
@@ -277,20 +314,25 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 						_b.nametype,
 						_e.name as expert_name,
 						_f.name as organisation_name,
-						_g.label as reference_label,
+						_g.label as reference_title,
 						_g.author as reference_author,
 						_g.date as reference_date,
 						_lan.language
+
 					from %PRE%names _a
+
 					left join %PRE%name_types _b 
 						on _a.type_id=_b.id 
 						and _a.project_id = _b.project_id
+
 					left join %PRE%actors _e
 						on _a.expert_id = _e.id 
 						and _a.project_id=_e.project_id
+
 					left join %PRE%actors _f
 						on _a.organisation_id = _f.id 
 						and _a.project_id=_f.project_id
+
 					left join %PRE%literature2 _g
 						on _a.reference_id = _g.id 
 						and _a.project_id=_g.project_id
@@ -302,21 +344,74 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 						_a.project_id = ".$this->getCurrentProjectId()."
 						and _a.taxon_id = ". $val['id']
 				);
-				
-				$val['content']=$content;
-				$val['name']=$names;
-				$data['taxon'][]=$val;
+				foreach((array)$c as $vdsdvsdfs) $names['name__'.count((array)$names)]=$vdsdvsdfs;
+
+				$val['status']=array(
+					'status' => $val['status_status'],
+					'reference_title' => $val['status_reference_title'],
+					'expert_name' => $val['status_expert_name'],
+					'organisation_name' => $val['status_organisation_name']
+				);
+				$val['description']=$description;
+				$val['names']=$names;
+				$val['classification']=explode(' ',$val['classification']);
+
+				unset($val['status_status']);
+				unset($val['status_reference_title']);
+				unset($val['status_expert_name']);
+				unset($val['status_organisation_name']);
+
+				$data['taxon__'.count((array)$data)]=$val;
 
 			}
-			
-			
-			if ($recordsPerFile < count((array)$data['taxon']))
+
+			foreach($data as $key=>$val)
+			{
+				$class=array();
+
+				foreach($val['classification'] as $pId)
+				{
+					if (in_array($pId,$idsToSuppressInClassification)) continue;
+					
+					if (isset($lookuplist[$pId]))
+					{
+						$t=$lookuplist[$pId];
+					}
+					else
+					{
+
+						$t=$this->models->Taxon->freeQuery("
+							select
+								_t.taxon,_r.rank
+							from
+								%PRE%taxa _t
+							left join %PRE%projects_ranks _f
+								on _t.rank_id=_f.id
+								and _t.project_id=_f.project_id
+							left join %PRE%ranks _r
+								on _f.rank_id=_r.id
+							where _t.project_id = ".$this->getCurrentProjectId()." and _t.id=".$pId
+						);
+						$t=$t[0];
+
+						$this->addError($pId." not in classification lookup list!?");
+
+					}
+					$class['taxon__'.count((array)$class)]=@array('name'=>$t['taxon'],'rank'=>$t['rank']);
+				}
+				
+				$data[$key]['classification']=$class;
+			}
+
+			$data=array('taxa'=>$data);
+
+			if ($recordsPerFile < count((array)$data))
 			{
 				$chunks=array_chunk($data['taxon'],$recordsPerFile);
 				foreach($chunks as $key=>$chunk)
 				{
 					$f=sprintf($filename,'-'.str_pad($key,3,"0",STR_PAD_LEFT));
-					$this->exportDataToFile(array('taxon'=>$chunk),$f,$exportfolder);
+					$this->exportDataToFile(array('data'=>array('taxon'=>$chunk),'filename'=>$f,'savefolder'=>$exportfolder,'rootelement'=>$rootelement));
 					$this->addMessage('Wrote '.(count($chunk)).' records to '.$exportfolder.$f);
 				}
 			}
@@ -325,7 +420,7 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 				$f=sprintf($filename,'');
 				if ($forceWriteToFile)
 				{
-					$this->exportDataToFile($data,$f,$exportfolder);
+					$this->exportDataToFile(array('data'=>$data,'filename'=>$f,'savefolder'=>$exportfolder,'rootelement'=>$rootelement));
 					$this->addMessage('Wrote '.$exportfolder.$f);
 				}
 				else
@@ -1287,59 +1382,35 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 	
 	}
 
-	function array_to_xml($array, $level=1) {
-			$xml = '';
-		if ($level==1) {
-			$xml .= '<?xml version="1.0" encoding="ISO-8859-1"?>'.
-					"\n<nederlands_soorten_register>\n";
-		}
-		foreach ($array as $key=>$value) {
-			$key = strtolower($key);
-			if (is_array($value)) {
-				$multi_tags = false;
-				foreach($value as $key2=>$value2) {
-					if (is_array($value2)) {
-						$xml .= str_repeat("\t",$level)."<$key>\n";
-						$xml .= $this->array_to_xml($value2, $level+1);
-						$xml .= str_repeat("\t",$level)."</$key>\n";
-						$multi_tags = true;
-					} else {
-						if (trim($value2)!='') {
-							if (htmlspecialchars($value2)!=$value2) {
-								$xml .= str_repeat("\t",$level).
-										"<$key><![CDATA[$value2]]>".
-										"</$key>\n";
-							} else {
-								$xml .= str_repeat("\t",$level).
-										"<$key>$value2</$key>\n";
-							}
-						}
-						$multi_tags = true;
+
+	private function arrayToXml($data, &$simpleXmlObject)
+	{
+		foreach($data as $key => $value)
+		{
+			if(is_array($value))
+			{
+				if(!is_numeric($key))
+				{
+					if (strpos($key,'__')!==false)
+					{
+						$key=substr($key,0,strpos($key,'__'));
 					}
+					$subnode = $simpleXmlObject->addChild("$key");
+					$this->arrayToXml($value, $subnode);
 				}
-				if (!$multi_tags and count($value)>0) {
-					$xml .= str_repeat("\t",$level)."<$key>\n";
-					$xml .= $this->array_to_xml($value, $level+1);
-					$xml .= str_repeat("\t",$level)."</$key>\n";
-				}
-			} else {
-				if (trim($value)!='') {
-					if (htmlspecialchars($value)!=$value) {
-						$xml .= str_repeat("\t",$level)."<$key>".
-								"<![CDATA[$value]]></$key>\n";
-					} else {
-						$xml .= str_repeat("\t",$level).
-								"<$key>$value</$key>\n";
-					}
+				else
+				{
+					$subnode = $simpleXmlObject->addChild("item$key");
+					$this->arrayToXml($value, $subnode);
 				}
 			}
+			else
+			{
+				$simpleXmlObject->addChild("$key",htmlspecialchars("$value"));
+			}
 		}
-		if ($level==1) {
-			$xml .= "</nederlands_soorten_register>\n";
-		}
-		return $xml;
 	}
-
+	
 	private function exportDataDownload($data,$filename)
 	{
 		//return;
@@ -1350,16 +1421,49 @@ $exportfolder='C:\zooi\\'; // downloads when just one file, writes to folder whe
 
 		//echo '<pre>';
 
-		print $this->array_to_xml($data);
+		print $this->arrayToXml($data);
 		die();
 
 		//echo $this->helpers->ArrayToXml->toXml($data);
 		//die();
 	}
 
-	private function exportDataToFile($data,$filename,$folder)
+	private function exportDataToFile($p)
 	{
-		file_put_contents($folder.$filename,$this->array_to_xml($data));
+		
+		$data=isset($p['data']) ? $p['data'] : null;
+		$filename=isset($p['filename']) ? $p['filename'] : null;
+		$savefolder=isset($p['savefolder']) ? $p['savefolder'] : null;
+		$rootelement=isset($p['rootelement']) ? $p['rootelement'] : 'root';
+		$prettify=isset($p['prettify']) ? $p['prettify'] : true;
+		$addexportdate=isset($p['addexportdate']) ? $p['addexportdate'] : true;
+
+		$xml=
+			'<?xml version="1.0"?><'.
+				$rootelement.
+				($addexportdate ? ' exportdate="'.date('c').'"' : '' ).
+				' taxoncount="'.count((array)$data).'"'.
+				'></'.$rootelement.'>';
+
+		$simpleXmlObject = new SimpleXMLElement($xml);
+
+		$this->arrayToXml($data,$simpleXmlObject);
+		
+		if ($prettify)
+		{
+			$dom = new DOMDocument('1.0');
+			$dom->preserveWhiteSpace = false;
+			$dom->formatOutput = true;
+			$dom->loadXML($simpleXmlObject->asXML());
+			$out=$dom->saveXML();
+		}
+		else
+		{
+			$out=$simpleXmlObject->asXML();
+		}
+		
+		file_put_contents($savefolder.$filename,$out);
+
 	}
 
 }

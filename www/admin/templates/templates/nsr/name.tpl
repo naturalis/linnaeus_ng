@@ -112,7 +112,6 @@
 </div>
 
 <div id="dropdown-list">
-	<div id="dropdown-list-close"><a href="#" onclick="closedropdownlist();return false;" />X</a></div>
 	<div id="dropdown-list-content"></div>
 </div>
 
@@ -123,7 +122,7 @@ $(document).ready(function()
 	{if !$newname}
 	dataid={$name.id};
 	{else}
-	parentid={$concept.id};
+	nameownerid={$concept.id};
 	{/if}
 
 	$('#data :input[type!=button]').each(function(key,value) {

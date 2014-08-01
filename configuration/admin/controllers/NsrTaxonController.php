@@ -48,18 +48,18 @@ class NsrTaxonController extends Controller
 	private $nameId=null;
 	
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->initialize();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
 
-    private function initialize ()
+    private function initialize()
     {
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -71,10 +71,35 @@ class NsrTaxonController extends Controller
 		));
     }
 
+    public function taxonNewAction()
+    {
+		$this->checkAuthorisation();
+
+		if (!$this->rHasId() && $this->rHasVal('action','save'))
+		{
+			$this->saveConcept();
+			if ($this->getConceptId())
+			{
+				$this->saveName();
+				$this->redirect('taxon.php?id='.$this->getConceptId());
+			}		
+		}
+
+		$this->smarty->assign('name_type_id',$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']);
+		$this->smarty->assign('name_language_id',LANGUAGE_ID_SCIENTIFIC);
+		$this->smarty->assign('ranks',$this->newGetProjectRanks());
+		$this->smarty->assign('statuses',$this->getStatuses());
+		$this->smarty->assign('habitats',$this->getHabitats());
+
+		$this->printPage();
+	}
+
     public function taxonAction()
     {
 		$this->checkAuthorisation();
 		
+		if (!$this->rHasId()) $this->redirect('taxon_new.php');
+	
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			//$this->setConceptId($this->rGetId());
@@ -91,12 +116,6 @@ class NsrTaxonController extends Controller
 
 		}
 		else
-		if (!$this->rHasId() && $this->rHasVal('action','save'))
-		{
-			$this->saveConcept();
-			$this->redirect('taxon.php?id='.$this->getConceptId());
-		} 
-		else
 		{
 			$this->setConceptId($this->rGetId());
 		}
@@ -112,12 +131,6 @@ class NsrTaxonController extends Controller
 			$this->smarty->assign('statuses',$this->getStatuses());
 			$this->smarty->assign('habitats',$this->getHabitats());
 
-		}
-		else
-		{
-			$this->smarty->assign('ranks',$this->newGetProjectRanks());
-			$this->smarty->assign('statuses',$this->getStatuses());
-			$this->smarty->assign('habitats',$this->getHabitats());
 		}
 
 		$this->checkMessage();
@@ -147,6 +160,7 @@ class NsrTaxonController extends Controller
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
+			$this->setConceptId($this->rGetVal('nameownerid'));
 			$this->saveName();
 		} 
 		else
@@ -679,6 +693,8 @@ class NsrTaxonController extends Controller
 				select
 					_a.taxon_id as id,
 					_a.name as label,
+					_a.uninomial,
+					_a.specific_epithet,
 					_b.rank_id,
 					_c.rank_id as base_rank_id,
 					_b.taxon as taxon,
@@ -717,6 +733,10 @@ class NsrTaxonController extends Controller
 			select
 				_b.id,
 				_b.taxon as label,
+
+					_a.uninomial,
+					_a.specific_epithet,
+
 				_b.rank_id,
 				_d.rank_id as base_rank_id,
 				_b.taxon as taxon,
@@ -724,6 +744,12 @@ class NsrTaxonController extends Controller
 				_e.rank
 			from
 				%PRE%taxa _b
+
+			left join
+				%PRE%names _a
+					on _a.project_id=_b.project_id
+					and _a.taxon_id=_b.id
+					and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 
 			left join
 				%PRE%projects_ranks _d
@@ -764,8 +790,24 @@ class NsrTaxonController extends Controller
 
 			$taxa[$key]['label']=$taxa[$key]['label'].' ['.$val['rank'].']';
 
+			if ($val['base_rank_id']==GENUS_RANK_ID)
+			{
+				$taxa[$key]['inheritable_name']=$val['uninomial'];
+			}
+			else
+			if ($val['base_rank_id']==SPECIES_RANK_ID)
+			{
+				$taxa[$key]['inheritable_name']=$val['uninomial'].' '.$val['specific_epithet'];
+			}
+			else
+			{
+				$taxa[$key]['inheritable_name']="";
+			}
+
 			unset($taxa[$key]['taxon']);
 			unset($taxa[$key]['source']);
+			unset($taxa[$key]['uninomial']);
+			unset($taxa[$key]['specific_epithet']);
 		}
 
 		return
@@ -909,7 +951,7 @@ class NsrTaxonController extends Controller
 			'rank_id' => trim($rank['new']),
 			'taxon' => trim($name['new']),
 		));
-		
+
 		if ($d)
 		{
 			$this->setConceptId($this->models->Taxon->getNewId());
@@ -1271,23 +1313,20 @@ class NsrTaxonController extends Controller
 
 	private function saveName()
 	{
-
 		$type=$this->rGetVal('name_type_id');
 		$language=$this->rGetVal('name_language_id');
 
 		$d=$this->models->Names->save(
-		array(
-			'project_id' => $this->getCurrentProjectId(),
-			'taxon_id' => $this->rGetVal('parentid'),
-			'language_id' => trim($language['new']),
-			'type_id' => trim($type['new'])
-		));
-		
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $this->getConceptId(),
+				'language_id' => trim($language['new']),
+				'type_id' => trim($type['new'])
+			));
 		
 		if ($d)
 		{
 			$this->setNameId($this->models->Names->getNewId());
-
 			$this->addMessage('Nieuwe naam aangemaakt.');
 			$this->updateName();
 		}
@@ -1295,7 +1334,6 @@ class NsrTaxonController extends Controller
 		{
 			$this->addError('Aanmaak nieuwe naam mislukt.');
 		}
-			
 	}
 
 	private function updateName()

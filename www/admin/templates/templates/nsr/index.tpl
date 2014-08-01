@@ -2,7 +2,7 @@
 <div id="page-main">
 <p>
 	<form>
-		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam"/>
+		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam" autocomplete="off" />
 	</form>
 </p>
 <p>
@@ -11,7 +11,8 @@
 </p>
 <p>
 	taken:<br />
-	<a href="taxon.php">nieuw taxonconcept maken</a>
+	<a href="taxon_new.php">nieuw taxonconcept maken</a><br />
+	<a href="../import/export_nsr.php">export voor NDA</a>
 </p>
 </div>
 

@@ -6,22 +6,15 @@
 <input type="hidden" name="action" value="export" />
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
-{t}Export project data to XML-file.{/t}
+{t}Export taxon data to XML{/t}
 </p>
-<table>
-{foreach from=$modules.modules item=v}
-{if $v.controller!='utilities' && $v.controller!='index' && $v.controller!='highertaxa'}
-<tr>
-	<td><input type="checkbox" name="modules[]" value="{$v.controller}" id="{$v.controller}" checked="checked" /></td>
-	<td><label for="{$v.controller}">{$v.module}</label></td>
-</tr>
-{/if}
-{/foreach}
 
-{foreach from=$modules.freeModules item=v}
-<tr><td><input type="checkbox" name="freeModules[]" value="{$v.id}" id="fm{$v.id}" checked="checked" /></td><td><label for="fm{$v.id}">{$v.module}</label></td></tr>
-{/foreach}
-</table>
+<p>
+aantal: <input type="text" style="width:40px;text-align:right" name="numberOfRecords" value="5000" /> * voor alles; anders willekeurige selectie<br />
+records per bestand: <input type="text" style="width:40px;text-align:right" name="recordsPerFile" value="10000" /><br />
+doelfolder: <input type="text" style="width:250px" name="exportfolder" value="" /><br />
+</p>
+
 <input type="submit" value="{t}export{/t}" />
 
 </form>
