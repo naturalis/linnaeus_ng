@@ -21,7 +21,7 @@
 				<ol>
 					{foreach from=$results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].data item=res}
 					<li style="margin-bottom:5px">
-					<a class="result"href="../species/taxon.php?id={$res.taxon_id}">
+					<a href="../species/nsr_taxon.php?id={$res.taxon_id}">
 					{if $res.label}{$res.label}{else}{$res.matches[0]}{/if}
 					</a>
 					{if $res.predicate=='isPreferredNameOf'}<br />{$res.subject.label}{/if}
@@ -40,15 +40,16 @@
 
 </div>
 
-{literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-{/literal}
+
+	$('title').html('Zoekresultaten - '+$('title').html());
+
 	var n=parseInt($('#resultcount-header').html());
 	$('#resultcount-header').html($('#resultcount-header').html()+' '+(n==1 ? 'resultaat' : 'resultaten'));
-{literal}
+
 });
 </script>
-{/literal}
+
 
 {include file="../shared/footer.tpl"}

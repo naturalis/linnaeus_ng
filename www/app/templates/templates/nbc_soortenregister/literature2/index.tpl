@@ -22,3 +22,12 @@
 </div>
 
 {include file="../shared/footer.tpl"}
+
+
+<script type="text/JavaScript">
+$(document).ready(function(){
+	
+	$('title').html('Literatuur - '+$('title').html());
+
+});
+</script>

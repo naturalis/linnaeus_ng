@@ -76,6 +76,9 @@
 
 <script type="text/JavaScript">
 $(document).ready(function() {
+	
+	$('title').html('{if $names.preffered_name}{$names.preffered_name|@strip_tags|@escape}{else}{$names.nomen|@strip_tags|@escape}{/if} - '+$('title').html());
+	
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 
 	 		opacity: 0.70, 
@@ -107,6 +110,7 @@ $(document).ready(function() {
 	{if $pp_popup}
 	$.prettyPhoto.open('http://images.naturalis.nl/comping/{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
+	
 } );
 </script>
 

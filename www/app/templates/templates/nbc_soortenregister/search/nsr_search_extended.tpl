@@ -151,6 +151,8 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
+
+$('title').html('Uitgebreid zoeken naar soorten - '+$('title').html());
 	
 $('#togglePresenceStatusGevestigd').bind('click',function() {
 	$('input:checkbox[established]').each(function() {

@@ -32,10 +32,6 @@
 	</div>
 </div>
 
-
-
-
-
 		<div>
 			<div>
 				{foreach from=$results.data item=v}
@@ -78,6 +74,9 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
+
+	$('title').html('Recente afbeeldingen - '+$('title').html());
+	
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
 	 		opacity: 0.70, 
