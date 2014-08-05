@@ -38,7 +38,7 @@
 		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship_year" value="" mandatory/> *</td></tr>	
 
 		<tr><th>&nbsp;</td></tr>
-		<tr><th></th><td><i>naam concept</i></th><td></td></tr>
+		<tr><th></th><td><i>concept</i></th><td></td></tr>
 		<tr><th>naam:</th><td>
 			<input type="text" id="concept_taxon" value="" mandatory="mandatory" onchange="$('#name_name').val($(this).val()).trigger('change');" /> *
 			<input type="hidden" id="name_name" value="" mandatory="mandatory" />

@@ -10,7 +10,7 @@
 </p>
 
 <p>
-aantal: <input type="text" style="width:40px;text-align:right" name="numberOfRecords" placeholder="5000" value="{$requestData.numberOfRecords}" /> limit; * voor alles; ? voor een willekeurige selectie<br />
+aantal: <input type="text" style="width:40px;text-align:right" name="numberOfRecords" placeholder="5000" value="{$requestData.numberOfRecords}" /> limit; * voor alles<br />
 records per bestand: <input type="text" style="width:40px;text-align:right" name="recordsPerFile" placeholder="10000" value="{$requestData.recordsPerFile}" /><br />
 doelfolder: <input type="text" style="width:250px" name="exportfolder" placeholder="/tmp/" value="{$requestData.exportfolder}" /><br />
 </p>
