@@ -7,7 +7,7 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 
-	<title>Nederlands Soortenregister - {$session.app.project.title|@strip_tags:false}</title>
+	<title>{$session.app.project.title|@strip_tags:false}</title>
 
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
 

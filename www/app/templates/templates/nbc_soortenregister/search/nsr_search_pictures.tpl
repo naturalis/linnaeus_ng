@@ -117,9 +117,11 @@
 
 </div>
 
-{literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
+	
+	$('title').html('Foto\'s zoeken - '+$('title').html());
+
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
 	 		opacity: 0.70, 
@@ -133,6 +135,6 @@ $(document).ready(function(){
 	bindKeys();
 });
 </script>
-{/literal}
+
 
 {include file="../shared/footer.tpl"}

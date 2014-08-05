@@ -32,3 +32,11 @@
 </div>
 
 {include file="../shared/footer.tpl"}
+
+<script type="text/JavaScript">
+$(document).ready(function(){
+	
+	$('title').html('Overzicht validatoren - '+$('title').html());
+
+});
+</script>

@@ -54,10 +54,12 @@
 
 </div>
 
-{literal}
+
 <script type="text/JavaScript">
 $(document).ready(function(){
-	
+
+	$('title').html('{$ref.label|@strip_tags|@escape} - '+$('title').html());
+
 	$('#presence').remove();
 
 	$('[id^=media-]').each(function(e){
@@ -66,6 +68,7 @@ $(document).ready(function(){
 	
 });
 </script>
-{/literal}
+
 
 {include file="../shared/footer.tpl"}
+

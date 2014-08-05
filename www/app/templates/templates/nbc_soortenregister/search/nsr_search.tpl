@@ -69,3 +69,11 @@
 </div>
 
 {include file="../shared/footer.tpl"}
+
+<script type="text/JavaScript">
+$(document).ready(function(){
+	
+	$('title').html('Zoekresultaten - '+$('title').html());
+
+});
+</script>
