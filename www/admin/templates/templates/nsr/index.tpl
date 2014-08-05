@@ -12,7 +12,7 @@
 <p>
 	taken:<br />
 	<a href="taxon_new.php">nieuw taxonconcept maken</a><br />
-	<a href="../import/export_nsr.php">export voor NDA</a>
+	<!-- a href="../import/export_nsr.php">export voor NDA</a -->
 </p>
 </div>
 
