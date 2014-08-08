@@ -40,7 +40,7 @@
 		</tr>
 		<tr><th>ouder:</th>
 			<td>
-				{$concept.parent.taxon}
+				<a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a>
 				<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
 				<span class="editspan" id="parent">
 				</span> *
@@ -170,9 +170,9 @@
 <p>
 	
 	{if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}&newrank={$smarty.const.SPECIES_RANK_ID}">soort toevoegen aan {$concept.taxon}</a><br />
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}">soort toevoegen aan {$concept.taxon}</a><br />
 	{elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}&newrank={$smarty.const.SUBSPECIES_RANK_ID}">ondersoort toevoegen aan {$concept.taxon}</a><br />
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}">ondersoort toevoegen aan {$concept.taxon}</a><br />
 	{/if}
 
 	<a href="index.php">terug</a>

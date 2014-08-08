@@ -89,7 +89,7 @@ function __dolookuplist(p)
 		data : data,
 		success : function (data)
 		{
-			console.log(data);
+			//console.log(data);
 			callback($.parseJSON(data),targetvar);
 		}
 	});

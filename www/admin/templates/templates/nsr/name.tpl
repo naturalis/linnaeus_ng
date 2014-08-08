@@ -9,13 +9,13 @@
 <form id="data" onsubmit="return false;">
 
 <table>
-	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr>
-	<tr><th>uninomial:</th><td><input class="medium" type="text" id="name_uninomial" value="{$name.uninomial}" /></td></tr>
-	<tr><th>specific epithet:</th><td><input class="medium" type="text" id="name_specific_epithet" value="{$name.specific_epithet}" /></td></tr>
-	<tr><th>infra specific epithet:</th><td><input class="medium" type="text" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td></tr>
-	<tr><th>authorship:</th><td><input class="medium" type="text" id="name_authorship" value="{$name.authorship}" /></td></tr>
-	<tr><th>name author:</th><td><input class="medium" type="text" id="name_name_author" value="{$name.name_author}" /></td></tr>
-	<tr><th>authorship year:</th><td><input class="small" type="text" maxlength="4" id="name_authorship_year" value="{$name.authorship_year}" /></td></tr>
+	<tr><th>volledige naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr>
+	<tr><th>genus:</th><td><input class="medium" type="text" id="name_uninomial" value="{$name.uninomial}" /></td></tr>
+	<tr><th>soort:</th><td><input class="medium" type="text" id="name_specific_epithet" value="{$name.specific_epithet}" /></td></tr>
+	<tr><th>ondersoort:</th><td><input class="medium" type="text" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td></tr>
+	<tr><th>auteurschap:</th><td><input class="medium" type="text" id="name_authorship" value="{$name.authorship}" /></td></tr>
+	<tr><th>auteur:</th><td><input class="medium" type="text" id="name_name_author" value="{$name.name_author}" /></td></tr>
+	<tr><th>jaar:</th><td><input class="small" type="text" maxlength="4" id="name_authorship_year" value="{$name.authorship_year}" /></td></tr>
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>type:</th><td>
 		<select id="name_type_id" mandatory="mandatory">

@@ -1433,6 +1433,9 @@ class Controller extends BaseClass
 		if (!isset($taxon['rank_id'])) // shouldn't happen!
 			 return $taxon['taxon'];
 
+		if (!isset($r[$taxon['rank_id']])) // shouldn't happen!
+			 return $taxon['taxon'];
+
         if (isset($r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
         else

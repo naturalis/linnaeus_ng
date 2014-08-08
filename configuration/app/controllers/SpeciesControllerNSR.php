@@ -250,7 +250,6 @@ class SpeciesControllerNSR extends SpeciesController
 	
 	private function getFirstTaxonIdNsr()
 	{
-
 		$data=$this->models->Taxon->freeQuery("
 			select
 				_a.id,
@@ -260,6 +259,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
+				and _a.taxon <>''
 			order by _a.taxon
 			limit 1"
 		);
