@@ -30,6 +30,7 @@ function clearCallbackTimer() {
 	clearTimeout(timer.callbacktimer);
 }
 
+var keyInterval=50;
 
 var dataid=null;
 var nameownerid=null;
@@ -43,23 +44,9 @@ var searchdata=
 		get_all : 0,
 		match_start : 1,
 		max_results: 100,
-		buffer_keys: false
+		buffer_keys: false,
+		url: "ajax_interface.php"
 	};
-
-function checkunsavedvalues()
-{
-	for(var i in values)
-	{
-		if (values[i].new)
-		{
-			return "Niet alle data is opgelagen!\nPagina toch verlaten?";
-		}
-	}
-
-}
-
-
-var keyInterval=50;
 
 function dolookuplist(p) 
 {
@@ -91,15 +78,18 @@ function __dolookuplist(p)
 	if (data.search.length<minlength)
 		return;
 
+	if (data.url.length==0)
+		return;
+
 	data.time = allGetTimestamp();
 
 	$.ajax({
-		url : "ajax_interface.php",
+		url : data.url,
 		type: "POST",
 		data : data,
 		success : function (data)
 		{
-			//console.log(data);
+			console.log(data);
 			callback($.parseJSON(data),targetvar);
 		}
 	});
@@ -166,8 +156,6 @@ function storedata(ele)
 function checkmandatory()
 {
 
-	//console.dir(values);
-	
 	for (i in values)
 	{
 		var val=values[i];
@@ -180,6 +168,7 @@ function checkmandatory()
 				(val.delete))
 			) 
 		{
+			//console.log(val.name);
 			alert('Vul alle verplichte velden in.');
 			return false;
 		}
@@ -187,9 +176,10 @@ function checkmandatory()
 	return true;
 }
 
-
 function savedataform()
 {
+	//console.dir(values);return;
+	
 	if (!checkmandatory())
 		return;
 	
@@ -220,11 +210,13 @@ function savedataform()
 				form.append('<input type="hidden" name="'+val.name+'[new]" value="'+val.new+'" />');
 		}
 	}
-
+	
 	$(window).unbind('beforeunload');
 	$('body').append(form);
 	form.submit();
 }
+
+
 
 function editparent(ele)
 {
@@ -247,6 +239,7 @@ function editparent(ele)
 			searchdata.taxa_only=1;
 			searchdata.formatted=0;
 			searchdata.rank_above=taxonrank;
+			searchdata.url='ajax_interface.php';
 		
 			dolookuplist({
 				e:e,
@@ -305,6 +298,7 @@ function editexpert(ele)
 		
 			searchdata.action='expert_lookup';
 			searchdata.search=$(this).val();
+			searchdata.url='ajax_interface.php';
 		
 			dolookuplist({
 				e:e,
@@ -366,7 +360,8 @@ function editorganisation(ele)
 			
 			searchdata.action='expert_lookup' ;
 			searchdata.search=$(this).val();
-		
+			searchdata.url='ajax_interface.php';		
+
 			dolookuplist({
 				e:e,
 				minlength: 1,
@@ -427,6 +422,7 @@ function editreference(ele)
 		
 			searchdata.action='reference_lookup';
 			searchdata.search=$(this).val();
+			searchdata.url='../literature2/ajax_interface.php';
 		
 			dolookuplist({
 				e:e,
@@ -453,7 +449,9 @@ function buildreferencelist(data,targetvar)
 		if (t.label && t.id)
 		{
 			buffer.push('<li><a href="#" onclick="setreference(this,\''+targetvar+'\');closedropdownlist();return false;" id="'+t.id+'">'+
-				'"'+t.label+'"'+(t.author ? ", "+t.author : "")+(t.date ? " ("+t.date+")" : "")+
+				(t.author ? t.author+" - " : "")+
+				(t.label)+
+				(t.date ? " ("+t.date+")" : "")+
 			'</a></li>');
 		}
 	}
@@ -506,7 +504,7 @@ function partstoname()
 		}
 	}
 	
-	var author=$('#name_authorship').val();
+	var author=$('#name_authorship').val().trim();
 	author=author.replace(/^\(+|\)+$/gm,'');
 	var year="";
 	var yearstart=author.lastIndexOf(" ");
@@ -518,26 +516,36 @@ function partstoname()
 		}
 		else
 		{
-			author=author.substr(0,yearstart).replace(/[,\s]+$/gm,'');
+			author=author.substr(0,yearstart).replace(/[,\s]+$/gm,'').trim();
 		}
 	}
 	
 	if (!$('#name_name_author').is(":focus"))
-		$('#name_name_author').val(author).trigger('change'); 
+		$('#name_name_author').val(author.trim()).trigger('change'); 
 	if (!$('#name_authorship_year').is(":focus"))
-		$('#name_authorship_year').val(year).trigger('change'); 
+		$('#name_authorship_year').val(year.trim()).trigger('change'); 
 
-	var taxon=
-		$('#name_uninomial').val()+' '+
-		$('#name_specific_epithet').val()+' '+
-		$('#name_infra_specific_epithet').val()+' '+
-		$('#name_authorship').val()
-		;
+	var u=$.trim($('#name_uninomial').val());
+	var s=$.trim($('#name_specific_epithet').val());
+	var i=$.trim($('#name_infra_specific_epithet').val());
+	var a=$.trim($('#name_authorship').val());
 
-	taxon=taxon.trim();
+	var taxon=(u?u+' ':'')+(s?s+' ':'')+(i?i+' ':'')+(a?a:'');
 
-	$('#concept_taxon').val(taxon).trigger('change'); 
+	$('#concept_taxon').val($.trim(taxon)).trigger('change'); 
 	
+}
+
+function checkunsavedvalues()
+{
+	for(var i in values)
+	{
+		if (values[i].new)
+		{
+			return "Niet alle data is opgelagen!\nPagina toch verlaten?";
+		}
+	}
+
 }
 
 
@@ -548,24 +556,5 @@ $(document).ready(function(){
 	});
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

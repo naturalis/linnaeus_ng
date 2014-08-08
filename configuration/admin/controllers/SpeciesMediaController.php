@@ -229,143 +229,230 @@ class SpeciesMediaController extends Controller
         $this->printPage();
     }
 
-    public function remoteImgFileAction()
+
+
+	private function acquireCsvLines()
+	{
+
+		set_time_limit(2400);
+
+		$raw = array();
+
+		if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
+			$i = 0;
+			while (($dummy = fgetcsv($handle)) !== FALSE)
+			{
+				foreach ((array) $dummy as $val)
+				{
+					$raw[$i][] = $val;
+				}
+				$i++;
+			}
+			fclose($handle);
+		}
+		
+		return $raw;
+		
+	}
+
+	private function matchLinesToTaxon($raw)
+	{
+		foreach ((array) $raw as $key => $line)
+		{
+
+			$d = implode('',$line);
+			
+			if (empty($d))
+				continue;
+				
+			foreach((array)$line as $fKey => $fVal)
+			{
+				
+				$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
+				
+				if (empty($fVal))
+					continue;
+					
+				if ($fKey==0)
+				{
+					$tIdOrName=$fVal;
+					$tId = $this->resolveTaxonByIdOrname($tIdOrName);
+					if (empty($tId))
+					{
+						$this->addError(sprintf('Could not resolve taxon "%s".',$tIdOrName));
+						$raw[$key][0]='?';
+					}
+					else
+					{
+						$raw[$key][0]=$tId;
+					}
+				}
+				
+			}
+			
+		}
+		
+		return $raw;
+		
+	}
+
+	private function deletePreviousMedia($p)
+	{
+		$id=isset($p['id']) ? $p['id'] : null;
+		$deleteRemote=isset($p['delete_remote']) ? $p['delete_remote'] : false;
+		$deleteLocal=isset($p['delete_local']) ? $p['delete_local'] : false;
+		
+		if (!isset($id))
+			return;
+
+		if ($deleteRemote)
+		{
+			$this->models->MediaTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id,
+				'file_name like' => 'http://%'
+			));
+	
+			$this->models->MediaTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id,
+				'file_name like' => 'https://%'
+			));
+			
+		}
+
+		if ($deleteLocal)
+		{
+			$this->models->MediaTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id,
+				'file_name not like' => 'http://%'
+			));
+	
+			$this->models->MediaTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id,
+				'file_name not like' => 'https://%'
+			));
+			
+		}
+
+	}
+
+	private function processImageLines($p)
+	{
+		$data=isset($p['data']) ? $p['data'] : null;
+		$deleteRemote=isset($p['delete_remote']) ? $p['delete_remote'] : false;
+		$deleteLocal=isset($p['delete_local']) ? $p['delete_local'] : false;
+		
+		$saved=$failed=0;
+
+		if (!isset($data))
+			return array('saved'=>$saved,'failed'=>$failed);
+
+		$clearedTaxa = array();
+
+		foreach ((array)$data as $key=>$line)
+		{
+			$d = implode('',$line);
+			
+			if (empty($d))
+				continue;
+
+			// name or id wasn't resolved
+			if (!is_numeric($line[0]))
+				continue;
+
+			$tId=$line[0];
+
+			if(($deleteRemote || $deleteLocal) && !isset($clearedTaxa[$tId]))
+			{
+				$this->deletePreviousMedia(array('id'=>$tId,'delete_remote'=>$deleteRemote,'delete_local'=>$deleteLocal));
+				$clearedTaxa[$tId] = true;
+			}
+
+			foreach((array)$line as $fKey => $fVal)
+			{
+				$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
+				
+				if (empty($fVal))
+					continue;
+
+				// potentially multiple images per column separated by ;						
+				$images=array_map('trim',explode(';',$fVal));
+
+				foreach((array)$images as $iKey => $iVal)
+				{
+					if (empty($iVal)) continue;
+					
+					$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
+					$d=pathinfo($iVal);
+					$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : '?';
+
+					$mt = $this->models->MediaTaxon->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $tId, 
+						'file_name' => $iVal, 
+						'original_name' => $iVal, 
+						'mime_type' => $mime, 
+						'file_size' => 0, 
+						'thumb_name' => null, 
+						'sort_order' => $this->getNextMediaSortOrder($tId)
+					));
+						
+					if ($mt)
+						$saved++;
+					else
+						$failed++;
+				
+				}
+				
+			}				
+			
+		}
+		
+		return array('saved'=>$saved,'failed'=>$failed);
+
+	}
+
+    public function remoteImgBatchAction()
     {
         $this->checkAuthorisation();
         
-        $this->setPageName($this->translate('Remote image file file upload'));
+        $this->setPageName($this->translate('Remote image batch upload'));
         
-        if ($this->requestDataFiles && !$this->isFormResubmit()) {
-			
-			set_time_limit(2400);
+        if ($this->requestDataFiles && !$this->isFormResubmit())
+		{
+			$saved=$failed=0;
 
-			$raw = array();
+			$data=$this->acquireCsvLines();
+			$data=$this->matchLinesToTaxon($data);
+			$result=$this->processImageLines(array('data'=>$tId,'delete_remote'=>$this->rHasVal('del_existing','1')));
 
-			$saved = $failed = $odd = $skipped = 0;
-	
-			if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
-				$i = 0;
-				while (($dummy = fgetcsv($handle)) !== FALSE) {
-					foreach ((array) $dummy as $val) {
-						$raw[$i][] = $val;
-					}
-					$i++;
-				}
-				fclose($handle);
-			}
+			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
 
-			$clearedTaxa = array();
-
-			foreach ((array) $raw as $key => $line) {
-				
-				$d = implode('',$line);
-				
-				if (empty($d))
-					continue;
-					
-				foreach((array)$line as $fKey => $fVal) {
-					
-					$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
-					
-					if (empty($fVal))
-						continue;
-						
-					if ($fKey==0) {
-
-						$tIdOrName=$fVal;
-						$tId = $this->resolveTaxonByIdOrname($tIdOrName);
-
-					} else {
-
-						if (empty($tId)) {
-							
-							if (empty($tId))
-								$this->addError(sprintf('Could not resolve taxon "%s".',$tIdOrName));
-							$skipped++;
-							continue;
-						}
-
-						if($this->rHasVal('del_existing','1') && !isset($clearedTaxa[$tId])) {
-
-							$this->models->MediaTaxon->delete(array(
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId,
-								'file_name like' => 'http://%'
-							));
-
-							$this->models->MediaTaxon->delete(array(
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId,
-								'file_name like' => 'https://%'
-							));
-							
-							$clearedTaxa[$tId] = true;
-							
-						}
-						
-						$images=array_map('trim',explode(';',$fVal));
-
-						foreach((array)$images as $iKey => $iVal) {
-							
-							if (empty($iVal)) continue;
-							
-							$mime=null;
-							
-							/*
-							$headers = get_headers($iVal);
-							
-							if ($headers!==false) {
-								foreach((array)$headers as $hVal) {
-									if (stripos($hVal,'Content-Type:')!==false)
-										$mime=trim(str_ireplace('Content-Type:','',$hVal));
-								}
-							}
-							
-							*/
-
-							if ($mime==null) {
-								$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
-								$d=pathinfo($iVal);
-								$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : '?';
-								//$odd++;
-							}
-
-
-							$mt = $this->models->MediaTaxon->save(
-							array(
-								'id' => null, 
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId, 
-								'file_name' => $iVal, 
-								'original_name' => $iVal, 
-								'mime_type' => $mime, 
-								'file_size' => 0, 
-								'thumb_name' => null, 
-								'sort_order' => $this->getNextMediaSortOrder($tId)
-							));
-							
-							if ($mt)
-								$saved++;
-							else
-								$failed++;
-							
-						}
-						
-					}
-					
-				}
-				
-            }
-			
-			$this->addMessage(sprintf('Saved %s images, skipped %s line, failed %s image.',$saved,$skipped,$failed));
-
-			if ($skipped)
-				$this->addMessage('Skipped lines are due to missing or incorrect taxon id.');
 			if ($failed)
 				$this->addMessage('Failed pages are due to botched inserts.');
-			if ($odd>0)
-				$this->addError(sprintf('%s images could not be resolved, but were saved anyway.',$odd));
+        }
+       
+        $this->printPage();
+    }
 
+    public function localImgBatchAction()
+    {
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Local image batch upload'));
+        
+        if ($this->requestDataFiles && !$this->isFormResubmit())
+		{
+			$saved=$failed=0;
+			$data=$this->acquireCsvLines();
+			$data=$this->matchLinesToTaxon($data);
+			$result=$this->processImageLines(array('data'=>$tId,'delete_local'=>$this->rHasVal('del_existing','1')));
+			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
         }
        
         $this->printPage();

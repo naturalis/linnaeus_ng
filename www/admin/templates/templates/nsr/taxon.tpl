@@ -76,7 +76,7 @@
 			</td>
 		</tr>
 
-		<tr><th>endemisch:</th>
+		{*<!-- tr><th>inheems:</th>
 			<td>
 				{if $presence.presence_id!=''}
 					{if $presence.is_indigenous=='1'}ja{else if $presence.is_indigenous=='0'}nee{else}n.v.t.{/if}
@@ -90,7 +90,7 @@
 					</select>
 				</span>
 			</td>
-		</tr>
+		</tr -->*}
 
 		<tr><th>habitat:</th>
 			<td>
@@ -168,6 +168,13 @@
 </form>
 
 <p>
+	
+	{if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$smarty.const.SPECIES_RANK_ID}">soort toevoegen aan {$concept.taxon}</a><br />
+	{elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$smarty.const.SUBSPECIES_RANK_ID}">ondersoort toevoegen aan {$concept.taxon}</a><br />
+	{/if}
+
 	<a href="index.php">terug</a>
 </p>
 

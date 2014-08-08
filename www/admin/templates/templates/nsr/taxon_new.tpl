@@ -6,26 +6,25 @@
 
 <form id="data" onsubmit="return false;">
 <p>
-	
 
 	<table>
 		<tr><th><h4>concept</h4></td><td></td></tr>
 
 		<tr><th>rang:</th>
-			<td>
+			<td>{$newrank}
 				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach} 
 				<select id="concept_rank_id" onchange="storedata(this);" mandatory="mandatory" >
 				<option value=""></option>
 				{foreach from=$ranks item=v}
-				<option value="{$v.id}">{$v.rank}</option>
+				<option value="{$v.id}" {if $newrank && $v.rank_id==$newrank} selected="selected"{/if}>{$v.rank}</option>
 				{/foreach}
 				</select> *
 			</td>
 		</tr>
 		<tr><th>ouder:</th>
 			<td>
-				<span id="parent"></span> <input type="text" class="medium" id="__parent_list_input" value="" /> *
-				<input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" />
+				<span id="parent">{$parent.label}</span> <input type="text" class="medium" id="__parent_list_input" value="" /> *
+				<input type="hidden" id="parent_taxon_id" value="{$parent.id}" mandatory="mandatory" />
 			</td>
 		</tr>
 		<tr><th>&nbsp;</td></tr>
@@ -33,20 +32,23 @@
 		<tr><th>genus:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="" mandatory="mandatory" /> *</td></tr>
 		<tr><th>soort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_specific_epithet" value="" /></td></tr>
 		<tr><th>ondersoort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="" /></td></tr>
-		<tr><th>auteurschap:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" mandatory/> *</td></tr>	
-		<tr><th>auteur:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_author" value="" mandatory/> *</td></tr>	
-		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship_year" value="" mandatory/> *</td></tr>	
+		<tr><th>auteurschap:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" mandatory="mandatory"/> *</td></tr>	
+		<tr><th>auteur:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_author" value="" mandatory="mandatory" disabled="disabled"/></td></tr>	
+		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="small" id="name_authorship_year" value="" mandatory="mandatory" disabled="disabled"/></td></tr>	
 
 		<tr><th>&nbsp;</td></tr>
 		<tr><th></th><td><i>concept</i></th><td></td></tr>
 		<tr><th>naam:</th><td>
-			<input type="text" id="concept_taxon" value="" mandatory="mandatory" onchange="$('#name_name').val($(this).val()).trigger('change');" /> *
+			<input type="text" id="concept_taxon" value="" mandatory="mandatory" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" />
 			<input type="hidden" id="name_name" value="" mandatory="mandatory" />
 		</td></tr>
-
-
 		<tr><th>nsr id:</th><td>(wordt automatisch gegenereerd)</td></tr>
 
+		<tr><th>&nbsp;</td></tr>
+		<tr><th></th><td><i>nederlandse naam</i></th><td></td></tr>
+		<tr><th>naam:</th><td>
+			<input type="text" id="dutch_name" value="" onchange="" />
+		</td></tr>
 
 		<tr><th>&nbsp;</td></tr>
 
@@ -67,7 +69,7 @@
 			</td>
 		</tr>
 
-		<tr><th>endemisch:</th>
+		{*<!-- tr><th>inheems:</th>
 			<td>
 				<select id="presence_is_indigenous" onchange="storedata(this);" >
 					<option value="-1">n.v.t.</option>
@@ -75,7 +77,7 @@
 					<option value="0">nee</option>
 				</select>
 			</td>
-		</tr>
+		</tr -->*}
 
 		<tr><th>habitat:</th>
 			<td>
@@ -146,26 +148,35 @@ $(document).ready(function()
 		searchdata.formatted=0;
 		searchdata.rank_above=taxonrank;
 		searchdata.buffer_keys=true;
+		searchdata.url='ajax_interface.php';
 		dolookuplist({ e:e,data:searchdata,callback:buildparentlist,targetvar:'parent_taxon_id'} )
 	} );
 	$( '#__expert_list_input' ).bind('keyup', function(e) {
 		searchdata.action='expert_lookup';
 		searchdata.search=$(this).val();
 		searchdata.buffer_keys=false;
+		searchdata.url='ajax_interface.php';
 		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildexpertlist,targetvar:'presence_expert_id' } )
 	} );
 	$( '#__organisation_list_input' ).bind('keyup', function(e) {
 		searchdata.action='expert_lookup';
 		searchdata.search=$(this).val();
 		searchdata.buffer_keys=false;
+		searchdata.url='ajax_interface.php';
 		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildorganisationlist,targetvar:'presence_organisation_id' } )
 	} );
 	$( '#__reference_list_input' ).bind('keyup', function(e) {
 		searchdata.action='reference_lookup';
 		searchdata.search=$(this).val();
 		searchdata.buffer_keys=false;
+		searchdata.url='../literature2/ajax_interface.php';
 		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildreferencelist,targetvar:'presence_reference_id' } )
 	} );
+	
+	{if $parent}
+	inheritablename='{$parent.inheritable_name|@escape}';
+	partstoname();
+	{/if}
 
 
 });
