@@ -12,6 +12,8 @@
 <p>
 	taken:<br />
 	<a href="taxon_new.php">nieuw taxonconcept maken</a><br />
+	<a href="actor_index.php">beheer experts & organisaties</a><br />
+	<a href="../literature2/index.php">beheer literatuur</a><br />
 	<!-- a href="../import/export_nsr.php">export voor NDA</a -->
 </p>
 </div>

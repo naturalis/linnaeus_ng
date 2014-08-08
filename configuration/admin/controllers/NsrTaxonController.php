@@ -9,6 +9,18 @@
 			unset($data['id']);
 			unset($data['action']);
 			$this->smarty->assign('data',$data);
+
+
+	notes:
+
+	augustus 2014
+	'endemisch' veranderd naar 'inheems', en vervolgens verwijderd, op
+	verzoek van roy kleukers en ed colijn. het veld is een overblijfsel
+	van een uiteindelijk niet geïmplementeerde aanpasing door trezorix.
+	(betreft invoerveld in taxon en taxon_new, plus de verwerking van de
+	waarde in updateConcept() -> updateConceptIsIndigeous())
+	
+
 */
 
 include_once ('Controller.php');
@@ -73,16 +85,31 @@ class NsrTaxonController extends Controller
 
     public function taxonNewAction()
     {
+
 		$this->checkAuthorisation();
 
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->saveConcept();
+
 			if ($this->getConceptId())
 			{
 				$this->saveName();
+				$this->saveDutchName();
 				$this->redirect('taxon.php?id='.$this->getConceptId());
 			}		
+		}
+
+		if ($this->rHasVal('parent'))
+		{
+			$parent=$this->getSpeciesList(array('id'=>$this->rGetVal('parent')));
+			if (isset($parent[0]))
+				$this->smarty->assign('parent',$parent[0]);
+		}
+
+		if ($this->rHasVal('newrank'))
+		{
+			$this->smarty->assign('newrank',$this->rGetVal('newrank'));
 		}
 
 		$this->smarty->assign('name_type_id',$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']);
@@ -136,7 +163,6 @@ class NsrTaxonController extends Controller
 		$this->checkMessage();
 		$this->printPage();
     }
-
 
     public function nameAction()
     {
@@ -215,11 +241,6 @@ class NsrTaxonController extends Controller
             $return=$this->getExpertsLookupList($this->requestData);
         } 
 		else
-		if ($this->rHasVal('action', 'reference_lookup'))
-		{
-            $return=$this->getReferenceLookupList($this->requestData);
-        } 
-		else
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
 			$return=json_encode($this->getTreeNode($this->requestData));
@@ -252,7 +273,7 @@ class NsrTaxonController extends Controller
 
 	private function getConceptId()
 	{
-		return $this->conceptId;
+		return isset($this->conceptId) ? $this->conceptId : false;
 	}
 
 	private function setNameId($id)
@@ -475,7 +496,6 @@ class NsrTaxonController extends Controller
 	{
 		$data=$this->models->PresenceTaxa->freeQuery(
 			"select
-				_a.is_indigenous,
 				_a.presence_id,
 				_a.presence82_id,
 				_a.reference_id,
@@ -670,7 +690,7 @@ class NsrTaxonController extends Controller
 
 
 
-    private function getSpeciesLookupList($p)
+    private function getSpeciesList($p)
     {
         $search=isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
@@ -681,9 +701,10 @@ class NsrTaxonController extends Controller
         $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
         $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
         $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
+        $id=isset($p['id']) ? (int)$p['id'] : null;
 
         //if (empty($search) && !$getAll)
-        if (empty($search)) return;
+        if (empty($search) && empty($id)) return;
 
         $taxa = $this->models->Taxon->freeQuery("
 			select * from
@@ -768,12 +789,12 @@ class NsrTaxonController extends Controller
 			where 1
 			".($rankAbove ? "and base_rank_id < ".$rankAbove : "")."
 			".($rankEqualAbove ? "and base_rank_id <= ".$rankEqualAbove : "")."
-
+			".($id ? "and id = ".$id : "")."
 			order by base_rank_id, label
 			limit ".$maxResults
 		);
 
-        foreach ((array) $taxa as $key => $val)
+		foreach ((array) $taxa as $key => $val)
 		{
 			if ($val['source']=='taxa')
 			{
@@ -809,6 +830,16 @@ class NsrTaxonController extends Controller
 			unset($taxa[$key]['uninomial']);
 			unset($taxa[$key]['specific_epithet']);
 		}
+		
+		return $taxa;
+		
+	}
+
+    private function getSpeciesLookupList($p)
+    {
+		$taxa=$this->getSpeciesList($p);
+		
+		$maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
 
 		return
 			$this->makeLookupList(
@@ -872,86 +903,31 @@ class NsrTaxonController extends Controller
 
     }
 
-    private function getReferenceLookupList($p)
-    {
-        $search=isset($p['search']) ? $p['search'] : null;
-        $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        //$getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
-        $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
-
-        //if (empty($search) && !$getAll)
-        if (empty($search))
-            return;
-
-		$data=$this->models->Literature2->freeQuery(
-			"select
-				_a.id,
-				_a.language_id,
-				_a.label,
-				_a.date,
-				ifnull(_a.author,ifnull(_e.name,'-')) as author,
-				_a.publication_type,
-				_a.citation,
-				_a.source,
-				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
-				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
-				_a.pages,
-				_a.volume,
-				_a.external_link
-				
-			from %PRE%literature2 _a
-
-			left join %PRE%actors _e
-				on _a.actor_id = _e.id 
-				and _a.project_id=_e.project_id
-
-			left join  %PRE%literature2 _h
-				on _a.publishedin_id = _h.id 
-				and _a.project_id=_h.project_id
-
-			left join %PRE%literature2 _i 
-				on _a.periodical_id = _i.id 
-				and _a.project_id=_i.project_id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and (
-					_a.label like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
-					_a.author like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
-					_e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-				)
-
-			order by
-				_a.label
-		");	
-
-		return
-			$this->makeLookupList(
-				$data,
-				'reference',
-				'reference.php?id=%s',
-				false,
-				true,
-				count($data)<$maxResults
-			);
-
-    }
-
 
 
 	private function saveConcept()
 	{
 		$name=$this->rGetVal('concept_taxon');
 		$rank=$this->rGetVal('concept_rank_id');
+		$name=trim($name['new']);
+		$rank=trim($rank['new']);
+					
+		if (empty($name) || empty($rank))
+		{
+			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
+			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		}
 
 		$d=$this->models->Taxon->save(
 		array(
 			'project_id' => $this->getCurrentProjectId(),
 			'is_empty' =>'0',
-			'rank_id' => trim($rank['new']),
-			'taxon' => trim($name['new']),
+			'rank_id' => $rank,
+			'taxon' => $name,
 		));
-
+		
 		if ($d)
 		{
 			$this->setConceptId($this->models->Taxon->getNewId());
@@ -1018,6 +994,8 @@ class NsrTaxonController extends Controller
 			}
 		}
 
+		/*
+		// removed: obsolete field from trezorix data export
 		if ($this->rHasVar('presence_is_indigenous'))
 		{
 			if ($this->updateConceptIsIndigeous($this->rGetVal('presence_is_indigenous')))
@@ -1029,6 +1007,7 @@ class NsrTaxonController extends Controller
 				$this->addError('Status endemisch niet opgeslagen.');
 			}
 		}
+		*/
 
 		if ($this->rHasVar('presence_habitat_id'))
 		{
@@ -1134,6 +1113,7 @@ class NsrTaxonController extends Controller
 		);
 	}
 
+	/*
 	private function updateConceptIsIndigeous($values)
 	{
 		return $this->models->PresenceTaxa->update(
@@ -1141,6 +1121,7 @@ class NsrTaxonController extends Controller
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
+	*/
 
 	private function updateConceptHabitatId($values)
 	{
@@ -1311,6 +1292,7 @@ class NsrTaxonController extends Controller
 
 	}
 
+
 	private function saveName()
 	{
 		$type=$this->rGetVal('name_type_id');
@@ -1333,6 +1315,32 @@ class NsrTaxonController extends Controller
 		else 
 		{
 			$this->addError('Aanmaak nieuwe naam mislukt.');
+		}
+	}
+
+	private function saveDutchName()
+	{
+		$name=$this->rGetVal('dutch_name');
+
+		if (!isset($name['new'])) return;
+
+		$d=$this->models->Names->save(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $this->getConceptId(),
+				'language_id' => LANGUAGECODE_DUTCH,
+				'type_id' => $this->_nameTypeIds[PREDICATE_PREFERRED_NAME],
+				'name' => trim($name['new'])
+			));
+		
+		if ($d)
+		{
+			$this->setNameId($this->models->Names->getNewId());
+			$this->addMessage('Nederlandse naam aangemaakt.');
+		}
+		else 
+		{
+			$this->addError('Aanmaak Nederlandse naam mislukt.');
 		}
 	}
 
@@ -1499,7 +1507,6 @@ class NsrTaxonController extends Controller
 
 	private function updateNameName($values)
 	{
-		// to delete, call deleteName()
 		return $this->models->Names->update(
 			array('name'=>trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())

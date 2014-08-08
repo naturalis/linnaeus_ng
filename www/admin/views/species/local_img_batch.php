@@ -4,5 +4,5 @@ require_once ('../../../../configuration/admin/controllers/SpeciesMediaControlle
 
 $c = new SpeciesMediaController();
 
-$c->remoteImgFileAction();
+$c->localImgBatchAction();
 

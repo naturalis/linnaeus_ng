@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 <script>
 
-function literature2_lookup_list(caller,action,letter) 
+function literature2LookupList(caller,action,letter) 
 {
 	if (!letter)
 	{
@@ -16,17 +16,29 @@ function literature2_lookup_list(caller,action,letter)
 	
 	$('#result-list-screen').html('');
 	$('#result-count').html('');
+	
+	data={
+		'action' : 'reference_lookup' ,
+		'time' : allGetTimestamp()
+	};
+
+	if (action=='lookup_title' || action=='lookup_title_letter')
+		data.search_title=text;
+
+	if (action=='lookup_author' || action=='lookup_author_letter')
+		data.search_author=text;
+
+	if (action=='lookup_title_letter' || action=='lookup_author_letter')
+		data.match_start='1';
+
 
 	$.ajax({
 		url : "ajax_interface.php",
 		type: "POST",
-		data : ({
-			'action' : action ,
-			'search' : text,
-			'time' : allGetTimestamp()
-		}),
+		data : data,
 		success : function (data)
 		{
+			//console.log(data);
 			if (data) build_list(caller,$.parseJSON(data));
 		}
 	});
@@ -37,14 +49,14 @@ function build_list(caller,data)
 {
 	var buffer=Array();
 	
-	$('#result-count').html('Found '+data.results.length);
+	//$('#result-count').html('Found '+data.results.length);
 
 	for(var i in data.results)
 	{
 		var t=data.results[i];
 		if (!t.id)
 			continue;
-		buffer.push('<li><a href="edit.php?id='+t.id+'">'+t.label+'</a></li>');
+		buffer.push('<li><a href="edit.php?id='+t.id+'">'+t.author+' - '+t.label+'</a></li>');
 	}
 
 	$('#result-list-screen').html('<ul>'+buffer.join('')+'</ul>');
@@ -52,33 +64,50 @@ function build_list(caller,data)
 }
 
 </script>
+<style>
+
+li {
+	white-space:nowrap;
+	overflow:hidden;
+	list-style:none;
+	margin-left:-36px;
+	list-style-position:outside;
+}
+
+.click-letter {
+	padding:0 2px 0 2px;
+}
+
+</style>
 <div id="page-main">
 	<table class="alphabet">
 		<tr>
 			<td>
-				Find by title:
+				Zoek op titel:
+			</td>
+			<td>
+				<input type="text" name="" id="lookup-input-title" onkeyup="literature2LookupList(this,'lookup_title');" />
+				
 			</td>
 			<td>
 				{foreach from=$titleAlphabet item=v}
-				<a href="#" onclick="literature2_lookup_list(this,'lookup_title_letter','{$v.letter}');">{$v.letter}</a>
+				<a href="#" class="click-letter" onclick="literature2LookupList(this,'lookup_title_letter','{$v.letter}');">{$v.letter|@strtoupper}</a>
 				{/foreach}
-			</td>
-			<td>
-				<input type="text" name="" id="lookup-input-title" onkeyup="literature2_lookup_list(this,'lookup_title');" />
-				
 			</td>
 		</tr>
 		<tr>
 			<td>
-				Find by author:
+				Zoek op auteur:
+			</td>
+			<td>
+				<input type="text" name="" id="lookup-input-author" onkeyup="literature2LookupList(this,'lookup_author');" />
 			</td>
 			<td>
 				{foreach from=$authorAlphabet item=v}
-				<a href="#" onclick="literature2_lookup_list(this,'lookup_author_letter','{$v.letter}');">{$v.letter}</a>
+				{if $v.letter}
+				<a href="#" class="click-letter" onclick="literature2LookupList(this,'lookup_author_letter','{$v.letter}');">{$v.letter|@strtoupper}</a>
+				{/if}
 				{/foreach}
-			</td>
-			<td>
-				<input type="text" name="" id="lookup-input-author" onkeyup="literature2_lookup_list(this,'lookup_author');" />
 			</td>
 		</tr>
 	</table>
