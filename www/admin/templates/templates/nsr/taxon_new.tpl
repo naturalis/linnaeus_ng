@@ -8,23 +8,22 @@
 <p>
 
 	<table>
-		<tr><th><h4>concept</h4></td><td></td></tr>
-
+		<tr><th></th><td><i>taxonomie</i></th><td></td></tr>
 		<tr><th>rang:</th>
-			<td>{$newrank}
+			<td>
 				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach} 
 				<select id="concept_rank_id" onchange="storedata(this);" mandatory="mandatory" >
 				<option value=""></option>
 				{foreach from=$ranks item=v}
-				<option value="{$v.id}" {if $newrank && $v.rank_id==$newrank} selected="selected"{/if}>{$v.rank}</option>
+				<option value="{$v.id}" {if $newrank && $v.id==$newrank} selected="selected"{/if}>{$v.rank}</option>
 				{/foreach}
 				</select> *
 			</td>
 		</tr>
 		<tr><th>ouder:</th>
 			<td>
-				<span id="parent">{$parent.label}</span> <input type="text" class="medium" id="__parent_list_input" value="" /> *
-				<input type="hidden" id="parent_taxon_id" value="{$parent.id}" mandatory="mandatory" />
+				<span id="parent">{$parent.taxon}</span> <input type="text" class="medium" id="__parent_list_input" value="" /> *
+				<input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" />
 			</td>
 		</tr>
 		<tr><th>&nbsp;</td></tr>
@@ -49,10 +48,36 @@
 		<tr><th>naam:</th><td>
 			<input type="text" id="dutch_name" value="" onchange="" />
 		</td></tr>
+		<tr><th>expert:</th>
+			<td>
+				<!-- span id="dutch_name_expert"></span> <input type="text" class="medium" id="__expert_list_input_dutch" value="" />
+				<input type="hidden" id="dutch_name_expert_id" value="" / -->
+				(coming soon)
+			</td>
+		</tr>
+
+		<tr><th>organisatie:</th>
+			<td>
+				<!-- span id="dutch_name_organisation"></span> <input type="text" class="medium" id="__organisation_list_input_dutch" value="" />
+				<input type="hidden" id="dutch_name_organisation_id" value="" / -->
+				(coming soon)
+			</td>
+		</tr>
+
+		<tr><th>publicatie:</th>
+			<td>
+				<!-- span id="dutch_name_reference"></span> <input type="text" class="medium" id="__reference_list_input_dutch" value="" />
+				<input type="hidden" id="dutch_name_reference_id" value="" / -->
+				(coming soon)
+			</td>
+		</tr>
+
+
+
 
 		<tr><th>&nbsp;</td></tr>
 
-		<tr><th><h4>voorkomen</h4></td><td></td></tr>
+		<tr><th></th><td><i>voorkomen</i></th><td></td></tr>
 		<tr><th>status:</th>
 			<td>
 				<select id="presence_presence_id" onchange="storedata(this);" >
@@ -134,7 +159,22 @@ $(document).ready(function()
 	allLookupNavigateOverrideUrl('taxon.php?id=%s');
 
 	$('#data :input[type!=button]').each(function(key,value) {
-		values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
+		var set={ name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' };
+		{if $parent}
+		if ($(this).attr('id')=='parent_taxon_id')
+		{
+			set.current=-1;
+			set.new={$parent.id};
+		}
+		{/if}
+		{if $newrank}
+		if ($(this).attr('id')=='concept_rank_id')
+		{
+			set.current=-1;
+			set.new={$newrank};
+		}
+		{/if}
+		values.push( set );
 		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
 
@@ -172,6 +212,31 @@ $(document).ready(function()
 		searchdata.url='../literature2/ajax_interface.php';
 		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildreferencelist,targetvar:'presence_reference_id' } )
 	} );
+	
+	/*
+	$( '#__expert_list_input_dutch' ).bind('keyup', function(e) {
+		searchdata.action='expert_lookup';
+		searchdata.search=$(this).val();
+		searchdata.buffer_keys=false;
+		searchdata.url='ajax_interface.php';
+		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildexpertlist,targetvar:'presence_expert_id' } )
+	} );
+	$( '#__organisation_list_input_dutch' ).bind('keyup', function(e) {
+		searchdata.action='expert_lookup';
+		searchdata.search=$(this).val();
+		searchdata.buffer_keys=false;
+		searchdata.url='ajax_interface.php';
+		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildorganisationlist,targetvar:'presence_organisation_id' } )
+	} );
+	$( '#__reference_list_input_dutch' ).bind('keyup', function(e) {
+		searchdata.action='reference_lookup';
+		searchdata.search=$(this).val();
+		searchdata.buffer_keys=false;
+		searchdata.url='../literature2/ajax_interface.php';
+		dolookuplist({ e:e,minlength:1,data:searchdata,callback:buildreferencelist,targetvar:'presence_reference_id' } )
+	} );
+	*/
+
 	
 	{if $parent}
 	inheritablename='{$parent.inheritable_name|@escape}';

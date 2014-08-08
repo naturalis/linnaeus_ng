@@ -54,7 +54,9 @@ class NsrTaxonController extends Controller
     );
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
+
 	private $_nameTypeIds;
+	private $_projectRankIds;
 	
 	private $conceptId=null;
 	private $nameId=null;
@@ -81,10 +83,21 @@ class NsrTaxonController extends Controller
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
-    }
+
+		$this->_projectRankIds=$this->models->ProjectRank->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id',
+			'fieldAsIndex'=>'rank_id'
+		));
+		
+	}
 
     public function taxonNewAction()
     {
+		
+//		q($this->requestData,1);
 
 		$this->checkAuthorisation();
 
@@ -102,7 +115,7 @@ class NsrTaxonController extends Controller
 
 		if ($this->rHasVal('parent'))
 		{
-			$parent=$this->getSpeciesList(array('id'=>$this->rGetVal('parent')));
+			$parent=$this->getSpeciesList(array('id'=>$this->rGetVal('parent'),'taxa_only'=>true));
 			if (isset($parent[0]))
 				$this->smarty->assign('parent',$parent[0]);
 		}
@@ -120,7 +133,7 @@ class NsrTaxonController extends Controller
 
 		$this->printPage();
 	}
-
+	
     public function taxonAction()
     {
 		$this->checkAuthorisation();
@@ -158,6 +171,9 @@ class NsrTaxonController extends Controller
 			$this->smarty->assign('statuses',$this->getStatuses());
 			$this->smarty->assign('habitats',$this->getHabitats());
 
+			$this->smarty->assign('rank_id_species',$this->_projectRankIds[SPECIES_RANK_ID]['id']);
+			$this->smarty->assign('rank_id_subspecies',$this->_projectRankIds[SUBSPECIES_RANK_ID]['id']);
+	
 		}
 
 		$this->checkMessage();
@@ -690,12 +706,122 @@ class NsrTaxonController extends Controller
 
 
 
-    private function getSpeciesList($p)
+	private function getSpeciesList($p)
+	{
+		$search=!empty($p['search']) ? $p['search'] : null;
+        $id=isset($p['id']) ? (int)$p['id'] : null;
+        $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
+        //$formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
+        $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
+        $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
+        $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
+		$limit=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
+		
+		$search=trim($search);
+		
+		if (empty($search) && empty($id))
+			return null;
+
+		$taxa=$this->models->Names->freeQuery("
+			select
+				_a.taxon_id as id,
+				concat(_a.name,' [',_q.rank,']') as label,
+				_e.rank_id,
+				_e.taxon,
+				_f.rank_id as base_rank_id,
+				_q.rank as rank,
+				_a.uninomial,
+				_a.specific_epithet,
+	
+				case
+					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
+					when _a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 95
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 90
+					when _a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 then 80
+					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 then 70
+					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 then 60
+					else 50
+				end as match_percentage,
+	
+				case
+					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
+					else 50
+				end as adjusted_rank
+			
+			from %PRE%names _a
+			
+			left join %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%ranks _q
+				on _f.rank_id=_q.id
+			
+			left join %PRE%name_types _b 
+				on _a.type_id=_b.id 
+				and _a.project_id = _b.project_id
+
+			where _a.project_id =".$this->getCurrentProjectId()."
+				and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+				and _b.nametype in (
+					'".PREDICATE_PREFERRED_NAME."',
+					'".PREDICATE_VALID_NAME."',
+					'".PREDICATE_ALTERNATIVE_NAME."',
+					'".PREDICATE_SYNONYM."',
+					'".PREDICATE_SYNONYM_SL."',
+					'".PREDICATE_HOMONYM."',
+					'".PREDICATE_BASIONYM."',
+					'".PREDICATE_MISSPELLED_NAME."'
+				)
+
+			".($taxaOnly ? "and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : "" )."
+			".($rankAbove ? "and _f.rank_id < ".$rankAbove : "" )."
+			".($rankEqualAbove ? "and _f.rank_id <= ".$rankEqualAbove : "" )."
+			".($id ? "and _a.taxon_id = ".$id : "" )."
+			
+			group by _a.taxon_id
+
+			order by 
+				adjusted_rank desc, match_percentage desc, _a.name asc, _f.rank_id asc, ".
+				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
+			".(isset($limit) ? "limit ".(int)$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
+		);
+
+		foreach ((array) $taxa as $key => $val)
+		{
+			if ($val['base_rank_id']==GENUS_RANK_ID)
+			{
+				$taxa[$key]['inheritable_name']=$val['uninomial'];
+			}
+			else
+			if ($val['base_rank_id']==SPECIES_RANK_ID)
+			{
+				$taxa[$key]['inheritable_name']=$val['uninomial'].' '.$val['specific_epithet'];
+			}
+			else
+			{
+				$taxa[$key]['inheritable_name']="";
+			}
+
+			unset($taxa[$key]['match_percentage']);
+			unset($taxa[$key]['adjusted_rank']);
+			unset($taxa[$key]['uninomial']);
+			unset($taxa[$key]['specific_epithet']);
+		}
+
+		return $taxa;
+
+	}
+
+    private function getSpeciesList_ORG($p)
     {
         $search=isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        //$getAll =isset($p['get_all']) ? $p['get_all']==1 : false;
-        $concise=isset($p['concise']) ? $p['concise']==1 : false;
         $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
         $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
@@ -830,7 +956,7 @@ class NsrTaxonController extends Controller
 			unset($taxa[$key]['uninomial']);
 			unset($taxa[$key]['specific_epithet']);
 		}
-		
+
 		return $taxa;
 		
 	}
@@ -902,7 +1028,6 @@ class NsrTaxonController extends Controller
 			);
 
     }
-
 
 
 	private function saveConcept()
