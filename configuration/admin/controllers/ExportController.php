@@ -204,6 +204,8 @@ $numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRec
 $recordsPerFile=$this->rHasVar('recordsPerFile') ? $this->rGetVal('recordsPerFile') : 10000;
 $exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
 
+$imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : 'http://images.naturalis.nl/original/';
+
 $rootelement='nederlands_soortenregister';
 $filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
 $forceWriteToFile=true;
@@ -230,7 +232,9 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 					_l2.label as status_reference_title,
 					_e1.name as status_expert_name,
 					_e2.name as status_organisation_name,
-					_q.parentage as classification
+					_q.parentage as classification,
+					
+					RAND() as fuck
 
 				from
 					%PRE%taxa _t
@@ -275,7 +279,9 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				where _t.project_id = ".$this->getCurrentProjectId()."
 
 				".(isset($ids) ? "and _t.id in (".implode(',',$ids).")" : "" )."
+				ORDER BY fuck
 				".($numberOfRecords!='?' && $numberOfRecords!='*'  ? "limit ".$numberOfRecords : "" )."
+				
 
 			");
 			
@@ -283,7 +289,7 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 			$data=array();
 			$lookuplist=array();
 			
-
+			/*
 			// get all content
 			$c=$this->models->Taxon->freeQuery("
 				select
@@ -307,19 +313,47 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				array_push($allpages[$val['taxon_id']],array('title'=>$val['title'],'text'=>$val['text']));
 			}
 			
+			*/
 			
+
+			$taxonCount=count($taxa);
 
 			foreach((array)$taxa as $key=>$val)
 			{
 				
 				$lookuplist[$val['id']]=array('taxon'=>$val['name'],'rank'=>$val['rank']);
-	
+
+				$pages=$this->models->ContentTaxon->freeQuery("
+					select
+						_x2.title,_x1.content as text,_x3.language
+					from
+						%PRE%content_taxa _x1
+
+					left join %PRE%pages_taxa_titles _x2
+						on _x1.project_id=_x2.project_id
+						and  _x1.page_id=_x2.page_id
+
+					left join %PRE%languages _x3
+						on _x1.language_id=_x3.id
+
+					where
+						_x1.project_id =".$this->getCurrentProjectId()."
+						and _x1.taxon_id = ".$val['id']
+					);
 
 				$description=array();
+				foreach((array)$pages as $page)
+				{
+					$description['page__'.count((array)$description)]=$page;
+				}				
+
+				
+				/*
 				if (isset($allpages[$val['id']]))
 				{
 					foreach((array)$allpages[$val['id']] as $sdsr) $description['page__'.count((array)$description)]=$sdsr;
 				}
+				*/
 				
 				$names=array();
 				$c=$this->models->Names->freeQuery("
@@ -368,6 +402,60 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				);
 				foreach((array)$c as $vdsdvsdfs) $names['name__'.count((array)$names)]=$vdsdvsdfs;
 
+				$images=array();
+				$c=$this->models->MediaTaxon->freeQuery("		
+					select
+						concat('".$imageBaseUrl."',file_name) as url,
+						_c.meta_data as photographer_name,
+						date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
+						_meta2.meta_data as short_description,
+						_meta3.meta_data as geography,
+						_meta5.meta_data as copyright,
+						_meta7.meta_data as maker_adress
+					
+					from  %PRE%media_taxon _m
+					
+					left join %PRE%media_meta _c
+						on _m.project_id=_c.project_id
+						and _m.id = _c.media_id
+						and _c.sys_label = 'beeldbankFotograaf'
+						and _c.language_id=".$this->getDefaultProjectLanguage()."
+				
+					left join %PRE%media_meta _meta1
+						on _m.id=_meta1.media_id
+						and _m.project_id=_meta1.project_id
+						and _meta1.sys_label='beeldbankDatumVervaardiging'
+						and _meta1.language_id=".$this->getDefaultProjectLanguage()."
+		
+					left join %PRE%media_meta _meta2
+						on _m.id=_meta2.media_id
+						and _m.project_id=_meta2.project_id
+						and _meta2.sys_label='beeldbankOmschrijving'
+						and _meta2.language_id=".$this->getDefaultProjectLanguage()."
+					
+					left join %PRE%media_meta _meta3
+						on _m.id=_meta3.media_id
+						and _m.project_id=_meta3.project_id
+						and _meta3.sys_label='beeldbankLokatie'
+						and _meta3.language_id=".$this->getDefaultProjectLanguage()."
+					
+					left join %PRE%media_meta _meta5
+						on _m.id=_meta5.media_id
+						and _m.project_id=_meta5.project_id
+						and _meta5.sys_label='beeldbankCopyright'
+						and _meta5.language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%media_meta _meta7
+						on _m.id=_meta7.media_id
+						and _m.project_id=_meta7.project_id
+						and _meta7.sys_label='beeldbankAdresMaker'
+						and _meta7.language_id=".$this->getDefaultProjectLanguage()."
+		
+					where _m.project_id = ".$this->getCurrentProjectId()."
+						and _m.taxon_id = ".$val['id']
+				);
+				foreach((array)$c as $buytjyuy) $images['image__'.count((array)$images)]=$buytjyuy;
+
 				$val['status']=array(
 					'status' => $val['status_status'],
 					'reference_title' => $val['status_reference_title'],
@@ -377,6 +465,7 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				$val['description']=$description;
 				$val['names']=$names;
 				$val['classification']=explode(' ',$val['classification']);
+				$val['images']=$images;
 
 				unset($val['status_status']);
 				unset($val['status_reference_title']);
@@ -384,12 +473,12 @@ $idsToSuppressInClassification=array(116297); // top of the tree ("life") which 
 				unset($val['status_organisation_name']);
 
 				$data['taxon__'.count((array)$data)]=$val;
+				unset($taxa[$key]);
 
 			}
 			
-			$taxonCount=count($taxa);
 			unset($taxa);
-			unset($allpages);
+			//unset($allpages);
 
 			foreach($data as $key=>$val)
 			{
