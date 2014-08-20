@@ -203,7 +203,6 @@ class ExportController extends Controller
 $numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRecords') : 500;
 $recordsPerFile=$this->rHasVar('recordsPerFile') ? $this->rGetVal('recordsPerFile') : 10000;
 $exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
-
 $imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : 'http://images.naturalis.nl/original/';
 
 $rootelement='nederlands_soortenregister';
