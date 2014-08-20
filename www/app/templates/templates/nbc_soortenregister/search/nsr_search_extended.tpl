@@ -122,7 +122,7 @@
 			{foreach from=$results.data item=v}
 				<div class="result">
 					{if $v.overview_image}
-					<img src="http://images.ncbnaturalis.nl/120x75/{$v.overview_image}" />
+					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}" />
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
 					{if $v.common_name}{$v.common_name}<br />{/if}
