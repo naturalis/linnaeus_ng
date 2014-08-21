@@ -288,7 +288,7 @@ function detail(data)
 		var buffer2=Array();
 		for (var i in data.img_add) {
 			var element=data.img_add[i];
-			var thumb=element.file.replace('w800','130x130');
+			var thumb=element.file.replace('w800','160x100');
 			var tpl=templates.extraimage.tpl;
 			tpl=(i==0?tpl.replace('%style%',templates.extraimage.style_0):tpl.replace('%style%',templates.extraimage.style_n));
 			if (element.file)
