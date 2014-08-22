@@ -1666,58 +1666,62 @@ class Controller extends BaseClass
         $idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
         $pId = isset($p['pId']) ? $p['pId'] :  $this->getCurrentProjectId();
 
-		$pr = $this->models->ProjectRank->_get(
-		array(
-			'id' => array(
-				'project_id' => $pId
-			),
-			'columns' => 'id,project_id,rank_id,parent_id,lower_taxon,keypath_endpoint',
-			'fieldAsIndex' => 'id',
-			'order' => 'rank_id'
-		));
+		$pr = $this->models->ProjectRank->freeQuery(
+			array(
+				"query"=>"
+					select 
+						_p.id,
+						_p.project_id,
+						_p.rank_id,
+						_p.parent_id,
+						_p.lower_taxon,
+						_p.keypath_endpoint,
+						_r.rank,
+						_r.abbreviation,
+						_r.can_hybrid,
+						_pr.id as ideal_parent_id,
+						replace(ifnull(_q.label,_r.rank),'_',' ') as label
+					from 
+						%PRE%projects_ranks _p
 
-		foreach ((array) $pr as $rankkey => $rank) {
+					left join %PRE%ranks _r
+						on _p.rank_id = _r.id
 
-			$r = $this->models->Rank->_get(array(
-				'id' => $rank['rank_id']
-			));
+					left join %PRE%projects_ranks _pr
+						on _p.project_id= _pr.project_id
+						and _r.ideal_parent_id = _pr.rank_id
 
-			$pr[$rankkey]['rank'] = $r['rank'];
+					left join %PRE%labels_projects_ranks _q
+						on _p.id=_q.project_rank_id
+						and _p.project_id = _q.project_id
+						and _q.language_id=".$this->getDefaultProjectLanguage()."
 
-			$pr[$rankkey]['abbreviation'] = $r['abbreviation'];
+					where 
+						_p.project_id = ".$pId."
+						order by _p.rank_id
+					",
+				"fieldAsIndex"=>"id"
+			)
+		);
+		
+		if ($includeLanguageLabels)
+		{
 
-			$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-
-			$pr[$rankkey]['ideal_parent_id'] = null;
-
-			if (!empty($r['ideal_parent_id'])) {
-
-				$d = $this->models->ProjectRank->_get(
-				array(
-					'id' => array(
-						'project_id' => $pId,
-						'rank_id' => $r['ideal_parent_id']
-					),
-					'columns' => 'id'
-				));
-
-				if ($d)
-					$pr[$rankkey]['ideal_parent_id'] = $d[0]['id'];
-			}
-
-			if ($includeLanguageLabels) {
-
-				foreach ((array) $this->getProjectLanguages() as $langaugekey => $language) {
+			foreach ((array) $pr as $rankkey => $rank)
+			{
+	
+				foreach ((array) $this->getProjectLanguages() as $langaugekey => $language)
+				{
 
 					$lpr = $this->models->LabelProjectRank->_get(
-					array(
-						'id' => array(
-							'project_id' => $pId,
-							'project_rank_id' => $rank['id'],
-							'language_id' => $language['language_id']
-						),
-						'columns' => 'label'
-					));
+						array(
+							'id' => array(
+								'project_id' => $pId,
+								'project_rank_id' => $rank['id'],
+								'language_id' => $language['language_id']
+							),
+							'columns' => 'label'
+						));
 
 					$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
 				}
