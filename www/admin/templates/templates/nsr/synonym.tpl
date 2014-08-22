@@ -9,30 +9,33 @@
 <form id="data" onsubmit="return false;">
 
 <table>
-	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr>
+	<tr><th>genus:</th><td><input class="medium" type="text" id="name_uninomial" value="{$name.uninomial}" /></td></tr>
+	<tr><th>soort:</th><td><input class="medium" type="text" id="name_specific_epithet" value="{$name.specific_epithet}" /></td></tr>
+	<tr><th>ondersoort:</th><td><input class="medium" type="text" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td></tr>
+	<tr><th>volledige naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr>
+
+	<tr><th>auteurschap:</th><td><input class="medium" type="text" id="name_authorship" value="{$name.authorship}" /></td></tr>
+	<tr><th>auteur:</th><td><input class="medium" type="text" id="name_name_author" value="{$name.name_author}" /></td></tr>
+	<tr><th>jaar:</th><td><input class="small" type="text" maxlength="4" id="name_authorship_year" value="{$name.authorship_year}" /></td></tr>
+	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>type:</th><td>
 		<select id="name_type_id" mandatory="mandatory">
 			<option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$nametypes item=v key=k}
-			{if $v.noNameParts}
+		{if !$v.noNameParts}
 			<option value="{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype}</option>
-			{/if}
+		{/if}
 		{/foreach}
 		</select> *
 	</td></tr>
 	<tr><th>taal:</th><td>
 		<select id="name_language_id" mandatory="mandatory">
-			{assign var=first value=true}
 			<option value="" {if !$name.language_id} selected="selected"{/if}>n.v.t.</option>
-		{foreach from=$languages item=v key=k}
-			{if $v.sort_criterium==0 && $first==true}
-			<option value="" disabled="disabled">&nbsp;</option>
-			{assign var=first value=false}
+			{foreach from=$languages item=v key=k}
+			{if $v.id==$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+				<option value="{$v.id}" {if $v.id==$name.language_id} selected="selected"{/if}>{$v.label}</option>
 			{/if}
-			{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-			<option value="{$v.id}" {if $v.id==$name.language_id} selected="selected"{/if}>{$v.label}</option>
-			{/if}
-		{/foreach}
+			{/foreach}
 		</select> *
 	</td></tr>
 	<tr><th colspan="2">&nbsp;</td></tr>

@@ -1,3 +1,20 @@
+{function name=makeNameLink nametype=0}
+{if 
+	$nametype==$smarty.const.PREDICATE_VALID_NAME ||
+	$nametype==$smarty.const.PREDICATE_HOMONYM ||
+	$nametype==$smarty.const.PREDICATE_BASIONYM ||
+	$nametype==$smarty.const.PREDICATE_SYNONYM ||
+	$nametype==$smarty.const.PREDICATE_SYNONYM_SL ||
+	$nametype==$smarty.const.PREDICATE_MISSPELLED_NAME ||
+	$nametype==$smarty.const.PREDICATE_INVALID_NAME
+}synonym.php{else}name.php{/if}
+{*
+	$nametype==$smarty.const.PREDICATE_PREFERRED_NAME
+	$nametype==$smarty.const.PREDICATE_ALTERNATIVE_NAME
+*}
+{/function}
+
+
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
@@ -14,8 +31,12 @@
 	
 
 	<table>
-		<tr><th><h4>concept</h4></td><td></td></tr>
-		<tr><th>naam:</th>
+		<tr>
+			<td></td>
+			<td><i>concept</i></td>
+		</tr>
+		<tr>
+			<th>naam:</th>
 			<td>
 				{$concept.taxon}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
@@ -27,12 +48,12 @@
 		</tr>
 		<tr><th>rang:</th>
 			<td>
-				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach} 
+				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach} 
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">edit</a>
 				<span class="editspan">
 				<select id="concept_rank_id" onchange="storedata(this);" >
 				{foreach from=$ranks item=v}
-				<option value="{$v.id}" {if $v.id==$concept.rank_id} selected="selected"{/if}>{$v.rank}</option>
+				<option value="{$v.id}" {if $v.id==$concept.rank_id} selected="selected"{/if}>{$v.label}</option>
 				{/foreach}
 				</select>
 				</span> *
@@ -53,8 +74,12 @@
 
 		<tr><th>&nbsp;</td></tr>
 
-		<tr><th><h4>voorkomen</h4></td><td></td></tr>
-		<tr><th>status:</th>
+		<tr>
+			<td></td>
+			<td><i>voorkomen</i></td>
+		</tr>
+		<tr>
+			<th>status:</th>
 			<td>
 				{if $presence.presence_id}
 					<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
@@ -76,22 +101,6 @@
 			</td>
 		</tr>
 
-		{*<!-- tr><th>inheems:</th>
-			<td>
-				{if $presence.presence_id!=''}
-					{if $presence.is_indigenous=='1'}ja{else if $presence.is_indigenous=='0'}nee{else}n.v.t.{/if}
-				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_is_indigenous">edit</a>
-				<span class="editspan">
-					<select id="presence_is_indigenous" onchange="storedata(this);" >
-						<option value="-1" {if $presence.is_indigenous==''} selected="selected"{/if}>n.v.t.</option>
-						<option value="1" {if $presence.is_indigenous=='1'} selected="selected"{/if}>ja</option>
-						<option value="0" {if $presence.is_indigenous=='0'} selected="selected"{/if}>nee</option>
-					</select>
-				</span>
-			</td>
-		</tr -->*}
-
 		<tr><th>habitat:</th>
 			<td>
 				{if $presence.habitat_id!=''}
@@ -108,6 +117,8 @@
 				</span>
 			</td>
 		</tr>
+
+		<tr><td colspan="2" style="height:5px;"></td></tr>
 
 		<tr><th>expert:</th>
 			<td>
@@ -151,14 +162,16 @@
 <p>
 
 	<h4>namen</h4>
+		
 	<ul>
 	{foreach from=$names.list item=v}
 		<li>
-		{$v.name} ({$v.language_label}) <i>{$v.nametype}</i> <a href="name.php?id={$v.id}" class="edit">edit</a>
+		{$v.name} ({$v.language_label}) <i>{$v.nametype}</i> <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
 		</li>
 	{/foreach}
-		<li><a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">nieuwe naam toevoegen</a></li>
 	</ul>
+	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">nieuwe naam toevoegen</a><br />
+	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0">nieuw synoniem toevoegen</a>
 
 
 </p>

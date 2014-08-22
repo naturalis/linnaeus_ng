@@ -155,6 +155,8 @@ function storedata(ele)
 
 function checkmandatory()
 {
+	var result=true;
+	var buffer='Vul alle verplichte velden in:';
 
 	for (i in values)
 	{
@@ -168,11 +170,21 @@ function checkmandatory()
 				(val.delete))
 			) 
 		{
-			//console.log(val.name);
-			alert('Vul alle verplichte velden in.');
-			return false;
+			//console.(val.name);
+			if (val.label)
+				buffer=buffer+"\n"+val.label;
+			result=false;
 		}
 	}
+
+	if (!result)
+		alert(buffer);
+
+	return result;
+}
+
+function checkcompletesets()
+{
 	return true;
 }
 
@@ -181,6 +193,9 @@ function savedataform()
 	//console.dir(values);return;
 	
 	if (!checkmandatory())
+		return;
+
+	if (!checkcompletesets())
 		return;
 	
 	form = $("<form method=post></form>");
@@ -505,7 +520,12 @@ function partstoname()
 	}
 	
 	var author=$('#name_authorship').val().trim();
-	author=author.replace(/^\(+|\)+$/gm,'');
+
+	if (author.indexOf('(')==0 && author.lastIndexOf(')')==author.length-1)
+	{
+		author=author.substring(1,author.length-1);
+	}
+
 	var year="";
 	var yearstart=author.lastIndexOf(" ");
 	if (yearstart!=-1) {
