@@ -99,6 +99,8 @@ class NsrTaxonController extends Controller
 		
 		$this->checkAuthorisation();
 
+        $this->setPageName($this->translate('New taxon concept'));
+
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->saveConcept();
@@ -139,6 +141,8 @@ class NsrTaxonController extends Controller
 		$this->checkAuthorisation();
 		
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
+
+        $this->setPageName($this->translate('Edit taxon concept'));
 	
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
@@ -183,6 +187,7 @@ class NsrTaxonController extends Controller
     public function synonymAction()
     {
 		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Edit synonym'));
 		$this->_nameAndSynonym();
 		$this->printPage();
     }
@@ -190,6 +195,7 @@ class NsrTaxonController extends Controller
     public function nameAction()
     {
 		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Edit name'));
 		$this->_nameAndSynonym();
 		$this->printPage();
 	}
@@ -557,7 +563,7 @@ class NsrTaxonController extends Controller
 				_f.name as organisation_name,
 				_a.reference_id,
 				_g.label as reference_label,
-				_g.author as reference_author,
+				_gg.name as reference_author,
 				_g.date as reference_date
 				
 			from %PRE%presence_taxa _a
@@ -588,6 +594,11 @@ class NsrTaxonController extends Controller
 			left join %PRE%literature2 _g
 				on _a.reference_id = _g.id 
 				and _a.project_id=_g.project_id
+
+			left join %PRE%actors _gg
+				on _g.actor_id = _gg.id 
+				and _g.project_id=_gg.project_id
+
 
 			where _a.project_id = ".$this->getCurrentProjectId()."
 				and _a.taxon_id =".$id
