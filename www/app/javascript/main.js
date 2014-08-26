@@ -591,6 +591,10 @@ function hint(caller,txt) {
 	});
 }
 
+function hintHide()
+{
+	$('#hint-box').toggle(false);
+}
 
 function setSessionVar(variable,value) {
 

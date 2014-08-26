@@ -174,8 +174,8 @@
 				auteurschap:
 			</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" mandatory="mandatory" label="auteurschap" /> *</td>
 		</tr>
-		<tr><th>auteur(s):</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_name_author" value="" mandatory="mandatory" disabled="disabled" label="auteur" /></td></tr>	
-		<tr><th>jaar:</th><td><input onkeyup="partstoname();" type="text" class="small" id="name_authorship_year" value="" mandatory="mandatory" disabled="disabled" label="jaar" /></td></tr>	
+		<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="" mandatory="mandatory" disabled="disabled" label="auteur" /></td></tr>	
+		<tr><th>jaar:</th><td><input type="text" class="small" id="name_authorship_year" value="" mandatory="mandatory" disabled="disabled" label="jaar" /></td></tr>	
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 

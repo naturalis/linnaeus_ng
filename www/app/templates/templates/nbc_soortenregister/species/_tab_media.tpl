@@ -1,26 +1,29 @@
 		<div>
 		
 			{if $mediaOwn.data}
-				<h4>
-					Afbeelding{if $mediaOwn.count!=1}en{/if}: {$mediaOwn.count}
-				</h4>
-				<div>
-
-				{foreach from=$mediaOwn.data item=v}
-					{if $search.img && $search.img==$v.image}
-						{$pp_popup=[{$v.image},{$v.meta_data}]}
-					{/if}
-					<div class="imageInGrid3 taxon-page">
-						<div class="thumbContainer">
-							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
-							</a>
+				<div style="width:100%">
+					<h4>
+						Afbeelding{if $mediaOwn.count!=1}en{/if}: {$mediaOwn.count}
+					</h4>
+					<div>
+	
+					{foreach from=$mediaOwn.data item=v}
+						{if $search.img && $search.img==$v.image}
+							{$pp_popup=[{$v.image},{$v.meta_data}]}
+						{/if}
+						<div class="imageInGrid3 taxon-page">
+							<div class="thumbContainer">
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+								</a>
+							</div>
+							<dl>
+								<dt>Foto</dt><dd>{$v.photographer}</dd>
+							</dl>
 						</div>
-						<dl>
-							<dt>Foto</dt><dd>{$v.photographer}</dd>
-						</dl>
+					{/foreach}
 					</div>
-				{/foreach}
+				</div>
 			{/if}
 
 			{if $mediaOwn.data && $mediaCollected.data}
@@ -28,23 +31,25 @@
 			{/if}			
 		
 			{if $mediaCollected.data}
-				<h4>
-					Soorten/taxa met afbeelding(en): {$mediaCollected.species}
-				</h4>
-				<div>
-				{foreach from=$mediaCollected.data item=v}
-					<div class="imageInGrid3 taxon-page collected">
-						<div class="thumbContainer">
-							<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
-								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
-							</a>
+				<div  style="width:100%">
+					<h4>
+						Soorten/taxa met afbeelding(en): {$mediaCollected.species}
+					</h4>
+					<div>
+					{foreach from=$mediaCollected.data item=v}
+						<div class="imageInGrid3 taxon-page collected">
+							<div class="thumbContainer">
+								<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+								</a>
+							</div>
+							<dl>
+								{if $v.name}<dd>{$v.name}</dd>{/if}
+								<dd><i>{$v.taxon}</i></dd>
+							</dl>
 						</div>
-						<dl>
-							{if $v.name}<dd>{$v.name}</dd>{/if}
-							<dd><i>{$v.taxon}</i></dd>
-						</dl>
+					{/foreach}
 					</div>
-				{/foreach}
 				</div>
 
 			{/if}

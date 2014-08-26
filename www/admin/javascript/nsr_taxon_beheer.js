@@ -502,8 +502,8 @@ function deleteform()
 
 function partstoname()
 {
-	
-	if (dataid) return;
+
+//	if (dataid) return;
 
 	if (inheritablename && $('#name_uninomial').val().length==0 && !$('#name_uninomial').is(":focus"))
 	{
@@ -518,7 +518,7 @@ function partstoname()
 			$('#name_specific_epithet').val(d[1]).trigger('change'); 
 		}
 	}
-	
+
 	var author=$('#name_authorship').val().trim();
 
 	if (author.indexOf('(')==0 && author.lastIndexOf(')')==author.length-1)

@@ -3,20 +3,57 @@
 <div id="page-main">
 
 <h2>{$concept.taxon}</h2>
-<h3>{if $newname}nieuwe naam{else}{$name.name}{/if}</h3>
+<h3>{if $newname}nieuw synoniem{else}{$name.name}{/if}</h3>
 
-
+<p>
 <form id="data" onsubmit="return false;">
 
 <table>
-	<tr><th>genus:</th><td><input class="medium" type="text" id="name_uninomial" value="{$name.uninomial}" /></td></tr>
+	<!-- tr><th>genus:</th><td><input class="medium" type="text" id="name_uninomial" value="{$name.uninomial}" /></td></tr>
 	<tr><th>soort:</th><td><input class="medium" type="text" id="name_specific_epithet" value="{$name.specific_epithet}" /></td></tr>
 	<tr><th>ondersoort:</th><td><input class="medium" type="text" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td></tr>
-	<tr><th>volledige naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr>
+	<tr><th>volledige naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr -->
 
-	<tr><th>auteurschap:</th><td><input class="medium" type="text" id="name_authorship" value="{$name.authorship}" /></td></tr>
+		<tr><th>genus:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" mandatory="mandatory" label="genus" /> *</td></tr>
+		<tr><th>soort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_specific_epithet" value="{$name.specific_epithet}" label="soort" /></td></tr>
+		<tr><th>ondersoort:</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td></tr>
+
+	<!-- tr><th>auteurschap:</th><td><input class="medium" type="text" id="name_authorship" value="{$name.authorship}" /></td></tr>
 	<tr><th>auteur:</th><td><input class="medium" type="text" id="name_name_author" value="{$name.name_author}" /></td></tr>
-	<tr><th>jaar:</th><td><input class="small" type="text" maxlength="4" id="name_authorship_year" value="{$name.authorship_year}" /></td></tr>
+	<tr><th>jaar:</th><td><input class="small" type="text" maxlength="4" id="name_authorship_year" value="{$name.authorship_year}" /></td></tr -->
+
+	<tr><td colspan="2" style="height:5px;"></td></tr>
+
+
+	<tr>
+		<th title="vul de volledige waarde voor 'auteurschap' in, inclusief komma, jaartal en haakjes; het programma leidt de waarden voor auteur en jaar automatisch af.">	
+			auteurschap:
+		</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship"  value="{$name.authorship}" label="auteurschap" /> *</td>
+	</tr>
+	<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" disabled="disabled" label="auteur" /></td></tr>	
+	<tr>
+		<th>jaar:</th>
+		<td>
+			<input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" disabled="disabled" label="jaar" />
+		</td>
+	</tr>	
+
+	<tr><td colspan="2" style="height:5px;"></td></tr>
+
+		<tr><th title="synoniem wordt automatische samengesteld.">synoniem:</th><td>
+			<input type="text" id="concept_taxon" value="{$name.name}" mandatory="mandatory" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="synoniem" />
+			<input type="hidden" id="name_name" value="" mandatory="mandatory" />
+		</td></tr>
+
+
+
+
+
+
+
+
+
+
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>type:</th><td>
 		<select id="name_type_id" mandatory="mandatory">
@@ -77,13 +114,13 @@
 		{if $name.reference}<tr><th>organisatie (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
 	{/if}
 </table>
-<p>
-
 </p>
 
+<p>
 <input type="button" value="opslaan" onclick="savedataform();" />
 {if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
 </form>
+</p>
 
 <p>
 	<a href="taxon.php?id={$concept.id}">terug</a>
