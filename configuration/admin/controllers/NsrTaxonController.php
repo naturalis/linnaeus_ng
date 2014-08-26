@@ -2124,11 +2124,11 @@ class NsrTaxonController extends Controller
 		}
 		if (!$this->checkIfConceptRetainsScientificName($name))
 		{
-			$this->addWarning("Aan concept is geen wetenschappelijke naam meer gekoppeld.");
+			$this->addWarning("Aan concept is geen wetenschappelijke naam gekoppeld.");
 		}
 		if (!$this->checkIfConceptRetainsDutchName($name))
 		{
-			$this->addWarning("Aan concept is geen Nederlandse 'preferred name' naam meer gekoppeld.");
+			$this->addWarning("Aan concept is geen Nederlandse 'preferred name' naam gekoppeld.");
 		}
 	}
 
