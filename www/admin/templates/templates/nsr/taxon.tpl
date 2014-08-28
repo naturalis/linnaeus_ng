@@ -183,8 +183,9 @@
 
 
 <p>
+	<a href="paspoort.php?id={$concept.id}" class="edit"  style="margin:0">paspoorten</a><br />
 		
-	<a href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
+	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
 
 	{if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
 		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">soort toevoegen aan {$concept.taxon}</a>
