@@ -1,3 +1,19 @@
+function prettyDialog(p)
+{
+	$( "#dialog-message-body-content" ).html(p.content);
+	$( "#dialog-message" ).dialog({
+		modal: true,
+		title: p.title,
+		height:600,
+		width:500,
+		buttons: [{
+			text: p.closetext ? p.closetext : _('Close'),
+			click:function() { $( this ).dialog( "close" ); }
+		}]
+	});
+};
+
+
 var timerinit={timer:null,ms:0,callbacktimer:null};
 var timer=timerinit;
 
@@ -569,12 +585,169 @@ function checkunsavedvalues()
 }
 
 
+
+function getinheritablename()
+{
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: "POST",
+		data : {id:$('#parent_taxon_id').val(),action:'get_inheritable_name'},
+		success : function (data)
+		{
+			inheritablename=data;
+			partstoname()
+		}
+	});
+
+}
+
+
+function doDelete()
+{
+	if (confirm("Weet u het zeker?"))
+	{
+		$( '#action' ).val('delete');
+		$( '#theForm' ).submit();
+	}
+}
+
+
+
+
+function dropListDialog(ele,title)
+{
+	var target=$(ele).attr('rel');
+	var id='__'+target+'_INPUT';
+	
+	prettyDialog({
+		title:title,
+		content :
+			'<p><input type="text" class="medium" id="'+id+'" /></p> \
+			 <p><div id="droplist-list-container"></div></p>'
+	});
+
+	$('#'+id).attr('autocomplete','off').bind('keyup', function(e) { 
+		doNsrDropList({ e:e, id: $(this).attr('id') } )
+	} );	
+
+}
+
+function doNsrDropList(p)
+{
+	// calling element (input)
+	var element=$('#'+p.id);
+	// variable to lookup and to assign resulting value to
+	var variable=element.attr('id').replace(/(^(__))/,'').replace(/((_INPUT)$)/,'');
+	// value (entered text)
+	var value=element.val();
+	// minimal length of value to trigger list
+	var minlength=element.attr('droplistminlength') ? element.attr('droplistminlength') : 1;
+
+	if (value.length<minlength)
+		return;
+
+	var minlength=3;
+	
+	if (variable.indexOf('reference_id')!=-1)
+	{
+		url = '../literature2/ajax_interface.php';
+	}
+	else
+	{
+		url = 'ajax_interface.php';
+	}
+
+	data = {
+		action: variable,
+		search: value,
+		time: allGetTimestamp()
+	}
+
+	$.ajax({
+		url : url,
+		type: "POST",
+		data : data,
+		success : function (data)
+		{
+			//console.log(data);
+			buildDropList($.parseJSON(data),variable);
+		}
+	});
+	
+}
+
+function setNsrDropListValue(ele,variable)
+{
+	// don't change order of lines
+	$('#'+variable.replace(/(_id)$/,'')).html( $(ele).attr('display-text') ? $(ele).attr('display-text') : $(ele).text() );
+	$('#'+variable).val($(ele).attr('value')).trigger('change');
+}
+
+function buildDropList(data,variable)
+{
+	var buffer=Array();
+
+	buffer.push('<li><a href="#" onclick="setNsrDropListValue(this,\''+variable+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" value="-1">geen waarde toekennen</a></li>');
+
+	if (!data.results)
+	{
+		buffer.push('<li>niets gevonden</li>');
+	}
+	else	
+	{
+		for(var i in data.results)
+		{
+			var t=data.results[i];
+	
+			if (variable=='dutch_name_organisation_id' && t.is_company!='1') continue;
+			if (variable=='dutch_name_expert_id' && t.is_company=='1') continue;
+			if (variable=='presence_organisation_id' && t.is_company!='1') continue;
+			if (variable=='presence_expert_id' && t.is_company=='1') continue;
+			if (variable=='name_organisation_id' && t.is_company!='1') continue;
+			if (variable=='name_expert_id' && t.is_company=='1') continue;
+			
+			if (1==1 || variable.indexOf('reference_id')!=-1)
+			{
+				var label=
+					(t.author ? t.author+", " : "")+
+					(t.label)+
+					(t.date ? " ("+t.date+")" : "");
+			}
+			else 
+			{
+				var label=t.label;
+			}
+	
+			if (t.label && t.id)
+			{
+				buffer.push(
+					'<li><a href="#" display-text="'+t.label.replace(/'/g,"\'")+'" title="'+label.replace(/'/g,"\'")+'" onclick="setNsrDropListValue(this,\''+variable+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" value="'+t.id+'">'+label+'</a></li>'
+				);
+			}
+		}
+		
+	}
+
+	$('#droplist-list-container').html('<ul>'+buffer.join('')+'</ul>');
+
+}
+
+
+
+
+
 $(document).ready(function(){
 
 	$('body').click(function() {
 		closedropdownlist();
 	});
+	
+//	$('<div id="dropdown-list"><div id="dropdown-list-content"></div></div>').appendTo('body');
+	$('<div id="dialog-message" title="title" style="display:none"><div id="dialog-message-body-content"></div></div>').appendTo('body');
+
 
 });
+
+
 
 

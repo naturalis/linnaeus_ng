@@ -1,133 +1,4 @@
 {include file="../shared/admin-header.tpl"}
-{literal}
-<style>
-.tip-text {
-	color:#888;
-}
-</style>
-<script>
-
-	function __untitled01(p)
-	{
-		// escape
-		if (p.e.keyCode == 27)
-		{ 
-			closedropdownlist();
-			return;
-		}
-
-		// calling element (input)
-		var element=$('#'+p.id);
-		// variable to lookup and to assign resulting value to
-		var variable=element.attr('id').replace(/(^(__))/,'').replace(/((_INPUT)$)/,'');
-		// value (entered text)
-		var value=element.val();
-		// minimal length of value to trigger list
-		var minlength=element.attr('droplistminlength') ? element.attr('droplistminlength') : 1;
-
-		if (value.length<minlength)
-			return;
-
-		var minlength=3;
-		
-		if (variable.indexOf('reference_id')!=-1)
-		{
-			url = '../literature2/ajax_interface.php';
-		}
-		else
-		{
-			url = 'ajax_interface.php';
-		}
-	
-		data = {
-			action: variable,
-			search: value,
-			time: allGetTimestamp()
-		}
-	
-		$.ajax({
-			url : url,
-			type: "POST",
-			data : data,
-			success : function (data)
-			{
-				//console.log(data);
-				buildlist($.parseJSON(data),variable);
-			}
-		});
-		
-	}
-	
-	function __untitled02(ele,variable)
-	{
-		// don't change order of lines
-		$('#'+variable.replace(/(_id)$/,'')).html($(ele).text());
-		$('#'+variable).val($(ele).attr('value')).trigger('change');
-	}
-
-	function buildlist(data,variable)
-	{
-		var buffer=Array();
-	
-		buffer.push('<li><a href="#" onclick="__untitled02(this,\''+variable+'\');closedropdownlist();return false;" value="-1">n.v.t.</a></li>');
-	
-		for(var i in data.results)
-		{
-			var t=data.results[i];
-
-			if (variable=='dutch_name_organisation_id' && t.is_company!='1') continue;
-			if (variable=='dutch_name_expert_id' && t.is_company=='1') continue;
-			if (variable=='presence_organisation_id' && t.is_company!='1') continue;
-			if (variable=='presence_expert_id' && t.is_company=='1') continue;
-			if (variable=='name_organisation_id' && t.is_company!='1') continue;
-			if (variable=='name_expert_id' && t.is_company=='1') continue;
-			
-			if (variable.indexOf('reference_id')!=-1)
-			{
-				var label=
-					(t.author ? t.author+" - " : "")+
-					(t.label)+
-					(t.date ? " ("+t.date+")" : "");
-			}
-			else 
-			{
-				var label=t.label;
-			}
-
-
-			if (t.label && t.id)
-			{
-				buffer.push(
-					'<li><a href="#" onclick="__untitled02(this,\''+variable+'\');closedropdownlist();return false;" value="'+t.id+'">'+label+'</a></li>'
-				);
-			}
-		}
-	
-		$('#dropdown-list-content').html('<ul>'+buffer.join('')+'</ul>');
-		
-		showdropdownlist('__'+variable+'_INPUT');
-
-	}
-
-	function getinheritablename()
-	{
-		$.ajax({
-			url : 'ajax_interface.php',
-			type: "POST",
-			data : {id:$('#parent_taxon_id').val(),action:'get_inheritable_name'},
-			success : function (data)
-			{
-				inheritablename=data;
-				partstoname()
-			}
-		});
-
-	}
-
-
-</script>
-{/literal}
-
 
 <div id="page-main">
 
@@ -414,11 +285,6 @@
 
 </div>
 
-<div id="dropdown-list">
-	<div id="dropdown-list-content"></div>
-</div>
-
-
 <script>
 $(document).ready(function()
 {
@@ -448,8 +314,9 @@ $(document).ready(function()
 	values.push( { name:'name_language_id',current:'',new:{$name_language_id},mandatory:true } );
 
 	$('[havedroplist=true]').each(function() {
+		$(this).attr('autocomplete','off');
 		$(this).bind('keyup', function(e) { 
-			__untitled01({ e:e, id: $(this).attr('id') } )
+			doNsrDropList({ e:e, id: $(this).attr('id') } )
 		} );
 	});
 

@@ -18,6 +18,17 @@ ul.signed {
 	list-style-position: outside; 
 	margin-left: 15px; 
 }
+
+ul.small {
+	list-style:outside none;
+	margin-left:15px; 
+	font-size:10px;
+}
+
+ul.small li::before {
+    content: "• ";
+} 
+
 a.edit {
 	margin-left:10px;
 	font-size:9.5px;
@@ -32,17 +43,15 @@ select {
 	width:auto;
 	max-width:250px;
 }
+
+
+
 #dropdown-list {
 	background-color:white;
-	border:1px solid #666;
-	display:none;
 	width:auto;
-	min-width:350px;
-	max-width:750px;
-	max-height:350px;
 	overflow:hidden;
 }
-#dropdown-list-close {
+#xdropdown-list-close {
 	text-align:right;
 	background-color:#eee;
 	height:15px;
@@ -58,6 +67,28 @@ select {
 	overflow-y:scroll;
 	overflow-x:hidden;
 }
+
+#dropdown-list-content li {
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow: ellipsis;
+}
+
+
+#droplist-list-container {
+	font-size:0.8em;
+}
+
+#droplist-list-container ul li {
+	font-size:0.9em;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow: ellipsis;
+	list-style:none;
+	list-style-position:outside;
+	line-height:1.6em;
+}
+
 th {
 	text-align:right;
 	font-weight:normal;
@@ -68,9 +99,36 @@ tr {
 input[type=text] {
 	width:300px;
 }
+input[type=text].large {
+	width:400px;
+}
 input[type=text].medium {
 	width:200px;
 }
 input[type=text].small {
 	width:100px;
+}
+.tip-text {
+	color:#888;
+}
+
+#lit2-result-list {
+	padding:0 5px 0 5px;
+}
+
+#lit2-result-list li {
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow: ellipsis;
+	list-style:none;
+	list-style-position:outside;
+}
+
+#lit2-result-list li.lit-index-item::before {
+    content: "• ";
+} 
+
+
+.click-letter {
+	padding:0 2px 0 2px;
 }
