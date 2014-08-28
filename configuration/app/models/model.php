@@ -455,6 +455,7 @@ abstract class Model extends BaseClass
 
         $this->logQueryResult($set,$query,'freeQuery');
         $this->setLastQuery($query);
+		$this->setAffectedRows();
     
         unset($this->data);
     

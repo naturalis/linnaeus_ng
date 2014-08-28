@@ -20,7 +20,7 @@
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/dialog/jquery.modaldialog.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/lookup.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/ui.css">
-		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui-1.10.0.custom.min.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui.min.css">
 
 {if $cssToLoad}
 		<style type="text/css" media="all">
