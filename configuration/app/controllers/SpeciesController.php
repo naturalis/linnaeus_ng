@@ -1213,9 +1213,11 @@ class SpeciesController extends Controller
 					".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
 					".(!empty($listMax) ? "limit ".$listMax : "")
 			));
+			
+		$ranks=$this->getProjectRanks();
 
         foreach ((array) $taxa as $key => $val) {
-			$taxa[$key]['label'] = $this->formatTaxon(array('taxon'=>$val,'rankpos'=>'post'));
+			$taxa[$key]['label'] = $this->formatTaxon(array('taxon'=>$val,'rankpos'=>'post','ranks'=>$ranks));
 			unset($taxa[$key]['taxon']);
 		}
 
