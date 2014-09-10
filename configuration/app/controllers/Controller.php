@@ -1410,18 +1410,17 @@ class Controller extends BaseClass
 			return;
 
 		// switching between $p being an array of parameters (taxon, ranks, rankpos) and $p just being the taxon (which is an array in itself)
-		if (isset($p['taxon']) && is_array($p['taxon'])) {
-
+		if (isset($p['taxon']) && is_array($p['taxon']))
+		{
 			$taxon=$p['taxon'];
 			$ranks=isset($p['ranks']) ? $p['ranks'] : null;
 			$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post')) ? $p['rankpos'] : 'pre');
-
-		} else {
-
+		} 
+		else 
+		{
 			$taxon=$p;
 			$ranks=null;
 			$rankpos='pre';
-
 		}
 
 		if (empty($taxon))
