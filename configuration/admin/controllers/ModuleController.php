@@ -1101,12 +1101,12 @@ class ModuleController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$cfm,
-				$this->controllerBaseName,
-				'../module/edit.php?id=%s',
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$cfm,
+				'module'=>$this->controllerBaseName,
+				'url'=>'../module/edit.php?id=%s',
+				'sortData'=>true
+			))
 		);
 		
 	}

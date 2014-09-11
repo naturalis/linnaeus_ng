@@ -2070,22 +2070,32 @@ class Controller extends BaseClass
 			);
 
 	*/
-    public function makeLookupList ($data, $module, $url, $sortData = false, $encode = true)
+    public function makeLookupList ($p)
     {
-
-        $sortBy = array(
-            'key' => 'label',
-            'dir' => 'asc',
-            'case' => 'i'
-        );
+		
+		$data=isset($p['data']) ? $p['data'] : null;
+		$module=isset($p['module']) ? $p['module'] : null;
+		$url=isset($p['url']) ? $p['url'] : null;
+		$sortData=isset($p['sortData']) ? $p['sortData'] : false;
+		$encode=isset($p['encode']) ? $p['encode'] : true;
+		$total=isset($p['total']) ? $p['total'] : null;
 
         if ($sortData)
+		{
+			$sortBy = array(
+				'key' => 'label',
+				'dir' => 'asc',
+				'case' => 'i'
+			);
+
             $this->customSortArray($data, $sortBy);
+		}
 
         $d = array(
             'module' => $module,
             'url' => $url,
-            'results' => $data
+            'results' => $data,
+            'total' => $total
         );
 
         return $encode ? json_encode($d) : $d;

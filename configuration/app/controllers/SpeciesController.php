@@ -1205,33 +1205,48 @@ class SpeciesController extends Controller
         $taxa = $this->models->Taxon->freeQuery(
 			array(
 				'query' => "
-					select _a.id, _a.taxon, _a.rank_id, _a.is_hybrid
-					from %PRE%taxa _a
-					left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-					where _a.project_id = ".$this->getCurrentProjectId()."
-					and _b.lower_taxon = ".($this->getTaxonType() == 'higher' ? 0 : 1)."
-					".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
+					select
+						SQL_CALC_FOUND_ROWS
+						_a.id, _a.taxon, _a.rank_id, _a.is_hybrid
+					from
+						%PRE%taxa _a
+					left join %PRE%projects_ranks _b
+						on _a.rank_id=_b.id
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _b.lower_taxon = ".($this->getTaxonType() == 'higher' ? 0 : 1)."
+						".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
+					order by taxon
 					".(!empty($listMax) ? "limit ".$listMax : "")
 			));
+
+		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		$total=$count[0]['total'];
 			
 		$ranks=$this->getProjectRanks();
 
-        foreach ((array) $taxa as $key => $val) {
+        foreach ((array) $taxa as $key => $val)
+		{
 			$taxa[$key]['label'] = $this->formatTaxon(array('taxon'=>$val,'rankpos'=>'post','ranks'=>$ranks));
 			unset($taxa[$key]['taxon']);
 		}
 
+		/*
         $this->customSortArray($taxa, array(
             'key' => 'label',
             'dir' => 'asc',
             'case' => 'i'
 		));
-
+		*/
+		
 		return $this->makeLookupList(
-				$taxa,
-				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
-				'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
-			);
+			array(
+				'data'=>$taxa,
+				'module'=>($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
+				'url'=>'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s',
+				'total'=>$total
+			)
+		);
 
 	}
 

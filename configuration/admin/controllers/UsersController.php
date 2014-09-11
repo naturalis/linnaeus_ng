@@ -2107,11 +2107,11 @@ MUST CHECK
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$users,
-				$this->controllerBaseName,
-				'edit.php?id=%s'
-			)
+			$this->makeLookupList(array(
+				'data'=>$users,
+				'module'=>$this->controllerBaseName,
+				'url'=>'edit.php?id=%s'
+			))
 		);
 		
 	}

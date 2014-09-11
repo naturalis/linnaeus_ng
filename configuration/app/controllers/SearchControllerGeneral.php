@@ -1331,12 +1331,11 @@ class SearchControllerGeneral extends SearchController
 
 			$this->smarty->assign(
 				'returnText',
-				$this->makeLookupList(
-					(array)$this->getSearchResultIndex(),
-					$this->controllerBaseName,
-					null,
-					false
-				)
+				$this->makeLookupList(array(
+					'data'=>(array)$this->getSearchResultIndex(),
+					'module'=>$this->controllerBaseName,
+					'sortData'=>false
+				))
 			);
 
         }

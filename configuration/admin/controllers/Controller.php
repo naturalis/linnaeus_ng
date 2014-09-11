@@ -1606,16 +1606,26 @@ class Controller extends BaseClass
 
 
 
-    public function makeLookupList($data,$module,$url,$sortData=false,$doJSONencode=true,$isFullSet=true)
+    public function makeLookupList($p)
     {
-        $sortBy = array(
-            'key' => 'label',
-            'dir' => 'asc',
-            'case' => 'i'
-        );
 
+		$data=isset($p['data']) ? $p['data'] : null;
+		$module=isset($p['module']) ? $p['module'] : null;
+		$url=isset($p['url']) ? $p['url'] : null;
+		$sortData=isset($p['sortData']) ? $p['sortData'] : false;
+		$encode=isset($p['encode']) ? $p['encode'] : true;
+		$isFullSet=isset($p['isFullSet']) ? $p['isFullSet'] : true;
+		
         if ($sortData)
+		{
+			$sortBy = array(
+				'key' => 'label',
+				'dir' => 'asc',
+				'case' => 'i'
+			);
+
             $this->customSortArray($data, $sortBy);
+		}
 
         $d = array(
             'module' => $module,
@@ -1624,7 +1634,7 @@ class Controller extends BaseClass
 			'fullset'=> $isFullSet
         );
 
-        return $doJSONencode ? json_encode($d) : $d;
+        return $encode ? json_encode($d) : $d;
     }
 
 

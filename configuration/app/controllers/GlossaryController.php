@@ -469,12 +469,12 @@ class GlossaryController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$l,
-				$this->controllerBaseName,
-				'../glossary/term.php?id=%s',
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$l,
+				'module'=>$this->controllerBaseName,
+				'url'=>'../glossary/term.php?id=%s',
+				'sortData'=>true
+			))
 		); // for glossary lookup list
 		
 		return $l; // for combined lookup list

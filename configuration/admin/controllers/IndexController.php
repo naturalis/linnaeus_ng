@@ -255,8 +255,8 @@ class IndexController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				(array)$s
+			$this->makeLookupList(array(
+				'data'=>(array)$s
 				/*
 				array_merge(
 					(array)$g,
@@ -265,10 +265,9 @@ class IndexController extends Controller
 					(array)$m
 				)
 				*/,
-				$this->controllerBaseName,
-				null,
-				true
-			)
+				'module'=>$this->controllerBaseName,
+				'sortData'=>true
+			))
 		);	
 		
 	}

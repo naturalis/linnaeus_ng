@@ -1087,12 +1087,12 @@ class GlossaryController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				array_merge((array)$l1,(array)$l2),
-				$this->controllerBaseName,
-				'../glossary/edit.php?id=%s',
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>array_merge((array)$l1,(array)$l2),
+				'module'=>$this->controllerBaseName,
+				'url'=>'../glossary/edit.php?id=%s',
+				'sortData'=>true
+			))
 		); // for glossary lookup list
 		
 		return array_merge((array)$l1,(array)$l2); // for combined lookup list

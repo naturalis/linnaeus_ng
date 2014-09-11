@@ -509,11 +509,11 @@ class MapKeyController extends Controller
 			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
 
 			$this->smarty->assign('taxa',
-				$this->makeLookupList(
-					$taxa,
-					'species',
-					'../mapkey/l2_examine_species.php?id=%s'
-				)
+				$this->makeLookupList(array(
+					'data'=>$taxa,
+					'module'=>'species',
+					'url'=>'../mapkey/l2_examine_species.php?id=%s'
+				))
 			);
 			
 			$this->smarty->assign('numOfTaxa',count((array)$taxa));
@@ -605,11 +605,11 @@ class MapKeyController extends Controller
 			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
 
 			$this->smarty->assign('taxa',
-				$this->makeLookupList(
-					$taxa,
-					'species',
-					'../species/taxon.php?id=%s'
-				)
+				$this->makeLookupList(array(
+					'data'=>$taxa,
+					'module'=>'species',
+					'url'=>'../species/taxon.php?id=%s'
+				))
 			);
 			
 		}
@@ -1096,12 +1096,12 @@ class MapKeyController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$l,
-				'species',
-				'../mapkey/examine_species.php?id=%s',
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$l,
+				'module'=>'species',
+				'url'=>'../mapkey/examine_species.php?id=%s',
+				'sortData'=>true
+			))
 		);
 
 	}
@@ -1869,12 +1869,12 @@ class MapKeyController extends Controller
 		if (isset($taxa)) {
 
 			$this->smarty->assign('returnText',
-				$this->makeLookupList(
-					$taxa,
-					'species',
-					'../mapkey/l2_examine_species.php?id=%s'
-				)
-			);
+				$this->makeLookupList(array(
+					'data'=>$taxa,
+					'module'=>'species',
+					'url'=>'../mapkey/l2_examine_species.php?id=%s'
+					))
+				);
 			
 		}
 	

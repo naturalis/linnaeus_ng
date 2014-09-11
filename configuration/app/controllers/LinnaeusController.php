@@ -421,12 +421,11 @@ class LinnaeusController extends Controller
 */
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$data,
-				$this->controllerBaseName,
-				null,
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$data,
+				'module'=>$this->controllerBaseName,
+				'sortData'=>true
+			))
 		); 
 			
 	}
