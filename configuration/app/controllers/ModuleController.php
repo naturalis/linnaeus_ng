@@ -538,7 +538,15 @@ class ModuleController extends Controller
             'columns' => 'distinct page_id as id, topic as label'
         ));
         
-        $this->smarty->assign('returnText', $this->makeLookupList($cfm, $this->controllerBaseName, '../module/topic.php?id=%s', true));
+        $this->smarty->assign(
+			'returnText', 
+			$this->makeLookupList(array(
+				'data'=>$cfm, 
+				'module'=>$this->controllerBaseName,
+				'url'=>'../module/topic.php?id=%s', 
+				'sortData'=>true
+			))
+		);
     }
 
 }

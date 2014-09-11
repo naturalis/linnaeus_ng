@@ -877,11 +877,11 @@ class LiteratureController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$l,
-				$this->controllerBaseName,
-				'../literature/edit.php?id=%s'
-			)
+			$this->makeLookupList(array(
+				'data'=>$l,
+				'module'=>$this->controllerBaseName,
+				'url'=>'../literature/edit.php?id=%s'
+			))
 		);
 		
 	}

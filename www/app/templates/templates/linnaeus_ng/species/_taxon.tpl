@@ -171,6 +171,7 @@ $(document).ready(function(){
 {/if}
 
 	allLookupSetListMax(0);
+	allLookupAlwaysFetch=true;
 
 {literal}
 	/* $(".group1").colorbox({rel:'group1'}); */

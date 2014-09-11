@@ -386,11 +386,11 @@ class IntroductionController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$pages,
-				$this->controllerBaseName,
-				'../introduction/topic.php?id=%s'
-			)
+			$this->makeLookupList(array(
+				'data'=>$pages,
+				'module'=>$this->controllerBaseName,
+				'url'=>'../introduction/topic.php?id=%s'
+			))
 		);
 
 	}

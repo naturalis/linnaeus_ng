@@ -1054,13 +1054,12 @@ die();
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$this->tmp['results'],
-				'key',
-				'index.php?forcetree=1&step=%s',
-				false,
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$this->tmp['results'],
+				'module'=>'key',
+				'url'=>'index.php?forcetree=1&step=%s',
+				'encode'=>true
+			))
 		);	
 		
 	}

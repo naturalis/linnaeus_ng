@@ -60,8 +60,9 @@ function allLookupGetData(text,getAll) {
 
 	allLookupDataShowLoading();
 
-	if (allLookupData==null || allLookupAlwaysFetch) {
-
+	if (allLookupData==null || allLookupAlwaysFetch)
+	{
+		// actually fetch data
 		$.ajax({
 			url : allLookupContentUrl,
 			type: "POST",
@@ -78,37 +79,42 @@ function allLookupGetData(text,getAll) {
 				//console.log(data);
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
-				if (data) allLookupBuildList(allLookupData,text);
+				allLookupBuildList(allLookupData,text);
 				allLookupDataHideLoading();
 
 			}
 		});
 		
-	} else {
-
-		if (allLookupData && allLookupData.results) {
+	} 
+	else
+	{
+		// used fetched data
+		if (allLookupData && allLookupData.results)
+		{
 			
 			if (allLookupMatchStartOnly)
+			{
 				//var regExp = '/^'+addSlashes(text)+'/ig';
 				var regExp = '/\\b'+addSlashes(text)+'/ig';
+			}
 			else
+			{
 				var regExp = '/'+addSlashes(text)+'/ig';
+			}
 		
 			
 			//var d = eval (allLookupData.toSource());
 			var d = jQuery.extend(true, {}, allLookupData);
 			r = new Array();
 
-			for(var i=0;i<allLookupData.results.length;i++) {
-				
+			for(var i=0;i<allLookupData.results.length;i++)
+			{
 				var stripped = stripTags(allLookupData.results[i].label);
 				
-				if (getAll || stripped.match(eval(regExp))) {
-					
+				if (getAll || stripped.match(eval(regExp)))
+				{
 					r[r.length] = allLookupData.results[i]
-					
 				}
-
 			}
 
 			d.results = r;
@@ -133,7 +139,8 @@ function allLookupPostProcessing(text,data,getAll) {
 		allLookupMatchStartOnly setting.
 	*/
 	
-	if (allLookupMatchStartOnly  && !getAll) {
+	if (allLookupMatchStartOnly  && !getAll)
+	{
 
 		//var regExp = '/^'+addSlashes(text)+'/ig';
 		var regExp = '/\\b'+addSlashes(text)+'/ig';
@@ -142,14 +149,17 @@ function allLookupPostProcessing(text,data,getAll) {
 		var d = jQuery.extend(true, {}, data);
 		r = new Array();
 
-		for(var i=0;i<data.results.length;i++) {
-			
-			if (data.results[i].label.match(eval(regExp))) {
+		if (data.results)
+		{
+			for(var i=0;i<data.results.length;i++) {
 				
-				r[r.length] = data.results[i]
-				
+				if (data.results[i].label.match(eval(regExp))) {
+					
+					r[r.length] = data.results[i]
+					
+				}
+	
 			}
-
 		}
 
 		d.results = r;
@@ -445,11 +455,16 @@ function allLookupSetSelectedId(id) {
 
 }
 
-function allLookupScrollToSelectedId() {
-
-	var diff = $('#'+allLookupSelectedElement).offset().top - $('#lookup-DialogContent').offset().top;
-	$('#lookup-DialogContent').animate({scrollTop: diff},100);
-
+function allLookupScrollToSelectedId()
+{
+	try
+	{
+		var diff = $('#'+allLookupSelectedElement).offset().top - $('#lookup-DialogContent').offset().top;
+		$('#lookup-DialogContent').animate({scrollTop: diff},100);
+	} 
+	catch(e) {
+		null;
+	}
 }
 
 $(document).ready(function(){

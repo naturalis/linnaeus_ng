@@ -810,12 +810,12 @@ class IntroductionController extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$cfm,
-				$this->controllerBaseName,
-				'../introduction/edit.php?id=%s',
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$cfm,
+				'module'=>$this->controllerBaseName,
+				'url'=>'../introduction/edit.php?id=%s',
+				'sortData'=>true
+			))
 		);
 		
 	}

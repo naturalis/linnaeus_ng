@@ -487,14 +487,13 @@ class Literature2Controller extends Controller
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
 
 		return
-			$this->makeLookupList(
-				$data,
-				'reference',
+			$this->makeLookupList(array(
+				'data'=>$data,
+				'module'=>'reference',
 				'reference.php?id=%s',
-				false,
-				true,
-				count($data)<$maxResults
-			);
+				'encode'=>true,
+				'isFullSet'=>count($data)<$maxResults
+			));
 
     }
 

@@ -369,11 +369,11 @@ class Literature2Controller extends Controller
 
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$l,
-				$this->controllerBaseName,
-				'../literature/reference.php?id=%s'
-			)
+			$this->makeLookupList(array(
+				'data'=>$l,
+				'module'=>$this->controllerBaseName,
+				'url'=>'../literature/reference.php?id=%s'
+			))
 		);
 		
 	}

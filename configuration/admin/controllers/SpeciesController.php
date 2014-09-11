@@ -4873,14 +4873,13 @@ class SpeciesController extends Controller
 		}
 
 		return
-			$this->makeLookupList(
-				$taxa,
-				'species',
-				'../species/taxon.php?id=%s',
-				false,
-				true,
-				count($taxa)<$maxResults
-			);
+			$this->makeLookupList(array(
+				'data'=>$taxa,
+				'module'=>'species',
+				'url'=>'../species/taxon.php?id=%s',
+				'encode'=>true,
+				'isFullSet'=>count($taxa)<$maxResults
+			));
 
     }
 

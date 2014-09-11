@@ -1027,12 +1027,12 @@ class MapKeyController extends Controller
 		
 		$this->smarty->assign(
 			'returnText',
-			$this->makeLookupList(
-				$l,
-				'species',
-				'../mapkey/species_show.php?id=%s',
-				true
-			)
+			$this->makeLookupList(array(
+				'data'=>$l,
+				'module'=>'species',
+				'url'=>'../mapkey/species_show.php?id=%s',
+				'sortData'=>true
+			))
 		);
 
 	}
