@@ -1,12 +1,21 @@
 <?php
 
+
+/*
+
+	at some point column literature2.actor_id can be dropped; now replaced with literature2_authors
+
+*/
+
+
 include_once ('Controller.php');
 
 class Literature2Controller extends Controller
 {
 
     public $usedModels = array(
-		'literature2'
+		'literature2',
+		'literature2_authors'
     );
    
     public $controllerPublicName = 'Literary references';
@@ -60,8 +69,6 @@ class Literature2Controller extends Controller
 				_a.label,
 				_a.date,
 				_a.author,
-				_a.actor_id,
-				_b.name as actor_name,
 				_a.publication_type,
 				_a.order_number,
 				_a.citation,
@@ -80,10 +87,6 @@ class Literature2Controller extends Controller
 
 			from %PRE%literature2 _a
 
-			left join %PRE%actors _b
-				on _a.actor_id = _b.id 
-				and _a.project_id=_b.project_id
-
 			left join %PRE%literature2 _c
 				on _a.publishedin_id = _c.id 
 				and _a.project_id=_c.project_id
@@ -100,8 +103,27 @@ class Literature2Controller extends Controller
 			where _a.project_id = ".$this->getCurrentProjectId()."
 			and _a.id =".$id
 		);	
+		
+		$data=$data[0];
+		
+		$authors=$this->models->Literature2Authors->freeQuery(
+			"select
+				_b.name
 
-		return $data[0];
+			from %PRE%literature2_authors _a
+
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id 
+				and _a.project_id=_b.project_id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.literature2_id =".$id
+		);
+		
+		$data['authors']=$authors;
+
+		return $data;
 
 	}
 

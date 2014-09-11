@@ -15,7 +15,11 @@
 			<table>
 				{if $ref.publication_type}<tr><td>Type</td><td>{$ref.publication_type}</td></tr>{/if}
 
-				{if $ref.actor_name}<tr><td>Auteur(s)</td><td>{$ref.actor_name}</td></tr>
+				{if $ref.authors}<tr><td>Auteur{if $ref.authors|@count>1}s{/if}</td><td>
+                	{foreach from=$ref.authors item=v key=k}
+                    	{$v.name}{if $ref.authors|@count>1 && $k<$ref.authors|@count-1}{if $k==$ref.authors|@count-2} &{else},{/if}{/if}
+                   	{/foreach}
+                    </td></tr>
 				{elseif $ref.author}<tr><td>Auteur(s)</td><td>{$ref.author}</td></tr>{/if}
 
 				{if $ref.date}<tr><td>Jaar</td><td>{$ref.date}</td></tr>{/if}

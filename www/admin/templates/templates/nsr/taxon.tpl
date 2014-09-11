@@ -43,7 +43,7 @@
 				<span class="editspan" id="taxon">
 				<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" />
 				</span> *
-				<input type="hidden" id="concept_taxon_id" value="{$concept.taxon.id}" />
+				<input type="hidden" id="concept_taxon_id" value="{$concept.id}" />
 			</td>
 		</tr>
 		<tr><th>rang:</th>
