@@ -106,8 +106,8 @@ class Literature2Controller extends Controller
 		
 		$data=$data[0];
 		
-		$authors=$this->models->Literature2Authors->freeQuery(
-			"select
+		$authors=$this->models->Literature2Authors->freeQuery("
+			select
 				_b.name
 
 			from %PRE%literature2_authors _a
@@ -118,8 +118,9 @@ class Literature2Controller extends Controller
 
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.literature2_id =".$id
-		);
+				and _a.literature2_id =".$id."
+			order by _b.name
+		");
 		
 		$data['authors']=$authors;
 
