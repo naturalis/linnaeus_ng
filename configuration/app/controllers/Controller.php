@@ -1478,8 +1478,14 @@ class Controller extends BaseClass
         }
 
         // Now we're handling more complicated cases. We need the parent before continuing
+
+        // Say goodbye to the orphans #1
+		if (empty($taxon['parent_id']))
+		{
+            return $taxon['taxon'];
+		}
         $parent = $this->getTaxonById($taxon['parent_id']);
-        // Say goodbye to the orphans
+        // Say goodbye to the orphans 32
         if (empty($parent['rank_id'])) {
             return $taxon['taxon'];
         }
