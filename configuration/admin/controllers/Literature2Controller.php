@@ -13,7 +13,8 @@ class Literature2Controller extends Controller
 		'literature_taxon',
 		'names',
 		'actors',
-		'presence_taxa'
+		'presence_taxa',
+		'literature2_authors'
     );
    
     public $controllerPublicName = 'Literatuur (v2)';
@@ -164,7 +165,6 @@ class Literature2Controller extends Controller
 			'label' => 'Naam',
 			'date' => 'Datum',
 			'author' => 'Auteur (verbatim)',
-			'actor_id' => 'Auteur',
 			'publication_type' => 'Publicatietype',
 			'citation' => 'Citatie',
 			'source' => 'Bron',
@@ -193,6 +193,39 @@ class Literature2Controller extends Controller
 			}
 		}
 		
+
+		// we'll generalize this once another one-many relation appears
+		if ($this->rHasVar('actor_id'))
+		{
+			
+			$current=$this->getReferenceAuthors();
+			$retain=array();
+			$new=$this->rGetVal('actor_id');
+
+			foreach($current as $key=>$actor) 
+			{
+				if (!in_array($actor['actor_id'],$new))
+				{
+					$this->deleteReferenceAuthor($actor['actor_id']);
+					$this->addMessage('Auteur verwijderd.');
+				}
+				else
+				{
+					array_push($retain,$actor['actor_id']);
+				}
+			}
+
+			foreach($new as $actor) 
+			{
+				if (!in_array($actor,$retain))
+				{
+					$this->saveReferenceAuthor($actor);
+					$this->addMessage('Auteur toegevoegd.');
+				}
+			}
+
+		}
+		
 	}
 
 	private function updateReferenceValue($name,$value)
@@ -202,7 +235,7 @@ class Literature2Controller extends Controller
 			array('id'=>$this->getReferenceId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
-
+				
 	private function deleteReference()
 	{
 		$id=$this->getReferenceId();
@@ -223,10 +256,82 @@ class Literature2Controller extends Controller
 		);
 		$this->addMessage("Referentie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
 
+		$this->deleteReferenceAuthors();
+
+		$this->addMessage("Auteurs ontkoppeld.");
+
 		$this->models->Literature2->freeQuery("delete from %PRE%literature2 where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");	
+		
 		$this->addMessage("Referentie verwijderd.");
 
 	}
+
+	private function getReferenceAuthors($id=null)
+	{
+		if (empty($id))
+		{
+			$id=$this->getReferenceId();
+			if (empty($id))
+			{
+				$this->addError("Geen ID.");
+				return;
+			}
+		}
+
+		return $this->models->Literature2Authors->freeQuery("
+			select
+				_a.actor_id, _b.name
+	
+			from %PRE%literature2_authors _a
+	
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id 
+				and _a.project_id=_b.project_id
+	
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.literature2_id =".$id."
+			order by _b.name
+		");
+		
+	}
+			
+	private function saveReferenceAuthor($actor)
+	{
+		return $this->models->Literature2Authors->save(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'literature2_id' => $this->getReferenceId(),
+				'actor_id' => $actor
+			));
+	}
+
+	private function deleteReferenceAuthor($actor)
+	{
+		$id=$this->getReferenceId();
+
+		if (empty($id)||empty($actor))
+		{
+			$this->addError("Geen ID.");
+			return;
+		}
+
+		$this->models->Literature2Authors->freeQuery("delete from %PRE%literature2_authors where project_id = ".$this->getCurrentProjectId()." and literature2_id = ".$id." and actor_id = ".$actor." limit 1");	
+	}
+
+	private function deleteReferenceAuthors()
+	{
+		$id=$this->getReferenceId();
+
+		if (empty($id))
+		{
+			$this->addError("Geen ID.");
+			return;
+		}
+
+		$this->models->Literature2Authors->freeQuery("delete from %PRE%literature2_authors where project_id = ".$this->getCurrentProjectId()." and literature2_id = ".$id);	
+	}
+
 
 
 	private function getTitleAlphabet()
@@ -284,15 +389,10 @@ class Literature2Controller extends Controller
 		$l=$this->models->Literature2->freeQuery(
 			"select
 				_a.*,
-				ifnull(_a.author,ifnull(_e.name,'-')) as author_or_verbatim,
 				_h.label as publishedin_label,
 				_i.label as periodical_label
 
 			from %PRE%literature2 _a
-
-			left join %PRE%actors _e
-				on _a.actor_id = _e.id 
-				and _a.project_id=_e.project_id
 
 			left join  %PRE%literature2 _h
 				on _a.publishedin_id = _h.id 
@@ -306,9 +406,30 @@ class Literature2Controller extends Controller
 				_a.project_id = ".$this->getCurrentProjectId()." 
 				and _a.id = ".$id
 		);
+
 		
 		if ($l)
+		{
+			$authors=$this->models->Literature2Authors->freeQuery("
+				select
+					_a.actor_id, _b.name
+	
+				from %PRE%literature2_authors _a
+	
+				left join %PRE%actors _b
+					on _a.actor_id = _b.id 
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$this->getCurrentProjectId()."
+					and _a.literature2_id =".$id."
+				order by _b.name
+			");
+		
+			$l[0]['authors']=$authors;
+			
 			return $l[0];
+		}
 
 	}
 
@@ -331,6 +452,7 @@ class Literature2Controller extends Controller
 			$fetchNonAlpha=false;
 		}
 
+		/*
 		$data=$this->models->Literature2->freeQuery(
 			"select
 				_a.id,
@@ -396,7 +518,135 @@ class Literature2Controller extends Controller
 				(!empty($search) || !empty($searchTitle) ? "_a.label, _a.author " : "" ).
 				(!empty($searchAuthor) ? "_a.author, _a.label " : "" )
 			);	
+		*/
+
+
+		$all=$this->models->Literature2->freeQuery(
+			"select
+				_a.id,
+				_a.language_id,
+				_a.label,
+				_a.date,
+				_a.author,
+				_a.publication_type,
+				_a.citation,
+				_a.source,
+				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
+				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
+				_a.pages,
+				_a.volume,
+				_a.external_link
+				
+			from %PRE%literature2 _a
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id 
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i 
+				on _a.periodical_id = _i.id 
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()
+			);	
+
+		$data=array();
+
+		foreach((array)$all as $key => $val)
+		{
+			$authors=$this->getReferenceAuthors($val['id']);
 			
+			$authors=$authors[0]['authors'];
+			
+			$match=false;
+			
+			if(!empty($search) && $search!='*')
+			{
+				if ($matchStartOnly)
+				{
+					$match=$match ? true : (stripos($val['label'],$search)===0);
+	
+					if (!$match)
+						$match=$match ? true : (stripos($val['author'],$search)===0);
+					
+					if (!$match)
+						$match=$match ? true : (stripos($authors,$search)===0);
+				}
+				else 
+				{
+					$match=$match ? true : (stripos($val['label'],$search)!==false);
+	
+					if (!$match)
+						$match=$match ? true : (stripos($val['author'],$search)!==false);
+					
+					if (!$match)
+						$match=$match ? true : (stripos($authors,$search)!==false);
+				}
+
+			} else
+			if(!empty($searchTitle))
+			{	
+				if ($fetchNonAlpha)
+				{
+					$startLetterOrd=ord(substr(strtolower($val['label']),0,1));
+					$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
+				}
+				else
+				{
+					if ($matchStartOnly)
+						$match=$match ? true : (stripos($val['label'],$searchTitle)===0);
+					else
+						$match=$match ? true : (stripos($val['label'],$searchTitle)!==false);
+				}
+
+			} else
+			if (!empty($searchAuthor))
+			{
+				if ($matchStartOnly)
+					$match=$match ? true : (stripos($val['author'],$searchAuthor)===0);
+				else
+					$match=$match ? true : (stripos($val['author'],$searchAuthor)!==false);
+
+				if (!$match)
+				{
+					if ($fetchNonAlpha)
+					{
+						$startLetterOrd=ord(substr(strtolower($authors),0,1));
+						$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
+					}
+					else
+					{
+						if ($matchStartOnly)
+							$match=$match ? true : (stripos($authors,$searchAuthor)===0);
+						else
+							$match=$match ? true : (stripos($authors,$searchAuthor)!==false);
+					}
+				}
+			}
+			
+			if ($match)
+			{
+				$val['authors']=$authors;
+				$data[]=$val;
+			}
+				 
+		}
+
+		if (!empty($searchAuthor))
+		{
+			usort($data,function($a,$b)
+			{ 
+				$aa=isset($a['authors']) ? $a['authors'] : $a['author'];
+				$bb=isset($b['authors']) ? $b['authors'] : $b['author'];
+				return strtolower($aa)>strtolower($bb);
+			});
+		}
+		else
+		{
+			usort($data,function($a,$b){ return strtolower($a['label'])>strtolower($b['label']); });
+		}
+
 		return $data;
 		
 	}

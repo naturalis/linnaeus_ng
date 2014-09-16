@@ -2806,8 +2806,10 @@ class SpeciesController extends Controller
 		if (empty($t[0]['id']))
 			die('no top!?');
 
+		/*
 		if (count((array)$t)>1)
 			die('multiple tops!?');
+		*/
 
 		$this->tmp=array();
 

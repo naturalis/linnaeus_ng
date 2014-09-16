@@ -92,10 +92,6 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('search',$this->requestData);	
 				$this->smarty->assign('querystring',$this->reconstructQueryString());
 
-
-//q($this->getTaxonMedia($this->requestData),1);
-
-
 //				if($taxon['base_rank_id']>=SPECIES_RANK_ID)
 				{
 					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));	

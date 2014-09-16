@@ -84,6 +84,7 @@ class NsrTreeController extends Controller
 		{
 	        $return=json_encode($this->restoreTree());
         }
+
         
         $this->allowEditPageOverlay = false;
 
@@ -458,5 +459,6 @@ class NsrTreeController extends Controller
 			);
 		
 	}
+
 
 }

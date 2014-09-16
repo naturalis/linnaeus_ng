@@ -2,6 +2,40 @@ var activeNode=false;
 var container='tree-container';
 var url='ajax_interface.php';
 var taxonTargetUrl='taxon.php?id=%s';
+var autoExpandArray=Array();
+var highlightNodes=Array();
+
+function setHighlightNode(node)
+{
+	highlightNodes.push(node);
+}
+
+function shouldHighlightNode(node)
+{
+	for(var i=0;i<highlightNodes.length;i++)
+	{
+		if (highlightNodes[i]==node)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+function addAutoExpandNode(node)
+{
+	autoExpandArray.push(node);
+}
+
+function checkAutoExpand()
+{
+	// called from buildtree(); call directly after adding nodes with addAutoExpandNode()
+	var node=autoExpandArray.shift();
+	if (node)
+	{
+		buildtree(node);
+	}
+}
 
 function buildtree(node)
 {
@@ -21,6 +55,8 @@ function buildtree(node)
 			var data=$.parseJSON(data);
 			growbranches(data);
 			storetree();
+			checkAutoExpand();
+			
 		}
 	});
 }
@@ -37,15 +73,19 @@ function growbranches(data)
 
 		if (d.id==undefined)
 			continue;
+			
+		var shouldHighlight=shouldHighlightNode(d.id);
 
 		progeny+=
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
+				(shouldHighlight ? '<span class="highlight-node">' : '' )+
 				(d.has_children ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
 				(d.child_count && d.child_count.total>0 ?
 					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' :
 					'' 
 				)+
+				(shouldHighlight ? '</span>' : '' )+
 				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'" class="detail-link">&rarr;</a> \
 			</li>';
 	}
@@ -89,8 +129,6 @@ function growbranches(data)
 	{
 		$( "#node-"+activeNode ).replaceWith( buffer );
 	}
-	
-	$('#top').addClass('fuck');
 	
 }
 

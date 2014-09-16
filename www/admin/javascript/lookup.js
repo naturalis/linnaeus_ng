@@ -35,10 +35,16 @@ var allNavigateDefaultUrl='edit.php?id=%s';
 var allNavigateTargetUrl=null;
 var allNavigateStartWithAll=false;
 var allNavigateMatchStartOnly=false;
+var allLookupNavigateListFunction=allLookupBuildList;
 
 function allLookupNavigateOverrideUrl(url)
 {
 	allLookupTargetUrl = allNavigateTargetUrl = url;
+}
+
+function allLookupNavigateOverrideListFunction(fnc)
+{
+	allLookupNavigateListFunction = fnc;
 }
 
 function allLookup()
@@ -97,7 +103,11 @@ function allLookupGetData(text)
 				allLookupData = $.parseJSON(data);
 				//console.dir(allLookupData);
 				allLookupForceLookup=(allLookupData.fullset==false);
-				if (data) allLookupBuildList(allLookupData,text);
+				if (data) 
+				{
+					//allLookupBuildList(allLookupData,text);
+					allLookupNavigateListFunction(allLookupData,text);
+				}
 
 			}
 		});
@@ -114,6 +124,8 @@ function allLookupGetData(text)
 
 			for(var i=0;i<allLookupData.results.length;i++)
 			{
+				if (!allLookupData.results[i].label) continue;
+				
 				if (allLookupData.results[i].label.match(eval('/'+addSlashes(text)+'/ig')))
 				{
 					r[r.length] = allLookupData.results[i]
@@ -122,7 +134,9 @@ function allLookupGetData(text)
 
 			d.results = r;
 		}
-		allLookupBuildList(d,text);
+		//allLookupBuildList(d,text);
+		allLookupNavigateListFunction(d,text);
+		
 	}
 
 	return true;
@@ -163,50 +177,6 @@ function allLookupBuildList(obj,txt)
 		}
 
 		$('#'+allLookupListName).append('<ul>'+buffer.join('')+'</ul>');
-
-	}
-
-}
-
-
-
-function allLookupBuildListORG(obj,txt) {
-
-	allLookupRowCount = 0;
-	
-	allLookupClearDiv();
-
-	if (obj.results) {
-		
-		$('#'+allLookupListName).append('<table id="allLookupListTable">');
-		
-		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
-
-		for(var i=0;i<obj.results.length;i++) {
-			
-			var d = obj.results[i];
-			
-			if (d.id && d.label) {
-
-				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
-
-				$('#'+allLookupListName).append(
-					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
-						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+
-							(d.url ? d.url : url.replace('%s',d.id)) +
-							'\',\'_self\')">'+
-							d.label +
-							(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
-						'</td>'+
-					'</tr>');
-				
-				allLookupRowCount++;
-
-			}
-
-		}
-
-		$('#'+allLookupListName).append('</table>');
 
 	}
 

@@ -17,6 +17,65 @@
 </div>
 
 <script>
+
+function setAutoExpand(id)
+{
+	setHighlightNode(id);
+	
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			action : 'get_parentage' ,
+			id : id ,
+			time : allGetTimestamp()
+		}),
+		success : function (data)
+		{
+			var data=$.parseJSON(data);
+			for (index=1;index<data.length;++index)
+			{
+				addAutoExpandNode(data[index]);
+			}
+			buildtree(false);
+			//checkAutoExpand();
+		}
+	});
+}
+
+function localList(obj,txt)
+{
+	allLookupClearDiv();
+	var buffer=Array();
+
+	if (obj.results)
+	{
+		
+		for(var i=0;i<obj.results.length;i++) {
+			
+			var d = obj.results[i];
+			
+			if (d.id && d.label)
+			{
+				buffer.push(
+					'<li> \
+						<a href="#"onclick="setAutoExpand('+d.id+');return false;">'+d.label+'</a> \
+						&nbsp;&nbsp;<a href="taxon.php?id='+d.id+'">&nbsp;&rarr;&nbsp;</a> \
+					</li>'
+				);
+				
+			}
+
+		}
+
+		$('#'+allLookupListName).append('<ul>'+buffer.join('')+'</ul>');
+
+	}
+
+}
+
+
+
 $(document).ready(function() {
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
@@ -27,8 +86,9 @@ $(document).ready(function() {
 		buildtree(false);
 		//restoretree();
 	{/if}
-	
+
 	allLookupNavigateOverrideUrl(taxonTargetUrl);
+	allLookupNavigateOverrideListFunction(localList);
 	
 });
 </script>

@@ -5,11 +5,11 @@
 				<table>
 					{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" 
 	onmouseover="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information_one_line|@escape}</p>');" onmouseout="hintHide()">{$presenceData.presence_index_label}</span>){/if}</td></tr>{/if}
-					{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
-					{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label}</a></td></tr>{/if}
+					{if $presenceData.habitat_label}<tr><td style="white-space:nowrap">Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
+					{if $presenceData.reference_label}<tr><td style="white-space:nowrap">Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label}</a></td></tr>{/if}
 					{* if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
-					{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
-					{if $statusRodeLijst}<tr><td>Status rode lijst</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
+					{if $presenceData.expert_name}<tr><td style="white-space:nowrap">Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
+					{if $statusRodeLijst}<tr><td style="white-space:nowrap">Status rode lijst</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
 				</table>
 			</p>
 
