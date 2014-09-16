@@ -12,7 +12,9 @@ class ActorsController extends Controller
 		'literature2',
 		'names',
 		'actors',
-		'presence_taxa'
+		'presence_taxa',
+		'content_taxon',
+		'literature2_authors'
     );
    
     public $controllerPublicName = 'Actoren';
@@ -158,6 +160,7 @@ class ActorsController extends Controller
 	{
 		$f=array( 
 			'name' => 'Naam',
+			'name_alt' => 'Alternatieve naam',
 			'gender' => 'Geslacht',
 			'is_company' => '"Persoon of instelling"',
 			'homepage' => 'Homepage',
@@ -220,9 +223,16 @@ class ActorsController extends Controller
 		);
 		$this->addMessage("Organisatie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
 
+		$this->models->Literature2Authors->freeQuery(
+			"delete from %PRE%literature2_authors where project_id = ".$this->getCurrentProjectId()." and actor_id = ".$id
+		);
+		$this->addMessage("Auteur ontkoppeld van ".$this->models->Literature2Authors->getAffectedRows()." literatuurreferenties.");
+
+		$this->models->Actors->freeQuery("delete from %PRE%rdf where _a.object_id=".$id." _a.object_type='actor'");
+		$this->addMessage("Auteur verwijderd van ".$this->models->Actors->getAffectedRows()." paspoorten.");
+
 		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");	
 		$this->addMessage("Actor verwijderd.");
-
 	}
 
 	private function getCompanyAlphabet()
@@ -318,12 +328,13 @@ class ActorsController extends Controller
 				and _a.is_company = ".($isCompany ? '1' : '0' )."
 				". ($search!='*' ? "	
 					and (
-						_a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
-						_a.name_alt like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+						_a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' 
 					)" : "")."
 
 			order by _a.name
 			");	
+
+//						or _a.name_alt like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 
 		return $data;
 		
@@ -420,15 +431,43 @@ class ActorsController extends Controller
 			")"
 		);	
 		
+		$passports=$this->models->ContentTaxon->freeQuery("
+			select
+				_a.id,
+				_a.subject_type,
+				_a.predicate,
+				_c.taxon,
+				_d.title,
+				_b.taxon_id
+			from
+				%PRE%rdf _a
+
+			left join %PRE%content_taxa _b
+				on _a.project_id = _b.project_id
+				and _a.subject_id = _b.id
+				
+			left join %PRE%pages_taxa_titles _d
+				on _a.project_id = _d.project_id
+				and _b.page_id = _d.page_id
+				and _d.language_id = ".$this->getDefaultProjectLanguage()."
+
+			left join %PRE%taxa _c
+				on _a.project_id = _b.project_id
+				and _b.taxon_id = _c.id
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.object_id=".$id."
+				and _a.object_type='actor'
+				and _a.subject_type='passport'
+			order by taxon, title
+		");
+		
 		return array(
 			'names' => $names,
 			'presences'=>$presences,
+			'passports'=>$passports,
 		);
 	
 	}
-
-
-
-
 	
 }

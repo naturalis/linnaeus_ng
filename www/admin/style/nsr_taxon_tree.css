@@ -39,4 +39,6 @@ li.child.no-expand {
 #tree-container .italics {
 	font-style:italic;
 }
-
+#tree-container .highlight-node {
+	background-color:yellow;
+}

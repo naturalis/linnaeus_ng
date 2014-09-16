@@ -35,16 +35,24 @@
 	<tr><th>auteur (verbatim):</th><td><input class="large" type="text" name="author" value="{$reference.author}" /></td></tr>
 	{*/if*}
 	<tr>
-		<th>auteur:</th>
+		<th>auteur(s):</th>
 		<td>
-			<select id="actor_id" name="actor_id">
-				<option value="" {if !$reference.actor_id} selected="selected"{/if}>-</option>
-			{foreach from=$actors item=v key=k}
-			{if $v.is_company=='0'}
-				<option value="{$v.id}" {if $v.id==$reference.actor_id} selected="selected"{/if}>{$v.label}</option>
-			{/if}
+        	<span id="authors">
+			{foreach from=$reference.authors item=author key=kk}
+            	<span id="actor_id-{$kk}">
+                <select name="actor_id[]">
+                    <option value="" {if !$reference.actor_id} selected="selected"{/if}>-</option>
+                {foreach from=$actors item=v key=k}
+                {if $v.is_company=='0'}
+                    <option value="{$v.id}" {if $v.id==$author.actor_id} selected="selected"{/if}>{$v.label}</option>
+                {/if}
+                {/foreach}
+                </select><a class="edit" href="#" onclick="removeAuthorField({$kk});return false;">verwijderen</a>
+                <br />
+                </span>
 			{/foreach}
-			</select> 
+            </span>
+            <a class="edit" style="margin-left:0px;" href="#" onclick="addAuthorField();return false;">auteur toevoegen</a>
 		</td>
 	</tr>
 	<tr>
@@ -136,15 +144,11 @@
 <script>
 $(document).ready(function()
 {
-	/*
-	$('[havedroplist=true]').each(function() {
-		$(this).attr('autocomplete','off');
-		$(this).bind('keyup', function(e) { 
-			doNsrDropList({ e:e, id: $(this).attr('id') } )
-		} );
-	});
-	*/
-
+	{foreach from=$actors item=v key=k}
+	{if $v.is_company!='1'}
+	storeAuthor({ id: {$v.id},name:'{$v.label|@escape}'});
+	{/if}
+	{/foreach}
 });
 </script>
 

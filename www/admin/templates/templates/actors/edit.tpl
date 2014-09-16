@@ -14,9 +14,7 @@
 <table>
 
 	<tr><th>naam:</th><td><input class="large" type="text" name="name" value="{$actor.name}" /></td></tr>
-	{if $actor.name_alt}
-	<tr><th>name_alt:</th><td><input class="small" type="text" name="name_alt" value="{$actor.name_alt}" /></td></tr>
-	{/if}
+	<tr><th>alternatieve naam:</th><td><input class="large" type="text" name="name_alt" value="{$actor.name_alt}" /></td></tr>
 	<tr>
 		<th>geslacht:</th>
 		<td>
@@ -32,7 +30,7 @@
 		</td>
 	</tr>
 	<tr><th>homepage:</th><td><input class="large" type="text" name="homepage" value="{$actor.homepage}" /></td></tr>
-	<tr>
+	<tr id="employee_of">
 		<th>werkt bij:</th>
 		<td>
 			<select id="employee_of_id" name="employee_of_id">
@@ -55,7 +53,7 @@
 <p>
 <div>
 	<b>Koppelingen</b><br />
-	{if $links.presences|@count==0 && $links.names|@count==0}
+	{if $links.presences|@count==0 && $links.names|@count==0 && $links.passports|@count==0}
 	(geen koppelingen)
 	{/if}
 	{if $links.names|@count > 0}
@@ -78,6 +76,20 @@
 			{/foreach}
 		</ul>
 	</div>
+	<br />
+	{/if}
+	{if $links.passports|@count > 0}
+	<a href="#" onclick="$('#links-passports').toggle();return false;">Gekoppelde paspoorten: {$links.passports|@count}</a>
+	<div id="links-passports" style="display:none">
+		<ul class="small">
+        	{assign var=prev value=null}
+            {foreach from=$links.passports item=v key=k}{if $v.taxon_id!=$prev}
+            	</li><li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a><br />&nbsp;&nbsp;
+			{else}, {/if}
+            {$v.title}{assign var=prev value=$v.taxon_id}{/foreach}
+			</li>
+		</ul>
+	</div>
 	{/if}
 </div>
 </p>
@@ -92,14 +104,26 @@
 <script>
 $(document).ready(function()
 {
-	/*
-	$('[havedroplist=true]').each(function() {
-		$(this).attr('autocomplete','off');
-		$(this).bind('keyup', function(e) { 
-			doNsrDropList({ e:e, id: $(this).attr('id') } )
-		} );
-	});
-	*/
+	
+	$( 'input[name=is_company]' ).on( "click", function() {
+		$( 'input[name=is_company]' ).each(function(){
+			if ($(this).attr('checked')=='checked') {
+				if ($(this).val()==1)
+				{
+					$('#employee_of').toggle(false);
+					$('#employee_of_id').val("");
+				}
+				else
+				{
+					$('#employee_of').toggle(true);
+				}
+			}
+		});
+	} );
+	
+	{if $actor.is_company=='1'}
+	$('#employee_of').toggle(false);
+	{/if}
 
 });
 </script>

@@ -36,7 +36,8 @@ class NsrTaxonController extends Controller
 		'actors',
 		'literature2',
 		'rdf',
-		'nsr_ids'
+		'nsr_ids',
+		'taxon_quick_parentage'
     );
     public $usedHelpers = array(
     );
@@ -96,7 +97,6 @@ class NsrTaxonController extends Controller
 
     public function taxonNewAction()
     {
-		
 		$this->checkAuthorisation();
 
         $this->setPageName($this->translate('New taxon concept'));
@@ -109,7 +109,8 @@ class NsrTaxonController extends Controller
 			{
 				$this->saveName(); 		// saves valid name
 				$this->saveDutchName(); // saves dutch name
-
+				$this->saveParentage($this->getConceptId());
+				$this->resetTree();
 				$this->redirect('taxon.php?id='.$this->getConceptId());
 			}		
 		}
@@ -150,6 +151,7 @@ class NsrTaxonController extends Controller
 			//$this->deleteVanAllesEnNogWat();
 			//$this->deleteConcept();
 			//$this->setMessage('Concept verwijderd.');
+			//$this->resetTree();
 			//$this->redirect('index.php');
 		} 
 		else
@@ -157,7 +159,8 @@ class NsrTaxonController extends Controller
 		{
 			$this->setConceptId($this->rGetId());
 			$this->updateConcept();
-
+			$this->saveParentage($this->getConceptId());
+			$this->resetTree();
 		}
 		else
 		{
@@ -247,6 +250,13 @@ class NsrTaxonController extends Controller
 		{
 			$return=$this->getInheritableName(array('id'=>$this->rGetVal('id')));
         }
+		else
+		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
+		{
+	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
+        }
+
+
 		
 		
         $this->allowEditPageOverlay=false;
@@ -1853,11 +1863,130 @@ class NsrTaxonController extends Controller
 	}
 
 
+	private function getProgeny($parent,$level,$family)
+	{
+		$result = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'parent_id' => $parent
+				),
+				'columns' => 'id,parent_id,taxon,'.$level.' as level'
+			)
+		);
+
+		$family[]=$parent;
+
+		foreach((array)$result as $row)
+		{
+			$row['parentage']=$family;
+			$this->tmp[]=$row;
+			$this->getProgeny($row['id'],$level+1,$family);
+		}
+	}
+
+	private function getParents($parent,$level,$family)
+	{
+		$result = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $parent
+				),
+				'columns' => 'id,parent_id,taxon'
+			)
+		);
+
+		$family[]=$parent;
+
+		foreach((array)$result as $row)
+		{
+			$row['parentage']=$family;
+			$this->tmp[]=$row;
+			$this->getParents($row['parent_id'],$level+1,$family);
+		}
+	}
+
+	private function saveParentage($id=null)
+	{
+
+		if (!$this->models->TaxonQuickParentage->getTableExists())
+			return;
+			
+		if (empty($id))
+		{
+
+			$t = $this->treeGetTop();
+	
+			if (empty($t))
+				die('no top!?');
+			/*
+			if (count((array)$t)>1)
+				die('multiple tops!?');
+			*/
+	
+			$this->tmp=array();
+	
+			$this->getProgeny($t,0,array());
+
+			$d=array('project_id' => $this->getCurrentProjectId());
+	
+			$this->models->TaxonQuickParentage->delete($d);
+	
+			$i=0;
+			foreach((array)$this->tmp as $key=>$val)
+			{
+	
+				if (!is_null($id) && $val['id']!=$id)
+					continue;
+	
+				$this->models->TaxonQuickParentage->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id,
+					'parentage' => implode(' ',$val['parentage'])
+	
+				));
+	
+				$i++;
+			}
+					
+		}
+		else
+		{
+			$this->tmp=array();
+			$t=$this->getTaxonById($id);
+			$this->getParents($t['parent_id'],0,array());
+			$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
+			$qp=array_pop($this->tmp);
+			$this->models->TaxonQuickParentage->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id,
+				'parentage' => implode(' ',array_reverse($qp['parentage']))
+
+			));
+			$i=1;
+		}
+
+		return $i;
+
+	}
+
+	
+
 
 
 	private function restoreTree()
 	{
 		return isset($_SESSION['admin']['user']['species']['tree']) ?  $_SESSION['admin']['user']['species']['tree'] : null;
+	}
+
+	private function resetTree()
+	{
+		unset($_SESSION['admin']['user']['species']['tree']);
 	}
 
 	private function treeGetTop()
@@ -2206,6 +2335,29 @@ class NsrTaxonController extends Controller
 		$m=$this->getMessage();
 		if ($m) $this->addMessage($m);
 		$this->setMessage();
+	}
+
+
+
+	private function getTaxonParentage($id)
+	{
+		if (is_null($id))
+			return;
+			
+		$this->saveParentage($id);
+
+		$d=$this->models->TaxonQuickParentage->freeQuery("
+			select
+				parentage
+			from
+				%PRE%taxon_quick_parentage
+			where 
+				project_id = ".$this->getCurrentProjectId()." 
+				and taxon_id = ".$id
+		);
+
+		return explode(' ',$d[0]['parentage']);
+
 	}
 
 }

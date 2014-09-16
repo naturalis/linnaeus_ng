@@ -26,7 +26,7 @@
 		<td><input type="text" name="specific_epithet" value="{$name.specific_epithet}"/></td>
 	</tr>		
 	<tr>
-		<td>Infra specific epithet:</td>
+		<td>Infraspecific epithet:</td>
 		<td><input type="text" name="infra_specific_epithet" value="{$name.infra_specific_epithet}"/></td>
 	</tr>		
 	<tr>

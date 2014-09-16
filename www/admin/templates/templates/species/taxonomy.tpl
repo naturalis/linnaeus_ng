@@ -51,7 +51,7 @@
 	<tr class="info-row">
 		<td>uninomial</td>
 		<td>epithet</td>
-		<td>infra specific epithet</td>
+		<td>infraspecific epithet</td>
 		<td>authorship</td>
 		<td>name author</td>
 		<td>year</td>
