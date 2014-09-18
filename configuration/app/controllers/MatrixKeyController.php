@@ -143,6 +143,9 @@ class MatrixKeyController extends Controller
 
     public function identifyAction ()
     {
+		
+//$states = $this->stateMemoryRecall();$taxa = $this->nbcGetTaxaScores($states);die('satan');		
+		
         $this->checkMatrixIdOverride();
         $this->checkMasterMatrixId();
 
@@ -342,7 +345,7 @@ class MatrixKeyController extends Controller
 		if ($this->rHasVal('action', 'get_taxa'))
 		{
             $this->stateMemoryUnset();
-            
+
             $this->stateMemoryStore($this->requestData['id']);
             
             $this->smarty->assign(
@@ -1065,7 +1068,8 @@ class MatrixKeyController extends Controller
         $stateCount = 0;
         
         // we have to find out which states we are looking for
-        foreach ((array) $states as $sKey => $sVal) {
+        foreach ((array) $states as $sKey => $sVal)
+		{
             $d = explode(':', $sVal);
             
             $charId = isset($d[1]) ? $d[1] : null;
@@ -1078,8 +1082,9 @@ class MatrixKeyController extends Controller
                     $s[$d[2]] = $d[2];
                 $stateCount++;
             }
+            else
             // ...but requires calculation for the ranged ones
-            else {
+			{
 
                 // is there a standard dev?
                 $sd = (isset($d[3]) ? $d[3] : null);
@@ -1092,16 +1097,16 @@ class MatrixKeyController extends Controller
 				
 				$value = str_replace(',','.',$value);
 
+                if (isset($sd))
                 // calculate the spread around the mean...
-                if (isset($sd)) {
-
+				{
 					$sd = str_replace(',','.',$sd);
-                    
                     $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
                     $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
                 }
+                else
                 // or mark just mark the upper and lower boundaries of the value
-                else {
+				{
                     
                     $d['lower <='] = $d['upper >='] =  floatval($value);
                 }
@@ -1124,10 +1129,11 @@ class MatrixKeyController extends Controller
         if (empty($s))
             return;
         
-        $n = $stateCount + ($incUnknowns ? 1 : 0);
-        $s = implode(',', $s);
-        $c = implode(',', $c);
-        
+        $n = $stateCount;
+        $si = implode(',', $s);
+        $ci = implode(',', $c);
+
+		// query to get all taxa, matrices and variations, including their matching percentage
         $q = "
         	select 'taxon' as type, _a.taxon_id as id,
        				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
@@ -1137,7 +1143,7 @@ class MatrixKeyController extends Controller
 				on _a.project_id = _b.project_id
 				and _a.matrix_id = _b.matrix_id
 				and _a.taxon_id = _b.taxon_id
-				and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+				and _b.state_id in (" . $si . ")
 			left join %PRE%taxa _c
 				on _a.taxon_id = _c.id
 			where _a.project_id = " . $this->getCurrentProjectId() . "
@@ -1154,7 +1160,7 @@ class MatrixKeyController extends Controller
 				on _a.project_id = _b.project_id
 				and _b.matrix_id = " . $this->getCurrentMatrixId() . "
 				and _a.id = _b.ref_matrix_id
-				and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+				and _b.state_id in (" . $si . ")
 			left join %PRE%matrices_names _c
 				on _a.id = _c.matrix_id
 				and _c.language_id = " . $this->getCurrentLanguageId() . "
@@ -1172,17 +1178,169 @@ class MatrixKeyController extends Controller
 				on _a.project_id = _b.project_id
 				and _a.matrix_id = _b.matrix_id
 				and _a.variation_id = _b.variation_id
-				and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+				and _b.state_id in (" . $si . ")
 			left join %PRE%taxa_variations _c
 				on _a.variation_id = _c.id
 			where _a.project_id = " . $this->getCurrentProjectId() . "
 				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 			group by _a.variation_id" : "")
-				//."order by s desc"
-        ;
+		;
 
-	
         $results = $this->models->MatrixTaxonState->freeQuery($q);
+
+		/*
+			"unknowns" are taxa for which no state has been defined within a certain character.
+			note that this is different froam having a differen state within that character. if
+			there is a character "colour", and taxon A has the state "green", taxon B has the 
+			state "brown" and taxon C has no state for colour, then selecting "brown" with 'Treat 
+			unknowns as matches' set to false will yield A:0%, B:100%, C:0%. selecting "brown" 
+			with 'Treat unknowns as matches' set to true will yield A:0%, B:100%, C:100%. it can
+			be seen as a 'rather safe than sorry' setting.
+		*/
+		if ($incUnknowns)
+		{
+			
+			$unknowns=array('taxon'=>array(),'matrix'=>array(),'variation'=>array());
+			
+			foreach((array)$c as $character)
+			{
+				$q = "
+					select
+						'taxon' as type, 
+						_a.taxon_id as id,
+						_c.is_hybrid as h, 
+						trim(_c.taxon) as l
+					from
+						%PRE%matrices_taxa _a
+					left join %PRE%taxa _c
+						on _a.taxon_id = _c.id
+					left join %PRE%matrices_taxa_states _b
+						on _a.project_id = _b.project_id
+						and _a.matrix_id = _b.matrix_id
+						and _a.taxon_id = _b.taxon_id
+						and _b.characteristic_id =".$character."
+					where
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					group by
+						_a.taxon_id
+					having count(_b.id)=0
+
+					union all
+
+					select
+						'matrix' as type, 
+						_a.id as id,
+						0 as h, 
+						trim(_c.name) as l
+					from
+						%PRE%matrices _a
+
+					left join %PRE%matrices_taxa_states _b
+						on _a.project_id = _b.project_id
+						and _b.matrix_id = " . $this->getCurrentMatrixId() . "
+						and _a.id = _b.ref_matrix_id
+						and _b.characteristic_id =".$character."
+					left join %PRE%matrices_names _c
+						on _a.id = _c.matrix_id
+						and _c.language_id = " . $this->getCurrentLanguageId() . "
+					where
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.id != " . $this->getCurrentMatrixId() . "
+
+					group by
+						_a.id
+					having count(_b.id)=0
+
+				".($this->_matrixType == 'nbc' ? "
+		
+					union all
+
+					select
+						'variation' as type, 
+						_a.variation_id as id,
+						0 as h, 
+						trim(_c.label) as l
+					from
+						%PRE%matrices_variations _a
+					left join %PRE%matrices_taxa_states _b
+						on _a.project_id = _b.project_id
+						and _a.matrix_id = _b.matrix_id
+						and _a.variation_id = _b.variation_id
+						and _b.characteristic_id =".$character."
+					left join %PRE%taxa_variations _c
+						on _a.variation_id = _c.id
+					where
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+
+					group by
+						_a.variation_id
+					having count(_b.id)=0
+				":"");
+
+		        $rrr=$this->models->MatrixTaxonState->freeQuery($q);
+
+				foreach($rrr as $r)
+				{
+					switch($r['type'])
+					{
+						case 'taxon': 
+							$unknowns['taxon'][$r['id']]=$r;
+							isset($unknowns['taxon'][$r['id']]['tot']) ?
+								$unknowns['taxon'][$r['id']]['tot']++ : 
+								$unknowns['taxon'][$r['id']]['tot']=1;
+
+							$unknowns['taxon'][$r['id']]['s'] = 
+								round(($unknowns['taxon'][$r['id']]['tot']/$n)*100);
+
+							break;
+						case 'matrix':
+							$unknowns['matrix'][$r['id']]=$r;
+							isset($unknowns['matrix'][$r['id']]['tot']) ?
+								$unknowns['matrix'][$r['id']]['tot']++ : 
+								$unknowns['matrix'][$r['id']]['tot']=1;
+
+							$unknowns['matrix'][$r['id']]['s'] = 
+								round(($unknowns['matrix'][$r['id']]['tot']/$n)*100);
+
+
+							break;
+						case 'variation':
+							$unknowns['variation'][$r['id']]=$r;
+							isset($unknowns['variation'][$r['id']]['tot']) ?
+								$unknowns['variation'][$r['id']]['tot']++ : 
+								$unknowns['variation'][$r['id']]['tot']=1;
+
+							$unknowns['variation'][$r['id']]['s'] = 
+								round(($unknowns['variation'][$r['id']]['tot']/$n)*100);
+
+							break;
+					}
+				}
+			}
+
+			foreach((array)$results as $key => $val)
+			{
+				if (isset($unknowns[$val['type']][$val['id']]))
+				{
+					$temp=$unknowns[$val['type']][$val['id']];
+					$results[$key]['tot']+=$temp['tot'];
+					$results[$key]['s']=round(($results[$key]['tot']/$n)*100);
+					unset($unknowns[$val['type']][$val['id']]);
+				}
+			}
+	
+			foreach((array)$unknowns as $type)
+			{
+				foreach((array)$type as $key => $val)
+				{
+					array_push($results,$val);
+				}
+			}
+
+		}
+
 
         usort($results, array(
             $this, 

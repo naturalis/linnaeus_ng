@@ -5,11 +5,19 @@
     {include file="_taxa.tpl"}
 	<div id="step">
 		<div id="question">
+
         {if $step.image}
             <div id="step-image">
                 <img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" />
             </div>
         {/if}
+
+		{if $step.content && $step.content!=$step.title}
+            <div id="content" style="width:550px;padding:0 0 0 10px;">
+                {$step.content}
+            </div>
+        {/if}
+
 		</div>
 		<div id="choices">
 
