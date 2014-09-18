@@ -394,28 +394,32 @@ class SearchControllerGeneral extends SearchController
 
 		if (!isset($s) || !isset($s[self::S_TOKENIZED_TERMS]) ) return $r;
 
-		foreach((array)$r as $rKey => $result) {
+		foreach((array)$r as $rKey => $result)
+		{
 
-			foreach((array)$f as $fKey => $field) {
+			foreach((array)$f as $fKey => $field)
+			{
 
 				$fullmatches = array();
 
-				if (isset($result[$field])) {
+				if (isset($result[$field]))
+				{
 
 					$stripped = $this->stripTagsForSearchExcerpt($result[$field]);
 
-					foreach((array)$s[self::S_TOKENIZED_TERMS] as $token) {
-
+					foreach((array)$s[self::S_TOKENIZED_TERMS] as $token)
+					{
 						$r[$rKey]['tokens_found'][$token]=!isset($r[$rKey]['tokens_found'][$token]) ? 0 : $r[$rKey]['tokens_found'][$token];
 
 						$matches=array();
 						preg_match_all('/'.$token.'/'.($s[self::S_IS_CASE_SENSITIVE] ? '' : 'i'),$stripped,$matches,PREG_OFFSET_CAPTURE);
 
-						if (isset($matches[0])) {
-							
-
-							foreach((array)$matches[0] as $match) {
-								if (isset($match[0])) {
+						if (isset($matches[0]))
+						{
+							foreach((array)$matches[0] as $match)
+							{
+								if (isset($match[0]))
+								{
 									$fullmatches[]=$match;
 									$r[$rKey]['tokens_found'][$token]++;
 								}
@@ -462,24 +466,53 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function sortResultsByMostTokensFound($data)
+	private function sortResultsByMostTokensFound($data,$secondaryfield=null)
 	{
+
 		if (count((array)$data)<2)
 			return $data;
-	
-		foreach((array)$data as $key=>$val) {
-			$scores[$key]=0;
-			if (isset($val['tokens_found'])) {
-				foreach((array)$val['tokens_found'] as $token)
-					if ($token>0) $scores[$key]++;
+
+		uasort($data,function($a,$b) use ($secondaryfield)
+		{
+			$aCount=$bCount=0;
+
+			if (!isset($a['matches']) || !isset($b['matches']))
+			{
+				foreach((array)$a['tokens_found'] as $token=>$count)
+				{
+					$aCount+=$count;
+				}
+				foreach((array)$b['tokens_found'] as $token=>$count)
+				{
+					$bCount+=$count;
+				}
 			}
-		}
-		uasort($scores,function($a,$b){return($a>$b?-1:($a<$b?1:0));});
-		$res=array();
-		foreach((array)$scores as $key => $val) {
-			$res[]=$data[$key];
-		}
-		return $res;
+			else
+			{
+				$aCount=count((array)$a['matches']);
+				$bCount=count((array)$b['matches']);
+			}
+			
+			$r=0;
+			if ($aCount>$bCount)
+				$r=-1;
+			else
+			if ($aCount<$bCount)
+				$r=1;
+			else
+			if (!empty($secondaryfield))
+			{
+				if ($a[$secondaryfield]<$b[$secondaryfield])
+					$r=-1;
+				else
+				if ($a[$secondaryfield]>$b[$secondaryfield])
+					$r=1;
+			}
+			return $r;
+		});
+		
+		return $data;
+
 	}
 	
 	private function makeLikeClause($s,$c)
@@ -1060,7 +1093,7 @@ class SearchControllerGeneral extends SearchController
 		$books = array_merge((array)$books,(array)$more); // and resets the keys as well. how neat.
 		$books = $this->filterResultsWithTokenizedSearch(array($p,$books));
 		$books = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$books));
-		$books = $this->sortResultsByMostTokensFound($books);
+		$books = $this->sortResultsByMostTokensFound($books,'label');
 
 		return array(
 			'label'=> $this->getModuleName(MODCODE_LITERATURE),
@@ -1085,7 +1118,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId()
 				),
-				'columns' => 'number',
+				'columns' => 'id, number',
 				'fieldAsIndex' => 'id'
 			)
 		);
@@ -1104,12 +1137,8 @@ class SearchControllerGeneral extends SearchController
 			)
 		);
 
- 		$choices = $this->filterResultsWithTokenizedSearch(array($p,$choices));
-		$choices = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$choices));
-		$choices = $this->sortResultsByMostTokensFound($choices);
-
-		foreach((array)$choices as $key => $val) {
-
+		foreach((array)$choices as $key => $val)
+		{
 			$step = $this->models->ChoiceKeystep->_get(
 				array(
 					'id' => array(
@@ -1120,10 +1149,13 @@ class SearchControllerGeneral extends SearchController
 				)
 			);
 
-			$choices[$key]['label'] = sprintf($this->translate('Step %s, choice %s'),$keysteps[$step[0]['keystep_id']]['number'],$step[0]['show_order']);
-
+			$choices[$key]['label']=sprintf($this->translate('Step %s, choice %s'),$keysteps[$step[0]['keystep_id']]['number'],$step[0]['show_order']);
+			$choices[$key]['id']=$step[0]['keystep_id'];
 		}
 
+ 		$choices = $this->filterResultsWithTokenizedSearch(array($p,$choices));
+		$choices = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$choices));
+		$choices = $this->sortResultsByMostTokensFound($choices,'label');
 
 
 		// steps
@@ -1134,17 +1166,18 @@ class SearchControllerGeneral extends SearchController
 					//'%LITERAL%' => "MATCH(title,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)"
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('title','content')),
 				),
-				'columns' => 'id,keystep_id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__
+				'columns' => 'keystep_id as id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__
 			)
 		);
+		
+		foreach((array)$steps as $key => $val)
+		{
+			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['id']]['number']);
+		}
 
 		$steps = $this->filterResultsWithTokenizedSearch(array($p,$steps));
 		$steps = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$steps));
-		$steps = $this->sortResultsByMostTokensFound($steps);
-
-		foreach((array)$steps as $key => $val)
-			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['keystep_id']]['number']);
-
+		$steps = $this->sortResultsByMostTokensFound($steps,'label');
 
 		return array(
 			'label'=> $this->getModuleName(MODCODE_KEY),
@@ -1157,7 +1190,8 @@ class SearchControllerGeneral extends SearchController
 				),
 				array(
 					'label' => $this->translate('Choices'),
-					'url' =>'../key/index.php?choice=%s',
+					'url' =>'../key/index.php?step=%s',
+					//'url' =>'../key/index.php?choice=%s',
 					'data' => $choices,
 					'numOfResults' => count((array)$choices)
 				)
