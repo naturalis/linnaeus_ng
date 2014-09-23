@@ -6,8 +6,18 @@
 		-moz-columns:100px 2; /* Firefox */
 
 		p{
-			margin-bottom: 0;
+			margin-bottom: 1em;
+      line-height: 1.5;
+      color: #666;
+
+      a{
+        color: black;
+      }
 		}
+
+    // invert color of internal link and normal text
+
+
 	}
 }
 
