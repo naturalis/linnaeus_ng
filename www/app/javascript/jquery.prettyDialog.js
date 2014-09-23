@@ -9,7 +9,7 @@
       +   '    <div class="dialog-close"></div>'
       +   '  </div>'
       +   '  <div class="dialog-content" class="prompt">'
-      +   '    <div class="dialog-content-inner">'
+      +   '    <div class="dialog-content-inner" >'
       +   '    </div>'
       +   '    <div class="dialog-button-container">'
       +   '      <span class="dialog-button promptbutton"></span>'
@@ -24,7 +24,6 @@
       var x = 50*Math.round(Math.random()*5);
       var y = 50*Math.round(Math.random()*5);
 
-      $_me.css("color", "green !important");
 
       var $_target = 
         $(str_html)
@@ -36,7 +35,8 @@
             .find(".dialog-content-inner")
               .append("<img src='" + str_url + "'>")
               .end();
-    
+
+
      $_target.draggable();
 
       $('.dialog-close', $_target).click(function(){
