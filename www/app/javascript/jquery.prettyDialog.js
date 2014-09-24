@@ -34,8 +34,6 @@
               .append("<div class='media-caption'>" + str_caption + "</div>")
               .end();
 
-
-
       $_target.draggable();
 
       $('.dialog-close', $_target).click(function(){

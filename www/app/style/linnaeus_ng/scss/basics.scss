@@ -618,11 +618,20 @@
 			      }
 					}
 				}
+
+
 			}
 
 			.index-entry{
 				font-weight: 700;
+			
+				.italics{
+					font-style: normal;
+				}
+
 			}
+
+
 
 			.alphabet-letter,
 			.alphabet-letter-ghosted,
