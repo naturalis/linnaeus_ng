@@ -26,14 +26,22 @@
 					{/if}
 					
 					<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
-						<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.alt}" href="{$projectUrls.uploadedMedia}{$v.file_name}">
+						<a 
+							rel          = "prettyPhoto[gallery]"
+							class        = "image-wrap"
+							title        = "{$v.file_name}"
+							alt          = "{$v.alt}"
+							href         = "{$projectUrls.uploadedMedia}{$v.file_name}"
+
+							>
+
 						{if $v.category=='image'}
 							{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
 							{if $v.thumb_name != ''}
 								<img
 									id="media-{$k}"
 									alt="{$v.alt}" 
-									src="{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}"
+									src="{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}" 
 									class="image-thumb" />
 							{else}
 								<img

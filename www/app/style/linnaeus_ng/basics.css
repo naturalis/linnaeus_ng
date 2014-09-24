@@ -2066,18 +2066,30 @@ b, .title {
     border-bottom-color: #542e08; }
 
 /* --- --- INDEX (inhoudsopgave) --- */
+.module-index #content p {
+  margin-bottom: 1em;
+  line-height: 1.4;
+  color: #666; }
+  .module-index #content p a {
+    color: black; }
+
+.index-entry {
+  font-weight: 700; }
+
 .alphabet-letter,
 .alphabet-letter-ghosted,
 .alphabet-active-letter {
   text-align: center;
   font-size: 18px;
   font-weight: 300;
-  border-bottom: 1px solid #f9f9f7; }
+  border-bottom: 1px solid #f9f9f7;
+  text-transform: uppercase; }
 
 .alphabet-letter {
   color: #009ee0;
   cursor: pointer;
-  transition: color 200ms; }
+  transition: color 200ms;
+  text-transform: uppercase; }
   .alphabet-letter:hover {
     color: #e3004a; }
 
@@ -2131,6 +2143,48 @@ b, .title {
 
 .inline-video:before {
   content: "\e607"; }
+
+.image-full {
+  max-width: 90%; }
+
+#media {
+  overflow: auto;
+  padding: 1em; }
+
+.media-cell {
+  background: rgba(255, 255, 255, 0.5);
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0 12px 12px 0;
+  padding: 5px;
+  outline: 1px solid #e6e6e6;
+  vertical-align: top;
+  text-align: center; }
+  .media-cell:hover {
+    background: rgba(240, 240, 240, 0.5); }
+  .media-cell.media-type-video {
+    width: 200px; }
+
+.image-wrap {
+  border: none !important;
+  text-align: center; }
+
+.image-thumb,
+.image-full {
+  height: 150px;
+  margin: 0 auto; }
+
+.media-caption {
+  margin: 0.75em 0 0;
+  font-weight: 400;
+  font-size: 12px;
+  font-family: arial, sans-serif;
+  max-width: 250px;
+  line-height: 14px; }
+
+.image-wrap {
+  border: none; }
 
 /* --- FORM-ELEMENTS --- */
 /* --- --- FORM-ELEMENTS: GENERAL --- */
@@ -2193,118 +2247,6 @@ button, input, select, textarea {
   border-color: #cccccc; }
 
 /* --- jQUERY DIALOGUE --- */
-#dialog {
-  position: fixed;
-  padding: 0;
-  z-index: 200;
-  height: 400px; }
-
-#dialog-header {
-  background: #009ee0;
-  display: block;
-  position: relative;
-  padding: 5px;
-  height: 2em;
-  font-weight: bold;
-  color: white; }
-
-#dialog-title {
-  float: left;
-  margin: 0;
-  overflow: hidden; }
-
-#dialog-close {
-  float: right;
-  cursor: pointer;
-  height: 20px;
-  width: 25px;
-  font-weight: normal;
-  text-align: center;
-  font-family: 'lng-icons';
-  font-size: 24px;
-  line-height: 24px;
-  margin-top: -2px; }
-  #dialog-close:after {
-    content: "\e609"; }
-
-#dialog-content {
-  display: block;
-  padding: 1em;
-  min-height: 160px;
-  background: white; }
-
-#dialog-content-inner {
-  min-height: 128px; }
-
-#dialog-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: #b2b1a8;
-  opacity: 0.6;
-  z-index: 100; }
-
-#dialog-button-container {
-  text-align: center;
-  margin: 2px 6px 6px 2px; }
-
-.error {
-  background: #fff;
-  border: 1px solid #e3004a;
-  border-top: none; }
-
-.errorheader {
-  color: #6f2c2c;
-  border: 1px solid #e3004a;
-  border-bottom: none; }
-
-.errorbutton {
-  border: 1px solid #e3004a;
-  color: #fff;
-  cursor: pointer; }
-
-.warning {
-  background: #fff;
-  border: 1px solid #f29400;
-  border-top: none; }
-
-.warningheader {
-  color: #957c17;
-  border: 1px solid #f29400;
-  border-bottom: none; }
-
-.warningbutton {
-  background-color: #eFcC47;
-  border: 1px solid #f29400;
-  color: #957C17;
-  cursor: pointer; }
-
-.success {
-  background: #fff;
-  border: 1px solid #60a174;
-  border-top: none; }
-
-.successheader {
-  color: #3c7f51;
-  border: 1px solid #60a174;
-  border-bottom: none; }
-
-.successbutton {
-  background-color: #3c7f51;
-  border: 1px solid #fff;
-  color: #fff;
-  cursor: pointer; }
-
-.promptbutton {
-  text-decoration: none;
-  color: #CC0000;
-  cursor: pointer; }
-
-.promptbutton:hover {
-  text-decoration: underline; }
-
 /* jQuery prettyDialog */
 /* --- jQUERY DIALOGUE --- */
 .dialog {
@@ -2332,20 +2274,22 @@ button, input, select, textarea {
   font-weight: bold;
   color: white;
   width: 100%;
-  position:absolute;
-  left:0; 
-  right:0; }
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border: 2px solid #eeede9; }
 
 .dialog-title {
   float: left;
   margin: 0;
   overflow: hidden;
-  position:absolute;
-  left:5px; 
-  right:40px;
-  text-overflow:ellipsis;
-  height:40px;
-  white-space:nowrap; }
+  position: absolute;
+  left: 5px;
+  right: 40px;
+  text-overflow: ellipsis;
+  height: 40px;
+  white-space: nowrap; }
 
 .dialog-close {
   float: right;
@@ -2366,11 +2310,10 @@ button, input, select, textarea {
   padding: 1em;
   min-height: 160px;
   background: white;
-  display: table-cell img;
-  display-max-width: 600px; 
-  padding-top: 47px;	
-	
-	}
+  display: table-cell;
+  padding-top: 47px; }
+  .dialog-content img {
+    max-width: 600px; }
 
 .dialog-content-inner {
   min-height: 128px; }
@@ -2608,16 +2551,13 @@ body {
 
 /* --- --- INDEX (inhoudsopgave) --- */
 #alphabet {
-  background-color: #f9f9f7; }
-
-.alphabet-letter,
-.alphabet-letter-ghosted,
-.alphabet-active-letter {
-  padding-top: 0.5em;
-  display: block;
-  float: left;
-  width: 3.84615%;
-  text-transform: uppercase; }
+  background-color: #f9f9f7;
+  display: table;
+  width: 75%;
+  table-layout: fixed; }
+  #alphabet > * {
+    display: table-cell;
+    text-align: center; }
 
 /* --- --- FOOTER  --- */
 #footer {

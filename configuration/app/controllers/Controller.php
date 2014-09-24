@@ -3226,7 +3226,7 @@ class Controller extends BaseClass
             $this->generalSettings['directories']['cache'] => 'www/shared/cache',
             $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
             $this->generalSettings['directories']['log'] => 'log',
-            $this->generalSettings['directories']['customStyle'] => 'www/app/style/custom'
+            //$this->generalSettings['directories']['customStyle'] => 'www/app/style/custom'
         );
 
         $p = $this->getCurrentProjectId();
