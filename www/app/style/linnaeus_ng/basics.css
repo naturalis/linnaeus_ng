@@ -2075,6 +2075,8 @@ b, .title {
 
 .index-entry {
   font-weight: 700; }
+  .index-entry .italics {
+    font-style: normal; }
 
 .alphabet-letter,
 .alphabet-letter-ghosted,
