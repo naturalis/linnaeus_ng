@@ -91,24 +91,31 @@
 			{/if}
 
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
-				<a rel="prettyPhoto[gallery]" class="image-wrap " title="{$v.description}" href="{$projectUrls.uploadedMedia}{$v.file_name}">
+				<a 
+					rel   = "prettyPhoto[gallery]"
+					class = "image-wrap "
+					title = "{$v.file_name}"
+					href  = "{$projectUrls.uploadedMedia}{$v.file_name}"
+					alt   = "{$v.description}"
+					>
+
 					{if $v.category=='image'}
 						{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
 						<div>
 							{if $v.thumb_name != ''}
 								<img
-									id="media-{$k}"
-									alt="{$v.description}"
-									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-									src="{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}"
-									class="image-thumb" />
+									id    = "media-{$k}"
+									alt   = "{$v.description}"
+									title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src   = "{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}"
+									class = "image-thumb" />
 							{else}
 								<img
-									id="media-{$k}"
-									alt="{$v.description}"
-									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-									src="{$projectUrls.uploadedMedia}{$v.file_name}"
-									class="image-full" />
+									id    = "media-{$k}"
+									alt   = "{$v.description}"
+									title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src   = "{$projectUrls.uploadedMedia}{$v.file_name}"
+									class = "image-full" />
 							{/if}
 						</div>
 					{elseif $v.category=='video'}

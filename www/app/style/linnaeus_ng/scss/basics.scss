@@ -288,8 +288,6 @@
 				content: "\e613";
 			}
 
-
-					
 		/* --- --- BASE FONT --- */
 			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic);
 
@@ -607,6 +605,25 @@
 		
 		/* --- --- INDEX (inhoudsopgave) --- */
 
+			.module-index{
+				#content{
+					
+					p{
+						margin-bottom: 1em;
+			      line-height: 1.4;
+			      color: #666;
+
+			      a{
+			        color: black;
+			      }
+					}
+				}
+			}
+
+			.index-entry{
+				font-weight: 700;
+			}
+
 			.alphabet-letter,
 			.alphabet-letter-ghosted,
 			.alphabet-active-letter {
@@ -614,12 +631,14 @@
 				font-size: 18px;
 				font-weight: 300;
 				border-bottom: 1px solid $proze-background;
+				text-transform: uppercase;
 			}
 
 			.alphabet-letter{
 				color: $blauw;
 				cursor: pointer;
 				transition: color 200ms;
+				text-transform: uppercase;
 
 				&:hover{
 					color: $rood;
@@ -693,6 +712,60 @@
 			.inline-video{ &:before{
 					content: "\e607";
 			} }
+
+			.image-full{
+				max-width: 90%;
+			}
+
+					#media{
+			overflow: auto;
+			padding: 1em;
+		}
+
+		.media-cell{
+			background: rgba(255,255,255,0.5);		    	
+	    position: relative;
+	    display: inline-block;
+	    overflow: hidden;
+	    margin: 0 12px 12px 0;
+			padding: 5px;
+	    outline: 1px solid $grijs-6;
+	    vertical-align: top;
+	    text-align: center;
+
+	    &:hover{
+			background: rgba(240,240,240,0.5);		    	
+	    }
+
+	    &.media-type-video{
+	    	width: 200px;
+	    }
+
+		}
+
+		.image-wrap{
+    		border: none !important;
+    		text-align: center;
+		}
+
+		.image-thumb,
+		.image-full{
+			height: 150px;
+			margin: 0 auto;
+		}
+
+		.media-caption{
+			margin: 0.75em 0 0;
+			font-weight: 400;
+			font-size: 12px;
+			font-family: arial, sans-serif;
+			max-width: 250px;
+			line-height: 14px;
+		}
+
+		.image-wrap{
+			border: none;
+		}
 
 	/* --- FORM-ELEMENTS --- */
 
@@ -768,140 +841,142 @@
 
 			}
 
-	/* --- jQUERY DIALOGUE --- */
-			#dialog {
-				position: fixed;
-				padding: 0;
-				z-index: 200;
-				height: 400px;
-			}
+	/* --- jQUERY DIALOGUE --- */ 
+	// Can most likely be removed
+			
+			// #dialog {
+			// 	position: fixed;
+			// 	padding: 0;
+			// 	z-index: 200;
+			// 	height: 400px;
+			// }
 
-			#dialog-header {
-				background: $blauw;
-				display: block;
-				position: relative;
-				padding: 5px;
-				height: 2em;
-				font-weight: bold;
-				color: $wit;
-			}
+			// #dialog-header {
+			// 	background: $blauw;
+			// 	display: block;
+			// 	position: relative;
+			// 	padding: 5px;
+			// 	height: 2em;
+			// 	font-weight: bold;
+			// 	color: $wit;
+			// }
 
-			#dialog-title {
-				float: left;
-				margin: 0;
-				overflow: hidden;
-			}
+			// #dialog-title {
+			// 	float: left;
+			// 	margin: 0;
+			// 	overflow: hidden;
+			// }
 
-			#dialog-close {
-				float: right;
-				cursor: pointer;
-				height: 20px;
-				width: 25px;
-				font-weight: normal;
-				text-align: center;
-				font-family:  'lng-icons';
-				font-size: 24px;
-				line-height: 24px;
-				margin-top: -2px;
-				&:after{
+			// #dialog-close {
+			// 	float: right;
+			// 	cursor: pointer;
+			// 	height: 20px;
+			// 	width: 25px;
+			// 	font-weight: normal;
+			// 	text-align: center;
+			// 	font-family:  'lng-icons';
+			// 	font-size: 24px;
+			// 	line-height: 24px;
+			// 	margin-top: -2px;
+			// 	&:after{
 					
-					content: "\e609";
-				}
-			}
+			// 		content: "\e609";
+			// 	}
+			// }
 
-			#dialog-content {
-				display: block;
-				padding: 1em;
-				min-height: 160px;
-				background: $wit;
+			// #dialog-content {
+			// 	display: block;
+			// 	padding: 1em;
+			// 	min-height: 160px;
+			// 	background: $wit;
 
-			}
+			// }
 
-			#dialog-content-inner {
-				min-height: 128px;
-			}
+			// #dialog-content-inner {
+			// 	min-height: 128px;
+			// }
 
-			#dialog-mask {
-				position: fixed;
-				top: 0;
-				left: 0;
-				height: 100%;
-				width: 100%;
-				background-color: $grijs;
-				opacity: 0.6;
-				z-index: 100;
-			}
+			// #dialog-mask {
+			// 	position: fixed;
+			// 	top: 0;
+			// 	left: 0;
+			// 	height: 100%;
+			// 	width: 100%;
+			// 	background-color: $grijs;
+			// 	opacity: 0.6;
+			// 	z-index: 100;
+			// }
 
-			#dialog-button-container {
-				text-align: center;
-				margin: 2px 6px 6px 2px;
-			}
+			// #dialog-button-container {
+			// 	text-align: center;
+			// 	margin: 2px 6px 6px 2px;
+			// }
 
-			.error {
-				background: #fff;
-				border: 1px solid $brand-danger;
-				border-top: none
-			}
+			// .error {
+			// 	background: #fff;
+			// 	border: 1px solid $brand-danger;
+			// 	border-top: none
+			// }
 
-			.errorheader {
-				color: #6f2c2c;
-				border: 1px solid $brand-danger;
-				border-bottom: none
-			}
+			// .errorheader {
+			// 	color: #6f2c2c;
+			// 	border: 1px solid $brand-danger;
+			// 	border-bottom: none
+			// }
 
-			.errorbutton {
-				border: 1px solid $brand-danger;
-				color: #fff;
-				cursor: pointer;
-			}
+			// .errorbutton {
+			// 	border: 1px solid $brand-danger;
+			// 	color: #fff;
+			// 	cursor: pointer;
+			// }
 
-			.warning {
-				background: #fff;
-				border: 1px solid $brand-warning;
-				border-top: none
-			}
+			// .warning {
+			// 	background: #fff;
+			// 	border: 1px solid $brand-warning;
+			// 	border-top: none
+			// }
 
-			.warningheader {
-				color: #957c17;
-				border: 1px solid $brand-warning;;
-				border-bottom: none
-			}
+			// .warningheader {
+			// 	color: #957c17;
+			// 	border: 1px solid $brand-warning;;
+			// 	border-bottom: none
+			// }
 
-			.warningbutton {
-				background-color: #eFcC47;
-				border: 1px solid $brand-warning;
-				color: #957C17;
-				cursor: pointer;
-			}
+			// .warningbutton {
+			// 	background-color: #eFcC47;
+			// 	border: 1px solid $brand-warning;
+			// 	color: #957C17;
+			// 	cursor: pointer;
+			// }
 
-			.success {
-				background: #fff;
-				border: 1px solid #60a174;
-				border-top: none
-			}
+			// .success {
+			// 	background: #fff;
+			// 	border: 1px solid #60a174;
+			// 	border-top: none
+			// }
 
-			.successheader {
-				color: #3c7f51;
-				border: 1px solid #60a174;
-				border-bottom: none
-			}
+			// .successheader {
+			// 	color: #3c7f51;
+			// 	border: 1px solid #60a174;
+			// 	border-bottom: none
+			// }
 
-			.successbutton {
-				background-color: #3c7f51;
-				border: 1px solid #fff;
-				color: #fff;
-				cursor: pointer;
-			}
+			// .successbutton {
+			// 	background-color: #3c7f51;
+			// 	border: 1px solid #fff;
+			// 	color: #fff;
+			// 	cursor: pointer;
+			// }
 
-			.promptbutton {
-				text-decoration: none;
-				color: #CC0000;
-				cursor: pointer;
-			}
+			// .promptbutton {
+			// 	text-decoration: none;
+			// 	color: #CC0000;
+			// 	cursor: pointer;
+			// }
 
-			.promptbutton:hover {
-				text-decoration: underline;
-			}
+			// .promptbutton:hover {
+			// 	text-decoration: underline;
+			// }
 
 		/* jQuery prettyDialog */
 
@@ -936,6 +1011,8 @@
 				position:absolute;
 				left:0; 
 				right:0;
+				top: 0;
+				border: 2px solid $grijs-7;
 			}
 
 			.dialog-title {
@@ -1252,17 +1329,16 @@
 
 			#alphabet{
 				background-color: $proze-background;
+				display: table;
+				width: 75%;
+				table-layout: fixed;
+				& > * {
+					display: table-cell;
+					text-align: center;
+				}
 			}
 
-			.alphabet-letter,
-			.alphabet-letter-ghosted,
-			.alphabet-active-letter {
-				padding-top: 0.5em;
-				display: block;
-				float: left;
-				width: percentage(1/26);
-				text-transform: uppercase;
-			}
+
 
 		/* --- --- FOOTER  --- */
 
