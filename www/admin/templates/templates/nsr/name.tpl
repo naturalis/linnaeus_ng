@@ -2,16 +2,16 @@
 
 <div id="page-main">
 
-<h2>{$concept.taxon}</h2>
-<h3>{if $newname}nieuwe naam{else}{$name.name}{/if}</h3>
+<h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe naam{else}{$name.name}{/if}</h2>
+<h3><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h3>
 
-
+<p>
 <form id="data" onsubmit="return false;">
 
 <table>
-	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" mandatory="mandatory" /> *</td></tr>
+	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
 	<tr><th>type:</th><td>
-		<select id="name_type_id" mandatory="mandatory">
+		<select id="name_type_id" mandatory="mandatory" label="type">
 			<option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$nametypes item=v key=k}
 			{if $v.noNameParts}
@@ -21,7 +21,7 @@
 		</select> *
 	</td></tr>
 	<tr><th>taal:</th><td>
-		<select id="name_language_id" mandatory="mandatory">
+		<select id="name_language_id" mandatory="mandatory" label="taal">
 			{assign var=first value=true}
 			<option value="" {if !$name.language_id} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$languages item=v key=k}
@@ -74,8 +74,6 @@
 		{if $name.reference}<tr><th>organisatie (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
 	{/if}
 </table>
-<p>
-
 </p>
 
 <input type="button" value="opslaan" onclick="savedataform();" />
@@ -103,7 +101,7 @@ $(document).ready(function()
 	{/if}
 
 	$('#data :input[type!=button]').each(function(key,value) {
-		values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
+		values.push( { name:$(this).attr('id'),label:$(this).attr('label'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
 		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
 	//console.dir(values);

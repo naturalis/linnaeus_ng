@@ -34,11 +34,11 @@
 	</table>
 
 	<p>
-		<div id="lit2-result-list"></div>
+		<a href="edit.php">nieuwe literatuurreferentie aanmaken</a>
 	</p>
 
 	<p>
-		<a href="edit.php">nieuwe literatuurreferentie aanmaken</a>
+		<div id="lit2-result-list"></div>
 	</p>
 
 </div>

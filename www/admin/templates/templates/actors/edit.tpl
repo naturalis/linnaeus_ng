@@ -44,7 +44,7 @@
 	<tr><th><input type="submit" value="save" /></th><td></td></tr>
 {if $actor.id}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
-	<tr><th><a href="#" onclick="doDelete();return false;">actor verwijderen</a></th><td></td></tr>
+	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$actor.name|@escape}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen, {$links.names|@count} namen en {$links.passports|@count} paspoorten aan deze persoon gekoppeld.');return false;">actor verwijderen</a></th><td></td></tr>
 {/if}
 </table>
 

@@ -21,6 +21,7 @@
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/lookup.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/ui.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui.min.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/prettyPhoto/prettyPhoto.css" />
 
 {if $cssToLoad}
 		<style type="text/css" media="all">
@@ -36,6 +37,7 @@
 	<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.tools.min.js"></script -->
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/prettyPhoto/jquery.prettyPhoto.custom.js"></script>
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
 {if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}

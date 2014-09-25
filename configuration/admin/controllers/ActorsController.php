@@ -328,7 +328,8 @@ class ActorsController extends Controller
 				and _a.is_company = ".($isCompany ? '1' : '0' )."
 				". ($search!='*' ? "	
 					and (
-						_a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' 
+						_a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
+						_a.name_alt like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' 
 					)" : "")."
 
 			order by _a.name

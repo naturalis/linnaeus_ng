@@ -1093,7 +1093,7 @@ class SearchControllerGeneral extends SearchController
 		$books = array_merge((array)$books,(array)$more); // and resets the keys as well. how neat.
 		$books = $this->filterResultsWithTokenizedSearch(array($p,$books));
 		$books = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$books));
-		$books = $this->sortResultsByMostTokensFound($books,'label');
+		$books = $this->sortResultsByMostTokensFound($books);
 
 		return array(
 			'label'=> $this->getModuleName(MODCODE_LITERATURE),

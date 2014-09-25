@@ -186,9 +186,10 @@ function checkmandatory()
 				(val.delete))
 			) 
 		{
-			//console.(val.name);
 			if (val.label)
 				buffer=buffer+"\n"+val.label;
+			else
+				buffer=buffer+"\n"+val.name;
 			result=false;
 		}
 	}
@@ -516,10 +517,32 @@ function deleteform()
 	}
 }
 
+function namepartscomplete(caller)
+{
+	if ($('#name_uninomial').val().length==0 && $('#name_specific_epithet').val().length!=0)
+	{
+		$('#name_specific_epithet').val('');
+		$('#name_specific_epithet_message').html('Vul eerst een genus in!');
+	}
+	else
+	{
+		$('#name_specific_epithet_message').html('');
+	}
+	if ($('#name_specific_epithet').val().length==0 && $('#name_infra_specific_epithet').val().length!=0)
+	{
+		$('#name_infra_specific_epithet').val('');
+		$('#name_infra_specific_epithet_message').html('Vul eerst een soortsnaam in!');
+	}
+	else
+	{
+		$('#name_infra_specific_epithet_message').html('');
+	}
+}
+
 function partstoname()
 {
 
-//	if (dataid) return;
+	//if (dataid) return;
 
 	if (inheritablename && $('#name_uninomial').val().length==0 && !$('#name_uninomial').is(":focus"))
 	{
@@ -544,7 +567,9 @@ function partstoname()
 
 	var year="";
 	var yearstart=author.lastIndexOf(" ");
-	if (yearstart!=-1) {
+
+	if (yearstart!=-1)
+	{
 		year=author.substr(yearstart);
 		if (isNaN(year))
 		{
@@ -558,6 +583,7 @@ function partstoname()
 	
 	if (!$('#name_name_author').is(":focus"))
 		$('#name_name_author').val(author.trim()).trigger('change'); 
+
 	if (!$('#name_authorship_year').is(":focus"))
 		$('#name_authorship_year').val(year.trim()).trigger('change'); 
 
@@ -602,9 +628,9 @@ function getinheritablename()
 }
 
 
-function doDelete()
+function doDelete(msg)
 {
-	if (confirm("Weet u het zeker?"))
+	if (confirm(msg ? msg : "Weet u het zeker?"))
 	{
 		$( '#action' ).val('delete');
 		$( '#theForm' ).submit();
@@ -612,13 +638,11 @@ function doDelete()
 }
 
 
-
-
 function dropListDialog(ele,title)
-{
+{	
 	var target=$(ele).attr('rel');
 	var id='__'+target+'_INPUT';
-	
+
 	prettyDialog({
 		title:title,
 		content :
@@ -628,9 +652,9 @@ function dropListDialog(ele,title)
 
 	$('#'+id).attr('autocomplete','off').bind('keyup', function(e) { 
 		doNsrDropList({ e:e, id: $(this).attr('id') } )
-	} );	
-
+	});	
 }
+
 
 function doNsrDropList(p)
 {
@@ -646,8 +670,6 @@ function doNsrDropList(p)
 	if (value.length<minlength)
 		return;
 
-	var minlength=3;
-	
 	if (variable.indexOf('reference_id')!=-1)
 	{
 		url = '../literature2/ajax_interface.php';
@@ -732,11 +754,26 @@ function buildDropList(data,variable)
 
 }
 
-
+function disconnectimage(p)
+{
+	if (confirm('Weet u het zeker?'))
+	{
+		$('<form>', {
+			'html':
+				'<input type="hidden" name="action" value="delete" /> \
+				<input type="hidden" name="id" value="'+p.id+'" /> \
+				<input type="hidden" name="image" value="'+p.image+'" />',
+			'action': window.url,
+			'method': 'post'
+		}).appendTo(document.body).submit();		
+	}
+}
 
 
 
 $(document).ready(function(){
+
+	closedropdownlist();
 
 	$('body').click(function() {
 		closedropdownlist();

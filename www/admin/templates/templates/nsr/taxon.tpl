@@ -19,11 +19,7 @@
 
 <div id="page-main">
 
-<!-- form>
-		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam"/>
-</form -->
-<h2>{$concept.taxon}</h2>
-<h3>{$names.preffered_name}</h3>
+<h2><span style="font-size:12px;font-style:normal">conceptkaart:</span> {$concept.taxon}</h2>
 
 <form id="data" onsubmit="return false;">
 
@@ -39,11 +35,12 @@
 			<th>naam:</th>
 			<td>
 				{$concept.taxon}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
+				{* <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
 				<span class="editspan" id="taxon">
 				<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" />
 				</span> *
 				<input type="hidden" id="concept_taxon_id" value="{$concept.id}" />
+                *}
 			</td>
 		</tr>
 		<tr><th>rang:</th>
@@ -170,12 +167,12 @@
 	<ul>
 	{foreach from=$names.list item=v}
 		<li>
-		{$v.name} ({$v.language_label}) <i>{$v.nametype}</i> <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
+		{$v.name_no_tags} ({$v.language_label}) <i>{$v.nametype}</i> <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
 		</li>
 	{/foreach}
 	</ul>
-	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">nieuwe naam toevoegen</a><br />
-	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0">nieuw synoniem toevoegen</a>
+	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">Nederlandse naam toevoegen</a><br />
+	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0">synoniem toevoegen (wetenschappelijke naam)</a>
 
 
 </p>
@@ -183,15 +180,19 @@
 
 
 <p>
-	<a href="paspoort.php?id={$concept.id}" class="edit"  style="margin:0">paspoorten</a><br />
-		
-	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
-
 	{if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">soort toevoegen aan {$concept.taxon}</a>
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">soort toevoegen aan {$concept.taxon}</a><br />
 	{elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}" class="edit" style="margin:0">ondersoort toevoegen aan "{$concept.taxon}"</a>
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}" class="edit" style="margin:0">ondersoort toevoegen aan "{$concept.taxon}"</a><br />
 	{/if}
+</p>
+<p>
+	<a href="paspoort.php?id={$concept.id}" class="edit"  style="margin:0">paspoorten</a><br />
+
+	<a href="images.php?id={$concept.id}" class="edit"  style="margin:0">afbeeldingen</a><br />
+		
+	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
+
 </p>
 <p>
 
