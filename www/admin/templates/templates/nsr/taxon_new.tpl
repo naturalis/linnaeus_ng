@@ -22,10 +22,15 @@
 			</td>
 		</tr>
 		<tr><th>ouder:</th>
-			<td>
-				<span id="parent_taxon">{$parent.taxon}</span>
+			<td style="vertical-align:bottom">
+	            {*
+				<!-- span id="parent_taxon">{$parent.taxon}</span>
 				<input type="text" class="medium" id="__parent_taxon_id_INPUT" value=""  havedroplist="true" droplistminlength="3" /> *
-				<input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" onchange="getinheritablename();" label="ouder" />
+				<input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" onchange="getinheritablename();" label="ouder" / -->
+    	         *}
+                <span id="parent_taxon">{$parent.taxon}</span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">edit</a>
+                <input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" onchange="getinheritablename();" label="ouder" droplistminlength="3" />
 			</td>
 		</tr>
 
@@ -77,30 +82,17 @@
 				</select> 
 			</td>
 		</tr>
-	
-		{*
-		<!--tr><th>expert:</th>
-			<td>
-				<span id="name_expert"></span>
-				<input type="text" class="medium" id="__name_expert_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="name_expert_id" value="" />
-			</td>
-		</tr>
-
-		<tr><th>organisatie:</th>
-			<td>
-				<span id="name_organisation"></span>
-				<input type="text" class="medium" id="__name_organisation_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="name_organisation_id" value="" />
-			</td>
-		</tr-->
-		*}
 
 		<tr><th>publicatie:</th>
-			<td>
-				<span id="name_reference"></span>
+			<td style="vertical-align:bottom">
+            	{*
+				<!--span id="name_reference"></span>
 				<input type="text" class="medium" id="__name_reference_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="name_reference_id" value="" />
+				<input type="hidden" id="name_reference_id" value="" /-->
+                *}
+                <span id="name_reference"></span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a>
+                <input type="hidden" id="name_reference_id" value="" />
 			</td>
 		</tr>
 		
@@ -154,31 +146,17 @@
 				</select> 
 			</td>
 		</tr>
-	
-
-		{*
-		<!--tr><th>expert:</th>
-			<td>
-				<span id="dutch_name_expert"></span>
-				<input type="text" class="medium" id="__dutch_name_expert_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="dutch_name_expert_id" value="" />
-			</td>
-		</tr>
-
-		<tr><th>organisatie:</th>
-			<td>
-				<span id="dutch_name_organisation"></span>
-				<input type="text" class="medium" id="__dutch_name_organisation_id_INPUT" value="" havedroplist="true"  />
-				<input type="hidden" id="dutch_name_organisation_id" value="" />
-			</td>
-		</tr -->
-		*}
 
 		<tr><th>publicatie:</th>
-			<td>
-				<span id="dutch_name_reference"></span>
+			<td style="vertical-align:bottom">
+            	{*
+				<!--span id="dutch_name_reference"></span>
 				<input type="text" class="medium" id="__dutch_name_reference_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="dutch_name_reference_id" value="" />
+				<input type="hidden" id="dutch_name_reference_id" value="" /-->
+				*}
+                <span id="dutch_name_reference"></span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="dutch_name_reference_id">edit</a>
+                <input type="hidden" id="dutch_name_reference_id" value="" />
 			</td>
 		</tr>
 
@@ -245,32 +223,19 @@
 			</td>
 		</tr>
 	
-		{*
-		<!-- tr><th>expert:</th>
-			<td>
-				<span id="presence_expert"></span>
-				<input type="text" class="medium" id="__presence_expert_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="presence_expert_id" value="" />
-			</td>
-		</tr>
-
-		<tr><th>organisatie:</th>
-			<td>
-				<span id="presence_organisation"></span>
-				<input type="text" class="medium" id="__presence_organisation_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="presence_organisation_id" value="" />
-			</td>
-		</tr -->
-		*}
-
 		<tr><th>publicatie:</th>
-			<td>
-				<span id="presence_reference"></span>
+			<td style="vertical-align:bottom">
+            	{*
+				<!-- span id="presence_reference"></span>
 				<input type="text" class="medium" id="__presence_reference_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="presence_reference_id" value="" />
-				<!-- span id="reference"></span> <input type="text" class="medium" id="__reference_list_input" value="" />
 				<input type="hidden" id="presence_reference_id" value="" / -->
+				*}
+                <span id="presence_reference"></span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a>
+                <input type="hidden" id="presence_reference_id" value="" />
+
 			</td>
+
 		</tr>
 		</table>
 </p>
@@ -283,6 +248,10 @@
 	<a href="index.php">terug</a>
 </p>
 
+</div>
+
+<div id="dropdown-list">
+	<div id="dropdown-list-content"></div>
 </div>
 
 <script>

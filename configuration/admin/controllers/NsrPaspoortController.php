@@ -80,6 +80,26 @@ class NsrPaspoortController extends Controller
 		$this->printPage();
 	}
 
+    public function ajaxInterfaceAction ()
+    {
+		
+        if (!$this->rHasVal('action'))
+            return;
+
+		if ($this->rHasVal('action', 'save_passport'))
+		{
+			$return=$this->savePassport($this->requestData);
+        }
+		
+        $this->allowEditPageOverlay=false;
+
+		$this->smarty->assign('returnText',$return);
+
+        $this->printPage('ajax_interface');
+    }
+
+
+
 	private function setTaxonId($id)
 	{
 		$this->TaxonId=$id;
@@ -232,6 +252,44 @@ CTAB_DNA_BARCODES
 		return array('content'=>$content,'rdf'=>$rdf);
     }
 
-	
+	private function savePassport($p)
+	{
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
+		$page = isset($p['page']) ? $p['page'] : null;
+		$content = isset($p['content']) ? $p['content'] : null;
+		
+		if (empty($content))
+		{
+			return $this->models->ContentTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id'=>$taxon,
+				'language_id'=>$this->getDefaultProjectLanguage(),
+				'page_id'=>$page
+			));
+		}
+		else
+		{
+			$d=$this->models->ContentTaxon->_get(array(
+				'id'=>array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id'=>$taxon,
+					'language_id'=>$this->getDefaultProjectLanguage(),
+					'page_id'=>$page
+				)
+			));
+			
+			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
 
+			return $this->models->ContentTaxon->save(array(
+				'id'=>$id,
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$taxon,
+				'language_id'=>$this->getDefaultProjectLanguage(),
+				'page_id'=>$page,
+				'content' => $content
+			));
+			
+		}
+
+	}
 }

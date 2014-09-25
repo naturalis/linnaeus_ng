@@ -55,7 +55,8 @@ function actorsBuildList(action,data)
 		var t=data.results[i];
 		if (!t.id)
 			continue;
-		buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+t.name+'</a>'+(t.employer_name ? '('+t.employer_name+')' : '' )+'</li>');
+//		buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+t.name+'</a>'+(t.employer_name ? '('+t.employer_name+')' : '' )+'</li>');
+		buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+t.name+(t.name_alt ? ' ('+t.name_alt+')' : '' )+'</a></li>');
 	}
 
 	$('#actor-result-list').html('<ul>'+buffer.join('')+'</ul>');

@@ -35,11 +35,13 @@
 			</td>
 		</tr>
 	</table>
-	<p>
-		<div id="actor-result-list"></div>
-	</p>
+
 	<p>
 		<a href="edit.php">nieuwe actor aanmaken</a>
+	</p>
+
+	<p>
+		<div id="actor-result-list"></div>
 	</p>
 
 </div>

@@ -201,7 +201,8 @@ class ExportController extends Controller
 			set_time_limit(4800); // RIGHT!
 
 $numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRecords') : 500;
-$recordsPerFile=$this->rHasVar('recordsPerFile') ? $this->rGetVal('recordsPerFile') : 10000;
+//$recordsPerFile=!empty($this->rHasVar('recordsPerFile')) && is_numeric($this->rHasVar('recordsPerFile')) ? $this->rGetVal('recordsPerFile') : 10000;
+$recordsPerFile=10000;
 $exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
 $imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : 'http://images.naturalis.nl/original/';
 

@@ -556,8 +556,8 @@ class Literature2Controller extends Controller
 		foreach((array)$all as $key => $val)
 		{
 			$authors=$this->getReferenceAuthors($val['id']);
-			
-			$authors=$authors[0]['authors'];
+
+			$authors=empty($authors[0]['authors']) ? null : $authors[0]['authors'];
 			
 			$match=false;
 			

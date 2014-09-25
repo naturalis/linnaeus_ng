@@ -37,7 +37,9 @@ class NsrTaxonController extends Controller
 		'literature2',
 		'rdf',
 		'nsr_ids',
-		'taxon_quick_parentage'
+		'taxon_quick_parentage',
+		'media_taxon',
+		'media_meta'
     );
     public $usedHelpers = array(
     );
@@ -61,6 +63,8 @@ class NsrTaxonController extends Controller
 	
 	private $conceptId=null;
 	private $nameId=null;
+	
+	private $_resPicsPerPage=100;
 	
 
     public function __construct()
@@ -171,6 +175,7 @@ class NsrTaxonController extends Controller
 		if ($this->rHasId())
 		{
 			$concept=$this->getConcept($this->rGetId());
+
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('names',$this->getNames($concept));
 			$this->smarty->assign('presence',$this->getPresenceData($this->rGetId()));
@@ -202,6 +207,28 @@ class NsrTaxonController extends Controller
 		$this->_nameAndSynonym();
 		$this->printPage();
 	}
+
+    public function imagesAction()
+    {
+		if (!$this->rHasId()) $this->redirect('taxon_new.php');
+		
+		if ($this->rHasId() && $this->rHasVal('image') && $this->rHasVal('action','delete'))
+		{
+			$this->setConceptId($this->rGetId());
+			$this->disconnectTaxonMedia($this->rGetVal('image'));
+			$this->setMessage('Afbeelding ontkoppeld.');
+		} 
+		
+		$this->checkAuthorisation();
+		$this->setConceptId($this->rGetId());
+        $this->setPageName($this->translate('Taxon images'));
+		$this->smarty->assign('concept',$this->getConcept($this->rGetVal('id')));
+		$this->smarty->assign('images',$this->getTaxonMedia());
+
+		$this->checkMessage();
+		$this->printPage();
+	}
+
 
     public function ajaxInterfaceAction ()
     {
@@ -255,8 +282,6 @@ class NsrTaxonController extends Controller
 		{
 	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
         }
-
-
 		
 		
         $this->allowEditPageOverlay=false;
@@ -265,6 +290,8 @@ class NsrTaxonController extends Controller
 
         $this->printPage();
     }
+
+
 
 
     private function _nameAndSynonym()
@@ -283,12 +310,16 @@ class NsrTaxonController extends Controller
 		{
 			$this->setNameId($this->rGetId());
 			$this->updateName();
+			$this->updateConceptBySciName();
+			$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
 		} 
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->setConceptId($this->rGetVal('nameownerid'));
 			$this->saveName();
+			$this->updateConceptBySciName();
+			$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
 		} 
 		else
 		{
@@ -305,8 +336,7 @@ class NsrTaxonController extends Controller
 			$this->smarty->assign('nametypes',$this->getNameTypes());
 			$this->smarty->assign('languages',$this->getLanguages());
 			$this->smarty->assign('actors',$this->getActors());
-
-			$this->doNameChecks($name);
+			$this->doNameReferentialChecks($name);
 
 		}
 		else
@@ -541,6 +571,7 @@ class NsrTaxonController extends Controller
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 			}
+			$names[$key]['name_no_tags']=strip_tags($names[$key]['name']);
 		}
 
 		return
@@ -661,6 +692,17 @@ class NsrTaxonController extends Controller
 		
 	private function getStatuses()
 	{
+		/*
+			take note: presence_taxa contains a column 'presence82_id'.
+			this is an obsolete leftover from a previous version. the
+			values are displayed nowhere, but still exist in the database.
+			connected, presence contains several statuses that are used
+			only by 'presence82_id', and are therefore also obsolete.
+			these statuses get a index_label of 99, based on the fact that
+			they, and they alone, have no actual index_label, and are
+			subsequently excluded from the list in the wehre-statement.
+		*/
+		
 		$data=$this->models->PresenceTaxa->freeQuery(
 			"select
             	_a.id,
@@ -678,6 +720,7 @@ class NsrTaxonController extends Controller
 				and _b.language_id=".$this->getDefaultProjectLanguage()."
 
 			where _a.project_id = ".$this->getCurrentProjectId()."
+			and index_label != 99
 			order by index_label"
 		);	
 
@@ -758,6 +801,193 @@ class NsrTaxonController extends Controller
 
 		return $languages;
 	}
+
+    private function getTaxonMedia()
+    {
+		$id=$this->getConceptId();
+
+		if (empty($id))
+			return;
+
+		$overview=isset($p['overview']) ? $p['overview'] : false;
+		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
+		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
+		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
+		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc';
+
+		$data=$this->models->Taxon->freeQuery("		
+			select
+				SQL_CALC_FOUND_ROWS
+				_m.id,
+				_m.taxon_id,
+				file_name as image,
+				file_name as thumb,
+				_k.taxon,
+				_z.name as common_name,
+				_j.name,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
+				".($distributionMaps?
+					"_map1.meta_data as meta_map_source,
+					 _map2.meta_data as meta_map_description,": "")."
+				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
+				_meta2.meta_data as meta_short_desc,
+				_meta3.meta_data as meta_geografie,
+				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
+				_meta5.meta_data as meta_copyrights,
+				_meta6.meta_data as meta_validator,
+				_meta7.meta_data as meta_adres_maker,
+				_meta8.meta_data as photographer
+			
+			from  %PRE%media_taxon _m
+			
+			left join %PRE%media_meta _c
+				on _m.project_id=_c.project_id
+				and _m.id = _c.media_id
+				and _c.sys_label = 'beeldbankFotograaf'
+			
+			left join %PRE%taxa _k
+				on _m.taxon_id=_k.id
+				and _m.project_id=_k.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+
+			left join %PRE%names _z
+				on _m.taxon_id=_z.taxon_id
+				and _m.project_id=_z.project_id
+				and _z.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _j
+				on _m.taxon_id=_j.taxon_id
+				and _m.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".
+					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+				
+
+			left join %PRE%media_meta _map1
+				on _m.id=_map1.media_id
+				and _m.project_id=_map1.project_id
+				and _map1.sys_label='verspreidingsKaartBron'
+
+			left join %PRE%media_meta _map2
+				on _m.id=_map2.media_id
+				and _m.project_id=_map2.project_id
+				and _map2.sys_label='verspreidingsKaartTitel'
+
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
+			left join %PRE%media_meta _meta2
+				on _m.id=_meta2.media_id
+				and _m.project_id=_meta2.project_id
+				and _meta2.sys_label='beeldbankOmschrijving'
+			
+			left join %PRE%media_meta _meta3
+				on _m.id=_meta3.media_id
+				and _m.project_id=_meta3.project_id
+				and _meta3.sys_label='beeldbankLokatie'
+			
+			left join %PRE%media_meta _meta4
+				on _m.id=_meta4.media_id
+				and _m.project_id=_meta4.project_id
+				and _meta4.sys_label='beeldbankDatumAanmaak'
+			
+			left join %PRE%media_meta _meta5
+				on _m.id=_meta5.media_id
+				and _m.project_id=_meta5.project_id
+				and _meta5.sys_label='beeldbankCopyright'
+
+			left join %PRE%media_meta _meta6
+				on _m.id=_meta6.media_id
+				and _m.project_id=_meta6.project_id
+				and _meta6.sys_label='beeldbankValidator'
+				and _meta6.language_id=".$this->getDefaultProjectLanguage()."
+
+			left join %PRE%media_meta _meta7
+				on _m.id=_meta7.media_id
+				and _m.project_id=_meta7.project_id
+				and _meta7.sys_label='beeldbankAdresMaker'
+				and _meta7.language_id=".$this->getDefaultProjectLanguage()."
+
+			left join %PRE%media_meta _meta8
+				on _m.id=_meta8.media_id
+				and _m.project_id=_meta8.project_id
+				and _meta8.sys_label='beeldbankFotograaf'
+			
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+			
+			where
+				_m.project_id=".$this->getCurrentProjectId()."
+				and _m.taxon_id=".$id."
+				and ifnull(_meta9.meta_data,0)!=".($distributionMaps?'0':'1')."
+				".($overview ? "and _m.overview_image=1" : "")."
+
+
+			".(isset($sort) ? "order by ".$sort : "")."
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+		);
+
+		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		
+		foreach((array)$data as $key=>$val)
+		{
+			$data[$key]['label']=
+				trim(
+					(isset($val['photographer']) ? $val['photographer'].', ' : '' ).
+					(isset($val['meta_datum']) ? $val['meta_datum'].', ' : '' ).
+					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
+					', '
+				);			
+
+			$data[$key]['meta']=$this->models->Taxon->freeQuery("		
+				select
+					* 
+				from
+					%PRE%media_meta 
+				where 
+					project_id=".$this->getCurrentProjectId()."
+					and media_id = ".$val['id']."
+					and language_id=".$this->getDefaultProjectLanguage()."
+			");
+
+		}
+
+		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
+
+    }
+
+	private function disconnectTaxonMedia($image)
+	{
+		$id=$this->getConceptId();
+
+		if (empty($id) || empty($image))
+			return;
+
+		$this->models->MediaMeta->delete(
+		array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'media_id'=>$image
+		));
+
+		$this->models->MediaTaxon->delete(
+		array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'id'=>$image,
+			'taxon_id'=>$id
+		));
+
+	}
+
 
 
 
@@ -1297,7 +1527,7 @@ class NsrTaxonController extends Controller
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
-
+	
 	private function updateConceptRankId($values)
 	{
 		return $this->models->Taxon->update(
@@ -1343,16 +1573,6 @@ class NsrTaxonController extends Controller
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
-
-	/*
-	private function updateConceptIsIndigeous($values)
-	{
-		return $this->models->PresenceTaxa->update(
-			array('is_indigenous'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
-			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
-		);
-	}
-	*/
 
 	private function updateConceptHabitatId($values)
 	{
@@ -1561,7 +1781,7 @@ class NsrTaxonController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $this->getConceptId(),
 				'language_id' => LANGUAGECODE_DUTCH,
-				'type_id' => $this->_nameTypeIds[PREDICATE_PREFERRED_NAME],
+				'type_id' => $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 				'name' => trim($name['new'])
 			));
 
@@ -1601,6 +1821,8 @@ class NsrTaxonController extends Controller
 		}
 
 	}
+	
+	
 			
 
 
@@ -1764,6 +1986,24 @@ class NsrTaxonController extends Controller
 			'project_id'=>$this->getCurrentProjectId(),
 			'id'=>$this->getNameId()
 		));
+	}
+
+	private function updateConceptBySciName()
+	{
+		$name=$this->getName(array('id'=>$this->getNameId()));
+
+		if (!empty($name['type_id']) && $name['type_id']==$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] && $this->rHasVar('name_name'))
+		{
+			if ($this->updateConceptTaxon($this->rGetVal('name_name')))
+			{
+				$this->addMessage('Conceptnaam opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Conceptnaam niet opgeslagen.');
+			}
+
+		}
 	}
 
 	private function updateNameName($values)
@@ -2235,7 +2475,7 @@ class NsrTaxonController extends Controller
 
 
 
-	private function doNameChecks($name)
+	private function doNameIntegrityChecks($name)
 	{
 		if (!$this->checkNameParts($name))
 		{
@@ -2243,12 +2483,16 @@ class NsrTaxonController extends Controller
 		}
 		if (!$this->checkAuthorshipYear($name))
 		{
-			$this->addWarning("'Authorship year' wijkt af van 'Authorship' + 'Year'.");
+			$this->addWarning("'Auteurschap' wijkt af van 'auteur(s)' + 'jaar'.");
 		}
 		if (!$this->checkYear($name))
 		{
 			$this->addWarning("Geen geldig jaar.");
 		}
+	}
+
+	private function doNameReferentialChecks($name)
+	{
 		if (!$this->checkIfConceptRetainsScientificName($name))
 		{
 			$this->addWarning("Aan concept is geen wetenschappelijke naam gekoppeld.");
@@ -2265,10 +2509,10 @@ class NsrTaxonController extends Controller
 		
 		if (
 			trim(str_replace('  ',' ',
-				$name['uninomial'].' '.
-				$name['specific_epithet'].' '.
-				$name['infra_specific_epithet'].' '.
-				$name['authorship']
+				(!empty($name['uninomial']) ? $name['uninomial'].' ' : null).
+				(!empty($name['specific_epithet']) ? $name['specific_epithet'].' ' : null).
+				(!empty($name['infra_specific_epithet']) ? $name['infra_specific_epithet'].' ' : null).
+				(!empty($name['authorship']) ? $name['authorship'] : null)
 		)) != $name['name'])
 			return false;
 
@@ -2278,12 +2522,13 @@ class NsrTaxonController extends Controller
 	private function checkAuthorshipYear($name)
 	{
 		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
+		if ($name['language_id']==LANGUAGE_ID_SCIENTIFIC && empty($name['authorship_year']) && empty($name['name_author'])) return true;
 
 		if (
 			trim(
-				$name['name_author'].', '.
-				$name['authorship_year']
-			) != trim($name['authorship'],')('))
+				(!empty($name['name_author']) ? $name['name_author'].', ' : null).
+				(!empty($name['authorship_year']) ? $name['authorship_year'] : null),', '
+			) != trim($name['authorship'],')( '))
 			return false;
 
 		return true;
@@ -2292,6 +2537,7 @@ class NsrTaxonController extends Controller
 	private function checkYear($name)
 	{
 		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
+		if ($name['language_id']==LANGUAGE_ID_SCIENTIFIC && empty($name['authorship_year'])) return true;
 		return is_numeric($name['authorship_year']) && $name['authorship_year'] > 1000 && $name['authorship_year'] <= date('Y');
 	}
 
@@ -2336,6 +2582,7 @@ class NsrTaxonController extends Controller
 		if ($m) $this->addMessage($m);
 		$this->setMessage();
 	}
+
 
 
 

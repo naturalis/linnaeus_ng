@@ -6,6 +6,7 @@
 <h3>{$reference.author_or_verbatim}</h3>
 </p>
 <p>
+
 <form method="post" id="theForm">
 <input type="hidden" name="id" value="{$reference.id}">
 <input type="hidden" name="action" id="action" value="save">
@@ -29,7 +30,7 @@
 			</select>
 		</td>
 	</tr>
-	<tr><th>titel:</th><td><input class="large" type="text" name="label" value="{$reference.label}" /></td></tr>
+	<tr><th>titel:</th><td><input class="large" type="text" name="label" value="{$reference.label|@escape}" /></td></tr>
 	<tr><th>datum:</th><td><input class="small" type="text" name="date" value="{$reference.date}" /></td></tr>
 	{*if $reference.author*}
 	<tr><th>auteur (verbatim):</th><td><input class="large" type="text" name="author" value="{$reference.author}" /></td></tr>
@@ -97,7 +98,7 @@
 
 {if $reference.id}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
-	<tr><th><a href="#" onclick="doDelete();return false;">referentie verwijderen</a></th><td></td></tr>
+	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$reference.label|@escape}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen en {$links.names|@count} namen aan deze titel gekoppeld.');return false;">referentie verwijderen</a></th><td></td></tr>
 {/if}
 
 </table>

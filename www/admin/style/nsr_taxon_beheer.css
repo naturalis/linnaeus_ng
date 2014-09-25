@@ -66,6 +66,8 @@ select {
 	max-height:340px;
 	overflow-y:scroll;
 	overflow-x:hidden;
+	border:1px solid #999;
+	margin-bottom:50px;
 }
 
 #dropdown-list-content li {
@@ -131,4 +133,12 @@ input[type=text].small {
 
 .click-letter {
 	padding:0 2px 0 2px;
+}
+
+.inline_subtext {
+	font-size:0.8em;
+}
+.inline_message {
+	padding-left:10px;
+	color:#F30;
 }
