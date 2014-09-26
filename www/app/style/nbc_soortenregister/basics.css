@@ -391,3 +391,11 @@ html, body {
 #tree-container .italics {
 	font-style:italic;
 }
+#tree-container .highlight-node {
+	background-color:#f9a555;
+	color:#fff;
+}
+#tree-container .highlight-node.a {
+	color:#fff;
+}
+

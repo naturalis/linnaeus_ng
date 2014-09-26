@@ -8,6 +8,7 @@ class TreeController extends Controller
 		'name_types'
     );
 	
+	public $jsToLoad=array('all' => array('project_specific/soortenregister-tree.js'));
 	private $_idPreferredName=0;
 	private $_idValidName=0;
 		
@@ -53,6 +54,13 @@ class TreeController extends Controller
 
 	public function treeAction()
 	{
+
+    header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
+    header('Last-Modified: ' . gmdate( 'D, d M Y H:i:s') . ' GMT');
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Pragma: no-cache'); 
+	
 		$tree=$this->restoreTree();
 
 		if (is_null($tree))
@@ -60,6 +68,9 @@ class TreeController extends Controller
 		else
 			$this->smarty->assign('tree',json_encode($tree));
 	
+		if ($this->rHasVar('expand'))
+			$this->smarty->assign('expand',(int)$this->rGetVal('expand'));
+
 		$this->printPage('tree');
 	}
 	

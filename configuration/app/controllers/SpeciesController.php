@@ -37,7 +37,8 @@ class SpeciesController extends Controller
 		'taxon_trend_years',
 		'taxon_trends',
 		'external_orgs',
-		'external_ids'
+		'external_ids',
+		'taxon_quick_parentage'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -277,7 +278,11 @@ class SpeciesController extends Controller
 
 			$return=json_encode($this->getTaxonMedia(array('id'=>$this->requestData['id'])));
 
-
+        }
+		else
+		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
+		{
+	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
         }
 
         $this->allowEditPageOverlay = false;
@@ -1365,6 +1370,27 @@ class SpeciesController extends Controller
 			$this->redirect($base.'taxon.php?epi='.$this->requestData['epi'].'&id='.$t[0]['id']);
 
 	}
+
+	private function getTaxonParentage($id)
+	{
+		if (is_null($id))
+			return;
+			
+		$d=$this->models->TaxonQuickParentage->freeQuery("
+			select
+				parentage
+			from
+				%PRE%taxon_quick_parentage
+			where 
+				project_id = ".$this->getCurrentProjectId()." 
+				and taxon_id = ".$id
+		);
+
+		return explode(' ',$d[0]['parentage']);
+
+	}
+
+
 
 
 }

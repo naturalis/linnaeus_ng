@@ -1,41 +1,8 @@
 var activeNode=false;
 var container='tree-container';
-var url='ajax_interface.php';
-var taxonTargetUrl='taxon.php?id=%s';
+var url='ajax_interface_tree.php';
 var autoExpandArray=Array();
 var highlightNodes=Array();
-
-function setHighlightNode(node)
-{
-	highlightNodes.push(node);
-}
-
-function shouldHighlightNode(node)
-{
-	for(var i=0;i<highlightNodes.length;i++)
-	{
-		if (highlightNodes[i]==node)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-function addAutoExpandNode(node)
-{
-	autoExpandArray.push(node);
-}
-
-function checkAutoExpand()
-{
-	// called from buildtree(); call directly after adding nodes with addAutoExpandNode()
-	var node=autoExpandArray.shift();
-	if (node)
-	{
-		buildtree(node);
-	}
-}
 
 function buildtree(node)
 {
@@ -56,7 +23,6 @@ function buildtree(node)
 			growbranches(data);
 			storetree();
 			checkAutoExpand();
-			
 		}
 	});
 }
@@ -86,15 +52,14 @@ function growbranches(data)
 					'' 
 				)+
 				(shouldHighlight ? '</span>' : '' )+
-				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'" class="detail-link">&rarr;</a> \
+				'<a href="nsr_taxon.php?id='+d.id+'" class="detail-link">&rarr;</a> \
 			</li>';
 	}
-	
 	
 	if (progeny) progeny='<ul id="children-'+data.node.id+'">'+progeny+'</ul>';
 
 	var buffer=
-		'<ul class="top">'+
+		'<ul>'+
 			'<li class="child">'+
 				(!activeNode ?
 					//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
@@ -115,12 +80,12 @@ function growbranches(data)
 				)+
 				(!activeNode ?
 					'':
-					'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'" class="detail-link">&rarr;</a>'
+					'<a href="nsr_taxon.php?id='+data.node.id+'" class="detail-link">&rarr;</a>'
 				)+
 				progeny+
 			'</li>'+
 		'</ul>';
-
+				
 	if (activeNode==false)
 	{
 		$( "#"+container ).html( buffer );
@@ -129,7 +94,6 @@ function growbranches(data)
 	{
 		$( "#node-"+activeNode ).replaceWith( buffer );
 	}
-	
 }
 
 function storetree()
@@ -171,6 +135,21 @@ function restoretree()
 	});
 }
 
+function addAutoExpandNode(node)
+{
+	autoExpandArray.push(node);
+}
+
+function checkAutoExpand()
+{
+	// called from buildtree(); call directly after adding nodes with addAutoExpandNode()
+	var node=autoExpandArray.shift();
+	if (node)
+	{
+		buildtree(node);
+	}
+}
+
 function setAutoExpand(id)
 {
 	setHighlightNode(id);
@@ -191,7 +170,24 @@ function setAutoExpand(id)
 				addAutoExpandNode(data[index]);
 			}
 			buildtree(false);
-			//checkAutoExpand();
 		}
 	});
 }
+
+function setHighlightNode(node)
+{
+	highlightNodes.push(node);
+}
+
+function shouldHighlightNode(node)
+{
+	for(var i=0;i<highlightNodes.length;i++)
+	{
+		if (highlightNodes[i]==node)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
