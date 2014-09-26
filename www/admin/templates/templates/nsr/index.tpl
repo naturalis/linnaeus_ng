@@ -17,32 +17,6 @@
 </div>
 
 <script>
-
-function setAutoExpand(id)
-{
-	setHighlightNode(id);
-	
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			action : 'get_parentage' ,
-			id : id ,
-			time : allGetTimestamp()
-		}),
-		success : function (data)
-		{
-			var data=$.parseJSON(data);
-			for (index=1;index<data.length;++index)
-			{
-				addAutoExpandNode(data[index]);
-			}
-			buildtree(false);
-			//checkAutoExpand();
-		}
-	});
-}
-
 function localList(obj,txt)
 {
 	allLookupClearDiv();

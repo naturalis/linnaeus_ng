@@ -36,7 +36,9 @@ $(document).ready(function() {
 		storetree();	
 	{else}
 		buildtree(false);
-		//restoretree();
+	{/if}
+	{if $expand}
+		setAutoExpand({$expand});
 	{/if}
 	
 });
