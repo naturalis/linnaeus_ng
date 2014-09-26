@@ -235,7 +235,7 @@ div.auto_complete ul li.selected {
 }
 
 #body #dialogRidge #right {
-
+	margin-top:1px;
 }
 
 #body #dialogRidge #content.taxon-detail {
