@@ -102,7 +102,7 @@ class SearchControllerNSR extends SearchController
 
     public function recentPicturesAction()
     {
-		$results = $this->doPictureSearch(null);
+		$results = $this->doPictureSearch($this->requestData);
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
@@ -842,9 +842,11 @@ class SearchControllerNSR extends SearchController
 
 			$data[$key]['photographer']=$val['photographer'];
 			$data[$key]['label']=
-				$val['photographer'].', '.
-				$val['meta_datum'].', '.
-				$val['meta_geografie'];
+				trim(
+					(!empty($val['photographer']) ? $val['photographer'].', ' : '') .
+					(!empty($val['meta_datum']) ? $val['meta_datum'].', ' : '') .
+					$val['meta_geografie'], ', '
+				);
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: ','<br /><span class="pic-meta-label">',$metaData,true);
 			
 		}

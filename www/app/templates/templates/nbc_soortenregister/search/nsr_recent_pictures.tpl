@@ -27,7 +27,7 @@
 			<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/510x272/{$v.thumb}" />
 		</a>
 		<div id="taxonImageCredits">
-			<span class="photographer-title">Foto</span>&nbsp;{$v.photographer}, {$v.meta_datum}, {$v.meta_geografie}
+			<span class="photographer-title">Foto</span>&nbsp;{$v.label}
 		</div>
 	</div>
 </div>
