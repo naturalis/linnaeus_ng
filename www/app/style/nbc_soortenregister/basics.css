@@ -395,7 +395,7 @@ html, body {
 	background-color:#f9a555;
 	color:#fff;
 }
-#tree-container .highlight-node.a {
+#tree-container .highlight-node a {
 	color:#fff;
 }
 
