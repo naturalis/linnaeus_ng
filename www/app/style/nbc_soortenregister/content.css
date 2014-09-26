@@ -477,6 +477,7 @@ div.banner
 	padding: 11px 10px 5px;
 	background: #f9a555;
 	height: 100x;
+	margin-top:-4px;
 }
 	
 #quicksearch label {

@@ -62,19 +62,18 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function taxonAction()
     {
-        if ($this->rHasId())
-		{
-            $taxon = $this->getTaxonById($this->rGetVal('id'));
-			$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
-		}
-		else 
+
+		$taxon = $this->getTaxonById($this->rGetVal('id'));
+
+        if (empty($taxon))
 		{
 			$this->redirect('nsr_index.php');
 		}
-
-        if (!empty($taxon))
+		else
 		{
 			
+			$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
+
 			$sideBarLogos=array();
 
 			$reqCat=$this->rHasVal('cat') ? $this->rGetVal('cat') : null;
@@ -212,11 +211,8 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
             $this->smarty->assign('headerTitles', array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
 
-        } else {
-            
-            $this->addError($this->translate('No or unknown taxon ID specified.'));
         }
-        
+
         $this->printPage('taxon');
 
     }
