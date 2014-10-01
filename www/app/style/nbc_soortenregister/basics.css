@@ -25,6 +25,11 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 	background: url(images/stippellijn.gif) no-repeat left bottom;
 }
 
+#toolbox ul
+{
+	margin-top: -3px;
+}
+
 #toolbox li
 {
     padding-left:15px;
@@ -50,6 +55,7 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 
 #left #categories {
 	margin-bottom:25px;
+	margin-top:-3px;
 }
 
 #treebranchContainer #name-tree {
@@ -235,7 +241,6 @@ div.auto_complete ul li.selected {
 }
 
 #body #dialogRidge #right {
-	margin-top:1px;
 }
 
 #body #dialogRidge #content.taxon-detail {
@@ -243,7 +248,7 @@ div.auto_complete ul li.selected {
 }
 
 #body #dialogRidge #content.image-search, #body #dialogRidge #content.simple-search {
-	margin-top:-17px;
+	margin-top:-18px;
 }
 
 #body #dialogRidge #content.literature {
