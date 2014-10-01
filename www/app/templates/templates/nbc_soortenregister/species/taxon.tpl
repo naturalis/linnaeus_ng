@@ -67,6 +67,7 @@
 			{include file="_rdf_data.tpl"}
 
 		{/if}
+
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
