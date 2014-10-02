@@ -418,7 +418,7 @@ class NsrTreeController extends Controller
 
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 
-			unset($val['parent_id']);
+			//unset($val['parent_id']);
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
 			unset($val['base_rank']);
@@ -443,7 +443,7 @@ class NsrTreeController extends Controller
 				$progeny[]=$val;
 			}
 		}
-		
+
 		usort(
 			$progeny,
 			function($a,$b)

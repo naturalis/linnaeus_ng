@@ -2294,7 +2294,6 @@ class NsrTaxonController extends Controller
 					ifnull(_k.name,_l.commonname) as name,
 					_m.authorship,
 					_r.rank,
-					_q.label as rank_label_ORIG,
 					replace(ifnull(_q.label,_r.rank),'_',' ') as rank_label,
 					_p.rank_id as base_rank
 
@@ -2431,7 +2430,7 @@ class NsrTaxonController extends Controller
 
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 
-			unset($val['parent_id']);
+			//unset($val['parent_id']);
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
 			unset($val['base_rank']);
