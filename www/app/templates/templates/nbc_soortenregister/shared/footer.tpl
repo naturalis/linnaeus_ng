@@ -18,7 +18,7 @@
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
 <div id="hint-box"></div>
 
-{literal}
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -37,7 +37,5 @@ $(document).ready(function(){
 });
   
 </script>
-
-{/literal}
 </body>
 </html>

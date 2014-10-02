@@ -91,9 +91,11 @@
 	{/if}
 				
 })
-{literal}
+
 </script>
-{/literal}
+
+{snippet}google_analytics.html{/snippet}
+
 
 </body>
 </html>

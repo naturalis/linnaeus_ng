@@ -5,7 +5,8 @@
 &nbsp;
 {t}Find taxa:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
-<a href="branches.php" class="allLookupLink">Taxon list</a>
+<!-- a href="branches.php" class="allLookupLink">Taxon list</a-->
+<a href="tree.php" class="allLookupLink">Taxon list</a>
 &nbsp;
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
