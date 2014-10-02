@@ -120,13 +120,13 @@
 		titles--0024.html
 	and if that doesn't exist, for
 		titles.html
-	please note the files are included "as is", and are not run through any server-side 
-	interperter; therefore php or smarty-codes won't work. javascript will, however, so 
+	please note the files are included "as is", and are not run through any server-side
+	interperter; therefore php or smarty-codes won't work. javascript will, however, so
 	it can be used for google analytics-codes, which can be different per project.
 	snippets can also be useful for inlcuding bits of html that depend on which OTAP-server
 	you're working on (like "noindex" tags on development servers). note that this last
 	strategy only works if the _snippets folder is *not* included in SVN.
-	
+
 
 */
 
@@ -1420,8 +1420,8 @@ class Controller extends BaseClass
 			$taxon=$p['taxon'];
 			$ranks=isset($p['ranks']) ? $p['ranks'] : null;
 			$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post')) ? $p['rankpos'] : 'pre');
-		} 
-		else 
+		}
+		else
 		{
 			$taxon=$p;
 			$ranks=null;
@@ -1510,7 +1510,7 @@ class Controller extends BaseClass
 
         // Return now if name has been set
         if (isset($name)) {
-            return $this->setHybridMarker($name, $rankId, $taxon['is_hybrid']);
+            return $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
 
         // If we end up here something must be wrong, just return name sans formatting
@@ -2083,7 +2083,7 @@ class Controller extends BaseClass
 	*/
     public function makeLookupList ($p)
     {
-		
+
 		$data=isset($p['data']) ? $p['data'] : null;
 		$module=isset($p['module']) ? $p['module'] : null;
 		$url=isset($p['url']) ? $p['url'] : null;
@@ -2364,7 +2364,7 @@ class Controller extends BaseClass
 					{
 						$skin = $d;
 					}
-					else 
+					else
 					{
 						$skin = $this->getSetting('skin_mobile');
 					}
