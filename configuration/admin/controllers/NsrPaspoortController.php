@@ -119,6 +119,7 @@ class NsrPaspoortController extends Controller
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
 				_a.show_order,
 				_c.content,
+				_c.publish,
 				_a.def_page
 
 			from 

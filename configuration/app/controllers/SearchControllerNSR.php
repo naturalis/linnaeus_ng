@@ -8,6 +8,7 @@ class SearchControllerNSR extends SearchController
 	private $_suggestionListItemMax=25;
 	private $_resPicsPerPage=12;
 	private $_resSpeciesPerPage=50;
+	private $_nameTypeIds;
 
     public $usedModels = array(
 		'taxa',
@@ -40,6 +41,13 @@ class SearchControllerNSR extends SearchController
     private function initialise()
     {
 		$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
     }
 
     public function searchAction()
@@ -226,7 +234,7 @@ class SearchControllerNSR extends SearchController
 				_e.rank_id,
 				_f.lower_taxon,
 				_k.name as common_name,
-				_q.label as common_rank,
+				ifnull(_q.label,_x.rank) as common_rank,
 				_g.presence_id,
 				_h.information_title as presence_information_title,
 				_h.index_label as presence_information_index_label,
@@ -257,6 +265,9 @@ class SearchControllerNSR extends SearchController
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
 
+			left join %PRE%ranks _x
+				on _f.rank_id=_x.id
+
 			left join %PRE%labels_projects_ranks _q
 				on _e.rank_id=_q.project_rank_id
 				and _a.project_id = _q.project_id
@@ -283,8 +294,7 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
 				and _e.project_id=_k.project_id
-				and _k.type_id=
-					(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _k.language_id=".$this->getCurrentLanguageId()."
 
 			where _a.project_id =".$this->getCurrentProjectId()."
@@ -391,16 +401,14 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _k.language_id=".$this->getCurrentLanguageId()."
 
 			". (isset($auth) ? "
 				left join %PRE%names _m
 					on _a.id=_m.taxon_id
 					and _a.project_id=_m.project_id
-					and _m.type_id=(select id from %PRE%name_types where project_id = ".
-						$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+					and _m.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 					and _m.language_id=".LANGUAGE_ID_SCIENTIFIC : "" 
 				)."
 
@@ -739,15 +747,13 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%names _z
 				on _m.taxon_id=_z.taxon_id
 				and _m.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
 				and _m.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 				
 			left join %PRE%media_meta _meta1

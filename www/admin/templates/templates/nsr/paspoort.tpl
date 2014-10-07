@@ -23,6 +23,24 @@
 ul {
 	list-style: inside square;
 }
+span[id^=indicator] {
+	color:#390;
+	font-size:0.9em;
+	padding:0 5px 0 5px;
+}
+span[id^=indicator] .unpublished {
+	color:#C33;
+}
+span[id^=indicator] .unpublished::before {
+    content: "(";
+}
+span[id^=indicator] .unpublished::after {
+    content: ")";
+}
+span[id^=indicator] .leeg {
+	color:#999;
+	font-size:0.8em;
+}
 </style>
 
 <div id="page-main">
@@ -38,18 +56,31 @@ ul {
 	<li>
 		<span class="passport-title">
         	<a href="#" onclick="$('#body{$k}').toggle();return false;">{$v.title}</a>
-            <span id="indicator{$k}">{if $v.content|@strlen>0} *{/if}</span>
+            <span id="indicator{$k}">
+	            {if $v.content|@strlen>0 && $v.publish==1}
+                <span title="heeft content, is gepubliceerd">{$v.content|@strlen} tekens</span>
+                {elseif $v.content|@strlen>0 && $v.publish!=1}
+                <span title="heeft content, niet gepubliceerd (onzichtbaar)" class="unpublished">{$v.content|@strlen} tekens</span>
+                {else}
+                <span title="geen content" class="leeg">(leeg)</span>
+                {/if}
+            </span>
 			<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat={$v.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr" title="paspoort bekijken in het Soortenregister (nieuw venster)">&rarr;</a><br />
 		</span>
 		<div class="passport-body" id="body{$k}">
             <span class="passport-content" id="content{$k}">{$v.content}</span>
 			<a href="#" class="edit" id="edit{$k}" onclick="openeditor(this);return false;" style="margin-left:0;">edit</a>
             <div id="button-container{$k}" class="button-container" style="display:none">
+            <p>
+            <input id="publish{$k}" type="checkbox" value="publiceren" {if $v.publish==1}checked="checked"{/if} />publiceren?
+            </p>
+            <p>
             <input id="save{$k}" value="opslaan" type="button" onclick="saveeditordata(this);">
             <input id="close{$k}" value="sluiten" type="button" onclick="closeeditor(this);">
             <input id="revert{$k}" value="oorspronkelijke tekst" type="button" onclick="reverttext(this);">
             <input id="page{$k}" value="{$v.id}" type="hidden" />
             <span id="message{$k}"></span>
+            </p>
             </div>
         </div>
 	</li>
@@ -63,6 +94,14 @@ ul {
 </p>
 
 </div>
+
+<script>
+	{foreach from=$tabs item=v key=k}
+	currentpublish[{$k}]={if $v.publish==1}true{else}false{/if};
+	{/foreach}
+</script>
+
+
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

@@ -54,7 +54,7 @@
 {else}
 
 
-<form id="theForm" method="post" action="" onsubmit="return searchDoSearchForm()" >
+<form id="theForm" method="get" action="" onsubmit="return searchDoSearchForm()" >
 <input type="hidden" name="extended" value="1" />
 
 	<div class="page-generic-div">
