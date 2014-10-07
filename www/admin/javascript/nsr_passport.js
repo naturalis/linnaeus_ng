@@ -1,5 +1,6 @@
 var reverttexts=Array();
 var currenttexts=Array();
+var currentpublish=Array();
 
 function getcallerid(caller)
 {
@@ -40,19 +41,27 @@ function reverttext(caller)
 	}
 }
 
-function closeeditor(caller)
+function geteditordata(editor)
 {
-	var id=getcallerid(caller);
-	var editor='editor'+id;
+	var data='';
+
 	for(var i in CKEDITOR.instances)
 	{
 		var e=CKEDITOR.instances[i];
 		if (e.name==editor)
 		{
-			var data=e.getData();
+			data=e.getData();
 			
 		}
 	}
+	return data;
+}
+
+function closeeditor(caller)
+{
+	var id=getcallerid(caller);
+	var editor='editor'+id;
+	var data=geteditordata(editor);
 
 	if (currenttexts[id]!=data)
 	{
@@ -73,16 +82,15 @@ function saveeditordata(caller)
 {
 	var id=getcallerid(caller);
 	var editor='editor'+id;
-	for(var i in CKEDITOR.instances)
+	var content=geteditordata(editor);
+	var publish=$('#publish'+id).is(':checked');
+
+	if (currenttexts[id]==content && currentpublish[id]==publish) return;
+
+	if (publish && content.length==0)
 	{
-		var e=CKEDITOR.instances[i];
-		if (e.name==editor)
-		{
-			var content=e.getData();
-		}
+		alert('Een leeg paspoort wordt niet getoond, ook niet wanneer het gepubliceerd is!');
 	}
-	
-	if (currenttexts[id]==content) return;
 
 	var page=$('#page'+id).val();
 	var taxon=$('#taxon_id').val();
@@ -95,6 +103,7 @@ function saveeditordata(caller)
 			taxon: taxon,
 			page : page,
 			content : content,
+			publish : publish,
 		},
 		success : function (data)
 		{
@@ -102,7 +111,9 @@ function saveeditordata(caller)
 			{
 				$('#message'+id).html('Tekst opgeslagen.').toggle(true).fadeOut(2000);
 				currenttexts[id]=content;
+				currentpublish[id]=publish;
 				$('#indicator'+id).html(content.length==0?'':'*');
+				alert('HIER MOET NOG HET EEN EN ANDER GEBEUREN! EN DE publish WORDT OOK NOG NIET OPGESPLAGEN!');
 			}
 			else
 			{
@@ -113,3 +124,4 @@ function saveeditordata(caller)
 	});	
 	
 }
+

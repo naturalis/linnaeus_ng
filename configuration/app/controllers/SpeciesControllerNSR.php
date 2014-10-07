@@ -1,4 +1,4 @@
-<?php
+	<?php
 /*
 
 automatische tabs
@@ -22,6 +22,7 @@ include_once ('RdfController.php');
 class SpeciesControllerNSR extends SpeciesController
 {
 	private $_resPicsPerPage=12;
+	private $_nameTypeIds;
 
     public function __construct()
     {
@@ -38,6 +39,13 @@ class SpeciesControllerNSR extends SpeciesController
     {
 		$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
 		$this->Rdf = new RdfController;
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
     }
 
     public function indexAction()
@@ -628,17 +636,14 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%names _z
 				on _m.taxon_id=_z.taxon_id
 				and _m.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".LANGUAGE_ID_DUTCH."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
 				and _m.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-				
 
 			left join %PRE%media_meta _map1
 				on _m.id=_map1.media_id
@@ -814,14 +819,13 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%names _z
 				on _q.taxon_id=_z.taxon_id
 				and _q.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".LANGUAGE_ID_DUTCH."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
 				and _m.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
 			left join %PRE%media_meta _meta1
@@ -1004,7 +1008,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_f.rank_id,
 				_f.lower_taxon,
 				_g.label as rank,
-				_q.label as rank_label,
+				ifnull(_q.label,_x.rank) as rank_label,
 				_k.name as common_name
 			
 			from %PRE%taxa _a
@@ -1012,14 +1016,13 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%names _m
 				on _a.id=_m.taxon_id
 				and _a.project_id=_m.project_id
-				and _m.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _m.type_id= ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 				and _m.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _k.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _k.language_id=".LANGUAGE_ID_DUTCH."
 
 			left join %PRE%projects_ranks _f
@@ -1030,6 +1033,9 @@ class SpeciesControllerNSR extends SpeciesController
 				on _a.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
 				and _g.language_id=". LANGUAGE_ID_SCIENTIFIC ."
+
+			left join %PRE%ranks _x
+				on _f.rank_id=_x.id
 
 			left join %PRE%labels_projects_ranks _q
 				on _a.rank_id=_q.project_rank_id
@@ -1152,8 +1158,7 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
-				and _k.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _k.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 				and _k.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
 			left join %PRE%projects_ranks _f
