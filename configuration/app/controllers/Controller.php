@@ -120,13 +120,13 @@
 		titles--0024.html
 	and if that doesn't exist, for
 		titles.html
-	please note the files are included "as is", and are not run through any server-side
-	interperter; therefore php or smarty-codes won't work. javascript will, however, so
+	please note the files are included "as is", and are not run through any server-side 
+	interperter; therefore php or smarty-codes won't work. javascript will, however, so 
 	it can be used for google analytics-codes, which can be different per project.
 	snippets can also be useful for inlcuding bits of html that depend on which OTAP-server
 	you're working on (like "noindex" tags on development servers). note that this last
-	strategy only works if the _snippets folder is *not* included in SVN.
-
+	strategy only works if the _snippets folder is not included in SVN, so it doesn't
+	automatically appear on the production-environment.
 
 */
 
