@@ -311,6 +311,8 @@ class ExportAppController extends Controller
 			$this->_filename = $this->makeFileName($name,'sql');
 			$this->_dbname = $this->makeDatabaseName($name);
 
+			$this->_exportDump=new stdClass();
+
 			$this->makeSpeciesDump();
 			$this->makeMatrixDump();
 			$this->makeKeyDump();
