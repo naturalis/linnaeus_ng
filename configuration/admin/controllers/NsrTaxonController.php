@@ -1053,6 +1053,11 @@ class NsrTaxonController extends Controller
 				on _a.type_id=_b.id 
 				and _a.project_id = _b.project_id
 
+			left join %PRE%nsr_ids _ids
+				on _a.taxon_id =_ids.lng_id 
+				and _a.project_id = _ids.project_id
+				and _ids.item_type = 'taxon'
+
 			where _a.project_id =".$this->getCurrentProjectId()."
 				and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 				and _b.nametype in (

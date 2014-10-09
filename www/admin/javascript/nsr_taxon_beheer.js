@@ -177,6 +177,7 @@ function checkmandatory()
 	for (i in values)
 	{
 		var val=values[i];
+	
 		if (val.name.substr(0,2)=='__') continue;
 		if (
 			val.mandatory && 
@@ -602,7 +603,7 @@ function checkunsavedvalues()
 {
 	for(var i in values)
 	{
-		if (values[i].new)
+		if (values[i].new && values[i].nocheck!=true)
 		{
 			return "Niet alle data is opgelagen!\nPagina toch verlaten?";
 		}

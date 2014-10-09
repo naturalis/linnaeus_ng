@@ -7,7 +7,7 @@
 
 <p>
 <form id="data" onsubmit="return false;">
-<input type="hidden" id="name_language_id" value="{$smarty.const.LANGUAGE_ID_SCIENTIFIC}" />
+<input type="hidden" id="name_language_id" name="name_language_id" value="{$name.name_language_id}" new="{$smarty.const.LANGUAGE_ID_SCIENTIFIC}" />
 
 	<table>
 		<tr>
@@ -144,7 +144,13 @@ $(document).ready(function()
 	{/if}
 
 	$('#data :input[type!=button]').each(function(key,value) {
-		values.push( { name:$(this).attr('id'),label:$(this).attr('label'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
+		var p={ name:$(this).attr('id'),label:$(this).attr('label'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' };
+		if ($(this).attr('new') && $(this).val().length==0)
+		{
+			p.new=$(this).attr('new');
+			p.nocheck=true;
+		}
+		values.push( p );
 		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
 	//console.dir(values);
