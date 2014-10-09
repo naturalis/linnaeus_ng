@@ -91,6 +91,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$names=$this->getNames($taxon);
 			
 			$classification=$this->getTaxonClassification($taxon['id']);
+
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 

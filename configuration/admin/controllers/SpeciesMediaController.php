@@ -29,13 +29,10 @@ class SpeciesMediaController extends Controller
     public $controllerPublicName = 'Species module';
     public $includeLocalMenu = false;
 
-	/* initialise */
-
     public function __construct ()
     {
         parent::__construct();
     }
-
 
     public function __destruct()
     {
@@ -43,52 +40,107 @@ class SpeciesMediaController extends Controller
     }
 
 
+    private function getTaxonMedia($id)
+    {
+        $d=$this->models->MediaTaxon->freeQuery("
+			select 				
+				_a.id,
+				_a.taxon_id,
+				_a.file_name,
+				_a.thumb_name,
+				_a.original_name,
+				_a.mime_type,
+				substring(_a.mime_type,1,locate('/',_a.mime_type)-1) as media_type,
+				_a.file_size,
+				_a.sort_order,
+				_a.overview_image,
+				_b.description
+			from
+				%PRE%media_taxon _a
+				
+			left join %PRE%media_descriptions_taxon _b
+				on _a.id = _b.media_id
+				and _b.project_id = _a.project_id
+				and _b.language_id = ".$this->getDefaultProjectLanguage()."
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.taxon_id = ".$id." 
+
+			order by 
+				media_type,
+				_a.sort_order,
+				_a.file_name
+		");
+
+        foreach ((array)$d as $key=>$val)
+		{
+			$url=$_SESSION['admin']['project']['urls']['project_media'].$val['file_name'];
+
+            if (file_exists($url))
+			{
+                $d[$key]['file_exists']=true;
+				if ($val['media_type']=='image')
+					$d[$key]['dimensions']=getimagesize($url);
+            }
+			else
+			{
+                $d[$key]['file_exists']=true;
+			}
+			
+            $d[$key]['file_size_hr']=$this->helpers->HrFilesizeHelper->convert($val['file_size']);
+			
+        }
+
+		$data=array();
+
+        foreach ((array)$d as $val)
+		{
+			$data[$val['media_type']][]=$val;
+        }
+
+        return $data;
+    }
+	
+
     public function mediaAction()
     {
         $this->checkAuthorisation();
-        
-        $this->setBreadcrumbIncludeReferer(array(
-            'name' => $this->translate('Taxon list'), 
-            'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/branches.php'
-        ));
-        
-        if ($this->rHasId()) {
-            // get existing taxon name
+		
+        if (!$this->rHasId())
+		{
+			$this->redirect('index.php');
+		}
 
-            $taxon = $this->getTaxonById();
-            
-			$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
-            
-            $this->smarty->assign('id', $this->requestData['id']);
-            
+		$taxon=$this->getTaxonById();
+		$media=$this->getTaxonMedia($this->rGetId());
 
-            if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
-                
+		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
+            
+		$this->smarty->assign('media',$media);
+		$this->smarty->assign('taxon',$taxon);
+        $this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
+        $this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
+		$this->smarty->assign('languages', $this->getProjectLanguages());
+		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
+
+        $this->printPage();
+        
+return;
+
+        if ($this->rHasId())
+		{
+
+            if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit())
+			{
                 $this->changeMediaSortOrder($this->requestData['id'], $this->requestData['mId'], $this->requestData['move']);
             }
             
-            $media = $this->getTaxonMedia($this->requestData['id']);
+           
             
             foreach ((array) $this->controllerSettings['media']['allowedFormats'] as $key => $val) {
                 
                 $d[$val['mime']] = $val['media_type'];
-            }
-            
-            foreach ((array) $media as $key => $val) {
-                
-                $mdt = $this->models->MediaDescriptionsTaxon->_get(
-                array(
-                    'id' => array(
-                        'media_id' => $val['id'], 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->getDefaultProjectLanguage()
-                    )
-                ));
-                
-                $val['description'] = $mdt[0]['description'];
-                
-                if (isset($d[$val['mime_type']]))
-                    $r[$d[$val['mime_type']]][] = $val;
             }
             
             if (isset($r))
@@ -109,10 +161,6 @@ class SpeciesMediaController extends Controller
             $this->smarty->assign('taxon', $taxon);
 //	        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
 		}
-        $this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
-        $this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
-        
-        $this->printPage();
     }
 
     public function mediaUploadAction()
@@ -582,6 +630,7 @@ class SpeciesMediaController extends Controller
         }
     }
 
+/*
     private function getTaxonMedia($id)
     {
         $d = $this->models->MediaTaxon->_get(
@@ -608,6 +657,8 @@ class SpeciesMediaController extends Controller
         
         return $d;
     }
+	
+*/
 
     private function setOverviewImageState($taxon, $id, $state)
     {

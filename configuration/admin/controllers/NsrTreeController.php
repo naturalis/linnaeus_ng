@@ -448,7 +448,9 @@ class NsrTreeController extends Controller
 			$progeny,
 			function($a,$b)
 			{
-				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
+				return
+					(strtolower($a['label'])==strtolower($b['label']) ? 
+						0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
 			}
 		);
 
