@@ -21,9 +21,11 @@ class Controller extends BaseClass
     public $data;
     public $randomValue;
     public $breadcrumbIncludeReferer;
-    public $errors;
-    public $messages;
-	public $warnings;
+
+    public $errors=array();
+    public $messages=array();
+	public $warnings=array();
+	
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
     public $pageName;
@@ -264,8 +266,7 @@ class Controller extends BaseClass
      */
     public function addError ($error, $writeToLog = false)
     {
-        if (!$error)
-            return;
+		if (empty($error)) return;
 
         if (!is_array($error)) {
 
@@ -327,28 +328,30 @@ class Controller extends BaseClass
      * @param      type    $message    the message
      * @access     public
      */
-    public function addMessage ($message)
+    public function addMessage ($d)
     {
-        $this->messages[] = $message;
+		if (empty($d)) return;
+		
+		if (is_array($d))
+			$this->messages=array_merge($this->messages,$d);
+		else
+	        $this->messages[]=$d;
     }
 
-
-
-    /**
-     * Returns the class's stack of messages stored in class variable 'messages'
-     *
-     * @return     array    stack of messages
-     * @access     public
-     */
     public function getMessages ()
     {
         return $this->messages;
     }
 
 
-    public function addWarning($message)
+    public function addWarning($d)
     {
-        $this->warnings[] = $message;
+		if (empty($d)) return;
+		
+		if (is_array($d))
+			$this->warnings=array_merge($this->warnings,$d);
+		else
+	        $this->warnings[]=$d;
     }
 
     public function getWarnings()
