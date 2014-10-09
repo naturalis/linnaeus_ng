@@ -1,198 +1,132 @@
 {include file="../shared/admin-header.tpl"}
 {include file="../shared/admin-messages.tpl"}
 
-{if $id}
+<style>
+table tr td {
+	vertical-align:top;
+}
+table {
+	padding-bottom:10px;
+	border-bottom:1px solid #ddd;
+}
+.image {
+	max-width:150px;
+}
+.thumb {
+	max-width:75px;
+}
+textarea {
+	width:250px;
+	height:50px;
+	font-family:"Consolas", Courier, monospace;
+	font-size:11px;
+}
+</style>
+    
 <div id="page-main">
-<p>
-<form id="theForm" method="post">
-	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
-	<input type="hidden" name="action" id="action" value="" />
-	<input type="button" value="{t}upload media{/t}" onclick="window.open('media_upload.php?id={$id}','_top')" />&nbsp;
-	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
-</form>
-</p>
-<div>
-<a name="image"></a>
-<fieldset style="width:735px;">
-<legend id="key-step-choices">{t}Images{/t}</legend>
-	<table class="taxon-media-table">
-		<tr>
-			<td></td>
-			<td><div id="taxon-language-other-language-1"></div></td>
-			<td>{t}Overview image{/t}</td>
-		</tr>
-		{section name=i loop=$media.image}
-		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
-			<td style="width:150px;padding-right:10px">
-			
-			{$media.image[i].sort_order}
-			
-			
-				{if $media.image[i].thumb_name != ''}
-					{capture name="src"}{$session.admin.project.urls.project_thumbs}{$media.image[i].thumb_name}{/capture} 
-				{else}
-					{capture name="src"}{$session.admin.project.urls.project_media}{$media.image[i].file_name}{/capture} 
-				{/if}
-				<a rel="prettyPhoto[gallery]" title="{$media.image[i].description}" href="{$session.admin.project.urls.project_media}{$media.image[i].file_name}">
-					<img src="{$smarty.capture.src}" style="width:150px;cursor:pointer"/>
-				</a>
-				<p>
-				{$media.image[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.image[i].mime_type}; {$media.image[i].hr_file_size} {t}kb{/t})</span>
-				</p>
-				<p>
-				<input type="button" value="{t}delete this image{/t}" onclick="taxonMediaDelete({$media.image[i].id},'image','{$media.image[i].original_name}');" />
-				</p>
-				<script type="text/javascript">
-					taxonMediaFileStore([
-						'image',
-						'{$media.image[i].id}',
-						'{$session.admin.project.urls.project_media}{$media.image[i].file_name}',
-						'{$media.image[i].original_name}',
-						{$media.image[i].dimensions[1]}
-					]);
-				</script>
-			</td>
-			<td style="padding-right:10px">
-				<textarea id="media-{$media.image[i].id}" style="width:400px;height:100px">{$media.image[i].description}</textarea><br />
-				<input type="button" value="{t}save description{/t}" onclick="taxonMediaSaveDesc('media-{$media.image[i].id}','{$media.image[i].id}')" />
-			</td>
-			<td>
-				<input type="checkbox" id="overview-{$media.image[i].id}"{if $media.image[i].overview_image=='1'} checked="checked"{/if} onclick="taxonChangeOverviewPicture(this)" />
-			</td>
-			<td>
-			{if $smarty.section.i.index>0}
-				<span
-					class="a updownarrows"
-					title="{t}move image upward{/t}"
-					onclick="taxonChangeMediaOrder('{$id}','{$media.image[i].id}','up')">
-					&uarr;
-				</span>
-			{/if}
-			</td>
-			<td>
-			{if $smarty.section.i.index<$media.image|@count-1}
-				<span
-					class="a updownarrows"
-					title="{t}move image downward{/t}"
-					onclick="taxonChangeMediaOrder('{$id}','{$media.image[i].id}','down')">
-					&darr;
-				</span>
-			{/if}
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" style="height:20px;"></td>
-		</tr>
-	{/section}
-	</table>
-	</fieldset>
+    <p>
+        <a href="media_upload.php?id={$taxon.id}">{t}upload media{/t}</a><br />
+        <a href="taxon.php?id={$taxon.id}">{t}main page{/t}</a>
+    </p>
+
+	<form id="theForm" method="post">
+    <input type="hidden" name="taxon_id" value="{$taxon.id}" />
+    <input type="hidden" id="action" name="action" value="save" />
+    <input type="hidden" id="subject" name="subject" value="" />
+
+    {if $languages|@count>1}
+    <p>
+    See captions in:
+    <select id="language_id" name="language_id" onchange="$('#action').val('language_change');$('#theForm').submit();">
+        {foreach from=$languages item=v}
+        <option value="{$v.language_id}"{if $v.language_id==$language_id} selected="selected"{/if}>{$v.language}</option>
+        {/foreach}
+	</select>
+    </p>
+    {else}
+    <input type="hidden" id="language_id" name="language_id" value="{$defaultLanguage}" />
+    {/if}
+    
+    
+    <div>
+    
+
+     
+    
+    {foreach from=$media item=v}
+
+        <p>
+            <table>
+                <tr>
+                    <th colspan="3">
+                        {$v.file_name} ({$v.media_type})
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <a
+                            rel="prettyPhoto[gallery]" 
+                            title="{$v.description}"
+                            href="{$session.admin.project.urls.project_media}{$v.file_name}">
+                            
+                            {if $v.media_type=='image'}
+                             <img src="{$session.admin.project.urls.project_media}{$v.file_name}" class="image" />
+                            {elseif $v.media_type=='video'}
+                            <img src="{$baseUrl}admin/media/system/icons/video.jpg" />
+                            {elseif $v.media_type=='sound'}
+                            <img src="{$baseUrl}admin/media/system/icons/audio.jpg" />
+                            {/if}
+                        </a><br />
+                        ({$v.mime_type}, {$v.file_size_hr})
+                       
+                    </td>
+                    <td>
+                        <textarea name="captions[{$v.id}]">{$v.description}</textarea><br />
+                        {* original name: {$v.original_name}<br /> *}
+                        {if $v.media_type=='image'}
+                        <label>
+                            <input type="radio" name="overview-image" value="{$v.id}" {if $v.overview_image=='1'} checked="checked"{/if} />
+                            is overview image
+                        </label>
+                        {/if}
+                        <br /><br />
+                        <input type="submit" value="save" title="save all captions" />
+                        <input type="button" value="&uarr;" title="move image up"
+                            onclick="$('#subject').val({$v.id});$('#action').val('up');$('#theForm').submit();" />
+                        <input type="button" value="&darr;" title="move image down"
+                            onclick="$('#subject').val({$v.id});$('#action').val('down');$('#theForm').submit();" />
+                        <input type="button" value="delete" title="delete image{if $v.thumb_name} and its thumbnail{/if}"
+                            onclick="if (!confirm('{t}Are you sure?{/t}')) { return; } $('#subject').val({$v.id});$('#action').val('delete');$('#theForm').submit();" />
+                    </td>
+                </tr>
+               {if $v.thumb_name}
+                <tr>
+                    <th colspan="3">
+                        {$v.thumb_name} (thumbnail)<br />
+                        <a
+                            rel="prettyPhoto[gallery]" 
+                            href="{$session.admin.project.urls.project_thumbs}{$v.thumb_name}">
+                            <img src="{$session.admin.project.urls.project_thumbs}{$v.thumb_name}" class="thumb" />
+                        </a>
+                    </th>
+	            </tr>
+                    {/if}
+			</table>
+        </p>
+    
+    {/foreach}
+
+    </div>
+    </form>
+
 </div>
 
-<br />
-
-<div>
-	<a name="video"></a>
-<fieldset style="width:735px;">
-<legend id="key-step-choices">{t}Videos{/t}</legend>
-	<table class="taxon-media-table">
-		<tr>
-			<td></td>
-			<td><div id="taxon-language-other-language-2"></div></td>
-		</tr>
-		{section name=i loop=$media.video}
-		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
-			<!-- 
-			<td style="cursor:pointer;width:260px;" onclick="window.open('{$session.admin.project.urls.project_media}{$media.video[i].file_name}','_video');">
-			-->
-			<td>
-				<a rel="prettyPhoto[gallery]" title="{$media.image[i].description}" href="{$session.admin.project.urls.project_media}{$media.video[i].file_name}">
-				<img 
-					src="{$baseUrl}admin/media/system/icons/video.jpg" 
-				/>
-				</a>
-				<p>
-				{$media.video[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.video[i].mime_type}; {$media.video[i].file_size} {t}kb{/t})</span>
-				</p>
-				<p>
-				<input type="button" value="{t}delete this video{/t}" onclick="taxonMediaDelete({$media.video[i].id},'video','{$media.video[i].original_name}');" />
-				</p>
-				<!-- script type="text/javascript">
-					taxonMediaFileStore([
-						'video',
-						'{$media.video[i].id}',
-						'{$session.admin.project.urls.project_media}{$media.video[i].file_name}',
-						'{$media.video[i].original_name}'
-					]);
-				</script -->
-			</td>
-			<td>
-				<textarea id="media-{$media.video[i].id}" style="width:450px;height:100px">{$media.video[i].description}</textarea><br />
-				<input type="button" value="{t}save description{/t}" onclick="taxonMediaSaveDesc('media-{$media.video[i].id}','{$media.video[i].id}')" />
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" style="height:20px;"></td>
-		</tr>
-	{/section}
-	</table>
-</fieldset>
-</div>
-
-<br />
-
-
-<div>
-	<a name="sound"></a>
-<fieldset style="width:735px;">
-<legend id="key-step-choices">{t}Sound{/t}</legend>
-	<table class="taxon-media-table">
-		<tr>
-			<td></td>
-			<td><div id="taxon-language-other-language-2"></div></td>
-		</tr>
-		{section name=i loop=$media.sound}
-		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
-			<td style="width:260px;" >
-				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
-					<param name="movie" value="{$soundPlayerName}" />
-					<param name="FlashVars" value="mp3={$session.admin.project.urls.project_media}{$media.sound[i].file_name}" />
-				</object>
-				<p>
-				{$media.sound[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.sound[i].mime_type}; {$media.sound[i].file_size} {t}kb{/t})</span>
-				</p>
-				<p>
-				<input type="button" value="{t}delete this sound file{/t}" onclick="taxonMediaDelete({$media.sound[i].id},'sound file','{$media.sound[i].original_name}');" />
-				</p>
-				<!-- script type="text/javascript">
-					taxonMediaFileStore([
-						'sound',
-						'{$media.sound[i].id}',
-						'{$session.admin.project.urls.project_media}{$media.sound[i].file_name}',
-						'{$media.sound[i].original_name}'
-					]);
-				</script -->
-			</td>
-			<td>
-				<textarea id="media-{$media.sound[i].id}" style="width:450px;height:100px">{$media.sound[i].description}</textarea><br />
-				<input type="button" value="{t}save description{/t}" onclick="taxonMediaSaveDesc('media-{$media.sound[i].id}','{$media.sound[i].id}')" />
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" style="height:20px;"></td>
-		</tr>
-	{/section}
-	</table>
-</fieldset>
-</div>
-{/if}
-
-{literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-{/literal}
+	
+	$('#page-block-messages').fadeOut(1500);
+	
+/*
 	allShowLoadingDiv();
 {section name=i loop=$languages}
 	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
@@ -200,7 +134,8 @@ $(document).ready(function(){
 
 	allActiveLanguage = {$defaultLanguage};
 	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
-
+	
+{*
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat(
 		'{$session.admin.user.id}',
@@ -209,11 +144,10 @@ $(document).ready(function(){
 		'{$session.admin.system.active_page.viewName}',
 		'{$taxon.id}'
 	);
+*}
 	allHideLoadingDiv();
-	allLookupNavigateOverrideUrl('media.php?id=%s');
-{literal}	
+//	allLookupNavigateOverrideUrl('media.php?id=%s');
+*/
 });
 </script>
-{/literal}
-
 {include file="../shared/admin-footer.tpl"}
