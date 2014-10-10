@@ -67,18 +67,21 @@ class LiteratureController extends Controller
 		
         $this->checkAuthorisation();
 
-		if ($this->rHasVal('add','hoc') && !isset($_SESSION['admin']['system']['literature']['newRef'])) {
-		// referred from the taxon content editing page
+		if ($this->rHasVal('add','hoc') && !isset($_SESSION['admin']['system']['literature']['newRef']))
+		{	// referred from the taxon content editing page
 			$_SESSION['admin']['system']['literature']['newRef'] = '<new>';
 		}
 
-		if ($this->rHasVal('letter')) {
+		if ($this->rHasVal('letter'))
+		{
 			$ref = $this->getFirstReference($this->rGetVal('letter'));
 		} else
-		if ($this->rHasId()) {
+		if ($this->rHasId())
+		{
 			$ref = $this->getReference($this->rGetVal('id'));
 		} else
-		if (!$this->rHasVal('action','new')) {
+		if (!$this->rHasVal('action','new'))
+		{
 			$ref = $this->getFirstReference();
 		}
 
@@ -242,9 +245,9 @@ class LiteratureController extends Controller
 
 
 
-//		$this->getTaxonTree();
+		$this->getTaxonTree();
 
-//		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 
