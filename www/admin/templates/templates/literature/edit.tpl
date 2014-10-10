@@ -7,7 +7,6 @@
 <input type="hidden" name="id" id="id" value="{$ref.id}" />
 <input type="hidden" name="action" id="action" value="" />
 
-
 {if $ref.multiple_authors==0 && $ref.author_second!=''}
 {assign var=num value=2}
 {elseif $ref.multiple_authors==1}
@@ -149,30 +148,38 @@
     </table>
 </p>
 
-    <p>
-        {t}Taxa this reference pertains to:{/t}<br />
-        (you can drag and drop selected taxa to put them in the desired order)
-    </p>
+	<br />
 
     <p>
-        <div id="selected-taxa"></div>
-    </p>
-    <p>
+		{t}Taxa this reference links to:{/t}
+    <div id="lit-taxa-wrapper">
+        <div id="lit-taxa-first">
+        	All taxa:
+            <select id="taxa" multiple="multiple" size="20" style="width:300px" ondblclick="litAddTaxon();">
+            {foreach from=$taxa key=k item=v}
+            <option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
+            {'&nbsp;&nbsp;'|str_repeat:($v.level-$taxa[0].level)}{$v.taxon}
+            </option>
+            {/foreach}
+            </select>
+        </div>
+        <div id="lit-taxa-second">
+	        Linked taxa:
+	        <div id="selected-taxa"></div>
+	        
+		</div>
+	</div>
 
-        <select id="taxa" multiple="multiple" size="20" style="width:300px" ondblclick="litAddTaxon();">
-        {foreach from=$taxa key=k item=v}
-        {*if $v.id && (($isHigherTaxa && $v.lower_taxon==0) || !$isHigherTaxa)*}
-        <option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>{'&nbsp;&nbsp;'|str_repeat:$v.level-$taxa[0].level}{$v.taxon}</option>
-        {*/if*}
-        {/foreach}
-        </select>
     </p>
     <p>
         <input type="button" onclick="litAddTaxon();" value="{t}add selected{/t}" />
     </p>
-    <p>
-        {t}(you can select multiple taxa by holding down the Ctrl or Shift key while selecting; you can also add single taxa by double-clicking their name){/t}
-    </p>
+	<p>
+        {t}Select the relevant taxon, and click 'add' to add it to the list of linked taxa. Alternatively, you can add a taxon by double-clicking its name.{/t}<br/>
+        {t}You can select multiple taxa at once by holding down the Ctrl while selecting, or select a range by holding down Shift and clicking the first and last taxon of the desired range.{/t}<br />
+        {t}The order of the linked taxa can be changed by dragging and dropping them. Click the 'x' next to each name to remove it from the list.{/t}<br />
+        {t}(Changes to the linked taxa are saved immediately, not just when you click 'save'){/t}
+	</p>
 
 </form>
 </div>

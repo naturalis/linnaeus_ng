@@ -20,7 +20,7 @@
 .delete-x {
   cursor: pointer;
   color: #999;
-  padding-left: 10px; }
+  padding: 0 10px 0 10px; }
 
 .delete-x:hover {
   color: #f00; }
@@ -38,6 +38,25 @@
   font-size: 0.9em;
   width: 90px;
   cursor: pointer; }
+
+#lit-taxa-wrapper {
+    width: 800px;
+    overflow: hidden;
+}
+#lit-taxa-first {
+    width: 300px;
+    float:left;
+}
+#lit-taxa-second {
+    float: left;
+	width:450px;
+	x-overflow: hidden;
+	margin-left:10px;
+}
+#selected-taxa {
+	border-top:1px solid #bbb;
+	border-bottom:1px solid #bbb;
+}
 
 a, .a {
   text-decoration: none;
