@@ -1,6 +1,6 @@
 
 /*
- _     _                                   _   _  ____ 
+ _     _                                   _   _  ____
 | |   (_)_ __  _ __   __ _ ___ _   _ ___  | \ | |/ ___|       _ _
 | |   | | '_ \| '_ \ / _` / _ \ | | / __| |  \| | |  _       _{ ' }_
 | |___| | | | | | | | (_|   __/ |_| \__ \ | |\  | |_| |     { `.!.` }
@@ -10,13 +10,13 @@
 
 
 
-// SETTINGS 
+// SETTINGS
 			@import "settings";
 
 
 /* BOOTSTRAP STYLES */
 
-	// --- bootstrap: SETTINGS 
+	// --- bootstrap: SETTINGS
 
 			// --- bootstrap: variables
 			@import "bootstrap/variables";
@@ -61,7 +61,7 @@
 
 			// @import "bootstrap/glyphicons";
 
-			// --- --- bootstrap: dropdown --- 
+			// --- --- bootstrap: dropdown ---
 			// @import "bootstrap/dropdowns";
 
 			// --- --- bootstrap: button-groups ---
@@ -115,7 +115,7 @@
 
 			// @import "bootstrap/popovers";
 
-			// @import "bootstrap/carousel"; 
+			// @import "bootstrap/carousel";
 
 	/* --- bootstrap: UTILITY CLASSES */
 
@@ -125,11 +125,11 @@
 
 /* NATURALIS - LINNÆUS  */
 
-	//  --- MIXINS --- 
+	//  --- MIXINS ---
 
 			@mixin container{
 				max-width: $page-width;
-				margin: 0 auto;	
+				margin: 0 auto;
 			}
 
 			@mixin cols( $cols ){
@@ -140,7 +140,7 @@
 
 			@mixin margin-left($cols){
 				margin-left: percentage( $cols / $grid-columns);
-			}			
+			}
 
 			@mixin margin-right($cols){
 				margin-right: percentage( $cols / $grid-columns);
@@ -148,7 +148,7 @@
 
 			@mixin padding-left($cols){
 				padding-left: percentage( $cols / $grid-columns);
-			}			
+			}
 
 			@mixin padding-right($cols){
 				padding-right: percentage( $cols / $grid-columns);
@@ -159,8 +159,8 @@
 				$gutter-perc: percentage($grid-gutter-width / $page-width);
 				$line-color: #eff;
 
-				background-image: repeating-linear-gradient(90deg, 
-					$line-color, 
+				background-image: repeating-linear-gradient(90deg,
+					$line-color,
 					$line-color $gutter-perc,
 					white $gutter-perc,
 					white $col-width - $gutter-perc,
@@ -197,11 +197,11 @@
 
 				@media (max-width: $medium-width){
 					font-size: 75%;
-				}				
+				}
 			}
 
 	/* --- FONT */
-	
+
 		/* --- --- ICON FONTS --- */
 
 			@font-face {
@@ -292,7 +292,7 @@
 			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic);
 
 			body{
-				font-weight: 400; 
+				font-weight: 400;
 				font-stretch:normal;
 				letter-spacing: 0.01em;
 				font-family: $font-family-humanist;
@@ -340,9 +340,9 @@
 			}
 
 		/* --- --- TOP STRIP (SERVICE MENU) --- */
-			
+
 			#top-strip {
-				p{ 
+				p{
 					color: $grijs-4;
 					text-align: right;
 					margin-top: 15px;
@@ -366,11 +366,11 @@
 			    margin: 0;
 			    overflow: hidden;
 			    font-weight: 300;
-			    
+
 			    .container{
 				    width: $page-width;
 				    max-width: 100%;
-			    	
+
 			    }
 
 			    a{
@@ -389,7 +389,7 @@
 
 				ul {
 					width: 100%;
-					
+
 					@media screen and (max-width:$medium-width){
 						text-align: center;
 					}
@@ -397,7 +397,7 @@
 
 				li {
 					list-style: none inside none;
-				
+
 					@media screen and (max-width:$medium-width){
 						&:after {
 							content: " |";
@@ -418,7 +418,7 @@
 			}
 
 		/* --- --- TITLE --- */
-			
+
 			#header-title{
 				font-size: 32px;
 				color: $blauw;
@@ -426,14 +426,14 @@
 
 		/* --- --- CONTENT --- */
 
-			#content, 
-			#common, 
+			#content,
+			#common,
 			#classification,
 			#media,
 			#search-results,
 			#definition,
 			#list
-			{				
+			{
 				padding-top: 1em;
 				background-color: $proze-background;
 				padding: 1em percentage(1/17);
@@ -475,7 +475,7 @@
 
 				&:before{
 					content: "(";
-				}	
+				}
 
 				&:after{
 					content: ")";
@@ -484,7 +484,7 @@
 			}
 
 		/* --- --- CATEGORIES (tabs) --- */
-			
+
 			#categories{
 
 				@media (max-width: $medium-width){
@@ -514,7 +514,7 @@
 					color: $rood;
 					padding: 0.25em 0.75em 0.5em;
 					border-top: 1px solid $wit;
-					
+
 					&:hover{
 						text-decoration: none;
 						color: $blauw;
@@ -532,7 +532,7 @@
 				}
 
 			}
-	
+
 		/* --- --- NAVIGATION PANE --- */
 
 			.navigation-icon{
@@ -553,7 +553,7 @@
 			.icon-inactive{
 				color: $grijs-4;
 			}
-			
+
 			[id$=icon-inactive]{
 				&:before {
 					cursor: default;
@@ -561,15 +561,15 @@
 			}
 
 		/* --- --- LOOKUP DIALOGUE --- */
-			
+
 			#lookup-DialogContent{
-				
+
 				margin-top: 0.5em;
 				height: 400px;
 				overflow-y: auto;
 				padding-left: 1em;
 				border-left: 1px solid $grijs-7;
-				
+
 				p{
 					margin: 0;
 				}
@@ -582,7 +582,7 @@
 						color: $rood;
 						border-bottom: 1px dotted $rood;
 						text-decoration: none;
-					
+
 						&:hover{
 							color: $blauw;
 							border-bottom-color: $blauw;
@@ -602,12 +602,12 @@
 				}
 
 			}
-		
+
 		/* --- --- INDEX (inhoudsopgave) --- */
 
 			.module-index{
 				#content{
-					
+
 					p{
 						margin-bottom: 1em;
 			      line-height: 1.4;
@@ -624,7 +624,7 @@
 
 			.index-entry{
 				font-weight: 700;
-			
+
 				.italics{
 					font-style: normal;
 				}
@@ -732,7 +732,7 @@
 		}
 
 		.media-cell{
-			background: rgba(255,255,255,0.5);		    	
+			background: rgba(255,255,255,0.5);
 	    position: relative;
 	    display: inline-block;
 	    overflow: hidden;
@@ -743,7 +743,7 @@
 	    text-align: center;
 
 	    &:hover{
-			background: rgba(240,240,240,0.5);		    	
+			background: rgba(240,240,240,0.5);
 	    }
 
 	    &.media-type-video{
@@ -779,7 +779,7 @@
 	/* --- FORM-ELEMENTS --- */
 
 		/* --- --- FORM-ELEMENTS: GENERAL --- */
-			
+
 			.btn-group-justified .btn {
 		    	.btn {
 			    	display: block;
@@ -791,7 +791,7 @@
 			.btn {
 				&.active{
 					@include box-shadow(none);	// override Bootstraps' shadow
-					background-color : $btn-active-bg; 
+					background-color : $btn-active-bg;
 					color            : $btn-active-color;
 					border-color     : $btn-active-border;
 				}
@@ -827,7 +827,7 @@
 			    display: inline-block;
 			    padding: 6px 20px;
 			    position: relative;
-			    text-align: center; 
+			    text-align: center;
 			    font-size: 12px;
 			    font-family: $font-family-sans-serif;
 			}
@@ -850,142 +850,141 @@
 
 			}
 
-	/* --- jQUERY DIALOGUE --- */ 
-	// Can most likely be removed
-			
-			// #dialog {
-			// 	position: fixed;
-			// 	padding: 0;
-			// 	z-index: 200;
-			// 	height: 400px;
-			// }
+	/* --- jQUERY DIALOGUE --- */
 
-			// #dialog-header {
-			// 	background: $blauw;
-			// 	display: block;
-			// 	position: relative;
-			// 	padding: 5px;
-			// 	height: 2em;
-			// 	font-weight: bold;
-			// 	color: $wit;
-			// }
+			#dialog {
+				position: fixed;
+				padding: 0;
+				z-index: 200;
+				height: 400px;
+			}
 
-			// #dialog-title {
-			// 	float: left;
-			// 	margin: 0;
-			// 	overflow: hidden;
-			// }
+			#dialog-header {
+				background: $blauw;
+				display: block;
+				position: relative;
+				padding: 5px;
+				height: 2em;
+				font-weight: bold;
+				color: $wit;
+			}
 
-			// #dialog-close {
-			// 	float: right;
-			// 	cursor: pointer;
-			// 	height: 20px;
-			// 	width: 25px;
-			// 	font-weight: normal;
-			// 	text-align: center;
-			// 	font-family:  'lng-icons';
-			// 	font-size: 24px;
-			// 	line-height: 24px;
-			// 	margin-top: -2px;
-			// 	&:after{
-					
-			// 		content: "\e609";
-			// 	}
-			// }
+			#dialog-title {
+				float: left;
+				margin: 0;
+				overflow: hidden;
+			}
 
-			// #dialog-content {
-			// 	display: block;
-			// 	padding: 1em;
-			// 	min-height: 160px;
-			// 	background: $wit;
+			#dialog-close {
+				float: right;
+				cursor: pointer;
+				height: 20px;
+				width: 25px;
+				font-weight: normal;
+				text-align: center;
+				font-family:  'lng-icons';
+				font-size: 24px;
+				line-height: 24px;
+				margin-top: -2px;
+				&:after{
 
-			// }
+					content: "\e609";
+				}
+			}
 
-			// #dialog-content-inner {
-			// 	min-height: 128px;
-			// }
+			#dialog-content {
+				display: block;
+				padding: 1em;
+				min-height: 160px;
+				background: $wit;
 
-			// #dialog-mask {
-			// 	position: fixed;
-			// 	top: 0;
-			// 	left: 0;
-			// 	height: 100%;
-			// 	width: 100%;
-			// 	background-color: $grijs;
-			// 	opacity: 0.6;
-			// 	z-index: 100;
-			// }
+			}
 
-			// #dialog-button-container {
-			// 	text-align: center;
-			// 	margin: 2px 6px 6px 2px;
-			// }
+			#dialog-content-inner {
+				min-height: 128px;
+			}
 
-			// .error {
-			// 	background: #fff;
-			// 	border: 1px solid $brand-danger;
-			// 	border-top: none
-			// }
+			#dialog-mask {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+				background-color: $grijs;
+				opacity: 0.6;
+				z-index: 100;
+			}
 
-			// .errorheader {
-			// 	color: #6f2c2c;
-			// 	border: 1px solid $brand-danger;
-			// 	border-bottom: none
-			// }
+			#dialog-button-container {
+				text-align: center;
+				margin: 2px 6px 6px 2px;
+			}
 
-			// .errorbutton {
-			// 	border: 1px solid $brand-danger;
-			// 	color: #fff;
-			// 	cursor: pointer;
-			// }
+			.error {
+				background: #fff;
+				border: 1px solid $brand-danger;
+				border-top: none
+			}
 
-			// .warning {
-			// 	background: #fff;
-			// 	border: 1px solid $brand-warning;
-			// 	border-top: none
-			// }
+			.errorheader {
+				color: #6f2c2c;
+				border: 1px solid $brand-danger;
+				border-bottom: none
+			}
 
-			// .warningheader {
-			// 	color: #957c17;
-			// 	border: 1px solid $brand-warning;;
-			// 	border-bottom: none
-			// }
+			.errorbutton {
+				border: 1px solid $brand-danger;
+				color: #fff;
+				cursor: pointer;
+			}
 
-			// .warningbutton {
-			// 	background-color: #eFcC47;
-			// 	border: 1px solid $brand-warning;
-			// 	color: #957C17;
-			// 	cursor: pointer;
-			// }
+			.warning {
+				background: #fff;
+				border: 1px solid $brand-warning;
+				border-top: none
+			}
 
-			// .success {
-			// 	background: #fff;
-			// 	border: 1px solid #60a174;
-			// 	border-top: none
-			// }
+			.warningheader {
+				color: #957c17;
+				border: 1px solid $brand-warning;;
+				border-bottom: none
+			}
 
-			// .successheader {
-			// 	color: #3c7f51;
-			// 	border: 1px solid #60a174;
-			// 	border-bottom: none
-			// }
+			.warningbutton {
+				background-color: #eFcC47;
+				border: 1px solid $brand-warning;
+				color: #957C17;
+				cursor: pointer;
+			}
 
-			// .successbutton {
-			// 	background-color: #3c7f51;
-			// 	border: 1px solid #fff;
-			// 	color: #fff;
-			// 	cursor: pointer;
-			// }
+			.success {
+				background: #fff;
+				border: 1px solid #60a174;
+				border-top: none
+			}
 
-			// .promptbutton {
-			// 	text-decoration: none;
-			// 	color: #CC0000;
-			// 	cursor: pointer;
-			// }
+			.successheader {
+				color: #3c7f51;
+				border: 1px solid #60a174;
+				border-bottom: none
+			}
 
-			// .promptbutton:hover {
-			// 	text-decoration: underline;
-			// }
+			.successbutton {
+				background-color: #3c7f51;
+				border: 1px solid #fff;
+				color: #fff;
+				cursor: pointer;
+			}
+
+			.promptbutton {
+				text-decoration: none;
+				color: #CC0000;
+				cursor: pointer;
+			}
+
+			.promptbutton:hover {
+				text-decoration: underline;
+			}
 
 		/* jQuery prettyDialog */
 
@@ -1018,7 +1017,7 @@
 				color: $wit;
 				width: 100%;
 				position:absolute;
-				left:0; 
+				left:0;
 				right:0;
 				top: 0;
 				border: 2px solid $grijs-7;
@@ -1029,7 +1028,7 @@
 				margin: 0;
 				overflow: hidden;
 				position:absolute;
-				left:5px; 
+				left:5px;
 				right:40px;
 				text-overflow:ellipsis;
 				height:40px;
@@ -1088,8 +1087,8 @@
 				}
 			}
 
-			html{ 
-				height:100%; 
+			html{
+				height:100%;
 			}
 
 			body {
@@ -1117,7 +1116,7 @@
 				overflow: auto;
 			}
 
-			.row{ 
+			.row{
 				padding-top: 30px;
 			}
 
@@ -1127,7 +1126,7 @@
 
 		/* --- --- TOP-STRIP --- */
 			#top-strip{
-				
+
 				height: 50px;
 				margin-bottom: -50px;
 				width: $page-width;
@@ -1135,8 +1134,8 @@
 				margin-right: auto;
 				text-align: right;
 				padding-top: 15px;
-				
-				p{ 					
+
+				p{
 					position: relative;
 					top: -50px;
 					text-align: right;
@@ -1147,7 +1146,7 @@
 
 				@media (max-width: $medium-width){
 					clear: both;
-					float: none; 
+					float: none;
 					width: 100%;
 					display: none;
 				}
@@ -1183,7 +1182,7 @@
 			#alphabet
 			{
 				@include cols(18);
-				
+
 				@media screen and (max-width:$medium-width){
 					width: 100%;
 					text-align: center;
@@ -1214,7 +1213,7 @@
 			}
 
 
-			#overview-image, 
+			#overview-image,
 			.introduction-img{
 				float               : right;
 				margin-left         : 1em;
@@ -1232,9 +1231,9 @@
 			}
 
 		/* --- --- CATEGORIES (tabs) --- */
-		
+
 			#categories{
-				padding: 0;	
+				padding: 0;
 
 			}
 
@@ -1246,7 +1245,7 @@
 				left: percentage(0.5/ $grid-columns);
 				margin:  0;
 				@include cols(5);
-				
+
 				@media screen and (max-width:$medium-width){
 					font-size: 12px;
 					width: 50%;
@@ -1267,7 +1266,7 @@
 			#search-main-no-tabs{
 				width: 100%;
 				clear: both;
-				
+
 				#search{
 					@include cols(4);
 				}
@@ -1276,7 +1275,7 @@
 					float: left;
 					position: relative;
 					top: 32px;
-					margin-right: -16px;					
+					margin-right: -16px;
 				}
 
 				#header-titles-small{
@@ -1317,7 +1316,7 @@
 						color: $wit;
 					}
 				}
-			
+
 			}
 
 			.navigation-icon{
@@ -1325,7 +1324,7 @@
 					width: 30px;
 					height: 30px;
 					display: block;
-					float: left;					
+					float: left;
 				}
 			}
 
@@ -1366,7 +1365,7 @@
 				@include make-sm-column(9);
 				padding: 0;
 				background-color: $blauw;
-				
+
 				img{
 					max-width: 100%;
 
@@ -1377,7 +1376,7 @@
 			}
 
 			#col-footer-text{
-				@include make-sm-column(15);				
+				@include make-sm-column(15);
 			}
 
 
@@ -1399,7 +1398,7 @@
 
 			#header-title, #header-titles-small{
 				color: $theme-color;
-			} 
+			}
 
 			#buttons input[value="Search >>"] {
     			background-color:$theme-color !important;

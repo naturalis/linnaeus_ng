@@ -1,7 +1,7 @@
 @charset "UTF-8";
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic);
 /*
- _     _                                   _   _  ____ 
+ _     _                                   _   _  ____
 | |   (_)_ __  _ __   __ _ ___ _   _ ___  | \ | |/ ___|       _ _
 | |   | | '_ \| '_ \ / _` / _ \ | | / __| |  \| | |  _       _{ ' }_
 | |___| | | | | | | | (_|   __/ |_| \__ \ | |\  | |_| |     { `.!.` }
@@ -2249,6 +2249,118 @@ button, input, select, textarea {
   border-color: #cccccc; }
 
 /* --- jQUERY DIALOGUE --- */
+#dialog {
+  position: fixed;
+  padding: 0;
+  z-index: 200;
+  height: 400px; }
+
+#dialog-header {
+  background: #009ee0;
+  display: block;
+  position: relative;
+  padding: 5px;
+  height: 2em;
+  font-weight: bold;
+  color: white; }
+
+#dialog-title {
+  float: left;
+  margin: 0;
+  overflow: hidden; }
+
+#dialog-close {
+  float: right;
+  cursor: pointer;
+  height: 20px;
+  width: 25px;
+  font-weight: normal;
+  text-align: center;
+  font-family: 'lng-icons';
+  font-size: 24px;
+  line-height: 24px;
+  margin-top: -2px; }
+  #dialog-close:after {
+    content: "\e609"; }
+
+#dialog-content {
+  display: block;
+  padding: 1em;
+  min-height: 160px;
+  background: white; }
+
+#dialog-content-inner {
+  min-height: 128px; }
+
+#dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #b2b1a8;
+  opacity: 0.6;
+  z-index: 100; }
+
+#dialog-button-container {
+  text-align: center;
+  margin: 2px 6px 6px 2px; }
+
+.error {
+  background: #fff;
+  border: 1px solid #e3004a;
+  border-top: none; }
+
+.errorheader {
+  color: #6f2c2c;
+  border: 1px solid #e3004a;
+  border-bottom: none; }
+
+.errorbutton {
+  border: 1px solid #e3004a;
+  color: #fff;
+  cursor: pointer; }
+
+.warning {
+  background: #fff;
+  border: 1px solid #f29400;
+  border-top: none; }
+
+.warningheader {
+  color: #957c17;
+  border: 1px solid #f29400;
+  border-bottom: none; }
+
+.warningbutton {
+  background-color: #eFcC47;
+  border: 1px solid #f29400;
+  color: #957C17;
+  cursor: pointer; }
+
+.success {
+  background: #fff;
+  border: 1px solid #60a174;
+  border-top: none; }
+
+.successheader {
+  color: #3c7f51;
+  border: 1px solid #60a174;
+  border-bottom: none; }
+
+.successbutton {
+  background-color: #3c7f51;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer; }
+
+.promptbutton {
+  text-decoration: none;
+  color: #CC0000;
+  cursor: pointer; }
+
+.promptbutton:hover {
+  text-decoration: underline; }
+
 /* jQuery prettyDialog */
 /* --- jQUERY DIALOGUE --- */
 .dialog {
