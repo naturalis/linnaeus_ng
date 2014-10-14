@@ -151,8 +151,6 @@ class LoaderController extends Controller
 		$c->loadControllerConfig('Key');
 
 		$c->getKeyTree();
-		$c->getAllTaxaInKey();
-		$c->getTaxonDivision($c->getStartKeystepId());
 
 		$c->loadControllerConfig();
 

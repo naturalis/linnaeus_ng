@@ -24,7 +24,7 @@
 		- translate categories
 		- check and posibly change sections *
 		- translate sections *
-		  (must be done before editing taxa because they actively `influence the content)
+		  (must be done before editing taxa because they actively influence the content)
 		- edit taxa
 
 		- check project specific css

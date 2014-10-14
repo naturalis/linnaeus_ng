@@ -149,7 +149,7 @@ class Controller extends BaseClass
     private $_hotwordNoLinks = array();
     private $_tmpTree = null;
 
-    public $useCache = true;
+    public $useCache = false;//true;
     public $viewName;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
@@ -1654,6 +1654,8 @@ class Controller extends BaseClass
     {
         if ($this->_allowEditOverlay === false)
             return;
+			
+		$this->useCache=false;
 
         $d = $this->controllerBaseName . ':' . $this->viewName;
 
