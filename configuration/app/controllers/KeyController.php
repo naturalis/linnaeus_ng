@@ -249,7 +249,6 @@ class KeyController extends Controller
 	
 	}
 
-	/* it's in the trees (it's coming this way!) */
 	public function getKeyTree()
 	{
 
@@ -775,254 +774,173 @@ class KeyController extends Controller
 	}
 
 
+
+	private $choiceKeystepTable;
+
+	private function getStepsByTarget($step)
+	{
+		$data=array();
+		array_push($data,$step);
+		$d=@$this->choiceKeystepTable[$step];
+		foreach((array)$d as $val)
+		{
+			$r=$this->getStepsByTarget($val['keystep_id']);
+			$data=array_merge($data,$r);
+		}
+		return $data;
+	}
+
+	private function setChoiceKeystepTable()
+	{
+		// store in $_SESSION? (but suppress on preview)
+		
+		$d=$this->models->ChoiceKeystep->freeQuery("
+			select 
+				res_keystep_id, keystep_id
+			from 
+				%PRE%choices_keysteps 
+			where
+				project_id = ".$this->getCurrentProjectId()."
+				and res_keystep_id is not null
+			");
+
+		foreach($d as $key=>$val)
+		{
+			$this->choiceKeystepTable[$val['res_keystep_id']][]['keystep_id']=$val['keystep_id'];
+		}
+	}
+
+	private function getAllStepsByTarget()
+	{
+		$this->setChoiceKeystepTable();
+
+		$d = $this->models->ChoiceKeystep->freeQuery("
+			select 
+				_ck.res_taxon_id,
+				_ck.keystep_id,
+				_a.id,
+				_a.taxon,
+				_a.rank_id,
+				_a.is_hybrid,
+				_c.commonname
+
+			from 
+				%PRE%choices_keysteps _ck
+
+			left join %PRE%taxa _a
+				on _ck.project_id=_a.project_id
+				and _ck.res_taxon_id=_a.id
+
+			left join %PRE%commonnames _c
+				on _ck.project_id=_c.project_id
+				and _c.id=
+					(select
+						id
+					from
+						%PRE%commonnames
+					where
+						project_id=_ck.project_id
+						and taxon_id=_ck.res_taxon_id
+						and language_id = ". $this->getCurrentLanguageId() ."
+						limit 1
+					)
+			where
+				_ck.project_id = ".$this->getCurrentProjectId()."
+				and _ck.res_taxon_id is not null
+			");
+
+		//$ranks=$this->getProjectRanks();
+
+		foreach((array)$d as $val)
+		{
+			$stepsByTarget[$val['res_taxon_id']]['steps'][]=$val['keystep_id'];
+			$stepsByTarget[$val['res_taxon_id']]['data']=array(
+				'id'=>$val['id'],
+				'taxon'=>$val['taxon'],
+				'is_hybrid'=>$val['is_hybrid'],
+				'commonname'=>$val['commonname'],
+				//'label'=>$this->formatTaxon($val,$ranks)
+			);
+			$fuck[$val['id']]=$val['id'];
+		}
+
+		foreach((array)$stepsByTarget as $key=>$steps)
+		{
+			foreach($steps['steps'] as $step)
+			{
+				$stepsByTarget[$key]['steps']=
+					array_unique(array_merge($stepsByTarget[$key]['steps'],$this->getStepsByTarget($step)));
+			}
+
+		}
+
+		usort(
+			$stepsByTarget,
+			function($a,$b)
+			{ 
+				return
+					($a['data']['taxon'] > $b['data']['taxon'] ? 
+						1 : 
+						($a['data']['taxon'] < $b['data']['taxon'] ?
+							-1 : 
+							0
+						)
+					);
+			}
+		);
+
+
+		return $stepsByTarget;
+
+	}
+
 	/* branches and fruits */
 	public function getTaxonDivision($step)
 	{
+		$in=$out=array();		
 
-		$div = $this->getCache('key-taxonDivision-'.$step);
-		
-		if (!$div) {
+		$allsteps=$this->getAllStepsByTarget();
+		$start=$this->getStartKeystepId();
 
-			$this->tmp = null;
-
-			$this->sawOffABranch($this->getKeyTree(),$step);
-
-			$this->reapFruits($this->tmp['branch']);
-	
-			$excludedTaxa = array();
-		
-			$allTaxa = $this->getAllTaxaInKey();
-			
-			foreach((array)$allTaxa as $val) {
-			
-				if (!isset($this->tmp['remaining'][$val['res_taxon_id']]))
-					$excludedTaxa[$val['res_taxon_id']] = null;
-
-			}
-	
-			$div = 
-				array(
-					'remaining' => (isset($this->tmp['remaining']) ? $this->tmp['remaining'] : null),
-					'excluded' => $excludedTaxa
-				);
-				
-			$this->saveCache('key-taxonDivision-'.$step, $div);
-				
-		}
-		
-		$includedTaxa = $excludedTaxa = array();
-
-		$tree = $this->getTreeList(array('includeEmpty'=>true));
-
-		foreach((array)$div['remaining'] as $key => $val)
+		foreach($allsteps as $key=>$val)
 		{
+			// taxa that are present but unreachable from the start of the key (separate key sections)
+			if (!in_array($start,$val['steps']))
+				continue;
 
-			$d=$tree[$key];
-			$commonname=null;
-			if (isset($d['commonnames']))
+			if (in_array($step,$val['steps']))
 			{
-				foreach((array)$d['commonnames'] as $name)
-				{
-					if ($name['language_id']==$this->getCurrentLanguageId()) {
-						$commonname=$name['commonname'];
-						break;
-					}
-				}
+				array_push($in,$val['data']);
 			}
-
-			$includedTaxa[$val] = 
-				array(
-					'id' => $d['id'],
-					'taxon' => $this->formatTaxon($d),
-					'commonname' => $commonname,
-					'is_hybrid' => $d['is_hybrid']
-				);
-		
+			else
+			{
+				array_push($out,$val['data']);
+			}
 		}
 
-		foreach((array)$div['excluded'] as $key => $val) {
-
-			$d = $tree[$key];
-			$commonname=null;
-			foreach((array)$d['commonnames'] as $name) {
-				if ($name['language_id']==$this->getCurrentLanguageId()) {
-					$commonname=$name['commonname'];
-					break;
-				}
-			}
-
-			$excludedTaxa[$key] = 
-				array(
-					'id' => $d['id'],
-					'taxon' => $this->formatTaxon($d),
-					'commonname' => $commonname,
-					'is_hybrid' => $d['is_hybrid']
-				);
-		
-		}
-
-		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
-		$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
-
-		return array(
-				'remaining' => $includedTaxa,
-				'excluded' => $excludedTaxa
+		return
+			array(
+				'remaining'=>$in,
+				'excluded'=>$out
 			);
-
-	}
-
-	/*
-		this gives the same output as getTaxonDivision(), but stores full taxon information in the cache, rather
-		than just ID's, as getTaxonDivision() does. because the division for *each* step is cached, the size of 
-		the cache will be considerably greater with this function (in heukels flora, the cache file sizes for the 
-		first step for each function was 246K and 43K, respectively). potential downside is that the new function
-		has to retrieve, and sort, full taxon data evertime it is called. nevertheless, it appears to be slightly 
-		faster than this one. go figure.
-	*/
-	public function originalGetTaxonDivision($step)
-	{
-die();
-		$div = $this->getCache('key-taxonDivision-'.$step);
-		
-		if (!$div) {
-
-			$this->tmp = null;
-
-			$this->sawOffABranch($this->getKeyTree(),$step);
-
-			$this->reapFruits($this->tmp['branch']);
-	
-			$includedTaxa = $excludedTaxa = array();
-		
-			$allTaxa = $this->getAllTaxaInKey();
-			
-			$tree = $this->getTreeList();
-	
-			foreach((array)$allTaxa as $val) {
-			
-				if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) {
-	
-					$d = $tree[$val['res_taxon_id']];
-	
-					$excludedTaxa[$val['res_taxon_id']] = 
-						array(
-							'id' => $d['id'],
-							'taxon' => $this->formatTaxon($d),
-							'is_hybrid' => $d['is_hybrid']
-						);
-				}
-			
-			}
-	
-			foreach((array)$this->tmp['remaining'] as $val) {
-	
-				$d = $tree[$val];
-	
-				$includedTaxa[$val] = 
-					array(
-						'id' => $d['id'],
-						'taxon' => $this->formatTaxon($d),
-						'is_hybrid' => $d['is_hybrid']
-					);
-			
-			}
-	
-			$this->customSortArray($includedTaxa,array('key' => 'taxon'));
-
-			$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
-
-			$div = 
-				array(
-					'remaining' => $includedTaxa,
-					'excluded' => $excludedTaxa
-				);
-				
-			$this->saveCache('key-taxonDivision-'.$step, $div);
-				
-		}
-		
-		return $div;
-
-	}
-
-	private function sawOffABranch($branch,$step)
-	{
-	
-		if (isset($branch['id']) && $branch['id']==$step) {
-
-			$this->tmp['branch'] = $branch;
-			return;
-
-		}
-
-		foreach((array)$branch['choices'] as $val) {
-		
-			if (isset($val['step'])) $this->sawOffABranch($val['step'],$step);
-		
-		}
-	
-	}
-	
-	private function reapFruits($branch)
-	{
-
-		foreach((array)$branch['choices'] as $val) {
-		
-			if (isset($val['res_taxon_id'])) $this->tmp['remaining'][$val['res_taxon_id']] = $val['res_taxon_id'];
-
-			if (isset($val['step'])) $this->reapFruits($val['step']);
-		
-		}
-	
 	}
 
 
-	public function getAllTaxaInKey()
-	{
-
-		if (!$this->getCache('key-keyTaxa')) {
-	
-			 $d = $this->models->ChoiceKeystep->_get(
-					array('id' =>
-							array(
-									'project_id' => $this->getCurrentProjectId(),
-									'res_taxon_id is not' => 'null',
-									'id in' => '('.implode(',',(array)$this->_choiceList).')'
-							),
-							'columns' => 'res_taxon_id'
-					)
-			);
-
-			 $this->saveCache('key-keyTaxa', $d);
-			 
-			 return $d;
-	
-		}
-	
-		return $this->getCache('key-keyTaxa');
-	
-	}
 	
 	/* the rest */
 	private function getKeytype()
 	{
-
 		return $this->getSetting('keytype');
-	
 	}
 	
 	private function choicesHaveL2Attributes($choices)
 	{
-
 		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
-
 		return false;	
-	
 	}
 	
 	private  function reapSteps($branch)
 	{
-
 		$this->tmp['results'][(int)$branch['number']] =
 			array(
 				'id' => $branch['id'],
@@ -1031,17 +949,14 @@ die();
 				'number' => (int)$branch['number'],
 			);
 
-		foreach((array)$branch['choices'] as $val) {
-
+		foreach((array)$branch['choices'] as $val)
+		{
 			if (isset($val['step'])) $this->reapSteps($val['step']);
-		
 		}
-	
 	}
 
 	private function getLookupList()
 	{
-
 		$this->tmp = array();
 		$this->tmp['found'] = false;
 		$this->tmp['excluded'] = array();
@@ -1061,7 +976,6 @@ die();
 				'encode'=>true
 			))
 		);	
-		
 	}
 		
 	private function setTaxaState ($state)
@@ -1071,8 +985,10 @@ die();
 	
 	private function getTaxaState ()
 	{
-		return isset($_SESSION['app']['user']['key']['taxaState']) ? $_SESSION['app']['user']['key']['taxaState'] :
-			'remaining';
+		return
+			(isset($_SESSION['app']['user']['key']['taxaState']) ? 
+				$_SESSION['app']['user']['key']['taxaState'] :
+				'remaining');
 	}
 	
 	private function formatPathChoice ($choice, $step = null, $choiceMarker = null)
