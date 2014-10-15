@@ -89,6 +89,7 @@ function storeAuthor(p)
 
 function addAuthorField()
 {
+	// find the next available author field
 	for(var k=0;k<99;k++)
 	{
 		if ($("#actor_id-"+k).length==0)
@@ -102,10 +103,21 @@ function addAuthorField()
 		buffer.push('<option value="'+authors[i].id+'">'+authors[i].name+'</option>');
 	}
 
+
+	var currVals=Array;
+	$('select[name^=actor_id]').each(function(i){
+		currVals[i]=$(this).val();
+	});
+
 	$('#authors').html(
 		$('#authors').html()+
 		'<span id="actor_id-'+k+'"><select name="actor_id[]">'+buffer.join('')+'</select>'+
-		'<a class="edit" href="#" onclick="removeAuthorField('+k+');return false;">verwijderen</a><br /></span>')
+		'<a class="edit" href="#" onclick="removeAuthorField('+k+');return false;">verwijderen</a><br /></span>');
+
+	$('select[name^=actor_id]').each(function(i){
+		$(this).val(currVals[i]);
+	});
+
 }
 
 function removeAuthorField(k)

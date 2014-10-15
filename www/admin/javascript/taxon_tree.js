@@ -65,7 +65,7 @@ function growbranches(data)
 		progeny+=
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'"> \
 				<div class="node-div">&#9617;</div>'+
-				(d.has_children ?'<span><a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+(d.rank_label ?
+				(d.has_children ?'<span style="padding-left:2px"><a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+(d.rank_label ?
 					'<span class="rank">'+d.rank_label+'</span>' : '' )+'</a></span>':d.label)+
 				(nodeCountType=='species' && d.child_count && d.child_count.total>0 ?
 					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' : '')+

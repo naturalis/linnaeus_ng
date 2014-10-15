@@ -523,7 +523,8 @@ function namepartscomplete(caller)
 	if ($('#name_uninomial').val().length==0 && $('#name_specific_epithet').val().length!=0)
 	{
 		$('#name_specific_epithet').val('');
-		$('#name_specific_epithet_message').html('Vul eerst een genus in!');
+		$('#name_specific_epithet_message').
+		html('Vul eerst een genus in!').toggle(true).fadeOut({duration:2000,easing:'easeInQuint'});
 	}
 	else
 	{
@@ -532,11 +533,12 @@ function namepartscomplete(caller)
 	if ($('#name_specific_epithet').val().length==0 && $('#name_infra_specific_epithet').val().length!=0)
 	{
 		$('#name_infra_specific_epithet').val('');
-		$('#name_infra_specific_epithet_message').html('Vul eerst een soortsnaam in!');
+		$('#name_infra_specific_epithet_message').
+			html('Vul eerst een soortsnaam in!').toggle(true).fadeOut({duration:2000,easing:'easeInQuint'});
 	}
 	else
 	{
-		$('#name_infra_specific_epithet_message').html('');
+//		$('#name_infra_specific_epithet_message').html('');
 	}
 }
 

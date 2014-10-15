@@ -1,7 +1,9 @@
 <?php
 
-include_once ('Controller.php');
-class NsrTreeController extends Controller
+
+include_once ('NsrController.php');
+
+class NsrTreeController extends NsrController
 {
 	private $_lookupListMaxResults=99999;
 

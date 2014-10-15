@@ -30,7 +30,7 @@
 			{assign var=first value=false}
 			{/if}
 			{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-			<option value="{$v.id}" {if $v.id==$name.language_id} selected="selected"{/if}>{$v.label}</option>
+			<option value="{$v.id}" {if ($v.id==$name.language_id) || ($newname && $v.id==$smarty.const.LANGUAGE_ID_DUTCH)} selected="selected"{/if}>{$v.label}</option>
 			{/if}
 		{/foreach}
 		</select> *
@@ -106,6 +106,12 @@ $(document).ready(function()
 	});
 	//console.dir(values);
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
+
+	$('th[title]').each(function(key,value)
+	{
+		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
+	});
+
 });
 </script>
 

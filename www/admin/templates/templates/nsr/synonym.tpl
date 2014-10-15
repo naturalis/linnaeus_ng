@@ -62,7 +62,7 @@
 			<option value="{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype}</option>
 		{/if}
 		{/foreach}
-		</select> * 
+		</select> *
 	</td></tr>
     {*
 	<tr><th>taal:</th><td>
@@ -143,7 +143,8 @@ $(document).ready(function()
 	nameownerid={$concept.id};
 	{/if}
 
-	$('#data :input[type!=button]').each(function(key,value) {
+	$('#data :input[type!=button]').each(function(key,value)
+	{
 		var p={ name:$(this).attr('id'),label:$(this).attr('label'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' };
 		if ($(this).attr('new') && $(this).val().length==0)
 		{
@@ -155,6 +156,12 @@ $(document).ready(function()
 	});
 	//console.dir(values);
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
+
+	$('th[title]').each(function(key,value)
+	{
+		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
+	});
+
 });
 </script>
 

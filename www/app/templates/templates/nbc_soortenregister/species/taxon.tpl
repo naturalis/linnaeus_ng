@@ -78,7 +78,7 @@
 <script type="text/JavaScript">
 $(document).ready(function() {
 	
-	$('title').html('{if $names.preffered_name}{$names.preffered_name|@strip_tags|@escape}{else}{$names.nomen|@strip_tags|@escape}{/if} - '+$('title').html());
+	$('title').html('{if $names.preffered_name}{$names.preffered_name|@strip_tags|@escape} ({$names.nomen_no_tags|@strip_tags|@escape}){else}{$names.nomen|@strip_tags|@escape}{/if} - '+$('title').html());
 	
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 

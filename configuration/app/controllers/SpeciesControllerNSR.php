@@ -75,7 +75,10 @@ class SpeciesControllerNSR extends SpeciesController
 
         if (empty($taxon))
 		{
-			$this->redirect('nsr_index.php');
+//			$this->redirect('nsr_index.php');
+			$this->smarty->assign('title','Pagina niet gevonden');
+			$this->smarty->assign('text','De gevraagde pagina kon niet worden gevonden.');
+	        $this->printPage('../shared/404');
 		}
 		else
 		{
@@ -219,12 +222,11 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('classification',$classification);
 			$this->smarty->assign('children',$children);
 			$this->smarty->assign('names',$names);
-			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-            $this->smarty->assign('headerTitles', array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
+			$this->smarty->assign('overviewImage',$this->getTaxonOverviewImage($taxon['id']));
+            $this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
+	        $this->printPage('taxon');
 
         }
-
-        $this->printPage('taxon');
 
     }
 

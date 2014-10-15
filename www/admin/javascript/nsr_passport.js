@@ -110,10 +110,19 @@ function saveeditordata(caller)
 			if(data==true)
 			{
 				$('#message'+id).html('Tekst opgeslagen.').toggle(true).fadeOut(2000);
+				$('#indicator'+id).html(content.length==0?'': content.length+' tekens');
+
+				if (currentpublish!==publish && publish==true)
+				{
+					$('#indicator'+id).removeClass('passport-unpublished').addClass('passport-published');
+				}
+				else
+				if (currentpublish!==publish && publish==false)
+				{
+					$('#indicator'+id).removeClass('passport-published').addClass('passport-unpublished');
+				}
 				currenttexts[id]=content;
 				currentpublish[id]=publish;
-				$('#indicator'+id).html(content.length==0?'':'*');
-				alert('HIER MOET NOG HET EEN EN ANDER GEBEUREN! EN DE publish WORDT OOK NOG NIET OPGESPLAGEN!');
 			}
 			else
 			{

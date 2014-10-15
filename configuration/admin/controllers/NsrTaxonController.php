@@ -23,9 +23,9 @@
 
 */
 
-include_once ('Controller.php');
-include_once ('RdfController.php');
-class NsrTaxonController extends Controller
+include_once ('NsrController.php');
+
+class NsrTaxonController extends NsrController
 {
 	private $_lookupListMaxResults=99999;
 
@@ -661,35 +661,6 @@ class NsrTaxonController extends Controller
 		return $data[0];
 	}
 
-	private function getActors()
-	{
-		return $this->models->Actors->freeQuery(
-			"select
-				_e.id,
-				_e.name as label,
-				_e.name_alt,
-				_e.homepage,
-				_e.gender,
-				_e.is_company,
-				_e.employee_of_id,
-				_f.name as company_of_name,
-				_f.name_alt as company_of_name_alt,
-				_f.homepage as company_of_homepage
-
-			from %PRE%actors _e
-
-			left join %PRE%actors _f
-				on _e.employee_of_id = _f.id 
-				and _e.project_id=_f.project_id
-
-			where
-				_e.project_id = ".$this->getCurrentProjectId()."
-
-			order by
-				_e.is_company, _e.name
-		");	
-	}
-		
 	private function getStatuses()
 	{
 		/*

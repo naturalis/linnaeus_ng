@@ -22,7 +22,7 @@ class TreeController extends Controller
 			'taxon_tree.js'
         )
     );
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Species module';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
 
@@ -50,6 +50,11 @@ class TreeController extends Controller
 
     public function indexAction()
     {
+
+        $this->checkAuthorisation();
+
+        $this->setPageName($this->translate('Taxonomic tree'));
+
 		$tree=$this->restoreTree();
 
 		if (is_null($tree))
