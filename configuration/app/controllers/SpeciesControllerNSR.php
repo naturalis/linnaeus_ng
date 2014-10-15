@@ -185,6 +185,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (isset($content))
 			{
+
 				$name=$url=null;	
 				foreach((array)$content['rdf'] as $val)
 				{
@@ -192,17 +193,18 @@ class SpeciesControllerNSR extends SpeciesController
 					{
 						$name=isset($val['data']['name']) ? $val['data']['name'] : null;
 						$url=isset($val['data']['homepage']) ? $val['data']['homepage'] : null;
+
+						array_push(
+							$sideBarLogos,
+							array(
+								'organisation'=>$name,
+								'logo'=>$this->getOrganisationLogoUrl($name),
+								'url'=>$url
+							)
+						);
 					}
 				}
 
-				array_push(
-					$sideBarLogos,
-					array(
-						'organisation'=>$name,
-						'logo'=>$this->getOrganisationLogoUrl($name),
-						'url'=>$url
-					)
-				);
 						
 				
 				$this->smarty->assign('content',$content['content']);
@@ -1581,7 +1583,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$d as $val)
 		{
-
 			if (file_exists($this->getProjectUrl('projectMedia').$val))
 			{
 				$logo=$this->getProjectUrl('projectMedia').$val;
