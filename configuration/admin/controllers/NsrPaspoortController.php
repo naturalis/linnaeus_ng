@@ -1,13 +1,20 @@
 <?php
 
-// WHY WON'T THE RDF WORK!?
+/*
+	TAB_VERSPREIDING::$this->getPresenceData($taxon)
+	TAB_BEDREIGING_EN_BESCHERMING::EZ
+	CTAB_LITERATURE			
+	CTAB_MEDIA
+	CTAB_DNA_BARCODES
+*/
 
-include_once ('Controller.php');
-include_once ('RdfController.php');
 
-class NsrPaspoortController extends Controller
+include_once ('NsrController.php');
+
+class NsrPaspoortController extends NsrController
 {
     public $usedModels = array(
+		'actors',
 		'content_taxon',
 		'page_taxon',
 		'page_taxon_title',
@@ -42,8 +49,6 @@ class NsrPaspoortController extends Controller
 
     private function initialize()
     {
-		$this->Rdf = new RdfController;
-
 		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
 		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page)
 		{
@@ -74,6 +79,7 @@ class NsrPaspoortController extends Controller
 
         $this->setPageName($this->translate('Edit taxon passport'));
 
+		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('tabs',$this->getCategories());	
 		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));	
 
@@ -119,6 +125,7 @@ class NsrPaspoortController extends Controller
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
 				_a.show_order,
 				_c.content,
+				_c.id as content_id,
 				_c.publish,
 				_a.def_page
 
@@ -142,17 +149,10 @@ class NsrPaspoortController extends Controller
 			order by 
 				_a.show_order
 		");
-		
+
 		if (!$categories) $categories=array();
 
 		$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
-/*
-TAB_VERSPREIDING::$this->getPresenceData($taxon)
-TAB_BEDREIGING_EN_BESCHERMING::EZ
-CTAB_LITERATURE			
-CTAB_MEDIA
-CTAB_DNA_BARCODES
-*/
 
 		$order=$this->models->TabOrder->_get(
 		array(
@@ -179,6 +179,23 @@ CTAB_DNA_BARCODES
 			} else
 			if (is_null($start) && !empty($order[$val['tabname']]['start_order']) && empty($val['is_empty'])) {
 				$start=$val['id'];
+			}
+
+			$categories[$key]['obsolete']=($val['id']==TAB_ALGEMEEN || $val['id']==TAB_BESCHERMING || $val['id']==TAB_DESCRIPTION || $val['id']==TAB_HABITAT);
+
+			if ($val['content_id'])
+			{
+				$rdf=$this->Rdf->getRdfValues($val['content_id']);
+				foreach((array)$rdf as $rVal)
+				{
+					if ($rVal['predicate']=='hasPublisher')
+						$categories[$key]['rdf']['publisher']=$rVal['data'];
+					if ($rVal['predicate']=='hasReference')
+						$categories[$key]['rdf']['reference']=$rVal['data'];
+					if ($rVal['predicate']=='hasAuthor')
+						$categories[$key]['rdf']['author']=$rVal['data'];
+				}
+				
 			}
 		}
 		
@@ -258,7 +275,8 @@ CTAB_DNA_BARCODES
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$page = isset($p['page']) ? $p['page'] : null;
 		$content = isset($p['content']) ? $p['content'] : null;
-		
+		$publish = isset($p['publish']) && $p['publish']==1 ? '1' : '0';
+
 		if (empty($content))
 		{
 			return $this->models->ContentTaxon->delete(array(
@@ -287,7 +305,8 @@ CTAB_DNA_BARCODES
 				'taxon_id'=>$taxon,
 				'language_id'=>$this->getDefaultProjectLanguage(),
 				'page_id'=>$page,
-				'content' => $content
+				'content' => $content,
+				'publish' => $publish
 			));
 			
 		}

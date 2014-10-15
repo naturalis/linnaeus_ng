@@ -243,6 +243,11 @@ $(document).ready(function()
 	} );
 	{/if}
 
+	$('th[title]').each(function(key,value)
+	{
+		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
+	});
+
 });
 </script>
 

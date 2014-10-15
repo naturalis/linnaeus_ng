@@ -5,6 +5,7 @@
 	display:inline-block;
 	padding-right:5px;
 	cursor:move;
+	width:10px;
 }
 </style>
 

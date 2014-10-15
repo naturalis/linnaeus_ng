@@ -52,13 +52,12 @@ class SearchControllerNSR extends SearchController
 
     public function searchAction()
     {
-		if ($this->rHasVal('search')) {
-
+		if ($this->rHasVal('search'))
+		{
 			$search=$this->requestData;
 			$results=$this->doSearch($search);
 			$this->smarty->assign('search',$search);	
 			$this->smarty->assign('results',$results);	
-
 		}
 		
 		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
@@ -241,20 +240,69 @@ class SearchControllerNSR extends SearchController
 				ifnull(_j.number_of_barcodes,0) as number_of_barcodes,
 	
 				case
-					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
-					when _a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 95
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 90
-					when _a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 then 80
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 then 70
-					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 then 60
-					else 50
-				end as match_percentage,
-	
-				case
-					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
-					else 50
-				end as adjusted_rank
-			
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1
+						or
+						trim(concat(
+							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
+							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
+							if(_a.infra_specific_epithet is null,'',concat(_a.infra_specific_epithet,' '))
+						)) REGEXP '^".mysql_real_escape_string($search)."$' = 1
+					then 100
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 95
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 90
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 85
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 80
+					when 
+						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 75
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 70
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 65
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 60
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 55
+					when 
+						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 50
+
+					else 10
+				end as match_percentage
+				
 			from %PRE%names _a
 			
 			left join %PRE%taxa _e
@@ -313,12 +361,13 @@ class SearchControllerNSR extends SearchController
 			group by _a.taxon_id
 
 			order by 
-				adjusted_rank desc, match_percentage desc, _a.name asc, _f.rank_id asc, ".
+				match_percentage desc, _a.name asc, _f.rank_id asc, ".
 				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
 		
+		//q($d,1);
 		//q($this->models->Names->q(),1);
 
 		//SQL_CALC_FOUND_ROWS
