@@ -12,7 +12,8 @@
 <p>
 	taken:<br />
 	<a href="taxon_new.php">nieuw taxonconcept maken</a><br />
-	<a href="../import/export_nsr.php">export voor NDA</a> (experimenteel)
+	<a href="../import/export_nsr.php">export voor NDA</a> (experimenteel)<br />
+	<a href="activity_log.php">editor log</a>
 </p>
 </div>
 
@@ -48,9 +49,11 @@ function localList(obj,txt)
 
 }
 
+$(document).ready(function()
+{
 
-
-$(document).ready(function() {
+	setAjaxTreeUrl('tree_ajax_interface.php');
+	
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
 	{elseif $nodes}

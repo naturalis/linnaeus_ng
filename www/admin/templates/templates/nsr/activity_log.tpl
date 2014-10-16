@@ -1,14 +1,108 @@
 {include file="../shared/admin-header.tpl"}
 
-<script type="text/javascript" src="../../../admin/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="../../../admin/javascript/nsr_passport.js"></script>
+<style>
+table tr td {
+	vertical-align:top;
+}
+</style>
+
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h2>
-<h3>paspoorten</h3>
+<h2><span style="font-size:12px;font-style:normal"></h2>
+<h3></h3>
 
+<table>
+{foreach from=$results.data item=v key=k}
+    <tr>
+    	<td style="width:200px;">
+		    {$v.note}
+		</td>
+    	<td style="width:200px;">
+		    {$v.user_id}
+		    {$v.user|@replace:' (':'<br />('}
+		</td>
+    	<td>
+		    {$v.last_change_hr}
+		</td>
+    	<td>
+		    <a href="#" onclick="$('#row{$k}').toggle();">show</a>
+		</td>
+    <tr>
+    <tr id="row{$k}" style="display:naone;border-bottomn:1px solid #666">
+    	<td colspan="4">
+        	<table><tr><td>
+			    {foreach from=$v.data_before item=b key=kb}
+                {if $b|is_array}
+                    {foreach from=$b item=bb key=kbb}
+	                {$kbb}: {$bb}<br />
+	                {/foreach}
+                {else}
+					{$kb}: {$b}<br />
+                {/if}
+                {/foreach}
+            </td>
+            <td>
+			    {foreach from=$v.data_after item=a key=ka}
+                {if $a|is_array}
+                    {foreach from=$a item=aa key=kaa}
+	                {$kaa}: {$aa}<br />
+	                {/foreach}
+                {else}
+					{$ka}: {$a}<br />
+                {/if}
+                {/foreach}
+			</td></tr></table>
+		</td>
+    </tr>
+{/foreach}
+</table>
 <p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <form>
 <input type="hidden" id="taxon_id" value="{$concept.id}" />
 	<ul>
