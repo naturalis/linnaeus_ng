@@ -10,6 +10,7 @@
 <input type="hidden" id="name_language_id" name="name_language_id" value="{$name.name_language_id}" new="{$smarty.const.LANGUAGE_ID_SCIENTIFIC}" />
 
 	<table>
+{if $concept.base_rank>=$smarty.const.SPECIES_RANK_ID}
 		<tr>
         	<th>genus:</th>
             <td><input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" mandatory="mandatory" label="genus" /> *
@@ -29,6 +30,14 @@
             	<span class="inline_message" id="name_infra_specific_epithet_message"></span>
             </td>
 	</tr>
+{else}
+		<tr>
+        	<th>uninomial:</th>
+            <td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" mandatory="mandatory" label="naam" /> *
+            
+            </td>
+		</tr>
+{/if}
 
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
@@ -122,10 +131,15 @@
 {if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
 </form>
 </p>
+</div>
 
-<p>
-	<a href="taxon.php?id={$concept.id}">terug</a>
-</p>
+{include file="../shared/admin-messages.tpl"}
+
+<div class="page-generic-div">
+
+    <p>
+        <a href="taxon.php?id={$concept.id}">terug</a>
+    </p>
 
 </div>
 
@@ -165,5 +179,4 @@ $(document).ready(function()
 });
 </script>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

@@ -194,14 +194,19 @@
 	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
 
 </p>
-<p>
 
-	<a href="index.php">terug</a>
-</p>
+</div>
 
-<!-- p>
-	<a href="taxon.php?id={$concept.id}">soortsbeschrijvingen bewerken</a>
-</p -->
+{include file="../shared/admin-messages.tpl"}
+
+<div class="page-generic-div">
+    <p>
+        <a href="index.php">terug</a>
+    </p>
+    
+    <!-- p>
+        <a href="taxon.php?id={$concept.id}">soortsbeschrijvingen bewerken</a>
+    </p -->
 
 </div>
 
@@ -251,5 +256,4 @@ $(document).ready(function()
 });
 </script>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
