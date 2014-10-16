@@ -176,6 +176,8 @@ class NsrTaxonController extends NsrController
 		{
 			$concept=$this->getConcept($this->rGetId());
 
+			$this->doNameReferentialChecks($this->getConceptId());
+
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('names',$this->getNames($concept));
 			$this->smarty->assign('presence',$this->getPresenceData($this->rGetId()));
@@ -331,13 +333,36 @@ class NsrTaxonController extends NsrController
 		{
 			$name=$this->getName(array('id'=>$this->getNameId()));
 			$concept=$this->getConcept($name['taxon_id']);
+
+			if (!in_array($name['nametype'],array(PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME)))
+			{
+				if (!$this->checkNameParts($name))
+				{
+					if ($concept['base_rank']<SPECIES_RANK_ID)
+					{
+						$this->addWarning("
+							Let op: het synoniem komt niet overeen met de samengestelde naamdelen. Dit is
+							waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
+							de juiste uninomial en eventueel auteurschap in om de naamkaart volledig te maken.
+						");
+					}
+					else
+					{
+						$this->addWarning("
+							Let op: het synoniem komt niet overeen met de samengestelde naamdelen. Dit is
+							waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
+							de juiste genus, soort, eventuele derde naamdeel en auteurschap in om de 
+							naamkaart volledig te maken.
+						");
+					}
+				}
+			}
+
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('name',$name);
 			$this->smarty->assign('nametypes',$this->getNameTypes());
 			$this->smarty->assign('languages',$this->getLanguages());
 			$this->smarty->assign('actors',$this->getActors());
-			$this->doNameReferentialChecks($name);
-
 		}
 		else
 		if ($this->rHasVal('taxon'))
@@ -2466,15 +2491,15 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-	private function doNameReferentialChecks($name)
+	private function doNameReferentialChecks($concept)
 	{
-		if (!$this->checkIfConceptRetainsScientificName($name))
+		if (!$this->checkIfConceptRetainsScientificName($concept))
 		{
 			$this->addWarning("Aan concept is geen wetenschappelijke naam gekoppeld.");
 		}
-		if (!$this->checkIfConceptRetainsDutchName($name))
+		if (!$this->checkIfConceptRetainsDutchName($concept))
 		{
-			$this->addWarning("Aan concept is geen Nederlandse 'preferred name' naam gekoppeld.");
+			$this->addWarning("Aan concept is geen Nederlandse voorkeursnaam gekoppeld.");
 		}
 	}
 
@@ -2516,10 +2541,10 @@ class NsrTaxonController extends NsrController
 		return is_numeric($name['authorship_year']) && $name['authorship_year'] > 1000 && $name['authorship_year'] <= date('Y');
 	}
 
-	private function checkIfConceptRetainsScientificName($name)
+	private function checkIfConceptRetainsScientificName($concept)
 	{
 		$d=$this->getName(array(
-			'taxon_id'=>$name['taxon_id'],
+			'taxon_id'=>$concept,
 			'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
 			'language_id'=>LANGUAGE_ID_SCIENTIFIC
 		));
@@ -2527,10 +2552,10 @@ class NsrTaxonController extends NsrController
 		return count((array)$d)>0;
 	}
 
-	private function checkIfConceptRetainsDutchName($name)
+	private function checkIfConceptRetainsDutchName($concept)
 	{
 		$d=$this->getName(array(
-			'taxon_id'=>$name['taxon_id'],
+			'taxon_id'=>$concept,
 			'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 			'language_id'=>$this->getDefaultProjectLanguage()
 		));
