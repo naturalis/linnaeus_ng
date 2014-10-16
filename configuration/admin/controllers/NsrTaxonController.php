@@ -111,9 +111,9 @@ class NsrTaxonController extends NsrController
 
 			if ($this->getConceptId())
 			{
-				$this->saveName(); 		// saves valid name
-				$this->saveDutchName(); // saves dutch name
-				$this->saveParentage($this->getConceptId());
+				$this->saveName();
+				$this->saveDutchName();
+				$this->saveTaxonParentage($this->getConceptId());
 				$this->resetTree();
 				$this->redirect('taxon.php?id='.$this->getConceptId());
 			}		
@@ -154,6 +154,7 @@ class NsrTaxonController extends NsrController
 			//$this->setConceptId($this->rGetId());
 			//$this->deleteVanAllesEnNogWat();
 			//$this->deleteConcept();
+			//$this->logNsrChange(array('before'=>'???','after'=>'???','note'=>'deleted concept'));
 			//$this->setMessage('Concept verwijderd.');
 			//$this->resetTree();
 			//$this->redirect('index.php');
@@ -163,7 +164,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->rGetId());
 			$this->updateConcept();
-			$this->saveParentage($this->getConceptId());
+			$this->saveTaxonParentage($this->getConceptId());
 			$this->resetTree();
 		}
 		else
@@ -209,92 +210,6 @@ class NsrTaxonController extends NsrController
 		$this->_nameAndSynonym();
 		$this->printPage();
 	}
-
-    public function imagesAction()
-    {
-		if (!$this->rHasId()) $this->redirect('taxon_new.php');
-		
-		if ($this->rHasId() && $this->rHasVal('image') && $this->rHasVal('action','delete'))
-		{
-			$this->setConceptId($this->rGetId());
-			$this->disconnectTaxonMedia($this->rGetVal('image'));
-			$this->setMessage('Afbeelding ontkoppeld.');
-		} 
-		
-		$this->checkAuthorisation();
-		$this->setConceptId($this->rGetId());
-        $this->setPageName($this->translate('Taxon images'));
-		$this->smarty->assign('concept',$this->getConcept($this->rGetVal('id')));
-		$this->smarty->assign('images',$this->getTaxonMedia());
-
-		$this->checkMessage();
-		$this->printPage();
-	}
-
-
-    public function ajaxInterfaceAction ()
-    {
-        if (!$this->rHasVal('action'))
-            return;
-
-		if ($this->rHasVal('action', 'get_tree_node'))
-		{
-			$return=json_encode($this->getTreeNode($this->requestData));
-        }
-		else
-		if ($this->rHasVal('action', 'store_tree'))
-		{	
-	        $_SESSION['admin']['user']['species']['tree']=$this->requestData['tree'];
-			$return='saved';
-        }
-		else
-		if ($this->rHasVal('action', 'restore_tree'))
-		{
-	        $return=json_encode($this->restoreTree());
-        }
-		else
-		if (
-			$this->rHasVal('action', 'get_lookup_list') || 
-			$this->rHasVal('action', 'species_lookup') ||
-			$this->rHasVal('action', 'parent_taxon_id')
-		)
-		{
-            $return=$this->getSpeciesLookupList($this->requestData);
-        } 
-		else
-		if (
-			$this->rHasVal('action', 'expert_lookup') ||
-			$this->rHasVal('action', 'name_expert_id') ||
-			$this->rHasVal('action', 'name_organisation_id') ||
-			$this->rHasVal('action', 'dutch_name_expert_id') ||
-			$this->rHasVal('action', 'dutch_name_organisation_id') ||
-			$this->rHasVal('action', 'presence_expert_id') ||
-			$this->rHasVal('action', 'presence_organisation_id')
-		)
-		{
-            $return=$this->getExpertsLookupList($this->requestData);
-        }
-		else
-		if ($this->rHasVal('action', 'get_inheritable_name'))
-		{
-			$return=$this->getInheritableName(array('id'=>$this->rGetVal('id')));
-        }
-		else
-		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
-		{
-	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
-        }
-		
-		
-        $this->allowEditPageOverlay=false;
-
-		$this->smarty->assign('returnText',$return);
-
-        $this->printPage();
-    }
-
-
-
 
     private function _nameAndSynonym()
     {
@@ -381,6 +296,69 @@ class NsrTaxonController extends NsrController
 
     }
 
+    public function imagesAction()
+    {
+		if (!$this->rHasId()) $this->redirect('taxon_new.php');
+		
+		if ($this->rHasId() && $this->rHasVal('image') && $this->rHasVal('action','delete'))
+		{
+			$this->setConceptId($this->rGetId());
+			$this->disconnectTaxonMedia($this->rGetVal('image'));
+			$this->setMessage('Afbeelding ontkoppeld.');
+		} 
+		
+		$this->checkAuthorisation();
+		$this->setConceptId($this->rGetId());
+        $this->setPageName($this->translate('Taxon images'));
+		$this->smarty->assign('concept',$this->getConcept($this->rGetVal('id')));
+		$this->smarty->assign('images',$this->getTaxonMedia());
+
+		$this->checkMessage();
+		$this->printPage();
+	}
+
+    public function ajaxInterfaceAction ()
+    {
+        if (!$this->rHasVal('action'))
+            return;
+
+		if (
+			$this->rHasVal('action', 'get_lookup_list') || 
+			$this->rHasVal('action', 'species_lookup') ||
+			$this->rHasVal('action', 'parent_taxon_id')
+		)
+		{
+            $return=$this->getSpeciesLookupList($this->requestData);
+        } 
+		else
+		if (
+			$this->rHasVal('action', 'expert_lookup') ||
+			$this->rHasVal('action', 'name_expert_id') ||
+			$this->rHasVal('action', 'name_organisation_id') ||
+			$this->rHasVal('action', 'dutch_name_expert_id') ||
+			$this->rHasVal('action', 'dutch_name_organisation_id') ||
+			$this->rHasVal('action', 'presence_expert_id') ||
+			$this->rHasVal('action', 'presence_organisation_id')
+		)
+		{
+            $return=$this->getExpertsLookupList($this->requestData);
+        }
+		else
+		if ($this->rHasVal('action', 'get_inheritable_name'))
+		{
+			$return=$this->getInheritableName(array('id'=>$this->rGetVal('id')));
+        }
+		
+		
+        $this->allowEditPageOverlay=false;
+
+		$this->smarty->assign('returnText',$return);
+
+        $this->printPage();
+    }
+
+
+
 
 	private function setConceptId($id)
 	{
@@ -401,7 +379,6 @@ class NsrTaxonController extends NsrController
 	{
 		return $this->nameId;
 	}
-
 
 	private function getNsrId($p)
 	{
@@ -969,19 +946,22 @@ class NsrTaxonController extends NsrController
 		if (empty($id) || empty($image))
 			return;
 
-		$this->models->MediaMeta->delete(
-		array(
+		$p=array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'media_id'=>$image
-		));
+		);
+		$data=$this->models->MediaMeta->_get(array('id'=>$p));
+		$this->models->MediaMeta->delete($p);
+		$this->logNsrChange(array('before'=>$data,'note'=>'deleted media meta-data'));
 
-		$this->models->MediaTaxon->delete(
-		array(
+		$p=array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'id'=>$image,
 			'taxon_id'=>$id
-		));
-
+		);
+		$data=$this->models->MediaTaxon->_get(array('id'=>$p));
+		$this->models->MediaTaxon->delete($p);
+		$this->logNsrChange(array('before'=>$data,'note'=>'disconnected media from taxon'));
 	}
 
 
@@ -1394,6 +1374,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->models->Taxon->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
+			$this->logNsrChange(array('after'=>$this->getConcept($this->getConceptId()),'note'=>'new concept'));
 			$this->updateConcept();
 		}
 		else 
@@ -1407,6 +1388,8 @@ class NsrTaxonController extends NsrController
 		
 		$this->createConceptNsrIds();
 		$this->createConceptPresence();
+		
+		$before=$this->getConcept($this->rGetId());
 
 		if ($this->rHasVar('concept_taxon'))
 		{
@@ -1456,21 +1439,6 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
-		/*
-		// removed: obsolete field from trezorix data export
-		if ($this->rHasVar('presence_is_indigenous'))
-		{
-			if ($this->updateConceptIsIndigeous($this->rGetVal('presence_is_indigenous')))
-			{
-				$this->addMessage('Status endemisch opgeslagen.');
-			}
-			else
-			{
-				$this->addError('Status endemisch niet opgeslagen.');
-			}
-		}
-		*/
-
 		if ($this->rHasVar('presence_habitat_id'))
 		{
 			if ($this->updateConceptHabitatId($this->rGetVal('presence_habitat_id')))
@@ -1518,15 +1486,33 @@ class NsrTaxonController extends NsrController
 				$this->addError('Publicatie niet opgeslagen.');
 			}
 		}
+
+		$after=$this->getConcept($this->rGetId());
+		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept'));
 		
 	}
 
 	private function updateConceptTaxon($values)
 	{
-		return $this->models->Taxon->update(
+		$before=$this->models->Taxon->_get(array(
+			'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
+			'columns'=>'taxon'
+		));
+
+		$result=$this->models->Taxon->update(
 			array('taxon'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
+
+		if ($result)
+		{
+			$after=$this->models->Taxon->_get(array(
+				'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
+				'columns'=>'taxon'
+			));
+			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept name'));
+		}
+		return $result;
 	}
 	
 	private function updateConceptRankId($values)
@@ -1724,6 +1710,9 @@ class NsrTaxonController extends NsrController
 					'lng_id'=>$this->getConceptId(),
 					'item_type'=>'taxon',
 				)); 
+				
+			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID'));
+
 		}
 		else
 		if (!empty($rdf))
@@ -1740,6 +1729,8 @@ class NsrTaxonController extends NsrController
 				array('nsr_id'=>$nsr),
 				array('lng_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId(),'item_type'=>'taxon')
 			);
+
+			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID'));
 		}
 
 	}
@@ -1762,6 +1753,7 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->setNameId($this->models->Names->getNewId());
+			$this->logNsrChange(array('after'=>$this->getName(array('id'=>$this->getNameId())),'note'=>'new name'));
 			$this->addMessage('Nieuwe naam aangemaakt.');
 			$this->updateName();
 		}
@@ -1790,6 +1782,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setNameId($this->models->Names->getNewId());
 			$this->addMessage('Nederlandse naam aangemaakt.');
+			$this->logNsrChange(array('after'=>$this->getName(array('id'=>$this->getNameId())),'note'=>'new dutch name'));
 
 			if ($this->rHasVar('dutch_name_reference_id'))
 			{
@@ -1977,16 +1970,25 @@ class NsrTaxonController extends NsrController
 				$this->addError('Organisatie niet opgeslagen.');
 			}
 		}
+
+		$after=$this->getName(array('id'=>$this->getNameId()));
+		$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'updated name'));
 			
 	}
 
 	private function deleteName()
 	{
-		$this->models->Names->delete(
-		array(
+		$p=array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'id'=>$this->getNameId()
-		));
+		);
+		$before=$this->models->Names->_get(array('id'=>$p));
+		$d=$this->models->Names->delete($p);
+		if ($d)
+		{
+			$this->logNsrChange(array('before'=>$before,'note'=>'deleted name'));
+		}
+		return $d;
 	}
 
 	private function updateConceptBySciName()
@@ -2126,355 +2128,6 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-	private function getParents($parent,$level,$family)
-	{
-		$result = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $parent
-				),
-				'columns' => 'id,parent_id,taxon'
-			)
-		);
-
-		$family[]=$parent;
-
-		foreach((array)$result as $row)
-		{
-			$row['parentage']=$family;
-			$this->tmp[]=$row;
-			$this->getParents($row['parent_id'],$level+1,$family);
-		}
-	}
-
-	private function saveParentage($id=null)
-	{
-
-		if (!$this->models->TaxonQuickParentage->getTableExists())
-			return;
-			
-		if (empty($id))
-		{
-
-			$t = $this->treeGetTop();
-	
-			if (empty($t))
-				die('no top!?');
-			/*
-			if (count((array)$t)>1)
-				die('multiple tops!?');
-			*/
-	
-			$this->tmp=array();
-	
-			$this->getProgeny($t,0,array());
-
-			$d=array('project_id' => $this->getCurrentProjectId());
-	
-			$this->models->TaxonQuickParentage->delete($d);
-	
-			$i=0;
-			foreach((array)$this->tmp as $key=>$val)
-			{
-	
-				if (!is_null($id) && $val['id']!=$id)
-					continue;
-	
-				$this->models->TaxonQuickParentage->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id,
-					'parentage' => implode(' ',$val['parentage'])
-	
-				));
-	
-				$i++;
-			}
-					
-		}
-		else
-		{
-			$this->tmp=array();
-			$t=$this->getTaxonById($id);
-			$this->getParents($t['parent_id'],0,array());
-			$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
-			$qp=array_pop($this->tmp);
-			$this->models->TaxonQuickParentage->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $id,
-				'parentage' => implode(' ',array_reverse($qp['parentage']))
-
-			));
-			$i=1;
-		}
-
-		return $i;
-
-	}
-
-	
-
-
-
-	private function restoreTree()
-	{
-		return isset($_SESSION['admin']['user']['species']['tree']) ?  $_SESSION['admin']['user']['species']['tree'] : null;
-	}
-
-	private function resetTree()
-	{
-		unset($_SESSION['admin']['user']['species']['tree']);
-	}
-
-	private function treeGetTop()
-	{
-		/*
-			get the top taxon = no parent
-			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks 
-		*/
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_r.rank
-			from
-				%PRE%taxa _a
-					
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
-
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.parent_id is null
-				and _r.id < 10
-
-		");
-
-		if ($p && count((array)$p)==1)
-		{
-			$p=$p[0]['id'];
-		} 
-		else
-		{
-			$p=null;
-		}
-
-		if (count((array)$p)>1)
-		{
-			$this->addError('Detected multiple high-order taxa without a parent. Unable to determine which is the top of the tree.');
-		}
-
-		return $p;
-	}
-	
-	private function getTreeNode($p)
-	{
-		
-		$node=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
-		$count=isset($p['count']) && in_array($p['count'],array('none','taxon','species')) ? $p['count'] : 'none';
-
-		if (is_null($node))
-			return;
-
-		$taxa=
-			$this->models->Taxon->freeQuery("
-				select
-					_a.id,
-					_a.parent_id,
-					_a.is_hybrid,
-					_a.rank_id,
-					_a.taxon,
-					ifnull(_k.name,_l.commonname) as name,
-					_m.authorship,
-					_r.rank,
-					replace(ifnull(_q.label,_r.rank),'_',' ') as rank_label,
-					_p.rank_id as base_rank
-
-				from
-					%PRE%taxa _a
-
-				left join %PRE%projects_ranks _p
-					on _a.project_id=_p.project_id
-					and _a.rank_id=_p.id
-
-				left join %PRE%labels_projects_ranks _q
-					on _a.rank_id=_q.project_rank_id
-					and _a.project_id = _q.project_id
-					and _q.language_id=".$this->getDefaultProjectLanguage()."
-
-				left join %PRE%ranks _r
-					on _p.rank_id=_r.id
-
-				left join %PRE%commonnames _l
-					on _a.id=_l.taxon_id
-					and _a.project_id=_l.project_id
-					and _l.language_id=".$this->getDefaultProjectLanguage()."
-
-				left join %PRE%names _k
-					on _a.id=_k.taxon_id
-					and _a.project_id=_k.project_id
-					and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-					and _k.language_id=".$this->getDefaultProjectLanguage()."
-	
-				left join %PRE%names _m
-					on _a.id=_m.taxon_id
-					and _a.project_id=_m.project_id
-					and _m.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-	
-				where 
-					_a.project_id = ".$this->getCurrentProjectId()." 
-					and (_a.id = ".$node." or _a.parent_id = ".$node.")
-
-				order by
-					label
-			");
-			
-		$taxon=$progeny=array();
-
-		foreach((array)$taxa as $key=>$val)
-		{
-			if ($count=='taxon') 
-			{
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(*) as total
-					from
-						%PRE%taxon_quick_parentage
-					where 
-						project_id = ".$this->getCurrentProjectId()." 
-						and MATCH(parentage) AGAINST ('".$val['id']."' in boolean mode)
-					");
-					
-				$val['child_count']['taxon']=$d[0]['total'];
-			}
-			else
-			if ($count=='species') 
-			{
-	
-				$d=$this->models->Taxon->freeQuery(array(
-					'query'=> "
-						select
-							count(_sq.taxon_id) as total,
-							_sq.taxon_id,
-							_sp.presence_id,
-							ifnull(_sr.established,'undefined') as established
-						from 
-							%PRE%taxon_quick_parentage _sq
-						
-						left join %PRE%presence_taxa _sp
-							on _sq.project_id=_sp.project_id
-							and _sq.taxon_id=_sp.taxon_id
-						
-						left join %PRE%presence _sr
-							on _sp.project_id=_sr.project_id
-							and _sp.presence_id=_sr.id
-		
-						left join %PRE%taxa _e
-							on _sq.taxon_id = _e.id
-							and _sq.project_id = _e.project_id
-						
-						left join %PRE%projects_ranks _f
-							on _e.rank_id=_f.id
-							and _e.project_id = _f.project_id
-						
-						where
-							_sq.project_id=".$this->getCurrentProjectId()."
-							and _sp.presence_id is not null
-							and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-
-							and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
-							
-						group by _sr.established",
-					'fieldAsIndex' =>"established"
-					)
-				);
-	
-				$val['child_count']=
-					array(
-						'total'=>
-							(int)
-								(isset($d['undefined']['total'])?$d['undefined']['total']:0)+
-								(isset($d[0]['total'])?$d[0]['total']:0)+
-								(isset($d[1]['total'])?$d[1]['total']:0),
-						'established'=>
-								(int)(isset($d[1]['total'])?$d[1]['total']:0),
-						'not_established'=>
-								(int)(isset($d[0]['total'])?$d[0]['total']:0)
-					);
-			} else
-			{
-				$val['child_count']=null;
-			}
-			
-			if ($val['base_rank']>=SPECIES_RANK_ID)
-			{
-				if ($val['authorship']!='')
-				{
-					$val['taxon']=
-						'<i>'.
-						str_replace($val['authorship'],'',$val['taxon']).
-						'</i>'.' '.$val['authorship'];
-				}
-				else
-				{
-					$val['taxon']=$this->formatTaxon($val);
-				}
-			}
-
-			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
-
-			//unset($val['parent_id']);
-			unset($val['is_hybrid']);
-			unset($val['rank_id']);
-			unset($val['base_rank']);
-
-			if ($val['id']==$node)
-			{
-				$taxon=$val;
-			}
-			else 
-			{
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(*) as total
-					from
-						%PRE%taxa
-					where 
-						project_id = ".$this->getCurrentProjectId()." 
-						and parent_id = ".$val['id']
-					);
-					
-				$val['has_children']=$d[0]['total']>0;
-				$progeny[]=$val;
-			}
-		}
-		
-		usort(
-			$progeny,
-			function($a,$b)
-			{
-				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
-			}
-		);
-
-		return
-			array(
-				'node'=>$taxon,
-				'progeny'=>$progeny
-			);
-		
-	}
-
-
-
 	private function doNameIntegrityChecks($name)
 	{
 		if (!$this->checkNameParts($name))
@@ -2585,38 +2238,6 @@ class NsrTaxonController extends NsrController
 
 
 
-
-	private function getTaxonParentage($id)
-	{
-		if (is_null($id))
-			return;
-			
-		$this->saveParentage($id);
-
-		$d=$this->models->TaxonQuickParentage->freeQuery("
-			select
-				parentage
-			from
-				%PRE%taxon_quick_parentage
-			where 
-				project_id = ".$this->getCurrentProjectId()." 
-				and taxon_id = ".$id
-		);
-
-		return explode(' ',$d[0]['parentage']);
-
-	}
-	
-	private function logChanges($p)
-	{
-		/*
-		$p['changed'] // no logging if false
-		$p['before']  // data before edit
-		$p['after']   // data after edit
-		$p['user']    // user doing edit (default to log in name, email etc)
-		*/
-		$this->logChange($p);
-	}
 
 }
 

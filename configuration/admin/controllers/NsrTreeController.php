@@ -8,6 +8,7 @@ class NsrTreeController extends NsrController
 	private $_lookupListMaxResults=99999;
 
     public $usedModels = array(
+		'taxon_quick_parentage',
 		'name_types'
     );
     public $usedHelpers = array(
@@ -28,18 +29,18 @@ class NsrTreeController extends NsrController
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->initialize();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
 
-    private function initialize ()
+    private function initialize()
     {
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -62,7 +63,7 @@ class NsrTreeController extends NsrController
 		$this->printPage();
     }
 
-    public function ajaxInterfaceAction ()
+    public function ajaxInterfaceAction()
     {
         if (!$this->rHasVal('action'))
             return;
@@ -86,13 +87,18 @@ class NsrTreeController extends NsrController
 		{
 	        $return=json_encode($this->restoreTree());
         }
+		else
+		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
+		{
+	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
+        }
 
         
         $this->allowEditPageOverlay = false;
 
 		$this->smarty->assign('returnText',$return);
 
-        $this->printPage();
+        $this->printPage('ajax_interface');
     }
 
     private function getLookupList($p)
@@ -463,6 +469,5 @@ class NsrTreeController extends NsrController
 			);
 		
 	}
-
 
 }

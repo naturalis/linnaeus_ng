@@ -538,7 +538,7 @@ class Controller extends BaseClass
 
     public function getTaxonById ($id)
     {
-        if (empty($id) || $id==0)
+        if (empty($id) || !is_numeric($id) || $id==0)
             return;
 
 		$t=$this->models->Taxon->freeQuery("

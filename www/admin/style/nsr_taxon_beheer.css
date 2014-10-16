@@ -186,6 +186,12 @@ ul {
 	color:#999;
 	font-size:0.8em;
 }
+.passport-leeg::before {
+    content: "(";
+}
+.passport-leeg::after {
+    content: ")";
+}
 .passport-waarschuwing {
 	color:#F00;
 	text-decoration:underline;
@@ -195,4 +201,5 @@ ul {
 .passport-meta .label {
 	color:#666;
 }
+
 

@@ -80,7 +80,7 @@ class NsrPaspoortController extends NsrController
         $this->setPageName($this->translate('Edit taxon passport'));
 
 		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('tabs',$this->getCategories());	
+		$this->smarty->assign('tabs',$this->getPassportCategories());	
 		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));	
 
 		$this->printPage();
@@ -105,7 +105,6 @@ class NsrPaspoortController extends NsrController
     }
 
 
-
 	private function setTaxonId($id)
 	{
 		$this->TaxonId=$id;
@@ -116,7 +115,7 @@ class NsrPaspoortController extends NsrController
 		return isset($this->TaxonId) ? $this->TaxonId : false;
 	}
 
-    private function getCategories()
+    private function getPassportCategories()
     {
 		$categories=$this->models->PageTaxon->freeQuery("
 			select
@@ -152,7 +151,7 @@ class NsrPaspoortController extends NsrController
 
 		if (!$categories) $categories=array();
 
-		$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
+		$d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
 
 		$order=$this->models->TabOrder->_get(
 		array(
@@ -207,7 +206,7 @@ class NsrPaspoortController extends NsrController
 
     }
 
-    private function getTaxonContent($p=null)
+    private function getPassport($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$category = isset($p['category']) ? $p['category'] : null;
@@ -270,21 +269,28 @@ class NsrPaspoortController extends NsrController
 		return array('content'=>$content,'rdf'=>$rdf);
     }
 
+
 	private function savePassport($p)
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$page = isset($p['page']) ? $p['page'] : null;
 		$content = isset($p['content']) ? $p['content'] : null;
 		$publish = isset($p['publish']) && $p['publish']==1 ? '1' : '0';
+		
+		$before=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
 
 		if (empty($content))
 		{
-			return $this->models->ContentTaxon->delete(array(
+			$r=$this->models->ContentTaxon->delete(array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id'=>$taxon,
 				'language_id'=>$this->getDefaultProjectLanguage(),
 				'page_id'=>$page
 			));
+
+			$this->logNsrChange(array('before'=>$before,'note'=>'deleted passport'));
+			return $r;
+
 		}
 		else
 		{
@@ -299,7 +305,7 @@ class NsrPaspoortController extends NsrController
 			
 			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
 
-			return $this->models->ContentTaxon->save(array(
+			$d=$this->models->ContentTaxon->save(array(
 				'id'=>$id,
 				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$taxon,
@@ -309,7 +315,14 @@ class NsrPaspoortController extends NsrController
 				'publish' => $publish
 			));
 			
+			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
+
+			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport' : 'new passport')));
+			
+			return $d;
+			
 		}
 
 	}
+
 }

@@ -1,11 +1,16 @@
 var activeNode=false;
 var container='tree-container';
-var url='ajax_interface.php';
+var ajaxTreeUrl='ajax_interface.php';
 var taxonTargetUrl='taxon.php?id=%s';
 var autoExpandArray=Array();
 var highlightNodes=Array();
 var nodeCountType='species'; // species, taxon, none
 var rootNodeLabel='Nederlands Soortenregister';
+
+function setAjaxTreeUrl(url)
+{
+	ajaxTreeUrl=url;
+}
 
 function setHighlightNode(node)
 {
@@ -44,7 +49,7 @@ function buildtree(node)
 	activeNode=node;
 
 	$.ajax({
-		url : url,
+		url : ajaxTreeUrl,
 		type: "POST",
 		data : ({
 			action : 'get_tree_node' ,
@@ -149,7 +154,7 @@ function storetree()
 {
 	var tree=$( "#"+container ).html().replace(/\n/ig,'').replace(/(\s+)/ig,' ');
 	$.ajax({
-		url : url,
+		url : ajaxTreeUrl,
 		type: "POST",
 		data : ({
 			action : 'store_tree' ,
@@ -162,7 +167,7 @@ function storetree()
 function restoretree()
 {
 	$.ajax({
-		url : url,
+		url : ajaxTreeUrl,
 		type: "POST",
 		data : ({
 			action : 'restore_tree' ,
@@ -189,7 +194,7 @@ function setAutoExpand(id)
 	setHighlightNode(id);
 	
 	$.ajax({
-		url : "ajax_interface.php",
+		url : ajaxTreeUrl,
 		type: "POST",
 		data : ({
 			action : 'get_parentage' ,
@@ -198,6 +203,7 @@ function setAutoExpand(id)
 		}),
 		success : function (data)
 		{
+			console.log(data);
 			var data=$.parseJSON(data);
 			for (index=1;index<data.length;++index)
 			{
