@@ -2606,5 +2606,37 @@ class NsrTaxonController extends NsrController
 		return explode(' ',$d[0]['parentage']);
 
 	}
+	
+	private function logChanges($p)
+	{
+		/*
+		$p['changed'] // no logging if false
+		$p['before']  // data before edit
+		$p['after']   // data after edit
+		$p['user']    // user doing edit (default to log in name, email etc)
+		*/
+		$this->logChange($p);
+	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

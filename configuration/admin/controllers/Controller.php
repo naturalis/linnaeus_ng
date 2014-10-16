@@ -1784,7 +1784,18 @@ class Controller extends BaseClass
 
 	public function logChange($p)
 	{
-		if ($p['changed']!==true)
+		$changed=isset($p['changed']) ? $p['changed'] : false;
+		$before=isset($p['before']) ? $p['before'] : null;
+		$after=isset($p['after']) ? $p['after'] : null;
+		$user=isset($p['user']) ? $p['user'] :
+					(
+						@$_SESSION['admin']['user']['first_name'].' '.
+						@$_SESSION['admin']['user']['last_name'].' ('.
+						@$_SESSION['admin']['user']['username'].' - '.
+						@$_SESSION['admin']['user']['email_address'].')'
+					);
+
+		if ($changed!==true)
 			return;
 
 		if (!$this->models->ActivityLog->getTableExists())
@@ -1794,15 +1805,11 @@ class Controller extends BaseClass
 			array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'user_id'=>$this->getCurrentUserId(),
-				'user'=>
-					@$_SESSION['admin']['user']['first_name'].' '.
-					@$_SESSION['admin']['user']['last_name'].' ('.
-					@$_SESSION['admin']['user']['username'].' - '.
-					@$_SESSION['admin']['user']['email_address'].')',
+				'user'=> $user,
 				'controller'=>$this->getControllerBaseName(),
 				'view'=>$this->getViewName(),
-				'data_before'=> !empty($p['before']) ? serialize($p['before']) : null,
-				'data_after'=> !empty($p['after']) ? serialize($p['after']) : null,
+				'data_before'=> !empty($before) ? serialize($before) : null,
+				'data_after'=> !empty($after) ? serialize($after) : null,
 			)
 		);
 	}
