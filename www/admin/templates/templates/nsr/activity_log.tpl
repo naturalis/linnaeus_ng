@@ -4,18 +4,37 @@
 table tr td {
 	vertical-align:top;
 }
+.inline-table {
+	margin-left:10px;
+	border-collapse:collapse;
+}
+.inline-table tr td, .inline-table tr th  {
+	font-size:10px;
+	padding-left:5px;
+	background-color:#eee;
+}
+.inline-table td {
+	width:350px;
+	border:1px solid #ddd;
+}
+
 </style>
 
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal"></h2>
+<h2>Ovezicht Soortenregister edits</h2>
 <h3></h3>
+
+Aantal edits: {$results.count}
+
+<p style="color:red">coming: zoeken, pagineren, verbeterde weergave data, verbeterde weergave user</p>
+
 
 <table>
 {foreach from=$results.data item=v key=k}
     <tr>
-    	<td style="width:200px;">
+    	<td style="width:350px;">
 		    {$v.note}
 		</td>
     	<td style="width:200px;">
@@ -26,17 +45,21 @@ table tr td {
 		    {$v.last_change_hr}
 		</td>
     	<td>
-		    <a href="#" onclick="$('#row{$k}').toggle();">show</a>
+		    <a href="#" onclick="$('#alldata{$k}').toggle();return false;">toon data</a>
 		</td>
     <tr>
-    <tr id="row{$k}" style="display:naone;border-bottomn:1px solid #666">
+    
+    <tr id="alldata{$k}" style="display:none;border-bottomn:1px solid #666">
     	<td colspan="4">
-        	<table><tr><td>
+        	<table class="inline-table"><tr><td>
 			    {foreach from=$v.data_before item=b key=kb}
                 {if $b|is_array}
+                	<p>
+	                <b>{$kb}</b><br />
                     {foreach from=$b item=bb key=kbb}
-	                {$kbb}: {$bb}<br />
+	                &nbsp;&nbsp;{$kbb}: {$bb}<br />
 	                {/foreach}
+                    </p>
                 {else}
 					{$kb}: {$b}<br />
                 {/if}
@@ -45,9 +68,12 @@ table tr td {
             <td>
 			    {foreach from=$v.data_after item=a key=ka}
                 {if $a|is_array}
+                	<p>
+	                <b>{$ka}</b><br />
                     {foreach from=$a item=aa key=kaa}
 	                {$kaa}: {$aa}<br />
 	                {/foreach}
+                    </p>
                 {else}
 					{$ka}: {$a}<br />
                 {/if}
@@ -58,135 +84,7 @@ table tr td {
 {/foreach}
 </table>
 <p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<form>
-<input type="hidden" id="taxon_id" value="{$concept.id}" />
-	<ul>
-    {assign var=hasObsolete value=false}
-	{foreach from=$tabs item=v key=k}
-	{if !($v.obsolete && $v.content|@strlen==0)}
-	<li>
-		<span class="passport-title">
-        	<a href="#" onclick="$('#body{$k}').toggle();return false;">{$v.title}</a>
-            {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Verouderde paspoorttitel</span>{/if}
-            <span id="indicator{$k}">
-	            {if $v.content|@strlen>0 && $v.publish==1}
-                <span title="heeft content, is gepubliceerd" class="passport-published">{$v.content|@strlen} tekens</span>
-                {elseif $v.content|@strlen>0 && $v.publish!=1}
-                <span title="heeft content, niet gepubliceerd (onzichtbaar)" class="passport-unpublished">{$v.content|@strlen} tekens</span>
-                {else}
-                <span title="geen content (onzichtbaar)" class="passport-leeg">leeg</span>
-                {/if}
-            </span>
-			<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat={$v.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr" title="paspoort bekijken in het Soortenregister (nieuw venster)">&rarr;</a><br />
-		</span>
-		<div class="passport-body" id="body{$k}">
-            <span class="passport-content" id="content{$k}">{$v.content}</span>
-
-{* if $v.rdf.author.name || $v.rdf.reference.citation || $v.rdf.publisher.name}
-<div id="meta{$k}" class="passport-meta">
-    <span class="label">Auteur(s):</span> {$v.rdf.author.name}<br />
-    <span class="label">Publicatie:</span> {$v.rdf.reference.citation}<br />
-    <span class="label">Organisatie:</span> {$v.rdf.publisher.name}<br />
-</div>
-{/if *}
-            
-			<a href="#" class="edit" id="edit{$k}" onclick="openeditor(this);return false;" style="margin-left:0;">edit</a>
-            <div id="button-container{$k}" class="button-container" style="display:none">
-{*<p>
-    Auteur:<select id="author{$k}">
-        <option value="" {if !$v.rdf.author.id}selected="selected"{/if}>-</option>
-    {foreach from=$actors item=a key=k}
-    {if $a.is_company=='0'}
-        <option value="{$a.id}"{if $a.id==$v.rdf.author.id} selected="selected"{/if}>{$a.label}</option>
-    {/if}
-    {/foreach}
-    </select> 
-<i>
-{$v.rdf.publisher.id}{$v.rdf.publisher.name}
-{$v.rdf.reference.id}{$v.rdf.reference.label}
-{$v.rdf.author.id}{$v.rdf.author.name}
- </i> 
- *}          
-            <input id="publish{$k}" type="checkbox" value="publiceren" {if $v.publish==1}checked="checked"{/if} />publiceren?
-            </p>
-            <p>
-            <input id="save{$k}" value="opslaan" type="button" onclick="saveeditordata(this);">
-            <input id="close{$k}" value="sluiten" type="button" onclick="closeeditor(this);">
-            <input id="revert{$k}" value="oorspronkelijke tekst" type="button" onclick="reverttext(this);">
-            <input id="page{$k}" value="{$v.id}" type="hidden" />
-            <span id="message{$k}"></span>
-            </p>
-            </div>
-        </div>
-	</li>
-    {/if}
-	{/foreach}
-	</ul>
-</form>
-
-{if $hasObsolete}
-<p>
-<span class="passport-waarschuwing">Verouderde paspoorttitels</span><br/>
-Dit zijn oude paspoorttitels die overlappen met nieuwe titels.<br />
-Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe paspoort:
-<ul>
-    <li>Algemeen > Samenvatting</li>
-    <li>Bescherming > Bedreiging en bescherming</li>
-    <li>Description > Summary</li>
-    <li>Habitat > Biotopen</li>
-</ul>
-</p>
-{/if}
-
-</p>
-
-<p>
-	<a href="taxon.php?id={$concept.id}">terug</a>
+	<a href="index.php">terug</a>
 </p>
 
 </div>

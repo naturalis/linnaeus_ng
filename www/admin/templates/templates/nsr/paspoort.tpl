@@ -6,7 +6,7 @@
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h2>
-<h3>paspoorten</h3>
+<h3>paspoort</h3>
 
 <p>
 <form>
@@ -33,31 +33,8 @@
 		<div class="passport-body" id="body{$k}">
             <span class="passport-content" id="content{$k}">{$v.content}</span>
 
-{* if $v.rdf.author.name || $v.rdf.reference.citation || $v.rdf.publisher.name}
-<div id="meta{$k}" class="passport-meta">
-    <span class="label">Auteur(s):</span> {$v.rdf.author.name}<br />
-    <span class="label">Publicatie:</span> {$v.rdf.reference.citation}<br />
-    <span class="label">Organisatie:</span> {$v.rdf.publisher.name}<br />
-</div>
-{/if *}
-            
 			<a href="#" class="edit" id="edit{$k}" onclick="openeditor(this);return false;" style="margin-left:0;">edit</a>
             <div id="button-container{$k}" class="button-container" style="display:none">
-{*<p>
-    Auteur:<select id="author{$k}">
-        <option value="" {if !$v.rdf.author.id}selected="selected"{/if}>-</option>
-    {foreach from=$actors item=a key=k}
-    {if $a.is_company=='0'}
-        <option value="{$a.id}"{if $a.id==$v.rdf.author.id} selected="selected"{/if}>{$a.label}</option>
-    {/if}
-    {/foreach}
-    </select> 
-<i>
-{$v.rdf.publisher.id}{$v.rdf.publisher.name}
-{$v.rdf.reference.id}{$v.rdf.reference.label}
-{$v.rdf.author.id}{$v.rdf.author.name}
- </i> 
- *}          
             <input id="publish{$k}" type="checkbox" value="publiceren" {if $v.publish==1}checked="checked"{/if} />publiceren?
             </p>
             <p>
@@ -89,6 +66,10 @@ Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe pasp
 </p>
 {/if}
 
+</p>
+
+<p>
+	<a href="paspoort_meta.php?id={$concept.id}" class="edit"  style="margin:0">meta-gegevens</a><br />
 </p>
 
 <p>
