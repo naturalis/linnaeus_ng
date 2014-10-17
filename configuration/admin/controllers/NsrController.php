@@ -180,6 +180,25 @@ class NsrController extends Controller
 		$this->logChange($p);
 	}
 
+	private function getNsrId($p)
+	{
+		$data=$this->models->NsrIds->_get(array(
+			'id'=>array(
+				'lng_id' => $p['id'],
+				'item_type' => $p['item_type']
+			),
+			'columns'=>'nsr_id'
+		));
+
+		return str_replace('tn.nlsr.concept/','',$data[0]['nsr_id']);
+	}
 		
+	public function getConcept($id)
+	{
+		$c=$this->getTaxonById($id);
+		$c['nsr_id']=$this->getNsrId(array('id'=>$c['id'],'item_type'=>'taxon'));
+		$c['parent']=$this->getTaxonById($c['parent_id']);
+		return $c;
+	}		
 
 }

@@ -11,6 +11,8 @@ class NsrActivityLogController extends NsrController
     public $usedModels = array(
 		'activity_log',
     );
+    public $controllerPublicName = 'Soortenregister beheer';
+    public $includeLocalMenu = false;
 
     public function __construct()
     {
@@ -40,61 +42,6 @@ class NsrActivityLogController extends NsrController
 		$this->printPage('activity_log');
     }
 	
-	
- 	private function nbcHandleOverlappingItemsFromDetails($p)
-	{
-		//return $p['data'];
-
-        $data = isset($p['data']) ? $p['data'] : null;
-        $action = isset($p['action']) ? $p['action'] : 'remove';
-
-		if (count((array)$data)==1)
-			return $data;
-
-		$d = array();
-		foreach((array)$data as $key => $dVal) {
-			foreach((array)$dVal['d'] as $characteristic_id => $cVal)	{
-				foreach((array)$cVal['states'] as $state)	{
-					if (isset($state['id']))
-						$d[$key][] = $characteristic_id.':'.$state['id']; // characteristic_id:state_id
-				}
-			}
-		}
-
-		$common = call_user_func_array('array_intersect',$d);
-
-		foreach((array)$data as $key => $dVal) {
-			foreach((array)$dVal['d'] as $characteristic_id => $cVal) {
-				foreach((array)$cVal['states'] as $sVal => $state)	{
-					
-					if (isset($state['id'])) {
-
-						if (in_array($characteristic_id.':'.$state['id'],$common)) {
-							if ($action=='remove') {
-								unset($data[$key]['d'][$characteristic_id]['states'][$sVal]);
-							} else
-							if ($action=='tag') {
-								$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'] = '<span class="overlapState">'.$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'].'</span>';
-							}
-						}
-						
-					}
-					
-				}
-				
-				if (count((array)$data[$key]['d'][$characteristic_id]['states'])==0 && $action=='remove') {
-
-					unset($data[$key]['d'][$characteristic_id]);
-
-				}
-			}
-		}
-
-		return $data;
-		
-	}
-
-
 	
 	private function getLogLines($p=null)
 	{
@@ -130,16 +77,60 @@ class NsrActivityLogController extends NsrController
 		{
 			$d[$key]['data_before']=unserialize($val['data_before']);
 			$d[$key]['data_after']=unserialize($val['data_after']);
+			//$d[$key]['differences']=$this->getLineDifferences($d[$key]['data_before'],$d[$key]['data_after']);
 		}
-
-		q($d,1);
-
 
 		$count=$this->models->ActivityLog->freeQuery('select found_rows() as total');
 		
 		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_logLinesPerPage);
 
 	}
+
+	private function getLineDifferences($a,$b)
+	{
+
+		if ((!is_array($a) && is_array($b)) || (is_array($a) && !is_array($b)))
+		{
+			return array('before'=>$a,'after'=>$b);
+		} 
+		else
+		if (!is_array($a))
+		{
+			return $a==$b ? null : array('before'=>$a,'after'=>$b);
+		} 
+		else
+		{
+			$ta=array();
+			$tb=array();
+			$tc=array();
+			$td=array();
+			
+			foreach($a as $key=>$val)
+			{
+				if (is_array($val))
+				{
+					$ta[$key]=array_diff($a[$key],$b[$key]);
+					$tb[$key]=array_diff($b[$key],$a[$key]);
+				}
+				else
+				{
+					$tc[$key]=$a[$key];
+					$td[$key]=$b[$key];
+				}
+			}
+			
+			$te=array_diff($tc,$td);
+			$tf=array_diff($td,$tc);
+			
+			return array(
+				'before'=>array_merge($ta,$te),
+				'after'=>array_merge($tb,$tf)
+			);
+			
+		}
+	}
+
+
 
 
 

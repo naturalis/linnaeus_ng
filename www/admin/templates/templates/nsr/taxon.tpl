@@ -187,7 +187,7 @@
 	{/if}
 </p>
 <p>
-	<a href="paspoort.php?id={$concept.id}" class="edit"  style="margin:0">paspoorten</a><br />
+	<a href="paspoort.php?id={$concept.id}" class="edit"  style="margin:0">paspoort</a><br />
 
 	<a href="images.php?id={$concept.id}" class="edit"  style="margin:0">afbeeldingen</a><br />
 		

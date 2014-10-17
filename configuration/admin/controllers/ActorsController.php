@@ -229,7 +229,7 @@ class ActorsController extends Controller
 		$this->addMessage("Auteur ontkoppeld van ".$this->models->Literature2Authors->getAffectedRows()." literatuurreferenties.");
 
 		$this->models->Actors->freeQuery("delete from %PRE%rdf where _a.object_id=".$id." _a.object_type='actor'");
-		$this->addMessage("Auteur verwijderd van ".$this->models->Actors->getAffectedRows()." paspoorten.");
+		$this->addMessage("Auteur verwijderd van ".$this->models->Actors->getAffectedRows()." tabbladen.");
 
 		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");	
 		$this->addMessage("Actor verwijderd.");
