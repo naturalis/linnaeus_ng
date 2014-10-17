@@ -17,7 +17,7 @@
 			<h2>Verspreiding</h2>
 			{foreach from=$distributionMaps.data item=v}
 
-			<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
+			<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/original/{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
 			{if $v.meta_map_source && $v.meta_map_description}<br />{/if}{if $v.meta_map_source}Bron: {$v.meta_map_source}{/if}">
 				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="http://images.naturalis.nl/comping/{$v.image}" />
 			</a>

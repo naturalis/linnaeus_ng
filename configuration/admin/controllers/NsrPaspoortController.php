@@ -97,6 +97,11 @@ class NsrPaspoortController extends NsrController
 		}
 		
 		$this->setTaxonId($this->rGetId());
+		
+		if ($this->rHasVal('update-reach'))
+		{
+			$this->savePassportMeta($this->requestData);
+		}
 
         $this->setPageName($this->translate('Edit taxon passport'));
 
@@ -295,6 +300,143 @@ class NsrPaspoortController extends NsrController
 		$page = isset($p['page']) ? $p['page'] : null;
 		$content = isset($p['content']) ? $p['content'] : null;
 		$publish = isset($p['publish']) && $p['publish']==1 ? '1' : '0';
+		
+		$concept=$this->getConcept($taxon);
+		$before=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
+
+		if (empty($content))
+		{
+			$r=$this->models->ContentTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id'=>$taxon,
+				'language_id'=>$this->getDefaultProjectLanguage(),
+				'page_id'=>$page
+			));
+
+			$this->logNsrChange(array('before'=>$before,'note'=>'deleted passport from '.$concept['taxon']));
+			return $r;
+
+		}
+		else
+		{
+			$d=$this->models->ContentTaxon->_get(array(
+				'id'=>array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id'=>$taxon,
+					'language_id'=>$this->getDefaultProjectLanguage(),
+					'page_id'=>$page
+				)
+			));
+			
+			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
+
+			$r=$this->models->ContentTaxon->save(array(
+				'id'=>$id,
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$taxon,
+				'language_id'=>$this->getDefaultProjectLanguage(),
+				'page_id'=>$page,
+				'content' => $content,
+				'publish' => $publish
+			));
+			
+			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
+
+			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport' : 'new passport').' from '.$concept['taxon']));
+			
+			return $r;
+			
+		}
+
+	}
+
+	private function savePassportMeta($p)
+	{
+		$taxon = isset($p['id']) ? $p['id'] : null;
+		$updatereach = isset($p['update-reach']) ? $p['update-reach'] : null;
+		$actors = isset($p['actor_id']) ? $p['actor_id'] : null;
+		$organisations = isset($p['organisation_id']) ? $p['organisation_id'] : null;
+		$references = isset($p['reference_id']) ? $p['reference_id'] : null;
+
+		if (empty($taxon)||empty($updatereach))
+			return;
+
+		/*
+			<option value="all">alle tabbladen</option>
+			<option value="all-text">alle tabbladen met tekst</option>
+			<option value="no-meta">tabbladen zonder meta-gegevens</option>
+			<option value="text-no-meta">tabbladen met tekst zonder meta-gegevens</option>
+
+			bestaande meta-gegevens van de geselecteerde tab(s) worden overschreven
+		*/
+		
+		$categories=$this->getPassportCategories();
+		$shouldUpdate=array();
+
+		foreach((array)$categories as $val)
+		{
+			if ($val['obsolete']==1 && strlen($val['content'])==0)
+				continue;
+				
+			if ($updatereach="all")
+			{
+				// alle tabbladen
+				array_push($shouldUpdate,$val['content_id']);
+			}
+			else
+			if ($updatereach="all-text")
+			{
+				// alle tabbladen met tekst
+				if (strlen($val['content'])>0)
+					array_push($shouldUpdate,$val['content_id']);
+			}
+			else
+			if ($updatereach="no-meta")
+			{
+				// tabbladen zonder meta-gegevens
+				if (!isset($val['rdf']) || count((array)$val['rdf'])==0)
+					array_push($shouldUpdate,$val['content_id']);
+			}
+			else
+			if ($updatereach="text-no-meta")
+			{
+				// tabbladen met tekst zonder meta-gegevens
+				if (
+					(strlen($val['content'])>0) &&
+					(!isset($val['rdf']) || count((array)$val['rdf'])==0)
+				)
+				array_push($shouldUpdate,$val['content_id']);
+			}
+			else
+			if (is_numeric($updatereach) && $updatereach==$val['content_id'])
+			{
+				array_push($shouldUpdate,$val['content_id']);
+			}
+
+		}
+		
+		
+		q($p);
+		q($categories);
+		q($shouldUpdate);
+		
+
+die();
+
+/*
+
+
+					if ($rVal['predicate']=='hasPublisher')
+						$categories[$key]['rdf']['publisher']=$rVal['data'];
+					if ($rVal['predicate']=='hasReference')
+						$categories[$key]['rdf']['reference']=$rVal['data'];
+					if ($rVal['predicate']=='hasAuthor')
+						$categories[$key]['rdf']['author']=$rVal['data'];
+				}
+
+
+*/
+		
 		
 		$concept=$this->getConcept($taxon);
 		$before=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));

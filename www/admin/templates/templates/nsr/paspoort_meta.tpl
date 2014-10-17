@@ -2,94 +2,78 @@
 
 <script type="text/javascript" src="../../../admin/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="../../../admin/javascript/nsr_passport.js"></script>
-
-<script>
-
-var authors=Array();
-
-function storeAuthor(p)
-{
-	authors.push(p);
-}
-
-function addAuthorField()
-{
-	// find the next available author field
-	for(var k=0;k<99;k++)
-	{
-		if ($("#actor_id-"+k).length==0)
-			break;
-	}
-	
-	var buffer=Array()
-	buffer.push('<option value="">-</option>');
-	for(var i in authors)
-	{
-		buffer.push('<option value="'+authors[i].id+'">'+authors[i].name+'</option>');
-	}
-
-
-	var currVals=Array;
-	$('select[name^=actor_id]').each(function(i){
-		currVals[i]=$(this).val();
-	});
-
-	$('#authors').html(
-		$('#authors').html()+
-		'<span id="actor_id-'+k+'"><select name="actor_id[]">'+buffer.join('')+'</select>'+
-		'<a class="edit" href="#" onclick="removeAuthorField('+k+');return false;">verwijderen</a><br /></span>');
-
-	$('select[name^=actor_id]').each(function(i){
-		$(this).val(currVals[i]);
-	});
-
-}
-
-function removeAuthorField(k)
-{
-	$('#actor_id-'+k).remove();
-}
-</script>
-
+<script type="text/javascript" src="../../../admin/javascript/literature2.js"></script>
 <style>
 li {
 	margin-bottom:10px;
+}
+th {
+	border-bottom:1px solid black;
+	text-align:left;
+}
+select {
+	width:150px;
 }
 </style>
 
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h2>
-<h3>paspoorten</h3>
+<h3>paspoorten (meta-gegevens)</h3>
 
-<form>
+<form method="post" id="theForm">
 <input type="hidden" id="taxon_id" value="{$concept.id}" />
 
-auteur(s):<br />
-<span id="authors">
-    <span id="actor_id-0">
-    <select name="actor_id[]">
-        <option value="" {if !$reference.actor_id} selected="selected"{/if}>-</option>
-    {foreach from=$actors item=v key=k}
-    {if $v.is_company=='0'}
-        <option value="{$v.id}" {if $v.id==$author.actor_id} selected="selected"{/if}>{$v.label}</option>
-    {/if}
+<p>
+<table>
+	<tr style="vertical-align:top">
+    	<th style="width:225px;">Auteur(s)</th>
+    	<th style="width:225px;">Organisatie(s)</th>
+    	<th style="width:400px;">Publicatie(s)</th>
+	</tr>        
+    <tr>
+    	<td>
+            <a class="edit" style="margin-left:0px;" href="#" onclick="addAuthorField();return false;">auteur toevoegen</a><br />
+            <span id="authors">
+            </span>
+		</td>
+    	<td>
+            <a class="edit" style="margin-left:0px;" href="#" onclick="addOrganisationField();return false;">organisatie toevoegen</a><br />
+            <span id="organisations">
+            </span>
+		</td>
+        <td>
+            <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="reference_id">referentie toevoegen</a><br />
+            <input type="hidden" id="reference_id" value="" onchange="collectReferences(this.value);"/>
+            <span id="reference" style="display:none;"></span>
+			<span id="references"></span>
+
+		</td>
+        <td>
+		</td>
+	</tr>
+</table>
+</p>
+
+<p>
+toevoegen aan:<br />
+<select name="update-reach">
+    <option value="all">alle tabbladen</option>
+    <option value="all-text">alle tabbladen met tekst</option>
+    <option value="no-meta">tabbladen zonder meta-gegevens</option>
+    <option value="text-no-meta">tabbladen met tekst zonder meta-gegevens</option>
+    <option disabled="disabled">----------------------------</option>
+	{foreach from=$tabs item=v key=k}
+	{if !($v.obsolete && $v.content|@strlen==0)}
+    <option value="{$v.content_id}">{$v.title}</option>
+	{/if}
     {/foreach}
-    </select><a class="edit" href="#" onclick="removeAuthorField(0);return false;">verwijderen</a>
-    <br />
-    </span>
-</span>
-<a class="edit" style="margin-left:0px;" href="#" onclick="addAuthorField();return false;">auteur toevoegen</a>
-
-
-
-referentie(s):<br />
-		<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="name_reference_id">edit</a>
-		<span class="editspan" id="reference"></span>
-		<input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
-
-
-
+</select><br />
+(let op: bestaande meta-gegevens van de geselecteerde tab(s) worden overschreven)
+</p>
+<p>
+<input type="button" onclick="doPassportMeta();" value="opslaan" />
+</p>
 
 
 </form>
@@ -158,6 +142,8 @@ $(document).ready(function(e) {
 	{foreach from=$actors item=v key=k}
 	{if $v.is_company!='1'}
 	storeAuthor({ id: {$v.id},name:'{$v.label|@escape}'});
+	{else}
+	storeOrganisation({ id: {$v.id},name:'{$v.label|@escape}'});
 	{/if}
 	{/foreach}
 });
