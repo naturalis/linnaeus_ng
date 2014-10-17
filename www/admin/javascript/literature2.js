@@ -81,43 +81,59 @@ function lit2BuildList(action,data)
 }
 
 var authors=Array();
+var organisations=Array();
 
 function storeAuthor(p)
 {
 	authors.push(p);
 }
 
-function addAuthorField()
+function storeOrganisation(p)
+{
+	organisations.push(p);
+}
+
+function addAnyField(p)
 {
 	// find the next available author field
 	for(var k=0;k<99;k++)
 	{
-		if ($("#actor_id-"+k).length==0)
+		if ($('#'+p.id_root+'-'+k).length==0)
 			break;
 	}
 	
 	var buffer=Array()
 	buffer.push('<option value="">-</option>');
-	for(var i in authors)
+	for(var i in p.values)
 	{
-		buffer.push('<option value="'+authors[i].id+'">'+authors[i].name+'</option>');
+		buffer.push('<option value="'+p.values[i].id+'">'+p.values[i].name+'</option>');
 	}
 
 
 	var currVals=Array;
-	$('select[name^=actor_id]').each(function(i){
+	$('select[name^='+p.id_root+']').each(function(i){
 		currVals[i]=$(this).val();
 	});
 
-	$('#authors').html(
-		$('#authors').html()+
-		'<span id="actor_id-'+k+'"><select name="actor_id[]">'+buffer.join('')+'</select>'+
-		'<a class="edit" href="#" onclick="removeAuthorField('+k+');return false;">verwijderen</a><br /></span>');
+	$('#'+p.container).html(
+		$('#'+p.container).html()+
+		'<span id="'+p.id_root+'-'+k+'"><select name="'+p.id_root+'[]">'+buffer.join('')+'</select>'+
+		'<a class="edit" href="#" onclick="$(\'#'+p.id_root+'-'+k+'\').remove();return false;">verwijderen</a><br /></span>');
 
-	$('select[name^=actor_id]').each(function(i){
+	$('select[name^='+p.id_root+']').each(function(i){
 		$(this).val(currVals[i]);
 	});
 
+}
+
+function addAuthorField()
+{
+	addAnyField({id_root:"actor_id",values:authors,container:"authors"});
+}
+
+function addOrganisationField()
+{
+	addAnyField({id_root:"organisation_id",values:organisations,container:"organisations"});
 }
 
 function removeAuthorField(k)
