@@ -98,9 +98,13 @@ class NsrPaspoortController extends NsrController
 		
 		$this->setTaxonId($this->rGetId());
 		
-		if ($this->rHasVal('update-reach'))
+		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->savePassportMeta($this->requestData);
+		} else
+		if ($this->rHasVal('action','delete') && $this->rHasVal('tab') && !$this->isFormResubmit())
+		{
+			$this->deletePassportMeta($this->requestData);
 		}
 
         $this->setPageName($this->translate('Edit taxon passport'));
@@ -140,6 +144,7 @@ class NsrPaspoortController extends NsrController
 	{
 		return isset($this->TaxonId) ? $this->TaxonId : false;
 	}
+
 
     private function getPassportCategories()
     {
@@ -211,19 +216,38 @@ class NsrPaspoortController extends NsrController
 			if ($val['content_id'])
 			{
 				$rdf=$this->Rdf->getRdfValues($val['content_id']);
+				
 				foreach((array)$rdf as $rVal)
 				{
 					if ($rVal['predicate']=='hasPublisher')
-						$categories[$key]['rdf']['publisher']=$rVal['data'];
+					{
+						$categories[$key]['rdf']['publisher'][]=$rVal['data'];
+					}
 					if ($rVal['predicate']=='hasReference')
-						$categories[$key]['rdf']['reference']=$rVal['data'];
+					{
+						$categories[$key]['rdf']['reference'][]=$rVal['data'];
+					}
 					if ($rVal['predicate']=='hasAuthor')
-						$categories[$key]['rdf']['author']=$rVal['data'];
+					{
+						$categories[$key]['rdf']['author'][]=$rVal['data'];
+					}
 				}
-				
+
+				if (isset($categories[$key]['rdf']['publisher']))
+				{
+					$this->customSortArray($categories[$key]['rdf']['publisher'],array('key' => 'name'));
+				}
+				if (isset($categories[$key]['rdf']['reference']))
+				{
+					$this->customSortArray($categories[$key]['rdf']['reference'],array('key' => 'label'));
+				}
+				if (isset($categories[$key]['rdf']['author']))
+				{
+					$this->customSortArray($categories[$key]['rdf']['author'],array('key' => 'name'));
+				}
 			}
 		}
-		
+
 		$this->customSortArray($categories,array('key' => 'show_order'));
 
 		if (is_null($start)) $start=$firstNonEmpty;
@@ -294,6 +318,15 @@ class NsrPaspoortController extends NsrController
     }
 
 
+	private function doDeletePassportMeta($id)
+	{
+		if (empty($id)) return;
+
+		$this->Rdf->deleteRdfValue(array('subject_type'=>'passport','subject_id'=>$id,'predicate'=>'hasPublisher'));
+		$this->Rdf->deleteRdfValue(array('subject_type'=>'passport','subject_id'=>$id,'predicate'=>'hasReference'));
+		$this->Rdf->deleteRdfValue(array('subject_type'=>'passport','subject_id'=>$id,'predicate'=>'hasAuthor'));
+	}
+
 	private function savePassport($p)
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -362,12 +395,10 @@ class NsrPaspoortController extends NsrController
 			return;
 
 		/*
-			<option value="all">alle tabbladen</option>
 			<option value="all-text">alle tabbladen met tekst</option>
-			<option value="no-meta">tabbladen zonder meta-gegevens</option>
 			<option value="text-no-meta">tabbladen met tekst zonder meta-gegevens</option>
 
-			bestaande meta-gegevens van de geselecteerde tab(s) worden overschreven
+			bestaande meta-gegevens van de geselecteerde tab(s) worden overschreven!
 		*/
 		
 		$categories=$this->getPassportCategories();
@@ -378,27 +409,14 @@ class NsrPaspoortController extends NsrController
 			if ($val['obsolete']==1 && strlen($val['content'])==0)
 				continue;
 				
-			if ($updatereach="all")
-			{
-				// alle tabbladen
-				array_push($shouldUpdate,$val['content_id']);
-			}
-			else
-			if ($updatereach="all-text")
+			if ($updatereach=="all-text")
 			{
 				// alle tabbladen met tekst
 				if (strlen($val['content'])>0)
 					array_push($shouldUpdate,$val['content_id']);
 			}
 			else
-			if ($updatereach="no-meta")
-			{
-				// tabbladen zonder meta-gegevens
-				if (!isset($val['rdf']) || count((array)$val['rdf'])==0)
-					array_push($shouldUpdate,$val['content_id']);
-			}
-			else
-			if ($updatereach="text-no-meta")
+			if ($updatereach=="text-no-meta")
 			{
 				// tabbladen met tekst zonder meta-gegevens
 				if (
@@ -415,78 +433,65 @@ class NsrPaspoortController extends NsrController
 
 		}
 		
-		
-		q($p);
-		q($categories);
-		q($shouldUpdate);
-		
-
-die();
-
-
-
-/*
-
-
-					if ($rVal['predicate']=='hasPublisher')
-						$categories[$key]['rdf']['publisher']=$rVal['data'];
-					if ($rVal['predicate']=='hasReference')
-						$categories[$key]['rdf']['reference']=$rVal['data'];
-					if ($rVal['predicate']=='hasAuthor')
-						$categories[$key]['rdf']['author']=$rVal['data'];
-				}
-
-
-*/
-		
-		
-		$concept=$this->getConcept($taxon);
-		$before=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
-
-		if (empty($content))
+		foreach((array)$shouldUpdate as $val)
 		{
-			$r=$this->models->ContentTaxon->delete(array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id'=>$taxon,
-				'language_id'=>$this->getDefaultProjectLanguage(),
-				'page_id'=>$page
-			));
-
-			$this->logNsrChange(array('before'=>$before,'note'=>'deleted passport from '.$concept['taxon']));
-			return $r;
-
-		}
-		else
-		{
-			$d=$this->models->ContentTaxon->_get(array(
-				'id'=>array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id'=>$taxon,
-					'language_id'=>$this->getDefaultProjectLanguage(),
-					'page_id'=>$page
-				)
-			));
 			
-			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
-
-			$r=$this->models->ContentTaxon->save(array(
-				'id'=>$id,
-				'project_id'=>$this->getCurrentProjectId(),
-				'taxon_id'=>$taxon,
-				'language_id'=>$this->getDefaultProjectLanguage(),
-				'page_id'=>$page,
-				'content' => $content,
-				'publish' => $publish
-			));
+			$this->doDeletePassportMeta($val);
+		
+			$d=array(
+				'subject_type'=>'passport',
+				'subject_id'=>$val,
+			);
 			
-			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
+			foreach((array)$actors as $actor)
+			{
+				$d['predicate']='hasAuthor';
+				$d['object_type']='actor';
+				$d['object_id']=$actor;
+				$this->Rdf->saveRdfValue($d);
+			}
 
-			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport' : 'new passport').' from '.$concept['taxon']));
+			foreach((array)$organisations as $organisation)
+			{
+				$d['predicate']='hasPublisher';
+				$d['object_type']='actor';
+				$d['object_id']=$organisation;
+				$this->Rdf->saveRdfValue($d);
+			}
+
+			foreach((array)$references as $reference)
+			{
+				$d['predicate']='hasReference';
+				$d['object_type']='reference';
+				$d['object_id']=$reference;
+				$this->Rdf->saveRdfValue($d);
+			}
 			
-			return $r;
 			
 		}
 
 	}
+	
+	private function deletePassportMeta($p)
+	{
+		$tab=isset($p['tab']) ? $p['tab'] : null;
+
+		if (empty($tab)) return;
+
+		if ($tab=='*')
+		{
+			$categories=$this->getPassportCategories();
+			foreach((array)$categories as $val)
+			{
+				$this->doDeletePassportMeta($val['content_id']);
+			}
+		}
+		else
+		{
+			$this->doDeletePassportMeta($tab);
+		}
+		
+	}
+		
 
 }

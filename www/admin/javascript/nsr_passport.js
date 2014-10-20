@@ -198,6 +198,13 @@ function displayReferences()
 
 function doPassportMeta()
 {
+	var havedata=false;
+	$('[id^=actor_id] :selected').each(function(){ if($(this).val().length!=0) havedata=true; });
+	$('[id^=organisation_id] :selected').each(function(){ if($(this).val().length!=0) havedata=true; });
+	if (collectedreferences.length>0) havedata=true;
+
+	if (!havedata) return;
+	
 	for (var i in collectedreferences)
 	{
 		if (collectedreferences[i].id)
@@ -206,7 +213,14 @@ function doPassportMeta()
 	$('#theForm').submit();
 }
 
+function doDeleteMeta(id)
+{
+	if (id=='*' && !confirm('Weet u het zeker?')) return;
 
+	$('#action').val('delete');
+	$('#theForm').append('<input type="hidden" name="tab" value="'+id+'" />');
+	$('#theForm').submit();
+}
 
 
 
