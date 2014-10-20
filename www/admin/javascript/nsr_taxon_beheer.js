@@ -169,7 +169,7 @@ function storedata(ele)
 	setnewvalue({name:$(ele).attr('id'),value:$(ele).val()});
 }
 
-function checkmandatory()
+function checkMandatory()
 {
 	var result=true;
 	var buffer='Vul alle verplichte velden in:';
@@ -195,26 +195,155 @@ function checkmandatory()
 		}
 	}
 
-	if (!result)
-		alert(buffer);
+	if (!result) alert(buffer);
 
 	return result;
 }
 
-function checkcompletesets()
+var genusBaseRankid=null;
+var speciesBaseRankid=null;
+
+function checkNameAgainstRank()
 {
-	return true;
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	var ranklabel = $('#concept_rank_id :selected').text();
+
+	var p1=$('#name_uninomial').val().length;
+	var p2=$('#name_specific_epithet').val().length;
+	var p3=$('#name_infra_specific_epithet').val().length;
+
+	var result=true;
+	var buffer=[];
+
+	if (rank<genusBaseRankid)
+	{
+		if (p1==0) buffer.push("Uninomial is niet ingevuld.");
+		if (p2!=0) buffer.push("Een "+ranklabel+" kan geen soortsnaam bevatten.");
+		if (p3!=0) buffer.push("Een "+ranklabel+" kan geen derde naamdeel bevatten.");
+	}
+	else
+	if (rank>=genusBaseRankid && rank<speciesBaseRankid)
+	{
+		if (p1==0) buffer.push("Genus is niet ingevuld.");
+		if (p2!=0) buffer.push("Een "+ranklabel+" kan geen soortsnaam bevatten.");
+		if (p3!=0) buffer.push("Een "+ranklabel+" kan geen derde naamdeel bevatten.");
+	}
+	else
+	if (rank==speciesBaseRankid)
+	{
+		if (p1==0) buffer.push("Genus is niet ingevuld.");
+		if (p2==0) buffer.push("Soortsnaam is niet ingevuld.");
+		if (p3!=0) buffer.push("Een "+ranklabel+" kan geen derde naamdeel bevatten.");
+	}
+	else
+	if (rank>speciesBaseRankid)
+	{
+		if (p1==0) buffer.push("Genus is niet ingevuld.");
+		if (p2==0) buffer.push("Soortsnaam is niet ingevuld.");
+		if (p3==0) buffer.push("Derde naamdeel is niet ingevuld.");
+	}
+
+	if (buffer.length>0) alert(buffer.join("\n"));
+
+	return buffer.length==0;
 }
+
+function checkPresenceDataSpecies()
+{
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	var buffer=[];
+
+	if (rank>=speciesBaseRankid)
+	{
+		if ($('#presence_presence_id :selected').val()==-1)
+			buffer.push("Voorkomen: status is niet ingevuld.");
+
+		if ($('#presence_expert_id :selected').val()==-1)
+			buffer.push("Voorkomen: expert is niet ingevuld.");
+
+		if ($('#presence_organisation_id :selected').val()==-1)
+			buffer.push("Voorkomen: organisatie is niet ingevuld.");
+
+		if ($('#presence_reference_id').val().length==0)
+			buffer.push("Voorkomen: publicatie is niet ingevuld.");
+	}
+
+	if (buffer.length>0) alert(buffer.join("\n"));
+
+	return buffer.length==0;
+}
+
+function checkScientificName()
+{
+	var result=true;
+	var buffer=[];
+
+	if ($('#name_expert_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: expert");
+	if ($('#name_organisation_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: organisatie");
+	if ($('#name_reference_id').val().length==0) buffer.push("Wetenschappelijke naam: publicatie");
+
+	return buffer;
+}
+
+function checkDutchName()
+{
+	if ($('#dutch_name').val().length==0) return;
+
+	var buffer=[];
+
+	if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
+	if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");
+	if ($('#dutch_name_reference_id').val().length==0) buffer.push("Nederlandse naam: publicatie");
+
+	return buffer;
+}
+
+function checkPresenceDataHT()
+{
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	
+	if (rank>=speciesBaseRankid) return;
+	
+	var buffer=[];
+
+	var p1=$('#presence_presence_id :selected').val()==-1;
+	var p2=$('#presence_expert_id :selected').val()==-1;
+	var p3=$('#presence_organisation_id :selected').val()==-1;
+	var p4=$('#presence_reference_id').val().length==0;
+		
+	if ((p1 && p2 && p3 && p4)!=true)
+	{
+		if (p1) buffer.push("Voorkomen: status is niet ingevuld.");
+		if (p2) buffer.push("Voorkomen: expert is niet ingevuld.");
+		if (p3) buffer.push("Voorkomen: organisatie is niet ingevuld.");
+		if (p4) buffer.push("Voorkomen: publicatie is niet ingevuld.");
+	}
+
+	return buffer;
+}
+
 
 function savedataform()
 {
-	//console.dir(values);return;
-	
-	if (!checkmandatory())
-		return;
+	// lethal checks
+//	if (!checkMandatory()) return;
+//	if (!checkNameAgainstRank()) return;
+//	if (!checkPresenceDataSpecies()) return;
 
-	if (!checkcompletesets())
-		return;
+	// warnings
+	var notifications=[];
+	notifications=notifications.concat(
+		checkScientificName(),
+		checkDutchName(),
+		checkPresenceDataHT()
+	);
+	
+	if (notifications.length>0)
+	{
+		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
+	}
+	
+return;
 	
 	form = $("<form method=post></form>");
 	form.append('<input type="hidden" name="action" value="save" />');
@@ -613,8 +742,6 @@ function checkunsavedvalues()
 
 }
 
-
-
 function getinheritablename()
 {
 	$.ajax({
@@ -630,7 +757,6 @@ function getinheritablename()
 
 }
 
-
 function doDelete(msg)
 {
 	if (confirm(msg ? msg : "Weet u het zeker?"))
@@ -639,7 +765,6 @@ function doDelete(msg)
 		$( '#theForm' ).submit();
 	}
 }
-
 
 function dropListDialog(ele,title)
 {	
@@ -654,10 +779,9 @@ function dropListDialog(ele,title)
 	});
 
 	$('#'+id).attr('autocomplete','off').bind('keyup', function(e) { 
-		doNsrDropList({ e:e, id: $(this).attr('id') } )
+		doNsrDropList({ e:e, id: $(this).attr('id'), target: target } )
 	});	
 }
-
 
 function doNsrDropList(p)
 {
@@ -668,7 +792,7 @@ function doNsrDropList(p)
 	// value (entered text)
 	var value=element.val();
 	// minimal length of value to trigger list
-	var minlength=element.attr('droplistminlength') ? element.attr('droplistminlength') : 1;
+	var minlength=$('#'+p.target).attr('droplistminlength') ? $('#'+p.target).attr('droplistminlength') : 1;
 
 	if (value.length<minlength)
 		return;

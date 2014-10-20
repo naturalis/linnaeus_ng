@@ -177,7 +177,7 @@ class NsrTaxonController extends NsrController
 		{
 			$concept=$this->getConcept($this->rGetId());
 
-			$this->doNameReferentialChecks($this->getConceptId());
+			$this->doNameReferentialChecks($this->getConcept($this->getConceptId()));
 
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('names',$this->getNames($concept));
@@ -2132,13 +2132,14 @@ class NsrTaxonController extends NsrController
 
 	private function doNameReferentialChecks($concept)
 	{
-		if (!$this->checkIfConceptRetainsScientificName($concept))
+		if (!$this->checkIfConceptRetainsScientificName($concept['id']))
 		{
-			$this->addWarning("Aan concept is geen wetenschappelijke naam gekoppeld.");
+			$this->addWarning("Aan dit concept is geen wetenschappelijke naam gekoppeld.");
 		}
-		if (!$this->checkIfConceptRetainsDutchName($concept))
+		
+		if (!$this->checkIfConceptRetainsDutchName($concept['id']) && $concept['base_rank']>=SPECIES_RANK_ID)
 		{
-			$this->addWarning("Aan concept is geen Nederlandse voorkeursnaam gekoppeld.");
+			$this->addWarning("Aan dit concept is geen Nederlandse voorkeursnaam gekoppeld.");
 		}
 	}
 
