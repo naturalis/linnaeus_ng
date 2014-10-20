@@ -145,46 +145,55 @@ function saveeditordata(caller)
 }
 
 
-var collectedreferences=Array();
+var collectedreferences=[];
 
 function collectReferences(val)
 {
-	collectedreferences.push( { id:val,label:$('#reference').text() } );
+	var exists=false;
+	for (var j in collectedreferences)
+	{
+		if (collectedreferences[j].id==val)
+		{
+			exists=true;
+		}
+	}
+	if (!exists)
+	{
+		collectedreferences.push( { id:val,label:$('#reference').text() } );
+	}
+
 	displayReferences();
 }
 
 function removeReference(i)
 {
-	var temp=new Array();
+	var index=-1;
 	for (var j in collectedreferences)
 	{
-		if (i==j) continue;
-		temp.push(collectedreferences[j]);
+		if (collectedreferences[j].id==i)
+		{
+			var index=j;
+		}
 	}
-
-	while(collectedreferences.length > 0)
+	if (index>-1)
 	{
-		collectedreferences.pop();
+		collectedreferences.splice(index, 1);
 	}
 
-	collectedreferences=temp.slice(0);
 	displayReferences();
 }
 
 function displayReferences()
 {
-	var buffer=new Array;
+	var buffer=[]
 	
 	for (var i in collectedreferences)
 	{
-		if (collectedreferences[i].id)
-			buffer[i]=collectedreferences[i].label+' <a href="#" class="edit" onclick="removeReference('+i+');return false;">verwijderen</a>';
+		var ele=collectedreferences[i];
+		buffer[i]=ele.label+' <a href="#" class="edit" onclick="removeReference('+ele.id+');return false;">verwijderen</a>';
 	}
 
-	$('#references').html(buffer.length>0 ? '<ul><li>'+buffer.join('</li><li>')+'</li></ul>' : '');
-	
-	console.dir(collectedreferences);
-	
+	$('#references').html(buffer.length>0 ? '<ul><li>'+buffer.join('</li><li>')+'</li></ul>' : '');	
 }
 
 function doPassportMeta()
