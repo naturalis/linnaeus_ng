@@ -4,7 +4,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="{$session.app.project.keywords}" />
 	<meta name="description" content="{$session.app.project.description}" />
-	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 {snippet}nsr_development_no_follow.html{/snippet}
 
