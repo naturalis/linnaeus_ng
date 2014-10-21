@@ -186,7 +186,8 @@ class Controller extends BaseClass
         'variation_label',
         'taxon_variation',
         'taxa_relations',
-		'names'
+		'names',
+		'trash_can'
     );
     private $usedHelpersBase = array(
         'logging_helper',
@@ -557,6 +558,13 @@ class Controller extends BaseClass
 				_b.rank_id as base_rank_id
 			from %PRE%taxa _a
 
+		".($this->models->TrashCan->getTableExists() ? "
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+			" : "")."
+
 			left join %PRE%projects_ranks _b
 				on _a.project_id=_b.project_id
 				and _a.rank_id=_b.id
@@ -576,7 +584,8 @@ class Controller extends BaseClass
 					)
 			where
 				_a.id=".$id."
-				and _a.project_id=".$this->getCurrentProjectId()
+				and _a.project_id=".$this->getCurrentProjectId()."
+				".($this->models->TrashCan->getTableExists() ? " and ifnull(_trash.is_deleted,0)=0" : "")
 		);
 
 		$taxon=$t[0];

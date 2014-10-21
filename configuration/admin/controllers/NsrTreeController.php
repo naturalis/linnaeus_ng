@@ -68,10 +68,12 @@ class NsrTreeController extends NsrController
         if (!$this->rHasVal('action'))
             return;
 
+		/*
         if ($this->requestData['action'] == 'get_lookup_list')
 		{
             $return=$this->getLookupList($this->requestData);
         } else
+		*/
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
 			$return=json_encode($this->getTreeNode($this->requestData));
@@ -101,6 +103,7 @@ class NsrTreeController extends NsrController
         $this->printPage('ajax_interface');
     }
 
+	/*
     private function getLookupList($p)
     {
         $search=isset($p['search']) ? $p['search'] : null;
@@ -131,23 +134,25 @@ class NsrTreeController extends NsrController
 				from
 					%PRE%names _a
 
-				left join
-					%PRE%taxa _b
-						on _a.project_id=_b.project_id
-						and _a.taxon_id=_b.id
+				left join %PRE%taxa _b
+					on _a.project_id=_b.project_id
+					and _a.taxon_id=_b.id
 
-				left join
-					%PRE%projects_ranks _c
-						on _b.project_id=_c.project_id
-						and _b.rank_id=_c.id
+				left join %PRE%trash_can _trash
+					on _b.project_id = _trash.project_id
+					and _b.id = _trash.lng_id
+					and _trash.item_type='taxon'
 
-				left join
-					%PRE%ranks _d
+				left join %PRE%projects_ranks _c
+					on _b.project_id=_c.project_id
+					and _b.rank_id=_c.id
+
+				left join %PRE%ranks _d
 					on _c.rank_id=_d.id
-
 
 				where
 					_a.project_id =  ".$this->getCurrentProjectId()."
+					and ifnull(_trash.is_deleted,0)=0
 					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 					and _a.type_id != ".
 						(
@@ -169,17 +174,21 @@ class NsrTreeController extends NsrController
 			from
 				%PRE%taxa _b
 
-			left join
-				%PRE%projects_ranks _d
-					on _b.project_id=_d.project_id
-					and _b.rank_id=_d.id
+			left join %PRE%trash_can _trash
+				on _b.project_id = _trash.project_id
+				and _b.id = _trash.lng_id
+				and _trash.item_type='taxon'
 
-			left join
-				%PRE%ranks _e
+			left join %PRE%projects_ranks _d
+				on _b.project_id=_d.project_id
+				and _b.rank_id=_d.id
+
+			left join %PRE%ranks _e
 				on _d.rank_id=_e.id
 
 			where
 				_b.project_id = ".$this->getCurrentProjectId()."
+				and ifnull(_trash.is_deleted,0)=0
 				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 
 			) as unification
@@ -219,6 +228,7 @@ class NsrTreeController extends NsrController
 			));
 
     }
+	*/
 
 	private function restoreTree()
 	{
@@ -238,6 +248,11 @@ class NsrTreeController extends NsrController
 				_r.rank
 			from
 				%PRE%taxa _a
+
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
 					
 			left join %PRE%projects_ranks _p
 				on _a.project_id=_p.project_id
@@ -248,6 +263,7 @@ class NsrTreeController extends NsrController
 
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()." 
+				and ifnull(_trash.is_deleted,0)=0
 				and _a.parent_id is null
 				and _r.id < 10
 
@@ -296,6 +312,11 @@ class NsrTreeController extends NsrController
 				from
 					%PRE%taxa _a
 
+				left join %PRE%trash_can _trash
+					on _a.project_id = _trash.project_id
+					and _a.id = _trash.lng_id
+					and _trash.item_type='taxon'
+	
 				left join %PRE%projects_ranks _p
 					on _a.project_id=_p.project_id
 					and _a.rank_id=_p.id
@@ -326,6 +347,7 @@ class NsrTreeController extends NsrController
 	
 				where 
 					_a.project_id = ".$this->getCurrentProjectId()." 
+					and ifnull(_trash.is_deleted,0)=0
 					and (_a.id = ".$node." or _a.parent_id = ".$node.")
 
 				order by
@@ -342,10 +364,22 @@ class NsrTreeController extends NsrController
 					select
 						count(*) as total
 					from
-						%PRE%taxon_quick_parentage
+						%PRE%taxon_quick_parentage _sq
+
+					left join %PRE%taxa _e
+						on _sq.taxon_id = _e.id
+						and _sq.project_id = _e.project_id
+
+					left join %PRE%trash_can _trash
+						on _e.project_id = _trash.project_id
+						and _e.id = _trash.lng_id
+						and _trash.item_type='taxon'
+
+
 					where 
-						project_id = ".$this->getCurrentProjectId()." 
-						and MATCH(parentage) AGAINST ('".$val['id']."' in boolean mode)
+						_sq.project_id = ".$this->getCurrentProjectId()." 
+						and ifnull(_trash.is_deleted,0)=0
+						and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
 					");
 					
 				$val['child_count']['taxon']=$d[0]['total'];
@@ -375,6 +409,11 @@ class NsrTreeController extends NsrController
 						left join %PRE%taxa _e
 							on _sq.taxon_id = _e.id
 							and _sq.project_id = _e.project_id
+
+						left join %PRE%trash_can _trash
+							on _e.project_id = _trash.project_id
+							and _e.id = _trash.lng_id
+							and _trash.item_type='taxon'
 						
 						left join %PRE%projects_ranks _f
 							on _e.rank_id=_f.id
@@ -382,11 +421,11 @@ class NsrTreeController extends NsrController
 						
 						where
 							_sq.project_id=".$this->getCurrentProjectId()."
+							and ifnull(_trash.is_deleted,0)=0
 							and _sp.presence_id is not null
 							and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-
 							and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
-							
+
 						group by _sr.established",
 					'fieldAsIndex' =>"established"
 					)
@@ -441,10 +480,17 @@ class NsrTreeController extends NsrController
 					select
 						count(*) as total
 					from
-						%PRE%taxa
+						%PRE%taxa _a
+
+					left join %PRE%trash_can _trash
+						on _a.project_id = _trash.project_id
+						and _a.id = _trash.lng_id
+						and _trash.item_type='taxon'
+
 					where 
-						project_id = ".$this->getCurrentProjectId()." 
-						and parent_id = ".$val['id']
+						_a.project_id = ".$this->getCurrentProjectId()." 
+						and ifnull(_trash.is_deleted,0)=0
+						and _a.parent_id = ".$val['id']
 					);
 					
 				$val['has_children']=$d[0]['total']>0;

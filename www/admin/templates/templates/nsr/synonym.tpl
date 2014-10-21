@@ -7,6 +7,7 @@
 
 <p>
 <form id="data" onsubmit="return false;">
+<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 <input type="hidden" id="name_language_id" name="name_language_id" value="{$name.name_language_id}" new="{$smarty.const.LANGUAGE_ID_SCIENTIFIC}" />
 
 	<table>

@@ -12,8 +12,9 @@
 <p>
 	taken:<br />
 	<a href="taxon_new.php">nieuw taxonconcept maken</a><br />
+	<a href="taxon_deleted.php">verwijderde taxonconcepten</a><br />
+	<a href="activity_log.php">editor log</a><br /><br />
 	<a href="../import/export_nsr.php">export voor NDA</a> (experimenteel)<br />
-	<a href="activity_log.php">editor log</a>
 </p>
 </div>
 

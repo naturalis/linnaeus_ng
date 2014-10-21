@@ -11,6 +11,7 @@
 <p>
 <form>
 <input type="hidden" id="taxon_id" value="{$concept.id}" />
+<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	<ul>
     {assign var=hasObsolete value=false}
 	{foreach from=$tabs item=v key=k}

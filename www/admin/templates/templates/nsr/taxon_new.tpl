@@ -5,6 +5,7 @@
 <h2>nieuw concept</h2><span id="timer"></span>
 
 <form id="data" onsubmit="return false;">
+<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 <p>
 
 	<table>

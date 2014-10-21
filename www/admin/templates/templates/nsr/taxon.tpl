@@ -20,8 +20,12 @@
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">conceptkaart:</span> {$concept.taxon}</h2>
+{if $concept.is_deleted}<span style="color:red;font-weight:bold">CONCEPT IS GEMARKEERD ALS VERWIJDERD</span><br />
+<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">verwijdering ongedaan maken</a>
+{/if}
 
 <form id="data" onsubmit="return false;">
+<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 
 <p>
 	
@@ -187,12 +191,19 @@
 	{/if}
 </p>
 <p>
-	<a href="paspoort.php?id={$concept.id}" class="edit"  style="margin:0">paspoort</a><br />
+	<a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">paspoort</a><br />
 
-	<a href="images.php?id={$concept.id}" class="edit"  style="margin:0">afbeeldingen</a><br />
+	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">afbeeldingen</a><br />
 		
 	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
+{if !$concept.is_deleted}
+<br />
+<a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">taxon markeren als verwijderd</a>
+{/if}
 
+</p>
+
+<p>
 </p>
 
 </div>
@@ -201,7 +212,12 @@
 
 <div class="page-generic-div">
     <p>
-        <a href="index.php">terug</a>
+{if $concept.is_deleted}
+    <a href="taxon_deleted.php" style="margin:0">overzicht verwijderde taxa</a><br />
+    <a href="index.php">index</a>
+{else}
+    <a href="index.php">terug</a>
+{/if}
     </p>
     
     <!-- p>

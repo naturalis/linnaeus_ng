@@ -72,6 +72,7 @@ class SearchControllerNSR extends SearchController
 
     public function searchExtendedAction()
     {
+	
 		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('search',$this->requestData);	
@@ -308,6 +309,12 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
+
+
+			left join %PRE%trash_can _trash
+				on _e.project_id = _trash.project_id
+				and _e.id =  _trash.lng_id
+				and _trash.item_type='taxon'
 				
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
@@ -357,6 +364,7 @@ class SearchControllerNSR extends SearchController
 					'".PREDICATE_BASIONYM."',
 					'".PREDICATE_MISSPELLED_NAME."'
 				)
+				and ifnull(_trash.is_deleted,0)=0
 			
 			group by _a.taxon_id
 
@@ -400,10 +408,14 @@ class SearchControllerNSR extends SearchController
 	{
 		$d=null;
 		if (!empty($p['group_id']))
+		{
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
+		}
 		else
 		if (!empty($p['group']))
+		{
 			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
+		}
 
 		if ($d) 
 			$ancestor=$d[0];
@@ -420,7 +432,8 @@ class SearchControllerNSR extends SearchController
 
 		if (!empty($p['author'])) $auth=$p['author'];
 
-		if (!empty($p['presence'])) {
+		if (!empty($p['presence']))
+		{
 			$pres=array();
 			foreach((array)$p['presence'] as $key=>$val) {
 				if ($val=='on') $pres[]=intval($key);
@@ -446,6 +459,11 @@ class SearchControllerNSR extends SearchController
 				_l.file_name as overview_image
 			
 			from %PRE%taxa _a
+
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id =  _trash.lng_id
+				and _trash.item_type='taxon'
 
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
@@ -486,14 +504,16 @@ class SearchControllerNSR extends SearchController
 			
 			". ($dna ? "
 				left join
-				(select project_id,taxon_id,count(*) as number_of_barcodes from %PRE%dna_barcodes group by project_id,taxon_id) as _j
+				(select project_id,taxon_id,count(*) as number_of_barcodes 
+					from %PRE%dna_barcodes group by project_id,taxon_id) as _j
 					on _a.id=_j.taxon_id
 					and _j.project_id=_a.project_id" :  "" 
 				)."
 
 			". ($trend ? "
 				left join
-				(select project_id,taxon_id,count(*) as number_of_trend_years from %PRE%taxon_trend_years group by project_id,taxon_id) as _trnd
+				(select project_id,taxon_id,count(*) as number_of_trend_years 
+					from %PRE%taxon_trend_years group by project_id,taxon_id) as _trnd
 					on _a.id=_trnd.taxon_id
 					and _trnd.project_id=_a.project_id" :  "" 
 				)."
@@ -546,6 +566,7 @@ class SearchControllerNSR extends SearchController
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.lower_taxon=1
+				and ifnull(_trash.is_deleted,0)=0
 			".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)" : "")."
 			".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
 			".(isset($auth) ? "and _m.authorship like '". mysql_real_escape_string($auth)."%'" : "")."
@@ -582,7 +603,13 @@ class SearchControllerNSR extends SearchController
 			$data[$key]['overview_image']=$img[0]['file_name'];
 		}
 
-		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resSpeciesPerPage,'ancestor'=>isset($ancestor) ? $ancestor : null);
+		return 
+			array(
+				'count'=>$count[0]['total'],
+				'data'=>$data,
+				'perpage'=>$this->_resSpeciesPerPage,
+				'ancestor'=>isset($ancestor) ? $ancestor : null
+			);
 	}
 
 	private function getPhotographersPictureCount($p=null)
@@ -629,10 +656,9 @@ class SearchControllerNSR extends SearchController
 				)
 			);
 			
-			foreach((array)$photographers as $key=>$val) {
-				
+			foreach((array)$photographers as $key=>$val)
+			{
 				$photographers[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
-				
 			}
 			
 			$this->saveCache('search-photographer-count',$photographers);
@@ -641,7 +667,8 @@ class SearchControllerNSR extends SearchController
 
 		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
 
-		if (!empty($limit) && $limit<count((array)$photographers)) {
+		if (!empty($limit) && $limit<count((array)$photographers))
+		{
 			$photographers=array_slice($photographers,0,$limit);
 		}
 		
@@ -672,7 +699,8 @@ class SearchControllerNSR extends SearchController
 					
 					where
 						_a.project_id=".$this->getCurrentProjectId()."
-					group by _b.meta_data",
+					group by
+						_b.meta_data",
 				'fieldAsIndex'=>'meta_data'
 				)
 			);
@@ -694,10 +722,9 @@ class SearchControllerNSR extends SearchController
 				)
 			);
 			
-			foreach((array)$validators as $key=>$val) {
-				
+			foreach((array)$validators as $key=>$val)
+			{
 				$validators[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
-				
 			}
 			
 			$this->saveCache('search-validator-count',$validators);
@@ -706,7 +733,8 @@ class SearchControllerNSR extends SearchController
 
 		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
 
-		if (!empty($limit) && $limit<count((array)$validators)) {
+		if (!empty($limit) && $limit<count((array)$validators))
+		{
 			$validators=array_slice($validators,0,$limit);
 		}
 
@@ -717,36 +745,45 @@ class SearchControllerNSR extends SearchController
 	{
 		$group_id=null;
 
-		if (empty($p['group_id']) && !empty($p['group'])) {
+		if (empty($p['group_id']) && !empty($p['group']))
+		{
 			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
-			if ($d) 
-				$group_id=$d[0];
+			if ($d) $group_id=$d[0];
 		} else
-		if (!empty($p['group_id'])) {
+		if (!empty($p['group_id']))
+		{
 			$group_id=intval($p['group_id']);
 		}
 
-		if (!empty($p['photographer'])) {
+		if (!empty($p['photographer']))
+		{
 			$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
 		}
 
-		if (!empty($p['validator'])) {
+		if (!empty($p['validator']))
+		{
 			$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
 		}
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		
 
 		$sort="_meta4.meta_date desc";
 		
 		if (isset($p['sort']) && $p['sort']=='photographer')
+		{
 			$sort="_c.meta_data asc";
+		}
 		else
 		if (isset($p['sort']))
+		{
 			$sort=$p['sort'];
+		}
+
 		if (!empty($p['photographer']) || !empty($p['validator']))
+		{
 			$sort="_meta4.meta_date desc, _k.taxon";
+		}
 
 		$data=$this->models->MediaTaxon->freeQuery("		
 			select
@@ -788,7 +825,12 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%taxa _k
 				on _m.taxon_id=_k.id
 				and _m.project_id=_k.project_id
-				
+
+			left join %PRE%trash_can _trash
+				on _k.project_id = _trash.project_id
+				and _k.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+
 			left join %PRE%projects_ranks _f
 				on _k.rank_id=_f.id
 				and _k.project_id=_f.project_id
@@ -861,7 +903,8 @@ class SearchControllerNSR extends SearchController
 			where _m.project_id = ".$this->getCurrentProjectId()."
 
 				and ifnull(_meta9.meta_data,0)!=1
-			
+				and ifnull(_trash.is_deleted,0)=0
+		
 				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
 				".(!empty($p['name']) && empty($p['name']) ?
 					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
@@ -876,7 +919,7 @@ class SearchControllerNSR extends SearchController
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 		
 		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
-		
+
 	}
 
 	private function formatPictureResults($data)
@@ -943,6 +986,11 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
+
+			left join %PRE%trash_can _trash
+				on _e.project_id = _trash.project_id
+				and _e.id =  _trash.lng_id
+				and _trash.item_type='taxon'
 				
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
@@ -972,6 +1020,7 @@ class SearchControllerNSR extends SearchController
 			where 
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.lower_taxon!=1
+				and ifnull(_trash.is_deleted,0)=0
 				and 
 				".$clause."
 				and (
@@ -1080,19 +1129,6 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName($p)
 	{
-		$d=$this->models->NameTypes->_get(
-			array(
-				'id'=>array(
-				 	'project_id' => $this->getCurrentProjectId(),
-					'nametype' => PREDICATE_PREFERRED_NAME,
-					'language_id' => $this->getCurrentLanguageId()
-				),
-				'columns'=>'id'
-			)
-		);
-		
-		$typeId=$d[0]['id'];
-
 		$d=$this->models->MediaTaxon->freeQuery("
 			select
 				distinct 
@@ -1105,6 +1141,11 @@ class SearchControllerNSR extends SearchController
 				on _a.taxon_id = _d.id
 				and _a.project_id = _d.project_id
 
+			left join %PRE%trash_can _trash
+				on _d.project_id = _trash.project_id
+				and _d.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+
 			right join %PRE%media_taxon _b
 				on _a.taxon_id = _b.taxon_id
 				and _a.project_id = _b.project_id
@@ -1112,24 +1153,21 @@ class SearchControllerNSR extends SearchController
 			left join %PRE%names _c
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
-				and _c.type_id=".$typeId."
+				and _c.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _c.language_id=".$this->getCurrentLanguageId()."
 			
-			left join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-			
 			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
+				on _d.rank_id=_f.id
+				and _d.project_id = _f.project_id
 
 			left join %PRE%labels_projects_ranks _g
-				on _e.rank_id=_g.project_rank_id
-				and _e.project_id = _g.project_id
+				on _d.rank_id=_g.project_rank_id
+				and _d.project_id = _g.project_id
 				and _g.language_id=".$this->getCurrentLanguageId()."
 
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()."
+				and ifnull(_trash.is_deleted,0)=0
 				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and _a.name like '". mysql_real_escape_string($p['search']) ."%'
 				and (_a.language_id=".$this->getCurrentLanguageId()." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")

@@ -54,22 +54,29 @@ class TreeController extends Controller
 
 	public function treeAction()
 	{
-
+		/*
 		header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
 		header('Last-Modified: ' . gmdate( 'D, d M Y H:i:s') . ' GMT');
 		header('Cache-Control: no-store, no-cache, must-revalidate');
 		header('Cache-Control: post-check=0, pre-check=0', false);
 		header('Pragma: no-cache'); 
-	
+		*/
+
 		$tree=$this->restoreTree();
 
 		if (is_null($tree))
+		{
 			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
+		}
 		else
+		{
 			$this->smarty->assign('tree',json_encode($tree));
+		}
 	
 		if ($this->rHasVar('expand'))
+		{
 			$this->smarty->assign('expand',(int)$this->rGetVal('expand'));
+		}
 
 		$this->printPage('tree');
 	}
@@ -119,6 +126,11 @@ class TreeController extends Controller
 				_r.rank
 			from
 				%PRE%taxa _a
+
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
 					
 			left join %PRE%projects_ranks _p
 				on _a.project_id=_p.project_id
@@ -129,6 +141,7 @@ class TreeController extends Controller
 
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()." 
+				and ifnull(_trash.is_deleted,0)=0
 				and _a.parent_id is null
 				and _r.id < 10
 
@@ -176,6 +189,11 @@ class TreeController extends Controller
 				from
 					%PRE%taxa _a
 
+				left join %PRE%trash_can _trash
+					on _a.project_id = _trash.project_id
+					and _a.id = _trash.lng_id
+					and _trash.item_type='taxon'
+
 				left join %PRE%projects_ranks _p
 					on _a.project_id=_p.project_id
 					and _a.rank_id=_p.id
@@ -206,6 +224,7 @@ class TreeController extends Controller
 	
 				where 
 					_a.project_id = ".$this->getCurrentProjectId()." 
+					and ifnull(_trash.is_deleted,0)=0
 					and (_a.id = ".$node." or _a.parent_id = ".$node.")
 
 				order by
@@ -222,10 +241,21 @@ class TreeController extends Controller
 					select
 						count(*) as total
 					from
-						%PRE%taxon_quick_parentage
+						%PRE%taxon_quick_parentage _sq
+
+						left join %PRE%taxa _e
+							on _sq.taxon_id = _e.id
+							and _sq.project_id = _e.project_id
+
+						left join %PRE%trash_can _trash
+							on _e.project_id = _trash.project_id
+							and _e.id = _trash.lng_id
+							and _trash.item_type='taxon'
+
 					where 
-						project_id = ".$this->getCurrentProjectId()." 
-						and MATCH(parentage) AGAINST ('".$val['id']."' in boolean mode)
+						_sq.project_id = ".$this->getCurrentProjectId()." 
+						and ifnull(_trash.is_deleted,0)=0
+						and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
 					");
 					
 				$val['child_count']['taxon']=$d[0]['total'];
@@ -255,13 +285,19 @@ class TreeController extends Controller
 						left join %PRE%taxa _e
 							on _sq.taxon_id = _e.id
 							and _sq.project_id = _e.project_id
-						
+
+						left join %PRE%trash_can _trash
+							on _e.project_id = _trash.project_id
+							and _e.id = _trash.lng_id
+							and _trash.item_type='taxon'
+
 						left join %PRE%projects_ranks _f
 							on _e.rank_id=_f.id
 							and _e.project_id = _f.project_id
 						
 						where
 							_sq.project_id=".$this->getCurrentProjectId()."
+							and ifnull(_trash.is_deleted,0)=0
 							and _sp.presence_id is not null
 							and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
 							and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
@@ -320,10 +356,17 @@ class TreeController extends Controller
 					select
 						count(*) as total
 					from
-						%PRE%taxa
+						%PRE%taxa _a
+
+					left join %PRE%trash_can _trash
+						on _a.project_id = _trash.project_id
+						and _a.id = _trash.lng_id
+						and _trash.item_type='taxon'
+
 					where 
-						project_id = ".$this->getCurrentProjectId()." 
-						and parent_id = ".$val['id']
+						_a.project_id = ".$this->getCurrentProjectId()." 
+						and ifnull(_trash.is_deleted,0)=0
+						and _a.parent_id = ".$val['id']
 					);
 					
 				$val['has_children']=$d[0]['total']>0;
