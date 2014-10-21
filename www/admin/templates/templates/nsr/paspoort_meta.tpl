@@ -29,7 +29,7 @@ select {
 <h3>paspoorten (meta-gegevens)</h3>
 
 <form method="post" id="theForm">
-<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 <input type="hidden" id="action" name="action" value="save" />
 <input type="hidden" id="taxon_id" name="taxon_id" value="{$concept.id}" />
 

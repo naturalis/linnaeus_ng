@@ -1,16 +1,6 @@
 <?php
 
 /*
-	to do:
-	implement revert
-
-			// for revert:
-			$data=$this->requestData;
-			unset($data['id']);
-			unset($data['action']);
-			$this->smarty->assign('data',$data);
-
-
 	notes:
 
 	augustus 2014
@@ -39,7 +29,8 @@ class NsrTaxonController extends NsrController
 		'nsr_ids',
 		'taxon_quick_parentage',
 		'media_taxon',
-		'media_meta'
+		'media_meta',
+		'trash_can'
     );
     public $usedHelpers = array(
     );
@@ -149,18 +140,25 @@ class NsrTaxonController extends NsrController
 
         $this->setPageName($this->translate('Edit taxon concept'));
 	
-		if ($this->rHasId() && $this->rHasVal('action','delete'))
+		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
-			//$this->setConceptId($this->rGetId());
-			//$this->deleteVanAllesEnNogWat();
-			//$this->deleteConcept();
+			$this->setConceptId($this->rGetId());
+			$this->toggleConceptDeleted(true);
 			//$this->logNsrChange(array('before'=>'???','after'=>'???','note'=>'deleted concept'));
-			//$this->setMessage('Concept verwijderd.');
-			//$this->resetTree();
-			//$this->redirect('index.php');
+			$this->setMessage('Concept gemarkeerd als verwijderd.');
+			$this->resetTree();
 		} 
 		else
-		if ($this->rHasId() && $this->rHasVal('action','save'))
+		if ($this->rHasId() && $this->rHasVal('action','undelete') && !$this->isFormResubmit())
+		{
+			$this->setConceptId($this->rGetId());
+			$this->toggleConceptDeleted(false);
+			//$this->logNsrChange(array('before'=>'???','after'=>'???','note'=>'deleted concept'));
+			$this->setMessage('Concept niet langer gemarkeerd als verwijderd.');
+			$this->resetTree();
+		} 
+		else
+		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->setConceptId($this->rGetId());
 			$this->updateConcept();
@@ -314,6 +312,14 @@ class NsrTaxonController extends NsrController
 		$this->smarty->assign('images',$this->getTaxonMedia());
 
 		$this->checkMessage();
+		$this->printPage();
+	}
+
+    public function taxonDeletedAction()
+    {
+		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Taxa marked as deleted'));
+		$this->smarty->assign('concepts',$this->getSpeciesList(array('have_deleted'=>'only')));
 		$this->printPage();
 	}
 
@@ -957,11 +963,14 @@ class NsrTaxonController extends NsrController
         $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
         $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
 		$limit=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
+        $haveDeleted = isset($p['have_deleted']) ? $p['have_deleted'] : 'no'; // yes, no, only
 		
 		$search=trim($search);
 		
-		if (empty($search) && empty($id))
+		if (empty($search) && empty($id) && $haveDeleted!='only')
+		{
 			return null;
+		}
 
 		$taxa=$this->models->Names->freeQuery("
 			select
@@ -973,7 +982,6 @@ class NsrTaxonController extends NsrController
 				_q.rank as rank,
 				_a.uninomial,
 				_a.specific_epithet,
-				
 				_b.nametype,
 	
 				case
@@ -989,13 +997,20 @@ class NsrTaxonController extends NsrController
 				case
 					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
 					else 50
-				end as adjusted_rank
+				end as adjusted_rank,
+				
+				ifnull(_trash.is_deleted,0) as is_deleted
 			
 			from %PRE%names _a
 			
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
+
+			left join %PRE%trash_can _trash
+				on _e.project_id = _trash.project_id
+				and _e.id = _trash.lng_id
+				and _trash.item_type='taxon'
 				
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
@@ -1030,8 +1045,9 @@ class NsrTaxonController extends NsrController
 			".($rankAbove ? "and _f.rank_id < ".$rankAbove : "" )."
 			".($rankEqualAbove ? "and _f.rank_id <= ".$rankEqualAbove : "" )."
 			".($id ? "and _a.taxon_id = ".$id : "" )."
-
 			".($nametype ? "and _b.nametype = ".$nametype : "" )."
+			".($haveDeleted=='no' ? "and ifnull(_trash.is_deleted,0)=0" :  "" )."
+			".($haveDeleted=='only' ? "and ifnull(_trash.is_deleted,0)=1" : "" )."
 			
 			group by _a.taxon_id
 
@@ -1113,149 +1129,6 @@ class NsrTaxonController extends NsrController
 
 		return $inheritableName;
 
-	}
-
-    private function getSpeciesList_ORG($p)
-    {
-        $search=isset($p['search']) ? $p['search'] : null;
-        $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
-        $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
-        $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
-        $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
-        $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
-        $id=isset($p['id']) ? (int)$p['id'] : null;
-
-        //if (empty($search) && !$getAll)
-        if (empty($search) && empty($id)) return;
-
-        $taxa = $this->models->Taxon->freeQuery("
-			select * from
-			(
-			". ($taxaOnly ? "" : "
-
-				select
-					_a.taxon_id as id,
-					_a.name as label,
-					_a.uninomial,
-					_a.specific_epithet,
-					_b.rank_id,
-					_c.rank_id as base_rank_id,
-					_b.taxon as taxon,
-					'names' as source,
-					_d.rank
-				from
-					%PRE%names _a
-
-				left join
-					%PRE%taxa _b
-						on _a.project_id=_b.project_id
-						and _a.taxon_id=_b.id
-
-				left join
-					%PRE%projects_ranks _c
-						on _b.project_id=_c.project_id
-						and _b.rank_id=_c.id
-
-				left join
-					%PRE%ranks _d
-					on _c.rank_id=_d.id
-
-
-				where
-					_a.project_id =  ".$this->getCurrentProjectId()."
-					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-					and _a.type_id != ".
-						(
-							isset($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ?
-								$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1
-						)."
-				union
-
-			")."
-
-			select
-				_b.id,
-				_b.taxon as label,
-
-					_a.uninomial,
-					_a.specific_epithet,
-
-				_b.rank_id,
-				_d.rank_id as base_rank_id,
-				_b.taxon as taxon,
-				'taxa' as source,
-				_e.rank
-			from
-				%PRE%taxa _b
-
-			left join
-				%PRE%names _a
-					on _a.project_id=_b.project_id
-					and _a.taxon_id=_b.id
-					and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-
-			left join
-				%PRE%projects_ranks _d
-					on _b.project_id=_d.project_id
-					and _b.rank_id=_d.id
-
-				left join
-					%PRE%ranks _e
-					on _d.rank_id=_e.id
-
-			where
-				_b.project_id = ".$this->getCurrentProjectId()."
-				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-
-			) as unification
-			where 1
-			".($rankAbove ? "and base_rank_id < ".$rankAbove : "")."
-			".($rankEqualAbove ? "and base_rank_id <= ".$rankEqualAbove : "")."
-			".($id ? "and id = ".$id : "")."
-			order by base_rank_id, label
-			limit ".$maxResults
-		);
-
-		foreach ((array) $taxa as $key => $val)
-		{
-			if ($val['source']=='taxa')
-			{
-				if ($formatted)
-					$taxa[$key]['label']=$this->formatTaxon($val);
-			}
-			else
-			{
-				if ($formatted)
-					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$this->formatTaxon($val).')';
-				else
-					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$val['taxon'].')';
-			}
-
-			$taxa[$key]['label']=$taxa[$key]['label'].' ['.$val['rank'].']';
-
-			if ($val['base_rank_id']==GENUS_RANK_ID)
-			{
-				$taxa[$key]['inheritable_name']=$val['uninomial'];
-			}
-			else
-			if ($val['base_rank_id']==SPECIES_RANK_ID)
-			{
-				$taxa[$key]['inheritable_name']=$val['uninomial'].' '.$val['specific_epithet'];
-			}
-			else
-			{
-				$taxa[$key]['inheritable_name']="";
-			}
-
-			unset($taxa[$key]['taxon']);
-			unset($taxa[$key]['source']);
-			unset($taxa[$key]['uninomial']);
-			unset($taxa[$key]['specific_epithet']);
-		}
-
-		return $taxa;
-		
 	}
 
     private function getSpeciesLookupList($p)
@@ -2222,8 +2095,62 @@ class NsrTaxonController extends NsrController
 		if ($m) $this->addMessage($m);
 		$this->setMessage();
 	}
+	
+	private function toggleConceptDeleted($delete)
+	{
+		$concept=$this->getConcept($this->rGetId());
+		$before=$after=array('id'=>$concept['id'],'taxon'=>$concept['taxon'],'is_deleted'=>$concept['is_deleted']);
 
+		if ($delete)
+		{
+			$d=$this->models->TrashCan->_get(array('id'=>
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'lng_id'=>$this->rGetId(),
+				'item_type'=>'taxon'
+			)));
+			
+			$this->models->TrashCan->save(
+			array(
+				'id' => isset($d[0]['id']) ? $d[0]['id'] : null,
+				'project_id'=>$this->getCurrentProjectId(),
+				'lng_id'=>$this->rGetId(),
+				'item_type'=>'taxon',
+				 'is_deleted'=>1
+			));		
 
+			$after['is_deleted']=1;
+
+			$this->logNsrChange(
+				array(
+					'before'=>$before,
+					'after'=>$after,
+					'note'=>'marked '.$before['taxon'].' as deleted'
+				)
+			);
+
+		}
+		else 
+		{
+			$d=$this->models->TrashCan->delete(
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'lng_id'=>$this->rGetId(),
+				'item_type'=>'taxon'
+			));
+
+			$after['is_deleted']=0;
+
+			$this->logNsrChange(
+				array(
+					'before'=>$before,
+					'after'=>$after,
+					'note'=>'removed deletion mark from '.$before['taxon']
+				)
+			);
+
+		}
+	}
 
 
 }

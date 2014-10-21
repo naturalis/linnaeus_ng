@@ -287,13 +287,14 @@ function checkScientificName()
 
 function checkDutchName()
 {
-	if ($('#dutch_name').val().length==0) return;
-
 	var buffer=[];
 
-	if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
-	if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");
-	if ($('#dutch_name_reference_id').val().length==0) buffer.push("Nederlandse naam: publicatie");
+	if ($('#dutch_name').val().length!=0)
+	{
+		if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
+		if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");
+		if ($('#dutch_name_reference_id').val().length==0) buffer.push("Nederlandse naam: publicatie");
+	}
 
 	return buffer;
 }
@@ -302,21 +303,22 @@ function checkPresenceDataHT()
 {
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 	
-	if (rank>=speciesBaseRankid) return;
-	
 	var buffer=[];
 
-	var p1=$('#presence_presence_id :selected').val()==-1;
-	var p2=$('#presence_expert_id :selected').val()==-1;
-	var p3=$('#presence_organisation_id :selected').val()==-1;
-	var p4=$('#presence_reference_id').val().length==0;
-		
-	if ((p1 && p2 && p3 && p4)!=true)
+	if (rank<speciesBaseRankid)
 	{
-		if (p1) buffer.push("Voorkomen: status is niet ingevuld.");
-		if (p2) buffer.push("Voorkomen: expert is niet ingevuld.");
-		if (p3) buffer.push("Voorkomen: organisatie is niet ingevuld.");
-		if (p4) buffer.push("Voorkomen: publicatie is niet ingevuld.");
+		var p1=$('#presence_presence_id :selected').val()==-1;
+		var p2=$('#presence_expert_id :selected').val()==-1;
+		var p3=$('#presence_organisation_id :selected').val()==-1;
+		var p4=$('#presence_reference_id').val().length==0;
+			
+		if ((p1 && p2 && p3 && p4)!=true)
+		{
+			if (p1) buffer.push("Voorkomen: status is niet ingevuld.");
+			if (p2) buffer.push("Voorkomen: expert is niet ingevuld.");
+			if (p3) buffer.push("Voorkomen: organisatie is niet ingevuld.");
+			if (p4) buffer.push("Voorkomen: publicatie is niet ingevuld.");
+		}
 	}
 
 	return buffer;
@@ -326,12 +328,13 @@ function checkPresenceDataHT()
 function savedataform()
 {
 	// lethal checks
-//	if (!checkMandatory()) return;
-//	if (!checkNameAgainstRank()) return;
-//	if (!checkPresenceDataSpecies()) return;
+	if (!checkMandatory()) return;
+	if (!checkNameAgainstRank()) return;
+	if (!checkPresenceDataSpecies()) return;
 
 	// warnings
 	var notifications=[];
+
 	notifications=notifications.concat(
 		checkScientificName(),
 		checkDutchName(),
@@ -342,8 +345,6 @@ function savedataform()
 	{
 		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
 	}
-	
-return;
 	
 	form = $("<form method=post></form>");
 	form.append('<input type="hidden" name="action" value="save" />');
@@ -376,6 +377,40 @@ return;
 	$(window).unbind('beforeunload');
 	$('body').append(form);
 	form.submit();
+}
+
+
+function deletedataform(style)
+{
+	if (style)
+	{
+		var msg=
+			"Wilt u dit taxon markeren als verwijderd?\n"+
+			"Gemarkeerde taxa worden niet werkelijk verwijderd, maar zijn niet langer zichtbaar.";
+	}
+	else
+	{
+		var msg="Wilt u dit taxon weer zichtbaar maken?";
+	}
+	
+	if (!confirm(msg)) return;
+
+	if (dataid)
+	{
+		form = $("<form method=post></form>");
+		form.append('<input type="hidden" name="action" value="'+(style==false?'undelete':'delete')+'" />');
+		form.append('<input type="hidden" name="rnd" value="'+$('#rnd').val()+'" />');
+		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
+
+		$(window).unbind('beforeunload');
+		$('body').append(form);
+		form.submit();
+	}
+	else
+	{
+		alert("Fout opgetreden: geen ID gevonden.");
+	}
+
 }
 
 
@@ -636,7 +671,7 @@ function deleteform()
 {
 	if (!dataid) return;
 
-	if (confirm('Weet u het zeker?'))
+	if (confirm("Weet u het zeker?"))
 	{
 		form = $("<form method=post></form>");
 		form.append('<input type="hidden" name="action" value="delete" />');

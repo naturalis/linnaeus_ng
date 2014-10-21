@@ -68,9 +68,9 @@ class SpeciesControllerNSR extends SpeciesController
 		}
     }
 
+
     public function taxonAction()
     {
-
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 
         if (empty($taxon))
@@ -261,11 +261,19 @@ class SpeciesControllerNSR extends SpeciesController
 				_a.taxon
 			
 			from %PRE%taxa _a
+			
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id =  _trash.lng_id
+				and _trash.item_type='taxon'
 
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _a.taxon <>''
-			order by _a.taxon
+				and ifnull(_trash.is_deleted,0)=0
+
+			order by
+				_a.taxon
 			limit 1"
 		);
 		
@@ -815,11 +823,12 @@ class SpeciesControllerNSR extends SpeciesController
 			left join %PRE%taxa _k
 				on _q.taxon_id=_k.id
 				and _q.project_id=_k.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
 
+			left join %PRE%trash_can _trash
+				on _k.project_id = _trash.project_id
+				and _k.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+				
 			left join %PRE%names _z
 				on _q.taxon_id=_z.taxon_id
 				and _q.project_id=_z.project_id
@@ -882,13 +891,12 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode))
+				and ifnull(_trash.is_deleted,0)=0
 
 			order by taxon
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
-//				and _f.rank_id >= ".SPECIES_RANK_ID."
-
 
 		foreach((array)$data as $key=>$val)
 		{
@@ -976,10 +984,16 @@ class SpeciesControllerNSR extends SpeciesController
 				on _k.rank_id=_f.id
 				and _k.project_id=_f.project_id
 
+			left join %PRE%trash_can _trash
+				on _k.project_id = _trash.project_id
+				and _k.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
 				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode))
+				and ifnull(_trash.is_deleted,0)=0				
 			"
 		);
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
@@ -1045,9 +1059,15 @@ class SpeciesControllerNSR extends SpeciesController
 				and _a.project_id = _q.project_id
 				and _q.language_id=".$this->getCurrentLanguageId()."
 
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _a.id=".$id."
+				and ifnull(_trash.is_deleted,0)=0
 			"
 		);
 
@@ -1094,7 +1114,12 @@ class SpeciesControllerNSR extends SpeciesController
 				left join %PRE%taxa _e
 					on _sq.taxon_id = _e.id
 					and _sq.project_id = _e.project_id
-				
+
+				left join %PRE%trash_can _trash
+					on _e.project_id = _trash.project_id
+					and _e.id =  _trash.lng_id
+					and _trash.item_type='taxon'
+
 				left join %PRE%projects_ranks _f
 					on _e.rank_id=_f.id
 					and _e.project_id = _f.project_id
@@ -1104,6 +1129,7 @@ class SpeciesControllerNSR extends SpeciesController
 					and MATCH(_sq.parentage) AGAINST ('".$id."' in boolean mode)
 					and _sp.presence_id is not null
 					and _f.rank_id".($rank>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
+					and ifnull(_trash.is_deleted,0)=0
 					
 				group by _sr.established",
 			'fieldAsIndex'=>'established'
@@ -1173,9 +1199,15 @@ class SpeciesControllerNSR extends SpeciesController
 				and _a.project_id = _g.project_id
 				and _g.language_id=". LANGUAGE_ID_DUTCH."
 
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _a.parent_id = ".$id."
+				and ifnull(_trash.is_deleted,0)=0
 			order by _a.taxon
 		");
 
@@ -1261,6 +1293,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_g.label as reference_label,
 				_g.author as reference_author,
 				_g.date as reference_date
+
 			from %PRE%names _a
 
 			left join %PRE%name_types _b 
