@@ -42,7 +42,7 @@ function lit2Lookup(caller,action,letter)
 		data : data,
 		success : function (data)
 		{
-			console.log(data);
+			//console.log(data);
 			if (data) lit2BuildList(action,$.parseJSON(data));
 		}
 	});
@@ -63,7 +63,11 @@ function lit2BuildList(action,data)
 			
 		if (t.authors)
 		{
-			var author=t.authors;
+			var author='';
+			for (var k=0;k<t.authors.length;k++)
+			{
+				author+=(k>0?', ':'')+t.authors[k].name;
+			}
 		}
 		else
 		{
@@ -71,9 +75,13 @@ function lit2BuildList(action,data)
 		}
 			
 		if (action.indexOf('title')!=-1)
+		{
 			buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+t.label+', '+author+'</a></li>');
+		}
 		else
-			buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+author+', '+t.label+'</a></li>');
+		{
+			buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+author+': '+t.label+'</a></li>');
+		}
 	}
 
 	$('#lit2-result-list').html('<ul>'+buffer.join('')+'</ul>');

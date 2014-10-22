@@ -162,7 +162,8 @@ class Literature2Controller extends Controller
 	{
 		$f=array( 
 			'language_id' => 'Taal',
-			'label' => 'Naam',
+			'label' => 'Titel',
+			'alt_label' => 'Alt. label',
 			'date' => 'Datum',
 			'author' => 'Auteur (verbatim)',
 			'publication_type' => 'Publicatietype',
@@ -278,7 +279,7 @@ class Literature2Controller extends Controller
 			}
 		}
 
-		return $this->models->Literature2Authors->freeQuery("
+		$d=$this->models->Literature2Authors->freeQuery("
 			select
 				_a.actor_id, _b.name
 	
@@ -294,6 +295,7 @@ class Literature2Controller extends Controller
 			order by _b.name
 		");
 		
+		return $d;
 	}
 			
 	private function saveReferenceAuthor($actor)
@@ -453,80 +455,14 @@ class Literature2Controller extends Controller
 			$fetchNonAlpha=false;
 		}
 
-		/*
-		$data=$this->models->Literature2->freeQuery(
-			"select
-				_a.id,
-				_a.language_id,
-				_a.label,
-				_a.date,
-				ifnull(_a.author,ifnull(_e.name,'-')) as author,
-				_a.publication_type,
-				_a.citation,
-				_a.source,
-				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
-				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
-				_a.pages,
-				_a.volume,
-				_a.external_link
-				
-			from %PRE%literature2 _a
-
-			left join %PRE%actors _e
-				on _a.actor_id = _e.id 
-				and _a.project_id=_e.project_id
-
-			left join  %PRE%literature2 _h
-				on _a.publishedin_id = _h.id 
-				and _a.project_id=_h.project_id
-
-			left join %PRE%literature2 _i 
-				on _a.periodical_id = _i.id 
-				and _a.project_id=_i.project_id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-
-			". (!empty($search) && $search!='*' ? "	
-					and (
-						_a.label like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
-						_a.author like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
-						_e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-					)" : "")."
-
-			".
-				( !empty($searchTitle) ?
-					( $fetchNonAlpha ?
-						"and ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122"  : 
-						"and (_a.label like '".($matchStartOnly ? '':'%').mysql_real_escape_string($searchTitle)."%')"
-					) : 
-				"")."
-
-			". ( !empty($searchAuthor) ?
-					( $fetchNonAlpha ?
-						"and (
-							(ord(substr(lower(_a.author),1,1))<97||ord(substr(lower(_a.author),1,1))>122) ||
-							(ord(substr(lower(_e.name),1,1))<97||ord(substr(lower(_e.name),1,1))>122)
-						)" : 
-						"and (
-							_a.author like '".($matchStartOnly ? '':'%').mysql_real_escape_string($searchAuthor)."%' or
-							_e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($searchAuthor)."%'
-						)"
-					) :
-				 "")."
-
-			order by ".
-				(!empty($search) || !empty($searchTitle) ? "_a.label, _a.author " : "" ).
-				(!empty($searchAuthor) ? "_a.author, _a.label " : "" )
-			);	
-		*/
-
 
 		$all=$this->models->Literature2->freeQuery(
 			"select
 				_a.id,
 				_a.language_id,
 				_a.label,
+				_a.alt_label,
+				_a.alt_label_language_id,
 				_a.date,
 				_a.author,
 				_a.publication_type,
@@ -562,9 +498,17 @@ class Literature2Controller extends Controller
 
 		foreach((array)$all as $key => $val)
 		{
+
 			$authors=$this->getReferenceAuthors($val['id']);
 
-			$authors=empty($authors[0]['authors']) ? null : $authors[0]['authors'];
+			$tempauthors='';
+			if ($authors)
+			{
+				foreach((array)$authors as $author)
+				{
+					$tempauthors.=$author['name'].', ';
+				}
+			}
 			
 			$match=false;
 			
@@ -573,22 +517,25 @@ class Literature2Controller extends Controller
 				if ($matchStartOnly)
 				{
 					$match=$match ? true : (stripos($val['label'],$search)===0);
-	
+
 					if (!$match)
-						$match=$match ? true : (stripos($val['author'],$search)===0);
-					
+						$match=$match ? true : (stripos($val['alt_label'],$search)===0);
+
 					if (!$match)
-						$match=$match ? true : (stripos($authors,$search)===0);
+						$match=$match ? true : (stripos($tempauthors,$search)===0);
 				}
 				else 
 				{
 					$match=$match ? true : (stripos($val['label'],$search)!==false);
-	
+						echo '.';	
 					if (!$match)
-						$match=$match ? true : (stripos($val['author'],$search)!==false);
+					{
+
+						$match=$match ? true : (stripos($val['alt_label'],$search)!==false);
+					}
 					
 					if (!$match)
-						$match=$match ? true : (stripos($authors,$search)!==false);
+						$match=$match ? true : (stripos($tempauthors,$search)!==false);
 				}
 
 			} else
@@ -604,30 +551,34 @@ class Literature2Controller extends Controller
 					if ($matchStartOnly)
 						$match=$match ? true : (stripos($val['label'],$searchTitle)===0);
 					else
+					{
 						$match=$match ? true : (stripos($val['label'],$searchTitle)!==false);
+						if (!$match)
+							$match=$match ? true : (stripos($val['alt_label'],$searchTitle)!==false);
+					}
 				}
 
 			} else
 			if (!empty($searchAuthor))
 			{
 				if ($matchStartOnly)
-					$match=$match ? true : (stripos($val['author'],$searchAuthor)===0);
+					$match=$match ? true : (stripos($tempauthors,$searchAuthor)===0);
 				else
-					$match=$match ? true : (stripos($val['author'],$searchAuthor)!==false);
+					$match=$match ? true : (stripos($tempauthors,$searchAuthor)!==false);
 
 				if (!$match)
 				{
 					if ($fetchNonAlpha)
 					{
-						$startLetterOrd=ord(substr(strtolower($authors),0,1));
+						$startLetterOrd=ord(substr(strtolower($tempauthors),0,1));
 						$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
 					}
 					else
 					{
 						if ($matchStartOnly)
-							$match=$match ? true : (stripos($authors,$searchAuthor)===0);
+							$match=$match ? true : (stripos($tempauthors,$searchAuthor)===0);
 						else
-							$match=$match ? true : (stripos($authors,$searchAuthor)!==false);
+							$match=$match ? true : (stripos($tempauthors,$searchAuthor)!==false);
 					}
 				}
 			}
@@ -644,8 +595,8 @@ class Literature2Controller extends Controller
 		{
 			usort($data,function($a,$b)
 			{ 
-				$aa=isset($a['authors']) ? $a['authors'] : $a['author'];
-				$bb=isset($b['authors']) ? $b['authors'] : $b['author'];
+				$aa=isset($a['authors'][0]['name']) ? $a['authors'][0]['name'] : $a['author'];
+				$bb=isset($b['authors'][0]['name']) ? $b['authors'][0]['name'] : $b['author'];
 				return strtolower($aa)>strtolower($bb);
 			});
 		}
@@ -732,8 +683,6 @@ class Literature2Controller extends Controller
 		);
 	
 	}
-
-
 
 
 

@@ -31,6 +31,9 @@
 		</td>
 	</tr>
 	<tr><th>titel:</th><td><input class="large" type="text" name="label" value="{$reference.label|@escape}" /></td></tr>
+
+	<tr><th>alt. label:</th><td><input class="large" type="text" name="alt_label" value="{$reference.alt_label|@escape}" /></td></tr>
+
 	<tr><th>datum:</th><td><input class="small" type="text" name="date" value="{$reference.date}" /></td></tr>
 	{*if $reference.author*}
 	<tr><th>auteur (verbatim):</th><td><input class="large" type="text" name="author" value="{$reference.author}" /></td></tr>
