@@ -41,7 +41,7 @@
             <p>
             <input id="save{$k}" value="opslaan" type="button" onclick="saveeditordata(this);">
             <input id="close{$k}" value="sluiten" type="button" onclick="closeeditor(this);">
-            <input id="revert{$k}" value="oorspronkelijke tekst" type="button" onclick="reverttext(this);">
+            {*<!--input id="revert{$k}" value="oorspronkelijke tekst" type="button" onclick="reverttext(this);"-->*}
             <input id="page{$k}" value="{$v.id}" type="hidden" />
             <span id="message{$k}"></span>
             </p>
