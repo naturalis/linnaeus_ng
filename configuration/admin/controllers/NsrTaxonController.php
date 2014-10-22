@@ -2170,7 +2170,13 @@ class NsrTaxonController extends NsrController
 		}
 
 		$after=$this->getName(array('id'=>$this->getNameId()));
-		$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'updated name '.$before['name']));
+		$this->logNsrChange(
+			array(
+				'before'=>(!empty($name) ? $name : null),
+				'after'=>$after,
+				'note'=>(!empty($name) ? 'updated name '.$before['name'] : 'new name '.$after['name'])
+			)
+		);
 			
 	}
 
