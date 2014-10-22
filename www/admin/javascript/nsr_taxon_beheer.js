@@ -327,6 +327,7 @@ function checkPresenceDataHT()
 
 function savedataform()
 {
+	
 	// lethal checks
 	if (!checkMandatory()) return;
 	if (!checkNameAgainstRank()) return;

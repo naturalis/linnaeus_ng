@@ -98,23 +98,56 @@ class NsrTaxonController extends NsrController
 
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
+		
 			$this->saveConcept();
 
 			if ($this->getConceptId())
 			{
 				$this->saveName();
+				$this->checkDutchName();
 				$this->saveDutchName();
 				$this->saveTaxonParentage($this->getConceptId());
 				$this->resetTree();
 				$this->redirect('taxon.php?id='.$this->getConceptId());
 			}		
+			else
+			{
+				$data=$this->requestData;
+				array_walk($data, function(&$val, $key){if (isset($val['new'])) $val=$val['new'];});
+				unset($data['action']);
+				
+				if (isset($data['parent_taxon_id']))
+				{
+					$d=$this->getConcept($data['parent_taxon_id']);
+					$texts['parent_taxon']=$d['taxon'];
+				}
+				if (isset($data['name_reference_id']))
+				{
+					$d=$this->getReference($data['name_reference_id']);
+					$texts['name_reference']=$d['label'];
+				}
+				if (isset($data['dutch_name_reference_id']))
+				{
+					$d=$this->getReference($data['dutch_name_reference_id']);
+					$texts['dutch_name_reference']=$d['label'];
+				}
+				if (isset($data['presence_reference_id']))
+				{
+					$d=$this->getReference($data['presence_reference_id']);
+					$texts['presence_reference']=$d['label'];
+				}
+				$this->smarty->assign('data',$data);
+				$this->smarty->assign('texts',$texts);
+			}
 		}
 
 		if ($this->rHasVal('parent'))
 		{
 			$parent=$this->getSpeciesList(array('id'=>$this->rGetVal('parent'),'taxa_only'=>true));
 			if (isset($parent[0]))
+			{
 				$this->smarty->assign('parent',$parent[0]);
+			}
 		}
 
 		if ($this->rHasVal('newrank'))
@@ -249,7 +282,7 @@ class NsrTaxonController extends NsrController
 
 			if (!in_array($name['nametype'],array(PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME)))
 			{
-				if (!$this->checkNameParts($name))
+				if (!$this->checkNamePartsMatchName($name))
 				{
 					if ($concept['base_rank']<SPECIES_RANK_ID)
 					{
@@ -814,15 +847,13 @@ class NsrTaxonController extends NsrController
 			left join %PRE%names _z
 				on _m.taxon_id=_z.taxon_id
 				and _m.project_id=_z.project_id
-				and _z.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
+				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".LANGUAGE_ID_DUTCH."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
 				and _m.project_id=_j.project_id
-				and _j.type_id=(select id from %PRE%name_types where project_id = ".
-					$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 				
 
@@ -1203,17 +1234,69 @@ class NsrTaxonController extends NsrController
 	{
 		$name=$this->rGetVal('concept_taxon');
 		$rank=$this->rGetVal('concept_rank_id');
+		$parent=$this->rGetVal('parent_taxon_id');
+		$uninomial=$this->rGetVal('name_uninomial');
+		$authorship=$this->rGetVal('name_authorship');
+		$specificEpithet=$this->rGetVal('name_specific_epithet');
+		$infraSpecificEpithet=$this->rGetVal('name_infra_specific_epithet');
+		$presencePresenceId=$this->rGetVal('presence_presence_id');
+		$presenceExpertId=$this->rGetVal('presence_expert_id');
+		$presenceOrganisationId=$this->rGetVal('presence_organisation_id');
+		$presenceReferenceId=$this->rGetVal('presence_reference_id');
+
 		$name=trim($name['new']);
 		$rank=trim($rank['new']);
-					
-		if (empty($name) || empty($rank))
+		$parent=trim($parent['new']);
+		$uninomial=trim($uninomial['new']);
+		$authorship=trim($authorship['new']);
+		$specificEpithet=trim($specificEpithet['new']);
+		$infraSpecificEpithet=trim($infraSpecificEpithet['new']);
+		$presencePresenceId=trim($presencePresenceId['new']);
+		$presenceExpertId=trim($presenceExpertId['new']);
+		$presenceOrganisationId=trim($presenceOrganisationId['new']);
+		$presenceReferenceId=trim($presenceReferenceId['new']);
+
+		// let's run some tests
+		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial) || empty($authorship))
 		{
 			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
 			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
+			if (empty($parent)) $this->addError('Geen ouder. Concept niet opgeslagen.');
+			if (empty($uninomial)) $this->addError('Geen genus of uninomial. Concept niet opgeslagen.');
+			if (empty($authorship)) $this->addError('Geen auteurschap. Concept niet opgeslagen.');
 			$this->setConceptId(null);
 			return;
 		}
 
+		if (!$this->checkParentChildRelationship($rank,$parent))
+		{
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (!$this->checkNamePartsMatchRank($rank,$uninomial,$specificEpithet,$infraSpecificEpithet))
+		{
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (!$this->checkNameUniqueness($name,$rank,$parent))
+		{
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (empty($presencePresenceId) || 
+			empty($presenceExpertId) || 
+			empty($presenceOrganisationId) || 
+			empty($presenceReferenceId))
+		{
+			$this->addError('Incomplete voorkomensgegevens. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		}
+		
+		// we passed the tests!
 		$d=$this->models->Taxon->save(
 		array(
 			'project_id' => $this->getCurrentProjectId(),
@@ -1235,6 +1318,232 @@ class NsrTaxonController extends NsrController
 			$this->addError('Aanmaak nieuw concept mislukt.');
 		}
 	}
+
+	private function checkParentChildRelationship($childRankId,$parentId)
+	{
+		$d=$this->models->ProjectRank->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'id'=>$childRankId
+			),
+			'columns'=>'rank_id'
+		));
+		
+		$childBaseRank=$d[0]['rank_id'];
+		$d=$this->getTaxonById($parentId);
+		$parent_base_rank=$d['base_rank'];
+		
+		$ranks=$this->models->Rank->_get(array(
+			'id'=>'*',
+			'columns'=>'id,rank',
+			'fieldAsIndex'=>'id'
+		));
+		
+		$error=null;
+		
+		if ($childBaseRank>SPECIES_RANK_ID && $parent_base_rank!=SPECIES_RANK_ID)
+		{
+			/*
+			forma moet onder soort
+			varietas moet onder soort
+			cultivar moet onder soort
+			forma specialis moet onder soort
+			ondersoort moet onder soort
+			*/
+			$error=array($ranks[SPECIES_RANK_ID]['rank']);
+		} 
+		else
+		if (($childBaseRank==SPECIES_RANK_ID && $parent_base_rank!=GENUS_RANK_ID) &&
+			($childBaseRank==SPECIES_RANK_ID && $ranks[$parent_base_rank]['rank']!='subgenus'))
+		{
+			// soort moet onder genus of subgenus
+			$error=array($ranks[GENUS_RANK_ID]['rank'],'subgenus');
+		}
+		else
+		if ($ranks[$childBaseRank]['rank']=='subgenus' && $parent_base_rank!=GENUS_RANK_ID)
+		{
+			// subgenus moet onder genus
+			$error=array($ranks[GENUS_RANK_ID]['rank']);
+		}
+		else
+		if (($childBaseRank==GENUS_RANK_ID && $ranks[$parent_base_rank]['rank']!='subfamilia') &&
+			($childBaseRank==GENUS_RANK_ID && $parent_base_rank!=FAMILY_RANK_ID))
+		{
+			// genus moet onder subfamilie of familie
+			$error=array('subfamilia',$ranks[FAMILY_RANK_ID]['rank']);
+		}
+		else
+		if ($ranks[$childBaseRank]['rank']=='subfamilia' && $parent_base_rank!=FAMILY_RANK_ID)
+		{
+			// subfamilie moet onder familie
+			$error=array($ranks[FAMILY_RANK_ID]['rank']);
+		}
+		else
+		if (($childBaseRank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='subordo') &&
+			($childBaseRank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='ordo'))
+		{
+			// familie moet onder suborde of orde
+			$error=array('subordo','ordo');
+		}
+		else
+		if ($ranks[$childBaseRank]['rank']=='subordo' && $ranks[$parent_base_rank]['rank']!='ordo')
+		{
+			// suborde moet onder orde
+			$error=array('ordo');
+		}
+		else
+		if (($ranks[$childBaseRank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='subclassis') &&
+			($ranks[$childBaseRank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='classis'))
+		{
+			// orde moet onder subklasse of klasse
+			$error=array('subclassis','classis');
+		}
+		else
+		if ($ranks[$childBaseRank]['rank']=='subclassis' && $ranks[$parent_base_rank]['rank']!='classis')
+		{
+			// subklasse moet onder klasse
+			$error=array('classis');
+		}
+		else
+		if (($ranks[$childBaseRank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='subphylum') &&
+			($ranks[$childBaseRank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='phylum'))
+		{
+			// klasse moet onder subphylum of phylum
+			$error=array('subphylum','phylum');
+		}
+		else
+		if ($ranks[$childBaseRank]['rank']=='subphylum' && $ranks[$parent_base_rank]['rank']!='phylum')
+		{
+			// subphylum moet onder phylum
+			$error=array('phylum');
+		}
+		else
+		if (($ranks[$childBaseRank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='subregnum') &&
+			($ranks[$childBaseRank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='regnum'))
+		{
+			// phylum moet moet onder subrijk of rijk
+			$error=array('subregnum','regnum');
+		}
+		else
+		if ($ranks[$childBaseRank]['rank']=='subregnum' && $ranks[$parent_base_rank]['rank']!='regnum')
+		{
+			// subrijk moet onder rijk
+			$error=array('regnum');
+		}
+
+		if ($error)
+		{
+			$this->addError(
+				sprintf(
+					"Een %s kan alleen %s als ouder hebben.",
+					$ranks[$childBaseRank]['rank'],
+					implode(" of ",$error).". ".
+					"Concept niet opgeslagen."
+				)
+			);
+			return false;
+		}
+
+		return true;
+	}
+
+	private function checkNamePartsMatchRank($rank,$uninomial,$specificEpithet,$infraSpecificEpithet)
+	{
+		$d=$this->models->ProjectRank->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'id'=>$rank
+			),
+			'columns'=>'rank_id'
+		));
+		
+		$baseRank=$d[0]['rank_id'];
+
+		
+		if ($baseRank<SPECIES_RANK_ID)
+		{
+			if (empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID))
+			{
+				$this->addError("Wetenschappelijke naam: genus ontbreekt. Concept niet opgeslagen.");
+				return false;
+			}
+			else
+			if (empty($uninomial) && $baseRank<GENUS_RANK_ID)
+			{
+				$this->addError("Wetenschappelijke naam: uninomial ontbreekt. Concept niet opgeslagen.");
+				return false;
+			}
+			else
+			if (!empty($specificEpithet) || !empty($infraSpecificEpithet))
+			{
+				$this->addError("Wetenschappelijke naam kan maar uit één deel bestaan. Concept niet opgeslagen.");
+				return false;
+			}
+		}
+		else
+		if ($baseRank==SPECIES_RANK_ID)
+		{
+			if (empty($uninomial) || empty($specificEpithet))
+			{
+				$this->addError("Wetenschappelijke naam incompleet. Concept niet opgeslagen.");
+				return false;
+			}
+			else
+			if (!empty($infraSpecificEpithet))
+			{
+				$this->addError("Wetenschappelijke naam kan geen derde naamdeel hebben. Concept niet opgeslagen.");
+				return false;
+			}
+		
+		}
+		else
+		if ($baseRank>SPECIES_RANK_ID)
+		{
+			if (empty($uninomial) || empty($specificEpithet) || empty($infraSpecificEpithet))
+			{
+				$this->addError("Wetenschappelijke naam incompleet. Concept niet opgeslagen.");
+				return false;
+			}
+		}
+
+		return true;
+			
+	}
+
+	private function checkNameUniqueness($name,$childRankId,$parentId)
+	{
+		$d=$this->models->Taxon->freeQuery("
+			select
+				_a.*,ifnull(_trash.is_deleted,0) as is_deleted
+			from
+				%PRE%taxa _a
+	
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
+	
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.taxon like '". mysql_real_escape_string($name) ."'
+				and _a.rank_id = ". mysql_real_escape_string($childRankId) ."
+				and _a.parent_id = ". mysql_real_escape_string($parentId)
+			);
+
+		if ($d)
+		{
+			$this->addError(
+				"Combinatie naam, rang en ouder bestaat al".
+				( $d[0]['is_deleted']==1 ? " (verwijderd taxon)" : "" ).".".
+				" Concept niet opgeslagen.".
+				" <a href=\"taxon.php?id=".$d[0]['id']."\">Taxon tonen</a>");
+			return false;
+		}
+
+		return true;		
+	}
+		
+
 
 	private function updateConcept()
 	{
@@ -1592,7 +1901,6 @@ class NsrTaxonController extends NsrController
 	}
 
 
-
 	private function saveName()
 	{
 		$type=$this->rGetVal('name_type_id');
@@ -1618,6 +1926,37 @@ class NsrTaxonController extends NsrController
 		{
 			$this->addError('Aanmaak nieuwe naam mislukt.');
 		}
+	}
+
+	private function checkDutchName()
+	{
+		$name=$this->rGetVal('dutch_name');
+
+		if (!isset($name['new'])) return;
+
+		$d=$this->models->Names->freeQuery("
+			select
+				_a.id, 
+				_b.taxon
+			from 
+				%PRE%names _a
+			left join %PRE%taxa _b
+				on _a.project_id = _b.project_id
+				and _a.taxon_id=_b.id
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and lower(_a.name) = '" . mysql_real_escape_string(trim($name['new'])) . "'
+		");
+
+		if ($d)
+		{
+			$this->setMessage('Nederlandse naam bestaat al (naam wel opgeslagen):');
+			foreach((array)$d as $val)
+			{
+				$this->setMessage('<a href="name.php?id='.$val['id'].'">Naam van: '.$val['taxon'].'</a>');
+			}
+		}
+
 	}
 
 	private function saveDutchName()
@@ -1989,7 +2328,7 @@ class NsrTaxonController extends NsrController
 
 	private function doNameIntegrityChecks($name)
 	{
-		if (!$this->checkNameParts($name))
+		if (!$this->checkNamePartsMatchName($name))
 		{
 			$this->addWarning("Samengevoegde naamdelen komen niet overeen met de naam.");
 		}
@@ -2016,7 +2355,7 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-	private function checkNameParts($name)
+	private function checkNamePartsMatchName($name)
 	{
 		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
 		
@@ -2152,6 +2491,35 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
+
+	private function getReference($id=null)
+	{
+		if (empty($id))
+			return;
+
+		$l=$this->models->Literature2->freeQuery(
+			"select
+				_a.*,
+				_h.label as publishedin_label,
+				_i.label as periodical_label
+
+			from %PRE%literature2 _a
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id 
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i 
+				on _a.periodical_id = _i.id 
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.id = ".$id
+		);
+
+		return $l[0];
+	}
 
 }
 

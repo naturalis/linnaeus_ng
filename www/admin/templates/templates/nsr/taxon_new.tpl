@@ -29,7 +29,7 @@
         	<th>ouder:</th>
 			<td style="vertical-align:bottom">
                 <span id="parent_taxon">{$parent.taxon}</span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">edit</a>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">edit</a> *
                 <input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" onchange="getinheritablename();" label="ouder" droplistminlength="3" />
 			</td>
 		</tr>
@@ -99,11 +99,6 @@
 
 		<tr><th>publicatie:</th>
 			<td style="vertical-align:bottom">
-            	{*
-				<!--span id="name_reference"></span>
-				<input type="text" class="medium" id="__name_reference_id_INPUT" value="" havedroplist="true" />
-				<input type="hidden" id="name_reference_id" value="" /-->
-                *}
                 <span id="name_reference"></span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a>
                 <input type="hidden" id="name_reference_id" value="" />
@@ -195,7 +190,7 @@
 					{/if}
 					<option value="{$v.id}">{$v.index_label}. {$v.label}</option>
 				{/foreach}
-				</select>
+				</select> *
 			</td>
 		</tr>
 
@@ -222,7 +217,7 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
+				</select> *
 			</td>
 		</tr>
 	
@@ -236,7 +231,7 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
+				</select> *
 			</td>
 		</tr>
 	
@@ -244,7 +239,7 @@
         	<th>publicatie:</th>
 			<td style="vertical-align:bottom">
                 <span id="presence_reference"></span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a> *
                 <input type="hidden" id="presence_reference_id" value="" />
 			</td>
 		</tr>
@@ -312,6 +307,17 @@ $(document).ready(function()
 	{
 		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
 	});
+	
+	{if $data}
+	{foreach from=$data item=v key=k}
+		$('#{$k}').val('{$v|@escape}').trigger('change');
+	{/foreach}
+	{/if}
+	{if $texts}
+	{foreach from=$texts item=v key=k}
+		$('#{$k}').text('{$v|@escape}');
+	{/foreach}
+	{/if}
 
 });
 </script>
