@@ -19,7 +19,8 @@ class NsrPaspoortController extends NsrController
 		'page_taxon',
 		'page_taxon_title',
 		'tab_order',
-		'nsr_ids'
+		'nsr_ids',
+		'trash_can'
 	);
     public $usedHelpers = array();
     public $cacheFiles = array();

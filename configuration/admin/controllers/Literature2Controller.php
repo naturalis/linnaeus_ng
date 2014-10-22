@@ -439,6 +439,7 @@ class Literature2Controller extends Controller
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
         $searchTitle=isset($p['search_title']) ? $p['search_title'] : null;
         $searchAuthor=isset($p['search_author']) ? $p['search_author'] : null;
+        $publicationType=isset($p['publication_type']) ? $p['publication_type'] : null;
 
         if (empty($search) && empty($searchTitle) && empty($searchAuthor))
             return;
@@ -548,9 +549,15 @@ class Literature2Controller extends Controller
 				and _a.project_id=_i.project_id
 
 			where
-				_a.project_id = ".$this->getCurrentProjectId()
-			);	
-
+				_a.project_id = ".$this->getCurrentProjectId()."
+				".(isset($publicationType) ? 
+					"and ".
+					(is_array($publicationType) ? 
+						"_a.publication_type in ('" . implode("','",array_map('mysql_real_escape_string',$publicationType)). "')" : 
+						"_a.publication_type = '" . mysql_real_escape_string($publicationType) . "'") : 
+					"" )."
+			");	
+			
 		$data=array();
 
 		foreach((array)$all as $key => $val)
@@ -731,7 +738,7 @@ class Literature2Controller extends Controller
 
 
     private function getReferenceLookupList($p)
-    {
+    {		
 		$data=$this->getReferences($p);
 
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
