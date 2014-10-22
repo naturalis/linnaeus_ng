@@ -76,7 +76,7 @@
 </table>
 </p>
 
-<input type="button" value="opslaan" onclick="savedataform();" />
+<input type="button" value="opslaan" onclick="savedataform('name');" />
 {if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
 </form>
 

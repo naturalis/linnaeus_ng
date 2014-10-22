@@ -325,26 +325,29 @@ function checkPresenceDataHT()
 }
 
 
-function savedataform()
+function savedataform(type)
 {
-	
-	// lethal checks
 	if (!checkMandatory()) return;
-	if (!checkNameAgainstRank()) return;
-	if (!checkPresenceDataSpecies()) return;
 
-	// warnings
-	var notifications=[];
-
-	notifications=notifications.concat(
-		checkScientificName(),
-		checkDutchName(),
-		checkPresenceDataHT()
-	);
-	
-	if (notifications.length>0)
+	if (type!='name')
 	{
-		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
+		// lethal checks
+		if (!checkNameAgainstRank()) return;
+		if (!checkPresenceDataSpecies()) return;
+	
+		// warnings
+		var notifications=[];
+	
+		notifications=notifications.concat(
+			checkScientificName(),
+			checkDutchName(),
+			checkPresenceDataHT()
+		);
+		
+		if (notifications.length>0)
+		{
+			if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
+		}
 	}
 	
 	form = $("<form method=post></form>");
