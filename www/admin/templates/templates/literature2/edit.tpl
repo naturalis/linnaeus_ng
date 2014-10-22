@@ -69,32 +69,67 @@
 	</tr>
 	<tr><th>citatie:</th><td><input class="large" type="text" name="citation" value="{$reference.citation}" /></td></tr>
 	<tr><th>bron:</th><td><input class="medium" type="text" name="source" value="{$reference.source}" /></td></tr>
-	{if $reference.publishedin}
-	<tr><th>gepubliceerd in (verbatim):</th><td><input class="large" type="text" name="publishedin" value="{$reference.publishedin}" /></td></tr>
-	{/if}
+
 	<tr>
-		<th>gepubliceerd in:</th>
+		<th title="gebruik dit veld voor delen/hoofdstukken van boeken en voor onderdelen van websites.">gepubliceerd in:</th>
 		<td>
 			<span id="publishedin">{if $reference.publishedin_label}{$reference.publishedin_label}{else}-{/if}</span>
-			<a class="edit" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="publishedin_id">edit</a>
+			<a class="edit" href="#" onclick="dropListDialog(this,'Publicatie', { publication_type:['Boek','Website'] });return false;" rel="publishedin_id">edit</a>
 			<input type="hidden" id="publishedin_id" name="publishedin_id" value="{$reference.publishedin_id}" />
 		</td>
 	</tr>
-	<tr><th>pagina(s):</th><td><input class="small" type="text" name="pages" value="{$reference.pages}" /></td></tr>
-	<tr><th>volume:</th><td><input class="small" type="text" name="volume" value="{$reference.volume}" /></td></tr>
-	{if $reference.periodical}
-	<tr><th>periodiek (verbatim):</th><td><input type="text" name="periodical" value="{$reference.periodical}" /></td></tr>
-	{/if}
+	{if $reference.publishedin}
 	<tr>
-		<th>periodiek:</th>
+    	<th>gepubliceerd in (verbatim):</th>
+        <td>
+        	<input class="large" type="text" name="publishedin" value="{$reference.publishedin}" /><br />
+            <span class="small-warning">
+                Deze letterlijke waarde is een overerving uit de oude Soortenregister-database.<br />
+                Vervang deze waarde waar mogelijk door een verwijzing achter "gepubliceerd in".
+            </span>
+        </td>
+	</tr>
+	{/if}
+
+	<tr>
+		<th title="gebruik dit veld voor het tijdschrift of seriewerk waarin betreffende referentie gepubliceerd is.">periodiek:</th>
 		<td>
-				<span id="periodical">{if $reference.periodical_label}{$reference.periodical_label}{else}-{/if}</span>
-				<a class="edit" href="#" onclick="dropListDialog(this,'Periodiek');return false;" rel="periodical_id">edit</a>
-				<input type="hidden" id="periodical_id" name="periodical_id" value="{$reference.periodical_id}" />
+            <span id="periodical">{if $reference.periodical_label}{$reference.periodical_label}{else}-{/if}</span>
+            <a class="edit" href="#" onclick="dropListDialog(this,'Periodiek', { publication_type:['Serie','Tijdschrift'] });return false;" 
+                rel="periodical_id">edit</a>
+            <input type="hidden" id="periodical_id" name="periodical_id" value="{$reference.periodical_id}" />
 		</td>
 	</tr>
-	<tr><th>link:</th><td><input class="large" type="text" name="external_link" value="{$reference.external_link}" /></td></tr>
-	<tr><th><input type="submit" value="save" /></th><td></td></tr>
+	{if $reference.periodical}
+	<tr>
+    	<th>periodiek (verbatim):</th>
+        <td>
+        	<input type="text" name="periodical" value="{$reference.periodical}" /><br />
+            <span class="small-warning">
+                Deze letterlijke waarde is een overerving uit de oude Soortenregister-database.<br />
+                Vervang deze waarde waar mogelijk door een verwijzing achter "periodiek".
+            </span>
+		</td>
+	</tr>
+	{/if}
+
+    
+	<tr>
+    	<th>pagina(s):</th>
+        <td><input class="small" type="text" name="pages" value="{$reference.pages}" /></td>
+	</tr>
+	<tr>
+    	<th>volume:</th>
+        <td><input class="small" type="text" name="volume" value="{$reference.volume}" /></td>
+	</tr>
+	<tr>
+    	<th>link:</th>
+        <td><input class="large" type="text" name="external_link" value="{$reference.external_link}" /></td>
+	</tr>
+	<tr>
+    	<th><input type="submit" value="save" /></th>
+        <td></td>
+	</tr>
 
 {if $reference.id}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
@@ -150,6 +185,13 @@ $(document).ready(function()
 	storeAuthor({ id: {$v.id},name:'{$v.label|@escape}'});
 	{/if}
 	{/foreach}
+
+	$('th[title]').each(function(key,value)
+	{
+		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
+	});
+	
+
 });
 </script>
 

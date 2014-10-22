@@ -22,7 +22,7 @@ function openeditor(caller)
 
 	editor.on( 'dataReady', function( evt ) {
 		currenttexts[id]=evt.editor.getData();
-		console.dir(currenttexts);
+		//console.dir(currenttexts);
 	});
 
 }
@@ -107,6 +107,7 @@ function saveeditordata(caller)
 		},
 		success : function (data)
 		{
+			//console.log(data);
 			if(data==true)
 			{
 				$('#message'+id).html('Tekst opgeslagen.').toggle(true).fadeOut(2000);

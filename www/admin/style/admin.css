@@ -473,3 +473,8 @@ tr[type=drag-row] {
 .searchResultMatch {
   color: #b00;
   font-weight: bold; }
+
+.small-warning {
+	color:red;
+	font-size:0.8em;
+}

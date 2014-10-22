@@ -802,8 +802,8 @@ function doDelete(msg)
 	}
 }
 
-function dropListDialog(ele,title)
-{	
+function dropListDialog(ele,title,params)
+{
 	var target=$(ele).attr('rel');
 	var id='__'+target+'_INPUT';
 
@@ -815,7 +815,7 @@ function dropListDialog(ele,title)
 	});
 
 	$('#'+id).attr('autocomplete','off').bind('keyup', function(e) { 
-		doNsrDropList({ e:e, id: $(this).attr('id'), target: target } )
+		doNsrDropList({ e:e, id: $(this).attr('id'), target: target, params: params } )
 	});	
 }
 
@@ -847,6 +847,8 @@ function doNsrDropList(p)
 		search: value,
 		time: allGetTimestamp()
 	}
+	
+	if (p.params) $.extend(data, p.params);
 
 	$.ajax({
 		url : url,
