@@ -1294,10 +1294,19 @@ class NsrTaxonController extends NsrController
 			return;
 		}
 
-		if (empty($presencePresenceId) || 
-			empty($presenceExpertId) || 
-			empty($presenceOrganisationId) || 
-			empty($presenceReferenceId))
+		if (
+			(!empty($presencePresenceId) || !empty($presenceExpertId) || !empty($presenceOrganisationId) ||  !empty($presenceReferenceId)) &&
+			 $rank<SPECIES_RANK_ID
+			)
+		{
+			$this->addError('Voorkomensgegevens kunnen niet worden ingevuld voor hogere taxa. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		} else
+		if (
+			(empty($presencePresenceId) || empty($presenceExpertId) || empty($presenceOrganisationId) || empty($presenceReferenceId)) && 
+			$rank>=SPECIES_RANK_ID
+		)
 		{
 			$this->addError('Incomplete voorkomensgegevens. Concept niet opgeslagen.');
 			$this->setConceptId(null);
@@ -1445,9 +1454,10 @@ class NsrTaxonController extends NsrController
 				sprintf(
 					"Een %s kan alleen %s als ouder hebben.",
 					$ranks[$childBaseRank]['rank'],
-					implode(" of ",$error).". ".
-					"Concept niet opgeslagen."
-				)
+					implode(" of ",$error)
+				).". ".
+				"Concept niet opgeslagen."
+
 			);
 			return false;
 		}

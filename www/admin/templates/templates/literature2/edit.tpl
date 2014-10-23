@@ -39,7 +39,7 @@
         	<input class="large" type="text" name="alt_label" value="{$reference.alt_label|@escape}" /><br />
             <span class="small-warning">
                 De alternatieve titel is een overerving uit de oude Soortenregister-database. Dit veld wordt
-                neregens gebruikt, en kan leeggemaakt worden.
+                nergens gebruikt, en kan leeggemaakt worden.
             </span>
 		</td>
 	</tr>

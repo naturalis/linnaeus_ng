@@ -38,7 +38,9 @@ class SpeciesController extends Controller
 		'taxon_trends',
 		'external_orgs',
 		'external_ids',
-		'taxon_quick_parentage'
+		'taxon_quick_parentage',
+		'literature2',
+		'literature2_authors'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
