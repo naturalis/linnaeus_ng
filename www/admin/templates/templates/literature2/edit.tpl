@@ -32,7 +32,21 @@
 	</tr>
 	<tr><th>titel:</th><td><input class="large" type="text" name="label" value="{$reference.label|@escape}" /></td></tr>
 
-	<tr><th>alt. label:</th><td><input class="large" type="text" name="alt_label" value="{$reference.alt_label|@escape}" /></td></tr>
+	{if $reference.alt_label}
+	<tr>
+    	<th>alt. label:</th>
+        <td>
+        	<input class="large" type="text" name="alt_label" value="{$reference.alt_label|@escape}" /><br />
+            <span class="small-warning">
+                De alternatieve titel is een overerving uit de oude Soortenregister-database. Dit veld wordt
+                neregens gebruikt, en kan leeggemaakt worden.
+            </span>
+		</td>
+	</tr>
+	{/if}
+
+
+
 
 	<tr><th>datum:</th><td><input class="small" type="text" name="date" value="{$reference.date}" /></td></tr>
 	{*if $reference.author*}
