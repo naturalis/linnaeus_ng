@@ -519,20 +519,11 @@ class Literature2Controller extends Controller
 					$match=$match ? true : (stripos($val['label'],$search)===0);
 
 					if (!$match)
-						$match=$match ? true : (stripos($val['alt_label'],$search)===0);
-
-					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)===0);
 				}
 				else 
 				{
 					$match=$match ? true : (stripos($val['label'],$search)!==false);
-
-					if (!$match)
-					{
-
-						$match=$match ? true : (stripos($val['alt_label'],$search)!==false);
-					}
 					
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)!==false);
@@ -553,8 +544,6 @@ class Literature2Controller extends Controller
 					else
 					{
 						$match=$match ? true : (stripos($val['label'],$searchTitle)!==false);
-						if (!$match)
-							$match=$match ? true : (stripos($val['alt_label'],$searchTitle)!==false);
 					}
 				}
 

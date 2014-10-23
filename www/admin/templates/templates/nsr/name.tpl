@@ -92,11 +92,6 @@
 
 </div>
 
-<div id="dropdown-list">
-	<div id="dropdown-list-content"></div>
-</div>
-
-
 <script>
 $(document).ready(function()
 {

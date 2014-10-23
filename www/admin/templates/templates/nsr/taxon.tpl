@@ -28,7 +28,6 @@
 <input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 
 <p>
-	
 
 	<table>
 		<tr>
@@ -39,12 +38,6 @@
 			<th>naam:</th>
 			<td>
 				{$concept.taxon}
-				{* <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_taxon">edit</a>
-				<span class="editspan" id="taxon">
-				<input type="text" id="concept_taxon" value="{$concept.taxon}" mandatory="mandatory" />
-				</span> *
-				<input type="hidden" id="concept_taxon_id" value="{$concept.id}" />
-                *}
 			</td>
 		</tr>
 		<tr><th>rang:</th>
@@ -62,16 +55,13 @@
 		</tr>
 		<tr><th>ouder:</th>
 			<td>
-				<a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a>
-				<a class="edit" href="#" onclick="toggleedit(this);editparent(this);return false;" rel="parent_taxon_id">edit</a>
-				<span class="editspan" id="parent">
-				</span> *
-				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory" />
+                <span id="parent_taxon">{$concept.parent.taxon}</span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">edit</a> *
+				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="ouder" droplistminlength="3" />
 			</td>
 		</tr>
 
 		<tr><th>nsr id:</th><td>{if $concept}{$concept.nsr_id}{else}(auto){/if}</td></tr>
-
 
 		<tr><th>&nbsp;</td></tr>
 
@@ -81,7 +71,7 @@
 		</tr>
 		<tr>
 			<th>status:</th>
-			<td>
+			<td>{$presence.presence_id}
 				{if $presence.presence_id}
 					<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
 				{else}n.v.t.{/if}
@@ -126,10 +116,19 @@
 				{if $presence.expert_id!=''}
 					{$presence.expert_name}
 				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);editexpert(this);return false;" rel="presence_expert_id">edit</a>
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_expert_id">edit</a>
 				<span class="editspan" id="expert">
+				
+                <select id="presence_expert_id">
+					<option value="-1" selected="selected">n.v.t.</option>
+				{foreach from=$actors item=v key=k}
+				{if $v.is_company=='0'}
+					<option value="{$v.id}" {if $v.id==$presence.expert_id} selected="selected"{/if}>{$v.label}</option>
+				{/if}
+				{/foreach}
+				</select> 
+                                
 				</span>
-				<input type="hidden" id="presence_expert_id" value="{$presence.expert_id}" />
 			</td>
 		</tr>
 
@@ -138,27 +137,34 @@
 				{if $presence.organisation_id!=''}
 					{$presence.organisation_name}
 				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);editorganisation(this);return false;" rel="presence_organisation_id">edit</a>
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_organisation_id">edit</a>
 				<span class="editspan" id="organisation">
+
+				<select id="presence_organisation_id">
+					<option value="-1" selected="selected">n.v.t.</option>
+				{foreach from=$actors item=v key=k}
+				{if $v.is_company=='1'}
+					<option value="{$v.id}" {if $v.id==$presence.organisation_id} selected="selected"{/if}>{$v.label}</option>
+				{/if}
+				{/foreach}
+				</select> 
+                                
 				</span>
-				<input type="hidden" id="presence_organisation_id" value="{$presence.organisation_id}" />
+				<input type="hidden" id="" value="{$presence.organisation_id}" />
 			</td>
 		</tr>
 
 		<tr><th>publicatie:</th>
 			<td>
-				{if $presence.reference_id!=''}
-					"{$presence.reference_label}"{if $presence.reference_author}, {$presence.reference_author}{/if}{if $presence.reference_date} ({$presence.reference_date}){/if}
-				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="presence_reference_id">edit</a>
-				<span class="editspan" id="reference">
-				</span><br />
+
+                <span id="presence_reference">{if $presence.reference_id!=''}{$presence.reference_label}{/if}</span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a> *
 				<input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
 			</td>
 		</tr>
 		</table>
 </p>
-<input type="button" value="opslaan" onclick="savedataform();" />
+<input type="button" value="opslaan" onclick="savedataform('existing');" />
 </form>
 
 
@@ -220,23 +226,8 @@
 {/if}
     </p>
     
-    <!-- p>
-        <a href="taxon.php?id={$concept.id}">soortsbeschrijvingen bewerken</a>
-    </p -->
-
 </div>
 
-<div id="dropdown-list">
-	<div id="dropdown-list-content"></div>
-</div>
-
-{*
-	// revert:
-	var previousValues=Array();
-	{foreach from=$data item=v key=k}
-	previousValues.push( { name: '{$k}', value: {$v.current} } );
-	{/foreach}
-*}
 
 <script>
 $(document).ready(function()

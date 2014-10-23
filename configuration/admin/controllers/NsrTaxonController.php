@@ -216,6 +216,7 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('ranks',$this->newGetProjectRanks());
 			$this->smarty->assign('statuses',$this->getStatuses());
 			$this->smarty->assign('habitats',$this->getHabitats());
+			$this->smarty->assign('actors',$this->getActors());
 
 			$this->smarty->assign('rank_id_species',$this->_projectRankIds[SPECIES_RANK_ID]['id']);
 			$this->smarty->assign('rank_id_subspecies',$this->_projectRankIds[SUBSPECIES_RANK_ID]['id']);
@@ -1728,7 +1729,7 @@ class NsrTaxonController extends NsrController
 	private function updateConceptPresenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('presence_id'=>trim($values['new'])),
+			array('presence_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
