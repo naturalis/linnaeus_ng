@@ -30,20 +30,26 @@
 			{assign var=first value=false}
 			{/if}
 			{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-			<option value="{$v.id}" {if ($v.id==$name.language_id) || ($newname && $v.id==$smarty.const.LANGUAGE_ID_DUTCH)} selected="selected"{/if}>{$v.label}</option>
+			<option value="{$v.id}" {if $v.id==$name.language_id} selected="selected"{/if}>{$v.label}</option>
 			{/if}
 		{/foreach}
 		</select> *
 	</td></tr>
-	<tr><th colspan="2">&nbsp;</td></tr>
-	<tr><th>literatuur:</th><td>
+	<tr>
+    	<th colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+    	<th>literatuur:</th>
+        <td>
+    	<span id="name_reference">
 		{if $name.reference_id!=''}
 			{$name.reference_name}
 		{else}n.v.t.{/if}	
-		<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="name_reference_id">edit</a>
-		<span class="editspan" id="reference"></span>
-		<input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
-	</td></tr>
+        </span>
+        <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
+        <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
+		</td>
+	</tr>
 	
 	<tr><th>expert:</th><td>
 		<select id="name_expert_id">
@@ -106,6 +112,10 @@ $(document).ready(function()
 	});
 	//console.dir(values);
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
+
+	{if $newname}
+	$("#name_language_id").val({$smarty.const.LANGUAGE_ID_DUTCH}).trigger('change');
+	{/if}
 
 	$('th[title]').each(function(key,value)
 	{

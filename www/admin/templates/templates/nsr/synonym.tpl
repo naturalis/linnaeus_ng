@@ -81,8 +81,8 @@
 			{$name.reference_name}
 		{else}n.v.t.{/if}	
         </span>
-            <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
-		<input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
+        <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
+        <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 	</td></tr>
 	
 	<tr><th>expert:</th><td>
