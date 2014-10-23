@@ -171,7 +171,7 @@
 	<ul>
 	{foreach from=$names.list item=v}
 		<li>
-		{$v.name_no_tags} ({$v.language_label}) <i>{$v.nametype}</i> <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
+		{$v.name_no_tags} {*({$v.language_label})*}<i>({$v.nametype_label})</i> <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
 		</li>
 	{/foreach}
 	</ul>
