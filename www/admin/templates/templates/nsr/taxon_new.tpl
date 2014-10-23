@@ -190,7 +190,7 @@
 					{/if}
 					<option value="{$v.id}">{$v.index_label}. {$v.label}</option>
 				{/foreach}
-				</select> *
+				</select>
 			</td>
 		</tr>
 
@@ -217,7 +217,7 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> *
+				</select>
 			</td>
 		</tr>
 	
@@ -231,7 +231,7 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> *
+				</select>
 			</td>
 		</tr>
 	
@@ -239,7 +239,7 @@
         	<th>publicatie:</th>
 			<td style="vertical-align:bottom">
                 <span id="presence_reference"></span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a> *
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a>
                 <input type="hidden" id="presence_reference_id" value="" />
 			</td>
 		</tr>

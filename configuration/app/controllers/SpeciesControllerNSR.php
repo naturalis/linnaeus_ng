@@ -190,7 +190,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 
 				$name=$url=null;	
-				foreach((array)$content['rdf'] as $val)
+				foreach((array)$content['rdf'] as $key=>$val)
 				{
 					if ($val['predicate']=='hasPublisher')
 					{
@@ -205,6 +205,12 @@ class SpeciesControllerNSR extends SpeciesController
 								'url'=>$url
 							)
 						);
+					}
+					if ($val['predicate']=='hasReference')
+					{
+						$content['rdf'][$key]['data']['authors']=$this->getReferenceAuthors($val['data']['id']);
+						$content['rdf'][$key]['data']['periodical_ref']=$this-> getReference($val['data']['periodical_id']);
+						$content['rdf'][$key]['data']['publishedin_ref']=$this-> getReference($val['data']['publishedin_id']);
 					}
 				}
 
@@ -1826,6 +1832,76 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 		
 		return $data;
+
+	}
+
+	private function getReferenceAuthors($id)
+	{
+		$d=$this->models->Literature2Authors->freeQuery("
+			select
+				_a.actor_id, _b.name
+	
+			from %PRE%literature2_authors _a
+	
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id 
+				and _a.project_id=_b.project_id
+	
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.literature2_id =".$id."
+			order by _b.name
+		");
+		
+		return $d;
+	}
+
+	private function getReference($id)
+	{
+		$l=$this->models->Literature2->freeQuery(
+			"select
+				_a.*,
+				_h.label as publishedin_label,
+				_i.label as periodical_label
+
+			from %PRE%literature2 _a
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id 
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i 
+				on _a.periodical_id = _i.id 
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.id = ".$id
+		);
+
+		
+		if ($l)
+		{
+			$authors=$this->models->Literature2Authors->freeQuery("
+				select
+					_a.actor_id, _b.name
+	
+				from %PRE%literature2_authors _a
+	
+				left join %PRE%actors _b
+					on _a.actor_id = _b.id 
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$this->getCurrentProjectId()."
+					and _a.literature2_id =".$id."
+				order by _b.name
+			");
+		
+			$l[0]['authors']=$authors;
+			
+			return $l[0];
+		}
 
 	}
 

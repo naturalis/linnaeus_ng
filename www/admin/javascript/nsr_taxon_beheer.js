@@ -158,20 +158,25 @@ function checkPresenceDataSpecies()
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 	var buffer=[];
 
+	var p1=$('#presence_presence_id :selected').val();
+	var p2=$('#presence_expert_id :selected').val();
+	var p3=$('#presence_organisation_id :selected').val();
+	var p4=$('#presence_reference_id').val();
+		
 	if (rank>=speciesBaseRankid)
 	{
-		if ($('#presence_presence_id :selected').val()==-1)
-			buffer.push("Voorkomen: status is niet ingevuld.");
-
-		if ($('#presence_expert_id :selected').val()==-1)
-			buffer.push("Voorkomen: expert is niet ingevuld.");
-
-		if ($('#presence_organisation_id :selected').val()==-1)
-			buffer.push("Voorkomen: organisatie is niet ingevuld.");
-
-		if ($('#presence_reference_id').val().length==0)
-			buffer.push("Voorkomen: publicatie is niet ingevuld.");
+		if (p1==-1) buffer.push("Voorkomen: status is niet ingevuld.");
+		if (p2==-1) buffer.push("Voorkomen: expert is niet ingevuld.");
+		if (p3==-1) buffer.push("Voorkomen: organisatie is niet ingevuld.");
+		if (p4.length==0) buffer.push("Voorkomen: publicatie is niet ingevuld.");
 	}
+	else
+	if (rank<speciesBaseRankid)
+	{
+		if (p1!=-1 || p2!=-1 || p3!=-1 || p4.length!=0) 
+			buffer.push("Voorkomen kan niet worden ingevuld voor hogere taxa.");
+	}
+	
 
 	if (buffer.length>0) alert(buffer.join("\n"));
 
@@ -238,13 +243,14 @@ function savedataform(type)
 	if (type=='existing')
 	{
 		if (!checkPresenceDataSpecies()) return;
-	} else
+	} 
+	else
 	if (type!='name')
 	{
 		// lethal checks
 		if (!checkNameAgainstRank()) return;
 		if (!checkPresenceDataSpecies()) return;
-	
+
 		// warnings
 		var notifications=[];
 	
@@ -472,7 +478,9 @@ function dropListDialog(ele,title,params)
 		title:title,
 		content :
 			'<p><input type="text" class="medium" id="'+id+'" /></p> \
-			 <p><div id="droplist-list-container"></div></p>'
+			 <p> \
+			 <a href="#" onclick="setNsrDropListValue(this,\''+target+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;">geen waarde toekennen</a> \
+			 <div id="droplist-list-container"></div></p>'
 	});
 
 	$('#'+id).attr('autocomplete','off').bind('keyup', function(e) { 
@@ -527,7 +535,7 @@ function doNsrDropList(p)
 function setNsrDropListValue(ele,variable)
 {
 	// don't change order of lines
-	$('#'+variable.replace(/(_id)$/,'')).html( $(ele).attr('display-text') ? $(ele).attr('display-text') : $(ele).text() );
+	$('#'+variable.replace(/(_id)$/,'')).html( $(ele).attr('display-text') ? $.trim($(ele).attr('display-text')) : $(ele).text() );
 	$('#'+variable).val($(ele).attr('value')).trigger('change');
 }
 
@@ -535,7 +543,7 @@ function buildDropList(data,variable)
 {
 	var buffer=Array();
 
-	buffer.push('<li><a href="#" onclick="setNsrDropListValue(this,\''+variable+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" value="-1">geen waarde toekennen</a></li>');
+//	buffer.push('<li><a href="#" onclick="setNsrDropListValue(this,\''+variable+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" value="-1">geen waarde toekennen</a></li>');
 
 	if (!data.results)
 	{
