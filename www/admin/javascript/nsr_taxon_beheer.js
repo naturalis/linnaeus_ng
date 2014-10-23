@@ -327,6 +327,7 @@ function checkPresenceDataHT()
 
 function savedataform(type)
 {
+
 	if (!checkMandatory()) return;
 
 	if (type!='name')
@@ -349,6 +350,7 @@ function savedataform(type)
 			if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
 		}
 	}
+
 	
 	form = $("<form method=post></form>");
 	form.append('<input type="hidden" name="action" value="save" />');
@@ -371,6 +373,7 @@ function savedataform(type)
 		if ((val.new && val.new!=val.current) || val.delete)
 		{
 			form.append('<input type="hidden" name="'+val.name+'[current]" value="'+val.current+'" />');
+
 			if (val.delete)
 				form.append('<input type="hidden" name="'+val.name+'[delete]" value="1" />');
 			else
@@ -668,8 +671,6 @@ function setreference(ele,targetvar)
 	setnewvalue({name:targetvar,value:$(ele).attr('id')});
 	$( '#reference' ).html($(ele).text());
 }
-
-
 
 function deleteform()
 {

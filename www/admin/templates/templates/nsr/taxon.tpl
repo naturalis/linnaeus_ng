@@ -259,9 +259,6 @@ $(document).ready(function()
 		$(this).trigger('click'); 
 		//$(this).remove(); 
 	} );
-	$('span.editspan').each(function() {
-		//$(this).removeClass('editspan'); 
-	} );
 	{/if}
 
 	$('th[title]').each(function(key,value)
