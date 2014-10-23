@@ -351,7 +351,7 @@ class NsrTaxonController extends NsrController
     public function taxonDeletedAction()
     {
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Taxa marked as deleted'));
+        $this->setPageName($this->translate('Taxa gemarkeerd als verwijderd'));
 		$this->smarty->assign('concepts',$this->getSpeciesList(array('have_deleted'=>'only')));
 		$this->printPage();
 	}
@@ -1032,7 +1032,9 @@ class NsrTaxonController extends NsrController
 					else 50
 				end as adjusted_rank,
 				
-				ifnull(_trash.is_deleted,0) as is_deleted
+				ifnull(_trash.is_deleted,0) as is_deleted,
+				concat(_user.first_name,' ',_user.last_name) as deleted_by,
+				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
 			
 			from %PRE%names _a
 			
@@ -1044,6 +1046,9 @@ class NsrTaxonController extends NsrController
 				on _e.project_id = _trash.project_id
 				and _e.id = _trash.lng_id
 				and _trash.item_type='taxon'
+
+			left join %PRE%users _user
+				on _trash.user_id = _user.id
 				
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
@@ -2463,7 +2468,8 @@ class NsrTaxonController extends NsrController
 				'project_id'=>$this->getCurrentProjectId(),
 				'lng_id'=>$this->rGetId(),
 				'item_type'=>'taxon',
-				 'is_deleted'=>1
+				'user_id'=>$this->getCurrentUserId(),
+				'is_deleted'=>1
 			));		
 
 			$after['is_deleted']=1;
