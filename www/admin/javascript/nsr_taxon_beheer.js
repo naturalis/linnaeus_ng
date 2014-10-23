@@ -289,7 +289,7 @@ function checkDutchName()
 {
 	var buffer=[];
 
-	if ($('#dutch_name').val().length!=0)
+	if ($('#dutch_name').val() && $('#dutch_name').val().length!=0)
 	{
 		if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
 		if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");

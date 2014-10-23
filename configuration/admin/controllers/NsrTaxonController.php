@@ -2174,7 +2174,7 @@ class NsrTaxonController extends NsrController
 			array(
 				'before'=>(!empty($name) ? $name : null),
 				'after'=>$after,
-				'note'=>(!empty($name) ? 'updated name '.$before['name'] : 'new name '.$after['name'])
+				'note'=>(!empty($name) ? 'updated name '.$name['name'] : 'new name '.$after['name'])
 			)
 		);
 			
