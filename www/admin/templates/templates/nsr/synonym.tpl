@@ -74,25 +74,14 @@
 		{/foreach}
 		</select> *
 	</td></tr>
-    {*
-	<tr><th>taal:</th><td>
-		<select id="name_language_id" mandatory="mandatory">
-			<option value="" {if !$name.language_id} selected="selected"{/if}>n.v.t.</option>
-			{foreach from=$languages item=v key=k}
-			{if $v.id==$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-				<option value="{$v.id}" {if $v.id==$name.language_id} selected="selected"{/if}>{$v.label}</option>
-			{/if}
-			{/foreach}
-		</select> *
-	</td></tr>
-    *}
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>literatuur:</th><td>
+    	<span id="name_reference">
 		{if $name.reference_id!=''}
 			{$name.reference_name}
 		{else}n.v.t.{/if}	
-		<a class="edit" href="#" onclick="toggleedit(this);editreference(this);return false;" rel="name_reference_id">edit</a>
-		<span class="editspan" id="reference"></span>
+        </span>
+            <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
 		<input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 	</td></tr>
 	
@@ -128,7 +117,7 @@
 </p>
 
 <p>
-<input type="button" value="opslaan" onclick="savedataform();" />
+<input type="button" value="opslaan" onclick="savedataform('synonym');" />
 {if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
 </form>
 </p>

@@ -527,7 +527,7 @@ class Literature2Controller extends Controller
 				else 
 				{
 					$match=$match ? true : (stripos($val['label'],$search)!==false);
-						echo '.';	
+
 					if (!$match)
 					{
 
