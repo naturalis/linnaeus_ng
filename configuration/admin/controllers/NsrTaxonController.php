@@ -745,9 +745,11 @@ class NsrTaxonController extends NsrController
 				'project_id'=>$this->getCurrentProjectId()
 			)
 		));
+		
 
 		foreach($types as $key=>$val)
 		{
+			$types[$key]['nametype']=$this->Rdf->translatePredicate($val['nametype'],true);
 			$types[$key]['noNameParts']= in_array($val['nametype'],array(PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME)) ? true : false ;
 		}
 		

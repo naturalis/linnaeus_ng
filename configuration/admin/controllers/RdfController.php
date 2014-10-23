@@ -113,26 +113,30 @@ class RdfController extends Controller
 		return $rdf;
 	}
 	
-	public function translatePredicate($predicate)
+	public function translatePredicate($predicate,$removelanguageparam=false)
 	{
+	
 		$predicateTranslations=array(
 			24 => array(
 				PREDICATE_VALID_NAME=>'geldige naam',
-				PREDICATE_PREFERRED_NAME=>'%se naam', // language table should have an extra adjective-column
+				PREDICATE_PREFERRED_NAME=>'%se voorkeursnaam', // language table should have an extra adjective-column
 				PREDICATE_HOMONYM=>'homoniem',
 				PREDICATE_BASIONYM=>'basioniem',
 				PREDICATE_SYNONYM=>'synoniem',
-				PREDICATE_SYNONYM_SL=>'synoniem',
-				PREDICATE_MISSPELLED_NAME=>'fout gespelde naam',
+				PREDICATE_SYNONYM_SL=>'synoniem sensu lato',
+				PREDICATE_MISSPELLED_NAME=>'foutieve spelling',
 				PREDICATE_INVALID_NAME=>'ongeldige naam',
 				PREDICATE_ALTERNATIVE_NAME=>'alternatieve %se naam'
 			)
 		);
 
-		return isset($predicateTranslations[$this->getDefaultProjectLanguage()][$predicate]) ?
+		$d=isset($predicateTranslations[$this->getDefaultProjectLanguage()][$predicate]) ?
 			$predicateTranslations[$this->getDefaultProjectLanguage()][$predicate] : 
 			$predicate;
 
+		if ($removelanguageparam) $d=str_replace('%se ','',$d);
+
+		return $d;
 	}
 		
 	public function deleteRdfValue($p)
