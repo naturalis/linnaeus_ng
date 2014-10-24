@@ -76,7 +76,7 @@ class KeyController extends Controller
         $this->setPageName( $this->translate('Index'));
 		
 		// set the stored key tree (= compact hierarchical representation of the entire key)
-		$this->getKeyTree();
+//		$this->getKeyTree();
 
 		// get user's decision path
 		$keyPath = $this->getKeyPath();
