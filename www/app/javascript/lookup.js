@@ -109,7 +109,7 @@ function allLookupGetData(text,getAll) {
 
 			for(var i=0;i<allLookupData.results.length;i++)
 			{
-				var stripped = stripTags(allLookupData.results[i].label);
+				var stripped = stripTags(allLookupData.results[i].label) || '';
 				
 				if (getAll || stripped.match(eval(regExp)))
 				{
