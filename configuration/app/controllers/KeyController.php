@@ -76,7 +76,7 @@ class KeyController extends Controller
         $this->setPageName( $this->translate('Index'));
 		
 		// set the stored key tree (= compact hierarchical representation of the entire key)
-//		$this->getKeyTree();
+		//		$this->getKeyTree();
 
 		// get user's decision path
 		$keyPath = $this->getKeyPath();
@@ -776,24 +776,35 @@ class KeyController extends Controller
 
 
 	private $choiceKeystepTable;
+	private $stepsDone;
+	private $startStep;
 
 	private function getStepsByTarget($step)
 	{
 		$data=array();
-		array_push($data,$step);
-		$d=@$this->choiceKeystepTable[$step];
-		foreach((array)$d as $val)
+
+		if (!isset($this->stepsDone[$step]) || $this->stepsDone[$step]!=true)
 		{
-			$r=$this->getStepsByTarget($val['keystep_id']);
-			$data=array_merge($data,$r);
+			$this->stepsDone[$step]=true;
+			array_push($data,$step);
+	
+			if (isset($this->choiceKeystepTable[$step]))
+			{
+				$d=$this->choiceKeystepTable[$step];
+				
+				foreach((array)$d as $val)
+				{
+					$r=$this->getStepsByTarget($val['keystep_id']);
+					if ($r) $data=array_merge($data,$r);
+				}
+			}
 		}
+
 		return $data;
 	}
 
 	private function setChoiceKeystepTable()
 	{
-		// store in $_SESSION? (but suppress on preview)
-		
 		$d=$this->models->ChoiceKeystep->freeQuery("
 			select 
 				res_keystep_id, keystep_id
@@ -814,14 +825,11 @@ class KeyController extends Controller
 	{
 		$this->setChoiceKeystepTable();
 
-		$d = $this->models->ChoiceKeystep->freeQuery("
+		$choiceLeadingToATaxon=$this->models->ChoiceKeystep->freeQuery("
 			select 
 				_ck.res_taxon_id,
 				_ck.keystep_id,
-				_a.id,
 				_a.taxon,
-				_a.rank_id,
-				_a.is_hybrid,
 				_c.commonname
 
 			from 
@@ -849,29 +857,28 @@ class KeyController extends Controller
 				and _ck.res_taxon_id is not null
 			");
 
-		//$ranks=$this->getProjectRanks();
-
-		foreach((array)$d as $val)
+		foreach((array)$choiceLeadingToATaxon as $val)
 		{
 			$stepsByTarget[$val['res_taxon_id']]['steps'][]=$val['keystep_id'];
 			$stepsByTarget[$val['res_taxon_id']]['data']=array(
-				'id'=>$val['id'],
+				'id'=>$val['res_taxon_id'],
 				'taxon'=>$val['taxon'],
-				'is_hybrid'=>$val['is_hybrid'],
+				//'is_hybrid'=>$val['is_hybrid'],
 				'commonname'=>$val['commonname'],
 				//'label'=>$this->formatTaxon($val,$ranks)
 			);
-			$fuck[$val['id']]=$val['id'];
 		}
 
 		foreach((array)$stepsByTarget as $key=>$steps)
 		{
 			foreach($steps['steps'] as $step)
 			{
-				$stepsByTarget[$key]['steps']=
-					array_unique(array_merge($stepsByTarget[$key]['steps'],$this->getStepsByTarget($step)));
+				$r=$this->getStepsByTarget($step);
+				if ($r)
+					$stepsByTarget[$key]['steps']=
+						array_unique(array_merge($stepsByTarget[$key]['steps'],$r));
+				unset($this->stepsDone);
 			}
-
 		}
 
 		usort(
@@ -901,6 +908,9 @@ class KeyController extends Controller
 
 		$allsteps=$this->getAllStepsByTarget();
 		$start=$this->getStartKeystepId();
+		$this->startStep=$start;
+		//q($step);q($allsteps,1);
+
 
 		foreach($allsteps as $key=>$val)
 		{
