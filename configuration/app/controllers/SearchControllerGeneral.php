@@ -2,6 +2,8 @@
 
 /*
 
+	be aware that the MySQL function fnStripTags is only applied in some cases, i.e. large text columns.
+
 	we are now doing LIKE instead of MATCH (as MATCH ignores wildcards at the beginning: *olar only matches olar, not polar)
 	(do the same limitations still apply? think not.)
 
@@ -57,14 +59,17 @@
 
 
 	WE WILL NOT SEARCH THE MATRIX!
-	
-	STRIP TAGS AND SHIT FROM SEARCH STRING!!! (also + and - and * which fuck up the fulltext)
 
+	STRIP TAGS AND SHIT FROM SEARCH STRING!!! (also + and - and * which fuck up the fulltext)
 
 	search is case-insensitive! 
 	the php post-filtering is designed to allow for case-sensitivity, but it is not actually implemented. 
 	as the full text search is insensitive by default (unless we start altering the collation of the indexed 
 	columns), searches that have no literal bits ("...") will be harder to turn into case sensitive ones.
+	(eh?)
+
+	W E   W I L L   N O T   S E A R C H   T H E   M A T R I X !
+	
 
 */
 
@@ -146,10 +151,19 @@ class SearchControllerGeneral extends SearchController
 
 	private function initialize()
 	{
-		$this->_excerptPreMatchLength = isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
-		$this->_excerptPostMatchLength = isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
-		$this->_excerptPrePostMatchString = isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
-		$this->_searchResultSort = $this->getSetting('app_search_result_sort','alpha');
+		$this->_excerptPreMatchLength=
+			isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
+
+		$this->_excerptPostMatchLength=
+			isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
+
+		$this->_excerptPrePostMatchString=
+			isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
+
+		$this->_searchResultSort=
+			$this->getSetting('app_search_result_sort','alpha');
+			
+		$this->createMySQLfunction_fnStripTags();
 	}
 
     public function searchResetAction ()
@@ -160,15 +174,18 @@ class SearchControllerGeneral extends SearchController
 
     public function searchAction ()
     {
-		if ($this->rHasVal('search')) {
+		if ($this->rHasVal('search'))
+		{
 
-			$_SESSION['app'][$this->spid()]['search'] = array(
-				'search' => $this->requestData['search'],
-				'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
-				'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
+			$_SESSION['app'][$this->spid()]['search']=
+				array(
+					'search' => $this->requestData['search'],
+					'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
+					'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
 				);
 				
-			if ($this->validateSearchString($this->requestData['search'])) {
+			if ($this->validateSearchString($this->requestData['search']))
+			{
 				
 				if ($this->rHasVal('extended','1')) {
 
@@ -182,8 +199,9 @@ class SearchControllerGeneral extends SearchController
 							)
 						);
 
-				} else {
-
+				} 
+				else
+				{
 					$search='"'.trim($this->requestData['search'],'"').'"';
 
 					$results=
@@ -201,8 +219,9 @@ class SearchControllerGeneral extends SearchController
 				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
 				$this->smarty->assign('results',$results);
 
-			} else {
-
+			} 
+			else 
+			{
 				$this->addError(
 					sprintf(
 						$this->translate('Search string must be between %s and %s characters in length.'),
@@ -210,9 +229,7 @@ class SearchControllerGeneral extends SearchController
 						$this->_maxSearchLength
 					)
 				);
-
 			}
-			
 		}
 
 		$this->smarty->assign('CONSTANTS',
@@ -226,7 +243,7 @@ class SearchControllerGeneral extends SearchController
 			)
 		);
 	
-		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
+		$this->smarty->assign('modules',$this->getProjectModules(array('ignore'=>MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 		$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
 
@@ -236,29 +253,31 @@ class SearchControllerGeneral extends SearchController
 
 	private function tokenizeSearchString($s)
 	{
-
 		/*
-			splits search string in groups delimited by ". if there's an 
-			uneven number the last one is ignored.
+			splits search string in groups delimited by ". if there's an uneven number of ", the last one is ignored.
 		*/	
-
 		$parts = preg_split('/('.$this->_searchStringGroupDelimiter.')/i',$s,-1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 		$b = null;    // buffer
 		$t = array(); // resulting array of parts
 		$r = false;   // "rec"-toggle
 
-		foreach($parts as $val) {
-			if ($val=='"') {
+		foreach($parts as $val)
+		{
+			if ($val=='"')
+			{
 				// if "rec" is on, add the concatenated string to the results and reset the buffer
-				if ($r) {
+				if ($r)
+				{
 					if (!empty($b))
 						array_push($t,$b);
 					$b = null;
 				}
 				// and toggle "rec"
 				$r = !$r;
-			} else {
+			}
+			else
+			{
 				// concatenate consecutive parts when "rec" is on (i.e., we are inside a "...")
 				if($r)
 					$b .= $val;
@@ -268,7 +287,9 @@ class SearchControllerGeneral extends SearchController
 			}
 		}
 		// take out the empty ones and return
-		return array_filter($t);
+		$t=array_filter($t);
+	
+		return $t;
 
 	}
 	
@@ -276,9 +297,9 @@ class SearchControllerGeneral extends SearchController
 	{
 		// make tokens into a single string for mysql MATCH statement; add *'s to enable partial matches
 		$r = '';
-		foreach((array)$s as $val) {
-			foreach(explode(' ',$val) as $b)
-				$r .= 	$b.'* ';
+		foreach((array)$s as $val)
+		{
+			foreach(explode(' ',$val) as $b) $r.=$b.'* ';
 		}
 		return trim($r);
 	}
@@ -568,8 +589,7 @@ class SearchControllerGeneral extends SearchController
 		
 		if (isset($restrict))
 			$p['restrict']=$restrict;
-		
-		
+
 		$results =
 			array(
 				'introduction' =>
@@ -640,7 +660,8 @@ class SearchControllerGeneral extends SearchController
 		}
 
 
-		if ($p[self::S_EXTENDED_SEARCH]) {
+		if ($p[self::S_EXTENDED_SEARCH])
+		{
 
 			// taxon content
 			$content = $this->models->ContentTaxon->_get(
@@ -648,14 +669,14 @@ class SearchControllerGeneral extends SearchController
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						//'%LITERAL%' => "MATCH(content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
-						'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('content')),
+						'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('fnStripTags(content)')),
 						'publish' => 1
 					),
 					'columns' => 'taxon_id as id,taxon_id,content,page_id as cat,content as '.self::__CONCAT_RESULT__,
 					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 				)
 			);
-
+			
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 			$content = $this->sortResultsByMostTokensFound($content);
@@ -923,7 +944,7 @@ class SearchControllerGeneral extends SearchController
 					
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
-					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','content')),
+					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','fnStripTags(content)')),
 				),
 				'columns' => 'page_id as id,topic as label,content,content as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
@@ -958,7 +979,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(term,definition) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
-					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('term','definition')),
+					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('term','fnStripTags(definition)')),
 				),
 				'columns' => 'id,term as label,definition as content,concat(ifnull(term,\'\'),\' \',ifnull(definition,\'\')) as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
@@ -1065,7 +1086,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(text) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
-					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('text')),
+					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('fnStripTags(text)')),
 				),
 				'columns' => $c,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
@@ -1130,7 +1151,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(choice_txt) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
-					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('choice_txt')),
+					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('fnStripTags(choice_txt)')),
 				),
 				'columns' => 'id,choice_id,choice_txt as content,choice_txt as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
@@ -1164,7 +1185,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(title,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)"
-					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('title','content')),
+					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('title','fnStripTags(content)')),
 				),
 				'columns' => 'keystep_id as id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__
 			)
@@ -1203,9 +1224,8 @@ class SearchControllerGeneral extends SearchController
 
 	private function searchMatrixKey($p)
 	{
-		//what IS the matrix?
+		// NO! NOT! NEVER!
 		return null;
-
 	}
 
 	private function searchMap($p)
@@ -1251,7 +1271,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(subject,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
-					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('subject','content')),
+					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('subject','fnStripTags(content)')),
 				),
 				'columns' => 'id,subject as label,content,language_id,concat(ifnull(subject,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
@@ -1288,7 +1308,7 @@ class SearchControllerGeneral extends SearchController
 		$d=array(
 			'project_id' => $this->getCurrentProjectId(),
 			'module_id' => $id,
-			'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','content')),
+			'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','fnStripTags(content)')),
 		);
 
 		$content = $this->models->ContentFreeModule->_get(
@@ -1379,6 +1399,32 @@ class SearchControllerGeneral extends SearchController
         $this->printPage();
     
     }
+
+	private function createMySQLfunction_fnStripTags()
+	{
+		$this->models->Taxon->freeQuery("DROP FUNCTION IF EXISTS fnStripTags");
+		$this->models->Taxon->freeQuery("
+			CREATE FUNCTION fnStripTags( Dirty varchar(4000) )
+			RETURNS varchar(4000)
+			DETERMINISTIC 
+			BEGIN
+			  DECLARE iStart, iEnd, iLength int;
+				WHILE Locate( '<', Dirty ) > 0 And Locate( '>', Dirty, Locate( '<', Dirty )) > 0 DO
+				  BEGIN
+					SET iStart = Locate( '<', Dirty ), iEnd = Locate( '>', Dirty, Locate('<', Dirty ));
+					SET iLength = ( iEnd - iStart) + 1;
+					IF iLength > 0 THEN
+					  BEGIN
+						SET Dirty = Insert( Dirty, iStart, iLength, '');
+					  END;
+					END IF;
+				  END;
+				END WHILE;
+				RETURN Dirty;
+			END;
+		");
+	}
+
 
 
 }
