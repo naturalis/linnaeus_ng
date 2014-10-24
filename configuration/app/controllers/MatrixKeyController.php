@@ -1281,7 +1281,7 @@ class MatrixKeyController extends Controller
 
 		        $rrr=$this->models->MatrixTaxonState->freeQuery($q);
 
-				foreach($rrr as $r)
+				foreach((array)$rrr as $r)
 				{
 					switch($r['type'])
 					{
