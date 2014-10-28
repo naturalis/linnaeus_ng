@@ -223,6 +223,8 @@ class LoaderController extends Controller
 
 	private function preloadMatrix()
 	{
+		
+		return;
 
 		require_once ('../../../../configuration/app/controllers/MatrixKeyController.php');
 		$c = new MatrixKeyController(array('checkForSplash'=>false));
