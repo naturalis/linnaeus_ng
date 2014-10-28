@@ -1681,7 +1681,7 @@ class NsrTaxonController extends NsrController
 			'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 			'columns'=>'taxon'
 		));
-
+		
 		$result=$this->models->Taxon->update(
 			array('taxon'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
@@ -1693,7 +1693,7 @@ class NsrTaxonController extends NsrController
 				'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'taxon'
 			));
-			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept name '.$before['taxon']));
+			$this->logNsrChange(array('before'=>$before[0],'after'=>$after[0],'note'=>'updated concept name '.$before[0]['taxon']));
 		}
 		return $result;
 	}
