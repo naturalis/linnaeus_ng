@@ -71,7 +71,7 @@
 		</tr>
 		<tr>
 			<th>status:</th>
-			<td>{$presence.presence_id}
+			<td>
 				{if $presence.presence_id}
 					<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
 				{else}n.v.t.{/if}
