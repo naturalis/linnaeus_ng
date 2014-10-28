@@ -266,7 +266,7 @@ class Controller extends BaseClass
 
 		$this->setOtherStuff();
 
-		$this->splashScreen();
+		//$this->splashScreen();
 
     }
 

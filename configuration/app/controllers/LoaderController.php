@@ -57,8 +57,6 @@ class LoaderController extends Controller
 	
 		if ($this->rHasVal('go','load')) {
 
-			return;
-
 			$this->doPreload();
 			
 			die();
