@@ -57,6 +57,8 @@ class LoaderController extends Controller
 	
 		if ($this->rHasVal('go','load')) {
 
+			return;
+
 			$this->doPreload();
 			
 			die();
@@ -184,17 +186,6 @@ class LoaderController extends Controller
 
 	private function preloadMap()
 	{
-		/*
-			for some reason		
-
-			l2GetTaxaWithOccurrences() ->
-			buildTaxonTree() ->
-			_buildTaxonTree() ->
-			getTaxonChildren() 
-
-			has started thrashing the loader. needs to be investigated.			
-		*/
-		return;
 
 		require_once ('../../../../configuration/app/controllers/MapKeyController.php');
 		$c = new MapKeyController(array('checkForSplash'=>false));
@@ -223,8 +214,6 @@ class LoaderController extends Controller
 
 	private function preloadMatrix()
 	{
-		
-		return;
 
 		require_once ('../../../../configuration/app/controllers/MatrixKeyController.php');
 		$c = new MatrixKeyController(array('checkForSplash'=>false));
