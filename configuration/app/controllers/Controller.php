@@ -2,8 +2,6 @@
 
 /*
 
-	bla
-
 	on skins:
 	if the setting (in the table 'settings') for 'skin' exists, that skin is used
 	providing the follwing directories exist ($this->doesSkinExist()):

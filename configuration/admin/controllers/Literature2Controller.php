@@ -169,6 +169,7 @@ class Literature2Controller extends Controller
 			'publication_type' => 'Publicatietype',
 			'citation' => 'Citatie',
 			'source' => 'Bron',
+			'publisher' => 'Uitgever',
 			'publishedin' => 'Publicatie (verbatim)',
 			'publishedin_id' => 'Publicatie',
 			'periodical' => 'Periodiek (verbatim)',

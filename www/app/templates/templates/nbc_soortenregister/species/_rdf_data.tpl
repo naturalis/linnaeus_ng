@@ -21,10 +21,11 @@
 			<li>
                 <a href="../literature2/reference.php?id={$v.data.id}">
                 {foreach from=$v.data.authors item=author key=ak}{if $ak>0}, {/if}{$author.name}{/foreach}{if $v.data.date}, {$v.data.date}{/if}.
+                {if $v.data.label}{$v.data.label}. {/if}
                 {if $v.data.periodical_id}{$v.data.periodical_ref.label} {elseif $v.data.periodical}{$v.data.periodical} {/if}
                 {if $v.data.publishedin_id}{$v.data.publishedin_ref.label} {elseif $v.data.publishedin}{$v.data.publishedin} {/if}
                 {if $v.data.volume}{$v.data.volume}{/if}{if $v.data.pages}: {$v.data.pages}. {/if}
-                {if $v.data.source}{$v.data.source}.{/if}      
+                {if $v.data.publisher}{$v.data.publisher}.{/if}      
                 </a></li>
 			{/if}
 		{/foreach}
