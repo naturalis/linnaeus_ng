@@ -73,6 +73,7 @@ class Literature2Controller extends Controller
 				_a.order_number,
 				_a.citation,
 				_a.source,
+				_a.publisher,
 				_a.publishedin,
 				_a.publishedin_id,
 				_c.label as publishedin_name,

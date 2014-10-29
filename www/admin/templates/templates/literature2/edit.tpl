@@ -95,6 +95,9 @@
 			<input type="hidden" id="publishedin_id" name="publishedin_id" value="{$reference.publishedin_id}" />
 		</td>
 	</tr>
+
+	<tr><th>uitgever:</th><td><input class="" type="text" name="publisher" value="{$reference.publisher}" /></td></tr>
+
 	{if $reference.publishedin}
 	<tr>
     	<th>gepubliceerd in (verbatim):</th>

@@ -219,7 +219,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->smarty->assign('content',$content['content']);
 				$this->smarty->assign('rdf',$content['rdf']);
 			}
-			
+
             $this->smarty->assign('sideBarLogos',$sideBarLogos);
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',$categories['categories']);
@@ -1603,17 +1603,24 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$a=str_replace(' ','_',$name);
 			$b=str_replace(' ','-',$name);
+			$c=substr($name,0,strpos($name,' '));
 			foreach($exts as $ext)
 			{
 				array_push($d,
 					$a.'.'.$ext,
 					strtolower($a).'.'.$ext,
-					$a.'_logo.'.$ext,
-					strtolower($a).'_logo.'.$ext,
+					$a.'-logo.'.$ext,
+					strtolower($a).'-logo.'.$ext,
+					
 					$b.'.'.$ext,
 					strtolower($b).'.'.$ext,
 					$b.'-logo.'.$ext,
-					strtolower($b).'-logo.'.$ext
+					strtolower($b).'-logo.'.$ext,
+					
+					$c.'.'.$ext,
+					strtolower($c).'.'.$ext,
+					$c.'-logo.'.$ext,
+					strtolower($c).'-logo.'.$ext
 				);
 			}
 		}
