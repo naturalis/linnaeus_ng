@@ -75,7 +75,6 @@ class SpeciesControllerNSR extends SpeciesController
 
         if (empty($taxon))
 		{
-//			$this->redirect('nsr_index.php');
 			$this->smarty->assign('title','Pagina niet gevonden');
 			$this->smarty->assign('text','De gevraagde pagina kon niet worden gevonden.');
 	        $this->printPage('../shared/404');

@@ -2,7 +2,7 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuw synoniem{else}{$name.name}{/if}</h2>
+<h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe wetenschappelijke naam{else}{$name.name}{/if}</h2>
 <h3><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h3>
 
 <p>
@@ -64,12 +64,20 @@
 
 
 	<tr><th colspan="2">&nbsp;</td></tr>
-	<tr><th>type:</th><td>
+	<tr><th>type:
+    
+    
+    
+    </th><td>
 		<select id="name_type_id" mandatory="mandatory" label="type" >
 			<option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$nametypes item=v key=k}
 		{if !$v.noNameParts}
-			<option value="{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype}</option>
+			<option
+            	value="{$v.id}"
+                {if $v.id==$name.type_id}selected="selected"{/if}
+                {if $hasvalidname && $v.id==$validnameid && $v.id!=$name.type_id}disabled="disabled"{/if}
+                >{$v.nametype_label}</option>
 		{/if}
 		{/foreach}
 		</select> *

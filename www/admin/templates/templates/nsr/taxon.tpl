@@ -182,7 +182,7 @@
 	{/foreach}
 	</ul>
 	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">Nederlandse naam toevoegen</a><br />
-	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0">synoniem toevoegen (wetenschappelijke naam)</a>
+	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0" title="toevoegen van geldige naam, synoniem, etc.">wetenschappelijke naam toevoegen</a>
 
 
 </p>
