@@ -230,7 +230,7 @@ class NsrTaxonController extends NsrController
     public function synonymAction()
     {
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Edit synonym'));
+        $this->setPageName($this->translate('Bewerk wetenschappelijke naam'));
 		$this->_nameAndSynonym();
 		$this->printPage();
     }
@@ -238,7 +238,7 @@ class NsrTaxonController extends NsrController
     public function nameAction()
     {
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Edit name'));
+        $this->setPageName($this->translate('Bewerk name'));
 		$this->_nameAndSynonym();
 		$this->printPage();
 	}
@@ -288,42 +288,48 @@ class NsrTaxonController extends NsrController
 					if ($concept['base_rank']<SPECIES_RANK_ID)
 					{
 						$this->addWarning("
-							Let op: het synoniem komt niet overeen met de samengestelde naamdelen. Dit is
-							waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
+							Let op: de wetenschappelijke naam komt niet overeen met de samengestelde naamdelen.
+							Dit is waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
 							de juiste uninomial en eventueel auteurschap in om de naamkaart volledig te maken.
 						");
 					}
 					else
 					{
 						$this->addWarning("
-							Let op: het synoniem komt niet overeen met de samengestelde naamdelen. Dit is
-							waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
-							de juiste genus, soort, eventuele derde naamdeel en auteurschap in om de 
-							naamkaart volledig te maken.
+							Let op: de wetenschappelijke naam komt niet overeen met de samengestelde naamdelen.
+							Dit is waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
+							de juiste genus, soort, eventuele derde naamdeel en auteurschap in om de naamkaart
+							volledig te maken.
 						");
 					}
 				}
 			}
 
-			$this->smarty->assign('concept',$concept);
+
+
 			$this->smarty->assign('name',$name);
-			$this->smarty->assign('nametypes',$this->getNameTypes());
-			$this->smarty->assign('languages',$this->getLanguages());
-			$this->smarty->assign('actors',$this->getActors());
 		}
 		else
 		if ($this->rHasVal('taxon'))
 		{
 			$concept=$this->getConcept($this->rGetVal('taxon'));
-			$this->smarty->assign('concept',$concept);
-			$this->smarty->assign('nametypes',$this->getNameTypes());
-			$this->smarty->assign('languages',$this->getLanguages());
-			$this->smarty->assign('actors',$this->getActors());
 			$this->smarty->assign('newname',true);
 		}
 		else
 		{
 			$this->addError('Geen ID.');
+		}
+		
+		if (isset($concept))
+		{
+			$this->smarty->assign('concept',$concept);
+			$this->smarty->assign('preferrednames',$this->getPreferredNames($concept['id']));
+			$this->smarty->assign('preferrednameid',$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']);
+			$this->smarty->assign('hasvalidname',$this->checkIfConceptRetainsScientificName($concept['id']));
+			$this->smarty->assign('validnameid',$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']);
+			$this->smarty->assign('nametypes',$this->getNameTypes());
+			$this->smarty->assign('languages',$this->getLanguages());
+			$this->smarty->assign('actors',$this->getActors());
 		}
 
     }
@@ -605,6 +611,44 @@ class NsrTaxonController extends NsrController
 			);
 	}
 
+	private function getPreferredNames($concept)
+	{
+		
+		if (empty($concept))
+			return;
+
+        $names=$this->models->Names->freeQuery(
+			array(
+				'query' => "
+					select
+						_a.id,
+						_a.name,
+						_a.language_id,
+						_c.language,
+						ifnull(_d.label,_c.language) as language_label
+
+					from %PRE%names _a 
+
+					left join %PRE%languages _c
+						on _a.language_id=_c.id
+
+					left join %PRE%labels_languages _d
+						on _a.language_id=_d.language_id
+						and _a.project_id=_d.project_id
+						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
+
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.taxon_id = ".$concept."
+						and _a.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
+						"
+			)
+		);
+		
+		return $names;
+
+	}
+
 	private function getPresenceData($id)
 	{
 		$data=$this->models->PresenceTaxa->freeQuery(
@@ -750,7 +794,7 @@ class NsrTaxonController extends NsrController
 
 		foreach($types as $key=>$val)
 		{
-			$types[$key]['nametype']=$this->Rdf->translatePredicate($val['nametype'],true);
+			$types[$key]['nametype_label']=$this->Rdf->translatePredicate($val['nametype'],true);
 			$types[$key]['noNameParts']= in_array($val['nametype'],array(PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME)) ? true : false ;
 		}
 		
@@ -2032,8 +2076,6 @@ class NsrTaxonController extends NsrController
 
 	}
 	
-	
-			
 
 
 

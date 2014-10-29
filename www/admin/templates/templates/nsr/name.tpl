@@ -12,16 +12,16 @@
 	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
 	<tr><th>type:</th><td>
 		<select id="name_type_id" mandatory="mandatory" label="type">
-			<option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
+			<option value="" id="nametype-none" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$nametypes item=v key=k}
 			{if $v.noNameParts}
-			<option value="{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype}</option>
+			<option  value="{$v.id}" id="nametype-{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype_label}</option>
 			{/if}
 		{/foreach}
 		</select> *
 	</td></tr>
 	<tr><th>taal:</th><td>
-		<select id="name_language_id" mandatory="mandatory" label="taal">
+		<select id="name_language_id" mandatory="mandatory" label="taal" onchange="checkprefnameavail()">
 			{assign var=first value=true}
 			<option value="" {if !$name.language_id} selected="selected"{/if}>n.v.t.</option>
 		{foreach from=$languages item=v key=k}
@@ -34,6 +34,7 @@
 			{/if}
 		{/foreach}
 		</select> *
+        <span></span>
 	</td></tr>
 	<tr>
     	<th colspan="2">&nbsp;</td>
@@ -116,6 +117,16 @@ $(document).ready(function()
 	{
 		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
 	});
+
+	{foreach from=$preferrednames item=v key=k}
+	storeprefname( { id:{$v.id},language_id:{$v.language_id},name:'{$v.name|@escape}' } );
+	{/foreach}
+	{if $name.id};
+	currentnameid={$name.id};
+	{/if}
+	preferrednameid={$preferrednameid};
+	checkprefnameavail();
+
 
 });
 </script>
