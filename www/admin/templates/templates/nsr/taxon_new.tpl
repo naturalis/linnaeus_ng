@@ -176,7 +176,7 @@
 
 		<tr>
 			<th></th>
-			<td><i>voorkomen</i></td>
+			<td title="status voorkomen kan alleen worden ingevuld voor soorten en lager."><i>voorkomen</i></td>
 		</tr>
 		<tr><th>status:</th>
 			<td>
@@ -265,7 +265,14 @@ $(document).ready(function()
 	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
 
 	$('#data :input[type!=button]').each(function(key,value) {
-		var set={ name:$(this).attr('id'),label:$(this).attr('label'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' };
+		var set={ 
+			name:$(this).attr('id'),
+			label:$(this).attr('label'),
+			current:$(this).val(), 
+			mandatory:$(this).attr('mandatory')=='mandatory',
+			hidden:$(this).attr('type')=='hidden'
+		};
+
 		{if $parent}
 		if ($(this).attr('id')=='parent_taxon_id')
 		{
@@ -287,7 +294,8 @@ $(document).ready(function()
 	values.push( { name:'name_type_id',current:'',new:{$name_type_id},mandatory:true } );
 	values.push( { name:'name_language_id',current:'',new:{$name_language_id},mandatory:true } );
 
-	$('[havedroplist=true]').each(function() {
+	$('[havedroplist=true]').each(function()
+	{
 		$(this).attr('autocomplete','off');
 		$(this).bind('keyup', function(e) { 
 			doNsrDropList({ e:e, id: $(this).attr('id') } )
@@ -299,11 +307,6 @@ $(document).ready(function()
 	partstoname();
 	{/if}
 
-	$('th[title]').each(function(key,value)
-	{
-		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
-	});
-	
 	{if $data}
 	{foreach from=$data item=v key=k}
 		$('#{$k}').val('{$v|@escape}').trigger('change');
@@ -315,6 +318,11 @@ $(document).ready(function()
 	{/foreach}
 	{/if}
 
+	$('th[title]').add('td[title]').each(function(key,value)
+	{
+		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
+	});
+	
 });
 </script>
 

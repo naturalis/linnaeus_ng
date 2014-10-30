@@ -233,6 +233,10 @@
 $(document).ready(function()
 {
 	allLookupNavigateOverrideUrl('taxon.php?id=%s');
+
+	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
+	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
+
 	{if $concept}
 	dataid={$concept.id};
 	taxonrank={$concept.base_rank};

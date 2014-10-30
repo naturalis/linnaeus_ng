@@ -1499,7 +1499,7 @@ class NsrTaxonController extends NsrController
 					"Een %s kan alleen %s als ouder hebben.",
 					$ranks[$childBaseRank]['rank'],
 					implode(" of ",$error)
-				).". ".
+				).
 				"Concept niet opgeslagen."
 
 			);

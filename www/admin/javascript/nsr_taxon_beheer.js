@@ -83,7 +83,7 @@ function checkMandatory()
 	{
 		var val=values[i];
 	
-		if (val.name.substr(0,2)=='__') continue;
+		if (val.name.substr(0,2)=='__' || val.hidden) continue;
 		if (
 			val.mandatory && 
 			(
@@ -211,9 +211,13 @@ function checkDutchName()
 
 function checkPresenceDataHT()
 {
-	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
-	
 	var buffer=[];
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+
+	if (!rank)
+	{
+		rank=taxonrank;
+	}
 
 	if (rank<speciesBaseRankid)
 	{
@@ -221,7 +225,7 @@ function checkPresenceDataHT()
 		var p2=$('#presence_expert_id :selected').val()==-1;
 		var p3=$('#presence_organisation_id :selected').val()==-1;
 		var p4=$('#presence_reference_id').val().length==0;
-			
+
 		if ((p1 && p2 && p3 && p4)!=true)
 		{
 			if (p1) buffer.push("Voorkomen: status is niet ingevuld.");
@@ -240,9 +244,12 @@ function savedataform(type)
 
 	if (!checkMandatory()) return;
 
+	var notifications=[];
+	
 	if (type=='existing')
 	{
 		if (!checkPresenceDataSpecies()) return;
+		notifications=notifications.concat(checkPresenceDataHT());
 	} 
 	else
 	if (type!='name')
@@ -252,20 +259,18 @@ function savedataform(type)
 		if (!checkPresenceDataSpecies()) return;
 
 		// warnings
-		var notifications=[];
-	
 		notifications=notifications.concat(
 			checkScientificName(),
 			checkDutchName(),
 			checkPresenceDataHT()
 		);
 		
-		if (notifications.length>0)
-		{
-			if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
-		}
 	}
 
+	if (notifications.length>0)
+	{
+		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
+	}
 	
 	form = $("<form method=post></form>");
 	form.append('<input type="hidden" name="action" value="save" />');
