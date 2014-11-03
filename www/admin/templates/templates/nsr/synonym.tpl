@@ -125,7 +125,7 @@
 </p>
 
 <p>
-<input type="button" value="opslaan" onclick="savedataform('synonym');" />
+<input type="button" value="opslaan" onclick="savesynonym();" />
 {if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
 </form>
 </p>
@@ -144,6 +144,9 @@
 <script>
 $(document).ready(function()
 {
+	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
+	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
+
 	{if !$newname}
 	dataid={$name.id};
 	{else}

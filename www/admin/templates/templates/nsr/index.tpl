@@ -24,7 +24,7 @@ function localList(obj,txt)
 	allLookupClearDiv();
 	var buffer=Array();
 
-	if (obj.results)
+	if (obj && obj.results)
 	{
 		
 		for(var i=0;i<obj.results.length;i++) {

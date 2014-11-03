@@ -247,7 +247,7 @@
 </p>
 
 
-<input type="button" value="opslaan" onclick="savedataform();" />
+<input type="button" value="opslaan" onclick="savenewconcept();" />
 </form>
 
 <p>
