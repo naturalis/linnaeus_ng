@@ -99,7 +99,7 @@ function allLookupGetData(text)
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-				//console.log(data);
+				console.log(data);
 				allLookupData = $.parseJSON(data);
 				//console.dir(allLookupData);
 				allLookupForceLookup=(allLookupData.fullset==false);

@@ -113,9 +113,9 @@ function checkNameAgainstRank()
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 	var ranklabel = $('#concept_rank_id :selected').text();
 
-	var p1=$('#name_uninomial').val().length;
-	var p2=$('#name_specific_epithet').val().length;
-	var p3=$('#name_infra_specific_epithet').val().length;
+	var p1=$('#name_uninomial').val() ? $('#name_uninomial').val().length : 0;
+	var p2=$('#name_specific_epithet').val() ? $('#name_specific_epithet').val().length : 0;
+	var p3=$('#name_infra_specific_epithet').val() ? $('#name_infra_specific_epithet').val().length : 0;
 
 	var result=true;
 	var buffer=[];
@@ -156,13 +156,19 @@ function checkNameAgainstRank()
 function checkPresenceDataSpecies()
 {
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	if (!rank)
+	{
+		rank=taxonrank;
+	}
+
+
 	var buffer=[];
 
 	var p1=$('#presence_presence_id :selected').val();
 	var p2=$('#presence_expert_id :selected').val();
 	var p3=$('#presence_organisation_id :selected').val();
 	var p4=$('#presence_reference_id').val();
-		
+
 	if (rank>=speciesBaseRankid)
 	{
 		if (p1==-1) buffer.push("Voorkomen: status is niet ingevuld.");
@@ -236,6 +242,96 @@ function checkPresenceDataHT()
 	}
 
 	return buffer;
+}
+
+function saveconcept()
+{
+	if (!checkMandatory()) return;
+
+	var notifications=[];
+	
+	if (!checkPresenceDataSpecies()) return;
+	notifications=notifications.concat(checkPresenceDataHT());
+	saveform(notifications);
+}
+
+function savenewconcept()
+{
+	if (!checkMandatory()) return;
+
+	var notifications=[];
+	
+	if (!checkNameAgainstRank()) return;
+	if (!checkPresenceDataSpecies()) return;
+
+	notifications=notifications.concat(
+		checkScientificName(),
+		checkDutchName(),
+		checkPresenceDataHT()
+	);
+	saveform(notifications);
+}
+
+function savesynonym()
+{
+	if (!checkMandatory()) return;
+
+	var notifications=[];
+	
+	// warnings
+	notifications=notifications.concat(checkScientificName());
+	saveform(notifications);
+}
+
+function savename()
+{
+	if (!checkMandatory()) return;
+	saveform();
+}
+
+
+
+
+
+function saveform(notifications)
+{
+	if (notifications && notifications.length>0)
+	{
+		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
+	}
+	
+	form = $("<form method=post></form>");
+	form.append('<input type="hidden" name="action" value="save" />');
+
+	if (dataid)
+	{
+		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
+	}
+	if (nameownerid)
+	{
+		form.append('<input type="hidden" name="nameownerid" value="'+nameownerid+'" />');
+	}
+
+	for (i in values)
+	{
+		var val=values[i];
+
+		if (val.name.substr(0,2)=='__') continue;
+
+		if ((val.new && val.new!=val.current) || val.delete)
+		{
+			form.append('<input type="hidden" name="'+val.name+'[current]" value="'+val.current+'" />');
+
+			if (val.delete)
+				form.append('<input type="hidden" name="'+val.name+'[delete]" value="1" />');
+			else
+				form.append('<input type="hidden" name="'+val.name+'[new]" value="'+val.new+'" />');
+		}
+	}
+	
+	$(window).unbind('beforeunload');
+	$('body').append(form);
+	form.submit();
 }
 
 

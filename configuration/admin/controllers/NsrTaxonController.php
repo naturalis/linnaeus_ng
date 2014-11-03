@@ -88,6 +88,8 @@ class NsrTaxonController extends NsrController
 			'fieldAsIndex'=>'rank_id'
 		));
 		
+///		$this->saveTaxonParentage();
+		
 	}
 
     public function taxonNewAction()
@@ -107,7 +109,7 @@ class NsrTaxonController extends NsrController
 				$this->checkDutchName();
 				$this->saveDutchName();
 				$this->saveTaxonParentage($this->getConceptId());
-				$this->resetTree();
+				
 				$this->redirect('taxon.php?id='.$this->getConceptId());
 			}		
 			else
@@ -177,7 +179,6 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->rGetId());
 			$this->toggleConceptDeleted(true);
-			//$this->logNsrChange(array('before'=>'???','after'=>'???','note'=>'deleted concept'));
 			$this->setMessage('Concept gemarkeerd als verwijderd.');
 			$this->resetTree();
 		} 
@@ -186,7 +187,6 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->rGetId());
 			$this->toggleConceptDeleted(false);
-			//$this->logNsrChange(array('before'=>'???','after'=>'???','note'=>'deleted concept'));
 			$this->setMessage('Concept niet langer gemarkeerd als verwijderd.');
 			$this->resetTree();
 		} 
@@ -194,8 +194,16 @@ class NsrTaxonController extends NsrController
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->setConceptId($this->rGetId());
-			$this->updateConcept();
-			$this->saveTaxonParentage($this->getConceptId());
+
+			if ($this->needParentChange() && $this->canParentChange())
+			{
+				$this->doParentChange();
+			}
+			else
+			{
+				$this->updateConcept();
+				$this->saveTaxonParentage($this->getConceptId());
+			}
 			$this->resetTree();
 		}
 		else
@@ -258,9 +266,17 @@ class NsrTaxonController extends NsrController
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->setNameId($this->rGetId());
-			$this->updateName();
-			$this->updateConceptBySciName();
-			$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
+			
+			if ($this->needParentChange() && $this->canParentChange())
+			{
+				$this->doParentChange();
+			}
+			else
+			{
+				$this->updateName();
+				$this->updateConceptBySciName();
+				$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
+			}
 		} 
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
@@ -1217,7 +1233,7 @@ class NsrTaxonController extends NsrController
     private function getSpeciesLookupList($p)
     {
 		$taxa=$this->getSpeciesList($p);
-		
+
 		$maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
 
 		return
@@ -1281,104 +1297,6 @@ class NsrTaxonController extends NsrController
     }
 
 
-
-	private function saveConcept()
-	{
-		$name=$this->rGetVal('concept_taxon');
-		$rank=$this->rGetVal('concept_rank_id');
-		$parent=$this->rGetVal('parent_taxon_id');
-		$uninomial=$this->rGetVal('name_uninomial');
-		$authorship=$this->rGetVal('name_authorship');
-		$specificEpithet=$this->rGetVal('name_specific_epithet');
-		$infraSpecificEpithet=$this->rGetVal('name_infra_specific_epithet');
-		$presencePresenceId=$this->rGetVal('presence_presence_id');
-		$presenceExpertId=$this->rGetVal('presence_expert_id');
-		$presenceOrganisationId=$this->rGetVal('presence_organisation_id');
-		$presenceReferenceId=$this->rGetVal('presence_reference_id');
-
-		$name=trim($name['new']);
-		$rank=trim($rank['new']);
-		$parent=trim($parent['new']);
-		$uninomial=trim($uninomial['new']);
-		$authorship=trim($authorship['new']);
-		$specificEpithet=trim($specificEpithet['new']);
-		$infraSpecificEpithet=trim($infraSpecificEpithet['new']);
-		$presencePresenceId=trim($presencePresenceId['new']);
-		$presenceExpertId=trim($presenceExpertId['new']);
-		$presenceOrganisationId=trim($presenceOrganisationId['new']);
-		$presenceReferenceId=trim($presenceReferenceId['new']);
-
-		// let's run some tests
-		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial) || empty($authorship))
-		{
-			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
-			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
-			if (empty($parent)) $this->addError('Geen ouder. Concept niet opgeslagen.');
-			if (empty($uninomial)) $this->addError('Geen genus of uninomial. Concept niet opgeslagen.');
-			if (empty($authorship)) $this->addError('Geen auteurschap. Concept niet opgeslagen.');
-			$this->setConceptId(null);
-			return;
-		}
-
-		if (!$this->checkParentChildRelationship($rank,$parent))
-		{
-			$this->setConceptId(null);
-			return;
-		}
-
-		if (!$this->checkNamePartsMatchRank($rank,$uninomial,$specificEpithet,$infraSpecificEpithet))
-		{
-			$this->setConceptId(null);
-			return;
-		}
-
-		if (!$this->checkNameUniqueness($name,$rank,$parent))
-		{
-			$this->setConceptId(null);
-			return;
-		}
-
-		if (
-			(!empty($presencePresenceId) || !empty($presenceExpertId) || !empty($presenceOrganisationId) ||  !empty($presenceReferenceId)) &&
-			 $rank<SPECIES_RANK_ID
-			)
-		{
-			$this->addError('Voorkomensgegevens kunnen niet worden ingevuld voor hogere taxa. Concept niet opgeslagen.');
-			$this->setConceptId(null);
-			return;
-		} else
-		if (
-			(empty($presencePresenceId) || empty($presenceExpertId) || empty($presenceOrganisationId) || empty($presenceReferenceId)) && 
-			$rank>=SPECIES_RANK_ID
-		)
-		{
-			$this->addError('Incomplete voorkomensgegevens. Concept niet opgeslagen.');
-			$this->setConceptId(null);
-			return;
-		}
-		
-		// we passed the tests!
-		$d=$this->models->Taxon->save(
-		array(
-			'project_id' => $this->getCurrentProjectId(),
-			'is_empty' =>'0',
-			'rank_id' => $rank,
-			'taxon' => $name,
-		));
-		
-		if ($d)
-		{
-			$this->setConceptId($this->models->Taxon->getNewId());
-			$this->addMessage('Nieuw concept aangemaakt.');
-			$newconcept=$this->getConcept($this->getConceptId());
-			$this->logNsrChange(array('after'=>$newconcept,'note'=>'new concept '.$newconcept['taxon']));
-			$this->updateConcept();
-		}
-		else 
-		{
-			$this->addError('Aanmaak nieuw concept mislukt.');
-		}
-	}
 
 	private function checkParentChildRelationship($childRankId,$parentId)
 	{
@@ -1606,6 +1524,104 @@ class NsrTaxonController extends NsrController
 	}
 		
 
+
+	private function saveConcept()
+	{
+		$name=$this->rGetVal('concept_taxon');
+		$rank=$this->rGetVal('concept_rank_id');
+		$parent=$this->rGetVal('parent_taxon_id');
+		$uninomial=$this->rGetVal('name_uninomial');
+		$authorship=$this->rGetVal('name_authorship');
+		$specificEpithet=$this->rGetVal('name_specific_epithet');
+		$infraSpecificEpithet=$this->rGetVal('name_infra_specific_epithet');
+		$presencePresenceId=$this->rGetVal('presence_presence_id');
+		$presenceExpertId=$this->rGetVal('presence_expert_id');
+		$presenceOrganisationId=$this->rGetVal('presence_organisation_id');
+		$presenceReferenceId=$this->rGetVal('presence_reference_id');
+
+		$name=trim($name['new']);
+		$rank=trim($rank['new']);
+		$parent=trim($parent['new']);
+		$uninomial=trim($uninomial['new']);
+		$authorship=trim($authorship['new']);
+		$specificEpithet=trim($specificEpithet['new']);
+		$infraSpecificEpithet=trim($infraSpecificEpithet['new']);
+		$presencePresenceId=trim($presencePresenceId['new']);
+		$presenceExpertId=trim($presenceExpertId['new']);
+		$presenceOrganisationId=trim($presenceOrganisationId['new']);
+		$presenceReferenceId=trim($presenceReferenceId['new']);
+
+		// let's run some tests
+		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial) || empty($authorship))
+		{
+			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
+			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
+			if (empty($parent)) $this->addError('Geen ouder. Concept niet opgeslagen.');
+			if (empty($uninomial)) $this->addError('Geen genus of uninomial. Concept niet opgeslagen.');
+			if (empty($authorship)) $this->addError('Geen auteurschap. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (!$this->checkParentChildRelationship($rank,$parent))
+		{
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (!$this->checkNamePartsMatchRank($rank,$uninomial,$specificEpithet,$infraSpecificEpithet))
+		{
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (!$this->checkNameUniqueness($name,$rank,$parent))
+		{
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (
+			(!empty($presencePresenceId) || !empty($presenceExpertId) || !empty($presenceOrganisationId) ||  !empty($presenceReferenceId)) &&
+			 $rank<SPECIES_RANK_ID
+			)
+		{
+			$this->addError('Voorkomensgegevens kunnen niet worden ingevuld voor hogere taxa. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		} else
+		if (
+			(empty($presencePresenceId) || empty($presenceExpertId) || empty($presenceOrganisationId) || empty($presenceReferenceId)) && 
+			$rank>=SPECIES_RANK_ID
+		)
+		{
+			$this->addError('Incomplete voorkomensgegevens. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		}
+		
+		// we passed the tests!
+		$d=$this->models->Taxon->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'is_empty' =>'0',
+			'rank_id' => $rank,
+			'taxon' => $name,
+		));
+		
+		if ($d)
+		{
+			$this->setConceptId($this->models->Taxon->getNewId());
+			$this->addMessage('Nieuw concept aangemaakt.');
+			$newconcept=$this->getConcept($this->getConceptId());
+			$this->logNsrChange(array('after'=>$newconcept,'note'=>'new concept '.$newconcept['taxon']));
+			$this->updateConcept();
+		}
+		else 
+		{
+			$this->addError('Aanmaak nieuw concept mislukt.');
+		}
+	}
 
 	private function updateConcept()
 	{
@@ -1963,6 +1979,7 @@ class NsrTaxonController extends NsrController
 	}
 
 
+
 	private function saveName()
 	{
 		$type=$this->rGetVal('name_type_id');
@@ -2075,7 +2092,6 @@ class NsrTaxonController extends NsrController
 		}
 
 	}
-	
 
 
 
@@ -2558,7 +2574,6 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-
 	private function getReference($id=null)
 	{
 		if (empty($id))
@@ -2587,26 +2602,555 @@ class NsrTaxonController extends NsrController
 
 		return $l[0];
 	}
+	
+
+
+	private function getTaxonBranch($parent)
+	{
+		return $this->models->Taxon->freeQuery("
+			select
+				_b.*
+			from 
+				%PRE%taxon_quick_parentage _a
+
+			left join %PRE%names _b
+				on _a.project_id = _b.project_id
+				and _a.taxon_id = _b.taxon_id
+				and _b.type_id =".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and MATCH(_a.parentage) AGAINST ('".$parent['id']."' in boolean mode)
+		");
+	}
+
+	private function checkIfNameExistsInConceptsKingdom($intendedNewConceptName,$concept)
+	{
+		/*
+			deze functie zoekt naar bestaande concepten die een naam hebben gelijk aan de
+			beoogde nieuwe naam van het concept. omdat namen uniek geacht worden te zijn
+			binnen een kingdom (animalia, plantae, funghi), wordt ook bekeken in welk
+			kingdom de eventueel gevonden dubbele namen vallen. hier treedt wel een kip/ei
+			kwestie op: deze test maakt onderdeel uit van een test die uitmaakt of een
+			taxon van parent kan veranderen. maar verandering van parent kan in principe
+			het kingdom waar het taxon toe behoort wijzigen, waardoor de uitkomst van deze
+			test anders zou kunnen zijn. gemakshalve wordt er van uit gegaan dat een 
+			bestaand taxon nooit van kingdom verandert, zodat alleen hoeft te worden 
+			getest de overlappende namen wel of niet in hetzelfde kingdom vallen waar het
+			ongewijzigde concept valt.
+		*/
+		
+		$d=$this->models->Taxon->freeQuery("		
+			select
+				*
+			from
+				%PRE%names
+			where 
+				project_id = ".$this->getCurrentProjectId()."
+				and type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+				and language_id=".LANGUAGE_ID_SCIENTIFIC."
+				and (
+					trim(replace(name,ifnull(authorship,''),'')) = '". mysql_real_escape_string($intendedNewConceptName) ."'
+						or
+					concat(
+						if(uninomial is null,'',concat(uninomial,' ')),
+						if(specific_epithet is null,'',concat(specific_epithet,' ')),
+						if(infra_specific_epithet is null,'',infra_specific_epithet)
+					) = '". mysql_real_escape_string($intendedNewConceptName) ."'
+				)
+				and taxon_id != ".mysql_real_escape_string($concept['id'])."
+		");
+
+		if ($d)
+		{
+			// checking whether everything is in the same kingdom
+			$a[]=$concept['id'];
+			foreach((array)$d as $key=>$val)
+				$a[]=$val['taxon_id'];
+
+			$parentage=$this->models->Taxon->freeQuery(array(
+				"query" => "
+					select
+						taxon_id,parentage
+					from 
+						%PRE%taxon_quick_parentage
+					where 
+						project_id = ".$this->getCurrentProjectId()."
+						and taxon_id in (".implode(",",$a).")",
+				"fieldAsIndex"=>"taxon_id"
+				)
+			);
+
+			/*
+			example:
+			+----------+--------------------------------------------------+
+			| taxon_id | parentage                                        |
+			+----------+--------------------------------------------------+
+			|   138998 | 116297 116298 138384 138887 138978 138985 138997 |
+			|   138999 | 116297 116298 138384 138887 138978               |
+			+----------+--------------------------------------------------+				
+			first two parts are realm (life) and kingdom (plantae, animalia, funghi)
+			*/		
+
+			if (isset($parentage[$concept['id']]))
+			{
+				$d1=explode(' ',$parentage[$concept['id']]['parentage']);
+			
+				foreach((array)$parentage as $key=> $val)
+				{
+					$d2=explode(' ',$val['parentage']);
+					if (($d1[0]==$d2[0])||($d1[1]==$d2[1]))
+					{
+						return $key;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	private function getParentChangeStyle()
+	{
+		/*
+			two possible entry points:
+			- edit concept	-> $this->getConceptId()
+			- edit name		-> $this->getNameId()
+		*/
+		
+		$data=$this->requestData;
+
+		if ($this->getConceptId())
+		{
+
+			$taxon=$this->getConcept($this->rGetId());
+
+			// A. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE PARENT WORDT GEWIJZIGD.
+			if (
+				$taxon['base_rank']>=SPECIES_RANK_ID &&
+				isset($data['parent_taxon_id']['new']) && 
+				$data['parent_taxon_id']['new']!=$taxon['parent_id']
+			)
+			{
+				return 'A';
+			}
+
+		}
+		else
+		if ($this->getNameId())
+		{
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$concept=$this->getConcept($name['taxon_id']);
+
+			if (
+				$name['nametype']==PREDICATE_VALID_NAME &&
+				isset($data['name_name']['new']) && 
+				$data['name_name']['new']!=$name['name']
+			)
+			{
+				// B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
+				if ($concept['base_rank']>=SPECIES_RANK_ID) return 'B';
+				// C. WANNEER VAN EEN BESTAAND GENUS DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
+				if ($concept['base_rank']==GENUS_RANK_ID) return 'C';
+			}
+
+		}
+
+		return;
+	}
+
+	private function needParentChange()
+	{
+		return $this->getParentChangeStyle()!=null;
+	}
+	
+	private function canParentChange()
+	{
+		// preliminairies
+		$style=$this->getParentChangeStyle();
+		
+		if (is_null($style)) return true;
+		
+		$canChange=true;
+
+		$data=$this->requestData;
+
+		if ($this->getConceptId())
+		{
+			$concept=$this->getConcept($this->getConceptId());
+			$name=$this->getName(
+				array(
+					'taxon_id'=>$this->getConceptId(),
+					'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']
+				)
+			);
+			$parent=$this->getConcept($concept['parent_id']);
+		}
+		else
+		if ($this->getNameId())
+		{
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$concept=$this->getConcept($name['taxon_id']);
+			$parent=$this->getConcept($concept['parent_id']);
+		}
+
+
+		/*
+		A. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE PARENT WORDT GEWIJZIGD.		
+		1. stel de beoogde nieuwe naam (BNN; sorry) samen op basis van 
+		NIEUWE (maar wel al bestaande) ouder (uninominaal) & BESTAANDE epithet (& infra sp. eph.)
+		*/
+		if ($style=='A')
+		{
+
+			$parent=$this->getConcept($data['parent_taxon_id']['new']);
+			$parentName=$this->getName(
+				array(
+					'taxon_id'=>$data['parent_taxon_id']['new'],
+					'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']
+				)
+			);
+
+			// checking if name parts are complete
+			if (empty($name['uninomial']))
+			{
+				$this->addError('Geldige naam huidige taxon heeft geen losse uninominaal.');
+				$canChange=false;
+			}
+			if ($concept['base_rank']>=SPECIES_RANK_ID && empty($name['specific_epithet']))
+			{
+				$this->addError('Geldige naam huidige taxon heeft geen los specifiek epithet.');
+				$canChange=false;
+			}
+			if (empty($parentName['uninomial']))
+			{
+				$this->addError('Geldige naam beoogde ouder heeft geen losse uninominaal.');
+				$canChange=false;
+			}
+			if ($parent['base_rank']>=SPECIES_RANK_ID && empty($parentName['specific_epithet']))
+			{
+				$this->addError('Geldige naam beoogde ouder heeft geen los specifiek epithet.');
+				$canChange=false;
+			}
+			
+			if (!$canChange) return false;
+
+			// creating the intended new name based on the intended new parents name
+			if ($parent['base_rank']>=SPECIES_RANK_ID)
+			{
+				$intendedNewConceptName=
+					trim($parentName['uninomial']).' '.
+					trim($name['specific_epithet']).' '.
+					trim($name['infra_specific_epithet']);
+			}
+			else
+			{
+				$intendedNewConceptName=
+					trim($parentName['uninomial']).' '.
+					trim($name['specific_epithet']);
+			}
+
+		}
+
+
+		/*
+		B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD	
+		*/
+		if ($style=='B')
+		{
+			$spcEpithet=
+				(isset($data['name_specific_epithet']['new']) ? 
+					trim($data['name_specific_epithet']['new']) : 
+					$name['specific_epithet']);
+
+			$infraSpEp=
+				(isset($data['name_infra_specific_epithet']['new']) ? 
+					trim($data['name_infra_specific_epithet']['new']) :
+					$name['infra_specific_epithet']);
+
+
+			// creating the intended new name
+			$intendedNewConceptName=
+				(isset($data['name_uninomial']['new']) ? 
+					trim($data['name_uninomial']['new']) : 
+					$name['uninomial']).
+				(!empty($spcEpithet) ? ' '.$spcEpithet : '').
+				(!empty($infraSpEp) ? ' '.$infraSpEp : '');
+		
+		}
+
+
+		/*
+		2. bestaat BNN al in de database? test op volledige naam zonder authorship en inclusief de grandparent (kingdom)
+		(we zouden het liefst zoeken op uninomial=uninomial, specific_epithet=specific_epithet etc, maar helaas zijn in
+		de productiedatabase de losse naamdelen niet altijd volledig ingevuld. derhalve zoeken we ook op 
+		beoogde_naam=volledge_geldige_naam.replace(auhorship,'').
+		als ook de auhorship niet bestaat, dan... ??? (we miss out)
+		*/
+		if ($style=='A'||$style=='B')
+		{
+
+			$d=$this->checkIfNameExistsInConceptsKingdom($intendedNewConceptName,$concept);
+
+			if ($d!==false)
+			{
+				$this->addError(
+					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$intendedNewConceptName.'</a>" in hetzelfde kingdom.'
+				);
+				return false;
+			}
+
+		}
+
+
+		/*
+		C. WANNEER VAN EEN BESTAAND GENUS DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
+		1. controleer of er niet al een genus bestaat met de nieuwe naam binnen dezelfde parent.
+		*/
+		if ($style=='C')
+		{
+
+			$intendedNewConceptName=$data['name_uninomial']['new'];
+
+			$d=$this->models->Taxon->freeQuery("		
+				select
+					_a.*
+				from
+					%PRE%names _a
+				
+				left join %PRE%taxa _b
+					on _a.project_id = _b.project_id
+					and _a.taxon_id = _b.id
+				
+				where 
+					_a.project_id = ".$this->getCurrentProjectId()."
+					and _a.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+					and _a.language_id=".LANGUAGE_ID_SCIENTIFIC."
+					and (
+						trim(replace(name,ifnull(_a.authorship,''),'')) = '". mysql_real_escape_string($intendedNewConceptName) ."'
+							or
+						concat(
+							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
+							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
+							if(_a.infra_specific_epithet is null,'',_a.infra_specific_epithet)
+						) = '". mysql_real_escape_string($intendedNewConceptName) ."'
+					)
+					and _b.parent_id = ".mysql_real_escape_string($concept['parent_id'])."
+					and _b.id != ".mysql_real_escape_string($concept['id'])."
+			");
+
+			if ($d)
+			{
+				$this->addError('Er bestaat al een taxon "<a href="taxon.php?id='.$d[0]['taxon_id'].'">'.$intendedNewConceptName.'</a>" onder dezelfde ouder.');
+				return false;
+			}
+
+		}
+
+
+		/*
+		3. haal de hele taxonomische tak op onder het te wijzigen taxon.
+		*/
+		$children=$this->getTaxonBranch($concept);
+
+		/*
+		4. doorloop alle taxa uit die tak en doe eenzelfde test: maak een beoogde nieuwe naam 
+		op basis van de nieuwe uninominaal en de bestaande epithet (& infra sp. eph.), maar geen auteur, en kijk of ze al bestaan.
+		BNN + grandparent (realm)
+		*/
+		foreach((array)$children as $key=>$val)
+		{
+			$a=(isset($data['specific_epithet']['new']) ? trim($data['specific_epithet']['new']) : trim($val['specific_epithet']));
+			
+			$iName=
+				trim($data['name_uninomial']['new']).
+				(!empty($a) ? ' '.$a : '').
+				(isset($val['infra_specific_epithet']) ? ' '.trim($val['infra_specific_epithet']) : null);			
+
+			$d=$this->checkIfNameExistsInConceptsKingdom($iName,$val);
+
+			if ($d!==false)
+			{
+				$this->addError(
+					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$iName.'</a>" in hetzelfde kingdom.'
+				);
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	private function doParentChange()
+	{
+		// preliminairies
+		$data=$this->requestData;
+
+		if ($this->getConceptId())
+		{
+			$concept=$this->getConcept($this->getConceptId());
+			$name=$this->getName(
+				array(
+					'taxon_id'=>$this->getConceptId(),
+					'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']
+				)
+			);
+		}
+		else
+		if ($this->getNameId())
+		{
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$concept=$this->getConcept($name['taxon_id']);
+		}
+
+
+		if (isset($data['parent_taxon_id']['new']))
+		{
+			$newParentName=$this->getName(
+				array(
+					'taxon_id'=>$data['parent_taxon_id']['new'],
+					'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']
+				)
+			);
+		}
+		
+		/*
+		3. taxon + hele taxonomische tak op onder het te wijzigen taxon.
+		*/
+		$taxa=$this->getTaxonBranch($concept);
+
+		if ($taxa)
+		{
+			array_unshift($taxa,$name);
+		}
+		else
+		{
+			$taxa=array($name);
+		}
+
+		/*
+		5. doe voor taxon + alle taxa uit die tak het volgende:
+		a) verander hun geaccepteerde naam van type naar synoniem.
+			i. maak het beoogde nieuwe synoniem aan (BNS)
+			ii. kijk of het BNS al bestaat (deze keer inclusief authorship).
+			zo ja, meld het en negeer dat BNS verder (maar ga door met de transactie)
+			zo nee => iii
+			iii. verander hun geaccepteerde naam van type naar synoniem.
+		
+		b) maak een nieuwe geaccepteerde naam aan op basis van BNN + authorship van de oude geaccepeerde naam; 
+			als authorship nog geen haakjes had, krijgt hij die nu.
+
+		c) update de naam van het concept op basis van de nieuwe geaccepeerde naam.
+		*/
+		
+		foreach((array)$taxa as $key=>$val)
+		{
+			$newSynonym=$val['name'];
+
+			$d=$this->models->Names->freeQuery("
+				select
+					*
+				from
+					%PRE%names
+				where 
+					project_id = ".$this->getCurrentProjectId()."
+					and taxon_id = ".$val['taxon_id']."
+					and name = '". mysql_real_escape_string($newSynonym) ."'
+					and type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
+			);
+
+			if ($d)
+			{
+				$this->addWarning("Synoniem \"".$newSynonym."\" bestaat al; synoniem niet opnieuw aangemaakt.");
+				$this->models->Names->freeQuery("
+					delete
+					from
+						%PRE%names
+					where 
+						project_id = ".$this->getCurrentProjectId()."
+						and id = ".$val['id']."
+					limit 1
+				");
+				$this->logNsrChange(array('before'=>$name,'note'=>'deleted duplicate synonym '.$newSynonym));
+			}
+			else
+			{
+				$this->models->Names->freeQuery("
+					update
+						%PRE%names
+					set
+						type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']."
+					where 
+						project_id = ".$this->getCurrentProjectId()."
+						and id = ".$val['id']."
+					limit 1
+				");	
+
+				$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
+				$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'changed valid name '.$newSynonym.' to synonym'));
+			}
+
+			$spcEpithet=
+				(isset($data['specific_epithet']['new']) ? trim($data['specific_epithet']['new']) : trim($val['specific_epithet']));
+
+			$authorship=
+				(!empty($val['name_author']) ? $val['name_author'] : null).
+				(!empty($val['name_author']) && !empty($val['authorship_year']) ? ', ' : '').
+				(!empty($val['authorship_year']) ? $val['authorship_year'] : null);
+
+			$authorship=
+				trim(!empty($authorship) ? '('.$authorship.')' : '');
+				
+			$uninomial=
+				trim(isset($data['name_uninomial']['new']) ? trim($data['name_uninomial']['new']) : $newParentName['uninomial']);
+
+			$newName=
+				trim(
+					$uninomial.
+					(!empty($spcEpithet) ? ' '.$spcEpithet : null).
+					(!empty($val['infra_specific_epithet']) ? ' '.trim($val['infra_specific_epithet']) : null).
+					(!empty($authorship) ? ' '.$authorship : null)
+				);
+
+			$this->models->Names->save(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $val['taxon_id'],
+					'language_id' => LANGUAGE_ID_SCIENTIFIC,
+					'type_id' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+					'name' => $newName,
+					'uninomial' => $uninomial,
+					'specific_epithet' => (!empty($spcEpithet) ? $spcEpithet : null),
+					'infra_specific_epithet' => (!empty($val['infra_specific_epithet']) ? $val['infra_specific_epithet'] : null),
+					'authorship' => $authorship,
+					'name_author' => $val['name_author'],
+					'authorship_year' => $val['authorship_year'],
+					'reference' => $val['reference'],
+					'reference_id' => $val['reference_id'],
+					'expert' => $val['expert'],
+					'expert_id' => $val['expert_id'],
+					'organisation' => $val['organisation'],
+					'organisation_id' => $val['organisation_id'],
+				));
+
+			$id=$this->models->Names->getNewId();
+			$after=$this->models->Names->_get(array('id'=> array('id'=>$id)));
+
+			$this->logNsrChange(array('after'=>$after,'note'=>'created new valid name '.$newName));
+
+			$this->setConceptId($concept['id']);
+			$this->updateConceptTaxon(array('new'=>$newName));
+
+			if (isset($data['parent_taxon_id']['new']))
+			{
+				$this->updateParentId($data['parent_taxon_id']);
+			}
+
+		}
+		
+		$this->resetTree();
+
+	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

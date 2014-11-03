@@ -164,7 +164,7 @@
 		</tr>
 		</table>
 </p>
-<input type="button" value="opslaan" onclick="savedataform('existing');" />
+<input type="button" value="opslaan" onclick="saveconcept();" />
 </form>
 
 
