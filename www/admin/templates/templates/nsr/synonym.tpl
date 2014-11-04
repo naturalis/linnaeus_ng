@@ -133,6 +133,14 @@
 
 {include file="../shared/admin-messages.tpl"}
 
+{if $concept.base_rank>=$smarty.const.SPECIES_RANK_ID}
+
+<div class="page-generic-div">
+Let op: een wijziging van het genus leidt alleen tot naamsverandering, <i>niet</i> tot een verandering van de taxonomische ouder van het concept. Ga om die te wijzigen naar <a href="taxon.php?id={$concept.id}">de bewerkingspagina van het concept</a>.
+</div>
+
+{/if}
+
 <div class="page-generic-div">
 
     <p>
