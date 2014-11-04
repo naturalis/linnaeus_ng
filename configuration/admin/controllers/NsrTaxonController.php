@@ -3045,6 +3045,7 @@ class NsrTaxonController extends NsrController
 		
 		foreach((array)$taxa as $key=>$val)
 		{
+			
 			$newSynonym=$val['name'];
 
 			$d=$this->models->Names->freeQuery("
@@ -3088,7 +3089,10 @@ class NsrTaxonController extends NsrController
 
 				$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
 				$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'changed valid name '.$newSynonym.' to synonym'));
+				$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
+
 			}
+			
 
 			$spcEpithet=
 				(isset($data['specific_epithet']['new']) ? trim($data['specific_epithet']['new']) : trim($val['specific_epithet']));
@@ -3137,13 +3141,16 @@ class NsrTaxonController extends NsrController
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$id)));
 
 			$this->logNsrChange(array('after'=>$after,'note'=>'created new valid name '.$newName));
+			$this->addMessage('Nieuwe geaccepteerde naam aangemaakt.');
 
-			$this->setConceptId($concept['id']);
+			$this->setConceptId($val['taxon_id']);
 			$this->updateConceptTaxon(array('new'=>$newName));
+			$this->addMessage('Naam concept gewijzigd.');
 
 			if (isset($data['parent_taxon_id']['new']))
 			{
 				$this->updateParentId($data['parent_taxon_id']);
+				$this->addMessage('Taxonomische ouder gewijzigd.');
 			}
 
 		}
