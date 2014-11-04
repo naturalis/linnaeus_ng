@@ -1299,17 +1299,8 @@ class NsrTaxonController extends NsrController
 
 
 
-	private function checkParentChildRelationship($childRankId,$parentId)
+	private function checkParentChildRelationship($childBaseRank,$parentId)
 	{
-		$d=$this->models->ProjectRank->_get(array(
-			'id'=>array(
-				'project_id'=>$this->getCurrentProjectId(),
-				'id'=>$childRankId
-			),
-			'columns'=>'rank_id'
-		));
-		
-		$childBaseRank=$d[0]['rank_id'];
 		$d=$this->getTaxonById($parentId);
 		$parent_base_rank=$d['base_rank'];
 		
@@ -1428,19 +1419,9 @@ class NsrTaxonController extends NsrController
 		return true;
 	}
 
-	private function checkNamePartsMatchRank($rank,$uninomial,$specificEpithet,$infraSpecificEpithet)
+	private function checkNamePartsMatchRank($baseRank,$uninomial,$specificEpithet,$infraSpecificEpithet)
 	{
-		$d=$this->models->ProjectRank->_get(array(
-			'id'=>array(
-				'project_id'=>$this->getCurrentProjectId(),
-				'id'=>$rank
-			),
-			'columns'=>'rank_id'
-		));
-		
-		$baseRank=$d[0]['rank_id'];
 
-		
 		if ($baseRank<SPECIES_RANK_ID)
 		{
 			if (empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID))
@@ -1551,6 +1532,12 @@ class NsrTaxonController extends NsrController
 		$presenceExpertId=trim($presenceExpertId['new']);
 		$presenceOrganisationId=trim($presenceOrganisationId['new']);
 		$presenceReferenceId=trim($presenceReferenceId['new']);
+		
+		foreach((array)$this->_projectRankIds as $val)
+		{
+			if ($val['id']==$rank)
+				$baseRank=$val['rank_id'];
+		}
 
 		// let's run some tests
 		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial) || empty($authorship))
@@ -1564,13 +1551,13 @@ class NsrTaxonController extends NsrController
 			return;
 		}
 
-		if (!$this->checkParentChildRelationship($rank,$parent))
+		if (!$this->checkParentChildRelationship($baseRank,$parent))
 		{
 			$this->setConceptId(null);
 			return;
 		}
 
-		if (!$this->checkNamePartsMatchRank($rank,$uninomial,$specificEpithet,$infraSpecificEpithet))
+		if (!$this->checkNamePartsMatchRank($baseRank,$uninomial,$specificEpithet,$infraSpecificEpithet))
 		{
 			$this->setConceptId(null);
 			return;
@@ -1584,7 +1571,7 @@ class NsrTaxonController extends NsrController
 
 		if (
 			(!empty($presencePresenceId) || !empty($presenceExpertId) || !empty($presenceOrganisationId) ||  !empty($presenceReferenceId)) &&
-			 $rank<SPECIES_RANK_ID
+			 $baseRank<SPECIES_RANK_ID
 			)
 		{
 			$this->addError('Voorkomensgegevens kunnen niet worden ingevuld voor hogere taxa. Concept niet opgeslagen.');
@@ -1596,9 +1583,9 @@ class NsrTaxonController extends NsrController
 			$rank>=SPECIES_RANK_ID
 		)
 		{
-			$this->addError('Incomplete voorkomensgegevens. Concept niet opgeslagen.');
-			$this->setConceptId(null);
-			return;
+			$this->addWarning('Incomplete voorkomensgegevens. Concept wel opgeslagen.');
+			//$this->setConceptId(null);
+			//return;
 		}
 		
 		// we passed the tests!
