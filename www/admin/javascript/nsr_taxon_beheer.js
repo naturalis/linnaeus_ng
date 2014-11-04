@@ -183,34 +183,7 @@ function checkPresenceDataSpecies()
 			buffer.push("Voorkomen kan niet worden ingevuld voor hogere taxa.");
 	}
 	
-
-	if (buffer.length>0) alert(buffer.join("\n"));
-
-	return buffer.length==0;
-}
-
-function checkScientificName()
-{
-	var result=true;
-	var buffer=[];
-
-	if ($('#name_expert_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: expert");
-	if ($('#name_organisation_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: organisatie");
-	if ($('#name_reference_id').val().length==0) buffer.push("Wetenschappelijke naam: publicatie");
-
-	return buffer;
-}
-
-function checkDutchName()
-{
-	var buffer=[];
-
-	if ($('#dutch_name').val() && $('#dutch_name').val().length!=0)
-	{
-		if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
-		if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");
-		if ($('#dutch_name_reference_id').val().length==0) buffer.push("Nederlandse naam: publicatie");
-	}
+	//if (buffer.length>0) alert(buffer.join("\n"));
 
 	return buffer;
 }
@@ -244,14 +217,43 @@ function checkPresenceDataHT()
 	return buffer;
 }
 
+
+function checkScientificName()
+{
+	var result=true;
+	var buffer=[];
+
+	if ($('#name_expert_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: expert");
+	if ($('#name_organisation_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: organisatie");
+	if ($('#name_reference_id').val().length==0) buffer.push("Wetenschappelijke naam: publicatie");
+
+	return buffer;
+}
+
+function checkDutchName()
+{
+	var buffer=[];
+
+	if ($('#dutch_name').val() && $('#dutch_name').val().length!=0)
+	{
+		if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
+		if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");
+		if ($('#dutch_name_reference_id').val().length==0) buffer.push("Nederlandse naam: publicatie");
+	}
+
+	return buffer;
+}
+
 function saveconcept()
 {
 	if (!checkMandatory()) return;
 
 	var notifications=[];
 	
-	if (!checkPresenceDataSpecies()) return;
-	notifications=notifications.concat(checkPresenceDataHT());
+	notifications=notifications.concat(
+		checkPresenceDataHT(),
+		checkPresenceDataSpecies()
+	);
 	saveform(notifications);
 }
 
@@ -262,9 +264,9 @@ function savenewconcept()
 	var notifications=[];
 	
 	if (!checkNameAgainstRank()) return;
-	if (!checkPresenceDataSpecies()) return;
 
 	notifications=notifications.concat(
+		checkPresenceDataSpecies(),
 		checkScientificName(),
 		checkDutchName(),
 		checkPresenceDataHT()
@@ -296,74 +298,6 @@ function savename()
 function saveform(notifications)
 {
 	if (notifications && notifications.length>0)
-	{
-		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
-	}
-	
-	form = $("<form method=post></form>");
-	form.append('<input type="hidden" name="action" value="save" />');
-
-	if (dataid)
-	{
-		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
-	}
-	if (nameownerid)
-	{
-		form.append('<input type="hidden" name="nameownerid" value="'+nameownerid+'" />');
-	}
-
-	for (i in values)
-	{
-		var val=values[i];
-
-		if (val.name.substr(0,2)=='__') continue;
-
-		if ((val.new && val.new!=val.current) || val.delete)
-		{
-			form.append('<input type="hidden" name="'+val.name+'[current]" value="'+val.current+'" />');
-
-			if (val.delete)
-				form.append('<input type="hidden" name="'+val.name+'[delete]" value="1" />');
-			else
-				form.append('<input type="hidden" name="'+val.name+'[new]" value="'+val.new+'" />');
-		}
-	}
-	
-	$(window).unbind('beforeunload');
-	$('body').append(form);
-	form.submit();
-}
-
-
-function savedataform(type)
-{
-
-	if (!checkMandatory()) return;
-
-	var notifications=[];
-	
-	if (type=='existing')
-	{
-		if (!checkPresenceDataSpecies()) return;
-		notifications=notifications.concat(checkPresenceDataHT());
-	} 
-	else
-	if (type!='name')
-	{
-		// lethal checks
-		if (!checkNameAgainstRank()) return;
-		if (!checkPresenceDataSpecies()) return;
-
-		// warnings
-		notifications=notifications.concat(
-			checkScientificName(),
-			checkDutchName(),
-			checkPresenceDataHT()
-		);
-		
-	}
-
-	if (notifications.length>0)
 	{
 		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
 	}

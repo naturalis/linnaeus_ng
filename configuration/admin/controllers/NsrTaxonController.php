@@ -197,6 +197,7 @@ class NsrTaxonController extends NsrController
 
 			if ($this->needParentChange() && $this->canParentChange())
 			{
+				$this->updateConcept();
 				$this->doParentChange();
 			}
 			else
