@@ -2739,6 +2739,17 @@ class NsrTaxonController extends NsrController
 		else
 		if ($this->getNameId())
 		{
+
+			if (
+				!isset($data['name_uninomial']['new']) && 
+				!isset($data['name_specific_epithet']['new']) && 
+				!isset($data['name_infra_specific_epithet']['new'])
+			)
+			{
+				// nothing relevant changed
+				return;
+			}
+			
 			$name=$this->getName(array('id'=>$this->getNameId()));
 			$concept=$this->getConcept($name['taxon_id']);
 
