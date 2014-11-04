@@ -1536,7 +1536,9 @@ class NsrTaxonController extends NsrController
 		foreach((array)$this->_projectRankIds as $val)
 		{
 			if ($val['id']==$rank)
+			{
 				$baseRank=$val['rank_id'];
+			}
 		}
 
 		// let's run some tests
@@ -2728,6 +2730,11 @@ class NsrTaxonController extends NsrController
 		if ($this->getNameId())
 		{
 
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			if ($name['nametype']!=PREDICATE_VALID_NAME)
+				return;
+
+
 			if (
 				!isset($data['name_uninomial']['new']) && 
 				!isset($data['name_specific_epithet']['new']) && 
@@ -2740,18 +2747,20 @@ class NsrTaxonController extends NsrController
 			
 			$name=$this->getName(array('id'=>$this->getNameId()));
 			$concept=$this->getConcept($name['taxon_id']);
-
-			if (
-				$name['nametype']==PREDICATE_VALID_NAME &&
-				isset($data['name_name']['new']) && 
-				$data['name_name']['new']!=$name['name']
+			
+			if ($concept['base_rank']>SPECIES_RANK_ID &&
+				!isset($data['name_uninomial']['new']) && 
+				!isset($data['name_specific_epithet']['new'])
 			)
 			{
-				// B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
-				if ($concept['base_rank']>=SPECIES_RANK_ID) return 'B';
-				// C. WANNEER VAN EEN BESTAAND GENUS DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
-				if ($concept['base_rank']==GENUS_RANK_ID) return 'C';
+				// nothing relevant changed
+				return;
 			}
+			
+			// B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
+			if ($concept['base_rank']>=SPECIES_RANK_ID) return 'B';
+			// C. WANNEER VAN EEN BESTAAND GENUS DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
+			if ($concept['base_rank']==GENUS_RANK_ID) return 'C';
 
 		}
 
@@ -2959,11 +2968,12 @@ class NsrTaxonController extends NsrController
 		*/
 		foreach((array)$children as $key=>$val)
 		{
-			$a=(isset($data['specific_epithet']['new']) ? trim($data['specific_epithet']['new']) : trim($val['specific_epithet']));
+			$unin=(isset($data['name_uninomial']['new']) ? trim($data['name_uninomial']['new']) : trim($val['uninomial']));
+			$spEp=(isset($data['name_specific_epithet']['new']) ? trim($data['name_specific_epithet']['new']) : trim($val['specific_epithet']));
 			
 			$iName=
-				trim($data['name_uninomial']['new']).
-				(!empty($a) ? ' '.$a : '').
+				(!empty($unin) ? $unin : '').
+				(!empty($spEp) ? ' '.$spEp : '').
 				(isset($val['infra_specific_epithet']) ? ' '.trim($val['infra_specific_epithet']) : null);			
 
 			$d=$this->checkIfNameExistsInConceptsKingdom($iName,$val);
@@ -3012,6 +3022,9 @@ class NsrTaxonController extends NsrController
 				)
 			);
 		}
+
+
+
 		
 		/*
 		3. taxon + hele taxonomische tak op onder het te wijzigen taxon.
@@ -3026,6 +3039,7 @@ class NsrTaxonController extends NsrController
 		{
 			$taxa=array($name);
 		}
+
 
 		/*
 		5. doe voor taxon + alle taxa uit die tak het volgende:
@@ -3061,40 +3075,61 @@ class NsrTaxonController extends NsrController
 
 			if ($d)
 			{
-				$this->addWarning("Synoniem \"".$newSynonym."\" bestaat al; synoniem niet opnieuw aangemaakt.");
-				$this->models->Names->freeQuery("
-					delete
-					from
-						%PRE%names
-					where 
-						project_id = ".$this->getCurrentProjectId()."
-						and id = ".$val['id']."
-					limit 1
-				");
-				$this->logNsrChange(array('before'=>$name,'note'=>'deleted duplicate synonym '.$newSynonym));
+				$this->addWarning("Synoniem \"".$newSynonym."\" bestaat al; duplicaat synoniem aangemaakt.");
+			}
+
+			$this->models->Names->freeQuery("
+				update
+					%PRE%names
+				set
+					type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']."
+				where 
+					project_id = ".$this->getCurrentProjectId()."
+					and id = ".$val['id']."
+				limit 1
+			");	
+
+			$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
+			$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'changed valid name '.$newSynonym.' to synonym'));
+			$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
+			
+			
+			if (isset($data['name_uninomial']['new']))
+			{
+				$uninomial=trim($data['name_uninomial']['new']);
+			}
+			else
+			if (isset($newParentName['uninomial']))
+			{
+				$uninomial=$newParentName['uninomial'];
 			}
 			else
 			{
-				$this->models->Names->freeQuery("
-					update
-						%PRE%names
-					set
-						type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']."
-					where 
-						project_id = ".$this->getCurrentProjectId()."
-						and id = ".$val['id']."
-					limit 1
-				");	
-
-				$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
-				$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'changed valid name '.$newSynonym.' to synonym'));
-				$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
-
+				$uninomial=$val['uninomial'];
 			}
 			
+			if (isset($data['name_specific_epithet']['new']))
+			{
+				$specificEpithet=trim($data['name_specific_epithet']['new']);
+			}
+			else
+			if (isset($newParentName['specific_epithet']))
+			{
+				$specificEpithet=$newParentName['specific_epithet'];
+			}
+			else
+			{
+				$specificEpithet=$val['specific_epithet'];
+			}
 
-			$spcEpithet=
-				(isset($data['specific_epithet']['new']) ? trim($data['specific_epithet']['new']) : trim($val['specific_epithet']));
+			if (isset($data['name_infra_specific_epithet']['new']))
+			{
+				$infraSpecificEpithet=trim($data['name_infra_specific_epithett']['new']);
+			}
+			else
+			{
+				$infraSpecificEpithet=$val['infra_specific_epithet'];
+			}
 
 			$authorship=
 				(!empty($val['name_author']) ? $val['name_author'] : null).
@@ -3104,14 +3139,11 @@ class NsrTaxonController extends NsrController
 			$authorship=
 				trim(!empty($authorship) ? '('.$authorship.')' : '');
 				
-			$uninomial=
-				trim(isset($data['name_uninomial']['new']) ? trim($data['name_uninomial']['new']) : $newParentName['uninomial']);
-
 			$newName=
 				trim(
 					$uninomial.
-					(!empty($spcEpithet) ? ' '.$spcEpithet : null).
-					(!empty($val['infra_specific_epithet']) ? ' '.trim($val['infra_specific_epithet']) : null).
+					(!empty($specificEpithet) ? ' '.$specificEpithet : null).
+					(!empty($infraSpecificEpithet) ? ' '.$infraSpecificEpithet : null).
 					(!empty($authorship) ? ' '.$authorship : null)
 				);
 
@@ -3123,8 +3155,8 @@ class NsrTaxonController extends NsrController
 					'type_id' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
 					'name' => $newName,
 					'uninomial' => $uninomial,
-					'specific_epithet' => (!empty($spcEpithet) ? $spcEpithet : null),
-					'infra_specific_epithet' => (!empty($val['infra_specific_epithet']) ? $val['infra_specific_epithet'] : null),
+					'specific_epithet' => (!empty($specificEpithet) ? $specificEpithet : null),
+					'infra_specific_epithet' => (!empty($infraSpecificEpithet) ? $infraSpecificEpithet : null),
 					'authorship' => $authorship,
 					'name_author' => $val['name_author'],
 					'authorship_year' => $val['authorship_year'],
@@ -3153,7 +3185,8 @@ class NsrTaxonController extends NsrController
 			}
 
 		}
-		
+
+		$this->setConceptId($name['taxon_id']);
 		$this->resetTree();
 
 	}
