@@ -267,7 +267,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setNameId($this->rGetId());
 			
-			if ($this->needParentChange() && $this->canParentChange())
+			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
 			{
 				$this->doParentChange();
 			}
