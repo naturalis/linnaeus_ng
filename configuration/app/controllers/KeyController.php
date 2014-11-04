@@ -815,7 +815,7 @@ class KeyController extends Controller
 				and res_keystep_id is not null
 			");
 
-		foreach($d as $key=>$val)
+		foreach((array)$d as $key=>$val)
 		{
 			$this->choiceKeystepTable[$val['res_keystep_id']][]['keystep_id']=$val['keystep_id'];
 		}
@@ -856,6 +856,8 @@ class KeyController extends Controller
 				_ck.project_id = ".$this->getCurrentProjectId()."
 				and _ck.res_taxon_id is not null
 			");
+			
+		$stepsByTarget=array();
 
 		foreach((array)$choiceLeadingToATaxon as $val)
 		{
