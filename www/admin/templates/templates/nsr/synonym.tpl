@@ -57,7 +57,7 @@
 
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
-    <tr><th title="synoniem wordt automatische samengesteld.">synoniem:</th><td>
+    <tr><th title="wetenschappelijke naam wordt automatische samengesteld.">wetenschappelijke naam:</th><td>
         <input type="text" id="concept_taxon" value="{$name.name}" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="synoniem" />
         <input type="hidden" id="name_name" value="" />
     </td></tr>
