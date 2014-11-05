@@ -1650,11 +1650,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateParentId($this->rGetVal('parent_taxon_id')))
 			{
-				$this->addMessage('Ouder opgeslagen.');
+				$this->addMessage('Koppeling ouder opgeslagen.');
 			}
 			else
 			{
-				$this->addError('Ouder niet opgeslagen.');
+				$this->addError('Koppeling ouder niet opgeslagen.');
 			}
 		}
 
@@ -2903,7 +2903,7 @@ class NsrTaxonController extends NsrController
 			if ($d!==false)
 			{
 				$this->addError(
-					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$intendedNewConceptName.'</a>" in hetzelfde kingdom.'
+					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$intendedNewConceptName.'</a>" in hetzelfde koninkrijk.'
 				);
 				return false;
 			}
@@ -2981,7 +2981,7 @@ class NsrTaxonController extends NsrController
 			if ($d!==false)
 			{
 				$this->addError(
-					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$iName.'</a>" in hetzelfde kingdom.'
+					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$iName.'</a>" in hetzelfde koninkrijk.'
 				);
 				return false;
 			}
