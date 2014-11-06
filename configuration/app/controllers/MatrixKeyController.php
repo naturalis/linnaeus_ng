@@ -315,12 +315,10 @@ class MatrixKeyController extends Controller
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": compare'), $matrix['name']));
         
+        $this->smarty->assign('projectId', $this->getCurrentProjectId());
         $this->smarty->assign('taxa', $this->getTaxaInMatrix());
-        
         $this->smarty->assign('matrixCount', $this->getMatrixCount());
-        
         $this->smarty->assign('matrix', $matrix);
-        
         $this->smarty->assign('compareSpeciesRecall', $this->compareSpeciesRecall());
         
         $this->printPage();
