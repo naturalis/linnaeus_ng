@@ -814,6 +814,7 @@ class KeyController extends Controller
 				project_id = ".$this->getCurrentProjectId()."
 				and res_keystep_id is not null
 			");
+		echo '.';
 
 		foreach((array)$d as $key=>$val)
 		{
