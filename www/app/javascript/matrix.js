@@ -19,8 +19,8 @@ var freeValues = Array();
 var sdValues = Array();
 var storedShowState;
 
-function getData(action,id,postFunction) {
-
+function getData(action,id,postFunction)
+{
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -38,7 +38,6 @@ function getData(action,id,postFunction) {
 			if (postFunction) eval(postFunction+'(obj,id)');
 		}
 	});
-	
 }
 
 function storeCharacter(id,label,type,sorts) {
@@ -650,6 +649,7 @@ function goCompare(ids) {
 		return;
 
 	}
+
 	getData('compare',[id1,id2],'fillCompareResults');
 	getData('store_compare_vals',[id1,id2]);
 

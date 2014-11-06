@@ -18,6 +18,12 @@
 	<li><a href="remote_img_batch.php">{t}Import links to remote images from CSV-file{/t}</a></li>
 	<li><a href="local_img_batch.php">{t}Import links to local images from CSV-file{/t}</a></li>
 </ul>
+
+<ul class="admin-list">
+	<li><a href="taxongroups.php">{t}Taxon groups{/t}</a></li>
+</ul>
+
+
 {t}Management tasks:{/t}
 <ul class="admin-list">
 	<li><a href="ranks.php">{t}Define taxonomic ranks{/t}</a></li>

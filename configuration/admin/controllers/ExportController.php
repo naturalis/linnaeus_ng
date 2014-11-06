@@ -200,6 +200,8 @@ class ExportController extends Controller
 			
 			set_time_limit(4800); // RIGHT!
 
+define('VALID_NAME_ID',1);
+
 $numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRecords') : 500;
 //$recordsPerFile=!empty($this->rHasVar('recordsPerFile')) && is_numeric($this->rHasVar('recordsPerFile')) ? $this->rGetVal('recordsPerFile') : 10000;
 $recordsPerFile=10000;
@@ -289,9 +291,6 @@ $includeClassification=true;
 
 			foreach((array)$taxa as $key=>$val)
 			{
-
-				$lookuplist[$val['id']]=array('taxon'=>$val['name'],'rank'=>$val['rank']);
-
 				if ($includeDescriptions)
 				{
 					$pages=$this->models->ContentTaxon->freeQuery("
@@ -474,22 +473,33 @@ $includeClassification=true;
 	
 							$t=$this->models->Taxon->freeQuery("
 								select
-									_t.taxon,_r.rank
+									_t.id,
+									ifnull(_names.uninomial,_t.taxon) as name,
+									_r.rank
+
 								from
 									%PRE%taxa _t
+
 								left join %PRE%projects_ranks _f
 									on _t.rank_id=_f.id
 									and _t.project_id=_f.project_id
+
+								left join %PRE%names _names
+									on _t.project_id=_f.project_id
+									and _t.id=_names.taxon_id
+									and _names.type_id=".VALID_NAME_ID."
+
 								left join %PRE%ranks _r
 									on _f.rank_id=_r.id
+
 								where _t.project_id = ".$this->getCurrentProjectId()." and _t.id=".$pId
 							);
 							$t=$t[0];
-	
+							$lookuplist[$t['id']]=array('name'=>$t['name'],'rank'=>$t['rank']);
 							//$this->addError($pId." not in classification lookup list!?");
 	
 						}
-						$class['taxon__'.($m++)]=@array('name'=>$t['taxon'],'rank'=>$t['rank']);
+						$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
 					}
 					
 					$data[$key]['classification']=$class;
