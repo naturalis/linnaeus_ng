@@ -1,67 +1,5 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-a.edit {
-	color:#03F;
-	font-size:0.8em;
-	margin-left:5px;
-}
-ul {
-    padding:0 0 4px 13px;
-}
-ul[id^=level] {
-	display:none;
-}
-ul[id=level0] {
-	display:block;
-}
-table tr td {
-	vertical-align:top;
-}
-td {
-	width:400px;
-}
-td:last-child {
-	border-left:1px solid #999;
-	padding-left:10px;
-	width:500px;
-}
-</style>
-
-<script>
-
-function addTaxonToGroup(id,label)
-{
-	label=label?label:$('#taxon'+id).html();
-	
-	if ($('#selected'+id).length==0)
-	{
-		$('#selection').append(
-			'<li id="selected'+id+'" value="'+id+'">'+
-			label+
-			'<a href="#" class="edit" onclick="removeTaxonFromGroup('+id+');false;">remove</a></li>'
-		);
-		$('#add'+id).toggle(false);
-	}
-}
-
-function removeTaxonFromGroup(id)
-{
-	$('#selected'+id).remove();
-	$('#add'+id).toggle(true);
-}
-
-function doTaxongroupTaxaFormSubmit()
-{
-	$( "#selection").find("li").each(function( index ) {
-		$("#theForm").append('<input type="hidden" name="taxa[]" value="'+ $( this ).attr("value") +'" />');
-	});
-	$("#theForm").append('<input type="hidden" name="action" value="save" />');
-	$("#theForm").submit();
-}
-
-</script>
-
 <div id="page-main">
 
 	<h3>group: {$group.sys_label}</h3>
@@ -70,16 +8,21 @@ function doTaxongroupTaxaFormSubmit()
     <form id="theForm" method="post">
     <input type="hidden" name="rnd" value="{$rnd}" />
     <input type="hidden" name="group_id" value="{$group.id}" />
+    Click the taxa under "all taxa" to expand the tree. Click "add" to add them to the
+    current groups selection. A grey "add" link indicates that the same taxon already 
+    belongs to another group or groups; nevertheless, it can be added to the present
+    group as well.<br />
+    Drag and drop the selected taxa to change their order.
+    Click "save" when you are done to store your selection.<br /><br />
     <input type="button" id="save" value="save" />
     </form>
     </p>
-    
-    <table><tr>
+
+	<table><tr>
     <td>
 	    Taxa in group:
-	    <ul id="selection">
+	    <ul id="selection" class="sortable">
         </ul>
-        {if $groups|@count==0}(none){/if}
 	</td>
     <td>
         All taxa:
@@ -87,15 +30,19 @@ function doTaxongroupTaxaFormSubmit()
           <ul id="level{$level}">
           {foreach $data as $entry}
                 <li>
-                    {if $entry.children}<a href="#" onclick="$(this).nextUntil('ul').next().toggle();return false;">{/if}<span id="taxon{$entry.id}">{$entry.taxon} ({$entry.rank})</span>{if $entry.children}</a>{/if}
-                     <a href="#" id="add{$entry.id}" class="edit" onclick="addTaxonToGroup({$entry.id});return false;">add</a>
+                    {if $entry.children}<a href="#" onclick="$(this).nextUntil('ul').next().toggle();return false;">{/if}
+                    <span id="taxon{$entry.id}">{$entry.taxon} ({$entry.rank})</span>
+                    {if $entry.children}</a>{/if}
+					<a href="#" id="add{$entry.id}" class="edit{if $entry.group_memberships|@count>0 && !$entry.group_memberships[$group.id]} non-zero{/if}" onclick="addTaxonToGroup({$entry.id});return false;">add</a>
                     {if $entry.children}{menu data=$entry.children level=$level+1}{/if}
                 </li>
           {/foreach}
           </ul>
         {/function}
-        
+        <div id="all-taxa">
         {menu data=$taxa}
+		<div>
+
 	</td>
     </tr></table>
 
@@ -110,10 +57,16 @@ function doTaxongroupTaxaFormSubmit()
 <script type="text/JavaScript">
 $(document).ready(function(){
 	{foreach $taxongroupTaxa as $v}
-	addTaxonToGroup({$v.id},'{$v.taxon|@escape}');
+	addTaxonToGroup({$v.id},'{$v.taxon|@escape} ({$v.rank|@escape})');
 	{/foreach}
+	
+	$('.sortable').nestedSortable({
+		items: 'li',
+		listType: 'ul',
+	});
 
 	$('#save').bind('click',function() { doTaxongroupTaxaFormSubmit(); } );
+	$('#page-block-messages').fadeOut(2000);
 });
 </script>
 
