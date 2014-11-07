@@ -1,5 +1,48 @@
 <?php
 
+
+/*
+
+CREATE TABLE IF NOT EXISTS `taxongroups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `sys_label` varchar(64) NOT NULL,
+  `show_order` int(2) NOT NULL DEFAULT '99',
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`,`sys_label`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `taxongroups_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `taxongroup_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`,`taxongroup_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `taxongroups_taxa` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `taxongroup_id` int(11) NOT NULL,
+  `taxon_id` int(11) NOT NULL,
+  `show_order` int(3) NOT NULL DEFAULT '999',
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`,`taxongroup_id`,`taxon_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+*/
+
 include_once ('Controller.php');
 class TaxongroupController extends Controller
 {

@@ -14,7 +14,7 @@
 {if $concept.base_rank>=$smarty.const.SPECIES_RANK_ID}
 		<tr>
         	<th>genus:</th>
-            <td><input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" mandatory="mandatory" label="genus" /> *
+            <td><input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" mandatory="mandatory" label="genus" {if $name.uninomial|count_characters>0}disabled="disabled"{/if}/> *
             </td>
 		</tr>
 		<tr>
@@ -136,7 +136,7 @@
 {if $concept.base_rank>=$smarty.const.SPECIES_RANK_ID}
 
 <div class="page-generic-div">
-Let op: een wijziging van het genus leidt alleen tot naamsverandering, <i>niet</i> tot een verandering van de taxonomische ouder van het concept. Ga om die te wijzigen naar <a href="taxon.php?id={$concept.id}">de bewerkingspagina van het concept</a>.
+Let op: wijzig om het genus te veranderen de taxonomische ouder van het concept. Ga daarvoor naar <a href="taxon.php?id={$concept.id}">de bewerkingspagina van het concept</a>.
 </div>
 
 {/if}
