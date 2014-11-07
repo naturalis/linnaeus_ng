@@ -1,0 +1,37 @@
+a.edit {
+	color:#03F;
+	font-size:0.8em;
+	margin-left:5px;
+}
+a.non-zero {
+	color:#999;
+}
+
+#all-taxa ul {
+    padding:0 0 4px 13px;
+}
+#all-taxa ul[id^=level] {
+	display:none;
+}
+#all-taxa ul[id=level0] {
+	display:block;
+}
+table tr td {
+	vertical-align:top;
+}
+#all-taxa td {
+	width:400px;
+}
+#all-taxa td:last-child {
+	border-left:1px solid #999;
+	padding-left:10px;
+	width:500px;
+}
+.sortable {
+	cursor:move;
+}
+.group-taxa {
+	font-size:0.8em;
+	padding-left:0px;
+	display:none;
+}

@@ -56,15 +56,25 @@ function checkFormMandatory(form)
 	return messages.length==0;
 }
 
+function deleteGroup()
+{
+	if (confirm(_('Are you sure?')))
+	{
+		$('#action').val('delete');
+		$('#theForm').submit();
+	}
+}
+
 
 </script>
 
 <div id="page-main">
-	<h3>{if $newgroup}new group{else}{$group.label}{/if}</h3>
+	<h3>{if $newgroup}new group{else}edit group {$group.sys_label}{/if}</h3>
     
     <form id="theForm" method="post">
     <input type="hidden" name="rnd" value="{$rnd}" />
-    <input type="hidden" name="action" value="save" />
+    <input type="hidden" name="action" id="action" value="save" />
+    <input type="hidden" name="id" id="id" value="{$group.id}" />
 
     <table>
         <tr>
@@ -78,7 +88,9 @@ function checkFormMandatory(form)
             	<select name="parent_id">
                     <option value=""{if !$group || $group.parent_id==''} selected="selected"{/if}>-</option>
                     {foreach from=$groups item=v key=k}
-                    <option value="{$v.id}"{if $group.parent_id==$v.id} selected="selected"{/if}>{$v.name}</option>
+                    {if $v.id!=$group.id}
+                    <option value="{$v.id}"{if $group.parent_id==$v.id} selected="selected"{/if}>{$v.sys_label}</option>
+                    {/if}
                     {/foreach}
                 </select>
             </td>
@@ -103,7 +115,11 @@ function checkFormMandatory(form)
         {/foreach}
 	</table>
     
+    <p>
     <input type="submit" value="save" />
+	{if !$newgroup}&nbsp;<input type="button" value="delete" onclick="deleteGroup();" />{/if}
+    </p>
+
     
     </form>
 
@@ -117,7 +133,7 @@ function checkFormMandatory(form)
 <script type="text/JavaScript">
 $(document).ready(function(){
 	
-	$('#sys_label').bind('keyup',function() { duplicateSysLabel(); } );
+	{if $newgroup}$('#sys_label').bind('keyup',function() { duplicateSysLabel(); } );{/if}
 	$('#names-0').bind('focus',function() { setName0Focused(); } );
 	$('#theForm').bind('submit',function() { return checkFormMandatory(this); } );
 

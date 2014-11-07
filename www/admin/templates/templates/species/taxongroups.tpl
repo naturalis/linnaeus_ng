@@ -1,37 +1,26 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-a.edit {
-	color:#03F;
-	font-size:0.8em;
-	margin-left:5px;
-}
-</style>
-
 <div id="page-main">
 
 	<p>
-    Groups:
+
+    <h3>Groups</h3>
+    Drag and drop groups to change their show order; click "save group order" to save the new order.
 
     {function menu level=0}
-      <ul class="level{$level}">
+      <ul class="level{$level} sortable">
       {foreach $data as $entry}
-        {if $entry.children}
-            <li>
-            	{$entry.name}
-                <a class="edit" href="taxongroup_taxa.php?id={$entry.id}">edit group</a>
-                <a class="edit" href="taxongroup_taxa.php?id={$entry.id}">add taxa</a>
-            	<div></div>
-	            {menu data=$entry.children level=$level+1}
-            </li>
-        {else}
-            <li>
-	            {$entry.name}
-                <a class="edit" href="taxongroup_taxa.php?id={$entry.id}">edit group</a>
-                <a class="edit" href="taxongroup_taxa.php?id={$entry.id}">add taxa</a>
-            	<div></div>
-            </li>
-        {/if}
+        <li id="group{$entry.id}">
+            {$entry.sys_label} ({if $entry.taxa|@count>0}<a href="#" onclick="$('#taxa{$entry.id}').toggle();return false;">{/if}{$entry.taxa|@count} taxa{if $entry.taxa|@count>0}</a>{/if})
+            <a class="edit" href="taxongroup.php?id={$entry.id}">edit group</a>
+            <a class="edit" href="taxongroup_taxa.php?id={$entry.id}">add taxa</a>
+            <div class="group-taxa" id="taxa{$entry.id}">
+            {foreach $entry.taxa as $v}
+            {$v.taxon} ({$v.rank})<br />
+            {/foreach}
+            </div>
+	        {if $entry.children}{menu data=$entry.children level=$level+1}{/if}
+        </li>
       {/foreach}
       </ul>
     {/function}
@@ -41,6 +30,9 @@ a.edit {
     </p>
     
     <p>
+    	<input type="button" value="save group order" onclick="doSaveGroupOrder()" />
+    </p>
+    <p>
     	<a href="taxongroup.php">create new group</a>
     </p>
 
@@ -49,6 +41,13 @@ a.edit {
 
 <script type="text/JavaScript">
 $(document).ready(function(){
+
+	$('.sortable').nestedSortable({
+		items: 'li',
+		listType: 'ul',
+	});
+
+	$('#page-block-messages').fadeOut(2000);
 });
 </script>
 
