@@ -143,9 +143,6 @@ class MatrixKeyController extends Controller
 
     public function identifyAction ()
     {
-		
-//$states = $this->stateMemoryRecall();$taxa = $this->nbcGetTaxaScores($states);die('satan');		
-		
         $this->checkMatrixIdOverride();
         $this->checkMasterMatrixId();
 
@@ -272,10 +269,9 @@ class MatrixKeyController extends Controller
         
         $id = $this->getCurrentMatrixId();
 
-        if (!isset($id)) {
-            
+        if (!isset($id))
+		{
             $this->storeHistory = false;
-            
             $this->redirect('matrices.php');
         }
         
@@ -284,13 +280,11 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('function', 'Examine');
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": examine'), $matrix['name']));
-        
+
+        $this->smarty->assign('projectId', $this->getCurrentProjectId());
         $this->smarty->assign('taxa', $this->getTaxaInMatrix());
-        
         $this->smarty->assign('matrixCount', $this->getMatrixCount());
-        
         $this->smarty->assign('matrix', $matrix);
-        
         $this->smarty->assign('examineSpeciesRecall', $this->examineSpeciesRecall());
         
         $this->printPage();
@@ -298,6 +292,7 @@ class MatrixKeyController extends Controller
 
     public function compareAction ()
     {
+		
         $this->checkMatrixIdOverride();
         
         $id = $this->getCurrentMatrixId();
@@ -326,8 +321,8 @@ class MatrixKeyController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-		
-		if ($this->rHasVar('key')) {
+		if ($this->rHasVar('key'))
+		{
 			$this->setCurrentMatrixId($this->requestData['key']);
 			$this->setTotalEntityCount();
 		}
