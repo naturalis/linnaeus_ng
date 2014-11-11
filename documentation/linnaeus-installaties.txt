@@ -19,12 +19,7 @@ linnaeustest.etibioinformatics.nl	132.229.167.136
 162.13.155.159	(nouvelle_flore development)
 	/var/www/linnaeusng
 
-determineren-development-001.openstack.naturalis.nl	10.42.1.48
-(vincents sleutels test, maar bleek niet zichtbaar van buiten. wordt niet gebruikt)
-	/var/www/linnaeusng
-
-soortenregister-development-001.cloud.naturalis.nl
-(in misbruik als test vincents sleutels)
+soortenregister-development-001.cloud.naturalis.nl (NSR development)
 	/var/www/linnaeusng
 
 134.213.48.249
@@ -39,3 +34,8 @@ determineren.nederlandsesoorten.nl/xxxx/	keys (boktorren, rivierkreeften etc)
 162.13.138.109
 www.nederlandsesoorten.nl/linnaeus_ng		soortenregister
 	/var/www/linnaeusng
+
+determineren-development-001.naturalis.nl	10.42.1.48
+(vincents sleutels test, maar bleek niet zichtbaar van buiten. wordt niet gebruikt)
+	/var/www/linnaeusng
+

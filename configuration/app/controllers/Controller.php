@@ -315,7 +315,8 @@ class Controller extends BaseClass
     {
         $pB = $this->getCurrentProjectId();
 
-        if ($this->rHasVal('p')) {
+        if ($this->rHasVal('p'))
+		{
             $this->resolveProjectId();
         }
         else

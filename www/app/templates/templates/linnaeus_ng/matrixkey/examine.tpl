@@ -36,10 +36,13 @@
 	</div>
 </div>
 
-{literal}
+
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function() {
+
+matrixId={$matrix.id};
+projectId={$projectId};
+
 {foreach from=$characteristics key=k item=v}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}');
 {/foreach}
@@ -48,12 +51,8 @@ $(document).ready(function(){
 	goExamine({$examineSpeciesRecall});
 {/if}
 
-
-{literal}
 });
 </script>
-{/literal}
-
 
 {include file="../shared/messages.tpl"}
 {include file="../shared/footer.tpl"}
