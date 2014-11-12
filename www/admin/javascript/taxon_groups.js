@@ -50,6 +50,11 @@ function saveTaxonToGroup(taxon,group)
 			{
 				$("#add"+taxon).remove();
 				$("#span"+taxon).addClass('non-zero');
+				for(var i=0;i<groups.length;i++)
+				{
+					if (groups[i].id==group)
+						$("#groups"+taxon).html('['+groups[i].sys_label+']');
+				}				
 				$("#save-msg").html('saved').fadeOut(750, function() { closeGroupSelector(); } );
 			}
 			else

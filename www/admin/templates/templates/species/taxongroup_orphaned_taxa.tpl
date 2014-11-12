@@ -15,10 +15,14 @@
                     {$entry.taxon} ({$entry.rank})
                     {/if}
                 </span>
-                {if $entry.children}</a>{/if}
 				{if $entry.group_memberships|@count==0}
                 <a href="#" id="add{$entry.id}" class="edit" onclick="showGroupSelector({$entry.id});return false;">add</a>
-				{/if}
+                {/if}
+                <span id="groups{$entry.id}" class="non-zero" style="font-size:0.8em">
+                {foreach $entry.group_memberships as $group name=gm}
+                {if $smarty.foreach.gm.iteration==1}[{/if}{if $smarty.foreach.gm.iteration>1} / {/if}{$group.sys_label}{if $smarty.foreach.gm.iteration==$entry.group_memberships|@count}]{/if}
+                {/foreach}
+                </span>
                 {if $entry.children}{menu data=$entry.children level=$level+1}{/if}
             </li>
       {/foreach}
