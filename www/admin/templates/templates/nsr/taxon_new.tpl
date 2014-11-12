@@ -61,11 +61,11 @@
 				auteurschap:
 			</th>
             <td>
-            	<input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" Xmandatory="mandatory" label="auteurschap" /> *
+            	<input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" label="auteurschap" /> *
 			</td>
 		</tr>
-		<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="" Xmandatory="mandatory" disabled="disabled" label="auteur" /></td></tr>	
-		<tr><th>jaar:</th><td><input type="text" class="small" id="name_authorship_year" value="" Xmandatory="mandatory" disabled="disabled" label="jaar" /></td></tr>	
+		<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="" disabled="disabled" label="auteur" /></td></tr>	
+		<tr><th>jaar:</th><td><input type="text" class="small" id="name_authorship_year" value="" disabled="disabled" label="jaar" /></td></tr>	
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 

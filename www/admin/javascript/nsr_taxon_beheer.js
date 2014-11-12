@@ -314,10 +314,6 @@ function savename()
 	saveform();
 }
 
-
-
-
-
 function saveform(notifications)
 {
 	if (notifications && notifications.length>0)
