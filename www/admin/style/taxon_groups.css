@@ -3,7 +3,7 @@ a.edit {
 	font-size:0.8em;
 	margin-left:5px;
 }
-a.non-zero {
+span.non-zero, a.non-zero {
 	color:#999;
 }
 
@@ -34,4 +34,9 @@ table tr td {
 	font-size:0.8em;
 	padding-left:0px;
 	display:none;
+}
+.group-list {
+	
+}
+.taxon-list {
 }

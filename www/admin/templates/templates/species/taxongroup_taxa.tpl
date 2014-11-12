@@ -18,7 +18,7 @@
     </form>
     </p>
 
-	<table><tr>
+	<table id="all-taxa"><tr>
     <td>
 	    Taxa in group:
 	    <ul id="selection" class="sortable">
@@ -31,7 +31,13 @@
           {foreach $data as $entry}
                 <li>
                     {if $entry.children}<a href="#" onclick="$(this).nextUntil('ul').next().toggle();return false;">{/if}
-                    <span id="taxon{$entry.id}">{$entry.taxon} ({$entry.rank})</span>
+                    <span id="taxon{$entry.id}">
+	                    {if $entry.commonname}
+                    	{$entry.commonname} (<i>{$entry.taxon}</i>; {$entry.rank})
+                       	{else}
+                    	{$entry.taxon} ({$entry.rank})
+                        {/if}
+					</span>
                     {if $entry.children}</a>{/if}
 					<a href="#" id="add{$entry.id}" class="edit{if $entry.group_memberships|@count>0 && !$entry.group_memberships[$group.id]} non-zero{/if}" onclick="addTaxonToGroup({$entry.id});return false;">add</a>
                     {if $entry.children}{menu data=$entry.children level=$level+1}{/if}
@@ -57,7 +63,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 	{foreach $taxongroupTaxa as $v}
-	addTaxonToGroup({$v.id},'{$v.taxon|@escape} ({$v.rank|@escape})');
+	addTaxonToGroup({$v.id},'{if $v.commonname}{$v.commonname|@escape} (<i>{$v.taxon|@escape}</i>; {$v.rank|@escape}){else}{$v.taxon|@escape} ({$v.rank|@escape}){/if}');
 	{/foreach}
 	
 	$('.sortable').nestedSortable({

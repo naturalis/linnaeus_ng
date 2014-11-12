@@ -108,6 +108,28 @@ function checkMandatory()
 var genusBaseRankid=null;
 var speciesBaseRankid=null;
 
+function checkAuthorshipAgainstRank()
+{
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	var ranklabel = $('#concept_rank_id :selected').text();
+
+	var p1=$('#name_authorship').val() ? $('#name_authorship').val().length : 0;
+	//var p2=$('#name_name_author').val() ? $('#name_name_author').val().length : 0;
+	//var p3=$('#name_authorship_year').val() ? $('#name_authorship_year').val().length : 0;
+
+	var result=true;
+	var buffer=[];
+
+	if (rank>=genusBaseRankid)
+	{
+		if (p1==0) buffer.push("Auteurschap is niet ingevuld.");
+	}
+
+	if (buffer.length>0) alert(buffer.join("\n"));
+
+	return buffer.length==0;
+}
+
 function checkNameAgainstRank()
 {
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
@@ -217,7 +239,6 @@ function checkPresenceDataHT()
 	return buffer;
 }
 
-
 function checkScientificName()
 {
 	var result=true;
@@ -264,6 +285,7 @@ function savenewconcept()
 	var notifications=[];
 	
 	if (!checkNameAgainstRank()) return;
+	if (!checkAuthorshipAgainstRank()) return;
 
 	notifications=notifications.concat(
 		checkPresenceDataSpecies(),
@@ -271,6 +293,7 @@ function savenewconcept()
 		checkDutchName(),
 		checkPresenceDataHT()
 	);
+	
 	saveform(notifications);
 }
 
@@ -330,7 +353,7 @@ function saveform(notifications)
 				form.append('<input type="hidden" name="'+val.name+'[new]" value="'+val.new+'" />');
 		}
 	}
-	
+
 	$(window).unbind('beforeunload');
 	$('body').append(form);
 	form.submit();

@@ -33,9 +33,10 @@
     	<input type="button" value="save group order" onclick="doSaveGroupOrder()" />
     </p>
     <p>
-    	<a href="taxongroup.php">create new group</a>
+    	<a href="taxongroup.php">create new group</a><br />
+    	<a href="taxongroup_clickthrough.php">group click-through</a><br />
+    	<a href="taxongroup_orphaned_taxa.php">taxa not in any group</a>
     </p>
-
 </div>
 
 

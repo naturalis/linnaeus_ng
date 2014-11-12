@@ -1,3 +1,66 @@
+var groups=Array();
+
+function registerGroup(p)
+{
+	groups.push(p);
+}
+
+function closeGroupSelector()
+{
+	$('#group-list').toggle(false);
+}
+
+function showGroupSelector(id)
+{
+	var buffer=Array();
+	buffer.push(
+		'Add to group: \
+		<a href="#" class="edit" onclick="closeGroupSelector();return false;">(close window)</a>\
+		<span style="float:right;padding-right:2px;" id="save-msg"></span>'
+	);
+	
+	for(var i=0;i<groups.length;i++)
+	{
+		var group=groups[i];
+		var b="";
+		for(var j=0;j<group.level;j++)
+		{
+			b+="&nbsp;&nbsp;";
+		}
+		buffer.push(b+'<a href="#" onclick="saveTaxonToGroup('+id+','+group.id+');return false;">'+group.sys_label+'</a>');
+	}
+	$('#group-list').html(buffer.join('<br/>')).toggle(true);;
+	
+	allStickElementUnderElement('add'+id,'group-list');
+}
+
+function saveTaxonToGroup(taxon,group)
+{
+	$.ajax({
+		url : "taxongroup_ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			action : 'save_taxon_to_group',
+			taxon : taxon,
+			group : group,
+			time : allGetTimestamp()			
+		}),
+		success : function (data) {
+			if(data==1)
+			{
+				$("#add"+taxon).remove();
+				$("#span"+taxon).addClass('non-zero');
+				$("#save-msg").html('saved').fadeOut(750, function() { closeGroupSelector(); } );
+			}
+			else
+			{
+				$("#save-msg").html('error');
+			}
+		}
+	});
+
+}
+
 function addTaxonToGroup(id,label)
 {
 	label=label?label:$('#taxon'+id).html();

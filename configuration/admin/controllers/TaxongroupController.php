@@ -50,7 +50,8 @@ class TaxongroupController extends Controller
     public $usedModels = array(
 		'taxongroups',
 		'taxongroups_labels',
-		'taxongroups_taxa'
+		'taxongroups_taxa',
+		'commonname'
     );
     public $jsToLoad = array(
         'all' => array('taxon_groups.js','jquery.mjs.nestedSortable.js')
@@ -151,11 +152,77 @@ class TaxongroupController extends Controller
 		$this->printPage();
     }
 
+    public function taxongroupClickthroughAction ()
+    {
+		$this->checkAuthorisation();
+		
+		if ($this->rHasId())
+		{
+			$group=$this->getGroup($this->rGetId());
+
+			if ($this->rHasVal('back','1'))
+			{
+				$d=array();
+				foreach($_SESSION['admin']['user']['taxongroup']['path'] as $row)
+				{
+					$d[]=$row;
+					if ($row['id']==$this->rGetId())
+						break;
+				}
+				$_SESSION['admin']['user']['taxongroup']['path']=$d;
+			}
+			else
+			{
+				$_SESSION['admin']['user']['taxongroup']['path'][$group['id']]=array('id'=>$group['id'],'sys_label'=>$group['sys_label']);
+			}
+
+			$this->smarty->assign('group',$group);
+			$this->smarty->assign('path',$_SESSION['admin']['user']['taxongroup']['path']);
+		}
+		else
+		{
+			unset($_SESSION['admin']['user']['taxongroup']['path']);
+			$groups=$this->getGroups(array('stop_level'=>0));
+			$this->smarty->assign('groups',$groups);
+		}
+
+		$this->printPage();
+    }
+	
+    public function taxongroupOrphanedTaxaAction ()
+    {
+		$this->checkAuthorisation();
+		$this->smarty->assign('taxa',$this->getTaxa());
+		$this->smarty->assign('groups',$this->getGroups());
+		$this->printPage();
+    }
+
+    public function ajaxInterfaceAction ()
+    {
+        if (!$this->rHasVal('action'))
+            return;
+
+        if ($this->requestData['action'] == 'save_taxon_to_group')
+		{
+			 $r=$this->saveTaxongroupTaxon(
+			 	array(
+					'taxongroup_id'=>$this->rGetVal('group'),
+					'taxon_id'=>$this->rGetVal('taxon')
+				)
+			);
+			$this->smarty->assign('returnText',$r);
+		}
+
+        $this->printPage('ajax_interface');
+	}
+
 
 
 	private function getGroups($p=null)
 	{
 		$parent=isset($p['parent']) ? $p['parent'] : null;
+		$level=isset($p['level']) ? $p['level'] : 0;
+		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
 		
 		$g=$this->models->Taxongroups->freeQuery("
 			select
@@ -179,8 +246,13 @@ class TaxongroupController extends Controller
 		
 		foreach((array)$g as $key=>$val)
 		{
+			$g[$key]['level']=$level;	
 			$g[$key]['taxa']=$this->getTaxongroupTaxa($val['id']);	
-			$g[$key]['children']=$this->getGroups(array('parent'=>$val['id']));
+			if (!is_null($stopLevel) && $stopLevel<=$level)
+			{
+				continue;
+			}
+			$g[$key]['children']=$this->getGroups(array('parent'=>$val['id'],'level'=>$level+1,'stop_level'=>$stopLevel));
 		}
 		
 		return $g;
@@ -221,6 +293,9 @@ class TaxongroupController extends Controller
 			$r['names'][$val['language_id']]=$val['name'];
 			$r['descriptions'][$val['language_id']]=$val['description'];
 		}
+		
+		$r['taxa']=$this->getTaxongroupTaxa($r['id']);
+		$r['groups']=$this->getGroups(array('parent'=>$r['id'],'level'=>0,'stop_level'=>0));
 
 		return $r;
 	}
@@ -309,14 +384,38 @@ class TaxongroupController extends Controller
 			'id'=>mysql_real_escape_string($id),
 		));
 
+		$this->models->Taxongroups->update(
+			array('parent_id'=>'null'),
+			array('project_id'=>$this->getCurrentProjectId(),'parent_id'=>mysql_real_escape_string($id))
+		);
+
 		return true;
 	}
 
 
+	private function getAllCommonnames()
+	{
+		return $this->models->Commonname->freeQuery(array(
+				"query" => "
+					select
+						taxon_id,commonname
+					from %PRE%commonnames
+					where
+						project_id = ".$this->getCurrentProjectId()."
+						and language_id=".LANGUAGE_ID_DUTCH."
+						order by show_order desc",
+				"fieldAsIndex"=>"taxon_id"
+			));
+	}
 
 	private function getTaxa($p=null)
 	{
 		$parent=isset($p['parent']) ? $p['parent'] : null;
+
+		if (is_null($p))
+		{
+			$this->tmp=$this->getAllCommonnames();
+		}
 
 		$g=$this->models->Taxon->freeQuery("
 			select
@@ -334,7 +433,7 @@ class TaxongroupController extends Controller
 
 			left join %PRE%ranks _q
 				on _f.rank_id=_q.id
-
+				
 			where
 				_t.project_id=". $this->getCurrentProjectId()."
 				and _t.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
@@ -345,11 +444,34 @@ class TaxongroupController extends Controller
 
 		foreach((array)$g as $key=>$val)
 		{
+			$g[$key]['commonname']=isset($this->tmp[$val['id']]['commonname']) ? $this->tmp[$val['id']]['commonname'] : null;
 			$g[$key]['group_memberships']=$this->getTaxongroupMemberships($val['id']);
 			$g[$key]['children']=$this->getTaxa(array('parent'=>$val['id']));
 		}
 				
 		return $g;
+	}
+
+	private function saveTaxongroupTaxon($p)
+	{
+		$taxongroup_id=isset($p['taxongroup_id']) ? $p['taxongroup_id'] : null;
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$show_order=isset($p['show_order']) ? $p['show_order'] : null;
+		
+		if (empty($taxongroup_id) || empty($taxon_id))
+			return false;
+		
+		$d=array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxongroup_id'=>mysql_real_escape_string($taxongroup_id),
+			'taxon_id'=>mysql_real_escape_string($taxon_id)
+		);
+		
+		if (!is_null($show_order)) $d['show_order']=$show_order;
+
+		$this->models->TaxongroupsTaxa->save($d);
+		
+		return true;
 	}
 
 	private function saveTaxongroupTaxa($p)
@@ -367,12 +489,13 @@ class TaxongroupController extends Controller
 
 		foreach((array)$taxa as $key=>$taxon)
 		{
-			$this->models->TaxongroupsTaxa->save(array(
-				'project_id'=>$this->getCurrentProjectId(),
-				'taxongroup_id'=>mysql_real_escape_string($group_id),
-				'taxon_id'=>mysql_real_escape_string($taxon),
-				'show_order'=>$key
-			));
+			 $this->saveTaxongroupTaxon(
+			 	array(
+					'taxongroup_id'=>mysql_real_escape_string($group_id),
+					'taxon_id'=>mysql_real_escape_string($taxon),
+					'show_order'=>($key+1)
+				)
+			);
 		}
 
 	}
@@ -410,6 +533,13 @@ class TaxongroupController extends Controller
 			order by 
 				_a.show_order
 		");
+		
+		$c=$this->getAllCommonnames();
+		
+		foreach((array)$d as $key=>$val)
+		{
+			$d[$key]['commonname']=isset($c[$val['id']]['commonname']) ? $c[$val['id']]['commonname'] : null;
+		}
 
 		return $d;
 
@@ -423,9 +553,12 @@ class TaxongroupController extends Controller
 		$d=$this->models->TaxongroupsTaxa->freeQuery(array(
 			"query"=>"
 				select
-					_a.id,_a.taxongroup_id
+					_a.id,_a.taxongroup_id,_g.sys_label
 				from
 					%table% _a
+				left join %PRE%taxongroups _g
+					on _a.project_id=_g.project_id
+					and _a.taxongroup_id=_g.id
 				where
 					_a.project_id=".$this->getCurrentProjectId()."
 					and _a.taxon_id = ".$id,
@@ -462,6 +595,35 @@ class TaxongroupController extends Controller
 				)
 			);
 		}
+
+		$g=$this->models->Taxongroups->freeQuery("
+			select
+				_a.*
+			from
+				%PRE%taxongroups _a
+				
+			left join 
+				%PRE%taxongroups _b
+				on _a.project_id=_b.project_id
+				and _a.parent_id=_b.id
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.parent_id is not null
+				and _b.id is null
+		");
+
+		foreach((array)$g as $val)
+		{
+			$this->models->Taxongroups->update(
+				array('parent_id'=>'null'),
+				array('project_id'=>$this->getCurrentProjectId(),'id'=>$val['id'])
+			);
+
+		}
+
+		
+
 			
 	}
 
