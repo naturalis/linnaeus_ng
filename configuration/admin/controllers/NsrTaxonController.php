@@ -1419,6 +1419,17 @@ class NsrTaxonController extends NsrController
 		return true;
 	}
 
+	private function checkAuthorshipAgainstRank($baseRank,$authorship)
+	{
+		if ($baseRank>=GENUS_RANK_ID && empty($authorship))
+		{
+			$this->addError("Geen auteurschap. Concept niet opgeslagen.");
+			return false;
+		}
+
+		return true;
+	}
+
 	private function checkNamePartsMatchRank($baseRank,$uninomial,$specificEpithet,$infraSpecificEpithet)
 	{
 
@@ -1542,13 +1553,19 @@ class NsrTaxonController extends NsrController
 		}
 
 		// let's run some tests
-		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial) || empty($authorship))
+		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial)) // || empty($authorship))
 		{
 			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
 			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
 			if (empty($parent)) $this->addError('Geen ouder. Concept niet opgeslagen.');
 			if (empty($uninomial)) $this->addError('Geen genus of uninomial. Concept niet opgeslagen.');
-			if (empty($authorship)) $this->addError('Geen auteurschap. Concept niet opgeslagen.');
+			//if (empty($authorship)) $this->addError('Geen auteurschap. Concept niet opgeslagen.');
+			$this->setConceptId(null);
+			return;
+		}
+
+		if (!$this->checkAuthorshipAgainstRank($baseRank,$authorship))
+		{
 			$this->setConceptId(null);
 			return;
 		}

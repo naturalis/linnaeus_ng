@@ -85,14 +85,26 @@ function deleteGroup()
         <tr>
         	<th>parent group:</th>
         	<td>
-            	<select name="parent_id">
-                    <option value=""{if !$group || $group.parent_id==''} selected="selected"{/if}>-</option>
-                    {foreach from=$groups item=v key=k}
-                    {if $v.id!=$group.id}
-                    <option value="{$v.id}"{if $group.parent_id==$v.id} selected="selected"{/if}>{$v.sys_label}</option>
-                    {/if}
-                    {/foreach}
-                </select>
+
+            {function groupselect level=0}
+              {foreach $data as $entry}
+                    <option 
+                        value="{$entry.id}"
+                        {if $group.parent_id==$entry.id} selected="selected"{/if}
+                        {if $group.id==$entry.id} disabled="disabled"{/if}
+                        >
+                        {'&nbsp;&nbsp;'|@str_repeat:$level}
+                        {$entry.sys_label}
+                        </option>
+                    {if $entry.children}{groupselect data=$entry.children level=$level+1}{/if}
+                {/foreach}
+            {/function}
+            
+            <select name="parent_id">
+            <option value=""{if !$group || $group.parent_id==''} selected="selected"{/if}>-</option>
+            {groupselect data=$groups}
+            </select>
+    
             </td>
         </tr>
 
