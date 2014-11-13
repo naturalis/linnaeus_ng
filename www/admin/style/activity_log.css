@@ -1,0 +1,42 @@
+#activity-log table tr td {
+	vertical-align:top;
+}
+
+
+#activity-log table tr:hover {
+	background-color:#f9c788;
+}
+
+#activity-log .inline-table {
+	margin-left:10px;
+	border-collapse:collapse;
+}
+
+#activity-log .inline-table tr td, .inline-table tr th  {
+	font-size:10px;
+	padding-left:5px;
+	background-color:#eee;
+}
+
+#activity-log .inline-table td {
+	width:350px;
+	border:1px solid #ddd;
+}
+
+
+#activity-log ul.compare {
+	font-style:normal;
+	font-size:11px;
+}
+
+#activity-log ul li.same {
+	color:#777;
+}
+
+#activity-log ul li.different {
+	color:red;
+}
+
+#activity-log ul li.inner-header {
+	font-style:italic;
+}

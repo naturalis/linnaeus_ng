@@ -376,7 +376,7 @@ class NsrTaxonController extends NsrController
     {
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Taxa gemarkeerd als verwijderd'));
-		$this->smarty->assign('concepts',$this->getSpeciesList(array('have_deleted'=>'only')));
+		$this->smarty->assign('concepts',$this->getDeletedSpeciesList());
 		$this->printPage();
 	}
 
@@ -441,6 +441,16 @@ class NsrTaxonController extends NsrController
 	private function getNameId()
 	{
 		return $this->nameId;
+	}
+
+	private function setIsNewRecord($state)
+	{
+		$this->isNewRecord=$state;
+	}
+
+	private function getIsNewRecord()
+	{
+		return isset($this->isNewRecord) ? $this->isNewRecord : false;
 	}
 
 	private function getName($p)
@@ -1045,7 +1055,46 @@ class NsrTaxonController extends NsrController
 	}
 
 
+	private function getDeletedSpeciesList()
+	{
+		$taxa=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon,
+				_q.rank,
+				concat(_user.first_name,' ',_user.last_name) as deleted_by,
+				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
+			
+			from %PRE%taxa _a
+			
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
 
+			left join %PRE%users _user
+				on _trash.user_id = _user.id
+				
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%ranks _q
+				on _f.rank_id=_q.id
+
+			left join %PRE%nsr_ids _ids
+				on _a.id =_ids.lng_id 
+				and _a.project_id = _ids.project_id
+				and _ids.item_type = 'taxon'
+
+			where _a.project_id =".$this->getCurrentProjectId()."
+				and ifnull(_trash.is_deleted,0)=1
+
+			order by _trash.created desc
+		");
+
+		return $taxa;
+	}
 
 	private function getSpeciesList($p)
 	{
@@ -1620,8 +1669,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->models->Taxon->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
-			$newconcept=$this->getConcept($this->getConceptId());
-			$this->logNsrChange(array('after'=>$newconcept,'note'=>'new concept '.$newconcept['taxon']));
+			$this->setIsNewRecord(true);
 			$this->updateConcept();
 		}
 		else 
@@ -1738,7 +1786,7 @@ class NsrTaxonController extends NsrController
 		$after=$this->getConcept($this->rGetId());
 		$after['presence']=$this->getPresenceData($this->rGetId());
 
-		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$before['taxon']));
+		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$after['taxon']));
 		
 	}
 
@@ -2003,9 +2051,8 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->setNameId($this->models->Names->getNewId());
-			$newname=$this->getName(array('id'=>$this->getNameId()));
-			$this->logNsrChange(array('after'=>$newname,'note'=>'new name '.$newname['name']));
 			$this->addMessage('Nieuwe naam aangemaakt.');
+			$this->setIsNewRecord(true);
 			$this->updateName();
 		}
 		else 
@@ -2102,7 +2149,7 @@ class NsrTaxonController extends NsrController
 
 
 
-	private function updateName()
+	private function updateName($new=false)
 	{
 		$name=$this->getName(array('id'=>$this->getNameId()));
 
@@ -2255,12 +2302,12 @@ class NsrTaxonController extends NsrController
 		$after=$this->getName(array('id'=>$this->getNameId()));
 		$this->logNsrChange(
 			array(
-				'before'=>(!empty($name) ? $name : null),
+				'before'=>(!$this->getIsNewRecord() ? $name : null),
 				'after'=>$after,
-				'note'=>(!empty($name) ? 'updated name '.$name['name'] : 'new name '.$after['name'])
+				'note'=>(!$this->getIsNewRecord() ? 'updated name '.$name['name'] : 'new name '.$after['name'])
 			)
 		);
-			
+		$this->setIsNewRecord(false);
 	}
 
 	private function deleteName()
@@ -2273,7 +2320,7 @@ class NsrTaxonController extends NsrController
 		$d=$this->models->Names->delete($p);
 		if ($d)
 		{
-			$this->logNsrChange(array('before'=>$before,'note'=>'deleted name '.$name['name']));
+			$this->logNsrChange(array('before'=>$before,'note'=>'deleted name '.$before[0]['name']));
 		}
 		return $d;
 	}
@@ -3107,7 +3154,7 @@ class NsrTaxonController extends NsrController
 			");	
 
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
-			$this->logNsrChange(array('before'=>$name,'after'=>$after,'note'=>'changed valid name '.$newSynonym.' to synonym'));
+			$this->logNsrChange(array('before'=>$name,'after'=>$after[0],'note'=>'changed valid name '.$newSynonym.' to synonym'));
 			$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
 			
 			
@@ -3188,7 +3235,7 @@ class NsrTaxonController extends NsrController
 			$id=$this->models->Names->getNewId();
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$id)));
 
-			$this->logNsrChange(array('after'=>$after,'note'=>'created new valid name '.$newName));
+			$this->logNsrChange(array('after'=>$after[0],'note'=>'created new valid name '.$newName));
 			$this->addMessage('Nieuwe geaccepteerde naam aangemaakt.');
 
 			$this->setConceptId($val['taxon_id']);
