@@ -62,6 +62,8 @@ $(document).ready(function() {
 			changepicturecallback:function() { prettyPhotoCycle(); }
 	 	} );
 	}
+
+	$('#page-block-messages').fadeOut(3000);
 	
 } );
 </script>

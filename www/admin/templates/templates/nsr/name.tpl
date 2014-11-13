@@ -127,6 +127,7 @@ $(document).ready(function()
 	preferrednameid={$preferrednameid};
 	checkprefnameavail();
 
+	$('#page-block-messages').fadeOut(3000);
 
 });
 </script>

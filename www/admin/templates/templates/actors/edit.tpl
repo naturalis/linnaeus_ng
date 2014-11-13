@@ -125,6 +125,8 @@ $(document).ready(function()
 	$('#employee_of').toggle(false);
 	{/if}
 
+	$('#page-block-messages').fadeOut(3000);
+
 });
 </script>
 

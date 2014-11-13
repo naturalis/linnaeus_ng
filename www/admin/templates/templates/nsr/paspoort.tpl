@@ -84,6 +84,9 @@ $(document).ready(function(e) {
 	{foreach from=$tabs item=v key=k}
 	currentpublish[{$k}]={if $v.publish==1}true{else}false{/if};
 	{/foreach}
+	
+	$('#page-block-messages').fadeOut(3000);
+	
 });
 </script>
 
