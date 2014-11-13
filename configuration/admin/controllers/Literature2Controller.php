@@ -197,14 +197,14 @@ class Literature2Controller extends Controller
 		
 
 		// we'll generalize this once another one-many relation appears
-		if ($this->rHasVar('actor_id'))
+		//if ($this->rHasVar('actor_id'))  // no if, or the last quthor won't delete
 		{
-			
+
 			$current=$this->getReferenceAuthors();
 			$retain=array();
-			$new=$this->rGetVal('actor_id');
+			$new=(array)$this->rGetVal('actor_id');
 
-			foreach($current as $key=>$actor) 
+			foreach((array)$current as $key=>$actor) 
 			{
 				if (!in_array($actor['actor_id'],$new))
 				{

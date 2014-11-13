@@ -165,6 +165,9 @@ $(document).ready(function(e) {
 	storeOrganisation({ id: {$v.id},name:'{$v.label|@escape}'});
 	{/if}
 	{/foreach}
+
+	$('#page-block-messages').fadeOut(3000);
+
 });
 </script>
 
