@@ -51,7 +51,7 @@
             {/if}
 		</td>
     	<td>
-		    {$v.last_change_hr}::{$v.id}
+		    {$v.last_change_hr}
 		</td>
     	<td>
 		    <a href="#" onclick="$('#alldata{$k}').toggle();return false;">toon data</a>
