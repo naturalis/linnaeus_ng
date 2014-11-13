@@ -176,7 +176,13 @@ class NsrController extends Controller
 
 	public function logNsrChange($p)
 	{
-		$p['changed']=isset($p['changed']) ? $p['changed']: true;
+		if (!isset($p['changed']))
+		{
+			$before=serialize((isset($p['before']) ? $p['before'] : null));
+			$after=serialize((isset($p['after']) ? $p['after'] : null));
+			$p['changed']=md5($before)!=md5($after);
+		}
+
 		$this->logChange($p);
 	}
 
