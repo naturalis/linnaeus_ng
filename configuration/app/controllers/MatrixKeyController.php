@@ -54,7 +54,7 @@ class MatrixKeyController extends Controller
 
 
 
-    public function __construct ($p = null)
+    public function __construct($p = null)
     {
         parent::__construct($p);
 
@@ -62,12 +62,12 @@ class MatrixKeyController extends Controller
 
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
 
-    public function indexAction ()
+    public function indexAction()
     {
 		// reset session-saved matrix id
 		$this->setCurrentMatrixId();
@@ -108,7 +108,7 @@ class MatrixKeyController extends Controller
 
     }
 
-    public function matricesAction ()
+    public function matricesAction()
     {
 		
 		$this->storeHistory = false;
@@ -123,7 +123,7 @@ class MatrixKeyController extends Controller
 
     }
 
-    public function useMatrixAction ()
+    public function useMatrixAction()
     {
         if ($this->rHasId()) {
 
@@ -141,7 +141,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    public function identifyAction ()
+    public function identifyAction()
     {
         $this->checkMatrixIdOverride();
         $this->checkMasterMatrixId();
@@ -168,11 +168,8 @@ class MatrixKeyController extends Controller
 
         if ($this->_matrixType == 'nbc')
 		{
-
             $states = $this->stateMemoryRecall();
-
             $taxa = $this->nbcGetTaxaScores($states);
-
 			$groups = $this->getCharacterGroups();
 
 			$activeChars = array();
@@ -185,8 +182,6 @@ class MatrixKeyController extends Controller
 			));
 
 			$countPerCharacter = $this->getRemainingCharacterCount();
-
-//			q($characters,1);
 
 			$menu = $this->getGUIMenu(
 					array(
@@ -258,7 +253,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('function', 'Identify');
         $this->smarty->assign('characteristics', $characters);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
-		
+
         $this->printPage('identify');
     }
 
@@ -1767,7 +1762,6 @@ class MatrixKeyController extends Controller
 			);
 		}
 		
-		//q($res,1);
 		return $res;
     }
 
@@ -2161,8 +2155,10 @@ class MatrixKeyController extends Controller
         $val = isset($p['val']) ? $p['val'] : null;
         $nbc = isset($p['nbc']) ? $p['nbc'] : null;
         $label = isset($p['label']) ? $p['label'] : null;
+
         $common = isset($p['common']) ? $p['common'] : null;
         $gender = isset($p['gender']) ? $p['gender'] : null;
+		
         $related = isset($p['related']) ? $p['related'] : null;
         $type = isset($p['type']) ? $p['type'] : null;
         $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
@@ -2204,15 +2200,10 @@ class MatrixKeyController extends Controller
             'd' => isset($details) ? $details : null
         );
 
-        if (isset($val['taxon_id']))
-            $d['t'] = $val['taxon_id'];
-        if (isset($gender)) {
-            $d['g'] = $gender[0];
-            $d['e'] = $gender[1];
-		}
-
-        if ($inclRelated && !empty($related))
-            $d['related'] = $related;
+		if (isset($val['taxon_id'])) $d['t'] = $val['taxon_id'];
+        if (isset($gender[0])) $d['g']=$gender[0];
+        if (isset($gender[1])) $d['e']=$gender[1];
+        if ($inclRelated && !empty($related)) $d['related'] = $related;
         
         return $d;
     }
@@ -2426,7 +2417,6 @@ class MatrixKeyController extends Controller
 			";
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-		//q($this->models->MatrixTaxonState->q(),1);
         
         $all = array();
     
@@ -2575,44 +2565,41 @@ class MatrixKeyController extends Controller
 
     private function nbcGetCompleteDataset ($p = null)
     {
-
         $res = $this->getCache('matrix-nbc-data-'.$this->getCurrentMatrixId());
 
-        if (!$res) {
-
+        if (!$res)
+		{
             $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
             $tId = isset($p['tId']) ? $p['tId'] : false;
             $vId = isset($p['vId']) ? $p['vId'] : false;
             
-            $var = $this->getVariationsInMatrix();
+            $var=$this->getVariationsInMatrix();
 
-            foreach ((array)$var as $val) {
-
+            foreach ((array)$var as $val)
+			{
                 if ($vId && $val['id'] != $vId)
                     continue;
                 
-                $nbc = $this->models->NbcExtras->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'ref_id' => $val['id'], 
-                        'ref_type' => 'variation'
-                    ), 
-                    'columns' => 'name,value', 
-                    'fieldAsIndex' => 'name'
-                ));
-                
-                $label = $val['label'];
-                
-                $d = $this->nbcExtractGenderTag($label);
+                $nbc=$this->models->NbcExtras->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'ref_id' => $val['id'], 
+							'ref_type' => 'variation'
+						), 
+						'columns' => 'name,value', 
+						'fieldAsIndex' => 'name'
+					));
 
+                $gender=$this->nbcExtractGenderTag($val['label']);
+				
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $val['label'], 
 					'common' => $this->getCommonname($val['taxon_id']),
-                    'gender' => array($d['gender'], $d['gender_label']),
+                    'gender' => array($gender['gender'], $gender['gender_label']),
                     'related' => $this->getRelatedEntities(array(
                         'vId' => $val['id']
                     )), 
@@ -2969,15 +2956,14 @@ class MatrixKeyController extends Controller
 
 	private function nbcExtractGenderTag($label)
 	{
-
 		$gender=$gender_label=null;
 
 		if (
-			preg_match('/\s(man|vrouw|beide)(\s|$)/', $label, $matches) ||
-			preg_match('/\s(male|female|both)(\s|$)/', $label, $matches)
+			preg_match('/^(\s*)(man|vrouw|beide)(.*)$/', $label, $matches) ||
+			preg_match('/^(\s*)(male|female|both)(.*)$/', $label, $matches)
 			) {
-			
-			switch($matches[1]) {
+
+			switch($matches[2]) {
 				case 'man' :
 				case 'male':
 					$gender='m';
@@ -3076,19 +3062,15 @@ class MatrixKeyController extends Controller
 			if ($val['type']=='taxon' && isset($tmp[$val['id']]))
 				continue;
 
-			if ($val['type']=='variation') {
-				
-				//$label = $d['label']; ???
-
-				$gender = $this->nbcExtractGenderTag($val['label']);
-
-				$common = $this->getCommonname($val['taxon_id']);
-			
-			} else {
-
-				//$label = $val['label']; ???
-
-				$gender = array();
+			if ($val['type']=='variation')
+			{
+				$d=$this->nbcExtractGenderTag($val['label']);
+				$gender=array($d['gender'], $d['gender_label']);
+				$common=$this->getCommonname($val['taxon_id']);
+			}
+			else
+			{
+				$gender=array();
 
 				if ($val['commonname'] != $val['label'])
 					$label = $val['commonname'];
