@@ -307,7 +307,7 @@ class SpeciesController extends Controller
 		$this->printPage();
     }
 
-    public function manageAction ()
+    public function manageAction()
     {
         $this->checkAuthorisation();
 
@@ -319,7 +319,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function parentageAction ()
+    public function parentageAction()
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Generate parentage table'));
@@ -333,7 +333,7 @@ class SpeciesController extends Controller
 		$this->printPage();
     }
 
-    public function allSynonymsAction ()
+    public function allSynonymsAction()
     {
 
         $this->checkAuthorisation();
@@ -354,7 +354,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function allSynonyms2Action ()
+    public function allSynonyms2Action()
     {
 
         $this->checkAuthorisation();
@@ -397,7 +397,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function allCommonAction ()
+    public function allCommonAction()
     {
 
         $this->checkAuthorisation();
@@ -426,7 +426,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function pageAction ()
+    public function pageAction()
     {
         $this->checkAuthorisation();
 
@@ -486,7 +486,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function editAction ()
+    public function editAction()
     {
         $this->checkAuthorisation();
 
@@ -734,7 +734,9 @@ class SpeciesController extends Controller
 			$this->newGetTaxonTree();
 
 			if (isset($this->treeList))
+			{
 				$this->smarty->assign('taxa', $this->treeList);
+			}
 
             $s = $this->getProjectIdRankByname('Subgenus');
             if ($s)

@@ -24,8 +24,8 @@ var nbcPreviousBrowseStyles = {};
 var baseUrlProjectImages = null;
 var nbcUseEmergingCharacters=true;
 
-function nbcGetResults(p) {
-
+function nbcGetResults(p)
+{
 	setCursor('wait');
 
 	allAjaxHandle = $.ajax({
@@ -38,7 +38,9 @@ function nbcGetResults(p) {
 			key : matrixId,
 			p : projectId
 		}),
-		success : function (data) {
+		success : function (data)
+		{
+			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcFilterEmergingCharacters();
 			nbcDoResults();
@@ -49,14 +51,13 @@ function nbcGetResults(p) {
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
 
 			setCursor();
-
 		}
 	});
-	
+
 }
 
-function nbcDoSearch() {
-
+function nbcDoSearch()
+{
 	var str = $('#inlineformsearchInput').val();
 	str = str.replace(/^\s+|\s+$/g, ''); 
 
@@ -77,7 +78,8 @@ function nbcDoSearch() {
 			key : matrixId,
 			p : projectId
 		}),
-		success : function (data) {
+		success : function (data)
+		{
 			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcDoResults();
@@ -92,14 +94,12 @@ function nbcDoSearch() {
 
 		}
 	});
-
 	return false; // suppress submit of form
-
 }
 
 
-function nbcDoResults(p) {
-
+function nbcDoResults(p)
+{
 	if (p && p.resetStart!==false)
 		nbcStart = 0;
 	nbcExpandedShowing = 0;
@@ -108,17 +108,15 @@ function nbcDoResults(p) {
 		nbcPrintResults();
 	else 
 		nbcRemoveShowMoreButton()
-	
 }
 
-function nbcClearResults() {
-
+function nbcClearResults()
+{
 	$('#results-container').html('');
-
 }
 
-function nbcPrintResults() {
-
+function nbcPrintResults()
+{
 	if (nbcExpandResults)
 		nbcPrintResultsExpanded();
 	else
@@ -126,21 +124,23 @@ function nbcPrintResults() {
 
 	nbcPrettyPhotoInit();
 	nbcResetClearButton();	
-
 }
 
-function nbcPrintResultsPaginated() {
-
+function nbcPrintResultsPaginated()
+{
 	var results = nbcData.results;
 	var s = '';
 	var d = 0;
 
 	s = '<div class="resultRow">';
 
-	for(var i=0;i<results.length;i++) {
-		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
+	for(var i=0;i<results.length;i++)
+	{
+		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false)
+		{
 			s = s + nbcFormatResult(results[i]);
-			if (++d==nbcPerLine) {
+			if (++d==nbcPerLine)
+			{
 				s = s + '</div><br/><div class="resultRow">';
 				d=0;
 			}
@@ -154,21 +154,24 @@ function nbcPrintResultsPaginated() {
 	$('#results-container').html(s);
 }
 
-function nbcPrintResultsExpanded() {
-
+function nbcPrintResultsExpanded()
+{
 	var results = nbcData.results;
 	var s = '';
 	var added = d = 0;
 
 	s = '<div class="resultRow">';
 
-	for(var i=0;i<results.length;i++) {
+	for(var i=0;i<results.length;i++)
+	{
 		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
 			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
-			) {
+			)
+		{
 			s = s + nbcFormatResult(results[i]);
 			added++;
-			if (++d==nbcPerLine) {
+			if (++d==nbcPerLine)
+			{
 				s = s + '</div><br/><div class="resultRow">';
 				d=0;
 			}
@@ -203,11 +206,10 @@ function nbcPrintResultsExpanded() {
 	nbcExpandedPrevious = null;
 	
 	nbcDoOverhead();
-
 }
 
-function nbcFormatResult(data) {
-
+function nbcFormatResult(data)
+{
 	/*
 		data.
 			i : id 
@@ -228,6 +230,9 @@ function nbcFormatResult(data) {
 			h : highlight (bool)
 			d : full species details (only when comparing or resultset has only one taxon/variation)
     */
+	
+	console.dir(data);
+	
 	var showDetails = nbcData.results.length <= nbcPerPage;
 
 	if (data.l!=data.c && data.l.indexOf(data.c)===0) {

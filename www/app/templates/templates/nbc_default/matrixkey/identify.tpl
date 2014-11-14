@@ -38,10 +38,10 @@
 
 </div>
     
-{literal}
+
 <script type="text/JavaScript">
 $(document).ready(function(){
-{/literal}
+
 nbcImageRoot='{$nbcImageRoot}';
 baseUrlProjectImages='{$projectUrls.projectMedia}';
 nbcBrowseStyle='{$nbcBrowseStyle}';
@@ -49,11 +49,11 @@ matrixId={$matrix.id};
 projectId={$projectId};
 nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 
-{literal}
+
 if (typeof nbcInit=='function') {
 	nbcInit();
 }
-{/literal}
+
 {if $nbcFullDatasetCount}nbcFullDatasetCount = {$nbcFullDatasetCount};
 {/if}
 {if $nbcStart}nbcStart={$nbcStart};
@@ -66,26 +66,26 @@ if (typeof nbcInit=='function') {
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
 {if $taxaJSON}
-{literal}
-try {{/literal}
+
+try {
 	nbcData = $.parseJSON('{$taxaJSON}');
 	nbcFilterEmergingCharacters();
-	nbcDoResults({literal}{resetStart:false}{/literal});
+	nbcDoResults( { resetStart:false } );
 	nbcDoOverhead();
 	nbcDoPaging();
 	nbcRefreshGroupMenu();
-{literal}} catch(err){
+} catch(err){
 	nbcGetResults();
 }
-{/literal}
+
 {else}
 nbcGetResults();
 {/if}
 {/if}
 
-{literal}
+
 });
 </script>
-{/literal}
+
 
 {include file="../shared/footer.tpl"}
