@@ -2823,6 +2823,7 @@ class Controller extends BaseClass
 
         $this->smarty->assign('debugMode', $this->debugMode);
         $this->smarty->assign('session', $_SESSION);
+        $this->smarty->assign('database', $this->config->getDatabaseSettings());
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
