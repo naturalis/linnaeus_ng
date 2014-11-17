@@ -155,6 +155,7 @@
 
 {include file="../shared/admin-messages.tpl"}
 
+<!-- database: {$database.database} -->
 
 {literal}
 <script type="text/JavaScript">
