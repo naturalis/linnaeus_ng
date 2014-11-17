@@ -574,7 +574,7 @@ class SpeciesMediaController extends Controller
 
 
 
-	private function acquireCsvLines()
+	private function acquireCsvLines($delimiter=",")
 	{
 
 		set_time_limit(2400);
@@ -583,7 +583,7 @@ class SpeciesMediaController extends Controller
 
 		if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
 			$i = 0;
-			while (($dummy = fgetcsv($handle)) !== FALSE)
+			while (($dummy = fgetcsv($handle,0,$delimiter)) !== FALSE)
 			{
 				foreach ((array) $dummy as $val)
 				{
@@ -600,8 +600,6 @@ class SpeciesMediaController extends Controller
 
 	private function matchLinesToTaxon($raw)
 	{
-		q($raw,1);
-		
 		foreach ((array) $raw as $key => $line)
 		{
 
@@ -718,6 +716,8 @@ class SpeciesMediaController extends Controller
 
 			foreach((array)$line as $fKey => $fVal)
 			{
+				if($fKey==0) continue;
+				
 				$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
 				
 				if (empty($fVal))
@@ -732,7 +732,8 @@ class SpeciesMediaController extends Controller
 					
 					$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
 					$d=pathinfo($iVal);
-					$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : '?';
+
+					$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : null;
 
 					$mt = $this->models->MediaTaxon->save(
 					array(
@@ -771,10 +772,9 @@ class SpeciesMediaController extends Controller
         if ($this->requestDataFiles && !$this->isFormResubmit())
 		{
 			$saved=$failed=0;
-
-			$data=$this->acquireCsvLines();
+			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
 			$data=$this->matchLinesToTaxon($data);
-			$result=$this->processImageLines(array('data'=>$tId,'delete_remote'=>$this->rHasVal('del_existing','1')));
+			$result=$this->processImageLines(array('data'=>$data,'delete_remote'=>$this->rHasVal('del_existing','1')));
 
 			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
 
@@ -790,13 +790,12 @@ class SpeciesMediaController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Local image batch upload'));
-        
         if ($this->requestDataFiles && !$this->isFormResubmit())
 		{
 			$saved=$failed=0;
-			$data=$this->acquireCsvLines();
+			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
 			$data=$this->matchLinesToTaxon($data);
-			$result=$this->processImageLines(array('data'=>$tId,'delete_local'=>$this->rHasVal('del_existing','1')));
+			$result=$this->processImageLines(array('data'=>$data,'delete_local'=>$this->rHasVal('del_existing','1')));
 			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
         }
        
