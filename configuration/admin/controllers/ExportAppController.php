@@ -86,25 +86,18 @@ class ExportAppController extends Controller
      */
     public function __construct ()
     {
-        
+       
         parent::__construct();
-
 		define('APP_SUMMARY_TAB_NAME','APP_SUMMARY');
-
     }
 
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
-        
         parent::__destruct();
-
     }
 
+
+	/* version 1 (dierenzoeker) */
 
 	public function matrixAppExportAction()
 	{
@@ -176,7 +169,7 @@ class ExportAppController extends Controller
 		
 	}
 
-    private function getMatrices ()
+    private function getMatrices()
     {
 		$m = $this->models->Matrix->_get(
 		array(
@@ -282,13 +275,17 @@ class ExportAppController extends Controller
 	}
 
 
+
+
+	/* version 2 (eti apps) */
+
 	public function appExportAction()
 	{
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Export database for Linnaeus Mobile'));
 		
-//		$pModules = $this->getProjectModules();
+		$pModules = $this->getProjectModules();
 		
 		$config = new configuration;
 		$dbSettings = $config->getDatabaseSettings();
@@ -316,8 +313,8 @@ class ExportAppController extends Controller
 			$this->makeSpeciesDump();
 			$this->makeMatrixDump();
 			$this->makeKeyDump();
-			$this->makeMapDump();
-			//$this->makeIntroductionDump();
+			//$this->makeMapDump();
+			$this->makeIntroductionDump();
 	
 			if ($this->_makeImageList) $this->makeImageList();
 
@@ -329,6 +326,7 @@ class ExportAppController extends Controller
 			
 		}
 
+		$this->smarty->assign('projectModules',$pModules);
 		$this->smarty->assign('getTaxonTabs',$this->getTaxonTabs());
 		$this->smarty->assign('getProjectLanguages',$this->getProjectLanguages());
 		$this->smarty->assign('dbSettings',$dbSettings);
@@ -453,7 +451,6 @@ class ExportAppController extends Controller
 		//$this->_exportDump->Keytree = $this->models->Keytree->_get(array('id' => $where));
 	}
 
-	
     private function makeMapDump()
 	{
 		$where = 
@@ -479,6 +476,54 @@ class ExportAppController extends Controller
 			}
 		}
 	}
+
+    private function makeIntroductionDump()
+	{
+		$where = 
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->_projectLanguage
+			);
+
+		$this->_exportDump->ProjectRank = $this->models->ProjectRank->_get(array('id' => $where));
+		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
+		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
+		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
+		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
+		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
+		//$this->_exportDump->PageTaxon = $this->models->PageTaxon->_get(array('id' => $where));  // exporting a single tab
+		//$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
+		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
+		$this->_exportDump->NbcExtras = $this->models->NbcExtras->_get(array('id' => $where));
+		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
+		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
+		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
+		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where));
+
+		if ($this->_reduceURLs)
+		{
+			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
+			{
+				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false)
+				{
+					$d=pathinfo($val['file_name']);
+					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
+				}
+			}
+
+			foreach((array)$this->_exportDump->NbcExtras as $key => $val)
+			{
+				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && 
+					(stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false))
+				{
+					$d=pathinfo($val['value']);
+					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
+				}
+			}
+		}
+
+	}
+	
 
 	
 
