@@ -600,6 +600,8 @@ class SpeciesMediaController extends Controller
 
 	private function matchLinesToTaxon($raw)
 	{
+		q($raw,1);
+		
 		foreach ((array) $raw as $key => $line)
 		{
 
