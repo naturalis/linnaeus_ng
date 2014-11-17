@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="page-main">
 <form method="post" action="" enctype="multipart/form-data">
+<div id="page-main">
 	<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
     <input type="hidden" name="rnd" value="{$rnd}" />
     <p>
@@ -16,7 +16,6 @@
     <p>
 	<input type="submit" value="{t}upload{/t}" />
     </p>
-</form>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
@@ -28,7 +27,7 @@
 </p>
 <ol>
 	<li>{t}The format needs to be CSV.{/t}</li>
-	<li>{t}The field delimiter must be a comma.{/t}</li>
+	<li>{t}The field delimiter is a {/t}<input type="text" name="delimiter" value="," maxlength="1" style="width:10px;font-size:12px"> (comma by default)</li>
 	<li>{t}The fields in the CSV-file *may* be enclosed by " (double-quotes), but this is not mandatory.{/t}</li>
 	<li>{t}Each line consists of the following fields:{/t}
 		<ol>

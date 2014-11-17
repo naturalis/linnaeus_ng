@@ -8,10 +8,10 @@ dev2.etibioinformatics.nl	132.229.167.132
 		/var/www/linnaeus_ng_app			(projecten gemigreerd uit de "OKE")
 	databases:
 		dierenzoeker
-		linnaeus_ng                                    |
-		linnaeus_ng_legacy_apps                        |
-		linnaeus_ng_nsr    
-		...?                            |
+		linnaeus_ng
+		linnaeus_ng_legacy_apps
+		linnaeus_ng_nsr
+		...?
 
 
 linnaeus.etibioinformatics.nl		132.229.167.135
