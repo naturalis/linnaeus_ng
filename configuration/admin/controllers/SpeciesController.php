@@ -3167,9 +3167,14 @@ class SpeciesController extends Controller
 
         $modified = $content;
 
-        if ($this->controllerSettings['filterContent']['html']['doFilter']) {
-
-            $modified = strip_tags($modified, $this->controllerSettings['filterContent']['html']['allowedTags']);
+        if ($this->controllerSettings['filterContent']['html']['doFilter'])
+		{
+			$allowedtags=$this->controllerSettings['filterContent']['html']['allowedTags'];
+			if ($this->getSetting('admin_species_allow_embedded_images',false))
+			{
+				$allowedtags.='<img>';
+			}
+            $modified=strip_tags($modified,$allowedtags);
         }
 
         return array(

@@ -9,9 +9,6 @@
     </p>
     <p>
     <label><input type="checkbox" name="del_existing" value="1" />delete existing remote images for the specified taxa.</label><br />
-    <!-- label><input type="checkbox" name="check_exists" value="1" />check if the images exist (by retrieving their headers).</label><br />
-	&nbsp;&nbsp;<label><input type="radio" name="insert_non_existing" value="0" />insert URLs even if the headers cannot be be r.</label><br />
-	&nbsp;&nbsp;<label><input type="radio" name="insert_non_existing" value="1" />check if the images exist (by retrieving their headers).</label><br / -->
     </p>
     <p>
 	<input type="submit" value="{t}upload{/t}" />

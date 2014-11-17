@@ -62,6 +62,7 @@ class ProjectsController extends Controller
 		array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
 		array('matrix_calc_char_h_val','bool',0,'false: do not calculate characters H-value; enhances performance'),
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
+
 		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
 
@@ -75,6 +76,9 @@ class ProjectsController extends Controller
 
 		array('include_overview_in_media','bool',0,'show overview image in species media'),
 		array('app_search_result_sort','alpha / token_count','token_count','variable to sort search results by'),
+		array('admin_species_allow_embedded_images','bool',1,'id.'),
+
+
 	);
 
 /*
