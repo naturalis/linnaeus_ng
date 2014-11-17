@@ -200,6 +200,87 @@ class SpeciesMediaController extends Controller
         $this->printPage();
     }
 
+    public function remoteImgBatchAction()
+    {
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Remote image batch upload'));
+        
+        if ($this->requestDataFiles && !$this->isFormResubmit())
+		{
+			$saved=$failed=0;
+			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
+			$data=$this->matchLinesToTaxon($data);
+			$result=$this->processImageLines(array('data'=>$data,'delete_remote'=>$this->rHasVal('del_existing','1')));
+
+			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
+
+			if ($failed)
+				$this->addMessage('Failed pages are due to botched inserts.');
+        }
+       
+        $this->printPage();
+    }
+
+    public function localImgBatchAction()
+    {
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Local image batch upload'));
+        if ($this->requestDataFiles && !$this->isFormResubmit())
+		{
+			$saved=$failed=0;
+			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
+			$data=$this->matchLinesToTaxon($data);
+			$result=$this->processImageLines(array('data'=>$data,'delete_local'=>$this->rHasVal('del_existing','1')));
+			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
+        }
+       
+        $this->printPage();
+    }
+
+    public function imageCaptionAction()
+    {
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Image caption batch upload'));
+        if ($this->requestDataFiles) // && !$this->isFormResubmit())
+		{
+			$saved=$failed=0;
+			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
+			$data=$this->matchLinesToTaxon($data);
+			$data=$this->matchLinesToMedia($data);
+
+			foreach($data as $key=>$val)
+			{	
+				if (!is_numeric($val[0])) continue;
+			
+				if (isset($val['media_id']))
+				{
+					$this->saveCaptions(array(
+						'taxon_id'=>$val[0],
+						'language_id'=>$this->rGetVal('language_id') ,
+						'captions'=>array($val['media_id']=>$val[2])
+					));
+
+				}
+				if (empty($val[2]))
+				{
+					$this->addMessage(sprintf('Removed caption for %s',$val[1]));
+				}
+				else
+				{
+					$this->addMessage(sprintf('Saved caption %s',$val[2]));
+				}
+			}
+
+        }
+
+		$this->smarty->assign('languages', $this->getProjectLanguages());
+       
+        $this->printPage();
+    }
+
 	public function tempNsr1Action()
 	{
         $this->checkAuthorisation();
@@ -569,6 +650,22 @@ class SpeciesMediaController extends Controller
 		return $messages;
     }
 	
+	private function matchLinesToMedia($raw)
+	{
+		foreach ((array)$raw as $key=>$line)
+		{
+			if (empty($line[1])) continue;
+			
+			$mt=$this->models->MediaTaxon->_get(array("id"=>array("taxon_id"=>$line[0],"file_name"=>$line[1])));
+			
+			if (!$mt) continue;
+			
+			$raw[$key]['media_id']=$mt[0]['id'];
+		}
+		
+		return $raw;
+	}
+
 
 
 
@@ -687,7 +784,8 @@ class SpeciesMediaController extends Controller
 		$data=isset($p['data']) ? $p['data'] : null;
 		$deleteRemote=isset($p['delete_remote']) ? $p['delete_remote'] : false;
 		$deleteLocal=isset($p['delete_local']) ? $p['delete_local'] : false;
-		
+		$handleDuplicates=isset($p['handle_duplicates']) ? $p['handle_duplicates'] : 'suppress_duplicates';
+
 		$saved=$failed=0;
 
 		if (!isset($data))
@@ -730,6 +828,23 @@ class SpeciesMediaController extends Controller
 				{
 					if (empty($iVal)) continue;
 					
+					if ($handleDuplicates=='suppress_duplicates')
+					{
+						if ($this->doesImageExist(array('file_name'=>$iVal,'taxon'=>$tId)))
+						{
+							$this->addWarning($iVal." ignored: already exists for the same taxon.");
+							continue;
+						}
+					} else
+					if ($handleDuplicates=='suppress_global_duplicates')
+					{
+						if ($this->doesImageExist(array('file_name'=>$iVal)))
+						{
+							$this->addWarning($iVal." ignored: already exists for this or another taxon.");
+							continue;
+						}
+					}
+					
 					$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
 					$d=pathinfo($iVal);
 
@@ -762,45 +877,6 @@ class SpeciesMediaController extends Controller
 		return array('saved'=>$saved,'failed'=>$failed);
 
 	}
-
-    public function remoteImgBatchAction()
-    {
-        $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Remote image batch upload'));
-        
-        if ($this->requestDataFiles && !$this->isFormResubmit())
-		{
-			$saved=$failed=0;
-			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
-			$data=$this->matchLinesToTaxon($data);
-			$result=$this->processImageLines(array('data'=>$data,'delete_remote'=>$this->rHasVal('del_existing','1')));
-
-			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
-
-			if ($failed)
-				$this->addMessage('Failed pages are due to botched inserts.');
-        }
-       
-        $this->printPage();
-    }
-
-    public function localImgBatchAction()
-    {
-        $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Local image batch upload'));
-        if ($this->requestDataFiles && !$this->isFormResubmit())
-		{
-			$saved=$failed=0;
-			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
-			$data=$this->matchLinesToTaxon($data);
-			$result=$this->processImageLines(array('data'=>$data,'delete_local'=>$this->rHasVal('del_existing','1')));
-			$this->addMessage(sprintf('Saved %s image(s), failed %s image(s).',$result['saved'],$result['failed']));
-        }
-       
-        $this->printPage();
-    }
 
 	private function resolveTaxonByIdOrname($whatisit)
 	{
@@ -844,6 +920,36 @@ class SpeciesMediaController extends Controller
 		
 		return $tId;
 										
+	}
+	
+	private function doesImageExist($p)
+	{
+		$id=isset($p['id']) ? $p['id'] : null;
+		$file_name=isset($p['file_name']) ? $p['file_name'] : null;
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+
+		if (empty($id) && empty($file_name) && empty($taxon))
+		{
+			return;
+		}
+		
+		$d=array('project_id' => $this->getCurrentProjectId());
+		
+		if (isset($id))
+		{
+			$d['taxon_id']=$id;
+		}
+		if (isset($file_name))
+		{
+			$d['file_name']=$file_name;
+		}
+		if (isset($taxon))
+		{
+			$d['taxon_id']=$taxon;
+		}
+
+		$mt=$this->models->MediaTaxon->_get(array("id"=>$d,"columns"=>"count(*) as total"));
+		return $mt[0]['total']!=0;
 	}
 
 }

@@ -15,8 +15,11 @@
 	<li><a href="file.php">{t}Import taxon tree from file{/t}</a></li>
 	<li><a href="col.php">{t}Import taxon tree from Catalogue Of Life{/t}</a></li>
 	<li><a href="import.php">{t}Import taxon content from file{/t}</a></li>
+</ul>
+<ul>
 	<li><a href="remote_img_batch.php">{t}Import links to remote images from CSV-file{/t}</a></li>
 	<li><a href="local_img_batch.php">{t}Import links to local images from CSV-file{/t}</a></li>
+	<li><a href="image_caption.php">{t}Import image captions from CSV-file{/t}</a></li>
 </ul>
 
 <ul class="admin-list">
