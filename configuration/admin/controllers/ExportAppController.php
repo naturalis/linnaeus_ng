@@ -1,6 +1,5 @@
 <?php
 
-
 include_once ('Controller.php');
 
 class ExportAppController extends Controller
@@ -86,7 +85,6 @@ class ExportAppController extends Controller
      */
     public function __construct ()
     {
-       
         parent::__construct();
 		define('APP_SUMMARY_TAB_NAME','APP_SUMMARY');
     }
@@ -127,9 +125,11 @@ class ExportAppController extends Controller
 			$matrixId = $d[0];
 			$languageId = $d[1];
 
-			$this->_filename = $this->makeFileName($matrices[$matrixId]['names'][$languageId]['name'].' '.$matrices[$matrixId]['names'][$languageId]['language'],'sql');
-			$this->_dbname = $this->makeDatabaseName($matrices[$matrixId]['names'][$languageId]['name'].' '.$matrices[$matrixId]['names'][$languageId]['language']);
-			$this->_projectName = $matrices[$matrixId]['names'][$languageId]['name'];
+			$this->_filename =
+				$this->makeFileName($matrices[$matrixId]['names'][$languageId]['name'].' '.$matrices[$matrixId]['names'][$languageId]['language'],'sql');
+			$this->_dbName =
+				$this->makeDatabaseName($matrices[$matrixId]['names'][$languageId]['name'].' '.$matrices[$matrixId]['names'][$languageId]['language']);
+			$this->_dbDisplayName = $matrices[$matrixId]['names'][$languageId]['name'];
 
 			$this->makeStandAloneMatrixDump($matrixId,$languageId);
 			if ($this->_makeImageList) $this->makeImageList();
@@ -265,6 +265,10 @@ class ExportAppController extends Controller
 					$d=pathinfo($val['file_name']);
 					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
 				}
+				if (stripos($val['thumb_name'],'http://')!==false || stripos($val['thumb_name'],'https://')!==false) {
+					$d=pathinfo($val['thumb_name']);
+					$this->_exportDump->MediaTaxon[$key]['thumb_name']=$d['basename'];
+				}
 			}
 		}
 		
@@ -292,29 +296,33 @@ class ExportAppController extends Controller
 
 		if ($this->rHasVal('action','export'))
 		{
+			$this->_modules = $this->requestData['modules'];
 			$this->_removePrefix = $this->rGetVal('removePrefix')=='y' ? $dbSettings['tablePrefix'] : false;
 			$this->_includeCode = $this->rGetVal('includeCode')=='y';
 			$this->_downloadFile = $this->rGetVal('downloadFile')=='y';
 			$this->_separateDrop = $this->rGetVal('separateDrop')=='y';
 			$this->_reduceURLs = $this->rGetVal('reduceURLs')=='y';
+			$this->_keepSubURLs = $this->rGetVal('keepSubURLs')=='y';
+			$this->_imgRootPlaceholder = $this->rGetVal('imgRootPlaceholder');
 			$this->_makeImageList =  $this->rGetVal('imageList')=='y';
 			$this->_summaryTabId = $this->rGetVal('taxonTab');
 			$this->_projectLanguage = $this->rGetVal('projectLanguage');
-			
+			$this->_appTitle = $this->rGetVal('appTitle');
 			$this->_appType = 'completeLNGApp';
-			$this->_projectName = $_SESSION['admin']['project']['sys_name'];
+			$this->_dbDisplayName = $_SESSION['admin']['project']['sys_name'];
+
 			$name=$_SESSION['admin']['project']['sys_name'].' '.$_SESSION['admin']['project']['languageList'][$this->_projectLanguage]['language'];
 
 			$this->_filename = $this->makeFileName($name,'sql');
-			$this->_dbname = $this->makeDatabaseName($name);
+			$this->_dbName = $this->makeDatabaseName($name);
 
 			$this->_exportDump=new stdClass();
 
-			$this->makeSpeciesDump();
-			$this->makeMatrixDump();
-			$this->makeKeyDump();
-			//$this->makeMapDump();
-			$this->makeIntroductionDump();
+			if (in_array('species',$this->_modules)) $this->makeSpeciesDump();
+			if (in_array('matrixkey',$this->_modules)) $this->makeMatrixDump();
+			if (in_array('key',$this->_modules)) $this->makeKeyDump();
+			if (in_array('mapkey',$this->_modules)) $this->makeMapDump();
+			if (in_array('introduction',$this->_modules)) $this->makeIntroductionDump();
 	
 			if ($this->_makeImageList) $this->makeImageList();
 
@@ -326,6 +334,7 @@ class ExportAppController extends Controller
 			
 		}
 
+		$this->smarty->assign('appTitle',$_SESSION['admin']['project']['sys_name']);
 		$this->smarty->assign('projectModules',$pModules);
 		$this->smarty->assign('getTaxonTabs',$this->getTaxonTabs());
 		$this->smarty->assign('getProjectLanguages',$this->getProjectLanguages());
@@ -362,6 +371,35 @@ class ExportAppController extends Controller
 		else
 			return preg_replace('/(`'.$table.'`)/','`'.str_ireplace($this->_removePrefix,'',$table).'`',$s);
 	}
+
+	private function reduceEmbeddedImgURLs($matches)
+	{
+		if ($this->_keepSubURLs)
+		{
+			$newpath=str_replace($_SESSION['admin']['project']['urls']['project_media'],'',$matches[4]);
+		}
+		else
+		{
+			$d=pathinfo($matches[4]);
+			$newpath=$d['basename'];
+		}
+
+		return
+			$matches[1].$matches[2].$matches[3].
+			$this->_imgRootPlaceholder.$newpath.
+			$matches[5].$matches[6];
+	}
+
+	private function supplantEmbeddedImgURLs($content)
+	{
+		if (stripos($content,'<img')!==false)
+		{
+			$content=preg_replace_callback('/(\<img)(.*?)(src=")([^"]*?)(")[^>]*?(\>)/is',array($this,'reduceEmbeddedImgURLs'), $content);
+		}
+
+		return $content;		
+	}
+
 
 
     private function makeSpeciesDump()
@@ -407,6 +445,11 @@ class ExportAppController extends Controller
 					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
 				}
 			}
+
+			foreach((array)$this->_exportDump->ContentTaxon as $key => $val)
+			{
+				$this->_exportDump->ContentTaxon[$key]['content']=$this->supplantEmbeddedImgURLs($val['content']);
+			}
 		}
 
 	}
@@ -449,6 +492,19 @@ class ExportAppController extends Controller
 		$this->_exportDump->ChoiceKeystep = $this->models->ChoiceKeystep->_get(array('id' => $where));
 		$this->_exportDump->ChoiceContentKeystep = $this->models->ChoiceContentKeystep->_get(array('id' => $where));
 		//$this->_exportDump->Keytree = $this->models->Keytree->_get(array('id' => $where));
+
+		if ($this->_reduceURLs)
+		{
+			foreach((array)$this->_exportDump->ContentKeystep as $key => $val)
+			{
+				$this->_exportDump->ContentKeystep[$key]['content']=$this->supplantEmbeddedImgURLs($val['content']);
+			}
+			foreach((array)$this->_exportDump->ChoiceContentKeystep as $key => $val)
+			{
+				$this->_exportDump->ChoiceContentKeystep[$key]['choice_txt']=$this->supplantEmbeddedImgURLs($val['choice_txt']);
+			}
+		}
+
 	}
 
     private function makeMapDump()
@@ -485,41 +541,31 @@ class ExportAppController extends Controller
 				'language_id' => $this->_projectLanguage
 			);
 
-		$this->_exportDump->ProjectRank = $this->models->ProjectRank->_get(array('id' => $where));
-		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
-		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
-		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
-		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
-		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
-		//$this->_exportDump->PageTaxon = $this->models->PageTaxon->_get(array('id' => $where));  // exporting a single tab
-		//$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
-		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
-		$this->_exportDump->NbcExtras = $this->models->NbcExtras->_get(array('id' => $where));
-		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
-		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
-		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
-		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where));
+		$this->_exportDump->IntroductionPage = $this->models->IntroductionPage->_get(array('id' => $where));
+		$this->_exportDump->ContentIntroduction = $this->models->ContentIntroduction->_get(array('id' => $where));
+		$this->_exportDump->IntroductionMedia = $this->models->IntroductionMedia->_get(array('id' => $where));
 
 		if ($this->_reduceURLs)
 		{
-			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
+			foreach((array)$this->_exportDump->IntroductionMedia as $key => $val)
 			{
 				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false)
 				{
 					$d=pathinfo($val['file_name']);
-					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
+					$this->_exportDump->IntroductionMedia[$key]['file_name']=$d['basename'];
+				}
+				if (stripos($val['thumb_name'],'http://')!==false || stripos($val['thumb_name'],'https://')!==false)
+				{
+					$d=pathinfo($val['thumb_name']);
+					$this->_exportDump->IntroductionMedia[$key]['thumb_name']=$d['basename'];
 				}
 			}
 
-			foreach((array)$this->_exportDump->NbcExtras as $key => $val)
+			foreach((array)$this->_exportDump->ContentIntroduction as $key => $val)
 			{
-				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && 
-					(stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false))
-				{
-					$d=pathinfo($val['value']);
-					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
-				}
+				$this->_exportDump->ContentIntroduction[$key]['content']=$this->supplantEmbeddedImgURLs($val['content']);
 			}
+
 		}
 
 	}
@@ -682,9 +728,8 @@ class ExportAppController extends Controller
 		{
 			header('Cache-Control: public');
 			header('Content-Description: File Transfer');
-			header('Content-Disposition: attachment; filename='.$this->_dbname.'-app-installer.js');
+			header('Content-Disposition: attachment; filename='.$this->_dbName.'-app-installer.js');
 			header('Content-Type: text/javascript ');
-
 		}
 
 		if (!$this->_includeCode)
@@ -755,9 +800,9 @@ class ExportAppController extends Controller
     // cut the block below & paste into app-controller.js --------------------------------
 		
     var credentials = {
-      dbName:'".$this->_dbname."',
+      dbName:'".$this->_dbName."',
       dbVersion: '".$this->_projectVersion."', 
-      dbDisplayName: '".$this->_projectName."', 
+      dbDisplayName: '".$this->_dbDisplayName."', 
       dbEstimatedSize: ".floor($this->_dataSize * 5).",
       exportId:'".$exportId."'
     };
@@ -784,9 +829,9 @@ class ExportAppController extends Controller
     // cut the block below & paste into app-config.js ----------------------------------
     
     credentials : {
-      dbName:'".$this->_dbname."',
+      dbName:'".$this->_dbName."',
       dbVersion: '".$this->_projectVersion."', 
-      dbDisplayName: '".$this->_projectName."', 
+      dbDisplayName: '".$this->_dbDisplayName."', 
       dbEstimatedSize: ".floor($this->_dataSize * 5).",
       exportId:'".$exportId."'
     },
@@ -829,8 +874,9 @@ class ExportAppController extends Controller
 " : '')."    //
 */
 var installConfig = {
-  installProject:'".$this->_projectName."',
-  installDbName:'".$this->_dbname."',
+  appTitle:'".addslashes($this->_appTitle)."'
+  installProject:'".addslashes($this->_dbDisplayName)."',
+  installDbName:'".$this->_dbName."',
   installDbVersion:'".$this->_projectVersion."',".
 "
   queryCountDDL:".count((array)$this->_sqliteQueriesDDL).",

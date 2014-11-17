@@ -244,7 +244,7 @@ class SpeciesMediaController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Image caption batch upload'));
-        if ($this->requestDataFiles) // && !$this->isFormResubmit())
+        if ($this->requestDataFiles && !$this->isFormResubmit())
 		{
 			$saved=$failed=0;
 			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));

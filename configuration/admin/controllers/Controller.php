@@ -2810,8 +2810,6 @@ class Controller extends BaseClass
 	}
 
 
-
-
     /**
      * Assigns basic Smarty variables
      *

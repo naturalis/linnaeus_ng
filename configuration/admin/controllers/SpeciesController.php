@@ -2641,6 +2641,57 @@ class SpeciesController extends Controller
         $this->redirect('../../../app/views/species/taxon.php?p=' . $this->getCurrentProjectId() . '&id=' . $this->requestData['taxon_id'] . '&cat=' . $this->requestData['activePage'] . '&lan=' . $this->getDefaultProjectLanguage());
     }
 
+
+	private function getAdjacentTaxa($taxon)
+    {
+		$type=$taxon['lower_taxon']?'lower':'higher';
+
+		if (!isset($_SESSION['admin']['species']['browse_order'][$type])) {
+
+			$_SESSION['admin']['species']['browse_order'][$type]=
+				$this->models->Taxon->freeQuery(
+					array(
+						'query' => '
+							select _a.id,_a.taxon
+							from %PRE%taxa _a
+							left join %PRE%projects_ranks _b on _a.rank_id=_b.id
+							where _a.project_id = '.$this->getCurrentProjectId().'
+							and _b.lower_taxon = '.($type=='higher' ? 0 : 1).'
+							order by _a.taxon_order, _a.taxon
+							'
+					));
+
+		}
+
+		$prev=$next=false;
+		while (list ($key, $val) = each($_SESSION['admin']['species']['browse_order'][$type])) {
+
+			if ($val['id']==$taxon['id']) {
+
+				// current = next because the pointer has already shifted forward
+				$next = current($_SESSION['admin']['species']['browse_order'][$type]);
+
+				return array(
+					'prev' => $prev!==false ? array(
+						'id' => $prev['id'],
+						'label' => $prev['taxon']
+					) : null,
+					'next' => $next!==false ? array(
+						'id' => $next['id'],
+						'label' => $next['taxon']
+					) : null
+				);
+			}
+
+			$prev=$val;
+
+		}
+
+        return null;
+    }
+
+
+
 	private function getProgeny($parent,$level,$family)
 	{
 		$result = $this->models->Taxon->_get(
@@ -4593,54 +4644,6 @@ class SpeciesController extends Controller
 		}
 
 	}
-
-	private function getAdjacentTaxa($taxon)
-    {
-		$type=$taxon['lower_taxon']?'lower':'higher';
-
-		if (!isset($_SESSION['admin']['species']['browse_order'][$type])) {
-
-			$_SESSION['admin']['species']['browse_order'][$type]=
-				$this->models->Taxon->freeQuery(
-					array(
-						'query' => '
-							select _a.id,_a.taxon
-							from %PRE%taxa _a
-							left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-							where _a.project_id = '.$this->getCurrentProjectId().'
-							and _b.lower_taxon = '.($type=='higher' ? 0 : 1).'
-							order by _a.taxon_order, _a.taxon
-							'
-					));
-
-		}
-
-		$prev=$next=false;
-		while (list ($key, $val) = each($_SESSION['admin']['species']['browse_order'][$type])) {
-
-			if ($val['id']==$taxon['id']) {
-
-				// current = next because the pointer has already shifted forward
-				$next = current($_SESSION['admin']['species']['browse_order'][$type]);
-
-				return array(
-					'prev' => $prev!==false ? array(
-						'id' => $prev['id'],
-						'label' => $prev['taxon']
-					) : null,
-					'next' => $next!==false ? array(
-						'id' => $next['id'],
-						'label' => $next['taxon']
-					) : null
-				);
-			}
-
-			$prev=$val;
-
-		}
-
-        return null;
-    }
 
     private function getLookupList($p)
     {
