@@ -792,6 +792,7 @@ class SpeciesMediaController extends Controller
 			return array('saved'=>$saved,'failed'=>$failed);
 
 		$clearedTaxa = array();
+		$counter=array();
 
 		foreach ((array)$data as $key=>$line)
 		{
@@ -849,7 +850,7 @@ class SpeciesMediaController extends Controller
 					$d=pathinfo($iVal);
 
 					$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : null;
-
+					$counter[$tId]=isset($counter[$tId]) ? $counter[$tId]+1 : 0;
 					$mt = $this->models->MediaTaxon->save(
 					array(
 						'id' => null, 
@@ -860,7 +861,7 @@ class SpeciesMediaController extends Controller
 						'mime_type' => $mime, 
 						'file_size' => 0, 
 						'thumb_name' => null, 
-						'sort_order' => 99
+						'sort_order' => $counter[$tId]
 					));
 						
 					if ($mt)
