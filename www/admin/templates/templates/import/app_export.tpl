@@ -33,8 +33,9 @@ Output:
 	<p>
 	Species-tabs to export:
 	<select name="taxonTab">
+    {assign var=bla value=false}
 	{foreach from=$getTaxonTabs item=v}
-		<option value="{$v.id}">{$v.page}</option>
+		<option value="{$v.id}" {if $v.page|stripos:"app" && !$bla} selected="selected"{assign var=bla value=true}{/if}>{$v.page}</option>
 	{/foreach}
 	</select>
 	</p>	

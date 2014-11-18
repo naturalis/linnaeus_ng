@@ -56,7 +56,10 @@ class ExportAppController extends Controller
 		'characteristic_chargroup',
 		'chargroup_label',
 		'gui_menu_order',
-		'taxon_quick_parentage'
+		'taxon_quick_parentage',
+		'taxongroups',
+		'taxongroups_labels',
+		'taxongroups_taxa',
     );
    
     public $controllerPublicName = 'Export';
@@ -311,6 +314,12 @@ class ExportAppController extends Controller
 			$this->_appType = 'completeLNGApp';
 			$this->_dbDisplayName = $_SESSION['admin']['project']['sys_name'];
 
+			$this->_hasSpecies = in_array('species',$this->_modules);
+			$this->_hasMatrix = in_array('matrixkey',$this->_modules);
+			$this->_hasKey = in_array('key',$this->_modules);
+			$this->_hasMap = in_array('mapkey',$this->_modules);
+			$this->_hasIntroduction = in_array('introduction',$this->_modules);
+
 			$name=$_SESSION['admin']['project']['sys_name'].' '.$_SESSION['admin']['project']['languageList'][$this->_projectLanguage]['language'];
 
 			$this->_filename = $this->makeFileName($name,'sql');
@@ -318,11 +327,11 @@ class ExportAppController extends Controller
 
 			$this->_exportDump=new stdClass();
 
-			if (in_array('species',$this->_modules)) $this->makeSpeciesDump();
-			if (in_array('matrixkey',$this->_modules)) $this->makeMatrixDump();
-			if (in_array('key',$this->_modules)) $this->makeKeyDump();
-			if (in_array('mapkey',$this->_modules)) $this->makeMapDump();
-			if (in_array('introduction',$this->_modules)) $this->makeIntroductionDump();
+			if ($this->_hasSpecies) $this->makeSpeciesDump();
+			if ($this->_hasMatrix) $this->makeMatrixDump();
+			if ($this->_hasKey) $this->makeKeyDump();
+			if ($this->_hasMap) $this->makeMapDump();
+			if ($this->_hasIntroduction) $this->makeIntroductionDump();
 	
 			if ($this->_makeImageList) $this->makeImageList();
 
@@ -372,6 +381,7 @@ class ExportAppController extends Controller
 			return preg_replace('/(`'.$table.'`)/','`'.str_ireplace($this->_removePrefix,'',$table).'`',$s);
 	}
 
+
 	private function reduceEmbeddedImgURLs($matches)
 	{
 		if ($this->_keepSubURLs)
@@ -389,14 +399,33 @@ class ExportAppController extends Controller
 			$this->_imgRootPlaceholder.$newpath.
 			$matches[5].$matches[6];
 	}
-
+	
+	private function reduceEmbeddedImgSpans($matches)
+	{
+		if ($this->_keepSubURLs)
+		{
+			$newpath=str_replace($_SESSION['admin']['project']['urls']['project_media'],'',$matches[6]);
+		}
+		else
+		{
+			$d=pathinfo($matches[6]);
+			$newpath=$d['basename'];
+		}
+		
+		return '<img src="'.$this->_imgRootPlaceholder.$newpath.'">';
+	}
+	
 	private function supplantEmbeddedImgURLs($content)
 	{
 		if (stripos($content,'<img')!==false)
 		{
-			$content=preg_replace_callback('/(\<img)(.*?)(src=")([^"]*?)(")[^>]*?(\>)/is',array($this,'reduceEmbeddedImgURLs'), $content);
+			$content=preg_replace_callback('/(\<img)(.*?)(src=")([^"]*?)(")[^>]*?(\>)/is',array($this,'reduceEmbeddedImgURLs'),$content);
 		}
 
+		if (stripos($content,'class="inline-image"')!==false)
+		{
+			$content=preg_replace_callback('/(\<span)(.*?)(class="inline-image")(.*?)(onclick="showMedia\(\')([^\']*?)(\')(.*?)(\<\/span\>)/is',array($this,'reduceEmbeddedImgSpans'),$content);
+		}
 		return $content;		
 	}
 
@@ -424,6 +453,9 @@ class ExportAppController extends Controller
 		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
 		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
 		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where));
+		$this->_exportDump->Taxongroups = $this->models->Taxongroups->_get(array('id' => $where));
+		$this->_exportDump->TaxongroupsLabels = $this->models->TaxongroupsLabels->_get(array('id' => $where));
+		$this->_exportDump->TaxongroupsTaxa = $this->models->TaxongroupsTaxa->_get(array('id' => $where));
 
 		if ($this->_reduceURLs)
 		{
@@ -477,6 +509,7 @@ class ExportAppController extends Controller
 		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $where));
 		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $where));
 
+		$this->_defaultMatrixId = $this->_exportDump->Matrix[0]['id'];
 	}
 
     private function makeKeyDump()
@@ -661,7 +694,7 @@ class ExportAppController extends Controller
 						unset($row[$column]);
 				}
 				
-				$inserts[] = "('".implode("','",array_map(function($str){return trim(preg_replace(array('/\\\'/','/\\\"/'),array("''",'"'), $str));},$row))."')";
+				$inserts[] = "('".implode("','",array_map(function($str){return trim(preg_replace(array('/\\\'/','/\\\"/','/(\n|\r)/'),array("''",'"',' '), $str));},$row))."')";
 				
 				if (count((array)$inserts)>=$setsPerInsert)
 				{
@@ -827,7 +860,10 @@ class ExportAppController extends Controller
 	{
 		$output = "/*
     // cut the block below & paste into app-config.js ----------------------------------
-    
+
+
+var exportedVariables = {
+   
     credentials : {
       dbName:'".$this->_dbName."',
       dbVersion: '".$this->_projectVersion."', 
@@ -836,11 +872,18 @@ class ExportAppController extends Controller
       exportId:'".$exportId."'
     },
     
+    APP_TITLE :'".addslashes($this->_appTitle)."',
     PROJECT_ID : ".$this->getCurrentProjectId().",
     LANGUAGE_ID : ".$this->_projectLanguage.",
     SPECIES_RANK_ID : ".SPECIES_RANK_ID.",
     FAMILY_RANK_ID : ".FAMILY_RANK_ID.",
-    CONTENT_TAB_ID : ".$this->_summaryTabId.", // copy this to 'modules.species.contentTabId' below
+    CONTENT_TAB_ID : ".$this->_summaryTabId.",
+    ".( !empty($this->_imgRootPlaceholder) ? "IMAGE_ROOT_PLACEHOLDER : '".addslashes($this->_imgRootPlaceholder)."', " : "" )."
+    ".( $this->_hasMatrix ? "DEFAULT_MATRIX_ID : ".$this->_defaultMatrixId.", " : "" )."
+	
+}
+
+
 
 
     // to add the project data to your PhoneGap app:
@@ -874,7 +917,6 @@ class ExportAppController extends Controller
 " : '')."    //
 */
 var installConfig = {
-  appTitle:'".addslashes($this->_appTitle)."'
   installProject:'".addslashes($this->_dbDisplayName)."',
   installDbName:'".$this->_dbName."',
   installDbVersion:'".$this->_projectVersion."',".
