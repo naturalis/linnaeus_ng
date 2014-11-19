@@ -227,7 +227,7 @@ class SpeciesMediaController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Local image batch upload'));
-        if ($this->requestDataFiles && !$this->isFormResubmit())
+        if ($this->requestDataFiles)// && !$this->isFormResubmit())
 		{
 			$saved=$failed=0;
 			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
@@ -813,65 +813,64 @@ class SpeciesMediaController extends Controller
 				$clearedTaxa[$tId] = true;
 			}
 
-			foreach((array)$line as $fKey => $fVal)
+			$fVal=$line[1];
+			$isOverview=(isset($line[2]) && ($line[2]=='1' || strtolower($line[2])=='y' || strtolower($line[2])=='yes'));
+
+			$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
+			
+			if (empty($fVal))
+				continue;
+
+			// potentially multiple images per column separated by ;						
+			$images=array_map('trim',explode(';',$fVal));
+
+			foreach((array)$images as $iKey => $iVal)
 			{
-				if($fKey==0) continue;
+				if (empty($iVal)) continue;
 				
-				$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
-				
-				if (empty($fVal))
-					continue;
-
-				// potentially multiple images per column separated by ;						
-				$images=array_map('trim',explode(';',$fVal));
-
-				foreach((array)$images as $iKey => $iVal)
+				if ($handleDuplicates=='suppress_duplicates')
 				{
-					if (empty($iVal)) continue;
-					
-					if ($handleDuplicates=='suppress_duplicates')
+					if ($this->doesImageExist(array('file_name'=>$iVal,'taxon'=>$tId)))
 					{
-						if ($this->doesImageExist(array('file_name'=>$iVal,'taxon'=>$tId)))
-						{
-							$this->addWarning($iVal." ignored: already exists for the same taxon.");
-							continue;
-						}
-					} else
-					if ($handleDuplicates=='suppress_global_duplicates')
-					{
-						if ($this->doesImageExist(array('file_name'=>$iVal)))
-						{
-							$this->addWarning($iVal." ignored: already exists for this or another taxon.");
-							continue;
-						}
+						$this->addWarning($iVal." ignored: already exists for the same taxon.");
+						continue;
 					}
-					
-					$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
-					$d=pathinfo($iVal);
-
-					$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : null;
-					$counter[$tId]=isset($counter[$tId]) ? $counter[$tId]+1 : 0;
-					$mt = $this->models->MediaTaxon->save(
-					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'taxon_id' => $tId, 
-						'file_name' => $iVal, 
-						'original_name' => $iVal, 
-						'mime_type' => $mime, 
-						'file_size' => 0, 
-						'thumb_name' => null, 
-						'sort_order' => $counter[$tId]
-					));
-						
-					if ($mt)
-						$saved++;
-					else
-						$failed++;
-				
+				} else
+				if ($handleDuplicates=='suppress_global_duplicates')
+				{
+					if ($this->doesImageExist(array('file_name'=>$iVal)))
+					{
+						$this->addWarning($iVal." ignored: already exists for this or another taxon.");
+						continue;
+					}
 				}
 				
-			}				
+				$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
+				$d=pathinfo($iVal);
+
+				$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : null;
+				$counter[$tId]=isset($counter[$tId]) ? $counter[$tId]+1 : 0;
+				$mt = $this->models->MediaTaxon->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $tId, 
+					'file_name' => $iVal, 
+					'original_name' => $iVal, 
+					'mime_type' => $mime, 
+					'file_size' => 0, 
+					'thumb_name' => null, 
+					'sort_order' => $counter[$tId],
+					'overview_image' => ($isOverview && $iKey==0 ? '1' : '0')
+				));
+					
+				if ($mt)
+					$saved++;
+				else
+					$failed++;
+			
+			}
+			
 			
 		}
 		
