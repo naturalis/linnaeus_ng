@@ -77,6 +77,7 @@ class ExportAppController extends Controller
 	private $_removePrefix=false;
 	private $_includeCode=true;
 	private $_dataSize=0;
+	private $_listOfEmbeddedImages=array();
 
 	private $_projectVersion='1.0';
 
@@ -393,6 +394,8 @@ class ExportAppController extends Controller
 			$d=pathinfo($matches[4]);
 			$newpath=$d['basename'];
 		}
+		
+		$this->_listOfEmbeddedImages[]=$newpath;
 
 		return
 			$matches[1].$matches[2].$matches[3].
@@ -411,6 +414,8 @@ class ExportAppController extends Controller
 			$d=pathinfo($matches[6]);
 			$newpath=$d['basename'];
 		}
+		
+		$this->_listOfEmbeddedImages[]=$newpath;
 		
 		return '<img src="'.$this->_imgRootPlaceholder.$newpath.'">';
 	}
@@ -628,21 +633,13 @@ class ExportAppController extends Controller
 					$this->_imageList[]=$val['value'];
 			}
 		}		
-		if (isset($this->_exportDump->NbcExtras))
-		{
-			foreach((array)$this->_exportDump->NbcExtras as $val)
-			{
-				if ($val['name']=='url_thumbnail'||$val['name']=='url_image')
-					$this->_imageList[]=$val['value'];
-			}
-		}		
 
 		if (isset($this->_exportDump->Keystep))
 		{
 			foreach((array)$this->_exportDump->Keystep as $val)
 			{
-				if ($val['name']=='image')
-					$this->_imageList[]=$val['value'];
+				if (!empty($val['image']))
+					$this->_imageList[]=$val['image'];
 			}
 		}		
 
@@ -650,10 +647,12 @@ class ExportAppController extends Controller
 		{
 			foreach((array)$this->_exportDump->ChoiceKeystep as $val)
 			{
-				if ($val['name']=='choice_img')
-					$this->_imageList[]=$val['value'];
+				if (!empty($val['choice_img']))
+					$this->_imageList[]=$val['choice_img'];
 			}
 		}		
+
+		$this->_imageList=array_merge($this->_imageList,$this->_listOfEmbeddedImages);
 
 	}
 	
@@ -858,9 +857,7 @@ class ExportAppController extends Controller
 	else
 	if ($this->_appType=='completeLNGApp')
 	{
-		$output = "/*
-    // cut the block below & paste into app-config.js ----------------------------------
-
+		$output = "/* goes into app-config.js:
 
 var exportedVariables = {
    
@@ -879,43 +876,44 @@ var exportedVariables = {
     FAMILY_RANK_ID : ".FAMILY_RANK_ID.",
     CONTENT_TAB_ID : ".$this->_summaryTabId.",
     ".( !empty($this->_imgRootPlaceholder) ? "IMAGE_ROOT_PLACEHOLDER : '".addslashes($this->_imgRootPlaceholder)."', " : "" )."
-    ".( $this->_hasMatrix ? "DEFAULT_MATRIX_ID : ".$this->_defaultMatrixId.", " : "" )."
-	
+    ".( $this->_hasMatrix ? "DEFAULT_MATRIX_ID : ".$this->_defaultMatrixId.", " : "" )."	
 }
+*/
 
 
+/*  goes into database-installer.js:
 
+    to add this data to your PhoneGap app:
+    - remove the block above (\"goes into app-config.js\")
+    - remove this comment block
+    - copy and paste the remaining code into the folder
+        /js/data/database-installer.js
+      of the app, overwriting any existing code if the file already exists.
 
-    // to add the project data to your PhoneGap app:
-    // - remove this entire comment block
-    // - copy and paste the remaining code into
-    //     /js/data/database-installer.js
-    //   overwriting any existing code if the file already exists.
-    //
-    // a new download is automatically installed on the device, as exportID
-    // always has a new value (you can force a re-install of the same file by manually
-    // altering the value of exportID in the credentials in /js/data/app-config.js
+    a new download is automatically installed on the device, as exportID
+    always has a new value (you can force a re-install of the same file by manually
+    altering the value of exportID in the credentials in /js/data/app-config.js)
 ";
 	}
 
 	$output .= 
 	($this->_separateDrop ? "
-    // there is a separate variable \"encodedDropQueries\" in the script that holds
-    // compressed drop table & index queries. these are *not* automatically
-    // executed in the install script; you'll have to do this manually by setting
-    // forceInstall to true and changing 
-    //   window.atob(installConfig.encodedData)
-    // to
-    //   window.atob(installConfig.encodedDropQueries)
-    // in the function loadRecords()
+    there is a separate variable \"encodedDropQueries\" in the script that holds
+    compressed drop table & index queries. these are *not* automatically
+    executed in the install script; you'll have to do this manually by setting
+    forceInstall to true and changing 
+        window.atob(installConfig.encodedData)
+    to
+        window.atob(installConfig.encodedDropQueries)
+    in the function loadRecords()
 " : '' )."
-    //
 ".($this->_makeImageList ? "
-    //    below is a list of images referred to in the data:
-    //
-    //    ".implode(chr(10).'    //    ',$this->_imageList)."
-" : '')."    //
+    below is a list of images referred to in the data:
+    --------------------------------------------------
+    ".implode(chr(10).'    ',$this->_imageList)."
+" : '')."
 */
+
 var installConfig = {
   installProject:'".addslashes($this->_dbDisplayName)."',
   installDbName:'".$this->_dbName."',

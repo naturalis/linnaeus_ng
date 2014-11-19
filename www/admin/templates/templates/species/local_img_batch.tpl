@@ -8,7 +8,7 @@
 	<input name="uploadedfile" type="file" />
     </p>
     <p>
-    <label><input type="checkbox" name="del_existing" value="1" />delete existing remote images for the specified taxa.</label><br />
+    <label><input type="checkbox" name="del_existing" value="1" />delete existing local images for the specified taxa.</label><br />
 
     </p>
     <p>
@@ -31,6 +31,7 @@
 		<ol>
             <li>Taxon ID <i>or</i> scientific name; interpretation is based on the value being an integer or not</li>
             <li>{t}A field containing one or more image names, separated with semi-colons.{/t}</li>
+			<li>{t}An optional third field, in which "1" (or "y" or "yes") indicates if the image is the overview image for that species. If set to "1" while multiple images have been specified in the second field, the first of those images is considered the overview image.{/t}</li>
 		</ol>
 	</li>
 </ol>
