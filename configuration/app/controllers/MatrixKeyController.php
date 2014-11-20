@@ -2471,7 +2471,7 @@ class MatrixKeyController extends Controller
 				group by
 					_a.characteristic_id
 				
-				union
+				union all
 
 				select 
 					_a.characteristic_id as characteristic_id,
@@ -2487,7 +2487,7 @@ class MatrixKeyController extends Controller
 				group by
 					_a.characteristic_id
 
-				union
+				union all
 
 				select 
 					_a.characteristic_id as characteristic_id,
@@ -2509,12 +2509,15 @@ class MatrixKeyController extends Controller
 			
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
+		
+		//q($this->models->MatrixTaxonState->q(),1);
 
         $characteristics = array();
     
         foreach ((array) $results as $val) {
 
-           $characteristics[$val['characteristic_id']]=array('taxon_count'=>$val['taxon_count'],'distinct_state_count'=>$val['distinct_state_count']);
+           $characteristics[$val['characteristic_id']]=
+		   	array('taxon_count'=>$val['taxon_count'],'distinct_state_count'=>$val['distinct_state_count']);
 
         }
 

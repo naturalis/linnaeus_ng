@@ -28,6 +28,16 @@ class SpeciesMediaController extends Controller
     );
     public $controllerPublicName = 'Species module';
     public $includeLocalMenu = false;
+	
+	private $_mimeTypes=
+		array(
+			'jpg'=>'image/jpeg',
+			'png'=>'image/png',
+			'gif'=>'image/gif',
+			'bmp'=>'image/bmp',
+			'mp3'=>'audio/mpeg'
+		);
+
 
     public function __construct ()
     {
@@ -244,7 +254,7 @@ class SpeciesMediaController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Image caption batch upload'));
-        if ($this->requestDataFiles && !$this->isFormResubmit())
+        if ($this->requestDataFiles)// && !$this->isFormResubmit())
 		{
 			$saved=$failed=0;
 			$data=$this->acquireCsvLines($this->rGetVal('delimiter',","));
@@ -844,11 +854,11 @@ class SpeciesMediaController extends Controller
 						continue;
 					}
 				}
-				
-				$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
+
 				$d=pathinfo($iVal);
 
-				$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : null;
+				$mime=isset($this->_mimeTypes[strtolower($d['extension'])]) ? $this->_mimeTypes[strtolower($d['extension'])] : null;
+				
 				$counter[$tId]=isset($counter[$tId]) ? $counter[$tId]+1 : 0;
 				$mt = $this->models->MediaTaxon->save(
 				array(
