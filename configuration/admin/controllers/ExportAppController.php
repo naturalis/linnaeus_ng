@@ -453,6 +453,7 @@ class ExportAppController extends Controller
 		//$this->_exportDump->PageTaxon = $this->models->PageTaxon->_get(array('id' => $where));  // exporting a single tab
 		//$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
 		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
+		$this->_exportDump->MediaDescriptionsTaxon = $this->models->MediaDescriptionsTaxon->_get(array('id' => $where));
 		$this->_exportDump->NbcExtras = $this->models->NbcExtras->_get(array('id' => $where));
 		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
 		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));

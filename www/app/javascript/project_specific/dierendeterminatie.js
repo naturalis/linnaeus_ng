@@ -231,7 +231,7 @@ function nbcFormatResult(data)
 			d : full species details (only when comparing or resultset has only one taxon/variation)
     */
 	
-	console.dir(data);
+	//console.dir(data);
 	
 	var showDetails = nbcData.results.length <= nbcPerPage;
 
@@ -841,17 +841,21 @@ function nbcSetExpandResults(state) {
 	
 }
 
-function nbcFilterEmergingCharacters() {
+function nbcFilterEmergingCharacters()
+{
 
 	if (nbcUseEmergingCharacters==false) return;
 
 	var charactersWithAnActiveState=Array();
-	for(var i in nbcData.selectedStates) {
+	for(var i in nbcData.selectedStates)
+	{
 		charactersWithAnActiveState[nbcData.selectedStates[i].characteristic_id]=true;
 	}
 
-	for(var i in nbcData.menu.groups) {
-		for (var j in nbcData.menu.groups[i].chars) {
+	for(var i in nbcData.menu.groups)
+	{
+		for (var j in nbcData.menu.groups[i].chars)
+		{
 			var char=nbcData.menu.groups[i].chars[j];
 			var id=char.id;
 
@@ -888,10 +892,8 @@ function nbcFilterEmergingCharacters() {
 				the result set unchanged, and is therefore no
 				longer distinctive.
 				(nbcData.countPerCharacter[id].distinct_state_count<=1)
-				
-
 			*/
-
+			
 			if (nbcData.countPerCharacter && (char.type=='media' || char.type=='text') && charactersWithAnActiveState[id]!==true) {
 
 				nbcData.menu.groups[i].chars[j].disabled=
