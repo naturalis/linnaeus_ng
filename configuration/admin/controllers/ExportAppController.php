@@ -448,7 +448,8 @@ class ExportAppController extends Controller
 		$this->_exportDump->LabelProjectRank = $this->models->LabelProjectRank->_get(array('id' => $where));
 		$this->_exportDump->TaxonQuickParentage = $this->models->TaxonQuickParentage->_get(array('id' => $where));
 		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
-		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
+		//$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
+		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('project_id' => $this->getCurrentProjectId()));
 		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => array_merge($where,array('page_id'=>$this->_summaryTabId))));
 		//$this->_exportDump->PageTaxon = $this->models->PageTaxon->_get(array('id' => $where));  // exporting a single tab
 		//$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
@@ -462,6 +463,7 @@ class ExportAppController extends Controller
 		$this->_exportDump->Taxongroups = $this->models->Taxongroups->_get(array('id' => $where));
 		$this->_exportDump->TaxongroupsLabels = $this->models->TaxongroupsLabels->_get(array('id' => $where));
 		$this->_exportDump->TaxongroupsTaxa = $this->models->TaxongroupsTaxa->_get(array('id' => $where));
+
 
 		if ($this->_reduceURLs)
 		{
