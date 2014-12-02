@@ -10,7 +10,7 @@ class WebservicesController extends Controller
 	private $_project=null;
 	private $_matchType=null;
 	private $_taxonUrl='/linnaeus_ng/app/views/species/nsr_taxon.php?epi=1&id=%s';
-	private $_thumbBaseUrl='http://images.naturalis.nl/190x100/';
+	private $_thumbBaseUrl='http://images.naturalis.nl/160x100/';
 	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
 	private $_JSONPCallback=false;
 	private $_JSON=null;
