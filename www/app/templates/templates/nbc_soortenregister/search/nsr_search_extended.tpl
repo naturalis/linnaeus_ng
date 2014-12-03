@@ -41,7 +41,7 @@
 					<p>
 					<label>
 						<strong>Status voorkomen</strong>
-						&nbsp;<a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/i000335.html" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
+						&nbsp;<a href="http://www.nederlandsesoorten.nl/node/15" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
 					</label>
 					<span style="float:right">
 						<a id="togglePresenceStatusGevestigd" href="#">gevestigde soorten</a> / 
