@@ -56,13 +56,16 @@ class SearchControllerNSR extends SearchController
 		{
 			$search=$this->requestData;
 			$results=$this->doSearch($search);
-			$this->smarty->assign('search',$search);	
+
+			$search['search']=htmlspecialchars($search['search']);
+
+			$this->smarty->assign('search', $search);
 			$this->smarty->assign('results',$results);	
 		}
 		
 		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
 
-		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
+		$this->smarty->assign('querystring',htmlspecialchars($this->reconstructQueryString(array('page'))));
 		$this->smarty->assign('type',$searchType);
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
