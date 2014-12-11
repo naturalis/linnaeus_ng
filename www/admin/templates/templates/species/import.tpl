@@ -8,6 +8,11 @@
 	<input name="uploadedfile" type="file" />
     </p>
     <p>
+    field separator:
+    <label><input type="radio" value="," name="fieldsep" />comma</label>
+    <label><input type="radio" value=";" name="fieldsep" checked="checked" />semi-colon</label>
+    </p>
+    <p>
     <label><input type="checkbox" name="del_all" value="1" />replace all data, not just that for the categories in your file (see below).</label><br />
     </p>
     <p>
@@ -25,7 +30,7 @@
 </p>
 <ol>
 	<li>{t}The format needs to be CSV.{/t}</li>
-	<li>{t}The field delimiter must be a comma.{/t}</li>
+	<li>{t}The field delimiter must be either a comma or a semi-colon, and can be selected above.{/t}</li>
 	<li>{t}The fields in the CSV-file *may* be enclosed by " (double-quotes), but this is not mandatory.{/t}</li>
 	<li>{t}Each line consists of the following fields:{/t}
 		<ol>
