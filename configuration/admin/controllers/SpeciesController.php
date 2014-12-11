@@ -1517,16 +1517,20 @@ class SpeciesController extends Controller
 
         $this->setPageName($this->translate('Taxon file upload'));
 
-        if ($this->requestDataFiles) { // && !$this->isFormResubmit()) {
+        if ($this->requestDataFiles) // && !$this->isFormResubmit())
+		{
 
 			$raw = array();
 
 			$saved = $failed = $odd = $skipped = 0;
 
-			if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
+			if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE)
+			{
 				$i = 0;
-				while (($dummy = fgetcsv($handle)) !== FALSE) {
-					foreach ((array) $dummy as $val) {
+				while (($dummy = fgetcsv($handle,0,$this->rGetVal('fieldsep'))) !== FALSE)
+				{
+					foreach ((array) $dummy as $val)
+					{
 						$raw[$i][] = $val;
 					}
 					$i++;
@@ -1537,8 +1541,8 @@ class SpeciesController extends Controller
 			$cats = array();
 			$clearedTaxa = array();
 
-			foreach ((array) $raw as $key => $line) {
-
+			foreach ((array) $raw as $key => $line)
+			{
 				$d = implode('',$line);
 
 				if (empty($d))
