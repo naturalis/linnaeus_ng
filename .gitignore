@@ -108,7 +108,6 @@ database/rights.php
 database/shared.php
 database/taxon.php
 database/users.php
-www/app/style
 configuration/admin/controllers/Literature2Controller.php
 configuration/admin/controllers/SearchController-ORG.php
 www/app/style/linnaeus_ng/.sass-cache
