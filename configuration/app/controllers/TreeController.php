@@ -8,7 +8,6 @@ class TreeController extends Controller
 		'name_types'
     );
 	
-	public $jsToLoad=array('all' => array('project_specific/soortenregister-tree.js'));
 	private $_idPreferredName=0;
 	private $_idValidName=0;
 		

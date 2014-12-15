@@ -3,6 +3,7 @@ var container='tree-container';
 var url='ajax_interface_tree.php';
 var autoExpandArray=Array();
 var highlightNodes=Array();
+var topLevelLabel='Nederlands Soortenregister';
 
 function buildtree(node)
 {
@@ -63,7 +64,7 @@ function growbranches(data)
 			'<li class="child">'+
 				(!activeNode ?
 					//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
-					'<a href="#" onclick="buildtree(false);return false">Nederlands Soortenregister</a>' :
+					'<a href="#" onclick="buildtree(false);return false">'+topLevelLabel+'</a>' :
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
 				(data.node.rank_label ? 
