@@ -32,10 +32,16 @@ Note :
 
     public function canResize($mime)
     {
-    
-        if ($mime=='image/png' || $mime=='image/jpg' || $mime=='image/jpeg' || $mime=='image/gif') {
+        if ($mime=='image/png' || $mime=='image/jpg' || $mime=='image/jpeg' || $mime=='image/gif')
+		{
             return true;
-        } else {
+        }
+		else
+		{
+	        if (($mime=='image/png') && !function_exists('ImageCreateFromPNG')) return false;
+	        if (($mime=='image/jpg' || $mime=='image/jpeg') && !function_exists('imagecreatefromjpeg')) return false;
+	        if (($mime=='image/gif') && !function_exists('ImageCreateFromGIF')) return false;
+
             return false;
         }
     }
