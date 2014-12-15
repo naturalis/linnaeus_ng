@@ -71,6 +71,10 @@
 
 		{foreach name=taxonloop from=$list key=k item=v}
 		<p>
+        
+        {$v|@var_dump}
+        
+        
 			<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.label}</a>
 			{if $v.source =='synonym' && $v.ref_taxon!=''}<span class="synonym-addition"> ({$v.ref_taxon})</span>{/if}{if $v.source =='synonym'}{t}[syn.]{/t}{/if}
 		</p>

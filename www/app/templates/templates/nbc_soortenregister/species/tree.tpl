@@ -24,6 +24,7 @@
 
 </div>
 
+<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister-tree.js"></script>
 <script type="text/JavaScript">
 $(document).ready(function() {
 	

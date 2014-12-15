@@ -20,6 +20,7 @@
         {assign var=first value=false}
     {/if}
 {/foreach}
+	<li><a href="http://localhost/linnaeus_ng/app/views/search/search.php">{t}Advanced search{/t}</a></li>
 </ul>
 
 

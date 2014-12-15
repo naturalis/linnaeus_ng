@@ -1,5 +1,6 @@
 {include file="../shared/header.tpl"}
 {include file="_search-main-no-tabs.tpl"}
+{* include file="../shared/_search-main.tpl" *}
 
 <div id="page-main">
 

@@ -79,6 +79,8 @@ include_once ('SearchController.php');
 class SearchControllerGeneral extends SearchController
 {
 
+	private $_minSearchLength = 3;
+	private $_maxSearchLength = 50;
 	private $_searchStringGroupDelimiter = '"';
 	private $_excerptPreMatchLength;
 	private $_excerptPostMatchLength;
@@ -131,6 +133,7 @@ class SearchControllerGeneral extends SearchController
 	);
 
 	public $jsToLoad = array('all' => array(
+		'main.js',
 		'search.js'
 	));
 
@@ -172,6 +175,7 @@ class SearchControllerGeneral extends SearchController
 		$this->redirect('search.php');
 	}
 
+
     public function searchAction ()
     {
 		if ($this->rHasVal('search'))
@@ -183,12 +187,12 @@ class SearchControllerGeneral extends SearchController
 					'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
 					'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
 				);
-				
+
 			if ($this->validateSearchString($this->requestData['search']))
 			{
 				
-				if ($this->rHasVal('extended','1')) {
-
+				if ($this->rHasVal('extended','1'))
+				{
 					$results =
 						$this->doSearch(
 							array(
@@ -556,7 +560,7 @@ class SearchControllerGeneral extends SearchController
 			}
 		}
 
-		return $this->_moduleNames[$id];
+		return isset($this->_moduleNames[$id]) ? $this->_moduleNames[$id] : $id;
 	}
 
 	private function doSearch($p=null)
@@ -623,6 +627,7 @@ class SearchControllerGeneral extends SearchController
 
 	private function searchSpecies($p)
 	{
+	
 		// taxa
 		$taxa = $this->models->Taxon->_get(
 			array(

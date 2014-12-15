@@ -167,6 +167,7 @@ class SearchController extends Controller
 		$this->redirect('index.php');
 	}
 
+	/*
     public function indexAction ()
     {
 
@@ -222,6 +223,7 @@ class SearchController extends Controller
         $this->printPage();
   
     }
+	*/
 
 
 
@@ -698,6 +700,9 @@ class SearchController extends Controller
 		$commonnames = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$commonnames,'fields'=>array('commonname','transliteration'),'excerpt'=>false));
 		$commonnames = $this->sortResultsByMostTokensFound($commonnames);
 
+
+
+
 		// media
 		$media = $this->models->MediaDescriptionsTaxon->_get(
 			array(
@@ -724,12 +729,11 @@ class SearchController extends Controller
 			)
 		);
 
-		foreach((array)$media as $key => $val) {
-
+		foreach((array)$media as $key => $val)
+		{
 			$media[$key]['id'] = $d[$val['media_id']]['taxon_id'];
 			$media[$key]['taxon_id'] = $d[$val['media_id']]['taxon_id'];
 			$media[$key]['label'] = $d[$val['media_id']]['file_name'];
-
 		}
 
 		return array(
