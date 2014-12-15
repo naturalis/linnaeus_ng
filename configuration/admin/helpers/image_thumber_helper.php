@@ -35,11 +35,9 @@ Note :
     
         if ($mime=='image/png' || $mime=='image/jpg' || $mime=='image/jpeg' || $mime=='image/gif')
 		{
-			
 			if (($mime=='image/png') && !function_exists('ImageCreateFromPNG')) return false;
 			if (($mime=='image/jpg' || $mime=='image/jpeg') && !function_exists('ImageCreateFromJPEG')) return false;
 			if (($mime=='image/gif') && !function_exists('ImageCreateFromGIF')) return false;
-			
             return true;
         } 
 		else 
