@@ -30,6 +30,7 @@ function buildtree(node)
 
 function growbranches(data)
 {
+
 	if (!data) return;
 
 	var progeny='';
@@ -60,32 +61,35 @@ function growbranches(data)
 	if (progeny) progeny='<ul id="children-'+data.node.id+'">'+progeny+'</ul>';
 
 	var buffer=
-		'<ul>'+
-			'<li class="child">'+
-				(!activeNode ?
-					//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
-					'<a href="#" onclick="buildtree(false);return false">'+topLevelLabel+'</a>' :
-					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
-				)+
-				(data.node.rank_label ? 
-					'<span class="rank">'+data.node.rank_label+'</span>' : 
-					'' 
-				)+
-				(data.node.child_count && data.node.child_count.total>0 && !activeNode ?
-					'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
-					'' 
-				)+
-				(data.node.child_count && data.node.child_count.total>0 && activeNode ?
-					'<span class="child-count">'+data.node.child_count.total+'/'+data.node.child_count.established+'</span>' :
-					'' 
-				)+
-				(!activeNode ?
-					'':
-					'<a href="nsr_taxon.php?id='+data.node.id+'" class="detail-link">&rarr;</a>'
-				)+
-				progeny+
-			'</li>'+
-		'</ul>';
+		'<li class="child">'+
+			(!activeNode ?
+				//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
+				'<a href="#" onclick="buildtree(false);return false">'+topLevelLabel+'</a>' :
+				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
+			)+
+			(data.node.rank_label ? 
+				'<span class="rank">'+data.node.rank_label+'</span>' : 
+				'' 
+			)+
+			(data.node.child_count && data.node.child_count.total>0 && !activeNode ?
+				'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
+				'' 
+			)+
+			(data.node.child_count && data.node.child_count.total>0 && activeNode ?
+				'<span class="child-count">'+data.node.child_count.total+'/'+data.node.child_count.established+'</span>' :
+				'' 
+			)+
+			(!activeNode ?
+				'':
+				'<a href="nsr_taxon.php?id='+data.node.id+'" class="detail-link">&rarr;</a>'
+			)+
+			progeny+
+		'</li>';
+		
+	if (data.node.is_top)
+	{
+		buffer='<ul class="tree-top">'+buffer+'</ul>';
+	}
 				
 	if (activeNode==false)
 	{

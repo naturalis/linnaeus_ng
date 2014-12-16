@@ -165,7 +165,18 @@ class TreeController extends Controller
 	
 	private function getTreeNode($p)
 	{
-		$node=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
+
+		if (isset($p['node']) && $p['node']!==false)
+		{
+			$node=$p['node'];
+			$isTop=false;
+		}
+		else
+		{
+			$node=$this->treeGetTop();
+			$isTop=true;
+		}
+		
 		$count=isset($p['count']) && in_array($p['count'],array('none','taxon','species')) ? $p['count'] : 'none';
 
 		if (is_null($node))
@@ -380,6 +391,8 @@ class TreeController extends Controller
 				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
 			}
 		);
+		
+		$taxon['is_top']=$isTop;
 
 		return
 			array(
