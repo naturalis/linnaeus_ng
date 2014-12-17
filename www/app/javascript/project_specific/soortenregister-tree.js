@@ -4,10 +4,7 @@ var url='ajax_interface_tree.php';
 var autoExpandArray=Array();
 var highlightNodes=Array();
 var topLevelLabel='Nederlands Soortenregister';
-
-var topLevelLabel='Nederlands Soortenregister';
-var topLevelLabel='Nederlands Soortenregister';
-var topLevelLabel='Nederlands Soortenregister';
+var includeSpeciesStats=true;
 
 function buildtree(node)
 {
@@ -53,7 +50,7 @@ function growbranches(data)
 				(shouldHighlight ? '<span class="highlight-node">' : '' )+
 				(d.has_children ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
-				(d.child_count && d.child_count.total>0 ?
+				(includeSpeciesStats && d.child_count && d.child_count.total>0 ?
 					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' :
 					'' 
 				)+
@@ -80,7 +77,7 @@ function growbranches(data)
 				'<span class="child-count">'+sprintf(_('%s soorten in totaal / %s gevestigde soorten'),data.node.child_count.total,data.node.child_count.established)+'</span>' :
 				'' 
 			)+
-			(data.node.child_count && data.node.child_count.total>0 && activeNode ?
+			(includeSpeciesStats && data.node.child_count && data.node.child_count.total>0 && activeNode ?
 				'<span class="child-count">'+data.node.child_count.total+'/'+data.node.child_count.established+'</span>' :
 				'' 
 			)+
