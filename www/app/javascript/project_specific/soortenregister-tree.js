@@ -72,7 +72,7 @@ function growbranches(data)
 				'<span class="rank">'+data.node.rank_label+'</span>' : 
 				'' 
 			)+
-			(data.node.child_count && data.node.child_count.total>0 && !activeNode ?
+			(includeSpeciesStats && data.node.child_count && data.node.child_count.total>0 && !activeNode ?
 				//'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
 				'<span class="child-count">'+sprintf(_('%s soorten in totaal / %s gevestigde soorten'),data.node.child_count.total,data.node.child_count.established)+'</span>' :
 				'' 
