@@ -62,7 +62,7 @@ class TreeController extends Controller
 		*/
 
 		$tree=$this->restoreTree();
-
+//q($this->getTreeNode(array('node'=>false,'count'=>'species')),1);
 		if (is_null($tree))
 		{
 			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
