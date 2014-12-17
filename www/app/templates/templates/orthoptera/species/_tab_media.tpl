@@ -70,6 +70,3 @@
 			{assign var=pgnURL value=$smarty.server.PHP_SELF}
 			{assign var=pgnQuerystring value=$querystring}
 			{include file="../shared/_paginator.tpl"}
-
-		
-		</div>

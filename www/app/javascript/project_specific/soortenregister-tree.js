@@ -5,6 +5,10 @@ var autoExpandArray=Array();
 var highlightNodes=Array();
 var topLevelLabel='Nederlands Soortenregister';
 
+var topLevelLabel='Nederlands Soortenregister';
+var topLevelLabel='Nederlands Soortenregister';
+var topLevelLabel='Nederlands Soortenregister';
+
 function buildtree(node)
 {
 	activeNode=node;
@@ -54,7 +58,7 @@ function growbranches(data)
 					'' 
 				)+
 				(shouldHighlight ? '</span>' : '' )+
-				'<a href="nsr_taxon.php?id='+d.id+'" class="detail-link">&rarr;</a> \
+				'<a href="nsr_taxon.php?id='+d.id+'" class="detail-link"></a> \
 			</li>';
 	}
 	
@@ -72,7 +76,8 @@ function growbranches(data)
 				'' 
 			)+
 			(data.node.child_count && data.node.child_count.total>0 && !activeNode ?
-				'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
+				//'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
+				'<span class="child-count">'+sprintf(_('%s soorten in totaal / %s gevestigde soorten'),data.node.child_count.total,data.node.child_count.established)+'</span>' :
 				'' 
 			)+
 			(data.node.child_count && data.node.child_count.total>0 && activeNode ?
@@ -81,7 +86,7 @@ function growbranches(data)
 			)+
 			(!activeNode ?
 				'':
-				'<a href="nsr_taxon.php?id='+data.node.id+'" class="detail-link">&rarr;</a>'
+				'<a href="nsr_taxon.php?id='+data.node.id+'" class="detail-link"></a>'
 			)+
 			progeny+
 		'</li>';
@@ -135,6 +140,7 @@ function restoretree()
 			else
 			{
 				buildtree(false);
+				
 			}
 		}
 	});
@@ -152,6 +158,7 @@ function checkAutoExpand()
 	if (node)
 	{
 		buildtree(node);
+		
 	}
 }
 
@@ -175,6 +182,7 @@ function setAutoExpand(id)
 				addAutoExpandNode(data[index]);
 			}
 			buildtree(false);
+			
 		}
 	});
 }
@@ -195,4 +203,3 @@ function shouldHighlightNode(node)
 	}
 	return false;
 }
-
