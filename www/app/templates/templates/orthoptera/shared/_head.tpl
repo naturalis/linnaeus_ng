@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-sortelements.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/main.js"></script>
-	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script -->
+	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script>
 
 
   <!--[if lt IE 9]>

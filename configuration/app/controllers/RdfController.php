@@ -102,6 +102,17 @@ class RdfController extends Controller
 				PREDICATE_MISSPELLED_NAME=>'fout gespelde naam',
 				PREDICATE_INVALID_NAME=>'ongeldige naam',
 				PREDICATE_ALTERNATIVE_NAME=>'alternatieve %se naam'
+			),
+			26 => array(
+				PREDICATE_VALID_NAME=>'valid name',
+				PREDICATE_PREFERRED_NAME=>'%s name', // language table should have an extra adjective-column
+				PREDICATE_HOMONYM=>'homonym',
+				PREDICATE_BASIONYM=>'basionym',
+				PREDICATE_SYNONYM=>'synonym',
+				PREDICATE_SYNONYM_SL=>'synonym',
+				PREDICATE_MISSPELLED_NAME=>'misspelled name',
+				PREDICATE_INVALID_NAME=>'invalid name',
+				PREDICATE_ALTERNATIVE_NAME=>'alternative % name'
 			)
 		);
 

@@ -544,9 +544,9 @@ parameters:
 		}
 
 		$result['labels']=array(
-			'title'=>'Stand van zaken',
-			'main'=>'Aantal soorten in Nederland',
-			'sub'=>'Het soortenregister bevat'
+			'title'=>$this->translate('Stand van zaken'),
+			'main'=>$this->translate('Aantal soorten in Nederland'),
+			'sub'=>$this->translate('Het soortenregister bevat')
 		);
 
 
