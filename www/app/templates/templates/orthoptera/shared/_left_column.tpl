@@ -6,7 +6,7 @@
             <form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
             <fieldset>
                 <input id="searchString" type="text" name="search" class="searchString" value="{$search.search}" />
-                <input id="search-submit" type="submit"  value="zoek">
+                <input id="search-submit" type="submit"  value="{t}zoek{/t}">
             </fieldset>
             
             <ul class="no-bullet">
