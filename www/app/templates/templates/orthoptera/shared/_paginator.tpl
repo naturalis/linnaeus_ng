@@ -55,7 +55,7 @@ $(document).ready(function(){
 		{if $temp>$pgnResultCount}{$pgnResultCount}{else}{$temp}{/if}+
 		' van '+
 		{$pgnResultCount}+
-		({$pgnResultCount}==1 ? ' resultaat' : ' resultaten')
+		({$pgnResultCount}==1 ? ' {t}resultaat{/t}' : ' {t}resultaten{/t}')
 	);
 {literal}
 });
@@ -66,7 +66,7 @@ $(document).ready(function(){
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	$('#resultcount-header').html({$pgnResultCount}+({$pgnResultCount}==1 ? ' resultaat' : ' resultaten'));
+	$('#resultcount-header').html({$pgnResultCount}+({$pgnResultCount}==1 ? ' {t}resultaat{/t}' : ' {t}resultaten{/t}'));
 {literal}
 });
 </script>

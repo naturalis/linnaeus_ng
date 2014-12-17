@@ -16,6 +16,9 @@
                 <li>
                 	<a href="../species/tree.php">Show taxonomic tree</a>
                 </li>
+                <li>
+                	<a href="../search/nsr_search_pictures.php">Photo search</a>
+                </li>
             </ul>
 
             </form>
