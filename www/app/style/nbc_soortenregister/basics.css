@@ -372,6 +372,10 @@ html, body {
 	margin-left:8px;
 	font-weight:bold;
 	font-size:1.1em;
+	&rarr;
+}
+#tree-container .detail-link::before{ 
+    content: '→';
 }
 #tree-container .rank, .child-count {
 	margin-left:3px;

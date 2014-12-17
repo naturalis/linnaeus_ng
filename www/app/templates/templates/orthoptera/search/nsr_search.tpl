@@ -16,14 +16,16 @@
 			<h2>{t}Zoekresultaten{/t}</h2>
 			<h3>{t _s1=$search.search}Gezocht op "%s":{/t} <span id="resultcount-header">{$results.count}</span></h3>
 			
+            {*
 			<p>
 				<label for="" accesskey="g">{t}Resultaten sorteren op:{/t}</label>
-				<select name="sort" onchange="sortResults(this);">
+				<select name="sort" onChange="sortResults(this);">
 					<option value="sort_relevance"selected="selected">{t}Relevantie{/t}</option>
 					<option value="sort_name">{t}Wetenschappelijke naam{/t}</option>
 					<option value="sort_common">{t}Engelse naam{/t}</option>
 				</select>
 			</p>
+            *}
 			
 
             <div id="results">
