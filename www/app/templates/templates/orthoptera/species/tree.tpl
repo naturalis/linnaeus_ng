@@ -44,6 +44,7 @@ $(document).ready(function() {
 	$('title').html('{t}Taxonomische boom{/t} - '+$('title').html());
 	
 	topLevelLabel='The Orthoptera Of Europe';
+	includeSpeciesStats=false;
 
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
