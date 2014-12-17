@@ -45,11 +45,14 @@ function growbranches(data)
 			
 		var shouldHighlight=shouldHighlightNode(d.id);
 
+		var label = d.name ? '<span class="common-name">'+d.name +'</span><span class="sci-name"> ('+d.taxon+')</span>' : '<span class="sci-name">'+d.taxon+'</span>';
+
 		progeny+=
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
 				(shouldHighlight ? '<span class="highlight-node">' : '' )+
-				(d.has_children ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
-				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
+				(d.has_children ?
+					'<a href="#" onclick="buildtree('+d.id+');return false;">'+label+'</a>' : label) +
+				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' ) +
 				(includeSpeciesStats && d.child_count && d.child_count.total>0 ?
 					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' :
 					'' 
@@ -60,13 +63,18 @@ function growbranches(data)
 	}
 	
 	if (progeny) progeny='<ul id="children-'+data.node.id+'">'+progeny+'</ul>';
+	
+	var label =
+		data.node.name ?
+			'<span class="common-name">'+data.node.name +'</span><span class="sci-name"> ('+data.node.taxon+')</span>' :
+			'<span class="sci-name">'+data.node.taxon+'</span>';
 
 	var buffer=
 		'<li class="child">'+
 			(!activeNode ?
 				//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
 				'<a href="#" onclick="buildtree(false);return false">'+topLevelLabel+'</a>' :
-				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
+				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+label+'</a>'
 			)+
 			(data.node.rank_label ? 
 				'<span class="rank">'+data.node.rank_label+'</span>' : 
