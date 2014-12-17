@@ -25,7 +25,7 @@
                 <div id="taxonImage">
                     <img src="http://images.naturalis.nl/510x272/{$overviewImage.image}" />
                     <div id="taxonImageCredits">
-                        <span class="photographer-title">Foto</span> {$overviewImage.label} 
+                        <span class="photographer-title">{t}Foto{/t}</span> {$overviewImage.label} 
                     </div>
                 </div>
 			{/if}
