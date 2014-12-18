@@ -89,13 +89,19 @@ class SpeciesControllerNSR extends SpeciesController
 			$reqCat=$this->rHasVal('cat') ? $this->rGetVal('cat') : null;
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
-
+			
 			$names=$this->getNames($taxon);
 			
 			$classification=$this->getTaxonClassification($taxon['id']);
 
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
+
+			// allow empty media page
+			if ($categories['start']!=$reqCat && $reqCat=='media')
+			{
+				$categories['start']='media';
+			}
 
 			if ($categories['start']==CTAB_MEDIA)
 			{
@@ -388,27 +394,15 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (!$this->_suppressTab_MEDIA)
 			{
-				/*
-					species & lower should always show the media tab, even
-					if there is no media, to be able to show the upload link
-				*/
-				if (isset($baseRank) && $baseRank>=SPECIES_RANK_ID)
+				$d=$this->getTaxonMedia(array('id'=>$taxon,'limit'=>1));
+				if ($d['count']>0)
 				{
-					$isEmpty=false;
+					$isEmpty=0;
 				}
 				else
 				{
-
-					$d=$this->getTaxonMedia(array('id'=>$taxon,'limit'=>1));
-					if ($d['count']>0)
-					{
-						$isEmpty=0;
-					}
-					else
-					{
-						$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
-						$isEmpty=(count((array)$d['data'])==0);
-					}
+					$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
+					$isEmpty=(count((array)$d['data'])==0);
 				}
 
 				array_push($categories,
@@ -453,16 +447,21 @@ class SpeciesControllerNSR extends SpeciesController
 			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
 			
 			if (is_null($firstNonEmpty) && empty($val['is_empty']))
+			{
 				$firstNonEmpty=$val['id'];
+			}
 
-			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty'])) {
+			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty']))
+			{
 				$start=$val['id'];
-			} else
-			if (is_null($start) && !empty($order[$val['tabname']]['start_order']) && empty($val['is_empty'])) {
+			} 
+			else
+			if (is_null($start) && !empty($order[$val['tabname']]['start_order']) && empty($val['is_empty']))
+			{
 				$start=$val['id'];
 			}
 		}
-		
+
 		$this->customSortArray($categories,array('key' => 'show_order'));
 
 		if (is_null($start)) $start=$firstNonEmpty;
