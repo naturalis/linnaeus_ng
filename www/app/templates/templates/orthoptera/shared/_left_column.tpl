@@ -28,12 +28,12 @@
         <section class="block block-menu-block block-menu-block-2 clearfix">
         
         	<h2 class="block-title">About</h2>
-        
+
             <div class="menu-block-wrapper menu-block-2 menu-name-main-menu parent-mlid-0 menu-level-2">
 
 				<ul>
 					{foreach from=$categories key=k item=v}
-					{if ($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES) && $v.id!=$smarty.const.CTAB_CLASSIFICATION}
+					{if (($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES) && $v.id!=$smarty.const.CTAB_CLASSIFICATION)||$v.id==$smarty.const.CTAB_MEDIA}
 					<li id="ctb-{$v.id}" tabname="{$v.tabname}">
 						{* $v.tabname *}
 						{if $activeCategory==$v.id}

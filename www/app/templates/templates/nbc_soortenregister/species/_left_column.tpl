@@ -9,7 +9,11 @@
 			<div id="categories">
 				<ul>
 					{foreach from=$categories key=k item=v}
-					{if ($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES) && $v.id!=$smarty.const.CTAB_CLASSIFICATION}
+					{if
+						($v.id!=$smarty.const.CTAB_CLASSIFICATION &&
+						($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES)) ||
+                        ($v.id==$smarty.const.CTAB_MEDIA && $taxon['base_rank_id'] >= $smarty.const.SPECIES_RANK_ID)
+					}
 					<li id="ctb-{$v.id}" tabname="{$v.tabname}">
 						{* $v.tabname *}
 						{if $activeCategory==$v.id}

@@ -324,7 +324,8 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Generate parentage table'));
 
-        if ($this->rHasVal('action','generate')) {
+        if ($this->rHasVal('action','generate'))
+		{
 			$i=$this->saveParentage();
 	        $this->smarty->assign('cleared', true);
 			$this->addMessage('Generated parentage for '.$i.' taxa');
@@ -2730,44 +2731,47 @@ class SpeciesController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'parent_id is' => null
 			),
-			'columns' => 'id'
+			'columns' => '*'
 		));
 
 		if (empty($t[0]['id']))
-			die('no top!?');
+		{
+			$this->addError('no top!?');
+			return;
+		}
 
-		/*
-		if (count((array)$t)>1)
-			die('multiple tops!?');
-		*/
-
-		$this->tmp=array();
-
-		$this->getProgeny($t[0]['id'],0,array());
-
-		$d=array('project_id' => $this->getCurrentProjectId());
-
-		if (!is_null($id)) $d['taxon_id']=$id;
-
-		$this->models->TaxonQuickParentage->delete($d);
-
-		$i=0;
-		foreach((array)$this->tmp as $key=>$val)
+		foreach((array)$t as $parentlesstaxon)
 		{
 
-			if (!is_null($id) && $val['id']!=$id)
-				continue;
+			$this->tmp=array();
+	
+			$this->getProgeny($parentlesstaxon['id'],0,array());
+	
+			$d=array('project_id' => $this->getCurrentProjectId());
+	
+			if (!is_null($id)) $d['taxon_id']=$id;
+	
+			$this->models->TaxonQuickParentage->delete($d);
+	
+			$i=0;
+			foreach((array)$this->tmp as $key=>$val)
+			{
+	
+				if (!is_null($id) && $val['id']!=$id)
+					continue;
+	
+				$this->models->TaxonQuickParentage->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $val['id'],
+					'parentage' => implode(' ',$val['parentage'])
+	
+				));
+	
+				$i++;
+			}
 
-			$this->models->TaxonQuickParentage->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $val['id'],
-				'parentage' => implode(' ',$val['parentage'])
-
-			));
-
-			$i++;
 		}
 
 		return $i;
