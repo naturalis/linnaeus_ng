@@ -1,0 +1,97 @@
+html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertical scrollbar/ when page content changes through JS without reload */
+
+#results .result {
+	line-height:1.2em;
+	margin-bottom:10px;
+}
+
+#taxonImageCredits {
+	font-size:0.8em;
+	padding-top:3px;
+}
+
+#content #names-table tr td {
+	font-size:1em;
+	padding:0 4px 2px 0;
+}
+
+.imageInGrid3.taxon-page {
+    height: 120px;
+}
+
+.imageInGrid3.taxon-page.collected {
+    height: 130px;
+}
+
+.imageInGrid3
+{
+	float: left;
+	display: inline;
+	width: 145px;
+	height: 190px;
+	overflow: hidden;
+	color: #666;
+	background-color: #FFF;
+	margin: 10px 5px 0px 5px;
+	font-size: 10px;
+}
+
+.imageInGrid3 dt
+{
+	float: left;
+	clear: both;
+	margin-right: 0.5em;
+  font-weight: bold; 
+  color:#333;
+}
+
+.imageInGrid3 dd, dl
+{
+	font-size: 1em;
+}
+
+.imageInGrid3 dd 
+{
+	/*float: left;*/
+	margin-right: 0.5em;
+  /*display: inline;
+  display: inline-block;*/
+}
+
+.imageInGrid3 dl
+{
+	clear: both;
+}
+
+.imageInGrid3 h3
+{
+	margin-top: 2px;
+}
+
+#paginator {
+	width:510px;
+	-border-top:1px dotted #aaa;
+}
+
+#paginator ul {
+	margin:5px;
+	display:block;
+	float:left;
+}
+
+#paginator li {
+    display: block;
+    float: left;
+    list-style: none inside none;
+	margin:0 0px 0 0;
+	border-right:1px solid #aaa;
+}
+
+#paginator li a, .cell {
+	padding:0 10px 0 10px;
+}
+
+#paginator li.no-border {
+	border-right:none;
+	padding-right:1px;
+}

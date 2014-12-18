@@ -12,14 +12,10 @@
         <div class="large-6 large-push-3 main columns">
       
             <a id="main-content"></a>
-           
-            {if $names.preffered_name}
-                <h2 id="page-title" class="title">{$names.preffered_name}</h2>
-                <h3>{$names.nomen}</h3>
-            {else}
-                <h2 id="page-title" class="title">{$names.nomen}</h2>
-                <h3></h3>
-            {/if}
+
+            <h2 id="page-title" class="title">{$names.scientific_name}</h2>
+            <h3>{$names.preffered_name}</h3>
+
 
 			{if $overviewImage.image}
                 <div id="taxonImage">

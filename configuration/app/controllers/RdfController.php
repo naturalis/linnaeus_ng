@@ -112,7 +112,7 @@ class RdfController extends Controller
 				PREDICATE_SYNONYM_SL=>'synonym',
 				PREDICATE_MISSPELLED_NAME=>'misspelled name',
 				PREDICATE_INVALID_NAME=>'invalid name',
-				PREDICATE_ALTERNATIVE_NAME=>'alternative % name'
+				PREDICATE_ALTERNATIVE_NAME=>'alternative %s name'
 			)
 		);
 
