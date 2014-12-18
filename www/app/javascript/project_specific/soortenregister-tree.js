@@ -45,7 +45,10 @@ function growbranches(data)
 			
 		var shouldHighlight=shouldHighlightNode(d.id);
 
-		var label = d.name ? '<span class="common-name">'+d.name +'</span><span class="sci-name"> ('+d.taxon+')</span>' : '<span class="sci-name">'+d.taxon+'</span>';
+		var label =
+			d.name ?
+				'<span class="common-name">'+d.name +' (</span><span class="sci-name">'+d.taxon+'</span><span class="common-name">)</span>' :
+				'<span class="sci-name">'+d.taxon+'</span>';
 
 		progeny+=
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
@@ -66,7 +69,7 @@ function growbranches(data)
 	
 	var label =
 		data.node.name ?
-			'<span class="common-name">'+data.node.name +'</span><span class="sci-name"> ('+data.node.taxon+')</span>' :
+			'<span class="common-name">'+data.node.name +' (</span><span class="sci-name">'+data.node.taxon+'</span><span class="common-name">)</span>' :
 			'<span class="sci-name">'+data.node.taxon+'</span>';
 
 	var buffer=
