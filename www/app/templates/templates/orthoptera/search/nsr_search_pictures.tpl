@@ -59,6 +59,7 @@
                 <h3><span id="resultcount-header">{$results.count}</span></h3>
 
 				{foreach from=$results.data item=v}
+
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
 							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
@@ -66,15 +67,10 @@
 							</a>
 						</div>
 							
-						{if $v.common_name}		
-						<h3>{$v.common_name}</h3>
-						<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>
-						{else}
-						<h3 class="wetenschappelijkenaam"><i>{$v.name}</i></h3>
-						{/if}
+						<h3>{$v.nomen}</h3>
 						<dl>
-							<dt>{t}Foto{/t}</dt><dd>{$v.photographer}</dd>
-							<dt>{t}Geplaatst op{/t}</dt><dd>{$v.meta_datum_plaatsing}</dd>
+							<dt>{t}Foto:{/t}</dt><dd>{$v.photographer}</dd>
+							<dd>{$v.meta_geografie}</dd>
 						</dl>
 						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{t}Naar deze soort{/t}</a></div>
 					</div>
@@ -93,7 +89,7 @@
 
     <!--/.main region -->
 
-	{include file="../shared/_left_column.tpl"}
+	{include file="../shared/_left_column_just_search.tpl"}
 
 	{include file="../shared/_right_column.tpl"}
     

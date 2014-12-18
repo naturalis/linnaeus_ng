@@ -47,6 +47,7 @@ html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertica
 
 .imageInGrid3 dd, dl
 {
+	line-height:0.5em;
 	font-size: 1em;
 }
 
