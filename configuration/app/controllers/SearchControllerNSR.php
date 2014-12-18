@@ -371,7 +371,7 @@ class SearchControllerNSR extends SearchController
 			group by _a.taxon_id
 
 			order by 
-				match_percentage desc, _a.name asc, _f.rank_id asc, ".
+				match_percentage desc, _e.taxon asc, _f.rank_id asc, ".
 				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
