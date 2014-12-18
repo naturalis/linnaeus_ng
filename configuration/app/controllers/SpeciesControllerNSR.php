@@ -561,16 +561,15 @@ class SpeciesControllerNSR extends SpeciesController
 				
 				if (strlen(trim($nomen))==0)
 					$nomen=trim(str_replace($val['authorship'],'',$val['name']));
-				
+
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
 					$nomen='<i>'.trim($nomen).'</i>';
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
-				else
-				{
-					$scientific_name=trim($val['name']);
-				}
+
+				$scientific_name=trim($val['name']);
+
 			}
 		}
 

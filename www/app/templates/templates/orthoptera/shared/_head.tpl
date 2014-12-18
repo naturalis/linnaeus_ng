@@ -23,6 +23,13 @@
 @import url("http://10.42.1.191/sites/all/themes/custom/eis_theme/css/eis_theme.css?ngf69p");
 </style>
 
+{if $cssToLoad}
+{section name=i loop=$cssToLoad}
+	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
+{/section}
+{/if}
+
+    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
@@ -39,8 +46,6 @@
 <!-- WILL NEED TO FIX THESE
 
 	<title>{$session.app.project.title|@strip_tags:false}</title>
-    <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
 
