@@ -53,7 +53,7 @@ $(document).ready(function(){
 		{math equation="((x-1)*y)+1" x=$currPage y=$pgnResultsPerPage}+
 		' - '+
 		{if $temp>$pgnResultCount}{$pgnResultCount}{else}{$temp}{/if}+
-		' van '+
+		' {t}van{/t} '+
 		{$pgnResultCount}+
 		({$pgnResultCount}==1 ? ' {t}resultaat{/t}' : ' {t}resultaten{/t}')
 	);
