@@ -14,13 +14,13 @@
 <link rel="canonical" href="/content/status-taxonomy" />
   <title>Status taxonomy | The Orthoptera of Europe</title>
   <style>
-@import url("http://10.42.1.191/profiles/naturalis/modules/contrib/views/css/views.css?ngf69p");
+@import url("http://10.42.1.191/profiles/naturalis/modules/contrib/views/css/views.css?ngtocw");
 </style>
 <style>
-@import url("http://10.42.1.191/profiles/naturalis/modules/contrib/ctools/css/ctools.css?ngf69p");
+@import url("http://10.42.1.191/profiles/naturalis/modules/contrib/ctools/css/ctools.css?ngtocw");
 </style>
 <style>
-@import url("http://10.42.1.191/sites/all/themes/custom/eis_theme/css/eis_theme.css?ngf69p");
+@import url("http://10.42.1.191/sites/all/themes/custom/eis_theme/css/eis_theme.css?ngtocw");
 </style>
 
 {if $cssToLoad}
@@ -43,14 +43,11 @@
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 
-<!-- WILL NEED TO FIX THESE
-
+<!--
 	<title>{$session.app.project.title|@strip_tags:false}</title>
-
-	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
-
--->
     <script type="text/javascript" src="{$baseUrl}app/javascript/prettyPhoto/jquery.prettyPhoto.js"></script>
+-->
+	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/lookup.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/dialog/jquery.modaldialog.js"></script>
 

@@ -16,12 +16,11 @@
             <h2 id="page-title" class="title">{$names.scientific_name}</h2>
             <h3>{$names.preffered_name}</h3>
 
-
 			{if $overviewImage.image}
                 <div id="taxonImage">
                     <img src="http://images.naturalis.nl/510x272/{$overviewImage.image}" />
                     <div id="taxonImageCredits">
-                        <span class="photographer-title">{t}Foto{/t}</span> {$overviewImage.label} 
+                        <span class="photographer-title">{t}Foto:{/t}</span> {$overviewImage.label} 
                     </div>
                 </div>
 			{/if}
