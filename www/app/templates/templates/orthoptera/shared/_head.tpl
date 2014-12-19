@@ -14,13 +14,13 @@
 <link rel="canonical" href="/content/status-taxonomy" />
   <title>Status taxonomy | The Orthoptera of Europe</title>
   <style>
-@import url("http://10.42.1.191/profiles/naturalis/modules/contrib/views/css/views.css?ngtocw");
+@import url("/profiles/naturalis/modules/contrib/views/css/views.css?ngtocw");
 </style>
 <style>
-@import url("http://10.42.1.191/profiles/naturalis/modules/contrib/ctools/css/ctools.css?ngtocw");
+@import url("/profiles/naturalis/modules/contrib/ctools/css/ctools.css?ngtocw");
 </style>
 <style>
-@import url("http://10.42.1.191/sites/all/themes/custom/eis_theme/css/eis_theme.css?ngtocw");
+@import url("/sites/all/themes/custom/eis_theme/css/eis_theme.css?ngtocw");
 </style>
 
 {if $cssToLoad}
