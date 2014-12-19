@@ -738,14 +738,14 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$metaData=array(
 				'' => '<span class="pic-meta-label">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
-				'Omschrijving' => $val['meta_short_desc'],
-				'Fotograaf' => $val['photographer'],
-				'Datum' => $val['meta_datum'],
-				'Locatie' => $val['meta_geografie'],
-				'Validator' => $val['meta_validator'],
-				'Geplaatst op' => $val['meta_datum_plaatsing'],
-				'Copyright' => $val['meta_copyrights'],
-				'Contactadres fotograaf' => $val['meta_adres_maker'],
+				$this->translate('Omschrijving') => $val['meta_short_desc'],
+				$this->translate('Fotograaf') => $val['photographer'],
+				$this->translate('Datum') => $val['meta_datum'],
+				$this->translate('Locatie') => $val['meta_geografie'],
+				$this->translate('Validator') => $val['meta_validator'],
+				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
+				$this->translate('Copyright') => $val['meta_copyrights'],
+				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
@@ -906,14 +906,14 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$metaData=array(
 				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
-				'Omschrijving' => $val['meta_short_desc'],
-				'Fotograaf' => $val['photographer'],
-				'Datum' => $val['meta_datum'],
-				'Locatie' => $val['meta_geografie'],
-				'Validator' => $val['meta_validator'],
-				'Geplaatst op' => $val['meta_datum_plaatsing'],
-				'Copyright' => $val['meta_copyrights'],
-				'Contactadres fotograaf' => $val['meta_adres_maker'],
+				$this->translate('Omschrijving') => $val['meta_short_desc'],
+				$this->translate('Fotograaf') => $val['photographer'],
+				$this->translate('Datum') => $val['meta_datum'],
+				$this->translate('Locatie') => $val['meta_geografie'],
+				$this->translate('Validator') => $val['meta_validator'],
+				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
+				$this->translate('Copyright') => $val['meta_copyrights'],
+				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
 			);
 
 			$data[$key]['photographer']=$val['photographer'];

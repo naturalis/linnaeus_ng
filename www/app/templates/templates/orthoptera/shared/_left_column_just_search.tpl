@@ -1,7 +1,7 @@
     <aside role="complementary" class="large-3 large-pull-6 sidebar-first columns sidebar">
         <section class="block block-block-nlsoort-search block-block-nlsoort-search-nlsoort-search clearfix">
         
-	        <h2 class="block-title">Search</h2>
+	        <h2 class="block-title">&nbsp;</h2>
         
             <form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
             <fieldset>

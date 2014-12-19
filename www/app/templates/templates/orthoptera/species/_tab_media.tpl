@@ -1,10 +1,10 @@
 		<div>
 		
 			{if $mediaOwn.data}
-				<div style="width:100%">
-					<h4>
+				<div style="width:100%;margin-top:20px;">
+					<h3>
 						{if $mediaOwn.count!=1}{t}Afbeeldingen:{/t}{else}{t}Afbeelding:{/t}{/if} {$mediaOwn.count}
-					</h4>
+					</h3>
 					<div>
 	
 					{foreach from=$mediaOwn.data item=v}

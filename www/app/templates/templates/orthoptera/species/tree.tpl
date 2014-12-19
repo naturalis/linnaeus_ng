@@ -24,7 +24,7 @@
     </div>
     <!--/.main region -->
 
-	{include file="../shared/_left_column.tpl"}
+	{include file="../shared/_left_column_just_search.tpl"}
 
 	{include file="../shared/_right_column.tpl"}
     

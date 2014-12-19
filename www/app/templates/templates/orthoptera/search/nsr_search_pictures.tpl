@@ -69,10 +69,10 @@
 							
 						<h3>{$v.nomen}</h3>
 						<dl>
-							<dt>{t}Foto:{/t}</dt><dd>{$v.photographer}</dd>
+							<dd><b>{t}Foto:{/t}</b> {$v.photographer}</dd>
 							<dd>{$v.meta_geografie}</dd>
 						</dl>
-						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{t}Naar deze soort{/t}</a></div>
+						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}&cat=media">{t}Naar deze soort{/t}</a></div>
 					</div>
 				{/foreach}
 
