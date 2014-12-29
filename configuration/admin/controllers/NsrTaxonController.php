@@ -380,6 +380,21 @@ class NsrTaxonController extends NsrController
 		$this->printPage();
 	}
 
+    public function updateParentageAction()
+    {
+		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Indextabel bijwerken'));
+
+		if ($this->rHasVal('action','update') && !$this->isFormResubmit())
+		{
+			$this->saveTaxonParentage();
+			$this->addMessage('Tabel bijgewerkt');
+		}
+		
+		
+		$this->printPage();
+	}
+
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVal('action'))
@@ -419,6 +434,7 @@ class NsrTaxonController extends NsrController
 
         $this->printPage();
     }
+
 
 
 
@@ -1054,7 +1070,6 @@ class NsrTaxonController extends NsrController
 		$this->logNsrChange(array('before'=>$data,'note'=>'disconnected media from taxon'));
 	}
 
-
 	private function getDeletedSpeciesList()
 	{
 		$taxa=$this->models->Taxon->freeQuery("
@@ -1116,10 +1131,10 @@ class NsrTaxonController extends NsrController
 			return null;
 		}
 
-		$taxa=$this->models->Names->freeQuery("
+		$taxa=$this->models->Taxon->freeQuery("
 			select
 				_a.taxon_id as id,
-				concat(_a.name,' [',_q.rank,']') as label,
+				concat(_a.name,' [',_q.rank,'%s]') as label,
 				_e.rank_id,
 				_e.taxon,
 				_f.rank_id as base_rank_id,
@@ -1127,7 +1142,8 @@ class NsrTaxonController extends NsrController
 				_a.uninomial,
 				_a.specific_epithet,
 				_b.nametype,
-	
+				ifnull(_d.label,_c.language) as language_label,
+
 				case
 					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
 					when _a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 95
@@ -1147,11 +1163,19 @@ class NsrTaxonController extends NsrController
 				concat(_user.first_name,' ',_user.last_name) as deleted_by,
 				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
 			
-			from %PRE%names _a
-			
-			left join %PRE%taxa _e
+			from %PRE%taxa _e
+
+			left join %PRE%names _a
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
+
+			left join %PRE%languages _c
+				on _a.language_id=_c.id
+
+			left join %PRE%labels_languages _d
+				on _a.language_id=_d.language_id
+				and _a.project_id=_d.project_id
+				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
 
 			left join %PRE%trash_can _trash
 				on _e.project_id = _trash.project_id
@@ -1207,6 +1231,7 @@ class NsrTaxonController extends NsrController
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
 
+
 		foreach ((array) $taxa as $key => $val)
 		{
 			if ($val['base_rank_id']==GENUS_RANK_ID)
@@ -1227,6 +1252,15 @@ class NsrTaxonController extends NsrController
 			unset($taxa[$key]['adjusted_rank']);
 			unset($taxa[$key]['uninomial']);
 			unset($taxa[$key]['specific_epithet']);
+			
+			if ($val['nametype']!=PREDICATE_VALID_NAME && $val['nametype']!=PREDICATE_PREFERRED_NAME)
+			{
+				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'; '.sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']));
+			}
+			else
+			{
+				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'');
+			}
 		}
 
 		return $taxa;
@@ -1669,7 +1703,8 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->models->Taxon->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
-			$this->setIsNewRecord(true);
+			$this->logNsrChange(array('after'=>array('id'=>$this->getConceptId(),'taxon'=>$name,'rank_id' =>$rank),'note'=>'new concept '.$name));
+			//$this->setIsNewRecord(true);
 			$this->updateConcept();
 		}
 		else 
@@ -1679,8 +1714,7 @@ class NsrTaxonController extends NsrController
 	}
 
 	private function updateConcept()
-	{
-		
+	{	
 		$this->createConceptNsrIds();
 		$this->createConceptPresence();
 		
@@ -1785,9 +1819,7 @@ class NsrTaxonController extends NsrController
 
 		$after=$this->getConcept($this->rGetId());
 		$after['presence']=$this->getPresenceData($this->rGetId());
-
-		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$after['taxon']));
-		
+		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$before['taxon']));
 	}
 
 	private function updateConceptTaxon($values)
@@ -2440,28 +2472,6 @@ class NsrTaxonController extends NsrController
 	}
 
 
-	private function getProgeny($parent,$level,$family)
-	{
-		$result = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'parent_id' => $parent
-				),
-				'columns' => 'id,parent_id,taxon,'.$level.' as level'
-			)
-		);
-
-		$family[]=$parent;
-
-		foreach((array)$result as $row)
-		{
-			$row['parentage']=$family;
-			$this->tmp[]=$row;
-			$this->getProgeny($row['id'],$level+1,$family);
-		}
-	}
-
 	private function doNameIntegrityChecks($name)
 	{
 		if (!$this->checkNamePartsMatchName($name))
@@ -3087,11 +3097,9 @@ class NsrTaxonController extends NsrController
 			);
 		}
 
-
-
 		
 		/*
-		3. taxon + hele taxonomische tak op onder het te wijzigen taxon.
+		3. taxon + hele taxonomische tak onder het te wijzigen taxon.
 		*/
 		$taxa=$this->getTaxonBranch($concept);
 
@@ -3244,8 +3252,13 @@ class NsrTaxonController extends NsrController
 
 			if (isset($data['parent_taxon_id']['new']))
 			{
-				$this->updateParentId($data['parent_taxon_id']);
-				$this->addMessage('Taxonomische ouder gewijzigd.');
+				/*
+					de ouder van deze "ondertaxa" is van parent gewijzigd, parentage
+					opnieuw vaststellen (en vooral *niet* de parent van deze ondertaxa
+					ook wijzigen)
+					
+				*/
+				$this->saveTaxonParentage($val['taxon_id']);
 			}
 
 		}

@@ -203,7 +203,7 @@ function setAutoExpand(id)
 		}),
 		success : function (data)
 		{
-			console.log(data);
+			//console.log(data);
 			var data=$.parseJSON(data);
 			for (index=1;index<data.length;++index)
 			{
