@@ -46,12 +46,12 @@
 						<div class="formrow">
 							<label accesskey="g" for="photographer">Fotograaf</label>
 							<input type="text" size="60" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">
-							<div id="photographer_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+							<div id="photographer_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 						</div>
 						<div class="formrow">
 							<label accesskey="g" for="validator">Validator</label>
 							<input type="text" size="60" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
-							<div id="validator_suggestion" match="start" class="auto_complete" style="display: none;"></div>
+							<div id="validator_suggestion" match="like" class="auto_complete" style="display: none;"></div>
 						</div>
 					</fieldset>
 	

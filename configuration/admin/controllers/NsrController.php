@@ -79,6 +79,79 @@ class NsrController extends Controller
 
 	}
 
+	public function getProgeny($parent,$level,$family)
+	{
+		$result = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'parent_id' => $parent
+				),
+				'columns' => 'id,parent_id,taxon,'.$level.' as level'
+			)
+		);
+
+		$family[]=$parent;
+
+		foreach((array)$result as $row)
+		{
+			$row['parentage']=$family;
+			$this->tmp[]=$row;
+			$this->getProgeny($row['id'],$level+1,$family);
+		}
+	}
+
+	public function treeGetTop()
+	{
+		/*
+			get the top taxon = no parent
+			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks 
+		*/
+		$p=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon,
+				_r.rank
+			from
+				%PRE%taxa _a
+
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
+					
+			left join %PRE%projects_ranks _p
+				on _a.project_id=_p.project_id
+				and _a.rank_id=_p.id
+
+			left join %PRE%ranks _r
+				on _p.rank_id=_r.id
+
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and ifnull(_trash.is_deleted,0)=0
+				and _a.parent_id is null
+				and _r.id < 10
+
+		");
+
+		if ($p && count((array)$p)==1)
+		{
+			$p=$p[0]['id'];
+		} 
+		else
+		{
+			$p=null;
+		}
+
+		if (count((array)$p)>1)
+		{
+			$this->addError('Detected multiple high-order taxa without a parent. Unable to determine which is the top of the tree.');
+		}
+
+		return $p;
+	}
+	
 	public function saveTaxonParentage($id=null)
 	{
 
@@ -87,7 +160,6 @@ class NsrController extends Controller
 			
 		if (empty($id))
 		{
-
 			$t = $this->treeGetTop();
 	
 			if (empty($t))
@@ -104,19 +176,15 @@ class NsrController extends Controller
 			$d=array('project_id' => $this->getCurrentProjectId());
 	
 			$this->models->TaxonQuickParentage->delete($d);
-	
+
 			$i=0;
 			foreach((array)$this->tmp as $key=>$val)
 			{
-	
-				if (!is_null($id) && $val['id']!=$id)
-					continue;
-	
 				$this->models->TaxonQuickParentage->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id,
+					'taxon_id' => $val['id'],
 					'parentage' => implode(' ',$val['parentage'])
 	
 				));

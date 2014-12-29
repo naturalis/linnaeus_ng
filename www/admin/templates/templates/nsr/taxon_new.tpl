@@ -43,15 +43,15 @@
 		</tr>
 		<tr>
         	<th>genus of uninomial:</th>
-            <td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="" mandatory="mandatory" label="genus" /> *</td>
+            <td><input type="text" class="medium" id="name_uninomial" value="" mandatory="mandatory" label="genus" /> *</td>
 		</tr>
 		<tr>
         	<th>soort:</th>
-            <td><input onkeyup="partstoname();" type="text" class="medium" id="name_specific_epithet" value="" label="soort" /></td>
+            <td><input type="text" class="medium" id="name_specific_epithet" value="" label="soort" /></td>
 		</tr>
 		<tr>
         	<th>derde naamdeel:<br /><span class="inline_subtext">(ondersoort, forma, varietas, etc.)</span></th>
-	        <td><input onkeyup="partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="" /></td>
+	        <td><input type="text" class="medium" id="name_infra_specific_epithet" value="" /></td>
 		</tr>
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
@@ -61,7 +61,7 @@
 				auteurschap:
 			</th>
             <td>
-            	<input onkeyup="partstoname();" type="text" class="medium" id="name_authorship" value="" label="auteurschap" /> *
+            	<input type="text" class="medium" id="name_authorship" value="" label="auteurschap" /> *
 			</td>
 		</tr>
 		<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="" disabled="disabled" label="auteur" /></td></tr>	
@@ -259,6 +259,12 @@
 <script>
 $(document).ready(function()
 {
+
+	$('#name_uninomial').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
+	$('#name_specific_epithet').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
+	$('#name_infra_specific_epithet').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
+	$('#name_authorship').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
+
 	//allLookupNavigateOverrideUrl('taxon.php?id=%s');
 	
 	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};

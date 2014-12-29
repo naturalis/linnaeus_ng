@@ -103,189 +103,11 @@ class NsrTreeController extends NsrController
         $this->printPage('ajax_interface');
     }
 
-	/*
-    private function getLookupList($p)
-    {
-        $search=isset($p['search']) ? $p['search'] : null;
-        $matchStartOnly=isset($p['match_start']) ? $p['match_start']==1 : false;
-        $getAll=isset($p['get_all']) ? $p['get_all']==1 : false;
-        $concise=isset($p['concise']) ? $p['concise']==1 : false;
-        $formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
-        $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
-        $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
-        $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
-
-        if (empty($search) && !$getAll)
-            return;
-
-        $taxa = $this->models->Taxon->freeQuery("
-			select * from
-			(
-			". ($taxaOnly ? "" : "
-
-				select
-					_a.taxon_id as id,
-					_a.name as label,
-					_b.rank_id,
-					_c.rank_id as base_rank_id,
-					_b.taxon as taxon,
-					'names' as source,
-					_d.rank
-				from
-					%PRE%names _a
-
-				left join %PRE%taxa _b
-					on _a.project_id=_b.project_id
-					and _a.taxon_id=_b.id
-
-				left join %PRE%trash_can _trash
-					on _b.project_id = _trash.project_id
-					and _b.id = _trash.lng_id
-					and _trash.item_type='taxon'
-
-				left join %PRE%projects_ranks _c
-					on _b.project_id=_c.project_id
-					and _b.rank_id=_c.id
-
-				left join %PRE%ranks _d
-					on _c.rank_id=_d.id
-
-				where
-					_a.project_id =  ".$this->getCurrentProjectId()."
-					and ifnull(_trash.is_deleted,0)=0
-					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-					and _a.type_id != ".
-						(
-							isset($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ?
-								$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1
-						)."
-				union
-
-			")."
-
-			select
-				_b.id,
-				_b.taxon as label,
-				_b.rank_id,
-				_d.rank_id as base_rank_id,
-				_b.taxon as taxon,
-				'taxa' as source,
-				_e.rank
-			from
-				%PRE%taxa _b
-
-			left join %PRE%trash_can _trash
-				on _b.project_id = _trash.project_id
-				and _b.id = _trash.lng_id
-				and _trash.item_type='taxon'
-
-			left join %PRE%projects_ranks _d
-				on _b.project_id=_d.project_id
-				and _b.rank_id=_d.id
-
-			left join %PRE%ranks _e
-				on _d.rank_id=_e.id
-
-			where
-				_b.project_id = ".$this->getCurrentProjectId()."
-				and ifnull(_trash.is_deleted,0)=0
-				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-
-			) as unification
-			".($rankAbove ? "where base_rank_id < ".$rankAbove : "")."
-			order by label, base_rank_id
-			limit ".$maxResults
-		);
-
-        foreach ((array) $taxa as $key => $val)
-		{
-			if ($val['source']=='taxa')
-			{
-				if ($formatted)
-					$taxa[$key]['label']=$this->formatTaxon($val);
-			}
-			else
-			{
-				if ($formatted)
-					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$this->formatTaxon($val).')';
-				else
-					$taxa[$key]['label']=$taxa[$key]['label'].' ('.$val['taxon'].')';
-			}
-
-			$taxa[$key]['label']=$taxa[$key]['label'].' ['.$val['rank'].']';
-
-			unset($taxa[$key]['taxon']);
-			unset($taxa[$key]['source']);
-		}
-
-		return
-			$this->makeLookupList(array(
-				'data'=>$taxa,
-				'module'=>'species',
-				'url'=>'../species/taxon.php?id=%s',
-				'encode'=>true,
-				'isFullSet'=>count($taxa)<$maxResults
-			));
-
-    }
-	*/
-
 	private function restoreTree()
 	{
 		return isset($_SESSION['admin']['user']['species']['tree']) ?  $_SESSION['admin']['user']['species']['tree'] : null;
 	}
 
-	private function treeGetTop()
-	{
-		/*
-			get the top taxon = no parent
-			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks 
-		*/
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_r.rank
-			from
-				%PRE%taxa _a
-
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-					
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
-
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and ifnull(_trash.is_deleted,0)=0
-				and _a.parent_id is null
-				and _r.id < 10
-
-		");
-
-		if ($p && count((array)$p)==1)
-		{
-			$p=$p[0]['id'];
-		} 
-		else
-		{
-			$p=null;
-		}
-
-		if (count((array)$p)>1)
-		{
-			$this->addError('Detected multiple high-order taxa without a parent. Unable to determine which is the top of the tree.');
-		}
-
-		return $p;
-	}
-	
 	private function getTreeNode($p)
 	{
 		
@@ -430,7 +252,7 @@ class NsrTreeController extends NsrController
 					'fieldAsIndex' =>"established"
 					)
 				);
-	
+
 				$val['child_count']=
 					array(
 						'total'=>
@@ -443,6 +265,7 @@ class NsrTreeController extends NsrController
 						'not_established'=>
 								(int)(isset($d[0]['total'])?$d[0]['total']:0)
 					);
+
 			} else
 			{
 				$val['child_count']=null;

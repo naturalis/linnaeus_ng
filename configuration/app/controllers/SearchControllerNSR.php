@@ -10,6 +10,13 @@ class SearchControllerNSR extends SearchController
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
 
+	public $csvExportSettings=array(
+		'field-sep'=>',',
+		'field-enclose'=>'"',
+		'line-end'=>"\n",
+		'file-extension'=>".csv"
+	);
+
     public $usedModels = array(
 		'taxa',
 		'presence',
@@ -65,49 +72,102 @@ class SearchControllerNSR extends SearchController
 		
 		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
 
-		$this->smarty->assign('querystring',htmlspecialchars($this->reconstructQueryString(array('page'))));
-		$this->smarty->assign('type',$searchType);
-		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+		if ($this->rHasVal('action','export'))
+		{
+			$search['limit']=1000;
+			$template='export_search';
+			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
+			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->downloadHeaders(
+				array(
+					'mime'=>'text/csv',
+					'charset'=>'utf-8',
+					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
+					);
+		}
+		else
+		{
+			$template=null;
+			$this->smarty->assign('querystring',htmlspecialchars($this->reconstructQueryString(array('page'))));
+			$this->smarty->assign('type',$searchType);
+			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
+			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+		}
 
-        $this->printPage($this->rHasVal('action','export') ? 'export' : null);
+        $this->printPage($template);
 	}
 
     public function searchExtendedAction()
     {
-		$this->smarty->assign('results',$this->doExtendedSearch($this->requestData));
-		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
-		$this->smarty->assign('search',$this->requestData);	
-		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+		$search=isset($this->requestData) ? $this->requestData : null;
+		
+		if ($this->rHasVal('action','export'))
+		{
+			$search['limit']=1000;
+			$template='export_search_extended';
+			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
+			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->downloadHeaders(
+				array(
+					'mime'=>'text/csv',
+					'charset'=>'utf-8',
+					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
+					);
+		}
+		else
+		{
+			$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
+			$this->smarty->assign('search',$search);	
+			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
+			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$template=null;
+		}
 
-        $this->printPage($this->rHasVal('action','export') ? 'export' : null);
+		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
+		$this->smarty->assign('results',$this->doExtendedSearch($search));
+        $this->printPage($template);
     }
 
     public function searchPicturesAction()
     {
-		$results = $this->doPictureSearch($this->requestData);
+		$search=$this->requestData;
+
+		if ($this->rHasVal('action','export'))
+		{
+			$search['limit']=1000;
+			$template='export_search_pictures';
+			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
+			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->downloadHeaders(
+				array(
+					'mime'=>'text/csv',
+					'charset'=>'utf-8',
+					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
+					);
+		}
+		else
+		{
+			$template=null;
+			$this->smarty->assign('photographers',$this->getPhotographersPictureCount($search));
+			$this->smarty->assign('validators',$this->getValidatorPictureCount($search));
+			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
+			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('imageExport',true);
+		}
+
+		if ($this->rHasVal('show','photographers'))
+		{
+			$this->smarty->assign('show','photographers');
+			$search['limit']='*';
+		}
+
+		$results = $this->doPictureSearch($search);
 
 		$this->smarty->assign('search',$this->requestData);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 		$this->smarty->assign('results',$results);	
 			
-		$p=$this->requestData;
-
-		if ($this->rHasVal('show','photographers'))
-		{
-			$this->smarty->assign('show','photographers');
-			$p['limit']='*';
-		}
-
-		$this->smarty->assign('photographers',$this->getPhotographersPictureCount($p));
-		$this->smarty->assign('validators',$this->getValidatorPictureCount($p));
-		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-		$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
-		$this->smarty->assign('imageExport',true);
-
-        $this->printPage($this->rHasVal('action','export') ? 'export' : null);
+        $this->printPage($template);
     }
 
     public function recentPicturesAction()
@@ -305,7 +365,8 @@ class SearchControllerNSR extends SearchController
 					then 50
 
 					else 10
-				end as match_percentage
+				end as match_percentage,
+				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
 				
 			from %PRE%names _a
 			
@@ -354,6 +415,11 @@ class SearchControllerNSR extends SearchController
 				and _e.project_id=_k.project_id
 				and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _k.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%nsr_ids _ids
+				on _a.taxon_id=_ids.lng_id
+				and _a.project_id=_ids.project_id
+				and _ids.item_type='taxon'
 
 			where _a.project_id =".$this->getCurrentProjectId()."
 				and _a.name like '%".mysql_real_escape_string($search)."%'
@@ -459,7 +525,8 @@ class SearchControllerNSR extends SearchController
 				".($distribution ? "ifnull(_ii.number_of_maps,0) as number_of_maps," : "" )."
 				_h.information_title as presence_information_title,
 				_h.index_label as presence_information_index_label,
-				_l.file_name as overview_image
+				_l.file_name as overview_image,
+				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
 			
 			from %PRE%taxa _a
 
@@ -565,6 +632,11 @@ class SearchControllerNSR extends SearchController
 				on _a.id=_l.taxon_id
 				and _a.project_id=_l.project_id
 				and _l.overview_image=1
+
+			left join %PRE%nsr_ids _ids
+				on _a.id=_ids.lng_id
+				and _a.project_id=_ids.project_id
+				and _ids.item_type='taxon'
 
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
@@ -760,12 +832,14 @@ class SearchControllerNSR extends SearchController
 
 		if (!empty($p['photographer']))
 		{
-			$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
+			//$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
+			$photographer="_c.meta_data like '%".mysql_real_escape_string($p['photographer'])."%'";
 		}
 
 		if (!empty($p['validator']))
 		{
-			$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
+			//$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
+			$photographer="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
 		}
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
@@ -815,7 +889,8 @@ class SearchControllerNSR extends SearchController
 				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
-				_meta7.meta_data as meta_adres_maker
+				_meta7.meta_data as meta_adres_maker,
+				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
 			
 			from  %PRE%media_taxon _m
 			
@@ -896,6 +971,11 @@ class SearchControllerNSR extends SearchController
 				on _m.id=_meta9.media_id
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
+
+			left join %PRE%nsr_ids _ids
+				on _m.taxon_id=_ids.lng_id
+				and _m.project_id=_ids.project_id
+				and _ids.item_type='taxon'
 			
 			".(!empty($group_id) ? 
 				"right join %PRE%taxon_quick_parentage _q
@@ -1068,11 +1148,15 @@ class SearchControllerNSR extends SearchController
 	private function getSuggestionsValidator($p)
 	{
 		$clause=null;
+
 		if ($p['match']=='start')
 			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
 		else
 		if ($p['match']=='exact')
 			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
+		else
+		if ($p['match']=='like')
+			$clause="meta_data like '%".mysql_real_escape_string($p['search'])."%'";
 
 		if (empty($clause)) return;
 
@@ -1096,20 +1180,15 @@ class SearchControllerNSR extends SearchController
 	private function getSuggestionsPhotographer($p)
 	{
 		$clause=null;
-		
-		/*		
-		if ($p['match']=='start')
-			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
-		else
-		if ($p['match']=='exact')
-			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
-		*/
 
 		if ($p['match']=='start')
 			$clause="meta_data like '".mysql_real_escape_string($p['search'])."%'";
 		else
 		if ($p['match']=='exact')
 			$clause="meta_data = '".mysql_real_escape_string($p['search'])."'";
+		else
+		if ($p['match']=='like')
+			$clause="meta_data like '%".mysql_real_escape_string($p['search'])."%'";
 
 		if (empty($clause)) return;
 
@@ -1233,5 +1312,22 @@ class SearchControllerNSR extends SearchController
 		
 		return trim($querystring);
 	}
+
+	private function downloadHeaders($p)
+	{
+		$filename=isset($p['filename']) ? $p['filename'] : null;
+		$mime=isset($p['mime']) ? $p['mime'] : null;
+		$charset=isset($p['charset']) ? $p['charset'] : null;
+		
+		header('Content-Description: File Transfer');
+		header('Content-type: '.(!empty($mime) ? $mime : '').'; '.(!empty($charset) ? 'charset='.$charset : ''));
+		header('Content-Disposition: attachment; '.(!empty($filename) ? 'filename='.$filename : ''));
+		header('Content-Transfer-Encoding: binary');
+		header('Connection: Keep-Alive');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: public');
+	}
+
 
 }
