@@ -3,7 +3,7 @@
 			{if $mediaOwn.data}
 				<div style="width:100%">
 					<h4>
-						Afbeelding{if $mediaOwn.count!=1}en{/if}: {$mediaOwn.count}
+						Totaal aantal afbeeldingen: {$mediaOwn.count}
 					</h4>
 					<div>
 	

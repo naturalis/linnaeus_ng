@@ -61,7 +61,7 @@
 				auteurschap:
 			</th>
             <td>
-            	<input type="text" class="medium" id="name_authorship" value="" label="auteurschap" /> *
+            	<input type="text" class="medium" id="name_authorship" value="" label="auteurschap" />
 			</td>
 		</tr>
 		<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="" disabled="disabled" label="auteur" /></td></tr>	
@@ -270,7 +270,8 @@ $(document).ready(function()
 	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
 	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
 
-	$('#data :input[type!=button]').each(function(key,value) {
+	$('#data :input[type!=button]').each(function(key,value)
+	{
 		var set={ 
 			name:$(this).attr('id'),
 			label:$(this).attr('label'),

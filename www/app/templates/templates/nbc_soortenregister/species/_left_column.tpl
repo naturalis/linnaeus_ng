@@ -8,11 +8,12 @@
 
 			<div id="categories">
 				<ul>
+                	{* remove 1==2 on r16 once the beelduitwisselaar comes back online, so its linkl might show on empty media-pages *}
 					{foreach from=$categories key=k item=v}
 					{if
 						($v.id!=$smarty.const.CTAB_CLASSIFICATION &&
 						($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES)) ||
-                        ($v.id==$smarty.const.CTAB_MEDIA && $taxon['base_rank_id'] >= $smarty.const.SPECIES_RANK_ID)
+                        (1==2 && $v.id==$smarty.const.CTAB_MEDIA && $taxon['base_rank_id'] >= $smarty.const.SPECIES_RANK_ID)
 					}
 					<li id="ctb-{$v.id}" tabname="{$v.tabname}">
 						{* $v.tabname *}

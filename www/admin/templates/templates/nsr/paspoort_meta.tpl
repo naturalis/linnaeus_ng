@@ -75,8 +75,8 @@ meta-gegevens toe te wijzen.
 <p>
 toevoegen aan:<br />
 <select name="update-reach">
-    <option value="all-text">alle tabbladen met tekst</option>
-    <option value="text-no-meta">tabbladen met tekst zonder meta-gegevens</option>
+    <option value="all-text">alle huidige tabbladen met tekst</option>
+    <option value="text-no-meta">huidige tabbladen met tekst zonder meta-gegevens</option>
     <option disabled="disabled">----------------------------</option>
 	{foreach from=$tabs item=v key=k}
 	{if !($v.obsolete && $v.content|@strlen==0) && $v.content|@strlen!=0}
