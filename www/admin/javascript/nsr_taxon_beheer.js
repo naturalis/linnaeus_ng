@@ -120,7 +120,7 @@ function checkAuthorshipAgainstRank()
 	var result=true;
 	var buffer=[];
 
-	if (rank>=genusBaseRankid)
+	if (rank>genusBaseRankid)
 	{
 		if (p1==0) buffer.push("Auteurschap is niet ingevuld.");
 	}
@@ -128,6 +128,22 @@ function checkAuthorshipAgainstRank()
 	if (buffer.length>0) alert(buffer.join("\n"));
 
 	return buffer.length==0;
+}
+
+function checkAuthorshipAgainstRankGenus()
+{
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	var ranklabel = $('#concept_rank_id :selected').text();
+	var p1=$('#name_authorship').val() ? $('#name_authorship').val().length : 0;
+	var buffer=[];
+
+	//if (rank=<genusBaseRankid)
+	if (rank==genusBaseRankid)
+	{
+		if (p1==0) buffer.push("Auteurschap");
+	}
+
+	return buffer;
 }
 
 function checkNameAgainstRank()
@@ -288,6 +304,7 @@ function savenewconcept()
 	if (!checkAuthorshipAgainstRank()) return;
 
 	notifications=notifications.concat(
+		checkAuthorshipAgainstRankGenus(),
 		checkPresenceDataSpecies(),
 		checkScientificName(),
 		checkDutchName(),

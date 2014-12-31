@@ -60,6 +60,8 @@ class NsrActivityLogController extends NsrController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_logLinesPerPage;
 		//$order=!empty($p['order']) ? $p['order'] : null;
 
+		$tz=isset($this->generalSettings['serverTimeZone']) ? $this->generalSettings['serverTimeZone'] : 'Europe/Amsterdam';
+
 		$d=$this->models->ActivityLog->freeQuery("
 			select
 				SQL_CALC_FOUND_ROWS	
@@ -71,7 +73,7 @@ class NsrActivityLogController extends NsrController
 				_a.data_before,
 				_a.data_after,
 				_a.note,
-				DATE_FORMAT(_a.created,'%d %b %Y, %T') as last_change_hr,
+				DATE_FORMAT(CONVERT_TZ(_a.created,'UTC','".$tz."'),'%d %b %Y, %T') as last_change_hr,
 				_u.id as user_user_id,
 				_u.username as user_username,
 				_u.first_name as user_first_name,
