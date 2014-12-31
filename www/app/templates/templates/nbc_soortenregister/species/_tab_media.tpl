@@ -1,3 +1,150 @@
+<div>
+    <div style="width:100%">
+		{if $mediaOwn.count>0}
+        <h4>
+            Totaal aantal afbeeldingen: <span class="total-image-count"></span>
+        </h4>
+        {elseif $mediaCollected.species>0}
+        <h4>
+			Soorten/taxa met afbeelding(en): {$mediaCollected.species}
+        </h4>
+        {/if}
+        
+        <div id="images-container">
+        </div>
+        
+        <input id="more-images-button" type="button" value="Meer afbeeldingen"  style="font-size:0.9em;width:100%;margin-top:10px;display:none;" />
+    </div>
+</div>
+
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+	{if $mediaOwn.count>0}
+	var action='get_media_batch';
+	{elseif $mediaCollected.species>0}
+	var action='get_collected_batch';
+	{/if}
+	var page=0;
+	var id={$taxon.id};
+	
+	function setTotalImageCount(i)
+	{
+		$('.total-image-count').html(i);
+	}
+	
+	function setMoreImagesButton(total)
+	{
+		$('#more-images-button').toggle($('.thumbContainer').length<total);
+	}
+	
+	function setImageBatch(images)
+	{
+		if (!images) return;
+
+		var template=
+			(action=='get_collected_batch' ?
+				$('#template-image-cell-collected').html() :
+				$('#template-image-cell').html()
+			).replace('<!--','').replace('-->','');
+
+		var buffer=Array();
+		for(var i=0;i<images.length;i++)
+		{
+			var image=images[i];
+			buffer.push(
+				template
+					.replace(/%image%/g,image.image)
+					.replace(/%meta_data%/g,escape(image.meta_data))
+					.replace(/%photographer%/g,image.photographer)
+					.replace(/%thumb%/g,image.thumb)
+					.replace(/%id%/g,image.taxon_id)
+					.replace(/%name%/g,image.name)
+					.replace(/%taxon%/g,image.taxon)
+			);
+		}
+		
+		if (page==1)
+		{
+			$('#images-container').append(buffer.join("\n"));
+		}
+		else
+		{
+			$('#images-container').append("<span class='image-batch' style='display:none'>"+buffer.join("\n")+"</span>");
+			$('.image-batch:hidden').show('slow');
+		}
+		
+		nbcPrettyPhotoInit();
+	}
+
+	function getMediaBatch()
+	{
+		$.ajax({
+			url : 'ajax_interface_nsr.php',
+			type: "POST",
+			data : ({
+				action : action,
+				id : id,
+				page : page,
+				time : allGetTimestamp()
+			}),
+			success : function (data) {
+				var data=$.parseJSON(data)
+				console.dir(data);
+				setTotalImageCount(data.count);
+				setImageBatch(data.data);
+				setMoreImagesButton(data.count);
+			}
+		});	
+	}
+	
+	function getMediaNextBatch()
+	{
+		page++;
+		getMediaBatch();
+	}
+
+	$('#more-images-button').on('click',function() { getMediaNextBatch(); } );
+
+	getMediaNextBatch();	
+		
+});
+</script>
+
+
+<span style="display:none" id="template-image-cell">
+<!--
+<div class="imageInGrid3 taxon-page">
+    <div class="thumbContainer">
+        <a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
+            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="http://images.naturalis.nl/160x100/%thumb%" />
+        </a>
+    </div>
+    <dl>
+        <dt>Foto</dt><dd>%photographer%</dd>
+    </dl>
+</div>
+-->
+</span>
+<span style="display:none" id="template-image-cell-collected">
+<!--
+<div class="imageInGrid3 taxon-page collected">
+    <div class="thumbContainer">
+        <a href="nsr_taxon.php?id=%id%&cat=media">
+            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="http://images.naturalis.nl/160x100/%thumb%" />
+        </a>
+    </div>
+    <dl>
+		<dd>%name%</dd>
+        <dd><i>%taxon%</i></dd>
+    </dl>
+</div>
+-->
+</span>
+
+
+
+{*
 		<div>
 		
 			{if $mediaOwn.data}
@@ -81,3 +228,5 @@
 			{/if}
 		
 		</div>
+
+*}

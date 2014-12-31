@@ -902,6 +902,8 @@ class SpeciesControllerNSR extends SpeciesController
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 
+		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+
 		foreach((array)$data as $key=>$val)
 		{
 			$metaData=array(
@@ -928,8 +930,6 @@ class SpeciesControllerNSR extends SpeciesController
 			
 		}
 
-		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
-		
 		/*
 		$totalCount=$this->models->Taxon->freeQuery("		
 			select
@@ -1000,6 +1000,7 @@ class SpeciesControllerNSR extends SpeciesController
 				and ifnull(_trash.is_deleted,0)=0				
 			"
 		);
+		
 //				and _f.rank_id >= ".SPECIES_RANK_ID."
 		
 		$data= 
@@ -1909,6 +1910,27 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 
 	}
+
+
+    public function ajaxInterfaceAction ()
+    {
+		
+		$return=null;
+		
+		if ($this->rHasVal('action', 'get_media_batch') && $this->rHasId())
+		{
+			$return=json_encode($this->getTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+        } else
+		if ($this->rHasVal('action', 'get_collected_batch') && $this->rHasId())
+		{
+			$return=json_encode($this->getCollectedHigherTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+        }
+
+        $this->allowEditPageOverlay = false;
+		$this->smarty->assign('returnText',$return);
+        $this->printPage('ajax_interface');
+    }
+
 
 
 }

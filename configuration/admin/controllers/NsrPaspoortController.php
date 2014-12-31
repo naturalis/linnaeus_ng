@@ -347,7 +347,7 @@ class NsrPaspoortController extends NsrController
 				'page_id'=>$page
 			));
 
-			$this->logNsrChange(array('before'=>$before,'note'=>'deleted passport from '.$concept['taxon']));
+			$this->logNsrChange(array('before'=>$before,'note'=>'deleted passport tabpage from '.$concept['taxon']));
 			return $r;
 
 		}
@@ -376,7 +376,7 @@ class NsrPaspoortController extends NsrController
 			
 			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
 
-			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport' : 'new passport').' from '.$concept['taxon']));
+			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' from '.$concept['taxon']));
 			
 			return $r;
 			
@@ -396,8 +396,8 @@ class NsrPaspoortController extends NsrController
 			return;
 
 		/*
-			<option value="all-text">alle tabbladen met tekst</option>
-			<option value="text-no-meta">tabbladen met tekst zonder meta-gegevens</option>
+			<option value="all-text">alle huidige tabbladen met tekst</option>
+			<option value="text-no-meta">huidige tabbladen met tekst zonder meta-gegevens</option>
 
 			bestaande meta-gegevens van de geselecteerde tab(s) worden overschreven!
 		*/
@@ -412,14 +412,14 @@ class NsrPaspoortController extends NsrController
 				
 			if ($updatereach=="all-text")
 			{
-				// alle tabbladen met tekst
+				// alle huidige tabbladen met tekst
 				if (strlen($val['content'])>0)
 					array_push($shouldUpdate,$val['content_id']);
 			}
 			else
 			if ($updatereach=="text-no-meta")
 			{
-				// tabbladen met tekst zonder meta-gegevens
+				// huidige tabbladen met tekst zonder meta-gegevens
 				if (
 					(strlen($val['content'])>0) &&
 					(!isset($val['rdf']) || count((array)$val['rdf'])==0)

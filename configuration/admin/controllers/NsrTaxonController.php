@@ -87,9 +87,6 @@ class NsrTaxonController extends NsrController
 			'columns'=>'id',
 			'fieldAsIndex'=>'rank_id'
 		));
-		
-///		$this->saveTaxonParentage();
-		
 	}
 
     public function taxonNewAction()
@@ -198,6 +195,7 @@ class NsrTaxonController extends NsrController
 			if ($this->needParentChange() && $this->canParentChange())
 			{
 				$this->updateConcept();
+				$this->saveTaxonParentage($this->getConceptId());
 				$this->doParentChange();
 			}
 			else
@@ -254,7 +252,6 @@ class NsrTaxonController extends NsrController
 
     private function _nameAndSynonym()
     {
-	
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			$this->setNameId($this->rGetId());
@@ -271,6 +268,8 @@ class NsrTaxonController extends NsrController
 			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
 			{
 				$this->doParentChange();
+				$name=$this->getName(array('id'=>$this->getNameId()));
+				$this->saveTaxonParentage($name['taxon_id']);
 			}
 			else
 			{
@@ -390,7 +389,6 @@ class NsrTaxonController extends NsrController
 			$this->saveTaxonParentage();
 			$this->addMessage('Tabel bijgewerkt');
 		}
-		
 		
 		$this->printPage();
 	}
@@ -1504,7 +1502,8 @@ class NsrTaxonController extends NsrController
 
 	private function checkAuthorshipAgainstRank($baseRank,$authorship)
 	{
-		if ($baseRank>=GENUS_RANK_ID && empty($authorship))
+		//if ($baseRank>=GENUS_RANK_ID && empty($authorship))
+		if ($baseRank>GENUS_RANK_ID && empty($authorship))
 		{
 			$this->addError("Geen auteurschap. Concept niet opgeslagen.");
 			return false;
@@ -1686,9 +1685,13 @@ class NsrTaxonController extends NsrController
 		)
 		{
 			$this->addWarning('Incomplete voorkomensgegevens. Concept wel opgeslagen.');
-			//$this->setConceptId(null);
-			//return;
 		}
+
+		if ($baseRank==GENUS_RANK_ID && empty($authorship))
+		{
+			$this->addWarning("Geen auteurschap. Concept wel opgeslagen.");
+		}
+			
 		
 		// we passed the tests!
 		$d=$this->models->Taxon->save(
