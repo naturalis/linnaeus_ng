@@ -56,7 +56,7 @@
 		<td class="key-choice-number">{$choices[i].marker}.</td>
 
 		<td class="key-choice-title">
-			{$choices[i].choice_txt|@strip_tags}
+			{$choices[i].choice_txt}
 		</td>
 		
 		<td>
