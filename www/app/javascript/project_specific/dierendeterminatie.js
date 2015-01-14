@@ -28,6 +28,14 @@ function nbcGetResults(p)
 {
 	setCursor('wait');
 
+	console.dir({
+			action : 'get_results_nbc',
+			params : p,
+			time : getTimestamp(),
+			key : matrixId,
+			p : projectId
+		});
+
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -42,8 +50,10 @@ function nbcGetResults(p)
 		{
 			//console.log(data);
 			nbcData = $.parseJSON(data);
+			//console.dir(nbcData);
 			nbcFilterEmergingCharacters();
 			nbcDoResults();
+
 			if (p && p.action!='similar') nbcDoOverhead();
 			nbcDoPaging();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
@@ -967,3 +977,7 @@ function nbcInit() {
 	*/
 
 }
+
+
+
+// alleen bijen

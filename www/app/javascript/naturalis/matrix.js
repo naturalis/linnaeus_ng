@@ -23,6 +23,14 @@ function nbcGetResults(p) {
 
 	setCursor('wait');
 
+	console.dir({
+			action : 'get_results_nbc',
+			params : p,
+			time : getTimestamp(),
+			key : matrixId,
+			p : projectId
+		});
+
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -33,9 +41,11 @@ function nbcGetResults(p) {
 			key : matrixId,
 			p : projectId
 		}),
-		success : function (data) {
+		success : function (data)
+		{
 			//console.log(data);
 			nbcData = $.parseJSON(data);
+			//console.dir(nbcData);
 			nbcFilterEmergingCharacters();
 			nbcDoResults();
 
@@ -786,3 +796,7 @@ function nbcInit() {
 	*/
 
 }
+
+
+
+// alleen litho

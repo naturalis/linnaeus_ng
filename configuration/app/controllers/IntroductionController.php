@@ -359,7 +359,7 @@ class IntroductionController extends Controller
 
 			$d = array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' =>  $_SESSION['app']['project']['default_language_id'],
+					'language_id' => $this->getDefaultLanguageId()
 				);
 
 			if ($matchStartOnly)
