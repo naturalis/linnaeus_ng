@@ -979,7 +979,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function setCurrentProjectData ($data = null)
+    public function setCurrentProjectData($data = null)
     {
         if ($data == null) {
 
@@ -997,8 +997,8 @@ class Controller extends BaseClass
             }
         }
 
-        foreach ((array) $data as $key => $val) {
-
+        foreach ((array) $data as $key => $val)
+		{
             $_SESSION['app']['project'][$key] = $val;
         }
 
@@ -1014,7 +1014,7 @@ class Controller extends BaseClass
 
 
 
-    public function setProjectLanguages ()
+    public function setProjectLanguages()
     {
         $lp = $this->models->LanguageProject->_get(array(
             'id' => array(
@@ -1023,7 +1023,8 @@ class Controller extends BaseClass
             'order' => 'def_language desc'
         ));
 
-        foreach ((array) $lp as $key => $val) {
+        foreach ((array) $lp as $key => $val)
+		{
 
             $l = $this->models->Language->_get(array(
                 'id' => $val['language_id']
@@ -1035,7 +1036,9 @@ class Controller extends BaseClass
             $lp[$key]['iso3'] = $l['iso3'];
 
             if ($val['def_language'] == 1)
+			{
                 $defaultLanguage = $val['language_id'];
+			}
 
             $list[$val['language_id']] = array(
                 'language' => $l['language'],
@@ -1043,19 +1046,19 @@ class Controller extends BaseClass
             );
         }
 
-        $_SESSION['app']['project']['languages'] = $lp;
+        $_SESSION['app'][$this->spid()]['project']['languages'] = $lp;
 
         if (isset($defaultLanguage))
-            $_SESSION['app']['project']['default_language_id'] = $defaultLanguage;
+            $_SESSION['app'][$this->spid()]['project']['default_language_id'] = $defaultLanguage;
 
         //        if (isset($list)) $_SESSION['app']['project']['languageList'] = $list;
     }
 
 
 
-    public function getProjectLanguages ()
+    public function getProjectLanguages()
     {
-        return isset($_SESSION['app']['project']['languages']) ? $_SESSION['app']['project']['languages'] : null;
+        return isset($_SESSION['app'][$this->spid()]['project']['languages']) ? $_SESSION['app'][$this->spid()]['project']['languages'] : null;
     }
 
 
@@ -1066,68 +1069,68 @@ class Controller extends BaseClass
      * @param      integer    $id    new active project's id
      * @access     public
      */
-    public function setCurrentProjectId ($id)
+    public function setCurrentProjectId($id)
     {
         $_SESSION['app']['project']['id'] = $id;
     }
 
 
 
-    public function didActiveLanguageChange ()
+    public function didActiveLanguageChange()
     {
-        return isset($_SESSION['app']['user']['languageChanged']) ? $_SESSION['app']['user']['languageChanged'] : false;
+        return isset($_SESSION['app'][$this->spid()]['user']['languageChanged']) ? $_SESSION['app'][$this->spid()]['user']['languageChanged'] : false;
     }
 
 
 
-    public function getCurrentLanguageId ()
+    public function getCurrentLanguageId()
     {
-        if (empty($_SESSION['app']['project']['activeLanguageId']))
+        if (empty($_SESSION['app'][$this->spid()]['project']['activeLanguageId']))
             $this->setCurrentLanguageId();
 
-        return $_SESSION['app']['project']['activeLanguageId'];
+        return $_SESSION['app'][$this->spid()]['project']['activeLanguageId'];
     }
 
 
 
-    public function getDefaultLanguageId ()
+    public function getDefaultLanguageId()
     {
-        return isset($_SESSION['app']['project']['default_language_id']) ? $_SESSION['app']['project']['default_language_id'] : null;
+        return isset($_SESSION['app'][$this->spid()]['project']['default_language_id']) ? $_SESSION['app'][$this->spid()]['project']['default_language_id'] : null;
     }
 
 
 
     public function setCurrentLanguageId ($l = null)
     {
-        if ($l) {
-
-            $_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['project']['activeLanguageId'] != $l;
-
-            $_SESSION['app']['project']['activeLanguageId'] = $l;
+        if ($l)
+		{
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $l;
+            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $l;
         }
-        else if ($this->rHasVal('languageId')) {
-
-            $_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['project']['activeLanguageId'] != $this->requestData['languageId'];
-
-            $_SESSION['app']['project']['activeLanguageId'] = $this->requestData['languageId'];
+        else if ($this->rHasVal('languageId'))
+		{
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $this->requestData['languageId'];
+            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->requestData['languageId'];
         }
-        else {
-
-            $_SESSION['app']['user']['languageChanged'] = false;
+        else
+		{
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = false;
         }
 
-        if (!isset($_SESSION['app']['project']['activeLanguageId'])) {
-
-            $_SESSION['app']['project']['activeLanguageId'] = $this->getDefaultLanguageId();
-            $_SESSION['app']['user']['languageChanged'] = true;
+        if (!isset($_SESSION['app'][$this->spid()]['project']['activeLanguageId']))
+		{
+            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->getDefaultLanguageId();
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = true;
         }
 
-        if (!isset($_SESSION['app']['user']['languageChanged']))
-            $_SESSION['app']['user']['languageChanged'] = true;
+        if (!isset($_SESSION['app'][$this->spid()]['user']['languageChanged']))
+		{
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = true;
+		}
 
         unset($this->requestData['languageId']);
 
-        $_SESSION['app']['user']['currentLanguage'] = $_SESSION['app']['project']['activeLanguageId'];
+        $_SESSION['app']['user']['currentLanguage'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'];
     }
 
 
@@ -1138,7 +1141,7 @@ class Controller extends BaseClass
      * @return     string    controller's base name
      * @access     public
      */
-    public function getControllerBaseName ()
+    public function getControllerBaseName()
     {
         return $this->controllerBaseName;
     }
@@ -1151,12 +1154,16 @@ class Controller extends BaseClass
      * @return     integer    active project's id
      * @access     public
      */
-    public function getCurrentProjectId ()
+    public function getCurrentProjectId()
     {
 		if (defined('FIXED_PROJECT_ID'))
+		{
 			return FIXED_PROJECT_ID;
+		}
 		else
+		{
         	return isset($_SESSION['app']['project']['id']) ? $_SESSION['app']['project']['id'] : null;
+		}
     }
 
 
@@ -1191,7 +1198,7 @@ class Controller extends BaseClass
     }
 
 
-    public function rHasVal ($var, $val = null)
+    public function rHasVal($var, $val = null)
     {
         if ($val !== null) {
 
@@ -1210,7 +1217,7 @@ class Controller extends BaseClass
 
 
 
-    public function rHasId ()
+    public function rHasId()
     {
         return $this->rHasVal('id');
     }
@@ -1239,7 +1246,6 @@ class Controller extends BaseClass
 
 	public function getPreferredName($id)
 	{
-
 		$name = $this->models->Names->freeQuery(
 			"select * from %PRE%names _a
 			  left join %PRE%name_types _b
@@ -1253,7 +1259,6 @@ class Controller extends BaseClass
 		);
 
 		return $name[0]['name'];
-
 	}
 
     public function getVariation ($id)
@@ -1400,7 +1405,7 @@ class Controller extends BaseClass
     }
 
 
-    public function getSetting ($name,$substitute=null)
+    public function getSetting($name,$substitute=null)
     {
         $s = $this->models->Settings->_get(
         array(
@@ -1529,7 +1534,7 @@ class Controller extends BaseClass
     }
 
 
-   private function setHybridMarker ($name, $rankId, $isHybrid)
+   private function setHybridMarker($name, $rankId, $isHybrid)
     {
         if ($isHybrid == 0) {
             return $name;
@@ -1556,7 +1561,7 @@ class Controller extends BaseClass
 
 
 
-    public function splashScreen ()
+    public function splashScreen()
     {
 
 		// admin editors that are previewing get no splash
@@ -2227,8 +2232,8 @@ class Controller extends BaseClass
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
         if (isset($this->jsToLoad))
             $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
-        if (isset($_SESSION['app']['project']['languages']))
-            $this->smarty->assign('languages', $_SESSION['app']['project']['languages']);
+        if (isset($_SESSION['app'][$this->spid()]['project']['languages']))
+            $this->smarty->assign('languages', $_SESSION['app'][$this->spid()]['project']['languages']);
 
         $this->smarty->assign('currentLanguageId', $this->getCurrentLanguageId());
         $this->smarty->assign('menu', $this->getMainMenu());
