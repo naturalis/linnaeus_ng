@@ -12,17 +12,8 @@
       {foreach $data as $entry}
         <li id="group{$entry.id}">
             {$entry.sysname}
-            <!--
-            	({if $entry.taxa|@count>0}<a href="#" onclick="$('#taxa{$entry.id}').toggle();return false;">{/if}
-                {$entry.taxa|@count} taxa{if $entry.taxa|@count>0}</a>{/if})
-			-->
             <a class="edit" href="traitgroup.php?id={$entry.id}">edit group</a>
-            <a class="edit" href="traitgroup_traits.php?id={$entry.id}">add trait</a>
-            <!-- div class="group-taxa" id="taxa{$entry.id}">
-            {* foreach $entry.taxa as $v}
-            {$v.taxon} ({$v.rank})<br />
-            {/foreach *}
-            </div -->
+            <a class="edit" href="traitgroup_traits.php?group={$entry.id}">edit traits</a>
 	        {if $entry.children}{menu data=$entry.children level=$level+1}{/if}
         </li>
       {/foreach}
