@@ -79,28 +79,6 @@ class NsrController extends Controller
 
 	}
 
-	public function getProgeny($parent,$level,$family)
-	{
-		$result = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'parent_id' => $parent
-				),
-				'columns' => 'id,parent_id,taxon,'.$level.' as level'
-			)
-		);
-
-		$family[]=$parent;
-
-		foreach((array)$result as $row)
-		{
-			$row['parentage']=$family;
-			$this->tmp[]=$row;
-			$this->getProgeny($row['id'],$level+1,$family);
-		}
-	}
-
 	public function treeGetTop()
 	{
 		/*
@@ -152,63 +130,81 @@ class NsrController extends Controller
 		return $p;
 	}
 	
+	
+	private function storeParentage($p)
+	{
+		if (empty($p['id'])||empty($p['parentage']))
+			return;
+
+		$this->models->TaxonQuickParentage->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $p['id'],
+			'parentage' => implode(' ',$p['parentage'])
+		));
+	}
+	
+	
+	public function getProgeny($parent,$level,$family)
+	{
+		$result = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'parent_id' => $parent
+				),
+				'columns' => 'id,parent_id,taxon,'.$level.' as level'
+			)
+		);
+
+		$family[]=$parent;
+
+		foreach((array)$result as $row)
+		{
+			$this->storeParentage(array('id'=>$row['id'],'parentage'=>$family));
+			$this->getProgeny($row['id'],$level+1,$family);
+		}
+	}
+
 	public function saveTaxonParentage($id=null)
 	{
-		set_time_limit(2400); // RIGHT!
+		set_time_limit(600);
 
 		if (!$this->models->TaxonQuickParentage->getTableExists())
 			return;
-			
+
 		if (empty($id))
 		{
 			$t = $this->treeGetTop();
-	
+
 			if (empty($t))
 				die('no top!?');
 			/*
 			if (count((array)$t)>1)
 				die('multiple tops!?');
 			*/
-	
-			$this->tmp=array();
-	
+
+			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId())); // ??? crashes
+
+			$this->models->TaxonQuickParentage->freeQuery("delete from %PRE%taxon_quick_parentage where  project_id = ".$this->getCurrentProjectId());
+		
+			$this->tmp=0;
 			$this->getProgeny($t,0,array());
-
-			$d=array('project_id' => $this->getCurrentProjectId());
-	
-			$this->models->TaxonQuickParentage->delete($d);
-
-			$i=0;
-			foreach((array)$this->tmp as $key=>$val)
-			{
-				$this->models->TaxonQuickParentage->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $val['id'],
-					'parentage' => implode(' ',$val['parentage'])
-	
-				));
-	
-				$i++;
-			}
-					
+			$i=$this->tmp;
 		}
 		else
 		{
 			$this->tmp=array();
 			$t=$this->getTaxonById($id);
 			$this->getParents($t['parent_id'],0,array());
-			$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
-			$qp=array_pop($this->tmp);
-			$this->models->TaxonQuickParentage->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $id,
-				'parentage' => implode(' ',array_reverse($qp['parentage']))
+			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
+			$this->models->TaxonQuickParentage->freeQuery("
+				delete from %PRE%taxon_quick_parentage where  project_id = ".$this->getCurrentProjectId()." and taxon_id = ".$id
+			);
 
-			));
+
+			$qp=array_pop($this->tmp);
+			$this->storeParentage(array('id'=>$id,'parentage'=>implode(' ',array_reverse($qp['parentage']))));
 			$i=1;
 		}
 
