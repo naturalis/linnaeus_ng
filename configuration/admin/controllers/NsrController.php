@@ -154,6 +154,7 @@ class NsrController extends Controller
 	
 	public function saveTaxonParentage($id=null)
 	{
+		set_time_limit(2400); // RIGHT!
 
 		if (!$this->models->TaxonQuickParentage->getTableExists())
 			return;
