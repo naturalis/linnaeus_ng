@@ -98,7 +98,7 @@ class RdfController extends Controller
 				PREDICATE_HOMONYM=>'homoniem',
 				PREDICATE_BASIONYM=>'basioniem',
 				PREDICATE_SYNONYM=>'synoniem',
-				PREDICATE_SYNONYM_SL=>'synoniem',
+				PREDICATE_SYNONYM_SL=>'synoniem sensu lato',
 				PREDICATE_MISSPELLED_NAME=>'fout gespelde naam',
 				PREDICATE_INVALID_NAME=>'ongeldige naam',
 				PREDICATE_ALTERNATIVE_NAME=>'alternatieve %se naam'
@@ -109,7 +109,7 @@ class RdfController extends Controller
 				PREDICATE_HOMONYM=>'homonym',
 				PREDICATE_BASIONYM=>'basionym',
 				PREDICATE_SYNONYM=>'synonym',
-				PREDICATE_SYNONYM_SL=>'synonym',
+				PREDICATE_SYNONYM_SL=>'synonym sensu lato',
 				PREDICATE_MISSPELLED_NAME=>'misspelled name',
 				PREDICATE_INVALID_NAME=>'invalid name',
 				PREDICATE_ALTERNATIVE_NAME=>'alternative %s name'
