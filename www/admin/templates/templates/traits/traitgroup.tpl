@@ -136,7 +136,8 @@ function deleteGroup()
     </form>
 
     <p>
-    	<a href="traitgroups.php">back</a>
+    	<a href="traitgroups.php">back</a><br />
+    	<a href="index.php">index</a>
     </p>
 
 </div>
