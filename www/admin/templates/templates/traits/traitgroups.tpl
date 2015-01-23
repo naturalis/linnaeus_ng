@@ -10,10 +10,10 @@
     {function menu level=0}
       <ul class="level{$level} sortable">
       {foreach $data as $entry}
-        <li id="group{$entry.id}">
+        <li id="sortable{$entry.id}">
             {$entry.sysname}
-            <a class="edit" href="traitgroup.php?id={$entry.id}">edit group</a>
-            <a class="edit" href="traitgroup_traits.php?group={$entry.id}">edit traits</a>
+            <a class="edit" href="traitgroup.php?id={$entry.id}">edit</a>
+            <a class="edit" href="traitgroup_traits.php?group={$entry.id}">traits</a>
 	        {if $entry.children}{menu data=$entry.children level=$level+1}{/if}
         </li>
       {/foreach}
@@ -24,7 +24,7 @@
 	{if $groups|@count==0}(none){/if}
     </p>
     <p>
-    	<input type="button" value="save group order" onclick="doSaveGroupOrder()" />
+    	<input type="button" value="save group order" onclick="doSaveOrder()" />
     </p>
     <p>
     	<a href="traitgroup.php">create new traitgroup</a><br />
@@ -38,6 +38,7 @@ $(document).ready(function()
 	$('.sortable').nestedSortable({
 		items: 'li',
 		listType: 'ul',
+		disableParentChange : true
 	});
 	
 	$('#page-block-messages').fadeOut(2000);

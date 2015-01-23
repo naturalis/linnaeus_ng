@@ -1,12 +1,5 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-.datatype-comment {
-	color:#999;
-	font-size:0.8em;
-}
-</style>
-
 <div id="page-main">
 
 	<p>
