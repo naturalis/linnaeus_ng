@@ -1,80 +1,23 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-tr {
-	vertical-align:top;
-}
-th {
-	text-align:right;
-	font-weight:normal;
-}
-input[type=text].normal {
-	width:200px;
-}
-input[type=text].small {
-	width:50px;
-}
-</style>
-<script>
-
-var name0Focused=false;
-
-function duplicateSysLabel()
-{
-	if ($('#sysname').val().length>0 && !name0Focused)
-	{
-		$('#name').val($('#sysname').val());
-	}
-}
-
-function setName0Focused()
-{
-	name0Focused=true;
-}
-
-function checkAndSaveForm()
-{
-	var buffer=Array();
-
-	$(':input').each(function()
-	{
-		if ($(this).attr('mandatory')=='mandatory' && $(this).val().length<1)
-		{
-			var id=$(this).attr('id');
-			var label=$("label[for='"+id+"']").html();
-			label=label.length<1 ? id : label;
-			buffer.push(label);
-		}
-	});
-	
-	if (buffer.length>0)
-	{
-		alert("Values are missing for the following mandatory field(s):\n"+buffer.join("\n"));
-		return false;
-	}
-	else
-	{
-		if ($('#project_type_id option:selected').attr('sysname').indexOf('date')!==0)
-		{
-			$('#date_format_id').remove();
-		}
-		$('#theForm').submit();
-	}
-		
-}
-
-</script>
-
-
 <div id="page-main">
 
 	<p>
-
-    <h3>{t _s1=$group.name}%s: new trait{/t}</h3>
+        <h3>
+        {if $trait}
+        {t _s1=$group.name _s2=$trait.sysname}%s: %s{/t}
+        {else}
+        {t _s1=$group.name}%s: new trait{/t}
+        {/if}
+    </h3>
 
     <form id="theForm" method="post">
     <input name="trait_group_id" type="hidden" value="{$group.id}">
-    <input type="hidden" name="action" value="save">
+    <input type="hidden" name="rnd" value="{$rnd}" />
+    {if $trait}
+    <input name="id" type="hidden" value="{$trait.id}">
+    {/if}
+    <input type="hidden" name="action" id="action" value="save">
 
     <table>
         <tr>
@@ -88,6 +31,9 @@ function checkAndSaveForm()
                     $('#project_type_id_description').html($('#project_type_id option:selected').attr('desc'));
                     $('.date-format').toggle($('#project_type_id option:selected').attr('sysname').indexOf('date')===0);
                     $('.allow-select-multiple').toggle($('#project_type_id option:selected').attr('allow_select_multiple')==1);
+                    $('.allow-values').toggle($('#project_type_id option:selected').attr('allow_values')==1);
+                    $('.allow-max-length').toggle($('#project_type_id option:selected').attr('allow_max_length')==1);
+                    $('.allow-unit').toggle($('#project_type_id option:selected').attr('allow_unit')==1);
                     ">
             	{foreach $datatypes as $datatype}
                 {if $datatype.project_type_id}
@@ -95,7 +41,13 @@ function checkAndSaveForm()
                 	value="{$datatype.project_type_id}" 
                     desc="{$datatype.description|@escape}"
                     allow_select_multiple="{$datatype.allow_select_multiple}" 
-                    sysname="{$datatype.sysname}">{$datatype.name}</option>
+                    allow_values="{$datatype.allow_values}" 
+                    allow_max_length="{$datatype.allow_max_length}" 
+                    allow_unit="{$datatype.allow_unit}" 
+                    sysname="{$datatype.sysname}"
+                    {if $trait.project_type_id==$datatype.project_type_id}selected="selected"{/if}>
+                    	{$datatype.name}
+                    </option>
 				{/if}
             	{/foreach}
             </select>
@@ -110,33 +62,36 @@ function checkAndSaveForm()
                     id="date_format_id" 
                     onchange="$('#project_type_id_description').html($('#project_type_id option:selected').attr('desc'));">
                     {foreach $dateformats as $dateformat}
-                    <option value="{$dateformat.id}">{$dateformat.sysname} ({$dateformat.format})</option>
+                    <option value="{$dateformat.id}" {if $trait.date_format_id==$dateformat.id}selected="selected"{/if}>
+                    	{$dateformat.sysname} ({$dateformat.format})
+					</option>
                     {/foreach}
                 </select>
             </td>
         </tr>
        
 		{function text}
-		<tr>
+		<tr{if $data.row_class} class="{$data.row_class}"{/if}>
         	<th><label for="{$data.name}">{t}{$data.label}{/t}</label>:</th>
             <td>
             	{if $data.class=='textarea'}
-                <textarea value="" name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} ></textarea>
+                <textarea value="" name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} >{$data.value}</textarea>
                 {else}
-	            <input class="{$data.class}" type="text" value="" name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} />
+	            <input class="{$data.class}" type="text" value="{$data.value}" name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} />
                 {/if}
                 {if $data.mandatory} *{/if}</td>
 		</tr>
         {/function}
 
 		{$array = [
-            ['label'=>'system name','name'=>'sysname','mandatory'=>true,'class'=>'normal'],
-            ['label'=>'name','name'=>'name','mandatory'=>true,'class'=>'normal'],
-            ['label'=>'code','name'=>'code','class'=>'small'],
-            ['label'=>'description','name'=>'description','class'=>'textarea'],
-            ['label'=>'unit','name'=>'unit','class'=>'small']
+            ['label'=>'system name','name'=>'sysname','mandatory'=>true,'class'=>'normal','value'=>$trait.sysname],
+            ['label'=>'name','name'=>'name','mandatory'=>true,'class'=>'normal','value'=>$trait.name],
+            ['label'=>'code','name'=>'code','class'=>'small','value'=>$trait.code],
+            ['label'=>'description','name'=>'description','class'=>'textarea','value'=>$trait.description],
+            ['label'=>'max. length','name'=>'max_length','class'=>'small','value'=>$trait.max_length,'row_class'=>'allow-max-length'],
+            ['label'=>'unit','name'=>'unit','class'=>'small','value'=>$trait.unit,'row_class'=>'allow-unit']
 		]}
-        
+       
         {foreach $array as $v}
         {text data=$v}
         {/foreach}
@@ -145,21 +100,21 @@ function checkAndSaveForm()
         <tr{if $data.row_class} class="{$data.row_class}"{/if}>
         	<th>{$data.label}:</th>
             <td>
-            	<label><input type="radio" value="y" name="{$data.name}" />{t}yes{/t}</label>
-                <label><input type="radio" value="n" name="{$data.name}" checked="checked" />{t}no{/t}</label>
+            	<label><input type="radio" value="y" name="{$data.name}" {if $data.value==1}checked="checked"{/if} />{t}yes{/t}</label>
+                <label><input type="radio" value="n" name="{$data.name}" {if $data.value!=1}checked="checked"{/if} />{t}no{/t}</label>
 			</td>
 		</tr>
         {/function}
         
 		{$array = [
-            ['label'=>'can be null','name'=>'can_be_null'],
-            ['label'=>'can select multiple','name'=>'can_select_multiple','row_class'=>'allow-select-multiple'],
-            ['label'=>'can include comment','name'=>'can_include_comment'],
-            ['label'=>'show index numbers','name'=>'show_index_numbers']
+            ['label'=>'can be null','name'=>'can_be_null','value'=>$trait.can_be_null],
+            ['label'=>'can select multiple','name'=>'can_select_multiple','row_class'=>'allow-select-multiple','value'=>$trait.can_select_multiple],
+            ['label'=>'can include comment','name'=>'can_include_comment','value'=>$trait.can_include_comment],
+            ['label'=>'show index numbers','name'=>'show_index_numbers','value'=>$trait.show_index_numbers]
 		]}
         
         {foreach $array as $v}
-        {boolean data=$v}
+        	{boolean data=$v}
         {/foreach}
     </table>
     
@@ -167,18 +122,26 @@ function checkAndSaveForm()
     </p>
     <p>
     	<input type="button" value="save" onclick="checkAndSaveForm();" />
+	{if $trait}&nbsp;<input type="button" value="delete" onclick="deleteItem();" />{/if}
+
     </p>
     <p>
     	<a href="traitgroup_traits.php?group={$group.id}">back</a><br />
     	<a href="index.php">index</a><br />
     </p>
+    
+    maybe add max. items as well?
+    
+	explanation: max length is max of prefined values OR the user-specified value when free value
+
 </div>
+
 
 
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	$('#sysname').bind('keyup',function() { duplicateSysLabel(); } );
+	{if !$trait} $('#sysname').bind('keyup',function() { duplicateSysLabel(); } );{/if}
 	$('#name').bind('focus',function() { setName0Focused(); } );
 	$('#page-block-messages').fadeOut(2000);
 	$('#project_type_id').trigger('change'); 

@@ -9,14 +9,22 @@
 
         <ul class="level{$level} sortable">
             {foreach $group.traits as $trait}
-            <li>{$trait.sysname} ({$trait.type_sysname}) <a class="edit" href="traitgroup_trait.php?id={$trait.id}">edit</a></li>
+            <li id="sortable{$trait.id}">{$trait.sysname} ({$trait.type_sysname})
+            	<a class="edit" href="traitgroup_trait.php?id={$trait.id}">edit</a>
+                {if $trait.type_allow_values==1}
+            	<a class="edit" href="traitgroup_trait_values.php?trait={$trait.id}">values ({$trait.value_count})</a>
+                {/if}
+			</li>
             {/foreach}
 		</ul>
-    	<a href="traitgroup_trait.php?group={$group.id}">create new trait</a><br />
+
+        {if $group.traits|@count==0}<p>(none)</p>{/if}
+        
+    	<a class="edit" style="margin-left:0" href="traitgroup_trait.php?group={$group.id}">create new trait</a><br />
 
     </p>
     <p>
-    	<input type="button" value="save trait order" onclick="doSaveGroupOrder()" />
+    	<input type="button" value="save trait order" onclick="doSaveOrder()" />
     </p>
     <p>
     	<a href="traitgroups.php">back</a><br />
@@ -31,9 +39,9 @@ $(document).ready(function()
 	$('.sortable').nestedSortable({
 		items: 'li',
 		listType: 'ul',
-		disableNesting: true
+		disableParentChange : true
 	});
-	
+
 	$('#page-block-messages').fadeOut(2000);
 });
 </script>

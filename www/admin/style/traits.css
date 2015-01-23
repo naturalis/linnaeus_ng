@@ -1,0 +1,36 @@
+tr {
+	vertical-align:top;
+}
+th {
+	text-align:right;
+	font-weight:normal;
+}
+input[type=text].normal {
+	width:200px;
+}
+input[type=text].small {
+	width:50px;
+}
+input, textarea {
+	font-family:inherit;
+	font-size:12px;
+}
+textarea {
+	width:300px;
+	height:100px;
+}
+.datatype-comment, .comment {
+	color:#888;
+	font-size:0.9em;
+}
+.datatype-comment {
+	font-size:0.8em;
+}
+a.edit {
+	color:#03F;
+	font-size:0.8em;
+	margin-left:5px;
+}
+.sortable {
+	cursor:move;
+}

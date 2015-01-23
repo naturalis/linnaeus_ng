@@ -1,73 +1,5 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-th {
-	text-align:right;
-}
-tr {
-	vertical-align:top;
-}
-input, textarea {
-	font-family:inherit;
-	font-size:12px;
-}
-textarea {
-	width:300px;
-	height:100px;
-}
-
-</style>
-
-<script>
-
-var name0Focused=false;
-
-function duplicateSysLabel()
-{
-	if ($('#sysname').val().length>0 && !name0Focused)
-	{
-		$('#names-0').val($('#sysname').val());
-	}
-}
-
-function setName0Focused()
-{
-	name0Focused=true;
-}
-
-function checkFormMandatory(form)
-{
-	var messages=[];
-	for(var i=0;i<form.elements.length;i++)
-	{
-		var ele=$(form.elements[i]);
-		if (ele.attr('mandatory')=='mandatory' && ele.val().length==0)
-		{
-			var label=$("label[for='"+ele.attr('id')+"']").html();
-			messages.push(label);
-		}
-	}
-	
-	if (messages.length>0)
-	{
-		alert(_("Please fill out all required fields:\n")+messages.join("\n"))
-	}
-	
-	return messages.length==0;
-}
-
-function deleteGroup()
-{
-	if (confirm(_('Are you sure?')))
-	{
-		$('#action').val('delete');
-		$('#theForm').submit();
-	}
-}
-
-
-</script>
-
 <div id="page-main">
 	<h3>{if $newgroup}new group{else}edit group {$group.sysname}{/if}</h3>
     
@@ -129,7 +61,7 @@ function deleteGroup()
     
     <p>
     <input type="submit" value="save" />
-	{if !$newgroup}&nbsp;<input type="button" value="delete" onclick="deleteGroup();" />{/if}
+	{if !$newgroup}&nbsp;<input type="button" value="delete" onclick="deleteItem();" />{/if}
     </p>
 
     
@@ -144,11 +76,11 @@ function deleteGroup()
 
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	{if $newgroup}$('#sysname').bind('keyup',function() { duplicateSysLabel(); } );{/if}
 	$('#names-0').bind('focus',function() { setName0Focused(); } );
-	$('#theForm').bind('submit',function() { return checkFormMandatory(this); } );
+	$('#theForm').bind('submit',function() { return checkAndSaveForm(this); } );
 
 });
 </script>
