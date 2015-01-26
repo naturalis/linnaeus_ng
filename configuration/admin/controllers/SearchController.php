@@ -167,7 +167,7 @@ class SearchController extends Controller
 		$this->redirect('index.php');
 	}
 
-	/*
+
     public function indexAction ()
     {
 
@@ -223,8 +223,6 @@ class SearchController extends Controller
         $this->printPage();
   
     }
-	*/
-
 
 
 
