@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `traits_values` (
   `project_id` int(11) NOT NULL,
   `trait_id` int(11) NOT NULL,
   `string_value` varchar(255),  
-  `numerical_value_start` FLOAT(12,5),
+  `numerical_value` FLOAT(12,5),
   `numerical_value_end` FLOAT(12,5),
   `date_start` date,
   `date_end` date,
@@ -302,6 +302,7 @@ class TraitsController extends Controller
     {
 		$this->smarty->assign('defaultMaxLengthStringValue',$this->_defaultMaxLengthStringValue);
 		$this->smarty->assign('defaultMaxLengthIntegerValue',$this->_defaultMaxLengthIntegerValue);
+		$this->smarty->assign('defaultMaxLengthFloatValue',$this->_defaultMaxLengthFloatValue);
     }
 
     public function indexAction()
@@ -472,6 +473,7 @@ class TraitsController extends Controller
 
     public function traitgroupTraitValuesAction()
     {
+
 		$this->checkAuthorisation();
 		
 		if (!$this->rHasId() && !$this->rHasVar('trait'))
@@ -496,6 +498,28 @@ class TraitsController extends Controller
 		$this->smarty->assign('trait',$trait);
 		$this->printPage();
     }
+	
+    public function ajaxInterfaceAction()
+    {
+		$this->checkAuthorisation();
+
+		if ($this->rHasVal('action','verifydate'))
+		{
+			if (!$this->rGetVal('date') || !$this->rGetVal('format'))
+			{
+				$r=!$this->rGetVal('date') ? 'missing date' : 'missing format';
+			}
+			else
+			{
+				$r=$this->verifyDate($this->rGetVal('date'),$this->rGetVal('format'));
+			}
+
+		}
+		
+		$this->smarty->assign('returnText',json_encode($r));
+		$this->printPage();
+    }
+	
 
 
 
@@ -826,6 +850,7 @@ class TraitsController extends Controller
 				_d.translation as description,
 				_e.sysname as date_format_name,
 				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
 				_g.sysname as type_sysname,
 				_g.allow_values as type_allow_values,
 				_g.allow_select_multiple as type_allow_select_multiple,
@@ -1029,6 +1054,7 @@ class TraitsController extends Controller
 				_d.translation as description,
 				_e.sysname as date_format_name,
 				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
 				_g.sysname as type_sysname
 			from
 				%PRE%traits_traits _a
@@ -1073,6 +1099,12 @@ class TraitsController extends Controller
 		
 		if (!empty($r))
 		{
+			
+			if (strpos($r['type_sysname'],'float')===0)
+			{
+				$r['max_length']=round($r['max_length'],0,PHP_ROUND_HALF_DOWN);
+			}
+
 			$r['values']=$this->getTraitgroupTraitValues(array('trait'=>$id));
 		}
 
@@ -1139,7 +1171,8 @@ class TraitsController extends Controller
 		$r=$this->models->TraitsValues->freeQuery("
 			select
 				_a.*,
-				_g.allow_fractures
+				_g.allow_fractures,
+				_e.format as date_format_format
 
 			from 
 				%PRE%traits_values _a
@@ -1148,6 +1181,10 @@ class TraitsController extends Controller
 				%PRE%traits_traits _b
 				on _a.project_id=_b.project_id
 				and _a.trait_id=_b.id
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _b.date_format_id=_e.id
 
 			left join 
 				%PRE%traits_project_types _f
@@ -1168,10 +1205,19 @@ class TraitsController extends Controller
 		
 		foreach((array)$r as $key=>$val)
 		{
-			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value_start']) || !empty($val['numerical_value_end'])))
+			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
 			{
-				$r[$key]['numerical_value_start']=round($r[$key]['numerical_value_start'],0,PHP_ROUND_HALF_DOWN);
-				$r[$key]['numerical_value_end']=round($r[$key]['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
+				if (!empty($val['numerical_value']))
+					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
+				if (!empty($val['numerical_value_end']))
+					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
+			} else
+			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
+			{
+				if (!empty($val['date']))
+					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
+				if (!empty($val['date_end']))
+					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
 			}
 		}
 		
@@ -1194,24 +1240,6 @@ class TraitsController extends Controller
 		
 		$trait=$this->getTraitgroupTrait($trait);
 
-		/*
-		
-		$d=array(
-			'project_id'=>$this->getCurrentProjectId(),
-			'trait_id'=>$trait_id,
-			'string_value'=>$string_value,
-			'numerical_value_start'=>$numerical_value_start,
-			'numerical_value_end'=>$numerical_value_end,
-			'date_start'=>$date_start,
-			'date_end'=>$date_end,
-			'is_lower_limit'=>$is_lower_limit,
-			'is_upper_limit'=>$is_upper_limit,
-			'lower_limit_label'=>$lower_limit_label,
-			'upper_limit_label'=>$upper_limit_label,
-			'show_order'=>$key
-		);
-		
-		*/
 		$base=array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'trait_id'=>$trait['id']
@@ -1226,7 +1254,8 @@ class TraitsController extends Controller
 
 			foreach((array)$values as $key=>$val)
 			{
-				$d=$base+array(
+				$d=$base+
+					array(
 						'string_value'=>$val,
 						'show_order'=>$key
 					);
@@ -1248,7 +1277,10 @@ class TraitsController extends Controller
 
 		}
 		else
-		if ($trait['type_sysname']=='intlist' || $trait['type_sysname']=='intlistfree')
+		if (
+			$trait['type_sysname']=='intlist' || $trait['type_sysname']=='intlistfree' ||
+			$trait['type_sysname']=='floatlist' || $trait['type_sysname']=='floatlistfree'
+			)
 		{
 			$this->models->TraitsValues->delete($base);
 
@@ -1256,8 +1288,9 @@ class TraitsController extends Controller
 
 			foreach((array)$values as $key=>$val)
 			{
-				$d=$base+array(
-						'numerical_value_start'=>$val,
+				$d=$base+
+					array(
+						'numerical_value'=>$val,
 						'show_order'=>$key
 					);
 				
@@ -1277,72 +1310,92 @@ class TraitsController extends Controller
 			$this->addMessage(sprintf($this->translate('%s values saved'),$saved));
 
 		}
-
-
-return;
-
-	
-		$d=array(
-				'project_id' => $this->getCurrentProjectId(),
-				'trait_group_id' => $trait_group_id,
-				'project_type_id' => $project_type_id,
-				'date_format_id' => $date_format_id,
-				'sysname' => trim($sysname),
-				'unit' => $unit,
-				'can_select_multiple' => ($can_select_multiple=='y' ? 1 : 0),
-				'can_include_comment' => ($can_include_comment=='y' ? 1 : 0),
-				'can_be_null' => ($can_be_null=='y' ? 1 : 0),
-				'show_index_numbers' => ($show_index_numbers=='y' ? 1 : 0),
-				'show_order' => $show_order,
-				'max_length' => $max_length
-			);
-
-		if (!empty($id)) $d['id']=$id;
-
-		$d=$this->models->TraitsTraits->save($d);
-
-		if ($d)
+		else
+		if ($trait['type_sysname']=='datelist' || $trait['type_sysname']=='datelistfree')
 		{
-			if (empty($id))
+			$this->models->TraitsValues->delete($base);
+
+			$saved=0;
+
+			foreach((array)$values as $key=>$val)
 			{
-				$id=$this->models->TraitsTraits->getNewId();
+				$r=date_parse_from_format($trait['date_format_format'],$val);
+				
+				if ($r['error_count']==0)
+				{
+					/*
+						we want to be able to do:
+						  date_format(date_create($row['date']),'Y');
+						and since
+						  date_format(date_create('1996-00-00'),'Y')
+						outputs "1995" (1995-11-30, even!), we default empty months and
+						days to 01 rather than 00 to avoid unpleasentness. the distinction
+						between '1996-01-01' equalling 'january 1st 1996' or '1996' (or
+						'january 1996') is made based upon te chosen date format of the
+						trait (Y, Y-m-d or Y-m).
+
+						column is `date` so the time parts are somewhat pointless
+					*/
+					$d=$base+
+						array(
+							'date'=>
+								(!empty($r['year']) ? $r['year'] : '0000')."-".
+								(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
+								(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
+								(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
+								(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
+								(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00'),
+							'show_order'=>$key
+						);
+
+					$r=$this->models->TraitsValues->save($d);
+				}
+				else
+				{
+					$r=false;
+				}
+				
+				
+				if (!$r)
+				{
+					$this->addError(sprintf($this->translate('Value %s not saved'),$val));
+				}
+				else
+				{
+					$saved++;
+				}
+
 			}
 			
-			if (!empty($name))
-			{
-				$nId=$this->saveTextTranslation($name,$this->getDefaultProjectLanguage());
-				$this->models->TraitsTraits->update(array('name_tid'=>$nId),array('id'=>$id));
-			}
+			$this->addMessage(sprintf($this->translate('%s values saved'),$saved));
 
-			if (!empty($code))
-			{
-				$cId=$this->saveTextTranslation($code,$this->getDefaultProjectLanguage());
-				$this->models->TraitsTraits->update(array('code_tid'=>$cId),array('id'=>$id));
-			}
+		}
 
-			if (!empty($description))
-			{
-				$dId=$this->saveTextTranslation($description,$this->getDefaultProjectLanguage());
-				$this->models->TraitsTraits->update(array('description_tid'=>$dId),array('id'=>$id));
-			}
 
+	}
+	
+	private function verifyDate($date,$format)
+	{
+		$r=date_parse_from_format($format,$date);
+
+		if ($r['error_count']==0)
+		{
 			return true;
 		}
-		else 
+		else
 		{
-			return false;
+			return implode("\n",$r['errors']);
 		}
-			
+	}
+
+	private function formatDbDate($date,$format)
+	{
+		return date_format(date_create($date),$format);
 	}
 
 
 
-
-
-
-
-
-
-
 }
+
+
 

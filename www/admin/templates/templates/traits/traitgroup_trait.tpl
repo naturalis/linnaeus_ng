@@ -63,7 +63,7 @@
                     onchange="$('#project_type_id_description').html($('#project_type_id option:selected').attr('desc'));">
                     {foreach $dateformats as $dateformat}
                     <option value="{$dateformat.id}" {if $trait.date_format_id==$dateformat.id}selected="selected"{/if}>
-                    	{$dateformat.sysname} ({$dateformat.format})
+                    	{$dateformat.sysname} ({$dateformat.format_hr})
 					</option>
                     {/foreach}
                 </select>
