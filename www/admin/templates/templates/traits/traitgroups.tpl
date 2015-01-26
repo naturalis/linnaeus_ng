@@ -28,6 +28,7 @@
     </p>
     <p>
     	<a href="traitgroup.php">create new traitgroup</a><br />
+    	<a href="index.php">index</a>
     </p>
 </div>
 

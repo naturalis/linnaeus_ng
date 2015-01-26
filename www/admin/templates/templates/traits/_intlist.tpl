@@ -59,7 +59,7 @@ function checkTraitValue(v)
 $(document).ready(function()
 {
 	{foreach from=$trait.values item=v}
-	doAddTraitValue('{$v.numerical_value_start|@escape}');
+	doAddTraitValue('{$v.numerical_value|@escape}');
 	{/foreach}
 
 	traitValuesInitialise();

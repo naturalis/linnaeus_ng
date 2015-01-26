@@ -18,12 +18,12 @@
         intlistfree		->	_intlist.tpl
         intfree			->	(has no values)
         intfreelimit
-        floatlist
-        floatlistfree
+        floatlist		->	_floatlist.tpl
+        floatlistfree	->	_floatlist.tpl
         floatfree		->	(has no values)
         floatfreelimit
-        datelist
-        datelistfree
+        datelist		->	_datelist.tpl
+        datelistfree	->	_datelist.tpl
         datefree		->	(has no values)
         datefreelimit
         

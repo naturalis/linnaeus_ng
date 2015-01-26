@@ -117,7 +117,7 @@ function doAddTraitValue(v)
 	valuelist.push(v);
 }
 
-function addTraitValue()
+function addTraitValue(checkresult)
 {
 	var v=$('#newvalue').val();
 
@@ -127,9 +127,17 @@ function addTraitValue()
 		return;
 	}
 
-	if (typeof checkTraitValue=="function")
+	if (checkresult || typeof checkTraitValue=="function")
 	{
-		var r=checkTraitValue(v);
+		if (checkresult)
+		{
+			var r=checkresult;
+		}
+		else
+		{
+			var r=checkTraitValue(v);
+		}
+		
 		if (r.result!=true)
 		{
 			if (r.remarks.length>0)
