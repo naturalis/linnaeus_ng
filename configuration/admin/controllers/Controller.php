@@ -2855,17 +2855,24 @@ class Controller extends BaseClass
 
         $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
 
-        if (isset($_SESSION['admin']['user']) && !$_SESSION['admin']['user']['_said_welcome']) {
+        if (isset($_SESSION['admin']['user']) && !$_SESSION['admin']['user']['_said_welcome'])
+		{
 
-            $msg = sprintf(($_SESSION['admin']['user']['logins'] <= 1 ? $this->translate('Welcome, %s.') : $this->translate('Welcome back, %s.')), $_SESSION['admin']['user']['first_name'] . ' ' . $_SESSION['admin']['user']['last_name']);
+            $msg=
+				sprintf(($_SESSION['admin']['user']['logins'] <= 1 ? 
+					$this->translate('Welcome, %s.') : 
+					$this->translate('Welcome back, %s.')), 
+				$_SESSION['admin']['user']['first_name'] . ' ' . $_SESSION['admin']['user']['last_name']);
 
             $this->smarty->assign('welcomeMessage', $msg);
 
             $_SESSION['admin']['user']['_said_welcome'] = true;
         }
 
-		if (isset($_SESSION['admin']['user']['search']) && $_SESSION['admin']['user']['search']['results']['count']>0)
+		if (isset($_SESSION['admin']['user']['search']['results']) && $_SESSION['admin']['user']['search']['results']['count']>0)
+		{
             $this->smarty->assign('userSearch',$_SESSION['admin']['user']['search']);
+		}
 
     }
 
