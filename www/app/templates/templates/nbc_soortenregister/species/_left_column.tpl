@@ -84,7 +84,10 @@
 			<tr><td>
 				{'&nbsp;'|str_repeat:($buffercount+4)}
 				<span class="classification-connector"></span>
-				<span class="classification-name smaller"><a href="?id={$v.id}">{$v.name|replace:$lastname:''}</a></span>
+                <span class="classification-name smaller"><a href="?id={$v.id}">
+                    {if $v.rank_id >= $smarty.const.SPECIES_RANK_ID}
+                    {$v.name|replace:$lastname:''}{else}{$v.name}{/if}
+                </a></span>
 				<span class="classification-rank">[{$v.rank_label}]</span>
 				{if $v.species_count.total>0}
 				<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
