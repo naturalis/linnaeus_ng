@@ -90,7 +90,7 @@ $(document).ready(function()
 			}),
 			success : function (data) {
 				var data=$.parseJSON(data)
-				console.dir(data);
+				//console.dir(data);
 				setTotalImageCount(data.count);
 				setImageBatch(data.data);
 				setMoreImagesButton(data.count);

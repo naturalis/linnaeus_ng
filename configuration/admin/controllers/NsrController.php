@@ -63,7 +63,7 @@ class NsrController extends Controller
 		if (is_null($id))
 			return;
 			
-		$this->saveTaxonParentage($id);
+		//$this->saveTaxonParentage($id);
 
 		$d=$this->models->TaxonQuickParentage->freeQuery("
 			select
