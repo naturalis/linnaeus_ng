@@ -34,6 +34,7 @@
                     $('.allow-values').toggle($('#project_type_id option:selected').attr('allow_values')==1);
                     $('.allow-max-length').toggle($('#project_type_id option:selected').attr('allow_max_length')==1);
                     $('.allow-unit').toggle($('#project_type_id option:selected').attr('allow_unit')==1);
+                    $('.allow-ranges').toggle($('#project_type_id option:selected').attr('allow_ranges')==1);
                     ">
             	{foreach $datatypes as $datatype}
                 {if $datatype.project_type_id}
@@ -44,6 +45,7 @@
                     allow_values="{$datatype.allow_values}" 
                     allow_max_length="{$datatype.allow_max_length}" 
                     allow_unit="{$datatype.allow_unit}" 
+                    allow_ranges="{$datatype.allow_ranges}" 
                     sysname="{$datatype.sysname}"
                     {if $trait.project_type_id==$datatype.project_type_id}selected="selected"{/if}>
                     	{$datatype.name}
@@ -109,6 +111,7 @@
 		{$array = [
             ['label'=>'can be null','name'=>'can_be_null','value'=>$trait.can_be_null],
             ['label'=>'can select multiple','name'=>'can_select_multiple','row_class'=>'allow-select-multiple','value'=>$trait.can_select_multiple],
+            ['label'=>'can have range','name'=>'can_have_range','value'=>$trait.can_have_range,'row_class'=>'allow-ranges'],
             ['label'=>'can include comment','name'=>'can_include_comment','value'=>$trait.can_include_comment],
             ['label'=>'show index numbers','name'=>'show_index_numbers','value'=>$trait.show_index_numbers]
 		]}
