@@ -10,6 +10,7 @@ class SearchControllerNSR extends SearchController
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
 
+
 	public $csvExportSettings=array(
 		'field-sep'=>',',
 		'field-enclose'=>'"',
@@ -1327,7 +1328,11 @@ class SearchControllerNSR extends SearchController
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
+
+		//http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
+		echo chr(239).chr(187).chr(191);
 	}
+
 
 
 }
