@@ -257,11 +257,12 @@ class TraitsController extends Controller
 
 	private $_lookupListMaxResults=99999;
 	
-	private $_defaultMaxLengthStringValue=255;
-	private $_defaultMaxLengthIntegerValue=12;
-	private $_defaultMaxLengthFloatValue=17;
+	public $_defaultMaxLengthStringValue=1000;
+	public $_defaultMaxLengthIntegerValue=12;
+	public $_defaultMaxLengthFloatValue=17;
 
     public $usedModels = array(
+		'traits_settings',
 		'traits_groups',
 		'traits_types',
 		'traits_project_types',
@@ -352,7 +353,7 @@ class TraitsController extends Controller
 		$this->printPage();
     }
 
-    public function traitgroupAction ()
+    public function traitgroupAction()
     {
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Trait group'));
@@ -499,6 +500,199 @@ class TraitsController extends Controller
 		$this->printPage();
     }
 	
+	public function getTraitgroups($p=null)
+	{
+		$parent=isset($p['parent']) ? $p['parent'] : null;
+		$level=isset($p['level']) ? $p['level'] : 0;
+		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
+		
+		$g=$this->models->TraitsGroups->freeQuery("
+			select
+				_a.*,
+				_b.translation as name,
+				_c.translation as description
+			from
+				%PRE%traits_groups _a
+				
+			left join 
+				%PRE%text_translations _b
+				on _a.project_id=_b.project_id
+				and _a.name_tid=_b.id
+				and _b.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%text_translations _c
+				on _a.project_id=_c.project_id
+				and _a.description_tid=_c.id
+				and _c.language_id=". $this->getDefaultProjectLanguage() ."
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
+				order by _a.show_order, _a.sysname
+		");
+		
+		foreach((array)$g as $key=>$val)
+		{
+			$g[$key]['level']=$level;	
+			//$g[$key]['taxa']=$this->getTaxongroupTaxa($val['id']);
+			if (!is_null($stopLevel) && $stopLevel<=$level)
+			{
+				continue;
+			}
+			$g[$key]['children']=$this->getTraitgroups(array('parent'=>$val['id'],'level'=>$level+1,'stop_level'=>$stopLevel));
+		}
+		
+		return $g;
+	}
+
+	public function getTraitgroupTraits($group)
+	{
+		if (empty($group)) return;
+		
+		$r=$this->models->TraitsTraits->freeQuery("
+			select
+				_a.*,
+				_b.translation as name,
+				_c.translation as code,
+				_d.translation as description,
+				_e.sysname as date_format_name,
+				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
+				_g.sysname as type_sysname,
+				_g.allow_values as type_allow_values,
+				_g.allow_select_multiple as type_allow_select_multiple,
+				_g.allow_max_length as type_allow_max_length,
+				_g.allow_unit as type_allow_unit,
+				count(_v.id) as value_count
+
+			from
+				%PRE%traits_traits _a
+				
+			left join 
+				%PRE%text_translations _b
+				on _a.project_id=_b.project_id
+				and _a.name_tid=_b.id
+				and _b.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%text_translations _c
+				on _a.project_id=_c.project_id
+				and _a.code_tid=_c.id
+				and _c.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%text_translations _d
+				on _a.project_id=_d.project_id
+				and _a.description_tid=_d.id
+				and _d.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _a.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _a.project_id=_f.project_id
+				and _a.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+				
+			left join
+				%PRE%traits_values _v
+				on _a.project_id=_v.project_id
+				and _a.id=_v.trait_id
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.trait_group_id=".$group."
+			group by _a.id
+			order by _a.show_order
+		");
+
+		return $r;
+	}
+
+	public function getTraitgroupTrait($id)
+	{
+		if (empty($id)) return;
+		
+		$r=$this->models->TraitsTraits->freeQuery("
+			select
+				_a.*,
+				_b.translation as name,
+				_c.translation as code,
+				_d.translation as description,
+				_e.sysname as date_format_name,
+				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
+				_g.sysname as type_sysname,
+				_g.verification_function_name as type_verification_function_name
+			from
+				%PRE%traits_traits _a
+				
+			left join 
+				%PRE%text_translations _b
+				on _a.project_id=_b.project_id
+				and _a.name_tid=_b.id
+				and _b.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%text_translations _c
+				on _a.project_id=_c.project_id
+				and _a.code_tid=_c.id
+				and _c.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%text_translations _d
+				on _a.project_id=_d.project_id
+				and _a.description_tid=_d.id
+				and _d.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _a.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _a.project_id=_f.project_id
+				and _a.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.id=".$id."
+		");
+
+		$r = isset($r[0]) ? $r[0] : null;
+
+		if (!empty($r))
+		{
+			if (strpos($r['type_sysname'],'float')===false)
+			{
+				$r['max_length']=round($r['max_length'],0,PHP_ROUND_HALF_DOWN);
+			}
+
+			$r['values']=$this->getTraitgroupTraitValues(array('trait'=>$id));
+		}
+
+		return $r;
+	}
+
+    public function settingsAction()
+    {
+        $this->checkAuthorisation();
+        $this->setPageName($this->translate('Traits settings'));
+        $this->printPage();
+    }
+
+
+	
     public function ajaxInterfaceAction()
     {
 		$this->checkAuthorisation();
@@ -638,52 +832,6 @@ class TraitsController extends Controller
 		return true;
 	}
 	
-	private function getTraitgroups($p=null)
-	{
-		$parent=isset($p['parent']) ? $p['parent'] : null;
-		$level=isset($p['level']) ? $p['level'] : 0;
-		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
-		
-		$g=$this->models->TraitsGroups->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as description
-			from
-				%PRE%traits_groups _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.description_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
-				order by _a.show_order, _a.sysname
-		");
-		
-		foreach((array)$g as $key=>$val)
-		{
-			$g[$key]['level']=$level;	
-			//$g[$key]['taxa']=$this->getTaxongroupTaxa($val['id']);
-			if (!is_null($stopLevel) && $stopLevel<=$level)
-			{
-				continue;
-			}
-			$g[$key]['children']=$this->getTraitgroups(array('parent'=>$val['id'],'level'=>$level+1,'stop_level'=>$stopLevel));
-		}
-		
-		return $g;
-	}
-
 	private function getTraitgroup($id)
 	{
 		if (empty($id)) return;
@@ -838,75 +986,6 @@ class TraitsController extends Controller
 		return true;
 	}
 
-	private function getTraitgroupTraits($group)
-	{
-		if (empty($group)) return;
-		
-		$r=$this->models->TraitsTraits->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as code,
-				_d.translation as description,
-				_e.sysname as date_format_name,
-				_e.format as date_format_format,
-				_e.format_hr as date_format_format_hr,
-				_g.sysname as type_sysname,
-				_g.allow_values as type_allow_values,
-				_g.allow_select_multiple as type_allow_select_multiple,
-				_g.allow_max_length as type_allow_max_length,
-				_g.allow_unit as type_allow_unit,
-				count(_v.id) as value_count
-
-			from
-				%PRE%traits_traits _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.code_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _d
-				on _a.project_id=_d.project_id
-				and _a.description_tid=_d.id
-				and _d.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%traits_date_formats _e
-				on _a.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _a.project_id=_f.project_id
-				and _a.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-				
-			left join
-				%PRE%traits_values _v
-				on _a.project_id=_v.project_id
-				and _a.id=_v.trait_id
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.trait_group_id=".$group."
-			group by _a.id
-			order by _a.show_order
-		");
-
-		return $r;
-	}
-	
 	private function saveTraitgroupTrait($p)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -921,6 +1000,7 @@ class TraitsController extends Controller
 		$can_be_null=isset($p['can_be_null']) ? $p['can_be_null'] : null;
 		$can_select_multiple=isset($p['can_select_multiple']) ? $p['can_select_multiple'] : null;
 		$can_include_comment=isset($p['can_include_comment']) ? $p['can_include_comment'] : null;
+		$can_have_range=isset($p['can_have_range']) ? $p['can_have_range'] : null;
 		$show_index_numbers=isset($p['show_index_numbers']) ? $p['show_index_numbers'] : null;
 		$show_order=isset($p['show_order']) && is_numeric($p['show_order'])  ? $p['show_order'] : (empty($id) ? 999 : null);
 		$max_length=isset($p['max_length']) && is_numeric($p['max_length']) ? $p['max_length'] : null;
@@ -952,11 +1032,11 @@ class TraitsController extends Controller
 						$type['sysname']=='stringlistfree' || 
 						$type['sysname']=='stringfree'
 					) &&
-			 		$max_length > $this->_defaultMaxLengthString
+			 		$max_length > $this->_defaultMaxLengthStringValue
 				)
 			{
-				$max_length=$this->_defaultMaxLengthString;
-				$this->addWarning(sprintf($this->translate('Max. length cannot exceed %s'),$this->_defaultMaxLengthString));
+				$max_length=$this->_defaultMaxLengthStringValue;
+				$this->addWarning(sprintf($this->translate('Max. length cannot exceed %s'),$this->_defaultMaxLengthStringValue));
 			}
 			else
 			if (
@@ -999,6 +1079,7 @@ class TraitsController extends Controller
 				'can_select_multiple' => ($can_select_multiple=='y' ? 1 : 0),
 				'can_include_comment' => ($can_include_comment=='y' ? 1 : 0),
 				'can_be_null' => ($can_be_null=='y' ? 1 : 0),
+				'can_have_range' => ($can_have_range=='y' ? 1 : 0),
 				'show_index_numbers' => ($show_index_numbers=='y' ? 1 : 0),
 				'show_order' => $show_order,
 				'max_length' => $max_length
@@ -1040,75 +1121,6 @@ class TraitsController extends Controller
 			return false;
 		}
 			
-	}
-
-	private function getTraitgroupTrait($id)
-	{
-		if (empty($id)) return;
-		
-		$r=$this->models->TraitsTraits->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as code,
-				_d.translation as description,
-				_e.sysname as date_format_name,
-				_e.format as date_format_format,
-				_e.format_hr as date_format_format_hr,
-				_g.sysname as type_sysname
-			from
-				%PRE%traits_traits _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.code_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _d
-				on _a.project_id=_d.project_id
-				and _a.description_tid=_d.id
-				and _d.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%traits_date_formats _e
-				on _a.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _a.project_id=_f.project_id
-				and _a.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.id=".$id."
-		");
-
-		$r = isset($r[0]) ? $r[0] : null;
-		
-		if (!empty($r))
-		{
-			
-			if (strpos($r['type_sysname'],'float')===0)
-			{
-				$r['max_length']=round($r['max_length'],0,PHP_ROUND_HALF_DOWN);
-			}
-
-			$r['values']=$this->getTraitgroupTraitValues(array('trait'=>$id));
-		}
-
-		return $r;
 	}
 
 	private function saveTraitgroupTraitsOrder($p)
@@ -1160,69 +1172,6 @@ class TraitsController extends Controller
 		));
 
 		return true;
-	}
-	
-	private function getTraitgroupTraitValues($p)
-	{
-		$trait=isset($p['trait']) ? $p['trait'] : null;
-
-		if (empty($trait)) return;
-
-		$r=$this->models->TraitsValues->freeQuery("
-			select
-				_a.*,
-				_g.allow_fractures,
-				_e.format as date_format_format
-
-			from 
-				%PRE%traits_values _a
-				
-			left join 
-				%PRE%traits_traits _b
-				on _a.project_id=_b.project_id
-				and _a.trait_id=_b.id
-
-			left join 
-				%PRE%traits_date_formats _e
-				on _b.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _b.project_id=_f.project_id
-				and _b.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.trait_id = ".$trait." 
-			order by 
-				_a.show_order
-		
-		");
-		
-		foreach((array)$r as $key=>$val)
-		{
-			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
-			{
-				if (!empty($val['numerical_value']))
-					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
-				if (!empty($val['numerical_value_end']))
-					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
-			} else
-			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
-			{
-				if (!empty($val['date']))
-					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
-				if (!empty($val['date_end']))
-					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
-			}
-		}
-		
-		return $r;
-
 	}
 	
 	private function saveTraitgroupTraitValues($p)
@@ -1371,6 +1320,69 @@ class TraitsController extends Controller
 
 		}
 
+
+	}
+
+	private function getTraitgroupTraitValues($p)
+	{
+		$trait=isset($p['trait']) ? $p['trait'] : null;
+
+		if (empty($trait)) return;
+
+		$r=$this->models->TraitsValues->freeQuery("
+			select
+				_a.*,
+				_g.allow_fractures,
+				_e.format as date_format_format
+
+			from 
+				%PRE%traits_values _a
+				
+			left join 
+				%PRE%traits_traits _b
+				on _a.project_id=_b.project_id
+				and _a.trait_id=_b.id
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _b.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _b.project_id=_f.project_id
+				and _b.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.trait_id = ".$trait." 
+			order by 
+				_a.show_order
+		
+		");
+		
+		foreach((array)$r as $key=>$val)
+		{
+			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
+			{
+				if (!empty($val['numerical_value']))
+					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
+				if (!empty($val['numerical_value_end']))
+					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
+			} else
+			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
+			{
+				if (!empty($val['date']))
+					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
+				if (!empty($val['date_end']))
+					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
+			}
+		}
+
+		return $r;
 
 	}
 	

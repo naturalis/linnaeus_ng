@@ -10,20 +10,30 @@ td {
 }
 </style>
 
-
 <div id="page-main">
-<a href="?action=clear">try again</a>
+	<p>
+	    <a href="?action=clear">upload another file</a>
+	</p>
 
-<table>
-{foreach from=$lines item=line}
-	<tr>
-    {foreach from=$line item=v}
-	<td>{$v}</td>
-    {/foreach}
-    </tr>
-{/foreach}
-</table>
+   <p>
+        <table>
+        {foreach from=$lines item=line}
+            <tr>
 
+                <td>
+                	{if !$line.has_data}x{/if}
+                
+                
+                	{$line.trait.sysname}
+				</td>
+
+                {foreach from=$line.cells item=v key=k}
+                <td>{$v}</td>
+                {/foreach}
+            </tr>
+        {/foreach}
+        </table>
+	</p>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
