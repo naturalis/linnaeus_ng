@@ -32,7 +32,7 @@ function checkTraitValue(v)
     	<tr>
         	<td>new value:</td>
             <td>
-            	<input type="text" name="newvalue" id="newvalue" maxlength="{$trait.max_length}" />
+            	<input type="text" name="newvalue" id="newvalue" maxlength="{$maxlength}" />
 			    <input type="button" value="add" onclick="addTraitValue();updateValueList();updateValueCount();" />
 			    <span id="remarks"></span><br />
 			</td>
