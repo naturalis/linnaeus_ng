@@ -14,8 +14,13 @@ include_once ('TraitsController.php');
 class TraitsDataController extends TraitsController
 {
 	private $_columnHeaderSpecies='Species';
-	private $_columnHeaderNsr='ID SRTregister';
+	private $_columnHeaderTaxonId='ID SRTregister';
 	private $_columnHeaderReferences='References';
+	private $_taxonIdResolveQuery;
+	
+	private $_sysColSpecies='#species';
+	private $_sysColReferences='#references';
+	private $_sysColNsrId='#nsr_id';
 
 	private $_yesValues;
 	private $_noValues;
@@ -61,6 +66,9 @@ class TraitsDataController extends TraitsController
 
     private function initialise()
     {
+		$this->smarty->assign('sysColSpecies',$this->_sysColSpecies);
+		$this->smarty->assign('sysColReferences',$this->_sysColReferences);
+		$this->smarty->assign('sysColNsrId',$this->_sysColNsrId);
     }
 
     public function dataUploadAction()
@@ -114,16 +122,18 @@ class TraitsDataController extends TraitsController
 		$f=$this->getDataSession();
 		$this->getSettings($f['traitgroup']);
 
+		// we'll just keep it like this for a while, ok?
 		if (1==1||$f['status']=='raw')
 		{
 			$this->matchTraits();
 			$this->matchValues();
+			$this->matchSpecies();
 			$this->setDataStatus('matched');
 		}
 
         $this->setPageName($this->translate('Data upload'));
 
-		$this->smarty->assign('lines',$this->getSessionLines());
+		$this->smarty->assign('data',$this->getDataSession());
 
 		$this->printPage();
     }
@@ -140,10 +150,13 @@ class TraitsDataController extends TraitsController
 
 		$this->_columnHeaderSpecies=
 			isset($s['column header species']['value']) ? $s['column header species']['value'] : $this->_columnHeaderSpecies;
-		$this->_columnHeaderNsr=
-			isset($s['column header nsr id']['value']) ? $s['column header nsr id']['value'] : $this->_columnHeaderNsr;
+		$this->_columnHeaderTaxonId=
+			isset($s['column header taxon id']['value']) ? $s['column header taxon id']['value'] : $this->_columnHeaderTaxonId;
 		$this->_columnHeaderReferences=
 			isset($s['column header references']['value']) ? $s['column header references']['value'] : $this->_columnHeaderReferences;
+		$this->_taxonIdResolveQuery=
+			isset($s['taxon id query']['value']) ? $s['taxon id query']['value'] : null;
+
 
 		$this->_yesValues= isset($s['yes values']['value']) ? $s['yes values']['value'] : array('yes');
 		if (preg_match('/(\{)([^\{\}]*)(\})/',$this->_yesValues,$matches))
@@ -241,17 +254,17 @@ class TraitsDataController extends TraitsController
 		{
 			if (isset($line['cells'][0]) && $line['cells'][0]==$this->_columnHeaderSpecies)
 			{
-				$lines[$key]['trait']['sysname']='#species';
+				$lines[$key]['trait']['sysname']=$this->_sysColSpecies;
 			}
 			else
-			if (isset($line['cells'][0]) && $line['cells'][0]==$this->_columnHeaderNsr)
+			if (isset($line['cells'][0]) && $line['cells'][0]==$this->_columnHeaderTaxonId)
 			{
-				$lines[$key]['trait']['sysname']='#nsr_id';
+				$lines[$key]['trait']['sysname']=$this->_sysColNsrId;
 			}
 			else
 			if (isset($line['cells'][0]) && $line['cells'][0]==$this->_columnHeaderReferences)
 			{
-				$lines[$key]['trait']['sysname']='#references';
+				$lines[$key]['trait']['sysname']=$this->_sysColReferences;
 			}
 			
 			$cells=array();
@@ -279,7 +292,6 @@ class TraitsDataController extends TraitsController
 		// matching cell 0 to trait names
 		foreach((array)$lines as $key=>$line)
 		{
-			
 			//q($line,1);
 			foreach((array)$traits as $trait)
 			{
@@ -308,11 +320,50 @@ class TraitsDataController extends TraitsController
 			else
 			if (isset($prevTrait) && is_array($prevTrait) && substr($prevTrait['sysname'],0,1)!='#')
 			{
+				//die("also check if the values match!");
 				$lines[$key]['trait']=$prevTrait;
 			}
 		}
 
 		$this->setSessionLines($lines);
+	}
+
+	private function matchSpecies()
+	{
+		$data=$this->getDataSession();
+		
+		$taxa=array();
+
+		foreach((array)$data['lines'] as $line)
+		{
+			if (isset($line['trait']['sysname']) && $line['trait']['sysname']==$this->_sysColSpecies)
+			{
+				foreach($line['cells'] as $c=>$cell)
+				{
+					if ($c==0) continue;
+					
+					$t=$this->getTaxonByName($cell);
+
+					if ($t)
+					{
+						$taxa[$c]=$t;
+					}
+					else
+					{
+						//_taxonIdResolveQuery
+					}
+					
+					//die("always also run _taxonIdResolveQuery");
+				}
+				break;
+			}
+		}
+		
+		$data['taxa']=$taxa;
+		
+//		q($data,1);
+
+		$this->setDataSession($data);
 	}
 
 	private function matchValues()
@@ -321,7 +372,7 @@ class TraitsDataController extends TraitsController
 
 		foreach((array)$data['lines'] as $key=>$line)
 		{
-			
+
 			$cell_status=array();
 			
 			if (isset($line['trait']['id']))
@@ -335,7 +386,16 @@ class TraitsDataController extends TraitsController
 					foreach((array)$line['cells'] as $c=>$cell)
 					{
 						if ($c==0) continue;
-						$cell_status[$c]=call_user_func($func,array('value'=>$cell,'trait'=>$trait));
+						$cell_status[$c]=
+							call_user_func(
+								$func,
+								array(
+									'value'=>$cell,
+									'trait'=>$trait,
+									'boolean_data'=>$line['boolean_data'],
+									'cell_0'=>$line['cells'][0]
+								)
+							);
 					}
 				}
 				else
@@ -349,7 +409,7 @@ class TraitsDataController extends TraitsController
 		}
 		
 		
-		q($data['lines'],1);
+		//q($data['lines'],1);
 
 		$this->setSessionLines($data['lines']);
 	}
@@ -365,7 +425,7 @@ class TraitsDataController extends TraitsController
 	v	check_stringfree
 	check_datelist
 	check_datelistfree
-	check_datefree
+	v	check_datefree
 	check_datefreelimit
 	check_intlist
 	check_intlistfree
@@ -413,7 +473,43 @@ class TraitsDataController extends TraitsController
 
 		}
 	}
+	
+	private function __string_list_check_weak($value,$trait)
+	{
+		$potential_matches=array();
+		foreach((array)$trait['values'] as $val)
+		{
+			if (strpos($val['string_value'],$value)===0)
+			{
+				$potential_matches[]=$val['string_value'];
+			}
+			else
+			if (preg_replace('/[^(\x20-\x7F)]*/','',$val['string_value'])==preg_replace('/[^(\x20-\x7F)]*/','',$value))
+			{
+				$potential_matches[]=$val['string_value'];
+			}
+			
+		}
 
+		if (count($potential_matches)==1)
+		{
+			return 
+				array(
+					'pass'=>true,
+					'warning'=>$this->translate('weak trait match')
+				);
+		} else
+		if (count($potential_matches)>1)
+		{
+			return 
+				array(
+					'pass'=>true,
+					'warning'=>$this->translate('weak trait matches'),
+					'matches'=>$potential_matches
+				);
+		}
+	}
+	
 	private function __free_string_length_check($value,$trait)
 	{
 		$max=!empty($trait['max_length']) ? $trait['max_length'] : $this->_defaultMaxLengthStringValue;
@@ -466,12 +562,35 @@ class TraitsDataController extends TraitsController
 	{
 		$value=isset($p['value']) ? $p['value'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
+		$boolean_data=isset($p['boolean_data']) ? $p['boolean_data'] : null;
+		$cell_0=isset($p['cell_0']) ? $p['cell_0'] : null;
 
 		$check=$this->__null_check($value,$trait);
 		if (!empty($check)) return $check;
 
-		$check=$this->__string_list_check($value,$trait);
-		if (!empty($check)) return $check;
+		if ($boolean_data)
+		{
+			$check=$this->__string_list_check($cell_0,$trait);
+			if (empty($check))
+				$check=$this->__string_list_check_weak($cell_0,$trait);
+			
+			if (!empty($check)) 
+			{
+				$value=strtolower($value);
+				$check['true_value']=$cell_0;
+				$check['bool_value']=(in_array($value,$this->_yesValues) ? true : (in_array($value,$this->_noValues) ? false : null));
+				return $check;
+			}
+		}
+		else
+		{
+			$check=$this->__string_list_check($value,$trait);
+			if (!empty($check)) return $check;
+
+			$check=$this->__string_list_check_weak($value,$trait);
+			if (!empty($check)) return $check;
+
+		}
 
 		$allowed=array();
 		foreach((array)$trait['values'] as $val)
@@ -496,8 +615,22 @@ class TraitsDataController extends TraitsController
 		$check=$this->__null_check($value,$trait);
 		if (!empty($check)) return $check;
 		
-		$check=$this->__string_list_check($value,$trait);
-		if (!empty($check)) return $check;
+		if ($boolean_data)
+		{
+			$check=$this->__string_list_check($cell_0,$trait);
+			if (!empty($check)) 
+			{
+				$value=strtolower($value);
+				$check['true_value']=$cell_0;
+				$check['bool_value']=(in_array($value,$this->_yesValues) ? true : (in_array($value,$this->_noValues) ? false : null));
+				return $check;
+			}
+		}
+		else
+		{
+			$check=$this->__string_list_check($value,$trait);
+			if (!empty($check)) return $check;
+		}
 
 		$check=$this->__free_string_length_check($value,$trait);
 		if (!empty($check)) return $check;
@@ -536,7 +669,7 @@ class TraitsDataController extends TraitsController
 		if (!empty($check)) return $check;
 
 		
-		$value=str_replace(' ',$value);
+		$value=str_replace(' ','',$value);
 
 		$f=date_parse_from_format($trait['date_format_format'],$value);
 

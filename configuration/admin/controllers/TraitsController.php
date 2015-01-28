@@ -1205,7 +1205,7 @@ class TraitsController extends Controller
 			{
 				$d=$base+
 					array(
-						'string_value'=>$val,
+						'string_value'=>trim($val),
 						'show_order'=>$key
 					);
 				
@@ -1239,7 +1239,7 @@ class TraitsController extends Controller
 			{
 				$d=$base+
 					array(
-						'numerical_value'=>$val,
+						'numerical_value'=>trim($val),
 						'show_order'=>$key
 					);
 				

@@ -129,7 +129,8 @@
 
     </p>
     <p>
-    	<a href="traitgroup_traits.php?group={$group.id}">back</a><br />
+    	<a href="traitgroup_trait_values.php?trait={$trait.id}">values</a>&nbsp;&nbsp;
+    	<a href="traitgroup_traits.php?group={$group.id}">back</a>&nbsp;&nbsp;
     	<a href="index.php">index</a><br />
     </p>
     

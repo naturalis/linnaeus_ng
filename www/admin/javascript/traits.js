@@ -71,6 +71,7 @@ function deleteItem()
 {
 	if (confirm(_('Are you sure?')))
 	{
+		$('#theForm').unbind('submit');
 		$('#action').val('delete');
 		$('#theForm').submit();
 	}
