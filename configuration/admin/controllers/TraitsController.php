@@ -684,14 +684,85 @@ class TraitsController extends Controller
 		return $r;
 	}
 
+	public function getTraitgroupTraitValues($p)
+	{
+		$trait=isset($p['trait']) ? $p['trait'] : null;
+
+		if (empty($trait)) return;
+
+		$r=$this->models->TraitsValues->freeQuery("
+			select
+				_a.id,
+				_a.trait_id,
+				_a.string_value,
+				_a.numerical_value,
+				_a.numerical_value_end,
+				_a.date,
+				_a.date_end,
+				_a.is_lower_limit,
+				_a.is_upper_limit,
+				_a.lower_limit_label,
+				_a.upper_limit_label,						
+				_g.allow_fractures,
+				_e.format as date_format_format
+
+			from 
+				%PRE%traits_values _a
+				
+			left join 
+				%PRE%traits_traits _b
+				on _a.project_id=_b.project_id
+				and _a.trait_id=_b.id
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _b.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _b.project_id=_f.project_id
+				and _b.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.trait_id = ".$trait." 
+			order by 
+				_a.show_order
+		
+		");
+		
+		foreach((array)$r as $key=>$val)
+		{
+			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
+			{
+				if (!empty($val['numerical_value']))
+					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
+				if (!empty($val['numerical_value_end']))
+					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
+			} else
+			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
+			{
+				if (!empty($val['date']))
+					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
+				if (!empty($val['date_end']))
+					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
+			}
+		}
+
+		return $r;
+
+	}
+
     public function settingsAction()
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Traits settings'));
         $this->printPage();
     }
-
-
 	
     public function ajaxInterfaceAction()
     {
@@ -1323,69 +1394,6 @@ class TraitsController extends Controller
 
 	}
 
-	private function getTraitgroupTraitValues($p)
-	{
-		$trait=isset($p['trait']) ? $p['trait'] : null;
-
-		if (empty($trait)) return;
-
-		$r=$this->models->TraitsValues->freeQuery("
-			select
-				_a.*,
-				_g.allow_fractures,
-				_e.format as date_format_format
-
-			from 
-				%PRE%traits_values _a
-				
-			left join 
-				%PRE%traits_traits _b
-				on _a.project_id=_b.project_id
-				and _a.trait_id=_b.id
-
-			left join 
-				%PRE%traits_date_formats _e
-				on _b.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _b.project_id=_f.project_id
-				and _b.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.trait_id = ".$trait." 
-			order by 
-				_a.show_order
-		
-		");
-		
-		foreach((array)$r as $key=>$val)
-		{
-			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
-			{
-				if (!empty($val['numerical_value']))
-					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
-				if (!empty($val['numerical_value_end']))
-					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
-			} else
-			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
-			{
-				if (!empty($val['date']))
-					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
-				if (!empty($val['date_end']))
-					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
-			}
-		}
-
-		return $r;
-
-	}
-	
 	private function verifyDate($date,$format)
 	{
 		$r=date_parse_from_format($format,$date);
