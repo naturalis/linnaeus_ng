@@ -3,7 +3,7 @@
 
 function saveRawData()
 {	
-	var form=$('<form method="post"></form>').appendTo('body');
+	var form=$('<form method="post" action="data_save.php"></form>').appendTo('body');
 	form.append('<input type="hidden" name="action" value="save" />');
 	form.submit();
 }

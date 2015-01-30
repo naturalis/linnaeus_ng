@@ -46,6 +46,10 @@
 		
 			{include file="_tab_bedreiging.tpl"}
 
+		{elseif $ext_template}
+		
+			{include file=$ext_template}
+
 		{else}
 
 			{if $content|@is_array}

@@ -1358,13 +1358,7 @@ class TraitsController extends Controller
 					*/
 					$d=$base+
 						array(
-							'date'=>
-								(!empty($r['year']) ? $r['year'] : '0000')."-".
-								(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
-								(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
-								(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
-								(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
-								(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00'),
+							'date'=>$this->makeInsertableDate($val,$trait['date_format_format']),
 							'show_order'=>$key
 						);
 
@@ -1412,9 +1406,23 @@ class TraitsController extends Controller
 	{
 		return date_format(date_create($date),$format);
 	}
-
-
-
+	
+	public function makeInsertableDate($date,$format)
+	{
+		$r=date_parse_from_format($format,$date);
+		
+		if ($r['error_count']==0)
+		{
+			return
+				(!empty($r['year']) ? $r['year'] : '0000')."-".
+				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
+				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
+				(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
+				(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
+				(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00')
+			;
+		}
+	}
 }
 
 
