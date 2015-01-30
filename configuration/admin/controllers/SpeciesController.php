@@ -430,22 +430,19 @@ class SpeciesController extends Controller
     public function pageAction()
     {
         $this->checkAuthorisation();
-
         $this->setPageName($this->translate('Define categories'));
 
-        // adding a new page
-        if ($this->rHasVal('new_page') && !$this->isFormResubmit()) {
-
-            $tp = $this->createTaxonCategory($this->requestData['new_page'], $this->requestData['show_order']);
-
-            if ($tp !== true) {
-
+        if ($this->rHasVal('new_page') && !$this->isFormResubmit())
+		{
+            $tp=$this->createTaxonCategory($this->rGetVal('new_page'), $this->rGetVal('show_order'));
+            if (!$tp)
+			{
                 $this->addError($this->translate('Could not save category.'), 1);
                 $this->addError('(' . $tp . ')', 1);
             }
         }
 
-        $lp = $this->getProjectLanguages();
+        $lp=$this->getProjectLanguages();
 
         $pages = $this->models->PageTaxon->_get(array(
             'id' => array(
@@ -454,10 +451,10 @@ class SpeciesController extends Controller
             'order' => 'show_order'
         ));
 
-        foreach ((array) $pages as $key => $page) {
-
-            foreach ((array) $lp as $k => $language) {
-
+        foreach((array)$pages as $key=>$page)
+		{
+            foreach((array)$lp as $k=>$language)
+			{
                 $tpt = $this->models->PageTaxonTitle->_get(
                 array(
                     'id' => array(
@@ -469,19 +466,13 @@ class SpeciesController extends Controller
 
                 $pages[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
             }
-
             $nextShowOrder = $page['show_order'] + 1;
         }
 
-
         $this->smarty->assign('nextShowOrder', $nextShowOrder);
-
         $this->smarty->assign('maxCategories', $this->generalSettings['maxCategories']);
-
         $this->smarty->assign('languages', $lp);
-
         $this->smarty->assign('pages', $pages);
-
         $this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 
         $this->printPage();

@@ -7,8 +7,26 @@
 		tab as field sep
 		'Species',
 
-*/
 
+	// check functions
+	v	check_boolean
+	v	check_stringlist
+	v	check_stringlistfree
+	v	check_stringfree
+	check_datelist
+	check_datelistfree
+	v	check_datefree
+	check_datefreelimit
+	check_intlist
+	check_intlistfree
+	check_intfree
+	check_intfreelimit
+	check_floatlist
+	check_floatlistfree
+	check_floatfree
+	check_floatfreelimit
+*/
+	
 include_once ('TraitsController.php');
 
 class TraitsDataController extends TraitsController
@@ -127,13 +145,6 @@ class TraitsDataController extends TraitsController
 		$f=$this->getDataSession();
 		$this->getSettings($f['traitgroup']);
 
-		if ($this->rHasVal('action','save'))
-		{
-			$this->saveValues();
-die();		
-		}
-
-
 		// we'll just keep it like this for now, ok?
 		if (1==1||$f['status']=='raw')
 		{
@@ -143,10 +154,26 @@ die();
 			$this->setDataStatus('matched');
 		}
 
-        $this->setPageName($this->translate('Data upload'));
+        $this->setPageName($this->translate('Data matched'));
 
 		$this->smarty->assign('data',$this->getDataSession());
 
+		$this->printPage();
+    }
+
+    public function dataSaveAction()
+    {
+		$this->checkAuthorisation();
+
+		$f=$this->getDataSession();
+		$this->getSettings($f['traitgroup']);
+
+		if ($this->rHasVal('action','save'))
+		{
+			$this->saveValues();
+		}
+
+        $this->setPageName($this->translate('Data saved'));
 		$this->printPage();
     }
 
@@ -543,7 +570,7 @@ die();
 			}
 		}
 		
-		$data['references']=$refs;
+		if (isset($refs)) $data['references']=$refs;
 
 
 		// detecting illegal multiple selects
@@ -592,18 +619,23 @@ die();
 	private function saveValues()
 	{
 		$data=$this->getDataSession();
+		
+		$saveVal=array();
+		$saveFree=array();
+		$delFree=array();
 
 		foreach((array)$data['lines'] as $key=>$line)
 		{
 			if (isset($line['trait']['id']) && $line['has_data'])
 			{
+				
 				//echo $line['trait']['sysname'],'<br />';
 				
 				foreach((array)$line['cell_status'] as $c=>$cell)
 				{
 					$q=array();
-					
-					if ($cell['pass'])
+
+					if ($cell['pass'] && ((!isset($cell['bool_value'])) || (isset($cell['bool_value']) && $cell['bool_value']==true)))
 					{
 						$taxon_id=$data['taxa'][$c]['will_use_id'];
 						
@@ -620,9 +652,11 @@ die();
 								'project_id'=>$this->getCurrentProjectId(),
 								'taxon_id'=>$taxon_id,
 								'value_id'=>$cell['value_id'],
+								'trait_id'=>$line['trait']['id'],
 								//'comment'=>$line['cell_comments'][$c]
 							);
 
+							$saveVal[]=$q;
 						}
 						else
 						{
@@ -642,7 +676,12 @@ die();
 											'cell_0'=>$line['cells'][0]
 										)
 									);
-
+									
+									if (!$r['pass'])
+									{
+										continue;
+									}
+									
 									$q=array(
 										'project_id'=>$this->getCurrentProjectId(),
 										'taxon_id'=>$taxon_id,
@@ -652,114 +691,119 @@ die();
 																		
 									if (strpos($trait['type_sysname'],'boolean')===0)
 									{
+										$q+=array('boolean_value'=>$r['value']);
 									}
 									else
 									if (strpos($trait['type_sysname'],'string')===0)
 									{
+										$q+=array('string_value'=>$r['value']);
 									}
 									else
 									if ((strpos($trait['type_sysname'],'int')===0)||(strpos($trait['type_sysname'],'float')===0))
 									{
+										if (is_array($r['value']))
+										{
+											$q+=array('numerical_value'=>$r['value'][0],'numerical_value_end'=>$r['value'][1]);
+										}
+										else
+										{
+											$q+=array('numerical_value'=>$r['value']);
+										}
 									}
 									else
 									if (strpos($trait['type_sysname'],'date')===0)
 									{
+										if (is_array($r['value']))
+										{
+											$q+=array(
+												'date_value'=>$this->makeInsertableDate($r['value'][0],$trait['date_format_format']),
+												'date_value_end'=>$this->makeInsertableDate($r['value'][1],$trait['date_format_format'])
+											);
+										}
+										else
+										{
+											$q+=array('date_value'=>$this->makeInsertableDate($r['value'],$trait['date_format_format']));
+										}
 									}
 
-
-
-q();
-									
-/*
-`taxon_id` int(11) NOT NULL,
-`trait_id` int(11) NOT NULL,
-`boolean_value` bool,
-`string_value` varchar(1000),  
-`numerical_value` FLOAT(12,5),
-`date_value` date,
-*/
-									q($r);		
-									
+									$saveFree[]=$q;
 								}
 								else
 								{
 									$this->addError(sprintf($this->translate('Missing check function "%s"'),$trait['type_verification_function_name']));
 								}
 							}
-							
-							//echo 'B:',$line['cells'][$c],'<br />';
 						}
 					}
 				}
-//			q($line);
 			}
-			
-//				'project_id' => $this->getCurrentProjectId(),
-			
 		}
 
-die();		
-q($data,1);
-/*
-TraitsTaxonValues
-TraitsTaxonFreevalues
+		$saved=$failed=0;
+		$deletedtraits=array();
+		
+		foreach($saveVal as $val)
+		{
+			if (isset($val['trait_id']) && !isset($deletedtraits[$val['trait_id']]))
+			{
+				$this->models->TraitsTaxonValues->freeQuery("
+					delete from 
+						%PRE%traits_taxon_values
+					where
+						project_id=".$val['project_id']."
+						and taxon_id=".$val['taxon_id']."
+						and value_id in (
+							select id 
+							from %PRE%traits_values 
+							where
+								project_id=".$val['project_id']."
+								and trait_id=".$val['trait_id']."
+							)
+				");
+				$deletedtraits[$val['trait_id']]=true;
+			}
 
+			unset($val['trait_id']);
 
-drop TABLE if exists `traits_taxon_values`;
-CREATE TABLE IF NOT EXISTS `traits_taxon_values` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `value_id` int(11) NOT NULL,
-  `comment` varchar(1000), # ref `can_include_comment`
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+			if ($this->models->TraitsTaxonValues->save($val))
+			{
+				$saved++;
+			}
+			else
+			{
+				$failed++;
+			}
+		}
 
-drop TABLE if exists `traits_taxon_freevalues`;
-CREATE TABLE IF NOT EXISTS `traits_taxon_freevalues` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `trait_id` int(11) NOT NULL,
-  `boolean_value` bool,
-  `string_value` varchar(1000),  
-  `numerical_value` FLOAT(12,5),
-  `date_value` date,
-  `comment` varchar(1000), # ref `can_include_comment`
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+		$deletedtraits=array();
+		foreach($saveFree as $val)
+		{
+			if (isset($val['trait_id']) && !isset($deletedtraits[$val['trait_id']]))
+			{
+				$this->models->TraitsTaxonFreevalues->delete(array(
+					'project_id'=>$val['project_id'],
+					'taxon_id'=>$val['taxon_id'],
+					'trait_id'=>$val['trait_id']
+				));
+				$deletedtraits[$val['trait_id']]=true;
+			}
 
-
-*/
-
+			if ($this->models->TraitsTaxonFreevalues->save($val))
+			{
+				$saved++;
+			}
+			else
+			{
+				$failed++;
+			}			
+		}
+		
+		$this->addMessage(sprintf($this->translate('Saved %s values, failed %s.'),$saved,$failed));
 
 	}
 
 
 
-	// check functions
-	/*
-	v	check_boolean
-	v	check_stringlist
-	v	check_stringlistfree
-	v	check_stringfree
-	check_datelist
-	check_datelistfree
-	v	check_datefree
-	check_datefreelimit
-	check_intlist
-	check_intlistfree
-	check_intfree
-	check_intfreelimit
-	check_floatlist
-	check_floatlistfree
-	check_floatfree
-	check_floatfreelimit
-	*/
 
 	private function __null_check($value,$trait)
 	{

@@ -97,134 +97,145 @@ class SpeciesControllerNSR extends SpeciesController
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 
-			// allow empty media page
-			if ($categories['start']!=$reqCat && $reqCat=='media')
+			if ($this->rGetVal('cat')=='external' && $this->rHasVal('source'))
 			{
-				$categories['start']='media';
-			}
+				$source=base64_decode($this->rGetVal('source'));
 
-			if ($categories['start']==CTAB_MEDIA)
-			{
-				$this->smarty->assign('search',$this->requestData);	
-				$this->smarty->assign('querystring',$this->reconstructQueryString());
+				$source.='&project='.$this->getCurrentProjectId();
+				$source.='&language='.$this->getCurrentLanguageId();
 
-//				if($taxon['base_rank_id']>=SPECIES_RANK_ID)
+				foreach((array)$this->requestData as $key=>$val)
 				{
-					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));	
-					//$this->smarty->assign('mediaType','taxon');
+					$source=str_replace('%'.$key.'%',$val,$source);
 				}
-//				else
-				{
-					$this->smarty->assign('mediaCollected',$this->getCollectedHigherTaxonMedia($this->requestData));	
-					//$this->smarty->assign('mediaType','collected');
-				}
-			}
-			else
-			{
-				$content=$this->getTaxonContent(
-					array(
-						'taxon' => $taxon['id'], 
-						'category' => $categories['start'], 
-						'allowUnpublished' => $this->isLoggedInAdmin(),
-						'isLower' =>  $taxon['lower_taxon']
-					)
-				);
-			}
 
-			if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
-			{
-				$wetten=$this->getEzData($taxon['id']);
-				$this->smarty->assign('wetten',$wetten);
-			} 
-			else
-			if (defined('TAB_VERSPREIDING') && $categories['start']==TAB_VERSPREIDING)
-			{
+				$raw=file_get_contents($source);
+
+				//q($raw,1);
+
+				$content['content']=json_decode($raw,true);
 				
-				$distributionMaps=$this->getDistributionMaps($taxon['id']);
-				$this->smarty->assign('distributionMaps',$distributionMaps);
-
-				$presenceData=$this->getPresenceData($taxon['id']);
-				$this->smarty->assign('presenceData',$presenceData);
-
-				$trendData=$this->getTrendData($taxon['id']);
-				$this->smarty->assign('trendData',$trendData);
-
-				$statusRodeLijst=$this->getEzStatusRodeLijst($taxon['id']);
-				$this->smarty->assign('statusRodeLijst',$statusRodeLijst);
-
-				$atlasData=$this->getVerspreidingsatlasData($taxon['id']);
-				if (!empty($atlasData['logo']))
+				
+				$this->smarty->assign('ext_template','_tab_exoten.tpl');
+				$this->smarty->assign('ext_tab',$this->rGetVal('ext_tab'));
+				
+			}
+			else
+			{
+				// allow empty media page
+				if ($categories['start']!=$reqCat && $reqCat=='media')
 				{
-					array_push(
-						$sideBarLogos,
+					$categories['start']='media';
+				}
+	
+				if ($categories['start']==CTAB_MEDIA)
+				{
+					$this->smarty->assign('search',$this->requestData);	
+					$this->smarty->assign('querystring',$this->reconstructQueryString());
+	
+					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));	
+					$this->smarty->assign('mediaCollected',$this->getCollectedHigherTaxonMedia($this->requestData));	
+				}
+				else
+				{
+					$content=$this->getTaxonContent(
 						array(
-							'organisation'=>$atlasData['organisation'],
-							'logo'=>$atlasData['logo'],
-							'url'=>$atlasData['organisation_url']
+							'taxon' => $taxon['id'], 
+							'category' => $categories['start'], 
+							'allowUnpublished' => $this->isLoggedInAdmin(),
+							'isLower' =>  $taxon['lower_taxon']
 						)
 					);
-				}				
-				$this->smarty->assign('atlasData',$atlasData);
+				}
 	
-			} 
-			else
-			if (defined('TAB_NAAMGEVING') && ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING))
-			{
-				$content=$this->getTaxonContent(
-					array(
-						'taxon' => $taxon['id'], 
-						'category' =>  TAB_NAAMGEVING, 
-						'allowUnpublished' => $this->isLoggedInAdmin(),
-						'isLower' =>  $taxon['lower_taxon']
-					)
-				);
-
-			}
-
-			/*
-			if ($categories['start']!=CTAB_MEDIA && $categories['start']!=CTAB_DNA_BARCODES)
-			{
-				$content['content'] = $this->matchGlossaryTerms($content['content']);
-				$content['content'] = $this->matchHotwords($content['content']);
-			}
-			*/
-
-			$this->setPageName($taxon['label']);
-
-			if (isset($content))
-			{
-
-				$name=$url=null;	
-				foreach((array)$content['rdf'] as $key=>$val)
+				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
 				{
-					if ($val['predicate']=='hasPublisher')
+					$wetten=$this->getEzData($taxon['id']);
+					$this->smarty->assign('wetten',$wetten);
+				} 
+				else
+				if (defined('TAB_VERSPREIDING') && $categories['start']==TAB_VERSPREIDING)
+				{
+					
+					$distributionMaps=$this->getDistributionMaps($taxon['id']);
+					$this->smarty->assign('distributionMaps',$distributionMaps);
+	
+					$presenceData=$this->getPresenceData($taxon['id']);
+					$this->smarty->assign('presenceData',$presenceData);
+	
+					$trendData=$this->getTrendData($taxon['id']);
+					$this->smarty->assign('trendData',$trendData);
+	
+					$statusRodeLijst=$this->getEzStatusRodeLijst($taxon['id']);
+					$this->smarty->assign('statusRodeLijst',$statusRodeLijst);
+	
+					$atlasData=$this->getVerspreidingsatlasData($taxon['id']);
+					if (!empty($atlasData['logo']))
 					{
-						$name=isset($val['data']['name']) ? $val['data']['name'] : null;
-						$url=isset($val['data']['homepage']) ? $val['data']['homepage'] : null;
-
 						array_push(
 							$sideBarLogos,
 							array(
-								'organisation'=>$name,
-								'logo'=>$this->getOrganisationLogoUrl($name),
-								'url'=>$url
+								'organisation'=>$atlasData['organisation'],
+								'logo'=>$atlasData['logo'],
+								'url'=>$atlasData['organisation_url']
 							)
 						);
-					}
-					if ($val['predicate']=='hasReference')
+					}				
+					$this->smarty->assign('atlasData',$atlasData);
+		
+				} 
+				else
+				if (defined('TAB_NAAMGEVING') && ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING))
+				{
+					$content=$this->getTaxonContent(
+						array(
+							'taxon' => $taxon['id'], 
+							'category' =>  TAB_NAAMGEVING, 
+							'allowUnpublished' => $this->isLoggedInAdmin(),
+							'isLower' =>  $taxon['lower_taxon']
+						)
+					);
+	
+				}
+				
+				// need to be moved to function
+				if (isset($content['rdf']))
+				{
+					$name=$url=null;	
+					foreach((array)$content['rdf'] as $key=>$val)
 					{
-						$content['rdf'][$key]['data']['authors']=$this->getReferenceAuthors($val['data']['id']);
-						$content['rdf'][$key]['data']['periodical_ref']=$this-> getReference($val['data']['periodical_id']);
-						$content['rdf'][$key]['data']['publishedin_ref']=$this-> getReference($val['data']['publishedin_id']);
+						if ($val['predicate']=='hasPublisher')
+						{
+							$name=isset($val['data']['name']) ? $val['data']['name'] : null;
+							$url=isset($val['data']['homepage']) ? $val['data']['homepage'] : null;
+	
+							array_push(
+								$sideBarLogos,
+								array(
+									'organisation'=>$name,
+									'logo'=>$this->getOrganisationLogoUrl($name),
+									'url'=>$url
+								)
+							);
+						}
+						if ($val['predicate']=='hasReference')
+						{
+							$content['rdf'][$key]['data']['authors']=$this->getReferenceAuthors($val['data']['id']);
+							$content['rdf'][$key]['data']['periodical_ref']=$this-> getReference($val['data']['periodical_id']);
+							$content['rdf'][$key]['data']['publishedin_ref']=$this-> getReference($val['data']['publishedin_id']);
+						}
 					}
+					
+					$this->smarty->assign('rdf',$content['rdf']);
 				}
 
-						
-				
-				$this->smarty->assign('content',$content['content']);
-				$this->smarty->assign('rdf',$content['rdf']);
 			}
 
+
+			$this->setPageName($taxon['label']);
+
+
+			$this->smarty->assign('content',$content['content']);
             $this->smarty->assign('sideBarLogos',$sideBarLogos);
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',$categories['categories']);
@@ -298,15 +309,19 @@ class SpeciesControllerNSR extends SpeciesController
 		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 
+		$has_redirect_to=isset($this->models->PageTaxon->columns['redirect_to']);
+		$has_check_query=isset($this->models->PageTaxon->columns['check_query']);
+
 		$categories=$this->models->PageTaxon->freeQuery("
 			select
 				_a.id,
 				ifnull(_b.title,_a.page) as title,
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
-				_a.show_order,
 				".(isset($taxon) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
-				_a.def_page
-
+				_a.def_page,
+			".($has_redirect_to ? '_a.redirect_to,' : '')."
+			".($has_check_query ? '_a.check_query,' : '')."
+				_a.show_order
 			from 
 				%PRE%pages_taxa _a
 				
@@ -321,7 +336,6 @@ class SpeciesControllerNSR extends SpeciesController
 					and _a.id=_c.page_id
 					and _c.taxon_id =".$taxon."
 					and _c.language_id = ". $this->getCurrentLanguageId() ."
-				
 				" : "")."
 
 			where 
@@ -335,7 +349,30 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if (isset($taxon))
 		{
+			foreach((array)$categories as $key=>$val)
+			{
+				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
+					$categories[$key]['is_empty']=true;
+					
+				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+					$dummy=$key;
 
+				if (isset($val['check_query']))
+				{
+					$r=$this->models->Taxon->freeQuery(str_replace(array('%pid%','%tid%'),array($this->getCurrentProjectId(),$taxon),$val['check_query']));
+					if ($r)
+					{
+						$categories[$key]['is_empty']=$r[0]['result']!=1;
+					}
+					unset($categories[$key]['check_query']);
+				}
+
+				if (isset($val['redirect_to']))
+				{
+					$categories[$key]['redirect_to']=str_replace('%tid%',$taxon,$val['redirect_to']);
+				}
+			}
+			
 			if (defined('TAB_VERSPREIDING'))
 			{
 				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
@@ -352,6 +389,14 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 							
+			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
+			// this should be changed to a generalized method, using 'redirect_to'
+			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1)
+			{
+				$ezData=$this->getEzData($taxon);
+				$categories[$dummy]['is_empty']=empty($ezData);
+			}
+
 			if (!$this->_suppressTab_NAMES)
 			{
 				array_push($categories,
@@ -362,22 +407,6 @@ class SpeciesControllerNSR extends SpeciesController
 						'tabname' => 'CTAB_NAMES'
 					)
 				);
-			}
-
-			foreach((array)$categories as $key=>$val)
-			{
-				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
-					$categories[$key]['is_empty']=true;
-					
-				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
-					$dummy=$key;
-			}
-			
-			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
-			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1)
-			{
-				$ezData=$this->getEzData($taxon);
-				$categories[$dummy]['is_empty']=empty($ezData);
 			}
 
 			if (!$this->_suppressTab_LITERATURE)
@@ -426,7 +455,7 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-									
+			
 		}
 
 		$order=$this->models->TabOrder->_get(
@@ -465,6 +494,8 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->customSortArray($categories,array('key' => 'show_order'));
 
 		if (is_null($start)) $start=$firstNonEmpty;
+
+		if ($requestedTab=='external') $start=$requestedTab;
 
 		return array('start'=>$start,'categories'=>$categories);
 

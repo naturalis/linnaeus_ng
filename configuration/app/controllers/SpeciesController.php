@@ -88,6 +88,7 @@ class SpeciesController extends Controller
 
 		}
 
+		// fixed tabs
 		if (!defined('CTAB_NAMES')) define('CTAB_NAMES','names');
 		if (!defined('CTAB_CLASSIFICATION')) define('CTAB_CLASSIFICATION','classification');
 		if (!defined('CTAB_TAXON_LIST')) define('CTAB_TAXON_LIST','list');
@@ -170,7 +171,7 @@ class SpeciesController extends Controller
             );
 
             // determine the page_id the page will open in
-			$requestedCat=$this->rHasVal('cat') ? $this->requestData['cat'] : null;
+			$requestedCat=$this->rHasVal('cat') ? $this->rGetVal('cat') : null;
 
             $activeCategory =
             	!empty($requestedCat) ?
@@ -185,7 +186,9 @@ class SpeciesController extends Controller
 
 
             // setting the css classnames
-            foreach ((array) $categories['categories'] as $key => $val) {
+			// we need to move this to a template
+            foreach ((array) $categories['categories'] as $key => $val)
+			{
                 $c = array(
                     'category'
                 );
@@ -205,22 +208,20 @@ class SpeciesController extends Controller
                     $c[] = 'category-no-content';
                 }
                 $categories['categories'][$key]['className'] = implode(' ', $c);
-
             }
 
-            if ($taxon['lower_taxon'] == 1) {
-
+            if ($taxon['lower_taxon']==1)
+			{
                 $this->setPageName(sprintf($this->translate('Species module: "%s" (%s)'), $taxon['label'], $this->getCategoryName($activeCategory)));
-
                 $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
             }
-            else {
-
+            else
+			{
                 $this->setPageName(sprintf($this->translate('Higher taxa: "%s" (%s)'), $taxon['label'], $this->getCategoryName($activeCategory)));
             }
 
-            if (isset($taxon)) {
-
+            if (isset($taxon))
+			{
                 $this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
                 //$this->smarty->assign('overviewSound', $this->getTaxonOverviewSound($taxon['id']));
 
