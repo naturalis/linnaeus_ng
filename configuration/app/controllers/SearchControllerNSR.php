@@ -24,7 +24,9 @@ class SearchControllerNSR extends SearchController
 		'presence_labels',
 		'media_meta',
 		'media_taxon',
-		'name_types'
+		'name_types',
+		'traits_traits',
+		'traits_values'
     );
 
     public $controllerPublicName = 'Search';
@@ -123,9 +125,13 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
+		
+
+		$this->traitGroupsToInclude=array(1);
+		$this->smarty->assign('traits',$this->getTraits($this->traitGroupsToInclude));
 
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-		$this->smarty->assign('results',$this->doExtendedSearch($search));
+//		$this->smarty->assign('results',$this->doExtendedSearch($search));
         $this->printPage($template);
     }
 
@@ -231,6 +237,8 @@ class SearchControllerNSR extends SearchController
         $this->printPage();
     
     }
+
+
 
 	private function getPresenceStatuses()
 	{
@@ -1332,6 +1340,182 @@ class SearchControllerNSR extends SearchController
 		//http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
 		echo chr(239).chr(187).chr(191);
 	}
+
+	private function getTraits($groups)
+	{
+		if (empty($groups)) return;
+		
+		$r=$this->models->TraitsTraits->freeQuery("
+			select
+				_a.*,
+				_b.translation as name,
+				_c.translation as code,
+				_d.translation as description,
+				_e.sysname as date_format_name,
+				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
+				_g.sysname as type_sysname,
+				_g.allow_values as type_allow_values,
+				_g.allow_select_multiple as type_allow_select_multiple,
+				_g.allow_max_length as type_allow_max_length,
+				_g.allow_unit as type_allow_unit,
+				count(_v.id) as value_count,
+				_grp_b.translation as group_name,
+				_grp_c.translation as group_description
+
+			from
+				%PRE%traits_traits _a
+
+			left join 
+				%PRE%traits_groups _grp
+				on _a.project_id=_grp.project_id
+				and _a.trait_group_id=_grp.id
+				
+			left join 
+				%PRE%text_translations _grp_b
+				on _grp.project_id=_grp_b.project_id
+				and _grp.name_tid=_grp_b.id
+				and _grp_b.language_id=". $this->getCurrentLanguageId() ."
+
+			left join 
+				%PRE%text_translations _grp_c
+				on _grp.project_id=_grp_c.project_id
+				and _grp.description_tid=_grp_c.id
+				and _grp_c.language_id=". $this->getCurrentLanguageId() ."
+				
+			left join 
+				%PRE%text_translations _b
+				on _a.project_id=_b.project_id
+				and _a.name_tid=_b.id
+				and _b.language_id=". $this->getCurrentLanguageId() ."
+
+			left join 
+				%PRE%text_translations _c
+				on _a.project_id=_c.project_id
+				and _a.code_tid=_c.id
+				and _c.language_id=". $this->getCurrentLanguageId() ."
+
+			left join 
+				%PRE%text_translations _d
+				on _a.project_id=_d.project_id
+				and _a.description_tid=_d.id
+				and _d.language_id=". $this->getCurrentLanguageId() ."
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _a.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _a.project_id=_f.project_id
+				and _a.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+				
+			left join
+				%PRE%traits_values _v
+				on _a.project_id=_v.project_id
+				and _a.id=_v.trait_id
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.trait_group_id in (".implode(",",$groups).")
+			group by _a.id
+			order by _a.show_order
+		");
+		
+		$data=array();
+
+		foreach((array)$r as $key=>$trait)
+		{
+			$trait['values']=$this->getTraitgroupTraitValues($trait['id']);
+			$data[$trait['trait_group_id']]['name']=$trait['group_name'];
+			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
+			$data[$trait['trait_group_id']]['data'][]=$trait;
+		}
+//q($data,1);
+		return $data;
+	}
+
+	private function getTraitgroupTraitValues($trait)
+	{
+		if (empty($trait)) return;
+
+		$r=$this->models->TraitsValues->freeQuery("
+			select
+				_a.id,
+				_a.trait_id,
+				_a.string_value,
+				_a.numerical_value,
+				_a.numerical_value_end,
+				_a.date,
+				_a.date_end,
+				_a.is_lower_limit,
+				_a.is_upper_limit,
+				_a.lower_limit_label,
+				_a.upper_limit_label,						
+				_g.allow_fractures,
+				_e.format as date_format_format
+
+			from 
+				%PRE%traits_values _a
+				
+			left join 
+				%PRE%traits_traits _b
+				on _a.project_id=_b.project_id
+				and _a.trait_id=_b.id
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _b.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _b.project_id=_f.project_id
+				and _b.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()." 
+				and _a.trait_id = ".$trait." 
+			order by 
+				_a.show_order
+		
+		");
+		
+		foreach((array)$r as $key=>$val)
+		{
+			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
+			{
+				if (!empty($val['numerical_value']))
+					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
+				if (!empty($val['numerical_value_end']))
+					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
+			} else
+			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
+			{
+				if (!empty($val['date']))
+					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
+				if (!empty($val['date_end']))
+					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
+			}
+		}
+
+		return $r;
+
+	}
+
+	private function formatDbDate($date,$format)
+	{
+		return date_format(date_create($date),$format);
+	}
+	
+
 
 
 
