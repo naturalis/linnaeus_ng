@@ -1,4 +1,21 @@
 {include file="../shared/header.tpl"}
+
+<style>
+.formrow select {
+	font-size:1em;
+	margin-left:0px;
+	width:200px;
+	margin-top:2px;
+}
+label.clickable {
+	cursor:pointer;
+}
+label.clickable:hover {
+	text-decoration:underline;
+}
+</style>
+
+
 <div id="dialogRidge">
 
 	<div id="left">
@@ -9,17 +26,17 @@
 
 	<div id="content" class="simple-search">
 
-		
 
 		<div>
 
-		<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+            <form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+            
+            <input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
+            <input type="hidden" id="author_id" name="author_id" value="{$search.author_id}">
 
-		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
-		<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}">
-
-			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:4px;border-bottom:1px solid #666666;margin-bottom:5px;">{if $search.header}{$search.header}{else}Uitgebreid zoeken naar soorten{/if}</h1>
-
+			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:4px;border-bottom:1px solid #666666;margin-bottom:5px;">
+            	{if $search.header}{$search.header}{else}Uitgebreid zoeken naar soorten{/if}
+			</h1>
 			
 
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
@@ -38,7 +55,6 @@
 
 			<fieldset>
 				<div class="formrow">
-					<p>
 					<label>
 						<strong>Status voorkomen</strong>
 						&nbsp;<a href="http://www.nederlandsesoorten.nl/node/15" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
@@ -47,64 +63,110 @@
 						<a id="togglePresenceStatusGevestigd" href="#">gevestigde soorten</a> / 
 						<a id="togglePresenceStatusNietGevestigd" href="#">niet gevestigde soorten</a>
 					</span>
-					</p>
-					<ul id="presenceStatusList">
+					<select id="presenceStatusList" name="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
-						<li>
-							<label>
-								<input type="checkbox" class="list" id="established{$v.id}" name="presence[{$v.id}]" established="{$v.established}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
-								<div class="presenceStatusCode">{$v.index_label}</div>
-								<div class="presenceStatusDescription">{$v.information_short}</div>
-							</label>
-						</li>
+						<option 
+                        	id="established{$v.id}" 
+                            value="presence[{$v.id}]" 
+                            established="{$v.established}"
+                            >
+                            <div class="presenceStatusCode">{$v.index_label}</div>
+                            <div class="presenceStatusDescription">{$v.information_short}</div>
+						</option>
 					{/foreach}
-					</ul>
+					</select>
+                    
+                    <input type="button" value=" >" />
 				</div>
 				
 				<div class="formrow">
-					<div style="width: 250px; float: left;">
-						<label accesskey="g" for="">
-							<strong>Alleen soorten</strong>
-						</label>
-						<ul id="speciesOptionList">
-							<li>
-								<input type="checkbox" class="list" id="images" name="images"{if $search.images=='on'} checked="checked"{/if}>
-								<label for="images">met foto('s)</label>
-							</li>
-							<li>
-								<input type="checkbox" class="list" id="distribution" name="distribution"{if $search.distribution=='on'} checked="checked"{/if}>
-								<label for="distribution">met verspreidingskaart</label>
-							</li>
-							<li>
-								<input type="checkbox" class="list" id="trend" name="trend"{if $search.trend=='on'} checked="checked"{/if}>
-								<label for="trend">met trendgrafiek</label>
-							</li>
-						</ul>
-					</div>
-					<div style="width: 250px; float: left;">
-						<label accesskey="d" for="">
-							<strong>Soorten voor DNA barcoding</strong>&nbsp;
-							<a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
-						</label>
-						<ul id="speciesOptionList">
-							<li>
-								<input type="checkbox" class="list" id="dna" name="dna" {if $search.dna=='on'} checked="checked"{/if}>
-								<label for="dna">met exemplaren verzameld</label>
-							</li>
-							<li>
-								<input type="checkbox" class="list" id="dna_insuff" name="dna_insuff" {if $search.dna_insuff=='on'} checked="checked"{/if}>
-								<label for="dna_insuff">minder dan drie exemplaren verzameld</label>
-							</li>
-						</ul>
-					</div>
-				</div>
-		
-				<div class="formrow">
-					<label accesskey="g" for="">Resultaten sorteren op</label>
-					<select name="sort">
-						<option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>Wetenschappelijk naam</option>
-						<option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>Nederlandse naam</option>
+                	<label class="clickable" onclick="$(this).next().toggle();">
+	                    <strong>Afbeeldingen</strong>
+                    </label>
+                    <p style="display:none">
+					<select id="presenceStatusList" name="presenceStatusList">
+                        <option value="images">met foto('s)</option>
+                        <option value="distribution">met verspreidingskaart</option>
+                        <option value="trend">met trendgrafiek</option>
 					</select>
+                    
+                    <input type="button" value=" >" />
+
+                    </p>
+				</div>
+
+				<div class="formrow">
+                	<label class="clickable" onclick="$(this).next().toggle();">
+	                    <strong>DNA barcoding</strong>
+						&nbsp;<a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
+                    </label>
+                    <p style="display:none">
+					<select id="presenceStatusList" name="presenceStatusList">
+                        <option value="dna">met exemplaren verzameld</option>
+                        <option value="dna_insuff">minder dan drie exemplaren verzameld</option>
+					</select>
+                    
+                    <input type="button" value=" >" />
+                    </p>
+				</div>
+
+	
+				{foreach from=$traits item=t}
+				<div class="formrow">
+					<label class="clickable" onclick="$(this).next().toggle();">
+						<strong>{$t.name}</strong>
+					</label>
+                    <table style="display:none">
+					{foreach from=$t.data item=d}
+                    {if $d.type_sysname!=='stringfree'}
+                    	<tr>
+                        	<td>{$d.name}</td>
+                            <td>
+                                {if $d.type_allow_values==1 && $d.value_count>0}
+                                <select id="presenceStatusList" name="presenceStatusList">
+                                {foreach from=$d.values item=v}
+                                    <option value="">{$v.string_value}</option>
+                                {/foreach}
+                                </select>
+		                        {/if}
+                                {if $d.type_allow_values==0}
+                                <input type="text" placeholder="{$d.date_format_format_hr}" />
+                                {/if}
+                                <input type="button" value=" >" />
+							</td>
+						</tr>
+					{/if}
+					{/foreach}
+                    </table>
+
+
+
+
+                    
+                    
+				</div>
+				{/foreach}
+                
+                
+                
+		
+
+
+
+				<div class="formrow" style="margin-top:10px;">
+					<strong>Geselecteerde zoekparameters:</strong>
+                    <ul id="parameters">
+                    </ul>
+				</div>
+
+
+
+				<div class="formrow">
+					<strong>Resultaten sorteren op:</strong>
+                    <select name="sort">
+                        <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>Wetenschappelijk naam</option>
+                        <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>Nederlandse naam</option>
+                    </select>
 				</div>
 
 				<input type="submit" class="zoekknop" value="zoek">
@@ -145,7 +207,21 @@
 </div>
 
 
-	
+{*
+
+{foreach from=$presence_statuses item=v}
+{if $search.presence[$v.id]=='on'}{/if}
+{/foreach}
+<input type="checkbox" class="list" id="images" name="images"{if $search.images=='on'} checked="checked"{/if}>
+<input type="checkbox" class="list" id="distribution" name="distribution"{if $search.distribution=='on'} checked="checked"{/if}>
+<input type="checkbox" class="list" id="trend" name="trend"{if $search.trend=='on'} checked="checked"{/if}>
+<input type="checkbox" class="list" id="dna" name="dna" {if $search.dna=='on'} checked="checked"{/if}>
+<input type="checkbox" class="list" id="dna_insuff" name="dna_insuff" {if $search.dna_insuff=='on'} checked="checked"{/if}>
+*}
+
+
+
+
 	
     
 {literal}
