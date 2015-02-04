@@ -103,7 +103,7 @@ class SearchControllerNSR extends SearchController
     public function searchExtendedAction()
     {
 		$search=isset($this->requestData) ? $this->requestData : null;
-		
+
 		if ($this->rHasVal('action','export'))
 		{
 			$search['limit']=1000;
@@ -125,13 +125,12 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
-		
 
 		$this->traitGroupsToInclude=array(1);
 		$this->smarty->assign('traits',$this->getTraits($this->traitGroupsToInclude));
 
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-//		$this->smarty->assign('results',$this->doExtendedSearch($search));
+		$this->smarty->assign('results',$this->doExtendedSearch($search));
         $this->printPage($template);
     }
 
