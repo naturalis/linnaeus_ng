@@ -2,8 +2,6 @@ var projectId=null;
 
 (function($)
 {
-
-
     $.fn.removeClassRegEx = function(regex)
     {
         var classes = $(this).attr('class');
