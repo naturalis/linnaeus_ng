@@ -26,7 +26,9 @@ class SearchControllerNSR extends SearchController
 		'media_taxon',
 		'name_types',
 		'traits_traits',
-		'traits_values'
+		'traits_values',
+		'traits_taxon_values',
+		'traits_taxon_freevalues'
     );
 
     public $controllerPublicName = 'Search';
@@ -495,9 +497,9 @@ class SearchControllerNSR extends SearchController
 		}
 
 		if ($d) 
+		{
 			$ancestor=$d[0];
-//		else
-//			return null;
+		}
 
 		$img=!empty($p['images']);
 		$distribution=!empty($p['distribution']);
@@ -519,6 +521,25 @@ class SearchControllerNSR extends SearchController
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
+		$traits=!empty($p['traits']) ? $p['traits'] :null;
+
+		if (!empty($traits))
+		{
+			$traitIds=array();
+			foreach((array)$traits as $key=>$val)
+			{
+				if ($val=='on')
+				{
+					$traitIds[]=$key;
+				}
+			}
+
+			$haveTraits=true;
+		}
+		else
+		{
+			$haveTraits=false;
+		}
 
 		$data=$this->models->Taxon->freeQuery("
 			select
@@ -535,8 +556,15 @@ class SearchControllerNSR extends SearchController
 				_h.index_label as presence_information_index_label,
 				_l.file_name as overview_image,
 				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
-			
+				".($haveTraits ? ", count(_trait.taxon_id) as trait_count " : "" )."
 			from %PRE%taxa _a
+			".($haveTraits ? "
+
+				right join %PRE%traits_taxon_values _trait
+					on _a.project_id = _trait.project_id
+					and _a.id =  _trait.taxon_id
+					and _trait.value_id in (".implode(",",$traitIds).")
+				" : "" )."
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -657,16 +685,46 @@ class SearchControllerNSR extends SearchController
 			".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
 			".($trend ? "and number_of_trend_years > 0" : "")."
 			".($distribution ? "and number_of_maps > 0" : "")."
-
+			".($haveTraits ? " group by _a.id" : "" )."
+			".($haveTraits ? " having trait_count > 0": "" )."
 			order by ".(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 	
 		//q($this->models->Taxon->q(),1);
+		//q($data,1);
 
-		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		$count=$count[0]['total'];
+		
+		if ($haveTraits)
+		{
+			$dataWithMatchingTraits=array();
+			foreach((array)$data as $key=>$val)
+			{
+				$d=$this->getTaxonTraitValues($val['taxon_id']);
+				$t=array();
+				foreach($d as $a) $t[]=$a['value_id'];
+				$p=true;
+				foreach($traitIds as $v1) { if (!in_array($v1,$t)) $p=false; }
+				if ($p) $dataWithMatchingTraits[$key]=$val;
+			}
+			$data=$dataWithMatchingTraits;
+			
+			if (count($data)>=$this->_resSpeciesPerPage)
+			{
+				$count='?'; // eeeeek!
+			}
+			else
+			{
+				$count=count($data);
+			}
+		}
 
+//q($data,1);
+
+		
 		foreach((array)$data as $key=>$val)
 		{
 			$img=$this->models->MediaTaxon->freeQuery("
@@ -688,7 +746,7 @@ class SearchControllerNSR extends SearchController
 
 		return 
 			array(
-				'count'=>$count[0]['total'],
+				'count'=>$count,
 				'data'=>$data,
 				'perpage'=>$this->_resSpeciesPerPage,
 				'ancestor'=>isset($ancestor) ? $ancestor : null
@@ -1336,8 +1394,11 @@ class SearchControllerNSR extends SearchController
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
 
-		//http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
-		echo chr(239).chr(187).chr(191);
+		if (!empty($charset) && strtolower($charset)=='utf-8')
+		{
+			//http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
+			echo chr(239).chr(187).chr(191);
+		}
 	}
 
 	private function getTraits($groups)
@@ -1434,7 +1495,7 @@ class SearchControllerNSR extends SearchController
 			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
 			$data[$trait['trait_group_id']]['data'][]=$trait;
 		}
-//q($data,1);
+
 		return $data;
 	}
 
@@ -1506,6 +1567,20 @@ class SearchControllerNSR extends SearchController
 		}
 
 		return $r;
+
+	}
+
+	private function getTaxonTraitValues($taxon)
+	{
+		if (empty($taxon)) return;
+
+		return $this->models->TraitsTaxonValues->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$taxon
+			),
+			'columns'=>'id,value_id'
+		));
 
 	}
 

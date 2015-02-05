@@ -43,16 +43,26 @@ function addSearchParameter(id)
 function printParameters()
 {
 	$('#search-parameters').empty();
+
 	for(var i=0;i<search_parameters.length;i++)
 	{
 		var e=search_parameters[i];
-		$('#search-parameters').append($('<li>'+e.varlabel+': '+e.valuetext+' <a href="#" onclick="removeSearchParameter('+i+');return false;"> X </a></li>'));
+		$('#search-parameters').
+			append($('<li>'+e.varlabel+': '+e.valuetext+' <a href="#" onclick="removeSearchParameter('+i+');return false;"> X </a></li>'));
 	}
+
+	$('#remove-all').toggle(search_parameters.length>0);
 }
 
 function removeSearchParameter(i)
 {
 	search_parameters.splice(i,1);
+	printParameters();
+}
+
+function removeAllSearchParameters()
+{
+	search_parameters.splice(0);
 	printParameters();
 }
 
@@ -133,6 +143,9 @@ label.clickable {
 label.clickable:hover {
 	text-decoration:underline;
 }
+.zoekknop {
+	cursor:pointer;
+}
 </style>
 
 
@@ -141,36 +154,30 @@ label.clickable:hover {
 	<div id="left">
 	
 	{include file="_toolbox.tpl"}
-    
-    <div id=fuck>
-    </div>
-	
+
 	</div>
 
 	<div id="content" class="simple-search">
 
-
 		<div>
 
             <form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
-            
-            <input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
-            <input type="hidden" id="author_id" name="author_id" value="{$search.author_id}">
+            <input type="hidden" id="group_id" name="group_id" value="{$search.group_id}" />
+            <input type="hidden" id="author_id" name="author_id" value="{$search.author_id}" />
 
 			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:4px;border-bottom:1px solid #666666;margin-bottom:5px;">
-            	{if $search.header}{$search.header}{else}Uitgebreid zoeken naar soorten{/if}
+            	{if $search.header}{$search.header}{else}{t}Uitgebreid zoeken naar soorten{/t}{/if}
 			</h1>
 			
-
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
-					<label accesskey="g" for="search">Soortgroep</label>
+					<label accesskey="g" for="search">{t}Soortgroep{/t}</label>
 					<input type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
 					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 				<div class="formrow">
-					<label accesskey="g" for="author">Auteur</label>
+					<label accesskey="g" for="author">{t}Auteur{/t}</label>
 					<input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
 					<div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
@@ -179,23 +186,26 @@ label.clickable:hover {
 			<fieldset>
 				<div class="formrow">
 					<label for="presenceStatusList">
-						<strong>Status voorkomen</strong>
-						&nbsp;<a href="http://www.nederlandsesoorten.nl/node/15" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
+						<strong>{t}Status voorkomen{/t}</strong>&nbsp;
+                        <a href="http://www.nederlandsesoorten.nl/node/15"
+                        	target="_blank" 
+                            title="{t}klik voor help over dit onderdeel{/t}" 
+                            class="help">&nbsp;</a>
 					</label>
 					<span style="float:right">
-						<a href="#" onclick="addEstablished();return false;">gevestigde soorten</a> / 
-						<a href="#" onclick="addNonEstablished();return false;">niet gevestigde soorten</a>
+						<a href="#" onclick="addEstablished();return false;">{t}gevestigde soorten{/t}</a> / 
+						<a href="#" onclick="addNonEstablished();return false;">{t}niet gevestigde soorten{/t}</a>
 					</span>
 					<select id="presenceStatusList" name="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
-						<option 
-                        	id="established{$v.id}" 
+                        <option 
+                            id="established{$v.id}" 
                             value="presence[{$v.id}]" 
                             established="{$v.established}"
                             >
                             <div class="presenceStatusCode">{$v.index_label}</div>
                             <div class="presenceStatusDescription">{$v.information_short}</div>
-						</option>
+                        </option>
 					{/foreach}
 					</select>
                     
@@ -204,38 +214,38 @@ label.clickable:hover {
 				
 				<div class="formrow">
                 	<label for="photoOptions" class="clickable" onclick="$(this).next().toggle();">
-	                    <strong>Afbeeldingen</strong>
+	                    <strong>{t}Afbeeldingen{/t}</strong>
                     </label>
                     <p style="display:none">
 					<select id="photoOptions" name="photoOptions">
-                        <option value="images">met foto('s)</option>
-                        <option value="distribution">met verspreidingskaart</option>
-                        <option value="trend">met trendgrafiek</option>
+                        <option value="images">{t}met foto('s){/t}</option>
+                        <option value="distribution">{t}met verspreidingskaart{/t}</option>
+                        <option value="trend">{t}met trendgrafiek{/t}</option>
 					</select>
-                    
                     <input type="button" value=" > " onclick="addSearchParameter('photoOptions');" />
-
                     </p>
 				</div>
 
 				<div class="formrow">
                 	<label for="dnaOptions" class="clickable" onclick="$(this).next().toggle();">
-	                    <strong>DNA barcoding</strong>
-						&nbsp;<a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" target="_blank" title="klik voor help over dit onderdeel" class="help">&nbsp;</a>
+	                    <strong>{t}DNA barcoding{/t}</strong>&nbsp;
+                        <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" 
+                        	target="_blank" 
+                            title="klik voor help over dit onderdeel" 
+                            class="help">&nbsp;</a>
                     </label>
                     <p style="display:none">
-					<select id="dnaOptions" name="dnaOptions">
-                        <option value="dna">met exemplaren verzameld</option>
-                        <option value="dna_insuff">minder dan drie exemplaren verzameld</option>
-					</select>
-                    
+                    <select id="dnaOptions" name="dnaOptions">
+                        <option value="dna">{t}met exemplaren verzameld{/t}</option>
+                        <option value="dna_insuff">{t}minder dan drie exemplaren verzameld{/t}</option>
+                    </select>
                     <input type="button" value=" > " onclick="addSearchParameter('dnaOptions');" />
                     </p>
 				</div>
 	
 				{foreach from=$traits item=t key=k1}
 				<div class="formrow">
-					<label class="clickable" onclick="$(this).next().toggle();">
+					<label for="traits" class="clickable" onclick="$(this).next().toggle();">
 						<strong>{$t.name}</strong>
 					</label>
                     <table style="display:none">
@@ -251,7 +261,11 @@ label.clickable:hover {
                                 {/foreach}
                                 </select>
                                 {else if $d.type_allow_values==0}
-                                <input id="trait-{$k1}{$k2}" value_id="{$v.id}" placeholder="{$d.date_format_format_hr}" maxlength="{$d.date_format_format_hr|@strlen}" />
+                                <input
+                                	id="trait-{$k1}{$k2}" 
+                                    value_id="{$v.id}" 
+                                    placeholder="{$d.date_format_format_hr}" 
+                                    maxlength="{$d.date_format_format_hr|@strlen}" />
                                 {/if}
                                 <input type="button" value=" > " onclick="addSearchParameter('trait-{$k1}{$k2}');" />
 							</td>
@@ -261,106 +275,100 @@ label.clickable:hover {
                     </table>
 				</div>
 				{/foreach}
-                
 
 				<div class="formrow" style="margin-top:10px;">
-					<strong>Geselecteerde zoekparameters:</strong>
+					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
+                    <span id="remove-all" style="display:none">&nbsp;<a href="#" onclick="removeAllSearchParameters();return;">{t}alles verwijderen{/t}</a></span>
                     <ul id="search-parameters">
                     </ul>
 				</div>
 
-
-
 				<div class="formrow">
-					<strong>Resultaten sorteren op:</strong>
+					<strong>{t}Resultaten sorteren op:{/t}</strong>
                     <select name="sort" id="sort">
-                        <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>Wetenschappelijk naam</option>
-                        <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>Nederlandse naam</option>
+                        <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
+                        <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>{t}Nederlandse naam{/t}</option>
                     </select>
 				</div>
-
-				<input type="button=" class="zoekknop" value="zoek" onclick="submitSearchParams()" />
+                
+                <div class="formrow">
+					<input type="button=" class="zoekknop" value="zoek" onclick="submitSearchParams()" />
+				</div>
                 
 			</fieldset>
+
 			</div>
 		</form>
 		</div>
 
-<script>
-
-{foreach from=$search item=v}
-{/
-
-
-$('option').each(function () {
-
-	if ($(this).val()=='presence[15]')
-	{
-		$("#presenceStatusList").val($(this).val());
-		addSearchParameter('presenceStatusList');
-
-	}
-
-});
-
-</script>
-
-
-
-{*
-
 		<div id="results">
 			<p>
-				<h4><span id="resultcount-header">{$results.count}</span>{if $searchHR} voor '{$searchHR}'{/if}</h4>
+				<h4><span id="resultcount-header">{$results.count}</span>{if $searchHR} {t}voor{/t} '{$searchHR}'{/if}</h4>
 			</p>
 			{foreach from=$results.data item=v}
-				<div class="result">
-					{if $v.overview_image}
-					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}" />
-					{/if}
-					<strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
-					{if $v.common_name}{$v.common_name}<br />{/if}
-					Status voorkomen: {$v.presence_information_index_label} {$v.presence_information_title}
-				</div>
+            <div class="result">
+                {if $v.overview_image}
+                <img src="http://images.naturalis.nl/120x75/{$v.overview_image}" />
+                {/if}
+                <strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
+                {if $v.common_name}{$v.common_name}<br />{/if}
+                {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
+            </div>
 			{/foreach}
 		</div>
         
-*}
-{*
+
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
 		{assign var=pgnCurrPage value=$search.page}
 		{assign var=pgnURL value=$smarty.server.PHP_SELF}
 		{assign var=pgnQuerystring value=$querystring}
 		{include file="../shared/_paginator.tpl"}
-*}				
+
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
 
 </div>
 
-
-{*
-
-{foreach from=$presence_statuses item=v}
-{if $search.presence[$v.id]=='on'}{/if}
+<script>
+{if $search}
+{foreach from=$search.presence item=v key=k}
+$("#presenceStatusList").val('presence[{$k}]');
+addSearchParameter('presenceStatusList');
 {/foreach}
-<input type="checkbox" class="list" id="images" name="images"{if $search.images=='on'} checked="checked"{/if}>
-<input type="checkbox" class="list" id="distribution" name="distribution"{if $search.distribution=='on'} checked="checked"{/if}>
-<input type="checkbox" class="list" id="trend" name="trend"{if $search.trend=='on'} checked="checked"{/if}>
-<input type="checkbox" class="list" id="dna" name="dna" {if $search.dna=='on'} checked="checked"{/if}>
-<input type="checkbox" class="list" id="dna_insuff" name="dna_insuff" {if $search.dna_insuff=='on'} checked="checked"{/if}>
-*}
 
+{foreach from=$search item=v key=k}
+{if $k=='images' || $k=='distribution' || $k=='trend'}
+$("#photoOptions").val('{$k}');
+addSearchParameter('photoOptions');
+$('label[for=photoOptions]').next().toggle(true);
+{else if $k=='dna' || $k=='dna_insuff'}
+$("#dnaOptions").val('{$k}');
+addSearchParameter('dnaOptions');
+$('label[for=dnaOptions]').next().toggle(true);
+{/if}
+{/foreach}
 
-<script type="text/JavaScript">
+var t=[{foreach name=tloop from=$search.traits item=v key=k}{if $smarty.foreach.tloop.index>0},{/if}'{$k}'{/foreach}];
+
+$('select[id^=trait-] > option').each(function()
+{
+	var s=$(this).parent().attr('id');
+	var o=$(this).attr('value');
+
+	if (t.indexOf(o)!=-1)
+	{
+		$("#"+s).val(o);
+		addSearchParameter(s);
+	}
+
+});
+
+{/if}
+
 $(document).ready(function()
 {
-	
-
-	
-	
 	$('title').html('Uitgebreid zoeken naar soorten - '+$('title').html());
 	bindKeys();
 });
