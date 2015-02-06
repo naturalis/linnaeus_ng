@@ -465,6 +465,7 @@ class TraitsController extends Controller
 			$this->redirect('traitgroup_traits.php?group='.$group['id']);
 		}
 
+		$this->smarty->assign('languages',$this->getProjectLanguages());
 		$this->smarty->assign('datatypes',$this->getDatatypes());
 		$this->smarty->assign('dateformats',$this->getDateFormats());
 		$this->smarty->assign('group',$group);
@@ -670,7 +671,7 @@ class TraitsController extends Controller
 		");
 
 		$r = isset($r[0]) ? $r[0] : null;
-
+	
 		if (!empty($r))
 		{
 			if (strpos($r['type_sysname'],'float')===false)
@@ -1404,7 +1405,7 @@ class TraitsController extends Controller
 
 	private function formatDbDate($date,$format)
 	{
-		return date_format(date_create($date),$format);
+		return is_null($date) ? null : date_format(date_create($date),$format);
 	}
 	
 	public function makeInsertableDate($date,$format)
