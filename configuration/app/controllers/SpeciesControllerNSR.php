@@ -231,9 +231,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			}
 
-
 			$this->setPageName($taxon['label']);
-
 
 			$this->smarty->assign('content',$content['content']);
             $this->smarty->assign('sideBarLogos',$sideBarLogos);

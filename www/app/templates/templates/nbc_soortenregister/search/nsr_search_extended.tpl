@@ -15,6 +15,7 @@ function addSearchParameter(id)
 
 	if (tagtype=='SELECT')
 	{
+		var traitid=null;
 		var valueid=$('#'+id+' :selected').val();
 		var value='on';
 		var valuetext=$('#'+id+' :selected').text().trim();
@@ -22,7 +23,8 @@ function addSearchParameter(id)
 	else
 	if (tagtype=='INPUT')
 	{
-		var valueid=ele.attr('value_id');
+		var traitid=ele.attr('trait-id');
+		var valueid=null;
 		var value=ele.val();
 		var valuetext=value;
 	}
@@ -36,7 +38,7 @@ function addSearchParameter(id)
 		}
 	}
 		
-	search_parameters.push( { valueid:valueid,value:value,valuetext:valuetext,varlabel:varlabel,istrait:istrait } );
+	search_parameters.push( { traitid:traitid,valueid:valueid,value:value,valuetext:valuetext,varlabel:varlabel,istrait:istrait } );
 	printParameters();
 }
 
@@ -116,7 +118,14 @@ function submitSearchParams()
 
 		if (param.istrait)
 		{
-			form.append('<input type="hidden" name="traits['+param.valueid+']" value="'+param.value+'" />');
+			if (param.traitid)
+			{
+				form.append('<input type="hidden" name="traits[freevalues]['+param.traitid+']" value="'+param.value+'" />');
+			}
+			else
+			{
+				form.append('<input type="hidden" name="traits[values]['+param.valueid+']" value="'+param.value+'" />');
+			}
 		}
 		else
 		{
@@ -263,7 +272,7 @@ label.clickable:hover {
                                 {else if $d.type_allow_values==0}
                                 <input
                                 	id="trait-{$k1}{$k2}" 
-                                    value_id="{$v.id}" 
+                                    trait-id="{$d.id}"
                                     placeholder="{$d.date_format_format_hr}" 
                                     maxlength="{$d.date_format_format_hr|@strlen}" />
                                 {/if}
@@ -278,7 +287,9 @@ label.clickable:hover {
 
 				<div class="formrow" style="margin-top:10px;">
 					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
-                    <span id="remove-all" style="display:none">&nbsp;<a href="#" onclick="removeAllSearchParameters();return;">{t}alles verwijderen{/t}</a></span>
+                    <span id="remove-all" style="display:none">&nbsp;
+                    	<a href="#" onclick="removeAllSearchParameters();return;">{t}alles verwijderen{/t}</a>
+					</span>
                     <ul id="search-parameters">
                     </ul>
 				</div>
@@ -338,7 +349,7 @@ $("#presenceStatusList").val('presence[{$k}]');
 addSearchParameter('presenceStatusList');
 {/foreach}
 
-{foreach from=$search item=v key=k}
+{foreach from=$search.values item=v key=k}
 {if $k=='images' || $k=='distribution' || $k=='trend'}
 $("#photoOptions").val('{$k}');
 addSearchParameter('photoOptions');
@@ -350,7 +361,7 @@ $('label[for=dnaOptions]').next().toggle(true);
 {/if}
 {/foreach}
 
-var t=[{foreach name=tloop from=$search.traits item=v key=k}{if $smarty.foreach.tloop.index>0},{/if}'{$k}'{/foreach}];
+var t=[{foreach name=tloop from=$search.traits.values item=v key=k}{if $smarty.foreach.tloop.index>0},{/if}'{$k}'{/foreach}];
 
 $('select[id^=trait-] > option').each(function()
 {
@@ -364,6 +375,14 @@ $('select[id^=trait-] > option').each(function()
 	}
 
 });
+
+{foreach from=$search.traits.freevalues item=v key=k}
+$('input[trait-id={$k}]').val('{$v}').next().trigger('click');
+{/foreach}
+
+{if $search.traits.values|@count>0 || $search.traits.freevalues|@count>0}
+$('label[for=traits]').next().toggle(true);
+{/if}
 
 {/if}
 

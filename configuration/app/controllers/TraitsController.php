@@ -40,6 +40,11 @@ class TraitsController extends Controller
     }
 
 
+	private function formatDbDate($date,$format)
+	{
+		return is_null($date) ? null : date_format(date_create($date),$format);
+	}
+
     public function getAction()
 	{
 		$project=$this->rGetVal('project');
@@ -75,6 +80,10 @@ class TraitsController extends Controller
 						WHEN locate('date',_g.sysname)=1 THEN _b.date_end
 						ELSE null
 					END) AS value_end,
+
+					_b.date as _date_value,
+					_b.date_end as _date_value_end,
+					_e.format as _date_format,
 					
 					_c.show_order as _show_order_1,
 					_b.show_order as _show_order_2
@@ -111,10 +120,15 @@ class TraitsController extends Controller
 			
 				left join  %PRE%traits_types _g
 					on _f.type_id=_g.id
-			
+
+				left join 
+					%PRE%traits_date_formats _e
+					on _c.date_format_id=_e.id
+							
 				where
 					_a.project_id=".$project."
 					and _a.taxon_id=".$taxon."
+					and _b.trait_id is not null
 			
 				union
 			
@@ -136,6 +150,10 @@ class TraitsController extends Controller
 						WHEN locate('date',_g.sysname)=1 THEN date_value_end
 						ELSE null
 					END) AS value_end,
+
+					date_value as _date_value,
+					date_value_end as _date_value_end,
+					_e.format as _date_format,
 			
 					_c.show_order as _show_order_1,
 					null as _show_order_2
@@ -168,6 +186,10 @@ class TraitsController extends Controller
 				
 				left join %PRE%traits_types _g
 					on _f.type_id=_g.id
+
+				left join 
+					%PRE%traits_date_formats _e
+					on _c.date_format_id=_e.id
 				
 				where
 					_a.project_id=".$project."
@@ -177,28 +199,38 @@ class TraitsController extends Controller
 			order by _show_order_1,_show_order_2
 		");
 	
-		$data=array();
+		$d=array();
+		
 		foreach($r as $key=>$val)
 		{
-			$data[$key]=
+			$d[$val['trait_id']]['trait']=
 				array(
-					'trait'=>
-						array(
-							'id'=>$val['trait_id'],
-							'sysname'=>$val['trait_sysname'],
-							'name'=>$val['trait_name'],
-							'code'=>$val['trait_code'],
-							'description'=>$val['trait_description'],
-							'type'=>$val['trait_type_sysname'],
-						),
-					'values'=>
-						array(
-							'value_start'=>$val['value_start'],
-							'value_end'=>$val['value_end'],
-						)
+					'id'=>$val['trait_id'],
+					'sysname'=>$val['trait_sysname'],
+					'name'=>$val['trait_name'],
+					'code'=>$val['trait_code'],
+					'description'=>$val['trait_description'],
+					'type'=>$val['trait_type_sysname'],
+				);
+				
+			if (!empty($val['_date_value']))
+				$val['value_start']=$this->formatDbDate($val['_date_value'],$val['_date_format']);
+			if (!empty($val['_date_value_end']))
+				$val['value_end']=$this->formatDbDate($val['_date_value_end'],$val['_date_format']);
 
+			$d[$val['trait_id']]['values'][]=
+				array(
+					'value_start'=>$val['value_start'],
+					'value_end'=>$val['value_end'],
 				);
 		}
+
+		foreach($d as $val)
+		{
+			$data[]=$val;
+		}
+		
+		//q($data,1);
 		
 		echo json_encode(array(
 			'request'=>array(

@@ -93,7 +93,7 @@ class SearchControllerNSR extends SearchController
 		else
 		{
 			$template=null;
-			$this->smarty->assign('querystring',htmlspecialchars($this->reconstructQueryString(array('page'))));
+			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('type',$searchType);
 			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
@@ -121,8 +121,8 @@ class SearchControllerNSR extends SearchController
 		}
 		else
 		{
-			$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 			$this->smarty->assign('search',$search);	
+			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
@@ -171,8 +171,8 @@ class SearchControllerNSR extends SearchController
 
 		$results = $this->doPictureSearch($search);
 
-		$this->smarty->assign('search',$this->requestData);	
-		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
+		$this->smarty->assign('search',$search);	
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 		$this->smarty->assign('results',$results);	
 			
         $this->printPage($template);
@@ -180,9 +180,10 @@ class SearchControllerNSR extends SearchController
 
     public function recentPicturesAction()
     {
-		$results = $this->doPictureSearch($this->requestData);
-		$this->smarty->assign('search',$this->requestData);	
-		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
+		$search=$this->requestData;
+		$results = $this->doPictureSearch($search);
+		$this->smarty->assign('search',$search);	
+		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 		$this->smarty->assign('results',$results);	
 		$this->smarty->assign('show','photographers');
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
@@ -274,6 +275,7 @@ class SearchControllerNSR extends SearchController
 			);
 		
 	}
+
 
 	private function doSearch($p)
 	{
@@ -504,9 +506,7 @@ class SearchControllerNSR extends SearchController
 		$img=!empty($p['images']);
 		$distribution=!empty($p['distribution']);
 		$trend=!empty($p['trend']);
-
 		$dna=(!empty($p['dna']) || !empty($p['dna_insuff']));
-
 		$dna_insuff=!empty($p['dna_insuff']);
 
 		if (!empty($p['author'])) $auth=$p['author'];
@@ -514,32 +514,51 @@ class SearchControllerNSR extends SearchController
 		if (!empty($p['presence']))
 		{
 			$pres=array();
-			foreach((array)$p['presence'] as $key=>$val) {
+			foreach((array)$p['presence'] as $key=>$val)
+			{
 				if ($val=='on') $pres[]=intval($key);
 			}
 		}
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
-		$traits=!empty($p['traits']) ? $p['traits'] :null;
 
+
+		// TRAITS
+		$traits=!empty($p['traits']) ? $p['traits'] :null;
+		$haveTraits=false;
 		if (!empty($traits))
 		{
-			$traitIds=array();
-			foreach((array)$traits as $key=>$val)
+			if (isset($traits['values']))
 			{
-				if ($val=='on')
+				$valueIds=array();
+				foreach((array)$traits['values'] as $key=>$val)
 				{
-					$traitIds[]=$key;
+					if ($val=='on')
+					{
+						$valueIds[]=$key;
+					}
 				}
+				$haveTraits=true;
 			}
 
-			$haveTraits=true;
+			if (isset($traits['freevalues']))
+			{
+				$traitIds=array();
+				foreach((array)$traits['freevalues'] as $key=>$val)
+				{
+					$traitIds[]=$key;
+				}				
+
+				$traitFreevalues=$traits['freevalues']; // traitid => user entered value
+				$haveTraits=true;
+			}
+
+			$haveValueIds=(isset($valueIds) && count($valueIds)>0);
+			$haveTraitIds=(isset($traitIds) && count($traitIds)>0);
 		}
-		else
-		{
-			$haveTraits=false;
-		}
+		// /TRAITS
+
 
 		$data=$this->models->Taxon->freeQuery("
 			select
@@ -556,15 +575,37 @@ class SearchControllerNSR extends SearchController
 				_h.index_label as presence_information_index_label,
 				_l.file_name as overview_image,
 				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
-				".($haveTraits ? ", count(_trait.taxon_id) as trait_count " : "" )."
-			from %PRE%taxa _a
-			".($haveTraits ? "
+				".($haveTraits && isset($valueIds) && count($valueIds)>0 ? ", count(_trait_values.taxon_id) as _trait_value_count " : "" )."
+				".($haveTraits && isset($traitIds) && count($traitIds)>0 ? ", _trait_freevalues.trait_count as _freevalue_trait_count " : "" )."
 
-				right join %PRE%traits_taxon_values _trait
-					on _a.project_id = _trait.project_id
-					and _a.id =  _trait.taxon_id
-					and _trait.value_id in (".implode(",",$traitIds).")
+			from %PRE%taxa _a
+
+			".($haveTraits ?
+			
+				($haveValueIds ? "
+					right join %PRE%traits_taxon_values _trait_values
+						on _a.project_id = _trait_values.project_id
+						and _a.id =  _trait_values.taxon_id
+						and _trait_values.value_id in (".implode(",",$valueIds).")
+				" : "").
+				
+				($haveTraitIds ? "
+					left join 
+						(
+							select
+								count(*) as trait_count, project_id, taxon_id
+							from
+								%PRE%traits_taxon_freevalues
+							where
+								trait_id in (".implode(",",$traitIds).")
+							group by
+								project_id, taxon_id
+						) as _trait_freevalues 
+					on _a.project_id = _trait_freevalues.project_id
+					and _a.id = _trait_freevalues.taxon_id
 				" : "" )."
+			
+			" : "" )."
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -585,7 +626,7 @@ class SearchControllerNSR extends SearchController
 					and _m.language_id=".LANGUAGE_ID_SCIENTIFIC : "" 
 				)."
 
-			". ($img ? "
+			".($img ? "
 				left join
 					(
 						select 
@@ -608,44 +649,54 @@ class SearchControllerNSR extends SearchController
 					and _i.project_id=_a.project_id" :  "" 
 				)."
 			
-			". ($dna ? "
+			".($dna ? "
 				left join
-				(select project_id,taxon_id,count(*) as number_of_barcodes 
-					from %PRE%dna_barcodes group by project_id,taxon_id) as _j
+					(
+						select 
+							project_id,taxon_id,count(*) as number_of_barcodes 
+						from
+							%PRE%dna_barcodes group by project_id,taxon_id
+					) as _j
 					on _a.id=_j.taxon_id
 					and _j.project_id=_a.project_id" :  "" 
 				)."
 
-			". ($trend ? "
+			".($trend ? "
 				left join
-				(select project_id,taxon_id,count(*) as number_of_trend_years 
-					from %PRE%taxon_trend_years group by project_id,taxon_id) as _trnd
+					(
+						select 
+							project_id,taxon_id,count(*) as number_of_trend_years 
+						from
+							%PRE%taxon_trend_years 
+						group by 
+							project_id,taxon_id
+					) as _trnd
 					on _a.id=_trnd.taxon_id
 					and _trnd.project_id=_a.project_id" :  "" 
 				)."
 
-			". ($distribution ? "
+			".($distribution ? "
 				left join
 					(
 						select 
 							_sub2.project_id,taxon_id,count(*) as number_of_maps
 						from
 							%PRE%media_taxon as _sub2
-
+	
 						left join %PRE%media_meta _meta19
 							on _sub2.id=_meta19.media_id
 							and _sub2.project_id=_meta19.project_id
 							and _meta19.sys_label='verspreidingsKaart'
-
+	
 						where
 							_meta19.meta_data=1
-
+	
 						group by
 							_sub2.project_id,taxon_id
 					) as _ii
 					on _a.id=_ii.taxon_id
 					and _ii.project_id=_a.project_id" :  "" 
-				)."
+			)."
 
 			right join %PRE%taxon_quick_parentage _q
 				on _a.id=_q.taxon_id
@@ -678,52 +729,98 @@ class SearchControllerNSR extends SearchController
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.lower_taxon=1
 				and ifnull(_trash.is_deleted,0)=0
-			".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)" : "")."
-			".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
-			".(isset($auth) ? "and _m.authorship like '". mysql_real_escape_string($auth)."%'" : "")."
-			".($img ? "and number_of_images > 0" : "")."
-			".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
-			".($trend ? "and number_of_trend_years > 0" : "")."
-			".($distribution ? "and number_of_maps > 0" : "")."
-			".($haveTraits ? " group by _a.id" : "" )."
-			".($haveTraits ? " having trait_count > 0": "" )."
-			order by ".(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name" : "_a.taxon")."
+				".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)" : "")."
+				".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
+				".(isset($auth) ? "and _m.authorship like '". mysql_real_escape_string($auth)."%'" : "")."
+				".($img ? "and number_of_images > 0" : "")."
+				".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
+				".($trend ? "and number_of_trend_years > 0" : "")."
+				".($distribution ? "and number_of_maps > 0" : "")."
+				".($haveTraits ? " group by _a.id" : "" )."
+				".($haveTraits && ($haveValueIds || $haveTraitIds) ? " having (".
+					($haveValueIds ? "_trait_value_count > 0 " : "").
+					($haveValueIds && $haveTraitIds ? "  and  " : "").
+					($haveTraitIds ? "_freevalue_trait_count > 0" : "" ) .")"
+				: "" )."
+			order by ".
+				(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 	
-		//q($this->models->Taxon->q(),1);
 		//q($data,1);
+		//q($this->models->Taxon->q(),1);
 
 		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 		$count=$count[0]['total'];
-		
+
 		if ($haveTraits)
 		{
 			$dataWithMatchingTraits=array();
+			$filtered=0;
+
 			foreach((array)$data as $key=>$val)
 			{
-				$d=$this->getTaxonTraitValues($val['taxon_id']);
-				$t=array();
-				foreach($d as $a) $t[]=$a['value_id'];
+				$taxonValues=$this->getTaxonTraitValues($val['taxon_id']);
 				$p=true;
-				foreach($traitIds as $v1) { if (!in_array($v1,$t)) $p=false; }
-				if ($p) $dataWithMatchingTraits[$key]=$val;
+
+				if ($haveValueIds && !empty($taxonValues['values']))
+				{
+					$t=array();
+					foreach($taxonValues['values'] as $a) $t[]=$a['value_id'];
+					foreach($valueIds as $v1) { if (!in_array($v1,$t)) $p=false; }
+				}
+
+				if ($haveTraitIds && !empty($taxonValues['freevalues']))
+				{
+					// iterate though all the stored free values of a taxon
+					foreach($taxonValues['freevalues'] as $taxonFreeValue)//va1
+					{
+						// each time, iterate through all free value's the use has entered
+						foreach($traitFreevalues as $traitId=>$traitFreeValue)//k2 v2
+						{
+							// if the trait ID of one of the taxon's stored values equals one the user entered
+							if($taxonFreeValue['trait_id']==$traitId)
+							{
+								if ((!empty($taxonFreeValue['date_value']) || 
+									!empty($taxonFreeValue['date_end']))  && 
+									!empty($taxonFreeValue['date_format_format']))
+								{
+
+									$y_start=$this->formatDbDate($taxonFreeValue['date_value'],$taxonFreeValue['date_format_format']);
+									$y_end=$this->formatDbDate($taxonFreeValue['date_value_end'],$taxonFreeValue['date_format_format']);
+									$y_user=$this->formatDbDate($traitFreeValue,$taxonFreeValue['date_format_format']);
+
+									if (empty($y_end) && $y_start!=$y_user) $p=false;
+									if (!empty($y_end) && ($y_start>$y_user || $y_user>$y_end)) $p=false;
+								}								
+							}
+						}
+					}
+				}
+				
+				if ($p)
+				{
+					$dataWithMatchingTraits[$key]=$val;
+				}
+				else
+				{
+					$filtered++;
+				}
 			}
+
 			$data=$dataWithMatchingTraits;
-			
+
 			if (count($data)>=$this->_resSpeciesPerPage)
 			{
-				$count='?'; // eeeeek!
+				$count=$count-$filtered; // WHICH IS VERY LIKELY WAY TOO HIGH
 			}
 			else
 			{
 				$count=count($data);
 			}
 		}
-
-//q($data,1);
-
+		
 		
 		foreach((array)$data as $key=>$val)
 		{
@@ -1329,8 +1426,20 @@ class SearchControllerNSR extends SearchController
 		
 	}
 
-	private function reconstructQueryString($ignore)
+	private function reconstructQueryString($p)
 	{
+		$search=isset($p['search']) ? $p['search'] : null;
+		$ignore=isset($p['ignore']) ? $p['ignore'] : null;
+
+		foreach((array)$ignore as $val)
+		{
+			unset($search[$val]);
+		}
+
+		return (http_build_query((array)$search).'&');
+		
+		if (empty($search)) return;
+		
 		$querystring=null;
 
 		foreach((array)$this->requestData as $key=>$val)
@@ -1341,7 +1450,16 @@ class SearchControllerNSR extends SearchController
 			{
 				foreach((array)$val as $k2=>$v2)
 				{
-					$querystring.=$key.'['.$k2.']='.$v2.'&';
+					if (is_array($v2))
+					{
+						foreach((array)$val as $k3=>$v3)
+						{
+							$querystring.=$key.'['.$k2.']['.$k3.']='.$v3.'&';
+						}
+		
+					} else {
+						$querystring.=$key.'['.$k2.']='.$v2.'&';
+					}
 				}
 
 			} else {
@@ -1349,7 +1467,7 @@ class SearchControllerNSR extends SearchController
 			}
 		}
 		
-		return $querystring;
+		return htmlspecialchars($querystring);
 	}
 
 	private function makeReadableQueryString()
@@ -1574,21 +1692,107 @@ class SearchControllerNSR extends SearchController
 	{
 		if (empty($taxon)) return;
 
-		return $this->models->TraitsTaxonValues->_get(array(
+		$t1=$this->models->TraitsTaxonValues->_get(array(
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$taxon
-			),
-			'columns'=>'id,value_id'
+			)
 		));
 
+		$t2=$this->models->TraitsTaxonFreevalues->freeQuery("
+			select
+				_a.*,
+				_e.sysname as date_format_name,
+				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
+				_b.sysname,
+				_b.can_be_null,
+				_b.can_have_range,
+				_g.sysname,
+				_g.verification_function_name as type_verification_function_name
+
+			from 
+				%PRE%traits_taxon_freevalues _a
+
+			left join %PRE%traits_traits _b
+				on _a.project_id=_b.project_id
+				and _a.trait_id=_b.id
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _b.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _b.project_id=_f.project_id
+				and _b.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+							
+			where
+				_a.project_id=".$this->getCurrentProjectId()."
+				and _a.taxon_id=".$taxon."
+		");
+		
+		return 
+			array(
+				'values'=>$t1,
+				'freevalues'=>$t2
+			);
 	}
 
 	private function formatDbDate($date,$format)
 	{
-		return date_format(date_create($date),$format);
+		return is_null($date) ? null : date_format(date_create($date),$format);
 	}
+
 	
+	private function check_datefree($p)
+	{
+		$value=isset($p['value']) ? $p['value'] : null;
+		$trait=isset($p['trait']) ? $p['trait'] : null;
+
+		$value=str_replace(' ','',$value);
+
+		$f=date_parse_from_format($trait['date_format_format'],$value);
+
+		if ($f['error_count']==0)
+		{
+			return array('pass'=>true,'value'=>$value);
+		}
+
+		if ($trait['can_have_range']==1)
+		{
+			$dash=null;
+			foreach((array)$this->_dashValues as $val)
+			{
+				if (strpos($value,$val)!==false)
+				{
+					$dash=$val;
+					break;
+				}
+			}
+
+			if (!is_null($dash))
+			{
+				$values=explode($dash,$value);
+				if (count($values)!=2)
+				{
+					return array('pass'=>false,'error'=>$this->translate('illegal range'));
+				}
+				else
+				{
+					return array('pass'=>true,'value'=>$values);
+				}
+			}
+		}
+
+		return array('pass'=>false,'error'=>$this->translate('illegal value'));
+
+	}
+
 
 
 
