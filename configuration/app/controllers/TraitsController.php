@@ -65,7 +65,7 @@ class TraitsController extends Controller
 				select
 					_b.trait_id,
 					_c.sysname as trait_sysname,
-					_t1.translation as trait_name,
+					if(length(ifnull(_t1.translation,''))=0,_c.sysname,_t1.translation) as trait_name,
 					_t2.translation as trait_code,
 					_t3.translation as trait_description,
 					_g.sysname as trait_type_sysname,
@@ -101,17 +101,17 @@ class TraitsController extends Controller
 			
 				left join %PRE%text_translations _t1
 					on _c.project_id=_t1.project_id
-					and _c.name_tid=_t1.id
+					and _c.name_tid=_t1.text_id
 					and _t1.language_id=".$language."
 			
 				left join %PRE%text_translations _t2
 					on _c.project_id=_t2.project_id
-					and _c.code_tid=_t2.id
+					and _c.code_tid=_t2.text_id
 					and _t2.language_id=".$language."
 			
 				left join %PRE%text_translations _t3
 					on _c.project_id=_t3.project_id
-					and _c.description_tid=_t3.id
+					and _c.description_tid=_t3.text_id
 					and _t3.language_id=".$language."
 			
 				left join %PRE%traits_project_types _f
@@ -167,17 +167,17 @@ class TraitsController extends Controller
 				
 				left join %PRE%text_translations _t1
 					on _c.project_id=_t1.project_id
-					and _c.name_tid=_t1.id
+					and _c.name_tid=_t1.text_id
 					and _t1.language_id=".$language."
 				
 				left join %PRE%text_translations _t2
 					on _c.project_id=_t2.project_id
-					and _c.code_tid=_t2.id
+					and _c.code_tid=_t2.text_id
 					and _t2.language_id=".$language."
 				
 				left join %PRE%text_translations _t3
 					on _c.project_id=_t3.project_id
-					and _c.description_tid=_t3.id
+					and _c.description_tid=_t3.text_id
 					and _t3.language_id=".$language."
 				
 				left join %PRE%traits_project_types _f
