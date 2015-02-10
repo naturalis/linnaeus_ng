@@ -71,13 +71,14 @@
                 </select>
             </td>
         </tr>
+
        
 		{function text}
 		<tr{if $data.row_class} class="{$data.row_class}"{/if}>
         	<th><label for="{$data.name}">{t}{$data.label}{/t}</label>:</th>
             <td>
             	{if $data.class=='textarea'}
-                <textarea value="" name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} >{$data.value}</textarea>
+                <textarea name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} >{$data.value}</textarea>
                 {else}
 	            <input class="{$data.class}" type="text" value="{$data.value}" name="{$data.name}" id="{$data.name}"{if $data.mandatory} mandatory="mandatory"{/if} />
                 {/if}
@@ -85,11 +86,54 @@
 		</tr>
         {/function}
 
+		{function text_language}
+		{foreach from=$languages item=v}
+		<tr{if $data.row_class} class="{$data.row_class}"{/if}>
+        	<th class="language-labels">
+            	<label for="{$data.name}">{$v.language} {t}{$data.label}{/t}</label>:
+			</th>
+            <td class="language-labels">
+            	{if $data.class=='textarea'}
+                <textarea
+                	name="{$data.name}[{$v.language_id}]" 
+                    id="{$data.name}-{$v.language_id}"
+                    {if $data.mandatory} mandatory="mandatory"{/if} 
+				>{$trait.language_labels[$data.name][$v.language_id]}</textarea>
+                {else}
+	            <input
+                	class="{$data.class}" 
+                    type="text" 
+                    value="{$trait.language_labels[$data.name][$v.language_id]|@escape}" 
+                    name="{$data.name}[{$v.language_id}]" 
+                    id="{$data.name}-{$v.language_id}"
+                    {if $data.mandatory} mandatory="mandatory"{/if}
+				/>
+                {/if}
+                {if $data.mandatory} *{/if}</td>
+		</tr>
+		{/foreach}        
+        {/function}
+        
+        
 		{$array = [
-            ['label'=>'system name','name'=>'sysname','mandatory'=>true,'class'=>'normal','value'=>$trait.sysname],
+            ['label'=>'system name','name'=>'sysname','mandatory'=>true,'class'=>'normal','value'=>$trait.sysname]
+		]}
+       
+        {foreach $array as $v}
+        {text data=$v}
+        {/foreach}
+
+		{$array = [
             ['label'=>'name','name'=>'name','mandatory'=>true,'class'=>'normal','value'=>$trait.name],
             ['label'=>'code','name'=>'code','class'=>'small','value'=>$trait.code],
-            ['label'=>'description','name'=>'description','class'=>'textarea','value'=>$trait.description],
+            ['label'=>'description','name'=>'description','class'=>'textarea','value'=>$trait.description]
+		]}
+       
+        {foreach $array as $v}
+        {text_language data=$v}
+        {/foreach}
+
+		{$array = [
             ['label'=>'max. length','name'=>'max_length','class'=>'small','value'=>$trait.max_length,'row_class'=>'allow-max-length'],
             ['label'=>'unit','name'=>'unit','class'=>'small','value'=>$trait.unit,'row_class'=>'allow-unit']
 		]}
@@ -145,7 +189,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if !$trait} $('#sysname').bind('keyup',function() { duplicateSysLabel(); } );{/if}
+//	{if !$trait} $('#sysname').bind('keyup',function() { duplicateSysLabel(); } );{/if}
 	$('#name').bind('focus',function() { setName0Focused(); } );
 	$('#page-block-messages').fadeOut(2000);
 	$('#project_type_id').trigger('change'); 

@@ -27,8 +27,6 @@ function setName0Focused()
 	name0Focused=true;
 }
 
-
-
 function checkAndSaveForm()
 {
 	var buffer=Array();
@@ -80,15 +78,17 @@ function deleteItem()
 
 
 var valuelist=[];
+var languages=[]
 var valuelisthash=null;
 var usersave=false;
+var havelabels=false;
 
 function hash(a)
 {
 	var b='';
 	for (var i=0;i<valuelist.length;i++)
 	{
-		b+=valuelist[i]+"\t";
+		b+=valuelist[i].value+valuelist[i].labels.join("\t")+"\t";
 	}
 	return b;
 }
@@ -115,6 +115,16 @@ function characterCount()
 
 function doAddTraitValue(v)
 {
+	if (havelabels && !v.labels)
+	{
+		var labels=[];
+		for (var j=0;j<languages.length;j++)
+		{
+			labels.push( { language:languages[j].id, label:''} );
+		}
+		v.labels=labels;
+	}
+
 	valuelist.push(v);
 }
 
@@ -156,7 +166,7 @@ function addTraitValue(checkresult)
 		}
 	}
 	
-	doAddTraitValue(v);
+	doAddTraitValue( { value: v } );
 	$('#newvalue').val('');
 	characterCount();
 }
@@ -180,11 +190,43 @@ function updateValueList()
 	var b=[];
 	for (var i=0;i<valuelist.length;i++)
 	{
+		var val=valuelist[i];
+		var l=[];
+
+		for (var j=0;j<languages.length;j++)
+		{
+			var lng=languages[j];
+			var thisval='';
+			
+			for(var k=0;k<val.labels.length;k++)
+			{
+				if (val.labels[k].language==lng.id)
+				{
+					thisval=val.labels[k].label;
+				}
+			}
+			
+			l.push(
+				'<span class="language-labels">'+
+				lng.language+': \
+				<input \
+					onkeyup="addTraitValueLabel(this)" \
+					class="language-labels" \
+					type="text" \
+					maxlength="4000" \
+					value="'+thisval+'" \
+					value-id="'+i+'" \
+					language-id="'+lng.id+'"> \
+				</span>');
+		}
+
 		b.push(
-			'<span class="value">'+valuelist[i]+'</span> \
+			'<span class="value">'+val.value+'</span> \
 			<a href="#" class="edit" onclick="removeTraitValue('+i+');updateValueList();updateValueCount();return false;">'+
 			_('remove')+
-			'</a>');
+			'</a>'+
+			'<br />'+l.join('')
+			);
 	}
 	$('#valuelist').html('<li>'+b.join('</li><li>')+'</li>');
 }
@@ -209,33 +251,64 @@ function reorderValueList()
 	});
 }
 
-
-function saveValues()
-{
-	/*
-	if (valuelist.length<1)
-	{
-		publishRemark(_("nothing to save"));
-	}
-	else
-	*/
-	{
-		var form=$('<form method="post"></form>').appendTo('body');
-		form.append('<input type="hidden" name="action" value="save" />');
-		
-		$.each( valuelist, function( index, value ) {
-			form.append('<input type="hidden" name="values[]" value="'+value+'" />');
-		});
-
-		form.submit();
-	}
-}
-
 function traitValuesInitialise()
 {
 	updateValueList();
 	updateValueCount();
 	setInitialValueListHash();
 	$('#newvalue').focus();
+}
+
+function doAddTraitLanguage(p)
+{
+	languages.push(p);
+}
+
+function addTraitValueLabel(ele)
+{
+	
+	var id=$(ele).attr('value-id');
+	var language=$(ele).attr('language-id');
+	var value=$(ele).val();
+
+	//console.log(id,language,value);
+	var add=true;
+	for(var i=0;i<valuelist.length;i++)
+	{
+		if (i==id)
+		{
+			for(var j=0;j<valuelist[i].labels.length;j++)
+			{
+				if (valuelist[i].labels[j].language==language)
+				{
+					valuelist[i].labels[j].label=value;
+					add=false;
+				}
+			}
+			if (add)
+			{
+				valuelist[i].labels.push( { language:language,label:value });
+			}
+		}
+	}
+	
+}
+
+function saveValues()
+{
+	var form=$('<form method="post"></form>').appendTo('body');
+	form.append('<input type="hidden" name="action" value="save" />');
+	
+	$.each( valuelist, function( index1, value )
+	{
+		form.append('<input type="hidden" name="values[]" value="'+value.value+'" />');
+
+		$.each( value.labels, function( index2, label )
+		{
+			form.append('<input type="hidden" name="valuelabels['+index1+']['+label.language+']" value="'+label.label+'" />');
+		});
+	});
+	
+	form.submit();
 }
 
