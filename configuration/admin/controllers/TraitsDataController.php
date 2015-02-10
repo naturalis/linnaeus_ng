@@ -288,8 +288,13 @@ class TraitsDataController extends TraitsController
 		$raw=file($file['path'],FILE_IGNORE_NEW_LINES);
 		$lines=array();
 
-		foreach((array)$raw as $line)
+		foreach((array)$raw as $key=>$line)
 		{
+			if ($key==0)
+			{
+				$line = ltrim($line,chr(239).chr(187).chr(191));  //BOM!
+			}
+				
 			$cell=explode($this->_inputFileFieldSeparator,$line);
 			$buffer=array();
 
@@ -531,7 +536,7 @@ class TraitsDataController extends TraitsController
 				}
 			}
 		}
-
+		
 		foreach($taxa as $c=>$val)
 		{
 			$taxa[$c]=
