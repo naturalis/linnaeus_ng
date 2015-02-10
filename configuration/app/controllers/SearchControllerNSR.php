@@ -1629,7 +1629,7 @@ class SearchControllerNSR extends SearchController
 			select
 				_a.id,
 				_a.trait_id,
-				ifnull(_trans.translation,_a.string_value) as string_value,
+				if(length(ifnull(_trans.translation,''))=0,_a.string_value,_trans.translation) as string_value,
 				_a.numerical_value,
 				_a.numerical_value_end,
 				_a.date,
