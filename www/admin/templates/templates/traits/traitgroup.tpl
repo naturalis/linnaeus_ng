@@ -40,7 +40,6 @@
             </td>
         </tr>
 
-    
         {foreach from=$languages item=v key=k}
         <tr>
             <td></td>
@@ -78,7 +77,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if $newgroup}$('#sysname').bind('keyup',function() { duplicateSysLabel(); } );{/if}
+	//{if $newgroup}$('#sysname').bind('keyup',function() { duplicateSysLabel(); } );{/if}
 	$('#names-0').bind('focus',function() { setName0Focused(); } );
 	$('#theForm').bind('submit',function() { return checkAndSaveForm(this); } );
 

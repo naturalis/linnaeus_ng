@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `traits_taxon_values_references` (
 
 	dude, are you COMPLETELY deleting trait groups!?
 	NO! need to delete traits as well! + texts
-
+	
 */	
 
 include_once ('Controller.php');
@@ -257,7 +257,7 @@ class TraitsController extends Controller
 
 	private $_lookupListMaxResults=99999;
 	
-	public $_defaultMaxLengthStringValue=1000;
+	public $_defaultMaxLengthStringValue=4000;
 	public $_defaultMaxLengthIntegerValue=12;
 	public $_defaultMaxLengthFloatValue=17;
 
@@ -475,7 +475,6 @@ class TraitsController extends Controller
 
     public function traitgroupTraitValuesAction()
     {
-
 		$this->checkAuthorisation();
 		
 		if (!$this->rHasId() && !$this->rHasVar('trait'))
@@ -495,6 +494,7 @@ class TraitsController extends Controller
 			$group=$this->getTraitgroup($trait['trait_group_id']);
 		}
 
+		$this->smarty->assign('languages',$this->getProjectLanguages());
 		$this->smarty->assign('dateformats',$this->getDateFormats());
 		$this->smarty->assign('group',$group);
 		$this->smarty->assign('trait',$trait);
@@ -623,9 +623,6 @@ class TraitsController extends Controller
 		$r=$this->models->TraitsTraits->freeQuery("
 			select
 				_a.*,
-				_b.translation as name,
-				_c.translation as code,
-				_d.translation as description,
 				_e.sysname as date_format_name,
 				_e.format as date_format_format,
 				_e.format_hr as date_format_format_hr,
@@ -633,24 +630,6 @@ class TraitsController extends Controller
 				_g.verification_function_name as type_verification_function_name
 			from
 				%PRE%traits_traits _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.code_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _d
-				on _a.project_id=_d.project_id
-				and _a.description_tid=_d.id
-				and _d.language_id=". $this->getDefaultProjectLanguage() ."
 
 			left join 
 				%PRE%traits_date_formats _e
@@ -680,6 +659,13 @@ class TraitsController extends Controller
 			}
 
 			$r['values']=$this->getTraitgroupTraitValues(array('trait'=>$id));
+
+			$r['language_labels']=
+				array(
+					'name'=>$this->getTextTranslations(array('text_id'=>$r['name_tid'])),
+					'code'=>$this->getTextTranslations(array('text_id'=>$r['code_tid'])),
+					'description'=>$this->getTextTranslations(array('text_id'=>$r['description_tid']))
+				);
 		}
 
 		return $r;
@@ -696,6 +682,7 @@ class TraitsController extends Controller
 				_a.id,
 				_a.trait_id,
 				_a.string_value,
+				_a.string_label_tid,
 				_a.numerical_value,
 				_a.numerical_value_end,
 				_a.date,
@@ -752,6 +739,10 @@ class TraitsController extends Controller
 				if (!empty($val['date_end']))
 					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
 			}
+
+
+			$r[$key]['language_labels']= $this->getTextTranslations(array('text_id'=>$val['string_label_tid']));
+		
 		}
 
 		return $r;
@@ -789,16 +780,14 @@ class TraitsController extends Controller
 
 
 
-	private function saveTextTranslation($text,$language_id)
-	{
-		$this->models->TextTranslations->save(array(
-			'project_id'=>$this->getCurrentProjectId(),
-			'language_id'=>$language_id,
-			'translation'=>$text,
-		));
-		return $this->models->TextTranslations->getNewId();
-	}
-	
+
+
+
+
+
+
+
+
 	private function getDatatypes()
 	{
 		$g=$this->models->TraitsTypes->freeQuery("
@@ -812,13 +801,13 @@ class TraitsController extends Controller
 
 			left join 
 				%PRE%text_translations _d
-				on _a.name_tid=_d.id
+				on _a.name_tid=_d.text_id
 				and _d.language_id=". $this->getDefaultProjectLanguage() ."
 				and _d.project_id is null
 
 			left join 
 				%PRE%text_translations _e
-				on _a.description_tid=_e.id
+				on _a.description_tid=_e.text_id
 				and _e.language_id=". $this->getDefaultProjectLanguage() ."
 				and _e.project_id is null
 				
@@ -919,13 +908,13 @@ class TraitsController extends Controller
 			left join 
 				%PRE%text_translations _b
 				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
+				and _a.name_tid=_b.text_id
 				and _b.language_id=". $this->getDefaultProjectLanguage() ."
 
 			left join 
 				%PRE%text_translations _c
 				on _a.project_id=_c.project_id
-				and _a.description_tid=_c.id
+				and _a.description_tid=_c.text_id
 				and _c.language_id=". $this->getDefaultProjectLanguage() ."
 
 			where
@@ -935,28 +924,10 @@ class TraitsController extends Controller
 		
 		$r=$d[0];
 
-		$d=$this->models->TextTranslations->_get(array("id"=>array(
-			'project_id'=>$this->getCurrentProjectId(),
-			'id'=>$r['name_tid']
-		)));
 
-		foreach((array)$d as $val)
-		{
-			$r['names'][$val['language_id']]=$val['translation'];
-		}
-
-		$d=$this->models->TextTranslations->_get(array("id"=>array(
-			'project_id'=>$this->getCurrentProjectId(),
-			'id'=>$r['description_tid']
-		)));
-
-		foreach((array)$d as $val)
-		{
-			$r['descriptions'][$val['language_id']]=$val['translation'];
-		}
-		
+		$r['names']= $this->getTextTranslations(array('text_id'=>$r['name_tid']));
+		$r['descriptions']= $this->getTextTranslations(array('text_id'=>$r['description_tid']));
 		$r['groups']=$this->getTraitgroups(array('parent'=>$r['id'],'level'=>0,'stop_level'=>0));
-
 		$r['traits']=$this->getTraitgroupTraits($r['id']);
 
 		return $r;
@@ -982,27 +953,22 @@ class TraitsController extends Controller
 		
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
 		
-		if (!$id) return;
-					
-		foreach((array)$names as $language_id=>$name)
-		{
-			$tid=$this->saveTextTranslation($name,$language_id);
-			if ($tid)
-			{
-				$this->models->TraitsGroups->update(array('name_tid'=>$tid),array('id'=>$id));			
-			}
 
-			if (isset($descriptions[$language_id]))
-			{
-				$tid=$this->saveTextTranslation($descriptions[$language_id],$language_id);
-				
-				if ($tid)
-				{
-					$this->models->TraitsGroups->update(array('description_tid'=>$tid),array('id'=>$id));			
-				}
-			}
-		}
+		$textids=$this->storeTranslations(
+			array(
+				'record'=>$this->getTraitgroup($id),
+				'data'=>array(
+					'name_tid'=>$names,
+					'description_tid'=>$descriptions
+				)
+			)
+		);
 		
+		foreach((array)$textids as $col=>$text_id)
+		{
+			$this->models->TraitsGroups->update(array($col=>$text_id),array('id'=>$id));
+		}
+
 		return true;
 	}
 
@@ -1163,30 +1129,32 @@ class TraitsController extends Controller
 
 		if ($d)
 		{
-			if (empty($id))
-			{
-				$id=$this->models->TraitsTraits->getNewId();
-			}
+
+			if (empty($id)) $id=$this->models->TraitsTraits->getNewId();
+
+			$trait=$this->models->TraitsTraits->_get(array('id'=>array(
+				'id'=>$id,
+				'project_id'=>$this->getCurrentProjectId(),
+			)));
 			
-			if (!empty($name))
-			{
-				$nId=$this->saveTextTranslation($name,$this->getDefaultProjectLanguage());
-				$this->models->TraitsTraits->update(array('name_tid'=>$nId),array('id'=>$id));
-			}
+			$textids=$this->storeTranslations(
+				array(
+					'record'=>$trait[0],
+					'data'=>array(
+						'name_tid'=>$name,
+						'code_tid'=>$code,
+						'description_tid'=>$description
+					)
+				)
+			);
 
-			if (!empty($code))
+			foreach((array)$textids as $col=>$text_id)
 			{
-				$cId=$this->saveTextTranslation($code,$this->getDefaultProjectLanguage());
-				$this->models->TraitsTraits->update(array('code_tid'=>$cId),array('id'=>$id));
-			}
-
-			if (!empty($description))
-			{
-				$dId=$this->saveTextTranslation($description,$this->getDefaultProjectLanguage());
-				$this->models->TraitsTraits->update(array('description_tid'=>$dId),array('id'=>$id));
+				$this->models->TraitsTraits->update(array($col=>$text_id),array('id'=>$id));
 			}
 
 			return true;
+
 		}
 		else 
 		{
@@ -1250,6 +1218,7 @@ class TraitsController extends Controller
 	{
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		$values=isset($p['values']) ? $p['values'] : null;
+		$valuelabels=isset($p['valuelabels']) ? $p['valuelabels'] : null;
 
 		if (empty($trait))
 		{
@@ -1268,10 +1237,20 @@ class TraitsController extends Controller
 		
 		if ($trait['type_sysname']=='stringlist' || $trait['type_sysname']=='stringlistfree')
 		{
-			
+			// deleting all old values & translations
+			$prev=$this->models->TraitsValues->_get(array('id'=>$base));
+
+			foreach((array)$prev as $val)
+			{
+				$this->deleteTranslations(array('text_id'=>$val['string_label_tid']));
+			}
+
 			$this->models->TraitsValues->delete($base);
 
+
+			// saving all new values
 			$saved=0;
+			$index=array();
 
 			foreach((array)$values as $key=>$val)
 			{
@@ -1283,19 +1262,39 @@ class TraitsController extends Controller
 				
 				$r=$this->models->TraitsValues->save($d);
 				
-				if (!$r)
+				if ($r)
 				{
-					$this->addError(sprintf($this->translate('Value %s not saved'),$val));
+					$index[$key]=$this->models->TraitsValues->getNewId();
+					$saved++;
 				}
 				else
 				{
-					$saved++;
+					$this->addError(sprintf($this->translate('Value %s not saved'),$val));
+				}
+			}
+
+
+			// saving the translations
+			foreach((array)$index as $key=>$id)
+			{
+				
+				$textids=$this->storeTranslations(
+					array(
+						'record'=>array('string_label_tid'=>null), // all new values, none have a text_id yet
+						'data'=>array(
+							'string_label_tid'=>$valuelabels[$key],
+						)
+					)
+				);
+		
+				foreach((array)$textids as $col=>$text_id)
+				{
+					$this->models->TraitsValues->update(array($col=>$text_id),array('id'=>$id));
 				}
 
 			}
-			
-			$this->addMessage(sprintf($this->translate('%s values saved'),$saved));
 
+			$this->addMessage(sprintf($this->translate('%s values saved'),$saved));
 		}
 		else
 		if (
@@ -1424,6 +1423,164 @@ class TraitsController extends Controller
 			;
 		}
 	}
+
+
+
+	private function getNextTextId()
+	{
+		$d=$this->models->TextTranslations->freeQuery("select ifnull(max(text_id)+1,1) as next from %TABLE%  where project_id = ".$this->getCurrentProjectId());
+		return $d[0]['next'];
+	}
+
+	private function storeTranslations($p)
+	{
+		$record=isset($p['record']) ? $p['record'] : null;
+		$data=isset($p['data']) ? $p['data'] : null;
+
+		/*		
+		array(
+			'record'=>$this->getTraitgroup(), // any record with column x_tid ref. text_id
+			'data'=>array(
+				'x_tid'=>$xs, // array(language_id=>translation,language_id=>translation)
+				...=>...
+			)
+		*/
+
+		if (empty($record)) return;
+
+		$index=array();
+
+		foreach((array)$data as $column=>$translations)
+		{
+			foreach((array)$translations as $language=>$translation)
+			{
+
+				if (!array_key_exists($column,$record)) continue;
+
+				$newTextId=false;
+				
+				// make sure this record has a valid text_id (regardless of language)
+				$text_id=$record[$column];
+
+				if (empty($text_id) && isset($index[$column]))
+				{
+					$text_id=$index[$column];
+				}
+				
+				if (empty($text_id))
+				{
+					$text_id=$this->getNextTextId();
+					$newTextId=true;
+				}
+				else
+				{
+					$d=$this->models->TextTranslations->_get(array('id'=>array('project_id'=>$this->getCurrentProjectId(),'text_id'=>$text_id)));
+					if (empty($d))
+					{
+						$newTextId=true;
+					}
+				}
+
+				if ($newTextId)
+				{
+					$this->models->TextTranslations->save(array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'language_id'=>$language,
+						'text_id'=>$text_id,
+						'translation'=>$translation
+					));
+				}
+				
+				$index[$column]=$text_id;
+				
+				if ($newTextId)
+				{
+					// we already inserted this first translation, to get a new text_id
+					continue;
+				}
+
+				$base=array('project_id'=>$this->getCurrentProjectId(),'text_id'=>$text_id,'language_id'=>$language);
+
+				// see if a translation exist for this combination of text_id and language
+				$d=$this->models->TextTranslations->_get(array('id'=>$base));
+
+				$base+=array('translation'=>(empty($translation) ? 'null' : $translation));
+
+				// update translation if the combination text_id+language already exists
+				if (!empty($d))
+				{
+					$this->models->TextTranslations->update($base,array('id'=>$d[0]['id']));
+				}
+				else
+				// insert if it doesn't
+				{
+					$this->models->TextTranslations->save($base);
+				}
+				
+				//echo $text_id,$column,$language,'<br />';
+			}
+		}
+
+		return $index;
+	}
+
+	private function deleteTranslations($p)
+	{
+		$text_id=isset($p['text_id']) ? $p['text_id'] : null;
+		$language=isset($p['language']) ? $p['language'] : null;
+
+		if (empty($text_id)) return;
+		
+		$base=
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'text_id'=>$text_id
+			);
+
+		if (!empty($language)) $base+=array('language_id'=>$language);
+
+		$d=$this->models->TextTranslations->delete($base);
+	}
+
+	private function getTextTranslations($p)
+	{
+		$text_id=isset($p['text_id']) ? $p['text_id'] : null;
+		$language_id=isset($p['language']) ? $p['language'] : null;
+		
+		if (empty($text_id)) return;
+		
+		$base=array('project_id'=>$this->getCurrentProjectId(),'text_id'=>$text_id);
+		if (!empty($language_id)) $base+=array('language_id'=>$language_id);
+
+		$d=$this->models->TextTranslations->_get(array('id'=>$base));
+
+		$r=array();
+		foreach((array)$d as $key=>$val)
+		{
+			$r[$val['language_id']]=$val['translation'];
+		}
+		return $r;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

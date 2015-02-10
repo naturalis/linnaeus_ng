@@ -59,7 +59,6 @@ div.data {
 <div id="page-main">
 	<p>
     	<input type="button" value="save data" onclick="saveRawData();" />
-	    <a href="?action=clear">upload another file</a>
 	</p>
    <p>
         <table>
@@ -110,6 +109,16 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
         {/foreach}
         </table>
 	</p>
+
+	<p>
+    	<input type="button" value="save data" onclick="saveRawData();" />
+	</p>
+	<p>
+    	data not looking right?<br />
+	    <a href="?action=rotate">rotate sheet</a><br />
+	    <a href="?action=clear">upload another file</a>
+	</p>
+    
 </div>
 
 {include file="../shared/admin-messages.tpl"}

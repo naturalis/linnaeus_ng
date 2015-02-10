@@ -1518,6 +1518,10 @@ class SearchControllerNSR extends SearchController
 			echo chr(239).chr(187).chr(191);
 		}
 	}
+	
+	
+	
+	
 
 	private function getTraits($groups)
 	{
@@ -1526,7 +1530,7 @@ class SearchControllerNSR extends SearchController
 		$r=$this->models->TraitsTraits->freeQuery("
 			select
 				_a.*,
-				_b.translation as name,
+				ifnull(_b.translation,_a.sysname) as name,
 				_c.translation as code,
 				_d.translation as description,
 				_e.sysname as date_format_name,
@@ -1552,31 +1556,31 @@ class SearchControllerNSR extends SearchController
 			left join 
 				%PRE%text_translations _grp_b
 				on _grp.project_id=_grp_b.project_id
-				and _grp.name_tid=_grp_b.id
+				and _grp.name_tid=_grp_b.text_id
 				and _grp_b.language_id=". $this->getCurrentLanguageId() ."
 
 			left join 
 				%PRE%text_translations _grp_c
 				on _grp.project_id=_grp_c.project_id
-				and _grp.description_tid=_grp_c.id
+				and _grp.description_tid=_grp_c.text_id
 				and _grp_c.language_id=". $this->getCurrentLanguageId() ."
 				
 			left join 
 				%PRE%text_translations _b
 				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
+				and _a.name_tid=_b.text_id
 				and _b.language_id=". $this->getCurrentLanguageId() ."
 
 			left join 
 				%PRE%text_translations _c
 				on _a.project_id=_c.project_id
-				and _a.code_tid=_c.id
+				and _a.code_tid=_c.text_id
 				and _c.language_id=". $this->getCurrentLanguageId() ."
 
 			left join 
 				%PRE%text_translations _d
 				on _a.project_id=_d.project_id
-				and _a.description_tid=_d.id
+				and _a.description_tid=_d.text_id
 				and _d.language_id=". $this->getCurrentLanguageId() ."
 
 			left join 
@@ -1625,7 +1629,7 @@ class SearchControllerNSR extends SearchController
 			select
 				_a.id,
 				_a.trait_id,
-				_a.string_value,
+				ifnull(_trans.translation,_a.string_value) as string_value,
 				_a.numerical_value,
 				_a.numerical_value_end,
 				_a.date,
@@ -1639,6 +1643,12 @@ class SearchControllerNSR extends SearchController
 
 			from 
 				%PRE%traits_values _a
+
+			left join 
+				%PRE%text_translations _trans
+				on _a.project_id=_trans.project_id
+				and _a.string_label_tid=_trans.text_id
+				and _trans.language_id=". $this->getCurrentLanguageId() ."
 				
 			left join 
 				%PRE%traits_traits _b
@@ -1671,16 +1681,25 @@ class SearchControllerNSR extends SearchController
 			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
 			{
 				if (!empty($val['numerical_value']))
+				{
 					$r[$key]['numerical_value']=round($val['numerical_value'],0,PHP_ROUND_HALF_DOWN);
+				}
 				if (!empty($val['numerical_value_end']))
+				{
 					$r[$key]['numerical_value_end']=round($val['numerical_value_end'],0,PHP_ROUND_HALF_DOWN);
-			} else
+				}
+			}
+			else
 			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
 			{
 				if (!empty($val['date']))
+				{
 					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);
+				}
 				if (!empty($val['date_end']))
+				{
 					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
+				}
 			}
 		}
 

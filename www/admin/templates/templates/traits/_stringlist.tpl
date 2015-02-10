@@ -3,28 +3,46 @@
 	stringlistfree
 -->
 
+<style>
+#valuelist li {
+	margin-bottom:10px;
+}
+.language-labels {
+	font-size:0.9em;
+}
+.language-labels input {
+	font-size:0.9em;
+	margin:0 10px 0 2px;
+	width:125px;
+}
+</style>
+
 {if $trait.max_length}{assign var=maxlength value=$trait.max_length}{else}{assign var=maxlength value=$defaultMaxLengthStringValue}{/if}
 
 <script>
-var maxlength={$maxlength};
+havelabels=true;
 
+var maxlength={$maxlength};
 function checkTraitValue(v)
 {
 	e=Array();
 	r=true;
 	
+/*	
 	if (valuelist.indexOf(v)!=-1)
 	{
 		e.push(_('duplicate value'));
 	}
-	
+*/	
 	return { result:r, remarks:e };
 }
 
 </script>
 
 <p>
-	Add values, optionally drag and drop values to change their show order, and click "save" to save them.
+	Add values, optionally drag and drop values to change their show order, and click "save" to save them.<br />
+    The value is the string that will be recognized when importing data sheets, with the language labels you
+    can specify how the value will be presented in the front-end of the site.
 </p>
 
 <form id="theForm">
@@ -52,11 +70,18 @@ function checkTraitValue(v)
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+	{foreach from=$languages item=v}
+	doAddTraitLanguage( { id:{$v.language_id|@escape}, language: '{$v.language|@escape}' } );
+	{/foreach}
+
 	{foreach from=$trait.values item=v}
-	doAddTraitValue('{$v.string_value|@escape}');
+	var labels=[];
+	{foreach from=$v.language_labels item=l key=k}
+	labels.push( { language:{$k},label:'{$l|@escape}' } );
+	{/foreach}
+	doAddTraitValue( { value:'{$v.string_value|@escape}', labels: labels } );
 	{/foreach}
 
 	traitValuesInitialise();
-
 });
 </script>

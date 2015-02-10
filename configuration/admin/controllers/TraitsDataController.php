@@ -140,19 +140,21 @@ class TraitsDataController extends TraitsController
 			$this->setDataSession(null);
 			$this->getSessionLines(null);
 			$this->redirect('data_upload.php');
+		} else		
+		if ($this->rHasVal('action','rotate'))
+		{
+			$this->setSessionLines($this->parseSessionFile(!$this->getIsRotated()));
+			$this->setIsRotated(!$this->getIsRotated());
+			$this->redirect('data_raw.php?');
 		} 
 		
+
 		$f=$this->getDataSession();
 		$this->getSettings($f['traitgroup']);
 
-		// we'll just keep it like this for now, ok?
-		if (1==1||$f['status']=='raw')
-		{
-			$this->matchTraits();
-			$this->matchSpecies();
-			$this->matchValues();
-			$this->setDataStatus('matched');
-		}
+		$this->matchTraits();
+		$this->matchSpecies();
+		$this->matchValues();
 
         $this->setPageName($this->translate('Data matched'));
 
@@ -177,6 +179,15 @@ class TraitsDataController extends TraitsController
 		$this->printPage();
     }
 
+	private function setIsRotated($state)
+	{
+		$_SESSION['admin']['traits']['data']['rotated']=$state;
+	}
+
+	private function getIsRotated()
+	{
+		return isset($_SESSION['admin']['traits']['data']['rotated']) ? $_SESSION['admin']['traits']['data']['rotated'] : false;
+	}
 
 
 	private function getSettings($group)
@@ -243,11 +254,6 @@ class TraitsDataController extends TraitsController
 		return isset($_SESSION['admin']['traits']['data']) ? $_SESSION['admin']['traits']['data'] : null;
 	}
 
-	private function setDataStatus($status)
-	{
-		$_SESSION['admin']['traits']['data']['status']=$status;
-	}
-
 	private function setSessionLines($lines)
 	{
 		$_SESSION['admin']['traits']['data']['lines']=$lines;
@@ -261,7 +267,22 @@ class TraitsDataController extends TraitsController
 				null;
 	}
 
-	private function parseSessionFile()
+	private function array_rotate($array)
+	{
+		$new_array = array();
+		foreach ($array as $el)
+		{
+			foreach($el as $i => $value)
+			{
+				if (!isset($new_array[$i])) $new_array[$i] = array();
+				$new_array[$i][] = $value;
+			}
+		}
+		return $new_array;
+	}
+		
+
+	private function parseSessionFile($rotate=false)
 	{
 		$file=$this->getDataSession();
 		$raw=file($file['path'],FILE_IGNORE_NEW_LINES);
@@ -279,8 +300,27 @@ class TraitsDataController extends TraitsController
 			}
 			if (isset($buffer))
 			{
-				$lines[]=array('cells'=>$buffer);
+				if ($rotate)
+				{
+					$lines[]=$buffer;
+				}
+				else
+				{
+					$lines[]=array('cells'=>$buffer);
+				}
 			}
+		}
+		
+		if ($rotate)
+		{
+			$lines=$this->array_rotate($lines);
+			
+			$b=array();
+			foreach((array)$lines as $key=>$val)
+			{
+				$b[$key]['cells']=$val;
+			}
+			$lines=$b;
 		}
 		
 		return $lines;
@@ -496,8 +536,8 @@ class TraitsDataController extends TraitsController
 		{
 			$taxa[$c]=
 				array(
-					'by_name'=>$val['by_name'],
-					'by_id'=>$val['by_id'],
+					'by_name'=>isset($val['by_name']) ? $val['by_name'] : null,
+					'by_id'=>isset($val['by_id']) ? $val['by_id'] : null,
 					'match'=> isset($val['by_name']) && isset($val['by_id']) && $val['by_name']['id']==$val['by_id']['id'],
 					'have_taxon'=>isset($val['by_name']) || isset($val['by_id']),
 					'will_use'=> isset($val['by_id']) ? $val['by_id']['taxon'] : (isset($val['by_name']) ? $val['by_name']['taxon'] :  null ),
@@ -545,7 +585,7 @@ class TraitsDataController extends TraitsController
 				}
 				else
 				{
-					$this->addWarning(sprintf($this->translate('Check function "%s" does not exist'),$values['type_verification_function_name']));
+					$this->addWarning(sprintf($this->translate('Check function "%s" does not exist'),$trait['type_verification_function_name']));
 				}
 				
 			}
@@ -614,7 +654,6 @@ class TraitsDataController extends TraitsController
 
 		$this->setSessionLines($data['lines']);
 	}
-
 
 	private function saveValues()
 	{

@@ -3,7 +3,7 @@
 <div id="page-main">
 
 	<p>
-	    <h3>{t _s1=$group.name}%s: traits{/t}</h3>
+	    <h3>{t _s1=$group.sysname}%s: traits{/t}</h3>
 
     	Drag and drop traits to change their show order; click "save trait order" to save the new order.
 
