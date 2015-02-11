@@ -145,7 +145,8 @@ class RdfController extends Controller
 			$predicateTranslations[$this->getDefaultProjectLanguage()][$predicate] : 
 			$predicate;
 
-		if ($removelanguageparam) $d=str_replace('%se ','',$d);
+		if ($removelanguageparam && $this->getDefaultProjectLanguage()==24) $d=str_replace('%se ','',$d);
+		if ($removelanguageparam && $this->getDefaultProjectLanguage()==26) $d=str_replace('%s ','',$d);
 
 		return $d;
 	}
