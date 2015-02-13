@@ -3,7 +3,7 @@
 <div id="page-main">
 
 	<p>
-	    <h3>{$group.name}: {$trait.name} {t}values{/t}</h3>
+	    <h3>{$group.name}: {$trait.sysname} {t}values{/t}</h3>
 	</p>
 
         <!--
