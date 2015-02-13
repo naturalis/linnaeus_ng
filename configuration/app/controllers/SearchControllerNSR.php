@@ -129,7 +129,14 @@ class SearchControllerNSR extends SearchController
 		}
 
 		$this->traitGroupsToInclude=array(1);
-		$this->smarty->assign('traits',$this->getTraits($this->traitGroupsToInclude));
+		$traits=$this->getTraits($this->traitGroupsToInclude);
+		$this->smarty->assign('traits',$traits);
+		$this->smarty->assign('searchTraitsHR',
+			$this->makeReadableTraitString(array(
+				'traits'=>$traits,
+				'search'=>isset($search['traits']) ? $search['traits'] : null
+			)
+		));
 
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
@@ -1474,28 +1481,78 @@ class SearchControllerNSR extends SearchController
 	{
 		$querystring=null;
 		
-		if ($this->rHasVal('group')) $querystring.='Soortgroep="'.$this->requestData['group'].'"; ';
-		if ($this->rHasVal('author')) $querystring.='Auteur="'.$this->requestData['author'].'"; ';
+		if ($this->rHasVal('group')) $querystring.='Soortgroep="'.$this->rGetVal('group').'"; ';
+		if ($this->rHasVal('author')) $querystring.='Auteur="'.$this->rGetVal('author').'"; ';
 		
 		if ($this->rHasVal('presence'))
 		{
 			$statuses=$this->getPresenceStatuses();
-			$querystring.='Status voorkomen="';
+			$querystring.=$this->translate('Status voorkomen="');
 		
-			foreach((array)$this->requestData['presence'] as $key=>$val)
+			foreach((array)$this->rGetVal('presence') as $key=>$val)
 			{
 				$querystring.=$statuses[$key]['index_label'].', ';
 			}
 			$querystring=rtrim($querystring,' ,').'; ';
 		}
 					
-		if ($this->rHasVal('images','on')) $querystring.='met foto\'s; ';
-		if ($this->rHasVal('dna','on')) $querystring.='met DNA-exemplaren verzameld; ';
-		if ($this->rHasVal('dna_insuff','on')) $querystring.='met nog DNA-exemplaren te verzamelen; ';
-		
-		
+		if ($this->rHasVal('images','on')) $querystring.=$this->translate('met foto\'s; ');
+		if ($this->rHasVal('dna','on')) $querystring.=$this->translate('met DNA-exemplaren verzameld; ');
+		if ($this->rHasVal('dna_insuff','on')) $querystring.=$this->translate('met nog DNA-exemplaren te verzamelen; ');
+
 		return trim($querystring);
 	}
+
+	private function makeReadableTraitString($p)
+	{
+		$traits=isset($p['traits']) ? $p['traits'] : null;
+		$search=isset($p['search']) ? $p['search'] : null;
+
+		$str=array();
+		foreach((array)$traits as $a)
+		{
+			foreach((array)$a['data'] as $data)
+			{
+				if (isset($search['values']))
+				{
+					foreach((array)$data['values'] as $value)
+					{
+						foreach((array)$search['values'] as $key=>$val)
+						{
+							if ($key==$value['id'])
+							{
+								$str[$data['name']][]=
+									$value["string_value"].
+									$value["numerical_value"].
+									$value["numerical_value_end"].
+									$value["date"].
+									$value["date_end"];
+							}
+						}
+					}
+					
+				}
+				
+				if (isset($search['freevalues']))
+				{
+					foreach((array)$search['freevalues'] as $key=>$val)
+					{
+						if ($key==$data['id'])
+						{
+							$str[$data['name']][]=$val;
+						}
+					}
+				}
+			}
+		}
+		
+		array_walk($str,function(&$a){ $a=is_array($a) ? implode(",",$a) : $a; });
+		array_walk($str,function(&$a,$key){ $a=$key.'='.$a; });
+		
+		return implode("; ",$str);
+	}
+
+
 
 	private function downloadHeaders($p)
 	{

@@ -70,9 +70,12 @@ class TraitsController extends Controller
 					_t3.translation as trait_description,
 					_g.sysname as trait_type_sysname,
 					(CASE 
-						WHEN locate('string',_g.sysname)=1 THEN _b.string_value
-						WHEN (locate('int',_g.sysname)=1 || locate('float',_g.sysname)=1) THEN _b.numerical_value
-						WHEN locate('date',_g.sysname)=1 THEN _b.date
+						WHEN locate('string',_g.sysname)=1 THEN 
+							if(length(ifnull(_t4.translation,''))=0,_b.string_value,_t4.translation)
+						WHEN (locate('int',_g.sysname)=1 || locate('float',_g.sysname)=1) THEN
+							_b.numerical_value
+						WHEN locate('date',_g.sysname)=1 THEN
+							_b.date
 						ELSE null
 					END) AS value_start,
 					(CASE 
@@ -114,6 +117,11 @@ class TraitsController extends Controller
 					and _c.description_tid=_t3.text_id
 					and _t3.language_id=".$language."
 			
+				left join %PRE%text_translations _t4
+					on _b.project_id=_t4.project_id
+					and _b.string_label_tid=_t4.text_id
+					and _t4.language_id=".$language."
+			
 				left join %PRE%traits_project_types _f
 					on _c.project_id=_f.project_id
 					and _c.project_type_id=_f.id
@@ -135,7 +143,7 @@ class TraitsController extends Controller
 				select
 					_a.trait_id,
 					_c.sysname as trait_sysname,
-					_t1.translation as trait_name,
+					if(length(ifnull(_t1.translation,''))=0,_c.sysname,_t1.translation) as trait_name,
 					_t2.translation as trait_code,
 					_t3.translation as trait_description,
 					_g.sysname as trait_type_sysname,

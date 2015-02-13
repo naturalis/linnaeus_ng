@@ -75,20 +75,19 @@ function deleteItem()
 	}
 }
 
-
-
 var valuelist=[];
 var languages=[]
 var valuelisthash=null;
 var usersave=false;
 var havelabels=false;
+var newcounter=-1;
 
 function hash(a)
 {
 	var b='';
 	for (var i=0;i<valuelist.length;i++)
 	{
-		b+=valuelist[i].value+valuelist[i].labels.join("\t")+"\t";
+		b+=valuelist[i].id+valuelist[i].value+valuelist[i].labels.join("\t")+"\t";
 	}
 	return b;
 }
@@ -120,7 +119,7 @@ function doAddTraitValue(v)
 		var labels=[];
 		for (var j=0;j<languages.length;j++)
 		{
-			labels.push( { language:languages[j].id, label:''} );
+			labels.push( { language:languages[j].id, label:'' } );
 		}
 		v.labels=labels;
 	}
@@ -166,7 +165,7 @@ function addTraitValue(checkresult)
 		}
 	}
 	
-	doAddTraitValue( { value: v } );
+	doAddTraitValue( { id: newcounter--, value: v } );
 	$('#newvalue').val('');
 	characterCount();
 }
@@ -221,14 +220,16 @@ function updateValueList()
 		}
 
 		b.push(
-			'<span class="value">'+val.value+'</span> \
+			'<li data-id="'+i+'">'+
+			val.value+' \
 			<a href="#" class="edit" onclick="removeTraitValue('+i+');updateValueList();updateValueCount();return false;">'+
 			_('remove')+
 			'</a>'+
-			'<br />'+l.join('')
+			'<br />'+l.join('')+
+			'</li>'
 			);
 	}
-	$('#valuelist').html('<li>'+b.join('</li><li>')+'</li>');
+	$('#valuelist').html(b.join(''));
 }
 
 function checkUnsavedValues()
@@ -241,14 +242,13 @@ function checkUnsavedValues()
 
 function reorderValueList()
 {
-	valuelist.empty();
+	var b=[];
 	$("#valuelist li").each(function( index )
 	{
-		$.each( $.parseHTML( $(this).html() ), function( i, el )
-		{
-			if (el.className=='value') valuelist.push(el.textContent);
-		});
+		b.push(valuelist[$(this).attr('data-id')]);
 	});
+	valuelist.empty();
+	valuelist=b.splice(0);
 }
 
 function traitValuesInitialise()
@@ -299,15 +299,21 @@ function saveValues()
 	var form=$('<form method="post"></form>').appendTo('body');
 	form.append('<input type="hidden" name="action" value="save" />');
 	
-	$.each( valuelist, function( index1, value )
+	for(var i=0;i<valuelist.length;i++)
 	{
-		form.append('<input type="hidden" name="values[]" value="'+value.value+'" />');
+		var value=valuelist[i];
+		
+		form.append('<input type="hidden" name="values['+value.id+']" value="'+value.value+'" />');
 
-		$.each( value.labels, function( index2, label )
+		if (value.labels)
 		{
-			form.append('<input type="hidden" name="valuelabels['+index1+']['+label.language+']" value="'+label.label+'" />');
-		});
-	});
+			for(var j=0;j<value.labels.length;j++)
+			{
+				var label=value.labels[j];
+				form.append('<input type="hidden" name="valuelabels['+value.id+']['+label.language+']" value="'+label.label+'" />');
+			}
+		}
+	}
 	
 	form.submit();
 }
