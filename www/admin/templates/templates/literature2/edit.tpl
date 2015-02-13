@@ -50,7 +50,7 @@
 
 	<tr><th>datum:</th><td><input class="small" type="text" name="date" value="{$reference.date}" /></td></tr>
 	{*if $reference.author*}
-	<tr><th>auteur (verbatim):</th><td><input class="large" type="text" name="author" value="{$reference.author}" /></td></tr>
+	<tr><th>auteur (verbatim):</th><td><input class="large" type="text" name="author" value="{$reference.author|@escape}" /></td></tr>
 	{*/if*}
 	<tr>
 		<th>auteur(s):</th>
@@ -84,8 +84,8 @@
 			</select> 
 		</td>
 	</tr>
-	<tr><th>citatie:</th><td><input class="large" type="text" name="citation" value="{$reference.citation}" /></td></tr>
-	<tr><th>bron:</th><td><input class="medium" type="text" name="source" value="{$reference.source}" /></td></tr>
+	<tr><th>citatie:</th><td><input class="large" type="text" name="citation" value="{$reference.citation|@escape}" /></td></tr>
+	<tr><th>bron:</th><td><input class="medium" type="text" name="source" value="{$reference.source|@escape}" /></td></tr>
 
 	<tr>
 		<th title="gebruik dit veld voor delen/hoofdstukken van boeken en voor onderdelen van websites.">gepubliceerd in:</th>

@@ -68,7 +68,7 @@ function characterCount()
 $(document).ready(function()
 {
 	{foreach from=$trait.values item=v}
-	doAddTraitValue('{$v.numerical_value|@escape}');
+	doAddTraitValue( { id: {$v.id}, value:{$v.numerical_value|@escape} } );
 	{/foreach}
 
 	traitValuesInitialise();

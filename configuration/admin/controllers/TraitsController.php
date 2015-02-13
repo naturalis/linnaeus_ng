@@ -1,247 +1,4 @@
 <?php
-/*
-INSERT INTO modules
-	(`id`, `module`, `description`, `controller`, `icon`, `show_order`, `show_in_menu`, `show_in_public_menu`, `created`, `last_change`)
-VALUES
-	(null, 'Kenmerken', 'Kenmerkenmodule', 'traits', 'index.png', 0, 1, 0, now(), now());
-
-INSERT INTO rights
-	(`id`, `controller`, `view`, `view_description`, `created`)
-VALUES
-	(null, 'traits', '*', 'full access', now());
-
-//drop TABLE if exists traits_date_formats;
-//drop TABLE if exists traits_groups;
-//drop TABLE if exists traits_project_types;
-//drop TABLE if exists traits_taxon_values;
-//drop TABLE if exists traits_taxon_values_references;
-//drop TABLE if exists traits_traits;
-//drop TABLE if exists traits_types;
-//drop TABLE if exists traits_values;
-
-drop TABLE if exists `text_translations`;
-CREATE TABLE IF NOT EXISTS `text_translations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NULL,
-  `language_id` int(11) NOT NULL,
-  `translation` varchar(4000) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-drop TABLE if exists `traits_types`;
-CREATE TABLE IF NOT EXISTS `traits_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `sysname` varchar(64) NOT NULL,
-  `name_tid` int(11) DEFAULT NULL,
-  `description_tid` int(11) DEFAULT NULL,
-  `verification_class_name` varchar(64),
-  `allow_select_multiple` tinyint(1) default 0 not null,
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sysname` (`sysname`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-insert into text_translations values (1,null,24,'Boolean',now(),now());
-insert into text_translations values (2,null,24,'Ja of Nee',now(),now());
-insert into traits_types values (null,'boolean',1,2,'boolean',0,now(),now());
-
-insert into text_translations values (3,null,24,'Lijst van termen',now(),now());
-insert into text_translations values (4,null,24,'Lijst van termen, tekst, max. 255 karakters per term',now(),now());
-insert into traits_types values (null,'stringlist',3,4,'stringlist',1,now(),now());
-
-insert into text_translations values (5,null,24,'Lijst van termen plus optie eigen antwoord',now(),now());
-insert into text_translations values (6,null,24,'Lijst van termen, tekst, max. 255 karakters per term, plus optie eigen antwoord ("Anders, namelijk:")',now(),now());
-insert into traits_types values (null,'stringlistfree',5,6,'stringlistfree',1,now(),now());
-
-insert into text_translations values (7,null,24,'Vrije invoer tekst',now(),now());
-insert into text_translations values (8,null,24,'Vrije invoer, tekst, max. 1000 karakters',now(),now());
-insert into traits_types values (null,'stringfree',7,8,'stringfree',0,now(),now());
-
-
-insert into text_translations values (9,null,24,'Numerieke lijst, gehele getallen',now(),now());
-insert into traits_types values (null,'intlist',9,null,'intlist',1,now(),now());
-
-insert into text_translations values (10,null,24,'Numerieke lijst, gehele getallen, plus optie eigen antwoord',now(),now());
-insert into text_translations values (11,null,24,'Numerieke lijst, gehele getallen (maximale precisie: 12,5), plus optie eigen antwoord ("Anders, namelijk:")',now(),now());
-insert into traits_types values (null,'intlistfree',10,11,'intlistfree',1,now(),now());
-
-insert into text_translations values (12,null,24,'Vrije invoer geheel getal',now(),now());
-insert into text_translations values (13,null,24,'Vrije invoer, geheel getal, zonder begrenzing',now(),now());
-insert into traits_types values (null,'intfree',12,13,'intfree',0,now(),now());
-
-insert into text_translations values (14,null,24,'Vrije invoer geheel getal, begrensd',now(),now());
-insert into text_translations values (15,null,24,'Vrije invoer, geheel getal, met boven- en/of ondergrens',now(),now());
-insert into traits_types values (null,'intfreelimit',14,15,'intfreelimit',0,now(),now());
-
-
-insert into text_translations values (16,null,24,'Numerieke lijst, decimale getallen',now(),now());
-insert into text_translations values (17,null,24,'Numerieke lijst, decimale getallen (maximale precisie: 12,5)',now(),now());
-insert into traits_types values (null,'floatlist',16,17,'floatlist',1,now(),now());
-
-insert into text_translations values (18,null,24,'Numerieke lijst, decimale getallen, plus optie eigen antwoord',now(),now());
-insert into text_translations values (19,null,24,'Numerieke lijst, decimale getallen, plus optie eigen antwoord ("Anders, namelijk:") (maximale precisie: 12,5)',now(),now());
-insert into traits_types values (null,'floatlistfree',18,19,'floatlistfree',1,now(),now());
-
-insert into text_translations values (20,null,24,'Vrije invoer decimaal getal',now(),now());
-insert into text_translations values (21,null,24,'Vrije invoer, decimaal getal, zonder begrenzing (maximale precisie: 12,5)',now(),now());
-insert into traits_types values (null,'floatfree',20,21,'floatfree',0,now(),now());
-
-insert into text_translations values (22,null,24,'Vrije invoer decimaal getal, begrensd',now(),now());
-insert into text_translations values (23,null,24,'Vrije invoer, decimaal getal, met boven- en/of ondergrens (maximale precisie: 12,5)',now(),now());
-insert into traits_types values (null,'floatfreelimit',22,23,'floatfreelimit',0,now(),now());
-
-
-insert into text_translations values (24,null,24,'Datumlijst (verschillende datumformaten)',now(),now());
-insert into traits_types values (null,'datelist',24,null,'datelist',1,now(),now());
-
-insert into text_translations values (25,null,24,'Datumlijst, plus optie eigen antwoord',now(),now());
-insert into text_translations values (26,null,24,'Datumlijst, plus optie eigen antwoord ("Anders, namelijk:"), verschillende datumformaten',now(),now());
-insert into traits_types values (null,'datelistfree',25,26,'datelistfree',1,now(),now());
-
-insert into text_translations values (27,null,24,'Vrije invoer datum (verschillende datumformaten)',now(),now());
-insert into traits_types values (null,'datefree',27,null,'datefree',0,now(),now());
-
-insert into text_translations values (28,null,24,'Vrije invoer datum, begrensd',now(),now());
-insert into text_translations values (29,null,24,'Vrije invoer, datum, met boven- en/of ondergrens (verschillende datumformaten)',now(),now());
-insert into traits_types values (null,'datefreelimit',28,29,'datefreelimit',0,now(),now());
-
-alter table traits_types add column allow_values tinyint(1) default 1 after verification_class_name;
-update traits_types set allow_values=0 where id in (1,4,7,11,15);
-
-alter table traits_types add column allow_max_length tinyint(1) default 0 after allow_values;
-update traits_types set allow_max_length=1 where id in (2,3,4,5,6,7,8,9,10,11,12);
-
-alter table traits_types add column allow_unit tinyint(1) default 0 after allow_max_length;
-update traits_types set allow_unit=1 where id in (2,3,4,5,6,7,8); // KLOPT DIT!?
-
-alter table traits_types add column allow_fractures tinyint(1) default 0 after allow_unit;
-update traits_types set allow_fractures=1 where id in (9,10,11,12);
-
-
-
-drop TABLE if exists `traits_date_formats`;
-CREATE TABLE IF NOT EXISTS `traits_date_formats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `sysname` varchar(64) NOT NULL,
-  `format` varchar(64) NOT NULL,
-  `show_order` int(3) null DEFAULT 0,
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sysname` (`sysname`),
-  UNIQUE KEY `format` (`format`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-insert into traits_date_formats values (null,'year','YYYY',0,now(),now());
-insert into traits_date_formats values (null,'fulldate','DD-MM-YYYY',1,now(),now());
-
-
-drop TABLE if exists `traits_groups`;
-CREATE TABLE IF NOT EXISTS `traits_groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `parent_id` int(11), # when null: topmost are projects ("invasieve exoten")
-  `sysname` varchar(64) NOT NULL,
-  `name_tid` int(11) DEFAULT NULL,
-  `description_tid` int(11) DEFAULT NULL,
-  `show_order` int(3) null DEFAULT 0,
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sysname` (`project_id`,`sysname`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-drop TABLE if exists `traits_project_types`;
-CREATE TABLE IF NOT EXISTS `traits_project_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `type_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `project_type` (`project_id`,`type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-drop TABLE if exists `traits_traits`;
-CREATE TABLE IF NOT EXISTS `traits_traits` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `trait_group_id` int(11) NOT NULL, # trait type
-  `project_type_id` int(11) NOT NULL,
-  `date_format_id` int(11),
-  `sysname` varchar(64) NOT NULL,
-  `name_tid` int(11) DEFAULT NULL,
-  `code_tid` int(11) DEFAULT NULL,
-  `description_tid` int(11) DEFAULT NULL,
-  `unit` varchar(32) NULL, # m, gr, years, etc
-  `can_select_multiple` tinyint(1) not null DEFAULT 1,
-  `can_include_comment` tinyint(1) not null DEFAULT 0, # can include comment (other than extra value)
-  `can_be_null` tinyint(1) not null DEFAULT 0, # trait accepts possible null values
-  `show_index_numbers` tinyint(1) not null DEFAULT 0, # index with 1), 2) etc. when displaying
-  `show_order` int(3) null DEFAULT 0,
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sysname` (`project_id`,`trait_group_id`,`sysname`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-alter table traits_traits add max_length smallint(3) null after description_tid;
-
-
-
-drop TABLE if exists `traits_values`;
-CREATE TABLE IF NOT EXISTS `traits_values` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `trait_id` int(11) NOT NULL,
-  `string_value` varchar(255),  
-  `numerical_value` FLOAT(12,5),
-  `numerical_value_end` FLOAT(12,5),
-  `date_start` date,
-  `date_end` date,
-  `is_lower_limit` tinyint(1) default 0,  # for limit like "< 0" or "prior to 1758"
-  `is_upper_limit` tinyint(1) default 0, # for limit  like "> 100" 
-  `lower_limit_label` varchar(16), # must be able to have a label as well, i.e. "< 0"
-  `upper_limit_label` varchar(16), # idem, "> 100"
-  `show_order` int(3) null DEFAULT 0, # "natural" sort if null
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-
-----------------------------------------------
-
-drop TABLE if exists `traits_taxon_values`;
-CREATE TABLE IF NOT EXISTS `traits_taxon_values` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `value_id` int(11) NOT NULL,
-  `comment` varchar(255), # ref `can_include_comment`
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-
-vvvvvvvvvvv IS EEN BRON PER WAARDE VAN BELANG??? vvvvvvvvvvvvvvvvv
-TAXON-VALUE
-- some sort of link!
-- some sort of source!
-
-drop TABLE if exists `traits_taxon_values_references`;
-CREATE TABLE IF NOT EXISTS `traits_taxon_values_references` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `trait_taxon_value_id` int(11) NOT NULL,
-  `reference_id` int(11) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-*/
 
 /*
 
@@ -1230,71 +987,82 @@ class TraitsController extends Controller
 		
 		$trait=$this->getTraitgroupTrait($trait);
 
-		$base=array(
-			'project_id'=>$this->getCurrentProjectId(),
-			'trait_id'=>$trait['id']
-		);
+		$base=
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'trait_id'=>$trait['id']
+			);
+		
+
+		// get the current values
+		$current=$this->models->TraitsValues->_get(array('id'=>$base));
 		
 		if ($trait['type_sysname']=='stringlist' || $trait['type_sysname']=='stringlistfree')
 		{
-			// deleting all old values & translations
-			$prev=$this->models->TraitsValues->_get(array('id'=>$base));
 
-			foreach((array)$prev as $val)
-			{
-				$this->deleteTranslations(array('text_id'=>$val['string_label_tid']));
-			}
-
-			$this->models->TraitsValues->delete($base);
-
-
-			// saving all new values
-			$saved=0;
 			$index=array();
-
+			$showorder=0;
 			foreach((array)$values as $key=>$val)
 			{
-				$d=$base+
-					array(
-						'string_value'=>trim($val),
-						'show_order'=>$key
-					);
+				$base['show_order']=$showorder++;
+				$base['string_value']=trim($val);
 				
-				$r=$this->models->TraitsValues->save($d);
-				
-				if ($r)
+				if ($key>=0)
+				// update
 				{
-					$index[$key]=$this->models->TraitsValues->getNewId();
-					$saved++;
+					$this->models->TraitsValues->update($base,array('id'=>$key,'project_id'=>$this->getCurrentProjectId()));
+					$value=$this->models->TraitsValues->_get(array('id'=>$key));
+					
+					if (isset($valuelabels[$key]))
+					{
+						$textids=$this->storeTranslations(
+							array(
+								'record'=>$value,
+								'data'=>array('string_label_tid'=>$valuelabels[$key])
+							)
+						);
+				
+						foreach((array)$textids as $col=>$text_id)
+						{
+							$this->models->TraitsValues->update(array($col=>$text_id),array('id'=>$key));
+						}
+					}
+
 				}
 				else
+				// insert
 				{
-					$this->addError(sprintf($this->translate('Value %s not saved'),$val));
-				}
-			}
-
-
-			// saving the translations
-			foreach((array)$index as $key=>$id)
-			{
+					$this->models->TraitsValues->save($base);
+					$id=$this->models->TraitsValues->getNewId();
+					
+					if (isset($valuelabels[$id]))
+					{
+						$textids=$this->storeTranslations(
+							array(
+								'record'=>array('string_label_tid'=>null), // all new values, none have a text_id yet
+								'data'=>array('string_label_tid'=>$valuelabels[$id],)
+							)
+						);
 				
-				$textids=$this->storeTranslations(
-					array(
-						'record'=>array('string_label_tid'=>null), // all new values, none have a text_id yet
-						'data'=>array(
-							'string_label_tid'=>$valuelabels[$key],
-						)
-					)
-				);
-		
-				foreach((array)$textids as $col=>$text_id)
-				{
-					$this->models->TraitsValues->update(array($col=>$text_id),array('id'=>$id));
+						foreach((array)$textids as $col=>$text_id)
+						{
+							$this->models->TraitsValues->update(array($col=>$text_id),array('id'=>$id));
+						}
+					}
 				}
-
 			}
 
-			$this->addMessage(sprintf($this->translate('%s values saved'),$saved));
+			// delete previous values that are no longer part of the new set
+			foreach((array)$current as $key=>$val)
+			{
+				if (!array_key_exists($val['id'],$values))
+				{
+					$this->deleteTranslations(array('text_id'=>$val['string_label_tid']));
+					$this->models->TraitsValues->delete(array('id'=>$val['id'],'project_id'=>$this->getCurrentProjectId()));
+				}
+			}
+
+			$this->addMessage(sprintf($this->translate('%s values saved'),$showorder));
 		}
 		else
 		if (
@@ -1428,7 +1196,9 @@ class TraitsController extends Controller
 
 	private function getNextTextId()
 	{
-		$d=$this->models->TextTranslations->freeQuery("select ifnull(max(text_id)+1,1) as next from %TABLE%  where project_id = ".$this->getCurrentProjectId());
+		$d=$this->models->TextTranslations->freeQuery("
+			select ifnull(max(text_id)+1,1) as next from %TABLE%  where project_id = ".$this->getCurrentProjectId()
+		);
 		return $d[0]['next'];
 	}
 

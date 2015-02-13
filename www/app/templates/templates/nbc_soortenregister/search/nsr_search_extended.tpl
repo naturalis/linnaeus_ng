@@ -223,7 +223,7 @@ label.clickable:hover {
 				
 				<div class="formrow">
                 	<label for="photoOptions" class="clickable" onclick="$(this).next().toggle();">
-	                    <strong>{t}Afbeeldingen{/t}</strong>
+	                    <strong>{t}Multimedia{/t}</strong>
                     </label>
                     <p style="display:none">
 					<select id="photoOptions" name="photoOptions">
@@ -314,7 +314,9 @@ label.clickable:hover {
 
 		<div id="results">
 			<p>
-				<h4><span id="resultcount-header">{$results.count}</span>{if $searchHR} {t}voor{/t} '{$searchHR}'{/if}</h4>
+				<h4><span id="resultcount-header">{$results.count}</span>
+                {if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
+                </h4>
 			</p>
 			{foreach from=$results.data item=v}
             <div class="result">
@@ -342,6 +344,7 @@ label.clickable:hover {
 
 </div>
 
+
 <script>
 {if $search}
 {foreach from=$search.presence item=v key=k}
@@ -349,7 +352,7 @@ $("#presenceStatusList").val('presence[{$k}]');
 addSearchParameter('presenceStatusList');
 {/foreach}
 
-{foreach from=$search.values item=v key=k}
+{foreach from=$search item=v key=k}
 {if $k=='images' || $k=='distribution' || $k=='trend'}
 $("#photoOptions").val('{$k}');
 addSearchParameter('photoOptions');

@@ -44,7 +44,7 @@ function checkTraitValue(v)
     The value is the string that will be recognized when importing data sheets, with the language labels you
     can specify how the value will be presented in the front-end of the site.
 </p>
-
+    
 <form id="theForm">
 	<table>
     	<tr>
@@ -79,7 +79,7 @@ $(document).ready(function()
 	{foreach from=$v.language_labels item=l key=k}
 	labels.push( { language:{$k},label:'{$l|@escape}' } );
 	{/foreach}
-	doAddTraitValue( { value:'{$v.string_value|@escape}', labels: labels } );
+	doAddTraitValue( { id: {$v.id}, value:'{$v.string_value|@escape}', labels: labels } );
 	{/foreach}
 
 	traitValuesInitialise();
