@@ -19,7 +19,8 @@
 		<th>geslacht:</th>
 		<td>
 			<label><input type="radio" name="gender" value="f" {if $actor.gender=='f'}checked="checked"{/if} />v</label>
-			<label><input type="radio" name="gender" value="m" {if $actor.gender!='f'}checked="checked"{/if} />m</label>
+			<label><input type="radio" name="gender" value="m" {if $actor.gender=='m'}checked="checked"{/if} />m</label>
+			<label><input type="radio" name="gender" value="" {if $actor.gender!='f' && $actor.gender!='m'}checked="checked"{/if} />niet gespecificeerd</label>            
 		</td>
 	</tr>
 	<tr>
