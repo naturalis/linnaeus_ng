@@ -67,7 +67,28 @@ function checkTraitValue(v)
     <input type="button" value="save" onclick="setUserSave();saveValues()" />
 </form>
 
+<p>
+	<textarea id="bulk"></textarea><br /><br />
+    <input type="button" value="parse" onclick="fuck()" />
+</p>
+
 <script type="text/JavaScript">
+
+function fuck()
+{
+	var a=$('#bulk').val().split("\n");
+	
+	for(var i=0;i<a.length;i++)
+	{
+		$('#newvalue').val(a[i]);
+		addTraitValue();
+	}
+	updateValueList();
+	updateValueCount();
+	$('#bulk').val('');
+}
+
+
 $(document).ready(function()
 {
 	{foreach from=$languages item=v}

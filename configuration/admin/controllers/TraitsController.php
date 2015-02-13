@@ -1055,7 +1055,7 @@ class TraitsController extends Controller
 			// delete previous values that are no longer part of the new set
 			foreach((array)$current as $key=>$val)
 			{
-				if (!array_key_exists($val['id'],$values))
+				if (!array_key_exists($val['id'],(array)$values))
 				{
 					$this->deleteTranslations(array('text_id'=>$val['string_label_tid']));
 					$this->models->TraitsValues->delete(array('id'=>$val['id'],'project_id'=>$this->getCurrentProjectId()));
