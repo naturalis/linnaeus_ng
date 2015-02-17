@@ -1,5 +1,5 @@
 	<p>
-		<h2 id="name-header">Exoteninformatie</h2>
+		<h2 id="name-header">Exotenpaspoort</h2>
 
         {foreach from=$content.result.data item=v key=k}
         <p>
