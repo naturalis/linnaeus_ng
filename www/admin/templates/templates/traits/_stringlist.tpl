@@ -67,32 +67,62 @@ function checkTraitValue(v)
     <input type="button" value="save" onclick="setUserSave();saveValues()" />
 </form>
 
+
 <p>
-	<textarea id="bulk"></textarea><br /><br />
-    <input type="button" value="parse" onclick="fuck()" />
+<a href="#" onclick="$('#add-bulk').toggle();return false;">add bulk</a>
 </p>
+
+<p id="add-bulk" style="display:none">
+	<textarea id="bulk"></textarea><br />
+	<label><input type="radio" class="language-select" name="langselect" value="values" checked="checked" />values</label>
+	{foreach from=$languages item=v}
+	<label><input type="radio" class="language-select" name="langselect" value="{$v.language_id}" />{$v.language|@escape}</label>
+	{/foreach}
+    <br />
+  
+    <input type="button" value="add" onclick="addBulk()" />
+</p>
+
 
 <script type="text/JavaScript">
 
-function fuck()
+function addBulk()
 {
+
+	var l=$('input[name=langselect]:checked').val();
 	var a=$('#bulk').val().split("\n");
 	
-	for(var i=0;i<a.length;i++)
+	if (l=='values')
 	{
-		$('#newvalue').val(a[i]);
-		addTraitValue();
+		for(var i=0;i<a.length;i++)
+		{
+			$('#newvalue').val(a[i]);
+			addTraitValue();
+		}
+		updateValueList();
+		updateValueCount();
 	}
-	updateValueList();
-	updateValueCount();
+	else
+	{
+		var i=0;	
+		$('.language-labels[type=text]').each(function()
+		{
+			if ($(this).attr('language-id')==l)
+			{
+				$(this).val(a[i++]);
+			}
+		});
+	}
+
 	$('#bulk').val('');
+
 }
 
 
 $(document).ready(function()
 {
 	{foreach from=$languages item=v}
-	doAddTraitLanguage( { id:{$v.language_id|@escape}, language: '{$v.language|@escape}' } );
+	doAddTraitLanguage( { id:{$v.language_id}, language: '{$v.language|@escape}' } );
 	{/foreach}
 
 	{foreach from=$trait.values item=v}
