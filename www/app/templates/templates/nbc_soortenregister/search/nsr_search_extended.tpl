@@ -50,7 +50,7 @@ function printParameters()
 	{
 		var e=search_parameters[i];
 		$('#search-parameters').
-			append($('<li>'+e.varlabel+': '+e.valuetext+' <a href="#" onclick="removeSearchParameter('+i+');return false;"> X </a></li>'));
+			append($('<li>'+e.varlabel+': '+e.valuetext+' <a href="#" onclick="removeSearchParameter('+i+');submitSearchParams();return false;"> X </a></li>'));
 	}
 
 	$('#remove-all').toggle(search_parameters.length>0);
@@ -218,7 +218,7 @@ label.clickable:hover {
 					{/foreach}
 					</select>
                     
-                    <input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');" />
+                    <input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');submitSearchParams();" />
 				</div>
 				
 				<div class="formrow">
@@ -231,7 +231,7 @@ label.clickable:hover {
                         <option value="distribution">{t}met verspreidingskaart{/t}</option>
                         <option value="trend">{t}met trendgrafiek{/t}</option>
 					</select>
-                    <input type="button" value=" > " onclick="addSearchParameter('photoOptions');" />
+                    <input type="button" value=" > " onclick="addSearchParameter('photoOptions');submitSearchParams();" />
                     </p>
 				</div>
 
@@ -248,7 +248,7 @@ label.clickable:hover {
                         <option value="dna">{t}met exemplaren verzameld{/t}</option>
                         <option value="dna_insuff">{t}minder dan drie exemplaren verzameld{/t}</option>
                     </select>
-                    <input type="button" value=" > " onclick="addSearchParameter('dnaOptions');" />
+                    <input type="button" value=" > " onclick="addSearchParameter('dnaOptions');submitSearchParams();" />
                     </p>
 				</div>
 	
@@ -276,7 +276,7 @@ label.clickable:hover {
                                     placeholder="{$d.date_format_format_hr}" 
                                     maxlength="{$d.date_format_format_hr|@strlen}" />
                                 {/if}
-                                <input type="button" value=" > " onclick="addSearchParameter('trait-{$k1}{$k2}');" />
+                                <input type="button" value=" > " onclick="addSearchParameter('trait-{$k1}{$k2}');submitSearchParams();" />
 							</td>
 						</tr>
 					{/if}
@@ -288,7 +288,7 @@ label.clickable:hover {
 				<div class="formrow" style="margin-top:10px;">
 					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
-                    	<a href="#" onclick="removeAllSearchParameters();return;">{t}alles verwijderen{/t}</a>
+                    	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
 					</span>
                     <ul id="search-parameters">
                     </ul>
