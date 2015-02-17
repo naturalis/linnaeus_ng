@@ -110,6 +110,7 @@ function addBulk()
 			if ($(this).attr('language-id')==l)
 			{
 				$(this).val(a[i++]);
+				addTraitValueLabel(this);
 			}
 		});
 	}
