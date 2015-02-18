@@ -54,6 +54,10 @@ div.data {
     overflow:hidden;
 	-white-space:nowrap;
 }
+td.identified-trait {
+	min-width:150px;
+}
+
 </style>
 
 <div id="page-main">
@@ -62,16 +66,20 @@ div.data {
 	</p>
    <p>
         <table>
-        {foreach from=$data.lines item=line}
+        {foreach from=$data.lines item=line key=l}
 
 	        {if $line.has_data || $line.trait.sysname}
             <tr class="{if !$line.has_data}no-data{/if}{if !$line.trait}no-trait{/if}{if $line.trait.sysname==''}irrelevant{/if}">
 
-                <td class="{if $line.trait}identified-trait {/if}">
+                <td class="{if $line.trait}identified-trait{/if}">
                 {if $line.trait.sysname!=$sysColSpecies && $line.trait.sysname!=$sysColReferences && $line.trait.sysname!=$sysColNsrId}
 	                <a href="traitgroup_trait.php?id={$line.trait.id}" target="_trait">{$line.trait.sysname}</a>
                 {else}
     	            {$line.trait.sysname}
+                {/if}
+                
+				{if $line.trait.id==$prevtrait && $line.trait.can_have_range}
+				<br /><label style="font-size:0.9em"><input name="joinrows[]" value="[{$prevrow},{$l}]" type="checkbox" />join with previous row</label>
                 {/if}
                 </td>
 
@@ -105,6 +113,8 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
 				{/if}
                 {/foreach}
             </tr>
+            {assign var=prevtrait value=$line.trait.id}
+            {assign var=prevrow value=$l}
             {/if}
         {/foreach}
         </table>
