@@ -18,14 +18,13 @@ class Literature2Controller extends Controller
     );
    
     public $controllerPublicName = 'Literatuur (v2)';
+    public $cacheFiles = array();
+    public $usedHelpers = array('csv_parser_helper');
+    public $cssToLoad = array('nsr_taxon_beheer.css');
 
-    public $cacheFiles = array(
-    );
-    
-    public $cssToLoad = array(
-		'lookup.css',
-		'nsr_taxon_beheer.css'
-	);
+	private $_actors=null;
+	private $_literature=null;
+	private $_matchThreshold=75;
 
 	public $jsToLoad =
 		array(
@@ -114,6 +113,176 @@ class Literature2Controller extends Controller
 		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('publicationTypes',$this->getPublicationTypes());
 		$this->printPage(isset($template) ? $template : null);
+	}
+
+	private function setSessionVar($var,$val=null)
+	{
+		if (is_null($val))
+		{
+			unset($_SESSION['admin']['system']['literature2'][$var]);
+		}
+		else
+		{
+			$_SESSION['admin']['system']['literature2'][$var]=$val;
+		}
+	}
+
+	private function getSessionVar($var)
+	{
+		return isset($_SESSION['admin']['system']['literature2'][$var]) ? $_SESSION['admin']['system']['literature2'][$var] : null;
+	}
+
+	private function parseRawCsvData($raw)
+	{
+		$this->helpers->CsvParserHelper->setFieldDelimiter("\t");
+		$this->helpers->CsvParserHelper->setFieldMax(99);
+		$this->helpers->CsvParserHelper->parseRawData($raw);
+		$this->addError($this->helpers->CsvParserHelper->getErrors());
+
+		if (!$this->getErrors())
+		{
+			return $this->helpers->CsvParserHelper->getResults();
+		}
+	}
+
+
+    public function bulkUploadAction()
+	{
+		$this->checkAuthorisation();
+		$this->setPageName($this->translate('Bulk upload'));
+
+		$lit2Columns=
+			array(
+				'label'=>'titel',
+				'alt_label'=>'alt. titel',
+				'date'=>'datum',
+				'author'=>'auteur(s)',
+				'publication_type'=>'type publicatie',
+				'citation'=>'citatie',
+				'source'=>'bron',
+				'publishedin'=>'gepubliceerd in',
+				'publisher'=>'uitgever',
+				'periodical'=>'periodiek',
+				'pages'=>'pagina(s)',
+				'volume'=>'volume',
+				'external_link'=>'link',
+			);
+		
+		$raw=null;
+		$ignorefirst=false;
+		$lines=null;
+		$delcols=null;
+		$emptycols=null;
+		$fields=null;
+		$matches=null;
+
+		$ignorefirst=$this->rHasVal('ignorefirst','1');
+
+		if ($this->rHasVal('raw'))
+		{
+			$raw=$this->rGetVal('raw');
+			
+			$hash=md5($raw);
+			if ($hash!=$this->getSessionVar('hash'))
+			{
+				$this->setSessionVar('delcols',null);
+			}
+			$this->setSessionVar('hash',$hash);
+			
+			$lines=$this->parseRawCsvData($raw);
+
+			foreach($lines as $key=>$val)
+			{
+				if ($key==0)
+				{
+					foreach($val as $c=>$cell) $emptycols[$c]=true;
+				}
+
+				if ($ignorefirst && $key==0) continue;
+
+				foreach($val as $c=>$cell)
+				{
+					if (strlen(trim($cell))!=0)
+					{
+						$emptycols[$c]=false;
+					}
+				}
+			}
+		}
+		
+		if ($lines)
+		{
+			if ($this->rHasVal('action','delcolreset'))
+			{
+				$this->setSessionVar('delcols',null);
+			}
+			else
+			if ($this->rHasVal('action','delcol') && $this->rHasVal('value'))
+			{
+				$delcols=(array)$this->getSessionVar('delcols');
+				$delcols[$this->rGetVal('value')]=true;
+				$this->setSessionVar('delcols',$delcols);
+			}
+			
+			if ($this->rHasVal('fields'))
+			{
+				$fields=$this->rGetVal('fields');
+			}
+		}
+		
+		if ($this->rHasVal('threshold'))
+		{
+			$this->_matchThreshold=
+				is_numeric($this->rGetVal('threshold')) && 
+				$this->rGetVal('threshold')<=100 &&
+				$this->rGetVal('threshold')>0 ? 
+					$this->rGetVal('threshold') : 
+					$this->_matchThreshold;
+		}
+		
+		if ($lines && $fields) 
+		{
+			$matches=$this->matchPossibleReferences(array('lines'=>$lines,'ignorefirst'=>$ignorefirst,'fields'=>$fields));
+
+			foreach((array)$lines[0] as $c=>$cell)
+			{
+				if(isset($fields[$c]) && $fields[$c]=='author')
+				{
+					$this->smarty->assign('field_author',$c);
+				}
+				else
+				if(isset($fields[$c]) && $fields[$c]=='label')
+				{
+					$this->smarty->assign('field_label',$c);
+				}
+				else
+				if(isset($fields[$c]) && $fields[$c]=='date')
+				{
+					$this->smarty->assign('field_date',$c);
+				}
+			}
+
+			//q($matches,1);
+
+		}
+		
+		/*
+		language_id
+		alt_label_language_id
+		actor_id
+		publishedin_id
+		periodical_id
+		*/
+		$this->smarty->assign('threshold',$this->_matchThreshold);
+		$this->smarty->assign('matches',$matches);
+		$this->smarty->assign('emptycols',$emptycols);
+		$this->smarty->assign('fields',$fields);
+		$this->smarty->assign('cols',$lit2Columns);
+		$this->smarty->assign('delcols',$this->getSessionVar('delcols'));
+		$this->smarty->assign('raw',$raw);
+		$this->smarty->assign('ignorefirst',$ignorefirst);
+		$this->smarty->assign('lines',$lines);
+		$this->printPage();
 	}
 
 
@@ -217,11 +386,11 @@ class Literature2Controller extends Controller
 				}
 			}
 
-			foreach($new as $actor) 
+			foreach($new as $key=>$actor) 
 			{
 				if (!in_array($actor,$retain))
 				{
-					$this->saveReferenceAuthor($actor);
+					$this->saveReferenceAuthor($actor,$key);
 					$this->addMessage('Auteur toegevoegd.');
 				}
 			}
@@ -299,13 +468,14 @@ class Literature2Controller extends Controller
 		return $d;
 	}
 			
-	private function saveReferenceAuthor($actor)
+	private function saveReferenceAuthor($actor,$sort_order=0)
 	{
 		return $this->models->Literature2Authors->save(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'literature2_id' => $this->getReferenceId(),
-				'actor_id' => $actor
+				'actor_id' => $actor,
+				'sort_order' => $sort_order
 			));
 	}
 
@@ -426,7 +596,7 @@ class Literature2Controller extends Controller
 				where
 					_a.project_id = ".$this->getCurrentProjectId()."
 					and _a.literature2_id =".$id."
-				order by _b.name
+				order by _a.sort_order, _b.name
 			");
 		
 			$l[0]['authors']=$authors;
@@ -494,7 +664,7 @@ class Literature2Controller extends Controller
 						"_a.publication_type = '" . mysql_real_escape_string($publicationType) . "'") : 
 					"" )."
 			");	
-			
+
 		$data=array();
 
 		foreach((array)$all as $key => $val)
@@ -513,7 +683,11 @@ class Literature2Controller extends Controller
 			
 			$match=false;
 			
-			if(!empty($search) && $search!='*')
+			if(!empty($search) && $search=='*')
+			{
+				$match=true;
+			} else
+			if(!empty($search))
 			{
 				if ($matchStartOnly)
 				{
@@ -530,7 +704,8 @@ class Literature2Controller extends Controller
 						$match=$match ? true : (stripos($tempauthors,$search)!==false);
 				}
 
-			} else
+			} 
+			else
 			if(!empty($searchTitle))
 			{	
 				if ($fetchNonAlpha)
@@ -548,7 +723,8 @@ class Literature2Controller extends Controller
 					}
 				}
 
-			} else
+			} 
+			else
 			if (!empty($searchAuthor))
 			{
 				if ($matchStartOnly)
@@ -776,6 +952,271 @@ class Literature2Controller extends Controller
 			");
 	}
 
+
+
+	private function matchPossibleAuthor($raw)
+	{
+		if (empty($this->_actors)) return;
+		if (empty($raw)) return;
+		
+		if(substr_count($raw,",")>0)
+		{
+			$a=preg_split('/(,)|\&/',$raw);
+			$a[1]=trim($a[1]).' '.trim($a[0]);
+			array_shift($a);
+		}
+		else
+		{
+			$a=array(trim($raw));
+		}
+					
+		array_walk($a,function(&$val)
+		{
+			$val=trim(preg_replace('/(\s)+/',' ',$val));
+		});
+					
+		//echo $raw;
+		//q($a);
+		
+		$suggestions=array();
+		//$best_best_match=0;
+
+		foreach($a as $key=>$suggestedname)
+		{
+			$best_match=0;
+			$suggestions[$key]=array('name'=>$suggestedname,'suggestions'=>array());
+			
+			foreach($this->_actors as $actor)
+			{
+				$name=$actor['label'];
+				$name_alt=$actor['name_alt'];
+
+				$pct1=$pct2=0;
+
+				if (!empty($name))
+				{								
+					if(substr_count($name,",")>0)
+					{
+						$d=explode(",",$name);
+						$name=trim($d[1]).' '.trim($d[0]);
+					}
+					similar_text($suggestedname,$name,$pct1);
+				}
+
+				if (!empty($name_alt))
+				{	
+					if(substr_count($name_alt,",")>0)
+					{
+						$d=explode(",",$name_alt);
+						$name_alt=trim($d[1]).' '.trim($d[0]);
+					}							
+					similar_text($suggestedname,$name_alt,$pct2);
+				}
+
+				if ($pct1>=$this->_matchThreshold || $pct2>=$this->_matchThreshold)
+				{
+					/*
+					echo 
+						$suggestedname,' :: ',
+						$name,' (',$actors['name'],') ',' / ',$name_alt,
+						' (',round($pct1),'% / ',round($pct2),'%)',
+						' [',$actors['id'],']',
+						'<br />';
+					*/
+					
+					$suggestions[$key]['suggestions'][]=
+						array(
+							'id'=>$actor['id'],
+							'names'=>
+								array(
+									'name'=>$actor['label'],
+									'swapped'=>$name,
+									'name_alt'=>$name_alt,
+								),
+							'match'=>
+								array(
+									'name'=>$pct1,
+									'name_alt'=>$pct2
+								)
+						);
+
+					if ($best_match['match']<($pct1>$pct2?$pct1:$pct2))
+					{
+						$best_match=($pct1>$pct2?$pct1:$pct2);
+					}
+					
+				}
+			}
+			
+			$suggestions[$key]['best_match']=$best_match;
+			//$best_best_match=($best_best_match<$best_match?$best_match:$best_best_match);
+
+		}
+
+		//q($suggestions);
+		
+		return $suggestions;
+					
+	}
+
+	private function matchPossibleLabel($raw)
+	{
+		if (empty($this->_literature)) return;
+		if (empty($raw)) return;
+
+		$suggestions=array();
+
+		foreach($this->_literature as $_literature)
+		{
+			$label=$_literature['label'];
+			$label_alt=$_literature['alt_label'];
+
+			$pct1=$pct2=0;
+
+			if (!empty($label))
+			{								
+				similar_text($raw,$label,$pct1);
+			}
+
+			if (!empty($label_alt))
+			{	
+				similar_text($raw,$label_alt,$pct2);
+			}
+
+			if ($pct1>=$this->_matchThreshold || $pct2>=$this->_matchThreshold)
+			{
+				/*
+				echo 
+					'|',$raw,'|','<br />',
+					'|',$label,'|','<br />',
+					(!empty($label_alt) ? $label_alt.'<br />' : ''),
+					' (',round($pct1),'% / ',round($pct2),'%)',
+					' [',$_literature['id'],']',
+					'<br /><br />';
+				*/
+				
+				$suggestions[]=
+					array(
+						'id'=>$_literature['id'],
+						'date'=>$_literature['date'],
+						'authors'=>$_literature['authors'],
+						'authors_literal'=>$_literature['author'],
+						'names'=>
+							array(
+								'label'=>$label,
+								'label_alt'=>$label_alt,
+							),
+						'match'=>
+							array(
+								'label'=>$pct1,
+								'label_alt'=>$pct2
+							)
+					);
+			}
+		}
+		
+		if (!empty($suggestions))
+		{
+			usort($suggestions,function($a,$b)
+			{
+				$a=($a['match']['label']>=$a['match']['label_alt']?$a['match']['label']:$a['match']['label_alt']);
+				$b=($b['match']['label']>=$b['match']['label_alt']?$b['match']['label']:$b['match']['label_alt']);
+				return ($a>$b ? -1 : ($a<$b ? 1 : 0 ));
+			});
+		}
+
+		return $suggestions;
+
+	}
+
+	private function matchPossibleReferences($p)
+	{
+		$lines=isset($p['lines']) ? $p['lines'] : null;
+		$ignorefirst=isset($p['ignorefirst']) ? $p['ignorefirst'] : false;
+		$fields=isset($p['fields']) ? $p['fields'] : null;
+
+		if (is_null($lines) || is_null($fields)) return null;
+
+		$this->_actors=$this->getActors();
+		$this->_literature=$this->getReferences(array('search'=>'*'));
+
+		
+		$found=array();
+		$suggestions=array();
+		
+		// go through all lines (= literature references offered by users)
+		foreach((array)$lines as $key=>$line)
+		{
+			if ($ignorefirst && $key==0) continue;
+			
+			$date=null;
+		
+			// go through each cell of this reference	
+			foreach((array)$line as $c=>$cell)
+			{
+				// this is supposed to be the cell containing the author, let's try and match it to database entries
+				if(isset($fields[$c]) && $fields[$c]=='author')
+				{
+					$suggestions[$key]['authors']=$this->matchPossibleAuthor($cell);
+					$found['authors']=true;
+				}
+				else
+				// this is supposed to be the cell containing the title, let's try and match it to database entries
+				if(isset($fields[$c]) && $fields[$c]=='label')
+				{
+					$suggestions[$key]['labels']=$this->matchPossibleLabel($cell);
+					$found['labels']=true;
+				}
+				else
+				/*
+					this is supposed to be the cell containing the date, let's remember it so we can match it to 
+					the year of suggested titles from the database later
+				*/
+				if(isset($fields[$c]) && $fields[$c]=='date')
+				{
+					$date=$cell;
+					$found['date']=true;
+				}
+			}
+
+			// finished all cells for this line, on to post-processing
+			
+			// lets see if the remembered date matches those of the retrieved titles
+			if (!is_null($date))
+			{
+				foreach((array)$suggestions[$key]['labels'] as $klab=>$lab)
+				{
+					$suggestions[$key]['labels'][$klab]['match']['date']=($lab['date']==$date)*100;
+				}
+			}
+			
+			if (count($suggestions[$key]['labels'])>0)
+			{
+				foreach((array)$suggestions[$key]['labels'] as $val)
+				{
+					if (!empty($val['authors_literal']))
+					{
+						$suggestions[$key]['authors']=
+							array_map('unserialize',array_unique(array_map('serialize',array_merge(
+								$suggestions[$key]['authors'],
+								$this->matchPossibleAuthor($val['authors_literal'])
+							))));
+					}
+				}
+			}
+
+		}
+
+		if ((!isset($found['authors']) || $found['authors']!==true) || (!isset($found['labels']) || $found['labels']!==true))
+		{
+			$this->addWarning('choose author and title columns to try match (date/year is not required, but might help)');
+		}
+
+		return $suggestions;
+
+	}
+		
+		
 
 
 	

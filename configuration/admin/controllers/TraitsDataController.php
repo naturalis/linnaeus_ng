@@ -285,7 +285,19 @@ class TraitsDataController extends TraitsController
 	private function parseSessionFile($rotate=false)
 	{
 		$file=$this->getDataSession();
-		$raw=file($file['path'],FILE_IGNORE_NEW_LINES);
+
+
+		//		$raw=file($file['path'],FILE_IGNORE_NEW_LINES);
+		/*
+			apparently, excelsheets use line feeds (Lf, chr(10)) for line breaks within cells. for
+			file(), these Lf's are indistinguishable from proper CrLf's, and mess up the resulting
+			array. the three lines below filter out the lone Lf's before splitting the file's contents
+			on CrLf's.
+		*/
+		$tmp=file_get_contents ($file['path']);
+		$tmp=str_replace(chr(10),' ',str_replace(chr(13).chr(10),chr(11),$tmp));
+		$raw=explode(chr(11),$tmp);
+
 		$lines=array();
 
 		foreach((array)$raw as $key=>$line)
