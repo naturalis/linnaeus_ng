@@ -312,7 +312,7 @@ class TraitsDataController extends TraitsController
 
 			for($i=count($cell)-1;$i>=0;$i--)
 			{
-				$c=trim($cell[$i]);
+				$c=trim(preg_replace(array('/(\p{Z})+/'),' ',$cell[$i]));
 				if (empty($c) && empty($buffer)) continue;
 				array_unshift($buffer,trim($c,$this->_inputFileFieldEncloser." "));
 			}
