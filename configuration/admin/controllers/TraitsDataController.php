@@ -312,8 +312,9 @@ class TraitsDataController extends TraitsController
 
 			for($i=count($cell)-1;$i>=0;$i--)
 			{
-				if (empty($cell[$i]) && empty($buffer)) continue;
-				array_unshift($buffer,trim($cell[$i],$this->_inputFileFieldEncloser." "));
+				$c=trim($cell[$i]);
+				if (empty($c) && empty($buffer)) continue;
+				array_unshift($buffer,trim($c,$this->_inputFileFieldEncloser." "));
 			}
 			if (isset($buffer))
 			{
