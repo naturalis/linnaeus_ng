@@ -1190,7 +1190,7 @@ class Literature2Controller extends Controller
 				}
 			}
 			
-			if (count($suggestions[$key]['labels'])>0)
+			if (isset($suggestions[$key]['labels']) && count($suggestions[$key]['labels'])>0)
 			{
 				foreach((array)$suggestions[$key]['labels'] as $val)
 				{

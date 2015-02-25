@@ -700,7 +700,6 @@ function checkprefnameavail()
 	if (prefnameexists)
 	{
 		$('#nametype-'+preferrednameid).attr('disabled','disabled');
-		$("#nametype-none").attr("selected","selected") ;
 	}
 	else
 	{

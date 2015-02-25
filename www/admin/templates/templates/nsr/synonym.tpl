@@ -82,6 +82,14 @@
 		{/foreach}
 		</select> *
 	</td></tr>
+
+	{*<tr>
+		<th>nsr id:</th>
+		<td>
+			{$name.nsr_id}
+		</td>
+	</tr>*}
+
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>literatuur:</th><td>
     	<span id="name_reference">

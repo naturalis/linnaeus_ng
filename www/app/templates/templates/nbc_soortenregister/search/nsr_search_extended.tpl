@@ -1,8 +1,38 @@
 {include file="../shared/header.tpl"}
 
+<style>
+.formrow select {
+	font-size:1em;
+	margin-left:0px;
+	width:200px;
+	margin-top:2px;
+}
+label.clickable {
+	cursor:pointer;
+}
+label.clickable:hover {
+	text-decoration:underline;
+}
+.zoekknop {
+	cursor:pointer;
+}
+.tumble-arrow-head:before {
+    content:"▶";
+} 
+.tumble-arrow-head:hover:before {
+    content:"◢ ";
+} 
+.down-arrow-head:before {
+    content:"🔻";
+} 
+.traits-legend-cell {
+	width:150px;
+}	
+</style>
+                
 <script>
-
 var search_parameters=[];
+var init=true;
 
 function addSearchParameter(id)
 {
@@ -13,9 +43,14 @@ function addSearchParameter(id)
 	var varlabel=$('label[for='+id+']').text().trim();	
 	var istrait=ele.attr('id').indexOf('trait-')===0;
 
+	var value2=null;
+	var valuetext2=null;
+	var operator=null;
+	var operatorlabel=null;
+
 	if (tagtype=='SELECT')
 	{
-		var traitid=null;
+		var traitid=ele.attr('trait-id');
 		var valueid=$('#'+id+' :selected').val();
 		var value='on';
 		var valuetext=$('#'+id+' :selected').text().trim();
@@ -27,19 +62,56 @@ function addSearchParameter(id)
 		var valueid=null;
 		var value=ele.val();
 		var valuetext=value;
+
+		var ele2=$('#'+id+'-2');
+		if (ele2.is(':visible'))
+		{
+			value2=ele2.val();
+			valuetext2=value2;
+		}
+
+		var d=$(':selected','#operator-'+id.replace('trait-','')).val();
+		if (d)
+		{
+			operator=d;
+			operatorlabel=$(':selected','#operator-'+id.replace('trait-','')).text();
+		}
+		
+	}
+
+	if (((!valueid || valueid.length==0) || value.length==0) && (!value2 || value2.length==0))
+	{
+		return;
 	}
 	
 	for(var i=0;i<search_parameters.length;i++)
 	{
 		var e=search_parameters[i];
-		if (e.valueid==valueid && e.value==value && e.istrait==istrait)
+		if (e.valueid==valueid && e.value==value && e.value2==value2 && e.operator==operator && e.istrait==istrait)
 		{
 			return;
 		}
 	}
-		
-	search_parameters.push( { traitid:traitid,valueid:valueid,value:value,valuetext:valuetext,varlabel:varlabel,istrait:istrait } );
+	
+	search_parameters.push(
+	{ 
+		traitid:traitid,
+		valueid:valueid,
+		value:value,
+		valuetext:valuetext,
+		varlabel:varlabel,
+		istrait:istrait,
+		operator:operator,
+		operatorlabel:operatorlabel,
+		value2:value2,
+		valuetext2:valuetext2
+	} );
+	
+	//console.dir(search_parameters);
+	
 	printParameters();
+
+	submitSearchParams();
 }
 
 function printParameters()
@@ -50,7 +122,14 @@ function printParameters()
 	{
 		var e=search_parameters[i];
 		$('#search-parameters').
-			append($('<li>'+e.varlabel+': '+e.valuetext+' <a href="#" onclick="removeSearchParameter('+i+');submitSearchParams();return false;"> X </a></li>'));
+			append(
+				$(
+					'<li>'+
+						e.varlabel+': '+
+						(e.operatorlabel ? e.operatorlabel+' ' : '' )+
+						e.valuetext+
+						(e.valuetext2 ? ' & ' + e.valuetext2 : '' )+
+					' <a href="#" onclick="removeSearchParameter('+i+');submitSearchParams();return false;"> X </a></li>'));
 	}
 
 	$('#remove-all').toggle(search_parameters.length>0);
@@ -104,6 +183,18 @@ function addEstablishedOrNot(state)
 
 function submitSearchParams()
 {
+	if (init) return;
+
+/*
+
+	$('.options-panel').each(function(){
+		$(this).is(':visible');
+		remember and re-set.
+
+	});
+
+*/
+	
 	var form=$('<form method="get"></form>').appendTo('body');
 
 	form.append('<input type="hidden" name="group_id" value="'+$('#group_id').val()+'" />');
@@ -112,20 +203,16 @@ function submitSearchParams()
 	form.append('<input type="hidden" name="author" value="'+$('#author').val()+'" />');
 	form.append('<input type="hidden" name="sort" value="'+$('#sort').val()+'" />');
 
+	var traits={};
+	var j=0;
+
 	for (var i=0;i<search_parameters.length;i++)
 	{
 		var param=search_parameters[i];
 
 		if (param.istrait)
 		{
-			if (param.traitid)
-			{
-				form.append('<input type="hidden" name="traits[freevalues]['+param.traitid+']" value="'+param.value+'" />');
-			}
-			else
-			{
-				form.append('<input type="hidden" name="traits[values]['+param.valueid+']" value="'+param.value+'" />');
-			}
+			traits[j++]=param;
 		}
 		else
 		{
@@ -133,30 +220,11 @@ function submitSearchParams()
 		}
 	}
 	
+	form.append('<input type="hidden" name="traits" value="'+ encodeURIComponent(JSON.stringify(traits))+'" />');
+	
 	form.submit();	
 }
-
-
 </script>
-
-<style>
-.formrow select {
-	font-size:1em;
-	margin-left:0px;
-	width:200px;
-	margin-top:2px;
-}
-label.clickable {
-	cursor:pointer;
-}
-label.clickable:hover {
-	text-decoration:underline;
-}
-.zoekknop {
-	cursor:pointer;
-}
-</style>
-
 
 <div id="dialogRidge">
 
@@ -196,17 +264,17 @@ label.clickable:hover {
 				<div class="formrow">
 					<label for="presenceStatusList">
 						<strong>{t}Status voorkomen{/t}</strong>&nbsp;
-                        <a href="http://www.nederlandsesoorten.nl/node/15"
-                        	target="_blank" 
-                            title="{t}klik voor help over dit onderdeel{/t}" 
-                            class="help">&nbsp;</a>
+                    <a href="http://www.nederlandsesoorten.nl/node/15"
+                        target="_blank" 
+                        title="{t}klik voor help over dit onderdeel{/t}" 
+                        class="help"
+                     >&nbsp;</a>
 					</label>
-					<span style="float:right">
-						<a href="#" onclick="addEstablished();return false;">{t}gevestigde soorten{/t}</a> / 
-						<a href="#" onclick="addNonEstablished();return false;">{t}niet gevestigde soorten{/t}</a>
-					</span>
-					<select id="presenceStatusList" name="presenceStatusList">
-					{foreach from=$presence_statuses item=v}
+                    <br />
+					<select id="presenceStatusList" name="presenceStatusList" style="width:250px;color:#666">
+                        <option value="">maak een keuze</option>
+                        <optgroup style="color:#000">
+						{foreach from=$presence_statuses item=v}
                         <option 
                             id="established{$v.id}" 
                             value="presence[{$v.id}]" 
@@ -215,68 +283,139 @@ label.clickable:hover {
                             <div class="presenceStatusCode">{$v.index_label}</div>
                             <div class="presenceStatusDescription">{$v.information_short}</div>
                         </option>
-					{/foreach}
+						{/foreach}
+                    	</optgroup>
 					</select>
-                    
-                    <input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');submitSearchParams();" />
+					<input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');" />
+					<br />
+                    <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
+                    <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
 				</div>
-				
+
 				<div class="formrow">
-                	<label for="photoOptions" class="clickable" onclick="$(this).next().toggle();">
+                	<label for="photoOptions" 
+                        class="clickable tumble-arrow-head" 
+                        onclick="
+                        	$('#multimedia-options').toggle();
+                            if ($('#multimedia-options').is(':visible'))
+	                            $(this).removeClass('tumble-arrow-head').addClass('down-arrow-head')
+							else
+	                            $(this).removeClass('down-arrow-head').addClass('tumble-arrow-head')
+							">
 	                    <strong>{t}Multimedia{/t}</strong>
                     </label>
-                    <p style="display:none">
-					<select id="photoOptions" name="photoOptions">
+                    <p class="options-panel" id="multimedia-options" style="display:none">
+					<select id="photoOptions" name="photoOptions" style="width:250px;color:#666">
+                        <option value="">maak een keuze</option>
+                        <optgroup style="color:#000">
                         <option value="images">{t}met foto('s){/t}</option>
                         <option value="distribution">{t}met verspreidingskaart{/t}</option>
                         <option value="trend">{t}met trendgrafiek{/t}</option>
+                        </optgroup>
 					</select>
-                    <input type="button" value=" > " onclick="addSearchParameter('photoOptions');submitSearchParams();" />
+                    <input type="button" value=" > " onclick="addSearchParameter('photoOptions');" />
                     </p>
 				</div>
 
 				<div class="formrow">
-                	<label for="dnaOptions" class="clickable" onclick="$(this).next().toggle();">
+                	<label for="dnaOptions"
+                        class="clickable tumble-arrow-head" 
+                        onclick="
+                        	$('#dna-options').toggle();
+                            if ($('#dna-options').is(':visible'))
+	                            $(this).removeClass('tumble-arrow-head').addClass('down-arrow-head')
+							else
+	                            $(this).removeClass('down-arrow-head').addClass('tumble-arrow-head')
+							">
 	                    <strong>{t}DNA barcoding{/t}</strong>&nbsp;
                         <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" 
                         	target="_blank" 
                             title="klik voor help over dit onderdeel" 
                             class="help">&nbsp;</a>
                     </label>
-                    <p style="display:none">
-                    <select id="dnaOptions" name="dnaOptions">
+                    <p class="options-panel" id="dna-options" style="display:none">
+                    <select id="dnaOptions" name="dnaOptions"style="width:250px;color:#666">
+                        <option value="">maak een keuze</option>
+                        <optgroup style="color:#000">
                         <option value="dna">{t}met exemplaren verzameld{/t}</option>
                         <option value="dna_insuff">{t}minder dan drie exemplaren verzameld{/t}</option>
+                        </optgroup>
                     </select>
-                    <input type="button" value=" > " onclick="addSearchParameter('dnaOptions');submitSearchParams();" />
+                    <input type="button" value=" > " onclick="addSearchParameter('dnaOptions');" />
                     </p>
 				</div>
 	
+    
 				{foreach from=$traits item=t key=k1}
 				<div class="formrow">
-					<label for="traits" class="clickable" onclick="$(this).next().toggle();">
+					<label for="traits"
+                        class="clickable tumble-arrow-head" 
+                        onclick="
+                        	$('#traits{$k1}-options').toggle();
+                            if ($('#traits{$k1}-options').is(':visible'))
+	                            $(this).removeClass('tumble-arrow-head').addClass('down-arrow-head')
+							else
+	                            $(this).removeClass('down-arrow-head').addClass('tumble-arrow-head')
+							">                    
 						<strong>{$t.name}</strong>
 					</label>
-                    <table style="display:none">
+                    <table class="options-panel" id="traits{$k1}-options" style="display:none">
 					{foreach from=$t.data item=d key=k2}
                     {if $d.type_sysname!=='stringfree'}
                     	<tr>
-                        	<td><label for="trait-{$k1}{$k2}">{$d.name}</label></td>
+                        	<td class="traits-legend-cell"><label for="trait-{$k1}{$k2}">{$d.name}</label></td>
                             <td>
                                 {if $d.type_allow_values==1 && $d.value_count>0}
-                                <select id="trait-{$k1}{$k2}">
-                                {foreach from=$d.values item=v}
+                                <select trait-id="{$d.id}" id="trait-{$k1}{$k2}" style="width:250px;color:#666">
+                                    <option value="">maak een keuze</option>
+                                    <optgroup style="color:#000">
+	                                {foreach from=$d.values item=v}
                                     <option value="{$v.id}">{$v.string_value}</option>
-                                {/foreach}
+    	                            {/foreach}
+                                    </optgroup>
                                 </select>
                                 {else if $d.type_allow_values==0}
+                                
+                                <select
+                                	class="operator" 
+                                    trait-id="{$d.id}" 
+                                    id="operator-{$k1}{$k2}" 
+                                    style="width:150px" 
+                                    onchange="$('#trait-{$k1}{$k2}-2').toggle($('option:selected',this).attr('has-second-value')==1);"
+								>
+                                    <option value="==">{t}is gelijk aan{/t}</option>
+                                    <option value="!=">{t}is ongelijk aan{/t}</option>
+                                    <option value=">">{t}groter dan{/t}</option>
+                                    <option value="<">{t}kleiner dan{/t}</option>
+                                    <option value=">=">{t}groter dan of gelijk aan{/t}</option>
+                                    <option value="<=">{t}kleiner dan of gelijk aan{/t}</option>
+                                    <option value="<>" has-second-value="1">{t}ligt tussen{/t}</option>
+                                    <option value="><" has-second-value="1">{t}ligt niet tussen{/t}</option>
+                                </select>
                                 <input
+                                	type="text"
                                 	id="trait-{$k1}{$k2}" 
                                     trait-id="{$d.id}"
                                     placeholder="{$d.date_format_format_hr}" 
-                                    maxlength="{$d.date_format_format_hr|@strlen}" />
+                                    maxlength="{$d.date_format_format_hr|@strlen}" 
+                                    style="width:45px;"
+                                    />
+                                <input
+                                	id="trait-{$k1}{$k2}-2"
+                                	type="text"
+                                    trait-id="{$d.id}"
+                                    second-value="1"
+                                    placeholder="{$d.date_format_format_hr}" 
+                                    maxlength="{$d.date_format_format_hr|@strlen}" 
+                                    style="width:45px;display:none;"
+                                    />
                                 {/if}
-                                <input type="button" value=" > " onclick="addSearchParameter('trait-{$k1}{$k2}');submitSearchParams();" />
+                                <input
+                                	type="button" 
+                                    value=" > " 
+                                    trait-id="{$d.id}" 
+                                    class="add-trait" 
+                                    onclick="addSearchParameter('trait-{$k1}{$k2}');" />
 							</td>
 						</tr>
 					{/if}
@@ -285,10 +424,11 @@ label.clickable:hover {
 				</div>
 				{/foreach}
 
-				<div class="formrow" style="margin-top:10px;">
+				<div class="formrow" style="margin-top:10px;border-top:1px dotted #999;padding-top:5px">
 					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
                     	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
+                    	<!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
 					</span>
                     <ul id="search-parameters">
                     </ul>
@@ -346,54 +486,79 @@ label.clickable:hover {
 
 
 <script>
-{if $search}
-{foreach from=$search.presence item=v key=k}
-$("#presenceStatusList").val('presence[{$k}]');
-addSearchParameter('presenceStatusList');
-{/foreach}
-
-{foreach from=$search item=v key=k}
-{if $k=='images' || $k=='distribution' || $k=='trend'}
-$("#photoOptions").val('{$k}');
-addSearchParameter('photoOptions');
-$('label[for=photoOptions]').next().toggle(true);
-{else if $k=='dna' || $k=='dna_insuff'}
-$("#dnaOptions").val('{$k}');
-addSearchParameter('dnaOptions');
-$('label[for=dnaOptions]').next().toggle(true);
-{/if}
-{/foreach}
-
-var t=[{foreach name=tloop from=$search.traits.values item=v key=k}{if $smarty.foreach.tloop.index>0},{/if}'{$k}'{/foreach}];
-
-$('select[id^=trait-] > option').each(function()
-{
-	var s=$(this).parent().attr('id');
-	var o=$(this).attr('value');
-
-	if (t.indexOf(o)!=-1)
-	{
-		$("#"+s).val(o);
-		addSearchParameter(s);
-	}
-
-});
-
-{foreach from=$search.traits.freevalues item=v key=k}
-$('input[trait-id={$k}]').val('{$v}').next().trigger('click');
-{/foreach}
-
-{if $search.traits.values|@count>0 || $search.traits.freevalues|@count>0}
-$('label[for=traits]').next().toggle(true);
-{/if}
-
-{/if}
-
 $(document).ready(function()
 {
+	{if $search}
+		{foreach from=$search.presence item=v key=k}
+		$("#presenceStatusList").val('presence[{$k}]');
+		addSearchParameter('presenceStatusList');
+		{/foreach}
+	
+		{foreach from=$search item=v key=k}
+		{if $k=='images' || $k=='distribution' || $k=='trend'}
+		$("#photoOptions").val('{$k}');
+		addSearchParameter('photoOptions');
+		$('label[for=photoOptions]').next().toggle(true);
+		{else if $k=='dna' || $k=='dna_insuff'}
+		$("#dnaOptions").val('{$k}');
+		addSearchParameter('dnaOptions');
+		$('label[for=dnaOptions]').next().toggle(true);
+		{/if}
+		{/foreach}
+	
+	
+		{if $search.traits}
+
+			var h=$.parseJSON(decodeURIComponent('{$search.traits}'));
+	
+			for (var i in h)
+			{
+				var d=h[i];
+				
+				if (d.valueid)
+				{
+					$('select[trait-id='+d.traitid+']').val(d.valueid);
+				}
+				else
+				{
+					$('select.operator[trait-id='+d.traitid+']').val(d.operator).trigger('change');
+					$('input[type=text][trait-id='+d.traitid+']').val(d.value);
+	
+					if (d.value2)
+					{
+						$('input[trait-id='+d.traitid+'][second-value=1]').val(d.value2);
+					}
+					else
+					{
+						$('input[trait-id='+d.traitid+'][second-value=1]').val('');
+					}
+	
+				}
+	
+				$('input.add-trait[trait-id='+d.traitid+']').trigger('click');
+				$('label[for=traits]').next().toggle(true);
+			}
+	
+		{/if}
+	{/if}
+
 	$('title').html('Uitgebreid zoeken naar soorten - '+$('title').html());
+
 	bindKeys();
+
+	$("#group, #author").keyup(function(e)
+	{ 
+		var code = e.which;
+		if(code==13)
+		{
+			submitSearchParams();
+		}
+	});
+	
+	init=false;
+	
 });
 </script>
 
 {include file="../shared/footer.tpl"}
+

@@ -500,7 +500,8 @@ class NsrTaxonController extends NsrController
 						_b.nametype,
 						_a.language_id,
 						_c.language,
-						_d.label as language_label
+						_d.label as language_label,
+						replace(_ids.nsr_id,'tn.nlsr.name/','') as nsr_id
 
 					from %PRE%names _a 
 
@@ -527,6 +528,11 @@ class NsrTaxonController extends NsrController
 					left join  %PRE%literature2 _h
 						on _a.reference_id = _h.id 
 						and _a.project_id=_h.project_id
+
+					left join %PRE%nsr_ids _ids
+						on _a.id =_ids.lng_id 
+						and _a.project_id = _ids.project_id
+						and _ids.item_type = 'name'
 
 					where
 						_a.project_id = ".$this->getCurrentProjectId()."
@@ -1634,14 +1640,12 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
-		// let's run some tests
-		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial)) // || empty($authorship))
+		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial))
 		{
 			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
 			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
 			if (empty($parent)) $this->addError('Geen ouder. Concept niet opgeslagen.');
 			if (empty($uninomial)) $this->addError('Geen genus of uninomial. Concept niet opgeslagen.');
-			//if (empty($authorship)) $this->addError('Geen auteurschap. Concept niet opgeslagen.');
 			$this->setConceptId(null);
 			return;
 		}
@@ -1939,7 +1943,7 @@ class NsrTaxonController extends NsrController
 		return str_pad($r,12,'0',STR_PAD_LEFT);
 	}
 	
-	private function createConceptNsrCode()
+	private function createNsrCode($prefix)
 	{
 		$exists=true;
 		$i=0;
@@ -1953,8 +1957,8 @@ class NsrTaxonController extends NsrController
 				where
 					project_id = ".$this->getCurrentProjectId()."
 					and (
-						nsr_id = '.concept/'".$code."' or
-						nsr_id = 'tn.nlsr.concept/'".$code."'
+						nsr_id = '.".$prefix."/'".$code."' or
+						nsr_id = 'tn.nlsr.".$prefix."/'".$code."'
 					)
 			");
 			
@@ -1986,7 +1990,7 @@ class NsrTaxonController extends NsrController
 		return substr($r,0,8).'-'.substr($r,8,4).'-'.substr($r,12,4).'-'.substr($r,16,4).'-'.substr($r,20);
 	}
 	
-	private function createConceptRdfId()
+	private function createRdfId()
 	{
 		$exists=true;
 		$i=0;
@@ -2017,19 +2021,26 @@ class NsrTaxonController extends NsrController
 		return $code;
 	}
 
-	private function createConceptNsrIds()
+	private function createNsrIds($p)
 	{
+
+		$id=isset($p['id']) ? $p['id'] : null;
+		$type=isset($p['type']) ? $p['type'] : null;
+		
+		if (empty($id) || empty($type))	return;
+		
 		$d=$this->models->NsrIds->_get(array('id'=>
 			array(
 				'project_id'=>$this->getCurrentProjectId(),
-				'lng_id'=>$this->getConceptId(),
-				'item_type'=>'taxon',
+				'lng_id'=>$id,
+				'item_type'=>$type
 			)));
 
 		$rdf=$nsr=null;
 
-		if (empty($d[0]['rdf_id'])) $rdf=$this->createConceptRdfId();
-		if (empty($d[0]['nsr_id'])) $nsr=$this->createConceptNsrCode();
+		if (empty($d[0]['rdf_id'])) $rdf=$this->createRdfId();
+		if (empty($d[0]['nsr_id']) && $type=='taxon') $nsr=$this->createNsrCode('concept');
+		if (empty($d[0]['nsr_id']) && $type=='name') $nsr=$this->createNsrCode('name');
 		
 		if (empty($rdf) && empty($nsr)) return;
 		
@@ -2040,8 +2051,8 @@ class NsrTaxonController extends NsrController
 					'project_id'=>$this->getCurrentProjectId(), 
 					'rdf_id'=>$rdf,
 					'nsr_id'=>$nsr,
-					'lng_id'=>$this->getConceptId(),
-					'item_type'=>'taxon',
+					'lng_id'=>$id,
+					'item_type'=>$type
 				)); 
 				
 			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
@@ -2052,7 +2063,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->models->NsrIds->update(
 				array('rdf_id'=>$rdf),
-				array('lng_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId(),'item_type'=>'taxon')
+				array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>$type)
 			);
 		}
 		else
@@ -2060,13 +2071,24 @@ class NsrTaxonController extends NsrController
 		{
 			$this->models->NsrIds->update(
 				array('nsr_id'=>$nsr),
-				array('lng_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId(),'item_type'=>'taxon')
+				array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>$type)
 			);
 
 			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
 		}
-
 	}
+
+
+	private function createConceptNsrIds()
+	{
+		$this->createNsrIds(array('id'=>$this->getConceptId(),'type'=>'taxon'));
+	}
+
+	private function createNameNsrIds()
+	{
+		$this->createNsrIds(array('id'=>$this->getNameId(),'type'=>'name'));
+	}
+
 
 
 
@@ -2186,6 +2208,8 @@ class NsrTaxonController extends NsrController
 
 	private function updateName($new=false)
 	{
+		$this->createNameNsrIds();
+
 		$name=$this->getName(array('id'=>$this->getNameId()));
 
 		$this->setConceptId($name['taxon_id']);
@@ -2353,8 +2377,10 @@ class NsrTaxonController extends NsrController
 		);
 		$before=$this->models->Names->_get(array('id'=>$p));
 		$d=$this->models->Names->delete($p);
+	
 		if ($d)
 		{
+			$this->models->NsrIds->delete(array('project_id'=>$this->getCurrentProjectId(),'lng_id'=>$this->getNameId(),'item_type'=>'name'));
 			$this->logNsrChange(array('before'=>$before,'note'=>'deleted name '.$before[0]['name']));
 		}
 		return $d;

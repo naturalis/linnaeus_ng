@@ -115,6 +115,12 @@ function setSuggestionId(ele)
 {
 	$('#'+getSuggestionType()+'_id').val($(ele).attr('ident'));
 	$('#'+getSuggestionType()).val($(ele).html());
+
+	// trigger an Enter keyup in the receiving input, so we can hook a submit
+    var e = $.Event('keyup');
+    e.which = 13;
+    $('#'+getSuggestionType()).trigger(e);
+	
 	hideSuggestions();
 }
 

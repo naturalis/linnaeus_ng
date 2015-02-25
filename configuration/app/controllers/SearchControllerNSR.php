@@ -128,15 +128,22 @@ class SearchControllerNSR extends SearchController
 			$template=null;
 		}
 
+
 		$this->traitGroupsToInclude=array(1);
-		$traits=$this->getTraits($this->traitGroupsToInclude);
-		$this->smarty->assign('traits',$traits);
-		$this->smarty->assign('searchTraitsHR',
-			$this->makeReadableTraitString(array(
-				'traits'=>$traits,
-				'search'=>isset($search['traits']) ? $search['traits'] : null
-			)
-		));
+		
+		if (count($this->traitGroupsToInclude)>0)
+		{
+			$search['traits']=json_decode(urldecode($search['traits']),true);
+
+			$traits=$this->getTraits($this->traitGroupsToInclude);
+			$this->smarty->assign('traits',$traits);
+			$this->smarty->assign('searchTraitsHR',
+				$this->makeReadableTraitString(array(
+					'traits'=>$traits,
+					'search'=>isset($search['traits']) ? $search['traits'] : null
+				)
+			));
+		}
 
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
@@ -494,6 +501,10 @@ class SearchControllerNSR extends SearchController
 
 	private function doExtendedSearch($p)
 	{
+		
+//		q($p,1);
+		
+		
 		$d=null;
 		if (!empty($p['group_id']))
 		{
@@ -1509,43 +1520,46 @@ class SearchControllerNSR extends SearchController
 		$search=isset($p['search']) ? $p['search'] : null;
 
 		$str=array();
-		foreach((array)$traits as $a)
+
+		if (isset($search))
 		{
-			foreach((array)$a['data'] as $data)
+			foreach((array)$traits as $trait)
 			{
-				if (isset($search['values']))
+				foreach((array)$trait['data'] as $data)
 				{
-					foreach((array)$data['values'] as $value)
+					foreach((array)$search as $val)
 					{
-						foreach((array)$search['values'] as $key=>$val)
+						if (!empty($val['valueid']))
 						{
-							if ($key==$value['id'])
+							foreach((array)$data['values'] as $value)
 							{
-								$str[$data['name']][]=
-									$value["string_value"].
-									$value["numerical_value"].
-									$value["numerical_value_end"].
-									$value["date"].
-									$value["date_end"];
+								if ($val['valueid']==$value['id'])
+								{
+									$str[$data['name']][]=
+										$value["string_value"].
+										$value["numerical_value"].
+										$value["numerical_value_end"].
+										$value["date"].
+										$value["date_end"];
+								}
 							}
 						}
-					}
-					
-				}
-				
-				if (isset($search['freevalues']))
-				{
-					foreach((array)$search['freevalues'] as $key=>$val)
-					{
-						if ($key==$data['id'])
+						else
 						{
-							$str[$data['name']][]=$val;
+							if ($val['traitid']==$data['id'])
+							{
+								$str[$data['name']][]=
+									(!empty($val["operatorlabel"]) ? $val["operatorlabel"]." " : null).
+									(!empty($val["valuetext"]) ? $val["valuetext"]." " : null).
+									(!empty($val["valuetext"]) && !empty($val["valuetext2"]) ? "& " : null).
+									(!empty($val["valuetext2"]) ? $val["valuetext2"] : null);
+							}								
 						}
-					}
+					}	
 				}
 			}
 		}
-		
+
 		array_walk($str,function(&$a){ $a=is_array($a) ? implode(",",$a) : $a; });
 		array_walk($str,function(&$a,$key){ $a=$key.'='.$a; });
 		
