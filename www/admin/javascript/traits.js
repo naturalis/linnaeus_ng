@@ -318,3 +318,15 @@ function saveValues()
 	form.submit();
 }
 
+
+function saveRawData()
+{	
+	var form=$('<form method="post" action="data_save.php"></form>').appendTo('body');
+
+	$('.joinrows:checked').each(function(){
+		form.append('<input type="hidden" name="'+$(this).attr('name')+'" value="'+$(this).val()+'" />');
+	});
+
+	form.append('<input type="hidden" name="action" value="save" />');
+	form.submit();
+}

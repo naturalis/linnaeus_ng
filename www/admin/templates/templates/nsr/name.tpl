@@ -36,6 +36,14 @@
 		</select> *
         <span></span>
 	</td></tr>
+
+	{*<tr>
+		<th>nsr id:</th>
+		<td>
+			{$name.nsr_id}
+		</td>
+	</tr>*}
+
 	<tr>
     	<th colspan="2">&nbsp;</td>
 	</tr>
@@ -102,7 +110,8 @@ $(document).ready(function()
 	nameownerid={$concept.id};
 	{/if}
 
-	$('#data :input[type!=button]').each(function(key,value) {
+	$('#data :input[type!=button]').each(function(key,value)
+	{
 		values.push( { name:$(this).attr('id'),label:$(this).attr('label'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
 		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
@@ -121,7 +130,7 @@ $(document).ready(function()
 	{foreach from=$preferrednames item=v key=k}
 	storeprefname( { id:{$v.id},language_id:{$v.language_id},name:'{$v.name|@escape}' } );
 	{/foreach}
-	{if $name.id};
+	{if $name.id}
 	currentnameid={$name.id};
 	{/if}
 	preferrednameid={$preferrednameid};

@@ -172,12 +172,30 @@ class TraitsDataController extends TraitsController
 
 		if ($this->rHasVal('action','save'))
 		{
+			$this->setJoinrows($this->rGetVal('joinrows'));
 			$this->saveValues();
 		}
 
         $this->setPageName($this->translate('Data saved'));
 		$this->printPage();
     }
+
+
+
+	private function setJoinrows($data)
+	{
+		unset($_SESSION['admin']['traits']['data']['joinrows']);
+		foreach((array)$data as $val)
+		{
+			$d=explode(",",trim($val,'[]'));
+			$_SESSION['admin']['traits']['data']['joinrows'][$d[0]]=$d[1];
+		}
+	}
+
+	private function getJoinrows()
+	{
+		return isset($_SESSION['admin']['traits']['data']['joinrows']) ? $_SESSION['admin']['traits']['data']['joinrows'] : false;
+	}
 
 	private function setIsRotated($state)
 	{
@@ -188,7 +206,6 @@ class TraitsDataController extends TraitsController
 	{
 		return isset($_SESSION['admin']['traits']['data']['rotated']) ? $_SESSION['admin']['traits']['data']['rotated'] : false;
 	}
-
 
 	private function getSettings($group)
 	{
@@ -530,21 +547,35 @@ class TraitsDataController extends TraitsController
 				foreach($line['cells'] as $c=>$cell)
 				{
 					if ($c==0) continue;
+
 					$t1=$this->getTaxonByName($cell);
 					$taxa[$c]['by_name']=$t1;
+					$taxa[$c]['name']=$cell;
 				}
 			}
+				
 
-			if (!empty($this->_taxonIdResolveQuery) && isset($line['trait']['sysname']) && $line['trait']['sysname']==$this->_sysColNsrId)
+			if (isset($line['trait']['sysname']) && $line['trait']['sysname']==$this->_sysColNsrId)
 			{
 				foreach($line['cells'] as $c=>$cell)
 				{
 					if ($c==0) continue;
-					$t2=$this->models->Taxon->freeQuery(str_replace(array('%pid%','%tid%'),array($this->getCurrentProjectId(),$cell),$this->_taxonIdResolveQuery));
-					if ($t2)
+					
+					$taxa[$c]['code']=$cell;
+
+					if (!empty($this->_taxonIdResolveQuery))
 					{
-						$t2=$this->getTaxonById($t2[0]['id']);
-						$taxa[$c]['by_id']=$t2;
+						$t2=$this->models->Taxon->freeQuery(
+							str_replace(
+								array('%pid%','%tid%'),
+								array($this->getCurrentProjectId(),$cell),$this->_taxonIdResolveQuery)
+							);
+	
+						if ($t2)
+						{
+							$t2=$this->getTaxonById($t2[0]['id']);
+							$taxa[$c]['by_id']=$t2;
+						}	
 					}
 				}
 			}
@@ -554,6 +585,8 @@ class TraitsDataController extends TraitsController
 		{
 			$taxa[$c]=
 				array(
+					'verbatim_name'=>isset($val['name']) ? $val['name'] : null,
+					'verbatim_code'=>isset($val['code']) ? $val['code'] : null,
 					'by_name'=>isset($val['by_name']) ? $val['by_name'] : null,
 					'by_id'=>isset($val['by_id']) ? $val['by_id'] : null,
 					'match'=> isset($val['by_name']) && isset($val['by_id']) && $val['by_name']['id']==$val['by_id']['id'],
@@ -676,13 +709,18 @@ class TraitsDataController extends TraitsController
 	private function saveValues()
 	{
 		$data=$this->getDataSession();
-		
+		$join=$this->getJoinrows();
+
 		$saveVal=array();
 		$saveFree=array();
 		$delFree=array();
+		$joined=array();
+		$failedtaxa=array();
 
 		foreach((array)$data['lines'] as $key=>$line)
 		{
+			if (isset($joined[$key]) && $joined[$key]==true) continue;
+			
 			if (isset($line['trait']['id']) && $line['has_data'])
 			{
 				
@@ -698,7 +736,7 @@ class TraitsDataController extends TraitsController
 						
 						if (empty($taxon_id))
 						{
-							$this->addError(sprintf($this->translate('No taxon ID for column %s'),$c));
+							$failedtaxa[$c]=array('name'=>$data['taxa'][$c]['verbatim_name'],'code'=>$data['taxa'][$c]['verbatim_code']);
 							continue;
 						}
 
@@ -721,21 +759,63 @@ class TraitsDataController extends TraitsController
 							{
 								$trait=$this->getTraitgroupTrait($line['trait']['id']);
 								$func=array($this,$trait['type_verification_function_name']);
+								$value=$line['cells'][$c];
 								
+								// joining cells for ranges
+								if(isset($join[$key]) && $trait['can_have_range'])
+								{
+									if (isset($data['lines'][$join[$key]]['cell_status'][$c]) && $data['lines'][$join[$key]]['cell_status'][$c]['pass']==true)
+									{
+										$value2=$data['lines'][$join[$key]]['cell_status'][$c]['value'];
+										
+										if ($value2<$value)
+										{
+											$this->addError(
+												sprintf(
+													$this->translate('Invalid range: second value smaller than first (column %s, lines %s & %s: %s<%s)'),
+													$c,$key,$join[$key],$value,$value2,$c)
+												);
+										}
+										else
+										if ($value2==$value)
+										{
+											$this->addWarning(
+												sprintf(
+													$this->translate('Second value same as first: not a range (column %s, lines %s & %s: %s==%s)'),
+													$c,$key,$join[$key],$value,$value2)
+												);
+										}
+										else
+										{
+											$value=
+												$value.
+												(isset($this->_dashValues[0]) ? $this->_dashValues[0] : '-').
+												$data['lines'][$join[$key]]['cell_status'][$c]['value'];
+										}
+									}
+									else
+									{
+										$this->addError($this->translate('Nothing to join to (illegal or non-existant second value)'));
+									}
+									$joined[$join[$key]]=true;
+								}
+									
+																	
 								if (is_callable($func))
 								{
 									$r=call_user_func(
 										$func,
 										array(
-											'value'=>$line['cells'][$c],
+											'value'=>$value,
 											'trait'=>$trait,
 											'boolean_data'=>$line['boolean_data'],
 											'cell_0'=>$line['cells'][0]
 										)
-									);
+									);									
 									
 									if (!$r['pass'])
 									{
+										$this->addError(sprintf($this->translate('Value didn\'t pass check function (%s at line %s, column %s)'),$value,$key,$c));
 										continue;
 									}
 									
@@ -795,10 +875,16 @@ class TraitsDataController extends TraitsController
 				}
 			}
 		}
+	
+		foreach((array)$failedtaxa as $val)
+		{
+			$this->addError(sprintf($this->translate('Unresolvable taxon: %s (%s)'),$val['name'],$val['code']));
+		}
+							
 
 		$saved=$failed=0;
 		$deletedtraits=array();
-		
+
 		foreach($saveVal as $val)
 		{
 			if (isset($val['trait_id']) && !isset($deletedtraits[$val['trait_id']]))

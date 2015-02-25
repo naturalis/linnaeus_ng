@@ -1,14 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-<script>
 
-function saveRawData()
-{	
-	var form=$('<form method="post" action="data_save.php"></form>').appendTo('body');
-	form.append('<input type="hidden" name="action" value="save" />');
-	form.submit();
-}
-
-</script>
 <style>
 table {
 	border-collapse:collapse;
@@ -58,6 +49,10 @@ td.identified-trait {
 	min-width:150px;
 }
 
+.with-error {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=);
+}
+
 </style>
 
 <div id="page-main">
@@ -67,7 +62,6 @@ td.identified-trait {
    <p>
         <table>
         {foreach from=$data.lines item=line key=l}
-
 	        {if $line.has_data || $line.trait.sysname}
             <tr class="{if !$line.has_data}no-data{/if}{if !$line.trait}no-trait{/if}{if $line.trait.sysname==''}irrelevant{/if}">
 
@@ -79,19 +73,24 @@ td.identified-trait {
                 {/if}
                 
 				{if $line.trait.id==$prevtrait && $line.trait.can_have_range}
-				<br /><label style="font-size:0.9em"><input name="joinrows[]" value="[{$prevrow},{$l}]" type="checkbox" />join with previous row</label>
+				<br /><label style="font-size:0.9em"><input class="joinrows" name="joinrows[]" value="[{$prevrow},{$l}]" type="checkbox" />range with prev. row</label>
                 {/if}
                 </td>
 
                 {foreach from=$line.cells item=v key=k}
                 {if $k==0}{assign var=currValue value=$v}{/if}
                 {if $line.trait.sysname==$sysColSpecies || $line.trait.sysname==$sysColNsrId}
-                    <td class="{if $k>0}{if !$data.taxa[$k].have_taxon}no-taxon{else if !$data.taxa[$k].match}cell-warning{else}taxon{/if}{/if}" \
+                    <td 
+                    	row-id="{$l}"
+                        col-id="{$k}"
+                    	class="{if $k>0}{if !$data.taxa[$k].have_taxon}no-taxon{else if !$data.taxa[$k].match}cell-warning{else}taxon{/if}{/if}"
                     	title="{if $k>0}{if !$data.taxa[$k].have_taxon}unknown taxon{else if !$data.taxa[$k].match}taxon name and ID do not match; using {$data.taxa[$k].will_use} (from {$data.taxa[$k].will_use_source}){/if}{/if}">
                         {$v}
                     </td>                
                 {else}
                     <td
+                    	row-id="{$l}"
+                        col-id="{$k}"
 						{if $k>0}
 						data-pass="{$line.cell_status[$k].pass}"
                         data-trait="{$line.trait.id}"
