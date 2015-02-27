@@ -112,5 +112,5 @@ configuration/admin/controllers/Literature2Controller.php
 configuration/admin/controllers/SearchController-ORG.php
 www/app/style/linnaeus_ng/.sass-cache
 configuration/locale
-configuration/app/rewrite/rewrite-0001.php
+configuration/app/rewrite/
 www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress).tpl
