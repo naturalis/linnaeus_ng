@@ -233,7 +233,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$this->setPageName($taxon['label']);
 
-			$this->smarty->assign('content',$content['content']);
+			$this->smarty->assign('content',isset($content['content']) ? $content['content'] : null);
             $this->smarty->assign('sideBarLogos',$sideBarLogos);
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',$categories['categories']);

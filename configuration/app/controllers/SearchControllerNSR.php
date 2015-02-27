@@ -10,6 +10,16 @@ class SearchControllerNSR extends SearchController
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
 
+	private $_operators=array(
+		'=='=>array('label'=>'is gelijk aan','range'=>false),
+		'!='=>array('label'=>'is ongelijk aan','range'=>false),
+		'>'=>array('label'=>'groter dan','range'=>false),
+		'<'=>array('label'=>'kleiner dan','range'=>false),
+		'>='=>array('label'=>'groter dan of gelijk aan','range'=>false),
+		'=<'=>array('label'=>'kleiner dan of gelijk aan','range'=>false),
+		'BETWEEN'=>array('label'=>'ligt tussen','range'=>true),
+		'NOT BETWEEN'=>array('label'=>'ligt niet tussen','range'=>true),
+	);
 
 	public $csvExportSettings=array(
 		'field-sep'=>',',
@@ -133,13 +143,17 @@ class SearchControllerNSR extends SearchController
 		
 		if (count($this->traitGroupsToInclude)>0)
 		{
-			$search['traits']=json_decode(urldecode($search['traits']),true);
+			$search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
+			$search['trait_group']=$this->rHasVal('trait_group') ? $search['trait_group'] : null;
 
 			$traits=$this->getTraits($this->traitGroupsToInclude);
+
+			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
 				$this->makeReadableTraitString(array(
 					'traits'=>$traits,
+					'trait_group'=>$search['trait_group'],
 					'search'=>isset($search['traits']) ? $search['traits'] : null
 				)
 			));
@@ -289,7 +303,6 @@ class SearchControllerNSR extends SearchController
 			);
 		
 	}
-
 
 	private function doSearch($p)
 	{
@@ -501,11 +514,8 @@ class SearchControllerNSR extends SearchController
 
 	private function doExtendedSearch($p)
 	{
-		
-//		q($p,1);
-		
-		
 		$d=null;
+
 		if (!empty($p['group_id']))
 		{
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
@@ -526,6 +536,8 @@ class SearchControllerNSR extends SearchController
 		$trend=!empty($p['trend']);
 		$dna=(!empty($p['dna']) || !empty($p['dna_insuff']));
 		$dna_insuff=!empty($p['dna_insuff']);
+		$traits=isset($p['traits']) ? $p['traits'] : null;
+		$trait_group=isset($p['trait_group']) ? $p['trait_group'] : null;
 
 		if (!empty($p['author'])) $auth=$p['author'];
 
@@ -541,42 +553,8 @@ class SearchControllerNSR extends SearchController
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
 
-
-		// TRAITS
-		$traits=!empty($p['traits']) ? $p['traits'] :null;
-		$haveTraits=false;
-		if (!empty($traits))
-		{
-			if (isset($traits['values']))
-			{
-				$valueIds=array();
-				foreach((array)$traits['values'] as $key=>$val)
-				{
-					if ($val=='on')
-					{
-						$valueIds[]=$key;
-					}
-				}
-				$haveTraits=true;
-			}
-
-			if (isset($traits['freevalues']))
-			{
-				$traitIds=array();
-				foreach((array)$traits['freevalues'] as $key=>$val)
-				{
-					$traitIds[]=$key;
-				}				
-
-				$traitFreevalues=$traits['freevalues']; // traitid => user entered value
-				$haveTraits=true;
-			}
-
-			$haveValueIds=(isset($valueIds) && count($valueIds)>0);
-			$haveTraitIds=(isset($traitIds) && count($traitIds)>0);
-		}
-		// /TRAITS
-
+		$trait_joins=$this->getTraitJoins($traits);
+		$traitgroup_joins=$this->getTraitGroupJoin($trait_group);
 
 		$data=$this->models->Taxon->freeQuery("
 			select
@@ -593,37 +571,11 @@ class SearchControllerNSR extends SearchController
 				_h.index_label as presence_information_index_label,
 				_l.file_name as overview_image,
 				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
-				".($haveTraits && isset($valueIds) && count($valueIds)>0 ? ", count(_trait_values.taxon_id) as _trait_value_count " : "" )."
-				".($haveTraits && isset($traitIds) && count($traitIds)>0 ? ", _trait_freevalues.trait_count as _freevalue_trait_count " : "" )."
 
 			from %PRE%taxa _a
-
-			".($haveTraits ?
 			
-				($haveValueIds ? "
-					right join %PRE%traits_taxon_values _trait_values
-						on _a.project_id = _trait_values.project_id
-						and _a.id =  _trait_values.taxon_id
-						and _trait_values.value_id in (".implode(",",$valueIds).")
-				" : "").
-				
-				($haveTraitIds ? "
-					left join 
-						(
-							select
-								count(*) as trait_count, project_id, taxon_id
-							from
-								%PRE%traits_taxon_freevalues
-							where
-								trait_id in (".implode(",",$traitIds).")
-							group by
-								project_id, taxon_id
-						) as _trait_freevalues 
-					on _a.project_id = _trait_freevalues.project_id
-					and _a.id = _trait_freevalues.taxon_id
-				" : "" )."
-			
-			" : "" )."
+			".$trait_joins."
+			".$traitgroup_joins."
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -754,91 +706,19 @@ class SearchControllerNSR extends SearchController
 				".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
 				".($trend ? "and number_of_trend_years > 0" : "")."
 				".($distribution ? "and number_of_maps > 0" : "")."
-				".($haveTraits ? " group by _a.id" : "" )."
-				".($haveTraits && ($haveValueIds || $haveTraitIds) ? " having (".
-					($haveValueIds ? "_trait_value_count > 0 " : "").
-					($haveValueIds && $haveTraitIds ? "  and  " : "").
-					($haveTraitIds ? "_freevalue_trait_count > 0" : "" ) .")"
-				: "" )."
+				".(!empty($trait_joins) || !empty($traitgroup_joins) ? "group by _a.id" : "" )."
+				".(!empty($traitgroup_joins) ? "having count(_ttv.id)+count(_ttf.id) > 0" : "" )."
 			order by ".
 				(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 	
-		//q($data,1);
-		//q($this->models->Taxon->q(),1);
+//		q($this->models->Taxon->q(),1);
+//		q($data,1);
 
 		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 		$count=$count[0]['total'];
-
-		if ($haveTraits)
-		{
-			$dataWithMatchingTraits=array();
-			$filtered=0;
-
-			foreach((array)$data as $key=>$val)
-			{
-				$taxonValues=$this->getTaxonTraitValues($val['taxon_id']);
-				$p=true;
-
-				if ($haveValueIds && !empty($taxonValues['values']))
-				{
-					$t=array();
-					foreach($taxonValues['values'] as $a) $t[]=$a['value_id'];
-					foreach($valueIds as $v1) { if (!in_array($v1,$t)) $p=false; }
-				}
-
-				if ($haveTraitIds && !empty($taxonValues['freevalues']))
-				{
-					// iterate though all the stored free values of a taxon
-					foreach($taxonValues['freevalues'] as $taxonFreeValue)//va1
-					{
-						// each time, iterate through all free value's the use has entered
-						foreach($traitFreevalues as $traitId=>$traitFreeValue)//k2 v2
-						{
-							// if the trait ID of one of the taxon's stored values equals one the user entered
-							if($taxonFreeValue['trait_id']==$traitId)
-							{
-								if ((!empty($taxonFreeValue['date_value']) || 
-									!empty($taxonFreeValue['date_end']))  && 
-									!empty($taxonFreeValue['date_format_format']))
-								{
-
-									$y_start=$this->formatDbDate($taxonFreeValue['date_value'],$taxonFreeValue['date_format_format']);
-									$y_end=$this->formatDbDate($taxonFreeValue['date_value_end'],$taxonFreeValue['date_format_format']);
-									$y_user=$this->formatDbDate($traitFreeValue,$taxonFreeValue['date_format_format']);
-
-									if (empty($y_end) && $y_start!=$y_user) $p=false;
-									if (!empty($y_end) && ($y_start>$y_user || $y_user>$y_end)) $p=false;
-								}								
-							}
-						}
-					}
-				}
-				
-				if ($p)
-				{
-					$dataWithMatchingTraits[$key]=$val;
-				}
-				else
-				{
-					$filtered++;
-				}
-			}
-
-			$data=$dataWithMatchingTraits;
-
-			if (count($data)>=$this->_resSpeciesPerPage)
-			{
-				$count=$count-$filtered; // WHICH IS VERY LIKELY WAY TOO HIGH
-			}
-			else
-			{
-				$count=count($data);
-			}
-		}
-		
 		
 		foreach((array)$data as $key=>$val)
 		{
@@ -1518,6 +1398,7 @@ class SearchControllerNSR extends SearchController
 	{
 		$traits=isset($p['traits']) ? $p['traits'] : null;
 		$search=isset($p['search']) ? $p['search'] : null;
+		$trait_group=isset($p['trait_group']) ? $p['trait_group'] : null;
 
 		$str=array();
 
@@ -1546,7 +1427,7 @@ class SearchControllerNSR extends SearchController
 						}
 						else
 						{
-							if ($val['traitid']==$data['id'])
+							if (isset($val['traitid']) && $val['traitid']==$data['id'])
 							{
 								$str[$data['name']][]=
 									(!empty($val["operatorlabel"]) ? $val["operatorlabel"]." " : null).
@@ -1563,10 +1444,16 @@ class SearchControllerNSR extends SearchController
 		array_walk($str,function(&$a){ $a=is_array($a) ? implode(",",$a) : $a; });
 		array_walk($str,function(&$a,$key){ $a=$key.'='.$a; });
 		
-		return implode("; ",$str);
+		$str=implode("; ",$str);
+		
+		if (!empty($trait_group))
+		{
+			$str=$traits[$trait_group]['name'].'=*;';
+		}
+
+		
+		return $str;
 	}
-
-
 
 	private function downloadHeaders($p)
 	{
@@ -1614,7 +1501,8 @@ class SearchControllerNSR extends SearchController
 				_g.allow_unit as type_allow_unit,
 				count(_v.id) as value_count,
 				_grp_b.translation as group_name,
-				_grp_c.translation as group_description
+				_grp_c.translation as group_description,
+				_grp.id as group_id
 
 			from
 				%PRE%traits_traits _a
@@ -1686,15 +1574,55 @@ class SearchControllerNSR extends SearchController
 			$trait['values']=$this->getTraitgroupTraitValues($trait['id']);
 			$data[$trait['trait_group_id']]['name']=$trait['group_name'];
 			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
+			$data[$trait['trait_group_id']]['group_id']=$trait['group_id'];
 			$data[$trait['trait_group_id']]['data'][]=$trait;
 		}
 
 		return $data;
 	}
 
-	private function getTraitgroupTraitValues($trait)
+	private function getTraitgroupTrait($id)
 	{
-		if (empty($trait)) return;
+		if (empty($id)) return;
+		
+		$r=$this->models->TraitsTraits->freeQuery("
+			select
+				_a.*,
+				_e.sysname as date_format_name,
+				_e.format as date_format_format,
+				_e.format_hr as date_format_format_hr,
+				_e.format_db as date_format_format_db,
+				_g.sysname as type_sysname,
+				_g.verification_function_name as type_verification_function_name
+			from
+				%PRE%traits_traits _a
+
+			left join 
+				%PRE%traits_date_formats _e
+				on _a.date_format_id=_e.id
+
+			left join 
+				%PRE%traits_project_types _f
+				on _a.project_id=_f.project_id
+				and _a.project_type_id=_f.id
+
+			left join 
+				%PRE%traits_types _g
+				on _f.type_id=_g.id
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.id=".$id."
+		");
+
+		$r = isset($r[0]) ? $r[0] : null;
+
+		return $r;
+	}
+
+	private function getTraitgroupTraitValues($id)
+	{
+		if (empty($id)) return;
 
 		$r=$this->models->TraitsValues->freeQuery("
 			select
@@ -1741,7 +1669,7 @@ class SearchControllerNSR extends SearchController
 
 			where
 				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.trait_id = ".$trait." 
+				and _a.trait_id = ".$id." 
 			order by 
 				_a.show_order
 		
@@ -1838,53 +1766,227 @@ class SearchControllerNSR extends SearchController
 		return is_null($date) ? null : date_format(date_create($date),$format);
 	}
 
-	
-	private function check_datefree($p)
+	private function getTraitJoins($traits)
 	{
-		$value=isset($p['value']) ? $p['value'] : null;
-		$trait=isset($p['trait']) ? $p['trait'] : null;
+		if (empty($traits))	return;
+		
+		$trait_joins='';
 
-		$value=str_replace(' ','',$value);
+		$trait_vals=array();
+		$traits_free=array();
 
-		$f=date_parse_from_format($trait['date_format_format'],$value);
-
-		if ($f['error_count']==0)
+		function cleanupfloat($s)
 		{
-			return array('pass'=>true,'value'=>$value);
+			return (float)$s;
+			// return str_replace(",",".",str_replace(".","",strrev(str_replace(".",",",strrev(str_replace(",",".",$s)),1))));
 		}
 
-		if ($trait['can_have_range']==1)
+		function cleanupint($s)
 		{
-			$dash=null;
-			foreach((array)$this->_dashValues as $val)
+			return (int)preg_replace('/\D*/','',$s);
+		}
+
+		foreach((array)$traits as $trait)
+		{
+			if (isset($trait['valueid']) && $trait['value']=='on')
 			{
-				if (strpos($value,$val)!==false)
+				$trait_vals[$trait['traitid']][]=$trait['valueid'];
+			}
+			else
+			{
+				if (isset($trait['value']) && isset($trait['operator']) && isset($this->_operators[$trait['operator']]))
 				{
-					$dash=$val;
-					break;
+					$d=array('value1'=>$trait['value'],'operator'=>$trait['operator']);
+					
+					if (isset($trait['value2']) && $this->_operators[$trait['operator']]['range'])
+					{
+						$d['value2']=$trait['value2'];
+					}
+					$traits_free[$trait['traitid']][]=$d;
 				}
 			}
 
-			if (!is_null($dash))
+		}
+		
+		foreach((array)$trait_vals as $trait=>$val)
+		{		
+			$trait_joins .=
+			"
+				right join %PRE%traits_taxon_values _trait_values".$trait."
+					on _a.project_id = _trait_values".$trait.".project_id
+					and _a.id = _trait_values".$trait.".taxon_id
+					and _trait_values".$trait.".value_id in (".implode(",",$val).")
+			";
+		}
+
+		foreach((array)$traits_free as $id=>$vals)
+		{		
+			$trait=$this->getTraitgroupTrait($id);
+
+			$trait_joins .=
+			"
+				right join %PRE%traits_taxon_freevalues _trait_values".$id."
+					on _a.project_id = _trait_values".$id.".project_id
+					and _trait_values".$id.".trait_id = ".$id."
+					and _a.id = _trait_values".$id.".taxon_id
+					and ifnull(_trait_values".$id.".date_value_end,_trait_values".$id.".date_value) is not null
+					and (
+			";
+
+			foreach((array)$vals as $key=>$val)
 			{
-				$values=explode($dash,$value);
-				if (count($values)!=2)
+				$value1=$value2=null;
+				
+				switch ($trait['type_sysname'])
 				{
-					return array('pass'=>false,'error'=>$this->translate('illegal range'));
+					case 'datefree':
+					case 'datelist':
+					case 'datelistfree':
+					case 'datefree':
+						$value1="STR_TO_DATE('".$val['value1']."', '".$trait['date_format_format_db']."')";
+						$value2=isset($val['value2']) ? "STR_TO_DATE('".$val['value2']."', '".$trait['date_format_format_db']."')" : null;
+						$column1="date_value";
+						$column2="date_value_end";
+						break;
+					case 'floatfree':
+					case 'floatfreelimit':
+					case 'floatlist':
+					case 'floatlistfree':
+						$value1=cleanupfloat($val['value1']);
+						$value2=isset($val['value2']) ? cleanupfloat($val['value2']) : null;
+						$column1="numerical_value";
+						$column2="numerical_value_end";
+						break;
+					case 'intfree':
+					case 'intfreelimit':
+					case 'intlist':
+					case 'intlistfree':
+						$value1=cleanupint($val['value1']);
+						$value2=isset($val['value2']) ? cleanupint($val['value2']) : null;
+						$column1="numerical_value";
+						$column2="numerical_value_end";
+						break;
+				};
+				
+				if (is_null($value1) && is_null($value2)) continue;
+
+				$operator=$val['operator'];
+				
+				if ($operator=='==')
+				{
+					$x= "
+					(
+						(
+							_trait_values".$id.".".$column2." is null AND
+							_trait_values".$id.".".$column1." = ".$value1."
+						)
+						OR
+						(
+							_trait_values".$id.".".$column2." is not null AND
+							(
+								_trait_values".$id.".".$column1." <= ".$value1." AND
+								_trait_values".$id.".".$column2." >= ".$value2."
+							)
+						)
+					)
+				";
+				} else
+				if ($operator=='!=')
+				{
+					$x= "
+					(
+						(
+							_trait_values".$id.".".$column2." is null AND
+							_trait_values".$id.".".$column1." !=".$value1."
+						)
+						OR
+						(
+							_trait_values".$id.".".$column2." is not null AND
+							(
+								_trait_values".$id.".".$column1." > ".$value1." OR
+								_trait_values".$id.".".$column2." < ".$value2."
+							)
+						)
+					)
+				";
 				}
 				else
+				if ($operator=='>' || $operator=='>=')
 				{
-					return array('pass'=>true,'value'=>$values);
+					$x= "
+					(
+						ifnull(_trait_values".$id.".".$column2.",_trait_values".$id.".".$column1.") ".$operator." ".$value1."
+					)
+					";
 				}
+				else
+				if ($operator=='<' || $operator=='=<')
+				{
+					$x= "
+					(
+						_trait_values".$id.".".$column1." ".$operator." ".$value1."
+					)
+					";
+				}
+				else
+				if ($operator=='<' || $operator=='=<')
+				{
+					$x= "
+					(
+						_trait_values".$id.".".$column1." ".$operator." ".$value1."
+					)
+					";
+				}
+				else
+				if ($operator=='BETWEEN' || $operator=='NOT BETWEEN')
+				{
+					$x= "
+					(
+						_trait_values".$id.".".$column1." ".$operator." ".$value1." AND ".$value2."
+					)
+					";
+				}
+				
+				$trait_joins .= ($key>0 ? " || " : "" ).$x;
 			}
+			
+			$trait_joins .= "
+					)
+					";
 		}
-
-		return array('pass'=>false,'error'=>$this->translate('illegal value'));
-
+							
+		return $trait_joins;
 	}
 
+	private function getTraitGroupJoin($group)
+	{
+		if (empty($group))	return;
+		
+		return
+			"
+				left join %PRE%traits_taxon_values _ttv
+					on _a.project_id = _ttv.project_id
+					and _a.id = _ttv.taxon_id
+
+				left join %PRE%traits_values _tv
+					on _ttv.project_id = _tv.project_id
+					and _ttv.value_id = _tv.id
+
+				left join %PRE%traits_traits _tt
+					on _tv.project_id = _tt.project_id
+					and _tv.trait_id = _tt.id
+					and _tt.trait_group_id=".$group."
 
 
+				left join %PRE%traits_taxon_freevalues _ttf
+					on _a.project_id = _ttf.project_id
+					and _a.id = _ttf.taxon_id
 
+				left join %PRE%traits_traits _tt2
+					on _ttf.project_id = _tt2.project_id
+					and _ttf.trait_id = _tt2.id
+					and _tt2.trait_group_id=".$group."
+			";
+	}
 
 }
