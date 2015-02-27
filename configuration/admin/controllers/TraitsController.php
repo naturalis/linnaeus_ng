@@ -650,7 +650,7 @@ class TraitsController extends Controller
 		return true;
 	}
 	
-	private function getTraitgroup($id)
+	public function getTraitgroup($id)
 	{
 		if (empty($id)) return;
 
@@ -686,6 +686,7 @@ class TraitsController extends Controller
 		$r['descriptions']= $this->getTextTranslations(array('text_id'=>$r['description_tid']));
 		$r['groups']=$this->getTraitgroups(array('parent'=>$r['id'],'level'=>0,'stop_level'=>0));
 		$r['traits']=$this->getTraitgroupTraits($r['id']);
+		$r['parent']=$this->getTraitgroup($r['parent_id']);
 
 		return $r;
 	}

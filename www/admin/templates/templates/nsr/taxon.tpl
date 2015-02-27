@@ -200,6 +200,12 @@
 	<a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">paspoort</a><br />
 
 	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">afbeeldingen</a><br />
+	
+    {foreach from=$traitgroups item=v}
+	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0">{$v.sysname}</a><br />
+    {/foreach}
+
+
 		
 	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
 {if !$concept.is_deleted}

@@ -30,7 +30,8 @@ class NsrTaxonController extends NsrController
 		'taxon_quick_parentage',
 		'media_taxon',
 		'media_meta',
-		'trash_can'
+		'trash_can',
+		'traits_groups'
     );
     public $usedHelpers = array(
     );
@@ -224,6 +225,7 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('statuses',$this->getStatuses());
 			$this->smarty->assign('habitats',$this->getHabitats());
 			$this->smarty->assign('actors',$this->getActors());
+			$this->smarty->assign('traitgroups',$this->getTraitgroups());
 
 			$this->smarty->assign('rank_id_species',$this->_projectRankIds[SPECIES_RANK_ID]['id']);
 			$this->smarty->assign('rank_id_subspecies',$this->_projectRankIds[SUBSPECIES_RANK_ID]['id']);
@@ -3296,6 +3298,54 @@ class NsrTaxonController extends NsrController
 		$this->resetTree();
 
 	}
+
+
+	private function getTraitgroups($p=null)
+	{
+		$parent=isset($p['parent']) ? $p['parent'] : null;
+		$level=isset($p['level']) ? $p['level'] : 0;
+		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
+		
+		$g=$this->models->TraitsGroups->freeQuery("
+			select
+				_a.*,
+				_b.translation as name,
+				_c.translation as description
+			from
+				%PRE%traits_groups _a
+				
+			left join 
+				%PRE%text_translations _b
+				on _a.project_id=_b.project_id
+				and _a.name_tid=_b.id
+				and _b.language_id=". $this->getDefaultProjectLanguage() ."
+
+			left join 
+				%PRE%text_translations _c
+				on _a.project_id=_c.project_id
+				and _a.description_tid=_c.id
+				and _c.language_id=". $this->getDefaultProjectLanguage() ."
+
+			where
+				_a.project_id=". $this->getCurrentProjectId()."
+				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
+				order by _a.show_order, _a.sysname
+		");
+		
+		foreach((array)$g as $key=>$val)
+		{
+			$g[$key]['level']=$level;	
+			//$g[$key]['taxa']=$this->getTaxongroupTaxa($val['id']);
+			if (!is_null($stopLevel) && $stopLevel<=$level)
+			{
+				continue;
+			}
+			$g[$key]['children']=$this->getTraitgroups(array('parent'=>$val['id'],'level'=>$level+1,'stop_level'=>$stopLevel));
+		}
+		
+		return $g;
+	}
+
 
 }
 
