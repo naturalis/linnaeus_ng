@@ -193,7 +193,6 @@ function submitSearchParams()
 	if (init) return;
 
 	var form=$('<form method="get"></form>').appendTo('body');
-
 	form.append('<input type="hidden" name="group_id" value="'+$('#group_id').val()+'" />');
 	form.append('<input type="hidden" name="author_id" value="'+$('#author_id').val()+'" />');
 	form.append('<input type="hidden" name="group" value="'+$('#group').val()+'" />');
@@ -366,8 +365,13 @@ function submitSearchParams()
 						<strong>{$t.name}</strong>
 					</label>&nbsp;
 					<a href="http://www.nederlandsesoorten.nl/content/exotenpaspoort" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
-                    
+					
                     <table class="options-panel" id="traits{$k1}-options" style="display:none">
+                    {if $t.description}
+                    	<tr>
+                        	<td colspan="2"><p>{$t.description}</p></td>
+                        </tr>
+                    {/if}
 					{foreach from=$t.data item=d key=k2}
                     {if $d.type_sysname!=='stringfree'}
                     	<tr>

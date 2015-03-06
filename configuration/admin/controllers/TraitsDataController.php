@@ -1105,7 +1105,7 @@ class TraitsDataController extends TraitsController
 
 		foreach($saveVal as $val)
 		{
-			if (isset($val['trait_id']) && !isset($deletedtraits[$val['trait_id']]))
+			if (isset($val['trait_id']) && !isset($deletedtraits[$val['taxon_id']][$val['trait_id']]))
 			{
 				$this->models->TraitsTaxonValues->freeQuery("
 					delete from 
@@ -1121,7 +1121,7 @@ class TraitsDataController extends TraitsController
 								and trait_id=".$val['trait_id']."
 							)
 				");
-				$deletedtraits[$val['trait_id']]=true;
+				$deletedtraits[$val['taxon_id']][$val['trait_id']]=true;
 			}
 
 			unset($val['trait_id']);
@@ -1139,14 +1139,14 @@ class TraitsDataController extends TraitsController
 		$deletedtraits=array();
 		foreach($saveFree as $val)
 		{
-			if (isset($val['trait_id']) && !isset($deletedtraits[$val['trait_id']]))
+			if (isset($val['trait_id']) && !isset($deletedtraits[$val['taxon_id']][$val['trait_id']]))
 			{
 				$this->models->TraitsTaxonFreevalues->delete(array(
 					'project_id'=>$val['project_id'],
 					'taxon_id'=>$val['taxon_id'],
 					'trait_id'=>$val['trait_id']
 				));
-				$deletedtraits[$val['trait_id']]=true;
+				$deletedtraits[$val['taxon_id']][$val['trait_id']]=true;
 			}
 
 			if ($this->models->TraitsTaxonFreevalues->save($val))

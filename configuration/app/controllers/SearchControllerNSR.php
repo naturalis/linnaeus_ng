@@ -13,10 +13,10 @@ class SearchControllerNSR extends SearchController
 	private $_operators=array(
 		'=='=>array('label'=>'is gelijk aan','range'=>false),
 		'!='=>array('label'=>'is ongelijk aan','range'=>false),
-		'>'=>array('label'=>'groter dan','range'=>false),
-		'<'=>array('label'=>'kleiner dan','range'=>false),
-		'>='=>array('label'=>'groter dan of gelijk aan','range'=>false),
-		'=<'=>array('label'=>'kleiner dan of gelijk aan','range'=>false),
+		'>'=>array('label'=>'na','range'=>false),
+		'<'=>array('label'=>'voor','range'=>false),
+		'>='=>array('label'=>'na of gelijk aan','range'=>false),
+		'=<'=>array('label'=>'voor of gelijk aan','range'=>false),
 		'BETWEEN'=>array('label'=>'ligt tussen','range'=>true),
 		'NOT BETWEEN'=>array('label'=>'ligt niet tussen','range'=>true),
 	);

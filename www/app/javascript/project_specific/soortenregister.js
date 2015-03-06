@@ -120,7 +120,6 @@ function setSuggestionId(ele)
     var e = $.Event('keyup');
     e.which = 13;
     $('#'+getSuggestionType()).trigger(e);
-	
 	hideSuggestions();
 }
 
@@ -151,22 +150,21 @@ function bindKeys()
 		var match=$(this).attr('match');
 
 		$('#'+ele).keyup(function(e) {
-			if (e.keyCode==27) { // esc
+			if (e.keyCode==27) // esc
+			{
 				hideSuggestions();
 				return;
 			}
-			$('#'+ele+'_id').val('');
+			if (e.keyCode!=undefined && e.keyCode!=13) // !enter
+			{
+				// empty ID value of user 
+				$('#'+ele+'_id').val('');
+			}
+			
 			doSuggestions({type:ele,match:match});
 		});
 	
 	});
-	
-/*
-38 up
-40 down
-13 enter
-*/			
-
 }
 
 function sortResults(ele)
