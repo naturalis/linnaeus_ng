@@ -1,6 +1,9 @@
 {include file="../shared/header.tpl"}
 
 <style>
+.options-panel {
+	margin-top:5px;
+}
 .formrow select {
 	font-size:1em;
 	margin-left:0px;
@@ -9,6 +12,8 @@
 }
 label.clickable {
 	cursor:pointer;
+	display:inline-block;
+	height:15px;
 }
 label.clickable:hover {
 	text-decoration:underline;
@@ -16,18 +21,35 @@ label.clickable:hover {
 .zoekknop {
 	cursor:pointer;
 }
-.tumble-arrow-head:before {
-    content:"▶";
-} 
-.tumble-arrow-head:hover:before {
-    content:"◢ ";
-} 
-.down-arrow-head:before {
-    content:"🔻";
-} 
 .traits-legend-cell {
 	width:150px;
 }	
+.arrow-container {
+	width:15px;
+}
+.arrow-e, .arrow-se, .arrow-s {
+	width: 0;
+	height: 0;
+	margin-right:2px;
+}
+.arrow-e {
+	margin-top:2px;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 10px solid black;
+}
+.arrow-se {
+	margin-top:2px;
+	border-top:10px dashed transparent;
+	border-right:10px solid black;
+}
+.arrow-s {
+	margin-top:3px;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 10px solid black;
+}
+
 </style>
                 
 <script>
@@ -194,9 +216,9 @@ function submitSearchParams()
 
 	var form=$('<form method="get"></form>').appendTo('body');
 	form.append('<input type="hidden" name="group_id" value="'+$('#group_id').val()+'" />');
-	form.append('<input type="hidden" name="author_id" value="'+$('#author_id').val()+'" />');
 	form.append('<input type="hidden" name="group" value="'+$('#group').val()+'" />');
-	form.append('<input type="hidden" name="author" value="'+$('#author').val()+'" />');
+	//form.append('<input type="hidden" name="author_id" value="'+$('#author_id').val()+'" />');
+	//form.append('<input type="hidden" name="author" value="'+$('#author').val()+'" />');
 	form.append('<input type="hidden" name="sort" value="'+$('#sort').val()+'" />');
 
 	var traits={};
@@ -235,6 +257,47 @@ function submitSearchParams()
 
 	form.submit();	
 }
+
+function toggle_panel(ele)
+{
+	$('#'+$(ele).attr('panel')).toggle();
+}
+
+function hover_panel_toggle(ele,out)
+{
+	var p=$('#'+$(ele).attr('panel'));
+	var c=$(ele).children().children('div.arrow'); 
+	if (out)
+	{
+		c.removeClass('arrow-se').addClass(p.is(':visible') ? 'arrow-s' :  'arrow-e')
+	}
+	else
+	{
+		c.removeClass('arrow-s').removeClass('arrow-e').addClass('arrow-se')
+	}
+}
+
+function toggle_all_panels()
+{
+	var allopen=true;
+	$('label').each(function()
+	{
+		if ($(this).attr('panel') && !$('#'+$(this).attr('panel')).is(':visible'))
+		{
+			allopen=false;
+		}
+	});
+	$('label').each(function()
+	{
+		if ($(this).attr('panel') && (allopen || (!allopen && !$('#'+$(this).attr('panel')).is(':visible'))))
+		{
+			toggle_panel(this);
+			hover_panel_toggle(this);
+            hover_panel_toggle(this,true);
+		}
+	});
+}
+
 </script>
 
 <div id="dialogRidge">
@@ -245,13 +308,14 @@ function submitSearchParams()
 
 	</div>
 
+    <form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+
 	<div id="content" class="simple-search">
 
 		<div>
 
-            <form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
             <input type="hidden" id="group_id" name="group_id" value="{$search.group_id}" />
-            <input type="hidden" id="author_id" name="author_id" value="{$search.author_id}" />
+            {*<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}" />*}
 
 			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:4px;border-bottom:1px solid #666666;margin-bottom:5px;">
             	{if $search.header}{$search.header}{else}{t}Uitgebreid zoeken naar soorten{/t}{/if}
@@ -264,51 +328,65 @@ function submitSearchParams()
 					<input type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
 					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
-				<div class="formrow">
+				{*<div class="formrow">
 					<label accesskey="g" for="author">{t}Auteur{/t}</label>
 					<input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
 					<div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
-				</div>
+				</div>*}
 			</fieldset>
 
 			<fieldset>
+
+				<div style="float:right;margin-top:3px"><a href="#" onclick="toggle_all_panels();return false;">alles in/uitklappen</a></div>
+	
 				<div class="formrow">
-					<label for="presenceStatusList">
+                	<label
+                    	for="presenceStatusList" 
+                        panel="presence-options-panel"
+                        class="clickable" 
+                        onmouseover="hover_panel_toggle(this);"
+                        onmouseout="hover_panel_toggle(this,true);"
+                        onclick="toggle_panel(this);">
+						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
+	                    <strong>{t}Status voorkomen{/t}</strong>
+                        <a href="http://www.nederlandsesoorten.nl/node/15" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
+                    </label>
+                    
+					<!-- label for="presenceStatusList">
 						<strong>{t}Status voorkomen{/t}</strong>&nbsp;
                         <a href="http://www.nederlandsesoorten.nl/node/15" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
 					</label>
-                    <br />
-					<select id="presenceStatusList" name="presenceStatusList" style="width:250px;">
-                        <option value="">maak een keuze</option>
-						{foreach from=$presence_statuses item=v}
-                        <option 
-                            id="established{$v.id}" 
-                            value="presence[{$v.id}]" 
-                            established="{$v.established}"
-                            >
-                            <div class="presenceStatusCode">{$v.index_label}</div>
-                            <div class="presenceStatusDescription">{$v.information_short}</div>
-                        </option>
-						{/foreach}
-					</select>
-					<input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');" />
-					<br />
-                    <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
-                    <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
+                    <br / -->
+                    <p class="options-panel" id="presence-options-panel" style="display:none">
+                        <select id="presenceStatusList" name="presenceStatusList" style="width:250px;">
+                            <option value="">maak een keuze</option>
+                            {foreach from=$presence_statuses item=v}
+                            <option 
+                                id="established{$v.id}" 
+                                value="presence[{$v.id}]" 
+                                established="{$v.established}"
+                                >
+                                <div class="presenceStatusCode">{$v.index_label}</div>
+                                <div class="presenceStatusDescription">{$v.information_short}</div>
+                            </option>
+                            {/foreach}
+                        </select>
+                        <input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');" />
+                        <br />
+                        <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
+                        <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
+					</p>
 				</div>
 
 				<div class="formrow">
                 	<label
                     	for="multimedia-options" 
                         panel="multimedia-options-panel"
-                        class="clickable tumble-arrow-head" 
-                        onclick="
-                        	$('#multimedia-options-panel').toggle();
-                            if ($('#multimedia-options-panel').is(':visible'))
-	                            $(this).removeClass('tumble-arrow-head').addClass('down-arrow-head')
-							else
-	                            $(this).removeClass('down-arrow-head').addClass('tumble-arrow-head')
-							">
+                        class="clickable" 
+                        onmouseover="hover_panel_toggle(this);"
+                        onmouseout="hover_panel_toggle(this,true);"
+                        onclick="toggle_panel(this);">
+						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 	                    <strong>{t}Multimedia{/t}</strong>
                     </label>
                     <p class="options-panel" id="multimedia-options-panel" style="display:none">
@@ -326,14 +404,11 @@ function submitSearchParams()
                 	<label 
                     	for="dna-options"
                         panel="dna-options-panel"
-                        class="clickable tumble-arrow-head" 
-                        onclick="
-                        	$('#dna-options-panel').toggle();
-                            if ($('#dna-options-panel').is(':visible'))
-	                            $(this).removeClass('tumble-arrow-head').addClass('down-arrow-head')
-							else
-	                            $(this).removeClass('down-arrow-head').addClass('tumble-arrow-head')
-							">
+                        class="clickable" 
+                        onmouseover="hover_panel_toggle(this);"
+                        onmouseout="hover_panel_toggle(this,true);"
+                        onclick="toggle_panel(this);">
+						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 	                    <strong>{t}DNA barcoding{/t}</strong>&nbsp;
                         <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" 
                         	target="_blank" 
@@ -353,15 +428,12 @@ function submitSearchParams()
 				{foreach from=$traits item=t key=k1}
 				<div class="formrow">
 					<label
-                        class="clickable tumble-arrow-head" 
+                        class="clickable" 
                         panel="traits{$k1}-options"
-                        onclick="
-                        	$('#traits{$k1}-options').toggle();
-                            if ($('#traits{$k1}-options').is(':visible'))
-	                            $(this).removeClass('tumble-arrow-head').addClass('down-arrow-head')
-							else
-	                            $(this).removeClass('down-arrow-head').addClass('tumble-arrow-head')
-							">                    
+                        onmouseover="hover_panel_toggle(this);"
+                        onmouseout="hover_panel_toggle(this,true);"
+                        onclick="toggle_panel(this);">
+						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 						<strong>{$t.name}</strong>
 					</label>&nbsp;
 					<a href="http://www.nederlandsesoorten.nl/content/exotenpaspoort" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
@@ -433,40 +505,42 @@ function submitSearchParams()
 				</div>
 				{/foreach}
 
-				<div class="formrow" style="margin-top:10px;border-top:1px dotted #999;padding-top:5px">
+				<div class="formrow" style="margin-top:10px;border-top:1px dotted #bbb;border-bottom:1px dotted #666;padding:5px 0 5px 0">
 					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
                     	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
                     	<!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
 					</span>
                     <ul id="search-parameters">
+                    {if $search.trait_group!=''}
+                    	<li>Alle taxa met exoteninformatie <a onclick="removeAllSearchParameters();submitSearchParams();return false;" href="#"> X </a></li>
+                    {/if}
                     </ul>
 				</div>
 
-				<div class="formrow">
-					<strong>{t}Resultaten sorteren op:{/t}</strong>
-                    <select name="sort" id="sort">
-                        <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
-                        <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>{t}Nederlandse naam{/t}</option>
-                    </select>
-				</div>
-                
-                <div class="formrow">
+                {*<div class="formrow">
 					<input type="button=" class="zoekknop" value="zoek" onclick="submitSearchParams()" />
-				</div>
+				</div>*}
                 
 			</fieldset>
 
 			</div>
-		</form>
+
 		</div>
 
 		<div id="results">
-			<p>
-				<h4><span id="resultcount-header">{$results.count}</span>
-                {if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
-                </h4>
-			</p>
+            <h4><span id="resultcount-header">{$results.count}</span>
+            {if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
+            </h4>
+
+            <div class="formrow" style="margin-bottom:15px">
+                <strong>{t}Resultaten sorteren op:{/t}</strong>
+                <select name="sort" id="sort" onchange="submitSearchParams();">
+                    <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
+                    <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>{t}Nederlandse naam{/t}</option>
+                </select>
+            </div>
+
 			{foreach from=$results.data item=v}
             <div class="result">
                 {if $v.overview_image}
@@ -479,6 +553,8 @@ function submitSearchParams()
 			{/foreach}
 		</div>
         
+  		</form>
+
 
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
@@ -555,9 +631,13 @@ $(document).ready(function()
 	{
 		if (v.visible)
 		{
-			$('label[panel='+v.id+']').trigger('click');
+			$('label[panel='+v.id+']').trigger('click').trigger('mouseout');
 		}
 	});
+	
+	{else}
+	
+		$('label[for=presenceStatusList]').trigger('click').trigger('mouseout');
 
 	{/if}
 
@@ -581,4 +661,3 @@ $(document).ready(function()
 </script>
 
 {include file="../shared/footer.tpl"}
-

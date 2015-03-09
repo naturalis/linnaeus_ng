@@ -1,10 +1,17 @@
 <style>
-table tr {
-	
+.exotica {
+	width:510px;	
+	border-collapse:collapse;
+}
+.exotica td {
+	padding:1px 0 1px 0;
+}
+.legend-cell {
+	width:200px;
 }
 .last-row {
-	border-bottom:1px solid #ddd;
-	padding-bottom:4px;
+	border-bottom:1px solid #eee;
+	padding-bottom:0px;
 }
 </style>
 	<div>
@@ -24,12 +31,12 @@ table tr {
             {capture "value"}{$l.value_start}{if $l.value_end} - {$l.value_end}{/if}{/capture}
 			<tr>
             {if $v.values|@count==1 && $v.trait.type=='stringfree'}
-				<td colspan="2"><b>{$v.trait.name}</b></td>
+				<td colspan="2" style="background-color:#eee">{$v.trait.name}</td>
 			</tr>
             <tr>
                 <td colspan="2">{$smarty.capture.value}</td>
             {else}
-				<td style="width:200px">{if $k==0}{$v.trait.name}{/if}</td>
+				<td class="legend-cell">{if $k==0}{$v.trait.name}{/if}</td>
                 <td>{if $v.values|@count>1}&#149; {/if}{$smarty.capture.value}</td>
             {/if}
 			</tr>

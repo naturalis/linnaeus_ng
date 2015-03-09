@@ -514,6 +514,7 @@ class SearchControllerNSR extends SearchController
 
 	private function doExtendedSearch($p)
 	{
+
 		$d=null;
 
 		if (!empty($p['group_id']))
@@ -702,10 +703,12 @@ class SearchControllerNSR extends SearchController
 				".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor['id']."' in boolean mode)" : "")."
 				".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
 				".(isset($auth) ? "and _m.authorship like '". mysql_real_escape_string($auth)."%'" : "")."
-				".($img ? "and number_of_images > 0" : "")."
 				".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
-				".($trend ? "and number_of_trend_years > 0" : "")."
-				".($distribution ? "and number_of_maps > 0" : "")."
+				".($img || $distribution || $trend ? " and (
+					".($img ? "number_of_images > 0" : "").($img && ($distribution || $trend) ? " || " : "" )."
+					".($distribution ? "number_of_maps > 0" : "").(($img || $distribution) && $trend ? " || " : "" )."
+					".($trend ? "number_of_trend_years > 0" : "")."
+				)" : "" ) ."
 				".(!empty($trait_joins) || !empty($traitgroup_joins) ? "group by _a.id" : "" )."
 				".(!empty($traitgroup_joins) ? "having count(_ttv.id)+count(_ttf.id) > 0" : "" )."
 			order by ".
@@ -1388,6 +1391,8 @@ class SearchControllerNSR extends SearchController
 		}
 					
 		if ($this->rHasVal('images','on')) $querystring.=$this->translate('met foto\'s; ');
+		if ($this->rHasVal('distribution','on')) $querystring.=$this->translate('met verspreidingskaart; ');
+		if ($this->rHasVal('trend','on')) $querystring.=$this->translate('met trendgrafiek; ');
 		if ($this->rHasVal('dna','on')) $querystring.=$this->translate('met DNA-exemplaren verzameld; ');
 		if ($this->rHasVal('dna_insuff','on')) $querystring.=$this->translate('met nog DNA-exemplaren te verzamelen; ');
 
