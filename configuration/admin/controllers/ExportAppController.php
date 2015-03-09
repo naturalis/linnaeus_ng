@@ -418,7 +418,7 @@ class ExportAppController extends Controller
 		
 		$this->_listOfEmbeddedImages[]=$newpath;
 		
-		return '<img src="'.$this->_imgRootPlaceholder.$newpath.'">';
+		return '<img class="inline-image" src="'.$this->_imgRootPlaceholder.$newpath.'">';
 	}
 	
 	private function supplantEmbeddedImgURLs($content)
