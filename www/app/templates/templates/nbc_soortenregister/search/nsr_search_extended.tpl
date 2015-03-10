@@ -356,8 +356,8 @@ function toggle_all_panels()
                         onclick="toggle_panel(this);">
 						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 	                    <strong>{t}Status voorkomen{/t}</strong>
-                        <a href="http://www.nederlandsesoorten.nl/node/15" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
-                    </label>
+                    </label>&nbsp;
+                    <a href="http://www.nederlandsesoorten.nl/node/15" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
                     
 					<!-- label for="presenceStatusList">
 						<strong>{t}Status voorkomen{/t}</strong>&nbsp;
@@ -416,12 +416,12 @@ function toggle_all_panels()
                         onmouseout="hover_panel_toggle(this,true);"
                         onclick="toggle_panel(this);">
 						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
-	                    <strong>{t}DNA barcoding{/t}</strong>&nbsp;
-                        <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" 
-                        	target="_blank" 
-                            title="klik voor help over dit onderdeel" 
-                            class="help">&nbsp;</a>
-                    </label>
+	                    <strong>{t}DNA barcoding{/t}</strong>
+                    </label>&nbsp;
+                    <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" 
+                        target="_blank" 
+                        title="klik voor help over dit onderdeel" 
+                        class="help">&nbsp;</a>
                     <p class="options-panel" id="dna-options-panel" style="display:none">
                         <select id="dna-options" name="dna-options"style="width:250px;">
                             <option value="">maak een keuze</option>
