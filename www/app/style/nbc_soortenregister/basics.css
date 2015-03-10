@@ -22,7 +22,9 @@ body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 	width: 100%;
 	margin-bottom: 10px;
 	padding-bottom: 5px;
-	background: url(images/stippellijn.gif) no-repeat left bottom;
+	/*background: url(images/stippellijn.gif) no-repeat left bottom;
+	background:none;*/
+	border-bottom:1px dashed #ddd;
 }
 
 #toolbox ul

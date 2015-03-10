@@ -81,11 +81,7 @@ a.help
 	background: url(images/card_help.gif) no-repeat 0 0;	
 	width:16px;
 	height:16px;
-}
-
-#formSearchFacetsSpecies a.help
-{
-	position:absolute;	
+	display:inline-block;
 }
 
 a.help:hover 
@@ -286,7 +282,7 @@ fieldset.block {
 .formrow ul#speciesOptionList input {display:inline; height:13px;}
 
 form br {
- clear: both;
+/* clear: both;*/
 }
 
 

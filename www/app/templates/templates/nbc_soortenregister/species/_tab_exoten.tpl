@@ -30,15 +30,8 @@
         	{foreach from=$v.values item=l key=k}
             {capture "value"}{$l.value_start}{if $l.value_end} - {$l.value_end}{/if}{/capture}
 			<tr>
-            {if $v.values|@count==1 && $v.trait.type=='stringfree'}
-				<td colspan="2" style="background-color:#eee">{$v.trait.name}</td>
-			</tr>
-            <tr>
-                <td colspan="2">{$smarty.capture.value}</td>
-            {else}
 				<td class="legend-cell">{if $k==0}{$v.trait.name}{/if}</td>
                 <td>{if $v.values|@count>1}&#149; {/if}{$smarty.capture.value}</td>
-            {/if}
 			</tr>
             {/foreach}
 			<tr><td class="last-row" colspan="2"></td></tr>
