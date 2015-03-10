@@ -324,7 +324,7 @@ function toggle_all_panels()
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
-					<label style="display:inline-block;margin-left:13px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
+					<label style="display:inline-block;margin-left:5px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
 					<input type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
 					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
@@ -337,15 +337,14 @@ function toggle_all_panels()
 
 			<fieldset>
 
+				<div class="formrow">
 				<div style="float:right;margin-top:3px;">
                 
-                    <a href="#" onclick="toggle_all_panels();return false;">alles in-/uitklappen</a>
-                    <a style="left:730px"
-                    	title="Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten.&#013;Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a of 1b).&#013;Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a en met foto's)." class="help">&nbsp;</a>
+                    <a href="#" onclick="toggle_all_panels();return false;">alles in-/uitklappen</a>&nbsp;&nbsp;
+                    <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s. Klik op > om een kenmerkwaarde te selecteren.).&lt;/p&gt;');" class="link">hulp bij zoeken</span>
 			    </div>
     
-    
-				<div class="formrow">
+
                 	<label
                     	for="presenceStatusList" 
                         panel="presence-options-panel"
@@ -424,7 +423,7 @@ function toggle_all_panels()
                     <p class="options-panel" id="dna-options-panel" style="display:none">
                         <select id="dna-options" name="dna-options"style="width:250px;">
                             <option value="">maak een keuze</option>
-                            <option value="dna">{t}met exemplaren verzameld{/t}</option>
+                            <option value="dna">{t}met een of meer exemplaren verzameld{/t}</option>
                             <option value="dna_insuff">{t}minder dan drie exemplaren verzameld{/t}</option>
                         </select>
                         <input type="button" value=" > " onclick="addSearchParameter('dna-options');" />
