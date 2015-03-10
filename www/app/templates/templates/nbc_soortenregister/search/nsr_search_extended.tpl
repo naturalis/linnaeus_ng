@@ -337,8 +337,14 @@ function toggle_all_panels()
 
 			<fieldset>
 
-				<div style="float:right;margin-top:3px"><a href="#" onclick="toggle_all_panels();return false;">alles in/uitklappen</a></div>
-	
+				<div style="float:right;margin-top:3px;">
+                
+                    <a href="#" onclick="toggle_all_panels();return false;" style="margin-right:18px;">alles in/uitklappen</a>
+                    <a style="left:730px"
+                    	title="Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. <b>Verruim</b> je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a of 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a en met foto's)." class="help">&nbsp;</a>
+			    </div>
+    
+    
 				<div class="formrow">
                 	<label
                     	for="presenceStatusList" 
@@ -505,7 +511,7 @@ function toggle_all_panels()
 				</div>
 				{/foreach}
 
-				<div class="formrow" style="margin-top:10px;border-top:1px dotted #bbb;border-bottom:1px dotted #666;padding:5px 0 5px 0">
+				<div class="formrow" style="margin:10px 0 10px 0;border-top:1px dashed #ddd;border-bottom:1px dashed #ddd;padding:5px 0 10px 0">
 					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
                     	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
