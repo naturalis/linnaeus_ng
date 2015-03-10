@@ -1,4 +1,4 @@
-		<div id="toolbox">
+		<div id="toolbox" style="background:none;border-bottom:1px dashed #ddd">
             <h2>Toolbox</h2>
 			<ul>
 				<li class="export">
