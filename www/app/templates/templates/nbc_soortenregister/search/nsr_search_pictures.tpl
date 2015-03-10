@@ -56,16 +56,8 @@
 					</fieldset>
 	
 					<fieldset>
-						<div class="formrow">
-							<label for="" accesskey="g">Resultaten sorteren op:</label>
-							<select name="sort">
-								<!-- option value="dateModified desc" selected="selected">Datum plaatsing</option -->
-								<option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>Wetenschappelijk naam</option>
-								<option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>Fotograaf</option>
-							</select>
-						</div>
-		
-						<div class="lineBreak" style="width:510px">&nbsp;</div>
+	
+						<div class="spineBreak" style="width:510px">&nbsp;</div>
 		
 						<input type="submit" class="zoekknop" value="zoek">
 					</fieldset>
@@ -76,7 +68,17 @@
 
 		<div>
 			<h4><span id="resultcount-header">{$results.count}</span></h4>
-			<div>
+
+            <div class="formrow" style="margin:-10px 0 15px 0">
+                <label for="" accesskey="g">{t}Resultaten sorteren op:{/t}</label>
+                <select name="sort">
+                    <!-- option value="dateModified desc" selected="selected">Datum plaatsing</option -->
+                    <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>Wetenschappelijk naam</option>
+                    <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>Fotograaf</option>
+                </select>
+            </div>
+
+   			<div>
 				{foreach from=$results.data item=v}
 					<div class="imageInGrid3">
 						<div class="thumbContainer">

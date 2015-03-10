@@ -324,7 +324,7 @@ function toggle_all_panels()
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
-					<label accesskey="g" for="search">{t}Soortgroep{/t}</label>
+					<label style="display:inline-block;margin-left:13px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
 					<input type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
 					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
@@ -339,9 +339,9 @@ function toggle_all_panels()
 
 				<div style="float:right;margin-top:3px;">
                 
-                    <a href="#" onclick="toggle_all_panels();return false;" style="margin-right:18px;">alles in/uitklappen</a>
+                    <a href="#" onclick="toggle_all_panels();return false;">alles in-/uitklappen</a>
                     <a style="left:730px"
-                    	title="Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. <b>Verruim</b> je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a of 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a en met foto's)." class="help">&nbsp;</a>
+                    	title="Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten.&#013;Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a of 1b).&#013;Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a en met foto's)." class="help">&nbsp;</a>
 			    </div>
     
     
@@ -505,7 +505,7 @@ function toggle_all_panels()
 					{/if}
 					{/foreach}
                     	<tr>
-                        	<td colspan="2"><a href="#" onclick="removeAllSearchParameters();setTraitGroup({$t.group_id});submitSearchParams();return;">alle taxa met exoteninformatie tonen</a></td>
+                        	<td colspan="2"><a href="#" onclick="removeAllSearchParameters();setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exoteninformatie tonen</a></td>
                         </tr>
                     </table>
 				</div>
@@ -519,7 +519,7 @@ function toggle_all_panels()
 					</span>
                     <ul id="search-parameters">
                     {if $search.trait_group!=''}
-                    	<li>Alle taxa met exoteninformatie <a onclick="removeAllSearchParameters();submitSearchParams();return false;" href="#"> X </a></li>
+                    	<li>Taxa met exoteninformatie <a onclick="removeAllSearchParameters();submitSearchParams();return false;" href="#"> X </a></li>
                     {/if}
                     </ul>
 				</div>
@@ -534,13 +534,13 @@ function toggle_all_panels()
 
 		</div>
 
-		<div id="results">
+		<div id="results"> 
             <h4><span id="resultcount-header">{$results.count}</span>
             {if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
             </h4>
 
             <div class="formrow" style="margin-bottom:15px">
-                <strong>{t}Resultaten sorteren op:{/t}</strong>
+                {t}Resultaten sorteren op:{/t}
                 <select name="sort" id="sort" onchange="submitSearchParams();">
                     <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
                     <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>{t}Nederlandse naam{/t}</option>
@@ -559,8 +559,7 @@ function toggle_all_panels()
 			{/foreach}
 		</div>
         
-  		</form>
-
+ 		</form>
 
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
