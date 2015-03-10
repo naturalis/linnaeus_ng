@@ -341,9 +341,11 @@ function toggle_all_panels()
 				<div style="float:right;margin-top:3px;">
                 
                     <a href="#" onclick="toggle_all_panels();return false;">alles in-/uitklappen</a>&nbsp;&nbsp;
-                    <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s. Klik op > om een kenmerkwaarde te selecteren.).&lt;/p&gt;');" class="link">hulp bij zoeken</span>
+                    <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.&lt;/p&gt;');" class="link">hulp bij zoeken</span>
 			    </div>
     
+
+
 
                 	<label
                     	for="presenceStatusList" 
@@ -504,7 +506,7 @@ function toggle_all_panels()
 					{/if}
 					{/foreach}
                     	<tr>
-                        	<td colspan="2"><a href="#" onclick="removeAllSearchParameters();setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exoteninformatie tonen</a></td>
+                        	<td colspan="2"><a href="#" onclick="removeAllSearchParameters();setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exotenpaspoort tonen</a></td>
                         </tr>
                     </table>
 				</div>
@@ -518,7 +520,7 @@ function toggle_all_panels()
 					</span>
                     <ul id="search-parameters">
                     {if $search.trait_group!=''}
-                    	<li>Taxa met exoteninformatie <a onclick="removeAllSearchParameters();submitSearchParams();return false;" href="#"> X </a></li>
+                    	<li>Taxa met exotenpaspoort <a onclick="removeAllSearchParameters();submitSearchParams();return false;" href="#"> X </a></li>
                     {/if}
                     </ul>
 				</div>

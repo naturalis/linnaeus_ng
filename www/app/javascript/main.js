@@ -582,7 +582,8 @@ function hint(caller,txt) {
 
 	if (caller) {
 		var pos = $(caller).offset();
-		$('#hint-box').offset({left:pos.left,top:pos.top+15});
+		$('#hint-box').offset({left:pos.left,top:pos.top+25});
+		// top+15 is a neat vertical outline, but we use 25 so the cursor doesn't cover the first few letters
 	}
 	if (txt) $('#hint-box').html(txt);
 
