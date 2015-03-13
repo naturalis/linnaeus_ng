@@ -787,7 +787,7 @@ parameters:
 		$result['statistics']['exotics']=
 			array(
 				'count'=>count($d),
-				'label'=>$this->translate('Exoten')
+				'label'=>$this->translate('Exotenpaspoort')
 			);
 
 
