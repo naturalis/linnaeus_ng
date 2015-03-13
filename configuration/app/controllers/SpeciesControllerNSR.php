@@ -483,7 +483,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$start=$val['id'];
 			} 
 			else
-			if (!empty($order[$val['tabname']]['start_order']) &&  empty($val['is_empty']) && 
+			if (!isset($requestedTab) && !empty($order[$val['tabname']]['start_order']) &&  empty($val['is_empty']) && 
 				(
 					is_null($start) || 
 					$order[$val['tabname']]['start_order']<$start
