@@ -513,7 +513,7 @@ function toggle_all_panels()
 				{/foreach}
 
 				<div class="formrow" style="margin:10px 0 10px 0;border-top:1px dashed #ddd;border-bottom:1px dashed #ddd;padding:5px 0 10px 0">
-					<strong>{t}Geselecteerde zoekparameters{/t}</strong>
+					<strong>{t}Geselecteerde kenmerken{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
                     	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
                     	<!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
