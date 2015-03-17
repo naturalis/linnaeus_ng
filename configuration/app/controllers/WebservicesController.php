@@ -12,6 +12,7 @@ class WebservicesController extends Controller
 	private $_taxonUrl='/linnaeus_ng/app/views/species/nsr_taxon.php?epi=1&id=%s';
 	private $_thumbBaseUrl='http://images.naturalis.nl/160x100/';
 	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
+	private $_nsrOriginalImageBaseUrl='http://images.naturalis.nl/original/';
 	private $_JSONPCallback=false;
 	private $_JSON=null;
 
@@ -256,7 +257,7 @@ parameters:
         $media=$this->models->MediaTaxon->freeQuery("
 			select
 				_a.id as media_id,
-				_a.file_name as url,
+				concat('".$this->_nsrOriginalImageBaseUrl."',_a.file_name) as url,
 				_b.meta_data as copyright,
 				_c.meta_data as caption,
 				_d.meta_data as creator,
