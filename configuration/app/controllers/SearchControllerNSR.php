@@ -138,7 +138,6 @@ class SearchControllerNSR extends SearchController
 			$template=null;
 		}
 
-
 		$this->traitGroupsToInclude=array(1);
 		
 		if (count($this->traitGroupsToInclude)>0)
@@ -512,6 +511,7 @@ class SearchControllerNSR extends SearchController
 
 	}
 
+
 	private function doExtendedSearch($p)
 	{
 
@@ -750,6 +750,9 @@ class SearchControllerNSR extends SearchController
 				'ancestor'=>isset($ancestor) ? $ancestor : null
 			);
 	}
+
+
+
 
 	private function getPhotographersPictureCount($p=null)
 	{

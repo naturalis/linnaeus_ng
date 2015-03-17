@@ -15,7 +15,8 @@
 	<li class="leaf"><a href="{$server}/node/23">Definitie</a></li>
 	<li class="leaf"><a href="{$server}/node/24">Lijsten</a></li>
 	<li class="leaf"><a href="{$server}/node/25">Soortinformatie</a></li>
-	<li class="last leaf"><a href="{$server}/node/26">Literatuur en websites</a></li>
+	<li class="last"><a href="{$server}/node/26">Literatuur en websites</a></li>
+	<li class="last leaf"><a href="{$server}/content/exotenpaspoort">Exotenpaspoort</a></li>
 	</ul></li>
 	<li class="leaf"><a href="{$server}/node/27">Determineren</a></li>
 	<li class="last expanded"><a title="" href="{$server}/node/28">Bronnen</a><ul class="menu clearfix"><li class="first leaf"><a href="{$server}/node/29">Bronnen A-B</a></li>
