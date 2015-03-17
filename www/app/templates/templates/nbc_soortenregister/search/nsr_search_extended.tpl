@@ -49,7 +49,6 @@ label.clickable:hover {
 	border-right: 5px solid transparent;
 	border-top: 10px solid black;
 }
-
 </style>
                 
 <script>
@@ -59,12 +58,13 @@ var init=true;
 
 function addSearchParameter(id)
 {
+	
 	if (!id) return;
 	
 	var ele=$('#'+id);
 	var tagtype=ele.prop('tagName');
 	var varlabel=$('label[for='+id+']').text().trim();	
-	var istrait=ele.attr('id').indexOf('trait-')===0;
+	var istrait=ele.attr('id') && ele.attr('id').indexOf('trait-')===0;
 
 	var traitid=null;
 	var valueid=null;
@@ -118,6 +118,7 @@ function addSearchParameter(id)
 			return;
 		}
 	}
+
 	
 	search_parameters.push(
 	{ 
@@ -155,8 +156,18 @@ function printParameters()
 						(e.valuetext2 ? ' & ' + e.valuetext2 : '' )+
 					' <a href="#" onclick="removeSearchParameter('+i+');submitSearchParams();return false;"> X </a></li>'));
 	}
+	
+	if(getTraitGroup())
+	{
+		$('#search-parameters').
+			append(
+				$(
+					'<li>Taxa met exotenpaspoort '+
+					' <a href="#" onclick="setTraitGroup(null);submitSearchParams();return false;"> X </a></li>'));
+	}
 
 	$('#remove-all').toggle(search_parameters.length>0);
+
 }
 
 function removeSearchParameter(i)
@@ -210,6 +221,51 @@ function setTraitGroup(id)
 	trait_group=id;
 }
 
+function getTraitGroup()
+{
+	return trait_group;
+}
+
+function toggle_panel(ele)
+{
+	$('#'+$(ele).attr('panel')).toggle();
+}
+
+function hover_panel_toggle(ele,out)
+{
+	var p=$('#'+$(ele).attr('panel'));
+	var c=$(ele).children().children('div.arrow'); 
+	if (out)
+	{
+		c.removeClass('arrow-se').addClass(p.is(':visible') ? 'arrow-s' :  'arrow-e')
+	}
+	else
+	{
+		c.removeClass('arrow-s').removeClass('arrow-e').addClass('arrow-se')
+	}
+}
+
+function toggle_all_panels()
+{
+	var allopen=true;
+	$('label').each(function()
+	{
+		if ($(this).attr('panel') && !$('#'+$(this).attr('panel')).is(':visible'))
+		{
+			allopen=false;
+		}
+	});
+	$('label').each(function()
+	{
+		if ($(this).attr('panel') && (allopen || (!allopen && !$('#'+$(this).attr('panel')).is(':visible'))))
+		{
+			toggle_panel(this);
+			hover_panel_toggle(this);
+            hover_panel_toggle(this,true);
+		}
+	});
+}
+
 function submitSearchParams()
 {
 	if (init) return;
@@ -258,46 +314,6 @@ function submitSearchParams()
 	form.submit();	
 }
 
-function toggle_panel(ele)
-{
-	$('#'+$(ele).attr('panel')).toggle();
-}
-
-function hover_panel_toggle(ele,out)
-{
-	var p=$('#'+$(ele).attr('panel'));
-	var c=$(ele).children().children('div.arrow'); 
-	if (out)
-	{
-		c.removeClass('arrow-se').addClass(p.is(':visible') ? 'arrow-s' :  'arrow-e')
-	}
-	else
-	{
-		c.removeClass('arrow-s').removeClass('arrow-e').addClass('arrow-se')
-	}
-}
-
-function toggle_all_panels()
-{
-	var allopen=true;
-	$('label').each(function()
-	{
-		if ($(this).attr('panel') && !$('#'+$(this).attr('panel')).is(':visible'))
-		{
-			allopen=false;
-		}
-	});
-	$('label').each(function()
-	{
-		if ($(this).attr('panel') && (allopen || (!allopen && !$('#'+$(this).attr('panel')).is(':visible'))))
-		{
-			toggle_panel(this);
-			hover_panel_toggle(this);
-            hover_panel_toggle(this,true);
-		}
-	});
-}
-
 </script>
 
 <div id="dialogRidge">
@@ -344,9 +360,6 @@ function toggle_all_panels()
                     <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.&lt;/p&gt;');" class="link">hulp bij zoeken</span>
 			    </div>
     
-
-
-
                 	<label
                     	for="presenceStatusList" 
                         panel="presence-options-panel"
@@ -423,7 +436,7 @@ function toggle_all_panels()
                         title="klik voor help over dit onderdeel" 
                         class="help">&nbsp;</a>
                     <p class="options-panel" id="dna-options-panel" style="display:none">
-                        <select id="dna-options" name="dna-options"style="width:250px;">
+                        <select id="dna-options" name="dna-options" style="width:250px;">
                             <option value="">maak een keuze</option>
                             <option value="dna">{t}met een of meer exemplaren verzameld{/t}</option>
                             <option value="dna_insuff">{t}minder dan drie exemplaren verzameld{/t}</option>
@@ -506,7 +519,7 @@ function toggle_all_panels()
 					{/if}
 					{/foreach}
                     	<tr>
-                        	<td colspan="2"><a href="#" onclick="removeAllSearchParameters();setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exotenpaspoort tonen</a></td>
+                        	<td colspan="2"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exotenpaspoort tonen</a></td>
                         </tr>
                     </table>
 				</div>
@@ -519,9 +532,6 @@ function toggle_all_panels()
                     	<!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
 					</span>
                     <ul id="search-parameters">
-                    {if $search.trait_group!=''}
-                    	<li>Taxa met exotenpaspoort <a onclick="removeAllSearchParameters();submitSearchParams();return false;" href="#"> X </a></li>
-                    {/if}
                     </ul>
 				</div>
 
@@ -625,6 +635,12 @@ $(document).ready(function()
 
 		$('input.add-trait[trait-id='+d.traitid+']').trigger('click');
 	}
+
+	{if $search.trait_group!=''}
+		setTraitGroup({$search.trait_group});
+		printParameters();
+	{/if}
+
 
 	{/if}
 	{/if}

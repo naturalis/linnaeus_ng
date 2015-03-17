@@ -2,6 +2,15 @@
 
 /*
 
+
+alter table pages_taxa add column redirect_to varchar(512) null after def_page;
+alter table pages_taxa add column check_query varchar(512) null after redirect_to;
+update pages_taxa set check_query='select if(sum(tot)>0,1,0) as `result` from (select count(*) as tot from  traits_taxon_values where project_id = %pid% and taxon_id = %tid% union select count(*) as tot from  traits_taxon_freevalues where project_id = %pid% and taxon_id = %tid%) as u' where page='Exotenpaspoort';
+
+update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J0ZW5yZWdpc3Rlci1kZXZlbG9wbWVudC0wMDEuY2xvdWQubmF0dXJhbGlzLm5sL2xpbm5hZXVzX25nL2FwcC92aWV3cy90cmFpdHMvZ2V0LnBocD90YXhvbj0ldGF4b24lJmdyb3VwPSVncm91cCU%3D&taxon=%tid%&group=1' where page='Exoteninformatie';
+	source = urlencode(base64encode(full url))
+		http://localhost/linnaeus_ng/app/views/traits/get.php?taxon=%taxon%&group=%group%
+
 	variationsAction
 		saves all variations in project default language only!!!!
 
