@@ -228,7 +228,7 @@ parameters:
 		$description = strip_tags($description);
 		*/
 		
-		$url=$this->makeNsrLink();
+		$url='http://'.$_SERVER['HTTP_HOST'].$this->makeNsrLink();
 
 		$query="
 			select
