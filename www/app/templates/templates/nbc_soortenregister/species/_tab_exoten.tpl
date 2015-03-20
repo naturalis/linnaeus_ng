@@ -36,6 +36,15 @@
             {/foreach}
 			<tr><td class="last-row" colspan="2"></td></tr>
         {/foreach}
+		</table>
+
+		<table class="exotica">
+        {foreach from=$content.result.references item=v}
+			<tr>
+				<td></td>
+                <td>{$v.label}</td>
+			</tr>
+        {/foreach}
        
         </table>
 

@@ -166,7 +166,7 @@ function printParameters()
 					' <a href="#" onclick="setTraitGroup(null);submitSearchParams();return false;"> X </a></li>'));
 	}
 
-	$('#remove-all').toggle(search_parameters.length>0);
+	$('#remove-all').toggle(search_parameters.length>0 || getTraitGroup()!=null);
 
 }
 
@@ -179,6 +179,7 @@ function removeSearchParameter(i)
 function removeAllSearchParameters()
 {
 	search_parameters.splice(0);
+	setTraitGroup(null);
 	printParameters();
 }
 
@@ -392,7 +393,7 @@ function submitSearchParams()
                             {/foreach}
                         </select>
                         <input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');" />
-                        <br />
+                        <br style="margin-bottom: 1em;" />
                         <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
                         <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
 					</p>
@@ -519,7 +520,7 @@ function submitSearchParams()
 					{/if}
 					{/foreach}
                     	<tr>
-                        	<td colspan="2"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exotenpaspoort tonen</a></td>
+                        	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exotenpaspoort tonen</a></td>
                         </tr>
                     </table>
 				</div>

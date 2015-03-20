@@ -1,0 +1,74 @@
+.raw, .lines {
+	cursor:pointer;
+}
+
+.literature-match table {
+	border-collapse:collapse;
+}
+
+.literature-match table td {
+	font-size:0.8em;
+	border:1px dotted #666;
+	padding-left:1px;
+}
+
+.literature-match .matches {
+	width:1000px;
+}
+.literature-match .processed {
+	width:850px;
+}
+.matches tr td:first-child,
+.matches tr td:last-child {
+	background-color:#ffe;
+	text-align:right;
+}
+.matches tr:first-child td {
+	border-bottom-color:red;
+}
+
+.matches tr:hover {
+	background-color:#eee;
+}
+
+.admin-row {
+	background-color:#eee;
+}
+.small-link
+{
+	font-size:0.8em;
+}
+.literature-match .matches td,
+.literature-match .processed td {
+	font-size:0.9em;
+	vertical-align:top;
+}
+
+.processed tr td:first-child {
+	background-color:#ffe;
+	text-align:right;
+}
+
+.processed tr:first-child td, .inner-matches tr td:first-child {
+	background-color:transparent;
+	text-align:left;
+}
+.inner-matches tr:hover {
+	background-color:#eee;
+}
+.inner-matches tr td {
+	border-left:none;
+}
+.inner-matches tr:first-child td {
+	border-top:none;
+}
+.inner-matches tr:last-child td {
+	border-bottom:none;
+}
+.inner-matches tr td:first-child  {
+	min-width:200px;
+}
+.inner-matches tr td:last-child  {
+	width:100%;
+	border-right:none;
+}

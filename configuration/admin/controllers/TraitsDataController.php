@@ -56,7 +56,9 @@ class TraitsDataController extends TraitsController
 		'text_translations',
 		'traits_values',
 		'traits_taxon_values',
-		'traits_taxon_freevalues'
+		'traits_taxon_freevalues',
+		'traits_taxon_references',
+		'literature2'
     );
    
     public $controllerPublicName = 'Kenmerken';
@@ -155,6 +157,7 @@ class TraitsDataController extends TraitsController
 		$this->matchTraits();
 		$this->matchSpecies();
 		$this->matchValues();
+		$this->matchReferences();
 
         $this->setPageName($this->translate('Data matched'));
 
@@ -174,6 +177,13 @@ class TraitsDataController extends TraitsController
 		{
 			$this->setJoinrows($this->rGetVal('joinrows'));
 			$this->saveValues();
+/*
+$this->setSessionLines(null);
+$this->setDataSession(null);
+$this->setIsRotated(null);
+$this->setJoinrows(null);
+
+*/
 		}
 
         $this->setPageName($this->translate('Data saved'));
@@ -395,19 +405,17 @@ class TraitsDataController extends TraitsController
 
 	}
 
-
-
-
-
-
 	private function setJoinrows($data)
 	{
 		unset($_SESSION['admin']['traits']['data']['joinrows']);
-		foreach((array)$data as $val)
+		if (!is_null($data))
 		{
-			$d=explode(",",trim($val,'[]'));
-			$_SESSION['admin']['traits']['data']['joinrows'][$d[0]]=$d[1];
-		}
+			foreach((array)$data as $val)
+			{
+				$d=explode(",",trim($val,'[]'));
+				$_SESSION['admin']['traits']['data']['joinrows'][$d[0]]=$d[1];
+			}
+		}	
 	}
 
 	private function getJoinrows()
@@ -417,7 +425,14 @@ class TraitsDataController extends TraitsController
 
 	private function setIsRotated($state)
 	{
-		$_SESSION['admin']['traits']['data']['rotated']=$state;
+		if (is_null($state))
+		{
+			unset($_SESSION['admin']['traits']['data']['rotated']);
+		}
+		else
+		{
+			$_SESSION['admin']['traits']['data']['rotated']=$state;
+		}	
 	}
 
 	private function getIsRotated()
@@ -481,7 +496,14 @@ class TraitsDataController extends TraitsController
 
 	private function setDataSession($p)
 	{
-		$_SESSION['admin']['traits']['data']=$p;
+		if (is_null($p))
+		{
+			unset($_SESSION['admin']['traits']['data']);
+		}
+		else
+		{
+			$_SESSION['admin']['traits']['data']=$p;
+		}
 	}
 
 	private function getDataSession()
@@ -491,7 +513,14 @@ class TraitsDataController extends TraitsController
 
 	private function setSessionLines($lines)
 	{
-		$_SESSION['admin']['traits']['data']['lines']=$lines;
+		if (is_null($lines))
+		{
+			unset($_SESSION['admin']['traits']['data']['lines']);
+		}
+		else
+		{
+			$_SESSION['admin']['traits']['data']['lines']=$lines;
+		}
 	}
 
 	private function getSessionLines()
@@ -924,6 +953,75 @@ class TraitsDataController extends TraitsController
 		$this->setSessionLines($data['lines']);
 	}
 
+	private function matchReferences()
+	{
+		$data=$this->getDataSession();
+		
+		$references=array();
+		$done=array();
+
+		foreach((array)$data['lines'] as $line)
+		{
+			if (isset($line['trait']['sysname']) && $line['trait']['sysname']==$this->_sysColReferences)
+			{
+				foreach($line['cells'] as $c=>$cell)
+				{
+					if ($c==0) continue;
+
+					// from 1234; 6578, 8765 -> 1234 6578 8765 -> array(1234,6578,8765)
+					$d=explode(' ',preg_replace(array('/\D/','/(\s)+/'),array(' ',' '),$cell));
+
+					$references[$c]['raw']=$cell;
+					$references[$c]['atomized']=$d;
+
+					foreach((array)$d as $val)
+					{
+						
+						if (empty($val)) continue;
+						
+						// check each ref id only once
+						if (!isset($done[$val]))
+						{
+							// see if the ref id exists in the database
+							$r=$this->models->Literature2->_get(array(
+								'id'=>array(
+									'id'=>$val,
+									'project_id'=>$this->getCurrentProjectId()
+								)
+							));
+							
+							if (empty($r[0]['id']))
+							{
+								$this->addError(sprintf($this->translate('Unknown reference id %s'),$val));
+								$references[$c]['invalid'][]=$val;
+								$done[$val]=false;
+							}
+							else
+							{
+								$references[$c]['valid'][]=$val;
+								$references['titles'][$val]=$r[0]['label'];
+								$done[$val]=true;
+							}
+						}
+						else
+						{
+							if ($done[$val]===true)
+								$references[$c]['valid'][]=$val;
+							else
+								$references[$c]['invalid'][]=$val;
+						}
+					}
+				}
+			}
+		}
+
+		$data['references']=$references;
+		
+		$this->setDataSession($data);
+	}
+
+
+
 	private function saveValues()
 	{
 		$data=$this->getDataSession();
@@ -966,6 +1064,7 @@ class TraitsDataController extends TraitsController
 								'taxon_id'=>$taxon_id,
 								'value_id'=>$cell['value_id'],
 								'trait_id'=>$line['trait']['id'],
+								'__column'=>$c
 								//'comment'=>$line['cell_comments'][$c]
 							);
 
@@ -1080,7 +1179,8 @@ class TraitsDataController extends TraitsController
 											$q+=array('date_value'=>$this->makeInsertableDate($r['value'],$trait['date_format_format']));
 										}
 									}
-
+									
+									$q+=array('__column'=>$c);
 									$saveFree[]=$q;
 								}
 								else
@@ -1102,6 +1202,7 @@ class TraitsDataController extends TraitsController
 
 		$saved=$failed=0;
 		$deletedtraits=array();
+		$savedtaxabycolumn=array(); // for knowing which references to save
 
 		foreach($saveVal as $val)
 		{
@@ -1124,11 +1225,14 @@ class TraitsDataController extends TraitsController
 				$deletedtraits[$val['taxon_id']][$val['trait_id']]=true;
 			}
 
+			$c=$val['__column'];
+			unset($val['__column']);
 			unset($val['trait_id']);
 
 			if ($this->models->TraitsTaxonValues->save($val))
 			{
 				$saved++;
+				$savedtaxabycolumn[$c]=$val['taxon_id'];
 			}
 			else
 			{
@@ -1149,14 +1253,42 @@ class TraitsDataController extends TraitsController
 				$deletedtraits[$val['taxon_id']][$val['trait_id']]=true;
 			}
 
+			$c=$val['__column'];
+			unset($val['__column']);
+
 			if ($this->models->TraitsTaxonFreevalues->save($val))
 			{
 				$saved++;
+				$savedtaxabycolumn[$c]=$val['taxon_id'];
 			}
 			else
 			{
 				$failed++;
 			}			
+		}
+
+
+		// saving references
+		foreach((array)$savedtaxabycolumn as $column=>$taxon_id)
+		{
+			$this->models->TraitsTaxonReferences->delete(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'trait_group_id'=>$data['traitgroup'],
+				'taxon_id'=>$taxon_id
+			));			
+			
+			if (isset($data['references'][$column]['valid']))
+			{
+				foreach((array)$data['references'][$column]['valid'] as $ref_id)
+				{
+					@$this->models->TraitsTaxonReferences->save(array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'trait_group_id'=>$data['traitgroup'],
+						'taxon_id'=>$taxon_id,
+						'reference_id'=>$ref_id,
+					));
+				}
+			}
 		}
 		
 		$this->addMessage(sprintf($this->translate('Saved %s values, failed %s.'),$saved,$failed));

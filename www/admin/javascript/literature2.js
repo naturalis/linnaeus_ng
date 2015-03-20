@@ -149,3 +149,43 @@ function removeAuthorField(k)
 	$('#actor_id-'+k).remove();
 	$('#actor_remove-'+k).remove();
 }
+
+
+var elements=[];
+
+function storeElement(id)
+{
+	elements.push( { id:id,seen:false } );
+}
+
+function markElementAsSeen(id)
+{
+	for(var i=0;i<elements.length;i++)
+	{
+		if (elements[i].id==id)
+		{
+			elements[i].seen=true;
+		}
+	}
+}
+
+
+function processMatches()
+{
+	var j=0;
+	for(var i=0;i<elements.length;i++)
+	{
+		if (!elements[i].seen) j++
+	}
+
+	if (j!=0 && !confirm("You have not reviewed "+j+" matches.\nAre you sure you want to proceed?"))
+	{
+		return;
+	}
+	else
+	{
+		var target='bulk_process.php';
+		if (document.URL.indexOf('bulk_process.php')!=-1) target='bulk_save.php';
+		$('#theForm').attr('action',target).submit();
+	}
+}

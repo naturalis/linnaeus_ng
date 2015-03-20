@@ -152,7 +152,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('searchTraitsHR',
 				$this->makeReadableTraitString(array(
 					'traits'=>$traits,
-					'trait_group'=>$search['trait_group'],
+					'trait_group'=>isset($search['trait_group']) ? $search['trait_group'] : null,
 					'search'=>isset($search['traits']) ? $search['traits'] : null
 				)
 			));
@@ -510,7 +510,6 @@ class SearchControllerNSR extends SearchController
 		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resSpeciesPerPage);
 
 	}
-
 
 	private function doExtendedSearch($p)
 	{
@@ -1456,10 +1455,9 @@ class SearchControllerNSR extends SearchController
 		
 		if (!empty($trait_group))
 		{
-			$str=$traits[$trait_group]['name'].'=*;';
+			$str=$str.';'.$traits[$trait_group]['name'].'=*;';
 		}
 
-		
 		return $str;
 	}
 
