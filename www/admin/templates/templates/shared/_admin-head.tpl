@@ -35,6 +35,7 @@
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-ui/jquery-ui-1.9.1.min.js"></script>
 
 	<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.tools.min.js"></script -->
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/prettyPhoto/jquery.prettyPhoto.custom.js"></script>

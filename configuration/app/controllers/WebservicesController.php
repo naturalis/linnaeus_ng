@@ -551,10 +551,16 @@ parameters:
 			'sub'=>$this->translate('Het soortenregister bevat')
 		);
 
+		function format_number($n)
+		{
+			return number_format($n,0,',','.');
+		}
+
 
         $d=$this->models->Taxon->freeQuery("
 			select
-				count(*) as total
+				count(*) as total,
+				_h.id as presence_id
 
 			from
 				%PRE%taxa _a
@@ -571,25 +577,33 @@ parameters:
 				on _g.presence_id=_h.id
 				and _g.project_id=_h.project_id
 
-
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.rank_id = ".SPECIES_RANK_ID."
-				and _h.established=1"
-		);
+				and _h.established=1
 
+			group by 
+				_h.id
+		");
+
+
+		$result['main_count']=0;
+		$result['established_exotic']=0;
 		/*
-		$result['statistics']['species']=
-			array(
-				'count'=>$d[0]['total'],
-				'label'=>$this->translate('Aantal soorten in Nederland'),
-				'description'=>$this->translate('Aantal soorten in Nederland met status voorkomen 1, 1a, 2, 2a of 2b.')
-			);
+		6	2a Exoot. Minimaal 100 jaar zelfstandige handhaving
+		3	2b Exoot. Tussen 10 en 100 jaar zelfstandige handhaving
 		*/
+		foreach((array)$d as $key=>$val)
+		{
+			$result['main_count']+=$val['total'];
+			if ($val['presence_id']==3 || $val['presence_id']==6)
+			{
+				$result['established_exotic']+=$val['total'];
+			}
+		}
 
-
-		$result['main_count']=$d[0]['total'];
-
+		$result['main_count']=format_number($result['main_count']);
+		$result['established_exotic']=format_number($result['established_exotic']);
 
         $d=$this->models->MediaTaxon->freeQuery("
 			select
@@ -603,7 +617,7 @@ parameters:
 		
 		$result['statistics']['species_with_image']=
 			array(
-				'count'=>$d[0]['total'],
+				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Soorten met foto\'s')
 			);
 
@@ -617,7 +631,7 @@ parameters:
 		
 		$result['statistics']['images']=
 			array(
-				'count'=>$d[0]['total'],
+				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Foto\'s')
 			);
 		
@@ -647,28 +661,30 @@ parameters:
 
 			if ($val['language_id']==LANGUAGE_ID_DUTCH)
 				$t['count_name_dutch']+=$val['total'];
-
+			/*
 			if ($val['language_id']==LANGUAGE_ID_ENGLISH)
 				$t['count_name_english']+=$val['total'];
+			*/
 		}
 
 		$result['statistics']['accepted_names']=
 			array(
-				'count'=>$t['count_name_accepted'],
+				'count'=>format_number($t['count_name_accepted']),
 				'label'=>$this->translate('Geaccepteerde soortnamen')
 			);
 
 		$result['statistics']['dutch_names']=
 			array(
-				'count'=>$t['count_name_dutch'],
+				'count'=>format_number($t['count_name_dutch']),
 				'label'=>$this->translate('Nederlandse namen')
 			);
-
+		/*
 		$result['statistics']['english_names']=
 			array(
-				'count'=>$t['count_name_english'],
+				'count'=>format_number($t['count_name_english']),
 				'label'=>$this->translate('Engelse namen')
 			);
+		*/
 	
 
 		$d=$this->models->Taxon->freeQuery("
@@ -697,7 +713,7 @@ parameters:
 
 		$result['statistics']['specialist']=
 			array(
-				'count'=>$d[0]['total'],
+				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Specialisten')
 			);
 		
@@ -710,7 +726,7 @@ parameters:
 
 		$result['statistics']['literature']=
 			array(
-				'count'=>$d[0]['total'],
+				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Literatuurbronnen')
 			);
 
@@ -725,10 +741,9 @@ parameters:
 
 		$result['statistics']['distribution_map']=
 			array(
-				'count'=>$d[0]['total'],
+				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Verspreidingskaarten')
 			);
-
 
         $d=$this->models->TaxonTrendYears->_get(array(
 			'id'=> array(
@@ -739,7 +754,7 @@ parameters:
 
 		$result['statistics']['trend_graph']=
 			array(
-				'count'=>$d[0]['total'],
+				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Trendgrafieken')
 			);
 
@@ -787,7 +802,7 @@ parameters:
 		
 		$result['statistics']['exotics']=
 			array(
-				'count'=>count($d),
+				'count'=>format_number(count($d)),
 				'label'=>$this->translate('Exotenpaspoorten')
 			);
 

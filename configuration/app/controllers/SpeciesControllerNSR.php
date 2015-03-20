@@ -68,7 +68,6 @@ class SpeciesControllerNSR extends SpeciesController
 		}
     }
 
-
     public function taxonAction()
     {
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
@@ -114,7 +113,6 @@ class SpeciesControllerNSR extends SpeciesController
 				//q($raw,1);
 
 				$content['content']=json_decode($raw,true);
-				
 				
 				$this->smarty->assign('ext_template','_tab_exoten.tpl');
 				$this->smarty->assign('ext_tab',$this->rGetVal('ext_tab'));

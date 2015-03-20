@@ -4,6 +4,48 @@
 
 	!!!! needs optimization: $this->getVariationStates($val['id'])
 
+	on NSR-style keys with landscape-orientated pictures:
+	change two settings:
+		matrix_items_per_line =  3
+		matrix_items_per_page = 18 (or something else divisible by 3)
+	and stylesheet overrides in project custom stylesheet:
+		www/app/style/custom/[pId].css 
+	containing:
+		.result {
+		  width: 222px;
+		  margin:15px 15px 10px 0;
+		  float:left;
+		  border: 1px solid #ddd;
+		}
+		
+		.result-image-container {
+		  width:202px;
+		  height:150px;
+		}
+		
+		.result-image {
+		  width:200px;
+		  height:auto;
+		  width:auto;
+		  max-width:202px;
+		  height:auto;
+		  max-height:150px;
+		  margin-left:auto;
+		  margin-right:auto;
+		  display: block;
+		  margin-bottom:2px;
+		}
+		
+		.result-labels {
+		  width:100%;
+		  height:45px;
+		  margin-top:6px;
+		}
+		
+		.result-icon {
+		  width:74px;
+		}
+
 */
 
 include_once ('Controller.php');

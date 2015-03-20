@@ -48,11 +48,12 @@ div.data {
 td.identified-trait {
 	min-width:150px;
 }
-
-.with-error {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=);
+.valid-ref {
+	color:#390;
 }
-
+.invalid-ref {
+	color:#F44;
+}
 </style>
 
 <div id="page-main">
@@ -86,6 +87,15 @@ td.identified-trait {
                     	class="{if $k>0}{if !$data.taxa[$k].have_taxon}no-taxon{else if !$data.taxa[$k].match}cell-warning{else}taxon{/if}{/if}"
                     	title="{if $k>0}{if !$data.taxa[$k].have_taxon}unknown taxon{else if !$data.taxa[$k].match}taxon name and ID do not match; using {$data.taxa[$k].will_use} (from {$data.taxa[$k].will_use_source}){/if}{/if}">
                         {$v}
+                    </td>                
+                {else if $line.trait.sysname==$sysColReferences}
+                    <td>
+                    	{if $data.references[$k]}
+                        {foreach from=$data.references[$k].valid item=val key=vk}{if $vk>0}, {/if}<span class="valid-ref" title="{$data.references.titles[$val]|@escape}">{$val}</span>{/foreach}
+                        {if $data.references[$k].valid && $data.references[$k].invalid}<br />{/if}
+                        <span class="invalid-ref" title="invalid references">{foreach from=$data.references[$k].invalid item=inval key=vk}{if $vk>0}, {/if}{$inval}{/foreach}</span>
+                        {/if}
+                    	<!-- {$v} -->
                     </td>                
                 {else}
                     <td

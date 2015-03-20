@@ -13,7 +13,9 @@ class TraitsController extends Controller
 		'traits_traits',
 		'text_translations',
 		'traits_values',
-		'traits_taxon_values'
+		'traits_taxon_values',
+		'literature2',
+		'literature2_authors'
     );
    
     public $controllerPublicName = 'Kenmerken';
@@ -231,6 +233,7 @@ class TraitsController extends Controller
 					'value_start'=>$val['value_start'],
 					'value_end'=>$val['value_end'],
 				);
+
 		}
 
 		foreach($d as $val)
@@ -238,6 +241,8 @@ class TraitsController extends Controller
 			$data[]=$val;
 		}
 		
+		$references=$this->getReferences(array('taxon'=>$taxon,'group'=>$group,'project'=>$project));
+
 		//q($data,1);
 		
 		echo json_encode(array(
@@ -248,7 +253,8 @@ class TraitsController extends Controller
 				'group_id'=>$group,
 			),
 			'result'=>array(
-				'data'=>$data
+				'data'=>$data,
+				'references'=>$references
 			)
 		));
 
@@ -257,6 +263,69 @@ class TraitsController extends Controller
     public function indexAction()
 	{
 	}
+
+	private function getReferences($p)
+	{
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		$group=isset($p['group']) ? $p['group'] : null;
+		$project=isset($p['project']) ? $p['project'] : null;
+
+		if (empty($taxon)||empty($group)||empty($project))
+			return;
+
+
+		$l=$this->models->Literature2->freeQuery("
+			select
+				_a.*,
+				_h.label as publishedin_label,
+				_i.label as periodical_label
+
+			from %PRE%literature2 _a
+
+			right join %PRE%traits_taxon_references _ttr
+				on _a.id = _ttr.reference_id 
+				and _a.project_id=_ttr.project_id
+				and _ttr.trait_group_id=".$group."
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id 
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i 
+				on _a.periodical_id = _i.id 
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id=".$project." 
+				and _ttr.taxon_id=".$taxon
+		);
+		
+		foreach((array)$l as $key=>$val)
+		{
+			$authors=$this->models->Literature2Authors->freeQuery("
+				select
+					_a.actor_id, _b.name
+	
+				from %PRE%literature2_authors _a
+	
+				left join %PRE%actors _b
+					on _a.actor_id = _b.id 
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$project."
+					and _a.literature2_id =".$val['id']."
+				order by _b.name
+			");
+		
+			$l[$key]['authors']=$authors;
+			
+		}
+		
+		return $l;
+
+	}
+
 
 }
 
