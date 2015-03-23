@@ -38,14 +38,16 @@
         {/foreach}
 		</table>
 
+		{if $content.result.references}
+        <br />
+        Referentie{if $content.result.references|@count>1}s{/if}:
 		<table class="exotica">
         {foreach from=$content.result.references item=v}
 			<tr>
-				<td></td>
-                <td>{$v.label}</td>
+                <td><a href="../literature2/reference.php?id={$v.id}">{$v.label}</a></td>
 			</tr>
         {/foreach}
-       
+		{/if}
         </table>
 
 
