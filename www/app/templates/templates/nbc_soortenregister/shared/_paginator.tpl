@@ -3,6 +3,8 @@
 
 	<span id="resultcount-header">{aantal}</span>
 
+
+	{assign var=pgnEntityNames value=['resultaat','resultaten']}
 	{assign var=pgnResultCount value=$results.count}
 	{assign var=pgnResultsPerPage value=$results.perpage}
 	{assign var=pgnCurrPage value=$search.page}
@@ -11,6 +13,11 @@
 	{include file="_paginator.tpl"}
 
 *}
+
+{if !pgnEntityNames}
+{assign var=pgnEntityNames value=['resultaat','resultaten']}
+{/if}
+
 {if $pgnResultCount > $pgnResultsPerPage}
 {math equation="ceil(x/y)" assign=pages x=$pgnResultCount y=$pgnResultsPerPage}
 {assign var=buffer value=3}
@@ -55,7 +62,7 @@ $(document).ready(function(){
 		{if $temp>$pgnResultCount}{$pgnResultCount}{else}{$temp}{/if}+
 		' van '+
 		{$pgnResultCount}+
-		({$pgnResultCount}==1 ? ' resultaat' : ' resultaten')
+		({$pgnResultCount}==1 ? ' {$pgnEntityNames[0]}' : ' {$pgnEntityNames[1]}')
 	);
 {literal}
 });

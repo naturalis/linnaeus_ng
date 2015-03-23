@@ -1455,7 +1455,7 @@ class SearchControllerNSR extends SearchController
 		
 		if (!empty($trait_group))
 		{
-			$str=$str.';'.$traits[$trait_group]['name'].'=*;';
+			$str=($str ? $str.';' : '').$traits[$trait_group]['name'].'=*;';
 		}
 
 		return $str;

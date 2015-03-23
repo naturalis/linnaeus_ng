@@ -49,6 +49,21 @@ label.clickable:hover {
 	border-right: 5px solid transparent;
 	border-top: 10px solid black;
 }
+
+.selectable-parameters {
+	padding:0 8px 0 8px;
+	background-color:#ffe999;
+	margin-bottom:10px;
+}
+.selected-parameters {
+	margin:10px 0 0 -8px;
+	-border-top:1px dashed #ddd;
+	-border-bottom:1px dashed #ddd;
+	padding:5px 6px 10px 10px;
+	background-color:#fffbbb;
+}
+
+
 </style>
                 
 <script>
@@ -167,6 +182,8 @@ function printParameters()
 	}
 
 	$('#remove-all').toggle(search_parameters.length>0 || getTraitGroup()!=null);
+	$('.selected-parameters').toggle(search_parameters.length>0 || getTraitGroup()!=null);
+	 
 
 }
 
@@ -352,7 +369,7 @@ function submitSearchParams()
 				</div>*}
 			</fieldset>
 
-			<fieldset>
+			<fieldset class="selectable-parameters">
 
 				<div class="formrow">
 				<div style="float:right;margin-top:3px;">
@@ -526,7 +543,7 @@ function submitSearchParams()
 				</div>
 				{/foreach}
 
-				<div class="formrow" style="margin:10px 0 10px 0;border-top:1px dashed #ddd;border-bottom:1px dashed #ddd;padding:5px 0 10px 0">
+				<div class="formrow selected-parameters" style="display:none">
 					<strong>{t}Geselecteerde kenmerken{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
                     	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
@@ -548,7 +565,7 @@ function submitSearchParams()
 
 		<div id="results"> 
             <h4><span id="resultcount-header">{$results.count}</span>
-            {if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
+            {* if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if *}
             </h4>
 
             <div class="formrow" style="margin-bottom:15px">
@@ -573,6 +590,8 @@ function submitSearchParams()
         
  		</form>
 
+
+		{assign var=pgnEntityNames value=['soorten (of onderliggend taxon)','soorten (en onderliggende taxa)']}
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
 		{assign var=pgnCurrPage value=$search.page}

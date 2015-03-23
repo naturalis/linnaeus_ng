@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/TraitsDataController.php');
+require_once ('../../../../configuration/admin/controllers/TraitsTaxonController.php');
 
-$c = new TraitsDataController();
+$c = new TraitsTaxonController();
 
 $c->taxonAction();
