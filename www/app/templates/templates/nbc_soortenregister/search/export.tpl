@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-Resultaten 1-{$results.count} van {$results.count}{if $searchHR} voor '{$searchHR}'{/if}
+Resultaten 1-{$results.count} van {$results.count}{if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
+
 <table>
 <tr>
 	<td><b>wetenschappelijke naam</b></td>

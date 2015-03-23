@@ -1,8 +1,8 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/TraitsController.php');
+require_once ('../../../../configuration/admin/controllers/TraitsTraitsController.php');
 
-$c = new TraitsController();
+$c = new TraitsTraitsController();
 
 $c->traitgroupAction();
 
