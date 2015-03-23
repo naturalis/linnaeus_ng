@@ -75,7 +75,7 @@ function addSearchParameter(id)
 {
 	
 	if (!id) return;
-
+	
 	var ele=$('#'+id);
 	var tagtype=ele.prop('tagName');
 	var varlabel=$('label[for='+id+']').text().trim();	
@@ -96,14 +96,6 @@ function addSearchParameter(id)
 		valueid=$('#'+id+' :selected').val();
 		if (valueid) value='on';
 		valuetext=$('#'+id+' :selected').text().trim();
-
-		if (valueid.indexOf(':')!=-1)
-		{
-			var d=valueid.split(':');
-			valueid=d[0];
-			value=d[1];
-		}
-
 	}
 	else
 	if (tagtype=='INPUT')
@@ -127,7 +119,7 @@ function addSearchParameter(id)
 			operatorlabel=$(':selected','#operator-'+id.replace('trait-','')).text();
 		}
 	}
-
+	
 	if (!value || value.length==0)
 	{
 		return;
@@ -158,6 +150,7 @@ function addSearchParameter(id)
 	} );
 	
 	printParameters();
+
 	submitSearchParams();
 }
 
@@ -423,7 +416,7 @@ function submitSearchParams()
 					</p>
 				</div>
 
-				<!-- div class="formrow">
+				<div class="formrow">
                 	<label
                     	for="multimedia-options" 
                         panel="multimedia-options-panel"
@@ -443,58 +436,8 @@ function submitSearchParams()
                         </select>
                         <input type="button" value=" > " onclick="addSearchParameter('multimedia-options');" />
                     </p>
-				</div -->
-
-
-				<div class="formrow">
-                	<label
-                    	for="multimedia-options" 
-                        panel="multimedia-options-panel"
-                        class="clickable" 
-                        onmouseover="hover_panel_toggle(this);"
-                        onmouseout="hover_panel_toggle(this,true);"
-                        onclick="toggle_panel(this);">
-						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
-	                    <strong>{t}Multimedia{/t}</strong>
-                    </label>
-                    <table class="options-panel" id="multimedia-options-panel" style="display:none">
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-images">Foto('s)</label></td>
-                            <td>
-                                <select id="multimedia-images" style="width:250px;">
-                                    <option value="">maak een keuze</option>
-                                    <option value="images_on">met foto('s)</option>
-                                    <option value="images_off">zonder foto's</option>
-                                </select>
-                                <input type="button" value=" > " onclick="addSearchParameter('multimedia-images');" />
-							</td>
-						</tr>
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-distribution">Verspreidingskaart(en)</label></td>
-                            <td>
-                                <select id="multimedia-distribution" style="width:250px;">
-                                    <option value="">maak een keuze</option>
-                                    <option value="distribution_on">met verspreidingskaart(en)</option>
-                                    <option value="distribution_off">zonder verspreidingskaarten</option>
-                                </select>
-                                <input type="button" value=" > " onclick="addSearchParameter('multimedia-distribution');" />
-							</td>
-						</tr>
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-trend">Trendgrafiek</label></td>
-                            <td>
-                                <select id="multimedia-trend" style="width:250px;">
-                                    <option value="">maak een keuze</option>
-                                    <option value="trend_on">met trendgrafiek</option>
-                                    <option value="trend_off">zonder trendgrafiek</option>
-                                </select>
-                                <input type="button" value=" > " onclick="addSearchParameter('multimedia-trend');" />
-							</td>
-						</tr>
-					</table>
 				</div>
-                        
-                        
+
 				<div class="formrow">
                 	<label 
                     	for="dna-options"
@@ -679,21 +622,8 @@ $(document).ready(function()
 	{else if $k=='dna' || $k=='dna_insuff'}
 	$("#dna-options").val('{$k}');
 	addSearchParameter('dna-options');
-	{else if $k=='images_on' || $k=='images_off'}
-	$("#multimedia-images").val('{$k}');
-	addSearchParameter('multimedia-images');
-	{else if $k=='distribution_on' || $k=='distribution_off'}
-	$("#multimedia-distribution").val('{$k}');
-	addSearchParameter('multimedia-distribution');
-	{else if $k=='trend_on' || $k=='trend_off'}
-	$("#multimedia-trend").val('{$k}');
-	addSearchParameter('multimedia-trend');
 	{/if}
 	{/foreach}
-	
-
-	
-	
 	
 	{if $search.traits}
 
