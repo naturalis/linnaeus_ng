@@ -53,6 +53,42 @@ function isArray(obj) {
 
 }
 
+/*
+	usage:
+	var example_template = "<div><span>%TITLE%</span>%CONTENT%</div>";
+	var example_object = {
+		TITLE: "this is the title",
+		CONTENT: "<p>some content</p>"
+	};
+	var html = templateReplace( example_template , example_object	);
+*/
+
+function templateReplace(str_template, obj_replace)
+{
+	$.each(obj_replace, function(find, str_replace) {
+		str_template = str_template.replace(RegExp("\\%" + find + "\\%","gi"),str_replace );
+	});
+
+	return str_template;
+}
+
+
+function prettyDialog(p)
+{
+	var b=[{ text: p.closetext ? p.closetext : _('Close'), click:function() { $( this ).dialog( "close" ); } }];
+	if (p.buttons) b=p.buttons;
+	
+	$( "#dialog-message-body-content" ).html(p.content);
+	$( "#dialog-message" ).dialog({
+		modal: true,
+		title: p.title,
+		height:600,
+		width:500,
+		buttons: b
+	});
+};
+
+
 var allShouldTranslate = true;
 var allTranslations = Array();
 
@@ -399,17 +435,15 @@ function showDialog(title,content) {
 	});
 
 }
-function allCreateButton(label,action,id,fixedHeight) {
-	
+function allCreateButton(label,action,id,fixedHeight)
+{
 	//<script> allCreateButton('click me!','window.open(\'char.php?id=\'+$(\'#characteristics\').val(),\'_self\');',500); </script>
-
 	document.write('<div class="all-fake-button" '+(fixedHeight ? 'style="height:'+fixedHeight+'px;"' : '' )+' '+(id ? 'id="'+id+'"' : '' )+' onmousedown="$(this).addClass(\'all-fake-button-shift\')"  onmouseup="$(this).removeClass(\'all-fake-button-shift\')"" onclick="'+action+'">'+label+'</div>');
-	
 }
 
 
-function prettyPhotoInit() {
-
+function prettyPhotoInit()
+{
  	$("a[rel^='prettyPhoto']").prettyPhoto({
 		allow_resize:true,
 		animation_speed:50,
@@ -418,10 +452,10 @@ function prettyPhotoInit() {
  		overlay_gallery: false,
  		social_tools: false
  	});
-
 }
 
-function allSaveDragOrder(form,vari) {
+function allSaveDragOrder(form,vari)
+{
 	/*
 		usage:
 
@@ -445,8 +479,8 @@ function allSaveDragOrder(form,vari) {
 	$('#'+form).submit();
 }
 
-function allInitDragtable(functionOnDrop) {
-
+function allInitDragtable(functionOnDrop)
+{
 	var fixHelper = function(e, ui) {
 		ui.children().each(function() {
 			$(this).width($(this).width());
@@ -465,29 +499,28 @@ function allInitDragtable(functionOnDrop) {
 			}
 		});
 	}
-	
+
 }
 
 
-function allSetSomething(name,value) {
-
+function allSetSomething(name,value)
+{
 	$.ajax({
 		type: "POST",
 		async: false,
 		url: "../utilities/ajax_interface.php",
 		data: ({name: name, value: value, action: 'set_something'})
 	}).success();
-
 }
 
-function allGetSomething(name,callback) {
+function allGetSomething(name,callback)
+{
 	$.ajax({
 		type: "POST",
 		async: false,
 		url: "../utilities/ajax_interface.php",
 		data: ({name: name, action: 'get_something'})
 	}).success(function(data){callback($.parseJSON(data));});
-	
 }
 
 function allStickElementUnderElement(ele1,ele2,resize)
@@ -510,3 +543,9 @@ function allStickElementUnderElement(ele1,ele2,resize)
 	}
 	
 }
+
+
+$(document).ready(function()
+{
+	$('<div id="dialog-message" title="title" style="display:none"><div id="dialog-message-body-content"></div></div>').appendTo('body');
+});

@@ -1,18 +1,3 @@
-function prettyDialog(p)
-{
-	$( "#dialog-message-body-content" ).html(p.content);
-	$( "#dialog-message" ).dialog({
-		modal: true,
-		title: p.title,
-		height:600,
-		width:500,
-		buttons: [{
-			text: p.closetext ? p.closetext : _('Close'),
-			click:function() { $( this ).dialog( "close" ); }
-		}]
-	});
-};
-
 var dataid=null;
 var nameownerid=null;
 var taxonrank=null;
@@ -706,9 +691,3 @@ function checkprefnameavail()
 		$('#nametype-'+preferrednameid).removeAttr('disabled');
 	}
 }
-
-
-$(document).ready(function()
-{
-	$('<div id="dialog-message" title="title" style="display:none"><div id="dialog-message-body-content"></div></div>').appendTo('body');
-});

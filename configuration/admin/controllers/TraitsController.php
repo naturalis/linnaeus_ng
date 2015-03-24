@@ -129,12 +129,11 @@ class TraitsController extends Controller
 		
 		$r=$d[0];
 
-
-		$r['names']= $this->getTextTranslations(array('text_id'=>$r['name_tid']));
-		$r['descriptions']= $this->getTextTranslations(array('text_id'=>$r['description_tid']));
-		$r['groups']=$this->getTraitgroups(array('parent'=>$r['id'],'level'=>0,'stop_level'=>0));
-		$r['traits']=$this->getTraitgroupTraits($r['id']);
-		$r['parent']=$this->getTraitgroup($r['parent_id']);
+		if (isset($r['name_tid'])) $r['names']=$this->getTextTranslations(array('text_id'=>$r['name_tid']));
+		if (isset($r['description_tid'])) $r['descriptions']=$this->getTextTranslations(array('text_id'=>$r['description_tid']));
+		if (isset($r['id'])) $r['groups']=$this->getTraitgroups(array('parent'=>$r['id'],'level'=>0,'stop_level'=>0));
+		if (isset($r['id'])) $r['traits']=$this->getTraitgroupTraits($r['id']);
+		if (isset($r['parent_id'])) $r['parent']=$this->getTraitgroup($r['parent_id']);
 
 		return $r;
 	}
@@ -248,15 +247,17 @@ class TraitsController extends Controller
 				_a.project_id=". $this->getCurrentProjectId()."
 				and _a.trait_group_id=".$group."
 			group by _a.id
-			order by _a.show_order
+			order by _a.show_order,_a.sysname
 		");
 
 		return $r;
 	}
 
-	public function getTraitgroupTrait($id)
+	public function getTraitgroupTrait($p)
 	{
-		if (empty($id)) return;
+		$trait=isset($p['trait']) ? $p['trait'] : null;
+
+		if (empty($trait)) return;
 		
 		$r=$this->models->TraitsTraits->freeQuery("
 			select
@@ -284,7 +285,7 @@ class TraitsController extends Controller
 
 			where
 				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.id=".$id."
+				and _a.id=".$trait."
 		");
 
 		$r = isset($r[0]) ? $r[0] : null;
@@ -296,7 +297,7 @@ class TraitsController extends Controller
 				$r['max_length']=round($r['max_length'],0,PHP_ROUND_HALF_DOWN);
 			}
 
-			$r['values']=$this->getTraitgroupTraitValues(array('trait'=>$id));
+			$r['values']=$this->getTraitgroupTraitValues($p);
 
 			$r['language_labels']=
 				array(
@@ -386,7 +387,6 @@ class TraitsController extends Controller
 		return $r;
 
 	}
-
 
 	public function getTextTranslations($p)
 	{
@@ -688,21 +688,11 @@ class TraitsController extends Controller
 	}
 
 
+
 	public function formatDbDate($date,$format)
 	{
 		return is_null($date) ? null : date_format(date_create($date),$format);
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

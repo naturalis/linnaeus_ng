@@ -87,7 +87,7 @@ function hash(a)
 	var b='';
 	for (var i=0;i<valuelist.length;i++)
 	{
-		b+=valuelist[i].id+valuelist[i].value+valuelist[i].labels.join("\t")+"\t";
+		b+=valuelist[i].id+valuelist[i].value+(valuelist[i].labels ? valuelist[i].labels.join("\t") : '')+"\t";
 	}
 	return b;
 }

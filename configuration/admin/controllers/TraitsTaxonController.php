@@ -49,22 +49,105 @@ class TraitsTaxonController extends TraitsController
     private function initialise()
     {
     }
+	
+	private function saveTaxonTraitData($p)
+	{
+		$project=$this->getCurrentProjectId();
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		$trait=isset($p['trait']) ? $p['trait'] : null;
+		$values=isset($p['values']) ? $p['values'] : null;
+
+		if (empty($project)||empty($taxon)||empty($trait))
+		{
+			return;
+		}
+
+		$existing=$this->getTaxonValues(array('taxon'=>$taxon,'trait'=>$trait));
+
+		if (isset($existing[0]['values']))
+		{
+			$delete=[];
+			foreach((array)$existing[0]['values'] as $key=>$val)
+			{
+				$exists=false;
+				foreach((array)$values as $newvalue)
+				{
+					if ($newvalue['id']!=-1 && $newvalue['id']==$val['id'])
+					{
+						$exists=true;
+					}
+				}
+				if (!$exists)
+				{
+					$delete[]=$val['id'];
+				}
+			}
+			
+			foreach((array)$delete as $val)
+			{
+				$this->models->TraitsTaxonValues->delete(array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'id'=>$val
+				));
+			}
+		}
+		
+		foreach((array)$values as $val)
+		{
+			if ($val['id']!=-1) continue;
+
+			$this->models->TraitsTaxonValues->save(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$taxon,
+				'value_id'=>$val['value_id']
+			));
+		}		
+	}
 
     public function taxonAction()
     {
 		$this->checkAuthorisation();
-//        $this->setPageName($this->translate('Data saved'));
+		$this->setPageName($this->translate('Taxon trait data'));
 		
-		if ($this->rHasVal('id') && $this->rHasVal('group'))
+		if ($this->rHasVal('action','save') && $this->rHasId() && $this->rHasVal('group'))
+		{
+			$this->saveTaxonTraitData(array(
+				'taxon'=>$this->rGetId(),
+				'trait'=>$this->rGetVal('trait'),
+				'values'=>$this->rHasVal('values') ? array_map(function($a){ return json_decode(urldecode($a),true); },$this->requestData['values']) : null
+			));
+			$this->addMessage('Saved');
+		}
+		
+		if ($this->rHasId('id') && $this->rHasVal('group'))
 		{
 			$this->smarty->assign('group',$this->getTraitgroup($this->rGetVal('group')));
 			$this->smarty->assign('traits',$this->getTraitgroupTraits($this->rGetVal('group')));
 			$this->smarty->assign('concept',$this->getTaxonById($this->rGetId()));
-			$this->smarty->assign('values',$this->getTaxonValues(array('taxon'=>$this->rGetVal('id'),'group'=>$this->rGetVal('group'))));
+			$this->smarty->assign('values',$this->getTaxonValues(array('taxon'=>$this->rGetId(),'group'=>$this->rGetVal('group'))));
 		}
 
 		$this->printPage();
     }
+
+    public function ajaxInterfaceAction()
+    {
+		$this->checkAuthorisation();
+
+		if ($this->rHasVal('action','get_taxon_trait'))
+		{
+			$d=$this->getTaxonValues($this->requestData);
+
+			$this->smarty->assign('returnText',json_encode(array(
+				'trait'=>$this->getTraitgroupTrait($this->requestData),
+				'taxon_values'=>isset($d[0]) ? $d[0] : null,
+			)));
+		}
+
+		$this->printPage('ajax_interface');
+    }
+
+
 
 
     private function getTaxonValues($p)
@@ -72,11 +155,11 @@ class TraitsTaxonController extends TraitsController
 		$project=$this->getCurrentProjectId();
 		$language=$this->getDefaultProjectLanguage();
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
-		$group=isset($p['group']) ? $p['group'] : null;
+		$trait=isset($p['trait']) ? $p['trait'] : null;
 
 		$data=array();
 
-		if (empty($project)||empty($taxon)||empty($group)||empty($language))
+		if (empty($project)||empty($taxon)||empty($language))
 		{
 			return;
 		}
@@ -85,6 +168,8 @@ class TraitsTaxonController extends TraitsController
 			select * from (
 			
 				select
+					_a.id,
+					_b.id as value_id,
 					_b.trait_id,
 					_c.sysname as trait_sysname,
 					if(length(ifnull(_t1.translation,''))=0,_c.sysname,_t1.translation) as trait_name,
@@ -163,6 +248,8 @@ class TraitsTaxonController extends TraitsController
 				union
 			
 				select
+					_a.id,
+					null as value_id,
 					_a.trait_id,
 					_c.sysname as trait_sysname,
 					if(length(ifnull(_t1.translation,''))=0,_c.sysname,_t1.translation) as trait_name,
@@ -226,12 +313,13 @@ class TraitsTaxonController extends TraitsController
 					and _a.taxon_id=".$taxon."
 			
 			) as unionized
+			".( $trait ? "where trait_id =".$trait : "" )."
 			order by _show_order_1,_show_order_2
 		");
 	
 		$d=array();
 		
-		foreach($r as $key=>$val)
+		foreach((array)$r as $key=>$val)
 		{
 			$d[$val['trait_id']]['trait']=
 				array(
@@ -250,6 +338,8 @@ class TraitsTaxonController extends TraitsController
 
 			$d[$val['trait_id']]['values'][]=
 				array(
+					'id'=>$val['id'],
+					'value_id'=>$val['value_id'],
 					'value_start'=>$val['value_start'],
 					'value_end'=>$val['value_end'],
 				);
@@ -259,7 +349,7 @@ class TraitsTaxonController extends TraitsController
 		{
 			$data[]=$val;
 		}
-		
+
 		return $data;
 
 	}
