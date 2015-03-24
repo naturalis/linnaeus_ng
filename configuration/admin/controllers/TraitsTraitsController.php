@@ -175,7 +175,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasId())
 		{
-			$trait=$this->getTraitgroupTrait($this->rGetId());
+			$trait=$this->getTraitgroupTrait(array('trait'=>$this->rGetId()));
 			$group=$this->getTraitgroup($trait['trait_group_id']);
 		}
 		else
@@ -195,7 +195,7 @@ class TraitsTraitsController extends TraitsController
 				if ($this->rHasId())
 				{
 					$this->addMessage('Data saved.');
-					$trait=$this->getTraitgroupTrait($this->rGetId());
+					$trait=$this->getTraitgroupTrait(array('trait'=>$this->rGetId()));
 				}
 				else
 				{
@@ -206,7 +206,7 @@ class TraitsTraitsController extends TraitsController
 			else
 			{
 				$this->helpers->SessionMessages->setMessage('Saving trait failed.');
-				$trait=$this->getTraitgroupTrait($this->rGetId());
+				$trait=$this->getTraitgroupTrait(array('trait'=>$this->rGetId()));
 			}
 			
 		}
@@ -243,7 +243,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVar('trait'))
 		{
-			$trait=$this->getTraitgroupTrait($this->rGetVal('trait'));
+			$trait=$this->getTraitgroupTrait(array('trait'=>$this->rGetVal('trait')));
 			$group=$this->getTraitgroup($trait['trait_group_id']);
 		}
 
@@ -276,9 +276,10 @@ class TraitsTraitsController extends TraitsController
 				$r=$this->verifyDate($this->rGetVal('date'),$this->rGetVal('format'));
 			}
 
+			$this->smarty->assign('returnText',json_encode($r));
+
 		}
 		
-		$this->smarty->assign('returnText',json_encode($r));
 		$this->printPage();
     }
 	
@@ -656,7 +657,7 @@ class TraitsTraitsController extends TraitsController
 		if (empty($id))
 			return false;
 		
-		$g=$this->getTraitgroupTrait($id);
+		$g=$this->getTraitgroupTrait(array('trait'=>$id));
 		
 		$this->models->TextTranslations->delete(array(
 			'project_id'=>$this->getCurrentProjectId(),
@@ -693,7 +694,7 @@ class TraitsTraitsController extends TraitsController
 			return;
 		}
 		
-		$trait=$this->getTraitgroupTrait($trait);
+		$trait=$this->getTraitgroupTrait($p);
 
 		$base=
 			array(

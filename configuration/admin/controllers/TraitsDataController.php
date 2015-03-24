@@ -576,7 +576,7 @@ $this->setJoinrows(null);
 			
 			if (isset($line['trait']['id']))
 			{
-				$trait=$this->getTraitgroupTrait($line['trait']['id']);
+				$trait=$this->getTraitgroupTrait(array('trait'=>$line['trait']['id']));
 
 				$func=array($this,$trait['type_verification_function_name']);
 				
@@ -790,7 +790,7 @@ $this->setJoinrows(null);
 						{
 							if (!empty($line['cells'][$c]))
 							{
-								$trait=$this->getTraitgroupTrait($line['trait']['id']);
+								$trait=$this->getTraitgroupTrait(array('trait'=>$line['trait']['id']));
 								$func=array($this,$trait['type_verification_function_name']);
 								$value=$line['cells'][$c];
 								

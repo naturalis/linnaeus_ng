@@ -211,7 +211,7 @@ class TraitsController extends Controller
 	
 		$d=array();
 		
-		foreach($r as $key=>$val)
+		foreach((array)$r as $key=>$val)
 		{
 			$d[$val['trait_id']]['trait']=
 				array(
