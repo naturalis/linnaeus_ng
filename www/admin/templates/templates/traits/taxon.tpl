@@ -2,11 +2,27 @@
 
 <script>
 
+var data=true;
 var can_select_multiple=true;
 var can_be_null=true;
 var concept=null;
 var group=null;
 var trait=null;
+var traittype=null;
+var traitname=null;
+var currentvalues=[];
+var currentselection=[];
+var oldvalue=null;
+
+function setData( d )
+{
+	data=d;
+}
+
+function getData()
+{
+	return data;
+}
 
 function setConcept( id )
 {
@@ -23,141 +39,269 @@ function setTrait( id )
 	trait=id;
 }
 
-function addTaxonTrait( caller )
+function setTraitType( type )
 {
-	try {
-		var newdata=$.parseJSON( $( caller ).attr( 'data' ) );
-		var exists=false;
-		$( '.selected-values' ).each(function()
+	traittype=type;
+}
+
+function getTraitType()
+{
+	return traittype;
+}
+
+function setTraitName( name )
+{
+	traitname=name;
+}
+
+function getTraitName()
+{
+	return traitname;
+}
+
+function setCanSelectMultiple( state )
+{
+	can_select_multiple=state;
+}
+
+function getCanSelectMultiple()
+{
+	return can_select_multiple;
+}
+
+function setCanBeNull( state )
+{
+	can_be_null=state;
+}
+
+function getCanBeNull()
+{
+	return can_be_null;
+}
+
+function setOldValue( value )
+{
+	oldvalue=value;
+}
+
+function getOldValue()
+{
+	return oldvalue;
+}
+
+
+function listTraitRemove( caller )
+{
+	if (currentselection.length<=1 && !getCanBeNull()) return;
+
+	var id=$( caller ).attr( 'data' );
+
+	for(var i=0;i<currentselection.length;i++)
+	{
+		if( currentselection[i].id==id )
 		{
-			var data=$.parseJSON( $(this).attr( 'data' ) );
-			if (data.value_id==newdata.id) exists=true;
-		});
-		
-		if (!exists)
-		{
-			if ($( '.selected-values' ).length>0 && !can_select_multiple)
-			{
-				$( '.selected-values' ).each(function()
-				{
-					$( this ).parent().remove();
-				});
-			}
-			$( '#selection-list' ).append($(templateReplace( $( "#stringlist_template_two" ).html() , { VALUE_START : newdata.label, ID : -1, VALUE_ID : newdata.id })));
+			currentselection.splice(i,1);
+			break;
 		}
 	}
-	catch (err) {}
-}
 
-function removeTaxonTrait( caller )
-{
-	if ($( '.selected-values' ).length<=1 && !can_be_null) return;
-	$( caller ).parent().remove();
-}
-
-function saveTaxonTrait()
-{
-	var form=$( '<form method="POST"></form>');
-	form.append( '<input type="hidden" name="action" value="save" />' );
-	form.append( '<input type="hidden" name="id" value="'+concept+'" />' );
-	form.append( '<input type="hidden" name="group" value="'+group+'" />' );
-	form.append( '<input type="hidden" name="trait" value="'+trait+'" />' );
-
-	$( '.selected-values' ).each(function()
+	if ( getTraitType()=='stringlist' )
 	{
-		form.append( '<input type="hidden" name="values[]" value="'+encodeURIComponent($(this).attr( 'data' ))+'" />' );
-	});
-
-	$('body').append(form);
-	form.submit();
+		$( "#dialog-message-body-content" ).html( __stringlist() );
+	}
 }
 
-function __stringlist( data )
+function listTraitAdd( caller )
 {
-	var selected=$('<p>');
+	var newid=$( caller ).attr( 'data' );
 
-	if ( data.taxon_values && data.taxon_values.values ) 
+	for(var i=0;i<currentselection.length;i++)
 	{
-		for( var i=0;i<data.taxon_values.values.length;i++ )
+		if( currentselection[i].id==newid ) return;
+	}
+	
+	if ( currentselection.length>0 && !getCanSelectMultiple() )
+	{
+		currentselection.splice(0,currentselection.length);
+	}
+
+	for(var i=0;i<currentvalues.length;i++)
+	{
+		if( currentvalues[i].id==newid )
 		{
-			selected.append( $(templateReplace( $( "#stringlist_template_two" ).html() , data.taxon_values.values[i] )));
+			currentselection.push( { id:currentvalues[i].id, value:currentvalues[i].value } );
+		}
+	}
+
+	if ( getTraitType()=='stringlist' )
+	{
+		$( "#dialog-message-body-content" ).html( __stringlist() );
+	}
+}
+
+function __stringlist()
+{
+	var dummy=[];
+	var selected=$('<p>');
+	if (currentselection)
+	{
+		for( var i=0;i<currentselection.length;i++ )
+		{
+			selected.append( $(templateReplace( $( "#stringlist_template_two" ).html() , currentselection[i] )));
+			dummy.push( currentselection[i].id );
 		}
 	}
 	
 	var values=$('<p>');
-
-	for( var i=0;i<data.trait.values.length;i++ )
+	for( var i=0;i<currentvalues.length;i++ )
 	{
-		values.append( $(templateReplace( $( "#stringlist_template_three" ).html() , data.trait.values[i] )));
+		if( dummy.indexOf( currentvalues[i].id )!=-1) continue;
+		values.append( $(templateReplace( $( "#stringlist_template_three" ).html() , currentvalues[i] )));
 	}
 	
 	return templateReplace( $( "#stringlist_template_one" ).html() , { SELECTED : selected.html(), VALUES : values.html() } );
 }
 
-
-function __stringfree( data )
+function __stringfree()
 {
+	setOldValue( currentselection[0] && currentselection[0].value ? currentselection[0].value : '' );
+	var selected=$('<p>').append( $(templateReplace( $( "#stringfree_template_two" ).html() , ( currentselection[0] ? currentselection[0] : { value: ''} ))));
+	return templateReplace( $( "#stringfree_template_one" ).html() , { SELECTED : selected.html() } );
+}
 
-	console.dir( data );
+function taxonTraitFormInit( data )
+{
+	setData( data );
+	setTrait( data.trait.id );
+	setTraitType( data.trait.type_sysname );
+	setTraitName( data.trait.sysname );
+	setCanSelectMultiple( data.trait.can_select_multiple==1 );
+	setCanBeNull( data.trait.can_be_null==1 );
+}
 
-	var selected=$('<p>');
+function taxonTraitForm(  )
+{
+	var d=getData();
 
-	if ( data.taxon_values && data.taxon_values.values ) 
+	currentselection.splice(0,currentselection.length);
+	currentvalues.splice(0,currentvalues.length);
+	
+	if ( getTraitType()=='stringlist' || getTraitType()=='stringfree' )
 	{
-		for( var i=0;i<data.taxon_values.values.length;i++ )
+		if ( d.taxon_values && d.taxon_values.values )
 		{
-//			selected.append( $(templateReplace( $( "#stringfree_template" ).html() , data.taxon_values.values[i] )));
+			for(var i=0;i<d.taxon_values.values.length;i++)
+			{
+				currentselection.push({
+					id:d.taxon_values.values[i].value_id,
+					value:d.taxon_values.values[i].value_start
+				});
+			}
+		}
+
+		if ( d.trait.values )
+		{
+			for(var i=0;i<d.trait.values.length;i++)
+			{
+				currentvalues.push({
+					id:d.trait.values[i].id,
+					value:d.trait.values[i].string_value
+				});
+			}
+		}
+	}
+
+
+	if ( getTraitType()=='stringlist' )
+	{
+		return __stringlist();
+	}
+	if ( getTraitType()=='stringfree' )
+	{
+		return __stringfree();
+	}
+}
+
+
+function hasChanged()
+{
+	if ( getTraitType()=='stringfree' )
+	{
+		var newvalue='';
+		$('textarea[name*=values]').each(function()
+		{
+			newvalue+=$(this).val();
+		});
+		
+		return getOldValue()!=newvalue;
+	}	
+	
+	return true;
+}
+
+
+function saveTaxonTrait()
+{
+	if (!hasChanged())
+	{
+		$( "#dialog-message" ).dialog( "close" );
+		return;
+	}
+
+	var form=$( '<form method="POST"></form>');
+	form.append( '<input type="hidden" name="action" value="save" />' );
+
+//<input type="hidden" name="rnd" value="{$rnd}" />
+
+	form.append( '<input type="hidden" name="id" value="'+concept+'" />' );
+	form.append( '<input type="hidden" name="group" value="'+group+'" />' );
+	form.append( '<input type="hidden" name="trait" value="'+trait+'" />' );
+
+	if ( getTraitType()=='stringfree' )
+	{
+		$('textarea[name*=values]').each(function()
+		{
+			form.append( '<input type="hidden" name="values[]" value="'+ $(this).val() +'" />' );
+		});
+	}	
+	else
+	{
+		for(var i=0;i<currentselection.length;i++)
+		{
+			form.append( '<input type="hidden" name="values[]" value="'+ currentselection[i].id +'" />' );
 		}
 	}
 	
-//	return templateReplace( $( "#stringlist_template_one" ).html() , { SELECTED : selected.html(), VALUES : values.html() } );
+	$('body').append(form);
+	form.submit();
 }
 
-
-function taxonTraitForm( data )
+function editTaxonTrait( d )
 {
-	setTrait( data.trait.id );
-	can_select_multiple=(data.trait.can_select_multiple==1);
-	can_be_null=(data.trait.can_be_null==1);
-	
-	if ( data.trait.type_sysname=='stringlist' )
-	{
-		return __stringlist( data );
-	}
-	if ( data.trait.type_sysname=='stringfree' )
-	{
-		return __stringfree( data );
-	}
-	
-
-	
-
-
-}
-
-function editTaxonTrait( data )
-{
-	data.time=allGetTimestamp();
-	data.action='get_taxon_trait';
+	d.time=allGetTimestamp();
+	d.action='get_taxon_trait';
 
 	$.ajax({
 		url: "ajax_taxon.php",
-		data: data,
-		success : function ( data )
+		data: d,
+		success : function ( d )
 		{
+			taxonTraitFormInit( $.parseJSON( d ) );
 			prettyDialog(
 			{ 
-				title : "Edit", 
-				content : taxonTraitForm($.parseJSON(data)) , 
+				title : getTraitName() , 
+				content : taxonTraitForm() , 
 				buttons :
 				{
 					"save" : { text:'Save', click:function() { saveTaxonTrait(); } },
 					"cancel" : { text:'Cancel', click:function() { $( this ).dialog( "close" ); } } }
 				}
 			);
-
-			$( "#dialog-message-body-content" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
 		}
+	}).done(function()
+	{
+		$( "#dialog-message-body-content" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
+		$( ".__stringfree" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
 	});
 }
 
@@ -196,9 +340,7 @@ function editTaxonTrait( data )
             <!--
             
               ["max_length"]=>
-              ["can_select_multiple"]=>
               ["can_include_comment"]=>
-              ["can_be_null"]=>
               ["can_have_range"]=>
               ["date_format_format_hr"]=>
             
@@ -231,13 +373,23 @@ function editTaxonTrait( data )
             </tr>
             {/foreach}
         </table>
+        
+        <p>
+        	references:
+        	<ul>
+                {foreach from=$references item=v}
+                <li>{$v.label}</li>
+                {/foreach}
+			</ul>        
+        </p>
+        
+        
     </p>
 
 {/if}
 </div>
 
 {include file="../shared/admin-messages.tpl"}
-
 <script id="stringlist_template_one" language="text">
 <table style="width:100%">
 	<tr>
@@ -255,12 +407,26 @@ function editTaxonTrait( data )
 </script>
 
 <script id="stringlist_template_two" language="text">
-<li>%VALUE_START% <a href="#" class="edit selected-values" style="padding:5px" data='{ "id": %ID% , "value_id": %VALUE_ID% }' onclick="removeTaxonTrait( this );return false;">X</a></li>
+<li>%VALUE% <a href="#" class="edit selected-values" style="padding:5px" data="%ID%" onclick="listTraitRemove( this );return false;">X</a></li>
 </script>
 
 <script id="stringlist_template_three" language="text">
-<li>%STRING_VALUE% <a href="#" class="edit" style="padding:5px" data='{ "id": %ID% , "label": "%STRING_VALUE%" }' onclick="addTaxonTrait( this );return false;">&rarr;</a></li>
+<li>%VALUE% <a href="#" class="edit" style="padding:5px" data="%ID%" onclick="listTraitAdd( this );return false;">&rarr;</a></li>
 </script>
+
+
+<script id="stringfree_template_one" language="text">
+<table style="width:100%">
+	<tr>
+		<td>%SELECTED%</td>
+	</tr>
+</table>
+</script>
+
+<script id="stringfree_template_two" language="text">
+<textarea class="__stringfree" style="width:100%;height:350px" name="values[]">%VALUE%</textarea>
+</script>
+
 
 <script>
 $(document).ready(function()
@@ -274,8 +440,8 @@ $(document).ready(function()
 		{
 			try
 			{
-				var data=JSON.parse($(this).attr('data'));
-				editTaxonTrait( data );
+				var d=JSON.parse($(this).attr('data'));
+				editTaxonTrait( d );
 			}
 			catch (err) {
 				console.log( err );
