@@ -163,11 +163,11 @@
 <p>
 <div>
 	<b>Koppelingen</b><br />
-	{if $links.presences|@count==0 && $links.names|@count==0}
+	{if $links.presences|@count==0 && $links.names|@count==0 && $links.traits|@count==0}
 	(geen koppelingen)
 	{/if}
 	{if $links.names|@count > 0}
-	<a href="#" onclick="$('#links-names').toggle();return false;">Gekoppelde namen: {$links.names|@count}</a>
+	<a href="#" onclick="$('#links-names').toggle();return false;">Gekoppelde namen ({$links.names|@count})</a>
 	<div id="links-names" style="display:none">
 		<ul class="small">
 			{foreach from=$links.names item=v}
@@ -178,13 +178,35 @@
 	<br />
 	{/if}
 	{if $links.presences|@count > 0}
-	<a href="#" onclick="$('#links-presences').toggle();return false;">Gekoppelde voorkomensstatussen: {$links.presences|@count}</a>
+	<a href="#" onclick="$('#links-presences').toggle();return false;">Gekoppelde voorkomensstatussen ({$links.presences|@count})</a>
 	<div id="links-presences" style="display:none">
 		<ul class="small">
 			{foreach from=$links.presences item=v}
 			<li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a>, {$v.presence_label}</li>
 			{/foreach}
 		</ul>
+	</div>
+	{/if}
+    <br />
+	{if $links.traits|@count > 0}
+	<a href="#" onclick="$('#links-traits').toggle();return false;">Gekoppelde kenmerken (<span id="trait-total">0</span>)</a>
+	<div id="links-traits" style="display:none">
+    	<ul>
+            {foreach from=$links.traits item=vv key=trait}
+        	<li>
+            	<a href="#" onclick="$('#links-traits-{$trait}').toggle();return false;">{$trait} ({$vv|@count})</a>
+                <ul class="small" id="links-traits-{$trait}" style="display:none">
+                    {foreach from=$vv item=v}
+                    <li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a></li>
+                    {/foreach}
+                </ul>
+			</li>
+            <script>
+			$( '#trait-total' ).html( parseInt($( '#trait-total' ).html())+{$vv|@count} );
+            </script>
+            {/foreach}
+		</ul>
+
 	</div>
 	{/if}
 </div>

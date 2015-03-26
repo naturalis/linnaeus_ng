@@ -35,7 +35,7 @@
 
 	<p>
 		<a href="edit.php">nieuwe literatuurreferentie aanmaken</a><br />
-		<a href="bulk_upload.php">bulk upload</a>
+		<a href="bulk_upload.php">bulk upload & matching</a>
 	</p>
 
 	<p>
