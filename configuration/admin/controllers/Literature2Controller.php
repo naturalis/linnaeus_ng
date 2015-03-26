@@ -438,27 +438,27 @@ class Literature2Controller extends Controller
 	
 			//q($this->requestData,1);
 	
-			$kill=$this->rHasVal('kill') ? $this->rGetVal('kill') : [];
-			$new_author=$this->rHasVal('new_author') ? $this->rGetVal('new_author') : [];
-			$author=$this->rHasVal('author') ? $this->rGetVal('author') : [];
-			$language=$this->rHasVal('language') ? $this->rGetVal('language') : [];
-			$new_publishedin=$this->rHasVal('new_publishedin') ? $this->rGetVal('new_publishedin') : [];
-			$new_publishedin_language=$this->rHasVal('new_publishedin_language') ? $this->rGetVal('new_publishedin_language') : [];
-			$publishedin=$this->rHasVal('publishedin') ? $this->rGetVal('publishedin') : [];
-			$new_periodical=$this->rHasVal('new_periodical') ? $this->rGetVal('new_periodical') : [];
-			$new_periodical_language=$this->rHasVal('new_periodical_language') ? $this->rGetVal('new_periodical_language') : [];
-			$periodical=$this->rHasVal('periodical') ? $this->rGetVal('periodical') : [];
+			$kill=$this->rHasVal('kill') ? $this->rGetVal('kill') : array();
+			$new_author=$this->rHasVal('new_author') ? $this->rGetVal('new_author') : array();
+			$author=$this->rHasVal('author') ? $this->rGetVal('author') : array();
+			$language=$this->rHasVal('language') ? $this->rGetVal('language') : array();
+			$new_publishedin=$this->rHasVal('new_publishedin') ? $this->rGetVal('new_publishedin') : array();
+			$new_publishedin_language=$this->rHasVal('new_publishedin_language') ? $this->rGetVal('new_publishedin_language') : array();
+			$publishedin=$this->rHasVal('publishedin') ? $this->rGetVal('publishedin') : array();
+			$new_periodical=$this->rHasVal('new_periodical') ? $this->rGetVal('new_periodical') : array();
+			$new_periodical_language=$this->rHasVal('new_periodical_language') ? $this->rGetVal('new_periodical_language') : array();
+			$periodical=$this->rHasVal('periodical') ? $this->rGetVal('periodical') : array();
 	
 			$this->setActors();
 			$this->setLiterature();
 	
-			$columns=[];
+			$columns=array();
 	
-			$literature_id_index=[];
+			$literature_id_index=array();
 			$literature_id_index=$match_ref;
 			
-			$prev_created_authors=[];
-			$prev_created_publications=[];
+			$prev_created_authors=array();
+			$prev_created_publications=array();
 	
 			// ontdubbelen kolommen
 			foreach((array)$fields as $key=>$val)
@@ -476,7 +476,7 @@ class Literature2Controller extends Controller
 				// get the current line
 				$line=$lines[$line_number];
 				
-				$line_authors=[];
+				$line_authors=array();
 				$line_publication=null;
 				$line_periodical=null;
 	
@@ -659,7 +659,7 @@ class Literature2Controller extends Controller
 					}
 					else
 					{
-						$f=[];
+						$f=array();
 						foreach((array)$field as $i)
 						{
 							if (empty($line[$i])) continue;
