@@ -1,10 +1,13 @@
 <style>
-.exotica {
+table.exotica {
 	width:510px;	
 	border-collapse:collapse;
 }
-.exotica td {
+table.exotica td {
 	padding:1px 0 1px 0;
+}
+table.exotica td li {
+	list-style-position: inside;
 }
 .legend-cell {
 	width:200px;
@@ -12,6 +15,13 @@
 .last-row {
 	border-bottom:1px solid #eee;
 	padding-bottom:0px;
+}
+ul.exotica {
+	list-style-type: disc;
+	list-style-position: outside;
+}
+ul.exotica li {
+	margin-left:12px;
 }
 </style>
 	<div>
@@ -31,7 +41,7 @@
             {capture "value"}{$l.value_start}{if $l.value_end} - {$l.value_end}{/if}{/capture}
 			<tr>
 				<td class="legend-cell">{if $k==0}{$v.trait.name}{/if}</td>
-                <td>{if $v.values|@count>1}&#149; {/if}{$smarty.capture.value}</td>
+                <td>{if $v.values|@count>1}<li>{/if}{$smarty.capture.value}</li></td>
 			</tr>
             {/foreach}
 			<tr><td class="last-row" colspan="2"></td></tr>
@@ -40,15 +50,13 @@
 
 		{if $content.result.references}
         <br />
-        Referentie{if $content.result.references|@count>1}s{/if}:
-		<table class="exotica">
+        <h4 class="source">Publicatie{if $content.result.references|@count>1}s{/if}</h4>
+		<ul class="exotica">
         {foreach from=$content.result.references item=v}
-			<tr>
-                <td><a href="../literature2/reference.php?id={$v.id}">{$v.label}</a></td>
-			</tr>
+			<li><a href="../literature2/reference.php?id={$v.id}">{$v.label}</a></li>
         {/foreach}
 		{/if}
-        </table>
+        </ul>
 
 
 	</div>

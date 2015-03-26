@@ -5,6 +5,8 @@
 var data=true;
 var can_select_multiple=true;
 var can_be_null=true;
+var can_have_range=true;
+var date_format=null;
 var concept=null;
 var group=null;
 var trait=null;
@@ -77,6 +79,26 @@ function setCanBeNull( state )
 function getCanBeNull()
 {
 	return can_be_null;
+}
+
+function setCanHaveRange( state )
+{
+	can_have_range=state;
+}
+
+function getCanHaveRange()
+{
+	return can_have_range;
+}
+
+function setSetDateFormat( format )
+{
+	date_format=format;
+}
+
+function getSetDateFormat()
+{
+	return date_format;
 }
 
 function setOldValue( value )
@@ -169,6 +191,44 @@ function __stringfree()
 	return templateReplace( $( "#stringfree_template_one" ).html() , { SELECTED : selected.html() } );
 }
 
+function __datefree()
+{
+	var b='';
+	var selected=$('<p>');
+	
+	var df=getSetDateFormat();
+
+	for(var i=0;i<currentselection.length;i++)
+	{
+		var val1='';
+		var val2='';
+		var c=currentselection[i];
+		b+=c.value_start+c.value_end;
+		
+		if (getCanHaveRange() || c.value_end.length!=0)
+		{
+			val2=templateReplace( $( "#datefree_template_one" ).html() ,
+				{ value:c.value_end?c.value_end:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
+		}
+
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:c.value_start, max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
+
+		selected.append( $(templateReplace( $( "#datefree_template_two" ).html() , { value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } )));
+		
+	}
+	setOldValue( b );
+
+//	getCanHaveRange();
+//	getCanSelectMultiple();
+//	getSetDateFormat();
+	
+	console.dir( currentselection );
+	
+
+	return templateReplace( $( "#datefree_template_three" ).html() , { SELECTED : selected.html() } );
+}
+
 function taxonTraitFormInit( data )
 {
 	setData( data );
@@ -177,9 +237,11 @@ function taxonTraitFormInit( data )
 	setTraitName( data.trait.sysname );
 	setCanSelectMultiple( data.trait.can_select_multiple==1 );
 	setCanBeNull( data.trait.can_be_null==1 );
+	setCanHaveRange( data.trait.can_have_range==1 );
+	setSetDateFormat( { format:data.trait.date_format_format,format_hr:data.trait.date_format_format_hr } );
 }
 
-function taxonTraitForm(  )
+function taxonTraitForm()
 {
 	var d=getData();
 
@@ -211,17 +273,36 @@ function taxonTraitForm(  )
 		}
 	}
 
+	if ( getTraitType()=='datefree' )
+	{
+		if ( d.taxon_values && d.taxon_values.values )
+		{
+			for(var i=0;i<d.taxon_values.values.length;i++)
+			{
+				currentselection.push({
+					id:d.taxon_values.values[i].value_id,
+					value_start:d.taxon_values.values[i].value_start,
+					value_end:d.taxon_values.values[i].value_end
+				});
+			}
+		}
+	}
 
 	if ( getTraitType()=='stringlist' )
 	{
 		return __stringlist();
 	}
+	else
 	if ( getTraitType()=='stringfree' )
 	{
 		return __stringfree();
 	}
+	else
+	if ( getTraitType()=='datefree' )
+	{
+		return __datefree();
+	}
 }
-
 
 function hasChanged()
 {
@@ -248,7 +329,7 @@ function saveTaxonTrait()
 		return;
 	}
 
-	var form=$( '<form method="POST"></form>');
+	var form=$( '<form method="POST"></form>' );
 	form.append( '<input type="hidden" name="action" value="save" />' );
 
 //<input type="hidden" name="rnd" value="{$rnd}" />
@@ -416,15 +497,23 @@ function editTaxonTrait( d )
 
 
 <script id="stringfree_template_one" language="text">
-<table style="width:100%">
-	<tr>
-		<td>%SELECTED%</td>
-	</tr>
-</table>
+<table style="width:100%"><tr><td>%SELECTED%</td></tr></table>
 </script>
 
 <script id="stringfree_template_two" language="text">
 <textarea class="__stringfree" style="width:100%;height:350px" name="values[]">%VALUE%</textarea>
+</script>
+
+<script id="datefree_template_one" language="text">
+<input type="text" maxlength="%MAX_LENGTH%" name="%NAME%[]" value="%VALUE%" placeholder="%PLACEHOLDER%" style="width:50px;text-align:right">
+</script>
+
+<script id="datefree_template_two" language="text">
+<tr><td>%VALUE_START%</td><td>%SEPARATOR%</td><td>%VALUE_END%</td></tr>
+</script>
+
+<script id="datefree_template_three" language="text">
+<table style="" class="datefree_table">%SELECTED%</table>
 </script>
 
 

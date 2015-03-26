@@ -51,32 +51,27 @@
 		{/if}
 	</ul>
 </div>
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-	{math assign=temp equation="(x*y)" x=$currPage y=$pgnResultsPerPage}
-	$('#resultcount-header').html(
-		{math equation="((x-1)*y)+1" x=$currPage y=$pgnResultsPerPage}+
-		' - '+
-		{if $temp>$pgnResultCount}{$pgnResultCount}{else}{$temp}{/if}+
-		' van '+
-		{$pgnResultCount}+
-		({$pgnResultCount}==1 ? ' {$pgnEntityNames[0]}' : ' {$pgnEntityNames[1]}')
-	);
-{literal}
-});
-</script>
-{/literal}
-{else}
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-	$('#resultcount-header').html({$pgnResultCount}+({$pgnResultCount}==1 ? ' resultaat' : ' resultaten'));
-{literal}
-});
-</script>
-{/literal}
 
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+	{math assign=temp equation="(x*y)" x=$currPage y=$pgnResultsPerPage}
+	$('#resultcount-header').html({math equation="((x-1)*y)+1" x=$currPage y=$pgnResultsPerPage}+' - '+ {if $temp>$pgnResultCount}{$pgnResultCount}{else}{$temp}{/if});
+});
+</script>
+{else}
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+	$('#resultcount-header').html({$pgnResultCount});
+});
+</script>
 {/if}
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+	$('#resultcount-header').html($('#resultcount-header').html()+' van '+{$pgnResultCount}+({$pgnResultCount}==1 ? ' {$pgnEntityNames[0]}' : ' {$pgnEntityNames[1]}'));
+});
+</script>
+
+

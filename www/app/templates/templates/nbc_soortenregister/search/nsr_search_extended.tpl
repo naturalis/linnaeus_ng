@@ -52,17 +52,19 @@ label.clickable:hover {
 
 .selectable-parameters {
 	padding:0 8px 0 8px;
-	background-color:#ffe999;
+	-background-color:#ffe999;
 	margin-bottom:10px;
 }
 .selected-parameters {
 	margin:10px 0 0 -8px;
 	-border-top:1px dashed #ddd;
 	-border-bottom:1px dashed #ddd;
-	padding:5px 6px 10px 10px;
-	background-color:#fffbbb;
+	padding:10px 6px 10px 10px;
+	background-color:rgb(246, 245, 236);
 }
-
+#search-parameters {
+	margin-top:5px;
+}
 
 </style>
                 
@@ -365,8 +367,8 @@ function submitSearchParams()
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
-					<label style="display:inline-block;margin-left:5px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
-					<input type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
+					<label style="display:inline-block;margin-left:13px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
+					<input style="width:370px" type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
 					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>
 				{*<div class="formrow">
@@ -403,7 +405,7 @@ function submitSearchParams()
 					</label>
                     <br / -->
                     <p class="options-panel" id="presence-options-panel" style="display:none">
-                        <select id="presenceStatusList" name="presenceStatusList" style="width:250px;">
+                        <select id="presenceStatusList" name="presenceStatusList" style="width:250px;margin-bottom:10px">
                             <option value="">maak een keuze</option>
                             {foreach from=$presence_statuses item=v}
                             <option 
@@ -417,34 +419,11 @@ function submitSearchParams()
                             {/foreach}
                         </select>
                         <input type="button" value=" > " onclick="addSearchParameter('presenceStatusList');" />
-                        <br style="margin-bottom: 1em;" />
+                        <br />
                         <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
                         <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
 					</p>
 				</div>
-
-				<!-- div class="formrow">
-                	<label
-                    	for="multimedia-options" 
-                        panel="multimedia-options-panel"
-                        class="clickable" 
-                        onmouseover="hover_panel_toggle(this);"
-                        onmouseout="hover_panel_toggle(this,true);"
-                        onclick="toggle_panel(this);">
-						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
-	                    <strong>{t}Multimedia{/t}</strong>
-                    </label>
-                    <p class="options-panel" id="multimedia-options-panel" style="display:none">
-                        <select id="multimedia-options" name="multimedia-options" style="width:250px;">
-                            <option value="">maak een keuze</option>
-                            <option value="images">{t}met foto('s){/t}</option>
-                            <option value="distribution">{t}met verspreidingskaart{/t}</option>
-                            <option value="trend">{t}met trendgrafiek{/t}</option>
-                        </select>
-                        <input type="button" value=" > " onclick="addSearchParameter('multimedia-options');" />
-                    </p>
-				</div -->
-
 
 				<div class="formrow">
                 	<label
@@ -690,10 +669,6 @@ $(document).ready(function()
 	addSearchParameter('multimedia-trend');
 	{/if}
 	{/foreach}
-	
-
-	
-	
 	
 	{if $search.traits}
 
