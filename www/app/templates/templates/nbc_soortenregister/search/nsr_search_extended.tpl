@@ -52,15 +52,12 @@ label.clickable:hover {
 
 .selectable-parameters {
 	padding:0 8px 0 8px;
-	-background-color:#ffe999;
 	margin-bottom:10px;
 }
 .selected-parameters {
 	margin:10px 0 0 -8px;
-	-border-top:1px dashed #ddd;
-	-border-bottom:1px dashed #ddd;
 	padding:10px 6px 10px 10px;
-	background-color:rgb(246, 245, 236);
+	background-color:#fffbbb;
 }
 #search-parameters {
 	margin-top:5px;
