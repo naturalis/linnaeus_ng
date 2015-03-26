@@ -69,6 +69,17 @@ $(document).ready(function()
 	allLookupNavigateOverrideUrl(taxonTargetUrl);
 	allLookupNavigateOverrideListFunction(localList);
 	
+	$(document).ready(function()
+	{
+		$(window).keydown(function(event)
+		{
+			if(event.keyCode == 13)
+			{
+				event.preventDefault();
+				return false;
+			}
+		});
+	});	
 });
 </script>
 

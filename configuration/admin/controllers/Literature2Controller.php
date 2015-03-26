@@ -24,7 +24,7 @@ class Literature2Controller extends Controller
 
 	private $_actors=null;
 	private $_literature=null;
-	private $_matchThreshold=75;
+	private $_matchThresholdDefault=85;
 
 	public $jsToLoad =
 		array(
@@ -144,6 +144,7 @@ class Literature2Controller extends Controller
 		$emptycols=null;
 		$fields=null;
 		$matches=null;
+		$firstline=null;
 
 		$ignorefirst=$this->rHasVal('ignorefirst','1');
 		$this->setSessionVar('ignorefirst',$ignorefirst);
@@ -169,6 +170,8 @@ class Literature2Controller extends Controller
 			
 			$lines=$this->parseRawCsvData($raw);
 
+			if (!$ignorefirst) $firstline=null;
+			
 			foreach($lines as $key=>$val)
 			{
 				if ($key==0)
@@ -176,7 +179,11 @@ class Literature2Controller extends Controller
 					foreach($val as $c=>$cell) $emptycols[$c]=true;
 				}
 
-				if ($ignorefirst && $key==0) continue;
+				if ($ignorefirst && $key==0) 
+				{
+					$firstline=$val;
+					continue;
+				}
 
 				foreach($val as $c=>$cell)
 				{
@@ -207,12 +214,12 @@ class Literature2Controller extends Controller
 
 		if ($this->rHasVal('threshold'))
 		{
-			$this->_matchThreshold=
+			$this->_matchThresholdDefault=
 				is_numeric($this->rGetVal('threshold')) && 
 				$this->rGetVal('threshold')<=100 &&
 				$this->rGetVal('threshold')>0 ? 
 					$this->rGetVal('threshold') : 
-					$this->_matchThreshold;
+					$this->_matchThresholdDefault;
 
 			$this->setSessionVar('threshold',$this->rGetVal('threshold'));
 		}
@@ -261,7 +268,7 @@ class Literature2Controller extends Controller
 		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
 		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
 
-		$this->smarty->assign('threshold',$this->_matchThreshold);
+		$this->smarty->assign('threshold',$this->_matchThresholdDefault);
 		$this->smarty->assign('matches',$matches);
 		$this->smarty->assign('emptycols',$emptycols);
 		$this->smarty->assign('fields',$fields);
@@ -269,6 +276,7 @@ class Literature2Controller extends Controller
 		$this->smarty->assign('delcols',$this->getSessionVar('delcols'));
 		$this->smarty->assign('raw',$raw);
 		$this->smarty->assign('ignorefirst',$ignorefirst);
+		$this->smarty->assign('firstline',$firstline);
 		$this->smarty->assign('lines',$lines);
 
 		$this->printPage();
@@ -306,8 +314,10 @@ class Literature2Controller extends Controller
 			// opsporen dubbele kolommen
 			foreach((array)$fields as $key=>$val)
 			{
+				if (empty($val)) continue;
 				$duplicate_columns[$val][]=$key;
 			}
+
 			$d=array();
 			foreach((array)$duplicate_columns as $key=>$val)
 			{
@@ -555,17 +565,19 @@ class Literature2Controller extends Controller
 								}
 								else
 								{
-									$language_id=isset($new_publishedin_language[$line_number][$field_publishedin][$key]) ?
-										$new_publishedin_language[$line_number][$field_publishedin][$key] :
-										$this->getDefaultProjectLanguage();
-	
-									$this->models->Literature2->save(
-									array(
+									$lit=array(
 										'project_id' => $this->getCurrentProjectId(),
-										'language_id' => $language_id,
 										'label' => $new_publ_name
-									));								
+									);
+									
+									if (isset($new_publishedin_language[$line_number][$field_publishedin][$key]) && 
+										!empty($new_publishedin_language[$line_number][$field_publishedin][$key]))
+									{
+										$lit['language_id']=$new_publishedin_language[$line_number][$field_publishedin][$key];
+									}
 	
+									$this->models->Literature2->save($lit);								
+
 									$new_publ_id=$prev_created_publications[$new_publ_name]=$this->models->Literature2->getNewId();
 									$this->addmessage(sprintf($this->translate('Saved reference "%s" (published in)'),$new_publ_name));
 								}
@@ -611,17 +623,20 @@ class Literature2Controller extends Controller
 								}
 								else
 								{
-									$language_id=isset($new_periodical_language[$line_number][$field_periodical][$key]) ?
-										$new_periodical_language[$line_number][$field_periodical][$key] :
-										$this->getDefaultProjectLanguage();
-	
-									$this->models->Literature2->save(
-									array(
+
+									$lit=array(
 										'project_id' => $this->getCurrentProjectId(),
-										'language_id' => $language_id,
 										'label' => $new_publ_name
-									));								
-	
+									);
+									
+									if (isset($new_periodical_language[$line_number][$field_periodical][$key]) && 
+										!empty($new_periodical_language[$line_number][$field_periodical][$key]))
+									{
+										$lit['language_id']=$new_periodical_language[$line_number][$field_periodical][$key];
+									}
+
+									$this->models->Literature2->save($lit);
+
 									$new_publ_id=$prev_created_publications[$new_publ_name]=$this->models->Literature2->getNewId();
 									$this->addmessage(sprintf($this->translate('Saved reference "%s" (periodical)'),$new_publ_name));
 								}
@@ -1317,9 +1332,46 @@ class Literature2Controller extends Controller
 				and _a.reference_id=".$id
 		);	
 		
+		
+		$d=$this->models->Literature2->freeQuery("
+			select
+				_a.taxon_id,
+				_b.taxon,
+				_a.trait_group_id,
+				_c.sysname
+			from
+				%PRE%traits_taxon_references _a
+				
+			left join %PRE%taxa _b
+				on _a.project_id=_b.project_id
+				and _a.taxon_id=_b.id
+			
+			left join %PRE%traits_groups _c
+				on _a.project_id=_c.project_id
+				and _a.trait_group_id=_c.id
+				
+			where
+				_a.project_id=".$this->getCurrentProjectId()." 
+				and _a.reference_id=".$id."
+			order
+				by _b.taxon
+		");
+		
+		$traits=array();
+		foreach((array)$d as $val)
+		{
+			$traits[$val['sysname']][]=
+				array(
+					'group_id'=>$val['trait_group_id'],
+					'taxon_id'=>$val['taxon_id'],
+					'taxon'=>$val['taxon']
+				);
+		}
+		
 		return array(
 			'names' => $names,
 			'presences'=>$presences,
+			'traits'=>$traits,
 		);
 	
 	}
@@ -1497,7 +1549,7 @@ class Literature2Controller extends Controller
 					similar_text($suggestedname,$name_alt,$pct2);
 				}
 
-				if ($pct1>=$this->_matchThreshold || $pct2>=$this->_matchThreshold)
+				if ($pct1>=$this->_matchThresholdDefault || $pct2>=$this->_matchThresholdDefault)
 				{
 					/*
 					echo 
@@ -1581,7 +1633,7 @@ class Literature2Controller extends Controller
 				similar_text($raw,$label_alt,$pct2);
 			}
 
-			if ($pct1>=$this->_matchThreshold || $pct2>=$this->_matchThreshold)
+			if ($pct1>=$this->_matchThresholdDefault || $pct2>=$this->_matchThresholdDefault)
 			{
 				/*
 				echo 

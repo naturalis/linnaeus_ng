@@ -38,17 +38,26 @@
 	        <span onclick="$('.lines').toggle();">found {$lines|@count} lines (showing 5).</span><br />
             select appropriate fields per column; mutiple columns of the same field will be concatenated.
             choose 'ignore' to skip a column, or click 'remove column' to ignore and hide it from view.
+
+
             
             <table>
             {foreach from=$lines item=line key=k}{if $k<5}
                 {if $k==0}
+				{if $firstline}
+                <tr class="admin-row">
+                    {foreach from=$firstline item=cell key=c}
+                    {if $delcols[$c]!==true}{if $suppressEmptyColumns && $emptycols[$c]!=true}
+                    <td style="font-weight:bold"> {$cell}</td>
+                    {/if}{/if}
+                    {/foreach}
+                </tr>
+				{/if}
                 <tr class="admin-row">
                     {foreach from=$line item=cell key=c}
-                    {if $delcols[$c]!==true}
-                    {if $suppressEmptyColumns && $emptycols[$c]!=true}
+                    {if $delcols[$c]!==true}{if $suppressEmptyColumns && $emptycols[$c]!=true}
                     <td>{colselect data=$c}</td>
-                    {/if}
-                    {/if}
+                    {/if}{/if}
                     {/foreach}
                 </tr>
                 <tr class="admin-row">
@@ -100,18 +109,6 @@
 
 	<div style="padding-bottom:10px;margin-bottom:20px;">
 
-        <!-- p>
-            below are the lines from your bulk import (<span style="color:#039">in blue</span>) plus, for each line, possible matches
-            with references that are already in the database, ranked by matching percentage.<br/>
-            please review the matches. if you judge an existing reference to be a match, check the radiobutton preceding it. if there
-            is no match, check the radiobutton labeled "none of the above". if you wish the reference to be created as a new entry in
-            the database, check the checkbox labeled "create as new?".<br />
-            when done, press "save" to save new entries. you will also be offered a download of your original data with an extra column
-            containing the ID's of the matching, resp. saved database entries.<br />
-            <b>when saving new entries, make sure you have assigned <i>all</i> possible appropriate fields to the corresponding
-            columns</b>
-        </p -->
-        
         <p>
         matches:
         </p>

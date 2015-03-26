@@ -34,10 +34,8 @@ function makeJoinExample(col)
 
     <p>
 		new references, to be stored:<br />
-        (don't sweat multiple "create as new"'s for the same name; they will resolve to one and the same. altijd aanvinken, anders geen link)
-        
+        (do not worry about multiple "create as new"'s for the same name; they will resolve to one and the same.)
     </p>
-
 
 	<div style="padding-bottom:10px;margin-bottom:20px;">
 
@@ -137,9 +135,10 @@ function makeJoinExample(col)
                     </td>
                     <td colspan="2">
                     	<select name="language[{$k}]">
-                        {foreach from=$languages item=v}
+                        {foreach from=$languages item=v key=k}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+						{if $v.sort_criterium==0 && $languages[$k-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
                         <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
-                        {/foreach}
+                        {/if}{/foreach}
                         </select>
 					</td>
 				</tr>
@@ -164,8 +163,10 @@ function makeJoinExample(col)
                                              data-id="{$k}.{$kk}pub"
                                              {if $publication.match.label==100} checked="checked"{assign var=found_full_match value=true}{/if}
                                             />
-                                        {$publication.names.label}, {$publication.date} ({$publication.match.label|@round:2}%)
-                                    </label><br />
+                                        {$publication.names.label}{if $publication.date}, {$publication.date}{/if} ({$publication.match.label|@round:2}%)
+                                    </label>
+                                    <a href="edit.php?id={$publication.id}" target="_referentie">&rarr;</a>
+                                    <br />
                                 {/foreach}
                                 <label>
                                     
@@ -189,9 +190,11 @@ function makeJoinExample(col)
 									/>
                                 </label>
                                 <select name="new_publishedin_language[{$k}][{$field_publishedin}][{$kk}]">
-                                {foreach from=$languages item=v}
-                                <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
-                                {/foreach}
+                                    <option value="">-</option>
+                                    {foreach from=$languages item=v key=k}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+                                    {if $v.sort_criterium==0 && $languages[$k-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
+                                    <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
+                                    {/if}{/foreach}
                                 </select>
                                 </td>
                             </tr>
@@ -219,8 +222,10 @@ function makeJoinExample(col)
                                             data-id="{$k}.{$kk}per"
                                             {if $publication.match.label==100} checked="checked"{assign var=found_full_match value=true}{/if}
                                          />
-                                        {$publication.names.label}, {$publication.date} ({$publication.match.label|@round:2}%)
-                                    </label><br />
+                                        {$publication.names.label}{if $publication.date}, {$publication.date}{/if} ({$publication.match.label|@round:2}%)
+                                    </label>
+                                    <a href="edit.php?id={$publication.id}" target="_referentie">&rarr;</a>
+                                    <br />
                                 {/foreach}
                                 <label>
                                     {if $matching_periodical[$k][$field_periodical]|@count==0}
@@ -242,9 +247,11 @@ function makeJoinExample(col)
                                         {if !$found_full_match} checked="checked"{/if} 
 									/>
                                     <select name="new_periodical_language[{$k}][{$field_publishedin}][{$kk}]">
-                                    {foreach from=$languages item=v}
-                                    <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
-                                    {/foreach}
+                                        <option value="">-</option>
+                                        {foreach from=$languages item=v key=k}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+                                        {if $v.sort_criterium==0 && $languages[$k-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
+                                        <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
+                                        {/if}{/foreach}
                                     </select>
 
                                 </label>
