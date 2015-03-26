@@ -156,9 +156,9 @@
             ['label'=>'can be null','name'=>'can_be_null','value'=>$trait.can_be_null],
             ['label'=>'can select multiple','name'=>'can_select_multiple','row_class'=>'allow-select-multiple','value'=>$trait.can_select_multiple],
             ['label'=>'can have range','name'=>'can_have_range','value'=>$trait.can_have_range,'row_class'=>'allow-ranges'],
-            ['label'=>'can include comment','name'=>'can_include_comment','value'=>$trait.can_include_comment],
-            ['label'=>'show index numbers','name'=>'show_index_numbers','value'=>$trait.show_index_numbers]
+            ['label'=>'can include comment','name'=>'can_include_comment','value'=>$trait.can_include_comment]
 		]}
+            {*['label'=>'show index numbers','name'=>'show_index_numbers','value'=>$trait.show_index_numbers]*}
         
         {foreach $array as $v}
         	{boolean data=$v}
