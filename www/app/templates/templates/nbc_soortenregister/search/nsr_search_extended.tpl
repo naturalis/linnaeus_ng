@@ -624,7 +624,7 @@ function submitSearchParams()
  		</form>
 
 
-		{assign var=pgnEntityNames value=['soorten (of onderliggend taxon)','soorten (en onderliggende taxa)']}
+		{assign var=pgnEntityNames value=['soort (of onderliggend taxon)','soorten (en onderliggende taxa)']}
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
 		{assign var=pgnCurrPage value=$search.page}
