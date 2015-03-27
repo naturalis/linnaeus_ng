@@ -22,7 +22,7 @@ class SearchControllerNSR extends SearchController
 	);
 
 	public $csvExportSettings=array(
-		'field-sep'=>',',
+		'field-sep'=>"\t",
 		'field-enclose'=>'"',
 		'line-end'=>"\n",
 		'file-extension'=>".csv"
@@ -122,12 +122,14 @@ class SearchControllerNSR extends SearchController
 			$template='export_search_extended';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+
 			$this->downloadHeaders(
 				array(
 					'mime'=>'text/csv',
 					'charset'=>'utf-8',
 					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
 					);
+
 		}
 		else
 		{
@@ -1648,20 +1650,23 @@ class SearchControllerNSR extends SearchController
 		if ($this->rHasVal('presence'))
 		{
 			$statuses=$this->getPresenceStatuses();
-			$querystring.=$this->translate('Status voorkomen="');
+			$querystring.=$this->translate('Status voorkomen=');
 		
 			foreach((array)$this->rGetVal('presence') as $key=>$val)
 			{
-				$querystring.=$statuses[$key]['index_label'].', ';
+				$querystring.=$statuses[$key]['index_label'].',';
 			}
-			$querystring=rtrim($querystring,' ,').'; ';
+			$querystring=rtrim($querystring,',').'; ';
 		}
-					
-		if ($this->rHasVal('images','on')) $querystring.=$this->translate('met foto\'s; ');
-		if ($this->rHasVal('distribution','on')) $querystring.=$this->translate('met verspreidingskaart; ');
-		if ($this->rHasVal('trend','on')) $querystring.=$this->translate('met trendgrafiek; ');
-		if ($this->rHasVal('dna','on')) $querystring.=$this->translate('met DNA-exemplaren verzameld; ');
-		if ($this->rHasVal('dna_insuff','on')) $querystring.=$this->translate('met nog DNA-exemplaren te verzamelen; ');
+
+		if ($this->rHasVal('images_on','on')) $querystring.=$this->translate('Met foto\'s; ');
+		if ($this->rHasVal('images_off','on')) $querystring.=$this->translate('Zonder foto\'s; ');
+		if ($this->rHasVal('distribution_on','on')) $querystring.=$this->translate('Met verspreidingskaart(en); ');
+		if ($this->rHasVal('distribution_off','on')) $querystring.=$this->translate('Zonder verspreidingskaart(en); ');
+		if ($this->rHasVal('trend_on','on')) $querystring.=$this->translate('Met trendgrafiek; ');
+		if ($this->rHasVal('trend_off','on')) $querystring.=$this->translate('Zonder trendgrafiek; ');
+		if ($this->rHasVal('dna','on')) $querystring.=$this->translate('Met DNA-exemplaren verzameld; ');
+		if ($this->rHasVal('dna_insuff','on')) $querystring.=$this->translate('Met nog DNA-exemplaren te verzamelen; ');
 
 		return trim($querystring);
 	}
@@ -1714,13 +1719,13 @@ class SearchControllerNSR extends SearchController
 		}
 
 		array_walk($str,function(&$a){ $a=is_array($a) ? implode(",",$a) : $a; });
-		array_walk($str,function(&$a,$key){ $a=$key.'='.$a; });
+		array_walk($str,function(&$a,$key){ $a=$key.'='.trim($a); });
 		
 		$str=implode("; ",$str);
 		
 		if (!empty($trait_group))
 		{
-			$str=($str ? $str.';' : '').$traits[$trait_group]['name'].'=*;';
+			$str=($str ? $str.';' : '').$traits[$trait_group]['name'].'=*; ';
 		}
 
 		return $str;
