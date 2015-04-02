@@ -12,7 +12,7 @@
 <link rel="shortlink" href="/node/17" />
 <meta name="Generator" content="Drupal 7 (http://drupal.org)" />
 <link rel="canonical" href="/content/status-taxonomy" />
-  <title>Status taxonomy | The Orthoptera of Europe</title>
+  <title>Status taxonomy | Grasshoppers of Europe</title>
   <style>
 @import url("/profiles/naturalis/modules/contrib/views/css/views.css?ngtocw");
 </style>

@@ -544,12 +544,14 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-
+		
+		/*
 		$result['labels']=array(
 			'title'=>$this->translate('Stand van zaken'),
 			'main'=>$this->translate('Aantal soorten in Nederland'),
 			'sub'=>$this->translate('Het soortenregister bevat')
 		);
+		*/
 
 		function format_number($n)
 		{

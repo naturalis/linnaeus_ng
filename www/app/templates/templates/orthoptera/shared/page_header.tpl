@@ -30,7 +30,7 @@
 
         
           <h1 id="site-name">
-            <a href="/" title="Home" rel="home"><span>The Orthoptera of Europe</span></a>
+            <a href="/" title="Home" rel="home"><span>Grasshoppers of Europe</span></a>
           </h1>
 
         
@@ -47,7 +47,7 @@
           
             <nav class="top-bar" data-topbar  data-options="scrolltop:false">
               <ul class="title-area">
-                <li class="name show-for-small-only"><h1><a href="/" rel="home" title="The Orthoptera of Europe Home">The Orthoptera of Europe</a></h1></li>
+                <li class="name show-for-small-only"><h1><a href="/" rel="home" title="Grasshoppers of Europe Home">Grasshoppers of Europe</a></h1></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
               </ul>
 
