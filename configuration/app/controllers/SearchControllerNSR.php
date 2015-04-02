@@ -976,7 +976,7 @@ class SearchControllerNSR extends SearchController
 				".(!empty($trait_joins) || !empty($traitgroup_joins) ? "group by _a.id" : "" )."
 				".(!empty($traitgroup_joins) ? "having count(_ttv.id)+count(_ttf.id) > 0" : "" )."
 			order by ".
-				(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name" : "_a.taxon")."
+				(isset($p['sort']) && $p['sort']=='name-pref-nl' ? "common_name,_a.taxon" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
