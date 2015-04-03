@@ -2489,7 +2489,7 @@ class NsrTaxonController extends NsrController
 	private function updateNameExpertId($values)
 	{
 		return $this->models->Names->update(
-			array('expert_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('expert_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -2497,7 +2497,7 @@ class NsrTaxonController extends NsrController
 	private function updateNameOrganisationId($values)
 	{
 		return $this->models->Names->update(
-			array('organisation_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('organisation_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
