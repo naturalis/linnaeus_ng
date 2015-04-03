@@ -1895,7 +1895,7 @@ class NsrTaxonController extends NsrController
 	private function updateConceptPresenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('presence_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('presence_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1903,7 +1903,7 @@ class NsrTaxonController extends NsrController
 	private function updateConceptHabitatId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('habitat_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('habitat_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1911,7 +1911,7 @@ class NsrTaxonController extends NsrController
 	private function updatePresenceExpertId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('actor_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('actor_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1919,7 +1919,7 @@ class NsrTaxonController extends NsrController
 	private function updatePresenceOrganisationId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('actor_org_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('actor_org_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -1927,7 +1927,7 @@ class NsrTaxonController extends NsrController
 	private function updatePresenceReferenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
-			array('reference_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('reference_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
@@ -2481,7 +2481,7 @@ class NsrTaxonController extends NsrController
 	private function updateNameReferenceId($values)
 	{
 		return $this->models->Names->update(
-			array('reference_id'=>$values['new']=='-1' ? 'null' : trim($values['new'])),
+			array('reference_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}
