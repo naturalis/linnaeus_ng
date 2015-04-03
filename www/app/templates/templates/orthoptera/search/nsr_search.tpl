@@ -37,14 +37,7 @@
                         {if $v.overview_image}
                         <img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
                         {/if}
-                        <strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">
-                        
-                        <h3>{$v.taxon}</h3>
-                        <h3>{$v.authorship}</h3>
-                        <h3>{$v.taxon|@replace:$v.authorship:''}</h3>
-                        
-                        
-                        </a></strong>
+                        <strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon|@replace:$v.authorship:''}</a></strong>
                         {if $v.common_rank} ({$v.common_rank}){/if}<br />
                         {if $v.common_name}{$v.common_name}<br />{/if}
                         {if $v.presence_information_index_label || $v.presence_information_title}
