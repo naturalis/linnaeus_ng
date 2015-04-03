@@ -955,7 +955,7 @@ parameters:
 		} 
 		else 
 		{
-			$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
+			$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 			$this->checkJSONPCallback();
 		}
     }

@@ -1,4 +1,4 @@
-	<?php
+<?php
 /*
 
 automatische tabs
@@ -37,7 +37,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function initialise()
     {
-		$this->models->Taxon->freeQuery("SET lc_time_names = 'nl_NL'");
+		$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
