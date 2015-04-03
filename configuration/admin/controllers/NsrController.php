@@ -172,7 +172,7 @@ class NsrController extends Controller
 
 		if (!$this->models->TaxonQuickParentage->getTableExists())
 		{
-			$this->addError('TaxonQuickParentage table does not exist');
+			$this->addError('table TaxonQuickParentage does not exist');
 			return;
 		}
 
