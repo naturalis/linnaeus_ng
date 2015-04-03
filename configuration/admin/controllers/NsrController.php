@@ -171,7 +171,10 @@ class NsrController extends Controller
 		set_time_limit(600);
 
 		if (!$this->models->TaxonQuickParentage->getTableExists())
+		{
+			$this->addError('TaxonQuickParentage table does not exist');
 			return;
+		}
 
 		if (empty($id))
 		{
