@@ -27,7 +27,7 @@
 			{/if}
 
 			{if $mediaOwn.data && $mediaCollected.data}
-			<p>&nbsp;</p>
+			<hr />
 			{/if}			
 		
 			{if $mediaCollected.data}

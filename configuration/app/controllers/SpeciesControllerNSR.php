@@ -132,7 +132,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$this->smarty->assign('querystring',$this->reconstructQueryString());
 	
 					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));	
-					$this->smarty->assign('mediaCollected',$this->getCollectedHigherTaxonMedia($this->requestData));	
+					$this->smarty->assign('mediaCollected',$this->getCollectedLowerTaxonMedia($this->requestData));	
 				}
 				else
 				{
@@ -426,7 +426,7 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 				else
 				{
-					$d=$this->getCollectedHigherTaxonMedia(array('id'=>$taxon));
+					$d=$this->getCollectedLowerTaxonMedia(array('id'=>$taxon));
 					$isEmpty=(count((array)$d['data'])==0);
 				}
 
@@ -797,7 +797,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     }
 
-    private function getCollectedHigherTaxonMedia($p)
+    private function getCollectedLowerTaxonMedia($p)
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
@@ -1954,7 +1954,7 @@ class SpeciesControllerNSR extends SpeciesController
         } else
 		if ($this->rHasVal('action', 'get_collected_batch') && $this->rHasId())
 		{
-			$return=json_encode($this->getCollectedHigherTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+			$return=json_encode($this->getCollectedLowerTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
         }
 
         $this->allowEditPageOverlay = false;

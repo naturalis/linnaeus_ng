@@ -1580,7 +1580,7 @@ CREATE TABLE IF NOT EXISTS `taxa` (
   KEY `project_id_2` (`project_id`,`parent_id`),
   KEY `project_id_3` (`project_id`,`parent_id`,`rank_id`),
   KEY `is_empty` (`is_empty`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
