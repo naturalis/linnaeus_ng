@@ -562,7 +562,8 @@ parameters:
         $d=$this->models->Taxon->freeQuery("
 			select
 				count(*) as total,
-				_h.id as presence_id
+				_h.id as presence_id,
+				_h.established as established
 
 			from
 				%PRE%taxa _a
@@ -589,7 +590,8 @@ parameters:
 		");
 
 
-		$result['main_count']=0;
+		$result['all']=0;
+		$result['all_established']=0;
 		$result['established_exotic']=0;
 		/*
 		6	2a Exoot. Minimaal 100 jaar zelfstandige handhaving
@@ -597,14 +599,20 @@ parameters:
 		*/
 		foreach((array)$d as $key=>$val)
 		{
-			$result['main_count']+=$val['total'];
+			$result['all']+=$val['total'];
+
+			if ($val['established']=='1')
+			{
+				$result['all_established']+=$val['total'];
+			}
+
 			if ($val['presence_id']==3 || $val['presence_id']==6)
 			{
 				$result['established_exotic']+=$val['total'];
 			}
 		}
 
-		$result['main_count']=format_number($result['main_count']);
+		$result['all_established']=format_number($result['all_established']);
 		$result['established_exotic']=format_number($result['established_exotic']);
 
         $d=$this->models->MediaTaxon->freeQuery("
