@@ -37,12 +37,12 @@
                         {if $v.overview_image}
                         <img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
                         {/if}
-                        <strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon|@replace:$v.authorship:''}</a></strong>
+                        <strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong>
                         {if $v.common_rank} ({$v.common_rank}){/if}<br />
-                        {if $v.common_name}{$v.common_name}<br />{/if}
-                        {if $v.presence_information_index_label || $v.presence_information_title}
+                        {* if $v.common_name}{$v.common_name}<br />{/if *}
+                        {* if $v.presence_information_index_label || $v.presence_information_title}
                         {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
-                        {/if}
+                        {/if *}
                     </div>
                     {/foreach}
     
