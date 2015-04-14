@@ -163,9 +163,11 @@
 <p>
 <div>
 	<b>Koppelingen</b><br />
-	{if $links.presences|@count==0 && $links.names|@count==0 && $links.traits|@count==0}
+
+	{if $links.presences|@count==0 && $links.names|@count==0 && $links.traits|@count==0 && $links.passports|@count==0}
 	(geen koppelingen)
 	{/if}
+    
 	{if $links.names|@count > 0}
 	<a href="#" onclick="$('#links-names').toggle();return false;">Gekoppelde namen ({$links.names|@count})</a>
 	<div id="links-names" style="display:none">
@@ -177,6 +179,7 @@
 	</div>
 	<br />
 	{/if}
+
 	{if $links.presences|@count > 0}
 	<a href="#" onclick="$('#links-presences').toggle();return false;">Gekoppelde voorkomensstatussen ({$links.presences|@count})</a>
 	<div id="links-presences" style="display:none">
@@ -186,8 +189,22 @@
 			{/foreach}
 		</ul>
 	</div>
-	{/if}
     <br />
+	{/if}
+
+	{if $links.passports|@count > 0}
+	<a href="#" onclick="$('#links-passports').toggle();return false;">Gekoppelde paspoorten ({$links.passports|@count})</a>
+	<div id="links-passports" style="display:none">
+		<ul class="small">
+			{foreach from=$links.passports key=k item=v}{if $v.taxon_id!=$links.passports[$k-1].taxon_id}
+            {if $k>0}</li>{/if}
+			<li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a>: {/if}{if $v.taxon_id==$links.passports[$k-1].taxon_id}, {/if}{$v.title}{/foreach}
+            </li>
+		</ul>
+	</div>
+    <br />
+	{/if}
+
 	{if $links.traits|@count > 0}
 	<a href="#" onclick="$('#links-traits').toggle();return false;">Gekoppelde kenmerken (<span id="trait-total">0</span>)</a>
 	<div id="links-traits" style="display:none">
@@ -206,9 +223,10 @@
             </script>
             {/foreach}
 		</ul>
-
 	</div>
+    <br />
 	{/if}
+
 </div>
 </p>
 
