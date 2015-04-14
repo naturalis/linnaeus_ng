@@ -242,7 +242,7 @@ $(document).ready(function()
 	});
 
 	$('.match').on('show', function() { markElementAsSeen($(this).attr('data-id')); } );
-	markElementAsSeen(1);
+	markElementAsSeen( '0' );
 
 	$(document).keydown(function(e) {
 		switch(e.which) {

@@ -1272,6 +1272,7 @@ class Literature2Controller extends Controller
 		if (empty($id))
 			return;
 
+		// NAMES
         $names=$this->models->Names->freeQuery("
 			select
 				_a.taxon_id,
@@ -1308,7 +1309,9 @@ class Literature2Controller extends Controller
 		{
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 		}
+		// NAMES
 
+		// PRESENCE
 		$presences=$this->models->PresenceTaxa->freeQuery(
 			"select
 				_a.taxon_id,
@@ -1331,8 +1334,9 @@ class Literature2Controller extends Controller
 			where _a.project_id = ".$this->getCurrentProjectId()."
 				and _a.reference_id=".$id
 		);	
+		// PRESENCE
 		
-		
+		// TRAITS
 		$d=$this->models->Literature2->freeQuery("
 			select
 				_a.taxon_id,
@@ -1367,11 +1371,54 @@ class Literature2Controller extends Controller
 					'taxon'=>$val['taxon']
 				);
 		}
+		// TRAITS
 		
+		// RDF > PASSPORTS
+		$passports=$this->models->Literature2->freeQuery("		
+		select _b.taxon_id, _e.taxon, _d.title
+			from 
+				%PRE%rdf _a
+		
+			left join
+				%PRE% content_taxa _b
+				on _a.subject_id=_b.id
+				and _a.project_id=_b.project_id
+				and _b.language_id=".$this->getDefaultProjectLanguage()."
+
+			left join
+				%PRE% taxa _e
+				on _b.taxon_id=_e.id
+				and _a.project_id=_e.project_id
+
+			left join
+				%PRE% pages_taxa _c
+				on _b.page_id=_c.id
+				and _a.project_id=_c.project_id
+
+			left join
+				%PRE% pages_taxa_titles _d
+				on _c.id=_d.page_id
+				and _c.project_id=_d.project_id
+				and _d.language_id=".$this->getDefaultProjectLanguage()."
+
+
+			where 
+				_a.project_id=".$this->getCurrentProjectId()."
+				and _a.object_type = 'reference'
+				and _a.subject_type = 'passport'
+				and _a.object_id = ".$id."
+				
+			order by
+				_e.taxon, _c.show_order
+				
+		");
+		// RDF > PASSPORTS
+
 		return array(
 			'names' => $names,
 			'presences'=>$presences,
 			'traits'=>$traits,
+			'passports'=>$passports,
 		);
 	
 	}

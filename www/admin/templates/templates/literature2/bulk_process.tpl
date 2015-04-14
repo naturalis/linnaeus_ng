@@ -356,8 +356,8 @@ $(document).ready(function()
 
 
 	$('.match').on('show', function() { markElementAsSeen($(this).attr('data-id')); } );
+	markElementAsSeen( '0' );
 	$('.column-joinage').trigger('keyup');
-	markElementAsSeen(1);
 });
 </script>
 
