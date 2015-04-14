@@ -583,7 +583,6 @@ parameters:
 			where
 				_a.project_id =".$this->getCurrentProjectId()."
 				and _f.rank_id = ".SPECIES_RANK_ID."
-				and _h.established=1
 
 			group by 
 				_h.id
