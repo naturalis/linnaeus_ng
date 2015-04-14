@@ -13,7 +13,7 @@
 						{/if}
 						<div class="imageInGrid3 taxon-page">
 							<div class="thumbContainer">
-								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/original/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
 									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
 								</a>
 							</div>

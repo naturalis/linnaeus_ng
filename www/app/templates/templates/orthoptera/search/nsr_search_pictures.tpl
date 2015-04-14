@@ -62,7 +62,7 @@
 
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
-							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/original/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
 								<img class="speciesimage" alt="{t}Foto{/t} {$v.photographer}" title="{t}Foto{/t} {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
 							</a>
 						</div>
