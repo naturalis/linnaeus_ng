@@ -121,3 +121,5 @@ $(document).ready(function(){
 //	allLookupAlwaysFetch=true;
 });
 </script>
+
+{include file="../shared/footer.tpl"}

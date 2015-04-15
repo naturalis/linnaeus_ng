@@ -96,5 +96,4 @@ $(document).ready(function() {
 });
 </script>		
 
-
 {include file="../shared/footer.tpl"}
