@@ -106,17 +106,28 @@ class NsrActivityLogController extends NsrController
 		
 		function splitOldName($name)
 		{
-			$d=preg_split('/\(/',$name);
-			$e=preg_split('/ - /',$d[1]);
-
-			return array('original'=>$name,'name'=>trim($d[0]),'username'=>trim($e[0]),'email_address'=>trim($e[1],' )'));
+			if (strpos($name,'(')!==false)
+			{
+				$d=preg_split('/\(/',$name);
+				$e=preg_split('/ - /',$d[1]);
+				return array(
+					'original'=>$name,
+					'name'=>trim($d[0]),
+					'username'=>trim($e[0]),
+					'email_address'=>isset($e[1]) ? trim($e[1],' )') : ''
+				);
+			}
+			else
+			{
+				return array('original'=>$name,'name'=>$name,'username'=>'','email_address'=>'');
+			}
 		}
 		
 		foreach((array)$d as $key =>$val)
 		{
 			$d[$key]['user']=splitOldName($val['user']);
-			$d[$key]['data_before']=unserialize($val['data_before']);
-			$d[$key]['data_after']=unserialize($val['data_after']);
+			$d[$key]['data_before']=@unserialize($val['data_before']);
+			$d[$key]['data_after']=@unserialize($val['data_after']);
 			//$d[$key]['differences']=$this->getLineDifferences($d[$key]['data_before'],$d[$key]['data_after']);
 		}
 

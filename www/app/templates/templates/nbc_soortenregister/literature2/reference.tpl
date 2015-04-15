@@ -47,7 +47,7 @@
 				{if $ref.volume}<tr><td>Volume</td><td>{$ref.volume}</td></tr>{/if}
 				{if $ref.pages}<tr><td>Pagina's</td><td>{$ref.pages}</td></tr>{/if}
 				{if $ref.publisher}<tr><td>Uitgever</td><td>{$ref.publisher}</td></tr>{/if}
-				{if $ref.external_link}<tr><td>Status</td><td><a href="{$ref.external_link}" target="_blank">{$ref.external_link}</a></td></tr>{/if}
+				{if $ref.external_link}<tr><td>Link</td><td><a href="{$ref.external_link}" target="_blank">{$ref.external_link}</a></td></tr>{/if}
 				</tbody>
 			</table>
 		</div>

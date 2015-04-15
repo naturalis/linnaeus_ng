@@ -144,6 +144,7 @@ class NsrTaxonController extends NsrController
 		if ($this->rHasVal('parent'))
 		{
 			$parent=$this->getSpeciesList(array('id'=>$this->rGetVal('parent'),'taxa_only'=>true));
+
 			if (isset($parent[0]))
 			{
 				$this->smarty->assign('parent',$parent[0]);
@@ -1264,7 +1265,7 @@ class NsrTaxonController extends NsrController
 				and _trash.item_type='taxon'
 
 			where _a.project_id =".$this->getCurrentProjectId()."
-				and _a.name like '%".mysql_real_escape_string($search)."%'
+				and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 				and _b.nametype in (
 					'".PREDICATE_PREFERRED_NAME."',
 					'".PREDICATE_VALID_NAME."',
@@ -1275,13 +1276,27 @@ class NsrTaxonController extends NsrController
 					'".PREDICATE_BASIONYM."',
 					'".PREDICATE_MISSPELLED_NAME."'
 				)
+
+			".($taxaOnly ? "and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : "" )."
+			".($rankAbove ? "and _f.rank_id < ".$rankAbove : "" )."
+			".($rankEqualAbove ? "and _f.rank_id <= ".$rankEqualAbove : "" )."
+			".($id ? "and _a.taxon_id = ".$id : "" )."
+			".($nametype ? "and _b.nametype = ".$nametype : "" )."
+			".($haveDeleted=='no' ? "and ifnull(_trash.is_deleted,0)=0" :  "" )."
+			".($haveDeleted=='only' ? "and ifnull(_trash.is_deleted,0)=1" : "" )."
 		
 			order by 
-				match_percentage desc, _e.taxon asc, _f.rank_id asc, ".
-				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
+				match_percentage desc, 
+				_e.taxon asc, 
+				_f.rank_id asc, ".
+				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ?
+					"common_name" :
+					"taxon" 
+				)."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
+
 
 		foreach ((array) $taxa as $key => $val)
 		{
