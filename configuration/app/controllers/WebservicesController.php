@@ -612,7 +612,7 @@ parameters:
 		}
 
 		$result['all']=format_number($result['all']);
-		$result['main_count']=$result['all'];  // backward compat NSR
+		$result['main_count']=$result['all_established'];  // backward compat NSR
 		$result['all_established']=format_number($result['all_established']);
 		$result['established_exotic']=format_number($result['established_exotic']);
 
