@@ -1137,43 +1137,92 @@ class NsrTaxonController extends NsrController
 			return null;
 		}
 
-		$taxa=$this->models->Taxon->freeQuery("
+		$taxa=$this->models->Names->freeQuery("
 			select
 				_a.taxon_id as id,
-				concat(_a.name,' [',_q.rank,'%s]') as label,
+				concat(_a.name,' [',ifnull(_q.label,_x.rank),'%s]') as label,
 				_e.rank_id,
 				_e.taxon,
+				_a.name,
+				_common.name as common_name,
 				_f.rank_id as base_rank_id,
-				_q.rank as rank,
+				_x.rank,
 				_a.uninomial,
 				_a.specific_epithet,
 				_b.nametype,
 				ifnull(_d.label,_c.language) as language_label,
-
+				ifnull(_trash.is_deleted,0) as is_deleted,
+	
 				case
-					when _a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1 then 100
-					when _a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 95
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 then 90
-					when _a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 then 80
-					when _a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 then 70
-					when _a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 then 60
-					else 50
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1
+						or
+						trim(concat(
+							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
+							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
+							if(_a.infra_specific_epithet is null,'',concat(_a.infra_specific_epithet,' '))
+						)) REGEXP '^".mysql_real_escape_string($search)."$' = 1
+					then 100
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 95
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 90
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 85
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 80
+					when 
+						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 75
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 70
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 65
+					when
+						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 60
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 55
+					when 
+						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 50
+
+					else 10
 				end as match_percentage,
 	
 				case
 					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
 					else 50
-				end as adjusted_rank,
+				end as adjusted_rank
 				
-				ifnull(_trash.is_deleted,0) as is_deleted,
-				concat(_user.first_name,' ',_user.last_name) as deleted_by,
-				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
-			
-			from %PRE%taxa _e
-
-			left join %PRE%names _a
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
+			from %PRE%names _a
 
 			left join %PRE%languages _c
 				on _a.language_id=_c.id
@@ -1182,33 +1231,40 @@ class NsrTaxonController extends NsrController
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
 				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
+			
+			left join %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
+
+			left join %PRE%names _common
+				on _e.id = _common.taxon_id
+				and _e.project_id = _common.project_id
+				and _common.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
+				and _common.language_id=".$this->getDefaultProjectLanguage()."
+				
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%ranks _x
+				on _f.rank_id=_x.id
+
+			left join %PRE%labels_projects_ranks _q
+				on _e.rank_id=_q.project_rank_id
+				and _a.project_id = _q.project_id
+				and _q.language_id=".$this->getDefaultProjectLanguage()."
+			
+			left join %PRE%name_types _b 
+				on _a.type_id=_b.id 
+				and _a.project_id = _b.project_id
 
 			left join %PRE%trash_can _trash
 				on _e.project_id = _trash.project_id
 				and _e.id = _trash.lng_id
 				and _trash.item_type='taxon'
 
-			left join %PRE%users _user
-				on _trash.user_id = _user.id
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
-			left join %PRE%ranks _q
-				on _f.rank_id=_q.id
-			
-			left join %PRE%name_types _b 
-				on _a.type_id=_b.id 
-				and _a.project_id = _b.project_id
-
-			left join %PRE%nsr_ids _ids
-				on _a.taxon_id =_ids.lng_id 
-				and _a.project_id = _ids.project_id
-				and _ids.item_type = 'taxon'
-
 			where _a.project_id =".$this->getCurrentProjectId()."
-				and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+				and _a.name like '%".mysql_real_escape_string($search)."%'
 				and _b.nametype in (
 					'".PREDICATE_PREFERRED_NAME."',
 					'".PREDICATE_VALID_NAME."',
@@ -1219,24 +1275,13 @@ class NsrTaxonController extends NsrController
 					'".PREDICATE_BASIONYM."',
 					'".PREDICATE_MISSPELLED_NAME."'
 				)
-
-			".($taxaOnly ? "and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : "" )."
-			".($rankAbove ? "and _f.rank_id < ".$rankAbove : "" )."
-			".($rankEqualAbove ? "and _f.rank_id <= ".$rankEqualAbove : "" )."
-			".($id ? "and _a.taxon_id = ".$id : "" )."
-			".($nametype ? "and _b.nametype = ".$nametype : "" )."
-			".($haveDeleted=='no' ? "and ifnull(_trash.is_deleted,0)=0" :  "" )."
-			".($haveDeleted=='only' ? "and ifnull(_trash.is_deleted,0)=1" : "" )."
-			
-			group by _a.taxon_id
-
+		
 			order by 
-				adjusted_rank desc, match_percentage desc, _a.name asc, _f.rank_id asc, ".
+				match_percentage desc, _e.taxon asc, _f.rank_id asc, ".
 				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ? "common_name" : "taxon" )."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
-
 
 		foreach ((array) $taxa as $key => $val)
 		{
