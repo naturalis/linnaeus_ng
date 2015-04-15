@@ -24,12 +24,12 @@
     </div>
     <!--/.main region -->
 
-<style>
-#search-box
-{
-	margin-bottom:100px;
-}
-</style>    
+	<style>
+    #search-box
+    {
+        margin-bottom:200px;
+    }
+    </style>    
 
 	{include file="../shared/_left_column_just_search.tpl"}
 
