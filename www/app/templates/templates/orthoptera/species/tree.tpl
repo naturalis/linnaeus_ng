@@ -27,7 +27,7 @@
 	<style>
     #search-box
     {
-        margin-bottom:200px;
+        margin-bottom:220px;
     }
     </style>    
 
