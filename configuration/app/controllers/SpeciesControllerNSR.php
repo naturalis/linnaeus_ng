@@ -372,8 +372,9 @@ class SpeciesControllerNSR extends SpeciesController
 			if (defined('TAB_VERSPREIDING'))
 			{
 				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon));
-	
-				if (!is_null($this->getPresenceData($taxon)) || !is_null($d['content']))
+				$p=$this->getPresenceData($taxon);
+
+				if (!empty($p['presence_information_one_line']) || !empty($d['content']))
 				{
 					foreach((array)$categories as $key=>$val)
 					{

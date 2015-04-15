@@ -38,6 +38,7 @@ function localList(obj,txt)
 					'<li> \
 						<a href="#"onclick="setAutoExpand('+d.id+');return false;">'+d.label+'</a> \
 						'+ (d.common_name && d.common_name!=d.name ? "("+d.common_name+")": "" ) +' \
+						'+ (d.nametype=='isPreferredNameOf' && d.taxon ? "("+d.taxon+")": "" ) +' \
 						&nbsp;&nbsp;<a href="taxon.php?id='+d.id+'">&nbsp;&rarr;&nbsp;</a> \
 					</li>'
 				);

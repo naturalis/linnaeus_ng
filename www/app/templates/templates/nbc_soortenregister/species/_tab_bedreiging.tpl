@@ -1,7 +1,7 @@
 	<div>
 	
 		{if $wetten}
-	
+
 			<h2>Beschermingsstatus</h2>
 
 			{foreach from=$wetten item=soort key=naam}
@@ -38,10 +38,13 @@
 			{/foreach}
 			
 		{/if}
-	
+    	
+		{if $content}
+        <h2>Bedreiging en bescherming</h2>
 		<p>
 			{$content}
 		</p>
+		{/if}
 	
 		<script type="text/JavaScript">
 		$(document).ready(function()

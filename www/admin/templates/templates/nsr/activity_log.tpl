@@ -54,11 +54,14 @@
 		    {$v.last_change_hr}
 		</td>
     	<td>
-		    <a href="#" onclick="$('#alldata{$k}').toggle();return false;">toon data</a>
+		    <a href="#" onclick="$('.alldata{$k}').toggle();return false;">
+            	<span class="alldata{$k}">toon data</span>
+                <span class="alldata{$k}" style="display:none">data verbergen</span>
+			</a>
 		</td>
     </tr>
     
-    <tr id="alldata{$k}" style="display:none;border-bottomn:1px solid #666">
+    <tr class="alldata{$k}" style="display:none;border-bottomn:1px solid #666">
     	<td colspan="4">
         	<table class="inline-table"><tr><td>
 				{menu data1=$v.data_before data2=$v.data_after}

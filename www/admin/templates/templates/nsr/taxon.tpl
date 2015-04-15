@@ -194,6 +194,8 @@
 		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">soort toevoegen aan {$concept.taxon}</a><br />
 	{elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
 		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}" class="edit" style="margin:0">ondersoort toevoegen aan "{$concept.taxon}"</a><br />
+	{elseif $concept.base_rank < $smarty.const.GENUS_RANK_ID}
+		<a href="taxon_new.php?parent={$concept.id}" class="edit" style="margin:0">onderliggend taxon toevoegen aan "{$concept.taxon}"</a><br />
 	{/if}
 </p>
 <p>

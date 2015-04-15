@@ -1175,7 +1175,8 @@ class Literature2Controller extends Controller
 			if(!empty($search) && $search=='*')
 			{
 				$match=true;
-			} else
+			} 
+			else
 			if(!empty($search))
 			{
 				if ($matchStartOnly)
@@ -1184,6 +1185,9 @@ class Literature2Controller extends Controller
 
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)===0);
+
+					if (!$match)
+						$match=$match ? true : (stripos($val['author'],$search)===0);
 				}
 				else 
 				{
@@ -1191,6 +1195,9 @@ class Literature2Controller extends Controller
 					
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)!==false);
+
+					if (!$match)
+						$match=$match ? true : (stripos($val['author'],$search)!==false);
 				}
 
 			} 
@@ -1217,9 +1224,17 @@ class Literature2Controller extends Controller
 			if (!empty($searchAuthor))
 			{
 				if ($matchStartOnly)
+				{
 					$match=$match ? true : (stripos($tempauthors,$searchAuthor)===0);
+					if (!$match)
+						$match=$match ? true : (stripos($val['author'],$searchAuthor)===0);
+				}
 				else
+				{
 					$match=$match ? true : (stripos($tempauthors,$searchAuthor)!==false);
+					if (!$match)
+						$match=$match ? true : (stripos($val['author'],$searchAuthor)!==false);
+				}
 
 				if (!$match)
 				{
@@ -1227,17 +1242,30 @@ class Literature2Controller extends Controller
 					{
 						$startLetterOrd=ord(substr(strtolower($tempauthors),0,1));
 						$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
+						if (!$match)
+						{
+							$startLetterOrd=ord(substr(strtolower($val['author']),0,1));
+							$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
+						}
 					}
 					else
 					{
 						if ($matchStartOnly)
+						{
 							$match=$match ? true : (stripos($tempauthors,$searchAuthor)===0);
+							if (!$match)
+								$match=$match ? true : (stripos($val['author'],$searchAuthor)===0);
+						}
 						else
+						{
 							$match=$match ? true : (stripos($tempauthors,$searchAuthor)!==false);
+							if (!$match)
+								$match=$match ? true : (stripos($val['author'],$searchAuthor)!==false);
+						}
 					}
 				}
 			}
-			
+
 			if ($match)
 			{
 				$val['authors']=$authors;
