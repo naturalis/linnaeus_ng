@@ -20,6 +20,7 @@ function parse_footer( data )
 
 $(document).ready(function()
 {
+	fetch_footer();
 	allLookupAlwaysFetch=true;
 });
 
