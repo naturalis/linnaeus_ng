@@ -1,4 +1,4 @@
-    <aside role="complementary" class="large-3 large-pull-6 sidebar-first columns sidebar">
+    <aside role="complementary" class="large-3 large-pull-6 sidebar-first columns sidebar" id='search-box'>
         <section class="block block-block-nlsoort-search block-block-nlsoort-search-nlsoort-search clearfix">
         
 	        <h2 class="block-title">&nbsp;</h2>
