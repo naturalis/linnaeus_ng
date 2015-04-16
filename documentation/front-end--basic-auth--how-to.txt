@@ -1,0 +1,11 @@
+/var/www/linnaeusng/www/app/.htaccess
+AuthUserFile /var/www/linnaeusng/.htpasswd
+AuthType Basic
+AuthName "project name"
+Require valid-user
+
+htpasswd -c /var/www/linnaeusng/.htpasswd your_username
+	enter password
+	
+requires apache2-utils
+	apt-get install apache2-utils

@@ -1,8 +1,17 @@
 {include file="../shared/admin-header.tpl"}
 {include file="../shared/admin-messages.tpl"}
 
-<div id="page-main">
+<style>
+h4 {
+	margin-bottom:-5px;
+}
+.result-block {
+	display:block;
+	margin-bottom:4px;
+}
+</style>
 
+<div id="page-main">
 
 {if $results}
 
@@ -14,18 +23,20 @@
 
 {if $results.count>0}
 
-
-	{foreach from=$results.data item=v}
+	{foreach from=$results.data item=v key=k}
 		{if $v.numOfResults>0}
+	    	<h3>{$v.label}</h3>
 			{foreach from=$v.results item=r}
 				{if $r.numOfResults>0}
-					<h3>{$r.label} ({$r.data|@count})</h3>
+					<h4>in {$r.label} ({$r.data|@count})</h4>
 					{foreach from=$r.data item=d}
+                    	<span class="result-block">
 						<h4>
 						{if $d.page_id}<a href="{$r.url|sprintf:$d.id:$d.page_id}">{else}<a href="{$r.url|sprintf:$d.id}">{/if}{$d.label}</a> ({$d.matches|@count})</h4>
 						{foreach from=$d.matches item=match}
 						<h5>{$match}</h5>
 						{/foreach}
+                        </span>
 					{/foreach}
 				{/if}
 			{/foreach}

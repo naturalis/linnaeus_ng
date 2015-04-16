@@ -735,33 +735,34 @@ class SearchController extends Controller
 		}
 
 		return array(
+			'label' => $this->translate('Species'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
+					'label' => $this->translate('names'), // when changing the label 'Species names', do the same in searchMap()
 					'url' => '../species/edit.php?id=%s',
 					'data' => $taxa,
 					'numOfResults' => count((array)$taxa)
 				),
 				array(
-					'label' => $this->translate('Species descriptions'),
+					'label' => $this->translate('descriptions'),
 					'url' => '../species/taxon.php?id=%s&page=%s',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				),
 				array(
-					'label' => $this->translate('Species synonyms'),
+					'label' => $this->translate('synonyms'),
 					'url' => '../species/synonyms.php?id=%s',
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				),
 				array(
-					'label' => $this->translate('Species common names'),
+					'label' => $this->translate('common names'),
 					'url' => '../species/common.php?id=%s',
 					'data' => $commonnames,
 					'numOfResults' => count((array)$commonnames)
 				),
 				array(
-					'label' => $this->translate('Species media'),
+					'label' => $this->translate('media'),
 					'url' => '../species/media.php?id=%s',
 					'data' => $media,
 					'numOfResults' => count((array)$media)
@@ -792,9 +793,10 @@ class SearchController extends Controller
 		$content = $this->sortResultsByMostTokensFound($content);
 
 		return array(
+			'label' => $this->translate('Introduction'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Introduction'),
+					'label' => $this->translate('pages'),
 					'url' =>'../introduction/edit.php?id=%s',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
@@ -833,7 +835,7 @@ class SearchController extends Controller
 					//'%LITERAL%' => "MATCH(synonym) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[S_LIKETEXT_STRING],array('synonym')),
 				),
-				'columns' => 'id,glossary_id,synonym,language_id,synonym as '.__CONCAT_RESULT__,
+				'columns' => 'id,glossary_id,synonym as label,language_id,synonym as '.__CONCAT_RESULT__,
 				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
 			)
 		);
@@ -843,15 +845,16 @@ class SearchController extends Controller
 		$synonym = $this->sortResultsByMostTokensFound($synonym);
 
 		return array(
+			'label' => $this->translate('Glossary'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Items'),
+					'label' => $this->translate('items'),
 					'url' =>'../glossary/edit.php?id=%s',
 					'data' => $gloss,
 					'numOfResults' => count((array)$gloss)
 				),
 				array(
-					'label' => $this->translate('Synonyms'),
+					'label' => $this->translate('synonyms'),
 					'url' =>'../glossary/edit.php?id=%s',
 					'data' => $synonym,
 					'numOfResults' => count((array)$synonym)
@@ -935,9 +938,10 @@ class SearchController extends Controller
 		$books = $this->sortResultsByMostTokensFound($books);
 
 		return array(
+			'label' => $this->translate('Literature'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Literature'),
+					'label' => $this->translate('references'),
 					'url' => '../literature/edit.php?id=%s',
 					'data' => $books,
 					'numOfResults' => count((array)$books)
@@ -950,7 +954,6 @@ class SearchController extends Controller
 
 	private function searchDichotomousKey($p)
 	{
-
 		$keysteps = $this->models->Keystep->_get(
 			array(
 				'id' => array(
@@ -970,7 +973,7 @@ class SearchController extends Controller
 					//'%LITERAL%' => "MATCH(choice_txt) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[S_LIKETEXT_STRING],array('choice_txt')),
 				),
-				'columns' => 'id,choice_id,choice_txt as content,choice_txt as '.__CONCAT_RESULT__,
+				'columns' => 'choice_id as id,choice_txt as content,choice_txt as '.__CONCAT_RESULT__,
 				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
 			)
 		);
@@ -985,7 +988,7 @@ class SearchController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['choice_id'],
+						'id' => $val['id'],
 					),
 					'columns' => 'keystep_id,show_order'
 				)
@@ -994,8 +997,6 @@ class SearchController extends Controller
 			$choices[$key]['label'] = sprintf($this->translate('Step %s, choice %s'),$keysteps[$step[0]['keystep_id']]['number'],$step[0]['show_order']);
 
 		}
-
-
 
 		// steps
 		$steps = $this->models->ContentKeystep->_get(
@@ -1018,15 +1019,16 @@ class SearchController extends Controller
 
 
 		return array(
+			'label' => $this->translate('Dichotomous key'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Steps'),
+					'label' => $this->translate('steps'),
 					'url' =>'../key/step_show.php?id=%s',
 					'data' => $steps,
 					'numOfResults' => count((array)$steps)
 				),
 				array(
-					'label' => $this->translate('Choices'),
+					'label' => $this->translate('choices'),
 					'url' =>'../key/choice_edit.php?id=%s',
 					'data' => $choices,
 					'numOfResults' => count((array)$choices)
@@ -1065,9 +1067,10 @@ class SearchController extends Controller
 		$titles = $this->sortResultsByMostTokensFound($titles);
 
 		return array(
+			'label' => $this->translate('Map'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Datatypes'),
+					'label' => $this->translate('datatypes'),
 					'url' => '../mapkey/data_types.php',
 					'data' => $titles,
 					'numOfResults' => count((array)$titles)
@@ -1100,9 +1103,10 @@ class SearchController extends Controller
 		$content = $this->sortResultsByMostTokensFound($content);
 
 		return array(
+			'label' => $this->translate('Content'),
 			'results' => array(
 				array(
-					'label' => $this->translate('Navigator'),
+					'label' => $this->translate('navigator'),
 					'url' => '../content/content.php?id=%s',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
@@ -1172,6 +1176,7 @@ class SearchController extends Controller
 		}
 		
 		return array(
+			'label' => $this->translate('Other modules'),
 			'results' => $content,
 			'numOfResults' => $t
 		);
