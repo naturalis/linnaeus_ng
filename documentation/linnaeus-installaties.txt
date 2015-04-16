@@ -66,3 +66,7 @@ determineren-development-001.naturalis.nl	10.42.1.48
 	/var/www/linnaeusng
 
 
+heukels
+	prod	http://heukels.naturalis.nl
+	test	http://134.213.157.116/
+
