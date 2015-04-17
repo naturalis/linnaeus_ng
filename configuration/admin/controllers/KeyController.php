@@ -4,7 +4,7 @@
 
 	MAKE SURE YOU RUN:
 	
-	alter table dev_choices_keysteps add index `project_id_2` (project_id,res_taxon_id);
+	alter table choices_keysteps add index `project_id_2` (project_id,res_taxon_id);
 
 */
 
