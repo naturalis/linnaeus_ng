@@ -7,6 +7,11 @@
 	cursor:move;
 	width:10px;
 }
+
+li.child {
+    list-style: outside none square;
+    margin-left: 15px;
+}
 </style>
 
 <div id="page-main">
