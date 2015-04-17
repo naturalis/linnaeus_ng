@@ -36,7 +36,7 @@ $(document).ready(function() {
 	rootNodeLabel=null;
 	taxonTargetUrl='edit.php?id=%s';
 
-	{if 1==2 && $tree}
+	{if $tree}
 		$( "#"+container ).html( {$tree} );
 		makeSortable();
 	{elseif $nodes}
