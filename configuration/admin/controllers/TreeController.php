@@ -191,11 +191,6 @@ class TreeController extends Controller
 
 				left join %PRE%ranks _r
 					on _p.rank_id=_r.id
-
-				left join %PRE%commonnames _l
-					on _a.id=_l.taxon_id
-					and _a.project_id=_l.project_id
-					and _l.language_id=".$this->getDefaultProjectLanguage()."
 	
 				where 
 					_a.project_id = ".$this->getCurrentProjectId()." 
@@ -226,34 +221,32 @@ class TreeController extends Controller
 			else
 			if ($count=='species') 
 			{
-	
-				$d=$this->models->Taxon->freeQuery(array(
-					'query'=> "
-						select
-							count(_sq.taxon_id) as total,
-							_sq.taxon_id
-						from 
-							%PRE%taxon_quick_parentage _sq
-						
-						left join %PRE%taxa _e
-							on _sq.taxon_id = _e.id
-							and _sq.project_id = _e.project_id
-						
-						left join %PRE%projects_ranks _f
-							on _e.rank_id=_f.id
-							and _e.project_id = _f.project_id
-						
-						where
-							_sq.project_id=".$this->getCurrentProjectId()."
-							and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-
-							and MATCH(_sq.parentage) AGAINST ('".$this->padId($val['id'])."' in boolean mode)"
-					)
-				);
+					$d=$this->models->Taxon->freeQuery("
+					select
+						count(_sq.taxon_id) as total,
+						_sq.taxon_id
+					from 
+						%PRE%taxon_quick_parentage _sq
+					
+					left join %PRE%taxa _e
+						on _sq.taxon_id = _e.id
+						and _sq.project_id = _e.project_id
+					
+					left join %PRE%projects_ranks _f
+						on _e.rank_id=_f.id
+						and _e.project_id = _f.project_id
+					
+					where
+						_sq.project_id=".$this->getCurrentProjectId()."
+						and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
+						and MATCH(_sq.parentage) AGAINST ('".$this->padId($val['id'])."' in boolean mode)
+					group by _sq.taxon_id
+				");
 				
 				$val['child_count']=$d[0]['total'];
 
-			} else
+			} 
+			else
 			{
 				$val['child_count']=null;
 			}
@@ -287,7 +280,7 @@ class TreeController extends Controller
 					);
 					
 				$val['has_children']=$d[0]['total']>0;
-				$progeny[]=$val;
+				$progeny[$val['id']]=$val;
 			}
 		}
 		
