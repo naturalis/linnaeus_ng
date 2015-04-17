@@ -210,8 +210,8 @@ function checkAutoExpand()
 
 
 
-	function saveNewOrder()
-	{
-arraied = $('.sortable').nestedSortable('toArray', { startDepthCount: 0 } );
-console.dir(arraied);
-	}
+function saveNewOrder()
+{
+	arraied = $('.sortable').nestedSortable('toArray', { startDepthCount: 0 } );
+	//console.dir(arraied);
+}
