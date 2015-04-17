@@ -14,6 +14,20 @@
 {assign var=isHigherTaxa value=true}
 {/if}
 
+{function branch level=0}
+    {foreach $data as $k => $v}
+    {* if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa) *}
+	<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $current==$v.id}selected="selected"{/if} >
+	{'&nbsp;&nbsp;&nbsp;'|str_repeat:$level}{$v.taxon_formatted}
+    </option>
+	{if $v.children}
+    {branch data=$v.children level=$level+1 current=$current}
+	{/if}
+    {* /if *}
+    {/foreach}
+{/function}
+
+
 {if $data.id}<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$data.id}','_top')" />{/if}
 <table>
 	<tr>
@@ -22,21 +36,13 @@
 		</td>
 		<td>
             <select name="parent_id" id="parent-id" style="width:300px">
-            <option value="-1">{t}No parent{/t}</option>
-            {foreach from=$taxa key=k item=v}
-            {if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-                <option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
-                {section name=foo loop=$v.level-$taxa[0].level}
-                &nbsp;
-                {/section}		
-                {$v.taxon_formatted}</option>
-            {/if}
-            {/foreach}
+                <option value="-1">{t}No parent{/t}</option>
+                <option disabled="disabled"></option>
+                {branch data=$taxa current=$data.parent_id}
             </select>
 		</td>
 		<td>
 			<span id="rank-message" class=""></span>
-            {* <span style="cursor:pointer" onclick="bla();">&xi;&Xi;&Xi;</span> *}
 		</td>
 	</tr>
 

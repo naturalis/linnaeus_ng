@@ -17,7 +17,7 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
 	pre-check
 		make sure $iniSettings.upload_max_filesize and $iniSettings.post_max_size are sufficient (see config for allowed filesizes)
 
-	new project order of business (* do immediately, else can be done later):
+	new project order of business (* do immediately, others can be done later):
 
 		- select ranks *
 		- determine where the distinction between hogher taxa and species module lies *
@@ -501,14 +501,15 @@ class SpeciesController extends Controller
 
         $pr = $this->newGetProjectRanks();
 
-        if (count((array) $pr) == 0) {
-
+		//REFAC2015 move this to init!
+        if (count((array)$pr)==0)
+		{
             $this->addMessage($this->translate('No ranks have been defined.'));
         }
 
         else
-        if (!$this->doLockOutUser($this->requestData['id'], true)) {
-
+        if (!$this->doLockOutUser($this->requestData['id'], true))
+		{
 	        if (isset($data))
 	            $this->smarty->assign('data', $data);
 
@@ -731,13 +732,7 @@ class SpeciesController extends Controller
 
 
             $this->smarty->assign('allowed', true);
-
-			$this->newGetTaxonTree();
-
-			if (isset($this->treeList))
-			{
-				$this->smarty->assign('taxa', $this->treeList);
-			}
+			$this->smarty->assign('taxa',$this->newGetTaxonTree());
 
             $s = $this->getProjectIdRankByname('Subgenus');
             if ($s)
@@ -768,17 +763,19 @@ class SpeciesController extends Controller
 
         $pr = $this->newGetProjectRanks();
 
-        $this->newGetTaxonTree();
-
+		// REFAC2015 move to init
         if (count((array) $pr)==0)
 		{
-
             $this->addMessage($this->translate('No ranks have been defined.'));
         }
         else
 		{
-
+			
+			// REFAC2015 why are these here??
+			$this->newGetTaxonTree();
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
+
+
 
             // save
             if ($this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save')
@@ -793,81 +790,89 @@ class SpeciesController extends Controller
 
                 $parent = $this->getTaxonById($parentId);
 
-                $newName = $this->requestData['taxon'];
 
-                $newName = trim(preg_replace('/\s+/', ' ', $newName));
+		// REFAC2015 move to a cleanuo function
+		$newName = $this->requestData['taxon'];
+		$newName = trim(preg_replace('/\s+/', ' ', $newName));
+		// remove ()'s from subgenus (changed silently)
+		$newName = $this->fixSubgenusParentheses($newName, $this->requestData['rank_id']);
+		// first letter is capitalized & subgenus parantheses are removed (changed silently)
+		$newName = $this->fixNameCasting($newName);
 
-                // remove ()'s from subgenus (changed silently)
-                $newName = $this->fixSubgenusParentheses($newName, $this->requestData['rank_id']);
-                // first letter is capitalized & subgenus parantheses are removed (changed silently)
-                $newName = $this->fixNameCasting($newName);
 
                 $hasErrorButCanSave = null;
 
-                //checks
-                /* NON LETHAL */
-                if (!$this->checkNameSpaces($newName, $this->requestData['rank_id'], $this->requestData['parent_id'])) {
-                    $this->addError($this->translate('The number of spaces in the name does not match the selected rank.'));
-                    $hasErrorButCanSave = true;
-                }
+		// REFAC2015 make separate functions
+		//checks
+		/* NON LETHAL */
+		if (!$this->checkNameSpaces($newName, $this->requestData['rank_id'], $this->requestData['parent_id'])) {
+			$this->addError($this->translate('The number of spaces in the name does not match the selected rank.'));
+			$hasErrorButCanSave = true;
+		}
 
-                // no markers
-                $d = $this->removeMarkers($newName);
-                if ($d != $newName) {
-                    $this->addError($this->translate('Markers are inserted automatically.'));
-                    $hasErrorButCanSave = true;
-                    $newName = $d;
-                }
+		// no markers
+		$d = $this->removeMarkers($newName);
+		if ($d != $newName) {
+			$this->addError($this->translate('Markers are inserted automatically.'));
+			$hasErrorButCanSave = true;
+			$newName = $d;
+		}
 
-                // 3. Names are written in Latin (yeah right) and should not contain special characters or digits.
-                if (!$this->checkCharacters($newName)) {
-                    $this->addError($this->translate('The name you specified contains invalid characters.'));
-                    $hasErrorButCanSave = true;
-                }
+		// 3. Names are written in Latin (yeah right) and should not contain special characters or digits.
+		if (!$this->checkCharacters($newName)) {
+			$this->addError($this->translate('The name you specified contains invalid characters.'));
+			$hasErrorButCanSave = true;
+		}
 
-                // 2. Issue warning if a species is not linked to an ideal parent.
-                if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
-                    $this->addError(
-                    sprintf($this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'),
-                    strtolower($pr[$this->requestData['rank_id']]['rank']), strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
-                    $hasErrorButCanSave = true;
-                }
-
-
-                /* LETHAL / NON-LETHAL */
-                $dummy = $this->newIsTaxonNameUnique(array(
-                    'name' => $newName,
-                    'rankId' => $this->requestData['rank_id'],
-                    'parentId' => $parentId
-                ));
-                if ($dummy === false) {
-                    $this->addError(sprintf($this->translate('The name "%s" already exists.'), $newName));
-                    $hasErrorButCanSave = false;
-                }
-                else if ($dummy !== true) {
-                    $this->addError($dummy);
-                    $hasErrorButCanSave = true;
+		// 2. Issue warning if a species is not linked to an ideal parent.
+		if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
+			$this->addError(
+			sprintf($this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'),
+			strtolower($pr[$this->requestData['rank_id']]['rank']), strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
+			$hasErrorButCanSave = true;
                 }
 
 
-                /* LETHAL */
-                if (!$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+
+
+		// REFAC2015 make separate functions
+		/* LETHAL / NON-LETHAL */
+		$dummy = $this->newIsTaxonNameUnique(array(
+			'name' => $newName,
+			'rankId' => $this->requestData['rank_id'],
+			'parentId' => $parentId
+		));
+		if ($dummy === false) {
+			$this->addError(sprintf($this->translate('The name "%s" already exists.'), $newName));
+			$hasErrorButCanSave = false;
+		}
+		else if ($dummy !== true) {
+			$this->addError($dummy);
+			$hasErrorButCanSave = true;
+		}
+
+
+		/* LETHAL */
+		if (!$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
 // causes problems when saving the very first taxon
 //                    $this->addError($this->translate('The selected parent taxon can not have children.'));
 //                    $hasErrorButCanSave = false;
-                }
-                else {
+		}
+		else {
 
-                    if (!$this->doNameAndParentMatch($newName, $parent['taxon'])) {
-                        $this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'), $parent['taxon'], $newName));
-                        $hasErrorButCanSave = false;
-                    }
-                }
+			if (!$this->doNameAndParentMatch($newName, $parent['taxon'])) {
+				$this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'), $parent['taxon'], $newName));
+				$hasErrorButCanSave = false;
+			}
+		}
 
-                if ($isHybrid != '0' && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
-                    $this->addError($this->translate('Rank cannot be hybrid.'));
-                    $hasErrorButCanSave = false;
-                }
+		if ($isHybrid != '0' && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
+			$this->addError($this->translate('Rank cannot be hybrid.'));
+			$hasErrorButCanSave = false;
+		}
+		
+		
+		
 
                 // save as requested
                 if (is_null($hasErrorButCanSave) || $this->rHasVal('override', '1'))
@@ -912,13 +917,15 @@ class SpeciesController extends Controller
 				{
                     $this->requestData['taxon'] = $newName;
 
-                    if ($hasErrorButCanSave) {
+                    if ($hasErrorButCanSave)
+					{
                         $this->addMessage(
                         '
                         	Please be aware of the warnings above before saving.<br />
                         	<input type="button" onclick="taxonOverrideSaveNew()" value="' . $this->translate('save anyway') . '" />');
                     }
-                    else {
+                    else
+					{
                         $this->addError('Taxon not saved.');
                     }
 
@@ -931,10 +938,10 @@ class SpeciesController extends Controller
 
         $this->smarty->assign('projectRanks', $pr);
 
-        if (isset($this->treeList))
-            $this->smarty->assign('taxa', $this->treeList);
+		$this->smarty->assign('taxa',$this->newGetTaxonTree());
 
         $s = $this->getProjectIdRankByname('Subgenus');
+
         if ($s)
             $this->smarty->assign('rankIdSubgenus', $s);
 
@@ -4736,7 +4743,7 @@ class SpeciesController extends Controller
 				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
 
 			) as unification
-			where 1
+			where 1=1
 			".($rankAbove ? "and base_rank_id < ".$rankAbove : "")."
 			".($rankEqualAbove ? "and base_rank_id <= ".$rankEqualAbove : "")."
 
@@ -4764,7 +4771,7 @@ class SpeciesController extends Controller
 			unset($taxa[$key]['taxon']);
 			unset($taxa[$key]['source']);
 		}
-
+		
 		return
 			$this->makeLookupList(array(
 				'data'=>$taxa,

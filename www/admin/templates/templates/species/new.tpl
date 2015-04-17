@@ -7,80 +7,31 @@
 <input type="hidden" id="action" name="action" value="save" />
 <input type="hidden" id="next" name="next" value="new" />
 <table>
-	{*
 	<tr>
 		<td>
 			{t}Parent taxon: {/t}
 		</td>
 		<td>				
-			{assign var=prev value=null}
-			{assign var=prevLevel value=-1}
+
+            {function branch level=0}
+                {foreach $data as $k => $v}
+                {* if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa) *}
+                <option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $current==$v.id}selected="selected"{/if} >
+                {'&nbsp;&nbsp;&nbsp;'|str_repeat:$level}{$v.taxon_formatted}
+                </option>
+                {if $v.children}
+                {branch data=$v.children level=$level+1}
+                {/if}
+                {* /if *}
+                {/foreach}
+            {/function}
+
 			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent();taxonBlankOutRanks();" style="width:300px">
-			<option value="-1">{t}No parent{/t}</option>
-			{foreach from=$taxa key=k item=v}
-			{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-				<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
-				{section name=foo loop=$v.level-$taxa[0].level}
-				&nbsp;
-				{/section}		
-				{$v.taxon_formatted}
-				</option>
-			{/if}
-			{if $prevLevel!=$v.level}
-			{assign var=prev value=$v.id}
-			{/if}
-			{assign var=prevLevel value=$v.level}
-			{/foreach}
-			</select>
-		</td>
-		<td>
-			<span id="rank-message" class=""></span> 
-		</td>
-	</tr>
-	<tr>
-		<td>
-			{t}Rank:{/t}
-		</td>
-		<td colspan="2">
-			<select name="rank_id" id="rank-id" onchange="taxonChangeSubmitButtonLabel();taxonGetFormattedPreview();">
-			{assign var=firstLower value=true}
-			{foreach item=v from=$projectRanks}
-				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
-					{if (!$isHigherTaxa && $v.lower_taxon==1) && $firstLower}
-						<option value="{$prev.id}" root_rank_id="{$prev.rank_id}" ideal_parent_id="{$prev.ideal_parent_id}" {if $data.rank_id==$prev.id}selected="selected"{/if}>{$prev.rank}</option>
-					{/if}
-					<option value="{$v.id}" root_rank_id="{$v.rank_id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
-					{if $v.lower_taxon==1}{assign var=firstLower value=false}{/if}
-				{/if}
-				{assign var=prev value=$v}
-			{/foreach}
-			</select>
-		</td>
-	</tr>
-	*}
-	
-	<tr>
-		<td>
-			{t}Parent taxon: {/t}
-		</td>
-		<td>				
-			{assign var=prev value=null}
-			{assign var=prevLevel value=-1}
-			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent();taxonBlankOutRanks();" style="width:300px">
-			<option value="-1">{t}No parent{/t}</option>
-			{foreach from=$taxa key=k item=v}
-			<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
-			{section name=foo loop=$v.level-$taxa[0].level}
-			&nbsp;
-			{/section}		
-			{$v.taxon_formatted}
-			</option>
-			{if $prevLevel!=$v.level}
-			{assign var=prev value=$v.id}
-			{/if}
-			{assign var=prevLevel value=$v.level}
-			{/foreach}
-			</select>
+                <option value="-1">{t}No parent{/t}</option>
+                <option disabled="disabled"></option>
+                {branch data=$taxa}
+            </select>
+
 		</td>
 		<td>
 			<span id="rank-message" class=""></span> 

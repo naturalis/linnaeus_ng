@@ -1819,7 +1819,8 @@ class Controller extends BaseClass
 
     private function getTaxonChildren($id,$alphabeticalTree)
     {
-        if (is_null($this->tmp)) {
+        if (is_null($this->tmp))
+		{
 
 			$p = array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -1831,10 +1832,9 @@ class Controller extends BaseClass
 
             $d = $this->models->Taxon->_get($p);
 
-            foreach((array)$d as $val) {
-
+            foreach((array)$d as $val)
+			{
                 $this->tmp[$val['parent_id']][$val['id']] = $val;
-
             }
 
         }
@@ -1843,7 +1843,7 @@ class Controller extends BaseClass
 
     }
 
-    private function _newGetTaxonTree ($p = null)
+    private function _newGetTaxonTree ( $p=null )
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
         $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
@@ -1855,8 +1855,8 @@ class Controller extends BaseClass
 
         $t = $this->getTaxonChildren($pId,$alphabeticalTree);
 
-        foreach ((array) $t as $key => $val) {
-
+        foreach ((array) $t as $key => $val)
+		{
             $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
             $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
             $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
