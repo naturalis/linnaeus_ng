@@ -65,43 +65,41 @@ function growbranches(data)
 		progeny+=
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'"> \
 				<div class="node-div">&#9617;</div>'+
-				(d.has_children ?'<span style="padding-left:2px"><a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+(d.rank_label ?
+				(d.has_children ?'<span><a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+(d.rank_label ?
 					'<span class="rank">'+d.rank_label+'</span>' : '' )+'</a></span>':d.label)+
 				(nodeCountType=='species' && d.child_count && d.child_count.total>0 ?
 					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' : '')+
 				(nodeCountType=='taxon' && d.child_count && d.child_count>0 ? '<span class="child-count">'+d.child_count+'</span>':'')+
-				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'" class="detail-link">&rarr;</a>'+
-			'</li>';
+				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'" class="detail-link">&rarr;</a> \
+			</li>';
 	}
 	
 	if (progeny) progeny='<ul id="children-'+data.node.id+'">'+progeny+'</ul>';
 
 	var buffer=
-		'<ul class="sortable">'+
-			'<li class="child" id="node-'+data.node.id+'">'+
-				'<div class="node-div">&#9617;</div>'+
-				(!activeNode ?
-					'<a href="#" onclick="buildtree(false);return false">'+(rootNodeLabel ? rootNodeLabel : data.node.label)+'</a>' :
-					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+(rootNodeLabel ? rootNodeLabel : data.node.label)+'</a>'
-				)+
-				(data.node.rank_label?'<span class="rank">'+data.node.rank_label+'</span>':'')+
-				(nodeCountType=='species' && data.node.child_count && data.node.child_count.total>0 && !activeNode ?
-					'<span class="child-count">'+
-						data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :'' )+
-				(nodeCountType=='species' &&data.node.child_count && data.node.child_count.total>0 && activeNode ?
-					'<span class="child-count">'+data.node.child_count.total+'/'+data.node.child_count.established+'</span>' :'' )+
-				(nodeCountType=='taxon' && data.node.child_count && data.node.child_count>0 && !activeNode ?
-					'<span class="child-count">'+data.node.child_count+' taxa</span>':'' )+
-				(nodeCountType=='taxon' &&data.node.child_count && data.node.child_count>0 && activeNode ?
-					'<span class="child-count">'+data.node.child_count+'</span>':'' )+
-				'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'" class="detail-link">&rarr;</a>'+
-				progeny+
-			'</li>'+
-		'</ul>';
+		'<li class="child" id="node-'+data.node.id+'"> \
+			<div class="node-div">&#9617;</div>'+
+			(!activeNode ?
+				'<a href="#" onclick="buildtree(false);return false">'+(rootNodeLabel ? rootNodeLabel : data.node.label)+'</a>' :
+				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+(rootNodeLabel ? rootNodeLabel : data.node.label)+'</a>'
+			)+
+			(data.node.rank_label?'<span class="rank">'+data.node.rank_label+'</span>':'')+
+			(nodeCountType=='species' && data.node.child_count && data.node.child_count.total>0 && !activeNode ?
+				'<span class="child-count">'+
+					data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :'' )+
+			(nodeCountType=='species' &&data.node.child_count && data.node.child_count.total>0 && activeNode ?
+				'<span class="child-count">'+data.node.child_count.total+'/'+data.node.child_count.established+'</span>' :'' )+
+			(nodeCountType=='taxon' && data.node.child_count && data.node.child_count>0 && !activeNode ?
+				'<span class="child-count">'+data.node.child_count+' taxa</span>':'' )+
+			(nodeCountType=='taxon' &&data.node.child_count && data.node.child_count>0 && activeNode ?
+				'<span class="child-count">'+data.node.child_count+'</span>':'' )+
+			'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'" class="detail-link">&rarr;</a>'+
+			progeny+
+		'</li>';
 
 	if (activeNode==false)
 	{
-		$( "#"+container ).html( buffer );
+		$( "#"+container ).html( '<ul class="sortable">' + buffer + '</ul>' );
 	}
 	else
 	{
@@ -109,6 +107,8 @@ function growbranches(data)
 	}
 	
 }
+
+
 
 function storetree()
 {
