@@ -617,7 +617,7 @@ class SearchController extends Controller
 					'%LITERAL%' => $this->makeLikeClause($p[S_LIKETEXT_STRING],array('content')),
 					'publish' => 1
 				),
-				'columns' => 'id,taxon_id,content,page_id,content as '.__CONCAT_RESULT__,
+				'columns' => 'taxon_id as id,taxon_id,content,page_id,content as '.__CONCAT_RESULT__,
 				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
 			)
 		);
@@ -626,8 +626,8 @@ class SearchController extends Controller
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 		$content = $this->sortResultsByMostTokensFound($content);
 
-		foreach((array)$content as $key => $val)  {
-
+		foreach((array)$content as $key => $val)
+		{
 			$tpt = $this->models->PageTaxonTitle->_get(
 				array(
 					'id' => array(
@@ -645,7 +645,6 @@ class SearchController extends Controller
 						'ranks' => $ranks
 					)
 				).' ('.$tpt[0]['title'].')';
-
 		}
 
 
@@ -682,8 +681,8 @@ class SearchController extends Controller
 
 		$commonnames = $this->filterResultsWithTokenizedSearch(array($p,$commonnames,array('commonname','transliteration')));
 
-		foreach((array)$commonnames as $key => $val) {
-			
+		foreach((array)$commonnames as $key => $val)
+		{
 			$commonnames[$key]['label'] = 
 				(!empty($val['transliteration']) ?
 					($val['transliteration']).
