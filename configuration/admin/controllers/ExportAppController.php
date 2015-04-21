@@ -209,7 +209,7 @@ class ExportAppController extends Controller
         return $m;
     }
 
-    private function makeStandAloneMatrixDump ($matrixId,$languageId)
+    private function makeStandAloneMatrixDump($matrixId,$languageId)
 	{
 		
 		$where = 
@@ -414,6 +414,55 @@ class ExportAppController extends Controller
 		
 		
 	}
+
+
+	public function deleteUnusedScriptAction()
+	{
+        $this->checkAuthorisation();
+
+		$platform=$this->rGetVal( "p" );
+
+		$list=$this->getImageList();
+
+		$buffer=array();
+
+		$file="delete_images.bat";
+		$tempdir="___temp_".time();
+
+		$buffer[]="mkdir ".$tempdir;
+
+		foreach((array)$list as $val)
+		{
+			$buffer[]='ren "'.$val.'" "'.$tempdir."/".$val.'"';
+		}
+
+		$buffer[]='del *.* /Q';
+
+		foreach((array)$list as $val)
+		{
+			$buffer[]='ren "'.$tempdir."/".$val.'" "'.$val.'"';
+		}
+
+		$buffer[]="rmdir ".$tempdir;
+echo '<pre>';
+/*
+		header('Cache-Control: public');
+		header('Content-Description: File Transfer');
+		header('Content-Type: text/plain');
+		header('Content-Disposition: attachment; filename='.$file);
+*/
+		foreach($buffer as $val)
+			echo $val,"\n";
+		
+		
+	}
+
+
+
+
+
+
+
 
 	private function makeFileName($projectName,$ext='xml')
 	{
@@ -816,6 +865,8 @@ class ExportAppController extends Controller
 
 		$this->_imageList=array_merge($this->_imageList,$this->_listOfEmbeddedImages);
 
+		$this->setImageList( $this->_imageList );
+
 	}
 	
 	private function convertDumpToSQLite()
@@ -913,6 +964,15 @@ class ExportAppController extends Controller
 		return @$_SESSION['admin']['user']['export']['_renameImageList'];
 	}
 
+    private function setImageList( $list )
+    {
+		$_SESSION['admin']['user']['export']['_imageList']=$list;
+    }
+
+    private function getImageList()
+    {
+		return @$_SESSION['admin']['user']['export']['_imageList'];
+	}
 
 
 

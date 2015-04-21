@@ -53,8 +53,8 @@
 		<td colspan="2">
 		{if $data.choice_img}
 			<img
-				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
-				src="{$session.admin.project.urls.project_media}{$data.choice_img}" 
+				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}','{$data.choice_img}');"
+				src="{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}" 
 				class="key-choice-image-normal" /><br />
 			<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 			{if $data.choice_image_params!=''}
