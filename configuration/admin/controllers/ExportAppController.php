@@ -389,20 +389,24 @@ class ExportAppController extends Controller
 			$buffer[]='#!/bin/bash';
 			$cmd="mv";
 			$file="rename_images.sh";
+			foreach((array)$list as $val)
+			{
+				$buffer[]=$cmd." ".escapeshellarg($val[0])." ".escapeshellarg($val[1]);
+			}
 		}
 		else
 		{
 			$cmd="ren";
 			$file="rename_images.bat";
-		}
-
-		foreach((array)$list as $val)
-		{
-			$buffer[]=$cmd." ".escapeshellarg($val[0])." ".escapeshellarg($val[1]);
+			foreach((array)$list as $val)
+			{
+				$buffer[]=$cmd.' "'.($val[0]).'" "'.($val[1]).'"';
+			}
 		}
 
 		header('Cache-Control: public');
 		header('Content-Description: File Transfer');
+		header('Content-Type: text/plain');
 		header('Content-Disposition: attachment; filename='.$file);
 
 		foreach($buffer as $val)
