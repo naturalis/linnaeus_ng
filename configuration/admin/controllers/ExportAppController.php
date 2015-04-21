@@ -257,20 +257,29 @@ class ExportAppController extends Controller
 			(array)$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation'))))
 		);
 
-		if ($this->_reduceURLs) {
-			foreach((array)$this->_exportDump->NbcExtras as $key => $val) {
-				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && (stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)) {
+		if ($this->_reduceURLs)
+		{
+			foreach((array)$this->_exportDump->NbcExtras as $key => $val)
+			{
+				if (
+					($val['name']=='url_image' || $val['name']=='url_thumbnail') && 
+					(stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)
+				)
+				{
 					$d=pathinfo($val['value']);
 					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
 				}
 			}
 
-			foreach((array)$this->_exportDump->MediaTaxon as $key => $val) {
-				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false) {
+			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
+			{
+				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false)
+				{
 					$d=pathinfo($val['file_name']);
 					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
 				}
-				if (stripos($val['thumb_name'],'http://')!==false || stripos($val['thumb_name'],'https://')!==false) {
+				if (stripos($val['thumb_name'],'http://')!==false || stripos($val['thumb_name'],'https://')!==false)
+				{
 					$d=pathinfo($val['thumb_name']);
 					$this->_exportDump->MediaTaxon[$key]['thumb_name']=$d['basename'];
 				}
@@ -307,6 +316,7 @@ class ExportAppController extends Controller
 			$this->_downloadFile = $this->rGetVal('downloadFile')=='y';
 			$this->_separateDrop = $this->rGetVal('separateDrop')=='y';
 			$this->_reduceURLs = $this->rGetVal('reduceURLs')=='y';
+			$this->_fixImageNames = $this->rGetVal('fixImageNames')=='y';
 			$this->_keepSubURLs = $this->rGetVal('keepSubURLs')=='y';
 			$this->_imgRootPlaceholder = $this->rGetVal('imgRootPlaceholder');
 			$this->_makeImageList =  $this->rGetVal('imageList')=='y';
@@ -335,16 +345,27 @@ class ExportAppController extends Controller
 			if ($this->_hasMap) $this->makeMapDump();
 			if ($this->_hasIntroduction) $this->makeIntroductionDump();
 	
+			if ($this->_fixImageNames) $this->fixImageNames();
 			if ($this->_makeImageList) $this->makeImageList();
 
 			$this->convertDumpToSQLite();
 			$output=$this->downloadSQLite();
 
 			if (!$this->_downloadFile)
+			{
 				$this->smarty->assign('output',$output);
+			}
+
+			if ($this->_fixImageNames)
+			{
+				$this->smarty->assign( 'fixImageNames',$this->_fixImageNames );
+				$this->smarty->assign( 'renameImageListCount', count((array)$this->_renameImageList) );
+			}
 			
 		}
 
+
+		$this->smarty->assign('appTitle',$_SESSION['admin']['project']['sys_name']);
 		$this->smarty->assign('appTitle',$_SESSION['admin']['project']['sys_name']);
 		$this->smarty->assign('projectModules',$pModules);
 		$this->smarty->assign('getTaxonTabs',$this->getTaxonTabs());
@@ -353,20 +374,53 @@ class ExportAppController extends Controller
 		$this->smarty->assign('default_langauge',$this->getDefaultProjectLanguage());
 		
         $this->printPage();
+	}
+	
+	public function imageRenameScriptAction()
+	{
+        $this->checkAuthorisation();
+
+		$platform=$this->rGetVal( "p" );
+		$list=$this->getRenameImageList();
+		$buffer=array();
+
+		if ( $platform=="lin" ) 
+		{
+			$buffer[]='#!/bin/bash';
+			$cmd="mv";
+			$file="rename_images.sh";
+		}
+		else
+		{
+			$cmd="ren";
+			$file="rename_images.bat";
+		}
+
+		foreach((array)$list as $val)
+		{
+			$buffer[]=$cmd." ".escapeshellarg($val[0])." ".escapeshellarg($val[1]);
+		}
+
+		header('Cache-Control: public');
+		header('Content-Description: File Transfer');
+		header('Content-Disposition: attachment; filename='.$file);
+
+		foreach($buffer as $val)
+			echo $val,"\n";
+		
 		
 	}
 
 	private function makeFileName($projectName,$ext='xml')
 	{
-
 		return strtolower(preg_replace('/\W/','_',$projectName)).(is_null($ext) ? null : '.'.$ext);
-
 	}
 
 	private function removeUnwantedColumns($s)
 	{
 		$d = explode(chr(10),$s);
-		foreach((array)$d as $key => $val) {
+		foreach((array)$d as $key => $val)
+		{
 			if (preg_match('/^(\s*)(`?)('.implode('|',$this->_appExpSkipCols).')(`?)/',$val)==1)
 				unset($d[$key]);
 		}
@@ -378,9 +432,13 @@ class ExportAppController extends Controller
 		if ($this->_removePrefix===false) return $s;
 		
 		if (is_null($table))
+		{
 			return str_ireplace($this->_removePrefix,'',$s);
+		}
 		else
+		{
 			return preg_replace('/(`'.$table.'`)/','`'.str_ireplace($this->_removePrefix,'',$table).'`',$s);
+		}
 	}
 
 
@@ -608,13 +666,108 @@ class ExportAppController extends Controller
 			{
 				$this->_exportDump->ContentIntroduction[$key]['content']=$this->supplantEmbeddedImgURLs($val['content']);
 			}
-
 		}
-
 	}
 	
 
-	
+	private function fixImageNames()
+	{
+		function needs_fixing( $s ) 
+		{
+			return preg_match( '/(\s+)/',$s );
+		}
+		
+		function do_fixing( $s ) 
+		{
+			return preg_replace( '/(\s+)/', '_', $s );
+		}
+		
+		function dont_duplicate( $s, $list1, $list2 )
+		{
+			$i=0;
+			while ( in_array( $s,$list1 ) || in_array( $s,$list2 ) )
+			{
+				$s .= "_(".$i.")";
+			}
+			return $s;
+		}
+		
+		$this->makeImageList();
+		$this->_renameImageList=array();
+		
+		if (isset($this->_exportDump->MediaTaxon))
+		{
+			foreach((array)$this->_exportDump->MediaTaxon as $key=>$val)
+			{
+				if ( needs_fixing( $val['file_name'] ) )
+				{
+					$p=do_fixing( $val['file_name'] );
+					$p=dont_duplicate( $p, $this->_imageList, $this->_renameImageList );
+					$this->_exportDump->MediaTaxon[$key]['file_name']=$p;
+					$this->_renameImageList[]=array( $val['file_name'],$p );
+				}
+			}
+		}
+
+		if (isset($this->_exportDump->CharacteristicState))
+		{
+			foreach((array)$this->_exportDump->CharacteristicState as $key=>$val)
+			{
+				if ( needs_fixing( $val['file_name'] ) )
+				{
+					$p=do_fixing( $val['file_name'] );
+					$p=dont_duplicate( $p, $this->_imageList, $this->_renameImageList );
+					$this->_exportDump->CharacteristicState[$key]['file_name']=$p;
+					$this->_renameImageList[]=array( $val['file_name'],$p );
+				}
+			}
+		}
+
+		if (isset($this->_exportDump->NbcExtras))
+		{
+			foreach((array)$this->_exportDump->NbcExtras as $key=>$val)
+			{
+				if ( ($val['name']=='url_thumbnail'||$val['name']=='url_image') && needs_fixing( $val['value'] ) )
+				{
+					$p=do_fixing( $val['value'] );
+					$p=dont_duplicate( $p, $this->_imageList, $this->_renameImageList );
+					$this->_exportDump->NbcExtras[$key]['value']=$p;
+					$this->_renameImageList[]=array( $val['value'],$p );
+				}
+			}
+		}		
+
+		if (isset($this->_exportDump->Keystep))
+		{
+			foreach((array)$this->_exportDump->Keystep as $key=>$val)
+			{
+				if ( needs_fixing( $val['image'] ) )
+				{
+					$p=do_fixing( $val['image'] );
+					$p=dont_duplicate( $p, $this->_imageList, $this->_renameImageList );
+					$this->_exportDump->Keystep[$key]['image']=$p;
+					$this->_renameImageList[]=array( $val['image'],$p );
+				}
+			}
+		}		
+
+		if (isset($this->_exportDump->ChoiceKeystep))
+		{
+			foreach((array)$this->_exportDump->ChoiceKeystep as $key=>$val)
+			{
+				if ( needs_fixing( $val['choice_img'] ) )
+				{
+					$p=do_fixing( $val['choice_img'] );
+					$p=dont_duplicate( $p, $this->_imageList, $this->_renameImageList );
+					$this->_exportDump->ChoiceKeystep[$key]['choice_img']=$p;
+					$this->_renameImageList[]=array( $val['choice_img'],$p );
+				}
+			}
+		}		
+
+		$this->setRenameImageList( $this->_renameImageList );
+		unset($this->_imageList);
+	}
 
 	private function makeImageList()
 	{
@@ -744,6 +897,18 @@ class ExportAppController extends Controller
 		));
 
     }
+
+
+    private function setRenameImageList( $list )
+    {
+		$_SESSION['admin']['user']['export']['_renameImageList']=$list;
+    }
+
+    private function getRenameImageList()
+    {
+		return @$_SESSION['admin']['user']['export']['_renameImageList'];
+	}
+
 
 
 
