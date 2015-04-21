@@ -8,7 +8,18 @@ Output:
 <p>
 <textarea id="output" style="width:100%;height:500px">{$output}</textarea>
 </p>
-<input type="button" value="select all (you'll have to copy manually)" onclick="$('#output').focus();$('#output').select();" />&nbsp;&nbsp;<a href="app_export.php">back</a>
+<input type="button" value="select all (you'll have to copy manually)" onclick="$('#output').focus();$('#output').select();" />
+{if $fixImageNames}
+<p>
+{if $renameImageListCount==0}
+(no images were renamed)
+{else}
+<a href="image_rename_script.php?p=win">download image rename script (windows)</a> / <a href="image_rename_script.php?p=lin">(linux)</a>
+<span style="color:red;font-weight:bold">make sure you run this on the image file directory!</span>
+{/if}
+</p>
+{/if}
+<a href="app_export.php">back</a>
 {else}
 
     <form method="post">
@@ -50,6 +61,7 @@ Output:
     <p>
     options:<br />
     <label><input type="checkbox" name="reduceURLs" value="y" checked="checked"/>reduce image URLs to filenames only</label><br />
+    <label><input type="checkbox" name="fixImageNames" value="y" checked="checked"/>remove spaces from image names</label><br />
     <label><input type="checkbox" name="keepSubURLs" value="y" checked="checked"/>when reducing image URLs, retain folder structure <i>inside</i> "{$session.admin.project.urls.project_media}" (embedded images only)</label><br />
 	image root placeholder: <input type="text" name="imgRootPlaceholder" value="$IMAGE_ROOT$" style="width:100px;" /> (embedded images only)<br />
     {if $dbSettings.tablePrefix!=''}
