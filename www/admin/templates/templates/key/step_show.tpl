@@ -25,7 +25,7 @@
 
     {if $step.image}
     <p>
-        <img src="{$session.admin.project.urls.project_media}{$step.image}" /><br />
+        <img src="{$session.admin.project.urls.project_media}{$step.image}?rnd={$rnd}" /><br />
         <span style="color:red">Please note: this image is a legacy feature inherited from Linnaeus 2. It cannot be changed.</span><br />
         <a href="#" onclick="keyDeleteImage();return false;">{t}delete image{/t}</a> | 
         <a href="#" onclick="keyDeleteAllImages()return false;;">{t}delete all images{/t}</a>
@@ -71,8 +71,8 @@
             <td>
             {if $v.choice_img}
                 <img
-                onclick="allShowMedia('{$session.admin.project.urls.project_media}{$v.choice_img}','{$v.choice_img}');" 
-                src="{$session.admin.project.urls.project_media}{$v.choice_img}"
+                onclick="allShowMedia('{$session.admin.project.urls.project_media}{$v.choice_img}?rnd={$rnd}','{$v.choice_img}');" 
+                src="{$session.admin.project.urls.project_media}{$v.choice_img}?rnd={$rnd}"
                 class="key-choice-image-small" />
             {/if}
             </td>

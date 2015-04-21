@@ -18,6 +18,11 @@ Output:
 <span style="color:red;font-weight:bold">make sure you run this on the image file directory!</span>
 {/if}
 </p>
+{*
+<p>
+<a href="delete_unused_script.php?p=win">download script for deleting unused imgaes from image folder (windows)</a>{*  / <a href="image_rename_script.php?p=lin">(linux)</a>*}
+</p>
+*}
 {/if}
 <a href="app_export.php">back</a>
 {else}
