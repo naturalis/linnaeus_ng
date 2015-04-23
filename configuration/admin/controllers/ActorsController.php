@@ -107,8 +107,9 @@ class ActorsController extends Controller
 
 		if ($this->getActorId())
 		{
-			$this->smarty->assign('actor',$this->getActor());
-			$this->smarty->assign('links',$this->getActorLinks());
+			$actor=$this->getActor();
+			$this->smarty->assign('actor',$actor);
+			$this->smarty->assign('links',$this->getActorLinks( $actor ));
 		}
 
 		$this->smarty->assign('companies',$this->getActors(array('is_company'=>true,'search'=>'*')));
@@ -295,7 +296,7 @@ class ActorsController extends Controller
 
 	}
 
-    private function getActors($p)
+    private function getActors( $p )
     {
         $search=isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
@@ -341,7 +342,7 @@ class ActorsController extends Controller
 		
 	}
 
-    private function getActorLookupList($p)
+    private function getActorLookupList( $p )
     {
 		$data=$this->getActors($p);
 
@@ -358,14 +359,21 @@ class ActorsController extends Controller
 
     }
 	
-    private function getActorLinks($id=null)
+    private function getActorLinks( $p )
     {
-		if (empty($id))
+        $id=isset($p['id']) ? $p['id'] : null;
+        $name = isset($p['name']) ? $p['name'] : null;
+        $name_alt=isset($p['name_alt']) ? $p['name_alt'] : null;
+		
+		if ( empty($id) && empty($name) && empty($name_alt) )
+		{
 			$id=$this->getActorId();
+		}
 
 		if (empty($id))
 			return;
 
+		// NAMES
         $names=$this->models->Names->freeQuery("
 			select
 				_a.taxon_id,
@@ -406,6 +414,7 @@ class ActorsController extends Controller
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 		}
 
+		// PRESENCE
 		$presences=$this->models->PresenceTaxa->freeQuery(
 			"select
 				_a.taxon_id,
@@ -432,6 +441,7 @@ class ActorsController extends Controller
 			")"
 		);	
 		
+		// PASSPORTS
 		$passports=$this->models->ContentTaxon->freeQuery("
 			select
 				_a.id,
@@ -463,10 +473,34 @@ class ActorsController extends Controller
 			order by taxon, title
 		");
 		
+		// LITERATURE
+		$literature=$this->models->Literature2Authors->freeQuery("
+				select
+					distinct
+					_b.id,
+					_b.label,
+					_b.citation
+				from
+					%PRE%literature2_authors _a
+	
+				left join %PRE%literature2 _b
+					on _a.literature2_id = _b.id 
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$this->getCurrentProjectId()."
+					and (
+						_a.actor_id =".$id." or 
+						_b.author like '%". mysql_real_escape_string($name) ."%' or
+						_b.author like '%". mysql_real_escape_string($name_alt) ."%' 
+					)
+			");	
+			
 		return array(
 			'names' => $names,
 			'presences'=>$presences,
 			'passports'=>$passports,
+			'literature'=>$literature,
 		);
 	
 	}
