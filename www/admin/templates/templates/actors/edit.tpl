@@ -15,12 +15,12 @@
 
 	<tr><th>naam:</th><td><input class="large" type="text" name="name" value="{$actor.name}" /></td></tr>
 	<tr><th>alternatieve naam:</th><td><input class="large" type="text" name="name_alt" value="{$actor.name_alt}" /></td></tr>
-	<tr>
+	<tr id="gender">
 		<th>geslacht:</th>
 		<td>
 			<label><input type="radio" name="gender" value="f" {if $actor.gender=='f'}checked="checked"{/if} />v</label>
 			<label><input type="radio" name="gender" value="m" {if $actor.gender=='m'}checked="checked"{/if} />m</label>
-			<label><input type="radio" name="gender" value="" {if $actor.gender!='f' && $actor.gender!='m'}checked="checked"{/if} />niet gespecificeerd</label>            
+			<label><input type="radio" name="gender" id="no_gender" value="" {if $actor.gender!='f' && $actor.gender!='m'}checked="checked"{/if} />niet gespecificeerd</label>            
 		</td>
 	</tr>
 	<tr>
@@ -68,6 +68,7 @@
 	</div>
 	<br />
 	{/if}
+    
 	{if $links.presences|@count > 0}
 	<a href="#" onclick="$('#links-presences').toggle();return false;">Gekoppelde voorkomensstatussen: {$links.presences|@count}</a>
 	<div id="links-presences" style="display:none">
@@ -79,6 +80,7 @@
 	</div>
 	<br />
 	{/if}
+    
 	{if $links.passports|@count > 0}
 	<a href="#" onclick="$('#links-passports').toggle();return false;">Gekoppelde paspoorten: {$links.passports|@count}</a>
 	<div id="links-passports" style="display:none">
@@ -91,7 +93,21 @@
 			</li>
 		</ul>
 	</div>
+	<br />
 	{/if}
+
+	{if $links.literature|@count > 0}
+	<a href="#" onclick="$('#links-literature').toggle();return false;">Gekoppelde literatuurreferenties: {$links.literature|@count}</a>
+	<div id="links-literature" style="display:none">
+		<ul class="small">
+            {foreach from=$links.literature item=v key=k}
+            <li><a href="../literature2/edit.php?id={$v.id}">{if 1==2 && $v.citation}{$v.citation}{else}{$v.label}{/if}</a></li>
+            {/foreach}
+		</ul>
+	</div>
+	<br />
+	{/if}
+    
 </div>
 </p>
 
@@ -108,15 +124,20 @@ $(document).ready(function()
 	
 	$( 'input[name=is_company]' ).on( "click", function() {
 		$( 'input[name=is_company]' ).each(function(){
-			if ($(this).attr('checked')=='checked') {
+			if ($(this).attr('checked')=='checked')
+			{
 				if ($(this).val()==1)
 				{
 					$('#employee_of').toggle(false);
 					$('#employee_of_id').val("");
+
+					$('#gender').toggle(false);
+					$('#no_gender').attr("checked","checked");
 				}
 				else
 				{
 					$('#employee_of').toggle(true);
+					$('#gender').toggle(true);
 				}
 			}
 		});
