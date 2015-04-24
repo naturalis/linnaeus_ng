@@ -24,7 +24,7 @@ class Literature2Controller extends Controller
 
 	private $_actors=null;
 	private $_literature=null;
-	private $_matchThresholdDefault=85;
+	private $_matchThresholdDefault=75;
 
 	public $jsToLoad =
 		array(
@@ -65,12 +65,11 @@ class Literature2Controller extends Controller
         parent::__destruct();
     }
 
-
     private function initialise()
     {
 		$this->Rdf = new RdfController;
+		$this->_matchThresholdDefault=$this->getSetting('literature2_import_match_threshold',$this->_matchThresholdDefault);
     }
-
 
     public function indexAction()
 	{
