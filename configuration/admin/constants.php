@@ -27,6 +27,7 @@
 	if (!defined('KINGDOM_RANK_ID')) define('KINGDOM_RANK_ID',2);
 	if (!defined('FAMILY_RANK_ID')) define('FAMILY_RANK_ID',56);
 	if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
+	if (!defined('SUBGENUS_RANK_ID')) define('SUBGENUS_RANK_ID',64);
 	if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
 	if (!defined('SUBSPECIES_RANK_ID')) define('SUBSPECIES_RANK_ID',77);
 	if (!defined('GRAFT_CHIMERA_RANK_ID')) define('GRAFT_CHIMERA_RANK_ID',88);

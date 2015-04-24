@@ -39,7 +39,25 @@
 			<li class="root">
 			{foreach from=$classification item=v key=x}
 			{if $v.parent_id!=null}{* skipping top most level "life" *}
-				<span class="classification-preffered-name"><a href="nsr_taxon.php?id={$v.id}">{$v.taxon}</a></span>
+				{* exception for displaying subgenera *}
+            	{if 
+                	$classification[$x-2].rank_id==$smarty.const.GENUS_RANK_ID && 
+                    $classification[$x-1].rank_id==$smarty.const.SUBGENUS_RANK_ID &&
+                    $v.specific_epithet && 
+                    $v.authorship
+                }
+				{assign var=label value=$classification[$x-2].name|cat:' (':$classification[$x-1].taxon:') ':$v.specific_epithet}
+                <script>
+					$('.main-display-name').html( '{$label|@escape}' );
+				</script>
+				{assign var=label value=$label|cat:' ':$v.authorship}
+                {else}
+				{assign var=label value=$v.taxon}
+                {/if}
+
+
+
+				<span class="classification-preffered-name"><a href="nsr_taxon.php?id={$v.id}">{$label}</a></span>
 				<span class="classification-rank">[{$v.rank_label}]</span>
 				{if $v.common_name}<br />
 				<span class="classification-accepted-name">{$v.common_name}</span>{/if}
