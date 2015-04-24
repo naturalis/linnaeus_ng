@@ -1,5 +1,9 @@
 {include file="../shared/header.tpl"}
 
+
+
+
+
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -9,10 +13,10 @@
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
 				{if $names.preffered_name}
-					<h1>{$names.preffered_name}</h1>
+					<h1 class="main-display-name">{$names.preffered_name}</h1>
 					<h2>{$names.nomen}</h2>
 				{else}
-					<h1 class="no-subtitle">{$names.nomen}</h1>
+					<h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
 					<h2></h2>
 				{/if}
 			</div>
@@ -82,7 +86,7 @@
 <script type="text/JavaScript">
 $(document).ready(function() {
 	
-	$('title').html('{if $names.preffered_name}{$names.preffered_name|@strip_tags|@escape} ({$names.nomen_no_tags|@strip_tags|@escape}){else}{$names.nomen|@strip_tags|@escape}{/if} - '+$('title').html());
+	$( 'title' ).html( $('<p>' + $('.main-display-name').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
 	
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 

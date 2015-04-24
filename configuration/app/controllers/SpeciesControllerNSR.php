@@ -89,7 +89,7 @@ class SpeciesControllerNSR extends SpeciesController
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
 			
-			$names=$this->getNames($taxon);
+			$names=$this->getNames( $taxon );
 			
 			$classification=$this->getTaxonClassification($taxon['id']);
 
@@ -569,9 +569,13 @@ class SpeciesControllerNSR extends SpeciesController
 		$prefferedname=null;
 		$scientific_name=null;
 		$nomen=null;
+		$prevs=array();
+
 
 		foreach((array)$names as $key=>$val)
 		{
+			$prevs[]=$key;
+
 			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
 			{
 				$prefferedname=$val['name'];

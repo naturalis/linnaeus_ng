@@ -26,7 +26,7 @@
 					<option value="sort_common">Nederlandse naam</option>
 				</select>
 			</p>
-			
+		
 			<p>
 				{if $results.data}
 				{assign var=i value=0}
@@ -34,8 +34,13 @@
 				<div class="result" sort_name="{$v.taxon}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
 					{if $v.overview_image}
 					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
-					{/if}				
-					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong>
+					{/if}
+                    {if $v.parent_rank_id==$smarty.const.SUBGENUS_RANK_ID}
+					{assign var=label value=$v.taxon_if_subgenus_as_parent}
+                    {else}
+                    {assign var=label value=$v.taxon}
+                    {/if}
+					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$label}</a></strong>
 					{if $v.common_rank} ({$v.common_rank}){/if}<br />
 					{if $v.common_name}{$v.common_name}<br />{/if}
 					{if $v.presence_information_index_label || $v.presence_information_title}
