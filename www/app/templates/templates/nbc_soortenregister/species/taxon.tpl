@@ -113,7 +113,7 @@ $(document).ready(function() {
 	{/if}
 	
 	{if $pp_popup}
-	$.prettyPhoto.open('http://images.naturalis.nl/comping/{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
+	$.prettyPhoto.open('{$taxon_main_image_base_url}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
 	
 } );

@@ -20,7 +20,7 @@
             {/capture}
 
             <td style="padding-bottom:15px;width:170px">
-                <a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>">
+                <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}{$v.image}" pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>">
                     <img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
                 </a><br />
                 <span style="font-size:10px">
