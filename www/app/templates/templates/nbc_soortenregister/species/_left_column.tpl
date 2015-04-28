@@ -89,8 +89,12 @@
 				{'&nbsp;'|str_repeat:($buffercount+4)}
 				<span class="classification-connector"></span>
                 <span class="classification-name smaller"><a href="?id={$v.id}">
-                    {if $v.rank_id >= $smarty.const.SPECIES_RANK_ID}
-                    {$v.name|replace:$lastname:''}{else}{$v.name}{/if}
+{if $v.rank_id >= $smarty.const.SPECIES_RANK_ID}
+{assign var=label value="`$v.specific_epithet` `$v.infra_specific_epithet`"}
+{$label|replace:$lastname:''|replace:'()':''}
+{else}
+{$v.name}
+{/if}
                 </a></span>
 				<span class="classification-rank">[{$v.rank_label}]</span>
 				{if $v.species_count.total>0}
