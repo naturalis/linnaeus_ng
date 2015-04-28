@@ -207,7 +207,7 @@ class NsrController extends Controller
 
 
 			$qp=array_pop($this->tmp);
-			$this->storeParentage(array('id'=>$id,'parentage'=>implode(' ',array_reverse($qp['parentage']))));
+			$this->storeParentage(array('id'=>$id,'parentage'=>array_reverse($qp['parentage'])));
 			$i=1;
 		}
 

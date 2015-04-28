@@ -227,10 +227,8 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('habitats',$this->getHabitats());
 			$this->smarty->assign('actors',$this->getActors());
 			$this->smarty->assign('traitgroups',$this->getTraitgroups());
-
 			$this->smarty->assign('rank_id_species',$this->_projectRankIds[SPECIES_RANK_ID]['id']);
 			$this->smarty->assign('rank_id_subspecies',$this->_projectRankIds[SUBSPECIES_RANK_ID]['id']);
-	
 		}
 
 		$this->checkMessage();
@@ -1446,11 +1444,9 @@ class NsrTaxonController extends NsrController
 
     }
 
-
-
-	private function checkParentChildRelationship($childBaseRank,$parentId)
+	private function checkParentChildRelationship($child_base_rank,$parent_id)
 	{
-		$d=$this->getTaxonById($parentId);
+		$d=$this->getTaxonById($parent_id);
 		$parent_base_rank=$d['base_rank'];
 		
 		$ranks=$this->models->Rank->_get(array(
@@ -1461,7 +1457,7 @@ class NsrTaxonController extends NsrController
 		
 		$error=null;
 		
-		if ($childBaseRank>SPECIES_RANK_ID && $parent_base_rank!=SPECIES_RANK_ID)
+		if ($child_base_rank>SPECIES_RANK_ID && $parent_base_rank!=SPECIES_RANK_ID)
 		{
 			/*
 			forma moet onder soort
@@ -1473,79 +1469,94 @@ class NsrTaxonController extends NsrController
 			$error=array($ranks[SPECIES_RANK_ID]['rank']);
 		} 
 		else
-		if (($childBaseRank==SPECIES_RANK_ID && $parent_base_rank!=GENUS_RANK_ID) &&
-			($childBaseRank==SPECIES_RANK_ID && $ranks[$parent_base_rank]['rank']!='subgenus'))
+		if (($child_base_rank==SPECIES_RANK_ID && $parent_base_rank!=GENUS_RANK_ID) &&
+			($child_base_rank==SPECIES_RANK_ID && $ranks[$parent_base_rank]['rank']!='subgenus'))
 		{
 			// soort moet onder genus of subgenus
 			$error=array($ranks[GENUS_RANK_ID]['rank'],'subgenus');
 		}
 		else
-		if ($ranks[$childBaseRank]['rank']=='subgenus' && $parent_base_rank!=GENUS_RANK_ID)
+		if ($ranks[$child_base_rank]['rank']=='subgenus' && $parent_base_rank!=GENUS_RANK_ID)
 		{
 			// subgenus moet onder genus
 			$error=array($ranks[GENUS_RANK_ID]['rank']);
 		}
 		else
-		if (($childBaseRank==GENUS_RANK_ID && $ranks[$parent_base_rank]['rank']!='subfamilia') &&
-			($childBaseRank==GENUS_RANK_ID && $parent_base_rank!=FAMILY_RANK_ID))
+		if (($child_base_rank==GENUS_RANK_ID && $ranks[$parent_base_rank]['rank']!='subfamilia') &&
+			($child_base_rank==GENUS_RANK_ID && $parent_base_rank!=FAMILY_RANK_ID))
 		{
 			// genus moet onder subfamilie of familie
 			$error=array('subfamilia',$ranks[FAMILY_RANK_ID]['rank']);
 		}
 		else
-		if ($ranks[$childBaseRank]['rank']=='subfamilia' && $parent_base_rank!=FAMILY_RANK_ID)
+		if ($ranks[$child_base_rank]['rank']=='subfamilia' && $parent_base_rank!=FAMILY_RANK_ID)
 		{
 			// subfamilie moet onder familie
 			$error=array($ranks[FAMILY_RANK_ID]['rank']);
 		}
 		else
-		if (($childBaseRank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='subordo') &&
-			($childBaseRank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='ordo'))
+		if (($child_base_rank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='subordo') &&
+			($child_base_rank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='ordo') &&
+			($child_base_rank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='superfamilia'))
 		{
-			// familie moet onder suborde of orde
-			$error=array('subordo','ordo');
+			// familie moet onder suborde, orde of superfamilia
+			$error=array('subordo','ordo','superfamilia');
 		}
 		else
-		if ($ranks[$childBaseRank]['rank']=='subordo' && $ranks[$parent_base_rank]['rank']!='ordo')
+		if ($ranks[$child_base_rank]['rank']=='superfamilia' && $ranks[$parent_base_rank]['rank']!='ordo')
+		{
+			// superfamilia moet onder orde
+			$error=array('ordo');
+		}
+		else
+		if ($ranks[$child_base_rank]['rank']=='subordo' && $ranks[$parent_base_rank]['rank']!='ordo')
 		{
 			// suborde moet onder orde
 			$error=array('ordo');
 		}
 		else
-		if (($ranks[$childBaseRank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='subclassis') &&
-			($ranks[$childBaseRank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='classis'))
+		if (($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='subclassis') &&
+			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='classis') &&
+			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='superorder') 
+			)
 		{
-			// orde moet onder subklasse of klasse
-			$error=array('subclassis','classis');
+			// orde moet onder subklasse, klasse of superorder
+			$error=array('subclassis','classis','superorder');
 		}
 		else
-		if ($ranks[$childBaseRank]['rank']=='subclassis' && $ranks[$parent_base_rank]['rank']!='classis')
+		if (($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='classis'))
+		{
+			// superordo moet onder klasse
+			$error=array('classis');
+		}
+		else
+		if ($ranks[$child_base_rank]['rank']=='subclassis' && $ranks[$parent_base_rank]['rank']!='classis')
 		{
 			// subklasse moet onder klasse
 			$error=array('classis');
 		}
 		else
-		if (($ranks[$childBaseRank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='subphylum') &&
-			($ranks[$childBaseRank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='phylum'))
+		if (($ranks[$child_base_rank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='subphylum') &&
+			($ranks[$child_base_rank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='phylum'))
 		{
 			// klasse moet onder subphylum of phylum
 			$error=array('subphylum','phylum');
 		}
 		else
-		if ($ranks[$childBaseRank]['rank']=='subphylum' && $ranks[$parent_base_rank]['rank']!='phylum')
+		if ($ranks[$child_base_rank]['rank']=='subphylum' && $ranks[$parent_base_rank]['rank']!='phylum')
 		{
 			// subphylum moet onder phylum
 			$error=array('phylum');
 		}
 		else
-		if (($ranks[$childBaseRank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='subregnum') &&
-			($ranks[$childBaseRank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='regnum'))
+		if (($ranks[$child_base_rank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='subregnum') &&
+			($ranks[$child_base_rank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='regnum'))
 		{
 			// phylum moet moet onder subrijk of rijk
 			$error=array('subregnum','regnum');
 		}
 		else
-		if ($ranks[$childBaseRank]['rank']=='subregnum' && $ranks[$parent_base_rank]['rank']!='regnum')
+		if ($ranks[$child_base_rank]['rank']=='subregnum' && $ranks[$parent_base_rank]['rank']!='regnum')
 		{
 			// subrijk moet onder rijk
 			$error=array('regnum');
@@ -1556,10 +1567,10 @@ class NsrTaxonController extends NsrController
 			$this->addError(
 				sprintf(
 					"Een %s kan alleen %s als ouder hebben.",
-					$ranks[$childBaseRank]['rank'],
+					$ranks[$child_base_rank]['rank'],
 					implode(" of ",$error)
 				).
-				"Concept niet opgeslagen."
+				" Concept niet opgeslagen."
 
 			);
 			return false;
