@@ -1221,7 +1221,12 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				) as name,
 				_f.rank_id,
-				_g.label as rank_label
+				_g.label as rank_label,
+_k.uninomial,
+_k.specific_epithet,
+_k.infra_specific_epithet,
+_k.authorship
+			
 			
 			from %PRE%taxa _a
 
