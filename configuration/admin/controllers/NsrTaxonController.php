@@ -1503,10 +1503,11 @@ class NsrTaxonController extends NsrController
 			$error=array('subordo','ordo','superfamilia');
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='superfamilia' && $ranks[$parent_base_rank]['rank']!='ordo')
+		if (($ranks[$child_base_rank]['rank']=='superfamilia' && $ranks[$parent_base_rank]['rank']!='ordo') &&
+			($ranks[$child_base_rank]['rank']=='superfamilia' && $ranks[$parent_base_rank]['rank']!='subordo'))
 		{
-			// superfamilia moet onder orde
-			$error=array('ordo');
+			// superfamilia moet onder orde of subordo
+			$error=array('ordo','subordo');
 		}
 		else
 		if ($ranks[$child_base_rank]['rank']=='subordo' && $ranks[$parent_base_rank]['rank']!='ordo')
