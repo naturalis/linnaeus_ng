@@ -406,45 +406,13 @@ class SearchControllerNSR extends SearchController
 
 					else 10
 				end as match_percentage,
-				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id,
-				_parentrank.rank_id as parent_rank_id,
-				concat(_grandparentname.uninomial,' (',_parentname.name,') ',_a.specific_epithet,' ',_a.authorship) as taxon_if_subgenus_as_parent
+				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
 				
 			from %PRE%names _a
 			
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
-
-
-			/* block below to be able to search for alternatelty compiled names of children of subgenera */
-			
-					left join %PRE%taxa _parent
-						on _e.parent_id = _parent.id
-						and _e.project_id = _parent.project_id
-					
-					left join %PRE%names _parentname
-						on _parent.id=_parentname.taxon_id
-						and _parent.project_id=_parentname.project_id
-						and _parentname.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-						and _parentname.language_id=".LANGUAGE_ID_SCIENTIFIC."
-					
-					left join %PRE%projects_ranks _parentrank
-						on _parent.rank_id=_parentrank.id
-						and _parent.project_id = _parentrank.project_id
-					
-					left join %PRE%taxa _grandparent
-						on _parent.parent_id = _grandparent.id
-						and _parent.project_id = _grandparent.project_id
-					
-					left join %PRE%names _grandparentname
-						on _grandparent.id=_grandparentname.taxon_id
-						and _grandparent.project_id=_grandparentname.project_id
-						and _grandparentname.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-						and _grandparentname.language_id=".LANGUAGE_ID_SCIENTIFIC."
-			
-			/* block above to be able to search for alternatelty compiled names of children of subgenera */
-
 
 			left join %PRE%trash_can _trash
 				on _e.project_id = _trash.project_id
@@ -493,29 +461,7 @@ class SearchControllerNSR extends SearchController
 				and _ids.item_type='taxon'
 
 			where _a.project_id =".$this->getCurrentProjectId()."
-				and
-					(
-						_a.name like '%".mysql_real_escape_string($search)."%' 
-						
-						/* block below to be able to search for alternatelty compiled names of children of subgenera */
-						
-						or
-
-						(
-							_parentrank.rank_id=".SUBGENUS_RANK_ID." and
-							concat(
-								_grandparentname.uninomial,
-								' (',_parentname.name,') ',
-								_a.specific_epithet,
-								' ',
-								_a.authorship
-							)  like '%".mysql_real_escape_string($search)."%'
-						)
-
-						/* block above to be able to search for alternatelty compiled names of children of subgenera */
-					
-					)
-
+				and _a.name like '%".mysql_real_escape_string($search)."%' 
 				and _b.nametype in (
 					'".PREDICATE_PREFERRED_NAME."',
 					'".PREDICATE_VALID_NAME."',
