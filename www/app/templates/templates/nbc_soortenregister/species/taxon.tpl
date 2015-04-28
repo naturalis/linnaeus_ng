@@ -1,9 +1,5 @@
 {include file="../shared/header.tpl"}
 
-
-
-
-
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
