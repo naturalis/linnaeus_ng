@@ -88,6 +88,10 @@ class NsrTaxonController extends NsrController
 			'columns'=>'id',
 			'fieldAsIndex'=>'rank_id'
 		));
+
+		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
+		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
+
 	}
 
     public function taxonNewAction()
@@ -1525,10 +1529,11 @@ class NsrTaxonController extends NsrController
 			$error=array('subclassis','classis','superorder');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='classis'))
+		if (($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='classis') && 
+			($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='subclassis'))
 		{
-			// superordo moet onder klasse
-			$error=array('classis');
+			// superordo moet onder klasse of subclassis
+			$error=array('classis','subclassis');
 		}
 		else
 		if ($ranks[$child_base_rank]['rank']=='subclassis' && $ranks[$parent_base_rank]['rank']!='classis')

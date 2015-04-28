@@ -116,7 +116,7 @@ $(document).ready(function()
 <!--
 <div class="imageInGrid3 taxon-page">
     <div class="thumbContainer">
-        <a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
+        <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}/%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
             <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="http://images.naturalis.nl/160x100/%thumb%" />
         </a>
     </div>
@@ -160,7 +160,7 @@ $(document).ready(function()
 						{/if}
 						<div class="imageInGrid3 taxon-page">
 							<div class="thumbContainer">
-								<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/comping/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
 									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
 								</a>
 							</div>

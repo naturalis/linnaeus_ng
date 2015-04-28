@@ -206,7 +206,9 @@ $numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRec
 //$recordsPerFile=!empty($this->rHasVar('recordsPerFile')) && is_numeric($this->rHasVar('recordsPerFile')) ? $this->rGetVal('recordsPerFile') : 10000;
 $recordsPerFile=10000;
 $exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
-$imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : 'http://images.naturalis.nl/comping/';
+
+$imagebase=$this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
+$imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : $imagebase;
 
 $rootelement='nederlands_soortenregister';
 $filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
