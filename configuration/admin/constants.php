@@ -25,6 +25,9 @@
 	
 	if (!defined('EMPIRE_RANK_ID')) define('EMPIRE_RANK_ID',1);
 	if (!defined('KINGDOM_RANK_ID')) define('KINGDOM_RANK_ID',2);
+	if (!defined('PHYLUM_RANK_ID')) define('PHYLUM_RANK_ID',7);
+	if (!defined('CLASS_RANK_ID')) define('CLASS_RANK_ID',16);
+	if (!defined('ORDO_RANK_ID')) define('ORDO_RANK_ID',38);
 	if (!defined('FAMILY_RANK_ID')) define('FAMILY_RANK_ID',56);
 	if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
 	if (!defined('SUBGENUS_RANK_ID')) define('SUBGENUS_RANK_ID',64);
