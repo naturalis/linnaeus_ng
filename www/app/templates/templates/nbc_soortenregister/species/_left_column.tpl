@@ -63,7 +63,7 @@
 							{else}
 								{$classification[taxon].specific_epithet}
 							{/if}
-							{assign var=lastname value="`$classification[taxon].uninomial` `$classification[taxon].specific_epithet`"}
+							{assign var=lastname value="`$classification[taxon].specific_epithet`"}
 						{else}
 							{$classification[taxon].name}
 							{assign var=lastname value=$classification[taxon].name}
@@ -89,9 +89,13 @@
 				{'&nbsp;'|str_repeat:($buffercount+4)}
 				<span class="classification-connector"></span>
                 <span class="classification-name smaller"><a href="?id={$v.id}">
+
 {if $v.rank_id >= $smarty.const.SPECIES_RANK_ID}
-{assign var=label value="`$v.specific_epithet` `$v.infra_specific_epithet`"}
-{$label|replace:$lastname:''|replace:'()':''}
+{if $v.infra_specific_epithet}
+{$v.infra_specific_epithet}
+{else}
+{$v.specific_epithet}
+{/if}
 {else}
 {$v.name}
 {/if}
