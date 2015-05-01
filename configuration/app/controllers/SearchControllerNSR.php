@@ -66,12 +66,12 @@ class SearchControllerNSR extends SearchController
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
-		$this->_taxon_base_url_images_s_thumb = $this->getSetting( "taxon_base_url_images_s_thumb", "http://images.naturalis.nl/120x75/" );
+		$this->_taxon_base_url_images_thumb_s = $this->getSetting( "taxon_base_url_images_thumb_s", "http://images.naturalis.nl/120x75/" );
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
-		$this->smarty->assign( 'taxon_base_url_images_s_thumb',$this->_taxon_base_url_images_s_thumb );
+		$this->smarty->assign( 'taxon_base_url_images_thumb_s',$this->_taxon_base_url_images_thumb_s );
 
 		$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(

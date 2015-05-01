@@ -612,7 +612,7 @@ function submitSearchParams()
 			{foreach from=$results.data item=v}
             <div class="result">
                 {if $v.overview_image}
-                <img src="{$taxon_base_url_images_s_thumb}{$v.overview_image}" />
+                <img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}" />
                 {/if}
                 <strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
                 {if $v.common_name}{$v.common_name}<br />{/if}
