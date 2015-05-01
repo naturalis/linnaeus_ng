@@ -19,7 +19,7 @@
 
 			<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/original/{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
 			{if $v.meta_map_source && $v.meta_map_description}<br />{/if}{if $v.meta_map_source}Bron: {$v.meta_map_source}{/if}">
-				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="http://images.naturalis.nl/comping/{$v.image}" />
+				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="{$taxon_main_image_base_url}{$v.image}" />
 			</a>
 			{if $v.meta_map_description}<br />{$v.meta_map_description|@ucfirst}{/if}
 			{if $v.meta_map_source}<br />Bron: {$v.meta_map_source}{/if}
