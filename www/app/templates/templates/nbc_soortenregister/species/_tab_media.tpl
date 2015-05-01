@@ -116,7 +116,7 @@ $(document).ready(function()
 <!--
 <div class="imageInGrid3 taxon-page">
     <div class="thumbContainer">
-        <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}/%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
+        <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
             <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="http://images.naturalis.nl/160x100/%thumb%" />
         </a>
     </div>
