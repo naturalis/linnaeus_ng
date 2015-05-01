@@ -29,16 +29,16 @@ Resultaten 1-{$results.count} van {$results.count}{if $searchHR || $searchTraits
 	<td>{$v.photographer}</td>
 	<td>{$v.validator}</td>
 	<td>{$url_taxon_detail}{$v.taxon_id}</td>
-	<td>http://images.naturalis.nl/original/{$v.image}</td>
+	<td>{$taxon_base_url_images_main}{$v.image}</td>
 {else}
 	<td>{$v.presence_information_index_label} {$v.presence_information_title}</td>
 	<td>{$v.number_of_barcodes}</td>
 	<td>{$url_taxon_detail}{$v.taxon_id}</td>
 	<td>
 		{if $v.overview_image}
-			http://images.naturalis.nl/original/{$v.overview_image}
+			{$taxon_base_url_images_main}{$v.overview_image}
 		{elseif $v.image}
-			http://images.naturalis.nl/original/{$v.image}
+			{$taxon_base_url_images_main}{$v.image}
 		{/if}
 	</td>
 {/if}

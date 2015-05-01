@@ -9,8 +9,6 @@ class SearchControllerNSR extends SearchController
 	private $_resPicsPerPage=12;
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
-	private $_taxon_main_image_base_url;
-	private $_taxon_thumb_image_base_url;
 
 	private $_operators=array(
 		'=='=>array('label'=>'is gelijk aan','range'=>false),
@@ -65,11 +63,15 @@ class SearchControllerNSR extends SearchController
     private function initialise()
     {
 
-		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
-		$this->_taxon_thumb_image_base_url = $this->getSetting( "taxon_thumb_image_base_url", "http://images.naturalis.nl/160x100/" );
+		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
+		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
+		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
+		$this->_taxon_base_url_images_s_thumb = $this->getSetting( "taxon_base_url_images_s_thumb", "http://images.naturalis.nl/120x75/" );
 
-		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
-		$this->smarty->assign( 'taxon_thumb_image_base_url',$this->_taxon_thumb_image_base_url );
+		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
+		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
+		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
+		$this->smarty->assign( 'taxon_base_url_images_s_thumb',$this->_taxon_base_url_images_s_thumb );
 
 		$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
