@@ -83,7 +83,7 @@
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
 							<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_thumb_image_base_url}{$v.thumb}" />
 							</a>
 						</div>
 							

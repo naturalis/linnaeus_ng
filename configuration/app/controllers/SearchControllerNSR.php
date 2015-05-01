@@ -10,6 +10,7 @@ class SearchControllerNSR extends SearchController
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
 	private $_taxon_main_image_base_url;
+	private $_taxon_thumb_image_base_url;
 
 	private $_operators=array(
 		'=='=>array('label'=>'is gelijk aan','range'=>false),
@@ -65,7 +66,10 @@ class SearchControllerNSR extends SearchController
     {
 
 		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
+		$this->_taxon_thumb_image_base_url = $this->getSetting( "taxon_thumb_image_base_url", "http://images.naturalis.nl/160x100/" );
+
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
+		$this->smarty->assign( 'taxon_thumb_image_base_url',$this->_taxon_thumb_image_base_url );
 
 		$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
