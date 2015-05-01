@@ -18,7 +18,7 @@
 			</div>
 			{if $overviewImage.image}
 			<div id="taxonImage">
-				<img src="http://images.naturalis.nl/510x272/{$overviewImage.image}" />
+				<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
 				<div id="taxonImageCredits">
 					<span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}Foto</span> {$overviewImage.label} 
 				</div>
@@ -113,7 +113,7 @@ $(document).ready(function() {
 	{/if}
 	
 	{if $pp_popup}
-	$.prettyPhoto.open('{$taxon_main_image_base_url}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
+	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
 	
 } );

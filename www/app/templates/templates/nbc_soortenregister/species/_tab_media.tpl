@@ -116,8 +116,8 @@ $(document).ready(function()
 <!--
 <div class="imageInGrid3 taxon-page">
     <div class="thumbContainer">
-        <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
-            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_thumb_image_base_url}%thumb%" />
+        <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
+            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
         </a>
     </div>
     <dl>
@@ -131,7 +131,7 @@ $(document).ready(function()
 <div class="imageInGrid3 taxon-page collected">
     <div class="thumbContainer">
         <a href="nsr_taxon.php?id=%id%&cat=media">
-            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_thumb_image_base_url}%thumb%" />
+            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
         </a>
     </div>
     <dl>
@@ -160,8 +160,8 @@ $(document).ready(function()
 						{/if}
 						<div class="imageInGrid3 taxon-page">
 							<div class="thumbContainer">
-								<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_thumb_image_base_url}{$v.thumb}" />
+								<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_base_url_images_thumb}{$v.thumb}" />
 								</a>
 							</div>
 							<dl>
@@ -187,7 +187,7 @@ $(document).ready(function()
 						<div class="imageInGrid3 taxon-page collected">
 							<div class="thumbContainer">
 								<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
-									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_thumb_image_base_url}{$v.thumb}" />
+									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_base_url_images_thumb}{$v.thumb}" />
 								</a>
 							</div>
 							<dl>

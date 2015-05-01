@@ -33,7 +33,7 @@
 				{foreach from=$results.data item=v}
 				<div class="result" sort_name="{$v.taxon}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
 					{if $v.overview_image}
-					<img src="http://images.naturalis.nl/120x75/{$v.overview_image}"/>
+					<img src="{$taxon_base_url_images_s_thumb}{$v.overview_image}"/>
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong>
 					{if $v.common_rank} ({$v.common_rank}){/if}<br />
