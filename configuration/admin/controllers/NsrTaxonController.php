@@ -419,7 +419,6 @@ class NsrTaxonController extends NsrController
 
 			$codes=explode(PHP_EOL,trim($this->rGetVal('codes')));
 			array_walk($codes,function(&$val,$key){ $val=substr(str_pad(trim($val),12,"0", STR_PAD_LEFT),-12);});
-			//array_walk($codes,function(&$val,$key){ $val=str_pad(trim($val),12,"0", STR_PAD_LEFT);});
 
 			$pre='tn.nlsr.concept/';
 			$buffer=array();
