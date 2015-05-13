@@ -9,6 +9,7 @@ class SearchControllerNSR extends SearchController
 	private $_resPicsPerPage=12;
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
+	private $conceptIdPrefix='tn.nlsr.concept/';
 
 	private $_operators=array(
 		'=='=>array('label'=>'is gelijk aan','range'=>false),
@@ -417,7 +418,7 @@ class SearchControllerNSR extends SearchController
 
 					else 10
 				end as match_percentage,
-				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
+				replace(_ids.nsr_id,'".$this->conceptIdPrefix."','') as nsr_id
 				
 			from %PRE%names _a
 			
@@ -472,7 +473,11 @@ class SearchControllerNSR extends SearchController
 				and _ids.item_type='taxon'
 
 			where _a.project_id =".$this->getCurrentProjectId()."
-				and _a.name like '%".mysql_real_escape_string($search)."%' 
+				and (
+					_a.name like '%".mysql_real_escape_string($search)."%' 
+					or _ids.nsr_id = '".mysql_real_escape_string($search)."' 
+					or _ids.nsr_id = '".$this->conceptIdPrefix . mysql_real_escape_string($search)."' 
+				)
 				and _b.nametype in (
 					'".PREDICATE_PREFERRED_NAME."',
 					'".PREDICATE_VALID_NAME."',
@@ -592,7 +597,7 @@ class SearchControllerNSR extends SearchController
 				_h.information_title as presence_information_title,
 				_h.index_label as presence_information_index_label,
 				_l.file_name as overview_image,
-				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
+				replace(_ids.nsr_id,'".$this->conceptIdPrefix."','') as nsr_id
 
 			from %PRE%taxa _a
 			
@@ -994,8 +999,8 @@ class SearchControllerNSR extends SearchController
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
-				replace(_ids.nsr_id,'tn.nlsr.concept/','') as nsr_id
-			
+				replace(_ids.nsr_id,'".$this->conceptIdPrefix."','') as nsr_id
+
 			from  %PRE%media_taxon _m
 			
 			left join %PRE%media_meta _c

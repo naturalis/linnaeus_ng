@@ -171,7 +171,5 @@ $(document).ready(function(e) {
 });
 </script>
 
-
-
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
