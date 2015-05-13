@@ -12,7 +12,7 @@
     <textarea name="codes" style="width:250px;height:200px">{$codes}</textarea>
     </p>
     <p>
-    <input type="submit" value="opzoeken" />
+    <input type="button" value="opzoeken" onclick="$('#action').val('resolve');$('#theForm').submit();return false;" />
     </p>
     </form>
     
