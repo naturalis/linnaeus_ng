@@ -6,7 +6,9 @@
 	<input type="hidden" name="action" id="action" value="resolve">
 	<input type="hidden" name="rnd" value="{$rnd}" />
     <p>
-    Plak een lijst NSR ID's in het vak hieronder - een per regel - en klik op "opzoeken" (alleen voor taxa!).
+    Plak een lijst NSR ID's in het vak hieronder - een per regel - en klik op "opzoeken" (alleen voor taxa!).<br />
+    Honderd of minder codes worden direct in het scherm getoond, en zijn downloadbaar als txt-bestand. Batches van meer
+    dan 100 codes zijn alleen downloadbaar.
     </p>
     <p>
     <textarea name="codes" style="width:250px;height:200px">{$codes}</textarea>
