@@ -418,8 +418,8 @@ class NsrTaxonController extends NsrController
 					key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))");
 
 			$codes=explode(PHP_EOL,trim($this->rGetVal('codes')));
-			//array_walk($codes,function(&$val,$key){ $val=substr(str_pad(trim($val),12,"0"),-12);});
-			array_walk($codes,function(&$val,$key){ $val=str_pad(trim($val),12,"0");});
+			array_walk($codes,function(&$val,$key){ $val=substr(str_pad(trim($val),12,"0", STR_PAD_LEFT),-12);});
+			//array_walk($codes,function(&$val,$key){ $val=str_pad(trim($val),12,"0", STR_PAD_LEFT);});
 
 			$pre='tn.nlsr.concept/';
 			$buffer=array();

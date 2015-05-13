@@ -1,0 +1,340 @@
+{include file="../shared/admin-header.tpl"}
+
+<style>
+fieldset {
+	margin-bottom:20px;
+}
+
+div.fieldsubset {
+	border-bottom:1px solid #ddd;
+	padding-bottom:5px;
+}
+.selected_ranks {
+	cursor:default;
+}
+.remark {
+	font-size:0.85em;
+	color:#444;
+}
+</style>
+
+<script>
+
+var selectedranks=[];
+var lastop='ge';
+
+function addEstablishedOrNot(state)
+{
+	$( '.presence_labels' ).each(function(index, element)
+	{
+		$(this).prop('checked',false);
+		if ($(this).attr('data-established')===state)
+		{
+			$(this).prop('checked',true);
+		}
+    });
+}
+
+function addRank()
+{
+	$( '.ranks' ).each(function(index, element)
+	{
+		if ($(this).prop('selected'))
+		{
+			for(var i=0;i<selectedranks.length;i++)
+			{
+				if (selectedranks[i].id==$(this).attr('id'))
+					return;
+			}
+			selectedranks.push( { id:$(this).attr('id'), label:$(this).text() } );
+		}
+    });
+}
+
+function removeRank(id)
+{
+	var index=-1;
+	for(var i=0;i<selectedranks.length;i++)
+	{
+		if (selectedranks[i].id==id )
+			index=i;
+	}
+
+	if (index>-1) selectedranks.splice(index,1);
+}
+
+function updateRanks()
+{
+	$( '.selected_ranks' ).remove();
+	
+	for(var i=0;i<selectedranks.length;i++)
+	{
+		$( '#selected_ranks' ).append( '<li class=selected_ranks data-id='+selectedranks[i].id+'>'+selectedranks[i].label+'</li>' )
+	}
+	
+	$( '.selected_ranks' ).on( 'dblclick' , function(index, element) { removeRank($(this).attr( 'data-id' ));updateRanks();checkRanksOp(); });
+}
+
+function checkRanksOp()
+{
+	if ( selectedranks.length > 1 )
+	{
+		$( '.rank_operator[value=in]' ).prop( 'checked', true );
+	}
+	if ( selectedranks.length == 1 && $( '.rank_operator[value=in]' ).prop( 'checked' ))
+	{
+		if (lastop != 'in' )
+			$( '.rank_operator[value='+lastop+']' ).prop( 'checked', true );
+		else
+			$( '.rank_operator[value=eq]' ).prop( 'checked', true );
+	}
+	lastop=$( '.rank_operator:checked' ).val();
+}
+
+function doSubmit()
+{
+	
+	alert( 'do some checking' );
+	
+	for(var i=0;i<selectedranks.length;i++)
+	{
+		$( '#theForm' ).append( '<input type="hidden" name="selected_ranks[]" value="'+selectedranks[i].id+'" />' );
+	}
+
+	$( '#theForm' ).submit();
+}
+		
+</script>
+
+<div id="page-main">
+
+	<form id="theForm" method="post">
+    <input type="hidden" name="action" value="export"  />
+
+    <fieldset>
+
+		<legend>Selectiecriteria</legend>
+
+        <div class="fieldsubset">
+            <h4>Top van de te exporteren tak</h4>
+            <span id="parent_taxon">-</span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Branch top');return false;" rel="parent_taxon_id">
+                    kiezen
+                </a>
+                <input type="hidden" id="parent_taxon_id" value="" name="branch_top_id" mandatory="mandatory"  label="ouder" droplistminlength="3" />
+        </div>
+    
+        <div class="fieldsubset">
+            <h4>Voorkomensstatus</h4>
+            <a onclick="addEstablishedOrNot('1');return false;" href="#">gevestigde soorten</a> /
+            <a onclick="addEstablishedOrNot('0');return false;" href="#">niet gevestigde soorten</a> / 
+            <a onclick="addEstablishedOrNot('2');return false;" href="#">niet filteren op voorkomensstatus</a>
+            <table>
+            {foreach $presence_labels v}
+                <tr>
+                    <td>
+                        <input 
+                            type=checkbox 
+                            class=presence_labels 
+                            name=presence_labels[]
+                            id="presence-{$v.index_label}" 
+                            value="{$v.index_label}"
+                            data-established="{$v.established}"
+                            >
+                    </td>
+                    <td style="text-align:right">
+                        <label for="presence-{$v.index_label}">{$v.index_label}.</label></td>
+                    <td>
+                        <label for="presence-{$v.index_label}">{$v.label}</label></td>
+                </tr>
+            {/foreach}
+            </table>
+        </div>
+
+        <h4>Taxonomische rangen</h4>
+        <table>
+            <tr>
+                <td>
+                    Beschikbaar:<br />
+                    <span class=remark>(dubbelklikken om toe te voegen)</span><br />
+                    <select size="10" multiple="multiple">
+                    {foreach $ranks v}
+                        <option 
+                            id={$v.id} 
+                            class=ranks
+                            ondblclick="addRank();updateRanks();checkRanksOp();"
+                            {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.rank}</option>
+                    {/foreach}
+                    </select>
+                </td>
+                <!-- td>
+                    <input type=button value="&#10140;" onclick="addRank();updateRanks();checkRanksOp();" />
+                </td -->
+                <td style="vertical-align:top;">
+                    Alleen taxa tonen met de volgende rang:<br />
+                    <span class=remark>(dubbelklikken om te verwijderen)</span>
+                    <ul id=selected_ranks style="border:1px solid #ddd;width:125px;padding-left:5px;">
+                    </ul>
+                    <div style="font-size:0.9em">
+                    Hoe toe te passen:<br />
+                    <label>
+                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=eq />
+                        alleen deze rang
+                    </label> 
+                    <label>
+                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=ge checked="checked" />
+                        deze rang en lager
+                    </label><br />
+                    <label>
+                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=in />
+                        deze rangen
+                    </label>
+                    </div>            
+                </td>
+            </tr>
+        </table>
+
+	</fieldset>
+    
+	<fieldset>
+
+		<legend>Te exporteren gegevens</legend>
+
+        <div class="fieldsubset">
+			<h4>Standaardkolommen</h4>
+            <table>
+                <tr>
+                    <td><input id=col_sci_name type=checkbox name=cols[sci_name] checked="checked" /></td>
+                    <td><label for=col_sci_name>wetenschappelijke naam</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_dutch_name type=checkbox name=cols[dutch_name] checked="checked" /></td>
+                    <td><label for=col_dutch_name>nederlandse naam</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_rank type=checkbox name=cols[rank] checked="checked" /></td>
+                    <td><label for=col_rank>rang</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_presence_status type=checkbox name=cols[presence_status] checked="checked" /></td>
+                    <td><label for=col_presence_status>voorkomensstatus</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_nsr_id type=checkbox name=cols[nsr_id] checked="checked" /></td>
+                    <td><label for=col_nsr_id>NSR ID</label></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="fieldsubset">
+			<h4>Extra kolommen</h4>
+            <table>
+                <tr>
+                    <td><input id=col_habitat type=checkbox name=cols[habitat] /></td>
+                    <td><label for=col_habitat>habitat</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_concept_url type=checkbox name=cols[concept_url]  /></td>
+                    <td><label for=col_concept_url>URL naar NSR-pagina concept</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_nameparts type=checkbox name=cols[name_parts] onclick="
+                        $( '.namepart' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) ) 
+                    " /></td>
+                    <td><label for=col_nameparts>losse naamdelen<span class=remark> (indien beschikbaar!)</span></label>
+                    <div class=namepart style="display:none">
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[uninomial] checked=checked>uninomial</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[specific_epithet] checked=checked>specific epithet</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[infra_specific_epithet] checked=checked>infra specific epithet</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship] checked=checked>authorship</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship_author]>authorship author</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship_year]>authorship year</label><br />
+                    <span class=remark>(geldt ook voor synoniemen, als die ook geëxporteerd worden)</span>
+                    </div>
+                    </td>
+                </tr>
+    
+                <tr>
+                    <td><input id=col_ancestry type=checkbox name=cols[ancestors] onclick="
+                        $( '.ancestry' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) ) 
+                    " /></td>
+                    <td><label for=col_ancestry>taxonomische ouders<span class=remark> (worden, indien van toepassing, opgenomen als extra cellen aan het eind van iedere regel)</span></label>
+                    <div class=ancestry style="display:none">
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[rijk] checked=checked value="{$smarty.const.KINGDOM_RANK_ID}" />rijk</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[phylum] checked=checked value="{$smarty.const.PHYLUM_RANK_ID}" />phylum</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[klasse] checked=checked value="{$smarty.const.CLASS_RANK_ID}" />klasse</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[orde] checked=checked value="{$smarty.const.ORDO_RANK_ID}" />orde</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[familie] checked=checked value="{$smarty.const.FAMILY_RANK_ID}" />familie</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[genus] checked=checked value="{$smarty.const.GENUS_RANK_ID}" />genus</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[species] checked=checked value="{$smarty.const.SPECIES_RANK_ID}" />species</label><br />
+                    </div>
+                    </td>
+                </tr>
+                
+            </table>
+		</div>
+
+		<h4>Synoniemen</h4>
+        <table><tr>
+		<td><input type=checkbox name=synonyms id=synonyms /></td>
+        <td><label for=synonyms>ook synoniemen van taxa exporteren</label></td>
+		</tr></table>
+        <span class=remark>(synoniemen worden getoond in een eigen sectie, onder de reguliere export)</span>
+        
+	</fieldset>
+
+    <fieldset>
+
+		<legend>CSV- en bestandsinstellingen</legend>
+        
+        <table>
+        	<tr><td colspan="2">
+                veldscheider:
+                    <label><input type="radio" name="field_sep" value="tab" checked="checked"/>tab</label>&nbsp;&nbsp;
+                    <label><input type="radio" name="field_sep" value="comma" />komma</label>
+			</td></tr>
+        	<tr><td colspan="2">
+                regeleinde:
+                    <label><input type="radio" name="new_line" value="CrLf"/>CrLf</label>&nbsp;&nbsp;
+                    <label><input type="radio" name="new_line" value="Lf"  checked="checked" />Lf</label>&nbsp;&nbsp;
+                    <label><input type="radio" name="new_line" value="Cr" />Cr</label>
+			</td></tr>
+        	<tr>
+            	<td><input type="checkbox" name="no_quotes" id="no_quotes" /></td>
+                <td><label for="no_quotes">geen dubbele quotes om waarden</label></td>
+			</tr>
+        	<tr>
+            	<td><input type="checkbox" name="utf8_to_utf16" id="utf8_to_utf16" /></td>
+                <td><label for="utf8_to_utf16">UTF8 naar UTF16 converteren</label></td>
+			</tr>
+        	<tr>
+            	<td><input type="checkbox" name="add_utf8_BOM" id="add_utf8_BOM" checked="checked" /></td>
+                <td><label for="add_utf8_BOM">UTF8-BOM toevoegen</label></td>
+			</tr>
+		</table>
+        
+        <span class=remark>
+        	Met deze default-waarden wordt een CSV	gegenereerd die goed te openen is in Excel.<br />
+            Open het te downloaden bestand niet direct in Excel, maar sla het eerst op en importeer het 
+            vervolgend in een Excel-leeg sheet via 'Data' > 'From text'.
+        </span>
+
+	</fieldset>
+    
+    <input type="button" value="exporteren" onclick="doSubmit();" />
+    
+    </form>
+    
+</div>
+
+<script>
+
+$(document).ready(function()
+{
+	selectedranks.push( { id:{$smarty.const.SPECIES_RANK_ID}, label:'species' } 	);
+	updateRanks();
+
+});
+</script>
+
+{include file="../shared/admin-footer.tpl"}
