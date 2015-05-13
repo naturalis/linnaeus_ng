@@ -473,11 +473,7 @@ class SearchControllerNSR extends SearchController
 				and _ids.item_type='taxon'
 
 			where _a.project_id =".$this->getCurrentProjectId()."
-				and (
-					_a.name like '%".mysql_real_escape_string($search)."%' 
-					or _ids.nsr_id = '".mysql_real_escape_string($search)."' 
-					or _ids.nsr_id = '".$this->conceptIdPrefix . mysql_real_escape_string($search)."' 
-				)
+				and _a.name like '%".mysql_real_escape_string($search)."%' 
 				and _b.nametype in (
 					'".PREDICATE_PREFERRED_NAME."',
 					'".PREDICATE_VALID_NAME."',
