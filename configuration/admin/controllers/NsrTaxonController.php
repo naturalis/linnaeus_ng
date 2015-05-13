@@ -407,18 +407,18 @@ class NsrTaxonController extends NsrController
 
 		if ( ($this->rHasVal('action','resolve') || $this->rHasVal('action','download')) && $this->rHasVal('codes') )
 		{
-			$t="%PRE%_tmp_".substr( "abcdefghijklmnopqrstuvwxyz" ,mt_rand( 0 ,25 ) ,1 ) .substr( md5( time( ) ) ,1 );
+			$t="%PRE%_tmp_".substr( "abcdefghijklmnopqrstuvwxyz", mt_rand( 0, 25 ), 1 ) .substr( md5( time() ), 1 );
 
 			$this->models->NsrIds->freeQuery("drop table ".$t);
 			$this->models->NsrIds->freeQuery("
 				create table ".$t." (
 					`id` int(11) not null primary key,
-					`code_1` varchar(32) not null, 
-					`code_2` varchar(64) not null, 
+					`code_1` varchar(16) not null, 
+					`code_2` varchar(32) not null, 
 					key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))");
 
 			$codes=explode(PHP_EOL,trim($this->rGetVal('codes')));
-			array_walk($codes,function(&$val,$key){ $val=substr(str_pad($val,12,"0"),-12);});
+			array_walk($codes,function(&$val,$key){ $val=substr(str_pad(trim($val),12,"0"),-12);});
 
 			$pre='tn.nlsr.concept/';
 			$buffer=array();
