@@ -413,8 +413,8 @@ class NsrTaxonController extends NsrController
 			$this->models->NsrIds->freeQuery("
 				create table ".$t." (
 					`id` int(11) not null primary key,
-					`code_1` varchar(16) not null, 
-					`code_2` varchar(32) not null, 
+					`code_1` varchar(32) not null, 
+					`code_2` varchar(64) not null, 
 					key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))");
 
 			$codes=explode(PHP_EOL,trim($this->rGetVal('codes')));
