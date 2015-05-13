@@ -727,12 +727,12 @@ echo '<pre>';
 	{
 		function needs_fixing( $s ) 
 		{
-			return preg_match( '/(\s+)/',$s );
+			return preg_match( '/(\s+)|(\(|\))/',$s );
 		}
 		
 		function do_fixing( $s ) 
 		{
-			return preg_replace( '/(\s+)/', '_', $s );
+			return preg_replace( '/(\s+)|(\(|\))/', '_', $s );
 		}
 		
 		function dont_duplicate( $s, $list1, $list2 )
@@ -740,7 +740,7 @@ echo '<pre>';
 			$i=0;
 			while ( in_array( $s,$list1 ) || in_array( $s,$list2 ) )
 			{
-				$s .= "_(".$i.")";
+				$s .= "_".$i;
 			}
 			return $s;
 		}
