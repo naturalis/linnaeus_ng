@@ -311,6 +311,10 @@ function doSubmit()
             	<td><input type="checkbox" name="add_utf8_BOM" id="add_utf8_BOM" checked="checked" /></td>
                 <td><label for="add_utf8_BOM">UTF8-BOM toevoegen</label></td>
 			</tr>
+        	<tr>
+            	<td><input type="checkbox" name="print_query_parameters" id="print_query_parameters" checked="checked" /></td>
+                <td><label for="print_query_parameters">query parameters in bestand weergeven</label></td>
+			</tr>
 		</table>
         
         <span class=remark>

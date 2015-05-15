@@ -564,7 +564,7 @@ function doNsrDropList(p)
 	}
 	else
 	{
-		url = 'ajax_interface.php';
+		url = '../nsr/ajax_interface.php';
 	}
 
 	data = {
