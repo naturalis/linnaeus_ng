@@ -94,7 +94,7 @@ function checkRanksOp()
 function doSubmit()
 {
 	
-	alert( 'do some checking' );
+	//alert( 'do some checking' );
 	
 	for(var i=0;i<selectedranks.length;i++)
 	{

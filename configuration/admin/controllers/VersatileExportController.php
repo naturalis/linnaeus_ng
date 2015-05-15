@@ -171,9 +171,10 @@ class VersatileExportController extends Controller
 		$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()] . " (".implode( "," , $this->getSelectedRanks() ).")";
 
 		$presence_status_clause="";
-		if ( !empty($this->getPresenceStatusLabels()) )
+		$p = $this->getPresenceStatusLabels();
+		if ( !empty( $p ) )
 		{
-			$presence_status_clause="and _h.index_label in ('".implode("','",$this->getPresenceStatusLabels())."') ";
+			$presence_status_clause="and _h.index_label in ('".implode("','",$p)."') ";
 		}
 
 		$this->query="
