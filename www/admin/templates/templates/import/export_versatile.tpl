@@ -20,7 +20,6 @@ div.fieldsubset {
 
 <script>
 
-var selectedranks=[];
 var lastop='ge';
 
 function addEstablishedOrNot(state)
@@ -35,71 +34,102 @@ function addEstablishedOrNot(state)
     });
 }
 
-function addRank()
+function addRank( rank )
 {
-	$( '.ranks' ).each(function(index, element)
+	if ( rank )
 	{
-		if ($(this).prop('selected'))
+		$( '#selected_ranks li' ).each(function()
 		{
-			for(var i=0;i<selectedranks.length;i++)
+			if (rank.id==$(this).data('id'))
+				return;
+		});
+		$( '#selected_ranks' ).append( '<li class=selected_ranks data-id='+rank.id+'>'+rank.label+'</li>' )
+	}
+	else
+	{
+		var candidate;
+		
+		$( '.ranks' ).each(function(index, element)
+		{
+			if ($(this).prop('selected'))
 			{
-				if (selectedranks[i].id==$(this).attr('id'))
-					return;
+				candidate = { id:$(this).attr('id'),label:$(this).text(),add:true };
+	
+				$( '#selected_ranks li' ).each(function()
+				{
+					if (candidate.id==$(this).data('id'))
+						candidate.add=false;
+				});
+	
+				if (candidate.add)
+					$( '#selected_ranks' ).append( '<li class=selected_ranks data-id='+candidate.id+'>'+candidate.label+'</li>' )
+				
 			}
-			selectedranks.push( { id:$(this).attr('id'), label:$(this).text() } );
-		}
-    });
-}
-
-function removeRank(id)
-{
-	var index=-1;
-	for(var i=0;i<selectedranks.length;i++)
-	{
-		if (selectedranks[i].id==id )
-			index=i;
+		});
 	}
 
-	if (index>-1) selectedranks.splice(index,1);
-}
+	$( '.selected_ranks' ).on( 'dblclick' , function(index, element) { $(this).remove();checkRanksOp(); });
 
-function updateRanks()
-{
-	$( '.selected_ranks' ).remove();
-	
-	for(var i=0;i<selectedranks.length;i++)
-	{
-		$( '#selected_ranks' ).append( '<li class=selected_ranks data-id='+selectedranks[i].id+'>'+selectedranks[i].label+'</li>' )
-	}
-	
-	$( '.selected_ranks' ).on( 'dblclick' , function(index, element) { removeRank($(this).attr( 'data-id' ));updateRanks();checkRanksOp(); });
 }
 
 function checkRanksOp()
 {
-	if ( selectedranks.length > 1 )
+	if ( $( '#selected_ranks li' ).size() > 1 )
 	{
 		$( '.rank_operator[value=in]' ).prop( 'checked', true );
 	}
-	if ( selectedranks.length == 1 && $( '.rank_operator[value=in]' ).prop( 'checked' ))
+	else
+	if ( $( '#selected_ranks li' ).size() == 1 && $( '.rank_operator[value=in]' ).prop( 'checked' ))
 	{
 		if (lastop != 'in' )
 			$( '.rank_operator[value='+lastop+']' ).prop( 'checked', true );
 		else
 			$( '.rank_operator[value=eq]' ).prop( 'checked', true );
 	}
+
 	lastop=$( '.rank_operator:checked' ).val();
 }
 
 function doSubmit()
 {
-	
-	//alert( 'do some checking' );
-	
-	for(var i=0;i<selectedranks.length;i++)
+	var m=[];
+
+	if ( $( '#parent_taxon_id' ).val().length==0 )
 	{
-		$( '#theForm' ).append( '<input type="hidden" name="selected_ranks[]" value="'+selectedranks[i].id+'" />' );
+		m.push( 'selecteer een taxon.' );
 	}
+	if ( $( '#selected_ranks li' ).size()<1 )
+	{
+		m.push( 'selecteer tenminmste één rang.' );
+	}
+	if ( $( 'input[type=checkbox][name^=cols]:checked' ).length<1)
+	{
+		m.push( 'selecteer tenminmste één kolom.' );
+	}
+	
+	if (m.length>0)
+	{
+		alert( m.join("\n") );
+		return;
+	}
+	
+	if ($( '#output_target_screen' ).prop('checked'))
+	{
+		$( '#theForm' ).attr('target','export_output');
+	}
+	else
+	{
+		$( '#theForm' ).attr('target','_self');
+	}
+
+	$( '.to_be_posted' ).remove();
+	
+	$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="branch_top_label" value="'+$( '#parent_taxon' ).text()+'" />' );
+
+	$( '#selected_ranks li' ).each(function()
+	{
+		$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
+	});
 
 	$( '#theForm' ).submit();
 }
@@ -108,7 +138,8 @@ function doSubmit()
 
 <div id="page-main">
 
-	<form id="theForm" method="post">
+	<form id="theForm" method="post" target="_self">
+
     <input type="hidden" name="action" value="export"  />
 
     <fieldset>
@@ -156,24 +187,32 @@ function doSubmit()
             <tr>
                 <td>
                     Beschikbaar:<br />
-                    <span class=remark>(dubbelklikken om toe te voegen)</span><br />
-                    <select size="10" multiple="multiple">
+                    <span class=remark>(dubbelklik of klik op pijl om toe te voegen)</span>
+                </td>
+                <td>
+                </td>
+                <td style="vertical-align:top;">
+                    Alleen taxa tonen met de volgende rang:<br />
+                    <span class=remark>(dubbelklik om te verwijderen)</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select size="10" multiple="multiple" style="width:200px">
                     {foreach $ranks v}
                         <option 
                             id={$v.id} 
                             class=ranks
-                            ondblclick="addRank();updateRanks();checkRanksOp();"
+                            ondblclick="addRank();checkRanksOp();"
                             {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.rank}</option>
                     {/foreach}
                     </select>
                 </td>
-                <!-- td>
-                    <input type=button value="&#10140;" onclick="addRank();updateRanks();checkRanksOp();" />
-                </td -->
+                <td>
+                    <input type=button value="&#10140;" onclick="addRank();checkRanksOp();" />
+                </td>
                 <td style="vertical-align:top;">
-                    Alleen taxa tonen met de volgende rang:<br />
-                    <span class=remark>(dubbelklikken om te verwijderen)</span>
-                    <ul id=selected_ranks style="border:1px solid #ddd;width:125px;padding-left:5px;">
+                    <ul id=selected_ranks style="border:1px solid #ddd;width:200px;padding-left:5px;">
                     </ul>
                     <div style="font-size:0.9em">
                     Hoe toe te passen:<br />
@@ -289,6 +328,11 @@ function doSubmit()
         
         <table>
         	<tr><td colspan="2">
+                doel:
+                    <label><input type="radio" name="output_target" value="download"  checked="checked" />download</label>&nbsp;&nbsp;
+                    <label><input id="output_target_screen" type="radio" name="output_target" value="screen" />scherm (opent in tab)</label>
+			</td></tr>
+        	<tr><td colspan="2">
                 veldscheider:
                     <label><input type="radio" name="field_sep" value="tab" checked="checked"/>tab</label>&nbsp;&nbsp;
                     <label><input type="radio" name="field_sep" value="comma" />komma</label>
@@ -303,17 +347,17 @@ function doSubmit()
             	<td><input type="checkbox" name="no_quotes" id="no_quotes" /></td>
                 <td><label for="no_quotes">geen dubbele quotes om waarden</label></td>
 			</tr>
-        	<tr>
+        	<!-- tr>
             	<td><input type="checkbox" name="utf8_to_utf16" id="utf8_to_utf16" /></td>
                 <td><label for="utf8_to_utf16">UTF8 naar UTF16 converteren</label></td>
-			</tr>
+			</tr -->
         	<tr>
             	<td><input type="checkbox" name="add_utf8_BOM" id="add_utf8_BOM" checked="checked" /></td>
-                <td><label for="add_utf8_BOM">UTF8-BOM toevoegen</label></td>
+                <td><label for="add_utf8_BOM">UTF8-BOM toevoegen aan download-bestand</label></td>
 			</tr>
         	<tr>
             	<td><input type="checkbox" name="print_query_parameters" id="print_query_parameters" checked="checked" /></td>
-                <td><label for="print_query_parameters">query parameters in bestand weergeven</label></td>
+                <td><label for="print_query_parameters">query parameters afdrukken</label></td>
 			</tr>
 		</table>
         
@@ -335,9 +379,11 @@ function doSubmit()
 
 $(document).ready(function()
 {
-	selectedranks.push( { id:{$smarty.const.SPECIES_RANK_ID}, label:'species' } 	);
-	updateRanks();
-
+	addRank( { id:{$smarty.const.SPECIES_RANK_ID}, label:'species' } 	);
+	{if $branch_top}
+	$( '#parent_taxon_id' ).val( {$branch_top.id} );
+	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
+	{/if}
 });
 </script>
 
