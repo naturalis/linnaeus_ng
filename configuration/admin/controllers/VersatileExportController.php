@@ -195,6 +195,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as voorkomens_status, " : "" )."
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as habitat, " : "" )."
 				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as concept_url, " : "" )."
+				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as database_id, " : "" )."
 				_q.taxon_id as _taxon_id,
 				_t.parent_id as _parent_id
 
@@ -344,6 +345,7 @@ class VersatileExportController extends Controller
 				_names.id,
 				_names.name,
 				".($this->query_bit_name_parts)."	
+				".( $this->hasCol( 'database_id' ) ? " _names.id as database_id, " : "" )."
 				_b.nametype
 			
 			FROM 
@@ -377,6 +379,10 @@ class VersatileExportController extends Controller
 					if (isset($row['authorship'])) $tmp['authorship']=$row['authorship'];
 					if (isset($row['name_author'])) $tmp['name_author']=$row['name_author'];
 					if (isset($row['authorship_year'])) $tmp['authorship_year']=$row['authorship_year'];
+				}
+				if ( $this->hasCol( 'database_id' ) )
+				{
+					if (isset($row['database_id'])) $tmp['database_id']=$row['database_id'];
 				}
 
 				array_push(
@@ -756,8 +762,5 @@ class VersatileExportController extends Controller
 	{
 		return isset($_SESSION['admin']['user']['export']['selected_branch_top']) ? $_SESSION['admin']['user']['export']['selected_branch_top'] : null;
 	}
-
-
-
 
 }
