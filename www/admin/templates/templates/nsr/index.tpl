@@ -16,7 +16,7 @@
 	<a href="update_parentage.php">indextabel bijwerken</a><br />
 	<a href="activity_log.php">editor log</a><br /><br />
 	<a href="nsr_id_resolver.php">NSR ID resolver</a><br />
-	<!-- a href="../import/export_versatile.php">multi-purpose export</a><br / -->
+	<a href="../import/export_versatile.php">multi-purpose export</a><br />
 	<a href="../import/export_nsr.php">export voor NDA</a> (experimenteel)<br />
 </p>
 </div>
