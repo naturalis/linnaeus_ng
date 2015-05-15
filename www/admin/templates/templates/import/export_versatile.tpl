@@ -309,6 +309,10 @@ function doSubmit()
                     </div>
                     </td>
                 </tr>
+                <tr>
+                    <td><input id=col_database_id type=checkbox name=cols[database_id]  /></td>
+                    <td><label for=col_database_id>database ID</label></td>
+                </tr>
                 
             </table>
 		</div>
