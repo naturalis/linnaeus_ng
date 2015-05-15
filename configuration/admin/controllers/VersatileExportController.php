@@ -38,7 +38,7 @@ class VersatileExportController extends Controller
 	private $no_quotes;
 	private $utf8_to_utf16;
 	private $add_utf8_BOM;
-
+	private $output_target;
 	private $_nameTypeIds;
 	private $suppress_underscored_fields=true;
 	private $replaceUnderscoresInHeaders=true;
@@ -77,6 +77,7 @@ class VersatileExportController extends Controller
 		
 		if ($this->rHasVal('action','export'))
 		{
+			$this->setBranchTopSession( array( $this->rGetVal('branch_top_id'), $this->rGetVal('branch_top_label') ) );
 			$this->setBranchTopId( $this->rGetVal('branch_top_id') );
 			$this->setPresenceStatusLabels( $this->rGetVal('presence_labels') );
 			$this->setSelectedRanks( $this->rGetVal('selected_ranks') );
@@ -91,7 +92,8 @@ class VersatileExportController extends Controller
 			$this->setUtf8ToUtf16( $this->rGetVal('utf8_to_utf16') );
 			$this->setAddUtf8BOM( $this->rGetVal('add_utf8_BOM') );
 			$this->setDoPrintQueryParameters( $this->rGetVal('print_query_parameters') );
-			
+			$this->setOutputTarget( $this->rGetVal('output_target') );
+
 			$this->setNameTypeIds();
 
 			$this->doMainQuery();
@@ -102,6 +104,7 @@ class VersatileExportController extends Controller
 
 		$this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
 		$this->smarty->assign( 'ranks', $this->getRanks() );
+		$this->smarty->assign( 'branch_top', $this->getBranchTopSession() );
 
         $this->printPage();
     
@@ -267,7 +270,7 @@ class VersatileExportController extends Controller
 
 	}
 
-	private function findAncestor($id,$rank_id)
+	private function findAncestor( $id,$rank_id )
 	{
 		if ( !isset($this->parentRegister[$id]) )
 		{
@@ -392,11 +395,21 @@ class VersatileExportController extends Controller
 
 	private function doOutput()
 	{
-		$this->printHeaders();
-		$this->printUtf8BOM();
+		if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
+		if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
+
+		if ( $this->getOutputTarget()=='screen' )
+		{
+			header('Content-Type: text/html; charset=utf-8');
+			echo "<pre>",$this->getNewLine();
+		}
+			
 		$this->doQueryParametersOutput();
 		$this->doNamesOutput();
 		$this->doSynonymsOutput();
+
+		if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
+
 		die();
 	}
 
@@ -416,8 +429,18 @@ class VersatileExportController extends Controller
 		echo chr(239).chr(187).chr(191);
 	}
 	
-	private function printHeaderLine( $header_line )
+	private function printHeaderLine( $lines )
 	{
+		$header_line=array();
+		
+		foreach((array)$lines as $key=>$line)
+		{
+			if (count((array)$line)>count($header_line))
+			{
+				$header_line=$line;
+			}
+		}
+		
 		// printing headers
 		foreach((array)$header_line as $rkey=>$rcol)
 		{
@@ -462,7 +485,7 @@ class VersatileExportController extends Controller
 
 	private function printNewLine( )
 	{		
-		echo $this->getNewLine(  );
+		echo $this->getNewLine();
 	}
 
 	private function doQueryParametersOutput()
@@ -494,9 +517,19 @@ class VersatileExportController extends Controller
 		echo
 			"statussen",
 			$this->getFieldSep(),
-			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-			"(",implode(",",$this->getPresenceStatusLabels(  )),")",
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
+
+			$p = $this->getPresenceStatusLabels();
+			if ( !empty( $p ) )
+			{
+				echo "(",implode(",",$this->getPresenceStatusLabels(  )),")";
+			}
+			else
+			{
+				echo "(alle)";
+			}
+			echo ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
+
 		$this->printNewLine();
 
 		$this->printNewLine();
@@ -504,7 +537,7 @@ class VersatileExportController extends Controller
 
 	private function doNamesOutput()
 	{
-		$this->printHeaderLine( $this->names[0] );
+		$this->printHeaderLine( $this->names );
 		$this->printNewLine();
 		$this->printBodyLines( $this->names );
 	}
@@ -515,16 +548,10 @@ class VersatileExportController extends Controller
 			return;
 
 		$this->printNewLine();
-		$this->printHeaderLine( $this->synonyms[0] );
+		$this->printHeaderLine( $this->synonyms );
 		$this->printNewLine();
 		$this->printBodyLines( $this->synonyms );
 	}
-
-
-
-
-
-
 
 	private function setBranchTopId( $branch_top_id )
 	{
@@ -673,6 +700,16 @@ class VersatileExportController extends Controller
 		return $this->doPrintQueryParameters;
 	}
 
+	private function setOutputTarget( $target )
+	{
+		$this->output_target=$target;
+	}
+
+	private function getOutputTarget()
+	{
+		return $this->output_target;
+	}
+
 	private function setUtf8ToUtf16( $state )
 	{
 		$this->utf8_to_utf16=isset($state) && $state=='on';
@@ -697,5 +734,25 @@ class VersatileExportController extends Controller
 	{
 		return $this->suppress_underscored_fields;
 	}
+
+	private function setBranchTopSession( $p )
+	{
+		if ( is_null($p) )
+		{
+			unset($_SESSION['admin']['user']['export']['selected_branch_top']);
+		}
+		else
+		{
+			$_SESSION['admin']['user']['export']['selected_branch_top']=array('id'=>$p[0],'label'=>$p[1]);
+		}
+	}
+
+	private function getBranchTopSession()
+	{
+		return isset($_SESSION['admin']['user']['export']['selected_branch_top']) ? $_SESSION['admin']['user']['export']['selected_branch_top'] : null;
+	}
+
+
+
 
 }
