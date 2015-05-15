@@ -356,6 +356,10 @@ function doSubmit()
                 <td><label for="add_utf8_BOM">UTF8-BOM toevoegen aan download-bestand</label></td>
 			</tr>
         	<tr>
+            	<td><input type="checkbox" name="replace_underscores_in_headers" id="replace_underscores_in_headers"/></td>
+                <td><label for="replace_underscores_in_headers"><i>underscores</i> in kolom-headers vervangen door spaties</label></td>
+			</tr>
+        	<tr>
             	<td><input type="checkbox" name="print_query_parameters" id="print_query_parameters" checked="checked" /></td>
                 <td><label for="print_query_parameters">query parameters afdrukken</label></td>
 			</tr>

@@ -89,10 +89,15 @@ class VersatileExportController extends Controller
 			$this->setFieldSep( $this->rGetVal('field_sep') );
 			$this->setNewLine( $this->rGetVal('new_line') );
 			$this->setNoQuotes( $this->rGetVal('no_quotes') );
-			$this->setUtf8ToUtf16( $this->rGetVal('utf8_to_utf16') );
+			$this->setReplaceUnderscoresInHeaders( $this->rGetVal('replace_underscores_in_headers') );
+			//$this->setUtf8ToUtf16( $this->rGetVal('utf8_to_utf16') );
 			$this->setAddUtf8BOM( $this->rGetVal('add_utf8_BOM') );
 			$this->setDoPrintQueryParameters( $this->rGetVal('print_query_parameters') );
 			$this->setOutputTarget( $this->rGetVal('output_target') );
+
+
+
+
 
 			$this->setNameTypeIds();
 
