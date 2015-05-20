@@ -169,10 +169,14 @@
     </p>
     <p>
     	<input type="button" value="save" onclick="checkAndSaveForm();" />
-	{if $trait}&nbsp;<input type="button" value="delete" onclick="deleteItem();" />{/if}
+        
+	{if $trait}&nbsp;<input type="button" value="delete" onclick='deleteItem( sprintf( _("There are %s taxa that have a value for this trait.\nAre you sure you want to remove it?"), {$trait.freevalue_total_count}) );' />{/if}
 
     </p>
     <p>
+
+
+    
     	<a href="traitgroup_trait_values.php?trait={$trait.id}">values</a>&nbsp;&nbsp;
     	<a href="traitgroup_traits.php?group={$group.id}">back</a>&nbsp;&nbsp;
     	<a href="index.php">index</a><br />

@@ -253,6 +253,65 @@ class TraitsController extends Controller
 		return $r;
 	}
 
+
+	private function getTraitgroupTraitValuesTaxonCount( $values )
+	{
+		if ( empty($values) )
+			return $values;
+		
+		$r=$this->models->TraitsValues->freeQuery(
+			array(
+				"query"=>"
+					select
+						count(distinct taxon_id) as taxon_count,
+						count(taxon_id) as total_count,
+						value_id
+					from
+						%PRE%traits_taxon_values
+					where 
+						project_id = " . $this->getCurrentProjectId() . "
+					group by
+						value_id
+					",
+				"fieldAsIndex"=>"value_id"
+			)
+		);
+		
+		foreach( $values as $key=>$val )
+		{
+			$values[$key]['usage_taxon_count']=$r[$val['id']]['taxon_count'];
+			$values[$key]['usage_total_count']=$r[$val['id']]['total_count'];
+		}
+		
+		return $values;
+	}
+
+	private function getTraitgroupTraitFreeValueTaxonCount( $trait )
+	{
+		if ( empty($trait) )
+			return $trait;
+			
+		$r=$this->models->TraitsValues->freeQuery("
+			select
+				count(distinct taxon_id) as taxon_count,
+				count(taxon_id) as total_count
+			from
+				%PRE%traits_taxon_freevalues
+			where 
+				project_id = " . $this->getCurrentProjectId() . "
+				and trait_id = ". $trait['id']
+		);
+		
+		$trait['freevalue_taxon_count']=$r[0]['taxon_count'];
+		$trait['freevalue_total_count']=$r[0]['total_count'];
+
+		return $trait;
+	}
+
+
+
+
+
 	public function getTraitgroupTrait($p)
 	{
 		$trait=isset($p['trait']) ? $p['trait'] : null;
@@ -297,7 +356,14 @@ class TraitsController extends Controller
 				$r['max_length']=round($r['max_length'],0,PHP_ROUND_HALF_DOWN);
 			}
 
-			$r['values']=$this->getTraitgroupTraitValues($p);
+			$r['values']=$this->getTraitgroupTraitValues( $p );
+			
+			$r['values']=$this->getTraitgroupTraitValuesTaxonCount( $r['values'] );
+			
+			if (substr($r['type_sysname'],-4)=='free')
+			{
+				$r=$this->getTraitgroupTraitFreeValueTaxonCount( $r );
+			}
 
 			$r['language_labels']=
 				array(
@@ -379,9 +445,7 @@ class TraitsController extends Controller
 					$r[$key]['date_end']=$this->formatDbDate($val['date_end'],$val['date_format_format']);
 			}
 
-
 			$r[$key]['language_labels']= $this->getTextTranslations(array('text_id'=>$val['string_label_tid']));
-		
 		}
 
 		return $r;
@@ -692,6 +756,24 @@ class TraitsController extends Controller
 	public function formatDbDate($date,$format)
 	{
 		return is_null($date) ? null : date_format(date_create($date),$format);
+	}
+
+
+	public function makeInsertableDate($date,$format)
+	{
+		$r=date_parse_from_format($format,$date);
+		
+		if ($r['error_count']==0)
+		{
+			return
+				(!empty($r['year']) ? $r['year'] : '0000')."-".
+				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
+				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
+				(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
+				(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
+				(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00')
+			;
+		}
 	}
 
 }

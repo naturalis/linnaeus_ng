@@ -32,15 +32,22 @@ function makeJoinExample(col)
 
 <div id="page-main" class="literature-match">
 
+    {assign var=i value=1}
+    {assign var=newcount value=$new_ref|@count}
+
     <p>
+		{if $newcount==0}
+		no new references to be stored.<br />
+        click 'next' to download matched ID's.
+		{else}
 		new references, to be stored:<br />
         (do not worry about multiple "create as new"'s for the same name; they will resolve to one and the same.)
+        {/if}
     </p>
 
 	<div style="padding-bottom:10px;margin-bottom:20px;">
+ 
 
-		{assign var=i value=1}
-		{assign var=newcount value=$new_ref|@count}
 
         {foreach from=$new_ref item=line key=k}{if !$ignorefirst || ($ignorefirst && $k>0)}
         <div class="match" data-id="{$k}" style="{if $i>1}display:none;{/if}border-bottom:1px dotted #666;padding-bottom:5px;margin-top:0">
@@ -303,9 +310,8 @@ function makeJoinExample(col)
 		</div>
 		{/if}
 
-
         <p>
-	        <input type="button" value="save" onclick="processMatches();" />
+	        <input type="button" value=" {if $newcount==0}next{else}save{/if}" onclick="processMatches();" />
         </p>
         <p>
 	        <a href="bulk_upload.php">back</a>

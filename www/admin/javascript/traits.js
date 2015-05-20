@@ -65,9 +65,9 @@ function checkAndSaveForm()
 		
 }
 
-function deleteItem()
+function deleteItem( message )
 {
-	if (confirm(_('Are you sure?')))
+	if ( confirm( message ? message : _('Are you sure?')) )
 	{
 		$('#theForm').unbind('submit');
 		$('#action').val('delete');
@@ -102,7 +102,7 @@ function setInitialValueListHash()
 	valuelisthash=hash(valuelist);
 }
 
-function publishRemark(r)
+function publishRemark( r )
 {
 	$('#remarks').toggle(true).html(r).fadeOut(1000);
 }
@@ -112,7 +112,7 @@ function characterCount()
 	$('#character-count').html(maxlength-$('#newvalue').val().length);
 }
 
-function doAddTraitValue(v)
+function doAddTraitValue( v )
 {
 	if (havelabels && !v.labels)
 	{
@@ -127,7 +127,7 @@ function doAddTraitValue(v)
 	valuelist.push(v);
 }
 
-function addTraitValue(checkresult)
+function addTraitValue( checkresult )
 {
 	var v=$('#newvalue').val();
 
@@ -175,8 +175,19 @@ function updateValueCount()
 	$('#value-count').html(valuelist.length);
 }
 
+function verifyTraitValueRemoval( i )
+{
+	if (i>0)
+	{
+		return confirm( sprintf( _("There are %s taxa that have been assigned this value.\nAre you sure you want to remove it?"), i) );
+	}
+	else
+	{
+		return true;
+	}
+}
 
-function removeTraitValue(i)
+function removeTraitValue( i )
 {
 	valuelist.splice(i,1);
 }
@@ -222,9 +233,10 @@ function updateValueList()
 		b.push(
 			'<li data-id="'+i+'">'+
 			val.value+' \
-			<a href="#" class="edit" onclick="removeTraitValue('+i+');updateValueList();updateValueCount();return false;">'+
+			<a href="#" class="edit" onclick="if(!verifyTraitValueRemoval('+val.usage_count+'))return;removeTraitValue('+i+');updateValueList();updateValueCount();return false;">'+
 			_('remove')+
-			'</a>'+
+			'</a> \
+			<span class="comment" title="currently assigned to '+val.usage_count+' taxa">(' + val.usage_count + ')</span>'+
 			'<br />'+l.join('')+
 			'</li>'
 			);

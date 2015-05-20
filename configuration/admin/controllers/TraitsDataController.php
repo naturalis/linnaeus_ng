@@ -61,6 +61,8 @@ class TraitsDataController extends TraitsController
     public $usedHelpers = array(
         'session_messages'
     );
+	
+	private $_referenceList=array();
 
     public function __construct ()
     {
@@ -116,11 +118,21 @@ class TraitsDataController extends TraitsController
 		$this->smarty->assign('groups',$this->getTraitgroups());
 		$this->printPage();
     }
-
+	
     public function dataRawAction()
     {
 		$this->checkAuthorisation();
 
+		if ($this->rHasVal('action','ref_codes'))
+		{
+			$this->handleUploadedRefCodes();
+		}
+		else
+		if ($this->rHasVal('action','clear_ref_codes'))
+		{
+			$this->setReferenceListSession( null );
+		}
+		else
 		if ($this->rHasVal('action','clear'))
 		{
 			$this->setDataSession(null);
@@ -133,19 +145,22 @@ class TraitsDataController extends TraitsController
 			$this->setIsRotated(!$this->getIsRotated());
 			$this->redirect('data_raw.php?');
 		} 
-		
 
 		$f=$this->getDataSession();
-		$this->getSettings($f['traitgroup']);
 
-		$this->matchTraits();
-		$this->matchSpecies();
-		$this->matchValues();
-		$this->matchReferences();
+		if ( isset($f['traitgroup']) )
+		{
+			$this->getSettings( $f['traitgroup'] );
+			$this->matchTraits();
+			$this->matchSpecies();
+			$this->matchValues();
+			$this->matchReferences();
+		}
 
         $this->setPageName($this->translate('Data matched'));
 
-		$this->smarty->assign('data',$this->getDataSession());
+		$this->smarty->assign( 'data', $this->getDataSession() );
+		$this->smarty->assign( 'reflist', $this->getReferenceListSession() );
 
 		$this->printPage();
     }
@@ -157,22 +172,25 @@ class TraitsDataController extends TraitsController
 		$f=$this->getDataSession();
 		$this->getSettings($f['traitgroup']);
 
-		if ($this->rHasVal('action','save'))
+		if ( $this->rHasVal('action','save') )
 		{
-			$this->setJoinrows($this->rGetVal('joinrows'));
+			$this->setJoinrows( $this->rGetVal('joinrows') );
 			$this->saveValues();
-/*
-$this->setSessionLines(null);
-$this->setDataSession(null);
-$this->setIsRotated(null);
-$this->setJoinrows(null);
 
-*/
+			/*
+			// reset
+			$this->setSessionLines( null );
+			$this->setDataSession( null );
+			$this->setIsRotated( null );
+			$this->setJoinrows( null );
+			$this->setReferenceListSession( null );
+			*/
 		}
 
-        $this->setPageName($this->translate('Data saved'));
+        $this->setPageName( $this->translate('Data saved') );
 		$this->printPage();
     }
+
 
 
 	private function setJoinrows($data)
@@ -247,6 +265,17 @@ $this->setJoinrows(null);
 				null;
 	}
 
+	private function setReferenceListSession( $p )
+	{
+		unset($_SESSION['admin']['traits']['reference_list']);
+		if ( !is_null($p) ) $_SESSION['admin']['traits']['reference_list']=$p;
+	}
+
+	private function getReferenceListSession()
+	{
+		return isset($_SESSION['admin']['traits']['reference_list']) ? $_SESSION['admin']['traits']['reference_list'] : null;
+	}
+
 	private function array_rotate($array)
 	{
 		$new_array = array();
@@ -262,7 +291,7 @@ $this->setJoinrows(null);
 	}
 		
 
-	private function parseSessionFile($rotate=false)
+	private function parseSessionFile( $rotate=false )
 	{
 		$file=$this->getDataSession();
 
@@ -672,9 +701,10 @@ $this->setJoinrows(null);
 	private function matchReferences()
 	{
 		$data=$this->getDataSession();
+		$reflist=$this->getReferenceListSession();
 		
-		$references=array();
 		$done=array();
+		$references=array();
 
 		foreach((array)$data['lines'] as $line)
 		{
@@ -685,55 +715,118 @@ $this->setJoinrows(null);
 					if ($c==0) continue;
 
 					// from 1234; 6578, 8765 -> 1234 6578 8765 -> array(1234,6578,8765)
-					$d=explode(' ',preg_replace(array('/\D/','/(\s)+/'),array(' ',' '),$cell));
+					//$d=explode(' ',preg_replace(array('/\D/','/(\s)+/'),array(' ',' '),$cell));
+					$d=explode(' ',preg_replace(array('/(,|;)/','/(\s)+/'),array(' ',' '),$cell));
 
 					$references[$c]['raw']=$cell;
 					$references[$c]['atomized']=$d;
 
 					foreach((array)$d as $val)
 					{
-						
 						if (empty($val)) continue;
 						
-						// check each ref id only once
-						if (!isset($done[$val]))
+						$resolved=false;
+						
+						foreach((array)$reflist as $r=>$ref)
 						{
-							// see if the ref id exists in the database
-							$r=$this->models->Literature2->_get(array(
-								'id'=>array(
-									'id'=>$val,
-									'project_id'=>$this->getCurrentProjectId()
-								)
-							));
-							
-							if (empty($r[0]['id']))
+							if ( isset($ref['ref_0']) )
 							{
-								$this->addError(sprintf($this->translate('Unknown reference id %s'),$val));
-								$references[$c]['invalid'][]=$val;
-								$done[$val]=false;
-							}
+								if ( $val==$ref[1] )
+								{
+									$references[$c]['valid'][$val]=array('id'=>$ref['ref_0']['id'],'label'=>$ref['ref_0']['label']);
+									$resolved=true;
+									$done[$val]=$ref['ref_0']['label'];
+								}
+							} 
 							else
+							if ( isset($ref['ref_1']) )
 							{
-								$references[$c]['valid'][]=$val;
-								$references['titles'][$val]=$r[0]['label'];
-								$done[$val]=true;
+								if ( $val==$ref[0] )
+								{
+									$references[$c]['valid'][$val]=array('id'=>$ref['ref_1']['id'],'label'=>$ref['ref_1']['label']);
+									$resolved=true;
+									$done[$val]=$ref['ref_1']['label'];
+								}
 							}
 						}
-						else
+						
+						if ( !$resolved )
 						{
-							if ($done[$val]===true)
-								$references[$c]['valid'][]=$val;
-							else
-								$references[$c]['invalid'][]=$val;
+							$this->addError(sprintf($this->translate('Unknown reference # %s'),$val));
+							$references[$c]['invalid'][]=$val;
 						}
 					}
 				}
 			}
 		}
+		
+		foreach($done as $key=>$val)
+		{
+			$this->addMessage(sprintf($this->translate('Resolved reference # %s to "%s"'),$key,$val));
+		}
+
+		//q($references,1);
 
 		$data['references']=$references;
 		
 		$this->setDataSession($data);
+	}
+
+
+
+	private function getLiterature2ById( $iets )
+	{
+		$r=$this->models->Literature2->freeQuery("
+			select
+				* 
+			from %PRE%literature2
+			where
+				project_id = ".$this->getCurrentProjectId()."
+				and id = ".$iets);
+
+		if ( $r )
+		{
+			return $r[0];
+		}
+	}
+
+	private function handleUploadedRefCodes()
+	{
+		$d='';
+		
+		if ($this->requestDataFiles)
+		{
+			$d.=trim(file_get_contents($this->requestDataFiles[0]["tmp_name"])).chr(10);
+		}
+	
+		if ($this->rHasVal( 'lines' ))
+		{
+			$d.=trim($this->rGetVal( 'lines' )).chr(10);
+		}
+		
+		$d = (explode( chr(10), $d ));
+
+		array_walk( $d, function( &$a ) { $a=explode(' ',preg_replace('/(\s+|,|;)/',' ',$a),2); } );
+		array_walk( $d, function( &$a ) { if ( isset($a[0]) ) $a[0]=trim($a[0]); if ( isset($a[1]) ) $a[1]=trim($a[1]); } );
+
+		foreach((array)$d as $key=>$val)
+		{
+			if ( empty($val[0]) || empty($val[1]) )
+				continue;
+			
+			if ( is_numeric($val[0]) )
+			{
+				$d[$key]['ref_0']=$this->getLiterature2ById( $val[0] );
+			}
+
+			if ( is_numeric($val[1]) )
+			{
+				$d[$key]['ref_1']=$this->getLiterature2ById( $val[1] );
+			}
+		}
+
+		$this->setReferenceListSession( $d );
+
 	}
 
 
@@ -914,7 +1007,7 @@ $this->setJoinrows(null);
 		{
 			$this->addError(sprintf($this->translate('Unresolvable taxon: %s (%s)'),$val['name'],$val['code']));
 		}
-							
+
 
 		$saved=$failed=0;
 		$deletedtraits=array();
@@ -993,16 +1086,20 @@ $this->setJoinrows(null);
 				'taxon_id'=>$taxon_id
 			));			
 			
-			if (isset($data['references'][$column]['valid']))
+			
+			if ( isset($data['references'][$column]['valid']) )
 			{
-				foreach((array)$data['references'][$column]['valid'] as $ref_id)
+				foreach((array)$data['references'][$column]['valid'] as $ref)
 				{
-					@$this->models->TraitsTaxonReferences->save(array(
-						'project_id'=>$this->getCurrentProjectId(),
-						'trait_group_id'=>$data['traitgroup'],
-						'taxon_id'=>$taxon_id,
-						'reference_id'=>$ref_id,
-					));
+					if ( isset($ref['id']) )
+					{
+						$this->models->TraitsTaxonReferences->save(array(
+							'project_id'=>$this->getCurrentProjectId(),
+							'trait_group_id'=>$data['traitgroup'],
+							'taxon_id'=>$taxon_id,
+							'reference_id'=>$ref['id'],
+						));
+					}
 				}
 			}
 		}
