@@ -61,11 +61,17 @@ class VersatileExportController extends Controller
     public function __construct ()
     {
         parent::__construct();
+		$this->initialize();
     }
 
     public function __destruct ()
     {
         parent::__destruct();
+	}
+	
+	private function initialize()
+	{
+		$this->setNameTypeIds();
     }
 
     public function exportAction()
@@ -95,10 +101,6 @@ class VersatileExportController extends Controller
 			$this->setDoPrintQueryParameters( $this->rGetVal('print_query_parameters') );
 			$this->setOutputTarget( $this->rGetVal('output_target') );
 
-
-
-
-
 			$this->setNameTypeIds();
 
 			$this->doMainQuery();
@@ -110,6 +112,7 @@ class VersatileExportController extends Controller
 		$this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
 		$this->smarty->assign( 'ranks', $this->getRanks() );
 		$this->smarty->assign( 'branch_top', $this->getBranchTopSession() );
+		$this->smarty->assign( 'nametypes', $this->_nameTypeIds );
 
         $this->printPage();
     
@@ -159,7 +162,7 @@ class VersatileExportController extends Controller
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId()
 			),
-			'columns'=>'id,nametype',
+			'columns'=>'id,nametype,substring(substring(name_types.nametype,3),1,length(name_types.nametype)-4) as nametype_hr',
 			'fieldAsIndex'=>'nametype'
 		));
 	}

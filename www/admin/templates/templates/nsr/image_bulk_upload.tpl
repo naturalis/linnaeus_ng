@@ -6,11 +6,7 @@
 <select name="fields[{$data}]">
 <option value="">ignore</option>
 {foreach from=$cols item=col key=c}
-{if $col|@strlen==0}
-<option value="" disabled="disabled"></option>
-{else}
 <option value="{$c}" {if $fields[{$data}]==$c}selected="selected"{/if}>{$col}</option>
-{/if}
 {/foreach}
 </select>
 {/function}
@@ -24,14 +20,10 @@
         <input type="hidden" name="value" value="" id="value" />
         <span class="raw" onclick="$('.raw').toggle();" style="display:none">show raw data</span>
         <span class="raw">
-            <span onclick="$('.raw').toggle();">raw referece data (TAB separated, like copy/pasted excel cells):</span>
-            <textarea name="raw" style="width:100%;height:200px;font-size:0.8em;overflow:scroll">{$raw}</textarea>
-            <p>
-            <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label>
-            </p>
-            <p>
+            <span onclick="$('.raw').toggle();">raw image data (TAB separated, like copy/pasted excel cells):</span>
+            <textarea name="raw" style="width:100%;height:200px;font-size:0.8em;overflow:scroll">{$raw}</textarea><br />
             <input type="submit" value="parse" />
-            </p>
+            <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label>
 	    </span>
     </div>
 
@@ -43,13 +35,11 @@
 	<div style="border-bottom:1px dotted #666;padding-bottom:10px;margin-bottom:20px;">
         <span class="lines" onclick="$('.lines').toggle();" style="display:none">show lines</span>
         <span class="lines">
-	        <span onclick="$('.lines').toggle();">found {$lines|@count} lines (showing 5).</span>
-            <p>
+	        <span onclick="$('.lines').toggle();">found {$lines|@count} lines (showing 5).</span><br />
             select appropriate fields per column; mutiple columns of the same field will be concatenated.
             choose 'ignore' to skip a column, or click 'remove column' to ignore and hide it from view.
-            optionally, use "reference #" to indicate the column in your data with an ID that you need 
-            to match with.
-            </p>
+
+
             
             <table>
             {foreach from=$lines item=line key=k}{if $k<5}
@@ -194,22 +184,23 @@
 			</table>
 
             {if $i>1}
-            <a href="#" class="prev" title="click or use left arrow for previous" onclick="
+            <a href="#" class="prev" onclick="
             	$(this).parent().prev().fadeToggle();
             	$(this).parent().toggle();
                 return false;
-			">previous</a>
+			">prev</a>
             {/if}
             {if $i>1 && $i<$linecount}
             |
             {/if}
             {if $i++<$linecount}
-            <a href="#" class="next" title="click or use right arrow for previous" onclick="
+            <a href="#" class="next" onclick="
             	$(this).parent().next().fadeToggle();
             	$(this).parent().toggle();
                 return false;
-			">next</a><br />
+			">next</a>
             {/if}
+
 		</div>
 		{/if}
         
@@ -251,7 +242,7 @@ $(document).ready(function()
 	});
 
 	$('.match').on('show', function() { markElementAsSeen($(this).attr('data-id')); } );
-	markElementAsSeen( '1' );
+	markElementAsSeen( '0' );
 
 	$(document).keydown(function(e) {
 		switch(e.which) {

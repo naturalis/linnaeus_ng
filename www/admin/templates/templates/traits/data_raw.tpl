@@ -56,6 +56,43 @@ td.identified-trait {
 }
 </style>
 
+<script>
+function doLitRefList( expunge )
+{
+	if ( expunge )
+	{
+		$('<form method=post></form>').append ( '<input type=hidden name=action value=clear_ref_codes>' ).appendTo('body').submit();
+	}
+	else
+	{
+		litRefDialog();
+	}
+}
+function litRefDialog()
+{
+	prettyDialog({
+		height: 400,
+		title: _( "Upload reference # / literature ID data" ),
+		content : " \
+			<div style=\"margin:5px 0 5px 0;font-size:0.8em\"><p> \
+			" + _( "Upload a file with databases ID's matched to your own reference numbers as they appear in your data sheet:" ) +" \
+			</p><form method='post' enctype='multipart/form-data'> \
+				<input type=hidden name=action value=ref_codes> \
+				<input name=file type=file><p> \
+				" + _( "Format needs to be plain text, containing two columns. Column order can be ID,ref# or vice versa." ) +" \
+				" + _( "Values can be separated by TAB, comma, semi-colon or space(s)." ) +" \
+				<br /> \
+				" + _( "You can also paste the information into the area below, using the same format." ) +" \
+				</p> \
+				<textarea name=lines></textarea><p> \
+				<input type=submit value=upload> \
+				</p> \
+				</div> \
+			</form>"
+	});
+}
+</script>    
+    
 <div id="page-main">
 	<p>
     	<input type="button" value="save data" onclick="saveRawData();" />
@@ -90,12 +127,12 @@ td.identified-trait {
                     </td>                
                 {else if $line.trait.sysname==$sysColReferences}
                     <td>
-                    	{if $data.references[$k]}
-                        {foreach from=$data.references[$k].valid item=val key=vk}{if $vk>0}, {/if}<span class="valid-ref" title="{$data.references.titles[$val]|@escape}">{$val}</span>{/foreach}
-                        {if $data.references[$k].valid && $data.references[$k].invalid}<br />{/if}
-                        <span class="invalid-ref" title="invalid references">{foreach from=$data.references[$k].invalid item=inval key=vk}{if $vk>0}, {/if}{$inval}{/foreach}</span>
-                        {/if}
-                    	<!-- {$v} -->
+                    
+{if $data.references[$k]}
+{foreach $data.references[$k].valid v vk}<span class="valid-ref" title="{$v.label|@escape}">{$vk} &#9654; {$v.id}</span><br />{/foreach}
+{foreach $data.references[$k].invalid v vk}<span class="invalid-ref" title="{t}unresolved reference{/t}">{$v} &#9654; ?</span><br />{/foreach}
+{/if}
+
                     </td>                
                 {else}
                     <td
@@ -130,12 +167,27 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
 	</p>
 
 	<p>
+		<a href="#" onclick="doLitRefList();return false;">{t}upload a file with reference # / literature ID data{/t}</a>
+        {if $reflist}
+		(<a href="#" onclick="doLitRefList(true);return false;">{t}clear last upload{/t}</a>)
+        {else}
+        <br />
+        <span class="comment">
+        you can match your reference #'s to literature ID's
+        <a href="../literature2/bulk_upload.php">by uploading your literature references and matching them to existing database entries</a>.<br />
+        if you do this now, and return here during the same session, your uploaded trait data printed above will still be available.
+        </span>
+        {/if}
+	</p>
+
+	<p>
     	<input type="button" value="save data" onclick="saveRawData();" />
 	</p>
+
 	<p>
     	data not looking right?<br />
 	    <a href="?action=rotate">rotate sheet</a><br />
-	    <a href="?action=clear">upload another file</a>
+	    <a href="?action=clear">upload a different file</a>
 	</p>
     
 </div>

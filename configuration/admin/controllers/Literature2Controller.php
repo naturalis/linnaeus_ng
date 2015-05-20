@@ -39,6 +39,7 @@ class Literature2Controller extends Controller
 
 	private $lit2Columns=
 		array(
+			'-1'=>'',
 			'label'=>'titel',
 			'alt_label'=>'alt. titel',
 			'date'=>'datum',
@@ -52,6 +53,8 @@ class Literature2Controller extends Controller
 			'pages'=>'pagina(s)',
 			'volume'=>'volume',
 			'external_link'=>'link',
+			'-2'=>'',
+			'_reference_'=>'reference #',
 		);
 
     public function __construct ()
@@ -431,7 +434,6 @@ class Literature2Controller extends Controller
 		
 		if (!$this->isFormResubmit())
 		{
-
 			$fields=$this->getSessionVar('fields');
 			$lines=$this->getSessionVar('lines');
 			$match_ref=$this->getSessionVar('match_ref');
@@ -688,7 +690,7 @@ class Literature2Controller extends Controller
 					}
 				}
 	
-				$this->models->Literature2->save($d);								
+				$this->models->Literature2->save( $d );								
 	
 				$literature_id_index[$line_number]=$this->models->Literature2->getNewId();
 				
@@ -709,38 +711,91 @@ class Literature2Controller extends Controller
 			
 			$this->setSessionVar('literature_id_index',$literature_id_index);
 			
+			$ref=array_search( '_reference_', $fields );
+			if ( $ref!==false )
+			{
+				$this->smarty->assign( 'have_ref_col', true );
+			}
+			
 		}
+		
+		$this->addmessage($this->translate('Done.'));
 
 		$this->printPage();
+	}
+	
+	private function downloadHeaders( $file )
+	{
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=' . $file );
+		header( 'Pragma: no-cache' );
 	}
 
 	public function bulkUploadDownloadAction()
 	{
 		$this->checkAuthorisation();
+
 		$literature_id_index=$this->getSessionVar('literature_id_index');
 
-		header('Content-Type: application/csv');
-		header('Content-Disposition: attachment; filename=bulk_literature_upload.csv');
-		header('Pragma: no-cache');
+		$fields=$this->getSessionVar('fields');
+		$ref_col=array_search( '_reference_',  $fields );
 		
+		$buffer_line=array();
+		$buffer=array();
+
 		foreach((array)$this->getSessionVar('lines') as $key=>$line)
 		{
+			if ( $this->rHasVal( "action", "ref_only" )  && $ref_col!==false && $this->getSessionVar('ignorefirst') && $key==0 )
+			{
+				continue;
+			}
+			
 			if ($key==0)
 			{
-				echo 'id',chr(9);
+				$buffer_line[]='id';
 			}
 			else
 			{
-				echo isset($literature_id_index[$key]) ? $literature_id_index[$key] : null,chr(9);
+				if ( !($this->rHasVal( "action", "ref_only" )  && $ref_col!==false) )
+				{
+					$buffer_line[]=isset($literature_id_index[$key]) ? $literature_id_index[$key] : null;
+				}
 			}
 			
-			foreach((array)$line as $cell)
+			foreach((array)$line as $cKey=>$cell)
 			{
-				echo $cell,chr(9);
+				if ( $this->rHasVal( "action", "ref_only" ) && $ref_col!==false )
+				{
+					if ( $cKey==$ref_col )
+					{
+						$buffer_line[]=$cell;
+					}
+				}
+				else
+				{
+					$buffer_line[]=$cell;
+				}
 			}
 
-			echo chr(10);
+			if ( $this->rHasVal( "action", "ref_only" )  && $ref_col!==false )
+			{
+				$buffer_line[]=isset($literature_id_index[$key]) ? $literature_id_index[$key] : null;
+			}
+			
+			$buffer[]=implode( chr(9), $buffer_line );
+			$buffer_line=array();
 		}
+
+		if ( $this->rHasVal( "action", "ref_only" ) && $ref_col!==false )
+		{
+			$this->downloadHeaders( "bulk_literature_upload_ref.txt" );
+		}
+		else
+		{
+			$this->downloadHeaders( "bulk_literature_upload.txt" );
+		}
+
+		echo implode( chr(10), $buffer );
 	}
 
 

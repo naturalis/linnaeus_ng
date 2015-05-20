@@ -243,14 +243,14 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVar('trait'))
 		{
-			$trait=$this->getTraitgroupTrait(array('trait'=>$this->rGetVal('trait')));
-			$group=$this->getTraitgroup($trait['trait_group_id']);
+			$trait=$this->getTraitgroupTrait( array('trait'=>$this->rGetVal('trait')) );
+			$group=$this->getTraitgroup( $trait['trait_group_id'] );
 		}
 
-		$this->smarty->assign('languages',$this->getProjectLanguages());
-		$this->smarty->assign('dateformats',$this->getDateFormats());
-		$this->smarty->assign('group',$group);
-		$this->smarty->assign('trait',$trait);
+		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
+		$this->smarty->assign( 'dateformats', $this->getDateFormats() );
+		$this->smarty->assign( 'group', $group );
+		$this->smarty->assign( 'trait', $trait );
 		$this->printPage();
     }
 	
@@ -878,25 +878,6 @@ class TraitsTraitsController extends TraitsController
 			return implode("\n",$r['errors']);
 		}
 	}
-
-	public function makeInsertableDate($date,$format)
-	{
-		$r=date_parse_from_format($format,$date);
-		
-		if ($r['error_count']==0)
-		{
-			return
-				(!empty($r['year']) ? $r['year'] : '0000')."-".
-				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
-				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
-				(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
-				(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
-				(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00')
-			;
-		}
-	}
-
-
 
 	private function getNextTextId()
 	{

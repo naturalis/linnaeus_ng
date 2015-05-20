@@ -319,8 +319,32 @@ function doSubmit()
 
 		<h4>Synoniemen</h4>
         <table><tr>
-		<td><input type=checkbox name=synonyms id=synonyms /></td>
-        <td><label for=synonyms>ook synoniemen van taxa exporteren</label></td>
+		<td><input type=checkbox name=synonyms id=synonyms onclick="
+        		$( '.nametypes' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) );
+             " />
+		</td>
+        <td>
+        	<label for=synonyms>ook synoniemen van taxa exporteren</label>
+
+            <div class=nametypes style="display:none">
+            {foreach $nametypes v}
+            {if $v.id!=$smarty.const.PREDICATE_VALID_NAME && $v.id!=$smarty.const.PREDICATE_PREFERRED_NAME}
+            <label>
+            	<input 
+                	class=nametypes
+                    disabled=disabled
+                    type=checkbox
+                    name=nametypes[{$v.id}]
+                    {if $v.id!=$smarty.const.PREDICATE_INVALID_NAME && $v.id!=$smarty.const.PREDICATE_MISSPELLED_NAME}
+                    checked=checked 
+                    {/if}
+                    value="{$v.id}" />{$v.nametype_hr}
+            </label><br />
+            {/if}
+            {/foreach}
+            </div>
+
+		</td>
 		</tr></table>
         <span class=remark>(synoniemen worden getoond in een eigen sectie, onder de reguliere export)</span>
         
