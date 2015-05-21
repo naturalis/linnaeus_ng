@@ -1,5 +1,11 @@
 <?php
 
+/*
+http://localhost/linnaeus_ng/app/views/traits/get.php?taxon=172145&group=1&language=24&project=1
+http://localhost/linnaeus_ng/app/views/traits/get.php?taxon=172145&group=1&language=24&project=1
+http://localhost/linnaeus_ng/app/views/traits/get.php?taxon=172145&group=1&language=24&project=1
+*/
+
 include_once ('Controller.php');
 
 class TraitsController extends Controller
@@ -321,7 +327,7 @@ class TraitsController extends Controller
 			$l[$key]['authors']=$authors;
 			
 		}
-		
+
 		return $l;
 
 	}

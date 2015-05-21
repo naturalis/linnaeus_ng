@@ -25,11 +25,16 @@ class TraitsTaxonController extends TraitsController
     
     public $cssToLoad = array(
 		'traits.css',
-//		'taxon_groups.css'
+//		'taxon_groups.css',
+		'nsr_taxon_beheer.css'
 	);
 
 	public $jsToLoad=array(
-        'all' => array('traits.js','jquery.mjs.nestedSortable.js')
+        'all' => array(
+			'traits.js',
+			'jquery.mjs.nestedSortable.js',
+			'nsr_taxon_beheer.js'
+		)
 	);
 
     public $usedHelpers = array(
@@ -56,14 +61,17 @@ class TraitsTaxonController extends TraitsController
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Taxon trait data'));
 		
-//$this->isFormResubmit()
+		//$this->isFormResubmit()
+		//q( $this->requestData );
 		
 		if ($this->rHasVal('action','save') && $this->rHasId() && $this->rHasVal('group'))
 		{
 			$this->saveTaxonTraitData(array(
 				'taxon'=>$this->rGetId(),
 				'trait'=>$this->rGetVal('trait'),
-				'values'=>$this->rGetVal('values')
+				'values'=>$this->rGetVal('values'),
+				'value_start'=>$this->rGetVal('value_start'),
+				'value_end'=>$this->rGetVal('value_end'),
 			));
 			$this->addMessage('Saved');
 		}
@@ -91,6 +99,7 @@ class TraitsTaxonController extends TraitsController
 			$this->smarty->assign('returnText',json_encode(array(
 				'trait'=>$this->getTraitgroupTrait($this->requestData),
 				'taxon_values'=>isset($d[0]) ? $d[0] : null,
+				'default_project_language' => $this->getDefaultProjectLanguage()
 			)));
 		}
 
@@ -305,11 +314,14 @@ class TraitsTaxonController extends TraitsController
 	private function saveTaxonTraitData($p)
 	{
 		$project=$this->getCurrentProjectId();
+
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		$values=isset($p['values']) ? $p['values'] : null;
+		$value_start=isset($p['value_start']) ? $p['value_start'] : null;
+		$value_end=isset($p['value_end']) ? $p['value_end'] : null;
 
-		if (empty($project)||empty($taxon)||empty($trait))
+		if ( empty($project) || empty($taxon) || empty($trait) )
 		{
 			return;
 		}
@@ -355,6 +367,30 @@ class TraitsTaxonController extends TraitsController
 						'string_value'=>$values[0]
 					));
 				}
+			}
+		}
+		else
+		if ($t['type_sysname']=='datefree')
+		{
+			$this->models->TraitsTaxonFreevalues->delete(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'taxon_id'=>$taxon,
+				'trait_id'=>$trait,
+			));
+
+			foreach((array)$value_start as $key=>$val)
+			{
+				$d=array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'taxon_id'=>$taxon,
+					'trait_id'=>$trait,
+					'date_value'=>$this->makeInsertableDate( $val, $t['date_format_format'] )
+				);
+				
+				if (isset($value_end) && isset($value_end[$key]))
+					$d['date_value_end']=$this->makeInsertableDate( $value_end[$key], $t['date_format_format'] );
+
+				$this->models->TraitsTaxonFreevalues->save( $d );
 			}
 		}
 		else
