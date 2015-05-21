@@ -1,5 +1,27 @@
 {include file="../shared/admin-header.tpl"}
 
+<!--
+
+  ["max_length"]=>
+  ["can_include_comment"]=>
+  ["can_have_range"]=>
+  ["date_format_format_hr"]=>
+
+  ["type_sysname"]=>
+  ["type_allow_values"]=>
+  ["type_allow_select_multiple"]=>
+  ["type_allow_max_length"]=>
+  ["type_allow_unit"]=>
+  ["value_count"]=>
+  
+-->
+<style>
+
+li.values:hover {
+	background-color:#eee;
+}
+
+</style>
 <script>
 
 var data=true;
@@ -15,6 +37,8 @@ var traitname=null;
 var currentvalues=[];
 var currentselection=[];
 var oldvalue=null;
+var default_language=null;
+var dialogheight=600;
 
 function setData( d )
 {
@@ -24,6 +48,16 @@ function setData( d )
 function getData()
 {
 	return data;
+}
+
+function setDefaultLanguage( d )
+{
+	default_language=d;
+}
+
+function getDefaultLanguage()
+{
+	return default_language;
 }
 
 function setConcept( id )
@@ -111,6 +145,15 @@ function getOldValue()
 	return oldvalue;
 }
 
+function setDialogHeight( value )
+{
+	dialogheight=value;
+}
+
+function getDialogHeight()
+{
+	return dialogheight;
+}
 
 function listTraitRemove( caller )
 {
@@ -195,7 +238,7 @@ function __datefree()
 {
 	var b='';
 	var selected=$('<p>');
-	
+
 	var df=getSetDateFormat();
 
 	for(var i=0;i<currentselection.length;i++)
@@ -205,18 +248,43 @@ function __datefree()
 		var c=currentselection[i];
 		b+=c.value_start+c.value_end;
 		
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:c.value_start?c.value_start:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
+
 		if (getCanHaveRange() || c.value_end.length!=0)
 		{
 			val2=templateReplace( $( "#datefree_template_one" ).html() ,
 				{ value:c.value_end?c.value_end:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
 		}
 
-		val1=templateReplace( $( "#datefree_template_one" ).html() ,
-			{ value:c.value_start, max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
-
-		selected.append( $(templateReplace( $( "#datefree_template_two" ).html() , { value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } )));
+		selected.append(
+			$(templateReplace(
+				$( "#datefree_template_two" ).html() , 
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
+			)
+		));
 		
 	}
+	
+	if (i==0)
+	{
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
+
+		if (getCanHaveRange() || c.value_end.length!=0)
+		{
+			val2=templateReplace( $( "#datefree_template_one" ).html() ,
+				{ value:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
+		}
+
+		selected.append(
+			$(templateReplace(
+				$( "#datefree_template_two" ).html() , 
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
+			)
+		));
+	}
+	
 	setOldValue( b );
 
 //	getCanHaveRange();
@@ -232,6 +300,7 @@ function __datefree()
 function taxonTraitFormInit( data )
 {
 	setData( data );
+	setDefaultLanguage( data.default_project_language );
 	setTrait( data.trait.id );
 	setTraitType( data.trait.type_sysname );
 	setTraitName( data.trait.sysname );
@@ -247,6 +316,8 @@ function taxonTraitForm()
 
 	currentselection.splice(0,currentselection.length);
 	currentvalues.splice(0,currentvalues.length);
+
+	setDialogHeight( 400 );
 	
 	if ( getTraitType()=='stringlist' || getTraitType()=='stringfree' )
 	{
@@ -265,9 +336,14 @@ function taxonTraitForm()
 		{
 			for(var i=0;i<d.trait.values.length;i++)
 			{
+				if (d.trait.values[i].language_labels && d.trait.values[i].language_labels[getDefaultLanguage()])
+					var label=d.trait.values[i].language_labels[getDefaultLanguage()];
+				else
+					var label=d.trait.values[i].string_value;
+				
 				currentvalues.push({
 					id:d.trait.values[i].id,
-					value:d.trait.values[i].string_value
+					value:label
 				});
 			}
 		}
@@ -295,11 +371,13 @@ function taxonTraitForm()
 	else
 	if ( getTraitType()=='stringfree' )
 	{
+		setDialogHeight( 200 );
 		return __stringfree();
 	}
 	else
 	if ( getTraitType()=='datefree' )
 	{
+		setDialogHeight( 200 );
 		return __datefree();
 	}
 }
@@ -332,7 +410,7 @@ function saveTaxonTrait()
 	var form=$( '<form method="POST"></form>' );
 	form.append( '<input type="hidden" name="action" value="save" />' );
 
-//<input type="hidden" name="rnd" value="{$rnd}" />
+	//<input type="hidden" name="rnd" value="{$rnd}" />
 
 	form.append( '<input type="hidden" name="id" value="'+concept+'" />' );
 	form.append( '<input type="hidden" name="group" value="'+group+'" />' );
@@ -343,6 +421,14 @@ function saveTaxonTrait()
 		$('textarea[name*=values]').each(function()
 		{
 			form.append( '<input type="hidden" name="values[]" value="'+ $(this).val() +'" />' );
+		});
+	}	
+	else
+	if ( getTraitType()=='datefree' )
+	{
+		$('input.__datefree[type=text]').each(function()
+		{
+			form.append( '<input type="hidden" name="'+ $(this).attr( 'name' ) +'" value="'+ $(this).val() +'" />' );
 		});
 	}	
 	else
@@ -367,11 +453,14 @@ function editTaxonTrait( d )
 		data: d,
 		success : function ( d )
 		{
+			//console.log( d );
 			taxonTraitFormInit( $.parseJSON( d ) );
 			prettyDialog(
 			{ 
 				title : getTraitName() , 
 				content : taxonTraitForm() , 
+				width: 600,
+				height: getDialogHeight(),
 				buttons :
 				{
 					"save" : { text:'Save', click:function() { saveTaxonTrait(); } },
@@ -417,27 +506,11 @@ function editTaxonTrait( d )
         </ul>
     </p>
     {/if}
-	
-            <!--
-            
-              ["max_length"]=>
-              ["can_include_comment"]=>
-              ["can_have_range"]=>
-              ["date_format_format_hr"]=>
-            
-              ["type_sysname"]=>
-              ["type_allow_values"]=>
-              ["type_allow_select_multiple"]=>
-              ["type_allow_max_length"]=>
-              ["type_allow_unit"]=>
-              ["value_count"]=>
-              
-            -->
 
     <p>
         <table>
             {foreach from=$traits item=v}
-            <tr class="tr-highlight">
+            <tr class="tr-highlight values">
                 <th style="width:200px">{$v.sysname}:</th>
                 <td>
                 {foreach from=$values item=t}
@@ -459,11 +532,16 @@ function editTaxonTrait( d )
         	references:
         	<ul>
                 {foreach from=$references item=v}
-                <li>{$v.label}</li>
+                <li>{if $v.citation}{$v.citation}{else}{$v.label}{/if}</li>
                 {/foreach}
 			</ul>        
         </p>
         
+        <span id="presence_reference" onchange="alert('change!');"></span>
+        <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">
+        	referentie toevoegen
+		</a>
+        <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
         
     </p>
 
@@ -505,7 +583,7 @@ function editTaxonTrait( d )
 </script>
 
 <script id="datefree_template_one" language="text">
-<input type="text" maxlength="%MAX_LENGTH%" name="%NAME%[]" value="%VALUE%" placeholder="%PLACEHOLDER%" style="width:50px;text-align:right">
+<input class="__datefree" type="text" maxlength="%MAX_LENGTH%" name="%NAME%[]" value="%VALUE%" placeholder="%PLACEHOLDER%" style="width:50px;text-align:right">
 </script>
 
 <script id="datefree_template_two" language="text">

@@ -53,7 +53,7 @@ ul.exotica li {
         <h4 class="source">Publicatie{if $content.result.references|@count>1}s{/if}</h4>
 		<ul class="exotica">
         {foreach from=$content.result.references item=v}
-			<li><a href="../literature2/reference.php?id={$v.id}">{$v.label}</a></li>
+			<li><a href="../literature2/reference.php?id={$v.id}">{if $v.citation}{$v.citation}{else}{$v.label}{/if}</a></li>
         {/foreach}
 		{/if}
         </ul>

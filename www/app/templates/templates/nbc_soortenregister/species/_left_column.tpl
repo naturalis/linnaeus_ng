@@ -8,7 +8,7 @@
 
 			<div id="categories">
 				<ul>
-                	{* remove 1==2 on r16 once the beelduitwisselaar comes back online, so its linkl might show on empty media-pages *}
+                	{* remove 1==2 on r16 once the beelduitwisselaar comes back online, so its link might show on empty media-pages *}
 					{foreach from=$categories key=k item=v}
 					{if
 						($v.id!=$smarty.const.CTAB_CLASSIFICATION &&

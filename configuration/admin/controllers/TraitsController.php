@@ -279,8 +279,8 @@ class TraitsController extends Controller
 		
 		foreach( $values as $key=>$val )
 		{
-			$values[$key]['usage_taxon_count']=$r[$val['id']]['taxon_count'];
-			$values[$key]['usage_total_count']=$r[$val['id']]['total_count'];
+			$values[$key]['usage_taxon_count']=@$r[$val['id']]['taxon_count'];
+			$values[$key]['usage_total_count']=@$r[$val['id']]['total_count'];
 		}
 		
 		return $values;

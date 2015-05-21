@@ -122,7 +122,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 				$content['content']=json_decode($raw,true);
 				
-				$this->smarty->assign('ext_template','_tab_exoten.tpl');
+				$this->smarty->assign('ext_template','_tab_exoten.tpl'); // --> this should become dependent on the actual called source
 				$this->smarty->assign('ext_tab',$this->rGetVal('ext_tab'));
 				
 			}

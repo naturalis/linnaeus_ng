@@ -186,6 +186,12 @@ function doSubmit()
         <table>
             <tr>
                 <td>
+                	<input type="checkbox" name="all_ranks" />Taxa van alle rangen tonen
+                </td>
+			</tr>
+<tbody style="background-color:red">              
+            <tr>
+                <td>
                     Beschikbaar:<br />
                     <span class=remark>(dubbelklik of klik op pijl om toe te voegen)</span>
                 </td>
@@ -231,6 +237,7 @@ function doSubmit()
                     </div>            
                 </td>
             </tr>
+</tbody>            
         </table>
 
 	</fieldset>
