@@ -76,11 +76,17 @@ function lit2BuildList(action,data)
 			
 		if (action.indexOf('title')!=-1)
 		{
-			buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+t.label+', '+author+'</a></li>');
+			buffer.push(
+				'<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+
+				t.label+
+				( author ? ', '+author : '' ) +
+				'</a></li>'
+				);
 		}
 		else
 		{
-			buffer.push('<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+author+': '+t.label+'</a></li>');
+			buffer.push(
+				'<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+author+': '+t.label+'</a></li>');
 		}
 	}
 

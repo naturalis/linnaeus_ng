@@ -606,21 +606,21 @@ class TraitsController extends Controller
 		$value=isset($p['value']) ? $p['value'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		$boolean_data=isset($p['boolean_data']) ? $p['boolean_data'] : null;
-		$cell_0=isset($p['cell_0']) ? $p['cell_0'] : null;
+		$actual_value=isset($p['actual_value']) ? $p['actual_value'] : null;
 
 		$check=$this->__null_check($value,$trait);
 		if (!empty($check)) return $check;
 
 		if ($boolean_data)
 		{
-			$check=$this->__string_list_check($cell_0,$trait);
+			$check=$this->__string_list_check($actual_value,$trait);
 			if (empty($check))
-				$check=$this->__string_list_check_weak($cell_0,$trait);
+				$check=$this->__string_list_check_weak($actual_value,$trait);
 			
 			if (!empty($check)) 
 			{
 				$value=strtolower($value);
-				$check['true_value']=$cell_0;
+				$check['true_value']=$actual_value;
 				$check['bool_value']=(in_array($value,$this->_yesValues) ? true : (in_array($value,$this->_noValues) ? false : null));
 				return $check;
 			}
@@ -654,17 +654,18 @@ class TraitsController extends Controller
 	{
 		$value=isset($p['value']) ? $p['value'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
+		$actual_value=isset($p['actual_value']) ? $p['actual_value'] : null;
 
 		$check=$this->__null_check($value,$trait);
 		if (!empty($check)) return $check;
 		
 		if ($boolean_data)
 		{
-			$check=$this->__string_list_check($cell_0,$trait);
+			$check=$this->__string_list_check($actual_value,$trait);
 			if (!empty($check)) 
 			{
 				$value=strtolower($value);
-				$check['true_value']=$cell_0;
+				$check['true_value']=$actual_value;
 				$check['bool_value']=(in_array($value,$this->_yesValues) ? true : (in_array($value,$this->_noValues) ? false : null));
 				return $check;
 			}
@@ -757,7 +758,6 @@ class TraitsController extends Controller
 	{
 		return is_null($date) ? null : date_format(date_create($date),$format);
 	}
-
 
 	public function makeInsertableDate($date,$format)
 	{

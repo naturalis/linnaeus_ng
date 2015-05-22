@@ -203,17 +203,21 @@
 
 	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">afbeeldingen</a><br />
 	
-    {foreach from=$traitgroups item=v}
-	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0">{$v.sysname}</a><br />
-    {/foreach}
-
-
+    {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
+	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
+    {/if}{/foreach}
 		
-	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
-{if !$concept.is_deleted}
-<br />
-<a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">taxon markeren als verwijderd</a>
-{/if}
+	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
+    {if !$concept.is_deleted}
+    <br />
+    <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">taxon markeren als verwijderd</a>
+	{/if}
+    {assign var=k value=0}
+    {foreach $traitgroups v}{if $v.taxon_count==0}
+   	{if $k==0}<br /><br /><span class="small">Kenmerken toevoegen:</span><br />{/if}
+	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
+    {assign var=k value=$k+1}
+    {/if}{/foreach}
 
 </p>
 
