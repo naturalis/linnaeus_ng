@@ -64,6 +64,23 @@ class TraitsTaxonController extends TraitsController
 		//$this->isFormResubmit()
 		//q( $this->requestData );
 		
+		if ($this->rHasVal('action','deleteall'))
+		{
+			$this->deleteTaxonTraitData(array('taxon'=>$this->rGetVal( 'id' ),'group'=>$this->rGetVal( 'group' )));
+			$this->deleteReferences(array('taxon'=>$this->rGetVal( 'id' ),'group'=>$this->rGetVal( 'group' )));
+			$this->addMessage('Deleted');
+		} 
+		else
+		if ($this->rHasVal('action','savereferences'))
+		{
+			$this->saveReferences(array(
+				'taxon'=>$this->rGetVal( 'id' ),
+				'group'=>$this->rGetVal( 'group' ),
+				'references'=>$this->rGetVal( 'references' )
+			));
+			$this->addMessage('Saved');
+		} 
+		else
 		if ($this->rHasVal('action','save') && $this->rHasId() && $this->rHasVal('group'))
 		{
 			$this->saveTaxonTraitData(array(
@@ -107,16 +124,17 @@ class TraitsTaxonController extends TraitsController
     }
 
 
-    private function getTaxonValues($p)
+
+    private function getTaxonValues( $p )
 	{
-		$project=$this->getCurrentProjectId();
-		$language=$this->getDefaultProjectLanguage();
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 
+		$language=$this->getDefaultProjectLanguage();
+
 		$data=array();
 
-		if (empty($project)||empty($taxon)||empty($language))
+		if ( empty($taxon) || empty($language) )
 		{
 			return;
 		}
@@ -153,7 +171,8 @@ class TraitsTaxonController extends TraitsController
 					_e.format as _date_format,
 					
 					_c.show_order as _show_order_1,
-					_b.show_order as _show_order_2
+					_b.show_order as _show_order_2,
+					'fixed' as type
 			
 				from
 					%PRE%traits_taxon_values _a
@@ -198,7 +217,7 @@ class TraitsTaxonController extends TraitsController
 					on _c.date_format_id=_e.id
 							
 				where
-					_a.project_id=".$project."
+					_a.project_id=".$this->getCurrentProjectId()."
 					and _a.taxon_id=".$taxon."
 					and _b.trait_id is not null
 			
@@ -230,7 +249,8 @@ class TraitsTaxonController extends TraitsController
 					_e.format as _date_format,
 			
 					_c.show_order as _show_order_1,
-					null as _show_order_2
+					null as _show_order_2,
+					'free' as type
 					
 				from
 					%PRE%traits_taxon_freevalues _a
@@ -266,7 +286,7 @@ class TraitsTaxonController extends TraitsController
 					on _c.date_format_id=_e.id
 				
 				where
-					_a.project_id=".$project."
+					_a.project_id=".$this->getCurrentProjectId()."
 					and _a.taxon_id=".$taxon."
 			
 			) as unionized
@@ -311,17 +331,15 @@ class TraitsTaxonController extends TraitsController
 
 	}
 
-	private function saveTaxonTraitData($p)
+	private function saveTaxonTraitData( $p )
 	{
-		$project=$this->getCurrentProjectId();
-
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		$values=isset($p['values']) ? $p['values'] : null;
 		$value_start=isset($p['value_start']) ? $p['value_start'] : null;
 		$value_end=isset($p['value_end']) ? $p['value_end'] : null;
 
-		if ( empty($project) || empty($taxon) || empty($trait) )
+		if ( empty($taxon) || empty($trait) )
 		{
 			return;
 		}
@@ -333,9 +351,17 @@ class TraitsTaxonController extends TraitsController
 		{
 			$existing=$existing[0];
 		}
-		
-		if ($t['type_sysname']=='stringfree')
+
+		$func=array($this,$t['type_verification_function_name']);
+
+		if (!is_callable($func))
 		{
+			$this->addWarning( sprintf($this->translate('No check function for type %s'),$t['type_sysname']) );
+		}
+								
+		if ( $t['type_sysname']=='stringfree' )
+		{
+
 			if (isset($existing['values'][0]['id']))
 			{
 				if (empty($values[0]))
@@ -347,6 +373,18 @@ class TraitsTaxonController extends TraitsController
 				}
 				else
 				{
+					if (is_callable($func))
+					{
+						$r=call_user_func( $func,array('value'=>$values[0],'trait'=>$t) );
+
+						if (!$r['pass'])
+						{
+							$this->addError( $r['error'] );
+							$this->addError(sprintf($this->translate('Value "%s" didn\'t pass check function'),$values[0]));
+							return;
+						}
+					}
+					
 					$this->models->TraitsTaxonFreevalues->save(array(
 						'project_id'=>$this->getCurrentProjectId(),
 						'id'=>$existing['values'][0]['id'],
@@ -360,6 +398,19 @@ class TraitsTaxonController extends TraitsController
 			{
 				if (!empty($values[0]))
 				{
+
+					if (is_callable($func))
+					{
+						$r=call_user_func( $func,array('value'=>$values[0],'trait'=>$t) );
+
+						if (!$r['pass'])
+						{
+							$this->addError( $r['error'] );
+							$this->addError(sprintf($this->translate('Value "%s" didn\'t pass check function'),$values[0]));
+							return;
+						}
+					}
+					
 					$this->models->TraitsTaxonFreevalues->save(array(
 						'project_id'=>$this->getCurrentProjectId(),
 						'taxon_id'=>$taxon,
@@ -370,8 +421,31 @@ class TraitsTaxonController extends TraitsController
 			}
 		}
 		else
-		if ($t['type_sysname']=='datefree')
+		if ( $t['type_sysname']=='datefree' )
 		{
+
+			$passed=true;
+
+			foreach((array)$value_start as $key=>$val)
+			{
+				if (is_callable($func))
+				{
+					$dummy=$val.(isset($value_end) && !empty($value_end[$key]) ? '-'.$value_end[$key] : '' );
+					
+					$r=call_user_func( $func,array('value'=>$dummy,'trait'=>$t) );
+
+					if (!$r['pass'])
+					{
+						$this->addError( $r['error'] );
+						$this->addError(sprintf($this->translate('Value "%s" didn\'t pass check function'),$dummy));
+						$passed=false;
+						continue;
+					}
+				}
+			}
+			
+			if ( !$passed ) return;
+
 			$this->models->TraitsTaxonFreevalues->delete(array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$taxon,
@@ -387,14 +461,14 @@ class TraitsTaxonController extends TraitsController
 					'date_value'=>$this->makeInsertableDate( $val, $t['date_format_format'] )
 				);
 				
-				if (isset($value_end) && isset($value_end[$key]))
+				if (isset($value_end) && !empty($value_end[$key]))
 					$d['date_value_end']=$this->makeInsertableDate( $value_end[$key], $t['date_format_format'] );
 
 				$this->models->TraitsTaxonFreevalues->save( $d );
 			}
 		}
 		else
-		if ($t['type_sysname']=='stringlist')
+		if ( $t['type_sysname']=='stringlist' )
 		{
 			if (isset($existing['values']))
 			{
@@ -409,6 +483,22 @@ class TraitsTaxonController extends TraitsController
 	
 			foreach((array)$values as $val)
 			{
+				/*
+				
+				// no values are being passed! just id's
+				if (is_callable($func))
+				{
+					$r=call_user_func( $func,array('value'=>$val,'trait'=>$t) );
+
+					if (!$r['pass'])
+					{
+						$this->addError( $r['error'] );
+						$this->addError(sprintf($this->translate('Value "%s" didn\'t pass check function'),$val));
+						continue;
+					}
+				}
+				*/
+				
 				$this->models->TraitsTaxonValues->save(array(
 					'project_id'=>$this->getCurrentProjectId(),
 					'taxon_id'=>$taxon,
@@ -418,20 +508,20 @@ class TraitsTaxonController extends TraitsController
 		}
 	}
 
-	private function getReferences($p)
+	private function getReferences( $p )
 	{
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$group=isset($p['group']) ? $p['group'] : null;
-		$project=$project=$this->getCurrentProjectId();
 
-		if (empty($taxon)||empty($group)||empty($project))
+		if ( empty($taxon) || empty($group) )
 			return;
 
 		$l=$this->models->Literature2->freeQuery("
 			select
-				_a.*,
-				_h.label as publishedin_label,
-				_i.label as periodical_label
+				_ttr.id,
+				_a.id as literature_id,
+				_a.label,
+				_a.citation
 
 			from %PRE%literature2 _a
 
@@ -440,19 +530,11 @@ class TraitsTaxonController extends TraitsController
 				and _a.project_id=_ttr.project_id
 				and _ttr.trait_group_id=".$group."
 
-			left join  %PRE%literature2 _h
-				on _a.publishedin_id = _h.id 
-				and _a.project_id=_h.project_id
-
-			left join %PRE%literature2 _i 
-				on _a.periodical_id = _i.id 
-				and _a.project_id=_i.project_id
-
 			where
-				_a.project_id=".$project." 
+				_a.project_id=".$this->getCurrentProjectId()." 
 				and _ttr.taxon_id=".$taxon
 		);
-		
+
 		foreach((array)$l as $key=>$val)
 		{
 			$authors=$this->models->Literature2Authors->freeQuery("
@@ -466,18 +548,114 @@ class TraitsTaxonController extends TraitsController
 					and _a.project_id=_b.project_id
 	
 				where
-					_a.project_id = ".$project."
-					and _a.literature2_id =".$val['id']."
+					_a.project_id = ".$this->getCurrentProjectId()."
+					and _a.literature2_id =".$val['literature_id']."
 				order by _b.name
 			");
 		
 			$l[$key]['authors']=$authors;
 			
 		}
-		
+	
 		return $l;
 
 	}
+
+	private function saveReferences( $p )
+	{
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		$group=isset($p['group']) ? $p['group'] : null;
+		$references=isset($p['references']) ? $p['references'] : null;
+
+		if ( empty($taxon) || empty($group) )
+			return;
+
+		$keep=array(-1);
+		$new=array();
+
+		foreach((array)$references as $val)
+		{
+			$d=explode(",",$val);
+
+			if ($d[0]==-1)
+				$new=$d[1];
+			else
+				$keep[]=$d[0];
+		}
+
+		$this->models->Literature2->freeQuery("
+			delete from 
+				%PRE%traits_taxon_references
+			where
+				project_id=".$this->getCurrentProjectId()." 
+				and taxon_id=".$taxon."
+				and id not in (".implode(",",$keep).")
+		");
+		
+		foreach((array)$new as $val)
+		{
+			$this->models->TraitsTaxonReferences->save(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'trait_group_id'=>$group,
+				'taxon_id'=>$taxon,
+				'reference_id'=>$val
+			));
+		}
+
+	}
+
+	private function deleteTaxonTraitData( $p )
+	{
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		$group=isset($p['group']) ? $p['group'] : null;
+
+		if ( empty($taxon) || empty($group) )
+		{
+			return;
+		}
+
+		$data = $this->getTaxonValues(array('taxon'=>$taxon,'group'=>$group));
+		
+		foreach((array)$data as $trait)
+		{
+			foreach((array)$trait['values'] as $val)
+			{
+				if (substr($trait['trait']['type'],-4)=='free')
+				{
+					$this->models->TraitsTaxonFreevalues->delete(array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'id'=>$val['id'],
+						'taxon_id'=>$taxon,
+					));					
+				}
+				else
+				{
+					$this->models->TraitsTaxonValues->delete(array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'id'=>$val['id'],
+						'taxon_id'=>$taxon
+					));
+				}
+			}
+		}
+	}
+						
+	private function deleteReferences( $p )
+	{
+		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
+		$group=isset($p['group']) ? $p['group'] : null;
+
+		if ( empty($taxon) || empty($group) )
+			return;
+
+		$this->models->TraitsTaxonReferences->delete(array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'trait_group_id'=>$group,
+			'taxon_id'=>$taxon
+		));
+
+	}
+
 
 
 }

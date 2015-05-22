@@ -8,6 +8,9 @@ h3 {
 h2,h4 {
     margin-top: 10px;
 }
+.small {
+	font-size:9.5px;
+}
 ul {
     margin-top:0;
 	list-style:outside none;
@@ -28,7 +31,6 @@ ul.small {
 ul.small li::before {
     content: "• ";
 } 
-
 a.edit {
 	margin-left:10px;
 	font-size:9.5px;

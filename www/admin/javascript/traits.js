@@ -335,10 +335,520 @@ function saveRawData()
 {	
 	var form=$('<form method="post" action="data_save.php"></form>').appendTo('body');
 
-	$('.joinrows:checked').each(function(){
+	$('.joinrows:checked').each(function()
+	{
 		form.append('<input type="hidden" name="'+$(this).attr('name')+'" value="'+$(this).val()+'" />');
 	});
 
 	form.append('<input type="hidden" name="action" value="save" />');
+	form.submit();
+}
+
+
+
+
+
+
+var taxonTraits = {}
+ 
+taxonTraits.data=true;
+taxonTraits.can_select_multiple=true;
+taxonTraits.can_be_null=true;
+taxonTraits.can_have_range=true;
+taxonTraits.date_format=null;
+taxonTraits.concept=null;
+taxonTraits.group=null;
+taxonTraits.trait=null;
+taxonTraits.traittype=null;
+taxonTraits.traitname=null;
+taxonTraits.currentvalues=[];
+taxonTraits.currentselection=[];
+taxonTraits.oldvalue=null;
+taxonTraits.default_language=null;
+taxonTraits.dialogheight=600;
+taxonTraits.references=[];
+
+taxonTraits.setData=function ( d )
+{
+	taxonTraits.data=d;
+}
+
+taxonTraits.getData=function()
+{
+	return taxonTraits.data;
+}
+
+taxonTraits.setDefaultLanguage=function( d )
+{
+	taxonTraits.default_language=d;
+}
+
+taxonTraits.getDefaultLanguage=function()
+{
+	return taxonTraits.default_language;
+}
+
+taxonTraits.setConcept=function( id )
+{
+	taxonTraits.concept=id;
+}
+
+taxonTraits.setGroup=function( id )
+{
+	taxonTraits.group=id;
+}
+
+taxonTraits.setTrait=function( id )
+{
+	taxonTraits.trait=id;
+}
+
+taxonTraits.setTraitType=function( type )
+{
+	taxonTraits.traittype=type;
+}
+
+taxonTraits.getTraitType=function()
+{
+	return taxonTraits.traittype;
+}
+
+taxonTraits.setTraitName=function( name )
+{
+	taxonTraits.traitname=name;
+}
+
+taxonTraits.getTraitName=function()
+{
+	return taxonTraits.traitname;
+}
+
+taxonTraits.setCanSelectMultiple=function( state )
+{
+	taxonTraits.can_select_multiple=state;
+}
+
+taxonTraits.getCanSelectMultiple=function()
+{
+	return taxonTraits.can_select_multiple;
+}
+
+taxonTraits.setCanBeNull=function( state )
+{
+	taxonTraits.can_be_null=state;
+}
+
+taxonTraits.getCanBeNull=function()
+{
+	return taxonTraits.can_be_null;
+}
+
+taxonTraits.setCanHaveRange=function( state )
+{
+	taxonTraits.can_have_range=state;
+}
+
+taxonTraits.getCanHaveRange=function()
+{
+	return taxonTraits.can_have_range;
+}
+
+taxonTraits.setSetDateFormat=function( format )
+{
+	taxonTraits.date_format=format;
+}
+
+taxonTraits.getSetDateFormat=function()
+{
+	return taxonTraits.date_format;
+}
+
+taxonTraits.setOldValue=function( value )
+{
+	taxonTraits.oldvalue=value;
+}
+
+taxonTraits.getOldValue=function()
+{
+	return taxonTraits.oldvalue;
+}
+
+taxonTraits.setDialogHeight=function( value )
+{
+	taxonTraits.dialogheight=value;
+}
+
+taxonTraits.getDialogHeight=function()
+{
+	return taxonTraits.dialogheight;
+}
+
+taxonTraits.listTraitRemove=function( caller )
+{
+	if (taxonTraits.currentselection.length<=1 && !taxonTraits.getCanBeNull()) return;
+
+	var id=$( caller ).attr( 'data' );
+
+	for(var i=0;i<taxonTraits.currentselection.length;i++)
+	{
+		if( taxonTraits.currentselection[i].id==id )
+		{
+			taxonTraits.currentselection.splice(i,1);
+			break;
+		}
+	}
+
+	if ( taxonTraits.getTraitType()=='stringlist' )
+	{
+		$( "#dialog-message-body-content" ).html( taxonTraits.__stringlist() );
+	}
+}
+
+taxonTraits.listTraitAdd=function( caller )
+{
+	var newid=$( caller ).attr( 'data' );
+
+	for(var i=0;i<taxonTraits.currentselection.length;i++)
+	{
+		if( taxonTraits.currentselection[i].id==newid ) return;
+	}
+	
+	if ( taxonTraits.currentselection.length>0 && !taxonTraits.getCanSelectMultiple() )
+	{
+		taxonTraits.currentselection.splice(0,taxonTraits.currentselection.length);
+	}
+
+	for(var i=0;i<taxonTraits.currentvalues.length;i++)
+	{
+		if( taxonTraits.currentvalues[i].id==newid )
+		{
+			taxonTraits.currentselection.push( { id:taxonTraits.currentvalues[i].id, value:taxonTraits.currentvalues[i].value } );
+		}
+	}
+
+	if ( taxonTraits.getTraitType()=='stringlist' )
+	{
+		$( "#dialog-message-body-content" ).html( taxonTraits.__stringlist() );
+	}
+}
+
+taxonTraits.__stringlist=function()
+{
+	var dummy=[];
+	var selected=$('<p>');
+	if (taxonTraits.currentselection)
+	{
+		for( var i=0;i<taxonTraits.currentselection.length;i++ )
+		{
+			selected.append( $(templateReplace( $( "#stringlist_template_two" ).html() , taxonTraits.currentselection[i] )));
+			dummy.push( taxonTraits.currentselection[i].id );
+		}
+	}
+	
+	var values=$('<p>');
+	for( var i=0;i<taxonTraits.currentvalues.length;i++ )
+	{
+		if( dummy.indexOf( taxonTraits.currentvalues[i].id )!=-1) continue;
+		values.append( $(templateReplace( $( "#stringlist_template_three" ).html() , taxonTraits.currentvalues[i] )));
+	}
+	
+	return templateReplace( $( "#stringlist_template_one" ).html() , { SELECTED : selected.html(), VALUES : values.html() } );
+}
+
+taxonTraits.__stringfree=function()
+{
+	taxonTraits.setOldValue( taxonTraits.currentselection[0] && taxonTraits.currentselection[0].value ? taxonTraits.currentselection[0].value : '' );
+	var selected=$('<p>').append(
+		$(templateReplace(
+			$( "#stringfree_template_two" ).html() , 
+			( taxonTraits.currentselection[0] ? taxonTraits.currentselection[0] : { value: ''} )
+		))
+	);
+	return templateReplace( $( "#stringfree_template_one" ).html() , { SELECTED : selected.html() } );
+}
+
+taxonTraits.__datefree=function()
+{
+	var b='';
+	var selected=$('<p>');
+	var df=taxonTraits.getSetDateFormat();
+
+	for(var i=0;i<taxonTraits.currentselection.length;i++)
+	{
+		var val1='';
+		var val2='';
+		var c=taxonTraits.currentselection[i];
+		b+=c.value_start+c.value_end;
+		
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:c.value_start?c.value_start:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
+
+		if (taxonTraits.getCanHaveRange() || c.value_end.length!=0)
+		{
+			val2=templateReplace( $( "#datefree_template_one" ).html() ,
+				{ value:c.value_end?c.value_end:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
+		}
+
+		selected.append(
+			$( templateReplace(
+				$( "#datefree_template_two" ).html() , 
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
+			)
+		));
+		
+	}
+	
+	if (i==0)
+	{
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
+
+		if ( taxonTraits.getCanHaveRange() || c.value_end.length!=0 )
+		{
+			val2=templateReplace( $( "#datefree_template_one" ).html() ,
+				{ value:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
+		}
+
+		selected.append(
+			$( templateReplace(
+				$( "#datefree_template_two" ).html() , 
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
+			)
+		));
+	}
+	
+	taxonTraits.setOldValue( b );
+
+//	taxonTraits.getCanHaveRange();
+//	taxonTraits.getCanSelectMultiple();
+//	taxonTraits.getSetDateFormat();
+
+	return templateReplace( $( "#datefree_template_three" ).html() , { SELECTED : selected.html() } );
+}
+
+taxonTraits.taxonTraitFormInit=function( data )
+{
+	taxonTraits.setData( data );
+	taxonTraits.setDefaultLanguage( data.default_project_language );
+	taxonTraits.setTrait( data.trait.id );
+	taxonTraits.setTraitType( data.trait.type_sysname );
+	taxonTraits.setTraitName( data.trait.sysname );
+	taxonTraits.setCanSelectMultiple( data.trait.can_select_multiple==1 );
+	taxonTraits.setCanBeNull( data.trait.can_be_null==1 );
+	taxonTraits.setCanHaveRange( data.trait.can_have_range==1 );
+	taxonTraits.setSetDateFormat( { format:data.trait.date_format_format,format_hr:data.trait.date_format_format_hr } );
+}
+
+taxonTraits.taxonTraitForm=function()
+{
+	var d=taxonTraits.getData();
+
+	taxonTraits.currentselection.splice(0,taxonTraits.currentselection.length);
+	taxonTraits.currentvalues.splice(0,taxonTraits.currentvalues.length);
+
+	taxonTraits.setDialogHeight( 400 );
+	
+	if ( taxonTraits.getTraitType()=='stringlist' || taxonTraits.getTraitType()=='stringfree' )
+	{
+		if ( d.taxon_values && d.taxon_values.values )
+		{
+			for(var i=0;i<d.taxon_values.values.length;i++)
+			{
+				taxonTraits.currentselection.push({
+					id:d.taxon_values.values[i].value_id,
+					value:d.taxon_values.values[i].value_start
+				});
+			}
+		}
+
+		if ( d.trait.values )
+		{
+			for(var i=0;i<d.trait.values.length;i++)
+			{
+				if (d.trait.values[i].language_labels && d.trait.values[i].language_labels[taxonTraits.getDefaultLanguage()])
+					var label=d.trait.values[i].language_labels[taxonTraits.getDefaultLanguage()];
+				else
+					var label=d.trait.values[i].string_value;
+				
+				taxonTraits.currentvalues.push({
+					id:d.trait.values[i].id,
+					value:label
+				});
+			}
+		}
+	}
+
+	if ( taxonTraits.getTraitType()=='datefree' )
+	{
+		if ( d.taxon_values && d.taxon_values.values )
+		{
+			for(var i=0;i<d.taxon_values.values.length;i++)
+			{
+				taxonTraits.currentselection.push({
+					id:d.taxon_values.values[i].value_id,
+					value_start:d.taxon_values.values[i].value_start,
+					value_end:d.taxon_values.values[i].value_end
+				});
+			}
+		}
+	}
+
+	if ( taxonTraits.getTraitType()=='stringlist' )
+	{
+		return taxonTraits.__stringlist();
+	}
+	else
+	if ( taxonTraits.getTraitType()=='stringfree' )
+	{
+		return taxonTraits.__stringfree();
+	}
+	else
+	if ( taxonTraits.getTraitType()=='datefree' )
+	{
+		taxonTraits.setDialogHeight( 200 );
+		return taxonTraits.__datefree();
+	}
+}
+
+taxonTraits.hasChanged=function()
+{
+	if ( taxonTraits.getTraitType()=='stringfree' )
+	{
+		var newvalue='';
+		$('textarea[name*=values]').each(function()
+		{
+			newvalue+=$(this).val();
+		});
+		
+		return taxonTraits.getOldValue()!=newvalue;
+	}	
+	
+	return true;
+}
+
+taxonTraits.saveTaxonTrait=function()
+{
+	if (!taxonTraits.hasChanged())
+	{
+		$( "#dialog-message" ).dialog( "close" );
+		return;
+	}
+
+	var form=$( '<form method="POST"></form>' );
+	form.append( '<input type="hidden" name="action" value="save" />' );
+	form.append( '<input type="hidden" name="id" value="'+taxonTraits.concept+'" />' );
+	form.append( '<input type="hidden" name="group" value="'+taxonTraits.group+'" />' );
+	form.append( '<input type="hidden" name="trait" value="'+taxonTraits.trait+'" />' );
+
+	if ( taxonTraits.getTraitType()=='stringfree' )
+	{
+		$('textarea[name*=values]').each(function()
+		{
+			form.append( '<input type="hidden" name="values[]" value="'+ $(this).val() +'" />' );
+		});
+	}	
+	else
+	if ( taxonTraits.getTraitType()=='datefree' )
+	{
+		$('input.__datefree[type=text]').each(function()
+		{
+			form.append( '<input type="hidden" name="'+ $(this).attr( 'name' ) +'" value="'+ $(this).val() +'" />' );
+		});
+	}	
+	else
+	{
+		for(var i=0;i<taxonTraits.currentselection.length;i++)
+		{
+			form.append( '<input type="hidden" name="values[]" value="'+ taxonTraits.currentselection[i].id +'" />' );
+		}
+	}
+
+	$('body').append(form);
+	form.submit();
+}
+
+taxonTraits.editTaxonTrait = function( d )
+{
+	d.time=allGetTimestamp();
+	d.action='get_taxon_trait';
+
+	$.ajax({
+		url: "ajax_taxon.php",
+		data: d,
+		success : function ( d )
+		{
+			//console.log( d );
+			taxonTraits.taxonTraitFormInit( $.parseJSON( d ) );
+			prettyDialog(
+			{ 
+				title : taxonTraits.getTraitName() , 
+				content : taxonTraits.taxonTraitForm() , 
+				width: 600,
+				height: taxonTraits.getDialogHeight(),
+				buttons :
+				{
+					"save" : { text:'Save', click:function() { taxonTraits.saveTaxonTrait(); } },
+					"cancel" : { text:'Cancel', click:function() { $( this ).dialog( "close" ); } } }
+				}
+			);
+		}
+	}).done(function()
+	{
+		$( "#dialog-message-body-content" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
+		$( ".__stringfree" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
+	});
+}
+
+taxonTraits.setReference=function( ref )
+{
+	for(var i=0;i<taxonTraits.references.length;i++)
+	{
+		if (taxonTraits.references[i].literature_id==ref.literature_id) return;
+	}
+	taxonTraits.references.push( ref );
+}
+
+taxonTraits.removeReference=function( i )
+{
+	taxonTraits.references.splice(i,1);
+}
+
+taxonTraits.printReferences=function()
+{
+	var buffer=[]
+	for(var i=0;i<taxonTraits.references.length;i++)
+	{
+		buffer.push(
+			'<li>'+
+				taxonTraits.references[i].label+
+				' <a href="#" onclick="taxonTraits.removeReference('+i+');taxonTraits.printReferences();return false;">x</a></li>'
+		 );
+	}
+	$( '#references' ).html( buffer.join('') );
+}
+
+taxonTraits.saveReferences=function()
+{
+	var form=$('<form method="post"></form>').appendTo('body');
+	form.append('<input type="hidden" name="action" value="savereferences" />');
+	 
+	for(var i=0;i<taxonTraits.references.length;i++)
+	{
+		form.append(
+			'<input type="hidden" name="references[]" value="'+
+				(taxonTraits.references[i].id ? taxonTraits.references[i].id : -1) +','+ taxonTraits.references[i].literature_id +
+			'" />');
+	};
+	
+	form.submit();
+
+}
+
+taxonTraits.deleteTraitsReferences=function()
+{
+	if (!confirm(_('Alle kenmerken en referenties verwijderen?'))) return;
+
+	var form=$('<form method="post"></form>').appendTo('body');
+	form.append('<input type="hidden" name="action" value="deleteall" />');
 	form.submit();
 }

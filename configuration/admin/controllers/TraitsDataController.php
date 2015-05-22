@@ -621,7 +621,7 @@ class TraitsDataController extends TraitsController
 									'value'=>$cell,
 									'trait'=>$trait,
 									'boolean_data'=>$line['boolean_data'],
-									'cell_0'=>$line['cells'][0]
+									'actual_value'=>$line['cells'][0]
 								)
 							);
 					}
@@ -935,7 +935,7 @@ class TraitsDataController extends TraitsController
 											'value'=>$value,
 											'trait'=>$trait,
 											'boolean_data'=>$line['boolean_data'],
-											'cell_0'=>$line['cells'][0]
+											'actual_value'=>$line['cells'][0]
 										)
 									);									
 									

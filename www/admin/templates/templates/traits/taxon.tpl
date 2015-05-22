@@ -22,460 +22,6 @@ li.values:hover {
 }
 
 </style>
-<script>
-
-var data=true;
-var can_select_multiple=true;
-var can_be_null=true;
-var can_have_range=true;
-var date_format=null;
-var concept=null;
-var group=null;
-var trait=null;
-var traittype=null;
-var traitname=null;
-var currentvalues=[];
-var currentselection=[];
-var oldvalue=null;
-var default_language=null;
-var dialogheight=600;
-
-function setData( d )
-{
-	data=d;
-}
-
-function getData()
-{
-	return data;
-}
-
-function setDefaultLanguage( d )
-{
-	default_language=d;
-}
-
-function getDefaultLanguage()
-{
-	return default_language;
-}
-
-function setConcept( id )
-{
-	concept=id;
-}
-
-function setGroup( id )
-{
-	group=id;
-}
-
-function setTrait( id )
-{
-	trait=id;
-}
-
-function setTraitType( type )
-{
-	traittype=type;
-}
-
-function getTraitType()
-{
-	return traittype;
-}
-
-function setTraitName( name )
-{
-	traitname=name;
-}
-
-function getTraitName()
-{
-	return traitname;
-}
-
-function setCanSelectMultiple( state )
-{
-	can_select_multiple=state;
-}
-
-function getCanSelectMultiple()
-{
-	return can_select_multiple;
-}
-
-function setCanBeNull( state )
-{
-	can_be_null=state;
-}
-
-function getCanBeNull()
-{
-	return can_be_null;
-}
-
-function setCanHaveRange( state )
-{
-	can_have_range=state;
-}
-
-function getCanHaveRange()
-{
-	return can_have_range;
-}
-
-function setSetDateFormat( format )
-{
-	date_format=format;
-}
-
-function getSetDateFormat()
-{
-	return date_format;
-}
-
-function setOldValue( value )
-{
-	oldvalue=value;
-}
-
-function getOldValue()
-{
-	return oldvalue;
-}
-
-function setDialogHeight( value )
-{
-	dialogheight=value;
-}
-
-function getDialogHeight()
-{
-	return dialogheight;
-}
-
-function listTraitRemove( caller )
-{
-	if (currentselection.length<=1 && !getCanBeNull()) return;
-
-	var id=$( caller ).attr( 'data' );
-
-	for(var i=0;i<currentselection.length;i++)
-	{
-		if( currentselection[i].id==id )
-		{
-			currentselection.splice(i,1);
-			break;
-		}
-	}
-
-	if ( getTraitType()=='stringlist' )
-	{
-		$( "#dialog-message-body-content" ).html( __stringlist() );
-	}
-}
-
-function listTraitAdd( caller )
-{
-	var newid=$( caller ).attr( 'data' );
-
-	for(var i=0;i<currentselection.length;i++)
-	{
-		if( currentselection[i].id==newid ) return;
-	}
-	
-	if ( currentselection.length>0 && !getCanSelectMultiple() )
-	{
-		currentselection.splice(0,currentselection.length);
-	}
-
-	for(var i=0;i<currentvalues.length;i++)
-	{
-		if( currentvalues[i].id==newid )
-		{
-			currentselection.push( { id:currentvalues[i].id, value:currentvalues[i].value } );
-		}
-	}
-
-	if ( getTraitType()=='stringlist' )
-	{
-		$( "#dialog-message-body-content" ).html( __stringlist() );
-	}
-}
-
-function __stringlist()
-{
-	var dummy=[];
-	var selected=$('<p>');
-	if (currentselection)
-	{
-		for( var i=0;i<currentselection.length;i++ )
-		{
-			selected.append( $(templateReplace( $( "#stringlist_template_two" ).html() , currentselection[i] )));
-			dummy.push( currentselection[i].id );
-		}
-	}
-	
-	var values=$('<p>');
-	for( var i=0;i<currentvalues.length;i++ )
-	{
-		if( dummy.indexOf( currentvalues[i].id )!=-1) continue;
-		values.append( $(templateReplace( $( "#stringlist_template_three" ).html() , currentvalues[i] )));
-	}
-	
-	return templateReplace( $( "#stringlist_template_one" ).html() , { SELECTED : selected.html(), VALUES : values.html() } );
-}
-
-function __stringfree()
-{
-	setOldValue( currentselection[0] && currentselection[0].value ? currentselection[0].value : '' );
-	var selected=$('<p>').append( $(templateReplace( $( "#stringfree_template_two" ).html() , ( currentselection[0] ? currentselection[0] : { value: ''} ))));
-	return templateReplace( $( "#stringfree_template_one" ).html() , { SELECTED : selected.html() } );
-}
-
-function __datefree()
-{
-	var b='';
-	var selected=$('<p>');
-
-	var df=getSetDateFormat();
-
-	for(var i=0;i<currentselection.length;i++)
-	{
-		var val1='';
-		var val2='';
-		var c=currentselection[i];
-		b+=c.value_start+c.value_end;
-		
-		val1=templateReplace( $( "#datefree_template_one" ).html() ,
-			{ value:c.value_start?c.value_start:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
-
-		if (getCanHaveRange() || c.value_end.length!=0)
-		{
-			val2=templateReplace( $( "#datefree_template_one" ).html() ,
-				{ value:c.value_end?c.value_end:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
-		}
-
-		selected.append(
-			$(templateReplace(
-				$( "#datefree_template_two" ).html() , 
-				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
-			)
-		));
-		
-	}
-	
-	if (i==0)
-	{
-		val1=templateReplace( $( "#datefree_template_one" ).html() ,
-			{ value:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
-
-		if (getCanHaveRange() || c.value_end.length!=0)
-		{
-			val2=templateReplace( $( "#datefree_template_one" ).html() ,
-				{ value:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
-		}
-
-		selected.append(
-			$(templateReplace(
-				$( "#datefree_template_two" ).html() , 
-				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
-			)
-		));
-	}
-	
-	setOldValue( b );
-
-//	getCanHaveRange();
-//	getCanSelectMultiple();
-//	getSetDateFormat();
-	
-	console.dir( currentselection );
-	
-
-	return templateReplace( $( "#datefree_template_three" ).html() , { SELECTED : selected.html() } );
-}
-
-function taxonTraitFormInit( data )
-{
-	setData( data );
-	setDefaultLanguage( data.default_project_language );
-	setTrait( data.trait.id );
-	setTraitType( data.trait.type_sysname );
-	setTraitName( data.trait.sysname );
-	setCanSelectMultiple( data.trait.can_select_multiple==1 );
-	setCanBeNull( data.trait.can_be_null==1 );
-	setCanHaveRange( data.trait.can_have_range==1 );
-	setSetDateFormat( { format:data.trait.date_format_format,format_hr:data.trait.date_format_format_hr } );
-}
-
-function taxonTraitForm()
-{
-	var d=getData();
-
-	currentselection.splice(0,currentselection.length);
-	currentvalues.splice(0,currentvalues.length);
-
-	setDialogHeight( 400 );
-	
-	if ( getTraitType()=='stringlist' || getTraitType()=='stringfree' )
-	{
-		if ( d.taxon_values && d.taxon_values.values )
-		{
-			for(var i=0;i<d.taxon_values.values.length;i++)
-			{
-				currentselection.push({
-					id:d.taxon_values.values[i].value_id,
-					value:d.taxon_values.values[i].value_start
-				});
-			}
-		}
-
-		if ( d.trait.values )
-		{
-			for(var i=0;i<d.trait.values.length;i++)
-			{
-				if (d.trait.values[i].language_labels && d.trait.values[i].language_labels[getDefaultLanguage()])
-					var label=d.trait.values[i].language_labels[getDefaultLanguage()];
-				else
-					var label=d.trait.values[i].string_value;
-				
-				currentvalues.push({
-					id:d.trait.values[i].id,
-					value:label
-				});
-			}
-		}
-	}
-
-	if ( getTraitType()=='datefree' )
-	{
-		if ( d.taxon_values && d.taxon_values.values )
-		{
-			for(var i=0;i<d.taxon_values.values.length;i++)
-			{
-				currentselection.push({
-					id:d.taxon_values.values[i].value_id,
-					value_start:d.taxon_values.values[i].value_start,
-					value_end:d.taxon_values.values[i].value_end
-				});
-			}
-		}
-	}
-
-	if ( getTraitType()=='stringlist' )
-	{
-		return __stringlist();
-	}
-	else
-	if ( getTraitType()=='stringfree' )
-	{
-		setDialogHeight( 200 );
-		return __stringfree();
-	}
-	else
-	if ( getTraitType()=='datefree' )
-	{
-		setDialogHeight( 200 );
-		return __datefree();
-	}
-}
-
-function hasChanged()
-{
-	if ( getTraitType()=='stringfree' )
-	{
-		var newvalue='';
-		$('textarea[name*=values]').each(function()
-		{
-			newvalue+=$(this).val();
-		});
-		
-		return getOldValue()!=newvalue;
-	}	
-	
-	return true;
-}
-
-
-function saveTaxonTrait()
-{
-	if (!hasChanged())
-	{
-		$( "#dialog-message" ).dialog( "close" );
-		return;
-	}
-
-	var form=$( '<form method="POST"></form>' );
-	form.append( '<input type="hidden" name="action" value="save" />' );
-
-	//<input type="hidden" name="rnd" value="{$rnd}" />
-
-	form.append( '<input type="hidden" name="id" value="'+concept+'" />' );
-	form.append( '<input type="hidden" name="group" value="'+group+'" />' );
-	form.append( '<input type="hidden" name="trait" value="'+trait+'" />' );
-
-	if ( getTraitType()=='stringfree' )
-	{
-		$('textarea[name*=values]').each(function()
-		{
-			form.append( '<input type="hidden" name="values[]" value="'+ $(this).val() +'" />' );
-		});
-	}	
-	else
-	if ( getTraitType()=='datefree' )
-	{
-		$('input.__datefree[type=text]').each(function()
-		{
-			form.append( '<input type="hidden" name="'+ $(this).attr( 'name' ) +'" value="'+ $(this).val() +'" />' );
-		});
-	}	
-	else
-	{
-		for(var i=0;i<currentselection.length;i++)
-		{
-			form.append( '<input type="hidden" name="values[]" value="'+ currentselection[i].id +'" />' );
-		}
-	}
-	
-	$('body').append(form);
-	form.submit();
-}
-
-function editTaxonTrait( d )
-{
-	d.time=allGetTimestamp();
-	d.action='get_taxon_trait';
-
-	$.ajax({
-		url: "ajax_taxon.php",
-		data: d,
-		success : function ( d )
-		{
-			//console.log( d );
-			taxonTraitFormInit( $.parseJSON( d ) );
-			prettyDialog(
-			{ 
-				title : getTraitName() , 
-				content : taxonTraitForm() , 
-				width: 600,
-				height: getDialogHeight(),
-				buttons :
-				{
-					"save" : { text:'Save', click:function() { saveTaxonTrait(); } },
-					"cancel" : { text:'Cancel', click:function() { $( this ).dialog( "close" ); } } }
-				}
-			);
-		}
-	}).done(function()
-	{
-		$( "#dialog-message-body-content" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
-		$( ".__stringfree" ).css( "font-family" , $( "body" ).css( "font-family" ) ).css( "font-size" , "0.9em" );
-	});
-}
-
-</script>
 
 
 <div id="page-main">
@@ -522,33 +68,50 @@ function editTaxonTrait( d )
                 {/foreach}
                 </td>
                 <td>
-					<a class="edit" data='{ "trait":{$v.id},"taxon":{$concept.id},"group":{$group.id} }'>edit</a>
+					<a class="edit values" data='{ "trait":{$v.id},"taxon":{$concept.id},"group":{$group.id} }'>edit</a>
                 </td>
             </tr>
             {/foreach}
         </table>
         
         <p>
-        	references:
-        	<ul>
-                {foreach from=$references item=v}
-                <li>{if $v.citation}{$v.citation}{else}{$v.label}{/if}</li>
-                {/foreach}
+        	referenties:
+        	<ul id="references">
 			</ul>        
         </p>
         
-        <span id="presence_reference" onchange="alert('change!');"></span>
-        <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">
+        <a
+        	class="edit" 
+            style="margin-left:0" 
+            href="#" 
+            onclick="dropListDialog(this,'Publicatie');return false;" 
+            rel="presence_reference_id">
         	referentie toevoegen
 		</a>
-        <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
+		<span id="presence_reference" style="display:none"></span>
+        <input 
+        	type="hidden" 
+            id="presence_reference_id" 
+            value="" 
+            onchange="taxonTraits.setReference( { literature_id: $(this).val(), label: $('#presence_reference').html() } );taxonTraits.printReferences();"
+		/>
         
+    </p>
+
+    <p>
+    	<input type="button" value="save" onclick="taxonTraits.saveReferences();" />
+    </p>
+
+    <p>
+	    <a href="#" style="margin-left:0" class="edit" onclick="taxonTraits.deleteTraitsReferences();return false;">alle kenmerken & referenties verwijderen</a><br />
+	    <a href="../nsr/taxon.php?id={$concept.id}"  style="margin-left:0" class="edit">naar taxonconceptkaart</a>
     </p>
 
 {/if}
 </div>
 
 {include file="../shared/admin-messages.tpl"}
+
 <script id="stringlist_template_one" language="text">
 <table style="width:100%">
 	<tr>
@@ -566,11 +129,11 @@ function editTaxonTrait( d )
 </script>
 
 <script id="stringlist_template_two" language="text">
-<li>%VALUE% <a href="#" class="edit selected-values" style="padding:5px" data="%ID%" onclick="listTraitRemove( this );return false;">X</a></li>
+<li>%VALUE% <a href="#" class="edit selected-values" style="padding:5px" data="%ID%" onclick="taxonTraits.listTraitRemove( this );return false;">X</a></li>
 </script>
 
 <script id="stringlist_template_three" language="text">
-<li>%VALUE% <a href="#" class="edit" style="padding:5px" data="%ID%" onclick="listTraitAdd( this );return false;">&rarr;</a></li>
+<li>%VALUE% <a href="#" class="edit" style="padding:5px" data="%ID%" onclick="taxonTraits.listTraitAdd( this );return false;">&rarr;</a></li>
 </script>
 
 
@@ -598,17 +161,17 @@ function editTaxonTrait( d )
 <script>
 $(document).ready(function()
 {
-	setConcept( {$concept.id} );
-	setGroup( {$group.id} );
+	taxonTraits.setConcept( {$concept.id} );
+	taxonTraits.setGroup( {$group.id} );
 	
-	$('a.edit').each(function()
+	$('a.values').each(function()
 	{ 
 		$(this).attr('href','#').on('click',function(e)
 		{
 			try
 			{
 				var d=JSON.parse($(this).attr('data'));
-				editTaxonTrait( d );
+				taxonTraits.editTaxonTrait( d );
 			}
 			catch (err) {
 				console.log( err );
@@ -616,9 +179,17 @@ $(document).ready(function()
 			e.preventDefault();
 		});
 	});
+
+	{foreach from=$references item=v}
+	taxonTraits.setReference( { id:{$v.id}, literature_id:{$v.literature_id}, label: '{if $v.citation}{$v.citation|@escape}{else}{$v.label|@escape}{/if}'} );
+	{/foreach}
+	taxonTraits.printReferences();
+
 	$('#page-block-messages').fadeOut(3000);
 
 });
 </script>
 
 {include file="../shared/admin-footer.tpl"}
+
+

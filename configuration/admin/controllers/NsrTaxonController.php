@@ -105,12 +105,12 @@ class NsrTaxonController extends NsrController
 		
 			$this->saveConcept();
 
-			if ($this->getConceptId())
+			if ( $this->getConceptId() )
 			{
 				$this->saveName();
 				$this->checkDutchName();
 				$this->saveDutchName();
-				$this->saveTaxonParentage($this->getConceptId());
+				$this->saveTaxonParentage( $this->getConceptId() );
 				
 				$this->redirect('taxon.php?id='.$this->getConceptId());
 			}		
@@ -180,7 +180,7 @@ class NsrTaxonController extends NsrController
 	
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
-			$this->setConceptId($this->rGetId());
+			$this->setConceptId( $this->rGetId() );
 			$this->toggleConceptDeleted(true);
 			$this->setMessage('Concept gemarkeerd als verwijderd.');
 			$this->resetTree();
@@ -188,7 +188,7 @@ class NsrTaxonController extends NsrController
 		else
 		if ($this->rHasId() && $this->rHasVal('action','undelete') && !$this->isFormResubmit())
 		{
-			$this->setConceptId($this->rGetId());
+			$this->setConceptId( $this->rGetId() );
 			$this->toggleConceptDeleted(false);
 			$this->setMessage('Concept niet langer gemarkeerd als verwijderd.');
 			$this->resetTree();
@@ -196,24 +196,24 @@ class NsrTaxonController extends NsrController
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->setConceptId($this->rGetId());
+			$this->setConceptId( $this->rGetId() );
 
 			if ($this->needParentChange() && $this->canParentChange())
 			{
 				$this->updateConcept();
-				$this->saveTaxonParentage($this->getConceptId());
+				$this->saveTaxonParentage( $this->getConceptId() );
 				$this->doParentChange();
 			}
 			else
 			{
 				$this->updateConcept();
-				$this->saveTaxonParentage($this->getConceptId());
+				$this->saveTaxonParentage( $this->getConceptId() );
 			}
 			$this->resetTree();
 		}
 		else
 		{
-			$this->setConceptId($this->rGetId());
+			$this->setConceptId( $this->rGetId() );
 		}
 	
 
@@ -221,7 +221,7 @@ class NsrTaxonController extends NsrController
 		{
 			$concept=$this->getConcept($this->rGetId());
 
-			$this->doNameReferentialChecks($this->getConcept($this->getConceptId()));
+			$this->doNameReferentialChecks($this->getConcept( $this->getConceptId() ));
 
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('names',$this->getNames($concept));
@@ -361,13 +361,13 @@ class NsrTaxonController extends NsrController
 		
 		if ($this->rHasId() && $this->rHasVal('image') && $this->rHasVal('action','delete'))
 		{
-			$this->setConceptId($this->rGetId());
+			$this->setConceptId( $this->rGetId() );
 			$this->disconnectTaxonMedia($this->rGetVal('image'));
 			$this->setMessage('Afbeelding ontkoppeld.');
 		} 
 		
 		$this->checkAuthorisation();
-		$this->setConceptId($this->rGetId());
+		$this->setConceptId( $this->rGetId() );
         $this->setPageName($this->translate('Taxon images'));
 		$this->smarty->assign('concept',$this->getConcept($this->rGetVal('id')));
 		$this->smarty->assign('images',$this->getTaxonMedia());
@@ -2989,7 +2989,7 @@ class NsrTaxonController extends NsrController
 		
 		$data=$this->requestData;
 
-		if ($this->getConceptId())
+		if ( $this->getConceptId() )
 		{
 
 			$taxon=$this->getConcept($this->rGetId());
@@ -3062,9 +3062,9 @@ class NsrTaxonController extends NsrController
 
 		$data=$this->requestData;
 
-		if ($this->getConceptId())
+		if ( $this->getConceptId() )
 		{
-			$concept=$this->getConcept($this->getConceptId());
+			$concept=$this->getConcept( $this->getConceptId() );
 			$name=$this->getName(
 				array(
 					'taxon_id'=>$this->getConceptId(),
@@ -3274,9 +3274,9 @@ class NsrTaxonController extends NsrController
 		// preliminairies
 		$data=$this->requestData;
 
-		if ($this->getConceptId())
+		if ( $this->getConceptId() )
 		{
-			$concept=$this->getConcept($this->getConceptId());
+			$concept=$this->getConcept( $this->getConceptId() );
 			$name=$this->getName(
 				array(
 					'taxon_id'=>$this->getConceptId(),
@@ -3484,7 +3484,12 @@ class NsrTaxonController extends NsrController
 			select
 				_a.*,
 				_b.translation as name,
-				_c.translation as description
+				_c.translation as description,
+				count(_tt.id) as trait_count,
+				count(_ttf.id) as taxon_freevalue_count,
+				count(_ttv.id) as taxon_value_count,
+				count(_ttf.id)+count(_ttv.id) as taxon_count
+
 			from
 				%PRE%traits_groups _a
 				
@@ -3499,11 +3504,34 @@ class NsrTaxonController extends NsrController
 				on _a.project_id=_c.project_id
 				and _a.description_tid=_c.id
 				and _c.language_id=". $this->getDefaultProjectLanguage() ."
+				
+			left join 
+				%PRE%traits_traits _tt
+				on _a.project_id=_tt.project_id
+				and _a.id=_tt.trait_group_id
+
+			left join 
+				%PRE%traits_taxon_freevalues _ttf
+				on _tt.project_id=_ttf.project_id
+				and _tt.id=_ttf.trait_id
+				and _ttf.taxon_id =". $this->getConceptId() ."
+
+			left join 
+				%PRE%traits_values _tv
+				on _tt.project_id=_tv.project_id
+				and _tt.id=_tv.trait_id
+
+			left join 
+				%PRE%traits_taxon_values _ttv
+				on _tv.project_id=_ttv.project_id
+				and _tv.id=_ttv.value_id
+				and _ttv.taxon_id =". $this->getConceptId() ."
 
 			where
 				_a.project_id=". $this->getCurrentProjectId()."
 				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
-				order by _a.show_order, _a.sysname
+			group by _a.id
+			order by _a.show_order, _a.sysname
 		");
 		
 		foreach((array)$g as $key=>$val)

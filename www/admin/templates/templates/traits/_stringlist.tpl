@@ -131,7 +131,7 @@ $(document).ready(function()
 	{foreach from=$v.language_labels item=l key=k}
 	labels.push( { language:{$k},label:'{$l|@escape}' } );
 	{/foreach}
-	doAddTraitValue( { id: {$v.id}, value:'{$v.string_value|@escape}', labels: labels, usage_count: {$v.usage_total_count} } );
+	doAddTraitValue( { id: {$v.id}, value:'{$v.string_value|@escape}', labels: labels, usage_count: {$v.usage_total_count+0} } );
 	{/foreach}
 			
 	traitValuesInitialise();

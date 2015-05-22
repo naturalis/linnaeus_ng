@@ -87,7 +87,7 @@ function verifyDate()
 $(document).ready(function()
 {
 	{foreach from=$trait.values item=v}
-	doAddTraitValue( { id: {$v.id}, value: {$v.date|@escape}, usage_count: {$v.usage_total_count} } );
+	doAddTraitValue( { id: {$v.id}, value: {$v.date|@escape}, usage_count: {$v.usage_total_count+0} } );
 	{/foreach}
 
 	traitValuesInitialise();
