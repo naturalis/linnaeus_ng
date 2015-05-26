@@ -820,7 +820,9 @@ taxonTraits.printReferences=function()
 	{
 		buffer.push(
 			'<li>'+
+				'<a href="../literature2/edit.php?id='+taxonTraits.references[i].literature_id+'">' +
 				taxonTraits.references[i].label+
+				'</a>'+
 				' <a href="#" onclick="taxonTraits.removeReference('+i+');taxonTraits.printReferences();return false;">x</a></li>'
 		 );
 	}

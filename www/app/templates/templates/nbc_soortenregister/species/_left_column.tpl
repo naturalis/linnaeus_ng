@@ -19,10 +19,10 @@
 						{* $v.tabname *}
 						{if $activeCategory==$v.id}
 						{$v.title}
-						{else if  $activeCategory=='external' && $ext_tab==$k}
+						{else if  $activeCategory=='external' && $ext_tab==$v.id}
 						{$v.title}
                         {else}
-						<a href="{if $v.redirect_to}{$v.redirect_to}&ext_tab={$k}{else}../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}{/if}" class="{$v.className}">
+						<a href="{if $v.redirect_to}{$v.redirect_to}&ext_tab={$v.id}{else}../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}{/if}" class="{$v.className}">
                         	{$v.title}
 						</a>	
 						{/if}

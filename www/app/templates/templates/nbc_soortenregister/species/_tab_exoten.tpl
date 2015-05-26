@@ -24,7 +24,7 @@ ul.exotica li {
 	margin-left:12px;
 }
 </style>
-	<div>
+	<div style="margin-bottom:10px">
 
 		<h2 id="name-header">Exotenpaspoort
 		<a
@@ -57,6 +57,5 @@ ul.exotica li {
         {/foreach}
 		{/if}
         </ul>
-
 
 	</div>
