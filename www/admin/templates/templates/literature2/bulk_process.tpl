@@ -362,7 +362,7 @@ $(document).ready(function()
 
 
 	$('.match').on('show', function() { markElementAsSeen($(this).attr('data-id')); } );
-	markElementAsSeen( '0' );
+	markElementAsSeen( '1' );
 	$('.column-joinage').trigger('keyup');
 });
 </script>

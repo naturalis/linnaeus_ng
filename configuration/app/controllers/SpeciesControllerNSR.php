@@ -96,7 +96,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$reqCat=$this->rHasVal('cat') ? $this->rGetVal('cat') : null;
 
             $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCat));
-			
+
 			$names=$this->getNames( $taxon );
 			
 			$classification=$this->getTaxonClassification($taxon['id']);
@@ -121,6 +121,19 @@ class SpeciesControllerNSR extends SpeciesController
 				//q($raw,1);
 
 				$content['content']=json_decode($raw,true);
+				
+				if ( !empty($this->rGetVal('ext_tab')) )
+				{
+					$content['content']['content']=
+						$this->getTaxonContent(
+							array(
+								'taxon' => $taxon['id'], 
+								'category' => $this->rGetVal('ext_tab'), 
+								'allowUnpublished' => $this->isLoggedInAdmin(),
+								'isLower' =>  $taxon['lower_taxon']
+							)
+						);
+				}
 				
 				$this->smarty->assign('ext_template','_tab_exoten.tpl'); // --> this should become dependent on the actual called source
 				$this->smarty->assign('ext_tab',$this->rGetVal('ext_tab'));

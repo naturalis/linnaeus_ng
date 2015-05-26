@@ -50,6 +50,12 @@
 		
 			{include file=$ext_template}
 
+			{if $content.content.content}
+			<p>
+				{$content.content.content}
+			</p>
+			{/if}
+
 		{else}
 
 			{if $content|@is_array}

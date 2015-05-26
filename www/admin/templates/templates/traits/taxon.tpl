@@ -181,7 +181,7 @@ $(document).ready(function()
 	});
 
 	{foreach from=$references item=v}
-	taxonTraits.setReference( { id:{$v.id}, literature_id:{$v.literature_id}, label: '{if $v.citation}{$v.citation|@escape}{else}{$v.label|@escape}{/if}'} );
+	taxonTraits.setReference( { id:{$v.id}, literature_id:{$v.literature_id}, label: '{$v.label|@escape}'} );
 	{/foreach}
 	taxonTraits.printReferences();
 
