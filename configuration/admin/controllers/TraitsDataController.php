@@ -59,7 +59,8 @@ class TraitsDataController extends TraitsController
 	);
 
     public $usedHelpers = array(
-        'session_messages'
+        'session_messages',
+		'encoding'
     );
 	
 	private $_referenceList=array();
@@ -293,6 +294,8 @@ class TraitsDataController extends TraitsController
 
 	private function parseSessionFile( $rotate=false )
 	{
+
+		
 		$file=$this->getDataSession();
 
 
@@ -303,7 +306,10 @@ class TraitsDataController extends TraitsController
 			array. the three lines below filter out the lone Lf's before splitting the file's contents
 			on CrLf's.
 		*/
-		$tmp=file_get_contents ($file['path']);
+		$tmp=file_get_contents($file['path']);
+
+		$tmp=$this->helpers->Encoding->toUTF8($tmp);
+		
 		$tmp=str_replace(chr(10),' ',str_replace(chr(13).chr(10),chr(11),$tmp));
 		$raw=explode(chr(11),$tmp);
 
@@ -752,7 +758,7 @@ class TraitsDataController extends TraitsController
 						
 						if ( !$resolved )
 						{
-							$this->addError(sprintf($this->translate('Unknown reference # %s'),$val));
+							//$this->addError(sprintf($this->translate('Unknown reference # %s'),$val));
 							$references[$c]['invalid'][]=$val;
 						}
 					}

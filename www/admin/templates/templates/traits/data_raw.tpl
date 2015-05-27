@@ -1,10 +1,10 @@
 {include file="../shared/admin-header.tpl"}
 
 <style>
-table {
+table.matches {
 	border-collapse:collapse;
 }
-td {
+table.matches td {
 	border:1px solid #999;
 	padding:0.5px;
 	font-size:0.9em;
@@ -94,11 +94,14 @@ function litRefDialog()
 </script>    
     
 <div id="page-main">
-	<p>
-    	<input type="button" value="save data" onclick="saveRawData();" />
-	</p>
-   <p>
-        <table>
+
+    <p>
+        <input type="button" value="save data" onclick="saveRawData();" />
+    </p>
+
+    <p>
+   
+        <table class="matches">
         {foreach from=$data.lines item=line key=l}
 	        {if $line.has_data || $line.trait.sysname}
             <tr class="{if !$line.has_data}no-data{/if}{if !$line.trait}no-trait{/if}{if $line.trait.sysname==''}irrelevant{/if}">
@@ -106,6 +109,9 @@ function litRefDialog()
                 <td class="{if $line.trait}identified-trait{/if}">
                 {if $line.trait.sysname!=$sysColSpecies && $line.trait.sysname!=$sysColReferences && $line.trait.sysname!=$sysColNsrId}
 	                <a href="traitgroup_trait.php?id={$line.trait.id}" target="_trait">{$line.trait.sysname}</a>
+					{if $line.trait.id!=$prevtraitWithData && $line.has_data} {* why doesn't this work? && $line.trait.type_allow_values==1 *}
+    	                <a href="traitgroup_trait_values.php?trait={$line.trait.id}" target="_trait">&#9016;</a>
+	                {/if}            
                 {else}
     	            {$line.trait.sysname}
                 {/if}
@@ -160,6 +166,7 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
                 {/foreach}
             </tr>
             {assign var=prevtrait value=$line.trait.id}
+			{if $line.has_data}{assign var=prevtraitWithData value=$line.trait.id}{/if}
             {assign var=prevrow value=$l}
             {/if}
         {/foreach}
@@ -184,6 +191,42 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
     	<input type="button" value="save data" onclick="saveRawData();" />
 	</p>
 
+	<p>
+    	<table>
+            <tr>
+                <td class="cell-ok" style="width:25px;border:1px solid #999"></td>
+                <td>full match: value matches the corresponding trait value, which is identified by the labels in the first two columns.</td>
+            </tr>
+            <tr>
+                <td class="cell-warning" style="width:25px;border:1px solid #999"></td>
+                <td>partial match: value partially matches the value. value will be saved; hover over the cell to see further information.</td>
+			</tr>
+            <tr>
+                <td></td>
+                <td>
+                	in case of the taxa, this means the name and the NSR ID do not match:
+                    <ul>
+	                    <li>the name is resolved, but the ID isn't: data will be saved as trait of the taxon identified by the name.</li>
+	                    <li>the ID is resolved, but the name isn't: data will be saved as trait of the taxon identified by the ID.</li>
+	                    <li>both are resolved, but to different taxa: data will be saved as trait of the taxon identified by the ID.</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td class="cell-error" style="width:25px;border:1px solid #999"></td>
+                <td>no match: value cannot be matched to the trait value, and will not be saved.</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                	usually this means a value is missing form the list of possible values for that trait, or is spelled differently.<br />
+                    click on the trait name in the first column to open the details of the trait, or on the list-icon &#9016; to see
+                    its values (opens in new tab).
+                </td>
+            </tr>
+		</table>
+	</p>
+        
 	<p>
     	data not looking right?<br />
 	    <a href="?action=rotate">rotate sheet</a><br />
