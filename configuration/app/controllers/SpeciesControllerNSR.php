@@ -122,7 +122,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 				$content['content']=json_decode($raw,true);
 				
-				if ( !empty($this->rGetVal('ext_tab')) )
+				$ext_tab=$this->rGetVal('ext_tab');
+				
+				if ( !empty($ext_tab) )
 				{
 					$content['content']['content']=
 						$this->getTaxonContent(
@@ -135,8 +137,8 @@ class SpeciesControllerNSR extends SpeciesController
 						);
 				}
 				
-				$this->smarty->assign('ext_template','_tab_exoten.tpl'); // --> this should become dependent on the actual called source
-				$this->smarty->assign('ext_tab',$this->rGetVal('ext_tab'));
+				$this->smarty->assign( 'ext_template', '_tab_exoten.tpl' ); // --> this should become dependent on the actual called source
+				$this->smarty->assign( 'ext_tab', $ext_tab );
 				
 			}
 			else
