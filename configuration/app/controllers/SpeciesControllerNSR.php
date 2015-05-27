@@ -1561,7 +1561,7 @@ _k.authorship
                     'language_id' => $this->getCurrentLanguageId(), 
                     'page_id' => $category
                 );
-
+				
                 if (!$allowUnpublished)
                     $d['publish'] = '1';
                 
@@ -1570,6 +1570,7 @@ _k.authorship
                 ));
 
 				$content = isset($ct) ? $ct[0] : null;
+				$isPublished = isset($content['publish']) ? $content['publish'] : null;
 
         }
 
@@ -1578,8 +1579,8 @@ _k.authorship
 
 		if (isset($content['content']))
 			$content=$content['content'];
-
-		return array('content'=>$content,'rdf'=>$rdf);
+		
+		return array('content'=>$content,'rdf'=>$rdf,'isPublished'=>$isPublished);
     }
 
     private function hasTaxonLiterature($id)

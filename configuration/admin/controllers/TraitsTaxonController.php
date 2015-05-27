@@ -60,7 +60,7 @@ class TraitsTaxonController extends TraitsController
     {
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Taxon trait data'));
-		
+
 		//$this->isFormResubmit()
 		//q( $this->requestData );
 		
