@@ -57,7 +57,7 @@ li.values:hover {
         <table>
             {foreach from=$traits item=v}
             <tr class="tr-highlight values">
-                <th style="width:200px">{$v.sysname}:</th>
+                <th style="width:200px">{if $v.name}{$v.name}{else}{$v.sysname}{/if}:</th>
                 <td>
                 {foreach from=$values item=t}
                 {if $t.trait.id==$v.id}

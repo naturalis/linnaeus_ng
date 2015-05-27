@@ -35,6 +35,13 @@ ul.exotica li {
             style="float:right"
 		>&nbsp;</a>
         </h2>
+
+        {if $content.content.content}
+        <div>
+            {$content.content.content}
+        </div>
+        {/if}
+
 		<table class="exotica">
         {foreach from=$content.result.data item=v}
         	{foreach from=$v.values item=l key=k}

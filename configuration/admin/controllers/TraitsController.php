@@ -187,7 +187,7 @@ class TraitsController extends Controller
 	public function getTraitgroupTraits($group)
 	{
 		if (empty($group)) return;
-		
+
 		$r=$this->models->TraitsTraits->freeQuery("
 			select
 				_a.*,
@@ -210,19 +210,19 @@ class TraitsController extends Controller
 			left join 
 				%PRE%text_translations _b
 				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
+				and _a.name_tid=_b.text_id
 				and _b.language_id=". $this->getDefaultProjectLanguage() ."
 
 			left join 
 				%PRE%text_translations _c
 				on _a.project_id=_c.project_id
-				and _a.code_tid=_c.id
+				and _a.code_tid=_c.text_id
 				and _c.language_id=". $this->getDefaultProjectLanguage() ."
 
 			left join 
 				%PRE%text_translations _d
 				on _a.project_id=_d.project_id
-				and _a.description_tid=_d.id
+				and _a.description_tid=_d.text_id
 				and _d.language_id=". $this->getDefaultProjectLanguage() ."
 
 			left join 
