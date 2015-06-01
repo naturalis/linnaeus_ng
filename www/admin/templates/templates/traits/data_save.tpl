@@ -1,5 +1,9 @@
 {include file="../shared/admin-header.tpl"}
-{include file="../shared/admin-messages.tpl"}
+
+{include file="../shared/_admin-messages.tpl"}
+{include file="../shared/_admin-errors.tpl"}
+{include file="../shared/_admin-warnings.tpl"}
+
 
 <div id="page-main">
 	<p>

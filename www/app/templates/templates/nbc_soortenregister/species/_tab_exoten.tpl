@@ -18,7 +18,7 @@ table.exotica td li {
 }
 ul.exotica {
 	list-style-type: disc;
-	list-style-position: outside;
+	list-style-position: inherit;
 }
 ul.exotica li {
 	margin-left:12px;
@@ -26,6 +26,14 @@ ul.exotica li {
 </style>
 	<div style="margin-bottom:10px">
 
+
+        {if $passport_content.content}
+        <div>
+            {$passport_content.content}
+        </div>
+        {/if}
+        
+        <div>
 		<h2 id="name-header">Exotenpaspoort
 		<a
         	href="http://www.nederlandsesoorten.nl/content/exotenpaspoort" 
@@ -36,33 +44,42 @@ ul.exotica li {
 		>&nbsp;</a>
         </h2>
 
-        {if $content.content.content}
-        <div>
-            {$content.content.content}
-        </div>
-        {/if}
-
 		<table class="exotica">
-        {foreach from=$content.result.data item=v}
-        	{foreach from=$v.values item=l key=k}
-            {capture "value"}{$l.value_start}{if $l.value_end} - {$l.value_end}{/if}{/capture}
+        {foreach from=$content->result->data item=v}
+        	{foreach from=$v->values item=l key=k}
+            {capture "value"}{$l->value_start}{if $l->value_end} - {$l->value_end}{/if}{/capture}
 			<tr>
-				<td class="legend-cell">{if $k==0}{$v.trait.name}{/if}</td>
-                <td>{if $v.values|@count>1}<li>{/if}{$smarty.capture.value}</li></td>
+				<td class="legend-cell">{if $k==0}{$v->trait->name}{/if}</td>
+                <td>{if $v->values|@count>1}<li>{/if}{$smarty.capture.value}</li></td>
 			</tr>
             {/foreach}
 			<tr><td class="last-row" colspan="2"></td></tr>
         {/foreach}
 		</table>
 
-		{if $content.result.references}
+		{if $content->result->references}
         <br />
-        <h4 class="source">Publicatie{if $content.result.references|@count>1}s{/if}</h4>
+        <h4 class="source">Publicatie{if $content->result->references|@count>1}s{/if}</h4>
 		<ul class="exotica">
-        {foreach from=$content.result.references item=v}
-			<li><a href="../literature2/reference.php?id={$v.id}">{if $v.citation}{$v.citation}{else}{$v.label}{/if}</a></li>
+
+        {foreach from=$content->result->references item=v}
+			<li>
+                <a href="../literature2/reference.php?id={$v->id}">
+                {capture authors}
+                {foreach from=$v->authors item=author key=ak}{if $ak>0}, {/if}{$author->name|@trim}{/foreach}
+                {/capture}
+                {$smarty.capture.authors|@trim}
+                {if $v->date}{if $smarty.capture.authors|@trim|@strlen>0}, {/if}{$v->date}{/if}.
+                {if $v->label}{$v->label}. {/if}
+                {if $v->periodical_id}{$v->periodical_ref->label} {elseif $v->periodical}{$v->periodical} {/if}
+                {if $v->publishedin_id}{$v->publishedin_ref->label} {elseif $v->publishedin}{$v->publishedin} {/if}
+                {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
+                {if $v->publisher}{$v->publisher}.{/if}      
+                </a>
+			</li>
         {/foreach}
 		{/if}
         </ul>
+        </div>
 
 	</div>

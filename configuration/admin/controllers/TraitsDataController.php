@@ -115,7 +115,7 @@ class TraitsDataController extends TraitsController
 			$this->setSessionLines($this->parseSessionFile());
 			$this->redirect('data_raw.php');
 		}
-		
+	
 		$this->smarty->assign('groups',$this->getTraitgroups());
 		$this->printPage();
     }
@@ -136,8 +136,9 @@ class TraitsDataController extends TraitsController
 		else
 		if ($this->rHasVal('action','clear'))
 		{
-			$this->setDataSession(null);
-			$this->getSessionLines(null);
+			$this->setDataSession( null );
+			$this->getSessionLines( null );
+			$this->setReferenceListSession( null );
 			$this->redirect('data_upload.php');
 		} else		
 		if ($this->rHasVal('action','rotate'))
@@ -159,8 +160,15 @@ class TraitsDataController extends TraitsController
 		}
 
         $this->setPageName($this->translate('Data matched'));
+		
+		$data=$this->getDataSession();
 
-		$this->smarty->assign( 'data', $this->getDataSession() );
+		if ($data['any_existing_values'])
+		{
+			$this->addWarning( $this->translate( 'For some or all taxa, there already are values for this trait group in the database. These will be overwritten by your new data.' ) );
+		}
+
+		$this->smarty->assign( 'data', $data );
 		$this->smarty->assign( 'reflist', $this->getReferenceListSession() );
 
 		$this->printPage();
@@ -186,6 +194,18 @@ class TraitsDataController extends TraitsController
 			$this->setJoinrows( null );
 			$this->setReferenceListSession( null );
 			*/
+		}
+
+		if ($this->hasErrors())
+		{
+			array_unshift($this->errors,$this->translate('(these records were not saved)'));
+			array_unshift($this->errors,sprintf('<b>%s</b>',$this->translate('Errors during saving')));
+		}
+
+		if ($this->hasWarnings())
+		{
+			array_unshift($this->warnings,$this->translate('(these records were saved)'));
+			array_unshift($this->warnings,sprintf('<b>%s</b>',$this->translate('Warnings during saving')));
 		}
 
         $this->setPageName( $this->translate('Data saved') );
@@ -294,8 +314,6 @@ class TraitsDataController extends TraitsController
 
 	private function parseSessionFile( $rotate=false )
 	{
-
-		
 		$file=$this->getDataSession();
 
 
@@ -308,7 +326,10 @@ class TraitsDataController extends TraitsController
 		*/
 		$tmp=file_get_contents($file['path']);
 
-		$tmp=$this->helpers->Encoding->toUTF8($tmp);
+		// replacing non-break space with space (&#160; / \xA0)
+		$tmp=str_replace( chr(160), ' ', $tmp );
+	
+		$tmp=$this->helpers->Encoding->toUTF8( $tmp );
 		
 		$tmp=str_replace(chr(10),' ',str_replace(chr(13).chr(10),chr(11),$tmp));
 		$raw=explode(chr(11),$tmp);
@@ -535,7 +556,7 @@ class TraitsDataController extends TraitsController
 	private function matchSpecies()
 	{
 		$data=$this->getDataSession();
-		
+
 		$taxa=array();
 
 		foreach((array)$data['lines'] as $line)
@@ -578,9 +599,71 @@ class TraitsDataController extends TraitsController
 				}
 			}
 		}
-		
+
+		$existingTaxonValues=
+			$this->models->TraitsTaxonValues->freeQuery(array("query"=>"
+				select
+					_ttv.taxon_id, count(_ttv.id) as total
+				from
+					%PRE%traits_traits _tt
+	
+				left join 
+					%PRE%traits_values _tv
+					on _tt.project_id=_tv.project_id
+					and _tt.id=_tv.trait_id
+	
+				left join 
+					%PRE%traits_taxon_values _ttv
+					on _tv.project_id=_ttv.project_id
+					and _tv.id=_ttv.value_id
+	
+				where
+					_tt.project_id=". $this->getCurrentProjectId()."
+					and _tt.trait_group_id=".$data['traitgroup']."
+					and _ttv.taxon_id is not null
+				group by _ttv.taxon_id 
+	
+			","fieldAsIndex"=>"taxon_id"));
+
+		$existingTaxonFreeValues=
+			$this->models->TraitsTaxonFreevalues->freeQuery(array("query"=>"
+				select
+					_ttf.taxon_id, count(_ttf.id) as total
+				from
+					%PRE%traits_traits _tt
+	
+				left join 
+					%PRE%traits_taxon_freevalues _ttf
+					on _tt.project_id=_ttf.project_id
+					and _tt.id=_ttf.trait_id
+
+				where
+					_tt.project_id=". $this->getCurrentProjectId()."
+					and _tt.trait_group_id=".$data['traitgroup']."
+					and _ttf.taxon_id is not null
+				group by _ttf.taxon_id 
+	
+			","fieldAsIndex"=>"taxon_id"));
+			
+		$any_existing_values=false;
+
 		foreach($taxa as $c=>$val)
 		{
+			$will_use_id=isset($val['by_id']) ? $val['by_id']['id'] : (isset($val['by_name']) ? $val['by_name']['id'] :  null );
+			
+			$has_existing_values=false;
+			
+			if ( !empty($will_use_id) )
+			{
+				$has_existing_values=
+					(
+						(isset($existingTaxonValues[$will_use_id]['total']) ? $existingTaxonValues[$will_use_id]['total'] : 0 ) +
+						(isset($existingTaxonFreeValues[$will_use_id]['total']) ? $existingTaxonFreeValues[$will_use_id]['total'] : 0 )
+					) > 0;
+					
+				if ($has_existing_values) $any_existing_values=true;
+			}
+			
 			$taxa[$c]=
 				array(
 					'verbatim_name'=>isset($val['name']) ? $val['name'] : null,
@@ -590,12 +673,14 @@ class TraitsDataController extends TraitsController
 					'match'=> isset($val['by_name']) && isset($val['by_id']) && $val['by_name']['id']==$val['by_id']['id'],
 					'have_taxon'=>isset($val['by_name']) || isset($val['by_id']),
 					'will_use'=> isset($val['by_id']) ? $val['by_id']['taxon'] : (isset($val['by_name']) ? $val['by_name']['taxon'] :  null ),
-					'will_use_id'=> isset($val['by_id']) ? $val['by_id']['id'] : (isset($val['by_name']) ? $val['by_name']['id'] :  null ),
-					'will_use_source'=> isset($val['by_id']) ? 'ID' : (isset($val['by_name']) ? 'name' :  null )
+					'will_use_id'=> $will_use_id,
+					'will_use_source'=> isset($val['by_id']) ? 'ID' : (isset($val['by_name']) ? 'name' :  null ),
+					'has_existing_values'=> $has_existing_values
 				);
 		}
 		
 		$data['taxa']=$taxa;
+		$data['any_existing_values']=$any_existing_values;
 		
 		$this->setDataSession($data);
 	}
@@ -1110,7 +1195,8 @@ class TraitsDataController extends TraitsController
 			}
 		}
 		
-		$this->addMessage(sprintf($this->translate('Saved %s values, failed %s.'),$saved,$failed));
+		$this->addMessage(sprintf('<b>%s</b>',$this->translate('Summary')));
+		$this->addMessage(sprintf($this->translate('Saved %s trait values, failed %s.'),$saved,$failed));
 
 	}
 

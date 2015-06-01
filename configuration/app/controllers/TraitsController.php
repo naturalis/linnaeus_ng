@@ -249,7 +249,8 @@ class TraitsController extends Controller
 		
 		$references=$this->getReferences(array('taxon'=>$taxon,'group'=>$group,'project'=>$project));
 
-		//q($data,1);
+
+		header('Content-type:text/plain');
 		
 		echo json_encode(array(
 			'request'=>array(
@@ -308,6 +309,94 @@ class TraitsController extends Controller
 		
 		foreach((array)$l as $key=>$val)
 		{
+			$l[$key]['authors']=$this->getReferenceAuthors(array('id'=>$val['id'],'project'=>$project));
+			$l[$key]['periodical_ref']=$this->getReference(array('id'=>$val['periodical_id'],'project'=>$project));
+			$l[$key]['publishedin_ref']=$this->getReference(array('id'=>$val['publishedin_id'],'project'=>$project));
+		}
+		
+		if ( !empty($l) )
+		{
+			usort( $l, function($a,$b)
+			{
+				$aa=$bb='';
+				
+				foreach((array)$a['authors'] as $val)
+					$aa.=$val['name'].' ';
+	
+				foreach((array)$b['authors'] as $val)
+					$bb.=$val['name'].' ';
+				
+				$aa=!empty($aa) ? $aa : $a['author']; 
+				$bb=!empty($bb) ? $bb : $b['author']; 
+	
+				return ( $aa>$bb ? 1 : ( $aa<$bb ? -1 : 0 ) );
+			});
+		}
+		
+		return $l;
+
+	}
+
+
+	private function getReferenceAuthors($p)
+	{
+		$id=isset($p['id']) ? $p['id'] : null;
+		$project=isset($p['project']) ? $p['project'] : null;
+
+		if (empty($id)||empty($project))
+			return;
+		
+		$d=$this->models->Literature2Authors->freeQuery("
+			select
+				_a.actor_id, _b.name
+	
+			from %PRE%literature2_authors _a
+	
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id 
+				and _a.project_id=_b.project_id
+	
+			where
+				_a.project_id = ".$project."
+				and _a.literature2_id =".$id."
+			order by _b.name
+		");
+		
+		return $d;
+	}
+
+	private function getReference($p)
+	{
+		$id=isset($p['id']) ? $p['id'] : null;
+		$project=isset($p['project']) ? $p['project'] : null;
+
+		if (empty($id)||empty($project))
+			return;
+		
+		$l=$this->models->Literature2->freeQuery(
+			"select
+				_a.*,
+				_h.label as publishedin_label,
+				_i.label as periodical_label
+
+			from %PRE%literature2 _a
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id 
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i 
+				on _a.periodical_id = _i.id 
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id = ".$project." 
+				and _a.id = ".$id
+		);
+
+		
+		if ($l)
+		{
 			$authors=$this->models->Literature2Authors->freeQuery("
 				select
 					_a.actor_id, _b.name
@@ -320,17 +409,18 @@ class TraitsController extends Controller
 	
 				where
 					_a.project_id = ".$project."
-					and _a.literature2_id =".$val['id']."
+					and _a.literature2_id =".$id."
 				order by _b.name
 			");
 		
-			$l[$key]['authors']=$authors;
+			$l[0]['authors']=$authors;
 			
+			return $l[0];
 		}
 
-		return $l;
-
 	}
+
+			
 
 
 }

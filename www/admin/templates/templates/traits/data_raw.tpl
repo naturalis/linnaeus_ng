@@ -57,39 +57,9 @@ td.identified-trait {
 </style>
 
 <script>
-function doLitRefList( expunge )
+function expungeLitRefList()
 {
-	if ( expunge )
-	{
-		$('<form method=post></form>').append ( '<input type=hidden name=action value=clear_ref_codes>' ).appendTo('body').submit();
-	}
-	else
-	{
-		litRefDialog();
-	}
-}
-function litRefDialog()
-{
-	prettyDialog({
-		height: 400,
-		title: _( "Upload reference # / literature ID data" ),
-		content : " \
-			<div style=\"margin:5px 0 5px 0;font-size:0.8em\"><p> \
-			" + _( "Upload a file with databases ID's matched to your own reference numbers as they appear in your data sheet:" ) +" \
-			</p><form method='post' enctype='multipart/form-data'> \
-				<input type=hidden name=action value=ref_codes> \
-				<input name=file type=file><p> \
-				" + _( "Format needs to be plain text, containing two columns. Column order can be ID,ref# or vice versa." ) +" \
-				" + _( "Values can be separated by TAB, comma, semi-colon or space(s)." ) +" \
-				<br /> \
-				" + _( "You can also paste the information into the area below, using the same format." ) +" \
-				</p> \
-				<textarea name=lines></textarea><p> \
-				<input type=submit value=upload> \
-				</p> \
-				</div> \
-			</form>"
-	});
+	$('<form method=post></form>').append ( '<input type=hidden name=action value=clear_ref_codes>' ).appendTo('body').submit();
 }
 </script>    
     
@@ -122,14 +92,24 @@ function litRefDialog()
                 </td>
 
                 {foreach from=$line.cells item=v key=k}
+
                 {if $k==0}{assign var=currValue value=$v}{/if}
+
                 {if $line.trait.sysname==$sysColSpecies || $line.trait.sysname==$sysColNsrId}
                     <td 
                     	row-id="{$l}"
                         col-id="{$k}"
-                    	class="{if $k>0}{if !$data.taxa[$k].have_taxon}no-taxon{else if !$data.taxa[$k].match}cell-warning{else}taxon{/if}{/if}"
-                    	title="{if $k>0}{if !$data.taxa[$k].have_taxon}unknown taxon{else if !$data.taxa[$k].match}taxon name and ID do not match; using {$data.taxa[$k].will_use} (from {$data.taxa[$k].will_use_source}){/if}{/if}">
+                    	class="{if $k>0}{if !$data.taxa[$k].have_taxon}no-taxon{else if !$data.taxa[$k].match}cell-warning{else}taxon{/if}{/if}">
+                        <span title="{if $k>0}{if !$data.taxa[$k].have_taxon}unknown taxon{else if !$data.taxa[$k].match}taxon name and ID do not match; using {$data.taxa[$k].will_use} (from {$data.taxa[$k].will_use_source}){/if}{/if}">
                         {$v}
+                        </span>
+                        {if $line.trait.sysname==$sysColSpecies && $data.taxa[$k].has_existing_values}
+                        <span title="there are existing values in the database for this taxon in this trait group. these will be overwritten when you save this data. click on the asterisk to see current data (opens in new tab)">
+                        <a href="../traits/taxon.php?id={$data.taxa[$k].will_use_id}&group={$data.traitgroup}" style="padding:0 10px 0 10px;" target="_taxon">
+                        &#9888;</a>
+                        </span>
+                        
+                        {/if}
                     </td>                
                 {else if $line.trait.sysname==$sysColReferences}
                     <td>
@@ -174,9 +154,10 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
 	</p>
 
 	<p>
-		<a href="#" onclick="doLitRefList();return false;">{t}upload a file with reference # / literature ID data{/t}</a>
+		<a href="#" onclick="$('.lit-ref-upload').fadeToggle();return false;">{t}upload a file with reference # / literature ID data{/t}</a>
+
         {if $reflist}
-		(<a href="#" onclick="doLitRefList(true);return false;">{t}clear last upload{/t}</a>)
+		(<a href="#" onclick="expungeLitRefList();return false;">{t}clear last upload{/t}</a>)
         {else}
         <br />
         <span class="comment">
@@ -185,7 +166,36 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
         if you do this now, and return here during the same session, your uploaded trait data printed above will still be available.
         </span>
         {/if}
+
+        <div class="lit-ref-upload" style="display:none">
+        	<fieldset>
+			<p>
+				Upload a file with databases ID's matched to your own reference numbers as they appear in your data sheet:
+			</p>
+            <form method='post' enctype='multipart/form-data'>
+            <input type=hidden name=action value=ref_codes>
+            <input name=file type=file>
+            <p>
+                Format needs to be plain text, containing two columns. Column order can be ID,ref# or vice versa.
+                Values can be separated by TAB, comma, semi-colon or space(s).
+                <br />
+                You can also paste the information into the area below, using the same format.
+            </p>
+            <textarea name=lines></textarea>
+            <p>
+                <input type=submit value=upload>
+            </p>
+            </form>
+            </fieldset>
+        </div>
+
 	</p>
+
+</div>
+
+{include file="../shared/admin-messages.tpl"}
+
+<div class="page-generic-div">        
 
 	<p>
     	<input type="button" value="save data" onclick="saveRawData();" />
@@ -193,6 +203,9 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
 
 	<p>
     	<table>
+            <tr>
+                <td colspan="2">colour codes:</td>
+            </tr>
             <tr>
                 <td class="cell-ok" style="width:25px;border:1px solid #999"></td>
                 <td>full match: value matches the corresponding trait value, which is identified by the labels in the first two columns.</td>
@@ -226,7 +239,7 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
             </tr>
 		</table>
 	</p>
-        
+
 	<p>
     	data not looking right?<br />
 	    <a href="?action=rotate">rotate sheet</a><br />
@@ -235,5 +248,4 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
     
 </div>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

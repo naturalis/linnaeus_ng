@@ -359,6 +359,12 @@ class Controller extends BaseClass
         return $this->warnings;
     }
 
+    public function hasWarnings ()
+    {
+        return (count((array) $this->warnings) > 0);
+    }
+
+
 
 
     /**
