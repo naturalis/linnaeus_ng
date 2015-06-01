@@ -60,7 +60,6 @@ class UtilitiesController extends Controller
 		else
 		if ($this->requestData['action'] == 'get_session')
 		{
-			echo 'hoer';return;
 			$this->getSessionVar($this->requestData['var']);
         }
 		
