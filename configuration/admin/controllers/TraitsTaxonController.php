@@ -455,6 +455,9 @@ class TraitsTaxonController extends TraitsController
 
 			foreach((array)$value_start as $key=>$val)
 			{
+				if (empty($val) && (!isset($value_end) || empty($value_end[$key])))
+					continue;
+				
 				$d=array(
 					'project_id'=>$this->getCurrentProjectId(),
 					'taxon_id'=>$taxon,

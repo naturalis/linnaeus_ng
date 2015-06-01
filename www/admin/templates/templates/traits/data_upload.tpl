@@ -6,10 +6,6 @@
     {else}
 	<form method="post" action="" id="theForm" enctype="multipart/form-data">
     <p>
-        (explanantion)
-    </p>
-
-    <p>
         Traitgroup:
         <select name="traitgroup">
         {foreach $groups as $entry}

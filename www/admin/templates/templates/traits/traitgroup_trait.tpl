@@ -181,11 +181,11 @@
     	<a href="traitgroup_traits.php?group={$group.id}">back</a>&nbsp;&nbsp;
     	<a href="index.php">index</a><br />
     </p>
-    
+	<!--     
     maybe add max. items as well?
     
 	explanation: max length is max of prefined values OR the user-specified value when free value
-
+	-->
 </div>
 
 

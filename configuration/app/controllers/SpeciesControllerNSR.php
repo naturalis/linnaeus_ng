@@ -106,27 +106,25 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if ($this->rGetVal('cat')=='external' && $this->rHasVal('source'))
 			{
-				$source=base64_decode($this->rGetVal('source'));
-
-				$source.='&project='.$this->getCurrentProjectId();
-				$source.='&language='.$this->getCurrentLanguageId();
+				$source_url=
+					base64_decode($this->rGetVal('source'))
+					.'&project='.$this->getCurrentProjectId()
+					.'&language='.$this->getCurrentLanguageId();
 
 				foreach((array)$this->requestData as $key=>$val)
 				{
-					$source=str_replace('%'.$key.'%',$val,$source);
+					$source_url=str_replace('%'.$key.'%',$val,$source_url);
 				}
 
-				$raw=file_get_contents($source);
+				$raw=file_get_contents($source_url);
 
-				//q($raw,1);
-
-				$content['content']=json_decode($raw,true);
-				
+				$content['content']=json_decode($raw);
 				$ext_tab=$this->rGetVal('ext_tab');
+				$additional_content=null;
 				
 				if ( !empty($ext_tab) )
 				{
-					$content['content']['content']=
+					$passport_content=
 						$this->getTaxonContent(
 							array(
 								'taxon' => $taxon['id'], 
@@ -137,6 +135,7 @@ class SpeciesControllerNSR extends SpeciesController
 						);
 				}
 				
+				$this->smarty->assign( 'passport_content', $passport_content );
 				$this->smarty->assign( 'ext_template', '_tab_exoten.tpl' ); // --> this should become dependent on the actual called source
 				$this->smarty->assign( 'ext_tab', $ext_tab );
 				
@@ -242,8 +241,8 @@ class SpeciesControllerNSR extends SpeciesController
 						if ($val['predicate']=='hasReference')
 						{
 							$content['rdf'][$key]['data']['authors']=$this->getReferenceAuthors($val['data']['id']);
-							$content['rdf'][$key]['data']['periodical_ref']=$this-> getReference($val['data']['periodical_id']);
-							$content['rdf'][$key]['data']['publishedin_ref']=$this-> getReference($val['data']['publishedin_id']);
+							$content['rdf'][$key]['data']['periodical_ref']=$this->getReference($val['data']['periodical_id']);
+							$content['rdf'][$key]['data']['publishedin_ref']=$this->getReference($val['data']['publishedin_id']);
 						}
 					}
 					

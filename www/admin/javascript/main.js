@@ -77,18 +77,19 @@ function prettyDialog(p)
 {
 	var b=[{ text: p.closetext ? p.closetext : _('Close'), click:function() { $( this ).dialog( "close" ); } }];
 	if (p.buttons) b=p.buttons;
-
-	var height = p.height ? p.height : 600;
-	var width = p.width ? p.width : 500;
 	
-	$( "#dialog-message-body-content" ).html(p.content);
 	$( "#dialog-message" ).dialog({
+		draggable: false,
+		resizable: false,
 		modal: true,
 		title: p.title,
-		height: height,
-		width: width,
+		height: p.height ? p.height : 600,
+		width: p.width ? p.width : 500,
 		buttons: b
 	});
+
+	$( "#dialog-message-body-content" ).html(p.content);
+	
 };
 
 
