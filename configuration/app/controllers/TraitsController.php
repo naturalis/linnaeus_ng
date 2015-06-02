@@ -330,8 +330,13 @@ class TraitsController extends Controller
 	
 				if ( $aa>$bb ) return 1;
 				if ( $aa<$bb ) return -1;
+
 				if ( $a['date']>$b['date'] ) return 1;
 				if ( $a['date']<$b['date'] ) return -1;
+
+				if ( $a['label']>$b['label'] ) return 1;
+				if ( $a['label']<$b['label'] ) return -1;
+
 				return 0;
 			});
 		}
