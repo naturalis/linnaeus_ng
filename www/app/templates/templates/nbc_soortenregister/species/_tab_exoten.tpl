@@ -61,22 +61,22 @@ ul.exotica li {
         <br />
         <h4 class="source">Publicatie{if $content->result->references|@count>1}s{/if}</h4>
 		<ul class="exotica">
-
+        
         {foreach from=$content->result->references item=v}
-			<li>
+	        {if $content->result->references|@count>1}<li>{/if}
                 <a href="../literature2/reference.php?id={$v->id}">
                 {capture authors}
                 {foreach from=$v->authors item=author key=ak}{if $ak>0}, {/if}{$author->name|@trim}{/foreach}
+                {if $ak < 1}{$v->author}{/if}
                 {/capture}
-                {$smarty.capture.authors|@trim}
-                {if $v->date}{if $smarty.capture.authors|@trim|@strlen>0}, {/if}{$v->date}{/if}.
-                {if $v->label}{$v->label}. {/if}
+				{$smarty.capture.authors|@trim}{if $v->date}{if $smarty.capture.authors|@trim|@strlen>0}, {/if}{$v->date}{/if}.
+                {if $v->label|@trim|@strlen>0}{$v->label|@trim}{if !($v->label|@trim|@substr:-1)|@in_array:array('?','!','.')}. {/if}{/if}
                 {if $v->periodical_id}{$v->periodical_ref->label} {elseif $v->periodical}{$v->periodical} {/if}
                 {if $v->publishedin_id}{$v->publishedin_ref->label} {elseif $v->publishedin}{$v->publishedin} {/if}
                 {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
                 {if $v->publisher}{$v->publisher}.{/if}      
                 </a>
-			</li>
+	        {if $content->result->references|@count>1}</li>{/if}
         {/foreach}
 		{/if}
         </ul>

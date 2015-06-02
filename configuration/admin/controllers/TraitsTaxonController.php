@@ -582,7 +582,7 @@ class TraitsTaxonController extends TraitsController
 			$d=explode(",",$val);
 
 			if ($d[0]==-1)
-				$new=$d[1];
+				$new[]=$d[1];
 			else
 				$keep[]=$d[0];
 		}

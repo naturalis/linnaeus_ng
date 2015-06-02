@@ -66,7 +66,7 @@ function expungeLitRefList()
 <div id="page-main">
 
     <p>
-        <input type="button" value="save data" onclick="saveRawData();" />
+        Review your data and click 'save data' at the bottom of this page to save it in the database.
     </p>
 
     <p>
@@ -153,6 +153,17 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
         </table>
 	</p>
 
+</div>
+
+{include file="../shared/admin-messages.tpl"}
+
+<div class="page-generic-div">        
+
+	<p>
+    	<input type="button" value="save data" onclick="saveRawData();" />
+	</p>
+
+
 	<p>
 		<a href="#" onclick="$('.lit-ref-upload').fadeToggle();return false;">{t}upload a file with reference # / literature ID data{/t}</a>
 
@@ -189,16 +200,6 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
             </fieldset>
         </div>
 
-	</p>
-
-</div>
-
-{include file="../shared/admin-messages.tpl"}
-
-<div class="page-generic-div">        
-
-	<p>
-    	<input type="button" value="save data" onclick="saveRawData();" />
 	</p>
 
 	<p>

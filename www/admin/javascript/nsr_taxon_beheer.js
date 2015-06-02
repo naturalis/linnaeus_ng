@@ -90,6 +90,8 @@ function checkMandatory()
 	return result;
 }
 
+
+
 var genusBaseRankid=null;
 var speciesBaseRankid=null;
 
@@ -525,6 +527,44 @@ function doDelete(msg)
 	}
 }
 
+
+
+
+var timer=
+	{
+		threshold:200,//ms
+		threshold_grace:10,//ms
+		then:0,
+		now:0,
+		passed:999,
+		keys_hit:0,
+		timer_id:null
+	}
+
+function tempus_fugit( callback, params )
+{
+	var d=new Date();
+
+	if (timer.keys_hit==0)
+	{
+		timer.then=d.getTime();
+		timer.passed=999;
+	}
+
+	timer.now=d.getTime();
+	timer.keys_hit++;
+	timer.passed=timer.now-timer.then;
+	timer.then=timer.now;
+
+	clearTimeout( timer.timer_id );
+	timer.timer_id=setTimeout( function() { callback(params) }, timer.threshold + timer.threshold_grace);
+
+	if ( timer.passed > timer.threshold )
+	{
+		callback(params);
+	}
+}
+
 function dropListDialog(ele,title,params)
 {
 	var target=$(ele).attr('rel');
@@ -535,13 +575,24 @@ function dropListDialog(ele,title,params)
 		content :
 			'<p><input type="text" class="medium" id="'+id+'" /></p> \
 			 <p> \
-			 <a href="#" onclick="setNsrDropListValue(this,\''+target+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;">geen waarde toekennen</a> \
-			 <div id="droplist-list-container"></div></p>'
+			 <a href="#" onclick="setNsrDropListValue(this,\''+target+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
+				 geen waarde toekennen \
+			</a> \
+			<div id="droplist-list-container"></div> \
+			</p>'
 	});
 
-	$('#'+id).attr('autocomplete','off').bind('keyup', function(e) { 
-		doNsrDropList({ e:e, id: $(this).attr('id'), target: target, params: params } )
-	});	
+	$( '#'+id ).attr( 'autocomplete' , 'off' ).bind( 'keyup' , function(e)
+	{ 
+		if (typeof tempus_fugit=="function")
+		{
+			tempus_fugit( doNsrDropList, { e:e, id: $(this).attr('id'), target: target, params: params } );
+		}
+		else
+		{
+			doNsrDropList( { e:e, id: $(this).attr('id'), target: target, params: params } )
+		}
+	}).focus();	
 }
 
 function doNsrDropList(p)
