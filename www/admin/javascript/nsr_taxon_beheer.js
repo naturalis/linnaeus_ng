@@ -557,7 +557,7 @@ function tempus_fugit( callback, params )
 	timer.then=timer.now;
 
 	clearTimeout( timer.timer_id );
-	timer.timer_id=setTimeout( function() { callback(params) }, timer.threshold + timer.threshold_grace);
+	timer.timer_id=setTimeout( function() { callback(params) }, timer.threshold + timer.threshold_grace );
 
 	if ( timer.passed > timer.threshold )
 	{

@@ -249,7 +249,6 @@ class TraitsController extends Controller
 		
 		$references=$this->getReferences(array('taxon'=>$taxon,'group'=>$group,'project'=>$project));
 
-
 		header('Content-type:text/plain');
 		
 		echo json_encode(array(
@@ -329,7 +328,11 @@ class TraitsController extends Controller
 				$aa=!empty($aa) ? $aa : $a['author']; 
 				$bb=!empty($bb) ? $bb : $b['author']; 
 	
-				return ( $aa>$bb ? 1 : ( $aa<$bb ? -1 : 0 ) );
+				if ( $aa>$bb ) return 1;
+				if ( $aa<$bb ) return -1;
+				if ( $a['date']>$b['date'] ) return 1;
+				if ( $a['date']<$b['date'] ) return -1;
+				return 0;
 			});
 		}
 		
