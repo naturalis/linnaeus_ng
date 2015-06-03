@@ -19,7 +19,7 @@
                 <a href="../literature2/reference.php?id={$v.data.id}">
                 {capture authors}
                 {foreach from=$v.data.authors item=author key=ak}{if $ak>0}, {/if}{$author.name}{/foreach}
-                {if $ak < 1}{$v.data.author}{/if}
+                {if $ak|@is_null}{$v.data.author}{/if}
                 {/capture}
 				{$smarty.capture.authors|@trim}{if $v.data.date}{if $smarty.capture.authors|@trim|@strlen>0}, {/if}{$v.data.date}{/if}.
                 {if $v.data.label|@trim|@strlen>0}{$v.data.label|@trim}{if !($v.data.label|@trim|@substr:-1)|@in_array:array('?','!','.')}. {/if}{/if}
