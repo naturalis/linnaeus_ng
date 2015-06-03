@@ -581,7 +581,7 @@ class TraitsDataController extends TraitsController
 					if ($c==0) continue;
 					
 					$taxa[$c]['code']=$cell;
-
+					
 					if (!empty($this->_taxonIdResolveQuery))
 					{
 						$t2=$this->models->Taxon->freeQuery(
@@ -663,7 +663,7 @@ class TraitsDataController extends TraitsController
 					
 				if ($has_existing_values) $any_existing_values=true;
 			}
-			
+
 			$taxa[$c]=
 				array(
 					'verbatim_name'=>isset($val['name']) ? $val['name'] : null,
