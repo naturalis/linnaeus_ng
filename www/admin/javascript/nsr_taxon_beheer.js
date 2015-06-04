@@ -609,7 +609,11 @@ function doNsrDropList(p)
 	if (value.length<minlength)
 		return;
 
-	if (variable.indexOf('reference_id')!=-1)
+	if (
+		(variable.indexOf('reference_id')!=-1) ||
+		(variable.indexOf('publishedin_id')!=-1) ||
+		(variable.indexOf('periodical_id')!=-1)
+	)
 	{
 		url = '../literature2/ajax_interface.php';
 	}

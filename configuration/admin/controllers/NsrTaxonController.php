@@ -526,7 +526,7 @@ class NsrTaxonController extends NsrController
 			$return=$this->getInheritableName(array('id'=>$this->rGetVal('id')));
         }
 		
-		
+
         $this->allowEditPageOverlay=false;
 
 		$this->smarty->assign('returnText',$return);

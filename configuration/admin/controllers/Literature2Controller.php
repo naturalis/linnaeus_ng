@@ -1508,7 +1508,7 @@ class Literature2Controller extends Controller
 
 
     private function getReferenceLookupList($p)
-    {		
+    {
 		$data=$this->getReferences($p);
 
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
