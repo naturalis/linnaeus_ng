@@ -66,6 +66,7 @@ class Literature2Controller extends Controller
 		
 		$data=$this->models->Literature2->freeQuery(
 			"select
+				_a.id,
 				_a.label,
 				_a.date,
 				_a.author,
@@ -137,8 +138,8 @@ class Literature2Controller extends Controller
 
 		$ref=$this->getReference($this->requestData['id']);
 
-		if (!$ref) $this->redirect('index.php');
-		
+		if (!$ref['id']) $this->redirect('index.php');
+
 		$this->setPageName($ref['label'].', '.$ref['source']);
 
 		$this->smarty->assign('ref', $ref);
