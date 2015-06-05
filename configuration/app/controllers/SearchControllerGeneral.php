@@ -708,7 +708,8 @@ class SearchControllerGeneral extends SearchController
 			
 		}
 		
-		usort( $content, function($a,$b){ return $a['label']>$b['label'];  });
+		if ( !empty($content) )
+			usort( $content, function($a,$b){ return $a['label']>$b['label'];  });
 
 
 		// synonyms
