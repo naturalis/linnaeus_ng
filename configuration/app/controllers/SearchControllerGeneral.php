@@ -25,7 +25,7 @@
 				self::S_UNSET_ORIGINAL_CONTENT => true // if true, unsets the potentially large content fields after they've been excerpted
 			);
 
-			$this->searchSpecies($p) etc:
+			$this->searchSpecies($p) etc. (but not the matrix):
 
 
 			// taxon content
@@ -636,13 +636,15 @@ class SearchControllerGeneral extends SearchController
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('taxon'))
 				),
 				'columns' => 'id,taxon as label,rank_id,is_hybrid,parent_id,taxon as '.self::__CONCAT_RESULT__ ,
-				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
+				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
+				'order'=>'taxon'
 			)
 		);
 
 		$taxa = $this->filterResultsWithTokenizedSearch(array($p,$taxa));
 		$taxa = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$taxa));
-		$taxa = $this->sortResultsByMostTokensFound($taxa);
+		// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
+		//$taxa = $this->sortResultsByMostTokensFound($taxa);
 
 		//$ranks = $this->newGetProjectRanks();
 		$ranks = $this->getProjectRanks();
@@ -667,7 +669,6 @@ class SearchControllerGeneral extends SearchController
 
 		if ($p[self::S_EXTENDED_SEARCH])
 		{
-
 			// taxon content
 			$content = $this->models->ContentTaxon->_get(
 				array(
@@ -684,10 +685,13 @@ class SearchControllerGeneral extends SearchController
 			
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
-			$content = $this->sortResultsByMostTokensFound($content);
+			// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
+			// actual ordering by taxon name lower below (usort)
+			//$content = $this->sortResultsByMostTokensFound($content);
 
 			$pagenames=array();			
-			foreach((array)$content as $key=>$val) {
+			foreach((array)$content as $key=>$val)
+			{
 				$t=$this->getTaxonById($val['taxon_id']);
                 $ct = $this->models->PageTaxonTitle->_get(
                 array(
@@ -703,6 +707,9 @@ class SearchControllerGeneral extends SearchController
 			}
 			
 		}
+		
+		usort( $content, function($a,$b){ return $a['label']>$b['label'];  });
+
 
 		// synonyms
 		$synonyms = $this->models->Synonym->_get(
@@ -713,13 +720,15 @@ class SearchControllerGeneral extends SearchController
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('synonym')),
 				),
 				'columns' => 'id,taxon_id,synonym as label,synonym as '.self::__CONCAT_RESULT__,
-				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
+				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
+				'order'=>'synonym'
 			)
 		);
 
 		$synonyms = $this->filterResultsWithTokenizedSearch(array($p,$synonyms));
 		$synonyms = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$synonyms));
-		$synonyms = $this->sortResultsByMostTokensFound($synonyms);
+		// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
+		//$synonyms = $this->sortResultsByMostTokensFound($synonyms);
 
 		// common names
 		$commonnames = $this->models->Commonname->_get(
@@ -732,7 +741,8 @@ class SearchControllerGeneral extends SearchController
 				'columns' =>
 					'taxon_id as id,language_id,taxon_id,commonname,transliteration,
 					concat(ifnull(commonname,\'\'),\' \',ifnull(transliteration,\'\')) as '.self::__CONCAT_RESULT__,
-				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
+				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
+				'order'=>'commonname,transliteration'
 			)
 		);	
 
@@ -754,11 +764,14 @@ class SearchControllerGeneral extends SearchController
 		$commonnames = $this->getExcerptsSurroundingMatches(
 			array('param'=>$p,'results'=>$commonnames,'fields'=>array('commonname','transliteration'),'excerpt'=>false)
 		);
-		$commonnames = $this->sortResultsByMostTokensFound($commonnames);
+
+		// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
+		//$commonnames = $this->sortResultsByMostTokensFound($commonnames);
+
 		
-		
-		if ($this->models->Names->getTableExists()) {
-			
+
+		if ($this->models->Names->getTableExists())
+		{
 			$nameTypes = $this->models->NameTypes->_get(
 				array(
 					'id' => array(
@@ -776,7 +789,8 @@ class SearchControllerGeneral extends SearchController
 						'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('name')),
 					),
 					'columns' => 'taxon_id as id,language_id,taxon_id,name,type_id,name as '.self::__CONCAT_RESULT__,
-					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
+					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
+					'order'=>'name'
 				)
 			);	
 	
@@ -791,14 +805,14 @@ class SearchControllerGeneral extends SearchController
 			}
 	
 			$names = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$names,'fields'=>array('name'),'excerpt'=>false));
-//			$names = $this->sortResultsByMostTokensFound($names);
-
-		
+			// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
+			//	$names = $this->sortResultsByMostTokensFound($names);
+	
 		}
 
 		
-		if ($p[self::S_EXTENDED_SEARCH]) {
-
+		if ($p[self::S_EXTENDED_SEARCH])
+		{
 			// media
 			$media = $this->models->MediaDescriptionsTaxon->_get(
 				array(
@@ -814,6 +828,7 @@ class SearchControllerGeneral extends SearchController
 
 			$media = $this->filterResultsWithTokenizedSearch(array($p,$media));
 			$media = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$media));
+			// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
 			$media = $this->sortResultsByMostTokensFound($media);
 	
 			$d = $this->models->MediaTaxon->_get(
@@ -826,11 +841,10 @@ class SearchControllerGeneral extends SearchController
 				)
 			);
 	
-			foreach((array)$media as $key => $val) {
-	
+			foreach((array)$media as $key => $val)
+			{
 				$media[$key]['taxon_id'] = $d[$val['media_id']]['taxon_id'];
 				$media[$key]['label'] = $d[$val['media_id']]['file_name'];
-	
 			}
 			
 		}
@@ -838,8 +852,8 @@ class SearchControllerGeneral extends SearchController
 		$results=array();
 		$numOfResults=0;
 
-		if (isset($taxa)) {
-
+		if (isset($taxa))
+		{
 			$results[self::C_TAXA_SCI_NAMES]=
 				array(
 					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
@@ -849,11 +863,10 @@ class SearchControllerGeneral extends SearchController
 				);
 
 			$numOfResults+=count((array)$taxa);
-
 		}
 
-		if (isset($content)) {
-
+		if (isset($content))
+		{
 			$results[self::C_TAXA_DESCRIPTIONS]=
 				array(
 					'label' => $this->translate('Species descriptions'),
@@ -866,8 +879,8 @@ class SearchControllerGeneral extends SearchController
 
 		}
 
-		if (isset($synonyms)) {
-
+		if (isset($synonyms))
+		{
 			$results[self::C_TAXA_SYNONYMS]=
 				array(
 					'label' => $this->translate('Species synonyms'),
@@ -880,8 +893,8 @@ class SearchControllerGeneral extends SearchController
 
 		}
 
-		if (isset($commonnames)) {
-
+		if (isset($commonnames))
+		{
 			$results[self::C_TAXA_VERNACULARS]=
 				array(
 					'label' => $this->translate('Species common names'),
