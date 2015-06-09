@@ -37,6 +37,9 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function initialise()
     {
+
+		$this->defaultNvNLicenseText = $this->getSetting( "photo_NvN_license_text", "Alle rechten voorbehouden" );
+
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
@@ -810,7 +813,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') => $val['meta_license'],
+				$this->translate('Licentie') => !empty($val['meta_license']) ? $val['meta_license'] : $this->defaultNvNLicenseText,
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
@@ -987,7 +990,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') => $val['meta_license'],
+				$this->translate('Licentie') => !empty($val['meta_license']) ? $val['meta_license'] : $this->defaultNvNLicenseText,
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
