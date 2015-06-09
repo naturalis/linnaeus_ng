@@ -691,7 +691,8 @@ class SpeciesControllerNSR extends SpeciesController
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
-				_meta8.meta_data as photographer
+				_meta8.meta_data as photographer,
+				_meta10.meta_data as meta_license
 			
 			from  %PRE%media_taxon _m
 			
@@ -777,6 +778,11 @@ class SpeciesControllerNSR extends SpeciesController
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
 			
+			left join %PRE%media_meta _meta10
+				on _m.id=_meta10.media_id
+				and _m.project_id=_meta10.project_id
+				and _meta10.sys_label='beeldbankLicentie'
+			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
 				and _m.taxon_id=".$id."
@@ -804,6 +810,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
+				$this->translate('Licentie') => $val['meta_license'],
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
@@ -849,7 +856,8 @@ class SpeciesControllerNSR extends SpeciesController
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
-				_meta8.meta_data as photographer
+				_meta8.meta_data as photographer,
+				_meta10.meta_data as meta_license
 			
 			from
 				%PRE%taxon_quick_parentage _q
@@ -949,6 +957,11 @@ class SpeciesControllerNSR extends SpeciesController
 				on _m.id=_meta9.media_id
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
+
+			left join %PRE%media_meta _meta10
+				on _m.id=_meta10.media_id
+				and _m.project_id=_meta10.project_id
+				and _meta10.sys_label='beeldbankLicentie'
 		
 			where
 				_q.project_id=".$this->getCurrentProjectId()."
@@ -974,6 +987,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
+				$this->translate('Licentie') => $val['meta_license'],
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
