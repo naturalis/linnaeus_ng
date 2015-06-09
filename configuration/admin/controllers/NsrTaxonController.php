@@ -250,10 +250,72 @@ class NsrTaxonController extends NsrController
     public function nameAction()
     {
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Bewerk name'));
+        $this->setPageName($this->translate('Bewerk naam'));
 		$this->_nameAndSynonym();
 		$this->printPage();
 	}
+
+    public function taxonEditConceptDirectAction()
+    {
+		$this->checkAuthorisation();
+
+		if ( !$this->rHasId() ) $this->redirect('taxon_new.php');
+
+        $this->setPageName( $this->translate('Bewerk naam concept') );
+		$this->setConceptId( $this->rGetId() );
+		
+		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			if ($this->updateConceptTaxon(array('new'=>$this->rGetVal('taxon'))))
+			{
+				$this->addMessage( 'Naam opgeslagen' );
+				$this->resetTree();
+			}
+			else
+			{
+				$this->addWarning( 'Naam niet opgeslagen' );
+			}
+		}
+
+		$concept=$this->getConcept($this->getConceptId());
+		$this->smarty->assign('concept',$concept);
+		$this->smarty->assign('validname',$this->getName(array('taxon_id'=>$this->rGetId(),'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])));
+		$this->printPage();
+	}
+
+    public function taxonEditSynonymDirectAction()
+    {
+		$this->checkAuthorisation();
+
+		if ( !$this->rHasId() ) $this->redirect('synonym.php');
+
+        $this->setPageName( $this->translate('Bewerk geldige naam') );
+
+		$this->setNameId( $this->rGetId() );
+		$name=$this->getName(array('id'=>$this->getNameId()));
+
+		$this->setConceptId( $name['taxon_id'] );
+		$concept=$this->getConcept($this->getConceptId());
+		
+		if ($name['type_id']!=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])
+		{
+			$this->redirect('synonym.php');
+		}
+		
+		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->updateName();
+			$this->addMessage( 'Naam opgeslagen' );
+			$this->resetTree();
+		}
+
+		$this->smarty->assign('concept',$concept);
+		$this->smarty->assign('name',$this->getName(array('id'=>$this->getNameId())));
+		$this->printPage();
+	}
+
+
+
 
     private function _nameAndSynonym()
     {
@@ -325,8 +387,6 @@ class NsrTaxonController extends NsrController
 					}
 				}
 			}
-
-
 
 			$this->smarty->assign('name',$name);
 		}
