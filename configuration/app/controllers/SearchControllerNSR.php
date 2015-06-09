@@ -995,6 +995,7 @@ class SearchControllerNSR extends SearchController
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
+				_meta10.meta_data as meta_license,
 				replace(_ids.nsr_id,'".$this->conceptIdPrefix."','') as nsr_id
 
 			from  %PRE%media_taxon _m
@@ -1077,6 +1078,11 @@ class SearchControllerNSR extends SearchController
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
 
+			left join %PRE%media_meta _meta10
+				on _m.id=_meta10.media_id
+				and _m.project_id=_meta10.project_id
+				and _meta10.sys_label='beeldbankLicentie'
+
 			left join %PRE%nsr_ids _ids
 				on _m.taxon_id=_ids.lng_id
 				and _m.project_id=_ids.project_id
@@ -1124,6 +1130,7 @@ class SearchControllerNSR extends SearchController
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
 				$this->translate('Omschrijving') => $val['meta_short_desc'],
+				$this->translate('Licentie') => $val['meta_license'],
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
