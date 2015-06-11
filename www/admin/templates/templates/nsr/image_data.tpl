@@ -22,7 +22,7 @@
 		<tr><th>soort:</th>
 			<td>
                 <span id="taxon">{$image.taxon}</span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Soort');return false;" rel="taxon_id">edit</a> *
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Taxon');return false;" rel="taxon_id">edit</a> *
 				<input type="hidden" name="taxon_id" id="taxon_id" value="{$image.taxon_id}" droplistminlength="3" />
 			</td>
 		</tr>
