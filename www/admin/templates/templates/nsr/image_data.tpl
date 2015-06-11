@@ -19,7 +19,7 @@
     <input type="hidden" name="media_id" value="{$image.id}" />
 	<table>
 
-		<tr><th>soort:</th>
+		<tr><th>taxon:</th>
 			<td>
                 <span id="taxon">{$image.taxon}</span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Taxon');return false;" rel="taxon_id">edit</a> *
