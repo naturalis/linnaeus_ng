@@ -33,7 +33,7 @@ class NSRFunctionsController extends Controller
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') => !empty($val['meta_license']) ? $val['meta_license'] : $this->defaultNvNLicenseText,
+				$this->translate('Licentie') => !empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->defaultNvNLicenseText,
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
