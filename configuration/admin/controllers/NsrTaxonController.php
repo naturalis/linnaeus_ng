@@ -255,68 +255,6 @@ class NsrTaxonController extends NsrController
 		$this->printPage();
 	}
 
-    public function taxonEditConceptDirectAction()
-    {
-		$this->checkAuthorisation();
-
-		if ( !$this->rHasId() ) $this->redirect('taxon_new.php');
-
-        $this->setPageName( $this->translate('Bewerk naam concept') );
-		$this->setConceptId( $this->rGetId() );
-		
-		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
-		{
-			if ($this->updateConceptTaxon(array('new'=>$this->rGetVal('taxon'))))
-			{
-				$this->addMessage( 'Naam opgeslagen' );
-				$this->resetTree();
-			}
-			else
-			{
-				$this->addWarning( 'Naam niet opgeslagen' );
-			}
-		}
-
-		$concept=$this->getConcept($this->getConceptId());
-		$this->smarty->assign('concept',$concept);
-		$this->smarty->assign('validname',$this->getName(array('taxon_id'=>$this->rGetId(),'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])));
-		$this->printPage();
-	}
-
-    public function taxonEditSynonymDirectAction()
-    {
-		$this->checkAuthorisation();
-
-		if ( !$this->rHasId() ) $this->redirect('synonym.php');
-
-        $this->setPageName( $this->translate('Bewerk geldige naam') );
-
-		$this->setNameId( $this->rGetId() );
-		$name=$this->getName(array('id'=>$this->getNameId()));
-
-		$this->setConceptId( $name['taxon_id'] );
-		$concept=$this->getConcept($this->getConceptId());
-		
-		if ($name['type_id']!=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])
-		{
-			$this->redirect('synonym.php');
-		}
-		
-		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
-		{
-			$this->updateName();
-			$this->addMessage( 'Naam opgeslagen' );
-			$this->resetTree();
-		}
-
-		$this->smarty->assign('concept',$concept);
-		$this->smarty->assign('name',$this->getName(array('id'=>$this->getNameId())));
-		$this->printPage();
-	}
-
-
-
-
     private function _nameAndSynonym()
     {
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
@@ -415,8 +353,71 @@ class NsrTaxonController extends NsrController
 
     }
 
+
+    public function taxonEditConceptDirectAction()
+    {
+		$this->checkAuthorisation();
+
+		if ( !$this->rHasId() ) $this->redirect('taxon_new.php');
+
+        $this->setPageName( $this->translate('Bewerk naam concept') );
+		$this->setConceptId( $this->rGetId() );
+		
+		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			if ($this->updateConceptTaxon(array('new'=>$this->rGetVal('taxon'))))
+			{
+				$this->addMessage( 'Naam opgeslagen' );
+				$this->resetTree();
+			}
+			else
+			{
+				$this->addWarning( 'Naam niet opgeslagen' );
+			}
+		}
+
+		$concept=$this->getConcept($this->getConceptId());
+		$this->smarty->assign('concept',$concept);
+		$this->smarty->assign('validname',$this->getName(array('taxon_id'=>$this->rGetId(),'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])));
+		$this->printPage();
+	}
+
+    public function taxonEditSynonymDirectAction()
+    {
+		$this->checkAuthorisation();
+
+		if ( !$this->rHasId() ) $this->redirect('synonym.php');
+
+        $this->setPageName( $this->translate('Bewerk geldige naam') );
+
+		$this->setNameId( $this->rGetId() );
+		$name=$this->getName(array('id'=>$this->getNameId()));
+
+		$this->setConceptId( $name['taxon_id'] );
+		$concept=$this->getConcept($this->getConceptId());
+		
+		if ($name['type_id']!=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])
+		{
+			$this->redirect('synonym.php');
+		}
+		
+		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->updateName();
+			$this->addMessage( 'Naam opgeslagen' );
+			$this->resetTree();
+		}
+
+		$this->smarty->assign('concept',$concept);
+		$this->smarty->assign('name',$this->getName(array('id'=>$this->getNameId())));
+		$this->printPage();
+	}
+
+
     public function imagesAction()
     {
+		$this->checkAuthorisation();
+
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
 		
 		if ($this->rHasId() && $this->rHasVal('image') && $this->rHasVal('action','delete'))
@@ -426,13 +427,41 @@ class NsrTaxonController extends NsrController
 			$this->setMessage('Afbeelding ontkoppeld.');
 		} 
 		
-		$this->checkAuthorisation();
 		$this->setConceptId( $this->rGetId() );
         $this->setPageName($this->translate('Taxon images'));
 		$this->smarty->assign('concept',$this->getConcept($this->rGetVal('id')));
 		$this->smarty->assign('images',$this->getTaxonMedia());
 
 		$this->checkMessage();
+		$this->printPage();
+	}
+
+    public function imageDataAction()
+    {
+		$this->checkAuthorisation();
+
+		if (!$this->rHasId()) $this->redirect('taxon_new.php');
+
+        $this->setPageName($this->translate('Meta-data'));
+		
+		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->updateTaxonImageMetaData( $this->requestData );
+			$this->updateTaxonImageTaxonId( $this->requestData );
+			$this->addMessage( 'Meta-data opgeslagen.' );
+		}
+
+		$image=$this->getTaxonMedia(array('media_id'=>$this->rGetId()));
+		$meta=$this->getTaxonMediaMetaDataFields();
+
+		foreach((array)$image['data'][0]['meta'] as $val)
+		{
+			unset($meta[array_search($val['sys_label'],$meta)]);;
+		}
+		
+		$this->smarty->assign('image',$image);
+		$this->smarty->assign('meta_rest',$meta);
+	
 		$this->printPage();
 	}
 
@@ -562,6 +591,7 @@ class NsrTaxonController extends NsrController
 		if (
 			$this->rHasVal('action', 'get_lookup_list') || 
 			$this->rHasVal('action', 'species_lookup') ||
+			$this->rHasVal('action', 'taxon_id') ||
 			$this->rHasVal('action', 'parent_taxon_id')
 		)
 		{
@@ -1048,11 +1078,12 @@ class NsrTaxonController extends NsrController
 		return $languages;
 	}
 
-    private function getTaxonMedia()
+    private function getTaxonMedia( $p=null )
     {
-		$id=$this->getConceptId();
+		$id=isset($p['id']) ? $p['id'] : $this->getConceptId();
+		$media_id=isset($p['media_id']) ? $p['media_id'] : null;
 
-		if (empty($id))
+		if ( empty($id) && empty($media_id) )
 			return;
 
 		$overview=isset($p['overview']) ? $p['overview'] : false;
@@ -1171,10 +1202,10 @@ class NsrTaxonController extends NsrController
 			
 			where
 				_m.project_id=".$this->getCurrentProjectId()."
-				and _m.taxon_id=".$id."
+				".($id ? "and _m.taxon_id=". mysql_real_escape_string( $id ) : "")."
 				and ifnull(_meta9.meta_data,0)!=".($distributionMaps?'0':'1')."
 				".($overview ? "and _m.overview_image=1" : "")."
-
+				".($media_id ? "and _m.id=". mysql_real_escape_string( $media_id ) : "")."
 
 			".(isset($sort) ? "order by ".$sort : "")."
 			".(isset($limit) ? "limit ".$limit : "")."
@@ -1208,6 +1239,24 @@ class NsrTaxonController extends NsrController
 
 		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
 
+    }
+
+    private function getTaxonMediaMetaDataFields()
+    {
+		foreach((array)$this->models->Taxon->freeQuery("		
+			select
+				distinct sys_label
+			from
+				%PRE%media_meta
+			where
+				project_id=".$this->getCurrentProjectId()."
+			order by
+				sys_label
+			") as $val)
+			{
+				$d[]=$val['sys_label'];
+			}
+		return $d;
     }
 
 	private function disconnectTaxonMedia($image)
@@ -2166,6 +2215,89 @@ class NsrTaxonController extends NsrController
 		);
 	}
 
+	private function updateTaxonImageMetaData($p)
+	{
+		$media_id=!empty($p['media_id']) ? $p['media_id'] : null;
+		
+		if (empty($media_id)) return;
+
+		foreach((array)$p['values'] as $key=>$val)
+		{
+			$ids=explode(",",$key);
+			
+			if ( empty($ids[0]) || empty($ids[1]) ) continue;
+
+			if (empty($val))
+			{
+				$this->models->MediaMeta->delete(array(
+					'id' => $ids[0],
+					'project_id' => $this->getCurrentProjectId()
+				));
+			}
+			else
+			{
+				$this->models->MediaMeta->freeQuery("
+					update 
+					%PRE%media_meta 
+					set ".$ids[1]." = '".$val."' 
+					where 
+					id = ".$ids[0]." 
+					and project_id = ".$this->getCurrentProjectId()."
+				");
+			}
+		}
+
+
+		foreach((array)$p['new'] as $key=>$val)
+		{
+			if (empty($val)) continue;
+			
+			$d=array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'media_id'=>$media_id,
+				'language_id'=>$this->getDefaultProjectLanguage(),
+				'sys_label'=>$key,
+				'meta_data'=>$val,
+			);
+			
+			if ($p['type'][$key]=='meta_date')
+			{
+				$d['meta_date']="#'".$val."'";
+				$d['meta_number']=null;
+				$d['meta_data']=null;
+			}
+			elseif ($p['type'][$key]=='meta_number')
+			{
+				$d['meta_date']=null;
+				$d['meta_number']=$val;
+				$d['meta_data']=null;
+			}
+			else
+			{
+				$d['meta_date']=null;
+				$d['meta_number']=null;
+				$d['meta_data']=$val;
+			}
+			$this->models->MediaMeta->save( $d );
+
+		}
+	}
+
+	private function updateTaxonImageTaxonId($p)
+	{
+		$media_id=!empty($p['media_id']) ? $p['media_id'] : null;
+		$taxon_id=!empty($p['taxon_id']) ? $p['taxon_id'] : null;
+		
+		if ( empty($media_id) || empty($taxon_id) ) return;
+
+		$this->models->MediaTaxon->update(array(
+			'taxon_id' => $taxon_id
+		), array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $media_id
+		));
+	}
+
 
 
 	private function generateNsrCode()
@@ -2932,8 +3064,6 @@ class NsrTaxonController extends NsrController
 		return $l[0];
 	}
 	
-
-
 	private function getTaxonBranch($parent)
 	{
 		return $this->models->Taxon->freeQuery("
@@ -3532,7 +3662,6 @@ class NsrTaxonController extends NsrController
 		$this->resetTree();
 
 	}
-
 
 	private function getTraitgroups($p=null)
 	{

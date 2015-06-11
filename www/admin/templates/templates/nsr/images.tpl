@@ -26,7 +26,9 @@
                 <span style="font-size:10px">
                 {$v.label}<br />
                 Geplaatst: {$v.meta_datum_plaatsing}<br />
-                <a href="#" onclick="disconnectimage( { id:{$concept.id},image:{$v.id} } );return false;" class="edit" style="margin:0">afbeelding ontkoppelen</a><br />
+<a href="#" onclick="disconnectimage( { id:{$concept.id},image:{$v.id} } );return false;" class="edit" style="margin:0">afbeelding ontkoppelen</a> |
+<a href="image_data.php?id={$v.id}" class="edit" style="margin:0">edit data</a>
+                <br />
                 </span>
             </td>
             {if ($k+1)%5==0}</tr><tr>{/if}
@@ -36,8 +38,6 @@
 </p>
 
 <p>
-	<a href="javascript:alert('wordt toegevoegd als de beelduitwisselaar af is.');" class="edit"  style="margin:0">nieuwe afbeelding toevoegen</a><br />
-
 	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat=media&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">afbeeldingen bekijken in het Soortenregister (nieuw venster)</a><br />
 
 </p>
