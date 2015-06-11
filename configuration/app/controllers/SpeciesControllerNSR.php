@@ -18,6 +18,7 @@ TAB_NAAMGEVING wordt omgeleid naar CTAB_NAMES
 
 include_once ('SpeciesController.php');
 include_once ('RdfController.php');
+include_once ('NSRFunctionsController.php');
 
 class SpeciesControllerNSR extends SpeciesController
 {
@@ -37,9 +38,8 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function initialise()
     {
-
-		$this->defaultNvNLicenseText = $this->getSetting( "photo_NvN_license_text", "Alle rechten voorbehouden" );
-
+		$this->NSRFunctions=new NSRFunctionsController;
+		
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
@@ -799,38 +799,13 @@ class SpeciesControllerNSR extends SpeciesController
 		);
 		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
-		
-		foreach((array)$data as $key=>$val)
-		{
 
-			$metaData=array(
-				'' => '<span class="pic-meta-label">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
-				$this->translate('Omschrijving') => $val['meta_short_desc'],
-				$this->translate('Fotograaf') => $val['photographer'],
-				$this->translate('Datum') => $val['meta_datum'],
-				$this->translate('Locatie') => $val['meta_geografie'],
-				$this->translate('Validator') => $val['meta_validator'],
-				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
-				$this->translate('Copyright') => $val['meta_copyrights'],
-				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') => !empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->defaultNvNLicenseText,
+		return 
+			array(
+				'count'=>$count[0]['total'],
+				'data'=>$this->NSRFunctions->formatPictureResults( $data ),
+				'perpage'=>$this->_resPicsPerPage
 			);
-
-			$data[$key]['photographer']=$val['photographer'];
-			$data[$key]['label']=
-				trim(
-					(isset($val['photographer']) ? $val['photographer'].', ' : '' ).
-					(isset($val['meta_datum']) ? $val['meta_datum'].', ' : '' ).
-					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
-					', '
-				);
-				
-				
-			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: ','<br /><span class="pic-meta-label">',$metaData,true);
-			
-		}
-
-		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
 
     }
 

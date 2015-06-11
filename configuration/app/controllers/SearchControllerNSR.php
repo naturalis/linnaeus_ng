@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('SearchController.php');
+include_once ('NSRFunctionsController.php');
 
 class SearchControllerNSR extends SearchController
 {
@@ -63,7 +64,7 @@ class SearchControllerNSR extends SearchController
 	
     private function initialise()
     {
-		$this->defaultNvNLicenseText = $this->getSetting( "photo_NvN_license_text", "Alle rechten voorbehouden" );
+		$this->NSRFunctions=new NSRFunctionsController;
 
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
@@ -1113,40 +1114,13 @@ class SearchControllerNSR extends SearchController
 
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
 		
-		return array('count'=>$count[0]['total'],'data'=>$this->formatPictureResults($data),'perpage'=>$this->_resPicsPerPage);
-
-	}
-
-	private function formatPictureResults($data)
-	{
-		foreach((array)$data as $key=>$val)
-		{
-			$metaData=array(
-				'' => '<span class="pic-meta-label">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
-				$this->translate('Fotograaf') => $val['photographer'],
-				$this->translate('Datum') => $val['meta_datum'],
-				$this->translate('Locatie') => $val['meta_geografie'],
-				$this->translate('Validator') => $val['meta_validator'],
-				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
-				$this->translate('Copyright') => $val['meta_copyrights'],
-				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Omschrijving') => $val['meta_short_desc'],
-				$this->translate('Licentie') => !empty($val['meta_license']) ? $val['meta_license'] : $this->defaultNvNLicenseText,
+		return
+			array(
+				'count'=>$count[0]['total'],
+				'data'=> $this->NSRFunctions->formatPictureResults( $data ),
+				'perpage'=>$this->_resPicsPerPage
 			);
 
-			$data[$key]['photographer']=$val['photographer'];
-			$data[$key]['label']=
-				trim(
-					(!empty($val['photographer']) ? $val['photographer'].', ' : '') .
-					(!empty($val['meta_datum']) ? $val['meta_datum'].', ' : '') .
-					$val['meta_geografie'], ', '
-				);
-			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: ','<br /><span class="pic-meta-label">',$metaData,true);
-			
-		}
-		
-		return  $data;
-	
 	}
 
 	private function getSuggestionsGroup($p)
