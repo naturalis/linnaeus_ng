@@ -872,7 +872,7 @@ class SpeciesControllerNSR extends SpeciesController
 						and ifnull(_meta9.meta_data,0)!=1
 						and _m.project_id=".$this->getCurrentProjectId()." 
 					order by
-						_meta4.meta_date desc
+						_m.overview_image desc,_meta4.meta_date desc
 					limit 1
 				)
 
@@ -961,66 +961,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 
-		foreach((array)$data as $key=>$val)
-		{
-			$metaData=array(
-				'' => (!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>'),
-				$this->translate('Omschrijving') => $val['meta_short_desc'],
-				$this->translate('Fotograaf') => $val['photographer'],
-				$this->translate('Datum') => $val['meta_datum'],
-				$this->translate('Locatie') => $val['meta_geografie'],
-				$this->translate('Validator') => $val['meta_validator'],
-				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
-				$this->translate('Copyright') => $val['meta_copyrights'],
-				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') => !empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->defaultNvNLicenseText,
-			);
-
-			$data[$key]['photographer']=$val['photographer'];
-			$data[$key]['label']=
-				trim(
-					(isset($val['photographer']) ? $val['photographer'].', ' : '' ).
-					(isset($val['meta_datum']) ? $val['meta_datum'].', ' : '' ).
-					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
-					', '
-				);
-			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode(': ','<br />',$metaData,true);
-			
-		}
-
-		/*
-		$totalCount=$this->models->Taxon->freeQuery("		
-			select
-				count(*) as total
-			
-			from
-				%PRE%taxon_quick_parentage _q
-			
-			right join %PRE%media_taxon _m
-				on _q.taxon_id=_m.taxon_id
-				and _q.project_id=_m.project_id
-
-			left join %PRE%media_meta _meta9
-				on _m.id=_meta9.media_id
-				and _m.project_id=_meta9.project_id
-				and _meta9.sys_label='verspreidingsKaart'
-
-			left join %PRE%taxa _k
-				on _q.taxon_id=_k.id
-				and _q.project_id=_k.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			where
-				_q.project_id=".$this->getCurrentProjectId()."
-				and ifnull(_meta9.meta_data,0)!=1
-				and (MATCH(_q.parentage) AGAINST ('".$id."' in boolean mode))
-			"
-		);
-//				and _f.rank_id >= ".SPECIES_RANK_ID."
-		*/
+		$data=$this->NSRFunctions->formatPictureResults( $data );
 
 		$species=$this->models->Taxon->freeQuery("		
 			select
