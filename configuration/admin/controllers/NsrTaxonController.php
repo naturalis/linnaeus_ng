@@ -2378,7 +2378,7 @@ class NsrTaxonController extends NsrController
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $taxon_id,
-					'id' => "!= ".$media_id
+					'id != ' => $media_id
 				)
 			);
 			
