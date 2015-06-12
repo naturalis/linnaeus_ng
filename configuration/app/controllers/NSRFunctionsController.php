@@ -16,7 +16,7 @@ class NSRFunctionsController extends Controller
 	
     private function initialise()
     {
-		$this->defaultNvNLicenseText = $this->getSetting( "photo_NvN_license_text", "geen (alle rechten voorbehouden)" );
+		$this->defaultNvNLicenseText = $this->getSetting( "photo_NvN_license_text", "Alle rechten voorbehouden" );
     }
 	
 	public function formatPictureResults($data)
