@@ -2,25 +2,24 @@
 	vertical-align:top;
 }
 
-
 #activity-log table tr:hover {
-	background-color:#f9c788;
+	background-color:#eee;
 }
 
 #activity-log .inline-table {
-	margin-left:10px;
 	border-collapse:collapse;
 }
 
 #activity-log .inline-table tr td, .inline-table tr th  {
 	font-size:10px;
-	padding-left:5px;
-	background-color:#eee;
+	-padding-left:5px;
+	background-color:#fff;
 }
 
 #activity-log .inline-table td {
 	width:350px;
 	border:1px solid #ddd;
+	text-align:left;
 }
 
 
@@ -40,3 +39,13 @@
 #activity-log ul li.inner-header {
 	font-style:italic;
 }
+
+#activity-log span[class*=alldata] {
+	font-size:0.9em;
+	color:#666;
+}
+
+#activity-log a[class=toggle] {
+	text-decoration:none;
+}
+
