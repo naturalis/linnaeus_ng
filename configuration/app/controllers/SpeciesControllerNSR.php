@@ -1975,10 +1975,8 @@ _k.authorship
 
 	}
 
-
     public function ajaxInterfaceAction ()
     {
-		
 		$return=null;
 		
 		if ($this->rHasVal('action', 'get_media_batch') && $this->rHasId())

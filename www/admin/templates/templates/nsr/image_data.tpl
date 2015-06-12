@@ -32,7 +32,7 @@
         		banner-afbeelding:
         	</th>
 			<td>
-                <input type="checkbox" name="overview_image"{if $v.overview_image==1} checked="checked"{/if}>
+                <input type="checkbox" name="overview_image"{if $image.overview_image==1} checked="checked"{/if}>
 			</td>
 		</tr>
 

@@ -3,39 +3,49 @@
 <div id="page-main">
 
 <style>
+.regular_image, .overview_image {
+	margin-bottom:15px;
+	border:1px solid #999;
+}
 .overview_image {
-	border:1px solid red;
+	border-color:red;
 }
 </style>
 
 <h2><span style="font-size:12px;font-style:normal">afbeeldingen ({$images.data|@count}):</span> {$concept.taxon}</h2>
 
 <p>
-	<table>
+	<table style="border-collapse:collapse">
 	    <tr>
         {foreach from=$images.data item=v key=k}
 
 			{capture "metadata"}
-            {foreach from=$v.meta item=m}
-            {$m.sys_label|@replace:'beeldbank':''}:
-            
-            {if $m.meta_data}{$m.meta_data}{elseif $m.meta_date}{$m.meta_date}{elseif $m.meta_number}{$m.meta_number}{/if}
-            
-            <br />
-            {/foreach}
+                {foreach from=$v.meta item=m}
+                {$m.sys_label|@replace:'beeldbank':''}:
+                {if $m.meta_data}{$m.meta_data}{elseif $m.meta_date}{$m.meta_date}{elseif $m.meta_number}{$m.meta_number}{/if}
+                <br />
+                {/foreach}
             {/capture}
 
-            <td style="padding-bottom:15px;width:170px" class="{if $v.overview_image==1}overview_image{/if}">
-                <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}{$v.image}" pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>">
-                    <img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
-                </a><br />
-                <span style="font-size:10px">
-                {$v.label}<br />
-                Geplaatst: {$v.meta_datum_plaatsing}<br />
-<a href="#" onclick="disconnectimage( { id:{$concept.id},image:{$v.id} } );return false;" class="edit" style="margin:0">afbeelding ontkoppelen</a> |
-<a href="image_data.php?id={$v.id}" class="edit" style="margin:0">edit data</a>
-                <br />
-                </span>
+            <td style="width:160px">
+            	<div class="{if $v.overview_image==1}overview_image{else}regular_image{/if}">
+                    <a class="zoomimage" 
+                        rel="prettyPhoto[gallery]" 
+                        href="{$taxon_main_image_base_url}{$v.image}" 
+                        pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>"
+                    >
+                        <img alt="Foto {$v.photographer}" title="Foto {$v.photographer}{if $v.overview_image==1}; banner-afbeelding{/if}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
+                    </a>
+                    
+                    
+                    
+                    <div style="font-size:10px;padding:0 2px 1px 2px">
+                        {$v.label}<br />
+                        Geplaatst: {$v.meta_datum_plaatsing}<br />
+                        <a href="#" onclick="disconnectimage( { id:{$concept.id},image:{$v.id} } );return false;" class="edit" style="margin:0">afbeelding ontkoppelen</a> |
+                        <a href="image_data.php?id={$v.id}" class="edit" style="margin:0">edit data</a>
+					</div>
+                </div>
             </td>
             {if ($k+1)%5==0}</tr><tr>{/if}
         {/foreach}

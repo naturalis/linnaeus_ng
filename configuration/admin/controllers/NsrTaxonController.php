@@ -448,6 +448,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->updateTaxonImageMetaData( $this->requestData );
 			$this->updateTaxonImageTaxonId( $this->requestData );
+			$this->updateTaxonImageOverviewState( $this->requestData );
 			$this->addMessage( 'Meta-data opgeslagen.' );
 		}
 
@@ -1090,7 +1091,7 @@ class NsrTaxonController extends NsrController
 		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image,_meta4.meta_date desc';
+		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image desc,_meta4.meta_date desc';
 
 		$data=$this->models->Taxon->freeQuery("		
 			select
@@ -2352,6 +2353,68 @@ class NsrTaxonController extends NsrController
 		$after['taxon']=$this->getTaxonById( $after['taxon_id'] );
 
 		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('changed taxon of image %s',$before['file_name'])));
+
+	}
+
+	private function updateTaxonImageOverviewState($p)
+	{
+		$media_id=!empty($p['media_id']) ? $p['media_id'] : null;
+		$taxon_id=!empty($p['taxon_id']) ? $p['taxon_id'] : null;
+		$overview_image=!empty($p['overview_image']) &&  $p['overview_image']=='on' ? 1 : 0;
+
+		if ( empty($taxon_id) ) return;
+
+		$before=$this->models->MediaTaxon->_get(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $media_id
+		));
+
+		if ( !empty($media_id) )
+		{
+			$this->models->MediaTaxon->update(
+				array(
+					'overview_image' => '0'
+				), 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon_id,
+					'id' => "!= ".$media_id
+				)
+			);
+			
+			$this->models->MediaTaxon->update(
+				array(
+					'overview_image' => $overview_image
+				), 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon_id,
+					'id' => $media_id
+				)
+			);
+		}
+		else
+		{
+			$this->models->MediaTaxon->update(
+				array(
+					'overview_image' => '0'
+				), 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon_id
+				)
+			);
+		}
+
+		$after=$this->models->MediaTaxon->_get(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $media_id
+		));
+		
+		$before['taxon']=$after['taxon']=$this->getTaxonById( $before['taxon_id'] );
+		
+		
+		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('altered banner status of image %s',$before['file_name'])));
 
 	}
 

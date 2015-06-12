@@ -516,7 +516,7 @@ class SearchControllerNSR extends SearchController
 					and _a.id=_b.media_id
 					and _a.project_id=_b.project_id
 					and _b.sys_label='beeldbankDatumAanmaak'
-					order by meta_date desc
+					order by overview_image desc,meta_date desc
 				limit 1
 			");
 			$d[$key]['overview_image']=$img[0]['file_name'];
