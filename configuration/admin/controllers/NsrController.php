@@ -270,17 +270,21 @@ class NsrController extends Controller
 	public function getConcept($id)
 	{
 		$c=$this->getTaxonById($id);
-		$c['nsr_id']=$this->getNsrId(array('id'=>$c['id'],'item_type'=>'taxon'));
-		$c['parent']=$this->getTaxonById($c['parent_id']);
-
-		$d=$this->models->TrashCan->_get(array('id'=>
-		array(
-			'project_id'=>$this->getCurrentProjectId(),
-			'lng_id'=>$id,
-			'item_type'=>'taxon'
-		)));
-
-		$c['is_deleted']=($d[0]['is_deleted']==1);
+		
+		if ( !empty($c) )
+		{
+			$c['nsr_id']=$this->getNsrId(array('id'=>$c['id'],'item_type'=>'taxon'));
+			$c['parent']=$this->getTaxonById($c['parent_id']);
+	
+			$d=$this->models->TrashCan->_get(array('id'=>
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'lng_id'=>$id,
+				'item_type'=>'taxon'
+			)));
+	
+			$c['is_deleted']=($d[0]['is_deleted']==1);
+		}
 
 		return $c;
 	}		
