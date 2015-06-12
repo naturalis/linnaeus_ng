@@ -85,13 +85,14 @@ class SpeciesControllerNSR extends SpeciesController
 
         if (empty($taxon))
 		{
+			//REFAC2015 --> make this configurable
 			$this->smarty->assign('title','Pagina niet gevonden');
 			$this->smarty->assign('text','De gevraagde pagina kon niet worden gevonden.');
 	        $this->printPage('../shared/404');
 		}
 		else
 		{
-			
+
 			$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
 
 			$sideBarLogos=array();
@@ -105,6 +106,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$classification=$this->getTaxonClassification($taxon['id']);
 
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
+			
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 
 			if ($this->rGetVal('cat')=='external' && $this->rHasVal('source'))
@@ -656,7 +658,13 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonOverviewImage($id)
 	{
-		$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
+		$d=$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1,'overview'=>true));
+		
+		if ( empty($d['data']) )
+		{
+			$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
+		}
+
 		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 

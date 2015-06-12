@@ -27,6 +27,15 @@
 			</td>
 		</tr>
 
+		<tr>
+        	<th title="deze afbeelding wordt altijd voor deze soort groot getoond op de taxon-pagina. als een taxon geen bannerafbeelding heeft, wordt standaard de meest recente afbeelding getoond.">
+        		banner-afbeelding:
+        	</th>
+			<td>
+                <input type="checkbox" name="overview_image"{if $v.overview_image==1} checked="checked"{/if}>
+			</td>
+		</tr>
+
 
         {foreach $image.meta v k}
 	    <tr>
