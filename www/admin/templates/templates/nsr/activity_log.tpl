@@ -9,7 +9,7 @@
 <form method="post" action="activity_log.php">
 <input type="text" value="{$search.search}" name="search" id="search"  style="width:300px;" />
 <input type="submit" value="zoeken" />
-{if $search.search} <a href="activity_log.php">alles tonen</a>{/if}
+{if $search.search} <a style="margin-left:10px" href="activity_log.php">alles tonen</a>{/if}
 </form>
 </p>
 
@@ -54,14 +54,14 @@
 		    {$v.last_change_hr}
 		</td>
     	<td>
-		    <a href="#" onclick="$('.alldata{$k}').toggle();return false;">
+		    <a href="#" class="toggle" onclick="$('.alldata{$k}').toggle();return false;">
             	<span class="alldata{$k}">toon data</span>
-                <span class="alldata{$k}" style="display:none">data verbergen</span>
+                <span class="alldata{$k}" style="display:none">verbergen</span>
 			</a>
 		</td>
     </tr>
     
-    <tr class="alldata{$k}" style="display:none;border-bottomn:1px solid #666">
+    <tr class="alldata{$k}" style="display:none;border-bottom:1px solid #666">
     	<td colspan="4">
         	<table class="inline-table"><tr><td>
 				{menu data1=$v.data_before data2=$v.data_after}

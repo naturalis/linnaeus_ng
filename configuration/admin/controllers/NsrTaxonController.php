@@ -2221,11 +2221,21 @@ class NsrTaxonController extends NsrController
 		
 		if (empty($media_id)) return;
 
+		$image=$this->models->MediaTaxon->_get(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $media_id
+		));
+
 		foreach((array)$p['values'] as $key=>$val)
 		{
 			$ids=explode(",",$key);
 			
 			if ( empty($ids[0]) || empty($ids[1]) ) continue;
+
+			$before=$this->models->MediaMeta->_get(array(
+				'id' => $ids[0],
+				'project_id' => $this->getCurrentProjectId()
+			));
 
 			if (empty($val))
 			{
@@ -2233,6 +2243,7 @@ class NsrTaxonController extends NsrController
 					'id' => $ids[0],
 					'project_id' => $this->getCurrentProjectId()
 				));
+				$after=null;
 			}
 			else
 			{
@@ -2244,9 +2255,22 @@ class NsrTaxonController extends NsrController
 					id = ".$ids[0]." 
 					and project_id = ".$this->getCurrentProjectId()."
 				");
-			}
-		}
 
+				$after=$this->models->MediaMeta->_get(array(
+					'id' => $ids[0],
+					'project_id' => $this->getCurrentProjectId()
+				));
+			}
+			
+			$this->logNsrChange(
+				array(
+					'before'=>$before,
+					'after'=>$after,
+					'note'=>sprintf( (is_null($after) ? 'deleted' : 'changed'). ' meta data %s for image %s',$before['sys_label'],$image['file_name']) 
+					)
+				);
+			
+		}
 
 		foreach((array)$p['new'] as $key=>$val)
 		{
@@ -2278,8 +2302,20 @@ class NsrTaxonController extends NsrController
 				$d['meta_number']=null;
 				$d['meta_data']=$val;
 			}
+
 			$this->models->MediaMeta->save( $d );
 
+			$after=$this->models->MediaMeta->_get(array(
+				'id' => $this->models->MediaMeta->getNewId(),
+				'project_id' => $this->getCurrentProjectId()
+			));
+
+			$this->logNsrChange(
+				array(
+					'after'=>$after,
+					'note'=>sprintf( 'new meta data %s for image %s',$after['sys_label'],$image['file_name']) 
+					)
+				);
 		}
 	}
 
@@ -2290,12 +2326,32 @@ class NsrTaxonController extends NsrController
 		
 		if ( empty($media_id) || empty($taxon_id) ) return;
 
+		// logging = bureaucracy
+		$before=$this->models->MediaTaxon->_get(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $media_id
+		));
+		
+		$before['taxon']=$this->getTaxonById( $before['taxon_id'] );
+
+		// actual work			
 		$this->models->MediaTaxon->update(array(
 			'taxon_id' => $taxon_id
 		), array(
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $media_id
 		));
+		
+		// logging = bureaucracy
+		$after=$this->models->MediaTaxon->_get(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $media_id
+		));
+
+		$after['taxon']=$this->getTaxonById( $after['taxon_id'] );
+
+		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('changed taxon of image %s',$before['file_name'])));
+
 	}
 
 
