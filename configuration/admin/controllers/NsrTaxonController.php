@@ -1090,13 +1090,14 @@ class NsrTaxonController extends NsrController
 		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc';
+		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image,_meta4.meta_date desc';
 
 		$data=$this->models->Taxon->freeQuery("		
 			select
 				SQL_CALC_FOUND_ROWS
 				_m.id,
 				_m.taxon_id,
+				_m.overview_image,
 				file_name as image,
 				file_name as thumb,
 				_k.taxon,

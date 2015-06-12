@@ -2,6 +2,12 @@
 
 <div id="page-main">
 
+<style>
+.overview_image {
+	border:1px solid red;
+}
+</style>
+
 <h2><span style="font-size:12px;font-style:normal">afbeeldingen ({$images.data|@count}):</span> {$concept.taxon}</h2>
 
 <p>
@@ -19,7 +25,7 @@
             {/foreach}
             {/capture}
 
-            <td style="padding-bottom:15px;width:170px">
+            <td style="padding-bottom:15px;width:170px" class="{if $v.overview_image==1}overview_image{/if}">
                 <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_main_image_base_url}{$v.image}" pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>">
                     <img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
                 </a><br />
