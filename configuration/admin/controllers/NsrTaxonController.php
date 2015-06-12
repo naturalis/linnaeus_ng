@@ -2266,7 +2266,7 @@ class NsrTaxonController extends NsrController
 				array(
 					'before'=>$before,
 					'after'=>$after,
-					'note'=>sprintf( (is_null($after) ? 'deleted' : 'changed'). ' meta data %s for image %s',$before['sys_label'],$image['file_name']) 
+					'note'=>sprintf( (is_null($after) ? 'deleted' : 'changed'). ' metadata %s for image %s',$before['sys_label'],$image['file_name']) 
 					)
 				);
 			
@@ -2313,7 +2313,7 @@ class NsrTaxonController extends NsrController
 			$this->logNsrChange(
 				array(
 					'after'=>$after,
-					'note'=>sprintf( 'new meta data %s for image %s',$after['sys_label'],$image['file_name']) 
+					'note'=>sprintf( 'new metadata %s for image %s',$after['sys_label'],$image['file_name']) 
 					)
 				);
 		}
