@@ -17,22 +17,32 @@
 
 	{if $mediaOwn.count>0 && $mediaCollected.species>0}
 
-	<div style="width:510px;margin-bottom:25px;text-align:center;font-family:Georgia;">
+	<div style="width:510px;margin-bottom:10px;text-align:center;font-family:Georgia;">
         <div class="{if $requestData.media=='collected'}media-not-active{else}media-active{/if}">
 	        {if $requestData.media=='collected'}
-            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">Afbeeldingen bij soort/taxon</a>
-			{else}Afbeeldingen bij soort/taxon{/if}
+            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
+                	Afbeeldingen bij soort/taxon ({$mediaOwn.count})
+				</a>
+			{else}
+            	Afbeeldingen bij soort/taxon ({$mediaOwn.count})
+			{/if}
         </div>
         <div class="{if $requestData.media=='collected'}media-active{else}media-not-active{/if}">
 	        {if $requestData.media!='collected'}
-            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">Soorten/taxa met afbeelding(en)</a>
-			{else}Soorten/taxa met afbeelding(en){/if}
+            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
+                	Soorten/taxa met afbeelding(en) ({$mediaCollected.species})
+				</a>
+			{else}
+            	Soorten/taxa met afbeelding(en) ({$mediaCollected.species}){/if}
         </div>
     </div>
     
     {/if}
 
     <div style="width:100%">
+
+		{if !($mediaOwn.count>0 && $mediaCollected.species>0)}
+
 		{if $mediaOwn.count>0 && $requestData.media!='collected'}
         <h4>
             Totaal aantal afbeeldingen: <span class="total-image-count"></span>
@@ -41,6 +51,8 @@
         <h4>
 			Soorten/taxa met afbeelding(en): {$mediaCollected.species}
         </h4>
+        {/if}
+        
         {/if}
         
         <div id="images-container">
