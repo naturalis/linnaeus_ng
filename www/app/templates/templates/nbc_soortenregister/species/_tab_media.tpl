@@ -20,13 +20,13 @@
 	<div style="width:510px;margin-bottom:25px;text-align:center;font-family:Georgia;">
         <div class="{if $requestData.media=='collected'}media-not-active{else}media-active{/if}">
 	        {if $requestData.media=='collected'}
-            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">Foto's</a>
-			{else}Foto's{/if}
+            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">Afbeeldingen bij soort/taxon</a>
+			{else}Afbeeldingen bij soort/taxon{/if}
         </div>
         <div class="{if $requestData.media=='collected'}media-active{else}media-not-active{/if}">
 	        {if $requestData.media!='collected'}
-            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">Foto's van onderliggende soorten/taxa</a>
-			{else}Foto's van onderliggende soorten/taxa{/if}
+            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">Soorten/taxa met afbeelding(en)</a>
+			{else}Soorten/taxa met afbeelding(en){/if}
         </div>
     </div>
     
