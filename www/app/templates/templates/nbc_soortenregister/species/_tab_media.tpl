@@ -1,10 +1,43 @@
 <div>
+
+<style>
+.media-active, .media-not-active {
+	width:50%;
+	border-top:4px solid #666;
+	padding-top:5px;
+	font-weight:bold;
+}
+.media-not-active {
+	border-top:1px solid #999;
+	padding-top:8px;
+	color:#666;
+	font-weight:normal;
+}
+</style>
+
+	{if $mediaOwn.count>0 && $mediaCollected.species>0}
+
+	<div style="width:510px;margin-bottom:25px;text-align:center;font-family:Georgia;">
+        <div class="{if $requestData.media=='collected'}media-not-active{else}media-active{/if}">
+	        {if $requestData.media=='collected'}
+            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">Foto's</a>
+			{else}Foto's{/if}
+        </div>
+        <div class="{if $requestData.media=='collected'}media-active{else}media-not-active{/if}">
+	        {if $requestData.media!='collected'}
+            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">Foto's van onderliggende soorten/taxa</a>
+			{else}Foto's van onderliggende soorten/taxa{/if}
+        </div>
+    </div>
+    
+    {/if}
+
     <div style="width:100%">
-		{if $mediaOwn.count>0}
+		{if $mediaOwn.count>0 && $requestData.media!='collected'}
         <h4>
             Totaal aantal afbeeldingen: <span class="total-image-count"></span>
         </h4>
-        {elseif $mediaCollected.species>0}
+        {elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
         <h4>
 			Soorten/taxa met afbeelding(en): {$mediaCollected.species}
         </h4>
@@ -13,16 +46,21 @@
         <div id="images-container">
         </div>
         
-        <input id="more-images-button" type="button" value="Meer afbeeldingen"  style="font-size:0.9em;width:100%;margin-top:10px;display:none;" />
+        <input 
+        	id="more-images-button" 
+            type="button" 
+            value="{t}Meer afbeeldingen{/t}"
+            style="font-size:0.9em;width:100%;margin-top:10px;display:none;"
+		/>
     </div>
 </div>
 
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if $mediaOwn.count>0}
+	{if $mediaOwn.count>0 && $requestData.media!='collected'}
 	var action='get_media_batch';
-	{elseif $mediaCollected.species>0}
+	{elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
 	var action='get_collected_batch';
 	{/if}
 	var page=0;
