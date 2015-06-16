@@ -1,7 +1,7 @@
 <?php
 
-	include_once("../../configuration/admin/constants.php");
-	include_once("../../configuration/admin/configuration.php");
+	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
+	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
 	
 	class taxonParentageUpdater
 	{
