@@ -220,6 +220,8 @@ $includeNames=true;
 $includeImages=true;
 $includeClassification=true;
 
+			die( "ADD IS_DELETED=0 TO QUERY!" );
+
 			$taxa=$this->models->Taxon->freeQuery("
 				select
 					_t.taxon as name,
