@@ -361,16 +361,16 @@ class ActorsController extends Controller
 	
     private function getActorLinks( $p )
     {
-        $id=isset($p['id']) ? $p['id'] : null;
+        $id = isset($p['id']) ? $p['id'] : null;
         $name = isset($p['name']) ? $p['name'] : null;
-        $name_alt=isset($p['name_alt']) ? $p['name_alt'] : null;
+        $name_alt = isset($p['name_alt']) ? $p['name_alt'] : null;
 		
 		if ( empty($id) && empty($name) && empty($name_alt) )
 		{
 			$id=$this->getActorId();
 		}
 
-		if (empty($id))
+		if ( empty($id) )
 			return;
 
 		// NAMES
@@ -490,19 +490,19 @@ class ActorsController extends Controller
 				where
 					_a.project_id = ".$this->getCurrentProjectId()."
 					and (
-						_a.actor_id =".$id." or 
-						_b.author like '%". mysql_real_escape_string($name) ."%' or
-						_b.author like '%". mysql_real_escape_string($name_alt) ."%' 
+						_a.actor_id =".$id."
+						".( !empty($name) ? "or _b.author like '%". mysql_real_escape_string($name) ."%'" : "" )."
+						".( !empty($name_alt) ? "or _b.author like '%". mysql_real_escape_string($name_alt) ."%'" : "" )." 
 					)
 			");	
 			
-		return array(
-			'names' => $names,
-			'presences'=>$presences,
-			'passports'=>$passports,
-			'literature'=>$literature,
-		);
-	
+		return
+			array(
+				'names' => $names,
+				'presences'=>$presences,
+				'passports'=>$passports,
+				'literature'=>$literature,
+			);
 	}
 	
 }
