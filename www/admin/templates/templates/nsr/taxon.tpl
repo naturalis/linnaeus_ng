@@ -212,12 +212,8 @@
     <br />
     <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">taxon markeren als verwijderd</a>
 	{/if}
-
-	{if $smarty.session.admin.user.superuser==1}
     <br />
     <a href="taxon_edit_concept_direct.php?id={$concept.id}" class="edit" style="margin:0">naam taxon concept direct aanpassen</a>
-    {/if}
-
 
     {assign var=k value=0}
     {foreach $traitgroups v}{if $v.taxon_count==0}

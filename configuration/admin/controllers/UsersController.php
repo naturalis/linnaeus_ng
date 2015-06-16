@@ -208,7 +208,7 @@ class UsersController extends Controller
 
         if ($this->rHasVal('action','create') && !$this->isFormResubmit()) {
 
-			$this->requestData = $this->sanatizeUserData($this->requestData);
+			$this->requestData = $this->sanitizeUserData($this->requestData);
 			
 			if (
 				$this->isUserDataComplete($this->requestData) &&
@@ -596,7 +596,7 @@ class UsersController extends Controller
 	
 			if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
 	
-				$this->requestData = $this->sanatizeUserData($this->requestData);
+				$this->requestData = $this->sanitizeUserData($this->requestData);
 				
 				$passwordsUnchanged = empty($this->requestData['password']) && empty($this->requestData['password_2']);
 	
@@ -2187,7 +2187,7 @@ MUST CHECK
 	}
 
 
-	private function sanatizeUserData($data)
+	private function sanitizeUserData($data)
     {
 
         if (isset($data['email_address'])) {
