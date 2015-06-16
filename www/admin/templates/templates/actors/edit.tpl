@@ -54,7 +54,7 @@
 <p>
 <div>
 	<b>Koppelingen</b><br />
-	{if $links.presences|@count==0 && $links.names|@count==0 && $links.passports|@count==0}
+	{if $links.presences|@count==0 && $links.names|@count==0 && $links.passports|@count==0 && $links.literature|@count==0}
 	(geen koppelingen)
 	{/if}
 	{if $links.names|@count > 0}
