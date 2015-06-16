@@ -353,7 +353,6 @@ class NsrTaxonController extends NsrController
 
     }
 
-
     public function taxonEditConceptDirectAction()
     {
 		$this->checkAuthorisation();
@@ -378,7 +377,9 @@ class NsrTaxonController extends NsrController
 
 		$concept=$this->getConcept($this->getConceptId());
 		$this->smarty->assign('concept',$concept);
-		$this->smarty->assign('validname',$this->getName(array('taxon_id'=>$this->rGetId(),'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])));
+		$this->smarty->assign('validname',
+			$this->getName(array('taxon_id'=>$this->rGetId(),'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']))
+		);
 		$this->printPage();
 	}
 

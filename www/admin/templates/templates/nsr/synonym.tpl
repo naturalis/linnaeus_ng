@@ -83,13 +83,6 @@
 		</select> *
 	</td></tr>
 
-	{*<tr>
-		<th>nsr id:</th>
-		<td>
-			{$name.nsr_id}
-		</td>
-	</tr>*}
-
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>literatuur:</th><td>
     	<span id="name_reference">
@@ -151,9 +144,7 @@ Let op: wijzig om het genus te veranderen de taxonomische ouder van het concept.
 
 <div class="page-generic-div">
 
-	{if $smarty.session.admin.user.superuser==1 && $name.type_id==$validnameid}
     <a href="taxon_edit_synonym_direct.php?id={$name.id}" class="edit" style="margin:0">naam synoniem direct aanpassen</a>
-    {/if}
 
     <p>
         <a href="taxon.php?id={$concept.id}">terug</a>
