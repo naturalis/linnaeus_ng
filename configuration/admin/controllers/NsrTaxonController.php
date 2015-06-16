@@ -359,7 +359,7 @@ class NsrTaxonController extends NsrController
 
 		if ( !$this->rHasId() ) $this->redirect('taxon_new.php');
 
-        $this->setPageName( $this->translate('Bewerk naam concept') );
+        $this->setPageName( $this->translate('Naam concept direct aanpassen') );
 		$this->setConceptId( $this->rGetId() );
 		
 		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
@@ -389,7 +389,7 @@ class NsrTaxonController extends NsrController
 
 		if ( !$this->rHasId() ) $this->redirect('synonym.php');
 
-        $this->setPageName( $this->translate('Bewerk geldige naam') );
+        $this->setPageName( $this->translate('Geldige naam direct aanpassen') );
 
 		$this->setNameId( $this->rGetId() );
 		$name=$this->getName(array('id'=>$this->getNameId()));
