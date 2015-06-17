@@ -1101,8 +1101,6 @@ class SpeciesControllerNSR extends SpeciesController
 			'query'=>"
 				select
 					count(_sq.taxon_id) as total,
-					_sq.taxon_id,
-					_sp.presence_id,
 					ifnull(_sr.established,'undefined') as established
 				from 
 					%PRE%taxon_quick_parentage _sq
@@ -1119,15 +1117,15 @@ class SpeciesControllerNSR extends SpeciesController
 					on _sq.taxon_id = _e.id
 					and _sq.project_id = _e.project_id
 
+				left join %PRE%projects_ranks _f
+					on _e.rank_id=_f.id
+					and _e.project_id = _f.project_id
+				
 				left join %PRE%trash_can _trash
 					on _e.project_id = _trash.project_id
 					and _e.id =  _trash.lng_id
 					and _trash.item_type='taxon'
 
-				left join %PRE%projects_ranks _f
-					on _e.rank_id=_f.id
-					and _e.project_id = _f.project_id
-				
 				where
 					_sq.project_id=".$this->getCurrentProjectId()."
 					and MATCH(_sq.parentage) AGAINST ('".$id."' in boolean mode)
