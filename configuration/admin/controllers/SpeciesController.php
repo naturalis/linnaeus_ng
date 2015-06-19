@@ -770,7 +770,7 @@ class SpeciesController extends Controller
         }
         else
 		{
-			
+
 			// REFAC2015 why are these here??
 			$this->newGetTaxonTree();
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
@@ -870,9 +870,9 @@ class SpeciesController extends Controller
 			$this->addError($this->translate('Rank cannot be hybrid.'));
 			$hasErrorButCanSave = false;
 		}
-		
-		
-		
+
+
+
 
                 // save as requested
                 if (is_null($hasErrorButCanSave) || $this->rHasVal('override', '1'))
@@ -2751,31 +2751,31 @@ class SpeciesController extends Controller
 		{
 
 			$this->tmp=array();
-	
+
 			$this->getProgeny($parentlesstaxon['id'],0,array());
-	
+
 			$d=array('project_id' => $this->getCurrentProjectId());
-	
+
 			if (!is_null($id)) $d['taxon_id']=$id;
-	
+
 			$this->models->TaxonQuickParentage->delete($d);
-	
+
 			$i=0;
 			foreach((array)$this->tmp as $key=>$val)
 			{
-	
+
 				if (!is_null($id) && $val['id']!=$id)
 					continue;
-	
+
 				$this->models->TaxonQuickParentage->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $val['id'],
 					'parentage' => implode(' ',$val['parentage'])
-	
+
 				));
-	
+
 				$i++;
 			}
 
@@ -4643,7 +4643,7 @@ class SpeciesController extends Controller
             'forceLookup' => true
         ));
 
-		$pr = array_reverse($pr);
+		$pr = !empty($pr) ? array_reverse($pr) : array();
 
 		foreach((array)$pr as $key => $val) {
 
@@ -4771,7 +4771,7 @@ class SpeciesController extends Controller
 			unset($taxa[$key]['taxon']);
 			unset($taxa[$key]['source']);
 		}
-		
+
 		return
 			$this->makeLookupList(array(
 				'data'=>$taxa,

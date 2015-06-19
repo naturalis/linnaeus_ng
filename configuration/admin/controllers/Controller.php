@@ -25,7 +25,7 @@ class Controller extends BaseClass
     public $errors=array();
     public $messages=array();
 	public $warnings=array();
-	
+
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
     public $pageName;
@@ -331,7 +331,7 @@ class Controller extends BaseClass
     public function addMessage ($d)
     {
 		if (empty($d)) return;
-		
+
 		if (is_array($d))
 			$this->messages=array_merge($this->messages,$d);
 		else
@@ -347,7 +347,7 @@ class Controller extends BaseClass
     public function addWarning($d)
     {
 		if (empty($d)) return;
-		
+
 		if (is_array($d))
 			$this->warnings=array_merge($this->warnings,$d);
 		else
@@ -1624,7 +1624,7 @@ class Controller extends BaseClass
 		$sortData=isset($p['sortData']) ? $p['sortData'] : false;
 		$encode=isset($p['encode']) ? $p['encode'] : true;
 		$isFullSet=isset($p['isFullSet']) ? $p['isFullSet'] : true;
-		
+
         if ($sortData)
 		{
 			$sortBy = array(
@@ -1688,7 +1688,7 @@ class Controller extends BaseClass
 		$pr = $this->models->ProjectRank->freeQuery(
 			array(
 				"query"=>"
-					select 
+					select
 						_p.id,
 						_p.project_id,
 						_p.rank_id,
@@ -1700,7 +1700,7 @@ class Controller extends BaseClass
 						_r.can_hybrid,
 						_pr.id as ideal_parent_id,
 						replace(ifnull(_q.label,_r.rank),'_',' ') as label
-					from 
+					from
 						%PRE%projects_ranks _p
 
 					left join %PRE%ranks _r
@@ -1715,20 +1715,20 @@ class Controller extends BaseClass
 						and _p.project_id = _q.project_id
 						and _q.language_id=".$this->getDefaultProjectLanguage()."
 
-					where 
+					where
 						_p.project_id = ".$pId."
 						order by _p.rank_id
 					",
 				"fieldAsIndex"=>"id"
 			)
 		);
-		
+
 		if ($includeLanguageLabels)
 		{
 
 			foreach ((array) $pr as $rankkey => $rank)
 			{
-	
+
 				foreach ((array) $this->getProjectLanguages() as $langaugekey => $language)
 				{
 
@@ -2865,9 +2865,9 @@ class Controller extends BaseClass
 		{
 
             $msg=
-				sprintf(($_SESSION['admin']['user']['logins'] <= 1 ? 
-					$this->translate('Welcome, %s.') : 
-					$this->translate('Welcome back, %s.')), 
+				sprintf(($_SESSION['admin']['user']['logins'] <= 1 ?
+					$this->translate('Welcome, %s.') :
+					$this->translate('Welcome back, %s.')),
 				$_SESSION['admin']['user']['first_name'] . ' ' . $_SESSION['admin']['user']['last_name']);
 
             $this->smarty->assign('welcomeMessage', $msg);
