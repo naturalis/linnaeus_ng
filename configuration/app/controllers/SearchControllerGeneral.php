@@ -40,11 +40,11 @@
 					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 				)
 			);
-	
+
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 				currently bypassed, because use of LIKE rather than MATCH
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
-				implements <span class="search-match"> around hits			
+				implements <span class="search-match"> around hits
 			$content = $this->sortResultsByMostTokensFound($content);
 
 
@@ -53,7 +53,7 @@
 			$r=array();
 			foreach((array)$c as $v)
 				$r[] = str_replace(self::S_LIKETEXT_REPLACEMENT,$v,$s);
-	
+
 			return '('.implode(' or ',$r).')';
 		}
 
@@ -62,14 +62,14 @@
 
 	STRIP TAGS AND SHIT FROM SEARCH STRING!!! (also + and - and * which fuck up the fulltext)
 
-	search is case-insensitive! 
-	the php post-filtering is designed to allow for case-sensitivity, but it is not actually implemented. 
-	as the full text search is insensitive by default (unless we start altering the collation of the indexed 
+	search is case-insensitive!
+	the php post-filtering is designed to allow for case-sensitivity, but it is not actually implemented.
+	as the full text search is insensitive by default (unless we start altering the collation of the indexed
 	columns), searches that have no literal bits ("...") will be harder to turn into case sensitive ones.
 	(eh?)
 
 	W E   W I L L   N O T   S E A R C H   T H E   M A T R I X !
-	
+
 
 */
 
@@ -89,9 +89,9 @@ class SearchControllerGeneral extends SearchController
 
 	public $usedModels = array(
 		'content',
-        'content_taxon', 
-        'page_taxon', 
-        'page_taxon_title', 
+        'content_taxon',
+        'page_taxon',
+        'page_taxon_title',
         'media_taxon',
         'media_descriptions_taxon',
 		'synonym',
@@ -165,7 +165,7 @@ class SearchControllerGeneral extends SearchController
 
 		$this->_searchResultSort=
 			$this->getSetting('app_search_result_sort','alpha');
-			
+
 		$this->createMySQLfunction_fnStripTags();
 	}
 
@@ -190,7 +190,7 @@ class SearchControllerGeneral extends SearchController
 
 			if ($this->validateSearchString($this->requestData['search']))
 			{
-				
+
 				if ($this->rHasVal('extended','1'))
 				{
 					$results =
@@ -203,7 +203,7 @@ class SearchControllerGeneral extends SearchController
 							)
 						);
 
-				} 
+				}
 				else
 				{
 					$search='"'.trim($this->requestData['search'],'"').'"';
@@ -223,8 +223,8 @@ class SearchControllerGeneral extends SearchController
 				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
 				$this->smarty->assign('results',$results);
 
-			} 
-			else 
+			}
+			else
 			{
 				$this->addError(
 					sprintf(
@@ -246,20 +246,20 @@ class SearchControllerGeneral extends SearchController
 				'C_SPECIES_MEDIA'=>self::C_SPECIES_MEDIA,
 			)
 		);
-	
+
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore'=>MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 		$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
 
         $this->printPage();
-  
+
     }
 
 	private function tokenizeSearchString($s)
 	{
 		/*
 			splits search string in groups delimited by ". if there's an uneven number of ", the last one is ignored.
-		*/	
+		*/
 		$parts = preg_split('/('.$this->_searchStringGroupDelimiter.')/i',$s,-1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 		$b = null;    // buffer
@@ -292,11 +292,11 @@ class SearchControllerGeneral extends SearchController
 		}
 		// take out the empty ones and return
 		$t=array_filter($t);
-	
+
 		return $t;
 
 	}
-	
+
 	private function prefabFullTextMatchString($s)
 	{
 		// make tokens into a single string for mysql MATCH statement; add *'s to enable partial matches
@@ -311,7 +311,7 @@ class SearchControllerGeneral extends SearchController
 	private function prefabFullTextLikeString($s)
 	{
 		array_walk($s,function(&$n){$n=str_replace(array("'","%","_"),array("\'","\%","\_"),$n);});
-		
+
 		// make tokens into a single string for mysql LIKE statement; add ### to replace with column name
 		$r = "(".self::S_LIKETEXT_REPLACEMENT." like '%".implode("%' or ".self::S_LIKETEXT_REPLACEMENT." like '%",$s)."%')";
 
@@ -340,43 +340,43 @@ class SearchControllerGeneral extends SearchController
 		foreach((array)$p[1] as $key => $val) {
 			if (isset($p[1][$key][self::__CONCAT_RESULT__])) unset($p[1][$key][self::__CONCAT_RESULT__]);
 		}
-		return $p[1];		
+		return $p[1];
 		//OVERRIDE
 
-		
+
 		/*
 			$p[0] : array of search parameters:
 				$s[self::S_TOKENIZED_TERMS]	: array of tokens
 				$s[self::S_FULLTEXT_STRING]	: string for fulltext search (not used in this function)
 				$s[self::S_CONTAINS_LITERALS]	: boolean, indicates the presence of literal token(s) ("aa bb")
 			$p[1] : array of results
-			$p[2] : array of fields to check (optional; defaults to array('label','content'))			
+			$p[2] : array of fields to check (optional; defaults to array('label','content'))
 		*/
-	
+
 		$s = isset($p[0]) ? $p[0] : null;
 		$r = isset($p[1]) ? $p[1] : null;
 
 		if (!isset($s) || !isset($s[self::S_CONTAINS_LITERALS]) || !isset($s[self::S_TOKENIZED_TERMS]) ||$s[self::S_CONTAINS_LITERALS]==false) return $r;
-		
+
 		// really shouldn't happen but just in case i should forget to add the self::__CONCAT_RESULT__ field in the query
 		if (isset($r[0][self::__CONCAT_RESULT__]))
 			$concatField = self::__CONCAT_RESULT__;
 		else
 			$concatField = 'content';
-			
+
 
 		if ($s[self::S_CONTAINS_LITERALS]) {
-			
+
 			$filtered = array();
 
 			// loop all results
 			foreach((array)$r as $key => $result) {
 
 				if (!isset($result[$concatField])) continue;
-			
+
 
 				$d = $this->stripTagsForSearchExcerpt($result[$concatField]);
-				
+
 				$match = false;
 
 				// loop through all tokens
@@ -388,7 +388,7 @@ class SearchControllerGeneral extends SearchController
 					$match = $s[self::S_IS_CASE_SENSITIVE] ? strpos($d,$token)!==false : stripos($d,$token)!==false;
 
 				}
-				
+
 				if ($match) {
 					if ($concatField== self::__CONCAT_RESULT__)
 						unset($result[self::__CONCAT_RESULT__]);
@@ -398,11 +398,11 @@ class SearchControllerGeneral extends SearchController
 				}
 
 			}
-			
+
 			return $filtered;
 
 		}
-		
+
 		// just in case
 		return $r;
 
@@ -450,9 +450,9 @@ class SearchControllerGeneral extends SearchController
 								}
 							}
 						}
-						
+
 						unset($matches);
-					
+
 					}
 
 					foreach((array)$fullmatches as $match) {
@@ -460,7 +460,7 @@ class SearchControllerGeneral extends SearchController
 						if (in_array($field,$x)) {
 
 							$start = ($match[1] < $this->_excerptPreMatchLength ? 0 : ($match[1] - $this->_excerptPreMatchLength));
-							$r[$rKey]['matches'][]= 
+							$r[$rKey]['matches'][]=
 								($start>0 ? $this->_excerptPrePostMatchString : '').
 								substr($stripped,$start,($match[1]-$start)).
 								'<span class="search-match">'.$match[0].'</span>'.
@@ -468,8 +468,8 @@ class SearchControllerGeneral extends SearchController
 								($match[1]+strlen($match[0])+$this->_excerptPostMatchLength<strlen($stripped) ? $this->_excerptPrePostMatchString : '');
 
 						} else {
-							
-							$r[$rKey]['matches'][]= 
+
+							$r[$rKey]['matches'][]=
 								substr($stripped,0,$match[1]).
 								'<span class="search-match">'.$match[0].'</span>'.
 								substr($stripped,$match[1]+strlen($match[0]));
@@ -480,9 +480,9 @@ class SearchControllerGeneral extends SearchController
 
 					if ($s[self::S_UNSET_ORIGINAL_CONTENT] && in_array($field,$x))
 						unset($r[$rKey][$field]);
-				
+
 				}
-			
+
 			}
 
 		}
@@ -517,7 +517,7 @@ class SearchControllerGeneral extends SearchController
 				$aCount=count((array)$a['matches']);
 				$bCount=count((array)$b['matches']);
 			}
-			
+
 			$r=0;
 			if ($aCount>$bCount)
 				$r=-1;
@@ -535,11 +535,11 @@ class SearchControllerGeneral extends SearchController
 			}
 			return $r;
 		});
-		
+
 		return $data;
 
 	}
-	
+
 	private function makeLikeClause($s,$c)
 	{
 		// creates like-clause  ((taxon like '%phyllum a%' or taxon like '%orchid%'))
@@ -574,7 +574,7 @@ class SearchControllerGeneral extends SearchController
 			return null;
 
 		$searchAll=($modules=='*');
-		
+
 		$tokenized = $this->tokenizeSearchString($search);
 		//$fulltext = $this->prefabFullTextMatchString($tokenized);
 		$liketxt = $this->prefabFullTextLikeString($tokenized);
@@ -590,7 +590,7 @@ class SearchControllerGeneral extends SearchController
 			self::S_UNSET_ORIGINAL_CONTENT => true, // if true, unsets the potentially large content fields after they've been excerpted
 			self::S_EXTENDED_SEARCH => $extended
 		);
-		
+
 		if (isset($restrict))
 			$p['restrict']=$restrict;
 
@@ -600,34 +600,34 @@ class SearchControllerGeneral extends SearchController
 					($searchAll || (is_array($modules) && in_array('introduction',$modules)) ? $this->searchIntroduction($p) : null),
 				'glossary' =>
 					($searchAll || (is_array($modules) && in_array('glossary',$modules)) ? $this->searchGlossary($p) : null),
-				'literature' => 
+				'literature' =>
 					($searchAll || (is_array($modules) && in_array('literature',$modules)) ? $this->searchLiterature($p) : null),
-				'species' => 
+				'species' =>
 					($searchAll || (is_array($modules) && in_array('species',$modules)) ? $this->searchSpecies($p) : null),
-				'dichkey' => 
+				'dichkey' =>
 					($searchAll || (is_array($modules) && in_array('key',$modules)) ? $this->searchDichotomousKey($p) : null),
-				'matrixkey' => 
+				'matrixkey' =>
 					($searchAll || (is_array($modules) && in_array('matrixkey',$modules)) ? $this->searchMatrixKey($p) : null), // stub
-				'map' => 
+				'map' =>
 					($searchAll || (is_array($modules) && in_array('mapkey',$modules)) ? $this->searchMap($p) : null),
-				'content' => 
+				'content' =>
 					($searchAll || (is_array($modules) && in_array('content',$modules)) ? $this->searchContent($p) : null),
 			);
-	
+
 		$d=$this->searchModules($p,$freeModules);
 		$results=array_merge($results,(array)$d);
 
 		$totalcount=0;
-		
+
 		foreach((array)$results as $val)
 			$totalcount += $val['numOfResults'];
-		
+
 		return array('data'=>$results,'count'=>$totalcount);
 	}
 
 	private function searchSpecies($p)
 	{
-	
+
 		// taxa
 		$taxa = $this->models->Taxon->_get(
 			array(
@@ -682,32 +682,32 @@ class SearchControllerGeneral extends SearchController
 					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 				)
 			);
-			
+
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 			// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
 			// actual ordering by taxon name lower below (usort)
 			//$content = $this->sortResultsByMostTokensFound($content);
 
-			$pagenames=array();			
+			$pagenames=array();
 			foreach((array)$content as $key=>$val)
 			{
 				$t=$this->getTaxonById($val['taxon_id']);
                 $ct = $this->models->PageTaxonTitle->_get(
                 array(
                     'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->getCurrentLanguageId(), 
-                        'taxon_id' => $val['taxon_id'], 
+                        'project_id' => $this->getCurrentProjectId(),
+                        'language_id' => $this->getCurrentLanguageId(),
+                        'taxon_id' => $val['taxon_id'],
                         'page_id' => $val['cat']
-                    ), 
+                    ),
                     'columns' => 'title'
-                ));				
+                ));
 				$content[$key]['label']=$t['taxon'].' ('.strtolower($ct[0]['title']).')';
 			}
-			
+
 		}
-		
+
 		if ( !empty($content) )
 			usort( $content, function($a,$b){ return $a['label']>$b['label'];  });
 
@@ -745,16 +745,16 @@ class SearchControllerGeneral extends SearchController
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
 				'order'=>'commonname,transliteration'
 			)
-		);	
+		);
 
 		$commonnames = $this->filterResultsWithTokenizedSearch(array($p,$commonnames,array('commonname','transliteration')));
 
 		foreach((array)$commonnames as $key => $val) {
-			
-			$commonnames[$key]['label'] = 
+
+			$commonnames[$key]['label'] =
 				(!empty($val['transliteration']) ?
 					($val['transliteration']).
-					(!empty($val['commonname']) ? 
+					(!empty($val['commonname']) ?
 						' '.sprintf($this->translate('(transliteration of "%s")'),$val['commonname']) :
 						'') :
 					$val['commonname']
@@ -769,7 +769,7 @@ class SearchControllerGeneral extends SearchController
 		// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
 		//$commonnames = $this->sortResultsByMostTokensFound($commonnames);
 
-		
+
 
 		if ($this->models->Names->getTableExists())
 		{
@@ -781,8 +781,8 @@ class SearchControllerGeneral extends SearchController
 					'columns' => 'nametype,id',
 					'fieldAsIndex' => 'id'
 				)
-			);	
-			
+			);
+
 			$names = $this->models->Names->_get(
 				array(
 					'id' => array(
@@ -793,25 +793,25 @@ class SearchControllerGeneral extends SearchController
 					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT],
 					'order'=>'name'
 				)
-			);	
-	
+			);
+
 			$names = $this->filterResultsWithTokenizedSearch(array($p,$names,array('name')));
-	
+
 			foreach((array)$names as $key => $val) {
 				$names[$key]['label'] = $val['name'];
 				$names[$key]['predicate'] = $nameTypes[$val['type_id']]['nametype'];
 				if ($names[$key]['predicate']!=PREDICATE_VALID_NAME)
 					$names[$key]['subject'] = $this->getTaxonById($val['taxon_id']);
-					
+
 			}
-	
+
 			$names = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$names,'fields'=>array('name'),'excerpt'=>false));
 			// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
 			//	$names = $this->sortResultsByMostTokensFound($names);
-	
+
 		}
 
-		
+
 		if ($p[self::S_EXTENDED_SEARCH])
 		{
 			// media
@@ -831,7 +831,7 @@ class SearchControllerGeneral extends SearchController
 			$media = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$media));
 			// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
 			$media = $this->sortResultsByMostTokensFound($media);
-	
+
 			$d = $this->models->MediaTaxon->_get(
 				array(
 					'id' => array(
@@ -841,15 +841,15 @@ class SearchControllerGeneral extends SearchController
 					'fieldAsIndex' => 'id'
 				)
 			);
-	
+
 			foreach((array)$media as $key => $val)
 			{
-				$media[$key]['taxon_id'] = $d[$val['media_id']]['taxon_id'];
+				$media[$key]['id'] = $d[$val['media_id']]['taxon_id'];
 				$media[$key]['label'] = $d[$val['media_id']]['file_name'];
 			}
-			
+
 		}
-		
+
 		$results=array();
 		$numOfResults=0;
 
@@ -935,7 +935,7 @@ class SearchControllerGeneral extends SearchController
 			$numOfResults+=count((array)$media);
 
 		}
-	
+
 		foreach((array)$results as $rKey => $rVal) {
 			foreach((array)$rVal['data'] as $dKey => $dVal) {
 				if (!isset($dVal['predicate']) || $dVal['predicate']!=PREDICATE_PREFERRED_NAME) {
@@ -945,7 +945,7 @@ class SearchControllerGeneral extends SearchController
 			}
 		}
 
-		return 
+		return
 			array(
 				'label'=> $this->getModuleName(MODCODE_SPECIES),
 				'results'=>$results,
@@ -960,7 +960,7 @@ class SearchControllerGeneral extends SearchController
 		$content = $this->models->ContentIntroduction->_get(
 			array(
 				'id' => array(
-					
+
 					'project_id' => $this->getCurrentProjectId(),
 					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','fnStripTags(content)')),
@@ -969,7 +969,7 @@ class SearchControllerGeneral extends SearchController
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 			)
 		);
-		
+
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 		$content = $this->sortResultsByMostTokensFound($content);
@@ -988,10 +988,10 @@ class SearchControllerGeneral extends SearchController
 		);
 
 	}
-	
+
 	private function searchGlossary($p)
 	{
-		
+
 		// glossary items
 		$gloss = $this->models->Glossary->_get(
 			array(
@@ -1041,7 +1041,7 @@ class SearchControllerGeneral extends SearchController
 			$synonym[$key]['id']=$val['glossary_id'];
 			unset($synonym[$key]['glossary_id']);
 		}
-		
+
 		return array(
 			'label'=> $this->getModuleName(MODCODE_GLOSSARY),
 			'results' => array(
@@ -1118,7 +1118,7 @@ class SearchControllerGeneral extends SearchController
 		// literature by year (numbers, cannot be full text indexed)
 		$more = $this->models->Literature->_get(
 			array(
-				'where' => 
+				'where' =>
 					"project_id = ".$this->getCurrentProjectId()."
 					and (year like '%".implode("%' or year like '%",$p[self::S_TOKENIZED_TERMS])."%')",
 				'columns' => $c,
@@ -1209,7 +1209,7 @@ class SearchControllerGeneral extends SearchController
 				'columns' => 'keystep_id as id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__
 			)
 		);
-		
+
 		foreach((array)$steps as $key => $val)
 		{
 			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['id']]['number']);
@@ -1335,7 +1335,7 @@ class SearchControllerGeneral extends SearchController
 				'id' => $d,
 				'columns' => 'page_id as id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__,
 				'order' => 'module_id',
-				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]				
+				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 			)
 		);
 
@@ -1360,10 +1360,10 @@ class SearchControllerGeneral extends SearchController
 
 	private function searchModules($p,$fMod=null)
 	{
-	
+
 		if (is_null($fMod))
 			return null;
-			
+
 		$r=array();
 
 		if ($fMod=='*') {
@@ -1373,7 +1373,7 @@ class SearchControllerGeneral extends SearchController
 				$fMod[]=$val['id'];
 			}
 		}
-		
+
 		foreach((array)$fMod as $mod) {
 			$m=$this->models->FreeModuleProject->_get(
 				array(
@@ -1392,7 +1392,7 @@ class SearchControllerGeneral extends SearchController
 		}
 
 		return $r;
-	
+
 	}
 
     public function ajaxInterfaceAction ()
@@ -1414,18 +1414,18 @@ class SearchControllerGeneral extends SearchController
         }
 
 		$this->allowEditPageOverlay = false;
-		
+
         $this->printPage();
-    
+
     }
 
 	private function createMySQLfunction_fnStripTags()
 	{
 		$this->models->Taxon->freeQuery("DROP FUNCTION IF EXISTS fnStripTags");
 		$this->models->Taxon->freeQuery("
-			CREATE FUNCTION fnStripTags( Dirty varchar(4000) )
-			RETURNS varchar(4000)
-			DETERMINISTIC 
+			CREATE FUNCTION fnStripTags( Dirty text )
+			RETURNS text
+			DETERMINISTIC
 			BEGIN
 			  DECLARE iStart, iEnd, iLength int;
 				WHILE Locate( '<', Dirty ) > 0 And Locate( '>', Dirty, Locate( '<', Dirty )) > 0 DO
