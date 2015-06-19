@@ -650,9 +650,24 @@ function nbcBuildGroupMenu(data) {
 				var c = data.groups[i].chars[j];
 	
 				if (c.disabled===true)
+				{
 					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+' disabled">'+c.label+(c.value?' '+c.value:'');
+				}
 				else
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value?' '+c.value:'')+'</a>';
+				if (c.emergent_disabled==true)
+				{
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'" title="'+_( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." )+'"> \
+						<a class="facetLink emergent_disabled" href="#" onclick="nbcShowStates('+c.id+');return false;">('+
+							c.label+(c.value?' '+c.value:'')+
+						')</a>';
+				}
+				else
+				{
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"> \
+							<a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+
+								c.label+(c.value?' '+c.value:'')+
+							'</a>';
+				}
 					
 				if (data.activeChars[c.id]) {
 					openGroup = true;
@@ -853,7 +868,6 @@ function nbcSetExpandResults(state) {
 
 function nbcFilterEmergingCharacters()
 {
-
 	if (nbcUseEmergingCharacters==false) return;
 
 	var charactersWithAnActiveState=Array();
@@ -902,24 +916,27 @@ function nbcFilterEmergingCharacters()
 				the result set unchanged, and is therefore no
 				longer distinctive.
 				(nbcData.countPerCharacter[id].distinct_state_count<=1)
+
 			*/
 			
-			if (nbcData.countPerCharacter && (char.type=='media' || char.type=='text') && charactersWithAnActiveState[id]!==true) {
-
-				nbcData.menu.groups[i].chars[j].disabled=
+			if (nbcData.countPerCharacter && 
+				(char.type=='media' || char.type=='text') && 
+				charactersWithAnActiveState[id]!==true)
+			{
+				nbcData.menu.groups[i].chars[j].emergent_disabled=
 					(
 					nbcData.countPerCharacter[id]==undefined || 
 					nbcData.countPerCharacter[id].taxon_count<nbcData.results.length ||
 					nbcData.countPerCharacter[id].distinct_state_count<=1
 					);
-
-			} else {
-
-				nbcData.menu.groups[i].chars[j].disabled=false;
-
+			} 
+			else
+			{
+				nbcData.menu.groups[i].chars[j].emergent_disabled=null;
 			}
 			
-			//nbcData.menu.groups[i].chars[j].label=nbcData.menu.groups[i].chars[j].label+'::'+nbcData.menu.groups[i].chars[j].id;
+			//nbcData.menu.groups[i].chars[j].label=
+			//	 nbcData.menu.groups[i].chars[j].label+'::'+nbcData.menu.groups[i].chars[j].id;
 		}
 	}
 
