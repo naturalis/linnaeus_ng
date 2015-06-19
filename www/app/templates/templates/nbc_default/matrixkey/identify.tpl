@@ -1,5 +1,11 @@
 {include file="../shared/header.tpl"}
 
+<style>
+.homepage #content, .conceptcard #content {
+    margin-top:-16px;
+}
+</style>
+
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -8,7 +14,7 @@
     
         <div id="resultsHeader">
             <span>
-	            <h1>{$session.app.project.title}</h1>
+	            <h1>{$matrix.name}{* if $master_matrix.id}{$matrix.name}{else}{$session.app.project.title}{/if *}</h1>
                 <div class="headerPagination">
                     <ul id="paging-header" class="list paging"></ul>
                 </div>
@@ -16,8 +22,8 @@
         </div>
 
 		<div>
-			{if $master_matrix_id}
-			{$matrix.name}; <a href="?mtrx={$master_matrix_id}">{t}terug naar de hoofdsleutel{/t}</a><br />
+			{if $master_matrix.id}
+			<a href="?mtrx={$master_matrix.id}">{t}terug naar {$master_matrix.name}{/t}</a><br />
 			{/if}
 
 			<div id="similarSpeciesHeader" class="hidden"></div>

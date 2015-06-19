@@ -265,7 +265,7 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('nbcPerPage', $this->getSetting('matrix_items_per_page'));
 			$this->smarty->assign('nbcBrowseStyle', $this->getSetting('matrix_browse_style'));
 			$this->smarty->assign('matrix_items_per_page', $this->getSetting('matrix_items_per_page'));
-			$this->smarty->assign('master_matrix_id', $this->getMasterMatrixId());
+			$this->smarty->assign('master_matrix', $this->getMatrix($this->getMasterMatrixId()) );
 			
 			$this->smarty->assign('nbcDataSource', 
 				array(
@@ -890,7 +890,7 @@ class MatrixKeyController extends Controller
 
     private function getMatrix($id)
     {
-        if (!isset($id))
+        if (is_null($id))
             return;
 
         $m = $this->getMatrices();

@@ -65,6 +65,10 @@ determineren-development-001.naturalis.nl	10.42.1.48
 (vincents sleutels test, maar bleek niet zichtbaar van buiten. wordt niet gebruikt)
 	/var/www/linnaeusng
 
+134.213.153.137
+vincents sleutels
+	/var/www/linnaeusng
+
 
 heukels
 	prod	http://heukels.naturalis.nl
