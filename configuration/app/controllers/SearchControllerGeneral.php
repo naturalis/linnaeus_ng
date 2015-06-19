@@ -844,7 +844,7 @@ class SearchControllerGeneral extends SearchController
 
 			foreach((array)$media as $key => $val)
 			{
-				$media[$key]['taxon_id'] = $d[$val['media_id']]['taxon_id'];
+				$media[$key]['id'] = $d[$val['media_id']]['taxon_id'];
 				$media[$key]['label'] = $d[$val['media_id']]['file_name'];
 			}
 
