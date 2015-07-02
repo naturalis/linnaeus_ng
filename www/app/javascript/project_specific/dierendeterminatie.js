@@ -27,14 +27,7 @@ var nbcUseEmergingCharacters=true;
 function nbcGetResults(p)
 {
 	setCursor('wait');
-
-	console.dir({
-			action : 'get_results_nbc',
-			params : p,
-			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
-		});
+	//console.dir({ action : 'get_results_nbc', params : p, time : getTimestamp(), key : matrixId, p : projectId });
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
@@ -926,7 +919,7 @@ function nbcFilterEmergingCharacters()
 				nbcData.menu.groups[i].chars[j].emergent_disabled=
 					(
 					nbcData.countPerCharacter[id]==undefined || 
-					nbcData.countPerCharacter[id].taxon_count<nbcData.results.length ||
+					nbcData.countPerCharacter[id].taxon_count< (nbcData.results.length ? nbcData.results.length : 0) ||
 					nbcData.countPerCharacter[id].distinct_state_count<=1
 					);
 			} 
