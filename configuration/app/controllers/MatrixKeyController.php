@@ -2786,14 +2786,14 @@ class MatrixKeyController extends Controller
                 $val['id'] = $val['relation_id'];
                 
 				$d = $this->nbcExtractGenderTag($label);
-				
+
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 
                     'nbc' => $nbc, 
-                    'label' => $d['label'], 
+                    'label' => isset($d['label']) ? $d['label'] : '', 
 					'common' => $this->getCommonname($val['taxon_id']), 
-                    'gender' => array($d['gender'], $d['gender_label']),
+                    'gender' => array(isset($d['gender']) ? $d['gender'] : '' , isset($d['gender_label']) ? $d['gender_label'] : '' ),
                     'type' => 'v', 
                     'highlight' => $val['id'] == $p['id'], 
                     'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['relation_id'])
