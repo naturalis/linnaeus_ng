@@ -862,6 +862,8 @@ function nbcSetExpandResults(state) {
 function nbcFilterEmergingCharacters()
 {
 	if (nbcUseEmergingCharacters==false) return;
+	
+	if (!nbcData.results) return;
 
 	var charactersWithAnActiveState=Array();
 	for(var i in nbcData.selectedStates)
@@ -919,7 +921,7 @@ function nbcFilterEmergingCharacters()
 				nbcData.menu.groups[i].chars[j].emergent_disabled=
 					(
 					nbcData.countPerCharacter[id]==undefined || 
-					nbcData.countPerCharacter[id].taxon_count< (nbcData.results.length ? nbcData.results.length : 0) ||
+					nbcData.countPerCharacter[id].taxon_count< nbcData.results.length ||
 					nbcData.countPerCharacter[id].distinct_state_count<=1
 					);
 			} 
