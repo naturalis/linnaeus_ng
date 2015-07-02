@@ -452,7 +452,10 @@ function nbcShowSimilar(id,type) {
 
 }
 
-function nbcPrintSimilarHeader() {
+function nbcPrintSimilarHeader()
+{
+
+	if (!nbcData.results) return;
 
 	var label = nbcData.results[0].l;
 
@@ -862,7 +865,6 @@ function nbcSetExpandResults(state) {
 function nbcFilterEmergingCharacters()
 {
 	if (nbcUseEmergingCharacters==false) return;
-	
 	if (!nbcData.results) return;
 
 	var charactersWithAnActiveState=Array();
