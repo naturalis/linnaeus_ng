@@ -1,16 +1,836 @@
-var nbcBrowseStyle='paginate';
-var nbcStart = 0;
-var nbcExpandedShowing = 0;
-var nbcExpandedPrevious = null;
-var nbcPerPage = 16;	// default, reset in identify.php
-var nbcPerLine = 4;		// default, reset in identify.php
-var nbcData;
+function __(text)
+{
+	// _() is sloooooow!
+	return text;
+	return _(text);
+}
+
+
+var resultsHtmlTemplate = '<div class="resultRow">%RESULTS%</div>';
+var resultsLineEndHtmlTemplate = '</div><br/><div class="resultRow">';
+var brHtmlTemplate = '<br />';
+
+var photoLabelHtmlTemplate = ' \
+<div style="margin-left:130px"> \
+	%SCI-NAME% \
+	%GENDER% \
+	%COMMON-NAME% \
+	%PHOTO-DETAILS% \
+</div> \
+';
+
+var photoLabelGenderHtmlTemplate = '<img class="gender" height="17" width="8" src="%IMG-SRC%" title="%GENDER-LABEL%" />';
+
+var photoLabelPhotographerHtmlTemplate = '<br />(%PHOTO-LABEL% %PHOTOGRAPHER%)';
+
+var imageHtmlTemplate = '\
+<a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title=""> \
+	<img class="result-image" src="%IMAGE-URL%" title="%PHOTO-CREDIT%" /> \
+</a>\
+';
+
+var genderHtmlTemplate = '<img class="result-gender-icon" src="%ICON-URL%" title="%GENDER-LABEL%" />';
+
+var matrixLinkHtmlTemplate = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT%</a>';
+
+var remoteLinkClickHtmlTemplate = '\
+onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%" \
+onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)" \
+';
+
+var statesClickHtmlTemplate = '\
+onclick="nbcToggleSpeciesDetail(\'%LOCAL-ID%\');return false;" title="%TITLE%" \
+onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)" \
+';
+
+var relatedClickHtmlTemplate = '\
+onclick="nbcShowSimilar(%ID%,\'%TYPE%\');return false;"  title="%TITLE%" \
+onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)" \
+';
+
+var statesHtmlTemplate = '\
+<div id="det-%LOCAL-ID%" class="result-detail hidden"> \
+	<ul> \
+		<li>%STATES%</li> \
+	</ul> \
+</div> \
+';
+
+var speciesStateItemHtmlTemplate = '<span class="result-detail-label">%CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
+
+var resultHtmlTemplate = '\
+<div class="result%CLASS-HIGHLIGHT%" id="res-%LOCAL-ID%"> \
+	<div class="result-result"> \
+		<div class="result-image-container"> \
+			%IMAGE-HTML% \
+		</div> \
+		<div class="result-labels"> \
+			%GENDER% \
+			<span class="result-name-scientific">%SCI-NAME%</span> \
+			%MATRIX-LINK% \
+			<span class="result-name-common"><br />%COMMON-NAME%</span> \
+            </div> \
+        </div> \
+        <div class="result-icons"> \
+			<div class="result-icon%REMOTE-LINK-CLASS%" \
+				%REMOTE-LINK-CLICK% \
+			>%REMOTE-LINK-ICON%</div> \
+			<div class="result-icon%SHOW-STATES-CLASS%" id="tog-%LOCAL-ID%" \
+				%SHOW-STATES-CLICK% \
+			>%SHOW-STATES-ICON%</div> \
+			<div class="result-icon%RELATED-CLASS%" \
+				%RELATED-CLICK% \
+			>%RELATED-ICON%</div> \
+        </div>%STATES% \
+    </div> \
+';
+
+var resultBatchHtmlTemplate= '<span class=result-batch style="%STYLE%">%PREVIOUS-RESULTS% %RESULTS%</span>' ;
+var buttonMoreHtmlTemplate='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
+var counterExpandHtmlTemplate='%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%';
+var pagePrevHtmlTemplate='<li><a href="#" onclick="browsePage(\'p\');return false;">&lt;</a></li>';
+var pageCurrHtmlTemplate='<li><strong>%NR%</strong></li>';
+var pageNumberHtmlTemplate='<li><a href="#" onclick="browsePage(%INDEX%);return false;">%NR%</a></li>';
+var pageNextHtmlTemplate='<li><a href="#" onclick="browsePage(\'n\');return false;" class="last">&gt;</a></li>';
+var counterPaginateHtmlTemplate=' %FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%';
+
+var menuOuterHtmlTemplate ='<ul>%MENU%</ul>';
+
+var menuGroupHtmlTemplate = '\
+<li id="character-item-%ID%" class="closed"><a href="#" onclick="toggleGroup(%ID%);return false;">%LABEL%</a></li> \
+<ul id="character-group-%ID%" class="hidden"> \
+	%CHARACTERS% \
+</ul> \
+';
+var menuCharDisabledHtmlTemplate='<li class="inner%CLASS% disabled">%LABEL%%VALUE%</li>';
+var menuCharEmergentDisabledHtmlTemplate='\
+<li class="inner%CLASS%" title="%TITLE%"> \
+	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
+</li> \
+';
+var menuCharHtmlTemplate='<li class="inner%CLASS%"><a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a></li>';
+var menuLoneCharHtmlTemplate='<li class="inner ungrouped last"><a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a></li>';
+
+
+
+var matrix_menu;
+var resultset;
+
+var settings = {
+	matrixId: 0,
+	projectId: 0,
+	perPage: 16,
+	perLine: 4,
+	start: 0,
+	expandedShowing: 0,
+	expandResults: true,
+	useEmergingCharacters: true,
+	showSpeciesDetails: true,
+	imageRoot: "",
+	defaultImage: "",
+	browseStyle: 'paginate', // expand, paginate, show_all
+	expandedPrevious: 0,
+	paginate: true,
+	currPage: 0,
+	lastPage: 0,
+};
+
+function getResults(p)
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_results',
+			params : p,
+			time : getTimestamp(),
+			key : settings.matrixId,
+			p : settings.projectId
+		}),
+		success : function (data)
+		{
+			//console.log(data);
+			resultset = $.parseJSON(data);
+			//console.dir(resultset);
+			filterEmergingCharacters();
+			printResults();
+			
+//			if (p && p.action!='similar') nbcDoOverhead();
+//			nbcDoPaging();
+//			if (p && p.action=='similar') nbcPrintSimilarHeader();
+//			if (p && p.closeDialog==true) jDialogCancel();
+//			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
+
+			setCursor();
+		}
+	});
+
+}
+
+function printResults( p )
+{
+	if (p && p.resetStart!==false) settings.start=0;
+
+//	settings.expandedShowing=0;
+
+	if (resultset && settings.browseStyle=='expand') 
+	{
+		printResultsExpanded();
+	}
+	else
+	if (resultset && settings.browseStyle!='expand') // (non-)paginated
+	{
+		printResultsPaginated();
+		if (settings.browseStyle=='paginate')
+		{
+			printPaging();
+		}
+	}
+
+	clearOverhead();
+	printCountHeader();
+	prettyPhotoInit();
+//	nbcResetClearButton();	
+}
+
+function clearResults()
+{
+	$('#results-container').html('');
+}
+
+function printResultsExpanded()
+{
+	settings.showSpeciesDetails = resultset.length <= settings.perPage;
+
+	var s="";
+	var added=0;
+	var d=0;
+	
+	for(var i=0;i<resultset.length;i++)
+	{
+		if (i>=settings.expandedShowing && i<settings.expandedShowing+settings.perPage)
+		{
+			s=s+formatResult(resultset[i]);
+
+			added++;
+
+			if (++d==settings.perLine)
+			{
+				s=s+resultsLineEndHtmlTemplate;
+				d=0;
+			}
+		}
+	}
+
+	$('#results-container').html(
+		resultBatchHtmlTemplate
+			.replace('%STYLE%',"")
+			.replace('%PREVIOUS-RESULTS%',$('#results-container').html())
+			.replace('%RESULTS%', resultsHtmlTemplate.replace('%RESULTS%',s))
+	);
+
+	// parallel processing if show() causes mayhem when clicking more-button fast.
+	//		.replace('%STYLE%',(settings.expandedShowing>0  ? 'display:none' : ''))
+	//	$('.result-batch:hidden').show('normal');
+	
+	settings.expandedShowing=settings.expandedShowing+added;
+
+	if (settings.expandedShowing<resultset.length-1)
+	{
+		if (!$("#show-more").is(':visible'))
+		{
+			$("#paging-footer").append( buttonMoreHtmlTemplate.replace('%LABEL%',__('meer resultaten laden')) );
+			$("#footerPagination").addClass('noline');
+		}
+	}
+	else
+	{
+		$("#show-more").remove();
+		$("#footerPagination").removeClass('noline');
+	}
+	
+	if (settings.expandedShowing>0) 
+	{
+		//window.scrollBy(0,99999);
+	}
+
+}
+
+function printResultsPaginated()
+{
+	var s="";
+	var d=0;
+
+	for(var i=0;i<resultset.length;i++)
+	{
+		if (
+			(settings.browseStyle=='paginate' && i>=settings.start && i<settings.start+settings.perPage) || 
+			settings.browseStyle=='show_all'
+		)
+		{
+			s=s+formatResult(resultset[i]);
+			if (++d==settings.perLine)
+			{
+				s=s+resultsLineEndHtmlTemplate;
+				d=0;
+			}
+		}
+	}
+
+	$('#results-container').html(resultsHtmlTemplate.replace('%RESULTS%',s));
+}
+
+function formatResult( data )
+{
+	//console.dir(data);
+	
+	if ( data.type=='taxon' )
+	{
+		//var sciName=data.label;
+		var sciName='<i>'+data.taxon+'</i>';
+		var commonName=data.commonname ? data.commonname : "";
+	}
+	else
+	if ( data.type=='variation' )
+	{
+		//var sciName=data.taxon.label;
+		var sciName='<i>'+data.taxon.taxon+'</i>';
+		var commonName=data.label ? data.label : "";
+	}
+	
+
+/*
+	if (data.l!=data.c && data.l.indexOf(data.c)===0)
+	{
+		data.l = data.c + ' (' + data.l.replace(data.c,'').replace(/(^\s|\s$)/,'') + ')';
+	}
+*/
+
+	if (settings.showSpeciesDetails && data.states)
+	{
+		var states = Array();
+
+		for(var i in data.states)
+		{
+			var state=data.states[i];
+			
+			if (state.characteristic==undefined)
+				continue;
+			
+			var labels = Array();
+			
+			if (state.characteristic.indexOf('|')!=false) {
+				var t = state.characteristic.split('|');
+				t = t[0];
+			} else {
+				var t = state.characteristic;
+			}
+			
+			for(var j in state.states)
+				labels.push(state.states[j].label);
+
+			if (labels.length>1)
+				var l = labels.join('; ');
+			else
+				var l = labels[0];
+
+			states.push(
+				speciesStateItemHtmlTemplate
+					.replace('%CHARACTER%',t)
+					.replace('%STATE%',l)
+			);
+		}
+	}
+
+	var image="";
+
+	if (data.info.url_image)
+	{
+		image=data.info.url_image;
+	}
+	else
+	{
+		if (settings.defaultImage) image=settings.defaultImage;
+	}
+		
+	if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=baseUrlProjectImages+image;
+	
+	var id = data.type+'-'+data.id;
+	var showStates = states && states.length > 0;
+
+	photoLabelHtml=
+		photoLabelHtmlTemplate
+			.replace('%SCI-NAME%',sciName)
+			.replace('%GENDER%',(data.gender ?
+				photoLabelGenderHtmlTemplate
+					.replace('%IMG-SRC%', settings.imageRoot + data.gender+'.png')
+					.replace('%GENDER-LABEL%', data.gender_label)
+				: "" ))
+			.replace('%COMMON-NAME%',(commonName ? brHtmlTemplate + commonName : ""))
+			.replace('%PHOTO-DETAILS%',(data.info.photographer ? 
+				photoLabelPhotographerHtmlTemplate
+					.replace('%PHOTO-LABEL%', __('foto')+' &copy;' )
+					.replace('%PHOTOGRAPHER%', data.info.photographer )
+				: ""));
+
+	imageHtml=
+		imageHtmlTemplate
+			.replace(/%IMAGE-URL%/g,image)
+			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
+			.replace('%PHOTO-CREDIT%',(data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+		;	
+
+	resultHtml=
+		resultHtmlTemplate
+			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
+			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
+			.replace('%GENDER%',(data.gender ? 
+				genderHtmlTemplate
+					.replace('%ICON-URL%', settings.imageRoot+data.gender+'.png') 
+					.replace('%GENDER-LABEL%', data.gender_label) 
+				: "" )
+			)
+			.replace('%SCI-NAME%', sciName)
+			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
+				matrixLinkHtmlTemplate.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
+				: ""))
+			.replace('%COMMON-NAME%', commonName)
+
+			.replace('%REMOTE-LINK-CLASS%', data.info.url_external_page ? "" : " no-content")
+			.replace('%REMOTE-LINK-CLICK%', data.info.url_external_page ?  
+				remoteLinkClickHtmlTemplate
+					.replace('%REMOTE-LINK%', data.info.url_external_page)
+					.replace('%TITLE%', nbcLabelExternalLink)
+				: "")
+			.replace('%REMOTE-LINK-ICON%', data.info.url_external_page ? '<img class="result-icon-image" src="'+settings.imageRoot+'information_grijs.png">' : "")
+
+			.replace('%SHOW-STATES-CLASS%', showStates ? "" : " no-content")
+			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTemplate.replace('%TITLE%',nbcLabelDetails) : "")
+			.replace('%SHOW-STATES-ICON%', showStates ? '<img class="result-icon-image icon-info" src="'+settings.imageRoot+'lijst_grijs.png">' : "")
+
+			.replace('%RELATED-CLASS%', data.related_count>0 ? "" : " no-content")
+			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
+				relatedClickHtmlTemplate
+					.replace('%TYPE%', data.type)
+					.replace('%LOCAL-ID%', id)
+					.replace('%TITLE%', nbcLabelSimilarSpecies)
+				: "" )
+			)
+			.replace('%RELATED-ICON%', data.related_count>0 ? '<img class="result-icon-image icon-similar" src="'+settings.imageRoot+'gelijk_grijs.png">' : "")
+			.replace('%STATES%', showStates ? statesHtmlTemplate.replace( '%STATES%',states.join('</li><li>')) : "")
+			.replace(/%LOCAL-ID%/g,id)
+			.replace(/%ID%/g,data.od)
+			;
+			
+	return resultHtml;
+
+}
+
+function clearOverhead()
+{
+	$('#result-count').html('');
+	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
+	$('#similarSpeciesHeader').html('');
+}
+
+function printCountHeader()
+{
+	if (settings.browseStyle=='expand')
+	{
+		$('#result-count').html(
+			counterExpandHtmlTemplate
+				.replace('%START-NUMBER%',(settings.expandedShowing > 1 ? "1-" : "" ))
+				.replace('%NUMBER-SHOWING%',settings.expandedShowing)
+				.replace('%FROM-LABEL%',__('van'))
+				.replace('%NUMBER-TOTAL%',resultset.length)
+		);
+	}
+	else
+	if (settings.browseStyle=='paginate')
+	{
+		$('#result-count').html(
+			counterPaginateHtmlTemplate
+				.replace('%FIRST-NUMBER%', (settings.start+1))
+				.replace('%LAST-NUMBER%',(settings.start+settings.perPage))
+				.replace('%NUMBER-LABEL%',__('van'))
+				.replace('%NUMBER-TOTAL%',resultset.length)
+		);
+	}
+	else
+	{
+		$('#result-count').html(
+			counterPaginateHtmlTemplate
+				.replace('%FIRST-NUMBER%',1)
+				.replace('%LAST-NUMBER%',resultset.length)
+				.replace('%NUMBER-LABEL%',"")
+				.replace('%NUMBER-TOTAL%',"")
+		);
+	}
+}
+
+function clearPaging()
+{
+	$('#paging-header').html('');	
+	$('#paging-footer').html('');	
+}
+
+function printPaging()
+{
+	settings.lastPage = Math.ceil(resultset.length / settings.perPage);
+	settings.currPage = Math.floor(settings.start / settings.perPage);
+
+	if (settings.lastPage > 1 && settings.currPage!=0)
+	{
+		$("#paging-header").append( pagePrevHtmlTemplate );
+	}
+	
+	if (settings.lastPage>1)
+	{ 
+		for (var i=0;i<settings.lastPage;i++)
+		{
+			if (i==settings.currPage)
+			{
+				$("#paging-header").append( pageCurrHtmlTemplate.replace('%NR%',(i+1)) );
+			}
+		    else
+			{
+				$("#paging-header").append( pageNumberHtmlTemplate.replace('%NR%',(i+1)).replace('%INDEX%',i) );
+			}
+		}
+	}
+
+	if (settings.lastPage > 1 && settings.currPage<settings.lastPage-1)
+	{
+		$("#paging-header").append( pageNextHtmlTemplate );
+	}
+
+	$("#paging-footer").html($("#paging-header").html());
+}
+
+function browsePage( id )
+{
+	if (id=='n') settings.start = settings.start+settings.perPage;
+	else if (id=='p') settings.start = settings.start-settings.perPage;
+	else if (!isNaN(id)) settings.start = id * settings.perPage;
+	else return;
+			
+//	nbcSaveSessionSetting('nbcStart',nbcStart);
+	clearResults();
+	printResults();
+	clearPaging();
+	printPaging();
+
+}
+
+function printMenu()
+{
+
+	$('#facet-categories-menu').html('');
+	
+	var buffer=Array();
+
+	for (var i in matrix_menu)
+	{
+		var item = matrix_menu[i];
+
+		var s="";
+		
+		if (item.type=='group')
+		{
+			var c="";
+
+			for (var j in item.chars)
+			{
+				var char = item.chars[j];
+
+				if (char.disabled==true)
+				{
+					c=c+menuCharDisabledHtmlTemplate
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%LABEL%',char.label)
+						.replace('%VALUE%',(char.value?' '+char.value:''));
+				}
+				else
+				if (char.emergent_disabled==true)
+				{
+					c=c+menuCharEmergentDisabledHtmlTemplate
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label)
+						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
+						.replace('%VALUE%',(char.value?' '+char.value:''));
+				}
+				else
+				{
+					c=c+menuCharHtmlTemplate
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label)
+						.replace('%VALUE%',(char.value?' '+char.value:''));
+				}
+
+			}
+			
+			s=menuGroupHtmlTemplate
+				.replace(/%ID%/g,item.id)
+				.replace('%LABEL%',item.label)
+				.replace('%CHARACTERS%',c)
+
+		}
+		else
+		if (item.type=='char')
+		{
+			s=menuLoneCharHtmlTemplate
+				.replace('%ID%',item.id)
+				.replace('%LABEL%',item.label)
+				.replace('%VALUE%',(item.value?' '+item.value:''));
+
+		}
+		
+		buffer.push(s);
+
+
+		continue;
+		
+		/*
+
+		var openGroup = data.groups.length==1 ? true : false;
+
+		if (v.type=='group') {
+
+			var s = 
+				'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
+				'<ul id="character-group-'+v.id+'" class="hidden">';			
+	
+			for (var j in v.chars)
+			{
+	
+				var c = data.groups[i].chars[j];
+	
+				if (c.disabled===true)
+				{
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+' disabled">'+c.label+(c.value?' '+c.value:'');
+				}
+				else
+				if (c.emergent_disabled==true)
+				{
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'" title="'+__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." )+'"> \
+						<a class="facetLink emergent_disabled" href="#" onclick="nbcShowStates('+c.id+');return false;">('+
+							c.label+(c.value?' '+c.value:'')+
+						')</a>';
+				}
+				else
+				{
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"> \
+							<a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+
+								c.label+(c.value?' '+c.value:'')+
+							'</a>';
+				}
+					
+				if (data.activeChars[c.id]) {
+					openGroup = true;
+					s = s + '<span>';
+					for (k in data.storedStates) {
+						var state = data.storedStates[k];
+						if (state.characteristic_id==c.id) {
+							var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
+							s = s + 
+								'<div class="facetValueHolder">'+
+									(state.value ? state.value+' ' : '')+
+									(state.label ? state.label+' ' : '')+
+									(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
+									'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+									'<img src="'+settings.imageRoot+'clearSelection.gif">'+
+									'</a>'+
+								'</div>';
+	
+						}
+					}
+					
+					s = s + '</span>';
+	
+				}
+	
+				s = s  +'</li>';
+	
+			}
+	
+			s = s  +'</ul>';
+			
+			if (openGroup)
+				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
+					
+			d.push(s);
+
+
+		} else {
+			
+			var c = v;
+
+			s = '<li class="inner ungrouped last"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
+			
+			if (data.activeChars[c.id]) {
+				openGroup = true;
+				s = s + '<span>';
+				for (k in data.storedStates) {
+					var state = data.storedStates[k];
+					if (state.characteristic_id==c.id) {
+						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
+						s = s + 
+							'<div class="facetValueHolder">'+
+								(state.value ? state.value+' ' : '')+
+								(state.label ? state.label+' ' : '')+
+								(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
+								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+								'<img src="'+settings.imageRoot+'clearSelection.gif">'+
+								'</a>'+
+							'</div>';
+
+					}
+				}
+				
+				s = s + '</span>';
+
+			}
+
+			s = s  +'</li>';
+			
+			d.push(s);
+
+
+		}
+			*/
+	}
+	
+	
+	$('#facet-categories-menu').html( menuOuterHtmlTemplate.replace('%MENU%',buffer.join('\n') ) );
+	
+}
+
+function toggleGroup(id)
+{
+	if ($('#character-group-'+id).css('display')=='none')
+	{
+		$('#character-group-'+id).removeClass('hidden').addClass('visible');
+		$('#character-item-'+id).removeClass('closed').addClass('open');
+	}
+	else
+	{
+		$('#character-group-'+id).removeClass('visible').addClass('hidden');
+		$('#character-item-'+id).removeClass('open').addClass('closed');
+	}
+} 
+
+function showStates(id)
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_states',
+			id: id,
+			time : getTimestamp(),
+			key : settings.matrixId,
+			p : settings.projectId
+		}),
+		success : function (data)
+		{
+			//console.log(data);
+
+			data = $.parseJSON(data);
+			showDialog(
+				data.title,
+				data.page,
+				{width:data.width,height:data.height,showOk:data.showOk}
+			);
+			setCursor();
+		}
+	});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function nbcRefreshGroupMenu() {
+
+	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function resetClearButton()
+{
+	return;
+	
+	if (nbcData.paramCount==0) {
+		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
+	} else {
+		$('#clearSelectionContainer').removeClass('ghosted');
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var nbcFullDatasetCount = 0;
-var nbcCurrPage = 0;
-var nbcLastPage = 0;
-var nbcImageRoot;
-var nbcPaginate = true;
-var nbcExpandResults = false;
 var nbcStatevalue = '';
 var nbcDetailShowStates = Array();
 var nbcSearchTerm = '';
@@ -22,42 +842,6 @@ var nbcLabelBack = '';
 var nbcLabelSimilarSpecies = '';
 var nbcPreviousBrowseStyles = {};
 var baseUrlProjectImages = null;
-var nbcUseEmergingCharacters=true;
-
-function nbcGetResults(p)
-{
-	setCursor('wait');
-	//console.dir({ action : 'get_results_nbc', params : p, time : getTimestamp(), key : matrixId, p : projectId });
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_results_nbc',
-			params : p,
-			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
-		}),
-		success : function (data)
-		{
-			//console.log(data);
-			nbcData = $.parseJSON(data);
-			//console.dir(nbcData);
-			nbcFilterEmergingCharacters();
-			nbcDoResults();
-
-			if (p && p.action!='similar') nbcDoOverhead();
-			nbcDoPaging();
-			if (p && p.action=='similar') nbcPrintSimilarHeader();
-			if (p && p.closeDialog==true) jDialogCancel();
-			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
-
-			setCursor();
-		}
-	});
-
-}
 
 function nbcDoSearch()
 {
@@ -101,348 +885,27 @@ function nbcDoSearch()
 }
 
 
-function nbcDoResults(p)
-{
-	if (p && p.resetStart!==false)
-		nbcStart = 0;
-	nbcExpandedShowing = 0;
-	nbcClearResults();
-	if (nbcData.results)
-		nbcPrintResults();
-	else 
-		nbcRemoveShowMoreButton()
-}
 
-function nbcClearResults()
-{
-	$('#results-container').html('');
-}
 
-function nbcPrintResults()
-{
-	if (nbcExpandResults)
-		nbcPrintResultsExpanded();
-	else
-		nbcPrintResultsPaginated(); // also for non-paginated, non-expanded
-
-	nbcPrettyPhotoInit();
-	nbcResetClearButton();	
-}
-
-function nbcPrintResultsPaginated()
-{
-	var results = nbcData.results;
-	var s = '';
-	var d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++)
-	{
-		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false)
-		{
-			s = s + nbcFormatResult(results[i]);
-			if (++d==nbcPerLine)
-			{
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
-		}
-	}
-
-	s = s + '</div>';
-	
-	nbcRemoveShowMoreButton();
-
-	$('#results-container').html(s);
-}
-
-function nbcPrintResultsExpanded()
-{
-	var results = nbcData.results;
-	var s = '';
-	var added = d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++)
-	{
-		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
-			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
-			)
-		{
-			s = s + nbcFormatResult(results[i]);
-			added++;
-			if (++d==nbcPerLine)
-			{
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
-		}
-	}
-	
-	s = s + '</div>';
-
-	if (nbcExpandedShowing>0) {
-		var n = 'p'+rndStr();
-		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
-	}
-
-	$('#results-container').html($('#results-container').html()+s);
-
-	if (nbcExpandedShowing>0)
-		$('#'+n).show('normal');
-
-	nbcExpandedShowing = nbcExpandedShowing + added;
-
-	if (nbcExpandedShowing==added)
-		nbcRemoveShowMoreButton();
-
-	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
-		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResults();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
-		$("#footerPagination").removeClass('noline').addClass('noline');
-	}
-
-	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
-		nbcRemoveShowMoreButton();
-
-	nbcExpandedPrevious = null;
-	
-	nbcDoOverhead();
-}
-
-function nbcFormatResult(data)
-{
-	/*
-		data.
-			i : id 
-			t : taxon id (absent when not a variation) 
-			y : type: t(axon) or v(ariation) or m(atrix)
-			l : label 
-			c : taxon
-			g : gender (absent when not a variation)
-			s : scientific name 
-			n : has image?
-			m : image url
-			x : generic image (only when n==false, and even then still optional)
-			h : thumbnail
-			p : photographer credit 
-			u : remote url
-			v : remote url target
-			r : number of similars
-			h : highlight (bool)
-			d : full species details (only when comparing or resultset has only one taxon/variation)
-    */
-	
-	//console.dir(data);
-	
-	var showDetails = nbcData.results.length <= nbcPerPage;
-
-	if (data.l!=data.c && data.l.indexOf(data.c)===0) {
-		data.l = data.c + ' (' + data.l.replace(data.c,'').replace(/(^\s|\s$)/,'') + ')';
-	}
-
-	var photoLabel = 
-		'<div style="margin-left:130px">'+
-		(data.s==data.l || !data.s ? '<i>'+(data.l)+'</i>' : data.l)+
-		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.e+'" />' : '' )+
-		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')+
-		(data.p ? '<br />('+_('foto')+' &copy; '+(data.p)+')' : '')+'</div>';
-	
-	var id = data.y+'-'+data.i;
-
-	if (showDetails && data.d) {
-
-		var states = Array();
-
-		for(var i in data.d) {
-			
-			if (data.d[i].characteristic==undefined)
-				continue;
-			
-			var labels = Array();
-			
-			if (data.d[i].characteristic.indexOf('|')!=false) {
-				var t = data.d[i].characteristic.split('|');
-				t = t[0];
-			} else {
-				var t = data.d[i].characteristic;
-			}
-			
-			for(var j in data.d[i].states)
-				labels.push(data.d[i].states[j].label);
-
-			if (labels.length>1)
-				var l = labels.join('; ');
-			else
-				var l = labels[0];
-
-			states.push('<span class="result-detail-label">'+t +':</span> <span class="result-detail-value">'+l+'</span>');
-		}
-		
-	}
-	
-	var showStates = states && states.length > 0;
-
-	if (data.n) {
-		if (!data.m.match(/^(http:\/\/|https:\/\/)/i)) data.m = baseUrlProjectImages + data.m;
-	} else {
-		if (data.x) data.m = data.x;
-	}
-
- 	return '<div class="result'+(data.h ? ' result-highlight' : '')+'" id="res-'+id+'"> \
-        <div class="result-result"> \
-			<div class="result-image-container">'+
-				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
-				'<img class="result-image" src="'+data.m+'" title="'+(data.p ? _('foto')+' &copy;'+data.p : '')+'" />' +
-				(data.n ? '</a>' : '' )+
-            '</div> \
-			<div class="result-labels">'+
-				(data.g ? '<img class="result-gender-icon" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-                '<span class="result-name-scientific">'+data.s+'</span> '+
-				(data.y=='m'? '<br /><a href="?mtrx='+data.i+'">'+_('Ga naar sleutel')+'</a>' : '' )+
-                '<span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
-            </div> \
-        </div> \
-        <div class="result-icons"> \
-			<div class="result-icon'+( data.u ? '' : ' no-content')+'"'+
-				( data.u ? 
-					' onclick="window.open(\''+data.u+'\',\''+data.v+'\');" title="'+nbcLabelExternalLink+'"'+
-					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
-				(data.u ? '<img class="result-icon-image" src="'+nbcImageRoot+'information_grijs.png">' : '' ) +
-			'</div> \
-			<div class="result-icon'+( showStates ? '' : ' no-content')+'" id="tog-'+id+'" '+
-				( showStates ?
-					' onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'"' +
-					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"': '' )+'>'+
-				(showStates ? '<img class="result-icon-image icon-info" src="'+nbcImageRoot+'lijst_grijs.png">' : '' ) +
-			'</div> \
-			<div class="result-icon'+( data.r ? '' : ' no-content')+'" '+
-				( data.r ? 
-					' onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;"  title="'+nbcLabelSimilarSpecies+'"' +
-					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
-				( data.r ? '<img class="result-icon-image icon-similar" src="'+nbcImageRoot+'gelijk_grijs.png">' : '' ) +
-			'</div> \
-        </div>'+
-		(states && states.length > 0 ? 
-			'<div id="det-'+id+'" class="result-detail hidden"> \
-				<ul> \
-					<li>'+states.join('</li><li>')+'</li> \
-				</ul> \
-			</div> ' : '' ) + '\
-    </div> \
-	';
-
-}
 
 function nbcSwitchImagename(ele,state) {
+//	alert('eeeek!');
 	var p = '_grijs';
 	$(ele).find('img').attr('src',state==1 ? $(ele).find('img').attr('src').replace(p,'') : $(ele).find('img').attr('src').replace('.png',p+'.png'));	
 }
 
-function nbcResetClearButton() {
-	if (nbcData.paramCount==0) {
-		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
-	} else {
-		$('#clearSelectionContainer').removeClass('ghosted');
-	}
-}
-
-function nbcRemoveShowMoreButton() {
-	$("#show-more").remove();
-	$("#footerPagination").removeClass('noline');	
-}
 
 
-function nbcDoOverhead() {
-	nbcClearOverhead();
-	if (nbcData.count) nbcPrintOverhead();
-}
 
-function nbcClearOverhead() {
-	$('#result-count').html('');
-	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
-	$('#similarSpeciesHeader').html('');
-}
 
-function nbcPrintOverhead() {
 
-	if (nbcBrowseStyle=='expand') {
-
-		$('#result-count').html((nbcExpandedShowing > 1 ? '1-'+nbcExpandedShowing : nbcExpandedShowing)+'&nbsp;'+_('van')+'&nbsp;'+nbcData.count.results);
-		return;
-
-	}
-
-	var count = nbcData.count;
-	
-	nbcFullDatasetCount = (nbcFullDatasetCount==0) ? count.all : nbcFullDatasetCount;
-	
-	$('#result-count').html(
-		sprintf(
-			'<strong style="color:#333">%s</strong> %s',
-			count.results,
-			sprintf(
-				_(' van %s '),
-					sprintf(
-						'<strong style="color:#777;">%s</strong>',
-						nbcFullDatasetCount
-					)
-				)
-			)
-		);
-}
-
-function nbcDoPaging() {
-	nbcClearPaging();
-	if (nbcData.count) nbcPrintPaging();
-}
-
-function nbcClearPaging() {
-
-	if (!nbcPaginate) return;
-
-	$('#paging-header').html('');	
-	$('#paging-footer').html('');	
-}
-
-function nbcPrintPaging() {
-
-	if (!nbcPaginate) return;
-
-	var count = nbcData.count;
-
-	nbcLastPage = Math.ceil(count.results / nbcPerPage);
-	nbcCurrPage = Math.floor(nbcStart / nbcPerPage);
-
-	if (nbcLastPage > 1 && nbcCurrPage!=0)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'p\');return false;">&lt;&lt;</a></li>');
-	
-	if (nbcLastPage>1) { 
-	
-		for (var i=0;i<nbcLastPage;i++) {
-	
-			if (i==nbcCurrPage)
-				$("#paging-header").append('<li><strong>'+(i+1)+'</strong></li>');
-		    else
-				$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+');return false;">'+(i+1)+'</a></li>');
-	
-		}
-		
-	}
-
-	if (nbcLastPage > 1 && nbcCurrPage<nbcLastPage-1)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\');return false;" class="last">&gt;&gt;</a></li>');
-
-	$("#paging-footer").html($("#paging-header").html());
-}
 
 function nbcShowSimilar(id,type) {
 
-	nbcPreviousBrowseStyles.paginate = nbcPaginate;
-	nbcPreviousBrowseStyles.expand = nbcExpandResults;
+	nbcPreviousBrowseStyles.paginate = settings.paginate;
+	nbcPreviousBrowseStyles.expand = settings.expandResults;
 	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
-	nbcPreviousBrowseStyles.expandPrev = nbcExpandedPrevious;
+	nbcPreviousBrowseStyles.expandPrev = settings.expandedPrevious;
 	nbcPreviousBrowseStyles.lastPos = getPageScroll();
 
 	nbcSetPaginate(false);
@@ -457,7 +920,7 @@ function nbcPrintSimilarHeader() {
 	var label = nbcData.results[0].l;
 
 	$('#similarSpeciesHeader').html(
-		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
+		sprintf(__('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
 		'<br />'+
 		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
 		'<span id="show-all-divider"> | </span>'+
@@ -476,7 +939,7 @@ function nbcCloseSimilar() {
 	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
 	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
 	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
+	settings.expandedPrevious = nbcPreviousBrowseStyles.expandPrev;
 
 	nbcGetResults();
 	nbcClearOverhead();
@@ -499,7 +962,7 @@ function nbcCloseSearch() {
 	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
 	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
 	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
+	settings.expandedPrevious = nbcPreviousBrowseStyles.expandPrev;
 
 	$('#inlineformsearchInput').val('');
 
@@ -514,7 +977,7 @@ function nbcCloseSearch() {
 function nbcPrintSearchHeader() {
 
 	$('#similarSpeciesHeader').html(
-		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
+		sprintf(__('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
 		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
@@ -522,23 +985,6 @@ function nbcPrintSearchHeader() {
 
 
 
-function nbcBrowse(id) {
-
-	if (id=='n')
-	    nbcStart = nbcStart+nbcPerPage;
-	else 
-	if (id=='p')
-    	nbcStart = nbcStart-nbcPerPage;
-	else
-		nbcStart = id * nbcPerPage;
-			
-	nbcSaveSessionSetting('nbcStart',nbcStart);
-	nbcClearResults();
-	nbcPrintResults();
-	nbcClearPaging();
-	nbcPrintPaging();
-
-}
 
 
 
@@ -573,174 +1019,6 @@ function nbcToggleAllSpeciesDetail() {
 		$('#showAllLabel').html(nbcLabelShowAll);
 
 }
-
-function nbcToggleGroup(id) {
-
-	if ($('#character-group-'+id).css('display')=='none') {
-		$('#character-group-'+id).removeClass('hidden').addClass('visible');
-		$('#character-item-'+id).removeClass('closed').addClass('open');
-	} else {
-		$('#character-group-'+id).removeClass('visible').addClass('hidden');
-		$('#character-item-'+id).removeClass('open').addClass('closed');
-	}
-	
-} 
-
-function nbcShowStates(id) {
-
-	setCursor('wait');
-	
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_formatted_states' ,
-			id : id , 
-			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
-		}),
-		success : function (data) {
-			//console.log(data);
-			data = $.parseJSON(data);
-			showDialog(
-				data.character.label,
-				data.page,
-				{width:data.width,height:data.height,showOk:data.showOk}
-			);
-			setCursor();
-		}
-	});
-
-}
-
-function nbcRefreshGroupMenu() {
-
-	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
-	
-}
-
-function nbcBuildGroupMenu(data) {
-
-	$('#facet-categories-menu').html('');
-	
-	var d = Array();
-
-	for (var i in data.groups) {
-
-		var v = data.groups[i];
-
-		var openGroup = data.groups.length==1 ? true : false;
-
-		if (v.type=='group') {
-
-			var s = 
-				'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
-				'<ul id="character-group-'+v.id+'" class="hidden">';			
-	
-			for (var j in v.chars) {
-	
-				var c = data.groups[i].chars[j];
-	
-				if (c.disabled===true)
-				{
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+' disabled">'+c.label+(c.value?' '+c.value:'');
-				}
-				else
-				if (c.emergent_disabled==true)
-				{
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'" title="'+_( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." )+'"> \
-						<a class="facetLink emergent_disabled" href="#" onclick="nbcShowStates('+c.id+');return false;">('+
-							c.label+(c.value?' '+c.value:'')+
-						')</a>';
-				}
-				else
-				{
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"> \
-							<a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+
-								c.label+(c.value?' '+c.value:'')+
-							'</a>';
-				}
-					
-				if (data.activeChars[c.id]) {
-					openGroup = true;
-					s = s + '<span>';
-					for (k in data.storedStates) {
-						var state = data.storedStates[k];
-						if (state.characteristic_id==c.id) {
-							var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-							s = s + 
-								'<div class="facetValueHolder">'+
-									(state.value ? state.value+' ' : '')+
-									(state.label ? state.label+' ' : '')+
-									(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-									'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
-									'<img src="'+nbcImageRoot+'clearSelection.gif">'+
-									'</a>'+
-								'</div>';
-	
-						}
-					}
-					
-					s = s + '</span>';
-	
-				}
-	
-				s = s  +'</li>';
-	
-			}
-	
-			s = s  +'</ul>';
-			
-			if (openGroup)
-				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
-					
-			d.push(s);
-
-		} else {
-			
-			var c = v;
-
-			s = '<li class="inner ungrouped last"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
-			
-			if (data.activeChars[c.id]) {
-				openGroup = true;
-				s = s + '<span>';
-				for (k in data.storedStates) {
-					var state = data.storedStates[k];
-					if (state.characteristic_id==c.id) {
-						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-						s = s + 
-							'<div class="facetValueHolder">'+
-								(state.value ? state.value+' ' : '')+
-								(state.label ? state.label+' ' : '')+
-								(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
-								'<img src="'+nbcImageRoot+'clearSelection.gif">'+
-								'</a>'+
-							'</div>';
-
-					}
-				}
-				
-				s = s + '</span>';
-
-			}
-
-			s = s  +'</li>';
-			
-			d.push(s);
-
-
-		}
-
-	}
-	
-	$('#facet-categories-menu').html('<ul>'+d.join('\n')+'</ul>');
-	
-}
-
-
 
 function nbcSaveSessionSetting(name,value) {
 
@@ -834,34 +1112,46 @@ function nbcBindDialogKeyUp() {
 
 }
 
-function nbcPrettyPhotoInit() {
-
- 	$("a[rel^='prettyPhoto']").prettyPhoto({
-		allow_resize:true,
-		animation_speed:50,
- 		opacity: 0.70, 
-		show_title: false,
- 		overlay_gallery: false,
- 		social_tools: false
- 	});
-
-}
-
 function nbcSetPaginate(state) {
 
-	nbcPaginate = state;
+	settings.paginate = state;
 	
 }
 
 function nbcSetExpandResults(state) {
 
-	nbcExpandResults = state;
+	settings.expandResults = state;
 	
 }
 
-function nbcFilterEmergingCharacters()
+
+// dialog button function, called from main.js::showDialog 
+function jDialogOk() {
+
+	nbcSetStateValue();
+
+}
+
+// dialog button function, called from main.js::showDialog 
+function jDialogCancel() {
+
+	closeDialog();
+
+}
+
+
+
+
+
+
+
+
+function filterEmergingCharacters()
 {
-	if (nbcUseEmergingCharacters==false) return;
+	
+	return;
+	
+	if (!settings.useEmergingCharacters) return;
 
 	var charactersWithAnActiveState=Array();
 	for(var i in nbcData.selectedStates)
@@ -935,46 +1225,45 @@ function nbcFilterEmergingCharacters()
 
 }
 
-// dialog button function, called from main.js::showDialog 
-function jDialogOk() {
-
-	nbcSetStateValue();
+function prettyPhotoInit()
+{
+ 	$("a[rel^='prettyPhoto']").prettyPhoto({
+		allow_resize:true,
+		animation_speed:50,
+ 		opacity: 0.70, 
+		show_title: false,
+ 		overlay_gallery: false,
+ 		social_tools: false
+ 	});
 
 }
 
-// dialog button function, called from main.js::showDialog 
-function jDialogCancel() {
-
-	closeDialog();
-
-}
-
-function nbcInit() {
-
-	nbcLabelClose = _('sluiten');
-	nbcLabelDetails = _('onderscheidende kenmerken');
-	nbcLabelBack = _('terug');
-	nbcLabelSimilarSpecies = _('gelijkende soorten');
-	nbcLabelShowAll = _('alle kenmerken tonen');
-	nbcLabelHideAll = _('alle kenmerken verbergen');
-	nbcLabelExternalLink = _('Meer informatie over soort/taxon');
+function matrixInit()
+{
+	nbcLabelClose = __('sluiten');
+	nbcLabelDetails = __('onderscheidende kenmerken');
+	nbcLabelBack = __('terug');
+	nbcLabelSimilarSpecies = __('gelijkende soorten');
+	nbcLabelShowAll = __('alle kenmerken tonen');
+	nbcLabelHideAll = __('alle kenmerken verbergen');
+	nbcLabelExternalLink = __('Meer informatie over soort/taxon');
 
 	$('#legendDetails').html(nbcLabelDetails);
 	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
 	$('#legendExternalLink').html(nbcLabelExternalLink);
 
 
-	if (nbcBrowseStyle=='paginate') {
+	if (settings.browseStyle=='paginate') {
 		nbcSetPaginate(true);
 		nbcSetExpandResults(false);
 	} else
-	if (nbcBrowseStyle=='expand') {
+	if (settings.browseStyle=='expand') {
 		nbcSetPaginate(false);
 		nbcSetExpandResults(true);
 	}
 
-	nbcPreviousBrowseStyles.paginate=nbcPaginate;
-	nbcPreviousBrowseStyles.expand=nbcExpandResults;
+	nbcPreviousBrowseStyles.paginate=settings.paginate;
+	nbcPreviousBrowseStyles.expand=settings.expandResults;
 
 	/*
 	if ("ontouchstart" in document) {
@@ -987,7 +1276,3 @@ function nbcInit() {
 	*/
 
 }
-
-
-
-// alleen bijen
