@@ -293,35 +293,7 @@ class MatrixKeyController extends Controller
             $this->saveSessionSetting($this->requestData['setting']);
         }
         else
-		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_formatted_states'))
-		{}
-		else
-        else
-		if ($this->_matrixType=='nbc' && $this->rHasVal('action','clear_state'))
-		{
 
-			if (!$this->rHasVal('state'))
-				$this->stateMemoryUnset();
-			else
-				$this->stateMemoryUnset($this->requestData['state']);
-				
-
-		}
-        else 
-		if ($this->_matrixType=='nbc' && $this->rHasVal('action','set_state') && $this->rHasVal('state'))
-		{
-
-			if ($this->rHasVal('value'))
-				$state = $this->requestData['state'] . ':' . $this->requestData['value'];
-			else
-				$state = $this->requestData['state'];
-		
-			$this->stateMemoryStore($state);
-			
-			return;
-
-		}
-        else
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_initial_values'))
 		{
 			// state image urls
@@ -1948,15 +1920,7 @@ class MatrixKeyController extends Controller
 
 
 
-
-
-
-
-
-
-
-
-    private function setTaxaScores2()
+function setTaxaScores2()
     {
         $states = array();
 		$d=$this->getSessionStates();
