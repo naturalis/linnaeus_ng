@@ -56,6 +56,8 @@ var statesHtmlTemplate = '\
 </div> \
 ';
 
+var statesJoinHtmlTemplate = '</li><li>';
+
 var speciesStateItemHtmlTemplate = '<span class="result-detail-label">%CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
 
 var resultHtmlTemplate = '\
@@ -102,20 +104,51 @@ var menuGroupHtmlTemplate = '\
 	%CHARACTERS% \
 </ul> \
 ';
-var menuCharDisabledHtmlTemplate='<li class="inner%CLASS% disabled">%LABEL%%VALUE%</li>';
+
+var menuCharDisabledHtmlTemplate='<li class="inner%CLASS% disabled">%LABEL%%VALUE%	%SELECTED% </li>';
+
 var menuCharEmergentDisabledHtmlTemplate='\
 <li class="inner%CLASS%" title="%TITLE%"> \
 	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
+	%SELECTED% \
 </li> \
 ';
-var menuCharHtmlTemplate='<li class="inner%CLASS%"><a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a></li>';
-var menuLoneCharHtmlTemplate='<li class="inner ungrouped last"><a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a></li>';
+var menuCharHtmlTemplate='\
+<li class="inner%CLASS%"> \
+	<a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a> \
+	%SELECTED% \
+</li>';
 
+var menuLoneCharHtmlTemplate='\
+<li class="inner ungrouped last"> \
+	<a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a> \
+	%SELECTED% \
+</li> \
+';
 
+var menuSelStateHtmlTemplate = '\
+<div class="facetValueHolder"> \
+%VALUE% %LABEL% %COEFF% \
+<a href="#" class="removeBtn" onclick="clearStateValue(\'%STATE-ID%\');return false;"> \
+<img src="%IMG-URL%"></a> \
+</div> \
+';
 
-var matrix_menu;
-var dataset;
-var tempstatevalue=""; // updated while typing
+var menuSelStatesHtmlTemplate = '<span>%STATES%</span>';
+		
+var iconUrlHtmlTemplate ='<img class="result-icon-image" src="%IMG-URL%">';
+var iconInfoHtmlTemplate='<img class="result-icon-image icon-info" src="%IMG-URL%">';
+var iconListSimilarTemplate='<img class="result-icon-image icon-similar" src="%IMG-URL%">';
+
+						
+
+var menu; // full menu
+var dataset; // full dataset
+var resultset; // result subset
+var states; // user-selected states
+var scores; // match scores based on selection
+
+var tempstatevalue="";
 
 var settings = {
 	matrixId: 0,
@@ -133,11 +166,13 @@ var settings = {
 	expandedPrevious: 0,
 	paginate: true,
 	currPage: 0,
-	lastPage: 0
+	lastPage: 0,
+	scoreThreshold: 0
 };
 
+var openGroups=Array();
 
-function getDataSet(p)
+function getDataSet()
 {
 	setCursor('wait');
 
@@ -146,7 +181,6 @@ function getDataSet(p)
 		type: 'POST',
 		data : ({
 			action : 'get_dataset',
-			params : p,
 			time : getTimestamp(),
 			key : settings.matrixId,
 			p : settings.projectId
@@ -156,7 +190,9 @@ function getDataSet(p)
 			//console.log(data);
 			dataset = $.parseJSON(data);
 			//console.dir(dataset);
-			filterEmergingCharacters();
+
+			applyScores();
+			clearResults();
 			printResults();
 			
 //			if (p && p.action!='similar') nbcDoOverhead();
@@ -168,10 +204,9 @@ function getDataSet(p)
 			setCursor();
 		}
 	});
-
 }
 
-function getMenu(p)
+function getMenu()
 {
 	setCursor('wait');
 
@@ -187,27 +222,61 @@ function getMenu(p)
 		success : function (data)
 		{
 			//console.log(data);
-			matrix_menu = $.parseJSON(data);
+			menu = $.parseJSON(data);
+			filterEmergingCharacters();
 			printMenu();
-			//console.dir(dataset);
+			//console.dir(menu);
 			setCursor();
 		}
 	});
-
 }
 
-function printResults( p )
+function getSession()
 {
-	if (p && p.resetStart!==false) settings.start=0;
+	setCursor('wait');
 
-//	settings.expandedShowing=0;
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_session' ,
+			time : getTimestamp(),
+			key : settings.matrixId,
+			p : settings.projectId
+		}),
+		success : function(data)
+		{
+			//console.log(data);
+			var d=$.parseJSON(data);
+			scores=d.scores;
+			states=d.states;
+			//console.dir(states);
 
-	if (dataset && settings.browseStyle=='expand') 
+			applyScores();
+			clearResults();
+			printResults();
+			printMenu();
+
+			setCursor();
+		}
+	});
+	
+}
+
+function resetMatrix()
+{
+	clearStateValue();
+	openGroups.splice(0,openGroups.length);
+}
+
+function printResults()
+{
+	if (resultset && settings.browseStyle=='expand') 
 	{
 		printResultsExpanded();
 	}
 	else
-	if (dataset && settings.browseStyle!='expand') // (non-)paginated
+	if (resultset && settings.browseStyle!='expand') // (non-)paginated
 	{
 		printResultsPaginated();
 		if (settings.browseStyle=='paginate')
@@ -219,27 +288,28 @@ function printResults( p )
 	clearOverhead();
 	printCountHeader();
 	prettyPhotoInit();
-//	nbcResetClearButton();	
 }
 
 function clearResults()
 {
 	$('#results-container').html('');
+	settings.start=0;
+	settings.expandedShowing=0;
 }
 
 function printResultsExpanded()
 {
-	settings.showSpeciesDetails = dataset.length <= settings.perPage;
+	settings.showSpeciesDetails = resultset.length <= settings.perPage;
 
 	var s="";
 	var added=0;
 	var d=0;
 	
-	for(var i=0;i<dataset.length;i++)
+	for(var i=0;i<resultset.length;i++)
 	{
 		if (i>=settings.expandedShowing && i<settings.expandedShowing+settings.perPage)
 		{
-			s=s+formatResult(dataset[i]);
+			s=s+formatResult(resultset[i]);
 
 			added++;
 
@@ -264,7 +334,7 @@ function printResultsExpanded()
 	
 	settings.expandedShowing=settings.expandedShowing+added;
 
-	if (settings.expandedShowing<dataset.length-1)
+	if (settings.expandedShowing<resultset.length-1)
 	{
 		if (!$("#show-more").is(':visible'))
 		{
@@ -290,14 +360,14 @@ function printResultsPaginated()
 	var s="";
 	var d=0;
 
-	for(var i=0;i<dataset.length;i++)
+	for(var i=0;i<resultset.length;i++)
 	{
 		if (
 			(settings.browseStyle=='paginate' && i>=settings.start && i<settings.start+settings.perPage) || 
 			settings.browseStyle=='show_all'
 		)
 		{
-			s=s+formatResult(dataset[i]);
+			s=s+formatResult(resultset[i]);
 			if (++d==settings.perLine)
 			{
 				s=s+resultsLineEndHtmlTemplate;
@@ -348,20 +418,29 @@ function formatResult( data )
 			
 			var labels = Array();
 			
-			if (state.characteristic.indexOf('|')!=false) {
+			if (state.characteristic.indexOf('|')!=false)
+			{
 				var t = state.characteristic.split('|');
 				t = t[0];
-			} else {
+			} 
+			else
+			{
 				var t = state.characteristic;
 			}
 			
 			for(var j in state.states)
+			{
 				labels.push(state.states[j].label);
+			}
 
 			if (labels.length>1)
+			{
 				var l = labels.join('; ');
+			}
 			else
+			{
 				var l = labels[0];
+			}
 
 			states.push(
 				speciesStateItemHtmlTemplate
@@ -390,10 +469,10 @@ function formatResult( data )
 	photoLabelHtml=
 		photoLabelHtmlTemplate
 			.replace('%SCI-NAME%',sciName)
-			.replace('%GENDER%',(data.gender ?
+			.replace('%GENDER%',(data.gender && data.gender.gender ?
 				photoLabelGenderHtmlTemplate
-					.replace('%IMG-SRC%', settings.imageRoot + data.gender+'.png')
-					.replace('%GENDER-LABEL%', data.gender_label)
+					.replace('%IMG-SRC%', settings.imageRoot + data.gender.gender+'.png')
+					.replace('%GENDER-LABEL%', data.gender.gender_label)
 				: "" ))
 			.replace('%COMMON-NAME%',(commonName ? brHtmlTemplate + commonName : ""))
 			.replace('%PHOTO-DETAILS%',(data.info.photographer ? 
@@ -413,10 +492,10 @@ function formatResult( data )
 		resultHtmlTemplate
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
-			.replace('%GENDER%',(data.gender ? 
+			.replace('%GENDER%',(data.gender && data.gender.gender ? 
 				genderHtmlTemplate
-					.replace('%ICON-URL%', settings.imageRoot+data.gender+'.png') 
-					.replace('%GENDER-LABEL%', data.gender_label) 
+					.replace('%ICON-URL%', settings.imageRoot+data.gender.gender+'.png') 
+					.replace('%GENDER-LABEL%', data.gender.gender_label) 
 				: "" )
 			)
 			.replace('%SCI-NAME%', sciName)
@@ -431,12 +510,12 @@ function formatResult( data )
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
 					.replace('%TITLE%', nbcLabelExternalLink)
 				: "")
-			.replace('%REMOTE-LINK-ICON%', data.info.url_external_page ? '<img class="result-icon-image" src="'+settings.imageRoot+'information_grijs.png">' : "")
-
+			.replace('%REMOTE-LINK-ICON%', data.info.url_external_page ?
+				iconUrlHtmlTemplate.replace('%IMG-URL%',settings.imageRoot+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? "" : " no-content")
 			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTemplate.replace('%TITLE%',nbcLabelDetails) : "")
-			.replace('%SHOW-STATES-ICON%', showStates ? '<img class="result-icon-image icon-info" src="'+settings.imageRoot+'lijst_grijs.png">' : "")
-
+			.replace('%SHOW-STATES-ICON%', showStates ?
+				iconInfoHtmlTemplate.replace('%IMG-URL%',settings.imageRoot+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? "" : " no-content")
 			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
 				relatedClickHtmlTemplate
@@ -445,14 +524,14 @@ function formatResult( data )
 					.replace('%TITLE%', nbcLabelSimilarSpecies)
 				: "" )
 			)
-			.replace('%RELATED-ICON%', data.related_count>0 ? '<img class="result-icon-image icon-similar" src="'+settings.imageRoot+'gelijk_grijs.png">' : "")
-			.replace('%STATES%', showStates ? statesHtmlTemplate.replace( '%STATES%',states.join('</li><li>')) : "")
+			.replace('%RELATED-ICON%', data.related_count>0 ?
+				iconListSimilarTemplate.replace('%IMG-URL%',settings.imageRoot+"gelijk_grijs.png") : "")
+			.replace('%STATES%', showStates ? statesHtmlTemplate.replace( '%STATES%',states.join(statesJoinHtmlTemplate)) : "")
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.od)
 			;
 			
 	return resultHtml;
-
 }
 
 function clearOverhead()
@@ -471,7 +550,7 @@ function printCountHeader()
 				.replace('%START-NUMBER%',(settings.expandedShowing > 1 ? "1-" : "" ))
 				.replace('%NUMBER-SHOWING%',settings.expandedShowing)
 				.replace('%FROM-LABEL%',__('van'))
-				.replace('%NUMBER-TOTAL%',dataset.length)
+				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
 	}
 	else
@@ -482,7 +561,7 @@ function printCountHeader()
 				.replace('%FIRST-NUMBER%', (settings.start+1))
 				.replace('%LAST-NUMBER%',(settings.start+settings.perPage))
 				.replace('%NUMBER-LABEL%',__('van'))
-				.replace('%NUMBER-TOTAL%',dataset.length)
+				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
 	}
 	else
@@ -490,7 +569,7 @@ function printCountHeader()
 		$('#result-count').html(
 			counterPaginateHtmlTemplate
 				.replace('%FIRST-NUMBER%',1)
-				.replace('%LAST-NUMBER%',dataset.length)
+				.replace('%LAST-NUMBER%',resultset.length)
 				.replace('%NUMBER-LABEL%',"")
 				.replace('%NUMBER-TOTAL%',"")
 		);
@@ -505,7 +584,7 @@ function clearPaging()
 
 function printPaging()
 {
-	settings.lastPage = Math.ceil(dataset.length / settings.perPage);
+	settings.lastPage = Math.ceil(resultset.length / settings.perPage);
 	settings.currPage = Math.floor(settings.start / settings.perPage);
 
 	if (settings.lastPage > 1 && settings.currPage!=0)
@@ -551,16 +630,33 @@ function browsePage( id )
 
 }
 
+function getActiveStates( id )
+{
+	if (!states) return;
+	
+	var res=Array();
+	
+	for(var i in states)
+	{
+		var state=states[i];
+		if (state.characteristic_id==id)
+		{
+			res.push(state);
+		}
+	}
+	
+	return (res.length>0 ? res : null);
+}
+
 function printMenu()
 {
-
 	$('#facet-categories-menu').html('');
 	
 	var buffer=Array();
 
-	for (var i in matrix_menu)
+	for (var i in menu)
 	{
-		var item = matrix_menu[i];
+		var item = menu[i];
 
 		var s="";
 		
@@ -572,12 +668,36 @@ function printMenu()
 			{
 				var char = item.chars[j];
 
+				activestates=getActiveStates(char.id);
+				
+				var l=""
+
+				if (activestates)
+				{
+					openGroups.push(item.id);
+
+					var t="";
+					for (var k in activestates)
+					{
+						var state = activestates[k];
+						t=t+menuSelStateHtmlTemplate
+							.replace('%VALUE%',(state.value ? state.value : ''))
+							.replace('%LABEL%',(state.label ? state.label : ''))
+							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
+							.replace('%STATE-ID%',state.val)
+							.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
+					}
+					
+					l=menuSelStatesHtmlTemplate.replace('%STATES%',t);
+				}
+
 				if (char.disabled==true)
 				{
 					c=c+menuCharDisabledHtmlTemplate
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%LABEL%',char.label)
-						.replace('%VALUE%',(char.value?' '+char.value:''));
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
 				}
 				else
 				if (char.emergent_disabled==true)
@@ -587,7 +707,8 @@ function printMenu()
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label)
 						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
-						.replace('%VALUE%',(char.value?' '+char.value:''));
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
 				}
 				else
 				{
@@ -595,158 +716,89 @@ function printMenu()
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label)
-						.replace('%VALUE%',(char.value?' '+char.value:''));
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
 				}
-
 			}
 			
 			s=menuGroupHtmlTemplate
 				.replace(/%ID%/g,item.id)
 				.replace('%LABEL%',item.label)
-				.replace('%CHARACTERS%',c)
+				.replace('%CHARACTERS%',c);
 
 		}
 		else
 		if (item.type=='char')
 		{
+			activestates=getActiveStates(item.id);
+			
+			var l=""
+	
+			if (activestates)
+			{
+				var t="";
+				for (var k in activestates)
+				{
+					var state = activestates[k];
+					t=t+menuSelStateHtmlTemplate
+						.replace('%VALUE%',(state.value ? state.value : ''))
+						.replace('%LABEL%',(state.label ? state.label : ''))
+						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
+						.replace('%STATE-ID%',state.val)
+						.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
+				}
+				
+				l=menuSelStatesHtmlTemplate.replace('%STATES%',t);
+			}
+			
 			s=menuLoneCharHtmlTemplate
 				.replace('%ID%',item.id)
 				.replace('%LABEL%',item.label)
-				.replace('%VALUE%',(item.value?' '+item.value:''));
-
+				.replace('%VALUE%',(item.value?' '+item.value:''))
+				.replace('%SELECTED%',l);
 		}
 		
 		buffer.push(s);
 
-
-		continue;
-		
-		/*
-
-		var openGroup = data.groups.length==1 ? true : false;
-
-		if (v.type=='group') {
-
-			var s = 
-				'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
-				'<ul id="character-group-'+v.id+'" class="hidden">';			
-	
-			for (var j in v.chars)
-			{
-	
-				var c = data.groups[i].chars[j];
-	
-				if (c.disabled===true)
-				{
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+' disabled">'+c.label+(c.value?' '+c.value:'');
-				}
-				else
-				if (c.emergent_disabled==true)
-				{
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'" title="'+__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." )+'"> \
-						<a class="facetLink emergent_disabled" href="#" onclick="nbcShowStates('+c.id+');return false;">('+
-							c.label+(c.value?' '+c.value:'')+
-						')</a>';
-				}
-				else
-				{
-					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"> \
-							<a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+
-								c.label+(c.value?' '+c.value:'')+
-							'</a>';
-				}
-					
-				if (data.activeChars[c.id]) {
-					openGroup = true;
-					s = s + '<span>';
-					for (k in data.storedStates) {
-						var state = data.storedStates[k];
-						if (state.characteristic_id==c.id) {
-							var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-							s = s + 
-								'<div class="facetValueHolder">'+
-									(state.value ? state.value+' ' : '')+
-									(state.label ? state.label+' ' : '')+
-									(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-									'<a href="#" class="removeBtn" onclick="clearStateValue(\''+dummy+'\');return false;">'+
-									'<img src="'+settings.imageRoot+'clearSelection.gif">'+
-									'</a>'+
-								'</div>';
-	
-						}
-					}
-					
-					s = s + '</span>';
-	
-				}
-	
-				s = s  +'</li>';
-	
-			}
-	
-			s = s  +'</ul>';
-			
-			if (openGroup)
-				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
-					
-			d.push(s);
-
-
-		} else {
-			
-			var c = v;
-
-			s = '<li class="inner ungrouped last"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
-			
-			if (data.activeChars[c.id]) {
-				openGroup = true;
-				s = s + '<span>';
-				for (k in data.storedStates) {
-					var state = data.storedStates[k];
-					if (state.characteristic_id==c.id) {
-						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-						s = s + 
-							'<div class="facetValueHolder">'+
-								(state.value ? state.value+' ' : '')+
-								(state.label ? state.label+' ' : '')+
-								(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-								'<a href="#" class="removeBtn" onclick="clearStateValue(\''+dummy+'\');return false;">'+
-								'<img src="'+settings.imageRoot+'clearSelection.gif">'+
-								'</a>'+
-							'</div>';
-
-					}
-				}
-				
-				s = s + '</span>';
-
-			}
-
-			s = s  +'</li>';
-			
-			d.push(s);
-
-
-		}
-			*/
 	}
-	
 	
 	$('#facet-categories-menu').html( menuOuterHtmlTemplate.replace('%MENU%',buffer.join('\n') ) );
 	
+	for(var i in $.unique(openGroups))
+	{
+		toggleGroup( openGroups[i], true );
+	}
+	
+	if (!states || states.count==0)
+	{
+		$('#clearSelectionContainer').addClass('ghosted');
+	}
+	else
+	{
+		$('#clearSelectionContainer').removeClass('ghosted');
+	}	
 }
 
-function toggleGroup(id)
+function toggleGroup( id, forceOpen )
 {
-	if ($('#character-group-'+id).css('display')=='none')
+	if ( $('#character-group-'+id).css('display')=='none' || forceOpen )
 	{
 		$('#character-group-'+id).removeClass('hidden').addClass('visible');
 		$('#character-item-'+id).removeClass('closed').addClass('open');
+		openGroups.push(id);
 	}
 	else
 	{
 		$('#character-group-'+id).removeClass('visible').addClass('hidden');
 		$('#character-item-'+id).removeClass('open').addClass('closed');
+
+		for(var i=openGroups.length-1; i>=0; i--)
+		{
+			if(openGroups[i]===id)
+			{
+			   openGroups.splice(i,1);
+			}
+		}
 	}
 } 
 
@@ -758,7 +810,7 @@ function showStates(id)
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : 'get_states',
+			action : 'get_character_states',
 			id: id,
 			time : getTimestamp(),
 			key : settings.matrixId,
@@ -774,9 +826,6 @@ function showStates(id)
 	});
 
 }
-
-
-
 
 function clearStateValue(state)
 {
@@ -806,67 +855,48 @@ function setState( p )
 		}),
 		success : function(data)
 		{
-alert(data);
+			//console.log(data);
+			var d=$.parseJSON(data);
+			scores=d.scores;
+			states=d.states;
+			//console.dir(states);
 
-//			if (p.norefresh!==true)
-//			getResults({closeDialog:true,refreshGroups:true});
-//			getResults();
+			applyScores();
+			clearResults();
+			printResults();
+			printMenu();
+
 			setCursor();
 		}
 	});
 	
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-function nbcRefreshGroupMenu() {
-
-	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
-	
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function resetClearButton()
+function applyScores()
 {
-	return;
-	
-	if (nbcData.paramCount==0) {
-		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
-	} else {
-		$('#clearSelectionContainer').removeClass('ghosted');
+	if (!scores || scores.length==0)
+	{
+		resultset=dataset.slice();
 	}
+	else
+	{
+		resultset.splice(0,resultset.length);
+		for(var i in scores)
+		{
+			var score=scores[i];
+			for(var j in dataset)
+			{
+				var item=dataset[j];
+				if (score.id==item.id && score.type==item.type && (settings.scoreThreshold==0 || score.score>=settings.scoreThreshold))
+				{
+					resultset.push(item);
+				}
+			}
+		}
+	}
+
+	// scores are sorted in the controller
 }
-
-
-
-
 
 
 

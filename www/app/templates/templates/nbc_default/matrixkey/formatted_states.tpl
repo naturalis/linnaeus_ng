@@ -46,7 +46,7 @@
                     {foreach from=$states item=v name=foo}
 					<td>
 						<div class="state-image-cell" style="padding:0;">
-							<a href="#" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');return false;">
+							<a href="#" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                                 <img
                                 	class="state-image" 
                                     {if $v.file_name}
@@ -69,19 +69,6 @@
 
                 </tr>
             </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 {*
@@ -119,7 +106,7 @@
         {elseif $character.type=='text'}
        
             <ul class="facetListType">
-                {foreach from=$s item=v key=k}
+                {foreach from=$states item=v key=k}
                 {if $states[$character.id][$v.id]}{assign var=selected value=true}{else}{assign var=selected value=false}{/if}
                 {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
                 <li {if $irrelephant}class="irrelevant"{/if}>
@@ -146,6 +133,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+
 	if (typeof matrixInit=='function')
 	{
 		matrixInit();
