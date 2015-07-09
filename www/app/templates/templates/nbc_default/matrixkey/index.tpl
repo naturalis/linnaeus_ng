@@ -57,14 +57,17 @@ $(document).ready(function()
 	settings.defaultImage='{$nbcImageRoot}noimage.gif';
 	settings.browseStyle='{$matrix_browse_style}';
 	settings.stateImagesPerRow='{$matrix_browse_style}';
-
-
-
+	settings.scoreThreshold={$matrix_score_threshold};
 
 	matrixInit();
 
+	setCursor('wait');
+
 	getMenu();
 	getDataSet();
+	getSession();
+
+	setCursor();
 
 
 try {
