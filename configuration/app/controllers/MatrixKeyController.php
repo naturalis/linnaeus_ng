@@ -12,6 +12,10 @@
 		// if ($this->rGetVal( 'key' )) setmatrix
 		// if ($this->rGetVal( 'p' )) setproject
 
+
+	???
+	{$prevRangeValue}
+
 */
 
 
@@ -43,13 +47,14 @@ class MatrixKeyController extends Controller
 	private $_activeMatrix=null;
 
 //	private $_characters=null;
-	private $_resultSet=null;
+	private $_dataSet=null;
 	private $_menu=null;
 
 	private $_matrix_calc_char_h_val=true;
 	private $_matrix_allow_empty_species=true;
 	private $_matrix_use_emerging_characters=true;
 	private $_matrix_browse_style;
+	private $_matrix_state_image_per_row;
 	
 	private $_nbcImageRoot=true;
 	
@@ -82,6 +87,7 @@ class MatrixKeyController extends Controller
     private function initialize ($force = false)
     {
 		$this->initializeMatrixId();
+		$this->setActiveMatrix();
 		
 		if (is_null($this->getCurrentMatrixId()))
 		{
@@ -92,14 +98,14 @@ class MatrixKeyController extends Controller
 		$this->_matrix_allow_empty_species=$this->getSetting('matrix_allow_empty_species',true);
 		$this->_matrix_use_emerging_characters = $this->getSetting('matrix_use_emerging_characters',true);
 		$this->_matrix_browse_style=$this->getSetting('matrix_browse_style','paginate');
+		$this->_matrix_state_image_per_row=$this->getSetting('matrix_state_image_per_row',4);
+		
 
 		$this->_nbcImageRoot = $this->getSetting('nbc_image_root');
 
-		$this->setActiveMatrix();
+
 		$this->setTotalEntityCount();
 		$this->setMenu();
-
-
 
 //			$_SESSION['app']['system']['urls']['nbcImageRoot']=
 
@@ -128,43 +134,16 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 
-/*
-            $states = $this->stateMemoryRecall();
-			$d = array();
-			foreach ((array) $states as $val)
-				$d[$val['characteristic_id']] = true;
 
-						'menu' => array(
-							'groups' => $groups,
-							'activeChars' => $d,
-							'storedStates' => $this->stateMemoryRecall()
-						),
-						
-*/
+		$this->fuck();die();
 
 
-//		$this->setCharacters();
-//		$this->setResultSet();
-
-
-
-//			$groups = $this->getCharacterGroups();
-
-
-
-
-
+        $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
 		$this->smarty->assign('matrix_browse_style', $this->_matrix_browse_style);
-        $this->smarty->assign('matrix', $matrix);
-        $this->smarty->assign('matrix_menu', json_encode($this->getMenu()));
-		
-//        $this->smarty->assign('characters', $this->getCharacters());
-//        $this->smarty->assign('resultset', json_encode($this->getResultSet(),JSON_HEX_APOS | JSON_HEX_QUOT));
 			
         $this->printPage();
-
     }
 
     public function identifyAction()
@@ -175,30 +154,80 @@ class MatrixKeyController extends Controller
 	
     public function ajaxInterfaceAction ()
     {
-		
-		
-		if ($this->rHasVal('action', 'get_results'))
+		if ($this->rHasVal('action', 'get_menu'))
 		{
-			$this->setResultSet();
-			$this->smarty->assign('returnText', json_encode($this->getResultSet()));
+			$this->smarty->assign('returnText', json_encode($this->getMenu()));
         }	
+		
 		else
+		
+		if ($this->rHasVal('action', 'get_dataset'))
+		{
+			$this->setDataSet();
+			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
+        }	
+		
+		else
+		
 		if ($this->rHasVal('action', 'get_states'))
 		{
-			$character=$this->getCharacter($this->rGetVal( 'id' ));
+			$character=$this->getCharacter(array('id'=>$this->rGetVal( 'id' )));
+			$states=$this->getCharacterStates(array('id'=>$this->rGetVal( 'id' )));
 
 			$this->smarty->assign('character', $character);
-			$this->smarty->assign('states', $this->getCharacterStates($this->rGetVal( 'id' )));
+			$this->smarty->assign('states', $states);
+            $this->smarty->assign('stateImagesPerRow', $this->_matrix_state_image_per_row);
+
             $this->smarty->assign('returnText', 
 				json_encode(
 					array(
-						'title' => $character['label'],
-						'page' =>  $this->fetchPage('formatted_states'),
-						'showOk' => ($character['type'] == 'media' || $character['type'] == 'text' ? false : true)
+						'title'=>$character['label'],
+						'page'=>$this->fetchPage('formatted_states'),
+						'showOk'=>($character['type'] == 'media' || $character['type'] == 'text' ? false : true)
 					)));
+		}
+
+		else
+
+		if ($this->rHasVal('action','set_state'))
+		{
+			if ($this->rHasVal('state') && $this->rHasVal('value'))
+			{
+				$state=$this->rGetVal('state') . ':' . $this->rGetVal('value');
+			}
+			else
+			if ($this->rHasVal('state'))
+			{
+				$state=$this->rGetVal('state');
+			}
+			else
+			{
+				return;
+			}
+		
+			$this->sessionStateStore( $state );
+			
+			
+			
+			
+		}
+
+        else					
+
+		if ($this->rHasVal('action','clear_state'))
+		{
+			if ($this->rHasVal('state'))
+			{
+				$this->sessionStateUnset($this->rGetVal('state'));
+			}
+			else
+			{
+				$this->sessionStateUnset();
+			}
+		}
+
 				
-				
-//			$this->smarty->assign('returnText', json_encode($this->getResultSet()));
+//			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
 
 
 
@@ -219,7 +248,6 @@ class MatrixKeyController extends Controller
 
             $states = $this->nbcStateMemoryReformat($states);
 		
-            $this->smarty->assign('stateImagesPerRow',$this->getSetting('matrix_state_image_per_row',4));
             $this->smarty->assign('c', $c);
             $this->smarty->assign('s', $s);
             $this->smarty->assign('states', $states);
@@ -325,10 +353,11 @@ class MatrixKeyController extends Controller
 				);
 			
 			$this->smarty->assign('returnText', $result	);
+		}
 		*/	
         
 		
-		}
+
 		
 		$this->printPage();	
 	}
@@ -412,7 +441,7 @@ class MatrixKeyController extends Controller
 	private function initializeMatrixId()
 	{
 		$id=$this->getCurrentMatrixId();
-		
+
 		if ( is_null($id) )
 		{
 			$m=$this->getMatrix( null ); // get all
@@ -515,7 +544,7 @@ class MatrixKeyController extends Controller
 
 	private function setActiveMatrix()
 	{
-		$this->_activeMatrix=$this->getMatrix( array('p'=>$this->getCurrentMatrixId()) );
+		$this->_activeMatrix=$this->getMatrix( array('id'=>$this->getCurrentMatrixId()) );
 		$this->_activeMatrix=$this->_activeMatrix[$this->getCurrentMatrixId()];
 	}
 
@@ -569,8 +598,10 @@ class MatrixKeyController extends Controller
 
     private function getMatrix( $p )
     {
-		
 		$id=isset($p['id']) ? $p['id'] : null;
+		
+		if (is_null($id))
+			return;
 		
 		$m = $this->models->Matrix->freeQuery(array(
 			"query" => "
@@ -636,7 +667,7 @@ class MatrixKeyController extends Controller
 		
 		$states=array();
 
-		foreach((array)$this->getCharacterStates( '*' ) as $val)
+		foreach((array)$this->getCharacterStates( array('id'=>'*') ) as $val)
 		{
 			$states[$val['characteristic_id']][]=$val;
 		}
@@ -671,10 +702,12 @@ class MatrixKeyController extends Controller
         return $this->_characters;
     }
 */
-    private function getCharacterStates( $id )
+    private function getCharacterStates( $p )
     {
-        if (!isset($id))
-            return;
+		$id=isset($p['id']) ? $p['id'] : null;
+		
+		if (is_null($id))
+			return;
 
         $cs=$this->models->CharacteristicState->freeQuery("
 			select 
@@ -782,22 +815,14 @@ class MatrixKeyController extends Controller
 
 
 
-    private function setResultSet()
+    private function setDataSet()
     {
-		$d=$this->getSessionStates();
-
-		if (count($d)==0)
-		{
-			$this->_resultSet=$this->getAllIdentifiableEntities();
-		}
-		else
-		{
-		}
+		$this->_dataSet=$this->getAllIdentifiableEntities();
 	}
 
-    private function getResultSet()
+    private function getDataSet()
     {
-		return $this->_resultSet;
+		return $this->_dataSet;
 	}
 	
 	private function getAllIdentifiableEntities()
@@ -1357,7 +1382,7 @@ private function getRelatedEntities( $p )
 			else
 			if ($val['type']=='char')
 			{
-				//$menu[$key]['states']=$this->getCharacterStates( $val['id'] );
+				//$menu[$key]['states']=$this->getCharacterStates( array('id'=>$val['id']) );
 			}
 		}
 		
@@ -1400,7 +1425,9 @@ private function getRelatedEntities( $p )
 			select 
 				_a.id,
 				_a.type,
-				_c.label
+				_c.label,
+				if (_a.type='media'||_a.type='text','c','f') as prefix
+
 			from 
 				%PRE%characteristics _a
 
@@ -1447,31 +1474,33 @@ private function getRelatedEntities( $p )
 
 
 
-
-
-
-
-
-    private function stateMemoryStore ($data)
+    private function sessionStateStore( $data )
     {
-        foreach ((array) $data as $key => $val) {
-            
+        foreach ((array)$data as $key=>$val)
+		{
             $d = explode(':', $val);
             
             if ($d[0] == 'f') // f:x:n[:sd] (free values)
+			{
                 $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ':' . $d[1]] = $val;
+			}
             else // c:x:y (fixed values)
+			{
                 $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$val] = $val;
+			}
         }
-		
     }
 
-    private function stateMemoryUnset ($id = null)
+    private function sessionStateUnset( $id=null )
     {
         if (empty($id))
+		{
             unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()]);
+		}
         else
+		{
             unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
+		}
     }
 
     private function getSessionStates( $p=null )
@@ -1524,6 +1553,152 @@ private function getRelatedEntities( $p )
 
 
 
+	private function fuck()
+	{
+        $states = array();
+		$d=$this->getSessionStates();
+        q($d,1);
+        // get all stored selected states
+        foreach ((array) $d as $val)
+		{
+            $states[] = $val['val'];
+		}
+
+		// calculate scores
+        $matches = $this->getTaxaScores($states, false);
+
+		$fullhits = 0;
+		foreach((array)$matches as $match)
+			if ($match['s']) $fullhits++;
+
+        // only keep the 100% scores, no partial matches for naturalis
+        $res = array();
+        foreach ((array) $matches as $match) {
+
+            if ($match['s'] == 100) {
+
+                if ($match['type'] == 'variation') {
+
+                    $val = $this->getVariation($match['id']);
+
+                    $nbc = $this->models->NbcExtras->_get(
+                    array(
+                        'id' => array(
+                            'project_id' => $this->getCurrentProjectId(), 
+                            'ref_id' => $val['id'], 
+                            'ref_type' => 'variation'
+                        ), 
+                        'columns' => 'name,value', 
+                        'fieldAsIndex' => 'name'
+                    ));
+
+                    $label = $val['label'];
+                    
+					$d = $this->nbcExtractGenderTag($label);
+                    
+                    $res[] = $this->createDatasetEntry(
+                    array(
+                        'val' => $val, 
+                        'nbc' => $nbc, 
+                        'label' => $val['label'], 
+						'common' => $this->getCommonname($val['taxon_id']),
+                        'gender' => array($d['gender'], $d['gender_label']),
+                        'related' => $this->getRelatedEntities(array(
+                            'vId' => $val['id']
+                        )), 
+                        'type' => 'v', 
+                        'inclRelated' => false,
+						'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['id'])
+                    ));
+					
+                } else
+                if ($match['type'] == 'matrix') {
+
+					$image = $match['l'].'.jpg';
+
+                    $res[] = $this->createDatasetEntry(
+                    array(
+                        'val' => $match, 
+                        'label' => $match['l'], 
+                        'type' => 'm', 
+						'image' => file_exists($this->getProjectUrl('projectMedia').$image) ? $image : null,
+                        'inclRelated' => false,
+						'details' => $this->_matrixSuppressDetails ? null : $this->getMatrixStates($match['id'])
+                    ));
+
+                }
+                else {
+
+                    $c = $this->models->Commonname->_get(
+                    array(
+                        'id' => array(
+                            'project_id' => $this->getCurrentProjectId(), 
+                            'taxon_id' => $match['id'], 
+                            'language_id' => $this->getCurrentLanguageId()
+                        )
+                    ));
+                    
+                    $common = $match['l'];
+
+                    foreach ((array) $c as $cVal) {
+                        if ($cVal['commonname'] != $match['l']) {
+                            $common = $cVal['commonname'];
+                            break;
+                        }
+                    }
+                    
+                    $nbc = $this->models->NbcExtras->_get(
+                    array(
+                        'id' => array(
+                            'project_id' => $this->getCurrentProjectId(), 
+                            'ref_id' => $match['id'], 
+                            'ref_type' => 'taxon'
+                        ), 
+                        'columns' => 'name,value', 
+                        'fieldAsIndex' => 'name'
+                    ));
+                    
+
+                    $res[] = $this->createDatasetEntry(
+
+                    array(
+                        'val' => $match, 
+                        'nbc' => $nbc, 
+                        'label' => $common, 
+                        'related' => $this->getRelatedEntities(array(
+                            'tId' => $match['id']
+                        )), 
+                        'type' => 't', 
+                        'highlight' => 0,
+						'details' => $this->_matrixSuppressDetails ? null : $this->getTaxonStates($match['id'])
+                    ));
+
+                }
+            }
+        }
+
+        if (count((array)$res)==1) {
+            
+            $res[0]['d'] =
+            	$res[0]['y']=='t' ?
+	            	$this->getTaxonStates($res[0]['i']) :
+	            	$this->getVariationStates($res[0]['i']);
+            
+        } else {
+        
+	        $this->customSortArray($res, array(
+	            'key' => 'l', 
+	            'case' => 'i',
+				'dir' => 'asc'
+	        ));
+
+        }
+		
+		if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
+			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
+
+        return $res;
+	}
 
 
 
