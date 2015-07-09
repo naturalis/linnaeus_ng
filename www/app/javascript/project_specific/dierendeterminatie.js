@@ -114,7 +114,8 @@ var menuLoneCharHtmlTemplate='<li class="inner ungrouped last"><a class="facetLi
 
 
 var matrix_menu;
-var resultset;
+var dataset;
+var tempstatevalue=""; // updated while typing
 
 var settings = {
 	matrixId: 0,
@@ -132,10 +133,11 @@ var settings = {
 	expandedPrevious: 0,
 	paginate: true,
 	currPage: 0,
-	lastPage: 0,
+	lastPage: 0
 };
 
-function getResults(p)
+
+function getDataSet(p)
 {
 	setCursor('wait');
 
@@ -143,7 +145,7 @@ function getResults(p)
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : 'get_results',
+			action : 'get_dataset',
 			params : p,
 			time : getTimestamp(),
 			key : settings.matrixId,
@@ -152,8 +154,8 @@ function getResults(p)
 		success : function (data)
 		{
 			//console.log(data);
-			resultset = $.parseJSON(data);
-			//console.dir(resultset);
+			dataset = $.parseJSON(data);
+			//console.dir(dataset);
 			filterEmergingCharacters();
 			printResults();
 			
@@ -169,18 +171,43 @@ function getResults(p)
 
 }
 
+function getMenu(p)
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_menu',
+			time : getTimestamp(),
+			key : settings.matrixId,
+			p : settings.projectId
+		}),
+		success : function (data)
+		{
+			//console.log(data);
+			matrix_menu = $.parseJSON(data);
+			printMenu();
+			//console.dir(dataset);
+			setCursor();
+		}
+	});
+
+}
+
 function printResults( p )
 {
 	if (p && p.resetStart!==false) settings.start=0;
 
 //	settings.expandedShowing=0;
 
-	if (resultset && settings.browseStyle=='expand') 
+	if (dataset && settings.browseStyle=='expand') 
 	{
 		printResultsExpanded();
 	}
 	else
-	if (resultset && settings.browseStyle!='expand') // (non-)paginated
+	if (dataset && settings.browseStyle!='expand') // (non-)paginated
 	{
 		printResultsPaginated();
 		if (settings.browseStyle=='paginate')
@@ -202,17 +229,17 @@ function clearResults()
 
 function printResultsExpanded()
 {
-	settings.showSpeciesDetails = resultset.length <= settings.perPage;
+	settings.showSpeciesDetails = dataset.length <= settings.perPage;
 
 	var s="";
 	var added=0;
 	var d=0;
 	
-	for(var i=0;i<resultset.length;i++)
+	for(var i=0;i<dataset.length;i++)
 	{
 		if (i>=settings.expandedShowing && i<settings.expandedShowing+settings.perPage)
 		{
-			s=s+formatResult(resultset[i]);
+			s=s+formatResult(dataset[i]);
 
 			added++;
 
@@ -237,7 +264,7 @@ function printResultsExpanded()
 	
 	settings.expandedShowing=settings.expandedShowing+added;
 
-	if (settings.expandedShowing<resultset.length-1)
+	if (settings.expandedShowing<dataset.length-1)
 	{
 		if (!$("#show-more").is(':visible'))
 		{
@@ -263,14 +290,14 @@ function printResultsPaginated()
 	var s="";
 	var d=0;
 
-	for(var i=0;i<resultset.length;i++)
+	for(var i=0;i<dataset.length;i++)
 	{
 		if (
 			(settings.browseStyle=='paginate' && i>=settings.start && i<settings.start+settings.perPage) || 
 			settings.browseStyle=='show_all'
 		)
 		{
-			s=s+formatResult(resultset[i]);
+			s=s+formatResult(dataset[i]);
 			if (++d==settings.perLine)
 			{
 				s=s+resultsLineEndHtmlTemplate;
@@ -444,7 +471,7 @@ function printCountHeader()
 				.replace('%START-NUMBER%',(settings.expandedShowing > 1 ? "1-" : "" ))
 				.replace('%NUMBER-SHOWING%',settings.expandedShowing)
 				.replace('%FROM-LABEL%',__('van'))
-				.replace('%NUMBER-TOTAL%',resultset.length)
+				.replace('%NUMBER-TOTAL%',dataset.length)
 		);
 	}
 	else
@@ -455,7 +482,7 @@ function printCountHeader()
 				.replace('%FIRST-NUMBER%', (settings.start+1))
 				.replace('%LAST-NUMBER%',(settings.start+settings.perPage))
 				.replace('%NUMBER-LABEL%',__('van'))
-				.replace('%NUMBER-TOTAL%',resultset.length)
+				.replace('%NUMBER-TOTAL%',dataset.length)
 		);
 	}
 	else
@@ -463,7 +490,7 @@ function printCountHeader()
 		$('#result-count').html(
 			counterPaginateHtmlTemplate
 				.replace('%FIRST-NUMBER%',1)
-				.replace('%LAST-NUMBER%',resultset.length)
+				.replace('%LAST-NUMBER%',dataset.length)
 				.replace('%NUMBER-LABEL%',"")
 				.replace('%NUMBER-TOTAL%',"")
 		);
@@ -478,7 +505,7 @@ function clearPaging()
 
 function printPaging()
 {
-	settings.lastPage = Math.ceil(resultset.length / settings.perPage);
+	settings.lastPage = Math.ceil(dataset.length / settings.perPage);
 	settings.currPage = Math.floor(settings.start / settings.perPage);
 
 	if (settings.lastPage > 1 && settings.currPage!=0)
@@ -641,7 +668,7 @@ function printMenu()
 									(state.value ? state.value+' ' : '')+
 									(state.label ? state.label+' ' : '')+
 									(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-									'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+									'<a href="#" class="removeBtn" onclick="clearStateValue(\''+dummy+'\');return false;">'+
 									'<img src="'+settings.imageRoot+'clearSelection.gif">'+
 									'</a>'+
 								'</div>';
@@ -683,7 +710,7 @@ function printMenu()
 								(state.value ? state.value+' ' : '')+
 								(state.label ? state.label+' ' : '')+
 								(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+								'<a href="#" class="removeBtn" onclick="clearStateValue(\''+dummy+'\');return false;">'+
 								'<img src="'+settings.imageRoot+'clearSelection.gif">'+
 								'</a>'+
 							'</div>';
@@ -740,13 +767,8 @@ function showStates(id)
 		success : function (data)
 		{
 			//console.log(data);
-
 			data = $.parseJSON(data);
-			showDialog(
-				data.title,
-				data.page,
-				{width:data.width,height:data.height,showOk:data.showOk}
-			);
+			showDialog(data.title,data.page,{width:data.width,height:data.height,showOk:data.showOk});
 			setCursor();
 		}
 	});
@@ -756,7 +778,44 @@ function showStates(id)
 
 
 
+function clearStateValue(state)
+{
+	setState({state:state,action:'clear_state'});
+}
 
+function setStateValue(state)
+{
+	var state=state?state:$('#state-id').val();
+	setState({state:state,value:tempstatevalue});
+}
+
+function setState( p )
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : (p && p.action) ? p.action : 'set_state' ,
+			state : p.state,
+			value : p.value,
+			time : getTimestamp(),
+			key : settings.matrixId,
+			p : settings.projectId
+		}),
+		success : function(data)
+		{
+alert(data);
+
+//			if (p.norefresh!==true)
+//			getResults({closeDialog:true,refreshGroups:true});
+//			getResults();
+			setCursor();
+		}
+	});
+	
+}
 
 
 
@@ -831,7 +890,6 @@ function resetClearButton()
 
 
 var nbcFullDatasetCount = 0;
-var nbcStatevalue = '';
 var nbcDetailShowStates = Array();
 var nbcSearchTerm = '';
 var nbcLabelShowAll = '';
@@ -851,7 +909,7 @@ function nbcDoSearch()
 	if (str.length==0) return false;
 
 	nbcSearchTerm=str;
-	nbcSetState({norefresh:true,clearState:true});
+	setState({norefresh:true,clearState:true});
 	
 	setCursor('wait');
 
@@ -1040,77 +1098,7 @@ function nbcSaveSessionSetting(name,value) {
 	
 }
 
-function nbcSetState(p) {
-	
-	//nbcSetPaginate(true);
-	
-	setCursor('wait');
 
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
-			state : p.state,
-			value : p.value,
-			id : null,
-			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
-		}),
-		success : function (data) {
-			if (p.norefresh!==true)
-				nbcGetResults({closeDialog:true,refreshGroups:true});
-			setCursor();
-		}
-	});
-	
-}
-
-function nbcSetStateValue(state) {
-	
-	var state = state ? state : $('#state-id').html();
-
-	nbcSetState({state:state,value:nbcStatevalue});
-		
-}
-
-function nbcClearStateValue(state) {
-
-	$('#state-value').val('');
-	nbcSetState({state:state,clearState:true});
-		
-}
-
-function nbcBindDialogKeyUp() {
-
-    $("#state-value").keydown(function(event) {
-        // Allow: backspace, delete, tab, escape, and enter
-        if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
-             // Allow: Ctrl+A
-            (event.keyCode==65 && event.ctrlKey===true) || 
-             // Allow: home, end, left, right
-            (event.keyCode>=35 && event.keyCode<=39)) {
-                 // let it happen, don't do anything
-                 return;
-        }
-        else {
-            // Ensure that it is a number and stop the keypress
-            if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105)) {
-                event.preventDefault(); 
-            }   
-        }
-    });
-
-	$('#state-value').keyup(function(e) {
-		if (e.keyCode==13) {
-			// return
-			nbcSetStateValue();
-		}
-		return;
-	});
-
-}
 
 function nbcSetPaginate(state) {
 
@@ -1123,22 +1111,6 @@ function nbcSetExpandResults(state) {
 	settings.expandResults = state;
 	
 }
-
-
-// dialog button function, called from main.js::showDialog 
-function jDialogOk() {
-
-	nbcSetStateValue();
-
-}
-
-// dialog button function, called from main.js::showDialog 
-function jDialogCancel() {
-
-	closeDialog();
-
-}
-
 
 
 
@@ -1235,6 +1207,56 @@ function prettyPhotoInit()
  		overlay_gallery: false,
  		social_tools: false
  	});
+
+}
+
+function bindDialogKeyUp()
+{
+    $("#state-value").keydown(function(event)
+	{
+        // Allow: backspace, delete, tab, escape, and enter
+        if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
+             // Allow: Ctrl+A
+            (event.keyCode==65 && event.ctrlKey===true) || 
+             // Allow: home, end, left, right
+            (event.keyCode>=35 && event.keyCode<=39))
+		{
+			// let it happen, don't do anything
+			return;
+        }
+        else
+		{
+			// Ensure that it is a number and stop the keypress
+			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105))
+			{
+				event.preventDefault(); 
+			}   
+        }
+    });
+
+	$('#state-value').keyup(function(e)
+	{
+		if (e.keyCode==13)
+		{
+			// return
+			setStateValue();
+		}
+		return;
+	});
+
+}
+
+function jDialogOk()
+{
+	// dialog button function, called from main.js::showDialog 
+	setStateValue();
+
+}
+
+function jDialogCancel()
+{
+	// dialog button function, called from main.js::showDialog 
+	closeDialog();
 
 }
 

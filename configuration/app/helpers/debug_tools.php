@@ -1,5 +1,8 @@
 <?php
 
+
+if (function_exists("xdebug_disable")) xdebug_disable();
+
 class DebugTools {}
 
 //q(timeTaken(),1);

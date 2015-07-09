@@ -47,7 +47,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	
+
 	baseUrlProjectImages='{$projectUrls.projectMedia}';
 
 	settings.matrixId={$matrix.id};
@@ -56,15 +56,16 @@ $(document).ready(function()
 	settings.useEmergingCharacters={$matrix_use_emerging_characters};
 	settings.defaultImage='{$nbcImageRoot}noimage.gif';
 	settings.browseStyle='{$matrix_browse_style}';
+	settings.stateImagesPerRow='{$matrix_browse_style}';
 
-	matrix_menu=$.parseJSON('{$matrix_menu}');
+
+
 
 	matrixInit();
-	printMenu();
-	
-	
-//	getMenu();
-	getResults();
+
+	getMenu();
+	getDataSet();
+
 
 try {
 //	resultset = $.parseJSON({$resultset});
