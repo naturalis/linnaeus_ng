@@ -1,6 +1,7 @@
 	<div id="left">
 
         <div id="quicksearch">
+
             <h2>{t}Zoek op naam{/t}</h2>
             
             <form id="inlineformsearch" name="inlineformsearch" action="" method="post" onsubmit="nbcDoSearch();return false;">
@@ -20,7 +21,7 @@
 	        </span>	
 			
             <div id="clearSelectionContainer" class="facetCategories clearSelectionBtn{if $activeChars|@count==0} ghosted{/if}">
-                <a id="clearSelectionLink" href="#" onclick="nbcClearStateValue();return false;">
+                <a id="clearSelectionLink" href="#" onclick="clearStateValue();return false;">
                 	<img class="reloadBtnImg" src="{$nbcImageRoot}reload-icon.png" style="margin-bottom:-4px">{t}opnieuw beginnen{/t}
                 </a>
             </div>
