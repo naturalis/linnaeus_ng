@@ -149,6 +149,7 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 .state-image {border:2px solid #eee;text-align:center;vertical-align:middle;}
 .state-image:hover {border:2px solid #666;cursor: pointer;}
 .state-image-irrelevant {cursor: default;}
+.state-image-irrelevant:hover {cursor: default;}
 
 .irrelevant {border:none;filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 .irrelevant a {color:#000000;text-decoration:none; cursor:default;}
@@ -216,7 +217,6 @@ ul.facetListType li.selected {font-weight:bold;}
 .legend-icon-image.icon-similar  {
 	max-width:21px;
 }
-
 
 
 

@@ -9,7 +9,7 @@
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
-    
+      
     <div id="content" class="title-type4">
     
         <div id="resultsHeader">
@@ -26,8 +26,7 @@
 			<a href="?mtrx={$master_matrix.id}">{t}terug naar {$master_matrix.name}{/t}</a><br />
 			{/if}
 
-			<div id="similarSpeciesHeader" class="hidden"></div>
-	
+			<div id="similarSpeciesHeader" class="hidden" style="width:100%"></div>
 			<div id="result-count" class="headerSelectionLabel"></div>
 			
 		</div>
@@ -59,14 +58,15 @@ $(document).ready(function()
 	settings.stateImagesPerRow='{$matrix_browse_style}';
 	settings.scoreThreshold={$matrix_score_threshold};
 
+	setScores($.parseJSON('{$session_scores}'));
+	setStates($.parseJSON('{$session_states}'));
+			
 	matrixInit();
 
 	setCursor('wait');
 
-	getMenu();
-	getDataSet();
-	getSession();
-
+	retrieveMenu();
+	retrieveDataSet();
 	setCursor();
 
 
