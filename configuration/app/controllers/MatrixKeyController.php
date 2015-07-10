@@ -13,15 +13,14 @@
 		// if ($this->rGetVal( 'p' )) setproject
 
 
-	???
-	{$prevRangeValue}
-
 	!!! handle in JS (= only show species details that are not the same for all remaining species)
 	if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
 		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 		
 		
 	setTotalEntityCount --> do we need it!?!?!
+	
+	getRemainingCharacterCount  --> is it actually in use??
 
 
 */
@@ -58,6 +57,7 @@ class MatrixKeyController extends Controller
 	private $_dataSet=null;
 	private $_menu=null;
 	private $_scores=null;
+	private $_related=null;
 
 	private $_matrix_calc_char_h_val=true;
 	private $_matrix_allow_empty_species=true;
@@ -147,9 +147,13 @@ class MatrixKeyController extends Controller
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 		
 		//$this->setScores();q($this->getScores(),1);
-		
-		q($this->setRemainingStateCount( array('char'=>2361) ),1);
+		//q($this->setRemainingStateCount( array('char'=>2361) ),1);
+		//q($this->getSessionStates( array('char'=>2361,'reindex'=>true) ),1);
 
+		$this->setScores();
+		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
+		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
+		
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
@@ -189,8 +193,8 @@ class MatrixKeyController extends Controller
 
 			$this->smarty->assign('character', $character);
 			$this->smarty->assign('states', $states);
-
-//			$this->smarty->assign('states', $states);
+			$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
+			$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
 
             $this->smarty->assign('stateImagesPerRow', $this->_matrix_state_image_per_row);
 
@@ -201,15 +205,6 @@ class MatrixKeyController extends Controller
 						'page'=>$this->fetchPage('formatted_states'),
 						'showOk'=>($character['type'] == 'media' || $character['type'] == 'text' ? false : true)
 					)));
-		}
-
-		else
-
-		if ($this->rHasVal('action','get_session'))
-		{
-			$this->setScores();
-
-			$this->smarty->assign('returnText',json_encode( array('scores'=>$this->getScores(),'states'=>$this->getSessionStates())));
 		}
 
         else					
@@ -233,7 +228,6 @@ class MatrixKeyController extends Controller
 			$this->sessionStateStore( $state );
 
 			$this->setScores();
-
 			$this->smarty->assign('returnText',json_encode( array('scores'=>$this->getScores(),'states'=>$this->getSessionStates())));
 		}
 
@@ -251,8 +245,15 @@ class MatrixKeyController extends Controller
 			}
 
 			$this->setScores();
-
 			$this->smarty->assign('returnText',json_encode( array('scores'=>$this->getScores(),'states'=>$this->getSessionStates())));
+		}
+
+		else
+		
+		if ($this->rHasVal('action', 'get_similar'))
+		{
+			$this->setRelatedEntities( array('id'=>$this->rGetVal('id'),'type'=>$this->rGetVal('type')) );
+			$this->smarty->assign('returnText',json_encode( $this->getRelatedEntities()) );
 		}
 
 		$this->printPage();	
@@ -921,118 +922,6 @@ class MatrixKeyController extends Controller
         return $this->getEntityStates( array('id'=>$id,'type'=>'matrix') );
     }
 
-	private function getRelatedEntityCount( $p )
-	{
-		
-		$id=isset($p['id']) ? $p['id'] : null;
-		$type=isset($p['type']) ? $p['type'] : null;
-	
-		if ( is_null($id) || is_null($type) ) return;
-		
-		if ($type=='taxon')
-		{
-			$rel = $this->models->TaxaRelations->_get(array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'taxon_id' => $id
-				)
-			));
-			
-			return count((array)$rel);
-			
-		}
-		else 
-		if ($type=='variation')
-		{
-			
-			$rel = $this->models->VariationRelations->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'variation_id' => $id
-				)
-			));
-			
-			return count((array)$rel);
-			
-
-		}
-	}
-
-
-private function getRelatedEntities( $p )
-{
-	
-	$id=isset($p['id']) ? $p['id'] : null;
-	$type=isset($p['type']) ? $p['type'] : null;
-	$includeSelf=isset($p['includeSelf']) ? $p['includeSelf'] : false;
-
-	if ( is_null($id) || is_null($type) ) return;
-	
-	if ($type=='taxon')
-	{
-		$rel = $this->models->TaxaRelations->_get(array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'taxon_id' => $id
-			)
-		));
-		
-		if ($includeSelf && isset($id))
-		{
-			array_unshift($rel, array(
-				'id' => $id, 
-				'relation_id' => $id, 
-				'ref_type' => 'taxon'
-			));
-		}
-		
-		foreach ((array) $rel as $key => $val)
-		{
-			if ($val['ref_type'] == 'taxon')
-			{
-				$rel[$key]['label'] = $this->formatTaxon($this->getTaxonById($val['relation_id']));
-			}
-			else
-			{
-				$d = $this->getVariation($val['relation_id']);
-				$rel[$key]['label'] = $d['label'];
-				$rel[$key]['taxon_id'] = $d['taxon_id'];
-			}
-		}
-	}
-	else if ($vId) {
-		
-		$rel = $this->models->VariationRelations->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'variation_id' => $vId
-			)
-		));
-		
-		if ($includeSelf && isset($vId))
-			array_unshift($rel, array(
-				'id' => $vId, 
-				'relation_id' => $vId, 
-				'ref_type' => 'variation'
-			));
-		
-
-		foreach ((array) $rel as $key => $val) {
-			
-			if ($val['ref_type'] == 'taxon') {
-				$rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id'])); // is that even legal, semantically?
-			}
-			else {
-				$d = $this->getVariation($val['relation_id']);
-				$rel[$key]['label'] = $d['label'];
-			}
-		}
-	}
-	
-	return $rel;
-}
 
 
 	private function setMenu()
@@ -1218,16 +1107,26 @@ private function getRelatedEntities( $p )
 		}
         else
 		{
-            unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
+            $d = explode(':', $id);
+            if ($d[0] == 'f')
+			{
+	            unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ":" . $d[1]]);
+			}
+			else
+			{
+	            unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
+			}
 		}
     }
 
-    private function getSessionStates()
+    private function getSessionStates( $p=null )
     {
+		$char = isset($p['char']) ? $p['char'] : null;
+		$reindex = isset($p['reindex']) ? $p['reindex'] : null;
+
         if (isset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()]))
 		{
-            $charId = isset($p['charId']) ? $p['charId'] : null;
-            $states = array();
+            $states=array();
             
             foreach ((array) $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()] as $key=>$val)
 			{
@@ -1251,7 +1150,7 @@ private function getRelatedEntities( $p )
                     $states[$key]['value'] = $d[2];
                 }
                 
-                if (!empty($charId) && !in_array($states[$key]['characteristic_id'], (array) $charId))
+                if (!empty($char) && !in_array($states[$key]['characteristic_id'],(array)$char))
 				{
                     unset($states[$key]);
 				}
@@ -1260,6 +1159,25 @@ private function getRelatedEntities( $p )
                     unset($states[$key]);
 				}
             }
+
+			if ($reindex && !empty($states))
+			{
+				$d=array();
+
+				foreach((array)$states as $key=>$val)
+				{
+					if (isset($val['id']))
+					{
+						$d[$val['id']]=$val;
+					}
+					else
+					{
+						$d[$val['characteristic_id']]=$val;
+					}
+				}
+
+				$states=$d;
+			}
             
             return !empty($states) ? $states : null;
         }
@@ -1809,12 +1727,13 @@ private function getRelatedEntities( $p )
 
 
 
-    private function setRemainingStateCount( $p )
+    private function setRemainingStateCount( $p=null )
     {
         $char = isset($p['char']) ? $p['char'] : null;
+        $groupByChar = isset($p['groupByChar']) ? $p['groupByChar'] : false;
 
    		$c=$this->makeRemainingCountClauses($p);
-q($c,1);
+
 		$dT = $c['dT'];
 		$fsT = $c['fsT'];
 		$dV = $c['dV'];
@@ -1824,13 +1743,7 @@ q($c,1);
 
 		$s = array();
 
-//        $charIdToShow = isset($p['char']) ? $p['char'] : null;
-//        $groupByCharId = isset($p['groupByCharId']) ? $p['groupByCharId'] : false;
-		
-
-
-
-       
+      
         /*
         find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
         have the already selected states, unless no states have been selected at all, in which case we just
@@ -1871,32 +1784,28 @@ q($c,1);
 			group by q1.state_id
 			";
 
-        $results = $this->models->MatrixTaxonState->freeQuery( $q );
+        $all=$this->models->MatrixTaxonState->freeQuery( $q );
 		
-		q($results);
-        
-        $all = array();
+        $results=array();
     
-        foreach ((array) $results as $val)
+        foreach ((array)$all as $val)
 		{
             if (!is_null($char) && $val['characteristic_id']!=$char) continue;
     
-			if ($groupByCharId)
+			if ($groupByChar)
 			{
-	            $all[$val['characteristic_id']]['states'][$val['state_id']] = intval($val['tot']);
-	            $all[$val['characteristic_id']]['tot'] =
+	            $results[$val['characteristic_id']]['states'][$val['state_id']] = intval($val['tot']);
+	            $results[$val['characteristic_id']]['tot'] =
 					(isset($all[$val['characteristic_id']]['tot']) ? $all[$val['characteristic_id']]['tot'] : 0) + intval($val['tot']);
 			} 
 			else
 			{
-	            $all[$val['state_id']] = intval($val['tot']);
+	            $results[$val['state_id']] = intval($val['tot']);
 			}
     
         }
 		
-		q($all,1);
-
-        return empty($all) ? '*' : $all;
+        return $results;
     }
 
     private function getRemainingCharacterCount()
@@ -1970,19 +1879,19 @@ q($c,1);
 			";
 			
 
-        $results = $this->models->MatrixTaxonState->freeQuery($q);
+        $all = $this->models->MatrixTaxonState->freeQuery($q);
 		
 		//q($this->models->MatrixTaxonState->q(),1);
 
-        $characteristics = array();
+        $results=array();
     
-        foreach ((array) $results as $val)
+        foreach ((array)$all as $val)
 		{
-			$characteristics[$val['characteristic_id']]=
+			$results[$val['characteristic_id']]=
 				array('taxon_count'=>$val['taxon_count'],'distinct_state_count'=>$val['distinct_state_count']);
         }
 
-        return $characteristics;
+        return $results;
     }
 
     private function makeRemainingCountClauses()
@@ -2032,9 +1941,7 @@ q($c,1);
 						$d['lower <='] = $d['upper >='] = intval($value);
 					}					
 
-					$cs = $this->models->CharacteristicState->_get(array(
-						'id' => $d
-					));
+					$cs = $this->models->CharacteristicState->_get(array('id' => $d));
 
 					foreach ((array) $cs as $key => $cVal)
 					{
@@ -2077,6 +1984,86 @@ q($c,1);
 	}
 
 
+
+	private function getRelatedEntityCount( $p )
+	{
+		
+		$id=isset($p['id']) ? $p['id'] : null;
+		$type=isset($p['type']) ? $p['type'] : null;
+	
+		if ( is_null($id) || is_null($type) ) return;
+		
+		if ($type=='taxon')
+		{
+			$rel = $this->models->TaxaRelations->_get(array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $id
+				)
+			));
+			
+			return count((array)$rel);
+			
+		}
+		else 
+		if ($type=='variation')
+		{
+			
+			$rel = $this->models->VariationRelations->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'variation_id' => $id
+				)
+			));
+			
+			return count((array)$rel);
+			
+
+		}
+	}
+
+    private function setRelatedEntities( $p )
+    {
+        $id = isset($p['id']) ? $p['id'] : null;
+        $type = isset($p['type']) ? $p['type'] : null;
+        $inclSelf = isset($p['inclSelf']) ? $p['inclSelf'] : true;
+
+        if (!isset($type) || !isset($id))
+            return;
+        
+        if ($type=='variation')
+		{
+			$this->_related=$this->models->VariationRelations->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'variation_id' => $id
+				),
+				'columns'=>'relation_id,ref_type'
+			));
+			
+        }
+        else
+		if ($type=='taxon')
+		{
+			$this->_related=$this->models->TaxaRelations->_get(array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $id
+				),
+				'columns'=>'relation_id,ref_type'
+			));
+        }
+
+		if ($inclSelf) array_unshift($this->_related,array('relation_id'=>$id,'ref_type'=>$type));
+
+    }
+
+	private function getRelatedEntities()
+	{
+		return $this->_related;
+	}
 
 
 

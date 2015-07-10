@@ -5,7 +5,6 @@ function __(text)
 	return _(text);
 }
 
-
 var resultsHtmlTemplate = '<div class="resultRow">%RESULTS%</div>';
 var resultsLineEndHtmlTemplate = '</div><br/><div class="resultRow">';
 var brHtmlTemplate = '<br />';
@@ -33,20 +32,11 @@ var genderHtmlTemplate = '<img class="result-gender-icon" src="%ICON-URL%" title
 
 var matrixLinkHtmlTemplate = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT%</a>';
 
-var remoteLinkClickHtmlTemplate = '\
-onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%" \
-onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)" \
-';
+var remoteLinkClickHtmlTemplate = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
 
-var statesClickHtmlTemplate = '\
-onclick="nbcToggleSpeciesDetail(\'%LOCAL-ID%\');return false;" title="%TITLE%" \
-onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)" \
-';
+var statesClickHtmlTemplate = 'onclick="nbcToggleSpeciesDetail(\'%LOCAL-ID%\');return false;"title="%TITLE%"';
 
-var relatedClickHtmlTemplate = '\
-onclick="nbcShowSimilar(%ID%,\'%TYPE%\');return false;"  title="%TITLE%" \
-onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)" \
-';
+var relatedClickHtmlTemplate = 'onclick="setSimilar({id:%ID%,type:\'%TYPE%\'});return false;" title="%TITLE%"';
 
 var statesHtmlTemplate = '\
 <div id="det-%LOCAL-ID%" class="result-detail hidden"> \
@@ -80,7 +70,7 @@ var resultHtmlTemplate = '\
 			<div class="result-icon%SHOW-STATES-CLASS%" id="tog-%LOCAL-ID%" \
 				%SHOW-STATES-CLICK% \
 			>%SHOW-STATES-ICON%</div> \
-			<div class="result-icon%RELATED-CLASS%" \
+			<div class="result-icon%RELATED-CLASS% related" \
 				%RELATED-CLICK% \
 			>%RELATED-ICON%</div> \
         </div>%STATES% \
@@ -135,20 +125,18 @@ var menuSelStateHtmlTemplate = '\
 ';
 
 var menuSelStatesHtmlTemplate = '<span>%STATES%</span>';
-		
+
 var iconUrlHtmlTemplate ='<img class="result-icon-image" src="%IMG-URL%">';
 var iconInfoHtmlTemplate='<img class="result-icon-image icon-info" src="%IMG-URL%">';
-var iconListSimilarTemplate='<img class="result-icon-image icon-similar" src="%IMG-URL%">';
+var iconSimilarTemplate='<img class="result-icon-image icon-similar" src="%IMG-URL%">';
 
-						
-
-var menu; // full menu
-var dataset; // full dataset
-var resultset; // result subset
-var states; // user-selected states
-var scores; // match scores based on selection
-
-var tempstatevalue="";
+var similarHeaderHtmlTemplate='\
+%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> \
+<br /> \
+<a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;">%BACK-TEXT%</a> \
+<span id="show-all-divider"> | </span> \
+<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
+';
 
 var settings = {
 	matrixId: 0,
@@ -170,9 +158,21 @@ var settings = {
 	scoreThreshold: 0
 };
 
+var data={
+	menu: Array(), // full menu
+	dataset: Array(), // full dataset
+	resultset: Array(), // result subset
+	states: {}, // user-selected states
+	scores: {}, // match scores based on selection
+	related: {} // related species
+}
+
+var lastScrollPos=0;
+var lastShowing=0;
+var tempstatevalue="";
 var openGroups=Array();
 
-function getDataSet()
+function retrieveDataSet()
 {
 	setCursor('wait');
 
@@ -188,8 +188,8 @@ function getDataSet()
 		success : function (data)
 		{
 			//console.log(data);
-			dataset = $.parseJSON(data);
-			//console.dir(dataset);
+			setDataSet($.parseJSON(data));
+			//console.dir(getDataSet());
 
 			applyScores();
 			clearResults();
@@ -206,7 +206,7 @@ function getDataSet()
 	});
 }
 
-function getMenu()
+function retrieveMenu()
 {
 	setCursor('wait');
 
@@ -222,45 +222,13 @@ function getMenu()
 		success : function (data)
 		{
 			//console.log(data);
-			menu = $.parseJSON(data);
+			setMenu($.parseJSON(data));
 			filterEmergingCharacters();
 			printMenu();
 			//console.dir(menu);
 			setCursor();
 		}
 	});
-}
-
-function getSession()
-{
-	setCursor('wait');
-
-	$.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_session' ,
-			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
-		}),
-		success : function(data)
-		{
-			//console.log(data);
-			var d=$.parseJSON(data);
-			scores=d.scores;
-			states=d.states;
-			//console.dir(states);
-
-			applyScores();
-			clearResults();
-			printResults();
-			printMenu();
-
-			setCursor();
-		}
-	});
-	
 }
 
 function resetMatrix()
@@ -271,6 +239,8 @@ function resetMatrix()
 
 function printResults()
 {
+	var resultset = getResultSet();
+
 	if (resultset && settings.browseStyle=='expand') 
 	{
 		printResultsExpanded();
@@ -288,6 +258,16 @@ function printResults()
 	clearOverhead();
 	printCountHeader();
 	prettyPhotoInit();
+
+	$('.result-icon').on('mouseover',function()
+	{	
+		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('_grijs','')  : "" );
+	}).on('mouseout',function()
+	{
+		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('.png','_grijs.png')  : "" );
+	});
+
+	
 }
 
 function clearResults()
@@ -299,6 +279,8 @@ function clearResults()
 
 function printResultsExpanded()
 {
+	var resultset = getResultSet();
+
 	settings.showSpeciesDetails = resultset.length <= settings.perPage;
 
 	var s="";
@@ -320,6 +302,8 @@ function printResultsExpanded()
 			}
 		}
 	}
+	
+	
 
 	$('#results-container').html(
 		resultBatchHtmlTemplate
@@ -357,6 +341,8 @@ function printResultsExpanded()
 
 function printResultsPaginated()
 {
+	var resultset = getResultSet();
+
 	var s="";
 	var d=0;
 
@@ -396,7 +382,7 @@ function formatResult( data )
 		var sciName='<i>'+data.taxon.taxon+'</i>';
 		var commonName=data.label ? data.label : "";
 	}
-	
+
 
 /*
 	if (data.l!=data.c && data.l.indexOf(data.c)===0)
@@ -520,12 +506,12 @@ function formatResult( data )
 			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
 				relatedClickHtmlTemplate
 					.replace('%TYPE%', data.type)
-					.replace('%LOCAL-ID%', id)
+					.replace('%ID%', data.id)
 					.replace('%TITLE%', nbcLabelSimilarSpecies)
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
-				iconListSimilarTemplate.replace('%IMG-URL%',settings.imageRoot+"gelijk_grijs.png") : "")
+				iconSimilarTemplate.replace('%IMG-URL%',settings.imageRoot+"gelijk_grijs.png") : "")
 			.replace('%STATES%', showStates ? statesHtmlTemplate.replace( '%STATES%',states.join(statesJoinHtmlTemplate)) : "")
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.od)
@@ -543,6 +529,8 @@ function clearOverhead()
 
 function printCountHeader()
 {
+	var resultset = getResultSet();
+	
 	if (settings.browseStyle=='expand')
 	{
 		$('#result-count').html(
@@ -584,6 +572,8 @@ function clearPaging()
 
 function printPaging()
 {
+	var resultset = getResultSet();
+
 	settings.lastPage = Math.ceil(resultset.length / settings.perPage);
 	settings.currPage = Math.floor(settings.start / settings.perPage);
 
@@ -632,6 +622,8 @@ function browsePage( id )
 
 function getActiveStates( id )
 {
+	var states=getStates();
+	
 	if (!states) return;
 	
 	var res=Array();
@@ -652,6 +644,7 @@ function printMenu()
 {
 	$('#facet-categories-menu').html('');
 	
+	var menu=getMenu();
 	var buffer=Array();
 
 	for (var i in menu)
@@ -668,7 +661,7 @@ function printMenu()
 			{
 				var char = item.chars[j];
 
-				activestates=getActiveStates(char.id);
+				var activestates=getActiveStates(char.id);
 				
 				var l=""
 
@@ -730,7 +723,7 @@ function printMenu()
 		else
 		if (item.type=='char')
 		{
-			activestates=getActiveStates(item.id);
+			var activestates=getActiveStates(item.id);
 			
 			var l=""
 	
@@ -768,6 +761,8 @@ function printMenu()
 	{
 		toggleGroup( openGroups[i], true );
 	}
+	
+	var states=getStates();
 	
 	if (!states || states.count==0)
 	{
@@ -857,9 +852,10 @@ function setState( p )
 		{
 			//console.log(data);
 			var d=$.parseJSON(data);
-			scores=d.scores;
-			states=d.states;
-			//console.dir(states);
+
+			setScores(d.scores);
+			setStates(d.states);
+			//console.dir(getStates());
 
 			applyScores();
 			clearResults();
@@ -874,13 +870,20 @@ function setState( p )
 
 function applyScores()
 {
-	if (!scores || scores.length==0)
+	var scores=getScores();
+	var states=getStates();
+	var dataset=getDataSet();
+	var resultset=getResultSet();
+	
+	// clean slate (also include states to be sure it's not a selection that returns zero matches)
+	if ((!states || states.length==0) && (!scores || scores.length==0))
 	{
 		resultset=dataset.slice();
 	}
 	else
 	{
 		resultset.splice(0,resultset.length);
+
 		for(var i in scores)
 		{
 			var score=scores[i];
@@ -894,15 +897,107 @@ function applyScores()
 			}
 		}
 	}
+	
+	setResultSet(resultset);
 
 	// scores are sorted in the controller
 }
 
+function applyRelated()
+{
+	var related=getRelated();
+	var dataset=getDataSet();
+	var resultset=getResultSet();
+
+	if ((!related || related.length==0))
+	{
+		resultset=dataset.slice();
+	}
+	else
+	{
+		resultset.splice(0,resultset.length);
+
+		for(var i in related)
+		{
+			var relate=related[i];
+			for(var j in dataset)
+			{
+				var item=dataset[j];
+				if (relate.relation_id==item.id && relate.ref_type==item.type)
+				{
+					resultset.push(item);
+				}
+			}
+		}
+	}
+	
+	setResultSet(resultset);
+}
+
+function setSimilar( p )
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_similar' ,
+			id : p.id,
+			type : p.type,
+			time : getTimestamp(),
+			key : settings.matrixId,
+			p : settings.projectId
+		}),
+		success : function(data)
+		{
+			var related=$.parseJSON(data);
+			setRelated(related);
+			
+			setLastShowing();
+			setLastScrollPos();
+			applyRelated();
+			clearResults();
+			printResults();
+			printSimilarHeader();
+
+			setCursor();
+		}
+	});
+	
+}
 
 
+function clearSimilarHeader()
+{
+	$('#similarSpeciesHeader').html('');	
+}
 
+function printSimilarHeader()
+{
+	var resultset = getResultSet();
+	
+	$('#similarSpeciesHeader').html(
+		similarHeaderHtmlTemplate
+			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
+			.replace('%SPECIES-NAME%', resultset[0].label)
+			.replace('%BACK-TEXT%', __('terug'))
+			.replace('%SHOW-STATES-TEXT%', __('alle onderscheidende kenmerken tonen'))
+	).removeClass('hidden').addClass('visible');
+	
+	$('.result-icon.related').find('img').remove();
 
+}
 
+function closeSimilar()
+{
+	setRelated();
+	clearSimilarHeader();
+	applyScores();
+	clearResults();
+	printResults();
+	window.scroll(0,getLastScrollPos());
+}
 
 
 
@@ -976,66 +1071,8 @@ function nbcDoSearch()
 
 
 
-function nbcSwitchImagename(ele,state) {
-//	alert('eeeek!');
-	var p = '_grijs';
-	$(ele).find('img').attr('src',state==1 ? $(ele).find('img').attr('src').replace(p,'') : $(ele).find('img').attr('src').replace('.png',p+'.png'));	
-}
 
 
-
-
-
-
-
-function nbcShowSimilar(id,type) {
-
-	nbcPreviousBrowseStyles.paginate = settings.paginate;
-	nbcPreviousBrowseStyles.expand = settings.expandResults;
-	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
-	nbcPreviousBrowseStyles.expandPrev = settings.expandedPrevious;
-	nbcPreviousBrowseStyles.lastPos = getPageScroll();
-
-	nbcSetPaginate(false);
-	nbcSetExpandResults(false);
-	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
-	nbcSaveSessionSetting('nbcSimilar',[id,type]);
-
-}
-
-function nbcPrintSimilarHeader() {
-
-	var label = nbcData.results[0].l;
-
-	$('#similarSpeciesHeader').html(
-		sprintf(__('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
-		'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
-		'<span id="show-all-divider"> | </span>'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
-
-	var t=$('.icon-info:visible').not('.legend-icon-image').length!=0;
-	$('#showAllLabel').toggle(t);
-	$('#show-all-divider').toggle(t);
-
-}
-
-function nbcCloseSimilar() {
-
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
-	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
-	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	settings.expandedPrevious = nbcPreviousBrowseStyles.expandPrev;
-
-	nbcGetResults();
-	nbcClearOverhead();
-	nbcSaveSessionSetting('nbcSimilar');
-
-	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
-	
-}
 
 
 function nbcClearSearchTerm() {
@@ -1107,43 +1144,6 @@ function nbcToggleAllSpeciesDetail() {
 		$('#showAllLabel').html(nbcLabelShowAll);
 
 }
-
-function nbcSaveSessionSetting(name,value) {
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'save_session_setting' ,
-			setting : { name : name, value: value },
-			id : null,
-			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
-		}),
-		success : function (data) {
-			//alert(data);
-		}
-	});
-	
-}
-
-
-
-function nbcSetPaginate(state) {
-
-	settings.paginate = state;
-	
-}
-
-function nbcSetExpandResults(state) {
-
-	settings.expandResults = state;
-	
-}
-
-
-
 
 
 
@@ -1270,6 +1270,7 @@ function bindDialogKeyUp()
 		{
 			// return
 			setStateValue();
+			closeDialog();
 		}
 		return;
 	});
@@ -1280,14 +1281,13 @@ function jDialogOk()
 {
 	// dialog button function, called from main.js::showDialog 
 	setStateValue();
-
+	closeDialog();
 }
 
 function jDialogCancel()
 {
 	// dialog button function, called from main.js::showDialog 
 	closeDialog();
-
 }
 
 function matrixInit()
@@ -1305,15 +1305,6 @@ function matrixInit()
 	$('#legendExternalLink').html(nbcLabelExternalLink);
 
 
-	if (settings.browseStyle=='paginate') {
-		nbcSetPaginate(true);
-		nbcSetExpandResults(false);
-	} else
-	if (settings.browseStyle=='expand') {
-		nbcSetPaginate(false);
-		nbcSetExpandResults(true);
-	}
-
 	nbcPreviousBrowseStyles.paginate=settings.paginate;
 	nbcPreviousBrowseStyles.expand=settings.expandResults;
 
@@ -1328,3 +1319,85 @@ function matrixInit()
 	*/
 
 }
+
+
+function setLastScrollPos()
+{
+	lastScrollPos=getPageScroll();
+}
+
+function getLastScrollPos()
+{
+	return lastScrollPos;
+}
+
+function setLastShowing()
+{
+	lastShowing=settings.expandedShowing;
+}
+
+function getLastShowing()
+{
+	return lastShowing;
+}
+
+function setScores(scores)
+{
+	data.scores=scores;
+}
+
+function getScores()
+{
+	return data.scores;
+}
+
+function setStates(states)
+{
+	data.states=states;
+}
+
+function getStates()
+{
+	return data.states;
+}
+
+function setDataSet(dataset)
+{
+	data.dataset=dataset;
+}
+
+function getDataSet()
+{
+	return data.dataset;
+}
+
+function setResultSet(resultset)
+{
+	data.resultset=resultset;
+}
+
+function getResultSet()
+{
+	return data.resultset;
+}
+
+function setMenu(menu)
+{
+	data.menu=menu;
+}
+
+function getMenu()
+{
+	return data.menu;
+}
+
+function setRelated(related)
+{
+	data.related=related;
+}
+
+function getRelated()
+{
+	return data.related;
+}
+

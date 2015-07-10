@@ -1267,113 +1267,6 @@ class MatrixKeyController extends Controller
 
 
 
-    private function nbcGetSimilar ($p = null)
-    {
-        if (!isset($p['type']) || !isset($p['id']))
-            return;
-        
-        if ($p['type'] == 'v') {
-            $d['vId'] = $p['id'];
-        }
-        else if ($p['type'] == 't') {
-            $d['tId'] = $p['id'];
-        }
-        else
-            return;
-        
-        $d['includeSelf'] = true;
-        
-        $rel = $this->getRelatedEntities($d);
-        
-        foreach ((array) $rel as $val) {
-            
-            if ($val['ref_type'] == 'variation') {
-                
-                $variation = $this->getVariation($val['relation_id']);
-                $val['taxon'] = $this->getTaxonById($variation['taxon_id']);
-
-                $val['taxon_id'] = $variation['taxon_id'];
-                
-                $nbc = $this->models->NbcExtras->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'ref_id' => $val['relation_id'], 
-                        'ref_type' => 'variation'
-                    ), 
-                    'columns' => 'name,value', 
-                    'fieldAsIndex' => 'name'
-                ));
-                
-                $label = $val['label'];
-                $val['id'] = $val['relation_id'];
-                
-				$d = $this->nbcExtractGenderTag($label);
-				
-                $res[] = $this->createDatasetEntry(
-                array(
-                    'val' => $val, 
-                    'nbc' => $nbc, 
-                    'label' => $d['label'], 
-					'common' => $this->getCommonname($val['taxon_id']), 
-                    'gender' => array($d['gender'], $d['gender_label']),
-                    'type' => 'v', 
-                    'highlight' => $val['id'] == $p['id'], 
-                    'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['relation_id'])
-                ));
-            }
-            else {
-                
-                $taxon = $this->getTaxonById($val['relation_id']);
-
-                $val['l'] = $taxon['label'];
-                
-                $c = $this->models->Commonname->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'taxon_id' => $taxon['id'], 
-                        'language_id' => $this->getCurrentLanguageId()
-                    )
-                ));
-                
-
-                $common = $val['l'];
-                foreach ((array) $c as $cVal) {
-                    if ($cVal['commonname'] != $val['l']) {
-                        $common = $cVal['commonname'];
-                        break;
-                    }
-                }
-                
-                $nbc = $this->models->NbcExtras->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'ref_id' => $val['relation_id'], 
-                        'ref_type' => 'taxon'
-                    ), 
-                    'columns' => 'name,value', 
-                    'fieldAsIndex' => 'name'
-                ));
-                
-                $res[] = $this->createDatasetEntry(
-                array(
-                    'val' => $val, 
-                    'nbc' => $nbc, 
-                    'label' => $common, 
-                    'type' => 't', 
-                    'highlight' => $val['relation_id'] == $p['id'], 
-                    'details' => $this->_matrixSuppressDetails ? null : $this->getTaxonStates($taxon['id'])
-                ));
-            }
-        }
-		
-		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-        
-        return $res;
-    }
-
 	private function nbcDoSearch($p=null)
     {
         if (!isset($p['term']))
@@ -1574,7 +1467,7 @@ class MatrixKeyController extends Controller
 
 		$smallIsSignificant = true;
 
-		$res = $this->getRemainingStateCount(array('states' => $states, 'groupByCharId' => true));
+		$res = $this->getRemainingStateCount(array('states' => $states, 'groupByChar' => true));
 
 		$l1['s'] = $l2['s'] = $l3['s'] = ($smallIsSignificant ? 1 : 0);
 		
