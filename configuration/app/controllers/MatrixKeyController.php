@@ -95,8 +95,11 @@ class MatrixKeyController extends Controller
 
     private function initialize ($force = false)
     {
+		echo '1:',$this->getCurrentMatrixId(),'<br />';
 		$this->initializeMatrixId();
+		echo '2:',$this->getCurrentMatrixId(),'<br />';
 		$this->setActiveMatrix();
+		echo '3:',$this->getCurrentMatrixId(),'<br />';
 
 		if (is_null($this->getCurrentMatrixId()))
 		{
@@ -266,26 +269,20 @@ class MatrixKeyController extends Controller
 	private function initializeMatrixId()
 	{
 		$id=$this->getCurrentMatrixId();
-echo '1:',$id,'<br />';
+
 		if ( is_null($id) )
 		{
-echo '2:',$id,'<br />';
 			$m=$this->getMatrix( null ); // get all
-echo '3:',$id,'<br />';			
-var_dump($m);
+			
 			if ( $m ) 
 			{
 				$m=array_shift($m);
 				$this->setCurrentMatrixId( $m['id'] );
-echo '4:',$id,'<br />';			
-var_dump($m);
 			}
 		}
-echo '5:','<br />';			
+
         $this->checkMatrixIdOverride();
-echo '6:','<br />';			
         $this->checkMasterMatrixId();
-echo '7:','<br />';			
 	}
 
     private function setCurrentMatrixId( $id=null )
