@@ -55,7 +55,6 @@ $(document).ready(function()
 	settings.useEmergingCharacters={$matrix_use_emerging_characters};
 	settings.defaultImage='{$nbcImageRoot}noimage.gif';
 	settings.browseStyle='{$matrix_browse_style}';
-	settings.stateImagesPerRow='{$matrix_browse_style}';
 	settings.scoreThreshold={$matrix_score_threshold};
 
 	setScores($.parseJSON('{$session_scores}'));

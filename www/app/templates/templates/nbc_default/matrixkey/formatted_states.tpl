@@ -82,29 +82,55 @@
                            ({$states_remain_count[{$v.id}]})
                         {/if}
 					</td>
-                    {if ($smarty.foreach.foo.index+1)%$stateImagesPerRow==0}
+                    {if ($smarty.foreach.foo.index+1)%$state_images_per_row==0}
                     </tr><tr>
                     {/if}
                 	{/foreach}
 
-	                {math equation="(counter+1) % columns" counter=$smarty.foreach.foo.index columns=$stateImagesPerRow assign=x}
+	                {math equation="(counter+1) % columns" counter=$smarty.foreach.foo.index columns=$state_images_per_row assign=x}
                     {'<td>&nbsp;</td>'|str_repeat:$x}
 
                 </tr>
             </table>
            
         {elseif $character.type=='text'}
-       
+
             <ul class="facetListType">
-                {foreach from=$states item=v key=k}
-                {if $states[$character.id][$v.id]}{assign var=selected value=true}{else}{assign var=selected value=false}{/if}
-                {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
-                <li {if $irrelephant}class="irrelevant"{/if}>
-                    <span class="selected" style="{if $selected}font-weight:bold{/if}">
-                        <a href="#" onclick="{if $selected}clearStateValue{else}setStateValue{/if}('{$character.prefix}:{$character.id}:{$v.id}');closeDialog();return false;">
-                        <img src="{$session.app.system.urls.systemMedia}orange_checkbox_{if $selected}on{else}off{/if}.png" style="margin-right:10px">{$v.label}</a>
-                    </span>
-                    {if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
+
+                {foreach from=$states item=v key=foo}
+                    
+                    {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
+	                    {assign var=irrelevant value=true}
+                    {else}
+    	                {assign var=irrelevant value=false}
+                    {/if}
+                    
+                    {if isset($states_selected[{$v.id}])}
+	                    {assign var=selected value=true}
+                    {else}
+    	                {assign var=selected value=false}
+                    {/if}
+
+				<li{if $irrelevant} class="irrelevant"{/if}>
+                	<span class="selected" {if $selected}style="font-weight:bold"{/if}>
+                    	{if !$irrelevant}
+                        <a href="#" 
+                        	onclick="{if $selected}
+                            clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');
+                            {else}
+                            setStateValue('{$character.prefix}:{$character.id}:{$v.id}');
+                            {/if}
+                            closeDialog();
+                            return false;" >
+						{/if}
+                            <img 
+                            	src="{$session.app.system.urls.systemMedia}orange_checkbox_{if $selected}on{else}off{/if}.png" 
+                                style="margin-right:10px">{$v.label}
+						{if !$irrelevant}
+						</a>
+                        {/if}
+					</span>
+                    {if $states_remain_count[{$v.id}] && !$selected}({$states_remain_count[{$v.id}]}){/if}
                 </li>
                 {/foreach}
             </ul>
@@ -123,7 +149,6 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-
 	if (typeof matrixInit=='function')
 	{
 		matrixInit();
@@ -133,7 +158,6 @@ $(document).ready(function()
 
 	$('#state-value').focus();
 	$('#state-value').select();
-
 });
 </script>
 {/literal}

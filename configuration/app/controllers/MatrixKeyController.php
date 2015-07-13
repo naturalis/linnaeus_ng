@@ -146,14 +146,10 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 		
-		//$this->setScores();q($this->getScores(),1);
-		//q($this->setRemainingStateCount( array('char'=>2361) ),1);
-		//q($this->getSessionStates( array('char'=>2361,'reindex'=>true) ),1);
-
 		$this->setScores();
+
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
-		
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
@@ -195,8 +191,7 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('states', $states);
 			$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
 			$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
-
-            $this->smarty->assign('stateImagesPerRow', $this->_matrix_state_image_per_row);
+            $this->smarty->assign('state_images_per_row', $this->_matrix_state_image_per_row);
 
             $this->smarty->assign('returnText', 
 				json_encode(
