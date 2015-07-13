@@ -51,7 +51,7 @@ $(document).ready(function()
 
 	setSetting({
 		matrixId: {$matrix.id},
-		projectId: {$session.admin.project.id},
+		projectId: {$session.app.project.id},
 		imageRoot: '{$nbcImageRoot}',
 		useEmergingCharacters: {$matrix_use_emerging_characters},
 		defaultImage: '{$nbcImageRoot}noimage.gif',
