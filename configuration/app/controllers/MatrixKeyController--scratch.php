@@ -1267,148 +1267,6 @@ class MatrixKeyController extends Controller
 
 
 
-	private function nbcDoSearch($p=null)
-    {
-        if (!isset($p['term']))
-            return;
-			
-		$term = mysql_real_escape_string(strtolower($p['term']));
-
-		// n.b. don't change to 'union all'
-        $q = "
-			select
-				'variation' as type,
-				_a.variation_id as id,
-				trim(_c.label) as label,
-				trim(_c.label) as l,
-				_c.taxon_id as taxon_id,
-				_d.taxon as taxon, 
-				1 as s, 
-				null as commonname
-			from  %PRE%matrices_variations _a        		
-			left join %PRE%matrices_taxa_states _b
-				on _a.matrix_id = _b.matrix_id
-				and _a.variation_id = _b.variation_id
-				and _b.project_id = " . $this->getCurrentProjectId() . "
-			left join %PRE%taxa_variations _c
-				on _a.variation_id = _c.id
-				and _c.project_id = " . $this->getCurrentProjectId() . "
-			left join %PRE%taxa _d
-				on _c.taxon_id = _d.id						
-				and _d.project_id = " . $this->getCurrentProjectId() . "
-			where _a.project_id = " . $this->getCurrentProjectId() . "
-				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-			and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
-
-			union
-
-			select 
-				'taxon' as type,
-				_a.taxon_id as id, 
-				trim(_c.taxon) as label, 
-				trim(_c.taxon) as l, 
-				_a.taxon_id as taxon_id,
-				_c.taxon as taxon, 
-				1 as s, 
-				_d.commonname as commonname
-			from %PRE%matrices_taxa _a
-			left join %PRE%matrices_taxa_states _b
-				on _a.matrix_id = _b.matrix_id
-				and _a.taxon_id = _b.taxon_id
-				and _b.project_id = " . $this->getCurrentProjectId() . "
-			left join %PRE%taxa _c
-				on _a.taxon_id = _c.id
-				and _c.project_id = " . $this->getCurrentProjectId() . "
-			left join %PRE%commonnames _d
-				on _a.taxon_id = _d.taxon_id
-				and _d.language_id = ".$this->getCurrentLanguageId() ." 
-				and _d.project_id = " . $this->getCurrentProjectId() . "
-			where _a.project_id = " . $this->getCurrentProjectId() . "
-				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-				and (lower(_c.taxon) like '%". $term ."%' or lower(_d.commonname) like '%". $term ."%')
-				";
-
-        $results = $this->models->MatrixTaxonState->freeQuery($q);
-
-        if (!$results)
-			return null;
-		
-		usort($results, array($this, 'sortQueryResultsByScoreThenLabel'));
-
-		$res = $tmp = array();
-		$i = 0;
-		
-		foreach((array)$results as $val) {
-
-			if ($val['type']=='taxon' && isset($tmp[$val['id']]))
-				continue;
-
-			if ($val['type']=='variation')
-			{
-				$d=$this->nbcExtractGenderTag($val['label']);
-				$gender=array($d['gender'], $d['gender_label']);
-				$common=$this->getCommonname($val['taxon_id']);
-			}
-			else
-			{
-				$gender=array();
-
-				if ($val['commonname'] != $val['label'])
-					$label = $val['commonname'];
-
-				$common = $val['commonname'];
-
-			}
-
-			$res[$i] = $this->createDatasetEntry(
-				array(
-					'val' => $val, 
-					'nbc' => $this->models->NbcExtras->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(), 
-								'ref_id' => $val['id'], 
-								'ref_type' => $val['type']
-							), 
-							'columns' => 'name,value', 'fieldAsIndex' => 'name'
-						)
-					), 
-					'label' => $val['label'], 
-					'common' => $common,
-					'gender' => $gender,
-					'related' => $this->getRelatedEntities(array(($val['type']=='variation' ? 'vId' : 'tId') => $val['id'])), 
-					'type' => $val['type'], 
-					'inclRelated' => true,
-					'details' => ($val['type']=='variation' ? $this->getVariationStates($val['id']) : $this->getTaxonStates($val['id']))
-				)
-			);
-
-			// post processing; createDatasetEntry() strips tages, hence.
-			$res[$i]['l'] = preg_replace_callback(
-				'/(' . $term . ')/i', 
-				create_function('$matches', 'if (trim($matches[0]) == "") return $matches[0]; else return "<span class=\"seachStringHighlight\">".$matches[0]."</span>";'), 
-				$res[$i]['l']
-			);
-
-			$res[$i]['s'] = preg_replace_callback(
-				'/(' . $term . ')/i', 
-				create_function('$matches', 'if (trim($matches[0]) == "") return $matches[0]; else return "<span class=\"seachStringHighlight\">".$matches[0]."</span>";'), 
-				$res[$i]['s']
-			);
-
-			if ($val['type']=='variation')
-				$tmp[$val['taxon_id']] = true;
-				
-			$i++;
-                    
-		}
-		
-		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-
-        return $res;
-		
-    }
- 
  	private function nbcHandleOverlappingItemsFromDetails($p)
 	{
 		//return $p['data'];
@@ -1505,6 +1363,78 @@ class MatrixKeyController extends Controller
 	}
 
 
+
+			
+
+
+
+    private function setCharacters()
+    {
+        $characters=$this->models->CharacteristicMatrix->freeQuery("
+			select
+				_a.characteristic_id as id,
+				_b.type,
+				_c.label,
+				if (_b.type='media'||_b.type='text','c','f') as prefix,
+				_a.show_order,
+				if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label_short,
+				if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description
+
+			from 
+				%PRE%characteristics_matrices _a
+				
+			right join %PRE%characteristics _b
+				on _a.project_id = _b.project_id
+				and _a.characteristic_id = _b.id
+
+			left join %PRE%characteristics_labels _c
+				on _a.project_id=_c.project_id
+				and _a.characteristic_id=_c.characteristic_id
+				and _c.language_id=".$this->getCurrentLanguageId()."
+				
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.matrix_id = ".$this->getCurrentMatrixId()." 
+			order by 
+				_a.show_order
+		");
+		
+		$states=array();
+
+		foreach((array)$this->getCharacterStates( array('id'=>'*') ) as $val)
+		{
+			$states[$val['characteristic_id']][]=$val;
+		}
+
+        foreach ((array) $characters as $key => $val)
+		{
+			$characters[$key]['states']=$states[$val['id']];
+
+			$characters[$key]['sort_by']=
+				array(
+					'alphabet' =>
+						isset($val['label']) ? strtolower(preg_replace('/[^A-Za-z0-9]/', '', $val['label'])) : '',
+					'characterType' =>
+						strtolower(preg_replace('/[^A-Za-z0-9]/', '', $val['type'])),
+					'numberOfStates' =>
+						-1 * count((array)$characters[$key]['states']), // -1 to avoid asc/desc hassles in JS-sorting
+					'entryOrder' =>
+						intval($val['show_order']),
+					'separationCoefficient' => 
+						$this->_matrix_calc_char_h_val ?
+							-1 * $this->getCharacteristicHValue( array('id'=>$val['id'],'states'=>$states[$val['id']]) )  : 
+							null
+				);
+        }
+		
+        $this->_characters=isset($characters) ? $characters : null;
+
+    }
+
+    private function getCharacters()
+    {
+        return $this->_characters;
+    }
 
 
 

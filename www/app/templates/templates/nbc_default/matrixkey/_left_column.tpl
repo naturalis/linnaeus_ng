@@ -4,8 +4,7 @@
 
             <h2>{t}Zoek op naam{/t}</h2>
             
-            <form id="inlineformsearch" name="inlineformsearch" action="" method="post" onsubmit="nbcDoSearch();return false;">
-                <label for="searchString" accesskey="t"></label>
+            <form onsubmit="setSearch();return false;">
                 <input id="inlineformsearchInput" type="text" name="searchString" class="searchString" title="{t}Zoek op naam{/t}" value="" />
                 <input id="inlineformsearchButton" type="submit" value="{t}zoek{/t}" class="zoekknop" />
             </form>

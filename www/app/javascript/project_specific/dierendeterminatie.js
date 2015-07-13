@@ -131,11 +131,17 @@ var iconInfoHtmlTemplate='<img class="result-icon-image icon-info" src="%IMG-URL
 var iconSimilarTemplate='<img class="result-icon-image icon-similar" src="%IMG-URL%">';
 
 var similarHeaderHtmlTemplate='\
-%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> \
+%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END%)</span> \
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;">%BACK-TEXT%</a> \
 <span id="show-all-divider"> | </span> \
 <a class="clearSimilarSelection" href="#" onclick="toggleAllDetails();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
+';
+
+var searchHeaderHtmlTemplate='\
+%HEADER-TEXT% <span id="similarSpeciesName">%SEARCH-TERM%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END% %OF-TEXT% %NUMBER-TOTAL%)</span> \
+<br /> \
+<a class="clearSimilarSelection" href="#" onclick="closeSearch();return false;">%BACK-TEXT%</a> \
 ';
 
 var settings={
@@ -155,7 +161,8 @@ var settings={
 	paginate: true,
 	currPage: 0,
 	lastPage: 0,
-	scoreThreshold: 0
+	scoreThreshold: 0,
+	mode: "identify" // similar, search
 };
 
 var data={
@@ -164,7 +171,8 @@ var data={
 	resultset: Array(), // result subset
 	states: {}, // user-selected states
 	scores: {}, // match scores based on selection
-	related: {} // related species
+	related: {}, // related species
+	found: {} // search results
 }
 
 var prevSettings={};
@@ -172,6 +180,7 @@ var prevSettings={};
 var lastScrollPos=0;
 var tempstatevalue="";
 var openGroups=Array();
+var searchedfor="";
 
 function retrieveDataSet()
 {
@@ -251,7 +260,7 @@ function printResults()
 	}
 
 	clearOverhead();
-	printCountHeader();
+	printHeader();
 	prettyPhotoInit();
 
 	$('.result-icon').on('mouseover',function()
@@ -266,7 +275,24 @@ function printResults()
 function clearResults()
 {
 	$('#results-container').html('');
-	settings.expandedShowing=0;
+	setSetting({expandedShowing:0});
+}
+
+function printHeader()
+{
+	if (settings.mode=="search")
+	{
+		printSearchHeader();
+	}
+	else
+	if (settings.mode=="similar")
+	{
+		printSimilarHeader();
+	}
+	else
+	{
+		printCountHeader();
+	}
 }
 
 function printResultsExpanded()
@@ -556,8 +582,8 @@ function printPaging()
 {
 	var resultset = getResultSet();
 
-	settings.lastPage = Math.ceil(resultset.length / settings.perPage);
-	settings.currPage = Math.floor(settings.start / settings.perPage);
+	setSetting({lastPage:Math.ceil(resultset.length / settings.perPage)});
+	setSetting({currPage:Math.floor(settings.start / settings.perPage)});
 
 	if (settings.lastPage > 1 && settings.currPage!=0)
 	{
@@ -589,10 +615,14 @@ function printPaging()
 
 function browsePage( id )
 {
-	if (id=='n') settings.start = settings.start+settings.perPage;
-	else if (id=='p') settings.start = settings.start-settings.perPage;
-	else if (!isNaN(id)) settings.start = id * settings.perPage;
-	else return;
+	if (id=='n')
+		setSetting({start: settings.start+settings.perPage});
+	else if (id=='p')
+		setSetting({start: settings.start-settings.perPage});
+	else if (!isNaN(id))
+		setSetting({start:id * settings.perPage});
+	else
+		return;
 			
 //	nbcSaveSessionSetting('nbcStart',nbcStart);
 	clearResults();
@@ -918,6 +948,37 @@ function applyRelated()
 	setResultSet(resultset);
 }
 
+function applyFound()
+{
+	var found=getFound();
+	var dataset=getDataSet();
+	var resultset=getResultSet();
+
+	if ((!found || found.length==0))
+	{
+		resultset=dataset.slice();
+	}
+	else
+	{
+		resultset.splice(0,resultset.length);
+
+		for(var i in found)
+		{
+			var tfound=found[i];
+			for(var j in dataset)
+			{
+				var item=dataset[j];
+				if (tfound.id==item.id && tfound.type==item.type)
+				{
+					resultset.push(item);
+				}
+			}
+		}
+	}
+	
+	setResultSet(resultset);
+}
+
 function setSimilar( p )
 {
 	setCursor('wait');
@@ -941,6 +1002,7 @@ function setSimilar( p )
 			setPrevSettings();
 			setLastScrollPos();
 
+			setSetting({mode:"similar"});
 			setSetting({start:0});
 			setSetting({expandedShowing:0});
 			setSetting({browseStyle:'show_all'});
@@ -1051,22 +1113,12 @@ function printSimilarHeader()
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
 			.replace('%SHOW-STATES-TEXT%', nbcLabelShowAll)
+			.replace('%NUMBER-START%', settings.start+1)
+			.replace('%NUMBER-END%', data.resultset.length)
 	).removeClass('hidden').addClass('visible');
 	
 	$('.result-icon.related').find('img').remove();
 
-}
-
-function closeSimilar()
-{
-	setRelated();
-	clearSimilarHeader();
-	applyScores();
-	clearResults();
-	setSetting(getPrevSettings());
-	setSetting({expandedShowing:settings.expandedShowing-settings.perPage});
-	printResults();
-	window.scroll(0,getLastScrollPos());
 }
 
 function toggleAllDetails()
@@ -1089,114 +1141,251 @@ function toggleDetails(id)
 	$('#det-'+id).toggle();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-var nbcFullDatasetCount = 0;
-var nbcDetailShowStates = Array();
-var nbcSearchTerm = '';
-var nbcLabelShowAll = '';
-var nbcLabelHideAll = '';
-var nbcLabelClose = '';
-var nbcLabelDetails = '';
-var nbcLabelBack = '';
-var nbcLabelSimilarSpecies = '';
-var nbcPreviousBrowseStyles = {};
-var baseUrlProjectImages = null;
-
-function nbcDoSearch()
+function setSearch( p )
 {
-	var str = $('#inlineformsearchInput').val();
-	str = str.replace(/^\s+|\s+$/g, ''); 
-
-	if (str.length==0) return false;
-
-	nbcSearchTerm=str;
-	setState({norefresh:true,clearState:true});
+	var s=$('#inlineformsearchInput').val();
+	
+	if (s.length==0) return;
 	
 	setCursor('wait');
+	
+	searchedfor=s;
 
-	allAjaxHandle = $.ajax({
+	$.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : 'do_search',
-			params : {term: nbcSearchTerm},
+			action : 'get_search' ,
+			search : s,
 			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
+			key : settings.matrixId,
+			p : settings.projectId
 		}),
-		success : function (data)
+		success : function(data)
 		{
-			//console.log(data);
-			nbcData = $.parseJSON(data);
-			nbcDoResults();
-			nbcDoOverhead();
-			nbcDoPaging();
-			nbcPrintSearchHeader();
-			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
+			var found=$.parseJSON(data);
+			setFound(found);
 
-			setCursor();
+			setPrevSettings();
+			setLastScrollPos();
+
+			setSetting({mode:"search"});
+			setSetting({start:0});
+			setSetting({expandedShowing:0});
+			setSetting({browseStyle:'expand'});
+			setSetting({showSpeciesDetails: true});
 			
-			return false;
+			clearPaging();
+			clearResults();
 
+			applyFound();
+			removeSimilarCharacters();
+			printResults();
+			printSearchHeader();
+			window.scroll(0,0);
+			setCursor();
 		}
 	});
-	return false; // suppress submit of form
-}
-
-
-
-
-
-
-
-
-
-function nbcClearSearchTerm() {
 	
-	nbcSearchTerm='';
-	$('#inlineformsearchInput').val('');
-
 }
 
-function nbcCloseSearch() {
-
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
-	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
-	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	settings.expandedPrevious = nbcPreviousBrowseStyles.expandPrev;
-
-	$('#inlineformsearchInput').val('');
-
-	nbcGetResults();
-	nbcClearOverhead();
-	nbcSaveSessionSetting('nbcSearch');
-
-	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
-
-}
-
-function nbcPrintSearchHeader() {
-
+function printSearchHeader()
+{
 	$('#similarSpeciesHeader').html(
-		sprintf(__('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+		searchHeaderHtmlTemplate
+			.replace('%HEADER-TEXT%', __('Zoekresultaten voor'))
+			.replace('%SEARCH-TERM%', searchedfor)
+			.replace('%BACK-TEXT%', __('terug'))
+			.replace('%NUMBER-START%', settings.start+1)
+			.replace('%NUMBER-END%', settings.expandedShowing)
+			.replace('%OF-TEXT%', __('van'))
+			.replace('%NUMBER-TOTAL%', data.resultset.length)
+	).removeClass('hidden').addClass('visible');
+}
+
+function closeSimilarSearch()
+{
+	setSetting({mode:"identify"});
+	clearSimilarHeader();
+	applyScores();
+	clearResults();
+	setSetting(getPrevSettings());
+	setSetting({expandedShowing:settings.expandedShowing-settings.perPage});
+	printResults();
+	window.scroll(0,getLastScrollPos());
+}
+
+function closeSimilar()
+{
+	setRelated();
+	closeSimilarSearch();
+}
+
+function closeSearch()
+{
+	setFound();
+	$('#inlineformsearchInput').val("");
+	closeSimilarSearch();
+}
+
+function prettyPhotoInit()
+{
+ 	$("a[rel^='prettyPhoto']").prettyPhoto({
+		allow_resize:true,
+		animation_speed:50,
+ 		opacity: 0.70, 
+		show_title: false,
+ 		overlay_gallery: false,
+ 		social_tools: false
+ 	});
+
+}
+
+function bindDialogKeyUp()
+{
+    $("#state-value").keydown(function(event)
+	{
+        // Allow: backspace, delete, tab, escape, and enter
+        if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
+             // Allow: Ctrl+A
+            (event.keyCode==65 && event.ctrlKey===true) || 
+             // Allow: home, end, left, right
+            (event.keyCode>=35 && event.keyCode<=39))
+		{
+			// let it happen, don't do anything
+			return;
+        }
+        else
+		{
+			// Ensure that it is a number and stop the keypress
+			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105))
+			{
+				event.preventDefault(); 
+			}   
+        }
+    });
+
+	$('#state-value').keyup(function(e)
+	{
+		if (e.keyCode==13)
+		{
+			// return
+			setStateValue();
+			closeDialog();
+		}
+		return;
+	});
+
+}
+
+function jDialogOk()
+{
+	// dialog button function, called from main.js::showDialog 
+	setStateValue();
+	closeDialog();
+}
+
+function jDialogCancel()
+{
+	// dialog button function, called from main.js::showDialog 
+	closeDialog();
 }
 
 
+function setLastScrollPos()
+{
+	lastScrollPos=getPageScroll();
+}
+
+function getLastScrollPos()
+{
+	return lastScrollPos;
+}
+
+function setScores(scores)
+{
+	data.scores=scores;
+}
+
+function getScores()
+{
+	return data.scores;
+}
+
+function setStates(states)
+{
+	data.states=states;
+}
+
+function getStates()
+{
+	return data.states;
+}
+
+function setDataSet(dataset)
+{
+	data.dataset=dataset;
+}
+
+function getDataSet()
+{
+	return data.dataset;
+}
+
+function setResultSet(resultset)
+{
+	data.resultset=resultset;
+}
+
+function getResultSet()
+{
+	return data.resultset;
+}
+
+function setMenu(menu)
+{
+	data.menu=menu;
+}
+
+function getMenu()
+{
+	return data.menu;
+}
+
+function setRelated(related)
+{
+	data.related=related;
+}
+
+function getRelated()
+{
+	return data.related;
+}
+
+function setFound(found)
+{
+	data.found=found;
+}
+
+function getFound()
+{
+	return data.found;
+}
+
+function setPrevSettings()
+{
+	prevSettings = jQuery.extend({}, settings);
+}
+
+function getPrevSettings()
+{
+	return prevSettings;
+}
+
+function setSetting( p )
+{
+	$.extend(settings, p);
+}
 
 
 
@@ -1282,68 +1471,6 @@ function filterEmergingCharacters()
 
 }
 
-function prettyPhotoInit()
-{
- 	$("a[rel^='prettyPhoto']").prettyPhoto({
-		allow_resize:true,
-		animation_speed:50,
- 		opacity: 0.70, 
-		show_title: false,
- 		overlay_gallery: false,
- 		social_tools: false
- 	});
-
-}
-
-function bindDialogKeyUp()
-{
-    $("#state-value").keydown(function(event)
-	{
-        // Allow: backspace, delete, tab, escape, and enter
-        if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
-             // Allow: Ctrl+A
-            (event.keyCode==65 && event.ctrlKey===true) || 
-             // Allow: home, end, left, right
-            (event.keyCode>=35 && event.keyCode<=39))
-		{
-			// let it happen, don't do anything
-			return;
-        }
-        else
-		{
-			// Ensure that it is a number and stop the keypress
-			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105))
-			{
-				event.preventDefault(); 
-			}   
-        }
-    });
-
-	$('#state-value').keyup(function(e)
-	{
-		if (e.keyCode==13)
-		{
-			// return
-			setStateValue();
-			closeDialog();
-		}
-		return;
-	});
-
-}
-
-function jDialogOk()
-{
-	// dialog button function, called from main.js::showDialog 
-	setStateValue();
-	closeDialog();
-}
-
-function jDialogCancel()
-{
-	// dialog button function, called from main.js::showDialog 
-	closeDialog();
-}
 
 function matrixInit()
 {
@@ -1360,9 +1487,6 @@ function matrixInit()
 	$('#legendExternalLink').html(nbcLabelExternalLink);
 
 
-	nbcPreviousBrowseStyles.paginate=settings.paginate;
-	nbcPreviousBrowseStyles.expand=settings.expandResults;
-
 	/*
 	if ("ontouchstart" in document) {
 		// touch only code (tablets)
@@ -1374,91 +1498,3 @@ function matrixInit()
 	*/
 
 }
-
-function setLastScrollPos()
-{
-	lastScrollPos=getPageScroll();
-}
-
-function getLastScrollPos()
-{
-	return lastScrollPos;
-}
-
-function setScores(scores)
-{
-	data.scores=scores;
-}
-
-function getScores()
-{
-	return data.scores;
-}
-
-function setStates(states)
-{
-	data.states=states;
-}
-
-function getStates()
-{
-	return data.states;
-}
-
-function setDataSet(dataset)
-{
-	data.dataset=dataset;
-}
-
-function getDataSet()
-{
-	return data.dataset;
-}
-
-function setResultSet(resultset)
-{
-	data.resultset=resultset;
-}
-
-function getResultSet()
-{
-	return data.resultset;
-}
-
-function setMenu(menu)
-{
-	data.menu=menu;
-}
-
-function getMenu()
-{
-	return data.menu;
-}
-
-function setRelated(related)
-{
-	data.related=related;
-}
-
-function getRelated()
-{
-	return data.related;
-}
-
-function setPrevSettings()
-{
-	prevSettings = jQuery.extend({}, settings);
-}
-
-function getPrevSettings()
-{
-	return prevSettings;
-}
-
-function setSetting( p )
-{
-	$.extend(settings, p);
-}
-
-
-//setsetting
