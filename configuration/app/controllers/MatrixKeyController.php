@@ -95,11 +95,8 @@ class MatrixKeyController extends Controller
 
     private function initialize ($force = false)
     {
-		echo '1:',$this->getCurrentMatrixId(),'<br />';
 		$this->initializeMatrixId();
-		echo '2:',$this->getCurrentMatrixId(),'<br />';
 		$this->setActiveMatrix();
-		echo '3:',$this->getCurrentMatrixId(),'<br />';
 
 		if (is_null($this->getCurrentMatrixId()))
 		{
