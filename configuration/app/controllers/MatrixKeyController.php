@@ -18,10 +18,7 @@
 		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 		
 		
-	setTotalEntityCount --> do we need it!?!?!
-	
 	getRemainingCharacterCount  --> is it actually in use??
-
 
 */
 
@@ -112,12 +109,9 @@ class MatrixKeyController extends Controller
 		$this->_matrix_browse_style=$this->getSetting('matrix_browse_style','paginate');
 		$this->_matrix_state_image_per_row=$this->getSetting('matrix_state_image_per_row',4);
 		$this->_matrix_score_threshold=$this->getSetting('matrix_score_threshold',100);
-		
 
 		$this->_nbcImageRoot = $this->getSetting('nbc_image_root');
 
-
-		$this->setTotalEntityCount();
 		$this->setMenu();
 
 //			$_SESSION['app']['system']['urls']['nbcImageRoot']=
@@ -168,6 +162,11 @@ class MatrixKeyController extends Controller
 	
     public function ajaxInterfaceAction ()
     {
+		if ($this->rHasVar('key'))
+		{
+			$this->setCurrentMatrixId($this->rGetVal('key'));
+		}
+	
 		if ($this->rHasVal('action', 'get_menu'))
 		{
 			$this->smarty->assign('returnText', json_encode($this->getMenu()));
@@ -317,57 +316,6 @@ class MatrixKeyController extends Controller
         return isset($_SESSION['app'][$this->spid()]['matrix']['v']) ? $_SESSION['app'][$this->spid()]['matrix']['master_id'] : null;
     }
 
-	private function setTotalEntityCount()
-	{
-		if ( is_null($this->getCurrentMatrixId()) )
-		{
-			return;
-		}
-		
-		$q = "
-			select
-				count(distinct _a.taxon_id) as tot
-				from
-					%PRE%matrices_taxa _a
-				left join %PRE%matrices_taxa_states _b
-					on _a.project_id = _b.project_id
-					and _a.matrix_id = _b.matrix_id
-					and _a.taxon_id = _b.taxon_id
-				where _a.project_id = " . $this->getCurrentProjectId() . "
-					and _a.matrix_id = " . $this->getCurrentMatrixId();
-				;		
-
-        //if ($this->_matrixType == 'nbc')
-		if ( $this->models->MatrixVariation->getTableExists() )
-		{
-			$q .=  "
-				union all
-	
-				select
-					count(distinct _a.variation_id) as tot
-					from
-						%PRE%matrices_variations _a
-					left join %PRE%matrices_taxa_states _b
-						on _a.project_id = _b.project_id
-						and _a.matrix_id = _b.matrix_id
-						and _a.variation_id = _b.variation_id
-					where _a.project_id = " . $this->getCurrentProjectId() . "
-						and _a.matrix_id = " . $this->getCurrentMatrixId()
-					;
-		}
-
-		$results = $this->models->MatrixTaxonState->freeQuery( $q );
-
-		$this->_totalEntityCount = $results[0]['tot']+(isset($results[1]['tot']) ? $results[1]['tot'] : 0);
-		
-	}
-
-	private function getTotalEntityCount()
-	{
-		return $this->_totalEntityCount;
-		
-	}
-
 	private function setActiveMatrix()
 	{
 		$this->_activeMatrix=$this->getMatrix( array('id'=>$this->getCurrentMatrixId()) );
@@ -394,7 +342,6 @@ class MatrixKeyController extends Controller
 		}
 		
 		$this->setCurrentMatrixId( $m['id'] );
-		//$this->setTotalEntityCount();
     }
 
     private function checkMasterMatrixId()
@@ -599,8 +546,8 @@ class MatrixKeyController extends Controller
 				$var[$key]['info']=isset($info['variation'][$val['id']]) ? $info['variation'][$val['id']] : null;
 			}
 		}
-				
-		$all=array_merge($taxa,$var);
+
+		$all=array_merge((array)$taxa,(array)$var);
 		
 		usort($all,function($a,$b)
 		{
