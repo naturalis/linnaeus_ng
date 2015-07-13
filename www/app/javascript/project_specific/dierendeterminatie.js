@@ -34,7 +34,7 @@ var matrixLinkHtmlTemplate = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEX
 
 var remoteLinkClickHtmlTemplate = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
 
-var statesClickHtmlTemplate = 'onclick="nbcToggleSpeciesDetail(\'%LOCAL-ID%\');return false;"title="%TITLE%"';
+var statesClickHtmlTemplate = 'onclick="toggleDetails(\'%LOCAL-ID%\');return false;"title="%TITLE%"';
 
 var relatedClickHtmlTemplate = 'onclick="setSimilar({id:%ID%,type:\'%TYPE%\'});return false;" title="%TITLE%"';
 
@@ -77,7 +77,7 @@ var resultHtmlTemplate = '\
     </div> \
 ';
 
-var resultBatchHtmlTemplate= '<span class=result-batch style="%STYLE%">%PREVIOUS-RESULTS% %RESULTS%</span>' ;
+var resultBatchHtmlTemplate= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
 var buttonMoreHtmlTemplate='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
 var counterExpandHtmlTemplate='%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%';
 var pagePrevHtmlTemplate='<li><a href="#" onclick="browsePage(\'p\');return false;">&lt;</a></li>';
@@ -135,10 +135,10 @@ var similarHeaderHtmlTemplate='\
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;">%BACK-TEXT%</a> \
 <span id="show-all-divider"> | </span> \
-<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
+<a class="clearSimilarSelection" href="#" onclick="toggleAllDetails();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
 ';
 
-var settings = {
+var settings={
 	matrixId: 0,
 	projectId: 0,
 	perPage: 16,
@@ -167,8 +167,9 @@ var data={
 	related: {} // related species
 }
 
+var prevSettings={};
+
 var lastScrollPos=0;
-var lastShowing=0;
 var tempstatevalue="";
 var openGroups=Array();
 
@@ -187,20 +188,10 @@ function retrieveDataSet()
 		}),
 		success : function (data)
 		{
-			//console.log(data);
 			setDataSet($.parseJSON(data));
-			//console.dir(getDataSet());
-
 			applyScores();
 			clearResults();
 			printResults();
-			
-//			if (p && p.action!='similar') nbcDoOverhead();
-//			nbcDoPaging();
-//			if (p && p.action=='similar') nbcPrintSimilarHeader();
-//			if (p && p.closeDialog==true) jDialogCancel();
-//			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
-
 			setCursor();
 		}
 	});
@@ -241,6 +232,10 @@ function printResults()
 {
 	var resultset = getResultSet();
 
+	// pre-emptively remove show_more-button (clicking similar automatically switches to browseStyle='show_all')
+	$("#show-more").remove();
+	$("#footerPagination").removeClass('noline');
+
 	if (resultset && settings.browseStyle=='expand') 
 	{
 		printResultsExpanded();
@@ -266,14 +261,11 @@ function printResults()
 	{
 		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('.png','_grijs.png')  : "" );
 	});
-
-	
 }
 
 function clearResults()
 {
 	$('#results-container').html('');
-	settings.start=0;
 	settings.expandedShowing=0;
 }
 
@@ -281,19 +273,17 @@ function printResultsExpanded()
 {
 	var resultset = getResultSet();
 
-	settings.showSpeciesDetails = resultset.length <= settings.perPage;
-
 	var s="";
-	var added=0;
+	var printed=0;
 	var d=0;
 	
 	for(var i=0;i<resultset.length;i++)
 	{
-		if (i>=settings.expandedShowing && i<settings.expandedShowing+settings.perPage)
+		if (i < settings.expandedShowing+settings.perPage)
 		{
 			s=s+formatResult(resultset[i]);
 
-			added++;
+			printed++;
 
 			if (++d==settings.perLine)
 			{
@@ -302,13 +292,10 @@ function printResultsExpanded()
 			}
 		}
 	}
-	
-	
 
 	$('#results-container').html(
 		resultBatchHtmlTemplate
 			.replace('%STYLE%',"")
-			.replace('%PREVIOUS-RESULTS%',$('#results-container').html())
 			.replace('%RESULTS%', resultsHtmlTemplate.replace('%RESULTS%',s))
 	);
 
@@ -316,7 +303,7 @@ function printResultsExpanded()
 	//		.replace('%STYLE%',(settings.expandedShowing>0  ? 'display:none' : ''))
 	//	$('.result-batch:hidden').show('normal');
 	
-	settings.expandedShowing=settings.expandedShowing+added;
+	settings.expandedShowing=printed;
 
 	if (settings.expandedShowing<resultset.length-1)
 	{
@@ -325,11 +312,6 @@ function printResultsExpanded()
 			$("#paging-footer").append( buttonMoreHtmlTemplate.replace('%LABEL%',__('meer resultaten laden')) );
 			$("#footerPagination").addClass('noline');
 		}
-	}
-	else
-	{
-		$("#show-more").remove();
-		$("#footerPagination").removeClass('noline');
 	}
 	
 	if (settings.expandedShowing>0) 
@@ -874,6 +856,8 @@ function applyScores()
 	var states=getStates();
 	var dataset=getDataSet();
 	var resultset=getResultSet();
+
+	// scores are sorted in the controller
 	
 	// clean slate (also include states to be sure it's not a selection that returns zero matches)
 	if ((!states || states.length==0) && (!scores || scores.length==0))
@@ -900,7 +884,7 @@ function applyScores()
 	
 	setResultSet(resultset);
 
-	// scores are sorted in the controller
+	setSetting({showSpeciesDetails: (resultset.length <= settings.perPage)});
 }
 
 function applyRelated()
@@ -953,20 +937,104 @@ function setSimilar( p )
 		{
 			var related=$.parseJSON(data);
 			setRelated(related);
-			
-			setLastShowing();
+
+			setPrevSettings();
 			setLastScrollPos();
-			applyRelated();
+
+			setSetting({start:0});
+			setSetting({expandedShowing:0});
+			setSetting({browseStyle:'show_all'});
+			setSetting({showSpeciesDetails: true});
+			
+			clearPaging();
 			clearResults();
+
+			applyRelated();
+			removeSimilarCharacters();
 			printResults();
 			printSimilarHeader();
-
+			window.scroll(0,0);
 			setCursor();
 		}
 	});
 	
 }
 
+function peersHaveIdenticalValues(fcharacter,fvalues)
+{
+	var resultset=getResultSet();
+	
+	if (resultset.length<=1)
+	{
+		return false;
+	}
+
+	fvalues.sort();
+	
+	foundnothing=true;
+	
+	for(var i=0;i<resultset.length;i++)
+	{
+		var result=resultset[i];
+		for(var c in result.states)
+		{
+			if (c==fcharacter)
+			{
+				foundnothing=false;
+				var character=result.states[c];
+				var values=Array();
+				
+				for(var s in character.states)
+				{
+					var state=character.states[s];
+					values.push(state.id);
+				}
+				
+				values.sort();
+				
+				if (values.join(';')!=fvalues.join(';')) return false;
+			}
+		}
+	}
+	
+	if (foundnothing)
+		return false;
+	else
+		return true;
+}
+
+function removeSimilarCharacters()
+{
+	var resultset=getResultSet();
+	//console.dir(resultset);
+	
+	var filteredStates=Array();
+	
+	for(var i=0;i<resultset.length;i++)
+	{
+		var result=resultset[i];
+		var filteredCharacters={};
+		for(var c in result.states)
+		{
+			var character=result.states[c];
+			//console.dir(character);
+			var values=Array();
+			for(var s in character.states)
+			{
+				var state=character.states[s];
+				//console.dir(state);
+				values.push(state.id);
+			}
+			values.sort();
+			if (!peersHaveIdenticalValues(c,values))
+			{
+				$.extend(filteredCharacters,{[c]:character});
+			}
+		}
+
+		resultset[i].states=filteredCharacters;
+	}
+}
 
 function clearSimilarHeader()
 {
@@ -976,13 +1044,13 @@ function clearSimilarHeader()
 function printSimilarHeader()
 {
 	var resultset = getResultSet();
-	
+
 	$('#similarSpeciesHeader').html(
 		similarHeaderHtmlTemplate
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
-			.replace('%SHOW-STATES-TEXT%', __('alle onderscheidende kenmerken tonen'))
+			.replace('%SHOW-STATES-TEXT%', nbcLabelShowAll)
 	).removeClass('hidden').addClass('visible');
 	
 	$('.result-icon.related').find('img').remove();
@@ -995,11 +1063,31 @@ function closeSimilar()
 	clearSimilarHeader();
 	applyScores();
 	clearResults();
+	setSetting(getPrevSettings());
+	setSetting({expandedShowing:settings.expandedShowing-settings.perPage});
 	printResults();
 	window.scroll(0,getLastScrollPos());
 }
 
+function toggleAllDetails()
+{
+	if ($('.result-detail:visible').length < getResultSet().length)
+	{
+		$('.result-detail').toggle(true);
+		$('#showAllLabel').html(nbcLabelHideAll);
+	}
+	else
+	{
+		$('.result-detail').toggle(false);
+		$('#showAllLabel').html(nbcLabelShowAll);
+	}
 
+}
+
+function toggleDetails(id)
+{
+	$('#det-'+id).toggle();
+}
 
 
 
@@ -1111,39 +1199,6 @@ function nbcPrintSearchHeader() {
 
 
 
-
-
-function nbcToggleSpeciesDetail(id,state) {
-
-	if (state)
-		nbcDetailShowStates[id] = (state=='show');
-	else
-		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
-	
-	if (nbcDetailShowStates[id]) {
-		$('#det-'+id).css('display','block');
-		$('#tog-'+id).attr('title',nbcLabelClose);
-	} else {
-		$('#det-'+id).css('display','none');
-		$('#tog-'+id).attr('title',nbcLabelDetails);
-	}
-	
-}
-
-function nbcToggleAllSpeciesDetail() {
-	
-	var currHiding = ($('#showAllLabel').html()==nbcLabelShowAll);
-	
-	$('[id^="tog-"]').each(function(){
-		nbcToggleSpeciesDetail($(this).attr('id').replace(/(tog-)/,''), currHiding ? 'show' : 'hide' );
-	});
-
-	if (currHiding)
-		$('#showAllLabel').html(nbcLabelHideAll);
-	else
-		$('#showAllLabel').html(nbcLabelShowAll);
-
-}
 
 
 
@@ -1296,8 +1351,8 @@ function matrixInit()
 	nbcLabelDetails = __('onderscheidende kenmerken');
 	nbcLabelBack = __('terug');
 	nbcLabelSimilarSpecies = __('gelijkende soorten');
-	nbcLabelShowAll = __('alle kenmerken tonen');
-	nbcLabelHideAll = __('alle kenmerken verbergen');
+	nbcLabelShowAll = __('alle onderscheidende kenmerken tonen');
+	nbcLabelHideAll = __('kenmerken verbergen');
 	nbcLabelExternalLink = __('Meer informatie over soort/taxon');
 
 	$('#legendDetails').html(nbcLabelDetails);
@@ -1320,7 +1375,6 @@ function matrixInit()
 
 }
 
-
 function setLastScrollPos()
 {
 	lastScrollPos=getPageScroll();
@@ -1329,16 +1383,6 @@ function setLastScrollPos()
 function getLastScrollPos()
 {
 	return lastScrollPos;
-}
-
-function setLastShowing()
-{
-	lastShowing=settings.expandedShowing;
-}
-
-function getLastShowing()
-{
-	return lastShowing;
 }
 
 function setScores(scores)
@@ -1401,3 +1445,20 @@ function getRelated()
 	return data.related;
 }
 
+function setPrevSettings()
+{
+	prevSettings = jQuery.extend({}, settings);
+}
+
+function getPrevSettings()
+{
+	return prevSettings;
+}
+
+function setSetting( p )
+{
+	$.extend(settings, p);
+}
+
+
+//setsetting
