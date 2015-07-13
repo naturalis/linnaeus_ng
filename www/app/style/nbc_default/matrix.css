@@ -47,6 +47,7 @@
 #content div#resultsHeader {width:703px; height:27px; margin:4px 0 0 0; position:relative;}
 #content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}
 #content div#result-count {font-size:0.9em;color:#333;}
+.result-count {font-size:0.9em;color:#333;}
 .overlapState {color:#999;}
 
 /* similar species */

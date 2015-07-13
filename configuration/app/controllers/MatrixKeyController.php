@@ -58,6 +58,8 @@ class MatrixKeyController extends Controller
 	private $_menu=null;
 	private $_scores=null;
 	private $_related=null;
+	private $_searchTerm=null;
+	private $_searchResults=null;
 
 	private $_matrix_calc_char_h_val=true;
 	private $_matrix_allow_empty_species=true;
@@ -66,8 +68,7 @@ class MatrixKeyController extends Controller
 	private $_matrix_state_image_per_row;
 	private $_matrix_score_threshold;
 
-	
-	private $_nbcImageRoot=true;
+		private $_nbcImageRoot=true;
 	
 	
     public $cssToLoad = array('matrix.css');
@@ -249,6 +250,15 @@ class MatrixKeyController extends Controller
 		{
 			$this->setRelatedEntities( array('id'=>$this->rGetVal('id'),'type'=>$this->rGetVal('type')) );
 			$this->smarty->assign('returnText',json_encode( $this->getRelatedEntities()) );
+		}
+
+		else
+		
+		if ($this->rHasVal('action', 'get_search'))
+		{
+			$this->setSearchTerm( array('search'=>$this->rGetVal('search')) );
+			$this->setSearchResults();
+			$this->smarty->assign('returnText',json_encode( $this->getSearchResults()) );
 		}
 
 		$this->printPage();	
@@ -446,78 +456,7 @@ class MatrixKeyController extends Controller
 		return $m;
 
 	}
-			
 
-
-/*
-    private function setCharacters()
-    {
-        $characters=$this->models->CharacteristicMatrix->freeQuery("
-			select
-				_a.characteristic_id as id,
-				_b.type,
-				_c.label,
-				if (_b.type='media'||_b.type='text','c','f') as prefix,
-				_a.show_order,
-				if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label_short,
-				if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description
-
-			from 
-				%PRE%characteristics_matrices _a
-				
-			right join %PRE%characteristics _b
-				on _a.project_id = _b.project_id
-				and _a.characteristic_id = _b.id
-
-			left join %PRE%characteristics_labels _c
-				on _a.project_id=_c.project_id
-				and _a.characteristic_id=_c.characteristic_id
-				and _c.language_id=".$this->getCurrentLanguageId()."
-				
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.matrix_id = ".$this->getCurrentMatrixId()." 
-			order by 
-				_a.show_order
-		");
-		
-		$states=array();
-
-		foreach((array)$this->getCharacterStates( array('id'=>'*') ) as $val)
-		{
-			$states[$val['characteristic_id']][]=$val;
-		}
-
-        foreach ((array) $characters as $key => $val)
-		{
-			$characters[$key]['states']=$states[$val['id']];
-
-			$characters[$key]['sort_by']=
-				array(
-					'alphabet' =>
-						isset($val['label']) ? strtolower(preg_replace('/[^A-Za-z0-9]/', '', $val['label'])) : '',
-					'characterType' =>
-						strtolower(preg_replace('/[^A-Za-z0-9]/', '', $val['type'])),
-					'numberOfStates' =>
-						-1 * count((array)$characters[$key]['states']), // -1 to avoid asc/desc hassles in JS-sorting
-					'entryOrder' =>
-						intval($val['show_order']),
-					'separationCoefficient' => 
-						$this->_matrix_calc_char_h_val ?
-							-1 * $this->getCharacteristicHValue( array('id'=>$val['id'],'states'=>$states[$val['id']]) )  : 
-							null
-				);
-        }
-		
-        $this->_characters=isset($characters) ? $characters : null;
-
-    }
-
-    private function getCharacters()
-    {
-        return $this->_characters;
-    }
-*/
     private function getCharacterStates( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -2059,25 +1998,105 @@ class MatrixKeyController extends Controller
 	{
 		return $this->_related;
 	}
+	
+	
 
+    private function setSearchTerm( $p )
+    {
+		$search=isset($p['search']) ? $p['search'] : null;
+		
+		if (is_null($search))
+			return;
+		
+		$this->_searchTerm=$search;
+    }
 
+    private function getSearchTerm()
+    {
+		return $this->_searchTerm;
+    }
 
+	private function setSearchResults()
+    {
+		$search=$this->getSearchTerm();
+		
+		if (empty($search))
+			return;
+		
+		$search=mysql_real_escape_string(strtolower($search));
 
+		// n.b. don't change to 'union all'
+        $q = "
+			select * from (
+				select
+					'variation' as type,
+					_a.variation_id as id,
+					trim(_c.label) as label,
+					_c.taxon_id as taxon_id,
+					_d.taxon as taxon, 
+					null as commonname
+	
+				from 
+					%PRE%matrices_variations _a        		
+	
+				left join %PRE%matrices_taxa_states _b
+					on _a.matrix_id = _b.matrix_id
+					and _a.variation_id = _b.variation_id
+					and _b.project_id = " . $this->getCurrentProjectId() . "
+	
+				left join %PRE%taxa_variations _c
+					on _a.variation_id = _c.id
+					and _c.project_id = " . $this->getCurrentProjectId() . "
+	
+				left join %PRE%taxa _d
+					on _c.taxon_id = _d.id						
+					and _d.project_id = " . $this->getCurrentProjectId() . "
+	
+				where _a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					and (lower(_c.label) like '%". $search ."%' or lower(_d.taxon) like '%". $search ."%')
+	
+				union
+	
+				select 
+					'taxon' as type,
+					_a.taxon_id as id, 
+					trim(_c.taxon) as label, 
+					_a.taxon_id as taxon_id,
+					_c.taxon as taxon, 
+					_d.commonname as commonname
+	
+				from
+					%PRE%matrices_taxa _a
+	
+				left join %PRE%matrices_taxa_states _b
+					on _a.matrix_id = _b.matrix_id
+					and _a.taxon_id = _b.taxon_id
+					and _b.project_id = " . $this->getCurrentProjectId() . "
+	
+				left join %PRE%taxa _c
+					on _a.taxon_id = _c.id
+					and _c.project_id = " . $this->getCurrentProjectId() . "
+	
+				left join %PRE%commonnames _d
+					on _a.taxon_id = _d.taxon_id
+					and _d.language_id = ".$this->getCurrentLanguageId() ." 
+					and _d.project_id = " . $this->getCurrentProjectId() . "
+	
+				where _a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					and (lower(_c.taxon) like '%". $search ."%' or lower(_d.commonname) like '%". $search ."%')
+			) as unionized
+			order by label
+			";
 
+        $this->_searchResults = $this->models->MatrixTaxonState->freeQuery( $q );
+		
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	private function getSearchResults()
+    {
+		return $this->_searchResults;
+    }
 
 }	

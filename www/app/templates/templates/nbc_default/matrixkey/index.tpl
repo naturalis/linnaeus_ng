@@ -49,13 +49,15 @@ $(document).ready(function()
 
 	baseUrlProjectImages='{$projectUrls.projectMedia}';
 
-	settings.matrixId={$matrix.id};
-	settings.projectId={$session.admin.project.id};
-	settings.imageRoot='{$nbcImageRoot}';
-	settings.useEmergingCharacters={$matrix_use_emerging_characters};
-	settings.defaultImage='{$nbcImageRoot}noimage.gif';
-	settings.browseStyle='{$matrix_browse_style}';
-	settings.scoreThreshold={$matrix_score_threshold};
+	setSetting({
+		matrixId: {$matrix.id},
+		projectId: {$session.admin.project.id},
+		imageRoot: '{$nbcImageRoot}',
+		useEmergingCharacters: {$matrix_use_emerging_characters},
+		defaultImage: '{$nbcImageRoot}noimage.gif',
+		browseStyle: '{$matrix_browse_style}',
+		scoreThreshold: {$matrix_score_threshold}
+	});
 
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
@@ -68,65 +70,7 @@ $(document).ready(function()
 	retrieveDataSet();
 	setCursor();
 
-
-try {
-//	resultset = $.parseJSON({$resultset});
-//	nbcFilterEmergingCharacters();
-//	printResults( { resetStart:false } );
-//	nbcDoOverhead();
-//	nbcDoPaging();
-//	nbcRefreshGroupMenu();
-} catch(err){
-//	nbcGetResults();
-}
-	
-
 });
 </script>
-
-<!--
-<script type="text/JavaScript">
-$(document).ready(function(){
-
-
-
-
-if (typeof matrixInit=='function') {
-	matrixInit();
-}
-
-{if $nbcFullDatasetCount}nbcFullDatasetCount = {$nbcFullDatasetCount};
-{/if}
-{if $nbcStart}nbcStart={$nbcStart};
-{/if}
-{if $nbcPerPage}nbcPerPage={$nbcPerPage};
-{/if}
-{if $nbcPerLine}nbcPerLine={$nbcPerLine};
-{/if}
-{if $nbcSimilar}
-nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
-{else}
-{if $taxaJSON}
-
-try {
-	nbcData = $.parseJSON('{$taxaJSON}');
-	nbcFilterEmergingCharacters();
-	nbcDoResults( { resetStart:false } );
-	nbcDoOverhead();
-	nbcDoPaging();
-	nbcRefreshGroupMenu();
-} catch(err){
-	nbcGetResults();
-}
-
-{else}
-nbcGetResults();
-{/if}
-{/if}
-
-
-});
-</script>
--->
 
 {include file="../shared/footer.tpl"}
