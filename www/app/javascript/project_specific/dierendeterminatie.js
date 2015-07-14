@@ -160,7 +160,7 @@ var settings={
 	lastPage: 0,
 	scoreThreshold: 0,
 	mode: "identify", // similar, search
-	groupsAlwaysOpen: true
+	groupsAlwaysOpen: false
 };
 
 var data={
