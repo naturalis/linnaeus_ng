@@ -93,7 +93,7 @@ class MatrixKeyController extends Controller
     }
 
 
-    private function initialize ($force = false)
+    private function initialize()
     {
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
@@ -269,7 +269,7 @@ class MatrixKeyController extends Controller
 
 		if ( is_null($id) )
 		{
-			$m=$this->getMatrix( null ); // get all
+			$m=$this->getMatrix( array('id'=>'*') ); // get all
 			
 			if ( $m ) 
 			{
@@ -393,7 +393,7 @@ class MatrixKeyController extends Controller
 				where
 					_a.project_id = " .  $this->getCurrentProjectId() ."
 					and _a.got_names = 1
-					" . ( isset($id) ? "and _a.id = " . $id : "" ) . "
+					" . ( isset($id) && $id!='*' ? "and _a.id = " . $id : "" ) . "
 				order by
 					_a.default desc
 		",
