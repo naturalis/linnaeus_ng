@@ -591,7 +591,10 @@ class MatrixKeyController extends Controller
 		{
 			$d=$this->getTaxonById( $val['taxon_id'] );
 			
-			if ($this->_matrix_allow_empty_species || (!$this->_matrix_allow_empty_species && $val['is_empty']==1))
+			if (
+				($this->_matrix_allow_empty_species) ||
+				(!isset($val['is_empty'])) ||
+				(!$this->_matrix_allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
 				$d['states']=$this->getTaxonStates( $val['taxon_id'] );
@@ -807,7 +810,7 @@ class MatrixKeyController extends Controller
 
 	private function setMenu()
 	{
-		$menu=$this->models->GuiMenuOrder->freeQuery("
+		$menu1=$this->models->GuiMenuOrder->freeQuery("
 			select
 				ref_id as id,
 				ref_type as type,
@@ -863,6 +866,90 @@ class MatrixKeyController extends Controller
 			order by 
 				show_order
 		");
+
+		$menu2=$this->models->GuiMenuOrder->freeQuery("
+		
+			select 
+				id,
+				label,
+				type,
+				show_order_main,
+				show_order_sub
+			 from (
+		
+				select 
+					_a.id,
+					_c.label,
+					'char' as type,
+					_gmo.show_order as show_order_main,
+					_b.show_order as show_order_sub
+	
+				from
+					%PRE%characteristics _a
+				
+				right join %PRE%characteristics_matrices _b
+					on _a.id = _b.characteristic_id
+					and _a.project_id = _b.project_id
+					and _b.matrix_id = " . $this->getCurrentMatrixId() . "
+	
+				right join %PRE%characteristics_labels _c
+					on _a.project_id = _c.project_id
+					and _a.id = _c.characteristic_id
+					and _c.language_id = ". $this->getCurrentLanguageId()."
+					
+				left join %PRE%characteristics_chargroups _d
+					on _a.project_id = _d.project_id
+					and _a.id = _d.characteristic_id
+					
+				left join %PRE%chargroups _e
+					on _d.project_id = _e.project_id
+					and _d.chargroup_id = _e.id
+					and _e.matrix_id = " . $this->getCurrentMatrixId() . "
+					
+				left join %PRE%gui_menu_order _gmo
+					on _a.project_id = _gmo.project_id
+					and _gmo.matrix_id = " . $this->getCurrentMatrixId() . "
+					and _gmo.ref_id = _a.id
+					and _gmo.ref_type='char'
+					
+				where 
+					_a.project_id = " . $this->getCurrentProjectId() . " 
+					and _d.id is null
+	
+				union		
+	
+				select 
+					_a.id,
+					_c.label,
+					'group' as type,
+					_gmo.show_order as show_order_main,
+					_a.show_order as show_order_sub
+	
+				from
+					%PRE%chargroups _a
+	
+				left join %PRE%chargroups_labels _c
+					on _a.project_id = _c.project_id
+					and _a.id = _c.chargroup_id
+					and _c.language_id = ". $this->getCurrentLanguageId()."
+	
+				left join %PRE%gui_menu_order _gmo
+					on _a.project_id = _gmo.project_id
+					and _gmo.matrix_id = " . $this->getCurrentMatrixId() . "
+					and _gmo.ref_id = _a.id
+					and _gmo.ref_type='group'
+	
+				where 
+					_a.project_id = " . $this->getCurrentProjectId() . " 
+					and _a.matrix_id = " . $this->getCurrentMatrixId() ." 			
+			
+			) as unionized
+			
+			order by show_order_main, show_order_sub, label
+		
+		");
+		
+		$menu=$menu2;
 		
 		foreach((array)$menu as $key=>$val)
 		{
