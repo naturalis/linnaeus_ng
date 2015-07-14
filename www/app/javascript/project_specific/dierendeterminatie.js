@@ -446,7 +446,7 @@ function formatResult( data )
 
 	var image="";
 
-	if (data.info.url_image)
+	if (data.info && data.info.url_image)
 	{
 		image=data.info.url_image;
 	}
@@ -469,7 +469,7 @@ function formatResult( data )
 					.replace('%GENDER-LABEL%', data.gender.gender_label)
 				: "" ))
 			.replace('%COMMON-NAME%',(commonName ? brHtmlTemplate + commonName : ""))
-			.replace('%PHOTO-DETAILS%',(data.info.photographer ? 
+			.replace('%PHOTO-DETAILS%',(data.info && data.info.photographer ? 
 				photoLabelPhotographerHtmlTemplate
 					.replace('%PHOTO-LABEL%', __('foto')+' &copy;' )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
@@ -479,7 +479,7 @@ function formatResult( data )
 		imageHtmlTemplate
 			.replace(/%IMAGE-URL%/g,image)
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
-			.replace('%PHOTO-CREDIT%',(data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	
 
 	resultHtml=
@@ -498,13 +498,13 @@ function formatResult( data )
 				: ""))
 			.replace('%COMMON-NAME%', commonName)
 
-			.replace('%REMOTE-LINK-CLASS%', data.info.url_external_page ? "" : " no-content")
-			.replace('%REMOTE-LINK-CLICK%', data.info.url_external_page ?  
+			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
+			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
 				remoteLinkClickHtmlTemplate
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
 					.replace('%TITLE%', nbcLabelExternalLink)
 				: "")
-			.replace('%REMOTE-LINK-ICON%', data.info.url_external_page ?
+			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
 				iconUrlHtmlTemplate.replace('%IMG-URL%',settings.imageRoot+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? "" : " no-content")
 			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTemplate.replace('%TITLE%',nbcLabelDetails) : "")
@@ -1090,7 +1090,9 @@ function removeSimilarCharacters()
 			values.sort();
 			if (!peersHaveIdenticalValues(c,values))
 			{
-				$.extend(filteredCharacters,{[c]:character});
+				var myObj = new Object;
+				myObj[c] = character;
+				$.extend(filteredCharacters,myObj);
 			}
 		}
 
