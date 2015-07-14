@@ -221,7 +221,7 @@ function retrieveMenu()
 		}),
 		success : function (data)
 		{
-			//console.log(data);
+			console.log(data);
 			setMenu($.parseJSON(data));
 			filterEmergingCharacters();
 			printMenu();
