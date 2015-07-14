@@ -5,11 +5,11 @@ function __(text)
 	return _(text);
 }
 
-var resultsHtmlTemplate = '<div class="resultRow">%RESULTS%</div>';
-var resultsLineEndHtmlTemplate = '</div><br/><div class="resultRow">';
-var brHtmlTemplate = '<br />';
+var resultsHtmlTpl = '<div class="resultRow">%RESULTS%</div>';
+var resultsLineEndHtmlTpl = '</div><br/><div class="resultRow">';
+var brHtmlTpl = '<br />';
 
-var photoLabelHtmlTemplate = ' \
+var photoLabelHtmlTpl = ' \
 <div style="margin-left:130px"> \
 	%SCI-NAME% \
 	%GENDER% \
@@ -18,27 +18,27 @@ var photoLabelHtmlTemplate = ' \
 </div> \
 ';
 
-var photoLabelGenderHtmlTemplate = '<img class="gender" height="17" width="8" src="%IMG-SRC%" title="%GENDER-LABEL%" />';
+var photoLabelGenderHtmlTpl = '<img class="gender" height="17" width="8" src="%IMG-SRC%" title="%GENDER-LABEL%" />';
 
-var photoLabelPhotographerHtmlTemplate = '<br />(%PHOTO-LABEL% %PHOTOGRAPHER%)';
+var photoLabelPhotographerHtmlTpl = '<br />(%PHOTO-LABEL% %PHOTOGRAPHER%)';
 
-var imageHtmlTemplate = '\
+var imageHtmlTpl = '\
 <a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title=""> \
 	<img class="result-image" src="%IMAGE-URL%" title="%PHOTO-CREDIT%" /> \
 </a>\
 ';
 
-var genderHtmlTemplate = '<img class="result-gender-icon" src="%ICON-URL%" title="%GENDER-LABEL%" />';
+var genderHtmlTpl = '<img class="result-gender-icon" src="%ICON-URL%" title="%GENDER-LABEL%" />';
 
-var matrixLinkHtmlTemplate = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT%</a>';
+var matrixLinkHtmlTpl = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT%</a>';
 
-var remoteLinkClickHtmlTemplate = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
+var remoteLinkClickHtmlTpl = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
 
-var statesClickHtmlTemplate = 'onclick="toggleDetails(\'%LOCAL-ID%\');return false;"title="%TITLE%"';
+var statesClickHtmlTpl = 'onclick="toggleDetails(\'%LOCAL-ID%\');return false;"title="%TITLE%"';
 
-var relatedClickHtmlTemplate = 'onclick="setSimilar({id:%ID%,type:\'%TYPE%\'});return false;" title="%TITLE%"';
+var relatedClickHtmlTpl = 'onclick="setSimilar({id:%ID%,type:\'%TYPE%\'});return false;" title="%TITLE%"';
 
-var statesHtmlTemplate = '\
+var statesHtmlTpl = '\
 <div id="det-%LOCAL-ID%" class="result-detail hidden"> \
 	<ul> \
 		<li>%STATES%</li> \
@@ -46,11 +46,11 @@ var statesHtmlTemplate = '\
 </div> \
 ';
 
-var statesJoinHtmlTemplate = '</li><li>';
+var statesJoinHtmlTpl = '</li><li>';
 
-var speciesStateItemHtmlTemplate = '<span class="result-detail-label">%CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
+var speciesStateItemHtmlTpl = '<span class="result-detail-label">%CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
 
-var resultHtmlTemplate = '\
+var resultHtmlTpl = '\
 <div class="result%CLASS-HIGHLIGHT%" id="res-%LOCAL-ID%"> \
 	<div class="result-result"> \
 		<div class="result-image-container"> \
@@ -77,60 +77,57 @@ var resultHtmlTemplate = '\
     </div> \
 ';
 
-var resultBatchHtmlTemplate= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
-var buttonMoreHtmlTemplate='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
-var counterExpandHtmlTemplate='%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%';
-var pagePrevHtmlTemplate='<li><a href="#" onclick="browsePage(\'p\');return false;">&lt;</a></li>';
-var pageCurrHtmlTemplate='<li><strong>%NR%</strong></li>';
-var pageNumberHtmlTemplate='<li><a href="#" onclick="browsePage(%INDEX%);return false;">%NR%</a></li>';
-var pageNextHtmlTemplate='<li><a href="#" onclick="browsePage(\'n\');return false;" class="last">&gt;</a></li>';
-var counterPaginateHtmlTemplate=' %FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%';
+var resultBatchHtmlTpl= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
+var buttonMoreHtmlTpl='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
+var counterExpandHtmlTpl='%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%';
+var pagePrevHtmlTpl='<li><a href="#" onclick="browsePage(\'p\');return false;">&lt;</a></li>';
+var pageCurrHtmlTpl='<li><strong>%NR%</strong></li>';
+var pageNumberHtmlTpl='<li><a href="#" onclick="browsePage(%INDEX%);return false;">%NR%</a></li>';
+var pageNextHtmlTpl='<li><a href="#" onclick="browsePage(\'n\');return false;" class="last">&gt;</a></li>';
+var counterPaginateHtmlTpl=' %FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%';
 
-var menuOuterHtmlTemplate ='<ul>%MENU%</ul>';
+var menuOuterHtmlTpl ='<ul>%MENU%</ul>';
 
-var menuGroupHtmlTemplate = '\
+var menuGroupHtmlTpl = '\
 <li id="character-item-%ID%" class="closed"><a href="#" onclick="toggleGroup(%ID%);return false;">%LABEL%</a></li> \
 <ul id="character-group-%ID%" class="hidden"> \
 	%CHARACTERS% \
 </ul> \
 ';
 
-var menuCharDisabledHtmlTemplate='<li class="inner%CLASS% disabled">%LABEL%%VALUE%	%SELECTED% </li>';
 
-var menuCharEmergentDisabledHtmlTemplate='\
-<li class="inner%CLASS%" title="%TITLE%"> \
-	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
-	%SELECTED% \
-</li> \
-';
-var menuCharHtmlTemplate='\
-<li class="inner%CLASS%"> \
-	<a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a> \
-	%SELECTED% \
-</li>';
-
-var menuLoneCharHtmlTemplate='\
+var menuLoneCharHtmlTpl='\
 <li class="inner ungrouped last"> \
 	<a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a> \
 	%SELECTED% \
 </li> \
 ';
+var menuLoneCharDisabledHtmlTpl='<li class="inner ungrouped %CLASS% disabled" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
+var menuLoneCharEmergentDisabledHtmlTpl='\
+<li class="inner ungrouped %CLASS%" title="%TITLE%"> \
+	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
+	%SELECTED% \
+</li> \
+';
+var menuCharHtmlTpl=menuLoneCharHtmlTpl.replace('ungrouped ','');
+var menuCharDisabledHtmlTpl=menuLoneCharDisabledHtmlTpl.replace('ungrouped ','');
+var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace('ungrouped ','');
 
-var menuSelStateHtmlTemplate = '\
+
+var menuSelStateHtmlTpl = '\
 <div class="facetValueHolder"> \
 %VALUE% %LABEL% %COEFF% \
 <a href="#" class="removeBtn" onclick="clearStateValue(\'%STATE-ID%\');return false;"> \
 <img src="%IMG-URL%"></a> \
 </div> \
 ';
+var menuSelStatesHtmlTpl = '<span>%STATES%</span>';
 
-var menuSelStatesHtmlTemplate = '<span>%STATES%</span>';
+var iconInfoHtmlTpl='<img class="result-icon-image icon-info" src="%IMG-URL%">';
+var iconUrlHtmlTpl = iconInfoHtmlTpl.replace(' icon-info','');
+var iconSimilarTpl = iconInfoHtmlTpl.replace(' icon-info',' icon-similar');
 
-var iconUrlHtmlTemplate ='<img class="result-icon-image" src="%IMG-URL%">';
-var iconInfoHtmlTemplate='<img class="result-icon-image icon-info" src="%IMG-URL%">';
-var iconSimilarTemplate='<img class="result-icon-image icon-similar" src="%IMG-URL%">';
-
-var similarHeaderHtmlTemplate='\
+var similarHeaderHtmlTpl='\
 %HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END%)</span> \
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;">%BACK-TEXT%</a> \
@@ -138,7 +135,7 @@ var similarHeaderHtmlTemplate='\
 <a class="clearSimilarSelection" href="#" onclick="toggleAllDetails();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
 ';
 
-var searchHeaderHtmlTemplate='\
+var searchHeaderHtmlTpl='\
 %HEADER-TEXT% <span id="similarSpeciesName">%SEARCH-TERM%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END% %OF-TEXT% %NUMBER-TOTAL%)</span> \
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSearch();return false;">%BACK-TEXT%</a> \
@@ -162,7 +159,8 @@ var settings={
 	currPage: 0,
 	lastPage: 0,
 	scoreThreshold: 0,
-	mode: "identify" // similar, search
+	mode: "identify", // similar, search
+	groupsAlwaysOpen: true
 };
 
 var data={
@@ -170,6 +168,7 @@ var data={
 	dataset: Array(), // full dataset
 	resultset: Array(), // result subset
 	states: {}, // user-selected states
+	characters: {}, // remaining states/taxa per character
 	scores: {}, // match scores based on selection
 	related: {}, // related species
 	found: {} // search results
@@ -177,10 +176,12 @@ var data={
 
 var prevSettings={};
 
+var initialize=true;
 var lastScrollPos=0;
 var tempstatevalue="";
 var openGroups=Array();
 var searchedfor="";
+
 
 function retrieveDataSet()
 {
@@ -202,6 +203,12 @@ function retrieveDataSet()
 			clearResults();
 			printResults();
 			setCursor();
+			
+			if (initialize)
+			{
+				initialize=false;
+				retrieveMenu();
+			}
 		}
 	});
 }
@@ -221,11 +228,8 @@ function retrieveMenu()
 		}),
 		success : function (data)
 		{
-			//console.log(data);
 			setMenu($.parseJSON(data));
-			filterEmergingCharacters();
 			printMenu();
-			//console.dir(menu);
 			setCursor();
 		}
 	});
@@ -235,6 +239,9 @@ function resetMatrix()
 {
 	clearStateValue();
 	openGroups.splice(0,openGroups.length);
+	closeSimilar();
+	closeSearch();
+	printCountHeader();
 }
 
 function printResults()
@@ -270,6 +277,216 @@ function printResults()
 	{
 		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('.png','_grijs.png')  : "" );
 	});
+}
+
+function shouldDisableChar( id )
+{
+	/*	
+	if the character has states that are already selected, we don't disable
+	*/
+	var activestates=getActiveStates(id);
+	if (activestates && activestates.length>=1) return false;
+
+
+	/*
+	if there is no or just one taxon left that "has" a state from this character, we disable
+	*/
+	var charactercounts=getCharacterCounts(id);
+	return (charactercounts.distinct_state_count<=1);
+}
+
+function shouldDisableEmergentChar( id )
+{
+	/*
+	usage of emergent characters can be turned off in project settings
+	*/
+	if (!settings.useEmergingCharacters) return false;
+	
+	/*
+	types other than text or media (i.e., "free-entry types", 'range' etc.)
+	can never be emergent
+	*/
+	var character=getCharacter(id);
+	if (character.prefix!="c") return false
+	
+	/*
+	the distinct taxon count for all its states that are  still available is
+	smaller than the current result set. put differently: there are remaining
+	species that have no defined state for this particular character.
+	*/
+	var charactercounts=getCharacterCounts(id);
+	return charactercounts.taxon_count < getResultSet().length;
+}
+
+function printMenu()
+{
+	$('#facet-categories-menu').html('');
+	
+	var menu=getMenu();
+	var buffer=Array();
+
+	for (var i in menu)
+	{
+		var item = menu[i];
+
+		var s="";
+		
+		if (item.type=='group')
+		{
+			var c="";
+
+			for (var j in item.chars)
+			{
+				if (settings.groupsAlwaysOpen) openGroups.push(item.id);
+				
+				var char=item.chars[j];
+
+				char.disabled = shouldDisableChar(char.id);
+				char.emergent_disabled = shouldDisableEmergentChar(char.id);
+
+				var activestates=getActiveStates(char.id);
+
+				var l=""
+
+				if (activestates)
+				{
+					openGroups.push(item.id);
+
+					var t="";
+					for (var k in activestates)
+					{
+						var state = activestates[k];
+						t=t+menuSelStateHtmlTpl
+							.replace('%VALUE%',(state.value ? state.value : ''))
+							.replace('%LABEL%',(state.label ? state.label : ''))
+							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
+							.replace('%STATE-ID%',state.val)
+							.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
+					}
+					
+					l=menuSelStatesHtmlTpl.replace('%STATES%',t);
+				}
+
+				if (char.disabled==true)
+				{
+					c=c+menuCharDisabledHtmlTpl
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
+				}
+				else
+				if (char.emergent_disabled==true)
+				{
+
+					//var charactercounts=getCharacterCounts(char.id);
+					//console.log(char.label,charactercounts.taxon_count);
+					
+					c=c+menuCharEmergentDisabledHtmlTpl
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
+				}
+				else
+				{
+					c=c+menuCharHtmlTpl
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
+				}
+			}
+			
+			s=menuGroupHtmlTpl
+				.replace(/%ID%/g,item.id)
+				.replace('%LABEL%',item.label)
+				.replace('%CHARACTERS%',c);
+
+		}
+		else
+		if (item.type=='char')
+		{
+			item.disabled = shouldDisableChar(item.id);
+			item.emergent_disabled = shouldDisableEmergentChar(item.id);
+			
+			var activestates=getActiveStates(item.id);
+			
+			var l=""
+	
+			if (activestates)
+			{
+				var t="";
+				for (var k in activestates)
+				{
+					var state=activestates[k];
+					t=t+menuSelStateHtmlTpl
+						.replace('%VALUE%',(state.value ? state.value : ''))
+						.replace('%LABEL%',(state.label ? state.label : ''))
+						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
+						.replace('%STATE-ID%',state.val)
+						.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
+				}
+				
+				l=menuSelStatesHtmlTpl.replace('%STATES%',t);
+			}
+			
+			if (item.disabled==true)
+			{
+				s=menuLoneCharDisabledHtmlTpl
+					.replace('%CLASS%',"")
+					.replace('%ID%',item.id)
+					.replace('%LABEL%',item.label)
+					.replace('%VALUE%',(item.value?' '+item.value:''))
+					.replace('%SELECTED%',l);
+			}
+			else
+			if (item.emergent_disabled==true)
+			{
+				s=menuLoneCharEmergentDisabledHtmlTpl
+					.replace('%CLASS%',"")
+					.replace('%ID%',item.id)
+					.replace('%LABEL%',item.label)
+					.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
+					.replace('%VALUE%',(item.value?' '+item.value:''))
+					.replace('%SELECTED%',l);
+			}
+			else
+			{
+				s=menuLoneCharHtmlTpl
+					.replace('%CLASS%',"")
+					.replace('%ID%',item.id)
+					.replace('%LABEL%',item.label)
+					.replace('%VALUE%',(item.value?' '+item.value:''))
+					.replace('%SELECTED%',l);
+			}
+		}
+		
+		buffer.push(s);
+
+	}
+	
+	$('#facet-categories-menu').html( menuOuterHtmlTpl.replace('%MENU%',buffer.join('\n') ) );
+	
+	for(var i in $.unique(openGroups))
+	{
+		toggleGroup( openGroups[i], true );
+	}
+	
+	var states=getStates();
+	
+	if (!states || states.count==0)
+	{
+		$('#clearSelectionContainer').addClass('ghosted');
+	}
+	else
+	{
+		$('#clearSelectionContainer').removeClass('ghosted');
+	}	
 }
 
 function clearResults()
@@ -313,29 +530,29 @@ function printResultsExpanded()
 
 			if (++d==settings.perLine)
 			{
-				s=s+resultsLineEndHtmlTemplate;
+				s=s+resultsLineEndHtmlTpl;
 				d=0;
 			}
 		}
 	}
 
 	$('#results-container').html(
-		resultBatchHtmlTemplate
+		resultBatchHtmlTpl
 			.replace('%STYLE%',"")
-			.replace('%RESULTS%', resultsHtmlTemplate.replace('%RESULTS%',s))
+			.replace('%RESULTS%', resultsHtmlTpl.replace('%RESULTS%',s))
 	);
 
-	// parallel processing if show() causes mayhem when clicking more-button fast.
+	// parallel processing using show() causes mayhem when clicking the 'show more'-button fast.
 	//		.replace('%STYLE%',(settings.expandedShowing>0  ? 'display:none' : ''))
 	//	$('.result-batch:hidden').show('normal');
 	
 	settings.expandedShowing=printed;
 
-	if (settings.expandedShowing<resultset.length-1)
+	if (settings.expandedShowing<resultset.length)
 	{
 		if (!$("#show-more").is(':visible'))
 		{
-			$("#paging-footer").append( buttonMoreHtmlTemplate.replace('%LABEL%',__('meer resultaten laden')) );
+			$("#paging-footer").append( buttonMoreHtmlTpl.replace('%LABEL%',__('meer resultaten laden')) );
 			$("#footerPagination").addClass('noline');
 		}
 	}
@@ -364,13 +581,13 @@ function printResultsPaginated()
 			s=s+formatResult(resultset[i]);
 			if (++d==settings.perLine)
 			{
-				s=s+resultsLineEndHtmlTemplate;
+				s=s+resultsLineEndHtmlTpl;
 				d=0;
 			}
 		}
 	}
 
-	$('#results-container').html(resultsHtmlTemplate.replace('%RESULTS%',s));
+	$('#results-container').html(resultsHtmlTpl.replace('%RESULTS%',s));
 }
 
 function formatResult( data )
@@ -437,7 +654,7 @@ function formatResult( data )
 			}
 
 			states.push(
-				speciesStateItemHtmlTemplate
+				speciesStateItemHtmlTpl
 					.replace('%CHARACTER%',t)
 					.replace('%STATE%',l)
 			);
@@ -461,66 +678,66 @@ function formatResult( data )
 	var showStates = states && states.length > 0;
 
 	photoLabelHtml=
-		photoLabelHtmlTemplate
+		photoLabelHtmlTpl
 			.replace('%SCI-NAME%',sciName)
 			.replace('%GENDER%',(data.gender && data.gender.gender ?
-				photoLabelGenderHtmlTemplate
+				photoLabelGenderHtmlTpl
 					.replace('%IMG-SRC%', settings.imageRoot + data.gender.gender+'.png')
 					.replace('%GENDER-LABEL%', data.gender.gender_label)
 				: "" ))
-			.replace('%COMMON-NAME%',(commonName ? brHtmlTemplate + commonName : ""))
+			.replace('%COMMON-NAME%',(commonName ? brHtmlTpl + commonName : ""))
 			.replace('%PHOTO-DETAILS%',(data.info && data.info.photographer ? 
-				photoLabelPhotographerHtmlTemplate
+				photoLabelPhotographerHtmlTpl
 					.replace('%PHOTO-LABEL%', __('foto')+' &copy;' )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
 				: ""));
 
 	imageHtml=
-		imageHtmlTemplate
+		imageHtmlTpl
 			.replace(/%IMAGE-URL%/g,image)
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	
 
 	resultHtml=
-		resultHtmlTemplate
+		resultHtmlTpl
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
 			.replace('%GENDER%',(data.gender && data.gender.gender ? 
-				genderHtmlTemplate
+				genderHtmlTpl
 					.replace('%ICON-URL%', settings.imageRoot+data.gender.gender+'.png') 
 					.replace('%GENDER-LABEL%', data.gender.gender_label) 
 				: "" )
 			)
 			.replace('%SCI-NAME%', sciName)
 			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
-				matrixLinkHtmlTemplate.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
+				matrixLinkHtmlTpl.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
 				: ""))
 			.replace('%COMMON-NAME%', commonName)
 
 			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
 			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
-				remoteLinkClickHtmlTemplate
+				remoteLinkClickHtmlTpl
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
 					.replace('%TITLE%', nbcLabelExternalLink)
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
-				iconUrlHtmlTemplate.replace('%IMG-URL%',settings.imageRoot+"information_grijs.png") : "")
+				iconUrlHtmlTpl.replace('%IMG-URL%',settings.imageRoot+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? "" : " no-content")
-			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTemplate.replace('%TITLE%',nbcLabelDetails) : "")
+			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',nbcLabelDetails) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
-				iconInfoHtmlTemplate.replace('%IMG-URL%',settings.imageRoot+"lijst_grijs.png") : "")
+				iconInfoHtmlTpl.replace('%IMG-URL%',settings.imageRoot+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? "" : " no-content")
 			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
-				relatedClickHtmlTemplate
+				relatedClickHtmlTpl
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
 					.replace('%TITLE%', nbcLabelSimilarSpecies)
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
-				iconSimilarTemplate.replace('%IMG-URL%',settings.imageRoot+"gelijk_grijs.png") : "")
-			.replace('%STATES%', showStates ? statesHtmlTemplate.replace( '%STATES%',states.join(statesJoinHtmlTemplate)) : "")
+				iconSimilarTpl.replace('%IMG-URL%',settings.imageRoot+"gelijk_grijs.png") : "")
+			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.od)
 			;
@@ -542,7 +759,7 @@ function printCountHeader()
 	if (settings.browseStyle=='expand')
 	{
 		$('#result-count').html(
-			counterExpandHtmlTemplate
+			counterExpandHtmlTpl
 				.replace('%START-NUMBER%',(settings.expandedShowing > 1 ? "1-" : "" ))
 				.replace('%NUMBER-SHOWING%',settings.expandedShowing)
 				.replace('%FROM-LABEL%',__('van'))
@@ -553,7 +770,7 @@ function printCountHeader()
 	if (settings.browseStyle=='paginate')
 	{
 		$('#result-count').html(
-			counterPaginateHtmlTemplate
+			counterPaginateHtmlTpl
 				.replace('%FIRST-NUMBER%', (settings.start+1))
 				.replace('%LAST-NUMBER%',(settings.start+settings.perPage))
 				.replace('%NUMBER-LABEL%',__('van'))
@@ -563,7 +780,7 @@ function printCountHeader()
 	else
 	{
 		$('#result-count').html(
-			counterPaginateHtmlTemplate
+			counterPaginateHtmlTpl
 				.replace('%FIRST-NUMBER%',1)
 				.replace('%LAST-NUMBER%',resultset.length)
 				.replace('%NUMBER-LABEL%',"")
@@ -587,7 +804,7 @@ function printPaging()
 
 	if (settings.lastPage > 1 && settings.currPage!=0)
 	{
-		$("#paging-header").append( pagePrevHtmlTemplate );
+		$("#paging-header").append( pagePrevHtmlTpl );
 	}
 	
 	if (settings.lastPage>1)
@@ -596,18 +813,18 @@ function printPaging()
 		{
 			if (i==settings.currPage)
 			{
-				$("#paging-header").append( pageCurrHtmlTemplate.replace('%NR%',(i+1)) );
+				$("#paging-header").append( pageCurrHtmlTpl.replace('%NR%',(i+1)) );
 			}
 		    else
 			{
-				$("#paging-header").append( pageNumberHtmlTemplate.replace('%NR%',(i+1)).replace('%INDEX%',i) );
+				$("#paging-header").append( pageNumberHtmlTpl.replace('%NR%',(i+1)).replace('%INDEX%',i) );
 			}
 		}
 	}
 
 	if (settings.lastPage > 1 && settings.currPage<settings.lastPage-1)
 	{
-		$("#paging-header").append( pageNextHtmlTemplate );
+		$("#paging-header").append( pageNextHtmlTpl );
 	}
 
 	$("#paging-footer").html($("#paging-header").html());
@@ -652,138 +869,21 @@ function getActiveStates( id )
 	return (res.length>0 ? res : null);
 }
 
-function printMenu()
+function getCharacterCounts( id )
 {
-	$('#facet-categories-menu').html('');
+	var characters=getCharacters();
+
+	if (!characters) return;
 	
-	var menu=getMenu();
-	var buffer=Array();
-
-	for (var i in menu)
+	for(var c in characters)
 	{
-		var item = menu[i];
-
-		var s="";
-		
-		if (item.type=='group')
+		if (c==id)
 		{
-			var c="";
-
-			for (var j in item.chars)
-			{
-				var char = item.chars[j];
-
-				var activestates=getActiveStates(char.id);
-				
-				var l=""
-
-				if (activestates)
-				{
-					openGroups.push(item.id);
-
-					var t="";
-					for (var k in activestates)
-					{
-						var state = activestates[k];
-						t=t+menuSelStateHtmlTemplate
-							.replace('%VALUE%',(state.value ? state.value : ''))
-							.replace('%LABEL%',(state.label ? state.label : ''))
-							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
-							.replace('%STATE-ID%',state.val)
-							.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
-					}
-					
-					l=menuSelStatesHtmlTemplate.replace('%STATES%',t);
-				}
-
-				if (char.disabled==true)
-				{
-					c=c+menuCharDisabledHtmlTemplate
-						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
-						.replace('%LABEL%',char.label)
-						.replace('%VALUE%',(char.value?' '+char.value:''))
-						.replace('%SELECTED%',l);
-				}
-				else
-				if (char.emergent_disabled==true)
-				{
-					c=c+menuCharEmergentDisabledHtmlTemplate
-						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
-						.replace('%ID%',char.id)
-						.replace('%LABEL%',char.label)
-						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
-						.replace('%VALUE%',(char.value?' '+char.value:''))
-						.replace('%SELECTED%',l);
-				}
-				else
-				{
-					c=c+menuCharHtmlTemplate
-						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
-						.replace('%ID%',char.id)
-						.replace('%LABEL%',char.label)
-						.replace('%VALUE%',(char.value?' '+char.value:''))
-						.replace('%SELECTED%',l);
-				}
-			}
-			
-			s=menuGroupHtmlTemplate
-				.replace(/%ID%/g,item.id)
-				.replace('%LABEL%',item.label)
-				.replace('%CHARACTERS%',c);
-
+			return characters[c];
 		}
-		else
-		if (item.type=='char')
-		{
-			var activestates=getActiveStates(item.id);
-			
-			var l=""
-	
-			if (activestates)
-			{
-				var t="";
-				for (var k in activestates)
-				{
-					var state = activestates[k];
-					t=t+menuSelStateHtmlTemplate
-						.replace('%VALUE%',(state.value ? state.value : ''))
-						.replace('%LABEL%',(state.label ? state.label : ''))
-						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
-						.replace('%STATE-ID%',state.val)
-						.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
-				}
-				
-				l=menuSelStatesHtmlTemplate.replace('%STATES%',t);
-			}
-			
-			s=menuLoneCharHtmlTemplate
-				.replace('%ID%',item.id)
-				.replace('%LABEL%',item.label)
-				.replace('%VALUE%',(item.value?' '+item.value:''))
-				.replace('%SELECTED%',l);
-		}
-		
-		buffer.push(s);
+	}
 
-	}
-	
-	$('#facet-categories-menu').html( menuOuterHtmlTemplate.replace('%MENU%',buffer.join('\n') ) );
-	
-	for(var i in $.unique(openGroups))
-	{
-		toggleGroup( openGroups[i], true );
-	}
-	
-	var states=getStates();
-	
-	if (!states || states.count==0)
-	{
-		$('#clearSelectionContainer').addClass('ghosted');
-	}
-	else
-	{
-		$('#clearSelectionContainer').removeClass('ghosted');
-	}	
+	return {taxon_count:0,distinct_state_count:0};
 }
 
 function toggleGroup( id, forceOpen )
@@ -862,12 +962,11 @@ function setState( p )
 		}),
 		success : function(data)
 		{
-			//console.log(data);
 			var d=$.parseJSON(data);
 
 			setScores(d.scores);
 			setStates(d.states);
-			//console.dir(getStates());
+			setCharacters(d.characters);
 
 			applyScores();
 			clearResults();
@@ -954,24 +1053,17 @@ function applyFound()
 	var dataset=getDataSet();
 	var resultset=getResultSet();
 
-	if ((!found || found.length==0))
-	{
-		resultset=dataset.slice();
-	}
-	else
-	{
-		resultset.splice(0,resultset.length);
+	resultset.splice(0,resultset.length);
 
-		for(var i in found)
+	for(var i in found)
+	{
+		var tfound=found[i];
+		for(var j in dataset)
 		{
-			var tfound=found[i];
-			for(var j in dataset)
+			var item=dataset[j];
+			if (tfound.id==item.id && tfound.type==item.type)
 			{
-				var item=dataset[j];
-				if (tfound.id==item.id && tfound.type==item.type)
-				{
-					resultset.push(item);
-				}
+				resultset.push(item);
 			}
 		}
 	}
@@ -1110,7 +1202,7 @@ function printSimilarHeader()
 	var resultset = getResultSet();
 
 	$('#similarSpeciesHeader').html(
-		similarHeaderHtmlTemplate
+		similarHeaderHtmlTpl
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
@@ -1165,6 +1257,7 @@ function setSearch( p )
 		}),
 		success : function(data)
 		{
+			//console.log(data);
 			var found=$.parseJSON(data);
 			setFound(found);
 
@@ -1194,7 +1287,7 @@ function setSearch( p )
 function printSearchHeader()
 {
 	$('#similarSpeciesHeader').html(
-		searchHeaderHtmlTemplate
+		searchHeaderHtmlTpl
 			.replace('%HEADER-TEXT%', __('Zoekresultaten voor'))
 			.replace('%SEARCH-TERM%', searchedfor)
 			.replace('%BACK-TEXT%', __('terug'))
@@ -1324,6 +1417,16 @@ function getStates()
 	return data.states;
 }
 
+function setCharacters(characters)
+{
+	data.characters=characters;
+}
+
+function getCharacters()
+{
+	return data.characters;
+}
+
 function setDataSet(dataset)
 {
 	data.dataset=dataset;
@@ -1389,89 +1492,33 @@ function setSetting( p )
 	$.extend(settings, p);
 }
 
-
-
-
-
-
-function filterEmergingCharacters()
+function getCharacter( id )
 {
-	
-	return;
-	
-	if (!settings.useEmergingCharacters) return;
+	var menu=getMenu();
 
-	var charactersWithAnActiveState=Array();
-	for(var i in nbcData.selectedStates)
+	for (var i in menu)
 	{
-		charactersWithAnActiveState[nbcData.selectedStates[i].characteristic_id]=true;
-	}
+		var item = menu[i];
 
-	for(var i in nbcData.menu.groups)
-	{
-		for (var j in nbcData.menu.groups[i].chars)
+		if (item.type=='group')
 		{
-			var char=nbcData.menu.groups[i].chars[j];
-			var id=char.id;
-
-			/*
-				[ disabling non-distinctive characters ]
-
-				we are setting disabled to false regardless of the
-				remaining number of states:
-				
-				1. if there was no count per character in the data set
-				(if (nbcData.countPerCharacter))
-				
-				2. for types other than text or media (i.e., for are
-				"free-entry types", 'range' etc.)
-				(char.type=='media' || char.type=='text')
-				
-				3. if the character has states that are already selected
-				(charactersWithAnActiveState[id]!==true)
-
-				next, characters are disabled when:
-
-				4. within it, there are no selectable states left
-				(nbcData.countPerCharacter[id]==undefined)
-				
-				5. the total taxon count for all its states taken is
-				together is smaller than the current result set. put
-				differently: there are remaining species that have
-				no defined state for this particular character
-				(nbcData.countPerCharacter[id]<nbcData.results.length)
-				
-				6. there is only one state left in a character, even
-				if there is more than one species that "has" it.
-				choosing the one last state would leave the size of
-				the result set unchanged, and is therefore no
-				longer distinctive.
-				(nbcData.countPerCharacter[id].distinct_state_count<=1)
-
-			*/
-			
-			if (nbcData.countPerCharacter && 
-				(char.type=='media' || char.type=='text') && 
-				charactersWithAnActiveState[id]!==true)
+			for (var j in item.chars)
 			{
-				nbcData.menu.groups[i].chars[j].emergent_disabled=
-					(
-					nbcData.countPerCharacter[id]==undefined || 
-					nbcData.countPerCharacter[id].taxon_count< (nbcData.results.length ? nbcData.results.length : 0) ||
-					nbcData.countPerCharacter[id].distinct_state_count<=1
-					);
-			} 
-			else
-			{
-				nbcData.menu.groups[i].chars[j].emergent_disabled=null;
+				if (item.chars[j].id==id) return item.chars[j];
 			}
-			
-			//nbcData.menu.groups[i].chars[j].label=
-			//	 nbcData.menu.groups[i].chars[j].label+'::'+nbcData.menu.groups[i].chars[j].id;
+		}
+		else
+		if (item.type=='char')
+		{
+			if (item.id==id) return item;
 		}
 	}
-
 }
+
+
+
+
+
 
 
 function matrixInit()
@@ -1487,8 +1534,7 @@ function matrixInit()
 	$('#legendDetails').html(nbcLabelDetails);
 	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
 	$('#legendExternalLink').html(nbcLabelExternalLink);
-
-
+	
 	/*
 	if ("ontouchstart" in document) {
 		// touch only code (tablets)

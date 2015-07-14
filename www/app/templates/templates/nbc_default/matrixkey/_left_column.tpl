@@ -43,11 +43,15 @@
 		</div>  
 
         <div class="left-divider"></div>
-
+        
+        {capture snippet}{snippet}colofon.html{/snippet}{/capture}
+        
+        {if $smarty.capture.snippet|@strlen>0}
 		<div id="dataSourceContainer">   
-			{snippet}colofon.html{/snippet}
+		{$smarty.capture.snippet}
 		</div>  
-
         <div class="left-divider"></div>
+        {/if}
+
 
 	</div>
