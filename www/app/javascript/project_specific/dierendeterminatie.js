@@ -151,8 +151,9 @@ var settings={
 	expandResults: true,
 	useEmergingCharacters: true,
 	showSpeciesDetails: true,
-	imageRoot: "",
-	defaultImage: "",
+	imageRootSkin: "",
+	imageRootProject: "",
+	defaultSpeciesImage: "",
 	browseStyle: 'paginate', // expand, paginate, show_all
 	expandedPrevious: 0,
 	paginate: true,
@@ -366,7 +367,7 @@ function printMenu()
 							.replace('%LABEL%',(state.label ? state.label : ''))
 							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 							.replace('%STATE-ID%',state.val)
-							.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
+							.replace('%IMG-URL%',settings.imageRootSkin+'clearSelection.gif');
 					}
 					
 					l=menuSelStatesHtmlTpl.replace('%STATES%',t);
@@ -434,7 +435,7 @@ function printMenu()
 						.replace('%LABEL%',(state.label ? state.label : ''))
 						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 						.replace('%STATE-ID%',state.val)
-						.replace('%IMG-URL%',settings.imageRoot+'clearSelection.gif');
+						.replace('%IMG-URL%',settings.imageRootSkin+'clearSelection.gif');
 				}
 				
 				l=menuSelStatesHtmlTpl.replace('%STATES%',t);
@@ -672,13 +673,12 @@ function formatResult( data )
 	if (data.info && data.info.url_image)
 	{
 		image=data.info.url_image;
+		if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=settings.imageRootProject+image;
 	}
 	else
 	{
-		if (settings.defaultImage) image=settings.defaultImage;
+		if (settings.defaultSpeciesImage) image=settings.defaultSpeciesImage;
 	}
-		
-	if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=baseUrlProjectImages+image;
 	
 	var id = data.type+'-'+data.id;
 	var showStates = states && states.length > 0;
@@ -688,7 +688,7 @@ function formatResult( data )
 			.replace('%SCI-NAME%',sciName)
 			.replace('%GENDER%',(data.gender && data.gender.gender ?
 				photoLabelGenderHtmlTpl
-					.replace('%IMG-SRC%', settings.imageRoot + data.gender.gender+'.png')
+					.replace('%IMG-SRC%', settings.imageRootSkin + data.gender.gender+'.png')
 					.replace('%GENDER-LABEL%', data.gender.gender_label)
 				: "" ))
 			.replace('%COMMON-NAME%',(commonName ? brHtmlTpl + commonName : ""))
@@ -711,7 +711,7 @@ function formatResult( data )
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
 			.replace('%GENDER%',(data.gender && data.gender.gender ? 
 				genderHtmlTpl
-					.replace('%ICON-URL%', settings.imageRoot+data.gender.gender+'.png') 
+					.replace('%ICON-URL%', settings.imageRootSkin+data.gender.gender+'.png') 
 					.replace('%GENDER-LABEL%', data.gender.gender_label) 
 				: "" )
 			)
@@ -728,11 +728,11 @@ function formatResult( data )
 					.replace('%TITLE%', nbcLabelExternalLink)
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
-				iconUrlHtmlTpl.replace('%IMG-URL%',settings.imageRoot+"information_grijs.png") : "")
+				iconUrlHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? "" : " no-content")
 			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',nbcLabelDetails) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
-				iconInfoHtmlTpl.replace('%IMG-URL%',settings.imageRoot+"lijst_grijs.png") : "")
+				iconInfoHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? "" : " no-content")
 			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
 				relatedClickHtmlTpl
@@ -742,7 +742,7 @@ function formatResult( data )
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
-				iconSimilarTpl.replace('%IMG-URL%',settings.imageRoot+"gelijk_grijs.png") : "")
+				iconSimilarTpl.replace('%IMG-URL%',settings.imageRootSkin+"gelijk_grijs.png") : "")
 			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.od)

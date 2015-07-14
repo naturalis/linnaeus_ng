@@ -47,14 +47,15 @@
 $(document).ready(function()
 {
 
-	baseUrlProjectImages='{$projectUrls.projectMedia}';
+	
 
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
-		imageRoot: '{$nbcImageRoot}',
+		imageRootSkin: '{$image_root_skin}',
+		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {$matrix_use_emerging_characters},
-		defaultImage: 'noimage.gif',
+		defaultSpeciesImage: '{$image_root_skin}noimage.gif',
 		browseStyle: '{$matrix_browse_style}',
 		scoreThreshold: {$matrix_score_threshold}
 	});

@@ -52,7 +52,7 @@ class MatrixKeyController extends Controller
 	private $_matrix_score_threshold;
 	private $_master_matrix;
 
-	private $_nbcImageRoot=true;
+	private $_nbc_image_root=true;
 	
 	
     public $cssToLoad = array('matrix.css');
@@ -97,7 +97,7 @@ class MatrixKeyController extends Controller
 		$this->_matrix_state_image_per_row=$this->getSetting('matrix_state_image_per_row',4);
 		$this->_matrix_score_threshold=$this->getSetting('matrix_score_threshold',100);
 
-		$this->_nbcImageRoot = $this->getSetting('nbc_image_root');
+		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
 
 		$this->setMenu();
 
@@ -136,7 +136,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 
         $this->smarty->assign('matrix', $matrix);
-		$this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
+		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
 		$this->smarty->assign('matrix_browse_style', $this->_matrix_browse_style);
 		$this->smarty->assign('matrix_score_threshold', $this->_matrix_score_threshold);
