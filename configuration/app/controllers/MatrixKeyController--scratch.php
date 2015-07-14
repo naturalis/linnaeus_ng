@@ -433,35 +433,6 @@ class MatrixKeyController extends Controller
         return isset($m[$id]) ? $m[$id] : null;
     }
 
-    private function getMatricesInMatrix ()
-    {
-        $mts = $this->models->MatrixTaxonState->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id' => $this->getCurrentMatrixId(), 
-                'ref_matrix_id is not' => 'null'
-            ), 
-            'columns' => 'distinct ref_matrix_id,\'matrix\' as type'
-        ));
-        
-        foreach ((array) $mts as $key => $val) {
-            
-            $d = $this->getMatrix($val['ref_matrix_id']);
-            
-            if (isset($d)) {
-                
-                $matrices[$val['ref_matrix_id']] = array(
-                    'id' => $d['id'], 
-                    'l' => $d['name'], 
-                    'type' => 'mtx'
-                );
-            }
-        }
-        
-        return isset($matrices) ? $matrices : null;
-    }
-
 	private function scaleDimensions($d)
 	{
 		

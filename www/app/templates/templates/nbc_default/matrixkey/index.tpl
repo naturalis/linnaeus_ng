@@ -14,7 +14,7 @@
     
         <div id="resultsHeader">
             <span>
-	            <h1>{$matrix.name}{* if $master_matrix.id}{$matrix.name}{else}{$session.app.project.title}{/if *}</h1>
+	            <h1>{$matrix.name}</h1>
                 <div class="headerPagination">
                     <ul id="paging-header" class="list paging"></ul>
                 </div>

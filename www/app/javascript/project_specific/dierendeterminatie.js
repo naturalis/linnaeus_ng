@@ -324,6 +324,8 @@ function printMenu()
 	
 	var menu=getMenu();
 	var buffer=Array();
+	var groupcount=0;
+	var lastgroupid;
 
 	for (var i in menu)
 	{
@@ -333,6 +335,9 @@ function printMenu()
 		
 		if (item.type=='group')
 		{
+			groupcount++;
+			lastgroupid=item.id;			
+
 			var c="";
 
 			for (var j in item.chars)
@@ -469,6 +474,8 @@ function printMenu()
 		buffer.push(s);
 
 	}
+
+	if (groupcount==1 && lastgroupid) openGroups.push(lastgroupid);
 	
 	$('#facet-categories-menu').html( menuOuterHtmlTpl.replace('%MENU%',buffer.join('\n') ) );
 	
@@ -607,14 +614,13 @@ function formatResult( data )
 		var sciName='<i>'+data.taxon.taxon+'</i>';
 		var commonName=data.label ? data.label : "";
 	}
-
-
-/*
-	if (data.l!=data.c && data.l.indexOf(data.c)===0)
+	else
+	if ( data.type=='matrix' )
 	{
-		data.l = data.c + ' (' + data.l.replace(data.c,'').replace(/(^\s|\s$)/,'') + ')';
+		//var sciName=data.taxon.label;
+		var sciName='<i>'+data.label+'</i>';
+		var commonName="";
 	}
-*/
 
 	if (settings.showSpeciesDetails && data.states)
 	{

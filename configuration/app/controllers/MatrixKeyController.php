@@ -1,8 +1,6 @@
 <?php
 /*
 
-	?mtrx=i --> override for specific matrix --> is this actually in use
-
 	needs to be undone of NBC:
 		private $_nbcImageRoot=true;
 
@@ -52,8 +50,9 @@ class MatrixKeyController extends Controller
 	private $_matrix_browse_style;
 	private $_matrix_state_image_per_row;
 	private $_matrix_score_threshold;
+	private $_master_matrix;
 
-		private $_nbcImageRoot=true;
+	private $_nbcImageRoot=true;
 	
 	
     public $cssToLoad = array('matrix.css');
@@ -128,8 +127,9 @@ class MatrixKeyController extends Controller
 		$matrix=$this->getActivematrix();
 
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
-		
+
 		$this->setScores();
+		$this->setMasterMatrix();
 
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
@@ -140,7 +140,8 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
 		$this->smarty->assign('matrix_browse_style', $this->_matrix_browse_style);
 		$this->smarty->assign('matrix_score_threshold', $this->_matrix_score_threshold);
-			
+		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
+
         $this->printPage();
     }
 
@@ -279,7 +280,6 @@ class MatrixKeyController extends Controller
 		}
 
         $this->checkMatrixIdOverride();
-        $this->checkMasterMatrixId();
 	}
 
     private function setCurrentMatrixId( $id=null )
@@ -299,27 +299,36 @@ class MatrixKeyController extends Controller
         return isset($_SESSION['app'][$this->spid()]['matrix']['active']) ? $_SESSION['app'][$this->spid()]['matrix']['active'] : null;
     }
 
-    private function setMasterMatrixId( $id=null )
+    private function setMasterMatrix()
     {
-		if ( is_null($id) )
+        $mts = $this->models->MatrixTaxonState->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'matrix_id !=' => $this->getCurrentMatrixId(), 
+                'ref_matrix_id' => $this->getCurrentMatrixId()
+            ), 
+            'columns' => 'distinct matrix_id'
+        ));		
+		
+		if ($mts)
 		{
-			unset($_SESSION['app'][$this->spid()]['matrix']['master_id']);
+			$this->_master_matrix=$this->getMatrix( array("id"=>$mts[0]['matrix_id']) );
 		}
 		else
 		{
-			$_SESSION['app'][$this->spid()]['matrix']['master_id']=$id;
+			$this->_master_matrix=null;
 		}
     }
 
-    private function getMasterMatrixId()
+    private function getMasterMatrix()
     {
-        return isset($_SESSION['app'][$this->spid()]['matrix']['v']) ? $_SESSION['app'][$this->spid()]['matrix']['master_id'] : null;
+		return $this->_master_matrix;
     }
 
 	private function setActiveMatrix()
 	{
 		$this->_activeMatrix=$this->getMatrix( array('id'=>$this->getCurrentMatrixId()) );
-		$this->_activeMatrix=$this->_activeMatrix[$this->getCurrentMatrixId()];
 	}
 
 	private function getActiveMatrix()
@@ -335,38 +344,15 @@ class MatrixKeyController extends Controller
 		}
 		
 		$m = $this->getMatrix( array( 'id'=>$this->rGetVal('mtrx') ) );
-
+		
         if ( empty($m) )
 		{
 			return;
 		}
-		
-		$this->setCurrentMatrixId( $m['id'] );
-    }
-
-    private function checkMasterMatrixId()
-    {
-        $m=$this->models->MatrixTaxonState->_get(
-			array(
-				'id' =>
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'matrix_id !=' => $this->getCurrentMatrixId(), 
-						'ref_matrix_id' => $this->getCurrentMatrixId()
-					), 
-				'columns' => 
-					'distinct matrix_id'
-			));		
-		
-		if ($m)
-		{
-			$this->setMasterMatrixId( $m[0]['matrix_id'] );
-		}
 		else
 		{
-			$this->setMasterMatrixId();
+			$this->setCurrentMatrixId( $m['id'] );
 		}
-
     }
 
     private function getMatrix( $p )
@@ -400,7 +386,7 @@ class MatrixKeyController extends Controller
 		"fieldAsIndex" => "id"
 		));
 		
-		return $m;
+		return ( isset($id) && $id!='*' && isset($m[$id]) ? $m[$id] : ( isset($m) ? $m  : null ) ) ;
 
 	}
 
@@ -532,7 +518,9 @@ class MatrixKeyController extends Controller
 	private function getAllIdentifiableEntities()
 	{
 		$taxa=$this->getTaxaInMatrix();
-		$var=$this->getVariationsInMatrix();
+		$variations=$this->getVariationsInMatrix();
+		$matrices=$this->getMatricesInMatrix();
+
 		$info=$this->getAllNBCExtras();
 
 		if ( !empty($info) )
@@ -541,13 +529,13 @@ class MatrixKeyController extends Controller
 			{
 				$taxa[$key]['info']=isset($info['taxon'][$val['id']]) ? $info['taxon'][$val['id']] : null;
 			}
-			foreach((array)$var as $key=>$val)
+			foreach((array)$variations as $key=>$val)
 			{
-				$var[$key]['info']=isset($info['variation'][$val['id']]) ? $info['variation'][$val['id']] : null;
+				$variations[$key]['info']=isset($info['variation'][$val['id']]) ? $info['variation'][$val['id']] : null;
 			}
 		}
 
-		$all=array_merge((array)$taxa,(array)$var);
+		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 		
 		usort($all,function($a,$b)
 		{
@@ -558,13 +546,18 @@ class MatrixKeyController extends Controller
 			else
 			if ($a['type']=='variation')
 				$aa=$a['taxon']['taxon'];
+			else
+			if ($a['type']=='matrix')
+				$aa=$a['label'];
 
 			if ($b['type']=='taxon')
 				$bb=$b['taxon'];
 			else
 			if ($b['type']=='variation')
 				$bb=$b['taxon']['taxon'];
-				
+			else
+			if ($b['type']=='matrix')
+				$bb=$b['label'];
 
 			return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1 ));
 
@@ -659,6 +652,37 @@ class MatrixKeyController extends Controller
 
         return $m;
     }
+
+    private function getMatricesInMatrix()
+    {
+        $matrices = $this->models->MatrixTaxonState->freeQuery("
+			select 
+				distinct _a.ref_matrix_id as id,
+				_b.name as label,
+				'matrix' as type 
+			from 
+				%PRE%matrices_taxa_states _a
+
+			left join %PRE%matrices_names _b
+				on _a.project_id = _b.project_id
+				and _a.ref_matrix_id = _b.matrix_id
+				and _b.language_id = " . $this->getCurrentLanguageId() . "
+
+			where 
+				_a.project_id = " . $this->getCurrentProjectId() . " 
+				and _a.matrix_id = " . $this->getCurrentMatrixId() . " 
+				and _a.ref_matrix_id is not null
+			");
+			
+		foreach((array)$matrices as $key=>$val)
+		{
+			$matrices[$key]['states']=$this->getMatrixStates( $val['id'] );
+		}
+
+        return $matrices;
+    }
+
+
 
 	//REFAC2015: should be moved to kenmerkenmodule!
     private function getAllNBCExtras()
