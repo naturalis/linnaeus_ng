@@ -54,7 +54,7 @@ $(document).ready(function()
 		projectId: {$session.app.project.id},
 		imageRoot: '{$nbcImageRoot}',
 		useEmergingCharacters: {$matrix_use_emerging_characters},
-		defaultImage: '{$nbcImageRoot}noimage.gif',
+		defaultImage: 'noimage.gif',
 		browseStyle: '{$matrix_browse_style}',
 		scoreThreshold: {$matrix_score_threshold}
 	});
