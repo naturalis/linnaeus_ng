@@ -8,18 +8,6 @@
 
 	vergeet matrixen als resultaat niet!
 
-	alleen in ajax:
-		// if ($this->rGetVal( 'key' )) setmatrix
-		// if ($this->rGetVal( 'p' )) setproject
-
-
-	!!! handle in JS (= only show species details that are not the same for all remaining species)
-	if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
-		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-		
-		
-	getRemainingCharacterCount  --> is it actually in use??
-
 */
 
 
@@ -114,10 +102,10 @@ class MatrixKeyController extends Controller
 
 		$this->setMenu();
 
-//			$_SESSION['app']['system']['urls']['nbcImageRoot']=
-
-//        $this->_matrixType = strtolower( $this->getSetting('matrixtype') );
-// this should be per matrix not per project
+		//			$_SESSION['app']['system']['urls']['nbcImageRoot']=
+		
+		//        $this->_matrixType = strtolower( $this->getSetting('matrixtype') );
+		// this should be per matrix not per project
 
 		/*
         $this->_useCharacterGroups = $this->getSetting('matrix_use_character_groups') == '1';
@@ -145,6 +133,8 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
+		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
+
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
@@ -223,7 +213,12 @@ class MatrixKeyController extends Controller
 			$this->sessionStateStore( $state );
 
 			$this->setScores();
-			$this->smarty->assign('returnText',json_encode( array('scores'=>$this->getScores(),'states'=>$this->getSessionStates())));
+			$this->smarty->assign('returnText',
+				json_encode( array(
+					'scores'=>$this->getScores(),
+					'states'=>$this->getSessionStates(),
+					'characters'=>$this->getCharacterCounts()
+				)));
 		}
 
         else					
@@ -240,7 +235,12 @@ class MatrixKeyController extends Controller
 			}
 
 			$this->setScores();
-			$this->smarty->assign('returnText',json_encode( array('scores'=>$this->getScores(),'states'=>$this->getSessionStates())));
+			$this->smarty->assign('returnText',
+				json_encode( array(
+					'scores'=>$this->getScores(),
+					'states'=>$this->getSessionStates(),
+					'characters'=>$this->getCharacterCounts()
+				)));
 		}
 
 		else
@@ -810,6 +810,7 @@ class MatrixKeyController extends Controller
 
 	private function setMenu()
 	{
+		/*
 		$menu1=$this->models->GuiMenuOrder->freeQuery("
 			select
 				ref_id as id,
@@ -866,8 +867,9 @@ class MatrixKeyController extends Controller
 			order by 
 				show_order
 		");
+		*/
 
-		$menu2=$this->models->GuiMenuOrder->freeQuery("
+		$menu=$this->models->GuiMenuOrder->freeQuery("
 		
 			select 
 				id,
@@ -949,8 +951,6 @@ class MatrixKeyController extends Controller
 		
 		");
 		
-		$menu=$menu2;
-		
 		foreach((array)$menu as $key=>$val)
 		{
 			if ($val['type']=='group')
@@ -960,7 +960,8 @@ class MatrixKeyController extends Controller
 			else
 			if ($val['type']=='char')
 			{
-				//$menu[$key]['states']=$this->getCharacterStates( array('char'=>$val['id']) );
+				$d=$this->getCharacter( $val );
+				$menu[$key]['prefix']=$d['prefix'];
 			}
 		}
 		
@@ -1776,9 +1777,8 @@ class MatrixKeyController extends Controller
         return $results;
     }
 
-    private function getRemainingCharacterCount()
+    private function getCharacterCounts()
     {
-
 		$c=$this->makeRemainingCountClauses();
 
 		$dT = $c['dT'];

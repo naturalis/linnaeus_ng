@@ -61,14 +61,10 @@ $(document).ready(function()
 
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
+	setCharacters($.parseJSON('{$session_characters}'));
 			
 	matrixInit();
-
-	setCursor('wait');
-
-	retrieveMenu();
 	retrieveDataSet();
-	setCursor();
 
 });
 </script>
