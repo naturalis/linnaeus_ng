@@ -13,29 +13,33 @@
             {/if}
         
         {if $character.type=='range'}
+        
+        	<div style="text-align:left">
 
-            <p>
-            	<input
-                	id="state-value" 
-                    name="state-value" 
-                    type="text" 
-                    value="{$states_selected[$character.id].value}" 
-                    onkeyup="tempstatevalue=$(this).val();"
-				>&nbsp;
-            	<a 
-                	href="#" 
-                    class="clearRange" 
-                    onclick="clearStateValue($('#state-id').val());$('#state-value').val('');return false;"
-				>{t}waarde wissen{/t}</a>
-            </p>
-
-            {if $character.min && $character.max}
-
-            <p id="state-value-extra">
-                {t _s1=$character.min_display _s2=$character.max_display _s3=$character.unit}Kies een waarde tussen %s en %s%s.{/t}
-            </p>
-
-	        {/if}
+                <p>
+                    <input
+                        id="state-value" 
+                        name="state-value" 
+                        type="text" 
+                        value="{$states_selected[$character.id].value}" 
+                        onkeyup="tempstatevalue=$(this).val();"
+                    >&nbsp;
+                    <a 
+                        href="#" 
+                        class="clearRange" 
+                        onclick="clearStateValue($('#state-id').val());$('#state-value').val('');return false;"
+                    >{t}waarde wissen{/t}</a>
+                </p>
+    
+                {if $character.min && $character.max}
+    
+                <p id="state-value-extra">
+                    {t _s1=$character.min_display _s2=$character.max_display _s3=$character.unit}Kies een waarde tussen %s en %s%s.{/t}
+                </p>
+    
+                {/if}
+            
+            </div>
 
         {elseif $character.type=='media'}
 
