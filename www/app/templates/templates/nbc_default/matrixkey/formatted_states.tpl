@@ -1,4 +1,4 @@
-<div id="graphicValueSelector">
+<div id="graphicVaslueSelector">
 
 	{*<p id="dialogHeader">
 		<span id="state-header">{$character.label}:</span>{if $character.info}<br />{$character.info}{/if}
@@ -39,6 +39,55 @@
 
         {elseif $character.type=='media'}
 
+
+			<div class="state-images-container">
+
+            {foreach from=$states item=v name=foo key=key}
+            
+                {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
+                    {assign var=irrelevant value=true}
+                {else}
+                    {assign var=irrelevant value=false}
+                {/if}
+                
+                {if isset($states_selected[{$v.id}])}
+                    {assign var=selected value=true}
+                {else}
+                    {assign var=selected value=false}
+                {/if}
+           
+                <div class="state-image-container{if $selected} state-image-selected{/if}{if $irrelevant} state-image-irrelevant{/if}">
+                	<div class="state-image-buffer">
+                        {if !$irrelevant}{if $selected}
+                            <a href="#" onclick="clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
+                        {else}
+                            <a href="#" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
+                        {/if}{/if}
+                    	<img
+                        	class="state-image" 
+                            key="{$key}"
+                            {if $v.file_name}
+                            src="http://134.213.153.137/linnaeus_ng/shared/media/project/0077/{$v.file_name}"
+                            ssrc="{$projectUrls.projectMedia}{$v.file_name}"
+                            {else}
+                            src="{$projectUrls.projectMedia}missing.jpg"
+                            {/if}                    
+                        >{if !$irrelevant}</a>{/if}<a id="full-size-link-{$key}" rel="prettyPhoto[states]" href="http://134.213.153.137/linnaeus_ng/shared/media/project/0077/{$v.file_name}" pTitle="{$character.label|@escape}: {$v.label|@escape}" title="" style="display:none;"><img class="full-size-icon" src="{$image_root_skin}full-size-icon.png"></a>
+					</div>
+					<div class="state-image-caption">{$v.label}
+                    {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
+                        <br />
+                       ({$states_remain_count[{$v.id}]})
+                    {/if}
+                    </div>
+                </div>
+                
+			{/foreach}
+            
+            </div>
+    
+
+		{*
             <table id="graphicValuesTable">
                 <tr>
                     {foreach from=$states item=v name=foo}
@@ -55,7 +104,7 @@
     	                {assign var=selected value=false}
                     {/if}
                     
-					<td class="{if $selected}selectedValue{/if}{if $irrelevant}irrelevant{/if}">
+					<td class="{if $selected}selectedValue{/if}{if $irrelevant}irrelevant{/if}" style="max-width:200px;">
 						<div class="state-image-cell" style="padding:0;">
                         {if !$irrelevant}
                         {if $selected}
@@ -64,20 +113,21 @@
                             <a href="#" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                         {/if}
                         {/if}
-                                <img
-                                	class="state-image{if $irrelevant} state-image-irrelevant{/if}"
-                                    {if $v.file_name}
-                                    	src="{$projectUrls.projectMedia}{$v.file_name}"
-                                    {else}
-                                    	src="{$projectUrls.systemMedia}missing.jpg"
-									{/if}
-                                   />
+                            <img
+                                class="state-image{if $irrelevant} state-image-irrelevant{/if}"
+                                {if $v.file_name}
+                                	src="http://134.213.153.137/linnaeus_ng/shared/media/project/0077/{$v.file_name}"
+                                    src="{$projectUrls.projectMedia}{$v.file_name}"
+                                {else}
+                                    src="{$projectUrls.projectMedia}missing.jpg"
+                                {/if}
+                               />
                         {if !$irrelevant}
 							</a>
 						{/if}
-                            <p class="state-image-caption">{$v.label}</p>
-						</div>
 
+                        <div class="state-image-caption" style="width:100%">{$v.label}
+						</div>
                         {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
                            ({$states_remain_count[{$v.id}]})
                         {/if}
@@ -92,6 +142,7 @@
 
                 </tr>
             </table>
+		*}
            
         {elseif $character.type=='text'}
 
@@ -99,19 +150,19 @@
 
                 {foreach from=$states item=v key=foo}
                     
-                    {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
-	                    {assign var=irrelevant value=true}
-                    {else}
-    	                {assign var=irrelevant value=false}
-                    {/if}
-                    
-                    {if isset($states_selected[{$v.id}])}
-	                    {assign var=selected value=true}
-                    {else}
-    	                {assign var=selected value=false}
-                    {/if}
+                {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
+                    {assign var=irrelevant value=true}
+                {else}
+                    {assign var=irrelevant value=false}
+                {/if}
+                
+                {if isset($states_selected[{$v.id}])}
+                    {assign var=selected value=true}
+                {else}
+                    {assign var=selected value=false}
+                {/if}
 
-				<li{if $irrelevant} class="irrelevant"{/if}>
+				<li class="{if $irrelevant}irrelevant{/if}">
                 	<span class="selected" {if $selected}style="font-weight:bold"{/if}>
                     	{if !$irrelevant}
                         <a href="#" 
@@ -124,8 +175,9 @@
                             return false;" >
 						{/if}
                             <img 
-                            	src="{$session.app.system.urls.systemMedia}orange_checkbox_{if $selected}on{else}off{/if}.png" 
-                                style="margin-right:10px">{$v.label}
+                            	src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png" 
+                                style="margin-right:10px"
+							>{$v.label}
 						{if !$irrelevant}
 						</a>
                         {/if}
@@ -145,19 +197,34 @@
 
 </div>
 
-{literal}
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	if (typeof matrixInit=='function')
+	if(jQuery().prettyPhoto)
 	{
-		matrixInit();
+		prettyPhotoInit();
 	}
-
+	
 	bindDialogKeyUp();
 
 	$('#state-value').focus();
 	$('#state-value').select();
+	
+    $(".state-image").load(function()
+	{
+		// dimensions as shown
+		var h=this.height,w=this.width;
+		var actualHeight=this.height,actualWidth=this.width;
+
+		// dimensions of full image
+		var img = new Image();
+		img.src = $(this).attr("src");
+		var fullHeight=img.height,fullWidth=img.width;
+
+		if (actualHeight<img.height || actualWidth<img.width)
+		{
+			$("#full-size-link-"+$(this).attr("key")).toggle(true);
+		}
+    })
 });
 </script>
-{/literal}
