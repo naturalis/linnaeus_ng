@@ -232,7 +232,7 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 .visible {display: block;}
 .ghosted {filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 
-ul.facetListType {padding:0;margin:0;list-style-position:outside;list-style-type:none;}
+ul.facetListType {padding:0;margin:0;list-style-position:outside;list-style-type:none;text-align:left;}
 ul.facetListType li {margin:0 0 8px 0;padding:0;}
 ul.facetListType li .last {margin:0;color:orange}
 ul.facetListType li:hover {color:black;}
