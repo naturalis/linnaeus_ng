@@ -67,12 +67,11 @@
                         	class="state-image" 
                             key="{$key}"
                             {if $v.file_name}
-                            src="http://134.213.153.137/linnaeus_ng/shared/media/project/0077/{$v.file_name}"
-                            ssrc="{$projectUrls.projectMedia}{$v.file_name}"
+                            src="{$projectUrls.projectMedia}{$v.file_name}"
                             {else}
                             src="{$projectUrls.projectMedia}missing.jpg"
                             {/if}                    
-                        >{if !$irrelevant}</a>{/if}<a id="full-size-link-{$key}" rel="prettyPhoto[states]" href="http://134.213.153.137/linnaeus_ng/shared/media/project/0077/{$v.file_name}" pTitle="{$character.label|@escape}: {$v.label|@escape}" title="" style="display:none;"><img class="full-size-icon" src="{$image_root_skin}full-size-icon.png"></a>
+                        >{if !$irrelevant}</a>{/if}<a id="full-size-link-{$key}" rel="prettyPhoto[states]" href="{$projectUrls.projectMedia}{$v.file_name}" pTitle="{$character.label|@escape}: {$v.label|@escape}" title="" style="display:none;"><img class="full-size-icon" src="{$image_root_skin}full-size-icon.png"></a>
 					</div>
 					<div class="state-image-caption">{$v.label}
                     {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
@@ -116,7 +115,6 @@
                             <img
                                 class="state-image{if $irrelevant} state-image-irrelevant{/if}"
                                 {if $v.file_name}
-                                	src="http://134.213.153.137/linnaeus_ng/shared/media/project/0077/{$v.file_name}"
                                     src="{$projectUrls.projectMedia}{$v.file_name}"
                                 {else}
                                     src="{$projectUrls.projectMedia}missing.jpg"
