@@ -4,7 +4,13 @@
 	needs to be undone of NBC:
 		private $_nbcImageRoot=true;
 
-	vergeet matrixen als resultaat niet!
+	must make config!
+		perPage: 16,
+		perLine: 4,
+		imageOrientation: "portrait",
+		useEmergingCharacters: {$matrix_use_emerging_characters},
+		browseStyle: '{$matrix_browse_style}',
+		scoreThreshold: {$matrix_score_threshold}
 
 */
 
@@ -99,6 +105,8 @@ class MatrixKeyController extends Controller
 
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
 
+		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
+
 		$this->setMenu();
 
 		//			$_SESSION['app']['system']['urls']['nbcImageRoot']=
@@ -136,7 +144,6 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 
         $this->smarty->assign('matrix', $matrix);
-		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
 		$this->smarty->assign('matrix_browse_style', $this->_matrix_browse_style);
 		$this->smarty->assign('matrix_score_threshold', $this->_matrix_score_threshold);

@@ -95,7 +95,6 @@ var menuGroupHtmlTpl = '\
 </ul> \
 ';
 
-
 var menuLoneCharHtmlTpl='\
 <li class="inner ungrouped last"> \
 	<a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a> \
@@ -112,7 +111,6 @@ var menuLoneCharEmergentDisabledHtmlTpl='\
 var menuCharHtmlTpl=menuLoneCharHtmlTpl.replace('ungrouped ','');
 var menuCharDisabledHtmlTpl=menuLoneCharDisabledHtmlTpl.replace('ungrouped ','');
 var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace('ungrouped ','');
-
 
 var menuSelStateHtmlTpl = '\
 <div class="facetValueHolder"> \
@@ -153,6 +151,8 @@ var settings={
 	showSpeciesDetails: true,
 	imageRootSkin: "",
 	imageRootProject: "",
+	imageOrientation: "portrait",
+	defaultSpeciesImages: {},
 	defaultSpeciesImage: "",
 	browseStyle: 'paginate', // expand, paginate, show_all
 	expandedPrevious: 0,
@@ -161,7 +161,7 @@ var settings={
 	lastPage: 0,
 	scoreThreshold: 0,
 	mode: "identify", // similar, search
-	groupsAlwaysOpen: false
+	groupsAlwaysOpen: true
 };
 
 var data={
@@ -1540,6 +1540,9 @@ function matrixInit()
 	$('#legendDetails').html(nbcLabelDetails);
 	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
 	$('#legendExternalLink').html(nbcLabelExternalLink);
+
+	settings.defaultSpeciesImage=settings.defaultSpeciesImages[settings.imageOrientation];
+
 	
 	/*
 	if ("ontouchstart" in document) {

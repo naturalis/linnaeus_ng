@@ -46,16 +46,13 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-
-	
-
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
 		imageRootSkin: '{$image_root_skin}',
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {$matrix_use_emerging_characters},
-		defaultSpeciesImage: '{$image_root_skin}noimage.gif',
+		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
 		browseStyle: '{$matrix_browse_style}',
 		scoreThreshold: {$matrix_score_threshold}
 	});
@@ -66,7 +63,6 @@ $(document).ready(function()
 			
 	matrixInit();
 	retrieveDataSet();
-
 });
 </script>
 
