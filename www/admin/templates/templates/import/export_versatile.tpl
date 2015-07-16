@@ -126,10 +126,14 @@ function doSubmit()
 	
 	$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="branch_top_label" value="'+$( '#parent_taxon' ).text()+'" />' );
 
-	$( '#selected_ranks li' ).each(function()
+
+	if( !$( 'input[name="all_ranks"]' ).prop( 'checked' ) )
 	{
-		$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
-	});
+		$( '#selected_ranks li' ).each(function()
+		{
+			$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
+		});
+	}
 
 	$( '#theForm' ).submit();
 }
@@ -186,58 +190,66 @@ function doSubmit()
         <table>
             <tr>
                 <td>
-                	<input type="checkbox" name="all_ranks" />Taxa van alle rangen tonen
+                	<label>
+                    	<input 
+                        	onchange="$('.rank-selector').toggle(!$(this).prop('checked'));"
+                            type="checkbox" 
+                            name="all_ranks" />Taxa van alle rangen tonen</label>
                 </td>
 			</tr>
-<tbody style="background-color:red">              
-            <tr>
-                <td>
-                    Beschikbaar:<br />
-                    <span class=remark>(dubbelklik of klik op pijl om toe te voegen)</span>
-                </td>
-                <td>
-                </td>
-                <td style="vertical-align:top;">
-                    Alleen taxa tonen met de volgende rang:<br />
-                    <span class=remark>(dubbelklik om te verwijderen)</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <select size="10" multiple="multiple" style="width:200px">
-                    {foreach $ranks v}
-                        <option 
-                            id={$v.id} 
-                            class=ranks
-                            ondblclick="addRank();checkRanksOp();"
-                            {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.rank}</option>
-                    {/foreach}
-                    </select>
-                </td>
-                <td>
-                    <input type=button value="&#10140;" onclick="addRank();checkRanksOp();" />
-                </td>
-                <td style="vertical-align:top;">
-                    <ul id=selected_ranks style="border:1px solid #ddd;width:200px;padding-left:5px;">
-                    </ul>
-                    <div style="font-size:0.9em">
-                    Hoe toe te passen:<br />
-                    <label>
-                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=eq />
-                        alleen deze rang
-                    </label> 
-                    <label>
-                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=ge checked="checked" />
-                        deze rang en lager
-                    </label><br />
-                    <label>
-                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=in />
-                        deze rangen
-                    </label>
-                    </div>            
-                </td>
-            </tr>
-</tbody>            
+
+			<tbody class="rank-selector">              
+                <tr>
+                    <td>
+                        Beschikbaar:<br />
+                        <span class=remark>(dubbelklik of klik op pijl om toe te voegen)</span>
+                    </td>
+                    <td>
+                    </td>
+                    <td style="vertical-align:top;">
+                        Alleen taxa tonen met de volgende rang:<br />
+                        <span class=remark>(dubbelklik om te verwijderen)</span>
+                        <span class=remark><a  href="#" 
+                        	onclick="$( '.selected_ranks' ).each(function(index, element) { 
+                            $(this).remove();checkRanksOp(); });return false;">alles verwijderen</a></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select size="10" multiple="multiple" style="width:200px">
+                        {foreach $ranks v}
+                            <option 
+                                id={$v.id} 
+                                class=ranks
+                                ondblclick="addRank();checkRanksOp();"
+                                {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.rank}</option>
+                        {/foreach}
+                        </select>
+                    </td>
+                    <td>
+                        <input type=button value="&#10140;" onclick="addRank();checkRanksOp();" />
+                    </td>
+                    <td style="vertical-align:top;">
+                        <ul id=selected_ranks style="border:1px solid #ddd;width:200px;padding-left:5px;">
+                        </ul>
+                        <div style="font-size:0.9em">
+                        Hoe toe te passen:<br />
+                        <label>
+                            <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=eq />
+                            alleen deze rang
+                        </label> 
+                        <label>
+                            <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=ge checked="checked" />
+                            deze rang en lager
+                        </label><br />
+                        <label>
+                            <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=in />
+                            deze rangen
+                        </label>
+                        </div>            
+                    </td>
+                </tr>
+			</tbody>            
         </table>
 
 	</fieldset>

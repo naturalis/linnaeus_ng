@@ -28,6 +28,7 @@ class VersatileExportController extends Controller
 	private $branch_top_id;
 	private $presence_labels;
 	private $selected_ranks;
+	private $all_ranks;
 	private $rank_operator;
 	private $cols;
 	private $name_parts;
@@ -86,6 +87,7 @@ class VersatileExportController extends Controller
 			$this->setBranchTopSession( array( $this->rGetVal('branch_top_id'), $this->rGetVal('branch_top_label') ) );
 			$this->setBranchTopId( $this->rGetVal('branch_top_id') );
 			$this->setPresenceStatusLabels( $this->rGetVal('presence_labels') );
+			$this->setAllRanks( $this->rGetVal('all_ranks') );
 			$this->setSelectedRanks( $this->rGetVal('selected_ranks') );
 			$this->setRankOperator( $this->rGetVal('rank_operator') );
 			$this->setCols( $this->rGetVal('cols') );
@@ -179,7 +181,11 @@ class VersatileExportController extends Controller
 			}
 		}
 		
-		$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()] . " (".implode( "," , $this->getSelectedRanks() ).")";
+		$ranks_clause="";
+		if ( !$this->getAllRanks() )
+		{
+			$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()] . " (".implode( "," , $this->getSelectedRanks() ).")";
+		}
 
 		$presence_status_clause="";
 		$p = $this->getPresenceStatusLabels();
@@ -271,6 +277,8 @@ class VersatileExportController extends Controller
 			limit " . $this->limit . "
 			
 			";
+
+		//q($this->query,1);
 
 		if ( !empty($this->query) )
 		{
@@ -518,13 +526,13 @@ class VersatileExportController extends Controller
 
 		$d=array();
 		foreach($this->getRanks() as $val)
-			if(in_array($val["id"],$this->getSelectedRanks( )))
+			if(in_array($val["id"],(array)$this->getSelectedRanks( )))
 				$d[]=$val["rank"];
 		echo
-			"rang",
+			"rangen",
 			$this->getFieldSep(),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-			$this->operators[$this->getRankOperator()]," ",implode(", ",$d),
+			$this->getAllRanks() ? "(alle)" : $this->operators[$this->getRankOperator()]," ",implode(", ",$d),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
 		$this->printNewLine();
 
@@ -589,12 +597,22 @@ class VersatileExportController extends Controller
 
 	private function setSelectedRanks( $selected_ranks )
 	{
-		$this->selected_ranks=array_unique($selected_ranks);
+		$this->selected_ranks=!is_null($selected_ranks) ? array_unique($selected_ranks) : null;
 	}
 
 	private function getSelectedRanks()
 	{
 		return $this->selected_ranks;
+	}
+
+	private function setAllRanks( $all_ranks )
+	{
+		$this->all_ranks=isset($all_ranks) && $all_ranks=='on';
+	}
+
+	private function getAllRanks()
+	{
+		return $this->all_ranks;
 	}
 
 	private function setRankOperator( $rank_operator )
