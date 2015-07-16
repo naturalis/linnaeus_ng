@@ -24,7 +24,7 @@ var photoLabelPhotographerHtmlTpl = '<br />(%PHOTO-LABEL% %PHOTOGRAPHER%)';
 
 var imageHtmlTpl = '\
 <a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title=""> \
-	<img class="result-image" src="%IMAGE-URL%" title="%PHOTO-CREDIT%" /> \
+	<img class="result-image" src="%THUMB-URL%" title="%PHOTO-CREDIT%" /> \
 </a>\
 ';
 
@@ -149,8 +149,8 @@ var settings={
 	expandResults: true,
 	useEmergingCharacters: true,
 	showSpeciesDetails: true,
-	imageRootSkin: "",
-	imageRootProject: "",
+	imageRootSkin: "",  // for skin images (icons and such)
+	imageRootProject: "",  // for local project images
 	imageOrientation: "portrait",
 	defaultSpeciesImages: {},
 	defaultSpeciesImage: "",
@@ -679,6 +679,18 @@ function formatResult( data )
 	{
 		if (settings.defaultSpeciesImage) image=settings.defaultSpeciesImage;
 	}
+
+	var thumb="";
+
+	if (data.info && data.info.url_thumb)
+	{
+		thumb=data.info.url_thumb;
+		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=settings.imageRootProject+thumb;
+	}
+	else
+	{
+		thumb=image;
+	}
 	
 	var id = data.type+'-'+data.id;
 	var showStates = states && states.length > 0;
@@ -700,7 +712,8 @@ function formatResult( data )
 
 	imageHtml=
 		imageHtmlTpl
-			.replace(/%IMAGE-URL%/g,image)
+			.replace('%IMAGE-URL%',image)
+			.replace('%THUMB-URL%',thumb)
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	

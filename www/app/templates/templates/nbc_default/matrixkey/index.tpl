@@ -53,6 +53,7 @@ $(document).ready(function()
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {$matrix_use_emerging_characters},
 		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
+		imageOrientation: '{$matrix_image_orientation}',
 		browseStyle: '{$matrix_browse_style}',
 		scoreThreshold: {$matrix_score_threshold}
 	});
