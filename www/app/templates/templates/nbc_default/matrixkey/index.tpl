@@ -55,7 +55,8 @@ $(document).ready(function()
 		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
 		imageOrientation: '{$matrix_image_orientation}',
 		browseStyle: '{$matrix_browse_style}',
-		scoreThreshold: {$matrix_score_threshold}
+		scoreThreshold: {$matrix_score_threshold},
+		alwaysShowDetails: {$matrix_always_show_details},
 	});
 
 	setScores($.parseJSON('{$session_scores}'));

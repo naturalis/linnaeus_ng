@@ -66,9 +66,11 @@ class MatrixKeyController extends Controller
 			array('state_image_per_row'=>4),
 			array('items_per_page'=>16),
 			array('use_emerging_characters'=>1),
+			array('always_show_details'=>0),
 			array('score_threshold'=>100),
 			array('img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//'),
 			array('img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/'),
+			array('image_orientation'=>'portrait'),
 			array('image_orientation'=>'portrait'),
 		);
 
@@ -144,9 +146,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('matrix_use_emerging_characters', $this->use_emerging_characters);
 		$this->smarty->assign('matrix_browse_style', $this->browse_style);
 		$this->smarty->assign('matrix_image_orientation', $this->image_orientation);
-		
-		
-		
+		$this->smarty->assign('matrix_always_show_details', $this->always_show_details);
 		$this->smarty->assign('matrix_score_threshold', $this->score_threshold);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 
