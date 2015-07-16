@@ -143,19 +143,27 @@ class VersatileExportController extends Controller
 
 	private function getRanks()
 	{
-		return $this->models->ProjectRank->freeQuery("
+		return $this->models->ProjectRank->freeQuery(array("query"=>"
 			select
-				_a.*
+				_a.*,
+				ifnull(_c.label,_a.rank) as label
 			from
 				%PRE%projects_ranks _b
 				
 			right join %PRE%ranks _a
 				on _a.id=_b.rank_id
 				
-			where _b.project_id = ". $this->getCurrentProjectId() ."
+			left join %PRE%labels_projects_ranks _c
+				on _b.project_id=_c.project_id 
+				and _b.id=_c.project_rank_id
+				and _c.language_id = " . LANGUAGE_ID_DUTCH . "
+
+			where 
+				_b.project_id = ". $this->getCurrentProjectId() ."
+
 			order by
 				_a.id
-			");
+			", "fieldAsIndex"=>"id"));
 	}
 
 	private function setNameTypeIds()
@@ -199,7 +207,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'sci_name' ) ? " _t.taxon as wetenschappelijke_naam, " : "" )."
 				".( $this->query_bit_name_parts )."
 				".( $this->hasCol( 'dutch_name' ) ? " _z.name as nederlandse_naam, " : "" )."
-				".( $this->hasCol( 'rank' ) ? " _r.rank as rang, " : "" )."
+				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as rang, " : "" )."
 				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as nsr_id, " : "" )."
 				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as voorkomens_status, " : "" )."
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as habitat, " : "" )."
@@ -244,6 +252,11 @@ class VersatileExportController extends Controller
 			
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
+
+			left join %PRE%labels_projects_ranks _lpr
+				on _f.project_id=_lpr.project_id 
+				and _f.id=_lpr.project_rank_id
+				and _lpr.language_id = " . LANGUAGE_ID_DUTCH . "
 			
 			left join %PRE%nsr_ids _b
 				on _t.project_id = _b.project_id
