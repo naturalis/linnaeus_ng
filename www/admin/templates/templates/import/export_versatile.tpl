@@ -222,7 +222,7 @@ function doSubmit()
                                 id={$v.id} 
                                 class=ranks
                                 ondblclick="addRank();checkRanksOp();"
-                                {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.rank}</option>
+                                {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.label}</option>
                         {/foreach}
                         </select>
                     </td>
@@ -430,7 +430,7 @@ function doSubmit()
 
 $(document).ready(function()
 {
-	addRank( { id:{$smarty.const.SPECIES_RANK_ID}, label:'species' } 	);
+	addRank( { id:{$smarty.const.SPECIES_RANK_ID}, label:'{$ranks[$smarty.const.SPECIES_RANK_ID].label}' } );
 	{if $branch_top}
 	$( '#parent_taxon_id' ).val( {$branch_top.id} );
 	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
