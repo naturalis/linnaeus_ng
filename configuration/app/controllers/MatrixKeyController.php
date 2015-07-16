@@ -62,7 +62,7 @@ class MatrixKeyController extends Controller
 			array('allow_empty_species'=>true),
 			array('use_emerging_characters'=>true),
 			array('use_character_groups'=>1),
-			array('browse_style'=>'paginate'),
+			array('browse_style'=>'expand'),
 			array('state_image_per_row'=>4),
 			array('items_per_page'=>16),
 			array('use_emerging_characters'=>1),
