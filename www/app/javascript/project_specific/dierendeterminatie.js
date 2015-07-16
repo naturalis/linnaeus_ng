@@ -58,9 +58,9 @@ var resultHtmlTpl = '\
 		</div> \
 		<div class="result-labels"> \
 			%GENDER% \
-			<span class="result-name-scientific">%SCI-NAME%</span> \
+			<span class="result-name-scientific" title="%SCI-NAME-TITLE%">%SCI-NAME%</span> \
 			%MATRIX-LINK% \
-			<span class="result-name-common"><br />%COMMON-NAME%</span> \
+			<span class="result-name-common" title="%COMMON-NAME-TITLE%"><br />%COMMON-NAME%</span> \
             </div> \
         </div> \
         <div class="result-icons"> \
@@ -149,6 +149,7 @@ var settings={
 	expandResults: true,
 	useEmergingCharacters: true,
 	showSpeciesDetails: true,
+	alwaysShowDetails: false,
 	imageRootSkin: "",  // for skin images (icons and such)
 	imageRootProject: "",  // for local project images
 	imageOrientation: "portrait",
@@ -729,11 +730,12 @@ function formatResult( data )
 				: "" )
 			)
 			.replace('%SCI-NAME%', sciName)
+			.replace('%SCI-NAME-TITLE%', addSlashes(stripTags(sciName)) )
 			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
 				matrixLinkHtmlTpl.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
 				: ""))
 			.replace('%COMMON-NAME%', commonName)
-
+			.replace('%COMMON-NAME-TITLE%', addSlashes(commonName) )
 			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
 			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
 				remoteLinkClickHtmlTpl
@@ -1032,7 +1034,7 @@ function applyScores()
 	
 	setResultSet(resultset);
 
-	setSetting({showSpeciesDetails: (resultset.length <= settings.perPage)});
+	setSetting({showSpeciesDetails: settings.alwaysShowDetails || (resultset.length <= settings.perPage)});
 }
 
 function applyRelated()
@@ -1533,12 +1535,6 @@ function getCharacter( id )
 		}
 	}
 }
-
-
-
-
-
-
 
 function matrixInit()
 {

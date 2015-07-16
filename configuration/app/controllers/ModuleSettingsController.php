@@ -28,11 +28,14 @@ insert into module_settings values
 (null,65,'matrixkey',null,null,'items_per_page',16,now(),now()),
 (null,65,'matrixkey',null,null,'use_character_groups',1,now(),now()),
 (null,65,'matrixkey',null,null,'allow_empty_species',1,now(),now()),
+(null,65,'matrixkey',null,null,'always_show_details',1,now(),now()),
 (null,65,'matrixkey',null,null,'calc_char_h_val',0,now(),now()),
 (null,65,'matrixkey',null,null,'use_emerging_characters',1,now(),now()),
 (null,65,'matrixkey',null,null,'score_threshold',100,now(),now()),
 (null,65,'matrixkey',null,null,'img_to_thumb_regexp_pattern',"/http:\\/\\/images.naturalis.nl\\/original\\//",now(),now()),
 (null,65,'matrixkey',null,null,'img_to_thumb_regexp_replacement',"http://images.naturalis.nl/comping/",now(),now())
+
+
 ;
 
 
