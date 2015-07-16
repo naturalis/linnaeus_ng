@@ -1,21 +1,12 @@
 <?php
 /*
-
 	needs to be undone of NBC:
 		private $_nbcImageRoot=true;
-
-	must make config!
-		perPage: 16,
-		perLine: 4,
-		imageOrientation: "portrait",
-		useEmergingCharacters: {$matrix_use_emerging_characters},
-		browseStyle: '{$matrix_browse_style}',
-		scoreThreshold: {$matrix_score_threshold}
-
 */
 
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsController.php');
 class MatrixKeyController extends Controller
 {
 
@@ -36,8 +27,12 @@ class MatrixKeyController extends Controller
         'matrix_variation', 
         'nbc_extras', 
         'variation_relations',
-		'gui_menu_order'
+		'gui_menu_order',
+		'module_settings'
     );
+
+    public $controllerPublicName = 'Matrix key';
+    public $controllerBaseName = 'matrix';
 	
 	private $_totalEntityCount=0;
 	private $_activeMatrix=null;
@@ -50,13 +45,32 @@ class MatrixKeyController extends Controller
 	private $_searchTerm=null;
 	private $_searchResults=null;
 
-	private $_matrix_calc_char_h_val=true;
-	private $_matrix_allow_empty_species=true;
-	private $_matrix_use_emerging_characters=true;
-	private $_matrix_browse_style;
-	private $_matrix_state_image_per_row;
-	private $_matrix_score_threshold;
+	private $calc_char_h_val=true;
+	private $allow_empty_species=true;
+	private $use_emerging_characters=true;
+	private $browse_style;
+	private $state_image_per_row;
+	private $score_threshold;
+	private $img_to_thumb_regexp_pattern;
+	private $img_to_thumb_regexp_replacement;
+
 	private $_master_matrix;
+
+	private $settingsDefaults=
+		array(
+			array('calc_char_h_val'=>true),
+			array('allow_empty_species'=>true),
+			array('use_emerging_characters'=>true),
+			array('use_character_groups'=>1),
+			array('browse_style'=>'paginate'),
+			array('state_image_per_row'=>4),
+			array('items_per_page'=>16),
+			array('use_emerging_characters'=>1),
+			array('score_threshold'=>100),
+			array('img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//'),
+			array('img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/'),
+			array('image_orientation'=>'portrait'),
+		);
 
 	private $_nbc_image_root=true;
 	
@@ -64,12 +78,7 @@ class MatrixKeyController extends Controller
     public $cssToLoad = array('matrix.css');
 
     public $jsToLoad = array(
-        'all' => array(
-            'main.js', 
-//            'matrix.js', 
-//            'prettyPhoto/jquery.prettyPhoto.js', 
-//            'dialog/jquery.modaldialog.js'
-        ), 
+        'all' => array('main.js'), 
         'IE' => array()
     );
 
@@ -85,9 +94,24 @@ class MatrixKeyController extends Controller
         parent::__destruct();
     }
 
-
     private function initialize()
     {
+		$this->moduleSettings=new ModuleSettingsController;
+		$this->moduleSettings->setModuleDefaults( $this->settingsDefaults );
+		$this->moduleSettings->setModuleSettings();
+
+		foreach((array)$this->settingsDefaults as $key=>$val)
+		{
+			$k=key($val);
+			$this->$k=$val[key($val)];
+		}
+
+		foreach((array)$this->moduleSettings->getModuleSettings() as $val)
+		{
+			$this->$val['setting']=$val['value'];
+		}
+
+
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
 
@@ -96,38 +120,11 @@ class MatrixKeyController extends Controller
 			$this->printGenericError($this->translate('No matrices have been defined.'));
 		}
 
-		$this->_matrix_calc_char_h_val=$this->getSetting('matrix_calc_char_h_val',true); // calculate characters H-value? enhances performance
-		$this->_matrix_allow_empty_species=$this->getSetting('matrix_allow_empty_species',true);
-		$this->_matrix_use_emerging_characters = $this->getSetting('matrix_use_emerging_characters',true);
-		$this->_matrix_browse_style=$this->getSetting('matrix_browse_style','paginate');
-		$this->_matrix_state_image_per_row=$this->getSetting('matrix_state_image_per_row',4);
-		$this->_matrix_score_threshold=$this->getSetting('matrix_score_threshold',100);
-
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
-
 		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
 
 		$this->setMenu();
 
-		//			$_SESSION['app']['system']['urls']['nbcImageRoot']=
-		
-		//        $this->_matrixType = strtolower( $this->getSetting('matrixtype') );
-		// this should be per matrix not per project
-
-		/*
-        $this->_useCharacterGroups = $this->getSetting('matrix_use_character_groups') == '1';
-        $this->useVariations = $this->getSetting('taxa_use_variations') == '1';
-        $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
-        $this->_useSepCoeffAsWeight = false; // $this->getSetting('matrix_use_sc_as_weight');
-        $this->_matrixStateImageMaxHeight = $this->getSetting('matrix_state_image_max_height');
-        $this->_externalSpeciesUrlTarget = $this->getSetting('external_species_url_target');
-        $this->_matrixSuppressDetails = $this->getSetting('matrix_suppress_details','0')=='1';
-		$this->_externalSpeciesUrlPrefix = $this->getSetting('external_species_url_prefix');
-
-
-        if ($this->_matrixType == 'nbc') {
-        }
-		*/
     }
 
     public function indexAction()
@@ -144,9 +141,13 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 
         $this->smarty->assign('matrix', $matrix);
-		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
-		$this->smarty->assign('matrix_browse_style', $this->_matrix_browse_style);
-		$this->smarty->assign('matrix_score_threshold', $this->_matrix_score_threshold);
+		$this->smarty->assign('matrix_use_emerging_characters', $this->use_emerging_characters);
+		$this->smarty->assign('matrix_browse_style', $this->browse_style);
+		$this->smarty->assign('matrix_image_orientation', $this->image_orientation);
+		
+		
+		
+		$this->smarty->assign('matrix_score_threshold', $this->score_threshold);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 
         $this->printPage();
@@ -189,7 +190,7 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('states', $states);
 			$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
 			$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
-            $this->smarty->assign('state_images_per_row', $this->_matrix_state_image_per_row);
+            $this->smarty->assign('state_images_per_row', $this->state_image_per_row);
 
             $this->smarty->assign('returnText', 
 				json_encode(
@@ -522,6 +523,19 @@ class MatrixKeyController extends Controller
 		return $this->_dataSet;
 	}
 	
+	private function induceThumbNailFromImage( &$item )
+	{
+		if( 
+			!empty($this->img_to_thumb_regexp_pattern) &&
+			!isset($item['url_thumb']) &&
+			isset($item['url_image'])
+		)
+		{
+			$item['url_thumb']=
+				preg_replace($this->img_to_thumb_regexp_pattern,$this->img_to_thumb_regexp_replacement,$item['url_image']);
+		}
+	}
+	
 	private function getAllIdentifiableEntities()
 	{
 		$taxa=$this->getTaxaInMatrix();
@@ -535,15 +549,17 @@ class MatrixKeyController extends Controller
 			foreach((array)$taxa as $key=>$val)
 			{
 				$taxa[$key]['info']=isset($info['taxon'][$val['id']]) ? $info['taxon'][$val['id']] : null;
+				$this->induceThumbNailFromImage( $taxa[$key]['info'] );
 			}
 			foreach((array)$variations as $key=>$val)
 			{
 				$variations[$key]['info']=isset($info['variation'][$val['id']]) ? $info['variation'][$val['id']] : null;
+				$this->induceThumbNailFromImage( $variations[$key]['info'] );
 			}
 		}
 
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
-		
+
 		usort($all,function($a,$b)
 		{
 			$aa=$bb='';
@@ -592,9 +608,9 @@ class MatrixKeyController extends Controller
 			$d=$this->getTaxonById( $val['taxon_id'] );
 			
 			if (
-				($this->_matrix_allow_empty_species) ||
+				($this->allow_empty_species) ||
 				(!isset($val['is_empty'])) ||
-				(!$this->_matrix_allow_empty_species && $val['is_empty']==1))
+				(!$this->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
 				$d['states']=$this->getTaxonStates( $val['taxon_id'] );
@@ -691,7 +707,8 @@ class MatrixKeyController extends Controller
 
 
 
-	//REFAC2015: should be moved to kenmerkenmodule!
+	// REFAC2015: should be moved to kenmerkenmodule!!!!!
+	// maybe rethink location of thumbs & images?
     private function getAllNBCExtras()
     {
 		if ( !$this->models->NbcExtras->getTableExists() )
@@ -2163,5 +2180,10 @@ class MatrixKeyController extends Controller
     {
 		return $this->_searchResults;
     }
+	
+	private function getModuleSetting( $p )
+	{
+		return $this->moduleSettings->getModuleSetting( $p );
+	}
 
 }	
