@@ -57,6 +57,14 @@ class VersatileExportController extends Controller
 
 	private $orderBy="_f.rank_id asc,_r.id, _t.taxon";  // rank, rank id, taxon
 	private $limit=9999999;
+	/*
+		when the number of names is larger than synonymStrategyThrehold, the
+		program will fetch all synonyms in one query, and filter and assign them
+		to the correct taxon in PHP next. below the threshold, a separate query
+		will be executed for each taxon. 
+		2000 is an arbitrary number, and shoud be calibrated.
+	*/
+	private $synonymStrategyThrehold=2000;
 
 	private $csv_file_name="nsr-export--%s.csv";
 	
@@ -378,7 +386,8 @@ class VersatileExportController extends Controller
 				".( $this->query_bit_name_parts )."	
 				".( $this->hasCol( 'database_id' ) ? " _names.id as database_id, " : "" )."
 				_b.nametype,
-				_c.language
+				_c.language,
+				_names.taxon_id as _taxon_id
 			
 			FROM 
 				%PRE%names _names
@@ -393,17 +402,40 @@ class VersatileExportController extends Controller
 			where
 				_names.project_id=".$this->getCurrentProjectId()." 
 				and _names.type_id in (" . implode(",",(array)$this->getSelectedSynonymTypes()) . ") 
-				and _names.taxon_id = %ID%
+				%ID-CLAUSE%
 			order by
 				_names.name
 			";
-
-				//and _names.type_id in (".$this->_nameTypeIds[PREDICATE_SYNONYM]['id'].",".$this->_nameTypeIds[PREDICATE_SYNONYM_SL]['id']	.") 
- 			
+			
+		$get_all=count((array)$this->names) >= $this->synonymStrategyThrehold;
+		
+		if ( !$get_all )
+		{
+			$this->query=str_replace('%ID-CLAUSE%','and _names.taxon_id = %ID%',$this->query);
+		}
+		else
+		{
+			$all_synonyms=array();
+			$q=str_replace('%ID-CLAUSE%','',$this->query);
+			$synonyms=$this->models->Names->freeQuery( $q );
+			foreach((array)$synonyms as $key=>$val)
+			{
+				$all_synonyms[$val['_taxon_id']][]=$val;
+			}
+			unset($synonyms);
+		}
+			
 		foreach( (array)$this->names as $key=>$val )
 		{
-			$q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
-			$synonyms=$this->models->Names->freeQuery( $q );
+			if ( !$get_all )
+			{
+				$q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
+				$synonyms=$this->models->Names->freeQuery( $q );
+			}
+			else
+			{
+				$synonyms=isset($all_synonyms[$val['_taxon_id']]) ? $all_synonyms[$val['_taxon_id']] : array();
+			}
 
 			foreach( (array)$synonyms as $row )
 			{
