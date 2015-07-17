@@ -16,6 +16,12 @@ div.fieldsubset {
 	font-size:0.85em;
 	color:#444;
 }
+.preset-label {
+	display:inline-block;
+	width:175px;
+	text-align:right;
+	padding:0px;
+}
 </style>
 
 <script>
@@ -90,8 +96,25 @@ function checkRanksOp()
 	lastop=$( '.rank_operator:checked' ).val();
 }
 
+function appendValues()
+{
+	// reset
+	$( '.to_be_posted' ).remove();
+	
+	$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="branch_top_label" value="'+$( '#parent_taxon' ).text()+'" />' );
+
+	if( !$( 'input[name="all_ranks"]' ).prop( 'checked' ) )
+	{
+		$( '#selected_ranks li' ).each(function()
+		{
+			$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
+		});
+	}
+}
+
 function doSubmit()
 {
+	// check
 	var m=[];
 
 	if ( $( '#parent_taxon_id' ).val().length==0 )
@@ -113,6 +136,7 @@ function doSubmit()
 		return;
 	}
 	
+	// aim
 	if ($( '#output_target_screen' ).prop('checked'))
 	{
 		$( '#theForm' ).attr('target','_blank');
@@ -122,22 +146,13 @@ function doSubmit()
 		$( '#theForm' ).attr('target','_self');
 	}
 
-	$( '.to_be_posted' ).remove();
-	
-	$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="branch_top_label" value="'+$( '#parent_taxon' ).text()+'" />' );
+	// append
+	appendValues();
 
-
-	if( !$( 'input[name="all_ranks"]' ).prop( 'checked' ) )
-	{
-		$( '#selected_ranks li' ).each(function()
-		{
-			$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
-		});
-	}
-
+	// submit
 	$( '#theForm' ).submit();
 }
-		
+	
 </script>
 
 <div id="page-main">
@@ -382,7 +397,6 @@ function doSubmit()
 	
 	</script>
     
-
     <fieldset>
 
 		<legend>Sorteren</legend>
@@ -460,18 +474,13 @@ function doSubmit()
         </span>
 
 	</fieldset>
+    
+    <p>
 
-    <input type="button" value="exporteren" onclick="doSubmit();" />
+    	<input type="button" value="exporteren" onclick="doSubmit();" />
     
-    <p class="comment">
-    to come:
-    	<ul>
-        	<li>saving presets</li>
-        	<li>maybe: determine column order in output (for oscar)</li>
-        	<li>escaping user inputs (in the meantime, be good)</li>
-        </ul>
     </p>
-    
+
     </form>
     
 </div>
