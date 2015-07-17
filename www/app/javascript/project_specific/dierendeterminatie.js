@@ -6,6 +6,7 @@ function __(text)
 }
 
 var resultsHtmlTpl = '<div class="resultRow">%RESULTS%</div>';
+var noResultHtmlTpl='<div style="margin-top:10px">%MESSAGE%</div>';
 var resultsLineEndHtmlTpl = '</div><br/><div class="resultRow">';
 var brHtmlTpl = '<br />';
 
@@ -48,7 +49,7 @@ var statesHtmlTpl = '\
 
 var statesJoinHtmlTpl = '</li><li>';
 
-var speciesStateItemHtmlTpl = '<span class="result-detail-label">%CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
+var speciesStateItemHtmlTpl = '<span class="result-detail-label">%GROUP% %CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
 
 var resultHtmlTpl = '\
 <div class="result%CLASS-HIGHLIGHT%" id="res-%LOCAL-ID%"> \
@@ -101,7 +102,7 @@ var menuLoneCharHtmlTpl='\
 	%SELECTED% \
 </li> \
 ';
-var menuLoneCharDisabledHtmlTpl='<li class="inner ungrouped %CLASS% disabled" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
+var menuLoneCharDisabledHtmlTpl='<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
 var menuLoneCharEmergentDisabledHtmlTpl='\
 <li class="inner ungrouped %CLASS%" title="%TITLE%"> \
 	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
@@ -267,6 +268,11 @@ function printResults()
 			printPaging();
 		}
 	}
+	
+	if (resultset.length==0)
+	{
+		$('#results-container').html(noResultHtmlTpl.replace('%MESSAGE%',__('Geen resultaten.')));
+	}
 
 	clearOverhead();
 	printHeader();
@@ -380,6 +386,7 @@ function printMenu()
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet langer onderscheidend." ))
 						.replace('%VALUE%',(char.value?' '+char.value:''))
 						.replace('%SELECTED%',l);
 				}
@@ -394,7 +401,7 @@ function printMenu()
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
-						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
+						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie nog niet onderscheidend." ))
 						.replace('%VALUE%',(char.value?' '+char.value:''))
 						.replace('%SELECTED%',l);
 				}
@@ -448,6 +455,7 @@ function printMenu()
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
+					.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet langer onderscheidend." ))
 					.replace('%VALUE%',(item.value?' '+item.value:''))
 					.replace('%SELECTED%',l);
 			}
@@ -458,7 +466,7 @@ function printMenu()
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
-					.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet onderscheidend." ))
+					.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie nog niet onderscheidend." ))
 					.replace('%VALUE%',(item.value?' '+item.value:''))
 					.replace('%SELECTED%',l);
 			}
@@ -663,6 +671,7 @@ function formatResult( data )
 
 			states.push(
 				speciesStateItemHtmlTpl
+					.replace('%GROUP%',state.group_label + ' > ')
 					.replace('%CHARACTER%',t)
 					.replace('%STATE%',l)
 			);
@@ -808,6 +817,11 @@ function printCountHeader()
 				.replace('%NUMBER-TOTAL%',"")
 		);
 	}
+	
+	if (resultset.length==0)
+	{
+		$('#result-count').html("");
+	};	
 }
 
 function clearPaging()
@@ -997,7 +1011,6 @@ function setState( p )
 			setCursor();
 		}
 	});
-	
 }
 
 function applyScores()
@@ -1373,8 +1386,8 @@ function bindDialogKeyUp()
         }
         else
 		{
-			// Ensure that it is a number and stop the keypress
-			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105))
+			// Ensure that it is a number or a dot and stop the keypress
+			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105) && event.keyCode!=190)
 			{
 				event.preventDefault(); 
 			}   
@@ -1552,7 +1565,13 @@ function matrixInit()
 
 	settings.defaultSpeciesImage=settings.defaultSpeciesImages[settings.imageOrientation];
 
-	
+
+
+
+	$('img').bind('contextmenu',function(e){
+		e.preventDefault();
+	});	
+
 	/*
 	if ("ontouchstart" in document) {
 		// touch only code (tablets)

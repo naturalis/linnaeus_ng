@@ -30,12 +30,35 @@
                         onclick="clearStateValue($('#state-id').val());$('#state-value').val('');return false;"
                     >{t}waarde wissen{/t}</a>
                 </p>
-    
+
                 {if $character.min && $character.max}
     
                 <p id="state-value-extra">
                     {t _s1=$character.min_display _s2=$character.max_display _s3=$character.unit}Kies een waarde tussen %s en %s%s.{/t}
                 </p>
+                
+                <script>
+				$('#state-value').bind('keyup',function()
+				{
+					{if $character.min}var min={$character.min};{/if}
+					{if $character.max}var max={$character.max};{/if}
+
+					var val=$(this).val();
+					
+					if (val.length==0) return;
+					
+					val=parseFloat(val);
+
+					if (val==NaN || (min && val<min) || (max && val>max))
+					{
+						$(this).css('color','red');
+					}
+					else
+					{
+						$(this).css('color','black');
+					}
+				});
+				</script>
     
                 {/if}
             
