@@ -113,7 +113,6 @@ class MatrixKeyController extends Controller
 			$this->$val['setting']=$val['value'];
 		}
 
-
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
 
@@ -141,7 +140,6 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
-
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('matrix_use_emerging_characters', $this->use_emerging_characters);
 		$this->smarty->assign('matrix_browse_style', $this->browse_style);
@@ -788,7 +786,8 @@ class MatrixKeyController extends Controller
 				_d.mean,
 				_d.sd,
 				_d.got_labels,
-				_e.label
+				_e.label,
+				_g.label as group_label
 				
 			from %PRE%matrices_taxa_states _a
 			
@@ -809,7 +808,16 @@ class MatrixKeyController extends Controller
 				on _a.state_id = _e.state_id
 				and _a.project_id=_e.project_id
 				and _e.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%characteristics_chargroups _f
+				on _a.project_id=_f.project_id
+				and _a.characteristic_id=_f.characteristic_id
 			
+			left join %PRE%chargroups_labels _g
+				on _f.project_id=_g.project_id
+				and _f.chargroup_id=_g.chargroup_id
+				and _g.language_id=".$this->getCurrentLanguageId()."
+
 			where 
 				_a.project_id = ".$this->getCurrentProjectId()." 
 				and _a.matrix_id = ".$this->getCurrentMatrixId()." 
@@ -823,6 +831,7 @@ class MatrixKeyController extends Controller
 			$res[$val['characteristic_id']]['characteristic']=$d[0];
 			//$res[$val['characteristic_id']]['explanation']=$d[1];
 			$res[$val['characteristic_id']]['type'] = $val['type'];
+			$res[$val['characteristic_id']]['group_label'] = $val['group_label'];
 			$res[$val['characteristic_id']]['states'][$val['state_id']] = array(
 				'characteristic_id'=>$val['characteristic_id'],
 				'id'=>$val['state_id'],
@@ -858,65 +867,6 @@ class MatrixKeyController extends Controller
 
 	private function setMenu()
 	{
-		/*
-		$menu1=$this->models->GuiMenuOrder->freeQuery("
-			select
-				ref_id as id,
-				ref_type as type,
-				label
-			from (
-				select
-					_a.ref_id,
-					_a.ref_type,
-					_a.show_order,
-					ifnull(_c.label,_b.label) as label
-					
-				from  %PRE%gui_menu_order _a
-				
-				left join %PRE%chargroups _b
-					on _a.project_id = _b.project_id
-					and _a.ref_id = _b.id
-
-				left join %PRE%chargroups_labels _c
-					on _b.project_id = _c.project_id
-					and _b.id = _c.chargroup_id
-					and _c.language_id = ". $this->getCurrentLanguageId()."
-
-				where 
-					_a.project_id = " . $this->getCurrentProjectId() . " 
-					and _a.matrix_id = " . $this->getCurrentMatrixId() ." 
-					and _a.ref_type = 'group'
-					
-				union
-	
-				select
-					_a.ref_id,
-					_a.ref_type,
-					_a.show_order,
-					_c.label
-					
-				from  %PRE%gui_menu_order _a
-
-				left join %PRE%characteristics _b
-					on _a.project_id = _b.project_id
-					and _a.ref_id = _b.id
-
-				left join %PRE%characteristics_labels _c
-					on _b.project_id = _c.project_id
-					and _b.id = _c.characteristic_id
-					and _c.language_id = ". $this->getCurrentLanguageId()."
-
-				where 
-					_a.project_id = " . $this->getCurrentProjectId() . " 
-					and _a.matrix_id = " . $this->getCurrentMatrixId() ." 
-					and _a.ref_type = 'char'
-
-			) as joined
-			order by 
-				show_order
-		");
-		*/
-
 		$menu=$this->models->GuiMenuOrder->freeQuery("
 		
 			select 
@@ -1071,9 +1021,9 @@ class MatrixKeyController extends Controller
 		if (strpos($char['label'],'|')!==false)
 		{
 			$d = explode('|',$char['label'],3);
-			$char['label'] = isset($d[0]) ? $d[0] : null;
-			$char['info'] = isset($d[1]) ? $d[1] : null;
-			$char['unit'] = isset($d[2]) ? $d[2] : null;
+			$char['label'] = isset($d[0]) ? $d[0] : '';
+			$char['info'] = isset($d[1]) ? $d[1] : '';
+			$char['unit'] = isset($d[2]) ? $d[2] : '';
 		}
 					
 		if ($char['type']=='range' || $char['type']=='distribution')
