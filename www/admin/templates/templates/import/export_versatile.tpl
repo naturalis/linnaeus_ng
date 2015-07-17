@@ -115,7 +115,7 @@ function doSubmit()
 	
 	if ($( '#output_target_screen' ).prop('checked'))
 	{
-		$( '#theForm' ).attr('target','export_output');
+		$( '#theForm' ).attr('target','_blank');
 	}
 	else
 	{
