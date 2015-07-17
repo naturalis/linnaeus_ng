@@ -160,7 +160,7 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 */
 
 .state-images-container {
-	min-width:650px;
+	min-width:750px;
 	max-width:1000px;
 	height:auto;
 	text-align:center;
@@ -171,7 +171,6 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 	display:inline-block;
 	vertical-align:top;
 	text-align:center;
-	-border:1px dotted grey;
 	margin:0 5px 10px 5px;
 	padding:15px 15px 5px 15px;
 }
