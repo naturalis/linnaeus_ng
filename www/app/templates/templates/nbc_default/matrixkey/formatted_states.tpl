@@ -88,64 +88,7 @@
 			{/foreach}
             
             </div>
-    
 
-		{*
-            <table id="graphicValuesTable">
-                <tr>
-                    {foreach from=$states item=v name=foo}
-                    
-                    {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
-	                    {assign var=irrelevant value=true}
-                    {else}
-    	                {assign var=irrelevant value=false}
-                    {/if}
-                    
-                    {if isset($states_selected[{$v.id}])}
-	                    {assign var=selected value=true}
-                    {else}
-    	                {assign var=selected value=false}
-                    {/if}
-                    
-					<td class="{if $selected}selectedValue{/if}{if $irrelevant}irrelevant{/if}" style="max-width:200px;">
-						<div class="state-image-cell" style="padding:0;">
-                        {if !$irrelevant}
-                        {if $selected}
-                            <a href="#" onclick="clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
-                        {else}
-                            <a href="#" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
-                        {/if}
-                        {/if}
-                            <img
-                                class="state-image{if $irrelevant} state-image-irrelevant{/if}"
-                                {if $v.file_name}
-                                    src="{$projectUrls.projectMedia}{$v.file_name}"
-                                {else}
-                                    src="{$projectUrls.projectMedia}missing.jpg"
-                                {/if}
-                               />
-                        {if !$irrelevant}
-							</a>
-						{/if}
-
-                        <div class="state-image-caption" style="width:100%">{$v.label}
-						</div>
-                        {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
-                           ({$states_remain_count[{$v.id}]})
-                        {/if}
-					</td>
-                    {if ($smarty.foreach.foo.index+1)%$state_images_per_row==0}
-                    </tr><tr>
-                    {/if}
-                	{/foreach}
-
-	                {math equation="(counter+1) % columns" counter=$smarty.foreach.foo.index columns=$state_images_per_row assign=x}
-                    {'<td>&nbsp;</td>'|str_repeat:$x}
-
-                </tr>
-            </table>
-		*}
-           
         {elseif $character.type=='text'}
 
             <ul class="facetListType">
