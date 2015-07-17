@@ -28,6 +28,8 @@ class VersatileExportController extends Controller
 	private $branch_top_id;
 	private $presence_labels;
 	private $selected_ranks;
+	private $selected_synonym_types;
+	private $all_ranks;
 	private $rank_operator;
 	private $cols;
 	private $name_parts;
@@ -43,6 +45,7 @@ class VersatileExportController extends Controller
 	private $suppress_underscored_fields=true;
 	private $replaceUnderscoresInHeaders=true;
 	private $doPrintQueryParameters=true;
+	private $printEOFMarker=false;
 	private $quoteChar='"';
 	private $query_bit_name_parts;
 	private $query;
@@ -52,10 +55,20 @@ class VersatileExportController extends Controller
 	private $parentRegister=array();
 	private $operators=array("eq"=>"=","ge"=>">=","in"=>"in");
 
-	private $order="_f.rank_id asc,_r.id, _t.taxon";
+	private $orderBy="_f.rank_id asc,_r.id, _t.taxon";  // rank, rank id, taxon
 	private $limit=9999999;
+	/*
+		when the number of names is larger than synonymStrategyThrehold, the
+		program will fetch all synonyms in one query, and filter and assign them
+		to the correct taxon in PHP next. below the threshold, a separate query
+		will be executed for each taxon. 
+		2000 is an arbitrary number, and shoud be calibrated.
+	*/
+	private $synonymStrategyThrehold=2000;
 
 	private $csv_file_name="nsr-export--%s.csv";
+	
+	private $EOFMarker='(end of file)';
 
 
     public function __construct ()
@@ -86,12 +99,15 @@ class VersatileExportController extends Controller
 			$this->setBranchTopSession( array( $this->rGetVal('branch_top_id'), $this->rGetVal('branch_top_label') ) );
 			$this->setBranchTopId( $this->rGetVal('branch_top_id') );
 			$this->setPresenceStatusLabels( $this->rGetVal('presence_labels') );
+			$this->setAllRanks( $this->rGetVal('all_ranks') );
 			$this->setSelectedRanks( $this->rGetVal('selected_ranks') );
 			$this->setRankOperator( $this->rGetVal('rank_operator') );
 			$this->setCols( $this->rGetVal('cols') );
 			$this->setNameParts( $this->rGetVal('name_parts') );
 			$this->setAncestors( $this->rGetVal('ancestors') );
 			$this->setDoSynonyms( $this->rGetVal('synonyms') );
+			$this->setSelectedSynonymTypes( $this->rGetVal('nametypes') );
+			$this->setOrderBy( $this->rGetVal('order_by') );
 			$this->setFieldSep( $this->rGetVal('field_sep') );
 			$this->setNewLine( $this->rGetVal('new_line') );
 			$this->setNoQuotes( $this->rGetVal('no_quotes') );
@@ -99,6 +115,7 @@ class VersatileExportController extends Controller
 			//$this->setUtf8ToUtf16( $this->rGetVal('utf8_to_utf16') );
 			$this->setAddUtf8BOM( $this->rGetVal('add_utf8_BOM') );
 			$this->setDoPrintQueryParameters( $this->rGetVal('print_query_parameters') );
+			$this->setPrintEOFMarker( $this->rGetVal('print_eof_marker') );
 			$this->setOutputTarget( $this->rGetVal('output_target') );
 
 			$this->setNameTypeIds();
@@ -141,19 +158,27 @@ class VersatileExportController extends Controller
 
 	private function getRanks()
 	{
-		return $this->models->ProjectRank->freeQuery("
+		return $this->models->ProjectRank->freeQuery(array("query"=>"
 			select
-				_a.*
+				_a.*,
+				ifnull(_c.label,_a.rank) as label
 			from
 				%PRE%projects_ranks _b
 				
 			right join %PRE%ranks _a
 				on _a.id=_b.rank_id
 				
-			where _b.project_id = ". $this->getCurrentProjectId() ."
+			left join %PRE%labels_projects_ranks _c
+				on _b.project_id=_c.project_id 
+				and _b.id=_c.project_rank_id
+				and _c.language_id = " . LANGUAGE_ID_DUTCH . "
+
+			where 
+				_b.project_id = ". $this->getCurrentProjectId() ."
+
 			order by
 				_a.id
-			");
+			", "fieldAsIndex"=>"id"));
 	}
 
 	private function setNameTypeIds()
@@ -179,7 +204,11 @@ class VersatileExportController extends Controller
 			}
 		}
 		
-		$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()] . " (".implode( "," , $this->getSelectedRanks() ).")";
+		$ranks_clause="";
+		if ( !$this->getAllRanks() )
+		{
+			$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()] . " (".implode( "," , $this->getSelectedRanks() ).")";
+		}
 
 		$presence_status_clause="";
 		$p = $this->getPresenceStatusLabels();
@@ -193,7 +222,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'sci_name' ) ? " _t.taxon as wetenschappelijke_naam, " : "" )."
 				".( $this->query_bit_name_parts )."
 				".( $this->hasCol( 'dutch_name' ) ? " _z.name as nederlandse_naam, " : "" )."
-				".( $this->hasCol( 'rank' ) ? " _r.rank as rang, " : "" )."
+				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as rang, " : "" )."
 				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as nsr_id, " : "" )."
 				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as voorkomens_status, " : "" )."
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as habitat, " : "" )."
@@ -238,6 +267,11 @@ class VersatileExportController extends Controller
 			
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
+
+			left join %PRE%labels_projects_ranks _lpr
+				on _f.project_id=_lpr.project_id 
+				and _f.id=_lpr.project_rank_id
+				and _lpr.language_id = " . LANGUAGE_ID_DUTCH . "
 			
 			left join %PRE%nsr_ids _b
 				on _t.project_id = _b.project_id
@@ -266,11 +300,13 @@ class VersatileExportController extends Controller
 				
 			and ifnull(_trash.is_deleted,0)=0
 			
-			order by " .$this->order . "
+			order by " .$this->getOrderBy() . "
 			
 			limit " . $this->limit . "
 			
 			";
+
+		//q($this->query,1);
 
 		if ( !empty($this->query) )
 		{
@@ -342,14 +378,16 @@ class VersatileExportController extends Controller
 				and _names.id = _c.lng_id
 				and _c.item_type = 'name'
 		*/
-
+		
 		$this->query="
 			SELECT
 				_names.id,
 				_names.name,
-				".($this->query_bit_name_parts)."	
+				".( $this->query_bit_name_parts )."	
 				".( $this->hasCol( 'database_id' ) ? " _names.id as database_id, " : "" )."
-				_b.nametype
+				_b.nametype,
+				_c.language,
+				_names.taxon_id as _taxon_id
 			
 			FROM 
 				%PRE%names _names
@@ -358,17 +396,46 @@ class VersatileExportController extends Controller
 				on _names.project_id=_b.project_id
 				and _names.type_id=_b.id
 			
+			left join %PRE%languages _c
+				on _names.language_id=_c.id
+
 			where
 				_names.project_id=".$this->getCurrentProjectId()." 
-				and _names.type_id in (".$this->_nameTypeIds[PREDICATE_SYNONYM]['id'].",".$this->_nameTypeIds[PREDICATE_SYNONYM_SL]['id']	.") 
-				and _names.taxon_id = %ID%
+				and _names.type_id in (" . implode(",",(array)$this->getSelectedSynonymTypes()) . ") 
+				%ID-CLAUSE%
+			order by
+				_names.name
 			";
-
- 			
+			
+		$get_all=count((array)$this->names) >= $this->synonymStrategyThrehold;
+		
+		if ( !$get_all )
+		{
+			$this->query=str_replace('%ID-CLAUSE%','and _names.taxon_id = %ID%',$this->query);
+		}
+		else
+		{
+			$all_synonyms=array();
+			$q=str_replace('%ID-CLAUSE%','',$this->query);
+			$synonyms=$this->models->Names->freeQuery( $q );
+			foreach((array)$synonyms as $key=>$val)
+			{
+				$all_synonyms[$val['_taxon_id']][]=$val;
+			}
+			unset($synonyms);
+		}
+			
 		foreach( (array)$this->names as $key=>$val )
 		{
-			$q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
-			$synonyms=$this->models->Names->freeQuery( $q );
+			if ( !$get_all )
+			{
+				$q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
+				$synonyms=$this->models->Names->freeQuery( $q );
+			}
+			else
+			{
+				$synonyms=isset($all_synonyms[$val['_taxon_id']]) ? $all_synonyms[$val['_taxon_id']] : array();
+			}
 
 			foreach( (array)$synonyms as $row )
 			{
@@ -395,6 +462,7 @@ class VersatileExportController extends Controller
 							'synoniem'=>$row['name'],
 							//'nsr_id'=>$row['nsr_id'],
 							'type_synoniem'=>$row['nametype'],
+							'taal'=>$row['language'],
 							'taxon'=>$val['wetenschappelijke_naam'],
 							'taxon_nsr_id'=>$val['nsr_id'],
 						),
@@ -421,6 +489,7 @@ class VersatileExportController extends Controller
 		$this->doQueryParametersOutput();
 		$this->doNamesOutput();
 		$this->doSynonymsOutput();
+		$this->doEOFMarkerOutput();
 
 		if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
 
@@ -518,13 +587,13 @@ class VersatileExportController extends Controller
 
 		$d=array();
 		foreach($this->getRanks() as $val)
-			if(in_array($val["id"],$this->getSelectedRanks( )))
+			if(in_array($val["id"],(array)$this->getSelectedRanks( )))
 				$d[]=$val["rank"];
 		echo
-			"rang",
+			"rangen",
 			$this->getFieldSep(),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-			$this->operators[$this->getRankOperator()]," ",implode(", ",$d),
+			$this->getAllRanks() ? "(alle)" : $this->operators[$this->getRankOperator()]," ",implode(", ",$d),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
 		$this->printNewLine();
 
@@ -589,12 +658,22 @@ class VersatileExportController extends Controller
 
 	private function setSelectedRanks( $selected_ranks )
 	{
-		$this->selected_ranks=array_unique($selected_ranks);
+		$this->selected_ranks=!is_null($selected_ranks) ? array_unique($selected_ranks) : null;
 	}
 
 	private function getSelectedRanks()
 	{
 		return $this->selected_ranks;
+	}
+
+	private function setAllRanks( $all_ranks )
+	{
+		$this->all_ranks=isset($all_ranks) && $all_ranks=='on';
+	}
+
+	private function getAllRanks()
+	{
+		return $this->all_ranks;
 	}
 
 	private function setRankOperator( $rank_operator )
@@ -615,6 +694,44 @@ class VersatileExportController extends Controller
 	private function getCols()
 	{
 		return $this->cols;
+	}
+	
+	private function setOrderBy( $order )
+	{
+		if ( $order=='rank-sci_name' && $this->hasCol( 'rank' ) && $this->hasCol( 'sci_name' ) )
+		{
+			$this->orderBy='_r.id,_t.taxon';
+		} 
+		else
+		if ( $order=='rank-dutch_name' && $this->hasCol( 'rank' ) && $this->hasCol( 'dutch_name' ) )
+		{
+			$this->orderBy='_r.id,_z.name';
+		} 
+		else
+		if ( $order=='sci_name' && $this->hasCol( 'sci_name' ) )
+		{
+			$this->orderBy='_t.taxon';
+		}
+		else
+		if ( $order=='dutch_name' && $this->hasCol( 'dutch_name' ) )
+		{
+			$this->orderBy='_z.name';
+		} 
+		else
+		if ( $order=='presence_status-sci_name' && $this->hasCol( 'presence_status' ) && $this->hasCol( 'sci_name' ) )
+		{
+			$this->orderBy='_h.index_label,_t.taxon';
+		} 
+		else
+		if ( $order=='presence_status-dutch_name' && $this->hasCol( 'presence_status' ) && $this->hasCol( 'dutch_name' ) )
+		{
+			$this->orderBy='_h.index_label,_z.name';
+		} 
+	}
+	
+	private function getOrderBy()
+	{
+		return $this->orderBy;
 	}
 
 	private function hasCol( $col )
@@ -650,6 +767,16 @@ class VersatileExportController extends Controller
 	private function getDoSynonyms()
 	{
 		return $this->doSynonyms;
+	}
+
+	private function setSelectedSynonymTypes( $selected_synonym_types )
+	{
+		$this->selected_synonym_types=$selected_synonym_types;
+	}
+
+	private function getSelectedSynonymTypes()
+	{
+		return $this->selected_synonym_types;
 	}
 
 	private function setFieldSep( $field_sep )
@@ -712,6 +839,24 @@ class VersatileExportController extends Controller
 	private function getDoPrintQueryParameters()
 	{
 		return $this->doPrintQueryParameters;
+	}
+
+	private function setPrintEOFMarker( $state )
+	{
+		$this->printEOFMarker=isset($state) && $state=='on';
+	}
+
+	private function getPrintEOFMarker()
+	{
+		return $this->printEOFMarker;
+	}
+
+	private function doEOFMarkerOutput()
+	{
+		if ($this->getPrintEOFMarker())
+		{
+			echo $this->EOFMarker;
+		}
 	}
 
 	private function setOutputTarget( $target )

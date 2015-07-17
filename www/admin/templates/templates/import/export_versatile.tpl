@@ -115,7 +115,7 @@ function doSubmit()
 	
 	if ($( '#output_target_screen' ).prop('checked'))
 	{
-		$( '#theForm' ).attr('target','export_output');
+		$( '#theForm' ).attr('target','_blank');
 	}
 	else
 	{
@@ -126,10 +126,14 @@ function doSubmit()
 	
 	$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="branch_top_label" value="'+$( '#parent_taxon' ).text()+'" />' );
 
-	$( '#selected_ranks li' ).each(function()
+
+	if( !$( 'input[name="all_ranks"]' ).prop( 'checked' ) )
 	{
-		$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
-	});
+		$( '#selected_ranks li' ).each(function()
+		{
+			$( '#theForm' ).append( '<input type="hidden" class="to_be_posted" name="selected_ranks[]" value="'+$(this).data('id')+'" />' );
+		});
+	}
 
 	$( '#theForm' ).submit();
 }
@@ -186,58 +190,66 @@ function doSubmit()
         <table>
             <tr>
                 <td>
-                	<input type="checkbox" name="all_ranks" />Taxa van alle rangen tonen
+                	<label>
+                    	<input 
+                        	onchange="$('.rank-selector').toggle(!$(this).prop('checked'));"
+                            type="checkbox" 
+                            name="all_ranks" />Taxa van alle rangen tonen</label>
                 </td>
 			</tr>
-<tbody style="background-color:red">              
-            <tr>
-                <td>
-                    Beschikbaar:<br />
-                    <span class=remark>(dubbelklik of klik op pijl om toe te voegen)</span>
-                </td>
-                <td>
-                </td>
-                <td style="vertical-align:top;">
-                    Alleen taxa tonen met de volgende rang:<br />
-                    <span class=remark>(dubbelklik om te verwijderen)</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <select size="10" multiple="multiple" style="width:200px">
-                    {foreach $ranks v}
-                        <option 
-                            id={$v.id} 
-                            class=ranks
-                            ondblclick="addRank();checkRanksOp();"
-                            {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.rank}</option>
-                    {/foreach}
-                    </select>
-                </td>
-                <td>
-                    <input type=button value="&#10140;" onclick="addRank();checkRanksOp();" />
-                </td>
-                <td style="vertical-align:top;">
-                    <ul id=selected_ranks style="border:1px solid #ddd;width:200px;padding-left:5px;">
-                    </ul>
-                    <div style="font-size:0.9em">
-                    Hoe toe te passen:<br />
-                    <label>
-                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=eq />
-                        alleen deze rang
-                    </label> 
-                    <label>
-                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=ge checked="checked" />
-                        deze rang en lager
-                    </label><br />
-                    <label>
-                        <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=in />
-                        deze rangen
-                    </label>
-                    </div>            
-                </td>
-            </tr>
-</tbody>            
+
+			<tbody class="rank-selector">              
+                <tr>
+                    <td>
+                        Beschikbaar:<br />
+                        <span class=remark>(dubbelklik of klik op pijl om toe te voegen)</span>
+                    </td>
+                    <td>
+                    </td>
+                    <td style="vertical-align:top;">
+                        Alleen taxa tonen met de volgende rang:<br />
+                        <span class=remark>(dubbelklik om te verwijderen)</span>
+                        <span class=remark><a  href="#" 
+                        	onclick="$( '.selected_ranks' ).each(function(index, element) { 
+                            $(this).remove();checkRanksOp(); });return false;">alles verwijderen</a></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select size="10" multiple="multiple" style="width:200px">
+                        {foreach $ranks v}
+                            <option 
+                                id={$v.id} 
+                                class=ranks
+                                ondblclick="addRank();checkRanksOp();"
+                                {if $v.id==$smarty.const.SPECIES_RANK_ID} selected="selected"{/if}>{$v.label}</option>
+                        {/foreach}
+                        </select>
+                    </td>
+                    <td>
+                        <input type=button value="&#10140;" onclick="addRank();checkRanksOp();" />
+                    </td>
+                    <td style="vertical-align:top;">
+                        <ul id=selected_ranks style="border:1px solid #ddd;width:200px;padding-left:5px;">
+                        </ul>
+                        <div style="font-size:0.9em">
+                        Hoe toe te passen:<br />
+                        <label>
+                            <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=eq />
+                            alleen deze rang
+                        </label> 
+                        <label>
+                            <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=ge checked="checked" />
+                            deze rang en lager
+                        </label><br />
+                        <label>
+                            <input type=radio class=rank_operator onchange=checkRanksOp() name=rank_operator value=in />
+                            deze rangen
+                        </label>
+                        </div>            
+                    </td>
+                </tr>
+			</tbody>            
         </table>
 
 	</fieldset>
@@ -250,23 +262,23 @@ function doSubmit()
 			<h4>Standaardkolommen</h4>
             <table>
                 <tr>
-                    <td><input id=col_sci_name type=checkbox name=cols[sci_name] checked="checked" /></td>
+                    <td><input class=col id=col_sci_name type=checkbox name=cols[sci_name] checked="checked" /></td>
                     <td><label for=col_sci_name>wetenschappelijke naam</label></td>
                 </tr>
                 <tr>
-                    <td><input id=col_dutch_name type=checkbox name=cols[dutch_name] checked="checked" /></td>
+                    <td><input class=col id=col_dutch_name type=checkbox name=cols[dutch_name] checked="checked" /></td>
                     <td><label for=col_dutch_name>nederlandse naam</label></td>
                 </tr>
                 <tr>
-                    <td><input id=col_rank type=checkbox name=cols[rank] checked="checked" /></td>
+                    <td><input class=col id=col_rank type=checkbox name=cols[rank] checked="checked" /></td>
                     <td><label for=col_rank>rang</label></td>
                 </tr>
                 <tr>
-                    <td><input id=col_presence_status type=checkbox name=cols[presence_status] checked="checked" /></td>
+                    <td><input class=col id=col_presence_status type=checkbox name=cols[presence_status] checked="checked" /></td>
                     <td><label for=col_presence_status>voorkomensstatus</label></td>
                 </tr>
                 <tr>
-                    <td><input id=col_nsr_id type=checkbox name=cols[nsr_id] checked="checked" /></td>
+                    <td><input class=col id=col_nsr_id type=checkbox name=cols[nsr_id] checked="checked" /></td>
                     <td><label for=col_nsr_id>NSR ID</label></td>
                 </tr>
             </table>
@@ -293,7 +305,7 @@ function doSubmit()
                     <label><input class=namepart disabled=disabled type=checkbox name=name_parts[specific_epithet] checked=checked>specific epithet</label><br />
                     <label><input class=namepart disabled=disabled type=checkbox name=name_parts[infra_specific_epithet] checked=checked>infra specific epithet</label><br />
                     <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship] checked=checked>authorship</label><br />
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship_author]>authorship author</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[name_author]>authorship author</label><br />
                     <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship_year]>authorship year</label><br />
                     <span class=remark>(geldt ook voor synoniemen, als die ook geëxporteerd worden)</span>
                     </div>
@@ -304,7 +316,7 @@ function doSubmit()
                     <td><input id=col_ancestry type=checkbox name=cols[ancestors] onclick="
                         $( '.ancestry' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) ) 
                     " /></td>
-                    <td><label for=col_ancestry>taxonomische ouders<span class=remark> (worden, indien van toepassing, opgenomen als extra cellen aan het eind van iedere regel)</span></label>
+                    <td><label for=col_ancestry>taxonomische ouders</label>
                     <div class=ancestry style="display:none">
                     <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[rijk] checked=checked value="{$smarty.const.KINGDOM_RANK_ID}" />rijk</label><br />
                     <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[phylum] checked=checked value="{$smarty.const.PHYLUM_RANK_ID}" />phylum</label><br />
@@ -313,6 +325,7 @@ function doSubmit()
                     <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[familie] checked=checked value="{$smarty.const.FAMILY_RANK_ID}" />familie</label><br />
                     <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[genus] checked=checked value="{$smarty.const.GENUS_RANK_ID}" />genus</label><br />
                     <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[species] checked=checked value="{$smarty.const.SPECIES_RANK_ID}" />species</label><br />
+                    <span class=remark> (worden, indien van toepassing, opgenomen als extra cellen aan het eind van iedere regel)</span>
                     </div>
                     </td>
                 </tr>
@@ -335,28 +348,64 @@ function doSubmit()
 
             <div class=nametypes style="display:none">
             {foreach $nametypes v}
-            {if $v.id!=$smarty.const.PREDICATE_VALID_NAME && $v.id!=$smarty.const.PREDICATE_PREFERRED_NAME}
+            
+            {if $v.nametype!=$smarty.const.PREDICATE_VALID_NAME && $v.nametype!=$smarty.const.PREDICATE_PREFERRED_NAME}
             <label>
             	<input 
                 	class=nametypes
                     disabled=disabled
                     type=checkbox
                     name=nametypes[{$v.id}]
-                    {if $v.id!=$smarty.const.PREDICATE_INVALID_NAME && $v.id!=$smarty.const.PREDICATE_MISSPELLED_NAME}
+                    {if $v.nametype==$smarty.const.PREDICATE_SYNONYM || $v.nametype==$smarty.const.PREDICATE_SYNONYM_SL}
                     checked=checked 
                     {/if}
                     value="{$v.id}" />{$v.nametype_hr}
             </label><br />
             {/if}
             {/foreach}
+            
+             <span class=remark>(synoniemen worden getoond in een eigen sectie, onder de reguliere export)</span>
+
             </div>
 
 		</td>
 		</tr></table>
-        <span class=remark>(synoniemen worden getoond in een eigen sectie, onder de reguliere export)</span>
         
 	</fieldset>
+    
+    <script>
+	
+		$('.col').on('change',function()
+		{
+			$( '.' + $(this).attr('id').replace( 'col_','ord_') ).prop( 'disabled' , !$(this).prop('checked') );
+		});
+	
+	</script>
+    
 
+    <fieldset>
+
+		<legend>Sorteren</legend>
+        
+        <table>
+        	<tr><td colspan="2">
+                <label><input class="ord_rank ord_sci_name" type="radio" name="order_by" value="rank-sci_name" checked="checked" />
+                	rang &#9656; wetenschappelijke naam</label><br />
+                <label><input class="ord_rank ord_dutch_name" type="radio" name="order_by" value="rank-dutch_name" />
+                	rang &#9656; nederlandse naam</label><br />
+                <label><input class="ord_sci_name" type="radio" name="order_by" value="sci_name" />
+                	wetenschappelijke naam</label><br />
+                <label><input class="ord_dutch_name" type="radio" name="order_by" value="dutch_name" />
+                	nederlandse naam</label><br />
+                <label><input class="ord_presence_status ord_sci_name" type="radio" name="order_by" value="presence_status-sci_name" />
+                	voorkomensstatus &#9656; wetenschappelijke naam</label><br />
+                <label><input class="ord_presence_status ord_dutch_name" type="radio" name="order_by" value="presence_status-dutch_name" />
+                	voorkomensstatus &#9656; nederlandse naam</label><br />
+			</td></tr>
+		</table>
+
+	</fieldset>
+    
     <fieldset>
 
 		<legend>CSV- en bestandsinstellingen</legend>
@@ -398,6 +447,10 @@ function doSubmit()
             	<td><input type="checkbox" name="print_query_parameters" id="print_query_parameters" checked="checked" /></td>
                 <td><label for="print_query_parameters">query parameters afdrukken</label></td>
 			</tr>
+        	<tr>
+            	<td><input type="checkbox" name="print_eof_marker" id="print_eof_marker" /></td>
+                <td><label for="print_eof_marker"><i>end of file</i>-marker toevoegen (voor controle complete download)</label></td>
+			</tr>
 		</table>
         
         <span class=remark>
@@ -407,8 +460,17 @@ function doSubmit()
         </span>
 
 	</fieldset>
-    
+
     <input type="button" value="exporteren" onclick="doSubmit();" />
+    
+    <p class="comment">
+    to come:
+    	<ul>
+        	<li>saving presets</li>
+        	<li>maybe: determine column order in output (for oscar)</li>
+        	<li>escaping user inputs (in the meantime, be good)</li>
+        </ul>
+    </p>
     
     </form>
     
@@ -418,7 +480,7 @@ function doSubmit()
 
 $(document).ready(function()
 {
-	addRank( { id:{$smarty.const.SPECIES_RANK_ID}, label:'species' } 	);
+	addRank( { id:{$smarty.const.SPECIES_RANK_ID}, label:'{$ranks[$smarty.const.SPECIES_RANK_ID].label}' } );
 	{if $branch_top}
 	$( '#parent_taxon_id' ).val( {$branch_top.id} );
 	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
