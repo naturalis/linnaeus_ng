@@ -199,9 +199,9 @@ function retrieveDataSet()
 			key : settings.matrixId,
 			p : settings.projectId
 		}),
-		success : function (data)
+		success : function ( d )
 		{
-			setDataSet($.parseJSON(data));
+			setDataSet($.parseJSON( d ));
 			applyScores();
 			clearResults();
 			printResults();
@@ -623,7 +623,8 @@ function formatResult( data )
 	{
 		//var sciName=data.taxon.label;
 		var sciName='<i>'+data.taxon.taxon+'</i>';
-		var commonName=data.label ? data.label : "";
+		var commonName=(data.taxon.commonname ? data.taxon.commonname : "" ) + " " + (data.label ? "(" + data.label + ")" : "");
+		commonName.trim();
 	}
 	else
 	if ( data.type=='matrix' )
@@ -680,6 +681,8 @@ function formatResult( data )
 	}
 
 	var image="";
+
+console.dir(data.info);
 
 	if (data.info && data.info.url_image)
 	{

@@ -638,7 +638,6 @@ class MatrixKeyController extends Controller
 					_b.id,
 					_b.taxon_id,
 					_b.label,
-					
 					_c.language_id,
 					_c.label,
 					_c.label_type,
@@ -658,7 +657,8 @@ class MatrixKeyController extends Controller
 				where 
 					_a.project_id = ". $this->getCurrentProjectId() ."
 					and _a.matrix_id = ". $this->getCurrentMatrixId()."
-				order by _c.label",
+				order by
+					_c.label",
 
             'fieldAsIndex' => 'variation_id'
         ));
