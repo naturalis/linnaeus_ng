@@ -1,48 +1,113 @@
-{include file="../shared/header.tpl"}
+{include file="../shared/head.tpl"}
 
-<style>
-.homepage #content, .conceptcard #content {
-    margin-top:-16px;
-}
-</style>
+  <body style='cursor: default;'>
 
-<div id="dialogRidge">
+	{include file="../shared/navbar.tpl"}
+	
+    <div id='container'>
+      <a name='top'></a>
+      <div id='main'>
 
-	{include file="_left_column.tpl"}
-      
-    <div id="content" class="title-type4">
-    
-        <div id="resultsHeader">
-            <span>
-	            <h1>{$matrix.name}</h1>
-                <div class="headerPagination">
-                    <ul id="paging-header" class="list paging"></ul>
-                </div>
-            </span>
+        <div id='logo'>
+          <img src='{$baseUrl}app/style/naturalis/images/logo-medium-zwart.png'>
         </div>
 
-		<div>
-			{if $master_matrix.id}
-			<a href="?mtrx={$master_matrix.id}">{t}terug naar {$master_matrix.name}{/t}</a><br />
-			{/if}
+		{snippet language=$currentLanguageId}titles.html{/snippet}
 
-			<div id="similarSpeciesHeader" class="hidden" style="width:100%"></div>
-			<div id="result-count" class="headerSelectionLabel"></div>
-			
+          <div id='left'>
+            <div id='quicksearch'>
+              <h2>{t}Zoek op naam{/t}</h2>
+            <form class='input-group' name='inlineformsearch' onsubmit='setSearch();return false;'>
+              <input class='form-control' name='searchString' id='inlineformsearchInput' placeholder='' title='{t}Zoek op naam{/t}' type='text' value=''>
+              <span class='input-group-btn'>
+                <button class='btn btn-default' id='button-search' type='submit' value='search'>
+                  <span class='icon icon-search'></span>
+                </button>
+              </span>
+              </form>
+            </div>
+            <div id='facets'>
+              <h2>{t}Zoek op kenmerken{/t}</h2>
+              <span id='facet-categories-menu'></span>
+            </div>
+
+          <div class='control'>
+            <span class='icon icon-reload'></span>
+              <a id="clearSelectionLink" href="#" onclick="resetMatrix();return false;">{t}Opnieuw beginnen{/t}</a>
+          </div>
+
+		{if $master_matrix_id}
+		<div class='control'>
+			<span class='icon icon-arrow-left-up'></span>
+			<a href="?mtrx={$master_matrix_id}">{t}Terug naar de hoofdsleutel{/t}</a>
 		</div>
-        
-        <div id="results">
-            <div id="results-container"></div>
-        </div>
+		{/if}
+						
+            <div id='legend'>
+              <h2>{t}Legenda:{/t}</h2>
+              <div class='legend-icon-cell'>
+                <span class='icon icon-book'></span>
+                {t}meer informatie{/t}
+              </div>
+              <div class='legend-icon-cell'>
+                <span class='icon icon-details'></span>
+                {t}onderscheidende kenmerken{/t}
+              </div>
+              <div class='legend-icon-cell'>
+                <span class='icon icon-resemblance'></span>
+                {t}gelijkende soorten{/t}
+              </div>
+            </div>
+            <div class='left-divider'></div>
+            <div id='dataSourceContainer'>
 
-        <div id="footerPagination" class="footerPagination">
-            <ul id="paging-footer" class="list paging"></ul>
+				{snippet}colofon.html{/snippet}
+
+              <div>
+                <h3>{t}Geïmplementeerd door{/t}</h3>
+                <p>{t}Naturalis & ETI BioInformatics.{/t}</p>
+              </div>
+            </div>
+            <div class='left-divider'></div>
+          </div>
+          <div class='title-type4' id='content'>
+            <div id='resultsHeader'>
+              <h2 id='similarSpeciesHeader' class='hidden'>
+                <span id='similarSpeciesLabel'>{t}Soorten lijkend op{/t}</span>
+                <span id='similarSpeciesName'></span>
+              </h2>
+              <div class='headerSelectionLabel' id='result-count'></div>
+              <div id='similarSpeciesNav' class='hidden'>
+                <a href='#' id='clearSimilarSelection' onclick='nbcCloseSimilar();'>
+                  <span class='icon icon-arrow-left'></span>
+                  {t}terug{/t}
+                </a>
+                <a href='#' id='showAllLabel' onclick='nbcToggleAllSpeciesDetail();return false;'>
+                  <span class='icon icon-details'></span>
+                  <span id='showAllLabelLabel'>{t}alle onderscheidende kenmerken tonen{/t}</span>
+                </a>
+              </div>
+            </div>
+            <div id='results'>
+              <div class='hidden'></div>
+              <div class='layout-landscapes' id='results-container'></div>
+            </div>
+            <div class='footerPagination noline' id='footerPagination'>
+              <input class='ui-button' id='show-more-button' onclick='printResults();return false;' type='button' value='show more results' class='hidden'>
+            </div>
+          </div>
         </div>
-        
     </div>
 
-</div>
-    
+	{include file="../shared/footerbar.tpl"}
+	
+	{snippet}{"google_analytics-`$smarty.server.SERVER_NAME`.html"}{/snippet}
+
+  </body>
+
+<div id="jDialog" title="" class="ui-helper-hidden"></div>
+<div id="tmpcontent" title="" class="ui-helper-hidden"></div>
+
 <script type="text/JavaScript">
 $(document).ready(function()
 {
@@ -69,6 +134,7 @@ $(document).ready(function()
 	retrieveDataSet();
 });
 </script>
+
 
 <script type="text/JavaScript">
 
@@ -121,31 +187,33 @@ var statesJoinHtmlTpl = '</li><li>';
 var speciesStateItemHtmlTpl = '<span class="result-detail-label">%GROUP% %CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
 
 var resultHtmlTpl = '\
-<div class="result%CLASS-HIGHLIGHT%" id="res-%LOCAL-ID%"> \
+<div id="res-v-%LOCAL-ID%" class="result"> \
 	<div class="result-result"> \
 		<div class="result-image-container"> \
 			%IMAGE-HTML% \
 		</div> \
 		<div class="result-labels"> \
-			%GENDER% \
 			<span class="result-name-scientific" title="%SCI-NAME-TITLE%">%SCI-NAME%</span> \
-			%MATRIX-LINK% \
-			<span class="result-name-common" title="%COMMON-NAME-TITLE%"><br />%COMMON-NAME%</span> \
-            </div> \
-        </div> \
-        <div class="result-icons"> \
-			<div class="result-icon%REMOTE-LINK-CLASS%" \
-				%REMOTE-LINK-CLICK% \
-			>%REMOTE-LINK-ICON%</div> \
-			<div class="result-icon%SHOW-STATES-CLASS%" id="tog-%LOCAL-ID%" \
+			<span class="result-name-common" title="%COMMON-NAME-TITLE%">%COMMON-NAME%</span> \
+		</div> \
+	</div> \
+	<div class="result-icons"> \
+		<div class="icon icon-book" title="more information" %REMOTE-LINK-CLICK%></div> \
+			<div class="icon %SHOW-STATES-CLASS%" id="tog-%LOCAL-ID%" \
 				%SHOW-STATES-CLICK% \
 			>%SHOW-STATES-ICON%</div> \
-			<div class="result-icon%RELATED-CLASS% related" \
-				%RELATED-CLICK% \
-			>%RELATED-ICON%</div> \
-        </div>%STATES% \
-    </div> \
-';
+		<div class="icon %RELATED-CLASS%" %RELATED-CLICK%></div> \
+	</div>%STATES% \
+</div> \
+';	
+
+//<div class="icon no-content"></div>
+//		<div %SHOW-STATES-CLICK% id="tog-%LOCAL-ID%" class="icon icon-details"></div> \
+	
+var iconInfoHtmlTpl='<img class="result-icon-image icon-info" src="%IMG-URL%">';
+var iconUrlHtmlTpl = iconInfoHtmlTpl.replace(' icon-info','');
+var iconSimilarTpl = iconInfoHtmlTpl.replace(' icon-info',' icon-similar');	
+
 
 var resultBatchHtmlTpl= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
 var buttonMoreHtmlTpl='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
@@ -191,9 +259,7 @@ var menuSelStateHtmlTpl = '\
 ';
 var menuSelStatesHtmlTpl = '<span>%STATES%</span>';
 
-var iconInfoHtmlTpl='<img class="result-icon-image icon-info" src="%IMG-URL%">';
-var iconUrlHtmlTpl = iconInfoHtmlTpl.replace(' icon-info','');
-var iconSimilarTpl = iconInfoHtmlTpl.replace(' icon-info',' icon-similar');
+
 
 var similarHeaderHtmlTpl='\
 %HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END%)</span> \
@@ -211,4 +277,5 @@ var searchHeaderHtmlTpl='\
 </script>
 
 
-{include file="../shared/footer.tpl"}
+
+</html>
