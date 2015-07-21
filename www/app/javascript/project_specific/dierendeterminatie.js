@@ -277,6 +277,7 @@ function printResults()
 	clearOverhead();
 	printHeader();
 	prettyPhotoInit();
+	disableImgContextMenu();
 
 	$('.result-icon').on('mouseover',function()
 	{	
@@ -1003,6 +1004,9 @@ function setState( p )
 			setStates(d.states);
 			setCharacters(d.characters);
 
+			closeSimilar();
+			closeSearch();
+
 			applyScores();
 			clearResults();
 			printResults();
@@ -1565,13 +1569,6 @@ function matrixInit()
 
 	settings.defaultSpeciesImage=settings.defaultSpeciesImages[settings.imageOrientation];
 
-
-
-
-	$('img').bind('contextmenu',function(e){
-		e.preventDefault();
-	});	
-
 	/*
 	if ("ontouchstart" in document) {
 		// touch only code (tablets)
@@ -1581,5 +1578,14 @@ function matrixInit()
 		// "desktop" code
 	}
 	*/
+
+}
+
+function disableImgContextMenu()
+{
+
+    $("img").on("contextmenu",function(){
+       return false;
+    });
 
 }
