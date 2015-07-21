@@ -46,8 +46,6 @@
 #content div#results {width:720px;padding:0px; }
 #content div#resultsHeader {width:703px; height:27px; margin:4px 0 0 0; position:relative;}
 #content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}
-#content div#result-count {font-size:0.9em;color:#333;}
-.result-count {font-size:0.9em;color:#333;}
 .overlapState {color:#999;}
 
 /* similar species */
@@ -176,6 +174,9 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 }
 .state-image-buffer {
 	min-height:150px;
+}
+.state-image-link:focus {
+	outline:0;
 }
 .state-image {
 	max-width:300px;

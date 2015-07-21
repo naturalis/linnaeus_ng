@@ -86,9 +86,9 @@
                 <div class="state-image-container{if $selected} state-image-selected{/if}{if $irrelevant} state-image-irrelevant{/if}">
                 	<div class="state-image-buffer">
                         {if !$irrelevant}{if $selected}
-                            <a href="#" onclick="clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
+                            <a href="#" class="state-image-link" onclick="clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                         {else}
-                            <a href="#" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
+                            <a href="#" class="state-image-link" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                         {/if}{/if}
                     	<img
                         	class="state-image" 
