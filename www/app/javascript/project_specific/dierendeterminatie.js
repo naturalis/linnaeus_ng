@@ -503,7 +503,7 @@ function printMenu()
 	}
 	else
 	{
-		$('#clearSelectionContainer').removeClass('ghosted');
+		showRestartButton();
 	}	
 }
 
@@ -681,8 +681,6 @@ function formatResult( data )
 	}
 
 	var image="";
-
-console.dir(data.info);
 
 	if (data.info && data.info.url_image)
 	{
@@ -1150,6 +1148,7 @@ function setSimilar( p )
 			printSimilarHeader();
 			window.scroll(0,0);
 			setCursor();
+			showRestartButton();
 		}
 	});
 	
@@ -1320,6 +1319,7 @@ function setSearch( p )
 			printSearchHeader();
 			window.scroll(0,0);
 			setCursor();
+			showRestartButton();
 		}
 	});
 	
@@ -1591,4 +1591,9 @@ function disableImgContextMenu()
        return false;
     });
 
+}
+
+function showRestartButton()
+{
+	$('#clearSelectionContainer').removeClass('ghosted');
 }
