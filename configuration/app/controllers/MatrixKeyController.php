@@ -274,7 +274,7 @@ class MatrixKeyController extends Controller
 	{
 		$id=$this->getCurrentMatrixId();
 
-		if ( is_null($id) )
+		if ( empty($id) && $id!==0 )
 		{
 			$m=$this->getMatrix( array('id'=>'*') ); // get all
 			
