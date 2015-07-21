@@ -80,7 +80,7 @@ class MatrixKeyController extends Controller
     public $cssToLoad = array('matrix.css');
 
     public $jsToLoad = array(
-        'all' => array('main.js'), 
+        'all' => array('main.js','matrix.js'), 
         'IE' => array()
     );
 
@@ -156,7 +156,21 @@ class MatrixKeyController extends Controller
 		// backward compatibility
 		$this->redirect( str_replace('identify.php','index.php',$_SERVER["REQUEST_URI"]));
 	}
+
+    public function characterStatesAction()
+	{
+		$character=$this->getCharacter(array('id'=>$this->rGetVal( 'id' )));
+		$states=$this->getCharacterStates(array('char'=>$this->rGetVal( 'id' )));
+
+		$this->smarty->assign('character', $character);
+		$this->smarty->assign('states', $states);
+		$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
+		$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
+		$this->smarty->assign('state_images_per_row', $this->state_image_per_row);
 	
+		$this->printPage();
+	}
+			
     public function ajaxInterfaceAction ()
     {
 		if ($this->rHasVar('key'))
@@ -177,28 +191,6 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
         }	
 		
-		else
-		
-		if ($this->rHasVal('action', 'get_character_states'))
-		{
-			$character=$this->getCharacter(array('id'=>$this->rGetVal( 'id' )));
-			$states=$this->getCharacterStates(array('char'=>$this->rGetVal( 'id' )));
-
-			$this->smarty->assign('character', $character);
-			$this->smarty->assign('states', $states);
-			$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
-			$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
-            $this->smarty->assign('state_images_per_row', $this->state_image_per_row);
-
-            $this->smarty->assign('returnText', 
-				json_encode(
-					array(
-						'title'=>$character['label'],
-						'page'=>$this->fetchPage('formatted_states'),
-						'showOk'=>($character['type'] == 'media' || $character['type'] == 'text' ? false : true)
-					)));
-		}
-
         else					
 
 		if ($this->rHasVal('action','set_state'))
