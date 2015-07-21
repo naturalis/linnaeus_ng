@@ -620,11 +620,11 @@ function formatResult( data )
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
 				iconUrlHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"information_grijs.png") : "")
-			.replace('%SHOW-STATES-CLASS%', showStates ? "" : " no-content")
+			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
 			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',nbcLabelDetails) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
 				iconInfoHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"lijst_grijs.png") : "")
-			.replace('%RELATED-CLASS%', data.related_count>0 ? "" : " no-content")
+			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
 			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
 				relatedClickHtmlTpl
 					.replace('%TYPE%', data.type)
