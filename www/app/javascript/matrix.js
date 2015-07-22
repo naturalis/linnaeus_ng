@@ -433,7 +433,7 @@ function printResultsExpanded()
 
 	if (settings.expandedShowing<resultset.length)
 	{
-		if (!$("#show-more").is(':visible'))
+		if (!$("#show-more-").is(':visible'))
 		{
 			$("#paging-footer").append( buttonMoreHtmlTpl.replace('%LABEL%',__('meer resultaten laden')) );
 			$("#footerPagination").addClass('noline');

@@ -33,7 +33,7 @@
 
           <div class='control'>
             <span class='icon icon-reload'></span>
-              <a id="clearSelectionLink" href="#" onclick="resetMatrix();return false;">{t}Opnieuw beginnen{/t}</a>
+              <a id="clearSelectionLink" href="#" onClick="resetMatrix();return false;">{t}Opnieuw beginnen{/t}</a>
           </div>
 
 		{if $master_matrix_id}
@@ -93,7 +93,10 @@
               <div class='layout-landscapes' id='results-container'></div>
             </div>
             <div class='footerPagination noline' id='footerPagination'>
+            <span id='paging-footer'>
+            <span id='show-more'>
               <input class='ui-button' id='show-more-button' onclick='printResults();return false;' type='button' value='show more results' class='hidden'>
+              </span></span>
             </div>
           </div>
         </div>
@@ -175,7 +178,7 @@ var statesClickHtmlTpl = 'onclick="toggleDetails(\'%LOCAL-ID%\');return false;"t
 var relatedClickHtmlTpl = 'onclick="setSimilar({ id:%ID%,type:\'%TYPE%\' });return false;" title="%TITLE%"';
 
 var statesHtmlTpl = '\
-<div id="det-%LOCAL-ID%" class="result-detail hidden"> \
+<div id="det-%LOCAL-ID%" class="result-detail" style="display:none"> \
 	<ul> \
 		<li>%STATES%</li> \
 	</ul> \
@@ -199,7 +202,7 @@ var resultHtmlTpl = '\
 	</div> \
 	<div class="result-icons"> \
 		<div class="icon icon-book" title="more information" %REMOTE-LINK-CLICK%></div> \
-			<div class="icon %SHOW-STATES-CLASS%" id="tog-%LOCAL-ID%" \
+			<div class="icon %SHOW-STATES-CLASS% result-detail-icon" id="tog-%LOCAL-ID%" \
 				%SHOW-STATES-CLICK% \
 			>%SHOW-STATES-ICON%</div> \
 		<div class="icon %RELATED-CLASS%" %RELATED-CLICK%></div> \
@@ -210,13 +213,14 @@ var resultHtmlTpl = '\
 //<div class="icon no-content"></div>
 //		<div %SHOW-STATES-CLICK% id="tog-%LOCAL-ID%" class="icon icon-details"></div> \
 	
-var iconInfoHtmlTpl='<img class="result-icon-image icon-info" src="%IMG-URL%">';
+var iconInfoHtmlTpl='';
 var iconUrlHtmlTpl = iconInfoHtmlTpl.replace(' icon-info','');
 var iconSimilarTpl = iconInfoHtmlTpl.replace(' icon-info',' icon-similar');	
 
 
 var resultBatchHtmlTpl= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
-var buttonMoreHtmlTpl='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
+var buttonMoreHtmlTpl="<span id='show-more'> \<input class='ui-button' id='show-more-button' onclick='printResults();return false;' type='button' value='show more results' class='hidden'> \
+</span>";
 var counterExpandHtmlTpl='%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%';
 var pagePrevHtmlTpl='<li><a href="#" onclick="browsePage(\'p\');return false;">&lt;</a></li>';
 var pageCurrHtmlTpl='<li><strong>%NR%</strong></li>';
@@ -253,9 +257,7 @@ var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace(
 var menuSelStateHtmlTpl = '\
 <div class="facetValueHolder"> \
 %VALUE% %LABEL% %COEFF% \
-<a href="#" class="removeBtn" onclick="clearStateValue(\'%STATE-ID%\');return false;"> \
-<img src="%IMG-URL%"></a> \
-</div> \
+<a href="#" class="removeBtn" onclick="clearStateValue(\'%STATE-ID%\');return false;"></a></div> \
 ';
 var menuSelStatesHtmlTpl = '<span>%STATES%</span>';
 

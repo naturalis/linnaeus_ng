@@ -1,16 +1,14 @@
 <div id="graphicVaslueSelector">
 
-	{*<p id="dialogHeader">
-		<span id="state-header">{$character.label}:</span>{if $character.info}<br />{$character.info}{/if}
-	</p>*}
-
 	<p id="dialogSelectorWindow">
 
         <div id="dialog-content-inner-inner">
-        
-            {if $character.info}
-            <p id="state-info">{$character.info}</p>
-            {/if}
+
+        {if $character.info}
+        <p id="state-info">
+            {$character.info}
+        </p>
+        {/if}
         
         {if $character.type=='range'}
         
@@ -66,8 +64,8 @@
 
         {elseif $character.type=='media'}
 
-
-			<div class="state-images-container">
+        <div id='dialog-content-inner-inner'>
+          <div id='graphicValues'>
 
             {foreach from=$states item=v name=foo key=key}
             
@@ -82,35 +80,34 @@
                 {else}
                     {assign var=selected value=false}
                 {/if}
-           
-                <div class="state-image-container{if $selected} state-image-selected{/if}{if $irrelevant} state-image-irrelevant{/if}">
-                	<div class="state-image-buffer">
-                        {if !$irrelevant}{if $selected}
-                            <a href="#" class="state-image-link" onclick="clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
-                        {else}
-                            <a href="#" class="state-image-link" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
-                        {/if}{/if}
-                    	<img
-                        	class="state-image" 
-                            key="{$key}"
-                            {if $v.file_name}
-                            src="{$projectUrls.projectMedia}{$v.file_name}"
-                            {else}
-                            src="{$image_root_skin}missing.jpg"
-                            {/if}                    
-                        >{if !$irrelevant}</a>{/if}<a id="full-size-link-{$key}" rel="prettyPhoto[states]" href="{$projectUrls.projectMedia}{$v.file_name}" pTitle="{$character.label|@escape}: {$v.label|@escape}" title="" style="display:none;"><img class="full-size-icon" src="{$image_root_skin}full-size-icon.png"></a>
-					</div>
-					<div class="state-image-caption">{$v.label}
-                    {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
-                        <br />
-                       ({$states_remain_count[{$v.id}]})
-                    {/if}
-                    </div>
-                </div>
+
+			<div class="state-image-cell {if $selected}active{elseif $irrelevant}disabled{else}selectable{/if}" 
+            	onclick="
+                {if $selected}
+                	clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;
+				{else}
+                	setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;
+                {/if}
+                ">
+				<img class="state-image" 
+                    {if $v.file_name}
+                    src="{$projectUrls.projectMedia}{$v.file_name}"
+                    {else}
+                    src="{$image_root_skin}missing.jpg"
+                    {/if}                 
+                />
+				<p class="state-image-caption">
+					{$v.label}
+				</p>
+				<p class='state-count'>
+                    {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}({$states_remain_count[{$v.id}]}){/if}
+				</p>
+			</div>
                 
 			{/foreach}
             
             </div>
+		</div>
 
         {elseif $character.type=='text'}
 

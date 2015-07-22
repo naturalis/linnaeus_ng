@@ -32,7 +32,10 @@
 	ad 1: these files are always loaded, for every module, and loaded first. after
 	 being merged with $cssToLoad in Controller::setCssFiles(), they are printed in
 	 the skin's _head.tpl file.
-	ad 2: module-specific files, are always loaded, directly after $cssToLoadBase.
+	ad 2: module-specific files, are always loaded, directly after $cssToLoadBase. be
+	 aware that the file 'basics.css' *needs* to exist in the skin's style-directory
+	 for the skin to be recognized as valid. the file may be empty, as long as it's
+	 there.
 	ad 3: skin-specific files, hardcoded (with project-parametrized paths) in
 	 _head.tpl. usually printed after the files in 2), but this can be changed if
 	 need be. note that these files do not *need* to change from one skin to the next
