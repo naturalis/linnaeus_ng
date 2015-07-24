@@ -252,7 +252,7 @@ function printMenu()
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
-						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet langer onderscheidend." ))
+						.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie niet langer onderscheidend." ))
 						.replace('%VALUE%',(char.value?' '+char.value:''))
 						.replace('%SELECTED%',l);
 				}
@@ -267,7 +267,7 @@ function printMenu()
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
-						.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie nog niet onderscheidend." ))
+						.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie nog niet onderscheidend." ))
 						.replace('%VALUE%',(char.value?' '+char.value:''))
 						.replace('%SELECTED%',l);
 				}
@@ -321,7 +321,7 @@ function printMenu()
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
-					.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie niet langer onderscheidend." ))
+					.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie niet langer onderscheidend." ))
 					.replace('%VALUE%',(item.value?' '+item.value:''))
 					.replace('%SELECTED%',l);
 			}
@@ -332,7 +332,7 @@ function printMenu()
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
-					.replace('%TITLE%',__( "Dit kenmkerk is bij de huidige selectie nog niet onderscheidend." ))
+					.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie nog niet onderscheidend." ))
 					.replace('%VALUE%',(item.value?' '+item.value:''))
 					.replace('%SELECTED%',l);
 			}
@@ -475,7 +475,7 @@ function printResultsPaginated()
 
 function formatResult( data )
 {
-	//console.dir(data);
+	console.dir(data);
 	
 	if ( data.type=='taxon' )
 	{
@@ -559,9 +559,9 @@ function formatResult( data )
 
 	var thumb="";
 
-	if (data.info && data.info.url_thumb)
+	if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
 	{
-		thumb=data.info.url_thumb;
+		thumb=data.info.url_thumbnail ? data.info.url_thumbnail : data.info.url_thumb;
 		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=settings.imageRootProject+thumb;
 	}
 	else
@@ -636,9 +636,9 @@ function formatResult( data )
 				iconSimilarTpl.replace('%IMG-URL%',settings.imageRootSkin+"gelijk_grijs.png") : "")
 			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
 			.replace(/%LOCAL-ID%/g,id)
-			.replace(/%ID%/g,data.od)
+			.replace(/%ID%/g,data.id)
 			;
-			
+
 	return resultHtml;
 }
 
