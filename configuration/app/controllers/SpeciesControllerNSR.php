@@ -334,6 +334,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$has_redirect_to=isset($this->models->PageTaxon->columns['redirect_to']);
 		$has_check_query=isset($this->models->PageTaxon->columns['check_query']);
+		$has_always_hide=isset($this->models->PageTaxon->columns['always_hide']);
 
 		$categories=$this->models->PageTaxon->freeQuery("
 			select
@@ -344,6 +345,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_a.def_page,
 			".($has_redirect_to ? '_a.redirect_to,' : '')."
 			".($has_check_query ? '_a.check_query,' : '')."
+			".($has_always_hide ? '_a.always_hide,' : '')."
 				_a.show_order
 			from 
 				%PRE%pages_taxa _a
@@ -374,6 +376,11 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			foreach((array)$categories as $key=>$val)
 			{
+				if (isset($val['always_hide']) && $val['always_hide']==1)
+				{
+					continue;
+				}
+			
 				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
 					
