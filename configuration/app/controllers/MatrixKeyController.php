@@ -531,7 +531,10 @@ class MatrixKeyController extends Controller
 		)
 		{
 			$item['url_thumb']=
-				preg_replace($this->img_to_thumb_regexp_pattern,$this->img_to_thumb_regexp_replacement,$item['url_image']);
+				preg_replace(
+					$this->img_to_thumb_regexp_pattern,
+					$this->img_to_thumb_regexp_replacement,$item['url_image']
+				);
 		}
 	}
 	
