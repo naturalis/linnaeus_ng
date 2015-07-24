@@ -75,6 +75,8 @@ class MatrixKeyController extends Controller
 			array('img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//'),
 			array('img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/'),
 			array('image_orientation'=>'portrait'),
+			array('match_sort_col_predominant'=>null),
+			array('match_sort_col_after_match'=>null),
 		);
 
 	private $_nbc_image_root=true;
@@ -104,7 +106,7 @@ class MatrixKeyController extends Controller
 		$this->moduleSettings=new ModuleSettingsController;
 		$this->moduleSettings->setModuleDefaults( $this->settingsDefaults );
 		$this->moduleSettings->setModuleSettings();
-
+		
 		foreach((array)$this->settingsDefaults as $key=>$val)
 		{
 			$k=key($val);
@@ -557,6 +559,9 @@ class MatrixKeyController extends Controller
 
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 
+		if ($all) usort($all, array($this,'sortMatches'));
+
+/*
 		usort($all,function($a,$b)
 		{
 			$aa=$bb='';
@@ -582,7 +587,7 @@ class MatrixKeyController extends Controller
 			return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1 ));
 
 		});
-		
+*/		
 		return $all;
 		
 	}
@@ -1159,7 +1164,7 @@ class MatrixKeyController extends Controller
     {
 		$scores=$this->getScoresRestrictive( array('states'=>$this->getSessionStates()) );
 		//$scores = $this->getScoresLiberal( array('states'=>$this->getSessionStates(),'incUnknowns'=>$incUnknowns);
-		if ($scores) usort($scores, array($this,'sortMatchesByScoreThenLabel'));
+		if ($scores) usort($scores, array($this,'sortMatches'));
 		$this->_scores=$scores;
     }
 
@@ -1676,19 +1681,51 @@ class MatrixKeyController extends Controller
         return $results;
     }
 	
-    private function sortMatchesByScoreThenLabel( $a,$b )
+    private function sortMatches( $a,$b )
     {
-        if ($a['score'] == $b['score'])
+		/*
+			sorting strategies:
+			
+			* column name defined by setting 'match_sort_col_predominant'
+			* matching percentage (100 > 0)
+			* column name defined by setting 'match_sort_col_after_match'
+			* label
+		*/
+		
+		if ( !empty($this->match_sort_col_predominant) )
 		{
-			$aa = strtolower(strip_tags($a['label']));
-			$bb = strtolower(strip_tags($b['label']));
+			if (isset($a[$this->match_sort_col_predominant]) && isset($b[$this->match_sort_col_predominant]))
+			{
+		        if ($a[$this->match_sort_col_predominant]>$b[$this->match_sort_col_predominant]) return 1;
+		        if ($a[$this->match_sort_col_predominant]<$b[$this->match_sort_col_predominant]) return -1;
+			}
+		}
 
-            if ($aa==$bb) return 0;
+		if (isset($a['score']) && isset($b['score']))
+		{
+			if ($a['score']<$b['score']) return 1;
+			if ($a['score']>$b['score']) return -1;
+		}
 
-            return ($aa<$bb) ? -1 : 1;
-        }
+		if ( !empty($this->match_sort_col_after_match) )
+		{
+			if (isset($a[$this->match_sort_col_after_match]) && isset($b[$this->match_sort_col_after_match]))
+			{
+		        if ($a[$this->match_sort_col_after_match]>$b[$this->match_sort_col_after_match]) return 1;
+		        if ($a[$this->match_sort_col_after_match]<$b[$this->match_sort_col_after_match]) return -1;
+			}
+		}
 
-        return ($a['score']>$b['score']) ? -1 : 1;
+		if (isset($a['label']) && isset($b['label']))
+		{
+			$aa=strtolower(strip_tags($a['label']));
+			$bb=strtolower(strip_tags($b['label']));
+			if ($aa<$bb) return -1;
+			if ($aa<$bb) return 1;
+		}
+
+		return 0;
+
     }
 
 

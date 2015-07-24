@@ -227,7 +227,7 @@ function toonDier(p) {
 		type: 'POST',
 		data : ({
 			id : p.id,
-			type : p.type,
+//			type : p.type,
 			back : p.back,
 			hotwords: false,
 			navigation: false,
