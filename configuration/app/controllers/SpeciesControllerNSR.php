@@ -365,6 +365,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			where 
 				_a.project_id=".$this->getCurrentProjectId()."
+				".($has_always_hide ? 'and _a.always_hide = 0' : '')."
 
 			order by 
 				_a.show_order
@@ -376,11 +377,6 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			foreach((array)$categories as $key=>$val)
 			{
-				if (isset($val['always_hide']) && $val['always_hide']==1)
-				{
-					continue;
-				}
-			
 				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
 					$categories[$key]['is_empty']=true;
 					
