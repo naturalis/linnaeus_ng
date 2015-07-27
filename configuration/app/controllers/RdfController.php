@@ -20,9 +20,9 @@ class RdfController extends Controller
 	public $jsToLoad = array('all' => array(
 	));
 	
-    public function __construct ()
+    public function __construct ( $p=null )
     {
-        parent::__construct();
+        parent::__construct( $p );
     }
 
     public function __destruct ()
