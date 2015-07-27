@@ -41,10 +41,31 @@
                 <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-similar" src="{$image_root_skin}gelijk_grijs.png" /></td><td>{t}gelijkende soorten{/t}</td></tr>
             </table>
 		</div>  
-
-        <div class="left-divider"></div>
         
-        {capture snippet}{snippet}colofon.html{/snippet}{/capture}
+
+        {if $introduction_links[$introduction_topic_citation]}
+	        <div class="left-divider"></div>
+            <div id="clearSelectionContainer" class="facetCategories">
+                <a href="#" onclick="
+                $.get( '../introduction/topic.php?id={$introduction_links[$introduction_topic_citation].page_id}&format=plain' )
+                .success(function(data) { printInfo( data ,'{t}Hoe citeren?{/t}'); } ) ;
+                ">{t}Citeren{/t}</a>
+            </div>
+        {/if}
+
+        {if $introduction_links[$introduction_topic_versions]}
+	        <div class="left-divider"></div>
+            <div id="clearSelectionContainer" class="facetCategories">
+                <a href="#" onclick="
+                $.get( '../introduction/topic.php?id={$introduction_links[$introduction_topic_versions].page_id}&format=plain' )
+                .success(function(data) { printInfo( data ,'{t}Versiegeschiedenis{/t}'); } ) ;
+                ">{t}Versiegeschiedenis{/t}</a>
+            </div>
+        {/if}
+                
+        <div class="left-divider"></div>
+              
+        {* capture snippet}{snippet}colofon.html{/snippet}{/capture *}
         
         {if $smarty.capture.snippet|@strlen>0}
 		<div id="dataSourceContainer">   
@@ -55,3 +76,4 @@
 
 
 	</div>
+

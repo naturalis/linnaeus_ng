@@ -1248,7 +1248,7 @@ class ProjectsController extends Controller
 			
 			if ($p) {
 				
-				$this->addError(sprintf('A project with that short name name alreasy exists (%s).',$p[0]['sys_name']));
+				$this->addError(sprintf('A project with that shortname already exists (%s).',$p[0]['sys_name']));
 				unset($this->requestData['short_name']);
 				
 			}

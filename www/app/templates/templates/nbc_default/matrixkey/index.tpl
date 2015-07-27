@@ -59,6 +59,7 @@ $(document).ready(function()
 		alwaysShowDetails: {$matrix_always_show_details},
 		perPage: {$matrix_items_per_page},
 		perLine: {$matrix_items_per_line},
+		generalSpeciesInfoUrl: '{$matrix_species_info_url}'
 	});
 
 	setScores($.parseJSON('{$session_scores}'));
@@ -102,7 +103,8 @@ var genderHtmlTpl = '';
 
 var matrixLinkHtmlTpl = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT%</a>';
 
-var remoteLinkClickHtmlTpl = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
+//var remoteLinkClickHtmlTpl = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
+var remoteLinkClickHtmlTpl = 'onclick="doRemoteLink(\'%REMOTE-LINK%\',\'%SCI-NAME%\');" title="%TITLE%"';
 
 var statesClickHtmlTpl = 'onclick="toggleDetails(\'%LOCAL-ID%\');return false;"title="%TITLE%"';
 
@@ -208,6 +210,16 @@ var searchHeaderHtmlTpl='\
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSearch();return false;">%BACK-TEXT%</a> \
 ';
+
+var infoDialogHtmlTpl=' \
+<div style="text-align:left;width:400px"> \
+<style> \
+p { \
+	margin-bottom:15px; \
+} \
+</style> \
+%BODY%</div>';
+
 </script>
 
 
