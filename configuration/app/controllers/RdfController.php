@@ -76,11 +76,16 @@ class RdfController extends Controller
 								'id'=>$data[0]['actor_id']
 							)
 						));
+						unset($actor[0]['created']);
+						unset($actor[0]['last_change']);
 						$data[0]['actor']=$actor[0];
 					}
 					break;
 				default : $data=null;
 			}
+			
+			unset($data[0]['created']);
+			unset($data[0]['last_change']);
 			
 			$rdf[$key]['data']=$data[0];
 			
