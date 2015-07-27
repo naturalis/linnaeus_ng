@@ -41,6 +41,10 @@ echo $fuck['Content-Type'];
 
 die();
 */
+
+var_dump($p);
+
+
         parent::__construct($p);
 		$this->initialise();
     }

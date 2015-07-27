@@ -214,6 +214,7 @@ class Controller extends BaseClass
     public function __construct ($p=null)
     {
 
+var_dump($p);
         parent::__construct();
 
         $this->setControllerParams($p);
@@ -1633,6 +1634,10 @@ die();
 
     private function setControllerParams ($params)
     {
+		
+		var_dump($params);
+		
+		
         if (isset($params['checkForSplash']))
             $this->setCheckForSplash($params['checkForSplash']);
         if (isset($params['checkForProjectId']))
