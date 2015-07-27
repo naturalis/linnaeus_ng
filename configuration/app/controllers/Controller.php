@@ -1529,9 +1529,6 @@ die();
 
     private function getCheckForProjectId ()
     {
-		
-		echo 3,'<br />';
-		var_dump($this->_checkForProjectId);
         return $this->_checkForProjectId;
     }
 
