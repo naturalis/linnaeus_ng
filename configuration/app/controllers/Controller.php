@@ -1663,6 +1663,9 @@ die();
 
     private function setCheckForProjectId ($state)
     {
+		echo 1;
+		var_dump($state);
+		
         if (is_bool($state))
             $this->_checkForProjectId = $state;
     }
