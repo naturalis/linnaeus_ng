@@ -221,7 +221,7 @@ class Controller extends BaseClass
 
 print_r($this->getCheckForSplash());
 print_r($this->setCheckForProjectId());
-
+die();
         $this->setPhpIniVars();
 
         $this->setDebugMode();
