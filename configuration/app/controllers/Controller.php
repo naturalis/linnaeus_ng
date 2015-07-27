@@ -86,8 +86,6 @@ var_dump($p);
         parent::__construct();
 
         $this->setControllerParams($p);
-
-die();
         $this->setPhpIniVars();
 
         $this->setDebugMode();
@@ -115,7 +113,7 @@ die();
             $this->checkForProjectId();
 
         }
-
+die();
 		$this->emptyCacheFolderByRequest();
 
         $this->restoreState();
