@@ -1496,10 +1496,6 @@ die();
 
     private function setControllerParams ($params)
     {
-		
-		var_dump($params);
-		
-		
         if (isset($params['checkForSplash']))
             $this->setCheckForSplash($params['checkForSplash']);
         if (isset($params['checkForProjectId']))
