@@ -139,9 +139,15 @@ class IntroductionController extends Controller
 			$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
 
 		}
-
-        $this->printPage();
-
+		
+		if ( $this->rHasVal('format','plain') )
+		{
+	        $this->printPage('topic_plain');
+		}
+		else
+		{
+	        $this->printPage();
+		}
     }
 
 

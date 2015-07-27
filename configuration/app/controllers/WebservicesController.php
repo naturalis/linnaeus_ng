@@ -32,15 +32,6 @@ class WebservicesController extends Controller
 
     public function __construct($p=null)
     {
-/*
-		$url = 'http://soortenregister-development-001.cloud.naturalis.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=Lacerta%20agilis&cat=154';
-echo '<pre>';
-$fuck=get_headers($url, 1);
-print_r($fuck);
-echo $fuck['Content-Type'];
-
-die();
-*/
         parent::__construct($p);
 		$this->initialise();
     }
@@ -1155,13 +1146,14 @@ parameters:
 
 	private function checkTaxonId()
 	{
-		if (!$this->rHasVal('taxon')) {
-
+		if (!$this->rHasVal('taxon'))
+		{
 			$this->addError('no taxon name specified.');
+		} 
+		else
+		{
 
-		} else {
-			
-			$taxon=trim($this->requestData['taxon']);
+			$taxon=trim(strip_tags($this->requestData['taxon']));
 			
 			$this->setMatchType('literal');
 
@@ -1172,8 +1164,8 @@ parameters:
 				)
 			));
 
-			if (!$t) {
-				
+			if (!$t)
+			{
 				$this->setMatchType('name only');
 
 				$t = $this->models->Names->freeQuery("
@@ -1187,12 +1179,14 @@ parameters:
 						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
 						and _b.nametype = 'isValidNameOf'"
 				);
-
 			}
 		
-			if (!$t) {
-				$this->addError('taxon name "'.$this->requestData['taxon'].'" not found in this project.');
-			} else {
+			if (!$t)
+			{
+				$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
+			} 
+			else
+			{
 				$this->setTaxonId($t[0]['id']);
 				return $t;
 			}

@@ -28,7 +28,8 @@ class MatrixKeyController extends Controller
         'nbc_extras', 
         'variation_relations',
 		'gui_menu_order',
-		'module_settings'
+		'module_settings',
+		'content_introduction'
     );
 
     public $controllerPublicName = 'Matrix key';
@@ -44,6 +45,8 @@ class MatrixKeyController extends Controller
 	private $_related=null;
 	private $_searchTerm=null;
 	private $_searchResults=null;
+	private $_introductionLinks=null;
+	
 
 	private $calc_char_h_val=true;
 	private $allow_empty_species=true;
@@ -77,6 +80,9 @@ class MatrixKeyController extends Controller
 			array('image_orientation'=>'portrait'),
 			array('match_sort_col_predominant'=>null),
 			array('match_sort_col_after_match'=>null),
+			array('species_info_url'=>null),
+			array('introduction_topic_citation'=>'Matrix citation'),
+			array('introduction_topic_versions'=>'Matrix version history'),
 		);
 
 	private $_nbc_image_root=true;
@@ -125,9 +131,14 @@ class MatrixKeyController extends Controller
 		{
 			$this->printGenericError($this->translate('No matrices have been defined.'));
 		}
+		
+		$this->setIntroductionLinks();
 
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
 		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
+		$this->smarty->assign('introduction_links', $this->getIntroductionLinks());
+		$this->smarty->assign('introduction_topic_citation', $this->introduction_topic_citation);
+		$this->smarty->assign('introduction_topic_versions', $this->introduction_topic_versions);
 
 		$this->setMenu();
 
@@ -153,6 +164,8 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('matrix_score_threshold', $this->score_threshold);
 		$this->smarty->assign('matrix_items_per_line', $this->items_per_line);
 		$this->smarty->assign('matrix_items_per_page', $this->items_per_page);
+		$this->smarty->assign('matrix_species_info_url', $this->species_info_url);
+
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 
 
@@ -510,8 +523,6 @@ class MatrixKeyController extends Controller
         return $hValue * ($this->controllerSettings['useCorrectedHValue'] == true ? $corrFactor : 1);
     }
 
-
-
     private function setDataSet()
     {
 		$this->_dataSet=$this->getAllIdentifiableEntities();
@@ -522,6 +533,7 @@ class MatrixKeyController extends Controller
 		return $this->_dataSet;
 	}
 	
+
 	private function induceThumbNailFromImage( &$item )
 	{
 		if( 
@@ -531,13 +543,14 @@ class MatrixKeyController extends Controller
 		)
 		{
 			$item['url_thumb']=
-				preg_replace(
+				@preg_replace(
 					$this->img_to_thumb_regexp_pattern,
-					$this->img_to_thumb_regexp_replacement,$item['url_image']
+					$this->img_to_thumb_regexp_replacement,
+					$item['url_image']
 				);
 		}
 	}
-	
+
 	private function getAllIdentifiableEntities()
 	{
 		$taxa=$this->getTaxaInMatrix();
@@ -563,34 +576,7 @@ class MatrixKeyController extends Controller
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 
 		if ($all) usort($all, array($this,'sortMatches'));
-
-/*
-		usort($all,function($a,$b)
-		{
-			$aa=$bb='';
-
-			if ($a['type']=='taxon')
-				$aa=$a['taxon'];
-			else
-			if ($a['type']=='variation')
-				$aa=$a['taxon']['taxon'];
-			else
-			if ($a['type']=='matrix')
-				$aa=$a['label'];
-
-			if ($b['type']=='taxon')
-				$bb=$b['taxon'];
-			else
-			if ($b['type']=='variation')
-				$bb=$b['taxon']['taxon'];
-			else
-			if ($b['type']=='matrix')
-				$bb=$b['label'];
-
-			return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1 ));
-
-		});
-*/		
+		
 		return $all;
 		
 	}
@@ -714,6 +700,8 @@ class MatrixKeyController extends Controller
 
 	// REFAC2015: should be moved to kenmerkenmodule!!!!!
 	// maybe rethink location of thumbs & images?
+	// rethink induceThumbNailFromImage() as well
+	// and induceEncTypeFromRemoteUrl()
     private function getAllNBCExtras()
     {
 		if ( !$this->models->NbcExtras->getTableExists() )
@@ -2174,5 +2162,42 @@ class MatrixKeyController extends Controller
 	{
 		return $this->moduleSettings->getModuleSetting( $p );
 	}
+
+	private function setIntroductionLinks()
+    {
+		$a=$this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'topic' => $this->introduction_topic_citation
+				),
+				'columns'=>'page_id,topic,content'
+			)
+		);
+
+		$b=$this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'topic' => $this->introduction_topic_versions
+				),
+				'columns'=>'page_id,topic,content'
+			)
+		);
+
+		$this->_introductionLinks=array(
+			$this->introduction_topic_citation=>$a ? $a[0] : null,
+			$this->introduction_topic_versions=>$b ? $b[0] : null,
+		);
+    }
+	
+	private function getIntroductionLinks()
+	{
+		return $this->_introductionLinks;
+	}
+
+
 
 }	

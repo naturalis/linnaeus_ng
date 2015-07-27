@@ -28,7 +28,8 @@ var settings={
 	lastPage: 0,
 	scoreThreshold: 0,
 	mode: "identify", // similar, search
-	groupsAlwaysOpen: false
+	groupsAlwaysOpen: false,
+	generalSpeciesInfoUrl: ""
 };
 
 var data={
@@ -50,6 +51,14 @@ var tempstatevalue="";
 var openGroups=Array();
 var searchedfor="";
 
+var	labels={
+	details: __('onderscheidende kenmerken'),
+	similar: __('gelijkende soorten'),
+	show_all: __('alle onderscheidende kenmerken tonen'),
+	hide_all: __('kenmerken verbergen'),
+	info_link: __('Meer informatie over soort/taxon'),
+	info_dialog_title:__('Informatie over soort/taxon')
+}
 
 function retrieveDataSet()
 {
@@ -66,6 +75,7 @@ function retrieveDataSet()
 		}),
 		success : function ( d )
 		{
+			//console.log( d );
 			setDataSet($.parseJSON( d ));
 			applyScores();
 			clearResults();
@@ -475,8 +485,6 @@ function printResultsPaginated()
 
 function formatResult( data )
 {
-	//console.dir(data);
-	
 	if ( data.type=='taxon' )
 	{
 		//var sciName=data.label;
@@ -510,7 +518,7 @@ function formatResult( data )
 			if (state.characteristic==undefined)
 				continue;
 			
-			var labels = Array();
+			var statelabels = Array();
 			
 			if (state.characteristic.indexOf('|')!=false)
 			{
@@ -524,16 +532,16 @@ function formatResult( data )
 			
 			for(var j in state.states)
 			{
-				labels.push(state.states[j].label);
+				statelabels.push(state.states[j].label);
 			}
 
-			if (labels.length>1)
+			if (statelabels.length>1)
 			{
-				var l = labels.join('; ');
+				var l = statelabels.join('; ');
 			}
 			else
 			{
-				var l = labels[0];
+				var l = statelabels[0];
 			}
 
 			states.push(
@@ -616,12 +624,13 @@ function formatResult( data )
 			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
 				remoteLinkClickHtmlTpl
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
-					.replace('%TITLE%', nbcLabelExternalLink)
+					.replace('%TITLE%', labels.info_link)
+					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
 				iconUrlHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
-			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',nbcLabelDetails) : "")
+			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',labels.details) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
 				iconInfoHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
@@ -629,7 +638,7 @@ function formatResult( data )
 				relatedClickHtmlTpl
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
-					.replace('%TITLE%', nbcLabelSimilarSpecies)
+					.replace('%TITLE%', labels.similar)
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
@@ -1109,7 +1118,7 @@ function printSimilarHeader()
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
-			.replace('%SHOW-STATES-TEXT%', nbcLabelShowAll)
+			.replace('%SHOW-STATES-TEXT%', labels.show_all)
 			.replace('%NUMBER-START%', settings.start+1)
 			.replace('%NUMBER-END%', data.resultset.length)
 	).removeClass('hidden').addClass('visible');
@@ -1123,12 +1132,12 @@ function toggleAllDetails()
 	if ($('.result-detail:visible').length < getResultSet().length)
 	{
 		$('.result-detail').toggle(true);
-		$('#showAllLabel').html(nbcLabelHideAll);
+		$('#showAllLabel').html(labels.hide_all);
 	}
 	else
 	{
 		$('.result-detail').toggle(false);
-		$('#showAllLabel').html(nbcLabelShowAll);
+		$('#showAllLabel').html(labels.show_all);
 	}
 
 }
@@ -1431,32 +1440,51 @@ function showRestartButton()
 	$('#clearSelectionContainer').removeClass('ghosted');
 }
 
+function doRemoteLink( url, name )
+{
+	if (settings.generalSpeciesInfoUrl.length>0)
+	{
+		setCursor('wait');
 
+		var url=settings.generalSpeciesInfoUrl
+			.replace('%PID%',settings.projectId)
+			.replace('%TAXON%',name);
+			
+		$.ajax({
+			url : url,
+			type: 'GET',
+			dataType: "jsonp",
+			success : function ( data )
+			{
+				//console.dir( data );
+				printInfo( data.page.body, labels.info_dialog_title );
+				setCursor();
+			}
+		});
+	}
+	else
+	if (url.length>0)
+	{
+		window.open( url, "_blank" );
+	}
+}
 
+function printInfo( info, title )
+{
+	if (info)
+	{
+		showDialog(title,infoDialogHtmlTpl.replace('%BODY%',info),{showOk:false});
+	}
+}
 
 function matrixInit()
 {
-	nbcLabelClose = __('sluiten');
-	nbcLabelDetails = __('onderscheidende kenmerken');
-	nbcLabelBack = __('terug');
-	nbcLabelSimilarSpecies = __('gelijkende soorten');
-	nbcLabelShowAll = __('alle onderscheidende kenmerken tonen');
-	nbcLabelHideAll = __('kenmerken verbergen');
-	nbcLabelExternalLink = __('Meer informatie over soort/taxon');
+	//nbcLabelClose = __('sluiten');
+	//nbcLabelBack = __('terug');
 
-	$('#legendDetails').html(nbcLabelDetails);
-	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
-	$('#legendExternalLink').html(nbcLabelExternalLink);
+	$('#legendDetails').html( labels.details );
+	$('#legendSimilarSpecies').html( labels.similar );
+	$('#legendExternalLink').html( labels.info_link );
 
 	settings.defaultSpeciesImage=settings.defaultSpeciesImages[settings.imageOrientation];
-
-	/*
-	if ("ontouchstart" in document) {
-		// touch only code (tablets)
-		$('#legendDivider').removeClass('hidden'); // show icon legend
-		$('#legendContainer').removeClass('hidden'); // show icon legend
-	} else {
-		// "desktop" code
-	}
-	*/
 }
