@@ -1627,12 +1627,16 @@ class Controller extends BaseClass
 
 	}
 
-    private function setControllerParams ($params)
+    private function setControllerParams ($p)
     {
-        if (isset($params['checkForSplash']))
-            $this->setCheckForSplash($params['checkForSplash']);
-        if (isset($params['checkForProjectId']))
-            $this->setCheckForProjectId($params['checkForProjectId']);
+        if (isset($p['checkForSplash']))
+		{
+            $this->setCheckForSplash($p['checkForSplash']);
+		}
+        if (isset($p['checkForProjectId']))
+		{
+            $this->setCheckForProjectId($p['checkForProjectId']);
+		}
     }
 
 
