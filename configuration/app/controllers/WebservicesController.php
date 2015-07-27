@@ -32,7 +32,7 @@ class WebservicesController extends Controller
 
     public function __construct($p=null)
     {
-
+/*
 		$url = 'http://soortenregister-development-001.cloud.naturalis.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=Lacerta%20agilis&cat=154';
 echo '<pre>';
 $fuck=get_headers($url, 1);
@@ -40,7 +40,7 @@ print_r($fuck);
 echo $fuck['Content-Type'];
 
 die();
-
+*/
         parent::__construct($p);
 		$this->initialise();
     }

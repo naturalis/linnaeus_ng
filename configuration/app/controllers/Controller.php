@@ -218,6 +218,10 @@ class Controller extends BaseClass
 
         $this->setControllerParams($p);
 
+
+print_r($this->getCheckForSplash());
+print_r($this->setCheckForProjectId());
+
         $this->setPhpIniVars();
 
         $this->setDebugMode();
