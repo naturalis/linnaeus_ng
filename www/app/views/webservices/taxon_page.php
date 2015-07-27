@@ -5,3 +5,4 @@ require_once ('../../../../configuration/app/controllers/WebservicesController.p
 $c = new WebservicesController(array('checkForProjectId'=>false,'checkForSplash'=>false));
 
 $c->taxonPageAction();
+
