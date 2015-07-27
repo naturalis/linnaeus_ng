@@ -81,11 +81,10 @@ class Controller extends BaseClass
      */
     public function __construct ($p=null)
     {
-
-var_dump($p);
         parent::__construct();
 
         $this->setControllerParams($p);
+
         $this->setPhpIniVars();
 
         $this->setDebugMode();

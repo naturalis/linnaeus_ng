@@ -41,8 +41,7 @@ echo $fuck['Content-Type'];
 
 die();
 */
-
-       parent::__construct($p);
+        parent::__construct($p);
 		$this->initialise();
     }
 
