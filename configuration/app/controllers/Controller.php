@@ -1,136 +1,4 @@
 <?php
-/*
-
-	on skins:
-	if the setting (in the table 'settings') for 'skin' exists, that skin is used
-	providing the follwing directories exist ($this->doesSkinExist()):
-		app/style/[skinname]/
-		app/media/system/skins/[skinname]/
-		app/templates/templates/[skinname]/[controller basename]/
-	please note they have to exist, even if they remain empty!
-	in all other cases, the skin named in $this->generalSettings['app']['skinName'] is
-	used. example, for a project with the skin "original_skin", the following
-	directories have to exist:
-		"www/linnaeus_ng/www/app/style/original_skin/"
-		"www/linnaeus_ng/www/app/media/system/skins/original_skin/"
-		"www/linnaeus_ng/www/app/templates/templates/original_skin/matrixkey/"
-	otherwise, the default skin, "linnaeus_2", will be used.
-	one exception to all this are the webservices. all views in
-		app/views/webservices/
-	have no design, therefore no skin. their templates all reside in:
-		app/templates/templates/webservices
-
-
-	on stylesheets:
-	there are five location where included .css files and styles can be specified:
-		____source__________scope___________location_____________________________
-		1)	$cssToLoadBase	global			declared in Controller
-		2)	$cssToLoad		module			declared in [Module]Controller
-		3)	hardcoded		skin			printed in _head.tpl
-		4)	dynamic			skin/project	utilities\dynamic-css.tpl
-		5)  dynamic			project			app/style/custom/[pId].css or app/style/custom/[pId]--[project name].css or
-	ad 1: these files are always loaded, for every module, and loaded first. after
-	 being merged with $cssToLoad in Controller::setCssFiles(), they are printed in
-	 the skin's _head.tpl file.
-	ad 2: module-specific files, are always loaded, directly after $cssToLoadBase. be
-	 aware that the file 'basics.css' *needs* to exist in the skin's style-directory
-	 for the skin to be recognized as valid. the file may be empty, as long as it's
-	 there.
-	ad 3: skin-specific files, hardcoded (with project-parametrized paths) in
-	 _head.tpl. usually printed after the files in 2), but this can be changed if
-	 need be. note that these files do not *need* to change from one skin to the next
-	 but may do so. an example is the styling of the jQuery-ui dialog.
-	 most skins also include 'cssreset-min.css' and several css-files aimed
-	 specifically at internet explorer in the _head.tpl file.
-	ad 4: the function UtilitiesController::dynamicCssAction() makes it possible to
-	 create dynamic css-data. it prints the template file dynamic-css.tpl,
-	 which exists (and can be altered) in each skin. this smarty-template allows for
-	 conditional formatting based on project id and other variables that are
-	 available to it (in a somewhat cumbersome fashion, as the shared use of the
-	 accolade by css and smarty probably requires a lot of {literal}-tags). the file
-	 is printed with a 'Content-type:text/css'-header, and printed in all _head.tpl
-	 files after being merged with $cssToLoad in Controller::setCssFiles().
-	ad 5: the last thing Controller::setCssFiles() looks for is an optional project-
-	 specific stylesheet either called "0023.css" or "0023--imaginary-beings.css",
-	 where 23 is the project ID and "imaginary beings" is the project's system name.
-
-
-	on caching:
-	the cache-folder can be found at:
-		[htdocs]/linnaeus_ng/www/shared/cache/[project-code]/
-	'project-code' being the system project-code (formatted as '0023').
-	to clear the cache, add
-		clearcache=1
-	to the url. this will delete all the project's cache-files. please note that in
-	many cases, the application will immediately create one or more new cache-files, so
-	don't be fooled into thinking clearing of the cache hasn't worked because there are
-	still files in the directory. make sure to remove the "clearcache" from the URL
-	afterwards, otherwise it will propagate through your session, deleting the
-	cache-files at every next page.
-	to suppress caching, set the variable $useCache to false. doing so will stop the
-	application from both storing and retrieving data from the cache. existing cache-
-	files will remain intact.
-
-
-	on translations:
-	after repeated problems with the "official" getText() functions, the function has
-	been replaced with a custom one:
-		translate($str)
-	this function fetches the translation based on the current setting of the language id.
-	if no translation exists, it saves the string into the table of strings to be
-	translated, and returns it unchanged. the functions:
-		javascriptTranslate()
-		smartyTranslate()
-	are wrappers for accessing translate() from javascript - via the function _() in
-	main.js - and smarty - via the registered block function {t}{/t} - respectively.
-
-
-	on the icon grid:
-	order of modules in the icon grid and the main menu is determined by two fields:
-		ModuleProject.show_order
-		FreeModuleProject.show_order
-	or just the first one, if there are no free modules. THERE IS NO INTERFACE FOR
-	CHANGING THESE VALUES, so changes will have to be made by hand, directly in the
-	tables. when changing these values, bear in mind that your list of modules is
-	ordered after having been combined from the normal modules (ModuleProject) and
-	possible free modules (FreeModuleProject). this means that the values for
-	show_order have to be unique across two tables; again, these is at present no
-	mechanism that actually enforces this - it is up to the system administrator.
-
-
-	on snippets:
-	to allow for the inclusion of project-dependent bits of html into general templates,
-	there is the concept of the snippet. snippets are bit of html-code that are included
-	in template if they exist for the current project. they are included like this:
-		{snippet}matrix_main_menu.html{/snippet}
-	after which the function smartyTranslateGetSnippet searches for the specified file
-	in the projects snippet-folder, which is
-		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/[project-code]/
-	if the file (or the directory) doesn't exist, nothing is included, and no error is
-	generated.
-	if a snippet contains text and a project is multi-lingual, the snippet code can be
-	parametrized with the language ID, like this:
-		{snippet language=$currentLanguageId}titles.html{/snippet}
-	the smarty variable '$currentLanguageId' is assigned by default (in preparePage()),
-	and is always available. when the language ID is thus specified, the system looks
-	for a file with that ID (formatted in a similar fashion as the pId, preceded by '--')
-	added after the	file's name, before the extension. if that file does not exist,
-	the system looks a file with a regular name (without the added ID) instead. so, if
-	this is included:
-		{snippet language=$currentLanguageId}titles.html{/snippet}
-	and $currentLanguageId is '24', the system will first look in the snippet-folder for
-		titles--0024.html
-	and if that doesn't exist, for
-		titles.html
-	please note the files are included "as is", and are not run through any server-side 
-	interperter; therefore php or smarty-codes won't work. javascript will, however, so 
-	it can be used for google analytics-codes, which can be different per project.
-	snippets can also be useful for inlcuding bits of html that depend on which OTAP-server
-	you're working on (like "noindex" tags on development servers). note that this last
-	strategy only works if the _snippets folder is not included in SVN, so it doesn't
-	automatically appear on the production-environment.
-
-*/
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
@@ -219,9 +87,6 @@ var_dump($p);
 
         $this->setControllerParams($p);
 
-
-var_dump($this->getCheckForSplash());
-var_dump($this->setCheckForProjectId());
 die();
         $this->setPhpIniVars();
 
@@ -1674,6 +1539,9 @@ die();
 
     private function getCheckForProjectId ()
     {
+		
+		echo 3,'<br />';
+		var_dump($this->_checkForProjectId);
         return $this->_checkForProjectId;
     }
 
