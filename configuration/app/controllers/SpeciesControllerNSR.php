@@ -223,7 +223,7 @@ class SpeciesControllerNSR extends SpeciesController
 	
 				}
 				
-				// need to be moved to function
+				// REFAC2015 --> needs to be moved to function
 				if (isset($content['rdf']))
 				{
 					$name=$url=null;	
