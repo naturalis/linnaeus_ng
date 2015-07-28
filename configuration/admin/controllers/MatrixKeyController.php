@@ -697,7 +697,8 @@ class MatrixKeyController extends Controller
             
             $c = $this->getCharacteristicStates($this->requestData['sId']);
             
-            if ($this->rHasVal('r', 'alph') || $this->rHasVal('r', 'num')) {
+            if ($this->rHasVal('r', 'alph') || $this->rHasVal('r', 'num'))
+			{
 
                 foreach((array)$c as $val) {
                     $assoc[$val['label']] = $val['id'];
@@ -711,9 +712,9 @@ class MatrixKeyController extends Controller
 	            	natcasesort($sort);
             
 	            $i=0;
-	            foreach((array)$sort as $val)
-	                $this->updateStateShowOrder($assoc[$val],$i++);
-					
+	            foreach((array)$c as $val)
+	                $this->updateStateShowOrder($val['id'],$i++);
+
 				$this->addMessage('Re-sorted state.');
 	            
 

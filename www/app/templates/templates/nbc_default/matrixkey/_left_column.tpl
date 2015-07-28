@@ -41,6 +41,31 @@
                 <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-similar" src="{$image_root_skin}gelijk_grijs.png" /></td><td>{t}gelijkende soorten{/t}</td></tr>
             </table>
 		</div>  
+
+                {* capture snippet}{snippet}colofon.html{/snippet}{/capture}
+                
+                <div class="left-divider"></div>
+        
+                {if $smarty.capture.snippet|@strlen>0}
+                <div id="dataSourceContainer">   
+                {$smarty.capture.snippet}
+                </div>  
+                {/if *}        
+        
+        {if $introduction_links[$introduction_topic_colophon]}
+	        <div class="left-divider"></div>
+            <div id="dataSourceContainer">   
+            <script>
+			$(document).ready(function()
+			{
+                $.get( '../introduction/topic.php?id={$introduction_links[$introduction_topic_colophon].page_id}&format=plain' )
+                .success(function(data) { $('#dataSourceContainer').html( data ); } ) ;
+			});
+			</script>
+            </div>
+        {/if}        
+        
+        
         
 
         {if $introduction_links[$introduction_topic_citation]}
@@ -62,18 +87,8 @@
                 ">{t}Versiegeschiedenis{/t}</a>
             </div>
         {/if}
-                
-        <div class="left-divider"></div>
-              
-        {* capture snippet}{snippet}colofon.html{/snippet}{/capture *}
-        
-        {if $smarty.capture.snippet|@strlen>0}
-		<div id="dataSourceContainer">   
-		{$smarty.capture.snippet}
-		</div>  
-        <div class="left-divider"></div>
-        {/if}
 
+        <div class="left-divider"></div>
 
 	</div>
 

@@ -1430,7 +1430,8 @@ function getCharacter( id )
 
 function disableImgContextMenu()
 {
-    $("img").on("contextmenu",function(){
+    $("img").on("contextmenu",function()
+	{
        return false;
     });
 }
