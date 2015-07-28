@@ -380,7 +380,8 @@ $includeClassification=true;
 					$l=0;
 					$c=$this->models->MediaTaxon->freeQuery("		
 						select
-							concat('".$imageBaseUrl."',file_name) as url,
+							concat('".$imageBaseUrl."',_m.file_name) as url,
+							_m.mime_type as mime_type,
 							_c.meta_data as photographer_name,
 							date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
 							_meta2.meta_data as short_description,
