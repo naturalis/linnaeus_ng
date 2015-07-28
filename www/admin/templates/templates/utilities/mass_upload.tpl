@@ -2,14 +2,13 @@
 
 <div id="page-header-localmenu">
 <div id="page-header-localmenu-content">
-    <a href="browse_media.php" class="allLookupLink">{t}Browse images{/t}</a>
-    &nbsp;&nbsp;
     <a href="mass_upload.php" class="allLookupLink">{t}Mass upload images{/t}</a>
+    &nbsp;&nbsp;
+    <a href="browse_media.php" class="allLookupLink">{t}Browse images{/t}</a>
 </div>
 </div>
 
 <div id="page-main">
-
 
 <form enctype="multipart/form-data" action="" method="post">
 <p>
@@ -57,6 +56,49 @@ Current server-limited maximum on file uploads: {$iniSettings.maximum}MB
 <b>{t}Uploading multiple files at once{/t}</b><br />
 {t}In the current HTML-specification there are no cross-broswer possibilities for the uploading of multiple files at once without resorting to Flash or Java. Despite this limitation, you can upload several images at once by adding them to a ZIP-archive and uploading that file. The application will unpack the ZIP-file and store the separate files contained within. To the files within a ZIP-file the same limitations with regards to format and size apply as to files that are uploaded normally.{/t}
 </p>
+
+<p>
+<b>Temporary alternative</b><br />
+Drag & drop files below. Be aware: same limitations in regards to size and format apply, but you won't
+get any feedback when they are enforced. You <i>can</i> drag & drop multiple files at once, though.<br />
+Wait for the upload of all dropped files to finish before leaving this page; take care, progress bars
+and status icons appear as overlays and can be a little tricky to see against a white background.<br />
+Not sure whether there is a limit on the number of files you can drop at once, but circa 200 files in
+one drop seemed to work fine.<br />
+This uploader never overwrites, always makes a new copy of a duplicate file by adding "(1)" etc. To avoid
+duplicates, delete old file first via the <a href="browse_media.php">browse page</a>. That page now also
+includes an option to delete all files in the project media directory with one action.
+<script src="../../javascript/dropzone/dropzone.js"></script>
+<link rel="stylesheet" href="../../javascript/dropzone/dropzone.css">
+
+<script >
+Dropzone.options.myAwesomeDropzone = {
+  init: function() {
+    this.on("addedfile", function(file)
+	{
+		$('#noise').html("Added " + file.name);
+	});
+    this.on("success", function(file)
+	{
+		$('#noise').html("Uploaded" + file.name);
+	});
+  }
+};
+</script>
+<p id=noise></p>
+<form action="mass_upload.php"
+      class="dropzone"
+      id="my-awesome-dropzone"></form>
+
+</p>      
+
+
+
+
+
+
+
+
 </div>
 
 
