@@ -246,6 +246,21 @@ class UtilitiesController extends Controller
 
 	}
 
+	public function deleteFile($id)
+	{
+		if (isset($_SESSION['admin']['system']['mediaFiles']['files'][$id]))
+		{
+			return unlink($this->getProjectsMediaStorageDir().$_SESSION['admin']['system']['mediaFiles']['files'][$id]);
+		} 
+		else 
+		{
+			$this->addError('Unknown file index.');
+			return false;
+		}
+	}
+
+
+
 	public function browseMediaAction()
 	{
 
@@ -253,49 +268,40 @@ class UtilitiesController extends Controller
 
 		$this->setPageName('Browse media');
 
-		function deleteFile($id) {
-
-			if (isset($_SESSION['admin']['system']['mediaFiles']['files'][$id])) {
-
-				return unlink(UtilitiesController::getProjectsMediaStorageDir().$_SESSION['admin']['system']['mediaFiles']['files'][$id]);
-
-			} else {
-
-				$this->addError('Unknown file index.');
-
-				return false;
-
-			}
-
-		}
-
 		if ($this->rHasVal('action','delete') && $this->rHasId()) {
 
-			if (deleteFile($this->requestData['id'])) {
-
+			if ($this->deleteFile($this->requestData['id']))
+			{
 				$this->redirect('browse_media.php#');
-
 			}
 
 		} else
 		if ($this->rHasVal('action','delete') && $this->rHasVal('delete') && !$this->isFormResubmit()) {
 
-			foreach((array)$this->requestData['delete'] as $val) {
-
-				deleteFile($val);
-
+			foreach((array)$this->requestData['delete'] as $val)
+			{
+				$this->deleteFile($val);
 			}
 
+		} else
+		if ($this->rHasVal('action','purge') && !$this->isFormResubmit())
+		{
+			foreach(glob($this->getProjectsMediaStorageDir().'/*') as $file)
+			{
+				if (filetype($file)=='file')
+				{
+					unlink($file);
+				}
+			}
 		}
 
-		foreach(glob($this->getProjectsMediaStorageDir().'/*') as $file) {
-
+		foreach(glob($this->getProjectsMediaStorageDir().'/*') as $file)
+		{
 			if (filetype($file)=='dir')
 					$r['dirs'][] = basename($file);
 			else
 			if (filetype($file)=='file')
 					$r['files'][] = basename($file);
-
 		}
 
 		$_SESSION['admin']['system']['mediaFiles'] = $r;
