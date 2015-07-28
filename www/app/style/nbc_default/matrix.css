@@ -422,8 +422,12 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 
-/* landscape overrides 
+.homepage #content, .conceptcard #content {
+    margin-top:-16px;
+}
 
+
+/* landscape overrides  // now in seperate file
 .result {
     width: 222px;
 	margin:15px 15px 10px 0;

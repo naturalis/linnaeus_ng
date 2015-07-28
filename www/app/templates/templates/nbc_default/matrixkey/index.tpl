@@ -1,11 +1,5 @@
 {include file="../shared/header.tpl"}
 
-<style>
-.homepage #content, .conceptcard #content {
-    margin-top:-16px;
-}
-</style>
-
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -46,6 +40,14 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+	{if $matrix_image_orientation=="landscape"}
+		$("<link/>", {
+		   rel: "stylesheet",
+		   type: "text/css",
+		   href: "{$projectUrls.projectCSS}/matrix_landscape.css"
+		}).appendTo("head");	
+	{/if}
+	
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
