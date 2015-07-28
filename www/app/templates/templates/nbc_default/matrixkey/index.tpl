@@ -173,13 +173,18 @@ var menuLoneCharHtmlTpl='\
 	%SELECTED% \
 </li> \
 ';
-var menuLoneCharDisabledHtmlTpl='<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
+var menuLoneCharDisabledHtmlTpl=
+	'<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
+/*
 var menuLoneCharEmergentDisabledHtmlTpl='\
 <li class="inner ungrouped %CLASS%" title="%TITLE%"> \
-	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
+	<a class="facetLink emergent_disabled" href="#" ondblclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
 	%SELECTED% \
 </li> \
 ';
+*/
+var menuLoneCharEmergentDisabledHtmlTpl=
+	'<li class="inner emergent_disabled %CLASS%" title="%TITLE%" ondblclick="showStates(%ID%);return false;">(%LABEL%%VALUE%) %SELECTED% </li>';
 var menuCharHtmlTpl=menuLoneCharHtmlTpl.replace('ungrouped ','');
 var menuCharDisabledHtmlTpl=menuLoneCharDisabledHtmlTpl.replace('ungrouped ','');
 var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace('ungrouped ','');

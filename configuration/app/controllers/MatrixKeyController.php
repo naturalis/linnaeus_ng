@@ -83,6 +83,7 @@ class MatrixKeyController extends Controller
 			array('species_info_url'=>null),
 			array('introduction_topic_citation'=>'Matrix citation'),
 			array('introduction_topic_versions'=>'Matrix version history'),
+			array('introduction_topic_colophon'=>'Matrix colophon'),
 		);
 
 	private $_nbc_image_root=true;
@@ -139,6 +140,9 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('introduction_links', $this->getIntroductionLinks());
 		$this->smarty->assign('introduction_topic_citation', $this->introduction_topic_citation);
 		$this->smarty->assign('introduction_topic_versions', $this->introduction_topic_versions);
+		$this->smarty->assign('introduction_topic_colophon', $this->introduction_topic_colophon);
+		
+		
 
 		$this->setMenu();
 
@@ -2187,9 +2191,21 @@ class MatrixKeyController extends Controller
 			)
 		);
 
+		$c=$this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'topic' => $this->introduction_topic_colophon
+				),
+				'columns'=>'page_id,topic,content'
+			)
+		);
+		
 		$this->_introductionLinks=array(
 			$this->introduction_topic_citation=>$a ? $a[0] : null,
 			$this->introduction_topic_versions=>$b ? $b[0] : null,
+			$this->introduction_topic_colophon=>$c ? $c[0] : null,
 		);
     }
 	
