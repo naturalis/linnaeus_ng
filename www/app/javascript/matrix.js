@@ -18,7 +18,7 @@ var settings={
 	alwaysShowDetails: false,
 	imageRootSkin: "",  // for skin images (icons and such)
 	imageRootProject: "",  // for local project images
-	imageOrientation: "portrait",
+	imageOrientation: "portrait",  // portrait, landscape
 	defaultSpeciesImages: {},
 	defaultSpeciesImage: "",
 	browseStyle: 'paginate', // expand, paginate, show_all
@@ -1488,4 +1488,5 @@ function matrixInit()
 	$('#legendExternalLink').html( labels.info_link );
 
 	settings.defaultSpeciesImage=settings.defaultSpeciesImages[settings.imageOrientation];
+
 }
