@@ -2203,9 +2203,9 @@ class MatrixKeyController extends Controller
 		);
 		
 		$this->_introductionLinks=array(
-			$this->introduction_topic_citation=>$a ? $a[0] : null,
-			$this->introduction_topic_versions=>$b ? $b[0] : null,
-			$this->introduction_topic_colophon=>$c ? $c[0] : null,
+			$this->introduction_topic_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
+			$this->introduction_topic_versions=>$b && (!empty(strip_tags($b[0]['content']))) ? $b[0] : null,
+			$this->introduction_topic_colophon=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
 		);
     }
 	
