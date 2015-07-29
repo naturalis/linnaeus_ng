@@ -6,4 +6,6 @@ require_once ('../../../../configuration/app/controllers/MatrixKeyController.php
 $c = new MatrixKeyController();
 //$c = new MatrixKeyControllerWeb();
 
+$c->setStoreHistory(false);
+
 $c->characterStatesAction();

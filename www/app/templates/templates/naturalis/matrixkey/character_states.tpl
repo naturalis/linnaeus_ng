@@ -128,7 +128,7 @@
                 {/if}
 
 				<li class="{if $irrelevant}irrelevant{/if}">
-                	<span class="selected" {if $selected}style="font-weight:bold"{/if}>
+                	{if $selected}<span class="selected" style="font-weight:bold">{/if}
                     	{if !$irrelevant}
                         <a href="#" 
                         	onclick="{if $selected}
@@ -138,15 +138,18 @@
                             {/if}
                             closeDialog();
                             return false;" >
+                        {else}
+                        <a>
 						{/if}
                             <img 
+                            	class="orange_checkbox"
                             	src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png" 
                                 style="margin-right:10px"
 							>{$v.label}
-						{if !$irrelevant}
+
 						</a>
-                        {/if}
-					</span>
+
+                	{if $selected}</span>{/if}
                     {if $states_remain_count[{$v.id}] && !$selected}({$states_remain_count[{$v.id}]}){/if}
                 </li>
                 {/foreach}

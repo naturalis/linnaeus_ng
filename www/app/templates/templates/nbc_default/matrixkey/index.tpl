@@ -48,6 +48,8 @@ $(document).ready(function()
 		}).appendTo("head");	
 	{/if}
 	
+	labels.popup_species_link="{$popup_species_link_text|@escape}";
+	
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
@@ -225,7 +227,11 @@ p { \
 	margin-bottom:15px; \
 } \
 </style> \
-%BODY%</div>';
+%BODY% \
+%URL% \
+</div>';
+
+var infoDialogUrlHtmlTpl='<a href="%URL%" class="popup-link" target="_blank">%LINK-LABEL%</a>';
 
 </script>
 

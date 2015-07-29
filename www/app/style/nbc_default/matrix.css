@@ -426,6 +426,18 @@ ul.facetListType li.selected {font-weight:bold;}
     margin-top:-16px;
 }
 
+.popup-link {
+    text-decoration: none;
+}
+
+.popup-link:hover {
+    text-decoration: underline;
+}
+
+.popup-link:focus {
+	outline:0;
+}
+
 
 /* landscape overrides  // now in seperate file
 .result {
