@@ -84,6 +84,7 @@ class MatrixKeyController extends Controller
 			array('introduction_topic_citation'=>'Matrix citation'),
 			array('introduction_topic_versions'=>'Matrix version history'),
 			array('introduction_topic_colophon'=>'Matrix colophon'),
+			array('popup_species_link_text'=>'Meer details'),
 		);
 
 	private $_nbc_image_root=true;
@@ -141,8 +142,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('introduction_topic_citation', $this->introduction_topic_citation);
 		$this->smarty->assign('introduction_topic_versions', $this->introduction_topic_versions);
 		$this->smarty->assign('introduction_topic_colophon', $this->introduction_topic_colophon);
-		
-		
+		$this->smarty->assign('popup_species_link_text', $this->popup_species_link_text);
 
 		$this->setMenu();
 

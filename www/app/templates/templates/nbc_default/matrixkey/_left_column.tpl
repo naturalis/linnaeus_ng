@@ -64,17 +64,14 @@
 			</script>
             </div>
         {/if}        
-        
-        
-        
 
         {if $introduction_links[$introduction_topic_citation]}
 	        <div class="left-divider"></div>
             <div id="clearSelectionContainer" class="facetCategories">
                 <a href="#" onclick="
                 $.get( '../introduction/topic.php?id={$introduction_links[$introduction_topic_citation].page_id}&format=plain' )
-                .success(function(data) { printInfo( data ,'{t}Hoe citeren?{/t}'); } ) ;
-                ">{t}Citeren{/t}</a>
+                .success(function(data) { printInfo( data ,'{t}Citatie{/t}'); } ) ;
+                ">{t}Citatie{/t}</a>
             </div>
         {/if}
 

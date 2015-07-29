@@ -31,3 +31,16 @@
 .ui-dialog-title {
     margin-left:20px;
 }
+
+ul li.disabled {color:#999; text-decoration:line-through;}
+a.emergent_disabled {color:#999;}
+ul li.emergent_disabled {color:#999;}
+
+#graphicVaslueSelector {
+	max-height:450px;
+	overflow-y:scroll;
+}
+
+.orange_checkbox {
+	display:none;
+}

@@ -57,7 +57,8 @@ var	labels={
 	show_all: __('alle onderscheidende kenmerken tonen'),
 	hide_all: __('kenmerken verbergen'),
 	info_link: __('Meer informatie over soort/taxon'),
-	info_dialog_title:__('Informatie over soort/taxon')
+	info_dialog_title:__('Informatie over soort/taxon'),
+	popup_species_link:__('Meer informatie'),
 }
 
 function retrieveDataSet()
@@ -1447,18 +1448,22 @@ function doRemoteLink( url, name )
 	{
 		setCursor('wait');
 
-		var url=settings.generalSpeciesInfoUrl
+		var iurl=settings.generalSpeciesInfoUrl
 			.replace('%PID%',settings.projectId)
 			.replace('%TAXON%',name);
 			
 		$.ajax({
-			url : url,
+			url : iurl,
 			type: 'GET',
 			dataType: "jsonp",
 			success : function ( data )
 			{
 				//console.dir( data );
-				printInfo( data.page.body, labels.info_dialog_title );
+				printInfo( 
+					data.page.body, 
+					labels.info_dialog_title,
+					url
+				);
 				setCursor();
 			}
 		});
@@ -1470,11 +1475,22 @@ function doRemoteLink( url, name )
 	}
 }
 
-function printInfo( info, title )
+function printInfo( info, title, url )
 {
 	if (info)
 	{
-		showDialog(title,infoDialogHtmlTpl.replace('%BODY%',info),{showOk:false});
+		
+		
+		showDialog(
+			title,
+			infoDialogHtmlTpl
+				.replace('%BODY%',info)
+				.replace('%URL%', url ? 
+					infoDialogUrlHtmlTpl
+						.replace('%URL%',url)
+						.replace('%LINK-LABEL%',labels.popup_species_link)
+					 : "" ),
+			{showOk:false});
 	}
 }
 
