@@ -2001,7 +2001,8 @@ class MatrixKeyController extends Controller
         ));
         
         foreach ((array) $cg as $key => $val) {
-            $cg[$key]['label'] = $this->getCharacterGroupLabel($val['id'], $this->getCurrentLanguageId());
+			$d=$this->getCharacterGroupLabel($val['id'], $this->getCurrentLanguageId());
+            $cg[$key]['label'] = !empty($d) ? $d : $cg[$key]['label'];
             
             $cc = $this->models->CharacteristicChargroup->_get(
             array(
