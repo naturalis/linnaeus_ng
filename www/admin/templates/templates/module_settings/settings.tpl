@@ -22,7 +22,6 @@ function updateValue(ele)
 	updateField(ele,inpt,"value");
 }
 
-
 function saveField( id,ele,field )
 {
 	var a=ele;
@@ -114,10 +113,12 @@ input[type=text] {
 <input type="hidden" id="setting_id" name="setting_id" value="" />
 
 <table>
-	<tr class="tr-highlight">
+	<tr class="tr-highlight" style="vertical-align:bottom">
     	<th class="setting-name">setting</th>
     	<th class="setting-info">info</th>
     	<th class="setting-default">default</th>
+    	<th class="setting-values"></th>
+    	<!-- th class="setting-allow">allow&nbspfree?</th -->
     	<th class="setting-delete"></th>
 	</tr>
 {foreach $settings v}
@@ -145,8 +146,8 @@ input[type=text] {
 <p>
     new setting:<br />
     <input type="text" value="" name="new_setting" placeholder="name" /><br />
-    <textarea name="new_info" style="font-family:inherit;font-size:inherit;width:300px;height:150px;" placeholder="description (optional)" ></textarea><br />
-    <input type="text" value="" name="new_default_value" placeholder="default value (optional)" /><br />
+    <textarea name="new_info" style="font-family:inherit;font-size:inherit;width:300px;height:150px;margin:3px 0 3px 0;" placeholder="description (optional)" ></textarea><br />
+    <input type="text" value="" name="new_default_value" placeholder="default value (optional)" />
 </p>
 <p>
 	<input type="submit" value="save" />

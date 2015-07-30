@@ -1452,6 +1452,8 @@ function doRemoteLink( url, name )
 			.replace('%PID%',settings.projectId)
 			.replace('%TAXON%',name);
 			
+		//console.log( iurl );
+			
 		$.ajax({
 			url : iurl,
 			type: 'GET',
@@ -1459,6 +1461,7 @@ function doRemoteLink( url, name )
 			success : function ( data )
 			{
 				//console.dir( data );
+
 				printInfo( 
 					data.page.body, 
 					labels.info_dialog_title,
@@ -1479,8 +1482,6 @@ function printInfo( info, title, url )
 {
 	if (info)
 	{
-		
-		
 		showDialog(
 			title,
 			infoDialogHtmlTpl
