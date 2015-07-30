@@ -3,7 +3,7 @@
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
-      
+
     <div id="content" class="title-type4">
     
         <div id="resultsHeader">
@@ -48,22 +48,22 @@ $(document).ready(function()
 		}).appendTo("head");	
 	{/if}
 	
-	labels.popup_species_link="{$popup_species_link_text|@escape}";
+	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
 	
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
 		imageRootSkin: '{$image_root_skin}',
 		imageRootProject: '{$projectUrls.projectMedia}',
-		useEmergingCharacters: {$matrix_use_emerging_characters},
+		useEmergingCharacters: {$settings->use_emerging_characters},
 		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
-		imageOrientation: '{$matrix_image_orientation}',
-		browseStyle: '{$matrix_browse_style}',
-		scoreThreshold: {$matrix_score_threshold},
-		alwaysShowDetails: {$matrix_always_show_details},
-		perPage: {$matrix_items_per_page},
-		perLine: {$matrix_items_per_line},
-		generalSpeciesInfoUrl: '{$matrix_species_info_url}'
+		imageOrientation: '{$settings->image_orientation}',
+		browseStyle: '{$settings->browse_style}',
+		scoreThreshold: {$settings->score_threshold},
+		alwaysShowDetails: {$settings->always_show_details},
+		perPage: {$settings->items_per_page},
+		perLine: {$settings->items_per_line},
+		generalSpeciesInfoUrl: '{$settings->species_info_url}'
 	});
 
 	setScores($.parseJSON('{$session_scores}'));

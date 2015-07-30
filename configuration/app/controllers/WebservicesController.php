@@ -378,7 +378,7 @@ parameters:
 
 			if (isset($p[0]['id']))
 			{
-				foreach($this->Rdf->getRdfValues($p[0]['id']) as $val)
+				foreach((array)$this->Rdf->getRdfValues($p[0]['id']) as $val)
 				{
 					$rdf[]=array('predicate'=>$val['predicate'],'object'=>$val['data']);
 				}

@@ -6,7 +6,7 @@
 
 drop table `module_settings`;
 
-create table `module_settings` (
+create table `module_settings1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `module_id` int(11) NOT NULL,
@@ -22,9 +22,10 @@ create table `module_settings` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 ;
 
-drop table `module_settings_values`;
 
-create table `module_settings_values` (
+drop table `module_settings_preset_values`;
+
+create table `module_settings_preset_values` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `setting_id` int(11) NOT NULL,
@@ -37,8 +38,6 @@ create table `module_settings_values` (
   UNIQUE `module_settings_3` (`project_id`,`setting_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 ;
-
-
 */
 
 include_once ('Controller.php');
@@ -150,13 +149,6 @@ class ModuleSettingsController extends Controller
 			$this->saveModuleSettingValues();
 			$this->setModuleSettingValues();
 		}
-		else
-		if ( $this->rHasVal('action','delete') && $this->rHasVal('setting_id') )
-		{
-			$this->setSettingId( $this->rGetVal('setting_id') );
-			$this->deleteModuleSetting();
-			$this->setModuleSettingValues();
-		}
 		
 		$m=$this->getModule();
 
@@ -182,7 +174,7 @@ class ModuleSettingsController extends Controller
 			$this->updateModuleDefaultValue( array( "id"=>$this->rGetId(), "value"=>$this->rGetVal("value") ) );
 			$this->smarty->assign( "returnText", "saved" );
         }	
-		
+
 		$this->printPage();	
 	}
 	
@@ -306,14 +298,15 @@ class ModuleSettingsController extends Controller
 			{
 				$this->models->ModuleSettings->freeQuery("
 					insert into %PRE%module_settings
-						(project_id,module_id,setting,info,default_value)
+						(project_id,module_id,setting,info,default_value,allow_free)
 					values
 						(" . 
 							$this->getCurrentProjectId() . "," . 
 							mysql_real_escape_string( $this->getModuleId() ) . "," . 
 							($this->rGetVal('new_setting') ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
 							($this->rGetVal('new_info') ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_default_value') ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" ) . "
+							($this->rGetVal('new_default_value') ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  .",". 
+							($this->rGetVal('new_allow_free')=="on" ? "1" : "0" ) ."
 						)
 				");	
 

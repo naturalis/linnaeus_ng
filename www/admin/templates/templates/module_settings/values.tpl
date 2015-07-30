@@ -4,7 +4,7 @@
 table tr {
 	vertical-align:top;
 }
-table td {
+table tr.second-line td {
 	border-bottom:1px dotted #bbb;
 }
 table th {
@@ -14,14 +14,27 @@ table tr td.setting-name, table tr th.setting-name {
 	text-align:right;
 	font-weight:bold;
 }
+table tr td.setting-name  {
+	cursor:pointer;
+}
+table tr td.setting-value {
+	width:200px;
+}
 table tr td.setting-info {
+	width:400px;
 	color:#666;
+}
+table tr td.setting-delete {
+	width:100px;
 }
 input[type=text] {
 	width:200px;
 }
 tr.empty-value {
 	color:#999;
+}
+tr.info-line {
+	display:none;
 }
 </style>
 
@@ -36,7 +49,7 @@ tr.empty-value {
 <table>
 	<tr class="tr-highlight">
     	<th class="setting-name">setting</th>
-    	<th class="setting-default">value</th>
+    	<th class="setting-value">value</th>
     	<th class="setting-delete"></th>
     	<th class="setting-delete"></th>
 	</tr>
@@ -47,7 +60,7 @@ tr.empty-value {
     {/foreach}
 	<tr class="tr-highlight{if $value==""} empty-value{/if}">
     	<td class="setting-name" title="{$v.info|@escape}">{$v.setting}</td>
-    	<td class="setting-default">
+    	<td class="setting-value">
         	<input type="text"  name="value[{$v.id}]" id="value-{$v.id}" value="{$value}" />
         </td>
     	<td class="setting-delete" title="{$v.default_value|@escape}">
@@ -57,7 +70,7 @@ tr.empty-value {
                 {
 	            	$('#value-{$v.id}').val( '{$v.default_value|@addslashes}' );
     	            return false;
-				}">add default</a>
+				}">use default</a>
             {else}
             <span style="color:#999">(no default)</span>
             {/if}
@@ -68,6 +81,14 @@ tr.empty-value {
             {/if}
 		</td>
 	</tr>
+	<tr class="info-line">
+    	<td></td>
+    	<td colspan="3" class="setting-info">{$v.info|@escape}</td>
+	</tr>    
+	<tr class="second-line">
+    	<td colspan="4"></td>
+	</tr>    
+    
 {/foreach}
 {if $settings|@count==0}
 	<tr class="tr-highlight">
@@ -94,6 +115,8 @@ tr.empty-value {
 $(document).ready(function()
 {
 	$('#page-block-messages').fadeOut(3000);
+	$('td.setting-name').on('click',function() { $(this).closest('tr').next('tr').toggle(); } );
+	
 });
 </script>
 

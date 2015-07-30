@@ -46,45 +46,9 @@ class MatrixKeyController extends Controller
 	private $_searchTerm=null;
 	private $_searchResults=null;
 	private $_introductionLinks=null;
-	
-
-	private $calc_char_h_val=true;
-	private $allow_empty_species=true;
-	private $use_emerging_characters=true;
-	private $browse_style;
-	private $state_image_per_row;
-	private $score_threshold;
-	private $img_to_thumb_regexp_pattern;
-	private $img_to_thumb_regexp_replacement;
-	private $matrix_items_per_line;
-	private $items_per_line;
-	private $items_per_page;
 
 	private $_master_matrix;
-
-	private $settingsDefaults=
-		array(
-			array('calc_char_h_val'=>true),
-			array('allow_empty_species'=>true),
-			array('use_emerging_characters'=>true),
-			array('use_character_groups'=>1),
-			array('browse_style'=>'expand'),
-			//array('state_image_per_row'=>4),  // obsolete?
-			array('items_per_line'=>4),
-			array('items_per_page'=>16),
-			array('always_show_details'=>0),
-			array('score_threshold'=>100),
-			array('img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//'),
-			array('img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/'),
-			array('image_orientation'=>'portrait'),
-			array('match_sort_col_predominant'=>null),
-			array('match_sort_col_after_match'=>null),
-			array('species_info_url'=>null),
-			array('introduction_topic_citation'=>'Matrix citation'),
-			array('introduction_topic_versions'=>'Matrix version history'),
-			array('introduction_topic_colophon'=>'Matrix colophon'),
-			array('popup_species_link_text'=>'Meer details'),
-		);
+	private $settings;
 
 	private $_nbc_image_root=true;
 	
@@ -111,20 +75,8 @@ class MatrixKeyController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsController;
-		$this->moduleSettings->setModuleDefaults( $this->settingsDefaults );
-		$this->moduleSettings->setModuleSettings();
+		$this->moduleSettings->assignModuleSettings( $this->settings );
 		
-		foreach((array)$this->settingsDefaults as $key=>$val)
-		{
-			$k=key($val);
-			$this->$k=$val[key($val)];
-		}
-
-		foreach((array)$this->moduleSettings->getModuleSettings() as $val)
-		{
-			$this->$val['setting']=$val['value'];
-		}
-
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
 
@@ -138,11 +90,7 @@ class MatrixKeyController extends Controller
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
 		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
 		$this->smarty->assign('introduction_links', $this->getIntroductionLinks());
-		$this->smarty->assign('introduction_topic_citation', $this->introduction_topic_citation);
-		$this->smarty->assign('introduction_topic_versions', $this->introduction_topic_versions);
-		$this->smarty->assign('introduction_topic_colophon', $this->introduction_topic_colophon);
-		$this->smarty->assign('popup_species_link_text', $this->popup_species_link_text);
-
+		$this->smarty->assign('settings', $this->settings);
 		$this->setMenu();
 
     }
@@ -160,15 +108,6 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
         $this->smarty->assign('matrix', $matrix);
-		$this->smarty->assign('matrix_use_emerging_characters', $this->use_emerging_characters);
-		$this->smarty->assign('matrix_browse_style', $this->browse_style);
-		$this->smarty->assign('matrix_image_orientation', $this->image_orientation);
-		$this->smarty->assign('matrix_always_show_details', $this->always_show_details);
-		$this->smarty->assign('matrix_score_threshold', $this->score_threshold);
-		$this->smarty->assign('matrix_items_per_line', $this->items_per_line);
-		$this->smarty->assign('matrix_items_per_page', $this->items_per_page);
-		$this->smarty->assign('matrix_species_info_url', $this->species_info_url);
-
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 
 
@@ -191,7 +130,6 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('states', $states);
 		$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
 		$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
-		$this->smarty->assign('state_images_per_row', $this->state_image_per_row);
 	
 		$this->printPage();
 	}
@@ -540,15 +478,15 @@ class MatrixKeyController extends Controller
 	private function induceThumbNailFromImage( &$item )
 	{
 		if( 
-			!empty($this->img_to_thumb_regexp_pattern) &&
+			!empty($this->settings->img_to_thumb_regexp_pattern) &&
 			!isset($item['url_thumb']) &&
 			isset($item['url_image'])
 		)
 		{
 			$item['url_thumb']=
 				@preg_replace(
-					$this->img_to_thumb_regexp_pattern,
-					$this->img_to_thumb_regexp_replacement,
+					$this->settings->img_to_thumb_regexp_pattern,
+					$this->settings->img_to_thumb_regexp_replacement,
 					$item['url_image']
 				);
 		}
@@ -602,9 +540,9 @@ class MatrixKeyController extends Controller
 			$d=$this->getTaxonById( $val['taxon_id'] );
 			
 			if (
-				($this->allow_empty_species) ||
+				($this->settings->allow_empty_species) ||
 				(!isset($val['is_empty'])) ||
-				(!$this->allow_empty_species && $val['is_empty']==1))
+				(!$this->settings->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
 				$d['states']=$this->getTaxonStates( $val['taxon_id'] );
@@ -1686,12 +1624,12 @@ class MatrixKeyController extends Controller
 			* label
 		*/
 		
-		if ( !empty($this->match_sort_col_predominant) )
+		if ( !empty($this->settings->match_sort_col_predominant) )
 		{
-			if (isset($a[$this->match_sort_col_predominant]) && isset($b[$this->match_sort_col_predominant]))
+			if (isset($a[$this->settings->match_sort_col_predominant]) && isset($b[$this->settings->match_sort_col_predominant]))
 			{
-		        if ($a[$this->match_sort_col_predominant]>$b[$this->match_sort_col_predominant]) return 1;
-		        if ($a[$this->match_sort_col_predominant]<$b[$this->match_sort_col_predominant]) return -1;
+		        if ($a[$this->settings->match_sort_col_predominant]>$b[$this->settings->match_sort_col_predominant]) return 1;
+		        if ($a[$this->settings->match_sort_col_predominant]<$b[$this->settings->match_sort_col_predominant]) return -1;
 			}
 		}
 
@@ -1701,12 +1639,12 @@ class MatrixKeyController extends Controller
 			if ($a['score']>$b['score']) return -1;
 		}
 
-		if ( !empty($this->match_sort_col_after_match) )
+		if ( !empty($this->settings->match_sort_col_after_match) )
 		{
-			if (isset($a[$this->match_sort_col_after_match]) && isset($b[$this->match_sort_col_after_match]))
+			if (isset($a[$this->settings->match_sort_col_after_match]) && isset($b[$this->settings->match_sort_col_after_match]))
 			{
-		        if ($a[$this->match_sort_col_after_match]>$b[$this->match_sort_col_after_match]) return 1;
-		        if ($a[$this->match_sort_col_after_match]<$b[$this->match_sort_col_after_match]) return -1;
+		        if ($a[$this->settings->match_sort_col_after_match]>$b[$this->settings->match_sort_col_after_match]) return 1;
+		        if ($a[$this->settings->match_sort_col_after_match]<$b[$this->settings->match_sort_col_after_match]) return -1;
 			}
 		}
 
@@ -2173,7 +2111,7 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->introduction_topic_citation
+					'topic' => $this->settings->introduction_topic_citation
 				),
 				'columns'=>'page_id,topic,content'
 			)
@@ -2184,7 +2122,7 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->introduction_topic_versions
+					'topic' => $this->settings->introduction_topic_versions
 				),
 				'columns'=>'page_id,topic,content'
 			)
@@ -2195,16 +2133,16 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->introduction_topic_colophon
+					'topic' => $this->settings->introduction_topic_colophon
 				),
 				'columns'=>'page_id,topic,content'
 			)
 		);
 		
 		$this->_introductionLinks=array(
-			$this->introduction_topic_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
-			$this->introduction_topic_versions=>$b && (!empty(strip_tags($b[0]['content']))) ? $b[0] : null,
-			$this->introduction_topic_colophon=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
+			$this->settings->introduction_topic_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
+			$this->settings->introduction_topic_versions=>$b && (!empty(strip_tags($b[0]['content']))) ? $b[0] : null,
+			$this->settings->introduction_topic_colophon=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
 		);
     }
 	
