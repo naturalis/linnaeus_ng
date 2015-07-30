@@ -69,10 +69,9 @@ class MatrixKeyController extends Controller
 			array('use_emerging_characters'=>true),
 			array('use_character_groups'=>1),
 			array('browse_style'=>'expand'),
-			array('state_image_per_row'=>4),
+			//array('state_image_per_row'=>4),  // obsolete?
 			array('items_per_line'=>4),
 			array('items_per_page'=>16),
-			array('use_emerging_characters'=>1),
 			array('always_show_details'=>0),
 			array('score_threshold'=>100),
 			array('img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//'),

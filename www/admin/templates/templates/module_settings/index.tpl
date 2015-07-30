@@ -6,14 +6,13 @@
 
 <ul>
 {foreach $modules v}
-	<li><a href="module.php?module={$v.module}">{$v.module}</a></li>
+	<li>
+    	{$v.module}<br />
+        	<a href="settings.php?id={$v.id}">setting</a> |
+        	<a href="values.php?id={$v.id}">values</a>
+	</li>
 {/foreach}
 </ul>
-
-<form method="get" action="module.php">
-new module: <input type="text" value="" name="module" />
-</form>
-
 
 </div>
 
