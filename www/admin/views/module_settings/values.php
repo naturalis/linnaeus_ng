@@ -4,5 +4,5 @@ require_once ('../../../../configuration/admin/controllers/ModuleSettingsControl
 
 $c = new ModuleSettingsController();
 
-$c->moduleAction();
+$c->valuesAction();
 
