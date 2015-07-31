@@ -5,7 +5,7 @@ div.pp_default .pp_description {
 </style>
 
 {if $back}
-<a class="no-text terug-naar-het-dier" href="#" onclick="toonDier( { id:{$back} } );return false;">Terug naar het dier</a>
+<a class="no-text terug-naar-het-dier" href="#" onclick="drnzkr_toon_dier( { id:{$back} } );return false;">Terug naar het dier</a>
 {/if}
 
 <h1>{$taxon.commonname}</h1>
@@ -18,11 +18,9 @@ div.pp_default .pp_description {
 {if $nbc.url_image}
 <div class="illustratie-wrapper">
     <div class="illustratie">
-        <!-- a id="lightbox905" href="{$nbc.url_image}" title="" -->
        	<a rel="prettyPhoto[gallery]" href="{$nbc.url_image_large}" title="{$v.description}" id="overview-picture">
             <img style="width:280px" title="" src="{$nbc.url_image}" alt="">
 		</a>
-        <!-- /a -->
     </div>
 </div>
 {/if}
@@ -84,7 +82,7 @@ div.pp_default .pp_description {
 
 </div>
 {if $parent.commonname && $parent.id && $parent.hasContent}
-<a class="grouplink group-container" href="#" onclick="toonDier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
+<a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
 {/if}
 {if $related}
 <div class="related">
@@ -92,7 +90,7 @@ div.pp_default .pp_description {
         <ul>
         {foreach from=$related item=v}
             <li class="">
-                <a href="#" onclick="toonDier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
+                <a href="#" onclick="drnzkr_toon_dier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
                 <img src="{$v.url_thumbnail}">
                 {$v.label}                    
                 </a>
@@ -109,9 +107,9 @@ div.pp_default .pp_description {
         <ul>
         {foreach from=$children item=v}
             <li class="">
-                <a href="#" onclick="toonDier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
+                <a href="#" onclick="drnzkr_toon_dier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
                 <img src="{$v.url_thumbnail}">
-                {$v.label}                    
+                {$v.label}
                 </a>
             </li>
 		{/foreach}
@@ -131,10 +129,11 @@ function getremotemetadata(p)
 		data : ({
 			image_id :p.name
 		}),
-		success : function (data) {
-			var data=$.parseJSON(data);
+		success : function (data)
+		{
 			if (data)
 			{
+				var data=$.parseJSON(data);
 				$('#'+p.id).attr('title',
 					(data.description? '"'+data.description+'" ' : '')+(data.copyright ? '&copy; '+data.copyright : '') +
 					(data.copyright && data.maker ? ' - ' : '') +(data.maker ? 'Maker: '+data.maker : '')

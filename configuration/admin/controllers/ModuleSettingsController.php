@@ -6,9 +6,8 @@
 
 drop table `module_settings`;
 
-create table `module_settings1` (
+create table `module_settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
   `module_id` int(11) NOT NULL,
   `setting` varchar(64) NOT NULL,
   `info` varchar(1000) NULL,
@@ -194,7 +193,6 @@ class ModuleSettingsController extends Controller
 			
 			left join %PRE%module_settings _b
 				on _a.id=_b.module_id
-				and _b.project_id = " . $this->getCurrentProjectId() . "
 
 			group by 
 				_a.controller
@@ -242,10 +240,8 @@ class ModuleSettingsController extends Controller
 	{
 		$this->_settings=$this->models->ModuleSettings->_get(array("id"=>
 			array(
-				"project_id"=>$this->getCurrentProjectId(),
 				"module_id"=>mysql_real_escape_string( $this->getModuleId() )
 			)));
-			
 	}
 
 	private function getModuleSettings()
@@ -298,18 +294,15 @@ class ModuleSettingsController extends Controller
 			{
 				$this->models->ModuleSettings->freeQuery("
 					insert into %PRE%module_settings
-						(project_id,module_id,setting,info,default_value,allow_free)
+						(module_id,setting,info,default_value)
 					values
 						(" . 
-							$this->getCurrentProjectId() . "," . 
 							mysql_real_escape_string( $this->getModuleId() ) . "," . 
 							($this->rGetVal('new_setting') ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
 							($this->rGetVal('new_info') ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_default_value') ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  .",". 
-							($this->rGetVal('new_allow_free')=="on" ? "1" : "0" ) ."
+							($this->rGetVal('new_default_value') ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  ."
 						)
 				");	
-
 				$this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ),  $this->rGetVal('new_setting') ) );
 			}
 		}
@@ -319,17 +312,14 @@ class ModuleSettingsController extends Controller
 			
 	private function deleteModuleSetting()
 	{
-		/*
-		$this->_settings=$this->models->ModuleSettingsValues->delete(array("id"=>
+		$this->_settings=$this->models->ModuleSettingsValues->delete(
 			array(
 				"project_id"=>$this->getCurrentProjectId(),
-				"module_id"=>mysql_real_escape_string( $this->getModuleId() )
-			)));
-		*/
+				"setting_id"=>mysql_real_escape_string( $this->getSettingId() )
+			));
 			
 		$this->_settings=$this->models->ModuleSettings->delete(
 			array(
-				"project_id"=>$this->getCurrentProjectId(),
 				"module_id"=>mysql_real_escape_string( $this->getModuleId() ),
 				"id"=>mysql_real_escape_string( $this->getSettingId() )
 			));
@@ -350,8 +340,7 @@ class ModuleSettingsController extends Controller
 			set
 				info = " . ( !empty($info) ? "'" . mysql_real_escape_string( $info ) . "'" : "null" ) ." 
 			where
-				id = " . mysql_real_escape_string( $id ) . "
-				and project_id = " .$this->getCurrentProjectId()
+				id = " . mysql_real_escape_string( $id )
 		);	
 		
 	}
@@ -367,10 +356,9 @@ class ModuleSettingsController extends Controller
 			update
 				%PRE%module_settings
 			set
-				default_value = " . ( !empty($value) ? "'" . mysql_real_escape_string( $value ) . "'" : "null" ) ." 
+				default_value = " . ( $value!="" ? "'" . mysql_real_escape_string( $value ) . "'" : "null" ) ." 
 			where
-				id = " . mysql_real_escape_string( $id ) . "
-				and project_id = " .$this->getCurrentProjectId()
+				id = " . mysql_real_escape_string( $id )
 		);	
 		
 	}

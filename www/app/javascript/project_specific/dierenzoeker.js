@@ -1,13 +1,96 @@
-var nbcData;
-var nbcStart = 0;
-var nbcPerPage = 16;	// default, reset in identify.php
-var nbcPerLine = 2;		// default, reset in identify.php
-var initData;
-var matrixId=null;
-var projectId=null;
-var startDier=null;
+var drnzkr_startDier=null;
 
-function nbcPrettyPhotoInit() {
+
+function hook_postPrintResults()
+{
+	$('#result-count-container').html( data.resultset.length );
+	drnzkr_open_dier_link();
+}
+
+function drnzkr_navigeren( target )
+{
+	if (target=='eerste')
+	{
+		matrixsettings.start=0;
+	}
+	else
+	if (target=='laatste')
+	{
+		matrixsettings.start=Math.floor(data.resultset.length/matrixsettings.perPage)*matrixsettings.perPage;
+	}
+	else
+	if (target=='vorige')
+	{
+		matrixsettings.start=matrixsettings.start-matrixsettings.perPage;
+	}
+	else
+	{
+		matrixsettings.start=matrixsettings.start+matrixsettings.perPage;
+	}
+
+	if (matrixsettings.start>data.resultset.length)
+	{
+		matrixsettings.start=matrixsettings.start-matrixsettings.perPage;
+	}
+	if (matrixsettings.start<0)
+	{
+		matrixsettings.start=0;
+	}
+
+	printResults();
+	drnzkr_update_navigatie();
+}
+
+function drnzkr_update_navigatie()
+{
+	if (matrixsettings.start==0)
+	{
+		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','hidden');
+	}
+	else
+	{
+		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','visible');
+	}
+
+	if (matrixsettings.start+matrixsettings.perPage>data.resultset.length)
+	{
+		$('#next-button-container-top,#next-button-container-bottom').css('visibility','hidden');
+	}
+	else
+	{
+		$('#next-button-container-top,#next-button-container-bottom').css('visibility','visible');
+	}
+}
+
+function drnzkr_toon_dier( p )
+{
+	$.ajax(
+	{
+		url : '../species/taxon_overview.php',
+		type: 'POST',
+		data : ({
+			id : p.id,
+			back : p.back,
+			hotwords: false,
+			navigation: false,
+			time : getTimestamp()
+		}),
+		success : function (data)
+		{
+			if (data)
+			{
+				//console.log( data );
+				$('#dier-content').html( data );
+				$('#dier-content-wrapper').css('visibility','visible');
+				drnzkr_prettyPhotoInit();
+			}
+		}
+	});
+}
+
+function drnzkr_prettyPhotoInit()
+{
+	if(!$.prettyPhoto) return;
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
 		allow_resize:true,
@@ -17,8 +100,56 @@ function nbcPrettyPhotoInit() {
  		overlay_gallery: false,
  		social_tools: false
  	});
-
 }
+
+function drnzkr_open_dier_link()
+{
+	if (!drnzkr_startDier) return
+
+	drnzkr_startDier=$('<textarea />').html( drnzkr_startDier ).text(); // convert entities to characters
+
+	var n=null;
+
+	for(var i=0;i<data.resultset.length;i++)
+	{
+		var d=data.resultset[i];
+
+		if (d.commonname.toLowerCase()==drnzkr_startDier.toLowerCase())
+		{
+			n=d
+			break;
+		}
+	}
+
+	if (n)
+	{
+		drnzkr_startDier=null;
+
+		drnzkr_toon_dier( { id:n.id, type:n.type } );
+
+		for (var j=0;j<Math.floor(i/matrixsettings.perPage);j++)
+		{
+			drnzkr_navigeren('volgende');
+		}
+	}		
+}
+
+
+
+
+
+
+
+
+
+var nbcData;
+var nbcStart = 0;
+var nbcPerPage = 16;	// default, reset in identify.php
+var nbcPerLine = 2;		// default, reset in identify.php
+var initData;
+var matrixId=null;
+var projectId=null;
+
 
 function nbcGetResults(p) {
 
@@ -68,7 +199,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="toonDier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><table><tr><td><img alt="" src="'+data.b+'"></td><td style="width:100%">'+data.l+'</td></tr></table></a></li>';
+			s = s + '<li class="result0"><a href="/linnaeus_ng/app/views/matrixkey/identify.php?dier='+data.l+'" onclick="drnzkr_toon_dier({id:'+data.i+',type:\''+data.y+'\'});return false;" style=""><table><tr><td><img alt="" src="'+data.b+'"></td><td style="width:100%">'+data.l+'</td></tr></table></a></li>';
 		}
 	}
 
@@ -79,48 +210,14 @@ function nbcPrintResults() {
 
 }
 
-function navigeren(dir) {
-
-	if (dir=='eerste')
-		nbcStart = 0;
-	else
-	if (dir=='laatste')
-		nbcStart = Math.floor(nbcData.count.results/nbcPerPage)*nbcPerPage;
-	else
-	if (dir=='vorige')
-		nbcStart = nbcStart-nbcPerPage;
-	else
-		nbcStart = nbcStart+nbcPerPage;
-
-	if (nbcStart>nbcData.count.results)
-		nbcStart = nbcStart-nbcPerPage;
-	if (nbcStart<0)
-		nbcStart = 0;
-
-	nbcPrintResults();
-	nbcUpdateNavigation();
-
-}
-
 function nbcResetNavigation() {
 
 	nbcStart=0;
-	nbcUpdateNavigation();
+	drnzkr_update_navigatie();
 
 }
 
-function nbcUpdateNavigation() {
-	
-	if (nbcStart==0)
-		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','hidden');
-	else
-		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','visible');
 
-	if (nbcStart+nbcPerPage>nbcData.count.results)
-		$('#next-button-container-top,#next-button-container-bottom').css('visibility','hidden');
-	else
-		$('#next-button-container-top,#next-button-container-bottom').css('visibility','visible');
-}
 
 function nbcSetState(p) {
 	
@@ -220,30 +317,6 @@ function updateStates(id) {
 
 }
 
-function toonDier(p) {
-
-	allAjaxHandle = $.ajax({
-		url : '../species/taxon_overview.php',
-		type: 'POST',
-		data : ({
-			id : p.id,
-//			type : p.type,
-			back : p.back,
-			hotwords: false,
-			navigation: false,
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			if (data) {
-				$('#dier-content').html(data);
-				$('#dier-content-wrapper').css('visibility','visible');
-				if(jQuery().prettyPhoto)
-					nbcPrettyPhotoInit();
-			}
-		}
-	});
-}
-
 function verbergDier() {
 
 	$('#dier-content').html('');
@@ -253,7 +326,7 @@ function verbergDier() {
 
 function openDiergroep(pId,tId,type) {
 
-	var pre = '<a href="#" class="no-text terug-naar-het-dier" onclick="toonDier('+tId+',\''+type+'\');return false;">Terug naar het dier</a>';
+	var pre = '<a href="#" class="no-text terug-naar-het-dier" onclick="drnzkr_toon_dier('+tId+',\''+type+'\');return false;">Terug naar het dier</a>';
 
 	allAjaxHandle = $.ajax({
 		url : '../module/topic.php',
@@ -268,7 +341,7 @@ function openDiergroep(pId,tId,type) {
 				$('#dier-content').html(pre + data);
 				$('#dier-content-wrapper').css('visibility','visible');
 				if(jQuery().prettyPhoto)
-					nbcPrettyPhotoInit();
+					drnzkr_prettyPhotoInit();
 			}
 		}
 	});
@@ -291,10 +364,10 @@ function openDierLink()
 
 	if (n)
 	{
-		toonDier({id:n.i,type:n.y});
+		drnzkr_toon_dier({id:n.i,type:n.y});
 		for (var j=0;j<Math.floor(i/nbcPerPage);j++)
 		{
-			navigeren('volgende');
+			drnzkr_navigeren('volgende');
 		}
 	}
 		
