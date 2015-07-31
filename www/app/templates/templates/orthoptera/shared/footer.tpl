@@ -27,6 +27,8 @@ $(document).ready(function()
 
 </script>
 
+{literal}
+
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -36,5 +38,8 @@ $(document).ready(function()
   ga('create', 'UA-21555206-5', 'auto');
   ga('send', 'pageview');
 </script>
+
+{/literal}
+
 </body>
 </html>
