@@ -136,3 +136,13 @@ $(document).ready(function() {
 
 
 {include file="../shared/footer.tpl"}
+
+<!-- 
+
+{$taxon_base_url_images_main}
+{$taxon_base_url_images_thumb}
+{$taxon_base_url_images_overview}
+
+
+
+-->
