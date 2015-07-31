@@ -40,7 +40,7 @@ class MatrixKeyController extends Controller
 
 //	private $_characters=null;
 	private $_dataSet=null;
-	private $_menu=null;
+	private $_facetmenu=null;
 	private $_scores=null;
 	private $_related=null;
 	private $_searchTerm=null;
@@ -93,7 +93,8 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
 		$this->smarty->assign('introduction_links', $this->getIntroductionLinks());
 		$this->smarty->assign('settings', $this->settings);
-		$this->setMenu();
+
+		$this->setFacetMenu();
     }
 
     public function indexAction()
@@ -111,7 +112,8 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 
-
+		$this->smarty->assign('facetmenu', $this->getFacetMenu());
+		$this->smarty->assign('states', $this->getCharacterStates(array("id"=>"*")) );
 
         $this->printPage();
     }
@@ -144,7 +146,7 @@ class MatrixKeyController extends Controller
 	
 		if ($this->rHasVal('action', 'get_menu'))
 		{
-			$this->smarty->assign('returnText', json_encode($this->getMenu()));
+			$this->smarty->assign('returnText', json_encode($this->getFacetMenu()));
         }	
 		
 		else
@@ -180,7 +182,8 @@ class MatrixKeyController extends Controller
 				json_encode( array(
 					'scores'=>$this->getScores(),
 					'states'=>$this->getSessionStates(),
-					'characters'=>$this->getCharacterCounts()
+					'characters'=>$this->getCharacterCounts(),
+					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
 
@@ -202,7 +205,8 @@ class MatrixKeyController extends Controller
 				json_encode( array(
 					'scores'=>$this->getScores(),
 					'states'=>$this->getSessionStates(),
-					'characters'=>$this->getCharacterCounts()
+					'characters'=>$this->getCharacterCounts(),
+					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
 
@@ -396,13 +400,13 @@ class MatrixKeyController extends Controller
 				_a.show_order
 			"
 		);
-		
+
         foreach ((array) $cs as $key => $val)
 		{
             $cs[$key]['img_dimensions']=explode(':',$val['file_dimensions']);
 		}
 
-        return (isset($id) && isset($cs[0]) ? $cs[0] : $cs);
+        return (isset($id) && $id!='*' && isset($cs[0]) ? $cs[0] : $cs);
     }
 
     private function getCharacteristicHValue( $p )
@@ -802,7 +806,7 @@ class MatrixKeyController extends Controller
 
 
 
-	private function setMenu()
+	private function setFacetMenu()
 	{
 		$menu=$this->models->GuiMenuOrder->freeQuery("
 		
@@ -900,12 +904,12 @@ class MatrixKeyController extends Controller
 			}
 		}
 		
-		$this->_menu=$menu;	
+		$this->_facetmenu=$menu;	
 	}
 
-	private function getMenu()
+	private function getFacetMenu()
 	{
-		return $this->_menu;
+		return $this->_facetmenu;
 	}
 
     private function getGroupCharacters( $id )
@@ -1045,6 +1049,7 @@ class MatrixKeyController extends Controller
                     $states[$key]['id'] = $d['id'];
                     $states[$key]['characteristic_id'] = $d['characteristic_id'];
                     $states[$key]['label'] = $d['label'];
+                    $states[$key]['file_name'] = $d['file_name'];
                 }
                 else
 				if ($d[0]=='f' && isset($d[2]))

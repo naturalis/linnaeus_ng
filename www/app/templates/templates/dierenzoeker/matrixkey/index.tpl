@@ -18,21 +18,24 @@
                     
                     <ul class="wat-weet-je-list">      
                         <li class="wat-weet-je-arrow no-text">Wat weet je van het dier?</li>
-                        {foreach from=$guiMenu item=v key=k}
-                        {capture name=chars}{if $v.chars}{foreach from=$v.chars item=vC}{$vC.id} {/foreach}{else}{$v.id} {/if}{/capture}
-                        <li class='facetgroup-btn'>
-                            <div class="facet-btn ui-block-d">
-                                <a data-facetgrouppageid="facetgrouppage{$k}" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}">
-                                    <div class="grid-iconbox" >
-                                        <img src="{$projectUrls.projectMedia}{$v.icon}" class="grid-icon" alt="" />
-                                    </div>
-                                    <div class="grid-labelbox ">
-                                        {if $v.label_short}{$v.label_short}{else}{$v.label}{/if}
-                                    </div>
-                                </a>
-                            </div>
-                        </li>
+                        
+                        {foreach from=$facetmenu item=group key=groupkey}
+                        
+                            {assign var=foo value="|"|explode:$group.label} 
+                                               
+                            <li class="facetgroup-btn" title="{$foo[1]}">
+                                <div class="facet-btn ui-block-d">
+                                    <a data-facetgrouppageid="facetgrouppage{$groupkey}" href="#" data-role="button" data-corners="false" data-shadow="false">
+                                        <div class="grid-iconbox" >
+                                            <img src="{$projectUrls.projectMedia}__menu{$foo[0]|regex_replace:"/\W/":""|ucwords}.png" class="grid-icon" alt="" />
+                                        </div>
+                                        <div class="grid-labelbox ">{$foo[0]}</div>
+                                    </a>
+                                </div>
+                            </li>
+                                    
                         {/foreach}
+
                     </ul>                
                 </div>
             </div>
@@ -93,7 +96,6 @@
                     <div id="dier-header" class="dier-header">
                         Dier
                     </div><div class="dier-content" id="dier-content">
-                        <!-- Placeholder for pretty first-time loading. -->
                        <div style='height:650px;'>
                        </div>                        
                     </div>
@@ -132,37 +134,46 @@
                 </div>
 
         </div>
-       
 
-		<div class="facetgrouppage-wrapper">  
+		<div class="facetgrouppage-wrapper"> 
+               
+        {foreach from=$facetmenu item=group key=groupkey}
 
-        {foreach from=$guiMenu item=v key=k}
-            <div id="facetgrouppage{$k}" class="facetgrouppage">
+            <div class="facetgrouppage" id="facetgrouppage{$groupkey}">
 				<img class="facetpage-puntje" alt="" src="{$session.app.system.urls.systemMedia}facet-puntje.png">
 				<a class="no-text facetgrouppage-close-btn" href="#">Sluiten</a>
-                
-                {if $v.chars}
-                {foreach from=$v.chars item=vC key=kC}
+
+                {if $group.chars}
+                {foreach from=$group.chars item=character key=characterkey}
 
 				<div class="facetgrouppage-inner">
-					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$vC.info}</h4>
+					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$character.info}</h4>
 					<div class="facetgrouppage-icons">
 						<div class="helper-div">
 							<div class="ui-grid-c">
-							
-								{foreach from=$vC.states item=sV key=sK}
-								{if $sV.file_name && $sV.file_exists}                            
-						   
-								<div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
-									<a href="#" onClick="nbcSetStateValue('c:{$vC.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
-									<div class="grid-iconbox">
-										<img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$sV.file_name}">
-									</div>
-									<div class="grid-labelbox ">
-										{$sV.label}
-									</div>
+
+								{foreach from=$states item=state key=statekey}
+                                {if $state.characteristic_id==$character.id && $state.file_name}
+
+								<div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
+									<a 
+                                    	href="#" 
+                                    	onClick="
+                                        	setStateValue('{$character.prefix}:{$character.id}:{$state.id}');
+	                                        $('.facetgrouppage-close-btn').trigger('click');
+                                            return false;
+                                            " 
+                                        class="" 
+                                        id="state-{$state.id}">
+                                        <div class="grid-iconbox">
+                                            <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$state.file_name}">
+                                        </div>
+                                        <div class="grid-labelbox ">
+                                            {$state.label}
+                                        </div>
 									</a>
 								</div>
+
 								{/if}
 								{/foreach}
 	
@@ -178,23 +189,31 @@
                 {/foreach}
 
 				{else}
-				
+
+				{assign var=foo value="|"|explode:$group.label} 
+
 				<div class="facetgrouppage-inner">
-					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$v.description}</h4>
+					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$foo[1]}</h4>
 					<div class="facetgrouppage-icons">
 						<div class="helper-div">
 							<div class="ui-grid-c">
-                
-                            {foreach from=$v.states item=sV key=sK}
-                            {if $sV.file_name && $sV.file_exists}                            
-                       
-                            <div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
-                                <a href="#" onClick="nbcSetStateValue('c:{$v.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
+                            {foreach from=$states item=state key=statekey}
+                            {if $state.characteristic_id==$group.id && $state.file_name}
+                            <div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
+                                <a
+                                	href="#" 
+                                    onClick="
+                                    	setStateValue('{$group.prefix}:{$group.id}:{$state.id}');
+                                        $('.facetgrouppage-close-btn').trigger('click');
+                                        return false;
+                                        " 
+                                    class="" 
+                                    id="state-{$state.id}">
                                 <div class="grid-iconbox">
-                                    <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$sV.file_name}">
+                                    <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$state.file_name}">
                                 </div>
                                 <div class="grid-labelbox ">
-                                    {$sV.label}
+                                    {$state.label}
                                 </div>
                                 </a>
                             </div>
@@ -251,23 +270,22 @@ $(document).ready(function()
 	drnzkr_startDier='{$requestData.dier|@escape}';
 	{/if}
 
-	
-	
-	$('.facetgrouppage-close-btn').click(function(e){
+	$('[data-facetgrouppageid^="facetgrouppage"]').click(function(e)
+	{
 		e.preventDefault();
-		// Hide all facet group pages:
-		$(".facetgrouppage").css("display", "none");
-		return false;           
-	});
-	  
-	$('[data-facetgrouppageid^="facetgrouppage"]').click(function(e){
-		e.preventDefault();
-		updateStates($(this).attr('characters'));
+		drnzkr_update_states();
 		var currentstate=$("#"+$(this).attr('data-facetgrouppageid')).css("display");
 		// Close all facet group pages (cleanup):
 		$(".facetgrouppage").css("display", "none");
 		// Show facet group page:
 		$("#"+$(this).attr('data-facetgrouppageid')).css("display", currentstate=="none"?"block":"none");
+		return false;           
+	});
+	
+	$('.facetgrouppage-close-btn').click(function(e){
+		e.preventDefault();
+		// Hide all facet group pages:
+		$(".facetgrouppage").css("display", "none");
 		return false;           
 	});
 
@@ -405,6 +423,23 @@ var searchHeaderHtmlTpl='\
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSearch();return false;">%BACK-TEXT%</a> \
 ';
+
+
+var drzkr_mainMenuItemHtmlTemplate = '\
+<li class="facetgroup-btn" title="%HINT%"> \
+	<div class="facet-btn ui-block-d"> \
+		<a data-facetgrouppageid="facetgrouppage%INDEX%" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}"> \
+			<div class="grid-iconbox" > \
+				<img src="%ICON%" class="grid-icon" alt="" /> \
+			</div> \
+			<div class="grid-labelbox ">%LABEL%</div> \
+		</a> \
+	</div> \
+</li> \
+';
+
+
 </script>
+
 
 </body>

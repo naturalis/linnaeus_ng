@@ -8,6 +8,9 @@ function __(text)
 /*
 	hooks:
 	hook_postPrintResults();
+	hook_prePrintResults();
+	hook_prePrintMenu();
+	hook_postPrintMenu();
 */
 
 var matrixsettings={
@@ -43,6 +46,7 @@ var data={
 	resultset: Array(), // result subset
 	states: {}, // user-selected states
 	characters: {}, // remaining states/taxa per character
+	statecount: {}, // remaining taxa per state
 	scores: {}, // match scores based on selection
 	related: {}, // related species
 	found: {} // search results
@@ -93,6 +97,11 @@ function retrieveDataSet()
 				initialize=false;
 				retrieveMenu();
 			}
+
+	hook_postPrintResults();
+	hook_prePrintResults();
+	
+
 		}
 	});
 }
@@ -130,6 +139,8 @@ function resetMatrix()
 
 function printResults()
 {
+	if (typeof hook_prePrintResults == 'function') { hook_prePrintResults(); }
+	
 	var resultset = getResultSet();
 
 	// pre-emptively remove show_more-button (clicking similar automatically switches to browseStyle='show_all')
@@ -212,6 +223,9 @@ function shouldDisableEmergentChar( id )
 
 function printMenu()
 {
+	
+	if (typeof hook_prePrintMenu == 'function') { hook_prePrintMenu(); }
+	
 	$('#facet-categories-menu').html('');
 	
 	var menu=getMenu();
@@ -388,6 +402,9 @@ function printMenu()
 	{
 		showRestartButton();
 	}	
+	
+	if (typeof hook_postPrintMenu == 'function') { hook_postPrintMenu(); }
+	
 }
 
 function clearResults()
@@ -883,6 +900,7 @@ function setState( p )
 
 			setScores(d.scores);
 			setStates(d.states);
+			setStateCount(d.statecount);
 			setCharacters(d.characters);
 
 			closeSimilar();
@@ -1346,6 +1364,16 @@ function setCharacters(characters)
 function getCharacters()
 {
 	return data.characters;
+}
+
+function setStateCount(statecount)
+{
+	data.statecount=statecount;
+}
+
+function getStateCount()
+{
+	return data.statecount;
 }
 
 function setDataSet(dataset)
