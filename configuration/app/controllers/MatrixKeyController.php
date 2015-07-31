@@ -75,8 +75,10 @@ class MatrixKeyController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsController;
-		$this->moduleSettings->assignModuleSettings( $this->settings );
 		
+		$this->moduleSettings->setUseDefaultWhenNoValue( true );
+		$this->moduleSettings->assignModuleSettings( $this->settings );
+
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
 
@@ -92,7 +94,6 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('introduction_links', $this->getIntroductionLinks());
 		$this->smarty->assign('settings', $this->settings);
 		$this->setMenu();
-
     }
 
     public function indexAction()

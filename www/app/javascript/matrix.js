@@ -5,7 +5,12 @@ function __(text)
 	return _(text);
 }
 
-var settings={
+/*
+	hooks:
+	hook_postPrintResults();
+*/
+
+var matrixsettings={
 	matrixId: 0,
 	projectId: 0,
 	perPage: 16,
@@ -43,7 +48,7 @@ var data={
 	found: {} // search results
 }
 
-var prevSettings={};
+var prevmatrixsettings={};
 
 var initialize=true;
 var lastScrollPos=0;
@@ -71,8 +76,8 @@ function retrieveDataSet()
 		data : ({
 			action : 'get_dataset',
 			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
 		success : function ( d )
 		{
@@ -102,8 +107,8 @@ function retrieveMenu()
 		data : ({
 			action : 'get_menu',
 			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
 		success : function (data)
 		{
@@ -131,15 +136,15 @@ function printResults()
 	$("#show-more").remove();
 	$("#footerPagination").removeClass('noline');
 
-	if (resultset && settings.browseStyle=='expand') 
+	if (resultset && matrixsettings.browseStyle=='expand') 
 	{
 		printResultsExpanded();
 	}
 	else
-	if (resultset && settings.browseStyle!='expand') // (non-)paginated
+	if (resultset && matrixsettings.browseStyle!='expand') // (non-)paginated
 	{
 		printResultsPaginated();
-		if (settings.browseStyle=='paginate')
+		if (matrixsettings.browseStyle=='paginate')
 		{
 			printPaging();
 		}
@@ -162,6 +167,8 @@ function printResults()
 	{
 		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('.png','_grijs.png')  : "" );
 	});
+	
+	if (typeof hook_postPrintResults == 'function') { hook_postPrintResults(); }
 }
 
 function shouldDisableChar( id )
@@ -183,9 +190,9 @@ function shouldDisableChar( id )
 function shouldDisableEmergentChar( id )
 {
 	/*
-	usage of emergent characters can be turned off in project settings
+	usage of emergent characters can be turned off in project matrixsettings
 	*/
-	if (!settings.useEmergingCharacters) return false;
+	if (!matrixsettings.useEmergingCharacters) return false;
 	
 	/*
 	types other than text or media (i.e., "free-entry types", 'range' etc.)
@@ -227,7 +234,7 @@ function printMenu()
 
 			for (var j in item.chars)
 			{
-				if (settings.groupsAlwaysOpen) openGroups.push(item.id);
+				if (matrixsettings.groupsAlwaysOpen) openGroups.push(item.id);
 				
 				var char=item.chars[j];
 
@@ -251,7 +258,7 @@ function printMenu()
 							.replace('%LABEL%',(state.label ? state.label : ''))
 							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 							.replace('%STATE-ID%',state.val)
-							.replace('%IMG-URL%',settings.imageRootSkin+'clearSelection.gif');
+							.replace('%IMG-URL%',matrixsettings.imageRootSkin+'clearSelection.gif');
 					}
 					
 					l=menuSelStatesHtmlTpl.replace('%STATES%',t);
@@ -320,7 +327,7 @@ function printMenu()
 						.replace('%LABEL%',(state.label ? state.label : ''))
 						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 						.replace('%STATE-ID%',state.val)
-						.replace('%IMG-URL%',settings.imageRootSkin+'clearSelection.gif');
+						.replace('%IMG-URL%',matrixsettings.imageRootSkin+'clearSelection.gif');
 				}
 				
 				l=menuSelStatesHtmlTpl.replace('%STATES%',t);
@@ -391,12 +398,12 @@ function clearResults()
 
 function printHeader()
 {
-	if (settings.mode=="search")
+	if (matrixsettings.mode=="search")
 	{
 		printSearchHeader();
 	}
 	else
-	if (settings.mode=="similar")
+	if (matrixsettings.mode=="similar")
 	{
 		printSimilarHeader();
 	}
@@ -416,13 +423,13 @@ function printResultsExpanded()
 	
 	for(var i=0;i<resultset.length;i++)
 	{
-		if (i < settings.expandedShowing+settings.perPage)
+		if (i < matrixsettings.expandedShowing+matrixsettings.perPage)
 		{
 			s=s+formatResult(resultset[i]);
 
 			printed++;
 
-			if (++d==settings.perLine)
+			if (++d==matrixsettings.perLine)
 			{
 				s=s+resultsLineEndHtmlTpl;
 				d=0;
@@ -437,12 +444,12 @@ function printResultsExpanded()
 	);
 
 	// parallel processing using show() causes mayhem when clicking the 'show more'-button fast.
-	//		.replace('%STYLE%',(settings.expandedShowing>0  ? 'display:none' : ''))
+	//		.replace('%STYLE%',(matrixsettings.expandedShowing>0  ? 'display:none' : ''))
 	//	$('.result-batch:hidden').show('normal');
 	
-	settings.expandedShowing=printed;
+	matrixsettings.expandedShowing=printed;
 
-	if (settings.expandedShowing<resultset.length)
+	if (matrixsettings.expandedShowing<resultset.length)
 	{
 		if (!$("#show-more-").is(':visible'))
 		{
@@ -451,7 +458,7 @@ function printResultsExpanded()
 		}
 	}
 	
-	if (settings.expandedShowing>0) 
+	if (matrixsettings.expandedShowing>0) 
 	{
 		//window.scrollBy(0,99999);
 	}
@@ -468,12 +475,12 @@ function printResultsPaginated()
 	for(var i=0;i<resultset.length;i++)
 	{
 		if (
-			(settings.browseStyle=='paginate' && i>=settings.start && i<settings.start+settings.perPage) || 
-			settings.browseStyle=='show_all'
+			(matrixsettings.browseStyle=='paginate' && i>=matrixsettings.start && i<matrixsettings.start+matrixsettings.perPage) || 
+			matrixsettings.browseStyle=='show_all'
 		)
 		{
 			s=s+formatResult(resultset[i]);
-			if (++d==settings.perLine)
+			if (++d==matrixsettings.perLine)
 			{
 				s=s+resultsLineEndHtmlTpl;
 				d=0;
@@ -508,7 +515,7 @@ function formatResult( data )
 		var commonName="";
 	}
 
-	if (settings.showSpeciesDetails && data.states)
+	if (matrixsettings.showSpeciesDetails && data.states)
 	{
 		var states = Array();
 
@@ -559,11 +566,11 @@ function formatResult( data )
 	if (data.info && data.info.url_image)
 	{
 		image=data.info.url_image;
-		if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=settings.imageRootProject+image;
+		if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=matrixsettings.imageRootProject+image;
 	}
 	else
 	{
-		if (settings.defaultSpeciesImage) image=settings.defaultSpeciesImage;
+		if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
 	}
 
 	var thumb="";
@@ -571,7 +578,7 @@ function formatResult( data )
 	if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
 	{
 		thumb=data.info.url_thumbnail ? data.info.url_thumbnail : data.info.url_thumb;
-		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=settings.imageRootProject+thumb;
+		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=matrixsettings.imageRootProject+thumb;
 	}
 	else
 	{
@@ -586,7 +593,7 @@ function formatResult( data )
 			.replace('%SCI-NAME%',sciName)
 			.replace('%GENDER%',(data.gender && data.gender.gender ?
 				photoLabelGenderHtmlTpl
-					.replace('%IMG-SRC%', settings.imageRootSkin + data.gender.gender+'.png')
+					.replace('%IMG-SRC%', matrixsettings.imageRootSkin + data.gender.gender+'.png')
 					.replace('%GENDER-LABEL%', data.gender.gender_label)
 				: "" ))
 			.replace('%COMMON-NAME%',(commonName ? brHtmlTpl + commonName : ""))
@@ -610,7 +617,7 @@ function formatResult( data )
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
 			.replace('%GENDER%',(data.gender && data.gender.gender ? 
 				genderHtmlTpl
-					.replace('%ICON-URL%', settings.imageRootSkin+data.gender.gender+'.png') 
+					.replace('%ICON-URL%', matrixsettings.imageRootSkin+data.gender.gender+'.png') 
 					.replace('%GENDER-LABEL%', data.gender.gender_label) 
 				: "" )
 			)
@@ -629,11 +636,11 @@ function formatResult( data )
 					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
-				iconUrlHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"information_grijs.png") : "")
+				iconUrlHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
 			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',labels.details) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
-				iconInfoHtmlTpl.replace('%IMG-URL%',settings.imageRootSkin+"lijst_grijs.png") : "")
+				iconInfoHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
 			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
 				relatedClickHtmlTpl
@@ -643,7 +650,7 @@ function formatResult( data )
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
-				iconSimilarTpl.replace('%IMG-URL%',settings.imageRootSkin+"gelijk_grijs.png") : "")
+				iconSimilarTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
 			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
@@ -663,23 +670,23 @@ function printCountHeader()
 {
 	var resultset = getResultSet();
 	
-	if (settings.browseStyle=='expand')
+	if (matrixsettings.browseStyle=='expand')
 	{
 		$('#result-count').html(
 			counterExpandHtmlTpl
-				.replace('%START-NUMBER%',(settings.expandedShowing > 1 ? "1-" : "" ))
-				.replace('%NUMBER-SHOWING%',settings.expandedShowing)
+				.replace('%START-NUMBER%',(matrixsettings.expandedShowing > 1 ? "1-" : "" ))
+				.replace('%NUMBER-SHOWING%',matrixsettings.expandedShowing)
 				.replace('%FROM-LABEL%',__('van'))
 				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
 	}
 	else
-	if (settings.browseStyle=='paginate')
+	if (matrixsettings.browseStyle=='paginate')
 	{
 		$('#result-count').html(
 			counterPaginateHtmlTpl
-				.replace('%FIRST-NUMBER%', (settings.start+1))
-				.replace('%LAST-NUMBER%',(settings.start+settings.perPage))
+				.replace('%FIRST-NUMBER%', (matrixsettings.start+1))
+				.replace('%LAST-NUMBER%',(matrixsettings.start+matrixsettings.perPage))
 				.replace('%NUMBER-LABEL%',__('van'))
 				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
@@ -711,19 +718,19 @@ function printPaging()
 {
 	var resultset = getResultSet();
 
-	setSetting({lastPage:Math.ceil(resultset.length / settings.perPage)});
-	setSetting({currPage:Math.floor(settings.start / settings.perPage)});
+	setSetting({lastPage:Math.ceil(resultset.length / matrixsettings.perPage)});
+	setSetting({currPage:Math.floor(matrixsettings.start / matrixsettings.perPage)});
 
-	if (settings.lastPage > 1 && settings.currPage!=0)
+	if (matrixsettings.lastPage > 1 && matrixsettings.currPage!=0)
 	{
 		$("#paging-header").append( pagePrevHtmlTpl );
 	}
 	
-	if (settings.lastPage>1)
+	if (matrixsettings.lastPage>1)
 	{ 
-		for (var i=0;i<settings.lastPage;i++)
+		for (var i=0;i<matrixsettings.lastPage;i++)
 		{
-			if (i==settings.currPage)
+			if (i==matrixsettings.currPage)
 			{
 				$("#paging-header").append( pageCurrHtmlTpl.replace('%NR%',(i+1)) );
 			}
@@ -734,7 +741,7 @@ function printPaging()
 		}
 	}
 
-	if (settings.lastPage > 1 && settings.currPage<settings.lastPage-1)
+	if (matrixsettings.lastPage > 1 && matrixsettings.currPage<matrixsettings.lastPage-1)
 	{
 		$("#paging-header").append( pageNextHtmlTpl );
 	}
@@ -745,11 +752,11 @@ function printPaging()
 function browsePage( id )
 {
 	if (id=='n')
-		setSetting({start: settings.start+settings.perPage});
+		setSetting({start: matrixsettings.start+matrixsettings.perPage});
 	else if (id=='p')
-		setSetting({start: settings.start-settings.perPage});
+		setSetting({start: matrixsettings.start-matrixsettings.perPage});
 	else if (!isNaN(id))
-		setSetting({start:id * settings.perPage});
+		setSetting({start:id * matrixsettings.perPage});
 	else
 		return;
 			
@@ -831,8 +838,8 @@ function showStates(id)
 		data : ({
 			id: id,
 			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
 		success : function( page )
 		{
@@ -867,8 +874,8 @@ function setState( p )
 			state : p.state,
 			value : p.value,
 			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
 		success : function(data)
 		{
@@ -915,7 +922,7 @@ function applyScores()
 			for(var j in dataset)
 			{
 				var item=dataset[j];
-				if (score.id==item.id && score.type==item.type && (settings.scoreThreshold==0 || score.score>=settings.scoreThreshold))
+				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
 					resultset.push(item);
 				}
@@ -925,7 +932,7 @@ function applyScores()
 	
 	setResultSet(resultset);
 
-	setSetting({showSpeciesDetails: settings.alwaysShowDetails || (resultset.length <= settings.perPage)});
+	setSetting({showSpeciesDetails: matrixsettings.alwaysShowDetails || (resultset.length <= matrixsettings.perPage)});
 }
 
 function applyRelated()
@@ -995,15 +1002,15 @@ function setSimilar( p )
 			id : p.id,
 			type : p.type,
 			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
 		success : function(data)
 		{
 			var related=$.parseJSON(data);
 			setRelated(related);
 
-			setPrevSettings();
+			setPrevmatrixsettings();
 			setLastScrollPos();
 
 			setSetting({mode:"similar"});
@@ -1120,7 +1127,7 @@ function printSimilarHeader()
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
 			.replace('%SHOW-STATES-TEXT%', labels.show_all)
-			.replace('%NUMBER-START%', settings.start+1)
+			.replace('%NUMBER-START%', matrixsettings.start+1)
 			.replace('%NUMBER-END%', data.resultset.length)
 	).removeClass('hidden').addClass('visible');
 	
@@ -1165,8 +1172,8 @@ function setSearch( p )
 			action : 'get_search' ,
 			search : s,
 			time : getTimestamp(),
-			key : settings.matrixId,
-			p : settings.projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
 		success : function(data)
 		{
@@ -1174,7 +1181,7 @@ function setSearch( p )
 			var found=$.parseJSON(data);
 			setFound(found);
 
-			setPrevSettings();
+			setPrevmatrixsettings();
 			setLastScrollPos();
 
 			setSetting({mode:"search"});
@@ -1205,8 +1212,8 @@ function printSearchHeader()
 			.replace('%HEADER-TEXT%', __('Zoekresultaten voor'))
 			.replace('%SEARCH-TERM%', searchedfor)
 			.replace('%BACK-TEXT%', __('terug'))
-			.replace('%NUMBER-START%', settings.start+1)
-			.replace('%NUMBER-END%', settings.expandedShowing)
+			.replace('%NUMBER-START%', matrixsettings.start+1)
+			.replace('%NUMBER-END%', matrixsettings.expandedShowing)
 			.replace('%OF-TEXT%', __('van'))
 			.replace('%NUMBER-TOTAL%', data.resultset.length)
 	).removeClass('hidden').addClass('visible');
@@ -1218,8 +1225,8 @@ function closeSimilarSearch()
 	clearSimilarHeader();
 	applyScores();
 	clearResults();
-	setSetting(getPrevSettings());
-	setSetting({expandedShowing:settings.expandedShowing-settings.perPage});
+	setSetting(getPrevmatrixsettings());
+	setSetting({expandedShowing:matrixsettings.expandedShowing-matrixsettings.perPage});
 	printResults();
 	window.scroll(0,getLastScrollPos());
 }
@@ -1391,19 +1398,19 @@ function getFound()
 	return data.found;
 }
 
-function setPrevSettings()
+function setPrevmatrixsettings()
 {
-	prevSettings = jQuery.extend({}, settings);
+	prevmatrixsettings = jQuery.extend({}, matrixsettings);
 }
 
-function getPrevSettings()
+function getPrevmatrixsettings()
 {
-	return prevSettings;
+	return prevmatrixsettings;
 }
 
 function setSetting( p )
 {
-	$.extend(settings, p);
+	$.extend(matrixsettings, p);
 }
 
 function getCharacter( id )
@@ -1444,12 +1451,12 @@ function showRestartButton()
 
 function doRemoteLink( url, name )
 {
-	if (settings.generalSpeciesInfoUrl.length>0)
+	if (matrixsettings.generalSpeciesInfoUrl.length>0)
 	{
 		setCursor('wait');
 
-		var iurl=settings.generalSpeciesInfoUrl
-			.replace('%PID%',settings.projectId)
+		var iurl=matrixsettings.generalSpeciesInfoUrl
+			.replace('%PID%',matrixsettings.projectId)
 			.replace('%TAXON%',name);
 			
 		//console.log( iurl );
@@ -1504,6 +1511,6 @@ function matrixInit()
 	$('#legendSimilarSpecies').html( labels.similar );
 	$('#legendExternalLink').html( labels.info_link );
 
-	settings.defaultSpeciesImage=settings.defaultSpeciesImages[settings.imageOrientation];
+	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
 
 }

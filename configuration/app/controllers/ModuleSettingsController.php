@@ -19,6 +19,8 @@ class ModuleSettingsController extends Controller
 	private $_modulecontroller;
 	private $_moduleid;
 	private $_settingsvalues;
+	private $_usedefaultwhennovalue=false;
+	
 
     public function __construct($p = null)
     {
@@ -56,11 +58,11 @@ class ModuleSettingsController extends Controller
 			{
 				return $val['value'];
 			}
-			
-			if ( isset($subst) )
-			{
-				return $subst;
-			}
+		}
+
+		if ( isset($subst) )
+		{
+			return $subst;
 		}
     }
 
@@ -69,9 +71,28 @@ class ModuleSettingsController extends Controller
 		$settings = new stdClass();
 		foreach((array)$this->getModuleSettingsValues() as $val)
 		{
-			$settings->$val['setting']=$val['value'];
+			if ( is_null($val['value']) && $this->getUseDefaultWhenNoValue() && !is_null($val['default_value']) )
+			{
+				$settings->$val['setting']=$val['default_value'];
+			}
+			else
+			{
+				$settings->$val['setting']=$val['value'];
+			}
 		}
 	}
+
+    public function setUseDefaultWhenNoValue( $state )
+    {
+		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
+    }
+
+    private function getUseDefaultWhenNoValue()
+    {
+		return $this->_usedefaultwhennovalue;
+    }
+
+
 
     private function setModuleController( $m )
     {
@@ -86,6 +107,7 @@ class ModuleSettingsController extends Controller
     private function setModuleId()
     {
 		$d=$this->models->Module->_get(array("id"=>array("controller"=>$this->getModuleController())));
+
 		if ($d)
 		{
 			$this->_moduleid=$d[0]['id'];
@@ -104,7 +126,8 @@ class ModuleSettingsController extends Controller
 		$this->_settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
 			select
 				_a.value as value,
-				_b.setting
+				_b.setting,
+				_b.default_value as default_value
 
 			from
 				%PRE%module_settings _b
