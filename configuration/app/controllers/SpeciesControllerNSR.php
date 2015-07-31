@@ -44,13 +44,6 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
 
-echo "<!-- tests
-".
-		$this->_taxon_base_url_images_main . chr(10).
-		$this->_taxon_base_url_images_thumb . chr(10).
-		$this->_taxon_base_url_images_overview . chr(10)."
--->";
-
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
