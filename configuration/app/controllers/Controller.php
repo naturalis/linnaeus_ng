@@ -1416,7 +1416,7 @@ class Controller extends BaseClass
             'limit' => 1
         ));
 
-        if (isset($s[0]))
+        if ($s[0]!="")
             return $s[0]['value'];
         else
             return isset($substitute) ? $substitute : null;
