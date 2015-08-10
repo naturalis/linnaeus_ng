@@ -624,8 +624,8 @@
 	$b->setLanguageId( 24 );
 	$b->setLimit( 100 );
 	$b->setFileNameRoot( "nsr-export--" );
-//	$b->setExportFolder( "/home/maarten.schermer/export/" );
-	$b->setExportFolder( "C:\\tmp\\bla\\" );
+	$b->setExportFolder( "/home/maarten.schermer/export/" );
+//	$b->setExportFolder( "C:\\tmp\\bla\\" );
 	$b->go();
 
 
