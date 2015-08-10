@@ -149,6 +149,10 @@
 			else
 			{
 				$this->feedback( "connected " . $this->connector->database . "@" . $this->connector->host );
+
+				$this->mysqli->query('SET NAMES ' . $this->connector->characterSet );
+				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->characterSet );
+
 			}
 		}
 
