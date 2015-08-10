@@ -43,7 +43,7 @@
 			<div class="sub-header-wrapper" style="display:none" >
                 <div class="sub-header">
                     <div class="sub-header-inner">
-                        <a href="#" class="no-text alles-wissen" onClick="nbcClearStateValue();return false;">Alles wissen</a>
+                        <a href="#" class="no-text alles-wissen" onClick="resetMatrix();return false;">Alles wissen</a>
                         <div class="dit-weet-je-arrow no-text">
                                 Dit weet je van het dier:
                         </div>
@@ -260,6 +260,7 @@ $(document).ready(function()
 
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
+	setStateCount($.parseJSON('{$session_statecount}'));
 	setCharacters($.parseJSON('{$session_characters}'));
 			
 	matrixInit();
@@ -436,6 +437,9 @@ var drzkr_mainMenuItemHtmlTemplate = '\
 		</a> \
 	</div> \
 </li> \
+';
+
+var drzkr_selectedFacetHtmlTemplate = '<li><div class="ui-block-a"><a class="chosen-facet" onclick="clearStateValue(\'%STATE-VAL%\');return false;" href="#"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;font-style:italic;margin-top:-15px;padding-bottom:5px;">%CHARACTER-LABEL%</div><img class="grid-icon" src="%ICON%" style="top:25px;" alt=""><img src="%IMG-ROOT-SKIN%button-close-shadow-overlay.png" style="position:relative;top:-5px;left:0px;margin-left:-73px;" alt=""></div><div class="grid-labelbox" style="margin-top:-5px;">%STATE-LABEL%</div></a></div></li> \
 ';
 
 
