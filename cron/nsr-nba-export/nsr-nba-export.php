@@ -69,6 +69,7 @@
 				$this->connector->database = $data['database'];
 				$this->connector->prefix = $data['tablePrefix'];
 				$this->connector->project_id = $data['project_id'];
+				$this->connector->character_set = $data['characterSet'];
 			} 
 			catch (Exception $e)
 			{
@@ -150,8 +151,8 @@
 			{
 				$this->feedback( "connected " . $this->connector->database . "@" . $this->connector->host );
 
-				$this->mysqli->query('SET NAMES ' . $this->connector->characterSet );
-				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->characterSet );
+				$this->mysqli->query('SET NAMES ' . $this->connector->character_set );
+				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->character_set );
 
 			}
 		}
