@@ -1467,6 +1467,8 @@ _k.authorship
 		$offset=isset($p['offset']) ? $p['offset'] : null;
 
 		$content=$rdf=null;
+		
+		$isPublished=null;
 
         switch ($category)
 		{
