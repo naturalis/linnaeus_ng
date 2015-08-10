@@ -290,12 +290,20 @@ $includeClassification=true;
 				".($numberOfRecords!='*'  ? "limit ".$numberOfRecords : "" )."
 
 			");
-	
+
 			$data=array();
 			$lookuplist=array();
 			
 			$taxonCount=count($taxa);
 			$i=0;
+
+
+$xmlWriter = new XMLWriter();
+$xmlWriter->openMemory();
+$xmlWriter->startDocument('1.0', 'UTF-8');
+//$f=$exportfolder . sprintf($filename,'-'.str_pad($key,3,"0",STR_PAD_LEFT));
+$f=$exportfolder . sprintf($filename,"");
+$prettify=true;
 
 			foreach((array)$taxa as $key=>$val)
 			{
@@ -448,24 +456,8 @@ $includeClassification=true;
 				$val['classification']=@explode(' ',$val['classification']);
 				$val['images']=@$images;
 
-				unset($val['id']);
-				unset($val['status_status']);
-				unset($val['status_reference_title']);
-				unset($val['status_expert_name']);
-				unset($val['status_organisation_name']);
 
-				$data['taxon__'.($i++)]=$val;
-				unset($taxa[$key]);
-
-			}
-
-			unset($taxa);
-
-			//unset($allpages);
-			
-			if ($includeClassification)
-			{
-				foreach($data as $key=>$val)
+				if ($includeClassification)
 				{
 					$class=array();
 					$m=0;	
@@ -511,11 +503,77 @@ $includeClassification=true;
 						$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
 					}
 					
-					$data[$key]['classification']=$class;
+					$val['classification']=$class;
+					
 				}
-				
+				else
+				{
+					unset($val['classification']);
+				}
+
+				unset($val['id']);
+				unset($val['status_status']);
+				unset($val['status_reference_title']);
+				unset($val['status_expert_name']);
+				unset($val['status_organisation_name']);
+
+//				$data['taxon__'.($i++)]=$val;
+				unset($taxa[$key]);
+
+
+		$xml=
+			'<taxon></taxon>';
+
+
+		$simpleXmlObject = new SimpleXMLElement($xml);
+
+		$this->arrayToXml($val,$simpleXmlObject);
+		
+		if ($prettify)
+		{
+			$dom = new DOMDocument('1.0');
+			$dom->preserveWhiteSpace = false;
+			$dom->formatOutput = true;
+			$dom->loadXML($simpleXmlObject->asXML());
+			$out=$dom->saveXML();
+		}
+		else
+		{
+			$out=$simpleXmlObject->asXML();
+		}
+	
+	if ($key==0)
+	{
+	    $xmlWriter->writeRaw ( '<'.$rootelement.' exportdate="'.date('c').'">' . "\n" . '<taxa>' );	
+	}
+
+    $xmlWriter->writeRaw ( str_replace('<?xml version="1.0"?>' , '' , $out ) );
+
+	unset($val);
+    // Flush XML in memory to file every 1000 iterations
+	
+	
+	
+    if (0 == $key%1000) {
+        file_put_contents( $f , $xmlWriter->flush(true), FILE_APPEND);
+    }
+
+
 			}
 
+	    $xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$rootelement.'>' );	
+
+        file_put_contents( $f , $xmlWriter->flush(true), FILE_APPEND);
+		
+		$this->addMessage('Wrote '.($key).' records to '.$exportfolder.$f);
+
+
+			//unset($taxa);
+
+			//unset($allpages);
+			
+			/*
+			
 			if ($recordsPerFile < $taxonCount)
 			{
 				$chunks=array_chunk($data,$recordsPerFile);
@@ -545,6 +603,8 @@ $includeClassification=true;
 					$this->exportDataDownload($data,$f);
 				}
 			}
+			
+			*/
 
 		}
 
