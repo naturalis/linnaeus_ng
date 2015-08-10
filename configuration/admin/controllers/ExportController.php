@@ -220,8 +220,6 @@ $includeNames=true;
 $includeImages=true;
 $includeClassification=true;
 
-			die( "ADD IS_DELETED=0 TO QUERY!" );
-
 			$taxa=$this->models->Taxon->freeQuery("
 				select
 					_t.taxon as name,
@@ -281,7 +279,13 @@ $includeClassification=true;
 					on _t.id=_q.taxon_id
 					and _t.project_id=_q.project_id
 
+				left join %PRE%trash_can _trash
+					on _t.project_id = _trash.project_id
+					and _t.id =  _trash.lng_id
+					and _trash.item_type='taxon'
+	
 				where _t.project_id = ".$this->getCurrentProjectId()."
+					and ifnull(_trash.is_deleted,0)=0
 
 				".($numberOfRecords!='*'  ? "limit ".$numberOfRecords : "" )."
 
