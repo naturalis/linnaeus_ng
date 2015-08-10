@@ -947,10 +947,39 @@ class MatrixKeyController extends Controller
 			from 
 				%PRE%characteristics _a
 
+<<<<<<< HEAD
 			left join %PRE%characteristics_labels _c
 				on _a.project_id=_c.project_id
 				and _a.id=_c.characteristic_id
 				and _c.language_id=".$this->getCurrentLanguageId()."
+=======
+    private function getCharacterGroups ()
+    {
+		
+        $cg = $this->models->Chargroup->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'matrix_id' => $this->getCurrentMatrixId()
+            ), 
+            'order' => 'show_order', 
+            'columns' => 'id,matrix_id,label,show_order',
+			'fieldAsIndex' => 'id'
+        ));
+        
+        foreach ((array) $cg as $key => $val) {
+			$d=$this->getCharacterGroupLabel($val['id'], $this->getCurrentLanguageId());
+            $cg[$key]['label'] = !empty($d) ? $d : $cg[$key]['label'];
+            
+            $cc = $this->models->CharacteristicChargroup->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'chargroup_id' => $val['id']
+                ), 
+                'order' => 'show_order'
+            ));
+>>>>>>> hot-fix-nba-export-memory-drain
 
 			where 
 				_a.project_id = " . $this->getCurrentProjectId() . "
@@ -1474,11 +1503,47 @@ class MatrixKeyController extends Controller
 						on _a.project_id = _c.project_id
 						and _a.taxon_id = _c.id
 
+<<<<<<< HEAD
 					left join %PRE%matrices_taxa_states _b
 						on _a.project_id = _b.project_id
 						and _a.matrix_id = _b.matrix_id
 						and _a.taxon_id = _b.taxon_id
 						and _b.characteristic_id =".$character."
+=======
+                $val['taxon_id'] = $variation['taxon_id'];
+                
+                $nbc = $this->models->NbcExtras->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'ref_id' => $val['relation_id'], 
+                        'ref_type' => 'variation'
+                    ), 
+                    'columns' => 'name,value', 
+                    'fieldAsIndex' => 'name'
+                ));
+                
+                $label = $val['label'];
+                $val['id'] = $val['relation_id'];
+                
+				$d = $this->nbcExtractGenderTag($label);
+
+                $res[] = $this->createDatasetEntry(
+                array(
+                    'val' => $val, 
+                    'nbc' => $nbc, 
+                    'label' => isset($d['label']) ? $d['label'] : '', 
+					'common' => $this->getCommonname($val['taxon_id']), 
+                    'gender' => array(isset($d['gender']) ? $d['gender'] : '' , isset($d['gender_label']) ? $d['gender_label'] : '' ),
+                    'type' => 'v', 
+                    'highlight' => $val['id'] == $p['id'], 
+                    'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['relation_id'])
+                ));
+            }
+            else {
+                
+                $taxon = $this->getTaxonById($val['relation_id']);
+>>>>>>> hot-fix-nba-export-memory-drain
 
 					where
 						_a.project_id = " . $this->getCurrentProjectId() . "
