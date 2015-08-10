@@ -157,7 +157,7 @@
 		{
 			$this->xmlWriter = new XMLWriter();
 			$this->xmlWriter->openMemory();
-			$this->xmlWriter->startDocument('1.0');
+			$this->xmlWriter->startDocument('1.0', 'UTF-8');
 		}
 		
 		private function setTaxa()
