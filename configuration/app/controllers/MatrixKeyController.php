@@ -947,39 +947,10 @@ class MatrixKeyController extends Controller
 			from 
 				%PRE%characteristics _a
 
-<<<<<<< HEAD
 			left join %PRE%characteristics_labels _c
 				on _a.project_id=_c.project_id
 				and _a.id=_c.characteristic_id
 				and _c.language_id=".$this->getCurrentLanguageId()."
-=======
-    private function getCharacterGroups ()
-    {
-		
-        $cg = $this->models->Chargroup->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id' => $this->getCurrentMatrixId()
-            ), 
-            'order' => 'show_order', 
-            'columns' => 'id,matrix_id,label,show_order',
-			'fieldAsIndex' => 'id'
-        ));
-        
-        foreach ((array) $cg as $key => $val) {
-			$d=$this->getCharacterGroupLabel($val['id'], $this->getCurrentLanguageId());
-            $cg[$key]['label'] = !empty($d) ? $d : $cg[$key]['label'];
-            
-            $cc = $this->models->CharacteristicChargroup->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'chargroup_id' => $val['id']
-                ), 
-                'order' => 'show_order'
-            ));
->>>>>>> hot-fix-nba-export-memory-drain
 
 			where 
 				_a.project_id = " . $this->getCurrentProjectId() . "
