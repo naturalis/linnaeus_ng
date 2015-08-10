@@ -7,10 +7,12 @@ function __(text)
 
 /*
 	hooks:
-	hook_postPrintResults();
 	hook_prePrintResults();
+	hook_postPrintResults();
 	hook_prePrintMenu();
 	hook_postPrintMenu();
+	hook_preApplyScores();
+	hook_postApplyScores();
 */
 
 var matrixsettings={
@@ -97,11 +99,6 @@ function retrieveDataSet()
 				initialize=false;
 				retrieveMenu();
 			}
-
-	hook_postPrintResults();
-	hook_prePrintResults();
-	
-
 		}
 	});
 }
@@ -918,6 +915,9 @@ function setState( p )
 
 function applyScores()
 {
+
+	if (typeof hook_preApplyScores == 'function') { hook_preApplyScores(); }
+
 	var scores=getScores();
 	var states=getStates();
 	var dataset=getDataSet();
@@ -951,6 +951,11 @@ function applyScores()
 	setResultSet(resultset);
 
 	setSetting({showSpeciesDetails: matrixsettings.alwaysShowDetails || (resultset.length <= matrixsettings.perPage)});
+	
+	matrixsettings.start=0;
+	
+	if (typeof hook_postApplyScores == 'function') { hook_postApplyScores(); }
+
 }
 
 function applyRelated()

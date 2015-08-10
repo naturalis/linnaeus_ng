@@ -109,6 +109,8 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
+		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
+
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 
@@ -1474,47 +1476,12 @@ class MatrixKeyController extends Controller
 						on _a.project_id = _c.project_id
 						and _a.taxon_id = _c.id
 
-<<<<<<< HEAD
 					left join %PRE%matrices_taxa_states _b
 						on _a.project_id = _b.project_id
 						and _a.matrix_id = _b.matrix_id
 						and _a.taxon_id = _b.taxon_id
 						and _b.characteristic_id =".$character."
-=======
-                $val['taxon_id'] = $variation['taxon_id'];
-                
-                $nbc = $this->models->NbcExtras->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'ref_id' => $val['relation_id'], 
-                        'ref_type' => 'variation'
-                    ), 
-                    'columns' => 'name,value', 
-                    'fieldAsIndex' => 'name'
-                ));
-                
-                $label = $val['label'];
-                $val['id'] = $val['relation_id'];
-                
-				$d = $this->nbcExtractGenderTag($label);
 
-                $res[] = $this->createDatasetEntry(
-                array(
-                    'val' => $val, 
-                    'nbc' => $nbc, 
-                    'label' => isset($d['label']) ? $d['label'] : '', 
-					'common' => $this->getCommonname($val['taxon_id']), 
-                    'gender' => array(isset($d['gender']) ? $d['gender'] : '' , isset($d['gender_label']) ? $d['gender_label'] : '' ),
-                    'type' => 'v', 
-                    'highlight' => $val['id'] == $p['id'], 
-                    'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['relation_id'])
-                ));
-            }
-            else {
-                
-                $taxon = $this->getTaxonById($val['relation_id']);
->>>>>>> hot-fix-nba-export-memory-drain
 
 					where
 						_a.project_id = " . $this->getCurrentProjectId() . "
