@@ -79,8 +79,14 @@ class NsrActivityLogController extends NsrController
 				_u.first_name as user_first_name,
 				_u.last_name as user_last_name,
 				_u.email_address as user_email_address,
-				_u.active as user_active
-	
+				_u.active as user_active,
+				CONCAT(
+					FLOOR(HOUR(TIMEDIFF(now(), _a.created)) / 24), 'd ',
+					MOD(HOUR(TIMEDIFF(now(), _a.created)), 24), 'h ',
+					MINUTE(TIMEDIFF(now(), _a.created)), 'm ',
+					SECOND(TIMEDIFF(now(), _a.created)), 's'
+				) as time_past_hr
+					
 			from %PRE%activity_log _a
 			
 			left join %PRE%users _u
