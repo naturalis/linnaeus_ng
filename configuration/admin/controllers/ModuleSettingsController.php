@@ -15,9 +15,8 @@ create table `module_settings` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `module_settings_1` (`project_id`),
-  KEY `module_settings_2` (`project_id`,`module_id`),
-  UNIQUE `module_settings_3` (`project_id`,`module_id`,`setting`)
+  KEY `module_settings_1` (`module_id`),
+  UNIQUE `module_settings_2` (`module_id`,`setting`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 ;
 
@@ -37,6 +36,7 @@ create table `module_settings_preset_values` (
   UNIQUE `module_settings_3` (`project_id`,`setting_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 ;
+
 */
 
 include_once ('Controller.php');
