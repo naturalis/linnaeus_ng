@@ -27,7 +27,7 @@
                                 <div class="facet-btn ui-block-d">
                                     <a data-facetgrouppageid="facetgrouppage{$groupkey}" href="#" data-role="button" data-corners="false" data-shadow="false">
                                         <div class="grid-iconbox" >
-                                            <img src="{$projectUrls.projectMedia}__menu{$foo[0]|regex_replace:"/\W/":""|ucwords}.png" class="grid-icon" alt="" />
+                                            <img src="{$projectUrls.projectMedia}__menu{$foo[0]|ucwords|regex_replace:"/\W/":""}.png" class="grid-icon" alt="" />
                                         </div>
                                         <div class="grid-labelbox ">{$foo[0]}</div>
                                     </a>
