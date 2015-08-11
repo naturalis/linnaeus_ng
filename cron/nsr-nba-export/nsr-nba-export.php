@@ -1,10 +1,10 @@
 <?php
 
-//	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
-//	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
+	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
+	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
 
-	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
-	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
+//	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
+//	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
 	
 	class nsrNbaExporter
 	{
@@ -240,9 +240,12 @@
 			
 			$result=$this->mysqli->query( $query );
 
-			while( $row=$result->fetch_assoc() )
+			if ( $result )
 			{
-				$this->taxa[]=$row;
+				while( $row=$result->fetch_assoc() )
+				{
+					$this->taxa[]=$row;
+				}
 			}
 		}
 
@@ -267,13 +270,16 @@
 			;
 
 			
-			$result=$this->mysqli->query( $query );
-			
 			$d=array();
 
-			while( $row=$result->fetch_assoc() )
+			$result=$this->mysqli->query( $query );
+			
+			if ( $result )
 			{
-				$d[]=$row;
+				while( $row=$result->fetch_assoc() )
+				{
+					$d[]=$row;
+				}
 			}
 			
 			return $d;
@@ -327,13 +333,16 @@
 			;
 
 			
-			$result=$this->mysqli->query( $query );
-			
 			$d=array();
 
-			while( $row=$result->fetch_assoc() )
+			$result=$this->mysqli->query( $query );
+			
+			if ( $result )
 			{
-				$d[]=$row;
+				while( $row=$result->fetch_assoc() )
+				{
+					$d[]=$row;
+				}
 			}
 			
 			return $d;
@@ -395,15 +404,18 @@
 			;
 
 			
-			$result=$this->mysqli->query( $query );
-			
 			$d=array();
 
-			while( $row=$result->fetch_assoc() )
-			{
-				$d[]=$row;
-			}
+			$result=$this->mysqli->query( $query );
 			
+			if ( $result )
+			{
+				while( $row=$result->fetch_assoc() )
+				{
+					$d[]=$row;
+				}
+			}
+				
 			return $d;
 		}
 		
@@ -435,10 +447,14 @@
 
 			
 			$result=$this->mysqli->query( $query );
-			$row=$result->fetch_assoc();
-			if ( $row )
+			
+			if ( $result )
 			{
-				return $row;
+				$row=$result->fetch_assoc();
+				if ( $row )
+				{
+					return $row;
+				}
 			}
 		}
 
@@ -627,7 +643,7 @@
 	$b = new nsrNbaExporter;
 	$b->setConnectData( $conn );
 	$b->setLanguageId( 24 );
-	$b->setLimit( 100 );
+//	$b->setLimit( 100 );
 	$b->setFileNameRoot( "nsr-export--" );
 	$b->setExportFolder( "/home/maarten.schermer/export/" );
 //	$b->setExportFolder( "C:\\tmp\\bla\\" );
