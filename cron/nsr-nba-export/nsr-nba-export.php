@@ -69,6 +69,7 @@
 				$this->connector->database = $data['database'];
 				$this->connector->prefix = $data['tablePrefix'];
 				$this->connector->project_id = $data['project_id'];
+				$this->connector->character_set = $data['characterSet'];
 			} 
 			catch (Exception $e)
 			{
@@ -149,6 +150,10 @@
 			else
 			{
 				$this->feedback( "connected " . $this->connector->database . "@" . $this->connector->host );
+
+				$this->mysqli->query('SET NAMES ' . $this->connector->character_set );
+				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->character_set );
+
 			}
 		}
 
@@ -157,7 +162,7 @@
 		{
 			$this->xmlWriter = new XMLWriter();
 			$this->xmlWriter->openMemory();
-			$this->xmlWriter->startDocument('1.0');
+			$this->xmlWriter->startDocument('1.0', 'UTF-8');
 		}
 		
 		private function setTaxa()
