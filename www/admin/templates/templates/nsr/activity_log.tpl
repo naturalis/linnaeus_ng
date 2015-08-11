@@ -50,7 +50,7 @@
 			<span title="{$v.user.username}{if $v.user.email_address!=$v.user.username}; {$v.user.email_address}{/if}">{$v.user.name}</span> <span title="gebruiker bestaat niet meer in de usertabel">(&notin;)</span>
             {/if}
 		</td>
-    	<td>
+    	<td title="{$v.time_past_hr} geleden">
 		    {$v.last_change_hr}
 		</td>
     	<td>
