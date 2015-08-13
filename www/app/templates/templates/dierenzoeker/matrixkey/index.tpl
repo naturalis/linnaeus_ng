@@ -266,8 +266,6 @@ $(document).ready(function()
 			
 	matrixInit();
 
-	//retrieveDataSet();
-
 	{if $requestData.dier}
 	drnzkr_startDier='{$requestData.dier|@escape}';
 	{/if}

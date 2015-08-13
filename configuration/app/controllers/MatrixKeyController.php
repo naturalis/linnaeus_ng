@@ -155,16 +155,6 @@ $this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
 			$this->smarty->assign('returnText', json_encode($this->getFacetMenu()));
         }	
 		
-		/*
-		else
-		
-		if ($this->rHasVal('action', 'get_dataset'))
-		{
-			$this->setDataSet();
-			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
-        }
-		*/	
-		
         else					
 
 		if ($this->rHasVal('action','set_state'))

@@ -72,39 +72,6 @@ var	labels={
 	popup_species_link:__('Meer informatie'),
 }
 
-/*
-function retrieveDataSet()
-{
-	setCursor('wait');
-
-	$.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_dataset',
-			time : getTimestamp(),
-			key : matrixsettings.matrixId,
-			p : matrixsettings.projectId
-		}),
-		success : function ( d )
-		{
-			//console.log( d );
-			setDataSet($.parseJSON( d ));
-			applyScores();
-			clearResults();
-			printResults();
-			setCursor();
-			
-			if (initialize)
-			{
-				initialize=false;
-				retrieveMenu();
-			}
-		}
-	});
-}
-*/
-
 function retrieveMenu()
 {
 	setCursor('wait');
@@ -120,6 +87,7 @@ function retrieveMenu()
 		}),
 		success : function (data)
 		{
+			//console.log(data);
 			setMenu($.parseJSON(data));
 			printMenu();
 			setCursor();
@@ -1271,15 +1239,17 @@ function closeSearch()
 
 function prettyPhotoInit()
 {
- 	$("a[rel^='prettyPhoto']").prettyPhoto({
-		allow_resize:true,
-		animation_speed:50,
- 		opacity: 0.70, 
-		show_title: false,
- 		overlay_gallery: false,
- 		social_tools: false
- 	});
-
+	if(jQuery().prettyPhoto)
+	{
+		$("a[rel^='prettyPhoto']").prettyPhoto({
+			allow_resize:true,
+			animation_speed:50,
+			opacity: 0.70, 
+			show_title: false,
+			overlay_gallery: false,
+			social_tools: false
+		});
+	}
 }
 
 function bindDialogKeyUp()
@@ -1548,6 +1518,7 @@ function matrixInit()
 
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
 
+	// inititializing scores, results and menu
 	setCursor('wait');
 	applyScores();
 	clearResults();
