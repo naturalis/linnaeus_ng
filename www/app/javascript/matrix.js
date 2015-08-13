@@ -56,7 +56,7 @@ var data={
 
 var prevmatrixsettings={};
 
-var initialize=true;
+//var initialize=true;
 var lastScrollPos=0;
 var tempstatevalue="";
 var openGroups=Array();
@@ -72,6 +72,7 @@ var	labels={
 	popup_species_link:__('Meer informatie'),
 }
 
+/*
 function retrieveDataSet()
 {
 	setCursor('wait');
@@ -102,6 +103,7 @@ function retrieveDataSet()
 		}
 	});
 }
+*/
 
 function retrieveMenu()
 {
@@ -1545,5 +1547,12 @@ function matrixInit()
 	$('#legendExternalLink').html( labels.info_link );
 
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
+
+	setCursor('wait');
+	applyScores();
+	clearResults();
+	printResults();
+	setCursor();
+	retrieveMenu();
 
 }

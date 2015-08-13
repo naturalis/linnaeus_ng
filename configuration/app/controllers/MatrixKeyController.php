@@ -105,11 +105,15 @@ class MatrixKeyController extends Controller
 
 		$this->setScores();
 		$this->setMasterMatrix();
+$this->setDataSet();
 
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
+
+$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
+
 
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
@@ -151,13 +155,15 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('returnText', json_encode($this->getFacetMenu()));
         }	
 		
+		/*
 		else
 		
 		if ($this->rHasVal('action', 'get_dataset'))
 		{
 			$this->setDataSet();
 			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
-        }	
+        }
+		*/	
 		
         else					
 

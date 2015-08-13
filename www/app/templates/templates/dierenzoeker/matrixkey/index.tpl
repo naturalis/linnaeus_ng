@@ -262,10 +262,11 @@ $(document).ready(function()
 	setStates($.parseJSON('{$session_states}'));
 	setStateCount($.parseJSON('{$session_statecount}'));
 	setCharacters($.parseJSON('{$session_characters}'));
+	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 			
 	matrixInit();
-	retrieveDataSet();
 
+	//retrieveDataSet();
 
 	{if $requestData.dier}
 	drnzkr_startDier='{$requestData.dier|@escape}';
