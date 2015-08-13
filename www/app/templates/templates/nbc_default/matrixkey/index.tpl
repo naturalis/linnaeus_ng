@@ -69,9 +69,12 @@ $(document).ready(function()
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
 	setCharacters($.parseJSON('{$session_characters}'));
-			
+	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
+
 	matrixInit();
-	retrieveDataSet();
+
+	//retrieveDataSet();
+
 });
 </script>
 
