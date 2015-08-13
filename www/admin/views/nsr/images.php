@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/NsrTaxonController.php');
+require_once ('../../../../configuration/admin/controllers/NsrTaxonImagesController.php');
 
-$c = new NsrTaxonController();
+$c = new NsrTaxonImagesController();
 
 $c->imagesAction();
