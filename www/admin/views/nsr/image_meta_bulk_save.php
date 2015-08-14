@@ -4,4 +4,4 @@ require_once ('../../../../configuration/admin/controllers/NsrTaxonImagesControl
 
 $c = new NsrTaxonImagesController();
 
-$c->imageDataAction();
+$c->imageMetaBulkSaveAction();

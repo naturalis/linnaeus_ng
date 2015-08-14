@@ -17,7 +17,8 @@
 	<a href="activity_log.php">editor log</a><br /><br />
 	<a href="nsr_id_resolver.php">NSR ID resolver</a><br />
 	<a href="../import/export_versatile.php">multi-purpose export</a><br />
-	<a href="../import/export_nsr.php">export voor NDA</a> (experimenteel)<br />
+	<!--a href="../import/export_nsr.php"-->export voor NDA<!--/a--> (nu command line, cron/nsr-nba-export)<br />
+	<a href="image_meta_bulk.php">image meta-data bulk upload</a><br />
 </p>
 </div>
 
