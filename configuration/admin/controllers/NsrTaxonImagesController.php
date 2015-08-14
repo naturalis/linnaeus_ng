@@ -964,7 +964,7 @@ class NsrTaxonImagesController extends NsrController
 						}
 					}
 					
-					$concatfields[]=array('beeldbankDatumAanmaak'=> date("Y-m-d H:i:s"));
+					$concatfields['beeldbankDatumAanmaak']=date("Y-m-d H:i:s");
 					
 					$allmeta=array();
 					
