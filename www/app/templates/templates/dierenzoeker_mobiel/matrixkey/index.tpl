@@ -152,164 +152,9 @@
 <script>
 $(document).ready(function()
 {
-
-	setSetting({
-		matrixId: {$matrix.id},
-		projectId: {$session.app.project.id},
-		imageRootSkin: '{$image_root_skin}',
-		imageRootProject: '{$projectUrls.projectMedia}',
-		useEmergingCharacters: {$settings->use_emerging_characters},
-		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
-		imageOrientation: '{$settings->image_orientation}',
-		browseStyle: '{$settings->browse_style}',
-		scoreThreshold: {$settings->score_threshold},
-		alwaysShowDetails: {$settings->always_show_details},
-		perPage: {$settings->items_per_page},
-		perLine: {$settings->items_per_line},
-		generalSpeciesInfoUrl: '{$settings->species_info_url}'
-	});
-
-	setScores($.parseJSON('{$session_scores}'));
-	setStates($.parseJSON('{$session_states}'));
-	setStateCount($.parseJSON('{$session_statecount}'));
-	setCharacters($.parseJSON('{$session_characters}'));
-	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
-			
-	matrixInit();
-
-
+	init( { project:{$session.app.project.id},matrix:{$matrix.id},language:{$currentLanguageId} } );
+	resultBatchSize={$settings->items_per_page};
 });
-
-
-
-var resultsHtmlTpl = '<ul>%RESULTS%</ul>';
-var noResultHtmlTpl='<div style="margin-top:10px">%MESSAGE%</div>';
-var resultsLineEndHtmlTpl = '';
-var brHtmlTpl = '<br />';
-
-var photoLabelHtmlTpl = '';
-var photoLabelGenderHtmlTpl = '';
-var photoLabelPhotographerHtmlTpl = '';
-var imageHtmlTpl = '<img src="%THUMB-URL%" alt="">';
-var genderHtmlTpl = '';
-var matrixLinkHtmlTpl = '';
-var remoteLinkClickHtmlTpl = '';
-var statesClickHtmlTpl = '';
-var relatedClickHtmlTpl = '';
-var statesHtmlTpl = '';
-var statesJoinHtmlTpl = '';
-var speciesStateItemHtmlTpl = '';
-
-
-var resultHtmlTpl = '\
-<li class="result0"> \
-<a style="" onclick="drnzkr_toon_dier( { id:%ID% } );return false;" href="#"> \
-<table><tbody><tr><td>%IMAGE-HTML% \
-</td><td style="width:100%">%COMMON-NAME%</td></tr></tbody></table></a> \
-</li> \
-';
-
-
-var resultBatchHtmlTpl= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
-var buttonMoreHtmlTpl='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
-var counterExpandHtmlTpl='%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%';
-var pagePrevHtmlTpl='<li><a href="#" onclick="browsePage(\'p\');return false;">&lt;</a></li>';
-var pageCurrHtmlTpl='<li><strong>%NR%</strong></li>';
-var pageNumberHtmlTpl='<li><a href="#" onclick="browsePage(%INDEX%);return false;">%NR%</a></li>';
-var pageNextHtmlTpl='<li><a href="#" onclick="browsePage(\'n\');return false;" class="last">&gt;</a></li>';
-var counterPaginateHtmlTpl=' %FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%';
-
-var menuOuterHtmlTpl ='<ul>%MENU%</ul>';
-
-var menuGroupHtmlTpl = '\
-<li id="character-item-%ID%" class="closed"><a href="#" onclick="toggleGroup(%ID%);return false;">%LABEL%</a></li> \
-<ul id="character-group-%ID%" class="hidden"> \
-	%CHARACTERS% \
-</ul> \
-';
-
-var menuLoneCharHtmlTpl='\
-<li class="inner ungrouped last"> \
-	<a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a> \
-	%SELECTED% \
-</li> \
-';
-var menuLoneCharDisabledHtmlTpl='<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
-var menuLoneCharEmergentDisabledHtmlTpl='\
-<li class="inner ungrouped %CLASS%" title="%TITLE%"> \
-	<a class="facetLink emergent_disabled" href="#" onclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
-	%SELECTED% \
-</li> \
-';
-var menuCharHtmlTpl=menuLoneCharHtmlTpl.replace('ungrouped ','');
-var menuCharDisabledHtmlTpl=menuLoneCharDisabledHtmlTpl.replace('ungrouped ','');
-var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace('ungrouped ','');
-
-var menuSelStateHtmlTpl = '\
-<div class="facetValueHolder"> \
-%VALUE% %LABEL% %COEFF% \
-<a href="#" class="removeBtn" onclick="clearStateValue(\'%STATE-ID%\');return false;"> \
-<img src="%IMG-URL%"></a> \
-</div> \
-';
-var menuSelStatesHtmlTpl = '<span>%STATES%</span>';
-
-var iconInfoHtmlTpl='<img class="result-icon-image icon-info" src="%IMG-URL%">';
-var iconUrlHtmlTpl = iconInfoHtmlTpl.replace(' icon-info','');
-var iconSimilarTpl = iconInfoHtmlTpl.replace(' icon-info',' icon-similar');
-
-var similarHeaderHtmlTpl='\
-%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END%)</span> \
-<br /> \
-<a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;">%BACK-TEXT%</a> \
-<span id="show-all-divider"> | </span> \
-<a class="clearSimilarSelection" href="#" onclick="toggleAllDetails();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
-';
-
-var searchHeaderHtmlTpl='\
-%HEADER-TEXT% <span id="similarSpeciesName">%SEARCH-TERM%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END% %OF-TEXT% %NUMBER-TOTAL%)</span> \
-<br /> \
-<a class="clearSimilarSelection" href="#" onclick="closeSearch();return false;">%BACK-TEXT%</a> \
-';
-
-
-var drzkr_mainMenuItemHtmlTemplate = '\
-<li class="facetgroup-btn" title="%HINT%"> \
-	<div class="facet-btn ui-block-d"> \
-		<a data-facetgrouppageid="facetgrouppage%INDEX%" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}"> \
-			<div class="grid-iconbox" > \
-				<img src="%ICON%" class="grid-icon" alt="" /> \
-			</div> \
-			<div class="grid-labelbox ">%LABEL%</div> \
-		</a> \
-	</div> \
-</li> \
-';
-
-var drzkr_selectedFacetHtmlTemplate = '<li><div class="ui-block-a"><a class="chosen-facet" onclick="clearStateValue(\'%STATE-VAL%\');return false;" href="#"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;font-style:italic;margin-top:-15px;padding-bottom:5px;">%CHARACTER-LABEL%</div><img class="grid-icon" src="%ICON%" style="top:25px;" alt=""><img src="%IMG-ROOT-SKIN%button-close-shadow-overlay.png" style="position:relative;top:-5px;left:0px;margin-left:-73px;" alt=""></div><div class="grid-labelbox" style="margin-top:-5px;">%STATE-LABEL%</div></a></div></li> \
-';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 {literal}
@@ -352,9 +197,45 @@ var templates = {
 {/literal}
 </script>
 
+{literal}
 
-{* include file="_counters.html" *}
+<script>
 
+(function(i,s,o,g,r,a,m) { i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() { (i[r].q=i[r].q||[]).push(arguments)}},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+} )(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-27823424-2', 'dierenzoeker.nl');
+ga('send', 'pageview');
+
+</script>
+
+
+
+<!-- Begin Sitestat ECMA -->
+<script type="text/ecmascript">
+// <![CDATA[
+function sitestat(u) { var d=document,l=location,ns_pixelUrl=u+"&ns__t="+(new Date().getTime());u=ns_pixelUrl+"&ns_ti="+encodeURIComponent(d.title)+"&ns_jspageurl="+encodeURIComponent(l.href)+"&ns_referrer="+encodeURIComponent(d.referrer);(d.images)?new Image().src=u:d.write('<img src="'+u+'" height=1 width=1 alt="*">');};
+sitestat("http://nl.sitestat.com/klo/ntr-mobiel/s?ntr.hetklokhuis.dierenzoeker.home&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd&pom_context=web&pom_appver=1.00&pom_appname=dierenzoeker&ns_t=1401874745");
+// ]]>
+</script>
+<noscript>
+<img src="http://nl.sitestat.com/klo/ntr-mobiel/s?ntr.hetklokhuis.dierenzoeker.home&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd&pom_context=web&pom_appver=1.00&pom_appname=dierenzoeker&ns_t=1401874745" height=1 width=1 alt="*" />
+</noscript>
+<!-- End Sitestat ECMA -->
+
+
+<!-- Begin comScore Inline Tag 1.1302.13 --> 
+<script type="text/javascript"> 
+// <![CDATA[
+function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="substring",u="length",a=2048,f,l="&ns_",c="&",h,p,d,v,m=window,g=m.encodeURIComponent||escape;if(r[s](t)+1)for(d=0,p=r.split(";"),v=p[u];d<v;d++)h=p[d][s](t),h+1&&(i=c+unescape(p[d][o](h+t[u])));e+=l+"_t="+ +(new Date)+l+"c="+(n.characterSet||n.defaultCharset||"")+"&c8="+g(n.title)+i+"&c7="+g(n.URL)+"&c9="+g(n.referrer),e[u]>a&&e[s](c)>0&&(f=e[o](0,a-8).lastIndexOf(c),e=(e[o](0,f)+l+"cut="+g(e[o](f+1)))[o](0,a)),n.images?(h=new Image,m.ns_p||(ns_p=h),h.src=e):n.write("<","p","><",'img src="',e,'" height="1" width="1" alt="*"',"><","/p",">")};udm_('http'+(document.location.href.charAt(4)=='s'?'s://sb':'://b')+'.scorecardresearch.com/b?c1=2&c2=17827132&ns_site=po-totaal&name=hetklokhuis.dierenzoeker.home&potag1=hetklokhuis&potag2=dierenzoeker&potag3=ntr&potag4=ntr&potag5=programma&potag6=video&potag7=npozapp&potag8=site&potag9=site&ntr_genre=jeugd');
+// ]]>
+</script>
+<noscript><p><img src="http://b.scorecardresearch.com/p?c1=2&amp;c2=17827132&amp;ns_site=po-totaal&amp;name=hetklokhuis.dierenzoeker.home&amp;potag1=hetklokhuis&amp;potag2=dierenzoeker&amp;potag3=ntr&amp;potag4=ntr&amp;potag5=programma&amp;potag6=video&amp;potag7=npozapp&amp;potag8=site&amp;potag9=site&amp;ntr_genre=jeugd" height="1" width="1" alt="*"></p></noscript> 
+<script type="text/javascript" language="JavaScript1.3" src="http://b.scorecardresearch.com/c2/17827132/cs.js"></script>
+<!-- End comScore Inline Tag -->
+
+{/literal}
 </body>
 </html>
 

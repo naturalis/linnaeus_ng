@@ -90,9 +90,10 @@ class MatrixKeyController extends Controller
 		$this->setIntroductionLinks();
 
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
-		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
-		$this->smarty->assign('introduction_links', $this->getIntroductionLinks());
-		$this->smarty->assign('settings', $this->settings);
+
+		$this->smarty->assign( 'image_root_skin', $this->_nbc_image_root );
+		$this->smarty->assign( 'introduction_links', $this->getIntroductionLinks() );
+		$this->smarty->assign( 'settings', $this->settings );
 
 		$this->setFacetMenu();
     }
@@ -105,19 +106,16 @@ class MatrixKeyController extends Controller
 
 		$this->setScores();
 		$this->setMasterMatrix();
-$this->setDataSet();
+		$this->setDataSet();
 
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
-
-$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
-
+		$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
 
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
-
 		$this->smarty->assign('facetmenu', $this->getFacetMenu());
 		$this->smarty->assign('states', $this->getCharacterStates(array("id"=>"*")) );
 
