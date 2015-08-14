@@ -47,6 +47,21 @@ class NsrTaxonImagesController extends NsrController
 	private $sys_label_NSR_ID='NSR ID';
 	private $sys_label_file_name='file name';
 
+	private $availableMetaDataFields=array(
+		'beeldbankAdresMaker',
+		'beeldbankCopyright',
+		'beeldbankDatumAanmaak',
+		'beeldbankDatumVervaardiging',
+		'beeldbankFotograaf',
+		'beeldbankLicentie',
+		'beeldbankLokatie',
+		'beeldbankOmschrijving',
+		'beeldbankValidator',
+		'verspreidingsKaart',
+		'verspreidingsKaartBron',
+		'verspreidingsKaartTitel',
+	);
+		
     private 
 		$_mime_types = array(          
 			'png' => 'image/png', 
@@ -83,19 +98,12 @@ class NsrTaxonImagesController extends NsrController
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
-		$this->availableMetaDataFields=$this->models->MediaMeta->_get(array(
-			'id'=>array(
-				'project_id'=>$this->getCurrentProjectId()
-			),
-			'columns'=>'distinct sys_label',
-			'order'=>'sys_label'
-		));
 
-		array_unshift($this->availableMetaDataFields,array('sys_label'=>''));
-		array_unshift($this->availableMetaDataFields,array('sys_label'=>$this->sys_label_NSR_ID));
-		array_unshift($this->availableMetaDataFields,array('sys_label'=>$this->sys_label_file_name));
+		array_unshift($this->availableMetaDataFields,'');
+		array_unshift($this->availableMetaDataFields,$this->sys_label_NSR_ID);
+		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
 		
-		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
+		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
 	}
 
@@ -264,7 +272,7 @@ class NsrTaxonImagesController extends NsrController
 				$assignedMetaFields>0
 			)
 			{
-				$matches=$this->matchNsrIds(array('lines'=>$lines,'ignorefirst'=>$ignorefirst));
+				$matches=$this->matchNsrIdsAndCheckImgExistence(array('lines'=>$lines,'ignorefirst'=>$ignorefirst));
 				$this->setSessionVar('matches',$matches);
 
 				$checks=$this->fieldFormatChecks(array('lines'=>$lines,'fields'=>$fields,'ignorefirst'=>$ignorefirst));
@@ -291,122 +299,10 @@ class NsrTaxonImagesController extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Meta-data bulk'));
-
-
-		$ignorefirst=$this->getSessionVar( 'ignorefirst' );
-		$lines=$this->getSessionVar( 'lines' );
-
-		$fields=$this->getSessionVar( 'fields' );
-		$checks=$this->getSessionVar( 'checks' );
-		$matches=$this->getSessionVar( 'matches' );
-
-		$col_nsr_id=$this->getSessionVar( $this->sys_label_NSR_ID );
-		$col_file_name=$this->getSessionVar( $this->sys_label_file_name );
-
-
-			
-		foreach((array)$lines as $key=>$line)
+		
+		if ( !$this->isFormResubmit() )
 		{
-			if ($ignorefirst && $key==0) continue;
-			
-			$filename=trim($line[$col_file_name]);
-			
-			if ( !is_null($matches['taxa'][$key]) && !empty($filename) )
-			{
-				$d=
-					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'taxon_id' => $matches['taxa'][$key]['taxon_id'], 
-						'file_name' => $filename, 
-						'original_name' => $filename,
-						'mime_type' => @$this->_mime_types[pathinfo($filename, PATHINFO_EXTENSION)], 
-						'sort_order' => 99
-					);
-
-				$mt=$this->models->MediaTaxon->save($d);
-
-				if ($mt==1) 
-				{
-					
-					$media_id=$this->models->MediaTaxon->getNewId();
-					
-					$concatfields=array();
-					
-					foreach((array)$line as $c=>$cell)
-					{
-						if ( isset($checks[$key][$c]) && $checks[$key][$c]['pass']==false) continue;
-
-						if (isset($checks[$key][$c]))
-						{
-							$cell=
-								sprintf('%s-%s-%s %02d:%02d:%02d',
-									$checks[$key][$c]['data']['year'],
-									$checks[$key][$c]['data']['month'],
-									$checks[$key][$c]['data']['day'],
-									$checks[$key][$c]['data']['hour'],
-									$checks[$key][$c]['data']['minute'],
-									$checks[$key][$c]['data']['second']
-								);
-						}
-
-						
-						if ( !empty($fields[$c]) && $c!=$col_file_name && $c!=$col_nsr_id)
-						{
-							if (!isset($concatfields[$fields[$c]]))
-							{
-								$concatfields[$fields[$c]]=$cell;
-							}
-							else
-							{
-								$concatfields[$fields[$c]]=$concatfields[$fields[$c]] . ( !empty($cell) ? ", ". $cell : "" );
-							}
-						}
-						
-
-					}
-					
-					foreach((array)$concatfields as $label=>$val)
-					{
-						$d=array(
-							'project_id'=>$this->getCurrentProjectId(),
-							'media_id'=>$media_id,
-							'language_id'=>$this->getDefaultProjectLanguage(),
-							'sys_label'=>$label,
-							'meta_data'=>$val,
-						);
-			
-						if( stripos($label,'datum') )
-						{
-							$d['meta_date']="#'".$val."'";
-							$d['meta_number']=null;
-							$d['meta_data']=null;
-						}			
-						else
-						{
-							$d['meta_date']=null;
-							$d['meta_number']=null;
-							$d['meta_data']=$val;
-						}
-						
-						$this->models->MediaMeta->save( $d );
-						
-						q( $this->models->MediaMeta->q());
-					}
-
-					$this->addMessage( sprintf('Wrote %s.',$line[$col_file_name]) );
-				}
-				else
-				{
-					$this->addError( $mt );
-				}
-
-			}
-			else
-			{
-				$this->addError( sprintf('Ignored line %s: couldn\' resolve NSR ID "%s".', $key+1, $line[$col_nsr_id]) );
-			}
-
+			$this->doSaveImageMetaBulk();
 		}
 
 		$this->printPage();
@@ -921,7 +817,7 @@ class NsrTaxonImagesController extends NsrController
 		return $taxa ? $taxa[0] : null;
 	}
 	
-	private function matchNsrIds( $p )
+	private function matchNsrIdsAndCheckImgExistence( $p )
 	{
 		$lines=isset($p['lines']) ? $p['lines'] : null;
 		$ignorefirst=isset($p['ignorefirst']) ? $p['ignorefirst'] : false;
@@ -995,6 +891,136 @@ class NsrTaxonImagesController extends NsrController
 		return $checks;
 	}
 
-	
+	private function doSaveImageMetaBulk()
+	{
+		$ignorefirst=$this->getSessionVar( 'ignorefirst' );
+		$lines=$this->getSessionVar( 'lines' );
+
+		$fields=$this->getSessionVar( 'fields' );
+		$checks=$this->getSessionVar( 'checks' );
+		$matches=$this->getSessionVar( 'matches' );
+
+		$col_nsr_id=$this->getSessionVar( $this->sys_label_NSR_ID );
+		$col_file_name=$this->getSessionVar( $this->sys_label_file_name );
+
+		foreach((array)$lines as $key=>$line)
+		{
+			if ($ignorefirst && $key==0) continue;
+			
+			$filename=trim($line[$col_file_name]);
+			
+			if ( !is_null($matches['taxa'][$key]) && !empty($filename) )
+			{
+				$d=
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $matches['taxa'][$key]['taxon_id'], 
+						'file_name' => $filename, 
+						'original_name' => $filename,
+						'mime_type' => @$this->_mime_types[pathinfo($filename, PATHINFO_EXTENSION)], 
+						'sort_order' => 99
+					);
+
+				$mt=$this->models->MediaTaxon->save($d);
+
+				if ($mt==1) 
+				{
+					
+					$media_id=$this->models->MediaTaxon->getNewId();
+					
+					$fieldssaved=0;
+					
+					$concatfields=array();
+					
+					foreach((array)$line as $c=>$cell)
+					{
+						if ( isset($checks[$key][$c]) && $checks[$key][$c]['pass']==false) continue;
+
+						if (isset($checks[$key][$c]))
+						{
+							$cell=
+								sprintf('%s-%s-%s %02d:%02d:%02d',
+									$checks[$key][$c]['data']['year'],
+									$checks[$key][$c]['data']['month'],
+									$checks[$key][$c]['data']['day'],
+									$checks[$key][$c]['data']['hour'],
+									$checks[$key][$c]['data']['minute'],
+									$checks[$key][$c]['data']['second']
+								);
+						}
+
+						
+						if ( !empty($fields[$c]) && $c!=$col_file_name && $c!=$col_nsr_id)
+						{
+							if (!isset($concatfields[$fields[$c]]))
+							{
+								$concatfields[$fields[$c]]=$cell;
+							}
+							else
+							{
+								$concatfields[$fields[$c]]=$concatfields[$fields[$c]] . ( !empty($cell) ? ", ". $cell : "" );
+							}
+						}
+						
+
+					}
+					
+					$allmeta=array();
+					foreach((array)$concatfields as $label=>$val)
+					{
+						$md=array(
+							'project_id'=>$this->getCurrentProjectId(),
+							'media_id'=>$media_id,
+							'language_id'=>$this->getDefaultProjectLanguage(),
+							'sys_label'=>$label,
+							'meta_data'=>$val,
+						);
+			
+						if( stripos($label,'datum') )
+						{
+							$md['meta_date']="#'".$val."'";
+							$md['meta_number']=null;
+							$md['meta_data']=null;
+						}			
+						else
+						{
+							$md['meta_date']=null;
+							$md['meta_number']=null;
+							$md['meta_data']=$val;
+						}
+						
+						if ($this->models->MediaMeta->save( $md ))
+						{
+							$fieldssaved++;
+							$allmeta[]=$md;
+						}
+						else
+						{
+							$this->addError( sprintf('Couldn\'t save %s=%s for %s.', $label, $val, $filename) );
+						}
+						
+					}
+					
+					$this->addMessage( sprintf('Wrote "%s" with %s meta-data fields.',$filename,$fieldssaved) );
+
+					$d['meta-data']=$allmeta;
+					$this->logNsrChange(array('after'=>$d,'note'=> sprintf('wrote "%s" (bulk upload).',$filename)));
+
+				}
+				else
+				{
+					$this->addError( $mt );
+				}
+
+			}
+			else
+			{
+				$this->addError( sprintf('Ignored line %s: couldn\'t resolve NSR ID "%s".', $key+1, $line[$col_nsr_id]) );
+			}
+
+		}
+	}
+			
 }
 
