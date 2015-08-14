@@ -50,16 +50,16 @@ class NsrTaxonImagesController extends NsrController
 	private $availableMetaDataFields=array(
 		'beeldbankAdresMaker',
 		'beeldbankCopyright',
-		'beeldbankDatumAanmaak',
+//		'beeldbankDatumAanmaak',
 		'beeldbankDatumVervaardiging',
 		'beeldbankFotograaf',
 		'beeldbankLicentie',
 		'beeldbankLokatie',
 		'beeldbankOmschrijving',
 		'beeldbankValidator',
-		'verspreidingsKaart',
-		'verspreidingsKaartBron',
-		'verspreidingsKaartTitel',
+//		'verspreidingsKaart',
+//		'verspreidingsKaartBron',
+//		'verspreidingsKaartTitel',
 	);
 		
     private 
@@ -937,7 +937,7 @@ class NsrTaxonImagesController extends NsrController
 					{
 						if ( isset($checks[$key][$c]) && $checks[$key][$c]['pass']==false) continue;
 
-						if (isset($checks[$key][$c]))
+						if ( isset($checks[$key][$c]) )
 						{
 							$cell=
 								sprintf('%s-%s-%s %02d:%02d:%02d',
@@ -962,11 +962,12 @@ class NsrTaxonImagesController extends NsrController
 								$concatfields[$fields[$c]]=$concatfields[$fields[$c]] . ( !empty($cell) ? ", ". $cell : "" );
 							}
 						}
-						
-
 					}
 					
+					$concatfields[]=array('beeldbankDatumAanmaak'=> date("Y-m-d H:i:s"));
+					
 					$allmeta=array();
+					
 					foreach((array)$concatfields as $label=>$val)
 					{
 						$md=array(
