@@ -1,18 +1,5 @@
 <?php
 
-/*
-	notes:
-
-	augustus 2014
-	'endemisch' veranderd naar 'inheems', en vervolgens verwijderd, op
-	verzoek van roy kleukers en ed colijn. het veld is een overblijfsel
-	van een uiteindelijk niet geïmplementeerde aanpasing door trezorix.
-	(betreft invoerveld in taxon en taxon_new, plus de verwerking van de
-	waarde in updateConcept() -> updateConceptIsIndigeous())
-	
-
-*/
-
 include_once ('NsrController.php');
 
 class NsrTaxonImagesController extends NsrController
