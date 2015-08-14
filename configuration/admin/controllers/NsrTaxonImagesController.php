@@ -1,18 +1,5 @@
 <?php
 
-/*
-	notes:
-
-	augustus 2014
-	'endemisch' veranderd naar 'inheems', en vervolgens verwijderd, op
-	verzoek van roy kleukers en ed colijn. het veld is een overblijfsel
-	van een uiteindelijk niet geïmplementeerde aanpasing door trezorix.
-	(betreft invoerveld in taxon en taxon_new, plus de verwerking van de
-	waarde in updateConcept() -> updateConceptIsIndigeous())
-	
-
-*/
-
 include_once ('NsrController.php');
 
 class NsrTaxonImagesController extends NsrController
@@ -50,16 +37,16 @@ class NsrTaxonImagesController extends NsrController
 	private $availableMetaDataFields=array(
 		'beeldbankAdresMaker',
 		'beeldbankCopyright',
-		'beeldbankDatumAanmaak',
+//		'beeldbankDatumAanmaak',
 		'beeldbankDatumVervaardiging',
 		'beeldbankFotograaf',
 		'beeldbankLicentie',
 		'beeldbankLokatie',
 		'beeldbankOmschrijving',
 		'beeldbankValidator',
-		'verspreidingsKaart',
-		'verspreidingsKaartBron',
-		'verspreidingsKaartTitel',
+//		'verspreidingsKaart',
+//		'verspreidingsKaartBron',
+//		'verspreidingsKaartTitel',
 	);
 		
     private 
@@ -937,7 +924,7 @@ class NsrTaxonImagesController extends NsrController
 					{
 						if ( isset($checks[$key][$c]) && $checks[$key][$c]['pass']==false) continue;
 
-						if (isset($checks[$key][$c]))
+						if ( isset($checks[$key][$c]) )
 						{
 							$cell=
 								sprintf('%s-%s-%s %02d:%02d:%02d',
@@ -962,11 +949,12 @@ class NsrTaxonImagesController extends NsrController
 								$concatfields[$fields[$c]]=$concatfields[$fields[$c]] . ( !empty($cell) ? ", ". $cell : "" );
 							}
 						}
-						
-
 					}
 					
+					$concatfields['beeldbankDatumAanmaak']=date("Y-m-d H:i:s");
+					
 					$allmeta=array();
+					
 					foreach((array)$concatfields as $label=>$val)
 					{
 						$md=array(
