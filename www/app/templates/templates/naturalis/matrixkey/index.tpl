@@ -44,7 +44,7 @@
 		{/if}
 						
             <div id='legend'>
-              <h2>{t}Legenda:{/t}</h2>
+              <h2>{t}Legenda{/t}</h2>
               <div class='legend-icon-cell'>
                 <span class='icon icon-book'></span>
                 {t}meer informatie{/t}
