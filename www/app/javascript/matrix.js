@@ -1,8 +1,19 @@
+var __translations=Array();
+
 function __(text)
 {
-	// _() is sloooooow!
+	for(var i=0;i<__translations.length;i++)
+	{
+		if (__translations[i].label==text)
+		{
+			return __translations[i].translation;
+		}
+	}
+	
 	return text;
-	return _(text);
+
+	// _() is sloooooow!
+	//return _(text);
 }
 
 /*
