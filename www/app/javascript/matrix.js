@@ -13,6 +13,7 @@ function __(text)
 	hook_postPrintMenu();
 	hook_preApplyScores();
 	hook_postApplyScores();
+	hook_preSetStateValue(); // halts set function when hook-function returns false
 */
 
 var matrixsettings={
@@ -842,6 +843,15 @@ function clearStateValue(state)
 
 function setStateValue(state)
 {
+	if (typeof hook_preSetStateValue == 'function')
+	{
+		var d=hook_preSetStateValue(state);
+		if (d===false)
+		{
+			return d;
+		}
+	}
+
 	var state=state?state:$('#state-id').val();
 	setState({state:state,value:tempstatevalue});
 }
@@ -879,6 +889,9 @@ function setState( p )
 			printMenu();
 
 			setCursor();
+
+			if (typeof hook_postSetState == 'function') { hook_postSetState(); }
+
 		}
 	});
 }

@@ -21,6 +21,16 @@ function hook_postApplyScores()
 	drnzkr_update_navigatie();
 }
 
+function hook_preSetStateValue(state)
+{
+	var d=state.split(':');
+	if (!data.statecount[d[2]] || data.statecount[d[2]]<1)
+	{
+		return false;
+	}
+}
+
+
 function drnzkr_navigeren( target )
 {
 	if (target=='eerste')
