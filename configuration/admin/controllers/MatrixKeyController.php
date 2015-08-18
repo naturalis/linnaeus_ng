@@ -2,6 +2,11 @@
 
 /*
 
+
+	alter table characteristics_states modify show_order int(6);
+
+
+
 	NEXUS IMPORT
 	
 	while exporting from L2, choose the version with tabs, not the "standard"
@@ -259,7 +264,8 @@ class MatrixKeyController extends Controller
                         
                         break;
                     }
-                    else if ($this->rHasVal('r', 'd')) {
+                    else if ($this->rHasVal('r', 'd'))
+					{
                         //q(($c[$key+1]));
                         if (isset($c[$key + 1]))
                             $this->updateCharShowOrder($c[$key + 1]['id'], $c[$key + 1]['show_order'] - 1);
@@ -684,41 +690,49 @@ class MatrixKeyController extends Controller
         if (!$this->rHasVal('sId'))
             $this->redirect('edit.php');
 
-        if ($this->rHasVal('states') && !$this->isFormResubmit()) {
+        if ($this->rHasVal('states') && !$this->isFormResubmit())
+		{
 
 			$i=0;
 			foreach((array)$this->requestData['states'] as $val)
+			{
 				$this->updateStateShowOrder($val,$i++);
+			}
 			
 			$this->addMessage('New state order saved.');
 			
 		} else
-        if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit()) {
+        if ($this->rHasId() && $this->rHasVal('r')
+		
+		) {
+		// && !$this->isFormResubmit()) {
             
             $c = $this->getCharacteristicStates($this->requestData['sId']);
             
             if ($this->rHasVal('r', 'alph') || $this->rHasVal('r', 'num'))
 			{
 
-                foreach((array)$c as $val) {
+                foreach((array)$c as $val)
+				{
                     $assoc[$val['label']] = $val['id'];
                     $sort[] = $val['label'];
                 }
 
-	            if ($this->rHasVal('r', 'alph'))
-	            	sort($sort);
+	            if ($this->rHasVal('r', 'alph')) sort($sort);
 
-	            if ($this->rHasVal('r', 'num'))
-	            	natcasesort($sort);
-            
-	            $i=0;
-	            foreach((array)$c as $val)
-	                $this->updateStateShowOrder($val['id'],$i++);
+	            if ($this->rHasVal('r', 'num')) natcasesort($sort);
+					
+	            foreach((array)$sort as $key=>$val)
+				{
+	                $this->updateStateShowOrder($assoc[$val],$key);
+				}
 
 				$this->addMessage('Re-sorted state.');
 	            
 
-            } else {
+            } 
+			else
+			{
 
 	            foreach ((array) $c as $key => $val) {
 	                
@@ -1680,11 +1694,11 @@ class MatrixKeyController extends Controller
             'order' => 'show_order'
         ));
 
-        foreach ((array) $cs as $key => $val) {
-            
+        foreach ((array) $cs as $key => $val)
+		{
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id'], $this->getDefaultProjectLanguage());
         }
-        
+
         $this->smarty->assign('returnText', json_encode($cs));
         
         return $cs;
@@ -2246,7 +2260,7 @@ class MatrixKeyController extends Controller
             'project_id' => $this->getCurrentProjectId(), 
             'id' => $id
         ));
-    }
+	}
 
     private function renumberStateShowOrder ($id)
     {

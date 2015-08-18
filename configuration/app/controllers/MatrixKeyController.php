@@ -517,7 +517,7 @@ class MatrixKeyController extends Controller
 
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 
-		if ($all) usort($all, array($this,'sortMatches'));
+		if ($all) usort($all, array($this,'sortDataSet'));
 		
 		return $all;
 		
@@ -1098,7 +1098,7 @@ class MatrixKeyController extends Controller
     {
 		$scores=$this->getScoresRestrictive( array('states'=>$this->getSessionStates()) );
 		//$scores = $this->getScoresLiberal( array('states'=>$this->getSessionStates(),'incUnknowns'=>$incUnknowns);
-		if ($scores) usort($scores, array($this,'sortMatches'));
+		if ($scores) usort($scores, array($this,'sortDataSet'));
 		$this->_scores=$scores;
     }
 
@@ -1616,7 +1616,7 @@ class MatrixKeyController extends Controller
         return $results;
     }
 	
-    private function sortMatches( $a,$b )
+    private function sortDataSet( $a,$b )
     {
 		/*
 			sorting strategies:
@@ -1624,6 +1624,7 @@ class MatrixKeyController extends Controller
 			* column name defined by setting 'match_sort_col_predominant'
 			* matching percentage (100 > 0)
 			* column name defined by setting 'match_sort_col_after_match'
+			* taxon concept
 			* label
 		*/
 		
@@ -1635,7 +1636,7 @@ class MatrixKeyController extends Controller
 		        if ($a[$this->settings->match_sort_col_predominant]<$b[$this->settings->match_sort_col_predominant]) return -1;
 			}
 		}
-
+		
 		if (isset($a['score']) && isset($b['score']))
 		{
 			if ($a['score']<$b['score']) return 1;
@@ -1651,16 +1652,37 @@ class MatrixKeyController extends Controller
 			}
 		}
 
-		if (isset($a['label']) && isset($b['label']))
+		if (isset($a['taxon']))
+		{
+			$aa=strtolower(is_array($a['taxon']) ? strip_tags($a['taxon']['taxon']) : strip_tags($a['taxon']));
+		}
+		else
+		if (isset($a['label']))
 		{
 			$aa=strtolower(strip_tags($a['label']));
-			$bb=strtolower(strip_tags($b['label']));
-			if ($aa<$bb) return -1;
-			if ($aa<$bb) return 1;
+		}
+		else
+		{
+			$aa=0;
 		}
 
-		return 0;
+		if (isset($b['taxon']))
+		{
+			$bb=strtolower(is_array($b['taxon']) ? strip_tags($b['taxon']['taxon']) : strip_tags($b['taxon']));
+		}
+		else
+		if (isset($b['label']))
+		{
+			$bb=strtolower(strip_tags($b['label']));
+		}
+		else
+		{
+			$bb=0;
+		}
 
+		if ($aa<$bb) return -1;
+		if ($aa>$bb) return 1;
+		return 0;
     }
 
 
