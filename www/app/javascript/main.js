@@ -204,7 +204,8 @@ function showDialog(title,content,vars,resize) {
 			title: title,
 			autoOpen: false,
 			buttons: buttons,
-			width: "auto"
+			width: "auto",
+			position: { my: "center", at: "center", of: window }
 		});
 		
 		$("#jDialog").html(content);
