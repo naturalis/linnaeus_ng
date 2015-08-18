@@ -816,7 +816,7 @@ class MatrixKeyController extends Controller
 		
 				select 
 					_a.id,
-					_c.label,
+					ifnull(_c.label,_cdef.label) as label,
 					'char' as type,
 					_gmo.show_order as show_order_main,
 					_b.show_order as show_order_sub
@@ -833,6 +833,11 @@ class MatrixKeyController extends Controller
 					on _a.project_id = _c.project_id
 					and _a.id = _c.characteristic_id
 					and _c.language_id = ". $this->getCurrentLanguageId()."
+
+				right join %PRE%characteristics_labels _cdef
+					on _a.project_id = _cdef.project_id
+					and _a.id = _cdef.characteristic_id
+					and _cdef.language_id = ". $this->getDefaultLanguageId()."
 					
 				left join %PRE%characteristics_chargroups _d
 					on _a.project_id = _d.project_id
@@ -857,7 +862,7 @@ class MatrixKeyController extends Controller
 	
 				select 
 					_a.id,
-					_c.label,
+					ifnull(_c.label,_a.label) as label,
 					'group' as type,
 					_gmo.show_order as show_order_main,
 					_a.show_order as show_order_sub
@@ -885,7 +890,7 @@ class MatrixKeyController extends Controller
 			order by show_order_main, show_order_sub, label
 		
 		");
-		
+
 		foreach((array)$menu as $key=>$val)
 		{
 			if ($val['type']=='group')
