@@ -889,9 +889,6 @@ function setState( p )
 			printMenu();
 
 			setCursor();
-
-			if (typeof hook_postSetState == 'function') { hook_postSetState(); }
-
 		}
 	});
 }
