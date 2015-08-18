@@ -40,7 +40,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if $matrix_image_orientation=="landscape"}
+	{if $settings->image_orientation=="landscape"}
 		$("<link/>", {
 		   rel: "stylesheet",
 		   type: "text/css",
