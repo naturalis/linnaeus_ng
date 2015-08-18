@@ -427,7 +427,7 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 .popup-link {
-    color: #fa7001;
+    color: #fa7001 !important;
     text-decoration: none;
 }
 
