@@ -51,7 +51,7 @@ function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="sub
 
 <script type="text/JavaScript">
 $(document).ready(function(){
-	document.title='Dierenzoeker op TV';
+	document.title='{$headerTitles.title|@escape}';
 });
 </script>
 
@@ -97,9 +97,9 @@ $(document).ready(function(){
           <div class="footer">
                 <div class="footer-inner">
                 <ul>
-                    <li><a href="mobiel.php" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
-                    <li><a href="faq.php" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
-                    <li><a href="colofon.php" class="no-text" id="colofon-btn">Colofon</a></li>
+                    <li><a href="../introduction/topic.php?id=Op%20je%20mobiel" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
+                    <li><a href="../introduction/topic.php?id=Veelgestelde%20vragen" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
+                    <li><a href="../introduction/topic.php?id=Colofon" class="no-text" id="colofon-btn">Colofon</a></li>
                 </ul>
                 <div class="clearer"></div>
                     <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='display:block;position:absolute;left:373px;top:30px;width:79px;height:83px;border: 0px solid black;'>Naturalis</a>
