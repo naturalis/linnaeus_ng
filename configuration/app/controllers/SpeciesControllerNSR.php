@@ -601,10 +601,19 @@ class SpeciesControllerNSR extends SpeciesController
 		$nomen=null;
 		$prevs=array();
 
+		$synonymStartIndex=-1;
+		$synonymCount=0;
+		$i=0;
 
 		foreach((array)$names as $key=>$val)
 		{
 			$prevs[]=$key;
+
+			if ($val['nametype']==PREDICATE_SYNONYM)
+			{
+				if ($synonymStartIndex==-1) $synonymStartIndex=$i;
+				$synonymCount++;
+			}
 
 			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
 			{
@@ -636,6 +645,19 @@ class SpeciesControllerNSR extends SpeciesController
 				$scientific_name=trim($val['name']);
 
 			}
+			$i++;
+		}
+
+		// sorting the synonyms by year
+		if ($synonymStartIndex>-1)
+		{
+			$synonyms=array_splice($names,$synonymStartIndex,$synonymCount,array());
+			usort($synonyms,function($a,$b){
+				$aa=isset($a['authorship_year']) ? intval($a['authorship_year']) : intval(preg_replace('/\D/',"",$a['name']));
+				$bb=isset($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
+				return ( $aa > $bb ? 1 : ( $aa < $bb ? -1 : 0 ) );
+			});
+			array_splice($names,$synonymStartIndex,0,$synonyms);
 		}
 
 		return
