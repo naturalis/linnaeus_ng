@@ -47,14 +47,14 @@ function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="sub
 <noscript><p><img src="http://b.scorecardresearch.com/p?c1=2&amp;c2=17827132&amp;ns_site=po-totaal&amp;name=hetklokhuis.dierenzoeker.optv.page&amp;potag1=hetklokhuis&amp;potag2=dierenzoeker&amp;potag3=ntr&amp;potag4=ntr&amp;potag5=programma&amp;potag6=video&amp;potag7=npozapp&amp;potag8=site&amp;potag9=site&amp;ntr_genre=jeugd" height="1" width="1" alt="*"></p></noscript> 
 <script type="text/javascript" language="JavaScript1.3" src="http://b.scorecardresearch.com/c2/17827132/cs.js"></script>
 <!-- End comScore Inline Tag -->
-
+{/literal}
 
 <script type="text/JavaScript">
 $(document).ready(function(){
 	document.title='{$headerTitles.title|@escape}';
 });
 </script>
-
+{literal}
 
 				<script language="JavaScript">
 					$(function(){
