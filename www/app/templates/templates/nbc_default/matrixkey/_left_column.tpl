@@ -18,6 +18,17 @@
                 <ul>
                 </ul>
 	        </span>	
+            
+            {if $settings->enable_treat_unknowns_as_matches}
+
+			<div style="margin:5px 0 5px 0">
+                <input onchange="setState( { action:'set_unknowns', value: $('#inc_unknowns').is(':checked') ? 1 : 0 } )" type="checkbox" id="inc_unknowns" />
+                <label for="inc_unknowns">{t}Behandel onbekenden als match{/t}</label>
+			</div>
+
+			<div class="left-divider"></div>
+
+            {/if}
 			
             <div id="clearSelectionContainer" class="facetCategories clearSelectionBtn{if $activeChars|@count==0} ghosted{/if}">
                 <a id="clearSelectionLink" href="#" onclick="resetMatrix();return false;">
@@ -42,17 +53,7 @@
             </table>
 		</div>  
 
-                {* capture snippet}{snippet}colofon.html{/snippet}{/capture}
-                
-                <div class="left-divider"></div>
-        
-                {if $smarty.capture.snippet|@strlen>0}
-                <div id="dataSourceContainer">   
-                {$smarty.capture.snippet}
-                </div>  
-                {/if *}        
-        
-        {if $introduction_links[$introduction_topic_colophon]}
+        {if $introduction_links[$settings->introduction_topic_colophon]}
 	        <div class="left-divider"></div>
             <div id="dataSourceContainer">   
             <script>
@@ -65,7 +66,7 @@
             </div>
         {/if}        
 
-        {if $introduction_links[$introduction_topic_citation]}
+        {if $introduction_links[$settings->introduction_topic_citation]}
 	        <div class="left-divider"></div>
             <div id="clearSelectionContainer" class="facetCategories">
                 <a href="#" onclick="
@@ -75,7 +76,7 @@
             </div>
         {/if}
 
-        {if $introduction_links[$introduction_topic_versions]}
+        {if $introduction_links[$settings->introduction_topic_versions]}
 	        <div class="left-divider"></div>
             <div id="clearSelectionContainer" class="facetCategories">
                 <a href="#" onclick="

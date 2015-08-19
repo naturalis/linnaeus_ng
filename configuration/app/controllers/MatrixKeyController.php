@@ -2,6 +2,38 @@
 /*
 	needs to be undone of NBC:
 		private $_nbcImageRoot=true;
+
+
+
+settings:
+
+
+(`id`, `module_id`, `setting`, `info`, `default_value`, `created`, `last_change`)
+
+INSERT INTO `module_settings` VALUES(null, 7, 'calc_char_h_val', 'do or don''t calculate the H-value for characters (turning off increases performance) [0,1]', '1', '0000-00-00 00:00:00', '2015-07-30 10:17:57');
+INSERT INTO `module_settings` VALUES(null, 7, 'allow_empty_species', 'allow empty species (species with no content in the species module) to appear in the matrix (L2 legacy keys only) [0,1]', '1', '0000-00-00 00:00:00', '2015-07-30 11:06:55');
+INSERT INTO `module_settings` VALUES(null, 7, 'use_emerging_characters', 'disable characters as long as their states do not apply to all remaining species/taxa. [0,1]', '1', '0000-00-00 00:00:00', '2015-07-30 10:18:02');
+INSERT INTO `module_settings` VALUES(null, 7, 'use_character_groups', 'allow characters to be organised in groups. [0,1]', '1', '0000-00-00 00:00:00', '2015-07-30 10:18:03');
+INSERT INTO `module_settings` VALUES(null, 7, 'browse_style', 'style of browsing through result sets [expand, paginate, show_all]', 'expand', '0000-00-00 00:00:00', '2015-07-30 10:17:56');
+INSERT INTO `module_settings` VALUES(null, 7, 'items_per_line', 'number of resulting species per line [number]', '4', '0000-00-00 00:00:00', '2015-07-30 09:23:35');
+INSERT INTO `module_settings` VALUES(null, 7, 'items_per_page', 'number of resulting species per page (no effect when browse_style = ''show_all'') [number]', '16', '0000-00-00 00:00:00', '2015-07-30 09:23:39');
+INSERT INTO `module_settings` VALUES(null, 7, 'always_show_details', 'icon for species characters normally only appears when resultset <= items_per_page. set this to 1 to always display the icon, regardless of the size of the resultset. [0,1]', '1', '0000-00-00 00:00:00', '2015-07-31 07:57:08');
+INSERT INTO `module_settings` VALUES(null, 7, 'score_threshold', 'threshold of match percentage during identifying above which species displayed. setting to 100 only shows full matches, i.e. species that have all selected states. [0...100]', '100', '0000-00-00 00:00:00', '2015-07-30 09:24:05');
+INSERT INTO `module_settings` VALUES(null, 7, 'img_to_thumb_regexp_pattern', 'reg exp replace pattern to match the URL of a species normal image (from the nsr_extras table) against for automatic creation of a thumbnail URL. works in unison with ''img_to_thumb_regexp_replacement''. take *great* care that the reg exp is valid and properly escaped, as there is currently no check on its validity, and a broken reg exp will cause errors.\r\nthe default applies specifically to NSR-related keys.\r\n', '/http:\\/\\/images.naturalis.nl\\/original\\//', '0000-00-00 00:00:00', '2015-07-29 13:36:15');
+INSERT INTO `module_settings` VALUES(null, 7, 'img_to_thumb_regexp_replacement', 'replacement string for the reg exp in \r\n''img_to_thumb_regexp_pattern'' (see there). can be empty!', 'http://images.naturalis.nl/comping/', '0000-00-00 00:00:00', '2015-07-29 13:37:08');
+INSERT INTO `module_settings` VALUES(null, 7, 'image_orientation', 'image orientation of the results [portrait, landscape]', 'portrait', '0000-00-00 00:00:00', '2015-07-30 10:17:58');
+INSERT INTO `module_settings` VALUES(null, 7, 'match_sort_col_predominant', 'column name to first sort results on. normal sorting is on match percentage desc, scientific name asc. the column in this setting precedes those two.', NULL, '0000-00-00 00:00:00', '2015-07-30 11:52:17');
+g266
+INSERT INTO `module_settings` VALUES(null, 7, 'match_sort_col_after_match', 'column name to sort results on after the match percentage.', NULL, '0000-00-00 00:00:00', '2015-07-29 13:40:09');
+INSERT INTO `module_settings` VALUES(null, 7, 'species_info_url', 'external URL for further info on a species. overrides the species-specific URL from the nsr_extras table as link under the info-icon (though in some skins that URL is also displayed in the details pop-up). expects a webservice URL that returns a JSON-object that at least has an element ''page'' with an element ''body''. URL can be parametrised with %TAXON% (scientific name, key) and, optionally, %PID% (project ID). example:\r\n\r\nhttp://www.nederlandssoortenregister.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163', NULL, '0000-00-00 00:00:00', '2015-07-29 13:45:10');
+INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_citation', 'topic name of the page from the introduction module to be used as citation-info', 'Matrix citation', '0000-00-00 00:00:00', '2015-07-29 13:50:30');
+INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_versions', 'topic name of the page from the introduction module to be used as version history.', 'Matrix version history', '0000-00-00 00:00:00', '2015-07-29 13:50:49');
+INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_colophon', 'topic name of the page from the introduction module to be used as colophon.', 'Matrix colophon', '0000-00-00 00:00:00', '2015-07-29 13:51:08');
+INSERT INTO `module_settings` VALUES(null, 7, 'popup_species_link_text', 'text for the remote link that appears in the pop-up that shows the info retrieved with species_info_url. only relevant when species_info_url is defined and if there''s a species-specific info-URL in the nsr_extras as well. note: strictly speaking, this is not the right place for something purely textually, as setting-values are not considered to be language-dependent. oh well.', 'Meer details', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
+INSERT INTO `module_settings` VALUES(null, 7, 'use_overview_image', 'use the species overview image, rather than the image from NBC-extras. [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
+INSERT INTO `module_settings` VALUES(null, 7, 'show_scores', 'show the matching percentage in the results (only useful when score_threshold is below 100). [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
+INSERT INTO `module_settings` VALUES(null, 7, 'enable_treat_unknowns_as_matches', 'enables the function "treat unknowns as matches", which scores a taxon for which no state has been defined within a certain character as a match for that character (a sort of "rather safe than sorry"-setting). [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
+
 */
 
 
@@ -29,7 +61,8 @@ class MatrixKeyController extends Controller
         'variation_relations',
 		'gui_menu_order',
 		'module_settings',
-		'content_introduction'
+		'content_introduction',
+		'media_taxon'
     );
 
     public $controllerPublicName = 'Matrix key';
@@ -46,6 +79,7 @@ class MatrixKeyController extends Controller
 	private $_searchTerm=null;
 	private $_searchResults=null;
 	private $_introductionLinks=null;
+	private $_incUnknowns=false;
 
 	private $_master_matrix;
 	private $settings;
@@ -63,7 +97,7 @@ class MatrixKeyController extends Controller
 	
     public function __construct($p = null)
     {
-        parent::__construct($p);
+		parent::__construct($p);
         $this->initialize();
     }
 
@@ -96,6 +130,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign( 'settings', $this->settings );
 
 		$this->setFacetMenu();
+		$this->setIncUnknowns( false );
     }
 
     public function indexAction()
@@ -221,6 +256,24 @@ class MatrixKeyController extends Controller
 			$this->setSearchTerm( array('search'=>$this->rGetVal('search')) );
 			$this->setSearchResults();
 			$this->smarty->assign('returnText',json_encode( $this->getSearchResults()) );
+		}
+
+		else
+		
+		if ($this->rHasVal('action', 'set_unknowns'))
+		{
+
+			if (!$this->settings->enable_treat_unknowns_as_matches) return;
+
+			$this->setIncUnknowns( $this->rGetVal( 'value' )==1 );
+			$this->setScores();
+			$this->smarty->assign('returnText',
+				json_encode( array(
+					'scores'=>$this->getScores(),
+					'states'=>$this->getSessionStates(),
+					'characters'=>$this->getCharacterCounts(),
+					'statecount'=>$this->setRemainingStateCount()
+				)));
 		}
 
 		$this->printPage();	
@@ -512,6 +565,24 @@ class MatrixKeyController extends Controller
 			{
 				$variations[$key]['info']=isset($info['variation'][$val['id']]) ? $info['variation'][$val['id']] : null;
 				$this->induceThumbNailFromImage( $variations[$key]['info'] );
+			}
+		}
+
+		if ( $this->settings->use_overview_image )
+		{
+			foreach((array)$taxa as $key=>$val)
+			{
+				$d=$this->models->MediaTaxon->_get(array("id"=>
+					array(
+						"taxon_id"=>$val['id'],
+						"project_id" => $this->getCurrentProjectId(), 
+						"overview_image"=>"1"
+				)));
+				
+				if ( $d )
+				{
+					$taxa[$key]['info']['url_image']=$d[0]['file_name'];
+				}
 			}
 		}
 
@@ -1101,7 +1172,12 @@ class MatrixKeyController extends Controller
 
     private function setScores()
     {
-		$scores=$this->getScoresRestrictive( array('states'=>$this->getSessionStates()) );
+		$scores=$this->getScoresRestrictive(
+			array(
+				'states'=>$this->getSessionStates(),
+				'incUnknowns'=>$this->getIncUnknowns()
+			)
+		);
 		//$scores = $this->getScoresLiberal( array('states'=>$this->getSessionStates(),'incUnknowns'=>$incUnknowns);
 		if ($scores) usort($scores, array($this,'sortDataSet'));
 		$this->_scores=$scores;
@@ -2180,7 +2256,21 @@ class MatrixKeyController extends Controller
 	{
 		return $this->_introductionLinks;
 	}
-
+	
+	private function setIncUnknowns( $state )
+	{
+		if ( is_bool($state) )
+		{
+			$this->_incUnknowns=$state;
+		}
+	}
+	
+	private function getIncUnknowns()
+	{
+		return $this->_incUnknowns;
+	}
+	
+	
 
 
 }	
