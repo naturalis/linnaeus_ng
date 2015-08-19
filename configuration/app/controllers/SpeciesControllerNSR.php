@@ -653,8 +653,8 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$synonyms=array_splice($names,$synonymStartIndex,$synonymCount,array());
 			usort($synonyms,function($a,$b){
-				$aa=isset($a['authorship_year']) ? intval($a['authorship_year']) : intval(preg_replace('/\D/',"",$a['name']));
-				$bb=isset($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
+				$aa=!empty($a['authorship_year']) ? intval($a['authorship_year']) : intval(preg_replace('/\D/',"",$a['name']));
+				$bb=!empty($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
 				return ( $aa > $bb ? 1 : ( $aa < $bb ? -1 : 0 ) );
 			});
 			array_splice($names,$synonymStartIndex,0,$synonyms);
