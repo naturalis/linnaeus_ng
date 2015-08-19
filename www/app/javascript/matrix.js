@@ -24,7 +24,7 @@ function __(text)
 	hook_postPrintMenu();
 	hook_preApplyScores();
 	hook_postApplyScores();
-	hook_preSetStateValue(); // halts set function when hook-function returns false
+	hook_preSetStateValue(); // setStateValue() halts when hook-function returns false
 */
 
 var matrixsettings={
@@ -550,7 +550,7 @@ function formatResult( data )
 
 			states.push(
 				speciesStateItemHtmlTpl
-					.replace('%GROUP%',state.group_label + ' > ')
+					.replace('%GROUP%', state.group_label ? state.group_label + ' > ' : '')
 					.replace('%CHARACTER%',t)
 					.replace('%STATE%',l)
 			);
@@ -650,6 +650,7 @@ function formatResult( data )
 			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
+			.replace('%SCORE%', matrixsettings.showScores && data.score ? resultScoreHtmlTpl.replace( '%SCORE%',data.score) : "")
 			;
 
 	return resultHtml;
@@ -755,8 +756,7 @@ function browsePage( id )
 		setSetting({start:id * matrixsettings.perPage});
 	else
 		return;
-			
-//	nbcSaveSessionSetting('nbcStart',nbcStart);
+
 	clearResults();
 	printResults();
 	clearPaging();
@@ -933,6 +933,7 @@ function applyScores()
 				var item=dataset[j];
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
+					item.score=score.score;
 					resultset.push(item);
 				}
 			}
@@ -1191,7 +1192,6 @@ function setSearch( p )
 		}),
 		success : function(data)
 		{
-			//console.log(data);
 			var found=$.parseJSON(data);
 			setFound(found);
 

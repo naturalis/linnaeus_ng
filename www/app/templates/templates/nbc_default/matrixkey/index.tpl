@@ -63,7 +63,8 @@ $(document).ready(function()
 		alwaysShowDetails: {$settings->always_show_details},
 		perPage: {$settings->items_per_page},
 		perLine: {$settings->items_per_line},
-		generalSpeciesInfoUrl: '{$settings->species_info_url}'
+		generalSpeciesInfoUrl: '{$settings->species_info_url}',
+		showScores: {$settings->show_scores},
 	});
 
 	setScores($.parseJSON('{$session_scores}'));
@@ -158,7 +159,8 @@ var resultHtmlTpl = '\
 			<span class="result-name-scientific" title="%SCI-NAME-TITLE%">%SCI-NAME%</span> \
 			%MATRIX-LINK% \
 			<span class="result-name-common" title="%COMMON-NAME-TITLE%"><br />%COMMON-NAME%</span> \
-            </div> \
+			%SCORE% \
+			</div> \
         </div> \
         <div class="result-icons"> \
 			<div class="result-icon%REMOTE-LINK-CLASS%" \
@@ -173,6 +175,9 @@ var resultHtmlTpl = '\
         </div>%STATES% \
     </div> \
 ';
+
+var resultScoreHtmlTpl= '<p>Score: %SCORE%%</p>' ;
+
 
 var resultBatchHtmlTpl= '<span class=result-batch style="%STYLE%">%RESULTS%</span>' ;
 var buttonMoreHtmlTpl='<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>';
