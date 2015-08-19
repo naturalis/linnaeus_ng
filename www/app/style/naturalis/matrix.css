@@ -11,6 +11,11 @@
 .ui-state-default:hover {background: #eee;}
 .no-close .ui-dialog-titlebar-close {display:none;}
 
+
+.ui-dialog {
+	border-radius: 6px;
+}
+
 .ui-dialog-titlebar {
     margin-bottom: 0px;
     margin-top: 5px;
@@ -23,10 +28,12 @@
 }
 .ui-dialog-titlebar {
 	background-color:#fff;
-	border-bottom:1px solid #999;
+	border-bottom:1px solid #eee;
+	text-align:center;
 }
 .ui-dialog-content {
     margin:20px;
+	min-width:175px;
 }
 .ui-dialog-title {
     margin-left:20px;
@@ -38,9 +45,8 @@ ul li.emergent_disabled {color:#999;}
 
 #graphicVaslueSelector {
 	max-height:450px;
-	overflow-y:scroll;
+	overflow-y:auto;
 }
-
 .orange_checkbox {
 	display:none;
 }

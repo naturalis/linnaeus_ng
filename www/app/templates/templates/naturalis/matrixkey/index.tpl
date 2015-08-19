@@ -279,6 +279,4 @@ var searchHeaderHtmlTpl='\
 ';
 </script>
 
-
-
 </html>
