@@ -1,4 +1,34 @@
 <?php
+
+/*
+	data & matching
+	on initial load, the entire data-set is fed into data.dataset in matrix.js via
+	setDataSet() in index.php/tpl. from that point on, each time a character state
+	is (un)set, setState() is called, which only returns an array of taxon id's with
+	scores, which are applied to data.dataset in applyScores(), resulting in
+	data.resultset, which contains the actual results as they are displayed.
+	
+	sorting
+	initial sorting is done in MatrixKeyController::sortDataSet(), using one of the
+	following fields:
+		- by field name defined by setting 'initial_sort_column'
+		- by taxon concept
+		- by label (always exists for each taxon, variation and matrix)
+	for each of compared items $a and $b the first existing field from the list above
+	is used for comparison (theoretically, a variation's label could be compared with
+	a taxon's scientific name)
+	sorting after selection of states is done by score (matching percentage).
+	data.scores sorted this way, causing data.resultset to be sorted in the same way.
+	should the setting 'always_sort_by_initial' be true, them data.resultset is
+	re-sorted in JS::sortResults(), using the field defined by 'initial_sort_column'.
+	this way, the score sort can be overridden. additionally, there is a hook-function
+	hook_postSortResults() which is called after sortResults(), allowing specific
+	implementations to further alter the results' order (function is called regardless
+	of the values of 'always_sort_by_initial' or 'initial_sort_column'.
+
+*/
+
+
 /*
 	needs to be undone of NBC:
 		private $_nbcImageRoot=true;
@@ -33,6 +63,23 @@ INSERT INTO `module_settings` VALUES(null, 7, 'popup_species_link_text', 'text f
 INSERT INTO `module_settings` VALUES(null, 7, 'use_overview_image', 'use the species overview image, rather than the image from NBC-extras. [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
 INSERT INTO `module_settings` VALUES(null, 7, 'show_scores', 'show the matching percentage in the results (only useful when score_threshold is below 100). [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
 INSERT INTO `module_settings` VALUES(null, 7, 'enable_treat_unknowns_as_matches', 'enables the function "treat unknowns as matches", which scores a taxon for which no state has been defined within a certain character as a match for that character (a sort of "rather safe than sorry"-setting). [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
+
+update module_settings set setting = 'initial_sort_column',
+info = 'column to initially sort the data set on'
+where setting = 'match_sort_col_predominant';
+
+update module_settings set setting = 'always_sort_by_initial',
+info = 'sort result set on \'initial_sort_column\' after matching percentages have been calculated (default behaviour is sorting by match percentage)'
+where setting = 'match_sort_col_after_match';
+
+update module_settings set 
+info = 'sort result set on \'initial_sort_column\' after matching percentages have been calculated (default behaviour is sorting by match percentage) [1,0]',
+default_value=0
+where setting = 'always_sort_by_initial';
+
+update module_settings set 
+info = 'column to initially sort the data set on (without settting, program sorts on scientific name)'
+where setting = 'initial_sort_column';
 
 */
 
@@ -139,9 +186,9 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 
-		$this->setScores();
 		$this->setMasterMatrix();
 		$this->setDataSet();
+		$this->setScores();
 
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
@@ -568,7 +615,7 @@ class MatrixKeyController extends Controller
 			}
 		}
 
-		if ( $this->settings->use_overview_image )
+		if ( isset($this->settings->use_overview_image) && $this->settings->use_overview_image )
 		{
 			foreach((array)$taxa as $key=>$val)
 			{
@@ -588,7 +635,10 @@ class MatrixKeyController extends Controller
 
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 
-		if ($all) usort($all, array($this,'sortDataSet'));
+		if ($all) 
+		{
+			usort($all, array($this,'sortDataSet'));
+		}
 		
 		return $all;
 		
@@ -1179,7 +1229,13 @@ class MatrixKeyController extends Controller
 			)
 		);
 		//$scores = $this->getScoresLiberal( array('states'=>$this->getSessionStates(),'incUnknowns'=>$incUnknowns);
-		if ($scores) usort($scores, array($this,'sortDataSet'));
+
+		
+		if ($scores && (!isset($this->settings->always_sort_by_initial) || (isset($this->settings->always_sort_by_initial) && $this->settings->always_sort_by_initial==0)))
+		{
+			usort($scores, array($this,'sortDataSet'));
+		}
+
 		$this->_scores=$scores;
     }
 
@@ -1691,7 +1747,6 @@ class MatrixKeyController extends Controller
 					array_push($results,$val);
 				}
 			}
-
 		}
 
         return $results;
@@ -1702,19 +1757,18 @@ class MatrixKeyController extends Controller
 		/*
 			sorting strategies:
 			
-			* column name defined by setting 'match_sort_col_predominant'
+			* column name defined by setting 'initial_sort_column'
 			* matching percentage (100 > 0)
-			* column name defined by setting 'match_sort_col_after_match'
 			* taxon concept
 			* label
 		*/
 		
-		if ( !empty($this->settings->match_sort_col_predominant) )
+		if ( !empty($this->settings->initial_sort_column) )
 		{
-			if (isset($a[$this->settings->match_sort_col_predominant]) && isset($b[$this->settings->match_sort_col_predominant]))
+			if (isset($a[$this->settings->initial_sort_column]) && isset($b[$this->settings->initial_sort_column]))
 			{
-		        if ($a[$this->settings->match_sort_col_predominant]>$b[$this->settings->match_sort_col_predominant]) return 1;
-		        if ($a[$this->settings->match_sort_col_predominant]<$b[$this->settings->match_sort_col_predominant]) return -1;
+		        if ($a[$this->settings->initial_sort_column]>$b[$this->settings->initial_sort_column]) return 1;
+		        if ($a[$this->settings->initial_sort_column]<$b[$this->settings->initial_sort_column]) return -1;
 			}
 		}
 		
@@ -1722,15 +1776,6 @@ class MatrixKeyController extends Controller
 		{
 			if ($a['score']<$b['score']) return 1;
 			if ($a['score']>$b['score']) return -1;
-		}
-
-		if ( !empty($this->settings->match_sort_col_after_match) )
-		{
-			if (isset($a[$this->settings->match_sort_col_after_match]) && isset($b[$this->settings->match_sort_col_after_match]))
-			{
-		        if ($a[$this->settings->match_sort_col_after_match]>$b[$this->settings->match_sort_col_after_match]) return 1;
-		        if ($a[$this->settings->match_sort_col_after_match]<$b[$this->settings->match_sort_col_after_match]) return -1;
-			}
 		}
 
 		if (isset($a['taxon']))

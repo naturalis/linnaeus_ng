@@ -65,6 +65,8 @@ $(document).ready(function()
 		perLine: {$settings->items_per_line},
 		generalSpeciesInfoUrl: '{$settings->species_info_url}',
 		showScores: {$settings->show_scores},
+		initialSortColumn: '{$settings->initial_sort_column}',
+		alwaysSortByInitial: {$settings->always_sort_by_initial},
 	});
 
 	setScores($.parseJSON('{$session_scores}'));
