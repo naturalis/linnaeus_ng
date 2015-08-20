@@ -1,7 +1,7 @@
                     <a class="no-text" style="width:465px;height:90px;display:block;position:absolute;" href="">Home</a>
                     
                     <ul class="menu">
-                        <li><a id="home-btn" class="no-text" href="">Home</a></li>
+                        <li><a id="home-btn" class="no-text" href="../../views/matrixkey/">Home</a></li>
                         <li><a id="tv-btn" class="no-text" href="../introduction/topic.php?id=Dierenzoeker%20op%20TV">Dierenzoeker op TV</a></li>
                         <li><a id="onderwijs-btn" class="no-text" href="../introduction/topic.php?id=Onderwijs">Onderwijs</a></li>
                     </ul>
