@@ -104,13 +104,15 @@
                 <div class="clearer"></div>
                                           
             </div>
-
+            
+            {include file="../shared/bottom-banners.tpl"}
+<!--
             <div class="footer">
                 <div class="footer-inner">
                     <ul>
-                        <li><a href="../../static/dierenzoeker/mobiel.php" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
-                        <li><a href="../../static/dierenzoeker/faq.php" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
-                        <li><a href="../../static/dierenzoeker/colofon.php" class="no-text" id="colofon-btn">Colofon</a></li>
+                        <li><a href="../introduction/topic.php?id=Op%20je%20mobiel" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
+                        <li><a href="../introduction/topic.php?id=Veelgestelde%20vragen" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
+                        <li><a href="../introduction/topic.php?id=Colofon" class="no-text" id="colofon-btn">Colofon</a></li>
                     </ul>
                     <div class="clearer"></div>               
                     <a href='http://www.naturalis.nl' class="no-text" target="_blank" 
@@ -132,7 +134,7 @@
 				</div>
 					</div>
                 </div>
-
+-->
         </div>
 
 		<div class="facetgrouppage-wrapper"> 

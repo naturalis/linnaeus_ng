@@ -94,6 +94,10 @@ $(document).ready(function(){
 			 </div>
 			</div> 
 		</div>
+        
+        {include file="../shared/bottom-banners.tpl"}
+
+<!--        
           <div class="footer">
                 <div class="footer-inner">
                 <ul>
@@ -114,7 +118,7 @@ $(document).ready(function(){
 </div>                
                 </div>
             </div>
-
+-->
        </div>
                     
     </body>
