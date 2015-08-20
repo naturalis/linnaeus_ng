@@ -11,9 +11,6 @@ function __(text)
 	}
 	
 	return text;
-
-	// _() is sloooooow!
-	//return _(text);
 }
 
 /*
@@ -25,6 +22,7 @@ function __(text)
 	hook_preApplyScores();
 	hook_postApplyScores();
 	hook_preSetStateValue(); // setStateValue() halts when hook-function returns false
+	hook_postSortResults();
 */
 
 var matrixsettings={
@@ -51,7 +49,9 @@ var matrixsettings={
 	scoreThreshold: 0,
 	mode: "identify", // similar, search
 	groupsAlwaysOpen: false,
-	generalSpeciesInfoUrl: ""
+	generalSpeciesInfoUrl: "",
+	initialSortColumn: "",
+	alwaysSortByInitial: 0,
 };
 
 var data={
@@ -895,6 +895,7 @@ function setState( p )
 			closeSearch();
 
 			applyScores();
+			sortResults();
 			clearResults();
 			printResults();
 			printMenu();
@@ -947,6 +948,30 @@ function applyScores()
 	matrixsettings.start=0;
 	
 	if (typeof hook_postApplyScores == 'function') { hook_postApplyScores(); }
+
+}
+
+function sortResults()
+{
+	if( matrixsettings.alwaysSortByInitial!=1 || matrixsettings.initialSortColumn=="" ) 
+	{
+		if (typeof hook_postSortResults  == 'function') { hook_postSortResults(); }
+		return;
+	}
+
+	var resultset=getResultSet();
+
+	if( resultset.length<1 ) return;
+	if( !resultset[0][matrixsettings.initialSortColumn] ) return;
+
+	resultset.sort(function(a,b)
+	{
+		if ( a[matrixsettings.initialSortColumn]<b[matrixsettings.initialSortColumn] ) return -1;
+		if ( a[matrixsettings.initialSortColumn]>b[matrixsettings.initialSortColumn] ) return 1;
+		return 0;
+	})
+
+	if (typeof hook_postSortResults  == 'function') { hook_postSortResults(); }
 
 }
 
@@ -1238,6 +1263,7 @@ function closeSimilarSearch()
 	setSetting({mode:"identify"});
 	clearSimilarHeader();
 	applyScores();
+	sortResults();
 	clearResults();
 	setSetting(getPrevmatrixsettings());
 	setSetting({expandedShowing:matrixsettings.expandedShowing-matrixsettings.perPage});
@@ -1542,9 +1568,11 @@ function matrixInit()
 	// inititializing scores, results and menu
 	setCursor('wait');
 	applyScores();
+	sortResults();
 	clearResults();
 	printResults();
 	setCursor();
 	retrieveMenu();
 
 }
+

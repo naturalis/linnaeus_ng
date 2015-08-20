@@ -255,7 +255,9 @@ $(document).ready(function()
 		alwaysShowDetails: {$settings->always_show_details},
 		perPage: {$settings->items_per_page},
 		perLine: {$settings->items_per_line},
-		generalSpeciesInfoUrl: '{$settings->species_info_url}'
+		generalSpeciesInfoUrl: '{$settings->species_info_url}',
+		initialSortColumn: '{$settings->initial_sort_column}',
+		alwaysSortByInitial: {$settings->always_sort_by_initial},
 	});
 
 	setScores($.parseJSON('{$session_scores}'));
