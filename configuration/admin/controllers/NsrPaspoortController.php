@@ -154,7 +154,7 @@ class NsrPaspoortController extends NsrController
 				_a.id,
 				ifnull(_b.title,_a.page) as title,
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
-				_a.show_order,
+				ifnull(_a.show_order,99) as show_order,
 				_c.content,
 				_c.id as content_id,
 				_c.publish,
