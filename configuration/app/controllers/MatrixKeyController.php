@@ -58,7 +58,7 @@ INSERT INTO `module_settings` VALUES(null, 7, 'match_sort_col_after_match', 'col
 INSERT INTO `module_settings` VALUES(null, 7, 'species_info_url', 'external URL for further info on a species. overrides the species-specific URL from the nsr_extras table as link under the info-icon (though in some skins that URL is also displayed in the details pop-up). expects a webservice URL that returns a JSON-object that at least has an element ''page'' with an element ''body''. URL can be parametrised with %TAXON% (scientific name, key) and, optionally, %PID% (project ID). example:\r\n\r\nhttp://www.nederlandssoortenregister.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163', NULL, '0000-00-00 00:00:00', '2015-07-29 13:45:10');
 INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_citation', 'topic name of the page from the introduction module to be used as citation-info', 'Matrix citation', '0000-00-00 00:00:00', '2015-07-29 13:50:30');
 INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_versions', 'topic name of the page from the introduction module to be used as version history.', 'Matrix version history', '0000-00-00 00:00:00', '2015-07-29 13:50:49');
-INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_colophon', 'topic name of the page from the introduction module to be used as colophon.', 'Matrix colophon', '0000-00-00 00:00:00', '2015-07-29 13:51:08');
+INSERT INTO `module_settings` VALUES(null, 7, 'introduction_topic_inline_info', 'topic name of the page from the introduction module to be used as colophon.', 'Matrix colophon', '0000-00-00 00:00:00', '2015-07-29 13:51:08');
 INSERT INTO `module_settings` VALUES(null, 7, 'popup_species_link_text', 'text for the remote link that appears in the pop-up that shows the info retrieved with species_info_url. only relevant when species_info_url is defined and if there''s a species-specific info-URL in the nsr_extras as well. note: strictly speaking, this is not the right place for something purely textually, as setting-values are not considered to be language-dependent. oh well.', 'Meer details', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
 INSERT INTO `module_settings` VALUES(null, 7, 'use_overview_image', 'use the species overview image, rather than the image from NBC-extras. [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
 INSERT INTO `module_settings` VALUES(null, 7, 'show_scores', 'show the matching percentage in the results (only useful when score_threshold is below 100). [0,1]', '0', '0000-00-00 00:00:00', '2015-07-29 13:54:03');
@@ -80,6 +80,22 @@ where setting = 'always_sort_by_initial';
 update module_settings set 
 info = 'column to initially sort the data set on (without settting, program sorts on scientific name)'
 where setting = 'initial_sort_column';
+
+
+
+update module_settings set 
+setting = 'introduction_topic_inline_info',
+info = 'topic name of the page from the introduction module containing additional info, to be displayed inline beneath the legend.',
+default_value='Matrix additional info'
+where setting = 'introduction_topic_inline_info';
+
+update module_settings set 
+setting = 'introduction_topic_inline_info_citation',
+info = 'topic name of the page from the introduction module to be used as colophon and citation-info.',
+default_value='Matrix colophon & citation'
+where setting = 'introduction_topic_citation';
+
+
 
 */
 
@@ -2262,7 +2278,7 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->settings->introduction_topic_citation
+					'topic' => $this->settings->introduction_topic_colophon_citation
 				),
 				'columns'=>'page_id,topic,content'
 			)
@@ -2284,16 +2300,16 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->settings->introduction_topic_colophon
+					'topic' => $this->settings->introduction_topic_inline_info
 				),
 				'columns'=>'page_id,topic,content'
 			)
 		);
 		
 		$this->_introductionLinks=array(
-			$this->settings->introduction_topic_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
+			$this->settings->introduction_topic_colophon_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
 			$this->settings->introduction_topic_versions=>$b && (!empty(strip_tags($b[0]['content']))) ? $b[0] : null,
-			$this->settings->introduction_topic_colophon=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
+			$this->settings->introduction_topic_inline_info=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
 		);
     }
 	

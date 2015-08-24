@@ -53,26 +53,26 @@
             </table>
 		</div>  
 
-        {if $introduction_links[$settings->introduction_topic_colophon]}
+        {if $introduction_links[$settings->introduction_topic_inline_info]}
 	        <div class="left-divider"></div>
             <div id="dataSourceContainer">   
             <script>
 			$(document).ready(function()
 			{
-                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon].page_id}&format=plain' )
+                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_inline_info].page_id}&format=plain' )
                 .success(function(data) { $('#dataSourceContainer').html( data ); } ) ;
 			});
 			</script>
             </div>
         {/if}        
 
-        {if $introduction_links[$settings->introduction_topic_citation]}
+        {if $introduction_links[$settings->introduction_topic_colophon_citation]}
 	        <div class="left-divider"></div>
             <div id="clearSelectionContainer" class="facetCategories">
                 <a href="#" onclick="
-                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_citation].page_id}&format=plain' )
+                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                 .success(function(data) { printInfo( data ,'{t}Citatie{/t}'); } ) ;
-                ">{t}Citatie{/t}</a>
+                ">{t}Colofon en citatie{/t}</a>
             </div>
         {/if}
 
