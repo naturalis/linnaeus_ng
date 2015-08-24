@@ -263,5 +263,4 @@ var infoDialogUrlHtmlTpl='<a href="%URL%" class="popup-link" target="_blank">%LI
 
 </script>
 
-
 {include file="../shared/footer.tpl"}
