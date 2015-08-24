@@ -798,5 +798,21 @@ function nbcInit() {
 }
 
 
-
+function printInfo( info, title, url )
+{
+	if (info)
+	{
+		showDialog(
+			title,
+			infoDialogHtmlTpl
+				.replace('%BODY%',info)
+				.replace('%URL%', url ? 
+					infoDialogUrlHtmlTpl
+						.replace('%URL%',url)
+						.replace('%LINK-LABEL%',labels.popup_species_link)
+					 : "" ),
+			{showOk:false});
+	}
+}
 // alleen litho
+
