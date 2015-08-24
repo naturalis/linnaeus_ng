@@ -1289,21 +1289,6 @@ class Controller extends BaseClass
     }
 
 
-	private function henk($m)
-	{
-
-		$d = $this->generateRandomHexString('%%%','%%%');
-
-		while (isset($this->_hotwordMightBeHotwords[$d]))
-			$d = $this->generateRandomHexString('%%%','%%%');
-
-		$this->_hotwordMightBeHotwords[$d]=$m[0];
-
-		return $d;
-
-	}
-
-
 	public function matchHotwords ($text, $forceLookup = false)
 	{
 
@@ -1331,11 +1316,27 @@ class Controller extends BaseClass
 		if ($hasPossibles) {
 			$processed = preg_replace_callback(
 				$exprMaybe,
-				array($this,'henk'),
+				array($this,'generate_rnd_string'),
 				$processed
 			);
 
 		}
+		
+		private function generate_rnd_string($m)
+		{
+	
+			$d = $this->generateRandomHexString('%%%','%%%');
+	
+			while (isset($this->_hotwordMightBeHotwords[$d]))
+				$d = $this->generateRandomHexString('%%%','%%%');
+	
+			$this->_hotwordMightBeHotwords[$d]=$m[0];
+	
+			return $d;
+	
+		}
+
+
 		*/
 
 		$currUrl = $this->getCurrentPathWithProjectlessQuery();
