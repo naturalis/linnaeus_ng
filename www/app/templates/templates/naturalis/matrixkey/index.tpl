@@ -64,6 +64,8 @@
 				{* snippet}colofon.html{/snippet *}
 
 
+{$introduction_links|@print_r}
+
         {if $introduction_links[$settings->introduction_topic_inline_info]}
             <div>
             <script>
