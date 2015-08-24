@@ -71,7 +71,7 @@
             <div id="clearSelectionContainer" class="facetCategories">
                 <a href="#" onclick="
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
-                .success(function(data) { printInfo( data ,'{t}Citatie{/t}'); } ) ;
+                .success(function(data) { printInfo( data ,'{t}Colofon en citatie{/t}'); } ) ;
                 ">{t}Colofon en citatie{/t}</a>
             </div>
         {/if}
