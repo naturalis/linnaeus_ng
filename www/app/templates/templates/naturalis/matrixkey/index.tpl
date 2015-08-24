@@ -65,7 +65,7 @@
 
 
         {if $introduction_links[$settings->introduction_topic_inline_info]}
-            <p>
+            <div>
             <script>
 			$(document).ready(function()
 			{
@@ -73,21 +73,25 @@
                 .success(function(data) { $('#dataSourceContainer').html( data ); } ) ;
 			});
 			</script>
-            </p>
+            </div>
         {/if}        
 
         {if $introduction_links[$settings->introduction_topic_colophon_citation]}
+            <div>
                 <h3><a href="#" onclick="
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                 .success(function(data) { printInfo( data ,'{t}Colofon en citatie{/t}'); } ) ;
                 ">{t}Colofon en citatie{/t}</a></h3>
+            </div>
         {/if}
 
         {if $introduction_links[$settings->introduction_topic_versions]}
+            <div>
                 <h3><a href="#" onclick="
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
                 .success(function(data) { printInfo( data ,'{t}Versiegeschiedenis{/t}'); } ) ;
                 ">{t}Versiegeschiedenis{/t}</a></h3>
+            </div>
         {/if}
         
 
