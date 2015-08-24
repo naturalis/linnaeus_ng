@@ -61,12 +61,46 @@
             <div class='left-divider'></div>
             <div id='dataSourceContainer'>
 
-				{snippet}colofon.html{/snippet}
+				{* snippet}colofon.html{/snippet *}
 
-              <div>
+
+        {if $introduction_links[$settings->introduction_topic_inline_info]}
+            <div>
+            <script>
+			$(document).ready(function()
+			{
+                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_inline_info].page_id}&format=plain' )
+                .success(function(data) { $('#dataSourceContainer').html( data ); } ) ;
+			});
+			</script>
+            </div>
+        {/if}        
+
+        {if $introduction_links[$settings->introduction_topic_colophon_citation]}
+            <div>
+                <h3><a href="#" onclick="
+                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
+                .success(function(data) { printInfo( data ,'{t}Colofon en citatie{/t}'); } ) ;
+                ">{t}Colofon en citatie{/t}</a></h3>
+            </div>
+        {/if}
+
+        {if $introduction_links[$settings->introduction_topic_versions]}
+            <div>
+                <h3><a href="#" onclick="
+                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
+                .success(function(data) { printInfo( data ,'{t}Versiegeschiedenis{/t}'); } ) ;
+                ">{t}Versiegeschiedenis{/t}</a></h3>
+            </div>
+        {/if}
+        
+
+
+
+              <!-- div>
                 <h3>{t}Geïmplementeerd door{/t}</h3>
                 <p>{t}Naturalis & ETI BioInformatics.{/t}</p>
-              </div>
+              </div -->
             </div>
             <div class='left-divider'></div>
           </div>
