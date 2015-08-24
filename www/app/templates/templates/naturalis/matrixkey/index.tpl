@@ -65,12 +65,12 @@
 
 
         {if $introduction_links[$settings->introduction_topic_inline_info]}
-            <div>
+            <div id='info-container'>
             <script>
 			$(document).ready(function()
 			{
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_inline_info].page_id}&format=plain' )
-                .success(function(data) { $('#dataSourceContainer').html( data ); } ) ;
+                .success(function(data) { $('#info-container').html( data ); } ) ;
 			});
 			</script>
             </div>
@@ -311,6 +311,20 @@ var searchHeaderHtmlTpl='\
 <br /> \
 <a class="clearSimilarSelection" href="#" onclick="closeSearch();return false;">%BACK-TEXT%</a> \
 ';
+
+var infoDialogHtmlTpl=' \
+<div style="text-align:left;width:400px"> \
+<style> \
+p { \
+	margin-bottom:15px; \
+} \
+</style> \
+%BODY% \
+%URL% \
+</div>';
+
+var infoDialogUrlHtmlTpl='<a href="%URL%" class="popup-link" target="_blank">%LINK-LABEL%</a>';
+
 </script>
 
 </html>
