@@ -13,7 +13,12 @@
 
 		<script type="text/javascript" src="../../javascript/jquery-1.9.1.min.js"></script>
 		<script type="text/javascript" src="../../javascript/project_specific/backstretch.js"></script>
+
 		</head>
+        
+        
+        
+        
     <body style="background-position-y:115px;background: url('../../media/system/skins/dierenzoeker/background_blurry.jpg');">       
         <div class="main-wrapper">
             
@@ -108,6 +113,16 @@ ga('create', 'UA-27823424-1', 'dierenzoeker.nl');
 ga('send', 'pageview');
 
 {/literal}
+
+$(document).ready(function(e) {
+    $('img').each(function(index, element) {
+        $(this).attr('src', '../../media/system/skins/dierenzoeker/' + $(this).attr('src') );
+    });
+});
+
+
+
+
 
 </script>
 </html>
