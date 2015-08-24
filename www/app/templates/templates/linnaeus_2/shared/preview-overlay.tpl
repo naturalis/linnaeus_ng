@@ -1,1 +1,1 @@
-<div id="preview-overlay"><p><a href="{$urlBackToAdmin}">EDIT PAGE</a></p></div>
+<div id="preview-overlay"><p><a href="{$urlBackToAdmin}">{t}EDIT PAGE{/t}</a></p></div>
