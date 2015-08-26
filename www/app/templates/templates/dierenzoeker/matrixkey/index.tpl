@@ -126,12 +126,8 @@
 								<div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
 									<a 
                                     	href="#" 
-                                    	onClick="
-                                        	setStateValue('{$character.prefix}:{$character.id}:{$state.id}');
-	                                        $('.facetgrouppage-close-btn').trigger('click');
-                                            return false;
-                                            " 
-                                        class="" 
+                                        data-value='{$character.prefix}:{$character.id}:{$state.id}'
+                                        class="bla" 
                                         id="state-{$state.id}">
                                         <div class="grid-iconbox">
                                             <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$state.file_name}">
@@ -170,12 +166,8 @@
                             <div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
                                 <a
                                 	href="#" 
-                                    onClick="
-                                    	setStateValue('{$group.prefix}:{$group.id}:{$state.id}');
-                                        $('.facetgrouppage-close-btn').trigger('click');
-                                        return false;
-                                        " 
-                                    class="" 
+                                    data-value='{$group.prefix}:{$group.id}:{$state.id}'
+                                    class="bla"
                                     id="state-{$state.id}">
                                 <div class="grid-iconbox">
                                     <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$state.file_name}">
@@ -304,6 +296,19 @@ function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="sub
 
 
 <script type="text/JavaScript">
+
+$(document).ready(function()
+{
+	$('.bla').on('click',function()
+	{
+		setStateValue($(this).attr('data-value'));
+		$('.facetgrouppage-close-btn').trigger('click');
+		return false;
+	});
+});
+
+
+
 
 var resultsHtmlTpl = '<ul>%RESULTS%</ul>';
 var noResultHtmlTpl='<div style="margin-top:10px">%MESSAGE%</div>';
