@@ -229,6 +229,15 @@ function drnzkr_update_choices_made()
 
 function drnzkr_update_states()
 {
+	/*
+
+		setStateValue($(this).attr('data-value'));
+		$('.facetgrouppage-close-btn').trigger('click');
+		return false;
+			
+	*/
+	
+	
 	$('a[id^="state-"]').addClass('ui-disabled');
 
 	var d=getStateCount();
