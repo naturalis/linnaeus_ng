@@ -1063,7 +1063,8 @@ class SearchControllerNSR extends SearchController
 					}
 					else
 					{
-						setlocale(LC_ALL,'nl_NL'); // linux only
+						if (!setlocale(LC_ALL,'nl_NL'))
+							setlocale(LC_ALL,'nl_NL.utf8');
 						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
 					}
 
