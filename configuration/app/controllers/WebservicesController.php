@@ -736,11 +736,30 @@ parameters:
 
         $d=$this->models->MediaTaxon->freeQuery("
 			select
-				count(id) as total
-			from %PRE%media_taxon _a
+				count(_m.id) as total
+
+			from
+				%PRE%media_taxon _m
+			
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+
+			left join %PRE%taxa _k
+				on _m.taxon_id=_k.id
+				and _m.project_id=_k.project_id
+
+			left join %PRE%trash_can _trash
+				on _k.project_id = _trash.project_id
+				and _k.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+			
 			where
-				_a.project_id = ".$this->getCurrentProjectId()
-		);
+				_m.project_id = ".$this->getCurrentProjectId()."
+				and ifnull(_meta9.meta_data,0)!=1
+				and ifnull(_trash.is_deleted,0)=0
+		");
 		
 		$result['statistics']['images']=
 			array(
