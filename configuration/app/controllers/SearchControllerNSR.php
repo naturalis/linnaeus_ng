@@ -945,8 +945,8 @@ class SearchControllerNSR extends SearchController
 
 		if (!empty($p['validator']))
 		{
-			//$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
-			$photographer="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
+			//$validator="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
+			$validator="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
 		}
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
@@ -1008,7 +1008,34 @@ class SearchControllerNSR extends SearchController
 				"right join %PRE%taxon_quick_parentage _q
 					on _m.taxon_id=_q.taxon_id
 					and _m.project_id=_q.project_id
+				" : "" )."
+
+			".(!empty($p['name']) ? 
+				"left join %PRE%names _j
+					on _m.taxon_id=_j.taxon_id
+					and _m.project_id=_j.project_id
+					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 					" : "" )."
+
+
+			".(isset($photographer) ? 
+				"left join %PRE%names _j
+					on _m.taxon_id=_j.taxon_id
+					and _m.project_id=_j.project_id
+					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+					" : "" )."
+					
+			".(isset($validator) ? 
+				"left join %PRE%names _j
+					on _m.taxon_id=_j.taxon_id
+					and _m.project_id=_j.project_id
+					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+					" : "" )."					
+
+
 			
 			where _m.project_id = ".$this->getCurrentProjectId()."
 
@@ -1019,7 +1046,10 @@ class SearchControllerNSR extends SearchController
 				".(!empty($p['name']) && empty($p['name']) ?
 					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
+				".(isset($validator)  ? "and ".$validator : "")." 		
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
+				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])  : "")." 		
+				".(!empty($p['name']) ? "and _j.name like '". mysql_real_escape_string($p['name'])."%'"  : "")."
 
 			".(isset($sort) ? "order by ".$sort : "")."
 			".(isset($limit) ? "limit ".$limit : "")."
@@ -1067,7 +1097,6 @@ class SearchControllerNSR extends SearchController
 							setlocale(LC_ALL,'nl_NL.utf8');
 						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
 					}
-
 				} 
 				else
 				if ($m['sys_label']=='beeldbankOmschrijving')
@@ -1134,12 +1163,21 @@ class SearchControllerNSR extends SearchController
 		}
 
 
+
+
+		if (!empty($p['photographer']))
+		{
+			//$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
+			$photographer="_c.meta_data like '%".mysql_real_escape_string($p['photographer'])."%'";
+		}
+
+		if (!empty($p['validator']))
+		{
+			//$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
+			$photographer="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
+		}
+
 /*
-
-".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
-				".(!empty($p['name']) && empty($p['name']) ?
-					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
-
 
 		if (!empty($p['photographer']))
 		{
@@ -1171,11 +1209,7 @@ class SearchControllerNSR extends SearchController
 				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".$this->getCurrentLanguageId()."
 
-			left join %PRE%names _j
-				on _m.taxon_id=_j.taxon_id
-				and _m.project_id=_j.project_id
-				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+
 				
 			left join %PRE%media_meta _meta1
 				on _m.id=_meta1.media_id
