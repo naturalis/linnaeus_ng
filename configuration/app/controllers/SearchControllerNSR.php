@@ -1015,28 +1015,26 @@ class SearchControllerNSR extends SearchController
 					on _m.taxon_id=_j.taxon_id
 					and _m.project_id=_j.project_id
 					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-					" : "" )."
+					and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+				" : "" )."
 
 
 			".(isset($photographer) ? 
-				"left join %PRE%names _j
-					on _m.taxon_id=_j.taxon_id
-					and _m.project_id=_j.project_id
-					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-					" : "" )."
+				"left join %PRE%media_meta _c
+					on _m.project_id=_c.project_id
+					and _m.id = _c.media_id
+					and _c.sys_label = 'beeldbankFotograaf'
+					and _c.language_id=".$this->getCurrentLanguageId()."
+				" : "" )."
 					
 			".(isset($validator) ? 
-				"left join %PRE%names _j
-					on _m.taxon_id=_j.taxon_id
-					and _m.project_id=_j.project_id
-					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-					" : "" )."					
+				"left join %PRE%media_meta _meta6
+					on _m.id=_meta6.media_id
+					and _m.project_id=_meta6.project_id
+					and _meta6.sys_label='beeldbankValidator'
+					and _meta6.language_id=".$this->getCurrentLanguageId()."
+				" : "" )."					
 
-
-			
 			where _m.project_id = ".$this->getCurrentProjectId()."
 
 				and ifnull(_meta9.meta_data,0)!=1
@@ -1161,140 +1159,6 @@ class SearchControllerNSR extends SearchController
 			
 	
 		}
-
-
-
-
-		if (!empty($p['photographer']))
-		{
-			//$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
-			$photographer="_c.meta_data like '%".mysql_real_escape_string($p['photographer'])."%'";
-		}
-
-		if (!empty($p['validator']))
-		{
-			//$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
-			$photographer="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
-		}
-
-/*
-
-		if (!empty($p['photographer']))
-		{
-			//$photographer="_c.meta_data='".mysql_real_escape_string($p['photographer'])."'";
-			$photographer="_c.meta_data like '%".mysql_real_escape_string($p['photographer'])."%'";
-		}
-
-		if (!empty($p['validator']))
-		{
-			//$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
-			$photographer="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
-		}
-		
-		
-
-"		
-			select
-				
-
-			from  %PRE%media_taxon _m
-
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			left join %PRE%names _z
-				on _m.taxon_id=_z.taxon_id
-				and _m.project_id=_z.project_id
-				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _z.language_id=".$this->getCurrentLanguageId()."
-
-
-				
-			left join %PRE%media_meta _meta1
-				on _m.id=_meta1.media_id
-				and _m.project_id=_meta1.project_id
-				and _meta1.sys_label='beeldbankDatumVervaardiging'
-				and _meta1.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta2
-				on _m.id=_meta2.media_id
-				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijving'
-				and _meta2.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta3
-				on _m.id=_meta3.media_id
-				and _m.project_id=_meta3.project_id
-				and _meta3.sys_label='beeldbankLokatie'
-				and _meta3.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta4
-				on _m.id=_meta4.media_id
-				and _m.project_id=_meta4.project_id
-				and _meta4.sys_label='beeldbankDatumAanmaak'
-				and _meta4.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta5
-				on _m.id=_meta5.media_id
-				and _m.project_id=_meta5.project_id
-				and _meta5.sys_label='beeldbankCopyright'
-				and _meta5.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta6
-				on _m.id=_meta6.media_id
-				and _m.project_id=_meta6.project_id
-				and _meta6.sys_label='beeldbankValidator'
-				and _meta6.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta7
-				on _m.id=_meta7.media_id
-				and _m.project_id=_meta7.project_id
-				and _meta7.sys_label='beeldbankAdresMaker'
-				and _meta7.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta9
-				on _m.id=_meta9.media_id
-				and _m.project_id=_meta9.project_id
-				and _meta9.sys_label='verspreidingsKaart'
-
-
-			left join %PRE%media_meta _meta10
-				on _m.id=_meta10.media_id
-				and _m.project_id=_meta10.project_id
-				and _meta10.sys_label='beeldbankLicentie'
-
-			left join %PRE%nsr_ids _ids
-				on _m.taxon_id=_ids.lng_id
-				and _m.project_id=_ids.project_id
-				and _ids.item_type='taxon'
-			
-			".(!empty($group_id) ? 
-				"right join %PRE%taxon_quick_parentage _q
-					on _m.taxon_id=_q.taxon_id
-					and _m.project_id=_q.project_id
-					" : "" )."
-			
-			where _m.project_id = ".$this->getCurrentProjectId()."
-
-				and ifnull(_meta9.meta_data,0)!=1
-				and ifnull(_trash.is_deleted,0)=0
-		
-				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
-				".(!empty($p['name']) && empty($p['name']) ?
-					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
-				".(isset($photographer)  ? "and ".$photographer : "")." 		
-				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
-
-			".(isset($sort) ? "order by ".$sort : "")."
-			".(isset($limit) ? "limit ".$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
-		
-
-*/
-
-
-
 		
 		return
 			array(
