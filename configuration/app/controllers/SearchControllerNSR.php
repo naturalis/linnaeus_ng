@@ -1055,6 +1055,7 @@ class SearchControllerNSR extends SearchController
 				else
 				if ($m['sys_label']=='beeldbankDatumVervaardiging')
 				{
+					setlocale(LC_TIME, 'nl_NL');
 					$data[$key]['meta_datum']=date_format(date_create($m['meta_date']),'j F Y');
 				} 
 				else
