@@ -38,15 +38,15 @@
 {else}
 
     <ul class="admin-list">
-    {section name=i loop=$projects}
-        {if $projects[i].active == '1' && $projects[i].id != 0}
+    {foreach from=$projects item=v}
+        {if $v.active == '1' && $v.id != 0}
         <li>
-            <a href="?project_id={$projects[i].id}">{if $projects[i].title!=''}{$projects[i].title}{else}{$projects[i].name}{/if}</a>
-            {if $session.admin.project.id==$projects[i].id}<span title="current active project">{t}(current){/t}</span>{/if}
+            <a href="?project_id={$v.id}">{if $v.title!=''}{$v.title}{else}{$v.name}{/if}</a>
+            {if $session.admin.project.id==$v.id}<span title="current active project">{t}(current){/t}</span>{/if}
 			<a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px">view</a>
         </li>
         {/if}
-    {/section}
+    {/foreach}
     </ul>
 
 	{if $currentUserRole<=2}
