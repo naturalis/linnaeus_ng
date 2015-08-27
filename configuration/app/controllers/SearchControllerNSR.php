@@ -1055,8 +1055,18 @@ class SearchControllerNSR extends SearchController
 				else
 				if ($m['sys_label']=='beeldbankDatumVervaardiging')
 				{
-					setlocale(LC_TIME, 'nl_NL');
-					$data[$key]['meta_datum']=date_format(date_create($m['meta_date']),'j F Y');
+					// REFAC2015: well...
+					if (strtoupper(substr(PHP_OS, 0, 3))==='WIN')
+					{
+						setlocale(LC_ALL,'nld_nld'); // windows only
+						$data[$key]['meta_datum']=strftime( '%d %B %Y',strtotime($m['meta_date']));
+					}
+					else
+					{
+						setlocale(LC_ALL,'nl_NL'); // linux only
+						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
+					}
+
 				} 
 				else
 				if ($m['sys_label']=='beeldbankOmschrijving')
