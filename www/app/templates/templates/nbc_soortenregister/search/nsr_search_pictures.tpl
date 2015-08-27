@@ -8,11 +8,11 @@
 
 		<div id="treebranchContainer">
 
-			{* include file="_photographers.tpl" *}
+			{include file="_photographers.tpl"}
 			
 			<br />
 
-			{* include file="_validators.tpl" *}
+			{include file="_validators.tpl"}
 
 		</div>  
 
