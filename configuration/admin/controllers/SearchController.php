@@ -537,6 +537,16 @@ class SearchController extends Controller
 			S_RESULT_LIMIT_PER_CAT => V_RESULT_LIMIT_PER_CAT, // max results per category (module)
 			S_UNSET_ORIGINAL_CONTENT => true // if true, unsets the potentially large content fields after they've been excerpted
 		);
+		
+		if (
+			( is_array($modules) && in_array('species',$modules) ) ||
+			( is_array($modules) && in_array('key',$modules) )
+		)
+		{
+			$species=$this->searchSpecies($p);
+			$p['species_results']=$species;
+		}
+			
 
 		$results =
 			array(
@@ -555,7 +565,7 @@ class SearchController extends Controller
 				'introduction' =>
 					(is_array($modules) && in_array('introduction',$modules) ? $this->searchIntroduction($p) : null),
 				'species' => 
-					(is_array($modules) && in_array('species',$modules) ? $this->searchSpecies($p) : null),
+					(is_array($modules) && in_array('species',$modules) ? $species : null),
 				'modules' => 
 					$this->searchModules($p,$freeModules)	
 			);
@@ -962,8 +972,65 @@ class SearchController extends Controller
 				'fieldAsIndex' => 'id'
 			)
 		);
+		
+		// endpoints
+		$endpoints=array();
+		if ( isset($p['species_results']) && isset($p['species_results']['results']) )
+		{
+			// harvest taxon id's from the search results from the species module
+			$taxon_ids=array();
+			foreach((array)$p['species_results']['results'] as $val)
+			{
+				if ($val['label']=='names')
+				{
+					foreach((array)$val['data'] as $match)
+					{
+						$taxon_ids[]=$match['id'];
+					}
+				}
+			}
+			
+			if ( !empty($taxon_ids) )
+			{
+				$a=$this->translate('Step');
+				$b=$this->translate('choice');
+	
+				$endpoints = $this->models->ChoiceKeystep->freeQuery("
+					select 
+						_a.id,
+						_a.keystep_id,
+						_a.show_order,
+						_b.number,
+						concat('".$a." ',_b.number,', ".$b." ',_a.show_order,' &rarr; ',_c.taxon) as label
+	
+					from 
+						%PRE%choices_keysteps _a
+						
+					left join %PRE%keysteps _b
+						on _a.project_id = _b.project_id
+						and _a.keystep_id = _b.id
+						
+					left join %PRE%taxa _c
+						on _a.project_id = _c.project_id
+						and _a.res_taxon_id = _c.id
+						
+					where 
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.res_taxon_id in (" . implode(",",$taxon_ids) . ")
 
+					order by
+						concat('".$a." ',_b.number,', ".$b." ',_a.show_order)						
 
+					limit " . $p[S_RESULT_LIMIT_PER_CAT] . "
+				");
+	
+				//_c.taxon as ".__CONCAT_RESULT__."
+ 				//$endpoints = $this->filterResultsWithTokenizedSearch(array($p,$endpoints));
+				$endpoints = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$endpoints));
+				//$endpoints = $this->sortResultsByMostTokensFound($endpoints);
+			}
+		}
+		
 		// choices
 		$choices = $this->models->ChoiceContentKeystep->_get(
 			array(
@@ -1031,9 +1098,15 @@ class SearchController extends Controller
 					'url' =>'../key/choice_edit.php?id=%s',
 					'data' => $choices,
 					'numOfResults' => count((array)$choices)
+				),
+				array(
+					'label' => $this->translate('endpoints'),
+					'url' =>'../key/choice_edit.php?id=%s',
+					'data' => $endpoints,
+					'numOfResults' => count((array)$endpoints)
 				)
 			),
-			'numOfResults' => count((array)$choices)+count((array)$steps)
+			'numOfResults' => count((array)$choices)+count((array)$steps)+count((array)$endpoints)
 		);
 
 	}

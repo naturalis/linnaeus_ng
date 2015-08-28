@@ -2,12 +2,27 @@
 {include file="../shared/admin-messages.tpl"}
 
 <style>
+h5 {
+	font-size:11px;
+}
 h4 {
-	margin-bottom:-5px;
+	margin-bottom:0px;
+	padding-top:10px;
+}
+h3 {
+	border-top:1px solid #eee;
+	width:550px;
+	padding-top:10px;
 }
 .result-block {
 	display:block;
 	margin-bottom:4px;
+}
+.alt-link {
+	font-weight:normal;
+	font-style:normal;
+	color:#666;
+	font-size:0.9em;
 }
 </style>
 
@@ -31,8 +46,12 @@ h4 {
 					<h4>in {$r.label} ({$r.data|@count})</h4>
 					{foreach from=$r.data item=d}
                     	<span class="result-block">
-						<h4>
-						{if $d.page_id}<a href="{$r.url|sprintf:$d.id:$d.page_id}">{else}<a href="{$r.url|sprintf:$d.id}">{/if}{$d.label}</a> ({$d.matches|@count})</h4>
+						<h5>
+						{if $d.page_id}<a href="{$r.url|sprintf:$d.id:$d.page_id}">{else}<a href="{$r.url|sprintf:$d.id}">{/if}{$d.label}</a>
+                        
+						{if $d.page_id}<a class="alt-link" href="{$r.url|sprintf:$d.id:$d.page_id}" target="_new">{else}<a class="alt-link" href="{$r.url|sprintf:$d.id}" target="_new">{/if}(new tab)</a>
+
+                        ({$d.matches|@count})</h4>
 						{foreach from=$d.matches item=match}
 						<h5>{$match}</h5>
 						{/foreach}
