@@ -29,7 +29,8 @@
 	$pw1 = $pw0;
 
 	$db0 = $s['database'];
-	$db1 = 'linnaeus_ng_diff_test';
+	// Better use name that's unlikely to already exist...
+	$db1 = 'linnaeus_ng_diff_test_HENKIEBOY';
 
 	$showDetails = false;
 	$ignoreComments = true;
@@ -80,26 +81,41 @@
     // Table prefix into account (only for source)
     $tablePrefix = $s['tablePrefix'];
 
-	$conn0 = @mysql_connect($host0, $user0, $pw0);
-    $conn1 = @mysql_connect($host1, $user1, $pw1);
-
 
 	// Let's go
 	echo 'This script compares the current Linnaeus NG database ' . $db0.
 	   " to the latest version in git and lists the differences between the two.\n\n";
 
-	// First create test database and add latest schema
-	if (!file_exists($dumpPath)) {
-	    die('Cannot open dump file for latest database at ' . $dumpPath . "\n");
+
+	// Bootstrap
+	$conn0 = @mysql_connect($host0, $user0, $pw0);
+	$conn1 = @mysql_connect($host1, $user1, $pw1);
+	// Check connections
+	if (!$conn0 || !$conn1) {
+	    die("Cannot connect to source and/or target database server");
 	}
+	// Can we access the dump file?
+    if (!file_exists($dumpPath)) {
+	    die('Cannot open dump file for latest database at ' . $dumpPath);
+	}
+	// Dump test database if it still exists from an aborted previous session
 	if (mysql_select_db($db1, $conn1)) {
-        mysql_query('DROP DATABASE `' . $db1 . '`', $conn1);
+        if (!mysql_query('DROP DATABASE `' . $db1 . '`', $conn1)) {
+            die("Cannot drop test database, please check MySQL credentials");;
+        }
 	}
+    // Does the user have CREATE credentials?
     if (!mysql_query('CREATE DATABASE `' . $db1 . '`', $conn1)) {
         die("Cannot create test database, please check MySQL credentials\n");
     }
     $cmd = "$mysqlPath -h $host1 -u $user1 --password='$pw1' $db1 < '$dumpPath'";
+    // Can we import the dump via the command line?
     exec($cmd, $m, $s);
+    if ($s !== 0) {
+        die('Cannot import the dump file through exec(); check $mysqlPath variable');
+    }
+
+
 
 	// Disabe MySQL STRICT mode if this has been set
 	$res = mysql_query("SELECT @@GLOBAL.sql_mode;", $conn0);
