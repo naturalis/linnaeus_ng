@@ -945,8 +945,8 @@ class SearchControllerNSR extends SearchController
 
 		if (!empty($p['validator']))
 		{
-			//$photographer="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
-			$photographer="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
+			//$validator="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
+			$validator="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
 		}
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
@@ -974,40 +974,16 @@ class SearchControllerNSR extends SearchController
 				SQL_CALC_FOUND_ROWS
 				_m.id,
 				_m.taxon_id,
-				file_name as image,
-				file_name as thumb,
-				_c.meta_data as photographer,
+				_m.file_name as image,
+				_m.file_name as thumb,
+
 				_k.taxon,
 				_k.taxon as validName,
-				_z.name as common_name,
-				_j.uninomial,
-				_j.specific_epithet,
-				_j.infra_specific_epithet,
-				_j.authorship,		
-				concat(
-					if(_j.uninomial is null,'',concat(_j.uninomial,' ')),
-					if(_j.specific_epithet is null,'',concat(_j.specific_epithet,' ')),
-					if(_j.infra_specific_epithet is null,'',_j.infra_specific_epithet)
-				) as name,
-				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
-				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
-				_meta2.meta_data as meta_short_desc,
-				_meta3.meta_data as meta_geografie,
-				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
-				_meta5.meta_data as meta_copyrights,
-				_meta6.meta_data as meta_validator,
-				_meta7.meta_data as meta_adres_maker,
-				_meta10.meta_data as meta_license,
-				replace(_ids.nsr_id,'".$this->conceptIdPrefix."','') as nsr_id
+
+				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing
 
 			from  %PRE%media_taxon _m
 			
-			left join %PRE%media_meta _c
-				on _m.project_id=_c.project_id
-				and _m.id = _c.media_id
-				and _c.sys_label = 'beeldbankFotograaf'
-				and _c.language_id=".$this->getCurrentLanguageId()."
-		
 			left join %PRE%taxa _k
 				on _m.taxon_id=_k.id
 				and _m.project_id=_k.project_id
@@ -1017,85 +993,48 @@ class SearchControllerNSR extends SearchController
 				and _k.id =  _trash.lng_id
 				and _trash.item_type='taxon'
 
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			left join %PRE%names _z
-				on _m.taxon_id=_z.taxon_id
-				and _m.project_id=_z.project_id
-				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _z.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%names _j
-				on _m.taxon_id=_j.taxon_id
-				and _m.project_id=_j.project_id
-				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-				
-			left join %PRE%media_meta _meta1
-				on _m.id=_meta1.media_id
-				and _m.project_id=_meta1.project_id
-				and _meta1.sys_label='beeldbankDatumVervaardiging'
-				and _meta1.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta2
-				on _m.id=_meta2.media_id
-				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijving'
-				and _meta2.language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%media_meta _meta3
-				on _m.id=_meta3.media_id
-				and _m.project_id=_meta3.project_id
-				and _meta3.sys_label='beeldbankLokatie'
-				and _meta3.language_id=".$this->getCurrentLanguageId()."
-			
 			left join %PRE%media_meta _meta4
 				on _m.id=_meta4.media_id
 				and _m.project_id=_meta4.project_id
 				and _meta4.sys_label='beeldbankDatumAanmaak'
 				and _meta4.language_id=".$this->getCurrentLanguageId()."
 			
-			left join %PRE%media_meta _meta5
-				on _m.id=_meta5.media_id
-				and _m.project_id=_meta5.project_id
-				and _meta5.sys_label='beeldbankCopyright'
-				and _meta5.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta6
-				on _m.id=_meta6.media_id
-				and _m.project_id=_meta6.project_id
-				and _meta6.sys_label='beeldbankValidator'
-				and _meta6.language_id=".$this->getCurrentLanguageId()."
-
-			left join %PRE%media_meta _meta7
-				on _m.id=_meta7.media_id
-				and _m.project_id=_meta7.project_id
-				and _meta7.sys_label='beeldbankAdresMaker'
-				and _meta7.language_id=".$this->getCurrentLanguageId()."
-
 			left join %PRE%media_meta _meta9
 				on _m.id=_meta9.media_id
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
 
-			left join %PRE%media_meta _meta10
-				on _m.id=_meta10.media_id
-				and _m.project_id=_meta10.project_id
-				and _meta10.sys_label='beeldbankLicentie'
-
-			left join %PRE%nsr_ids _ids
-				on _m.taxon_id=_ids.lng_id
-				and _m.project_id=_ids.project_id
-				and _ids.item_type='taxon'
-			
 			".(!empty($group_id) ? 
 				"right join %PRE%taxon_quick_parentage _q
 					on _m.taxon_id=_q.taxon_id
 					and _m.project_id=_q.project_id
-					" : "" )."
-			
+				" : "" )."
+
+			".(!empty($p['name']) ? 
+				"left join %PRE%names _j
+					on _m.taxon_id=_j.taxon_id
+					and _m.project_id=_j.project_id
+					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+					and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
+				" : "" )."
+
+
+			".(isset($photographer) ? 
+				"left join %PRE%media_meta _c
+					on _m.project_id=_c.project_id
+					and _m.id = _c.media_id
+					and _c.sys_label = 'beeldbankFotograaf'
+					and _c.language_id=".$this->getCurrentLanguageId()."
+				" : "" )."
+					
+			".(isset($validator) ? 
+				"left join %PRE%media_meta _meta6
+					on _m.id=_meta6.media_id
+					and _m.project_id=_meta6.project_id
+					and _meta6.sys_label='beeldbankValidator'
+					and _meta6.language_id=".$this->getCurrentLanguageId()."
+				" : "" )."					
+
 			where _m.project_id = ".$this->getCurrentProjectId()."
 
 				and ifnull(_meta9.meta_data,0)!=1
@@ -1105,14 +1044,121 @@ class SearchControllerNSR extends SearchController
 				".(!empty($p['name']) && empty($p['name']) ?
 					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
+				".(isset($validator)  ? "and ".$validator : "")." 		
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
+				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])  : "")." 		
+				".(!empty($p['name']) ? "and _j.name like '". mysql_real_escape_string($p['name'])."%'"  : "")."
 
 			".(isset($sort) ? "order by ".$sort : "")."
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
-
+		
 		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		
+		foreach((array)$data as $key=>$val)
+		{
+			$meta=$this->models->MediaMeta->_get(array("id"=>
+				array(
+					"project_id" => $this->getCurrentProjectId(),
+					"media_id" => $val["id"]
+				)
+			));
+
+			$data[$key]['photographer']="";
+			$data[$key]['meta_datum']="";
+			$data[$key]['meta_short_desc']="";
+			$data[$key]['meta_geografie']="";
+			$data[$key]['meta_copyrights']="";
+			$data[$key]['meta_validator']="";
+			$data[$key]['meta_adres_maker']="";
+			$data[$key]['meta_license']="";
+
+			foreach((array)$meta as $m)
+			{
+				if ($m['sys_label']=='beeldbankFotograaf')
+				{
+					$data[$key]['photographer']=$m['meta_data'];
+				}
+				else
+				if ($m['sys_label']=='beeldbankDatumVervaardiging')
+				{
+					// REFAC2015: well...
+					if (strtoupper(substr(PHP_OS, 0, 3))==='WIN')
+					{
+						setlocale(LC_ALL,'nld_nld'); // windows only
+						$data[$key]['meta_datum']=strftime( '%d %B %Y',strtotime($m['meta_date']));
+					}
+					else
+					{
+						if (!setlocale(LC_ALL,'nl_NL'))
+							setlocale(LC_ALL,'nl_NL.utf8');
+						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
+					}
+				} 
+				else
+				if ($m['sys_label']=='beeldbankOmschrijving')
+				{
+					$data[$key]['meta_short_desc']=$m['meta_data'];
+				} 
+				else
+				if ($m['sys_label']=='beeldbankLokatie')
+				{
+					$data[$key]['meta_geografie']=$m['meta_data'];
+				} 
+				else
+				if ($m['sys_label']=='beeldbankCopyright')
+				{
+					$data[$key]['meta_copyrights']=$m['meta_data'];
+				} 
+				else
+				if ($m['sys_label']=='beeldbankValidator')
+				{
+					$data[$key]['meta_validator']=$m['meta_data'];
+				} 
+				else
+				if ($m['sys_label']=='beeldbankAdresMaker')
+				{
+					$data[$key]['meta_adres_maker']=$m['meta_data'];
+				} 
+				else
+				if ($m['sys_label']=='beeldbankLicentie')
+				{
+					$data[$key]['meta_license']=$m['meta_data'];
+				}
+			}
+
+			$names=$this->models->Names->_get(array("id"=>
+				array(
+					"project_id" => $this->getCurrentProjectId(),
+					"taxon_id" => $val["taxon_id"]
+				)
+			));
+
+			foreach((array)$names as $n)
+			{
+				if ( $n['type_id']==$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] && $n['language_id']==$this->getCurrentLanguageId() )
+				{
+					$data[$key]['common_name']=$n['name'];
+				} else
+				if ( $n['type_id']==$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] && $n['language_id']==LANGUAGE_ID_SCIENTIFIC )
+				{
+					$data[$key]['uninomial']=$n['uninomial'];
+					$data[$key]['specific_epithet']=$n['specific_epithet'];
+					$data[$key]['infra_specific_epithet']=$n['infra_specific_epithet'];
+					$data[$key]['authorship']=$n['authorship'];
+					$data[$key]['nomen']=trim(str_replace($n['authorship'],'',$n['name']));
+					$data[$key]['name']=
+						(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
+						(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .
+						(empty($n['infra_specific_epithet']) ? '' : $n['infra_specific_epithet']);
+				}
+			}
+			
+			//$data[$key]['nsr_id']=replace(_ids.nsr_id,'".$this->conceptIdPrefix."','') as nsr_id
+			
+	
+		}
 		
 		return
 			array(
