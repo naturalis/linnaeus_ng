@@ -920,7 +920,7 @@ class MatrixKeyController extends Controller
 	
 				select 
 					_a.id,
-					_c.label,
+					ifnull(_c.label,_a.label) as label,
 					'group' as type,
 					_gmo.show_order as show_order_main,
 					_a.show_order as show_order_sub
