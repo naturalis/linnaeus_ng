@@ -46,7 +46,6 @@
 #content div#results {width:720px;padding:0px; }
 #content div#resultsHeader {width:703px; height:27px; margin:4px 0 0 0; position:relative;}
 #content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}
-#content div#result-count {font-size:0.9em;color:#333;}
 .overlapState {color:#999;}
 
 /* similar species */
@@ -116,7 +115,7 @@ div#graphicValueSelector #dialogHeader {top:5px;margin-bottom:5px}
 div#graphicValueSelector #dialogSelectorWindow {margin-top:5px}
 div#graphicValueSelector #resultsCounter {}
 div#graphicValueSelector #dialogFooter {border-top:1px dotted black;padding:10px 0px 0px 0px;text-align:center;}
-div#graphicValueSelector .selectedValue {background-color:#eee; border:1px dotted red;font-weight:bold;margin:2px;}
+/*div#graphicValueSelector .selectedValue {background-color:#eee; border:1px dotted red;font-weight:bold;margin:2px;}*/
 div#graphicValueSelector #graphicValuesTable {border:none;padding:5px;}
 div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-align:top}
 
@@ -144,20 +143,96 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 #dialog-content, #dialog-content-inner {background-color: #fff;}
 
 #state-header {font-weight: bold;}
+
+
+/*
 .state-image-cell {padding:0 0 10px 0;margin: 15px 15px 0px 15px;}
 .state-image-cell:hover {color: #f00;}
 .state-image {border:2px solid #eee;text-align:center;vertical-align:middle;}
 .state-image:hover {border:2px solid #666;cursor: pointer;}
 .state-image-irrelevant {cursor: default;}
-
+.state-image-irrelevant:hover {cursor: default;}
 .irrelevant {border:none;filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 .irrelevant a {color:#000000;text-decoration:none; cursor:default;}
 .irrelevant a:hover div {border-color:#ffffff;}
+*/
+
+.state-images-container {
+	min-width:700px;
+	max-width:1000px;
+	height:auto;
+	text-align:center;
+}
+.state-image-container {
+	max-width:350px;
+	min-height:150px;
+	display:inline-block;
+	vertical-align:top;
+	text-align:center;
+	margin:0 5px 10px 5px;
+	padding:15px 15px 5px 15px;
+}
+.state-image-buffer {
+	min-height:150px;
+}
+.state-image-link:focus {
+	outline:0;
+}
+.state-image {
+	max-width:300px;
+	max-height:200px;
+	border:2px solid #eee;
+	margin-left:auto;
+	margin-right:auto;
+}
+.full-size-icon {
+	position:absolute;
+	margin-left:-28px;
+	margin-top:2px;
+}
+.state-image-caption {
+	padding-top:5px;
+	color:#555;
+}
+
+.state-image-selected {
+	background-color:#eee; 
+	border:1px dotted red;
+	font-weight:bold;margin:2px;
+}
+.state-image-irrelevant {
+	border:none;
+	filter:alpha(opacity=25);
+	-moz-opacity:0.25;
+	-khtml-opacity: 0.25;
+	opacity: 0.25;
+	cursor: default;
+}
+.state-image-irrelevant a {
+	color:#000000;
+	text-decoration:none; 
+	cursor:default;
+}
+.state-image-irrelevant a:hover div {
+	border-color:#ffffff;
+	cursor: default;
+}
+
+
+
+
+
+
+
+
+
+
+
 .hidden {display: none;}
 .visible {display: block;}
 .ghosted {filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 
-ul.facetListType {padding:0;margin:0;list-style-position:outside;list-style-type:none;}
+ul.facetListType {padding:0;margin:0;list-style-position:outside;list-style-type:none;text-align:left;}
 ul.facetListType li {margin:0 0 8px 0;padding:0;}
 ul.facetListType li .last {margin:0;color:orange}
 ul.facetListType li:hover {color:black;}
@@ -219,7 +294,6 @@ ul.facetListType li.selected {font-weight:bold;}
 
 
 
-
 /* results restyle for better compat with landscape pictures*/
 .result {
 	float:left;
@@ -252,6 +326,17 @@ ul.facetListType li.selected {font-weight:bold;}
 	display: block;
 }
 
+.result-image.horizontal {
+	border:1px solid #aaa;
+	width:auto;
+	max-width:144px;
+	height:auto;
+	max-height:207px;
+	margin-left:auto;
+	margin-right:auto;
+	display: block;
+}
+
 .result-labels {
     color: #000000;
     font-size: 11px;
@@ -259,7 +344,8 @@ ul.facetListType li.selected {font-weight:bold;}
     line-height: 1.2em;
 	height:55px;
 	margin-top:13px;
-	width:100%;
+	max-width: 144px;
+	overflow-x: hidden;
 }
 
 .result-gender-icon {

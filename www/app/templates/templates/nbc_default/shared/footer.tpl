@@ -21,7 +21,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 	if(jQuery().prettyPhoto) {
-		nbcPrettyPhotoInit();
+		prettyPhotoInit();
 	}
 	$('img').bind('contextmenu',function(e){
 		e.preventDefault();
