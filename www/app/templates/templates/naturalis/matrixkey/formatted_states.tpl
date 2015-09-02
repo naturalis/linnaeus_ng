@@ -2,30 +2,14 @@
 
         <p id='dialogSelectorWindow'></p>
 
-        {if $c.info}
-        <p id="state-info">
-            {$c.info}
-        </p>
-        {/if}
+
     
 	{if $c.type=='range'}
 
-		{if $states[$c.id][0].value}{assign var=prevRangeValue value=$states[$c.id][0].value}{/if}
 
-			<p>
-            <input id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
-            <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val());return false;">{t}waarde wissen{/t}</a>
-            </p>
-			{if $c.min && $c.max}
-            <p id="state-value-extra">
-            	{t _s1=$c.min_display _s2=$c.max_display _s3=$c.unit}Kies een waarde tussen %s en %s%s.{/t}
-			</p>
-           {/if}
             
 	{elseif $c.type=='media'}
 
-        <div id='dialog-content-inner-inner'>
-          <div id='graphicValues'>
 
                 {foreach from=$s item=v name=foo}
                     {if $states[$c.id][$v.id]}{assign var=active value=true}{else}{assign var=active value=false}{/if}

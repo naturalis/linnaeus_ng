@@ -305,6 +305,108 @@ parameters:
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			
 		$this->printOutput();
+
+	}
+
+	public function taxonPageAction()	
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>&cat=<page ID>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+  taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
+  cat".chr(9)." : page ID of the content page (mandatory)
+";
+
+		// pid is mandatory, now checked in initialise()
+		//$this->checkProject();
+		
+		if (is_null($this->getCurrentProjectId()))
+		{
+			$this->sendErrors();
+			return;
+		}
+		
+		$this->checkTaxonId();
+
+		if (is_null($this->getTaxonId()))
+		{
+			$this->sendErrors();
+			return;
+		}
+
+		if (is_null($this->rGetVal('cat')))
+		{
+			$this->addError("no page category specified (param 'cat')");
+			$this->sendErrors();
+			return;
+		}
+
+		$query="
+			select
+				_b.id,
+				ifnull(_c.title,_a.page) as title,
+				_b.content
+
+			from
+				%PRE%pages_taxa _a
+				
+			left join %PRE%content_taxa _b
+				on _a.id=_b.page_id
+				and _a.project_id=_b.project_id
+				and _b.language_id =".LANGUAGE_ID_DUTCH."
+				and _b.taxon_id =".$this->getTaxonId()."
+				
+			left join %PRE%pages_taxa_titles _c
+				on _a.id=_c.page_id
+				and _a.project_id=_c.project_id
+				and _c.language_id =".LANGUAGE_ID_DUTCH."
+
+			where
+				_a.project_id=".$this->getCurrentProjectId()."
+				and _a.id=" . $this->rGetVal('cat')
+			;
+
+		$p=$this->models->Names->freeQuery($query);
+
+		$page=$title=$rdf=null;
+
+		if ( $p )
+		{
+			$page=$p[0]['content'];
+			$title=$p[0]['title'];
+
+			if (isset($p[0]['id']))
+			{
+				foreach((array)$this->Rdf->getRdfValues($p[0]['id']) as $val)
+				{
+					$rdf[]=array('predicate'=>$val['predicate'],'object'=>$val['data']);
+				}
+			}
+		}
+
+		$result=
+			array(
+				'pId'=>$this->getCurrentProjectId(),
+				'taxon'=>$this->rGetVal('taxon'),
+				'cat'=>$this->rGetVal('cat'),
+				'striptags'=>$this->rHasVal('striptags','1'),
+			);
+		
+		$p=$this->getProject();
+
+		$result['project']=$p['title'];
+		$result['exported']=date('c');
+		$result['page']=
+			array(
+				'title'=>$title,
+				'body'=>$page,
+				'rdf'=>$rdf
+			);
+
+		$this->setJSON(json_encode($result));
+		header('Content-Type: application/json');			
+		$this->printOutput();
 	}
 
 	public function ezAction()
@@ -875,8 +977,6 @@ parameters:
 			return;
 		}
 
-		$this->Rdf = new RdfController;
-		
 		if (isset($this->requestData['start']) && $this->requestData['start']=='1')
 			$this->setMatchType('match_start');
 
@@ -974,6 +1074,8 @@ parameters:
 
     private function initialise()
     {
+		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
+		
 		$this->useCache=false;
 		$this->checkProject();
 
@@ -1030,8 +1132,6 @@ parameters:
 	{
 		return $this->_project;
 	}
-	
-
 
 	private function checkFromDate()
 	{
@@ -1062,18 +1162,17 @@ parameters:
 	{
 		return $this->_fromDate;
 	}
-	
-
 
 	private function checkTaxonId()
 	{
-		if (!$this->rHasVal('taxon')) {
-
+		if (!$this->rHasVal('taxon'))
+		{
 			$this->addError('no taxon name specified.');
+		} 
+		else
+		{
 
-		} else {
-			
-			$taxon=trim($this->requestData['taxon']);
+			$taxon=trim(strip_tags($this->requestData['taxon']));
 			
 			$this->setMatchType('literal');
 
@@ -1084,8 +1183,8 @@ parameters:
 				)
 			));
 
-			if (!$t) {
-				
+			if (!$t)
+			{
 				$this->setMatchType('name only');
 
 				$t = $this->models->Names->freeQuery("
@@ -1099,12 +1198,14 @@ parameters:
 						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
 						and _b.nametype = 'isValidNameOf'"
 				);
-
 			}
 		
-			if (!$t) {
-				$this->addError('taxon name "'.$this->requestData['taxon'].'" not found in this project.');
-			} else {
+			if (!$t)
+			{
+				$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
+			} 
+			else
+			{
 				$this->setTaxonId($t[0]['id']);
 				return $t;
 			}

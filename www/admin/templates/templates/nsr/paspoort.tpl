@@ -18,7 +18,7 @@
 	{if !($v.obsolete && $v.content|@strlen==0)}
 	<li>
 		<span class="passport-title">
-        	<a href="#" onclick="$('#body{$k}').toggle();return false;">{$v.title}</a>
+        	{if $v.always_hide}({/if}<a href="#" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="verborgen tab"{/if}>{$v.title}</a>{if $v.always_hide}){/if}
             {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Verouderde paspoorttitel</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}

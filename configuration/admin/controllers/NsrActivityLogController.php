@@ -86,7 +86,7 @@ class NsrActivityLogController extends NsrController
 					MINUTE(TIMEDIFF(now(), _a.created)), 'm ',
 					SECOND(TIMEDIFF(now(), _a.created)), 's'
 				) as time_past_hr
-					
+
 			from %PRE%activity_log _a
 			
 			left join %PRE%users _u

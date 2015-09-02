@@ -21,7 +21,7 @@
 	</p>
     <p>        
         MS Excel does not have the option to explicitly save the CSV-file as UTF-8 encoded. Doing so may not be necessary,
-        however if your data contains -ASCII characters (like &euml; of &iuml;), it is advisable to explicitly convert the file. 
+        however if your data contains non-ASCII characters (like &euml; of &iuml;), it is advisable to explicitly convert the file. 
         Do so by opening the saved CSV-file in Notepad or another text-editor, and save it while explicitly specifying UTF-8 
         as encoding.<br />
 	</p>

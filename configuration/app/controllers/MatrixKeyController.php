@@ -1,7 +1,38 @@
 <?php
+
+/*
+	data & matching
+	on initial load, the entire data-set is fed into data.dataset in matrix.js via
+	setDataSet() in index.php/tpl. from that point on, each time a character state
+	is (un)set, setState() is called, which only returns an array of taxon id's with
+	scores, which are applied to data.dataset in applyScores(), resulting in
+	data.resultset, which contains the actual results as they are displayed.
+	
+	sorting
+	initial sorting is done in MatrixKeyController::sortDataSet(), using one of the
+	following fields:
+		- by field name defined by setting 'initial_sort_column'
+		- by taxon concept
+		- by label (always exists for each taxon, variation and matrix)
+	for each of compared items $a and $b the first existing field from the list above
+	is used for comparison (theoretically, a variation's label could be compared with
+	a taxon's scientific name)
+	sorting after selection of states is done by score (matching percentage).
+	data.scores sorted this way, causing data.resultset to be sorted in the same way.
+	should the setting 'always_sort_by_initial' be true, them data.resultset is
+	re-sorted in JS::sortResults(), using the field defined by 'initial_sort_column'.
+	this way, the score sort can be overridden. additionally, there is a hook-function
+	hook_postSortResults() which is called after sortResults(), allowing specific
+	implementations to further alter the results' order (function is called regardless
+	of the values of 'always_sort_by_initial' or 'initial_sort_column'.
+
+*/
+
+
 /*
 	needs to be undone of NBC:
 		private $_nbcImageRoot=true;
+
 */
 
 
@@ -28,7 +59,9 @@ class MatrixKeyController extends Controller
         'nbc_extras', 
         'variation_relations',
 		'gui_menu_order',
-		'module_settings'
+		'module_settings',
+		'content_introduction',
+		'media_taxon'
     );
 
     public $controllerPublicName = 'Matrix key';
@@ -39,40 +72,16 @@ class MatrixKeyController extends Controller
 
 //	private $_characters=null;
 	private $_dataSet=null;
-	private $_menu=null;
+	private $_facetmenu=null;
 	private $_scores=null;
 	private $_related=null;
 	private $_searchTerm=null;
 	private $_searchResults=null;
-
-	private $calc_char_h_val=true;
-	private $allow_empty_species=true;
-	private $use_emerging_characters=true;
-	private $browse_style;
-	private $state_image_per_row;
-	private $score_threshold;
-	private $img_to_thumb_regexp_pattern;
-	private $img_to_thumb_regexp_replacement;
+	private $_introductionLinks=null;
+	private $_incUnknowns=false;
 
 	private $_master_matrix;
-
-	private $settingsDefaults=
-		array(
-			array('calc_char_h_val'=>true),
-			array('allow_empty_species'=>true),
-			array('use_emerging_characters'=>true),
-			array('use_character_groups'=>1),
-			array('browse_style'=>'expand'),
-			array('state_image_per_row'=>4),
-			array('items_per_page'=>16),
-			array('use_emerging_characters'=>1),
-			array('always_show_details'=>0),
-			array('score_threshold'=>100),
-			array('img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//'),
-			array('img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/'),
-			array('image_orientation'=>'portrait'),
-			array('image_orientation'=>'portrait'),
-		);
+	private $settings;
 
 	private $_nbc_image_root=true;
 	
@@ -80,14 +89,14 @@ class MatrixKeyController extends Controller
     public $cssToLoad = array('matrix.css');
 
     public $jsToLoad = array(
-        'all' => array('main.js'), 
+        'all' => array('main.js','matrix.js'), 
         'IE' => array()
     );
 
 	
     public function __construct($p = null)
     {
-        parent::__construct($p);
+		parent::__construct($p);
         $this->initialize();
     }
 
@@ -99,19 +108,9 @@ class MatrixKeyController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsController;
-		$this->moduleSettings->setModuleDefaults( $this->settingsDefaults );
-		$this->moduleSettings->setModuleSettings();
-
-		foreach((array)$this->settingsDefaults as $key=>$val)
-		{
-			$k=key($val);
-			$this->$k=$val[key($val)];
-		}
-
-		foreach((array)$this->moduleSettings->getModuleSettings() as $val)
-		{
-			$this->$val['setting']=$val['value'];
-		}
+		
+		$this->moduleSettings->setUseDefaultWhenNoValue( true );
+		$this->moduleSettings->assignModuleSettings( $this->settings );
 
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
@@ -120,12 +119,17 @@ class MatrixKeyController extends Controller
 		{
 			$this->printGenericError($this->translate('No matrices have been defined.'));
 		}
+		
+		$this->setIntroductionLinks();
 
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
-		$this->smarty->assign('image_root_skin', $this->_nbc_image_root);
 
-		$this->setMenu();
+		$this->smarty->assign( 'image_root_skin', $this->_nbc_image_root );
+		$this->smarty->assign( 'introduction_links', $this->getIntroductionLinks() );
+		$this->smarty->assign( 'settings', $this->settings );
 
+		$this->setFacetMenu();
+		$this->setIncUnknowns( false );
     }
 
     public function indexAction()
@@ -134,19 +138,20 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 
-		$this->setScores();
 		$this->setMasterMatrix();
+		$this->setDataSet();
+		$this->setScores();
 
 		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
+		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
+		$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
+
         $this->smarty->assign('matrix', $matrix);
-		$this->smarty->assign('matrix_use_emerging_characters', $this->use_emerging_characters);
-		$this->smarty->assign('matrix_browse_style', $this->browse_style);
-		$this->smarty->assign('matrix_image_orientation', $this->image_orientation);
-		$this->smarty->assign('matrix_always_show_details', $this->always_show_details);
-		$this->smarty->assign('matrix_score_threshold', $this->score_threshold);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
+		$this->smarty->assign('facetmenu', $this->getFacetMenu());
+		$this->smarty->assign('states', $this->getCharacterStates(array("id"=>"*")) );
 
         $this->printPage();
     }
@@ -156,7 +161,20 @@ class MatrixKeyController extends Controller
 		// backward compatibility
 		$this->redirect( str_replace('identify.php','index.php',$_SERVER["REQUEST_URI"]));
 	}
+
+    public function characterStatesAction()
+	{
+		$character=$this->getCharacter(array('id'=>$this->rGetVal( 'id' )));
+		$states=$this->getCharacterStates(array('char'=>$this->rGetVal( 'id' )));
+
+		$this->smarty->assign('character', $character);
+		$this->smarty->assign('states', $states);
+		$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
+		$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
 	
+		$this->printPage();
+	}
+			
     public function ajaxInterfaceAction ()
     {
 		if ($this->rHasVar('key'))
@@ -166,39 +184,9 @@ class MatrixKeyController extends Controller
 	
 		if ($this->rHasVal('action', 'get_menu'))
 		{
-			$this->smarty->assign('returnText', json_encode($this->getMenu()));
+			$this->smarty->assign('returnText', json_encode($this->getFacetMenu()));
         }	
 		
-		else
-		
-		if ($this->rHasVal('action', 'get_dataset'))
-		{
-			$this->setDataSet();
-			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
-        }	
-		
-		else
-		
-		if ($this->rHasVal('action', 'get_character_states'))
-		{
-			$character=$this->getCharacter(array('id'=>$this->rGetVal( 'id' )));
-			$states=$this->getCharacterStates(array('char'=>$this->rGetVal( 'id' )));
-
-			$this->smarty->assign('character', $character);
-			$this->smarty->assign('states', $states);
-			$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
-			$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
-            $this->smarty->assign('state_images_per_row', $this->state_image_per_row);
-
-            $this->smarty->assign('returnText', 
-				json_encode(
-					array(
-						'title'=>$character['label'],
-						'page'=>$this->fetchPage('formatted_states'),
-						'showOk'=>($character['type'] == 'media' || $character['type'] == 'text' ? false : true)
-					)));
-		}
-
         else					
 
 		if ($this->rHasVal('action','set_state'))
@@ -224,7 +212,8 @@ class MatrixKeyController extends Controller
 				json_encode( array(
 					'scores'=>$this->getScores(),
 					'states'=>$this->getSessionStates(),
-					'characters'=>$this->getCharacterCounts()
+					'characters'=>$this->getCharacterCounts(),
+					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
 
@@ -246,7 +235,8 @@ class MatrixKeyController extends Controller
 				json_encode( array(
 					'scores'=>$this->getScores(),
 					'states'=>$this->getSessionStates(),
-					'characters'=>$this->getCharacterCounts()
+					'characters'=>$this->getCharacterCounts(),
+					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
 
@@ -265,6 +255,24 @@ class MatrixKeyController extends Controller
 			$this->setSearchTerm( array('search'=>$this->rGetVal('search')) );
 			$this->setSearchResults();
 			$this->smarty->assign('returnText',json_encode( $this->getSearchResults()) );
+		}
+
+		else
+		
+		if ($this->rHasVal('action', 'set_unknowns'))
+		{
+
+			if (!$this->settings->enable_treat_unknowns_as_matches) return;
+
+			$this->setIncUnknowns( $this->rGetVal( 'value' )==1 );
+			$this->setScores();
+			$this->smarty->assign('returnText',
+				json_encode( array(
+					'scores'=>$this->getScores(),
+					'states'=>$this->getSessionStates(),
+					'characters'=>$this->getCharacterCounts(),
+					'statecount'=>$this->setRemainingStateCount()
+				)));
 		}
 
 		$this->printPage();	
@@ -440,13 +448,13 @@ class MatrixKeyController extends Controller
 				_a.show_order
 			"
 		);
-		
+
         foreach ((array) $cs as $key => $val)
 		{
             $cs[$key]['img_dimensions']=explode(':',$val['file_dimensions']);
 		}
 
-        return (isset($id) && isset($cs[0]) ? $cs[0] : $cs);
+        return (isset($id) && $id!='*' && isset($cs[0]) ? $cs[0] : $cs);
     }
 
     private function getCharacteristicHValue( $p )
@@ -509,8 +517,6 @@ class MatrixKeyController extends Controller
         return $hValue * ($this->controllerSettings['useCorrectedHValue'] == true ? $corrFactor : 1);
     }
 
-
-
     private function setDataSet()
     {
 		$this->_dataSet=$this->getAllIdentifiableEntities();
@@ -521,19 +527,24 @@ class MatrixKeyController extends Controller
 		return $this->_dataSet;
 	}
 	
+
 	private function induceThumbNailFromImage( &$item )
 	{
 		if( 
-			!empty($this->img_to_thumb_regexp_pattern) &&
+			!empty($this->settings->img_to_thumb_regexp_pattern) &&
 			!isset($item['url_thumb']) &&
 			isset($item['url_image'])
 		)
 		{
 			$item['url_thumb']=
-				preg_replace($this->img_to_thumb_regexp_pattern,$this->img_to_thumb_regexp_replacement,$item['url_image']);
+				@preg_replace(
+					$this->settings->img_to_thumb_regexp_pattern,
+					$this->settings->img_to_thumb_regexp_replacement,
+					$item['url_image']
+				);
 		}
 	}
-	
+
 	private function getAllIdentifiableEntities()
 	{
 		$taxa=$this->getTaxaInMatrix();
@@ -556,33 +567,30 @@ class MatrixKeyController extends Controller
 			}
 		}
 
+		if ( isset($this->settings->use_overview_image) && $this->settings->use_overview_image )
+		{
+			foreach((array)$taxa as $key=>$val)
+			{
+				$d=$this->models->MediaTaxon->_get(array("id"=>
+					array(
+						"taxon_id"=>$val['id'],
+						"project_id" => $this->getCurrentProjectId(), 
+						"overview_image"=>"1"
+				)));
+				
+				if ( $d )
+				{
+					$taxa[$key]['info']['url_image']=$d[0]['file_name'];
+				}
+			}
+		}
+
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 
-		usort($all,function($a,$b)
+		if ($all) 
 		{
-			$aa=$bb='';
-
-			if ($a['type']=='taxon')
-				$aa=$a['taxon'];
-			else
-			if ($a['type']=='variation')
-				$aa=$a['taxon']['taxon'];
-			else
-			if ($a['type']=='matrix')
-				$aa=$a['label'];
-
-			if ($b['type']=='taxon')
-				$bb=$b['taxon'];
-			else
-			if ($b['type']=='variation')
-				$bb=$b['taxon']['taxon'];
-			else
-			if ($b['type']=='matrix')
-				$bb=$b['label'];
-
-			return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1 ));
-
-		});
+			usort($all, array($this,'sortDataSet'));
+		}
 		
 		return $all;
 		
@@ -606,9 +614,9 @@ class MatrixKeyController extends Controller
 			$d=$this->getTaxonById( $val['taxon_id'] );
 			
 			if (
-				($this->allow_empty_species) ||
+				($this->settings->allow_empty_species) ||
 				(!isset($val['is_empty'])) ||
-				(!$this->allow_empty_species && $val['is_empty']==1))
+				(!$this->settings->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
 				$d['states']=$this->getTaxonStates( $val['taxon_id'] );
@@ -707,6 +715,8 @@ class MatrixKeyController extends Controller
 
 	// REFAC2015: should be moved to kenmerkenmodule!!!!!
 	// maybe rethink location of thumbs & images?
+	// rethink induceThumbNailFromImage() as well
+	// and induceEncTypeFromRemoteUrl()
     private function getAllNBCExtras()
     {
 		if ( !$this->models->NbcExtras->getTableExists() )
@@ -865,7 +875,7 @@ class MatrixKeyController extends Controller
 
 
 
-	private function setMenu()
+	private function setFacetMenu()
 	{
 		$menu=$this->models->GuiMenuOrder->freeQuery("
 		
@@ -879,7 +889,7 @@ class MatrixKeyController extends Controller
 		
 				select 
 					_a.id,
-					_c.label,
+					ifnull(_c.label,_cdef.label) as label,
 					'char' as type,
 					_gmo.show_order as show_order_main,
 					_b.show_order as show_order_sub
@@ -896,6 +906,11 @@ class MatrixKeyController extends Controller
 					on _a.project_id = _c.project_id
 					and _a.id = _c.characteristic_id
 					and _c.language_id = ". $this->getCurrentLanguageId()."
+
+				right join %PRE%characteristics_labels _cdef
+					on _a.project_id = _cdef.project_id
+					and _a.id = _cdef.characteristic_id
+					and _cdef.language_id = ". $this->getDefaultLanguageId()."
 					
 				left join %PRE%characteristics_chargroups _d
 					on _a.project_id = _d.project_id
@@ -948,7 +963,7 @@ class MatrixKeyController extends Controller
 			order by show_order_main, show_order_sub, label
 		
 		");
-		
+
 		foreach((array)$menu as $key=>$val)
 		{
 			if ($val['type']=='group')
@@ -963,12 +978,12 @@ class MatrixKeyController extends Controller
 			}
 		}
 		
-		$this->_menu=$menu;	
+		$this->_facetmenu=$menu;	
 	}
 
-	private function getMenu()
+	private function getFacetMenu()
 	{
-		return $this->_menu;
+		return $this->_facetmenu;
 	}
 
     private function getGroupCharacters( $id )
@@ -1108,6 +1123,7 @@ class MatrixKeyController extends Controller
                     $states[$key]['id'] = $d['id'];
                     $states[$key]['characteristic_id'] = $d['characteristic_id'];
                     $states[$key]['label'] = $d['label'];
+                    $states[$key]['file_name'] = $d['file_name'];
                 }
                 else
 				if ($d[0]=='f' && isset($d[2]))
@@ -1158,9 +1174,20 @@ class MatrixKeyController extends Controller
 
     private function setScores()
     {
-		$scores=$this->getScoresRestrictive( array('states'=>$this->getSessionStates()) );
+		$scores=$this->getScoresRestrictive(
+			array(
+				'states'=>$this->getSessionStates(),
+				'incUnknowns'=>$this->getIncUnknowns()
+			)
+		);
 		//$scores = $this->getScoresLiberal( array('states'=>$this->getSessionStates(),'incUnknowns'=>$incUnknowns);
-		if ($scores) usort($scores, array($this,'sortMatchesByScoreThenLabel'));
+
+		
+		if ($scores && (!isset($this->settings->always_sort_by_initial) || (isset($this->settings->always_sort_by_initial) && $this->settings->always_sort_by_initial==0)))
+		{
+			usort($scores, array($this,'sortDataSet'));
+		}
+
 		$this->_scores=$scores;
     }
 
@@ -1538,6 +1565,7 @@ class MatrixKeyController extends Controller
 						and _a.taxon_id = _b.taxon_id
 						and _b.characteristic_id =".$character."
 
+
 					where
 						_a.project_id = " . $this->getCurrentProjectId() . "
 						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
@@ -1671,25 +1699,68 @@ class MatrixKeyController extends Controller
 					array_push($results,$val);
 				}
 			}
-
 		}
 
         return $results;
     }
 	
-    private function sortMatchesByScoreThenLabel( $a,$b )
+    private function sortDataSet( $a,$b )
     {
-        if ($a['score'] == $b['score'])
+		/*
+			sorting strategies:
+			
+			* column name defined by setting 'initial_sort_column'
+			* matching percentage (100 > 0)
+			* taxon concept
+			* label
+		*/
+		
+		if ( !empty($this->settings->initial_sort_column) )
 		{
-			$aa = strtolower(strip_tags($a['label']));
-			$bb = strtolower(strip_tags($b['label']));
+			if (isset($a[$this->settings->initial_sort_column]) && isset($b[$this->settings->initial_sort_column]))
+			{
+		        if ($a[$this->settings->initial_sort_column]>$b[$this->settings->initial_sort_column]) return 1;
+		        if ($a[$this->settings->initial_sort_column]<$b[$this->settings->initial_sort_column]) return -1;
+			}
+		}
+		
+		if (isset($a['score']) && isset($b['score']))
+		{
+			if ($a['score']<$b['score']) return 1;
+			if ($a['score']>$b['score']) return -1;
+		}
 
-            if ($aa==$bb) return 0;
+		if (isset($a['taxon']))
+		{
+			$aa=strtolower(is_array($a['taxon']) ? strip_tags($a['taxon']['taxon']) : strip_tags($a['taxon']));
+		}
+		else
+		if (isset($a['label']))
+		{
+			$aa=strtolower(strip_tags($a['label']));
+		}
+		else
+		{
+			$aa=0;
+		}
 
-            return ($aa<$bb) ? -1 : 1;
-        }
+		if (isset($b['taxon']))
+		{
+			$bb=strtolower(is_array($b['taxon']) ? strip_tags($b['taxon']['taxon']) : strip_tags($b['taxon']));
+		}
+		else
+		if (isset($b['label']))
+		{
+			$bb=strtolower(strip_tags($b['label']));
+		}
+		else
+		{
+			$bb=0;
+		}
 
-        return ($a['score']>$b['score']) ? -1 : 1;
+		if ($aa<$bb) return -1;
+		if ($aa>$bb) return 1;
+		return 0;
     }
 
 
@@ -2135,5 +2206,68 @@ class MatrixKeyController extends Controller
 	{
 		return $this->moduleSettings->getModuleSetting( $p );
 	}
+
+	private function setIntroductionLinks()
+    {
+		$a=$this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'topic' => $this->settings->introduction_topic_colophon_citation
+				),
+				'columns'=>'page_id,topic,content'
+			)
+		);
+
+		$b=$this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'topic' => $this->settings->introduction_topic_versions
+				),
+				'columns'=>'page_id,topic,content'
+			)
+		);
+
+		$c=$this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'topic' => $this->settings->introduction_topic_inline_info
+				),
+				'columns'=>'page_id,topic,content'
+			)
+		);
+		
+		$this->_introductionLinks=array(
+			$this->settings->introduction_topic_colophon_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
+			$this->settings->introduction_topic_versions=>$b && (!empty(strip_tags($b[0]['content']))) ? $b[0] : null,
+			$this->settings->introduction_topic_inline_info=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
+		);
+    }
+	
+	private function getIntroductionLinks()
+	{
+		return $this->_introductionLinks;
+	}
+	
+	private function setIncUnknowns( $state )
+	{
+		if ( is_bool($state) )
+		{
+			$this->_incUnknowns=$state;
+		}
+	}
+	
+	private function getIncUnknowns()
+	{
+		return $this->_incUnknowns;
+	}
+	
+	
+
 
 }	

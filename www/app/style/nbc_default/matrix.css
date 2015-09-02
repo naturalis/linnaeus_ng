@@ -22,6 +22,7 @@
 #facet-categories-menu ul li.ungrouped {padding:4px 0px 4px 0px;}
 #facet-categories-menu ul li.disabled {color:#999; text-decoration:line-through;}
 #facet-categories-menu a.emergent_disabled {color:#999;}
+#facet-categories-menu ul li.emergent_disabled {color:#999;}
 
 
 
@@ -342,10 +343,11 @@ ul.facetListType li.selected {font-weight:bold;}
     font-size: 11px;
 	font-family: Georgia;
     line-height: 1.2em;
-	height:55px;
+	min-height:55px;
 	margin-top:13px;
 	max-width: 144px;
 	overflow-x: hidden;
+	padding-bottom:5px;
 }
 
 .result-gender-icon {
@@ -420,8 +422,25 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 
-/* landscape overrides 
+.homepage #content, .conceptcard #content {
+    margin-top:-16px;
+}
 
+.popup-link {
+    color: #fa7001 !important;
+    text-decoration: none;
+}
+
+.popup-link:hover {
+    text-decoration: underline;
+}
+
+.popup-link:focus {
+	outline:0;
+}
+
+
+/* landscape overrides  // now in seperate file
 .result {
     width: 222px;
 	margin:15px 15px 10px 0;

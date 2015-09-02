@@ -18,6 +18,5 @@
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery-ui.js"></script>
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-controller.js"></script>
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-controller-implementation.js"></script>
-
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>

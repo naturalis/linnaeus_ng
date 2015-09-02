@@ -37,6 +37,16 @@ td:hover {
 
 </style>
 <script>
+function deleteAll()
+{
+	if (confirm('Are you sure?'))
+	{
+		$('#action').val('purge');
+		$('#theForm').attr('onsubmit','');
+		$('#theForm').submit();
+	}
+}
+
 function confirmDeleteImage(id) {
 	if (confirm('Are you sure?')){
 		window.open('?action=delete&id='+id,'_self');
@@ -98,19 +108,19 @@ function enableTitleEditing(ele,id) {
 
 <div id="page-header-localmenu">
 <div id="page-header-localmenu-content">
-    <a href="browse_media.php" class="allLookupLink">{t}Browse images{/t}</a>
-    &nbsp;&nbsp;
     <a href="mass_upload.php" class="allLookupLink">{t}Mass upload images{/t}</a>
+    &nbsp;&nbsp;
+    <a href="browse_media.php" class="allLookupLink">{t}Browse images{/t}</a>
 </div>
 </div>
 
 <div id="page-main">
 <p>
-Please be aware that these images are very likely referred to from various modules in your project: species, matrix, introduction, etc. 
-This function is just a file browswer: name changes or not deletions do <u>not</u> automatically propagate to the various referring modules.
+Double-click a filename to change it. Click 'delete' to delete a file. To delete multiple files, check the appropriate checkboxes
+and click 'delete selected'. To delete <i>all</i> files, <a href="#" onclick="deleteAll();return false;">click here</a>.
 </p>
-<form method="post" onsubmit="return confirmDeleteImages();">
-<input type="hidden" name="action" value="delete" />
+<form method="post" id="theForm" onsubmit="return confirmDeleteImages();">
+<input type="hidden" name="action" id="action" value="delete" />
 <input type="hidden" name="rnd" value="{$rnd}" />
 {if $files.files|@count==0}
 (there are no files in your media folder)
@@ -143,6 +153,13 @@ This function is just a file browswer: name changes or not deletions do <u>not</
 </p>
 </form>
 {/if}
+
+<p>
+Please be aware that these images are very likely referred to from various modules in your project: species, matrix, introduction, etc. 
+This function is just a file browswer: name changes or not deletions do <u>not</u> automatically propagate to the various referring modules.
+</p>
+
+
 </div>
 
 

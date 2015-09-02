@@ -1,754 +1,1578 @@
-var matrixId=null;
-var imagePath;
-var emptyIndicator = '\u2610'+' ';
-var selectIndicator = '\u2611'+' ';//'\u2022 ';
-var characterOrders =
-	Array(
-		['alphabet','Alphabet'],
-		['separationCoefficient','Separation coefficient'],
-		['characterType','Character type'],
-		['numberOfStates','Number of states'],
-		['entryOrder','Entry order']
-	);
+var __translations=Array();
 
-var sortField = null;
-var characters = Array();
-var states = Array();
-var selected = Array();
-var freeValues = Array();
-var sdValues = Array();
-var storedShowState;
-
-function getData(action,id,postFunction)
+function __(text)
 {
-	allAjaxHandle = $.ajax({
+	for(var i=0;i<__translations.length;i++)
+	{
+		if (__translations[i].label==text)
+		{
+			return __translations[i].translation;
+		}
+	}
+	
+	return text;
+}
+
+/*
+	hooks:
+	hook_prePrintResults();
+	hook_postPrintResults();
+	hook_prePrintMenu();
+	hook_postPrintMenu();
+	hook_preApplyScores();
+	hook_postApplyScores();
+	hook_preSetStateValue(); // setStateValue() halts when hook-function returns false
+	hook_postSortResults();
+*/
+
+var matrixsettings={
+	matrixId: 0,
+	projectId: 0,
+	perPage: 16,
+	perLine: 4,
+	start: 0,
+	expandedShowing: 0,
+	expandResults: true,
+	useEmergingCharacters: true,
+	showSpeciesDetails: true,
+	alwaysShowDetails: false,
+	imageRootSkin: "",  // for skin images (icons and such)
+	imageRootProject: "",  // for local project images
+	imageOrientation: "portrait",  // portrait, landscape
+	defaultSpeciesImages: {},
+	defaultSpeciesImage: "",
+	browseStyle: 'paginate', // expand, paginate, show_all
+	expandedPrevious: 0,
+	paginate: true,
+	currPage: 0,
+	lastPage: 0,
+	scoreThreshold: 0,
+	mode: "identify", // similar, search
+	groupsAlwaysOpen: false,
+	generalSpeciesInfoUrl: "",
+	initialSortColumn: "",
+	alwaysSortByInitial: 0,
+};
+
+var data={
+	menu: Array(), // full menu
+	dataset: Array(), // full dataset
+	resultset: Array(), // result subset
+	states: {}, // user-selected states
+	characters: {}, // remaining states/taxa per character
+	statecount: {}, // remaining taxa per state
+	scores: {}, // match scores based on selection
+	related: {}, // related species
+	found: {} // search results
+}
+
+var prevmatrixsettings={};
+
+//var initialize=true;
+var lastScrollPos=0;
+var tempstatevalue="";
+var openGroups=Array();
+var searchedfor="";
+
+var	labels={
+	details: __('onderscheidende kenmerken'),
+	similar: __('gelijkende soorten'),
+	show_all: __('alle onderscheidende kenmerken tonen'),
+	hide_all: __('kenmerken verbergen'),
+	info_link: __('Meer informatie over soort/taxon'),
+	info_dialog_title:__('Informatie over soort/taxon'),
+	popup_species_link:__('Meer informatie'),
+}
+
+function retrieveMenu()
+{
+	setCursor('wait');
+
+	$.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : action ,
-			id : id , 
-			inc_unknowns : $('#inc_unknowns').attr('checked') ? 1 : 0 , 
+			action : 'get_menu',
 			time : getTimestamp(),
-			key : matrixId,
-			p : projectId
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
 		}),
-		success : function (data) {
+		success : function (data)
+		{
 			//console.log(data);
-			obj = $.parseJSON(data);
-			if (postFunction) eval(postFunction+'(obj,id)');
+			setMenu($.parseJSON(data));
+			printMenu();
+			setCursor();
 		}
 	});
 }
 
-function storeCharacter(id,label,type,sorts) {
-
-	characters[characters.length] = {id:id,label:label,type:type,sorts:sorts};
-
+function resetMatrix()
+{
+	clearStateValue();
+	openGroups.splice(0,openGroups.length);
+	closeSimilar();
+	closeSearch();
+	printCountHeader();
 }
 
-function sortfunction(a,b){
-
-	var x = (eval('a.sorts.'+sortField));
-	var y = (eval('b.sorts.'+sortField));
-
-	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+function printResults()
+{
+	if (typeof hook_prePrintResults == 'function') { hook_prePrintResults(); }
 	
-}
+	var resultset = getResultSet();
 
-function sortCharacters(field) {
+	// pre-emptively remove show_more-button (clicking similar automatically switches to browseStyle='show_all')
+	$("#show-more").remove();
+	$("#footerPagination").removeClass('noline');
 
-	sortField = field;
-	characters.sort(sortfunction);
-
-	$('#characteristics	').empty();
-	
-	for (var i in characters)
-		$('#characteristics').append('<option value="'+characters[i].id+'" class="'+characters[i].type+'">'+emptyIndicator+characters[i].label+' ['+characters[i].type+']</option>');
-
-}
-
-function goCharacter() {
-
-	getData('get_states',$('#characteristics').val(),'fillStates');
-
-}
-
-function setUserInputInfo() {
-
-	var t = $('#characteristics :selected').text().replace(selectIndicator,'').replace(emptyIndicator,'');
-
-	setInfo(
-		'<b>'+t+'</b><br />',
-		sprintf(
-			_('%sClick here to specify a value%s; you can also click the "Add" button.'),
-			'<span class="internal-link" onclick="addSelected($(\'#characteristics\'))">',
-			'</span>'
-		),'&nbsp;','&nbsp;'
-	);
-
-}
-
-function fillStates(obj,char) {
-
-	$('#states').empty();
-
-	setInfo(' ',' ',' ',' ');
-
-	if (!obj) {
-		for(var i in characters) {
-			var c=characters[i];
-			if (c.id==$('#characteristics').val()) {
-				if(c.type=='range'||c.type=='distribution')
-					setUserInputInfo();
-			}
+	if (resultset && matrixsettings.browseStyle=='expand') 
+	{
+		printResultsExpanded();
+	}
+	else
+	if (resultset && matrixsettings.browseStyle!='expand') // (non-)paginated
+	{
+		printResultsPaginated();
+		if (matrixsettings.browseStyle=='paginate')
+		{
+			printPaging();
 		}
-		return;
+	}
+	
+	if (resultset.length==0)
+	{
+		$('#results-container').html(noResultHtmlTpl.replace('%MESSAGE%',__('Geen resultaten.')));
 	}
 
+	clearOverhead();
+	printHeader();
+	prettyPhotoInit();
+	disableImgContextMenu();
 
-	for(var i=0;i<obj.length;i++) {
+	$('.result-icon').on('mouseover',function()
+	{	
+		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('_grijs','')  : "" );
+	}).on('mouseout',function()
+	{
+		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('.png','_grijs.png')  : "" );
+	});
+	
+	if (typeof hook_postPrintResults == 'function') { hook_postPrintResults(); }
+}
 
-		if (obj[i].type != 'range' && obj[i].type != 'distribution') {
+function shouldDisableChar( id )
+{
+	/*	
+	if the character has states that are already selected, we don't disable
+	*/
+	var activestates=getActiveStates(id);
+	if (activestates && activestates.length>=1) return false;
+
+
+	/*
+	if there is no or just one taxon left that "has" a state from this character, we disable
+	*/
+	var charactercounts=getCharacterCounts(id);
+	return (charactercounts.distinct_state_count<=1);
+}
+
+function shouldDisableEmergentChar( id )
+{
+	/*
+	usage of emergent characters can be turned off in project matrixsettings
+	*/
+	if (!matrixsettings.useEmergingCharacters) return false;
 	
-			$('#states').append('<option value="'+obj[i].id+'">'+emptyIndicator+obj[i].label+'</option>').val(obj[i].id);
+	/*
+	types other than text or media (i.e., "free-entry types", 'range' etc.)
+	can never be emergent
+	*/
+	var character=getCharacter(id);
+	if (character.prefix!="c") return false
 	
-		}
+	/*
+	the distinct taxon count for all its states that are  still available is
+	smaller than the current result set. put differently: there are remaining
+	species that have no defined state for this particular character.
+	*/
+	var charactercounts=getCharacterCounts(id);
+	return charactercounts.taxon_count < getResultSet().length;
+}
+
+function printMenu()
+{
+	
+	if (typeof hook_prePrintMenu == 'function') { hook_prePrintMenu(); }
+	
+	$('#facet-categories-menu').html('');
+	
+	var menu=getMenu();
+	var buffer=Array();
+	var groupcount=0;
+	var lastgroupid;
+
+	for (var i in menu)
+	{
+		var item = menu[i];
+
+		var s="";
 		
-		states[obj[i].id] = obj[i];
+		if (item.type=='group')
+		{
+			groupcount++;
+			lastgroupid=item.id;			
 
-	}
+			var c="";
 
-	if (obj[0].type != 'range' && obj[0].type != 'distribution') {
+			for (var j in item.chars)
+			{
+				if (matrixsettings.groupsAlwaysOpen) openGroups.push(item.id);
+				
+				var char=item.chars[j];
 
-		$("#states :first").attr('selected','selected');
+				char.disabled = shouldDisableChar(char.id);
+				char.emergent_disabled = shouldDisableEmergentChar(char.id);
 
-		goState();
+				var activestates=getActiveStates(char.id);
 
-	} else {
+				var l=""
 
-		setUserInputInfo();
+				if (activestates)
+				{
+					openGroups.push(item.id);
 
-	}
-
-	highlightSelected();
-
-}
-
-function setInfo(h,b,v,f) {
-
-	if (h) $('#info-header').html(h);
-	if (b) $('#info-body').html(b);
-	if (v) $('#info-value').html(v);
-	if (f) $('#info-footer').html(f);
-
-}
-
-function goState() {
-
-	var state = states[$('#states').val()];
-
-	$('#info-footer').html(null);
-	
-	var title = ' ';
-
-	switch (state.type) {
-		case 'text':
-
-			var val = state.text;
-			var c = getCharacter(state.characteristic_id);
-			if (val) title = c.label;
-			break;
-
-		case 'media':
-
-
-			var file = encodeURIComponent(state.file_name);
-
-			var val = 
-				//'<a rel="prettyPhoto[gallery]" class="image-wrap " title="'+file+'" href="'+imagePath+state.file_name+'">'+
-				'<img id="state-'+state.id+'" alt="'+file+'" '+
-				'src="'+imagePath+state.file_name+'" class="info-image" '+
-				'style="max-height:400px;max-width:400px;" />'
-				//+'</a>'
-				;
+					var t="";
+					for (var k in activestates)
+					{
+						var state = activestates[k];
+						t=t+menuSelStateHtmlTpl
+							.replace('%VALUE%',(state.value ? state.value : ''))
+							.replace('%LABEL%',(state.label ? state.label : ''))
+							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
+							.replace('%STATE-ID%',state.val)
+							.replace('%IMG-URL%',matrixsettings.imageRootSkin+'clearSelection.gif');
+					}
 					
-			/*					
-			if (state.img_dimensions==null) break;
-
-			var c = getCharacter(state.characteristic_id);
-			
-			if (c) var label = c.label;
-
-			title  = label+': '+$('#states :selected').text().replace(emptyIndicator,'').replace(selectIndicator,'');
-
-			var file = encodeURIComponent(state.file_name);
-
-			var headerHeight = parseInt($('#info-header').css('height'));
-			if (isNaN(headerHeight)) headerHeight = parseInt(document.getElementById('info-header').offsetHeight); // IE7 / IE8
-			headerHeight = headerHeight + parseInt($('#info-header').css('marginBottom'));
-
-			var maxW = parseInt($('#info').css('width'));
-			var maxH = parseInt($('#info').css('height')) - headerHeight;
-
-			var imgW = state.img_dimensions[0];
-			var imgH = state.img_dimensions[1];
-
-			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
-
-			if (canEnlarge) {
-
-				$('#info-footer').html(_('(click image to enlarge)'));
-
-				var footerHeight = parseInt($('#info-footer').css('height'));
-				if (isNaN(footerHeight)) footerHeight = parseInt(document.getElementById('info-footer').offsetHeight); // IE7 / IE8
-				footerHeight = footerHeight + parseInt($('#info-footer').css('marginTop'));
-
-				if ((maxH/maxW) < (imgH/imgW)) {
-					var newH = (maxH - footerHeight);
-					var newW = ((newH / imgH) * imgW);
-					newW = Math.round(newW);
-				} else {
-					var newW = maxW;
-					var newH = ((maxH / imgH) * imgH);
-					newH = Math.round(newH);
+					l=menuSelStatesHtmlTpl.replace('%STATES%',t);
 				}
 
+				if (char.disabled==true)
+				{
+					c=c+menuCharDisabledHtmlTpl
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie niet langer onderscheidend." ))
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
+				}
+				else
+				if (char.emergent_disabled==true)
+				{
 
-				var val = 
-					'<div id="state-'+state.id+'" alt="'+state.label+'" class="info-image" '+
-					'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
-					'style="background: url(\''+imagePath+state.file_name+'\') no-repeat;'+
-					'background-size:cover;height:'+newH+'px;width:'+newW+'px;'+
-					'filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\''+
-					imagePath+state.file_name+'\', sizingMethod=\'scale\');'+
-					'-ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\''+
-					imagePath+state.file_name+'\', sizingMethod=\'scale\');"/>';
-
-			} else {
-
-				var val = 
-					'<div id="state-'+state.id+'" alt="'+state.label+'" class="info-image" '+
-					'style="background: url(\''+imagePath+state.file_name+'\') no-repeat;'+
-					'height:'+imgH+'px;width:'+imgW+'px;"/>';
-				
-			}
-			*/
-			break;
-		case 'range':
-			var val = 	
-				_('lower: ')+state.lower+'<br />'+
-				_('upper: ')+state.upper+'<br />';
-			break;
-		case 'distribution':
-			var val = 	
-				_('mean: ')+state.mean+'<br />'+
-				_('sd: ')+state.sd+'<br />';
-		break;
-	}
-
-	setInfo(title,val,' ',' ');
-
-}
-
-var strOpen = 
-	'<table style="font-size:11px;">'+
-		'<tr style="height:30px;vertical-align:top">'+
-			'<td colspan=2>%s</td>'+
-		'</tr>'+
-		'<tr>'+
-			'<td>'+_('Value:')+'</td>'+
-			'<td><input type=text id=dialogValue style="font-size:12px;width:35px;text-align:right" /></td>'+
-		'</tr>';
-
-var strClose = 
-	'<tr style="height:50px;vertical-align:bottom">'+
-		'<td colspan=2>'+
-			'<input type=button value="'+_('ok')+'" onclick="doDialog();" >'+
-			'<input type=button value="'+_('cancel')+'" onclick="$(\'#dialog-close\').click();">'+
-		'</td>'+
-	'</tr>'+
-'</table>'+
-'<script>'+
-'	$("#dialogValue").keypress(function(e) {'+
-'		if(e.keyCode == 13) {'+
-'			doDialog();'+
-'		}'+
-'	});'+
-'</script>';
-		
-var strDistro = 
-	strOpen +
-	'<tr>'+
-	'<td style="padding-right:10px">'+_('Number of allowed standard deviations:')+'</td>'+
-		'<td><select id=dialogSD style="font-size:11px;"><option selected>1</option><option>2</option><option>3</option></select></td>'+
-	'</tr>'+
-	strClose;
-
-var strRange = 
-	strOpen +
-	strClose;
-
-function doDialog() {
-	
-	var v = $('#dialogValue').val();
-	
-	if (v.length==0) {
-		
-		alert(_('Please enter a value'));
-		$('#dialogValue').focus();
-		return;
-		
-	}
-	if (isNaN(parseInt(v))) {
-		
-		alert(_('Please enter a valid number'));
-		$('#dialogValue').val('');
-		$('#dialogValue').focus();
-		return;
-		
-	}
-
-	setFreeValues([v,$('#dialogSD').val()]);
-
-	$('#dialog-close').click();
-	highlightSelected();
-
-}
-
-function setFreeValues(vals) {
-
-	var c = getCharacter($('#characteristics').val());
-
-	freeValues[$('#characteristics').val()]=vals[0];
-
-	if (c.type=='range') {
-		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+'">'+c.label+': '+vals[0]+'</option>');
-	} else { 
-		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c.label+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
-		sdValues[$('#characteristics').val()]=vals[1];
-	}
-
-}
-
-function getCharacter(id) {
-
-	for(var i=0;i<characters.length;i++) {
-
-		if (characters[i] && characters[i].id==id) return characters[i];
-	}
-	
-	return null;
-
-}
-
-function addSelected(caller) {
-
-	var c = getCharacter($('#characteristics').val());
-
-	if (caller.id=='characteristics' && (c.type!='distribution' && c.type!='range')) return;
-
-	if (c.type=='distribution') {
-
-		showDialog(_('Enter a value'),sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c.label)));
-		$('#dialogSD').val(sdValues[$('#characteristics').val()]);
-		$('#dialogValue').val(freeValues[$('#characteristics').val()]);
-		$('#dialogValue').focus();
-		$('#dialogValue').select();
-
-	} else
-	if (c.type=='range') {
-
-		showDialog(_('Enter a value'),sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c.label)));
-		$('#dialogValue').val(freeValues[$('#characteristics').val()]);
-		$('#dialogValue').focus();
-		$('#dialogValue').select();
-
-	} else {
-
-		var s = states[$('#states').val()];
-		
-		if (s) {
-			
-			if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
-				
-				var c = getCharacter(s.characteristic_id);
-		
-				$('#selected').
-					append('<option id="s'+s.id+'" value="c:'+s.characteristic_id+':'+s.id+'">'+c.label+': '+s.label+'</option>').
-					val(s.id);
-				selected[s.id] = true;
-		
-			} else {
-
-				deleteSelected(s.id);
-
+					//var charactercounts=getCharacterCounts(char.id);
+					//console.log(char.label,charactercounts.taxon_count);
+					
+					c=c+menuCharEmergentDisabledHtmlTpl
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie nog niet onderscheidend." ))
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
+				}
+				else
+				{
+					c=c+menuCharHtmlTpl
+						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
+						.replace('%ID%',char.id)
+						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
+						.replace('%VALUE%',(char.value?' '+char.value:''))
+						.replace('%SELECTED%',l);
+				}
 			}
 			
-		}
-		
-		highlightSelected();
-
-	}
-	
-}
-
-function deleteSelected(id) {
-
-	selected[id] = false;
-	$('#s'+id).remove();
-	removeHighlight();
-	highlightSelected();
-
-}
-
-function highlightSelected() {
-
-	$('#selected option').each(function(i){
-		var e = $(this).val().split(':');
-
-		$('#characteristics option').each(function(i){
-
-			if ($(this).val()==e[1]) {
-				$(this).addClass('character-selected');
-				if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text($(this).text().replace(emptyIndicator,selectIndicator));
-			}
-
-		});
-		
-		if (e[1]==$('#characteristics :selected').val()) {
-			
-			if (e[0]=='f') {
-				
-				var preVal = '';
-
-				$('#selected').children().each(function(){
-					var t = $(this).val().split(':');
-					if (t[1]==e[1]) {
-						preVal = e[2];
-						if (e[3]) preVal = 'mean '+preVal+' &plusmn; '+e[3]+' sd';
-					}
-				});	
-				
-				if (preVal) setInfo(null,null,'Current value: '+preVal,null);
-				
-			} else {
-
-				$('#states option').each(function(i){
-	
-					if (e[2]==$(this).val())  {
-						$(this).addClass('state-selected');
-						if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text($(this).text().replace(emptyIndicator,selectIndicator));
-					}
-	
-				});
-
-			}
+			s=menuGroupHtmlTpl
+				.replace(/%ID%/g,item.id)
+				.replace('%LABEL%',item.label)
+				.replace('%CHARACTERS%',c);
 
 		}
-
-	});
-	
-}
-
-function removeHighlight() {
-
-	$('#characteristics option').each(function(i){
-		$(this).removeClass('character-selected');
-		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().replace(selectIndicator,emptyIndicator));
-	});
-	
-	$('#states option').each(function(i){
-		$(this).removeClass('state-selected');
-		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().replace(selectIndicator,emptyIndicator));
-	});
-	
-	setInfo(' ',' ',' ',' ');
-
-}
-
-function deleteSelectedState(id) {
-
-	// anatomy of a selected element: type[f,c]:character id:state id
-	var id = $('#selected').val().split(':');
-
-	if (id[0]!='f') selected[id[2]] = false;
-
-	$('#selected').children(':selected').remove();
-
-	getScores($('#selected').children().length==0 ? 'clear' : null);
-	
-	removeHighlight();
-
-	highlightSelected();
-
-}
-
-function clearSelectedStates() {
-
-	$('#selected').empty();
-
-	selected = selected.splice(0,0);
-
-	removeHighlight();
-
-}
-
-function getScores(action) {
-
-	if (action!='clear') {
-
-		var opt = Array();
-	
-		$('#selected').children().each(function(){
-			opt[opt.length] = ($(this).val());
-		});
-		
-		storedShowState='';
-
-	} else {
-
-		opt = -1;
-
-	}
-
-	getData('get_taxa',opt,'fillScores');
-
-}
-
-function fillScores(obj,char) {
-
-	$('#scores').empty();
-
-	if (!obj) return;
-
-    var textToInsert = [];
-
-	for (var i=0;i<obj.length;i++) {
-		
-        textToInsert[i] =
-			'<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
-				(obj[i].s!=undefined ? obj[i].s+'%: ' : '')+
-				(obj[i].type=='matrix' ? sprintf(_('Key "%s"'),obj[i].l) : obj[i].l)+'</option>';
-     
-    }
-
-	$('#scores').append(textToInsert.join(''));
-
-	highlightSelected();
-	
-	$('#scores option').each(function(i){
-		$(this).attr('selected','');
-	});	
-
-	if (storedShowState && storedShowState=='pattern') {
-		showMatrixPattern();
-		storedShowState='';
-	} else {
-		showMatrixResults();
-	}
-
-}
-
-function showMatrixResults() {
-	
-	$('#search-pattern').css('display','none');
-	$('#search-results').css('display','block');
-	getData('store_showstate_results',-1); // storing state
-
-}
-
-function showMatrixPattern() {
-
-	$('#search-pattern').css('display','block');
-	$('#search-results').css('display','none');
-	getData('store_showstate_pattern',-1); // storing state
-
-}
-
-function setSelectedState(id,stateId,charId,label,value) {
-
-	var val = id.split(':');
-	var c = getCharacter(charId);
-	
-	if (val[0]=='c') {
-		
-		$('#selected').append('<option id="s'+stateId+'" value="c:'+charId+':'+stateId+'">'+c.label+': '+label+'</option>').val(stateId);
-
-		selected[stateId] = true;
-
-	} else {
-
-		if (c.type=='range')
-			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="'+id+'">'+c.label+': '+val[2]+'</option>');
 		else
-			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="'+id+'">'+c.label+': '+_('mean')+' '+val[2]+' &plusmn; '+val[3]+' '+_('sd')+'</option>');
-		
-		freeValues[charId]=val[2];
-		sdValues[charId]=val[3];
-		
-	}
-
-}
-
-function fillTaxonStates(obj,char) {
-
-	$('#states tbody tr').remove();
-
-	if (!obj) return;
-
-    var textToInsert = [];
-
-
-	for(var i in obj) {
-
-        var s = '<tr class="highlight" style="vertical-align:top"><td>'+obj[i].type+'</td><td>'+obj[i].characteristic+'</td><td>';
-
-		for(var j in obj[i].states)
-			s = s + obj[i].states[j].label+'<br />';
-
-		s = s + '</td><td></td></tr>';
-
-		textToInsert[i] = s;
-     
-    }
-
-	$('#states').append(textToInsert.join(''));	
-	
-	$('#states').removeClass().addClass('visible');
-	$('#help-text').removeClass().addClass('invisible');
-}
-
-function goExamine(id) {
-
-	if (id) $("#taxon-list option:[value="+id+"]").attr("selected", true);
-
-	getData('get_taxon_states',$('#taxon-list').val(),'fillTaxonStates');
-	getData('store_examine_val',$('#taxon-list').val());
-
-}
-
-function goCompare(ids) {
-
-	if (ids) {
-		if (ids[0]) $("#taxon-list-1 option:[value="+ids[0]+"]").attr("selected", true);
-		if (ids[1]) $("#taxon-list-2 option:[value="+ids[1]+"]").attr("selected", true);
-	}
-	
-	var id1 = $('#taxon-list-1').val();
-	var id2 = $('#taxon-list-2').val();
-
-	if (id1=='' || id2=='') {
-
-		alert(_('You must select two taxa.'));
-		return;
-
-	} else
-	if (id1==id2) {
-
-		alert(_('You cannot compare a taxon to itself.'));
-		return;
-
-	}
-
-	getData('compare',[id1,id2],'fillCompareResults');
-	getData('store_compare_vals',[id1,id2]);
-
-}
-
-function fillCompareResults(obj) {
-	
-	fillTaxaStatesOverviews(obj);
-	fillTaxaStates(obj);
-	
-}
-
-function fillTaxaStatesOverviews(obj) {
-
-	$('#taxon_name_1').html(obj.taxon_1);
-	$('#taxon_name_2').html(obj.taxon_2);
-	
-	var s = '';
-	
-	if (obj.taxon_states_1) for (i in obj.taxon_states_1)  s = s + obj.taxon_states_1[i].characteristic+': '+obj.taxon_states_1[i].label+'<br />';
-	$('#states1').html(s ? s : _('(none)'));
-	s = '';
-
-	if (obj.taxon_states_2) for (i in obj.taxon_states_2)  s = s + obj.taxon_states_2[i].characteristic+': '+obj.taxon_states_2[i].label+'<br />';
-	$('#states2').html(s ? s : _('(none)'));
-	s = '';
-
-	if (obj.taxon_states_overlap) for (i in obj.taxon_states_overlap)  s = s + obj.taxon_states_overlap[i].characteristic+': '+obj.taxon_states_overlap[i].label+'<br />';
-	$('#statesBoth').html(s ? s : _('(none)'));
-
-	$('#overview').removeClass('invisible').addClass('visible');
-
-}
-
-function fillTaxaStates(obj) {
+		if (item.type=='char')
+		{
+			item.disabled = shouldDisableChar(item.id);
+			item.emergent_disabled = shouldDisableEmergentChar(item.id);
 			
-	$('#count-both').html(obj.both);
-	$('#taxon-1').html(obj.taxon_1);
-	$('#count-1').html(obj.count_1);
-	$('#taxon-2').html(obj.taxon_2);
-	$('#count-2').html(obj.count_2);
-	$('#count-total').html(obj.total);
-	$('#count-neither').html(obj.neither);
-	$('#coefficient').html(obj.coefficients[0].value);
-
-	var s = '<select onchange="$(\'#coefficient\').html($(this).val());" id="coefficients">';
-
-	for (i in obj.coefficients) {
+			var activestates=getActiveStates(item.id);
+			
+			var l=""
 	
-		s = s + '<option value="'+obj.coefficients[i].value+'"'+(i==0 ? ' selected="selected"' : '')+'>'+obj.coefficients[i].name+'</option>'+"\n";
+			if (activestates)
+			{
+				var t="";
+				for (var k in activestates)
+				{
+					var state=activestates[k];
+					t=t+menuSelStateHtmlTpl
+						.replace('%VALUE%',(state.value ? state.value : ''))
+						.replace('%LABEL%',(state.label ? state.label : ''))
+						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
+						.replace('%STATE-ID%',state.val)
+						.replace('%IMG-URL%',matrixsettings.imageRootSkin+'clearSelection.gif');
+				}
+				
+				l=menuSelStatesHtmlTpl.replace('%STATES%',t);
+			}
+			
+			if (item.disabled==true)
+			{
+				s=menuLoneCharDisabledHtmlTpl
+					.replace('%CLASS%',"")
+					.replace('%ID%',item.id)
+					.replace('%LABEL%',item.label)
+					.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie niet langer onderscheidend." ))
+					.replace('%VALUE%',(item.value?' '+item.value:''))
+					.replace('%SELECTED%',l);
+			}
+			else
+			if (item.emergent_disabled==true)
+			{
+				s=menuLoneCharEmergentDisabledHtmlTpl
+					.replace('%CLASS%',"")
+					.replace('%ID%',item.id)
+					.replace('%LABEL%',item.label)
+					.replace('%TITLE%',__( "Dit kenmerk is bij de huidige selectie nog niet onderscheidend." ))
+					.replace('%VALUE%',(item.value?' '+item.value:''))
+					.replace('%SELECTED%',l);
+			}
+			else
+			{
+				s=menuLoneCharHtmlTpl
+					.replace('%CLASS%',"")
+					.replace('%ID%',item.id)
+					.replace('%LABEL%',item.label)
+					.replace('%VALUE%',(item.value?' '+item.value:''))
+					.replace('%SELECTED%',l);
+			}
+		}
+		
+		buffer.push(s);
 
 	}
+
+	if (groupcount==1 && lastgroupid) openGroups.push(lastgroupid);
 	
-	s = s + '</select>';
-
-
-	$('#formula').html(s);
-
-	$('#comparison').removeClass().addClass('visible');
-	$('#help-text').removeClass().addClass('invisible');
+	$('#facet-categories-menu').html( menuOuterHtmlTpl.replace('%MENU%',buffer.join('\n') ) );
+	
+	for(var i in $.unique(openGroups))
+	{
+		toggleGroup( openGroups[i], true );
+	}
+	
+	var states=getStates();
+	
+	if (!states || states.count==0)
+	{
+		$('#clearSelectionContainer').addClass('ghosted');
+	}
+	else
+	{
+		showRestartButton();
+	}	
+	
+	if (typeof hook_postPrintMenu == 'function') { hook_postPrintMenu(); }
+	
 }
 
-function showMatrixSelect() {
-	
-	showDialog(_('Choose a matrix to use'));
-	$('#dialog-content-inner').load('matrices.php?action=popup');
-
+function clearResults()
+{
+	$('#results-container').html('');
+	setSetting({expandedShowing:0});
 }
 
-function showCharacterSort() {
+function printHeader()
+{
+	if (matrixsettings.mode=="search")
+	{
+		printSearchHeader();
+	}
+	else
+	if (matrixsettings.mode=="similar")
+	{
+		printSimilarHeader();
+	}
+	else
+	{
+		printCountHeader();
+	}
+}
 
-	var html = '<div id="lookup-DialogContent">';
+function printResultsExpanded()
+{
+	var resultset = getResultSet();
 
-	for(var i=0;i<characterOrders.length;i++) {
-		if (characterOrders[i][0]==sortField)
-			html = html + '<p class="row row-selected">'+characterOrders[i][1]+'</p>';
-		else
-			html = html + '<p class="row" onclick="sortCharacters(\''+characterOrders[i][0]+'\');closeDialog();">'+characterOrders[i][1]+'</p>';
+	var s="";
+	var printed=0;
+	var d=0;
+	
+	for(var i=0;i<resultset.length;i++)
+	{
+		if (i < matrixsettings.expandedShowing+matrixsettings.perPage)
+		{
+			s=s+formatResult(resultset[i]);
+
+			printed++;
+
+			if (++d==matrixsettings.perLine)
+			{
+				s=s+resultsLineEndHtmlTpl;
+				d=0;
+			}
+		}
 	}
 
-	html += '</div>';
-	showDialog(_('Sort characters by:'),html);
+	$('#results-container').html(
+		resultBatchHtmlTpl
+			.replace('%STYLE%',"")
+			.replace('%RESULTS%', resultsHtmlTpl.replace('%RESULTS%',s))
+	);
+
+	// parallel processing using show() causes mayhem when clicking the 'show more'-button fast.
+	//		.replace('%STYLE%',(matrixsettings.expandedShowing>0  ? 'display:none' : ''))
+	//	$('.result-batch:hidden').show('normal');
+	
+	matrixsettings.expandedShowing=printed;
+
+	if (matrixsettings.expandedShowing<resultset.length)
+	{
+		if (!$("#show-more-").is(':visible'))
+		{
+			$("#paging-footer").append( buttonMoreHtmlTpl.replace('%LABEL%',__('meer resultaten laden')) );
+			$("#footerPagination").addClass('noline');
+		}
+	}
+	
+	if (matrixsettings.expandedShowing>0) 
+	{
+		//window.scrollBy(0,99999);
+	}
 
 }
 
-function translateCharacterOrders() {
+function printResultsPaginated()
+{
+	var resultset = getResultSet();
 
-	var chrs = _(['Alphabet','Separation coefficient','Character type','Number of states','Entry order']);
+	var s="";
+	var d=0;
 
-	characterOrders =
-		Array(
-			['alphabet',chrs[0]],
-			['separationCoefficient',chrs[1]],
-			['characterType',chrs[2]],
-			['numberOfStates',chrs[3]],
-			['entryOrder',chrs[4]]
+	for(var i=0;i<resultset.length;i++)
+	{
+		if (
+			(matrixsettings.browseStyle=='paginate' && i>=matrixsettings.start && i<matrixsettings.start+matrixsettings.perPage) || 
+			matrixsettings.browseStyle=='show_all'
+		)
+		{
+			s=s+formatResult(resultset[i]);
+			if (++d==matrixsettings.perLine)
+			{
+				s=s+resultsLineEndHtmlTpl;
+				d=0;
+			}
+		}
+	}
+
+	$('#results-container').html(resultsHtmlTpl.replace('%RESULTS%',s));
+}
+
+function formatResult( data )
+{
+	if ( data.type=='taxon' )
+	{
+		//var sciName=data.label;
+		var sciName='<i>'+data.taxon+'</i>';
+		var commonName=data.commonname ? data.commonname : "";
+	}
+	else
+	if ( data.type=='variation' )
+	{
+		//var sciName=data.taxon.label;
+		var sciName='<i>'+data.taxon.taxon+'</i>';
+		var commonName=(data.taxon.commonname ? data.taxon.commonname : "" ) + " " + (data.label ? "(" + data.label + ")" : "");
+		commonName.trim();
+	}
+	else
+	if ( data.type=='matrix' )
+	{
+		//var sciName=data.taxon.label;
+		var sciName='<i>'+data.label+'</i>';
+		var commonName="";
+	}
+
+	if (matrixsettings.showSpeciesDetails && data.states)
+	{
+		var states = Array();
+
+		for(var i in data.states)
+		{
+			var state=data.states[i];
+			
+			if (state.characteristic==undefined)
+				continue;
+			
+			var statelabels = Array();
+			
+			if (state.characteristic.indexOf('|')!=false)
+			{
+				var t = state.characteristic.split('|');
+				t = t[0];
+			} 
+			else
+			{
+				var t = state.characteristic;
+			}
+			
+			for(var j in state.states)
+			{
+				statelabels.push(state.states[j].label);
+			}
+
+			if (statelabels.length>1)
+			{
+				var l = statelabels.join('; ');
+			}
+			else
+			{
+				var l = statelabels[0];
+			}
+
+			states.push(
+				speciesStateItemHtmlTpl
+					.replace('%GROUP%', state.group_label ? state.group_label + ' > ' : '')
+					.replace('%CHARACTER%',t)
+					.replace('%STATE%',l)
+			);
+		}
+	}
+
+	var image="";
+
+	if (data.info && data.info.url_image)
+	{
+		image=data.info.url_image;
+		if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=matrixsettings.imageRootProject+image;
+	}
+	else
+	{
+		if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
+	}
+
+	var thumb="";
+
+	if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
+	{
+		thumb=data.info.url_thumbnail ? data.info.url_thumbnail : data.info.url_thumb;
+		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=matrixsettings.imageRootProject+thumb;
+	}
+	else
+	{
+		thumb=image;
+	}
+	
+	var id = data.type+'-'+data.id;
+	var showStates = states && states.length > 0;
+
+	photoLabelHtml=
+		photoLabelHtmlTpl
+			.replace('%SCI-NAME%',sciName)
+			.replace('%GENDER%',(data.gender && data.gender.gender ?
+				photoLabelGenderHtmlTpl
+					.replace('%IMG-SRC%', matrixsettings.imageRootSkin + data.gender.gender+'.png')
+					.replace('%GENDER-LABEL%', data.gender.gender_label)
+				: "" ))
+			.replace('%COMMON-NAME%',(commonName ? brHtmlTpl + commonName : ""))
+			.replace('%PHOTO-DETAILS%',(data.info && data.info.photographer ? 
+				photoLabelPhotographerHtmlTpl
+					.replace('%PHOTO-LABEL%', __('foto')+' &copy;' )
+					.replace('%PHOTOGRAPHER%', data.info.photographer )
+				: ""));
+
+	imageHtml=
+		imageHtmlTpl
+			.replace('%IMAGE-URL%',image)
+			.replace('%THUMB-URL%',thumb)
+			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
+			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+		;	
+
+	resultHtml=
+		resultHtmlTpl
+			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
+			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
+			.replace('%GENDER%',(data.gender && data.gender.gender ? 
+				genderHtmlTpl
+					.replace('%ICON-URL%', matrixsettings.imageRootSkin+data.gender.gender+'.png') 
+					.replace('%GENDER-LABEL%', data.gender.gender_label) 
+				: "" )
+			)
+			.replace('%SCI-NAME%', sciName)
+			.replace('%SCI-NAME-TITLE%', addSlashes(stripTags(sciName)) )
+			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
+				matrixLinkHtmlTpl.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
+				: ""))
+			.replace('%COMMON-NAME%', commonName)
+			.replace('%COMMON-NAME-TITLE%', addSlashes(commonName) )
+			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
+			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
+				remoteLinkClickHtmlTpl
+					.replace('%REMOTE-LINK%', data.info.url_external_page)
+					.replace('%TITLE%', labels.info_link)
+					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
+				: "")
+			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
+				iconUrlHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
+			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
+			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',labels.details) : "")
+			.replace('%SHOW-STATES-ICON%', showStates ?
+				iconInfoHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
+			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
+			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
+				relatedClickHtmlTpl
+					.replace('%TYPE%', data.type)
+					.replace('%ID%', data.id)
+					.replace('%TITLE%', labels.similar)
+				: "" )
+			)
+			.replace('%RELATED-ICON%', data.related_count>0 ?
+				iconSimilarTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
+			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
+			.replace(/%LOCAL-ID%/g,id)
+			.replace(/%ID%/g,data.id)
+			.replace('%SCORE%', matrixsettings.showScores && data.score ? resultScoreHtmlTpl.replace( '%SCORE%', data.score) : "")
+			;
+
+	return resultHtml;
+}
+
+function clearOverhead()
+{
+	$('#result-count').html('');
+	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
+	$('#similarSpeciesHeader').html('');
+}
+
+function printCountHeader()
+{
+	var resultset = getResultSet();
+	
+	if (matrixsettings.browseStyle=='expand')
+	{
+		$('#result-count').html(
+			counterExpandHtmlTpl
+				.replace('%START-NUMBER%',(matrixsettings.expandedShowing > 1 ? "1-" : "" ))
+				.replace('%NUMBER-SHOWING%',matrixsettings.expandedShowing)
+				.replace('%FROM-LABEL%',__('van'))
+				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
+	}
+	else
+	if (matrixsettings.browseStyle=='paginate')
+	{
+		$('#result-count').html(
+			counterPaginateHtmlTpl
+				.replace('%FIRST-NUMBER%', (matrixsettings.start+1))
+				.replace('%LAST-NUMBER%',(matrixsettings.start+matrixsettings.perPage))
+				.replace('%NUMBER-LABEL%',__('van'))
+				.replace('%NUMBER-TOTAL%',resultset.length)
+		);
+	}
+	else
+	{
+		$('#result-count').html(
+			counterPaginateHtmlTpl
+				.replace('%FIRST-NUMBER%',1)
+				.replace('%LAST-NUMBER%',resultset.length)
+				.replace('%NUMBER-LABEL%',"")
+				.replace('%NUMBER-TOTAL%',"")
+		);
+	}
+	
+	if (resultset.length==0)
+	{
+		$('#result-count').html("");
+	};	
+}
+
+function clearPaging()
+{
+	$('#paging-header').html('');	
+	$('#paging-footer').html('');	
+}
+
+function printPaging()
+{
+	var resultset = getResultSet();
+
+	setSetting({lastPage:Math.ceil(resultset.length / matrixsettings.perPage)});
+	setSetting({currPage:Math.floor(matrixsettings.start / matrixsettings.perPage)});
+
+	if (matrixsettings.lastPage > 1 && matrixsettings.currPage!=0)
+	{
+		$("#paging-header").append( pagePrevHtmlTpl );
+	}
+	
+	if (matrixsettings.lastPage>1)
+	{ 
+		for (var i=0;i<matrixsettings.lastPage;i++)
+		{
+			if (i==matrixsettings.currPage)
+			{
+				$("#paging-header").append( pageCurrHtmlTpl.replace('%NR%',(i+1)) );
+			}
+		    else
+			{
+				$("#paging-header").append( pageNumberHtmlTpl.replace('%NR%',(i+1)).replace('%INDEX%',i) );
+			}
+		}
+	}
+
+	if (matrixsettings.lastPage > 1 && matrixsettings.currPage<matrixsettings.lastPage-1)
+	{
+		$("#paging-header").append( pageNextHtmlTpl );
+	}
+
+	$("#paging-footer").html($("#paging-header").html());
+}
+
+function browsePage( id )
+{
+	if (id=='n')
+		setSetting({start: matrixsettings.start+matrixsettings.perPage});
+	else if (id=='p')
+		setSetting({start: matrixsettings.start-matrixsettings.perPage});
+	else if (!isNaN(id))
+		setSetting({start:id * matrixsettings.perPage});
+	else
+		return;
+
+	clearResults();
+	printResults();
+	clearPaging();
+	printPaging();
 
 }
 
+function getActiveStates( id )
+{
+	var states=getStates();
+	
+	if (!states) return;
+	
+	var res=Array();
+	
+	for(var i in states)
+	{
+		var state=states[i];
+		if (state.characteristic_id==id)
+		{
+			res.push(state);
+		}
+	}
+	
+	return (res.length>0 ? res : null);
+}
 
-translateCharacterOrders();
+function getCharacterCounts( id )
+{
+	var characters=getCharacters();
+
+	if (!characters) return;
+	
+	for(var c in characters)
+	{
+		if (c==id)
+		{
+			return characters[c];
+		}
+	}
+
+	return {taxon_count:0,distinct_state_count:0};
+}
+
+function toggleGroup( id, forceOpen )
+{
+	if ( $('#character-group-'+id).css('display')=='none' || forceOpen )
+	{
+		$('#character-group-'+id).removeClass('hidden').addClass('visible');
+		$('#character-item-'+id).removeClass('closed').addClass('open');
+		openGroups.push(id);
+	}
+	else
+	{
+		$('#character-group-'+id).removeClass('visible').addClass('hidden');
+		$('#character-item-'+id).removeClass('open').addClass('closed');
+
+		for(var i=openGroups.length-1; i>=0; i--)
+		{
+			if(openGroups[i]===id)
+			{
+			   openGroups.splice(i,1);
+			}
+		}
+	}
+} 
+
+function showStates(id)
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'character_states.php',
+		type: 'GET',
+		data : ({
+			id: id,
+			time : getTimestamp(),
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
+		}),
+		success : function( page )
+		{
+			var char=getCharacter(id);
+			showDialog(char.label,page,{showOk:(char.type=='media' || char.type=='text' ? false : true)});
+			setCursor();
+		}
+	});
+
+}
+
+function clearStateValue(state)
+{
+	setState({state:state,action:'clear_state'});
+}
+
+function setStateValue(state)
+{
+	if (typeof hook_preSetStateValue == 'function')
+	{
+		var d=hook_preSetStateValue(state);
+		if (d===false)
+		{
+			return d;
+		}
+	}
+
+	var state=state?state:$('#state-id').val();
+	setState({state:state,value:tempstatevalue});
+}
+
+function setState( p )
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : (p && p.action) ? p.action : 'set_state' ,
+			state : p.state,
+			value : p.value,
+			time : getTimestamp(),
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
+		}),
+		success : function(data)
+		{
+			var d=$.parseJSON(data);
+
+			setScores(d.scores);
+			setStates(d.states);
+			setStateCount(d.statecount);
+			setCharacters(d.characters);
+
+			closeSimilar();
+			closeSearch();
+
+			applyScores();
+			sortResults();
+			clearResults();
+			printResults();
+			printMenu();
+
+			setCursor();
+		}
+	});
+}
+
+function applyScores()
+{
+
+	if (typeof hook_preApplyScores == 'function') { hook_preApplyScores(); }
+
+	var scores=getScores();
+	var states=getStates();
+	var dataset=getDataSet();
+	var resultset=getResultSet();
+
+	// scores are sorted in the controller
+	
+	// clean slate (also include states to be sure it's not a selection that returns zero matches)
+	if ((!states || states.length==0) && (!scores || scores.length==0))
+	{
+		resultset=dataset.slice();
+	}
+	else
+	{
+		resultset.splice(0,resultset.length);
+
+		for(var i in scores)
+		{
+			var score=scores[i];
+			for(var j in dataset)
+			{
+				var item=dataset[j];
+				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
+				{
+					item.score=score.score;
+					resultset.push(item);
+				}
+			}
+		}
+	}
+	
+	setResultSet(resultset);
+
+	setSetting({showSpeciesDetails: matrixsettings.alwaysShowDetails || (resultset.length <= matrixsettings.perPage)});
+	
+	matrixsettings.start=0;
+	
+	if (typeof hook_postApplyScores == 'function') { hook_postApplyScores(); }
+
+}
+
+function sortResults()
+{
+	if( matrixsettings.alwaysSortByInitial!=1 || matrixsettings.initialSortColumn=="" ) 
+	{
+		if (typeof hook_postSortResults  == 'function') { hook_postSortResults(); }
+		return;
+	}
+
+	var resultset=getResultSet();
+
+	if( resultset.length<1 ) return;
+	if( !resultset[0][matrixsettings.initialSortColumn] ) return;
+
+	resultset.sort(function(a,b)
+	{
+		if ( a[matrixsettings.initialSortColumn]<b[matrixsettings.initialSortColumn] ) return -1;
+		if ( a[matrixsettings.initialSortColumn]>b[matrixsettings.initialSortColumn] ) return 1;
+		return 0;
+	})
+
+	if (typeof hook_postSortResults  == 'function') { hook_postSortResults(); }
+
+}
+
+function applyRelated()
+{
+	var related=getRelated();
+	var dataset=getDataSet();
+	var resultset=getResultSet();
+
+	if ((!related || related.length==0))
+	{
+		resultset=dataset.slice();
+	}
+	else
+	{
+		resultset.splice(0,resultset.length);
+
+		for(var i in related)
+		{
+			var relate=related[i];
+			for(var j in dataset)
+			{
+				var item=dataset[j];
+				if (relate.relation_id==item.id && relate.ref_type==item.type)
+				{
+					resultset.push(item);
+				}
+			}
+		}
+	}
+	
+	setResultSet(resultset);
+}
+
+function applyFound()
+{
+	var found=getFound();
+	var dataset=getDataSet();
+	var resultset=getResultSet();
+
+	resultset.splice(0,resultset.length);
+
+	for(var i in found)
+	{
+		var tfound=found[i];
+		for(var j in dataset)
+		{
+			var item=dataset[j];
+			if (tfound.id==item.id && tfound.type==item.type)
+			{
+				resultset.push(item);
+			}
+		}
+	}
+	
+	setResultSet(resultset);
+}
+
+function setSimilar( p )
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_similar' ,
+			id : p.id,
+			type : p.type,
+			time : getTimestamp(),
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
+		}),
+		success : function(data)
+		{
+			var related=$.parseJSON(data);
+			setRelated(related);
+
+			setPrevmatrixsettings();
+			setLastScrollPos();
+
+			setSetting({mode:"similar"});
+			setSetting({start:0});
+			setSetting({expandedShowing:0});
+			setSetting({browseStyle:'show_all'});
+			setSetting({showSpeciesDetails: true});
+			
+			clearPaging();
+			clearResults();
+
+			applyRelated();
+			removeSimilarCharacters();
+			printResults();
+			printSimilarHeader();
+			window.scroll(0,0);
+			setCursor();
+			showRestartButton();
+		}
+	});
+	
+}
+
+function peersHaveIdenticalValues(fcharacter,fvalues)
+{
+	var resultset=getResultSet();
+	
+	if (resultset.length<=1)
+	{
+		return false;
+	}
+
+	fvalues.sort();
+	
+	foundnothing=true;
+	
+	for(var i=0;i<resultset.length;i++)
+	{
+		var result=resultset[i];
+		for(var c in result.states)
+		{
+			if (c==fcharacter)
+			{
+				foundnothing=false;
+				var character=result.states[c];
+				var values=Array();
+				
+				for(var s in character.states)
+				{
+					var state=character.states[s];
+					values.push(state.id);
+				}
+				
+				values.sort();
+				
+				if (values.join(';')!=fvalues.join(';')) return false;
+			}
+		}
+	}
+	
+	if (foundnothing)
+		return false;
+	else
+		return true;
+}
+
+function removeSimilarCharacters()
+{
+	var resultset=getResultSet();
+	//console.dir(resultset);
+	
+	var filteredStates=Array();
+	
+	for(var i=0;i<resultset.length;i++)
+	{
+		var result=resultset[i];
+		var filteredCharacters={};
+		for(var c in result.states)
+		{
+			var character=result.states[c];
+			//console.dir(character);
+			var values=Array();
+			for(var s in character.states)
+			{
+				var state=character.states[s];
+				//console.dir(state);
+				values.push(state.id);
+			}
+			values.sort();
+			if (!peersHaveIdenticalValues(c,values))
+			{
+				var myObj = new Object;
+				myObj[c] = character;
+				$.extend(filteredCharacters,myObj);
+			}
+		}
+
+		resultset[i].states=filteredCharacters;
+	}
+}
+
+function clearSimilarHeader()
+{
+	$('#similarSpeciesHeader').html('');	
+}
+
+function printSimilarHeader()
+{
+	var resultset = getResultSet();
+
+	$('#similarSpeciesHeader').html(
+		similarHeaderHtmlTpl
+			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
+			.replace('%SPECIES-NAME%', resultset[0].label)
+			.replace('%BACK-TEXT%', __('terug'))
+			.replace('%SHOW-STATES-TEXT%', labels.show_all)
+			.replace('%NUMBER-START%', matrixsettings.start+1)
+			.replace('%NUMBER-END%', data.resultset.length)
+	).removeClass('hidden').addClass('visible');
+	
+	$('.result-icon.related').find('img').remove();
+
+}
+
+function toggleAllDetails()
+{
+	if ($('.result-detail:visible').length < getResultSet().length)
+	{
+		$('.result-detail').toggle(true);
+		$('#showAllLabel').html(labels.hide_all);
+	}
+	else
+	{
+		$('.result-detail').toggle(false);
+		$('#showAllLabel').html(labels.show_all);
+	}
+
+}
+
+function toggleDetails(id)
+{
+	$('#det-'+id).toggle();
+}
+
+function setSearch( p )
+{
+	var s=$('#inlineformsearchInput').val();
+	
+	if (s.length==0) return;
+	
+	setCursor('wait');
+	
+	searchedfor=s;
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_search' ,
+			search : s,
+			time : getTimestamp(),
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
+		}),
+		success : function(data)
+		{
+			var found=$.parseJSON(data);
+			setFound(found);
+
+			setPrevmatrixsettings();
+			setLastScrollPos();
+
+			setSetting({mode:"search"});
+			setSetting({start:0});
+			setSetting({expandedShowing:0});
+			setSetting({browseStyle:'expand'});
+			setSetting({showSpeciesDetails: true});
+			
+			clearPaging();
+			clearResults();
+
+			applyFound();
+			removeSimilarCharacters();
+			printResults();
+			printSearchHeader();
+			window.scroll(0,0);
+			setCursor();
+			showRestartButton();
+		}
+	});
+	
+}
+
+function printSearchHeader()
+{
+	$('#similarSpeciesHeader').html(
+		searchHeaderHtmlTpl
+			.replace('%HEADER-TEXT%', __('Zoekresultaten voor'))
+			.replace('%SEARCH-TERM%', searchedfor)
+			.replace('%BACK-TEXT%', __('terug'))
+			.replace('%NUMBER-START%', matrixsettings.start+1)
+			.replace('%NUMBER-END%', matrixsettings.expandedShowing)
+			.replace('%OF-TEXT%', __('van'))
+			.replace('%NUMBER-TOTAL%', data.resultset.length)
+	).removeClass('hidden').addClass('visible');
+}
+
+function closeSimilarSearch()
+{
+	setSetting({mode:"identify"});
+	clearSimilarHeader();
+	applyScores();
+	sortResults();
+	clearResults();
+	setSetting(getPrevmatrixsettings());
+	setSetting({expandedShowing:matrixsettings.expandedShowing-matrixsettings.perPage});
+	printResults();
+	window.scroll(0,getLastScrollPos());
+}
+
+function closeSimilar()
+{
+	setRelated();
+	closeSimilarSearch();
+}
+
+function closeSearch()
+{
+	setFound();
+	$('#inlineformsearchInput').val("");
+	closeSimilarSearch();
+}
+
+function prettyPhotoInit()
+{
+	if(jQuery().prettyPhoto)
+	{
+		$("a[rel^='prettyPhoto']").prettyPhoto({
+			allow_resize:true,
+			animation_speed:50,
+			opacity: 0.70, 
+			show_title: false,
+			overlay_gallery: false,
+			social_tools: false
+		});
+	}
+}
+
+function bindDialogKeyUp()
+{
+    $("#state-value").keydown(function(event)
+	{
+        // Allow: backspace, delete, tab, escape, and enter
+        if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
+             // Allow: Ctrl+A
+            (event.keyCode==65 && event.ctrlKey===true) || 
+             // Allow: home, end, left, right
+            (event.keyCode>=35 && event.keyCode<=39))
+		{
+			// let it happen, don't do anything
+			return;
+        }
+        else
+		{
+			// Ensure that it is a number or a dot and stop the keypress
+			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105) && event.keyCode!=190)
+			{
+				event.preventDefault(); 
+			}   
+        }
+    });
+
+	$('#state-value').keyup(function(e)
+	{
+		if (e.keyCode==13)
+		{
+			// return
+			setStateValue();
+			closeDialog();
+		}
+		return;
+	});
+
+}
+
+function jDialogOk()
+{
+	// dialog button function, called from main.js::showDialog 
+	setStateValue();
+	closeDialog();
+}
+
+function jDialogCancel()
+{
+	// dialog button function, called from main.js::showDialog 
+	closeDialog();
+}
+
+
+function setLastScrollPos()
+{
+	lastScrollPos=getPageScroll();
+}
+
+function getLastScrollPos()
+{
+	return lastScrollPos;
+}
+
+function setScores(scores)
+{
+	data.scores=scores;
+}
+
+function getScores()
+{
+	return data.scores;
+}
+
+function setStates(states)
+{
+	data.states=states;
+}
+
+function getStates()
+{
+	return data.states;
+}
+
+function setCharacters(characters)
+{
+	data.characters=characters;
+}
+
+function getCharacters()
+{
+	return data.characters;
+}
+
+function setStateCount(statecount)
+{
+	data.statecount=statecount;
+}
+
+function getStateCount()
+{
+	return data.statecount;
+}
+
+function setDataSet(dataset)
+{
+	data.dataset=dataset;
+}
+
+function getDataSet()
+{
+	return data.dataset;
+}
+
+function setResultSet(resultset)
+{
+	data.resultset=resultset;
+}
+
+function getResultSet()
+{
+	return data.resultset;
+}
+
+function setMenu(menu)
+{
+	data.menu=menu;
+}
+
+function getMenu()
+{
+	return data.menu;
+}
+
+function setRelated(related)
+{
+	data.related=related;
+}
+
+function getRelated()
+{
+	return data.related;
+}
+
+function setFound(found)
+{
+	data.found=found;
+}
+
+function getFound()
+{
+	return data.found;
+}
+
+function setPrevmatrixsettings()
+{
+	prevmatrixsettings = jQuery.extend({}, matrixsettings);
+}
+
+function getPrevmatrixsettings()
+{
+	return prevmatrixsettings;
+}
+
+function setSetting( p )
+{
+	$.extend(matrixsettings, p);
+}
+
+function getCharacter( id )
+{
+	var menu=getMenu();
+
+	for (var i in menu)
+	{
+		var item = menu[i];
+
+		if (item.type=='group')
+		{
+			for (var j in item.chars)
+			{
+				if (item.chars[j].id==id) return item.chars[j];
+			}
+		}
+		else
+		if (item.type=='char')
+		{
+			if (item.id==id) return item;
+		}
+	}
+}
+
+function disableImgContextMenu()
+{
+    $("img").on("contextmenu",function()
+	{
+       return false;
+    });
+}
+
+function showRestartButton()
+{
+	$('#clearSelectionContainer').removeClass('ghosted');
+}
+
+function doRemoteLink( url, name )
+{
+	if (matrixsettings.generalSpeciesInfoUrl.length>0)
+	{
+		setCursor('wait');
+
+		var iurl=matrixsettings.generalSpeciesInfoUrl
+			.replace('%PID%',matrixsettings.projectId)
+			.replace('%TAXON%',name);
+			
+		//console.log( iurl );
+			
+		$.ajax({
+			url : iurl,
+			type: 'GET',
+			dataType: "jsonp",
+			success : function ( data )
+			{
+				//console.dir( data );
+
+				printInfo( 
+					data.page.body, 
+					labels.info_dialog_title,
+					url
+				);
+				setCursor();
+			}
+		});
+	}
+	else
+	if (url.length>0)
+	{
+		window.open( url, "_blank" );
+	}
+}
+
+function printInfo( info, title, url )
+{
+	if (info)
+	{
+		showDialog(
+			title,
+			infoDialogHtmlTpl
+				.replace('%BODY%',info)
+				.replace('%URL%', url ? 
+					infoDialogUrlHtmlTpl
+						.replace('%URL%',url)
+						.replace('%LINK-LABEL%',labels.popup_species_link)
+					 : "" ),
+			{showOk:false});
+	}
+}
+
+function matrixInit()
+{
+	//nbcLabelClose = __('sluiten');
+	//nbcLabelBack = __('terug');
+
+	$('#legendDetails').html( labels.details );
+	$('#legendSimilarSpecies').html( labels.similar );
+	$('#legendExternalLink').html( labels.info_link );
+
+	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
+
+	// inititializing scores, results and menu
+	setCursor('wait');
+	applyScores();
+	sortResults();
+	clearResults();
+	printResults();
+	setCursor();
+	retrieveMenu();
+
+}
+
