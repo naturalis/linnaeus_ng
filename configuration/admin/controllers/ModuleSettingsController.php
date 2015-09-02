@@ -284,7 +284,7 @@ class ModuleSettingsController extends Controller
 
 	private function saveModuleSetting()
 	{
-		if ( $this->rHasVar('new_setting') && !empty($this->rGetVal('new_setting')) )
+		if ( $this->rHasVar('new_setting') && $this->rGetVal('new_setting')!="" )
 		{
 			if ( !empty( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) ) )
 			{
