@@ -286,7 +286,7 @@ class ModuleSettingsController extends Controller
 	{
 		if ( $this->rHasVar('new_setting') && $this->rGetVal('new_setting')!="" )
 		{
-			if ( !empty( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) ) )
+			if ( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) !="" )
 			{
 				$m=$this->getModule();
 				$this->addError( sprintf( 
