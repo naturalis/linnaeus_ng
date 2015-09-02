@@ -37,7 +37,7 @@
 	{/literal}
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_conceptcard.css">
+    <!-- link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_conceptcard.css" -->
     <!--[if lte IE 7]>
 	    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_conceptcardIeOnly.css" />
     <![endif]-->
