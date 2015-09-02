@@ -42,6 +42,10 @@
 			</select>
 		</td>
 	</tr>
+	<tr id="employee_of">
+		<th>NSR ID:</th>
+		<td>{if $actor.id}{$actor.nsr_id}{else}(wordt automatisch gegenereerd){/if}</td>
+	</tr>
 	<tr><th><input type="submit" value="save" /></th><td></td></tr>
 {if $actor.id}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
