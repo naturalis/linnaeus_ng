@@ -2241,11 +2241,15 @@ class MatrixKeyController extends Controller
 				'columns'=>'page_id,topic,content'
 			)
 		);
-		
+
+		$content_a=strip_tags($a[0]['content']);
+		$content_b=strip_tags($b[0]['content']);
+		$content_c=strip_tags($c[0]['content']);
+
 		$this->_introductionLinks=array(
-			$this->settings->introduction_topic_colophon_citation=>$a && (!empty(strip_tags($a[0]['content']))) ? $a[0] : null,
-			$this->settings->introduction_topic_versions=>$b && (!empty(strip_tags($b[0]['content']))) ? $b[0] : null,
-			$this->settings->introduction_topic_inline_info=>$c && (!empty(strip_tags($c[0]['content']))) ? $c[0] : null,
+			$this->settings->introduction_topic_colophon_citation=>$a && (!empty($content_a)) ? $a[0] : null,
+			$this->settings->introduction_topic_versions=>$b && (!empty($content_b)) ? $b[0] : null,
+			$this->settings->introduction_topic_inline_info=>$c && (!empty($content_c)) ? $c[0] : null,
 		);
     }
 	
