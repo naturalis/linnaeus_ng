@@ -2,58 +2,35 @@
 
 /*
 
-drop table `module_settings`;
-
-create table `module_settings` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `module` varchar(64) NOT NULL,
-  `lng_id` int(11) NULL,
-  `item_type` varchar(64) NULL,
-  `setting` varchar(64) NOT NULL,
-  `value` varchar(255) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `module_settings_1` (`project_id`),
-  KEY `module_settings_2` (`project_id`,`module`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
-;
-
-truncate module_settings ;
-insert into module_settings values
-(null,65,'matrixkey',null,null,'state_image_max_height',300,now(),now()),
-(null,65,'matrixkey',null,null,'browse_style','expand',now(),now()),
-(null,65,'matrixkey',null,null,'state_image_per_row',4,now(),now()),
-(null,65,'matrixkey',null,null,'items_per_page',16,now(),now()),
-(null,65,'matrixkey',null,null,'use_character_groups',1,now(),now()),
-(null,65,'matrixkey',null,null,'allow_empty_species',1,now(),now()),
-(null,65,'matrixkey',null,null,'always_show_details',1,now(),now()),
-(null,65,'matrixkey',null,null,'calc_char_h_val',0,now(),now()),
-(null,65,'matrixkey',null,null,'use_emerging_characters',1,now(),now()),
-(null,65,'matrixkey',null,null,'score_threshold',100,now(),now()),
-(null,65,'matrixkey',null,null,'img_to_thumb_regexp_pattern',"/http:\\/\\/images.naturalis.nl\\/original\\//",now(),now()),
-(null,65,'matrixkey',null,null,'img_to_thumb_regexp_replacement',"http://images.naturalis.nl/comping/",now(),now())
-
-
-;
-
+		$this->moduleSettings=new ModuleSettingsController;
+			echo $this->moduleSettings->getModuleSetting( 'setting_name' );
+		or
+			$this->moduleSettings->assignModuleSettings( $this->settings );
+			echo $this->settings->setting_name;
 
 */
+
 
 include_once ('Controller.php');
 class ModuleSettingsController extends Controller
 {
-    public $usedModels = array('module_settings');
+    public $usedModels = array('module_settings','module_settings_values');
 
-	private $_module;
-	private $_settings;
-	private $_defaultvalues;
+	private $_modulecontroller;
+	private $_moduleid;
+	private $_settingsvalues;
+	private $_usedefaultwhennovalue=false;
+	
 
     public function __construct($p = null)
     {
         parent::__construct($p);
-		$this->setModule( $this->controllerBaseName );
+
+		$this->setModuleController( $this->controllerBaseName );
+		$this->setModuleId();
+		$this->setModuleSettingsValues();
+		
+
     }
 
     public function __destruct()
@@ -61,88 +38,114 @@ class ModuleSettingsController extends Controller
         parent::__destruct();
     }
 
-    public function setModule( $m )
-    {
-		$this->_module=$m;
-    }
-
-    public function getModule()
-    {
-		return $this->_module;
-    }
-
-	public function setModuleSettings()
-	{
-        $this->_settings = $this->models->ModuleSettings->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'module' => $this->_module
-				),
-				'columns' => 'lng_id,item_type,setting,value'));
-	}
-
-	public function getModuleSettings()
-	{
-        return $this->_settings;
-	}
-
-	public function setModuleDefaults( $d )
-	{
-		$this->_defaultvalues=$d;
-	}
-
     public function getModuleSetting( $p )
     {
-		$setting=isset($p['setting']) ? $p['setting'] : null;
-		$id=isset($p['id']) ? $p['id'] : null;
-		$type=isset($p['type']) ? $p['type'] : null;
-		$subst=isset($p['subst']) ? $p['subst'] : null;
-
+		if ( is_array( $p )) 
+		{
+			$setting=isset($p['setting']) ? $p['setting'] : null;
+			$subst=isset($p['subst']) ? $p['subst'] : null;
+		}
+		else
+		{
+			$setting=$p;
+		}
+		
 		if ( empty($setting) ) return;
 		
-		foreach((array)$this->_settings as $key=>$val)
+		foreach((array)$this->getModuleSettingsValues() as $val)
 		{
 			if ($val['setting']==$setting && !is_null($val['value']))
 			{
-				if (
-					(!is_null($id) && $val['lng_id']==$id) &&
-					(!is_null($type) && $val['item_type']==$type)
-				)
-				{
-					return $val['value'];
-				}
-				else
-				if (
-					(!is_null($id) && $val['lng_id']==$id) &&
-					(is_null($type) && is_null($val['item_type']))
-				)
-				{
-					return $val['value'];
-				}
-				else
-				if (
-					(is_null($id) && is_null($val['lng_id'])) &&
-					(!is_null($type) && $val['item_type']==$type)
-				)
-				{
-					return $val['value'];
-				}
-				if (
-					(is_null($id) && is_null($val['lng_id'])) && 
-					(is_null($type) && is_null($val['item_type']))
-				)
-				{
-					return $val['value'];
-				}
+				return $val['value'];
 			}
-			
-			if (isset($this->_defaultvalues[ $setting ]))
-				return $this->_defaultvalues[ $setting ];
 		}
-		
+
+		if ( isset($subst) )
+		{
+			return $subst;
+		}
     }
 
+	public function assignModuleSettings( &$settings )
+	{
+		$settings = new stdClass();
+		foreach((array)$this->getModuleSettingsValues() as $val)
+		{
+			if ( is_null($val['value']) && $this->getUseDefaultWhenNoValue() && !is_null($val['default_value']) )
+			{
+				$settings->$val['setting']=$val['default_value'];
+			}
+			else
+			{
+				$settings->$val['setting']=$val['value'];
+			}
+		}
+	}
+
+    public function setUseDefaultWhenNoValue( $state )
+    {
+		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
+    }
+
+    private function getUseDefaultWhenNoValue()
+    {
+		return $this->_usedefaultwhennovalue;
+    }
+
+
+
+    private function setModuleController( $m )
+    {
+		$this->_modulecontroller=$m;
+    }
+
+    private function getModuleController()
+    {
+		return $this->_modulecontroller;
+    }
+
+    private function setModuleId()
+    {
+		$d=$this->models->Module->_get(array("id"=>array("controller"=>$this->getModuleController())));
+
+		if ($d)
+		{
+			$this->_moduleid=$d[0]['id'];
+		}
+    }
+
+    private function getModuleId()
+    {
+		return $this->_moduleid;
+    }
+
+	private function setModuleSettingsValues()
+	{
+		if (is_null($this->getModuleId())) return;
+
+		$this->_settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
+			select
+				_a.value as value,
+				_b.setting,
+				_b.default_value as default_value
+
+			from
+				%PRE%module_settings _b
+
+			left join
+				%PRE%module_settings_values _a
+				on _b.id=_a.setting_id
+				and _a.project_id = " . $this->getCurrentProjectId() . "
+
+			where
+				_b.module_id = " . $this->getModuleId() . "
+			");
+	}
+
+	private function getModuleSettingsValues()
+	{
+        return $this->_settingsvalues;
+	}
 
 
 }	

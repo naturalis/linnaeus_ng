@@ -223,7 +223,7 @@ class SpeciesControllerNSR extends SpeciesController
 	
 				}
 				
-				// need to be moved to function
+				// REFAC2015 --> needs to be moved to function
 				if (isset($content['rdf']))
 				{
 					$name=$url=null;	
@@ -334,6 +334,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$has_redirect_to=isset($this->models->PageTaxon->columns['redirect_to']);
 		$has_check_query=isset($this->models->PageTaxon->columns['check_query']);
+		$has_always_hide=isset($this->models->PageTaxon->columns['always_hide']);
 
 		$categories=$this->models->PageTaxon->freeQuery("
 			select
@@ -344,6 +345,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_a.def_page,
 			".($has_redirect_to ? '_a.redirect_to,' : '')."
 			".($has_check_query ? '_a.check_query,' : '')."
+			".($has_always_hide ? '_a.always_hide,' : '')."
 				_a.show_order
 			from 
 				%PRE%pages_taxa _a
@@ -363,6 +365,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			where 
 				_a.project_id=".$this->getCurrentProjectId()."
+				".($has_always_hide ? 'and _a.always_hide = 0' : '')."
 
 			order by 
 				_a.show_order
@@ -650,8 +653,8 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$synonyms=array_splice($names,$synonymStartIndex,$synonymCount,array());
 			usort($synonyms,function($a,$b){
-				$aa=isset($a['authorship_year']) ? intval($a['authorship_year']) : intval(preg_replace('/\D/',"",$a['name']));
-				$bb=isset($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
+				$aa=!empty($a['authorship_year']) ? intval($a['authorship_year']) : intval(preg_replace('/\D/',"",$a['name']));
+				$bb=!empty($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
 				return ( $aa > $bb ? 1 : ( $aa < $bb ? -1 : 0 ) );
 			});
 			array_splice($names,$synonymStartIndex,0,$synonyms);

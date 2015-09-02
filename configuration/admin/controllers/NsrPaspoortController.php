@@ -158,7 +158,8 @@ class NsrPaspoortController extends NsrController
 				_c.content,
 				_c.id as content_id,
 				_c.publish,
-				_a.def_page
+				_a.def_page,
+				_a.always_hide
 
 			from 
 				%PRE%pages_taxa _a
@@ -200,7 +201,7 @@ class NsrPaspoortController extends NsrController
 
 		foreach((array)$categories as $key=>$val)
 		{
-			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
+			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 999999;
 			
 			if (is_null($firstNonEmpty) && empty($val['is_empty']))
 				$firstNonEmpty=$val['id'];

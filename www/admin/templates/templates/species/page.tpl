@@ -42,8 +42,10 @@
                 </td>
                 {/if}
                 <td class="cell-page-delete" onclick="taxonPageDelete({$v.id},'{$v.page}');"></td>
-                <td>{if $v.redirect_to}{t}redirects to:{/t} {$v.redirect_to}{/if}</td>
+                <td>{if $v.redirect_to}{t}redirects to:{/t} {$v.redirect_to|substr:0:25}...{/if}</td>
+                <td>{if $v.always_hide==1}(hidden; id={$v.id}){/if}</td>
             </tr>
+
             {/foreach}
         </table>
 	</p>

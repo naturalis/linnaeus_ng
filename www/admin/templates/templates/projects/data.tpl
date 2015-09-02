@@ -43,7 +43,7 @@
 	</tr>
 	<tr>
 		<td>
-			{t}Short name for URL:{/t}
+			{t}Shortname for URL ("slug"):{/t}
 		</td>
 		<td colspan="2">
 			<input type="text" name="short_name" value="{$data.short_name}" style="width:300px;" />

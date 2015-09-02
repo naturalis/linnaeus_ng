@@ -1,1 +1,1 @@
-<!-- div id="preview-overlay"><p><a href="{$urlBackToAdmin}">EDIT PAGE</a></p></div -->
+<!-- div id="preview-overlay"><p><a href="{$urlBackToAdmin}">{t}Redactie: bewerk inhoud{/t}</a></p></div -->
