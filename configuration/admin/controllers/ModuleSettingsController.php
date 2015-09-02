@@ -94,7 +94,9 @@ class ModuleSettingsController extends Controller
 
 		$this->setModule();
 		
-		if ( empty($this->getModule()) )
+		$m=$this->getModule();
+		
+		if ( empty($m) )
 		{
 			$this->redirect('index.php');
 		}
