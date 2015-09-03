@@ -7,8 +7,3 @@ ul.clearSelectionBtn li {border-bottom:1px solid #BBBBBB; border-top:1px solid #
     background: url("{/literal}{$session.app.system.urls.systemMedia}{literal}logo.png") no-repeat scroll left bottom transparent;
 }
 {/literal}
-
-
-
-
-
