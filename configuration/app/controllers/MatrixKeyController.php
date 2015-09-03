@@ -155,13 +155,13 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
 
-		//$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
 		/* 
 			first page of dataset is loaded directly with the page. subsequently, the full dataset
 			is loaded by ajax. loading all of the resultset with the page has in the past lead to
 			memory problems (key of over 100 species on an ipad). the merging with an empty array
 			to fill out again to the size of the actual dataset is done to fool the result counters
 			in the html-page.
+			`full_dataset` is still used in some skins (dierenzoeker)
 		*/
 		$this->smarty->assign('limited_dataset',
 			json_encode(
@@ -171,6 +171,7 @@ class MatrixKeyController extends Controller
 				)
 			)
 		);
+		$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 		$this->smarty->assign('facetmenu', $this->getFacetMenu());
