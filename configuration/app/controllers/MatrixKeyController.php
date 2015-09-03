@@ -189,6 +189,17 @@ class MatrixKeyController extends Controller
 		
         else					
 
+
+
+		if ($this->rHasVal('action', 'get_data_set'))
+		{
+			$this->setDataSet();
+			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
+        }	
+		
+        else					
+
+
 		if ($this->rHasVal('action','set_state'))
 		{
 			if ($this->rHasVal('state') && $this->rHasVal('value'))
