@@ -959,7 +959,11 @@ function applyScores()
 			for(var j in dataset)
 			{
 				var item=dataset[j];
-				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
+				if 
+				(
+					(!score.id) ||
+					(score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
+				)
 				{
 					item.score=score.score;
 					resultset.push(item);
