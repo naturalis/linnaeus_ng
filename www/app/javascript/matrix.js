@@ -84,7 +84,7 @@ var	labels={
 	popup_species_link:__('Meer informatie'),
 }
 
-function retrieveDataSet()
+function initDataSet()
 {
 	setCursor('wait');
 
@@ -101,17 +101,17 @@ function retrieveDataSet()
 		{
 			//console.log(data);
 			setDataSet($.parseJSON(data));
+			applyScores();
+			sortResults();
+			clearResults();
+			printResults();
 			setCursor();
-			matrixInit();
+			if ( getMenu()=="" ) initMenu();
 		}
 	});
 }
 
-
-
-
-
-function retrieveMenu()
+function initMenu()
 {
 	setCursor('wait');
 
@@ -1594,12 +1594,16 @@ function matrixInit()
 
 	// inititializing scores, results and menu
 	setCursor('wait');
+
 	applyScores();
 	sortResults();
 	clearResults();
 	printResults();
+
+	initDataSet();
+	//initMenu();
+
 	setCursor();
-	retrieveMenu();
 
 }
 
