@@ -71,7 +71,8 @@ class Controller extends BaseClass
         'taxon_variation',
         'user',
         'variation_label',
-    );
+		'nsr_ids'
+     );
     private $usedHelpersBase = array(
         'logging_helper',
         'email_helper',

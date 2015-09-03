@@ -48,7 +48,21 @@
                     maxlength="255"/> *
             </td>
         </tr>
-    </table>
+  
+    
+        <tr style="vertical-align:top">
+            <td>
+                {t}Alternative forms:{/t}
+            </td>
+            <td>
+                <input type="text" name="synonym" id="synonym" value="" />
+                <input type="button" onclick="glossDoAddSynonym();" value="{t}add form{/t}">
+                {t}(alternative forms are also linked to this lemma by the hotwords-function){/t}
+                <p id="synonyms"></p>
+            </td>
+        </tr>
+    </table>    
+    
     <table>
         <tr style="vertical-align:top">
             <td>{t}Definition:{/t} *</td>
@@ -61,16 +75,10 @@
             </td>
         </tr>
     </table>
-<p>
-	{t}Synonyms:{/t}
-</p>
-<p id="synonyms"></p>
-<p>
-    <input type="text" name="synonym" id="synonym" value="" />
-    <input type="button" onclick="glossDoAddSynonym();" value="{t}add synonym{/t}">
-</p>
 
-<span class="a" onclick="$('#action').val('media');glossCheckForm();">{t}Edit multimedia{/t}</span>
+    <p>
+		<span class="a" onclick="$('#action').val('media');glossCheckForm();">{t}Edit multimedia{/t}</span>	
+	</p>
 
 </form>
 </div>

@@ -12,7 +12,7 @@
 
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
-				<h1 class="no-subtitle">Taxonomische boom</h1>
+				<h1 class="no-subtitle">{t}Taxonomische boom{/t}</h1>
 				<h2></h2>
 			</div>
 			<div id="tree-container"></div>
@@ -28,7 +28,7 @@
 <script type="text/JavaScript">
 $(document).ready(function() {
 	
-	$('title').html('Taxonomische boom - '+$('title').html());
+	$('title').html('{t}Taxonomische boom{/t} - '+$('title').html());
 
 	{if $tree}
 		$( "#"+container ).html( {$tree} );

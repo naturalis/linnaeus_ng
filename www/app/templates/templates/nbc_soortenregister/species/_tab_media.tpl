@@ -21,19 +21,19 @@
         <div class="{if $requestData.media=='collected'}media-not-active{else}media-active{/if}">
 	        {if $requestData.media=='collected'}
             	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
-                	Afbeeldingen bij soort/taxon ({$mediaOwn.count})
+                	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 				</a>
 			{else}
-            	Afbeeldingen bij soort/taxon ({$mediaOwn.count})
+            	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 			{/if}
         </div>
         <div class="{if $requestData.media=='collected'}media-active{else}media-not-active{/if}">
 	        {if $requestData.media!='collected'}
             	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
-                	Soorten/taxa met afbeelding(en) ({$mediaCollected.species})
+                	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 				</a>
 			{else}
-            	Soorten/taxa met afbeelding(en) ({$mediaCollected.species}){/if}
+            	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species}){/if}
         </div>
     </div>
     
@@ -45,11 +45,11 @@
 
 		{if $mediaOwn.count>0 && $requestData.media!='collected'}
         <h4>
-            Totaal aantal afbeeldingen: <span class="total-image-count"></span>
+            {t}Totaal aantal afbeeldingen{/t}: <span class="total-image-count"></span>
         </h4>
         {elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
         <h4>
-			Soorten/taxa met afbeelding(en): {$mediaCollected.species}
+			{t}Soorten/taxa met afbeelding(en){/t}: {$mediaCollected.species}
         </h4>
         {/if}
         

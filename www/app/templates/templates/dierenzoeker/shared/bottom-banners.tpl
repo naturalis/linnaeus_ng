@@ -20,8 +20,8 @@
 						style='display:block;position:absolute;left:779px;top:41px;width:150px;height:55px;border:0px solid blue;'>Ministerie voor landbouw en innovatie</a>
 
 				<div class="social-media">
-					<a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a>
-					<a href="http://twitter.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/twitter.png" alt="" style="width:32px;height:32px;" /></a>
+					<!-- a href="http://www.facebook.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/facebook.png" alt="" /></a>
+					<a href="http://twitter.com/dierenzoeker" target="_blank"><img src="../../media/system/skins/dierenzoeker/twitter.png" alt="" style="width:32px;height:32px;" /></a -->
 				</div>
 					</div>
                 </div>
