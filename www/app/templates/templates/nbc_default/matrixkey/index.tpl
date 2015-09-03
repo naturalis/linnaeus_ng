@@ -72,7 +72,7 @@ $(document).ready(function()
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
 	setCharacters($.parseJSON('{$session_characters}'));
-	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
+	setDataSet($.parseJSON('{$limited_dataset|@addslashes}'));
 
 	__translations = [
 		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },

@@ -1,12 +1,20 @@
 <?php
 
 /*
+
 	data & matching
-	on initial load, the entire data-set is fed into data.dataset in matrix.js via
+	on initial load, the entire data-set is fed into data. dataset in matrix.js via
 	setDataSet() in index.php/tpl. from that point on, each time a character state
 	is (un)set, setState() is called, which only returns an array of taxon id's with
 	scores, which are applied to data.dataset in applyScores(), resulting in
 	data.resultset, which contains the actual results as they are displayed.
+	n.b.: as loading everything at once in the PHP-page caused some browsers to stall
+	or crash (large keys on iPad), the initial loading is now done in two steps.
+	first, the first `$this->settings->items_per_page` items of the dataset are fully
+	loaded in the PHP-page (padded with empty array-cells to fool the various dataset
+	counters), then the entire dataset is loaded through AJAX, overwriting the initial
+	dataset (it is unclear why this does not cause any memory problems, as the size of 
+	the data is no different, but it appears to work).
 	
 	sorting
 	initial sorting is done in MatrixKeyController::sortDataSet(), using one of the
@@ -146,8 +154,23 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
 		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
 		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
-		$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
 
+		//$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
+		/* 
+			first page of dataset is loaded directly with the page. subsequently, the full dataset
+			is loaded by ajax. loading all of the resultset with the page has in the past lead to
+			memory problems (key of over 100 species on an ipad). the merging with an empty array
+			to fill out again to the size of the actual dataset is done to fool the result counters
+			in the html-page.
+		*/
+		$this->smarty->assign('limited_dataset',
+			json_encode(
+				array_merge(
+					array_slice($this->getDataSet(),0,$this->settings->items_per_page),
+					array_fill($this->settings->items_per_page,count((array)$this->getDataSet())-$this->settings->items_per_page,null)
+				)
+			)
+		);
         $this->smarty->assign('matrix', $matrix);
 		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
 		$this->smarty->assign('facetmenu', $this->getFacetMenu());
@@ -188,6 +211,17 @@ class MatrixKeyController extends Controller
         }	
 		
         else					
+
+
+
+		if ($this->rHasVal('action', 'get_data_set'))
+		{
+			$this->setDataSet();
+			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
+        }	
+		
+        else					
+
 
 		if ($this->rHasVal('action','set_state'))
 		{
