@@ -94,7 +94,9 @@ class ModuleSettingsController extends Controller
 
 		$this->setModule();
 		
-		if ( empty($this->getModule()) )
+		$m=$this->getModule();
+		
+		if ( empty($m) )
 		{
 			$this->redirect('index.php');
 		}
@@ -135,7 +137,9 @@ class ModuleSettingsController extends Controller
 
 		$this->setModule();
 		
-		if ( empty($this->getModule()) )
+		$m=$this->getModule();
+		
+		if ( empty($m) )
 		{
 			$this->redirect('index.php');
 		}
@@ -280,9 +284,9 @@ class ModuleSettingsController extends Controller
 
 	private function saveModuleSetting()
 	{
-		if ( $this->rHasVar('new_setting') && !empty($this->rGetVal('new_setting')) )
+		if ( $this->rHasVar('new_setting') && $this->rGetVal('new_setting')!="" )
 		{
-			if ( !empty( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) ) )
+			if ( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) !="" )
 			{
 				$m=$this->getModule();
 				$this->addError( sprintf( 
@@ -298,9 +302,9 @@ class ModuleSettingsController extends Controller
 					values
 						(" . 
 							mysql_real_escape_string( $this->getModuleId() ) . "," . 
-							($this->rGetVal('new_setting') ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_info') ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_default_value') ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  ."
+							($this->rGetVal('new_setting')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
+							($this->rGetVal('new_info')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
+							($this->rGetVal('new_default_value')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  ."
 						)
 				");	
 				$this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ),  $this->rGetVal('new_setting') ) );

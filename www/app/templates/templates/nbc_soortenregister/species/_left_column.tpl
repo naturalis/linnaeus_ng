@@ -39,7 +39,7 @@
 		{include file="../shared/_block_toolbox.tpl"}
 
 		<div id="treebranchContainer">
-            <h2>Indeling</h2>
+            <h2>{t}Indeling{/t}</h2>
 			<table id="name-tree">
 			{if $children|@count >0}
 			{math equation="(x-2)" x=$classification|@count assign=start}

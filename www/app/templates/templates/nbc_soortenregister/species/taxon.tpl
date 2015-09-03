@@ -20,7 +20,7 @@
 			<div id="taxonImage">
 				<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
 				<div id="taxonImageCredits">
-					<span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}Foto</span> {$overviewImage.label} 
+					<span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label} 
 				</div>
 			</div>
 			{/if}

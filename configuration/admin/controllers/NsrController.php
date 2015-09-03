@@ -289,4 +289,188 @@ class NsrController extends Controller
 		return $c;
 	}		
 
+
+
+	public function createNsrIds($p)
+	{
+
+		$id=isset($p['id']) ? $p['id'] : null;
+		$type=isset($p['type']) ? $p['type'] : null;
+		$subtype=isset($p['subtype']) ? $p['subtype'] : null;
+		
+		if (empty($id) || empty($type))	return;
+
+		$d=$this->models->NsrIds->_get(array('id'=>
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'lng_id'=>$id,
+				'item_type'=>$type
+			)));
+
+		$rdf=$nsr=null;
+
+		if (empty($d[0]['rdf_id'])) $rdf=$this->createRdfId();
+		if (empty($d[0]['nsr_id']) && $type=='taxon') $nsr=$this->createNsrCode('tn.nlsr.concept');
+		if (empty($d[0]['nsr_id']) && $type=='name') $nsr=$this->createNsrCode('tn.nlsr.name');
+		if (empty($d[0]['nsr_id']) && $type=='actor')
+		{
+			if ($subtype=='person' || empty($subtype) )
+			{
+				$nsr=$this->createNsrCode('nlsr.person');
+			}
+			else
+			if ($subtype=='organization')
+			{
+				$nsr=$this->createNsrCode('nlsr.organization');
+			}
+		}
+
+		if (empty($rdf) && empty($nsr)) return;
+		
+		if (!empty($rdf) && !empty($nsr))
+		{
+			$this->models->NsrIds->insert(
+				array(
+					'project_id'=>$this->getCurrentProjectId(), 
+					'rdf_id'=>$rdf,
+					'nsr_id'=>$nsr,
+					'lng_id'=>$id,
+					'item_type'=>$type
+				)); 
+				
+			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
+
+		}
+		else
+		if (!empty($rdf))
+		{
+			$this->models->NsrIds->update(
+				array('rdf_id'=>$rdf),
+				array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>$type)
+			);
+		}
+		else
+		if (!empty($nsr))
+		{
+			$this->models->NsrIds->update(
+				array('nsr_id'=>$nsr),
+				array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>$type)
+			);
+
+			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
+		}
+		
+		return array(
+			'rdf_id' => !empty($rdf) ? $rdf : null,
+			'nsr_id' => !empty($nsr) ? $nsr : null,
+		);
+	}
+
+	private function generateNsrCode()
+	{
+		$c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$r='';
+		while(strlen($r)<11)
+		{
+			$r.=substr($c,rand(0,35),1);
+		}
+		return str_pad($r,12,'0',STR_PAD_LEFT);
+	}
+	
+	private function createNsrCode( $prefix )
+	{
+		/*
+		NSR ID prefixes (inherited from Trezorix)
+		-----------------------------------------
+		taxon concept	tn.nlsr.concept/
+		taxon name		tn.nlsr.name/
+		actor (indiv.)	nlsr.person/
+		actor (comp.)	nlsr.organization/
+		reference		tn.nlsr.reference/
+		
+		to be determined (item_type exists in table, but ID's never issued)
+		-------------------------------------------------------------------
+		taxon_presence
+		habitat
+		presence
+		rank
+		*/
+
+		$exists=true;
+		$i=0;
+		$code=null;
+
+		while( $exists )
+		{
+			$code=$prefix."/".$this->generateNsrCode();
+			$d=$this->models->NsrIds->freeQuery("
+				select count(*) as total
+				from %PRE%nsr_ids
+				where
+					project_id = ".$this->getCurrentProjectId()."
+					and nsr_id = '".$code."'
+			");
+			
+			if ( $d[0]['total']==0 )
+			{
+				$exists=false;
+			}
+			if ( $i>=100 )
+			{
+				$this->addError('Kon geen nieuw uniek NSR ID creëren.');
+				return;
+			}
+			$i++;
+		}
+		
+		return $code;
+	}
+
+	private function generateRdfId()
+	{
+		$c='abcdefghijklmnopqrstuvwxyz0123456789';
+		$r='';
+		while(strlen($r)<32)
+		{
+			$r.=substr($c,rand(0,35),1);
+		}
+
+		return substr($r,0,8).'-'.substr($r,8,4).'-'.substr($r,12,4).'-'.substr($r,16,4).'-'.substr($r,20);
+	}
+	
+	private function createRdfId()
+	{
+		$exists=true;
+		$i=0;
+		$code=null;
+		while($exists)
+		{
+			$code=$this->generateRdfId();
+			$d=$this->models->NsrIds->freeQuery("
+				select count(*) as total
+				from %PRE%nsr_ids
+				where
+					project_id = ".$this->getCurrentProjectId()."
+					and rdf_id = 'http://data.nederlandsesoorten.nl/".$code."'"
+			);
+			
+			if ($d[0]['total']==0)
+			{
+				$exists=false;
+			}
+			if ($i>=100)
+			{
+				$this->addError('Kon geen nieuw uniek Rdf ID creëren.');
+				return;
+			}
+			$i++;
+		}
+		
+		return $code;
+	}
+
+
+
+
+
 }
