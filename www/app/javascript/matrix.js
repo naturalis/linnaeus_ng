@@ -960,7 +960,7 @@ function applyScores()
 			{
 				var item=dataset[j];
 				
-				if (typeof item == 'undefined' || typeof item.id == 'undefined') continue;
+				if(item==null) continue; // can happen on initial load (empty items in array)
 				
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
