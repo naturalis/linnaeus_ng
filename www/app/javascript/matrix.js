@@ -84,7 +84,34 @@ var	labels={
 	popup_species_link:__('Meer informatie'),
 }
 
-function retrieveMenu()
+function initDataSet()
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_data_set',
+			time : getTimestamp(),
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
+		}),
+		success : function (data)
+		{
+			//console.log(data);
+			setDataSet($.parseJSON(data));
+			applyScores();
+			sortResults();
+			clearResults();
+			printResults();
+			setCursor();
+			if ( getMenu()=="" ) initMenu();
+		}
+	});
+}
+
+function initMenu()
 {
 	setCursor('wait');
 
@@ -932,6 +959,7 @@ function applyScores()
 			for(var j in dataset)
 			{
 				var item=dataset[j];
+
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
 					item.score=score.score;
@@ -1501,6 +1529,11 @@ function showRestartButton()
 	$('#clearSelectionContainer').removeClass('ghosted');
 }
 
+function disableShowMoreButton()
+{
+	$('#show-more-button').prop('disabled',true);
+}
+
 function doRemoteLink( url, name )
 {
 	if (matrixsettings.generalSpeciesInfoUrl.length>0)
@@ -1567,12 +1600,14 @@ function matrixInit()
 
 	// inititializing scores, results and menu
 	setCursor('wait');
-	applyScores();
+
+	//applyScores();
+	setResultSet(getDataSet());
 	sortResults();
 	clearResults();
 	printResults();
+	disableShowMoreButton(); // gets reinitialized in printResults()
+	initDataSet();
 	setCursor();
-	retrieveMenu();
-
 }
 
