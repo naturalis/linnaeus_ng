@@ -959,8 +959,8 @@ function applyScores()
 			for(var j in dataset)
 			{
 				var item=dataset[j];
-
-				if (!item.id) continue;
+				
+				if (typeof item.id == 'undefined') continue;
 				
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
