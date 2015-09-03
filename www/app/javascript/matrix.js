@@ -1528,6 +1528,11 @@ function showRestartButton()
 	$('#clearSelectionContainer').removeClass('ghosted');
 }
 
+function disableShowMoreButton()
+{
+	$('#show-more-button').prop('disabled',true);
+}
+
 function doRemoteLink( url, name )
 {
 	if (matrixsettings.generalSpeciesInfoUrl.length>0)
@@ -1599,11 +1604,8 @@ function matrixInit()
 	sortResults();
 	clearResults();
 	printResults();
-
+	disableShowMoreButton(); // gets reinitialized in printResults()
 	initDataSet();
-	//initMenu();
-
 	setCursor();
-
 }
 

@@ -1,12 +1,20 @@
 <?php
 
 /*
+
 	data & matching
-	on initial load, the entire data-set is fed into data.dataset in matrix.js via
+	on initial load, the entire data-set is fed into data. dataset in matrix.js via
 	setDataSet() in index.php/tpl. from that point on, each time a character state
 	is (un)set, setState() is called, which only returns an array of taxon id's with
 	scores, which are applied to data.dataset in applyScores(), resulting in
 	data.resultset, which contains the actual results as they are displayed.
+	n.b.: as loading everything at once in the PHP-page caused some browsers to stall
+	or crash (large keys on iPad), the initial loading is now done in two steps.
+	first, the first `$this->settings->items_per_page` items of the dataset are fully
+	loaded in the PHP-page (padded with empty array-cells to fool the various dataset
+	counters), then the entire dataset is loaded through AJAX, overwriting the initial
+	dataset (it is unclear why this does not cause any memory problems, as the size of 
+	the data is no different, but it appears to work).
 	
 	sorting
 	initial sorting is done in MatrixKeyController::sortDataSet(), using one of the
