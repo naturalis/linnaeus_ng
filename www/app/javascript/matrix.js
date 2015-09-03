@@ -84,6 +84,33 @@ var	labels={
 	popup_species_link:__('Meer informatie'),
 }
 
+function retrieveDataSet()
+{
+	setCursor('wait');
+
+	$.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_data_set',
+			time : getTimestamp(),
+			key : matrixsettings.matrixId,
+			p : matrixsettings.projectId
+		}),
+		success : function (data)
+		{
+			//console.log(data);
+			setDataSet($.parseJSON(data));
+			setCursor();
+			matrixInit();
+		}
+	});
+}
+
+
+
+
+
 function retrieveMenu()
 {
 	setCursor('wait');
