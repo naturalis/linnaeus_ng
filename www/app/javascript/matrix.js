@@ -959,9 +959,7 @@ function applyScores()
 			for(var j in dataset)
 			{
 				var item=dataset[j];
-				
-				if(item==null) continue; // can happen on initial load (empty items in array)
-				
+
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
 					item.score=score.score;
@@ -1603,7 +1601,8 @@ function matrixInit()
 	// inititializing scores, results and menu
 	setCursor('wait');
 
-	applyScores();
+	//applyScores();
+	setResultSet(getDataSet());
 	sortResults();
 	clearResults();
 	printResults();
