@@ -302,9 +302,9 @@ class ModuleSettingsController extends Controller
 					values
 						(" . 
 							mysql_real_escape_string( $this->getModuleId() ) . "," . 
-							($this->rGetVal('new_setting') ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_info') ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_default_value') ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  ."
+							($this->rGetVal('new_setting')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
+							($this->rGetVal('new_info')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
+							($this->rGetVal('new_default_value')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  ."
 						)
 				");	
 				$this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ),  $this->rGetVal('new_setting') ) );
