@@ -960,7 +960,7 @@ function applyScores()
 			{
 				var item=dataset[j];
 				
-				if (!item.hasOwnProperty('id')) continue;
+				if (typeof item == 'undefined' || typeof item.id == 'undefined') continue;
 				
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
