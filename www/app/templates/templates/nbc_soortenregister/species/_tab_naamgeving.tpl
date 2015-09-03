@@ -1,5 +1,5 @@
 	<p>
-		<h2 id="name-header">Naamgeving</h2>
+		<h2 id="name-header">{t}Naamgeving{/t}</h2>
 
 		<table id="names-table">
 			{foreach from=$names.list item=v}

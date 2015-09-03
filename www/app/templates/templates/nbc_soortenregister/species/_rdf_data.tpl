@@ -4,9 +4,9 @@
 		{/capture}
 
 		{if $hasAuthor}			
-		<h2>Bron</h2>
+		<h2>{t}Bron{/t}</h2>
 		<p>
-			<h4 class="source">Auteur(s)</h4>
+			<h4 class="source">{t}Auteur(s){/t}</h4>
 			{$smarty.capture.authors}
 		</p>
 		{/if}
@@ -38,7 +38,7 @@
 			
 		{if $hasReferences>0}			
 		<p>
-			<h4 class="source">Publicatie{if $hasReferences>1}s{/if}</h4>
+			<h4 class="source">{t}Publicatie{if $hasReferences>1}s{/if}{/t}</h4>
 			<ul class="reference">
 			{$smarty.capture.references}
 			</ul>
