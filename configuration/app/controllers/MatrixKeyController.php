@@ -163,11 +163,16 @@ class MatrixKeyController extends Controller
 			in the html-page.
 			`full_dataset` is still used in some skins (dierenzoeker)
 		*/
+		
+//		q(array_slice($this->getDataSet(),0,$this->settings->items_per_page),1);
 		$this->smarty->assign('limited_dataset',
 			json_encode(
 				array_merge(
 					array_slice($this->getDataSet(),0,$this->settings->items_per_page),
-					array_fill($this->settings->items_per_page,count((array)$this->getDataSet())-$this->settings->items_per_page,null)
+					( count((array)$this->getDataSet())<=$this->settings->items_per_page ? 
+						array() :
+						array_fill($this->settings->items_per_page,count((array)$this->getDataSet())-$this->settings->items_per_page,null)
+					)
 				)
 			)
 		);
