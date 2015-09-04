@@ -148,6 +148,16 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+	{if $settings->image_orientation=="landscape"}
+		$("<link/>", {
+		   rel: "stylesheet",
+		   type: "text/css",
+		   href: "{$projectUrls.projectCSS}/matrix_landscape.css"
+		}).appendTo("head");	
+	{/if}
+	
+	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
+	
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
@@ -161,15 +171,39 @@ $(document).ready(function()
 		alwaysShowDetails: {$settings->always_show_details},
 		perPage: {$settings->items_per_page},
 		perLine: {$settings->items_per_line},
-		generalSpeciesInfoUrl: '{$settings->species_info_url}'
+		generalSpeciesInfoUrl: '{$settings->species_info_url}',
+		showScores: {$settings->show_scores},
+		initialSortColumn: '{$settings->initial_sort_column}',
+		alwaysSortByInitial: {$settings->always_sort_by_initial},
 	});
 
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
 	setCharacters($.parseJSON('{$session_characters}'));
-	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
+	setDataSet($.parseJSON('{$limited_dataset|@addslashes}'));
+
+	__translations = [
+		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },
+		{ key : 'Dit kenmerk is bij de huidige selectie nog niet onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie nog niet onderscheidend.{/t}' },
+		{ key : 'Ga naar sleutel', translation : '{t}Ga naar sleutel{/t}' },
+		{ key : 'Geen resultaten.', translation : '{t}Geen resultaten.{/t}' },
+		{ key : 'Gelijkende soorten van', translation : '{t}Gelijkende soorten van{/t}' },
+		{ key : 'Informatie over soort/taxon', translation : '{t}Informatie over soort/taxon{/t}' },
+		{ key : 'Meer informatie', translation : '{t}Meer informatie{/t}' },
+		{ key : 'Meer informatie over soort/taxon', translation : '{t}Meer informatie over soort/taxon{/t}' },
+		{ key : 'Zoekresultaten voor', translation : '{t}Zoekresultaten voor{/t}' },
+		{ key : 'alle onderscheidende kenmerken tonen', translation : '{t}alle onderscheidende kenmerken tonen{/t}' },
+		{ key : 'foto', translation : '{t}foto{/t}' },
+		{ key : 'gelijkende soorten', translation : '{t}gelijkende soorten{/t}' },
+		{ key : 'kenmerken verbergen', translation : '{t}kenmerken verbergen{/t}' },
+		{ key : 'meer resultaten laden', translation : '{t}meer resultaten laden{/t}' },
+		{ key : 'onderscheidende kenmerken', translation : '{t}onderscheidende kenmerken{/t}' },
+		{ key : 'terug', translation : '{t}terug{/t}' },
+		{ key : 'van', translation : '{t}van{/t}' },
+	];
 
 	matrixInit();
+
 });
 </script>
 
