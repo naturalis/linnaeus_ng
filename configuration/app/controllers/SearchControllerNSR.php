@@ -211,8 +211,8 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('show','photographers');
 			$search['limit']='*';
 		}
-
-		$results = $this->doPictureSearch($search);
+		
+		$results = $this->doPictureSearch( $search );
 
 		$this->smarty->assign('search',$search);	
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
@@ -926,6 +926,8 @@ class SearchControllerNSR extends SearchController
 	private function doPictureSearch($p)
 	{
 		$group_id=null;
+		$name_id=null;
+		$name=null;
 
 		if (empty($p['group_id']) && !empty($p['group']))
 		{
@@ -935,6 +937,21 @@ class SearchControllerNSR extends SearchController
 		if (!empty($p['group_id']))
 		{
 			$group_id=intval($p['group_id']);
+		}
+
+		if (!empty($p['name']))
+		{
+			$name=$p['name'];
+		}
+
+		if (!empty($p['name_id']))
+		{
+			$name_id=intval($p['name_id']);
+		}
+		
+		if ( !empty($name) && !empty($name_id) ) 
+		{
+			unset($name);
 		}
 
 		if (!empty($p['photographer']))
@@ -948,6 +965,7 @@ class SearchControllerNSR extends SearchController
 			//$validator="_meta6.meta_data='".mysql_real_escape_string($p['validator'])."'";
 			$validator="_meta6.meta_data like '%".mysql_real_escape_string($p['validator'])."%'";
 		}
+
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
@@ -968,6 +986,12 @@ class SearchControllerNSR extends SearchController
 		{
 			$sort="_meta4.meta_date desc, _k.taxon";
 		}
+
+		if (!empty($p['photographer']) || !empty($p['validator']))
+		{
+			$sort="_meta4.meta_date desc, _k.taxon";
+		}
+
 
 		$data=$this->models->MediaTaxon->freeQuery("		
 			select
@@ -1010,7 +1034,7 @@ class SearchControllerNSR extends SearchController
 					and _m.project_id=_q.project_id
 				" : "" )."
 
-			".(!empty($p['name']) ? 
+			".(!empty($name) ? 
 				"left join %PRE%names _j
 					on _m.taxon_id=_j.taxon_id
 					and _m.project_id=_j.project_id
@@ -1040,14 +1064,11 @@ class SearchControllerNSR extends SearchController
 				and ifnull(_meta9.meta_data,0)!=1
 				and ifnull(_trash.is_deleted,0)=0
 		
-				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])." and _f.lower_taxon=1"  : "")." 		
-				".(!empty($p['name']) && empty($p['name']) ?
-					"and _j.name like '". mysql_real_escape_string($p['name'])."%' and _f.rank_id>= ".SPECIES_RANK_ID  : "")."
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
 				".(isset($validator)  ? "and ".$validator : "")." 		
 				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
-				".(!empty($p['name_id']) ? "and _m.taxon_id = ".intval($p['name_id'])  : "")." 		
-				".(!empty($p['name']) ? "and _j.name like '". mysql_real_escape_string($p['name'])."%'"  : "")."
+				".(!empty($name_id) ? "and _m.taxon_id = ".intval($name_id)  : "")." 		
+				".(!empty($name) ? "and _j.name like '". mysql_real_escape_string($name)."%'"  : "")."
 
 			".(isset($sort) ? "order by ".$sort : "")."
 			".(isset($limit) ? "limit ".$limit : "")."
