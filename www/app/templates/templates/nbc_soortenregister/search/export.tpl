@@ -4,21 +4,21 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-Resultaten 1-{$results.count} van {$results.count}{if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
+{t}Resultaten{/t} 1-{$results.count} {t}van{/t} {$results.count}{if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if}
 
 <table>
 <tr>
-	<td><b>wetenschappelijke naam</b></td>
-	<td><b>nederlandse naam</b></td>
+	<td><b>{t}wetenschappelijke naam{/t}</b></td>
+	<td><b>{t}nederlandse naam{/t}</b></td>
 {if $imageExport}	
-	<td><b>fotograaf</b></td>
-	<td><b>validator</b></td>
+	<td><b>{t}fotograaf{/t}</b></td>
+	<td><b>{t}validator{/t}</b></td>
 {else}
-	<td><b>status voorkomen</b></td>
-	<td><b>barcode exemplaren</b></td>	
+	<td><b>{t}status voorkomen{/t}</b></td>
+	<td><b>{t}barcode exemplaren{/t}</b></td>	
 {/if}
-	<td><b>link naar soortenregister</b></td>
-	<td><b>link naar afbeelding</b></td>
+	<td><b>{t}link naar soortenregister{/t}</b></td>
+	<td><b>{t}link naar afbeelding{/t}</b></td>
 </tr>
 <tbody>
 {foreach from=$results.data item=v}

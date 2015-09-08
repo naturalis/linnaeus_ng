@@ -21,19 +21,19 @@
         <div class="{if $requestData.media=='collected'}media-not-active{else}media-active{/if}">
 	        {if $requestData.media=='collected'}
             	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
-                	Afbeeldingen bij soort/taxon ({$mediaOwn.count})
+                	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 				</a>
 			{else}
-            	Afbeeldingen bij soort/taxon ({$mediaOwn.count})
+            	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 			{/if}
         </div>
         <div class="{if $requestData.media=='collected'}media-active{else}media-not-active{/if}">
 	        {if $requestData.media!='collected'}
             	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
-                	Soorten/taxa met afbeelding(en) ({$mediaCollected.species})
+                	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 				</a>
 			{else}
-            	Soorten/taxa met afbeelding(en) ({$mediaCollected.species}){/if}
+            	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species}){/if}
         </div>
     </div>
     
@@ -45,11 +45,11 @@
 
 		{if $mediaOwn.count>0 && $requestData.media!='collected'}
         <h4>
-            Totaal aantal afbeeldingen: <span class="total-image-count"></span>
+            {t}Totaal aantal afbeeldingen:{/t} <span class="total-image-count"></span>
         </h4>
         {elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
         <h4>
-			Soorten/taxa met afbeelding(en): {$mediaCollected.species}
+			{t}Soorten/taxa met afbeelding(en):{/t} {$mediaCollected.species}
         </h4>
         {/if}
         
@@ -171,7 +171,7 @@ $(document).ready(function()
         </a>
     </div>
     <dl>
-        <dt>Foto</dt><dd>%photographer%</dd>
+        <dt>{t}Foto{/t}</dt><dd>%photographer%</dd>
     </dl>
 </div>
 -->
@@ -191,92 +191,3 @@ $(document).ready(function()
 </div>
 -->
 </span>
-
-
-
-{*
-		<div>
-		
-			{if $mediaOwn.data}
-				<div style="width:100%">
-					<h4>
-						Totaal aantal afbeeldingen: {$mediaOwn.count}
-					</h4>
-					<div>
-	
-					{foreach from=$mediaOwn.data item=v}
-						{if $search.img && $search.img==$v.image}
-							{$pp_popup=[{$v.image},{$v.meta_data}]}
-						{/if}
-						<div class="imageInGrid3 taxon-page">
-							<div class="thumbContainer">
-								<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
-									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_base_url_images_thumb}{$v.thumb}" />
-								</a>
-							</div>
-							<dl>
-								<dt>Foto</dt><dd>{$v.photographer}</dd>
-							</dl>
-						</div>
-					{/foreach}
-					</div>
-				</div>
-			{/if}
-
-			{if $mediaOwn.data && $mediaCollected.data}
-			<p>&nbsp;</p>
-			{/if}			
-		
-			{if $mediaCollected.data}
-				<div  style="width:100%">
-					<h4>
-						Soorten/taxa met afbeelding(en): {$mediaCollected.species}
-					</h4>
-					<div>
-					{foreach from=$mediaCollected.data item=v}
-						<div class="imageInGrid3 taxon-page collected">
-							<div class="thumbContainer">
-								<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
-									<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_base_url_images_thumb}{$v.thumb}" />
-								</a>
-							</div>
-							<dl>
-								{if $v.name}<dd>{$v.name}</dd>{/if}
-								<dd><i>{$v.taxon}</i></dd>
-							</dl>
-						</div>
-					{/foreach}
-					</div>
-				</div>
-
-			{/if}
-			
-			</div>
-			
-			{if $mediaOwn.data && $mediaCollected.data}
-			{assign var=results value=$mediaCollected}
-			{else if $mediaCollected.data}
-			{assign var=results value=$mediaCollected}
-			{else}
-			{assign var=results value=$mediaOwn}
-			{/if}
-
-			{assign var=pgnResultCount value=$results.count}
-			{assign var=pgnResultsPerPage value=$results.perpage}
-			{assign var=pgnCurrPage value=$search.page}
-			{assign var=pgnURL value=$smarty.server.PHP_SELF}
-			{assign var=pgnQuerystring value=$querystring}
-			{include file="../shared/_paginator.tpl"}
-
-			{if $showMediaUploadLink}			
-			<div>
-				<p>&nbsp;</p>
-				<p>
-					<!-- Heeft u mooie foto's van deze soort? Voeg ze dan <a href="">hier</a> toe en draag zo bij aan het Soortenregister.. -->
-				</p>
-			</div>
-			{/if}
-		
-		</div>
-
-*}

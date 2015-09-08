@@ -1,7 +1,7 @@
 	<div id="right">
 
 		<div id="quicksearch">
-			<h2>Zoek op naam</h2>
+			<h2>{t}Zoek op naam{/t}</h2>
 	
 				<form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
 				<fieldset>
@@ -12,13 +12,13 @@
 				</fieldset>
 				<ul>
 					<li class="searchdb">
-						<a href="../search/nsr_search_extended.php"><b>Uitgebreid zoeken</b></a>
+						<a href="../search/nsr_search_extended.php"><b>{t}Uitgebreid zoeken{/t}</b></a>
 					</li>
 					<li class="level2">
-						<a href="../search/nsr_search_pictures.php"><b>Foto's zoeken</b></a>
+						<a href="../search/nsr_search_pictures.php"><b>{t}Foto's zoeken{/t}</b></a>
 					</li>
 					<li class="level2">
-						<a href="../species/tree.php"><b>Taxonomische boom</b></a>
+						<a href="../species/tree.php"><b>{t}Taxonomische boom{/t}</b></a>
 					</li>
 				</ul>
 				</form>
@@ -29,42 +29,7 @@
 				</script>				
 		</div>
 		
-		<div id="block-boxes-aside-contribute" class="block block-boxes block-boxes-simple" style="margin-top:170px">
-		<div class="content">
-		<div id="boxes-box-aside_contribute" class="boxes-box">
-		<div class="boxes-box-content">
-		<p>
-		<a href="/content/fotosysteem-wordt-vernieuwd">
-		<img src="/sites/all/modules/nlsoort_aside_contribute/banner.jpg">
-		</a>
-		</p>
-		</div>
-		</div>
-		</div>
-		</div>
-		<div id="block-boxes-aside-widget" class="block block-boxes block-boxes-simple" style="margin-top:10px">
-		<div class="content">
-		<div id="boxes-box-aside_widget" class="boxes-box">
-		<div class="boxes-box-content">
-		<p>
-		<a href="/node/48">
-		<img src="/sites/all/modules/nlsoort_aside_widget/banner.jpg">
-		</a>
-		</p>
-		</div>
-		</div>
-		</div>
-		<div id="block-boxes-aside-widget" class="block block-boxes block-boxes-simple" style="margin-top:10px">
-		<div class="content">
-		<div id="boxes-box-aside_naturalis" class="boxes-box">
-		<div class="boxes-box-content">
-		<p><a href="http://www.naturalis.nl"><img src="/sites/all/modules/nlsoort_aside_naturalis/banner.jpg"></a></p>
-		</div>
-		</div>
-		</div>
-		</div>
-		</div>
-
+        {include file="../shared/_widget-block.tpl"}
 
 	</div>
 	

@@ -1,5 +1,5 @@
 	<p>
-		<h2 id="name-header">Naamgeving</h2>
+		<h2 id="name-header">{t}Naamgeving{/t}</h2>
 
 		<table id="names-table">
 			{foreach from=$names.list item=v}
@@ -34,7 +34,7 @@
 	</p>
 
 	<p>
-		<h2>Indeling</h2>
+		<h2>{t}Indeling{/t}</h2>
 		<ul class="taxonoverzicht">
 			<li class="root">
 			{foreach from=$classification item=v key=x}
