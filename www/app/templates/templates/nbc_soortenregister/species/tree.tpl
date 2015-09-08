@@ -28,7 +28,7 @@
 <script type="text/JavaScript">
 $(document).ready(function() {
 	
-	$('title').html('Taxonomische boom - '+$('title').html());
+	$('title').html('{t}Taxonomische boom{/t} - '+$('title').html());
 
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
