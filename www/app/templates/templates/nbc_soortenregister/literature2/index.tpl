@@ -10,8 +10,8 @@
 	
 	<div id="content" class="literature">
 
-		<h2 style="margin-top: 17px; margin-bottom: 6px">Literatuur</h2>
-		Referentie niet gevonden.
+		<h2 style="margin-top: 17px; margin-bottom: 6px">{t}Literatuur{/t}</h2>
+		{t}Referentie niet gevonden.{/t}
 		</div>
 
 

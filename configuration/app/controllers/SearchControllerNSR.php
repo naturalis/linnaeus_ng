@@ -1048,7 +1048,6 @@ class SearchControllerNSR extends SearchController
 					on _m.project_id=_c.project_id
 					and _m.id = _c.media_id
 					and _c.sys_label = 'beeldbankFotograaf'
-					and _c.language_id=".$this->getCurrentLanguageId()."
 				" : "" )."
 					
 			".(isset($validator) ? 
