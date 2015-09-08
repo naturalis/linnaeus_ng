@@ -48,7 +48,7 @@
                     allow_ranges="{$datatype.allow_ranges}" 
                     sysname="{$datatype.sysname}"
                     {if $trait.project_type_id==$datatype.project_type_id}selected="selected"{/if}>
-                    	{$datatype.name}
+                    	{if $datatype.name}{$datatype.name}{else}{$datatype.sysname}{/if}
                     </option>
 				{/if}
             	{/foreach}
