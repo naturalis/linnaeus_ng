@@ -2,7 +2,7 @@
 	
 		{if $wetten}
 
-			<h2>Beschermingsstatus</h2>
+			<h2>{t}Beschermingsstatus{/t}</h2>
 
 			{foreach from=$wetten item=soort key=naam}
 			<p>
@@ -32,7 +32,7 @@
 				<br />
 				
 				{* Zie ook: <a href="{$soort.url}">EL&I wettelijke bescherming, beleid en signalering</a><br /><br /> *}
-                Bron: <a href="{$soort.url}">{if $wetten|@count>1}{$naam}{else}soortgegevens{/if}</a> uit Beschermde natuur van Nederland: soorten in wetgeving en beleid (Ministerie van Economische Zaken)
+                {t}Bron:{/t} <a href="{$soort.url}">{if $wetten|@count>1}{$naam}{else}{t}soortgegevens{/t}{/if}</a> uit Beschermde natuur van Nederland: soorten in wetgeving en beleid (Ministerie van Economische Zaken)
 	
 			</p>
 			{/foreach}
@@ -40,7 +40,7 @@
 		{/if}
     	
 		{if $content}
-        <h2>Bedreiging en bescherming</h2>
+        <h2>{t}Bedreiging en bescherming{/t}</h2>
 		<p>
 			{$content}
 		</p>

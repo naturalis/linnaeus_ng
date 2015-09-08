@@ -1,20 +1,20 @@
 		<div>
-			<h2>Voorkomen</h2>
+			<h2>{t}Voorkomen{/t}</h2>
 			
 			<p>
 				<table>
-					{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" 
+					{if $presenceData.presence_label}<tr><td>{t}Status{/t}</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<span class="link" 
 	onmouseover="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information_one_line|@escape}</p>');" onmouseout="hintHide()">{$presenceData.presence_index_label}</span>){/if}</td></tr>{/if}
-					{if $presenceData.habitat_label}<tr><td style="white-space:nowrap">Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
-					{if $presenceData.reference_label}<tr><td style="white-space:nowrap">Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label}</a></td></tr>{/if}
-					{* if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
-					{if $presenceData.expert_name}<tr><td style="white-space:nowrap">Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
-					{if $statusRodeLijst}<tr><td style="white-space:nowrap">Status rode lijst</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
+					{if $presenceData.habitat_label}<tr><td style="white-space:nowrap">{t}Habitat{/t}</td><td>{$presenceData.habitat_label}</td></tr>{/if}
+					{if $presenceData.reference_label}<tr><td style="white-space:nowrap">{t}Referentie{/t}</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label}</a></td></tr>{/if}
+					{* if $presenceData.presence82_label}<tr><td>{t}Status 1982{/t}</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
+					{if $presenceData.expert_name}<tr><td style="white-space:nowrap">{t}Expert{/t}</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
+					{if $statusRodeLijst}<tr><td style="white-space:nowrap">{t}Status rode lijst{/t}</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
 				</table>
 			</p>
 
 			{if $distributionMaps.count>0}
-			<h2>Verspreiding</h2>
+			<h2>{t}Verspreiding{/t}</h2>
 			{foreach from=$distributionMaps.data item=v}
 
 			<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
@@ -22,7 +22,7 @@
 				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="{$taxon_base_url_images_main}{$v.image}" />
 			</a>
 			{if $v.meta_map_description}<br />{$v.meta_map_description|@ucfirst}{/if}
-			{if $v.meta_map_source}<br />Bron: {$v.meta_map_source}{/if}
+			{if $v.meta_map_source}<br />{t}Bron{/t}: {$v.meta_map_source}{/if}
 			{/foreach}
 			{/if}
 
@@ -34,23 +34,23 @@
 				</p>
 
 				{if $atlasData.distributionmap}
-				<h2>Verspreidingskaart</h2>
+				<h2>{t}Verspreidingskaart{/t}</h2>
 				<p>
 					<img class="verspreidingskaart" src="{$atlasData.distributionmap}" />
 				</p>
 				{/if}
 
 				{if $atlasData.author}
-				<h2>Bron</h2>
+				<h2>{t}Bron{/t}</h2>
 				<p>
-					<h4 class="source">Auteur(s)</h4>
+					<h4 class="source">{t}Auteur(s){/t}</h4>
 					{$atlasData.author}
 				</p>
 				{/if}
 				
 				{if $atlasData.general_url}
 				<p>
-				<a href="{$atlasData.general_url}" target="_blank">Meer over deze soort in de BLWG Verspreidingsatlas</a>
+				<a href="{$atlasData.general_url}" target="_blank">{t}Meer over deze soort in de BLWG Verspreidingsatlas{/t}</a>
 				</p>
 				{/if}
 
@@ -77,7 +77,7 @@
 				{/if}
 				{if $trendSources}
 				<br />
-				Bron:
+				{t}Bron{/t}:
 				{foreach from=$trendData.sources item=v key=k}
 				{if $k>0}, {/if}{$v}
 				{/foreach}
@@ -88,7 +88,7 @@
 			{/if}
 			
 			<!-- p>
-				<h2>Waarnemingen</h2>
+				<h2>{t}Waarnemingen{/t}</h2>
 			</p -->
 
 			<p>

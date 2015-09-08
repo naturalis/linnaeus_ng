@@ -70,7 +70,7 @@ $(document).ready(function()
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	$('#resultcount-header').html($('#resultcount-header').html()+' van '+{$pgnResultCount}+({$pgnResultCount}==1 ? ' {$pgnEntityNames[0]}' : ' {$pgnEntityNames[1]}'));
+	$('#resultcount-header').html($('#resultcount-header').html()+' {t}van{/t} '+{$pgnResultCount}+({$pgnResultCount}==1 ? ' {$pgnEntityNames[0]}' : ' {$pgnEntityNames[1]}'));
 });
 </script>
 

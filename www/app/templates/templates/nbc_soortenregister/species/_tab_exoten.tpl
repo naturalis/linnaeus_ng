@@ -34,7 +34,7 @@ ul.exotica li {
         {/if}
         
         <div>
-		<h2 id="name-header">Exotenpaspoort
+		<h2 id="name-header">{t}Exotenpaspoort{/t}
 		<a
         	href="http://www.nederlandsesoorten.nl/content/exotenpaspoort" 
             target="_blank"  
@@ -59,7 +59,7 @@ ul.exotica li {
 
 		{if $content->result->references}
         <br />
-        <h4 class="source">Publicatie{if $content->result->references|@count>1}s{/if}</h4>
+        <h4 class="source">{t}Publicatie{if $content->result->references|@count>1}s{/if}{/t}</h4>
 		<ul class="exotica">
         
         {foreach from=$content->result->references item=v}
