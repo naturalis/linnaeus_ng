@@ -406,6 +406,8 @@ class TraitsTraitsController extends TraitsController
 		$sysname=isset($p['sysname']) ? $p['sysname'] : null;
 		$names=isset($p['names']) ? $p['names'] : null;
 		$descriptions=isset($p['descriptions']) ? $p['descriptions'] : null;
+		$all_link_texts=isset($p['all_link_texts']) ? $p['all_link_texts'] : null;
+		$show_in_search=isset($p['show_in_search']) && in_array($p['show_in_search'],array('0','1'))? $p['show_in_search'] : null;
 
 		if (empty($sysname))
 			return false;
@@ -414,7 +416,8 @@ class TraitsTraitsController extends TraitsController
 			'id'=>$id,
 			'project_id'=>$this->getCurrentProjectId(),
 			'parent_id'=>mysql_real_escape_string($parent_id),
-			'sysname'=>mysql_real_escape_string($sysname)
+			'sysname'=>mysql_real_escape_string($sysname),
+			'show_in_search'=>$show_in_search
 		));
 		
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
@@ -425,7 +428,8 @@ class TraitsTraitsController extends TraitsController
 				'record'=>$this->getTraitgroup($id),
 				'data'=>array(
 					'name_tid'=>$names,
-					'description_tid'=>$descriptions
+					'description_tid'=>$descriptions,
+					'all_link_text_tid'=>$all_link_texts
 				)
 			)
 		);
