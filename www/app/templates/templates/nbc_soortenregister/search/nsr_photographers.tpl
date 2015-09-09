@@ -14,8 +14,8 @@
 
 	<div id="content">
 
-		<h2>Overzicht fotografen</h2>
-		<h4>Fotograaf (foto’s/soorten)</h4>
+		<h2>{t}Overzicht fotografen{/t}</h2>
+		<h4>{t}Fotograaf (foto’s/soorten){/t}</h4>
 		<br>
 			<ol>
 			{foreach from=$photographers item=v}
@@ -36,7 +36,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 	
-	$('title').html('Overzicht fotografen - '+$('title').html());
+	$('title').html('{t}Overzicht fotografen{/t} - '+$('title').html());
 
 });
 </script>

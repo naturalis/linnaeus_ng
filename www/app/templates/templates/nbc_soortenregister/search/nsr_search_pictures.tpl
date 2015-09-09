@@ -23,7 +23,7 @@
 		<div>
 		
 			<h1 style="color:#FA7001;font-size:30px;font-weight:normal;margin-top:4px;border-bottom:1px solid #666666;margin-bottom:5px;">
-            	{if $search.header}{$search.header}{else}Foto's zoeken{/if}
+            	{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}
 			</h1>
 			
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
@@ -34,22 +34,22 @@
 			
 					<fieldset class="block">
 						<div class="formrow">
-							<label accesskey="g" for="name">Soortnaam</label>
+							<label accesskey="g" for="name">{t}Soortnaam{/t}</label>
 							<input type="text" class="field" value="{$search.name}" id="name" name="name" autocomplete="off">
 							<div id="name_suggestion" match="start" class="auto_complete" style="display: none;"></div>
 						</div>
 						<div class="formrow">
-							<label accesskey="g" for="group">Soortgroep</label>
+							<label accesskey="g" for="group">{t}Soortgroep{/t}</label>
 							<input type="text" size="60" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
 							<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 						</div>
 						<div class="formrow">
-							<label accesskey="g" for="photographer">Fotograaf</label>
+							<label accesskey="g" for="photographer">{t}Fotograaf{/t}</label>
 							<input type="text" size="60" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">
 							<div id="photographer_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 						</div>
 						<div class="formrow">
-							<label accesskey="g" for="validator">Validator</label>
+							<label accesskey="g" for="validator">{t}Validator{/t}</label>
 							<input type="text" size="60" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
 							<div id="validator_suggestion" match="like" class="auto_complete" style="display: none;"></div>
 						</div>
@@ -59,7 +59,7 @@
 	
 						<div class="spineBreak" style="width:510px">&nbsp;</div>
 		
-						<input type="submit" class="zoekknop" value="zoek">
+						<input type="submit" class="zoekknop" value="{t}zoek{/t}">
 					</fieldset>
 				</form>
 				</div>
@@ -73,8 +73,8 @@
                 <label for="" accesskey="g">{t}Resultaten sorteren op:{/t}</label>
                 <select name="sort">
                     <!-- option value="dateModified desc" selected="selected">Datum plaatsing</option -->
-                    <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>Wetenschappelijk naam</option>
-                    <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>Fotograaf</option>
+                    <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
+                    <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
                 </select>
             </div>
 
@@ -94,10 +94,10 @@
 						<h3 class="wetenschappelijkenaam"><i>{$v.name}</i></h3>
 						{/if}
 						<dl>
-							<dt>Foto</dt><dd>{$v.photographer}</dd>
-							<dt>Geplaatst op</dt><dd>{$v.meta_datum_plaatsing}</dd>
+							<dt>{t}Foto{/t}</dt><dd>{$v.photographer}</dd>
+							<dt>{t}Geplaatst op{/t}</dt><dd>{$v.meta_datum_plaatsing}</dd>
 						</dl>
-						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">Naar deze soort</a></div>
+						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{t}Naar deze soort{/t}</a></div>
 					</div>
 				{/foreach}
 			</div>

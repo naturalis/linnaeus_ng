@@ -1,5 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
+
 <p>
 	<form>
 		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam" autocomplete="off" />
@@ -55,6 +56,10 @@ $(document).ready(function()
 {
 
 	setAjaxTreeUrl('tree_ajax_interface.php');
+	
+	{if $session.admin.project.title}
+	setRootNodeLabel('{$session.admin.project.title|@escape}');
+	{/if}
 	
 	{if $tree}
 		$( "#"+container ).html( {$tree} );

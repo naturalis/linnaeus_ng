@@ -14,8 +14,8 @@
 
 	<div id="content">
 
-		<h2>Overzicht validatoren</h2>
-		<h4>Validator (foto’s/soorten)</h4>
+		<h2>{t}Overzicht validatoren{/t}</h2>
+		<h4>{t}Validator (foto’s/soorten){/t}</h4>
 		<br>
 			<ol>
 			{foreach from=$validators item=v}

@@ -10,7 +10,7 @@
       {foreach $datatypes as $datatype}
         <li>
         	<div>
-            	{$datatype.name}
+            	{if $datatype.name}{$datatype.name}{else}{$datatype.sysname}{/if}
 
                 {if $datatype.project_type_id}
                 <a class="edit" href="?action=remove&id={$datatype.project_type_id}">remove</a>
