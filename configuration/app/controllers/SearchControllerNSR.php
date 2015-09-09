@@ -1636,7 +1636,8 @@ class SearchControllerNSR extends SearchController
 				_grp_b.translation as group_name,
 				_grp_c.translation as group_description,
 				_grp_d.translation as group_all_link_text,
-				_grp.id as group_id
+				_grp.id as group_id,
+				_grp.show_show_all_link as group_show_show_all_link
 
 			from
 				%PRE%traits_traits _a
@@ -1722,6 +1723,7 @@ class SearchControllerNSR extends SearchController
 			$data[$trait['trait_group_id']]['name']=$trait['group_name'];
 			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
 			$data[$trait['trait_group_id']]['all_link_text']=$trait['group_all_link_text'];
+			$data[$trait['trait_group_id']]['show_show_all_link']=$trait['group_show_show_all_link'];
 			$data[$trait['trait_group_id']]['group_id']=$trait['group_id'];
 			$data[$trait['trait_group_id']]['data'][]=$trait;
 		}

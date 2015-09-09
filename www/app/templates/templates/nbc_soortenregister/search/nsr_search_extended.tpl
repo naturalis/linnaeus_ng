@@ -569,11 +569,13 @@ function submitSearchParams()
 						</tr>
 					{/if}
 					{/foreach}
+                    	{if $t.show_show_all_link}
                     	<tr>
                         	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">
                             {if $t.all_link_text}{$t.all_link_text}{else}{t _s1=$t.name}Alle taxa met %s tonen{/t}{/if}
                             </a></td>
                         </tr>
+                        {/if}
                     </table>
 				</div>
 				{/foreach}
