@@ -8,7 +8,7 @@
 	<div id="content" class="taxon-detail">
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
-					<h1>Fout opgetreden</h1>
+					<h1>{t}Fout opgetreden{/t}</h1>
 			</div>
 
 		</div>
@@ -16,7 +16,7 @@
 			{$message}
 		</p>	
 		<p>
-			<a href="/linnaeus_ng/app/views/search/nsr_search_extended.php">Opnieuw zoeken</a>
+			<a href="/linnaeus_ng/app/views/search/nsr_search_extended.php">{t}Opnieuw zoeken{/t}</a>
 		</p>	
 	</div>
 </div>

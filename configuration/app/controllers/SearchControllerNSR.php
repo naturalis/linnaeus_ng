@@ -37,6 +37,7 @@ class SearchControllerNSR extends SearchController
 		'media_meta',
 		'media_taxon',
 		'name_types',
+		'traits_groups',
 		'traits_traits',
 		'traits_values',
 		'traits_taxon_values',
@@ -153,16 +154,20 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
-
-		$this->traitGroupsToInclude=array(1);
 		
-		if (count($this->traitGroupsToInclude)>0)
+		$this->traitGroupsToInclude=$this->getTraitGroups();
+		
+		if (count((array)$this->traitGroupsToInclude)>0)
 		{
 			$search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
 			$search['trait_group']=$this->rHasVal('trait_group') ? $search['trait_group'] : null;
-
-			$traits=$this->getTraits($this->traitGroupsToInclude);
-
+			
+			$traits=array();
+			foreach((array)$this->traitGroupsToInclude as $val)
+			{
+				$traits=$traits+$this->getTraits($val['id']);
+			}
+			
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
@@ -1048,7 +1053,6 @@ class SearchControllerNSR extends SearchController
 					on _m.project_id=_c.project_id
 					and _m.id = _c.media_id
 					and _c.sys_label = 'beeldbankFotograaf'
-					and _c.language_id=".$this->getCurrentLanguageId()."
 				" : "" )."
 					
 			".(isset($validator) ? 
@@ -1578,9 +1582,41 @@ class SearchControllerNSR extends SearchController
 	
 	
 
-	private function getTraits($groups)
+	private function getTraitGroups()
 	{
-		if (empty($groups)) return;
+		return $this->models->TraitsGroups->freeQuery("
+			select
+				_grp.id,
+				_grp.parent_id,
+				_grp.sysname,
+				_grp_b.translation as group_name,
+				_grp_c.translation as group_description,
+				_grp.id as group_id
+
+			from
+				%PRE%traits_groups _grp
+
+			left join 
+				%PRE%text_translations _grp_b
+				on _grp.project_id=_grp_b.project_id
+				and _grp.name_tid=_grp_b.text_id
+				and _grp_b.language_id=". $this->getCurrentLanguageId() ."
+
+			left join 
+				%PRE%text_translations _grp_c
+				on _grp.project_id=_grp_c.project_id
+				and _grp.description_tid=_grp_c.text_id
+				and _grp_c.language_id=". $this->getCurrentLanguageId() ."
+
+			where
+				_grp.project_id=". $this->getCurrentProjectId()."
+			order by _grp.show_order, _grp_b.translation
+		");
+	}
+
+	private function getTraits( $group )
+	{
+		if ( empty( $group ) ) return;
 		
 		$r=$this->models->TraitsTraits->freeQuery("
 			select
@@ -1599,12 +1635,14 @@ class SearchControllerNSR extends SearchController
 				count(_v.id) as value_count,
 				_grp_b.translation as group_name,
 				_grp_c.translation as group_description,
-				_grp.id as group_id
+				_grp_d.translation as group_all_link_text,
+				_grp.id as group_id,
+				_grp.show_show_all_link as group_show_show_all_link
 
 			from
 				%PRE%traits_traits _a
 
-			left join 
+			right join 
 				%PRE%traits_groups _grp
 				on _a.project_id=_grp.project_id
 				and _a.trait_group_id=_grp.id
@@ -1620,6 +1658,12 @@ class SearchControllerNSR extends SearchController
 				on _grp.project_id=_grp_c.project_id
 				and _grp.description_tid=_grp_c.text_id
 				and _grp_c.language_id=". $this->getCurrentLanguageId() ."
+				
+			left join 
+				%PRE%text_translations _grp_d
+				on _grp.project_id=_grp_d.project_id
+				and _grp.all_link_text_tid=_grp_d.text_id
+				and _grp_d.language_id=". $this->getCurrentLanguageId() ."
 				
 			left join 
 				%PRE%text_translations _b
@@ -1659,9 +1703,16 @@ class SearchControllerNSR extends SearchController
 
 			where
 				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.trait_group_id in (".implode(",",$groups).")
-			group by _a.id
-			order by _a.show_order
+				and _a.trait_group_id 
+				and _grp.show_in_search=1
+				
+				" . ( is_array($group) ? " in (".implode(",",$group).") " : " = " . $group ) ."
+
+			group by
+				_a.id
+
+			order by
+				_a.show_order
 		");
 		
 		$data=array();
@@ -1671,6 +1722,8 @@ class SearchControllerNSR extends SearchController
 			$trait['values']=$this->getTraitgroupTraitValues($trait['id']);
 			$data[$trait['trait_group_id']]['name']=$trait['group_name'];
 			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
+			$data[$trait['trait_group_id']]['all_link_text']=$trait['group_all_link_text'];
+			$data[$trait['trait_group_id']]['show_show_all_link']=$trait['group_show_show_all_link'];
 			$data[$trait['trait_group_id']]['group_id']=$trait['group_id'];
 			$data[$trait['trait_group_id']]['data'][]=$trait;
 		}

@@ -17,6 +17,17 @@ function setHighlightNode(node)
 	highlightNodes.push(node);
 }
 
+function setRootNodeLabel(label)
+{
+	rootNodeLabel=label;
+}
+
+function getRootNodeLabel()
+{
+	return rootNodeLabel;
+}
+
+
 function shouldHighlightNode(node)
 {
 	for(var i=0;i<highlightNodes.length;i++)
@@ -108,7 +119,7 @@ function growbranches(data)
 		'<ul class="top">'+
 			'<li class="child">'+
 				(!activeNode ?
-					'<a href="#" onclick="buildtree(false);return false">'+(rootNodeLabel ? rootNodeLabel : data.node.label)+'</a>' :
+					'<a href="#" onclick="buildtree(false);return false">'+(getRootNodeLabel()!="" ? getRootNodeLabel() : data.node.label)+'</a>' :
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
 				(data.node.rank_label ? 

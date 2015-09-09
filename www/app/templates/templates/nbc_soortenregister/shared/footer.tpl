@@ -8,7 +8,7 @@
             © Naturalis 2005 - {$currdate.year}  -  <a href="http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html" title="Disclaimer">
             Colofon &amp; Disclaimer</a>
         </p>
-        <a href="#top" class="up">naar boven</a>
+        <a href="#top" class="up">{t}naar boven{/t}</a>
     </div>
 </div>
 

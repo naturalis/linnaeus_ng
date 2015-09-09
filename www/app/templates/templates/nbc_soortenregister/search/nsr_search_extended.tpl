@@ -380,8 +380,8 @@ function submitSearchParams()
 				<div class="formrow">
 				<div style="float:right;margin-top:3px;">
                 
-                    <a href="#" onclick="toggle_all_panels();return false;">alles in-/uitklappen</a>&nbsp;&nbsp;
-                    <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.&lt;/p&gt;');" class="link">hulp bij zoeken</span>
+                    <a href="#" onclick="toggle_all_panels();return false;">{t}alles in-/uitklappen{/t}</a>&nbsp;&nbsp;
+                    <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;{t}Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.{/t}&lt;/p&gt;');" class="link">{t}hulp bij zoeken{/t}</span>
 			    </div>
     
                 	<label
@@ -403,7 +403,7 @@ function submitSearchParams()
                     <br / -->
                     <p class="options-panel" id="presence-options-panel" style="display:none">
                         <select id="presenceStatusList" name="presenceStatusList" style="width:250px;margin-bottom:10px">
-                            <option value="">maak een keuze</option>
+                            <option value="">{t}maak een keuze{/t}</option>
                             {foreach from=$presence_statuses item=v}
                             <option 
                                 id="established{$v.id}" 
@@ -435,34 +435,34 @@ function submitSearchParams()
                     </label>
                     <table class="options-panel" id="multimedia-options-panel" style="display:none">
                     	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-images">Foto('s)</label></td>
+                        	<td class="traits-legend-cell"><label for="multimedia-images">{t}Foto('s){/t}</label></td>
                             <td>
                                 <select id="multimedia-images" style="width:250px;">
-                                    <option value="">maak een keuze</option>
-                                    <option value="images_on">met foto('s)</option>
-                                    <option value="images_off">zonder foto's</option>
+                                    <option value="">{t}maak een keuze{/t}</option>
+                                    <option value="images_on">{t}met foto('s){/t}</option>
+                                    <option value="images_off">{t}zonder foto's{/t}</option>
                                 </select>
                                 <input type="button" value=" > " onclick="addSearchParameter('multimedia-images');" />
 							</td>
 						</tr>
                     	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-distribution">Verspreidingskaart(en)</label></td>
+                        	<td class="traits-legend-cell"><label for="multimedia-distribution">{t}Verspreidingskaart(en){/t}</label></td>
                             <td>
                                 <select id="multimedia-distribution" style="width:250px;">
-                                    <option value="">maak een keuze</option>
-                                    <option value="distribution_on">met verspreidingskaart(en)</option>
-                                    <option value="distribution_off">zonder verspreidingskaarten</option>
+                                    <option value="">{t}maak een keuze{/t}</option>
+                                    <option value="distribution_on">{t}met verspreidingskaart(en){/t}</option>
+                                    <option value="distribution_off">{t}zonder verspreidingskaarten{/t}</option>
                                 </select>
                                 <input type="button" value=" > " onclick="addSearchParameter('multimedia-distribution');" />
 							</td>
 						</tr>
                     	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-trend">Trendgrafiek</label></td>
+                        	<td class="traits-legend-cell"><label for="multimedia-trend">{t}Trendgrafiek{/t}</label></td>
                             <td>
                                 <select id="multimedia-trend" style="width:250px;">
-                                    <option value="">maak een keuze</option>
-                                    <option value="trend_on">met trendgrafiek</option>
-                                    <option value="trend_off">zonder trendgrafiek</option>
+                                    <option value="">{t}maak een keuze{/t}</option>
+                                    <option value="trend_on">{t}met trendgrafiek{/t}</option>
+                                    <option value="trend_off">{t}zonder trendgrafiek{/t}</option>
                                 </select>
                                 <input type="button" value=" > " onclick="addSearchParameter('multimedia-trend');" />
 							</td>
@@ -488,14 +488,14 @@ function submitSearchParams()
                         class="help">&nbsp;</a>
                     <p class="options-panel" id="dna-options-panel" style="display:none">
                         <select id="dna-options" name="dna-options" style="width:250px;">
-                            <option value="">maak een keuze</option>
+                            <option value="">{t}maak een keuze{/t}</option>
                             <option value="dna">{t}met een of meer exemplaren verzameld{/t}</option>
                             <option value="dna_insuff">{t}minder dan drie exemplaren verzameld{/t}</option>
                         </select>
                         <input type="button" value=" > " onclick="addSearchParameter('dna-options');" />
                     </p>
 				</div>
-    
+
 				{foreach from=$traits item=t key=k1}
 				<div class="formrow">
 					<label
@@ -522,7 +522,7 @@ function submitSearchParams()
                             <td>
                                 {if $d.type_allow_values==1 && $d.value_count>0}
                                 <select trait-id="{$d.id}" id="trait-{$k1}{$k2}" style="width:250px;">
-                                    <option value="">maak een keuze</option>
+                                    <option value="">{t}maak een keuze{/t}</option>
 	                                {foreach from=$d.values item=v}
                                     <option value="{$v.id}">{$v.string_value}</option>
     	                            {/foreach}
@@ -569,9 +569,13 @@ function submitSearchParams()
 						</tr>
 					{/if}
 					{/foreach}
+                    	{if $t.show_show_all_link}
                     	<tr>
-                        	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">Taxa met exotenpaspoort tonen</a></td>
+                        	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">
+                            {if $t.all_link_text}{$t.all_link_text}{else}{t _s1=$t.name}Alle taxa met %s tonen{/t}{/if}
+                            </a></td>
                         </tr>
+                        {/if}
                     </table>
 				</div>
 				{/foreach}
@@ -622,7 +626,6 @@ function submitSearchParams()
 		</div>
         
  		</form>
-
 
 		{assign var=pgnEntityNames value=['soort (of onderliggend taxon)','soorten (en onderliggende taxa)']}
 		{assign var=pgnResultCount value=$results.count}

@@ -13,7 +13,7 @@
 		<div id="results">
 			<p>
 				<h2>
-				Gezocht op "{$search.search}": <span id="resultcount-header">{$results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].numOfResults}</span>
+				{t}Gezocht op{/t} "{$search.search}": <span id="resultcount-header">{$results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].numOfResults}</span>
 				</h2>
 			</p>
 			<p>
@@ -29,7 +29,7 @@
 					{/foreach}
 				</ol>
 				{else}
-				Niets gevonden.
+				{t}Niets gevonden.{/t}
 				{/if}
 			</p>
 		</div>
