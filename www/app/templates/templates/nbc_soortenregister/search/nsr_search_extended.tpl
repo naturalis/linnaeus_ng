@@ -495,7 +495,7 @@ function submitSearchParams()
                         <input type="button" value=" > " onclick="addSearchParameter('dna-options');" />
                     </p>
 				</div>
-    
+
 				{foreach from=$traits item=t key=k1}
 				<div class="formrow">
 					<label
@@ -570,7 +570,9 @@ function submitSearchParams()
 					{/if}
 					{/foreach}
                     	<tr>
-                        	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">{t}Taxa met exotenpaspoort tonen{/t}</a></td>
+                        	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">
+                            {if $t.all_link_text}{$t.all_link_text}{else}{t _s1=$t.name}Alle taxa met %s tonen{/t}{/if}
+                            </a></td>
                         </tr>
                     </table>
 				</div>

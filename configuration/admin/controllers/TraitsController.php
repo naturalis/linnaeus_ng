@@ -131,6 +131,7 @@ class TraitsController extends Controller
 
 		if (isset($r['name_tid'])) $r['names']=$this->getTextTranslations(array('text_id'=>$r['name_tid']));
 		if (isset($r['description_tid'])) $r['descriptions']=$this->getTextTranslations(array('text_id'=>$r['description_tid']));
+		if (isset($r['all_link_text_tid'])) $r['all_link_texts']=$this->getTextTranslations(array('text_id'=>$r['all_link_text_tid']));
 		if (isset($r['id'])) $r['groups']=$this->getTraitgroups(array('parent'=>$r['id'],'level'=>0,'stop_level'=>0));
 		if (isset($r['id'])) $r['traits']=$this->getTraitgroupTraits($r['id']);
 		if (isset($r['parent_id'])) $r['parent']=$this->getTraitgroup($r['parent_id']);
