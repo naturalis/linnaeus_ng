@@ -128,10 +128,10 @@ class NsrTaxonController extends NsrController
 					$d=$this->getReference($data['name_reference_id']);
 					$texts['name_reference']=$d['label'];
 				}
-				if (isset($data['dutch_name_reference_id']))
+				if (isset($data['main_language_name_reference_id']))
 				{
-					$d=$this->getReference($data['dutch_name_reference_id']);
-					$texts['dutch_name_reference']=$d['label'];
+					$d=$this->getReference($data['main_language_name_reference_id']);
+					$texts['main_language_name_reference']=$d['label'];
 				}
 				if (isset($data['presence_reference_id']))
 				{
@@ -160,6 +160,10 @@ class NsrTaxonController extends NsrController
 
 		$this->smarty->assign('name_type_id',$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']);
 		$this->smarty->assign('name_language_id',LANGUAGE_ID_SCIENTIFIC);
+		$this->smarty->assign('main_language_name_language_id',$this->getDefaultProjectLanguage());
+
+		$this->smarty->assign('main_language_name_header',$this->getDefaultProjectLanguage());
+
 		$this->smarty->assign('ranks',$this->newGetProjectRanks());
 		$this->smarty->assign('statuses',$this->getStatuses());
 		$this->smarty->assign('habitats',$this->getHabitats());
@@ -347,6 +351,7 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('nametypes',$this->getNameTypes());
 			$this->smarty->assign('languages',$this->getLanguages());
 			$this->smarty->assign('actors',$this->getActors());
+			$this->smarty->assign('defaultprojectlanguage',$this->getDefaultProjectLanguage());
 		}
 
     }
@@ -550,8 +555,8 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'expert_lookup') ||
 			$this->rHasVal('action', 'name_expert_id') ||
 			$this->rHasVal('action', 'name_organisation_id') ||
-			$this->rHasVal('action', 'dutch_name_expert_id') ||
-			$this->rHasVal('action', 'dutch_name_organisation_id') ||
+			$this->rHasVal('action', 'main_language_name_expert_id') ||
+			$this->rHasVal('action', 'main_language_name_organisation_id') ||
 			$this->rHasVal('action', 'presence_expert_id') ||
 			$this->rHasVal('action', 'presence_organisation_id')
 		)
@@ -989,40 +994,28 @@ class NsrTaxonController extends NsrController
 
 	private function getLanguages()
 	{
-        $used=$this->models->Names->freeQuery("
-				select count(id) as `count`, language_id
-				from %PRE%names
-				where project_id=".$this->getCurrentProjectId()."
-				group by language_id
-				order by `count` asc
-		");
-		
-		$stuff=null;
-		foreach((array)$used as $key => $val)
-		{
-			$stuff .= "when _c.id = ".$val['language_id']." then ".($key+1)."\n";
-		}
-		
-		if (!empty($stuff))
-		{
-			$stuff = ", case ".$stuff." else 0 end as sort_criterium\n";
-		}
-
         $languages=$this->models->Language->freeQuery("
 			select
 				_c.id,
 				_c.language,
-				ifnull(_d.label,_c.language) as label
-				".$stuff."
+				ifnull(_d.label,_c.language) as label,
+				case
+					when _c.id= " . LANGUAGE_ID_SCIENTIFIC. " then 99
+					when _c.id= " . $this->getDefaultProjectLanguage() . " then 98
+					when _c.id= " . LANGUAGE_ID_DUTCH . " then 97
+					when _c.id= " . LANGUAGE_ID_ENGLISH . " then 97
+					else 0 
+				end as sort_criterium
+
 			from %PRE%languages _c
 
 			left join %PRE%labels_languages _d
 				on _c.id=_d.language_id
 				and _d.project_id = ".$this->getCurrentProjectId()."
 				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-				order by ".(!empty($stuff) ? "sort_criterium desc, " : "")."label asc
+				order by sort_criterium desc, label asc
 			");
-
+			
 		return $languages;
 	}
 
@@ -2027,6 +2020,7 @@ class NsrTaxonController extends NsrController
 	private function saveDutchName()
 	{
 		$name=$this->rGetVal('dutch_name');
+		$language_id=$this->rHasVal('main_language_name_language_id') ? $this->rGetVal('main_language_name_language_id') : LANGUAGECODE_DUTCH;
 
 		if (!isset($name['new'])) return;
 
@@ -2034,7 +2028,7 @@ class NsrTaxonController extends NsrController
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $this->getConceptId(),
-				'language_id' => LANGUAGECODE_DUTCH,
+				'language_id' => $language_id,
 				'type_id' => $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 				'name' => trim($name['new'])
 			));
@@ -2047,25 +2041,25 @@ class NsrTaxonController extends NsrController
 			$newname=$this->getName(array('id'=>$this->getNameId()));
 			$this->logNsrChange(array('after'=>$newname,'note'=>'new dutch name '.$newname['name']));
 
-			if ($this->rHasVar('dutch_name_reference_id'))
+			if ($this->rHasVar('main_language_name_reference_id'))
 			{
-				if (!$this->updateNameReferenceId($this->rGetVal('dutch_name_reference_id')))
+				if (!$this->updateNameReferenceId($this->rGetVal('main_language_name_reference_id')))
 				{
 					$this->addError('Nederlandse naam: referentie niet opgeslagen.');
 				}
 			}
 	
-			if ($this->rHasVar('dutch_name_expert_id'))
+			if ($this->rHasVar('main_language_name_expert_id'))
 			{
-				if (!$this->updateNameExpertId($this->rGetVal('dutch_name_expert_id')))
+				if (!$this->updateNameExpertId($this->rGetVal('main_language_name_expert_id')))
 				{
 					$this->addError('Nederlandse naam: expert niet opgeslagen.');
 				}
 			}
 	
-			if ($this->rHasVar('dutch_name_organisation_id'))
+			if ($this->rHasVar('main_language_name_organisation_id'))
 			{
-				if (!$this->updateNameOrganisationId($this->rGetVal('dutch_name_organisation_id')))
+				if (!$this->updateNameOrganisationId($this->rGetVal('main_language_name_organisation_id')))
 				{
 					$this->addError('Nederlandse naam: organisatie niet opgeslagen.');
 				}

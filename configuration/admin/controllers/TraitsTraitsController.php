@@ -409,6 +409,7 @@ class TraitsTraitsController extends TraitsController
 		$all_link_texts=isset($p['all_link_texts']) ? $p['all_link_texts'] : null;
 		$show_in_search=isset($p['show_in_search']) && in_array($p['show_in_search'],array('0','1'))? $p['show_in_search'] : null;
 		$show_show_all_link=isset($p['show_show_all_link']) && in_array($p['show_show_all_link'],array('0','1'))? $p['show_show_all_link'] : null;
+		$help_link_url=!empty($p['help_link_url']) ? $p['help_link_url'] : 'null';
 
 		if (empty($sysname))
 			return false;
@@ -419,11 +420,11 @@ class TraitsTraitsController extends TraitsController
 			'parent_id'=>mysql_real_escape_string($parent_id),
 			'sysname'=>mysql_real_escape_string($sysname),
 			'show_in_search'=>$show_in_search,
-			'show_show_all_link'=>$show_show_all_link
+			'show_show_all_link'=>$show_show_all_link,
+			'help_link_url'=>mysql_real_escape_string($help_link_url)
 		));
-		
+
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
-		
 
 		$textids=$this->storeTranslations(
 			array(

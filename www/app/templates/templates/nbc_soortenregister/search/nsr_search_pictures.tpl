@@ -124,7 +124,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 	
-	$('title').html('Foto\'s zoeken - '+$('title').html());
+	$('title').html("{t}Foto's zoeken{/t} - "+$('title').html());
 
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({

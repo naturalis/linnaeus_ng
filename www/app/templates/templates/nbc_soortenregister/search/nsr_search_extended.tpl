@@ -469,7 +469,9 @@ function submitSearchParams()
 						</tr>
 					</table>
 				</div>
-                        
+                
+                
+                {if !$suppressDnaBarcodes}
                         
 				<div class="formrow">
                 	<label 
@@ -495,6 +497,8 @@ function submitSearchParams()
                         <input type="button" value=" > " onclick="addSearchParameter('dna-options');" />
                     </p>
 				</div>
+                
+                {/if}
 
 				{foreach from=$traits item=t key=k1}
 				<div class="formrow">
@@ -507,7 +511,10 @@ function submitSearchParams()
 						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 						<strong>{$t.name}</strong>
 					</label>&nbsp;
-					<a href="http://www.nederlandsesoorten.nl/content/exotenpaspoort" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
+                    
+                    {if $t.help_link_url}
+					<a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
+                    {/if}
 					
                     <table class="options-panel" id="traits{$k1}-options" style="display:none">
                     {if $t.description}
@@ -626,8 +633,10 @@ function submitSearchParams()
 		</div>
         
  		</form>
+        {capture A}{t}soort (of onderliggend taxon){/t}{/capture}
+        {capture B}{t}soorten (en onderliggende taxa){/t}{/capture}
 
-		{assign var=pgnEntityNames value=['{t}soort (of onderliggend taxon){/t}','{t}soorten (en onderliggende taxa){/t}']}
+		{assign var=pgnEntityNames value=[$smarty.capture.A,$smarty.capture.B]}
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
 		{assign var=pgnCurrPage value=$search.page}
