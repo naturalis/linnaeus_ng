@@ -119,7 +119,7 @@ class RdfController extends Controller
 		$predicateTranslations=array(
 			24 => array(
 				PREDICATE_VALID_NAME=>'geldige naam',
-				PREDICATE_PREFERRED_NAME=>'%se voorkeursnaam', // language table should have an extra adjective-column
+				PREDICATE_PREFERRED_NAME=>'%se voorkeursnaam', // language table should have an extra adjective-column REFAC2015
 				PREDICATE_HOMONYM=>'homoniem',
 				PREDICATE_BASIONYM=>'basioniem',
 				PREDICATE_SYNONYM=>'synoniem',
@@ -130,7 +130,7 @@ class RdfController extends Controller
 			),
 			26 => array(
 				PREDICATE_VALID_NAME=>'valid name',
-				PREDICATE_PREFERRED_NAME=>'%s name', // language table should have an extra adjective-column
+				PREDICATE_PREFERRED_NAME=>'preferred %s name', // language table should have an extra adjective-column REFAC2015
 				PREDICATE_HOMONYM=>'homonym',
 				PREDICATE_BASIONYM=>'basionym',
 				PREDICATE_SYNONYM=>'synonym',
