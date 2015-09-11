@@ -484,7 +484,7 @@ function submitSearchParams()
                     </label>&nbsp;
                     <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" 
                         target="_blank" 
-                        title="klik voor help over dit onderdeel" 
+                        title="{t}klik voor help over dit onderdeel{/t}" 
                         class="help">&nbsp;</a>
                     <p class="options-panel" id="dna-options-panel" style="display:none">
                         <select id="dna-options" name="dna-options" style="width:250px;">
@@ -627,7 +627,7 @@ function submitSearchParams()
         
  		</form>
 
-		{assign var=pgnEntityNames value=['soort (of onderliggend taxon)','soorten (en onderliggende taxa)']}
+		{assign var=pgnEntityNames value=['{t}soort (of onderliggend taxon){/t}','{t}soorten (en onderliggende taxa){/t}']}
 		{assign var=pgnResultCount value=$results.count}
 		{assign var=pgnResultsPerPage value=$results.perpage}
 		{assign var=pgnCurrPage value=$search.page}
@@ -729,7 +729,7 @@ $(document).ready(function()
 	{/if}
 
 
-	$('title').html('Uitgebreid zoeken naar soorten - '+$('title').html());
+	$('title').html('{t}Uitgebreid zoeken naar soorten{/t} - '+$('title').html());
 
 	bindKeys();
 
