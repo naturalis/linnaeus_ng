@@ -140,9 +140,13 @@ class SpeciesControllerNSR extends SpeciesController
 						);
 				}
 				
+				$ext_name = $this->rHasVal('name') ? $this->rGetVal('name') : $thuis->translate("Kenmerken");
+				$ext_template = $this->rHasVal('name') ? '_tab_ext_' . $this->rGetVal('name') . '.tpl' : '_tab_ext_generic.tpl';
+				
 				$this->smarty->assign( 'passport_content', $passport_content );
-				$this->smarty->assign( 'ext_template', '_tab_exoten.tpl' ); // --> this should become dependent on the actual called source
+				$this->smarty->assign( 'ext_template', $ext_template );
 				$this->smarty->assign( 'ext_tab', $ext_tab );
+				$this->smarty->assign( 'ext_name', ucfirst($ext_name) );
 				
 			}
 			else

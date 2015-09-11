@@ -51,6 +51,8 @@ class SearchControllerNSR extends SearchController
 	public $cssToLoad = array();
 
 	public $jsToLoad = array();
+	
+	private $_suppressTab_DNA_BARCODES=false;
 
     public function __construct ()
     {
@@ -66,6 +68,8 @@ class SearchControllerNSR extends SearchController
     private function initialise()
     {
 		$this->NSRFunctions=new NSRFunctionsController;
+
+		$this->_suppressTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
 
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
@@ -181,6 +185,8 @@ class SearchControllerNSR extends SearchController
 
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
+		$this->smarty->assign('suppressDnaBarcodes',$this->_suppressTab_DNA_BARCODES);
+		
         $this->printPage($template);
     }
 
@@ -1637,7 +1643,8 @@ class SearchControllerNSR extends SearchController
 				_grp_c.translation as group_description,
 				_grp_d.translation as group_all_link_text,
 				_grp.id as group_id,
-				_grp.show_show_all_link as group_show_show_all_link
+				_grp.show_show_all_link as group_show_show_all_link,
+				_grp.help_link_url as group_help_link_url
 
 			from
 				%PRE%traits_traits _a
@@ -1724,6 +1731,7 @@ class SearchControllerNSR extends SearchController
 			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
 			$data[$trait['trait_group_id']]['all_link_text']=$trait['group_all_link_text'];
 			$data[$trait['trait_group_id']]['show_show_all_link']=$trait['group_show_show_all_link'];
+			$data[$trait['trait_group_id']]['help_link_url']=$trait['group_help_link_url'];
 			$data[$trait['trait_group_id']]['group_id']=$trait['group_id'];
 			$data[$trait['trait_group_id']]['data'][]=$trait;
 		}

@@ -73,7 +73,7 @@ class ProjectsController extends Controller
 		array('species_suppress_autotab_classification','bool',1,'suppress automatically generated tab "classification" in runtime'),
 		array('species_suppress_autotab_literature','bool',1,'suppress automatically generated tab "literature" in runtime'),
 		array('species_suppress_autotab_media','bool',1,'suppress automatically generated tab "media" in runtime'),
-		array('species_suppress_autotab_dna_barcodes','bool',1,'suppress automatically generated tab "dna_barcodes" in runtime'),
+		array('species_suppress_autotab_dna_barcodes','bool',1,'suppress automatically generated tab "dna_barcodes" in runtime (and in extensive search)'),
 
 		array('literature2_import_match_threshold','int',75),
 

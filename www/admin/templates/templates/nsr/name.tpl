@@ -119,7 +119,11 @@ $(document).ready(function()
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
 
 	{if $newname}
-	$("#name_language_id").val({$smarty.const.LANGUAGE_ID_DUTCH}).trigger('change');
+	
+	
+	
+	
+	$("#name_language_id").val({$defaultprojectlanguage}).trigger('change');
 	{/if}
 
 	$('th[title]').each(function(key,value)
