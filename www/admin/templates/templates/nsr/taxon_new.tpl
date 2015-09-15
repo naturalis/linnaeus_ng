@@ -132,7 +132,6 @@
         	<th>naam:</th>
             <td>
 				<input type="text" id="main_language_name" value="" onchange="" />
-				<input type="hidden" id="main_language_name_language_id" value="{$main_language_name_language_id}" />
 			</td>
 		</tr>
 
@@ -310,6 +309,7 @@ $(document).ready(function()
 
 	values.push( { name:'name_type_id',current:'',new:{$name_type_id},mandatory:true } );
 	values.push( { name:'name_language_id',current:'',new:{$name_language_id},mandatory:true } );
+	values.push( { name:'main_language_name_language_id',current:'',new:{$main_language_name_language_id},mandatory:true } );
 
 	$('[havedroplist=true]').each(function()
 	{
