@@ -13,7 +13,7 @@ var searchdata=
 		buffer_keys: false,
 		url: "ajax_interface.php"
 	};
-
+var main_language_display_label="nederlandse naam";
 function toggleedit(ele)
 {
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
@@ -258,11 +258,11 @@ function checkDutchName()
 {
 	var buffer=[];
 
-	if ($('#dutch_name').val() && $('#dutch_name').val().length!=0)
+	if ($('#main_language_name').val() && $('#main_language_name').val().length!=0)
 	{
-		if ($('#dutch_name_expert_id :selected').val().length==0) buffer.push("Nederlandse naam: expert");
-		if ($('#dutch_name_organisation_id :selected').val().length==0) buffer.push("Nederlandse naam: organisatie");
-		if ($('#dutch_name_reference_id').val().length==0) buffer.push("Nederlandse naam: publicatie");
+		if ($('#main_language_name_expert_id :selected').val().length==0) buffer.push(main_language_display_label + ": expert");
+		if ($('#main_language_name_organisation_id :selected').val().length==0) buffer.push(main_language_display_label + ": organisatie");
+		if ($('#main_language_name_reference_id').val().length==0) buffer.push(main_language_display_label + ": publicatie");
 	}
 
 	return buffer;
@@ -666,8 +666,8 @@ function buildDropList(data,variable)
 		{
 			var t=data.results[i];
 	
-			if (variable=='dutch_name_organisation_id' && t.is_company!='1') continue;
-			if (variable=='dutch_name_expert_id' && t.is_company=='1') continue;
+			if (variable=='main_language_name_organisation_id' && t.is_company!='1') continue;
+			if (variable=='main_language_name_expert_id' && t.is_company=='1') continue;
 			if (variable=='presence_organisation_id' && t.is_company!='1') continue;
 			if (variable=='presence_expert_id' && t.is_company=='1') continue;
 			if (variable=='name_organisation_id' && t.is_company!='1') continue;

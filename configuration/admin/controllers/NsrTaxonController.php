@@ -959,7 +959,7 @@ class NsrTaxonController extends NsrController
 		$data=$this->models->PresenceTaxa->freeQuery(
 			"select
             	_a.id,
-            	_b.label
+            	ifnull(_b.label,_a.sys_label) as label
 
 			from %PRE%habitats _a
 
@@ -970,7 +970,7 @@ class NsrTaxonController extends NsrController
 
 			where _a.project_id = ".$this->getCurrentProjectId()
 		);	
-
+		
 		return $data;
 	}
 
