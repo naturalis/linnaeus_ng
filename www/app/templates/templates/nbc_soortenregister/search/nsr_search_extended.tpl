@@ -394,13 +394,9 @@ function submitSearchParams()
 						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 	                    <strong>{t}Status voorkomen{/t}</strong>
                     </label>&nbsp;
-                    <a href="http://www.nederlandsesoorten.nl/node/15" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
-                    
-					<!-- label for="presenceStatusList">
-						<strong>{t}Status voorkomen{/t}</strong>&nbsp;
-                        <a href="http://www.nederlandsesoorten.nl/node/15" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
-					</label>
-                    <br / -->
+                    {if $search_presence_help_url}
+                    <a href="{$search_presence_help_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
+                    {/if}
                     <p class="options-panel" id="presence-options-panel" style="display:none">
                         <select id="presenceStatusList" name="presenceStatusList" style="width:250px;margin-bottom:10px">
                             <option value="">{t}maak een keuze{/t}</option>
