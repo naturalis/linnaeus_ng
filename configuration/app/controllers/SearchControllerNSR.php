@@ -69,12 +69,15 @@ class SearchControllerNSR extends SearchController
     {
 		$this->NSRFunctions=new NSRFunctionsController;
 
-		$this->_suppressTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
+		$this->_suppressTab_DNA_BARCODES = $this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
+		$this->_search_presence_help_url = $this->getSetting( "nbc_search_presence_help_url" );
 
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
 		$this->_taxon_base_url_images_thumb_s = $this->getSetting( "taxon_base_url_images_thumb_s", "http://images.naturalis.nl/120x75/" );
+
+
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
@@ -186,6 +189,8 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
 		$this->smarty->assign('suppressDnaBarcodes',$this->_suppressTab_DNA_BARCODES);
+		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
+	
 		
         $this->printPage($template);
     }
