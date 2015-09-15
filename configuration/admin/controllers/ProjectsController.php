@@ -39,6 +39,7 @@ class ProjectsController extends Controller
         )
     );
 
+	// REFAC2015 --> most need to go to module settings
 	private $_availableProjectSettings = array(
 		array('keytype','l2 / lng','lng','single access-key type'),
 		array('maptype','l2 / lng','l2','map type: L2 or Google'),
@@ -80,6 +81,8 @@ class ProjectsController extends Controller
 		array('include_overview_in_media','bool',0,'show overview image in species media'),
 		array('app_search_result_sort','alpha / token_count','token_count','variable to sort search results by'),
 		array('admin_species_allow_embedded_images','bool',1,'id.'),
+		array('nbc_search_presence_help_url','[URL]',null,'id.'),
+		
 
 
 	);
