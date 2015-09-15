@@ -126,20 +126,12 @@
 		<tr>
 			<th></th>
 			<td>
-            <i>
-            	{* REFAC2015 *}
-                {if $main_language_name_language_id==$smarty.const.LANGUAGE_ID_ENGLISH}
-                engelse naam
-                {else}
-                nederlandse naam
-                {/if}
-            
-            </i></td>
+            <i><span id="main_language_display"></span></i></td>
 		</tr>
 		<tr>
         	<th>naam:</th>
             <td>
-				<input type="text" id="dutch_name" value="" onchange="" />
+				<input type="text" id="main_language_name" value="" onchange="" />
 				<input type="hidden" id="main_language_name_language_id" value="{$main_language_name_language_id}" />
 			</td>
 		</tr>
@@ -269,6 +261,14 @@
 <script>
 $(document).ready(function()
 {
+	{* REFAC2015 *}
+	{if $main_language_name_language_id==$smarty.const.LANGUAGE_ID_ENGLISH}
+	main_language_display_label='Engelse naam';
+	{else}
+	main_language_display_label='Nederlandse naam';
+	{/if}
+	
+	$('#main_language_display').html( main_language_display_label.toLowerCase() );
 
 	$('#name_uninomial').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
 	$('#name_specific_epithet').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );

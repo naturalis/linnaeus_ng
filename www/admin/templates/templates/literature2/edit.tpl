@@ -79,7 +79,7 @@
 			<select id="publication_type" name="publication_type">
 				<option value="" {if $reference.publication_type==''} selected="selected"{/if}>-</option>
 			{foreach from=$publicationTypes item=v}
-				<option value="{$v.publication_type}" {if $v.publication_type==$reference.publication_type} selected="selected"{/if}>{$v.publication_type}</option>
+				<option value="{$v}" {if $v==$reference.publication_type} selected="selected"{/if}>{$v}</option>
 			{/foreach}
 			</select> 
 		</td>
