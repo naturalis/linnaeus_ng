@@ -2023,9 +2023,18 @@ class NsrTaxonController extends NsrController
 	private function saveMainLanguageCommonName()
 	{
 		$name=$this->rGetVal('main_language_name');
-		$language_id=$this->rHasVal('main_language_name_language_id') ? $this->rGetVal('main_language_name_language_id') : LANGUAGECODE_DUTCH;
 
 		if (!isset($name['new'])) return;
+		
+		if ($this->rHasVal('main_language_name_language_id'))
+		{
+			$d=$this->rGetVal('main_language_name_language_id');
+			$language_id=$d['new'];
+		}
+		else
+		{
+			$language_id=LANGUAGECODE_DUTCH;
+		}
 
 		$d=$this->models->Names->save(
 			array(
