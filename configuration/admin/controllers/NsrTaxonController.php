@@ -10,6 +10,9 @@
 	(betreft invoerveld in taxon en taxon_new, plus de verwerking van de
 	waarde in updateConcept() -> updateConceptIsIndigeous())
 	
+	
+	REFAC2015: need language names adjectives throughout! search for
+	"Nederlandse" and replace with an adjectivized resolved language_id
 
 */
 
@@ -106,8 +109,8 @@ class NsrTaxonController extends NsrController
 			if ( $this->getConceptId() )
 			{
 				$this->saveName();
-				$this->checkDutchName();
-				$this->saveDutchName();
+				$this->checkMainLanguageCommonName();
+				$this->saveMainLanguageCommonName();
 				$this->saveTaxonParentage( $this->getConceptId() );
 				
 				$this->redirect('taxon.php?id='.$this->getConceptId());
@@ -1986,9 +1989,9 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-	private function checkDutchName()
+	private function checkMainLanguageCommonName()
 	{
-		$name=$this->rGetVal('dutch_name');
+		$name=$this->rGetVal('main_language_name');
 
 		if (!isset($name['new'])) return;
 
@@ -2008,7 +2011,7 @@ class NsrTaxonController extends NsrController
 
 		if ($d)
 		{
-			$this->setMessage('Nederlandse naam bestaat al (naam wel opgeslagen):');
+			$this->setMessage(sprintf('Nederlandse "%s" bestaat al (naam wel opgeslagen):'),$name['new']);
 			foreach((array)$d as $val)
 			{
 				$this->setMessage('<a href="name.php?id='.$val['id'].'">Naam van: '.$val['taxon'].'</a>');
@@ -2017,9 +2020,9 @@ class NsrTaxonController extends NsrController
 
 	}
 
-	private function saveDutchName()
+	private function saveMainLanguageCommonName()
 	{
-		$name=$this->rGetVal('dutch_name');
+		$name=$this->rGetVal('main_language_name');
 		$language_id=$this->rHasVal('main_language_name_language_id') ? $this->rGetVal('main_language_name_language_id') : LANGUAGECODE_DUTCH;
 
 		if (!isset($name['new'])) return;
@@ -2039,7 +2042,7 @@ class NsrTaxonController extends NsrController
 			$this->addMessage('Nederlandse naam aangemaakt.');
 
 			$newname=$this->getName(array('id'=>$this->getNameId()));
-			$this->logNsrChange(array('after'=>$newname,'note'=>'new dutch name '.$newname['name']));
+			$this->logNsrChange(array('after'=>$newname,'note'=>'new main language name '.$newname['name']));
 
 			if ($this->rHasVar('main_language_name_reference_id'))
 			{
@@ -2393,7 +2396,7 @@ class NsrTaxonController extends NsrController
 			$this->addWarning("Aan dit concept is geen wetenschappelijke naam gekoppeld.");
 		}
 		
-		if (!$this->checkIfConceptRetainsDutchName($concept['id']) && $concept['base_rank']>=SPECIES_RANK_ID)
+		if (!$this->checkIfConceptRetainsNameInMainProjectLanguage($concept['id']) && $concept['base_rank']>=SPECIES_RANK_ID)
 		{
 			$this->addWarning("Aan dit concept is geen Nederlandse voorkeursnaam gekoppeld.");
 		}
@@ -2448,7 +2451,7 @@ class NsrTaxonController extends NsrController
 		return count((array)$d)>0;
 	}
 
-	private function checkIfConceptRetainsDutchName($concept)
+	private function checkIfConceptRetainsNameInMainProjectLanguage($concept)
 	{
 		$d=$this->getName(array(
 			'taxon_id'=>$concept,
