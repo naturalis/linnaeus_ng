@@ -36,6 +36,23 @@ class Literature2Controller extends Controller
 		);
 
 	private $referenceId=null;
+	
+	private $publicationTypes=array(
+		'Artikel',
+		'Boek',
+		'Boek (deel)',
+		'Database',
+		'Hoofdstuk',
+		'Literatuur',
+		'Manuscript',
+		'Persbericht',
+		'Persoonlijke mededeling',
+		'Rapport',
+		'Serie',
+		'Tijdschrift',
+		'Verslag',
+		'Website'
+	);	
 
 	private $lit2Columns=
 		array(
@@ -1594,8 +1611,7 @@ class Literature2Controller extends Controller
 
     private function getPublicationTypes()
     {
-		return
-			$this->models->Literature2->freeQuery("
+		$d=$this->models->Literature2->freeQuery("
 				select 
 					distinct publication_type 
 				from 
@@ -1605,6 +1621,13 @@ class Literature2Controller extends Controller
 				order by 
 					publication_type
 			");
+
+		foreach((array)$d as $val)
+		{
+			$this->publicationTypes[]=$val['publication_type'];
+		}
+		
+		return array_unique($this->publicationTypes);
 	}
 
 
