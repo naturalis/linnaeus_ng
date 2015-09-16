@@ -50,7 +50,6 @@ class Literature2Controller extends Controller
 		'Rapport',
 		'Serie',
 		'Tijdschrift',
-		'Verslag',
 		'Website'
 	);	
 
@@ -1627,10 +1626,9 @@ class Literature2Controller extends Controller
 			$this->publicationTypes[]=$val['publication_type'];
 		}
 
-		$x=array_unique($this->publicationTypes);
-		array_walk($x,function(&$a){ $a=$this->translate($a);});
-		
-		return $x;
+		array_walk($this->publicationTypes,function(&$a){ $a=$this->translate($a);});
+		$this->publicationTypes=array_unique($this->publicationTypes);
+		return $this->publicationTypes;
 	}
 
 
