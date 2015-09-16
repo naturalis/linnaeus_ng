@@ -1626,8 +1626,11 @@ class Literature2Controller extends Controller
 		{
 			$this->publicationTypes[]=$val['publication_type'];
 		}
+
+		$x=array_unique($this->publicationTypes);
+		array_walk($x,function(&$a){ $a=$this->translate($a);q($a);});
 		
-		return array_unique($this->publicationTypes);
+		return $x;
 	}
 
 
