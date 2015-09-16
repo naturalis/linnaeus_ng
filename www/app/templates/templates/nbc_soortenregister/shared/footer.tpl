@@ -91,24 +91,14 @@
   })();
 
 
-function getDrupalFooter()
-{
-	var url="http://www.nederlandsesoorten.nl/content/footer-only-lng";
-
-	$.get( url, function( data )
-	{
-		var bits=data.split(/(<!-- REGION: footerInfo-->|<!-- \/#footerInfo -->)/);
-		if (bits[2] && bits[2].length>10) $('#footer').html( bits[2] );
-	});
-}
-
-
 $(document).ready(function()
 {
 	allLookupAlwaysFetch=true;
-	getDrupalFooter();
 });
   
 </script>
+
+{snippet}change_footer.html{/snippet}
+
 </body>
 </html>
