@@ -1875,13 +1875,13 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		{
-			$this->addError('Update naam taxon concept mislukt.');
 			$exist=$this->getTaxonByName(trim($values['new']));
 			if ($exist)
 			{
-				$this->addError(sprintf('Naam bestaat al (taxon id: %s).'),$exist['id']);
+				$this->addError(sprintf('Naam bestaat al voor een <a target="_new" href="taxon.php?id=%s">ander taxonconcept</a>.',$exist['id']));
 			}
 		
+			$this->addError('Update naam taxon concept mislukt.');
 			return false;
 		}
 	}
