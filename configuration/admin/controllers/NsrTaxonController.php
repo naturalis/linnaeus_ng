@@ -1864,15 +1864,26 @@ class NsrTaxonController extends NsrController
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 
-		if ($result)
+		if ($result && $this->models->Taxon->getAffectedRows()!=0)
 		{
 			$after=$this->models->Taxon->_get(array(
 				'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'taxon'
 			));
 			$this->logNsrChange(array('before'=>$before[0],'after'=>$after[0],'note'=>'updated concept name '.$before[0]['taxon']));
+			return true;
 		}
-		return $result;
+		else
+		{
+			$this->addError('Update naam taxon concept mislukt.');
+			$exist=$this->getTaxonByName(trim($values['new']));
+			if ($exist)
+			{
+				$this->addError(sprintf('Naam bestaat al (taxon id: %s).'),$exist['id']);
+			}
+		
+			return false;
+		}
 	}
 	
 	private function updateConceptRankId($values)
