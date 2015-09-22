@@ -882,9 +882,8 @@ class Literature2Controller extends NsrController
 		{
 			$this->setReferenceId($this->models->Literature2->getNewId());
 			$this->addMessage('Nieuw referentie aangemaakt.');
-			$this->logNsrChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));		
-
 			$this->updateReference();
+			$this->logNsrChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));		
 		}
 		else 
 		{
@@ -1145,7 +1144,6 @@ class Literature2Controller extends NsrController
 				_a.project_id = ".$this->getCurrentProjectId()." 
 				and _a.id = ".$id
 		);
-
 		
 		if ($l)
 		{
