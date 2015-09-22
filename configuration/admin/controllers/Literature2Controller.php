@@ -35,6 +35,8 @@ class Literature2Controller extends Controller
 			)
 		);
 
+	private $referenceBefore;
+
 	private $referenceId=null;
 	
 	private $publicationTypes=array(
@@ -117,16 +119,19 @@ class Literature2Controller extends Controller
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			$this->setReferenceId($this->rGetId());
+			$this->setReferenceBefore();
 			$this->deleteReference();
 			$this->setReferenceId(null);
+			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'note'=>'deleted reference '.$this->getReferenceBefore('label')));		
 			$template='_delete_result';
 		} 
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->setReferenceId($this->rGetId());
+			$this->setReferenceBefore();
 			$this->updateReference();
-			
+			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));		
 		} 
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
@@ -877,6 +882,8 @@ class Literature2Controller extends Controller
 		{
 			$this->setReferenceId($this->models->Literature2->getNewId());
 			$this->addMessage('Nieuw referentie aangemaakt.');
+			$this->logNsrChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));		
+
 			$this->updateReference();
 		}
 		else 
@@ -1918,7 +1925,22 @@ class Literature2Controller extends Controller
 
 	}
 		
-		
+	private function setReferenceBefore()
+	{
+		$this->referenceBefore=$this->getReference();	
+	}
+
+	private function getReferenceBefore( $f=null )
+	{
+		if ( $f && isset($this->referenceBefore[$f]) )
+		{
+			return $this->referenceBefore[$f];
+		}
+		else
+		{
+			return $this->referenceBefore;
+		}
+	}		
 
 
 	
