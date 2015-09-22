@@ -1,9 +1,9 @@
 <?php
 
-include_once ('Controller.php');
+include_once ('NsrController.php');
 include_once ('RdfController.php');
 
-class Literature2Controller extends Controller
+class Literature2Controller extends NsrController
 {
 
 	private $_lookupListMaxResults=99999;
@@ -1547,7 +1547,7 @@ class Literature2Controller extends Controller
 
     }
 
-	private function getActors()
+	public function getActors()
 	{
 		return $this->models->Actors->freeQuery(
 			"select
