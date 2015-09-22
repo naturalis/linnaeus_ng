@@ -153,7 +153,7 @@
 
 {if $reference.id}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
-	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$reference.label|@escape}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen en {$links.names|@count} namen aan deze titel gekoppeld.');return false;">referentie verwijderen</a></th><td></td></tr>
+	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$reference.label|replace:"'":"\'"}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen en {$links.names|@count} namen aan deze titel gekoppeld.');return false;">referentie verwijderen</a></th><td></td></tr>
 {/if}
 
 </table>
