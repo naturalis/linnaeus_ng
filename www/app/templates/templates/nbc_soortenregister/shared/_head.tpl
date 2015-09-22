@@ -5,7 +5,8 @@
 	<meta name="keywords" content="{$session.app.project.keywords}" />
 	<meta name="description" content="{$session.app.project.description}" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
-{snippet}nsr_development_no_follow.html{/snippet}
+
+{snippet}development_no_follow.html{/snippet}
 
 	<title>{$session.app.project.title|@strip_tags:false}</title>
 

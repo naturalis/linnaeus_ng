@@ -1615,7 +1615,6 @@ class Literature2Controller extends NsrController
 
     private function getPublicationTypes()
     {
-		/*
 		$d=$this->models->Literature2->freeQuery("
 				select 
 					distinct publication_type 
@@ -1634,7 +1633,7 @@ class Literature2Controller extends NsrController
 
 		array_walk($this->publicationTypes,function(&$a){ $a=$this->translate($a);});
 		$this->publicationTypes=array_unique($this->publicationTypes);
-		*/
+
 		return $this->publicationTypes;
 	}
 
