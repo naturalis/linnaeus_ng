@@ -1610,6 +1610,7 @@ class Literature2Controller extends Controller
 
     private function getPublicationTypes()
     {
+		/*
 		$d=$this->models->Literature2->freeQuery("
 				select 
 					distinct publication_type 
@@ -1628,6 +1629,7 @@ class Literature2Controller extends Controller
 
 		array_walk($this->publicationTypes,function(&$a){ $a=$this->translate($a);});
 		$this->publicationTypes=array_unique($this->publicationTypes);
+		*/
 		return $this->publicationTypes;
 	}
 
