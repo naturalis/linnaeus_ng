@@ -156,7 +156,7 @@ class ActorsController extends NsrController
 			$this->createNsrIds(array('id'=>$this->getActorId(),'type'=> 'actor', 'subtype'=> ( $this->rHasVal('is_company','1') ? 'organization' : 'person' )));
 			$this->addMessage('Nieuw actor aangemaakt.');
 			$this->updateActor();
-			$this->logNsrChange(array('after'=>$this->getActor(),'note'=>'new actor '.$this->rGetVal('name')));
+			$this->logNsrChange(array('after'=>$this->getActor(),'note'=>'new actor '.$name));
 		}
 		else 
 		{
