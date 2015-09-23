@@ -1,5 +1,5 @@
 		<div>
-			<h2>Voorkomen</h2>
+			<h2>{t}Voorkomen{/t}</h2>
 			
 			<p>
 				<table>
@@ -22,7 +22,7 @@
 				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="{$taxon_base_url_images_main}{$v.image}" />
 			</a>
 			{if $v.meta_map_description}<br />{$v.meta_map_description|@ucfirst}{/if}
-			{if $v.meta_map_source}<br />{t}Bron:{/t} {$v.meta_map_source}{/if}
+			{if $v.meta_map_source}<br />{t}Bron{/t}: {$v.meta_map_source}{/if}
 			{/foreach}
 			{/if}
 
@@ -77,7 +77,7 @@
 				{/if}
 				{if $trendSources}
 				<br />
-				{t}Bron:{/t}
+				{t}Bron{/t}:
 				{foreach from=$trendData.sources item=v key=k}
 				{if $k>0}, {/if}{$v}
 				{/foreach}
@@ -88,7 +88,7 @@
 			{/if}
 			
 			<!-- p>
-				<h2>Waarnemingen</h2>
+				<h2>{t}Waarnemingen{/t}</h2>
 			</p -->
 
 			<p>

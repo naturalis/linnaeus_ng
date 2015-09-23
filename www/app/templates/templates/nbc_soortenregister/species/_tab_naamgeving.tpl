@@ -34,7 +34,7 @@
 	</p>
 
 	<p>
-		<h2>Indeling</h2>
+		<h2>{t}Indeling{/t}</h2>
 		<ul class="taxonoverzicht">
 			<li class="root">
 			{foreach from=$classification item=v key=x}

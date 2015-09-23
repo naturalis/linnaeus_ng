@@ -125,12 +125,13 @@
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
 			<th></th>
-			<td><i>nederlandse naam</i></td>
+			<td>
+            <i><span id="main_language_display"></span></i></td>
 		</tr>
 		<tr>
         	<th>naam:</th>
             <td>
-				<input type="text" id="dutch_name" value="" onchange="" />
+				<input type="text" id="main_language_name" value="" onchange="" />
 			</td>
 		</tr>
 
@@ -139,7 +140,7 @@
 		<tr>
 			<th>expert:</th>
 			<td>
-				<select id="dutch_name_expert_id">
+				<select id="main_language_name_expert_id">
 					<option value="" selected="selected">n.v.t.</option>
 				{foreach from=$actors item=v key=k}
 				{if $v.is_company=='0'}
@@ -153,7 +154,7 @@
 		<tr>
 			<th>organisatie:</th>
 			<td>
-				<select id="dutch_name_organisation_id">
+				<select id="main_language_name_organisation_id">
 					<option value="" selected="selected">n.v.t.</option>
 				{foreach from=$actors item=v key=k}
 				{if $v.is_company=='1'}
@@ -166,9 +167,9 @@
 
 		<tr><th>publicatie:</th>
 			<td style="vertical-align:bottom">
-                <span id="dutch_name_reference"></span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="dutch_name_reference_id">edit</a>
-                <input type="hidden" id="dutch_name_reference_id" value="" />
+                <span id="main_language_name_reference"></span>
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="main_language_name_reference_id">edit</a>
+                <input type="hidden" id="main_language_name_reference_id" value="" />
 			</td>
 		</tr>
 
@@ -259,6 +260,14 @@
 <script>
 $(document).ready(function()
 {
+	{* REFAC2015 *}
+	{if $main_language_name_language_id==$smarty.const.LANGUAGE_ID_ENGLISH}
+	main_language_display_label='Engelse naam';
+	{else}
+	main_language_display_label='Nederlandse naam';
+	{/if}
+	
+	$('#main_language_display').html( main_language_display_label.toLowerCase() );
 
 	$('#name_uninomial').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
 	$('#name_specific_epithet').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
@@ -300,6 +309,7 @@ $(document).ready(function()
 
 	values.push( { name:'name_type_id',current:'',new:{$name_type_id},mandatory:true } );
 	values.push( { name:'name_language_id',current:'',new:{$name_language_id},mandatory:true } );
+	values.push( { name:'main_language_name_language_id',current:'',new:{$main_language_name_language_id},mandatory:true } );
 
 	$('[havedroplist=true]').each(function()
 	{

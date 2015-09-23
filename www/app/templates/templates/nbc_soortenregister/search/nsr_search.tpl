@@ -11,19 +11,19 @@
 	<div id="content">
 	
 		<div id="results">
-			<h1 style="width:500px;color:#FA7001;font-size:30px;font-weight:normal;margin-top:-13px;border-bottom:1px solid #666666;margin-bottom:5px;">Zoekresultaten</h1>
+			<h1 style="width:500px;color:#FA7001;font-size:30px;font-weight:normal;margin-top:-13px;border-bottom:1px solid #666666;margin-bottom:5px;">{t}Zoekresultaten{/t}</h1>
 			<h4>
-				Gezocht op "{$search.search}": <span id="resultcount-header">{$results.count}</span>
+				{t}Gezocht op{/t} "{$search.search}": <span id="resultcount-header">{$results.count}</span>
 			</h4>
 			
 			<p>
 			</p>
 			<p>
-				<label for="" accesskey="g">Resultaten sorteren op:</label>
+				<label for="" accesskey="g">{t}Resultaten sorteren op:{/t}</label>
 				<select name="sort" onchange="sortResults(this);">
-					<option value="sort_relevance"selected="selected">Relevantie</option>
-					<option value="sort_name">Wetenschappelijke naam</option>
-					<option value="sort_common">Nederlandse naam</option>
+					<option value="sort_relevance"selected="selected">{t}Relevantie{/t}</option>
+					<option value="sort_name">{t}Wetenschappelijke naam{/t}</option>
+					<option value="sort_common">{t}Nederlandse naam{/t}</option>
 				</select>
 			</p>
 		
@@ -73,7 +73,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 	
-	$('title').html('Zoekresultaten - '+$('title').html());
+	$('title').html('{t}Zoekresultaten{/t} - '+$('title').html());
 
 });
 </script>

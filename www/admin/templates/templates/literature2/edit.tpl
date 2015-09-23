@@ -79,7 +79,7 @@
 			<select id="publication_type" name="publication_type">
 				<option value="" {if $reference.publication_type==''} selected="selected"{/if}>-</option>
 			{foreach from=$publicationTypes item=v}
-				<option value="{$v.publication_type}" {if $v.publication_type==$reference.publication_type} selected="selected"{/if}>{$v.publication_type}</option>
+				<option value="{$v}" {if $v==$reference.publication_type} selected="selected"{/if}>{$v}</option>
 			{/foreach}
 			</select> 
 		</td>
@@ -153,7 +153,7 @@
 
 {if $reference.id}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
-	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$reference.label|@escape}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen en {$links.names|@count} namen aan deze titel gekoppeld.');return false;">referentie verwijderen</a></th><td></td></tr>
+	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$reference.label|replace:"'":"\'"}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen en {$links.names|@count} namen aan deze titel gekoppeld.');return false;">referentie verwijderen</a></th><td></td></tr>
 {/if}
 
 </table>

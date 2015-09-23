@@ -39,6 +39,24 @@
     
             </td>
         </tr>
+        <tr>
+        	<th>show group in search:</th>
+            <td>
+            	<label><input name="show_in_search" type="radio" value="1" {if $group.show_in_search==1 || $newgroup} checked="checked"{/if}>yes</label>
+            	<label><input name="show_in_search" type="radio" value="0" {if $group.show_in_search!=1 && !$newgroup} checked="checked"{/if}>no</label>
+            </td>
+		</tr>
+        <tr>
+        	<th>show "show all" link in search:</th>
+            <td>
+            	<label><input name="show_show_all_link" type="radio" value="1" {if $group.show_show_all_link==1 && !$newgroup} checked="checked"{/if}>yes</label>
+            	<label><input name="show_show_all_link" type="radio" value="0" {if $group.show_show_all_link!=1 || $newgroup} checked="checked"{/if}>no</label>
+            </td>
+		</tr>
+        <tr>
+        	<th>"help" link (empty for none):</th>
+            <td><input id="help_link_url" style="width:300px" name="help_link_url" type="text" value="{$group.help_link_url}" placeholder="max. 255 characters"></td>
+		</tr>
 
         {foreach from=$languages item=v key=k}
         <tr>
@@ -55,7 +73,12 @@
             <textarea id="descriptions-{$k}" name="descriptions[{$v.language_id}]" maxlength="255" placeholder="max. 255 characters">{$group.descriptions[{$v.language_id}]}</textarea>
 			</td>
 		</tr>
+        <tr>
+        	<th>"show all" link text:</th>
+            <td><input id="all_link_texts-{$k}" style="width:300px" name="all_link_texts[{$v.language_id}]" type="text" value="{$group.all_link_texts[{$v.language_id}]}" placeholder="max. 64 characters"></td>
+		</tr>
         {/foreach}
+
 	</table>
     
     <p>

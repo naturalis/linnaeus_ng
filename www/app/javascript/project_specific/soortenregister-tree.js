@@ -6,6 +6,16 @@ var highlightNodes=Array();
 var topLevelLabel='Nederlands Soortenregister';
 var includeSpeciesStats=true;
 
+function setTopLevelLabel(label)
+{
+	topLevelLabel=label;
+}
+
+function getTopLevelLabel()
+{
+	return topLevelLabel;
+}
+
 function buildtree(node)
 {
 	activeNode=node;
@@ -76,7 +86,7 @@ function growbranches(data)
 		'<li class="child">'+
 			(!activeNode ?
 				//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
-				'<a href="#" onclick="buildtree(false);return false">'+topLevelLabel+'</a>' :
+				'<a href="#" onclick="buildtree(false);return false">'+getTopLevelLabel()+'</a>' :
 				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+label+'</a>'
 			)+
 			(data.node.rank_label ? 
