@@ -1,5 +1,36 @@
 <?php
 
+/*
+
+CREATE TABLE `literature2_publication_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `sys_label` varchar(255) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`project_id`),
+  UNIQUE `project_id` (`project_id`,`sys_label`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
+;
+
+CREATE TABLE `literature2_publication_types_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `publication_type_id` varchar(255) NOT NULL,
+  `language_id` int(11) DEFAULT NULL,
+  `label` varchar(255) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`project_id`),
+  UNIQUE `project_id` (`project_id`,`publication_type_id`,`language_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
+;
+
+
+*/
+
 include_once ('NsrController.php');
 include_once ('RdfController.php');
 
@@ -14,7 +45,9 @@ class Literature2Controller extends NsrController
 		'names',
 		'actors',
 		'presence_taxa',
-		'literature2_authors'
+		'literature2_authors',
+		'literature2_publication_types',
+		'literature2_publication_types_labels'
     );
    
     public $controllerPublicName = 'Literatuur (v2)';
@@ -55,6 +88,8 @@ class Literature2Controller extends NsrController
 		'Website'
 	);	
 
+	private $publicationTypesSortOrder=" ifnull(_b.label,_a.sys_label)";
+
 	private $lit2Columns=
 		array(
 			'-1'=>'',
@@ -90,6 +125,7 @@ class Literature2Controller extends NsrController
     {
 		$this->Rdf = new RdfController;
 		$this->_matchThresholdDefault=$this->getSetting('literature2_import_match_threshold',$this->_matchThresholdDefault);
+		$this->setPublicationTypes();
     }
 
     public function indexAction()
@@ -132,7 +168,8 @@ class Literature2Controller extends NsrController
 			$this->setReferenceBefore();
 			$this->updateReference();
 			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));		
-		} 
+		}
+		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->smarty->assign('reference',$this->requestData);
@@ -155,7 +192,33 @@ class Literature2Controller extends NsrController
 		$this->printPage(isset($template) ? $template : null);
 	}
 
-    public function bulkUploadAction()
+    public function publicationTypesAction()
+	{
+		$this->checkAuthorisation();
+		$this->setPageName($this->translate('Publicatievormen'));
+
+		if ( $this->rHasVal('action','save') )
+		{
+			$this->savePublicationType();
+		} else
+		if ( $this->rHasVal('action','save_translations') )
+		{
+			$this->savePublicationTypeTranslations();
+		} else
+		if ( $this->rHasId() && $this->rHasVal('action','delete') )
+		{
+			$this->deletePublicationType();
+		}
+
+		$this->setPublicationTypesSortOrder( 'sys_label' );
+		$this->setPublicationTypes();
+
+		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
+		$this->smarty->assign( 'publicationTypes', $this->getPublicationTypes() );
+		$this->printPage();
+	}
+
+	public function bulkUploadAction()
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Bulk upload (matching)'));
@@ -744,7 +807,7 @@ class Literature2Controller extends NsrController
 
 		$this->printPage();
 	}
-	
+
 	private function downloadHeaders( $file )
 	{
 		header( 'Content-Type: text/plain; charset=utf-8' );
@@ -891,7 +954,6 @@ class Literature2Controller extends NsrController
 		}
 	}
 
-
 	private function updateReference()
 	{
 		$f=array( 
@@ -900,7 +962,8 @@ class Literature2Controller extends NsrController
 			'alt_label' => 'Alt. label',
 			'date' => 'Datum',
 			'author' => 'Auteur (verbatim)',
-			'publication_type' => 'Publicatietype',
+			//'publication_type' => 'Publicatietype',
+			'publication_type_id' => 'Publicatievorm',
 			'citation' => 'Citatie',
 			'source' => 'Bron',
 			'publisher' => 'Uitgever',
@@ -1069,8 +1132,6 @@ class Literature2Controller extends NsrController
 
 		$this->models->Literature2Authors->freeQuery("delete from %PRE%literature2_authors where project_id = ".$this->getCurrentProjectId()." and literature2_id = ".$id);	
 	}
-
-
 
 	private function getTitleAlphabet()
 	{
@@ -1526,8 +1587,6 @@ class Literature2Controller extends NsrController
 	
 	}
 
-
-
     private function getReferenceLookupList($p)
     {
 		$data=$this->getReferences($p);
@@ -1613,29 +1672,224 @@ class Literature2Controller extends NsrController
 		return $languages;
 	}
 
+    private function setPublicationTypesSortOrder( $o )
+    {
+		$this->publicationTypesSortOrder=$o;
+	}
+
+    private function getPublicationTypesSortOrder()
+    {
+		return $this->publicationTypesSortOrder;
+	}
+
+    private function setPublicationTypes()
+    {
+		$this->publicationTypes=$this->models->Literature2PublicationTypes->freeQuery("
+			select
+				_a.id,
+				_a.sys_label,
+				ifnull(_b.label,_a.sys_label) as label,
+				count(_c.id) as total
+
+			from %PRE%literature2_publication_types _a
+
+			left join %PRE%literature2_publication_types_labels _b
+				on _a.id = _b.publication_type_id 
+				and _a.project_id=_b.project_id 
+				and _b.language_id=".$this->getDefaultProjectLanguage()."
+
+			left join %PRE%literature2 _c
+				on _a.id = _c.publication_type_id 
+				and _a.project_id=_c.project_id 
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId() ."
+			group by
+				_a.id
+			order by " . $this->getPublicationTypesSortOrder() ."
+		");
+		
+		foreach((array)$this->publicationTypes as $key=>$val)
+		{
+			$this->publicationTypes[$key]['translations']=
+				$this->models->Literature2PublicationTypesLabels->_get(array('id'=>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'publication_type_id' => $val['id'],
+				),'fieldAsIndex'=>'language_id','columns'=>'label'));
+		}
+	}
+
     private function getPublicationTypes()
     {
-		$d=$this->models->Literature2->freeQuery("
-				select 
-					distinct publication_type 
-				from 
-					%PRE%literature2 
-				where 
-					publication_type is not null 
-				order by 
-					publication_type
-			");
-
-		foreach((array)$d as $val)
-		{
-			$this->publicationTypes[]=$val['publication_type'];
-		}
-
-		array_walk($this->publicationTypes,function(&$a){ $a=$this->translate($a);});
-		$this->publicationTypes=array_unique($this->publicationTypes);
-
 		return $this->publicationTypes;
 	}
+
+    private function savePublicationType()
+    {
+		
+		$type=trim($this->rGetVal('type'));
+					
+		if (empty($type))
+		{
+			$this->addError('Geen naam. Publicatievorm niet opgeslagen.');
+			return;
+		}
+
+		$d=$this->models->Literature2PublicationTypes->_get(array("id"=>
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sys_label' => $type
+			)));
+
+		if ($d)
+		{
+			$this->addError('Naam bestaat al. Publicatievorm niet opgeslagen.');
+			return;
+		}
+
+		$d=$this->models->Literature2PublicationTypes->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'sys_label' => $type
+		));
+
+		$this->addMessage(sprintf('Publicatievorm "%s" opgeslagen.',$type));
+		
+		/*
+		if ($d)
+		{
+			$id=$this->models->Literature2PublicationTypes->getNewId();
+
+			$d=$this->models->Literature2PublicationTypesLabels->save(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'publication_type_id' => $id,
+				'language_id' => $this->getDefaultProjectLanguage(),
+				'label' => $type
+			));
+		}
+		*/
+
+	}
+
+    private function deletePublicationType()
+    {
+
+		$id=$this->rGetId();
+
+		if (empty($id))
+		{
+			$this->addError('Geen ID. Publicatievorm niet verwijderd.');
+			return;
+		}
+		
+		foreach($this->getPublicationTypes() as $val)
+		{
+			if ( $val['id']==$id ) $label=$val['label'];
+			
+			if ( $val['id']==$id && $val['total']>0 )
+			{
+				$this->addError(sprintf('Er zijn %s referenties met deze publicatievorm. Publicatievorm niet verwijderd.',$val['total']));
+				return;
+			}
+		}
+
+		$this->models->Literature2PublicationTypesLabels->delete(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'publication_type_id' => $id,
+		));
+			
+		$this->models->Literature2PublicationTypes->delete(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $id,
+		));
+
+		$this->addMessage(sprintf('Publicatievorm %s verwijderd.',$label));
+
+	}
+
+    private function savePublicationTypeTranslations()
+    {
+
+		$translations=$this->rGetVal('translations');
+
+		if (empty($translations)) return;
+		
+		$current=$this->models->Literature2PublicationTypesLabels->_get(array("id"=>
+		array(
+			"project_id" => $this->getCurrentProjectId()
+		)));
+
+/*
+
+	get current translations
+	loop new
+		if exists and same continue
+		if exists and other update
+		if not exists save
+		
+	remaining currents: delete
+	
+
+
+*/
+		
+		//q($translations);q($this->getPublicationTypes(),1);
+		
+		$keep=array();
+				
+		foreach((array)$translations as $type_id=>$val)
+		{
+			if ( is_array($val) && !empty($val) )
+			{
+				foreach((array)$val as $language_id=>$translation)
+				{
+					if (empty($translation)) continue;
+					
+					foreach((array)$this->getPublicationTypes() as $current)
+					{
+						if (isset($current['translations']) && isset($current['translations'][$language_id]))
+						{
+							$keep[$type_id][$language_id]=true;
+							
+							if ($current['translations'][$language_id]['label']!=$translation)
+							{
+								$this->models->Literature2PublicationTypesLabels->update(
+									array(
+										'label' => $translation
+									),
+									array(
+										'project_id' => $this->getCurrentProjectId(),
+										'publication_type_id' => $type_id,
+										'language_id' =>$language_id,
+									)
+								);											
+							}
+						}
+						else
+						{
+							$this->models->Literature2PublicationTypesLabels->save(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'publication_type_id' => $type_id,
+								'language_id' =>$language_id,
+								'label' => $translation
+							));									
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+
+
+
+
 
 
     private function setActors()
@@ -1940,6 +2194,8 @@ class Literature2Controller extends NsrController
 			return $this->referenceBefore;
 		}
 	}		
+
+
 
 
 	

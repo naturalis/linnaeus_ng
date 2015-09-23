@@ -76,12 +76,13 @@
 	<tr>
 		<th>type publicatie:</th>
 		<td>
-			<select id="publication_type" name="publication_type">
-				<option value="" {if $reference.publication_type==''} selected="selected"{/if}>-</option>
+			<select id="publication_type_id" name="publication_type_id">
+				<option value="" {if $reference.publication_type_id==''} selected="selected"{/if}>-</option>
 			{foreach from=$publicationTypes item=v}
-				<option value="{$v}" {if $v==$reference.publication_type} selected="selected"{/if}>{$v}</option>
+				<option value="{$v.id}" {if $v.id==$reference.publication_type_id} selected="selected"{/if}>{$v.label}</option>
 			{/foreach}
 			</select> 
+            <!-- verbatim: {$reference.publication_type} -->
 		</td>
 	</tr>
 	<tr><th>citatie:</th><td><input class="large" type="text" name="citation" value="{$reference.citation|@escape}" /></td></tr>
@@ -229,7 +230,6 @@
 
 </div>
 </p>
-
 <p>
 	<a href="index.php">terug</a>
 </p>
