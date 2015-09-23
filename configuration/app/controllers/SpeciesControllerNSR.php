@@ -140,9 +140,13 @@ class SpeciesControllerNSR extends SpeciesController
 						);
 				}
 				
+				$ext_name = $this->rHasVal('name') ? $this->rGetVal('name') : $this->translate("Kenmerken");
+				$ext_template = $this->rHasVal('name') ? '_tab_ext_' . $this->rGetVal('name') . '.tpl' : '_tab_ext_generic.tpl';
+				
 				$this->smarty->assign( 'passport_content', $passport_content );
-				$this->smarty->assign( 'ext_template', '_tab_exoten.tpl' ); // --> this should become dependent on the actual called source
+				$this->smarty->assign( 'ext_template', $ext_template );
 				$this->smarty->assign( 'ext_tab', $ext_tab );
+				$this->smarty->assign( 'ext_name', ucfirst($ext_name) );
 				
 			}
 			else
@@ -1055,7 +1059,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_f.lower_taxon,
 				_g.label as rank,
 				ifnull(_q.label,_x.rank) as rank_label,
-				_k.name as common_name
+				ifnull(_k.name,_kk.name) as common_name
 			
 			from %PRE%taxa _a
 
@@ -1069,7 +1073,13 @@ class SpeciesControllerNSR extends SpeciesController
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
 				and _k.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _k.language_id=".LANGUAGE_ID_DUTCH."
+				and _k.language_id=".$this->getCurrentLanguageId()."
+
+			left join %PRE%names _kk
+				on _a.id=_kk.taxon_id
+				and _a.project_id=_kk.project_id
+				and _kk.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
+				and _kk.language_id=".LANGUAGE_ID_DUTCH."
 
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
@@ -1207,12 +1217,11 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				) as name,
 				_f.rank_id,
-				_g.label as rank_label,
-_k.uninomial,
-_k.specific_epithet,
-_k.infra_specific_epithet,
-_k.authorship
-			
+				ifnull(_g.label,_gg.label) as rank_label,
+				_k.uninomial,
+				_k.specific_epithet,
+				_k.infra_specific_epithet,
+				_k.authorship
 			
 			from %PRE%taxa _a
 
@@ -1229,7 +1238,12 @@ _k.authorship
 			left join %PRE%labels_projects_ranks _g
 				on _a.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
-				and _g.language_id=". LANGUAGE_ID_DUTCH."
+				and _g.language_id=". $this->getCurrentLanguageId()."
+
+			left join %PRE%labels_projects_ranks _gg
+				on _a.rank_id=_gg.project_rank_id
+				and _a.project_id = _gg.project_id
+				and _gg.language_id=". LANGUAGE_ID_DUTCH."
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id

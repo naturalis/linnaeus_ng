@@ -32,7 +32,7 @@
 				<br />
 				
 				{* Zie ook: <a href="{$soort.url}">EL&I wettelijke bescherming, beleid en signalering</a><br /><br /> *}
-                {t}Bron{/t}: <a href="{$soort.url}">{if $wetten|@count>1}{$naam}{else}soortgegevens{/if}</a> uit Beschermde natuur van Nederland: soorten in wetgeving en beleid (Ministerie van Economische Zaken)
+                {t}Bron:{/t} <a href="{$soort.url}">{if $wetten|@count>1}{$naam}{else}{t}soortgegevens{/t}{/if}</a> uit Beschermde natuur van Nederland: soorten in wetgeving en beleid (Ministerie van Economische Zaken)
 	
 			</p>
 			{/foreach}

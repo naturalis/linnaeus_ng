@@ -11,10 +11,10 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			
 			<table class="taxon-dna-table">
 				<tr>
-					<th>Registratienummer</th>
-					<th>Verzameldatum, plaats</th>
-					<th>Verzamelaar</th>
-					<th>Soort</th>
+					<th>{t}Registratienummer{/t}</th>
+					<th>{t}Verzameldatum, plaats{/t}</th>
+					<th>{t}Verzamelaar{/t}</th>
+					<th>{t}Soort{/t}</th>
 				</tr>
 				{foreach from=$content item=v}
 				<tr><td>{$v.barcode}</td><td>{$v.date_literal}, {$v.location}</td><td>{$v.specialist}</td><td>{$v.taxon_literal}</td></tr>

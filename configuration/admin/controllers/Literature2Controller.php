@@ -1,9 +1,9 @@
 <?php
 
-include_once ('Controller.php');
+include_once ('NsrController.php');
 include_once ('RdfController.php');
 
-class Literature2Controller extends Controller
+class Literature2Controller extends NsrController
 {
 
 	private $_lookupListMaxResults=99999;
@@ -35,7 +35,25 @@ class Literature2Controller extends Controller
 			)
 		);
 
+	private $referenceBefore;
+
 	private $referenceId=null;
+	
+	private $publicationTypes=array(
+		'Artikel',
+		'Boek',
+		'Boek (deel)',
+		'Database',
+		'Hoofdstuk',
+		'Literatuur',
+		'Manuscript',
+		'Persbericht',
+		'Persoonlijke mededeling',
+		'Rapport',
+		'Serie',
+		'Tijdschrift',
+		'Website'
+	);	
 
 	private $lit2Columns=
 		array(
@@ -101,16 +119,19 @@ class Literature2Controller extends Controller
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			$this->setReferenceId($this->rGetId());
+			$this->setReferenceBefore();
 			$this->deleteReference();
 			$this->setReferenceId(null);
+			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'note'=>'deleted reference '.$this->getReferenceBefore('label')));		
 			$template='_delete_result';
 		} 
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->setReferenceId($this->rGetId());
+			$this->setReferenceBefore();
 			$this->updateReference();
-			
+			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));		
 		} 
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
@@ -862,6 +883,7 @@ class Literature2Controller extends Controller
 			$this->setReferenceId($this->models->Literature2->getNewId());
 			$this->addMessage('Nieuw referentie aangemaakt.');
 			$this->updateReference();
+			$this->logNsrChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));		
 		}
 		else 
 		{
@@ -1122,7 +1144,6 @@ class Literature2Controller extends Controller
 				_a.project_id = ".$this->getCurrentProjectId()." 
 				and _a.id = ".$id
 		);
-
 		
 		if ($l)
 		{
@@ -1524,7 +1545,7 @@ class Literature2Controller extends Controller
 
     }
 
-	private function getActors()
+	public function getActors()
 	{
 		return $this->models->Actors->freeQuery(
 			"select
@@ -1594,8 +1615,7 @@ class Literature2Controller extends Controller
 
     private function getPublicationTypes()
     {
-		return
-			$this->models->Literature2->freeQuery("
+		$d=$this->models->Literature2->freeQuery("
 				select 
 					distinct publication_type 
 				from 
@@ -1605,6 +1625,16 @@ class Literature2Controller extends Controller
 				order by 
 					publication_type
 			");
+
+		foreach((array)$d as $val)
+		{
+			$this->publicationTypes[]=$val['publication_type'];
+		}
+
+		array_walk($this->publicationTypes,function(&$a){ $a=$this->translate($a);});
+		$this->publicationTypes=array_unique($this->publicationTypes);
+
+		return $this->publicationTypes;
 	}
 
 
@@ -1894,7 +1924,22 @@ class Literature2Controller extends Controller
 
 	}
 		
-		
+	private function setReferenceBefore()
+	{
+		$this->referenceBefore=$this->getReference();	
+	}
+
+	private function getReferenceBefore( $f=null )
+	{
+		if ( $f && isset($this->referenceBefore[$f]) )
+		{
+			return $this->referenceBefore[$f];
+		}
+		else
+		{
+			return $this->referenceBefore;
+		}
+	}		
 
 
 	

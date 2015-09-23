@@ -7,10 +7,10 @@
 
         <div id="header">
 
-            <div id="logo" style="cursor:pointer" onclick="window.open('/','_self');"></div>
+            <div id="logo" style="cursor:pointer" onClick="window.open('/','_self');"></div>
 
             <h2 id="slogan">	
-                Overzicht van de Nederlandse biodiversiteit
+                {t}Overzicht van de Nederlandse biodiversiteit{/t}
             </h2>
 
             <div id="menucontainer">

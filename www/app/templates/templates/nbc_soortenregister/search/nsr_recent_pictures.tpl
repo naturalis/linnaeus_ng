@@ -18,7 +18,7 @@
 
 	<div id="content">
 		<div class="hasImage" id="taxonHeader">
-			<div id="titles" style="border-bottom: 1px solid #666666;margin-top:-13px;margin-bottom:5px;width:510px;"><h1>Recente afbeeldingen</h1>
+			<div id="titles" style="border-bottom: 1px solid #666666;margin-top:-13px;margin-bottom:5px;width:510px;"><h1>{t}Recente afbeeldingen{/t}</h1>
 		</div>
 		
 	<div id="taxonImage">
@@ -27,7 +27,7 @@
 			<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_base_url_images_overview}{$v.thumb}" />
 		</a>
 		<div id="taxonImageCredits">
-			<span class="photographer-title">Foto</span>&nbsp;{$v.label}
+			<span class="photographer-title">{t}Foto{/t}</span>&nbsp;{$v.label}
 		</div>
 	</div>
 </div>
@@ -52,7 +52,7 @@
 							<dt>Foto</dt><dd>{$v.photographer}</dd>
 							<dt>Geplaatst op</dt><dd>{$v.meta_datum_plaatsing}</dd>
 						</dl>
-						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">Naar deze soort</a></div>
+						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{t}Naar deze soort{/t}</a></div>
 					</div>
 				{/foreach}
 			</div>

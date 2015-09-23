@@ -1119,7 +1119,7 @@ class Controller extends BaseClass
             $_SESSION['app'][$this->spid()]['user']['languageChanged'] = false;
         }
 
-        if (!isset($_SESSION['app'][$this->spid()]['project']['activeLanguageId']))
+//        if (!isset($_SESSION['app'][$this->spid()]['project']['activeLanguageId']))
 		{
             $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->getDefaultLanguageId();
             $_SESSION['app'][$this->spid()]['user']['languageChanged'] = true;

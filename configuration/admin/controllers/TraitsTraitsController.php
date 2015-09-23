@@ -406,6 +406,10 @@ class TraitsTraitsController extends TraitsController
 		$sysname=isset($p['sysname']) ? $p['sysname'] : null;
 		$names=isset($p['names']) ? $p['names'] : null;
 		$descriptions=isset($p['descriptions']) ? $p['descriptions'] : null;
+		$all_link_texts=isset($p['all_link_texts']) ? $p['all_link_texts'] : null;
+		$show_in_search=isset($p['show_in_search']) && in_array($p['show_in_search'],array('0','1'))? $p['show_in_search'] : null;
+		$show_show_all_link=isset($p['show_show_all_link']) && in_array($p['show_show_all_link'],array('0','1'))? $p['show_show_all_link'] : null;
+		$help_link_url=!empty($p['help_link_url']) ? $p['help_link_url'] : 'null';
 
 		if (empty($sysname))
 			return false;
@@ -414,18 +418,21 @@ class TraitsTraitsController extends TraitsController
 			'id'=>$id,
 			'project_id'=>$this->getCurrentProjectId(),
 			'parent_id'=>mysql_real_escape_string($parent_id),
-			'sysname'=>mysql_real_escape_string($sysname)
+			'sysname'=>mysql_real_escape_string($sysname),
+			'show_in_search'=>$show_in_search,
+			'show_show_all_link'=>$show_show_all_link,
+			'help_link_url'=>mysql_real_escape_string($help_link_url)
 		));
-		
+
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
-		
 
 		$textids=$this->storeTranslations(
 			array(
 				'record'=>$this->getTraitgroup($id),
 				'data'=>array(
 					'name_tid'=>$names,
-					'description_tid'=>$descriptions
+					'description_tid'=>$descriptions,
+					'all_link_text_tid'=>$all_link_texts
 				)
 			)
 		);
