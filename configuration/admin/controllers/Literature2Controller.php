@@ -1755,21 +1755,6 @@ class Literature2Controller extends NsrController
 		));
 
 		$this->addMessage(sprintf('Publicatievorm "%s" opgeslagen.',$type));
-		
-		/*
-		if ($d)
-		{
-			$id=$this->models->Literature2PublicationTypes->getNewId();
-
-			$d=$this->models->Literature2PublicationTypesLabels->save(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'publication_type_id' => $id,
-				'language_id' => $this->getDefaultProjectLanguage(),
-				'label' => $type
-			));
-		}
-		*/
 
 	}
 
@@ -1818,45 +1803,38 @@ class Literature2Controller extends NsrController
 
 		if (empty($translations)) return;
 		
-		$current=$this->models->Literature2PublicationTypesLabels->_get(array("id"=>
-		array(
-			"project_id" => $this->getCurrentProjectId()
-		)));
-
-/*
-
-	get current translations
-	loop new
-		if exists and same continue
-		if exists and other update
-		if not exists save
-		
-	remaining currents: delete
-	
-
-
-*/
-		
-		//q($translations);q($this->getPublicationTypes(),1);
-		
-		$keep=array();
-				
 		foreach((array)$translations as $type_id=>$val)
 		{
 			if ( is_array($val) && !empty($val) )
 			{
 				foreach((array)$val as $language_id=>$translation)
 				{
-					if (empty($translation)) continue;
+					if (empty($translation))
+					{
+						$this->models->Literature2PublicationTypesLabels->delete(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'publication_type_id' => $type_id,
+								'language_id' =>$language_id
+							)
+						);	
+
+						if ($this->models->Literature2PublicationTypesLabels->getAffectedRows()!=0)
+							$this->addMessage('Vertaling verwijderd.');
+
+						continue;
+					}
+					
 					
 					foreach((array)$this->getPublicationTypes() as $current)
 					{
+						if ($current['id']!=$type_id) continue;
+						
 						if (isset($current['translations']) && isset($current['translations'][$language_id]))
 						{
-							$keep[$type_id][$language_id]=true;
-							
 							if ($current['translations'][$language_id]['label']!=$translation)
 							{
+								
 								$this->models->Literature2PublicationTypesLabels->update(
 									array(
 										'label' => $translation
@@ -1866,7 +1844,9 @@ class Literature2Controller extends NsrController
 										'publication_type_id' => $type_id,
 										'language_id' =>$language_id,
 									)
-								);											
+								);	
+
+								$this->addMessage(sprintf('Vertaling "%s" opgeslagen.',$translation));
 							}
 						}
 						else
@@ -1878,19 +1858,14 @@ class Literature2Controller extends NsrController
 								'language_id' =>$language_id,
 								'label' => $translation
 							));									
+
+							$this->addMessage(sprintf('Vertaling "%s" opgeslagen.',$translation));
 						}
 					}
 				}
 			}
 		}
 	}
-
-
-
-
-
-
-
 
     private function setActors()
 	{
