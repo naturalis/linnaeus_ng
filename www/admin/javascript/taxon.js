@@ -191,7 +191,7 @@ function taxonDrawPageBlock() {
 			buffer=buffer+'</tr><tr>';
 		}
 		
-		if (taxonHigherTaxa && i==0) break;
+		//if (taxonHigherTaxa && i==0) break;
 	}
 
 	buffer = buffer + '</tr></table>';
