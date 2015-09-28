@@ -122,8 +122,8 @@
 		titles--0024.html
 	and if that doesn't exist, for
 		titles.html
-	please note the files are included "as is", and are not run through any server-side 
-	interperter; therefore php or smarty-codes won't work. javascript will, however, so 
+	please note the files are included "as is", and are not run through any server-side
+	interperter; therefore php or smarty-codes won't work. javascript will, however, so
 	it can be used for google analytics-codes, which can be different per project.
 	snippets can also be useful for inlcuding bits of html that depend on which OTAP-server
 	you're working on (like "noindex" tags on development servers). note that this last
@@ -1321,19 +1321,19 @@ class Controller extends BaseClass
 			);
 
 		}
-		
+
 		private function generate_rnd_string($m)
 		{
-	
+
 			$d = $this->generateRandomHexString('%%%','%%%');
-	
+
 			while (isset($this->_hotwordMightBeHotwords[$d]))
 				$d = $this->generateRandomHexString('%%%','%%%');
-	
+
 			$this->_hotwordMightBeHotwords[$d]=$m[0];
-	
+
 			return $d;
-	
+
 		}
 
 
@@ -1473,11 +1473,26 @@ class Controller extends BaseClass
             //return $rankName . ' ' . $taxon['taxon'];
         }
 
-        // Genus or subgenus; add italics
+          // Genus or subgenus; add italics
         if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
-			$name = ($rankpos=='post' ? ('<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName) : ($rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>'));
-            //$name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
-			return $name;
+
+            $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
+
+            // Species case for subgenus and section: append genus name
+            // Set constant for section, may not be present in constants.php yet...
+            // @todo: delete next line somewhere in the future
+            if (!defined('SECTION_RANK_ID')) define('SECTION_RANK_ID',66);
+            if (($rankId == SECTION_RANK_ID || $rankId == SUBGENUS_RANK_ID) && isset($taxon['parent_id'])) {
+
+                $parent = $this->getTaxonById($taxon['parent_id']);
+                // Only append parent if this is a genus and rank is at the end
+                if ($parent['base_rank_id'] == GENUS_RANK_ID && $rankpos == 'post') {
+                    $name .= ' <span class="italics">(' . $parent['taxon'] . ')</span>';
+                }
+            }
+
+  			$name = ($rankpos=='post' ? $name . ', ' . $rankName : $rankName . ' ' . $name);
+            return $name;
         }
 
         // Species
@@ -1676,7 +1691,7 @@ class Controller extends BaseClass
     {
         if ($this->_allowEditOverlay === false)
             return;
-			
+
 		$this->useCache=false;
 
         $d = $this->controllerBaseName . ':' . $this->viewName;
