@@ -1215,7 +1215,7 @@ class SpeciesController extends Controller
 				'query' => "
 					select
 						SQL_CALC_FOUND_ROWS
-						_a.id, _a.taxon, _a.rank_id, _a.is_hybrid
+						_a.id, _a.taxon, _a.rank_id, _a.parent_id, _a.is_hybrid
 					from
 						%PRE%taxa _a
 					left join %PRE%projects_ranks _b
@@ -1230,7 +1230,7 @@ class SpeciesController extends Controller
 
 		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
 		$total=$count[0]['total'];
-			
+
 		$ranks=$this->getProjectRanks();
 
         foreach ((array) $taxa as $key => $val)
@@ -1246,7 +1246,7 @@ class SpeciesController extends Controller
             'case' => 'i'
 		));
 		*/
-		
+
 		return $this->makeLookupList(
 			array(
 				'data'=>$taxa,
@@ -1378,14 +1378,14 @@ class SpeciesController extends Controller
 	{
 		if (is_null($id))
 			return;
-			
+
 		$d=$this->models->TaxonQuickParentage->freeQuery("
 			select
 				parentage
 			from
 				%PRE%taxon_quick_parentage
-			where 
-				project_id = ".$this->getCurrentProjectId()." 
+			where
+				project_id = ".$this->getCurrentProjectId()."
 				and taxon_id = ".$id
 		);
 
