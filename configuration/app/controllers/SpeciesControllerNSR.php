@@ -49,7 +49,8 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 
-		$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
+		//$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
+
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -722,7 +723,7 @@ class SpeciesControllerNSR extends SpeciesController
 				file_name as image,
 				file_name as thumb,
 				_k.taxon,
-				_z.name as common_name,
+				ifnull(_zz.name,_z.name) as common_name,
 				_j.name,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				".($distributionMaps?
@@ -758,6 +759,12 @@ class SpeciesControllerNSR extends SpeciesController
 				and _m.project_id=_z.project_id
 				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _zz
+				on _m.taxon_id=_zz.taxon_id
+				and _m.project_id=_zz.project_id
+				and _zz.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
+				and _zz.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
