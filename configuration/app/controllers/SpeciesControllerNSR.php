@@ -43,6 +43,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
+		$this->_taxon_fetch_ez_data = $this->getSetting( "taxon_fetch_ez_data", false );
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
@@ -419,10 +420,10 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 				}
 			}
-							
+						
 			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
 			// this should be changed to a generalized method, using 'redirect_to'
-			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1)
+			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1 && $this->_taxon_fetch_ez_data)
 			{
 				$ezData=$this->getEzData($taxon);
 				$categories[$dummy]['is_empty']=empty($ezData);
@@ -1761,12 +1762,22 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$checked=$this->getSessionVar(array('ez-data-checked',$id));
 
-		if ($checked!==true)
+		if (1==1 || $checked!==true)
 		{
 			$org=$this->getExternalOrg('Ministerie EZ');
-			$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
+			//$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
+			
+			$url=str_replace(' ','%20',sprintf($org['service_url'],$this->getNSRId(array('id'=>$id))));
+			$ch=curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			$result=curl_exec($ch);
+			curl_close($ch);
+			$data=json_decode($result);
 
-			if (isset($data))
+			if (!empty($data))
 			{
 				$wetten=array();
 
