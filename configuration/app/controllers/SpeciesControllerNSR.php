@@ -1762,7 +1762,7 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$checked=$this->getSessionVar(array('ez-data-checked',$id));
 
-		if (1==1 || $checked!==true)
+		if ($checked!==true)
 		{
 			$org=$this->getExternalOrg('Ministerie EZ');
 			//$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
