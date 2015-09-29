@@ -386,7 +386,10 @@ class SpeciesControllerNSR extends SpeciesController
 					$categories[$key]['is_empty']=true;
 					
 				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
+				{
+					$categories[$key]['is_empty']=true;
 					$dummy=$key;
+				}
 
 				if (isset($val['check_query']))
 				{
