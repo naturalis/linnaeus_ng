@@ -1133,6 +1133,8 @@ class Controller extends BaseClass
         unset($this->requestData['languageId']);
 
         $_SESSION['app']['user']['currentLanguage'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'];
+		
+		$this->setDatabaseLocaleSettings();
     }
 
 
@@ -3454,6 +3456,17 @@ class Controller extends BaseClass
 				return $_SESSION['app'][$this->spid()][$this->getControllerBaseName()][$name[0]][$name[1]];
 		}
 
+	}
+
+	private function setDatabaseLocaleSettings()
+	{
+		$lng=$this->models->Language->_get(array("id"=>array("id"=>$this->getCurrentLanguageId())));
+		$locale=
+			isset($lng) && !empty($lng[0]['locale_lin']) ? 
+				$lng[0]['locale_lin'] : 
+				$this->getSetting('db_lc_time_names','nl_NL');
+
+		$this->models->Project->freeQuery("SET lc_time_names = '".$locale."'");
 	}
 
 
