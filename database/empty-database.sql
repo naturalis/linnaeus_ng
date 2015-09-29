@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `activity_log` (
   `data_after` text,
   `note` varchar(255) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`user`),
   FULLTEXT KEY `fulltext` (`controller`,`data_before`)
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `actors` (
   `is_company` tinyint(1) NOT NULL DEFAULT '0',
   `employee_of_id` int(11) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `actors_addresses` (
   `address_label` varchar(255) NOT NULL,
   `address` varchar(2000) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_chargroups` (
   `chargroup_id` int(11) NOT NULL,
   `show_order` tinyint(4) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `chargroups` (
   `label` varchar(255) NOT NULL,
   `show_order` tinyint(4) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `chargroups_labels` (
   `language_id` int(11) NOT NULL,
   `label` varchar(255) NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
   `language_id` int(11) NOT NULL,
   `choice_txt` text,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`choice_id`,`language_id`),
   FULLTEXT KEY `fulltext` (`choice_txt`)
@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
   `choice_content_created` datetime NOT NULL,
   `choice_last_change` datetime NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `choice_content_id` (`choice_content_id`,`project_id`,`choice_id`,`language_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `content` (
   `subject` varchar(32) NOT NULL,
   `content` text,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
   FULLTEXT KEY `fulltext` (`subject`,`content`)
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `content_free_modules` (
   `topic` varchar(255) NOT NULL,
   `content` text,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
   KEY `project_id_2` (`project_id`,`module_id`,`page_id`,`language_id`),
@@ -298,7 +298,7 @@ CREATE TABLE IF NOT EXISTS `content_introduction` (
   `topic` varchar(255) DEFAULT NULL,
   `content` text,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
   KEY `project_id_2` (`project_id`,`page_id`,`language_id`),
@@ -332,7 +332,7 @@ CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
   `keystep_content_created` datetime NOT NULL,
   `keystep_content_last_change` datetime NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `keystep_content_id` (`keystep_content_id`,`project_id`,`keystep_id`,`language_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -468,7 +468,7 @@ CREATE TABLE IF NOT EXISTS `free_modules_pages` (
   `image` varchar(255) DEFAULT NULL,
   `show_order` mediumint(9) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`),
   KEY `project_id_2` (`project_id`,`module_id`)
@@ -623,7 +623,7 @@ CREATE TABLE IF NOT EXISTS `habitats` (
   `project_id` int(11) NOT NULL,
   `sys_label` varchar(64) NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -636,7 +636,7 @@ CREATE TABLE IF NOT EXISTS `habitat_labels` (
   `language_id` int(11) NOT NULL,
   `label` varchar(255) NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`,`habitat_id`,`language_id`),
   KEY `project_id` (`project_id`,`label`)
@@ -739,7 +739,7 @@ CREATE TABLE IF NOT EXISTS `introduction_pages` (
   `got_content` tinyint(1) NOT NULL DEFAULT '0',
   `show_order` int(11) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -1173,7 +1173,7 @@ CREATE TABLE IF NOT EXISTS `names` (
   `organisation` varchar(255) DEFAULT NULL,
   `organisation_id` int(11) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`taxon_id`),
   KEY `project_id_2` (`project_id`,`taxon_id`,`language_id`),
@@ -1194,7 +1194,7 @@ CREATE TABLE IF NOT EXISTS `name_types` (
   `project_id` int(11) NOT NULL,
   `nametype` varchar(64) NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`nametype`),
   KEY `id` (`id`,`project_id`),
@@ -1282,7 +1282,7 @@ CREATE TABLE IF NOT EXISTS `presence` (
   `sys_label` varchar(255) NOT NULL,
   `established` tinyint(1) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -1299,7 +1299,7 @@ CREATE TABLE IF NOT EXISTS `presence_labels` (
   `information_title` varchar(64) DEFAULT NULL,
   `index_label` varchar(10) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`,`presence_id`,`language_id`),
   KEY `project_id` (`project_id`,`presence_id`,`language_id`)
@@ -1497,7 +1497,7 @@ CREATE TABLE IF NOT EXISTS `tab_order` (
   `show_order` int(2) NOT NULL DEFAULT '99',
   `start_order` int(2) DEFAULT NULL,
   `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1544,7 +1544,7 @@ CREATE TABLE IF NOT EXISTS `taxa_variations` (
   `taxon_id` int(11) NOT NULL,
   `label` varchar(255) NOT NULL,
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `taxon_id` (`taxon_id`,`label`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -1674,7 +1674,7 @@ CREATE TABLE IF NOT EXISTS `variations_labels` (
   `label` varchar(255) NOT NULL,
   `label_type` enum('alternative','prefix','postfix','') NOT NULL DEFAULT 'alternative',
   `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
