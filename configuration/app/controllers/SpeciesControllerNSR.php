@@ -874,7 +874,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_m.file_name as thumb,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as taxon,
-				_z.name,
+				ifnull(_zz.name,_z.name) as name,
 				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
@@ -930,6 +930,12 @@ class SpeciesControllerNSR extends SpeciesController
 				and _q.project_id=_z.project_id
 				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _z.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%names _zz
+				on _m.taxon_id=_zz.taxon_id
+				and _m.project_id=_zz.project_id
+				and _zz.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
+				and _zz.language_id=".$this->getCurrentLanguageId()."
 
 			left join %PRE%names _j
 				on _m.taxon_id=_j.taxon_id
