@@ -334,6 +334,25 @@ class SearchControllerNSR extends SearchController
 			);
 		
 	}
+	
+	private function getTaxonOverviewImage( $id ) 
+	{
+		$img=$this->models->MediaTaxon->freeQuery("
+			select
+				_a.file_name
+			from
+				%PRE%media_taxon _a, %PRE%media_meta _b
+			where
+				_a.project_id=".$this->getCurrentProjectId()."
+				and _a.taxon_id=". $id ."
+				and _a.id=_b.media_id
+				and _a.project_id=_b.project_id
+				and _b.sys_label='beeldbankDatumAanmaak'
+				order by overview_image desc,meta_date desc
+			limit 1
+		");
+		return isset($img[0]) ? $img[0]['file_name'] : null;
+	}
 
 	private function doSearch($p)
 	{
@@ -346,7 +365,7 @@ class SearchControllerNSR extends SearchController
 		if (empty($search))
 			return null;
 
-		$d=$this->models->Names->freeQuery("
+		$data=$this->models->Names->freeQuery("
 			select
 				SQL_CALC_FOUND_ROWS	
 				_a.taxon_id,
@@ -513,32 +532,18 @@ class SearchControllerNSR extends SearchController
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		);
 		
-		//q($d,1);
+		//q($data,1);
 		//q($this->models->Names->q(),1);
 
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->models->Names->freeQuery('select found_rows() as total');
 
-		foreach((array)$d as $key=>$val)
+		foreach((array)$data as $key=>$val)
 		{
-			$img=$this->models->MediaTaxon->freeQuery("
-				select
-					_a.file_name
-				from
-					%PRE%media_taxon _a, %PRE%media_meta _b
-				where
-					_a.project_id=".$this->getCurrentProjectId()."
-					and _a.taxon_id=".$val['taxon_id']."
-					and _a.id=_b.media_id
-					and _a.project_id=_b.project_id
-					and _b.sys_label='beeldbankDatumAanmaak'
-					order by overview_image desc,meta_date desc
-				limit 1
-			");
-			$d[$key]['overview_image']=$img[0]['file_name'];
+			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
-		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_resSpeciesPerPage);
+		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resSpeciesPerPage);
 
 	}
 
@@ -779,21 +784,7 @@ class SearchControllerNSR extends SearchController
 		
 		foreach((array)$data as $key=>$val)
 		{
-			$img=$this->models->MediaTaxon->freeQuery("
-				select
-					_a.file_name
-				from
-					%PRE%media_taxon _a, %PRE%media_meta _b
-				where
-					_a.project_id=".$this->getCurrentProjectId()."
-					and _a.taxon_id=".$val['taxon_id']."
-					and _a.id=_b.media_id
-					and _a.project_id=_b.project_id
-					and _b.sys_label='beeldbankDatumAanmaak'
-					order by meta_date desc
-				limit 1
-			");
-			$data[$key]['overview_image']=$img[0]['file_name'];
+			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
 		return 
