@@ -92,7 +92,8 @@
 		<th title="gebruik dit veld voor delen/hoofdstukken van boeken en voor onderdelen van websites.">gepubliceerd in:</th>
 		<td>
 			<span id="publishedin">{if $reference.publishedin_label}{$reference.publishedin_label}{else}-{/if}</span>
-			<a class="edit" href="#" onclick="dropListDialog(this,'Publicatie', { publication_type:['Boek','Website'] });return false;" rel="publishedin_id">edit</a>
+            
+			<a class="edit" href="#" onclick="dropListDialog(this,'Publicatie', { publication_type:[{$gepubliceerd_in_ids|@implode:','}] });return false;" rel="publishedin_id">edit</a>
 			<input type="hidden" id="publishedin_id" name="publishedin_id" value="{$reference.publishedin_id}" />
 		</td>
 	</tr>
@@ -116,7 +117,7 @@
 		<th title="gebruik dit veld voor het tijdschrift of seriewerk waarin betreffende referentie gepubliceerd is.">periodiek:</th>
 		<td>
             <span id="periodical">{if $reference.periodical_label}{$reference.periodical_label}{else}-{/if}</span>
-            <a class="edit" href="#" onclick="dropListDialog(this,'Periodiek', { publication_type:['Serie','Tijdschrift'] });return false;" 
+            <a class="edit" href="#" onclick="dropListDialog(this,'Periodiek', { publication_type:[{$periodiek_ids|@implode:','}] });return false;" 
                 rel="periodical_id">edit</a>
             <input type="hidden" id="periodical_id" name="periodical_id" value="{$reference.periodical_id}" />
 		</td>

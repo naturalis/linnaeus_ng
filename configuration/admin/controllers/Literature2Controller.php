@@ -2,6 +2,45 @@
 
 /*
 
+	TO DO
+	
+	- kunnen verwijderen (en dus ontkoppelen) publicatievormen
+	- zorgen dat het ook werjkt met de bulkupload
+	- checken dat de vertalingen werken aan de voorzijde (en ook in de admin)
+	- tabellen uitrollen en aanpassen in NSR & CSR 
+	- in CSR, engelse termen vervangen door nederlandse
+	- tabellen updaten in NSR & CSR 
+
+
+
+
+alter table literature2 add column publication_type_id int(11) null after publication_type;
+
+
+update literature2 _a
+set _a.publication_type_id =
+	(select _b.id from literature2_publication_types _b
+	where _b.sys_label = _a.publication_type)
+;
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
 CREATE TABLE `literature2_publication_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -185,10 +224,28 @@ class Literature2Controller extends NsrController
 			$this->smarty->assign('reference',$this->getReference());
 			$this->smarty->assign('links',$this->getReferenceLinks());
 		}
+		
+		$publicationTypes=$this->getPublicationTypes();
+		
+		$gepubliceerd_in_ids=$periodiek_ids=array();
+		foreach((array)$publicationTypes as $val)
+		{
+			if ($val['sys_label']=='Boek' || $val['sys_label']=='Website')
+			{
+				$gepubliceerd_in_ids[]=$val['id'];
+			}
+			if ($val['sys_label']=='Serie' || $val['sys_label']=='Tijdschrift')
+			{
+				$periodiek_ids[]=$val['id'];
+			}
+		}
+
+		$this->smarty->assign('gepubliceerd_in_ids',$gepubliceerd_in_ids);
+		$this->smarty->assign('periodiek_ids',$periodiek_ids);
 
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('publicationTypes',$this->getPublicationTypes());
+		$this->smarty->assign('publicationTypes',$publicationTypes);
 		$this->printPage(isset($template) ? $template : null);
 	}
 
@@ -1251,7 +1308,6 @@ class Literature2Controller extends NsrController
 			$fetchNonAlpha=false;
 		}
 
-
 		$all=$this->models->Literature2->freeQuery(
 			"select
 				_a.id,
@@ -1285,8 +1341,8 @@ class Literature2Controller extends NsrController
 				".(isset($publicationType) ? 
 					"and ".
 					(is_array($publicationType) ? 
-						"_a.publication_type in ('" . implode("','",array_map('mysql_real_escape_string',$publicationType)). "')" : 
-						"_a.publication_type = '" . mysql_real_escape_string($publicationType) . "'") : 
+						"_a.publication_type_id in (" . implode(",",array_map('intval',$publicationType)). ")" : 
+						"_a.publication_type_id = " . mysql_real_escape_string($publicationType) ) : 
 					"" )."
 			");	
 
