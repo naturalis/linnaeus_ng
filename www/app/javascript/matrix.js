@@ -4,7 +4,7 @@ function __(text)
 {
 	for(var i=0;i<__translations.length;i++)
 	{
-		if (__translations[i].label==text)
+		if (__translations[i].key==text)
 		{
 			return __translations[i].translation;
 		}
