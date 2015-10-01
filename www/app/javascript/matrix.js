@@ -655,13 +655,13 @@ function formatResult( data )
 			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
 				remoteLinkClickHtmlTpl
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
-					.replace('%TITLE%', labels.info_link)
+					.replace('%TITLE%', _('meer informatie'))
 					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
 				iconUrlHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
-			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',labels.details) : "")
+			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',__('onderscheidende kenmerken')) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
 				iconInfoHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
@@ -669,7 +669,7 @@ function formatResult( data )
 				relatedClickHtmlTpl
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
-					.replace('%TITLE%', labels.similar)
+					.replace('%TITLE%', _('gelijkende soorten'))
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
@@ -1194,7 +1194,7 @@ function printSimilarHeader()
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
-			.replace('%SHOW-STATES-TEXT%', labels.show_all)
+			.replace('%SHOW-STATES-TEXT%', __('alle onderscheidende kenmerken tonen'))
 			.replace('%NUMBER-START%', matrixsettings.start+1)
 			.replace('%NUMBER-END%', data.resultset.length)
 	).removeClass('hidden').addClass('visible');
@@ -1208,12 +1208,12 @@ function toggleAllDetails()
 	if ($('.result-detail:visible').length < getResultSet().length)
 	{
 		$('.result-detail').toggle(true);
-		$('#showAllLabel').html(labels.hide_all);
+		$('#showAllLabel').html(__('alle onderscheidende kenmerken tonen'));
 	}
 	else
 	{
 		$('.result-detail').toggle(false);
-		$('#showAllLabel').html(labels.show_all);
+		$('#showAllLabel').html(_('alle kenmerken verbergen'));
 	}
 
 }
@@ -1556,7 +1556,7 @@ function doRemoteLink( url, name )
 
 				printInfo( 
 					data.page.body, 
-					labels.info_dialog_title,
+					_('Meer informatie'),
 					url
 				);
 				setCursor();
@@ -1581,7 +1581,7 @@ function printInfo( info, title, url )
 				.replace('%URL%', url ? 
 					infoDialogUrlHtmlTpl
 						.replace('%URL%',url)
-						.replace('%LINK-LABEL%',labels.popup_species_link)
+						.replace('%LINK-LABEL%',_('Meer informatie'))
 					 : "" ),
 			{showOk:false});
 	}
@@ -1589,13 +1589,6 @@ function printInfo( info, title, url )
 
 function matrixInit()
 {
-	//nbcLabelClose = __('sluiten');
-	//nbcLabelBack = __('terug');
-
-	$('#legendDetails').html( labels.details );
-	$('#legendSimilarSpecies').html( labels.similar );
-	$('#legendExternalLink').html( labels.info_link );
-
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
 
 	// inititializing scores, results and menu
