@@ -567,7 +567,7 @@ parameters:
 				_f.meta_data as lokatie,
 				_g.meta_data as validator,
 				_k.name as dutch_name,
-				trim(replace(_m.name,_m.authorship,'')) as scientific_name
+				trim(replace(ifnull(_m.name,''),ifnull(_m.authorship,''),'')) as scientific_name
 
 			from %PRE%media_taxon _a
 			
