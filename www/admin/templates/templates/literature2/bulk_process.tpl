@@ -47,6 +47,8 @@ function makeJoinExample(col)
 
 	<div style="padding-bottom:10px;margin-bottom:20px;">
  
+ 
+{$matching_publication_types|@var_dump}
 
 
         {foreach from=$new_ref item=line key=k}{if !$ignorefirst || ($ignorefirst && $k>0)}

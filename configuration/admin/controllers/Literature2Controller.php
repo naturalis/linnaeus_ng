@@ -5,7 +5,7 @@
 	TO DO
 	
 	- kunnen verwijderen (en dus ontkoppelen) publicatievormen
-	- zorgen dat het ook werjkt met de bulkupload
+	- zorgen dat het ook werkt met de bulkupload
 	- checken dat de vertalingen werken aan de voorzijde (en ook in de admin)
 	- tabellen uitrollen en aanpassen in NSR & CSR 
 	- in CSR, engelse termen vervangen door nederlandse
@@ -288,6 +288,7 @@ class Literature2Controller extends NsrController
 		$fields=null;
 		$matches=null;
 		$firstline=null;
+		$matching_publication_types=null;
 
 		$ignorefirst=$this->rHasVal('ignorefirst','1');
 		$this->setSessionVar('ignorefirst',$ignorefirst);
@@ -370,7 +371,37 @@ class Literature2Controller extends NsrController
 		if ($lines && $fields) 
 		{
 			$matches=$this->matchPossibleReferences(array('lines'=>$lines,'ignorefirst'=>$ignorefirst,'fields'=>$fields));
+
 			$this->setSessionVar('matches',$matches);
+			$this->setSessionVar('matching_publication_types',null);
+
+			// publication_type -> publication_type_id			
+			if (in_array('publication_type',$fields))
+			{
+				$this->setPublicationTypes();
+				$these_keys=array_keys($fields,'publication_type');
+
+				foreach((array)$lines as $key=>$cols)
+				{
+					$first_type=null;  // multiple or concatenated publication_ types make no sense, so we take the first
+					
+					foreach( $these_keys as $this_key )
+					{
+						if ( isset($cols[$this_key]) ) 
+						{
+							$first_type=trim($cols[$this_key]);
+							break;
+						}
+					}
+					
+					$matching_publication_types[$key]=$this->matchPublicationType( $first_type );
+				}
+				
+				$this->setSessionVar('matching_publication_types',$matching_publication_types);
+
+			}
+			
+
 
 			foreach((array)$lines[0] as $c=>$cell)
 			{
@@ -398,6 +429,12 @@ class Literature2Controller extends NsrController
 				{
 					$this->setSessionVar('field_periodical',$c);
 				}
+				else
+				if(isset($fields[$c]) && $fields[$c]=='publication_type')
+				{
+					$this->setSessionVar('field_publication_type',$c);
+				}
+				
 			}
 
 
@@ -410,6 +447,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('field_date',$this->getSessionVar('field_date'));
 		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
 		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
+		$this->smarty->assign('field_publication_type',$this->getSessionVar('field_publication_type'));
 
 		$this->smarty->assign('threshold',$this->_matchThresholdDefault);
 		$this->smarty->assign('matches',$matches);
@@ -421,6 +459,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('ignorefirst',$ignorefirst);
 		$this->smarty->assign('firstline',$firstline);
 		$this->smarty->assign('lines',$lines);
+		$this->smarty->assign('matching_publication_types',$matching_publication_types);
 
 		$this->printPage();
 	}
@@ -541,6 +580,31 @@ class Literature2Controller extends NsrController
 				}
 			}
 
+			// publication_type -> publication_type_id			
+			// (they're already in session data, but lets be thorough)
+			if (in_array('publication_type',$fields))
+			{
+				$this->setPublicationTypes();
+				$these_keys=array_keys($fields,'publication_type');
+
+				foreach((array)$lines as $key=>$cols)
+				{
+					if ( !isset($new_ref[$key]) || $new_ref[$key]!='on' ) continue;
+					
+					$first_type=null;  // multiple or concatenated publication_ types make no sense, so we take the first
+					
+					foreach( $these_keys as $this_key )
+					{
+						if ( isset($cols[$this_key]) ) 
+						{
+							$first_type=trim($cols[$this_key]);
+							break;
+						}
+					}
+					
+					$matching_publication_types[$key]=$this->matchPublicationType( $first_type );
+				}
+			}
 		}
 
 		$this->smarty->assign('ignorefirst',$ignorefirst);
@@ -562,6 +626,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('matching_authors',$matching_authors);
 		$this->smarty->assign('matching_publishedin',$matching_publishedin);
 		$this->smarty->assign('matching_periodical',$matching_periodical);
+		$this->smarty->assign('matching_publication_types',$this->getSessionVar('matching_publication_types'));
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('default_language',$this->getDefaultProjectLanguage());
 	
@@ -2209,6 +2274,14 @@ class Literature2Controller extends NsrController
 
 	}
 		
+	private function matchPublicationType( $str )
+	{
+		foreach($this->getPublicationTypes() as $key=>$val)
+		{
+			if ( $val['sys_label']==$str ) return $val['id'];
+		}
+	}
+
 	private function setReferenceBefore()
 	{
 		$this->referenceBefore=$this->getReference();	
@@ -2225,8 +2298,6 @@ class Literature2Controller extends NsrController
 			return $this->referenceBefore;
 		}
 	}		
-
-
 
 
 	

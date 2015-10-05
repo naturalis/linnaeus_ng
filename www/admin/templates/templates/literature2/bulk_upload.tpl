@@ -17,6 +17,9 @@
 
 <form method="post" id="theForm">
 
+LEGAL PUBLICATION TYPES
+
+
 <div id="page-main" class="literature-match">
 
 	<div style="border-bottom:1px dotted #666;padding-bottom:10px;margin-bottom:20px;">
@@ -179,7 +182,7 @@
                         none of the above;
                     </label>
                     <label>
-                        create as new? <input type="checkbox" data-id="{$k}" name="new_ref[{$k}]" />
+                        create as new? <input type="checkbox" data-id="{$k}" name="new_ref[{$k}]" onchange="$('.pub-type-warning').toggle($(this).prop('checked'));" />
                     </label>
                     </td>
                 </tr>
@@ -187,10 +190,21 @@
             	<tr>
                 	<td></td>
                     <td colspan="4" style="text-align:left">
-                        <label>no matches; create as new? <input type="checkbox" name="new_ref[{$k}]" /></label>
+                        <label>no matches; create as new? <input type="checkbox" name="new_ref[{$k}]" onchange="$('.pub-type-warning').toggle($(this).prop('checked'));" /></label>
 					</td>
 				</tr>
             {/if}
+            
+
+			{if $matching_publication_types[$k]==""}
+            	<tr style="display:none" class="pub-type-warning">
+                	<td></td>
+                    <td colspan="4" style="text-align:left">
+                    	<span style="color:red">unknown publication type "{$line[$field_publication_type]}" will not be saved.</span>
+					</td>
+				</tr>
+			{/if}
+            
 			</table>
 
             {if $i>1}
