@@ -10,6 +10,7 @@
 
 */
 
+// general settings are stored under module_id -1
 
 include_once ('Controller.php');
 class ModuleSettingsController extends Controller
@@ -19,6 +20,7 @@ class ModuleSettingsController extends Controller
 	private $_modulecontroller;
 	private $_moduleid;
 	private $_settingsvalues;
+	private $_generalsettingsvalues;
 	private $_usedefaultwhennovalue=false;
 	
 
@@ -29,8 +31,7 @@ class ModuleSettingsController extends Controller
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
-		
-
+		$this->setGeneralSettingsValues();
     }
 
     public function __destruct()
@@ -70,6 +71,22 @@ class ModuleSettingsController extends Controller
 	{
 		$settings = new stdClass();
 		foreach((array)$this->getModuleSettingsValues() as $val)
+		{
+			if ( is_null($val['value']) && $this->getUseDefaultWhenNoValue() && !is_null($val['default_value']) )
+			{
+				$settings->$val['setting']=$val['default_value'];
+			}
+			else
+			{
+				$settings->$val['setting']=$val['value'];
+			}
+		}
+	}
+
+	public function assignGeneralSettings( &$settings )
+	{
+		$settings = new stdClass();
+		foreach((array)$this->getGeneralSettingsValues() as $val)
 		{
 			if ( is_null($val['value']) && $this->getUseDefaultWhenNoValue() && !is_null($val['default_value']) )
 			{
@@ -145,6 +162,32 @@ class ModuleSettingsController extends Controller
 	private function getModuleSettingsValues()
 	{
         return $this->_settingsvalues;
+	}
+
+	private function setGeneralSettingsValues()
+	{
+		$this->_generalsettingsvalues=$this->models->ModuleSettingsValues->freeQuery("
+			select
+				_a.value as value,
+				_b.setting,
+				_b.default_value as default_value
+
+			from
+				%PRE%module_settings _b
+
+			left join
+				%PRE%module_settings_values _a
+				on _b.id=_a.setting_id
+				and _a.project_id = " . $this->getCurrentProjectId() . "
+
+			where
+				_b.module_id = -1
+			");
+	}
+
+	private function getGeneralSettingsValues()
+	{
+        return $this->_generalsettingsvalues;
 	}
 
 
