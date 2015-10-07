@@ -1,7 +1,12 @@
 <?php
 
+include_once ('Controller.php');
+include_once ('ModuleSettingsController.php');
+
 class NSRFunctionsController extends Controller
 {
+
+	public $settings;
 
     public function __construct ()
     {
@@ -16,7 +21,9 @@ class NSRFunctionsController extends Controller
 	
     private function initialise()
     {
-		$this->defaultNvNLicenseText = $this->getSetting( "photo_NvN_license_text", "Alle rechten voorbehouden" );
+		$this->moduleSettings=new ModuleSettingsController;
+		$this->moduleSettings->setUseDefaultWhenNoValue( true );
+		$this->moduleSettings->assignGeneralSettings( $this->settings );
     }
 	
 	public function formatPictureResults($data)
@@ -33,7 +40,10 @@ class NSRFunctionsController extends Controller
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') => !empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->defaultNvNLicenseText,
+				$this->translate('Licentie') =>
+					(!empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->settings->picture_license_default) . 
+					'&nbsp;<a class="help" title="' . $this->translate('klik voor help over dit onderdeel') .'" target="_blank" href="'. $this->settings->url_to_picture_license_info .'">&nbsp;</a>'
+					
 			);
 
 			$data[$key]['photographer']=$val['photographer'];
