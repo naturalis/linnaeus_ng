@@ -12,7 +12,7 @@
                     
                     <ul class="wat-weet-je-list">      
                         <li class="wat-weet-je-arrow no-text">Wat weet je van het dier?</li>
-                        
+
                         {foreach from=$facetmenu item=group key=groupkey}
                         
                             {assign var=foo value="|"|explode:$group.label} 
@@ -220,10 +220,10 @@ $(document).ready(function()
 		alwaysSortByInitial: {$settings->always_sort_by_initial},
 	});
 
-	setScores($.parseJSON('{$session_scores}'));
-	setStates($.parseJSON('{$session_states}'));
-	setStateCount($.parseJSON('{$session_statecount}'));
-	setCharacters($.parseJSON('{$session_characters}'));
+	setScores($.parseJSON('{$session_scores|@addslashes}'));
+	setStates($.parseJSON('{$session_states|@addslashes}'));
+	setStateCount($.parseJSON('{$session_statecount|@addslashes}'));
+	setCharacters($.parseJSON('{$session_characters|@addslashes}'));
 	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 			
 	matrixInit();

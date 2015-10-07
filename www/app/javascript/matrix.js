@@ -1591,16 +1591,16 @@ function matrixInit()
 {
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
 
-	// inititializing scores, results and menu
 	setCursor('wait');
 
-	//applyScores();
-	setResultSet(getDataSet());
+	if ( getMenu()=="" ) 
+		initMenu();
+	else
+		printMenu();
+
+	applyScores();
 	sortResults();
 	clearResults();
 	printResults();
-	disableShowMoreButton(); // gets reinitialized in printResults()
-	initDataSet();
 	setCursor();
 }
-
