@@ -20,10 +20,10 @@ create table `module_settings` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 ;
 
+drop table module_settings_values;
 
-drop table `module_settings_preset_values`;
 
-create table `module_settings_preset_values` (
+CREATE TABLE `module_settings_values` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `setting_id` int(11) NOT NULL,
@@ -31,11 +31,12 @@ create table `module_settings_preset_values` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `module_settings_3` (`project_id`,`setting_id`),
   KEY `module_settings_1` (`project_id`),
-  KEY `module_settings_2` (`project_id`,`setting_id`),
-  UNIQUE `module_settings_3` (`project_id`,`setting_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
-;
+  KEY `module_settings_2` (`project_id`,`setting_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
 
 */
 
