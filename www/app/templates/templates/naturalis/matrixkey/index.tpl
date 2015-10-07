@@ -158,30 +158,6 @@ $(document).ready(function()
 	
 	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
 	
-	setSetting({
-		matrixId: {$matrix.id},
-		projectId: {$session.app.project.id},
-		imageRootSkin: '{$image_root_skin}',
-		imageRootProject: '{$projectUrls.projectMedia}',
-		useEmergingCharacters: {$settings->use_emerging_characters},
-		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
-		imageOrientation: '{$settings->image_orientation}',
-		browseStyle: '{$settings->browse_style}',
-		scoreThreshold: {$settings->score_threshold},
-		alwaysShowDetails: {$settings->always_show_details},
-		perPage: {$settings->items_per_page},
-		perLine: {$settings->items_per_line},
-		generalSpeciesInfoUrl: '{$settings->species_info_url}',
-		showScores: {$settings->show_scores},
-		initialSortColumn: '{$settings->initial_sort_column}',
-		alwaysSortByInitial: {$settings->always_sort_by_initial},
-	});
-
-	setScores($.parseJSON('{$session_scores}'));
-	setStates($.parseJSON('{$session_states}'));
-	setCharacters($.parseJSON('{$session_characters}'));
-	setDataSet($.parseJSON('{$limited_dataset|@addslashes}'));
-
 	__translations = [
 		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },
 		{ key : 'Dit kenmerk is bij de huidige selectie nog niet onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie nog niet onderscheidend.{/t}' },
@@ -204,6 +180,31 @@ $(document).ready(function()
 		{ key : 'alle kenmerken verbergen', translation : '{t}alle kenmerken verbergen{/t}' },
 		{ key : 'alle onderscheidende kenmerken tonen', translation : '{t}alle onderscheidende kenmerken tonen{/t}' },
 	];
+
+	setSetting({
+		matrixId: {$matrix.id},
+		projectId: {$session.app.project.id},
+		imageRootSkin: '{$image_root_skin}',
+		imageRootProject: '{$projectUrls.projectMedia}',
+		useEmergingCharacters: {$settings->use_emerging_characters},
+		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
+		imageOrientation: '{$settings->image_orientation}',
+		browseStyle: '{$settings->browse_style}',
+		scoreThreshold: {$settings->score_threshold},
+		alwaysShowDetails: {$settings->always_show_details},
+		perPage: {$settings->items_per_page},
+		perLine: {$settings->items_per_line},
+		generalSpeciesInfoUrl: '{$settings->species_info_url}',
+		showScores: {$settings->show_scores},
+		initialSortColumn: '{$settings->initial_sort_column}',
+		alwaysSortByInitial: {$settings->always_sort_by_initial},
+	});
+
+	setScores($.parseJSON('{$session_scores|@addslashes}'));
+	setStates($.parseJSON('{$session_states|@addslashes}'));
+	setCharacters($.parseJSON('{$session_characters|@addslashes}'));
+	setMenu(parseJSON('{$session_menu|@addslashes}'));
+	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 
 	matrixInit();
 
