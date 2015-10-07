@@ -55,13 +55,13 @@
                     <div class="result-list-header">
                         <ul>
                             <li id="prev-button-container-top" style="visibility:hidden">
-								<a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');"></a>
-								<a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');"></a>
+								<a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');return false;"></a>
+								<a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');return false;"></a>
 							</li>
                             <li class="num-found" style="margin-top:-2px;"><span class="num" id="result-count-container">0</span> dieren gevonden</li>
                             <li id="next-button-container-top" style="position:relative;left:84px;visibility:visible;">
-								<a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');"></a>
-								<a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');"></a>
+								<a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');return false;"></a>
+								<a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');return false;"></a>
 							</li>
                         </ul>
                         <div class="clearer"></div>
@@ -74,13 +74,13 @@
                     <div class="result-list-footer">
                          <ul>
                             <li id="prev-button-container-bottom" style="visibility:hidden">
-								<a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');" style="margin-left:5px"></a>
-								<a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');" style="margin-left:1px"></a>
+								<a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');return false;" style="margin-left:5px"></a>
+								<a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');return false;" style="margin-left:1px"></a>
 							</li>
                             <li style="width:184px;">&nbsp;</li>
                             <li id="next-button-container-bottom" style="position:relative;left:84px;visibility:visible;">
-								<a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');"></a>
-								<a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');"></a>
+								<a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');return false;"></a>
+								<a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');return false;"></a>
 							</li>
                         </ul>
                     </div>
@@ -127,7 +127,7 @@
 									<a 
                                     	href="#" 
                                         data-value='{$character.prefix}:{$character.id}:{$state.id}'
-                                        class="bla" 
+	                                    onclick="charClick(this)"
                                         id="state-{$state.id}">
                                         <div class="grid-iconbox">
                                             <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$state.file_name}">
@@ -167,7 +167,7 @@
                                 <a
                                 	href="#" 
                                     data-value='{$group.prefix}:{$group.id}:{$state.id}'
-                                    class="bla"
+                                    onclick="charClick(this)"
                                     id="state-{$state.id}">
                                 <div class="grid-iconbox">
                                     <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$state.file_name}">
@@ -194,14 +194,15 @@
 		{/foreach}
 
 		</div>
-       
-
-
 
 
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+	{if $requestData.dier}
+	drnzkr_startDier='{$requestData.dier|@escape}';
+	{/if}
+
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
@@ -227,10 +228,6 @@ $(document).ready(function()
 	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 			
 	matrixInit();
-
-	{if $requestData.dier}
-	drnzkr_startDier='{$requestData.dier|@escape}';
-	{/if}
 
 	$('[data-facetgrouppageid^="facetgrouppage"]').click(function(e)
 	{
@@ -263,7 +260,6 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 
 ga('create', 'UA-27823424-1', 'dierenzoeker.nl');
 ga('send', 'pageview');
-
 </script>
 
 {literal}
@@ -277,8 +273,6 @@ sitestat("//nl.sitestat.com/klo/ntr/s?ntr.hetklokhuis.dierenzoeker&category=hetk
 </script>
 <noscript><p><img src="//nl.sitestat.com/klo/ntr/s?ntr.hetklokhuis.dierenzoeker&category=hetklokhuis&ns_webdir=hetklokhuis&ns_channel=nieuws_informatie&po_source=fixed&po_sitetype=plus&po_merk=video.zz.zappelin&ntr_genre=jeugd" height="1" width="1" alt="*"/></p></noscript>
 <!-- End CMC -->
-
-
 
 <!-- Begin comScore Inline Tag 1.1302.13 --> 
 <script type="text/javascript"> 
@@ -296,18 +290,6 @@ function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="sub
 
 
 <script type="text/JavaScript">
-
-$(document).ready(function()
-{
-	$('.bla').on('click',function()
-	{
-		setStateValue($(this).attr('data-value'));
-		$('.facetgrouppage-close-btn').trigger('click');
-		return false;
-	});
-});
-
-
 
 
 var resultsHtmlTpl = '<ul>%RESULTS%</ul>';
@@ -330,7 +312,7 @@ var speciesStateItemHtmlTpl = '';
 
 var resultHtmlTpl = '\
 <li class="result0"> \
-<a style="" onclick="drnzkr_toon_dier( { id:%ID% } );return false;" href="#"> \
+<a style="" onclick="drnzkr_toon_dier( { id:%ID%, name:\'%COMMON-NAME%\' } );return false;" href="#"> \
 <table><tbody><tr><td>%IMAGE-HTML% \
 </td><td style="width:100%">%COMMON-NAME%</td></tr></tbody></table></a> \
 </li> \
@@ -415,7 +397,6 @@ var drzkr_mainMenuItemHtmlTemplate = '\
 
 var drzkr_selectedFacetHtmlTemplate = '<li><div class="ui-block-a"><a class="chosen-facet" onclick="clearStateValue(\'%STATE-VAL%\');return false;" href="#"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;font-style:italic;margin-top:-15px;padding-bottom:5px;">%CHARACTER-LABEL%</div><img class="grid-icon" src="%ICON%" style="top:25px;" alt=""><img src="%IMG-ROOT-SKIN%button-close-shadow-overlay.png" style="position:relative;top:-5px;left:0px;margin-left:-73px;" alt=""></div><div class="grid-labelbox" style="margin-top:-5px;">%STATE-LABEL%</div></a></div></li> \
 ';
-
 
 </script>
 
