@@ -204,6 +204,8 @@ class ModuleSettingsController extends Controller
 			order by
 				_a.module
 		");
+		
+		$this->_modules[]=array("id"=>-1,"module"=>"General settings");
 	}
 
 	private function getModules()
