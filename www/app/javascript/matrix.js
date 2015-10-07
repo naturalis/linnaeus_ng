@@ -77,7 +77,7 @@ var searchedfor="";
 var	labels={
 	details: __('onderscheidende kenmerken'),
 	similar: __('gelijkende soorten'),
-	show_all: __('alle onderscheidende kenmerken tonen'),
+	show_all: __('toon alle kenmerken'),
 	hide_all: __('kenmerken verbergen'),
 	info_link: __('Meer informatie over soort/taxon'),
 	info_dialog_title:__('Informatie over soort/taxon'),
@@ -1147,6 +1147,10 @@ function peersHaveIdenticalValues(fcharacter,fvalues)
 
 function removeSimilarCharacters()
 {
+
+	if (matrixsettings.similarSpeciesShowDistinctDetailsOnly!=1)
+		return;
+	
 	var resultset=getResultSet();
 	//console.dir(resultset);
 	
@@ -1194,7 +1198,7 @@ function printSimilarHeader()
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
-			.replace('%SHOW-STATES-TEXT%', __('alle onderscheidende kenmerken tonen'))
+			.replace('%SHOW-STATES-TEXT%', __('toon alle kenmerken'))
 			.replace('%NUMBER-START%', matrixsettings.start+1)
 			.replace('%NUMBER-END%', data.resultset.length)
 	).removeClass('hidden').addClass('visible');
@@ -1205,15 +1209,16 @@ function printSimilarHeader()
 
 function toggleAllDetails()
 {
+
 	if ($('.result-detail:visible').length < getResultSet().length)
 	{
 		$('.result-detail').toggle(true);
-		$('#showAllLabel').html(__('alle onderscheidende kenmerken tonen'));
+		$('#showAllLabel').html(_('alle kenmerken verbergen'));
 	}
 	else
 	{
 		$('.result-detail').toggle(false);
-		$('#showAllLabel').html(_('alle kenmerken verbergen'));
+		$('#showAllLabel').html(__('toon alle kenmerken'));
 	}
 
 }

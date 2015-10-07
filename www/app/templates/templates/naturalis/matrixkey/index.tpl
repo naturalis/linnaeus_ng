@@ -118,7 +118,7 @@
                 </a>
                 <a href='#' id='showAllLabel' onclick='nbcToggleAllSpeciesDetail();return false;'>
                   <span class='icon icon-details'></span>
-                  <span id='showAllLabelLabel'>{t}alle onderscheidende kenmerken tonen{/t}</span>
+                  <span id='showAllLabelLabel'>{t}toon alle kenmerken{/t}</span>
                 </a>
               </div>
             </div>
@@ -174,6 +174,7 @@ $(document).ready(function()
 		{ key : 'kenmerken verbergen', translation : '{t}kenmerken verbergen{/t}' },
 		{ key : 'meer resultaten laden', translation : '{t}meer resultaten laden{/t}' },
 		{ key : 'onderscheidende kenmerken', translation : '{t}onderscheidende kenmerken{/t}' },
+		{ key : 'toon alle kenmerken', translation : '{t}toon alle kenmerken{/t}' },
 		{ key : 'terug', translation : '{t}terug{/t}' },
 		{ key : 'van', translation : '{t}van{/t}' },
 		{ key : 'alle kenmerken tonen', translation : '{t}alle kenmerken tonen{/t}' },
@@ -198,12 +199,13 @@ $(document).ready(function()
 		showScores: {$settings->show_scores},
 		initialSortColumn: '{$settings->initial_sort_column}',
 		alwaysSortByInitial: {$settings->always_sort_by_initial},
+		similarSpeciesShowDistinctDetailsOnly: {$settings->similar_species_show_distinct_details_only},
 	});
 
 	setScores($.parseJSON('{$session_scores|@addslashes}'));
 	setStates($.parseJSON('{$session_states|@addslashes}'));
 	setCharacters($.parseJSON('{$session_characters|@addslashes}'));
-	setMenu(parseJSON('{$session_menu|@addslashes}'));
+	setMenu($.parseJSON('{$session_menu|@addslashes}'));
 	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 
 	matrixInit();

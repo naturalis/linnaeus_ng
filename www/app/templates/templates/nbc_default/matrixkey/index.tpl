@@ -61,6 +61,7 @@ $(document).ready(function()
 		{ key : 'Meer informatie over soort/taxon', translation : '{t}Meer informatie over soort/taxon{/t}' },
 		{ key : 'Zoekresultaten voor', translation : '{t}Zoekresultaten voor{/t}' },
 		{ key : 'alle onderscheidende kenmerken tonen', translation : '{t}alle onderscheidende kenmerken tonen{/t}' },
+		{ key : 'toon alle kenmerken', translation : '{t}toon alle kenmerken{/t}' },
 		{ key : 'foto', translation : '{t}foto{/t}' },
 		{ key : 'gelijkende soorten', translation : '{t}gelijkende soorten{/t}' },
 		{ key : 'kenmerken verbergen', translation : '{t}kenmerken verbergen{/t}' },
@@ -87,6 +88,7 @@ $(document).ready(function()
 		showScores: {$settings->show_scores},
 		initialSortColumn: '{$settings->initial_sort_column}',
 		alwaysSortByInitial: {$settings->always_sort_by_initial},
+		similarSpeciesShowDistinctDetailsOnly: {$settings->similar_species_show_distinct_details_only},
 	});
 
 	setScores($.parseJSON('{$session_scores}'));
