@@ -8,6 +8,7 @@
 	<li class="leaf"><a href="{$server}/node/16">DNA Barcoding</a></li>
 	<li class="collapsed"><a href="{$server}/node/17">Wie is wie?</a></li>
 	<li class="leaf"><a href="{$server}/node/18">Citering</a></li>
+	<li class="leaf"><a href="{$server}/content/gebruiksvoorwaarden-fotos">Gebruiksvoorwaarden foto's</a></li>
 	<li class="last leaf"><a href="{$server}/node/48">Natuurwidget</a></li>
 	</ul></li>
 	<li class="expanded"><a title="" href="{$server}/node/19">Exoten</a><ul class="menu clearfix"><li class="first leaf"><a href="{$server}/node/21">Inleiding</a></li>
