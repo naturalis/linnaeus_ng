@@ -1,4 +1,4 @@
-                    <a class="no-text" style="width:465px;height:90px;display:block;position:absolute;" href="">Home</a>
+                    <a class="no-text" style="width:465px;height:90px;display:block;position:absolute;" href="/">Home</a>
                     
                     <ul class="menu">
                         <li><a id="home-btn" class="no-text" href="../../views/matrixkey/">Home</a></li>

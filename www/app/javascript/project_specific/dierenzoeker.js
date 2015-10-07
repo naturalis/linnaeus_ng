@@ -88,6 +88,7 @@ function drnzkr_update_navigatie()
 
 function drnzkr_toon_dier( p )
 {
+
 	$.ajax(
 	{
 		url : '../species/taxon_overview.php',
@@ -103,6 +104,17 @@ function drnzkr_toon_dier( p )
 		{
 			if (data)
 			{
+
+				if ( p.name )
+				{
+					try {
+						// altering the URL without reloading for bookmarking purposes
+						var stateObj = { foo: "bar" };
+						window.history.pushState(stateObj, p.name , 'index.php?dier='+p.name );
+					}
+					catch(err) {}
+				}
+				
 				//console.log( data );
 				$('#dier-content').html( data );
 				$('#dier-content-wrapper').css('visibility','visible');
@@ -135,7 +147,7 @@ function drnzkr_prettyPhotoInit()
 
 function drnzkr_open_dier_link()
 {
-	if (!drnzkr_startDier) return
+	if (!drnzkr_startDier) return;
 
 	drnzkr_startDier=$('<textarea />').html( drnzkr_startDier ).text(); // convert entities to characters
 
@@ -156,13 +168,15 @@ function drnzkr_open_dier_link()
 	{
 		drnzkr_startDier=null;
 
-		drnzkr_toon_dier( { id:n.id, type:n.type } );
-
 		for (var j=0;j<Math.floor(i/matrixsettings.perPage);j++)
 		{
 			drnzkr_navigeren('volgende');
 		}
-	}		
+	
+		drnzkr_toon_dier( { id:n.id, type:n.type } );
+
+	}	
+
 }
 
 
@@ -227,23 +241,25 @@ function drnzkr_update_choices_made()
 	}
 }
 
+
+function charClick( item )
+{
+	setStateValue( $(item).attr('data-value') );
+	$('.facetgrouppage-close-btn').trigger('click');
+	return false;
+}
+
+
 function drnzkr_update_states()
 {
-	/*
-
-		setStateValue($(this).attr('data-value'));
-		$('.facetgrouppage-close-btn').trigger('click');
-		return false;
-			
-	*/
-	
-	
-	$('a[id^="state-"]').addClass('ui-disabled');
+	$('a[id^="state-"]').addClass('ui-disabled').prop('onclick',null).off('click');
 
 	var d=getStateCount();
 
 	for(var i in d)
 	{
-		if (d[i]>0) $('#state-'+i).removeClass('ui-disabled');
+		if (d[i]>0) $('#state-'+i).removeClass('ui-disabled').on('click',function(){ charClick(this);});
 	}
 }
+
+//196170 

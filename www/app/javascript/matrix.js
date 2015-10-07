@@ -649,7 +649,7 @@ function formatResult( data )
 			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
 				matrixLinkHtmlTpl.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
 				: ""))
-			.replace('%COMMON-NAME%', commonName)
+			.replace(/%COMMON-NAME%/g, addSlashes(commonName))
 			.replace('%COMMON-NAME-TITLE%', addSlashes(commonName) )
 			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
 			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
