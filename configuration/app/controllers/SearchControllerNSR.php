@@ -493,6 +493,7 @@ class SearchControllerNSR extends SearchController
 				and _g.project_id=_h.project_id 
 				and _h.language_id=".$this->getCurrentLanguageId()."
 
+
 			left join
 				(select project_id,taxon_id,count(*) as number_of_barcodes from %PRE%dna_barcodes group by project_id,taxon_id) as _j
 				on _a.taxon_id=_j.taxon_id
@@ -519,7 +520,8 @@ class SearchControllerNSR extends SearchController
 					'".PREDICATE_SYNONYM_SL."',
 					'".PREDICATE_HOMONYM."',
 					'".PREDICATE_BASIONYM."',
-					'".PREDICATE_MISSPELLED_NAME."'
+					'".PREDICATE_MISSPELLED_NAME."',
+					'".PREDICATE_INVALID_NAME."'
 				)
 				and ifnull(_trash.is_deleted,0)=0
 		
