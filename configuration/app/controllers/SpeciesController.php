@@ -684,16 +684,17 @@ class SpeciesController extends Controller
 			));
 
 			$start=null;
-			foreach((array)$tp as $key=>$val) {
-				$tp[$key]['show_order']=isset($tab[$val['tabname']]) ? $tab[$val['tabname']]['show_order'] : 99;
-				if (is_null($start) && !empty($tab[$val['tabname']]['start_order']) && $emptinessList[$val['id']]==0) {
-					$start=$val['id'];
-				}
+			if (!empty($tab)) {
+    			foreach((array)$tp as $key=>$val) {
+    				$tp[$key]['show_order']=isset($tab[$val['tabname']]) ? $tab[$val['tabname']]['show_order'] : 99;
+    				if (is_null($start) && !empty($tab[$val['tabname']]['start_order']) && $emptinessList[$val['id']]==0) {
+    					$start=$val['id'];
+    				}
+    			}
+    			$defCat=!is_null($start) ? $start : $defCat	;
+
+    			$this->customSortArray($tp,array('key' => array('show_order')));
 			}
-			$defCat=!is_null($start) ? $start : $defCat	;
-
-			$this->customSortArray($tp,array('key' => array('show_order')));
-
 		}
 
 		return array(
