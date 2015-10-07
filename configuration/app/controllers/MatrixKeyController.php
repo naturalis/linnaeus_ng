@@ -825,7 +825,7 @@ class MatrixKeyController extends Controller
 				_d.sd,
 				_d.got_labels,
 				_e.label,
-				_g.label as group_label
+				ifnull(_g.label,_gg.label) as group_label
 				
 			from %PRE%matrices_taxa_states _a
 			
@@ -851,6 +851,10 @@ class MatrixKeyController extends Controller
 				on _a.project_id=_f.project_id
 				and _a.characteristic_id=_f.characteristic_id
 			
+			left join %PRE%chargroups _gg
+				on _f.project_id=_gg.project_id
+				and _f.chargroup_id=_gg.id
+
 			left join %PRE%chargroups_labels _g
 				on _f.project_id=_g.project_id
 				and _f.chargroup_id=_g.chargroup_id
