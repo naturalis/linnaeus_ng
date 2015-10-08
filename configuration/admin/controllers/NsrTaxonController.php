@@ -32,7 +32,8 @@ class NsrTaxonController extends NsrController
 		'nsr_ids',
 		'taxon_quick_parentage',
 		'trash_can',
-		'traits_groups'
+		'traits_groups',
+		'names_additions'
     );
     public $usedHelpers = array(
     );
@@ -354,6 +355,7 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('nametypes',$this->getNameTypes());
 			$this->smarty->assign('languages',$this->getLanguages());
 			$this->smarty->assign('actors',$this->getActors());
+			$this->smarty->assign('projectlanguages',$this->getProjectLanguages());
 			$this->smarty->assign('defaultprojectlanguage',$this->getDefaultProjectLanguage());
 		}
 
@@ -614,6 +616,20 @@ class NsrTaxonController extends NsrController
 		return isset($this->isNewRecord) ? $this->isNewRecord : false;
 	}
 
+	private function getNameAddition($p)
+	{
+		$name_id=isset($p['name_id']) ? $p['name_id'] : null;
+		
+		if (is_null($name_id)) return;
+
+		return $this->models->NamesAdditions->_get(
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'name_id'=>$name_id
+			)
+		);
+	}
+
 	private function getName($p)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -690,7 +706,11 @@ class NsrTaxonController extends NsrController
 			)
 		);
 
-		return $name[0];
+		$name=$name[0];
+		
+		$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
+		
+		return $name;
 	}
 
 	private function getNames($p)
