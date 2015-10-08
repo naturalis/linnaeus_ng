@@ -1,5 +1,16 @@
 {include file="../shared/admin-header.tpl"}
 
+<style>
+.language-labels {
+    font-size: 0.9em;
+}
+.language-labels input {
+    font-size: 0.9em;
+    margin: 0 10px 0 0;
+    width: 125px;
+}
+</style>
+
 <div id="page-main">
 
 <h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe naam{else}{$name.name}{/if}</h2>
@@ -36,6 +47,16 @@
 		</select> *
         <span></span>
 	</td></tr>
+
+	{if $name.type_id==$preferrednameid || $name.type_id==$alternativenameid}
+
+	<tr><th>aanvulling:</th><td>
+	{foreach from=$projectlanguages item=v}
+	<span class="language-labels">{if $projectlanguages|@count>1}{$v.language}: {/if}<input type="text" value="" id="aanvulling[{$v.language_id}]" name="aanvulling[{$v.language_id}]" /></span>
+	{/foreach}		
+	</td></tr>
+
+	{/if}
 
 	{*<tr>
 		<th>nsr id:</th>

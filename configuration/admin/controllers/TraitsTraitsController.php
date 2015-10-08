@@ -475,6 +475,7 @@ class TraitsTraitsController extends TraitsController
 		
 		$g=$this->getTraitgroup($id);
 		
+		// REFAC2015: are these statments correct? shouldn't 'id'=> be 'text_id' =>
 		$this->models->TextTranslations->delete(array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'id'=>$g['name_tid']
