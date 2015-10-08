@@ -18,22 +18,23 @@
 	{if $mediaOwn.count>0 && $mediaCollected.species>0}
 
 	<div style="width:510px;margin-bottom:10px;text-align:center;font-family:Georgia;">
-        <div class="{if $requestData.media=='collected'}media-not-active{else}media-active{/if}">
-	        {if $requestData.media=='collected'}
-            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
-                	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
-				</a>
+        <div class="{if $requestData.media=='collected' || $requestData.media==''}media-active{else}media-not-active{/if}">
+	        {if $requestData.media=='collected' || $requestData.media==''}
+	            {t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 			{else}
-            	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
-			{/if}
-        </div>
-        <div class="{if $requestData.media=='collected'}media-active{else}media-not-active{/if}">
-	        {if $requestData.media!='collected'}
             	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
                 	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 				</a>
+			{/if}
+        </div>
+        <div class="{if $requestData.media=='own'}media-active{else}media-not-active{/if}">
+	        {if $requestData.media=='own'}
+            	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 			{else}
-            	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species}){/if}
+            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
+                	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
+				</a>
+			{/if}
         </div>
     </div>
     
@@ -70,10 +71,10 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if $mediaOwn.count>0 && $requestData.media!='collected'}
-	var action='get_media_batch';
-	{elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
+	{if $mediaCollected.species>0 &&  $requestData.media!='own'}
 	var action='get_collected_batch';
+	{elseif $mediaOwn.count>0 && $requestData.media!='collected'}
+	var action='get_media_batch';
 	{/if}
 	var page=0;
 	var id={$taxon.id};
