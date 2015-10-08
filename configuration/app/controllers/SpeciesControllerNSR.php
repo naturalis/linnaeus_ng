@@ -1939,7 +1939,7 @@ class SpeciesControllerNSR extends SpeciesController
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
 				and _a.literature2_id =".$id."
-			order by _b.name
+			order by _a.sort_order,_b.name
 		");
 		
 		return $d;
