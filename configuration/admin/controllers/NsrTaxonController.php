@@ -239,6 +239,7 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('traitgroups',$this->getTraitgroups());
 			$this->smarty->assign('rank_id_species',$this->_projectRankIds[SPECIES_RANK_ID]['id']);
 			$this->smarty->assign('rank_id_subspecies',$this->_projectRankIds[SUBSPECIES_RANK_ID]['id']);
+			$this->smarty->assign('main_language_name_language_id',$this->getDefaultProjectLanguage());
 		}
 
 		$this->checkMessage();
@@ -815,7 +816,11 @@ class NsrTaxonController extends NsrController
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 			}
+
 			$names[$key]['name_no_tags']=strip_tags($names[$key]['name']);
+
+			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
+
 		}
 
 		return
