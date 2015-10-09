@@ -19,7 +19,15 @@
 							<tr><td style="white-space:nowrap">{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
 						{/if}
 					{else}
-						<tr><td style="white-space:nowrap">{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+						<tr><td style="white-space:nowrap">
+                        {if $v.nametype=='isAlternativeNameOf' && $names.language_has_preferredname[$v.language_id]!=true && $v.alt_alt_nametype_label}
+                        {$v.alt_alt_nametype_label|@ucfirst}
+                        {else}
+                        {$v.nametype_label|@ucfirst}
+                        {/if}
+                        </td><td><a href="name.php?id={$v.id}">{$v.name}</a>
+                        {if $v.addition[$currentLanguageId].addition}({$v.addition[$currentLanguageId].addition}){/if}
+                        </td></tr>
 					{/if}
 				{/if}
 			{/foreach}

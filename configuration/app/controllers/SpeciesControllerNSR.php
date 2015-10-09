@@ -163,7 +163,6 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$this->smarty->assign('search',$this->requestData);	
 					$this->smarty->assign('querystring',$this->reconstructQueryString());
-	
 					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));	
 					$this->smarty->assign('mediaCollected',$this->getCollectedLowerTaxonMedia($this->requestData));	
 				}
@@ -610,6 +609,8 @@ class SpeciesControllerNSR extends SpeciesController
 		$nomen=null;
 		$prevs=array();
 
+		$language_has_preferredname=array(); // SANDER!?
+
 		$synonymStartIndex=-1;
 		$synonymCount=0;
 		$i=0;
@@ -629,15 +630,6 @@ class SpeciesControllerNSR extends SpeciesController
 				$prefferedname=$val['name'];
 			}
 
-			if (!empty($val['expert_id']))
-				$names[$key]['expert']=$this->getActor($val['expert_id']);
-
-			if (!empty($val['organisation_id']))
-				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
-
-			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
-
-
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
 				$nomen=trim($val['uninomial']).' '.trim($val['specific_epithet']).' '.trim($val['infra_specific_epithet']);
@@ -654,6 +646,53 @@ class SpeciesControllerNSR extends SpeciesController
 				$scientific_name=trim($val['name']);
 
 			}
+			
+			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
+			
+			if (!empty($val['expert_id']))
+				$names[$key]['expert']=$this->getActor($val['expert_id']);
+
+			if (!empty($val['organisation_id']))
+				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
+
+			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
+
+
+			// SANDER!?
+			/*
+				$language_has_preferredname will be used to determine whether there is
+				a preferred name in each language. if not, the alternative name(s) will 
+				be "promoted": 	it/they get the label of the preferred name, rather than
+				that of an alternative name. put ifferently, it makes no sense to display
+				alternative names if there's no preferred one.
+				so this:
+					Nederlandse naam 	Das
+					Alternatieve Nederlandse naam 	Dasseke
+					Alternatieve Nederlandse naam 	Bobbelbeest
+					Alternatieve Nederlandse naam 	Zwartwitje
+					Alternatieve Nederlandse naam 	Namaak-beer
+
+				will turn into this:
+					Nederlandse naam 	Das
+					Nederlandse naam 	Dasseke
+					Nederlandse naam 	Bobbelbeest
+					Nederlandse naam 	Zwartwitje
+					Nederlandse naam 	Namaak-beer
+
+				if 'Das' is changed from preferred to alternative name.
+			*/
+			if ($val['nametype']==PREDICATE_PREFERRED_NAME)
+			{
+				$language_has_preferredname[$val['language_id']]=true;
+			}
+			 
+			if ($val['nametype']==PREDICATE_ALTERNATIVE_NAME)
+			{
+				$names[$key]['alt_alt_nametype_label']=sprintf($this->Rdf->translatePredicate(PREDICATE_PREFERRED_NAME),$val['language_label']);
+			}
+			 // SANDER!?
+
+
 			$i++;
 		}
 
@@ -675,7 +714,8 @@ class SpeciesControllerNSR extends SpeciesController
 				'nomen'=>$nomen,
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
 				'preffered_name'=>$prefferedname,
-				'list'=>$names
+				'list'=>$names,
+				'language_has_preferredname'=>$language_has_preferredname // SANDER!?
 			);
 	}
 
@@ -1333,8 +1373,9 @@ class SpeciesControllerNSR extends SpeciesController
 	
 		if (empty($nameId) && (empty($taxonId) || empty($languageId) || empty($predicateType))) return;
 
-		return $this->models->Names->freeQuery("
+		$d=$this->models->Names->freeQuery("
 			select
+				_a.id,
 				_a.taxon_id,
 				_a.name,
 				_a.uninomial,
@@ -1389,6 +1430,9 @@ class SpeciesControllerNSR extends SpeciesController
 			(!empty($predicateType) ? " and _b.nametype=".$predicateType : "")
 		);
 		
+		$d[0]['addition']=$this->getNameAddition(array('name_id'=>$d[0]['id']));
+
+		return $d;
 	}
 
 	private function getDNABarcodes($id)
@@ -1993,6 +2037,23 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 
 	}
+
+	private function getNameAddition($p)
+	{
+		$name_id=isset($p['name_id']) ? $p['name_id'] : null;
+
+		if (is_null($name_id)) return;
+
+		return $this->models->NamesAdditions->_get(array('id'=>
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'name_id'=>$name_id
+			),
+			'columns'=>'id,language_id,addition',
+			'fieldAsIndex'=>'language_id'
+		));
+	}
+
 
     public function ajaxInterfaceAction ()
     {

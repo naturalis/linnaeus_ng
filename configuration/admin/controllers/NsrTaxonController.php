@@ -350,6 +350,7 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('preferrednames',$this->getPreferredNames($concept['id']));
 			$this->smarty->assign('preferrednameid',$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']);
+			$this->smarty->assign('alternativenameid',$this->_nameTypeIds[PREDICATE_ALTERNATIVE_NAME]['id']);
 			$this->smarty->assign('hasvalidname',$this->checkIfConceptRetainsScientificName($concept['id']));
 			$this->smarty->assign('validnameid',$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']);
 			$this->smarty->assign('nametypes',$this->getNameTypes());
@@ -619,15 +620,17 @@ class NsrTaxonController extends NsrController
 	private function getNameAddition($p)
 	{
 		$name_id=isset($p['name_id']) ? $p['name_id'] : null;
-		
+
 		if (is_null($name_id)) return;
 
-		return $this->models->NamesAdditions->_get(
+		return $this->models->NamesAdditions->_get(array('id'=>
 			array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'name_id'=>$name_id
-			)
-		);
+			),
+			'columns'=>'id,language_id,addition',
+			'fieldAsIndex'=>'language_id'
+		));
 	}
 
 	private function getName($p)
@@ -2270,6 +2273,18 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
+		if ($this->rHasVar('aanvulling'))
+		{
+			if ($this->saveNameAanvulling($this->rGetVal('aanvulling')))
+			{
+				$this->addMessage('Aanvulling opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Aanvulling niet opgeslagen.');
+			}
+		}
+
 		$after=$this->getName(array('id'=>$this->getNameId()));
 		$this->logNsrChange(
 			array(
@@ -2411,6 +2426,59 @@ class NsrTaxonController extends NsrController
 			array('organisation_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
+	}
+
+	private function saveNameAanvulling($values)
+	{
+		$current=$this->models->NamesAdditions->_get(
+			array(
+				'id'=>array('project_id'=>$this->getCurrentProjectId(),'name_id'=>$this->getNameId()),
+				'fieldAsIndex'=>'language_id'
+			)
+		);
+		
+		$results=array();
+		foreach((array)$values as $language_id=>$vals)
+		{
+			if ( isset($vals['new']) )
+				$new=trim($vals['new']);
+			else
+				$new=null;
+			
+			if ( !isset($current[$language_id]) )
+			{
+				//insert
+				$results[]=$this->models->NamesAdditions->save(
+					array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'name_id'=>$this->getNameId(),
+						'language_id'=>$language_id,
+						'addition'=>$new
+					)
+				);
+			}
+			else
+			if ( isset($current[$language_id]) && $current[$language_id]!=$new && !empty($new) )
+			{
+				//update
+				$results[]=$this->models->NamesAdditions->update(
+					array( 'addition'=>$new ),
+					array( 'project_id'=>$this->getCurrentProjectId(), 'id'=>$current[$language_id]['id'] )
+				);
+			}
+			else
+			if ( isset($current[$language_id]) && empty($new) )
+			{
+				//delete
+				$results[]=$this->models->NamesAdditions->delete(
+					array( 'project_id'=>$this->getCurrentProjectId(), 'id'=>$current[$language_id]['id'] )
+				);
+			}
+			
+		}
+		
+		return ( !in_array(false,$results) );
+		
 	}
 
 	private function doNameIntegrityChecks($name)
