@@ -2277,11 +2277,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->saveNameAanvulling($this->rGetVal('aanvulling')))
 			{
-				$this->addMessage('Aanvulling opgeslagen.');
+				$this->addMessage('Opmerking opgeslagen.');
 			}
 			else
 			{
-				$this->addError('Aanvulling niet opgeslagen.');
+				$this->addError('Opmerking niet opgeslagen.');
 			}
 		}
 
