@@ -48,15 +48,16 @@
         <span></span>
 	</td></tr>
 
-	{if $name.type_id==$preferrednameid || $name.type_id==$alternativenameid}
+	{* if $name.type_id==$preferrednameid || $name.type_id==$alternativenameid *}
 
-	<tr><th>aanvulling:</th><td>
+	<tr><th>opmerking:</th><td>
 	{foreach from=$projectlanguages item=v}
-	<span class="language-labels">{if $projectlanguages|@count>1}{$v.language}: {/if}<input type="text" value="" id="aanvulling[{$v.language_id}]" name="aanvulling[{$v.language_id}]" /></span>
+	<span class="language-labels">{if $projectlanguages|@count>1}{$v.language}: {/if}
+    <input type="text" value="{$name.addition[{$v.language_id}].addition}" id="aanvulling[{$v.language_id}]" name="aanvulling[{$v.language_id}]" /></span>
 	{/foreach}		
 	</td></tr>
 
-	{/if}
+	{* /if *}
 
 	{*<tr>
 		<th>nsr id:</th>

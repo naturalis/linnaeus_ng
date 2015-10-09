@@ -11,6 +11,9 @@
 	<div id="content">
 			<h2>{t}Naam{/t}: {$name.name}</h2>
 			<table>
+	            {if $name.addition[$currentLanguageId].addition}
+                    <tr><td>Opmerking:</td><td colspan="2">{$name.addition[$currentLanguageId].addition}</td></tr>
+                {/if}
 				<tr><td>{t}Is{/t} {$name.nametype} {t}voor{/t}</td><td colspan="2"><a href="nsr_taxon.php?id={$taxon.id}">{$taxon.taxon}</a></td></tr>
 				{if $name.reference_label}<tr><td>{t}Referentie{/t}</td><td colspan="2"><a href="../literature2/reference.php?id={$name.reference_id}">{$name.reference_label}</a></td></tr>{/if}
 				{if $name.expert_name}<tr><td>{t}Expert{/t}</td><td colspan="2">{$name.expert_name}</td></tr>{/if}
