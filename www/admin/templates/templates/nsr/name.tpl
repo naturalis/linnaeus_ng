@@ -2,10 +2,10 @@
 
 <style>
 .language-labels {
-    font-size: 0.9em;
+    -ont-size: 0.9em;
 }
 .language-labels input {
-    font-size: 0.9em;
+    -ont-size: 0.9em;
     margin: 0 10px 0 0;
     width: 125px;
 }
