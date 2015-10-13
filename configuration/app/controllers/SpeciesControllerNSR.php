@@ -284,8 +284,7 @@ class SpeciesControllerNSR extends SpeciesController
     {
         if ($this->rHasId())
 		{
-			$d=$this->getName(array('nameId'=>$this->requestData['id']));
-			$name=$d[0];
+			$name=$this->getName(array('nameId'=>$this->requestData['id']));
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 			$this->smarty->assign('name',$name);
 			$this->smarty->assign('taxon',$this->getTaxonById($name['taxon_id']));
@@ -303,6 +302,24 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->tmp;
 	}
 	
+    public function ajaxInterfaceAction ()
+    {
+		$return=null;
+		
+		if ($this->rHasVal('action', 'get_media_batch') && $this->rHasId())
+		{
+			$return=json_encode($this->getTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+        } else
+		if ($this->rHasVal('action', 'get_collected_batch') && $this->rHasId())
+		{
+			$return=json_encode($this->getCollectedLowerTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+        }
+
+        $this->allowEditPageOverlay = false;
+		$this->smarty->assign('returnText',$return);
+        $this->printPage('ajax_interface');
+    }
+
 	private function getFirstTaxonIdNsr()
 	{
 		$data=$this->models->Taxon->freeQuery("
@@ -609,7 +626,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$nomen=null;
 		$prevs=array();
 
-		$language_has_preferredname=array(); // SANDER!?
+		$language_has_preferredname=array();
 
 		$synonymStartIndex=-1;
 		$synonymCount=0;
@@ -658,7 +675,6 @@ class SpeciesControllerNSR extends SpeciesController
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 
 
-			// SANDER!?
 			/*
 				$language_has_preferredname will be used to determine whether there is
 				a preferred name in each language. if not, the alternative name(s) will 
@@ -690,8 +706,6 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$names[$key]['alt_alt_nametype_label']=sprintf($this->Rdf->translatePredicate(PREDICATE_PREFERRED_NAME),$val['language_label']);
 			}
-			 // SANDER!?
-
 
 			$i++;
 		}
@@ -715,7 +729,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
 				'preffered_name'=>$prefferedname,
 				'list'=>$names,
-				'language_has_preferredname'=>$language_has_preferredname // SANDER!?
+				'language_has_preferredname'=>$language_has_preferredname
 			);
 	}
 
@@ -1388,6 +1402,7 @@ class SpeciesControllerNSR extends SpeciesController
 				_a.expert_id,
 				_a.organisation,
 				_a.organisation_id,
+				_a.type_id,
 				_b.nametype,
 				_a.language_id,
 				_c.language,
@@ -1430,8 +1445,16 @@ class SpeciesControllerNSR extends SpeciesController
 			(!empty($predicateType) ? " and _b.nametype=".$predicateType : "")
 		);
 		
-		$d[0]['addition']=$this->getNameAddition(array('name_id'=>$d[0]['id']));
+		$d=$d[0];
+		
+		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));
 
+		if ($d['nametype']==PREDICATE_ALTERNATIVE_NAME)
+		{
+			$d['alt_alt_nametype_label']=sprintf($this->Rdf->translatePredicate(PREDICATE_PREFERRED_NAME),$d['language_label']);
+			$d['language_has_preferredname']=$this->doesLanguageHavePreferredName( $d );
+		}
+		
 		return $d;
 	}
 
@@ -2038,7 +2061,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	}
 
-	private function getNameAddition($p)
+	private function getNameAddition( $p )
 	{
 		$name_id=isset($p['name_id']) ? $p['name_id'] : null;
 
@@ -2053,25 +2076,36 @@ class SpeciesControllerNSR extends SpeciesController
 			'fieldAsIndex'=>'language_id'
 		));
 	}
+	
+	private function doesLanguageHavePreferredName( $p )
+	{
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
 
+		if ( is_null($taxon_id) || is_null($language_id) ) return;
 
-    public function ajaxInterfaceAction ()
-    {
-		$return=null;
+		$d=$this->models->Names->freeQuery("
+			select
+				count(*) as total
+			from
+				%PRE%names _a
+
+			left join %PRE%name_types _b 
+				on _a.type_id=_b.id 
+				and _a.project_id = _b.project_id
+
+			where
+				_a.project_id = " . $this->getCurrentProjectId() . " 
+				and _a.taxon_id=" . $taxon_id . "
+				and _a.language_id=" . $language_id . "
+				and _b.nametype= '".PREDICATE_PREFERRED_NAME . "'
+		");
 		
-		if ($this->rHasVal('action', 'get_media_batch') && $this->rHasId())
-		{
-			$return=json_encode($this->getTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
-        } else
-		if ($this->rHasVal('action', 'get_collected_batch') && $this->rHasId())
-		{
-			$return=json_encode($this->getCollectedLowerTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
-        }
+		return $d[0]['total']>0;
 
-        $this->allowEditPageOverlay = false;
-		$this->smarty->assign('returnText',$return);
-        $this->printPage('ajax_interface');
-    }
+	}
+	
+	
 
 
 
