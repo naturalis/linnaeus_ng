@@ -170,8 +170,15 @@ class Literature2Controller extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Index'));
-		$this->smarty->assign('authorAlphabet',$this->getAuthorAlphabet());
-		$this->smarty->assign('titleAlphabet',$this->getTitleAlphabet());
+
+
+		$this->printPage();
+	}
+
+    public function indexByTypeAction()
+	{
+		$this->checkAuthorisation();
+		$this->setPageName($this->translate('Index per publicatievorm'));
 		$this->printPage();
 	}
 
@@ -1345,7 +1352,7 @@ class Literature2Controller extends NsrController
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
         $searchTitle=isset($p['search_title']) ? $p['search_title'] : null;
         $searchAuthor=isset($p['search_author']) ? $p['search_author'] : null;
-        $publicationType=isset($p['publication_type']) ? $p['publication_type'] : null;
+        $publication_type_id=isset($p['publication_type']) ? $p['publication_type'] : null;
 
         if (empty($search) && empty($searchTitle) && empty($searchAuthor))
             return;
@@ -1389,11 +1396,11 @@ class Literature2Controller extends NsrController
 
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
-				".(isset($publicationType) ? 
+				".(isset($publication_type_id) ? 
 					"and ".
-					(is_array($publicationType) ? 
-						"_a.publication_type_id in (" . implode(",",array_map('intval',$publicationType)). ")" : 
-						"_a.publication_type_id = " . mysql_real_escape_string($publicationType) ) : 
+					(is_array($publication_type_id) ? 
+						"_a.publication_type_id in (" . implode(",",array_map('intval',$publication_type_id)). ")" : 
+						"_a.publication_type_id = " . mysql_real_escape_string($publication_type_id) ) : 
 					"" )."
 			");	
 
