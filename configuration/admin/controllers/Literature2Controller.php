@@ -1,5 +1,80 @@
 <?php
 
+/*
+
+	TO DO
+	
+	v kunnen verwijderen (en dus ontkoppelen) publicatievormen
+	v zorgen dat het ook werkt met de bulkupload
+	v checken dat de vertalingen werken aan de voorzijde (en ook in de admin)
+	v tabellen uitrollen en aanpassen in NSR & CSR 
+	- werkt het selecteren van secundair in een nieuwe referentie?
+	- in CSR, engelse termen vervangen door nederlandse
+	- tabellen updaten in NSR & CSR 
+
+update literature2 set publication_type='Boek' where publication_type='Book';
+update literature2 set publication_type='Tijdschrift' where publication_type='Journal';
+update literature2 set publication_type='Serie' where publication_type='Series';
+
+
+
+
+
+alter table literature2 add column publication_type_id int(11) null after publication_type;
+
+
+update literature2 _a
+set _a.publication_type_id =
+	(select _b.id from literature2_publication_types _b
+	where _b.sys_label = _a.publication_type)
+;
+
+
+CREATE TABLE `literature2_publication_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `sys_label` varchar(255) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`project_id`),
+  UNIQUE `project_id` (`project_id`,`sys_label`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
+;
+
+CREATE TABLE `literature2_publication_types_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `publication_type_id` varchar(255) NOT NULL,
+  `language_id` int(11) DEFAULT NULL,
+  `label` varchar(255) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`project_id`),
+  UNIQUE `project_id` (`project_id`,`publication_type_id`,`language_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
+;
+
+insert into `literature2_publication_types` values (null,1,'Artikel',now(),now());
+insert into `literature2_publication_types` values (null,1,'Persoonlijke mededeling',now(),now());
+insert into `literature2_publication_types` values (null,1,'Boek (deel)',now(),now());
+insert into `literature2_publication_types` values (null,1,'Boek',now(),now());
+insert into `literature2_publication_types` values (null,1,'Website',now(),now());
+insert into `literature2_publication_types` values (null,1,'Verslag',now(),now());
+insert into `literature2_publication_types` values (null,1,'Rapport',now(),now());
+insert into `literature2_publication_types` values (null,1,'Database',now(),now());
+insert into `literature2_publication_types` values (null,1,'Serie',now(),now());
+insert into `literature2_publication_types` values (null,1,'Persbericht',now(),now());
+insert into `literature2_publication_types` values (null,1,'Tijdschrift',now(),now());
+insert into `literature2_publication_types` values (null,1,'Literatuur',now(),now());
+insert into `literature2_publication_types` values (null,1,'Hoofdstuk',now(),now());
+insert into `literature2_publication_types` values (null,1,'Manuscript',now(),now());
+
+
+
+*/
+
 include_once ('NsrController.php');
 include_once ('RdfController.php');
 
@@ -14,7 +89,9 @@ class Literature2Controller extends NsrController
 		'names',
 		'actors',
 		'presence_taxa',
-		'literature2_authors'
+		'literature2_authors',
+		'literature2_publication_types',
+		'literature2_publication_types_labels'
     );
    
     public $controllerPublicName = 'Literatuur (v2)';
@@ -55,6 +132,8 @@ class Literature2Controller extends NsrController
 		'Website'
 	);	
 
+	private $publicationTypesSortOrder=" ifnull(_b.label,_a.sys_label)";
+
 	private $lit2Columns=
 		array(
 			'-1'=>'',
@@ -90,6 +169,7 @@ class Literature2Controller extends NsrController
     {
 		$this->Rdf = new RdfController;
 		$this->_matchThresholdDefault=$this->getSetting('literature2_import_match_threshold',$this->_matchThresholdDefault);
+		$this->setPublicationTypes();
     }
 
     public function indexAction()
@@ -98,6 +178,22 @@ class Literature2Controller extends NsrController
 		$this->setPageName($this->translate('Index'));
 		$this->smarty->assign('authorAlphabet',$this->getAuthorAlphabet());
 		$this->smarty->assign('titleAlphabet',$this->getTitleAlphabet());
+		$this->printPage();
+	}
+
+    public function indexByTypeAction()
+	{
+		$this->checkAuthorisation();
+		
+		if (!$this->rHasId()) $this->redirect('publication_types.php');
+		
+		$this->setPageName($this->translate('Index per publicatievorm'));
+
+		foreach((array)$this->getPublicationTypes() as $val)
+			if ($val['id']==$this->rGetId()) $publicationType=$val['sys_label'];
+	
+		$this->smarty->assign('publicationType',$publicationType);
+		$this->smarty->assign('references',$this->getReferences(array('publication_type'=>$this->rGetId(),'search'=>'*')));
 		$this->printPage();
 	}
 
@@ -132,7 +228,8 @@ class Literature2Controller extends NsrController
 			$this->setReferenceBefore();
 			$this->updateReference();
 			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));		
-		} 
+		}
+		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->smarty->assign('reference',$this->requestData);
@@ -148,14 +245,58 @@ class Literature2Controller extends NsrController
 			$this->smarty->assign('reference',$this->getReference());
 			$this->smarty->assign('links',$this->getReferenceLinks());
 		}
+		
+		$publicationTypes=$this->getPublicationTypes();
+		
+		$gepubliceerd_in_ids=$periodiek_ids=array();
+		foreach((array)$publicationTypes as $val)
+		{
+			if ($val['sys_label']=='Boek' || $val['sys_label']=='Website')
+			{
+				$gepubliceerd_in_ids[]=$val['id'];
+			}
+			if ($val['sys_label']=='Serie' || $val['sys_label']=='Tijdschrift')
+			{
+				$periodiek_ids[]=$val['id'];
+			}
+		}
+
+		$this->smarty->assign('gepubliceerd_in_ids',$gepubliceerd_in_ids);
+		$this->smarty->assign('periodiek_ids',$periodiek_ids);
 
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('publicationTypes',$this->getPublicationTypes());
+		$this->smarty->assign('publicationTypes',$publicationTypes);
 		$this->printPage(isset($template) ? $template : null);
 	}
 
-    public function bulkUploadAction()
+    public function publicationTypesAction()
+	{
+		$this->checkAuthorisation();
+		$this->setPageName($this->translate('Publicatievormen'));
+
+		if ( $this->rHasVal('action','save') )
+		{
+			$this->savePublicationType();
+		} else
+		if ( $this->rHasVal('action','save_translations') )
+		{
+			$this->savePublicationTypeTranslations();
+		} else
+		if ( $this->rHasId() && $this->rHasVal('action','delete') )
+		{
+			$this->deletePublicationType();
+		}
+
+		$this->setPublicationTypesSortOrder( 'sys_label' );
+		$this->setPublicationTypes();
+
+		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
+		$this->smarty->assign( 'publicationTypes', $this->getPublicationTypes() );
+		$this->printPage();
+	}
+
+	public function bulkUploadAction()
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Bulk upload (matching)'));
@@ -168,6 +309,7 @@ class Literature2Controller extends NsrController
 		$fields=null;
 		$matches=null;
 		$firstline=null;
+		$matching_publication_types=null;
 
 		$ignorefirst=$this->rHasVal('ignorefirst','1');
 		$this->setSessionVar('ignorefirst',$ignorefirst);
@@ -250,7 +392,35 @@ class Literature2Controller extends NsrController
 		if ($lines && $fields) 
 		{
 			$matches=$this->matchPossibleReferences(array('lines'=>$lines,'ignorefirst'=>$ignorefirst,'fields'=>$fields));
+
 			$this->setSessionVar('matches',$matches);
+			$this->setSessionVar('matching_publication_types',null);
+
+			// publication_type -> publication_type_id			
+			if (in_array('publication_type',$fields))
+			{
+				$this->setPublicationTypes();
+				$these_keys=array_keys($fields,'publication_type');
+
+				foreach((array)$lines as $key=>$cols)
+				{
+					$first_type=null;  // multiple or concatenated publication_ types make no sense, so we take the first
+					
+					foreach( $these_keys as $this_key )
+					{
+						if ( isset($cols[$this_key]) ) 
+						{
+							$first_type=trim($cols[$this_key]);
+							break;
+						}
+					}
+					
+					$matching_publication_types[$key]=$this->matchPublicationType( $first_type );
+				}
+				
+				$this->setSessionVar('matching_publication_types',$matching_publication_types);
+
+			}
 
 			foreach((array)$lines[0] as $c=>$cell)
 			{
@@ -278,8 +448,13 @@ class Literature2Controller extends NsrController
 				{
 					$this->setSessionVar('field_periodical',$c);
 				}
+				else
+				if(isset($fields[$c]) && $fields[$c]=='publication_type')
+				{
+					$this->setSessionVar('field_publication_type',$c);
+				}
+				
 			}
-
 
 			//q($matches,1);
 
@@ -290,6 +465,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('field_date',$this->getSessionVar('field_date'));
 		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
 		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
+		$this->smarty->assign('field_publication_type',$this->getSessionVar('field_publication_type'));
 
 		$this->smarty->assign('threshold',$this->_matchThresholdDefault);
 		$this->smarty->assign('matches',$matches);
@@ -301,6 +477,8 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('ignorefirst',$ignorefirst);
 		$this->smarty->assign('firstline',$firstline);
 		$this->smarty->assign('lines',$lines);
+		$this->smarty->assign('legal_publication_types',$this->getPublicationTypes());
+		$this->smarty->assign('matching_publication_types',$matching_publication_types);
 
 		$this->printPage();
 	}
@@ -322,6 +500,7 @@ class Literature2Controller extends NsrController
 		$lines=$this->getSessionVar('lines');
 		$fields=$this->getSessionVar('fields');
 		$matches=$this->getSessionVar('matches');
+		$matching_publication_types=$this->getSessionVar('matching_publication_types');
 
 		if ($this->rHasVal('match_ref'))
 		{
@@ -420,7 +599,6 @@ class Literature2Controller extends NsrController
 					}
 				}
 			}
-
 		}
 
 		$this->smarty->assign('ignorefirst',$ignorefirst);
@@ -433,15 +611,16 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('field_date',$this->getSessionVar('field_date'));
 		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
 		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
+		$this->smarty->assign('field_publication_type',$this->getSessionVar('field_publication_type'));
 
 		$this->smarty->assign('match_ref',$match_ref);
 		$this->smarty->assign('new_ref',$new_ref);
 
 		$this->smarty->assign('duplicate_columns',$duplicate_columns);
-
 		$this->smarty->assign('matching_authors',$matching_authors);
 		$this->smarty->assign('matching_publishedin',$matching_publishedin);
 		$this->smarty->assign('matching_periodical',$matching_periodical);
+		$this->smarty->assign('matching_publication_types',$matching_publication_types);
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('default_language',$this->getDefaultProjectLanguage());
 	
@@ -467,7 +646,8 @@ class Literature2Controller extends NsrController
 			$lpad=$this->getSessionVar('lpad');
 			$infix=$this->getSessionVar('infix');
 			$rpad=$this->getSessionVar('rpad');
-	
+			$matching_publication_types=$this->getSessionVar('matching_publication_types');
+
 			//q($this->requestData,1);
 	
 			$kill=$this->rHasVal('kill') ? $this->rGetVal('kill') : array();
@@ -690,6 +870,16 @@ class Literature2Controller extends NsrController
 				
 				foreach((array)$columns as $col_name=>$field)
 				{
+
+					if ( $col_name=='publication_type' )
+					{
+						if ( !empty($matching_publication_types[$line_number]) )
+						{
+							$d['publication_type_id']=$matching_publication_types[$line_number];
+						}
+						continue;
+					}
+					
 					if (count((array)$field)==1)
 					{
 						$d[$col_name]=trim($line[$field[0]]);
@@ -710,6 +900,9 @@ class Literature2Controller extends NsrController
 							(!empty($f) && isset($rpad[$col_name]) ? $rpad[$col_name] : '');
 					}
 				}
+
+
+
 	
 				$this->models->Literature2->save( $d );								
 	
@@ -744,7 +937,7 @@ class Literature2Controller extends NsrController
 
 		$this->printPage();
 	}
-	
+
 	private function downloadHeaders( $file )
 	{
 		header( 'Content-Type: text/plain; charset=utf-8' );
@@ -891,7 +1084,6 @@ class Literature2Controller extends NsrController
 		}
 	}
 
-
 	private function updateReference()
 	{
 		$f=array( 
@@ -900,7 +1092,8 @@ class Literature2Controller extends NsrController
 			'alt_label' => 'Alt. label',
 			'date' => 'Datum',
 			'author' => 'Auteur (verbatim)',
-			'publication_type' => 'Publicatietype',
+			//'publication_type' => 'Publicatietype',
+			'publication_type_id' => 'Publicatievorm',
 			'citation' => 'Citatie',
 			'source' => 'Bron',
 			'publisher' => 'Uitgever',
@@ -1070,8 +1263,6 @@ class Literature2Controller extends NsrController
 		$this->models->Literature2Authors->freeQuery("delete from %PRE%literature2_authors where project_id = ".$this->getCurrentProjectId()." and literature2_id = ".$id);	
 	}
 
-
-
 	private function getTitleAlphabet()
 	{
 		$alpha=$this->models->Literature2->freeQuery("
@@ -1176,7 +1367,7 @@ class Literature2Controller extends NsrController
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
         $searchTitle=isset($p['search_title']) ? $p['search_title'] : null;
         $searchAuthor=isset($p['search_author']) ? $p['search_author'] : null;
-        $publicationType=isset($p['publication_type']) ? $p['publication_type'] : null;
+        $publication_type_id=isset($p['publication_type']) ? $p['publication_type'] : null;
 
         if (empty($search) && empty($searchTitle) && empty($searchAuthor))
             return;
@@ -1189,7 +1380,6 @@ class Literature2Controller extends NsrController
 		{
 			$fetchNonAlpha=false;
 		}
-
 
 		$all=$this->models->Literature2->freeQuery(
 			"select
@@ -1221,14 +1411,14 @@ class Literature2Controller extends NsrController
 
 			where
 				_a.project_id = ".$this->getCurrentProjectId()."
-				".(isset($publicationType) ? 
+				".(isset($publication_type_id) ? 
 					"and ".
-					(is_array($publicationType) ? 
-						"_a.publication_type in ('" . implode("','",array_map('mysql_real_escape_string',$publicationType)). "')" : 
-						"_a.publication_type = '" . mysql_real_escape_string($publicationType) . "'") : 
+					(is_array($publication_type_id) ? 
+						"_a.publication_type_id in (" . implode(",",array_map('intval',$publication_type_id)). ")" : 
+						"_a.publication_type_id = " . mysql_real_escape_string(intval($publication_type_id)) ) : 
 					"" )."
 			");	
-
+			
 		$data=array();
 
 		foreach((array)$all as $key => $val)
@@ -1526,8 +1716,6 @@ class Literature2Controller extends NsrController
 	
 	}
 
-
-
     private function getReferenceLookupList($p)
     {
 		$data=$this->getReferences($p);
@@ -1613,30 +1801,200 @@ class Literature2Controller extends NsrController
 		return $languages;
 	}
 
+    private function setPublicationTypesSortOrder( $o )
+    {
+		$this->publicationTypesSortOrder=$o;
+	}
+
+    private function getPublicationTypesSortOrder()
+    {
+		return $this->publicationTypesSortOrder;
+	}
+
+    private function setPublicationTypes()
+    {
+		$this->publicationTypes=$this->models->Literature2PublicationTypes->freeQuery("
+			select
+				_a.id,
+				_a.sys_label,
+				ifnull(_b.label,_a.sys_label) as label,
+				count(_c.id) as total
+
+			from %PRE%literature2_publication_types _a
+
+			left join %PRE%literature2_publication_types_labels _b
+				on _a.id = _b.publication_type_id 
+				and _a.project_id=_b.project_id 
+				and _b.language_id=".$this->getDefaultProjectLanguage()."
+
+			left join %PRE%literature2 _c
+				on _a.id = _c.publication_type_id 
+				and _a.project_id=_c.project_id 
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId() ."
+			group by
+				_a.id
+			order by " . $this->getPublicationTypesSortOrder() ."
+		");
+		
+		foreach((array)$this->publicationTypes as $key=>$val)
+		{
+			$this->publicationTypes[$key]['translations']=
+				$this->models->Literature2PublicationTypesLabels->_get(array('id'=>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'publication_type_id' => $val['id'],
+				),'fieldAsIndex'=>'language_id','columns'=>'label'));
+		}
+	}
+
     private function getPublicationTypes()
     {
-		$d=$this->models->Literature2->freeQuery("
-				select 
-					distinct publication_type 
-				from 
-					%PRE%literature2 
-				where 
-					publication_type is not null 
-				order by 
-					publication_type
-			");
-
-		foreach((array)$d as $val)
-		{
-			$this->publicationTypes[]=$val['publication_type'];
-		}
-
-		array_walk($this->publicationTypes,function(&$a){ $a=$this->translate($a);});
-		$this->publicationTypes=array_unique($this->publicationTypes);
-
 		return $this->publicationTypes;
 	}
 
+    private function savePublicationType()
+    {
+		
+		$type=trim($this->rGetVal('type'));
+					
+		if (empty($type))
+		{
+			$this->addError('Geen naam. Publicatievorm niet opgeslagen.');
+			return;
+		}
+
+		$d=$this->models->Literature2PublicationTypes->_get(array("id"=>
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sys_label' => $type
+			)));
+
+		if ($d)
+		{
+			$this->addError('Naam bestaat al. Publicatievorm niet opgeslagen.');
+			return;
+		}
+
+		$d=$this->models->Literature2PublicationTypes->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'sys_label' => $type
+		));
+
+		$this->addMessage(sprintf('Publicatievorm "%s" opgeslagen.',$type));
+
+	}
+
+    private function deletePublicationType()
+    {
+
+		$id=$this->rGetId();
+
+		if (empty($id))
+		{
+			$this->addError('Geen ID. Publicatievorm niet verwijderd.');
+			return;
+		}
+		
+		foreach($this->getPublicationTypes() as $val)
+		{
+			if ( $val['id']==$id ) $label=$val['label'];
+			
+			if ( $val['id']==$id && $val['total']>0 )
+			{
+				$this->addError(sprintf('Er zijn %s referenties met deze publicatievorm. Publicatievorm niet verwijderd.',$val['total']));
+				return;
+			}
+		}
+
+		$this->models->Literature2PublicationTypesLabels->delete(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'publication_type_id' => $id,
+		));
+			
+		$this->models->Literature2PublicationTypes->delete(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $id,
+		));
+
+		$this->addMessage(sprintf('Publicatievorm %s verwijderd.',$label));
+
+	}
+
+    private function savePublicationTypeTranslations()
+    {
+
+		$translations=$this->rGetVal('translations');
+
+		if (empty($translations)) return;
+		
+		foreach((array)$translations as $type_id=>$val)
+		{
+			if ( is_array($val) && !empty($val) )
+			{
+				foreach((array)$val as $language_id=>$translation)
+				{
+					if (empty($translation))
+					{
+						$this->models->Literature2PublicationTypesLabels->delete(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'publication_type_id' => $type_id,
+								'language_id' =>$language_id
+							)
+						);	
+
+						if ($this->models->Literature2PublicationTypesLabels->getAffectedRows()!=0)
+							$this->addMessage('Vertaling verwijderd.');
+
+						continue;
+					}
+					
+					
+					foreach((array)$this->getPublicationTypes() as $current)
+					{
+						if ($current['id']!=$type_id) continue;
+						
+						if (isset($current['translations']) && isset($current['translations'][$language_id]))
+						{
+							if ($current['translations'][$language_id]['label']!=$translation)
+							{
+								
+								$this->models->Literature2PublicationTypesLabels->update(
+									array(
+										'label' => $translation
+									),
+									array(
+										'project_id' => $this->getCurrentProjectId(),
+										'publication_type_id' => $type_id,
+										'language_id' =>$language_id,
+									)
+								);	
+
+								$this->addMessage(sprintf('Vertaling "%s" opgeslagen.',$translation));
+							}
+						}
+						else
+						{
+							$this->models->Literature2PublicationTypesLabels->save(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'publication_type_id' => $type_id,
+								'language_id' =>$language_id,
+								'label' => $translation
+							));									
+
+							$this->addMessage(sprintf('Vertaling "%s" opgeslagen.',$translation));
+						}
+					}
+				}
+			}
+		}
+	}
 
     private function setActors()
 	{
@@ -1924,6 +2282,14 @@ class Literature2Controller extends NsrController
 
 	}
 		
+	private function matchPublicationType( $str )
+	{
+		foreach( (array)$this->getPublicationTypes() as $key=>$val )
+		{
+			if ( $val['sys_label']==$str ) return $val['id'];
+		}
+	}
+
 	private function setReferenceBefore()
 	{
 		$this->referenceBefore=$this->getReference();	

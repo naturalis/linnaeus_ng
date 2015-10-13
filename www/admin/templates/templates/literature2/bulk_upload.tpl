@@ -24,7 +24,9 @@
         <input type="hidden" name="value" value="" id="value" />
         <span class="raw" onclick="$('.raw').toggle();" style="display:none">show raw data</span>
         <span class="raw">
-            <span onclick="$('.raw').toggle();">raw referece data (TAB separated, like copy/pasted excel cells):</span>
+            <span onclick="$('.raw').toggle();">
+            	raw referece data (TAB separated, like copy/pasted excel cells; be sure to use <a href="publication_types.php">legal publication types</a> - use the system labels, not the translations):
+            </span>
             <textarea name="raw" style="width:100%;height:200px;font-size:0.8em;overflow:scroll">{$raw}</textarea>
             <p>
             <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label>
@@ -179,7 +181,7 @@
                         none of the above;
                     </label>
                     <label>
-                        create as new? <input type="checkbox" data-id="{$k}" name="new_ref[{$k}]" />
+                        create as new? <input type="checkbox" data-id="{$k}" name="new_ref[{$k}]" onchange="$('#pub-type-warning-{$k}').toggle($(this).prop('checked'));" />
                     </label>
                     </td>
                 </tr>
@@ -187,10 +189,21 @@
             	<tr>
                 	<td></td>
                     <td colspan="4" style="text-align:left">
-                        <label>no matches; create as new? <input type="checkbox" name="new_ref[{$k}]" /></label>
+                        <label>no matches; create as new? <input type="checkbox" name="new_ref[{$k}]" onchange="$('#pub-type-warning-{$k}').toggle($(this).prop('checked'));" /></label>
 					</td>
 				</tr>
             {/if}
+            
+
+			{if $matching_publication_types[$k]==""}
+            	<tr style="display:none" id="pub-type-warning-{$k}">
+                	<td></td>
+                    <td colspan="4" style="text-align:left">
+                    	<span style="color:red">unknown publication type "{$line[$field_publication_type]}" will not be saved ('publication_type_id' will be set to null).</span>
+					</td>
+				</tr>
+			{/if}
+            
 			</table>
 
             {if $i>1}
@@ -253,7 +266,8 @@ $(document).ready(function()
 	$('.match').on('show', function() { markElementAsSeen($(this).attr('data-id')); } );
 	markElementAsSeen( '1' );
 
-	$(document).keydown(function(e) {
+	$(document).keydown(function(e)
+	{
 		switch(e.which) {
 			case 37: // left
 				$('.prev:visible').trigger('click');
