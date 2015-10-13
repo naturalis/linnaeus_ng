@@ -144,8 +144,8 @@ function makeJoinExample(col)
                     </td>
                     <td colspan="2">
                     	<select name="language[{$k}]">
-                        {foreach from=$languages item=v key=k}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-						{if $v.sort_criterium==0 && $languages[$k-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
+                        {foreach from=$languages item=v key=l}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+						{if $v.sort_criterium==0 && $languages[$l-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
                         <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
                         {/if}{/foreach}
                         </select>
