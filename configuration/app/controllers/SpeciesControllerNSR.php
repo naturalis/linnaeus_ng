@@ -595,8 +595,12 @@ class SpeciesControllerNSR extends SpeciesController
 							when _b.nametype = '".PREDICATE_MISSPELLED_NAME."' then 4
 							when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
 							else 0
-						end as sort_criterium,
-						if(_a.language_id=".LANGUAGE_ID_DUTCH.",0,1) as sort_criterium2
+						end as sort_criterium_nametype,
+						case
+							when _a.language_id = ".LANGUAGE_ID_DUTCH." then 10
+							when _a.language_id = ".LANGUAGE_ID_SCIENTIFIC." then 0
+							else 5
+						end as sort_criterium_language
 
 					from %PRE%names _a 
 
@@ -615,7 +619,9 @@ class SpeciesControllerNSR extends SpeciesController
 						_a.project_id = ".$this->getCurrentProjectId()."
 						and _a.taxon_id=".$id."
 					order by 
-						sort_criterium desc, sort_criterium2 asc, language_label
+						sort_criterium_language desc, 
+						language_label, 
+						sort_criterium_nametype desc
 						",
 				'fieldAsIndex' => 'id'
 			)
