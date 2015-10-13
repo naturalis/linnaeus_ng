@@ -12,7 +12,7 @@
 			<h2>{t}Naam{/t}: {$name.name}</h2>
 			<table>
 	            {if $name.addition[$currentLanguageId].addition}
-                    <tr><td>Opmerking</td><td colspan="2">{$name.addition[$currentLanguageId].addition}</td></tr>
+                    <tr><td>{t}Opmerking{/t}</td><td colspan="2">{$name.addition[$currentLanguageId].addition}</td></tr>
                 {/if}
 				<tr><td>{t}Is{/t} 
                 
