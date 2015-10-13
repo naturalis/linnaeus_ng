@@ -67,7 +67,7 @@ li {
     
 </p>
 <p>
-	<a href="bulk_upload.php">back</a>
+	<a href="index.php">back</a>
 </p>
 </div>
 

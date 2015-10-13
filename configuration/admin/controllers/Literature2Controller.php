@@ -4,12 +4,18 @@
 
 	TO DO
 	
-	- kunnen verwijderen (en dus ontkoppelen) publicatievormen
-	- zorgen dat het ook werkt met de bulkupload
-	- checken dat de vertalingen werken aan de voorzijde (en ook in de admin)
-	- tabellen uitrollen en aanpassen in NSR & CSR 
+	v kunnen verwijderen (en dus ontkoppelen) publicatievormen
+	v zorgen dat het ook werkt met de bulkupload
+	v checken dat de vertalingen werken aan de voorzijde (en ook in de admin)
+	v tabellen uitrollen en aanpassen in NSR & CSR 
+	- werkt het selecteren van secundair in een nieuwe referentie?
 	- in CSR, engelse termen vervangen door nederlandse
 	- tabellen updaten in NSR & CSR 
+
+update literature2 set publication_type='Boek' where publication_type='Book';
+update literature2 set publication_type='Tijdschrift' where publication_type='Journal';
+update literature2 set publication_type='Serie' where publication_type='Series';
+
 
 
 
@@ -170,15 +176,24 @@ class Literature2Controller extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Index'));
-
-
+		$this->smarty->assign('authorAlphabet',$this->getAuthorAlphabet());
+		$this->smarty->assign('titleAlphabet',$this->getTitleAlphabet());
 		$this->printPage();
 	}
 
     public function indexByTypeAction()
 	{
 		$this->checkAuthorisation();
+		
+		if (!$this->rHasId()) $this->redirect('publication_types.php');
+		
 		$this->setPageName($this->translate('Index per publicatievorm'));
+
+		foreach((array)$this->getPublicationTypes() as $val)
+			if ($val['id']==$this->rGetId()) $publicationType=$val['sys_label'];
+	
+		$this->smarty->assign('publicationType',$publicationType);
+		$this->smarty->assign('references',$this->getReferences(array('publication_type'=>$this->rGetId(),'search'=>'*')));
 		$this->printPage();
 	}
 
@@ -1400,10 +1415,10 @@ class Literature2Controller extends NsrController
 					"and ".
 					(is_array($publication_type_id) ? 
 						"_a.publication_type_id in (" . implode(",",array_map('intval',$publication_type_id)). ")" : 
-						"_a.publication_type_id = " . mysql_real_escape_string($publication_type_id) ) : 
+						"_a.publication_type_id = " . mysql_real_escape_string(intval($publication_type_id)) ) : 
 					"" )."
 			");	
-
+			
 		$data=array();
 
 		foreach((array)$all as $key => $val)
