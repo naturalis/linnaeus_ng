@@ -24,23 +24,6 @@ set _a.publication_type_id =
 ;
 
 
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
 CREATE TABLE `literature2_publication_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -66,6 +49,22 @@ CREATE TABLE `literature2_publication_types_labels` (
   UNIQUE `project_id` (`project_id`,`publication_type_id`,`language_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
 ;
+
+insert into `literature2_publication_types` values (null,1,'Artikel',now(),now());
+insert into `literature2_publication_types` values (null,1,'Persoonlijke mededeling',now(),now());
+insert into `literature2_publication_types` values (null,1,'Boek (deel)',now(),now());
+insert into `literature2_publication_types` values (null,1,'Boek',now(),now());
+insert into `literature2_publication_types` values (null,1,'Website',now(),now());
+insert into `literature2_publication_types` values (null,1,'Verslag',now(),now());
+insert into `literature2_publication_types` values (null,1,'Rapport',now(),now());
+insert into `literature2_publication_types` values (null,1,'Database',now(),now());
+insert into `literature2_publication_types` values (null,1,'Serie',now(),now());
+insert into `literature2_publication_types` values (null,1,'Persbericht',now(),now());
+insert into `literature2_publication_types` values (null,1,'Tijdschrift',now(),now());
+insert into `literature2_publication_types` values (null,1,'Literatuur',now(),now());
+insert into `literature2_publication_types` values (null,1,'Hoofdstuk',now(),now());
+insert into `literature2_publication_types` values (null,1,'Manuscript',now(),now());
+
 
 
 */
@@ -400,8 +399,6 @@ class Literature2Controller extends NsrController
 				$this->setSessionVar('matching_publication_types',$matching_publication_types);
 
 			}
-			
-
 
 			foreach((array)$lines[0] as $c=>$cell)
 			{
@@ -437,7 +434,6 @@ class Literature2Controller extends NsrController
 				
 			}
 
-
 			//q($matches,1);
 
 		}
@@ -459,6 +455,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('ignorefirst',$ignorefirst);
 		$this->smarty->assign('firstline',$firstline);
 		$this->smarty->assign('lines',$lines);
+		$this->smarty->assign('legal_publication_types',$this->getPublicationTypes());
 		$this->smarty->assign('matching_publication_types',$matching_publication_types);
 
 		$this->printPage();
@@ -481,6 +478,7 @@ class Literature2Controller extends NsrController
 		$lines=$this->getSessionVar('lines');
 		$fields=$this->getSessionVar('fields');
 		$matches=$this->getSessionVar('matches');
+		$matching_publication_types=$this->getSessionVar('matching_publication_types');
 
 		if ($this->rHasVal('match_ref'))
 		{
@@ -579,32 +577,6 @@ class Literature2Controller extends NsrController
 					}
 				}
 			}
-
-			// publication_type -> publication_type_id			
-			// (they're already in session data, but lets be thorough)
-			if (in_array('publication_type',$fields))
-			{
-				$this->setPublicationTypes();
-				$these_keys=array_keys($fields,'publication_type');
-
-				foreach((array)$lines as $key=>$cols)
-				{
-					if ( !isset($new_ref[$key]) || $new_ref[$key]!='on' ) continue;
-					
-					$first_type=null;  // multiple or concatenated publication_ types make no sense, so we take the first
-					
-					foreach( $these_keys as $this_key )
-					{
-						if ( isset($cols[$this_key]) ) 
-						{
-							$first_type=trim($cols[$this_key]);
-							break;
-						}
-					}
-					
-					$matching_publication_types[$key]=$this->matchPublicationType( $first_type );
-				}
-			}
 		}
 
 		$this->smarty->assign('ignorefirst',$ignorefirst);
@@ -622,11 +594,10 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('new_ref',$new_ref);
 
 		$this->smarty->assign('duplicate_columns',$duplicate_columns);
-
 		$this->smarty->assign('matching_authors',$matching_authors);
 		$this->smarty->assign('matching_publishedin',$matching_publishedin);
 		$this->smarty->assign('matching_periodical',$matching_periodical);
-		$this->smarty->assign('matching_publication_types',$this->getSessionVar('matching_publication_types'));
+		$this->smarty->assign('matching_publication_types',$matching_publication_types);
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('default_language',$this->getDefaultProjectLanguage());
 	
@@ -652,7 +623,8 @@ class Literature2Controller extends NsrController
 			$lpad=$this->getSessionVar('lpad');
 			$infix=$this->getSessionVar('infix');
 			$rpad=$this->getSessionVar('rpad');
-	
+			$matching_publication_types=$this->getSessionVar('matching_publication_types');
+
 			//q($this->requestData,1);
 	
 			$kill=$this->rHasVal('kill') ? $this->rGetVal('kill') : array();
@@ -875,6 +847,16 @@ class Literature2Controller extends NsrController
 				
 				foreach((array)$columns as $col_name=>$field)
 				{
+
+					if ( $col_name=='publication_type' )
+					{
+						if ( !empty($matching_publication_types[$line_number]) )
+						{
+							$d['publication_type_id']=$matching_publication_types[$line_number];
+						}
+						continue;
+					}
+					
 					if (count((array)$field)==1)
 					{
 						$d[$col_name]=trim($line[$field[0]]);
@@ -895,6 +877,9 @@ class Literature2Controller extends NsrController
 							(!empty($f) && isset($rpad[$col_name]) ? $rpad[$col_name] : '');
 					}
 				}
+
+
+
 	
 				$this->models->Literature2->save( $d );								
 	
@@ -2276,7 +2261,7 @@ class Literature2Controller extends NsrController
 		
 	private function matchPublicationType( $str )
 	{
-		foreach($this->getPublicationTypes() as $key=>$val)
+		foreach( (array)$this->getPublicationTypes() as $key=>$val )
 		{
 			if ( $val['sys_label']==$str ) return $val['id'];
 		}

@@ -271,6 +271,15 @@ function makeJoinExample(col)
                 </tr>
                 {/if}
 
+			{if $matching_publication_types[$k]==""}
+            	<tr>
+                	<td></td>
+                    <td colspan="2" style="text-align:left">
+                    	<span style="color:red">unknown publication type "{$line[$field_publication_type]}" will not be saved ('publication_type_id' will be set to null).</span>
+					</td>
+				</tr>
+			{/if}
+            
 			</table>
             
             {if $i>1}
