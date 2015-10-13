@@ -70,7 +70,7 @@ class Literature2Controller extends Controller
 				_a.label,
 				_a.date,
 				_a.author,
-				_a.publication_type,
+				ifnull(ifnull(_l2ptl.label,_l2pt.sys_label),_a.publication_type) as publication_type,
 				_a.order_number,
 				_a.citation,
 				_a.source,
@@ -102,6 +102,15 @@ class Literature2Controller extends Controller
 				and _a.project_id=_e.project_id
 				and _e.label_language_id = ".$this->getCurrentLanguageId()."
 
+			left join %PRE%literature2_publication_types _l2pt
+				on _a.publication_type_id = _l2pt.id 
+				and _a.project_id=_l2pt.project_id
+			
+			left join %PRE%literature2_publication_types_labels _l2ptl
+				on _a.publication_type_id = _l2ptl.publication_type_id 
+				and _a.project_id=_l2ptl.project_id
+				and _l2ptl.language_id = ".$this->getCurrentLanguageId()."
+				
 			where _a.project_id = ".$this->getCurrentProjectId()."
 			and _a.id =".$id
 		);	
