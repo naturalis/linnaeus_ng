@@ -589,6 +589,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('field_date',$this->getSessionVar('field_date'));
 		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
 		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
+		$this->smarty->assign('field_publication_type',$this->getSessionVar('field_publication_type'));
 
 		$this->smarty->assign('match_ref',$match_ref);
 		$this->smarty->assign('new_ref',$new_ref);
