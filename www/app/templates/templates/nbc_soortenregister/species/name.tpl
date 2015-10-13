@@ -1,5 +1,11 @@
 {include file="../shared/header.tpl"}
 
+<style>
+table tr  td:first-child {
+	white-space:nowrap;
+}
+</style>
+
 <div id="dialogRidge">
 
 	<div id="left">
