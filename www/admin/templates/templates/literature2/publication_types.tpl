@@ -29,9 +29,9 @@ li {
 	<ul>
 	{foreach $publicationTypes v}
     	<li>
-        	{$v.sys_label} ({$v.total})
-            {if $v.total==0}
+        	{$v.sys_label}{if $v.total==0}
             <a class='edit' href='#' onclick="$('#id').val({$v.id});$('#action2').val('delete');$('#theForm').submit();return false;">delete</a>
+            {else}<a class='edit' href='index_by_type.php?id={$v.id}'>({$v.total})</a>
             {/if}
             <br />
             {foreach $languages l}
@@ -39,10 +39,7 @@ li {
             {$l.language}:
             <input class="type-labels" type="text" name="translations[{$v.id}][{$l.language_id}]" value="{$v.translations[{$l.language_id}].label}" onkeyup="">
             </span>
-
             {/foreach }
-
-            
         </li>
     {/foreach}
     </ul>
