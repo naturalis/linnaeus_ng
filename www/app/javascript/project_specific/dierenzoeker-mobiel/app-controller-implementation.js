@@ -235,7 +235,7 @@ function detail(data)
 			var tpl=templates.speciessimilaritem.tpl;
 			
 			if (Object.size(data.similar)==1)
-				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_single);
+				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_1);
 			else
 				tpl=
 					(i==0?
@@ -263,7 +263,7 @@ function detail(data)
 			var tpl=templates.speciessimilaritem.tpl;
 			
 			if (Object.size(data.children)==1)
-				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_single);
+				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_1);
 			else
 				tpl=(i==0?tpl.replace('%class%',templates.speciessimilaritem.class_0):(i<Object.size(data.children)-1?tpl.replace('%class%',templates.speciessimilaritem.class_1):tpl.replace('%class%',templates.speciessimilaritem.class_n)));
 
