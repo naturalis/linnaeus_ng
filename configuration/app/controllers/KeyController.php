@@ -448,6 +448,8 @@ class KeyController extends Controller
 	// be aware that this function also exists in the app controller and should have identical output there!
 	private function generateKeyTree($id=null,$level=0)
 	{
+        // Ruud 14-10-15: removed utf_decode() from 'title' => $step['title'] and
+        // $d['choice_marker'] = $val['marker'] as these fucked up the getLookupList().
 
 		if (is_null($id)) {
 
@@ -469,8 +471,8 @@ class KeyController extends Controller
 			array(
 				'id' => $d['id'],
 				'number' => $d['number'],
-				'title' => utf8_decode($d['title']),
-				'is_start' => $d['is_start'],
+				'title' => $d['title'],
+			    'is_start' => $d['is_start'],
 				'level' => $level
 			);
 
@@ -481,7 +483,7 @@ class KeyController extends Controller
 			$this->_choiceList[] = $val['id'];
 
 			$d['choice_id'] = $val['id'];
-			$d['choice_marker'] = utf8_decode($val['marker']);
+			$d['choice_marker'] = $val['marker'];
 			$d['res_keystep_id'] = $val['res_keystep_id'];
 			$d['res_taxon_id'] = $val['res_taxon_id'];
 
