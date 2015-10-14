@@ -1,80 +1,5 @@
 <?php
 
-/*
-
-	TO DO
-	
-	v kunnen verwijderen (en dus ontkoppelen) publicatievormen
-	v zorgen dat het ook werkt met de bulkupload
-	v checken dat de vertalingen werken aan de voorzijde (en ook in de admin)
-	v tabellen uitrollen en aanpassen in NSR & CSR 
-	- werkt het selecteren van secundair in een nieuwe referentie?
-	- in CSR, engelse termen vervangen door nederlandse
-	- tabellen updaten in NSR & CSR 
-
-update literature2 set publication_type='Boek' where publication_type='Book';
-update literature2 set publication_type='Tijdschrift' where publication_type='Journal';
-update literature2 set publication_type='Serie' where publication_type='Series';
-
-
-
-
-
-alter table literature2 add column publication_type_id int(11) null after publication_type;
-
-
-update literature2 _a
-set _a.publication_type_id =
-	(select _b.id from literature2_publication_types _b
-	where _b.sys_label = _a.publication_type)
-;
-
-
-CREATE TABLE `literature2_publication_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `sys_label` varchar(255) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`),
-  UNIQUE `project_id` (`project_id`,`sys_label`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
-;
-
-CREATE TABLE `literature2_publication_types_labels` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `publication_type_id` varchar(255) NOT NULL,
-  `language_id` int(11) DEFAULT NULL,
-  `label` varchar(255) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`),
-  UNIQUE `project_id` (`project_id`,`publication_type_id`,`language_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8
-;
-
-insert into `literature2_publication_types` values (null,1,'Artikel',now(),now());
-insert into `literature2_publication_types` values (null,1,'Persoonlijke mededeling',now(),now());
-insert into `literature2_publication_types` values (null,1,'Boek (deel)',now(),now());
-insert into `literature2_publication_types` values (null,1,'Boek',now(),now());
-insert into `literature2_publication_types` values (null,1,'Website',now(),now());
-insert into `literature2_publication_types` values (null,1,'Verslag',now(),now());
-insert into `literature2_publication_types` values (null,1,'Rapport',now(),now());
-insert into `literature2_publication_types` values (null,1,'Database',now(),now());
-insert into `literature2_publication_types` values (null,1,'Serie',now(),now());
-insert into `literature2_publication_types` values (null,1,'Persbericht',now(),now());
-insert into `literature2_publication_types` values (null,1,'Tijdschrift',now(),now());
-insert into `literature2_publication_types` values (null,1,'Literatuur',now(),now());
-insert into `literature2_publication_types` values (null,1,'Hoofdstuk',now(),now());
-insert into `literature2_publication_types` values (null,1,'Manuscript',now(),now());
-
-
-
-*/
-
 include_once ('NsrController.php');
 include_once ('RdfController.php');
 
@@ -2307,6 +2232,4 @@ class Literature2Controller extends NsrController
 		}
 	}		
 
-
-	
 }
