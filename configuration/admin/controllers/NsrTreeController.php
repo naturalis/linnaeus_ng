@@ -117,6 +117,9 @@ class NsrTreeController extends NsrController
 		if (is_null($node))
 			return;
 
+		$nameTypeIdPreferred=!empty($this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] : -1;
+		$nameTypeIdValid=!empty($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1;
+
 		$taxa=
 			$this->models->Taxon->freeQuery("
 				select
@@ -159,13 +162,13 @@ class NsrTreeController extends NsrController
 				left join %PRE%names _k
 					on _a.id=_k.taxon_id
 					and _a.project_id=_k.project_id
-					and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
+					and _k.type_id=".$nameTypeIdPreferred."
 					and _k.language_id=".$this->getDefaultProjectLanguage()."
 	
 				left join %PRE%names _m
 					on _a.id=_m.taxon_id
 					and _a.project_id=_m.project_id
-					and _m.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+					and _m.type_id=".$nameTypeIdValid."
 	
 				where 
 					_a.project_id = ".$this->getCurrentProjectId()." 
@@ -175,7 +178,7 @@ class NsrTreeController extends NsrController
 				order by
 					label
 			");
-			
+
 		$taxon=$progeny=array();
 
 		foreach((array)$taxa as $key=>$val)
