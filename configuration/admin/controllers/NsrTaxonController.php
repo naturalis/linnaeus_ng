@@ -229,6 +229,9 @@ class NsrTaxonController extends NsrController
 
 			$this->doNameReferentialChecks($this->getConcept( $this->getConceptId() ));
 
+			$rankIdSpecies=!empty($this->_projectRankIds[SPECIES_RANK_ID]['id']) ? $this->_projectRankIds[SPECIES_RANK_ID]['id'] : -1;
+			$rankIdSubSpecies=!empty($this->_projectRankIds[SUBSPECIES_RANK_ID]['id']) ? $this->_projectRankIds[SUBSPECIES_RANK_ID]['id'] : -1; 
+
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('names',$this->getNames($concept));
 			$this->smarty->assign('presence',$this->getPresenceData($this->rGetId()));
@@ -237,8 +240,8 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('habitats',$this->getHabitats());
 			$this->smarty->assign('actors',$this->getActors());
 			$this->smarty->assign('traitgroups',$this->getTraitgroups());
-			$this->smarty->assign('rank_id_species',$this->_projectRankIds[SPECIES_RANK_ID]['id']);
-			$this->smarty->assign('rank_id_subspecies',$this->_projectRankIds[SUBSPECIES_RANK_ID]['id']);
+			$this->smarty->assign('rank_id_species',$rankIdSpecies);
+			$this->smarty->assign('rank_id_subspecies',$rankIdSubSpecies);
 			$this->smarty->assign('main_language_name_language_id',$this->getDefaultProjectLanguage());
 		}
 
@@ -1014,7 +1017,7 @@ class NsrTaxonController extends NsrController
 		));
 		
 
-		foreach($types as $key=>$val)
+		foreach((array)$types as $key=>$val)
 		{
 			$types[$key]['nametype_label']=$this->Rdf->translatePredicate($val['nametype'],true);
 			$types[$key]['noNameParts']= in_array($val['nametype'],array(PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME)) ? true : false ;
