@@ -219,7 +219,7 @@ $(document).ready(function()
 		generalSpeciesInfoUrl: '{$settings->species_info_url}',
 		initialSortColumn: '{$settings->initial_sort_column}',
 		alwaysSortByInitial: {$settings->always_sort_by_initial},
-		similarSpeciesShowDistinctDetailsOnly: {$settings->similar_species_show_distinct_details_only},
+		similarSpeciesShowDistinctDetailsOnly: {if $settings->similar_species_show_distinct_details_only}{$settings->similar_species_show_distinct_details_only}{else}0{/if},
 	});
 
 	setScores($.parseJSON('{$session_scores|@addslashes}'));
