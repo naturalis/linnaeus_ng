@@ -518,15 +518,15 @@ function formatResult( data )
 {
 	if ( data.type=='taxon' )
 	{
-		//var sciName=data.label;
 		var sciName='<i>'+data.taxon+'</i>';
 		var commonName=data.commonname ? data.commonname : "";
 	}
 	else
 	if ( data.type=='variation' )
 	{
-		//var sciName=data.taxon.label;
 		var sciName='<i>'+data.taxon.taxon+'</i>';
+		// variation labels might contain a repetition of the full common name ("Bloedrode smalboktor vrouw") which is filtered out
+		if (data.label && data.taxon.commonname) data.label=data.label.replace(data.taxon.commonname,'').trim();
 		var commonName=(data.taxon.commonname ? data.taxon.commonname : "" ) + " " + (data.label ? "(" + data.label + ")" : "");
 		commonName.trim();
 	}
@@ -611,7 +611,7 @@ function formatResult( data )
 	var id = data.type+'-'+data.id;
 	var showStates = states && states.length > 0;
 
-	photoLabelHtml=
+	var photoLabelHtml=
 		photoLabelHtmlTpl
 			.replace('%SCI-NAME%',sciName)
 			.replace('%GENDER%',(data.gender && data.gender.gender ?
@@ -626,7 +626,7 @@ function formatResult( data )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
 				: ""));
 
-	imageHtml=
+	var imageHtml=
 		imageHtmlTpl
 			.replace('%IMAGE-URL%',image)
 			.replace('%THUMB-URL%',thumb)
@@ -634,7 +634,7 @@ function formatResult( data )
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	
 
-	resultHtml=
+	var resultHtml=
 		resultHtmlTpl
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
@@ -655,7 +655,7 @@ function formatResult( data )
 			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
 				remoteLinkClickHtmlTpl
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
-					.replace('%TITLE%', _('meer informatie'))
+					.replace('%TITLE%', __('meer informatie'))
 					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
@@ -669,7 +669,7 @@ function formatResult( data )
 				relatedClickHtmlTpl
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
-					.replace('%TITLE%', _('gelijkende soorten'))
+					.replace('%TITLE%', __('gelijkende soorten'))
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
@@ -1213,7 +1213,7 @@ function toggleAllDetails()
 	if ($('.result-detail:visible').length < getResultSet().length)
 	{
 		$('.result-detail').toggle(true);
-		$('#showAllLabel').html(_('alle kenmerken verbergen'));
+		$('#showAllLabel').html(__('alle kenmerken verbergen'));
 	}
 	else
 	{
@@ -1561,7 +1561,7 @@ function doRemoteLink( url, name )
 
 				printInfo( 
 					data.page.body, 
-					_('Meer informatie'),
+					__('Meer informatie'),
 					url
 				);
 				setCursor();
@@ -1586,7 +1586,7 @@ function printInfo( info, title, url )
 				.replace('%URL%', url ? 
 					infoDialogUrlHtmlTpl
 						.replace('%URL%',url)
-						.replace('%LINK-LABEL%',_('Meer informatie'))
+						.replace('%LINK-LABEL%',__('Meer informatie'))
 					 : "" ),
 			{showOk:false});
 	}
