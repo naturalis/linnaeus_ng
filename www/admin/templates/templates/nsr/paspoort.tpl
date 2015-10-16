@@ -63,6 +63,8 @@ Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe pasp
     <li>Bescherming > Bedreiging en bescherming</li>
     <li>Description > Summary</li>
     <li>Habitat > Biotopen</li>
+    <li>Gelijkende soorten > Herkenning</li>
+    <li>Verplaatsing > Verspreiding</li>
 </ul>
 </p>
 {/if}
