@@ -213,7 +213,14 @@ class NsrPaspoortController extends NsrController
 				$start=$val['id'];
 			}
 
-			$categories[$key]['obsolete']=($val['id']==TAB_ALGEMEEN || $val['id']==TAB_BESCHERMING || $val['id']==TAB_DESCRIPTION || $val['id']==TAB_HABITAT);
+			$categories[$key]['obsolete']=
+				$val['id']==TAB_ALGEMEEN || 
+				$val['id']==TAB_BESCHERMING || 
+				$val['id']==TAB_DESCRIPTION || 
+				$val['id']==TAB_HABITAT || 
+				$val['id']==TAB_GELIJKENDE_SOORTEN || 
+				$val['id']==TAB_VERPLAATSING
+				;
 
 			if ($val['content_id'])
 			{
