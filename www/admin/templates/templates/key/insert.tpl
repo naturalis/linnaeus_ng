@@ -32,7 +32,7 @@
 {/if}
 <p>
 <input type="submit" value="{t}insert{/t}" />
-<input type="button" value="{t}back{/t}" onclick="window.open('step_show.php?id={$step.id}','_self')"
+<input type="button" value="{t}back{/t}" onclick="window.open('step_show.php?id={$step.id}','_self')" />
 </p>
 </div>
 
