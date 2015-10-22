@@ -4,7 +4,7 @@
 
 	<p>
 	{if $deadSteps|@count==0}
-		There are currently no steps without choices.
+		{t}There are currently no steps without choices.{/t}
 	{else}
 		{t}Below is a list of steps without any choices. To edit, click the name the step.{/t}
 		<ul>
@@ -19,7 +19,7 @@
 
 	<p>
 	{if $sadSteps|@count==0}
-		There are currently no steps with only one choice.
+		{t}There are currently no steps with only one choice.{/t}
 	{else}
 		{t}Below is a list of steps with only one choice. To edit, click the name the step.{/t}
 		<ul>
@@ -34,7 +34,7 @@
 
 	<p>
 	{if $deadChoices|@count==0}
-		There are currently no unconnected choices.
+		{t}There are currently no unconnected choices.{/t}
 	{else}
 		{t}Below is a list of unconnected choices, i.e. those that do not lead to another step or a taxon. To edit, click the name of either the step or the choice.{/t}
 		<ul>
