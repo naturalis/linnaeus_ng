@@ -2,10 +2,15 @@
 
 include_once ('Controller.php');
 
+/**
+* KeyController
+*
+* class handling editing of dichotomous keys. a key consists of steps, each step having several choices.
+* each choice leads to a next step or ultimately to a taxon.
+*/
 class KeyController extends Controller
 {
 
-	
     public $usedModels = array(
         'keystep', 
         'keytree', 
@@ -59,11 +64,14 @@ class KeyController extends Controller
 	private $taxaInBranch=array();
 	private $branchStartStepId=null;  //step id
 
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access public
-     */
+	/**
+	* constructor
+	*
+	* class constructor; also calls initialize()
+	*
+	* @return void
+	* @access public
+	*/
     public function __construct ()
     {
         parent::__construct();
@@ -71,16 +79,18 @@ class KeyController extends Controller
         $this->initialize();
 	}
 
-    /**
-     * Destroys
-     *
-     * @access public
-     */
+	/**
+	* destructor
+	*
+	* class destructor
+	*
+	* @return void
+	* @access public
+	*/
     public function __destruct ()
     {
         parent::__destruct();
     }
-
 
     private function initialize()
     {
@@ -109,6 +119,14 @@ class KeyController extends Controller
 
     }
 
+	/**
+	* indexAction
+	*
+	* renders the index page
+	*
+	* @return void
+	* @access public
+	*/
     public function indexAction()
     {
         $this->checkAuthorisation();
@@ -118,6 +136,16 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* stepShowAction
+	*
+	* renders step_show.php
+	* steps can be accessed by ID or by tree-node. when no ID is specified, program fetches the start step ID
+	* also handles moving choices up and down in the display order
+	*
+	* @return void
+	* @access public
+	*/
     public function stepShowAction()
     {
         $this->checkAuthorisation();
@@ -219,6 +247,15 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* stepEditAction
+	*
+	* renders step_edit.php
+	* editing step data, creation of new step, inserting a new step between existing ones, deletion of L2 step-images
+	*
+	* @return void
+	* @access public
+	*/
     public function stepEditAction()
     {
         $this->checkAuthorisation();
@@ -355,6 +392,15 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* choiceEditAction
+	*
+	* renders choice_edit.php
+	* editing choice data, creation of new step, inserting a new step between existing ones, deletion of L2 step-images
+	*
+	* @return void
+	* @access public
+	*/
     public function choiceEditAction ()
     {
         $this->checkAuthorisation();
@@ -724,6 +770,15 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* storeAction
+	*
+	* renders store_action.php
+	* function stores a serialized version of the entire key into a table as cache for faster front-end key-navigation 
+	*
+	* @return void
+	* @access public
+	*/
     public function storeAction ()
     {
         $this->checkAuthorisation();
@@ -764,6 +819,19 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* cleanUpAction
+	*
+	* renders clean_up.php
+	* function:
+	* removes choices that belong to a non-existing step
+	* removes choices that have no text, image or target
+	* resets non-existant target steps
+	* resets non-existant target taxa
+	*
+	* @return void
+	* @access public
+	*/
     public function cleanUpAction ()
     {
         $this->checkAuthorisation();
@@ -780,6 +848,14 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* ajaxInterfaceAction
+	*
+	* handles all AJAX-calls for this module.
+	*
+	* @return void
+	* @access public
+	*/
     public function ajaxInterfaceAction ()
     {
         if (null!==$this->rHasVal('action'))
@@ -808,6 +884,14 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+	/**
+	* previewAction
+	*
+	* opens a preview of corresponding key step in the front-end 
+	*
+	* @return void
+	* @access public
+	*/
     public function previewAction ()
     {
         $this->redirect('../../../app/views/key/index.php?p=' . $this->getCurrentProjectId() . '&step=' . $this->rGetVal('step'));
