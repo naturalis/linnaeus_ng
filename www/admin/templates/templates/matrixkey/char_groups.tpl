@@ -62,3 +62,4 @@ $(document).ready(function(){
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
+<!-- REFACNOW -->
