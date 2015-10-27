@@ -1,30 +1,7 @@
 <?php
 
 /*
-
-
 	alter table characteristics_states modify show_order int(6);
-
-
-
-	NEXUS IMPORT
-	
-	while exporting from L2, choose the version with tabs, not the "standard"
-	
-	multiple states are assigned in the matrix as {023} for 0,2,3. i have no idea what 
-	happens when characters have more than 9 states. the import simply assumes 
-	it doesn't happen.
-
-	also, in the header:
-	FORMAT MISSING=?  GAP=- SYMBOLS= " 0 1 2 3";
-	is ignored. the application uses ? as symbol for missing values (hardcoded).
-	
-	for cleaning up names before resolving (reducing "Genus Flickingeria" to "Flickingeria")
-	program blindly assumes english ranks names. ranks are not checked to be valid when names are
-	found. obviously, the taxa already need to exist to be found! the import does NOT create
-	any taxa. if resolvement fails, the user is notified and the taxon is ignored.
-	
-	there is no check if there is another matrix with the same name (but import will work nonetheless)
 
 */
 
@@ -157,7 +134,6 @@ class MatrixKeyController extends Controller
 			}
 		
 		}
-		
 	}
 
 
