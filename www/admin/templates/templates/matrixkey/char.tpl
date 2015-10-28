@@ -4,18 +4,18 @@
 <p>
 <span class="matrix-header">
 {if $characteristic.label}
-{t _s1=$characteristic.label _s2=$matrix.matrix}Editing character "%s" for matrix "%s"{/t}
+{t _s1=$characteristic.label _s2=$matrix.sys_name}Editing character "%s" for matrix "%s"{/t}
 {else}
-{t _s1=$matrix.matrix}New charcteristic for matrix "%s"{/t}
+{t _s1=$matrix.sys_name}New charcteristic for matrix "%s"{/t}
 {/if}
 </span>
 </p>
 <p>
 {t}Add the name and type of the charcteristic you want to add. The following types of charcteristics are available:{/t}
 <ul>
-{section name=i loop=$charTypes}
-<li>{t}{$charTypes[i].name}{/t}: {t}{$charTypes[i].info}{/t}</li>
-{/section}
+{foreach $charTypes v k}
+	<li>{t}{$v.name}{/t}: {t}{$v.info}{/t}</li>
+{/foreach}
 </ul>
 </p>
 <p>
@@ -29,11 +29,11 @@
 		<td>
 		</td>
 {if $languages|@count>1}
-{section name=i loop=$languages}
-{if $languages[i].def_language=='1'}
-	<td>{$languages[i].language} *</td>
+{foreach $languages v k}
+{if $v.def_language=='1'}
+	<td>{$v.language} *</td>
 {/if}
-{/section}
+{/foreach}
 	<td colspan="2" id="project-language-tabs">(languages)</td>
 {/if}
 	</tr>
@@ -47,14 +47,14 @@
 				id="characteristic-default" 
 				onblur="matrixSaveCharacteristicLabel(allDefaultLanguage)" />
 		</td>
-{if $languages|@count>1}
+		{if $languages|@count>1}
 		<td>
 			<input
 				type="text" 
 				id="characteristic-other" 
 				onblur="matrixSaveCharacteristicLabel(allActiveLanguage)" />
 		</td>
-{/if}
+		{/if}
 	</tr>
 	<tr>
 		<td>
@@ -62,9 +62,9 @@
 		</td>
 		<td>
 	<select name="type" id="type">
-	{section name=i loop=$charTypes}
-		<option value="{$charTypes[i].name}" {if $characteristic.type.name==$charTypes[i].name}selected="selected"{/if}>{t}{$charTypes[i].name}{/t}</option>
-	{/section}
+	{foreach $charTypes v k}
+		<option value="{$v.name}" {if $characteristic.type.name==$v.name}selected="selected"{/if}>{t}{$v.name}{/t}</option>
+	{/foreach}
 	</select>
 		</td>
 	</tr>
@@ -90,9 +90,9 @@
 	<tr>
 		<td colspan="3">
 			<select name="existingChar" id="existingChar">
-			{section name=i loop=$charLib}
-				<option value="{$charLib[i].id}">{$charLib[i].label}</option>
-			{/section}
+			{foreach $charLib v k}
+				<option value="{$v.id}">{$v.label}</option>
+			{/foreach}
 			</select>
 		</td>
 	</tr>
@@ -113,25 +113,21 @@
 </div>
 
 <script type="text/javascript">
-{literal}
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 allActiveView = 'matrixchar';
 
-{section name=i loop=$languages}
-allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
-allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+{foreach $languages v k}
+allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
+allActiveLanguage = {if $v.language_id!=''}{$v.language_id}{else}false{/if};
 allDrawLanguages();
 
 matrixGetCharacteristicLabel(allDefaultLanguage);
 matrixGetCharacteristicLabel(allActiveLanguage);
 
-{literal}
 });
-{/literal}
 </script>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->

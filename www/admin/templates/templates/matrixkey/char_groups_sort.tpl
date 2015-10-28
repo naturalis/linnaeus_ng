@@ -3,7 +3,7 @@
 <div id="page-main">
 
 	<p>
-		Drag and drop to alter display order of groups and non-grouped characters:
+		{t}Drag and drop to alter display order of groups and non-grouped characters:{/t}
     </p>
 
     <div>
@@ -27,17 +27,16 @@
     </p>
     </form>
     
-    <a href="char_groups.php">Organize characters in groups</a>
+    <a href="char_groups.php">{t}Organize characters in groups{/t}</a>
 
     </div>
-
 
 </div>
 
 {literal}
 <script type="text/javascript">
-$(document).ready(function(){
-
+$(document).ready(function()
+{
 	$("[id^=sortable]").sortable({
 		opacity: 0.6, 
 		cursor: 'move',
@@ -53,4 +52,3 @@ $(document).ready(function(){
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->

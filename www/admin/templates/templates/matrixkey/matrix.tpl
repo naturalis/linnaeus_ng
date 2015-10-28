@@ -13,9 +13,9 @@
 		</td>
 		<td>
 		<span id="taxon-language-default-language">
-{section name=i loop=$languages}
-{if $languages[i].def_language=='1'}{$languages[i].language}{/if}
-{/section}		
+{foreach $languages v i}
+{if $v.def_language=='1'}{$v.language}{/if}
+{/foreach}		
 		</span>
 		</td>
 		<td>
@@ -59,25 +59,20 @@
 </p>
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	allActiveView = 'matrixname';
-{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
+{foreach $languages v i}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
 	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 	
 	matrixGetMatrixName(allDefaultLanguage);
 	matrixGetMatrixName(allActiveLanguage);
-
-{literal}	
 });
 </script>
-{/literal}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->

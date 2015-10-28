@@ -52,4 +52,3 @@
 {/if}
 </div>
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->

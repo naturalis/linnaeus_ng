@@ -3,12 +3,12 @@
 <div id="page-main">
 <p>
 <span class="matrix-header">
-	{t _s1=$matrix.matrix}Editing matrix "%s"{/t}
+	{t _s1=$matrix.sys_name}Editing matrix "%s"{/t}
 </span>
 </p>
 {t}Sort characters{/t}
 <table>
-{foreach item=v key=k from=$characteristics}
+{foreach $characteristics v k}
 	<tr>
 		<td>{$v.show_order+1}.</td>
 		<td>{$v.label} ({$v.type.name})</td>
@@ -24,4 +24,3 @@
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->

@@ -3,13 +3,14 @@
 <div id="page-main">
 <p>
 <span class="matrix-header">
-	{t _s1=$matrix.matrix}Editing matrix "%s"{/t}
+
+	{t _s1=$matrix.sys_name}Editing matrix "%s"{/t}
 	(<a href="preview.php">{t}preview{/t}</a>) (<a href="matrices.php">{t}select another matrix{/t}</a>)<br />
 	{if $matrices|@count> 1}
 		{if $matrix.default==1}
-			(this is the default matrix)
+			{t}(this is the default matrix){/t}
 		{else}
-			(this is not currently the default matrix; <a href="?action=def&id={$matrix.id}">make this matrix the default matrix</a>)
+			{t}(this is not currently the default matrix;{/t} <a href="?action=def&id={$matrix.id}">{t}make this matrix the default matrix{/t}</a>)
 		{/if}
 		<br />
 	{/if}
@@ -89,18 +90,14 @@
 </div>
 
 {if $activeCharacteristic}
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-matrixSetActiveState({$activeCharacteristic});
-matrixCharacteristicsChange();
-{literal}
+$(document).ready(function()
+{
+	matrixSetActiveState({$activeCharacteristic});
+	matrixCharacteristicsChange();
 });
 </script>
-{/literal}
 {/if}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->
