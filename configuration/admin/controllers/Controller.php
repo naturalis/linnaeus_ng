@@ -2,6 +2,7 @@
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+
 class Controller extends BaseClass
 {
     private $_smartySettings;
@@ -3154,32 +3155,28 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
+        $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
+
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php')) {
+
+            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+
+            $this->models->$t = new $t;
+
+        }
+
+        require_once dirname(__FILE__) . '/../models/Table.php';
+
         foreach ((array) $d as $key) {
 
-            if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
+            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
-                require_once (dirname(__FILE__) . '/../models/' . $key . '.php');
+            $this->models->$t = new Table($t);
 
-                $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            if (isset($this->helpers->LoggingHelper)) {
 
+                 $this->models->$t->setLogger($this->helpers->LoggingHelper);
 
-                if (class_exists($t)) {
-
-                    $this->models->$t = new $t();
-
-                    if (isset($this->helpers->LoggingHelper))
-                        $this->models->$t->setLogger($this->helpers->LoggingHelper);
-
-                    //echo $t.chr(10);
-                }
-                else {
-
-                    $this->log('Attempted to initiate non-existing model class "' . $t . '"', 2);
-                }
-            }
-            else {
-
-                $this->log('Attempted to load non-existing model file "' . $key . '"', 2);
             }
         }
     }
@@ -3866,7 +3863,6 @@ class Controller extends BaseClass
     private function doTranslate ($text)
     {
 
-        /*
         // get id of the text
         $i = $this->models->InterfaceText->_get(array(
             'id' => array(
@@ -3874,17 +3870,6 @@ class Controller extends BaseClass
                 'env' => $this->getAppName()
             ),
             'columns' => 'id'
-        ));
-        */
-
-        // get id of the text
-        $i = $this->models->InterfaceText->_get(
-        array(
-            'id' => 'select id
-						from %table%
-						where
-							text = "' . mysql_real_escape_string($text) . '"
-							and env = "' . $this->getAppName() . '"'
         ));
 
         // if not found, return unchanged
