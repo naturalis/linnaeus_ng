@@ -12,16 +12,16 @@ include_once ('Controller.php');
 
 class UsersController extends Controller
 {
-    
+
     public $usedModels = array(
-        'right', 
-        'project_role_user', 
-        'timezone',
-        'module', 
-        'module_project', 
-        'free_module_project', 
-        'module_project_user',
-		'user_taxon'
+        'rights',
+        'projects_roles_users',
+        'timezones',
+        'modules',
+        'modules_projects',
+        'free_modules_projects',
+        'modules_projects_users',
+		'users_taxa'
     );
 
 	public $cssToLoad = array('users.css','lookup.css','dialog/jquery.modaldialog.css');
@@ -38,9 +38,9 @@ class UsersController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
-    
+
     }
 
 
@@ -52,9 +52,9 @@ class UsersController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
-    
+
     }
 
 
@@ -82,28 +82,28 @@ class UsersController extends Controller
         }
 
         $this->setPageName($this->translate('Login'));
-       
+
         $this->smarty->assign('excludeLogout', true);
 
 		$this->includeLocalMenu = false;
-       
+
         // check wheter the user has entered a username and/or password
         if ($this->rHasVal('username') || $this->rHasVal('password')) {
 
             // get data of any active user based on entered username and password
-            $users = $this->models->User->_get(
+            $users = $this->models->Users->_get(
 				array(
 					'id' => array(
-						'username' => $this->requestData['username'], 
-						'password' => $this->userPasswordEncode($this->requestData['password']), 
+						'username' => $this->requestData['username'],
+						'password' => $this->userPasswordEncode($this->requestData['password']),
 						'active' => '1'
 					)
 				)
 			);
-            
+
             if (count((array) $users) != 1) {
             // no user found
-                
+
                 $this->addError($this->translate('Login failed.'));
 
             } else {
@@ -113,13 +113,13 @@ class UsersController extends Controller
 
                 // determine and redirect to the default start page after logging in
                 $this->redirect($this->getLoginStartPage());
-            
+
             }
-        
+
         }
 
         $this->printPage();
-    
+
     }
 
 
@@ -130,15 +130,15 @@ class UsersController extends Controller
      */
     public function logoutAction ()
     {
-        
+
         $this->setPageName($this->translate('Logout'));
-        
+
         $this->destroyUserSession();
-        
+
         $this->unsetRememberMeCookie();
 
         $this->redirect('login.php');
-    
+
     }
 
     /**
@@ -152,29 +152,29 @@ class UsersController extends Controller
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Select a project to work on'));
-		
+
 		$this->includeLocalMenu = false;
-        
+
         if ($this->rHasVal('project_id')) {
-		
+
 			if ($this->requestData['project_id'] != $this->getCurrentProjectId()) {
 
 				if ($this->isCurrentUserAuthorizedForProject($this->requestData['project_id'])) {
-				
+
 					$this->unsetProjectSessionData();
-					
+
 					$this->setCurrentProjectId($this->requestData['project_id']);
-	
+
 					$this->setCurrentProjectData();
 
 					$this->setCurrentUserRoleId();
-	
+
 					$this->redirect($this->getLoggedInMainIndex());
-				
+
 				} else {
-					
+
 					$this->redirect('choose_project.php');
-				
+
 				}
 
 			} else {
@@ -182,13 +182,13 @@ class UsersController extends Controller
 				$this->redirect($this->getLoggedInMainIndex());
 
 			}
-        
+
         }
 
         $this->smarty->assign('projects', $this->getCurrentUserProjects());
-        
+
         $this->printPage();
-    
+
     }
 
 
@@ -203,13 +203,13 @@ class UsersController extends Controller
     {
 
         $this->checkAuthorisation();
-        
+
         $this->setPageName($this->translate('Create new collaborator'));
 
         if ($this->rHasVal('action','create') && !$this->isFormResubmit()) {
 
 			$this->requestData = $this->sanitizeUserData($this->requestData);
-			
+
 			if (
 				$this->isUserDataComplete($this->requestData) &&
 				$this->isUsernameCorrect($this->requestData['username']) &&
@@ -224,19 +224,19 @@ class UsersController extends Controller
 				$d = $this->saveNewUser($this->requestData);
 
 				if ($d===true) {
-						
+
 					$this->sendNewUserEmail($this->requestData);
-	
+
 					$this->redirect('index.php');
 
 				} else {
 
-					$this->addError($this->translate('Failed to save user ('.$d.').'));	
-				
+					$this->addError($this->translate('Failed to save user ('.$d.').'));
+
 				}
-				
+
 			}
-					
+
         }
 
 		$maxLengths = array(
@@ -249,29 +249,29 @@ class UsersController extends Controller
 
 		$modules = $this->getProjectModules();
 
-		$zones = $this->models->Timezone->_get(array('id'=>'*'));
+		$zones = $this->models->Timezones->_get(array('id'=>'*'));
 
 		if ($this->isCurrentUserSysAdmin())
 			$d = array('id !=' => ID_ROLE_SYS_ADMIN);
 		else
 			$d = array('assignable' => 'y');
 
-        $roles = $this->models->Role->_get(array('id'=>$d));
+        $roles = $this->models->Roles->_get(array('id'=>$d));
 
 		$this->smarty->assign('maxLengths', $maxLengths);
 
 		$this->smarty->assign('zones', $zones);
 
         $this->smarty->assign('roles', $roles);
-        
+
         $this->smarty->assign('modules', $modules['modules']);
 
         $this->smarty->assign('freeModules', $modules['freeModules']);
 
         if (isset($this->requestData)) $this->smarty->assign('data', $this->requestData);
-        
+
         $this->printPage();
-    
+
     }
 
 
@@ -282,13 +282,13 @@ class UsersController extends Controller
      */
     public function indexAction ()
     {
-        
+
         $this->checkAuthorisation();
-        
+
         $this->setPageName($this->translate('Project collaborator overview'));
-        
+
         // get all collaborators for the current project
-        $pru = $this->models->ProjectRoleUser->_get(
+        $pru = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -304,10 +304,10 @@ class UsersController extends Controller
         // get full details, as well as roles for each collaborator
         foreach ((array) $pru as $key => $val) {
 
-            $u = $this->models->User->_get(array('id'=>$val['user_id']));
+            $u = $this->models->Users->_get(array('id'=>$val['user_id']));
 
-            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
-            
+            $r = $this->models->Roles->_get(array('id'=>$val['role_id']));
+
             $u['role'] = $r['role'];
             $u['role_id'] = $r['id'];
             $u['status'] = $val['status'];
@@ -315,35 +315,35 @@ class UsersController extends Controller
             $u['last_login'] = $val['last_login'];
 
             $users[] = $u;
-        
+
         }
-        
+
         // user requested a sort of the table
         if ($this->rHasVal('key')) {
 
             $sortBy = array(
-                'key' => $this->requestData['key'], 
-                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+                'key' => $this->requestData['key'],
+                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'),
                 'case' => 'i'
             );
-        
+
         }
         // default sort order
         else {
-            
+
             $sortBy = array(
-                'key' => 'username', 
-                'dir' => 'asc', 
+                'key' => 'username',
+                'dir' => 'asc',
                 'case' => 'i'
             );
-        
+
         }
-        
+
         // sort array of collaborators
         $this->customSortArray($users, $sortBy);
-        
+
         $this->smarty->assign('sortBy', $sortBy);
-        
+
         $this->smarty->assign('users', $users);
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
@@ -361,7 +361,7 @@ class UsersController extends Controller
         );
 
         $this->printPage();
-    
+
     }
 
 
@@ -372,16 +372,16 @@ class UsersController extends Controller
      */
     public function allAction ()
     {
-        
+
 		$this->checkAuthorisation(true);
-		
+
 		if ($this->getCurrentProjectId()==null) $this->setBreadcrumbRootName($this->translate('System administration'));
-        
+
         $this->setPageName($this->translate('All users'));
-        
-		$users = $this->models->User->_get(array('id'=>'*','order' => 'last_name,first_name'));
-        
-        $userProjectCount = $this->models->ProjectRoleUser->_get(
+
+		$users = $this->models->Users->_get(array('id'=>'*','order' => 'last_name,first_name'));
+
+        $userProjectCount = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id' => '*',
 				'fieldAsIndex' => 'user_id',
@@ -390,7 +390,7 @@ class UsersController extends Controller
 			)
 		);
 
-        $currentProjectUsers = $this->models->ProjectRoleUser->_get(
+        $currentProjectUsers = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
 				'fieldAsIndex' => 'user_id',
@@ -400,7 +400,7 @@ class UsersController extends Controller
 		$pagination = $this->getPagination($users,20);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
-	
+
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
 
 		$this->smarty->assign('users',$pagination['items']);
@@ -410,7 +410,7 @@ class UsersController extends Controller
         $this->smarty->assign('currentProjectUsers', $currentProjectUsers);
 
         $this->printPage();
-    
+
     }
 
 
@@ -421,43 +421,43 @@ class UsersController extends Controller
      */
     public function viewAction ()
     {
-        
+
         $this->checkAuthorisation($this->isCurrentUserSysAdmin());
-        
+
         $this->setPageName($this->translate('Project collaborator data'));
 
 		if ($this->rHasId()) {
 
 			$user = $this->getUser($this->requestData['id']);
-			
+
 			if ($user==null) {
 
-				$this->addError('Unknown user ID: '.$this->requestData['id']);	
+				$this->addError('Unknown user ID: '.$this->requestData['id']);
 
 			} else {
 
-	            $zone = $this->models->Timezone->_get(array('id'=>$user['timezone_id']));
+	            $zone = $this->models->Timezones->_get(array('id'=>$user['timezone_id']));
 
 				$currentRole = $this->getUserProjectRole($this->requestData['id'],$this->getCurrentProjectId());
 
 				$modules = $this->getProjectModules();
 
-				$mpu = $this->models->ModuleProjectUser->_get(
+				$mpu = $this->models->ModulesProjectsUsers->_get(
 					array(
 						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'user_id' => $this->requestData['id'],			
+							'project_id' => $this->getCurrentProjectId(),
+							'user_id' => $this->requestData['id'],
 						),
 						'columns' => 'module_id',
 						'fieldAsIndex' => 'module_id'
 					)
 				);
 
-				$fpu = $this->models->FreeModuleProjectUser->_get(
+				$fpu = $this->models->FreeModulesProjectsUsers->_get(
 					array(
 						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'user_id' => $this->requestData['id'],			
+							'project_id' => $this->getCurrentProjectId(),
+							'user_id' => $this->requestData['id'],
 						),
 						'columns' => 'free_module_id',
 						'fieldAsIndex' => 'free_module_id'
@@ -472,7 +472,7 @@ class UsersController extends Controller
 					$hasModules = $hasModules || isset($fpu[$val['module_id']]);
 
 				}
-	
+
 				foreach ((array) $modules['freeModules'] as $key => $val) {
 
 					$modules['freeModules'][$key]['isAssigned'] = isset($fpu[$val['id']]);
@@ -480,16 +480,16 @@ class UsersController extends Controller
 
 				}
 
-				$pru = $this->models->ProjectRoleUser->_get(
+				$pru = $this->models->ProjectsRolesUsers->_get(
 					array(
 						'id' => array('user_id' => $this->requestData['id']),
 						'columns' => 'project_id,role_id'
 					)
 				);
-				
+
 				foreach((array)$pru as $key => $val) {
-				
-					$p = $this->models->Project->_get(
+
+					$p = $this->models->Projects->_get(
 						array(
 							'id' => array('id' => $val['project_id']),
 							'columns' => 'title'
@@ -499,13 +499,13 @@ class UsersController extends Controller
 					$pru[$key]['projectTitle'] = $p[0]['title'];
 					$d = $this->getUserProjectRole($this->requestData['id'],$val['project_id']);
 					$pru[$key]['role'] = $d['role']['role'];
-				
+
 				}
 
 				$this->smarty->assign('user',$user);
-				
+
 				$this->smarty->assign('currentRole',$currentRole);
-				
+
 				$this->smarty->assign('zone', $zone);
 
 				$this->smarty->assign('modules', $modules);
@@ -515,14 +515,14 @@ class UsersController extends Controller
 				$this->smarty->assign('projects', $pru);
 
 			}
-			
+
 		} else {
 
-			$this->addError('No ID specified');	
+			$this->addError('No ID specified');
 
 		}
 
-		$this->printPage();	
+		$this->printPage();
 
     }
 
@@ -532,9 +532,9 @@ class UsersController extends Controller
         $this->checkAuthorisation();
 
 		if ($this->rHasId() && !$this->isFormResubmit()) {
-			
+
 			$user = $this->getUser($this->requestData['id']);
-			
+
 			//$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
 			$canDelete = $this->isCurrentUserSysAdmin();
 
@@ -560,7 +560,7 @@ class UsersController extends Controller
 				$this->addError($this->translate('User can only be deleted by system admin.'));
 
 			}
-		
+
 		} else {
 
 			$this->redirect('index.php');
@@ -581,25 +581,25 @@ class UsersController extends Controller
     {
 
         $this->checkAuthorisation();
-        
+
 		$this->setPageName($this->translate('Edit project collaborator'));
 
 		if ($this->getCurrentUserRoleId() != ID_ROLE_SYS_ADMIN &&
-			$this->getCurrentUserRoleId() != ID_ROLE_LEAD_EXPERT && 
+			$this->getCurrentUserRoleId() != ID_ROLE_LEAD_EXPERT &&
 			$this->getCurrentUserId() != $this->requestData['id']) {
-			
+
 			$this->addError($this->translate('You are not authorized to edit that user.'));
 
 		} else {
 
 			$user = $this->getUser($this->requestData['id']);
-	
+
 			if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
-	
+
 				$this->requestData = $this->sanitizeUserData($this->requestData);
-				
+
 				$passwordsUnchanged = empty($this->requestData['password']) && empty($this->requestData['password_2']);
-	
+
 				if (
 					$this->isUserDataComplete($this->requestData,($passwordsUnchanged ? array('password','password_2'): null)) &&
 					$this->isUsernameCorrect($this->requestData['username']) &&
@@ -610,131 +610,131 @@ class UsersController extends Controller
 					$this->isEmailAddressUnique($this->requestData['email_address'],$user['id']) &&
 					$this->isRoleAssignable($this->requestData['role_id'])
 					) {
-					
+
 					// get the current role of the collaborator in the current project
 					$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
-					
+
 					// if collaborator has a regular role (or the current user is sysadmin), update to the new role...
 					if (
-						($upr['role_id'] != ID_ROLE_SYS_ADMIN && $upr['role_id'] != ID_ROLE_LEAD_EXPERT) || 
+						($upr['role_id'] != ID_ROLE_SYS_ADMIN && $upr['role_id'] != ID_ROLE_LEAD_EXPERT) ||
 						$this->getCurrentUserRoleId() == ID_ROLE_SYS_ADMIN
 						) {
-	
-						$this->models->ProjectRoleUser->save(
+
+						$this->models->ProjectsRolesUsers->save(
 							array(
-								'id' => $this->requestData['userProjectRole'], 
-								'user_id' => $this->requestData['id'], 
-								'project_id' => $this->getCurrentProjectId(), 
+								'id' => $this->requestData['userProjectRole'],
+								'user_id' => $this->requestData['id'],
+								'project_id' => $this->getCurrentProjectId(),
 								'role_id' => $this->requestData['role_id'],
 								'active' => $this->requestData['active']
 							)
 						);
-					
+
 				   } else {
 					// ... but the role of lead expert or system admin cannot be changed, nether can he be made inactive
-							
+
 						$this->requestData['active'] = 1;
-						
+
 					}
-					
+
 					/*
 						'active' was moved to the ProjectRoleUser table but the column in User does still exist
 					*/
 					//$d = $this->requestData['active'];
 					//$this->requestData['active'] = 1;
-					
+
 					if (!$passwordsUnchanged)
 						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
 					else
 						unset($this->requestData['password']);
-	
-					$this->models->User->save($this->requestData);
+
+					$this->models->Users->save($this->requestData);
 					$this->saveUsersModuleData($this->requestData,$this->requestData['id'],true);
-					
+
 					//$this->requestData['active'] = $d;
-					
+
 					$this->addMessage($this->translate('User data saved'));
-					
+
 					$user = $this->getUser($this->requestData['id']);
-					
+
 				} else {
-	
+
 					$user = $this->requestData;
-					
+
 				}
-						
+
 			}
-	
+
 			$modules = $this->getProjectModules();
-	
-			$mpu = $this->models->ModuleProjectUser->_get(
+
+			$mpu = $this->models->ModulesProjectsUsers->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'user_id' => $this->requestData['id'],			
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->requestData['id'],
 					),
 					'columns' => 'count(*) as total,module_id',
 					'group' =>  'module_id',
 					'fieldAsIndex' => 'module_id'
 				)
 			);
-	
+
 			foreach ((array) $modules['modules'] as $key => $val) {
-				
+
 				$modules['modules'][$key]['isAssigned'] = isset($mpu[$val['module_id']]) ? $mpu[$val['module_id']]['total']=='1' : false;
-	
+
 			}
-	
-			$fpu = $this->models->FreeModuleProjectUser->_get(
+
+			$fpu = $this->models->FreeModulesProjectsUsers->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'user_id' => $this->requestData['id'],			
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->requestData['id'],
 					),
 					'columns' => 'count(*) as total,free_module_id',
 					'group' =>  'free_module_id',
 					'fieldAsIndex' => 'free_module_id'
 				)
 			);
-	
+
 			foreach ((array) $modules['freeModules'] as $key => $val) {
-	
+
 				$modules['freeModules'][$key]['isAssigned'] = isset($fpu[$val['id']]) ? $fpu[$val['id']]['total']=='1' : false;
-	
+
 			}
-	
+
 			$canDelete = (isset($user['created_by']) && $user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
-	
+
 			$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
 
 			if ($this->isCurrentUserSysAdmin())
 				$d = array('id !=' => ID_ROLE_SYS_ADMIN);
 			else
 				$d = array('assignable' => 'y');
-			
-			$roles = $this->models->Role->_get(array('id'=>$d));
-	
-			$zones = $this->models->Timezone->_get(array('id' => '*'));
-	
+
+			$roles = $this->models->Roles->_get(array('id'=>$d));
+
+			$zones = $this->models->Timezones->_get(array('id' => '*'));
+
 			$this->smarty->assign('isLeadExpert', $upr['role_id'] == ID_ROLE_LEAD_EXPERT);
-	
+
 			$this->smarty->assign('zones',$zones);
-	
+
 			$this->smarty->assign('modules',$modules['modules']);
-	
+
 			$this->smarty->assign('freeModules',$modules['freeModules']);
-	
+
 			$this->smarty->assign('roles',$roles);
-			
+
 			$this->smarty->assign('data',$user);
-			
+
 			$this->smarty->assign('userRole',$upr);
-	
+
 			$this->smarty->assign('canDelete',$canDelete);
 
 		}
-	
-		$this->printPage(); 
+
+		$this->printPage();
 
     }
 
@@ -753,7 +753,7 @@ class UsersController extends Controller
 
 		if ($this->rHasVal('email') && !$this->isFormResubmit()) {
 
-			$u = $this->models->User->_get(
+			$u = $this->models->Users->_get(
 				array(
 					'id' => array(
 						'email_address' => trim($this->requestData['email']
@@ -765,10 +765,10 @@ class UsersController extends Controller
 			if (count((array)$u)==1) {
 
 				$newPass = $this->generateRandomPassword();
-				
+
 				$this->sendPasswordEmail($u[0],$newPass);
 
-				$r = $this->models->User->save(
+				$r = $this->models->Users->save(
 					array(
 						'id' => $u[0]['id'],
 						'password' => $this->userPasswordEncode($newPass)
@@ -807,18 +807,18 @@ class UsersController extends Controller
 			}
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
-		
+
 		} else
 		if ($this->rHasVal('uid') && $this->rHasVal('modId')) {
 
 			$modules = $this->getProjectModules();
-			
+
 			if ($this->rHasVal('type','free')) {
 
 				foreach((array)$modules['freeModules'] as $val) {
 
 					if ($val['id']==$this->requestData['modId']) $module = $val['module'];
-	
+
 				}
 
 			} else {
@@ -826,25 +826,25 @@ class UsersController extends Controller
 				foreach((array)$modules['modules'] as $val) {
 
 					if ($val['module_id']==$this->requestData['modId'])  $module = $val['module'];
-	
+
 				}
 
 			}
-			
+
 			if (isset($module)) {
 
 				$this->smarty->assign('user',$this->getUser($this->requestData['uid']));
-	
+
 				$this->smarty->assign('module',$module);
-		
+
 				$this->smarty->assign('requestData',$this->requestData);
 
 			} else {
-	
+
 				$this->addError($this->translate('Non-existant module ID specified.'));
-	
+
 			}
-					
+
 		} else {
 
 			$this->addError($this->translate('No user ID or module ID specified.'));
@@ -852,9 +852,9 @@ class UsersController extends Controller
 		}
 
         $this->printPage();
-    
+
     }
-	
+
 
     public function removeUserModuleAction ()
     {
@@ -873,18 +873,18 @@ class UsersController extends Controller
 			}
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
-		
+
 		} else
 		if ($this->rHasVal('uid') && $this->rHasVal('modId')) {
 
 			$modules = $this->getProjectModules();
-			
+
 			if ($this->rHasVal('type','free')) {
 
 				foreach((array)$modules['freeModules'] as $val) {
 
 					if ($val['id']==$this->requestData['modId']) $module = $val['module'];
-	
+
 				}
 
 			} else {
@@ -892,25 +892,25 @@ class UsersController extends Controller
 				foreach((array)$modules['modules'] as $val) {
 
 					if ($val['module_id']==$this->requestData['modId'])  $module = $val['module'];
-	
+
 				}
 
 			}
-			
+
 			if (isset($module)) {
 
 				$this->smarty->assign('user',$this->getUser($this->requestData['uid']));
-	
+
 				$this->smarty->assign('module',$module);
-		
+
 				$this->smarty->assign('requestData',$this->requestData);
 
 			} else {
-	
+
 				$this->addError($this->translate('Non-existant module ID specified.'));
-	
+
 			}
-					
+
 		} else {
 
 			$this->addError($this->translate('No user ID or module ID specified.'));
@@ -918,13 +918,13 @@ class UsersController extends Controller
 		}
 
         $this->printPage();
-    
+
     }
 
 
 	public function rightsMatrixAction()
 	{
-	
+
         $this->checkAuthorisation(true);
 
 		$this->setBreadcrumbRootName($this->translate('System administration'));
@@ -933,19 +933,19 @@ class UsersController extends Controller
 
 		if ($this->rHasVal('right') && $this->rHasVal('role') && !$this->isFormResubmit()) {
 
-			$d = $this->models->RightRole->_get(
+			$d = $this->models->RightsRoles->_get(
 				array(
 					'id' => array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role'])
 				)
 			);
-			
+
 			if (isset($d)) {
 
-				$this->models->RightRole->delete(array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role']));
+				$this->models->RightsRoles->delete(array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role']));
 
 			} else {
 
-				$this->models->RightRole->save(
+				$this->models->RightsRoles->save(
 					array(
 						'id' => null,
 						'right_id' => $this->requestData['right'],
@@ -957,19 +957,19 @@ class UsersController extends Controller
 
 		}
 
-		$roles = $this->models->Role->_get(array('id' => '*'));
-		$rights = $this->models->Right->_get(array('id' => '*','order' => 'controller'));
-		
+		$roles = $this->models->Roles->_get(array('id' => '*'));
+		$rights = $this->models->Rights->_get(array('id' => '*','order' => 'controller'));
+
 		foreach((array)$rights as $iKey => $iVal) {
 
 			foreach((array)$roles as $oKey => $oVal) {
 
-				$d = $this->models->RightRole->_get(
+				$d = $this->models->RightsRoles->_get(
 					array(
 						'id' => array('right_id' => $iVal['id'],'role_id' => $oVal['id'])
 					)
 				);
-					
+
 				$rights[$iKey]['roles'][] = array('id' => $oVal['id'], 'state' => $d[0]['id']);
 
 			}
@@ -982,7 +982,7 @@ class UsersController extends Controller
         $this->smarty->assign('rights', $rights);
 
         $this->printPage();
-			
+
 	}
 
     public function addUserAction ()
@@ -999,7 +999,7 @@ class UsersController extends Controller
 			}
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
-		
+
 		} else
 		if ($this->rHasVal('uid')) {
 
@@ -1007,13 +1007,13 @@ class UsersController extends Controller
 				$d = array('id !=' => ID_ROLE_SYS_ADMIN);
 			else
 				$d = array('assignable' => 'y');
-	
+
 			$this->smarty->assign('user',$this->getUser($this->requestData['uid']));
-	
-			$this->smarty->assign('roles',$this->models->Role->_get(array('id'=>$d)));
+
+			$this->smarty->assign('roles',$this->models->Roles->_get(array('id'=>$d)));
 
 			if ($this->rHasVal('returnUrl')) $this->smarty->assign('returnUrl',$this->requestData['returnUrl']);
-			
+
 		} else {
 
 			$this->addError($this->translate('No user ID specified.'));
@@ -1021,7 +1021,7 @@ class UsersController extends Controller
 		}
 
         $this->printPage();
-    
+
     }
 
     public function removeUserAction ()
@@ -1034,22 +1034,22 @@ class UsersController extends Controller
 			if ($this->rHasVal('uid')) $this->removeUserFromProject($this->requestData['uid'],$this->getCurrentProjectId());
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
-		
+
 		} else
 		if ($this->rHasVal('uid')) {
-		
+
 			$user = $this->getUser($this->requestData['uid']);
 
-			$pru = $this->models->ProjectRoleUser->_get(
+			$pru = $this->models->ProjectsRolesUsers->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'user_id' => $this->requestData['uid'],
 					)
 				)
 			);
 			if (!$pru) {
-			
+
 				$this->addError($this->translate('User is not part of current project.'));
 
 			} else {
@@ -1057,13 +1057,13 @@ class UsersController extends Controller
 				$this->smarty->assign('uid',$this->requestData['uid']);
 
 				$this->smarty->assign('user',$user);
-		
-				$this->smarty->assign('role',$this->models->Role->_get(array('id'=>$pru[0]['role_id'])));
-				
+
+				$this->smarty->assign('role',$this->models->Roles->_get(array('id'=>$pru[0]['role_id'])));
+
 				if ($this->rHasVal('returnUrl')) $this->smarty->assign('returnUrl',$this->requestData['returnUrl']);
 
 			}
-			
+
 		} else {
 
 			$this->addError($this->translate('No user ID specified.'));
@@ -1071,7 +1071,7 @@ class UsersController extends Controller
 		}
 
         $this->printPage();
-    
+
     }
 
     /**
@@ -1083,7 +1083,7 @@ class UsersController extends Controller
     {
 
         if (!$this->rHasVal('action')) return;
-		
+
 		$idToIgnore = isset($this->requestData['id_to_ignore']) ? $this->requestData['id_to_ignore'] : null;
 
         if ($this->rHasVal('action','check_username')) {
@@ -1098,7 +1098,7 @@ class UsersController extends Controller
 				$this->isUsernameUnique($this->requestData['values'][0], $idToIgnore);
 
 			}
-        
+
 		} else
         if ($this->rHasVal('action','check_password')) {
 
@@ -1108,7 +1108,7 @@ class UsersController extends Controller
 				$this->getPasswordStrength($this->requestData['values'][0]);
 
 			}
-        
+
 		} else
         if ($this->rHasVal('action','check_passwords')) {
 
@@ -1122,7 +1122,7 @@ class UsersController extends Controller
 				$this->arePasswordsIdentical($this->requestData['values'][0],$this->requestData['values'][1]);
 
 			}
-        
+
 		} else
         if ($this->rHasVal('action','check_email_address')) {
 
@@ -1136,33 +1136,33 @@ class UsersController extends Controller
 				$this->isEmailAddressCorrect($this->requestData['values'][0]);
 
 			}
-        
+
 		} else
         if ($this->rHasVal('action','check_first_name') || $this->rHasVal('action','check_last_name')) {
 
 			if (in_array('f',$this->requestData['tests'])) {
 
 				if (strlen($this->requestData['values'][0]) == 0) $this->addError($this->translate('Missing value.'));
-			
+
 			}
-        
+
 		} else
         if ($this->rHasVal('action','connect_existing')) {
-            
+
             $this->ajaxActionConnectExistingUser();
-        
+
 		} else
         if ($this->rHasVal('action','create_from_session')) {
-            
+
             $this->ajaxActionCreateUserFromSession();
-        
+
 		} else
 		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 
         }
-		
+
         $this->printPage();
 
     }
@@ -1183,7 +1183,7 @@ class UsersController extends Controller
         } else {
 
 			$script=$this->baseUrl.$this->getAppName();
-            
+
 			if (isset($_SESSION['admin']['user']) && $_SESSION['admin']['user']['_number_of_projects'] == 1)
 				$script.=$this->generalSettings['paths']['projectIndex'];
 			else
@@ -1192,7 +1192,7 @@ class UsersController extends Controller
         }
 
 		return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
-		
+
     }
 
 
@@ -1207,19 +1207,19 @@ class UsersController extends Controller
 		) return;
 
 
-		$this->models->ProjectRoleUser->delete(
+		$this->models->ProjectsRolesUsers->delete(
 			array(
-				'project_id' => $this->getCurrentProjectId(), 
+				'project_id' => $this->getCurrentProjectId(),
 				'user_id' => $_SESSION['admin']['data']['new_user']['existing_user_id']
 			)
 		);
 
 		// save new role only for existing collaborator and new project
-		$pru = $this->models->ProjectRoleUser->save(
+		$pru = $this->models->ProjectsRolesUsers->save(
 			array(
-				'id' => null, 
-				'project_id' => $this->getCurrentProjectId(), 
-				'role_id' => $_SESSION['admin']['data']['new_user']['role_id'], 
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'role_id' => $_SESSION['admin']['data']['new_user']['role_id'],
 				'user_id' => $_SESSION['admin']['data']['new_user']['existing_user_id']
 			)
 		);
@@ -1230,8 +1230,8 @@ MUST CHECK
 
 		$this->saveUsersModuleData(
 			array(
-				'modules' => $this->models->ModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))),
-				'freeModules' => $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())))
+				'modules' => $this->models->ModulesProjects->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))),
+				'freeModules' => $this->models->FreeModulesProjects->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())))
 			),
 			$_SESSION['admin']['data']['new_user']['existing_user_id']
 		);
@@ -1250,9 +1250,9 @@ MUST CHECK
 
 	private function ajaxActionCreateUserFromSession ()
 	{
-	
+
 		if (!isset($_SESSION['admin']['data']['new_user'])) return;
-	
+
 		$su = $this->saveNewUser($_SESSION['admin']['data']['new_user']);
 
 		if (!$su) {
@@ -1274,45 +1274,45 @@ MUST CHECK
 
 		// encode passwords
 		$data['password'] = $this->userPasswordEncode($data['password']);
-		
+
 		$data['active'] = '1';
-		
+
 		$data['id'] = null;
 
 		$data['created_by'] = $this->getCurrentUserId();
-		
-		$r = $this->models->User->save($data);
-		
+
+		$r = $this->models->Users->save($data);
+
 		if ($r !== true) {
-			
+
 			$this->addError($this->translate('Failed to save user.'),2);
 
 			$this->log(serialize($data));
-			
+
 			return false;
-			
+
 		} else {
-			
+
 			// if saving was succesful, save new role
-			$newUserId = $this->models->User->getNewId();
-			
-			$this->models->ProjectRoleUser->save(
+			$newUserId = $this->models->Users->getNewId();
+
+			$this->models->ProjectsRolesUsers->save(
 				array(
-					'id' => null, 
-					'project_id' => $this->getCurrentProjectId(), 
-					'role_id' => $data['role_id'], 
+					'id' => null,
+					'project_id' => $this->getCurrentProjectId(),
+					'role_id' => $data['role_id'],
 					'user_id' => $newUserId,
 					'active' => '1'
 				)
 			);
 
 
-			$this->saveUsersModuleData($data,$newUserId); 
+			$this->saveUsersModuleData($data,$newUserId);
 
 			return true;
-		
+
 		}
-						
+
 	}
 
 
@@ -1324,9 +1324,9 @@ MUST CHECK
 
 			if ($deleteOld) {
 
-				$this->models->ModuleProjectUser->delete(
+				$this->models->ModulesProjectsUsers->delete(
 					array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'user_id' => $userId
 					)
 				);
@@ -1335,10 +1335,10 @@ MUST CHECK
 
 			foreach((array)$data['modules'] as $key => $val) {
 
-				$this->models->ModuleProjectUser->save(
+				$this->models->ModulesProjectsUsers->save(
 					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
 						'module_id' => $val,
 						'user_id' => $userId
 					)
@@ -1353,9 +1353,9 @@ MUST CHECK
 
 			if ($deleteOld) {
 
-				$this->models->FreeModuleProjectUser->delete(
+				$this->models->FreeModulesProjectsUsers->delete(
 					array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'user_id' => $userId
 					)
 				);
@@ -1364,10 +1364,10 @@ MUST CHECK
 
 			foreach((array)$data['freeModules'] as $key => $val) {
 
-				$this->models->FreeModuleProjectUser->save(
+				$this->models->FreeModulesProjectsUsers->save(
 					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
 						'free_module_id' => $val,
 						'user_id' => $userId
 					)
@@ -1384,22 +1384,22 @@ MUST CHECK
 	{
 
 		// avoiding orphans: see if collaborator is present in any other projects...
-		$data = $this->models->ProjectRoleUser->_get(
+		$data = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id' => array(
 					'user_id' => $id
-				), 
+				),
 				'columns' => 'count(*) as tot'
 			)
 		);
-		
+
 		// ...if not, delete entire collaborator record
 		if (isset($data) && $data[0]['tot'] == '0') {
 
-			$this->models->ModuleProjectUser->delete($id);
-			$this->models->FreeModuleProjectUser->delete($id);
-			$this->models->User->delete($id);
-			
+			$this->models->ModulesProjectsUsers->delete($id);
+			$this->models->FreeModulesProjectsUsers->delete($id);
+			$this->models->Users->delete($id);
+
 			return true;
 
 		} else {
@@ -1432,10 +1432,10 @@ MUST CHECK
 			$this->smarty->assign('returnText','<weak>');
 
 		} else {
-		
+
 			if (
-				preg_match_all('/[0-9]/',$password,$d)>=1 && 
-				preg_match_all('/[a-zA-Z]/',$password,$d)>=1 && 
+				preg_match_all('/[0-9]/',$password,$d)>=1 &&
+				preg_match_all('/[a-zA-Z]/',$password,$d)>=1 &&
 				preg_match_all('/[^a-zA-Z0-9]/',$password,$d)>=1
 			) {
 
@@ -1458,14 +1458,14 @@ MUST CHECK
      * @param      boolean    $remember    whether or not the user wants his being loged in to be remembered across sessions
      * @access     private
      */
-    private function doLogin($user,$remember) 
+    private function doLogin($user,$remember)
     {
 
         // update last and number of logins
-        $this->models->User->save(
+        $this->models->Users->save(
             array(
-                'id' => $user['id'], 
-                'last_login' => 'now()', 
+                'id' => $user['id'],
+                'last_login' => 'now()',
                 'logins' => 'logins+1'
             )
         );
@@ -1475,18 +1475,18 @@ MUST CHECK
 
         // save all relevant data to the session
         $this->initUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
-        
+
         // set 'remember me' cookie
         if ($remember) {
-        
+
             $this->setRememberMeCookie();
-        
+
         } else {
-        
+
             $this->unsetRememberMeCookie();
-        
+
         }
-        
+
         // determine and set the default active project
         $this->setDefaultProject();
 		$this->setCurrentUserRoleId();
@@ -1509,21 +1509,21 @@ MUST CHECK
      */
     private function initUserSession($userData, $roles, $rights, $numberOfProjects)
     {
-        
+
         if (!$userData) return;
 
         $_SESSION['admin']['user'] = $userData;
         $_SESSION['admin']['user']['_login']['time'] = time();
         $_SESSION['admin']['user']['_said_welcome'] = false;
         $_SESSION['admin']['user']['_logged_in'] = true;
-		
+
         //$_SESSION['admin']['user']['_roles'] = $roles;
         //$_SESSION['admin']['user']['_rights'] = $rights;
         //$_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
 		$this->setUserSessionRights($rights);
 		$this->setUserSessionRoles($roles);
 		$this->setUserSessionNumberOfProjects($numberOfProjects);
-   
+
     }
 
     /**
@@ -1544,8 +1544,8 @@ MUST CHECK
     {
 
         setcookie(
-            $this->generalSettings['login-cookie']['name'], 
-            $this->getCurrentUserId(), 
+            $this->generalSettings['login-cookie']['name'],
+            $this->getCurrentUserId(),
             time() + (86400 * $this->generalSettings['login-cookie']['lifetime'])
         );
 
@@ -1564,13 +1564,13 @@ MUST CHECK
     {
 
         setcookie(
-            $this->generalSettings['login-cookie']['name'], 
-            false, 
+            $this->generalSettings['login-cookie']['name'],
+            false,
             time() - 86400
         );
 
     }
-    
+
     private function getRememberedUser()
     {
 
@@ -1578,7 +1578,7 @@ MUST CHECK
 
         if ($c) {
 
-            return $this->models->User->_get(
+            return $this->models->Users->_get(
 				array(
 					'id' => array(
 						'id' => $c,
@@ -1590,7 +1590,7 @@ MUST CHECK
         } else {
 
             return false;
-    
+
         }
 
     }
@@ -1606,18 +1606,18 @@ MUST CHECK
      */
     private function isUserPartOfProject ($user, $project)
     {
-        
-        $pru = $this->models->ProjectRoleUser->_get(
+
+        $pru = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id'=> array(
-					'user_id' => $user, 
+					'user_id' => $user,
 					'project_id' => $project
 				)
 			)
 		);
-        
+
         return count((array) $pru) != 0;
-    
+
     }
 
 
@@ -1632,26 +1632,26 @@ MUST CHECK
      */
     private function getUserProjectRole($userId, $projectId)
     {
-        
-        $pru = $this->models->ProjectRoleUser->_get(
+
+        $pru = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id'=> array(
-					'user_id' => $userId, 
+					'user_id' => $userId,
 					'project_id' => $projectId
 				),
 				'columns' => '*,ifnull(last_project_select,"'.$this->translate('(has never worked on project)').'") as last_login'
         	)
 		);
- 
+
         if ($pru) {
-            
-            $r = $this->models->Role->_get(array('id'=>$pru[0]['role_id']));
-            
+
+            $r = $this->models->Roles->_get(array('id'=>$pru[0]['role_id']));
+
             $pru[0]['role'] = $r;
         }
-        
+
         return $pru[0];
-    
+
     }
 
 
@@ -1667,15 +1667,15 @@ MUST CHECK
      */
     private function userPasswordEncode ($p)
     {
-        
+
         return md5($p);
-    
+
     }
 
 
 
     /**
-     * Verifies if the user data that has been entered is complete 
+     * Verifies if the user data that has been entered is complete
      *
      * @param      array    $fieldsToIgnore    fields that might be in the data, but need not be checked
      * @return     boolean    data is complete or not
@@ -1683,54 +1683,54 @@ MUST CHECK
      */
     private function isUserDataComplete($data,$fieldsToIgnore=array())
     {
-        
+
         $result = true;
-        
+
         if (!in_array('username',(array)$fieldsToIgnore) && $data['username'] == '') {
-            
+
             $this->addError($this->translate('Missing username.'));
             $result = false;
-        
+
         }
-        
+
         if (!in_array('password',(array)$fieldsToIgnore) && $data['password'] == '') {
-            
+
             $this->addError($this->translate('Missing password.'));
             $result = false;
-        
+
         }
-        
+
         if (!in_array('password_2',(array)$fieldsToIgnore) && $data['password_2'] == '') {
-            
+
             $this->addError($this->translate('Missing password repeat.'));
             $result = false;
-        
+
         }
-        
+
 
         if (!in_array('first_name',(array)$fieldsToIgnore) && $data['first_name'] == '') {
-            
+
             $this->addError($this->translate('Missing first name.'));
             $result = false;
-        
+
         }
-        
+
         if (!in_array('last_name',(array)$fieldsToIgnore) && $data['last_name'] == '') {
-            
+
             $this->addError($this->translate('Missing last name.'));
             $result = false;
-        
+
         }
-        
+
         if (!in_array('email_address',(array)$fieldsToIgnore) && $data['email_address'] == '') {
-            
+
             $this->addError($this->translate('Missing email address.'));
             $result = false;
-        
+
         }
-        
+
         return $result;
-    
+
     }
 
 
@@ -1747,41 +1747,41 @@ MUST CHECK
      */
     private function isUsernameCorrect($username)
     {
-        
+
         if (!$username) return false;
-        
+
 		$min = $this->controllerSettings['dataChecks']['username']['minLength'];
 		$max = $this->controllerSettings['dataChecks']['username']['maxLength'];
-		
+
         $result = true;
-        
+
         if (strlen($username) < $min) {
-            
+
             $this->addError(sprintf($this->translate('Username too short; should be between %s and %s characters.'),$min,$max));
-            
+
             $result = false;
-        
+
         } else
         if (strlen($username) > $max) {
-            
+
             $this->addError(sprintf($this->translate('Username too long; should be between %s and %s characters.'),$min,$max));
-            
+
             $result = false;
-        
+
         } else
         if (
-			isset($this->controllerSettings['dataChecks']['username']['regexp']) && 
+			isset($this->controllerSettings['dataChecks']['username']['regexp']) &&
 			!preg_match($this->controllerSettings['dataChecks']['username']['regexp'],$username)
 		) {
-            
+
             $this->addError($this->translate('Username has incorrect format.'));
-            
+
             $result = false;
-        
+
         }
-        
+
         return $result;
-    
+
     }
 
 
@@ -1793,7 +1793,7 @@ MUST CHECK
      *
      * @param      string    $password    password to check; if absent, password is taken from the request variables
      * @param      string    $password_2    second password from user data form; idem.
-     * @return     boolean    password is correct (and identical if two were supplied) or not 
+     * @return     boolean    password is correct (and identical if two were supplied) or not
      * @access     private
      * @todo        a more complete check
      */
@@ -1806,45 +1806,45 @@ MUST CHECK
 		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
 
         $result = true;
-        
+
         if (strlen($password) < $min) {
-            
+
             $this->addError(sprintf($this->translate('Password too short; should be between %s and %s characters.'),$min,$max));
-            
+
             $result = false;
-        
+
         } else
         if (strlen($password) > $max) {
-            
+
             $this->addError(sprintf($this->translate('Password too long; should be between %s and %s characters.'),$min,$max));
-            
+
             $result = false;
-        
+
         } else
         if (
-			isset($this->controllerSettings['dataChecks']['password']['regexp']) && 
+			isset($this->controllerSettings['dataChecks']['password']['regexp']) &&
 			!preg_match($this->controllerSettings['dataChecks']['password']['regexp'],$password)
 			)  {
 
             $this->addError($this->translate('Password has incorrect format.'));
-            
+
             $result = false;
-        
+
         }
-        
+
 
         return $result;
-    
+
     }
 
     private function arePasswordsIdentical($password,$password_2)
     {
 
         if ($password != $password_2) {
-            
+
             $this->addError($this->translate('Passwords not the same.'));
-            
-			return false;        
+
+			return false;
         }
 
 		return true;
@@ -1868,35 +1868,35 @@ MUST CHECK
 
 		$min = $this->controllerSettings['dataChecks']['email_address']['minLength'];
 		$max = $this->controllerSettings['dataChecks']['email_address']['maxLength'];
-		
+
         $result = true;
-        
+
         if (strlen($email_address) < $min) {
-            
+
             $this->addError(sprintf($this->translate('E-mail adress too short; should be between %s and %s characters.'),$min,$max));
-            
+
             $result = false;
-        
+
         } else
         if (strlen($email_address) > $max) {
-            
+
             $this->addError(sprintf($this->translate('E-mail adress too long; should be between %s and %s characters.'),$min,$max));
-            
+
             $result = false;
-        
+
         } else
         if (!$this->verifyEmailAddress($email_address))  {
-            
+
             $this->addError($this->translate('Invalid e-mail address.'));
-            
+
             $result = false;
-        
+
         }
-        
+
         return $result;
-    
+
     }
-    
+
     private function verifyEmailAddress ($email)
     {
         // First, we check that there's one @ symbol, and that the lengths are right
@@ -1912,7 +1912,7 @@ MUST CHECK
                 return false;
             }
         }
-        if (!preg_match("/^\[?[0-9\.]+\]?$/", $email_array[1])) { 
+        if (!preg_match("/^\[?[0-9\.]+\]?$/", $email_array[1])) {
             // Check if domain is IP. If not, it should be valid domain name
             $domain_array = explode(".", $email_array[1]);
             if (sizeof($domain_array) < 2) {
@@ -1942,21 +1942,21 @@ MUST CHECK
 		$d = array('username' => $username);
 
 		if (!empty($idToIgnore)) $d['id !='] = $idToIgnore;
-            
-		$users = $this->models->User->_get(array('id'=>$d));
-            
+
+		$users = $this->models->Users->_get(array('id'=>$d));
+
 		if (count((array) $users) != 0) {
-			
+
 			$this->addError($this->translate('Username already exists.'));
-			
+
 			return false;
-		
+
 		} else {
 
 			return true;
 
 		}
-        
+
     }
 
 
@@ -1974,15 +1974,15 @@ MUST CHECK
 		$d = array('email_address' => $email_address);
 
 		if ($idToIgnore)  $d['id !='] = $idToIgnore;
-            
-		$users = $this->models->User->_get(array('id'=>$d));
-            
+
+		$users = $this->models->Users->_get(array('id'=>$d));
+
 		if (count((array) $users) != 0) {
 
 			$this->addError($this->translate('E-mail address already exists.'));
-			
+
 			return false;
-		
+
 		} else {
 
 			return true;
@@ -2054,26 +2054,26 @@ MUST CHECK
 		);
 
 	}
-	
+
 	private function generateRandomPassword()
 	{
 
 		$chars = $this->controllerSettings['randomPassword']['chars'];
-	
+
 		srand((double)microtime()*1000000);
-	
+
 		$i = 0;
 		$pass = '' ;
-	
+
 		while ($i <= $this->controllerSettings['randomPassword']['length']) {
 
-			$num = rand()%33;	
+			$num = rand()%33;
 			$tmp = substr($chars, $num, 1);
 			$pass = $pass.$tmp;
 			$i++;
-	
+
 		}
-	
+
 		return $pass;
 
 	}
@@ -2082,17 +2082,17 @@ MUST CHECK
 	{
 
 		if (empty($id)) return;
-		
-		return $this->models->User->_get(array('id' => $id));
-		
+
+		return $this->models->Users->_get(array('id' => $id));
+
 	}
 
 	private function getLookupList($search)
 	{
 
 		if (empty($search)) return;
-		
-		$users = $this->models->User->_get(
+
+		$users = $this->models->Users->_get(
 			array(
 				'where' =>
 						'username like \'%'.$search.'%\'
@@ -2113,13 +2113,13 @@ MUST CHECK
 				'url'=>'edit.php?id=%s'
 			))
 		);
-		
+
 	}
 
 	private function addUserToModule($uid,$pId,$modId)
-	{					
+	{
 
-		$this->models->ModuleProjectUser->save(
+		$this->models->ModulesProjectsUsers->save(
 			array(
 				'id' => null,
 				'user_id' => $uid,
@@ -2133,8 +2133,8 @@ MUST CHECK
 
 	private function addUserToFreeModule($uid,$pId,$modId)
 	{
-	
-		$this->models->FreeModuleProjectUser->save(
+
+		$this->models->FreeModulesProjectsUsers->save(
 			array(
 				'id' => null,
 				'user_id' => $uid,
@@ -2148,7 +2148,7 @@ MUST CHECK
 	private function removeUserFromModule($uid,$pId,$modId)
 	{
 
-		$this->models->ModuleProjectUser->delete(
+		$this->models->ModulesProjectsUsers->delete(
 			array(
 				'user_id' => $uid,
 				'project_id' => $pId,
@@ -2160,8 +2160,8 @@ MUST CHECK
 
 	private function removeUserFromFreeModule($uid,$pId,$modId)
 	{
-	
-		$this->models->FreeModuleProjectUser->delete(
+
+		$this->models->FreeModulesProjectsUsers->delete(
 			array(
 				'user_id' => $uid,
 				'project_id' => $pId,
@@ -2173,16 +2173,16 @@ MUST CHECK
 
 	private function removeUserFromProject($uid,$pId)
 	{
-	
+
 		$d = array(
 				'user_id' => $uid,
 				'project_id' => $pId
 			);
 
-		$this->models->ProjectRoleUser->delete($d);
-		$this->models->ModuleProjectUser->delete($d);
-		$this->models->FreeModuleProjectUser->delete($d);
-		$this->models->UserTaxon->delete($d);
+		$this->models->ProjectsRolesUsers->delete($d);
+		$this->models->ModulesProjectsUsers->delete($d);
+		$this->models->FreeModulesProjectsUsers->delete($d);
+		$this->models->UsersTaxa->delete($d);
 
 	}
 
@@ -2217,15 +2217,15 @@ MUST CHECK
         return $data;
 
     }
-	
+
 	private function isRoleAssignable($roleId)
 	{
-		
+
 		if ($this->isCurrentUserSysAdmin())
 			return true;
 
 		// make sure an unassignable role (like system admin) wasn't injected
-		$r = $this->models->Role->_get(array('id'=>$roleId));
+		$r = $this->models->Roles->_get(array('id'=>$roleId));
 
 		if ($r['assignable']=='n') {
 
@@ -2237,8 +2237,8 @@ MUST CHECK
 			return true;
 
 		}
-		
+
 	}
-	
-	
+
+
 }

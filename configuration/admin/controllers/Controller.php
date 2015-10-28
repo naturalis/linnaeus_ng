@@ -2,6 +2,7 @@
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+
 class Controller extends BaseClass
 {
     private $_smartySettings;
@@ -49,28 +50,28 @@ class Controller extends BaseClass
     private $usedModelsBase = array(
 		'dump', // debug!
 		'activity_log',
-        'free_module_project',
-        'free_module_project_user',
-        'interface_text',
-        'interface_translation',
-        'label_project_rank',
-        'language',
-        'language_project',
-        'module',
-        'module_project',
-        'module_project_user',
-        'project',
-        'project_rank',
-        'project_role_user',
-        'rank',
-        'right',
-        'right_role',
-        'role',
+        'free_modules_projects',
+        'free_modules_projects_users',
+        'interface_texts',
+        'interface_translations',
+        'labels_projects_ranks',
+        'languages',
+        'languages_projects',
+        'modules',
+        'modules_projects',
+        'modules_projects_users',
+        'projects',
+        'projects_ranks',
+        'projects_roles_users',
+        'ranks',
+        'rights',
+        'rights_roles',
+        'roles',
         'settings',
-        'taxon',
-        'taxon_variation',
-        'user',
-        'variation_label',
+        'taxa',
+        'taxa_variations',
+        'users',
+        'variations_labels',
 		'nsr_ids'
      );
     private $usedHelpersBase = array(
@@ -418,7 +419,7 @@ class Controller extends BaseClass
 
 		$this->reInitUserRolesAndRights();
 
-		$p = $this->models->Project->_get(array('id'=>'*','fieldAsIndex'=>'id'));
+		$p = $this->models->Projects->_get(array('id'=>'*','fieldAsIndex'=>'id'));
 
         foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
 
@@ -458,7 +459,7 @@ class Controller extends BaseClass
     {
         $_SESSION['admin']['project']['id'] = $id;
 
-        $this->models->ProjectRoleUser->update(array(
+        $this->models->ProjectsRolesUsers->update(array(
             'last_project_select' => 'now()',
             'project_selects' => 'project_selects+1'
         ), array(
@@ -495,11 +496,11 @@ class Controller extends BaseClass
 
             if (isset($id)) {
 
-                $data = $this->models->Project->_get(array(
+                $data = $this->models->Projects->_get(array(
                     'id' => $id
                 ));
 
-                $pru = $this->models->ProjectRoleUser->_get(
+                $pru = $this->models->ProjectsRolesUsers->_get(
                 array(
                     'id' => array(
                         'project_id' => $id,
@@ -510,7 +511,7 @@ class Controller extends BaseClass
 
                 foreach ((array) $pru as $key => $val) {
 
-                    $u = $this->models->User->_get(
+                    $u = $this->models->Users->_get(
                     array(
                         'id' => array(
                             'id' => $val['user_id'],
@@ -618,7 +619,7 @@ class Controller extends BaseClass
      */
     public function getUserRights ($id = false)
     {
-        $pru = $this->models->ProjectRoleUser->_get(
+        $pru = $this->models->ProjectsRolesUsers->_get(
         array(
             'id' => array(
                 'user_id' => $id ? $id : $this->getCurrentUserId()
@@ -630,7 +631,7 @@ class Controller extends BaseClass
 
         if ($this->isCurrentUserSysAdmin()) {
 
-            $p = $this->models->Project->_get(array(
+            $p = $this->models->Projects->_get(array(
                 'id' => '*'
             ));
 
@@ -650,14 +651,14 @@ class Controller extends BaseClass
 
         foreach ((array) $pru as $key => $val) {
 
-            $p = $this->models->Project->_get(array(
+            $p = $this->models->Projects->_get(array(
                 'id' => $val['project_id']
             ));
 
             // $val['project_id']==0 is the stub for all round system admin
             if ($p || $val['project_id'] == 0) {
 
-                $r = $this->models->Role->_get(array(
+                $r = $this->models->Roles->_get(array(
                     'id' => $val['role_id']
                 ));
 
@@ -671,7 +672,7 @@ class Controller extends BaseClass
                         'role_description' => $r['description']
                     ));
 
-                    $rr = $this->models->RightRole->_get(array(
+                    $rr = $this->models->RightsRoles->_get(array(
                         'id' => array(
                             'role_id' => $val['role_id']
                         )
@@ -679,7 +680,7 @@ class Controller extends BaseClass
 
                     foreach ((array) $rr as $rr_key => $rr_val) {
 
-                        $r = $this->models->Right->_get(array(
+                        $r = $this->models->Rights->_get(array(
                             'id' => $rr_val['right_id']
                         ));
 
@@ -692,7 +693,7 @@ class Controller extends BaseClass
         }
 
 
-        $fmpu = $this->models->FreeModuleProjectUser->_get(array(
+        $fmpu = $this->models->FreeModulesProjectsUsers->_get(array(
             'id' => array(
                 'user_id' => $id ? $id : $this->getCurrentUserId()
             )
@@ -894,7 +895,7 @@ class Controller extends BaseClass
     {
         if (!isset($_SESSION['admin']['user'])) {
 
-            $u = $this->models->User->_get(array(
+            $u = $this->models->Users->_get(array(
                 'id' => $this->getCurrentUserId()
             ));
 
@@ -965,13 +966,13 @@ class Controller extends BaseClass
 		if (isset($params['ignore']))
 			$p['ignore'] = $params['ignore'];
 
-		$modules = $this->models->ModuleProject->_get($p);
+		$modules = $this->models->ModulesProjects->_get($p);
 
 		foreach ((array) $modules as $key => $val) {
 
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
 
-			$mp = $this->models->Module->_get(array(
+			$mp = $this->models->Modules->_get(array(
 				'id' => $val['module_id']
 			));
 
@@ -989,7 +990,7 @@ class Controller extends BaseClass
 			'maintainKeys' => true
 		));
 
-		$freeModules = $this->models->FreeModuleProject->_get(array(
+		$freeModules = $this->models->FreeModulesProjects->_get(array(
 			'id' => array(
 				'project_id' => $d['project_id']
 			)
@@ -1158,7 +1159,7 @@ class Controller extends BaseClass
         if (isset($_SESSION['admin']['user']['currentLanguage']) && $languageId == $_SESSION['admin']['user']['currentLanguage'])
             return;
 
-        $l = $this->models->Language->_get(array(
+        $l = $this->models->Languages->_get(array(
             'id' => array(
                 'id' => $languageId
             )
@@ -1318,7 +1319,7 @@ class Controller extends BaseClass
         if (empty($id) || $id == 0)
             return;
 
-		$t = $this->models->Taxon->_get(array(
+		$t = $this->models->Taxa->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 				'id' => $id
@@ -1332,7 +1333,7 @@ class Controller extends BaseClass
 
 		$t[0]['label'] = $this->formatTaxon($t[0]);
 
-		$pr = $this->models->ProjectRank->_get(
+		$pr = $this->models->ProjectsRanks->_get(
 		array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
@@ -1355,7 +1356,7 @@ class Controller extends BaseClass
         if (empty($name))
             return;
 
-		$t=$this->models->Taxon->_get(array(
+		$t=$this->models->Taxa->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon' => $name
@@ -1569,16 +1570,16 @@ class Controller extends BaseClass
         $d['id'] = null;
         $d['sys_name'] = $d['title'];// . (isset($d['version']) ? ' v' . $d['version'] : $d['version']);
 
-        $p = $this->models->Project->save($d);
+        $p = $this->models->Projects->save($d);
 
-        return ($p) ? $this->models->Project->getNewId() : false;
+        return ($p) ? $this->models->Projects->getNewId() : false;
     }
 
 
 
     public function addUserToProject ($uid, $pId, $roleId, $active = 1, $addToAllModules = true)
     {
-        $this->models->ProjectRoleUser->save(array(
+        $this->models->ProjectsRolesUsers->save(array(
             'id' => null,
             'project_id' => $pId,
             'role_id' => $roleId,
@@ -1602,7 +1603,7 @@ class Controller extends BaseClass
         foreach ((array) $modules['modules'] as $key => $val) {
 
             $d['module_id'] = $val['module_id'];
-            $this->models->ModuleProjectUser->save($d);
+            $this->models->ModulesProjectsUsers->save($d);
         }
 
         unset($d['module_id']);
@@ -1610,7 +1611,7 @@ class Controller extends BaseClass
         foreach ((array) $modules['freeModules'] as $key => $val) {
 
             $d['free_module_id'] = $val['id'];
-            $this->models->FreeModuleProjectUser->save($d);
+            $this->models->FreeModulesProjectsUsers->save($d);
         }
     }
 
@@ -1686,7 +1687,7 @@ class Controller extends BaseClass
         $idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
         $pId = isset($p['pId']) ? $p['pId'] :  $this->getCurrentProjectId();
 
-		$pr = $this->models->ProjectRank->freeQuery(
+		$pr = $this->models->ProjectsRanks->freeQuery(
 			array(
 				"query"=>"
 					select
@@ -1733,7 +1734,7 @@ class Controller extends BaseClass
 				foreach ((array) $this->getProjectLanguages() as $langaugekey => $language)
 				{
 
-					$lpr = $this->models->LabelProjectRank->_get(
+					$lpr = $this->models->LabelsProjectsRanks->_get(
 						array(
 							'id' => array(
 								'project_id' => $pId,
@@ -1837,7 +1838,7 @@ class Controller extends BaseClass
 			if ($alphabeticalTree)
 				$p['order'] = 'taxon';
 
-            $d = $this->models->Taxon->_get($p);
+            $d = $this->models->Taxa->_get($p);
 
             foreach((array)$d as $val)
 			{
@@ -2012,7 +2013,7 @@ class Controller extends BaseClass
     {
         $pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
 
-        $pru = $this->models->ProjectRoleUser->_get(array(
+        $pru = $this->models->ProjectsRolesUsers->_get(array(
             'id' => array(
                 'project_id' => $pId,
                 'role_id !=' => '1',
@@ -2024,11 +2025,11 @@ class Controller extends BaseClass
 
         foreach ((array) $pru as $key => $val) {
 
-            $u = $this->models->User->_get(array(
+            $u = $this->models->Users->_get(array(
                 'id' => $val['user_id']
             ));
 
-            $r = $this->models->Role->_get(array(
+            $r = $this->models->Roles->_get(array(
                 'id' => $val['role_id']
             ));
 
@@ -2041,7 +2042,7 @@ class Controller extends BaseClass
         }
 
         // adding superusers (don't need assigned roles)
-        $superusers = $this->models->User->_get(array(
+        $superusers = $this->models->Users->_get(array(
             'id' => array(
                 'superuser' => '1'
             ),
@@ -2158,7 +2159,7 @@ class Controller extends BaseClass
 			11 | Index
 			12 | Search
 		*/
-        $this->models->ModuleProject->save(
+        $this->models->ModulesProjects->save(
         array(
             'id' => null,
             'project_id' => is_null($pId) ? $this->getCurrentProjectId() : $pId,
@@ -2344,7 +2345,7 @@ class Controller extends BaseClass
 
     public function grantModuleAccessRights ($mId, $pId, $uId = null)
     {
-        $this->models->ModuleProjectUser->save(array(
+        $this->models->ModulesProjectsUsers->save(array(
             'id' => null,
             'project_id' => $pId,
             'module_id' => $mId,
@@ -2356,7 +2357,7 @@ class Controller extends BaseClass
 
     public function addUserToProjectAsLeadExpert ($pId, $uId = null)
     {
-        $this->models->ProjectRoleUser->save(
+        $this->models->ProjectsRolesUsers->save(
         array(
             'id' => null,
             'project_id' => $pId,
@@ -2377,7 +2378,7 @@ class Controller extends BaseClass
         if (isset($tId))
             $d['taxon_id'] = $tId;
 
-        $tv = $this->models->TaxonVariation->_get(array(
+        $tv = $this->models->TaxaVariations->_get(array(
             'id' => $d,
             'columns' => 'id,taxon_id,label',
             'order' => 'label'
@@ -2387,7 +2388,7 @@ class Controller extends BaseClass
 
             $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
 
-            $tv[$key]['labels'] = $this->models->VariationLabel->_get(
+            $tv[$key]['labels'] = $this->models->VariationsLabels->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -2405,7 +2406,7 @@ class Controller extends BaseClass
     public function getVariation ($id)
     {
 
-        $tv = $this->models->TaxonVariation->_get(
+        $tv = $this->models->TaxaVariations->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -2414,7 +2415,7 @@ class Controller extends BaseClass
             'columns' => 'id,taxon_id,label'
         ));
 
-        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        $tv[0]['labels'] = $this->models->VariationsLabels->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -2430,7 +2431,7 @@ class Controller extends BaseClass
 
     private function getFrontEndMainMenu ()
     {
-        $modules = $this->models->ModuleProject->_get(
+        $modules = $this->models->ModulesProjects->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -2441,7 +2442,7 @@ class Controller extends BaseClass
 
         foreach ((array) $modules as $key => $val) {
 
-            $mp = $this->models->Module->_get(array(
+            $mp = $this->models->Modules->_get(array(
                 'id' => $val['module_id']
             ));
 
@@ -2451,7 +2452,7 @@ class Controller extends BaseClass
             $modules[$key]['controller'] = $mp['controller'];
         }
 
-        $freeModules = $this->models->FreeModuleProject->_get(array(
+        $freeModules = $this->models->FreeModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'active' => 'y'
@@ -2507,7 +2508,7 @@ class Controller extends BaseClass
         }
 
         // get the child taxa of the current parent
-        $t = $this->models->Taxon->_get(array(
+        $t = $this->models->Taxa->_get(array(
             'id' => $id,
             'order' => 'taxon_order'
         ));
@@ -2617,11 +2618,11 @@ class Controller extends BaseClass
                 $p['fieldAsIndex'] = 'id';
             }
 
-            $pr = $this->models->ProjectRank->_get($p);
+            $pr = $this->models->ProjectsRanks->_get($p);
 
             foreach ((array) $pr as $rankkey => $rank) {
 
-                $r = $this->models->Rank->_get(array(
+                $r = $this->models->Ranks->_get(array(
                     'id' => $rank['rank_id']
                 ));
 
@@ -2637,7 +2638,7 @@ class Controller extends BaseClass
 
                     foreach ((array) $this->getProjectLanguages() as $langaugekey => $language) {
 
-                        $lpr = $this->models->LabelProjectRank->_get(
+                        $lpr = $this->models->LabelsProjectsRanks->_get(
                         array(
                             'id' => array(
                                 'project_id' => $this->getCurrentProjectId(),
@@ -2665,15 +2666,15 @@ class Controller extends BaseClass
 
         /*
         $languages = array_merge(
-			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')),
-	        $this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
+			$this->models->Languages->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')),
+	        $this->models->Languages->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
 		);
 		*/
 
         //		unset($_SESSION['admin']['project']['system']['languages']);
         if (!isset($_SESSION['admin']['project']['system']['languages'])) {
 
-            $_SESSION['admin']['project']['system']['languages'] = $this->models->Language->_get(array(
+            $_SESSION['admin']['project']['system']['languages'] = $this->models->Languages->_get(array(
                 'id' => '*',
                 'fieldAsIndex' => 'id'
             ));
@@ -2686,7 +2687,7 @@ class Controller extends BaseClass
 
     public function setProjectLanguages()
     {
-        $lp = $this->models->LanguageProject->_get(array(
+        $lp = $this->models->LanguagesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ),
@@ -2695,7 +2696,7 @@ class Controller extends BaseClass
 
         foreach ((array) $lp as $key => $val) {
 
-            $l = $this->models->Language->_get(array(
+            $l = $this->models->Languages->_get(array(
                 'id' => $val['language_id']
             ));
 
@@ -2903,7 +2904,7 @@ class Controller extends BaseClass
         if (!isset($this->controllerBaseName))
             return 1;
 
-        $mp = $this->models->ModuleProject->_get(array(
+        $mp = $this->models->ModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'module_id' => $this->controllerModuleId
@@ -3154,32 +3155,28 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
+        $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
+
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php')) {
+
+            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+
+            $this->models->$t = new $t;
+
+        }
+
+        require_once dirname(__FILE__) . '/../models/Table.php';
+
         foreach ((array) $d as $key) {
 
-            if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
+            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
-                require_once (dirname(__FILE__) . '/../models/' . $key . '.php');
+            $this->models->$t = new Table($key);
 
-                $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            if (isset($this->helpers->LoggingHelper)) {
 
+                 $this->models->$t->setLogger($this->helpers->LoggingHelper);
 
-                if (class_exists($t)) {
-
-                    $this->models->$t = new $t();
-
-                    if (isset($this->helpers->LoggingHelper))
-                        $this->models->$t->setLogger($this->helpers->LoggingHelper);
-
-                    //echo $t.chr(10);
-                }
-                else {
-
-                    $this->log('Attempted to initiate non-existing model class "' . $t . '"', 2);
-                }
-            }
-            else {
-
-                $this->log('Attempted to load non-existing model file "' . $key . '"', 2);
             }
         }
     }
@@ -3252,7 +3249,7 @@ class Controller extends BaseClass
             if ($key == 0)
                 $this->uiDefaultLanguage = $val;
 
-            $l = $this->models->Language->_get(array(
+            $l = $this->models->Languages->_get(array(
                 'id' => array(
                     'id' => $val
                 ),
@@ -3847,7 +3844,7 @@ class Controller extends BaseClass
 
     private function saveInterfaceText ($text)
     {
-        @$this->models->InterfaceText->save(array(
+        @$this->models->InterfaceTexts->save(array(
             'id' => null,
             'text' => $text,
             'env' => $this->getAppName()
@@ -3866,25 +3863,13 @@ class Controller extends BaseClass
     private function doTranslate ($text)
     {
 
-        /*
         // get id of the text
-        $i = $this->models->InterfaceText->_get(array(
+        $i = $this->models->InterfaceTexts->_get(array(
             'id' => array(
                 'text' => $text,
                 'env' => $this->getAppName()
             ),
             'columns' => 'id'
-        ));
-        */
-
-        // get id of the text
-        $i = $this->models->InterfaceText->_get(
-        array(
-            'id' => 'select id
-						from %table%
-						where
-							text = "' . mysql_real_escape_string($text) . '"
-							and env = "' . $this->getAppName() . '"'
         ));
 
         // if not found, return unchanged
@@ -3894,7 +3879,7 @@ class Controller extends BaseClass
         // resolve language id
         $languageId = $this->getCurrentUiLanguage();
         // fetch appropriate translation
-        $it = $this->models->InterfaceTranslation->_get(
+        $it = $this->models->InterfaceTranslations->_get(
         array(
             'id' => array(
                 'interface_text_id' => $i[0]['id'],
@@ -3921,7 +3906,7 @@ class Controller extends BaseClass
 		if (empty($pId))
 			return;
 
-		   $pru = $this->models->ProjectRoleUser->_get(
+		   $pru = $this->models->ProjectsRolesUsers->_get(
 			array(
 				'id' => array(
 					'project_id' => $pId,
