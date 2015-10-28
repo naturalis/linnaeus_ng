@@ -2,7 +2,7 @@
 
 <div id="page-main">
 <p>
-<span class="matrix-header">{t _s1=$matrix.matrix}Viewing taxon-state links in the matrix "%s"{/t} (<a href="edit.php">{t}view matrix{/t}</a>)</span>
+<span class="matrix-header">{t _s1=$matrix.sys_name}Viewing taxon-state links in the matrix "%s"{/t} (<a href="edit.php">{t}view matrix{/t}</a>)</span>
 </p>
 
 <form id="theForm" method="post" action="">
@@ -59,4 +59,3 @@
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-<!-- REFACNOW -->
