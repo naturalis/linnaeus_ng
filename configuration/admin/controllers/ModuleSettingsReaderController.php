@@ -118,7 +118,7 @@ class ModuleSettingsReaderController extends Controller
 
     private function resolveModuleId( $controller )
     {
-		$d=$this->models->Module->_get(array("id"=>array("controller"=>$controller)));
+		$d=$this->models->Modules->_get(array("id"=>array("controller"=>$controller)));
 
 		if ($d)
 		{
