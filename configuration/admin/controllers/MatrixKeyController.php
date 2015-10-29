@@ -46,93 +46,11 @@ class MatrixKeyController extends Controller
     {
         parent::__construct();
 		
-		$this->DDL_STATEMENTS();
         $this->initialize();
     }
 	
-	private function DDL_STATEMENTS()
-	{
-		if ( !isset($this->models->Matrices->columns['sys_name']) ) 
-		{
-			$this->models->Matrices->freeQuery("alter table %PRE%matrices add sys_name varchar(64) default 'matrix' after project_id");
-			$d=$this->models->Matrices->freeQuery("
-				select
-				_a.matrix_id,
-				_a.name,
-				_b.language_id,
-				_c.title
-				
-				from 
-				%PRE%matrices_names _a
-				
-				left join %PRE%languages_projects _b
-				on _a.language_id = _b.language_id
-				and _b. def_language=1
-				and _a.project_id=_b.project_id
-				
-				left join %PRE%projects _c
-				on _a.project_id = _c.id
-			");
-			
-			foreach((array)$d as $val)
-			{
-				$this->models->Matrices->freeQuery("
-					update
-					%PRE%matrices 
-					set
-					sys_name = '" .
-					(!empty($val['name']) ? $val['name'] : 
-					(!empty($val['title']) ? $val['title'] : 
-					'matrix')
-					) . "' where id = " . $val['matrix_id']
-				);			
-			}
-		
-		}
-
-		if ( !isset($this->models->Characteristics->columns['sys_label']) ) 
-		{
-			$this->models->Matrices->freeQuery("alter table %PRE%characteristics add sys_label varchar(64) default 'character' after type");
-			$d=$this->models->Characteristics->freeQuery("
-				select
-					_a.characteristic_id,
-					_a.label
-				from 
-				%PRE%characteristics_labels _a
-				
-				left join %PRE%languages_projects _b
-					on _a.language_id = _b.language_id
-					and _b. def_language=1
-					and _a.project_id=_b.project_id
-			");
-
-			foreach((array)$d as $val)
-			{
-				if (strpos($val['label'],'|')!==false)
-				{
-					$d=explode('|',$val['label']);
-					$label=$d[0];
-				}
-				else
-				{
-					$label=$val['label'];
-				}
-				
-				$this->models->Characteristics->freeQuery("
-					update
-					%PRE%characteristics 
-					set
-					sys_label = '" .
-					(!empty($label) ? $label : 'character') . "' where id = " . $val['characteristic_id']
-				);			
-			}
-		
-		}
-	}
-
     private function initialize ()
     {
-
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
 		$this->moduleSettings->assignModuleSettings( $this->settings );
@@ -452,7 +370,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-
     public function charAction ()
     {
         $this->checkAuthorisation();
@@ -529,7 +446,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-
     public function taxaAction ()
     {
         $this->checkAuthorisation();
@@ -554,11 +470,10 @@ class MatrixKeyController extends Controller
                 }
             }
             
-            if ($this->rHasVal('variation')) {
-                
-
-                foreach ((array) $this->rGetVal('variation') as $val) {
-                    
+            if ($this->rHasVal('variation'))
+			{
+                foreach ((array) $this->rGetVal('variation') as $val)
+				{
                     $this->models->MatricesVariations->save(
                     array(
                         'project_id' => $this->getCurrentProjectId(), 
@@ -587,7 +502,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
     public function stateAction ()
     {
@@ -934,8 +848,6 @@ class MatrixKeyController extends Controller
         return $this->models->Matrices->getNewId();
     }
 
-
-
     private function setMatrixGotNames ($id, $state = null)
     {
         if ($state == null)
@@ -960,8 +872,6 @@ class MatrixKeyController extends Controller
         ));
     }
 
-
-
     private function setCurrentMatrixId ($id)
     {
         if ($id==null)
@@ -979,7 +889,7 @@ class MatrixKeyController extends Controller
 		return $this->moduleSession->getModuleSetting( 'currentMatrixId' );
     }
 
-    private function getMatrix ($id = null)
+    private function getMatrix($id = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         
@@ -1007,9 +917,7 @@ class MatrixKeyController extends Controller
         return $m[0];
     }
 
-
-
-    private function deleteMatrix ($id)
+    private function deleteMatrix($id)
     {
         if (!isset($id))
             return;
@@ -1032,7 +940,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function getMatrices ($skipCurrent = false)
+    private function getMatrices($skipCurrent = false)
     {
         $d = array(
             'project_id' => $this->getCurrentProjectId(), 
@@ -1079,7 +987,7 @@ class MatrixKeyController extends Controller
         return $m;
     }
 
-    private function ajaxSaveMatrixName ()
+    private function ajaxSaveMatrixName()
     {
         if (!$this->rHasId() || !$this->rHasVal('language'))
 		{
@@ -1184,7 +1092,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function updateCharacteristic ()
+    private function updateCharacteristic()
     {
         $this->models->Characteristics->update(array(
             'type' => $this->rGetVal('type')
@@ -1194,7 +1102,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function setCharacteristicGotLabels ($id, $state = null)
+    private function setCharacteristicGotLabels($id, $state = null)
     {
         if ($state == null)
 		{
@@ -1218,7 +1126,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function ajaxActionSaveCharacteristicLabel ()
+    private function ajaxActionSaveCharacteristicLabel()
     {
         if (!$this->rHasVal('language'))
 		{
@@ -1273,7 +1181,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function getCharacteristicLabel ($id = null, $language = null)
+    private function getCharacteristicLabel($id = null, $language = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         $language = isset($language) ? $language : $this->rGetVal('language');
@@ -1292,7 +1200,7 @@ class MatrixKeyController extends Controller
         return isset($cl[0]['label']) ? $cl[0]['label'] : null;
     }
 
-    private function getCharacteristicLabels ($id)
+    private function getCharacteristicLabels($id)
     {
         $cl = $this->models->CharacteristicsLabels->_get(
         array(
@@ -1326,9 +1234,7 @@ class MatrixKeyController extends Controller
         );
     }
 
-
-
-    private function getCharacteristic ($id)
+    private function getCharacteristic($id)
     {
         $c = $this->models->Characteristics->_get(
         array(
@@ -1357,7 +1263,7 @@ class MatrixKeyController extends Controller
         return $char;
     }
 
-    private function deleteCharacteristic ($id = null)
+    private function deleteCharacteristic($id = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         
@@ -1404,7 +1310,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function getCharacteristics ($matrixId = null)
+    private function getCharacteristics($matrixId = null)
     {
         $matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
         
@@ -1433,7 +1339,7 @@ class MatrixKeyController extends Controller
         return isset($d) ? $d : null;
     }
 
-    private function getAllCharacteristics ($matrixToExclude = null)
+    private function getAllCharacteristics($matrixToExclude = null)
     {
         if (isset($matrixToExclude))
 		{
@@ -1471,7 +1377,7 @@ class MatrixKeyController extends Controller
         return $c;
     }
 
-    private function getCharacteristicType ($type)
+    private function getCharacteristicType($type)
     {
         foreach ((array) $this->controllerSettings['characteristicTypes'] as $key => $val)
 		{
@@ -1479,7 +1385,7 @@ class MatrixKeyController extends Controller
         }
     }
     
-    private function createState ()
+    private function createState()
     {
         if (!$this->rHasVal('char'))
             return;
@@ -1492,7 +1398,7 @@ class MatrixKeyController extends Controller
         return $this->models->CharacteristicsStates->getNewId();
     }
 
-    private function getCharacteristicStateLabels ($id)
+    private function getCharacteristicStateLabels($id)
     {
         $cls = $this->models->CharacteristicsLabelsStates->_get(
         array(
@@ -1509,7 +1415,7 @@ class MatrixKeyController extends Controller
         );
     }
 
-    private function getCharacteristicState ($id)
+    private function getCharacteristicState($id)
     {
         $cs = $this->models->CharacteristicsStates->_get(array(
             'id' => array(
@@ -1530,9 +1436,7 @@ class MatrixKeyController extends Controller
         return $state;
     }
 
-
-
-    private function verifyData ($data, $file)
+    private function verifyData($data, $file)
     {
         $result = true;
         
@@ -1630,9 +1534,7 @@ class MatrixKeyController extends Controller
         return $result;
     }
 
-
-
-    private function getCharacteristicStates ($id=null)
+    private function getCharacteristicStates($id=null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         
@@ -1659,9 +1561,7 @@ class MatrixKeyController extends Controller
         return $cs;
     }
 
-
-
-    private function getCharacteristicStateLabelOrText ($id = null, $language = null, $type = 'label')
+    private function getCharacteristicStateLabelOrText($id = null, $language = null, $type = 'label')
     {
         $id = isset($id) ? $id : $this->rGetId();
         $language = isset($language) ? $language : $this->rGetVal('language');
@@ -1681,20 +1581,20 @@ class MatrixKeyController extends Controller
         return $type == 'text' ? $cls[0]['text'] : $cls[0]['label'];
     }
 
-    private function ajaxActionGetCharacteristicStateLabel ()
+    private function ajaxActionGetCharacteristicStateLabel()
     {
         $this->smarty->assign('returnText', $this->getCharacteristicStateLabelOrText($this->rGetId(), $this->rGetVal('language')));
     }
 
-    private function ajaxActionGetCharacteristicStateText ()
+    private function ajaxActionGetCharacteristicStateText()
     {
         $this->smarty->assign('returnText', $this->getCharacteristicStateLabelOrText($this->rGetId(), $this->rGetVal('language'), 'text'));
     }
 
-    private function setCharacteristicStateGotLabels ($id, $state = null)
+    private function setCharacteristicStateGotLabels($id, $state = null)
     {
-        if ($state == null) {
-            
+        if ($state == null)
+		{
             $cl = $this->models->CharacteristicsLabelsStates->_get(
             array(
                 'id' => array(
@@ -1715,11 +1615,10 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function saveCharacteristicStateLabelOrText ($id, $language, $content, $type = 'label')
+    private function saveCharacteristicStateLabelOrText($id, $language, $content, $type = 'label')
     {
         if (!$content)
 		{
-
             $this->models->CharacteristicsLabelsStates->delete(array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'state_id' => $id, 
@@ -1762,7 +1661,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function ajaxActionSaveCharacteristicStateLabel ()
+    private function ajaxActionSaveCharacteristicStateLabel()
     {
         if (!$this->rHasVal('language') || !$this->rHasVal('id'))
 		{
@@ -1775,7 +1674,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function ajaxActionSaveCharacteristicStateText ()
+    private function ajaxActionSaveCharacteristicStateText()
     {
         if (!$this->rHasVal('language') || !$this->rHasVal('id'))
 		{
@@ -1788,7 +1687,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function deleteCharacteristicStateImage ($id = null)
+    private function deleteCharacteristicStateImage($id = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         
@@ -1808,9 +1707,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-
-
-    private function deleteCharacteristicState ($id = null)
+    private function deleteCharacteristicState($id = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         
@@ -1830,9 +1727,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-
-
-    private function deleteCharacteristicStates ($charId)
+    private function deleteCharacteristicStates($charId)
     {
         $cs = $this->getCharacteristicStates($charId);
         
@@ -1842,8 +1737,8 @@ class MatrixKeyController extends Controller
         
         foreach ((array) $cs as $key => $val) {
             
-            if (isset($val['file_name'])) {
-                
+            if (isset($val['file_name']))
+			{
                 @unlink($this->getProjectsMediaStorageDir(). $val['file_name']);
             }
         }
@@ -1854,9 +1749,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-
-
-    private function getTaxa ()
+    private function getTaxa()
     {
         $mt = $this->models->MatricesTaxa->_get(
         array(
@@ -1884,17 +1777,15 @@ class MatrixKeyController extends Controller
         return isset($t) ? $t : null;
     }
 
-
-
-    private function removeTaxon ($id = null)
+    private function removeTaxon($id = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
         
         if (!isset($id))
             return;
         
-        if (strpos($id, 'var-') === 0) {
-            
+        if (strpos($id, 'var-')===0)
+		{
             $id = str_replace('var-', '', $id);
             
             $this->deleteLinks(array(
@@ -1907,8 +1798,8 @@ class MatrixKeyController extends Controller
                 'variation_id' => $id
             ));
         }
-        else {
-            
+        else
+		{
             $this->deleteLinks(array(
                 'taxon_id' => $id
             ));
@@ -1920,26 +1811,25 @@ class MatrixKeyController extends Controller
         }
     }
 
-
-
-    private function addLink ($charId = null, $taxonId = null, $stateId = null)
+    private function addLink($charId = null, $taxonId = null, $stateId = null)
     {
         $charId = isset($charId) ? $charId : $this->rGetVal('characteristic');
         $taxonId = isset($taxonId) ? $taxonId : $this->rGetVal('taxon');
         $stateId = isset($stateId) ? $stateId : $this->rGetVal('state');
         
-        if (strpos($taxonId, 'mx-') === 0) {
-            
+        if (strpos($taxonId, 'mx-') === 0)
+		{
             $refMatrixId = str_replace('mx-', '', $taxonId);
             $taxonId = null;
         }
-        else if (strpos($taxonId, 'var-') === 0) {
-            
+        else 
+		if (strpos($taxonId, 'var-') === 0)
+		{
             $variationId = str_replace('var-', '', $taxonId);
             $taxonId = null;
         }
-        else {
-            
+        else
+		{
             $refMatrixId = null;
         }
         
@@ -2034,23 +1924,8 @@ class MatrixKeyController extends Controller
 
     private function cleanUpEmptyVariables ()
     {
-        $this->models->Matrices->delete('delete from %table% 
-			where project_id =  ' . $this->getCurrentProjectId() . '
-			and got_names = 0
-			and created < DATE_ADD(now(), INTERVAL -7 DAY)');
-        
-        $this->models->Characteristics->delete('delete from %table% 
-			where project_id =  ' . $this->getCurrentProjectId() . '
-			and got_labels = 0
-			and created < DATE_ADD(now(), INTERVAL -7 DAY)');
-        
-        /*
-		$this->models->CharacteristicsStates->delete('delete from %table% 
-			where project_id =  '.$this->getCurrentProjectId().'
-			and got_labels = 0
-			and created < DATE_ADD(now(), INTERVAL -7 DAY)'
-		);
-		*/
+        $this->models->MatrixkeyModel->deleteObsoleteMatrices(array('project_id'=>$this->getCurrentProjectId()));
+        $this->models->MatrixkeyModel->deleteObsoleteCharacters(array('project_id'=>$this->getCurrentProjectId()));
         
         // delete labelless states
         $cs = $this->models->CharacteristicsStates->_get(array(
@@ -2070,8 +1945,8 @@ class MatrixKeyController extends Controller
                 'columns' => 'count(*) as total'
             ));
             
-            if ($cs[0]['total'] == 0) {
-                
+            if ($cs[0]['total'] == 0)
+			{
                 $this->models->CharacteristicsStates->delete(array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'id' => $val['id']
@@ -2099,8 +1974,8 @@ class MatrixKeyController extends Controller
                 'columns' => 'count(*) as total'
             ));
             
-            if ($cs[0]['total'] == 0) {
-                
+            if ($cs[0]['total'] == 0)
+			{
                 $this->models->CharacteristicsLabelsStates->delete(array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'id' => $val['id']
@@ -2178,7 +2053,6 @@ class MatrixKeyController extends Controller
 
     private function getDefaultMatrixId ()
     {
-
 		$m = $this->models->Matrices->_get(
 		array(
 			'id' => array(
@@ -2190,7 +2064,6 @@ class MatrixKeyController extends Controller
 		));
 		
 		return isset($m[0]['id']) ? $m[0]['id'] : null;
-
     }
 
     private function updateStateShowOrder ($id, $val)
@@ -2247,7 +2120,8 @@ class MatrixKeyController extends Controller
         $matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
         $label = isset($p['label']) ? trim($p['label']) : null;
 		
-		if (is_null($label)) {
+		if (is_null($label))
+		{
 			$this->addError($this->translate('Cannot save a nameless group.'));
 			return; 
 		}
@@ -2274,29 +2148,23 @@ class MatrixKeyController extends Controller
 
     private function deleteCharacterGroup($p=null)
     {
-		
-		if (!isset($p['groupId']))
-			return;
-		else
-			$groupId =  $p['groupId'];
+		if (!isset($p['groupId'])) return;
 		
 		$this->models->ChargroupsLabels->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(), 
-				'chargroup_id' => $groupId
+				'chargroup_id' => $p['groupId']
 		));		
 
         $this->models->Chargroups->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(), 
-				'id' => $groupId,
+				'id' => $p['groupId']
 		));
-
     }
 
     private function deleteCharacteristicFromGroup ($p=null)
     {
-
         $charId = isset($p['charId']) ? $p['charId'] : null;
         $groupId = isset($p['groupId']) ? $p['groupId'] : null;
         $matrixId = isset($p['matrixId']) ? $p['matrixId'] : $this->getCurrentMatrixId();
@@ -2311,26 +2179,21 @@ class MatrixKeyController extends Controller
 				)
 			));
 			
-			foreach((array)$cg as $val) {
-
+			foreach((array)$cg as $val)
+			{
 				$this->deleteCharacteristicFromGroup(array('groupId' => $val['id']));
-
 			}
 			
-		} else {
-			
+		} 
+		else 
+		{
 			$d = array('project_id' => $this->getCurrentProjectId());
 			
-			if (!is_null($charId))
-				$d['characteristic_id'] = $charId;
-
-			if (!is_null($groupId))
-				$d['chargroup_id'] = $groupId;
+			if (!is_null($charId)) $d['characteristic_id'] = $charId;
+			if (!is_null($groupId)) $d['chargroup_id'] = $groupId;
 
 			$this->models->CharacteristicsChargroups->delete($d);
-
 		}
-
 	}
 
     private function saveCharacteristicToGroup ($p=null)
@@ -2431,14 +2294,11 @@ class MatrixKeyController extends Controller
     {
         $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
         
-        $mc = $this->models->CharacteristicsMatrices->freeQuery(array(
-			'query' => 'select _a.characteristic_id, _a.show_order, _c.id as characteristic_chargroup_id from %PRE%characteristics_matrices _a
-			left join %PRE%characteristics_chargroups _c
-				on _c.characteristic_id = _a.characteristic_id
-			where _a.matrix_id ='.$mId.'
-			and _c.id is null',
-			'fieldAsIndex' => 'characteristic_id'
-        ));
+        $mc = $this->models->MatrixkeyModel->getCharactersNotInGroups(
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'matrix_id'=>$mId 
+			));
 
         foreach ((array) $mc as $key => $val)
 		{
@@ -2504,7 +2364,6 @@ class MatrixKeyController extends Controller
 
 	private function reacquireStateImageDimensions($id=null)
 	{
-
 		$id = isset($id) ? $id : $this->getCurrentMatrixId();
 		
 		$d = $this->getCharacteristics($id);
@@ -2534,7 +2393,6 @@ class MatrixKeyController extends Controller
 
 	private function saveGUIMenuOrder($p=null)
 	{
-		
 		$id = isset($p['id']) ? $p['id'] : null;
 		$type = isset($p['type']) ? $p['type'] : null;
 		$order = isset($p['order']) ? $p['order'] : null;
