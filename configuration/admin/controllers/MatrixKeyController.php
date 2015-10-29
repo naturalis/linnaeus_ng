@@ -41,7 +41,6 @@ class MatrixKeyController extends Controller
     );
 
 	private $settings;
-	private $moduleSession;
 
     public function __construct ()
     {
@@ -140,9 +139,6 @@ class MatrixKeyController extends Controller
 
 		$this->_useCharacterGroups = $this->moduleSettings->getModuleSetting('use_character_groups')==1; 
 		$this->_useVariations=$this->moduleSettings->getModuleSetting(array('module'=>'species','setting'=>'use_variations'))=='1';
-
-		$this->moduleSession=$this->helpers->SessionModuleSettings;
-		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
 
         $this->setDefaultMatrix();
         
