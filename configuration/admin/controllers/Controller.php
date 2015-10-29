@@ -75,10 +75,13 @@ class Controller extends BaseClass
 		'nsr_ids'
      );
     private $usedHelpersBase = array(
+		'session_module_settings',
         'logging_helper',
         'email_helper',
 		'log_changes'
     );
+
+	protected $moduleSession;
 
 
 
@@ -93,6 +96,7 @@ class Controller extends BaseClass
     {
         parent::__construct();
 
+
         $this->setTimeZone();
 
         $this->setDebugMode();
@@ -104,6 +108,8 @@ class Controller extends BaseClass
         $this->initLogging();
 
         $this->setNames();
+
+        $this->startModuleSession();
 
         $this->loadControllerConfig();
 
@@ -137,6 +143,7 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
 
         $this->setProjectLanguages();
+
     }
 
 
@@ -3006,6 +3013,12 @@ class Controller extends BaseClass
             $this->log('No relative full path set', 2);
     }
 
+
+    private function startModuleSession()
+	{
+		$this->moduleSession=$this->helpers->SessionModuleSettings;
+		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
+	}
 
 
     /**

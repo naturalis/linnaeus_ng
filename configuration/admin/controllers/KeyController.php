@@ -12,13 +12,13 @@ class KeyController extends Controller
 {
 
     public $usedModels = array(
-        'keystep', 
-        'keytree', 
-        'content_keystep', 
-        'choice_keystep', 
-        'choice_content_keystep', 
+        'keysteps', 
+        'keytrees', 
+        'content_keysteps', 
+        'choices_keysteps', 
+        'choices_content_keysteps', 
     );
-	
+
 	public $usedHelpers = array(
 		'session_module_settings',
 		'file_upload_helper'
@@ -279,7 +279,7 @@ class KeyController extends Controller
                 // url was called from the 'new step' option of a choice: set
                 // the new referring step id
 
-                $this->models->ChoiceKeystep->save(array(
+                $this->models->ChoicesKeysteps->save(array(
                     'id' => $this->rGetVal('ref_choice'),
                     'res_keystep_id' => $id
                 ));
@@ -335,7 +335,7 @@ class KeyController extends Controller
                 // existing number specified
                 else
 				{
-                    $k = $this->models->Keystep->_get(
+                    $k = $this->models->Keysteps->_get(
                     array(
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(), 
@@ -356,7 +356,7 @@ class KeyController extends Controller
 						// don't update if unchanged
                         if ($this->rGetVal('number') != $step['number'])
 						{
-                            $this->models->Keystep->update(
+                            $this->models->Keysteps->update(
                             array(
                                 'number' => $this->rGetVal('number')
                             ),
@@ -447,7 +447,7 @@ class KeyController extends Controller
             if (!empty($choice['choice_img']))
                 @unlink($_SESSION['admin']['project']['paths']['project_media'] . $choice['choice_img']);
             
-            $this->models->ChoiceKeystep->save(array(
+            $this->models->ChoicesKeysteps->save(array(
                 'id' => $choice['id'], 
                 'choice_img' => 'null', 
                 'choice_image_params' => 'null'
@@ -465,7 +465,7 @@ class KeyController extends Controller
 				$newStepId = $this->rGetVal('res_keystep_id');
 			
 			
-            $ck = $this->models->ChoiceKeystep->update(
+            $ck = $this->models->ChoicesKeysteps->update(
             array(
                 'res_keystep_id' => $newStepId === '0' ? 'null' : $newStepId, 
                 'res_taxon_id' => $newStepId !== '0' ? 'null' : ($this->rGetVal('res_taxon_id') === '0' ? 'null' : $this->rGetVal('res_taxon_id'))
@@ -474,7 +474,7 @@ class KeyController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             ));
                        
-            if ($this->models->ChoiceKeystep->getAffectedRows() > 0)
+            if ($this->models->ChoicesKeysteps->getAffectedRows() > 0)
 			{
                 if ($this->rGetVal('res_taxon_id') !== '0')
 				{
@@ -499,7 +499,7 @@ class KeyController extends Controller
 
 			if ($filesToSave)
 			{
-				$ck = $this->models->ChoiceKeystep->save(
+				$ck = $this->models->ChoicesKeysteps->save(
 				array(
 					'id' => $choice['id'], 
 					'project_id' => $this->getCurrentProjectId(), 
@@ -594,7 +594,7 @@ class KeyController extends Controller
         
         $this->setPageName(sprintf($this->translate('Insert a step before step %s'), $step['number']));
         
-        $ck = $this->models->ChoiceKeystep->_get(
+        $ck = $this->models->ChoicesKeysteps->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
@@ -680,7 +680,7 @@ class KeyController extends Controller
                 if ($val['rank_id'] == $this->rGetVal('keyRankBorder'))
                     $endPoint = true;
                 
-                $this->models->ProjectRank->save(array(
+                $this->models->ProjectsRanks->save(array(
                     'id' => $val['id'], 
                     'keypath_endpoint' => $endPoint ? 1 : 0
                 ));
@@ -732,7 +732,7 @@ class KeyController extends Controller
                 $sadSteps[] = $val;
         }
 
-		$deadChoices = $this->models->ChoiceKeystep->freeQuery("
+		$deadChoices = $this->models->ChoicesKeysteps->freeQuery("
 			SELECT
 				_a.*, 
 				_b.title, 
@@ -902,7 +902,7 @@ class KeyController extends Controller
 
     private function setEndPointsExist()
     {
-        $d=$this->models->ProjectRank->freeQuery("
+        $d=$this->models->ProjectsRanks->freeQuery("
 			select 
 				count(_b.id) as total 
 			from
@@ -937,7 +937,7 @@ class KeyController extends Controller
 
     private function getStartKeystepId()
     {
-		$d=$this->models->Keystep->_get(array(
+		$d=$this->models->Keysteps->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'is_start' => 1
@@ -955,7 +955,7 @@ class KeyController extends Controller
 
 		//echo '<p>',count((array)$this->taxaInBranch),'</p>';
 		
-		$taxa=$this->models->Taxon->freeQuery(array(
+		$taxa=$this->models->Taxa->freeQuery(array(
 			"query" => "
 				select 
 					_a.id,
@@ -1033,7 +1033,7 @@ class KeyController extends Controller
 
 		if ( empty( $id ) )
 		{
-			$k = $this->models->Keystep->freeQuery( $q . "and _a.is_start = 1" );
+			$k = $this->models->Keysteps->freeQuery( $q . "and _a.is_start = 1" );
 			if ( $k )
 			{
 				$id = $k[0]['keystep_id'];
@@ -1046,7 +1046,7 @@ class KeyController extends Controller
 			$in_branch=true;
 		}
 		
-		$k = $this->models->Keystep->freeQuery( $q . "and _b.keystep_id = " . $id );
+		$k = $this->models->Keysteps->freeQuery( $q . "and _b.keystep_id = " . $id );
 		
 		foreach((array)$k as $val )
 		{
@@ -1065,7 +1065,7 @@ class KeyController extends Controller
     {
 		$sort=isset($p['sort']) ? $p['sort'] : null;
 
-        $taxa=$this->models->Taxon->freeQuery("
+        $taxa=$this->models->Taxa->freeQuery("
 				select
 					_a.id, 
 					_a.taxon, 
@@ -1104,7 +1104,7 @@ class KeyController extends Controller
 
         $order=isset($p['order']) ? $p['order'] : 'number';
 
-        $k = $this->models->Keystep->freeQuery("
+        $k = $this->models->Keysteps->freeQuery("
 			select
 				_a.*,
 				_b.title,
@@ -1216,7 +1216,7 @@ class KeyController extends Controller
 		{
             $tree = utf8_encode(serialize($tree));
             
-            $this->models->Keytree->delete(array(
+            $this->models->Keytrees->delete(array(
                 'project_id' => $this->getCurrentProjectId()
             ));
             
@@ -1224,14 +1224,14 @@ class KeyController extends Controller
             
             foreach ((array) $d as $key => $val) {
                 
-                $this->models->Keytree->save(array(
+                $this->models->Keytrees->save(array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'chunk' => $key, 
                     'keytree' => $val
                 ));
             }
 
-			$this->models->Keytree->save(array(
+			$this->models->Keytrees->save(array(
 				'project_id' => $this->getCurrentProjectId(), 
 				'chunk' => 999, 
 				'keytree' => utf8_encode(serialize($this->_choiceList))
@@ -1341,7 +1341,7 @@ class KeyController extends Controller
 		{
             $this->_stepList[$step['id']] = true;
             
-            $ck = $this->models->ChoiceKeystep->_get(
+            $ck = $this->models->ChoicesKeysteps->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1352,7 +1352,7 @@ class KeyController extends Controller
             
             foreach ((array) $ck as $key => $val)
 			{
-				$cck = $this->models->ChoiceContentKeystep->_get(
+				$cck = $this->models->ChoicesContentKeysteps->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
@@ -1411,7 +1411,7 @@ class KeyController extends Controller
     {
         if (empty($id)) return;
             
-		$k = $this->models->Keystep->_get(array(
+		$k = $this->models->Keysteps->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(), 
 				'id' => $id
@@ -1445,7 +1445,7 @@ class KeyController extends Controller
         }
         else {
             
-            $ck = $this->models->ContentKeystep->_get(
+            $ck = $this->models->ContentKeysteps->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1469,7 +1469,7 @@ class KeyController extends Controller
         }
         else
 		{
-            $ck = $this->models->ContentKeystep->_get(
+            $ck = $this->models->ContentKeysteps->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1491,9 +1491,9 @@ class KeyController extends Controller
             );
             
             // save step
-            $this->models->ContentKeystep->save($d);
+            $this->models->ContentKeysteps->save($d);
             
-            $this->smarty->assign('returnText', $this->models->ContentKeystep->getAffectedRows() > 0 ? $this->translate('saved') : '');
+            $this->smarty->assign('returnText', $this->models->ContentKeysteps->getAffectedRows() > 0 ? $this->translate('saved') : '');
         }
     }
 
@@ -1507,7 +1507,7 @@ class KeyController extends Controller
             $where['id'] = $step['id'];
         }  
       
-        $this->models->Keystep->update(
+        $this->models->Keysteps->update(
             array('image' => 'null'), 
             $where
         );
@@ -1515,7 +1515,7 @@ class KeyController extends Controller
        
     private function getNextLowestStepNumber()
     {
-        $k = $this->models->Keystep->_get(array(
+        $k = $this->models->Keysteps->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ), 
@@ -1545,7 +1545,7 @@ class KeyController extends Controller
 
     private function createNewKeystep($data = null)
     {
-        $this->models->Keystep->save(
+        $this->models->Keysteps->save(
         array(
             'id' => null, 
             'project_id' => $this->getCurrentProjectId(), 
@@ -1553,17 +1553,17 @@ class KeyController extends Controller
             'is_start' => !empty($data['is_start']) ? $data['is_start'] : 0
         ));
         
-        return $this->models->Keystep->getNewId();
+        return $this->models->Keysteps->getNewId();
     }
 
     private function deleteKeystepChoice($id)
     {
-        $this->models->ChoiceContentKeystep->delete(array(
+        $this->models->ChoicesContentKeysteps->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'choice_id' => $id
         ));
         
-        $this->models->ChoiceKeystep->delete(array(
+        $this->models->ChoicesKeysteps->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'id' => $id
         ));
@@ -1573,7 +1573,7 @@ class KeyController extends Controller
 
     private function deleteKeystep($id)
     {
-        $ck = $this->models->ChoiceKeystep->_get(array(
+        $ck = $this->models->ChoicesKeysteps->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'keystep_id' => $id
@@ -1591,19 +1591,19 @@ class KeyController extends Controller
         if ($hadTaxa)
             $this->setKeyTaxaChanged();
         
-        $this->models->ChoiceKeystep->update(array(
+        $this->models->ChoicesKeysteps->update(array(
             'res_keystep_id' => 'null'
         ), array(
             'project_id' => $this->getCurrentProjectId(), 
             'res_keystep_id' => $id
         ));
         
-        $this->models->ContentKeystep->delete(array(
+        $this->models->ContentKeysteps->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'keystep_id' => $id
         ));
         
-        $this->models->Keystep->delete(array(
+        $this->models->Keysteps->delete(array(
             'project_id' => $this->getCurrentProjectId(), 
             'id' => $id
         ));
@@ -1614,19 +1614,19 @@ class KeyController extends Controller
         if (empty($stepId))
             return;
         
-        $this->models->ChoiceKeystep->save(array(
+        $this->models->ChoicesKeysteps->save(array(
             'id' => null, 
             'project_id' => $this->getCurrentProjectId(), 
             'keystep_id' => $stepId, 
             'show_order' => 99
         ));
         
-        return $this->models->ChoiceKeystep->getNewId();
+        return $this->models->ChoicesKeysteps->getNewId();
     }
 
     private function getKeystepChoices($step, $formatHtml = false)
     {
-        $choices = $this->models->ChoiceKeystep->_get(
+        $choices = $this->models->ChoicesKeysteps->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
@@ -1664,7 +1664,7 @@ class KeyController extends Controller
             }
             elseif (!empty($val['res_taxon_id'])) {
                 
-                $t = $this->models->Taxon->_get(array(
+                $t = $this->models->Taxa->_get(array(
                     'id' => $val['res_taxon_id']
                 ));
                 
@@ -1684,7 +1684,7 @@ class KeyController extends Controller
 
     private function getKeystepChoice($id)
     {
-        $ck = $this->models->ChoiceKeystep->_get(array(
+        $ck = $this->models->ChoicesKeysteps->_get(array(
             'id' => array(
                 'id' => $id, 
                 'project_id' => $this->getCurrentProjectId()
@@ -1693,7 +1693,7 @@ class KeyController extends Controller
         
         $choice = $ck[0];
         
-        $k = $this->models->Keystep->_get(array(
+        $k = $this->models->Keysteps->_get(array(
             'id' => $choice['keystep_id']
         ));
         
@@ -1712,7 +1712,7 @@ class KeyController extends Controller
             }
             else {
                 
-                $k = $this->models->Keystep->_get(array(
+                $k = $this->models->Keysteps->_get(array(
                     'id' => $choice['res_keystep_id']
                 ));
                 
@@ -1722,7 +1722,7 @@ class KeyController extends Controller
         }
         elseif (!empty($choice['res_taxon_id'])) {
             
-            $t = $this->models->Taxon->_get(array(
+            $t = $this->models->Taxa->_get(array(
                 'id' => $choice['res_taxon_id']
             ));
             
@@ -1747,7 +1747,7 @@ class KeyController extends Controller
         }
         else {
             
-            $ck = $this->models->ChoiceContentKeystep->_get(
+            $ck = $this->models->ChoicesContentKeysteps->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1765,9 +1765,9 @@ class KeyController extends Controller
             );
             
             // save choice
-            $this->models->ChoiceContentKeystep->save($d);
+            $this->models->ChoicesContentKeysteps->save($d);
             
-            $this->smarty->assign('returnText', $this->models->ChoiceContentKeystep->getAffectedRows() > 0 ? $this->translate('saved') : '');
+            $this->smarty->assign('returnText', $this->models->ChoicesContentKeysteps->getAffectedRows() > 0 ? $this->translate('saved') : '');
         }
     }
 
@@ -1783,7 +1783,7 @@ class KeyController extends Controller
         }
         else {
             
-            $ck = $this->models->ChoiceContentKeystep->_get(
+            $ck = $this->models->ChoicesContentKeysteps->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1801,14 +1801,14 @@ class KeyController extends Controller
 
     private function moveKeystepChoice($id, $direction)
     {
-        $ck = $this->models->ChoiceKeystep->_get(array(
+        $ck = $this->models->ChoicesKeysteps->_get(array(
             'id' => array(
                 'id' => $id, 
                 'project_id' => $this->getCurrentProjectId()
             )
         ));
         
-        $ck2 = $this->models->ChoiceKeystep->_get(
+        $ck2 = $this->models->ChoicesKeysteps->_get(
         array(
             'id' => array(
                 'keystep_id' => $ck[0]['keystep_id'], 
@@ -1818,12 +1818,12 @@ class KeyController extends Controller
             )
         ));
         
-        $this->models->ChoiceKeystep->save(array(
+        $this->models->ChoicesKeysteps->save(array(
             'id' => $id, 
             'show_order' => $ck2[0]['show_order']
         ));
         
-        $this->models->ChoiceKeystep->save(array(
+        $this->models->ChoicesKeysteps->save(array(
             'id' => $ck2[0]['id'], 
             'show_order' => $ck[0]['show_order']
         ));
@@ -1831,7 +1831,7 @@ class KeyController extends Controller
 
     private function renumberKeystepChoices($step)
     {
-        $ck = $this->models->ChoiceKeystep->_get(
+        $ck = $this->models->ChoicesKeysteps->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
@@ -1842,7 +1842,7 @@ class KeyController extends Controller
         
         foreach ((array) $ck as $key => $val) {
             
-            $this->models->ChoiceKeystep->save(array(
+            $this->models->ChoicesKeysteps->save(array(
                 'id' => $val['id'], 
                 'show_order' => $key + 1
             ));
@@ -1857,7 +1857,7 @@ class KeyController extends Controller
         $srcChoice = $this->getKeystepChoice($choiceId);
         
         // update the source choice, making it point to the new, inserted step
-        $this->models->ChoiceKeystep->update(array(
+        $this->models->ChoicesKeysteps->update(array(
             'res_keystep_id' => $stepId, 
             'res_taxon_id' => 'null'
         ), array(
@@ -1872,7 +1872,7 @@ class KeyController extends Controller
         
         // set the target for the new choice to the original target of the
         // source choice
-        $x = $this->models->ChoiceKeystep->update(array(
+        $x = $this->models->ChoicesKeysteps->update(array(
             'res_keystep_id' => $srcChoice['res_keystep_id'], 
             'res_taxon_id' => $srcChoice['res_taxon_id']
         ), array(
@@ -1896,7 +1896,7 @@ class KeyController extends Controller
         $newStepId = $this->createNewKeystep();
         $newChoiceId = $this->createNewKeystepChoice($newStepId);
         
-        $this->models->ChoiceKeystep->update(array(
+        $this->models->ChoicesKeysteps->update(array(
             'res_keystep_id' => $andB
         ), array(
             'project_id' => $this->getCurrentProjectId(), 
@@ -1907,7 +1907,7 @@ class KeyController extends Controller
         
         if (!empty($betweenA)) {
             
-            $this->models->ChoiceKeystep->update(array(
+            $this->models->ChoicesKeysteps->update(array(
                 'res_keystep_id' => $newStepId
             ), array(
                 'project_id' => $this->getCurrentProjectId(), 
@@ -1932,7 +1932,7 @@ class KeyController extends Controller
             
             if (isset($val['id'])) {
                 
-                $k = $this->models->Keystep->update(array(
+                $k = $this->models->Keysteps->update(array(
                     'number' => $this->tmp
                 ), array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1956,7 +1956,7 @@ class KeyController extends Controller
         
         $this->tmp = 1;
         
-        $this->models->Keystep->update(array(
+        $this->models->Keysteps->update(array(
             'number' => -1
         ), array(
             'project_id' => $this->getCurrentProjectId()
@@ -1964,7 +1964,7 @@ class KeyController extends Controller
         
         $this->doRenumberKeySteps($tree);
         
-        $k = $this->models->Keystep->_get(array(
+        $k = $this->models->Keysteps->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'number' => '-1'
@@ -1973,7 +1973,7 @@ class KeyController extends Controller
         
         foreach ((array) $k as $val) {
             
-            $this->models->Keystep->update(array(
+            $this->models->Keysteps->update(array(
                 'number' => $this->tmp
             ), array(
                 'project_id' => $this->getCurrentProjectId(), 
@@ -1989,13 +1989,13 @@ class KeyController extends Controller
         if (empty($id))
             return;
         
-        $this->models->Keystep->update(array(
+        $this->models->Keysteps->update(array(
             'is_start' => 0
         ), array(
             'project_id' => $this->getCurrentProjectId()
         ));
         
-        $this->models->Keystep->update(array(
+        $this->models->Keysteps->update(array(
             'is_start' => 1
         ), array(
             'project_id' => $this->getCurrentProjectId(), 
@@ -2006,7 +2006,7 @@ class KeyController extends Controller
 	private function getKeySections()
 	{
 		return
-			$this->models->Keystep->freeQuery("        
+			$this->models->Keysteps->freeQuery("        
 				SELECT
 					_a.id, _a.number, _b.res_keystep_id, _c.title, _c.content
 
@@ -2033,7 +2033,7 @@ class KeyController extends Controller
     {
 		
 		// deleting choices that belong to a non-existing step
-		$steplessChoices = $this->models->ChoiceKeystep->freeQuery("        
+		$steplessChoices = $this->models->ChoicesKeysteps->freeQuery("        
 			select _a.*
 			from %PRE%choices_keysteps _a
 			left join %PRE%keysteps _b
@@ -2051,7 +2051,7 @@ class KeyController extends Controller
 
 
 		// deleting choices that have no text, image or target
-		$emptyChoices = $this->models->ChoiceKeystep->freeQuery("        
+		$emptyChoices = $this->models->ChoicesKeysteps->freeQuery("        
 			select _a.*,_b.choice_txt
 			from %PRE%choices_keysteps _a
 			left join %PRE%choices_content_keysteps _b
@@ -2073,7 +2073,7 @@ class KeyController extends Controller
 
 
 		// resetting non-existant target steps
-		$nonExistantKeyTargets = $this->models->ChoiceKeystep->freeQuery("        
+		$nonExistantKeyTargets = $this->models->ChoicesKeysteps->freeQuery("        
 			select _a.*
 			from %PRE%choices_keysteps _a
 			left join %PRE%keysteps _b
@@ -2085,7 +2085,7 @@ class KeyController extends Controller
 
         foreach ((array)$nonExistantKeyTargets as $val) {
 
-			$this->models->ChoiceKeystep->update(array(
+			$this->models->ChoicesKeysteps->update(array(
 				'res_keystep_id' => 'null'
 			), array(
 				'project_id' => $this->getCurrentProjectId(), 
@@ -2095,7 +2095,7 @@ class KeyController extends Controller
 		}
 
 		// resetting non-existant target taxa
-		$nonExistantKeyTaxa = $this->models->ChoiceKeystep->freeQuery("        
+		$nonExistantKeyTaxa = $this->models->ChoicesKeysteps->freeQuery("        
 			select _a.*
 			from %PRE%choices_keysteps _a
 			left join %PRE%taxa _b
@@ -2107,7 +2107,7 @@ class KeyController extends Controller
 
         foreach ((array)$nonExistantKeyTaxa as $val) {
 
-			$this->models->ChoiceKeystep->update(array(
+			$this->models->ChoicesKeysteps->update(array(
 				'res_taxon_id' => 'null'
 			), array(
 				'project_id' => $this->getCurrentProjectId(), 
@@ -2122,7 +2122,7 @@ class KeyController extends Controller
 
     private function getKeyInfo()
     {
-        $d1 = $this->models->Keytree->_get(
+        $d1 = $this->models->Keytrees->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
@@ -2130,7 +2130,7 @@ class KeyController extends Controller
             'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
         ));
         
-        $d2 = $this->models->Keystep->_get(
+        $d2 = $this->models->Keysteps->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
@@ -2140,7 +2140,7 @@ class KeyController extends Controller
             'limit' => 1
         ));
         
-        $d3 = $this->models->ChoiceKeystep->_get(
+        $d3 = $this->models->ChoicesKeysteps->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
@@ -2164,7 +2164,7 @@ class KeyController extends Controller
         if ($d == null)
             return true;
         
-        $k = $this->models->Keytree->_get(
+        $k = $this->models->Keytrees->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
@@ -2246,7 +2246,7 @@ class KeyController extends Controller
 	private function getStepsLeadingToThisOne($thisOne)
 	{
 		return
-			$this->models->ChoiceKeystep->freeQuery("        
+			$this->models->ChoicesKeysteps->freeQuery("        
 				SELECT 
 					_a.id, 
 					_a.number, 
