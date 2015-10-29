@@ -48,7 +48,6 @@ class KeyController extends Controller
 
     public $controllerPublicName = 'Dichotomous key';
 
-	private $moduleSession;
 	private $endPointsExist;
 	private $suppressTaxonDivision;
 	private $keyPath;
@@ -95,9 +94,6 @@ class KeyController extends Controller
     private function initialize()
     {
 		$this->setEndPointsExist();
-
-		$this->moduleSession=$this->helpers->SessionModuleSettings;
-		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
 
         if ($this->rHasVal('action','suppress_division'))
 		{
