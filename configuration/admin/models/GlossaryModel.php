@@ -26,6 +26,61 @@ final class GlossaryModel extends AbstractModel
         parent::__destruct();
     }
 
+    private function getSynonyms ($params)
+    {
+		if (!$params) {
+		    return false;
+		}
+
+		$search = isset($params['search']) ? $params['search'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
+
+        $query = 'select distinct glossary_id from glossary_synonyms
+			 where synonym like "%' . mysqli_real_escape_string($this->databaseConnection, $search) . '%"
+			 and project_id = ' . $projectId;
+        $set = mysqli_query($this->databaseConnection, $query);
+		$this->logQueryResult($set,$query,'set,normal');
+        $this->setLastQuery($query);
+
+        while ($row = @mysqli_fetch_assoc($set)) {
+             $this->data[] = $row;
+        }
+
+        return $data;
+    }
+
+    private function getTerms ($params)
+    {
+		if (!$params) {
+		    return false;
+		}
+
+		$search = isset($params['search']) ? $params['search'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
+		$synonymsIds = isset($params['synonymsIds']) ? $params['synonymsIds'] : false;
+
+		$b = false;
+		foreach((array)$synonymsIds as $key => $val) {
+			$b .= $val['glossary_id'].',';
+		}
+		if ($b) $b = '('.rtrim($b,',').')';
+
+        $query = 'select * from glossary where
+			(term like "%' . mysql_real_escape_string($search) . '%"
+			or definition like "%' . mysql_real_escape_string($search) . '%" '.
+			($b ? 'or id in '. $b .') ' : '').
+			'and project_id = ' . $projectId . '
+		    order by language_id,term';
+        $set = mysqli_query($this->databaseConnection, $query);
+		$this->logQueryResult($set,$query,'set,normal');
+        $this->setLastQuery($query);
+
+        while ($row = @mysqli_fetch_assoc($set)) {
+             $this->data[] = $row;
+        }
+
+        return $data;
+    }
 
 }
 

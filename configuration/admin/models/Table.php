@@ -540,8 +540,6 @@ final class Table extends AbstractModel
 
             $query .= $limit ? " limit " . $limit : '';
 
-            $this->setLastQuery($query);
-
             $set = mysqli_query($this->databaseConnection, $query);
 
 			$this->logQueryResult($set,$query,'set,normal');
