@@ -8,18 +8,18 @@
 <input type="hidden" name="char" value="{$characteristic.id}" />
 <input type="hidden" name="type" value="{$characteristic.type.name}" />
 <p>
-{t _s1=$characteristic.type.name _s2=$characteristic.label _s3=$matrix.matrix}Editing a state of the type "%s" for the character "%s" of matrix "%s".{/t}
+{t _s1=$characteristic.type.name _s2=$characteristic.label _s3=$matrix.sys_name}Editing a state of the type "%s" for the character "%s" of matrix "%s".{/t}
 </p>
 <table>
 	<tr>
 		<td>
 		</td>
 {if $languages|@count>1}
-{section name=i loop=$languages}
-{if $languages[i].def_language=='1'}
-	<td>{$languages[i].language} *</td>
-{/if}
-{/section}
+    {foreach $languages v k}
+    {if $v.def_language=='1'}
+        <td>{$v.language} *</td>
+    {/if}
+    {/foreach}
 	<td colspan="2" id="project-language-tabs">(languages)</td>
 {/if}
 	</tr>
@@ -32,16 +32,16 @@
 				id="label-default"
 				onblur="matrixSaveStateLabel(allDefaultLanguage)" />
 		</td>
-{if $languages|@count>1}
+	{if $languages|@count>1}
 		<td>
 			<input
 				type="text" 
 				id="label-other"
 				onblur="matrixSaveStateLabel(allActiveLanguage)" />
 		</td>
-{/if}
+	{/if}
 	</tr>
-{if $characteristic.type.name=='text'}
+	{if $characteristic.type.name=='text'}
 	<tr style="vertical-align:top">
 		<td>{t}Text:{/t}</td>
 		<td>
@@ -52,7 +52,7 @@
 				onblur="matrixSaveStateText(allDefaultLanguage)"
 				></textarea>
 		</td>
-{if $languages|@count>1}
+		{if $languages|@count>1}
 		<td>
 			<textarea
 				style="width:400px;height:300px;" 
@@ -60,9 +60,9 @@
 				onblur="matrixSaveStateText(allActiveLanguage)"
 				></textarea>
 		</td>
-{/if}
+		{/if}
 	</tr>
-{elseif $characteristic.type.name=='media'}
+	{elseif $characteristic.type.name=='media'}
 	<tr style="vertical-align:top">
 		<td>
 		{if $state.file_name}
@@ -140,14 +140,13 @@
 </form>
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	allActiveView = 'matrixstate';
-{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
+{foreach $languages v k}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
 	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 
@@ -157,10 +156,8 @@ $(document).ready(function(){
 	matrixGetStateText(allDefaultLanguage);
 	matrixGetStateText(allActiveLanguage);
 {/if}
-{literal}	
 });
 </script>
-{/literal}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

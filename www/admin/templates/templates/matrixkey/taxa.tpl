@@ -11,9 +11,9 @@
 		</td>
 		<td>
 	<select name="taxon[]" id="taxon" style="width:300px" size="10" multiple="true">
-	{foreach from=$taxa key=k item=val}
+	{foreach $taxa v k}
 		<option value="{$val.id}">
-		{section name=foo loop=$val.level-$taxa[0].level}
+		{section name=foo loop=$v.level-$taxa[0].level}
 		&nbsp;
 		{/section}		
 		{$val.taxon}</option>
@@ -28,9 +28,8 @@
 		</td>
 		<td>
 	<select name="variation[]" id="variation" style="width:300px" size="10" multiple="true">
-	{foreach from=$variations key=k item=val}
-		<option value="{$val.id}">
-		{$val.label}</option>
+	{foreach $variations v k}
+		<option value="{$v.id}">{$v.label}</option>
 	{/foreach}
 	</select>
 		</td>
@@ -51,7 +50,6 @@
 </table>
 </form>
 </div>
-
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
