@@ -2,7 +2,7 @@
 
 include_once (dirname(__FILE__) . "/AbstractModel.php");
 
-class Table extends AbstractModel
+final class Table extends AbstractModel
 {
 
      public function __construct ($tableBaseName = false)
