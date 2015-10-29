@@ -104,7 +104,7 @@ class GlossaryController extends Controller
     public function termAction()
     {
 
-		if ($this->rHasId() && !$this->didActiveLanguageChange()) {
+		if ($this->rHasId()) {
 
 			$term = $this->getGlossaryTerm($this->requestData['id']);
 
@@ -346,6 +346,9 @@ class GlossaryController extends Controller
 
 	private function getGlossaryAlphabet($forceLookup=false)
 	{
+		
+		// patch, oct 2015 
+		$forceLookup=true;
 
 		if (!isset($_SESSION['app'][$this->spid()]['glossary']['alpha']) or $forceLookup) {
 
