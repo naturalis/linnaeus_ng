@@ -35,18 +35,11 @@ final class GlossaryModel extends AbstractModel
 		$search = isset($params['search']) ? $params['search'] : false;
 		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
 
-        $query = 'select distinct glossary_id from glossary_synonyms
+        $query = 'select distinct glossary_id from %pre%glossary_synonyms
 			 where synonym like "%' . mysqli_real_escape_string($this->databaseConnection, $search) . '%"
 			 and project_id = ' . $projectId;
-        $set = mysqli_query($this->databaseConnection, $query);
-		$this->logQueryResult($set,$query,'set,normal');
-        $this->setLastQuery($query);
 
-        while ($row = @mysqli_fetch_assoc($set)) {
-             $this->data[] = $row;
-        }
-
-        return $data;
+        return $this->freeQuery($query);
     }
 
     private function getTerms ($params)
@@ -65,21 +58,14 @@ final class GlossaryModel extends AbstractModel
 		}
 		if ($b) $b = '('.rtrim($b,',').')';
 
-        $query = 'select * from glossary where
+        $query = 'select * from  %pre%glossary where
 			(term like "%' . mysql_real_escape_string($search) . '%"
 			or definition like "%' . mysql_real_escape_string($search) . '%" '.
 			($b ? 'or id in '. $b .') ' : '').
 			'and project_id = ' . $projectId . '
 		    order by language_id,term';
-        $set = mysqli_query($this->databaseConnection, $query);
-		$this->logQueryResult($set,$query,'set,normal');
-        $this->setLastQuery($query);
 
-        while ($row = @mysqli_fetch_assoc($set)) {
-             $this->data[] = $row;
-        }
-
-        return $data;
+        return $this->freeQuery($query);
     }
 
 }

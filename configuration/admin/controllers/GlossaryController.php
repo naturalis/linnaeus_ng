@@ -149,11 +149,13 @@ class GlossaryController extends Controller
 
 		} else {
 
-			if (!$this->rHasVal('letter') && isset($_SESSION['admin']['system']['glossary']['activeLetter']))
-				$this->requestData['letter'] = $_SESSION['admin']['system']['glossary']['activeLetter'];
+		    $this->moduleSession->getModuleSetting('activeLetter');
 
-			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['admin']['system']['glossary']['activeLanguage']))
-				$this->requestData['activeLanguage'] = $_SESSION['admin']['system']['glossary']['activeLanguage'];
+			if (!$this->rHasVal('letter') && $this->moduleSession->getModuleSetting('activeLetter'))
+				$this->requestData['letter'] = $this->moduleSession->getModuleSetting('activeLetter');
+
+			if (!$this->rHasVal('activeLanguage') && $this->moduleSession->getModuleSetting('activeLanguage'))
+				$this->requestData['activeLanguage'] = $this->moduleSession->getModuleSetting('activeLanguage');
 
 			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
 
@@ -210,12 +212,12 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('letter')) {
 
-			$gloss = $this->getFirstGlossaryTerm($this->rHasVal('letter'));
+			$gloss = $this->getFirstGlossaryTerm($this->rGetVal('letter'));
 
 		} else
 		if ($this->rHasId()) {
 
-			$gloss = $this->getGlossaryTerm($this->rHasVal('id'));
+			$gloss = $this->getGlossaryTerm($this->rGetVal('id'));
 
 		} else
 		if (!$this->rHasVal('action','new')) {
@@ -228,9 +230,9 @@ class GlossaryController extends Controller
 
 			$gloss['media'] = $this->getGlossaryMedia($gloss['id']);
 
-			$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($gloss['term'],0,1));
+			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($gloss['term'],0,1))));
 
-			$_SESSION['admin']['system']['glossary']['activeLanguage'] = $gloss['language_id'];
+			$this->moduleSession->setModuleSetting(array('setting'=>'activeLanguage','value'=>$gloss['language_id']));
 
     	    $this->setPageName(sprintf($this->translate('Editing glossary term "%s"'),$gloss['term']));
 
@@ -246,11 +248,11 @@ class GlossaryController extends Controller
 
 			$this->clearCache($this->cacheFiles);
 
-			$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($this->rGetVal('term'),0,1));
+			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($this->rGetVal('term'),0,1))));
 
-			$_SESSION['admin']['system']['glossary']['activeLanguage'] = $this->rHasVal('language_id');
+			$this->moduleSession->setModuleSetting( array('setting'=>'activeLanguage','value'=> $this->rGetVal('language_id')));
 
-			$this->deleteGlossaryTerm($this->rGetVal('id'));
+			$this->deleteGlossaryTerm($this->rGetId());
 
 			$d = $this->getFirstGlossaryTerm();
 
@@ -282,7 +284,7 @@ class GlossaryController extends Controller
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
-			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : null;
+			$data['id'] =  $this->rHasId() ? $this->rGetId() : null;
 
             $data['definition'] = $this->cleanUpRichContent($data['definition']);
 
@@ -292,7 +294,7 @@ class GlossaryController extends Controller
 
 				$gloss = $this->requestData;
 
-				$activeLanguage = $this->requestData['language_id'];
+				$activeLanguage = $this->rGetVal('language_id');
 
 			} else
 			if ($this->models->Glossary->save($data)) {
@@ -301,7 +303,7 @@ class GlossaryController extends Controller
 
 				$navList = $this->getGlossaryTermsNavList(true);
 
-				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
+				$id = $this->rHasId() ? $this->rGetId() : $this->models->Glossary->getNewId();
 
 				$this->models->GlossarySynonyms->delete(
 					array(
@@ -312,13 +314,13 @@ class GlossaryController extends Controller
 
 				if ($this->rHasVal('synonyms')) {
 
-					foreach((array)$this->requestData['synonyms'] as $key => $val) {
+					foreach((array)$this->rGetVal('synonyms') as $key => $val) {
 
 						$this->models->GlossarySynonyms->save(
 							array(
 								'project_id' => $this->getCurrentProjectId(),
 								'glossary_id' => $id,
-								'language_id' => $this->requestData['language_id'],
+								'language_id' => $this->rGetVal('language_id'),
 								'synonym' => rawurldecode($val)
 							)
 						);
@@ -340,9 +342,9 @@ class GlossaryController extends Controller
 
 				} else {
 
-					$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+				    $this->moduleSession->setModuleSetting( array('setting'=>'activeLetter','value'=> strtolower(substr($this->rGetVal('term'),0,1))));
 
-					$_SESSION['admin']['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
+				    $this->moduleSession->setModuleSetting( array('setting'=>'activeLanguage','value'=> $this->rGetVal('language_id')));
 
 					$this->redirect('edit.php?id='.$id);
 
@@ -392,7 +394,7 @@ class GlossaryController extends Controller
         if ($this->rHasId()) {
         // get existing glossary
 
-            $gloss = $this->getGlossaryTerm($this->requestData['id']);
+            $gloss = $this->getGlossaryTerm($this->rGetId());
 
             if ($gloss['id']) {
 
@@ -439,7 +441,7 @@ class GlossaryController extends Controller
                                 array(
                                     'id' => null,
                                     'project_id' => $this->getCurrentProjectId(),
-                                    'glossary_id' => $this->requestData['id'],
+                                    'glossary_id' => $this->rGetId(),
                                     'file_name' => $file['name'],
                                     'original_name' => $file['original_name'],
                                     'mime_type' => $file['mime_type'],
@@ -487,7 +489,7 @@ class GlossaryController extends Controller
 
             }
 
-            $this->smarty->assign('id',$this->requestData['id']);
+            $this->smarty->assign('id',$this->rGetId());
 
             $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
@@ -524,7 +526,7 @@ class GlossaryController extends Controller
 
 		if (!$this->rHasId()) $this->redirect('index.php');
 
-		$gloss = $this->getGlossaryTerm($this->requestData['id']);
+		$gloss = $this->getGlossaryTerm($this->rGetId());
 
 		$this->setBreadcrumbIncludeReferer(
 			array(
@@ -537,15 +539,15 @@ class GlossaryController extends Controller
 
         if ($this->rHasId()) {
 
-            $this->smarty->assign('id',$this->rGetVal('id'));
+            $this->smarty->assign('id',$this->rGetId());
 
 			if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
 
-				$this->changeMediaSortOrder($this->rGetVal('id'), $this->rGetVal('mId'), $this->rGetVal('move'));
+				$this->changeMediaSortOrder($this->rGetId(), $this->rGetVal('mId'), $this->rGetVal('move'));
 
 			}
 
-            $media = $this->getGlossaryMedia($this->rGetVal('id'));
+            $media = $this->getGlossaryMedia($this->rGetId());
 
             foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
 
@@ -623,12 +625,11 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('search')) {
 
-			if (
-				isset($_SESSION['admin']['system']['glossary']['search']) &&
-				$_SESSION['admin']['system']['glossary']['search']['search'] == $this->rGetVal('search'))
-			{
+		    $sSearch = $this->moduleSession->getModuleSetting('search');
 
-				$terms = $_SESSION['admin']['system']['glossary']['search']['results'];
+			if ($sSearch && $sSearch['search'] == $this->rGetVal('search')) {
+
+				$terms = $sSearch['results'];
 
 			} else {
 
@@ -638,7 +639,7 @@ class GlossaryController extends Controller
 						'select distinct glossary_id
 						from %table%
 						where
-							synonym like "%'.mysql_real_escape_string($this->requestData['search']).'%"
+							synonym like "%'.mysql_real_escape_string($this->rGetVal('search')).'%"
 							and project_id = '.$this->getCurrentProjectId()
 					)
 				);
@@ -659,8 +660,8 @@ class GlossaryController extends Controller
 						'select *
 						from %table%
 						where
-							(term like "%'.mysql_real_escape_string($this->requestData['search']).'%"
-							or definition like "%'.mysql_real_escape_string($this->requestData['search']).'%" '.
+							(term like "%'.mysql_real_escape_string($this->rGetVal('search')).'%"
+							or definition like "%'.mysql_real_escape_string($this->rGetVal('search')).'%" '.
 							($b ? 'or id in '.$b.') ' : '').
 							'and project_id = '.$this->getCurrentProjectId().'
 						order by language_id,term'
@@ -674,7 +675,7 @@ class GlossaryController extends Controller
 				));
 
 			    $terms = $this->models->GlossaryModel->getTerms(array(
-				    'search' => $this->requestData['search'],
+				    'search' => $this->rGetVal('search'),
 				    'synonymsIds' => $synonyms,
 				    'projectId' => $this->getCurrentProjectId()
 				));
@@ -685,9 +686,13 @@ class GlossaryController extends Controller
 
 				}
 
-				$_SESSION['admin']['system']['glossary']['search']['search'] = $this->requestData['search'];
+				$this->moduleSession->setModuleSetting(array('setting'=>'search','value'=> array('search' => $this->rGetVal('search'))));
 
-				$_SESSION['admin']['system']['glossary']['search']['results'] = $terms;
+				$this->moduleSession->setModuleSetting(array('setting'=>'search','value'=> array('results' => $terms)));
+
+				//$_SESSION['admin']['system']['glossary']['search']['search'] = $this->rGetVal('search');
+
+				//$_SESSION['admin']['system']['glossary']['search']['results'] = $terms;
 
 			}
 
@@ -697,8 +702,8 @@ class GlossaryController extends Controller
         if ($this->rHasVal('key')) {
 
             $sortBy = array(
-                'key' => $this->requestData['key'],
-                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'),
+                'key' => $this->rGetVal('key'),
+                'dir' => ($this->rGetVal('dir') == 'asc' ? 'desc' : 'asc'),
                 'case' => 'i'
             );
 
@@ -718,7 +723,7 @@ class GlossaryController extends Controller
 
 		if (isset($terms)) $this->smarty->assign('terms',$terms);
 
-		if ($this->rHasVal('search')) $this->smarty->assign('search',$this->requestData['search']);
+		if ($this->rHasVal('search')) $this->smarty->assign('search',$this->rGetVal('search'));
 
         $this->printPage();
 
@@ -735,33 +740,33 @@ class GlossaryController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->requestData['action'] == 'delete_media') {
+        if ($this->rHasVal('action','delete_media')) {
 
             $this->deleteMedia();
 
-        } else if ($this->requestData['action'] == 'save_media_desc') {
+        } else if ($this->rHasVal('action','save_media_desc')) {
 
             $this->ajaxActionSaveMediaDescription();
 
-        } else if ($this->requestData['action'] == 'get_media_desc') {
+        } else if ($this->rHasVal('action','get_media_desc')) {
 
             $this->ajaxActionGetMediaDescription();
 
-        } else if ($this->requestData['action'] == 'get_media_descs') {
+        } else if ($this->rHasVal('action','get_media_descs')) {
 
             $this->ajaxActionGetMediaDescriptions();
 
-        } else if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        } else if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->rGetVal('search'));
 
         } else if ($this->rHasVal('action','save_synonym') && $this->rHasId() && $this->rHasVal('synonym')) {
 
-			$this->saveSynonym($this->requestData['id'],$this->requestData['language_id'],$this->requestData['synonym']);
+			$this->saveSynonym($this->rGetId(),$this->rGetVal('language_id'),$this->rGetVal('synonym'));
 
         } else if ($this->rHasVal('action','delete_synonym') && $this->rHasId() && $this->rHasVal('synonym')) {
 
-			$this->deleteSynonymByName($this->requestData['id'],$this->requestData['language_id'],$this->requestData['synonym']);
+			$this->deleteSynonymByName($this->rGetId(),$this->rGetVal('language_id'),$this->rGetVal('synonym'));
 
         }
 
@@ -795,7 +800,7 @@ class GlossaryController extends Controller
     public function previewAction ()
     {
 
-		$this->redirect('../../../app/views/glossary/term.php?p='.$this->getCurrentProjectId().'&id='.$this->requestData['id']);
+		$this->redirect('../../../app/views/glossary/term.php?p='.$this->getCurrentProjectId().'&id='.$this->rGetId());
 
     }
 
@@ -812,7 +817,9 @@ class GlossaryController extends Controller
 	private function getWordList($languageId,$force=false)
 	{
 
-		if ($force || !isset($_SESSION['admin']['system']['glossary'][$languageId]['wordlist'])) {
+	    $sLanguageId = $this->moduleSession->getModuleSetting($languageId);
+
+		if ($force || !isset($sLanguageId['wordlist'])) {
 
 			$terms = $this->models->Glossary->_get(
 				array(
@@ -834,12 +841,12 @@ class GlossaryController extends Controller
 				)
 			);
 
-
-			$_SESSION['admin']['system']['glossary'][$languageId]['wordlist'] = array_merge($terms,$synonyms);
+			$wordlist = array_merge($terms,$synonyms);
+			$this->moduleSession->setModuleSetting(array('setting'=>$languageId,'value'=> array('wordlist' => $wordlist)));
 
 		}
 
-		return $_SESSION['admin']['system']['glossary'][$languageId]['wordlist'];
+		return $wordlist;
 
 	}
 
@@ -847,7 +854,7 @@ class GlossaryController extends Controller
 	private function deleteMedia($id=null)
 	{
 
-		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
+		$id = isset($id) ? $id : ($this->rGetId() ? $this->rGetId() : null);
 
 		if ($id == null) return;
 
@@ -927,7 +934,7 @@ class GlossaryController extends Controller
 
 		}
 
-		$_SESSION['admin']['system']['glossary']['alpha'] = $alpha;
+		$this->moduleSession->setModuleSetting(array('setting'=>'alpha','value'=> $alpha));
 
 		return $alpha;
 
@@ -1116,7 +1123,7 @@ class GlossaryController extends Controller
 
 	private function getGlossaryTermsNavList($forceLookup=false) {
 
-		if (empty($_SESSION['admin']['glossary']['navList']) || $forceLookup) {
+		if ($this->moduleSession->getModuleSetting('navList') || $forceLookup) {
 
 			$d = $this->getGlossaryTerms(null);
 
@@ -1129,11 +1136,11 @@ class GlossaryController extends Controller
 
 			}
 
-			$_SESSION['admin']['glossary']['navList'] = $res;
+			$this->moduleSession->setModuleSetting(array('setting'=>'navList','value'=> $res));
 
 		}
 
-		return $_SESSION['admin']['glossary']['navList'];
+		return $this->moduleSession->getModuleSetting('navList');
 
 	}
 
@@ -1168,9 +1175,9 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('activeLanguage')) {
 
-			return $this->requestData['activeLanguage'];
+			return $this->rGetVal('activeLanguage');
 
-		} elseif(!is_null($this->getDefaultProjectLanguage())) {
+		} else if(!is_null($this->getDefaultProjectLanguage())) {
 
 			return $this->getDefaultProjectLanguage();
 
@@ -1185,10 +1192,10 @@ class GlossaryController extends Controller
 	private function clearTempValues()
 	{
 
-		unset($_SESSION['admin']['system']['glossary']['alpha']);
-		unset($_SESSION['admin']['system']['glossary']['search']);
-		unset($_SESSION['admin']['system']['glossary']['activeLetter']);
-		unset($_SESSION['admin']['system']['glossary']['activeLanguage']);
+	    $this->moduleSession->setModuleSetting(array('setting'=>'alpha'));
+	    $this->moduleSession->setModuleSetting(array('setting'=>'search'));
+	    $this->moduleSession->setModuleSetting(array('setting'=>'activeLetter'));
+	    $this->moduleSession->setModuleSetting(array('setting'=>'activeLanguage'));
 
 	}
 
@@ -1206,8 +1213,8 @@ class GlossaryController extends Controller
                 $this->models->GlossaryMediaCaptions->delete(
                     array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'],
-                        'media_id' => $this->requestData['id']
+                        'language_id' => $this->rGetVal('language'),
+                        'media_id' => $this->rGetId()
                     ));
 
             } else {
@@ -1216,20 +1223,20 @@ class GlossaryController extends Controller
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							'language_id' => $this->requestData['language'],
-							'media_id' => $this->requestData['id']
+							'language_id' => $this->rGetVal('language'),
+							'media_id' => $this->rGetId()
 						)
                     )
                 );
 
-				$d = $this->filterContent(trim($this->requestData['description']));
+				$d = $this->filterContent(trim($this->rGetVal('description')));
 
                 $this->models->GlossaryMediaCaptions->save(
                     array(
                         'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null,
                         'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'],
-                        'media_id' => $this->requestData['id'],
+                        'language_id' => $this->rGetVal('language'),
+                        'media_id' => $this->rGetId(),
                         'caption' => $d['content']
                     )
                 );
@@ -1255,8 +1262,8 @@ class GlossaryController extends Controller
 				array(
 					'id' =>  array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->requestData['language'],
-						'media_id' => $this->requestData['id']
+						'language_id' => $this->rGetVal('language'),
+						'media_id' => $this->rGetId()
 					)
 				)
 			);
@@ -1280,7 +1287,7 @@ class GlossaryController extends Controller
 				array(
 					'id' =>  array(
 						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id']
+						'taxon_id' => $this->rGetId()
 					),
 					'columns' => 'id'
 				)
@@ -1292,7 +1299,7 @@ class GlossaryController extends Controller
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							'language_id' => $this->requestData['language'],
+							'language_id' => $this->rGetVal('language'),
 							'media_id' => $val['id']
 						),
 						'columns' => 'caption'
