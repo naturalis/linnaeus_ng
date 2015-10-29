@@ -9,6 +9,8 @@ DICH KEY
 cleanup
 store key tree
 
+MATRIX KEY
+acquire state image dimensions (l2 only)
 
 
 
@@ -19,11 +21,26 @@ check for <!-- REFACNOW --> !!!
 new SESSION HANDLER!
 
 
+	public $usedHelpers = array(
+		'session_module_settings',
+    );
+
 private $moduleSession;
 
 $this->moduleSession=$this->helpers->SessionModuleSettings;
 $this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
-
-$this->moduleSession->getModuleSetting( 'suppressTaxonDivision' )
-
+$this->moduleSession->getModuleSetting( 'suppressTaxonDivision' );
 $this->moduleSession->setModuleSetting( array('setting'=>'suppressTaxonDivision','value'=>$state ) );
+
+
+
+$this->moduleSettings=new ModuleSettingsReaderController;
+$this->moduleSettings->setUseDefaultWhenNoValue( true );
+$this->moduleSettings->assignModuleSettings( $this->settings );
+$this->moduleSettings->getModuleSetting('use_character_groups'); 
+$this->moduleSettings->getModuleSetting(array('module'=>'species','setting'=>'use_variations'));
+
+
+rememeber!
+http://localhost/linnaeus_ng/app/views/matrixkey/use_matrix.php?p=3&id=5
+
