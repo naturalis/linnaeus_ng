@@ -2,7 +2,7 @@
 
 include_once (dirname(__FILE__) . "/AbstractModel.php");
 
-class Table extends AbstractModel
+final class Table extends AbstractModel
 {
 
      public function __construct ($tableBaseName = false)
@@ -539,8 +539,6 @@ class Table extends AbstractModel
             $query .= $order ? " order by " . $order : '';
 
             $query .= $limit ? " limit " . $limit : '';
-
-            $this->setLastQuery($query);
 
             $set = mysqli_query($this->databaseConnection, $query);
 
