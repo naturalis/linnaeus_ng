@@ -135,24 +135,6 @@ class MatrixKeyController extends Controller
 
     }
 
-    public function useMatrixAction()
-    {
-        if ($this->rHasId()) {
-
-            $this->storeHistory = false;
-
-            $this->setCurrentMatrixId($this->requestData['id']);
-
-			$this->setTotalEntityCount();
-
-            $this->redirect('identify.php');
-        }
-        else {
-
-            $this->printGenericError($this->translate('Missing matrix ID.'));
-        }
-    }
-
     public function examineAction ()
     {
         $this->checkMatrixIdOverride();
