@@ -26,7 +26,7 @@ final class GlossaryModel extends AbstractModel
         parent::__destruct();
     }
 
-    private function getSynonyms ($params)
+    public function getSynonyms ($params)
     {
 		if (!$params) {
 		    return false;
@@ -42,7 +42,7 @@ final class GlossaryModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    private function getTerms ($params)
+    public function getTerms ($params)
     {
 		if (!$params) {
 		    return false;
