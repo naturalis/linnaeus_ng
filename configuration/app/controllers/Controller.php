@@ -169,29 +169,31 @@ class Controller extends BaseClass
     public $allowEditPageOverlay = true;
     public $tmp;
     private $usedModelsBase = array(
-        'settings',
-        'project',
-        'language_project',
-        'module',
-        'module_project',
-        'free_module_project',
-        'language',
-        'interface_text',
-        'interface_translation',
-        'taxon',
-        'project_rank',
-        'label_project_rank',
-        'rank',
+        'ControllerModel',
+        'free_modules_projects',
         'glossary',
-        'glossary_synonym',
-        'hotword',
-        'variation_label',
-        'taxon_variation',
-        'taxa_relations',
+        'glossary_synonyms',
+        'hotwords',
+        'interface_texts',
+        'interface_translations',
+        'labels_projects_ranks',
+        'languages',
+        'languages_projects',
+        'modules',
+        'modules_projects',
 		'names',
-		'trash_can'
+        'projects',
+        'projects_ranks',
+        'ranks',
+        'settings',
+        'taxa',
+        'taxa_relations',
+        'taxa_variations',
+    	'trash_can',
+        'variations_labels'
     );
     private $usedHelpersBase = array(
+		'session_module_settings',
         'logging_helper',
         'debug_tools',
 		'user_agent',
@@ -237,6 +239,8 @@ class Controller extends BaseClass
         $this->checkWriteableDirectories();
 
         $this->setNames();
+
+        $this->startModuleSession();
 
         $this->setRequestData();
 
@@ -350,7 +354,7 @@ class Controller extends BaseClass
 
         if (is_numeric($this->requestData['p'])) {
 
-            $p = $this->models->Project->_get(array(
+            $p = $this->models->Projects->_get(array(
                 'id' => $this->requestData['p']
             ));
 
@@ -365,7 +369,7 @@ class Controller extends BaseClass
 
 			$this->setCurrentProjectId(null);
 
-            $p = $this->models->Project->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
+            $p = $this->models->Projects->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
 
 			if ($p) {
 				foreach((array)$p as $val) {
@@ -407,7 +411,7 @@ class Controller extends BaseClass
         if (isset($tId))
             $d['taxon_id'] = $tId;
 
-        $tv = $this->models->TaxonVariation->_get(array(
+        $tv = $this->models->TaxaVariations->_get(array(
             'id' => $d,
             'columns' => 'id,taxon_id,label',
             'order' => 'label'
@@ -417,7 +421,7 @@ class Controller extends BaseClass
 
             $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
 
-            $tv[$key]['labels'] = $this->models->VariationLabel->_get(
+            $tv[$key]['labels'] = $this->models->VariationsLabels->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -444,7 +448,7 @@ class Controller extends BaseClass
         $t = $this->getTaxonChildren($pId);
 
         /*
-        $t = $this->models->Taxon->_get(
+        $t = $this->models->Taxa->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -490,7 +494,7 @@ class Controller extends BaseClass
 
         if (!$pr) {
 
-            $pr = $this->models->ProjectRank->_get(
+            $pr = $this->models->ProjectsRanks->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId()
@@ -506,7 +510,7 @@ class Controller extends BaseClass
                 if (empty($rank['rank_id']))
                     continue;
 
-                $r = $this->models->Rank->_get(array(
+                $r = $this->models->Ranks->_get(array(
                     'id' => $rank['rank_id']
                 ));
 
@@ -518,7 +522,7 @@ class Controller extends BaseClass
 
                 foreach ((array) $pl as $val) {
 
-                    $lpr = $this->models->LabelProjectRank->_get(
+                    $lpr = $this->models->LabelsProjectsRanks->_get(
                     array(
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(),
@@ -545,51 +549,12 @@ class Controller extends BaseClass
         if (empty($id) || !is_numeric($id) || $id==0)
             return;
 
-		$t=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_a.author,
-				_a.parent_id,
-				_a.rank_id,
-				_a.taxon_order,
-				_a.is_hybrid,
-				_a.list_level,
-				_a.is_empty,
-				_b.lower_taxon,
-				_c.commonname,
-				_b.rank_id as base_rank_id
-			from %PRE%taxa _a
-
-		".($this->models->TrashCan->getTableExists() ? "
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id =  _trash.lng_id
-				and _trash.item_type='taxon'
-			" : "")."
-
-			left join %PRE%projects_ranks _b
-				on _a.project_id=_b.project_id
-				and _a.rank_id=_b.id
-
-			left join %PRE%commonnames _c
-				on _a.project_id=_c.project_id
-				and _c.id=
-					(select
-						id
-					from
-						%PRE%commonnames
-					where
-						project_id = ".$this->getCurrentProjectId()."
-						and taxon_id=".$id."
-						and language_id = ". $this->getCurrentLanguageId() ."
-						limit 1
-					)
-			where
-				_a.id=".$id."
-				and _a.project_id=".$this->getCurrentProjectId()."
-				".($this->models->TrashCan->getTableExists() ? " and ifnull(_trash.is_deleted,0)=0" : "")
-		);
+		$t = $this->models->ControllerModel->getTaxonById(array(
+            'trashCanExists' => $this->models->TrashCan->getTableExists(),
+		    'projectId' => $this->getCurrentProjectId(),
+		    'languageId'=> $this->getCurrentLanguageId(),
+		    'taxonId' => $id
+		));
 
 		$taxon=$t[0];
 
@@ -989,7 +954,7 @@ class Controller extends BaseClass
 
             if (isset($id)) {
 
-                $data = $this->models->Project->_get(array(
+                $data = $this->models->Projects->_get(array(
                     'id' => $id
                 ));
             }
@@ -1018,7 +983,7 @@ class Controller extends BaseClass
 
     public function setProjectLanguages()
     {
-        $lp = $this->models->LanguageProject->_get(array(
+        $lp = $this->models->LanguagesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ),
@@ -1028,7 +993,7 @@ class Controller extends BaseClass
         foreach ((array) $lp as $key => $val)
 		{
 
-            $l = $this->models->Language->_get(array(
+            $l = $this->models->Languages->_get(array(
                 'id' => $val['language_id']
             ));
 
@@ -1133,7 +1098,7 @@ class Controller extends BaseClass
         unset($this->requestData['languageId']);
 
         $_SESSION['app']['user']['currentLanguage'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'];
-		
+
 		if ( isset($_SESSION['app']['user']['currentLanguage']) )
 		$this->setDatabaseLocaleSettings( $_SESSION['app']['user']['currentLanguage'] );
     }
@@ -1251,24 +1216,19 @@ class Controller extends BaseClass
 
 	public function getPreferredName($id)
 	{
-		$name = $this->models->Names->freeQuery(
-			"select * from %PRE%names _a
-			  left join %PRE%name_types _b
-			  	on _a.type_id=_b.id
-				and _a.project_id=_b.project_id
-				and _b.nametype = '".PREDICATE_PREFERRED_NAME."'
-			  where _a.project_id =".$this->getCurrentProjectId()."
-			    and _a.taxon_id =".$id."
-				and language_id =".$this->getCurrentLanguageId()."
-				limit 1"
-		);
+	    $name = $this->models->ControllerModel->getPreferredName(array(
+    	    'predicatePreferredName' => PREDICATE_PREFERRED_NAME,
+    		'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getCurrentLanguageId(),
+    		'taxonId' => $id
+	    ));
 
 		return $name[0]['name'];
 	}
 
     public function getVariation ($id)
     {
-        $tv = $this->models->TaxonVariation->_get(
+        $tv = $this->models->TaxaVariations->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1277,7 +1237,7 @@ class Controller extends BaseClass
             'columns' => 'id,taxon_id,label'
         ));
 
-        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        $tv[0]['labels'] = $this->models->VariationsLabels->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1879,13 +1839,13 @@ class Controller extends BaseClass
 		if (isset($params['ignore']))
 			$p['ignore'] = $params['ignore'];
 
-		$modules = $this->models->ModuleProject->_get($p);
+		$modules = $this->models->ModulesProjects->_get($p);
 
 		foreach ((array) $modules as $key => $val) {
 
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
 
-			$mp = $this->models->Module->_get(array(
+			$mp = $this->models->Modules->_get(array(
 				'id' => $val['module_id']
 			));
 
@@ -1901,7 +1861,7 @@ class Controller extends BaseClass
 			'maintainKeys' => true
 		));
 
-		$freeModules = $this->models->FreeModuleProject->_get(array(
+		$freeModules = $this->models->FreeModulesProjects->_get(array(
 			'id' => array(
 				'project_id' => $d['project_id']
 			)
@@ -2177,7 +2137,12 @@ class Controller extends BaseClass
 
     public function doesCurrentProjectHaveModule ($mpCode)
     {
-		$d=$this->models->ModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'active' => 'y','module_id'=>$mpCode)));
+		$d=$this->models->ModulesProjects->_get(array(
+		  'id'=> array(
+		      'project_id' => $this->getCurrentProjectId(),'
+		      active' => 'y',
+		      'module_id'=>$mpCode)
+		));
 		return isset($d[0]) ? true : false;
     }
 
@@ -2367,6 +2332,12 @@ class Controller extends BaseClass
     }
 
 
+    private function startModuleSession()
+	{
+		$this->moduleSession=$this->helpers->SessionModuleSettings;
+		$this->moduleSession->setModule( array('environment'=>'app','controller'=>$this->controllerBaseName) );
+	}
+
 
 	private function getCurrentPathWithProjectlessQuery()
 	{
@@ -2497,34 +2468,28 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
+        $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
+
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php')) {
+
+            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+
+            $this->models->$t = new $t;
+
+        }
+
+        require_once dirname(__FILE__) . '/../models/Table.php';
+
         foreach ((array) $d as $key) {
 
-            if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
+            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
-                require_once (dirname(__FILE__) . '/../models/' . $key . '.php');
+            $this->models->$t = new Table($key);
 
-                $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            if (isset($this->helpers->LoggingHelper)) {
 
+                 $this->models->$t->setLogger($this->helpers->LoggingHelper);
 
-                if (class_exists($t)) {
-
-                    $this->models->$t = new $t();
-
-
-
-                    if (isset($this->helpers->LoggingHelper))
-                        $this->models->$t->setLogger($this->helpers->LoggingHelper);
-
-                    //echo $t.chr(10);
-                }
-                else {
-
-                    $this->log('Attempted to initiate non-existing model class "' . $t . '"', 2);
-                }
-            }
-            else {
-
-                $this->log('Attempted to load non-existing model file "' . $key . '"', 2);
             }
         }
     }
@@ -2926,7 +2891,7 @@ class Controller extends BaseClass
                 'columns' => 'id,term as word,\'term\' as source'
             ));
 
-            $synonyms = $this->models->GlossarySynonym->_get(
+            $synonyms = $this->models->GlossarySynonyms->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -2985,7 +2950,7 @@ class Controller extends BaseClass
 
 		if ($forceUpdate || !$d) {
 
-            $d = $this->models->Hotword->_get(
+            $d = $this->models->Hotwords->_get(
             array(
                 'id' =>
 					'select
@@ -3311,7 +3276,7 @@ class Controller extends BaseClass
 
     private function saveInterfaceText ($text)
     {
-        @$this->models->InterfaceText->save(array(
+        @$this->models->InterfaceTexts->save(array(
             'id' => null,
             'text' => $text,
             'env' => $this->getAppName()
@@ -3326,7 +3291,7 @@ class Controller extends BaseClass
         //return strrev($text);
 
         // get id of the text
-        $i = $this->models->InterfaceText->_get(array(
+        $i = $this->models->InterfaceTexts->_get(array(
             'id' => array(
                 'text' => $text,
                 'env' => $this->getAppName()
@@ -3344,7 +3309,7 @@ class Controller extends BaseClass
             $languageId = $this->getDefaultLanguageId();
 
 		// fetch appropriate translation
-        $it = $this->models->InterfaceTranslation->_get(
+        $it = $this->models->InterfaceTranslations->_get(
         array(
             'id' => array(
                 'interface_text_id' => $i[0]['id'],
@@ -3364,7 +3329,7 @@ class Controller extends BaseClass
 
 	private function projectHasTaxa()
 	{
-		$t = $this->models->Taxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()), 'columns' => 'count(*) as total'));
+		$t = $this->models->Taxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()), 'columns' => 'count(*) as total'));
 		return ($t[0]['total']>0);
 	}
 
@@ -3372,30 +3337,16 @@ class Controller extends BaseClass
     {
         if (is_null($this->_tmpTree)) {
 
-            $d = $this->models->Taxon->freeQuery("
-				select
-					_a.id,
-					_a.taxon,
-					_a.parent_id,
-					_a.rank_id,
-					_a.taxon_order,
-					_a.is_hybrid,
-					_a.list_level,
-					_a.is_empty,
-					_a.author
-				from %PRE%taxa _a
-				where
-					_a.project_id = ".$this->getCurrentProjectId()
-            );
+            $d = $this->models->ControllerModel->getTaxa(array(
+                'projectId' => $this->getCurrentProjectId()
+            ));
 
             foreach ((array) $d as $val) {
 
-				$val['commonnames']=$this->models->Taxon->freeQuery("
-					select language_id, commonname, transliteration
-					from %PRE%commonnames
-					where project_id = ".$this->getCurrentProjectId()."
-					and taxon_id=".$val['id']
-				);
+				$val['commonnames'] = $this->models->ControllerModel->getTaxonCommonNames(array(
+				    'projectId' => $this->getCurrentProjectId(),
+    				'taxonId' => $val['id']
+				));
 
                 $this->_tmpTree[$val['parent_id']][$val['id']] = $val;
             }
@@ -3461,13 +3412,13 @@ class Controller extends BaseClass
 
 	private function setDatabaseLocaleSettings( $language_id )
 	{
-		$lng=$this->models->Language->_get(array("id"=>array("id"=>$language_id)));
+		$lng=$this->models->Languages->_get(array("id"=>array("id"=>$language_id)));
 		$locale=
-			isset($lng) && !empty($lng[0]['locale_lin']) ? 
-				$lng[0]['locale_lin'] : 
+			isset($lng) && !empty($lng[0]['locale_lin']) ?
+				$lng[0]['locale_lin'] :
 				$this->getSetting('db_lc_time_names','nl_NL');
 
-		$this->models->Project->freeQuery("SET lc_time_names = '".$locale."'");
+		$this->models->ControllerModel->setLocale($locale);
 
 	}
 
