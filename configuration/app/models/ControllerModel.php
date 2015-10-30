@@ -26,23 +26,7 @@ final class ControllerModel extends AbstractModel
         parent::__destruct();
     }
 
-    private function getSynonyms ($params)
-    {
-		if (!$params) {
-		    return false;
-		}
-
-		$search = isset($params['search']) ? $params['search'] : false;
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-
-        $query = 'select distinct glossary_id from %pre%glossary_synonyms
-			 where synonym like "%' . mysqli_real_escape_string($this->databaseConnection, $search) . '%"
-			 and project_id = ' . $projectId;
-
-        return $this->freeQuery($query);
-    }
-
-    public function getTaxonById ($params)
+    private function getTaxonById ($params)
     {
 		if (!$params) {
 		    return false;
@@ -102,8 +86,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-
-    public function getPreferredName ($params)
+    private function getPreferredName ($params)
     {
 		if (!$params) {
 		    return false;
@@ -129,7 +112,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    public function getTaxa ($params)
+    private function getTaxa ($params)
     {
 		if (!$params) {
 		    return false;
@@ -156,7 +139,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    public function getTaxonCommonNames ($params)
+    private function getTaxonCommonNames ($params)
     {
 		if (!$params) {
 		    return false;
@@ -175,7 +158,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    public function getLookupList ($params)
+    private function getLookupList ($params)
     {
 		if (!$params) {
 		    return false;
