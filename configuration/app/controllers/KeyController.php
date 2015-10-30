@@ -11,11 +11,11 @@ class KeyController extends Controller
 	public $currentKeyStepId;
 
     public $usedModels = array(
-		'keystep',
-		'keytree',
-		'content_keystep',
-		'choice_keystep',
-		'choice_content_keystep',
+		'keysteps',
+		'keytrees',
+		'content_keysteps',
+		'choices_keysteps',
+		'choices_content_keysteps',
     );
 
     public $controllerPublicName = 'Dichotomous key';
@@ -89,8 +89,8 @@ class KeyController extends Controller
 		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || ($this->rHasVal('forcetree','1') || $this->rHasVal('r'))) {
 
 			$this->createPathInstantly(
-				($this->rHasVal('step') ? $this->requestData['step'] : null),
-				($this->rHasVal('choice') ? $this->requestData['choice'] : null)
+				($this->rHasVal('step') ? $this->rGetVal('step') : null),
+				($this->rHasVal('choice') ? $this->rGetVal('choice') : null)
 			);
 
 		}
@@ -98,7 +98,7 @@ class KeyController extends Controller
 		// step points at a specific step, from keypath
 		if ($this->rHasVal('step')) {
 
-			$step = $this->getKeystep($this->requestData['step']);
+			$step = $this->getKeystep($this->rGetVal('step'));
 
 			$this->updateKeyPath(array('step' => $step,'fromPath' => true));
 
@@ -107,7 +107,7 @@ class KeyController extends Controller
 		// choice is choice clicked by user
 		if ($this->rHasVal('choice')) {
 
-			$choice = $this->getKeystepChoice($this->requestData['choice']);
+			$choice = $this->getKeystepChoice($this->rGetVal('choice'));
 
 			// choice points to a taxon
 			if (!empty($choice['res_taxon_id'])) {
@@ -271,7 +271,7 @@ class KeyController extends Controller
 	{
 
 		// get stored tree from database
-		$kt = $this->models->Keytree->_get(
+		$kt = $this->models->Keytrees->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId()
@@ -320,7 +320,7 @@ class KeyController extends Controller
 		if (!is_null($choiceId)) {
 
 			// get choice requested
-			$d = $this->models->ChoiceKeystep->_get(
+			$d = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -362,7 +362,7 @@ class KeyController extends Controller
 			$step = $this->getKeystep($d[0]['keystep_id']);
 
 			// find the choice that lead to this step, i.e., the previous step in the path
-			$prevChoice = $this->models->ChoiceKeystep->_get(
+			$prevChoice = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -408,7 +408,7 @@ class KeyController extends Controller
 			);
 
 			// find the choice that lead to this step, i.e., the previous step in the path
-			$prevChoice = $this->models->ChoiceKeystep->_get(
+			$prevChoice = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -436,8 +436,8 @@ class KeyController extends Controller
 		$this->tmp['results'] = array();
 
 		$this->_createPathInstantly(
-			($this->rHasVal('step') ? $this->requestData['step'] : null),
-			($this->rHasVal('choice') ? $this->requestData['choice'] : null)
+			($this->rHasVal('step') ? $this->rGetVal('step') : null),
+			($this->rHasVal('choice') ? $this->rGetVal('choice') : null)
 		);
 
 		$this->setKeyPath($this->tmp['results']);
@@ -502,7 +502,7 @@ class KeyController extends Controller
 
         if (empty($id))  return;
 
-		$k = $this->models->Keystep->_get(
+		$k = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -515,7 +515,7 @@ class KeyController extends Controller
 
 		$step = $k[0];
 
-		$ck = $this->models->ContentKeystep->_get(
+		$ck = $this->models->ContentKeysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -545,7 +545,7 @@ class KeyController extends Controller
 	public function getStartKeystepId()
 	{
 
-		$k = $this->models->Keystep->_get(
+		$k = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -564,7 +564,7 @@ class KeyController extends Controller
 		if ($choice == null) {
 
 			// get all choices available for this keystep
-			$choices =  $this->models->ChoiceKeystep->_get(
+			$choices =  $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -577,7 +577,7 @@ class KeyController extends Controller
 		} else {
 
 			// get single choice
-			$choices =  $this->models->ChoiceKeystep->_get(
+			$choices =  $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'id' => $choice,
@@ -593,7 +593,7 @@ class KeyController extends Controller
 			if ($includeContent) {
 
 				// get the actual language-sensitive content for each choice
-				$cck = $this->models->ChoiceContentKeystep->_get(
+				$cck = $this->models->ChoicesContentKeysteps->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
@@ -805,15 +805,7 @@ class KeyController extends Controller
 
 	private function setChoiceKeystepTable()
 	{
-		$d=$this->models->ChoiceKeystep->freeQuery("
-			select
-				res_keystep_id, keystep_id
-			from
-				%PRE%choices_keysteps
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				and res_keystep_id is not null
-			");
+		$d = $this->models->KeyModel->setChoiceKeystepTable($this->getCurrentProjectId());
 
 		foreach((array)$d as $key=>$val)
 		{
@@ -825,7 +817,7 @@ class KeyController extends Controller
 	{
 		$this->setChoiceKeystepTable();
 
-		$choiceLeadingToATaxon=$this->models->ChoiceKeystep->freeQuery("
+		$choiceLeadingToATaxon=$this->models->ChoicesKeysteps->freeQuery("
 			select
 				_ck.res_taxon_id,
 				_ck.keystep_id,
