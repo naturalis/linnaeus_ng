@@ -175,6 +175,115 @@ final class ControllerModel extends AbstractModel
     }
 
 
+    public function getLookupList ($params)
+    {
+		if (!$params) {
+		    return false;
+		}
+
+		$search = isset($params['search']) ? mysqli_real_escape_string($this->databaseConnection, $params['search']) : false;
+		$matchStart = isset($params['matchStart']) ? $params['matchStart'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
+
+        $query = "
+			select * from
+			(
+				select
+					id,taxon as label,'species' as source, concat('../species/taxon.php?id=',id) as url, rank_id
+				from
+					%PRE%taxa
+				where
+					project_id = ".$projectId ."
+					".($search=='*' ? "" : "and taxon like '".(!$matchStart ? '%' : ''). $search."%'" )."
+
+			union
+
+				select
+					id,concat(
+						author_first,
+						if(multiple_authors=1,
+							' et al.',
+							if(author_second!='',concat(' & ',author_second),'')
+						),
+						', ',
+						year,
+						ifnull(suffix,'')
+					) as label,'literature' as source, concat('../literature/reference.php?id=',id) as url, null as rank_id
+				from %PRE%literature
+				where
+					project_id = ".$projectId ."
+					".($search=='*' ? "" : "
+						and (
+							author_first like '".(!$matchStart ? '%' : ''). $search."%' or
+							author_second like '".(!$matchStart ? '%' : ''). $search."%' or
+							year like '".(!$matchStart ? '%' : ''). $search."%'
+						)
+					")."
+
+			union
+
+				select
+					id,topic as label,'introduction' as source, concat('../introduction/topic.php?id=',id) as url, null as rank_id
+				from
+					%PRE%content_introduction
+				where
+					project_id = ".$projectId ."
+					".($search=='*' ? "" : "and topic like '".(!$matchStart ? '%' : ''). $search."%'" )."
+
+
+			) as unification
+			order by label
+			limit 100";
+
+
+        /* Copied from LinnaeusController. Not updated to fit new model structure! Replace parameters and mysql_* if necessary.
+
+			union
+
+				select
+					id,term as label,'glossary' as source, concat('../glossary/term.php?id=',id) as url
+				from
+					%PRE%glossary
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and term like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+
+				select
+					taxon_id as id,commonname as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+				from
+					%PRE%commonnames
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and commonname like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+
+				select
+					taxon_id as id,synonym as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
+				from
+					%PRE%synonyms
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+			union
+
+				select
+					glossary_id as id,synonym as label,'glossary' as source, concat('../glossary/term.php?id=',glossary_id) as url
+				from
+					%PRE%glossary_synonyms
+				where
+					project_id = ".$this->getCurrentProjectId() ."
+					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+
+        */
+
+        return $this->freeQuery($query);
+    }
+
+
 
 }
 
