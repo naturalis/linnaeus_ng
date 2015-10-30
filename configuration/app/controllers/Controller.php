@@ -232,6 +232,8 @@ class Controller extends BaseClass
 
         $this->initLogging();
 
+        $this->setNames();
+
         $this->loadModels();
 
         $this->loadControllerConfig();
@@ -239,8 +241,6 @@ class Controller extends BaseClass
         $this->loadSmartyConfig();
 
         $this->checkWriteableDirectories();
-
-        $this->setNames();
 
         $this->setRequestData();
 
@@ -2492,6 +2492,7 @@ class Controller extends BaseClass
 
             }
         }
+
     }
 
 

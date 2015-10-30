@@ -26,7 +26,7 @@ final class ControllerModel extends AbstractModel
         parent::__destruct();
     }
 
-    private function getTaxonById ($params)
+    public function getTaxonById ($params)
     {
 		if (!$params) {
 		    return false;
@@ -86,7 +86,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    private function getPreferredName ($params)
+    public function getPreferredName ($params)
     {
 		if (!$params) {
 		    return false;
@@ -112,7 +112,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    private function getTaxa ($params)
+    public function getTaxa ($params)
     {
 		if (!$params) {
 		    return false;
@@ -139,7 +139,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    private function getTaxonCommonNames ($params)
+    public function getTaxonCommonNames ($params)
     {
 		if (!$params) {
 		    return false;
@@ -158,7 +158,7 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    private function getLookupList ($params)
+    public function getLookupList ($params)
     {
 		if (!$params) {
 		    return false;
