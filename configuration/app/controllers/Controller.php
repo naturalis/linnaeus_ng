@@ -228,7 +228,9 @@ class Controller extends BaseClass
 
         $this->loadHelpers();
 
-		$this->initLogging();
+        $this->startModuleSession();
+
+        $this->initLogging();
 
         $this->loadModels();
 
@@ -239,8 +241,6 @@ class Controller extends BaseClass
         $this->checkWriteableDirectories();
 
         $this->setNames();
-
-        $this->startModuleSession();
 
         $this->setRequestData();
 
