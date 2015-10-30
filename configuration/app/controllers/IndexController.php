@@ -126,7 +126,7 @@ class IndexController extends Controller
 		if ($type=='common')
 		{
 
-		    $alpha = $this->models->IndexController->getCommonNamesAlphabet(array(
+		    $alpha = $this->models->IndexModel->getCommonNamesAlphabet(array(
                 'projectId' => $this->getCurrentProjectId(),
 		        'languageId' => $language
 			));
@@ -134,7 +134,7 @@ class IndexController extends Controller
 		}
 		else
 		{
-            $alpha = $this->models->IndexController->getTaxaAlphabet(array(
+            $alpha = $this->models->IndexModel->getTaxaAlphabet(array(
                 'projectId' => $this->getCurrentProjectId(),
 		        'type' => $type
             ));
