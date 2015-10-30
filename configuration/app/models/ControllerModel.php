@@ -175,15 +175,6 @@ final class ControllerModel extends AbstractModel
     }
 
 
-    public function setLocale ($locale)
-    {
-		if (!$locale) {
-		    return false;
-		}
-
-        $this->freeQuery("SET lc_time_names = '". mysqli_real_escape_string($this->databaseConnection, $locale)."'");
-    }
-
 
 }
 

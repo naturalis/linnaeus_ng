@@ -355,4 +355,14 @@ class AbstractModel extends BaseClass
         return array_key_exists($n, $mysql_data_type_hash) ? $mysql_data_type_hash[$n] : null;
     }
 
+    public function setLocale ($locale)
+    {
+		if (!$locale) {
+		    return false;
+		}
+
+        $this->freeQuery("SET lc_time_names = '". mysqli_real_escape_string($this->databaseConnection, $locale)."'");
+    }
+
+
 }
