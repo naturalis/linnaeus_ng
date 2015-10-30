@@ -5,8 +5,8 @@ class IndexController extends Controller
 {
     public $noResultCaching = true;
     public $usedModels = array(
-        'synonym', 
-        'commonname'
+        //'synonyms',
+        'commonnames'
     );
     public $usedHelpers = array();
     public $cssToLoad = array(
@@ -54,7 +54,7 @@ class IndexController extends Controller
 
 		$letter=($this->rHasVar('letter') && $this->rGetVal('letter')!=''? $this->rGetVal('letter') : key($alpha['alphabet']));
 
-		$d=$prev=$next=null;		
+		$d=$prev=$next=null;
 		foreach((array)$alpha['alphabet'] as $key => $val)
 		{
 			$alphaNav['next']=$key;
@@ -66,9 +66,9 @@ class IndexController extends Controller
 			}
 			$prev=$key;
 		}
-		
+
 		$alphaNav['next']=($alphaNav['next']==$letter?null:$alphaNav['next']);
-		
+
 
         $this->setPageName($this->translate('Index: '.($type=='higher' ? 'Higher taxa' : ($type=='common' ? 'Common names' : 'Species and lower taxa'))));
 
@@ -117,7 +117,7 @@ class IndexController extends Controller
 				$querystring.=$key.'='.$val.'&';
 			}
 		}
-		
+
 		return $querystring;
 	}
 
@@ -126,68 +126,26 @@ class IndexController extends Controller
 		if ($type=='common')
 		{
 
-			$alpha=$this->models->Taxon->freeQuery("
-				select 
-					distinct lower(substr(commonname,1,1)) as letter
-				from
-					%PRE%commonnames
-				where
-					project_id = ".$this->getCurrentProjectId()."
-				".(!empty($language) ? " and language_id=".$language : "" )."
-				order by letter
-			
-			");
+		    $alpha = $this->models->IndexController->getCommonNamesAlphabet(array(
+                'projectId' => $this->getCurrentProjectId(),
+		        'languageId' => $language
+			));
 
-		} 
-		else 
+		}
+		else
 		{
+            $alpha = $this->models->IndexController->getTaxaAlphabet(array(
+                'projectId' => $this->getCurrentProjectId(),
+		        'type' => $type
+            ));
 
-			$alpha=$this->models->Taxon->freeQuery("
-				select distinct unionized.letter, _f.lower_taxon from (
-					select 
-						distinct lower(substr(taxon,1,1)) as letter,
-						project_id,
-						rank_id
-					from
-						%PRE%taxa
-					where
-						project_id = ".$this->getCurrentProjectId()."
-		
-					union
-		
-					select 
-						distinct lower(substr(_a.synonym,1,1)) as letter,
-						_a.project_id,
-						_b.rank_id as rank_id
-					from
-						%PRE%synonyms _a
-		
-					right join %PRE%taxa _b
-						on _a.project_id = _b.project_id
-						and _a.taxon_id = _b.id
-		
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-				) as unionized
-	
-				left join %PRE%projects_ranks _f
-					on unionized.rank_id=_f.id
-					and unionized.project_id = _f.project_id
-	
-				where
-					unionized.project_id = ".$this->getCurrentProjectId()."
-					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
-				order by letter
-			
-			");
-			
 		}
 
 		$result=array();
 		$result['hasNonAlpha']=false;
 
 		foreach((array)$alpha as $val)
-		{	
+		{
 			$result['hasNonAlpha']=$result['hasNonAlpha'] || (ord($val['letter'])<97 || ord($val['letter'])>122);
 			$result['alphabet'][$val['letter']]=true;
 		}
@@ -200,88 +158,22 @@ class IndexController extends Controller
 		if ($type=='common')
 		{
 
-			$list=$this->models->Taxon->freeQuery("
-				select 
-					_a.taxon_id,_a.commonname,_a.transliteration, ifnull(_b.label,_c.language) as language
+			$list = $this->models->IndexModel->getCommonNamesList(array(
+                'projectId' => $this->getCurrentProjectId(),
+			    'languageId' => $language,
+			    'letter' => $letter,
+            ));
 
-				from
-					%PRE%commonnames _a
-
-				left join
-					%PRE%languages _c
-					on _a.language_id = _c.id
-	
-				left join
-					%PRE%labels_languages _b
-					on _a.project_id = _b.project_id
-					and _a.language_id = _b.label_language_id
-					and _b.language_id = ".$this->getCurrentLanguageId()."
-					
-				where
-					_a.project_id = ".$this->getCurrentProjectId()."
-					".(!empty($language) ? " and _a.language_id=".$language : "" )."
-					".(!empty($letter) ? "and _a.commonname like '".mysql_real_escape_string($letter)."%'" : null)."
-
-				order by
-					_a.commonname
-			");
-			
-		} 
-		else 
+		}
+		else
 		{
-			$list=$this->models->Taxon->freeQuery("
-				select unionized.*, _f.lower_taxon from (
-					select 
-						project_id,
-						id as taxon_id,
-						taxon as label, 
-						null as author,
-						null as ref_taxon,
-						author as ref_author,
-						rank_id,
-						parent_id,
-						is_empty,
-						'taxon' as source
-					from
-						%PRE%taxa
-					where
-						project_id = ".$this->getCurrentProjectId()."
-		
-					union
-		
-					select 
-						_a.project_id,
-						_a.taxon_id, 
-						_a.synonym as label, 
-						_a.author,
-						_b.taxon as ref_taxon,
-						_b.author as ref_author,
-						_b.rank_id as rank_id, 
-						_b.parent_id as parent_id, 
-						_b.is_empty as is_empty, 
-						'synonym' as source
-					from
-						%PRE%synonyms _a
-		
-					right join %PRE%taxa _b
-						on _a.project_id = _b.project_id
-						and _a.taxon_id = _b.id
-		
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-				) as unionized
-	
-				left join %PRE%projects_ranks _f
-					on unionized.rank_id=_f.id
-					and unionized.project_id = _f.project_id
-	
-				where
-					unionized.project_id = ".$this->getCurrentProjectId()."
-					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
-					".(!empty($letter) ? "and label like '".mysql_real_escape_string($letter)."%'" : null)."
-				order by label
-			");
-			
+
+		    $list = $this->models->IndexModel->getTaxaList(array(
+                'projectId' => $this->getCurrentProjectId(),
+			    'type' => $type,
+			    'letter' => $letter,
+            ));
+
 			foreach((array)$list as $key=>$val)
 			{
 				if ($val['source']!='synonym')
@@ -289,37 +181,20 @@ class IndexController extends Controller
 				if (!empty($val['ref_taxon']))
 					$list[$key]['ref_taxon']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['ref_taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),'rankpos'=>'post'));
 			}
-			
+
 		}
 		//q($list);
 		return $list;
-		
+
     }
 
     private function getCommonLanguages()
     {
-		$list=$this->models->Taxon->freeQuery("
-			select 
-				distinct _a.language_id, ifnull(_b.label,_c.language) as language, _a.language_id as id
 
-			from
-				%PRE%commonnames _a
-
-			left join
-				%PRE%languages _c
-				on _a.language_id = _c.id
-
-			left join
-				%PRE%labels_languages _b
-				on _a.project_id = _b.project_id
-				and _a.language_id = _b.label_language_id
-				and _b.language_id = ".$this->getCurrentLanguageId()."
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-		");
-
-		return $list;
+		return $this->models->IndexModel->getCommonLanguages(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'languageId' => $this->getCurrentLanguageId()
+        ));
     }
 
     private function setIndexTabs()
@@ -338,28 +213,19 @@ class IndexController extends Controller
 			"empty" taxa in the index, so the HT-entries index can link to the HT-module.
 			this can be useful as taxa are never truely empty: the classification-tab
 			is always generated, automatically, based on the taxonomy.
-		
-		*/
-		$t = $this->models->Taxon->freeQuery(
-			array(
-				'query'=>
-					"select count(_a.id)>0 as has_values, _c.lower_taxon
-					from %PRE%taxa _a
-					left join %PRE%projects_ranks _c
-						on _a.rank_id = _c.id
-						and _a.project_id = _c.project_id 
-					where _a.project_id = " . $this->getCurrentProjectId() . "
-					".(!$this->doesCurrentProjectHaveModule(MODCODE_HIGHERTAXA) ? "and _a.is_empty = 0" : "" )."
-					group by _c.lower_taxon",
-				'fieldAsIndex'=>'lower_taxon'
-			)
-		);
 
-        $c = $this->models->Commonname->_get(array(
-            'where' => 'project_id = ' . $this->getCurrentProjectId(), 
+		*/
+
+		$t = $this->models->IndexModel->setTaxaIndexTabs(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'hasHigherTaxa' => $this->doesCurrentProjectHaveModule(MODCODE_HIGHERTAXA)
+		));
+
+        $c = $this->models->Commonnames->_get(array(
+            'where' => 'project_id = ' . $this->getCurrentProjectId(),
             'columns' => 'count(1)>0 as has_values'
         ));
-		
+
 		$_SESSION['app'][$this->spid()]['indexModule']['hasSpecies'] = isset($t[1]['has_values']) ? $t[1]['has_values'] : 0;
 		$_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa'] = isset($t[0]['has_values']) ? $t[0]['has_values'] : 0;
         $_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'] = isset($c[0]['has_values']) ? $c[0]['has_values'] : 0;
