@@ -35,7 +35,7 @@ final class GlossaryModel extends AbstractModel
 		$search = isset($params['search']) ? $params['search'] : false;
 		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
 
-        $query = 'select distinct glossary_id from %pre%glossary_synonyms
+        $query = 'select distinct glossary_id from %PRE%glossary_synonyms
 			 where synonym like "%' . mysqli_real_escape_string($this->databaseConnection, $search) . '%"
 			 and project_id = ' . $projectId;
 
@@ -58,7 +58,7 @@ final class GlossaryModel extends AbstractModel
 		}
 		if ($b) $b = '('.rtrim($b,',').')';
 
-        $query = 'select * from  %pre%glossary where
+        $query = 'select * from  %PRE%glossary where
 			(term like "%' . mysql_real_escape_string($search) . '%"
 			or definition like "%' . mysql_real_escape_string($search) . '%" '.
 			($b ? 'or id in '. $b .') ' : '').
