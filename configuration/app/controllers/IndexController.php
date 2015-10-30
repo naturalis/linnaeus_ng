@@ -47,8 +47,8 @@ class IndexController extends Controller
      */
     public function indexAction ()
     {
-		$type=$this->rHasVar('type') ? $this->requestData['type'] : 'lower';
-		$language=$this->rHasVar('language') ? $this->requestData['language'] : null;
+		$type=$this->rHasVar('type') ? $this->rGetVal('type') : 'lower';
+		$language=$this->rHasVar('language') ? $this->rGetVal('language') : null;
 
 		$alpha=$this->getAlphabet($type,$language);
 
