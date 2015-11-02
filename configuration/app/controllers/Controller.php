@@ -2335,7 +2335,11 @@ class Controller extends BaseClass
     private function startModuleSession()
 	{
 		$this->moduleSession=$this->helpers->SessionModuleSettings;
-		$this->moduleSession->setModule( array('environment'=>'app','controller'=>$this->controllerBaseName) );
+		$this->moduleSession->setModule(array(
+            'environment' => 'app',
+		    'controller' => $this->controllerBaseName,
+		    'projectId' => $this->spid()
+		));
 	}
 
 
