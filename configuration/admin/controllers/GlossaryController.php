@@ -149,12 +149,10 @@ class GlossaryController extends Controller
 
 		} else {
 
-		    $this->moduleSession->getModuleSetting('activeLetter');
-
-			if (!$this->rHasVal('letter') && $this->moduleSession->getModuleSetting('activeLetter'))
+			if (!$this->rHasVal('letter') && !is_null($this->moduleSession->getModuleSetting('activeLetter')))
 				$this->requestData['letter'] = $this->moduleSession->getModuleSetting('activeLetter');
 
-			if (!$this->rHasVal('activeLanguage') && $this->moduleSession->getModuleSetting('activeLanguage'))
+			if (!$this->rHasVal('activeLanguage') && !is_null($this->moduleSession->getModuleSetting('activeLanguage')))
 				$this->requestData['activeLanguage'] = $this->moduleSession->getModuleSetting('activeLanguage');
 
 			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
@@ -1123,7 +1121,7 @@ class GlossaryController extends Controller
 
 	private function getGlossaryTermsNavList($forceLookup=false) {
 
-		if ($this->moduleSession->getModuleSetting('navList') || $forceLookup) {
+		if (!is_null($this->moduleSession->getModuleSetting('navList')) || $forceLookup) {
 
 			$d = $this->getGlossaryTerms(null);
 
