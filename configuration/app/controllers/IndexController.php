@@ -27,7 +27,7 @@ class IndexController extends Controller
     {
         parent::__construct($p);
         $this->setIndexTabs();
-		$this->smarty->assign('hasNameTypes', $_SESSION['app'][$this->spid()]['indexModule']);
+		$this->smarty->assign('hasNameTypes', $this->moduleSession->getModuleSetting('indexModule'));
     }
 
     /**
@@ -201,10 +201,10 @@ class IndexController extends Controller
     {
 
         // Check if results have been stored in session; if so return
-        if (isset($_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']) &&
-			isset($_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa']) &&
-			isset($_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames']))
-		return;
+        if (!is_null($this->moduleSession->getModuleSetting('hasSpecies')) &&
+            !is_null($this->moduleSession->getModuleSetting('hasHigherTaxa')) &&
+            !is_null($this->moduleSession->getModuleSetting('hasCommonNames')))
+        return;
 
 		/*
 			usually, taxa that have is_empty==1 (indicating they have no user-generated
@@ -226,10 +226,18 @@ class IndexController extends Controller
             'columns' => 'count(1)>0 as has_values'
         ));
 
-		$_SESSION['app'][$this->spid()]['indexModule']['hasSpecies'] = isset($t[1]['has_values']) ? $t[1]['has_values'] : 0;
-		$_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa'] = isset($t[0]['has_values']) ? $t[0]['has_values'] : 0;
-        $_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'] = isset($c[0]['has_values']) ? $c[0]['has_values'] : 0;
-
+        $this->moduleSession->setModuleSetting(array(
+            'setting'=>'hasSpecies',
+            'value'=>isset($t[1]['has_values']) ? $t[1]['has_values'] : 0
+        ));
+        $this->moduleSession->setModuleSetting(array(
+            'setting'=>'hasHigherTaxa',
+            'value'=>isset($t[0]['has_values']) ? $t[0]['has_values'] : 0
+        ));
+        $this->moduleSession->setModuleSetting(array(
+            'setting'=>'hasCommonNames',
+            'value'=>isset($c[0]['has_values']) ? $c[0]['has_values'] : 0
+        ));
     }
 
 
