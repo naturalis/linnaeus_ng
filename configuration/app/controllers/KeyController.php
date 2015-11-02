@@ -506,8 +506,8 @@ class KeyController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'id' => $id,
-					)
+					'id' => $id
+				)
 			)
 		);
 
@@ -641,7 +641,7 @@ class KeyController extends Controller
 
 				if ($includeContent) {
 
-					$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
+					$t = $this->models->Taxa->_get(array('id' => $val['res_taxon_id']));
 
 					if (isset($t['taxon'])) {
 
@@ -686,14 +686,14 @@ class KeyController extends Controller
 	private function resetKeyPath()
 	{
 
-		unset($_SESSION['app']['user']['key']['path']);
+		$this->moduleSession->setModuleSetting(array('setting'=>'path'));
 
 	}
 
 	private function getKeyPath()
 	{
 
-		return isset($_SESSION['app']['user']['key']['path']) ? $_SESSION['app']['user']['key']['path'] : null;
+		return !is_null($this->moduleSession->getModuleSetting('path')) ? $this->moduleSession->getModuleSetting('path') : null;
 
 	}
 
@@ -702,7 +702,8 @@ class KeyController extends Controller
 
 		$this->resetKeyPath();
 
-		$_SESSION['app']['user']['key']['path'] = $path;
+		$this->moduleSession->setModuleSetting(array('setting' => 'path', 'value' => $path));
+
 
 	}
 
@@ -713,20 +714,20 @@ class KeyController extends Controller
 		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
 		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
 
-		if (!isset($_SESSION['app']['user']['key']['path'])) {
+		if (is_null($this->moduleSession->getModuleSetting('path'))) {
 
 			//$this->setStoredKeypath($step);
 
 		}
 
 
-		if (isset($_SESSION['app']['user']['key']['path'])) {
+		if (!is_null($this->moduleSession->getModuleSetting('path'))) {
 		// keypath already exists...
 
 			if ($fromPath) {
 			// ...user clicked somewhere in the path, so we copy the existing path up to the step he clicked
 
-				foreach((array)$_SESSION['app']['user']['key']['path'] as $key => $val) {
+				foreach((array)$this->moduleSession->getModuleSetting('path') as $key => $val) {
 
 					if ($val['id']==$step['id']) break;
 
@@ -737,7 +738,7 @@ class KeyController extends Controller
 			} else {
 			// user clicked a choice, existing path remains as it is
 
-				$d = $_SESSION['app']['user']['key']['path'];
+				$d = $this->moduleSession->getModuleSetting('path');
 
 			}
 
@@ -769,7 +770,7 @@ class KeyController extends Controller
 
 		}
 
-		$_SESSION['app']['user']['key']['path'] = $d;
+		$this->moduleSession->setModuleSetting(array('setting' => 'path', 'value' => $d));
 
 	}
 
@@ -817,37 +818,10 @@ class KeyController extends Controller
 	{
 		$this->setChoiceKeystepTable();
 
-		$choiceLeadingToATaxon=$this->models->ChoicesKeysteps->freeQuery("
-			select
-				_ck.res_taxon_id,
-				_ck.keystep_id,
-				_a.taxon,
-				_c.commonname
-
-			from
-				%PRE%choices_keysteps _ck
-
-			left join %PRE%taxa _a
-				on _ck.project_id=_a.project_id
-				and _ck.res_taxon_id=_a.id
-
-			left join %PRE%commonnames _c
-				on _ck.project_id=_c.project_id
-				and _c.id=
-					(select
-						id
-					from
-						%PRE%commonnames
-					where
-						project_id=_ck.project_id
-						and taxon_id=_ck.res_taxon_id
-						and language_id = ". $this->getCurrentLanguageId() ."
-						limit 1
-					)
-			where
-				_ck.project_id = ".$this->getCurrentProjectId()."
-				and _ck.res_taxon_id is not null
-			");
+		$choiceLeadingToATaxon = $this->models->KeyModel->getChoicesLeadingToATaxon(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'languageId' => $this->getCurrentLanguageId()
+		));
 
 		$stepsByTarget=array();
 
@@ -984,14 +958,14 @@ class KeyController extends Controller
 
 	private function setTaxaState ($state)
 	{
-		$_SESSION['app']['user']['key']['taxaState'] = $state;
+		$this->moduleSession->setModuleSetting(array('setting' => 'taxaState', 'value' => $state));
 	}
 
 	private function getTaxaState ()
 	{
 		return
-			(isset($_SESSION['app']['user']['key']['taxaState']) ?
-				$_SESSION['app']['user']['key']['taxaState'] :
+			(empty($this->moduleSession->getModuleSetting('taxaState')) ?
+				$this->moduleSession->getModuleSetting('taxaState') :
 				'remaining');
 	}
 
