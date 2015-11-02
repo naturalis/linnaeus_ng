@@ -228,8 +228,6 @@ class Controller extends BaseClass
 
         $this->loadHelpers();
 
-        $this->startModuleSession();
-
         $this->initLogging();
 
         $this->setNames();
@@ -249,6 +247,8 @@ class Controller extends BaseClass
             $this->checkForProjectId();
 
         }
+
+        $this->startModuleSession();
 
 		$this->emptyCacheFolderByRequest();
 

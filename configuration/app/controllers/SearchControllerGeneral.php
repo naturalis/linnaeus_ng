@@ -68,8 +68,7 @@
 	columns), searches that have no literal bits ("...") will be harder to turn into case sensitive ones.
 	(eh?)
 
-	W E   W I L L   N O T   S E A R C H   T H E   M A T R I X !
-
+	THERE IS NO SEARCHING THE MATRIX
 
 */
 
@@ -88,39 +87,7 @@ class SearchControllerGeneral extends SearchController
 	private $_moduleNames;
 
 	public $usedModels = array(
-		'content',
-        'content_taxon',
-        'page_taxon',
-        'page_taxon_title',
-        'media_taxon',
-        'media_descriptions_taxon',
-		'synonym',
-		'commonname',
-		'literature',
-		'content_free_module',
-		'choice_content_keystep',
-		'content_keystep',
-		'choice_keystep',
-		'keystep',
-		'literature',
-		'glossary',
-		'glossary_media',
-		'glossary_synonym',
-		'matrix',
-		'matrix_name',
-		'matrix_taxon_state',
-		'characteristic',
-		'characteristic_label',
-		'characteristic_label_state',
-		'characteristic_matrix',
-		'characteristic_label_state',
-		'characteristic_state',
-		'geodata_type_title',
-		'occurrence_taxon',
-		'content_introduction',
-		'name_types',
-		'presence',
-		'page_taxon_title'
+
     );
 
     public $controllerPublicName = 'Search';
@@ -140,38 +107,59 @@ class SearchControllerGeneral extends SearchController
 
     public function __construct ()
     {
-
         parent::__construct();
-
 		$this->initialize();
-
     }
+
+	private function initialize()
+	{
+		$this->_excerptPostMatchLength=
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) ?
+				$this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) : 
+				35;
+		$this->_excerptPreMatchLength = 
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) ?
+				$this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) : 
+				35;
+		$this->_excerptPrePostMatchString = 
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ? 
+				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) : 
+				'';
+
+		$this->_searchResultSort=
+			$this->getSetting('app_search_result_sort','alpha');
+	}
 
     public function __destruct ()
     {
         parent::__destruct();
     }
 
-	private function initialize()
-	{
-		$this->_excerptPreMatchLength=
-			isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
+    public function ajaxInterfaceAction ()
+    {
+        if (!$this->rHasVal('action')) return;
+        if ($this->rHasVal('action','get_search_result_index'))
+		{
+			$this->smarty->assign(
+				'returnText',
+				$this->makeLookupList(array(
+					'data'=>(array)$this->getSearchResultIndex(),
+					'module'=>$this->controllerBaseName,
+					'sortData'=>false
+				))
+			);
+        }
 
-		$this->_excerptPostMatchLength=
-			isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
-
-		$this->_excerptPrePostMatchString=
-			isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
-
-		$this->_searchResultSort=
-			$this->getSetting('app_search_result_sort','alpha');
-
-		$this->createMySQLfunction_fnStripTags();
-	}
+		$this->allowEditPageOverlay = false;
+        $this->printPage();
+    }
 
     public function searchResetAction ()
     {
-		unset($_SESSION['app'][$this->spid()]['search']);
+		$this->moduleSession->setModuleSetting( array('setting'=>'search') );
+		$this->moduleSession->setModuleSetting( array('setting'=>'modules') );
+		$this->moduleSession->setModuleSetting( array('setting'=>'freeModules') );
+		$this->moduleSession->setModuleSetting( array('setting'=>'results') );
 		$this->redirect('search.php');
 	}
 
@@ -180,33 +168,27 @@ class SearchControllerGeneral extends SearchController
     {
 		if ($this->rHasVal('search'))
 		{
+			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$this->rGetVal('search')) );
+			$this->moduleSession->setModuleSetting( array('setting'=>'modules','value'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null) );
+			$this->moduleSession->setModuleSetting( array('setting'=>'freeModules','value'=>$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null) );
 
-			$_SESSION['app'][$this->spid()]['search']=
-				array(
-					'search' => $this->requestData['search'],
-					'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
-					'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
-				);
-
-			if ($this->validateSearchString($this->requestData['search']))
+			if ($this->validateSearchString($this->rGetVal['search']))
 			{
-
 				if ($this->rHasVal('extended','1'))
 				{
 					$results =
 						$this->doSearch(
 							array(
-								'search'=>$this->requestData['search'],
-								'modules'=>$this->rHasVal('modules') ? $this->requestData['modules'] : null ,
-								'freeModules'=>$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null,
+								'search'=>$this->rGetVal('search'),
+								'modules'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null ,
+								'freeModules'=>$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null,
 								'extended'=>true
 							)
 						);
-
 				}
 				else
 				{
-					$search='"'.trim($this->requestData['search'],'"').'"';
+					$search='"'.trim($this->rGetVal('search'),'"').'"';
 
 					$results=
 						$this->doSearch(
@@ -218,9 +200,10 @@ class SearchControllerGeneral extends SearchController
 							)
 						);
 
+					$this->moduleSession->setModuleSetting( array('setting'=>'results','value'=>$results) );
 				}
 
-				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
+				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->rGetVal('search')));
 				$this->smarty->assign('results',$results);
 
 			}
@@ -1394,56 +1377,5 @@ class SearchControllerGeneral extends SearchController
 		return $r;
 
 	}
-
-    public function ajaxInterfaceAction ()
-    {
-
-        if (!$this->rHasVal('action')) return;
-
-        if ($this->rHasVal('action','get_search_result_index')) {
-
-			$this->smarty->assign(
-				'returnText',
-				$this->makeLookupList(array(
-					'data'=>(array)$this->getSearchResultIndex(),
-					'module'=>$this->controllerBaseName,
-					'sortData'=>false
-				))
-			);
-
-        }
-
-		$this->allowEditPageOverlay = false;
-
-        $this->printPage();
-
-    }
-
-	private function createMySQLfunction_fnStripTags()
-	{
-		$this->models->Taxon->freeQuery("DROP FUNCTION IF EXISTS fnStripTags");
-		$this->models->Taxon->freeQuery("
-			CREATE FUNCTION fnStripTags( Dirty text )
-			RETURNS text
-			DETERMINISTIC
-			BEGIN
-			  DECLARE iStart, iEnd, iLength int;
-				WHILE Locate( '<', Dirty ) > 0 And Locate( '>', Dirty, Locate( '<', Dirty )) > 0 DO
-				  BEGIN
-					SET iStart = Locate( '<', Dirty ), iEnd = Locate( '>', Dirty, Locate('<', Dirty ));
-					SET iLength = ( iEnd - iStart) + 1;
-					IF iLength > 0 THEN
-					  BEGIN
-						SET Dirty = Insert( Dirty, iStart, iLength, '');
-					  END;
-					END IF;
-				  END;
-				END WHILE;
-				RETURN Dirty;
-			END;
-		");
-	}
-
-
 
 }
