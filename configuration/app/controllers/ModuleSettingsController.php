@@ -123,7 +123,7 @@ class ModuleSettingsController extends Controller
 
     private function setModuleId()
     {
-		$d=$this->models->Module->_get(array("id"=>array("controller"=>$this->getModuleController())));
+		$d=$this->models->Modules->_get(array("id"=>array("controller"=>$this->getModuleController())));
 
 		if ($d)
 		{

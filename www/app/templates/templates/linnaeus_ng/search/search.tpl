@@ -1,6 +1,5 @@
 {include file="../shared/header.tpl"}
 {include file="_search-main-no-tabs.tpl"}
-{* include file="../shared/_search-main.tpl" *}
 
 <div id="page-main">
 
@@ -23,8 +22,6 @@
 	</div>
 
 	<div id="search-results">
-
-	<!-- h2>Results <span class="result-count">({$results.count})</span></h2 -->
 
 {if $results.count>0}
 
