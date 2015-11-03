@@ -17,12 +17,11 @@
 <div id="page-main">
 {if $alpha|@count>0}
 <table>
-{section name=i loop=$gloss}
+{foreach $gloss v i}
 	<tr class="tr-highlight">
-		<td><a href="edit.php?id={$gloss[i].id}">{$gloss[i].term}</a></td>
-		<!-- td>{$gloss[i].definition|@strip_tags:substr:0:100}{if $gloss[i].definition|@strlen>100}...{/if}</td -->
+		<td><a href="edit.php?id={$v.id}">{$v.term}</a></td>
 	</tr>
-{/section}
+{/foreach}
 </table>
 
 {if $prevStart!=-1 || $nextStart!=-1}
