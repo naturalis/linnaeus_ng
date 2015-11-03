@@ -9,21 +9,17 @@ class SpeciesController extends Controller
 	private $_defaultSpeciesTab;
 
     public $usedModels = array(
-        'content_taxon',
-        'section',
-        'label_section',
-        'page_taxon',
-        'page_taxon_title',
+        'content_taxa',
+        'pages_taxa',
+        'pages_taxa_titles',
         'media_taxon',
         'media_descriptions_taxon',
-        'hybrid',
-        'synonym',
-        'commonname',
-        'label_language',
+        'synonyms',
+        'commonnames',
+        'labels_languages',
         'literature',
-        'literature_taxon',
+        'literature_taxa',
 		'nbc_extras',
-		'content_free_module',
         'taxa_relations',
         'variation_relations',
 		'names',
@@ -79,7 +75,7 @@ class SpeciesController extends Controller
     {
 
 		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
-		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
+		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
 
 			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
 
@@ -308,7 +304,7 @@ class SpeciesController extends Controller
 			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
 			$related[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_thumbnail'));
 		}
-		$children=$this->models->Taxon->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+		$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
 		foreach((array)$children as $key => $val)
 		{
 			$d = $this->getCommonname($val['id']);
@@ -323,7 +319,7 @@ class SpeciesController extends Controller
 		$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
 		$parent = $this->getTaxonById($taxon['parent_id']);
 		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
-		$content = $this->models->ContentTaxon->_get(array(
+		$content = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
 				'taxon_id' => $this->rGetVal('id'),
 				'project_id' => $this->getCurrentProjectId(),
@@ -340,7 +336,7 @@ class SpeciesController extends Controller
 
 		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
 
-		$contentparent = $this->models->ContentTaxon->_get(array(
+		$contentparent = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
 				'taxon_id' => $parent['id'],
 				'project_id' => $this->getCurrentProjectId(),
@@ -432,7 +428,7 @@ class SpeciesController extends Controller
     public function getFirstTaxonId()
     {
 
-        $t = $this->models->Taxon->freeQuery(
+        $t = $this->models->Taxa->freeQuery(
         array(
 			'query' => '
 				select _a.id
@@ -455,7 +451,7 @@ class SpeciesController extends Controller
 		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
 			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]=
-				$this->models->Taxon->freeQuery(
+				$this->models->Taxa->freeQuery(
 					array(
 						'query' => '
 							select _a.id,_a.taxon
@@ -499,7 +495,7 @@ class SpeciesController extends Controller
 
     private function getTaxonNextLevel($id)
     {
-        $t = $this->models->Taxon->_get(
+        $t = $this->models->Taxa->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -533,7 +529,7 @@ class SpeciesController extends Controller
 		$stdCats=array();
 
 		// get the defined categories (just the page definitions, no content yet)
-		$tp = $this->models->PageTaxon->_get(
+		$tp = $this->models->PagesTaxa->_get(
 		array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId()
@@ -580,7 +576,7 @@ class SpeciesController extends Controller
 			{
                 $val['is_empty'] = 1;
 
-                $ct = $this->models->ContentTaxon->_get(
+                $ct = $this->models->ContentTaxa->_get(
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
@@ -713,7 +709,7 @@ class SpeciesController extends Controller
     {
 		if (is_numeric($id)) {
 
-			$tpt = $this->models->PageTaxonTitle->_get(
+			$tpt = $this->models->PagesTaxaTitles->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -725,7 +721,7 @@ class SpeciesController extends Controller
 
 			if (empty($tpt[0]['title'])) {
 
-				$tpt = $this->models->PageTaxon->_get(
+				$tpt = $this->models->PagesTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -794,7 +790,7 @@ class SpeciesController extends Controller
                 if (!$allowUnpublished)
                     $d['publish'] = '1';
 
-                $ct = $this->models->ContentTaxon->_get(array(
+                $ct = $this->models->ContentTaxa->_get(array(
                     'id' => $d,
                 ));
 
@@ -882,7 +878,7 @@ class SpeciesController extends Controller
         if ($refs = $this->getlastVisitedCategory($tId, CTAB_LITERATURE))
             return $refs;
 
-        $lt = $this->models->LiteratureTaxon->_get(array(
+        $lt = $this->models->LiteratureTaxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'taxon_id' => $tId
@@ -967,7 +963,7 @@ class SpeciesController extends Controller
 
     private function getTaxonSynonyms($tId)
     {
-        $s = $this->models->Synonym->_get(array(
+        $s = $this->models->Synonyms->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'taxon_id' => $tId
@@ -997,7 +993,7 @@ class SpeciesController extends Controller
         if (isset($languageId))
             $d['language_id'] = $languageId;
 
-        $c = $this->models->Commonname->_get(array(
+        $c = $this->models->Commonnames->_get(array(
             'id' => $d,
             'columns' => 'language_id,commonname,transliteration',
             'order' => 'show_order,commonname'
@@ -1013,7 +1009,7 @@ class SpeciesController extends Controller
                 }
                 else {
 
-                    $ll = $this->models->LabelLanguage->_get(
+                    $ll = $this->models->LabelsLanguages->_get(
                     array(
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(),
@@ -1083,7 +1079,7 @@ class SpeciesController extends Controller
 
     private function getTaxonSynonymCount($id)
     {
-        $s = $this->models->Synonym->_get(
+        $s = $this->models->Synonyms->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1098,7 +1094,7 @@ class SpeciesController extends Controller
 
     private function getTaxonCommonnameCount($id)
     {
-        $c = $this->models->Commonname->_get(
+        $c = $this->models->Commonnames->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1128,7 +1124,7 @@ class SpeciesController extends Controller
 
     private function getTaxonLiteratureCount($id)
     {
-        $lt = $this->models->LiteratureTaxon->_get(
+        $lt = $this->models->LiteratureTaxa->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1212,7 +1208,7 @@ class SpeciesController extends Controller
 
 		$regexp = ($matchStartOnly?'^':'').preg_quote($search);
 
-        $taxa = $this->models->Taxon->freeQuery(
+        $taxa = $this->models->Taxa->freeQuery(
 			array(
 				'query' => "
 					select
@@ -1230,7 +1226,7 @@ class SpeciesController extends Controller
 					".(!empty($listMax) ? "limit ".$listMax : "")
 			));
 
-		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		$count=$this->models->Taxa->freeQuery('select found_rows() as total');
 		$total=$count[0]['total'];
 
 		$ranks=$this->getProjectRanks();
@@ -1363,7 +1359,7 @@ class SpeciesController extends Controller
 			$this->redirect($base.'index.php');
 
 		// try literal
-		$t = $this->models->Taxon->_get(array(
+		$t = $this->models->Taxa->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon' => $name
