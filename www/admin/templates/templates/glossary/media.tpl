@@ -21,70 +21,46 @@
 			<td><div id="taxon-language-other-language-1"></div></td>
 			<!-- td>{t}Overview image{/t}</td -->
 		</tr>
-		{section name=i loop=$media.image}
-		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
+		{foreach $media.image v k}
+		<tr id="media-row-{$v.id}" class="tr-highlight" style="vertical-align:top">
 			<td style="width:150px;padding-right:10px">
 			
-			{$media.image[i].sort_order}
+				{$v.sort_order}
 			
-			
-				{if $media.image[i].thumb_name != ''}
-					{capture name="src"}{$session.admin.project.urls.project_thumbs}{$media.image[i].thumb_name}{/capture} 
+				{if $v.thumb_name != ''}
+					{capture name="src"}{$session.admin.project.urls.project_thumbs}{$v.thumb_name}{/capture} 
 				{else}
-					{capture name="src"}{$session.admin.project.urls.project_media}{$media.image[i].file_name}{/capture} 
+					{capture name="src"}{$session.admin.project.urls.project_media}{$v.file_name}{/capture} 
 				{/if}
-				<a rel="prettyPhoto[gallery]" title="{$media.image[i].description}" href="{$session.admin.project.urls.project_media}{$media.image[i].file_name}">
+				<a rel="prettyPhoto[gallery]" title="{$v.description}" href="{$session.admin.project.urls.project_media}{$v.file_name}">
 					<img src="{$smarty.capture.src}" style="width:150px;cursor:pointer"/>
 				</a>
 				<p>
-				{$media.image[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.image[i].mime_type}; {$media.image[i].hr_file_size} {t}kb{/t})</span>
+				{$v.original_name}<br />
+				<span class="taxon-media-secondary-info">({$v.mime_type}; {$v.hr_file_size} {t}kb{/t})</span>
 				</p>
 				<p>
-				<input type="button" value="{t}delete this image{/t}" onclick="glossMediaDelete({$media.image[i].id},'image','{$media.image[i].original_name}');" />
+				<input type="button" value="{t}delete this image{/t}" onclick="glossMediaDelete({$v.id},'image','{$v.original_name}');" />
 				</p>
 				<script type="text/javascript">
 					glossMediaFileStore([
 						'image',
-						'{$media.image[i].id}',
-						'{$session.admin.project.urls.project_media}{$media.image[i].file_name}',
-						'{$media.image[i].original_name}',
-						{$media.image[i].dimensions[1]}
+						'{$v.id}',
+						'{$session.admin.project.urls.project_media}{$v.file_name}',
+						'{$v.original_name}',
+						{$v.dimensions[1]}
 					]);
 				</script>
 			</td>
 			<td style="padding-right:10px">
-				<textarea id="media-{$media.image[i].id}" style="width:400px;height:100px">{$media.image[i].description}</textarea><br />
-				<input type="button" value="{t}save description{/t}" onclick="glossMediaSaveDesc('media-{$media.image[i].id}','{$media.image[i].id}')" />
+				<textarea id="media-{$v.id}" style="width:400px;height:100px">{$v.description}</textarea><br />
+				<input type="button" value="{t}save description{/t}" onclick="glossMediaSaveDesc('media-{$v.id}','{$v.id}')" />
 			</td>
-			<!-- td>
-				<input type="checkbox" id="overview-{$media.image[i].id}"{if $media.image[i].overview_image=='1'} checked="checked"{/if} onclick="taxonChangeOverviewPicture(this)" />
-			</td -->
-			<!-- td>
-			{if $smarty.section.i.index>0}
-				<span
-					class="a updownarrows"
-					title="{t}move image upward{/t}"
-					onclick="glassChangeMediaOrder('{$id}','{$media.image[i].id}','up')">
-					&uarr;
-				</span>
-			{/if}
-			</td>
-			<td>
-			{if $smarty.section.i.index<$media.image|@count-1}
-				<span
-					class="a updownarrows"
-					title="{t}move image downward{/t}"
-					onclick="glassChangeMediaOrder('{$id}','{$media.image[i].id}','down')">
-					&darr;
-				</span>
-			{/if}
-			</td -->
 		</tr>
-		<tr id="media-row-{$media.image[i].id}-space">
+		<tr id="media-row-{$v.id}-space">
 			<td colspan="2" style="height:20px;"></td>
 		</tr>
-	{/section}
+	{/foreach}
 	</table>
 	</fieldset>
 </div>
@@ -100,42 +76,39 @@
 			<td></td>
 			<td><div id="taxon-language-other-language-2"></div></td>
 		</tr>
-		{section name=i loop=$media.video}
-		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
-			<!-- 
-			<td style="cursor:pointer;width:260px;" onclick="window.open('{$session.admin.project.urls.project_media}{$media.video[i].file_name}','_video');">
-			-->
+		{foreach $media.video v k}
+		<tr id="media-row-{$v.id}" class="tr-highlight" style="vertical-align:top">
 			<td>
-				<a rel="prettyPhoto[gallery]" title="{$media.image[i].description}" href="{$session.admin.project.urls.project_media}{$media.video[i].file_name}">
+				<a rel="prettyPhoto[gallery]" title="{$v.description}" href="{$session.admin.project.urls.project_media}{$v.file_name}">
 				<img 
 					src="{$baseUrl}admin/media/system/icons/video.jpg" 
 				/>
 				</a>
 				<p>
-				{$media.video[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.video[i].mime_type}; {$media.video[i].file_size} {t}kb{/t})</span>
+				{$v.original_name}<br />
+				<span class="taxon-media-secondary-info">({$v.mime_type}; {$v.file_size} {t}kb{/t})</span>
 				</p>
 				<p>
-				<input type="button" value="{t}delete this video{/t}" onclick="glossMediaDelete({$media.video[i].id},'video','{$media.video[i].original_name}');" />
+				<input type="button" value="{t}delete this video{/t}" onclick="glossMediaDelete({$v.id},'video','{$v.original_name}');" />
 				</p>
 				<!-- script type="text/javascript">
 					glossMediaFileStore([
 						'video',
-						'{$media.video[i].id}',
-						'{$session.admin.project.urls.project_media}{$media.video[i].file_name}',
-						'{$media.video[i].original_name}'
+						'{$v.id}',
+						'{$session.admin.project.urls.project_media}{$v.file_name}',
+						'{$v.original_name}'
 					]);
 				</script -->
 			</td>
 			<td>
-				<textarea id="media-{$media.video[i].id}" style="width:450px;height:100px">{$media.video[i].description}</textarea><br />
-				<input type="button" value="{t}save description{/t}" onclick="glossMediaSaveDesc('media-{$media.video[i].id}','{$media.video[i].id}')" />
+				<textarea id="media-{$v.id}" style="width:450px;height:100px">{$v.description}</textarea><br />
+				<input type="button" value="{t}save description{/t}" onclick="glossMediaSaveDesc('media-{$v.id}','{$v.id}')" />
 			</td>
 		</tr>
-		<tr id="media-row-{$media.video[i].id}-space">
+		<tr id="media-row-{$v.id}-space">
 			<td colspan="2" style="height:20px;"></td>
 		</tr>
-	{/section}
+	{/foreach}
 	</table>
 </fieldset>
 </div>
@@ -152,57 +125,47 @@
 			<td></td>
 			<td><div id="taxon-language-other-language-2"></div></td>
 		</tr>
-		{section name=i loop=$media.sound}
-		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
+		{foreach $media.sound v k}
+		<tr id="media-row-{$v.id}" class="tr-highlight" style="vertical-align:top">
 			<td style="width:260px;" >
 				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
 					<param name="movie" value="{$soundPlayerName}" />
-					<param name="FlashVars" value="mp3={$session.admin.project.urls.project_media}{$media.sound[i].file_name}" />
+					<param name="FlashVars" value="mp3={$session.admin.project.urls.project_media}{$v.file_name}" />
 				</object>
 				<p>
-				{$media.sound[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.sound[i].mime_type}; {$media.sound[i].file_size} {t}kb{/t})</span>
+				{$v.original_name}<br />
+				<span class="taxon-media-secondary-info">({$v.mime_type}; {$v.file_size} {t}kb{/t})</span>
 				</p>
 				<p>
-				<input type="button" value="{t}delete this sound file{/t}" onclick="glossMediaDelete({$media.sound[i].id},'sound file','{$media.sound[i].original_name}');" />
+				<input type="button" value="{t}delete this sound file{/t}" onclick="glossMediaDelete({$v.id},'sound file','{$v.original_name}');" />
 				</p>
-				<!-- script type="text/javascript">
-					glossMediaFileStore([
-						'sound',
-						'{$media.sound[i].id}',
-						'{$session.admin.project.urls.project_media}{$media.sound[i].file_name}',
-						'{$media.sound[i].original_name}'
-					]);
-				</script -->
 			</td>
 			<td>
-				<textarea id="media-{$media.sound[i].id}" style="width:450px;height:100px">{$media.sound[i].description}</textarea><br />
-				<input type="button" value="{t}save description{/t}" onclick="glossMediaSaveDesc('media-{$media.sound[i].id}','{$media.sound[i].id}')" />
+				<textarea id="media-{$v.id}" style="width:450px;height:100px">{$v.description}</textarea><br />
+				<input type="button" value="{t}save description{/t}" onclick="glossMediaSaveDesc('media-{$v.id}','{$v.id}')" />
 			</td>
 		</tr>
-		<tr id="media-row-{$media.video[i].id}-space" >
+		<tr id="media-row-{$v.id}-space" >
 			<td colspan="2" style="height:20px;"></td>
 		</tr>
-	{/section}
+	{/foreach}
 	</table>
 </fieldset>
 </div>
 {/if}
 
-
 <script type="text/JavaScript">
-$(document).ready(function(){
+$(document).ready(function()
+{
 	allShowLoadingDiv();
-	{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-	{/section}
+	{foreach $languages v k}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+	{/foreach}
 	allActiveLanguage = {$defaultLanguage};
 	glossDrawLanguages('glossMediaChangeLanguage',true);
 	allHideLoadingDiv();
 	allLookupNavigateOverrideUrl('media.php?id=%s');
-
 });
 </script>
-
 
 {include file="../shared/admin-footer.tpl"}
