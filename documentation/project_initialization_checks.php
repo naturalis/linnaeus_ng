@@ -34,12 +34,15 @@ $this->moduleSession->setModuleSetting( array('setting'=>'suppressTaxonDivision'
 
 
 
+include_once ('ModuleSettingsReaderController.php');
+
+
 $this->moduleSettings=new ModuleSettingsReaderController;
 $this->moduleSettings->setUseDefaultWhenNoValue( true );
 $this->moduleSettings->assignModuleSettings( $this->settings );
 $this->moduleSettings->getModuleSetting('use_character_groups'); 
 $this->moduleSettings->getModuleSetting(array('module'=>'species','setting'=>'use_variations'));
-
+$this->moduleSettings->getModuleSetting(array('setting'=>'use_character_groups','subst'=>$substvalue)); 
 
 rememeber!
 http://localhost/linnaeus_ng/app/views/matrixkey/use_matrix.php?p=3&id=5

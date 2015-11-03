@@ -25,7 +25,7 @@
 				self::S_UNSET_ORIGINAL_CONTENT => true // if true, unsets the potentially large content fields after they've been excerpted
 			);
 
-			$this->searchSpecies($p) etc. (but not the matrix):
+			$this->searchSpecies( $p ) etc. (but not the matrix):
 
 
 			// taxon content
@@ -68,8 +68,7 @@
 	columns), searches that have no literal bits ("...") will be harder to turn into case sensitive ones.
 	(eh?)
 
-	W E   W I L L   N O T   S E A R C H   T H E   M A T R I X !
-
+	THERE IS NO SEARCHING THE MATRIX
 
 */
 
@@ -88,39 +87,26 @@ class SearchControllerGeneral extends SearchController
 	private $_moduleNames;
 
 	public $usedModels = array(
-		'content',
-        'content_taxon',
-        'page_taxon',
-        'page_taxon_title',
-        'media_taxon',
-        'media_descriptions_taxon',
-		'synonym',
-		'commonname',
-		'literature',
-		'content_free_module',
-		'choice_content_keystep',
-		'content_keystep',
-		'choice_keystep',
-		'keystep',
+		'choices_keysteps',
+		'content_keysteps',
+		'content_free_modules',
+		'free_modules_projects',
+		'geodata_types_titles',
+		'choices_content_keysteps',
+		'keysteps',
 		'literature',
 		'glossary',
-		'glossary_media',
-		'glossary_synonym',
-		'matrix',
-		'matrix_name',
-		'matrix_taxon_state',
-		'characteristic',
-		'characteristic_label',
-		'characteristic_label_state',
-		'characteristic_matrix',
-		'characteristic_label_state',
-		'characteristic_state',
-		'geodata_type_title',
-		'occurrence_taxon',
+		'glossary_synonyms',
+		'media_descriptions_taxon',
 		'content_introduction',
+		'media_taxon',
+		'names',
 		'name_types',
-		'presence',
-		'page_taxon_title'
+		'commonnames',
+		'synonyms',
+		'pages_taxa_titles',
+		'content_taxa',
+		'content'
     );
 
     public $controllerPublicName = 'Search';
@@ -140,73 +126,91 @@ class SearchControllerGeneral extends SearchController
 
     public function __construct ()
     {
-
         parent::__construct();
-
 		$this->initialize();
-
     }
+
+	private function initialize()
+	{
+		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3)); 
+		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50)); 
+
+		$this->_excerptPostMatchLength=
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) ?
+				$this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) : 
+				35;
+		$this->_excerptPreMatchLength = 
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) ?
+				$this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) : 
+				35;
+		$this->_excerptPrePostMatchString = 
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ? 
+				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) : 
+				'';
+
+		$this->_searchResultSort=
+			$this->getSetting('app_search_result_sort','alpha');
+	}
 
     public function __destruct ()
     {
         parent::__destruct();
     }
 
-	private function initialize()
-	{
-		$this->_excerptPreMatchLength=
-			isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
+    public function ajaxInterfaceAction ()
+    {
+        if (!$this->rHasVal('action')) return;
+        if ($this->rHasVal('action','get_search_result_index'))
+		{
+			$this->smarty->assign(
+				'returnText',
+				$this->makeLookupList(array(
+					'data'=>(array)$this->getSearchResultIndex(),
+					'module'=>$this->controllerBaseName,
+					'sortData'=>false
+				))
+			);
+        }
 
-		$this->_excerptPostMatchLength=
-			isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
-
-		$this->_excerptPrePostMatchString=
-			isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
-
-		$this->_searchResultSort=
-			$this->getSetting('app_search_result_sort','alpha');
-
-		$this->createMySQLfunction_fnStripTags();
-	}
+		$this->allowEditPageOverlay = false;
+        $this->printPage();
+    }
 
     public function searchResetAction ()
     {
-		unset($_SESSION['app'][$this->spid()]['search']);
+		$this->moduleSession->setModuleSetting( array('setting'=>'search') );
+		$this->moduleSession->setModuleSetting( array('setting'=>'modules') );
+		$this->moduleSession->setModuleSetting( array('setting'=>'freeModules') );
+		$this->moduleSession->setModuleSetting( array('setting'=>'results') );
 		$this->redirect('search.php');
 	}
-
 
     public function searchAction ()
     {
 		if ($this->rHasVal('search'))
 		{
+			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$this->rGetVal('search')) );
+			$this->moduleSession->setModuleSetting( array('setting'=>'modules','value'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null) );
+			$this->moduleSession->setModuleSetting( array('setting'=>'freeModules','value'=>$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null) );
 
-			$_SESSION['app'][$this->spid()]['search']=
-				array(
-					'search' => $this->requestData['search'],
-					'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
-					'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
-				);
-
-			if ($this->validateSearchString($this->requestData['search']))
+			if ($this->validateSearchString($this->rGetVal('search')))
 			{
-
+				
 				if ($this->rHasVal('extended','1'))
 				{
 					$results =
 						$this->doSearch(
 							array(
-								'search'=>$this->requestData['search'],
-								'modules'=>$this->rHasVal('modules') ? $this->requestData['modules'] : null ,
-								'freeModules'=>$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null,
+								'search'=>$this->rGetVal('search'),
+								'modules'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null ,
+								'freeModules'=>$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null,
 								'extended'=>true
 							)
 						);
-
 				}
 				else
 				{
-					$search='"'.trim($this->requestData['search'],'"').'"';
+					$search='"'.trim($this->rGetVal('search'),'"').'"';
 
 					$results=
 						$this->doSearch(
@@ -220,9 +224,8 @@ class SearchControllerGeneral extends SearchController
 
 				}
 
-				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
-				$this->smarty->assign('results',$results);
-
+				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->rGetVal('search')));
+				$this->moduleSession->setModuleSetting( array('setting'=>'results','value'=>$results) );
 			}
 			else
 			{
@@ -248,14 +251,20 @@ class SearchControllerGeneral extends SearchController
 		);
 
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore'=>MODCODE_MATRIXKEY)));
-		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
-		$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
+		$this->smarty->assign('minSearchLength',$this->_minSearchLength);
+		$this->smarty->assign('search',
+			array(
+				'search'=>$this->moduleSession->getModuleSetting( 'search' ),
+				'modules'=>$this->moduleSession->getModuleSetting( 'modules' ),
+				'freeModules'=>$this->moduleSession->getModuleSetting( 'freeModules' )
+			)
+		);
+		$this->smarty->assign('results',$this->moduleSession->getModuleSetting( 'results' ));
 
         $this->printPage();
-
     }
 
-	private function tokenizeSearchString($s)
+	private function tokenizeSearchString( $s )
 	{
 		/*
 			splits search string in groups delimited by ". if there's an uneven number of ", the last one is ignored.
@@ -297,18 +306,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function prefabFullTextMatchString($s)
-	{
-		// make tokens into a single string for mysql MATCH statement; add *'s to enable partial matches
-		$r = '';
-		foreach((array)$s as $val)
-		{
-			foreach(explode(' ',$val) as $b) $r.=$b.'* ';
-		}
-		return trim($r);
-	}
-
-	private function prefabFullTextLikeString($s)
+	private function prefabFullTextLikeString( $s )
 	{
 		array_walk($s,function(&$n){$n=str_replace(array("'","%","_"),array("\'","\%","\_"),$n);});
 
@@ -318,24 +316,24 @@ class SearchControllerGeneral extends SearchController
 		return trim($r);
 	}
 
-	private function doesSearchStringContainLiterals($s)
+	private function doesSearchStringContainLiterals( $s )
 	{
-		foreach((array)$s as $val) {
+		foreach((array)$s as $val)
+		{
 			if (strpos($val,' ')!==false)
 				return true;
 		}
 		return false;
 	}
 
-	private function stripTagsForSearchExcerpt($s)
+	private function stripTagsForSearchExcerpt( $s )
 	{
 		// replace <br> and ends of block elements with spaces to avoid words being concatenated
 		return strip_tags(str_replace('  ',' ',str_ireplace(array('<br>','<br />','</p>','</div>','</td>','</li>','</blockquote>','</h1>','</h2>','</h3>','</h4>','</h5>','</h6>'),' ',$s)));
 	}
 
-	private function filterResultsWithTokenizedSearch($p)
+	private function filterResultsWithTokenizedSearch( $p )
 	{
-
 		//OVERRIDE: the use of LIKE rather than MATCH make the post-filtering in PHP superfluous (i think)
 		foreach((array)$p[1] as $key => $val) {
 			if (isset($p[1][$key][self::__CONCAT_RESULT__])) unset($p[1][$key][self::__CONCAT_RESULT__]);
@@ -408,7 +406,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function getExcerptsSurroundingMatches($p)
+	private function getExcerptsSurroundingMatches( $p )
 	{
 		$s = isset($p['param']) ? $p['param'] : null;						// search parameters
 		$r = isset($p['results']) ? $p['results'] : null;					// results array
@@ -491,7 +489,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function sortResultsByMostTokensFound($data,$secondaryfield=null)
+	private function sortResultsByMostTokensFound( $data, $secondaryfield=null)
 	{
 
 		if (count((array)$data)<2)
@@ -540,7 +538,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function makeLikeClause($s,$c)
+	private function makeLikeClause( $s, $c)
 	{
 		// creates like-clause  ((taxon like '%phyllum a%' or taxon like '%orchid%'))
 		$r=array();
@@ -550,7 +548,7 @@ class SearchControllerGeneral extends SearchController
 		return '('.implode(' or ',$r).')';
 	}
 
-	private function getModuleName($id)
+	private function getModuleName( $id )
 	{
 		if (is_null($this->_moduleNames)) {
 			$d=$this->getProjectModules();
@@ -563,7 +561,7 @@ class SearchControllerGeneral extends SearchController
 		return isset($this->_moduleNames[$id]) ? $this->_moduleNames[$id] : $id;
 	}
 
-	private function doSearch($p=null)
+	private function doSearch( $p=null )
 	{
 		$search=isset($p['search']) ? $p['search'] : null;
 		$modules=isset($p['modules']) ? $p['modules'] : null;
@@ -576,13 +574,11 @@ class SearchControllerGeneral extends SearchController
 		$searchAll=($modules=='*');
 
 		$tokenized = $this->tokenizeSearchString($search);
-		//$fulltext = $this->prefabFullTextMatchString($tokenized);
 		$liketxt = $this->prefabFullTextLikeString($tokenized);
 		$containsLiterals = $this->doesSearchStringContainLiterals($tokenized);
 
 		$p = array(
 			self::S_TOKENIZED_TERMS => $tokenized,
-			//self::S_FULLTEXT_STRING => $fulltext,
 			self::S_LIKETEXT_STRING => $liketxt,
 			self::S_CONTAINS_LITERALS => $containsLiterals,
 			self::S_IS_CASE_SENSITIVE => false,
@@ -597,21 +593,21 @@ class SearchControllerGeneral extends SearchController
 		$results =
 			array(
 				'introduction' =>
-					($searchAll || (is_array($modules) && in_array('introduction',$modules)) ? $this->searchIntroduction($p) : null),
+					($searchAll || (is_array($modules) && in_array('introduction',$modules)) ? $this->searchIntroduction( $p ) : null),
 				'glossary' =>
-					($searchAll || (is_array($modules) && in_array('glossary',$modules)) ? $this->searchGlossary($p) : null),
+					($searchAll || (is_array($modules) && in_array('glossary',$modules)) ? $this->searchGlossary( $p ) : null),
 				'literature' =>
-					($searchAll || (is_array($modules) && in_array('literature',$modules)) ? $this->searchLiterature($p) : null),
+					($searchAll || (is_array($modules) && in_array('literature',$modules)) ? $this->searchLiterature( $p ) : null),
 				'species' =>
-					($searchAll || (is_array($modules) && in_array('species',$modules)) ? $this->searchSpecies($p) : null),
+					($searchAll || (is_array($modules) && in_array('species',$modules)) ? $this->searchSpecies( $p ) : null),
 				'dichkey' =>
-					($searchAll || (is_array($modules) && in_array('key',$modules)) ? $this->searchDichotomousKey($p) : null),
+					($searchAll || (is_array($modules) && in_array('key',$modules)) ? $this->searchDichotomousKey( $p ) : null),
 				'matrixkey' =>
-					($searchAll || (is_array($modules) && in_array('matrixkey',$modules)) ? $this->searchMatrixKey($p) : null), // stub
+					($searchAll || (is_array($modules) && in_array('matrixkey',$modules)) ? $this->searchMatrixKey( $p ) : null), // stub
 				'map' =>
-					($searchAll || (is_array($modules) && in_array('mapkey',$modules)) ? $this->searchMap($p) : null),
+					($searchAll || (is_array($modules) && in_array('mapkey',$modules)) ? $this->searchMap( $p ) : null),
 				'content' =>
-					($searchAll || (is_array($modules) && in_array('content',$modules)) ? $this->searchContent($p) : null),
+					($searchAll || (is_array($modules) && in_array('content',$modules)) ? $this->searchContent( $p ) : null),
 			);
 
 		$d=$this->searchModules($p,$freeModules);
@@ -625,11 +621,10 @@ class SearchControllerGeneral extends SearchController
 		return array('data'=>$results,'count'=>$totalcount);
 	}
 
-	private function searchSpecies($p)
+	private function searchSpecies( $p )
 	{
-
 		// taxa
-		$taxa = $this->models->Taxon->_get(
+		$taxa = $this->models->Taxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -670,7 +665,7 @@ class SearchControllerGeneral extends SearchController
 		if ($p[self::S_EXTENDED_SEARCH])
 		{
 			// taxon content
-			$content = $this->models->ContentTaxon->_get(
+			$content = $this->models->ContentTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -693,7 +688,7 @@ class SearchControllerGeneral extends SearchController
 			foreach((array)$content as $key=>$val)
 			{
 				$t=$this->getTaxonById($val['taxon_id']);
-                $ct = $this->models->PageTaxonTitle->_get(
+                $ct = $this->models->PagesTaxaTitles->_get(
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
@@ -713,7 +708,7 @@ class SearchControllerGeneral extends SearchController
 
 
 		// synonyms
-		$synonyms = $this->models->Synonym->_get(
+		$synonyms = $this->models->Synonyms->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -732,7 +727,7 @@ class SearchControllerGeneral extends SearchController
 		//$synonyms = $this->sortResultsByMostTokensFound($synonyms);
 
 		// common names
-		$commonnames = $this->models->Commonname->_get(
+		$commonnames = $this->models->Commonnames->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -954,9 +949,8 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchIntroduction($p)
+	private function searchIntroduction( $p )
 	{
-
 		$content = $this->models->ContentIntroduction->_get(
 			array(
 				'id' => array(
@@ -989,9 +983,8 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchGlossary($p)
+	private function searchGlossary( $p )
 	{
-
 		// glossary items
 		$gloss = $this->models->Glossary->_get(
 			array(
@@ -1010,7 +1003,7 @@ class SearchControllerGeneral extends SearchController
 		$gloss = $this->sortResultsByMostTokensFound($gloss);
 
 		// glossary synonyms
-		$synonym = $this->models->GlossarySynonym->_get(
+		$synonym = $this->models->GlossarySynonyms->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1063,7 +1056,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchLiterature($p)
+	private function searchLiterature( $p )
 	{
 
 		$c = 'id,
@@ -1150,10 +1143,10 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchDichotomousKey($p)
+	private function searchDichotomousKey( $p )
 	{
 
-		$keysteps = $this->models->Keystep->_get(
+		$keysteps = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId()
@@ -1165,7 +1158,7 @@ class SearchControllerGeneral extends SearchController
 
 
 		// choices
-		$choices = $this->models->ChoiceContentKeystep->_get(
+		$choices = $this->models->ChoicesContentKeysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1179,7 +1172,7 @@ class SearchControllerGeneral extends SearchController
 
 		foreach((array)$choices as $key => $val)
 		{
-			$step = $this->models->ChoiceKeystep->_get(
+			$step = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -1199,7 +1192,7 @@ class SearchControllerGeneral extends SearchController
 
 
 		// steps
-		$steps = $this->models->ContentKeystep->_get(
+		$steps = $this->models->ContentKeysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1241,17 +1234,17 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchMatrixKey($p)
+	private function searchMatrixKey( $p )
 	{
-		// NO! NOT! NEVER!
+		// NO! NO! NO!
 		return null;
 	}
 
-	private function searchMap($p)
+	private function searchMap( $p )
 	{
 
 		// data types
-		$titles = $this->models->GeodataTypeTitle->_get(
+		$titles = $this->models->GeodataTypesTitles->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1282,7 +1275,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchContent($p)
+	private function searchContent( $p )
 	{
 		// content
 		$content = $this->models->Content->_get(
@@ -1316,7 +1309,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchModule($p)
+	private function searchModule( $p )
 	{
 		$id=isset($p['module']['id']) ? $p['module']['id'] : null;
 		$name=isset($p['module']['name']) ? $p['module']['name'] : null;
@@ -1330,7 +1323,7 @@ class SearchControllerGeneral extends SearchController
 			'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','fnStripTags(content)')),
 		);
 
-		$content = $this->models->ContentFreeModule->_get(
+		$content = $this->models->ContentFreeModules->_get(
 			array(
 				'id' => $d,
 				'columns' => 'page_id as id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__,
@@ -1358,7 +1351,7 @@ class SearchControllerGeneral extends SearchController
 
 	}
 
-	private function searchModules($p,$fMod=null)
+	private function searchModules( $p, $fMod=null )
 	{
 
 		if (is_null($fMod))
@@ -1368,14 +1361,14 @@ class SearchControllerGeneral extends SearchController
 
 		if ($fMod=='*') {
 			$fMod=array();
-			$m=$this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId()),'columns' => 'id'));
+			$m=$this->models->FreeModulesProjects->_get(array('id'=>array('project_id' => $this->getCurrentProjectId()),'columns' => 'id'));
 			foreach((array)$m as $val) {
 				$fMod[]=$val['id'];
 			}
 		}
 
 		foreach((array)$fMod as $mod) {
-			$m=$this->models->FreeModuleProject->_get(
+			$m=$this->models->FreeModulesProjects->_get(
 				array(
 					'id'=>array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -1388,62 +1381,11 @@ class SearchControllerGeneral extends SearchController
 				'id'=>$mod,
 				'name'=>$m[0]['module']
 			);
-			$r[$m[0]['module']]=$this->searchModule($p);
+			$r[$m[0]['module']]=$this->searchModule( $p );
 		}
 
 		return $r;
 
 	}
-
-    public function ajaxInterfaceAction ()
-    {
-
-        if (!$this->rHasVal('action')) return;
-
-        if ($this->rHasVal('action','get_search_result_index')) {
-
-			$this->smarty->assign(
-				'returnText',
-				$this->makeLookupList(array(
-					'data'=>(array)$this->getSearchResultIndex(),
-					'module'=>$this->controllerBaseName,
-					'sortData'=>false
-				))
-			);
-
-        }
-
-		$this->allowEditPageOverlay = false;
-
-        $this->printPage();
-
-    }
-
-	private function createMySQLfunction_fnStripTags()
-	{
-		$this->models->Taxon->freeQuery("DROP FUNCTION IF EXISTS fnStripTags");
-		$this->models->Taxon->freeQuery("
-			CREATE FUNCTION fnStripTags( Dirty text )
-			RETURNS text
-			DETERMINISTIC
-			BEGIN
-			  DECLARE iStart, iEnd, iLength int;
-				WHILE Locate( '<', Dirty ) > 0 And Locate( '>', Dirty, Locate( '<', Dirty )) > 0 DO
-				  BEGIN
-					SET iStart = Locate( '<', Dirty ), iEnd = Locate( '>', Dirty, Locate('<', Dirty ));
-					SET iLength = ( iEnd - iStart) + 1;
-					IF iLength > 0 THEN
-					  BEGIN
-						SET Dirty = Insert( Dirty, iStart, iLength, '');
-					  END;
-					END IF;
-				  END;
-				END WHILE;
-				RETURN Dirty;
-			END;
-		");
-	}
-
-
 
 }
