@@ -2,7 +2,7 @@
 
 <div id="page-main">
 <table>
-{foreach from=$pages key=k item=v}
+{foreach $pages v k}
 	<tr class="tr-highlight">
 		<td><a href="edit.php?id={$v.id}">{$v.topic}</a></td>
 	</tr>

@@ -27,10 +27,14 @@ new SESSION HANDLER!
 
 private $moduleSession;
 
-$this->moduleSession=$this->helpers->SessionModuleSettings;
-$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
+	//$this->moduleSession=$this->helpers->SessionModuleSettings;
+	//$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
 $this->moduleSession->getModuleSetting( 'suppressTaxonDivision' );
 $this->moduleSession->setModuleSetting( array('setting'=>'suppressTaxonDivision','value'=>$state ) );
+
+
+$this->baseSession->getModuleSetting( 'suppressTaxonDivision' );
+$this->baseSession->setModuleSetting( array('setting'=>'suppressTaxonDivision','value'=>$state ) );
 
 
 
