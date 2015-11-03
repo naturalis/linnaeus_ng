@@ -9,35 +9,19 @@ class SpeciesController extends Controller
 	private $_defaultSpeciesTab;
 
     public $usedModels = array(
-        'content_taxa',
-        'pages_taxa',
-        'pages_taxa_titles',
-        'media_taxon',
-        'media_descriptions_taxon',
-        'synonyms',
         'commonnames',
+        'content_taxa',
+		'dna_barcodes',
         'labels_languages',
         'literature',
         'literature_taxa',
-		'nbc_extras',
-        'taxa_relations',
-        'variation_relations',
-		'names',
-		'name_types',
-		'actors',
-		'dna_barcodes',
-		'presence_taxa',
-		'media_meta',
-		'tab_order',
-		'nsr_ids',
-		'taxon_trend_years',
-		'taxon_trends',
-		'external_orgs',
-		'external_ids',
-		'taxon_quick_parentage',
-		'literature2',
-		'literature2_authors',
-		'names_additions'
+        'media_descriptions_taxon',
+        'media_taxon',
+        'pages_taxa',
+        'pages_taxa_titles',
+        'synonyms',
+        'tab_order',
+		'taxon_quick_parentage'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -427,21 +411,10 @@ class SpeciesController extends Controller
 
     public function getFirstTaxonId()
     {
-
-        $t = $this->models->Taxa->freeQuery(
-        array(
-			'query' => '
-				select _a.id
-				from %PRE%taxa _a
-				left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-				left join %PRE%ranks _c on _b.rank_id=_c.id
-				where _a.project_id = '.$this->getCurrentProjectId().'
-				and _b.lower_taxon = '.($this->getTaxonType() == 'higher' ? 0 : 1).'
-				order by _a.taxon_order, _a.taxon
-				limit 1'
+        return $this->models->SpeciesModel->getFirstTaxonId(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonType' => $this->getTaxonType()
         ));
-
-		return isset($t) ? $t[0]['id'] : null;
     }
 
 
@@ -451,18 +424,10 @@ class SpeciesController extends Controller
 		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
 			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]=
-				$this->models->Taxa->freeQuery(
-					array(
-						'query' => '
-							select _a.id,_a.taxon
-							from %PRE%taxa _a
-							left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-							where _a.project_id = '.$this->getCurrentProjectId().'
-							and _b.lower_taxon = '.($this->getTaxonType() == 'higher' ? 0 : 1).'
-							order by _a.taxon_order, _a.taxon
-							'
-					));
-
+				$this->models->SpeciesModel->getBrowseOrder(array(
+                    'projectId' => $this->getCurrentProjectId(),
+                    'taxonType' => $this->getTaxonType()
+				));
 		}
 
 		$prev=$next=false;
@@ -1025,7 +990,7 @@ class SpeciesController extends Controller
                     }
                     else {
 
-                        $l = $this->models->Language->_get(
+                        $l = $this->models->Languages->_get(
                         array(
                             'id' => array(
                                 'id' => $val['language_id']
@@ -1206,28 +1171,13 @@ class SpeciesController extends Controller
         if (empty($search) && !$getAll)
             return;
 
-		$regexp = ($matchStartOnly?'^':'').preg_quote($search);
-
-        $taxa = $this->models->Taxa->freeQuery(
-			array(
-				'query' => "
-					select
-						SQL_CALC_FOUND_ROWS
-						_a.id, _a.taxon, _a.rank_id, _a.parent_id, _a.is_hybrid
-					from
-						%PRE%taxa _a
-					left join %PRE%projects_ranks _b
-						on _a.rank_id=_b.id
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _b.lower_taxon = ".($this->getTaxonType() == 'higher' ? 0 : 1)."
-						".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
-					order by taxon
-					".(!empty($listMax) ? "limit ".$listMax : "")
-			));
-
-		$count=$this->models->Taxa->freeQuery('select found_rows() as total');
-		$total=$count[0]['total'];
+        list($taxa, $total) = $this->models->SpeciesModel->getTaxa(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonType' => $this->getTaxonType(),
+            'getAll' => $getAll,
+            'listMax' => $listMax,
+            'regExp' => ($matchStartOnly?'^':'').preg_quote($search)
+        ));
 
 		$ranks=$this->getProjectRanks();
 
@@ -1377,17 +1327,10 @@ class SpeciesController extends Controller
 		if (is_null($id))
 			return;
 
-		$d=$this->models->TaxonQuickParentage->freeQuery("
-			select
-				parentage
-			from
-				%PRE%taxon_quick_parentage
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				and taxon_id = ".$id
-		);
-
-		return explode(' ',$d[0]['parentage']);
+		return $this->models->SpeciesModel->getTaxonParentage(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'taxonId' => $id
+		));
 
 	}
 
