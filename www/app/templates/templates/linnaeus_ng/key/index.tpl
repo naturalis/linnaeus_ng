@@ -10,14 +10,14 @@
 		<div id="choices">
 		
     <table id="choice-table">
-	{foreach from=$choices key=k item=v name=henk}
+	{foreach $choices v k choice_loop}
 		 <tr><td class="choice_cell">
 			
 		    <div class="choice{if $v.choice_img} choice-picture"{else}"{/if} 
 		        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-		            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+		            onclick="window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'"
 		        {elseif $v.res_taxon_id!=''}
-		            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+		            onclick="window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'"
 		        {/if}
 		    >
 
@@ -30,24 +30,14 @@
 		</td>
 		{if $v.choice_img}
 			<td class="image-cell" rowspan="2">
-				{if $useJavascriptLinks}
-					<img
-						alt="{t}Choice{/t} {$step.number}{$v.marker}"
-						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
-						class="choice-image"
-						onclick="showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
-						src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
-						/>
-				{else}
-					<a href="javascript:showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
-					<img
-						alt="{t}Choice{/t} {$step.number}{$v.marker}"
-						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
-						class="choice-image"
-						src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
-					/>
-					</a>
-				{/if}	
+                <a href="javascript:showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
+                <img
+                    alt="{t}Choice{/t} {$step.number}{$v.marker}"
+                    title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
+                    class="choice-image"
+                    src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
+                />
+                </a>
 			</td>
 		{/if}
 		</tr>
@@ -66,7 +56,7 @@
 		{if $v.choice_img}<td></td>{/if}
 		</tr></table>
 		
-		{if not $smarty.foreach.henk.last}<tr><td class="separator"></td></tr>{/if}
+		{if not $smarty.foreach.choice_loop.last}<tr><td class="separator"></td></tr>{/if}
 
 {/foreach}
    
@@ -79,25 +69,26 @@
 </div>
 
 
-{literal}
 <script>
-  $(document).ready(function(){
-	$(".inline-image").click(function (e) {
+$(document).ready(function()
+{
+    $(".inline-image").click(function(e)
+    {
 	    e.stopPropagation();
-	});
-
-	$(".choice-image").click(function (e) {
-	    e.stopPropagation();
-	});
-
-	var panelTop = $('#panel').offset().top;
-	$('#page-main').scroll(function() {
-		//alert(panelTop);  
-		$('#panel').offset({top: panelTop});
-	  });	
-	  
-  });
+    });
+    
+    $(".choice-image").click(function(e)
+    {
+    	e.stopPropagation();
+    });
+    
+    var panelTop = $('#panel').offset().top;
+    $('#page-main').scroll(function()
+    {
+	    $('#panel').offset({top: panelTop});
+    });	
+});
 </script>
-{/literal}
+
 
 {include file="../shared/footer.tpl"}

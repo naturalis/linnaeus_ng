@@ -6,7 +6,7 @@
     	<a href="http://www.eti.uva.nl/support/contact.php">{t}contact{/t}</a>
  
  		{if $languages|@count>1} | 
-        {foreach from=$languages key=k item=v}
+        {foreach $languages v k}
         	{if $v.language_id!=$currentLanguageId}<span class="flag_link" onclick="doLanguageChange({$v.language_id})">{/if}
         	<img src="{$projectUrls.systemMedia}language_flags/{$v.iso2}.png">
         	{if $v.language_id!=$currentLanguageId}</span>{/if}
