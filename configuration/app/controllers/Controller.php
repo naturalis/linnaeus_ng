@@ -169,7 +169,6 @@ class Controller extends BaseClass
     public $allowEditPageOverlay = true;
     public $tmp;
     private $usedModelsBase = array(
-        'ControllerModel',
         'free_modules_projects',
         'glossary',
         'glossary_synonyms',
@@ -2472,31 +2471,35 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
+		$t='ControllerModel';
+
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
+		{
+            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+            $this->models->$t = new $t;
+        }
+
         $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
 
-        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php')) {
-
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
+		{
             require_once dirname(__FILE__) . '/../models/' . $t . '.php';
-
             $this->models->$t = new $t;
-
         }
 
         require_once dirname(__FILE__) . '/../models/Table.php';
 
-        foreach ((array) $d as $key) {
-
+        foreach ((array) $d as $key)
+		{
             $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
             $this->models->$t = new Table($key);
 
-            if (isset($this->helpers->LoggingHelper)) {
-
+            if (isset($this->helpers->LoggingHelper))
+			{
                  $this->models->$t->setLogger($this->helpers->LoggingHelper);
-
             }
         }
-
     }
 
 
