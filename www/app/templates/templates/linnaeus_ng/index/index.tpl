@@ -7,21 +7,21 @@
 <div id="categories">
 	<ul>
 		<li>
-			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasNameTypes.hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
+			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasSpecies==1}" href="?type=lower"{else} category-no-content"{/if}>
 			{t}Species and lower taxa{/t}</a>
 		</li>
 		<li>
-			<a class="category{if $type=='higher'}-active{/if}{if $hasNameTypes.hasHigherTaxa==1}" href="index.php?type=higher"{else} category-no-content"{/if}>
+			<a class="category{if $type=='higher'}-active{/if}{if $hasHigherTaxa==1}" href="?type=higher"{else} category-no-content"{/if}>
 			{t}Higher taxa{/t}</a>
 		</li>
 		<li>
-			<a class="category{if $type=='common'}-active{/if} category-last{if $hasNameTypes.hasCommonNames==1}" href="index.php?type=common"{else} category-no-content"{/if}>
+			<a class="category{if $type=='common'}-active{/if} category-last{if $hasCommonNames==1}" href="?type=common"{else} category-no-content"{/if}>
 			{t}Common names{/t}</a>
 		</li>
 	</ul>
 
     {if $type=='common'}
-	<div style="float:right">
+	<div style="float:right;">
 		{t}Language:{/t}
 		<select id="nameLanguage" onchange="window.open('index.php?type=common&language='+$('#nameLanguage').val()+'&letter=','_self');">
 		<option value=""{if $activeLanguage==''} selected="selected"{/if}>{t}Show all{/t}</option>
@@ -97,13 +97,6 @@
 			<a class="internal-link" href="../species/taxon.php?id={$v.taxon_id}">{$v.ref_taxon}</a>
 			{$v.author}
 			{if $v.ref_author} {$v.ref_author}{/if}{/if}{/if}
-			
-			{*
-			<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.label}</a> {$v.author}
-			{if $v.source =='synonym'} &ndash; {t}synonym{/t}{if $v.ref_taxon!=''} {t}of{/t}
-			<a class="internal-link" href="../species/taxon.php?id={$v.taxon_id}">{$v.ref_taxon}</a>{if $v.ref_author} {$v.ref_author}{/if}{/if}{/if}
-			*}
-
 		</p>
 		{/if}
 		{/foreach}

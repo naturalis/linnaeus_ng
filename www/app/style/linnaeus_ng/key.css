@@ -155,9 +155,11 @@
 
 #taxa a {
   display: block;
-  width: 240px;
+  width: 220px;
   text-align: left;
-  padding: 0 4px; }
+  padding: 0 4px;
+  font-size:12.5px;
+ }
 
 #taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
   color: #000;
@@ -176,9 +178,11 @@
 #categories {
   position: relative;
   left: 570px;
-  top: 10px; }
-  #categories a.category-active {
-    background-color: #eeede9 !important; }
+  top: 10px; 
+  font-size:0.9em; 
+  width:auto; }
+#categories a.category-active {
+background-color: #eeede9 !important; }
 
 /* Decision path */
 .module-key #lookup-DialogContent a {
@@ -189,3 +193,7 @@
   border-bottom: 1px dotted #009ee0; }
 .module-key #lookup-DialogContent .row {
   margin-bottom: 1em; }
+
+.name_switch {
+	font-size:11px;
+	font-weight:normal; }

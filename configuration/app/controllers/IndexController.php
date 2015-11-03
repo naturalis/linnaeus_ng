@@ -26,8 +26,7 @@ class IndexController extends Controller
     public function __construct ($p = null)
     {
         parent::__construct($p);
-        $this->setIndexTabs();
-		$this->smarty->assign('hasNameTypes', $this->moduleSession->getModuleSetting('indexModule'));
+        $this->setHasNameTypes();
     }
 
     /**
@@ -84,6 +83,10 @@ class IndexController extends Controller
 		$this->smarty->assign('alpha',$alpha);
 		$this->smarty->assign('letter',$letter);
 		$this->smarty->assign('list',$this->getList($type,$letter,$language));
+
+		$this->smarty->assign('hasSpecies', $this->moduleSession->getModuleSetting('hasSpecies'));
+		$this->smarty->assign('hasHigherTaxa', $this->moduleSession->getModuleSetting('hasHigherTaxa'));
+		$this->smarty->assign('hasCommonNames', $this->moduleSession->getModuleSetting('hasCommonNames'));
 
 		$this->printPage();
     }
@@ -197,7 +200,7 @@ class IndexController extends Controller
         ));
     }
 
-    private function setIndexTabs()
+    private function setHasNameTypes()
     {
 
         // Check if results have been stored in session; if so return

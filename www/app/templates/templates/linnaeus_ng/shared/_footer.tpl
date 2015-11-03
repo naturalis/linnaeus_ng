@@ -40,47 +40,47 @@
 	</div>
 </div>
 
-{literal}
 <script type="text/JavaScript">
 	
-	function showMedia(url,name) {		
+function showMedia(url,name)
+{		
+}
+
+$(document).ready(function()
+{
+	// Apply prettyDialog behaviour to items with inline-image class
+	$(".inline-image").each(function()
+	{
+		$_me = $(this);
+		
+		$_me.attr("rel","prettyDialog");
+		
+		arr_arguments = $_me.attr("onclick").split("'");
+		
+		$_me
+			.attr("href",arr_arguments[1])
+			.attr("title",arr_arguments[3])
+			.removeAttr('onclick')
+			.prettyDialog();
+	});
+
+	if( jQuery().prettyDialog )
+	{
+		$("a[rel^='prettyPhoto']").prettyDialog();
 	}
 
-
-	$(document).ready(function(){
-
-		// Apply prettyDialog behaviour to items with inline-image class
-		$(".inline-image").each(function(){
-			$_me = $(this);
-			
-			$_me.attr("rel","prettyDialog");
-			
-			arr_arguments = $_me.attr("onclick").split("'");
-			
-			$_me
-				.attr("href",arr_arguments[1])
-				.attr("title",arr_arguments[3])
-				.removeAttr('onclick')
-				.prettyDialog();
-		});
-
-		if( jQuery().prettyDialog ) {
-			$("a[rel^='prettyPhoto']").prettyDialog();
-		}
-
-
-		if( jQuery().shrinkText ){
+	if( jQuery().shrinkText )
+	{
+		$("#title a").shrinkText();
+		$("#header-title").shrinkText();
+	
+		$( window ).resize(function()
+		{
 			$("#title a").shrinkText();
 			$("#header-title").shrinkText();
-		
-			$( window ).resize(function(){
-				$("#title a").shrinkText();
-				$("#header-title").shrinkText();
-			});
-		}
+		});
+	}
 
-
-{/literal}
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
 	{foreach from=$requestData key=k item=v}
 	addRequestVar('{$k}','{$v|addslashes}')

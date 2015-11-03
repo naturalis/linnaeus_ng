@@ -10,9 +10,9 @@
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
 {if $cssToLoad}
-{section name=i loop=$cssToLoad}
-	<link rel="stylesheet" type="text/css" media="screen" href="{$cssToLoad[i]}" />
-{/section}
+{foreach $cssToLoad v}
+	<link rel="stylesheet" type="text/css" media="screen" href="{$v}" />
+{/foreach}
 {/if}
 	<link rel="stylesheet" type="text/css" media="print" href="{$projectUrls.projectCSS}print.css" />
     
@@ -35,21 +35,16 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
 
 {if $javascriptsToLoad}
-{section name=i loop=$javascriptsToLoad.all}
-{if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}
-{* if $javascriptsToLoad.all[i]!='main.js' *}
-	<script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.all[i]}"></script>
-{* else}
-	<!-- don't think this is actually necessary -->
-	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/main--linnaeus_ng--skin.js"></script>
-{/if *}
+{foreach $javascriptsToLoad.all v}
+{if $v|strpos:"http:"===false && $v|strpos:"https:"===false}
+	<script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script>
 {else}
-	<script type="text/javascript" src="{$javascriptsToLoad.all[i]}"></script>
+	<script type="text/javascript" src="{$v}"></script>
 {/if}
-{/section}
-{section name=i loop=$javascriptsToLoad.IE}
-	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
-{/section}
+{/foreach}
+{foreach $javascriptsToLoad.IE v}
+	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script><![endif]-->
+{/foreach}
 {/if}
 
 </head>
