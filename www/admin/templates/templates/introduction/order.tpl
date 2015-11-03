@@ -7,7 +7,7 @@
     
     <table id="drag-list" class="grid">
         <tbody>
-        {foreach from=$pages key=k item=v}
+        {foreach $pages v k}
             <tr class="tr-highlight" type="drag-row" drag-id="{$v.id}">
                 <td style="width:450px">{$v.topic}</td>
             </tr>
@@ -30,10 +30,9 @@
 
 {literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-
+$(document).ready(function()
+{
 	allInitDragtable();
-
 })
 </script>
 {/literal}

@@ -82,7 +82,7 @@ class Controller extends BaseClass
     );
 
 	protected $moduleSession;
-
+	protected $baseSession;
 
 
     /**
@@ -975,8 +975,8 @@ class Controller extends BaseClass
 
 		$modules = $this->models->ModulesProjects->_get($p);
 
-		foreach ((array) $modules as $key => $val) {
-
+		foreach ((array) $modules as $key => $val)
+		{
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
 
 			$mp = $this->models->Modules->_get(array(
@@ -984,11 +984,8 @@ class Controller extends BaseClass
 			));
 
 			$modules[$key]['module'] = $mp['module'];
-
 			$modules[$key]['description'] = $mp['description'];
-
 			$modules[$key]['controller'] = $mp['controller'];
-
 			$modules[$key]['show_order'] = $mp['show_order'];
 		}
 
@@ -1046,7 +1043,7 @@ class Controller extends BaseClass
      */
     public function getProjectsMediaStorageDir ()
     {
-        return isset($_SESSION['admin']['project']['paths']['project_media']) ? $_SESSION['admin']['project']['paths']['project_media'] : null;
+		return $this->baseSession->getModuleSetting( 'project_media_path' );
     }
 
 
@@ -1059,7 +1056,7 @@ class Controller extends BaseClass
      */
     public function getProjectsThumbsStorageDir ()
     {
-        return isset($_SESSION['admin']['project']['paths']['project_thumbs']) ? $_SESSION['admin']['project']['paths']['project_thumbs'] : null;
+		return $this->baseSession->getModuleSetting( 'project_thumbs_path' );
     }
 
 
@@ -1096,7 +1093,7 @@ class Controller extends BaseClass
 	*/
     public function setBreadcrumbIncludeReferer ($value = true)
     {
-        $this->breadcrumbIncludeReferer = $value;
+        $this->breadcrumbIncludeReferer=$value;
     }
 
 
@@ -1117,12 +1114,10 @@ class Controller extends BaseClass
      */
     public function isFormResubmit ()
     {
-        $result = false;
-
-        if (isset($this->requestData['rnd']) && isset($_SESSION['admin']['system']['last_rnd']) && ($_SESSION['admin']['system']['last_rnd'] == $this->requestData['rnd']))
-            $result = true;
-
-        return $result;
+		return 
+			$this->rHasVal('rnd') && 
+			null!==$this->baseSession->setModuleSetting( 'last_rnd' ) &&
+			($this->baseSession->setModuleSetting( 'last_rnd' ) == $this->rGetVal('rnd'));
     }
 
 
@@ -1787,13 +1782,13 @@ class Controller extends BaseClass
 
     public function emptyCacheFolder($pId=null)
     {
-		$cachePath = $this->makeCachePath($pId);
+		$cache_path = $this->makeCachePath($pId);
 
-		if (empty($cachePath))
+		if (empty($cache_path))
 			return;
 
-        if (file_exists($cachePath))
-			array_map('unlink', glob($cachePath.'/*'));
+        if (file_exists($cache_path))
+			array_map('unlink', glob($cache_path.'/*'));
     }
 
 
@@ -3018,6 +3013,9 @@ class Controller extends BaseClass
 	{
 		$this->moduleSession=$this->helpers->SessionModuleSettings;
 		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
+
+		$this->baseSession=$this->helpers->SessionModuleSettings;
+		$this->baseSession->setModule( array('environment'=>'admin','controller'=>'base') );
 	}
 
 
@@ -3342,12 +3340,14 @@ class Controller extends BaseClass
             $paths = $this->makePathNames($p);
 
             $_SESSION['admin']['project']['paths']['project_media'] = $paths['project_media'];
-
             $_SESSION['admin']['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
-
             $_SESSION['admin']['project']['paths']['project_media_l2_maps'] = $paths['project_media_l2_maps'];
-
             $_SESSION['admin']['project']['paths']['cache'] = $paths['cache'];
+			
+			$this->baseSession->setModuleSetting( array( 'setting'=>'project_media_path', 'value' => $paths['project_media'] ) );
+			$this->baseSession->setModuleSetting( array( 'setting'=>'project_thumbs_path', 'value' => $paths['project_thumbs'] ) );
+			$this->baseSession->setModuleSetting( array( 'setting'=>'project_media_l2_maps_path', 'value' => $paths['project_media_l2_maps'] ) );
+			$this->baseSession->setModuleSetting( array( 'setting'=>'cache_path', 'value' => $paths['cache'] ) );
 
             foreach ((array) $_SESSION['admin']['project']['paths'] as $key => $val) {
 
@@ -3756,7 +3756,7 @@ class Controller extends BaseClass
     private function saveFormResubmitVal ()
     {
         if (!$this->noResubmitvalReset)
-            $_SESSION['admin']['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+			$this->baseSession->setModuleSetting( array('setting'=>'last_rnd','value'=>$this->rHasVal('rnd') ? $this->rGetVal('rnd') : null ) );
     }
 
 
@@ -3765,7 +3765,7 @@ class Controller extends BaseClass
     {
         if ($this->getCurrentProjectId()) {
 
-            $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
+            $cacheDir = $this->baseSession->getModuleSetting( 'cache_path' );
 
             if (is_dir($cacheDir)) {
 
@@ -3787,10 +3787,10 @@ class Controller extends BaseClass
 		if ($this->useCache == false)
 		return;
 
-		$cacheFile=$_SESSION['admin']['project']['paths']['cache'].$key;
+		$cacheFile=$this->baseSession->getModuleSetting( 'cache_path' ) . $key;
 
 		if (!file_put_contents($cacheFile, serialize($data))) {
-			die('Cannot write to cache folder '.$_SESSION['admin']['project']['paths']['cache']);
+			die('Cannot write to cache folder ' . $this->baseSession->getModuleSetting( 'cache_path' ));
 		}
 	}
 
@@ -3801,7 +3801,7 @@ class Controller extends BaseClass
         if ($this->useCache == false)
             return false;
 
-        $cacheFile=$_SESSION['admin']['project']['paths']['cache'].$key;
+        $cacheFile=$this->baseSession->getModuleSetting( 'cache_path' ) . $key;
 
         if (file_exists($cacheFile)) {
             // Timeout provided and expired
@@ -3819,7 +3819,8 @@ class Controller extends BaseClass
 
     protected function clearCache ($files)
     {
-        $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
+	
+        $cacheDir=$this->baseSession->getModuleSetting( 'cache_path' );
 
         if (empty($files))
             return;
