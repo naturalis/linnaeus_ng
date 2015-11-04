@@ -346,7 +346,7 @@ class SpeciesControllerNSR extends SpeciesController
 	private function getFirstTaxonIdNsr()
 	{
 
-		return $this->models->SpeciesModel->getFirstTaxonIdNsr($this->getCurrentProjectId());
+		return $this->models->{$this->_model}->getFirstTaxonIdNsr($this->getCurrentProjectId());
 
 	}
 
@@ -356,7 +356,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 
-		$categories = $this->models->SpeciesModel->getCategoriesNsr(array(
+		$categories = $this->models->{$this->_model}->getCategoriesNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'taxonId' => $taxon,
     		'languageId' => $this->getCurrentLanguageId(),
@@ -380,7 +380,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if (isset($val['check_query']))
 				{
-					$r = $this->models->SpeciesModel->categoryIsEmptyNsr(
+					$r = $this->models->{$this->_model}->categoryIsEmptyNsr(
 					   str_replace(
 					       array('%pid%','%tid%'),
 					       array($this->getCurrentProjectId(),$taxon),
@@ -538,7 +538,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$id=isset($p['id']) ? $p['id'] : null;
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
-		$names = $this->models->SpeciesModel->getNamesNsr(array(
+		$names = $this->models->{$this->_model}->getNamesNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getDefaultLanguageId(),
     		'taxonId' => $id
@@ -692,7 +692,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc';
 
-		list($data, $total) = $this->models->SpeciesModel->getTaxonMediaNsr(array(
+		list($data, $total) = $this->models->{$this->_model}->getTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id,
@@ -723,7 +723,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if (empty($id))
 			return;
 
-		list($data, $total) = $this->models->SpeciesModel->getCollectedLowerTaxonMediaNsr(array(
+		list($data, $total) = $this->models->{$this->_model}->getCollectedLowerTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id,
@@ -737,7 +737,7 @@ class SpeciesControllerNSR extends SpeciesController
 			array(
 				'count'=>$total, // number of images, one per taxon in this branch
 //				'totalCount'=>$totalCount[0]['total'], // all images in this branch
-				'species' => $this->models->SpeciesModel->taxonMediaCountNsr(array(
+				'species' => $this->models->{$this->_model}->taxonMediaCountNsr(array(
                     'projectId' => $this->getCurrentProjectId(),
 				    'taxonId' => $id
 				)),
@@ -748,7 +748,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function _getTaxonClassification($id)
 	{
-		$taxon = $this->models->SpeciesModel->getTaxonNsr(array(
+		$taxon = $this->models->{$this->_model}->getTaxonNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'predicatePreferredNameId' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
     		'languageId' => $this->getCurrentLanguageId(),
@@ -777,7 +777,7 @@ class SpeciesControllerNSR extends SpeciesController
 			for indigenous
 		*/
 
-		$data = $this->models->SpeciesModel->getSpeciesCountNsr(array(
+		$data = $this->models->{$this->_model}->getSpeciesCountNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'taxonId' => $id,
     		'rankId' => $rank,
@@ -805,7 +805,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$include_count=isset($p['include_count']) ? $p['include_count'] : false;
 		$id=isset($p['taxon']) ? $p['taxon'] : null;
 
-		$data = $this->models->SpeciesModel->getTaxonChildrenNsr(array(
+		$data = $this->models->{$this->_model}->getTaxonChildrenNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'predicateValidNameId' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
     		'languageId' => $this->getCurrentLanguageId(),
@@ -868,7 +868,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if (empty($nameId) && (empty($taxonId) || empty($languageId) || empty($predicateType))) return;
 
-		$d = $this->models->SpeciesModel->getNameNsr(array(
+		$d = $this->models->{$this->_model}->getNameNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'predicateType' => $predicateType,
     		'languageId' => $languageId,
@@ -902,7 +902,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getPresenceData($id)
 	{
-		$data = $this->models->SpeciesModel->getPresenceDataNsr(array(
+		$data = $this->models->{$this->_model}->getPresenceDataNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id
@@ -915,12 +915,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getTrendData($id)
 	{
-	    $byYear = $this->models->SpeciesModel->getTrendDataByYear(array(
+	    $byYear = $this->models->{$this->_model}->getTrendDataByYear(array(
             'projectId' => $this->getCurrentProjectId(),
     	    'taxonId' => $id
 	    ));
 
-		$byTrend = $this->models->SpeciesModel->getTrendDataByTrend(array(
+		$byTrend = $this->models->{$this->_model}->getTrendDataByTrend(array(
             'projectId' => $this->getCurrentProjectId(),
     	    'taxonId' => $id
 	    ));
@@ -1133,7 +1133,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if (empty($id)||empty($org))
 			return;
 
-		$t = $this->models->SpeciesModel->getExternalIdNsr(array(
+		$t = $this->models->{$this->_model}->getExternalIdNsr(array(
             'projectId' => $this->getCurrentProjectId(),
             'taxonId' => $id,
     		'organisation' => $org
@@ -1160,7 +1160,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if (empty($org))
 			return;
 
-		$t = $this->models->SpeciesModel->getExternalOrgNsr(array(
+		$t = $this->models->{$this->_model}->getExternalOrgNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'organisation' => $org
 		));
@@ -1332,7 +1332,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getReferenceAuthors($id)
 	{
-		return $this->models->SpeciesModel->getReferenceAuthorsNsr(array(
+		return $this->models->{$this->_model}->getReferenceAuthorsNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'literatureId' => $id
 		));
@@ -1340,7 +1340,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getReference($id)
 	{
-		$l = $this->models->SpeciesModel->getReferenceNsr(array(
+		$l = $this->models->{$this->_model}->getReferenceNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'literatureId' => $id
 		));
@@ -1378,7 +1378,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ( is_null($taxon_id) || is_null($language_id) ) return;
 
-		return $this->models->SpeciesModel->doesLanguageHavePreferredNameNsr(array(
+		return $this->models->{$this->_model}->doesLanguageHavePreferredNameNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'taxonId' => $taxon_id,
     		'languageId' => $language_id,
@@ -1386,7 +1386,6 @@ class SpeciesControllerNSR extends SpeciesController
 		));
 
 	}
-
 
 
 
