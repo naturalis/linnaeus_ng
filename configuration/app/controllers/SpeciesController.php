@@ -7,6 +7,7 @@ class SpeciesController extends Controller
 	private $_lookupListMaxResults=100;
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
+	private $_model;
 
     public $usedModels = array(
         'commonnames',
@@ -57,8 +58,9 @@ class SpeciesController extends Controller
 
     private function initialise ()
     {
+        $this->setModel();
 
-		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
+        // creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
 		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
 
 			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
@@ -88,6 +90,12 @@ class SpeciesController extends Controller
         $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
 		$this->_defaultSpeciesTab=$this->getSetting('species_default_tab',CTAB_CLASSIFICATION);
 
+    }
+
+    /* Dynamically set proper model name (species/highertaxa) */
+    private function setModel ()
+    {
+       $this->_model = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
     }
 
 
@@ -412,7 +420,7 @@ class SpeciesController extends Controller
 
     public function getFirstTaxonId()
     {
-        return $this->models->SpeciesModel->getFirstTaxonId(array(
+        return $this->models->{$this->_model}->getFirstTaxonId(array(
             'projectId' => $this->getCurrentProjectId(),
             'taxonType' => $this->getTaxonType()
         ));
@@ -425,7 +433,7 @@ class SpeciesController extends Controller
 		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
 			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()] =
-				$this->models->SpeciesModel->getBrowseOrder(array(
+				$this->models->{$this->_model}->getBrowseOrder(array(
                     'projectId' => $this->getCurrentProjectId(),
                     'taxonType' => $this->getTaxonType()
 				));
@@ -1172,7 +1180,7 @@ class SpeciesController extends Controller
         if (empty($search) && !$getAll)
             return;
 
-        list($taxa, $total) = $this->models->SpeciesModel->getTaxa(array(
+        list($taxa, $total) = $this->models->{$this->_model}->getTaxa(array(
             'projectId' => $this->getCurrentProjectId(),
             'taxonType' => $this->getTaxonType(),
             'getAll' => $getAll,
@@ -1331,7 +1339,7 @@ class SpeciesController extends Controller
 		if (is_null($id))
 			return;
 
-		return $this->models->SpeciesModel->getTaxonParentage(array(
+		return $this->models->{$this->_model}->getTaxonParentage(array(
             'projectId' => $this->getCurrentProjectId(),
 		    'taxonId' => $id
 		));
