@@ -42,14 +42,14 @@ final class SpeciesModel extends AbstractModel
 			from %PRE%taxa _a
 			left join %PRE%projects_ranks _b on _a.rank_id=_b.id
 			left join %PRE%ranks _c on _b.rank_id=_c.id
-			where _a.project_id = '.$projectId.'
-			and _b.lower_taxon = '.($taxonType == 'higher' ? 0 : 1).'
+			where _a.project_id = ".$projectId."
+			and _b.lower_taxon = ".($taxonType == 'higher' ? 0 : 1)."
 			order by _a.taxon_order, _a.taxon
 			limit 1";
 
         $t = $this->freeQuery($query);
 
-		return isset($t) ? $t[0]['id'] : null;
+       	return isset($t) ? $t[0]['id'] : null;
     }
 
 
