@@ -1,7 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/AbstractModel.php");
 
-final class SpeciesModel extends AbstractModel
+class SpeciesModel extends AbstractModel
 {
 
     public function __construct ()
