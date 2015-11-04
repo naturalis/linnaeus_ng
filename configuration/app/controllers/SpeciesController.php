@@ -22,8 +22,7 @@ class SpeciesController extends Controller
         'pages_taxa',
         'pages_taxa_titles',
         'synonyms',
-        'tab_order',
-		'taxon_quick_parentage'
+        'tab_order'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
