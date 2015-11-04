@@ -7,7 +7,7 @@ class IntroductionController extends Controller
 
     public $usedModels = array(
 		'content_introduction',
-		'introduction_page',
+		'introduction_pages',
 		'introduction_media'
     );
 
@@ -36,9 +36,7 @@ class IntroductionController extends Controller
      */
     public function __construct($p=null)
     {
-
-        parent::__construct($p);
-
+		parent::__construct($p);
     }
 
     /**
@@ -48,9 +46,7 @@ class IntroductionController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
-
     }
 
     /**
@@ -60,43 +56,18 @@ class IntroductionController extends Controller
      */
 	public function indexAction()
 	{
-
-		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
-
 		$this->setStoreHistory(false);
 
-		if (!$this->rHasVal('page') && !$this->rHasVal('id')) {
-
+		if (!$this->rHasVal('page') && !$this->rHasVal('id'))
+		{
 			$this->redirect('topic.php?id='.$this->getFirstPageId());
-
-		} else {
-
+		} 
+		else 
+		{
 			$id = $this->rHasVal('page') ? $this->requestData['page'] : $this->requestData['id'];
-
 			$this->redirect('topic.php?id='.$id);
-
 		}
-
 	}
-
-
-	private function resolvePageName($name,$languageId)
-	{
-
-		$d =  $this->models->ContentIntroduction->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $languageId,
-					'topic' => $name
-				)
-			)
-		);
-
-		return $d ? $d[0]['page_id'] : null;
-
-	}
-
 
     /**
      * Create new page or edit existing
@@ -105,39 +76,38 @@ class IntroductionController extends Controller
      */
     public function topicAction()
     {
-
-		if (!$this->rHasId()) {
-
+		if (!$this->rHasId())
+		{
 			$page = array(
 				'content' => $this->translate('No ID specified, or no content available.')
 			);
 			$this->smarty->assign('page', $page);
+		} 
+		else
+		{
 
-		} else {
-
-			if (!is_numeric($this->requestData['id'])) {
+			if (!is_numeric($this->requestData['id']))
+			{
 				$id = $this->resolvePageName(
 					$this->requestData['id'],
 					($this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultLanguageId())
 				);
-			} else {
+			} 
+			else 
+			{
 				$id = $this->requestData['id'];
 			}
 
 			$page = $this->getPage($id);
 
 			$page['content'] = $this->matchGlossaryTerms($page['content']);
-
 			$page['content'] = $this->matchHotwords($page['content']);
 
 			$this->setPageName($page['topic']);
 
 			$this->smarty->assign('headerTitles',array('title' => $page['topic']));
-
 			$this->smarty->assign('page', $page);
-
 			$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
-
 		}
 		
 		if ( $this->rHasVal('format','plain') )
@@ -153,7 +123,6 @@ class IntroductionController extends Controller
 
 	public function listAction()
 	{
-
 		$refs = $this->getPageHeaders();
 
 		$this->setPageName($this->translate('Introduction contents'));
@@ -161,7 +130,6 @@ class IntroductionController extends Controller
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 
 		$this->printPage();
-
 	}
 
 
@@ -172,35 +140,29 @@ class IntroductionController extends Controller
 	*/
     public function ajaxInterfaceAction ()
     {
-
         if (!$this->rHasVal('action')) return;
 
-        if ($this->requestData['action'] == 'save_content') {
-
+        if ($this->requestData['action'] == 'save_content')
+		{
             $this->ajaxActionSaveContent();
-
-        } else
-        if ($this->requestData['action'] == 'get_content') {
-
+        } 
+		else
+        if ($this->requestData['action'] == 'get_content')
+		{
             $this->ajaxActionGetContent();
-
         }
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
-
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search']))
+		{
             $this->getLookupList($this->requestData);
-
         }
 
 		$this->allowEditPageOverlay = false;
-
         $this->printPage();
-
     }
 
 	private function getPageHeaders()
 	{
-
-		$ip =  $this->models->IntroductionPage->_get(
+		$ip =  $this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -210,9 +172,8 @@ class IntroductionController extends Controller
 			)
 		);
 
-
-		foreach((array)$ip as $key => $val) {
-
+		foreach((array)$ip as $key => $val)
+		{
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
@@ -225,7 +186,6 @@ class IntroductionController extends Controller
 			);
 
 			$ip[$key]['topic'] = $ip[$key]['label'] = $cfm[0]['topic'];
-
 		}
 
 		return $ip;
@@ -239,7 +199,7 @@ class IntroductionController extends Controller
 
 		if (!isset($id)) return;
 
-		$pfm = $this->models->IntroductionPage->_get(
+		$pfm = $this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'id' => $id,
@@ -249,9 +209,9 @@ class IntroductionController extends Controller
 			)
 		);
 
-		if ($pfm) {
-
-			$page =  $pfm[0];
+		if ($pfm)
+		{
+			$page = $pfm[0];
 
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
@@ -263,14 +223,11 @@ class IntroductionController extends Controller
 				)
 			);
 
-			if ($cfm) {
-
+			if ($cfm)
+			{
 				$page['topic'] = $cfm[0]['topic'];
-
 				$page['content'] = $cfm[0]['content'];
-
 			}
-
 
 			$fmm = $this->models->IntroductionMedia->_get(
 				array(
@@ -281,17 +238,17 @@ class IntroductionController extends Controller
 				)
 			);
 
-			if ($fmm) {
-
+			if ($fmm)
+			{
 				$page['image']['file_name'] = $fmm[0]['file_name'];
-
 				$page['image']['thumb_name'] = $fmm[0]['thumb_name'];
-
 			}
 
 			return $page;
 
-		} else {
+		}
+		else
+		{
 
 			return null;
 
@@ -301,8 +258,7 @@ class IntroductionController extends Controller
 
 	private function getFirstPageId()
 	{
-
-		$ip =  $this->models->IntroductionPage->_get(
+		$ip =  $this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -314,15 +270,12 @@ class IntroductionController extends Controller
 			)
 		);
 
-
 		return isset($ip[0]['id']) ? $ip[0]['id'] : null;
-
 	}
 
 	private function getAdjacentPages($id)
 	{
-
-		$ip = $this->models->IntroductionPage->_get(
+		$ip = $this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -333,45 +286,43 @@ class IntroductionController extends Controller
 			)
 		);
 
-		foreach((array)$ip as $key => $val) {
-
-			if ($val['id']==$id) {
-
+		foreach((array)$ip as $key => $val)
+		{
+			if ($val['id']==$id)
+			{
 				return array(
 					'prev' => isset($ip[$key-1]) ? $ip[$key-1] : null,
 					'next' => isset($ip[$key+1]) ? $ip[$key+1] : null
 				);
-
 			}
-
 		}
 
 		return null;
-
 	}
 
 	private function getLookupList($p)
 	{
-
 		$search = isset($p['search']) ? $p['search'] : null;
 		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
 		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
 
-//		$search = str_replace(array('/','\\'),'',$search);
-
 		if (empty($search) && !$getAll) return;
 
-		if (!$getAll) {
-
+		if (!$getAll)
+		{
 			$d = array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getDefaultLanguageId()
 				);
 
 			if ($matchStartOnly)
+			{
 				$match = mysql_real_escape_string($search).'%';
+			}
 			else
+			{
 				$match = '%'.mysql_real_escape_string($search).'%';
+			}
 
 			$d['topic like'] = $match;
 
@@ -383,12 +334,11 @@ class IntroductionController extends Controller
 				)
 			);
 
-		} else {
-
+		} 
+		else 
+		{
 			$pages = $this->getPageHeaders();
-
 		}
-
 
 		$this->smarty->assign(
 			'returnText',
@@ -399,6 +349,21 @@ class IntroductionController extends Controller
 			))
 		);
 
+	}
+
+	private function resolvePageName($name,$languageId)
+	{
+		$d =  $this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $languageId,
+					'topic' => $name
+				)
+			)
+		);
+
+		return $d ? $d[0]['page_id'] : null;
 	}
 
 }
