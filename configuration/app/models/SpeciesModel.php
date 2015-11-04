@@ -62,13 +62,13 @@ final class SpeciesModel extends AbstractModel
 		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
 		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : false;
 
-        $query = "
+        $query = '
 			select _a.id,_a.taxon
 			from %PRE%taxa _a
 			left join %PRE%projects_ranks _b on _a.rank_id=_b.id
 			where _a.project_id = '.$projectId.'
 			and _b.lower_taxon = '.($taxonType == 'higher' ? 0 : 1).'
-			order by _a.taxon_order, _a.taxon";
+			order by _a.taxon_order, _a.taxon';
 
         return $this->freeQuery($query);
     }
@@ -988,7 +988,8 @@ final class SpeciesModel extends AbstractModel
         $predicateValidNameId =
             isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : false;
 
-        $query = "select
+        $query = "
+            select
 				SQL_CALC_FOUND_ROWS
 				_q.taxon_id,
 				_m.file_name as image,

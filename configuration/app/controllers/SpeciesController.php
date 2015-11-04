@@ -422,11 +422,6 @@ class SpeciesController extends Controller
 	private function getAdjacentTaxa($id)
     {
 
-        die(print_r($this->models->SpeciesModel->getBrowseOrder(array(
-                    'projectId' => $this->getCurrentProjectId(),
-                    'taxonType' => $this->getTaxonType()
-				))));
-
 		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
 			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()] =
