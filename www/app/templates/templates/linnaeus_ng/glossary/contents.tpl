@@ -11,7 +11,7 @@
 		{else}
 	<div id="content">
 			<ul>
-			{foreach from=$gloss item=v}
+			{foreach $gloss v}
 				<li><a href="term.php?id={$v.id}">{$v.term}</a></li>
 			{/foreach}
 			</ul>
