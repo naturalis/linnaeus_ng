@@ -6,7 +6,7 @@
 		{$term.definition}
 		{if $term.synonyms}
 	 	<p id="synonyms"><span id="synonyms-title">{if $term.synonyms|@count > 1}{t}Synonyms{/t}{else}{t}Synonym{/t}{/if} {t}for{/t} {$term.term}</span>: 
-			{foreach from=$term.synonyms key=k item=v name=synonyms}{$v.synonym}{if $v.language} ({$v.language}){/if}{if !$smarty.foreach.synonyms.last}, {/if}{/foreach}.
+			{foreach from=$term.synonyms key=k item=v name=synonyms}{$v.synonym}{if $v.language && $v.language_id!=$currentLanguageId} ({$v.language}){/if}{if !$smarty.foreach.synonyms.last}, {/if}{/foreach}.
 	     </p>  
 	     {/if}
 	</div>
@@ -17,7 +17,7 @@
 		{assign var=widthInCells value=2}
 			<div id="media-grid">
 				{assign var=mediaCat value=false}
-				{foreach from=$term.media key=k item=v}
+				{foreach $term.media v k}
 
 					{assign var=mediaCat value=$v.category}
 					{if $requestData.disp==$v.id}
@@ -37,25 +37,17 @@
 
 						{if $v.category=='image'}
 							{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
-							{if $v.thumb_name != ''}
-								<img
-									id="media-{$k}"
-									alt="{$v.alt}" 
-									src="{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}" 
-									class="image-thumb" />
-							{else}
-								<img
-									id="media-{$k}"
-									alt="{$v.alt}" 
-									src="{$projectUrls.uploadedMedia}{$v.file_name}"
-									class="image-full" />
-							{/if}
+                            <img
+                                id="media-{$k}"
+                                alt="{$v.alt}" 
+                                src="{$v.full_path}"
+                                class="image-full" />
 						{elseif $v.category=='video'}
 								<img 
 									id="media-{$k}"
 									alt="{$v.description}" 
 									src="{$projectUrls.systemMedia}video.png" 
-									onclick="showMedia('{$projectUrls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+									onclick="showMedia('{$v.full_path}','{$v.original_name}');" 
 									class="media-video-icon" />
 						{elseif $v.category=='audio'}
 								<object 
@@ -66,7 +58,7 @@
 									width="130" 
 									height="20">
 									<param name="movie" value="{$soundPlayerName}" />
-									<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
+									<param name="FlashVars" value="mp3={$v.full_path}" />
 								</object>
 						{/if}
 						</a>
@@ -85,23 +77,17 @@
 	{/if}
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-
+$(document).ready(function()
+{
 {if $dispUrl && $dispName}
 	showMedia('{$dispUrl}','{$dispName}'); 
 {/if}
 
-
-{literal}
-	/* $(".group1").colorbox({rel:'group1'}); */
-	
-	$('[id^=media-]').each(function(e){
+	$('[id^=media-]').each(function(e)
+	{
 		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
 	});
 	
 });
 </script>
-{/literal}
