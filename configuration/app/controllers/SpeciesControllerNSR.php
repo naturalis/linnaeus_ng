@@ -89,7 +89,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$id = $this->getFirstTaxonIdNsr();
         }
         else
-			$id = $this->requestData['id'];
+			$id = $this->rGetId();
 
         $this->setStoreHistory(false);
 
@@ -106,7 +106,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function taxonAction()
     {
-		$taxon = $this->getTaxonById($this->rGetVal('id'));
+		$taxon = $this->getTaxonById($this->rGetId());
 
         if (empty($taxon))
 		{
@@ -307,7 +307,7 @@ class SpeciesControllerNSR extends SpeciesController
     {
         if ($this->rHasId())
 		{
-			$name=$this->getName(array('nameId'=>$this->requestData['id']));
+			$name=$this->getName(array('nameId'=>$this->rGetId()));
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 			$this->smarty->assign('name',$name);
 			$this->smarty->assign('taxon',$this->getTaxonById($name['taxon_id']));
