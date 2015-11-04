@@ -104,6 +104,7 @@ class SpeciesController extends Controller
 
     public function indexAction ()
     {
+
         $this->setPageName($this->translate('Species module index'));
 
         $this->setTaxonType('lower');
@@ -421,9 +422,14 @@ class SpeciesController extends Controller
 	private function getAdjacentTaxa($id)
     {
 
+        die(print_r($this->models->SpeciesModel->getBrowseOrder(array(
+                    'projectId' => $this->getCurrentProjectId(),
+                    'taxonType' => $this->getTaxonType()
+				))));
+
 		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
-			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]=
+			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()] =
 				$this->models->SpeciesModel->getBrowseOrder(array(
                     'projectId' => $this->getCurrentProjectId(),
                     'taxonType' => $this->getTaxonType()
@@ -1279,9 +1285,12 @@ class SpeciesController extends Controller
 
     private function _indexAction ()
     {
-        if (!$this->rHasVal('id')) {
+
+        if (!$this->rHasId()) {
 
             $id = $this->getFirstTaxonId();
+
+            //die('id ' . $id);
 
         }
         else {
