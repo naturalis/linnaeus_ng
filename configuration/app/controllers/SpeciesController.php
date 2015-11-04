@@ -7,7 +7,8 @@ class SpeciesController extends Controller
 	private $_lookupListMaxResults=100;
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
-	private $_model;
+
+	protected $_model;
 
     public $usedModels = array(
         'commonnames',
