@@ -1,4 +1,49 @@
 <?php
+/*
+ * Some examples:
+
+Get:
+$this->moduleSession->getModuleSetting('activeLanguage');
+
+Simple set:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage',
+    'value' => 'nl'
+));
+
+Unset a setting by not providing value:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage'
+));
+
+More complicated set with sub-array:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => array(
+        'last_visited' => array(
+            $taxon => array(
+                $category => $d
+            )
+        )
+    )
+));
+
+Get from other module; this requires array rather than single string;
+setting and module parameters required!
+$this->moduleSession->getModuleSetting(array(
+    'module' => 'mapkey',
+    'setting' => 'state'
+));
+
+Set in other module:
+$this->moduleSession->setModuleSetting(array(
+    'module' => 'mapkey',
+    'setting' => 'state'
+    'value' => 1
+));
+
+*/
+
+
 
 class SessionModuleSettings
 {
@@ -173,12 +218,11 @@ class SessionModuleSettings
 
 		$session->setModule(array(
             'environment' => 'admin',
-		    'controller' => $p['module']
+		    'controller' => isset($p['module']) ? $p['module'] : null,
 		));
 
-		unset($p['module']);
-
-        $session->getModuleSetting($p);
+		isset($p['setting']) ? $session->getModuleSetting($p['setting']) :
+            $session->getModuleSetting(null); // triggers error
 
         unset($session);
 
