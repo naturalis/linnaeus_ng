@@ -393,7 +393,7 @@ class SpeciesController extends Controller
             $this->moduleSession->setModuleSetting(array(
                 'setting' => 'state',
                 'module' => 'mapkey',
-                'projectId' => 'mapkey',
+                'projectId' => $this->spid()
             ));
 
             //unset($_SESSION['app']['user']['mapkey']['state']);
@@ -424,11 +424,8 @@ class SpeciesController extends Controller
 
         $storedTaxon = key($lastVisited);
         if ($storedTaxon != $taxon) {
-            $this->moduleSession->setModuleSetting(array(
-                'setting' => array('last_visited' => $storedTaxon)
-            ));
 
-            //unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
+            unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
         }
 
         return false;
@@ -438,11 +435,10 @@ class SpeciesController extends Controller
     private function setlastVisitedCategory($taxon,$category,$d)
     {
         $this->moduleSession->setModuleSetting(array(
-            'setting' => array(
-                'last_visited' => array(
-                    $taxon => array(
-                        $category => $d
-                    )
+            'setting' => 'last_visited',
+            'value' => array(
+                $taxon => array(
+                    $category => $d
                 )
             )
         ));
@@ -1038,38 +1034,31 @@ class SpeciesController extends Controller
 
             foreach ((array) $c as $key => $val) {
 
-                if (isset($_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()])) {
+               $ll = $this->models->LabelsLanguages->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'label_language_id' => $val['language_id'],
+                        'language_id' => $this->getCurrentLanguageId()
+                    ),
+                    'columns' => 'label'
+                ));
 
-                    $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()];
+                if ($ll) {
+
+                    $c[$key]['language_name'] = $ll[0]['label'];
                 }
                 else {
 
-                    $ll = $this->models->LabelsLanguages->_get(
+                    $l = $this->models->Languages->_get(
                     array(
                         'id' => array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'label_language_id' => $val['language_id'],
-                            'language_id' => $this->getCurrentLanguageId()
+                            'id' => $val['language_id']
                         ),
-                        'columns' => 'label'
+                        'columns' => 'language'
                     ));
 
-                    if ($ll) {
-
-                        $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = $ll[0]['label'];
-                    }
-                    else {
-
-                        $l = $this->models->Languages->_get(
-                        array(
-                            'id' => array(
-                                'id' => $val['language_id']
-                            ),
-                            'columns' => 'language'
-                        ));
-
-                        $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = $l[0]['language'];
-                    }
+                    $c[$key]['language_name'] = $l[0]['language'];
                 }
             }
         }
