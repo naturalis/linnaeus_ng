@@ -332,7 +332,7 @@ class KeyController extends Controller
 			);
 
 			$choice = $this->getKeystepChoice($choiceId);
-			$choiceMarker = $this->showOrderToMarker($d[0]['show_order']);
+			$choiceMarker = chr($d[0]['show_order'] + 96);
 
 			// add step & choice to the path
 			array_unshift(
@@ -594,7 +594,7 @@ class KeyController extends Controller
 				$choices[$key]['target'] = null;
 			}
 
-			$choices[$key]['marker'] = $this->showOrderToMarker($val['show_order']);
+			$choices[$key]['marker'] = chr($val['show_order'] + 96);
 
 			if ($val['choice_image_params']!='')
 			{
@@ -889,5 +889,16 @@ class KeyController extends Controller
 		$toSpace = array('<br />', '<br>');
 		return str_replace($remove, '', strip_tags(str_replace($toSpace, ' ', $choice['choice_txt'])));
 	}
+
+
+\
+    private function showOrderToMarker ($showOrder)
+    {
+        return ;
+    }
+
+
+
+
 
 }

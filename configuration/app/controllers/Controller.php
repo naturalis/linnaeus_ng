@@ -169,27 +169,27 @@ class Controller extends BaseClass
     public $allowEditPageOverlay = true;
     public $tmp;
     private $usedModelsBase = array(
-        'free_modules_projects',
-        'glossary',
-        'glossary_synonyms',
-        'hotwords',
-        'interface_texts',
-        'interface_translations',
-        'labels_projects_ranks',
-        'languages',
-        'languages_projects',
-        'modules',
-        'modules_projects',
-		'names',
-        'projects',
-        'projects_ranks',
-        'ranks',
-        'settings',
-        'taxa',
-        'taxa_relations',
-        'taxa_variations',
-    	'trash_can',
-        'variations_labels'
+		'commonname',
+		'free_modules_projects',
+		'glossary',
+		'glossary_synonyms',
+		'hotwords',
+		'interface_texts',
+		'interface_translations',
+		'labels_projects_ranks',
+		'languages',
+		'languages_projects',
+		'modules',
+		'modules_projects',
+		'nbc_extras',
+		'projects',
+		'projects_ranks',
+		'ranks',
+		'settings',
+		'taxa',
+		'taxa_variations',
+		'trash_can',
+		'variations_labels'
     );
     private $usedHelpersBase = array(
 		'session_module_settings',
@@ -219,8 +219,6 @@ class Controller extends BaseClass
 
         $this->setControllerParams($p);
 
-        $this->setPhpIniVars();
-
         $this->setDebugMode();
 
         $this->startSession();
@@ -241,10 +239,9 @@ class Controller extends BaseClass
 
         $this->setRequestData();
 
-        if ($this->getCheckForProjectId()) {
-
+        if ($this->getCheckForProjectId())
+		{
             $this->checkForProjectId();
-
         }
 
         $this->startModuleSession();
@@ -257,8 +254,6 @@ class Controller extends BaseClass
 
         $this->setCurrentLanguageId();
 
-        $this->checkBackStep();
-
 		$this->setSkinName();
 
 		$this->setUrls();
@@ -270,8 +265,6 @@ class Controller extends BaseClass
 		$this->setCssFiles();
 
 		$this->setOtherStuff();
-
-		//$this->splashScreen();
 
     }
 
@@ -302,7 +295,6 @@ class Controller extends BaseClass
 			return 'p-'.$p;
 	}
 
-
 	protected function saveCache ($key, $data)
 	{
 		if ($this->useCache == false)
@@ -314,7 +306,6 @@ class Controller extends BaseClass
 			die('Cannot write to cache folder '.$this->getProjectUrl('cache'));
 		}
 	}
-
 
     public function checkForProjectId ()
     {
@@ -343,8 +334,6 @@ class Controller extends BaseClass
         $this->setUrls();
         $this->setProjectLanguages();
     }
-
-
 
     public function resolveProjectId ()
     {
@@ -385,22 +374,6 @@ class Controller extends BaseClass
         }
     }
 
-
-
-    /**
-     * Makes a numeric show order into another list marker
-     *
-     * Used in the dich. key and in the search results, hence it's inclusion here
-     *
-     * @access     public
-     */
-    public function showOrderToMarker ($showOrder)
-    {
-        return chr($showOrder + 96);
-    }
-
-
-
     public function getVariations ($tId = null)
     {
         $d = array(
@@ -433,8 +406,6 @@ class Controller extends BaseClass
         return $tv;
     }
 
-
-
     public function _buildTaxonTree ($p = null)
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
@@ -446,21 +417,8 @@ class Controller extends BaseClass
 
         $t = $this->getTaxonChildren($pId);
 
-        /*
-        $t = $this->models->Taxa->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'parent_id' . (is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
-            ),
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author',
-            'fieldAsIndex' => 'id',
-            'order' => 'taxon_order,id'
-        ));
-        */
-
-        foreach ((array) $t as $key => $val) {
-
+        foreach ((array) $t as $key => $val)
+		{
             $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
             $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
             $t[$key]['sibling_count'] = count((array) $t);
@@ -485,8 +443,6 @@ class Controller extends BaseClass
         return $t;
     }
 
-
-
     public function getProjectRanks ()
     {
         $pr = $this->getCache('tree-ranks');
@@ -504,8 +460,8 @@ class Controller extends BaseClass
 
             $pl = $this->getProjectLanguages();
 
-            foreach ((array) $pr as $rankkey => $rank) {
-
+            foreach ((array) $pr as $rankkey => $rank)
+			{
                 if (empty($rank['rank_id']))
                     continue;
 
@@ -514,9 +470,7 @@ class Controller extends BaseClass
                 ));
 
                 $pr[$rankkey]['rank'] = $r['rank'];
-
                 $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-
                 $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
 
                 foreach ((array) $pl as $val) {
@@ -541,8 +495,6 @@ class Controller extends BaseClass
         return $pr;
     }
 
-
-
     public function getTaxonById ($id)
     {
         if (empty($id) || !is_numeric($id) || $id==0)
@@ -562,31 +514,19 @@ class Controller extends BaseClass
         return $taxon;
     }
 
-	public function printGenericError($message=null)
-	{
-        $this->smarty->assign('message',(!empty($message) ? $message : $this->translate('An error occurred.')));
-        $this->printPage('../shared/generic-error');
-	}
-
-
 	public function setSearchResultIndexActive($id)
 	{
-
 		$_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] = $id;
-
 	}
 
 	public function getSearchResultIndexActive()
 	{
-
 		return isset($_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive']) ? $_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] : null;
-
 	}
 
-
+	//REFAC2015
 	public function getNbcExtras($p=null)
 	{
-
         $id = isset($p['id']) ? $p['id'] : null;
         $type = isset($p['type']) ? $p['type'] : 'taxon';
         $name = isset($p['name']) ? $p['name'] : null;
@@ -620,12 +560,6 @@ class Controller extends BaseClass
 
 	}
 
-    public function generateRandomHexString ($pre=null,$post=null)
-    {
-        return $pre.substr(md5(rand()), 0, 16).$post;
-    }
-
-
     public function getTreeList ($p = null)
     {
 
@@ -650,7 +584,7 @@ class Controller extends BaseClass
 
 
 
-    public function buildTaxonTree ($p = null)
+    public function buildTaxonTree($p = null)
     {
 
         if (!$this->getCache('species-treeList')) {
@@ -1539,49 +1473,6 @@ class Controller extends BaseClass
         return '<span class="italics">' . $name . '</span>';
     }
 
-
-
-    public function splashScreen()
-    {
-
-		// admin editors that are previewing get no splash
-		if ($this->isLoggedInAdmin()) {
-			$_SESSION['app']['project']['showedSplash']=true;
-            return;
-		}
-
-		// systematically suppressed splash, which is set in view (so the splash screen won't redirect to itself)
-        if ($this->getCheckForSplash()==false) {
-			$_SESSION['app']['project']['showedSplash']=true;
-            return;
-		}
-
-		// already showed splash screen
-        if (isset($_SESSION['app']['project']['showedSplash']) && $_SESSION['app']['project']['showedSplash']===true) {
-            return;
-        }
-
-		// no splash screen has been defined
-        if (!isset($this->generalSettings['urlSplashScreen'])) {
-			return;
-		}
-
-		// optionally suppressed splash, set in project settings
-		if ($this->getSetting('suppress_splash')==1) {
-			$_SESSION['app']['project']['showedSplash']=true;
-            return;
-		}
-
-		// saving the current url for post-splash redirectingh
-		$_SESSION['app']['project']['splashEntryUrl']=$_SERVER['REQUEST_URI'];
-		$_SESSION['app']['project']['showedSplash']=true;
-
-		$this->redirect($this->generalSettings['urlSplashScreen']);
-
-    }
-
-
-
     private function getMainMenu ()
     {
 		$modules=$this->getProjectModules();
@@ -1607,32 +1498,11 @@ class Controller extends BaseClass
 
     private function setControllerParams ($p)
     {
-        if (isset($p['checkForSplash']))
-		{
-            $this->setCheckForSplash($p['checkForSplash']);
-		}
         if (isset($p['checkForProjectId']))
 		{
             $this->setCheckForProjectId($p['checkForProjectId']);
 		}
     }
-
-
-
-    private function setCheckForSplash ($state)
-    {
-        if (is_bool($state))
-            $this->_checkForSplash = $state;
-    }
-
-
-
-    private function getCheckForSplash ()
-    {
-        return $this->_checkForSplash;
-    }
-
-
 
     private function setCheckForProjectId ($state)
     {
@@ -2113,8 +1983,6 @@ class Controller extends BaseClass
         return $encode ? json_encode($d) : $d;
     }
 
-
-
     public function isLoggedInAdmin ()
     {
         if (!isset($_SESSION['admin']['project']['id']))
@@ -2123,8 +1991,6 @@ class Controller extends BaseClass
             return $this->getCurrentProjectId() == $_SESSION['admin']['project']['id'];
     }
 
-
-
     public function doesEntryProgramExist ()
     {
 
@@ -2132,7 +1998,6 @@ class Controller extends BaseClass
         return (file_exists($this->generalSettings['lngFileRoot'] . 'configuration/admin/configuration.php') && file_exists($this->generalSettings['lngFileRoot'] . 'configuration/admin/controllers/Controller.php') &&
          file_exists($this->generalSettings['lngFileRoot'] . 'www/admin/views/utilities/admin_index.php'));
     }
-
 
     public function doesCurrentProjectHaveModule ($mpCode)
     {
@@ -2145,16 +2010,6 @@ class Controller extends BaseClass
 		return isset($d[0]) ? true : false;
     }
 
-
-    private function setPhpIniVars ()
-    {
-
-        // avoid "page expired" messages on using browser's "back"-button
-        //ini_set('session.cache_limiter', 'private');
-    }
-
-
-
     /**
      * Sets a global 'debug' mode, based on a general setting in the config file
      *
@@ -2164,8 +2019,6 @@ class Controller extends BaseClass
     {
         $this->debugMode = $this->generalSettings['debugMode'];
     }
-
-
 
     /**
      * Starts the user's session
@@ -2182,8 +2035,6 @@ class Controller extends BaseClass
             /* DEBUG */
         $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
     }
-
-
 
     private function getProjectDependentTemplates ()
     {
@@ -2207,8 +2058,6 @@ class Controller extends BaseClass
 
         return $r;
     }
-
-
 
     /**
      * Assigns basic Smarty variables
@@ -2247,8 +2096,6 @@ class Controller extends BaseClass
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
     }
 
-
-
     public function loadControllerConfig ($controllerBaseName = null)
     {
         if (isset($controllerBaseName))
@@ -2266,14 +2113,10 @@ class Controller extends BaseClass
         }
     }
 
-
-
     private function loadSmartyConfig ()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
     }
-
-
 
     /**
      * Sets class variables, based on a page's url
@@ -2330,7 +2173,6 @@ class Controller extends BaseClass
 
     }
 
-
     private function startModuleSession()
 	{
 		$this->moduleSession=$this->helpers->SessionModuleSettings;
@@ -2340,7 +2182,6 @@ class Controller extends BaseClass
 		    'projectId' => $this->spid()
 		));
 	}
-
 
 	private function getCurrentPathWithProjectlessQuery()
 	{
@@ -2357,7 +2198,6 @@ class Controller extends BaseClass
 		return '../' . $this->controllerBaseName . '/' . $this->viewName . '.php' . (count($d)>0 ? '?'.implode('&',$d) : '');
 
 	}
-
 
     private function setSkinName ()
     {
@@ -2404,18 +2244,16 @@ class Controller extends BaseClass
 
     }
 
-
-
     private function doesSkinExist ($skin)
     {
-
 		$d = array(
 			$this->baseUrl . $this->getAppName() . '/style/' . $skin . '/',
 			$this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/',
 			$this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/'
 		);
 
-		if (false) {
+		if (false)
+		{
 			echo '<!-- template folders:'.chr(10);
 			foreach((array)$d as $val)
 				echo '  '.$val.': '.(file_exists($val) ? 'ok' : 'missing' ).chr(10);
@@ -2801,30 +2639,8 @@ class Controller extends BaseClass
         ), '', $url);
     }
 
-
-
-    private function checkBackStep ()
-    {
-
-        // check whether this is a clicked "back"-link
-        if ($this->rHasVal('backstep', '1')) {
-
-            // take off the last page from the history (the one the user clicked "back" from)
-            array_pop($_SESSION['app']['user']['history']);
-
-            // remove the variable from the requestdata to avoid its accidental inclusion in any constructed URL's
-            unset($this->requestData['backstep']);
-
-            // as this page was already retrieved from history, it should not be added again
-            $this->storeHistory = false;
-        }
-    }
-
-
-
     private function getBackLink ()
     {
-
         // if there is no history, there is no going back
         if (!isset($_SESSION['app']['user']['history']))
             return;
@@ -2969,7 +2785,7 @@ class Controller extends BaseClass
 						length(hotword) as `length`,
 						(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
 					from
-						%table%
+						%PRE%hotwords
 					where
 						project_id = ' . $this->getCurrentProjectId() .'
 						and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
@@ -2988,12 +2804,12 @@ class Controller extends BaseClass
 
     private function embedNoLink ($matches)
     {
-        if (trim($matches[0]) == '') {
-
+        if (trim($matches[0]) == '')
+		{
             return $matches[0];
         }
-        else {
-
+        else
+		{
             $d = $this->generateRandomHexString('###','###');
 
             while (isset($this->_hotwordNoLinks[$d])) {
@@ -3013,15 +2829,16 @@ class Controller extends BaseClass
 
     private function embedHotwordLink ($matches)
     {
-        if (trim($matches[0]) == '') {
-
+        if (trim($matches[0]) == '')
+		{
             return $matches[0];
         }
-        else {
-
+        else
+		{
             $d = $this->generateRandomHexString('@@@','@@@');
 
-            while (isset($this->_hotwordTempLinks[$d])) {
+            while (isset($this->_hotwordTempLinks[$d]))
+			{
                 $this->generateRandomHexString('@@@','@@@');
             }
 
@@ -3039,8 +2856,8 @@ class Controller extends BaseClass
     {
         $this->_hotwordTempLinks = array_reverse($this->_hotwordTempLinks);
 
-        foreach ((array) $this->_hotwordTempLinks as $val) {
-
+        foreach ((array) $this->_hotwordTempLinks as $val)
+		{
             $txt = str_replace($val['str'], $val['link'], $txt);
         }
 
@@ -3053,8 +2870,8 @@ class Controller extends BaseClass
 
     private function restoreNoLinks ($txt)
     {
-        foreach ((array) $this->_hotwordNoLinks as $val) {
-
+        foreach ((array) $this->_hotwordNoLinks as $val)
+		{
             $txt = str_replace($val['str'], str_ireplace(array(
                 '[no]',
                 '[/no]'
@@ -3157,10 +2974,10 @@ class Controller extends BaseClass
             $this->redirect($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']);
         }
 
-        if (isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()])) {
-
-            foreach ((array) $_SESSION['app']['user']['states'][$this->getControllerBaseName()] as $key => $val) {
-
+        if (isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]))
+		{
+            foreach ((array) $_SESSION['app']['user']['states'][$this->getControllerBaseName()] as $key => $val)
+			{
                 if (!isset($this->requestData[$key]) && $key!='lastPage')
                     $this->requestData[$key] = $val;
             }
@@ -3192,20 +3009,17 @@ class Controller extends BaseClass
 
  	private function makeCachePath()
 	{
-
         $p = $this->getCurrentProjectId();
 
         if (!$p)
             return;
 
         return $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
-
 	}
 
 
     private function createCacheFolder ()
     {
-
 		$cachePath = $this->makeCachePath();
 
 		if (empty($cachePath))
@@ -3215,11 +3029,8 @@ class Controller extends BaseClass
             mkdir($cachePath);
     }
 
-
-
     private function emptyCacheFolderByRequest ()
     {
-
 		if (!$this->rHasVal('clearcache','1'))
 			return;
 
@@ -3232,10 +3043,7 @@ class Controller extends BaseClass
 			array_map('unlink', glob($cachePath.'/*'));
 
 		unset($this->requestData['clearcache']);
-
     }
-
-
 
     private function checkWriteableDirectories ()
     {
@@ -3251,36 +3059,32 @@ class Controller extends BaseClass
 
         $p = $this->getCurrentProjectId();
 
-        if ($p) {
+        if ($p)
+		{
         	$paths[$this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)] =
         	    'www/shared/media/project/' . $this->getProjectFSCode($p);
          }
 
-        foreach ((array) $paths as $val => $display) {
-
-            if ((!file_exists($val) || !is_writable($val)) && @!mkdir($val)) {
+        foreach ((array) $paths as $val => $display)
+		{
+            if ((!file_exists($val) || !is_writable($val)) && @!mkdir($val))
+			{
                  $fixPaths[] = $display;
             }
-
         }
 
-        if (isset($fixPaths)) {
+        if (isset($fixPaths))
+		{
+        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot proceed until this has been corrected:</p>';
 
-        	echo '<p>Some required paths do not exist or are not writeable.
-        	    Linnaeus NG cannot proceed until this has been corrected:</p>';
-
-        	foreach ($fixPaths as $message) {
+        	foreach ($fixPaths as $message)
+			{
         		echo $message . '<br>';
         	}
 
         	die();
-
         }
-
     }
-
-
-
 
     private function saveInterfaceText ($text)
     {
@@ -3366,13 +3170,11 @@ class Controller extends BaseClass
 
 	private function setOtherStuff()
 	{
-
         $this->setRandomValue();
 
-		if ($this->rHasVar('sidx')) {
-
+		if ($this->rHasVar('sidx'))
+		{
 			$this->setSearchResultIndexActive($this->requestData['sidx']);
-
 		}
 	}
 
@@ -3421,15 +3223,18 @@ class Controller extends BaseClass
 	private function setDatabaseLocaleSettings( $language_id )
 	{
 		$lng=$this->models->Languages->_get(array("id"=>array("id"=>$language_id)));
+
 		$locale=
 			isset($lng) && !empty($lng[0]['locale_lin']) ?
 				$lng[0]['locale_lin'] :
 				$this->getSetting('db_lc_time_names','nl_NL');
 
 		$this->models->ControllerModel->setLocale($locale);
-
 	}
 
-
+    private function generateRandomHexString ($pre=null,$post=null)
+    {
+        return $pre.substr(md5(rand()), 0, 16).$post;
+    }
 
 }

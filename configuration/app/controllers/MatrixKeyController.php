@@ -125,7 +125,7 @@ class MatrixKeyController extends Controller
 
 		if (is_null($this->getCurrentMatrixId()))
 		{
-			$this->printGenericError($this->translate('No matrices have been defined.'));
+			$this->addError($this->translate('No matrices have been defined.'));
 		}
 		
 		$this->setIntroductionLinks();
