@@ -21,6 +21,15 @@ class SessionModuleSettings
 
 	public function setModuleSetting( $p )
 	{
+		// Allow setting value in different module
+	    if (isset($p['module'])) {
+
+            $this->setOtherModuleSetting($p);
+
+            return;
+
+		}
+
 		$this->setSetting( $p['setting'] );
 
 		$this->setValue( isset($p['value']) ? $p['value'] : null );
@@ -52,6 +61,7 @@ class SessionModuleSettings
     		}
 		}
 	}
+
 
 	public function getModuleSetting( $setting )
 	{
@@ -136,6 +146,47 @@ class SessionModuleSettings
 		if (empty($this->getSetting()) )
 			die( 'no setting' );
     }
+
+
+
+	private function setOtherModuleSetting ($p) {
+
+		$session = new SessionModuleSettings();
+
+		$session->setModule(array(
+            'environment' => 'app',
+		    'controller' => $p['module'],
+		    'projectId' => $this->spid()
+		));
+
+		unset($p['module']);
+
+        $session->setModuleSetting($p);
+
+        unset($session);
+
+	}
+
+
+	private function getOtherModuleSetting ($p) {
+
+		$session = new SessionModuleSettings();
+
+		$session->setModule(array(
+            'environment' => 'app',
+		    'controller' => $p['module'],
+		    'projectId' => $this->spid()
+		));
+
+		unset($p['module']);
+
+        $session->getModuleSetting($p);
+
+        unset($session);
+
+	}
+
+
 
 }
 
