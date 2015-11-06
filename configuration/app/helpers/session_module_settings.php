@@ -1,4 +1,43 @@
 <?php
+/*
+ * Some examples:
+
+Get:
+$this->moduleSession->getModuleSetting('activeLanguage');
+
+Simple set:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage',
+    'value' => 'nl'
+));
+
+More complicated set with sub-array:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => array(
+        'last_visited' => array(
+            $taxon => array(
+                $category => $d
+            )
+        )
+    )
+));
+
+Get from other module; this requires array rather than single string;
+setting parameter required!
+$this->moduleSession->getModuleSetting(array(
+    'module' => 'language',
+    'setting' => 'activeLanguage'
+));
+
+Set in other module:
+$this->moduleSession->setModuleSetting(array(
+    'module' => 'language',
+    'setting' => 'activeLanguage',
+    'value' => 'nl'
+));
+
+*/
+
 
 class SessionModuleSettings
 {
@@ -178,9 +217,8 @@ class SessionModuleSettings
 		    'projectId' => $this->spid()
 		));
 
-		unset($p['module']);
-
-        $session->getModuleSetting($p);
+		isset($p['setting']) ? $session->getModuleSetting($p['setting']) :
+            $session->getModuleSetting(null); // triggers error
 
         unset($session);
 
