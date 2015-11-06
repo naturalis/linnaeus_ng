@@ -1,4 +1,50 @@
 <?php
+/*
+ * Some examples:
+
+Get:
+$this->moduleSession->getModuleSetting('activeLanguage');
+
+Simple set:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage',
+    'value' => 'nl'
+));
+
+Unset a setting by not providing value:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage'
+));
+
+More complicated set with sub-array:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => array(
+        'last_visited' => array(
+            $taxon => array(
+                $category => $d
+            )
+        )
+    )
+));
+
+Get from other module; this requires array rather than single string;
+setting, module and projectId parameters required!
+$this->moduleSession->getModuleSetting(array(
+    'projectId' => 'mapkey',
+    'module' => 'mapkey',
+    'setting' => 'state'
+));
+
+Set in other module:
+$this->moduleSession->setModuleSetting(array(
+    'projectId' => 'mapkey',
+    'module' => 'mapkey',
+    'setting' => 'state'
+    'value' => 1
+));
+
+*/
+
 
 class SessionModuleSettings
 {
@@ -155,8 +201,8 @@ class SessionModuleSettings
 
 		$session->setModule(array(
             'environment' => 'app',
-		    'controller' => $p['module'],
-		    'projectId' => $this->spid()
+		    'controller' => isset($p['module']) ? $p['module'] : null,
+		    'projectId' => isset($p['projectId']) ? $p['projectId'] : null
 		));
 
 		unset($p['module']);
@@ -174,13 +220,12 @@ class SessionModuleSettings
 
 		$session->setModule(array(
             'environment' => 'app',
-		    'controller' => $p['module'],
-		    'projectId' => $this->spid()
+		    'controller' => isset($p['module']) ? $p['module'] : null,
+		    'projectId' => isset($p['projectId']) ? $p['projectId'] : null
 		));
 
-		unset($p['module']);
-
-        $session->getModuleSetting($p);
+		isset($p['setting']) ? $session->getModuleSetting($p['setting']) :
+            $session->getModuleSetting(null); // triggers error
 
         unset($session);
 
