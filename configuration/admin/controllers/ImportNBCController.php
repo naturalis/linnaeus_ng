@@ -650,7 +650,7 @@ class ImportNBCController extends ImportController
 				'matrix_use_character_groups' => true,
 				'taxa_use_variations' => true,
 				'start_page' => '../../../app/views/matrixkey/identify.php', 
-				'suppress_splash' => '1',
+				//'suppress_splash' => '1',
 				'skin' => $this->_defaultSkinName
 			);
 			
