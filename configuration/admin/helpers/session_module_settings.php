@@ -5,27 +5,34 @@
 Get:
 $this->moduleSession->getModuleSetting('activeLanguage');
 
+
 Simple set:
 $this->moduleSession->setModuleSetting(array(
     'setting' => 'activeLanguage',
     'value' => 'nl'
 ));
 
+
+More complicated set with sub-array:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'last_visited',
+    'value' => array(
+        $taxon => array(
+            $category => $d
+        )
+    )
+));
+
+
 Unset a setting by not providing value:
 $this->moduleSession->setModuleSetting(array(
     'setting' => 'activeLanguage'
 ));
 
-More complicated set with sub-array:
-$this->moduleSession->setModuleSetting(array(
-    'setting' => array(
-        'last_visited' => array(
-            $taxon => array(
-                $category => $d
-            )
-        )
-    )
-));
+
+Unsetting a nested setting currently is not possible and should be done 'manually':
+unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
+
 
 Get from other module; this requires array rather than single string;
 setting and module parameters required!
@@ -33,6 +40,7 @@ $this->moduleSession->getModuleSetting(array(
     'module' => 'mapkey',
     'setting' => 'state'
 ));
+
 
 Set in other module:
 $this->moduleSession->setModuleSetting(array(
@@ -82,30 +90,15 @@ class SessionModuleSettings
 
 		$this->initialize();
 
-		// admin; no project id in session
-		if (is_null($this->getProjectId())) {
+		if ( is_null($this->getValue()) ) {
 
-			if ( is_null($this->getValue()) ) {
+		    unset( $_SESSION[$this->getEnvironment()][$this->getController()][$this->getSetting()] );
 
-			    unset( $_SESSION[$this->getEnvironment()][$this->getController()][$this->getSetting()] );
-
-			} else {
-
-			    $_SESSION[$this->getEnvironment()][$this->getController()][$this->getSetting()]=$this->getValue();
-    		}
-
-    	// app; project id required
 		} else {
 
-			if ( is_null($this->getValue()) ) {
-
-			    unset( $_SESSION[$this->getEnvironment()][$this->getProjectId()][$this->getController()][$this->getSetting()] );
-
-			} else {
-
-			    $_SESSION[$this->getEnvironment()][$this->getProjectId()][$this->getController()][$this->getSetting()]=$this->getValue();
-    		}
+		    $_SESSION[$this->getEnvironment()][$this->getController()][$this->getSetting()]=$this->getValue();
 		}
+
 	}
 
 
