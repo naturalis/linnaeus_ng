@@ -154,9 +154,8 @@ class SessionModuleSettings
 		$session = new SessionModuleSettings();
 
 		$session->setModule(array(
-            'environment' => 'app',
-		    'controller' => $p['module'],
-		    'projectId' => $this->spid()
+            'environment' => 'admin',
+		    'controller' => $p['module']
 		));
 
 		unset($p['module']);
@@ -173,9 +172,8 @@ class SessionModuleSettings
 		$session = new SessionModuleSettings();
 
 		$session->setModule(array(
-            'environment' => 'app',
-		    'controller' => $p['module'],
-		    'projectId' => $this->spid()
+            'environment' => 'admin',
+		    'controller' => $p['module']
 		));
 
 		unset($p['module']);
