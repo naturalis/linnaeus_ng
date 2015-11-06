@@ -1052,8 +1052,8 @@ class Controller extends BaseClass
     {
 		return 
 			$this->rHasVal('rnd') && 
-			null!==$this->baseSession->setModuleSetting( 'last_rnd' ) &&
-			($this->baseSession->setModuleSetting( 'last_rnd' ) == $this->rGetVal('rnd'));
+			null!==$this->baseSession->getModuleSetting( 'last_rnd' ) &&
+			($this->baseSession->getModuleSetting( 'last_rnd' ) == $this->rGetVal('rnd'));
     }
 
 
