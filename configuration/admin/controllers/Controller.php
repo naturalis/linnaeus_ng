@@ -48,8 +48,8 @@ class Controller extends BaseClass
 	public $printBreadcrumbs = true;
 	private $usedModelsBase = array(
 		'activity_log',
-		'freemodules_projects',
-		'freemodules_projects_users',
+		'free_modules_projects',
+		'free_modules_projects_users',
 		'interface_texts',
 		'interface_translations',
 		'labels_projects_ranks',
