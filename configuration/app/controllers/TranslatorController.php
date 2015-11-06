@@ -1,0 +1,201 @@
+<?php
+
+/*
+
+	usage:
+
+	// admin
+	$babelfish = new TranslatorController($this->getAppName(),$this->getCurrentUiLanguage());
+		or
+	// app
+	$babelfish = new TranslatorController($this->getAppName(),$this->getCurrentLanguageId());
+
+	$translation = $bla->translate('Say what?');
+	$translations = $bla->translate(array('Say what?','How\'s that?')));
+
+	translator should be re-initialized when language changes; call initTranslator() again on language change!
+
+	to be added to the controllers:
+	
+		declaration:
+		$this->translator;
+	
+		init:
+		$this->initTranslator();
+		
+		functions:			
+		private function initTranslator()
+		{
+			include_once ('TranslatorController.php');
+			$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage());
+		}
+		
+		public function translate($content)
+		{
+			return $this->translator->translate($content);
+		}
+
+		public function javascriptTranslate($content)
+		{
+			return $this->translator->translate($content);
+		}
+
+		public function smartyTranslate ($params, $content, &$smarty, &$repeat)
+		{
+			$c = $this->translator->translate($content);
+		
+			if (isset($params))
+			{
+				foreach ((array) $params as $key => $val)
+				{
+					if (substr($key, 0, 2) == '_s' && isset($val))
+					{
+						$c = preg_replace('/\%s/', $val, $c, 1);
+					}
+				}
+			}
+			return $c;
+		}			
+	
+*/
+
+
+
+class TranslatorController extends Controller
+{
+
+    public $usedModels = array(
+		'interface_texts',
+		'interface_translations'
+    );
+
+	private $_environment=null;
+	private $_languageid=null;
+	private $_text=null;
+	private $_translation=null;
+	private $_didtranslate=false;
+	private $_isnewstring=false;
+	private $_newStrings=array();
+
+    public function __construct( $env, $languageid )
+    {
+		$this->_environment=$env;
+		$this->_languageid=$languageid;
+        parent::__construct();
+    }
+
+    public function __destruct ()
+    {
+        $this->saveNewStrings();
+        parent::__destruct();
+    }
+
+    public function translate( $s )
+    {
+		if ( empty($s) ) return;
+		
+		if ( is_array($s) )
+		{
+			$translations=array();
+			foreach($s as $key=>$val)
+			{
+				$this->_text=$val;
+				$this->doTranslate();
+				$this->rememberNewString();
+				if ( $this->_didtranslate )
+				{
+					$translations[$key]=$this->_translation;
+				}
+				else
+				{
+					$translations[$key]=$this->_text;
+				}				
+			}
+			return $translations;
+		}
+		else
+		{
+			$this->_text=$s;
+			$this->doTranslate();
+			$this->rememberNewString();
+
+			if ( $this->_didtranslate )
+			{
+				return $this->_translation;
+			}
+			else
+			{
+				return $this->_text;
+			}
+		}
+    }
+	
+    private function doTranslate()
+    {
+		$this->_didtranslate=false;
+		$this->_isnewstring=false;
+		
+		if ( empty($this->_text) )
+			return;
+
+		if ( empty($this->_languageid) )
+			return;
+
+        // get id of the text
+        $i = $this->models->InterfaceTexts->_get(array(
+            'id' => array(
+                'text' => $this->_text,
+                'env' => $this->_environment
+            ),
+            'columns' => 'id'
+        ));
+
+        // if not found, return unchanged
+        if (empty($i[0]['id']))
+		{
+			$this->_isnewstring=true;
+			return;
+		}
+	
+		// fetch appropriate translation
+		$it = $this->models->InterfaceTranslations->_get(
+			array(
+				'id' => array(
+					'interface_text_id' => $i[0]['id'],
+					'language_id' => $this->_languageid
+				),
+				'columns' => 'id,translation',
+				'limit' => 1
+			));
+	
+		// if not found, return unchanged
+		if ( empty($it[0]['id']) )
+			return;
+
+		$this->_translation=$it[0]['translation'];
+		$this->_didtranslate=true;
+
+    }
+
+	private function rememberNewString()
+	{
+		if (!$this->_didtranslate)
+			array_push($this->_newStrings,$this->_text);
+	}
+
+    private function saveNewStrings()
+    {
+		$this->_newStrings=array_unique($this->_newStrings);
+		
+		foreach($this->_newStrings as $text)
+		{
+			$d=$this->models->InterfaceTexts->_get(array('id'=>array('text' => $text,'env' => $this->_environment)));
+			
+			if (!$d)
+			{
+				$this->models->InterfaceTexts->save(array('id' => null,'text' => $text,'env' => $this->_environment));
+			}
+		}
+    }
+
+}
