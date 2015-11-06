@@ -49,7 +49,7 @@ class ProjectsController extends Controller
 		array('taxon_page_ext_classification','bool',1),
 		array('skin','[name]','nbc_default'),
 		array('skin_mobile','[name]','nbc_default_mobile'),
-		array('suppress_splash','bool',0,'bypass splash screen'),
+		//array('suppress_splash','bool',0,'bypass splash screen'),
 		array('start_page','[url]',null,'default start page of project'),
 		array('nbc_image_root','[url]',null,'for system images'),
 
