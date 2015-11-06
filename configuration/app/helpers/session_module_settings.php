@@ -1,4 +1,58 @@
 <?php
+/*
+ * Some examples:
+
+Get:
+$this->moduleSession->getModuleSetting('activeLanguage');
+
+
+Simple set:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage',
+    'value' => 'nl'
+));
+
+
+More complicated set with sub-array:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'last_visited',
+    'value' => array(
+        $taxon => array(
+            $category => $d
+        )
+    )
+));
+
+
+Unset a setting by not providing value:
+$this->moduleSession->setModuleSetting(array(
+    'setting' => 'activeLanguage'
+));
+
+
+Unsetting a nested setting currently is not possible and should be done 'manually':
+unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
+
+
+Get from other module; this requires array rather than single string;
+setting, module and projectId (= $this->spid()) parameters are required!
+$this->moduleSession->getModuleSetting(array(
+    'projectId' => 1,
+    'module' => 'mapkey',
+    'setting' => 'state'
+));
+
+
+Set in other module:
+$this->moduleSession->setModuleSetting(array(
+    'projectId' => 1,
+    'module' => 'mapkey',
+    'setting' => 'state'
+    'value' => 1
+));
+
+*/
+
 
 class SessionModuleSettings
 {
@@ -21,37 +75,32 @@ class SessionModuleSettings
 
 	public function setModuleSetting( $p )
 	{
+		// Allow setting value in different module
+	    if (isset($p['module'])) {
+
+            $this->setOtherModuleSetting($p);
+
+            return;
+
+		}
+
 		$this->setSetting( $p['setting'] );
 
 		$this->setValue( isset($p['value']) ? $p['value'] : null );
 
 		$this->initialize();
 
-		// admin; no project id in session
-		if (is_null($this->getProjectId())) {
+		if (is_null($this->getValue())) {
 
-			if ( is_null($this->getValue()) ) {
+		    unset( $_SESSION[$this->getEnvironment()][$this->getProjectId()][$this->getController()][$this->getSetting()] );
 
-			    unset( $_SESSION[$this->getEnvironment()][$this->getController()][$this->getSetting()] );
-
-			} else {
-
-			    $_SESSION[$this->getEnvironment()][$this->getController()][$this->getSetting()]=$this->getValue();
-    		}
-
-    	// app; project id required
 		} else {
 
-			if ( is_null($this->getValue()) ) {
+		    $_SESSION[$this->getEnvironment()][$this->getProjectId()][$this->getController()][$this->getSetting()]=$this->getValue();
 
-			    unset( $_SESSION[$this->getEnvironment()][$this->getProjectId()][$this->getController()][$this->getSetting()] );
-
-			} else {
-
-			    $_SESSION[$this->getEnvironment()][$this->getProjectId()][$this->getController()][$this->getSetting()]=$this->getValue();
-    		}
 		}
 	}
+
 
 	public function getModuleSetting( $setting )
 	{
@@ -136,6 +185,46 @@ class SessionModuleSettings
 		if (empty($this->getSetting()) )
 			die( 'no setting' );
     }
+
+
+
+	private function setOtherModuleSetting ($p) {
+
+		$session = new SessionModuleSettings();
+
+		$session->setModule(array(
+            'environment' => 'app',
+		    'controller' => isset($p['module']) ? $p['module'] : null,
+		    'projectId' => isset($p['projectId']) ? $p['projectId'] : null
+		));
+
+		unset($p['module']);
+
+        $session->setModuleSetting($p);
+
+        unset($session);
+
+	}
+
+
+	private function getOtherModuleSetting ($p) {
+
+		$session = new SessionModuleSettings();
+
+		$session->setModule(array(
+            'environment' => 'app',
+		    'controller' => isset($p['module']) ? $p['module'] : null,
+		    'projectId' => isset($p['projectId']) ? $p['projectId'] : null
+		));
+
+		isset($p['setting']) ? $session->getModuleSetting($p['setting']) :
+            $session->getModuleSetting(null); // triggers error
+
+        unset($session);
+
+	}
+
+
 
 }
 

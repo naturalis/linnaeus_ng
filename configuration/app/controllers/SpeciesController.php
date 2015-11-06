@@ -22,8 +22,7 @@ class SpeciesController extends Controller
         'pages_taxa',
         'pages_taxa_titles',
         'synonyms',
-        'tab_order',
-		'taxon_quick_parentage'
+        'tab_order'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -105,7 +104,12 @@ class SpeciesController extends Controller
     public function setTaxonType ($type)
     {
 		//public as it needs to be callable from the view
-        $_SESSION['app'][$this->spid()]['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
+        //$_SESSION['app'][$this->spid()]['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
+
+        $this->moduleSession->setModuleSetting(array(
+            'setting' => 'type',
+            'value' => ($type == 'higher') ? 'higher' : 'lower'
+        ));
     }
 
 
@@ -364,7 +368,8 @@ class SpeciesController extends Controller
 
     private function getTaxonType()
     {
-        return isset($_SESSION['app'][$this->spid()]['species']['type']) ? $_SESSION['app'][$this->spid()]['species']['type'] : 'lower';
+        return !is_null($this->moduleSession->getModuleSetting('type')) ?
+            $this->moduleSession->getModuleSetting('type') : 'lower';
     }
 
 
@@ -380,13 +385,26 @@ class SpeciesController extends Controller
     {
         if (!is_null($id)) {
 
-            $_SESSION['app'][$this->spid()]['species']['lastTaxon'] = $id;
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'lastTaxon',
+                'value' => $id
+            ));
 
-            unset($_SESSION['app']['user']['mapkey']['state']);
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'state',
+                'module' => 'mapkey',
+                'projectId' => $this->spid()
+            ));
+
+            //unset($_SESSION['app']['user']['mapkey']['state']);
         }
         else {
 
-            unset($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'lastTaxon'
+            ));
+
+            //unset($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
         }
     }
 
@@ -394,19 +412,20 @@ class SpeciesController extends Controller
     private function getlastVisitedCategory($taxon,$category)
     {
 
-		if (!$this->useCache)
+		if (!$this->useCache || is_null($this->moduleSession->getModuleSetting('last_visited'))) {
 			return false;
+		}
 
-        if (isset($_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category])) {
-            return $_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category];
+		$lastVisited = $this->moduleSession->getModuleSetting('last_visited');
+
+        if (isset($lastVisited[$taxon][$category])) {
+            return $lastVisited[$taxon][$category];
         }
 
-        if (isset($_SESSION['app'][$this->spid()]['species']['last_visited'])) {
+        $storedTaxon = key($lastVisited);
+        if ($storedTaxon != $taxon) {
 
-            $storedTaxon = key($_SESSION['app'][$this->spid()]['species']['last_visited']);
-            if ($storedTaxon != $taxon) {
-                unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
-            }
+            unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
         }
 
         return false;
@@ -415,7 +434,16 @@ class SpeciesController extends Controller
 
     private function setlastVisitedCategory($taxon,$category,$d)
     {
-        $_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category] = $d;
+        $this->moduleSession->setModuleSetting(array(
+            'setting' => 'last_visited',
+            'value' => array(
+                $taxon => array(
+                    $category => $d
+                )
+            )
+        ));
+
+        //$_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category] = $d;
     }
 
 
@@ -431,7 +459,9 @@ class SpeciesController extends Controller
 	private function getAdjacentTaxa($id)
     {
 
-		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
+        $browseOrder = $this->moduleSession->getModuleSetting('browse_order');
+/*
+        if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
 			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()] =
 				$this->models->{$this->_model}->getBrowseOrder(array(
@@ -439,14 +469,30 @@ class SpeciesController extends Controller
                     'taxonType' => $this->getTaxonType()
 				));
 		}
+*/
+        if (!isset($browseOrder[$this->getTaxonType()])) {
+
+            $browseOrder[$this->getTaxonType()] = $this->models->{$this->_model}->getBrowseOrder(array(
+                'projectId' => $this->getCurrentProjectId(),
+                'taxonType' => $this->getTaxonType()
+		    ));
+
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'browse_order',
+                'value' => array(
+                    $this->getTaxonType() => $browseOrder[$this->getTaxonType()]
+                )
+            ));
+
+		}
 
 		$prev=$next=false;
-		while (list ($key, $val) = each($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
+		while (list ($key, $val) = each($browseOrder[$this->getTaxonType()])) {
 
 			if ($val['id']==$id) {
 
 				// current = next because the pointer has already shifted forward
-				$next = current($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]);
+				$next = current($browseOrder[$this->getTaxonType()]);
 
 				return array(
 					'prev' => $prev!==false ? array(
@@ -516,14 +562,22 @@ class SpeciesController extends Controller
 		foreach ((array) $tp as $key => $val)
 		{
 
-			if (!isset($_SESSION['app'][$this->spid()]['species']['defaultCategory'])) {
-                $_SESSION['app'][$this->spid()]['species']['defaultCategory'] = $val['id'];
+		    if (is_null($this->moduleSession->getModuleSetting('defaultCategory'))) {
+                $this->moduleSession->setModuleSetting(array(
+                    'setting' => 'defaultCategory',
+                    'value' => $val['id']
+                ));
 			}
+
 			$tp[$key]['title'] = $this->getCategoryName($val['id']);
 			$tp[$key]['tabname'] = 'TAB_'.str_replace(' ','_',strtoupper($val['page']));
 
-			if ($val['def_page'] == 1)
-				$_SESSION['app'][$this->spid()]['species']['defaultCategory'] = $val['id'];
+			if ($val['def_page'] == 1) {
+                $this->moduleSession->setModuleSetting(array(
+                    'setting' => 'defaultCategory',
+                    'value' => $val['id']
+                ));
+			}
 		}
 
 
@@ -562,14 +616,16 @@ class SpeciesController extends Controller
                     'columns' => 'page_id,publish,content'
                 ));
 
-                if (($ct[0]['publish'] == '1' || $allowUnpublished) && strlen($ct[0]['content']) > 0)
+                if (($ct[0]['publish'] == '1' || $allowUnpublished) && strlen($ct[0]['content']) > 0) {
                     $val['is_empty'] = 0;
+                }
 
                 $d[$key] = $val;
 
-                if ($ct[0]['page_id'] == $_SESSION['app'][$this->spid()]['species']['defaultCategory'])
-                    $defCat = $_SESSION['app'][$this->spid()]['species']['defaultCategory'];
-            }
+                if ($ct[0]['page_id'] == $this->moduleSession->getModuleSetting('defaultCategory')) {
+                    $defCat = $this->moduleSession->getModuleSetting('defaultCategory');
+                }
+			}
 
 			foreach ((array) $d as $key => $val) {
 				$categoryList[$key] = $val['title'];
@@ -671,7 +727,7 @@ class SpeciesController extends Controller
 
 		return array(
             'categories' => $tp,
-			'defaultCategory' => isset($defCat) ? $defCat : $_SESSION['app'][$this->spid()]['species']['defaultCategory'],
+			'defaultCategory' => isset($defCat) ? $defCat : $this->moduleSession->getModuleSetting('defaultCategory'),
 			'categoryList' => isset($categoryList) ? $categoryList : null,
 			'categorySysList' => isset($categorySysList) ? $categorySysList : null,
 			'emptinessList' => isset($emptinessList) ? $emptinessList : null
@@ -978,38 +1034,31 @@ class SpeciesController extends Controller
 
             foreach ((array) $c as $key => $val) {
 
-                if (isset($_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()])) {
+               $ll = $this->models->LabelsLanguages->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'label_language_id' => $val['language_id'],
+                        'language_id' => $this->getCurrentLanguageId()
+                    ),
+                    'columns' => 'label'
+                ));
 
-                    $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()];
+                if ($ll) {
+
+                    $c[$key]['language_name'] = $ll[0]['label'];
                 }
                 else {
 
-                    $ll = $this->models->LabelsLanguages->_get(
+                    $l = $this->models->Languages->_get(
                     array(
                         'id' => array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'label_language_id' => $val['language_id'],
-                            'language_id' => $this->getCurrentLanguageId()
+                            'id' => $val['language_id']
                         ),
-                        'columns' => 'label'
+                        'columns' => 'language'
                     ));
 
-                    if ($ll) {
-
-                        $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = $ll[0]['label'];
-                    }
-                    else {
-
-                        $l = $this->models->Languages->_get(
-                        array(
-                            'id' => array(
-                                'id' => $val['language_id']
-                            ),
-                            'columns' => 'language'
-                        ));
-
-                        $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = $l[0]['language'];
-                    }
+                    $c[$key]['language_name'] = $l[0]['language'];
                 }
             }
         }

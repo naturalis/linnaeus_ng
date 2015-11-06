@@ -27,21 +27,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 	public $usedModelsNsr = array(
 		'actors',
-		'external_ids',
-		'external_orgs',
-		'literature2',
-		'literature2_authors',
-		'media_meta',
 		'name_types',
-		'names',
 		'names_additions',
-		'nsr_ids',
-		'presence_taxa',
-		'taxon_trend_years',
-		'taxon_trends',
-        'nbc_extras',
-        'taxa_relations',
-        'variation_relations'
+		'nsr_ids'
 	);
 
     public function __construct()
