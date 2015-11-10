@@ -29,7 +29,7 @@ final class ControllerModel extends AbstractModel
     public function getProjectRanks ($params)
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
-        $language_id = isset($language_id['language_id']) ? $language_id['language_id'] : null;
+        $language_id = isset($params['language_id']) ? $params['language_id'] : null;
 
 		if ( is_null($project_id) || is_null($language_id) )
 			return null;
@@ -111,7 +111,7 @@ final class ControllerModel extends AbstractModel
     public function getTaxonParentage ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-        $taxonId = isset($language_id['taxonId']) ? $language_id['taxonId'] : null;
+        $taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
 		if (is_null($projectId) || is_null($taxonId)) {
 			return null;
@@ -171,7 +171,7 @@ final class ControllerModel extends AbstractModel
 	public function deleteTaxonParentage ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-        $taxonId = isset($language_id['taxonId']) ? $language_id['taxonId'] : null;
+        $taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
         if (is_null($projectId)) {
 			return null;
@@ -190,7 +190,7 @@ final class ControllerModel extends AbstractModel
 	public function checkNsrCode ($params)
 	{
 	    $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-        $nsrCode = isset($language_id['nsrCode']) ? $language_id['nsrCode'] : null;
+        $nsrCode = isset($params['nsrCode']) ? $params['nsrCode'] : null;
 
         if (is_null($projectId) || is_null($nsrCode)) {
 			return null;
@@ -210,7 +210,7 @@ final class ControllerModel extends AbstractModel
 	public function checkRdfId ($params)
 	{
 	    $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-        $rdfId = isset($language_id['rdfId']) ? $language_id['rdfId'] : null;
+        $rdfId = isset($params['rdfId']) ? $params['rdfId'] : null;
 
         if (is_null($projectId) || is_null($rdfId)) {
 			return null;
@@ -220,7 +220,7 @@ final class ControllerModel extends AbstractModel
             select count(*) as total
 			from %PRE%nsr_ids
 			where
-				project_id = ".$this->getCurrentProjectId()."
+				project_id = ".$projectId."
 				and rdf_id = '".$rdfId."'";
 
         return $this->freeQuery($query);
