@@ -62,6 +62,7 @@ class Controller extends BaseClass
 		'projects_ranks',
 		'projects_roles_users',
 		'ranks',
+		'rights',
 		'rights_roles',
 		'roles',
 		'settings',
@@ -2659,6 +2660,11 @@ class Controller extends BaseClass
 		return isset($this->requestData[$var]) ? $this->requestData[$var] : null;
     }
 
+
+    public function rGetAll()
+    {
+		return isset($this->requestData) ? $this->requestData : null;
+    }
 
 
     public function rHasId ()
