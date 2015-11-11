@@ -14,8 +14,6 @@ class SpeciesMediaController extends Controller
         'image_thumber_helper', 
         'hr_filesize_helper'
     );
-    public $cacheFiles = array(
-    );
     public $cssToLoad = array(
         'prettyPhoto/prettyPhoto.css', 
         'taxon.css', 

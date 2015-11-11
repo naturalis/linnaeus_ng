@@ -661,7 +661,7 @@ class SpeciesController extends Controller
 
                     $this->clearErrors();
 
-                    $this->clearCache($this->cacheFiles);
+                    
 
                     $this->models->Taxon->save(
                     array(
@@ -705,8 +705,6 @@ class SpeciesController extends Controller
 					$data = $this->getTaxonById();
 
                     $this->smarty->assign('data', $d);
-
-					$this->clearCache($this->cacheFiles['list']);
 
                 }
                 else {
@@ -879,7 +877,7 @@ class SpeciesController extends Controller
 				{
                     $this->clearErrors();
 
-                    $this->clearCache($this->cacheFiles);
+                    
 
                     $this->models->Taxon->save(
                     array(
@@ -956,7 +954,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasVal('action', 'process') && $this->rHasId()) {
 
-            $this->clearCache($this->cacheFiles);
+            
 
 			set_time_limit(600);
 
@@ -1044,7 +1042,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasVal('child')) {
 
-            $this->clearCache($this->cacheFiles);
+            
 
             foreach ((array) $this->requestData['child'] as $key => $val) {
 
@@ -1752,7 +1750,7 @@ class SpeciesController extends Controller
         }
         else if ($this->requestData['action'] == 'delete_taxon') {
 
-            $this->clearCache($this->cacheFiles);
+            
 
             $this->ajaxActionDeleteTaxon();
         }
@@ -1782,13 +1780,11 @@ class SpeciesController extends Controller
         }
         else if ($this->requestData['action'] == 'save_col') {
 
-            $this->clearCache($this->cacheFiles);
+            
 
             $this->ajaxActionImportTaxa();
         }
         else if ($this->requestData['action'] == 'save_taxon_name') {
-
-            $this->clearCache($this->cacheFiles['list']);
 
             $this->ajaxActionSaveTaxonName();
         }
@@ -1878,8 +1874,6 @@ class SpeciesController extends Controller
 
         }
 		 else if ($this->rHasVal('action', 'save_synonym_data') && !empty($this->requestData['id']) && !empty($this->requestData['val']) && !empty($this->requestData['col'])) {
-
-            $this->clearCache($this->cacheFiles['list']);
 
 			if ($this->requestData['col']=='s')
 				$what = array('synonym' => trim($this->requestData['val']));
@@ -2320,26 +2314,9 @@ class SpeciesController extends Controller
                 ),
                 'order' => 'show_order'
             ));
-            /*
-			foreach((array)$synonyms as $key => $val) {
-
-				if($val['lit_ref_id']) {
-
-					$synonyms[$key]['literature'] = $this->doMultiArrayFind($literature,'id',$val['lit_ref_id']);
-					$synonyms[$key]['literature'] = array_shift($synonyms[$key]['literature']);
-
-				}
-
-			}
-*/
         }
 
         $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
-
-        //		$this->smarty->assign('literature', $literature);
-
-
-
 
         $this->smarty->assign('id', $this->requestData['id']);
 

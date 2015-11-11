@@ -220,16 +220,7 @@ class KeyController extends Controller
 
 	public function getKeyTree()
 	{
-		$tree = $this->getCache('tree-keyTree');
-		$this->_choiceList = $this->getCache('tree-choiceList');
-
-		if (!$tree || !$this->_choiceList)
-		{
-			$tree = $this->setKeyTree();
-			$this->saveCache('tree-keyTree', $tree);
-			$this->saveCache('tree-choiceList', $this->_choiceList);
-		}
-
+		$tree = $this->setKeyTree();
 		return $tree;
 	}
 

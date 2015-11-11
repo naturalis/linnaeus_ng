@@ -54,24 +54,6 @@
 	 specific stylesheet either called "0023.css" or "0023--imaginary-beings.css",
 	 where 23 is the project ID and "imaginary beings" is the project's system name.
 
-
-	on caching:
-	the cache-folder can be found at:
-		[htdocs]/linnaeus_ng/www/shared/cache/[project-code]/
-	'project-code' being the system project-code (formatted as '0023').
-	to clear the cache, add
-		clearcache=1
-	to the url. this will delete all the project's cache-files. please note that in
-	many cases, the application will immediately create one or more new cache-files, so
-	don't be fooled into thinking clearing of the cache hasn't worked because there are
-	still files in the directory. make sure to remove the "clearcache" from the URL
-	afterwards, otherwise it will propagate through your session, deleting the
-	cache-files at every next page.
-	to suppress caching, set the variable $useCache to false. doing so will stop the
-	application from both storing and retrieving data from the cache. existing cache-
-	files will remain intact.
-
-
 	on translations:
 	after repeated problems with the "official" getText() functions, the function has
 	been replaced with a custom one:
@@ -103,7 +85,7 @@
 	there is the concept of the snippet. snippets are bit of html-code that are included
 	in template if they exist for the current project. they are included like this:
 		{snippet}matrix_main_menu.html{/snippet}
-	after which the function smartyTranslateGetSnippet searches for the specified file
+	after which the function smartyGetSnippet searches for the specified file
 	in the projects snippet-folder, which is
 		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/[project-code]/
 	if the file (or the directory) doesn't exist, nothing is included, and no error is
@@ -151,7 +133,6 @@ class Controller extends BaseClass
     private $_hotwordNoLinks = array();
     private $_tmpTree = null;
 
-    public $useCache = false;//true;
     public $viewName;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
@@ -196,7 +177,8 @@ class Controller extends BaseClass
         'logging_helper',
         'debug_tools',
 		'user_agent',
-		'functions'
+		'functions',
+		'custom_array_sort'
     );
     public $cssToLoadBase = array(
         'basics.css',
@@ -246,19 +228,17 @@ class Controller extends BaseClass
 
         $this->startModuleSession();
 
-		$this->emptyCacheFolderByRequest();
-
         $this->restoreState();
 
         $this->setProjectLanguages();
 
         $this->setCurrentLanguageId();
 
+		$this->initTranslator();
+
 		$this->setSkinName();
 
 		$this->setUrls();
-
-		$this->createCacheFolder();
 
 		$this->setSmartySettings();
 
@@ -293,18 +273,6 @@ class Controller extends BaseClass
 			return 'p-general';
 		else
 			return 'p-'.$p;
-	}
-
-	protected function saveCache ($key, $data)
-	{
-		if ($this->useCache == false)
-		return;
-
-		$cacheFile=$this->getProjectUrl('cache').$key;
-
-		if (!file_put_contents($cacheFile, serialize($data))) {
-			die('Cannot write to cache folder '.$this->getProjectUrl('cache'));
-		}
 	}
 
     public function checkForProjectId ()
@@ -445,52 +413,45 @@ class Controller extends BaseClass
 
     public function getProjectRanks ()
     {
-        $pr = $this->getCache('tree-ranks');
+		$pr = $this->models->ProjectsRanks->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			),
+			'fieldAsIndex' => 'id',
+			'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
+		));
 
-        if (!$pr) {
+		$pl = $this->getProjectLanguages();
 
-            $pr = $this->models->ProjectsRanks->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ),
-                'fieldAsIndex' => 'id',
-                'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
-            ));
+		foreach ((array) $pr as $rankkey => $rank)
+		{
+			if (empty($rank['rank_id']))
+				continue;
 
-            $pl = $this->getProjectLanguages();
+			$r = $this->models->Ranks->_get(array(
+				'id' => $rank['rank_id']
+			));
 
-            foreach ((array) $pr as $rankkey => $rank)
-			{
-                if (empty($rank['rank_id']))
-                    continue;
+			$pr[$rankkey]['rank'] = $r['rank'];
+			$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+			$pr[$rankkey]['abbreviation'] = $r['abbreviation'];
 
-                $r = $this->models->Ranks->_get(array(
-                    'id' => $rank['rank_id']
-                ));
+			foreach ((array) $pl as $val) {
 
-                $pr[$rankkey]['rank'] = $r['rank'];
-                $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-                $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
+				$lpr = $this->models->LabelsProjectsRanks->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'project_rank_id' => $rank['id'],
+						'language_id' => $val['language_id']
+					),
+					'columns' => 'label'
+				));
 
-                foreach ((array) $pl as $val) {
-
-                    $lpr = $this->models->LabelsProjectsRanks->_get(
-                    array(
-                        'id' => array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'project_rank_id' => $rank['id'],
-                            'language_id' => $val['language_id']
-                        ),
-                        'columns' => 'label'
-                    ));
-
-                    $pr[$rankkey]['labels'][$val['id']] = $lpr[0]['label'];
-                }
-            }
-
-            $this->saveCache('tree-ranks', $pr);
-        }
+				$pr[$rankkey]['labels'][$val['id']] = $lpr[0]['label'];
+			}
+		}
 
         return $pr;
     }
@@ -586,25 +547,12 @@ class Controller extends BaseClass
 
     public function buildTaxonTree($p = null)
     {
+		$this->_buildTaxonTree();
 
-        if (!$this->getCache('species-treeList')) {
-
-            $this->_buildTaxonTree();
-
-			if (isset($this->treeList))
-				uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
-
-            $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
-        }
-        else {
-
-            $this->treeList = $this->getCache('species-treeList');
-
-        }
+		if (isset($this->treeList))
+			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
 
         return $this->getTreeList($p);
-
-        //return $this->getCache('species-tree'); // return value is unused!
     }
 
 
@@ -1524,8 +1472,6 @@ class Controller extends BaseClass
         if ($this->_allowEditOverlay === false)
             return;
 
-		$this->useCache=false;
-
         $d = $this->controllerBaseName . ':' . $this->viewName;
 
         if (isset($this->requestData['cat']) && !is_numeric($this->requestData['cat']) && isset($this->generalSettings['urlsToAdminEdit'][$d . ':' . $this->requestData['cat']])) {
@@ -1589,75 +1535,7 @@ class Controller extends BaseClass
         //$this->previewOverlay(); // not implemented in (the rarely used) fetch
     }
 
-
-
-    /**
-	 * Gettext wrapper, to be called from javascript (through the utilities controller)
-	 *
-	 * @access     public
-	 */
-    public function javascriptTranslate ($content)
-    {
-        if (empty($content))
-            return;
-
-		if (is_array($content)) {
-
-			$results = array();
-
-			foreach((array)$content as $val) {
-
-				$this->saveInterfaceText($val);
-
-				$results[] = $this->doTranslate($val);
-			}
-
-			return $results;
-
-		} else  {
-
-			$this->saveInterfaceText($content);
-
-			return $this->doTranslate($content);
-
-		}
-
-    }
-
-
-
-    /**
-     * Gettext wrapper, to be called from a registered block function within Smarty
-     *
-	 * parametrization: {t _s1='one' _s2='two' _s3='three'}The 1st parameter is %s, the 2nd is %s and the 3nd %s.{/t}
-	 *
-     * @access     public
-     */
-    public function smartyTranslate ($params, $content, &$smarty, &$repeat)
-    {
-        if (empty($content))
-            return;
-
-        $this->saveInterfaceText($content);
-
-        $c = $this->doTranslate($content);
-
-        if (isset($params)) {
-
-            foreach ((array) $params as $key => $val) {
-
-                if (substr($key, 0, 2) == '_s' && isset($val)) {
-
-                    $c = preg_replace('/\%s/', $val, $c, 1);
-                }
-            }
-        }
-
-        return $c;
-    }
-
-
-	public function smartyTranslateGetSnippet($params, $content, &$smarty, &$repeat)
+	public function smartyGetSnippet($params, $content, &$smarty, &$repeat)
 	{
 
 		if (is_null($content)) return;
@@ -1678,19 +1556,6 @@ class Controller extends BaseClass
 			return;
 		}
 	}
-
-
-
-    public function translate ($content)
-    {
-        if (empty($content))
-            return;
-
-        $this->saveInterfaceText($content);
-
-        return $this->doTranslate($content);
-    }
-
 
     public function getProjectModules ($params = null)
     {
@@ -1755,64 +1620,9 @@ class Controller extends BaseClass
      */
     public function customSortArray (&$array, $sortBy)
     {
-        if (!isset($array) || !is_array($array))
-            return;
-
-        if (isset($sortBy['key']))
-            $this->setSortField($sortBy['key']);
-
-        if (isset($sortBy['dir']))
-            $this->setSortDirection($sortBy['dir']);
-
-        if (isset($sortBy['case']))
-            $this->setSortCaseSensitivity($sortBy['case']);
-
-        $maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys'] === true);
-
-        if ($maintainKeys) {
-
-            $keys = array();
-
-            $f = md5(uniqid(null, true));
-
-            foreach ((array) $array as $key => $val) {
-
-                $x = md5(json_encode($val) . $key);
-                $array[$key][$f] = $x;
-                $keys[$x] = $key;
-            }
-        }
-
-        usort($array, array(
-            $this,
-            'doCustomSortArray'
-        ));
-
-        if ($maintainKeys) {
-
-            foreach ((array) $array as $val) {
-
-                if (is_array($val)) {
-
-                    $y = array();
-
-                    foreach ($val as $key2 => $val2) {
-
-                        if ($key2 != $f)
-                            $y[$key2] = $val2;
-                    }
-
-                    $d[$keys[$val[$f]]] = $y;
-                }
-                else {
-
-                    $d[$keys[$val[$f]]] = $val;
-                }
-            }
-
-            if (isset($d))
-                $array = $d;
-        }
+		$this->helpers->CustomArraySort->setSortyBy( $sortBy );
+		$this->helpers->CustomArraySort->sortArray( $array );
+		$array=$this->helpers->CustomArraySort->getSortedArray();
     }
 
 
@@ -1843,7 +1653,6 @@ class Controller extends BaseClass
         }
 
         $u['uploadedMediaThumbs'] = $u['uploadedMedia'] . 'thumbs/';
-        $u['cache'] = $this->baseUrl . 'shared/cache/' . $pCode . '/';
 
         // urls of the directory containing project specific media part of the interface, but not of the content (background etc)
         $u['projectMedia'] = $this->baseUrl . 'shared/media/project/' . $pCode . '/';
@@ -2363,7 +2172,7 @@ class Controller extends BaseClass
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
 		$this->smarty->registerPlugin("block","t", array($this,"smartyTranslate"));
-		$this->smarty->registerPlugin("block","snippet", array($this,"smartyTranslateGetSnippet"));
+		$this->smarty->registerPlugin("block","snippet", array($this,"smartyGetSnippet"));
 		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
 
@@ -2420,140 +2229,6 @@ class Controller extends BaseClass
         }
 
     }
-
-
-
-    /**
-     * Sets key to sort by for doCustomSortArray
-     *
-     * @param string    name of the field to sort by
-     * @access     private
-     */
-    private function setSortField ($field)
-    {
-        $this->sortField = $field;
-    }
-
-
-
-    /**
-     * Returns key to sort by; called by doCustomSortArray
-     *
-     * @return string    name of the field to sort by; defaults to 'id'
-     * @access     private
-     */
-    private function getSortField ()
-    {
-        return !empty($this->sortField) ? $this->sortField : 'id';
-    }
-
-
-
-    /**
-     * Sets sort direction for doCustomSortArray
-     *
-     * @param string    $a    asc or desc
-     * @access     private
-     */
-    private function setSortDirection ($dir)
-    {
-        $this->sortDirection = $dir;
-    }
-
-
-
-    /**
-     * Returns direction to sort in; called by doCustomSortArray
-     *
-     * @return string    asc or desc
-     * @access     private
-     */
-    private function getSortDirection ()
-    {
-        return !empty($this->sortDirection) ? $this->sortDirection : 'asc';
-    }
-
-
-
-    /**
-     * Sets case sensitivity for doCustomSortArray
-     *
-     * @param string    $a    i(nsensitive) or s(ensitive)
-     * @access     private
-     */
-    private function setSortCaseSensitivity ($sens)
-    {
-        $this->sortCaseSensitivity = $sens;
-    }
-
-
-
-    /**
-     * Returns setting for case-sensitivity while sorting; called by doCustomSortArray
-     *
-     * @return string    i(nsensitive) or s(ensitive)
-     * @access     private
-     */
-    private function getSortCaseSensitivity ()
-    {
-        return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
-    }
-
-
-
-    /**
-     * Performs the actual usort; called by customSortArray
-     *
-     * @param array    $a    value of one array-element
-     * @param array    $b    value of the other
-     * @access     private
-     */
-    private function doCustomSortArray ($a, $b)
-    {
-        $f = $this->getSortField();
-
-        $d = $this->getSortDirection();
-
-        $c = $this->getSortCaseSensitivity();
-
-        if (!is_array($f))
-            $f = array(
-                $f
-            );
-
-        $res = 0;
-
-        $dir = !is_array($d) ? $d : null;
-
-        foreach ($f as $key => $val) {
-
-            if (!isset($a[$val]) || !isset($b[$val]))
-                continue;
-
-            if (is_array($d) && isset($d[$key]))
-                $dir = $d[$key];
-
-                // should be parametrized
-            $a[$val] = strip_tags($a[$val]);
-            $b[$val] = strip_tags($b[$val]);
-
-            if ($c != 's') {
-
-                $a[$val] = strtolower($a[$val]);
-                $b[$val] = strtolower($b[$val]);
-            }
-
-            $res = ($a[$val] > $b[$val] ? ($dir == 'asc' ? 1 : -1) : ($a[$val] < $b[$val] ? ($dir == 'asc' ? -1 : 1) : 0));
-
-
-            if ($res != 0)
-                return $res;
-        }
-
-        return $res;
-    }
-
-
 
     /**
      * Loads the required helpers (separate multi-use classes)
@@ -2767,37 +2442,27 @@ class Controller extends BaseClass
 
 
 
-    private function getHotwords ($forceUpdate = false)
+    private function getHotwords()
     {
-
-		$d = $this->getCache('hotwords-'.$this->getCurrentLanguageId());
-
-		if ($forceUpdate || !$d) {
-
-            $d = $this->models->Hotwords->_get(
-            array(
-                'id' =>
-					'select
-						hotword,
-						controller,
-						view,
-						params,
-						length(hotword) as `length`,
-						(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
-					from
-						%PRE%hotwords
-					where
-						project_id = ' . $this->getCurrentProjectId() .'
-						and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
-					order by
-						num_of_words desc,
-						`length` desc'
-            ));
-
-            $this->saveCache('hotwords-'.$this->getCurrentLanguageId(),$d);
-        }
-
-        return $d;
+		return $this->models->Hotwords->_get(
+		array(
+			'id' =>
+				'select
+					hotword,
+					controller,
+					view,
+					params,
+					length(hotword) as `length`,
+					(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
+				from
+					%PRE%hotwords
+				where
+					project_id = ' . $this->getCurrentProjectId() .'
+					and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
+				order by
+					num_of_words desc,
+					`length` desc'
+		));
     }
 
 
@@ -2984,86 +2649,18 @@ class Controller extends BaseClass
         }
     }
 
-    // Timeout in seconds
-    // Key something like path in session, e.g. 'species-tree'
-    protected function getCache ($key, $timeOut = false)
-    {
-        if ($this->useCache == false)
-            return false;
-
-        $cacheFile=$this->getProjectUrl('cache').$key;
-
-        if (file_exists($cacheFile)) {
-            // Timeout provided and expired
-            if ($timeOut && time() - $timeOut >= filemtime($cacheFile)) {
-                // Delete from cache
-                unlink($cacheFile);
-                return false;
-            }
-            return unserialize(file_get_contents($cacheFile));
-        }
-        return false;
-    }
-
-
-
- 	private function makeCachePath()
-	{
-        $p = $this->getCurrentProjectId();
-
-        if (!$p)
-            return;
-
-        return $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
-	}
-
-
-    private function createCacheFolder ()
-    {
-		$cachePath = $this->makeCachePath();
-
-		if (empty($cachePath))
-			return;
-
-        if (!file_exists($cachePath))
-            mkdir($cachePath);
-    }
-
-    private function emptyCacheFolderByRequest ()
-    {
-		if (!$this->rHasVal('clearcache','1'))
-			return;
-
-		$cachePath = $this->makeCachePath();
-
-		if (empty($cachePath))
-			return;
-
-        if (file_exists($cachePath))
-			array_map('unlink', glob($cachePath.'/*'));
-
-		unset($this->requestData['clearcache']);
-    }
-
     private function checkWriteableDirectories ()
     {
 
         $paths = array(
             $this->_smartySettings['dir_compile'] => 'www/app/templates/templates_c',
             $this->_smartySettings['dir_cache'] => 'www/app/templates/cache',
-            $this->generalSettings['directories']['cache'] => 'www/shared/cache',
             $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
             $this->generalSettings['directories']['log'] => 'log',
             //$this->generalSettings['directories']['customStyle'] => 'www/app/style/custom'
         );
 
         $p = $this->getCurrentProjectId();
-
-        if ($p)
-		{
-        	$paths[$this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)] =
-        	    'www/shared/media/project/' . $this->getProjectFSCode($p);
-         }
 
         foreach ((array) $paths as $val => $display)
 		{
@@ -3236,5 +2833,39 @@ class Controller extends BaseClass
     {
         return $pre.substr(md5(rand()), 0, 16).$post;
     }
+
+	private function initTranslator()
+	{
+		include_once ('TranslatorController.php');
+		$this->translator = new TranslatorController('app',$this->getDefaultProjectLanguage(),$this->databaseConnection);
+	}
+	
+	public function translate($content)
+	{
+		return $this->translator->translate($content);
+	}
+
+	public function javascriptTranslate($content)
+	{
+		return $this->translator->translate($content);
+	}
+
+	public function smartyTranslate ($params, $content, &$smarty, &$repeat)
+	{
+		$c = $this->translator->translate($content);
+	
+		if (isset($params))
+		{
+			foreach ((array) $params as $key => $val)
+			{
+				if (substr($key, 0, 2) == '_s' && isset($val))
+				{
+					$c = preg_replace('/\%s/', $val, $c, 1);
+				}
+			}
+		}
+		return $c;
+	}
+
 
 }

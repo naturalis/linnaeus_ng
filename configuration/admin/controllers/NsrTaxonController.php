@@ -37,8 +37,6 @@ class NsrTaxonController extends NsrController
     );
     public $usedHelpers = array(
     );
-    public $cacheFiles = array(
-    );
     public $cssToLoad = array(
         'lookup.css',
 		'nsr_taxon_beheer.css'

@@ -805,55 +805,46 @@ class SearchControllerNSR extends SearchController
 
 	private function getPhotographersPictureCount($p=null)
 	{
-		$photographers=$this->getCache('search-photographer-count');
-
-		if (!$photographers)
-		{
-        
-			$tCount=$this->models->MediaTaxon->freeQuery(array(
-				'query'=>
-					"select 
-						count(distinct _a.taxon_id) as taxon_count,
-						_b.meta_data
-					from 
-						%PRE%media_taxon _a
+		$tCount=$this->models->MediaTaxon->freeQuery(array(
+			'query'=>
+				"select 
+					count(distinct _a.taxon_id) as taxon_count,
+					_b.meta_data
+				from 
+					%PRE%media_taxon _a
+	
+				right join %PRE%media_meta _b
+					on _a.project_id=_b.project_id
+					and _a.id = _b.media_id
+					and _b.sys_label = 'beeldbankFotograaf'
+				
+				where
+					_a.project_id=".$this->getCurrentProjectId()."
+				group by _b.meta_data",
+			'fieldAsIndex'=>'meta_data'
+			)
+		);
 		
-					right join %PRE%media_meta _b
-						on _a.project_id=_b.project_id
-						and _a.id = _b.media_id
-						and _b.sys_label = 'beeldbankFotograaf'
-					
-					where
-						_a.project_id=".$this->getCurrentProjectId()."
-					group by _b.meta_data",
+		$photographers=$this->models->MediaMeta->_get(
+			array(
+				'id'=>array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'sys_label' => 'beeldbankFotograaf'
+				),
+				'columns'=>"count(*) as total, meta_data,
+					trim(concat(
+						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+						trim(substring(meta_data, 1, locate(',',meta_data)-1))
+					)) as photographer",
+				'group'=>'meta_data, photographer',
+				'order'=>'count(*) desc, meta_data desc',
 				'fieldAsIndex'=>'meta_data'
-				)
-			);
-			
-			$photographers=$this->models->MediaMeta->_get(
-				array(
-					'id'=>array(
-						'project_id'=>$this->getCurrentProjectId(),
-						'sys_label' => 'beeldbankFotograaf'
-					),
-					'columns'=>"count(*) as total, meta_data,
-						trim(concat(
-							trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-							trim(substring(meta_data, 1, locate(',',meta_data)-1))
-						)) as photographer",
-					'group'=>'meta_data, photographer',
-					'order'=>'count(*) desc, meta_data desc',
-					'fieldAsIndex'=>'meta_data'
-				)
-			);
-			
-			foreach((array)$photographers as $key=>$val)
-			{
-				$photographers[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
-			}
-			
-			$this->saveCache('search-photographer-count',$photographers);
-			
+			)
+		);
+		
+		foreach((array)$photographers as $key=>$val)
+		{
+			$photographers[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
 		}
 
 		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
@@ -869,58 +860,49 @@ class SearchControllerNSR extends SearchController
 
 	private function getValidatorPictureCount($p=null)
 	{
-
-		$validators=$this->getCache('search-validator-count');
-
-		if (!$validators)
-		{
-        
-			$tCount=$this->models->MediaTaxon->freeQuery(array(
-				'query'=>
-					"select 
-						count(distinct _a.taxon_id) as taxon_count,
-						_b.meta_data
-					from 
-						%PRE%media_taxon _a
+		$tCount=$this->models->MediaTaxon->freeQuery(array(
+			'query'=>
+				"select 
+					count(distinct _a.taxon_id) as taxon_count,
+					_b.meta_data
+				from 
+					%PRE%media_taxon _a
+	
+				right join %PRE%media_meta _b
+					on _a.project_id=_b.project_id
+					and _a.id = _b.media_id
+					and _b.sys_label = 'beeldbankValidator'
+				
+				where
+					_a.project_id=".$this->getCurrentProjectId()."
+				group by
+					_b.meta_data",
+			'fieldAsIndex'=>'meta_data'
+			)
+		);
 		
-					right join %PRE%media_meta _b
-						on _a.project_id=_b.project_id
-						and _a.id = _b.media_id
-						and _b.sys_label = 'beeldbankValidator'
-					
-					where
-						_a.project_id=".$this->getCurrentProjectId()."
-					group by
-						_b.meta_data",
+		$validators=$this->models->MediaMeta->_get(
+			array(
+				'id'=>array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'sys_label' => 'beeldbankValidator'
+				),
+				'columns'=>"count(*) as total, meta_data,
+					trim(concat(
+						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+						trim(substring(meta_data, 1, locate(',',meta_data)-1))
+					)) as validator",
+				'group'=>'meta_data, validator',
+				'order'=>'count(*) desc, meta_data desc',
 				'fieldAsIndex'=>'meta_data'
-				)
-			);
-			
-			$validators=$this->models->MediaMeta->_get(
-				array(
-					'id'=>array(
-						'project_id'=>$this->getCurrentProjectId(),
-						'sys_label' => 'beeldbankValidator'
-					),
-					'columns'=>"count(*) as total, meta_data,
-						trim(concat(
-							trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-							trim(substring(meta_data, 1, locate(',',meta_data)-1))
-						)) as validator",
-					'group'=>'meta_data, validator',
-					'order'=>'count(*) desc, meta_data desc',
-					'fieldAsIndex'=>'meta_data'
-				)
-			);
-			
-			foreach((array)$validators as $key=>$val)
-			{
-				$validators[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
-			}
-			
-			$this->saveCache('search-validator-count',$validators);
-			
+			)
+		);
+		
+		foreach((array)$validators as $key=>$val)
+		{
+			$validators[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
 		}
+
 
 		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
 

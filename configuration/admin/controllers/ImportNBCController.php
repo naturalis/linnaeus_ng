@@ -680,7 +680,6 @@ class ImportNBCController extends ImportController
 
     public function nbcDeterminatie7Action()
     {
-		$this->emptyCacheFolder($this->getNewProjectId());
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();

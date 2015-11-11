@@ -553,10 +553,6 @@ class ProjectDeleteController extends Controller
         $this->rrmdir($paths['project_media_l2_maps']);
         $this->rrmdir($paths['project_thumbs']);
         $this->rrmdir($paths['project_media']);
-		
-		$this->clearAllCaches();
-		
-        $this->rrmdir($paths['cache']);
     }
 
 
@@ -657,14 +653,6 @@ class ProjectDeleteController extends Controller
 		}
 		
 		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
-			if(is_dir($file)) {
-				$boom = explode('/',$file);
-				$boom = array_pop($boom);
-				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
-			}
-		}
-		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
 			if(is_dir($file)) {
 				$boom = explode('/',$file);
 				$boom = array_pop($boom);

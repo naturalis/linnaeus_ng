@@ -76,7 +76,6 @@ class configuration
                 'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project', 
 				'log' => $this->_appFileRoot . 'log',
                 'runtimeStyleRoot' => $this->_appFileRoot . 'www/app/style',
-				'cache' => $this->_appFileRoot . 'www/shared/cache'
             ), 
             'maxCategories' => 10,
             'login-cookie' => array(

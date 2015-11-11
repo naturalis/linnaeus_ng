@@ -39,9 +39,6 @@ class SpeciesController extends Controller
         'IE' => array()
     );
 
-	public $useCache=false;
-
-
 	/* init */
     public function __construct ()
     {
@@ -412,7 +409,7 @@ class SpeciesController extends Controller
     private function getlastVisitedCategory($taxon,$category)
     {
 
-		if (!$this->useCache || is_null($this->moduleSession->getModuleSetting('last_visited'))) {
+		if (is_null($this->moduleSession->getModuleSetting('last_visited'))) {
 			return false;
 		}
 

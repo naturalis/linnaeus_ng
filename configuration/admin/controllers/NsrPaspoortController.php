@@ -23,7 +23,6 @@ class NsrPaspoortController extends NsrController
 		'trash_can'
 	);
     public $usedHelpers = array();
-    public $cacheFiles = array();
     public $cssToLoad = array(
         'lookup.css',
 		'nsr_taxon_beheer.css'

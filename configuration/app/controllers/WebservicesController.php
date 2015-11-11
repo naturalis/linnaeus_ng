@@ -1076,7 +1076,6 @@ parameters:
     {
 		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
 		
-		$this->useCache=false;
 		$this->checkProject();
 
 		if (is_null($this->getCurrentProjectId()))

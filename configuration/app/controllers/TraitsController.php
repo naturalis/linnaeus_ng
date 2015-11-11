@@ -26,8 +26,6 @@ class TraitsController extends Controller
    
     public $controllerPublicName = 'Kenmerken';
 
-    public $cacheFiles = array();
-    
     public $cssToLoad = array();
 
 	public $jsToLoad=array();

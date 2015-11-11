@@ -14,8 +14,6 @@ class NsrTaxonImagesController extends NsrController
 		'trash_can',
     );
     public $usedHelpers = array('csv_parser_helper');
-    public $cacheFiles = array(
-    );
     public $cssToLoad = array(
         'lookup.css',
 		'nsr_taxon_beheer.css'

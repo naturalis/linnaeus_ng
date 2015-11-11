@@ -29,8 +29,6 @@ class TraitsTraitsController extends TraitsController
    
     public $controllerPublicName = 'Kenmerken';
 
-    public $cacheFiles = array();
-    
     public $cssToLoad = array(
 		'traits.css',
 //		'taxon_groups.css'
