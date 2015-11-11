@@ -79,7 +79,8 @@ class Controller extends BaseClass
         'logging_helper',
         'email_helper',
 		'log_changes',
-		'custom_array_sort'
+		'custom_array_sort',
+		'paginator'
     );
 
 	protected $moduleSession;
@@ -1274,63 +1275,15 @@ class Controller extends BaseClass
         }
     }
 
-
-
     public function getPagination ($items, $maxPerPage = 25)
     {
+		$this->helpers->Paginator->setItemsPerPage( $maxPerPage );
+		$this->helpers->Paginator->setStart( $this->rHasVal('start') ? $this->requestData['start'] : 0 );
+		$this->helpers->Paginator->setItems( $items );
+		$this->helpers->Paginator->paginate();
 
-        /*
-
-			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
-
-			$gloss = $pagination['items'];
-
-			$this->smarty->assign('prevStart', $pagination['prevStart']);
-
-			$this->smarty->assign('nextStart', $pagination['nextStart']);
-
-
-		{if $prevStart!=-1 || $nextStart!=-1}
-			<div id="navigation">
-				{if $prevStart!=-1}
-				<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
-				{/if}
-				{if $nextStart!=-1}
-				<span class="a" onclick="goNavigate({$nextStart});">next ></span>
-				{/if}
-			</div>
-		{/if}
-
-		//goNavigate(val,formName) formname default = 'theForm'
-
-		<form action="" method="post" id="theForm" action="">
-		</form>
-
-		*/
-        if (!isset($items))
-            return;
-
-            // determine index of the first taxon to show
-        $start = $this->rHasVal('start') ? $this->requestData['start'] : 0;
-
-        //determine index of the first taxon to show on the previous page (if any)
-        $prevStart = $start == 0 ? -1 : (($start - $maxPerPage < 1) ? 0 : ($start - $maxPerPage));
-
-        //determine index of the first taxon to show on the next page (if any)
-        $nextStart = ($start + $maxPerPage >= count((array) $items)) ? -1 : ($start + $maxPerPage);
-
-        // slice out only the taxa we need (faster than looping the entire thing in smarty)
-        $items = array_slice($items, $start, $maxPerPage);
-
-        return array(
-            'items' => $items,
-            'prevStart' => $prevStart,
-            'currStart' => $start,
-            'nextStart' => $nextStart
-        );
+		return $this->helpers->Paginator->getItems();
     }
-
-
 
     public function sendEmail ($params)
     {
