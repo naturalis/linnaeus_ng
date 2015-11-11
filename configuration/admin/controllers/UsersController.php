@@ -437,20 +437,19 @@ class UsersController extends Controller
 
         $this->setPageName($this->translate('Project collaborator data'));
 
-		if ($this->rHasId()) {
-
+		if ($this->rHasId())
+		{
 			$user = $this->getUserById($this->rGetId());
 
-			if ($user==null) {
-
+			if ($user==null)
+			{
 				$this->addError('Unknown user ID: '.$this->rGetId());
-
-			} else {
+			} 
+			else 
+			{
 
 	            $zone = $this->models->Timezones->_get(array('id'=>$user['timezone_id']));
-
 				$currentRole = $this->getUserProjectRole($this->rGetId(),$this->getCurrentProjectId());
-
 				$modules = $this->getProjectModules();
 
 				$mpu = $this->models->ModulesProjectsUsers->_get(
@@ -477,18 +476,16 @@ class UsersController extends Controller
 
 				$hasModules = false;
 
-				foreach ((array) $modules['modules'] as $key => $val) {
-
+				foreach ((array) $modules['modules'] as $key => $val)
+				{
 					$modules['modules'][$key]['isAssigned'] = isset($mpu[$val['module_id']]);
 					$hasModules = $hasModules || isset($fpu[$val['module_id']]);
-
 				}
 
-				foreach ((array) $modules['freeModules'] as $key => $val) {
-
+				foreach ((array) $modules['freeModules'] as $key => $val)
+				{
 					$modules['freeModules'][$key]['isAssigned'] = isset($fpu[$val['id']]);
 					$hasModules = $hasModules || isset($fpu[$val['id']]);
-
 				}
 
 				$pru = $this->models->ProjectsRolesUsers->_get(
@@ -498,8 +495,8 @@ class UsersController extends Controller
 					)
 				);
 
-				foreach((array)$pru as $key => $val) {
-
+				foreach((array)$pru as $key => $val)
+				{
 					$p = $this->models->Projects->_get(
 						array(
 							'id' => array('id' => $val['project_id']),
@@ -510,27 +507,19 @@ class UsersController extends Controller
 					$pru[$key]['projectTitle'] = $p[0]['title'];
 					$d = $this->getUserProjectRole($this->rGetId(),$val['project_id']);
 					$pru[$key]['role'] = $d['role']['role'];
-
 				}
 
 				$this->smarty->assign('user',$user);
-
 				$this->smarty->assign('currentRole',$currentRole);
-
 				$this->smarty->assign('zone', $zone);
-
 				$this->smarty->assign('modules', $modules);
-
 				$this->smarty->assign('hasModules', $hasModules);
-
 				$this->smarty->assign('projects', $pru);
-
 			}
-
-		} else {
-
+		} 
+		else 
+		{
 			$this->addError('No ID specified');
-
 		}
 
 		$this->printPage();
@@ -542,36 +531,32 @@ class UsersController extends Controller
 
         $this->checkAuthorisation();
 
-		if ($this->rHasId() && !$this->isFormResubmit()) {
-
+		if ($this->rHasId() && !$this->isFormResubmit())
+		{
 			$user = $this->getUserById($this->rGetId());
 
 			//$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
 			$canDelete = $this->isCurrentUserSysAdmin();
 
-			if ($canDelete) {
-
+			if ($canDelete)
+			{
 				$this->removeUserFromProject($this->rGetId(),$this->getCurrentProjectId());
 
 				// conditional delete! can only delete when user is no longer part on *any* project
-				if ($this->deleteUser($this->rGetId())) {
-
+				if ($this->deleteUser($this->rGetId()))
+				{
 					$this->redirect('index.php');
-
-				} else {
-
+				} 
+				else 
+				{
 					$this->addMessage($this->translate('User removed from current project.'));
 					$this->addError($this->translate('User could not be deleted, as he is active in other project(s).'));
-
 				}
-
 			}
 			else
 			{
-
 				//$this->addError($this->translate('User can only be deleted by system admin or user record\'s creator.'));
 				$this->addError($this->translate('User can only be deleted by system admin.'));
-
 			}
 
 		} 
@@ -600,7 +585,6 @@ class UsersController extends Controller
 		{
 
 			$this->addError($this->translate('You are not authorized to edit that user.'));
-
 		} 
 		else 
 		{
@@ -666,9 +650,6 @@ class UsersController extends Controller
 
 					$this->models->Users->save($data);
 					$this->saveUsersModuleData($data,$this->rGetId(),true);
-
-					//$this->rGetVal('active') = $d;
-
 					$this->addMessage($this->translate('User data saved'));
 
 					$user=$this->getUserById( $this->rGetId() );
@@ -1182,9 +1163,6 @@ class UsersController extends Controller
 		return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
     }
 
-
-
-
 	private function ajaxActionConnectExistingUser()
 	{
 		if (
@@ -1209,18 +1187,6 @@ class UsersController extends Controller
 				'user_id' => $_SESSION['admin']['data']['new_user']['existing_user_id']
 			)
 		);
-		/*
-		REFAC2015 ????
-		MUST CHECK
-
-		$this->saveUsersModuleData(
-			array(
-				'modules' => $this->models->ModulesProjects->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))),
-				'freeModules' => $this->models->FreeModulesProjects->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())))
-			),
-			$_SESSION['admin']['data']['new_user']['existing_user_id']
-		);
-		*/
 		if (!$pru)
 		{
 			$this->addError($this->translate('Failed to connect user from session.'));
@@ -1563,7 +1529,7 @@ class UsersController extends Controller
 					'user_id' => $userId,
 					'project_id' => $projectId
 				),
-				'columns' => '*,ifnull(last_project_select,"'.$this->translate('(has never worked on project)').'") as last_login'
+				'columns' => '*, ifnull(last_project_select,"'.$this->translate('(has never worked on project)').'") as last_login'
         	)
 		);
 
@@ -1937,10 +1903,10 @@ class UsersController extends Controller
 		$users = $this->models->Users->_get(
 			array(
 				'where' =>
-						'username like \'%'.$search.'%\'
-						or first_name like \'%'.$search.'%\'
-						or last_name like \'%'.$search.'%\'
-						or email_address like \'%'.$search.'%\''
+					'username like \'%'.$search.'%\'
+					or first_name like \'%'.$search.'%\'
+					or last_name like \'%'.$search.'%\'
+					or email_address like \'%'.$search.'%\''
 				,
 				'columns' => 'id,concat(first_name,\' \',last_name,\' (\',username,\'; \',email_address,\')\') as label,last_name,first_name',
 				'order' => 'last_name,first_name'
