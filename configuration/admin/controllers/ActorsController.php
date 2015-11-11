@@ -68,7 +68,7 @@ class ActorsController extends NsrController
     {
         if (!isset($this->requestData['action'])) return;
 		$return=null;
-		$return=$this->getActorLookupList($this->requestData);
+		$return=$this->getActorLookupList($this->GetAll());
         $this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();

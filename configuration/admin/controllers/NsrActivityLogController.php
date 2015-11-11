@@ -41,7 +41,7 @@ class NsrActivityLogController extends NsrController
 
         $this->setPageName($this->translate('Activity log'));
 		
-		$search=isset($this->requestData) ? $this->requestData : null;
+		$search=isset($this->GetAll()) ? $this->requestData : null;
 		
 		$results=$this->getLogLines($search);
 		
@@ -189,7 +189,7 @@ class NsrActivityLogController extends NsrController
 
 	private function reconstructQueryString($ignore)
 	{
-		if (!isset($this->requestData)) return;
+		if (!isset($this->GetAll())) return;
 
 		$querystring=null;
 

@@ -61,20 +61,20 @@ class SpeciesMediaController extends Controller
 
 		if ($this->rHasVal('action','delete'))
 		{
-			$d=$this->deleteTaxonMedia($this->requestData);
+			$d=$this->deleteTaxonMedia(rGetAll());
 			@$this->addError($d['errors']);
 			@$this->addWarning($d['warnings']);
 			@$this->addMessage($d['messages']);
 		}
 		if ($this->rHasVal('action','save'))
 		{
-			$this->setOverviewImage($this->requestData);
-			$this->saveCaptions($this->requestData);
+			$this->setOverviewImage(rGetAll());
+			$this->saveCaptions(rGetAll());
 			$this->addMessage('Saved');
 		}
 		if ($this->rHasVal('action','up') || $this->rHasVal('action','down'))
 		{
-			if ($this->moveImageInOrder($this->requestData))
+			if ($this->moveImageInOrder(rGetAll()))
 				$this->addMessage('New media order saved');
 		}
 
@@ -961,26 +961,4 @@ class SpeciesMediaController extends Controller
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

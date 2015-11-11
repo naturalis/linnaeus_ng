@@ -2484,7 +2484,7 @@ class Controller extends BaseClass
     }
 
 
-    public function rGetAll()
+    public function GetAll()
     {
 		return isset($this->requestData) ? $this->requestData : null;
     }
@@ -2836,9 +2836,9 @@ class Controller extends BaseClass
 		{
             unset($this->requestData['uiLang']);
 
-            if (empty($this->requestData))
+            if (empty($this->requestData ))
 			{
-                unset($this->requestData);
+                unset($this->requestData );
             }
         }
     }
