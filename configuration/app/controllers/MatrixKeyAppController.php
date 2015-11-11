@@ -477,7 +477,22 @@ class MatrixKeyAppController extends Controller
 			
 	}
 			
-	
+	private function getCommonname($tId)
+	{
+		$c = $this->models->Commonname->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $tId,
+				'language_id' => $this->getCurrentLanguageId()
+			)
+		));
+
+		return $c[0]['commonname'];
+
+	}
+
+
 			
 
 }	

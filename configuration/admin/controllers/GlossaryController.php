@@ -175,13 +175,9 @@ class GlossaryController extends Controller
 			$gloss = $pagination['items'];
 
 			$this->smarty->assign('prevStart', $pagination['prevStart']);
-
 			$this->smarty->assign('nextStart', $pagination['nextStart']);
-
 			$this->smarty->assign('languages', $this->getProjectLanguages());
-
 			$this->smarty->assign('activeLanguage', $this->rGetVal('activeLanguage'));
-
 			$this->smarty->assign('alpha', $alpha);
 
 			if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->rGetVal('letter'));
