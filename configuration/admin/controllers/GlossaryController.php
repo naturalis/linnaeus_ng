@@ -41,10 +41,6 @@ class GlossaryController extends Controller
 
     public $controllerPublicName = 'Glossary';
 
-    public $cacheFiles = array(
-    	'search-contentsGlossary'
-    );
-
     public $cssToLoad = array(
 		'glossary.css',
 		'prettyPhoto/prettyPhoto.css',
@@ -244,7 +240,7 @@ class GlossaryController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
-			$this->clearCache($this->cacheFiles);
+			
 
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($this->rGetVal('term'),0,1))));
 
@@ -296,8 +292,6 @@ class GlossaryController extends Controller
 
 			} else
 			if ($this->models->Glossary->save($data)) {
-
-				$this->clearCache($this->cacheFiles);
 
 				$navList = $this->getGlossaryTermsNavList(true);
 

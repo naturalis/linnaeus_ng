@@ -216,6 +216,11 @@ class AbstractModel extends BaseClass
 
     protected function connectToDatabase ()
     {
+		global $global_DB_connection;
+		$this->databaseConnection = $global_DB_connection;
+		return true;
+		
+		/*
         $this->databaseSettings = $this->config->getDatabaseSettings();
         $this->databaseConnection = @mysqli_connect($this->databaseSettings['host'],
             $this->databaseSettings['user'], $this->databaseSettings['password']);
@@ -237,6 +242,7 @@ class AbstractModel extends BaseClass
                 'SET CHARACTER SET ' . $this->databaseSettings['characterSet']);
         }
         return true;
+		*/
     }
 
     protected function disconnectFromDatabase ()

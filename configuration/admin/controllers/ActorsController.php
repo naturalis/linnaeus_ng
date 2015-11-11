@@ -21,9 +21,6 @@ class ActorsController extends NsrController
 
     public $controllerPublicName = 'Actoren';
 
-    public $cacheFiles = array(
-    );
-
     public $cssToLoad = array(
 		'lookup.css',
 		'nsr_taxon_beheer.css'

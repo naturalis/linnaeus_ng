@@ -1058,42 +1058,34 @@ class MapKeyController extends Controller
 		
 		$index = md5($search.':'.(int)$matchStartOnly.':'.(int)$getAll.':'.(int)$l2MustHaveGeo);
 
-		$l = $this->getCache('map-contents-'.$index);
-	
-		if (!$l) {
+		$search = str_replace(array('/','\\'),'',$search);
 
-			$search = str_replace(array('/','\\'),'',$search);
-	
-			if (empty($search) && !$getAll) return;
-	
-			if ($matchStartOnly)
-				$regexp = '/^'.preg_quote($search).'/i';
-			else
-				$regexp = '/'.preg_quote($search).'/i';
-	
-			$l = array();
-	
-			if ($l2MustHaveGeo)
-				$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
-			else				
-				$taxa = $this->getTaxaOccurrenceCount($this->buildTaxonTree());
-	
-			foreach((array)$taxa as $key => $val) {
-	
-				if ($getAll || preg_match($regexp,$val['taxon']) == 1)
-					$l[] = array(
-						'id' => $val['id'],
-						'label' => $this->formatTaxon($val)
-					);
-	
-			}
-	
-			$this->customSortArray($l,array('key' => 'taxon','maintainKeys' => true));
-			
-			$this->saveCache('map-contents-'.$index, $l);
+		if (empty($search) && !$getAll) return;
+
+		if ($matchStartOnly)
+			$regexp = '/^'.preg_quote($search).'/i';
+		else
+			$regexp = '/'.preg_quote($search).'/i';
+
+		$l = array();
+
+		if ($l2MustHaveGeo)
+			$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
+		else				
+			$taxa = $this->getTaxaOccurrenceCount($this->buildTaxonTree());
+
+		foreach((array)$taxa as $key => $val) {
+
+			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
+				$l[] = array(
+					'id' => $val['id'],
+					'label' => $this->formatTaxon($val)
+				);
 
 		}
 
+		$this->customSortArray($l,array('key' => 'taxon','maintainKeys' => true));
+			
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(array(
@@ -1164,67 +1156,47 @@ class MapKeyController extends Controller
 
 	public function l2GetTaxaWithOccurrences()
 	{
-
-		$taxa = $this->getCache('map-L2OccurringTaxa');
-		
-		if (!$taxa) {
-
-			$taxa = $this->l2GetTaxaOccurrenceCount($this->buildTaxonTree());
-	
-			$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
-	
-			$this->saveCache('map-L2OccurringTaxa',$taxa);
-			
-		}
-
+		$taxa = $this->l2GetTaxaOccurrenceCount($this->buildTaxonTree());
+		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
 		return $taxa;
-	
 	}
 
 	public function l2GetTaxaOccurrenceCount($taxaToFilter=null)
 	{
 
-		$ot = $this->getCache('map-l2TaxaOccurrencesCount');
-		
-		if (!$ot) {
+		if ($this->l2HasTaxonOccurrencesCompacted()) {
 	
-			if ($this->l2HasTaxonOccurrencesCompacted()) {
-		
-				$ot = $this->models->L2OccurrenceTaxonCombi->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-						),
-						'columns' => 'taxon_id,square_numbers',
-						'fieldAsIndex' => 'taxon_id'
-					)
-				);
-				
-				foreach((array)$ot as $key => $val) {
-				
-					$ot[$key]['total'] = count((array)explode(' ',$val['square_numbers']));
-						
-				}
-
-			} else {
-		
-				$ot = $this->models->L2OccurrenceTaxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-						),
-						'columns' => 'taxon_id,count(*) as total',
-						'group' => 'taxon_id',
-						'fieldAsIndex' => 'taxon_id'
-					)
-				);
-		
+			$ot = $this->models->L2OccurrenceTaxonCombi->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+					),
+					'columns' => 'taxon_id,square_numbers',
+					'fieldAsIndex' => 'taxon_id'
+				)
+			);
+			
+			foreach((array)$ot as $key => $val) {
+			
+				$ot[$key]['total'] = count((array)explode(' ',$val['square_numbers']));
+					
 			}
-			
-			$this->saveCache('map-l2TaxaOccurrencesCount', $ot);
-			
+
+		} else {
+	
+			$ot = $this->models->L2OccurrenceTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+					),
+					'columns' => 'taxon_id,count(*) as total',
+					'group' => 'taxon_id',
+					'fieldAsIndex' => 'taxon_id'
+				)
+			);
+	
 		}
-		
+			
 		if (!empty($taxaToFilter)) {
 		
 			foreach((array)$ot as $key => $val) {
@@ -1379,135 +1351,126 @@ class MapKeyController extends Controller
 			8) /www/shared/media/system/l2_maps/South Pacific.GIF
 		*/
 
-		$m = $this->getCache('map-l2Maps');
+		$m = $this->models->L2Map->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'fieldAsIndex' => 'id',
+				'order' => 'id'
+			)
+		);
+						
+		$projectMediaL2maps=$this->getProjectUrl('projectL2Maps');
+		$systemMediaL2Maps=$this->getProjectUrl('systemL2Maps');
 		
-		if (!$m) {
-		
-			$saveCache = true;
-		
-			$m = $this->models->L2Map->_get(
-				array(
-					'id' => array('project_id' => $this->getCurrentProjectId()),
-					'fieldAsIndex' => 'id',
-					'order' => 'id'
-				)
-			);
-							
-			$projectMediaL2maps=$this->getProjectUrl('projectL2Maps');
-			$systemMediaL2Maps=$this->getProjectUrl('systemL2Maps');
+		foreach((array)$m as $key => $val) {
 			
-			foreach((array)$m as $key => $val) {
+			$m[$key]['mapExists'] = false;
+
+			if (!empty($val['image'])) {
 				
-				$m[$key]['mapExists'] = false;
-	
-				if (!empty($val['image'])) {
+				// 1)
+				$m[$key]['imageFullName'] = $projectMediaL2maps.$val['image'];
+				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+
+				if (!$m[$key]['mapExists']) {
 					
-					// 1)
-					$m[$key]['imageFullName'] = $projectMediaL2maps.$val['image'];
+					// 2)
+					$m[$key]['imageFullName'] = $projectMediaL2maps.strtolower($val['image']);
 					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-	
+
 					if (!$m[$key]['mapExists']) {
 						
-						// 2)
-						$m[$key]['imageFullName'] = $projectMediaL2maps.strtolower($val['image']);
-						$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-	
-						if (!$m[$key]['mapExists']) {
-							
-							// 3)
-							$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['image'];
-							$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-	
-							if (!$m[$key]['mapExists']) {
-								
-								// 4)
-								$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['image']);
-								$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-			
-							}
-							
-						}
-	
-					}
-	
-				} else {
-	
-					// 5)
-					$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.gif';
-					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-					
-					if (!$m[$key]['mapExists']) {
-	
-						// 6)
-						$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.GIF';
+						// 3)
+						$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['image'];
 						$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 
 						if (!$m[$key]['mapExists']) {
-		
-							// 7)
-							$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['name'].'.gif';
+							
+							// 4)
+							$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['image']);
 							$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-
-							if (!$m[$key]['mapExists']) {
-			
-								// 8)
-								$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['name'].'.GIF';
-								$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-			
-							}							
 		
 						}
 						
 					}
-	
+
 				}
-	
-				if ($m[$key]['mapExists']) {
-					
-					$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
-	
-					if ($this->controllerSettings['l2MaxMapWidth'] > 0 &&
-							$m[$key]['size'][0] > $this->controllerSettings['l2MaxMapWidth']) {
-					
-						$tmpHeight = $m[$key]['size'][1]*($this->controllerSettings['l2MaxMapWidth']/$m[$key]['size'][0]);
-							
-						$m[$key]['cellWidth'] = (floor($this->controllerSettings['l2MaxMapWidth']/$val['cols']))-1;
-						$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
-							
-						// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
-						$m[$key]['width'] = ($val['cols']*($m[$key]['cellWidth']+1))-1;
-						$m[$key]['height'] = ($val['rows']*($m[$key]['cellHeight']+1))-1;
-						$m[$key]['resized'] = 1;
-							
-					} else {
-	
-						$m[$key]['width'] = $m[$key]['size'][0];
-						$m[$key]['height'] = $m[$key]['size'][1];
-						$m[$key]['cellWidth'] = (floor($m[$key]['width']/$val['cols']))-1;
-						$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
-						$m[$key]['resized'] = 0;
-					}
-				
-				} else $saveCache = false;
 
+			} else {
+
+				// 5)
+				$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.gif';
+				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 				
-				$d = json_decode($val['coordinates']);
+				if (!$m[$key]['mapExists']) {
+
+					// 6)
+					$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.GIF';
+					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+
+					if (!$m[$key]['mapExists']) {
 	
-				$m[$key]['coordinates'] = array(
-					'topLeft' => array(
-						'lat' => (string)$d->topLeft->lat,
-						'long' => (string)$d->topLeft->long
-					),
-					'bottomRight' => array(
-						'lat' => (string)$d->bottomRight->lat,
-						'long' => (string)$d->bottomRight->long
-					),
-					'original' => $val['coordinates']
-				);
+						// 7)
+						$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['name'].'.gif';
+						$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+
+						if (!$m[$key]['mapExists']) {
+		
+							// 8)
+							$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['name'].'.GIF';
+							$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+		
+						}							
+	
+					}
+					
+				}
+
+			}
+
+			if ($m[$key]['mapExists'])
+			{
+				$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
+
+				if ($this->controllerSettings['l2MaxMapWidth'] > 0 &&
+						$m[$key]['size'][0] > $this->controllerSettings['l2MaxMapWidth']) {
+				
+					$tmpHeight = $m[$key]['size'][1]*($this->controllerSettings['l2MaxMapWidth']/$m[$key]['size'][0]);
+						
+					$m[$key]['cellWidth'] = (floor($this->controllerSettings['l2MaxMapWidth']/$val['cols']))-1;
+					$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
+						
+					// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
+					$m[$key]['width'] = ($val['cols']*($m[$key]['cellWidth']+1))-1;
+					$m[$key]['height'] = ($val['rows']*($m[$key]['cellHeight']+1))-1;
+					$m[$key]['resized'] = 1;
+						
+				} else {
+
+					$m[$key]['width'] = $m[$key]['size'][0];
+					$m[$key]['height'] = $m[$key]['size'][1];
+					$m[$key]['cellWidth'] = (floor($m[$key]['width']/$val['cols']))-1;
+					$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
+					$m[$key]['resized'] = 0;
+				}
 			
 			}
+
 			
-			if ($saveCache) $this->saveCache('map-l2Maps', $m);
+			$d = json_decode($val['coordinates']);
+
+			$m[$key]['coordinates'] = array(
+				'topLeft' => array(
+					'lat' => (string)$d->topLeft->lat,
+					'long' => (string)$d->topLeft->long
+				),
+				'bottomRight' => array(
+					'lat' => (string)$d->bottomRight->lat,
+					'long' => (string)$d->bottomRight->long
+				),
+				'original' => $val['coordinates']
+			);
+		
 		}
 		
 		return isset($id) ? $m[$id] : $m;
@@ -1729,10 +1692,6 @@ class MapKeyController extends Controller
 
 		$sessIdx = 	$mapId.'-'.(isset($typeId) ? implode('-',$typeId) : '');
 		
-		$storedData = $this->getCache('map-divIndex-'. $mapId. '-' . $sessIdx);
-		
-		if ($storedData) return $storedData;
-
 		$d = array(
 			'project_id' => $this->getCurrentProjectId(),
 			'map_id' => $mapId
@@ -1820,8 +1779,6 @@ class MapKeyController extends Controller
 				'legend' => $legend
 		);
 	
-		$this->saveCache('map-divIndex-'. $mapId. '-' . $sessIdx, $dataToStore);
-		
 		return $dataToStore;
 	}
 

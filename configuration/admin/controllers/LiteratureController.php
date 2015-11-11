@@ -14,10 +14,6 @@ class LiteratureController extends Controller
    
     public $controllerPublicName = 'Literary references';
 
-    public $cacheFiles = array(
-    	'search-contentsLiterature'
-    );
-    
     public $cssToLoad = array('literature.css','dialog/jquery.modaldialog.css','lookup.css');
 
 	public $jsToLoad =
@@ -123,13 +119,13 @@ class LiteratureController extends Controller
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
 
-			$this->clearCache($this->cacheFiles);
+			
 			
 			$_SESSION['admin']['system']['literature']['activeLetter'] = strtolower(substr($ref['author_first'],0,1));
 
 			$this->deleteReference($this->requestData['id']);
 
-			$this->clearCache($this->cacheFiles);
+			
 
 			$navList = $this->getReferencesNavList(true);
 
@@ -184,7 +180,7 @@ class LiteratureController extends Controller
 			if ($this->models->Literature->save($data))
 			{
 
-				$this->clearCache($this->cacheFiles);
+				
 				
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Literature->getNewId();
 
@@ -428,7 +424,7 @@ class LiteratureController extends Controller
 
 				}
 				
-	        	$this->clearCache($this->cacheFiles);
+	        	
 
 			}
 

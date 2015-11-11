@@ -17,8 +17,6 @@ class ModuleController extends Controller
 
     public $controllerPublicName = 'Free Modules';
 
-    public $cacheFiles = array('search-contentsModules');
-    
     public $cssToLoad = array(
 		'prettyPhoto/prettyPhoto.css',
 		'lookup.css',
@@ -170,7 +168,7 @@ class ModuleController extends Controller
 
 			if ($this->rHasVal('action','delete')) {
 
-				$this->clearCache($this->cacheFiles);
+				
 				
 				$this->deletePage();
 				
@@ -408,7 +406,7 @@ class ModuleController extends Controller
 
 		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
 		
-			$this->clearCache($this->cacheFiles);
+			
 			
 			$d = $this->getPages();
 			
@@ -579,7 +577,7 @@ class ModuleController extends Controller
         
         if ($this->requestData['action'] == 'save_content') {
             
-            $this->clearCache($this->cacheFiles);
+            
         	
             $this->ajaxSaveContent();
         

@@ -20,7 +20,6 @@ class Literature2Controller extends NsrController
     );
    
     public $controllerPublicName = 'Literatuur (v2)';
-    public $cacheFiles = array();
     public $usedHelpers = array('csv_parser_helper');
     public $cssToLoad = array('nsr_taxon_beheer.css','literature2.css');
 

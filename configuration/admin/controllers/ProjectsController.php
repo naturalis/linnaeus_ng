@@ -772,31 +772,6 @@ class ProjectsController extends Controller
         $this->printPage();
 
     }
-	
-	public function clearCacheAction()
-    {
-        $this->checkAuthorisation(true);
-        
-        $this->setPageName($this->translate('Clear project cache'));
-        
-		if ($this->rHasVal('action','clear') && !$this->isFormResubmit()) {
-                
-			$this->emptyCacheFolder();
-			
-			$this->addMessage('Cleared project cache.');
-
-	        $this->smarty->assign('cleared', true);
-
-        }
-		
-        $this->printPage();
-
-    }
-
-
-
-
-
 
     private function ajaxActionModules ($moduleType, $action, $moduleId)
     {
@@ -1132,14 +1107,6 @@ class ProjectsController extends Controller
 					$pInUse[intval($boom)] = intval($boom);
 			}
 		}
-		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
-			if(is_dir($file)) {
-				$boom = explode('/',$file);
-				$boom = array_pop($boom);
-				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
-			}
-		}
 
 		$d = $this->models->Project->_get(array('id' => '*'));
 		
@@ -1192,13 +1159,6 @@ class ProjectsController extends Controller
 		);
 
 		$this->addMessage('Renamed media directory');
-
-		rename(
-			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($oldId),
-			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($newId)
-		);
-
-		$this->addMessage('Renamed cache directory');
 
 		$this->models->Project->update(
 			array('id'=>$newId),

@@ -91,7 +91,6 @@ class UtilitiesController extends Controller
 	*/
     public function adminIndexAction ()
     {
-
         $this->checkAuthorisation();
 
         $this->includeLocalMenu = true;

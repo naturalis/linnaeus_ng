@@ -10,8 +10,6 @@ class TreeController extends Controller
     );
     public $usedHelpers = array(
     );
-    public $cacheFiles = array(
-    );
     public $cssToLoad = array(
         'lookup.css',
 		'nsr_taxon_tree.css'
