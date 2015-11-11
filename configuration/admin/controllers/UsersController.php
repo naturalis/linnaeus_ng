@@ -322,7 +322,6 @@ class UsersController extends Controller
 				$this->isRoleAssignable($this->rGetVal('role_id'))
 			)
 			{
-
 				$d = $this->saveNewUser($data);
 
 				if ($d===true)
@@ -416,13 +415,9 @@ class UsersController extends Controller
 		$pagination = $this->getPagination($users,20);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
-
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
-
 		$this->smarty->assign('users',$pagination['items']);
-
         $this->smarty->assign('userProjectCount', $userProjectCount);
-
         $this->smarty->assign('currentProjectUsers', $currentProjectUsers);
 
         $this->printPage();
@@ -666,7 +661,7 @@ class UsersController extends Controller
 					}
 					else
 					{
-						unset($this->rGetVal('password'));
+						unset($data['password']);
 					}
 
 					$this->models->Users->save($data);
@@ -1082,7 +1077,7 @@ class UsersController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-		$idToIgnore = isset($this->rGetVal('id_to_ignore')) ? $this->rGetVal('id_to_ignore') : null;
+		$idToIgnore = $this->rHasVal('id_to_ignore') ? $this->rGetVal('id_to_ignore') : null;
 		
 		$values=$this->rHasVal('values') ? $this->rGetVal('values') : null;
 
