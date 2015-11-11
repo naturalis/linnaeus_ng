@@ -309,7 +309,7 @@ class UsersController extends Controller
 
         if ($this->rHasVal('action','create') && !$this->isFormResubmit())
 		{
-			$data=$this->sanitizeUserData($this->rGetAll());
+			$data=$this->sanitizeUserData($this->GetAll());
 
 			if (
 				$this->isUserDataComplete($data) &&
@@ -365,14 +365,14 @@ class UsersController extends Controller
         $this->smarty->assign('modules', $modules['modules']);
         $this->smarty->assign('freeModules', $modules['freeModules']);
 
-        if (null!==$this->rGetAll() && isset($data) && $this->rGetAll()!=$data) 
+        if (null!==$this->GetAll() && isset($data) && $this->GetAll()!=$data) 
 		{
 			$this->smarty->assign('data', $data);
 		}
 		else
-        if (null!==$this->rGetAll())
+        if (null!==$this->GetAll())
 		{
-			$this->smarty->assign('data', $this->rGetAll());
+			$this->smarty->assign('data', $this->GetAll());
 		}
 
         $this->printPage();
@@ -609,7 +609,7 @@ class UsersController extends Controller
 
 			if ($this->rHasVal('action','update') && !$this->isFormResubmit())
 			{
-				$data=$this->sanitizeUserData($this->rGetAll());
+				$data=$this->sanitizeUserData($this->GetAll());
 
 				$passwordsUnchanged = empty($data['password']) && empty($data['password_2']);
 
@@ -675,7 +675,7 @@ class UsersController extends Controller
 				} 
 				else 
 				{
-					$user=$this->rGetAll();
+					$user=$this->GetAll();
 				}
 			}
 
@@ -845,7 +845,7 @@ class UsersController extends Controller
 			{
 				$this->smarty->assign('user',$this->getUserById($this->rGetVal('uid')));
 				$this->smarty->assign('module',$module);
-				$this->smarty->assign('requestData',$this->rGetAll());
+				$this->smarty->assign('requestData',$this->GetAll());
 			} 
 			else 
 			{
@@ -907,7 +907,7 @@ class UsersController extends Controller
 			{
 				$this->smarty->assign('user',$this->getUserById($this->rGetVal('uid')));
 				$this->smarty->assign('module',$module);
-				$this->smarty->assign('requestData',$this->rGetAll());
+				$this->smarty->assign('requestData',$this->GetAll());
 			} 
 			else
 			{

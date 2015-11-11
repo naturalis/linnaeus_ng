@@ -69,7 +69,7 @@ class SpeciesController extends Controller
         'content_taxon',
         'section',
         'label_section',
-        'page_taxon',
+        'pages_taxa',
         'page_taxon_title',
         'heartbeat',
         'content_taxon_undo',
@@ -255,7 +255,7 @@ class SpeciesController extends Controller
 
 			// determine the language the page will open in
 			$projectLanguages=$this->getProjectLanguages();
-			$startLanguage = $this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultProjectLanguage();
+			$startLanguage = $this->rHasVal('lan') ? $this->rGetVal('lan') : $this->getDefaultProjectLanguage();
 
 			// get the defined categories (just the page definitions, no content yet)
 			$taxonPages = $this->models->PageTaxon->_get(
@@ -296,7 +296,7 @@ class SpeciesController extends Controller
 			// determine the page_id the page will open in
 			$startPage=
 				$this->rHasVal('page') ?
-					$this->requestData['page'] :
+					$this->rGetVal('page') :
 					(isset($_SESSION['admin']['system']['lastActivePage']) ?
 						$_SESSION['admin']['system']['lastActivePage'] :
 						$defaultPage
@@ -494,7 +494,7 @@ class SpeciesController extends Controller
         if (!$this->rHasId())
             $this->redirect('new.php');
 
-        if (!$this->userHasTaxon($this->requestData['id']))
+        if (!$this->userHasTaxon($this->rGetVal('id')))
             $this->redirect('index.php');
 
         $data = $this->getTaxonById();
@@ -508,7 +508,7 @@ class SpeciesController extends Controller
         }
 
         else
-        if (!$this->doLockOutUser($this->requestData['id'], true))
+        if (!$this->doLockOutUser($this->rGetVal('id'), true))
 		{
 	        if (isset($data))
 	            $this->smarty->assign('data', $data);
@@ -525,21 +525,21 @@ class SpeciesController extends Controller
 
                 $isHybrid = $this->requestData['is_hybrid'];
 
-                if ($this->requestData['id'] == $this->requestData['parent_id'])
-                    $parentId = $this->requestData['org_parent_id'];
-                else if ($isEmptyTaxaList || $this->requestData['parent_id'] == '-1')
+                if ($this->rGetId() == $this->rGetVal('parent_id'))
+                    $parentId = $this->rGetVal('org_parent_id');
+                else if ($isEmptyTaxaList || $this->rGetVal('parent_id') == '-1')
                     $parentId = null;
                 else
-                    $parentId = $this->requestData['parent_id'];
+                    $parentId = $this->rGetVal('parent_id');
 
                 $parent = $this->getTaxonById($parentId);
 
-                $newName = $this->requestData['taxon'];
+                $newName = $this->rGetVal('taxon');
 
                 $newName = trim(preg_replace('/\s+/', ' ', $newName));
 
                 // remove ()'s from subgenus (changed silently)
-                $newName = $this->fixSubgenusParentheses($newName, $this->requestData['rank_id']);
+                $newName = $this->fixSubgenusParentheses($newName, $this->rGetVal('rank_id'));
                 // first letter is capitalized & subgenus parantheses are removed (changed silently)
                 $newName = $this->fixNameCasting($newName);
 
@@ -549,7 +549,7 @@ class SpeciesController extends Controller
                 // only applies to genus and below and when name != newName
                 $dummy = $this->models->ProjectRank->_get(array(
                     'id' => array(
-                        'id' => $this->requestData['rank_id'],
+                        'id' => $this->rGetVal('rank_id'),
                         'project_id' => $this->getCurrentProjectId()
                     )
                 ));
@@ -557,7 +557,7 @@ class SpeciesController extends Controller
                 if ($dummy[0]['rank_id'] >= GENUS_RANK_ID && $data['taxon'] != $newName)
 				{
 
-                    $this->getTaxonTree(array('pId' => $this->requestData['id']));
+                    $this->getTaxonTree(array('pId' => $this->rGetId()));
 
                     $children = isset($this->treeList) ? $this->treeList : false;
 
@@ -588,7 +588,7 @@ class SpeciesController extends Controller
 
                 //checks
                 /* NON LETHAL */
-                if (!$this->checkNameSpaces($newName, $this->requestData['rank_id'], $this->requestData['parent_id'])) {
+                if (!$this->checkNameSpaces($newName, $this->rGetVal('rank_id'), $this->rGetVal('parent_id'))) {
                     $this->addError($this->translate('The number of spaces in the name does not match the selected rank.'));
                     $hasErrorButCanSave = true;
                 }
@@ -612,10 +612,10 @@ class SpeciesController extends Controller
                     $this->addError($this->translate('No parent selected (you can still save).'));
                     $hasErrorButCanSave = true;
                 } else
-				if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
+				if (isset($pr[$this->rGetVal('rank_id')]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->rGetVal('rank_id')]['ideal_parent_id']) {
                     $this->addError(
                     sprintf($this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'),
-                    strtolower($pr[$this->requestData['rank_id']]['rank']), strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
+                    strtolower($pr[$this->rGetVal('rank_id')]['rank']), strtolower($pr[$pr[$this->rGetVal('rank_id')]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
                     $hasErrorButCanSave = true;
                 }
 
@@ -623,9 +623,9 @@ class SpeciesController extends Controller
                 /* LETHAL / NON-LETHAL */
                 $dummy = $this->newIsTaxonNameUnique(array(
                     'name' => $newName,
-                    'rankId' => $this->requestData['rank_id'],
+                    'rankId' => $this->rGetVal('rank_id'),
                     'parentId' => $parentId,
-	                'ignoreId' => $this->requestData['id']
+	                'ignoreId' => $this->rGetId()
                 ));
                 if ($dummy === false) {
                     $this->addError(sprintf($this->translate('The name "%s" already exists.'), $newName));
@@ -638,7 +638,7 @@ class SpeciesController extends Controller
 
 
                 /* LETHAL */
-                if (!is_null($parent) && !$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+                if (!is_null($parent) && !$this->canParentHaveChildTaxa($this->rGetVal('parent_id')) || $isEmptyTaxaList) {
                     $this->addError($this->translate('The selected parent taxon can not have children.'));
                     $hasErrorButCanSave = false;
                 }
@@ -651,7 +651,7 @@ class SpeciesController extends Controller
                     }
                 }
 
-                if ($isHybrid != '0' && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
+                if ($isHybrid != '0' && !$this->canRankBeHybrid($this->rGetVal('rank_id'))) {
                     $this->addError($this->translate('Rank cannot be hybrid.'));
                     $hasErrorButCanSave = false;
                 }
@@ -665,18 +665,18 @@ class SpeciesController extends Controller
 
                     $this->models->Taxon->save(
                     array(
-                        'id' => $this->requestData['id'],
+                        'id' => $this->rGetId(),
                         'project_id' => $this->getCurrentProjectId(),
                         'taxon' => $newName,
-                        'author' => ($this->requestData['author'] ? $this->requestData['author'] : null),
+                        'author' => ($this->rGetVal('author') ? $this->rGetVal('author') : null),
                         'parent_id' => (empty($parentId) ? 'null' : $parentId),
-                        'rank_id' => $this->requestData['rank_id'],
+                        'rank_id' => $this->rGetVal('rank_id'),
                         'is_hybrid' => $isHybrid
                     ));
 
 					$this->logChange($this->models->Taxon->getDataDelta());
 
-					$this->saveParentage($this->requestData['id']);
+					$this->saveParentage($this->rGetId());
 
                     if (!empty($children)) {
 
@@ -696,7 +696,7 @@ class SpeciesController extends Controller
                     }
 
                     if ($this->rHasVal('next', 'main'))
-                        $this->redirect('taxon.php?id=' . $this->requestData['id']);
+                        $this->redirect('taxon.php?id=' . $this->rGetId());
 
                     $d = $this->getTaxonById();
 
@@ -782,18 +782,18 @@ class SpeciesController extends Controller
 //			 && !$this->isFormResubmit())
 			{
 
-                $isHybrid = $this->requestData['is_hybrid'];
+                $isHybrid = $this->rGetVal('is_hybrid');
 
-                $parentId = ((isset($this->requestData['id']) && $this->requestData['id'] == $this->requestData['parent_id']) || $isEmptyTaxaList || $this->requestData['parent_id'] == '-1' ? null : $this->requestData['parent_id']);
+                $parentId = (($this->rHasId() && $this->rGetId() == $this->rGetVal('parent_id')) || $isEmptyTaxaList || $this->rGetVal('parent_id') == '-1' ? null : $this->rGetVal('parent_id'));
 
                 $parent = $this->getTaxonById($parentId);
 
 
 		// REFAC2015 move to a cleanuo function
-		$newName = $this->requestData['taxon'];
+		$newName = $this->rGetVal('taxon');
 		$newName = trim(preg_replace('/\s+/', ' ', $newName));
 		// remove ()'s from subgenus (changed silently)
-		$newName = $this->fixSubgenusParentheses($newName, $this->requestData['rank_id']);
+		$newName = $this->fixSubgenusParentheses($newName, $this->rGetVal('rank_id'));
 		// first letter is capitalized & subgenus parantheses are removed (changed silently)
 		$newName = $this->fixNameCasting($newName);
 
@@ -803,7 +803,7 @@ class SpeciesController extends Controller
 		// REFAC2015 make separate functions
 		//checks
 		/* NON LETHAL */
-		if (!$this->checkNameSpaces($newName, $this->requestData['rank_id'], $this->requestData['parent_id'])) {
+		if (!$this->checkNameSpaces($newName, $this->rGetVal('rank_id'), $this->rGetVal('parent_id'))) {
 			$this->addError($this->translate('The number of spaces in the name does not match the selected rank.'));
 			$hasErrorButCanSave = true;
 		}
@@ -823,10 +823,10 @@ class SpeciesController extends Controller
 		}
 
 		// 2. Issue warning if a species is not linked to an ideal parent.
-		if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
+		if (isset($pr[$this->rGetVal('rank_id')]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->rGetVal('rank_id')]['ideal_parent_id']) {
 			$this->addError(
 			sprintf($this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'),
-			strtolower($pr[$this->requestData['rank_id']]['rank']), strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
+			strtolower($pr[$this->rGetVal('rank_id')]['rank']), strtolower($pr[$pr[$this->rGetVal('rank_id')]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
 			$hasErrorButCanSave = true;
                 }
 
@@ -837,13 +837,14 @@ class SpeciesController extends Controller
 		/* LETHAL / NON-LETHAL */
 		$dummy = $this->newIsTaxonNameUnique(array(
 			'name' => $newName,
-			'rankId' => $this->requestData['rank_id'],
+			'rankId' => $this->rGetVal('rank_id'),
 			'parentId' => $parentId
 		));
 		if ($dummy === false) {
 			$this->addError(sprintf($this->translate('The name "%s" already exists.'), $newName));
 			$hasErrorButCanSave = false;
 		}
+
 		else if ($dummy !== true) {
 			$this->addError($dummy);
 			$hasErrorButCanSave = true;
@@ -851,7 +852,7 @@ class SpeciesController extends Controller
 
 
 		/* LETHAL */
-		if (!$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+		if (!$this->canParentHaveChildTaxa($this->rGetVal('parent_id')) || $isEmptyTaxaList) {
 // causes problems when saving the very first taxon
 //                    $this->addError($this->translate('The selected parent taxon can not have children.'));
 //                    $hasErrorButCanSave = false;
@@ -864,7 +865,7 @@ class SpeciesController extends Controller
 			}
 		}
 
-		if ($isHybrid != '0' && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
+		if ($isHybrid != '0' && !$this->canRankBeHybrid($this->rGetVal('rank_id'))) {
 			$this->addError($this->translate('Rank cannot be hybrid.'));
 			$hasErrorButCanSave = false;
 		}
@@ -881,12 +882,12 @@ class SpeciesController extends Controller
 
                     $this->models->Taxon->save(
                     array(
-                        'id' => ($this->rHasId() ? $this->requestData['id'] : null),
+                        'id' => ($this->rHasId() ? $this->rGetId() : null),
                         'project_id' => $this->getCurrentProjectId(),
                         'taxon' => $newName,
-                        'author' => ($this->requestData['author'] ? $this->requestData['author'] : null),
+                        'author' => ($this->rHasVal('author') ? $this->rGetVal('author') : null),
                         'parent_id' => $parentId,
-                        'rank_id' => $this->requestData['rank_id'],
+                        'rank_id' => $this->rGetVal('rank_id'),
                         'is_hybrid' => $isHybrid
                     ));
 
@@ -958,9 +959,9 @@ class SpeciesController extends Controller
 
 			set_time_limit(600);
 
-            $taxon = $this->getTaxonById($this->requestData['id']);
+            $taxon = $this->getTaxonById($this->rGetId());
 
-            foreach ((array) $this->requestData['child'] as $key => $val) {
+            foreach ((array) $this->rGetVal('child') as $key => $val) {
 
                 if ($val == 'delete')
 				{
@@ -991,7 +992,7 @@ class SpeciesController extends Controller
             }
 
             // delete the taxon
-            $this->deleteTaxon($this->requestData['id']);
+            $this->deleteTaxon($this->rGetId());
 
             $this->redirect('branches.php');
         }
@@ -1044,7 +1045,7 @@ class SpeciesController extends Controller
 
             
 
-            foreach ((array) $this->requestData['child'] as $key => $val) {
+            foreach ((array) $this->rGetVal('child') as $key => $val) {
 
                 if ($val == 'delete') {
 
@@ -1055,7 +1056,7 @@ class SpeciesController extends Controller
                 elseif ($val == 'attach') {
 
                     $this->models->Taxon->update(array(
-                        'parent_id' => $this->requestData['parent'][$key]
+                        'parent_id' => $this->rGetVal('parent')[$key]
                     ), array(
                         'project_id' => $this->getCurrentProjectId(),
                         'id' => $key
@@ -1131,7 +1132,7 @@ class SpeciesController extends Controller
                 $this->setPageName(sprintf($this->translate('Literature for "%s"'), $taxon['taxon']));
             }
 
-            $this->smarty->assign('id', $this->requestData['id']);
+            $this->smarty->assign('id', $this->rGetId());
 
             $refs = $this->getTaxonLiterature($taxon['id']);
 
@@ -1139,8 +1140,8 @@ class SpeciesController extends Controller
             if ($this->rHasVal('key')) {
 
                 $sortBy = array(
-                    'key' => $this->requestData['key'],
-                    'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'),
+                    'key' => $this->rGetVal('key'),
+                    'dir' => ($this->rGetVal('dir') == 'asc' ? 'desc' : 'asc'),
                     'case' => 'i'
                 );
             }
@@ -1185,7 +1186,7 @@ class SpeciesController extends Controller
             unset($_SESSION['admin']['system']['csv_data']);
 
             /*
-			switch ($this->requestData["enclosure"]) {
+			switch ($this->rGetVal("enclosure")) {
 				case 'double' :
 					$this->helpers->CsvParserHelper->setFieldEnclosure('"');
 					break;
@@ -1198,7 +1199,7 @@ class SpeciesController extends Controller
 			}
 			*/
 
-            switch ($this->requestData["delimiter"]) {
+            switch ($this->rGetVal("delimiter")) {
                 case 'comma':
                     $this->helpers->CsvParserHelper->setFieldDelimiter(',');
                     break;
@@ -1334,7 +1335,7 @@ class SpeciesController extends Controller
 
             }
         }
-        else if (isset($this->requestData) && !$this->isFormResubmit()) {
+        else if (null!==$this->GetAll() && !$this->isFormResubmit()) {
             // list of taxa and ranks to be saved detected: save taxa
 
             if ($this->rHasVal('rows') && isset($_SESSION['admin']['system']['csv_data'])) {
@@ -1345,7 +1346,7 @@ class SpeciesController extends Controller
                     array(
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(),
-                            'id' => $this->requestData['connectToTaxonId']
+                            'id' => $this->rGetVal('connectToTaxonId')
                         )
                     ));
 
@@ -1360,7 +1361,7 @@ class SpeciesController extends Controller
                 $predecessors = null;
 
                 // traverse the list of taxa
-                foreach ((array) $this->requestData['rows'] as $key => $val) {
+                foreach ((array) $this->rGetVal('rows') as $key => $val) {
 
                     $name = $_SESSION['admin']['system']['csv_data'][$val][0];
                     $rank = $_SESSION['admin']['system']['csv_data'][$val][1];
@@ -1735,71 +1736,71 @@ class SpeciesController extends Controller
         if (!$this->rHasVal('action'))
             return;
 
-        if ($this->requestData['action'] == 'save_taxon') {
+        if ($this->rGetVal('action') == 'save_taxon') {
 
-            $c = $this->saveTaxon($this->requestData);
+            $c = $this->saveTaxon($this->GetAll());
 
             if (!$c)
                 $this->smarty->assign('returnText', '<msg>Empty taxa are not shown');
         }
-        else if ($this->requestData['action'] == 'get_taxon') {
+        else if ($this->rGetVal('action') == 'get_taxon') {
 
             $this->ajaxActionGetTaxon();
 
-            $_SESSION['admin']['system']['lastActivePage'] = $this->requestData['page'];
+            $_SESSION['admin']['system']['lastActivePage'] = $this->rGetVal('page');
         }
-        else if ($this->requestData['action'] == 'delete_taxon') {
+        else if ($this->rGetVal('action') == 'delete_taxon') {
 
             
 
             $this->ajaxActionDeleteTaxon();
         }
-        else if ($this->requestData['action'] == 'delete_page') {
+        else if ($this->rGetVal('action') == 'delete_page') {
 
             $this->ajaxActionDeletePage();
         }
-        else if ($this->requestData['action'] == 'get_page_labels') {
+        else if ($this->rGetVal('action') == 'get_page_labels') {
 
             $this->ajaxActionGetPageTitles();
         }
-        else if ($this->requestData['action'] == 'save_page_title') {
+        else if ($this->rGetVal('action') == 'save_page_title') {
 
             $this->ajaxActionSavePageTitle();
         }
-        else if ($this->requestData['action'] == 'get_page_states') {
+        else if ($this->rGetVal('action') == 'get_page_states') {
 
             $this->ajaxActionGetPageStates();
         }
-        else if ($this->requestData['action'] == 'publish_content') {
+        else if ($this->rGetVal('action') == 'publish_content') {
 
             $this->ajaxActionPublishContent();
         }
-        else if ($this->requestData['action'] == 'get_col') {
+        else if ($this->rGetVal('action') == 'get_col') {
 
             $this->getCatalogueOfLifeData();
         }
-        else if ($this->requestData['action'] == 'save_col') {
+        else if ($this->rGetVal('action') == 'save_col') {
 
             
 
             $this->ajaxActionImportTaxa();
         }
-        else if ($this->requestData['action'] == 'save_taxon_name') {
+        else if ($this->rGetVal('action') == 'save_taxon_name') {
 
             $this->ajaxActionSaveTaxonName();
         }
-        else if ($this->requestData['action'] == 'save_rank_label') {
+        else if ($this->rGetVal('action') == 'save_rank_label') {
 
             $this->ajaxActionSaveRankLabel();
         }
-        else if ($this->requestData['action'] == 'get_rank_labels') {
+        else if ($this->rGetVal('action') == 'get_rank_labels') {
 
             $this->ajaxActionGetRankLabels();
         }
-        else if ($this->requestData['action'] == 'get_rank_by_parent') {
+        else if ($this->rGetVal('action') == 'get_rank_by_parent') {
 
             // get intel on the taxon that will be the parent
-            $d = $this->getTaxonById($this->requestData['id']);
+            $d = $this->getTaxonById($this->rGetId());
 
             //// get the project RANK that is the child of the parent taxon's RANK
             //$rank = $this->getProjectRankByParentProjectRank($d['rank_id']);
@@ -1810,75 +1811,76 @@ class SpeciesController extends Controller
 
             $this->smarty->assign('returnText', $rank);
         }
-        else if ($this->requestData['action'] == 'save_section_title') {
+        else if ($this->rGetVal('action') == 'save_section_title') {
 
             $this->ajaxActionSaveSectionTitle();
         }
-        else if ($this->requestData['action'] == 'delete_section_title') {
+        else if ($this->rGetVal('action') == 'delete_section_title') {
 
             $this->ajaxActionDeleteSectionTitle();
         }
-        else if ($this->requestData['action'] == 'get_section_titles') {
+        else if ($this->rGetVal('action') == 'get_section_titles') {
 
             $this->ajaxActionGetSectionLabels();
         }
-        else if ($this->requestData['action'] == 'get_language_labels') {
+        else if ($this->rGetVal('action') == 'get_language_labels') {
 
             $this->ajaxActionGetLanguageLabels();
         }
-        else if ($this->requestData['action'] == 'save_language_label') {
+        else if ($this->rGetVal('action') == 'save_language_label') {
 
             $this->ajaxActionSaveLanguageLabel();
         }
-        else if ($this->requestData['action'] == 'get_subgenus_child_name_prefix') {
+        else if ($this->rGetVal('action') == 'get_subgenus_child_name_prefix') {
 
-            $this->smarty->assign('returnText', $this->getSubgenusChildNamePrefix($this->requestData['id'])); // phew!
+            $this->smarty->assign('returnText', $this->getSubgenusChildNamePrefix($this->rGetId())); // phew!
         }
-        else if ($this->requestData['action'] == 'get_formatted_name') {
+        else if ($this->rGetVal('action') == 'get_formatted_name') {
 
             $this->smarty->assign('returnText',
             $this->formatTaxon(
             array(
-                'taxon' => $this->requestData['name'],
-                'rank_id' => $this->requestData['rank_id'],
-                'parent_id' => $this->requestData['parent_id'],
-                'is_hybrid' => $this->requestData['is_hybrid']
+                'taxon' => $this->rGetVal('name'),
+                'rank_id' => $this->rGetVal('rank_id'),
+
+                'parent_id' => $this->rGetVal('parent_id'),
+                'is_hybrid' => $this->rGetVal('is_hybrid')
             )));
         }
-        else if ($this->requestData['action'] == 'delete_variation') {
+        else if ($this->rGetVal('action') == 'delete_variation') {
 
-            $this->deleteVariation($this->requestData['id']);
+            $this->deleteVariation($this->rGetId());
         }
-        else if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
+        else if ($this->rHasVal('action', 'get_lookup_list') && $this->rHasVal('search')) {
 
-            $list=$this->getLookupList($this->requestData);
+            $list=$this->getLookupList($this->GetAll());
 			$this->smarty->assign('returnText',$list);
 
         }
-        else if ($this->rHasVal('action', 'delete_synonym') && !empty($this->requestData['id'])) {
+        else if ($this->rHasVal('action', 'delete_synonym') && rHasVal('id')) {
 
 			$d = $this->models->Synonym->delete(array(
 				'project_id' => $this->getCurrentProjectId(),
-				'id' => $this->requestData['id']
+				'id' => $this->rGetId()
 			));
 			$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );
 
         }
-        else if ($this->rHasVal('action', 'delete_common') && !empty($this->requestData['id'])) {
+        else if ($this->rHasVal('action', 'delete_common') && rHasVal('id')) {
 
 			$d = $this->models->Commonname->delete(array(
 				'project_id' => $this->getCurrentProjectId(),
-				'id' => $this->requestData['id']
+				'id' => $this->rGetId()
 			));
 			$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );
 
         }
-		 else if ($this->rHasVal('action', 'save_synonym_data') && !empty($this->requestData['id']) && !empty($this->requestData['val']) && !empty($this->requestData['col'])) {
+		 else if ($this->rHasVal('action', 'save_synonym_data') && !empty($this->rGetId()) && rHasVal('val') && rHasVal('col')) {
 
-			if ($this->requestData['col']=='s')
-				$what = array('synonym' => trim($this->requestData['val']));
-			elseif ($this->requestData['col']=='a')
-				$what = array('author' => trim($this->requestData['val']));
+			if ($this->rGetVal('col')=='s')
+				$what = array('synonym' => trim($this->rGetVal('val')));
+			elseif ($this->rGetVal('col')=='a')
+				$what = array('author' => trim($this->rGetVal('val')));
 			else
 				$what = null;
 
@@ -1888,7 +1890,7 @@ class SpeciesController extends Controller
 					$what,
 					array(
 					'project_id' => $this->getCurrentProjectId(),
-					'id' => $this->requestData['id']
+					'id' => $this->rGetId()
 				));
 				$this->logChange($this->models->Synonym->getDataDelta());
 				$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );
@@ -1922,9 +1924,9 @@ class SpeciesController extends Controller
 
             $isLowerTaxon = false;
 
-            foreach ((array) $this->requestData['ranks'] as $key => $rank) {
+            foreach ((array) $this->rGetVal('ranks') as $key => $rank) {
 
-                if ($this->requestData['higherTaxaBorder'] == $rank) {
+                if ($this->rGetVal('higherTaxaBorder') == $rank) {
 
                     $isLowerTaxon = true;
 
@@ -1976,7 +1978,7 @@ class SpeciesController extends Controller
 
             foreach ((array) $pr as $key => $rank) {
 
-                if (!in_array($rank['rank_id'], $this->requestData['ranks'])) {
+                if (!in_array($rank['rank_id'], $this->rGetVal('ranks'))) {
 
                     $pr = $this->models->ProjectRank->_get(
                     array(
@@ -2065,7 +2067,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasVal('new') && !$this->isFormResubmit()) {
 
-            foreach ((array) $this->requestData['new'] as $key => $val) {
+            foreach ((array) $this->rGetVal('new') as $key => $val) {
 
 				if (empty($val)) continue;
 
@@ -2134,18 +2136,18 @@ class SpeciesController extends Controller
 
         $this->setPageName($this->translate('Assign taxa to collaborators'));
 
-        if (isset($this->requestData) && !$this->isFormResubmit()) {
+        if (null!==$this->GetAll() && !$this->isFormResubmit()) {
 
             if ($this->rHasVal('delete')) {
 
                 $this->models->UserTaxon->delete(array(
-                    'id' => $this->requestData['delete'],
+                    'id' => $this->rGetVal('delete'),
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
             else {
 
-                $this->doAssignUserTaxon($this->requestData['user_id'], $this->requestData['taxon_id']);
+                $this->doAssignUserTaxon($this->rGetVal('user_id'), $this->rGetVal('taxon_id'));
             }
 
             unset($_SESSION['admin']['species']['usertaxa']);
@@ -2217,7 +2219,7 @@ class SpeciesController extends Controller
             if ($this->rHasVal('action', 'delete')) {
 
                 $this->models->Synonym->delete(array(
-                    'id' => $this->requestData['synonym_id'],
+                    'id' => $this->rGetVal('synonym_id'),
                     'project_id' => $this->getCurrentProjectId()
                 ));
 
@@ -2225,7 +2227,7 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'taxon_id' => $this->requestData['id']
+                        'taxon_id' => $this->rGetId()
                     ),
                     'order' => 'show_order'
                 ));
@@ -2250,7 +2252,7 @@ class SpeciesController extends Controller
                 $s = $this->models->Synonym->_get(
                 array(
                     'id' => array(
-                        'id' => $this->requestData['synonym_id'],
+                        'id' => $this->rGetVal('synonym_id'),
                         'project_id' => $this->getCurrentProjectId()
                     )
                 ));
@@ -2259,13 +2261,13 @@ class SpeciesController extends Controller
                     'show_order' => $s[0]['show_order']
                 ), array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'show_order' => ($this->requestData['action'] == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
+                    'show_order' => ($this->rGetVal('action') == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
                 ));
 
                 $this->models->Synonym->update(array(
-                    'show_order' => ($this->requestData['action'] == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
+                    'show_order' => ($this->rGetVal('action') == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
                 ), array(
-                    'id' => $this->requestData['synonym_id'],
+                    'id' => $this->rGetVal('synonym_id'),
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
@@ -2276,7 +2278,7 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'taxon_id' => $this->requestData['id']
+                        'taxon_id' => $this->rGetId()
                     ),
                     'columns' => 'max(show_order) as next'
                 ));
@@ -2286,10 +2288,10 @@ class SpeciesController extends Controller
                 $this->models->Synonym->save(
                 array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $this->requestData['id'],
-                    'lit_ref_id' => $this->rHasVal('lit_ref_id') ? $this->requestData['lit_ref_id'] : null,
-                    'synonym' => $this->requestData['synonym'],
-                    'author' => $this->rHasVal('author') ? $this->requestData['author'] : null,
+                    'taxon_id' => $this->rGetId(),
+                    'lit_ref_id' => $this->rHasVal('lit_ref_id') ? $this->rGetVal('lit_ref_id') : null,
+                    'synonym' => $this->rGetVal('synonym'),
+                    'author' => $this->rHasVal('author') ? $this->rGetVal('author') : null,
                     'show_order' => $show_order
                 ));
 
@@ -2310,7 +2312,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $this->requestData['id']
+                    'taxon_id' => $this->rGetId()
                 ),
                 'order' => 'show_order'
             ));
@@ -2318,7 +2320,7 @@ class SpeciesController extends Controller
 
         $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
 
-        $this->smarty->assign('id', $this->requestData['id']);
+        $this->smarty->assign('id', $this->rGetId());
 
         $this->smarty->assign('taxon', $taxon);
 
@@ -2360,7 +2362,7 @@ class SpeciesController extends Controller
             if ($this->rHasVal('action', 'delete')) {
 
                 $this->models->Commonname->delete(array(
-                    'id' => $this->requestData['commonname_id'],
+                    'id' => $this->rGetVal('commonname_id'),
                     'project_id' => $this->getCurrentProjectId()
                 ));
 
@@ -2368,7 +2370,7 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'taxon_id' => $this->requestData['id']
+                        'taxon_id' => $this->rGetId()
                     ),
                     'order' => 'show_order'
                 ));
@@ -2393,7 +2395,7 @@ class SpeciesController extends Controller
                 $s = $this->models->Commonname->_get(
                 array(
                     'id' => array(
-                        'id' => $this->requestData['commonname_id'],
+                        'id' => $this->rGetVal('commonname_id'),
                         'project_id' => $this->getCurrentProjectId()
                     )
                 ));
@@ -2402,13 +2404,13 @@ class SpeciesController extends Controller
                     'show_order' => $s[0]['show_order']
                 ), array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'show_order' => ($this->requestData['action'] == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
+                    'show_order' => ($this->rGetVal('action') == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
                 ));
 
                 $this->models->Commonname->update(array(
-                    'show_order' => ($this->requestData['action'] == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
+                    'show_order' => ($this->rGetVal('action') == 'up' ? $s[0]['show_order'] - 1 : $s[0]['show_order'] + 1)
                 ), array(
-                    'id' => $this->requestData['commonname_id'],
+                    'id' => $this->rGetVal('commonname_id'),
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
@@ -2419,7 +2421,7 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'taxon_id' => $this->requestData['id']
+                        'taxon_id' => $this->rGetId()
                     ),
                     'columns' => 'max(show_order) as next'
                 ));
@@ -2430,16 +2432,16 @@ class SpeciesController extends Controller
                 array(
                     'id' => null,
                     'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $this->requestData['id'],
-                    'language_id' => $this->requestData['language_id'],
-                    'commonname' => $this->requestData['commonname'],
-                    'transliteration' => $this->requestData['transliteration'],
+                    'taxon_id' => $this->rGetId(),
+                    'language_id' => $this->rGetVal('language_id'),
+                    'commonname' => $this->rGetVal('commonname'),
+                    'transliteration' => $this->rGetVal('transliteration'),
                     'show_order' => $show_order
                 ));
 
 				$this->logChange($this->models->Commonname->getDataDelta());
 
-                $this->smarty->assign('lastLanguage', $this->requestData['language_id']);
+                $this->smarty->assign('lastLanguage', $this->rGetVal('language_id'));
             }
         }
 
@@ -2455,7 +2457,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $this->requestData['id']
+                    'taxon_id' => $this->rGetId()
                 ),
                 'order' => 'show_order'
             ));
@@ -2471,7 +2473,7 @@ class SpeciesController extends Controller
 
         $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon));
 
-        $this->smarty->assign('id', $this->requestData['id']);
+        $this->smarty->assign('id', $this->rGetId());
 
         if ($taxon)
             $this->smarty->assign('taxon', $taxon);
@@ -2490,7 +2492,7 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
 
         if (!$this->rHasVal('id') && $this->rHasVal('var')) {
-            $d = $this->getVariation($this->requestData['var']);
+            $d = $this->getVariation($this->rGetVal('var'));
             $taxon = $this->getTaxonById($d['taxon_id']);
         }
         else {
@@ -2505,8 +2507,8 @@ class SpeciesController extends Controller
             array(
                 'id' => null,
                 'project_id' => $this->getCurrentProjectId(),
-                'taxon_id' => $this->requestData['id'],
-                'label' => trim($this->requestData['variation'])
+                'taxon_id' => $this->rGetId(),
+                'label' => trim($this->rGetVal('variation'))
             ));
 
 			$this->logChange($this->models->TaxonVariation->getDataDelta());
@@ -2521,7 +2523,7 @@ class SpeciesController extends Controller
                     'project_id' => $this->getCurrentProjectId(),
                     'variation_id' => $nId,
                     'language_id' => $this->getDefaultProjectLanguage(),
-                    'label' => trim($this->requestData['variation']),
+                    'label' => trim($this->rGetVal('variation')),
                     'label_type' => 'alternative'
                 ));
 
@@ -2549,7 +2551,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
 
-        $taxon = $this->getTaxonById($this->requestData['id']);
+        $taxon = $this->getTaxonById($this->rGetId());
 
         if ($this->useVariations)
             $this->setPageName(sprintf($this->translate('Related taxa and variations for "%s"'), $taxon['taxon']));
@@ -2627,7 +2629,7 @@ class SpeciesController extends Controller
 
     public function previewAction ()
     {
-        $this->redirect('../../../app/views/species/taxon.php?p=' . $this->getCurrentProjectId() . '&id=' . $this->requestData['taxon_id'] . '&cat=' . $this->requestData['activePage'] . '&lan=' . $this->getDefaultProjectLanguage());
+        $this->redirect('../../../app/views/species/taxon.php?p=' . $this->getCurrentProjectId() . '&id=' . $this->rGetVal('taxon_id') . '&cat=' . $this->rGetVal('activePage') . '&lan=' . $this->getDefaultProjectLanguage());
     }
 
 
@@ -2885,17 +2887,17 @@ class SpeciesController extends Controller
 
             if ($this->rHasVal('taxon_name')) {
 
-                $this->helpers->ColLoaderHelper->setTaxonName($this->requestData['taxon_name']);
+                $this->helpers->ColLoaderHelper->setTaxonName($this->rGetVal('taxon_name'));
             }
 
             if ($this->rHasVal('taxon_id')) {
 
-                $this->helpers->ColLoaderHelper->setTaxonId($this->requestData['taxon_id']);
+                $this->helpers->ColLoaderHelper->setTaxonId($this->rGetVal('taxon_id'));
             }
 
             if ($this->rHasVal('levels')) {
 
-                $this->helpers->ColLoaderHelper->setNumberOfChildLevels($this->requestData['levels']);
+                $this->helpers->ColLoaderHelper->setNumberOfChildLevels($this->rGetVal('levels'));
             }
 
             $this->helpers->ColLoaderHelper->setTimeout(TIMEOUT_COL_RETRIEVAL);
@@ -2919,7 +2921,7 @@ class SpeciesController extends Controller
 
     private function createStandardCategories ()
     {
-        $tp = $this->models->PageTaxon->_get(array(
+        $tp = $this->models->PagesTaxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ),
@@ -2940,7 +2942,7 @@ class SpeciesController extends Controller
 
                 if (isset($page['mandatory']) && $page['mandatory'] === true) {
 
-                    $d = $this->models->PageTaxon->_get(
+                    $d = $this->models->PagesTaxa->_get(
                     array(
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(),
@@ -2965,7 +2967,7 @@ class SpeciesController extends Controller
 
     private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
     {
-        $d=$this->models->PageTaxon->save(
+        $d=$this->models->PagesTaxa->save(
         array(
             'id' => null,
             'page' => $name,
@@ -3406,7 +3408,7 @@ class SpeciesController extends Controller
 
     private function isTaxonNameUnique ($taxonName = false, $idToIgnore = null)
     {
-        $taxonName = $taxonName ? $taxonName : $this->requestData['taxon_name'];
+        $taxonName = $taxonName ? $taxonName : $this->rGetVal('taxon_name');
 
         if (empty($taxonName))
             return;
@@ -3482,22 +3484,22 @@ class SpeciesController extends Controller
 
             $this->models->ContentTaxon->delete(array(
                 'project_id' => $this->getCurrentProjectId(),
-                'page_id' => $this->requestData['id']
+                'page_id' => $this->rGetId()
             ));
 
             $this->models->PageTaxonTitle->delete(array(
                 'project_id' => $this->getCurrentProjectId(),
-                'page_id' => $this->requestData['id']
+                'page_id' => $this->rGetId()
             ));
 
             $this->models->Section->delete(array(
                 'project_id' => $this->getCurrentProjectId(),
-                'page_id' => $this->requestData['id']
+                'page_id' => $this->rGetId()
             ));
 
             $this->models->PageTaxon->delete(array(
                 'project_id' => $this->getCurrentProjectId(),
-                'id' => $this->requestData['id']
+                'id' => $this->rGetId()
             ));
         }
     }
@@ -3511,7 +3513,7 @@ class SpeciesController extends Controller
         else {
 
             $l = $this->models->Language->_get(array(
-                'id' => $this->requestData['language'],
+                'id' => $this->rGetVal('language'),
                 'columns' => 'direction'
             ));
 
@@ -3519,7 +3521,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language']
+                    'language_id' => $this->rGetVal('language')
                 ),
                 'columns' => 'id,title,page_id,language_id,\'' . $l['direction'] . '\' as direction'
             ));
@@ -3541,8 +3543,8 @@ class SpeciesController extends Controller
                 $this->models->PageTaxonTitle->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'page_id' => $this->requestData['id']
+                    'language_id' => $this->rGetVal('language'),
+                    'page_id' => $this->rGetId()
                 ));
             }
             else {
@@ -3551,8 +3553,8 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'],
-                        'page_id' => $this->requestData['id']
+                        'language_id' => $this->rGetVal('language'),
+                        'page_id' => $this->rGetId()
                     )
                 ));
 
@@ -3560,9 +3562,9 @@ class SpeciesController extends Controller
                 array(
                     'id' => isset($tpt[0]['id']) ? $tpt[0]['id'] : null,
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'page_id' => $this->requestData['id'],
-                    'title' => trim($this->requestData['label'])
+                    'language_id' => $this->rGetVal('language'),
+                    'page_id' => $this->rGetId(),
+                    'title' => trim($this->rGetVal('label'))
                 ));
 
 				$this->logChange($this->models->PageTaxonTitle->getDataDelta());
@@ -3583,21 +3585,21 @@ class SpeciesController extends Controller
             $ct = $this->models->ContentTaxon->_get(
             array(
                 'id' => array(
-                    'taxon_id' => $this->requestData['id'],
+                    'taxon_id' => $this->rGetId(),
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'page_id' => $this->requestData['page']
+                    'language_id' => $this->rGetVal('language'),
+                    'page_id' => $this->rGetVal('page')
                 )
             ));
 
             if (empty($ct[0])) {
 
                 $c = array(
-                    'project_id' => $this->requestData['id'],
+                    'project_id' => $this->rGetId(),
                     'taxon_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'page_id' => $this->requestData['page'],
-                    'content' => $this->getDefaultPageSections($this->requestData['page'], $this->requestData['language']),
+                    'language_id' => $this->rGetVal('language'),
+                    'page_id' => $this->rGetVal('page'),
+                    'content' => $this->getDefaultPageSections($this->rGetVal('page'), $this->rGetVal('language')),
                     'publish' => '0',
                     'title' => null
                 );
@@ -3623,7 +3625,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'parent_id' => $this->requestData['id']
+                    'parent_id' => $this->rGetId()
                 ),
                 'columns' => 'count(*) as total'
             ));
@@ -3634,7 +3636,7 @@ class SpeciesController extends Controller
             }
             else {
 
-                $this->deleteTaxon($this->requestData['id']);
+                $this->deleteTaxon($this->rGetId());
 
                 $this->smarty->assign('returnText', '<ok>');
             }
@@ -3649,8 +3651,8 @@ class SpeciesController extends Controller
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
-                'taxon_id' => $this->requestData['id'],
-                'language_id' => $this->requestData['language']
+                'taxon_id' => $this->rGetId(),
+                'language_id' => $this->rGetVal('language')
             ),
             'columns' => 'page_id,publish'
         ));
@@ -3677,23 +3679,23 @@ class SpeciesController extends Controller
             $ct = $this->models->ContentTaxon->_get(
             array(
                 'id' => array(
-                    'taxon_id' => $this->requestData['id'],
+                    'taxon_id' => $this->rGetId(),
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'page_id' => $this->requestData['page']
+                    'language_id' => $this->rGetVal('language'),
+                    'page_id' => $this->rGetVal('page')
                 )
             ));
 
             if (!empty($ct[0])) {
 
                 $d = $this->models->ContentTaxon->update(array(
-                    'publish' => $this->requestData['state']
+                    'publish' => $this->rGetVal('state')
                 ),
                 array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $this->requestData['id'],
-                    'language_id' => $this->requestData['language'],
-                    'page_id' => $this->requestData['page']
+                    'taxon_id' => $this->rGetId(),
+                    'language_id' => $this->rGetVal('language'),
+                    'page_id' => $this->rGetVal('page')
                 ));
 
 				$this->logChange($this->models->ContentTaxon->getDataDelta());
@@ -3723,7 +3725,7 @@ class SpeciesController extends Controller
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
-                'id' => $this->requestData['taxon_id']
+                'id' => $this->rGetVal('taxon_id')
             ),
             'columns' => 'count(*) as total'
         ));
@@ -3731,8 +3733,8 @@ class SpeciesController extends Controller
         if ($t[0]['total'] > 0) {
 
             $d = $this->models->Taxon->save(array(
-                'id' => $this->requestData['taxon_id'],
-                'taxon' => trim($this->requestData['taxon_name'])
+                'id' => $this->rGetVal('taxon_id'),
+                'taxon' => trim($this->rGetVal('taxon_name'))
             ));
 
 			$this->logChange($this->models->Taxon->getDataDelta());
@@ -3747,7 +3749,7 @@ class SpeciesController extends Controller
         if (!$this->rHasVal('data'))
             return;
 
-        foreach ((array) $this->requestData['data'] as $key => $val) {
+        foreach ((array) $this->rGetVal('data') as $key => $val) {
 
             $t['taxon_id'] = $val[0];
             $t['taxon_name'] = $val[1];
@@ -3775,8 +3777,8 @@ class SpeciesController extends Controller
                 $this->models->LabelProjectRank->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'project_rank_id' => $this->requestData['id']
+                    'language_id' => $this->rGetVal('language'),
+                    'project_rank_id' => $this->rGetId()
                 ));
             }
             else {
@@ -3785,8 +3787,8 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'],
-                        'project_rank_id' => $this->requestData['id']
+                        'language_id' => $this->rGetVal('language'),
+                        'project_rank_id' => $this->rGetId()
                     )
                 ));
 
@@ -3794,9 +3796,9 @@ class SpeciesController extends Controller
                 array(
                     'id' => isset($lpr[0]['id']) ? $lpr[0]['id'] : null,
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'project_rank_id' => $this->requestData['id'],
-                    'label' => trim($this->requestData['label'])
+                    'language_id' => $this->rGetVal('language'),
+                    'project_rank_id' => $this->rGetId(),
+                    'label' => trim($this->rGetVal('label'))
                 ));
 
 				$this->logChange($this->models->LabelProjectRank->getDataDelta());
@@ -3814,7 +3816,7 @@ class SpeciesController extends Controller
         }
         else {
             $l = $this->models->Language->_get(array(
-                'id' => $this->requestData['language'],
+                'id' => $this->rGetVal('language'),
                 'columns' => 'direction'
             ));
 
@@ -3822,7 +3824,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language']
+                    'language_id' => $this->rGetVal('language')
                 ),
                 'columns' => '*, \'' . $l['direction'] . '\' as direction'
             ));
@@ -3834,7 +3836,7 @@ class SpeciesController extends Controller
     private function getProjectRankByParentProjectRank ($id = false)
     {
         if ($id === false)
-            $id = $this->requestData['id'];
+            $id = $this->rGetId();
 
         if (empty($id))
             return;
@@ -3903,8 +3905,8 @@ class SpeciesController extends Controller
                 $this->models->LabelSection->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'section_id' => $this->requestData['id']
+                    'language_id' => $this->rGetVal('language'),
+                    'section_id' => $this->rGetId()
                 ));
             }
             else {
@@ -3913,8 +3915,8 @@ class SpeciesController extends Controller
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'],
-                        'section_id' => $this->requestData['id']
+                        'language_id' => $this->rGetVal('language'),
+                        'section_id' => $this->rGetId()
                     )
                 ));
 
@@ -3922,9 +3924,9 @@ class SpeciesController extends Controller
                 array(
                     'id' => isset($ls[0]['id']) ? $ls[0]['id'] : null,
                     'project_id' => $this->getCurrentProjectId(),
-                    'section_id' => $this->requestData['id'],
-                    'language_id' => $this->requestData['language'],
-                    'label' => trim($this->requestData['label'])
+                    'section_id' => $this->rGetId(),
+                    'language_id' => $this->rGetVal('language'),
+                    'label' => trim($this->rGetVal('label'))
                 ));
 
 				$this->logChange($this->models->LabelSection->getDataDelta());
@@ -3944,12 +3946,12 @@ class SpeciesController extends Controller
 
             $this->models->LabelSection->delete(array(
                 'project_id' => $this->getCurrentProjectId(),
-                'section_id' => $this->requestData['id']
+                'section_id' => $this->rGetId()
             ));
 
             $this->models->Section->delete(array(
                 'project_id' => $this->getCurrentProjectId(),
-                'id' => $this->requestData['id']
+                'id' => $this->rGetId()
             ));
         }
     }
@@ -3963,7 +3965,7 @@ class SpeciesController extends Controller
         else {
 
             $l = $this->models->Language->_get(array(
-                'id' => $this->requestData['language'],
+                'id' => $this->rGetVal('language'),
                 'columns' => 'direction'
             ));
 
@@ -3971,7 +3973,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language']
+                    'language_id' => $this->rGetVal('language')
                 ),
                 'columns' => '*, \'' . $l['direction'] . '\' as direction'
             ));
@@ -3992,7 +3994,7 @@ class SpeciesController extends Controller
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language']
+                    'language_id' => $this->rGetVal('language')
                 )
             ));
 
@@ -4011,8 +4013,8 @@ class SpeciesController extends Controller
             $this->models->LabelLanguage->delete(
             array(
                 'project_id' => $this->getCurrentProjectId(),
-                'language_id' => $this->requestData['language'],
-                'label_language_id' => $this->requestData['id']
+                'language_id' => $this->rGetVal('language'),
+                'label_language_id' => $this->rGetId()
             ));
 
             if ($this->rHasVal('label')) {
@@ -4021,9 +4023,9 @@ class SpeciesController extends Controller
                 array(
                     'id' => null,
                     'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->requestData['language'],
-                    'label_language_id' => $this->requestData['id'],
-                    'label' => trim($this->requestData['label'])
+                    'language_id' => $this->rGetVal('language'),
+                    'label_language_id' => $this->rGetId(),
+                    'label' => trim($this->rGetVal('label'))
                 ));
 
 				$this->logChange($this->models->LabelLanguage->getDataDelta());
@@ -4035,7 +4037,7 @@ class SpeciesController extends Controller
 
     private function getTaxonSynonymsById ($id = false)
     {
-        $id = $id ? $id : ($this->rHasId() ? $this->requestData['id'] : false);
+        $id = $id ? $id : ($this->rHasId() ? $this->rGetId() : false);
 
         if (!$id)
             return;
@@ -4247,7 +4249,7 @@ class SpeciesController extends Controller
 
     private function createStandardCoLRanks ()
     {
-        $pr = $this->models->ProjectRank->_get(array(
+        $pr = $this->models->ProjectsRanks->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ),
@@ -4626,7 +4628,7 @@ class SpeciesController extends Controller
 
 			if (!isset($pr[$key+1]['id'])) continue;
 
-            $this->models->ProjectRank->update(array(
+            $this->models->ProjectsRanks->update(array(
                 'parent_id' => $pr[$key+1]['id']
             ), array(
                 'project_id' => $this->getCurrentProjectId(),

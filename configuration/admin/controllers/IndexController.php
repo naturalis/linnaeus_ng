@@ -384,7 +384,7 @@ class IndexController extends Controller
 		
 		$pr = $this->getProjectRanks(array('idsAsIndex' => true));
 		
-		$t = $this->models->Taxon->_get(
+		$t = $this->models->Taxa->_get(
 			array(
 				'id' => $d,
 				'columns' => 'id,taxon as label,\'taxon\' as source, concat(\'../species/taxon.php?id=\',id) as url,rank_id'

@@ -336,7 +336,7 @@ class UtilitiesController extends Controller
 		else 
 		if ($this->rGetVal('action')=='change_media_name')
 		{
-			$this->smarty->assign('returnText',$this->renameMedia($this->requestData));
+			$this->smarty->assign('returnText',$this->renameMedia($this->GetAll()));
 		}
 		else 
 		if ($this->rGetVal('action')=='set_something')

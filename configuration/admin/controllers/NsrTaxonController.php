@@ -556,7 +556,7 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'parent_taxon_id')
 		)
 		{
-            $return=$this->getSpeciesLookupList($this->requestData);
+            $return=$this->getSpeciesLookupList($this->GetAll());
         } 
 		else
 		if (
@@ -569,7 +569,7 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'presence_organisation_id')
 		)
 		{
-            $return=$this->getExpertsLookupList($this->requestData);
+            $return=$this->getExpertsLookupList($this->GetAll());
         }
 		else
 		if ($this->rHasVal('action', 'get_inheritable_name'))
