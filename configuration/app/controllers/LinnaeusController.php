@@ -18,8 +18,7 @@ class LinnaeusController extends Controller
 {
 
     public $usedModels = array(
-		'content',
-        'ControllerModel'
+		'content'
 
 /*
         'content_taxa',
