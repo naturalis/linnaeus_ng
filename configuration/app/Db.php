@@ -3,10 +3,6 @@ class Db
 {
     private static $instance = array();
 
-    /**
-     * The constructor is set to private so
-     * nobody can create a new instance using new
-      */
     private function __construct ()
     {
         //mysqli_report(MYSQLI_REPORT_STRICT);
@@ -37,14 +33,8 @@ class Db
         }
 
         return true;
-     }
+    }
 
-    /**
-     * Return DB instance or create intitial connection
-     *
-     * @return object (PDO)
-     * @access public
-     */
     public static function getInstance ($id)
     {
         if (!isset(self::$instance[$id])) {
@@ -53,10 +43,6 @@ class Db
         return self::$instance[$id];
     }
 
-    /**
-     * Like the constructor, we make __clone private
-     * so nobody can clone the instance
-     */
     private function __clone ()
     {
 
