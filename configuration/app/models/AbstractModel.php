@@ -1,6 +1,7 @@
 <?php
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
+include_once (dirname(__FILE__) . "/../Db.php");
 
 class AbstractModel extends BaseClass
 {
@@ -216,33 +217,17 @@ class AbstractModel extends BaseClass
 
     protected function connectToDatabase ()
     {
-		global $global_DB_connection;
-		$this->databaseConnection = $global_DB_connection;
-		return true;
-		
-		/*
-        $this->databaseSettings = $this->config->getDatabaseSettings();
-        $this->databaseConnection = @mysqli_connect($this->databaseSettings['host'],
-            $this->databaseSettings['user'], $this->databaseSettings['password']);
-        if (!$this->databaseConnection)
-		{
-			$this->log('Failed to connect to database ' . $this->databaseSettings['host'] .
-                ' with user ' . $this->databaseSettings['user'],2);
-			return false;
-		}
+		$config = new configuration;
+		$settings = $config->getDatabaseSettings();
 
-        mysqli_select_db($this->databaseConnection, $this->databaseSettings['database']) or
-            $this->log('Failed to select database '.$this->databaseSettings['database'],2);
+        Db::createInstance('lngApp', $settings);
+        $this->databaseConnection = Db::getInstance('lngApp');
 
-        if ($this->databaseSettings['characterSet'])
-		{
-            mysqli_query($this->databaseConnection,
-                'SET NAMES ' . $this->databaseSettings['characterSet']);
-            mysqli_query($this->databaseConnection,
-                'SET CHARACTER SET ' . $this->databaseSettings['characterSet']);
+        if (!$this->databaseConnection) {
+            die('Error ' . mysqli_connect_errno() . ': failed to connect to database ' .
+                $settings['database'] . ' with user ' . $settings['user']);
         }
-        return true;
-		*/
+		return true;
     }
 
     protected function disconnectFromDatabase ()
