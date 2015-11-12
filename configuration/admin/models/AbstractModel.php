@@ -370,5 +370,24 @@ class AbstractModel extends BaseClass
         $this->freeQuery("SET lc_time_names = '". mysqli_real_escape_string($this->databaseConnection, $locale)."'");
     }
 
+    public function getLanguagesUsed ($projectId)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
+
+        if (is_null($projectId)) {
+			return null;
+		}
+
+        $query = "
+            select count(id) as `count`, language_id
+			from %PRE%names
+			where project_id=".$projectId."
+			group by language_id
+			order by `count` asc";
+
+        return $this->freeQuery($query);
+
+    }
+
 
 }
