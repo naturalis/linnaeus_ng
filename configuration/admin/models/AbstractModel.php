@@ -220,8 +220,8 @@ class AbstractModel extends BaseClass
 		$config = new configuration;
 		$settings = $config->getDatabaseSettings();
 
-        Db::createInstance('lng', $settings);
-        $this->databaseConnection = Db::getInstance('lng');
+        Db::createInstance('lngAdmin', $settings);
+        $this->databaseConnection = Db::getInstance('lngAdmin');
 
         if (!$this->databaseConnection) {
             die('Error ' . mysqli_connect_errno() . ': failed to connect to database ' .
