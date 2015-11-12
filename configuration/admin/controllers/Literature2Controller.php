@@ -20,7 +20,6 @@ class Literature2Controller extends NsrController
     );
 
     public $controllerPublicName = 'Literatuur (v2)';
-    public $cacheFiles = array();
     public $usedHelpers = array('csv_parser_helper');
     public $cssToLoad = array('nsr_taxon_beheer.css','literature2.css');
 
@@ -126,8 +125,8 @@ class Literature2Controller extends NsrController
     {
         if (!isset($this->requestData['action'])) return;
 		$return=null;
-		$return=$this->getReferenceLookupList($this->requestData);
-		$this->allowEditPageOverlay = false;
+		$return=$this->getReferenceLookupList($this->GetAll());
+        $this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();
     }
