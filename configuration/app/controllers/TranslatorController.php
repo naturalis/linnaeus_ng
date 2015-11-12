@@ -1,67 +1,6 @@
 <?php
 
-/*
-
-	usage:
-
-	// admin
-	$babelfish = new TranslatorController($this->getAppName(),$this->getCurrentUiLanguage());
-		or
-	// app
-	$babelfish = new TranslatorController($this->getAppName(),$this->getCurrentLanguageId());
-
-	$translation = $bla->translate('Say what?');
-	$translations = $bla->translate(array('Say what?','How\'s that?')));
-
-	translator should be re-initialized when language changes; call initTranslator() again on language change!
-
-	to be added to the controllers:
-	
-		declaration:
-		$this->translator;
-	
-		init:
-		$this->initTranslator();
-		
-		functions:			
-		private function initTranslator()
-		{
-			include_once ('TranslatorController.php');
-			$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage());
-		}
-		
-		public function translate($content)
-		{
-			return $this->translator->translate($content);
-		}
-
-		public function javascriptTranslate($content)
-		{
-			return $this->translator->translate($content);
-		}
-
-		public function smartyTranslate ($params, $content, &$smarty, &$repeat)
-		{
-			$c = $this->translator->translate($content);
-		
-			if (isset($params))
-			{
-				foreach ((array) $params as $key => $val)
-				{
-					if (substr($key, 0, 2) == '_s' && isset($val))
-					{
-						$c = preg_replace('/\%s/', $val, $c, 1);
-					}
-				}
-			}
-			return $c;
-		}			
-	
-*/
-
-
-
-class TranslatorController extends Controller
+class TranslatorController
 {
 
     public $usedModels = array(
@@ -71,6 +10,7 @@ class TranslatorController extends Controller
 
 	private $_environment=null;
 	private $_languageid=null;
+	private $models;
 	private $_text=null;
 	private $_translation=null;
 	private $_didtranslate=false;
@@ -81,13 +21,12 @@ class TranslatorController extends Controller
     {
 		$this->_environment=$env;
 		$this->_languageid=$languageid;
-        parent::__construct();
+		$this->loadModels();
     }
 
     public function __destruct ()
     {
-        $this->saveNewStrings();
-        parent::__destruct();
+		//$this->saveNewStrings();
     }
 
     public function translate( $s )
@@ -102,6 +41,10 @@ class TranslatorController extends Controller
 				$this->_text=$val;
 				$this->doTranslate();
 				$this->rememberNewString();
+
+			$this->saveNewStrings();
+			$this->_newStrings=array();
+
 				if ( $this->_didtranslate )
 				{
 					$translations[$key]=$this->_translation;
@@ -118,6 +61,9 @@ class TranslatorController extends Controller
 			$this->_text=$s;
 			$this->doTranslate();
 			$this->rememberNewString();
+			
+		$this->saveNewStrings();
+		$this->_newStrings=array();
 
 			if ( $this->_didtranslate )
 			{
@@ -130,6 +76,19 @@ class TranslatorController extends Controller
 		}
     }
 	
+    private function loadModels ()
+    {
+        $this->models = new stdClass();
+
+        require_once dirname(__FILE__) . '/../models/Table.php';
+
+        foreach ((array) $this->usedModels as $key)
+		{
+            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            $this->models->$t = new Table($key);
+        }
+    }
+
     private function doTranslate()
     {
 		$this->_didtranslate=false;
@@ -167,7 +126,7 @@ class TranslatorController extends Controller
 				'columns' => 'id,translation',
 				'limit' => 1
 			));
-	
+			
 		// if not found, return unchanged
 		if ( empty($it[0]['id']) )
 			return;
@@ -186,11 +145,11 @@ class TranslatorController extends Controller
     private function saveNewStrings()
     {
 		$this->_newStrings=array_unique($this->_newStrings);
-		
+
 		foreach($this->_newStrings as $text)
 		{
 			$d=$this->models->InterfaceTexts->_get(array('id'=>array('text' => $text,'env' => $this->_environment)));
-			
+
 			if (!$d)
 			{
 				$this->models->InterfaceTexts->save(array('id' => null,'text' => $text,'env' => $this->_environment));

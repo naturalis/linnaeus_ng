@@ -3347,7 +3347,7 @@ class Controller extends BaseClass
 	private function initTranslator()
 	{
 		include_once ('TranslatorController.php');
-		$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage(),$this->databaseConnection);
+		$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage());
 	}
 	
 	public function translate($content)
