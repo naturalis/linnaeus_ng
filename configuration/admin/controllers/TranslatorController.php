@@ -10,7 +10,6 @@ class TranslatorController
 
 	private $_environment=null;
 	private $_languageid=null;
-	private $_db_connection=null;
 	private $models;
 	private $_text=null;
 	private $_translation=null;
@@ -18,7 +17,7 @@ class TranslatorController
 	private $_isnewstring=false;
 	private $_newStrings=array();
 
-    public function __construct( $env, $languageid, $db_connection )
+    public function __construct( $env, $languageid )
     {
 		$this->_environment=$env;
 		$this->_languageid=$languageid;
