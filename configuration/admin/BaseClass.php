@@ -6,15 +6,11 @@ if (file_exists(dirname(__FILE__) . "/configuration.php"))
 if (file_exists(dirname(__FILE__) . "/constants.php"))
 	include_once (dirname(__FILE__) . "/constants.php");
 
-if (file_exists(dirname(__FILE__) . "/connection.php"))
-	include_once (dirname(__FILE__) . "/connection.php");
-
 class BaseClass
 {
 
     public $config;
     public $generalSettings;
-	public $databaseConnection;
 
     public function __construct ()
     {
