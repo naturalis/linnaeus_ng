@@ -56,9 +56,7 @@ final class Literature2Model extends AbstractModel
 
     public function getTitleAlphabet ($projectId)
     {
-        $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-
-        if (is_null($projectId)) {
+        if (!$projectId) {
 			return null;
 		}
 
@@ -76,9 +74,7 @@ final class Literature2Model extends AbstractModel
 
     public function getAuthorAlphabet ($projectId)
     {
-        $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-
-        if (is_null($projectId)) {
+        if (!$projectId) {
 			return null;
 		}
 
@@ -148,7 +144,7 @@ final class Literature2Model extends AbstractModel
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $publicationTypeId = isset($params['publicationTypeId']) ? $params['publicationTypeId'] : null;
 
-        if (is_null($projectId) || is_null($publicationTypeId)) {
+        if (is_null($projectId)) {
 			return null;
 		}
 
@@ -200,7 +196,7 @@ final class Literature2Model extends AbstractModel
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-        if (is_null($projectId) || is_null($languageId) || is_null(literatureId)) {
+        if (is_null($projectId) || is_null($languageId) || is_null($literatureId)) {
 			return null;
 		}
 
@@ -244,7 +240,7 @@ final class Literature2Model extends AbstractModel
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-        if (is_null($projectId) || is_null($languageId) || is_null(literatureId)) {
+        if (is_null($projectId) || is_null($languageId) || is_null($literatureId)) {
 			return null;
 		}
 
@@ -277,7 +273,7 @@ final class Literature2Model extends AbstractModel
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-        if (is_null($projectId) || is_null(literatureId)) {
+        if (is_null($projectId) || is_null($literatureId)) {
 			return null;
 		}
 
@@ -312,7 +308,7 @@ final class Literature2Model extends AbstractModel
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-        if (is_null($projectId) || is_null($languageId) || is_null(literatureId)) {
+        if (is_null($projectId) || is_null($languageId) || is_null($literatureId)) {
 			return null;
 		}
 
@@ -359,9 +355,7 @@ final class Literature2Model extends AbstractModel
 
     public function getActors ($projectId)
     {
-        $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-
-        if (is_null($projectId)) {
+        if (!$projectId) {
 			return null;
 		}
 

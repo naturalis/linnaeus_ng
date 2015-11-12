@@ -127,7 +127,7 @@ class Literature2Controller extends NsrController
         if (!isset($this->requestData['action'])) return;
 		$return=null;
 		$return=$this->getReferenceLookupList($this->requestData);
-        $this->allowEditPageOverlay = false;
+		$this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();
     }
