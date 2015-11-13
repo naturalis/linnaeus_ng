@@ -1598,14 +1598,15 @@ function matrixInit()
 
 	setCursor('wait');
 
+	applyScores();
+	sortResults();
+	clearResults();
+	printResults();
+
 	if ( getMenu()=="" ) 
 		initMenu();
 	else
 		printMenu();
 
-	applyScores();
-	sortResults();
-	clearResults();
-	printResults();
 	setCursor();
 }
