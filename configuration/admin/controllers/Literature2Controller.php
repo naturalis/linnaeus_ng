@@ -236,26 +236,35 @@ class Literature2Controller extends NsrController
 		$matching_publication_types=null;
 
 		$ignorefirst=$this->rHasVal('ignorefirst','1');
-		$this->setSessionVar('ignorefirst',$ignorefirst);
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'ignorefirst',
+            'value' => $ignorefirst
+        ));
 
 		if ($this->rHasVal('fields'))
 		{
 			$fields=$this->rGetVal('fields');
-			$this->setSessionVar('fields',$fields);
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'fields',
+                'value' => $fields
+            ));
 		}
 
 		if ($this->rHasVal('raw'))
 		{
 			$raw=$this->rGetVal('raw');
 			$hash=md5($raw);
-			if ($hash!=$this->getSessionVar('hash'))
+			if ($hash != $this->moduleSession->getModuleSetting('hash'))
 			{
-				$this->setSessionVar('delcols',null);
-				$this->setSessionVar('match_ref',null);
-				$this->setSessionVar('new_ref',null);
+				$this->moduleSession->setModuleSetting(array('setting' => 'delcols'));
+				$this->moduleSession->setModuleSetting(array('setting' => 'match_ref'));
+				$this->moduleSession->setModuleSetting(array('setting' => 'new_ref'));
 				$fields=null;
 			}
-			$this->setSessionVar('hash',$hash);
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'hash',
+                'value' => $hash
+            ));
 
 			$lines=$this->parseRawCsvData($raw);
 
@@ -288,17 +297,23 @@ class Literature2Controller extends NsrController
 		{
 			if ($this->rHasVal('action','delcolreset'))
 			{
-				$this->setSessionVar('delcols',null);
+				$this->moduleSession->setModuleSetting(array('setting' => 'delcols'));
 			}
 			else
 			if ($this->rHasVal('action','delcol') && $this->rHasVal('value'))
 			{
-				$delcols=(array)$this->getSessionVar('delcols');
+				$delcols=(array)$this->moduleSession->getModuleSetting('delcols');
 				$delcols[$this->rGetVal('value')]=true;
-				$this->setSessionVar('delcols',$delcols);
+				$this->moduleSession->setModuleSetting(array(
+                    'setting' => 'delcols',
+                    'value' => $delcols
+                ));
 			}
 
-			$this->setSessionVar('lines',$lines);
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'lines',
+                'value' => $lines
+            ));
 		}
 
 		if ($this->rHasVal('threshold'))
@@ -310,15 +325,21 @@ class Literature2Controller extends NsrController
 					$this->rGetVal('threshold') :
 					$this->_matchThresholdDefault;
 
-			$this->setSessionVar('threshold',$this->rGetVal('threshold'));
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'threshold',
+                'value' => $this->rGetVal('threshold')
+            ));
 		}
 
 		if ($lines && $fields)
 		{
 			$matches=$this->matchPossibleReferences(array('lines'=>$lines,'ignorefirst'=>$ignorefirst,'fields'=>$fields));
 
-			$this->setSessionVar('matches',$matches);
-			$this->setSessionVar('matching_publication_types',null);
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'matches',
+                'value' => $matches
+            ));
+			$this->moduleSession->setModuleSetting(array('setting' => 'matching_publication_types'));
 
 			// publication_type -> publication_type_id
 			if (in_array('publication_type',$fields))
@@ -342,7 +363,10 @@ class Literature2Controller extends NsrController
 					$matching_publication_types[$key]=$this->matchPublicationType( $first_type );
 				}
 
-				$this->setSessionVar('matching_publication_types',$matching_publication_types);
+				$this->moduleSession->setModuleSetting(array(
+                    'setting' => 'matching_publication_types',
+                    'value' => $matching_publication_types
+                ));
 
 			}
 
@@ -350,32 +374,50 @@ class Literature2Controller extends NsrController
 			{
 				if(isset($fields[$c]) && $fields[$c]=='author')
 				{
-					$this->setSessionVar('field_author',$c);
+					$this->moduleSession->setModuleSetting(array(
+                        'setting' => 'field_author',
+                        'value' => $c
+                    ));
 				}
 				else
 				if(isset($fields[$c]) && $fields[$c]=='label')
 				{
-					$this->setSessionVar('field_label',$c);
+					$this->moduleSession->setModuleSetting(array(
+                        'setting' => 'field_label',
+                        'value' => $c
+                    ));
 				}
 				else
 				if(isset($fields[$c]) && $fields[$c]=='date')
 				{
-					$this->setSessionVar('field_date',$c);
+					$this->moduleSession->setModuleSetting(array(
+                        'setting' => 'field_date',
+                        'value' => $c
+                    ));
 				}
 				else
 				if(isset($fields[$c]) && $fields[$c]=='publishedin')
 				{
-					$this->setSessionVar('field_publishedin',$c);
+					$this->moduleSession->setModuleSetting(array(
+                        'setting' => 'field_publishedin',
+                        'value' => $c
+                    ));
 				}
 				else
 				if(isset($fields[$c]) && $fields[$c]=='periodical')
 				{
-					$this->setSessionVar('field_periodical',$c);
+					$this->moduleSession->setModuleSetting(array(
+                        'setting' => 'field_periodical',
+                        'value' => $c
+                    ));
 				}
 				else
 				if(isset($fields[$c]) && $fields[$c]=='publication_type')
 				{
-					$this->setSessionVar('field_publication_type',$c);
+					$this->moduleSession->setModuleSetting(array(
+                        'setting' => 'field_publication_type',
+                        'value' => $c
+                    ));
 				}
 
 			}
@@ -384,19 +426,19 @@ class Literature2Controller extends NsrController
 
 		}
 
-		$this->smarty->assign('field_author',$this->getSessionVar('field_author'));
-		$this->smarty->assign('field_label',$this->getSessionVar('field_label'));
-		$this->smarty->assign('field_date',$this->getSessionVar('field_date'));
-		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
-		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
-		$this->smarty->assign('field_publication_type',$this->getSessionVar('field_publication_type'));
+		$this->smarty->assign('field_author',$this->moduleSession->getModuleSetting('field_author'));
+		$this->smarty->assign('field_label',$this->moduleSession->getModuleSetting('field_label'));
+		$this->smarty->assign('field_date',$this->moduleSession->getModuleSetting('field_date'));
+		$this->smarty->assign('field_publishedin',$this->moduleSession->getModuleSetting('field_publishedin'));
+		$this->smarty->assign('field_periodical',$this->moduleSession->getModuleSetting('field_periodical'));
+		$this->smarty->assign('field_publication_type',$this->moduleSession->getModuleSetting('field_publication_type'));
 
 		$this->smarty->assign('threshold',$this->_matchThresholdDefault);
 		$this->smarty->assign('matches',$matches);
 		$this->smarty->assign('emptycols',$emptycols);
 		$this->smarty->assign('fields',$fields);
 		$this->smarty->assign('cols',$this->lit2Columns);
-		$this->smarty->assign('delcols',$this->getSessionVar('delcols'));
+		$this->smarty->assign('delcols',$this->moduleSession->getModuleSetting('delcols'));
 		$this->smarty->assign('raw',$raw);
 		$this->smarty->assign('ignorefirst',$ignorefirst);
 		$this->smarty->assign('firstline',$firstline);
@@ -420,22 +462,28 @@ class Literature2Controller extends NsrController
 		$matching_publishedin=null;
 		$matching_periodical=null;
 
-		$ignorefirst=$this->getSessionVar('ignorefirst');
-		$lines=$this->getSessionVar('lines');
-		$fields=$this->getSessionVar('fields');
-		$matches=$this->getSessionVar('matches');
-		$matching_publication_types=$this->getSessionVar('matching_publication_types');
+		$ignorefirst=$this->moduleSession->getModuleSetting('ignorefirst');
+		$lines=$this->moduleSession->getModuleSetting('lines');
+		$fields=$this->moduleSession->getModuleSetting('fields');
+		$matches=$this->moduleSession->getModuleSetting('matches');
+		$matching_publication_types=$this->moduleSession->getModuleSetting('matching_publication_types');
 
 		if ($this->rHasVal('match_ref'))
 		{
 			$match_ref=$this->rGetVal('match_ref');
-			$this->setSessionVar('match_ref',$match_ref);
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'match_ref',
+                'value' => $match_ref
+            ));
 		}
 
 		if ($this->rHasVal('new_ref'))
 		{
 			$new_ref=$this->rGetVal('new_ref');
-			$this->setSessionVar('new_ref',$new_ref);
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'new_ref',
+                'value' => $new_ref
+            ));
 
 			// opsporen dubbele kolommen
 			foreach((array)$fields as $key=>$val)
@@ -530,12 +578,12 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('fields',$fields);
 		$this->smarty->assign('matches',$matches);
 
-		$this->smarty->assign('field_author',$this->getSessionVar('field_author'));
-		$this->smarty->assign('field_label',$this->getSessionVar('field_label'));
-		$this->smarty->assign('field_date',$this->getSessionVar('field_date'));
-		$this->smarty->assign('field_publishedin',$this->getSessionVar('field_publishedin'));
-		$this->smarty->assign('field_periodical',$this->getSessionVar('field_periodical'));
-		$this->smarty->assign('field_publication_type',$this->getSessionVar('field_publication_type'));
+		$this->smarty->assign('field_author',$this->moduleSession->getModuleSetting('field_author'));
+		$this->smarty->assign('field_label',$this->moduleSession->getModuleSetting('field_label'));
+		$this->smarty->assign('field_date',$this->moduleSession->getModuleSetting('field_date'));
+		$this->smarty->assign('field_publishedin',$this->moduleSession->getModuleSetting('field_publishedin'));
+		$this->smarty->assign('field_periodical',$this->moduleSession->getModuleSetting('field_periodical'));
+		$this->smarty->assign('field_publication_type',$this->moduleSession->getModuleSetting('field_publication_type'));
 
 		$this->smarty->assign('match_ref',$match_ref);
 		$this->smarty->assign('new_ref',$new_ref);
@@ -558,19 +606,19 @@ class Literature2Controller extends NsrController
 
 		if (!$this->isFormResubmit())
 		{
-			$fields=$this->getSessionVar('fields');
-			$lines=$this->getSessionVar('lines');
-			$match_ref=$this->getSessionVar('match_ref');
-			$new_ref=$this->getSessionVar('new_ref');
-			$field_author=$this->getSessionVar('field_author');
-			$field_label=$this->getSessionVar('field_label');
-			$field_date=$this->getSessionVar('field_date');
-			$field_publishedin=$this->getSessionVar('field_publishedin');
-			$field_periodical=$this->getSessionVar('field_periodical');
-			$lpad=$this->getSessionVar('lpad');
-			$infix=$this->getSessionVar('infix');
-			$rpad=$this->getSessionVar('rpad');
-			$matching_publication_types=$this->getSessionVar('matching_publication_types');
+			$fields=$this->moduleSession->getModuleSetting('fields');
+			$lines=$this->moduleSession->getModuleSetting('lines');
+			$match_ref=$this->moduleSession->getModuleSetting('match_ref');
+			$new_ref=$this->moduleSession->getModuleSetting('new_ref');
+			$field_author=$this->moduleSession->getModuleSetting('field_author');
+			$field_label=$this->moduleSession->getModuleSetting('field_label');
+			$field_date=$this->moduleSession->getModuleSetting('field_date');
+			$field_publishedin=$this->moduleSession->getModuleSetting('field_publishedin');
+			$field_periodical=$this->moduleSession->getModuleSetting('field_periodical');
+			$lpad=$this->moduleSession->getModuleSetting('lpad');
+			$infix=$this->moduleSession->getModuleSetting('infix');
+			$rpad=$this->moduleSession->getModuleSetting('rpad');
+			$matching_publication_types=$this->moduleSession->getModuleSetting('matching_publication_types');
 
 			//q($this->requestData,1);
 
@@ -847,7 +895,10 @@ class Literature2Controller extends NsrController
 
 			}
 
-			$this->setSessionVar('literature_id_index',$literature_id_index);
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'literature_id_index',
+                'value' => $literature_id_index
+            ));
 
 			$ref=array_search( '_reference_', $fields );
 			if ( $ref!==false )
@@ -873,17 +924,18 @@ class Literature2Controller extends NsrController
 	{
 		$this->checkAuthorisation();
 
-		$literature_id_index=$this->getSessionVar('literature_id_index');
+		$literature_id_index=$this->moduleSession->getModuleSetting('literature_id_index');
 
-		$fields=$this->getSessionVar('fields');
+		$fields=$this->moduleSession->getModuleSetting('fields');
 		$ref_col=array_search( '_reference_',  $fields );
 
 		$buffer_line=array();
 		$buffer=array();
 
-		foreach((array)$this->getSessionVar('lines') as $key=>$line)
+		foreach((array)$this->moduleSession->getModuleSetting('lines') as $key=>$line)
 		{
-			if ( $this->rHasVal( "action", "ref_only" )  && $ref_col!==false && $this->getSessionVar('ignorefirst') && $key==0 )
+			if ( $this->rHasVal( "action", "ref_only" )  && $ref_col!==false &&
+			    $this->moduleSession->getModuleSetting('ignorefirst') && $key==0 )
 			{
 				continue;
 			}
@@ -934,25 +986,6 @@ class Literature2Controller extends NsrController
 		}
 
 		echo implode( chr(10), $buffer );
-	}
-
-
-
-	private function setSessionVar($var,$val=null)
-	{
-		if (is_null($val))
-		{
-			unset($_SESSION['admin']['system']['literature2'][$var]);
-		}
-		else
-		{
-			$_SESSION['admin']['system']['literature2'][$var]=$val;
-		}
-	}
-
-	private function getSessionVar($var)
-	{
-		return isset($_SESSION['admin']['system']['literature2'][$var]) ? $_SESSION['admin']['system']['literature2'][$var] : null;
 	}
 
 	private function parseRawCsvData($raw)
