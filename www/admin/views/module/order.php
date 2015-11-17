@@ -1,8 +1,8 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/ModuleController.php');
+require_once ('../../../../configuration/admin/controllers/FreeModuleController.php');
 
-$c = new ModuleController();
+$c = new FreeModuleController();
 
 $c->orderAction();
 
