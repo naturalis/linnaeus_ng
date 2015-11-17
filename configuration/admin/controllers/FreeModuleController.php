@@ -2,7 +2,7 @@
 
 include_once ('Controller.php');
 
-class ModuleController extends Controller
+class FreeModuleController extends Controller
 {
 
     public $usedModels = array(
@@ -12,8 +12,12 @@ class ModuleController extends Controller
 		'content_free_module',
 		'free_module_media'
     );
-   
-    public $usedHelpers = array('file_upload_helper','image_thumber_helper','csv_parser_helper');
+
+    public $usedHelpers = array(
+        'file_upload_helper',
+        'image_thumber_helper',
+        'csv_parser_helper'
+    );
 
     public $controllerPublicName = 'Free Modules';
 
@@ -41,7 +45,7 @@ class ModuleController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
 
 		$this->controllerPublicName = $this->getActiveModuleName();
@@ -55,9 +59,9 @@ class ModuleController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
-    
+
     }
 
 	public function checkAuthorisation()
@@ -65,12 +69,12 @@ class ModuleController extends Controller
 
 		// check if user is logged in, otherwise redirect to login page
 		if (!$this->isUserLoggedIn()) return false;
-		    
+
 		// check if there is an active project, otherwise redirect to choose project page
 		if (!$this->getCurrentProjectId() && !$allowNoProjectId) return false;
-		    
-		if ($this->isCurrentUserSysAdmin()) return true;	    
-	    
+
+		if ($this->isCurrentUserSysAdmin()) return true;
+
 		if ($this->rHasVal('freeId')) {
 
 			if (!$this->isUserAuthorizedForFreeModule())
@@ -82,7 +86,7 @@ class ModuleController extends Controller
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 
 		}
-	
+
 	}
 
 
@@ -95,11 +99,11 @@ class ModuleController extends Controller
     {
 
         $this->checkAuthorisation();
-		
+
 		if ($this->getActiveModule()==null || $this->rHasVal('freeId')) {
 
 			$this->setActiveModule($this->getFreeModule());
-			
+
 			$this->controllerPublicName = $this->getActiveModuleName();
 
 		}
@@ -108,7 +112,7 @@ class ModuleController extends Controller
 
 		if (!$this->rHasVal('page'))
 			$this->redirect('edit.php?id='.$this->getFirstPageId());
-		else		
+		else
 			$this->redirect('edit.php?id='.$this->requestData['page']);
 
 
@@ -121,24 +125,24 @@ class ModuleController extends Controller
      */
     public function contentsAction()
     {
-    
+
         $this->checkAuthorisation();
-    
+
         $this->setPageName($this->translate('Contents'));
 
         $pagination = $this->getPagination($this->getPages(),25);
-        
+
         $this->smarty->assign('prevStart', $pagination['prevStart']);
-        
+
         $this->smarty->assign('nextStart', $pagination['nextStart']);
 
         $this->smarty->assign('pages',$pagination['items']);
-    
+
         $this->printPage();
-    
-    }    
-    
-    
+
+    }
+
+
     /**
      * Create new page or edit existing
      *
@@ -168,10 +172,10 @@ class ModuleController extends Controller
 
 			if ($this->rHasVal('action','delete')) {
 
-				
-				
+
+
 				$this->deletePage();
-				
+
 				$this->redirect('index.php');
 
 			} else
@@ -184,7 +188,7 @@ class ModuleController extends Controller
 
 				$this->redirect('preview.php?id='.$this->requestData['id']);
 
-			} 
+			}
 
 			$page = $this->getPage();
 
@@ -201,7 +205,7 @@ class ModuleController extends Controller
 		}
 
 		$navList = $this->getModulePageNavList(true);
-	
+
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 			$this->smarty->assign('navCurrentId',isset($this->requestData['id']) ? $this->requestData['id'] : null);
 
@@ -210,13 +214,13 @@ class ModuleController extends Controller
 		if (isset($page)) $this->smarty->assign('page', $page);
 
 		$this->smarty->assign('languages', $this->getProjectLanguages());
-		
+
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
         $this->printPage();
-    
+
     }
 
 
@@ -234,7 +238,7 @@ class ModuleController extends Controller
 
     public function browseAction()
     {
-    
+
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Browsing pages'));
@@ -270,39 +274,39 @@ class ModuleController extends Controller
     {
 
 		$this->checkAuthorisation();
-		
+
 		$this->setPageName($this->translate('New image'));
-		
+
 		if ($this->requestDataFiles && !$this->isFormResubmit()) {
-		
+
 			$filesToSave =  $this->getUploadedMediaFiles();
-			
+
 			$firstInsert = false;
-			
+
 			if ($filesToSave && $this->rHasId()) {
-			
+
 				foreach((array)$filesToSave as $key => $file) {
-				
+
 					$thumb = false;
-					
+
 					if (
 					$this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
 					$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
 					) {
-					
+
 						$pi = pathinfo($file['name']);
 						$this->helpers->ImageThumberHelper->size_width(150);
-						
+
 						if ($this->helpers->ImageThumberHelper->save(
 						$this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
 						)) {
-						
+
 							$thumb = $pi['filename'].'-thumb.'.$pi['extension'];
-						
+
 						}
-					
+
 					}
-					
+
 					$fmm = $this->models->FreeModuleMedia->save(
 						array(
 							'id' => null,
@@ -315,27 +319,27 @@ class ModuleController extends Controller
 							'thumb_name' => $thumb ? $thumb : null,
 						)
 					);
-					
+
 					if ($fmm) {
-					
+
 						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-					
+
 					} else {
-					
+
 						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
-					
+
 					}
-				
+
 				}
 
 			}
-		
+
 		}
 
 		$this->smarty->assign('id',$this->requestData['id']);
-		
+
 		$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
-		
+
 		$this->smarty->assign('iniSettings',
 			array(
 				'upload_max_filesize' => ini_get('upload_max_filesize'),
@@ -344,7 +348,7 @@ class ModuleController extends Controller
 		);
 
 		$this->printPage();
-    
+
     }
 
 
@@ -357,23 +361,23 @@ class ModuleController extends Controller
     {
 
         $this->checkAuthorisation();
-		
+
 		$this->setPageName($this->translate('Management'));
-		
+
 		if ($this->rHasVal('submit')) {
-		
+
 			$d = array(
 					'id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId(),
 					'show_alpha' => $this->requestData['show_alpha'],
 				);
-				
+
 			$m = trim($this->requestData['module']);
-				
+
 			if (!empty($m)) $d['module'] = $m;
 
 			$this->models->FreeModuleProject->save($d);
-		
+
 			$module = $this->getFreeModule();
 
 			$this->setActiveModule($module);
@@ -383,7 +387,7 @@ class ModuleController extends Controller
 		} else {
 
 			$module = $this->getFreeModule();
-		
+
 		}
 
 		$this->smarty->assign('module',$module);
@@ -399,21 +403,21 @@ class ModuleController extends Controller
      */
     public function orderAction()
     {
-    
+
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Change page order'));
 
 		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
-		
-			
-			
+
+
+
 			$d = $this->getPages();
-			
+
 			$lowerNext = $prev = false;
 
 			foreach((array)$d as $key => $val) {
-			
+
 				$newOrder = $key;
 
 				if ($val['id'] == $this->requestData['id']) {
@@ -436,7 +440,7 @@ class ModuleController extends Controller
 					if ($this->requestData['dir']=='down') {
 
 						$newOrder = $key + 1;
-						
+
 					} else {
 
 						$newOrder = $key;
@@ -444,7 +448,7 @@ class ModuleController extends Controller
 					}
 
 				}
-				
+
 				if ($lowerNext) {
 
 					$newOrder = $key - 1;
@@ -467,8 +471,8 @@ class ModuleController extends Controller
 
 					$lowerNext = true;
 
-				} 
-									
+				}
+
 				$prev = $val['id'];
 
 			}
@@ -481,7 +485,7 @@ class ModuleController extends Controller
 
 	}
 
-	
+
     /**
      * Import texts
      *
@@ -491,13 +495,13 @@ class ModuleController extends Controller
     {
 
 		$this->checkAuthorisation();
-		
+
 		$this->setPageName($this->translate('CSV data import'));
-		
+
 		if ($this->requestDataFiles) { //  && !$this->isFormResubmit()) {
-	
+
             $tmp = tempnam(sys_get_temp_dir(), 'lng');
-            
+
 			switch ($this->requestData["delimiter"]) {
 				case 'comma' :
 					$this->helpers->CsvParserHelper->setFieldDelimiter(',');
@@ -509,61 +513,68 @@ class ModuleController extends Controller
 					$this->helpers->CsvParserHelper->setFieldDelimiter("\t");
 					break;
 			}
-			
+
 			$this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]['tmp_name']);
-			
+
 			$this->addError($this->helpers->CsvParserHelper->getErrors());
-			
+
 			if (!$this->getErrors()) {
 
-				$_SESSION['admin']['system']['freeModules']['import'] = array(
+			    $import = array(
 					'data' => $this->helpers->CsvParserHelper->getResults(),
 					'has_titles' => isset($this->requestData["has_titles"]) ? $this->requestData["has_titles"]=='1' : false,
 					'language' => $this->requestData["language"]
 				);
 
-				$this->smarty->assign('has_titles',$_SESSION['admin']['system']['freeModules']['import']['has_titles']);
-				$this->smarty->assign('data',$_SESSION['admin']['system']['freeModules']['import']['data']);
-				
+			    $this->moduleSession->setModuleSetting(array(
+                    'setting' => 'import',
+                    'value' => $import
+			    ));
+
+				$this->smarty->assign('has_titles',$import['has_titles']);
+				$this->smarty->assign('data',$import['data']);
+
             }
-		
+
 		} else
 		if ($this->rHasVal('action','import')) {
 
-			foreach((array)$_SESSION['admin']['system']['freeModules']['import']['data'] as $key => $val) {
-				
-				if ($_SESSION['admin']['system']['freeModules']['import']['has_titles'] && $key==0)
+		    $import = $this->moduleSession->getModuleSetting('import');
+
+			foreach((array)$import['data'] as $key => $val) {
+
+				if ($import['has_titles'] && $key==0)
 					continue;
-				
+
 				$p = array(
 					'id' => $this->createPage(),
 					'topic' => $val[0],
 					'content' => $val[1],
-					'language' => $_SESSION['admin']['system']['freeModules']['import']['language']
+					'language' => $import['language']
 				);
-				
+
 				if ($this->saveContent($p))
 					$this->addMessage(sprintf($this->translate('Saved page "%s".'),htmlentities($val[0])));
 				else
 					$this->addMessage(sprintf($this->translate('Couldn\'t save page "%s".'),$val[0]));
-					
+
 			}
 
-			unset($_SESSION['admin']['system']['freeModules']['import']);
+			$this->moduleSession->setModuleSetting(array('setting' => 'import'));
 			$this->smarty->assign('imported',true);
-			
+
 		}
-		
+
 		if (isset($this->requestData["reset"]))
-			unset($_SESSION['admin']['system']['freeModules']['import']);
-		
+			$this->moduleSession->setModuleSetting(array('setting' => 'import'));
+
 		$this->printPage();
-    
+
     }
 
 
-	
-	
+
+
 
 	/**
 	* General interface for all AJAX-calls
@@ -574,59 +585,60 @@ class ModuleController extends Controller
     {
 
         if (!$this->rHasVal('action')) return;
-        
+
         if ($this->requestData['action'] == 'save_content') {
-            
-            
-        	
+
+
+
             $this->ajaxSaveContent();
-        
+
         } else
         if ($this->requestData['action'] == 'get_content') {
-            
+
             $this->ajaxActionGetContent();
-        
+
         }
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 
         }
-		
+
         $this->printPage();
-    
+
     }
 
 	private function setActiveModule($data)
 	{
-	
-		$_SESSION['admin']['user']['freeModules']['activeModule'] = $data;
-	
+
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'activeModule',
+            'value' => $data
+        ));
+
 	}
 
 	private function getActiveModule()
 	{
-	
-		return isset($_SESSION['admin']['user']['freeModules']['activeModule']) ? $_SESSION['admin']['user']['freeModules']['activeModule'] : null;
-	
+
+	    return $this->moduleSession->getModuleSetting('activeModule');
+
 	}
 
 	private function getActiveModuleName()
 	{
-	
-		return
-			isset($_SESSION['admin']['user']['freeModules']['activeModule']['module']) ? 
-				$_SESSION['admin']['user']['freeModules']['activeModule']['module'] : 
-				null;
-	
+
+	    $activeModule = $this->moduleSession->getModuleSetting('activeModule');
+		return isset($activeModule['module']) ? $activeModule['module'] : null;
+
 	}
 
 	private function ajaxSaveContent()
 	{
-		
+
 		if (!$this->rHasId() || !$this->rHasVal('language'))
 			return;
-		
+
 		if (
 			$this->saveContent(
 				array(
@@ -640,7 +652,7 @@ class ModuleController extends Controller
 
 	}
 
-	
+
 	private function saveContent($p)
 	{
 
@@ -648,42 +660,42 @@ class ModuleController extends Controller
 		$language = isset($p['language']) ? $p['language'] : $this->getDefaultProjectLanguage();
 		$topic = isset($p['topic']) ? trim($p['topic']) : null;
 		$content = isset($p['content']) ? trim($p['content']) : null;
-		
+
 		if (empty($id))
 			return false;
 
 		if (empty($topic) && empty($content)) {
-	
+
 			$this->models->ContentFreeModule->delete(
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $language, 
+					'language_id' => $language,
 					'page_id' => $id
 				)
 			);
-			
+
 			$this->setPageGotContent($id);
-			
+
 		} else {
-                
+
 			$cfm = $this->models->ContentFreeModule->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'module_id' => $this->getCurrentModuleId(),
-						'language_id' => $language, 
+						'language_id' => $language,
 						'page_id' => $id
 					)
 				)
 			);
-			
+
 			$this->models->ContentFreeModule->save(
 				array(
-					'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null, 
-					'project_id' => $this->getCurrentProjectId(), 
+					'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null,
+					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $language, 
+					'language_id' => $language,
 					'page_id' => $id,
 					'topic' => $topic,
 					'content' => $content
@@ -692,10 +704,15 @@ class ModuleController extends Controller
 
 			$this->setPageGotContent($id,true);
 
-			unset($_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList']);
-			
+			$tmp = $this->moduleSession->getModuleSetting($this->getCurrentModuleId());
+            unset($tmp['navList']);
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => $this->getCurrentModuleId(),
+                'value' => $tmp
+            ));
+
         }
-		
+
 		return true;
 
 	}
@@ -704,22 +721,22 @@ class ModuleController extends Controller
 	{
 
         if (!$id || !$languageId) {
-            
+
             return;
-        
+
         } else {
 
 			$cfm = $this->models->ContentFreeModule->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'module_id' => $this->getCurrentModuleId(),
-						'language_id' => $languageId, 
+						'language_id' => $languageId,
 						'page_id' => $id,
 						)
 				)
 			);
-                
+
             return $cfm[0];
 
         }
@@ -730,15 +747,15 @@ class ModuleController extends Controller
 	{
 
         if (!$this->rHasVal('id') || !$this->rHasVal('language')) {
-            
+
             return;
-        
+
         } else {
 
 			$page = $this->getPageContent($this->requestData['id'],$this->requestData['language']);
-                
+
             $this->smarty->assign('returnText', json_encode(array('topic' => $page['topic'],'content' => $page['content'])));
-        
+
         }
 
 	}
@@ -754,11 +771,11 @@ class ModuleController extends Controller
 
 	private function isUserAuthorizedForFreeModule($id=null)
 	{
-	
+
 		$id = isset($id) ? $id : $this->requestData['freeId'];
-		
+
 		if (!isset($id)) return false;
-	
+
 		$fmpu = $this->models->FreeModuleProjectUser->_get(
 			array(
 				'id' => array(
@@ -777,9 +794,9 @@ class ModuleController extends Controller
 	private function getFreeModule($id=null)
 	{
 
-		$id = 
-			isset($id) ? 
-				$id : 
+		$id =
+			isset($id) ?
+				$id :
 				isset($this->requestData['freeId']) ?
 					$this->requestData['freeId'] :
 					$this->getCurrentModuleId();
@@ -794,12 +811,12 @@ class ModuleController extends Controller
 		);
 
 		if ($fmp) return $fmp[0];
-	
+
 	}
 
 	private function createPage()
 	{
-	
+
 		if (!$this->getCurrentModuleId()) return;
 
 		$this->models->FreeModulePage->save(
@@ -823,7 +840,7 @@ class ModuleController extends Controller
 			$cfm = $this->models->ContentFreeModule->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'page_id' => $id
 					),
 					'columns' => 'count(*) as total'
@@ -860,7 +877,7 @@ class ModuleController extends Controller
 				'order' => 'show_order'
 			)
 		);
-		
+
 		foreach((array)$fmp as $key => $val) {
 
 			$d = $this->getPageContent($val['id'],$this->getDefaultProjectLanguage());
@@ -868,7 +885,7 @@ class ModuleController extends Controller
 			$fmp[$key]['topic'] = $d['topic'];
 
 		}
-		
+
 		return $fmp;
 
 	}
@@ -889,7 +906,7 @@ class ModuleController extends Controller
 				)
 			)
 		);
-	
+
 		if ($pfm) {
 
 			$fmm = $this->models->FreeModuleMedia->_get(
@@ -900,7 +917,7 @@ class ModuleController extends Controller
 					)
 				)
 			);
-			
+
 			if ($fmm) {
 
 				$pfm[0]['image']['file_name'] = $fmm[0]['file_name'];
@@ -910,7 +927,7 @@ class ModuleController extends Controller
 			}
 
 			return $pfm[0];
-		
+
 		} else {
 
 			return null;
@@ -925,7 +942,7 @@ class ModuleController extends Controller
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $this->getCurrentModuleId(),
 					'language_id' => $this->getDefaultProjectLanguage()
 					),
@@ -937,7 +954,7 @@ class ModuleController extends Controller
 		);
 
 		return isset($cfm[0]) ? $cfm[0]['page_id'] : null;
-		
+
 	}
 
 	private function cleanUpEmptyPages()
@@ -946,7 +963,7 @@ class ModuleController extends Controller
 		if (!$this->getCurrentModuleId()) return;
 
 		// delete all pages with no content that are over 7 days old
-		$this->models->FreeModulePage->delete('delete from %table% 
+		$this->models->FreeModulePage->delete('delete from %table%
 			where module_id = '.$this->getCurrentModuleId().'
 			and project_id =  '.$this->getCurrentProjectId().'
 			and got_content = 0
@@ -962,17 +979,17 @@ class ModuleController extends Controller
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $this->getDefaultProjectLanguage(), 
+					'language_id' => $this->getDefaultProjectLanguage(),
 				),
 				'columns' => 'page_id, topic, lower(substr(topic,1,1)) as letter',
 				'order' => 'letter'
 			)
 		);
-		
+
 		$alpha = null;
-		
+
 		foreach((array)$cfm as $key => $val) {
 
 			$alpha[$val['letter']] = $val['letter'];
@@ -982,14 +999,14 @@ class ModuleController extends Controller
 		}
 
 		return $alpha;
-	
+
 	}
 
 	private function deleteMedia($id=null)
 	{
-	
+
 		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
-		
+
 		if ($id == null) return;
 
 		$fmm = $this->models->FreeModuleMedia->_get(
@@ -1000,13 +1017,13 @@ class ModuleController extends Controller
 				)
 			)
 		);
-			
+
 		if (file_exists($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
 
 			if (unlink($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
-			
+
 				if ($fmm[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name'])) {
-				
+
 					unlink($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name']);
 
 				}
@@ -1021,13 +1038,13 @@ class ModuleController extends Controller
 			)
 		);
 
-	}	
+	}
 
 	private function deletePage($id=null)
 	{
-	
+
 		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
-		
+
 		if ($id == null || !$this->getCurrentModuleId()) return;
 
 		$this->deleteMedia($id);
@@ -1048,13 +1065,13 @@ class ModuleController extends Controller
 			)
 		);
 
-	}	
+	}
 
 	private function getModulePageNavList($forceLookup=true)
 	{
-	
+
 		if (empty($_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
-		
+
 			$d = $this->getPages();
 
 			foreach((array)$d as $key => $val) {
@@ -1073,9 +1090,9 @@ class ModuleController extends Controller
 			}
 
 			$_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = isset($res) ? $res : null;
-		
+
 		}
-		
+
 		return $_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'];
 
 	}
@@ -1088,7 +1105,7 @@ class ModuleController extends Controller
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $this->getCurrentModuleId(),
 					'topic like' => '%'.$search.'%'
 					),
@@ -1106,7 +1123,7 @@ class ModuleController extends Controller
 				'sortData'=>true
 			))
 		);
-		
+
 	}
 
 }
