@@ -22,11 +22,11 @@ class Controller extends BaseClass
 	public $data;
 	public $randomValue;
 	public $breadcrumbIncludeReferer;
-	
+
 	public $errors=array();
 	public $messages=array();
 	public $warnings=array();
-	
+
 	public $controllerBaseName;
 	public $controllerBaseNameMask = false;
 	public $pageName;
@@ -47,6 +47,7 @@ class Controller extends BaseClass
 	public $suppressProjectInBreadcrumbs;
 	public $includeLocalMenu = true;
 	public $printBreadcrumbs = true;
+
 	private $usedModelsBase = array(
 		'activity_log',
 		'free_modules_projects',
@@ -69,9 +70,9 @@ class Controller extends BaseClass
 		'settings',
 		'taxa',
 		'taxa_variations',
-		'user_taxon',
+		'users_taxa',
 		'users',
-		'variations_labels'	
+		'variations_labels'
 	);
 
     private $usedHelpersBase = array(
@@ -140,7 +141,7 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
 
         $this->setProjectLanguages();
-		
+
 		$this->initTranslator();
 
     }
@@ -264,7 +265,7 @@ class Controller extends BaseClass
             if ($writeToLog !== false)
                 $this->log($error, $writeToLog);
         }
-        else 
+        else
 		{
             foreach ($error as $key => $val)
 			{
@@ -1056,8 +1057,8 @@ class Controller extends BaseClass
      */
     public function isFormResubmit ()
     {
-		return 
-			$this->rHasVal('rnd') && 
+		return
+			$this->rHasVal('rnd') &&
 			null!==$this->baseSession->getModuleSetting( 'last_rnd' ) &&
 			($this->baseSession->getModuleSetting( 'last_rnd' ) == $this->rGetVal('rnd'));
     }
@@ -3026,7 +3027,7 @@ class Controller extends BaseClass
             $_SESSION['admin']['project']['paths']['project_media'] = $paths['project_media'];
             $_SESSION['admin']['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
             $_SESSION['admin']['project']['paths']['project_media_l2_maps'] = $paths['project_media_l2_maps'];
-			
+
 			$this->baseSession->setModuleSetting( array( 'setting'=>'project_media_path', 'value' => $paths['project_media'] ) );
 			$this->baseSession->setModuleSetting( array( 'setting'=>'project_thumbs_path', 'value' => $paths['project_thumbs'] ) );
 			$this->baseSession->setModuleSetting( array( 'setting'=>'project_media_l2_maps_path', 'value' => $paths['project_media_l2_maps'] ) );
@@ -3097,8 +3098,8 @@ class Controller extends BaseClass
     private function checkLastVisitedPage ()
     {
         if (
-			null!==$this->baseSession->getModuleSetting( 'referer_url' ) && 
-			null!==$this->baseSession->getModuleSetting( 'prev_referer_url' ) && 
+			null!==$this->baseSession->getModuleSetting( 'referer_url' ) &&
+			null!==$this->baseSession->getModuleSetting( 'prev_referer_url' ) &&
 			$this->baseSession->getModuleSetting( 'referer_url' )==$_SERVER['REQUEST_URI'])
 		{
 			$this->baseSession->setModuleSetting( array('setting'=>'referer_url','value'=> $this->baseSession->getModuleSetting( 'prev_referer_url' ) ) );
@@ -3198,7 +3199,7 @@ class Controller extends BaseClass
                 }
             }
         }
-        else 
+        else
 		if ($this->_fullPathRelative != $cp)
 		{
             // for special cases in which no project has been set (like 'create project')
@@ -3349,7 +3350,7 @@ class Controller extends BaseClass
 		include_once ('TranslatorController.php');
 		$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage());
 	}
-	
+
 	public function translate($content)
 	{
 		return $this->translator->translate($content);
@@ -3363,7 +3364,7 @@ class Controller extends BaseClass
 	public function smartyTranslate ($params, $content, &$smarty, &$repeat)
 	{
 		$c = $this->translator->translate($content);
-	
+
 		if (isset($params))
 		{
 			foreach ((array) $params as $key => $val)
