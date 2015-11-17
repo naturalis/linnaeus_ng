@@ -6,10 +6,10 @@ class FreeModuleController extends Controller
 {
 
     public $usedModels = array(
-		'free_module_project',
-		'free_module_project_user',
-		'free_module_page',
-		'content_free_module',
+		'free_modules_projects',
+		'free_modules_projects_users',
+		'free_modules_pages',
+		'content_free_modules',
 		'free_module_media'
     );
 
@@ -64,7 +64,7 @@ class FreeModuleController extends Controller
 
     }
 
-	public function checkAuthorisation()
+	public function checkAuthorisation($allowNoProjectId = false)
 	{
 
 		// check if user is logged in, otherwise redirect to login page
@@ -250,11 +250,13 @@ class FreeModuleController extends Controller
 
 		if ($this->rHasVal('letter')) {
 
-			$refs = $_SESSION['admin']['system']['freeModule']['alphaIndex'][$this->requestData['letter']];
+		    $alphaIndex = $this->moduleSession->getModuleSetting('alphaIndex');
+
+		    $refs = $alphaIndex[$this->requestData['letter']];
+
+		    $this->smarty->assign('letter', $alphaIndex[$this->requestData['letter']]);
 
 		}
-
-		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
 
 		if (isset($alpha)) $this->smarty->assign('alpha',$alpha);
 
@@ -376,7 +378,7 @@ class FreeModuleController extends Controller
 
 			if (!empty($m)) $d['module'] = $m;
 
-			$this->models->FreeModuleProject->save($d);
+			$this->models->FreeModulesProjects->save($d);
 
 			$module = $this->getFreeModule();
 
@@ -426,7 +428,7 @@ class FreeModuleController extends Controller
 
 						$newOrder = $key - 1;
 
-						 $this->models->FreeModulePage->update(
+						 $this->models->FreeModulesPages->update(
 							array(
 								'show_order' => 'show_order + 1',
 							),
@@ -457,7 +459,7 @@ class FreeModuleController extends Controller
 
 				}
 
-				 $this->models->FreeModulePage->update(
+				 $this->models->FreeModulesPages->update(
 				 	array(
 						'show_order' => $newOrder,
 					),
@@ -666,7 +668,7 @@ class FreeModuleController extends Controller
 
 		if (empty($topic) && empty($content)) {
 
-			$this->models->ContentFreeModule->delete(
+			$this->models->ContentFreeModules->delete(
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $this->getCurrentModuleId(),
@@ -679,7 +681,7 @@ class FreeModuleController extends Controller
 
 		} else {
 
-			$cfm = $this->models->ContentFreeModule->_get(
+			$cfm = $this->models->ContentFreeModules->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -690,7 +692,7 @@ class FreeModuleController extends Controller
 				)
 			);
 
-			$this->models->ContentFreeModule->save(
+			$this->models->ContentFreeModules->save(
 				array(
 					'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null,
 					'project_id' => $this->getCurrentProjectId(),
@@ -726,7 +728,7 @@ class FreeModuleController extends Controller
 
         } else {
 
-			$cfm = $this->models->ContentFreeModule->_get(
+			$cfm = $this->models->ContentFreeModules->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -763,9 +765,9 @@ class FreeModuleController extends Controller
 	private function getCurrentModuleId()
 	{
 
-		return isset($_SESSION['admin']['user']['freeModules']['activeModule']['id']) ?
-				$_SESSION['admin']['user']['freeModules']['activeModule']['id'] :
-				false;
+		$activeModule = $this->moduleSession->getModuleSetting('activeModule');
+
+	    return isset($activeModule['id']) ? $activeModule['id'] : false;
 
 	}
 
@@ -776,7 +778,7 @@ class FreeModuleController extends Controller
 
 		if (!isset($id)) return false;
 
-		$fmpu = $this->models->FreeModuleProjectUser->_get(
+		$fmpu = $this->models->FreeModulesProjectsUsers->_get(
 			array(
 				'id' => array(
 					'free_module_id' => $id,
@@ -801,7 +803,7 @@ class FreeModuleController extends Controller
 					$this->requestData['freeId'] :
 					$this->getCurrentModuleId();
 
-		$fmp = $this->models->FreeModuleProject->_get(
+		$fmp = $this->models->FreeModulesProjects->_get(
 			array(
 				'id' => array(
 					'id' => $id,
@@ -810,7 +812,7 @@ class FreeModuleController extends Controller
 			)
 		);
 
-		if ($fmp) return $fmp[0];
+        if ($fmp) return $fmp[0];
 
 	}
 
@@ -819,14 +821,14 @@ class FreeModuleController extends Controller
 
 		if (!$this->getCurrentModuleId()) return;
 
-		$this->models->FreeModulePage->save(
+		$this->models->FreeModulesPages->save(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'module_id' => $this->getCurrentModuleId()
 			)
 		);
 
-		return $this->models->FreeModulePage->getNewId();
+		return $this->models->FreeModulesPages->getNewId();
 
 	}
 
@@ -837,7 +839,7 @@ class FreeModuleController extends Controller
 
 		if ($state==null) {
 
-			$cfm = $this->models->ContentFreeModule->_get(
+			$cfm = $this->models->ContentFreeModules->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -851,7 +853,7 @@ class FreeModuleController extends Controller
 
 		}
 
-		$this->models->FreeModulePage->update(
+		$this->models->FreeModulesPages->update(
 			array(
 				'got_content' => ($state==false ? '0' : '1'),
 			),
@@ -867,7 +869,7 @@ class FreeModuleController extends Controller
 	private function getPages()
 	{
 
-		$fmp = $this->models->FreeModulePage->_get(
+		$fmp = $this->models->FreeModulesPages->_get(
 			array(
 				'id' => array(
 					'module_id' => $this->getCurrentModuleId(),
@@ -897,7 +899,7 @@ class FreeModuleController extends Controller
 
 		if (!isset($id)) return;
 
-		$pfm = $this->models->FreeModulePage->_get(
+		$pfm = $this->models->FreeModulesPages->_get(
 			array(
 				'id' => array(
 					'id' => $id,
@@ -939,7 +941,7 @@ class FreeModuleController extends Controller
 	private function getFirstPageId()
 	{
 
-		$cfm = $this->models->ContentFreeModule->_get(
+		$cfm = $this->models->ContentFreeModules->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -963,7 +965,7 @@ class FreeModuleController extends Controller
 		if (!$this->getCurrentModuleId()) return;
 
 		// delete all pages with no content that are over 7 days old
-		$this->models->FreeModulePage->delete('delete from %table%
+		$this->models->FreeModulesPages->delete('delete from %table%
 			where module_id = '.$this->getCurrentModuleId().'
 			and project_id =  '.$this->getCurrentProjectId().'
 			and got_content = 0
@@ -974,9 +976,9 @@ class FreeModuleController extends Controller
 	private function getActualAlphabet()
 	{
 
-		unset($_SESSION['admin']['system']['freeModule']['alphaIndex']);
+		$this->moduleSession->setModuleSetting(array('setting' => 'alphaIndexs'));
 
-		$cfm = $this->models->ContentFreeModule->_get(
+		$cfm = $this->models->ContentFreeModules->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -988,15 +990,22 @@ class FreeModuleController extends Controller
 			)
 		);
 
-		$alpha = null;
+		$alpha = $alphaIndex = null;
 
 		foreach((array)$cfm as $key => $val) {
 
 			$alpha[$val['letter']] = $val['letter'];
 
-			$_SESSION['admin']['system']['freeModule']['alphaIndex'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
+			$alphaIndex[$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
+
+			//$_SESSION['admin']['system']['freeModule']['alphaIndex'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
 
 		}
+
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'alphaIndex',
+            'value' => $alphaIndex
+        ));
 
 		return $alpha;
 
@@ -1049,7 +1058,7 @@ class FreeModuleController extends Controller
 
 		$this->deleteMedia($id);
 
-		$this->models->ContentFreeModule->delete(
+		$this->models->ContentFreeModules->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'module_id' => $this->getCurrentModuleId(),
@@ -1057,7 +1066,7 @@ class FreeModuleController extends Controller
 			)
 		);
 
-		$this->models->FreeModulePage->delete(
+		$this->models->FreeModulesPages->delete(
 			array(
 				'id' => $id,
 				'project_id' => $this->getCurrentProjectId(),
@@ -1070,7 +1079,9 @@ class FreeModuleController extends Controller
 	private function getModulePageNavList($forceLookup=true)
 	{
 
-		if (empty($_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
+	    $moduleId = $this->moduleSession->getModuleSetting($this->getCurrentModuleId());
+
+		if (empty($moduleId['navList']) || $forceLookup) {
 
 			$d = $this->getPages();
 
@@ -1089,11 +1100,16 @@ class FreeModuleController extends Controller
 
 			}
 
-			$_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = isset($res) ? $res : null;
+			$moduleId['navList'] = isset($res) ? $res : null;
+
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => $this->getCurrentModuleId(),
+                'value' => $moduleId
+            ));
 
 		}
 
-		return $_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'];
+		return $moduleId['navList'];
 
 	}
 
@@ -1102,7 +1118,7 @@ class FreeModuleController extends Controller
 
 		if (empty($search)) return;
 
-		$cfm = $this->models->ContentFreeModule->_get(
+		$cfm = $this->models->ContentFreeModules->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
