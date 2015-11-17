@@ -37,11 +37,11 @@
 					'limit' => $p[S_RESULT_LIMIT_PER_CAT]
 				)
 			);
-	
+
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 				currently bypassed, because use of LIKE rather than MATCH
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
-				implements <span class="searchResultMatch"> around hits			
+				implements <span class="searchResultMatch"> around hits
 			$content = $this->sortResultsByMostTokensFound($content);
 
 
@@ -50,7 +50,7 @@
 			$r=array();
 			foreach((array)$c as $v)
 				$r[] = str_replace(S_LIKETEXT_REPLACEMENT,$v,$s);
-	
+
 			return '('.implode(' or ',$r).')';
 		}
 
@@ -60,9 +60,9 @@ WE WILL NOT SEARCH THE MATRIX!
 STRIP TAGS AND SHIT FROM SEARCH STRING!!! (also + and - and * which fuck up the fulltext)
 
 
-	search is case-insensitive! 
-	the php post-filtering is designed to allow for case-sensitivity, but it is not actually implemented. 
-	as the full text search is insensitive by default (unless we start altering the collation of the indexed 
+	search is case-insensitive!
+	the php post-filtering is designed to allow for case-sensitivity, but it is not actually implemented.
+	as the full text search is insensitive by default (unless we start altering the collation of the indexed
 	columns), searches that have no literal bits ("...") will be harder to turn into case sensitive ones.
 
 
@@ -71,11 +71,11 @@ STRIP TAGS AND SHIT FROM SEARCH STRING!!! (also + and - and * which fuck up the 
 
     Any word that is too short is ignored. The default minimum length of words that are found by full-text searches is four characters.
 
-    Words in the stopword list are ignored. A stopword is a word such as “the” or “some” that is so common that it is considered to have zero semantic value. There is a built-in stopword list, but it can be overwritten by a user-defined list. 
+    Words in the stopword list are ignored. A stopword is a word such as “the” or “some” that is so common that it is considered to have zero semantic value. There is a built-in stopword list, but it can be overwritten by a user-defined list.
 
-The default stopword list is given in Section 12.9.4, “Full-Text Stopwords”. 
+The default stopword list is given in Section 12.9.4, “Full-Text Stopwords”.
 	http://dev.mysql.com/doc/refman/5.0/en/fulltext-stopwords.html
-The default minimum word length and stopword list can be changed as described in Section 12.9.6, “Fine-Tuning MySQL Full-Text Search”. 
+The default minimum word length and stopword list can be changed as described in Section 12.9.6, “Fine-Tuning MySQL Full-Text Search”.
 
 //WHERE MATCH(title, body) AGAINST ('vnurk vnork' in boolean mode) // returns AND vnurk AND vnork
 
@@ -93,9 +93,9 @@ class SearchController extends Controller
 
     public $usedModels = array(
 		'content',
-		'content_taxa', 
-		'pages_taxa', 
-		'pages_taxa_titles', 
+		'content_taxa',
+		'pages_taxa',
+		'pages_taxa_titles',
 		'media_taxon',
 		'media_descriptions_taxon',
 		'synonyms',
@@ -159,12 +159,12 @@ class SearchController extends Controller
 		define('S_LIKETEXT_REPLACEMENT','###');
 		define('__CONCAT_RESULT__','__CONCAT_RESULT__');
 		define('V_RESULT_LIMIT_PER_CAT',200);
-	
-		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3)); 
-		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50)); 
-		$this->_excerptPreMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre-match_length','subst'=>35)); 
-		$this->_excerptPostMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_post-match_length','subst'=>35)); 
-		$this->_excerptPrePostMatchString=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre_post_match_string','subst'=>'...')); 
+
+		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3));
+		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50));
+		$this->_excerptPreMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre-match_length','subst'=>35));
+		$this->_excerptPostMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_post-match_length','subst'=>35));
+		$this->_excerptPrePostMatchString=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre_post_match_string','subst'=>'...'));
 	}
 
     public function indexAction ()
@@ -187,12 +187,12 @@ class SearchController extends Controller
 						$this->rHasVal('modules') ? $this->rGetVal('modules') : false,
 						$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : false
 					);
-					
+
 				$this->moduleSession->setModuleSetting( array('setting'=>'results','value'=>$results) );
 
 				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->rGetVal('search')));
 				$this->smarty->assign('results',$results);
-			} 
+			}
 			else
 			{
 				$this->addError(
@@ -241,9 +241,9 @@ class SearchController extends Controller
 	private function tokenizeSearchString( $s )
 	{
 		/*
-			splits search string in groups delimited by ". if there's an 
+			splits search string in groups delimited by ". if there's an
 			uneven number the last one is ignored.
-		*/	
+		*/
 
 		$parts = preg_split('/('.$this->_searchStringGroupDelimiter.')/i',$s,-1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
@@ -263,7 +263,7 @@ class SearchController extends Controller
 				}
 				// and toggle "rec"
 				$r = !$r;
-			} 
+			}
 			else
 			{
 				// concatenate consecutive parts when "rec" is on (i.e., we are inside a "...")
@@ -278,11 +278,11 @@ class SearchController extends Controller
 		return array_filter($t);
 
 	}
-	
+
 	private function prefabFullTextLikeString( $s )
 	{
 		array_walk($s,function(&$n){$n=str_replace(array("'","%","_"),array("\'","\%","\_"),$n);});
-		
+
 		// make tokens into a single string for mysql LIKE statement; add ### to replace with column name
 		$r = "(".S_LIKETEXT_REPLACEMENT." like '%".implode("%' or ".S_LIKETEXT_REPLACEMENT." like '%",$s)."%')";
 
@@ -313,43 +313,43 @@ class SearchController extends Controller
 		{
 			if (isset($p[1][$key][__CONCAT_RESULT__])) unset($p[1][$key][__CONCAT_RESULT__]);
 		}
-		return $p[1];		
+		return $p[1];
 		//OVERRIDE
 
-		
+
 		/*
 			$p[0] : array of search parameters:
 				$s[S_TOKENIZED_TERMS]	: array of tokens
 				$s[S_FULLTEXT_STRING]	: string for fulltext search (not used in this function)
 				$s[S_CONTAINS_LITERALS]	: boolean, indicates the presence of literal token(s) ("aa bb")
 			$p[1] : array of results
-			$p[2] : array of fields to check (optional; defaults to array('label','content'))			
+			$p[2] : array of fields to check (optional; defaults to array('label','content'))
 		*/
-	
+
 		$s = isset($p[0]) ? $p[0] : null;
 		$r = isset($p[1]) ? $p[1] : null;
 
 		if (!isset($s) || !isset($s[S_CONTAINS_LITERALS]) || !isset($s[S_TOKENIZED_TERMS]) ||$s[S_CONTAINS_LITERALS]==false) return $r;
-		
+
 		// really shouldn't happen but just in case i should forget to add the __CONCAT_RESULT__ field in the query
 		if (isset($r[0][__CONCAT_RESULT__]))
 			$concatField = __CONCAT_RESULT__;
 		else
 			$concatField = 'content';
-			
+
 
 		if ($s[S_CONTAINS_LITERALS]) {
-			
+
 			$filtered = array();
 
 			// loop all results
 			foreach((array)$r as $key => $result) {
 
 				if (!isset($result[$concatField])) continue;
-			
+
 
 				$d = $this->stripTagsForSearchExcerpt($result[$concatField]);
-				
+
 				$match = false;
 
 				// loop through all tokens
@@ -361,7 +361,7 @@ class SearchController extends Controller
 					$match = $s[S_IS_CASE_SENSITIVE] ? strpos($d,$token)!==false : stripos($d,$token)!==false;
 
 				}
-				
+
 				if ($match) {
 					if ($concatField== __CONCAT_RESULT__)
 						unset($result[__CONCAT_RESULT__]);
@@ -371,11 +371,11 @@ class SearchController extends Controller
 				}
 
 			}
-			
+
 			return $filtered;
 
 		}
-		
+
 		// just in case
 		return $r;
 
@@ -427,16 +427,16 @@ class SearchController extends Controller
 						if (in_array($field,$x))
 						{
 							$start = ($match[1] < $this->_excerptPreMatchLength ? 0 : ($match[1] - $this->_excerptPreMatchLength));
-							$r[$rKey]['matches'][]= 
+							$r[$rKey]['matches'][]=
 								($start>0 ? $this->_excerptPrePostMatchString : '').
 								substr($stripped,$start,($match[1]-$start)).
 								'<span class="searchResultMatch">'.$match[0].'</span>'.
 								substr($stripped,$match[1]+strlen($match[0]),$this->_excerptPostMatchLength).
 								($match[1]+strlen($match[0])+$this->_excerptPostMatchLength<strlen($stripped) ? $this->_excerptPrePostMatchString : '');
-						} 
+						}
 						else
 						{
-							$r[$rKey]['matches'][]= 
+							$r[$rKey]['matches'][]=
 								substr($stripped,0,$match[1]).
 								'<span class="searchResultMatch">'.$match[0].'</span>'.
 								substr($stripped,$match[1]+strlen($match[0]));
@@ -445,9 +445,9 @@ class SearchController extends Controller
 
 					if ($s[S_UNSET_ORIGINAL_CONTENT] && in_array($field,$x))
 						unset($r[$rKey][$field]);
-				
+
 				}
-			
+
 			}
 
 		}
@@ -457,10 +457,10 @@ class SearchController extends Controller
 	}
 
 	private function sortResultsByMostTokensFound( $data )
-	{	
+	{
 		if (count((array)$data)<2)
 			return $data;
-	
+
 		foreach((array)$data as $key=>$val)
 		{
 			$scores[$key]=0;
@@ -477,7 +477,7 @@ class SearchController extends Controller
 		}
 		return $res;
 	}
-	
+
 	private function makeLikeClause( $s, $c )
 	{
 		// creates like-clause  ((taxon like '%phyllum a%' or taxon like '%orchid%'))
@@ -505,7 +505,7 @@ class SearchController extends Controller
 			S_RESULT_LIMIT_PER_CAT => V_RESULT_LIMIT_PER_CAT, // max results per category (module)
 			S_UNSET_ORIGINAL_CONTENT => true // if true, unsets the potentially large content fields after they've been excerpted
 		);
-		
+
 		if (
 			( is_array($modules) && in_array('species',$modules) ) ||
 			( is_array($modules) && in_array('key',$modules) )
@@ -514,37 +514,37 @@ class SearchController extends Controller
 			$species=$this->searchSpecies( $p );
 			$p['species_results']=$species;
 		}
-			
+
 
 		$results =
 			array(
-				'content' => 
+				'content' =>
 					(is_array($modules) && in_array('content',$modules) ? $this->searchContent( $p ) : null),
-				'map' => 
+				'map' =>
 					(is_array($modules) && in_array('mapkey',$modules) ? $this->searchMap( $p ) : null),
-				'matrixkey' => 
+				'matrixkey' =>
 					(is_array($modules) && in_array('matrixkey',$modules) ? $this->searchMatrixKey( $p ) : null), // stub
-				'dichkey' => 
+				'dichkey' =>
 					(is_array($modules) && in_array('key',$modules) ? $this->searchDichotomousKey( $p ) : null),
-				'literature' => 
+				'literature' =>
 					(is_array($modules) && in_array('literature',$modules) ? $this->searchLiterature( $p ) : null),
 				'glossary' =>
 					(is_array($modules) && in_array('glossary',$modules) ? $this->searchGlossary( $p ) : null),
 				'introduction' =>
 					(is_array($modules) && in_array('introduction',$modules) ? $this->searchIntroduction( $p ) : null),
-				'species' => 
+				'species' =>
 					(is_array($modules) && in_array('species',$modules) ? $species : null),
-				'modules' => 
-					$this->searchModules($p,$freeModules)	
+				'modules' =>
+					$this->searchModules($p,$freeModules)
 			);
 
 		$totalcount = 0;
-		
+
 		foreach((array)$results as $val)
 			$totalcount += $val['numOfResults'];
-		
+
 		//echo '<h2>'.$totalcount.'</h2>';
-		
+
 		return array('data'=>$results,'count'=>$totalcount);
 	}
 
@@ -606,7 +606,7 @@ class SearchController extends Controller
 			$tpt = $this->models->PagesTaxaTitles->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getDefaultProjectLanguage(),
 						'page_id' => $val['page_id']
 					),
@@ -652,16 +652,16 @@ class SearchController extends Controller
 				'columns' => 'id,language_id,taxon_id,commonname,transliteration,concat(ifnull(commonname,\'\'),\' \',ifnull(transliteration,\'\')) as '.__CONCAT_RESULT__,
 				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
 			)
-		);	
+		);
 
 		$commonnames = $this->filterResultsWithTokenizedSearch(array($p,$commonnames,array('commonname','transliteration')));
 
 		foreach((array)$commonnames as $key => $val)
 		{
-			$commonnames[$key]['label'] = 
+			$commonnames[$key]['label'] =
 				(!empty($val['transliteration']) ?
 					($val['transliteration']).
-					(!empty($val['commonname']) ? 
+					(!empty($val['commonname']) ?
 						' '.sprintf($this->translate('(transliteration of "%s")'),$val['commonname']) :
 						'') :
 					$val['commonname']
@@ -777,7 +777,7 @@ class SearchController extends Controller
 		);
 
 	}
-	
+
 	private function searchGlossary( $p )
 	{
 
@@ -891,7 +891,7 @@ class SearchController extends Controller
 		// literature by year (numbers, cannot be full text indexed)
 		$more = $this->models->Literature->_get(
 			array(
-				'where' => 
+				'where' =>
 					"project_id = ".$this->getCurrentProjectId()."
 					and (year like '%".implode("%' or year like '%",$p[S_TOKENIZED_TERMS])."%')",
 				'columns' => $c,
@@ -934,7 +934,7 @@ class SearchController extends Controller
 				'fieldAsIndex' => 'id'
 			)
 		);
-		
+
 		// endpoints
 		$endpoints=array();
 		if ( isset($p['species_results']) && isset($p['species_results']['results']) )
@@ -951,48 +951,48 @@ class SearchController extends Controller
 					}
 				}
 			}
-			
+
 			if ( !empty($taxon_ids) )
 			{
 				$a=$this->translate('Step');
 				$b=$this->translate('choice');
-	
+
 				$endpoints = $this->models->ChoicesKeysteps->freeQuery("
-					select 
+					select
 						_a.id,
 						_a.keystep_id,
 						_a.show_order,
 						_b.number,
 						concat('".$a." ',_b.number,', ".$b." ',_a.show_order,' &rarr; ',_c.taxon) as label
-	
-					from 
+
+					from
 						%PRE%choices_keysteps _a
-						
+
 					left join %PRE%keysteps _b
 						on _a.project_id = _b.project_id
 						and _a.keystep_id = _b.id
-						
+
 					left join %PRE%taxa _c
 						on _a.project_id = _c.project_id
 						and _a.res_taxon_id = _c.id
-						
-					where 
+
+					where
 						_a.project_id = " . $this->getCurrentProjectId() . "
 						and _a.res_taxon_id in (" . implode(",",$taxon_ids) . ")
 
 					order by
-						concat('".$a." ',_b.number,', ".$b." ',_a.show_order)						
+						concat('".$a." ',_b.number,', ".$b." ',_a.show_order)
 
 					limit " . $p[S_RESULT_LIMIT_PER_CAT] . "
 				");
-	
+
 				//_c.taxon as ".__CONCAT_RESULT__."
  				//$endpoints = $this->filterResultsWithTokenizedSearch(array($p,$endpoints));
 				$endpoints = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$endpoints));
 				//$endpoints = $this->sortResultsByMostTokensFound($endpoints);
 			}
 		}
-		
+
 		// choices
 		$choices = $this->models->ChoicesContentKeysteps->_get(
 			array(
@@ -1022,7 +1022,7 @@ class SearchController extends Controller
 				)
 			);
 
-			$choices[$key]['label'] = 
+			$choices[$key]['label'] =
 				sprintf(
 					$this->translate('Step %s, choice %s'),
 					$keysteps[$step[0]['keystep_id']]['number'],
@@ -1178,7 +1178,7 @@ class SearchController extends Controller
 		);
 
 		// get appropriate free modules
-		$modules = $this->models->FreeModuleProject->_get(
+		$modules = $this->models->FreeModulesProjects->_get(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'columns' => 'id,module',
@@ -1189,20 +1189,20 @@ class SearchController extends Controller
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 		$content = $this->sortResultsByMostTokensFound($content);
-		
+
 		$r = array();
-		
+
 		foreach((array)$content as $val) {
 			$m = $modules[$val['module_id']]['module'];
 			if (isset($r[$m]) && count((array)$r[$m])>=$p[S_RESULT_LIMIT_PER_CAT]) continue;
 			$r[$m][] = $val;
 		}
-		
+
 		$content = array();
 		$t = 0;
-		
+
 		foreach((array)$r as $key => $val) {
-			
+
 			$content[] = array(
 				'label' => $key,
 				'url' => '../module/edit.php?id=%s',
@@ -1211,9 +1211,9 @@ class SearchController extends Controller
 			);
 
 			$t += count((array)$val);
-			
+
 		}
-		
+
 		return array(
 			'label' => $this->translate('Other modules'),
 			'results' => $content,
