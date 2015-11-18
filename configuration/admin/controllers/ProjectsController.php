@@ -163,7 +163,7 @@ class ProjectsController extends Controller
                 $this->models->FreeModulesProjects->save(
                 array(
                     'id' => null,
-                    'module' => $this->requestData['module_new'],
+                    'module' => $this->rGetVal('module_new'),
                     'project_id' => $this->getCurrentProjectId(),
                     'active' => 'n'
                 ));
@@ -374,7 +374,7 @@ class ProjectsController extends Controller
 
 			if ($this->rHasVar('setting')) {
 
-				foreach((array)$this->requestData['setting'] as $key => $val) {
+				foreach((array)$this->rGetVal('setting') as $key => $val) {
 
 					$val = trim($val);
 
@@ -394,25 +394,25 @@ class ProjectsController extends Controller
 
 			if ($this->rHasVal('new_setting')) {
 
-				$v = $this->getSetting($this->requestData['new_setting']);
+				$v = $this->getSetting($this->rGetVal('new_setting'));
 
 				if (is_null($v)) {
 
 					if ($this->rHasVal('new_setting') && !$this->rHasVal('new_value')) {
-						$this->addError(sprintf($this->translate('A value is required for "%s".'),$this->requestData['new_setting']));
-						$this->smarty->assign('new_setting',$this->requestData['new_setting']);
+						$this->addError(sprintf($this->translate('A value is required for "%s".'),$this->rGetVal('new_setting')));
+						$this->smarty->assign('new_setting',$this->rGetVal('new_setting'));
 					} else
 					if ($this->rHasVal('new_setting') && $this->rHasVal('new_value')) {
 
-						$c += $this->saveSetting(array('name' => $this->requestData['new_setting'],'value' => $this->requestData['new_value']));
+						$c += $this->saveSetting(array('name' => $this->rGetVal('new_setting'),'value' => $this->rGetVal('new_value')));
 
 					}
 
 				} else {
 
-					$this->addError(sprintf($this->translate('A setting with the name "%s" already exists.'),$this->requestData['new_setting']));
-					$this->smarty->assign('new_setting',$this->requestData['new_setting']);
-					$this->smarty->assign('new_value',$this->requestData['new_value']);
+					$this->addError(sprintf($this->translate('A setting with the name "%s" already exists.'),$this->rGetVal('new_setting')));
+					$this->smarty->assign('new_setting',$this->rGetVal('new_setting'));
+					$this->smarty->assign('new_value',$this->rGetVal('new_value'));
 
 				}
 
@@ -456,15 +456,15 @@ class ProjectsController extends Controller
 
         if ($this->rHasVal('view', 'modules')) {
 
-            $this->ajaxActionModules($this->requestData['type'], $this->requestData['action'], $this->requestData['id']);
+            $this->ajaxActionModules($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId());
         }
         else if ($this->rHasVal('view', 'collaborators')) {
 
-            $this->ajaxActionCollaborators($this->requestData['type'], $this->requestData['action'], $this->requestData['id'], $this->requestData['user']);
+            $this->ajaxActionCollaborators($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId(), $this->rGetVal('user'));
         }
         else if ($this->rHasVal('view', 'languages')) {
 
-            $this->ajaxActionLanguages($this->requestData['action'], $this->requestData['id']);
+            $this->ajaxActionLanguages($this->rGetVal('action'), $this->rGetId());
         }
 
         $this->printPage();
@@ -495,9 +495,9 @@ class ProjectsController extends Controller
 
                 $id = $this->createProject(
                 array(
-                    'title' => $this->requestData['title'],
-                    'version' => isset($this->requestData['version']) ? $this->requestData['version'] : null,
-                    'sys_description' => $this->requestData['sys_description']
+                    'title' => $this->rGetVal('title'),
+                    'version' => !is_null($this->rGetVal('version')) ? $this->rGetVal('version') : null,
+                    'sys_description' => $this->rGetVal('sys_description')
                 ));
 
                 if ($id) {
@@ -505,13 +505,13 @@ class ProjectsController extends Controller
                     $this->models->LanguagesProjects->save(
                     array(
                         'id' => null,
-                        'language_id' => $this->requestData['language'],
+                        'language_id' => $this->rGetVal('language'),
                         'project_id' => $id,
                         'def_language' => 1,
                         'active' => 'y'
                     ));
 
-                    $this->createProjectCssFile($id, $this->requestData['title']);
+                    $this->createProjectCssFile($id, $this->rGetVal('title'));
 
                     $this->addAllModulesToProject($id);
                     $this->addUserToProject($this->getCurrentUserId(), $id, ID_ROLE_SYS_ADMIN);
@@ -523,7 +523,7 @@ class ProjectsController extends Controller
                     $this->setCurrentUserRoleId();
 
                     $this->smarty->assign('saved', true);
-                    $this->addMessage(sprintf($this->translate('Project \'%s\' saved.'), $this->requestData['title']));
+                    $this->addMessage(sprintf($this->translate('Project \'%s\' saved.'), $this->rGetVal('title')));
                     $this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
                 }
                 else {
@@ -553,7 +553,7 @@ class ProjectsController extends Controller
 
         if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
 
-            $this->doDeleteProjectAction($this->requestData['id']);
+            $this->doDeleteProjectAction($this->rGetId());
 
             $this->reInitUserRolesAndRights();
 
@@ -562,7 +562,7 @@ class ProjectsController extends Controller
         else {
 
             $d = $this->rHasVal('p') ? array(
-                'id' => $this->requestData['p']
+                'id' => $this->rGetVal('p')
             ) : '*';
 
             $projects = $this->models->Projects->_get(array(
@@ -738,33 +738,33 @@ class ProjectsController extends Controller
 		if ($this->rHasVal('newId') && !$this->isFormResubmit()) {
 
             $p = $this->models->Projects->_get(array(
-                'id' => array('id' => $this->requestData['newId']),
+                'id' => array('id' => $this->rGetVal('newId')),
             ));
 
 			if ($p) {
 
-				 $this->addError(sprintf($this->translate('A project with ID %s already exists (%s).'),$this->requestData['newId'],$p[0]['title']));
+				 $this->addError(sprintf($this->translate('A project with ID %s already exists (%s).'),$this->rGetVal('newId'),$p[0]['title']));
 
 			} else {
 
 
 				if ($this->rHasVal('action','change')) {
 
-					$this->doChangeProjectId($this->requestData['p'],$this->requestData['newId']);
+					$this->doChangeProjectId($this->rGetVal('p'),$this->rGetVal('newId'));
 
 					$this->smarty->assign('done', true);
 
 				} else {
 
 					$projects = $this->models->Projects->_get(array(
-						'id' => array('id' => $this->requestData['p']),
+						'id' => array('id' => $this->rGetVal('p')),
 					));
 
-					$this->smarty->assign('newId', $this->requestData['newId']);
+					$this->smarty->assign('newId', $this->rGetVal('newId'));
 
 				}
 
-				$this->smarty->assign('oldId', $this->requestData['p']);
+				$this->smarty->assign('oldId', $this->rGetVal('p'));
 
 			}
 
