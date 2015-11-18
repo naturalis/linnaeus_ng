@@ -112,16 +112,31 @@ class ExportController extends Controller
 
 			$r = $this->models->Ranks->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
-			foreach((array)$d as $key => $val) $e[$key] = array('name' => $r[$val['rank_id']]['rank'], 'lower_taxon' => $val['lower_taxon']);
-
-			$_SESSION['admin']['export']['languages'] = $this->getAllLanguages();
-			$_SESSION['admin']['export']['ranks'] = $e;
-			$_SESSION['admin']['export']['taxa'] = $this->models->Taxa->_get(
+			$taxa = $this->models->Taxa->_get(
 				array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
 					'fieldAsIndex' => 'id'
 				)
 			);
+
+			foreach((array)$d as $key => $val) $e[$key] = array('name' => $r[$val['rank_id']]['rank'], 'lower_taxon' => $val['lower_taxon']);
+
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'languages',
+                'value' => $this->getAllLanguages()
+            ));
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'ranks',
+                'value' => $e
+            ));
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'languages',
+                'value' => $this->getAllLanguages()
+            ));
+			$this->moduleSession->setModuleSetting(array(
+                'setting' => 'taxa',
+                'value' => $taxa
+            ));
 
 			$d = $this->exportProject();
 
@@ -134,7 +149,7 @@ class ExportController extends Controller
 
 			if ($this->rHasVal('modules')) {
 
-				foreach ((array)$this->requestData['modules'] as $val) {
+				foreach ((array)$this->rGetVal('modules') as $val) {
 
 					$d = 'export'.ucfirst($val);
 
@@ -199,366 +214,365 @@ class ExportController extends Controller
 
 			set_time_limit(4800); // RIGHT!
 
-define('VALID_NAME_ID',1);
+        define('VALID_NAME_ID',1);
 
-$numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRecords') : 500;
-//$recordsPerFile=!empty($this->rHasVar('recordsPerFile')) && is_numeric($this->rHasVar('recordsPerFile')) ? $this->rGetVal('recordsPerFile') : 10000;
-$recordsPerFile=10000;
-$exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
+        $numberOfRecords=$this->rHasVar('numberOfRecords') ? $this->rGetVal('numberOfRecords') : 500;
+        //$recordsPerFile=!empty($this->rHasVar('recordsPerFile')) && is_numeric($this->rHasVar('recordsPerFile')) ? $this->rGetVal('recordsPerFile') : 10000;
+        $recordsPerFile=10000;
+        $exportfolder=$this->rHasVar('exportfolder') ? $this->rGetVal('exportfolder') : '/tmp/';
 
-$imagebase=$this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
-$imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : $imagebase;
+        $imagebase=$this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
+        $imageBaseUrl=$this->rHasVar('imageBaseUrl') ? $this->rGetVal('imageBaseUrl') : $imagebase;
 
-$rootelement='nederlands_soortenregister';
-$filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
-$forceWriteToFile=true;
-$idsToSuppressInClassification=array(116297); // top of the tree ("life") which is somewhat unofficial
+        $rootelement='nederlands_soortenregister';
+        $filename='nsr-export--'.date('Y-m-d_Hi').'%s.xml';
+        $forceWriteToFile=true;
+        $idsToSuppressInClassification=array(116297); // top of the tree ("life") which is somewhat unofficial
 
-$includeDescriptions=true;
-$includeNames=true;
-$includeImages=true;
-$includeClassification=true;
+        $includeDescriptions=true;
+        $includeNames=true;
+        $includeImages=true;
+        $includeClassification=true;
 
-			$taxa=$this->models->Taxa->freeQuery("
-				select
-					_t.taxon as name,
-					_r.rank,
-					_t.id,
-					trim(LEADING '0' FROM replace(_rr.nsr_id,'tn.nlsr.concept/','')) as nsr_id,
-					trim(LEADING '0' FROM replace(_pp.nsr_id,'tn.nlsr.concept/','')) as nsr_id_parent,
-					concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
-					concat(_h.index_label,' ',_h.label) as status_status,
-					_l2.label as status_reference_title,
-					_e1.name as status_expert_name,
-					_e2.name as status_organisation_name,
-					_q.parentage as classification
+		$taxa=$this->models->Taxa->freeQuery("
+			select
+				_t.taxon as name,
+				_r.rank,
+				_t.id,
+				trim(LEADING '0' FROM replace(_rr.nsr_id,'tn.nlsr.concept/','')) as nsr_id,
+				trim(LEADING '0' FROM replace(_pp.nsr_id,'tn.nlsr.concept/','')) as nsr_id_parent,
+				concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
+				concat(_h.index_label,' ',_h.label) as status_status,
+				_l2.label as status_reference_title,
+				_e1.name as status_expert_name,
+				_e2.name as status_organisation_name,
+				_q.parentage as classification
 
-				from
-					%PRE%taxa _t
+			from
+				%PRE%taxa _t
 
-				left join %PRE%projects_ranks _f
-					on _t.rank_id=_f.id
-					and _t.project_id=_f.project_id
+			left join %PRE%projects_ranks _f
+				on _t.rank_id=_f.id
+				and _t.project_id=_f.project_id
 
-				left join %PRE%ranks _r
-					on _f.rank_id=_r.id
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
 
-				left join %PRE%nsr_ids _rr
-					on _t.id=_rr.lng_id
-					and _rr.item_type='taxon'
-					and _t.project_id=_rr.project_id
+			left join %PRE%nsr_ids _rr
+				on _t.id=_rr.lng_id
+				and _rr.item_type='taxon'
+				and _t.project_id=_rr.project_id
 
-				left join %PRE%nsr_ids _pp
-					on _t.parent_id=_pp.lng_id
-					and _pp.item_type='taxon'
-					and _t.project_id=_pp.project_id
+			left join %PRE%nsr_ids _pp
+				on _t.parent_id=_pp.lng_id
+				and _pp.item_type='taxon'
+				and _t.project_id=_pp.project_id
 
-				left join %PRE%presence_taxa _g
-					on _t.id=_g.taxon_id
-					and _t.project_id=_g.project_id
+			left join %PRE%presence_taxa _g
+				on _t.id=_g.taxon_id
+				and _t.project_id=_g.project_id
 
-				left join %PRE%presence_labels _h
-					on _g.presence_id = _h.presence_id
-					and _g.project_id=_h.project_id
-					and _h.language_id=".$this->getDefaultProjectLanguage()."
+			left join %PRE%presence_labels _h
+				on _g.presence_id = _h.presence_id
+				and _g.project_id=_h.project_id
+				and _h.language_id=".$this->getDefaultProjectLanguage()."
 
-				left join %PRE%literature2 _l2
-					on _g.reference_id = _l2.id
-					and _g.project_id=_l2.project_id
+			left join %PRE%literature2 _l2
+				on _g.reference_id = _l2.id
+				and _g.project_id=_l2.project_id
 
-				left join %PRE%actors _e1
-					on _g.actor_id = _e1.id
-					and _g.project_id=_e1.project_id
+			left join %PRE%actors _e1
+				on _g.actor_id = _e1.id
+				and _g.project_id=_e1.project_id
 
-				left join %PRE%actors _e2
-					on _g.actor_org_id = _e2.id
-					and _g.project_id=_e2.project_id
+			left join %PRE%actors _e2
+				on _g.actor_org_id = _e2.id
+				and _g.project_id=_e2.project_id
 
-				left join %PRE%taxon_quick_parentage _q
-					on _t.id=_q.taxon_id
-					and _t.project_id=_q.project_id
+			left join %PRE%taxon_quick_parentage _q
+				on _t.id=_q.taxon_id
+				and _t.project_id=_q.project_id
 
-				left join %PRE%trash_can _trash
-					on _t.project_id = _trash.project_id
-					and _t.id =  _trash.lng_id
-					and _trash.item_type='taxon'
+			left join %PRE%trash_can _trash
+				on _t.project_id = _trash.project_id
+				and _t.id =  _trash.lng_id
+				and _trash.item_type='taxon'
 
-				where _t.project_id = ".$this->getCurrentProjectId()."
-					and ifnull(_trash.is_deleted,0)=0
+			where _t.project_id = ".$this->getCurrentProjectId()."
+				and ifnull(_trash.is_deleted,0)=0
 
-				".($numberOfRecords!='*'  ? "limit ".$numberOfRecords : "" )."
+			".($numberOfRecords!='*'  ? "limit ".$numberOfRecords : "" )."
 
-			");
+		");
 
-			$data=array();
-			$lookuplist=array();
+		$data=array();
+		$lookuplist=array();
 
-			$taxonCount=count($taxa);
-			$i=0;
+		$taxonCount=count($taxa);
+		$i=0;
 
 
-$xmlWriter = new XMLWriter();
-$xmlWriter->openMemory();
-$xmlWriter->startDocument('1.0', 'UTF-8');
-//$f=$exportfolder . sprintf($filename,'-'.str_pad($key,3,"0",STR_PAD_LEFT));
-$f=$exportfolder . sprintf($filename,"");
-$prettify=true;
+        $xmlWriter = new XMLWriter();
+        $xmlWriter->openMemory();
+        $xmlWriter->startDocument('1.0', 'UTF-8');
+        //$f=$exportfolder . sprintf($filename,'-'.str_pad($key,3,"0",STR_PAD_LEFT));
+        $f=$exportfolder . sprintf($filename,"");
+        $prettify=true;
 
-			foreach((array)$taxa as $key=>$val)
+		foreach((array)$taxa as $key=>$val)
+		{
+			if ($includeDescriptions)
 			{
-				if ($includeDescriptions)
-				{
-					$pages=$this->models->ContentTaxa->freeQuery("
-						select
-							_x2.title,_x1.content as text,_x3.language
-						from
-							%PRE%content_taxa _x1
+				$pages=$this->models->ContentTaxa->freeQuery("
+					select
+						_x2.title,_x1.content as text,_x3.language
+					from
+						%PRE%content_taxa _x1
 
-						left join %PRE%pages_taxa_titles _x2
-							on _x1.project_id=_x2.project_id
-							and  _x1.page_id=_x2.page_id
+					left join %PRE%pages_taxa_titles _x2
+						on _x1.project_id=_x2.project_id
+						and  _x1.page_id=_x2.page_id
 
-						left join %PRE%languages _x3
-							on _x1.language_id=_x3.id
+					left join %PRE%languages _x3
+						on _x1.language_id=_x3.id
 
-						where
-							_x1.project_id =".$this->getCurrentProjectId()."
-							and _x1.taxon_id = ".$val['id']
-						);
-
-					$j=0;
-					$description=array();
-					foreach((array)$pages as $page)
-					{
-						$description['page__'.($j++)]=$page;
-					}
-				}
-
-				if ($includeNames)
-				{
-					$names=array();
-					$k=0;
-					$c=$this->models->Names->freeQuery("
-						select
-							_a.name as fullname,
-							_a.uninomial,
-							_a.specific_epithet,
-							_a.infra_specific_epithet,
-							_a.name_author,
-							_a.authorship_year,
-							_a.reference,
-							_a.expert,
-							_a.organisation,
-							_b.nametype,
-							_e.name as expert_name,
-							_f.name as organisation_name,
-							_g.label as reference_title,
-							_g.author as reference_author,
-							_g.date as reference_date,
-							_lan.language
-
-						from %PRE%names _a
-
-						left join %PRE%name_types _b
-							on _a.type_id=_b.id
-							and _a.project_id = _b.project_id
-
-						left join %PRE%actors _e
-							on _a.expert_id = _e.id
-							and _a.project_id=_e.project_id
-
-						left join %PRE%actors _f
-							on _a.organisation_id = _f.id
-							and _a.project_id=_f.project_id
-
-						left join %PRE%literature2 _g
-							on _a.reference_id = _g.id
-							and _a.project_id=_g.project_id
-
-						left join %PRE%languages _lan
-							on _a.language_id=_lan.id
-
-						where
-							_a.project_id = ".$this->getCurrentProjectId()."
-							and _a.taxon_id = ". $val['id']
+					where
+						_x1.project_id =".$this->getCurrentProjectId()."
+						and _x1.taxon_id = ".$val['id']
 					);
-					foreach((array)$c as $vdsdvsdfs) $names['name__'.($k++)]=$vdsdvsdfs;
-				}
 
-				if ($includeImages)
+				$j=0;
+				$description=array();
+				foreach((array)$pages as $page)
 				{
-					$images=array();
-					$l=0;
-					$c=$this->models->MediaTaxon->freeQuery("
-						select
-							concat('".$imageBaseUrl."',_m.file_name) as url,
-							_m.mime_type as mime_type,
-							_c.meta_data as photographer_name,
-							date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
-							_meta2.meta_data as short_description,
-							_meta3.meta_data as geography,
-							_meta5.meta_data as copyright,
-							_meta7.meta_data as maker_adress
-
-						from  %PRE%media_taxon _m
-
-						left join %PRE%media_meta _c
-							on _m.project_id=_c.project_id
-							and _m.id = _c.media_id
-							and _c.sys_label = 'beeldbankFotograaf'
-							and _c.language_id=".$this->getDefaultProjectLanguage()."
-
-						left join %PRE%media_meta _meta1
-							on _m.id=_meta1.media_id
-							and _m.project_id=_meta1.project_id
-							and _meta1.sys_label='beeldbankDatumVervaardiging'
-							and _meta1.language_id=".$this->getDefaultProjectLanguage()."
-
-						left join %PRE%media_meta _meta2
-							on _m.id=_meta2.media_id
-							and _m.project_id=_meta2.project_id
-							and _meta2.sys_label='beeldbankOmschrijving'
-							and _meta2.language_id=".$this->getDefaultProjectLanguage()."
-
-						left join %PRE%media_meta _meta3
-							on _m.id=_meta3.media_id
-							and _m.project_id=_meta3.project_id
-							and _meta3.sys_label='beeldbankLokatie'
-							and _meta3.language_id=".$this->getDefaultProjectLanguage()."
-
-						left join %PRE%media_meta _meta5
-							on _m.id=_meta5.media_id
-							and _m.project_id=_meta5.project_id
-							and _meta5.sys_label='beeldbankCopyright'
-							and _meta5.language_id=".$this->getDefaultProjectLanguage()."
-
-						left join %PRE%media_meta _meta7
-							on _m.id=_meta7.media_id
-							and _m.project_id=_meta7.project_id
-							and _meta7.sys_label='beeldbankAdresMaker'
-							and _meta7.language_id=".$this->getDefaultProjectLanguage()."
-
-						where _m.project_id = ".$this->getCurrentProjectId()."
-							and _m.taxon_id = ".$val['id']
-					);
-					foreach((array)$c as $buytjyuy) $images['image__'.($l++)]=$buytjyuy;
+					$description['page__'.($j++)]=$page;
 				}
+			}
 
-				$val['status']=array(
-					'status' => $val['status_status'],
-					'reference_title' => $val['status_reference_title'],
-					'expert_name' => $val['status_expert_name'],
-					'organisation_name' => $val['status_organisation_name']
+			if ($includeNames)
+			{
+				$names=array();
+				$k=0;
+				$c=$this->models->Names->freeQuery("
+					select
+						_a.name as fullname,
+						_a.uninomial,
+						_a.specific_epithet,
+						_a.infra_specific_epithet,
+						_a.name_author,
+						_a.authorship_year,
+						_a.reference,
+						_a.expert,
+						_a.organisation,
+						_b.nametype,
+						_e.name as expert_name,
+						_f.name as organisation_name,
+						_g.label as reference_title,
+						_g.author as reference_author,
+						_g.date as reference_date,
+						_lan.language
+
+					from %PRE%names _a
+
+					left join %PRE%name_types _b
+						on _a.type_id=_b.id
+						and _a.project_id = _b.project_id
+
+					left join %PRE%actors _e
+						on _a.expert_id = _e.id
+						and _a.project_id=_e.project_id
+
+					left join %PRE%actors _f
+						on _a.organisation_id = _f.id
+						and _a.project_id=_f.project_id
+
+					left join %PRE%literature2 _g
+						on _a.reference_id = _g.id
+						and _a.project_id=_g.project_id
+
+					left join %PRE%languages _lan
+						on _a.language_id=_lan.id
+
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.taxon_id = ". $val['id']
 				);
-				$val['description']=@$description;
-				$val['names']=@$names;
-				$val['classification']=@explode(' ',$val['classification']);
-				$val['images']=@$images;
+				foreach((array)$c as $vdsdvsdfs) $names['name__'.($k++)]=$vdsdvsdfs;
+			}
+
+			if ($includeImages)
+			{
+				$images=array();
+				$l=0;
+				$c=$this->models->MediaTaxon->freeQuery("
+					select
+						concat('".$imageBaseUrl."',_m.file_name) as url,
+						_m.mime_type as mime_type,
+						_c.meta_data as photographer_name,
+						date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
+						_meta2.meta_data as short_description,
+						_meta3.meta_data as geography,
+						_meta5.meta_data as copyright,
+						_meta7.meta_data as maker_adress
+
+					from  %PRE%media_taxon _m
+
+					left join %PRE%media_meta _c
+						on _m.project_id=_c.project_id
+						and _m.id = _c.media_id
+						and _c.sys_label = 'beeldbankFotograaf'
+						and _c.language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%media_meta _meta1
+						on _m.id=_meta1.media_id
+						and _m.project_id=_meta1.project_id
+						and _meta1.sys_label='beeldbankDatumVervaardiging'
+						and _meta1.language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%media_meta _meta2
+						on _m.id=_meta2.media_id
+						and _m.project_id=_meta2.project_id
+						and _meta2.sys_label='beeldbankOmschrijving'
+						and _meta2.language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%media_meta _meta3
+						on _m.id=_meta3.media_id
+						and _m.project_id=_meta3.project_id
+						and _meta3.sys_label='beeldbankLokatie'
+						and _meta3.language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%media_meta _meta5
+						on _m.id=_meta5.media_id
+						and _m.project_id=_meta5.project_id
+						and _meta5.sys_label='beeldbankCopyright'
+						and _meta5.language_id=".$this->getDefaultProjectLanguage()."
+
+					left join %PRE%media_meta _meta7
+						on _m.id=_meta7.media_id
+						and _m.project_id=_meta7.project_id
+						and _meta7.sys_label='beeldbankAdresMaker'
+						and _meta7.language_id=".$this->getDefaultProjectLanguage()."
+
+					where _m.project_id = ".$this->getCurrentProjectId()."
+						and _m.taxon_id = ".$val['id']
+				);
+				foreach((array)$c as $buytjyuy) $images['image__'.($l++)]=$buytjyuy;
+			}
+
+			$val['status']=array(
+				'status' => $val['status_status'],
+				'reference_title' => $val['status_reference_title'],
+				'expert_name' => $val['status_expert_name'],
+				'organisation_name' => $val['status_organisation_name']
+			);
+			$val['description']=@$description;
+			$val['names']=@$names;
+			$val['classification']=@explode(' ',$val['classification']);
+			$val['images']=@$images;
 
 
-				if ($includeClassification)
+			if ($includeClassification)
+			{
+				$class=array();
+				$m=0;
+				foreach($val['classification'] as $pId)
 				{
-					$class=array();
-					$m=0;
-					foreach($val['classification'] as $pId)
+					if (in_array($pId,$idsToSuppressInClassification)) continue;
+
+					if (isset($lookuplist[$pId]))
 					{
-						if (in_array($pId,$idsToSuppressInClassification)) continue;
-
-						if (isset($lookuplist[$pId]))
-						{
-							$t=$lookuplist[$pId];
-						}
-						else
-						{
-
-							$t=$this->models->Taxa->freeQuery("
-								select
-									_t.id,
-									ifnull(_names.uninomial,_t.taxon) as name,
-									_r.rank
-
-								from
-									%PRE%taxa _t
-
-								left join %PRE%projects_ranks _f
-									on _t.rank_id=_f.id
-									and _t.project_id=_f.project_id
-
-								left join %PRE%names _names
-									on _t.project_id=_f.project_id
-									and _t.id=_names.taxon_id
-									and _names.type_id=".VALID_NAME_ID."
-
-								left join %PRE%ranks _r
-									on _f.rank_id=_r.id
-
-								where _t.project_id = ".$this->getCurrentProjectId()." and _t.id=".$pId
-							);
-							$t=$t[0];
-							$lookuplist[$t['id']]=array('name'=>$t['name'],'rank'=>$t['rank']);
-							//$this->addError($pId." not in classification lookup list!?");
-
-						}
-						$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
+						$t=$lookuplist[$pId];
 					}
+					else
+					{
 
-					$val['classification']=$class;
+						$t=$this->models->Taxa->freeQuery("
+							select
+								_t.id,
+								ifnull(_names.uninomial,_t.taxon) as name,
+								_r.rank
 
+							from
+								%PRE%taxa _t
+
+							left join %PRE%projects_ranks _f
+								on _t.rank_id=_f.id
+								and _t.project_id=_f.project_id
+
+							left join %PRE%names _names
+								on _t.project_id=_f.project_id
+								and _t.id=_names.taxon_id
+								and _names.type_id=".VALID_NAME_ID."
+
+							left join %PRE%ranks _r
+								on _f.rank_id=_r.id
+
+							where _t.project_id = ".$this->getCurrentProjectId()." and _t.id=".$pId
+						);
+						$t=$t[0];
+						$lookuplist[$t['id']]=array('name'=>$t['name'],'rank'=>$t['rank']);
+						//$this->addError($pId." not in classification lookup list!?");
+
+					}
+					$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
 				}
-				else
-				{
-					unset($val['classification']);
-				}
 
-				unset($val['id']);
-				unset($val['status_status']);
-				unset($val['status_reference_title']);
-				unset($val['status_expert_name']);
-				unset($val['status_organisation_name']);
-
-//				$data['taxon__'.($i++)]=$val;
-				unset($taxa[$key]);
-
-
-		$xml=
-			'<taxon></taxon>';
-
-
-		$simpleXmlObject = new SimpleXMLElement($xml);
-
-		$this->arrayToXml($val,$simpleXmlObject);
-
-		if ($prettify)
-		{
-			$dom = new DOMDocument('1.0');
-			$dom->preserveWhiteSpace = false;
-			$dom->formatOutput = true;
-			$dom->loadXML($simpleXmlObject->asXML());
-			$out=$dom->saveXML();
-		}
-		else
-		{
-			$out=$simpleXmlObject->asXML();
-		}
-
-	if ($key==0)
-	{
-	    $xmlWriter->writeRaw ( '<'.$rootelement.' exportdate="'.date('c').'">' . "\n" . '<taxa>' );
-	}
-
-    $xmlWriter->writeRaw ( str_replace('<?xml version="1.0"?>' , '' , $out ) );
-
-	unset($val);
-    // Flush XML in memory to file every 1000 iterations
-
-
-
-    if (0 == $key%1000) {
-        file_put_contents( $f , $xmlWriter->flush(true), FILE_APPEND);
-    }
-
+				$val['classification']=$class;
 
 			}
+			else
+			{
+				unset($val['classification']);
+			}
+
+			unset($val['id']);
+			unset($val['status_status']);
+			unset($val['status_reference_title']);
+			unset($val['status_expert_name']);
+			unset($val['status_organisation_name']);
+
+			// $data['taxon__'.($i++)]=$val;
+			unset($taxa[$key]);
+
+
+    		$xml = '<taxon></taxon>';
+
+
+    		$simpleXmlObject = new SimpleXMLElement($xml);
+
+    		$this->arrayToXml($val,$simpleXmlObject);
+
+    		if ($prettify)
+    		{
+    			$dom = new DOMDocument('1.0');
+    			$dom->preserveWhiteSpace = false;
+    			$dom->formatOutput = true;
+    			$dom->loadXML($simpleXmlObject->asXML());
+    			$out=$dom->saveXML();
+    		}
+    		else
+    		{
+    			$out=$simpleXmlObject->asXML();
+    		}
+
+        	if ($key==0)
+        	{
+        	    $xmlWriter->writeRaw ( '<'.$rootelement.' exportdate="'.date('c').'">' . "\n" . '<taxa>' );
+        	}
+
+            $xmlWriter->writeRaw ( str_replace('<?xml version="1.0"?>' , '' , $out ) );
+
+        	unset($val);
+            // Flush XML in memory to file every 1000 iterations
+
+
+
+            if (0 == $key%1000) {
+                file_put_contents( $f , $xmlWriter->flush(true), FILE_APPEND);
+            }
+
+
+		}
 
 	    $xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$rootelement.'>' );
 
