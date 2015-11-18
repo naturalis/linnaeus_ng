@@ -21,7 +21,8 @@ class UtilitiesController extends Controller
     );
 
     public $usedHelpers = array(
-        'file_upload_helper','session_module_settings'
+        'file_upload_helper',
+        'session_module_settings'
     );
 
 
@@ -68,7 +69,7 @@ class UtilitiesController extends Controller
 			if (count((array)$_SESSION['admin']['project']['lead_experts'])==1)
 			{
 				$this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
-			} 
+			}
 			else
 			{
 				$this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
@@ -228,8 +229,8 @@ class UtilitiesController extends Controller
 		if (isset($d['files'][$id]))
 		{
 			return unlink($this->getProjectsMediaStorageDir().$d['files'][$id]);
-		} 
-		else 
+		}
+		else
 		{
 			$this->addError('Unknown file index.');
 			return false;
@@ -249,7 +250,7 @@ class UtilitiesController extends Controller
 			{
 				$this->redirect('browse_media.php#');
 			}
-		} 
+		}
 		else
 		if ($this->rHasVal('action','delete') && $this->rHasVal('delete') && !$this->isFormResubmit())
 		{
@@ -258,7 +259,7 @@ class UtilitiesController extends Controller
 				$this->deleteFile($val);
 			}
 
-		} 
+		}
 		else
 		if ($this->rHasVal('action','purge') && !$this->isFormResubmit())
 		{
@@ -312,8 +313,8 @@ class UtilitiesController extends Controller
 					$this->getProjectsMediaStorageDir().$name
 				);
 			}
-		} 
-		else 
+		}
+		else
 		{
 			return false;
 		}
@@ -333,17 +334,17 @@ class UtilitiesController extends Controller
 		{
 			$this->smarty->assign('returnText',$this->javascriptTranslate($this->rGetVal('text')));
 		}
-		else 
+		else
 		if ($this->rGetVal('action')=='change_media_name')
 		{
 			$this->smarty->assign('returnText',$this->renameMedia($this->GetAll()));
 		}
-		else 
+		else
 		if ($this->rGetVal('action')=='set_something')
 		{
 			$this->moduleSession->setModuleSetting( array('setting'=>$this->rGetVal('name'),'value'=>$this->rGetVal('value') ) );
 		}
-		else 
+		else
 		if ($this->rGetVal('action')=='get_something')
 		{
 			$this->smarty->assign('returnText',json_encode($this->moduleSession->getModuleSetting( $this->rGetVal('name') ) ) );

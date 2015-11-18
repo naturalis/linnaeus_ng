@@ -15,9 +15,18 @@ class UsersController extends Controller
 
     public $usedModels = array();
 
-	public $cssToLoad = array('users.css','lookup.css','dialog/jquery.modaldialog.css');
+	public $cssToLoad = array(
+        'users.css',
+    	'lookup.css',
+    	'dialog/jquery.modaldialog.css'
+	);
 
-	public $jsToLoad = array('all' => array('user.js','lookup.js','dialog/jquery.modaldialog.js'));
+	public $jsToLoad = array(
+	   'all' => array(
+	       'user.js',
+    	   'lookup.js',
+    	   'dialog/jquery.modaldialog.js'
+	));
 
     public $controllerPublicName = 'User administration';
 
@@ -128,12 +137,12 @@ class UsersController extends Controller
 	private function authenticate( $username, $password )
 	{
 		$d=$this->getUserByCredentials( $username );
-		
+
 		if ( is_null($d) || !isset($d['password']) )
 		{
 			return false;
 		}
-		
+
 		if (password_verify( $password, $d['password'] ) )
 		{
 			return true;
@@ -150,18 +159,18 @@ class UsersController extends Controller
 					'id'=>$d['id'],
 					'username'=>$username,
 				)
-			);					
+			);
 
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	private function getUserByCredentials( $username, $password=null )
 	{
 		if ( empty($username) ) return;
-		
+
 		if ( isset($password) )
 		{
 			$d=$this->models->Users->_get(array('id'=>array('username' => $username, 'password' => $this->userPasswordEncode($password))));
@@ -170,7 +179,7 @@ class UsersController extends Controller
 		{
 			$d=$this->models->Users->_get(array('id'=>array('username' => $username)));
 		}
-		
+
 		return isset($d[0]) ? $d[0] : null;
 	}
 
@@ -207,12 +216,12 @@ class UsersController extends Controller
             if ($auth)
 			{
 				$user=$this->getUserByCredentials( $this->rGetVal('username') );
-				
+
 				if ( isset($user) )
 				{
 					// user found
 					$this->doLogin($user,(null!==$this->rGetVal('remember_me') && $this->rGetVal('remember_me')=='1'));
-	
+
 					// determine and redirect to the default start page after logging in
 					$this->redirect($this->getLoginStartPage());
 				}
@@ -273,13 +282,13 @@ class UsersController extends Controller
 					$this->setCurrentProjectData();
 					$this->setCurrentUserRoleId();
 					$this->redirect( $this->getLoggedInMainIndex() );
-				} 
+				}
 				else
 				{
 					$this->redirect('choose_project.php');
 				}
 
-			} 
+			}
 			else
 			{
 				$this->redirect($this->getLoggedInMainIndex());
@@ -328,8 +337,8 @@ class UsersController extends Controller
 				{
 					$this->sendNewUserEmail($data);
 					$this->redirect('index.php');
-				} 
-				else 
+				}
+				else
 				{
 					$this->addError($this->translate('Failed to save user ('.$d.').'));
 				}
@@ -365,7 +374,7 @@ class UsersController extends Controller
         $this->smarty->assign('modules', $modules['modules']);
         $this->smarty->assign('freeModules', $modules['freeModules']);
 
-        if (null!==$this->GetAll() && isset($data) && $this->GetAll()!=$data) 
+        if (null!==$this->GetAll() && isset($data) && $this->GetAll()!=$data)
 		{
 			$this->smarty->assign('data', $data);
 		}
@@ -444,8 +453,8 @@ class UsersController extends Controller
 			if ($user==null)
 			{
 				$this->addError('Unknown user ID: '.$this->rGetId());
-			} 
-			else 
+			}
+			else
 			{
 
 	            $zone = $this->models->Timezones->_get(array('id'=>$user['timezone_id']));
@@ -516,8 +525,8 @@ class UsersController extends Controller
 				$this->smarty->assign('hasModules', $hasModules);
 				$this->smarty->assign('projects', $pru);
 			}
-		} 
-		else 
+		}
+		else
 		{
 			$this->addError('No ID specified');
 		}
@@ -546,8 +555,8 @@ class UsersController extends Controller
 				if ($this->deleteUser($this->rGetId()))
 				{
 					$this->redirect('index.php');
-				} 
-				else 
+				}
+				else
 				{
 					$this->addMessage($this->translate('User removed from current project.'));
 					$this->addError($this->translate('User could not be deleted, as he is active in other project(s).'));
@@ -559,8 +568,8 @@ class UsersController extends Controller
 				$this->addError($this->translate('User can only be deleted by system admin.'));
 			}
 
-		} 
-		else 
+		}
+		else
 		{
 			$this->redirect('index.php');
 		}
@@ -585,8 +594,8 @@ class UsersController extends Controller
 		{
 
 			$this->addError($this->translate('You are not authorized to edit that user.'));
-		} 
-		else 
+		}
+		else
 		{
 
 			$user = $this->getUserById($this->rGetId());
@@ -653,8 +662,8 @@ class UsersController extends Controller
 					$this->addMessage($this->translate('User data saved'));
 
 					$user=$this->getUserById( $this->rGetId() );
-				} 
-				else 
+				}
+				else
 				{
 					$user=$this->GetAll();
 				}
@@ -767,8 +776,8 @@ class UsersController extends Controller
 
 				$this->addMessage($this->translate('Your password has been reset. An e-mail with a new password has been sent to you.'));
 
-			} 
-			else 
+			}
+			else
 			{
 				$this->addError($this->translate('Invalid or unknown e-mail address.'));
 			}
@@ -799,7 +808,7 @@ class UsersController extends Controller
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->rGetVal('returnUrl') : 'all.php');
 
-		} 
+		}
 		else
 		if ($this->rHasVal('uid') && $this->rHasVal('modId'))
 		{
@@ -812,7 +821,7 @@ class UsersController extends Controller
 					if ($val['id']==$this->rGetVal('modId'))
 						$module = $val['module'];
 				}
-			} 
+			}
 			else
 			{
 				foreach((array)$modules['modules'] as $val)
@@ -827,14 +836,14 @@ class UsersController extends Controller
 				$this->smarty->assign('user',$this->getUserById($this->rGetVal('uid')));
 				$this->smarty->assign('module',$module);
 				$this->smarty->assign('requestData',$this->GetAll());
-			} 
-			else 
+			}
+			else
 			{
 				$this->addError($this->translate('Non-existant module ID specified.'));
 			}
 
-		} 
-		else 
+		}
+		else
 		{
 			$this->addError($this->translate('No user ID or module ID specified.'));
 		}
@@ -862,7 +871,7 @@ class UsersController extends Controller
 			}
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->rGetVal('returnUrl') : 'all.php');
-		} 
+		}
 		else
 		if ($this->rHasVal('uid') && $this->rHasVal('modId'))
 		{
@@ -872,11 +881,11 @@ class UsersController extends Controller
 			{
 				foreach((array)$modules['freeModules'] as $val)
 				{
-					if ($val['id']==$this->rGetVal('modId')) 
+					if ($val['id']==$this->rGetVal('modId'))
 						$module = $val['module'];
 				}
-			} 
-			else 
+			}
+			else
 			{
 				foreach((array)$modules['modules'] as $val)
 				{
@@ -889,12 +898,12 @@ class UsersController extends Controller
 				$this->smarty->assign('user',$this->getUserById($this->rGetVal('uid')));
 				$this->smarty->assign('module',$module);
 				$this->smarty->assign('requestData',$this->GetAll());
-			} 
+			}
 			else
 			{
 				$this->addError($this->translate('Non-existant module ID specified.'));
 			}
-		} 
+		}
 		else
 		{
 			$this->addError($this->translate('No user ID or module ID specified.'));
@@ -924,7 +933,7 @@ class UsersController extends Controller
 			if (isset($d))
 			{
 				$this->models->RightsRoles->delete(array('right_id' => $this->rGetVal('right'),'role_id' => $this->rGetVal('role')));
-			} 
+			}
 			else
 			{
 				$this->models->RightsRoles->save(
@@ -974,7 +983,7 @@ class UsersController extends Controller
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->rGetVal('returnUrl') : 'all.php');
 
-		} 
+		}
 		else
 		if ($this->rHasVal('uid'))
 		{
@@ -992,8 +1001,8 @@ class UsersController extends Controller
 
 			if ($this->rHasVal('returnUrl'))
 				$this->smarty->assign('returnUrl',$this->rGetVal('returnUrl'));
-		} 
-		else 
+		}
+		else
 		{
 			$this->addError($this->translate('No user ID specified.'));
 		}
@@ -1012,7 +1021,7 @@ class UsersController extends Controller
 				$this->removeUserFromProject($this->rGetVal('uid'),$this->getCurrentProjectId());
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->rGetVal('returnUrl') : 'all.php');
-		} 
+		}
 		else
 		if ($this->rHasVal('uid'))
 		{
@@ -1030,8 +1039,8 @@ class UsersController extends Controller
 			if (!$pru)
 			{
 				$this->addError($this->translate('User is not part of current project.'));
-			} 
-			else 
+			}
+			else
 			{
 				$this->smarty->assign('uid',$this->rGetVal('uid'));
 				$this->smarty->assign('user',$user);
@@ -1039,8 +1048,8 @@ class UsersController extends Controller
 				if ($this->rHasVal('returnUrl'))
 					$this->smarty->assign('returnUrl',$this->rGetVal('returnUrl'));
 			}
-		} 
-		else 
+		}
+		else
 		{
 			$this->addError($this->translate('No user ID specified.'));
 		}
@@ -1059,7 +1068,7 @@ class UsersController extends Controller
         if (!$this->rHasVal('action')) return;
 
 		$idToIgnore = $this->rHasVal('id_to_ignore') ? $this->rGetVal('id_to_ignore') : null;
-		
+
 		$values=$this->rHasVal('values') ? $this->rGetVal('values') : null;
 
         if ($this->rHasVal('action','check_username'))
@@ -1072,7 +1081,7 @@ class UsersController extends Controller
 			{
 				$this->isUsernameUnique($values[0], $idToIgnore);
 			}
-		} 
+		}
 		else
         if ($this->rHasVal('action','check_password'))
 		{
@@ -1080,7 +1089,7 @@ class UsersController extends Controller
 			{
 				$this->getPasswordStrength($values[0]);
 			}
-		} 
+		}
 		else
         if ($this->rHasVal('action','check_passwords'))
 		{
@@ -1092,7 +1101,7 @@ class UsersController extends Controller
 			{
 				$this->arePasswordsIdentical($values[0],$values[1]);
 			}
-		} 
+		}
 		else
         if ($this->rHasVal('action','check_email_address'))
 		{
@@ -1104,7 +1113,7 @@ class UsersController extends Controller
 			{
 				$this->isEmailAddressCorrect($values[0]);
 			}
-		} 
+		}
 		else
         if ($this->rHasVal('action','check_first_name') || $this->rHasVal('action','check_last_name'))
 		{
@@ -1112,17 +1121,17 @@ class UsersController extends Controller
 			{
 				if (strlen($values[0]) == 0) $this->addError($this->translate('Missing value.'));
 			}
-		} 
+		}
 		else
         if ($this->rHasVal('action','connect_existing'))
 		{
             $this->ajaxActionConnectExistingUser();
-		} 
+		}
 		else
         if ($this->rHasVal('action','create_from_session'))
 		{
             $this->ajaxActionCreateUserFromSession();
-		} 
+		}
 		else
 		if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search')))
 		{
@@ -1145,8 +1154,8 @@ class UsersController extends Controller
 		{
             $script=$_SESSION['admin']['login_start_page'];
 			unset($_SESSION['admin']['login_start_page']);
-        } 
-		else 
+        }
+		else
 		{
 			$script=$this->baseUrl.$this->getAppName();
 
@@ -1190,8 +1199,8 @@ class UsersController extends Controller
 		if (!$pru)
 		{
 			$this->addError($this->translate('Failed to connect user from session.'));
-		} 
-		else 
+		}
+		else
 		{
 			unset($_SESSION['admin']['data']['new_user']);
 		}
@@ -1206,7 +1215,7 @@ class UsersController extends Controller
 		if (!$su)
 		{
 			$this->addError($this->translate('Failed to create user from session.'));
-		} 
+		}
 		else
 		{
 			$this->sendNewUserEmail($_SESSION['admin']['data']['new_user']);
@@ -1228,8 +1237,8 @@ class UsersController extends Controller
 			$this->addError($this->translate('Failed to save user.'),2);
 			$this->log(serialize($data));
 			return false;
-		} 
-		else 
+		}
+		else
 		{
 			// if saving was succesful, save new role
 			$newUserId = $this->models->Users->getNewId();
@@ -1324,8 +1333,8 @@ class UsersController extends Controller
 			$this->models->Users->delete($id);
 
 			return true;
-		} 
-		else 
+		}
+		else
 		{
 			return false;
 		}
@@ -1339,18 +1348,18 @@ class UsersController extends Controller
 		if (strlen($password) > $max)
 		{
             $this->smarty->assign('returnText',sprintf($this->translate('Password too long; should be between %s and %s characters.'),$min,$max));
-		} 
+		}
 		else
 		if (strlen($password) < $min)
 		{
             $this->smarty->assign('returnText',sprintf($this->translate('Password too short; should be between %s and %s characters.'),$min,$max));
-		} 
+		}
 		else
 		if (strlen($password) < ($min + 3))
 		{
 			$this->smarty->assign('returnText','<weak>');
-		} 
-		else 
+		}
+		else
 		{
 			if (
 				preg_match_all('/[0-9]/',$password,$d)>=1 &&
@@ -1394,7 +1403,7 @@ class UsersController extends Controller
         if ($remember)
 		{
             $this->setRememberMeCookie();
-        } 
+        }
 		else
 		{
             $this->unsetRememberMeCookie();
@@ -1484,8 +1493,8 @@ class UsersController extends Controller
 					)
 				)
             );
-        } 
-		else 
+        }
+		else
 		{
             return false;
         }
@@ -1548,7 +1557,7 @@ class UsersController extends Controller
      * password_hash is used as encoding function
      *
      * @param      string    $p    the password
-     * @return     string    password_hash 
+     * @return     string    password_hash
      * @access     private
      */
     private function userPasswordEncode($p,$force_md5=false)
@@ -1636,13 +1645,13 @@ class UsersController extends Controller
 		{
             $this->addError(sprintf($this->translate('Username too short; should be between %s and %s characters.'),$min,$max));
             $result = false;
-        } 
+        }
 		else
         if (strlen($username) > $max)
 		{
             $this->addError(sprintf($this->translate('Username too long; should be between %s and %s characters.'),$min,$max));
             $result = false;
-        } 
+        }
 		else
         if (
 			isset($this->controllerSettings['dataChecks']['username']['regexp']) &&
@@ -1680,13 +1689,13 @@ class UsersController extends Controller
 		{
             $this->addError(sprintf($this->translate('Password too short; should be between %s and %s characters.'),$min,$max));
             $result = false;
-        } 
+        }
 		else
         if (strlen($password) > $max)
 		{
             $this->addError(sprintf($this->translate('Password too long; should be between %s and %s characters.'),$min,$max));
             $result = false;
-        } 
+        }
 		else
         if (
 			isset($this->controllerSettings['dataChecks']['password']['regexp']) &&
@@ -1733,13 +1742,13 @@ class UsersController extends Controller
 		{
             $this->addError(sprintf($this->translate('E-mail adress too short; should be between %s and %s characters.'),$min,$max));
             $result = false;
-        } 
+        }
 		else
         if (strlen($email_address) > $max)
 		{
             $this->addError(sprintf($this->translate('E-mail adress too long; should be between %s and %s characters.'),$min,$max));
             $result = false;
-        } 
+        }
 		else
         if (!$this->verifyEmailAddress($email_address))
 		{
@@ -1775,8 +1784,8 @@ class UsersController extends Controller
 		{
 			$this->addError($this->translate('Username already exists.'));
 			return false;
-		} 
-		else 
+		}
+		else
 		{
 			return true;
 		}
@@ -1999,8 +2008,8 @@ class UsersController extends Controller
 				{
 		            $val[$key2] = trim($val2);
 				}
-			} 
-			else 
+			}
+			else
 			{
 	            $data[$key] = trim($val);
 			}
@@ -2021,7 +2030,7 @@ class UsersController extends Controller
 		{
 			$this->addError($this->translate('Unassignable role selected.'));
 			return false;
-		} 
+		}
 		else
 		{
 			return true;

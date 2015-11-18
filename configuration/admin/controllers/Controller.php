@@ -2878,24 +2878,20 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
-		$t='ControllerModel';
+        // Load base controller model first
+		require_once dirname(__FILE__) . '/../models/ControllerModel.php';
+		$this->models->ControllerModel = new ControllerModel;
 
-        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
-		{
-            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
-            $this->models->$t = new $t;
-        }
-
+		// Load controller-specific model
         $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
-
         if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
 		{
             require_once dirname(__FILE__) . '/../models/' . $t . '.php';
             $this->models->$t = new $t;
         }
 
+        // Load models for each table, as specified in used models
         require_once dirname(__FILE__) . '/../models/Table.php';
-
         foreach ((array) $d as $key)
 		{
             $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));

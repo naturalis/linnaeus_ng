@@ -61,20 +61,20 @@ class SpeciesMediaController extends Controller
 
 		if ($this->rHasVal('action','delete'))
 		{
-			$d=$this->deleteTaxonMedia(rGetAll());
+			$d=$this->deleteTaxonMedia($this->requestData);
 			@$this->addError($d['errors']);
 			@$this->addWarning($d['warnings']);
 			@$this->addMessage($d['messages']);
 		}
 		if ($this->rHasVal('action','save'))
 		{
-			$this->setOverviewImage(rGetAll());
-			$this->saveCaptions(rGetAll());
+			$this->setOverviewImage($this->requestData);
+			$this->saveCaptions($this->requestData);
 			$this->addMessage('Saved');
 		}
 		if ($this->rHasVal('action','up') || $this->rHasVal('action','down'))
 		{
-			if ($this->moveImageInOrder(rGetAll()))
+			if ($this->moveImageInOrder($this->requestData))
 				$this->addMessage('New media order saved');
 		}
 
