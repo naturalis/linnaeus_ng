@@ -2890,6 +2890,16 @@ class Controller extends BaseClass
             $this->models->$t = new $t;
         }
 
+		// Load controller-specific model by override
+		if ( isset($this->modelNameOverride) )
+		{
+			if (file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
+			{
+				require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
+				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
+			}
+		}
+
         // Load models for each table, as specified in used models
         require_once dirname(__FILE__) . '/../models/Table.php';
         foreach ((array) $d as $key)
