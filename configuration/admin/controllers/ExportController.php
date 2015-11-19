@@ -475,6 +475,8 @@ class ExportController extends Controller
 
 		$g = $this->models->Glossary->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
 
+		$languages = $this->moduleSession->getModuleSetting('languages');
+
 		foreach((array)$g as $key => $val) {
 
 			$d = $this->models->GlossarySynonyms->_get(array('id'=>array('glossary_id' => $val['id'])));
@@ -483,7 +485,7 @@ class ExportController extends Controller
 
 				$s['synonym'.$sKey] = array(
 					'id' => $sVal['id'],
-					'language' => $_SESSION['admin']['export']['languages'][$sVal['language_id']]['language'],
+					'language' => $languages[$sVal['language_id']]['language'],
 					'synonym' => $sVal['synonym']
 				);
 
@@ -507,7 +509,7 @@ class ExportController extends Controller
 
 			$e['item'.$key] = array(
 				'id' => $val['id'],
-				'language' => $_SESSION['admin']['export']['languages'][$val['language_id']]['language'],
+				'language' => $languages[$val['language_id']]['language'],
 				'term' => $val['term'],
 				'definition' => $val['definition'],
 				'synonyms' => isset($s) ? $s : null,
@@ -550,6 +552,8 @@ class ExportController extends Controller
 			)
 		);
 
+		$taxa = $this->moduleSession->getModuleSetting('taxa');
+
 		foreach((array)$g as $key => $val) {
 
 			$e['reference'.$key] = array(
@@ -569,7 +573,7 @@ class ExportController extends Controller
 
 				$e['reference'.$key]['taxa']['taxon'.$sKey] = array(
 					'id' => $sVal['taxon_id'],
-					'taxon' => $_SESSION['admin']['export']['taxa'][$sVal['taxon_id']]['taxon']
+					'taxon' => $taxa[$sVal['taxon_id']]['taxon']
 				);
 
 			}
@@ -584,7 +588,7 @@ class ExportController extends Controller
 	private function exportRanks()
 	{
 
-		foreach((array)$_SESSION['admin']['export']['ranks'] as $key => $val) {
+	    foreach((array)$this->moduleSession->getModuleSetting('ranks') as $key => $val) {
 
 			$e['rank'.$key] = array(
 				'name' => $val['name'],
@@ -669,6 +673,10 @@ class ExportController extends Controller
 
 		$c = $this->getSpeciesPageCategories();
 
+		$languages = $this->moduleSession->getModuleSetting('languages');
+		$ranks = $this->moduleSession->getModuleSetting('ranks');
+		$taxa = $this->moduleSession->getModuleSetting('taxa');
+
 		// taxa
 		foreach((array)$t as $key => $val) {
 
@@ -689,7 +697,7 @@ class ExportController extends Controller
 						$dummy['translation'.$dKey] = array(
 							'title' => $sVal['labels'][$dVal['language_id']]['title'],
 							'text' => $dVal['content'],
-							'language' => $_SESSION['admin']['export']['languages'][$dVal['language_id']]['language'],
+							'language' => $languages[$dVal['language_id']]['language'],
 						);
 
 					}
@@ -717,7 +725,7 @@ class ExportController extends Controller
 				$common['commonname'.$cKey] = array(
 					'commonname' => $cVal['commonname'],
 					'transliteration' => $cVal['transliteration'],
-					'language' => $_SESSION['admin']['export']['languages'][$cVal['language_id']]['language'],
+					'language' => $languages[$cVal['language_id']]['language'],
 				);
 
 			}
@@ -768,7 +776,7 @@ class ExportController extends Controller
 
 					$trans['translation'.$dKey] = array(
 						'description' => $dVal['description'],
-						'language' => $_SESSION['admin']['export']['languages'][$dVal['language_id']]['language'],
+						'language' => $languages[$dVal['language_id']]['language'],
 					);
 
 				}
@@ -793,10 +801,10 @@ class ExportController extends Controller
 				'id' => $val['id'],
 				'taxon' => $val['taxon'],
 				'is_hybrid' => $val['is_hybrid'],
-				'rank' => $_SESSION['admin']['export']['ranks'][$val['rank_id']]['name'],
+				'rank' => $ranks[$val['rank_id']]['name'],
 				'parent_id' => $val['parent_id'],
-				'parent' => @$_SESSION['admin']['export']['taxa'][$val['parent_id']]['taxon'],
-				'pages' => isset($content) ? $content : null,
+				'parent' => isset($taxa[$val['parent_id']]['taxon']) ? $taxa[$val['parent_id']]['taxon'] : null,
+			    'pages' => isset($content) ? $content : null,
 				'common_names' => isset($common) ? $common : null,
 				'synonyms' => isset($synonym) ? $synonym : null,
 				'media' => isset($media) ? $media : null,
@@ -815,6 +823,8 @@ class ExportController extends Controller
 
 	private function exportIntroduction()
 	{
+
+		$languages = $this->moduleSession->getModuleSetting('languages');
 
 		$ip = $this->models->IntroductionPages->_get(
 			array('id' =>
@@ -843,7 +853,7 @@ class ExportController extends Controller
 				$dummy['translation'.$sKey] = array(
 					'topic' => $sVal['topic'],
 					'content' => $sVal['content'],
-					'language' => $_SESSION['admin']['export']['languages'][$sVal['language_id']]['language'],
+					'language' => $languages[$sVal['language_id']]['language'],
 				);
 
 			}
@@ -866,6 +876,8 @@ class ExportController extends Controller
 
 		$e = array();
 
+		$languages = $this->moduleSession->getModuleSetting('languages');
+
 		$c = $this->models->Content->_get(
 			array('id' =>
 				array(
@@ -879,7 +891,7 @@ class ExportController extends Controller
 
 			$d[$val['subject']]['translation'.$key] = array(
 				'content' => $val['content'],
-				'language' => $_SESSION['admin']['export']['languages'][$val['language_id']]['language'],
+				'language' => $languages[$val['language_id']]['language'],
 			);
 
 		}
@@ -903,6 +915,9 @@ class ExportController extends Controller
 
 		$e = array();
 
+		$languages = $this->moduleSession->getModuleSetting('languages');
+		$mapLegend = array();
+
 		$t = $this->models->GeodataTypes->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -925,16 +940,23 @@ class ExportController extends Controller
 			foreach((array)$d as $sKey => $sVal) {
 
 				$e['type'.$key]['label']['translation'.$sKey] = array(
-					'language' => $_SESSION['admin']['export']['languages'][$sKey]['language'],
+					'language' => $languages[$sKey]['language'],
 					'label' => $sVal['title']
 				);
 
-				if ($sKey == $this->getDefaultProjectLanguage())
-					$_SESSION['admin']['export']['mapLegend'][$key] = $sVal['title'];
+				if ($sKey == $this->getDefaultProjectLanguage()) {
+				    $mapLegend[$key] = $sVal['title'];
+
+				}
 
 			}
 
 		}
+
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'mapLegend',
+            'value' => $mapLegend
+        ));
 
 		return $e;
 
@@ -947,6 +969,9 @@ class ExportController extends Controller
 
 		$e = array();
 
+		$taxa = $this->moduleSession->getModuleSetting('taxa');
+		$mapLegend = $this->moduleSession->getModuleSetting('mapLegend');
+
 		$o = $this->models->OccurrencesTaxa->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -957,9 +982,9 @@ class ExportController extends Controller
 		foreach((array)$o as $key => $val) {
 
 			$e['occurrence'.$key] = array(
-				'taxon' => $_SESSION['admin']['export']['taxa'][$val['taxon_id']]['taxon'],
+				'taxon' => $taxa[$val['taxon_id']]['taxon'],
 				'taxon_id' => $val['taxon_id'],
-				'type' => @$_SESSION['admin']['export']['mapLegend'][$val['type_id']],
+				'type' => isset($mapLegend[$val['type_id']]) ? $mapLegend[$val['type_id']] : null,
 				'type_id' => $val['type_id'],
 				'shape' => $val['type']=='marker' ? 'point' : $val['type'],
 				'point_coordinates' => array(
@@ -990,6 +1015,9 @@ class ExportController extends Controller
 
 		$e = array();
 
+		$languages = $this->moduleSession->getModuleSetting('languages');
+		$taxa = $this->moduleSession->getModuleSetting('taxa');
+
 		$k = $this->models->Keysteps->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
 
 		foreach ((array)$k as $key => $val) {
@@ -1009,7 +1037,7 @@ class ExportController extends Controller
 				$trans['translation'.$sKey] = array(
 					'title' => $sVal['title'],
 					'text' => $sVal['content'],
-					'language' => $_SESSION['admin']['export']['languages'][$sVal['language_id']]['language']
+					'language' => $languages[$sVal['language_id']]['language']
 				);
 
 			}
@@ -1039,7 +1067,7 @@ class ExportController extends Controller
 
 					$trans2['translation'.$dKey] = array(
 						'text' => $dVal['choice_txt'],
-						'language' => $_SESSION['admin']['export']['languages'][$dVal['language_id']]['language']
+						'language' => $languages[$dVal['language_id']]['language']
 					);
 
 				}
@@ -1049,7 +1077,7 @@ class ExportController extends Controller
 					'choice_img' => $cVal['choice_img'],
 					'choice_image_params' => $cVal['choice_image_params'],
 					'target_step_id' => $cVal['res_keystep_id'],
-					'target_taxon' => isset($cVal['res_taxon_id']) ? $_SESSION['admin']['export']['taxa'][$cVal['res_taxon_id']]['taxon'] : null,
+					'target_taxon' => isset($cVal['res_taxon_id']) ? $taxa[$cVal['res_taxon_id']]['taxon'] : null,
 					'target_taxon_id' => isset($cVal['res_taxon_id']) ? $cVal['res_taxon_id'] : null,
 					'text' => isset($trans2) ? $trans2 : null
 				);
@@ -1079,7 +1107,9 @@ class ExportController extends Controller
 	private function exportMatrixkey()
 	{
 
-		$e = array();
+		$e = $matrices = array();
+		$taxa = $this->moduleSession->getModuleSetting('taxa');
+		$languages = $this->moduleSession->getModuleSetting('languages');
 
 		// matrices
 		$m = $this->models->Matrices->_get(
@@ -1104,9 +1134,14 @@ class ExportController extends Controller
 				)
 			);
 
-			$_SESSION['admin']['export']['matrices'][$mVal['id']] = $mn[0]['name'];
+			$matrices[$mVal['id']] = $mn[0]['name'];
 
 		}
+
+        $this->moduleSession->setModuleSetting(array(
+            'setting' => 'matrices',
+            'value' => $matrices
+        ));
 
 		foreach((array)$m as $mKey => $mVal) {
 
@@ -1124,7 +1159,7 @@ class ExportController extends Controller
 			foreach((array)$mt as $mtKey => $mtVal) {
 
 				$mTaxa['taxon'.$mtKey] = array(
-					'taxon' => $_SESSION['admin']['export']['taxa'][$mtVal['taxon_id']]['taxon'],
+					'taxon' => $taxa[$mtVal['taxon_id']]['taxon'],
 					'id' => $mtVal['taxon_id']
 				);
 
@@ -1144,7 +1179,7 @@ class ExportController extends Controller
 
 				$mNames['translation'.$nKey] = array(
 					'name' => $nVal['name'],
-					'language' => $_SESSION['admin']['export']['languages'][$nVal['language_id']]['language'],
+					'language' => $languages[$nVal['language_id']]['language'],
 				);
 
 				//	if ($nVal['language_id']==$this->getDefaultProjectLanguage())
@@ -1189,7 +1224,7 @@ class ExportController extends Controller
 
 					$cNames['translation'.$clKey] = array(
 						'name' => $clVal['label'],
-						'language' => $_SESSION['admin']['export']['languages'][$clVal['language_id']]['language'],
+						'language' => $languages[$clVal['language_id']]['language'],
 					);
 
 				}
@@ -1221,7 +1256,7 @@ class ExportController extends Controller
 
 						$csNames['translation'.$clsKey] = array(
 							'name' => $clsVal['label'],
-							'language' => $_SESSION['admin']['export']['languages'][$clsVal['language_id']]['language'],
+							'language' => $languages[$clsVal['language_id']]['language'],
 						);
 
 					}
@@ -1243,15 +1278,15 @@ class ExportController extends Controller
 						if (isset($mtsVal['taxon_id'])) {
 
 							$sTaxa['taxon'.$mtsKey] = array(
-								'taxon' =>  $_SESSION['admin']['export']['taxa'][$mtsVal['taxon_id']]['taxon'],
+								'taxon' =>  $taxa[$mtsVal['taxon_id']]['taxon'],
 								'taxon_id' => $mtsVal['taxon_id']
 							);
 
 						} else
-						if (isset($mtsVal['ref_matrix_id']) && isset($_SESSION['admin']['export']['matrices'][$mtsVal['ref_matrix_id']])) {
+						if (isset($mtsVal['ref_matrix_id']) && isset($matrices[$mtsVal['ref_matrix_id']])) {
 
 							$sMatrices['matrix'.$mtsKey] = array(
-								'matrix' => $_SESSION['admin']['export']['matrices'][$mtsVal['ref_matrix_id']],
+								'matrix' => $matrices[$mtsVal['ref_matrix_id']],
 								'matrix_id' => $mtsVal['ref_matrix_id']
 							);
 
@@ -1311,6 +1346,8 @@ class ExportController extends Controller
 	private function exportFreemodule($mId)
 	{
 
+		$languages = $this->moduleSession->getModuleSetting('languages');
+
 		$m = $this->models->FreeModulesProjects->_get(
 			array(
 				'id' => array(
@@ -1345,7 +1382,7 @@ class ExportController extends Controller
 			foreach((array)$cfm as $cKey => $cVal) {
 
 				$dummy['translation'.$cKey] = array(
-					'language' => $_SESSION['admin']['export']['languages'][$cVal['language_id']]['language'],
+					'language' => $languages[$cVal['language_id']]['language'],
 					'topic' => $cVal['topic'],
 					'text' => $cVal['content'],
 				);
