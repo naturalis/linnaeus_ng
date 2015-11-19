@@ -1,6 +1,5 @@
 <?php
 
-
 include_once ('NsrController.php');
 
 class NsrActivityLogController extends NsrController
@@ -17,22 +16,18 @@ class NsrActivityLogController extends NsrController
 		'activity_log.css'
 	);
 
+    public $modelNameOverride='NsrActivityLogModel';
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
 
     public function __construct()
     {
         parent::__construct();
-        $this->initialize();
     }
 
     public function __destruct()
     {
         parent::__destruct();
-    }
-
-    private function initialize()
-    {
     }
 
     public function indexAction()
@@ -41,7 +36,7 @@ class NsrActivityLogController extends NsrController
 
         $this->setPageName($this->translate('Activity log'));
 		
-		$search=isset($this->GetAll()) ? $this->requestData : null;
+		$search=(null!==$this->GetAll() ? $this->requestData : null);
 		
 		$results=$this->getLogLines($search);
 		
@@ -52,63 +47,21 @@ class NsrActivityLogController extends NsrController
 		$this->printPage('activity_log');
     }
 	
-	
 	private function getLogLines($p=null)
 	{
 		$search=!empty($p['search']) ? $p['search'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_logLinesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_logLinesPerPage;
-		//$order=!empty($p['order']) ? $p['order'] : null;
 
 		$tz=isset($this->generalSettings['serverTimeZone']) ? $this->generalSettings['serverTimeZone'] : 'Europe/Amsterdam';
 
-		$d=$this->models->ActivityLog->freeQuery("
-			select
-				SQL_CALC_FOUND_ROWS	
-				_a.id,
-				_a.user_id,
-				_a.user,
-				_a.controller,
-				_a.view,
-				_a.data_before,
-				_a.data_after,
-				_a.note,
-				DATE_FORMAT(CONVERT_TZ(_a.created,'UTC','".$tz."'),'%d %b %Y, %T') as last_change_hr,
-				_u.id as user_user_id,
-				_u.username as user_username,
-				_u.first_name as user_first_name,
-				_u.last_name as user_last_name,
-				_u.email_address as user_email_address,
-				_u.active as user_active,
-				CONCAT(
-					FLOOR(HOUR(TIMEDIFF(now(), _a.created)) / 24), 'd ',
-					MOD(HOUR(TIMEDIFF(now(), _a.created)), 24), 'h ',
-					MINUTE(TIMEDIFF(now(), _a.created)), 'm ',
-					SECOND(TIMEDIFF(now(), _a.created)), 's'
-				) as time_past_hr
-
-			from %PRE%activity_log _a
-			
-			left join %PRE%users _u
-				on _a.user_id=_u.id
-
-			where _a.project_id =".$this->getCurrentProjectId()."
-			". (!is_null($search) ? " 
-				and (
-						_a.user like '%". mysql_real_escape_string($search) ."%' or
-						_a.data_before like '%". mysql_real_escape_string($search) ."%' or
-						_a.data_after like '%". mysql_real_escape_string($search) ."%' or
-						_a.note like '%". mysql_real_escape_string($search) ."%' or
-						DATE_FORMAT(_a.created,'%d %b %Y, %T') like '%". mysql_real_escape_string($search) ."%' or 
-						concat(_u.first_name,' ',_u.last_name) like '%". mysql_real_escape_string($search) ."%' or 
-						_u.email_address like '%". mysql_real_escape_string($search) ."%'
-					) " : 
-				"") ."
-			order by 
-				_a.created desc, _a.id desc
-			".(isset($limit) ? "limit ".(int)$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
-		);
+		$d=$this->models->NsrActivityLogModel->getActivityLog(array(
+			"timezone"=>$tz,
+			"project_id"=>$this->getCurrentProjectId(),
+			"search"=>$search,
+			"limit"=>$limit,
+			"offset"=>$offset
+		));
 		
 		function splitOldName($name)
 		{
@@ -134,7 +87,6 @@ class NsrActivityLogController extends NsrController
 			$d[$key]['user']=splitOldName($val['user']);
 			$d[$key]['data_before']=@unserialize($val['data_before']);
 			$d[$key]['data_after']=@unserialize($val['data_after']);
-			//$d[$key]['differences']=$this->getLineDifferences($d[$key]['data_before'],$d[$key]['data_after']);
 		}
 
 		$count=$this->models->ActivityLog->freeQuery('select found_rows() as total');
@@ -189,7 +141,7 @@ class NsrActivityLogController extends NsrController
 
 	private function reconstructQueryString($ignore)
 	{
-		if (!isset($this->GetAll())) return;
+		if (null===$this->GetAll()) return;
 
 		$querystring=null;
 
@@ -211,9 +163,5 @@ class NsrActivityLogController extends NsrController
 		
 		return $querystring;
 	}
-
-
-
-
 
 }

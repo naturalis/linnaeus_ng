@@ -47,6 +47,7 @@ class NsrTaxonController extends NsrController
 			'nsr_taxon_beheer.js'
         )
     );
+    public $modelNameOverride='NsrTaxonModel';
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
 
@@ -81,7 +82,7 @@ class NsrTaxonController extends NsrController
 			'fieldAsIndex'=>'nametype'
 		));
 
-		$this->_projectRankIds=$this->models->ProjectRank->_get(array(
+		$this->_projectRankIds=$this->models->ProjectsRanks->_get(array(
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId()
 			),
@@ -220,7 +221,6 @@ class NsrTaxonController extends NsrController
 			$this->setConceptId( $this->rGetId() );
 		}
 	
-
 		if ($this->rHasId())
 		{
 			$concept=$this->getConcept($this->rGetId());
@@ -425,7 +425,6 @@ class NsrTaxonController extends NsrController
 		$this->printPage();
 	}
 
-
     public function taxonDeletedAction()
     {
 		$this->checkAuthorisation();
@@ -450,6 +449,8 @@ class NsrTaxonController extends NsrController
 
     public function nsrIdResolverAction()
     {
+
+		// WHAT THE FUCK IS GOING ON!?
 
 		$this->checkAuthorisation();
 		
@@ -547,7 +548,9 @@ class NsrTaxonController extends NsrController
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVal('action'))
+		{
             return;
+		}
 
 		if (
 			$this->rHasVal('action', 'get_lookup_list') || 
@@ -584,10 +587,6 @@ class NsrTaxonController extends NsrController
 
         $this->printPage();
     }
-
-
-
-
 
 	private function setConceptId($id)
 	{
@@ -638,81 +637,19 @@ class NsrTaxonController extends NsrController
 	private function getName($p)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
-		$taxonId=isset($p['taxon_id']) ? $p['taxon_id'] : null;
-		$typeId=isset($p['type_id']) ? $p['type_id'] : null;
-		$languageId=isset($p['language_id']) ? $p['language_id'] : null;
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$type_id=isset($p['type_id']) ? $p['type_id'] : null;
+		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
 		
-        $name=$this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.id,
-						_a.taxon_id,
-						_a.name,
-						_a.uninomial,
-						_a.specific_epithet,
-						_a.infra_specific_epithet,
-						_a.authorship,
-						_a.name_author,
-						_a.authorship_year,
-						_a.reference,
-						_a.reference_id,
-						_h.label as reference_name,
-						_a.expert,
-						_a.expert_id,
-						_f.name as expert_name,
-						_a.organisation,
-						_a.organisation_id,
-						_g.name as organisation_name,
-						_a.type_id,
-						_b.nametype,
-						_a.language_id,
-						_c.language,
-						_d.label as language_label,
-						replace(_ids.nsr_id,'tn.nlsr.name/','') as nsr_id
+        $name=$this->models->NsrTaxonModel->getName(array(
+			'label_language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon_id,
+			'language_id'=>$language_id,
+			'type_id'=>$type_id,
+			'name_id'=>$id
+		));
 
-					from %PRE%names _a 
-
-					left join %PRE%name_types _b
-						on _a.type_id=_b.id 
-						and _a.project_id=_b.project_id
-
-					left join %PRE%languages _c
-						on _a.language_id=_c.id
-
-					left join %PRE%labels_languages _d
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id
-						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-					left join %PRE%actors _f
-						on _a.expert_id = _f.id 
-						and _a.project_id=_f.project_id
-		
-					left join %PRE%actors _g
-						on _a.organisation_id = _g.id 
-						and _a.project_id=_g.project_id
-		
-					left join  %PRE%literature2 _h
-						on _a.reference_id = _h.id 
-						and _a.project_id=_h.project_id
-
-					left join %PRE%nsr_ids _ids
-						on _a.id =_ids.lng_id 
-						and _a.project_id = _ids.project_id
-						and _ids.item_type = 'name'
-
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						".(isset($taxonId) ? "and _a.taxon_id=".$taxonId: "" )."
-						".(isset($languageId) ? "and _a.language_id=".$languageId: "" )."
-						".(isset($typeId) ? "and _a.type_id=".$typeId: "" )."
-						".(isset($id) ? "and _a.id=".$id: "" )
-			)
-		);
-
-		$name=$name[0];
-		
 		$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
 		
 		return $name;
@@ -720,68 +657,14 @@ class NsrTaxonController extends NsrController
 
 	private function getNames($p)
 	{
-		$id=isset($p['id']) ? $p['id'] : null;
+		$taxon_id=isset($p['id']) ? $p['id'] : null;
 		$base_rank_id=isset($p['base_rank']) ? $p['base_rank'] : null;
 
-        $names=$this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.id,
-						_a.name,
-						_a.uninomial,
-						_a.specific_epithet,
-						_a.infra_specific_epithet,
-						_a.authorship,
-						_a.name_author,
-						_a.authorship_year,
-						_a.reference,
-						_a.reference_id,
-						_a.expert,
-						_a.expert_id,
-						_a.organisation,
-						_a.organisation_id,
-						_b.nametype,
-						_a.language_id,
-						_c.language,
-						ifnull(_d.label,_c.language) as language_label,
-						case
-							when _b.nametype = '".PREDICATE_VALID_NAME."' then 11
-							when _b.nametype = '".PREDICATE_PREFERRED_NAME."' then 10
-							when _b.nametype = '".PREDICATE_ALTERNATIVE_NAME."' then 9
-							when _b.nametype = '".PREDICATE_SYNONYM."' then 7
-							when _b.nametype = '".PREDICATE_SYNONYM_SL."' then 6
-
-							when _b.nametype = '".PREDICATE_HOMONYM."' then 5
-							when _b.nametype = '".PREDICATE_MISSPELLED_NAME."' then 4
-							when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
-							else 0
-						end as sort_criterium
-
-					from %PRE%names _a 
-
-					left join %PRE%name_types _b
-						on _a.type_id=_b.id 
-						and _a.project_id=_b.project_id
-
-					left join %PRE%languages _c
-						on _a.language_id=_c.id
-
-					left join %PRE%labels_languages _d
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id
-						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.taxon_id=".$id."
-					order by 
-						sort_criterium desc
-						",
-				'fieldAsIndex' => 'id'
-			)
-		);
-		
+        $names=$this->models->NsrTaxonModel->getNames(array(
+			'label_language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon_id
+		));
 
 		$prefferedname=null;
 		$scientific_name=null;
@@ -834,108 +717,32 @@ class NsrTaxonController extends NsrController
 			);
 	}
 
-	private function getPreferredNames($concept)
+	private function getPreferredNames( $taxon_id )
 	{
-		
-		if (empty($concept))
+		if (empty($taxon_id))
+		{
 			return;
+		}
 
-        $names=$this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.id,
-						_a.name,
-						_a.language_id,
-						_c.language,
-						ifnull(_d.label,_c.language) as language_label
-
-					from %PRE%names _a 
-
-					left join %PRE%languages _c
-						on _a.language_id=_c.id
-
-					left join %PRE%labels_languages _d
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id
-						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.taxon_id = ".$concept."
-						and _a.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-						"
-			)
-		);
-		
-		return $names;
-
+        return $this->models->NsrTaxonModel->getPreferredNames(array(
+			'label_language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon_id,
+			'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']
+		));
 	}
 
 	private function getPresenceData($id)
 	{
-		$data=$this->models->PresenceTaxa->freeQuery(
-			"select
-				_a.presence_id,
-				_a.presence82_id,
-				_a.reference_id,
-				_b.label as presence_label,
-				_b.information as presence_information,
-				_b.information_title as presence_information_title,
-				_b.index_label as presence_index_label,
-				_c.label as presence82_label,
-				_d.habitat_id,
-				_d.label as habitat_label,
-				_e.id as expert_id,
-				_f.id as organisation_id,
-				_e.name as expert_name,
-				_f.name as organisation_name,
-				_a.reference_id,
-				_g.label as reference_label,
-				_gg.name as reference_author,
-				_g.date as reference_date
-				
-			from %PRE%presence_taxa _a
-
-			left join %PRE%presence_labels _b
-				on _a.presence_id = _b.presence_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%presence_labels _c
-				on _a.presence82_id = _c.presence_id 
-				and _a.project_id=_c.project_id 
-				and _c.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%habitat_labels _d
-				on _a.habitat_id = _d.habitat_id 
-				and _a.project_id=_d.project_id 
-				and _d.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%actors _e
-				on _a.actor_id = _e.id 
-				and _a.project_id=_e.project_id
-
-			left join %PRE%actors _f
-				on _a.actor_org_id = _f.id 
-				and _a.project_id=_f.project_id
-
-			left join %PRE%literature2 _g
-				on _a.reference_id = _g.id 
-				and _a.project_id=_g.project_id
-
-			left join %PRE%actors _gg
-				on _g.actor_id = _gg.id 
-				and _g.project_id=_gg.project_id
-
-
-			where _a.project_id = ".$this->getCurrentProjectId()."
-				and _a.taxon_id =".$id
-		);	
+		$data=$this->models->NsrTaxonModel->getPresenceData(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"taxon_id"=>$id
+		));
 		
-		$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
+		$data['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data['presence_information']);
 		
-		return $data[0];
+		return $data;
 	}
 
 	private function getActor($id)
@@ -962,48 +769,19 @@ class NsrTaxonController extends NsrController
 			subsequently excluded from the list in the wehre-statement.
 		*/
 		
-		$data=$this->models->PresenceTaxa->freeQuery(
-			"select
-            	_a.id,
-            	_b.label,
-            	_b.information,
-            	_b.information_short,
-            	_b.information_title,
-            	ifnull(_b.index_label,99) as index_label
+		return $this->models->NsrTaxonModel->getStatuses(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId()
+		));	
 
-			from %PRE%presence _a
-
-			left join %PRE%presence_labels _b
-				on _a.id = _b.presence_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
-
-			where _a.project_id = ".$this->getCurrentProjectId()."
-			and index_label != 99
-			order by index_label"
-		);	
-
-		return $data;
 	}
 
 	private function getHabitats()
 	{
-		$data=$this->models->PresenceTaxa->freeQuery(
-			"select
-            	_a.id,
-            	ifnull(_b.label,_a.sys_label) as label
-
-			from %PRE%habitats _a
-
-			left join %PRE%habitat_labels _b
-				on _a.id = _b.habitat_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
-
-			where _a.project_id = ".$this->getCurrentProjectId()
-		);	
-		
-		return $data;
+		return $this->models->NsrTaxonModel->getHabitats(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
 	private function getNameTypes()
@@ -1026,70 +804,17 @@ class NsrTaxonController extends NsrController
 
 	private function getLanguages()
 	{
-        $languages=$this->models->Language->freeQuery("
-			select
-				_c.id,
-				_c.language,
-				ifnull(_d.label,_c.language) as label,
-				case
-					when _c.id= " . LANGUAGE_ID_SCIENTIFIC. " then 99
-					when _c.id= " . $this->getDefaultProjectLanguage() . " then 98
-					when _c.id= " . LANGUAGE_ID_DUTCH . " then 97
-					when _c.id= " . LANGUAGE_ID_ENGLISH . " then 97
-					else 0 
-				end as sort_criterium
-
-			from %PRE%languages _c
-
-			left join %PRE%labels_languages _d
-				on _c.id=_d.language_id
-				and _d.project_id = ".$this->getCurrentProjectId()."
-				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-				order by sort_criterium desc, label asc
-			");
-			
-		return $languages;
+        return $this->models->NsrTaxonModel->getLanguages(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"label_language_id"=>$this->getDefaultProjectLanguage()
+		));
 	}
 
 	private function getDeletedSpeciesList()
 	{
-		$taxa=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_q.rank,
-				concat(_user.first_name,' ',_user.last_name) as deleted_by,
-				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
-			
-			from %PRE%taxa _a
-			
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-
-			left join %PRE%users _user
-				on _trash.user_id = _user.id
-				
-			left join %PRE%projects_ranks _f
-				on _a.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
-			left join %PRE%ranks _q
-				on _f.rank_id=_q.id
-
-			left join %PRE%nsr_ids _ids
-				on _a.id =_ids.lng_id 
-				and _a.project_id = _ids.project_id
-				and _ids.item_type = 'taxon'
-
-			where _a.project_id =".$this->getCurrentProjectId()."
-				and ifnull(_trash.is_deleted,0)=1
-
-			order by _trash.created desc
-		");
-
-		return $taxa;
+		return $this->models->NsrTaxonModel->getDeletedSpeciesList(array(
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
 	private function getSpeciesList($p)
@@ -1104,6 +829,8 @@ class NsrTaxonController extends NsrController
         $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
 		$limit=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
         $haveDeleted = isset($p['have_deleted']) ? $p['have_deleted'] : 'no'; // yes, no, only
+        $sort = isset($p['sort']) ? $p['sort'] : null;
+        $offset = isset($p['offset']) ? $p['offset'] : null;
 		
 		$search=trim($search);
 		
@@ -1112,164 +839,23 @@ class NsrTaxonController extends NsrController
 			return null;
 		}
 
-		$taxa=$this->models->Names->freeQuery("
-			select
-				_a.taxon_id as id,
-				concat(_a.name,' [',ifnull(_q.label,_x.rank),'%s]') as label,
-				_e.rank_id,
-				_e.taxon,
-				_a.name,
-				_common.name as common_name,
-				_f.rank_id as base_rank_id,
-				_x.rank,
-				_a.uninomial,
-				_a.specific_epithet,
-				_b.nametype,
-				ifnull(_d.label,_c.language) as language_label,
-				ifnull(_trash.is_deleted,0) as is_deleted,
-	
-				case
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1
-						or
-						trim(concat(
-							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
-							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
-							if(_a.infra_specific_epithet is null,'',concat(_a.infra_specific_epithet,' '))
-						)) REGEXP '^".mysql_real_escape_string($search)."$' = 1
-					then 100
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 95
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 90
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 85
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 80
-					when 
-						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 75
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 70
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 65
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 60
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 55
-					when 
-						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 50
-
-					else 10
-				end as match_percentage,
-	
-				case
-					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
-					else 50
-				end as adjusted_rank
-				
-			from %PRE%names _a
-
-			left join %PRE%languages _c
-				on _a.language_id=_c.id
-
-			left join %PRE%labels_languages _d
-				on _a.language_id=_d.language_id
-				and _a.project_id=_d.project_id
-				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-			
-			left join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-
-			left join %PRE%names _common
-				on _e.id = _common.taxon_id
-				and _e.project_id = _common.project_id
-				and _common.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _common.language_id=".$this->getDefaultProjectLanguage()."
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
-			left join %PRE%ranks _x
-				on _f.rank_id=_x.id
-
-			left join %PRE%labels_projects_ranks _q
-				on _e.rank_id=_q.project_rank_id
-				and _a.project_id = _q.project_id
-				and _q.language_id=".$this->getDefaultProjectLanguage()."
-			
-			left join %PRE%name_types _b 
-				on _a.type_id=_b.id 
-				and _a.project_id = _b.project_id
-
-			left join %PRE%trash_can _trash
-				on _e.project_id = _trash.project_id
-				and _e.id = _trash.lng_id
-				and _trash.item_type='taxon'
-
-			where _a.project_id =".$this->getCurrentProjectId()."
-				and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-				and _b.nametype in (
-					'".PREDICATE_PREFERRED_NAME."',
-					'".PREDICATE_VALID_NAME."',
-					'".PREDICATE_ALTERNATIVE_NAME."',
-					'".PREDICATE_SYNONYM."',
-					'".PREDICATE_SYNONYM_SL."',
-					'".PREDICATE_HOMONYM."',
-					'".PREDICATE_BASIONYM."',
-					'".PREDICATE_MISSPELLED_NAME."'
-				)
-
-			".($taxaOnly ? "and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : "" )."
-			".($rankAbove ? "and _f.rank_id < ".$rankAbove : "" )."
-			".($rankEqualAbove ? "and _f.rank_id <= ".$rankEqualAbove : "" )."
-			".($id ? "and _a.taxon_id = ".$id : "" )."
-			".($nametype ? "and _b.nametype = ".$nametype : "" )."
-			".($haveDeleted=='no' ? "and ifnull(_trash.is_deleted,0)=0" :  "" )."
-			".($haveDeleted=='only' ? "and ifnull(_trash.is_deleted,0)=1" : "" )."
-		
-			order by 
-				match_percentage desc, 
-				_e.taxon asc, 
-				_f.rank_id asc, ".
-				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ?
-					"common_name" :
-					"taxon" 
-				)."
-			".(isset($limit) ? "limit ".(int)$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
-		);
+		$taxa=$this->models->NsrTaxonModel->getSpeciesList(array(
+			"search"=>$search,
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
+			"type_id_valid"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"project_id"=>$this->getCurrentProjectId(),
+			"match_start_only"=>$matchStartOnly,
+			"taxa_only"=>$taxaOnly,
+			"rank_above"=>$rankAbove,
+			"rank_equal_above"=>$rankEqualAbove,
+			"taxon_id"=>$id,
+			"nametype"=>$nametype,
+			"have_deleted"=>$haveDeleted,
+			"sort"=>$sort,
+			"limit"=>$limit,
+			"offset"=>$offset,
+		));
 
 
 		foreach ((array) $taxa as $key => $val)
@@ -1314,27 +900,11 @@ class NsrTaxonController extends NsrController
 		if (empty($taxonId))
 			return null;
 
-		$taxa=$this->models->Names->freeQuery("
-			select
-				_a.*, _f.rank_id as base_rank_id
-			from
-				%PRE%names _a
-			
-			left join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
-			where
-				_a.project_id =".$this->getCurrentProjectId()."
-				and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _a.taxon_id =".$taxonId
-		);
-		
-		$val=$taxa[0];
+		$val=$this->models->NsrTaxonModel->getInheritableName(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"taxon_id"=>$taxonId
+		));
 		
 		if ($val['base_rank_id']==GENUS_RANK_ID)
 		{
@@ -1382,32 +952,12 @@ class NsrTaxonController extends NsrController
         if (empty($search))
             return;
 
-		$data=$this->models->Actors->freeQuery(
-			"select
-				_e.id,
-				_e.name as label,
-				_e.name_alt,
-				_e.homepage,
-				_e.gender,
-				_e.is_company,
-				_e.employee_of_id,
-				_f.name as company_of_name,
-				_f.name_alt as company_of_name_alt,
-				_f.homepage as company_of_homepage
-
-			from %PRE%actors _e
-
-			left join %PRE%actors _f
-				on _e.employee_of_id = _f.id 
-				and _e.project_id=_f.project_id
-
-			where
-				_e.project_id = ".$this->getCurrentProjectId()."
-				".(!$getAll ? "and _e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'" : "")."
-
-			order by
-				_e.is_company, _e.name
-		");	
+		$data=$this->models->NsrTaxonModel->getExpertsLookupList(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"get_all"=>$getAll,
+			"match_start_only"=>$matchStartOnly,
+			"search"=>$search
+		));	
 
 		return
 			$this->makeLookupList(array(
@@ -1425,7 +975,7 @@ class NsrTaxonController extends NsrController
 		$d=$this->getTaxonById($parent_id);
 		$parent_base_rank=$d['base_rank'];
 		
-		$ranks=$this->models->Rank->_get(array(
+		$ranks=$this->models->Ranks->_get(array(
 			'id'=>'*',
 			'columns'=>'id,rank',
 			'fieldAsIndex'=>'id'
@@ -1624,23 +1174,12 @@ class NsrTaxonController extends NsrController
 
 	private function checkNameUniqueness($name,$childRankId,$parentId)
 	{
-		$d=$this->models->Taxon->freeQuery("
-			select
-				_a.*,ifnull(_trash.is_deleted,0) as is_deleted
-			from
-				%PRE%taxa _a
-	
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-	
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.taxon like '". mysql_real_escape_string($name) ."'
-				and _a.rank_id = ". mysql_real_escape_string($childRankId) ."
-				and _a.parent_id = ". mysql_real_escape_string($parentId)
-			);
+		$d=$this->models->NsrTaxonModel->checkNameUniqueness(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"name"=>$name,
+			"child_rank_id"=>$childRankId,
+			"parent_id"=>$parentId
+		));
 
 		if ($d)
 		{
@@ -1750,7 +1289,7 @@ class NsrTaxonController extends NsrController
 			
 		
 		// we passed the tests!
-		$d=$this->models->Taxon->save(
+		$d=$this->models->Taxa->save(
 		array(
 			'project_id' => $this->getCurrentProjectId(),
 			'is_empty' =>'0',
@@ -1760,7 +1299,7 @@ class NsrTaxonController extends NsrController
 		
 		if ($d)
 		{
-			$this->setConceptId($this->models->Taxon->getNewId());
+			$this->setConceptId($this->models->Taxa->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
 			$this->logNsrChange(array('after'=>array('id'=>$this->getConceptId(),'taxon'=>$name,'rank_id' =>$rank),'note'=>'new concept '.$name));
 			//$this->setIsNewRecord(true);
@@ -1883,19 +1422,19 @@ class NsrTaxonController extends NsrController
 
 	private function updateConceptTaxon($values)
 	{
-		$before=$this->models->Taxon->_get(array(
+		$before=$this->models->Taxa->_get(array(
 			'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 			'columns'=>'taxon'
 		));
 		
-		$result=$this->models->Taxon->update(
+		$result=$this->models->Taxa->update(
 			array('taxon'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 
-		if ($result && $this->models->Taxon->getAffectedRows()!=0)
+		if ($result && $this->models->Taxa->getAffectedRows()!=0)
 		{
-			$after=$this->models->Taxon->_get(array(
+			$after=$this->models->Taxa->_get(array(
 				'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'taxon'
 			));
@@ -1917,7 +1456,7 @@ class NsrTaxonController extends NsrController
 	
 	private function updateConceptRankId($values)
 	{
-		return $this->models->Taxon->update(
+		return $this->models->Taxa->update(
 			array('rank_id'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
@@ -1925,7 +1464,7 @@ class NsrTaxonController extends NsrController
 
 	private function updateParentId($values)
 	{
-		return $this->models->Taxon->update(
+		return $this->models->Taxa->update(
 			array('parent_id'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
@@ -2035,19 +1574,10 @@ class NsrTaxonController extends NsrController
 
 		if (!isset($name['new'])) return;
 
-		$d=$this->models->Names->freeQuery("
-			select
-				_a.id, 
-				_b.taxon
-			from 
-				%PRE%names _a
-			left join %PRE%taxa _b
-				on _a.project_id = _b.project_id
-				and _a.taxon_id=_b.id
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and lower(_a.name) = '" . mysql_real_escape_string(trim($name['new'])) . "'
-		");
+		$d=$this->models->NsrTaxonModel->checkMainLanguageCommonName(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"name"=>$name['new']
+		));
 
 		if ($d)
 		{
@@ -2124,8 +1654,6 @@ class NsrTaxonController extends NsrController
 		}
 
 	}
-
-
 
 	private function updateName($new=false)
 	{
@@ -2411,7 +1939,6 @@ class NsrTaxonController extends NsrController
 
 	private function updateNameReferenceId($values)
 	{
-
 		return $this->models->Names->update(
 			array('reference_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
@@ -2653,52 +2180,24 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-	private function getReference($id=null)
+	private function getReference($literature_id=null)
 	{
-		if (empty($id))
+		if (empty($literature_id))
 			return;
 
-		$l=$this->models->Literature2->freeQuery(
-			"select
-				_a.*,
-				_h.label as publishedin_label,
-				_i.label as periodical_label
-
-			from %PRE%literature2 _a
-
-			left join  %PRE%literature2 _h
-				on _a.publishedin_id = _h.id 
-				and _a.project_id=_h.project_id
-
-			left join %PRE%literature2 _i 
-				on _a.periodical_id = _i.id 
-				and _a.project_id=_i.project_id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.id = ".$id
-		);
-
-		return $l[0];
+		return $this->models->NsrTaxonModel->getReference(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"literature_id"=>$literature_id
+		));
 	}
 	
-	private function getTaxonBranch($parent)
+	private function getTaxonBranch( $parent )
 	{
-		return $this->models->Taxon->freeQuery("
-			select
-				_b.*
-			from 
-				%PRE%taxon_quick_parentage _a
-
-			left join %PRE%names _b
-				on _a.project_id = _b.project_id
-				and _a.taxon_id = _b.taxon_id
-				and _b.type_id =".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and MATCH(_a.parentage) AGAINST ('".$parent['id']."' in boolean mode)
-		");
+		return $this->models->NsrTaxonModel->getTaxonBranch(array(
+			"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"project_id"=>$this->getCurrentProjectId(),
+			"parent_id"=>$parent['id']
+		));
 	}
 
 	private function checkIfNameExistsInConceptsKingdom($intendedNewConceptName,$concept)
@@ -2717,26 +2216,12 @@ class NsrTaxonController extends NsrController
 			ongewijzigde concept valt.
 		*/
 		
-		$d=$this->models->Taxon->freeQuery("		
-			select
-				*
-			from
-				%PRE%names
-			where 
-				project_id = ".$this->getCurrentProjectId()."
-				and type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and language_id=".LANGUAGE_ID_SCIENTIFIC."
-				and (
-					trim(replace(name,ifnull(authorship,''),'')) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-						or
-					concat(
-						if(uninomial is null,'',concat(uninomial,' ')),
-						if(specific_epithet is null,'',concat(specific_epithet,' ')),
-						if(infra_specific_epithet is null,'',infra_specific_epithet)
-					) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-				)
-				and taxon_id != ".mysql_real_escape_string($concept['id'])."
-		");
+		$d=$this->models->NsrTaxonModel->checkIfNameExistsInConceptsKingdom(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"intended_new_concept_name"=>$intendedNewConceptName,
+			"taxon_id"=>$concept['id']
+		));
 
 		if ($d)
 		{
@@ -2745,19 +2230,14 @@ class NsrTaxonController extends NsrController
 			foreach((array)$d as $key=>$val)
 				$a[]=$val['taxon_id'];
 
-			$parentage=$this->models->Taxon->freeQuery(array(
-				"query" => "
-					select
-						taxon_id,parentage
-					from 
-						%PRE%taxon_quick_parentage
-					where 
-						project_id = ".$this->getCurrentProjectId()."
-						and taxon_id in (".implode(",",$a).")",
-				"fieldAsIndex"=>"taxon_id"
+			$parentage=$this->models->TaxonQuickParentage->_get(
+				array(
+					"columns" => "taxon_id,parentage",
+					"id"=> array("project_id"=>$this->getCurrentProjectId(),"taxon_id #"=>"in (".implode(",",$a).")"),
+					"fieldAsIndex"=>"taxon_id"
 				)
 			);
-
+			
 			/*
 			example:
 			+----------+--------------------------------------------------+
@@ -3007,32 +2487,13 @@ class NsrTaxonController extends NsrController
 
 			$intendedNewConceptName=$data['name_uninomial']['new'];
 
-			$d=$this->models->Taxon->freeQuery("		
-				select
-					_a.*
-				from
-					%PRE%names _a
-				
-				left join %PRE%taxa _b
-					on _a.project_id = _b.project_id
-					and _a.taxon_id = _b.id
-				
-				where 
-					_a.project_id = ".$this->getCurrentProjectId()."
-					and _a.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-					and _a.language_id=".LANGUAGE_ID_SCIENTIFIC."
-					and (
-						trim(replace(name,ifnull(_a.authorship,''),'')) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-							or
-						concat(
-							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
-							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
-							if(_a.infra_specific_epithet is null,'',_a.infra_specific_epithet)
-						) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-					)
-					and _b.parent_id = ".mysql_real_escape_string($concept['parent_id'])."
-					and _b.id != ".mysql_real_escape_string($concept['id'])."
-			");
+			$d=$this->models->NsrTaxonModel->checkIfGenusWithSameNameExists(array(
+				"project_id"=>$this->getCurrentProjectId(),
+				"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+				"intended_new_concept_name"=>$intendedNewConceptName,
+				"parent_id"=>$concept['parent_id'],
+				"taxon_id"=>$concept['id']
+			));
 
 			if ($d)
 			{
@@ -3146,33 +2607,30 @@ class NsrTaxonController extends NsrController
 			
 			$newSynonym=$val['name'];
 
-			$d=$this->models->Names->freeQuery("
-				select
-					*
-				from
-					%PRE%names
-				where 
-					project_id = ".$this->getCurrentProjectId()."
-					and taxon_id = ".$val['taxon_id']."
-					and name = '". mysql_real_escape_string($newSynonym) ."'
-					and type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
-			);
+			$d=$this->models->Names->_get(array(
+				"id"=>
+					array(
+						"project_id"=>$this->getCurrentProjectId(),
+						"taxon_id"=>$val['taxon_id'],
+						"name"=>$this->models->Names->escapeString($newSynonym),
+						"type_id"=>$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
+					)
+			));
 
 			if ($d)
 			{
 				$this->addWarning("Synoniem \"".$newSynonym."\" bestaat al; duplicaat synoniem aangemaakt.");
 			}
 
-			$this->models->Names->freeQuery("
-				update
-					%PRE%names
-				set
-					type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']."
-				where 
-					project_id = ".$this->getCurrentProjectId()."
-					and id = ".$val['id']."
-				limit 1
-			");	
+			$this->models->Names->update(
+				array(
+					"type_id"=>$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
+				),
+				array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"id"=>$val['id']
+				)
+			);	
 
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
 			$this->logNsrChange(array('before'=>$name,'after'=>$after[0],'note'=>'changed valid name '.$newSynonym.' to synonym'));
@@ -3287,59 +2745,12 @@ class NsrTaxonController extends NsrController
 		$level=isset($p['level']) ? $p['level'] : 0;
 		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
 		
-		$g=$this->models->TraitsGroups->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as description,
-				count(_tt.id) as trait_count,
-				count(_ttf.id) as taxon_freevalue_count,
-				count(_ttv.id) as taxon_value_count,
-				count(_ttf.id)+count(_ttv.id) as taxon_count
-
-			from
-				%PRE%traits_groups _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.description_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-				
-			left join 
-				%PRE%traits_traits _tt
-				on _a.project_id=_tt.project_id
-				and _a.id=_tt.trait_group_id
-
-			left join 
-				%PRE%traits_taxon_freevalues _ttf
-				on _tt.project_id=_ttf.project_id
-				and _tt.id=_ttf.trait_id
-				and _ttf.taxon_id =". $this->getConceptId() ."
-
-			left join 
-				%PRE%traits_values _tv
-				on _tt.project_id=_tv.project_id
-				and _tt.id=_tv.trait_id
-
-			left join 
-				%PRE%traits_taxon_values _ttv
-				on _tv.project_id=_ttv.project_id
-				and _tv.id=_ttv.value_id
-				and _ttv.taxon_id =". $this->getConceptId() ."
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
-			group by _a.id
-			order by _a.show_order, _a.sysname
-		");
+		$g=$this->models->NsrTaxonModel->getTraitgroups(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"taxon_id"=>$this->getConceptId(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"parent_id"=>$parent
+		));
 		
 		foreach((array)$g as $key=>$val)
 		{
