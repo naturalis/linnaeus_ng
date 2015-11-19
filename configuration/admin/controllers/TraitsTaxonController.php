@@ -19,6 +19,7 @@ class TraitsTaxonController extends TraitsController
 		'literature2_authors'
     );
    
+    public $modelNameOverride='TraitsTaxonModel';
     public $controllerPublicName = 'Kenmerken';
 
     public $cssToLoad = array(
@@ -378,7 +379,7 @@ class TraitsTaxonController extends TraitsController
 
 		foreach((array)$l as $key=>$val)
 		{
-			$authors=$this->models->TraitsDataModel->getLiterature2Authors(array(
+			$authors=$this->models->TraitsTaxonModel->getLiterature2Authors(array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'literature2_id'=>$val['literature_id']
 			));

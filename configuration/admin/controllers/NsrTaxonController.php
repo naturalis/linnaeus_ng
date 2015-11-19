@@ -449,77 +449,39 @@ class NsrTaxonController extends NsrController
 
     public function nsrIdResolverAction()
     {
-
-		// WHAT THE FUCK IS GOING ON!?
-
 		$this->checkAuthorisation();
 		
         $this->setPageName($this->translate('NSR ID resolver'));
 
 		if ( ($this->rHasVal('action','resolve') || $this->rHasVal('action','download')) && $this->rHasVal('codes') )
 		{
-			$t="%PRE%_tmp_".substr( "abcdefghijklmnopqrstuvwxyz", mt_rand( 0, 25 ), 1 ) .substr( md5( time() ), 1 );
+			$t="_tmp_" . substr( "abcdefghijklmnopqrstuvwxyz", mt_rand( 0, 25 ), 1 ) .substr( md5( time() ), 1 ) . "_p". $this->getCurrentProjectId();
 
-			$this->models->NsrIds->freeQuery("drop table ".$t);
-			$this->models->NsrIds->freeQuery("
-				create table ".$t." (
-					`id` int(11) not null primary key,
-					`code_1` varchar(16) not null, 
-					`code_2` varchar(32) not null, 
-					key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))");
+			$this->models->NsrTaxonModel->dropTempTable(array(
+				'table_name'=>$t
+			));
+
+			$this->models->NsrTaxonModel->createTempTable(array(
+				'table_name'=>$t
+			));
 
 			$codes=explode(PHP_EOL,trim($this->rGetVal('codes')));
 			array_walk($codes,function(&$val,$key){ $val=substr(str_pad(trim($val),12,"0", STR_PAD_LEFT),-12);});
 
-			$pre='tn.nlsr.concept/';
-			$buffer=array();
-			foreach((array)$codes as $line=>$code)
-			{
-				$buffer[]= "(".$line.",'" . mysql_real_escape_string( $code ) . "','". mysql_real_escape_string( $pre . $code ) . "')";
-				if ($line > 0 && ($line % 500)==0)
-				{
-					$this->models->NsrIds->freeQuery("insert into ".$t." values ".implode(",",$buffer));
-					$buffer=array();
-				}
-			}
+			$this->models->NsrTaxonModel->fillTempTable(array(
+				'table_name'=>$t,
+				'id_prefix'=>'tn.nlsr.concept/',
+				'codes'=>$codes
+			));
 
-			$this->models->NsrIds->freeQuery("insert into ".$t." values ".implode(",",$buffer));
+			$result=$this->models->NsrTaxonModel->getResolvedCodes(array(
+				'table_name'=>$t,
+				'project_id'=>$this->getCurrentProjectId()
+			));
 
-			$result=$this->models->NsrIds->freeQuery("
-				select
-					_a.id as line,
-					_a.code_1 as code,
-					ifnull(_b.lng_id,_c.lng_id) as lng_id,
-					ifnull(_t1.taxon,_t2.taxon) as taxon
-					
-				from ".$t." _a
-
-				left join %PRE%nsr_ids _b
-					on _a.code_1 = _b.nsr_id
-					and _b.project_id = ".$this->getCurrentProjectId()."
-					and _b.item_type = 'taxon'
-					and _b.lng_id is not null
-
-				left join %PRE%nsr_ids _c
-					on _a.code_2 = _c.nsr_id
-					and _c.project_id = ".$this->getCurrentProjectId()."
-					and _c.item_type = 'taxon'
-					and _c.lng_id is not null
-
-				left join %PRE%taxa _t1
-					on _b.lng_id = _t1.id
-					and _t1.project_id = ".$this->getCurrentProjectId()."
-					
-				left join %PRE%taxa _t2
-					on _c.lng_id = _t2.id
-					and _t2.project_id = ".$this->getCurrentProjectId()."
-					
-				group by _a.id
-
-				order by _a.id
-			");
-				
-			@$this->models->NsrIds->freeQuery("drop table ".$t);
+			$this->models->NsrTaxonModel->dropTempTable(array(
+				'table_name'=>$t
+			));
 
 			if ($this->rHasVal('action','download'))
 			{
