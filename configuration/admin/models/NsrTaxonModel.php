@@ -978,6 +978,118 @@ final class NsrTaxonModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
+	public function dropTempTable( $params )
+	{
+		$table_name=isset($params['table_name']) ? $params['table_name'] : null;
 
+		if( !isset( $table_name ) )
+		{
+			return;
+		}
+
+		$query="drop table %PRE%".$table_name;
+
+		@$this->freeQuery( $query );
+	}
+
+	public function createTempTable( $params )
+	{
+		$table_name=isset($params['table_name']) ? $params['table_name'] : null;
+
+		if( !isset( $table_name ) )
+		{
+			return;
+		}
+
+		$query="
+			create table %PRE%".$table_name." (
+				`id` int(11) not null primary key,
+				`code_1` varchar(16) not null, 
+				`code_2` varchar(32) not null, 
+				key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))";
+
+		$this->freeQuery( $query );
+	}
+
+	public function fillTempTable( $params )
+	{
+		$table_name=isset($params['table_name']) ? $params['table_name'] : null;
+		$id_prefix=isset($params['id_prefix']) ? $params['id_prefix'] : null;
+		$codes=isset($params['codes']) ? $params['codes'] : null;
+
+		if( !isset( $table_name ) || !isset( $id_prefix )  || !isset( $codes ) )
+		{
+			return;
+		}
+	
+		$buffer=array();
+		$queries=array();
+
+		foreach((array)$codes as $line=>$code)
+		{
+			$buffer[]= "(".$line.",'" . $this->escapeString( $code ) . "','". $this->escapeString( $id_prefix . $code ) . "')";
+			if ($line > 0 && ($line % 500)==0)
+			{
+				$queries[]="insert into ".$table_name." values ".implode(",",$buffer);
+				$buffer=array();
+			}
+		}
+
+		if (!empty($buffer))
+		{
+			$queries[]="insert into ".$table_name." values ".implode(",",$buffer);
+		}
+		
+		foreach($queries as $query)
+		{
+			$this->freeQuery( $query );
+		}
+			
+	}
+
+	public function getResolvedCodes( $params )
+	{
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+		$table_name=isset($params['table_name']) ? $params['table_name'] : null;
+
+		if( !isset( $project_id ) || !isset( $table_name ) )
+		{
+			return;
+		}
+
+		$query="select
+					_a.id as line,
+					_a.code_1 as code,
+					ifnull(_b.lng_id,_c.lng_id) as lng_id,
+					ifnull(_t1.taxon,_t2.taxon) as taxon
+					
+				from %PRE%".$table_name." _a
+
+				left join %PRE%nsr_ids _b
+					on _a.code_1 = _b.nsr_id
+					and _b.project_id = ".$project_id."
+					and _b.item_type = 'taxon'
+					and _b.lng_id is not null
+
+				left join %PRE%nsr_ids _c
+					on _a.code_2 = _c.nsr_id
+					and _c.project_id = ".$project_id."
+					and _c.item_type = 'taxon'
+					and _c.lng_id is not null
+
+				left join %PRE%taxa _t1
+					on _b.lng_id = _t1.id
+					and _t1.project_id = ".$project_id."
+					
+				left join %PRE%taxa _t2
+					on _c.lng_id = _t2.id
+					and _t2.project_id = ".$project_id."
+					
+				group by _a.id
+				order by _a.id
+			";
+
+		return $this->freeQuery( $query );
+	}
 
 }
