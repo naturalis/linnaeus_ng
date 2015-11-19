@@ -31,6 +31,7 @@ class SearchControllerNSR extends SearchController
 	);
 
     public $usedModels = array(
+		'names',
 		'taxa',
 		'presence',
 		'presence_labels',
@@ -43,7 +44,9 @@ class SearchControllerNSR extends SearchController
 		'traits_taxon_values',
 		'traits_taxon_freevalues'
     );
+	
 
+    public $modelNameOverride = 'SearchControllerNSRModel';
     public $controllerPublicName = 'Search';
 
     public $usedHelpers = array();
@@ -84,7 +87,7 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 		$this->smarty->assign( 'taxon_base_url_images_thumb_s',$this->_taxon_base_url_images_thumb_s );
 
-		$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
+		$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId()
@@ -604,7 +607,7 @@ class SearchControllerNSR extends SearchController
 		$trait_joins=$this->getTraitJoins($traits);
 		$traitgroup_joins=$this->getTraitGroupJoin($trait_group);
 
-		$data=$this->models->Taxon->freeQuery("
+		$data=$this->models->Taxa->freeQuery("
 			select
 				SQL_CALC_FOUND_ROWS
 				_a.id,
@@ -778,10 +781,10 @@ class SearchControllerNSR extends SearchController
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		);
 
-//		q($this->models->Taxon->q(),1);
+//		q($this->models->Taxa->q(),1);
 //		q($data,1);
 
-		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+		$count=$this->models->Taxa->freeQuery('select found_rows() as total');
 		$count=$count[0]['total'];
 		
 		foreach((array)$data as $key=>$val)
@@ -1195,7 +1198,7 @@ class SearchControllerNSR extends SearchController
 
 		if (empty($clause)) return;
 		
-		$d=$this->models->Taxon->freeQuery("
+		$d=$this->models->Taxa->freeQuery("
 			select
 
 				_a.taxon_id as id,
@@ -1276,7 +1279,7 @@ class SearchControllerNSR extends SearchController
 
 		if (empty($clause)) return;
 		
-		$d=$this->models->Taxon->freeQuery("
+		$d=$this->models->Taxa->freeQuery("
 			select
 				distinct authorship as label
 			from %PRE%names
