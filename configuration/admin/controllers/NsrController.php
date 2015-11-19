@@ -13,6 +13,9 @@ include_once ('RdfController.php');
 
 class NsrController extends Controller
 {
+
+//    public $modelNameOverride='NsrTreeModel';
+
     public function __construct()
     {
         parent::__construct();
@@ -88,7 +91,7 @@ class NsrController extends Controller
 
 	public function getProgeny($parent,$level,$family)
 	{
-		$result = $this->models->Taxon->_get(
+		$result = $this->models->Taxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -130,7 +133,7 @@ class NsrController extends Controller
 
 			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId())); // ??? crashes
 
-			$this->model->ControllerModel->deleteTaxonParentage(array(
+			$this->models->ControllerModel->deleteTaxonParentage(array(
                 'projectId' => $this->getCurrentProjectId()
             ));
 
@@ -144,7 +147,7 @@ class NsrController extends Controller
 			$t=$this->getTaxonById($id);
 			$this->getParents($t['parent_id'],0,array());
 			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
-			$this->model->ControllerModel->deleteTaxonParentage(array(
+			$this->models->ControllerModel->deleteTaxonParentage(array(
                 'projectId' => $this->getCurrentProjectId(),
 			    'taxonId' => $id
             ));
@@ -160,7 +163,7 @@ class NsrController extends Controller
 
 	private function getParents($parent,$level,$family)
 	{
-		$result = $this->models->Taxon->_get(
+		$result = $this->models->Taxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),

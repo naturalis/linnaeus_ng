@@ -24,6 +24,7 @@ class NsrTaxonImagesController extends NsrController
 			'nsr_taxon_beheer.js'
         )
     );
+    public $modelNameOverride='NsrTaxonImagesModel';
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
@@ -72,25 +73,6 @@ class NsrTaxonImagesController extends NsrController
     {
         parent::__destruct();
     }
-
-    private function initialize()
-    {
-		$this->Rdf = new RdfController;
-		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
-			'id'=>array(
-				'project_id'=>$this->getCurrentProjectId()
-			),
-			'columns'=>'id,nametype',
-			'fieldAsIndex'=>'nametype'
-		));
-
-		array_unshift($this->availableMetaDataFields,'');
-		array_unshift($this->availableMetaDataFields,$this->sys_label_NSR_ID);
-		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
-		
-		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
-		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
-	}
 
     public function imagesAction()
     {
@@ -293,10 +275,24 @@ class NsrTaxonImagesController extends NsrController
 		$this->printPage();
 	}
 
+    private function initialize()
+    {
+		$this->Rdf = new RdfController;
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
 
-
-
-
+		array_unshift($this->availableMetaDataFields,'');
+		array_unshift($this->availableMetaDataFields,$this->sys_label_NSR_ID);
+		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
+		
+		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
+		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
+	}
 
 	private function setConceptId($id)
 	{
@@ -322,128 +318,22 @@ class NsrTaxonImagesController extends NsrController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image desc,_meta4.meta_date desc';
 
-		$data=$this->models->Taxon->freeQuery("		
-			select
-				SQL_CALC_FOUND_ROWS
-				_m.id,
-				_m.taxon_id,
-				_m.overview_image,
-				file_name as image,
-				file_name as thumb,
-				_k.taxon,
-				_z.name as common_name,
-				_j.name,
-				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
-				".($distributionMaps?
-					"_map1.meta_data as meta_map_source,
-					 _map2.meta_data as meta_map_description,": "")."
-				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
-				_meta2.meta_data as meta_short_desc,
-				_meta3.meta_data as meta_geografie,
-				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
-				_meta5.meta_data as meta_copyrights,
-				_meta6.meta_data as meta_validator,
-				_meta7.meta_data as meta_adres_maker,
-				_meta8.meta_data as photographer
-			
-			from  %PRE%media_taxon _m
-			
-			left join %PRE%media_meta _c
-				on _m.project_id=_c.project_id
-				and _m.id = _c.media_id
-				and _c.sys_label = 'beeldbankFotograaf'
-			
-			left join %PRE%taxa _k
-				on _m.taxon_id=_k.id
-				and _m.project_id=_k.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _k.rank_id=_f.id
-				and _k.project_id=_f.project_id
-
-			left join %PRE%names _z
-				on _m.taxon_id=_z.taxon_id
-				and _m.project_id=_z.project_id
-				and _z.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
-
-			left join %PRE%names _j
-				on _m.taxon_id=_j.taxon_id
-				and _m.project_id=_j.project_id
-				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-				
-
-			left join %PRE%media_meta _map1
-				on _m.id=_map1.media_id
-				and _m.project_id=_map1.project_id
-				and _map1.sys_label='verspreidingsKaartBron'
-
-			left join %PRE%media_meta _map2
-				on _m.id=_map2.media_id
-				and _m.project_id=_map2.project_id
-				and _map2.sys_label='verspreidingsKaartTitel'
-
-			left join %PRE%media_meta _meta1
-				on _m.id=_meta1.media_id
-				and _m.project_id=_meta1.project_id
-				and _meta1.sys_label='beeldbankDatumVervaardiging'
-
-			left join %PRE%media_meta _meta2
-				on _m.id=_meta2.media_id
-				and _m.project_id=_meta2.project_id
-				and _meta2.sys_label='beeldbankOmschrijving'
-			
-			left join %PRE%media_meta _meta3
-				on _m.id=_meta3.media_id
-				and _m.project_id=_meta3.project_id
-				and _meta3.sys_label='beeldbankLokatie'
-			
-			left join %PRE%media_meta _meta4
-				on _m.id=_meta4.media_id
-				and _m.project_id=_meta4.project_id
-				and _meta4.sys_label='beeldbankDatumAanmaak'
-			
-			left join %PRE%media_meta _meta5
-				on _m.id=_meta5.media_id
-				and _m.project_id=_meta5.project_id
-				and _meta5.sys_label='beeldbankCopyright'
-
-			left join %PRE%media_meta _meta6
-				on _m.id=_meta6.media_id
-				and _m.project_id=_meta6.project_id
-				and _meta6.sys_label='beeldbankValidator'
-				and _meta6.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%media_meta _meta7
-				on _m.id=_meta7.media_id
-				and _m.project_id=_meta7.project_id
-				and _meta7.sys_label='beeldbankAdresMaker'
-				and _meta7.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%media_meta _meta8
-				on _m.id=_meta8.media_id
-				and _m.project_id=_meta8.project_id
-				and _meta8.sys_label='beeldbankFotograaf'
-			
-			left join %PRE%media_meta _meta9
-				on _m.id=_meta9.media_id
-				and _m.project_id=_meta9.project_id
-				and _meta9.sys_label='verspreidingsKaart'
-			
-			where
-				_m.project_id=".$this->getCurrentProjectId()."
-				".($id ? "and _m.taxon_id=". mysql_real_escape_string( $id ) : "")."
-				and ifnull(_meta9.meta_data,0)!=".($distributionMaps?'0':'1')."
-				".($overview ? "and _m.overview_image=1" : "")."
-				".($media_id ? "and _m.id=". mysql_real_escape_string( $media_id ) : "")."
-
-			".(isset($sort) ? "order by ".$sort : "")."
-			".(isset($limit) ? "limit ".$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
-		);
-
-		$count=$this->models->MediaTaxon->freeQuery('select found_rows() as total');
+		$d=$this->models->NsrTaxonImagesModel->getTaxonMedia(array(
+			"distribution_maps"=>$distributionMaps,
+			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
+			"type_id_valid"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"taxon_id"=>$id,
+			"overview"=>$overview,
+			"media_id"=>$media_id,
+			"sort"=>$sort,
+			"limit"=>$limit,
+			"offset"=>$offset
+		));
+		
+		$data=$d['data'];
+		$count=$d['count'];
 		
 		foreach((array)$data as $key=>$val)
 		{
@@ -455,38 +345,32 @@ class NsrTaxonImagesController extends NsrController
 					', '
 				);			
 
-			$data[$key]['meta']=$this->models->Taxon->freeQuery("		
-				select
-					* 
-				from
-					%PRE%media_meta 
-				where 
-					project_id=".$this->getCurrentProjectId()."
-					and media_id = ".$val['id']."
-					and language_id=".$this->getDefaultProjectLanguage()."
-			");
-
+			$data[$key]['meta']=$this->models->MediaMeta->_get(array("id"=>
+				array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"media_id"=>$val['id'],
+					"language_id"=>$this->getDefaultProjectLanguage()
+				)
+			));
 		}
 
-		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resPicsPerPage);
+		return array('count'=>$count,'data'=>$data,'perpage'=>$this->_resPicsPerPage);
 
     }
 
     private function getTaxonMediaMetaDataFields()
     {
-		foreach((array)$this->models->Taxon->freeQuery("		
-			select
-				distinct sys_label
-			from
-				%PRE%media_meta
-			where
-				project_id=".$this->getCurrentProjectId()."
-			order by
-				sys_label
-			") as $val)
-			{
-				$d[]=$val['sys_label'];
-			}
+		$fields=$this->models->MediaMeta->_get(array(
+			"id"=>array("project_id"=>$this->getCurrentProjectId()),
+			"columns"=>"distinct sys_label",
+			"order"=>"sys_label"
+		));
+			
+		foreach((array)$fields as $val)
+		{
+			$d[]=$val['sys_label'];
+		}
+
 		return $d;
     }
 
@@ -547,14 +431,10 @@ class NsrTaxonImagesController extends NsrController
 			}
 			else
 			{
-				$this->models->MediaMeta->freeQuery("
-					update 
-					%PRE%media_meta 
-					set ".$ids[1]." = '".$val."' 
-					where 
-					id = ".$ids[0]." 
-					and project_id = ".$this->getCurrentProjectId()."
-				");
+				$this->models->MediaMeta->update(
+					array($ids[1]=>$val),
+					array("id"=>$ids[0],"project_id"=>$this->getCurrentProjectId())
+				);
 
 				$after=$this->models->MediaMeta->_get(array(
 					'id' => $ids[0],
@@ -717,8 +597,6 @@ class NsrTaxonImagesController extends NsrController
 
 	}
 
-
-
 	private function setMessage($m=null)
 	{
 		if (empty($m))
@@ -773,31 +651,10 @@ class NsrTaxonImagesController extends NsrController
 	{
 		$id=str_pad( $id, 12, '0',STR_PAD_LEFT);
 		
-		$taxa=$this->models->Taxon->freeQuery("
-			select
-				_ids.lng_id as taxon_id,
-				_a.taxon
-			from %PRE%taxa _a
-			
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-
-			left join %PRE%nsr_ids _ids
-				on _a.id =_ids.lng_id 
-				and _a.project_id = _ids.project_id
-				and _ids.item_type = 'taxon'
-
-			where
-				_a.project_id =".$this->getCurrentProjectId()."
-				and ifnull(_trash.is_deleted,0)=0
-				and (
-					nsr_id = '".$id."' or
-					nsr_id = 'concept/".$id."' or
-					nsr_id = 'tn.nlsr.concept/".$id."'
-				)
-		");
+		$taxa=$this->models->NsrTaxonImagesModel->getTaxonByNsrId(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"nsr_id"=>$id
+		));
 
 		return $taxa ? $taxa[0] : null;
 	}

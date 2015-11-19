@@ -310,7 +310,7 @@ class VersatileExportController extends Controller
 
 		if ( !empty($this->query) )
 		{
-			$this->names=$this->models->Taxon->freeQuery( $this->query );
+			$this->names=$this->models->Taxa->freeQuery( $this->query );
 		}
 
 	}
@@ -319,7 +319,7 @@ class VersatileExportController extends Controller
 	{
 		if ( !isset($this->parentRegister[$id]) )
 		{
-			$r=$this->models->Taxon->freeQuery("
+			$r=$this->models->Taxa->freeQuery("
 				select
 					_t.taxon,_t.id, _t.parent_id, _f.rank_id
 				from
