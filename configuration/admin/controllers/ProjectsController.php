@@ -595,7 +595,7 @@ class ProjectsController extends Controller
 
         if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit()) {
 
-			$this->doDeleteOrpahnedData();
+			$this->doDeleteOrphanedData();
 
             $this->addMessage('Deleted orphaned data.');
 			$this->smarty->assign('processed',true);
@@ -1076,7 +1076,7 @@ class ProjectsController extends Controller
 
     }
 
-	private function doDeleteOrpahnedData()
+	private function doDeleteOrphanedData()
 	{
 
 		$data = $this->models->Projects->freeQuery('show tables');
