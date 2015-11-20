@@ -25,7 +25,7 @@ class SpeciesControllerNSR extends SpeciesController
 	private $_resPicsPerPage=12;
 	private $_nameTypeIds;
 
-	public $usedModelsNsr = array(
+	public $usedModelsExtended = array(
 		'actors',
 		'name_types',
 		'names_additions',
@@ -34,8 +34,8 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function __construct()
     {
-        // add NSR specific models to $usedModels
-        $this->usedModels = array_merge($this->usedModels, $this->usedModelsNsr);
+        // Add specific models for this extended class to $usedModels
+        $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
 
         parent::__construct();
 		$this->initialise();
