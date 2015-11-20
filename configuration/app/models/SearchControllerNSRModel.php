@@ -90,7 +90,7 @@ final class SearchControllerNSRModel extends AbstractModel
 		";
 
 		$d=$this->freeQuery( $query );
-		return isset($d[0]) ? $d[0] : null;
+		return (isset($d[0]) && isset($d[0]['file_name']))  ? $d[0]['file_name'] : null;
 
 	}
 
