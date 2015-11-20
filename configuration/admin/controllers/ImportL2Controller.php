@@ -139,7 +139,6 @@ class ImportL2Controller extends ImportController
     }
 
 
-
     public function l2StartAction ()
     {
         if ($this->rHasVal('process', '1'))
@@ -155,35 +154,31 @@ class ImportL2Controller extends ImportController
 
             if (copy($this->requestDataFiles[0]['tmp_name'], $tmp)) {
 
-                $this->moduleSession->setModuleSetting(array(
-                    'setting' => 'file',
-                    'value' => array(
-                        'path' => $tmp,
-                        'name' => $this->requestDataFiles[0]['name'],
-                        'src' => 'upload'
-                )));
+                $_SESSION['admin']['system']['import']['file'] = array(
+                    'path' => $tmp,
+                    'name' => $this->requestDataFiles[0]['name'],
+                    'src' => 'upload'
+                );
             }
             else {
 
-                $this->moduleSession->setModuleSetting(array('setting' => 'file'));
+                unset($_SESSION['admin']['system']['import']['file']);
             }
         }
         else if ($this->rHasVal('serverFile') && !$this->rHasVal('clear', 'file')) {
 
-            if (file_exists($this->rGetVal('serverFile'))) {
+            if (file_exists($this->requestData['serverFile'])) {
 
-                $this->moduleSession->setModuleSetting(array(
-                    'setting' => 'file',
-                    'value' => array(
-                        'path' => $this->rGetVal('serverFile'),
-                        'name' => $this->rGetVal('serverFile'),
-                        'src' => 'existing')
-                ));
+                $_SESSION['admin']['system']['import']['file'] = array(
+                    'path' => $this->requestData['serverFile'],
+                    'name' => $this->requestData['serverFile'],
+                    'src' => 'existing'
+                );
             }
             else {
 
-                $this->addError('File "' . $this->rGetVal('serverFile') . '" does not exist.');
-                $this->moduleSession->setModuleSetting(array('setting' => 'file'));
+                $this->addError('File "' . $this->requestData['serverFile'] . '" does not exist.');
+                unset($_SESSION['admin']['system']['import']['file']);
             }
         }
 
@@ -191,21 +186,15 @@ class ImportL2Controller extends ImportController
 
             if ($this->rHasVal('noImages')) {
 
-                $this->moduleSession->setModuleSetting(array(
-                    'setting' => 'imagePath',
-                    'value' => false
-                ));
+                $_SESSION['admin']['system']['import']['imagePath'] = false;
             }
-            else if (file_exists($this->rGetVal('imagePath'))) {
+            else if (file_exists($this->requestData['imagePath'])) {
 
-                $this->moduleSession->setModuleSetting(array(
-                    'setting' => 'imagePath',
-                    'value' => rtrim($this->rGetVal('imagePath'), '/') . '/'
-                ));
+                $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'], '/') . '/';
 
-                if (!is_writable($this->rGetVal('imagePath'))) {
+                if (!is_writable($_SESSION['admin']['system']['import']['imagePath'])) {
 
-                    $this->addError($this->rGetVal('imagePath') . ' is not writable.<br/>
+                    $this->addError($_SESSION['admin']['system']['import']['imagePath'] . ' is not writable.<br/>
                         This is required to change the file names to lowercase.');
 
                 }
@@ -213,26 +202,43 @@ class ImportL2Controller extends ImportController
             }
             else {
 
-                $this->addError('Image path "' . $this->rGetVal('imagePath') . '" does not exist or unreachable.');
-                $this->moduleSession->setModuleSetting(array('setting' => 'imagePath'));
+                $this->addError('Image path "' . $this->requestData['imagePath'] . '" does not exist or unreachable.');
+                unset($_SESSION['admin']['system']['import']['imagePath']);
             }
         }
 
-		$this->moduleSession->setModuleSetting(array(
-            'setting' => 'thumbsPath',
-            'value' => false
-        ));
+		/*
+        if ($this->rHasVal('thumbsPath') || $this->rHasVal('noThumbs')) {
+
+            if ($this->rHasVal('noThumbs')) {
+
+                $_SESSION['admin']['system']['import']['thumbsPath'] = false;
+            }
+            else if (file_exists($this->requestData['thumbsPath'])) {
+
+                $_SESSION['admin']['system']['import']['thumbsPath'] = rtrim($this->requestData['thumbsPath'], '/') . '/';
+            }
+            else {
+
+                $this->addError('Thumbs path "' . $this->requestData['thumbsPath'] . '" does not exist or unreachable.');
+                unset($_SESSION['admin']['system']['import']['thumbsPath']);
+            }
+        }
+		*/
+
+		$_SESSION['admin']['system']['import']['thumbsPath'] = false;
 
         if ($this->rHasVal('clear', 'file')) {
 
-            $this->moduleSession->setModuleSetting(array('setting' => 'file'));
-            $this->moduleSession->setModuleSetting(array('setting' => 'raw'));
+            unset($_SESSION['admin']['system']['import']['file']);
+            unset($_SESSION['admin']['system']['import']['raw']);
         }
 
         if ($this->rHasVal('clear', 'imagePath'))
-            $this->moduleSession->setModuleSetting(array('setting' => 'imagePath'));
+            unset($_SESSION['admin']['system']['import']['imagePath']);
         if ($this->rHasVal('clear', 'thumbsPath'))
-            $this->moduleSession->setModuleSetting(array('setting' => 'thumbsPath'));
+            unset($_SESSION['admin']['system']['import']['thumbsPath']);
+
 
         if (isset($_SESSION['admin']['system']['import']))
             $this->smarty->assign('s', $_SESSION['admin']['system']['import']);
@@ -247,10 +253,9 @@ class ImportL2Controller extends ImportController
     }
 
 
-
     public function l2ProjectAction ()
     {
-        if (!is_null($this->moduleSession->getModuleSetting('imagePath'))) {
+        if (!empty($_SESSION['admin']['system']['import']['imagePath'])) {
 
             $errors = $this->lowercaseMediaFiles();
 
@@ -346,7 +351,6 @@ class ImportL2Controller extends ImportController
 
         $this->printPage();
     }
-
 
 
     public function l2SpeciesAction ()
@@ -1361,7 +1365,7 @@ class ImportL2Controller extends ImportController
     {
 
         // create the module
-        $m = $this->models->FreeModuleProject->save(array(
+        $m = $this->models->FreeModulesProjects->save(array(
             'id' => null,
             'module' => $module,
             'project_id' => $this->getNewProjectId(),
@@ -1370,7 +1374,7 @@ class ImportL2Controller extends ImportController
 
         $_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = 'Created module "' . $module . '".';
 
-        $newModuleId = $this->models->FreeModuleProject->getNewId();
+        $newModuleId = $this->models->FreeModulesProjects->getNewId();
 
         $this->grantFreeModuleAccessRights($newModuleId);
 

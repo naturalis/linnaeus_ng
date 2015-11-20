@@ -38,8 +38,8 @@ class ImportController extends Controller
         'literature_taxa',
         'matrices',
         'matrices_names',
-        'matrices_taxon',
-        'matrices_taxon_state',
+        'matrices_taxa',
+        'matrices_taxa_states',
         'media_descriptions_taxon',
         'media_taxon',
 		'nbc_extras',
@@ -48,7 +48,7 @@ class ImportController extends Controller
         'pages_taxa_titles',
         'synonyms',
         'users_taxa'
- 
+
     );
     public $usedHelpers = array(
         'file_upload_helper',
