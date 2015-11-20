@@ -121,7 +121,7 @@ class KeyController extends Controller
 				$step = $this->getKeystep($choice['res_keystep_id']);
 				$this->updateKeyPath(array('step' => $step,'choice' => $choice));
 			}
-		} 
+		}
 		else
 		if (!$this->rHasVal('start','1') && !empty($keyPath))
 		{
@@ -367,8 +367,8 @@ class KeyController extends Controller
 					)
 				)
 			);
-		} 
-		else 
+		}
+		else
 		{
 			return null;
 		}
@@ -404,7 +404,7 @@ class KeyController extends Controller
 		if (!isset($this->_tempList[$d['id']]))
 		{
 			$this->_tempList[$d['id']] = true;
-		} 
+		}
 		else
 		{
 			//$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$d['id']));
@@ -510,8 +510,8 @@ class KeyController extends Controller
 					'order' => 'show_order'
 				)
 			);
-		} 
-		else 
+		}
+		else
 		{
 			// get single choice
 			$choices =  $this->models->ChoicesKeysteps->_get(
@@ -579,8 +579,8 @@ class KeyController extends Controller
 						$choices[$key]['is_hybrid'] = $t['is_hybrid'];
 					}
 				}
-			} 
-			else 
+			}
+			else
 			{
 				$choices[$key]['target'] = null;
 			}
@@ -644,7 +644,7 @@ class KeyController extends Controller
 					if ($val['id']==$step['id']) break;
 					if (!empty($val['id'])) $d[] = $val;
 				}
-			} 
+			}
 			else
 			{
 				// user clicked a choice, existing path remains as it is
@@ -882,7 +882,7 @@ class KeyController extends Controller
 	}
 
 
-\
+
     private function showOrderToMarker ($showOrder)
     {
         return ;
