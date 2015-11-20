@@ -193,7 +193,6 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
 		$this->smarty->assign('suppressDnaBarcodes',$this->_suppressTab_DNA_BARCODES);
 		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
-	
 		
         $this->printPage($template);
     }
@@ -370,10 +369,7 @@ class SearchControllerNSR extends SearchController
 			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
 		}
 
-		if ($d) 
-		{
-			$ancestor=$d[0];
-		}
+		$ancestor=$d ? $d[0] : null;
 
 		$images_on=(!empty($p['images_on']) && $p['images_on']=='on' ? true : null);
 		$images_off=(!empty($p['images_off']) && $p['images_off']=='on' ? true : null);
@@ -391,9 +387,9 @@ class SearchControllerNSR extends SearchController
 		$dna_insuff=!empty($p['dna_insuff']);
 		$traits=isset($p['traits']) ? $p['traits'] : null;
 		$trait_group=isset($p['trait_group']) ? $p['trait_group'] : null;
+		$auth=!empty($p['author']) ? $p['author'] : null;
 
-		if (!empty($p['author'])) $auth=$p['author'];
-
+		$pres=null;
 		if (!empty($p['presence']))
 		{
 			$pres=array();
@@ -405,6 +401,7 @@ class SearchControllerNSR extends SearchController
 
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
+		$sort=!empty($p['sort']) ? $p['sort'] : null;
 
 		$d=$this->models->SearchControllerNSRModel->doExtendedSearch(array(
 			"images"=>$images,
@@ -428,7 +425,7 @@ class SearchControllerNSR extends SearchController
 			"project_id"=>$this->getCurrentProjectId(),
 			"ancestor_id"=>$ancestor['id'],
 			"presence"=>$pres,
-			"sort"=>$p['sort'],
+			"sort"=>$sort,
 			"limit"=>$limit,
 			"offset"=>$offset,
 			"operators"=>$this->_operators
