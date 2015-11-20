@@ -59,10 +59,10 @@ final class SearchControllerNSRModel extends AbstractModel
 				_a.project_id=" . $project_id . "
 				and _b.index_label is not null
 			order by 
-				_b.index_label',
+				_b.index_label
 		";
 			
-		return $this->freeQuery( array( "query"=>$query, "fieldAsIndex"=>$id) );
+		return $this->freeQuery( array( "query"=>$query, "fieldAsIndex"=>"id") );
 		
 	}
 
