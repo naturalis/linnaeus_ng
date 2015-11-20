@@ -162,15 +162,15 @@ class HotwordController extends Controller
 
 		if ($this->rHasVal('c')) {
 
-			$id['controller'] = $this->requestData['c'];
+			$id['controller'] = $this->rGetVal('c');
 
-			$this->smarty->assign('controller',$this->requestData['c']);
+			$this->smarty->assign('controller',$this->rGetVal('c'));
 
 		}
 
 		if ($this->rHasVal('id') && $this->rHasVal('action','delete')) {
 
-			$this->models->Hotwords->delete(array_merge($id,array('id' => $this->requestData['id'])));
+			$this->models->Hotwords->delete(array_merge($id,array('id' => $this->rGetId())));
 
 
 		} else
