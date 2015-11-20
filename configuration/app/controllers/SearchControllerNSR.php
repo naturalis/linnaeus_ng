@@ -325,6 +325,7 @@ class SearchControllerNSR extends SearchController
 		$search=!empty($p['search']) ? $p['search'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
+		$sort=!empty($p['sort']) ? $p['sort'] : null;
 
 		$search=trim($search);
 		
@@ -337,7 +338,7 @@ class SearchControllerNSR extends SearchController
 			"language_id"=>$this->getCurrentLanguageId(),
 			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 			"project_id"=>$this->getCurrentProjectId(),
-			"sort"=>$p['sort'],
+			"sort"=>$sort,
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
@@ -350,7 +351,7 @@ class SearchControllerNSR extends SearchController
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
-		return array('count'=>$count[0]['total'],'data'=>$data,'perpage'=>$this->_resSpeciesPerPage);
+		return array('count'=>$count,'data'=>$data,'perpage'=>$this->_resSpeciesPerPage);
 
 	}
 
