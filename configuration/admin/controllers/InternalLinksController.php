@@ -1,7 +1,6 @@
 <?php
 
-include_once ('Controller.php');
-include_once ('KeyController.php');
+include_once 'Controller.php';
 
 class InternalLinksController extends Controller
 {
@@ -35,6 +34,10 @@ class InternalLinksController extends Controller
     {
 
         parent::__construct();
+
+        // "Manually" load KeyModel
+        include_once dirname(__FILE__) . '/../models/KeyModel.php';
+        $this->models->KeyModel = new KeyModel;
 
     }
 
@@ -399,9 +402,7 @@ class InternalLinksController extends Controller
 	private function intLinkGetKeySteps()
 	{
 
-		$this->models->keyController = new KeyController();
-
-	    $l = $this->models->keyController->getInternalLinksKeysteps(array(
+	    $l = $this->models->KeyModel->getInternalLinksKeysteps(array(
             'projectId' => $this->getCurrentProjectId(),
 	        'languageId' => $this->getDefaultProjectLanguage()
 	    ));
