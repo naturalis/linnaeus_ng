@@ -43,7 +43,7 @@ class InterfaceController extends Controller
 	public function indexAction ()
     {
         $this->setPageName($this->translate('Interface translations'));
-        
+
         $this->printList();
     }
 
@@ -53,9 +53,9 @@ class InterfaceController extends Controller
     {
 
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Interface translations'));
-        
+
         $this->printList(true);
     }
 
@@ -65,48 +65,48 @@ class InterfaceController extends Controller
     {
 
         if ($this->rHasVal('action', 'delete') && $this->rHasVal('id')) {
-            
-            $this->models->InterfaceTranslation->delete(array(
-                'interface_text_id' => $this->requestData['id']
+
+            $this->models->InterfaceTranslations->delete(array(
+                'interface_text_id' => $this->rGetId()
             ));
-            
-            $this->models->InterfaceText->delete(array(
-                'id' => $this->requestData['id']
+
+            $this->models->InterfaceTexts->delete(array(
+                'id' => $this->rGetId()
             ));
         }
-        
 
-        $env = $this->rhasVal('env') ? $this->requestData['env'] : $this->getAppname();
-        $lan = $this->rhasVal('lan') ? $this->requestData['lan'] : $this->_idDutch;
-        
+
+        $env = $this->rhasVal('env') ? $this->rGetVal('env') : $this->getAppname();
+        $lan = $this->rhasVal('lan') ? $this->rGetVal('lan') : $this->_idDutch;
+
         $texts = $this->getAllTexts(array(
-            'lan' => $lan, 
-            'env' => $env, 
+            'lan' => $lan,
+            'env' => $env,
             'untranslatedOnly' => $untranslatedOnly
         ));
-        
+
         $pagination = $this->getPagination($texts,2500);
 
         $this->smarty->assign('prevStart', $pagination['prevStart']);
         $this->smarty->assign('currStart', $pagination['currStart']);
         $this->smarty->assign('nextStart', $pagination['nextStart']);
         $this->smarty->assign('texts', $pagination['items']);
-        
+
         $this->smarty->assign('env', $env);
         $this->smarty->assign('lan', $lan);
-        
+
         $this->smarty->assign('isOriginalLanguage', $lan == $this->_idEnglish);
-        
+
         $this->smarty->assign('envs', array(
-            $this->getAppName(), 
+            $this->getAppName(),
             $this->generalSettings['appNameFrontEnd']
         ));
-        
+
         if ($this->rHasVal('immediateEdit', '1'))
             $this->smarty->assign('immediateEdit', true);
-            
-            //        
-        
+
+            //
+
 
 
         $this->printPage('index');
@@ -119,52 +119,52 @@ class InterfaceController extends Controller
         $env = isset($p['env']) ? $p['env'] : null;
         $lan = isset($p['lan']) ? $p['lan'] : null;
         $untranslatedOnly = isset($p['untranslatedOnly']) ? $p['untranslatedOnly'] : null;
-        
+
         $d = array(
             'project_id' => $this->getCurrentProjectId()
         );
-        
+
         if (in_array($env, array(
-            'app', 
+            'app',
             'admin'
         )))
             $d['env'] = $env;
-        
-        $i = $this->models->InterfaceText->_get(array(
-            'id' => $d, 
-            'columns' => 'id,text,env', 
+
+        $i = $this->models->InterfaceTexts->_get(array(
+            'id' => $d,
+            'columns' => 'id,text,env',
             'order' => 'lower(text)'
         ));
-        
+
         if ($untranslatedOnly)
             $d = array();
-        
+
         if (!is_null($lan)) {
-            
+
             foreach ((array) $i as $key => $val) {
-                
-                $it = $this->models->InterfaceTranslation->_get(
+
+                $it = $this->models->InterfaceTranslations->_get(
                 array(
                     'id' => array(
-                        'interface_text_id' => $val['id'], 
+                        'interface_text_id' => $val['id'],
                         'language_id' => $lan
-                    ), 
+                    ),
                     'columns' => 'translation'
                 ));
-                
+
                 $i[$key]['translation'] = empty($it[0]) ? null : $it[0]['translation'];
                 $i[$key]['translation_language_id'] = $lan;
-                
+
                 if ($untranslatedOnly) {
                     if (empty($i[$key]['translation']))
                         $d[] = $i[$key];
                 }
             }
         }
-        
+
         if ($untranslatedOnly)
             $i = $d;
-        
+
         return $i;
     }
 
@@ -174,12 +174,12 @@ class InterfaceController extends Controller
     {
         if (!$this->rHasVal('action'))
             return;
-        
-        if ($this->requestData['action'] == 'save_translation') {
-            
+
+        if ($this->rGetVal('action') == 'save_translation') {
+
             $this->saveTranslation();
         }
-        
+
         $this->printPage();
     }
 
@@ -187,29 +187,30 @@ class InterfaceController extends Controller
 
     private function saveTranslation ()
     {
-        $id = empty($this->requestData['param']['id']) ? null : $this->requestData['param']['id'];
-        $lan = empty($this->requestData['param']['lan']) ? null : $this->requestData['param']['lan'];
-        $newVal = empty($this->requestData['param']['newVal']) ? null : $this->requestData['param']['newVal'];
-        
+        $p = $this->rGetVal('param');
+        $id = empty($p['id']) ? null : $p['id'];
+        $lan = empty($p['lan']) ? null : $p['lan'];
+        $newVal = empty($p['newVal']) ? null : $p['newVal'];
+
         if (is_null($id) || is_null($lan)) {
             $this->smarty->assign('returnText', 'not saved<br/>(' . (is_null($id) ? 'no id' : 'no lang. id') . ')');
             return;
         }
-        
-        $this->models->InterfaceTranslation->delete(array(
-            'interface_text_id' => $id, 
+
+        $this->models->InterfaceTranslations->delete(array(
+            'interface_text_id' => $id,
             'language_id' => $lan
         ));
-        
+
         if (!is_null($newVal)) {
-            
-            $this->models->InterfaceTranslation->save(array(
-                'interface_text_id' => $id, 
-                'language_id' => $lan, 
+
+            $this->models->InterfaceTranslations->save(array(
+                'interface_text_id' => $id,
+                'language_id' => $lan,
                 'translation' => $newVal
             ));
         }
-        
+
         $this->smarty->assign('returnText', 'saved');
     }
 }
