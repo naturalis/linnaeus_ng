@@ -9,13 +9,13 @@ class Paginator
 
 	public function setItemsPerPage( $int )
 	{
-		if ( is_int($int) && $int > 0 ) $this->_itemsPerPage=$int;
+		if ( is_numeric($int) && $int > 0 ) $this->_itemsPerPage=$int;
 	}
 
 	public function setStart( $start )
 	{
-		// determines first item to show
-		if ( is_int($start) && $start > 0 ) $this->_start=$start;
+	    // determines first item to show
+		if ( is_numeric($start) && $start > 0 ) $this->_start=$start;
 	}
 
 	public function setItems( $items )
@@ -25,7 +25,7 @@ class Paginator
 
 	public function paginate( )
 	{
-        if ( empty($this->_items) ) return;
+	    if ( empty($this->_items) ) return;
 
         //determine index of the first item to show on the previous page (if any)
         $prevStart = $this->_start==0 ? -1 : (($this->_start - $this->_itemsPerPage < 1) ? 0 : ($this->_start - $this->_itemsPerPage));
@@ -43,7 +43,7 @@ class Paginator
 				'currStart' => $this->_start,
 				'nextStart' => $nextStart
 			);
-	
+
 	}
 
 	public function getItems( )
@@ -51,5 +51,5 @@ class Paginator
 		return $this->_result;
 	}
 
-	
+
 }
