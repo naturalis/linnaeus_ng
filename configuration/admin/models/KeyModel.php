@@ -37,10 +37,10 @@ class KeyModel extends AbstractModel
 
 		$query="
 			select
-				_a.id, 
-				_a.number, 
+				_a.id,
+				_a.number,
 				_b.res_keystep_id,
-				_c.title, 
+				_c.title,
 				_c.content
 
 			from %PRE%keysteps _a
@@ -61,7 +61,7 @@ class KeyModel extends AbstractModel
 			order by
 				_c.title
 		";
-		
+
 		return $this->freeQuery($query);
 	}
 
@@ -115,7 +115,7 @@ class KeyModel extends AbstractModel
 				_a.*,
 				_b.title,
 				_b.content
-				
+
 			from %PRE%keysteps _a
 
 			left join %PRE%content_keysteps _b
@@ -123,13 +123,13 @@ class KeyModel extends AbstractModel
 				and _a.id=_b.keystep_id
 				and _b.language_id = " . $language_id . "
 
-			where 
-				_a.project_id = " . $project_id . " 
+			where
+				_a.project_id = " . $project_id . "
 				".( !empty($id) ? "and _a.id = ".$id : "" )."
 				".( !empty($exclude) ? "and _a.id != ".$exclude : "" )."
 				".( !empty($is_start) ? "and _a.is_start = 1" : "" )."
 			order by
-				_a.".$order."		
+				_a.".$order."
 		");
 
     }
@@ -144,23 +144,23 @@ class KeyModel extends AbstractModel
 
         return $this->freeQuery("
 			select
-				_a.id, 
-				_a.taxon, 
-				_a.rank_id, 
-				_b.res_taxon_id, 
-				_d.rank, 
-				_c.lower_taxon, 
+				_a.id,
+				_a.taxon,
+				_a.rank_id,
+				_b.res_taxon_id,
+				_d.rank,
+				_c.lower_taxon,
 				_c.keypath_endpoint
 
 			from %PRE%taxa _a
 
 			left join %PRE%choices_keysteps _b
 				on _a.id = _b.res_taxon_id
-				and _a.project_id = _b.project_id 
+				and _a.project_id = _b.project_id
 
 			left join %PRE%projects_ranks _c
 				on _a.rank_id = _c.id
-				and _a.project_id = _c.project_id 
+				and _a.project_id = _c.project_id
 
 			left join %PRE%ranks _d
 				on _c.rank_id = _d.id
@@ -168,7 +168,7 @@ class KeyModel extends AbstractModel
 			where _a.project_id = " . $project_id . "
 
 			order by ".($order=='rank' ? '_c.rank_id,_a.taxon' : '_a.taxon')
-		);	
+		);
 
 		return $taxa;
 
@@ -182,20 +182,20 @@ class KeyModel extends AbstractModel
 			return;
 
         $d=$this->freeQuery("
-			select 
-				count(_b.id) as total 
+			select
+				count(_b.id) as total
 			from
 				%PRE%projects_ranks _a
 			left join %PRE%taxa _b
-				on _a.project_id = _b.project_id 
-				and _a.id =  _b.rank_id 
-			where 
+				on _a.project_id = _b.project_id
+				and _a.id =  _b.rank_id
+			where
 				_a.project_id = " . $project_id . "
 				and _a.keypath_endpoint = 1
 		");
-		
+
 		return $d[0]['total'];
-    }	
+    }
 
     public function getAllKeyConnectedTaxa( $params )
 	{
@@ -206,9 +206,9 @@ class KeyModel extends AbstractModel
 
 		return $this->freeQuery(array(
 			"query" => "
-				select 
+				select
 					_a.id,
-					_a.taxon 
+					_a.taxon
 				from
 					%PRE%taxa _a
 				right join %PRE%choices_keysteps _b
@@ -219,7 +219,7 @@ class KeyModel extends AbstractModel
 			"fieldAsIndex" => "id"
 		));
 	}
-	
+
     public function getKeystepChoices( $params )
     {
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
@@ -237,18 +237,18 @@ class KeyModel extends AbstractModel
 				_b.res_taxon_id
 			from
 				%PRE%choices_keysteps _b
-			
+
 			left join %PRE%keysteps _a
 
 				on _a.project_id=_b.project_id
 				and _a.id=_b.keystep_id
-			
-			where 
-				_a.project_id = " . $project_id . " 
-			" . ( $is_start ? "and _a.is_start = 1" : "" ) . " 
-			" . ( !is_null($keystep_id) ? "and _b.keystep_id = " . $keystep_id : "" ) . " 
+
+			where
+				_a.project_id = " . $project_id . "
+			" . ( $is_start ? "and _a.is_start = 1" : "" ) . "
+			" . ( !is_null($keystep_id) ? "and _b.keystep_id = " . $keystep_id : "" ) . "
 		");
-		
+
 	}
 
     public function getSteplessChoices( $params )
@@ -258,7 +258,7 @@ class KeyModel extends AbstractModel
 		if ( is_null($project_id) )
 			return;
 
-        return $this->freeQuery("        
+        return $this->freeQuery("
 			select _a.*
 			from %PRE%choices_keysteps _a
 			left join %PRE%keysteps _b
@@ -276,7 +276,7 @@ class KeyModel extends AbstractModel
 		if ( is_null($project_id) )
 			return;
 
-        return $this->freeQuery("        
+        return $this->freeQuery("
 			select _a.*,_b.choice_txt
 			from %PRE%choices_keysteps _a
 			left join %PRE%choices_content_keysteps _b
@@ -285,7 +285,7 @@ class KeyModel extends AbstractModel
 			where _a.project_id = " . $project_id . "
 				and _a.choice_img is null
 				and _a.res_keystep_id is null
-				and _a.res_taxon_id is null			
+				and _a.res_taxon_id is null
 				and _b.choice_txt is null
 			and _b.id is null
 		");
@@ -298,7 +298,7 @@ class KeyModel extends AbstractModel
 		if ( is_null($project_id) )
 			return;
 
-        return $this->freeQuery("        
+        return $this->freeQuery("
 			select _a.*
 			from %PRE%choices_keysteps _a
 			left join %PRE%keysteps _b
@@ -316,7 +316,7 @@ class KeyModel extends AbstractModel
 		if ( is_null($project_id) )
 			return;
 
-        return $this->freeQuery("        
+        return $this->freeQuery("
 			select _a.*
 			from %PRE%choices_keysteps _a
 			left join %PRE%taxa _b
@@ -327,7 +327,7 @@ class KeyModel extends AbstractModel
 		");
 	}
 
-    public function getDeadEndChoicesKeysteps( $params )
+    public function getDeadEndChoicesKeysteps ($params )
     {
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
@@ -337,11 +337,11 @@ class KeyModel extends AbstractModel
 
         return $this->freeQuery("
 			SELECT
-				_a.*, 
-				_b.title, 
-				_c.number, 
+				_a.*,
+				_b.title,
+				_c.number,
 				_d.choice_txt
-				
+
 			from %PRE%choices_keysteps _a
 
 			left join %PRE%content_keysteps _b
@@ -352,19 +352,44 @@ class KeyModel extends AbstractModel
 			left join %PRE%keysteps _c
 				on _c.id = _a.keystep_id
 				and _a.project_id = _c.project_id
-				
+
 			left join %PRE%choices_content_keysteps _d
 				on _a.id = _d.choice_id
 				and _a.project_id = _d.project_id
-				
-			where _a.project_id = " . $project_id ."
-				and (_a.res_keystep_id = -1 or _a.res_keystep_id is null) and _a.res_taxon_id is null 
-				
-			order by 
-				_a.keystep_id, _a.id
-			");	
 
-		return $taxa;
+			where _a.project_id = " . $project_id ."
+				and (_a.res_keystep_id = -1 or _a.res_keystep_id is null) and _a.res_taxon_id is null
+
+			order by
+				_a.keystep_id, _a.id
+			");
+
+    }
+
+    public function getInternalLinksKeysteps ($params)
+    {
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+
+		if (is_null($projectId) || is_null($languageId))
+			return;
+
+		return $this->models->Projects->freeQuery("
+			SELECT _a.*, _b.title, _c.number, _d.choice_txt
+				from %PRE%choices_keysteps _a
+				left join %PRE%content_keysteps _b
+					on _b.keystep_id = _a.keystep_id
+					and _b.language_id = ".$languageId."
+					and _a.project_id = _b.project_id
+				left join %PRE%keysteps _c
+					on _c.id = _a.keystep_id
+					and _a.project_id = _c.project_id
+				left join %PRE%choices_content_keysteps _d
+					on _a.id = _d.choice_id
+					and _a.project_id = _d.project_id
+				where _a.project_id = " . $projectId ."
+				order by _a.keystep_id, title
+			");
 
     }
 

@@ -1,27 +1,28 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('KeyController.php');
 
 class InternalLinksController extends Controller
 {
-    
+
 	private $_lowerSpecies;
-	
+
     public $usedModels = array(
 		'content',
 		'glossary',
 		'literature',
-		'project_rank',
-		'page_taxon',
-		'page_taxon_title',
-		'matrix',
-		'matrix_name',
-		'free_module_project',
-		'content_free_module',
-		'occurrence_taxon',
+		'projects_ranks',
+		'pages_taxa',
+		'pages_taxa_titles',
+		'matrices',
+		'matrices_names',
+		'free_modules_projects',
+		'content_free_modules',
+		'occurrences_taxa',
 		'content_introduction'
     );
-    
+
     public $controllerPublicName = 'Internal Links';
 
 
@@ -32,9 +33,9 @@ class InternalLinksController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
-        
+
     }
 
 
@@ -45,16 +46,16 @@ class InternalLinksController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
-    
+
     }
 
 	public function intLinksAction()
 	{
 
 		if ($this->rHasVal('language'))
-			$this->smarty->assign('language',$this->requestData['language']);
+			$this->smarty->assign('language',$this->rGetVal('language'));
 		else
 			$this->smarty->assign('language',$this->getDefaultProjectLanguage());
 
@@ -66,7 +67,7 @@ class InternalLinksController extends Controller
 
  	private function intLinkGetGlossaryTerms()
 	{
-	
+
 		$l = $this->models->Glossary->_get(
 				array(
 					'id' => array(
@@ -76,13 +77,13 @@ class InternalLinksController extends Controller
 					'order' => 'language_id,term',
 					)
 				);
-	
+
 		foreach((array)$l as $key => $val) {
 
 			$r[$val['language_id']][] = array('id' => $val['id'],'label' => htmlspecialchars($val['term'],ENT_QUOTES));
 
 		}
-		
+
 		return isset($r) ? $r : null;
 
 	}
@@ -105,21 +106,21 @@ class InternalLinksController extends Controller
 			$r[$val['language_id']][] = array('id' => $val['letter'],'label' => $val['letter']);
 
 		}
-		
+
 		return isset($r) ? $r : null;
 
 	}
-	
+
  	private function intLinkGetLiteratureReferences()
 	{
-	
+
 		$l = $this->models->Literature->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId()
 					),
 					'order' => 'label',
-					'columns' => 'id, 
+					'columns' => 'id,
 					 				concat(
 									author_first,
 									(
@@ -161,7 +162,7 @@ class InternalLinksController extends Controller
 	private function intLinkGetSpecies($higher=false)
 	{
 
-		$pr = $this->models->ProjectRank->_get(
+		$pr = $this->models->ProjectsRanks->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId()
@@ -171,7 +172,7 @@ class InternalLinksController extends Controller
 				)
 			);
 
-		$l = $this->models->Taxon->_get(
+		$l = $this->models->Taxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId()
@@ -190,7 +191,7 @@ class InternalLinksController extends Controller
 					'id'=> $val['id'],
 					'label' => htmlspecialchars($val['taxon'],ENT_QUOTES).($val['is_hybrid']==1 ? ' &#215;' : '')
 				);
-		
+
 		}
 
 		if (!$higher) $this->_lowerSpecies = $d;
@@ -202,7 +203,7 @@ class InternalLinksController extends Controller
 	private function intLinkGetSpeciesCategories()
 	{
 
-		$tp = $this->models->PageTaxon->_get(
+		$tp = $this->models->PagesTaxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId()
@@ -213,39 +214,39 @@ class InternalLinksController extends Controller
 		);
 
 		foreach ((array) $tp as $key => $val) {
-	
-			$tpt = $this->models->PageTaxonTitle->_get(
+
+			$tpt = $this->models->PagesTaxaTitles->_get(
 				array(
 					'id'=>array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'page_id' => $val['id']
 					),
 					'columns'=>'language_id,title'
 				)
 			);
-			
+
 			foreach((array)$tpt as $tKey => $tVal) {
 
 				$l[$tVal['language_id']][] = array('id' => $val['id'],'label' => $tVal['title']);
 				$d[$tVal['language_id']] = $tVal['language_id'];
 
 			}
-		
+
 		}
-		
+
 		if (isset($d)) {
 
 			foreach((array)$d as $key => $val) {
-	
+
 				$l[$val][] = array('id' => 'media','label' => 'Media','untranslated' => 1);
 				$l[$val][] = array('id' => 'classification','label' => 'Classification','untranslated' => 1);
 				$l[$val][] = array('id' => 'literature','label' => 'Literature','untranslated' => 1);
 				$l[$val][] = array('id' => 'names','label' => 'Synonyms','untranslated' => 1);
-			
+
 			}
-			
+
 		}
-		
+
 		return isset($l) ? $l : null;
 
 	}
@@ -257,7 +258,7 @@ class InternalLinksController extends Controller
 
 		foreach((array)$this->_lowerSpecies as $key => $val) {
 
-			$ot = $this->models->OccurrenceTaxon->_get(
+			$ot = $this->models->OccurrencesTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -273,7 +274,7 @@ class InternalLinksController extends Controller
 					'id'=> $val['id'],
 					'label' => $val['label']
 				);
-		
+
 			}
 
 		}
@@ -285,7 +286,7 @@ class InternalLinksController extends Controller
 	private function intLinkGetMatricexCount()
 	{
 
-		$m = $this->models->Matrix->_get(
+		$m = $this->models->Matrices->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -294,15 +295,15 @@ class InternalLinksController extends Controller
 				'columns' => 'count(*) as total'
 			)
 		);
-		
+
 		return $m[0]['total'];
 
 	}
 
  	private function intLinkGetMatrices()
 	{
-	
-		$m = $this->models->Matrix->_get(
+
+		$m = $this->models->Matrices->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -310,10 +311,10 @@ class InternalLinksController extends Controller
 				)
 			)
 		);
-		
+
 		foreach((array)$m as $key => $val) {
 
-			$mn = $this->models->MatrixName->_get(
+			$mn = $this->models->MatricesNames->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -352,15 +353,15 @@ class InternalLinksController extends Controller
 			$l[$val['language_id']][] = array('id' => $val['id'],'label' => $val['subject']);
 
 		}
-	
+
 		return isset($l) ? $l : null;
-	
+
 	}
 
 	private function intLinkGetFreeModules()
 	{
 
-		return $this->models->FreeModuleProject->_get(
+		return $this->models->FreeModulesProjects->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -368,16 +369,16 @@ class InternalLinksController extends Controller
 				'columns' => 'id,module as label'
 			)
 		);
-	
+
 	}
 
 	private function intLinkGetFreeModuleTopics($id)
 	{
-	
-		$cfm = $this->models->ContentFreeModule->_get(
+
+		$cfm = $this->models->ContentFreeModules->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'module_id' => $id,
 				),
 				'columns' => 'language_id,page_id, topic',
@@ -392,28 +393,18 @@ class InternalLinksController extends Controller
 		}
 
 		return isset($l) ? $l : null;
-	
+
 	}
 
 	private function intLinkGetKeySteps()
 	{
-		
-		$l = $this->models->Project->freeQuery("
-			SELECT _a.*, _b.title, _c.number, _d.choice_txt
-				from %PRE%choices_keysteps _a
-				left join %PRE%content_keysteps _b
-					on _b.keystep_id = _a.keystep_id
-					and _b.language_id = ".$this->getDefaultProjectLanguage()."
-					and _a.project_id = _b.project_id
-				left join %PRE%keysteps _c
-					on _c.id = _a.keystep_id
-					and _a.project_id = _c.project_id
-				left join %PRE%choices_content_keysteps _d
-					on _a.id = _d.choice_id
-					and _a.project_id = _d.project_id
-				where _a.project_id = " . $this->getCurrentProjectId() ."
-				order by _a.keystep_id, title
-			");
+
+		$this->models->keyController = new KeyController();
+
+	    $l = $this->models->keyController->getInternalLinksKeysteps(array(
+            'projectId' => $this->getCurrentProjectId(),
+	        'languageId' => $this->getDefaultProjectLanguage()
+	    ));
 
 		$d=array();
 		foreach((array)$l as $key => $val) {
@@ -422,22 +413,22 @@ class InternalLinksController extends Controller
 
 				$d[$val['keystep_id']] = array(
 					'id'=> $val['keystep_id'],
-					'label' => 
+					'label' =>
 						htmlspecialchars($val['title'].'. '.substr(strip_tags($val['choice_txt']),0,25),ENT_QUOTES).'...'
 				);
-				
+
 			} else {
 
 				$d[$val['keystep_id']]['label'] .= ' / '.htmlspecialchars(substr(strip_tags($val['choice_txt']),0,25),ENT_QUOTES).'...';
 
 			}
-		
+
 		}
-		
+
 		unset($l);
 
 		foreach((array)$d as $val) $l[] = $val;
-				
+
 
 		return isset($l) ? $l : null;
 
@@ -460,23 +451,23 @@ class InternalLinksController extends Controller
 			$l[$val['language_id']][] = array('id' => $val['id'],'label' => $val['topic']);
 
 		}
-	
+
 		return isset($l) ? $l : null;
-	
+
 	}
 
 
 	private function makeInternalLinksStructure()
 	{
 
-		$modules = $this->models->ModuleProject->_get(array(
+		$modules = $this->models->ModulesProjects->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId()
 			),
 			'columns' => 'module_id',
 			'fieldAsIndex' => 'module_id'
 		));
-		
+
 
 		$i = array();
 
@@ -514,9 +505,9 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-			
+
 		}
-			
+
 
 		if (isset($modules[MODCODE_HIGHERTAXA]))
 		{
@@ -527,7 +518,7 @@ class InternalLinksController extends Controller
 					'controller' => 'highertaxa',
 				)
 			);
-	
+
 			$d=$this->intLinkGetSpecies(true);
 			if (count($d)>0)
 				array_push($i,
@@ -558,7 +549,7 @@ class InternalLinksController extends Controller
 
 		if (isset($modules[MODCODE_INTRODUCTION]))
 		{
-			
+
 			$d=$this->intLinkGetIntroduction();
 			if (count($d)>0)
 				array_push($i,
@@ -576,7 +567,7 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-			
+
 		}
 
 
@@ -600,7 +591,7 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-	
+
 			$d=$this->intLinkGetGlossaryTerms();
 			if (count($d)>0)
 				array_push($i,
@@ -619,7 +610,7 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-				
+
 		}
 
 
@@ -632,7 +623,7 @@ class InternalLinksController extends Controller
 					'controller' => 'literature',
 				)
 			);
-	
+
 			$d=$this->intLinkGetLiteratureAlpha();
 			if (count($d)>0)
 				array_push($i,
@@ -651,7 +642,7 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-	
+
 			$d=$this->intLinkGetLiteratureReferences();
 			if (count($d)>0)
 				array_push($i,
@@ -671,7 +662,7 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-			
+
 		}
 
 
@@ -697,7 +688,7 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-			
+
 		}
 
 
@@ -710,7 +701,7 @@ class InternalLinksController extends Controller
 					'controller' => 'mapkey',
 				)
 			);
-	
+
 			$d=$this->intLinkGetMapSpecies(true);
 			if (count($d)>0)
 				array_push($i,
@@ -730,17 +721,17 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-			
+
 		}
 
 
 		if (isset($modules[MODCODE_MATRIXKEY]))
 		{
-			
+
 			$mc = $this->intLinkGetMatricexCount();
-		
+
 			if ($mc>1) {
-	
+
 				array_push($i,
 					array(
 						'label' => $this->translate('Matrix key index'),
@@ -748,7 +739,7 @@ class InternalLinksController extends Controller
 						'url' => 'matrices.php'
 					)
 				);
-	
+
 
 				array_push($i,
 					array(
@@ -776,10 +767,10 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-	
+
 			} else
 			if ($mc==1) {
-	
+
 				array_push($i,
 					array(
 						'label' => $this->translate('Matrix key'),
@@ -801,14 +792,14 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-	
+
 			}
-			
+
 		}
 
 
 		$mods = $this->intLinkGetFreeModules();
-		
+
 		foreach((array)$mods as $key => $val) {
 
 			array_push($i,
@@ -842,7 +833,7 @@ class InternalLinksController extends Controller
 
 		if (isset($modules[MODCODE_CONTENT]))
 		{
-			
+
 			$d=$this->intLinkGetContent();
 			if (count($d)>0)
 				array_push($i,
@@ -860,12 +851,12 @@ class InternalLinksController extends Controller
 						)
 					)
 				);
-			
+
 		}
 
 		return $i;
 
 	}
-	
-	
+
+
 }
