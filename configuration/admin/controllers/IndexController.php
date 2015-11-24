@@ -150,7 +150,7 @@ class IndexController extends Controller
 
         $this->setPageName($this->translate('Index: comon names'));
 
-		$languages = $this->models->Language->_get(array('id' => '*','fieldAsIndex' => 'id'));
+		$languages = $this->models->Languages->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
 		$names = $this->getCommonnameLookupList();
 
@@ -161,7 +161,7 @@ class IndexController extends Controller
 
 			if ($this->rHasVal('activeLanguage')) {
 
-				if ($this->requestData['activeLanguage']==$val['language_id'] || $this->requestData['activeLanguage']=='*') {
+				if ($this->rGetVal('activeLanguage')==$val['language_id'] || $this->rGetVal('activeLanguage')=='*') {
 
 					$n[$key] = $val;
 					$n[$key]['language'] = $languages[$val['language_id']]['language'];
@@ -184,7 +184,7 @@ class IndexController extends Controller
 
 		if ($this->rHasVal('activeLanguage')) {
 
-			$activeLanguage = $this->requestData['activeLanguage'];
+			$activeLanguage = $this->rGetVal('activeLanguage');
 
 		} else {
 
@@ -203,7 +203,7 @@ class IndexController extends Controller
 			}
 		}
 
-		$d =  $this->makeAlphabetFromArray($n,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+		$d =  $this->makeAlphabetFromArray($n,'label',($this->rHasVal('letter') ? $this->rGetVal('letter') : null));
 
 		$pagination = $this->getPagination($d['names']);
 
@@ -213,7 +213,7 @@ class IndexController extends Controller
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
-		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : (isset($d['alpha'][0]) ? $d['alpha'][0] : null));
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->rGetVal('letter') : (isset($d['alpha'][0]) ? $d['alpha'][0] : null));
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
@@ -237,9 +237,9 @@ class IndexController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->rGetVal('search'));
 
         }
 
@@ -303,7 +303,7 @@ class IndexController extends Controller
 			)
 		);
 
-		$l2 = $this->models->GlossarySynonym->_get(
+		$l2 = $this->models->GlossarySynonyms->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -324,64 +324,20 @@ class IndexController extends Controller
 	private function getLiteratureLookupList($search)
 	{
 
-		if (empty($search)) return;
-
-		$l = $this->models->Literature->_get(
-			array('id' =>
-				'select
-					id,
-					concat(
-						author_first,
-						(
-							if(multiple_authors=1,
-								\' et al.\',
-								if(author_second!=\'\',concat(\' & \',author_second),\'\')
-							)
-						),
-						\' (\',
-						year(`year`),
-						(
-							if(isnull(suffix)!=1,
-									suffix,
-									\'\'
-								)
-						),
-						\')\'
-					) as label,
-					lower(author_first) as _a1,
-					lower(author_second) as _a2,
-					`year`,
-					"literature" as source,
-					concat("views/literature/edit.php?id=",id) as url
-				from %table%
-				where
-					(author_first like "%'.mysql_real_escape_string($search).'%" or
-					author_second like "%'.mysql_real_escape_string($search).'%" or
-					`year` like "%'.mysql_real_escape_string($search).'%")
-					and project_id = '.$this->getCurrentProjectId().'
-				order by _a1,_a2,`year`'
-			)
-		);
-
-		return $l;
+		return $this->models->IndexController->getLiteratureLookupList(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'search' => $search,
+		    'path' => "views/literature/edit.php?id="
+		));
 
 	}
 
 	private function makeRegExpCompatSearchString($s)
 	{
 
-		$s = trim($s);
+		// Moved to ControllerModel
 
-		// if string enclosed by " take it literally
-		if (preg_match('/^"(.+)"$/',$s)) return '('.mysql_real_escape_string(substr($s,1,strlen($s)-2)).')';
-
-		$s = preg_replace('/(\s+)/',' ',$s);
-
-		if (strpos($s,' ')===0) return mysql_real_escape_string($s);
-
-		$s = str_replace(' ','|',$s);
-
-		return '('.mysql_real_escape_string($s).')';
+		return $this->models->ControllerModel->makeRegExpCompatSearchString($s);
 
 	}
 
@@ -419,7 +375,7 @@ class IndexController extends Controller
 
 		if ($search) $d['synonym regexp'] = $this->makeRegExpCompatSearchString($search);
 
-		return $this->models->Synonym->_get(
+		return $this->models->Synonyms->_get(
 			array(
 				'id' => $d,
 				'columns' => 'taxon_id as id,synonym as label,\'synonym\' as source, concat(\'../species/synonyms.php?id=\',taxon_id) as url'
@@ -431,15 +387,15 @@ class IndexController extends Controller
 	private function getCommonnameLookupList($search=null)
 	{
 
-		return $this->models->Commonname->_get(
+		return $this->models->Commonnames->_get(
 			array(
 				'where' =>
 					'project_id  = '.$this->getCurrentProjectId().
 						($search ?
 							' and
 							(
-								commonname regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-								transliteration regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+								commonname regexp \''.$this->models->Commonnames->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+								transliteration regexp \''.$this->models->Commonnames->escapeString($this->makeRegExpCompatSearchString($search)).'\'
 							)' :
 							''
 						),
@@ -475,7 +431,7 @@ class IndexController extends Controller
 
 		if (empty($search)) return;
 
-		$fmp = $this->models->FreeModuleProject->_get(
+		$fmp = $this->models->FreeModulesProjects->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -485,7 +441,7 @@ class IndexController extends Controller
 			)
 		);
 
-		$cfm = $this->models->ContentFreeModule->_get(
+		$cfm = $this->models->ContentFreeModules->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
