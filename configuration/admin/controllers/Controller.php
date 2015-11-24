@@ -1278,9 +1278,9 @@ class Controller extends BaseClass
 
     public function getPagination ($items, $maxPerPage = 25)
     {
-		$this->helpers->Paginator->setItemsPerPage( $maxPerPage );
-		$this->helpers->Paginator->setStart( $this->rHasVal('start') ? $this->requestData['start'] : 0 );
-		$this->helpers->Paginator->setItems( $items );
+        $this->helpers->Paginator->setItemsPerPage($maxPerPage);
+		$this->helpers->Paginator->setStart($this->rHasVal('start') ? $this->rGetVal('start') : 0);
+		$this->helpers->Paginator->setItems($items);
 		$this->helpers->Paginator->paginate();
 
 		return $this->helpers->Paginator->getItems();
