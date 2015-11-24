@@ -374,7 +374,7 @@ class KeyModel extends AbstractModel
 		if (is_null($projectId) || is_null($languageId))
 			return;
 
-		return $this->models->Projects->freeQuery("
+		return $this->freeQuery("
 			SELECT _a.*, _b.title, _c.number, _d.choice_txt
 				from %PRE%choices_keysteps _a
 				left join %PRE%content_keysteps _b
