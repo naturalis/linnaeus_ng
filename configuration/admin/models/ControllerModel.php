@@ -227,6 +227,33 @@ final class ControllerModel extends AbstractModel
 
 	}
 
+
+	// Used in IndexController but maybe useful elsewhere too? Moved to model as it requires db connection
+
+	public function makeRegExpCompatSearchString ($s)
+	{
+
+		$s = trim($s);
+
+		// if string enclosed by " take it literally
+		if (preg_match('/^"(.+)"$/',$s)) {
+		    return '(' . mysqli_real_escape_string($this->databaseConnection, substr($s,1,strlen($s)-2)).')';
+		}
+
+		$s = preg_replace('/(\s+)/',' ',$s);
+
+		if (strpos($s,' ')===0) {
+		    return mysql_real_escape_string($this->databaseConnection, $s);
+		}
+
+		$s = str_replace(' ','|',$s);
+
+		return '('.mysqli_real_escape_string($this->databaseConnection, $s).')';
+
+	}
+
+
+
 }
 
 ?>
