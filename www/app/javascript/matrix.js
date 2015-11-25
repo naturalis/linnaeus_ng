@@ -229,7 +229,6 @@ function shouldDisableEmergentChar( id )
 
 function printMenu()
 {
-	
 	if (typeof hook_prePrintMenu == 'function') { hook_prePrintMenu(); }
 	
 	$('#facet-categories-menu').html('');
@@ -499,7 +498,7 @@ function printResultsPaginated()
 	{
 		if (
 			(matrixsettings.browseStyle=='paginate' && i>=matrixsettings.start && i<matrixsettings.start+matrixsettings.perPage) || 
-			matrixsettings.browseStyle=='show_all'
+			matrixsettings.browseStyle!='paginate' // =='show_all'
 		)
 		{
 			s=s+formatResult(resultset[i]);
@@ -934,7 +933,6 @@ function setState( p )
 
 function applyScores()
 {
-
 	if (typeof hook_preApplyScores == 'function') { hook_preApplyScores(); }
 
 	var scores=getScores();
