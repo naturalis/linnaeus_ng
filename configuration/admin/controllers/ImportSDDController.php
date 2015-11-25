@@ -92,17 +92,17 @@ class ImportSDDController extends ImportController
         }
         else if ($this->rHasVal('serverFile') && !$this->rHasVal('clear', 'file')) {
 
-            if (file_exists($this->requestData['serverFile'])) {
+            if (file_exists($this->rGetVal('serverFile'))) {
 
                 $_SESSION['admin']['system']['import']['file'] = array(
-                    'path' => $this->requestData['serverFile'],
-                    'name' => $this->requestData['serverFile'],
+                    'path' => $this->rGetVal('serverFile'),
+                    'name' => $this->rGetVal('serverFile'),
                     'src' => 'existing'
                 );
             }
             else {
 
-                $this->addError('File "' . $this->requestData['serverFile'] . '" does not exist.');
+                $this->addError('File "' . $this->rGetVal('serverFile') . '" does not exist.');
                 unset($_SESSION['admin']['system']['import']['file']);
             }
         }
@@ -113,14 +113,14 @@ class ImportSDDController extends ImportController
 
                 $_SESSION['admin']['system']['import']['imagePath'] = false;
             }
-            else if (file_exists($this->requestData['imagePath'])) {
+            else if (file_exists($this->rGetVal('imagePath'))) {
 
-                $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'], '/') . '/';
+                $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->rGetVal('imagePath'), '/') . '/';
 
             }
             else {
 
-                $this->addError('Image path "' . $this->requestData['imagePath'] . '" does not exist or unreachable.');
+                $this->addError('Image path "' . $this->rGetVal('imagePath') . '" does not exist or unreachable.');
                 unset($_SESSION['admin']['system']['import']['imagePath']);
             }
         }

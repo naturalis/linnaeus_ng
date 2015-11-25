@@ -173,7 +173,8 @@ class ContentController extends Controller
 
         $this->setPageName($this->translate($currentSubject));
 
-		$this->smarty->assign('isFreeModule', isset($_SESSION['admin']['system']['content']['is-free-module']) ? $_SESSION['admin']['system']['content']['is-free-module'] : false);
+		$this->smarty->assign('isFreeModule', isset($_SESSION['admin']['system']['content']['is-free-module']) ?
+            $_SESSION['admin']['system']['content']['is-free-module'] : false);
 
 		if (!is_null($this->moduleSession->getModuleSetting('free-module-id')))
 			$this->smarty->assign('freeModuleId', $this->moduleSession->getModuleSetting('free-module-id'));
@@ -195,7 +196,7 @@ class ContentController extends Controller
     public function previewAction ()
     {
 
-		$this->redirect('../../../app/views/linnaeus/index.php?p='.$this->getCurrentProjectId().'&sub='.$this->requestData['subject']);
+		$this->redirect('../../../app/views/linnaeus/index.php?p='.$this->getCurrentProjectId().'&sub='.$this->rGetVal('subject'));
 
     }
 

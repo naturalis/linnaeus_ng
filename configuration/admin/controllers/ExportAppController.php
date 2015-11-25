@@ -124,15 +124,15 @@ class ExportAppController extends Controller
 
 		if ($this->rHasVal('action','export'))
 		{
-			$this->_removePrefix = isset($this->requestData['removePrefix']) && $this->requestData['removePrefix']=='y' ? $dbSettings['tablePrefix'] : false;
-			$this->_includeCode = isset($this->requestData['includeCode']) && $this->requestData['includeCode']=='y' ? true : false;
-			$this->_downloadFile = isset($this->requestData['downloadFile']) && $this->requestData['downloadFile']=='y' ? true : false;
-			$this->_separateDrop = isset($this->requestData['separateDrop']) && $this->requestData['separateDrop']=='y' ? true : false;
-			$this->_reduceURLs = isset($this->requestData['reduceURLs']) && $this->requestData['reduceURLs']=='y' ? true : false;
-			$this->_makeImageList = isset($this->requestData['imageList']) && $this->requestData['imageList']=='y' ? true : false;
+			$this->_removePrefix = $this->rHasVar('removePrefix', 'y') ? $dbSettings['tablePrefix'] : false;
+			$this->_includeCode = $this->rHasVar('includeCode', 'y') ? true : false;
+			$this->_downloadFile = $this->rHasVar('downloadFile', 'y') ? true : false;
+			$this->_separateDrop = $this->rHasVar('separateDrop', 'y') ? true : false;
+			$this->_reduceURLs = $this->rHasVar('reduceURLs', 'y') ? true : false;
+			$this->_makeImageList = $this->rHasVar('imageList', 'y') ? true : false;
 			$this->_projectVersion = $this->rHasVar('version') ? $this->rGetVal('version') : $this->_projectVersion;
 
-			$d = explode('-',$this->requestData['id']);
+			$d = explode('-',$this->rGetId());
 			$matrixId = $d[0];
 			$languageId = $d[1];
 
@@ -315,7 +315,7 @@ class ExportAppController extends Controller
 
 		if ($this->rHasVal('action','export'))
 		{
-			$this->_modules = $this->requestData['modules'];
+			$this->_modules = $this->rGetVal('modules');
 			$this->_removePrefix = $this->rGetVal('removePrefix')=='y' ? $dbSettings['tablePrefix'] : false;
 			$this->_includeCode = $this->rGetVal('includeCode')=='y';
 			$this->_downloadFile = $this->rGetVal('downloadFile')=='y';
