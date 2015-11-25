@@ -171,7 +171,7 @@ class ExportController extends Controller
 
 			if ($this->rHasVal('freeModules')) {
 
-				foreach ((array)$this->requestData['freeModules'] as $val) {
+				foreach ((array)$this->rGetVal('freeModules') as $val) {
 
 					$fmp = $this->models->FreeModulesProjects->_get(
 						array(

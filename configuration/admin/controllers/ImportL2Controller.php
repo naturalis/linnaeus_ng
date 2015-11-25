@@ -167,17 +167,17 @@ class ImportL2Controller extends ImportController
         }
         else if ($this->rHasVal('serverFile') && !$this->rHasVal('clear', 'file')) {
 
-            if (file_exists($this->requestData['serverFile'])) {
+            if (file_exists($this->rGetVal('serverFile'))) {
 
                 $_SESSION['admin']['system']['import']['file'] = array(
-                    'path' => $this->requestData['serverFile'],
-                    'name' => $this->requestData['serverFile'],
+                    'path' => $this->rGetVal('serverFile'),
+                    'name' => $this->rGetVal('serverFile'),
                     'src' => 'existing'
                 );
             }
             else {
 
-                $this->addError('File "' . $this->requestData['serverFile'] . '" does not exist.');
+                $this->addError('File "' . $this->rGetVal('serverFile') . '" does not exist.');
                 unset($_SESSION['admin']['system']['import']['file']);
             }
         }
@@ -188,9 +188,9 @@ class ImportL2Controller extends ImportController
 
                 $_SESSION['admin']['system']['import']['imagePath'] = false;
             }
-            else if (file_exists($this->requestData['imagePath'])) {
+            else if (file_exists($this->rGetVal('imagePath'))) {
 
-                $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'], '/') . '/';
+                $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->rGetVal('imagePath'), '/') . '/';
 
                 if (!is_writable($_SESSION['admin']['system']['import']['imagePath'])) {
 
@@ -202,7 +202,7 @@ class ImportL2Controller extends ImportController
             }
             else {
 
-                $this->addError('Image path "' . $this->requestData['imagePath'] . '" does not exist or unreachable.');
+                $this->addError('Image path "' . $this->rGetVal('imagePath') . '" does not exist or unreachable.');
                 unset($_SESSION['admin']['system']['import']['imagePath']);
             }
         }
@@ -371,7 +371,7 @@ class ImportL2Controller extends ImportController
 
         $this->helpers->XmlParser->getNodes('treetaxon');
 
-        $_SESSION['admin']['system']['import']['substRanks'] = ($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null);
+        $_SESSION['admin']['system']['import']['substRanks'] = ($this->rHasVal('substRanks') ? $this->rGetVal('substRanks') : null);
 
         $this->helpers->XmlParser->setCallbackFunction(array(
             $this,
@@ -412,9 +412,9 @@ class ImportL2Controller extends ImportController
             $_SESSION['admin']['system']['import']['loaded']['ranks'] =
 				$this->addProjectRanks(
 					$_SESSION['admin']['system']['import']['loaded']['ranks'],
-					($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null),
-		            ($this->rHasVal('substParentRanks') ? $this->requestData['substParentRanks'] : null),
-		            ($this->rHasVal('multiRankChoice') ? $this->requestData['multiRankChoice'] : null)
+					($this->rHasVal('substRanks') ? $this->rGetVal('substRanks') : null),
+		            ($this->rHasVal('substParentRanks') ? $this->rGetVal('substParentRanks') : null),
+		            ($this->rHasVal('multiRankChoice') ? $this->rGetVal('multiRankChoice') : null)
 				);
 
             $species = $_SESSION['admin']['system']['import']['loaded']['species'] =
@@ -423,8 +423,8 @@ class ImportL2Controller extends ImportController
 					$_SESSION['admin']['system']['import']['loaded']['ranks']
 				);
 
-            if (isset($this->requestData['treetops']))
-                $_SESSION['admin']['system']['import']['loaded']['species'] = $this->fixTreetops($species, $this->requestData['treetops']);
+            if ($this->rHasVar('treetops'))
+                $_SESSION['admin']['system']['import']['loaded']['species'] = $this->fixTreetops($species, $this->rGetVal('treetops'));
 
 			foreach((array)$_SESSION['admin']['system']['import']['loaded']['species'] as $key => $val) {
 
@@ -463,10 +463,10 @@ class ImportL2Controller extends ImportController
         $this->smarty->assign('multiples', $multiples);
 
         if ($this->rHasVal('substRanks'))
-            $this->smarty->assign('substRanks', $this->requestData['substRanks']);
+            $this->smarty->assign('substRanks', $this->rGetVal('substRanks'));
 
         if ($this->rHasVal('substParentRanks'))
-            $this->smarty->assign('substParentRanks', $this->requestData['substParentRanks']);
+            $this->smarty->assign('substParentRanks', $this->rGetVal('substParentRanks'));
 
         $this->smarty->assign('species', $_SESSION['admin']['system']['import']['loaded']['species']);
 
@@ -640,7 +640,7 @@ class ImportL2Controller extends ImportController
 					$_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'] = array();
 					$_SESSION['admin']['system']['import']['synVernDescription']['synonymCount'] =
 					$_SESSION['admin']['system']['import']['synVernDescription']['commonCount'] = 0;
-                    $_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description'] = $this->requestData['syn_vern_description'];
+                    $_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description'] = $this->rGetVal('syn_vern_description');
 
 					$this->helpers->XmlParser->setCallbackFunction(array(
 						$this,
@@ -1188,7 +1188,7 @@ class ImportL2Controller extends ImportController
 
                 if ($this->rHasVal('modules-name')) {
 
-                    $_SESSION['admin']['system']['import']['freeModules']['names'] = $this->requestData['modules-name'];
+                    $_SESSION['admin']['system']['import']['freeModules']['names'] = $this->rGetVal('modules-name');
                 }
                 else {
 
@@ -1204,7 +1204,7 @@ class ImportL2Controller extends ImportController
 
                 $_SESSION['admin']['system']['import']['loaded']['custom']['saved'] = null;
 
-                foreach ((array) $this->requestData['modules'] as $module => $val) {
+                foreach ((array)$this->rGetVal('modules') as $module => $val) {
 
                     if ($val == 'on')
                         $this->helpers->XmlParser->getNodes($module);
