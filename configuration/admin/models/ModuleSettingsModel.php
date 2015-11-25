@@ -81,6 +81,41 @@ final class ModuleSettingsModel extends AbstractModel
 	}
 
 
+	public function setModuleReaderSettingValues ($params)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] : null;
+        $moduleId = isset($params['moduleId']) ? $params['moduleId'] : null;
+        $setting = isset($params['setting']) ? $params['setting'] : null;
+
+        if (is_null($moduleId) || is_null($projectId)) {
+			return null;
+		}
+
+		$query = "
+			select
+				_a.value as value,
+				_b.setting,
+				_b.default_value as default_value
+
+			from
+				%PRE%module_settings _b
+
+			left join
+				%PRE%module_settings_values _a
+				on _b.id=_a.setting_id
+				and _a.project_id = " . $projectId . "
+
+			where
+				_b.module_id = " . $moduleId;
+
+		 if (!is_null($setting)) {
+			$query .= "	and _b.setting = '" . $setting . "'";
+         }
+
+        return $this->freeQuery($query);
+	}
+
+
 
 }
 
