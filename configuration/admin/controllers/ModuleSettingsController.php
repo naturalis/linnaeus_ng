@@ -9,7 +9,7 @@ drop table `module_settings`;
 create table `module_settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `module_id` int(11) NOT NULL,
-  `setting` varchar(64) NOT NULL,
+  `setting` varchar(64) NULL,
   `info` varchar(1000) NULL,
   `default_value` varchar(512) NULL,
   `created` datetime NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE `module_settings_values` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `setting_id` int(11) NOT NULL,
-  `value` varchar(512) NOT NULL,
+  `value` varchar(512) NULL,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -49,7 +49,7 @@ class ModuleSettingsController extends Controller
 	public $controllerPublicName = 'Module Settings';
 	public $cssToLoad = array();
 	public $jsToLoad = array();
-	
+
 	private $_modules;
 	private $_moduleid;
 	private $_module;
@@ -76,27 +76,27 @@ class ModuleSettingsController extends Controller
     public function indexAction()
     {
         $this->checkAuthorisation();
-        
+
         $this->setPageName( $this->translate('Module settings') );
-        
+
 		$this->smarty->assign('modules',$this->getModules());
-		
+
 		$this->printPage();
     }
-	
+
     public function settingsAction()
     {
-		
+
 		// REFAC2015: access level needs to be sysadmin
-		
+
         $this->checkAuthorisation();
-        
+
 		$this->setModuleId( $this->rGetVal('id') );
 
 		$this->setModule();
-		
+
 		$m=$this->getModule();
-		
+
 		if ( empty($m) )
 		{
 			$this->redirect('index.php');
@@ -116,14 +116,14 @@ class ModuleSettingsController extends Controller
 			$this->deleteModuleSetting();
 			$this->setModuleSettings();
 		}
-		
+
 		$m=$this->getModule();
 
         $this->setPageName( sprintf( $this->translate('Module settings: %s ') , $m['module'] ));
 
 		$this->smarty->assign( 'module', $this->getModule() );
 		$this->smarty->assign( 'settings', $this->getModuleSettings() );
-		
+
 		$this->printPage();
     }
 
@@ -131,15 +131,15 @@ class ModuleSettingsController extends Controller
     {
 
 		// REFAC2015: access level needs to be lead expert
-		
+
         $this->checkAuthorisation();
-        
+
 		$this->setModuleId( $this->rGetVal('id') );
 
 		$this->setModule();
-		
+
 		$m=$this->getModule();
-		
+
 		if ( empty($m) )
 		{
 			$this->redirect('index.php');
@@ -153,7 +153,7 @@ class ModuleSettingsController extends Controller
 			$this->saveModuleSettingValues();
 			$this->setModuleSettingValues();
 		}
-		
+
 		$m=$this->getModule();
 
         $this->setPageName( sprintf( $this->translate('Module settings: %s ') , $m['module'] ));
@@ -161,7 +161,7 @@ class ModuleSettingsController extends Controller
 		$this->smarty->assign( 'module', $this->getModule() );
 		$this->smarty->assign( 'settings', $this->getModuleSettings() );
 		$this->smarty->assign( 'values', $this->getModuleSettingValues() );
-		
+
 		$this->printPage();
     }
 
@@ -171,41 +171,24 @@ class ModuleSettingsController extends Controller
 		{
 			$this->updateModuleInfo( array( "id"=>$this->rGetId(), "info"=>$this->rGetVal("value") ) );
 			$this->smarty->assign( "returnText", "saved" );
-        }	
+        }
 		else
 		if ( $this->rHasVal('action', 'update_value') && $this->rHasId() )
 		{
 			$this->updateModuleDefaultValue( array( "id"=>$this->rGetId(), "value"=>$this->rGetVal("value") ) );
 			$this->smarty->assign( "returnText", "saved" );
-        }	
+        }
 
-		$this->printPage();	
+		$this->printPage();
 	}
-	
-	
-	
+
+
+
 
 	private function setModules()
 	{
-		$this->_modules=$this->models->ModuleSettings->freeQuery("
-			select
-				_a.id,
-				_a.module,
-				_a.controller,
-				count(_b.id) as num_of_settings
-			from
-				%PRE%modules _a
-			
-			left join %PRE%module_settings _b
-				on _a.id=_b.module_id
+		$this->_modules = $this->models->ModuleSettingsModel->setModules();
 
-			group by 
-				_a.controller
-
-			order by
-				_a.module
-		");
-		
 		$this->_modules[]=array("id"=>-1,"module"=>"General settings");
 	}
 
@@ -213,7 +196,7 @@ class ModuleSettingsController extends Controller
 	{
 		return $this->_modules;
 	}
-	
+
 	private function setModuleId( $id )
 	{
 		$this->_moduleid=$id;
@@ -222,7 +205,7 @@ class ModuleSettingsController extends Controller
 	private function getModuleId()
 	{
 		return $this->_moduleid;
-	}	
+	}
 
 	private function setModule( )
 	{
@@ -235,7 +218,7 @@ class ModuleSettingsController extends Controller
 				$this->_module=$val;
 			}
 		}
-		
+
 	}
 
 	private function getModule()
@@ -247,7 +230,7 @@ class ModuleSettingsController extends Controller
 	{
 		$this->_settings=$this->models->ModuleSettings->_get(array("id"=>
 			array(
-				"module_id"=>mysql_real_escape_string( $this->getModuleId() )
+				"module_id"=>$this->getModuleId()
 			)));
 	}
 
@@ -255,7 +238,7 @@ class ModuleSettingsController extends Controller
 	{
 		return $this->_settings;
 	}
-	
+
 	private function getModuleSetting( $p )
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -273,7 +256,7 @@ class ModuleSettingsController extends Controller
 				return $val;
 			}
 		}
-	}	
+	}
 
 	private function setSettingId( $id )
 	{
@@ -283,52 +266,61 @@ class ModuleSettingsController extends Controller
 	private function getSettingId()
 	{
 		return $this->_settingid;
-	}	
+	}
 
 	private function saveModuleSetting()
 	{
+
 		if ( $this->rHasVar('new_setting') && $this->rGetVal('new_setting')!="" )
 		{
 			if ( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) !="" )
 			{
 				$m=$this->getModule();
-				$this->addError( sprintf( 
-					$this->translate( '%s: a setting with that name already exists in  %s.' ), 
-					$this->rGetVal('new_setting'), $m['module'] ) 
+				$this->addError( sprintf(
+					$this->translate( '%s: a setting with that name already exists in  %s.' ),
+					$this->rGetVal('new_setting'), $m['module'] )
 				);
 			}
 			else
 			{
-				$this->models->ModuleSettings->freeQuery("
+			    $this->models->ModuleSettings->insert(array(
+    				'module_id' => $this->getModuleId(),
+    				'setting' => $this->rGetVal('new_setting'),
+    				'info' => $this->rGetVal('new_info'),
+    				'default_value' => $this->rGetVal('new_default_value')
+    			));
+/*
+			    $this->models->ModuleSettings->freeQuery("
 					insert into %PRE%module_settings
 						(module_id,setting,info,default_value)
 					values
-						(" . 
-							mysql_real_escape_string( $this->getModuleId() ) . "," . 
-							($this->rGetVal('new_setting')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",". 
-							($this->rGetVal('new_info')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",". 
+						(" .
+							mysql_real_escape_string( $this->getModuleId() ) . "," .
+							($this->rGetVal('new_setting')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_setting') ) . "'" : "null" ) .",".
+							($this->rGetVal('new_info')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_info') ) . "'" : "null" ) .",".
 							($this->rGetVal('new_default_value')!="" ? "'" . mysql_real_escape_string( $this->rGetVal('new_default_value') ) . "'" : "null" )  ."
 						)
-				");	
-				$this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ),  $this->rGetVal('new_setting') ) );
+				");
+*/
+                $this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ),  $this->rGetVal('new_setting') ) );
 			}
 		}
-		
-		
+
+
 	}
-			
+
 	private function deleteModuleSetting()
 	{
 		$this->_settings=$this->models->ModuleSettingsValues->delete(
 			array(
 				"project_id"=>$this->getCurrentProjectId(),
-				"setting_id"=>mysql_real_escape_string( $this->getSettingId() )
+				"setting_id"=>$this->getSettingId()
 			));
-			
+
 		$this->_settings=$this->models->ModuleSettings->delete(
 			array(
-				"module_id"=>mysql_real_escape_string( $this->getModuleId() ),
-				"id"=>mysql_real_escape_string( $this->getSettingId() )
+				"module_id"=>$this->getModuleId(),
+				"id"=>$this->getSettingId()
 			));
 
 		$this->addMessage( $this->translate( 'setting deleted.' ) );
@@ -341,17 +333,19 @@ class ModuleSettingsController extends Controller
 
 		if ( empty($id) ) return;
 
+		$this->models->ModuleSettings->update(array('info' => $info, 'id' => $id));
+/*
 		$this->models->ModuleSettings->freeQuery("
 			update
 				%PRE%module_settings
 			set
-				info = " . ( !empty($info) ? "'" . mysql_real_escape_string( $info ) . "'" : "null" ) ." 
+				info = " . ( !empty($info) ? "'" . mysql_real_escape_string( $info ) . "'" : "null" ) ."
 			where
 				id = " . mysql_real_escape_string( $id )
-		);	
-		
+		);
+*/
 	}
-			
+
 	private function updateModuleDefaultValue( $p )
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
@@ -359,37 +353,26 @@ class ModuleSettingsController extends Controller
 
 		if ( empty($id) ) return;
 
+		$this->models->ModuleSettings->update(array('default_value' => $value, 'id' => $id));
+
+/*
 		$this->models->ModuleSettings->freeQuery("
 			update
 				%PRE%module_settings
 			set
-				default_value = " . ( $value!="" ? "'" . mysql_real_escape_string( $value ) . "'" : "null" ) ." 
+				default_value = " . ( $value!="" ? "'" . mysql_real_escape_string( $value ) . "'" : "null" ) ."
 			where
 				id = " . mysql_real_escape_string( $id )
-		);	
-		
+		);
+*/
 	}
-			
+
 	private function setModuleSettingValues()
 	{
-		$this->_settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
-			select
-				_b.id as setting_id,
-				_a.id as value_id,
-				_a.value as value,
-				_b.default_value as default_value
-
-			from
-				%PRE%module_settings_values _a
-
-			left join
-				%PRE%module_settings _b
-				on _b.id=_a.setting_id
-
-			where 
-				_a.project_id = " . $this->getCurrentProjectId() . "
-				and _b.module_id = " . mysql_real_escape_string( $this->getModuleId() ) . "
-			");
+		$this->_settingsvalues = $this->models->ModuleSettingsModel->setModuleSettingValues(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'moduleId' => $this->getModuleId()
+		));
 	}
 
 	private function getModuleSettingValues()
@@ -408,22 +391,27 @@ class ModuleSettingsController extends Controller
 				return $val;
 			}
 		}
-	}	
+	}
 
 
 
 	private function saveModuleSettingValues()
 	{
-		
+
 		foreach((array)$this->rGetVal('value') as $setting_id => $val)
 		{
 			if ( empty($setting_id) ) continue;
-			
+
 			$curr=$this->getModuleSettingValue( $setting_id );
 
 			if ( $val!="" && !empty($curr) && $val != $curr['value'] )
 			{
-				$this->models->ModuleSettingsValues->freeQuery("
+                $this->models->ModuleSettingsValues->update(array(
+                    array('value' => $val),
+                    array('project_id' => $this->getCurrentProjectId(), 'id' => $curr['value_id'])
+                ));
+			    /*
+			    $this->models->ModuleSettingsValues->freeQuery("
 					update
 						%PRE%module_settings_values
 					set
@@ -431,24 +419,30 @@ class ModuleSettingsController extends Controller
 					where
 						project_id = " . $this->getCurrentProjectId() . "
 						and id = " . $curr['value_id'] . "
-				");	
-
+				");
+                */
 				$this->addMessage( sprintf( $this->translate( 'value updated to %s.' ),  $val ) );
 			}
 			else
 			if ( $val!="" && empty($curr) )
 			{
+                $this->models->ModuleSettingsValues->insert(array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'setting_id' => $setting_id,
+                    'value' => $val
+                ));
+			    /*
 				$this->models->ModuleSettingsValues->freeQuery("
 					insert into %PRE%module_settings_values
 						(project_id,setting_id,value)
 					values
-						(" . 
-							$this->getCurrentProjectId() . "," . 
-							mysql_real_escape_string( $setting_id ) .",". 
+						(" .
+							$this->getCurrentProjectId() . "," .
+							mysql_real_escape_string( $setting_id ) .",".
 							"'" . mysql_real_escape_string( $val ) . "'
 						)
-				");	
-				
+				");
+                */
 				$this->addMessage( sprintf( $this->translate( 'value %s saved.' ),  $val ) );
 			}
 			else
@@ -467,33 +461,7 @@ class ModuleSettingsController extends Controller
 			{
 				// no existing value, no new value
 			}
-			
+
 		}
-		
-		
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
