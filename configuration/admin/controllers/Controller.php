@@ -3385,4 +3385,19 @@ class Controller extends BaseClass
 	}
 
 
+	/*
+	 * Used to load an external model. Useful if the required methods of a controller's
+	 * model are more logically stored in a model associated with a different controller;
+	 * e.g. the methods for ModuleSettingsReaderController are available in ModuleSettingsModel rather
+	 * than in its own model.
+	 */
+	protected function loadExternalModel ($model)
+	{
+        if (file_exists(dirname(__FILE__) . "/../models/{$model}.php")) {
+            include_once dirname(__FILE__) . "/../models/{$model}.php";
+            $this->models->{$model} = new $model;
+        }
+	}
+
+
 }
