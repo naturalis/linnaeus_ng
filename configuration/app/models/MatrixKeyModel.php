@@ -924,6 +924,91 @@ final class MatrixKeyModel extends AbstractModel
         return $this->freeQuery( $query );
     }
 
+    public function getSearchResults( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		$search = isset($params['search']) ? $params['search'] : null;
+
+		if ( is_null($project_id) || is_null($language_id) || is_null($matrix_id) || is_null($search) )
+			return;
+
+
+		$search=$this->escapeString(strtolower($search));
+
+		// n.b. don't change to 'union all'
+		$query="
+			select * from (
+				select
+					'variation' as type,
+					_a.variation_id as id,
+					trim(_c.label) as label,
+					_c.taxon_id as taxon_id,
+					_d.taxon as taxon, 
+					null as commonname
+	
+				from 
+					%PRE%matrices_variations _a        		
+	
+				left join %PRE%matrices_taxa_states _b
+					on _a.matrix_id = _b.matrix_id
+					and _a.variation_id = _b.variation_id
+					and _b.project_id = " . $project_id . "
+	
+				left join %PRE%taxa_variations _c
+					on _a.variation_id = _c.id
+					and _c.project_id = " . $project_id . "
+	
+				left join %PRE%taxa _d
+					on _c.taxon_id = _d.id						
+					and _d.project_id = " . $project_id . "
+	
+				where _a.project_id = " . $project_id . "
+					and _a.matrix_id = " . $matrix_id . "
+					and (lower(_c.label) like '%". $search ."%' or lower(_d.taxon) like '%". $search ."%')
+	
+				union
+	
+				select 
+					'taxon' as type,
+					_a.taxon_id as id, 
+					trim(_c.taxon) as label, 
+					_a.taxon_id as taxon_id,
+					_c.taxon as taxon, 
+					_d.commonname as commonname
+	
+				from
+					%PRE%matrices_taxa _a
+	
+				left join %PRE%matrices_taxa_states _b
+					on _a.matrix_id = _b.matrix_id
+					and _a.taxon_id = _b.taxon_id
+					and _b.project_id = " . $project_id . "
+	
+				left join %PRE%taxa _c
+					on _a.taxon_id = _c.id
+					and _c.project_id = " . $project_id . "
+	
+				left join %PRE%commonnames _d
+					on _a.taxon_id = _d.taxon_id
+					and _d.language_id = ".$language_id ." 
+					and _d.project_id = " . $project_id . "
+	
+				where _a.project_id = " . $project_id . "
+					and _a.matrix_id = " . $matrix_id . "
+					and (lower(_c.taxon) like '%". $search ."%' or lower(_d.commonname) like '%". $search ."%')
+			) as unionized
+			order by label
+			";
+
+        return $this->freeQuery( $query );
+    }
+
+
+
+
+
     public function setRemainingCountClauses( $clause )
     {
 		$this->remainingCountClauses=$clause;

@@ -958,8 +958,6 @@ function applyScores()
 			{
 				var item=dataset[j];
 
-console.log(score.score,matrixsettings.scoreThreshold);
-
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
 					item.score=score.score;

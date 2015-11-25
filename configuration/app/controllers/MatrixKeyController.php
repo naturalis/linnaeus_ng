@@ -1129,7 +1129,7 @@ class MatrixKeyController extends Controller
         if (empty($s))
             return;
 
-        $d=$this->models->MatrixkeyModel->getScoresLiberal(array(
+		return $this->models->MatrixkeyModel->getScoresRestrictive(array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'matrix_id'=>$this->getCurrentMatrixId(),
 			'language_id'=>$this->getCurrentLanguageId(),
@@ -1139,7 +1139,6 @@ class MatrixKeyController extends Controller
 			'stateCount'=>$stateCount,
 			'matrixVariationExists'=>$this->models->MatricesVariations->getTableExists()
 		));
-		q($d,1);
     }
 	
     private function sortDataSet( $a,$b )
@@ -1438,80 +1437,12 @@ class MatrixKeyController extends Controller
 
 	private function setSearchResults()
     {
-		$search=$this->getSearchTerm();
-		
-		if (empty($search))
-			return;
-		
-		$search=mysql_real_escape_string(strtolower($search));
-
-		// n.b. don't change to 'union all'
-        $q = "
-			select * from (
-				select
-					'variation' as type,
-					_a.variation_id as id,
-					trim(_c.label) as label,
-					_c.taxon_id as taxon_id,
-					_d.taxon as taxon, 
-					null as commonname
-	
-				from 
-					%PRE%matrices_variations _a        		
-	
-				left join %PRE%matrices_taxa_states _b
-					on _a.matrix_id = _b.matrix_id
-					and _a.variation_id = _b.variation_id
-					and _b.project_id = " . $this->getCurrentProjectId() . "
-	
-				left join %PRE%taxa_variations _c
-					on _a.variation_id = _c.id
-					and _c.project_id = " . $this->getCurrentProjectId() . "
-	
-				left join %PRE%taxa _d
-					on _c.taxon_id = _d.id						
-					and _d.project_id = " . $this->getCurrentProjectId() . "
-	
-				where _a.project_id = " . $this->getCurrentProjectId() . "
-					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-					and (lower(_c.label) like '%". $search ."%' or lower(_d.taxon) like '%". $search ."%')
-	
-				union
-	
-				select 
-					'taxon' as type,
-					_a.taxon_id as id, 
-					trim(_c.taxon) as label, 
-					_a.taxon_id as taxon_id,
-					_c.taxon as taxon, 
-					_d.commonname as commonname
-	
-				from
-					%PRE%matrices_taxa _a
-	
-				left join %PRE%matrices_taxa_states _b
-					on _a.matrix_id = _b.matrix_id
-					and _a.taxon_id = _b.taxon_id
-					and _b.project_id = " . $this->getCurrentProjectId() . "
-	
-				left join %PRE%taxa _c
-					on _a.taxon_id = _c.id
-					and _c.project_id = " . $this->getCurrentProjectId() . "
-	
-				left join %PRE%commonnames _d
-					on _a.taxon_id = _d.taxon_id
-					and _d.language_id = ".$this->getCurrentLanguageId() ." 
-					and _d.project_id = " . $this->getCurrentProjectId() . "
-	
-				where _a.project_id = " . $this->getCurrentProjectId() . "
-					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-					and (lower(_c.taxon) like '%". $search ."%' or lower(_d.commonname) like '%". $search ."%')
-			) as unionized
-			order by label
-			";
-
-        $this->_searchResults = $this->models->MatricesTaxaStates->freeQuery( $q );
-		
+        $this->_searchResults = $this->models->MatrixkeyModel->getSearchResults(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"language_id"=>$this->getCurrentLanguageId(),
+			"matrix_id"=>$this->getCurrentMatrixId(),
+			"search"=>$this->getSearchTerm()
+		));
     }
 
 	private function getSearchResults()
