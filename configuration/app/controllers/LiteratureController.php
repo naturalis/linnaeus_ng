@@ -39,9 +39,7 @@ class LiteratureController extends Controller
      */
     public function __construct($p=null)
     {
-        
         parent::__construct($p);
-		
     }
 
     /**
@@ -51,67 +49,32 @@ class LiteratureController extends Controller
      */
     public function __destruct ()
     {
-        
         parent::__destruct();
-    
     }
 
     public function indexAction()
     {
- 
  		if (!$this->rHasVal('id'))
 		{
-
 			$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
-
 			$id = (isset($d['id']) ? $d['id'] : null);
-			
-		} else {
-			
+		} 
+		else 
+		{
 			$id = $this->requestData['id'];
-				
 		}
-		
- 		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
-		
+
 		$this->setStoreHistory(false);
 		
 		if (isset($id)) $this->redirect('reference.php?id='.$id);
 
- 		/*
- 		$alpha = $this->getLiteratureAlphabet();
-
-		if (!$this->rHasVal('letter')) $this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : null;
-
-		if ($this->rHasVal('letter')) {
-		
-			$this->requestData['letter'] = strtolower($this->requestData['letter']);
-
-			$refs = $this->getReferences(array('author_first like' => $this->requestData['letter'].'%'));
-
-			$this->setPageName(sprintf($this->translate('Literature Index: %s'),strtoupper($this->requestData['letter'])));
-
-		}
-
-		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
-
-		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
-
-		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-
-		if (isset($refs)) $this->smarty->assign('refs',$refs);
-
-		*/
-   
         $this->printPage();
-
-    }
+	}
 
     public function referenceAction()
     {
-
-		if ($this->rHasId()) {
-
+		if ($this->rHasId())
+		{
 			$ref = $this->getReference($this->requestData['id']);
 			
 			$ref['text'] = $this->matchGlossaryTerms($ref['text']);
@@ -121,31 +84,25 @@ class LiteratureController extends Controller
 
 			$this->setPageName(sprintf($this->translate('Literature: "%s"'),$ref['author_full'].' ('.$ref['year'].')'));
 
-		} else {
-		
+		} 
+		else
+		{
 			$this->redirect('index.php');
-		
 		}
-
 
 		$alpha = $this->getLiteratureAlphabet();
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
-
 		if (isset($letter)) $this->smarty->assign('letter', $letter);
-
 		if (isset($ref)) $this->smarty->assign('ref', $ref);
-
 		if (isset($ref)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($ref['id']));
 
         $this->printPage();
-
     }
 
 
     public function contentsAction()
     {
-    
 		$alpha = $this->getLiteratureAlphabet();
 
 		if (!$this->rHasVal('letter') && isset($_SESSION['admin']['system']['literature']['activeLetter']))
@@ -154,16 +111,14 @@ class LiteratureController extends Controller
 		if (!$this->rHasVal('letter'))
 			$this->requestData['letter'] = $alpha[0];
 
-
-		if ($this->rHasVal('letter')) {
-
+		if ($this->rHasVal('letter'))
+		{
 			$refs = $this->getReferences(array('author_first like' => $this->requestData['letter'].'%'),'author_first,author_second,year');
-
 		}
 
         // user requested a sort of the table
-        if ($this->rHasVal('key')) {
-
+        if ($this->rHasVal('key'))
+		{
             $sortBy = array(
                 'key' => $this->requestData['key'], 
                 'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
@@ -171,73 +126,56 @@ class LiteratureController extends Controller
             );
         
 			$this->customSortArray($refs, $sortBy);
-
-        } else {
-
+        } 
+		else 
+		{
             $sortBy = array(
                 'key' => 'author_first', 
                 'dir' => 'asc', 
                 'case' => 'i'
             );
-	
 		}
         
 		$this->smarty->assign('sortBy', $sortBy);
-
 		$this->smarty->assign('alpha', $alpha);
-
 		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 
         $this->printPage();
-
 	}
 
-    public function ajaxInterfaceAction ()
+    public function ajaxInterfaceAction()
     {
-
         if (!isset($this->requestData['action'])) return;
         
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
-
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search']))
+		{
             $this->getLookupList($this->requestData);
-
         }
 
 		$this->allowEditPageOverlay = false;
 				
         $this->printPage();
-    
     }
 
 	private function getLiteratureAlphabet($forceLookup=false)
 	{
-
-		if (!isset($_SESSION['app']['user']['literature']['alpha']) or $forceLookup) {
-
-			unset($_SESSION['app']['user']['literature']['alpha']);
-
-			$l = $this->models->Literature->_get(
-				array(
-					'id' => array('project_id' => $this->getCurrentProjectId()),
-					'columns' => 'distinct lower(substr(author_first,1,1)) as letter',
-					'order' => 'author_first'
-				)
-			);
-
-			$_SESSION['app']['user']['literature']['alpha'] = null;
+		$l=$this->models->Literature->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'distinct lower(substr(author_first,1,1)) as letter',
+				'order' => 'author_first'
+			)
+		);
 		
-			foreach((array)$l as $key => $val) {
+		$alpha=array();
 
-				$_SESSION['app']['user']['literature']['alpha'][] = $val['letter'];
-
-			}
-
+		foreach((array)$l as $key => $val)
+		{
+			$alpha[] = $val['letter'];
 		}
 
-		return $_SESSION['app']['user']['literature']['alpha'];
-	
+		return $alpha;
 	}
 
 	private function getReferences($search,$order=null)
@@ -299,7 +237,6 @@ class LiteratureController extends Controller
 
 	private function getReference($id)
 	{
-
 		if (!isset($id)) return;
 
 		$l = $this->models->Literature->_get(
@@ -341,8 +278,9 @@ class LiteratureController extends Controller
 			)
 		);
 		
-		if ($l) {
-		
+		if ($l)
+		{
+
 			$ref = $l[0];
 			
 			$lt = $this->models->LiteratureTaxon->_get(
@@ -393,18 +331,15 @@ class LiteratureController extends Controller
 			$ref['synonyms'] = $s;
 
 			return $ref;
-
-		} else {
-		
-			return;
-
 		}
-
+		else
+		{
+			return;
+		}
 	}
 
 	private function getFirstReference($letter=null)
 	{
-
 		$d = array('project_id' => $this->getCurrentProjectId());
 			
 		if (isset($letter)) $d['author_first like'] = $letter.'%';
@@ -419,8 +354,8 @@ class LiteratureController extends Controller
 				)
 			);
 			
-		if (!$l) {
-		
+		if (!$l)
+		{
 			$l = $this->models->Literature->_get(
 					array(
 						'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -429,7 +364,6 @@ class LiteratureController extends Controller
 						'limit' => 1
 					)
 				);
-		
 		}
 
 		return $l[0];
@@ -438,7 +372,6 @@ class LiteratureController extends Controller
 
 	private function getAdjacentItems($id)
 	{
-
 		$l = $this->models->Literature->_get(
 			array(
 				'id' => array(
@@ -458,26 +391,22 @@ class LiteratureController extends Controller
 			)
 		);
 
-		foreach((array)$l as $key => $val) {
-
-			if ($val['id']==$id) {
-			
+		foreach((array)$l as $key => $val)
+		{
+			if ($val['id']==$id)
+			{
 				return array(
 					'prev' => isset($l[$key-1]) ? $l[$key-1] : null,
 					'next' => isset($l[$key+1]) ? $l[$key+1] : null
 				);
-
 			}
-
 		}
 
 		return null;
-
 	}
 
 	public function getLookupList($p)
 	{
-
 		$search = isset($p['search']) ? $p['search'] : null;
 		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
 		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
