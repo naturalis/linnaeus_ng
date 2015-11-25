@@ -34,10 +34,7 @@ class InternalLinksController extends Controller
     {
 
         parent::__construct();
-
-        // "Manually" load KeyModel
-        include_once dirname(__FILE__) . '/../models/KeyModel.php';
-        $this->models->KeyModel = new KeyModel;
+        $this->loadExternalModel('KeyModel');
 
     }
 

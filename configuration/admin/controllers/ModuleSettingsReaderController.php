@@ -4,19 +4,23 @@ include_once ('Controller.php');
 
 class ModuleSettingsReaderController extends Controller
 {
-    public $usedModels = array('module_settings','module_settings_values');
+    public $usedModels = array(
+        'module_settings',
+        'module_settings_values'
+    );
 
 	private $_modulecontroller;
 	private $_moduleid;
 	private $_settingsvalues;
 	private $_generalsettingsvalues;
 	private $_usedefaultwhennovalue=false;
-	
+
 
     public function __construct($p = null)
     {
         parent::__construct($p);
 
+        $this->loadExternalModel('ModuleSettingsModel');
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
@@ -30,7 +34,7 @@ class ModuleSettingsReaderController extends Controller
 
     public function getModuleSetting( $p )
     {
-		if ( is_array( $p )) 
+		if ( is_array( $p ))
 		{
 			$setting=isset($p['setting']) ? $p['setting'] : null;
 			$subst=isset($p['subst']) ? $p['subst'] : null;
@@ -40,14 +44,14 @@ class ModuleSettingsReaderController extends Controller
 		{
 			$setting=$p;
 		}
-		
+
 		if ( isset($module) && $module!=$this->getModuleController() )
 		{
 			return $this->getExtraneousModuleSetting( $p );
 		}
-		
+
 		if ( empty($setting) ) return;
-		
+
 		foreach((array)$this->getModuleSettingsValues() as $val)
 		{
 			if ($val['setting']==$setting && !is_null($val['value']))
@@ -140,6 +144,11 @@ class ModuleSettingsReaderController extends Controller
 	{
 		if (is_null($this->getModuleId())) return;
 
+		$this->_settingsvalues = $this->models->ModuleSettingsModel->setModuleReaderSettingValues(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'moduleId' => $this->getModuleId()
+		));
+/*
 		$this->_settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
 			select
 				_a.value as value,
@@ -157,6 +166,7 @@ class ModuleSettingsReaderController extends Controller
 			where
 				_b.module_id = " . $this->getModuleId() . "
 			");
+*/
 	}
 
 	private function getModuleSettingsValues()
@@ -166,7 +176,12 @@ class ModuleSettingsReaderController extends Controller
 
 	private function setGeneralSettingsValues()
 	{
-		$this->_generalsettingsvalues=$this->models->ModuleSettingsValues->freeQuery("
+		$this->_generalsettingsvalues = $this->models->ModuleSettingsModel->setModuleReaderSettingValues(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'moduleId' => -1
+		));
+/*
+	    $this->_generalsettingsvalues=$this->models->ModuleSettingsValues->freeQuery("
 			select
 				_a.value as value,
 				_b.setting,
@@ -183,13 +198,14 @@ class ModuleSettingsReaderController extends Controller
 			where
 				_b.module_id = -1
 			");
-	}
+*/
+		}
 
 	private function getGeneralSettingsValues()
 	{
         return $this->_generalsettingsvalues;
 	}
-	
+
 	private function getExtraneousModuleSetting( $p )
 	{
 		$setting=isset($p['setting']) ? $p['setting'] : null;
@@ -201,9 +217,15 @@ class ModuleSettingsReaderController extends Controller
 		$moduleid=$this->resolveModuleId( $module );
 
 		if ( empty($moduleid) ) return;
-		
+
 		if (is_null($this->getModuleId())) return;
 
+		$settingsvalues = $this->models->ModuleSettingsModel->setModuleReaderSettingValues(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'moduleId' => $moduleid,
+		    'setting' => $setting
+		));
+/*
 		$settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
 			select
 				_a.value as value,
@@ -222,7 +244,8 @@ class ModuleSettingsReaderController extends Controller
 				_b.module_id = " . $moduleid . "
 				and _b.setting = '" . $setting . "'
 			");
-			
+*/
+
 		if ( $settingsvalues )
 		{
 			if (!is_null($settingsvalues[0]['value']))
@@ -234,8 +257,8 @@ class ModuleSettingsReaderController extends Controller
 		if ( isset($subst) )
 		{
 			return $subst;
-		}			
+		}
     }
 
 
-}	
+}
