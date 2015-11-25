@@ -46,7 +46,7 @@ class SearchControllerNSR extends SearchController
     );
 	
 
-    public $modelNameOverride = 'SearchControllerNSRModel';
+    public $modelNameOverride = 'SearchNSRModel';
     public $controllerPublicName = 'Search';
 
     public $usedHelpers = array();
@@ -304,7 +304,7 @@ class SearchControllerNSR extends SearchController
 	private function getPresenceStatuses()
 	{
 		return
-			$this->models->SearchControllerNSRModel->getPresenceStatuses(array(
+			$this->models->SearchNSRModel->getPresenceStatuses(array(
 				"language_id"=>$this->getCurrentLanguageId(),
 				"project_id"=>$this->getCurrentProjectId()
 			));
@@ -313,7 +313,7 @@ class SearchControllerNSR extends SearchController
 	private function getTaxonOverviewImage( $taxon_id ) 
 	{
 		return 
-			$this->models->SearchControllerNSRModel->getTaxonOverviewImage(array(
+			$this->models->SearchNSRModel->getTaxonOverviewImage(array(
 				"project_id"=>$this->getCurrentProjectId(),
 				"taxon_id"=>$taxon_id
 			));
@@ -331,7 +331,7 @@ class SearchControllerNSR extends SearchController
 		if (empty($search))
 			return null;
 
-		$d=$this->models->SearchControllerNSRModel->doSearch(array(
+		$d=$this->models->SearchNSRModel->doSearch(array(
 			"search"=>$search,
 			"nsr_id_prefix"=>$this->conceptIdPrefix,
 			"language_id"=>$this->getCurrentLanguageId(),
@@ -403,7 +403,7 @@ class SearchControllerNSR extends SearchController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : null;
 
-		$d=$this->models->SearchControllerNSRModel->doExtendedSearch(array(
+		$d=$this->models->SearchNSRModel->doExtendedSearch(array(
 			"images"=>$images,
 			"images_on"=>$images_on,
 			"images_off"=>$images_off,
@@ -450,7 +450,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getPhotographersPictureCount($p=null)
 	{
-		$tCount=$this->models->SearchControllerNSRModel->getPhotographersPictureCount(array(
+		$tCount=$this->models->SearchNSRModel->getPhotographersPictureCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
 		
@@ -489,7 +489,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getValidatorPictureCount($p=null)
 	{
-		$tCount= $this->models->SearchControllerNSRModel->getValidatorPictureCount(array(
+		$tCount= $this->models->SearchNSRModel->getValidatorPictureCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
 		
@@ -564,7 +564,7 @@ class SearchControllerNSR extends SearchController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : null;
 
-		$d=$this->models->SearchControllerNSRModel->doPictureSearch(array(
+		$d=$this->models->SearchNSRModel->doPictureSearch(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"group_id"=>$group_id,
 			"name"=>$name,
@@ -684,7 +684,7 @@ class SearchControllerNSR extends SearchController
 		
 		return
 			array(
-				'count'=>$count[0]['total'],
+				'count'=>$count,
 				'data'=> $this->NSRFunctions->formatPictureResults( $data ),
 				'perpage'=>$this->_resPicsPerPage
 			);
@@ -693,7 +693,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsGroup( $p )
 	{
-		return $this->models->SearchControllerNSRModel->getSuggestionsGroup(array(
+		return $this->models->SearchNSRModel->getSuggestionsGroup(array(
 			"match"=>$p['match'],
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
@@ -705,7 +705,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsAuthor( $p )
 	{
-		return $this->models->SearchControllerNSRModel->getSuggestionsAuthor(array(
+		return $this->models->SearchNSRModel->getSuggestionsAuthor(array(
 			"match"=>$p['match'],
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
@@ -715,7 +715,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsValidator( $p )
 	{
-		return $this->models->SearchControllerNSRModel->getSuggestionsValidator(array(
+		return $this->models->SearchNSRModel->getSuggestionsValidator(array(
 			"match"=>$p['match'],
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
@@ -725,7 +725,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsPhotographer( $p )
 	{
-		return $this->models->SearchControllerNSRModel->getSuggestionsValidator(array(
+		return $this->models->SearchNSRModel->getSuggestionsValidator(array(
 			"match"=>$p['match'],
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
@@ -735,7 +735,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName( $p )
 	{
-		return $this->models->SearchControllerNSRModel->getSuggestionsValidator(array(
+		return $this->models->SearchNSRModel->getSuggestionsValidator(array(
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
 			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
@@ -937,7 +937,7 @@ class SearchControllerNSR extends SearchController
 	{
 		if ( empty( $group ) ) return;
 		
-		$r=$this->models->SearchControllerNSRModel->getTraits(array(
+		$r=$this->models->SearchNSRModel->getTraits(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"group"=>$group
@@ -964,7 +964,7 @@ class SearchControllerNSR extends SearchController
 	{
 		if (empty($trait_id)) return;
 		
-		return $this->models->SearchControllerNSRModel->getTraitgroupTrait(array(
+		return $this->models->SearchNSRModel->getTraitgroupTrait(array(
 			"project_id"=>$this->getCurrentProjectId(),
 			"trait_id"=>$trait_id
 		));
@@ -975,7 +975,7 @@ class SearchControllerNSR extends SearchController
 	{
 		if (empty($trait_id)) return;
 
-		$r=$this->models->SearchControllerNSRModel->getTraitgroupTraitValues(array(
+		$r=$this->models->SearchNSRModel->getTraitgroupTraitValues(array(
 			"language_id"=> $this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"trait_id"=>$trait_id
@@ -1023,7 +1023,7 @@ class SearchControllerNSR extends SearchController
 			)
 		));
 
-		$t2=$this->models->SearchControllerNSRModel->getTaxonTraitFreeValues(array(
+		$t2=$this->models->SearchNSRModel->getTaxonTraitFreeValues(array(
 			"project_id"=>$this->getCurrentProjectId(),
 			"taxon_id"=>$taxon_id
 		));

@@ -53,7 +53,7 @@ class RdfController extends Controller
 					));
 					break;
 				case 'taxon' :
-					$data=$this->models->Taxon->_get(array(
+					$data=$this->models->Taxa->_get(array(
 						'id' => array(
 							'project_id'=>$this->getCurrentProjectId(),
 							'id'=>$val['object_id']

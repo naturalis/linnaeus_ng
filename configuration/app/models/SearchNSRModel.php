@@ -1,7 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/AbstractModel.php");
 
-final class SearchControllerNSRModel extends AbstractModel
+final class SearchNSRModel extends AbstractModel
 {
 	
 	private $_operators;
