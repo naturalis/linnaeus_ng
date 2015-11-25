@@ -5,7 +5,7 @@ include_once (dirname(__FILE__) . "/AbstractModel.php");
 final class Table extends AbstractModel
 {
 
-    private $columns;
+    public $columns;
 
     public function __construct ($tableBaseName = false)
     {
