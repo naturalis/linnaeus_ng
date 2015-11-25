@@ -116,11 +116,11 @@ class MergeController extends Controller
         if ($this->rHasVal('id')) {
 
 			$merge = $this->models->Projects->_get(array(
-				'id' => array('id' => $this->requestData['id']),
+				'id' => array('id' => $this->rGetId()),
 				'order' => 'title'
 			));
 
-			$modules = $this->getProjectModules(array('project_id'=>$this->requestData['id']));
+			$modules = $this->getProjectModules(array('project_id'=>$this->rGetId()));
 
 
 			$moduleInfo = array(
@@ -145,11 +145,11 @@ class MergeController extends Controller
 
 			$res = $this->doMergeProject(
 				array(
-					'sourceId' => $this->requestData['id'],
+					'sourceId' => $this->rGetId(),
 					'targetId' => $this->getCurrentProjectId(),
 					'postfix' => ' ('.$merge[0]['title'].')',
-					'modules' => isset($this->requestData['modules']) ? $this->requestData['modules'] : null,
-					'freeModules' => isset($this->requestData['freeModules']) ? $this->requestData['freeModules'] : null,
+					'modules' => $this->rHasVar('modules') ? $this->rGetVal('modules') : null,
+					'freeModules' => $this->rHasVar('freeModules') ? $this->rGetVal('freeModules') : null
 				)
 			);
 

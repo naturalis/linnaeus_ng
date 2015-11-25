@@ -113,7 +113,7 @@ class FreeModuleController extends Controller
 		if (!$this->rHasVal('page'))
 			$this->redirect('edit.php?id='.$this->getFirstPageId());
 		else
-			$this->redirect('edit.php?id='.$this->requestData['page']);
+			$this->redirect('edit.php?id='.$this->rGetVal('page'));
 
 
     }
@@ -186,7 +186,7 @@ class FreeModuleController extends Controller
 			} else
 			if ($this->rHasVal('action','preview')) {
 
-				$this->redirect('preview.php?id='.$this->requestData['id']);
+				$this->redirect('preview.php?id='.$this->rGetId());
 
 			}
 
@@ -207,9 +207,9 @@ class FreeModuleController extends Controller
 		$navList = $this->getModulePageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-			$this->smarty->assign('navCurrentId',isset($this->requestData['id']) ? $this->requestData['id'] : null);
+			$this->smarty->assign('navCurrentId',$this->rGetId()) ? $this->rGetId() : null);
 
-		$this->smarty->assign('id', $this->rHasId() ? $this->requestData['id'] : $id);
+		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
 
 		if (isset($page)) $this->smarty->assign('page', $page);
 
@@ -230,7 +230,7 @@ class FreeModuleController extends Controller
 		$this->redirect(
 			'../../../app/views/module/topic.php?p='.$this->getCurrentProjectId().
 			'&modId='.$this->getCurrentModuleId().
-			'&id='.$this->requestData['id'].
+			'&id='.$this->rGetId().
 			'&lan='.$this->getDefaultProjectLanguage()
 		);
 
@@ -252,9 +252,9 @@ class FreeModuleController extends Controller
 
 		    $alphaIndex = $this->moduleSession->getModuleSetting('alphaIndex');
 
-		    $refs = $alphaIndex[$this->requestData['letter']];
+		    $refs = $alphaIndex[$this->rGetVal('letter')];
 
-		    $this->smarty->assign('letter', $alphaIndex[$this->requestData['letter']]);
+		    $this->smarty->assign('letter', $alphaIndex[$this->rGetVal('letter')]);
 
 		}
 
@@ -338,7 +338,7 @@ class FreeModuleController extends Controller
 
 		}
 
-		$this->smarty->assign('id',$this->requestData['id']);
+		$this->smarty->assign('id',$this->rGetId());
 
 		$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
@@ -371,10 +371,10 @@ class FreeModuleController extends Controller
 			$d = array(
 					'id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId(),
-					'show_alpha' => $this->requestData['show_alpha'],
+					'show_alpha' => $this->rGetVal('show_alpha'),
 				);
 
-			$m = trim($this->requestData['module']);
+			$m = trim($this->rGetVal('module'));
 
 			if (!empty($m)) $d['module'] = $m;
 
@@ -422,9 +422,9 @@ class FreeModuleController extends Controller
 
 				$newOrder = $key;
 
-				if ($val['id'] == $this->requestData['id']) {
+				if ($val['id'] == $this->rGetId()) {
 
-					if (($this->requestData['dir']=='up') && $prev) {
+					if ($this->rHasVar('dir', 'up') && $prev) {
 
 						$newOrder = $key - 1;
 
@@ -439,7 +439,7 @@ class FreeModuleController extends Controller
 						);
 
 					} else
-					if ($this->requestData['dir']=='down') {
+					if ($this->rHasVar('dir', 'down')) {
 
 						$newOrder = $key + 1;
 
@@ -469,7 +469,7 @@ class FreeModuleController extends Controller
 					)
 				);
 
-				if ($val['id'] == $this->requestData['id'] && $this->requestData['dir']=='down') {
+				if ($val['id'] == $this->rGetId() && $this->rHasVar('dir', 'down')) {
 
 					$lowerNext = true;
 
@@ -588,21 +588,18 @@ class FreeModuleController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->requestData['action'] == 'save_content') {
-
-
+        if ($this->rHasVar('action', 'save_content')) {
 
             $this->ajaxSaveContent();
 
-        } else
-        if ($this->requestData['action'] == 'get_content') {
+        } else if ($this->rHasVar('action', 'get_content')) {
 
             $this->ajaxActionGetContent();
 
         }
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->rGetVal('search'));
 
         }
 
@@ -644,10 +641,10 @@ class FreeModuleController extends Controller
 		if (
 			$this->saveContent(
 				array(
-					'id' => $this->requestData['id'],
-					'language' => $this->requestData['language'],
-					'topic' => isset($this->requestData['topic']) ? $this->requestData['topic'] : null,
-					'content' => isset($this->requestData['content']) ? $this->requestData['content'] : null,
+					'id' => $this->rGetId(),
+					'language' => $this->rGetVal('language'),
+					'topic' => $this->rGetVal('topic'),
+					'content' => $this->rGetVal('content'),
 				)
 			)
 		) $this->smarty->assign('returnText', 'saved');
@@ -754,7 +751,7 @@ class FreeModuleController extends Controller
 
         } else {
 
-			$page = $this->getPageContent($this->requestData['id'],$this->requestData['language']);
+			$page = $this->getPageContent($this->rGetId(),$this->rGetVal('language'));
 
             $this->smarty->assign('returnText', json_encode(array('topic' => $page['topic'],'content' => $page['content'])));
 
@@ -774,7 +771,7 @@ class FreeModuleController extends Controller
 	private function isUserAuthorizedForFreeModule($id=null)
 	{
 
-		$id = isset($id) ? $id : $this->requestData['freeId'];
+		$id = isset($id) ? $id : $this->rGetVal('freeId');
 
 		if (!isset($id)) return false;
 
@@ -799,8 +796,8 @@ class FreeModuleController extends Controller
 		$id =
 			isset($id) ?
 				$id :
-				isset($this->requestData['freeId']) ?
-					$this->requestData['freeId'] :
+				isset($this->rGetVal('freeId')) ?
+					$this->rGetVal('freeId') :
 					$this->getCurrentModuleId();
 
 		$fmp = $this->models->FreeModulesProjects->_get(
@@ -1014,7 +1011,7 @@ class FreeModuleController extends Controller
 	private function deleteMedia($id=null)
 	{
 
-		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
+		$id = isset($id) ? $id : ($this->rGetId() ? $this->rGetId() : null);
 
 		if ($id == null) return;
 
@@ -1052,7 +1049,7 @@ class FreeModuleController extends Controller
 	private function deletePage($id=null)
 	{
 
-		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
+		$id = isset($id) ? $id : ($this->rGetId() ? $this->rGetId() : null);
 
 		if ($id == null || !$this->getCurrentModuleId()) return;
 

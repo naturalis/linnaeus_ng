@@ -66,7 +66,7 @@ class ActorsController extends NsrController
 
     public function ajaxInterfaceAction ()
     {
-        if (!isset($this->requestData['action'])) return;
+        if (!$this->rHasVar('action')) return;
 		$return=null;
 		$return=$this->getActorLookupList($this->GetAll());
         $this->allowEditPageOverlay = false;

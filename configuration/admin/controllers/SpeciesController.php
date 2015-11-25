@@ -523,7 +523,7 @@ class SpeciesController extends Controller
             if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save') && !$this->isFormResubmit())
 			{
 
-                $isHybrid = $this->requestData['is_hybrid'];
+                $isHybrid = $this->rGetVal('is_hybrid');
 
                 if ($this->rGetId() == $this->rGetVal('parent_id'))
                     $parentId = $this->rGetVal('org_parent_id');
@@ -661,7 +661,7 @@ class SpeciesController extends Controller
 
                     $this->clearErrors();
 
-                    
+
 
                     $this->models->Taxon->save(
                     array(
@@ -878,7 +878,7 @@ class SpeciesController extends Controller
 				{
                     $this->clearErrors();
 
-                    
+
 
                     $this->models->Taxon->save(
                     array(
@@ -955,7 +955,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasVal('action', 'process') && $this->rHasId()) {
 
-            
+
 
 			set_time_limit(600);
 
@@ -1043,7 +1043,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasVal('child')) {
 
-            
+
 
             foreach ((array) $this->rGetVal('child') as $key => $val) {
 
@@ -1751,7 +1751,7 @@ class SpeciesController extends Controller
         }
         else if ($this->rGetVal('action') == 'delete_taxon') {
 
-            
+
 
             $this->ajaxActionDeleteTaxon();
         }
@@ -1781,7 +1781,7 @@ class SpeciesController extends Controller
         }
         else if ($this->rGetVal('action') == 'save_col') {
 
-            
+
 
             $this->ajaxActionImportTaxa();
         }
