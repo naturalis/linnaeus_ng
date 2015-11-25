@@ -4,20 +4,20 @@ include_once ('Controller.php');
 class MatrixKeyAppController extends Controller
 {
     public $usedModels = array(
-        'matrix', 
-        'matrix_name', 
-        'matrix_taxon', 
-        'matrix_taxon_state', 
-        'commonname', 
-        'characteristic', 
-        'characteristic_matrix', 
-        'characteristic_label', 
-        'characteristic_state', 
-        'characteristic_label_state', 
-        'chargroup_label', 
-        'chargroup', 
-        'characteristic_chargroup', 
-        'matrix_variation', 
+		'matrices', 
+		'matrices_names', 
+		'matrices_taxa', 
+		'matrices_taxa_states', 
+		'matrices_variations', 
+		'commonnames', 
+		'characteristics', 
+		'characteristics_chargroups', 
+		'characteristics_labels', 
+		'characteristics_labels_states', 
+		'characteristics_matrices', 
+		'characteristics_states', 
+		'chargroups', 
+		'chargroups_labels', 
         'nbc_extras', 
         'variation_relations',
 		'gui_menu_order'
@@ -427,6 +427,11 @@ class MatrixKeyAppController extends Controller
 		);
 		$res['similar']=$t;
 
+
+
+
+
+
 		$t=$this->models->Taxon->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id'=>$data['id'])));
 		foreach((array)$t as $key => $val)
 		{
@@ -447,34 +452,16 @@ class MatrixKeyAppController extends Controller
 	{
 		if (!isset($_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']))
 		{
-			
 			$_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']=
-				$this->models->GuiMenuOrder->freeQuery(
-					"select 
-						_a.ref_id as id,'character' as type,_a.show_order as show_order,
-						if(locate('|',_b.label)=0,_b.label,substring(_b.label,1,locate('|',_b.label)-1)) as label,
-					if(locate('|',_b.label)=0,_b.label,substring(_b.label,locate('|',_b.label)+1)) as description
-					from %TABLE% _a
-					left join %PRE%characteristics_labels _b on _b.characteristic_id = _a.ref_id and _b.language_id = ".$lId."
-					where 
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.matrix_id = ".$mId."
-						and _a.ref_type='char'
-					union all
-					select 
-						_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %TABLE% _a
-					left join %PRE%chargroups_labels _c on _c.chargroup_id = _a.ref_id and _c.language_id = ".$lId."
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.matrix_id = ".$mId."
-						and _a.ref_type='group'
-					order by show_order,label"
-				);
-				
+				$this->models->MatrixkeyappModel->getGuiMenuOrder(array(
+					"language_id"=>$lId,
+					"project_id"=>$this->getCurrentProjectId(),
+					"matrix_id"=>$mId
+				));
 		}
 		
 		return $_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder'];
-			
+
 	}
 			
 	private function getCommonname($tId)
