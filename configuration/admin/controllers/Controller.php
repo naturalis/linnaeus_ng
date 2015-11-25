@@ -1138,7 +1138,7 @@ class Controller extends BaseClass
     public function getTaxonById ($id = false)
     {
 
-        $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
+        $id = $id===false ? ($this->rGetId()) ? $this->rGetId() : null) : $id;
 
         if (empty($id) || $id == 0)
             return;
@@ -2498,7 +2498,7 @@ class Controller extends BaseClass
 
     public function rGetId ()
     {
-        return $this->rGetVal('id');
+        return $this->rGetId();
     }
 
 
@@ -2823,14 +2823,14 @@ class Controller extends BaseClass
     {
         if ($this->isMultiLingual)
 		{
-            if (isset($this->requestData['uiLang']))
+            if ($this->rHasVar('uiLang'))
 			{
-                $this->setLocale($this->requestData['uiLang']);
+                $this->setLocale($this->rGetVal('uiLang'));
             }
         }
         else
 		{
-            $this->log('Attempt to set language ' . $this->requestData['uiLang'] . ' for non-mulitlanguage page', 1);
+            $this->log('Attempt to set language ' . $this->rGetVal('uiLang') . ' for non-mulitlanguage page', 1);
         }
 
         if ($unsetRequestVar)

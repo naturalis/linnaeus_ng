@@ -313,7 +313,7 @@ class ImportNBCController extends ImportController
 
 			if ($this->rHasVal('action')) {
 
-				$_SESSION['admin']['system']['import']['existingProjectTreatment'] = $this->requestData['action'];
+				$_SESSION['admin']['system']['import']['existingProjectTreatment'] = $this->rGetVal('action');
 
 				if ($this->rHasVal('action','replace_data') || $this->rHasVal('action','replace_species_data')) {
 
@@ -375,14 +375,14 @@ class ImportNBCController extends ImportController
         if ($this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
 
 			if ($this->rHasVal('nbcColumns'))
-				$_SESSION['admin']['system']['import']['data']['nbcColumns'] = $this->requestData['nbcColumns'];
+				$_SESSION['admin']['system']['import']['data']['nbcColumns'] = $this->rGetVal('nbcColumns');
 
             $ranks = $this->addRanks();
 
             $_SESSION['admin']['system']['import']['project']['ranks'] = $ranks;
 
             if ($this->rHasVal('variant_columns'))
-				$_SESSION['admin']['system']['import']['variantColumns'] = $this->requestData['variant_columns'];
+				$_SESSION['admin']['system']['import']['variantColumns'] = $this->rGetVal('variant_columns');
 
             $data = $_SESSION['admin']['system']['import']['data'];
 
@@ -519,7 +519,7 @@ class ImportNBCController extends ImportController
             $data = $this->storeCharacterGroups($_SESSION['admin']['system']['import']['data'], $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['chargroups'] . ' character groups.');
 
-            $data = $this->storeCharacters($data, $mId, $this->requestData['char_type']);
+            $data = $this->storeCharacters($data, $mId, $this->rGetVal('char_type'));
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['characters'] . ' characters.');
 
             $data = $this->storeStates($data);
@@ -621,9 +621,9 @@ class ImportNBCController extends ImportController
 			foreach((array)$settings as $key => $val)
 				$this->saveSetting(array('name' => $key, 'value' => $val, 'pId' => $this->getNewProjectId()));
 
-			if (isset($this->requestData['settings']))
+			if ($this->rHasVar('settings'))
 			{
-				foreach((array)$this->requestData['settings'] as $key => $val) {
+				foreach((array)$this->rGetVal('settings') as $key => $val) {
 					if (!empty($val))
 						$this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));
 				}

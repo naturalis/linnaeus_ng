@@ -24,7 +24,7 @@ class HighertaxaController extends Controller
 
     public function editAction ()
     {
-		$this->redirect('../species/edit.php?id='.$this->requestData['id']);
+		$this->redirect('../species/edit.php?id='.$this->rGetId());
     }
 
 }

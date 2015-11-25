@@ -123,7 +123,7 @@ class Literature2Controller extends NsrController
 
     public function ajaxInterfaceAction ()
     {
-        if (!isset($this->requestData['action'])) return;
+        if (!$this->rHasVal('action')) return;
 		$return=null;
 		$return=$this->getReferenceLookupList($this->GetAll());
         $this->allowEditPageOverlay = false;
