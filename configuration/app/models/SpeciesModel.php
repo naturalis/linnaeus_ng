@@ -1225,7 +1225,7 @@ class SpeciesModel extends AbstractModel
 			where
 				_a.project_id = ".$projectId."
 				and lower(_a.name) = '".
-                    mysqli_real_escape_string($this->databaseConnection, $organisation) ."'";
+                    $this->escapeString($this->databaseConnection, $organisation) ."'";
 
         return $this->freeQuery($query);
 
@@ -1251,20 +1251,11 @@ class SpeciesModel extends AbstractModel
 			where
 				project_id = ".$projectId."
 				and lower(name) = '".
-                    mysqli_real_escape_string($this->databaseConnection, $organisation) ."'";
+                    $this->escapeString($this->databaseConnection, $organisation) ."'";
 
         return $this->freeQuery($query);
 
     }
-
-
-
-
-
-
-
-
-
 
 }
 
