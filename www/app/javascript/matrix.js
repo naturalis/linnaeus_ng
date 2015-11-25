@@ -229,7 +229,6 @@ function shouldDisableEmergentChar( id )
 
 function printMenu()
 {
-	
 	if (typeof hook_prePrintMenu == 'function') { hook_prePrintMenu(); }
 	
 	$('#facet-categories-menu').html('');
@@ -499,7 +498,7 @@ function printResultsPaginated()
 	{
 		if (
 			(matrixsettings.browseStyle=='paginate' && i>=matrixsettings.start && i<matrixsettings.start+matrixsettings.perPage) || 
-			matrixsettings.browseStyle=='show_all'
+			matrixsettings.browseStyle!='paginate' // =='show_all'
 		)
 		{
 			s=s+formatResult(resultset[i]);
@@ -934,7 +933,6 @@ function setState( p )
 
 function applyScores()
 {
-
 	if (typeof hook_preApplyScores == 'function') { hook_preApplyScores(); }
 
 	var scores=getScores();
@@ -959,6 +957,8 @@ function applyScores()
 			for(var j in dataset)
 			{
 				var item=dataset[j];
+
+console.log(score.score,matrixsettings.scoreThreshold);
 
 				if (score.id==item.id && score.type==item.type && (matrixsettings.scoreThreshold==0 || score.score>=matrixsettings.scoreThreshold))
 				{
