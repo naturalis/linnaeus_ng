@@ -207,25 +207,6 @@ class ImportL2Controller extends ImportController
             }
         }
 
-		/*
-        if ($this->rHasVal('thumbsPath') || $this->rHasVal('noThumbs')) {
-
-            if ($this->rHasVal('noThumbs')) {
-
-                $_SESSION['admin']['system']['import']['thumbsPath'] = false;
-            }
-            else if (file_exists($this->requestData['thumbsPath'])) {
-
-                $_SESSION['admin']['system']['import']['thumbsPath'] = rtrim($this->requestData['thumbsPath'], '/') . '/';
-            }
-            else {
-
-                $this->addError('Thumbs path "' . $this->requestData['thumbsPath'] . '" does not exist or unreachable.');
-                unset($_SESSION['admin']['system']['import']['thumbsPath']);
-            }
-        }
-		*/
-
 		$_SESSION['admin']['system']['import']['thumbsPath'] = false;
 
         if ($this->rHasVal('clear', 'file')) {

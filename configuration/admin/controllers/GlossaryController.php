@@ -207,7 +207,7 @@ class GlossaryController extends Controller
 		} else
 		if ($this->rHasId()) {
 
-			$gloss = $this->getGlossaryTerm($this->rGetVal('id'));
+			$gloss = $this->getGlossaryTerm($this->rGetId());
 
 		} else
 		if (!$this->rHasVal('action','new')) {
@@ -236,7 +236,7 @@ class GlossaryController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
-			
+
 
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($this->rGetVal('term'),0,1))));
 
@@ -270,7 +270,7 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('term') && $this->rHasVal('definition') && !$this->rHasVal('action','browse') && !$this->isFormResubmit()) {
 
-			$data = $this->requestData;
+			$data = $this->GetAll();
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
@@ -282,7 +282,7 @@ class GlossaryController extends Controller
 
 				$this->addError($this->translate('Glossary term already exists.'));
 
-				$gloss = $this->requestData;
+				$gloss = $this->GetAll();
 
 				$activeLanguage = $this->rGetVal('language_id');
 

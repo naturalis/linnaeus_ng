@@ -313,7 +313,7 @@ class FreeModuleController extends Controller
 						array(
 							'id' => null,
 							'project_id' => $this->getCurrentProjectId(),
-							'page_id' => $this->requestData['id'],
+							'page_id' => $this->rGetId(),
 							'file_name' => $file['name'],
 							'original_name' => $file['original_name'],
 							'mime_type' => $file['mime_type'],
@@ -504,7 +504,7 @@ class FreeModuleController extends Controller
 
             $tmp = tempnam(sys_get_temp_dir(), 'lng');
 
-			switch ($this->requestData["delimiter"]) {
+			switch ($this->rGetVal('delimiter')) {
 				case 'comma' :
 					$this->helpers->CsvParserHelper->setFieldDelimiter(',');
 					break;
@@ -524,8 +524,8 @@ class FreeModuleController extends Controller
 
 			    $import = array(
 					'data' => $this->helpers->CsvParserHelper->getResults(),
-					'has_titles' => isset($this->requestData["has_titles"]) ? $this->requestData["has_titles"]=='1' : false,
-					'language' => $this->requestData["language"]
+					'has_titles' => $this->rHasVar('has_titles') ? $this->rGetVar('has_titles') == '1' : false,
+					'language' => $this->rGetVar('language')
 				);
 
 			    $this->moduleSession->setModuleSetting(array(
@@ -567,7 +567,7 @@ class FreeModuleController extends Controller
 
 		}
 
-		if (isset($this->requestData["reset"]))
+		if ($this->rHasVar('reset'))
 			$this->moduleSession->setModuleSetting(array('setting' => 'import'));
 
 		$this->printPage();
@@ -892,7 +892,7 @@ class FreeModuleController extends Controller
 	private function getPage($id=null)
 	{
 
-		$id = isset($id) ? $id : $this->requestData['id'];
+		$id = isset($id) ? $id : $this->rGetId();
 
 		if (!isset($id)) return;
 
