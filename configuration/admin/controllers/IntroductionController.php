@@ -412,7 +412,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->requestData['language'],
+						'language_id' => $this->rGetVal('language'),
 						'page_id' => $this->rGetId(),
 						)
 				)

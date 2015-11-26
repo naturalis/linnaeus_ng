@@ -162,9 +162,6 @@ class ContentController extends Controller
                 'value' => $d['subject']
             ));
 
-			//$d = $this->getContentById($this->requestData['id'],$_SESSION['admin']['project']['default_language_id']);
-			//$_SESSION['admin']['system']['content']['current-subject'] = $d['subject'];
-
 		}
 
 		$currentSubject =

@@ -110,10 +110,10 @@ class TraitsTaxonController extends TraitsController
 
 		if ($this->rHasVal('action','get_taxon_trait'))
 		{
-			$d=$this->getTaxonValues($this->requestData);
+			$d=$this->getTaxonValues($this->rGetId());
 
 			$this->smarty->assign('returnText',json_encode(array(
-				'trait'=>$this->getTraitgroupTrait($this->requestData),
+				'trait'=>$this->getTraitgroupTrait($this->rGetId()),
 				'taxon_values'=>isset($d[0]) ? $d[0] : null,
 				'default_project_language' => $this->getDefaultProjectLanguage()
 			)));

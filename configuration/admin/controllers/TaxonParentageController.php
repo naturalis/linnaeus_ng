@@ -12,18 +12,20 @@ class TaxonParentageController extends Controller
     public function __construct ()
     {
         parent::__construct();
+
+        $this->loadExternalModel('TreeModel');
     }
 
     public function __destruct ()
     {
         parent::__destruct();
     }
-	
+
 	public function padId($id)
 	{
 		return sprintf('%05s',$id);
 	}
-	
+
 	private function initialize()
 	{
 		if (!$this->models->TaxonQuickParentage->getTableExists())
@@ -39,13 +41,13 @@ class TaxonParentageController extends Controller
 			'id'=>
 				array(
 					'project_id' => $this->getCurrentProjectId()
-			
+
 				),
 			'columns' => 'count(*) as total'
 			));
-			
+
 		return $d[0]['total'];
-				
+
     }
 
 	public function generateParentageAll()
@@ -90,34 +92,15 @@ class TaxonParentageController extends Controller
 	{
 		/*
 			get the top taxon = no parent
-			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks 
+			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks
 		*/
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_r.rank
-			from
-				%PRE%taxa _a
-					
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
 
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.parent_id is null
-				and _r.id < 10
-
-		");
+	    $p = $this->models->TreeModel->getTreeTop($this->getCurrentProjectId());
 
 		if ($p && count((array)$p)==1)
 		{
 			$p=$p[0]['id'];
-		} 
+		}
 		else
 		{
 			$p=null;
@@ -130,10 +113,10 @@ class TaxonParentageController extends Controller
 
 		return $p;
 	}
-	
+
 	private function getProgeny($parent,$level,$family)
 	{
-		$result = $this->models->Taxon->_get(
+		$result = $this->models->Taxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),

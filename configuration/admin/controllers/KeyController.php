@@ -316,7 +316,6 @@ class KeyController extends Controller
             // number can now no longer be edited
             if ($this->rHasVal('action', 'save') && !$this->isFormResubmit())
 			{
-            	//$this->redirect('step_show.php?id=' . $this->requestData['id']);
             	// no number specified
                 if (empty($this->rGetVal('number')))
 				{
@@ -370,13 +369,9 @@ class KeyController extends Controller
 							$this->addMessage($this->translate('Saved.'));
 
 						}
-
-                        //$this->redirect('step_show.php?id=' . $this->requestData['id']);
                     }
                 }
-
             }
-
 		}
 
         if (isset($step))

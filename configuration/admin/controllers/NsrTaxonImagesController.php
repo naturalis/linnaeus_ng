@@ -47,21 +47,21 @@ class NsrTaxonImagesController extends NsrController
 //		'verspreidingsKaartBron',
 //		'verspreidingsKaartTitel',
 	);
-		
-    private 
-		$_mime_types = array(          
-			'png' => 'image/png', 
-			'jpe' => 'image/jpeg', 
-			'jpeg' => 'image/jpeg', 
-			'jpg' => 'image/jpeg', 
-			'gif' => 'image/gif', 
-			'bmp' => 'image/bmp', 
-			'ico' => 'image/vnd.microsoft.icon', 
-			'tiff' => 'image/tiff', 
-			'tif' => 'image/tiff', 
-			'svg' => 'image/svg+xml', 
-			'svgz' => 'image/svg+xml', 
-		); 
+
+    private
+		$_mime_types = array(
+			'png' => 'image/png',
+			'jpe' => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+			'jpg' => 'image/jpeg',
+			'gif' => 'image/gif',
+			'bmp' => 'image/bmp',
+			'ico' => 'image/vnd.microsoft.icon',
+			'tiff' => 'image/tiff',
+			'tif' => 'image/tiff',
+			'svg' => 'image/svg+xml',
+			'svgz' => 'image/svg+xml',
+		);
 
     public function __construct()
     {
@@ -79,17 +79,17 @@ class NsrTaxonImagesController extends NsrController
 		$this->checkAuthorisation();
 
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
-		
+
 		if ($this->rHasId() && $this->rHasVal('image') && $this->rHasVal('action','delete'))
 		{
 			$this->setConceptId( $this->rGetId() );
 			$this->disconnectTaxonMedia($this->rGetVal('image'));
 			$this->setMessage('Afbeelding ontkoppeld.');
-		} 
-		
+		}
+
 		$this->setConceptId( $this->rGetId() );
         $this->setPageName($this->translate('Taxon images'));
-		$this->smarty->assign('concept',$this->getConcept($this->rGetVal('id')));
+		$this->smarty->assign('concept',$this->getConcept($this->rGetId()));
 		$this->smarty->assign('images',$this->getTaxonMedia());
 
 		$this->checkMessage();
@@ -103,12 +103,12 @@ class NsrTaxonImagesController extends NsrController
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
 
         $this->setPageName($this->translate('Meta-data'));
-		
+
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->updateTaxonImageMetaData( $this->requestData );
-			$this->updateTaxonImageTaxonId( $this->requestData );
-			$this->updateTaxonImageOverviewState( $this->requestData );
+			$this->updateTaxonImageMetaData($this->GetAll());
+			$this->updateTaxonImageTaxonId($this->GetAll());
+			$this->updateTaxonImageOverviewState($this->GetAll());
 			$this->addMessage( 'Meta-data opgeslagen.' );
 		}
 
@@ -119,10 +119,10 @@ class NsrTaxonImagesController extends NsrController
 		{
 			unset($meta[array_search($val['sys_label'],$meta)]);;
 		}
-		
+
 		$this->smarty->assign('image',$image);
 		$this->smarty->assign('meta_rest',$meta);
-	
+
 		$this->printPage();
 	}
 
@@ -130,7 +130,7 @@ class NsrTaxonImagesController extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Meta-data bulk'));
-		
+
 		$raw=null;
 		$ignorefirst=false;
 		$lines=null;
@@ -148,7 +148,7 @@ class NsrTaxonImagesController extends NsrController
 			$fields=$this->rGetVal('fields');
 			$this->setSessionVar('fields',$fields);
 		}
-		
+
 		if ($this->rHasVal('raw'))
 		{
 			$raw=$this->rGetVal('raw');
@@ -160,11 +160,11 @@ class NsrTaxonImagesController extends NsrController
 				$fields=null;
 			}
 			$this->setSessionVar('hash',$hash);
-			
+
 			$lines=$this->parseRawCsvData($raw);
 
 			if (!$ignorefirst) $firstline=null;
-			
+
 			foreach($lines as $key=>$val)
 			{
 				if ($key==0)
@@ -172,7 +172,7 @@ class NsrTaxonImagesController extends NsrController
 					foreach($val as $c=>$cell) $emptycols[$c]=true;
 				}
 
-				if ($ignorefirst && $key==0) 
+				if ($ignorefirst && $key==0)
 				{
 					$firstline=$val;
 					continue;
@@ -187,11 +187,11 @@ class NsrTaxonImagesController extends NsrController
 				}
 			}
 		}
-		
-		if ($lines && $fields) 
+
+		if ($lines && $fields)
 		{
 			$this->setSessionVar( 'lines', $lines );
-			
+
 			$this->setSessionVar( $this->sys_label_NSR_ID );
 			$this->setSessionVar( $this->sys_label_file_name );
 
@@ -216,7 +216,7 @@ class NsrTaxonImagesController extends NsrController
 					}
 				}
 			}
-			
+
 			if ( is_null($this->getSessionVar( $this->sys_label_NSR_ID )) )
 			{
 				$this->addError( 'Must have a NSR ID-column.' );
@@ -233,9 +233,9 @@ class NsrTaxonImagesController extends NsrController
 			}
 
 			if
-			( 
-				!is_null($this->getSessionVar( $this->sys_label_NSR_ID )) && 
-				!is_null($this->getSessionVar( $this->sys_label_file_name )) && 
+			(
+				!is_null($this->getSessionVar( $this->sys_label_NSR_ID )) &&
+				!is_null($this->getSessionVar( $this->sys_label_file_name )) &&
 				$assignedMetaFields>0
 			)
 			{
@@ -247,7 +247,7 @@ class NsrTaxonImagesController extends NsrController
 			}
 
 		}
-		
+
 		$this->smarty->assign('col_NSR_ID',$this->getSessionVar( $this->sys_label_NSR_ID ));
 		$this->smarty->assign('col_file_name',$this->getSessionVar( $this->sys_label_file_name ));
 		$this->smarty->assign('checks',$checks);
@@ -266,7 +266,7 @@ class NsrTaxonImagesController extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Meta-data bulk'));
-		
+
 		if ( !$this->isFormResubmit() )
 		{
 			$this->doSaveImageMetaBulk();
@@ -289,7 +289,7 @@ class NsrTaxonImagesController extends NsrController
 		array_unshift($this->availableMetaDataFields,'');
 		array_unshift($this->availableMetaDataFields,$this->sys_label_NSR_ID);
 		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
-		
+
 		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
 	}
@@ -331,10 +331,10 @@ class NsrTaxonImagesController extends NsrController
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
-		
+
 		$data=$d['data'];
 		$count=$d['count'];
-		
+
 		foreach((array)$data as $key=>$val)
 		{
 			$data[$key]['label']=
@@ -343,7 +343,7 @@ class NsrTaxonImagesController extends NsrController
 					(isset($val['meta_datum']) ? $val['meta_datum'].', ' : '' ).
 					(isset($val['meta_geografie']) ? $val['meta_geografie'] : ''),
 					', '
-				);			
+				);
 
 			$data[$key]['meta']=$this->models->MediaMeta->_get(array("id"=>
 				array(
@@ -365,7 +365,7 @@ class NsrTaxonImagesController extends NsrController
 			"columns"=>"distinct sys_label",
 			"order"=>"sys_label"
 		));
-			
+
 		foreach((array)$fields as $val)
 		{
 			$d[]=$val['sys_label'];
@@ -402,7 +402,7 @@ class NsrTaxonImagesController extends NsrController
 	private function updateTaxonImageMetaData($p)
 	{
 		$media_id=!empty($p['media_id']) ? $p['media_id'] : null;
-		
+
 		if (empty($media_id)) return;
 
 		$image=$this->models->MediaTaxon->_get(array(
@@ -413,7 +413,7 @@ class NsrTaxonImagesController extends NsrController
 		foreach((array)$p['values'] as $key=>$val)
 		{
 			$ids=explode(",",$key);
-			
+
 			if ( empty($ids[0]) || empty($ids[1]) ) continue;
 
 			$before=$this->models->MediaMeta->_get(array(
@@ -441,21 +441,21 @@ class NsrTaxonImagesController extends NsrController
 					'project_id' => $this->getCurrentProjectId()
 				));
 			}
-			
+
 			$this->logNsrChange(
 				array(
 					'before'=>$before,
 					'after'=>$after,
-					'note'=>sprintf( (is_null($after) ? 'deleted' : 'changed'). ' metadata %s for image %s',$before['sys_label'],$image['file_name']) 
+					'note'=>sprintf( (is_null($after) ? 'deleted' : 'changed'). ' metadata %s for image %s',$before['sys_label'],$image['file_name'])
 					)
 				);
-			
+
 		}
 
 		foreach((array)$p['new'] as $key=>$val)
 		{
 			if (empty($val)) continue;
-			
+
 			$d=array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'media_id'=>$media_id,
@@ -463,7 +463,7 @@ class NsrTaxonImagesController extends NsrController
 				'sys_label'=>$key,
 				'meta_data'=>$val,
 			);
-			
+
 			if ($p['type'][$key]=='meta_date')
 			{
 				$d['meta_date']="#'".$val."'";
@@ -493,7 +493,7 @@ class NsrTaxonImagesController extends NsrController
 			$this->logNsrChange(
 				array(
 					'after'=>$after,
-					'note'=>sprintf( 'new metadata %s for image %s',$after['sys_label'],$image['file_name']) 
+					'note'=>sprintf( 'new metadata %s for image %s',$after['sys_label'],$image['file_name'])
 					)
 				);
 		}
@@ -503,7 +503,7 @@ class NsrTaxonImagesController extends NsrController
 	{
 		$media_id=!empty($p['media_id']) ? $p['media_id'] : null;
 		$taxon_id=!empty($p['taxon_id']) ? $p['taxon_id'] : null;
-		
+
 		if ( empty($media_id) || empty($taxon_id) ) return;
 
 		// logging = bureaucracy
@@ -511,17 +511,17 @@ class NsrTaxonImagesController extends NsrController
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $media_id
 		));
-		
+
 		$before['taxon']=$this->getTaxonById( $before['taxon_id'] );
 
-		// actual work			
+		// actual work
 		$this->models->MediaTaxon->update(array(
 			'taxon_id' => $taxon_id
 		), array(
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $media_id
 		));
-		
+
 		// logging = bureaucracy
 		$after=$this->models->MediaTaxon->_get(array(
 			'project_id' => $this->getCurrentProjectId(),
@@ -552,7 +552,7 @@ class NsrTaxonImagesController extends NsrController
 			$this->models->MediaTaxon->update(
 				array(
 					'overview_image' => '0'
-				), 
+				),
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $taxon_id,
@@ -560,11 +560,11 @@ class NsrTaxonImagesController extends NsrController
 					'id != ' => $media_id
 				)
 			);
-			
+
 			$this->models->MediaTaxon->update(
 				array(
 					'overview_image' => $overview_image
-				), 
+				),
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $taxon_id,
@@ -577,7 +577,7 @@ class NsrTaxonImagesController extends NsrController
 			$this->models->MediaTaxon->update(
 				array(
 					'overview_image' => '0'
-				), 
+				),
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $taxon_id
@@ -589,10 +589,10 @@ class NsrTaxonImagesController extends NsrController
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $media_id
 		));
-		
+
 		$before['taxon']=$after['taxon']=$this->getTaxonById( $before['taxon_id'] );
-		
-		
+
+
 		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('altered banner status of image %s',$before['file_name'])));
 
 	}
@@ -646,11 +646,11 @@ class NsrTaxonImagesController extends NsrController
 			return $this->helpers->CsvParserHelper->getResults();
 		}
 	}
-	
+
 	private function getTaxonByNsrId( $id )
 	{
 		$id=str_pad( $id, 12, '0',STR_PAD_LEFT);
-		
+
 		$taxa=$this->models->NsrTaxonImagesModel->getTaxonByNsrId(array(
 			"project_id"=>$this->getCurrentProjectId(),
 			"nsr_id"=>$id
@@ -658,7 +658,7 @@ class NsrTaxonImagesController extends NsrController
 
 		return $taxa ? $taxa[0] : null;
 	}
-	
+
 	private function matchNsrIdsAndCheckImgExistence( $p )
 	{
 		$lines=isset($p['lines']) ? $p['lines'] : null;
@@ -670,15 +670,15 @@ class NsrTaxonImagesController extends NsrController
 		if (is_null($lines) || is_null($col_nsr_id) || is_null($col_file_name)) return null;
 
 		$taxa=array();
-		
+
 		// go through all lines
 		foreach((array)$lines as $key=>$line)
 		{
 			if ($ignorefirst && $key==0) continue;
-			
+
 			$date=null;
-		
-			// go through each cell of this reference	
+
+			// go through each cell of this reference
 			foreach((array)$line as $c=>$cell)
 			{
 				// resolve taxon
@@ -698,7 +698,7 @@ class NsrTaxonImagesController extends NsrController
 				}
 			}
 		}
-		
+
 		return array(
 			'taxa'=>$taxa,
 			'files'=>$file_exists
@@ -715,11 +715,11 @@ class NsrTaxonImagesController extends NsrController
 		if (is_null($lines)) return null;
 
 		$checks=array();
-		
+
 		foreach((array)$lines as $key=>$line)
 		{
 			if ($ignorefirst && $key==0) continue;
-			
+
 			foreach((array)$line as $c=>$cell)
 			{
 				if( stripos($fields[$c],'datum') )
@@ -748,33 +748,33 @@ class NsrTaxonImagesController extends NsrController
 		foreach((array)$lines as $key=>$line)
 		{
 			if ($ignorefirst && $key==0) continue;
-			
+
 			$filename=trim($line[$col_file_name]);
-			
+
 			if ( !is_null($matches['taxa'][$key]) && !empty($filename) )
 			{
 				$d=
 					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'taxon_id' => $matches['taxa'][$key]['taxon_id'], 
-						'file_name' => $filename, 
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $matches['taxa'][$key]['taxon_id'],
+						'file_name' => $filename,
 						'original_name' => $filename,
-						'mime_type' => @$this->_mime_types[pathinfo($filename, PATHINFO_EXTENSION)], 
+						'mime_type' => @$this->_mime_types[pathinfo($filename, PATHINFO_EXTENSION)],
 						'sort_order' => 99
 					);
 
 				$mt=$this->models->MediaTaxon->save($d);
 
-				if ($mt==1) 
+				if ($mt==1)
 				{
-					
+
 					$media_id=$this->models->MediaTaxon->getNewId();
-					
+
 					$fieldssaved=0;
-					
+
 					$concatfields=array();
-					
+
 					foreach((array)$line as $c=>$cell)
 					{
 						if ( isset($checks[$key][$c]) && $checks[$key][$c]['pass']==false) continue;
@@ -792,7 +792,7 @@ class NsrTaxonImagesController extends NsrController
 								);
 						}
 
-						
+
 						if ( !empty($fields[$c]) && $c!=$col_file_name && $c!=$col_nsr_id)
 						{
 							if (!isset($concatfields[$fields[$c]]))
@@ -805,11 +805,11 @@ class NsrTaxonImagesController extends NsrController
 							}
 						}
 					}
-					
+
 					$concatfields['beeldbankDatumAanmaak']=date("Y-m-d H:i:s");
-					
+
 					$allmeta=array();
-					
+
 					foreach((array)$concatfields as $label=>$val)
 					{
 						$md=array(
@@ -819,20 +819,20 @@ class NsrTaxonImagesController extends NsrController
 							'sys_label'=>$label,
 							'meta_data'=>$val,
 						);
-			
+
 						if( stripos($label,'datum') )
 						{
 							$md['meta_date']="#'".$val."'";
 							$md['meta_number']=null;
 							$md['meta_data']=null;
-						}			
+						}
 						else
 						{
 							$md['meta_date']=null;
 							$md['meta_number']=null;
 							$md['meta_data']=$val;
 						}
-						
+
 						if ($this->models->MediaMeta->save( $md ))
 						{
 							$fieldssaved++;
@@ -842,9 +842,9 @@ class NsrTaxonImagesController extends NsrController
 						{
 							$this->addError( sprintf('Couldn\'t save %s=%s for %s.', $label, $val, $filename) );
 						}
-						
+
 					}
-					
+
 					$this->addMessage( sprintf('Wrote "%s" with %s meta-data fields.',$filename,$fieldssaved) );
 
 					$d['meta-data']=$allmeta;
@@ -864,6 +864,6 @@ class NsrTaxonImagesController extends NsrController
 
 		}
 	}
-			
+
 }
 

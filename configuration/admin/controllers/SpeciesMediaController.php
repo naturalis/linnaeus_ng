@@ -61,20 +61,20 @@ class SpeciesMediaController extends Controller
 
 		if ($this->rHasVal('action','delete'))
 		{
-			$d=$this->deleteTaxonMedia($this->requestData);
+			$d=$this->deleteTaxonMedia($this->rGetId());
 			@$this->addError($d['errors']);
 			@$this->addWarning($d['warnings']);
 			@$this->addMessage($d['messages']);
 		}
 		if ($this->rHasVal('action','save'))
 		{
-			$this->setOverviewImage($this->requestData);
-			$this->saveCaptions($this->requestData);
+			$this->setOverviewImage($this->rGetId());
+			$this->saveCaptions($this->rGetId());
 			$this->addMessage('Saved');
 		}
 		if ($this->rHasVal('action','up') || $this->rHasVal('action','down'))
 		{
-			if ($this->moveImageInOrder($this->requestData))
+			if ($this->moveImageInOrder($this->rGetId()))
 				$this->addMessage('New media order saved');
 		}
 
@@ -337,7 +337,7 @@ class SpeciesMediaController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'file_name like' => $this->rGetVal('id').'%'
+					'file_name like' => $this->rGetId().'%'
 				)
 			));
 
@@ -379,7 +379,7 @@ class SpeciesMediaController extends Controller
 		}
 
 		$this->smarty->assign('newid', $this->rGetVal('newid'));
-		$this->smarty->assign('id', $this->rGetVal('id'));
+		$this->smarty->assign('id', $this->rGetId());
 
         $this->printPage();
 	}
