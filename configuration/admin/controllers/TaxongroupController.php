@@ -93,7 +93,7 @@ class TaxongroupController extends Controller
 
 		if ($this->rHasVal('action','saveorder'))
 		{
-			$i=$this->saveGroupOrder($this->requestData);
+			$i=$this->saveGroupOrder($this->rGetId());
 			if ($i>0) $this->addMessage('New order saved.');
 		}
 
@@ -107,14 +107,14 @@ class TaxongroupController extends Controller
 
 		if ($this->rHasVal('action','save'))
 		{
-			$this->saveGroup($this->requestData);
+			$this->saveGroup($this->rGetId());
 			$this->helpers->SessionMessages->setMessage('Saved.');
 			$this->redirect('taxongroups.php');
 		}
 		else
 		if ($this->rHasVal('action','delete'))
 		{
-			$this->deleteGroup($this->requestData);
+			$this->deleteGroup($this->rGetId());
 			$this->helpers->SessionMessages->setMessage('Group deleted.');
 			$this->redirect('taxongroups.php');
 		}
@@ -145,7 +145,7 @@ class TaxongroupController extends Controller
 
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->saveTaxongroupTaxa($this->requestData);
+			$this->saveTaxongroupTaxa($this->rGetId());
 			$this->addMessage('Saved');
 		}
 

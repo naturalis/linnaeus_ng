@@ -35,18 +35,18 @@ class NsrActivityLogController extends NsrController
 		$this->checkAuthorisation();
 
         $this->setPageName($this->translate('Activity log'));
-		
-		$search=(null!==$this->GetAll() ? $this->requestData : null);
-		
+
+		$search=(null!==$this->GetAll() ? $this->GetAll() : null);
+
 		$results=$this->getLogLines($search);
-		
-		$this->smarty->assign('search',$search);	
+
+		$this->smarty->assign('search',$search);
         $this->smarty->assign('results',$results);
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('page')));
 
 		$this->printPage('activity_log');
     }
-	
+
 	private function getLogLines($p=null)
 	{
 		$search=!empty($p['search']) ? $p['search'] : null;
@@ -62,7 +62,7 @@ class NsrActivityLogController extends NsrController
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
-		
+
 		function splitOldName($name)
 		{
 			if (strpos($name,'(')!==false)
@@ -81,7 +81,7 @@ class NsrActivityLogController extends NsrController
 				return array('original'=>$name,'name'=>$name,'username'=>'','email_address'=>'');
 			}
 		}
-		
+
 		foreach((array)$d as $key =>$val)
 		{
 			$d[$key]['user']=splitOldName($val['user']);
@@ -90,7 +90,7 @@ class NsrActivityLogController extends NsrController
 		}
 
 		$count=$this->models->ActivityLog->freeQuery('select found_rows() as total');
-		
+
 		return array('count'=>$count[0]['total'],'data'=>$d,'perpage'=>$this->_logLinesPerPage);
 
 	}
@@ -101,19 +101,19 @@ class NsrActivityLogController extends NsrController
 		if ((!is_array($a) && is_array($b)) || (is_array($a) && !is_array($b)))
 		{
 			return array('before'=>$a,'after'=>$b);
-		} 
+		}
 		else
 		if (!is_array($a))
 		{
 			return $a==$b ? null : array('before'=>$a,'after'=>$b);
-		} 
+		}
 		else
 		{
 			$ta=array();
 			$tb=array();
 			$tc=array();
 			$td=array();
-			
+
 			foreach($a as $key=>$val)
 			{
 				if (is_array($val))
@@ -127,15 +127,15 @@ class NsrActivityLogController extends NsrController
 					$td[$key]=$b[$key];
 				}
 			}
-			
+
 			$te=array_diff($tc,$td);
 			$tf=array_diff($td,$tc);
-			
+
 			return array(
 				'before'=>array_merge($ta,$te),
 				'after'=>array_merge($tb,$tf)
 			);
-			
+
 		}
 	}
 
@@ -145,7 +145,7 @@ class NsrActivityLogController extends NsrController
 
 		$querystring=null;
 
-		foreach((array)$this->requestData as $key=>$val)
+		foreach((array)$this->GetAll() as $key=>$val)
 		{
 			if (in_array($key,$ignore)) continue;
 
@@ -160,7 +160,7 @@ class NsrActivityLogController extends NsrController
 				$querystring.=$key.'='.$val.'&';
 			}
 		}
-		
+
 		return $querystring;
 	}
 

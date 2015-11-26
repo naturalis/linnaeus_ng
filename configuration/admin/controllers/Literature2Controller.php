@@ -156,7 +156,7 @@ class Literature2Controller extends NsrController
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$this->smarty->assign('reference',$this->requestData);
+			$this->smarty->assign('reference',$this->GetAll());
 			$this->saveReference();
 		}
 		if ($this->rHasId())

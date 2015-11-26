@@ -91,7 +91,7 @@ class ModuleSettingsController extends Controller
 
         $this->checkAuthorisation();
 
-		$this->setModuleId( $this->rGetVal('id') );
+		$this->setModuleId( $this->rGetId() );
 
 		$this->setModule();
 
@@ -134,7 +134,7 @@ class ModuleSettingsController extends Controller
 
         $this->checkAuthorisation();
 
-		$this->setModuleId( $this->rGetVal('id') );
+		$this->setModuleId( $this->rGetId() );
 
 		$this->setModule();
 

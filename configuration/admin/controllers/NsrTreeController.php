@@ -85,7 +85,7 @@ class NsrTreeController extends NsrController
 		else
 		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
 		{
-	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
+	        $return=json_encode($this->getTaxonParentage($this->rGetId()));
         }
 
         

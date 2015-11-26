@@ -211,7 +211,7 @@ class SpeciesController extends Controller
 
 		$this->checkAuthorisation();
 
-		$taxon=$this->getTaxonById($this->rGetVal('id'));
+		$taxon=$this->getTaxonById($this->rGetId());
 
         if (!$taxon)
 		{
@@ -228,7 +228,7 @@ class SpeciesController extends Controller
 
 			if ($this->rHasVal('action','save_and_preview'))
 			{
-				$p['id'] = $this->rGetVal('id');
+				$p['id'] = $this->rGetId();
 				$p['page'] = $this->rGetVal('activePage');
 				$p['language'] = $this->rGetVal('language-default');
 				$p['content'] = $this->rGetVal('content-default');
@@ -247,7 +247,7 @@ class SpeciesController extends Controller
 			 }
 
             // replace possible [new litref] and [new media] tags with links to newly created reference of media
-            $this->filterInternalTags($this->rGetVal('id'));
+            $this->filterInternalTags($this->rGetId());
 //            $taxon=$this->getTaxonById();
 
 			$this->setActiveTaxonId($taxon['id']);
@@ -494,7 +494,7 @@ class SpeciesController extends Controller
         if (!$this->rHasId())
             $this->redirect('new.php');
 
-        if (!$this->userHasTaxon($this->rGetVal('id')))
+        if (!$this->userHasTaxon($this->rGetId()))
             $this->redirect('index.php');
 
         $data = $this->getTaxonById();
@@ -508,7 +508,7 @@ class SpeciesController extends Controller
         }
 
         else
-        if (!$this->doLockOutUser($this->rGetVal('id'), true))
+        if (!$this->doLockOutUser($this->rGetId(), true))
 		{
 	        if (isset($data))
 	            $this->smarty->assign('data', $data);

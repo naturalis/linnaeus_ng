@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('TaxonParentageController.php');
+
 class TreeController extends Controller
 {
 	private $_lookupListMaxResults=99999;
@@ -116,27 +117,7 @@ class TreeController extends Controller
 			get the top taxon = no parent
 			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks
 		*/
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_r.rank
-			from
-				%PRE%taxa _a
-
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
-
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.parent_id is null
-				and _r.id < 10
-
-		");
+	    $p = $this->models->TreeModel->getTreeTop($this->getCurrentProjectId());
 
 		if ($p && count((array)$p)==1)
 		{
@@ -163,40 +144,11 @@ class TreeController extends Controller
 		if (is_null($node))
 			return;
 
-		$taxa=
-			$this->models->Taxon->freeQuery("
-				select
-					_a.id,
-					_a.parent_id,
-					_a.is_hybrid,
-					_a.rank_id,
-					_a.taxon,
-					_r.rank,
-					_q.label as rank_label,
-					_p.rank_id as base_rank
-
-				from
-					%PRE%taxa _a
-
-				left join %PRE%projects_ranks _p
-					on _a.project_id=_p.project_id
-					and _a.rank_id=_p.id
-
-				left join %PRE%labels_projects_ranks _q
-					on _a.rank_id=_q.project_rank_id
-					and _a.project_id = _q.project_id
-					and _q.language_id=".$this->getDefaultProjectLanguage()."
-
-				left join %PRE%ranks _r
-					on _p.rank_id=_r.id
-
-				where
-					_a.project_id = ".$this->getCurrentProjectId()."
-					and (_a.id = ".$node." or _a.parent_id = ".$node.")
-
-				order by
-					taxon_order, label
-			");
+		$taxa = $this->models->TreeModel->getTreeNode(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getDefaultProjectLanguage(),
+    		'node' => $node
+		));
 
 		$taxon=$progeny=array();
 
@@ -204,45 +156,18 @@ class TreeController extends Controller
 		{
 			if ($count=='taxon')
 			{
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(*) as total
-					from
-						%PRE%taxon_quick_parentage
-					where
-						project_id = ".$this->getCurrentProjectId()."
-						and MATCH(parentage) AGAINST ('".$this->padId($val['id'])."' in boolean mode)
-					");
-
-				$val['child_count']=$d[0]['total'];
+				$val['child_count'] = $this->models->TreeModel->countChildrenTaxon(array(
+    				'projectId' => $this->getCurrentProjectId(),
+    				'parentId' => $this->padId($val['id'])
+				));
 			}
-			else
-			if ($count=='species')
+			else if ($count=='species')
 			{
-					$d=$this->models->Taxon->freeQuery("
-					select
-						count(_sq.taxon_id) as total,
-						_sq.taxon_id
-					from
-						%PRE%taxon_quick_parentage _sq
-
-					left join %PRE%taxa _e
-						on _sq.taxon_id = _e.id
-						and _sq.project_id = _e.project_id
-
-					left join %PRE%projects_ranks _f
-						on _e.rank_id=_f.id
-						and _e.project_id = _f.project_id
-
-					where
-						_sq.project_id=".$this->getCurrentProjectId()."
-						and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-						and MATCH(_sq.parentage) AGAINST ('".$this->padId($val['id'])."' in boolean mode)
-					group by _sq.taxon_id
-				");
-
-				$val['child_count']=$d[0]['total'];
-
+				$val['child_count'] = $this->models->TreeModel->countChildrenSpecies(array(
+    				'projectId' => $this->getCurrentProjectId(),
+    				'parentId' => $this->padId($val['id']),
+				    'rankId' => $val['base_rank']
+				));
 			}
 			else
 			{
@@ -267,17 +192,10 @@ class TreeController extends Controller
 			}
 			else
 			{
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(*) as total
-					from
-						%PRE%taxa
-					where
-						project_id = ".$this->getCurrentProjectId()."
-						and parent_id = ".$val['id']
-					);
-
-				$val['has_children']=$d[0]['total']>0;
+				$val['has_children'] = $this->models->TreeModel->hasChildren(array(
+    				'projectId' => $this->getCurrentProjectId(),
+    				'parentId' => $val['id']
+				));
 				$progeny[$val['id']]=$val;
 			}
 		}
