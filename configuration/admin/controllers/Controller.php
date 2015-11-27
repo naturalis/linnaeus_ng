@@ -2487,7 +2487,7 @@ class Controller extends BaseClass
 
     public function GetAll()
     {
-		return isset($this->rGetId()) ? $this->requestData : null;
+		return isset($this->requestData) ? $this->requestData : null;
     }
 
 
@@ -2498,7 +2498,7 @@ class Controller extends BaseClass
 
     public function rGetId ()
     {
-        return $this->rGetId();
+        return $this->rGetVal('id');
     }
 
 
