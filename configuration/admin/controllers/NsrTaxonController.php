@@ -611,8 +611,11 @@ class NsrTaxonController extends NsrController
 			'type_id'=>$type_id,
 			'name_id'=>$id
 		));
-
-		$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
+		
+		if ( isset($name['id']) )
+		{
+			$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
+		}
 
 		return $name;
 	}
