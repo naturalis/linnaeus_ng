@@ -1138,7 +1138,7 @@ class Controller extends BaseClass
     public function getTaxonById ($id = false)
     {
 
-        $id = $id===false ? ($this->rGetId()) ? $this->rGetId() : null) : $id;
+        $id = $id===false ? ($this->rGetId() ? $this->rGetId() : null) : $id;
 
         if (empty($id) || $id == 0)
             return;
