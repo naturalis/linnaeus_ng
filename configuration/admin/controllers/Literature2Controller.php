@@ -10,7 +10,7 @@ class Literature2Controller extends NsrController
 
     public $usedModels = array(
 		'literature2',
-		'literature_taxon',
+		'literature_taxa',
 		'names',
 		'actors',
 		'presence_taxa',
