@@ -1206,7 +1206,7 @@ class SpeciesModel extends AbstractModel
 
 		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
 		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-		$organisation = isset($params['organisation']) ? $params['organisation'] : false;
+		$organisation = isset($params['organisation']) ? $this->escapeString($params['organisation']) : false;
 
         $query = "
 			select
@@ -1224,8 +1224,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_a.project_id = ".$projectId."
-				and lower(_a.name) = '".
-                    $this->escapeString($this->databaseConnection, $organisation) ."'";
+				and lower(_a.name) = '". $organisation ."'";
 
         return $this->freeQuery($query);
 
@@ -1239,7 +1238,7 @@ class SpeciesModel extends AbstractModel
 		}
 
 		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$organisation = isset($params['organisation']) ? $params['organisation'] : false;
+		$organisation = isset($params['organisation']) ? $this->escapeString($params['organisation']) : false;
 
         $query = "
 			select
@@ -1250,8 +1249,7 @@ class SpeciesModel extends AbstractModel
 			from %PRE%external_orgs
 			where
 				project_id = ".$projectId."
-				and lower(name) = '".
-                    $this->escapeString($this->databaseConnection, $organisation) ."'";
+				and lower(name) = '".$organisation ."'";
 
         return $this->freeQuery($query);
 
