@@ -932,7 +932,7 @@ CREATE TABLE IF NOT EXISTS `literature2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `language_id` int(11) DEFAULT NULL,
-  `label` varchar(255) NOT NULL,
+  `label` varchar(1000) NOT NULL,
   `alt_label` varchar(255) DEFAULT NULL,
   `alt_label_language_id` int(11) DEFAULT NULL,
   `date` varchar(32) DEFAULT NULL,
@@ -954,7 +954,7 @@ CREATE TABLE IF NOT EXISTS `literature2` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id` (`id`,`project_id`),
-  KEY `project_id` (`project_id`,`label`)
+  KEY `project_id` (`project_id`,`label`(250))
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `literature2_authors`;
