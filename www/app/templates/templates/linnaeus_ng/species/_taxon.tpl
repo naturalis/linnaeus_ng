@@ -2,7 +2,7 @@
 
 <div id="categories">
 <ul>
-	{foreach from=$categories key=k item=v}
+	{foreach $categories v k}
 		<li id="ctb-{$v.id}">
 			<a {if $v.is_empty==0}href="../species/taxon.php?id={$taxon.id}&cat={$v.id}"{/if} class="{$v.className}">{$v.title}</a>
 		</li>
@@ -19,7 +19,7 @@
 <div id="classification">
 	<p>
 	<b>{t}Classification{/t}</b><br />
-	{foreach from=$content.classification key=k item=v name=classification}
+	{foreach $content.classification v k classification}
 	{if $v.do_display}
 
 		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
@@ -37,7 +37,7 @@
 	{if $content.taxonlist|@count>0}
 	<p>
 	<b>{$taxon.label} {t}contains the following taxa{/t}:</b><br/>
-	{foreach from=$content.taxonlist key=k item=v name=list}
+	{foreach $content.taxonlist v k list}
 		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
 		{if $v.commonname} ({$v.commonname}){/if}
 		<br />
@@ -50,7 +50,7 @@
 {elseif $activeCategory=='literature'}
 {if $contentCount.literature>0}
 <div id="literature">
-	{foreach from=$content key=k item=v}
+	{foreach $content v k}
 	<b>{$v.author_full}, {$v.year_full}:</b> {$v.text}
 	{/foreach}
 </div>
@@ -61,7 +61,7 @@
 <div id="synonyms">
 	<div class="title">{t}Synonyms{/t}</div>
 	<table>
-	{foreach from=$content.synonyms key=k item=v}
+	{foreach $content.synonyms v k}
 		<p>{if $session.app.user.species.type=='lower'}<i>{/if}{$v.synonym}{if $session.app.user.species.type=='lower'}</i>{/if} {$v.author}</p>
 	{/foreach}
 	</table>
@@ -70,7 +70,7 @@
 {if $content.common}
 <div id="common">
 	<div class="title">{t}Common names{/t}</div>
-	{foreach from=$content.common key=k item=v}
+	{foreach $content.common v k}
 		<p>{$v.commonname}{if $v.transliteration} ({$v.transliteration}){/if} [{$v.language_name}]</p>
 	{/foreach}
 </div>
@@ -82,9 +82,10 @@
 {assign var=widthInCells value=5}
 	<div id="media-grid">
 		{assign var=mediaCat value=false}
-		{foreach from=$content key=k item=v}
+		{foreach $content v k}
 
 			{assign var=mediaCat value=$v.category}
+
 			{if $requestData.disp==$v.id}
 				{assign var=dispUrl value=$smarty.capture.fullImgUrl}
 				{assign var=dispName value=$v.original_name}
@@ -168,25 +169,13 @@
 
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-
+$(document).ready(function()
+{
 {if $dispUrl && $dispName}
 	showMedia('{$dispUrl}','{$dispName}');
 {/if}
-
 	allLookupSetListMax(0);
 	allLookupAlwaysFetch=true;
-
-{literal}
-	/* $(".group1").colorbox({rel:'group1'}); */
-
-	// $('[id^=media-]').each(function(e){
-	// 	$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
-	// });
-
 });
 </script>
-{/literal}

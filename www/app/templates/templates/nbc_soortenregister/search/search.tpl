@@ -19,7 +19,7 @@
 			<p>
 				{if $results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].data}
 				<ol>
-					{foreach from=$results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].data item=res}
+					{foreach $results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].data res}
 					<li style="margin-bottom:5px">
 					<a href="../species/nsr_taxon.php?id={$res.taxon_id}">
 					{if $res.label}{$res.label}{else}{$res.matches[0]}{/if}
@@ -41,13 +41,12 @@
 </div>
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-
+$(document).ready(function()
+{
 	$('title').html('Zoekresultaten - '+$('title').html());
 
 	var n=parseInt($('#resultcount-header').html());
 	$('#resultcount-header').html($('#resultcount-header').html()+' '+(n==1 ? 'resultaat' : 'resultaten'));
-
 });
 </script>
 

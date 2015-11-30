@@ -1,5 +1,5 @@
 <div id="lookup-DialogContent">
-{foreach from=$matrices key=k item=v}
+{foreach $matrices v k}
 	{if $v.id==$currentMatrixId}
 		<p class="row row-selected">{$v.name}</p>
 	{else}

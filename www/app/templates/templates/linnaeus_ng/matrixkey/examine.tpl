@@ -38,12 +38,13 @@
 
 
 <script type="text/JavaScript">
-$(document).ready(function() {
+$(document).ready(function()
+{
 
-matrixId={$matrix.id};
-projectId={$projectId};
-
-{foreach from=$characteristics key=k item=v}
+	matrixId={$matrix.id};
+	projectId={$projectId};
+	
+{foreach $characteristics v k}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}');
 {/foreach}
 

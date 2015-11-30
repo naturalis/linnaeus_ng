@@ -5,7 +5,6 @@
 <span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon icon-book" />
 {t}Contents{/t}</span>
 
-
 {if $useJavascriptLinks}
     <span
     {if $adjacentItems.prev}

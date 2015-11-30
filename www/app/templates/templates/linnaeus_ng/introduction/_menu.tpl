@@ -34,4 +34,3 @@ $(document).ready(function()
 	allLookupSetSelectedId({$page.id});
 });
 </script>
-
