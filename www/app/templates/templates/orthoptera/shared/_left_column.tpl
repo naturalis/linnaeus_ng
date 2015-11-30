@@ -32,7 +32,7 @@
             <div class="menu-block-wrapper menu-block-2 menu-name-main-menu parent-mlid-0 menu-level-2">
 
 				<ul>
-					{foreach from=$categories key=k item=v}
+					{foreach $categories v k}
 					{if (($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES) && $v.id!=$smarty.const.CTAB_CLASSIFICATION)||$v.id==$smarty.const.CTAB_MEDIA}
 					<li id="ctb-{$v.id}" tabname="{$v.tabname}">
 						{* $v.tabname *}
@@ -89,7 +89,7 @@
 				{/if}
 			{/section}
 
-			{foreach from=$children item=v key=x}
+			{foreach $children v x}
 			<tr><td>
 				{'&nbsp;'|str_repeat:($buffercount+4)}
 				<span class="classification-connector"></span>

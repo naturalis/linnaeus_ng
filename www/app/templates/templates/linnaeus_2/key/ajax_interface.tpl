@@ -1,2 +1,2 @@
-{section name=i loop=$errors}{$errors[i]}. {/section}{section name=i loop=$messages}{$messages[i]}{/section}
+{foreach $errors v}{$v}. {/foreach}{foreach $messages v}{$v}{/foreach}
 {if $errors|@count!=0}<error>{else}{$returnText}{/if}

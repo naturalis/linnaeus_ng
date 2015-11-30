@@ -4,7 +4,7 @@
 	
 			<h2>Beschermingsstatus</h2>
 
-			{foreach from=$wetten item=soort key=naam}
+			{foreach $wetten soort naam}
 			<p>
             	
 				{* if $naam!=$names.nomen_no_tags}
@@ -15,11 +15,11 @@
 				{/if}
 				
 				<ul>
-					{foreach from=$soort.wetten item=v key=wet}
+					{foreach $soort.wetten v wet}
 					<li>
 						<b>{$wet}</b>
 						<ul>
-							{foreach from=$v item=w}
+							{foreach $v w}
 							<li>
 								{$w.categorie}<br />
 								{$w.publicatie}

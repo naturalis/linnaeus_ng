@@ -3,7 +3,7 @@
 {if $alpha}
 	<div id="alphabet">
 		
-		{foreach from=$alpha key=k item=v}
+		{foreach $alpha v k}
 			{if $letter==$v}
 				<span class="letter-active">{$v}</span>
 			{else}
@@ -33,7 +33,7 @@
 			</thead>
 
 			<tbody>
-				{foreach from=$refs key=k item=v}
+				{foreach $refs v k}
 
 					<tr class="highlight">
 						{if $useJavascriptLinks}
