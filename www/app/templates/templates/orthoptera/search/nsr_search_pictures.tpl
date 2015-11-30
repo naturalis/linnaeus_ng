@@ -58,8 +58,7 @@
 
                 <h3><span id="resultcount-header">{$results.count}</span></h3>
 
-				{foreach from=$results.data item=v}
-
+				{foreach $results.data v}
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
 							<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/original/{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
@@ -76,13 +75,12 @@
 					</div>
 				{/foreach}
 
-
-			{assign var=pgnResultCount value=$results.count}
-			{assign var=pgnResultsPerPage value=$results.perpage}
-			{assign var=pgnCurrPage value=$search.page}
-			{assign var=pgnURL value=$smarty.server.PHP_SELF}
-			{assign var=pgnQuerystring value=$querystring}
-			{include file="../shared/_paginator.tpl"}
+                {assign var=pgnResultCount value=$results.count}
+                {assign var=pgnResultsPerPage value=$results.perpage}
+                {assign var=pgnCurrPage value=$search.page}
+                {assign var=pgnURL value=$smarty.server.PHP_SELF}
+                {assign var=pgnQuerystring value=$querystring}
+                {include file="../shared/_paginator.tpl"}
             
 		</div>
      </div>
@@ -103,8 +101,8 @@
 			
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html("{t}Foto's zoeken{/t} - "+$('title').html());
 
 	if(jQuery().prettyPhoto) {

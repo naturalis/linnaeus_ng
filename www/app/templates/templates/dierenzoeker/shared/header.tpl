@@ -18,16 +18,16 @@
 
 
 {if $javascriptsToLoad}
-{section name=i loop=$javascriptsToLoad.all}
-{if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}
-	<script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.all[i]}"></script>
+{foreach $javascriptsToLoad.all v}
+{if $v|strpos:"http:"===false && $v|strpos:"https:"===false}
+	<script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script>
     {else}
-	<script type="text/javascript" src="{$javascriptsToLoad.all[i]}"></script>
+	<script type="text/javascript" src="{$v}"></script>
 {/if}
-{/section}
-{section name=i loop=$javascriptsToLoad.IE}
-	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
-{/section}
+{/foreach}
+{foreach $javascriptsToLoad.IE v}
+	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script><![endif]-->
+{/foreach}
 {/if}
 
 <script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>

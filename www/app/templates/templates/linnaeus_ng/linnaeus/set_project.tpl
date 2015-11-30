@@ -26,7 +26,7 @@
 
 <div id="page-header-titles"><span id="page-header-title">Linnaeus NG</span><br />
 <span id="admin-subtitle"></span></div>
-{literal}
+
 <style>
 #messages,#errors {
 	margin-left: 10px;
@@ -41,14 +41,14 @@
 	background-color: #fee;
 }
 </style>
-{/literal}
+
 {include file="../shared/messages.tpl"}
+
 <div id="page-main">
 <p>
 <a href="{$baseUrl}">{t}Back to{/t} {t}Linnaeus NG root{/t}</a>
 </p>
 </div>
-
 
 </div ends="page-container">
 <div id="footer-container"></div ends="footer-container">

@@ -1,7 +1,7 @@
 {include file="../shared/header.tpl"}
 
-{literal}
 <script>
+
 var activeNode=false;
 var container='tree-container';
 var url='ajax_interface_tree.php';
@@ -171,7 +171,8 @@ li.child.no-expand {
 	font-style:italic;
 }
 </style>
-{/literal}
+
+
 <div id="dialogRidge">
 
 	<div id="content" class="taxon-detail">
@@ -188,13 +189,11 @@ li.child.no-expand {
 
 </div>
 
-
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-	//buildtree(false);
+$(document).ready(function()
+{
 	restoretree();
 });
 </script>
-{/literal}
+
 

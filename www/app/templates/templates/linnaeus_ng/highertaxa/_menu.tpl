@@ -49,9 +49,5 @@
     <span class="navigation-icon icon-nav-back icon-inactive" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 
-
-
-
-
 </div>
 </div>

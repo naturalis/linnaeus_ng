@@ -7,7 +7,7 @@
 					</h3>
 					<div>
 	
-					{foreach from=$mediaOwn.data item=v}
+					{foreach $mediaOwn.data v}
 						{if $search.img && $search.img==$v.image}
 							{$pp_popup=[{$v.image},{$v.meta_data}]}
 						{/if}
@@ -36,7 +36,7 @@
 						{t}Soorten/taxa met afbeelding(en):{/t} {$mediaCollected.species}
 					</h4>
 					<div>
-					{foreach from=$mediaCollected.data item=v}
+					{foreach $mediaCollected.data v}
 						<div class="imageInGrid3 taxon-page collected">
 							<div class="thumbContainer">
 								<a href="nsr_taxon.php?id={$v.taxon_id}&cat=media">
