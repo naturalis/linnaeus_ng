@@ -7,9 +7,9 @@ class LiteratureController extends Controller
 
     public $usedModels = array(
 		'literature',
-		'literature_taxon',
-		'taxon',
-		'synonym'
+		'literature_taxa',
+		'taxa',
+		'synonyms'
     );
 
     public $controllerPublicName = 'Literary references';
@@ -449,7 +449,7 @@ class LiteratureController extends Controller
 
 		if (!is_null($taxonId)) $d['taxon_id'] = $taxonId;
 
-		return $this->models->LiteratureTaxon->delete($d);
+		return $this->models->LiteratureTaxa->delete($d);
 
 	}
 
@@ -467,7 +467,7 @@ class LiteratureController extends Controller
 
 		if (!is_null($sortOrder)) $d['sort_order'] = $sortOrder;
 
-		$x =  $this->models->LiteratureTaxon->save($d);
+		$x =  $this->models->LiteratureTaxa->save($d);
 
 	}
 
@@ -490,7 +490,7 @@ class LiteratureController extends Controller
 
 			$ref = $l[0];
 
-			$lt = $this->models->LiteratureTaxon->_get(
+			$lt = $this->models->LiteratureTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -505,7 +505,7 @@ class LiteratureController extends Controller
 
 				if (isset($val['taxon_id'])) {
 
-					$t = $this->models->Taxon->_get(
+					$t = $this->models->Taxa->_get(
 						array(
 							'id' => array(
 								'project_id' => $this->getCurrentProjectId(),
@@ -523,7 +523,7 @@ class LiteratureController extends Controller
 
 			$ref['taxa'] = $lt;
 
-			$s = $this->models->Synonym->_get(
+			$s = $this->models->Synonyms->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -567,7 +567,7 @@ class LiteratureController extends Controller
 
 			$ref = $l[0];
 
-			$lt = $this->models->LiteratureTaxon->_get(
+			$lt = $this->models->LiteratureTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -671,7 +671,7 @@ class LiteratureController extends Controller
 	{
 		if (empty($id)) return false;
 
-		$this->models->LiteratureTaxon->delete(
+		$this->models->LiteratureTaxa->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'literature_id' => $id
