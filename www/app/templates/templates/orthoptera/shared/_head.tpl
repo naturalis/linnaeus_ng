@@ -24,9 +24,9 @@
 </style>
 
 {if $cssToLoad}
-{section name=i loop=$cssToLoad}
-	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
-{/section}
+{foreach $cssToLoad v}
+	<link rel="stylesheet" type="text/css" href="{$v}" />
+{/foreach}
 {/if}
 
     <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />

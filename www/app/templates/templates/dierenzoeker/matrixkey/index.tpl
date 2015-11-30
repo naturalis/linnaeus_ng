@@ -13,7 +13,7 @@
                     <ul class="wat-weet-je-list">      
                         <li class="wat-weet-je-arrow no-text">Wat weet je van het dier?</li>
 
-                        {foreach from=$facetmenu item=group key=groupkey}
+                        {foreach $facetmenu group groupkey}
                         
                             {assign var=foo value="|"|explode:$group.label} 
                                                
@@ -105,14 +105,14 @@
 
 		<div class="facetgrouppage-wrapper"> 
                
-        {foreach from=$facetmenu item=group key=groupkey}
+        {foreach $facetmenu group groupkey}
 
             <div class="facetgrouppage" id="facetgrouppage{$groupkey}">
 				<img class="facetpage-puntje" alt="" src="{$session.app.system.urls.systemMedia}facet-puntje.png">
 				<a class="no-text facetgrouppage-close-btn" href="#">Sluiten</a>
 
                 {if $group.chars}
-                {foreach from=$group.chars item=character key=characterkey}
+                {foreach $group.chars character characterkey}
 
 				<div class="facetgrouppage-inner">
 					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$character.info}</h4>
@@ -120,7 +120,7 @@
 						<div class="helper-div">
 							<div class="ui-grid-c">
 
-								{foreach from=$states item=state key=statekey}
+								{foreach $states state statekey}
                                 {if $state.characteristic_id==$character.id && $state.file_name}
 
 								<div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
@@ -161,7 +161,7 @@
 					<div class="facetgrouppage-icons">
 						<div class="helper-div">
 							<div class="ui-grid-c">
-                            {foreach from=$states item=state key=statekey}
+                            {foreach $states state statekey}
                             {if $state.characteristic_id==$group.id && $state.file_name}
                             <div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
                                 <a

@@ -51,7 +51,7 @@ class SearchControllerNSR extends SearchController
 
     public $usedHelpers = array();
 
-	public $cssToLoad = array();
+	public $cssToLoad = array('search.css');
 
 	public $jsToLoad = array();
 	

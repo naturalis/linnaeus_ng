@@ -7,7 +7,7 @@
 		<p>
 			<select id="taxon-list-1">
 			<option disabled="disabled" selected="selected" value="">{t}Select a taxon{/t}</option>
-			{foreach from=$taxa key=k item=v}
+			{foreach $taxa v k}
 			{if $v.type=='tx'}
 			<option value="{$v.id}">{$v.l}</option>
 			{/if}
@@ -16,7 +16,7 @@
 		
 			<select id="taxon-list-2">
 			<option disabled="disabled" selected="selected" value="">{t}Select a taxon{/t}</option>
-			{foreach from=$taxa key=k item=v}
+			{foreach $taxa v k}
 			{if $v.type=='tx'}
 			<option value="{$v.id}">{$v.l}</option>
 			{/if}
@@ -53,15 +53,13 @@
 	</div>
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
+	matrixId={$matrix.id};
+	projectId={$projectId};
 
-matrixId={$matrix.id};
-projectId={$projectId};
-
-{foreach from=$characteristics key=k item=v}
+{foreach $characteristics v k}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}');
 {/foreach}
 
@@ -69,11 +67,8 @@ projectId={$projectId};
 	goCompare([{$compareSpeciesRecall[0]},{$compareSpeciesRecall[1]}]);
 {/if}
 
-{literal}
 });
 </script>
-{/literal}
-
 
 {include file="../shared/messages.tpl"}
 {include file="../shared/footer.tpl"}

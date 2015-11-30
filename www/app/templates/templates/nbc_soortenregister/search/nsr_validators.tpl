@@ -18,7 +18,7 @@
 		<h4>{t}Validator (foto’s/soorten){/t}</h4>
 		<br>
 			<ol>
-			{foreach from=$validators item=v}
+			{foreach $validators v}
 				<li>
 					<a href="nsr_search_pictures.php?validator={$v.validator}">{$v.validator} ({$v.total} / {$v.taxon_count})</a>
 				</li>
@@ -34,9 +34,8 @@
 {include file="../shared/footer.tpl"}
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html('Overzicht validatoren - '+$('title').html());
-
 });
 </script>
