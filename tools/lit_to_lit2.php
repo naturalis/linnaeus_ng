@@ -7,10 +7,6 @@
 <body style="font: 12px Verdana; width: 800px;">
 
 <?php
-	// A few script settings..
-
-
-
 //	$cfg = 'configuration/admin/configuration.php';
 	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
 
@@ -73,7 +69,8 @@
                 $author = $full;
                 echo "<span style='color: red;'>Reference \"$full\" cannot be properly parsed</span><br>";
             }
-            $q = 'INSERT INTO `literature2` (`id`, `project_id`, `language_id`, `actor_id`, `label`, `date`, `author`, `created`)
+            $q = 'INSERT INTO `literature2` (`id`, `project_id`, `language_id`, `actor_id`, `label`,
+                      `date`, `author`, `created`)
                   VALUES (' .
                      $row['id'] . ', ' .
                      $row['project_id'] . ', ' .
@@ -81,7 +78,8 @@
                      (is_null($label) ? -1 : 'NULL') . ',
                      "' . mysqli_real_escape_string($d, $label). '",
                      "' . mysqli_real_escape_string($d, $date). '",
-                     "' . mysqli_real_escape_string($d, $author). '", CURRENT_TIMESTAMP' .
+                     "' . mysqli_real_escape_string($d, $author). '",
+                     CURRENT_TIMESTAMP' .
                   ')';
             mysqli_query($d, $q) or die($q . mysqli_error($d));
 
@@ -93,12 +91,15 @@
                     $actor_id = $row2['id'];
                 } else {
                     $q3 = 'INSERT INTO `actors` (`project_id`, `name`, `created`) VALUES (' .
-                        $row['project_id'] . ', "' . mysqli_real_escape_string($d, $actor) . '", CURRENT_TIMESTAMP)';
+                        $row['project_id'] . ', "' .
+                        mysqli_real_escape_string($d, $actor) . '",
+                        CURRENT_TIMESTAMP
+                    )';
                     mysqli_query($d, $q3) or die($q3. mysqli_error($d));
                     $actor_id = mysqli_insert_id($d);
                 }
-                $q4 = 'INSERT INTO `literature2_authors` (`project_id`, `literature2_id`, `actor_id`, `sort_order`)
-                    VALUES (' .
+                $q4 = 'INSERT INTO `literature2_authors`
+                    (`project_id`, `literature2_id`, `actor_id`, `sort_order`) VALUES (' .
                         $row['project_id'] . ', ' .
                         $row['id'] . ', ' .
                         $actor_id . ', ' .
