@@ -2,7 +2,7 @@
 
 {if $alpha}
 <div id="alphabet">
-	{foreach from=$alpha key=k item=v}
+	{foreach $alpha v k}
 	{if $letter==$v}
 	<span class="letter-active">{$v}</span>
 	{else}
@@ -20,7 +20,7 @@
 	{if !$alpha}
 	{t}No pages have been defined in this module.{/t}
 	{else}
-	{foreach from=$refs key=k item=v}
+	{foreach $refs v k}
 	{if $useJavascriptLinks}
 	<span class="topic" onclick="goModuleTopic({$v.id})">{$v.topic}</span>
 	{else}

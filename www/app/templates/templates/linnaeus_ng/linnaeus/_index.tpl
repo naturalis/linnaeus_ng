@@ -10,7 +10,7 @@
     <table id="module-grid">
         <tr>
         {assign var=i value=1}
-        {foreach from=$menu key=k item=v}
+        {foreach $menu v k}
         {if $v.type=='regular' && $v.show_in_public_menu==1}
         <td class="grid">
             <a class="menu-item" href="../{$v.controller}/">
@@ -43,11 +43,10 @@
 	{$content}
 	</div>
 </div>
-{literal}
+
 <script type="text/JavaScript">
-$(document).ready(function(){
-//	allLookupContentOverrideUrl('../search/ajax_interface.php');
-allLookupAlwaysFetch=true;
+$(document).ready(function()
+{
+	allLookupAlwaysFetch=true;
 });
 </script>
-{/literal}

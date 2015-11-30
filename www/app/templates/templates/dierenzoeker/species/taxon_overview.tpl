@@ -69,7 +69,7 @@ div.pp_default .pp_description {
 <div class="fotos">
 	<ul>
 	
-	{foreach from=$media item=v}
+	{foreach $media v}
     	<li>
         	<a rel="prettyPhoto[gallery]" href="{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
             	<img style="width:130px" title="{$v.description}" src="{$v.file_name|@replace:'w800':'160x100'}" alt="">
@@ -88,7 +88,7 @@ div.pp_default .pp_description {
 <div class="related">
         <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Lijkt op</span>
         <ul>
-        {foreach from=$related item=v}
+        {foreach $related v}
             <li class="">
                 <a href="#" onclick="drnzkr_toon_dier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
                 <img src="{$v.url_thumbnail}">
@@ -105,7 +105,7 @@ div.pp_default .pp_description {
 <div class="related">
         <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Dieren in deze groep</span>
         <ul>
-        {foreach from=$children item=v}
+        {foreach $children v}
             <li class="">
                 <a href="#" onclick="drnzkr_toon_dier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
                 <img src="{$v.url_thumbnail}">
@@ -143,18 +143,14 @@ function getremotemetadata(p)
 	});	
 }
 
-
 {if $nbc.url_image}
 	var url = '{$nbc.url_image}';
 	getremotemetadata( { id: 'overview-picture' , name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
 {/if}
-{foreach from=$media item=v}
+{foreach $media v}
 	var url = '{$v.file_name}';
 	getremotemetadata( { id: 'img-'+ {$v.id} , name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
 {/foreach}
-
-
-
 
 });
 </script>

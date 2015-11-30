@@ -1,4 +1,5 @@
 {assign var=selectedChoice value=$keypath|@end}
+
 <script type="text/javascript">
 	allLookupSetSelectedId({$selectedChoice.id});
 </script>

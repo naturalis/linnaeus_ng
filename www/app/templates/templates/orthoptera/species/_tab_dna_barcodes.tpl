@@ -16,7 +16,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					<th>Verzamelaar</th>
 					<th>Soort</th>
 				</tr>
-				{foreach from=$content item=v}
+				{foreach $content v}
 				<tr><td>{$v.barcode}</td><td>{$v.date_literal}, {$v.location}</td><td>{$v.specialist}</td><td>{$v.taxon_literal}</td></tr>
 				{/foreach}
 			</table>
