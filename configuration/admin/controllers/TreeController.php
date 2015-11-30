@@ -38,7 +38,8 @@ class TreeController extends Controller
 
     private function initialize ()
     {
-		$this->TaxonParentageController = new TaxonParentageController;
+        $this->loadExternalModel('TreeModel');
+        $this->TaxonParentageController = new TaxonParentageController;
 		$this->checkParentage();
     }
 

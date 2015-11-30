@@ -56,6 +56,7 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
 */
 
 include_once ('Controller.php');
+
 class SpeciesController extends Controller
 {
     private $_useNBCExtras = false;
