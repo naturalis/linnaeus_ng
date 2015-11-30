@@ -27,9 +27,7 @@ final class MatrixKeyAppModel extends AbstractModel
         parent::__destruct();
     }
 
-
-
-	private function getStateCount( $params )
+	public function getStateCount( $params )
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
@@ -43,18 +41,18 @@ final class MatrixKeyAppModel extends AbstractModel
 
 		$query="
 			select case count(1) when 0 then -1 else 0 end as can_select, state_id
-			from %TABLE%
+			from %PRE%matrices_taxa_states
 			where project_id = ".$project_id." and matrix_id = ".$matrix_id.
 			(count($taxa)!=0 ? " and taxon_id in (".implode(',',$taxa).") " : "" ).
 			(count($selStates)!=0 ? " and state_id not in (".$states.") " : "")."
 			group by state_id
 				union all
 			select distinct -1 as can_select, state_id
-			from %TABLE%
+			from %PRE%matrices_taxa_states
 			where project_id = ".$project_id." and matrix_id = ".$matrix_id." 
 			".(count($taxa)!=0 ? " and taxon_id not in (".implode(',',$taxa).") " : "" ). "
 			and state_id not in (
-				select state_id from %TABLE%
+				select state_id from %PRE%matrices_taxa_states
 				where project_id = ".$project_id." and matrix_id = ".$matrix_id.
 				(count($taxa)!=0 ? " and taxon_id in (".implode(',',$taxa).") " : "" ).
 				(count($selStates)!=0 ? " and state_id not in (".$states.") " : "").
@@ -72,9 +70,7 @@ final class MatrixKeyAppModel extends AbstractModel
 		));
 	}
 
-
-
-	private function getCharacteristicStates( $params )
+	public function getCharacteristicStates( $params )
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
@@ -90,7 +86,7 @@ final class MatrixKeyAppModel extends AbstractModel
 				_a.file_name as img,
 				'0' as select_state, 
 				_a.show_order
-			from %TABLE% _a
+			from %PRE%characteristics_states _a
 			left join %PRE%characteristics_labels_states _c 
 				on _a.id = _c.state_id 
 				and _c.language_id = ".$language_id." 
@@ -106,13 +102,13 @@ final class MatrixKeyAppModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
-	private function getCharacteristicStates( $params )
+	public function getChargroupCharacteristics( $params )
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
-		$characteristic_id = isset($params['characteristic_id']) ? $params['characteristic_id'] : null;
+		$chargroup_id = isset($params['chargroup_id']) ? $params['chargroup_id'] : null;
 					
-		if ( is_null($project_id) || is_null($language_id) || is_null($characteristic_id) )
+		if ( is_null($project_id) || is_null($language_id) || is_null($chargroup_id) )
 			return;
 			
 		$query="
@@ -122,7 +118,7 @@ final class MatrixKeyAppModel extends AbstractModel
 				_a.show_order as show_order,
 				if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label,
 				if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description					
-			from %TABLE% _a
+			from %PRE%characteristics_chargroups _a
 			left join %PRE%characteristics _b 
 				on _a.characteristic_id = _b.id
 			left join %PRE%characteristics_labels _c 
@@ -130,89 +126,14 @@ final class MatrixKeyAppModel extends AbstractModel
 				and _c.language_id = ".$language_id." 
 				and _c.project_id = ".$project_id."
 			where
-				_a.chargroup_id = ".$val['id']. " 
+				_a.chargroup_id = ".$chargroup_id. " 
 				and _a.project_id = ".$project_id."
 			order by 
 				label"
 		;
-
-				$hasSelectedGroup=false;
-
-				foreach((array)$c as $cKey=>$cVal)
-				{
-					
-					$c[$cKey]['img']=makeCharacterIconName($val['label']);
-
-					$c[$cKey]['states']=$this->models->CharacteristicState->freeQuery(
-						"select
-							_a.id,
-							_c.label,
-							_a.file_name as img,
-							'0' as select_state, 
-							_a.show_order
-						from %TABLE% _a
-						left join %PRE%characteristics_labels_states _c 
-							on _a.id = _c.state_id 
-							and _c.language_id = ".$language_id." 
-							and _c.project_id = ".$project_id."
-						where 
-							_a.characteristic_id = ".$cVal['id']." 
-							and _a.project_id = ".$project_id."
-						order by 
-							_a.show_order,_c.label"
-					);
-					
-					$hasSelected=false;
-					foreach((array)$c[$cKey]['states'] as $sKey => $sVal)
-					{
-						unset($c[$cKey]['states'][$sKey]['show_order']);
-
-						$c[$cKey]['states'][$sKey]['select_state']=
-							isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
-
-						if ($c[$cKey]['states'][$sKey]['select_state']=='1') $hasSelected=true;
-
-						if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
-							unset($c[$cKey]['states'][$sKey]);
-
-						if (in_array($sVal['id'],$selStates))
-						{
-							$stateList[]=
-								array_merge(
-									$sVal,
-									array(
-										'display'=>array_search($sVal['id'],$selStates),
-										'character'=>
-											array('id'=>$val['id'],'label'=>$cVal['label'])
-										)
-									);
-						}
-					}
-					
-					$c[$cKey]['hasStates']=count((array)$c[$cKey]['states'])>0;
-					$c[$cKey]['hasSelected']=$hasSelected;
-					
-					if ($hasSelected) $hasSelectedGroup=true;
-
-				}
-				
-				$menu[$key]['characters']=$c;
-				$menu[$key]['hasCharacters']=count((array)$c)>0;
-				$menu[$key]['hasSelected']=$hasSelectedGroup;
-				
-			}
 		
-		}
-		usort($stateList,function ($a,$b) {return $a['display']>$b['display'] ? 1 : -1;});
-
-		return array('all'=>$menu,'active'=>$stateList);
+		return $this->freeQuery( $query );
 	}
-
-
-
-
-
-
 
 	public function getResults( $params )
 	{
@@ -229,7 +150,7 @@ final class MatrixKeyAppModel extends AbstractModel
 		{
 			$query="
 				select 'taxon' as type, _a.taxon_id as id, 0 as total_states, 100 as score,_c.is_hybrid as is_hybrid, trim(_c.taxon) as sci_name, trim(_d.commonname) as label,_e.value as url_thumbnail
-				from %TABLE% _a
+				from %PRE%matrices_taxa _a
 				left join %PRE%taxa _c on _a.taxon_id = _c.id and _c.project_id = ".$project_id."
 				left join %PRE%commonnames _d on _d.taxon_id = _a.taxon_id and _d.project_id = ".$project_id." and _d.language_id = ".$language_id." 
 				left join %PRE%nbc_extras _e on _c.id = _e.ref_id and _e.ref_type='taxon' and _e.name='url_thumbnail' and _e.project_id = ".$project_id."
@@ -253,7 +174,7 @@ final class MatrixKeyAppModel extends AbstractModel
 				select 'taxon' as type, _a.taxon_id as id, count(_b.state_id) as total_states,
 				round((case when count(_b.state_id)>".$selStateCount." then ".$selStateCount." else count(_b.state_id) end/".$selStateCount.")*100,0) as score,
 				_c.is_hybrid as is_hybrid, trim(_c.taxon) as sci_name, trim(_d.commonname) as label,_e.value as url_thumbnail
-				from %TABLE% _a
+				from %PRE%matrices_taxa _a
 				left join %PRE%matrices_taxa_states _b on _a.project_id = _b.project_id and _a.matrix_id = _b.matrix_id and _a.taxon_id = _b.taxon_id and (_b.state_id in (".$states.")) and _b.project_id = ".$project_id."
 				left join %PRE%taxa _c on _a.taxon_id = _c.id  and _c.project_id = ".$project_id."
 				left join %PRE%commonnames _d on _d.taxon_id = _a.taxon_id and _d.project_id = ".$project_id." and _d.language_id = ".$language_id." 
@@ -403,15 +324,15 @@ final class MatrixKeyAppModel extends AbstractModel
 					_a.ref_id as id,'character' as type,_a.show_order as show_order,
 					if(locate('|',_b.label)=0,_b.label,substring(_b.label,1,locate('|',_b.label)-1)) as label,
 				if(locate('|',_b.label)=0,_b.label,substring(_b.label,locate('|',_b.label)+1)) as description
-			from %TABLE% _a
+			from %PRE%gui_menu_order _a
 			left join %PRE%characteristics_labels _b on _b.characteristic_id = _a.ref_id and _b.language_id = ".$language_id."
 			where 
 				_a.project_id = ".$project_id."
-				and _a.matrix_id = ".$mmatrix_idId."
+				and _a.matrix_id = ".$matrix_id."
 				and _a.ref_type='char'
 			union all
 			select 
-				_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %TABLE% _a
+				_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %PRE%gui_menu_order _a
 			left join %PRE%chargroups_labels _c on _c.chargroup_id = _a.ref_id and _c.language_id = ".$language_id."
 			where
 				_a.project_id = ".$project_id."
@@ -422,21 +343,6 @@ final class MatrixKeyAppModel extends AbstractModel
 
 		return $this->freeQuery( $query );
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

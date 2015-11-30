@@ -22,6 +22,8 @@ class MatrixKeyAppController extends Controller
         'variation_relations',
 		'gui_menu_order'
     );
+	
+	public $modelNameOverride='MatrixKeyAppModel';
 
 	public function appControllerInterfaceAction()
 	{
@@ -142,26 +144,11 @@ class MatrixKeyAppController extends Controller
 			if ($val['type']=='c_group')
 			{
 				
-				$c = $this->models->CharacteristicChargroup->freeQuery(
-					"select
-						_a.characteristic_id as id,
-						'character' as type,
-						_a.show_order as show_order,
-						if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label,
-						if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description					
-					from %TABLE% _a
-					left join %PRE%characteristics _b 
-						on _a.characteristic_id = _b.id
-					left join %PRE%characteristics_labels _c 
-						on _a.characteristic_id = _c.characteristic_id 
-						and _c.language_id = ".$data['language']." 
-						and _c.project_id = ".$this->getCurrentProjectId()."
-					where
-						_a.chargroup_id = ".$val['id']. " 
-						and _a.project_id = ".$this->getCurrentProjectId()."
-					order by 
-						label"
-				);
+				$c = $this->models->MatrixKeyAppModel->getChargroupCharacteristics(array(
+					"language_id"=>$data['language'],
+					"project_id"=>$this->getCurrentProjectId(),
+					"chargroup_id"=>$val['id']
+				));
 
 				$hasSelectedGroup=false;
 
@@ -170,25 +157,12 @@ class MatrixKeyAppController extends Controller
 					
 					$c[$cKey]['img']=makeCharacterIconName($val['label']);
 
-					$c[$cKey]['states']=$this->models->CharacteristicState->freeQuery(
-						"select
-							_a.id,
-							_c.label,
-							_a.file_name as img,
-							'0' as select_state, 
-							_a.show_order
-						from %TABLE% _a
-						left join %PRE%characteristics_labels_states _c 
-							on _a.id = _c.state_id 
-							and _c.language_id = ".$data['language']." 
-							and _c.project_id = ".$this->getCurrentProjectId()."
-						where 
-							_a.characteristic_id = ".$cVal['id']." 
-							and _a.project_id = ".$this->getCurrentProjectId()."
-						order by 
-							_a.show_order,_c.label"
-					);
-					
+					$c[$cKey]['states']=$this->models->MatrixKeyAppModel->getCharacteristicStates(array(
+						"language_id"=>$data['language'],
+						"project_id"=>$this->getCurrentProjectId(),
+						"characteristic_id"=>$cVal['id']
+					));
+				
 					$hasSelected=false;
 					foreach((array)$c[$cKey]['states'] as $sKey => $sVal)
 					{
@@ -252,7 +226,7 @@ class MatrixKeyAppController extends Controller
 			"taxon_id"=>$data['id']
 		));
 
-		$t=$this->models->Taxon->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id'=>$data['id'])));
+		$t=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id'=>$data['id'])));
 		foreach((array)$t as $key => $val)
 		{
 			$t[$key]['label']=$this->getCommonname($val['id']);
@@ -273,7 +247,7 @@ class MatrixKeyAppController extends Controller
 		if (!isset($_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']))
 		{
 			$_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']=
-				$this->models->MatrixkeyappModel->getGuiMenuOrder(array(
+				$this->models->MatrixKeyAppModel->getGuiMenuOrder(array(
 					"language_id"=>$lId,
 					"project_id"=>$this->getCurrentProjectId(),
 					"matrix_id"=>$mId
