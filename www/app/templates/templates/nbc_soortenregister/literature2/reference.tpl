@@ -23,8 +23,6 @@
 
 				<tr><td>{t}Auteur(s){/t}</td><td>{if ($smarty.capture.authors|@trim|@strlen)>0}{$smarty.capture.authors|@trim}{else}{$ref.author}{/if}</td></tr>
 
-
-
 				{if $ref.date}<tr><td>{t}Jaar{/t}</td><td>{$ref.date}</td></tr>{/if}
 				{if $ref.label}<tr><td>{t}Titel{/t}</td><td>{$ref.label}</td></tr>{/if}
 
@@ -62,16 +60,15 @@
 
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-
+$(document).ready(function()
+{
 	$('title').html('{$ref.label|@strip_tags|@escape} - '+$('title').html());
 
 	$('#presence').remove();
 
 	$('[id^=media-]').each(function(e){
 		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
-	});
-	
+	});	
 });
 </script>
 

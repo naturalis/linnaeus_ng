@@ -3,7 +3,7 @@
 <div id="page-main">
 	<div id="index">
 		<table>
-		{foreach name=taxonloop from=$taxa key=k item=v}
+		{foreach $taxa v k}
 		{if $v.do_display}
 		<tr class="highlight">
 			<td><a href="../species/taxon.php?id={$v.id}">{$v.taxon}</a></td>

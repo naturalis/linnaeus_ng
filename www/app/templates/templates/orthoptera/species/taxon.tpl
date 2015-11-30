@@ -28,7 +28,6 @@
 
         <div id="content" class="taxon-detail">
         
-        
             {if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
         
                 {include file="_tab_media.tpl"}
@@ -53,7 +52,7 @@
         
                 {if $content|@is_array}
                 <ul>
-                    {foreach from=$content item=v key=k}
+                    {foreach $content v k}
                     {if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
                     {/foreach}
                 </ul>
@@ -92,13 +91,14 @@
 
 
 <script type="text/JavaScript">
-$(document).ready(function() {
+$(document).ready(function()
+{
 	$( '#inlineformsearchInput' ).focus();
-
 
 	$('title').html('{if $names.preffered_name}{$names.preffered_name|@strip_tags|@escape} ({$names.nomen_no_tags|@strip_tags|@escape}){else}{$names.nomen|@strip_tags|@escape}{/if} - '+$('title').html());
 	
-	if(jQuery().prettyPhoto) {
+	if(jQuery().prettyPhoto)
+	{
 	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 
 	 		opacity: 0.70, 
 			animation_speed:50,

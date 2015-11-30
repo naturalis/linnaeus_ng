@@ -51,16 +51,15 @@
 	</div>
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 
-matrixId={$matrix.id};
-projectId={$projectId};
-nbcUseEmergingCharacters={$matrix_use_emerging_characters};
+	matrixId={$matrix.id};
+	projectId={$projectId};
+	nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 
-{foreach from=$characteristics key=k item=v}
+{foreach $characteristics v k}
 	storeCharacter(
 		{$v.id},
 		'{$v.label|addslashes}',
@@ -78,7 +77,7 @@ nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 	imagePath = '{$projectUrls.uploadedMedia}';
 	
 {if $storedStates}
-{foreach from=$storedStates key=k item=v}
+{foreach $storedStates v k}
 	setSelectedState('{$v.val}',{if $v.id}{$v.id}{else}-1{/if},{$v.characteristic_id},'{$v.label|addslashes}'{if $v.value},{$v.value}{/if});
 {/foreach}
 	getScores();
@@ -92,9 +91,7 @@ nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 	showMatrixSelect();
 {/if}
 
-{literal}
 });
 </script>
-{/literal}
 
 {include file="../shared/footer.tpl"}

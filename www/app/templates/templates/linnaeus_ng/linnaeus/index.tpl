@@ -7,7 +7,7 @@
 	<table>
 		<tr>
 		{assign var=i value=1}
-		{foreach from=$menu key=k item=v}
+		{foreach $menu v k}
 		{if $v.type=='regular' && $v.show_in_public_menu==1}
 		<td class="grid">
 			<a class="menu-item" href="../{$v.controller}/">

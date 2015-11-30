@@ -34,7 +34,7 @@
 
 		<div>
 			<div>
-				{foreach from=$results.data item=v}
+				{foreach $results.data v}
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
 							<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
@@ -71,13 +71,13 @@
 
 </div>
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-
+$(document).ready(function()
+{
 	$('title').html('Recente afbeeldingen - '+$('title').html());
 	
-	if(jQuery().prettyPhoto) {
+	if(jQuery().prettyPhoto)
+	{
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
 	 		opacity: 0.70, 
 			animation_speed:50,
@@ -89,6 +89,5 @@ $(document).ready(function(){
 	bindKeys();
 });
 </script>
-{/literal}
 
 {include file="../shared/footer.tpl"}
