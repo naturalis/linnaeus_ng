@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Lit to Lit2</title>
+	<title>Update Literature</title>
 </head>
 <body style="font: 12px Verdana; width: 800px;">
 
@@ -16,7 +16,7 @@
 	$c = new configuration;
 	$s = $c->getDatabaseSettings();
 
-	echo '<h3>Lit to Lit2</h3>';
+	echo '<h3>Update Literature</h3>';
 
  	$d = mysqli_connect($s['host'],$s['user'],$s['password'], $s['database']);
 	mysqli_set_charset($d, 'utf8');
