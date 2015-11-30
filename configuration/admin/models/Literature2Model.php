@@ -49,7 +49,8 @@ final class Literature2Model extends AbstractModel
 			where
 				_a.project_id = ".$projectId."
 				and _a.literature2_id =".$literatureId."
-			order by _b.name";
+
+			order by _a.sort_order,_b.name";
 
         return $this->freeQuery($query);
     }
@@ -62,7 +63,13 @@ final class Literature2Model extends AbstractModel
 
         $query = "
             select
-				distinct if(ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122,'#',substr(lower(_a.label),1,1)) as letter
+				distinct
+                    if(
+                        ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122,
+                        '#',
+                        substr(lower(_a.label),1,1)
+                    )
+                as letter
 			from
 				%PRE%literature2 _a
 			where
