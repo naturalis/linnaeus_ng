@@ -326,7 +326,7 @@ class ProjectsController extends Controller
 
         $this->setPageName($this->translate('Project data'));
 
-        if (isset($this->rGetId()) && !$this->isFormResubmit()) {
+        if (!is_null($this->rGetId()) && !$this->isFormResubmit()) {
             // saving all data (except the logo image)
 
 			$this->saveProjectData($this->rGetId());
@@ -480,7 +480,7 @@ class ProjectsController extends Controller
 
         $this->setSuppressProjectInBreadcrumbs();
 
-        if (isset($this->rGetId()) && !$this->isFormResubmit()) {
+        if (!is_null($this->rGetId()) && !$this->isFormResubmit()) {
 
             if (!$this->rHasVal('title') || !$this->rHasVal('sys_description') || !$this->rHasVal('language')) {
 
@@ -533,7 +533,7 @@ class ProjectsController extends Controller
             }
         }
 
-        if (isset($this->rGetId()))
+        if (!is_null($this->rGetId()))
             $this->smarty->assign('data', $this->GetAll());
 
         $this->smarty->assign('languages', $this->getAvailableLanguages());
