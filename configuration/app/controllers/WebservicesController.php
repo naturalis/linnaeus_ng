@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('RdfController.php');
+
 class WebservicesController extends Controller
 {
     private $_usage=null;
@@ -17,15 +18,7 @@ class WebservicesController extends Controller
 	private $_JSON=null;
 
     public $usedModels = array(
-		'taxon',
-		'commonname',
-		'synonym',
-		'names',
-		'media_taxon',
-		'nsr_ids',
-		'media_meta',
-		'literature2',
-		'taxon_trend_years'
+		'nsr_ids'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -33,13 +26,37 @@ class WebservicesController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
+
 		$this->initialise();
+
     }
 
     public function __destruct ()
     {
         parent::__destruct();
     }
+
+    private function initialise()
+    {
+		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
+		
+		$this->checkProject();
+
+		if (is_null($this->getCurrentProjectId()))
+		{
+			$this->addError('cannot get project settings.');
+		} 
+		else 
+		{
+			$this->models->WebservicesModel->initDb( array( "db_lc_time_names" => $this->getSetting('db_lc_time_names') ) );
+			$this->checkJSONPCallback();
+		}
+    }
+
+
+
+
+
 
 	public function namesAction()
 	{
@@ -53,82 +70,39 @@ parameters:
   count".chr(9)." : when set to 1, only the number of records in the resultset are returned (optional)
 ";
 
-		// pid is mandatory, now checked in initialise()
+		//pid is mandatory, now checked in initialise()
 		//$this->checkProject();
 		$this->checkFromDate();
 		
-		if (is_null($this->getCurrentProjectId())||is_null($this->getFromDate())) {
+		if ( is_null($this->getCurrentProjectId() ) || is_null($this->getFromDate()) )
+		{
 			$this->sendErrors();
 			return;
 		}
 
-		$offset = isset($this->requestData['offset']) && is_numeric($this->requestData['offset']) ? (int)$this->requestData['offset'] : null;
-		$rowcount = isset($this->requestData['rows']) && is_numeric($this->requestData['rows']) ? (int)$this->requestData['rows'] : null;
-		$onlyCount = $this->rHasVal('count','1');
+		$offset = null!==$this->rGetVal('offset') && is_numeric($this->rGetVal('offset')) ? (int)$this->rGetVal('offset') : null;
+		$rowcount = null!==$this->rGetVal('rows') && is_numeric($this->rGetVal('rows')) ? (int)$this->rGetVal('rows') : null;
+		$count_only = $this->rHasVal('count','1');
 
-		if ($onlyCount) {
-
-			$query="
-				select
-					count(_a.id) as total
-				from %PRE%names _a
-				left join %PRE%taxa _d on _a.taxon_id=_d.id and _a.project_id=_d.project_id
-				left join %PRE%projects_ranks _e on _d.rank_id=_e.id and _a.project_id=_d.project_id
-				where _a.project_id=".$this->getCurrentProjectId()."
-				and (
-					(_a.last_change='0000-00-00 00:00:00' && _a.created>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d')) ||
-					(_a.last_change!='0000-00-00 00:00:00' && _a.last_change>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d'))
-				)
-				and _e.rank_id >= ".SPECIES_RANK_ID."
-				and _d.taxon is not null";
-
-		} else {
-			
-			$url=sprintf($this->_taxonUrl,$this->getTaxonId());
-
-			$query="
-				select
-					_a.id as name_id,
-					_a.name,
-					_a.uninomial,
-					_a.specific_epithet,
-					_a.infra_specific_epithet,
-					_a.authorship,
-					_c.language,
-					_c.iso3 as language_iso3,
-					if(_a.last_change='0000-00-00 00:00:00',_a.created,_a.last_change) as last_change,
-					_b.nametype,
-					_a.taxon_id, 
-					_d.taxon, 
-					_f.default_label as rank,
-					concat('".$url."',_a.taxon_id) as url,
-					_h.id as taxon_valid_name_id
-				from %PRE%names _a
-				
-				left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id=_b.project_id
-				left join %PRE%languages _c on _a.language_id=_c.id
-				left join %PRE%taxa _d on _a.taxon_id=_d.id and _a.project_id=_d.project_id
-				left join %PRE%projects_ranks _e on _d.rank_id=_e.id and _a.project_id=_e.project_id
-				left join %PRE%ranks _f on _e.rank_id=_f.id
-				
-				left join %PRE%name_types _g on _a.project_id=_g.project_id and _g.nametype='isValidNameOf'
-				left join %PRE%names _h on _h.taxon_id=_a.taxon_id and _h.type_id=_g.id and _a.project_id=_h.project_id
-
-				left join %PRE%nsr_ids _i on _a.project_id=_i.project_id and _a.taxon_id=_i.lng_id and _i.item_type='taxon'
-
-				where _a.project_id=".$this->getCurrentProjectId()."
-				and (
-					(_a.last_change='0000-00-00 00:00:00' && _a.created>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d')) ||
-					(_a.last_change!='0000-00-00 00:00:00' && _a.last_change>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d'))
-				)
-				and _e.rank_id >= ".SPECIES_RANK_ID."
-				and _d.taxon is not null".
-				(!is_null($rowcount) ? ' limit '.$rowcount : '').
-				(!is_null($rowcount) && !is_null($offset) ? ' offset '.$offset : '');
-
+		if ($count_only)
+		{
+			$names=$this->models->WebservicesModel->getNameCount(array(
+				"project_id"=>$this->getCurrentProjectId(),
+				"from_date"=>$this->getFromDate()
+			));
+		} 
+		else
+		{
+			$data=$this->models->WebservicesModel->getNames(array(
+				"project_id"=>$this->getCurrentProjectId(),
+				"from_date"=>$this->getFromDate(),
+				"rowcount"=>$rowcount,
+				"offset"=>$offset,
+				"url"=>sprintf($this->_taxonUrl,$this->getTaxonId())
+			));
+			$names=$data['data'];
 		}
 
-		$names = $this->models->Names->freeQuery($query);
 		if (is_null($names)) $names=array();
 
 		$result=array(
@@ -137,19 +111,28 @@ parameters:
 		);
 		
 		if (!is_null($rowcount))
+		{
 			$result['rows']=$rowcount;
+		}
 
 		if (!is_null($rowcount) && !is_null($offset))
+		{
 			$result['offset']=$offset;
+		}
 
 		$p=$this->getProject();
+
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
 		
-		if ($onlyCount) {
+		if ($count_only)
+		{
 			$result['count']=$names[0]['total'];
-		} else {
+		} 
+		else
+		{
 			$result['count']=count((array)$names);
+			$result['total_count']=$data['count'];
 			$result['names']=$names;
 		}
 
@@ -167,119 +150,53 @@ parameters:
   taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
 ";
 
-		// pid is mandatory, now checked in initialise()
-		//$this->checkProject();
-		
-		if (is_null($this->getCurrentProjectId())) {
+		if (is_null($this->getCurrentProjectId()))
+		{
 			$this->sendErrors();
 			return;
 		}
-
+		
 		$this->checkTaxonId();
 		
-		if (is_null($this->getTaxonId())) {
+		if (is_null($this->getTaxonId()))
+		{
 			$this->sendErrors();
 			return;
 		}
 
 		$taxon=$this->getTaxonById($this->getTaxonId());
 
-		$ranklabel=$this->models->LabelProjectRank->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'project_rank_id' => $taxon['rank_id'],
-				'language_id' => LANGUAGE_ID_ENGLISH
-			), 
-			'columns' => 'label'
-		));
+		$ranklabel=$this->models->LabelsProjectsRanks->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'project_rank_id' => $taxon['rank_id'],
+					'language_id' => LANGUAGE_ID_ENGLISH
+				), 
+				'columns' => 'label'
+			));
 
 		$ranklabel=$ranklabel[0]['label'];
-				
 
-		$query="
-			select
-				_a.content, _b.page
-			from %PRE%content_taxa _a, %PRE%pages_taxa _b
-			where _a.project_id=".$this->getCurrentProjectId()."
-			and _a.taxon_id =".$this->getTaxonId()."
-			and _a.language_id =".LANGUAGE_ID_DUTCH."
-			and _b.project_id=".$this->getCurrentProjectId()."
-			and _a.page_id=_b.id
-			and _b.page='Summary_dutch'
-			"
-			;
+		$summary=$this->models->WebservicesModel->getTaxonSummary(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"taxon_id"=>$this->getTaxonId(),
+		));
 
-		$descriptions = $this->models->Names->freeQuery($query);
-
-		$summary=strip_tags($descriptions[0]['content']);
-		
 		if (empty($summary)) $summary=null;
-		
-
-		/*
-		//and (_b.page='Summary_dutch' or _b.page='Description')
-		//order by _b.page desc"
-
-		foreach((array)$descriptions as $val) {
-			if (($val['page']=='Description' && empty($description)) || $val['page']=='Summary_dutch')
-			$description=$val['content'];
-		}
-		
-		$description = strip_tags($description);
-		*/
 		
 		$url='http://'.$_SERVER['HTTP_HOST'].$this->makeNsrLink();
 
-		$query="
-			select
-				_a.id as name_id,
-				_a.name,
-				_a.uninomial,
-				_a.specific_epithet,
-				_a.infra_specific_epithet,
-				_a.authorship,
-				_c.language,
-				_c.iso3 as language_iso3,
-				_b.nametype
-			from %PRE%names _a
-			
-			left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id=_b.project_id
-			left join %PRE%languages _c on _a.language_id=_c.id
-			left join %PRE%taxa _d on _a.taxon_id=_d.id and _a.project_id=_d.project_id
+		$names=$this->models->WebservicesModel->getTaxonNames(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"taxon_id"=>$this->getTaxonId()
+		));
 
-			where _a.project_id=".$this->getCurrentProjectId()."
-			and _a.taxon_id =".$this->getTaxonId()
-			;
-
-		$names=$this->models->Names->freeQuery($query);
-
-        $media=$this->models->MediaTaxon->freeQuery("
-			select
-				_a.id as media_id,
-				concat('".$this->_nsrOriginalImageBaseUrl."',_a.file_name) as url,
-				_b.meta_data as copyright,
-				_c.meta_data as caption,
-				_d.meta_data as creator,
-				date_format(_e.meta_date,'%e %M %Y') as date_created
-
-			from %PRE%media_taxon _a
-
-			left join %PRE%media_meta _b
-				on _a.id=_b.media_id and _a.project_id=_b.project_id and _b.sys_label = 'beeldbankCopyright'
-			left join %PRE%media_meta _c
-				on _a.id=_c.media_id and _a.project_id=_c.project_id and _c.sys_label = 'beeldbankCaption'
-			left join %PRE%media_meta _d
-				on _a.id=_d.media_id and _a.project_id=_d.project_id and _d.sys_label = 'beeldbankFotograaf'
-			left join %PRE%media_meta _e
-				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumVervaardiging'
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.taxon_id = ".$this->getTaxonId()."
-			order by
-				_e.meta_date desc
-			");
+		$media=$this->models->WebservicesModel->getTaxonMedia(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"taxon_id"=>$this->getTaxonId(),
+			"image_base_url"=>$this->_nsrOriginalImageBaseUrl
+		));
 
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
@@ -305,7 +222,6 @@ parameters:
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			
 		$this->printOutput();
-
 	}
 
 	public function taxonPageAction()	
@@ -318,9 +234,6 @@ parameters:
   cat".chr(9)." : page ID of the content page (mandatory)
 ";
 
-		// pid is mandatory, now checked in initialise()
-		//$this->checkProject();
-		
 		if (is_null($this->getCurrentProjectId()))
 		{
 			$this->sendErrors();
@@ -342,43 +255,22 @@ parameters:
 			return;
 		}
 
-		$query="
-			select
-				_b.id,
-				ifnull(_c.title,_a.page) as title,
-				_b.content
-
-			from
-				%PRE%pages_taxa _a
-				
-			left join %PRE%content_taxa _b
-				on _a.id=_b.page_id
-				and _a.project_id=_b.project_id
-				and _b.language_id =".LANGUAGE_ID_DUTCH."
-				and _b.taxon_id =".$this->getTaxonId()."
-				
-			left join %PRE%pages_taxa_titles _c
-				on _a.id=_c.page_id
-				and _a.project_id=_c.project_id
-				and _c.language_id =".LANGUAGE_ID_DUTCH."
-
-			where
-				_a.project_id=".$this->getCurrentProjectId()."
-				and _a.id=" . $this->rGetVal('cat')
-			;
-
-		$p=$this->models->Names->freeQuery($query);
+		$p=$this->models->WebservicesModel->getTaxonPage(array(
+			"taxon_id"=>$this->getTaxonId(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"page_id"=>$this->rGetVal('cat')
+		));
 
 		$page=$title=$rdf=null;
 
 		if ( $p )
 		{
-			$page=$p[0]['content'];
-			$title=$p[0]['title'];
+			$page=$p['content'];
+			$title=$p['title'];
 
-			if (isset($p[0]['id']))
+			if (isset($p['id']))
 			{
-				foreach((array)$this->Rdf->getRdfValues($p[0]['id']) as $val)
+				foreach((array)$this->Rdf->getRdfValues($p['id']) as $val)
 				{
 					$rdf[]=array('predicate'=>$val['predicate'],'object'=>$val['data']);
 				}
@@ -418,14 +310,16 @@ parameters:
   nsr".chr(9)." : NSR-id of the taxon to retrieve (mandatory)
 ";
 
-		if (is_null($this->getCurrentProjectId())) {
+		if (is_null($this->getCurrentProjectId()))
+		{
 			$this->sendErrors();
 			return;
 		}
 
 		$this->checkNsrId();
 		
-		if (is_null($this->getTaxonId())) {
+		if (is_null($this->getTaxonId()))
+		{
 			$this->sendErrors();
 			return;
 		}
@@ -1072,37 +966,27 @@ parameters:
 	}
 	
 
-    private function initialise()
-    {
-		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
-		
-		$this->checkProject();
 
-		if (is_null($this->getCurrentProjectId()))
-		{
-			$this->addError('cannot get project settings.');
-		} 
-		else 
-		{
-			$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
-			$this->checkJSONPCallback();
-		}
-    }
+
+
+
+
+
+
+
+
 
 	private function checkProject()
 	{
 		if (!$this->rHasVal('pid'))
 		{
-
 			$this->setProject(null);
 			$this->setCurrentProjectId(null);
 			$this->addError('no project id specified.');
-
 		}
 		else
-		 {
-
-			$p = $this->models->Project->_get(array(
+		{
+			$p = $this->models->Projects->_get(array(
 				'id' => $this->requestData['pid']
 			));
 		
@@ -1134,21 +1018,25 @@ parameters:
 
 	private function checkFromDate()
 	{
-		if (!$this->rHasVal('from')) {
-
+		if (!$this->rHasVal('from'))
+		{
 			$this->addError('no starttime specified of retrieval window.');
+		} 
+		else
+		{
+			$d=str_split($this->rGetVal('from'),2);
 
-		} else {
-
-			$d=str_split($this->requestData['from'],2);
-
-			if (strlen($this->requestData['from'])==8 && checkdate($d[2],$d[3],$d[0].$d[1])) {
-				$this->setFromDate($this->requestData['from']);
+			if (strlen($this->rGetVal('from'))==8 && checkdate($d[2],$d[3],$d[0].$d[1]))
+			{
+				$this->setFromDate($this->rGetVal('from'));
 				return true;
-			} else {
-				$this->addError('illegal date: '.$this->requestData['from'].'.');
+			} 
+			else 
+			{
+				$this->addError('illegal date: '.$this->rGetVal('from').'.');
 			}
 		}
+
 		return false;
 	}
 
@@ -1170,72 +1058,71 @@ parameters:
 		} 
 		else
 		{
-
-			$taxon=trim(strip_tags($this->requestData['taxon']));
+			$taxon=trim(strip_tags($this->rGetVal('taxon')));
 			
-			$this->setMatchType('literal');
+			$this->setMatchType('concept');
 
-			$t = $this->models->Taxon->_get(array(
+			$t=$this->models->Taxa->_get(array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon' => $taxon
 				)
 			));
 
-			if (!$t)
-			{
-				$this->setMatchType('name only');
-
-				$t = $this->models->Names->freeQuery("
-					select
-						_a.taxon_id as id, _a.name
-					from %PRE%names _a
-					left join %PRE%name_types _b 
-						on _a.type_id=_b.id and _a.project_id=_b.project_id
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
-						and _b.nametype = 'isValidNameOf'"
-				);
-			}
-		
-			if (!$t)
-			{
-				$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
-			} 
-			else
+			if ($t)
 			{
 				$this->setTaxonId($t[0]['id']);
-				return $t;
 			}
+			else
+			{
+				$this->setMatchType('valid name');
+
+				$t = $this->models->WebservicesModel->resolveName(array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"taxon"=>$taxon
+				));
+
+				if (!$t)
+				{
+					$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
+				} 
+				else
+				{
+					$this->setTaxonId($t['id']);
+				}
+	
+			}
+		
 		}
 		return false;
 	}
 
 	private function checkNsrId()
 	{
-		if (!$this->rHasVal('nsr')) {
-
+		if (!$this->rHasVal('nsr'))
+		{
 			$this->addError('no NSR-id specified.');
-
-		} else {
-			
-			$nsr=trim($this->requestData['nsr']);
+		} 
+		else 
+		{
+			$nsr=trim($this->rGetVal('nsr'));
 			
 			$this->setMatchType('literal');
 
 			$t = $this->models->NsrIds->_get(array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'nsr_id' => 'tn.nlsr.concept/'.str_pad(mysql_real_escape_string($nsr),12,'0',STR_PAD_LEFT),
+					'nsr_id' => 'tn.nlsr.concept/'.str_pad($nsr,12,'0',STR_PAD_LEFT),
 					'item_type' => 'taxon'
 				)
 			));
-			
 		
-			if (!$t) {
+			if (!$t)
+			{
 				$this->addError('NSR-id "'.$this->requestData['nsr'].'" not found in this project.');
-			} else {
+			} 
+			else
+			{
 				$this->setTaxonId($t[0]['lng_id']);
 				return $t;
 			}
