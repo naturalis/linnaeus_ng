@@ -207,7 +207,8 @@ class FreeModuleController extends Controller
 		$navList = $this->getModulePageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-			$this->smarty->assign('navCurrentId',$this->rGetId()) ? $this->rGetId() : null);
+
+		$this->smarty->assign('navCurrentId', $this->rGetId() ? $this->rGetId() : null);
 
 		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
 
