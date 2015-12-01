@@ -797,7 +797,7 @@ class FreeModuleController extends Controller
 		$id =
 			isset($id) ?
 				$id :
-				isset($this->rGetVal('freeId')) ?
+				!is_null($this->rGetVal('freeId')) ?
 					$this->rGetVal('freeId') :
 					$this->getCurrentModuleId();
 
