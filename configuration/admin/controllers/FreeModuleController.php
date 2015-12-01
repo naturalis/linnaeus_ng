@@ -172,8 +172,6 @@ class FreeModuleController extends Controller
 
 			if ($this->rHasVal('action','delete')) {
 
-
-
 				$this->deletePage();
 
 				$this->redirect('index.php');
@@ -203,6 +201,8 @@ class FreeModuleController extends Controller
 			}
 
 		}
+
+//die(print_r($page));
 
 		$navList = $this->getModulePageNavList(true);
 
@@ -589,11 +589,11 @@ class FreeModuleController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVar('action', 'save_content')) {
+        if ($this->rHasVal('action', 'save_content')) {
 
             $this->ajaxSaveContent();
 
-        } else if ($this->rHasVar('action', 'get_content')) {
+        } else if ($this->rHasVal('action', 'get_content')) {
 
             $this->ajaxActionGetContent();
 

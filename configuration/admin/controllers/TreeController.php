@@ -74,7 +74,7 @@ class TreeController extends Controller
         if (!$this->rHasVal('action'))
             return;
 
-        if ($this->rHasVar('action', 'get_lookup_list'))
+        if ($this->rHasVal('action', 'get_lookup_list'))
 		{
             $return=$this->getLookupList($this->GetAll());
         } else
