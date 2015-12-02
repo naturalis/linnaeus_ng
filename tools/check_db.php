@@ -11,7 +11,7 @@
 	$dumpPath = $path . 'empty-database.sql';
 	$emptyDatabaseFile = file_get_contents($dumpPath);
     $mysqlPath = '/Applications/MAMP/Library/bin/mysql';
-    $includeBaseDataUpdate = false;
+    $includeBaseDataUpdate = true;
 
 	include($cfg);
 	$c = new configuration;
