@@ -15,7 +15,7 @@ class ActorsController extends NsrController
         'rdf',
         'nsr_ids',
 		'presence_taxa',
-		'content_taxon',
+		'content_taxa',
 		'literature2_authors'
     );
 
