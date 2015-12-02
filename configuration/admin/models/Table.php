@@ -307,7 +307,6 @@ final class Table extends AbstractModel
 		{
             return;
         }
-
         $this->retainDataBeforeQuery($query);
         $this->setLastQuery($query);
         $result = mysqli_query($this->databaseConnection, $query);
@@ -667,6 +666,5 @@ final class Table extends AbstractModel
 			$this->log('Called _get with an empty query (poss. cause: "...\'id\' => \'null\' " instead of " => null ")',1);
 		}
     }
-
 
 }

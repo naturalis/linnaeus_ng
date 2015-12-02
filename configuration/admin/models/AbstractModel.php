@@ -22,6 +22,7 @@ class AbstractModel extends BaseClass
 	protected $_currentWhereArray=null;
     protected $tableExists=true;
 
+    protected $_retainQuery = true;
     protected $_dataBeforeQuery=true;
     protected $_dataAfterQuery=true;
 
@@ -71,6 +72,11 @@ class AbstractModel extends BaseClass
 	{
 		if (is_bool($state)) $this->noKeyViolationLogging = $state;
 	}
+
+    public function setRetainQuery ($state)
+    {
+        if (is_bool($state)) $this->retainQuery = $state;
+    }
 
     public function freeQuery($params)
     {
@@ -261,6 +267,10 @@ class AbstractModel extends BaseClass
 
     protected function retainDataBeforeQuery($query)
     {
+        if (!$this->_retainQuery) {
+            return;
+        }
+
         unset($this->_dataBeforeQuery);
 
 		if (empty($query))
@@ -280,6 +290,10 @@ class AbstractModel extends BaseClass
 
     protected function retainDataAfterQuery($query,$failed=false)
     {
+        if (!$this->_retainQuery) {
+            return;
+        }
+
         unset($this->_dataAfterQuery);
 
 		if ($failed)
