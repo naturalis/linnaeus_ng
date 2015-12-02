@@ -80,8 +80,16 @@ class ProjectDeleteController extends Controller
     public function __construct ()
     {
         parent::__construct();
+        $this->initialize();
     }
 
+    private function initialize ()
+    {
+        // Disable retaining query results, as this will cause memory errors for large tables
+        foreach ($this->models as $model) {
+            $model->setRetainQuery(false);
+        }
+    }
 
     public function __destruct ()
     {
