@@ -200,7 +200,7 @@
 		});
 		foreach ($orphans as $k => $orphan) {
 			// Add column
-            if (count($columns1) > count($columns0)) {
+            if (count($columns1) < count($columns0)) {
                 $queries['Columns added'][] = printUpdateTable($orphan, 'create');
             // Drop column
             } else {
@@ -233,13 +233,6 @@
 		if (count($attrs) === 0) {
 			return 0;
 		}
-
-		/*
-		$format = '<p class="column-differences">Column <em>%s</em> has different definitions in source and target</p>';
-		echo sprintf($format, $col0[COLUMN_NAME]);
-		echo '<table class="column-differences"><thead><tr><th>Column Attribute</th><th>Source</th><th>Target</th></tr></thead><tbody>';
-		$format = '<tr><td>%s</td><td>%s</td><td>%s</td></tr>';
-		*/
 
 		$attributeTypes = array('COLUMN_DEFAULT', 'IS_NULLABLE', 'NUMERIC_SCALE', 'COLUMN_TYPE', 'EXTRA');
 
