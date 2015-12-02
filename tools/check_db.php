@@ -200,7 +200,7 @@
 		});
 		foreach ($orphans as $k => $orphan) {
 			// Add column
-            if (count($columns1) < count($columns0)) {
+            if (count($columns1) > count($columns0)) {
                 $queries['Columns added'][] = printUpdateTable($orphan, 'create');
             // Drop column
             } else {
