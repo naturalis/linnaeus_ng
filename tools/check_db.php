@@ -7,9 +7,11 @@
 	// $dumpPath = 'database/empty-database.sql';
 	// $mysqlPath = 'mysql';
 	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
-	$dumpPath = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/database/empty-database.sql';
-    $dumpFile = file_get_contents($dumpPath);
-	$mysqlPath = '/Applications/MAMP/Library/bin/mysql';
+	$path = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/database/';
+	$dumpPath = $path . 'empty-database.sql';
+	$emptyDatabaseFile = file_get_contents($dumpPath);
+    $mysqlPath = '/Applications/MAMP/Library/bin/mysql';
+    $includeBaseDataUpdate = false;
 
 	include($cfg);
 	$c = new configuration;
@@ -50,15 +52,15 @@
 	// that's not something that you can specify explicitly when creating
 	// a table. As for table catalog, who cares?
 	$ignoredAttributes = array(
-			COLUMN_NAME,
-			'TABLE_NAME',
-			'TABLE_SCHEMA',
-			'TABLE_CATALOG',
-			'ORDINAL_POSITION',
-			'CHARACTER_MAXIMUM_LENGTH',
-			'CHARACTER_OCTET_LENGTH',
-			'DATA_TYPE',
-			'NUMERIC_PRECISION'
+		COLUMN_NAME,
+		'TABLE_NAME',
+		'TABLE_SCHEMA',
+		'TABLE_CATALOG',
+		'ORDINAL_POSITION',
+		'CHARACTER_MAXIMUM_LENGTH',
+		'CHARACTER_OCTET_LENGTH',
+		'DATA_TYPE',
+		'NUMERIC_PRECISION'
 	);
 	if($ignoreComments) {
 		$ignoredAttributes[] = 'COLUMN_COMMENT';
@@ -125,15 +127,25 @@
     }
 
     compareDatabases();
-	$queries = sortArrayByArray($queries, $printOrder);
 
-    foreach ($queries as $type => $list) {
-        echo "#$type: " . count($queries[$type]) . "\n";
-        foreach ($list as $query) {
-            echo $query;
+    // There are differences: list these plus base-data, which may contain updates
+    if (!empty($queries)) {
+        $queries = sortArrayByArray($queries, $printOrder);
+        foreach ($queries as $type => $list) {
+            echo "#$type: " . count($queries[$type]) . "\n";
+            foreach ($list as $query) {
+                echo $query;
+            }
+            echo "\n\n";
         }
-        echo "\n";
+        if ($includeBaseDataUpdate) {
+            echo "#Base data update:\n" . file_get_contents($path . 'base-data.sql');
+        }
+    // Same
+    } else {
+        echo "Database is up-to-date!\n";
     }
+
 
     mysql_query('DROP DATABASE `' . $db1 . '`', $conn1);
 
@@ -183,15 +195,18 @@
 	function displayOrphanColumns($columns0, $columns1, $dbName, $dbType)
 	{
 		global $queries;
-		$orphans = array_udiff($columns0, $columns1, function ($col0, $col1)
-		{
+		$orphans = array_udiff($columns0, $columns1, function ($col0, $col1) {
 			return strcmp($col0[COLUMN_NAME], $col1[COLUMN_NAME]);
 		});
-		$format = '<p class="orphan-column">Column <em>%s</em> only present in %s database (%s)</p>';
-		foreach($orphans as $orphan) {
-			//echo sprintf($format, $orphan[COLUMN_NAME], $dbType, $dbName);
-			//Add column
-            $queries['Columns added'][] = printUpdateTable($orphan, 'create');
+		foreach ($orphans as $k => $orphan) {
+			// Add column
+            if (count($columns1) > count($columns0)) {
+                $queries['Columns added'][] = printUpdateTable($orphan, 'create');
+            // Drop column
+            } else {
+                $queries['Columns dropped'][] = 'ALTER TABLE `' . $orphans[$k]['TABLE_NAME'] .
+                    '` DROP COLUMN `' . $orphans[$k]['COLUMN_NAME'] . "`;\n";
+            }
 		}
 		return count($orphans);
 	}
@@ -201,6 +216,18 @@
 	function displayColumnDifferences($col0, $col1)
 	{
 		global $showDetails, $ignoredAttributes, $queries, $droppedIndices;
+
+		// There a problem with [EXTRA] => 'on update CURRENT_TIMESTAMP' in combination with
+		// [COLUMN_DEFAULT] => 'CURRENT_TIMESTAMP'. This is not set properly with the
+		// resulting ALTER TABLE statement. Workaround is to manually reset this in the
+		// comparison database...
+        if (strtolower($col0['COLUMN_DEFAULT']) == 'current_timestamp' &&
+            strtolower($col1['COLUMN_DEFAULT']) == 'current_timestamp' &&
+            empty($col0['EXTRA']) &&
+            strpos(strtolower($col1['EXTRA']), 'current_timestamp') !== false) {
+            unset($col0['EXTRA'], $col1['EXTRA']);
+        }
+
 		$attrs = array_keys(array_diff_assoc($col0, $col1));
 		$attrs = array_diff($attrs, $ignoredAttributes);
 		if (count($attrs) === 0) {
@@ -235,7 +262,6 @@
 			    die(print_r($col1));
 			}
 		}
-		//echo '</tbody></table>';
 		return 1;
 
 	}
@@ -257,24 +283,28 @@
 	       ($action == 'update' ?
 	           "CHANGE `$col` `$col` " :
 	           "ADD `$col` ") .
-	       strtoupper($definition['DATA_TYPE']) .
+	        strtoupper($definition['DATA_TYPE']) .
             (!empty($definition['CHARACTER_MAXIMUM_LENGTH']) ?
-                '(' . $definition['CHARACTER_MAXIMUM_LENGTH'] . ')' :
+                ' (' . $definition['CHARACTER_MAXIMUM_LENGTH'] . ')' :
                 '') .
             (!empty($definition['NUMERIC_PRECISION']) ?
-                '(' . ($definition['NUMERIC_PRECISION'] - 1) . ')' :
+                ' (' . ($definition['NUMERIC_PRECISION'] + 1) . ')' :
                 '') .
             ' ' .
-            ($definition['IS_NULLABLE'] == 'NO' ?
-                'NOT NULL' :
-                '');
+            (strtolower($definition['IS_NULLABLE']) == 'no' ?
+                ' NOT NULL' :
+                '') .
+            (strtolower($definition['EXTRA']) == 'auto_increment' ?
+                ' AUTO_INCREMENT' :
+                '')
+	        ;
 	    $default =  setDefault($definition['COLUMN_DEFAULT']);
-        if ($definition['IS_NULLABLE'] == 'NO' && $default == 'NULL') {
+        if (strtolower($definition['IS_NULLABLE']) == 'no' && $default == 'NULL') {
             return $output . ";\n";
-        } else if ($definition['IS_NULLABLE'] == 'YES' && $default == 'NULL') {
+        } else if (strtolower($definition['IS_NULLABLE']) == 'yes' && $default == 'NULL') {
             return $output . "DEFAULT NULL;\n";
         }
-        return $output . ' DEFAULT ' . ($definition['COLUMN_DEFAULT'] == 'CURRENT_TIMESTAMP' ?
+        return $output . ' DEFAULT ' . (strtolower($definition['COLUMN_DEFAULT']) == 'current_timestamp' ?
             "CURRENT_TIMESTAMP;\n" :
             setDefault($definition['COLUMN_DEFAULT']) . ";\n");
 	}
@@ -306,15 +336,11 @@
 
 		foreach($sourceColumns as $sourceColumn) {
 			$name = $sourceColumn[COLUMN_NAME];
-			if (! isset($index[$name])) {
+			if (!isset($index[$name])) {
 				continue;
 			}
 			$targetColumn = $index[$name];
 			$diffCount += displayColumnDifferences($sourceColumn, $targetColumn);
-		}
-
-		if ($diffCount === 0) {
-			//echo '<p class="no-differences">The tables are identical in source and target</p>';
 		}
 
 		return true;
@@ -327,11 +353,9 @@
 		// Iterate over source tables
 		$sourceTables = getTables($db0, $conn0);
 		foreach($sourceTables as $table) {
-			//echo "<h3>Table <em>$table</em></h3>";
+			// Only present in source; drop table
 			if (compareColumns($table) === false) {
-                // Only present in source; drop table
                 $queries['Tables dropped'][] = "DROP TABLE `$table`;\n";
-				//echo "<p class=\"orphan-table\">Table <em>$table</em> only present in source database ($db0)</p>";
 			}
 		}
 		// Iterate over left-over target tables
@@ -339,8 +363,6 @@
 		$orphansInTarget = array_diff($targetTables, $sourceTables);
 		foreach($orphansInTarget as $table) {
 		    $queries['Tables created'][] = printCreateTable($table);
-			//echo "<h3>Table <em>$table</em></h3>";
-			//echo "<p class=\"orphan-table\">Table <em>$table</em> only present in target database ($db1)</p>";
 		}
 	}
 
@@ -454,14 +476,14 @@
 	}
 
 	function printCreateTable ($table) {
-        global $dumpPath, $dumpFile, $tablePrefix;
+        global $dumpPath, $emptyDatabaseFile, $tablePrefix;
         $table = str_replace($tablePrefix, '', $table);
         $statements = array(
             'CREATE TABLE IF NOT EXISTS',
             'CREATE TABLE'
         );
         foreach ($statements as $create) {
-            preg_match(setRegex("$create `$table`", ';'), $dumpFile, $matches);
+            preg_match(setRegex("$create `$table`", ';'), $emptyDatabaseFile, $matches);
             if (isset($matches[0])) {
                 return str_replace("`$table`", "`{$tablePrefix}{$table}`", $matches[0]) . "\n";
             }
