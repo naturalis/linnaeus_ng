@@ -4,15 +4,15 @@ include_once ('Controller.php');
 
 class LiteratureController extends Controller
 {
-    
+
 
     public $usedModels = array(
 		'literature',
-		'literature_taxon',
-		'synonym',
-		'taxon'
+		'literature_taxa',
+		'synonyms',
+		'taxa'
     );
-   
+
     public $controllerPublicName = 'Literary references';
 
 	public $cssToLoad = array(
@@ -58,14 +58,14 @@ class LiteratureController extends Controller
 		{
 			$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 			$id = (isset($d['id']) ? $d['id'] : null);
-		} 
-		else 
+		}
+		else
 		{
 			$id = $this->requestData['id'];
 		}
 
 		$this->setStoreHistory(false);
-		
+
 		if (isset($id)) $this->redirect('reference.php?id='.$id);
 
         $this->printPage();
@@ -76,7 +76,7 @@ class LiteratureController extends Controller
 		if ($this->rHasId())
 		{
 			$ref = $this->getReference($this->requestData['id']);
-			
+
 			$ref['text'] = $this->matchGlossaryTerms($ref['text']);
 			$ref['text'] = $this->matchHotwords($ref['text']);
 
@@ -84,7 +84,7 @@ class LiteratureController extends Controller
 
 			$this->setPageName(sprintf($this->translate('Literature: "%s"'),$ref['author_full'].' ('.$ref['year'].')'));
 
-		} 
+		}
 		else
 		{
 			$this->redirect('index.php');
@@ -120,22 +120,22 @@ class LiteratureController extends Controller
         if ($this->rHasVal('key'))
 		{
             $sortBy = array(
-                'key' => $this->requestData['key'], 
-                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+                'key' => $this->requestData['key'],
+                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'),
                 'case' => 'i'
             );
-        
+
 			$this->customSortArray($refs, $sortBy);
-        } 
-		else 
+        }
+		else
 		{
             $sortBy = array(
-                'key' => 'author_first', 
-                'dir' => 'asc', 
+                'key' => 'author_first',
+                'dir' => 'asc',
                 'case' => 'i'
             );
 		}
-        
+
 		$this->smarty->assign('sortBy', $sortBy);
 		$this->smarty->assign('alpha', $alpha);
 		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
@@ -147,14 +147,14 @@ class LiteratureController extends Controller
     public function ajaxInterfaceAction()
     {
         if (!isset($this->requestData['action'])) return;
-        
+
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search']))
 		{
             $this->getLookupList($this->requestData);
         }
 
 		$this->allowEditPageOverlay = false;
-				
+
         $this->printPage();
     }
 
@@ -167,7 +167,7 @@ class LiteratureController extends Controller
 				'order' => 'author_first'
 			)
 		);
-		
+
 		$alpha=array();
 
 		foreach((array)$l as $key => $val)
@@ -277,17 +277,17 @@ class LiteratureController extends Controller
 								) as year_full',
 			)
 		);
-		
+
 		if ($l)
 		{
 
 			$ref = $l[0];
-			
-			$lt = $this->models->LiteratureTaxon->_get(
+
+			$lt = $this->models->LiteratureTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'literature_id' => $id	
+						'literature_id' => $id
 					),
 					'order' => 'sort_order'
 				)
@@ -299,7 +299,7 @@ class LiteratureController extends Controller
 
 				if (isset($val['taxon_id'])) {
 
-					$t = $this->models->Taxon->_get(
+					$t = $this->models->Taxa->_get(
 						array(
 							'id' => array(
 								'project_id' => $this->getCurrentProjectId(),
@@ -315,14 +315,14 @@ class LiteratureController extends Controller
 				}
 
 			}
-			
+
 			$ref['taxa'] = $lt;
 
-			$s = $this->models->Synonym->_get(
+			$s = $this->models->Synonyms->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'lit_ref_id' => $id	
+						'lit_ref_id' => $id
 					),
 					'columns' => 'synonym,taxon_id'
 				)
@@ -341,7 +341,7 @@ class LiteratureController extends Controller
 	private function getFirstReference($letter=null)
 	{
 		$d = array('project_id' => $this->getCurrentProjectId());
-			
+
 		if (isset($letter)) $d['author_first like'] = $letter.'%';
 
 		$l = $this->models->Literature->_get(
@@ -353,7 +353,7 @@ class LiteratureController extends Controller
 					'limit' => 1
 				)
 			);
-			
+
 		if (!$l)
 		{
 			$l = $this->models->Literature->_get(
@@ -423,7 +423,7 @@ class LiteratureController extends Controller
 		$l = $this->models->Literature->_get(
 			array('id' =>
 				'select
-					id, 
+					id,
 					concat(
 						author_first,
 						(
@@ -455,7 +455,7 @@ class LiteratureController extends Controller
 					) as label,
 					lower(author_first) as _a1,
 					lower(author_second) as _a2,
-					`year`					
+					`year`
 				from %table%
 				where project_id = '.
 					$this->getCurrentProjectId().
@@ -472,9 +472,9 @@ class LiteratureController extends Controller
 				'url'=>'../literature/reference.php?id=%s'
 			))
 		);
-		
+
 		return $l;
-		
+
 	}
 
 }
