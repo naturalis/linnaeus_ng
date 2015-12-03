@@ -44,7 +44,7 @@ class SearchControllerNSR extends SearchController
 		'traits_taxon_values',
 		'traits_taxon_freevalues'
     );
-	
+
 
     public $modelNameOverride = 'SearchNSRModel';
     public $controllerPublicName = 'Search';
@@ -54,7 +54,7 @@ class SearchControllerNSR extends SearchController
 	public $cssToLoad = array('search.css');
 
 	public $jsToLoad = array();
-	
+
 	private $_suppressTab_DNA_BARCODES=false;
 
     public function __construct ()
@@ -67,7 +67,7 @@ class SearchControllerNSR extends SearchController
     {
         parent::__destruct();
     }
-	
+
     private function initialise()
     {
 		$this->NSRFunctions=new NSRFunctionsController;
@@ -107,10 +107,10 @@ class SearchControllerNSR extends SearchController
 			$search['search']=htmlspecialchars($search['search']);
 
 			$this->smarty->assign('search', $search);
-			$this->smarty->assign('results',$results);	
+			$this->smarty->assign('results',$results);
 		}
-		
-		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
+
+		$searchType = $this->rHasVar('type') ? $this->rGetVal('type') : null;
 
 		if ($this->rHasVal('action','export'))
 		{
@@ -158,26 +158,26 @@ class SearchControllerNSR extends SearchController
 		}
 		else
 		{
-			$this->smarty->assign('search',$search);	
+			$this->smarty->assign('search',$search);
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
 			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
-		
+
 		$this->traitGroupsToInclude=$this->getTraitGroups();
-		
+
 		if (count((array)$this->traitGroupsToInclude)>0)
 		{
 			$search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
 			$search['trait_group']=$this->rHasVal('trait_group') ? $search['trait_group'] : null;
-			
+
 			$traits=array();
 			foreach((array)$this->traitGroupsToInclude as $val)
 			{
 				$traits=$traits+$this->getTraits($val['id']);
 			}
-			
+
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
@@ -193,7 +193,7 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
 		$this->smarty->assign('suppressDnaBarcodes',$this->_suppressTab_DNA_BARCODES);
 		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
-		
+
         $this->printPage($template);
     }
 
@@ -229,13 +229,13 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('show','photographers');
 			$search['limit']='*';
 		}
-		
+
 		$results = $this->doPictureSearch( $search );
 
-		$this->smarty->assign('search',$search);	
+		$this->smarty->assign('search',$search);
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
-		$this->smarty->assign('results',$results);	
-			
+		$this->smarty->assign('results',$results);
+
         $this->printPage($template);
     }
 
@@ -243,9 +243,9 @@ class SearchControllerNSR extends SearchController
     {
 		$search=$this->requestData;
 		$results = $this->doPictureSearch($search);
-		$this->smarty->assign('search',$search);	
+		$this->smarty->assign('search',$search);
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
-		$this->smarty->assign('results',$results);	
+		$this->smarty->assign('results',$results);
 		$this->smarty->assign('show','photographers');
 		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
 		$this->smarty->assign('validators',$this->getValidatorPictureCount());
@@ -298,7 +298,7 @@ class SearchControllerNSR extends SearchController
         }
 
         $this->printPage();
-    
+
     }
 
 	private function getPresenceStatuses()
@@ -309,10 +309,10 @@ class SearchControllerNSR extends SearchController
 				"project_id"=>$this->getCurrentProjectId()
 			));
 	}
-	
-	private function getTaxonOverviewImage( $taxon_id ) 
+
+	private function getTaxonOverviewImage( $taxon_id )
 	{
-		return 
+		return
 			$this->models->SearchNSRModel->getTaxonOverviewImage(array(
 				"project_id"=>$this->getCurrentProjectId(),
 				"taxon_id"=>$taxon_id
@@ -327,7 +327,7 @@ class SearchControllerNSR extends SearchController
 		$sort=!empty($p['sort']) ? $p['sort'] : null;
 
 		$search=trim($search);
-		
+
 		if (empty($search))
 			return null;
 
@@ -341,7 +341,7 @@ class SearchControllerNSR extends SearchController
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
-		
+
 		$data=$d['data'];
 		$count=$d['count'];
 
@@ -430,16 +430,16 @@ class SearchControllerNSR extends SearchController
 			"offset"=>$offset,
 			"operators"=>$this->_operators
 		));
-		
+
 		$data=$d['data'];
 		$count=$d['count'];
-		
+
 		foreach((array)$data as $key=>$val)
 		{
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
-		return 
+		return
 			array(
 				'count'=>$count,
 				'data'=>$data,
@@ -453,7 +453,7 @@ class SearchControllerNSR extends SearchController
 		$tCount=$this->models->SearchNSRModel->getPhotographersPictureCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
-		
+
 		$photographers=$this->models->MediaMeta->_get(
 			array(
 				'id'=>array(
@@ -470,7 +470,7 @@ class SearchControllerNSR extends SearchController
 				'fieldAsIndex'=>'meta_data'
 			)
 		);
-		
+
 		foreach((array)$photographers as $key=>$val)
 		{
 			$photographers[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
@@ -483,7 +483,7 @@ class SearchControllerNSR extends SearchController
 			$photographers=array_slice($photographers,0,$limit);
 		}
 
-		return $photographers;		
+		return $photographers;
 
 	}
 
@@ -492,7 +492,7 @@ class SearchControllerNSR extends SearchController
 		$tCount= $this->models->SearchNSRModel->getValidatorPictureCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
-		
+
 		$validators=$this->models->MediaMeta->_get(
 			array(
 				'id'=>array(
@@ -509,7 +509,7 @@ class SearchControllerNSR extends SearchController
 				'fieldAsIndex'=>'meta_data'
 			)
 		);
-		
+
 		foreach((array)$validators as $key=>$val)
 		{
 			$validators[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
@@ -523,8 +523,8 @@ class SearchControllerNSR extends SearchController
 			$validators=array_slice($validators,0,$limit);
 		}
 
-		return $validators;		
-		
+		return $validators;
+
 	}
 
 	private function doPictureSearch( $p )
@@ -552,8 +552,8 @@ class SearchControllerNSR extends SearchController
 		{
 			$name_id=intval($p['name_id']);
 		}
-		
-		if ( !empty($name) && !empty($name_id) ) 
+
+		if ( !empty($name) && !empty($name_id) )
 		{
 			unset($name);
 		}
@@ -581,7 +581,7 @@ class SearchControllerNSR extends SearchController
 
 		$data=$d['data'];
 		$count=$d['count'];
-		
+
 		foreach((array)$data as $key=>$val)
 		{
 			$meta=$this->models->MediaMeta->_get(array("id"=>
@@ -621,32 +621,32 @@ class SearchControllerNSR extends SearchController
 							setlocale(LC_ALL,'nl_NL.utf8');
 						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
 					}
-				} 
+				}
 				else
 				if ($m['sys_label']=='beeldbankOmschrijving')
 				{
 					$data[$key]['meta_short_desc']=$m['meta_data'];
-				} 
+				}
 				else
 				if ($m['sys_label']=='beeldbankLokatie')
 				{
 					$data[$key]['meta_geografie']=$m['meta_data'];
-				} 
+				}
 				else
 				if ($m['sys_label']=='beeldbankCopyright')
 				{
 					$data[$key]['meta_copyrights']=$m['meta_data'];
-				} 
+				}
 				else
 				if ($m['sys_label']=='beeldbankValidator')
 				{
 					$data[$key]['meta_validator']=$m['meta_data'];
-				} 
+				}
 				else
 				if ($m['sys_label']=='beeldbankAdresMaker')
 				{
 					$data[$key]['meta_adres_maker']=$m['meta_data'];
-				} 
+				}
 				else
 				if ($m['sys_label']=='beeldbankLicentie')
 				{
@@ -681,7 +681,7 @@ class SearchControllerNSR extends SearchController
 				}
 			}
 		}
-		
+
 		return
 			array(
 				'count'=>$count,
@@ -755,9 +755,9 @@ class SearchControllerNSR extends SearchController
 		}
 
 		return (http_build_query((array)$search).'&');
-		
+
 		if (empty($search)) return;
-		
+
 		$querystring=null;
 
 		foreach((array)$this->requestData as $key=>$val)
@@ -774,7 +774,7 @@ class SearchControllerNSR extends SearchController
 						{
 							$querystring.=$key.'['.$k2.']['.$k3.']='.$v3.'&';
 						}
-		
+
 					} else {
 						$querystring.=$key.'['.$k2.']='.$v2.'&';
 					}
@@ -784,22 +784,22 @@ class SearchControllerNSR extends SearchController
 				$querystring.=$key.'='.$val.'&';
 			}
 		}
-		
+
 		return htmlspecialchars($querystring);
 	}
 
 	private function makeReadableQueryString()
 	{
 		$querystring=null;
-		
+
 		if ($this->rHasVal('group')) $querystring.='Soortgroep="'.$this->rGetVal('group').'"; ';
 		if ($this->rHasVal('author')) $querystring.='Auteur="'.$this->rGetVal('author').'"; ';
-		
+
 		if ($this->rHasVal('presence'))
 		{
 			$statuses=$this->getPresenceStatuses();
 			$querystring.=$this->translate('Status voorkomen=');
-		
+
 			foreach((array)$this->rGetVal('presence') as $key=>$val)
 			{
 				$querystring.=$statuses[$key]['index_label'].',';
@@ -859,18 +859,18 @@ class SearchControllerNSR extends SearchController
 									(!empty($val["valuetext"]) ? $val["valuetext"]." " : null).
 									(!empty($val["valuetext"]) && !empty($val["valuetext2"]) ? "& " : null).
 									(!empty($val["valuetext2"]) ? $val["valuetext2"] : null);
-							}								
+							}
 						}
-					}	
+					}
 				}
 			}
 		}
 
 		array_walk($str,function(&$a){ $a=is_array($a) ? implode(",",$a) : $a; });
 		array_walk($str,function(&$a,$key){ $a=$key.'='.trim($a); });
-		
+
 		$str=implode("; ",$str);
-		
+
 		if (!empty($trait_group))
 		{
 			$str=($str ? $str.';' : '').$traits[$trait_group]['name'].'=*; ';
@@ -884,7 +884,7 @@ class SearchControllerNSR extends SearchController
 		$filename=isset($p['filename']) ? $p['filename'] : null;
 		$mime=isset($p['mime']) ? $p['mime'] : null;
 		$charset=isset($p['charset']) ? $p['charset'] : null;
-		
+
 		header('Content-Description: File Transfer');
 		header('Content-type: '.(!empty($mime) ? $mime : '').'; '.(!empty($charset) ? 'charset='.$charset : ''));
 		header('Content-Disposition: attachment; '.(!empty($filename) ? 'filename='.$filename : ''));
@@ -915,13 +915,13 @@ class SearchControllerNSR extends SearchController
 			from
 				%PRE%traits_groups _grp
 
-			left join 
+			left join
 				%PRE%text_translations _grp_b
 				on _grp.project_id=_grp_b.project_id
 				and _grp.name_tid=_grp_b.text_id
 				and _grp_b.language_id=". $this->getCurrentLanguageId() ."
 
-			left join 
+			left join
 				%PRE%text_translations _grp_c
 				on _grp.project_id=_grp_c.project_id
 				and _grp.description_tid=_grp_c.text_id
@@ -936,13 +936,13 @@ class SearchControllerNSR extends SearchController
 	private function getTraits( $group )
 	{
 		if ( empty( $group ) ) return;
-		
+
 		$r=$this->models->SearchNSRModel->getTraits(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"group"=>$group
 		));
-		
+
 		$data=array();
 
 		foreach((array)$r as $key=>$trait)
@@ -963,7 +963,7 @@ class SearchControllerNSR extends SearchController
 	private function getTraitgroupTrait( $trait_id )
 	{
 		if (empty($trait_id)) return;
-		
+
 		return $this->models->SearchNSRModel->getTraitgroupTrait(array(
 			"project_id"=>$this->getCurrentProjectId(),
 			"trait_id"=>$trait_id
@@ -980,7 +980,7 @@ class SearchControllerNSR extends SearchController
 			"project_id"=>$this->getCurrentProjectId(),
 			"trait_id"=>$trait_id
 		));
-		
+
 		foreach((array)$r as $key=>$val)
 		{
 			if ($val['allow_fractures']!='1' && (!empty($val['numerical_value']) || !empty($val['numerical_value_end'])))
@@ -1027,8 +1027,8 @@ class SearchControllerNSR extends SearchController
 			"project_id"=>$this->getCurrentProjectId(),
 			"taxon_id"=>$taxon_id
 		));
-		
-		return 
+
+		return
 			array(
 				'values'=>$t1,
 				'freevalues'=>$t2

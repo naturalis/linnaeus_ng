@@ -309,20 +309,20 @@ class Controller extends BaseClass
         if (!$this->rHasVal('p'))
             $this->setCurrentProjectId(null);
 
-        if (is_numeric($this->requestData['p'])) {
+        if (is_numeric($this->rGetVal('p'))) {
 
             $p = $this->models->Projects->_get(array(
-                'id' => $this->requestData['p']
+                'id' => $this->rGetVal('p')
             ));
 
             if (!$p)
                 $this->setCurrentProjectId(null);
             else
-                $this->setCurrentProjectId(intval($this->requestData['p']));
+                $this->setCurrentProjectId(intval($this->rGetVal('p')));
         }
         else {
 
-            $pName = str_replace('_', ' ', strtolower($this->requestData['p']));
+            $pName = str_replace('_', ' ', strtolower($this->rGetVal('p')));
 
 			$this->setCurrentProjectId(null);
 
@@ -569,7 +569,7 @@ class Controller extends BaseClass
     public function getPagination ($items, $maxPerPage = 25)
     {
 		$this->helpers->Paginator->setItemsPerPage( $maxPerPage );
-		$this->helpers->Paginator->setStart( $this->rHasVal('start') ? $this->requestData['start'] : 0 );
+		$this->helpers->Paginator->setStart( $this->rHasVal('start') ? $this->rGetVal('start') : 0 );
 		$this->helpers->Paginator->setItems( $items );
 		$this->helpers->Paginator->paginate();
 
@@ -909,7 +909,8 @@ class Controller extends BaseClass
 
     public function getDefaultLanguageId()
     {
-        return isset($_SESSION['app'][$this->spid()]['project']['default_language_id']) ? $_SESSION['app'][$this->spid()]['project']['default_language_id'] : null;
+        return isset($_SESSION['app'][$this->spid()]['project']['default_language_id']) ?
+            $_SESSION['app'][$this->spid()]['project']['default_language_id'] : null;
     }
 
 
@@ -918,13 +919,15 @@ class Controller extends BaseClass
     {
         if ($l)
 		{
-            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $l;
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] =
+                $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $l;
             $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $l;
         }
         else if ($this->rHasVal('languageId'))
 		{
-            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $this->requestData['languageId'];
-            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->requestData['languageId'];
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] =
+                $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $this->rGetVal('languageId');
+            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->rGetVal('languageId');
         }
         else
 		{
@@ -1423,16 +1426,16 @@ class Controller extends BaseClass
 
         $d = $this->controllerBaseName . ':' . $this->viewName;
 
-        if (isset($this->requestData['cat']) && !is_numeric($this->requestData['cat']) && isset($this->generalSettings['urlsToAdminEdit'][$d . ':' . $this->requestData['cat']])) {
+        if ($this->rHasVar('cat') && !is_numeric($this->rGetVal('cat')) && isset($this->generalSettings['urlsToAdminEdit'][$d . ':' . $this->rGetVal('cat')])) {
 
-            $d = $d . ':' . $this->requestData['cat'];
+            $d = $d . ':' . $this->rGetVal('cat');
         }
 
         if ($this->isLoggedInAdmin() && $this->allowEditPageOverlay && isset($this->generalSettings['urlsToAdminEdit'][$d])) {
 
-            if (isset($this->requestData['id'])) {
+            if ($this->rHasId()) {
 
-                $id = $this->requestData['id'];
+                $id = $this->rGetId();
 
                 if ($this->controllerBaseName == 'module') {
                     $modId = $this->getCurrentModule();
@@ -1446,7 +1449,7 @@ class Controller extends BaseClass
                 }
 
                 $this->smarty->assign('urlBackToAdmin',
-                sprintf($this->generalSettings['urlsToAdminEdit'][$d], $id, (isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? $this->requestData['cat'] : ($this->controllerBaseName == 'module' ? $modId : null))));
+                sprintf($this->generalSettings['urlsToAdminEdit'][$d], $id, ($this->rHasVar('cat') && is_numeric($this->rGetVal('cat')) ? $this->rGetVal('cat') : ($this->controllerBaseName == 'module' ? $modId : null))));
                 $this->smarty->display('../shared/preview-overlay.tpl');
             }
         }
@@ -2538,14 +2541,14 @@ class Controller extends BaseClass
 
         $d = null;
 
-        if ($this->rHasVal('id'))
-            $d['id'] = $this->requestData['id'];
+        if ($this->rHasId())
+            $d['id'] = $this->rGetId();
         if ($this->rHasVal('cat'))
-            $d['cat'] = $this->requestData['cat'];
+            $d['cat'] = $this->rGetVal('cat');
         if ($this->rHasVal('m'))
-            $d['m'] = $this->requestData['m'];
+            $d['m'] = $this->rGetVal('m');
         if ($this->rHasVal('letter'))
-            $d['letter'] = $this->requestData['letter'];
+            $d['letter'] = $this->rGetVal('letter');
 
         $d['lastPage'] = $_SERVER['REQUEST_URI'];
 
@@ -2726,7 +2729,7 @@ class Controller extends BaseClass
 
 		if ($this->rHasVar('sidx'))
 		{
-			$this->setSearchResultIndexActive($this->requestData['sidx']);
+			$this->setSearchResultIndexActive($this->rGetVal('sidx'));
 		}
 	}
 

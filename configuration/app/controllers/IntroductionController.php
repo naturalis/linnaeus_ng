@@ -61,10 +61,10 @@ class IntroductionController extends Controller
 		if (!$this->rHasVal('page') && !$this->rHasVal('id'))
 		{
 			$this->redirect('topic.php?id='.$this->getFirstPageId());
-		} 
-		else 
+		}
+		else
 		{
-			$id = $this->rHasVal('page') ? $this->requestData['page'] : $this->requestData['id'];
+			$id = $this->rHasVal('page') ? $this->rGetVal('page') : $this->rGetId();
 			$this->redirect('topic.php?id='.$id);
 		}
 	}
@@ -82,20 +82,20 @@ class IntroductionController extends Controller
 				'content' => $this->translate('No ID specified, or no content available.')
 			);
 			$this->smarty->assign('page', $page);
-		} 
+		}
 		else
 		{
 
-			if (!is_numeric($this->requestData['id']))
+			if (!is_numeric($this->rGetId()))
 			{
 				$id = $this->resolvePageName(
-					$this->requestData['id'],
-					($this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultLanguageId())
+					$this->rGetId(),
+					($this->rHasVal('lan') ? $this->rGetVal('lan') : $this->getDefaultLanguageId())
 				);
-			} 
-			else 
+			}
+			else
 			{
-				$id = $this->requestData['id'];
+				$id = $this->rGetId();
 			}
 
 			$page = $this->getPage($id);
@@ -109,7 +109,7 @@ class IntroductionController extends Controller
 			$this->smarty->assign('page', $page);
 			$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
 		}
-		
+
 		if ( $this->rHasVal('format','plain') )
 		{
 	        $this->printPage('topic_plain');
@@ -142,16 +142,16 @@ class IntroductionController extends Controller
     {
         if (!$this->rHasVal('action')) return;
 
-        if ($this->requestData['action'] == 'save_content')
+        if ($this->rHasVar('action', 'save_content'))
 		{
             $this->ajaxActionSaveContent();
-        } 
+        }
 		else
-        if ($this->requestData['action'] == 'get_content')
+        if ($this->rHasVar('action', 'get_content'))
 		{
             $this->ajaxActionGetContent();
         }
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search']))
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search')))
 		{
             $this->getLookupList($this->requestData);
         }
@@ -195,7 +195,7 @@ class IntroductionController extends Controller
 	private function getPage($id=null)
 	{
 
-		$id = isset($id) ? $id : $this->requestData['id'];
+		$id = isset($id) ? $id : $this->rGetId();
 
 		if (!isset($id)) return;
 
@@ -334,8 +334,8 @@ class IntroductionController extends Controller
 				)
 			);
 
-		} 
-		else 
+		}
+		else
 		{
 			$pages = $this->getPageHeaders();
 		}

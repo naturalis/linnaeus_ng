@@ -2,12 +2,12 @@
 
 /*
 	glossary anatomy:
-	
+
 	- the glossary consists of terms.
 	- a term consists of the term and its definition.
 	- the term can consist of one or more words.
 	- term and defintion are defined in one language.
-	- terms and defintions have no translations into the other languages, as they are intended to complement the text in a 
+	- terms and defintions have no translations into the other languages, as they are intended to complement the text in a
 	  specific language. this means that the glossaries for each language might differ in size and content.
 	- each term can have one or more synonyms.
 	- a synonym consists of a single term (one or more words) in the same language as the term it is a synonym of.
@@ -24,7 +24,7 @@ class GlossaryController extends Controller
 		'glossary_media',
 		'glossary_media_captions'
     );
-   
+
     public $controllerPublicName = 'Glossary';
 
 	public $cssToLoad = array(
@@ -75,7 +75,7 @@ class GlossaryController extends Controller
 		{
 			$d=$this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->rGetVal('letter') : null);
 			$id=(isset($d['id']) ? $d['id'] : null);
-		} 
+		}
 		else
 		{
 			$id = $this->rGetId();
@@ -88,7 +88,7 @@ class GlossaryController extends Controller
 		}
 
         $this->printPage();
-  
+
     }
 
     public function termAction()
@@ -141,9 +141,9 @@ class GlossaryController extends Controller
 		}
 		else
 		{
-			$letter = $this->requestData['letter'];
+			$letter = $this->rGetVal('letter');
 		}
-				
+
 		if (!empty($letter))
 		{
 			$gloss = $this->getGlossaryTerms(
@@ -152,12 +152,12 @@ class GlossaryController extends Controller
 					'language_id' => $this->getCurrentLanguageId()
 				),
 				'term');
-				
+
 			$this->smarty->assign('letter', $letter);
 			$this->smarty->assign('gloss',$gloss);
 
 		}
-	
+
 		$this->smarty->assign('alpha', $alpha);
 		$this->printPage();
 
@@ -169,9 +169,9 @@ class GlossaryController extends Controller
 
         if ($this->rHasVal('action','get_lookup_list'))
 		{
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->rGetVal('search'));
         }
-		
+
 		$this->allowEditPageOverlay = false;
         $this->printPage();
     }
@@ -180,7 +180,7 @@ class GlossaryController extends Controller
 	{
 
 		if (empty($search)) return;
-		
+
 		$includeSynonyms = false;
 
 		$l = $this->models->Glossary->_get(
@@ -207,7 +207,7 @@ class GlossaryController extends Controller
 					'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
 				)
 			);
-			
+
 			$l = array_merge((array)$l,(array)$l2);
 		}
 
@@ -220,7 +220,7 @@ class GlossaryController extends Controller
 				'sortData'=>true
 			))
 		); // for glossary lookup list
-		
+
 		return $l; // for combined lookup list
 	}
 
@@ -239,7 +239,7 @@ class GlossaryController extends Controller
 		{
 			$g[$key]['synonyms'] = $this->getGlossarySynonyms($val['id']);
 		}
-		
+
 		return $g;
 	}
 
@@ -277,12 +277,12 @@ class GlossaryController extends Controller
 			'id' => $id ,
 			'language_id' => $this->getCurrentLanguageId()
 		));
-	
+
 
 		$this->loadControllerConfig('Species');
 		$mimes = $this->controllerSettings['mime_types'];
 		$this->loadControllerConfig();
-		
+
 		foreach((array)$gm as $key => $val)
 		{
 			$gm[$key]['caption'] = isset($gmc[0]['caption']) ? $this->matchHotwords($gmc[0]['caption']) : null;
@@ -309,12 +309,12 @@ class GlossaryController extends Controller
 				'order' => 'letter'
 			)
 		);
-		
+
 		foreach((array)$g as $key => $val)
 		{
 			$d[]=$val['letter'];
 		}
-			
+
 		return $d;
 	}
 
@@ -324,7 +324,7 @@ class GlossaryController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'language_id' => $this->getCurrentLanguageId(),
 			);
-			
+
 		if (isset($letter)) $d['term like'] = $letter.'%';
 
 		$g = $this->models->Glossary->_get(
@@ -344,7 +344,7 @@ class GlossaryController extends Controller
 		$g = $this->models->Glossary->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
 				),
 				'columns' => 'id,term as label',
@@ -362,7 +362,7 @@ class GlossaryController extends Controller
 				);
 			}
 		}
-		
+
 		return null;
 
 	}
