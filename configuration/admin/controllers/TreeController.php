@@ -22,6 +22,7 @@ class TreeController extends Controller
         )
     );
     public $controllerPublicName = 'Species module';
+    public $modelNameOverride = 'TreeModel';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
 
@@ -38,7 +39,6 @@ class TreeController extends Controller
 
     private function initialize ()
     {
-        $this->loadExternalModel('TreeModel');
         $this->TaxonParentageController = new TaxonParentageController;
 		$this->checkParentage();
     }

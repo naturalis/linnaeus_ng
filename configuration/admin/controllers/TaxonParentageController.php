@@ -8,12 +8,11 @@ class TaxonParentageController extends Controller
     );
 
     public $controllerPublicName = 'Quick Taxon Parentage';
+    public $modelNameOverride = 'TreeModel';
 
     public function __construct ()
     {
         parent::__construct();
-
-        $this->loadExternalModel('TreeModel');
     }
 
     public function __destruct ()
