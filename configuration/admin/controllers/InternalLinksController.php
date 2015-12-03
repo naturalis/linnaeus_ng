@@ -23,7 +23,7 @@ class InternalLinksController extends Controller
     );
 
     public $controllerPublicName = 'Internal Links';
-
+    public $modelNameOverride = 'KeyModel';
 
     /**
      * Constructor, calls parent's constructor
@@ -32,10 +32,7 @@ class InternalLinksController extends Controller
      */
     public function __construct ()
     {
-
         parent::__construct();
-        $this->loadExternalModel('KeyModel');
-
     }
 
 

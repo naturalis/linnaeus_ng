@@ -14,13 +14,12 @@ class ModuleSettingsReaderController extends Controller
 	private $_settingsvalues;
 	private $_generalsettingsvalues;
 	private $_usedefaultwhennovalue=false;
-
+	public $modelNameOverride = 'ModuleSettingsModel';
 
     public function __construct($p = null)
     {
         parent::__construct($p);
 
-        $this->loadExternalModel('ModuleSettingsModel');
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
