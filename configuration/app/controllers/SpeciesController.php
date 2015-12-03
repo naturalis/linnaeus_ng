@@ -1396,7 +1396,7 @@ class SpeciesController extends Controller
 
 	private function getCommonname($tId)
 	{
-		$c = $this->models->Commonname->_get(
+		$c = $this->models->Commonnames->_get(
 		array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),

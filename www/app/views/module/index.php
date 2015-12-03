@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/app/controllers/ModuleController.php');
+require_once ('../../../../configuration/app/controllers/FreeModuleController.php');
 
-$c = new ModuleController();
+$c = new FreeModuleController();
 
 $c->indexAction();

@@ -13,9 +13,9 @@
 	first, the first `$this->settings->items_per_page` items of the dataset are fully
 	loaded in the PHP-page (padded with empty array-cells to fool the various dataset
 	counters), then the entire dataset is loaded through AJAX, overwriting the initial
-	dataset (it is unclear why this does not cause any memory problems, as the size of 
+	dataset (it is unclear why this does not cause any memory problems, as the size of
 	the data is no different, but it appears to work).
-	
+
 	sorting
 	initial sorting is done in MatrixKeyController::sortDataSet(), using one of the
 	following fields:
@@ -50,22 +50,20 @@ class MatrixKeyController extends Controller
 {
 
     public $usedModels = array(
-        'matrix', 
-        'matrices_names', 
-        'matrices_taxa', 
-        'matrices_taxa_states', 
-//        'commonname', 
-        'characteristics', 
+        'matrices',
+        'matrices_names',
+        'matrices_taxa',
+        'matrices_taxa_states',
+        'characteristics',
 		'characteristics_chargroups',
-        'characteristics_matrices', 
-        'characteristics_labels', 
-        'characteristics_states', 
-//        'characteristics_labels_states', 
-        'chargroups_labels', 
-        'chargroups', 
-        'characteristics_chargroups', 
-        'matrices_variations', 
-        'nbc_extras', 
+        'characteristics_matrices',
+        'characteristics_labels',
+        'characteristics_states',
+        'chargroups_labels',
+        'chargroups',
+        'characteristics_chargroups',
+        'matrices_variations',
+        'nbc_extras',
         'variation_relations',
 		'matrices_variations',
 		'taxa_relations',
@@ -77,7 +75,7 @@ class MatrixKeyController extends Controller
 
     public $controllerPublicName = 'Matrix key';
     public $controllerBaseName = 'matrix';
-	
+
 	private $_totalEntityCount=0;
 	private $_activeMatrix=null;
 
@@ -95,16 +93,16 @@ class MatrixKeyController extends Controller
 	private $settings;
 
 	private $_nbc_image_root=true;
-	
-	
+
+
     public $cssToLoad = array('matrix.css');
 
     public $jsToLoad = array(
-        'all' => array('main.js','matrix.js'), 
+        'all' => array('main.js','matrix.js'),
         'IE' => array()
     );
 
-	
+
     public function __construct($p = null)
     {
 		parent::__construct($p);
@@ -119,7 +117,7 @@ class MatrixKeyController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsController;
-		
+
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
 		$this->moduleSettings->assignModuleSettings( $this->settings );
 
@@ -130,7 +128,7 @@ class MatrixKeyController extends Controller
 		{
 			$this->addError($this->translate('No matrices have been defined.'));
 		}
-		
+
 		$this->setIntroductionLinks();
 
 		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
@@ -182,28 +180,28 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('states', $states);
 		$this->smarty->assign('states_selected', $this->getSessionStates( array('char'=>$this->rGetVal( 'id' ),'reindex'=>true)));
 		$this->smarty->assign('states_remain_count', $this->setRemainingStateCount(array('char'=>$this->rGetVal( 'id' ))));
-	
+
 		$this->printPage();
 	}
-			
+
     public function ajaxInterfaceAction ()
     {
 		if ($this->rHasVar('key'))
 		{
 			$this->setCurrentMatrixId($this->rGetVal('key'));
 		}
-	
+
 		if ($this->rHasVal('action', 'get_menu'))
 		{
 			$this->smarty->assign('returnText', json_encode($this->getFacetMenu()));
-        }	
-        else					
+        }
+        else
 		if ($this->rHasVal('action', 'get_data_set'))
 		{
 			$this->setDataSet();
 			$this->smarty->assign('returnText', json_encode($this->getDataSet()));
-        }	
-        else					
+        }
+        else
 		if ($this->rHasVal('action','set_state'))
 		{
 			if ($this->rHasVal('state') && $this->rHasVal('value'))
@@ -219,7 +217,7 @@ class MatrixKeyController extends Controller
 			{
 				return;
 			}
-		
+
 			$this->sessionStateStore( $state );
 
 			$this->setScores();
@@ -231,7 +229,7 @@ class MatrixKeyController extends Controller
 					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
-        else					
+        else
 		if ($this->rHasVal('action','clear_state'))
 		{
 			if ($this->rHasVal('state'))
@@ -282,9 +280,9 @@ class MatrixKeyController extends Controller
 				)));
 		}
 
-		$this->printPage();	
+		$this->printPage();
 	}
-	
+
 	private function initializeMatrixId()
 	{
 		$id=$this->getCurrentMatrixId();
@@ -292,8 +290,8 @@ class MatrixKeyController extends Controller
 		if ( empty($id) && $id!==0 )
 		{
 			$m=$this->getMatrix( array('id'=>'*') ); // get all
-			
-			if ( $m ) 
+
+			if ( $m )
 			{
 				$m=array_shift($m);
 				$this->setCurrentMatrixId( $m['id'] );
@@ -314,7 +312,7 @@ class MatrixKeyController extends Controller
 	        $_SESSION['app'][$this->spid()]['matrix']['active'] = $id;
 		}
     }
-	
+
     private function getCurrentMatrixId()
     {
         return isset($_SESSION['app'][$this->spid()]['matrix']['active']) ? $_SESSION['app'][$this->spid()]['matrix']['active'] : null;
@@ -325,13 +323,13 @@ class MatrixKeyController extends Controller
         $mts = $this->models->MatricesTaxaStates->_get(
         array(
             'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id !=' => $this->getCurrentMatrixId(), 
+                'project_id' => $this->getCurrentProjectId(),
+                'matrix_id !=' => $this->getCurrentMatrixId(),
                 'ref_matrix_id' => $this->getCurrentMatrixId()
-            ), 
+            ),
             'columns' => 'distinct matrix_id'
-        ));		
-		
+        ));
+
 		if ($mts)
 		{
 			$this->_master_matrix=$this->getMatrix( array("id"=>$mts[0]['matrix_id']) );
@@ -363,9 +361,9 @@ class MatrixKeyController extends Controller
 		{
 			return;
 		}
-		
+
 		$m = $this->getMatrix( array( 'id'=>$this->rGetVal('mtrx') ) );
-		
+
         if ( empty($m) )
 		{
 			return;
@@ -379,7 +377,7 @@ class MatrixKeyController extends Controller
     private function getMatrix( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
-		
+
 		if (is_null($id))
 			return;
 
@@ -388,7 +386,7 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$id
 		));
-		
+
 		return ( isset($id) && $id!='*' && isset($m[$id]) ? $m[$id] : ( isset($m) ? $m  : null ) ) ;
 	}
 
@@ -412,28 +410,28 @@ class MatrixKeyController extends Controller
     {
 		$charId=isset($p['id']) ? $p['id'] : null;
 		$states=isset($p['states']) ? $p['states'] : null;
-		
+
 		if ( !isset($states) || !isset($states) ) return 0;
 
         $taxa=array();
 
         $tot=0;
-			        
+
         foreach((array)$states as $key=>$val)
 		{
             $states[$key]['n'] = 0;
-            
+
             $mts = $this->models->MatricesTaxaStates->_get(
             array(
                 'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'matrix_id' => $this->getCurrentMatrixId(), 
-                    'characteristic_id' => $charId, 
+                    'project_id' => $this->getCurrentProjectId(),
+                    'matrix_id' => $this->getCurrentMatrixId(),
+                    'characteristic_id' => $charId,
                     'state_id' => $val['id']
-                ), 
+                ),
                 'columns' => 'distinct taxon_id'
             ));
-            
+
             foreach ((array) $mts as $val2)
 			{
                 @$taxa[$val2['taxon_id']]['states']++;
@@ -441,20 +439,20 @@ class MatrixKeyController extends Controller
                 $tot++;
             }
         }
-		
+
         if ($tot==0) return 0;
-        
+
 		$hValue=0;
-        
+
         foreach ((array) $states as $val)
 		{
             $hValue += ($val['n'] / $tot) * log($val['n'] / $tot, 10);
 		}
-        
+
 		$hValue = is_nan($hValue) ? 0 : -1 * $hValue;
-        
+
         $uniqueTaxa = 0;
-        
+
         foreach ((array) $taxa as $val)
 		{
             if ($val['states'] == 1)
@@ -462,9 +460,9 @@ class MatrixKeyController extends Controller
                 $uniqueTaxa++;
 			}
 		}
-        
+
 		$corrFactor = $uniqueTaxa / $tot;
-        
+
         return $hValue * ($this->controllerSettings['useCorrectedHValue'] == true ? $corrFactor : 1);
     }
 
@@ -480,7 +478,7 @@ class MatrixKeyController extends Controller
 
 	private function induceThumbNailFromImage( &$item )
 	{
-		if( 
+		if(
 			!empty($this->settings->img_to_thumb_regexp_pattern) &&
 			!isset($item['url_thumb']) &&
 			isset($item['url_image'])
@@ -524,10 +522,10 @@ class MatrixKeyController extends Controller
 				$d=$this->models->MediaTaxon->_get(array("id"=>
 					array(
 						"taxon_id"=>$val['id'],
-						"project_id" => $this->getCurrentProjectId(), 
+						"project_id" => $this->getCurrentProjectId(),
 						"overview_image"=>"1"
 				)));
-				
+
 				if ( $d )
 				{
 					$taxa[$key]['info']['url_image']=$d[0]['file_name'];
@@ -537,13 +535,13 @@ class MatrixKeyController extends Controller
 
 		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
 
-		if ($all) 
+		if ($all)
 		{
 			usort($all, array($this,'sortDataSet'));
 		}
-		
+
 		return $all;
-		
+
 	}
 
     private function getTaxaInMatrix()
@@ -551,9 +549,9 @@ class MatrixKeyController extends Controller
 		$m=$this->models->MatricesTaxa->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'matrix_id' => $this->getCurrentMatrixId()
-				), 
+				),
 				'columns' => 'taxon_id'
 			));
 
@@ -562,7 +560,7 @@ class MatrixKeyController extends Controller
         foreach ( (array)$m as $key=>$val )
 		{
 			$d=$this->getTaxonById( $val['taxon_id'] );
-			
+
 			if (
 				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species) ||
 				(!isset($val['is_empty'])) ||
@@ -578,9 +576,9 @@ class MatrixKeyController extends Controller
 			}
 
         }
-		
+
 		$this->customSortArray($taxa, array(
-			'key' => 'taxon', 
+			'key' => 'taxon',
 			'case' => 'i'
 		));
 
@@ -591,7 +589,7 @@ class MatrixKeyController extends Controller
     {
 		if ( !$this->models->MatricesVariations->getTableExists() )
 			return null;
-		
+
         $m=$this->models->MatrixkeyModel->getVariationsInMatrix(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
@@ -619,7 +617,7 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$this->getCurrentMatrixId()
 		));
-			
+
 		foreach((array)$m as $key=>$val)
 		{
 			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
@@ -642,17 +640,17 @@ class MatrixKeyController extends Controller
 
 		$d=$this->models->NbcExtras->freeQuery(array(
 			"query"=>"
-				select 
+				select
 					ref_id,
 					ref_type,
 					name,
 					value
-				from 
-					%PRE%nbc_extras 
-				where 
+				from
+					%PRE%nbc_extras
+				where
 					project_id = ".$this->getCurrentProjectId(),
 			"fieldAsIndex"=>"temp_index"));
-			
+
 		$res=array();
 		foreach((array)$d as $key=>$val)
 		{
@@ -682,7 +680,7 @@ class MatrixKeyController extends Controller
 					$gender_label='vrouw';
 					break;
 			}
-				
+
 		}
 
 		return
@@ -690,23 +688,23 @@ class MatrixKeyController extends Controller
 				'gender' => $gender,
 				'gender_label' => $this->translate($gender_label)
 			);
-		
+
 	}
 
     private function getEntityStates( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 		$type=isset($p['type']) ? $p['type'] : null;
-		
+
 		if ( is_null($id) || is_null($type) ) return;
-		
+
 		return $this->models->MatrixkeyModel->getEntityStates(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$this->getCurrentMatrixId(),
 			"type"=>$type,
 			"id"=>$id
-		));		
+		));
     }
 
     private function getTaxonStates( $id )
@@ -718,7 +716,7 @@ class MatrixKeyController extends Controller
     {
         return $this->getEntityStates( array('id'=>$id,'type'=>'variation') );
     }
-    
+
     private function getMatrixStates( $id )
     {
         return $this->getEntityStates( array('id'=>$id,'type'=>'matrix') );
@@ -745,8 +743,8 @@ class MatrixKeyController extends Controller
 				$menu[$key]['prefix']=$d['prefix'];
 			}
 		}
-		
-		$this->_facetmenu=$menu;	
+
+		$this->_facetmenu=$menu;
 	}
 
 	private function getFacetMenu()
@@ -755,16 +753,16 @@ class MatrixKeyController extends Controller
 	}
 
     private function getGroupCharacters( $id )
-    {	
+    {
 		$c=$this->models->CharacteristicsChargroups->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'chargroup_id' => $id
-				), 
+				),
 				'order' => 'show_order'
 			));
-			
+
 		$d=array();
 
 		foreach ((array)$c as $val)
@@ -778,7 +776,7 @@ class MatrixKeyController extends Controller
     private function getCharacter( $p )
     {
 		$id = isset($p['id']) ? $p['id'] : null;
-		
+
 		if (empty($id)) return;
 
         $char=$this->models->MatrixkeyModel->getCharacter(array(
@@ -786,7 +784,7 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"characteristic_id"=>$id
 		));
-		
+
 		if (strpos($char['label'],'|')!==false)
 		{
 			$d = explode('|',$char['label'],3);
@@ -794,15 +792,15 @@ class MatrixKeyController extends Controller
 			$char['info'] = isset($d[1]) ? $d[1] : '';
 			$char['unit'] = isset($d[2]) ? $d[2] : '';
 		}
-					
+
 		if ($char['type']=='range' || $char['type']=='distribution')
 		{
 			$cs = $this->models->CharacteristicsStates->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'characteristic_id' => $id
-					), 
+					),
 					'columns' => 'min(lower) as lowest,max(upper) as most_upper'
 				));
 
@@ -811,7 +809,7 @@ class MatrixKeyController extends Controller
 			$char['min_display'] = round($char['min'],(is_float($char['min']) ? 1 : 0));
 			$char['max_display'] = round($char['max'],(is_float($char['max']) ? 1 : 0));
 		}
-		
+
         return $char;
     }
 
@@ -820,7 +818,7 @@ class MatrixKeyController extends Controller
         foreach ((array)$data as $key=>$val)
 		{
             $d = explode(':', $val);
-            
+
             if ($d[0] == 'f') // f:x:n[:sd] (free values)
 			{
                 $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ':' . $d[1]] = $val;
@@ -860,13 +858,13 @@ class MatrixKeyController extends Controller
         if (isset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()]))
 		{
             $states=array();
-            
+
             foreach ((array) $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()] as $key=>$val)
 			{
                 $states[$key]['val'] = $val;
-                
+
                 $d = explode(':', $val);
-                
+
                 if ($d[0]=='c' && isset($d[2]))
 				{
                     $d = $this->getCharacterStates( array('id'=>$d[2]) );
@@ -883,7 +881,7 @@ class MatrixKeyController extends Controller
                     $states[$key]['characteristic_id'] = $d[1];
                     $states[$key]['value'] = $d[2];
                 }
-                
+
                 if (!empty($char) && !in_array($states[$key]['characteristic_id'],(array)$char))
 				{
                     unset($states[$key]);
@@ -912,7 +910,7 @@ class MatrixKeyController extends Controller
 
 				$states=$d;
 			}
-            
+
             return !empty($states) ? $states : null;
         }
         else
@@ -920,7 +918,7 @@ class MatrixKeyController extends Controller
             return null;
         }
     }
-	
+
     private function setScores()
     {
 		$scores=$this->getScoresRestrictive(
@@ -930,7 +928,7 @@ class MatrixKeyController extends Controller
 			)
 		);
 		//$scores = $this->getScoresLiberal( array('states'=>$this->getSessionStates(),'incUnknowns'=>$incUnknowns);
-		
+
 		if ($scores && (!isset($this->settings->always_sort_by_initial) || (isset($this->settings->always_sort_by_initial) && $this->settings->always_sort_by_initial==0)))
 		{
 			usort($scores, array($this,'sortDataSet'));
@@ -943,28 +941,28 @@ class MatrixKeyController extends Controller
     {
 		return $this->_scores;
     }
-	
+
     private function getScoresLiberal( $p )
     {
 		$states=isset($p['states']) ? $p['states'] : null;
 		$incUnknowns=isset($p['incUnknowns']) ? $p['incUnknowns'] : false;
-		
+
 		if (!isset($states))
 			return;
-		
+
         $s = $c = array();
         $stateCount = 0;
-        
+
         // we have to find out which states we are looking for
         foreach ((array) $states as $sKey => $sVal) {
             $d = explode(':', $sVal);
-            
+
             $charId = isset($d[1]) ? $d[1] : null;
             $value = isset($d[2]) ? $d[2] : null;
 
             // which is easy for the non-range characters...
             if ($d[0] != 'f') {
-                
+
                 if (isset($d[2]))
                     $s[$d[2]] = $d[2];
                 $stateCount++;
@@ -974,29 +972,29 @@ class MatrixKeyController extends Controller
 
                 // is there a standard dev?
                 $sd = (isset($d[3]) ? $d[3] : null);
-                
+
                 // where-clause basics
                 $d = array(
-                    'project_id' => $this->getCurrentProjectId(), 
+                    'project_id' => $this->getCurrentProjectId(),
                     'characteristic_id' => $charId
                 );
-				
+
 				$value = str_replace(',','.',$value);
 
                 // calculate the spread around the mean...
                 if (isset($sd)) {
 
 					$sd = str_replace(',','.',$sd);
-                    
+
                     $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
                     $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
                 }
                 // or mark just mark the upper and lower boundaries of the value
                 else {
-                    
+
                     $d['lower <='] = $d['upper >='] =  floatval($value);
                 }
-                
+
                 // get any states that correspond with these values
                 $cs = $this->models->CharacteristicsStates->_get(array(
                     'id' => $d
@@ -1005,13 +1003,13 @@ class MatrixKeyController extends Controller
                 // and store them
                 foreach ((array) $cs as $key => $val)
                     $s[] = $val['id'];
-                
+
                 $stateCount++;
             }
-            
+
             $c[$charId] = $charId;
         }
-        
+
         if (empty($s))
             return;
 
@@ -1035,14 +1033,14 @@ class MatrixKeyController extends Controller
 
 			if (!isset($d[$val['id']]['s']))
 				$d[$val['id']]['s'] = 0;
-				
+
 			if (!empty($val['state_id'])) {
 				if ($val['state_id']==$prevChar)
 					$d[$val['id']]['s']++;
 				else
 					$d[$val['id']]['s']++;
 			}
-			
+
 			$prevChar = $val['characteristic_id'];
 
 		}
@@ -1061,15 +1059,15 @@ class MatrixKeyController extends Controller
 
 		if (!isset($states))
 			return;
-		
+
         $s=$c=array();
         $stateCount = 0;
-        
+
         // we have to find out which states we are looking for
         foreach ((array) $states as $sKey => $sVal)
 		{
             $d = explode(':', $sVal['val']);
-            
+
             $charId = isset($d[1]) ? $d[1] : null;
             $value = isset($d[2]) ? $d[2] : null;
 
@@ -1085,13 +1083,13 @@ class MatrixKeyController extends Controller
 
                 // is there a standard dev?
                 $sd = (isset($d[3]) ? $d[3] : null);
-                
+
                 // where-clause basics
                 $d = array(
-                    'project_id' => $this->getCurrentProjectId(), 
+                    'project_id' => $this->getCurrentProjectId(),
                     'characteristic_id' => $charId
                 );
-				
+
 				// normalising decimal separator
 				$value = str_replace(',','.',$value);
 
@@ -1107,7 +1105,7 @@ class MatrixKeyController extends Controller
 				{
                     $d['lower <='] = $d['upper >='] =  floatval($value);
                 }
-                
+
                 // get any states that correspond with these values...
                 $cs = $this->models->CharacteristicsStates->_get(array(
                     'id' => $d
@@ -1118,14 +1116,14 @@ class MatrixKeyController extends Controller
 				{
                     $s[] = $val['id'];
 				}
-                
+
 				// keep count of the number of states we're interested in
                 $stateCount++;
             }
-            
+
             $c[$charId] = $charId;
         }
-        
+
         if (empty($s))
             return;
 
@@ -1140,18 +1138,18 @@ class MatrixKeyController extends Controller
 			'matrixVariationExists'=>$this->models->MatricesVariations->getTableExists()
 		));
     }
-	
+
     private function sortDataSet( $a,$b )
     {
 		/*
 			sorting strategies:
-			
+
 			* column name defined by setting 'initial_sort_column'
 			* matching percentage (100 > 0)
 			* taxon concept
 			* label
 		*/
-		
+
 		if ( !empty($this->settings->initial_sort_column) )
 		{
 			if (isset($a[$this->settings->initial_sort_column]) && isset($b[$this->settings->initial_sort_column]))
@@ -1160,7 +1158,7 @@ class MatrixKeyController extends Controller
 		        if ($a[$this->settings->initial_sort_column]<$b[$this->settings->initial_sort_column]) return -1;
 			}
 		}
-		
+
 		if (isset($a['score']) && isset($b['score']))
 		{
 			if ($a['score']<$b['score']) return 1;
@@ -1211,19 +1209,19 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$this->getCurrentMatrixId()
 		));
-		
+
         $results=array();
-    
+
         foreach ((array)$all as $val)
 		{
             if (!is_null($char) && $val['characteristic_id']!=$char) continue;
-    
+
 			if ($groupByChar)
 			{
 	            $results[$val['characteristic_id']]['states'][$val['state_id']] = intval($val['tot']);
 	            $results[$val['characteristic_id']]['tot'] =
 					(isset($all[$val['characteristic_id']]['tot']) ? $all[$val['characteristic_id']]['tot'] : 0) + intval($val['tot']);
-			} 
+			}
 			else
 			{
 	            $results[$val['state_id']] = intval($val['tot']);
@@ -1242,9 +1240,9 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$this->getCurrentMatrixId()
 		));
-		
+
         $results=array();
-    
+
         foreach ((array)$all as $val)
 		{
 			$results[$val['characteristic_id']]=
@@ -1284,22 +1282,22 @@ class MatrixKeyController extends Controller
 					$value = $val['value'];
 
 					$sd = (isset($d[3]) ? $d[3] : null);
-					
+
 					$d = array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'characteristic_id' => $val['characteristic_id']
 					);
-					
+
 					if (isset($sd))
 					{
 						$d['mean >=#'] = '(' . strval(intval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
 						$d['mean <=#'] = '(' . strval(intval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
 
-					} 
+					}
 					else
 					{
 						$d['lower <='] = $d['upper >='] = intval($value);
-					}					
+					}
 
 					$cs = $this->models->CharacteristicsStates->_get(array('id' => $d));
 
@@ -1310,15 +1308,15 @@ class MatrixKeyController extends Controller
 				}
             }
         }
-		
+
         if ($s)
 		{
 			$s = implode(',', $s);
 
 			$fsT = "right join %PRE%matrices_taxa_states _s
-					on _s.project_id = _a.project_id 
+					on _s.project_id = _a.project_id
 					and _s.matrix_id = _a.matrix_id
-					and _s.taxon_id = _a.taxon_id 
+					and _s.taxon_id = _a.taxon_id
 					and _s.taxon_id is not null
 					and _s.state_id in (" . $s . ")";
 
@@ -1330,7 +1328,7 @@ class MatrixKeyController extends Controller
             $dV = str_replace('variation_id is null', 'taxon_id is null', str_replace('taxon_id', 'variation_id', $dT));
             $dM = str_replace('ref_matrix_id is null', 'variation_id is null', str_replace('taxon_id', 'ref_matrix_id', $dT));
 		}
-		
+
 		return
 			array(
 				'dT' => isset($dT) ? $dT : null,
@@ -1340,39 +1338,39 @@ class MatrixKeyController extends Controller
 				'dM' => isset($dM) ? $dM : null,
 				'fsM' => isset($fsM) ? $fsM : null
 			);
-						
+
 	}
 
 	private function getRelatedEntityCount( $p )
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
 		$type=isset($p['type']) ? $p['type'] : null;
-	
+
 		if ( is_null($id) || is_null($type) ) return;
-		
+
 		if ($type=='taxon')
 		{
 			$rel = $this->models->TaxaRelations->_get(array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $id
 				)
 			));
-			
+
 			return count((array)$rel);
-			
+
 		}
-		else 
+		else
 		if ($type=='variation')
 		{
 			$rel = $this->models->VariationRelations->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'variation_id' => $id
 				)
 			));
-			
+
 			return count((array)$rel);
 
 		}
@@ -1386,25 +1384,25 @@ class MatrixKeyController extends Controller
 
         if (!isset($type) || !isset($id))
             return;
-        
+
         if ($type=='variation')
 		{
 			$this->_related=$this->models->VariationRelations->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'variation_id' => $id
 				),
 				'columns'=>'relation_id,ref_type'
 			));
-			
+
         }
         else
 		if ($type=='taxon')
 		{
 			$this->_related=$this->models->TaxaRelations->_get(array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $id
 				),
 				'columns'=>'relation_id,ref_type'
@@ -1423,10 +1421,10 @@ class MatrixKeyController extends Controller
     private function setSearchTerm( $p )
     {
 		$search=isset($p['search']) ? $p['search'] : null;
-		
+
 		if (is_null($search))
 			return;
-		
+
 		$this->_searchTerm=$search;
     }
 
@@ -1449,7 +1447,7 @@ class MatrixKeyController extends Controller
     {
 		return $this->_searchResults;
     }
-	
+
 	private function getModuleSetting( $p )
 	{
 		return $this->moduleSettings->getModuleSetting( $p );
@@ -1472,7 +1470,7 @@ class MatrixKeyController extends Controller
 					'columns'=>'page_id,topic,content'
 				)
 			);
-			
+
 			if ($a)
 			{
 				$this->_introductionLinks[$this->settings->introduction_topic_colophon_citation]=
@@ -1520,12 +1518,12 @@ class MatrixKeyController extends Controller
 			}
 		}
     }
-	
+
 	private function getIntroductionLinks()
 	{
 		return $this->_introductionLinks;
 	}
-	
+
 	private function setIncUnknowns( $state )
 	{
 		if ( is_bool($state) )
@@ -1533,13 +1531,13 @@ class MatrixKeyController extends Controller
 			$this->_incUnknowns=$state;
 		}
 	}
-	
+
 	private function getIncUnknowns()
 	{
 		return $this->_incUnknowns;
 	}
-	
-	
 
 
-}	
+
+
+}
