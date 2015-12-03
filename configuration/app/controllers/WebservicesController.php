@@ -40,14 +40,14 @@ class WebservicesController extends Controller
     private function initialise()
     {
 		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
-		
+
 		$this->checkProject();
 
 		if (is_null($this->getCurrentProjectId()))
 		{
 			$this->addError('cannot get project settings.');
-		} 
-		else 
+		}
+		else
 		{
 			$this->models->WebservicesModel->initDb( array( "db_lc_time_names" => $this->getSetting('db_lc_time_names') ) );
 			$this->checkJSONPCallback();
@@ -69,7 +69,7 @@ parameters:
 		//pid is mandatory, now checked in initialise()
 		//$this->checkProject();
 		$this->checkFromDate();
-		
+
 		if ( is_null($this->getCurrentProjectId() ) || is_null($this->getFromDate()) )
 		{
 			$this->sendErrors();
@@ -86,7 +86,7 @@ parameters:
 				"project_id"=>$this->getCurrentProjectId(),
 				"from_date"=>$this->getFromDate()
 			));
-		} 
+		}
 		else
 		{
 			$data=$this->models->WebservicesModel->getNames(array(
@@ -105,7 +105,7 @@ parameters:
 			'pId'=>$this->getCurrentProjectId(),
 			'from'=>$this->getFromDate()
 		);
-		
+
 		if (!is_null($rowcount))
 		{
 			$result['rows']=$rowcount;
@@ -120,11 +120,11 @@ parameters:
 
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
-		
+
 		if ($count_only)
 		{
 			$result['count']=$names[0]['total'];
-		} 
+		}
 		else
 		{
 			$result['count']=count((array)$names);
@@ -133,11 +133,11 @@ parameters:
 		}
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
-	public function taxonAction()	
+	public function taxonAction()
 	{
 		$this->_usage=
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>
@@ -151,9 +151,9 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-		
+
 		$this->checkTaxonId();
-		
+
 		if (is_null($this->getTaxonId()))
 		{
 			$this->sendErrors();
@@ -165,10 +165,10 @@ parameters:
 		$ranklabel=$this->models->LabelsProjectsRanks->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'project_rank_id' => $taxon['rank_id'],
 					'language_id' => LANGUAGE_ID_ENGLISH
-				), 
+				),
 				'columns' => 'label'
 			));
 
@@ -180,7 +180,7 @@ parameters:
 		));
 
 		if (empty($summary)) $summary=null;
-		
+
 		$url='http://'.$_SERVER['HTTP_HOST'].$this->makeNsrLink();
 
 		$names=$this->models->WebservicesModel->getTaxonNames(array(
@@ -196,15 +196,15 @@ parameters:
 
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
-			'search'=>$this->requestData['taxon'],
+			'search'=>$this->rGetVal('taxon'),
 			'match'=>$this->getMatchType()
 		);
-		
+
 		$p=$this->getProject();
 
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
-		
+
 		$result['taxon']=array(
 			'id'=>$taxon['id'],
 			'scientific_name'=>$taxon['taxon'],
@@ -216,11 +216,11 @@ parameters:
 		);
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
-	public function taxonPageAction()	
+	public function taxonPageAction()
 	{
 		$this->_usage=
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>&cat=<page ID>
@@ -235,7 +235,7 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-		
+
 		$this->checkTaxonId();
 
 		if (is_null($this->getTaxonId()))
@@ -280,7 +280,7 @@ parameters:
 				'cat'=>$this->rGetVal('cat'),
 				'striptags'=>$this->rHasVal('striptags','1'),
 			);
-		
+
 		$p=$this->getProject();
 
 		$result['project']=$p['title'];
@@ -293,7 +293,7 @@ parameters:
 			);
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -313,7 +313,7 @@ parameters:
 		}
 
 		$this->checkNsrId();
-		
+
 		if (is_null($this->getTaxonId()))
 		{
 			$this->sendErrors();
@@ -328,17 +328,17 @@ parameters:
 			"image_base_url"=>$this->_nsrOriginalImageBaseUrl,
 			"limit"=>4
 		));
-		
+
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
-			'search'=>$this->requestData['nsr']
+			'search'=>$this->rGetVal('nsr')
 		);
-		
+
 		$p=$this->getProject();
 
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
-		
+
 		$result['taxon']=array(
 			'id'=>$taxon['id'],
 			'scientific_name'=>$taxon['taxon'],
@@ -348,7 +348,7 @@ parameters:
 		);
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -365,9 +365,9 @@ parameters:
 ";
 
 		if (
-			$this->rHasVar('size') && 
-			is_numeric($this->rGetVal('size')) && 
-			$this->rGetVal('size')>0 && 
+			$this->rHasVar('size') &&
+			is_numeric($this->rGetVal('size')) &&
+			$this->rGetVal('size')>0 &&
 			$this->rGetVal('size')<1000
 		)
 		{
@@ -384,7 +384,7 @@ parameters:
 			"pool_size"=>$poolSize,
 			"img_base_url"=>$this->_190x100BaseUrl
 		));
-		
+
 		$this->setTaxonId($media[0]['taxon_id']);
 
 		$result=array('pId'=>$this->getCurrentProjectId());
@@ -395,7 +395,7 @@ parameters:
 		$result['exported']=date('c');
 
 		$result['url_recent_images']='http://'.$_SERVER['HTTP_HOST'].'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
-	
+
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
 		$result['image']['url_image_popup']=$this->makeNsrMediaLink()."&img=".$media[0]['file_name'];
@@ -410,7 +410,7 @@ parameters:
 		);
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -426,13 +426,13 @@ parameters:
 		{
 			return number_format($n,0,',','.');
 		}
-	
+
 		if (is_null($this->getCurrentProjectId()))
 		{
 			$this->sendErrors();
 			return;
 		}
-		
+
 		$result=$this->models->WebservicesModel->getEstablishedExoticAllTaxa(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
@@ -456,7 +456,7 @@ parameters:
 		$d=$this->models->WebservicesModel->getNameTypeCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
-		
+
 		$result['statistics']['accepted_names']=
 			array(
 				'count'=>$d['accepted_names'],
@@ -475,13 +475,13 @@ parameters:
 				'label'=>$this->translate('Engelse namen')
 			);
 		*/
-	
+
 		$result['statistics']['specialist']=
 			array(
 				'count'=>$this->models->WebservicesModel->getTaxonSpecialistCount(array("project_id"=>$this->getCurrentProjectId())),
 				'label'=>$this->translate('Specialisten')
 			);
-		
+
         $d=$this->models->Literature2->_get(array(
 			'id'=> array('project_id' => $this->getCurrentProjectId()),
 			'columns'=>'count(*) as total'
@@ -522,7 +522,7 @@ parameters:
 			);
 
 		$exotenGroupId=1;
-		
+
 		$result['statistics']['exotics']=
 			array(
 				'count'=>$this->models->WebservicesModel->getExoticsPassportCount(array(
@@ -534,7 +534,7 @@ parameters:
 
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -565,7 +565,7 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-		
+
 		$search=$this->rGetVal('text');
 
 		if (strlen($search)<$minStrLen)
@@ -581,11 +581,11 @@ parameters:
 		}
 
 		$max=
-			$this->rHasVal('max') && 
+			$this->rHasVal('max') &&
 			is_numeric($this->rGetVal('max')) &&
 			(int)$this->rGetVal('max')>0  &&
-			(int)$this->rGetVal('max')<=1000  ? 
-				(int)$this->rGetVal('max') : 
+			(int)$this->rGetVal('max')<=1000  ?
+				(int)$this->rGetVal('max') :
 				$max;
 
 		$taxa=$this->models->WebservicesModel->getSearchResults(array(
@@ -624,7 +624,7 @@ parameters:
 		$result['results']=$taxa;
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -639,16 +639,16 @@ parameters:
 		else
 		{
 			$p = $this->models->Projects->_get(array(
-				'id' => $this->requestData['pid']
+				'id' => $this->rGetVal('pid')
 			));
-		
+
 			if (!$p)
 			{
 				$this->setProject(null);
 				$this->setCurrentProjectId(null);
-				$this->addError('illegal project id. there is no project with id '.$this->requestData['pid'].'.');
-			} 
-			else 
+				$this->addError('illegal project id. there is no project with id '.$this->rGetVal('pid').'.');
+			}
+			else
 			{
 				$this->setProject($p);
 				$this->setCurrentProjectId($p['id']);
@@ -657,7 +657,7 @@ parameters:
 		}
 		return false;
 	}
-	
+
 	private function setProject( $project )
 	{
 		$this->_project=$project;
@@ -673,7 +673,7 @@ parameters:
 		if (!$this->rHasVal('from'))
 		{
 			$this->addError('no starttime specified of retrieval window.');
-		} 
+		}
 		else
 		{
 			$d=str_split($this->rGetVal('from'),2);
@@ -682,8 +682,8 @@ parameters:
 			{
 				$this->setFromDate($this->rGetVal('from'));
 				return true;
-			} 
-			else 
+			}
+			else
 			{
 				$this->addError('illegal date: '.$this->rGetVal('from').'.');
 			}
@@ -707,11 +707,11 @@ parameters:
 		if (!$this->rHasVal('taxon'))
 		{
 			$this->addError('no taxon name specified.');
-		} 
+		}
 		else
 		{
 			$taxon=trim(strip_tags($this->rGetVal('taxon')));
-			
+
 			$this->setMatchType('concept');
 
 			$t=$this->models->Taxa->_get(array(
@@ -737,14 +737,14 @@ parameters:
 				if (!$t)
 				{
 					$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
-				} 
+				}
 				else
 				{
 					$this->setTaxonId($t['id']);
 				}
-	
+
 			}
-		
+
 		}
 		return false;
 	}
@@ -754,11 +754,11 @@ parameters:
 		if (!$this->rHasVal('nsr'))
 		{
 			$this->addError('no NSR-id specified.');
-		} 
-		else 
+		}
+		else
 		{
 			$nsr=trim($this->rGetVal('nsr'));
-			
+
 			$this->setMatchType('literal');
 
 			$t = $this->models->NsrIds->_get(array(
@@ -768,11 +768,11 @@ parameters:
 					'item_type' => 'taxon'
 				)
 			));
-		
+
 			if (!$t)
 			{
-				$this->addError('NSR-id "'.$this->requestData['nsr'].'" not found in this project.');
-			} 
+				$this->addError('NSR-id "'.$this->rGetVal('nsr').'" not found in this project.');
+			}
 			else
 			{
 				$this->setTaxonId($t[0]['lng_id']);
@@ -791,7 +791,7 @@ parameters:
 	{
 		return $this->_taxonId;
 	}
-	
+
 	private function setMatchType( $t )
 	{
 		$this->_matchType=$t;
@@ -801,7 +801,7 @@ parameters:
 	{
 		return $this->_matchType;
 	}
-	
+
 	private function setJSON( $json )
 	{
 		$this->_JSON=$json;
@@ -811,7 +811,7 @@ parameters:
 	{
 		return $this->_JSON;
 	}
-	
+
 	private function checkJSONPCallback()
 	{
 		if ($this->rHasVal('callback'))
@@ -819,7 +819,7 @@ parameters:
 			$this->setJSONPCallback($this->rGetVal('callback'));
 		}
 	}
-	
+
 	private function setJSONPCallback( $callback )
 	{
 		$this->_JSONPCallback=$callback;
@@ -829,12 +829,12 @@ parameters:
 	{
 		return $this->_JSONPCallback;
 	}
-	
+
 	private function hasJSONPCallback()
 	{
 		return $this->getJSONPCallback()!=false;
 	}
-	
+
 	private function makeNsrLink()
 	{
 		return sprintf($this->_taxonUrl,$this->getTaxonId());
@@ -847,11 +847,11 @@ parameters:
 
 	private function sendErrors()
 	{
-		$this->_usage = $this->_usage."  
+		$this->_usage = $this->_usage."
 function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with the appropriate function name.
 ";
 		$this->setJSON(json_encode(array('errors'=>$this->errors,'usage'=>$this->_usage)));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput(true);
 	}
 
@@ -871,7 +871,7 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 
 		$this->smarty->assign('json',$this->_JSON);
 
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printPage('template');
 	}
 

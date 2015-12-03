@@ -121,7 +121,7 @@ class LinnaeusController extends Controller
 
 			if ($this->rHasVal('r')) {
 
-				$url = $this->requestData['r'];
+				$url = $this->rGetVal('r');
 
 			} else {
 
@@ -175,8 +175,8 @@ class LinnaeusController extends Controller
 		} else {
 
 			$d = $this->getContent(
-				(isset($this->requestData['sub']) ? $this->requestData['sub'] : null),
-				(isset($this->requestData['id']) ? $this->requestData['id'] : null)
+				($this->rHasVar('sub') ? $this->rGetVal('sub') : null),
+				($this->rHasVar('id') ? $this->rGetId() : null)
 			);
 
 		}
@@ -299,7 +299,7 @@ class LinnaeusController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
             $this->getLookupList($this->requestData);
 

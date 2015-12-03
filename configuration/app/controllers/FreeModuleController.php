@@ -74,7 +74,7 @@ class FreeModuleController extends Controller
             $this->setStoreHistory(false);
 
             // two ways of requesting a specific page
-            $id = ($this->rHasVal('page') ? $this->requestData['page'] : ($this->rHasVal('id') ? $this->requestData['id'] : null));
+            $id = ($this->rHasVal('page') ? $this->rGetVal('page') : ($this->rHasVal('id') ? $this->rGetId() : null));
 
             $page = $this->getPage($id);
 
@@ -109,20 +109,20 @@ class FreeModuleController extends Controller
 
         if ($this->rHasVal('modId')) {
 
-            $this->setCurrentModule($this->getFreeModule($this->requestData['modId']));
+            $this->setCurrentModule($this->getFreeModule($this->rGetVal('modId')));
         }
 
         $module = $this->getCurrentModule();
 
         if ($this->rHasVal('letter') && $module['show_alpha'] == '1') {
 
-            $refs = $this->getPagesByLetter(strtolower($this->requestData['letter']));
+            $refs = $this->getPagesByLetter(strtolower($this->rGetVal('letter')));
 
             $id = $refs[0]['id'];
         }
         else if ($this->rHasId()) {
 
-            $id = $this->requestData['id'];
+            $id = $this->rGetId();
         }
         else {
 
@@ -156,7 +156,7 @@ class FreeModuleController extends Controller
             $this->smarty->assign('alpha', $this->getPageAlphabet());
 
         if ($this->rHasVal('letter'))
-            $this->smarty->assign('letter', $this->requestData['letter']);
+            $this->smarty->assign('letter', $this->rGetVal('letter'));
 
 		if (!empty($page)) {
 	        $this->setPageName(sprintf($this->translate($module['module'] . ': "%s"'), $page['topic']));
@@ -188,9 +188,9 @@ class FreeModuleController extends Controller
         if (!$this->rHasVal('action'))
             return;
 
-        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->requestData);
+            $this->getLookupList($this->GetAll());
         }
 
         $this->allowEditPageOverlay = false;

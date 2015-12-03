@@ -5,7 +5,7 @@ include_once ('Controller.php');
 
 class UtilitiesController extends Controller
 {
-    
+
     public $usedModels = array(
 		'commonname',
 		'synonym'
@@ -20,9 +20,9 @@ class UtilitiesController extends Controller
      */
     public function __construct($p=null)
     {
-	
+
         parent::__construct($p);
-    
+
     }
 
     /**
@@ -32,9 +32,9 @@ class UtilitiesController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
-    
+
     }
 
     /**
@@ -44,46 +44,46 @@ class UtilitiesController extends Controller
      */
     public function ajaxInterfaceAction ()
     {
-        
-        if (!isset($this->requestData['action'])) return;
-        
-		if ($this->requestData['action'] == 'translate')
-		{
-			$this->smarty->assign('returnText',json_encode($this->javascriptTranslate($this->requestData['text'])));
 
-        } 
-		else
-		if ($this->requestData['action'] == 'set_session')
+        if (!$this->rHasVar('action')) return;
+
+		if ($this->rHasVar('action', 'translate'))
 		{
-			$this->setSessionVar($this->requestData['var'],@$this->requestData['val']);
+			$this->smarty->assign('returnText',json_encode($this->javascriptTranslate($this->rGetVal('text'))));
+
         }
 		else
-		if ($this->requestData['action'] == 'get_session')
+		if ($this->rHasVar('action', 'set_session'))
 		{
-			$this->getSessionVar($this->requestData['var']);
+			$this->setSessionVar($this->rGetVal('var'), $this->rHasVar('val') ? $this->rGetVal('val') : null);
         }
-		
+		else
+		if ($this->rHasVar('action', 'get_session'))
+		{
+			$this->getSessionVar($this->rGetVal('var'));
+        }
+
 		$this->allowEditPageOverlay = false;
-		
+
         $this->printPage();
-    
+
     }
 
 	public function getNamesAction()
 	{
-	
+
 		/*
-		
+
 		taxon	[taxon id]	[taxon name]	[taxon rank]
 		commonname	[common name id]	[common name]	[language name]	[taxon id]	[taxon name]	[taxon rank]
 		synonym	[synonym id]	[synonym]	[remark]	[taxon id]	[taxon name]	[taxon rank]
-		
-		*/	
-	
+
+		*/
+
 		if (!$this->rHasVal('id')) return null;
-		
-		$pId = $this->requestData['id'];
-		
+
+		$pId = $this->rGetId();
+
 		$ranks = $this->models->ProjectRank->_get(
 			array(
 				'id' => array(
@@ -103,17 +103,17 @@ class UtilitiesController extends Controller
 					'columns' => 'rank'
 				)
 			);
-			
+
 			$ranks[$key]['rank'] = $r[0]['rank'];
 
 		}
-		
+
 		$a = false;
 		foreach((array)$ranks as $key => $val) {
 
 			if (!$a) $a = $val['rank']=='Species' ? true : false;
 			if ($a) $d[$key] = $val;
-		
+
 		}
 
 		$ranks = $d;
@@ -161,20 +161,20 @@ class UtilitiesController extends Controller
 
 	public function dynamicCssAction()
 	{
-	
+
 		$cssVariables = array(
 			'projectMedia' => $this->getProjectUrl('projectMedia'),
 			'systemMedia' => $this->getProjectUrl('systemMedia')
 		);
-		
+
 		foreach ($cssVariables as $k => $v) {
 			$this->smarty->assign($k,$v);
 		}
-		
+
 		header('Content-type:text/css');
 
 		$this->printPage('dynamic-css');
-	
+
 	}
 
 }
