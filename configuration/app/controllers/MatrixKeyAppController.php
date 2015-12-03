@@ -4,30 +4,30 @@ include_once ('Controller.php');
 class MatrixKeyAppController extends Controller
 {
     public $usedModels = array(
-		'matrices', 
-		'matrices_names', 
-		'matrices_taxa', 
-		'matrices_taxa_states', 
-		'matrices_variations', 
-		'commonnames', 
-		'characteristics', 
-		'characteristics_chargroups', 
-		'characteristics_labels', 
-		'characteristics_labels_states', 
-		'characteristics_matrices', 
-		'characteristics_states', 
-		'chargroups', 
-		'chargroups_labels', 
-        'nbc_extras', 
+		'matrices',
+		'matrices_names',
+		'matrices_taxa',
+		'matrices_taxa_states',
+		'matrices_variations',
+		'commonnames',
+		'characteristics',
+		'characteristics_chargroups',
+		'characteristics_labels',
+		'characteristics_labels_states',
+		'characteristics_matrices',
+		'characteristics_states',
+		'chargroups',
+		'chargroups_labels',
+        'nbc_extras',
         'variation_relations',
 		'gui_menu_order'
     );
-	
+
 	public $modelNameOverride='MatrixKeyAppModel';
 
 	public function appControllerInterfaceAction()
 	{
-		
+
 		/*
 			used exclusively by the Javascript app-controller object
 			implemented in the web-enabled version of the linnaeus mobile-app
@@ -42,10 +42,10 @@ class MatrixKeyAppController extends Controller
 			time: timestamp against caching of Ajax-calls
 
 		*/
-		
+
 		$res=null;
 
-	
+
 		if (!$this->rHasVal('action'))
 		{
             $res='error (request lacks an action)';
@@ -59,13 +59,13 @@ class MatrixKeyAppController extends Controller
 		if ($this->rHasVal('action', 'query'))
 		{
 			$data = $this->requestData;
-  			
+
 			$functions = array(
 				'states' => '_appControllerGetStates',
 				'results' => '_appControllerGetResults',
 				'detail' => '_appControllerGetDetail'
 			);
-			
+
 			if (!isset($data['language']))
 				$data['language']=$this->getDefaultLanguageId();
 
@@ -81,10 +81,10 @@ class MatrixKeyAppController extends Controller
 		{
 			return '__menu'.preg_replace('/\W/i','',ucwords($label)).'.png';
 		}
-		
+
 		$resTaxa = isset($data['results']['taxa']) ? $data['results']['taxa'] : array();
 		$resVar = isset($data['results']['variations']) ? $data['results']['variations'] : array();
-	
+
 		$selStates=isset($data['states']) ? preg_split('/,/',$data['states'],-1,PREG_SPLIT_NO_EMPTY) : array();
 		$stateList=array();
 
@@ -136,14 +136,14 @@ class MatrixKeyAppController extends Controller
 							);
 					}
 				}
-				
+
 				$menu[$key]['hasStates']=count((array)$menu[$key]['states'])>0;
 				$menu[$key]['hasSelected']=$hasSelected;
 
 			} else
 			if ($val['type']=='c_group')
 			{
-				
+
 				$c = $this->models->MatrixKeyAppModel->getChargroupCharacteristics(array(
 					"language_id"=>$data['language'],
 					"project_id"=>$this->getCurrentProjectId(),
@@ -154,7 +154,7 @@ class MatrixKeyAppController extends Controller
 
 				foreach((array)$c as $cKey=>$cVal)
 				{
-					
+
 					$c[$cKey]['img']=makeCharacterIconName($val['label']);
 
 					$c[$cKey]['states']=$this->models->MatrixKeyAppModel->getCharacteristicStates(array(
@@ -162,7 +162,7 @@ class MatrixKeyAppController extends Controller
 						"project_id"=>$this->getCurrentProjectId(),
 						"characteristic_id"=>$cVal['id']
 					));
-				
+
 					$hasSelected=false;
 					foreach((array)$c[$cKey]['states'] as $sKey => $sVal)
 					{
@@ -189,20 +189,20 @@ class MatrixKeyAppController extends Controller
 									);
 						}
 					}
-					
+
 					$c[$cKey]['hasStates']=count((array)$c[$cKey]['states'])>0;
 					$c[$cKey]['hasSelected']=$hasSelected;
-					
+
 					if ($hasSelected) $hasSelectedGroup=true;
 
 				}
-				
+
 				$menu[$key]['characters']=$c;
 				$menu[$key]['hasCharacters']=count((array)$c)>0;
 				$menu[$key]['hasSelected']=$hasSelectedGroup;
-				
+
 			}
-		
+
 		}
 		usort($stateList,function ($a,$b) {return $a['display']>$b['display'] ? 1 : -1;});
 
@@ -211,14 +211,14 @@ class MatrixKeyAppController extends Controller
 
 	private function _appControllerGetResults( $data )
 	{
-		return 
+		return
 			$this->models->MatrixKeyAppModel->getResults(array(
 				"project_id"=>$this->getCurrentProjectId(),
 				"language_id"=>$data['language'],
 				"states"=>isset($data['states']) ? $data['states'] : null,
-			));					
+			));
 	}
-			
+
 	private function _appControllerGetDetail($data)
 	{
 		$res=$this->models->MatrixKeyAppModel->getDetail(array(
@@ -239,9 +239,9 @@ class MatrixKeyAppController extends Controller
 		}
 
 		return $res;
-					
+
 	}
-	
+
 	private function getGuiMenuOrder($mId,$lId)
 	{
 		if (!isset($_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder']))
@@ -253,11 +253,11 @@ class MatrixKeyAppController extends Controller
 					"matrix_id"=>$mId
 				));
 		}
-		
+
 		return $_SESSION['app'][$this->spid()]['matrix'][$mId][$lId]['guiMenuOrder'];
 
 	}
-			
+
 	private function getCommonname($tId)
 	{
 		$c = $this->models->Commonname->_get(
@@ -274,6 +274,6 @@ class MatrixKeyAppController extends Controller
 	}
 
 
-			
 
-}	
+
+}
