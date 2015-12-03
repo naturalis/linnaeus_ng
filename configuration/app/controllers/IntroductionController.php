@@ -142,12 +142,7 @@ class IntroductionController extends Controller
     {
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVar('action', 'save_content'))
-		{
-            $this->ajaxActionSaveContent();
-        }
-		else
-        if ($this->rHasVar('action', 'get_content'))
+        if ($this->rHasVal('action', 'get_content'))
 		{
             $this->ajaxActionGetContent();
         }
