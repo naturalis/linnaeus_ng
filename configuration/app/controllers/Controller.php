@@ -150,7 +150,7 @@ class Controller extends BaseClass
     public $allowEditPageOverlay = true;
     public $tmp;
     private $usedModelsBase = array(
-		'commonname',
+		'commonnames',
 		'free_modules_projects',
 		'glossary',
 		'glossary_synonyms',
@@ -2067,13 +2067,9 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
-		$t='ControllerModel';
-
-        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
-		{
-            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
-            $this->models->$t = new $t;
-        }
+        // Load base controller model first
+		require_once dirname(__FILE__) . '/../models/ControllerModel.php';
+		$this->models->ControllerModel = new ControllerModel;
 
         $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
 
@@ -2798,7 +2794,7 @@ class Controller extends BaseClass
 		include_once ('TranslatorController.php');
 		$this->translator = new TranslatorController('app',$this->getDefaultLanguageId());
 	}
-	
+
 	public function translate($content)
 	{
 		return $this->translator->translate($content);
@@ -2812,7 +2808,7 @@ class Controller extends BaseClass
 	public function smartyTranslate ($params, $content, &$smarty, &$repeat)
 	{
 		$c = $this->translator->translate($content);
-	
+
 		if (isset($params))
 		{
 			foreach ((array) $params as $key => $val)
