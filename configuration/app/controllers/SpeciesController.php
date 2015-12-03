@@ -264,7 +264,7 @@ class SpeciesController extends Controller
     {
 		$return='error';
 
-        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->rGetVal('search'))) {
 
             $return=$this->getLookupList($this->requestData);
 

@@ -7,8 +7,8 @@ class UtilitiesController extends Controller
 {
 
     public $usedModels = array(
-		'commonname',
-		'synonym'
+		'commonnames',
+		'synonyms'
     );
     public $cssToLoad = array();
     public $controllerPublicName = 'Utilities';
