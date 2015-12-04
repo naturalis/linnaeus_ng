@@ -2485,7 +2485,7 @@ class Controller extends BaseClass
     }
 
 
-    public function rGetAll()
+    public function GetAll()
     {
 		return isset($this->requestData) ? $this->requestData : null;
     }
