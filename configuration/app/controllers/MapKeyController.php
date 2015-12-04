@@ -1173,6 +1173,7 @@ class MapKeyController extends Controller
 		);
 
 	}
+
 	private function getAdjacentItems($id)
 	{
 
