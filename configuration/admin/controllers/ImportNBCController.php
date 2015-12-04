@@ -72,7 +72,7 @@ class ImportNBCController extends ImportController
     {
 
         // Add specific models for this extended class to $usedModels
-        $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
+        $this->extendUsedModels();
 
         parent::__construct();
 
