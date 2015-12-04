@@ -699,7 +699,7 @@ class SearchControllerNSR extends SearchController
 			"project_id"=>$this->getCurrentProjectId(),
 			"language_id"=>$this->getCurrentLanguageId(),
 			"limit"=>$this->_suggestionListItemMax,
-			"taxon_id"=>$p['id']
+			"taxon_id"=>isset($p['id']) ? $p['id'] : null
 		));
 	}
 
