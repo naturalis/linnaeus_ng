@@ -190,7 +190,7 @@ class FreeModuleController extends Controller
 
         if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->rGetId());
+            $this->getLookupList($this->GetAll());
         }
 
         $this->allowEditPageOverlay = false;

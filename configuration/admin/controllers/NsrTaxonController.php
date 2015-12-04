@@ -117,7 +117,7 @@ class NsrTaxonController extends NsrController
 			}
 			else
 			{
-				$data=$this->rGetId();
+				$data=$this->GetAll();
 				array_walk($data, function(&$val, $key){if (isset($val['new'])) $val=$val['new'];});
 				unset($data['action']);
 
@@ -521,7 +521,7 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'parent_taxon_id')
 		)
 		{
-            $return=$this->getSpeciesLookupList($this->rGetId());
+            $return=$this->getSpeciesLookupList($this->GetAll());
         }
 		else
 		if (
@@ -534,7 +534,7 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'presence_organisation_id')
 		)
 		{
-            $return=$this->getExpertsLookupList($this->rGetId());
+            $return=$this->getExpertsLookupList($this->GetAll());
         }
 		else
 		if ($this->rHasVal('action', 'get_inheritable_name'))
@@ -2240,7 +2240,7 @@ class NsrTaxonController extends NsrController
 			- edit name		-> $this->getNameId()
 		*/
 
-		$data=$this->rGetId();
+		$data=$this->GetAll();
 
 		if ( $this->getConceptId() )
 		{
@@ -2313,7 +2313,7 @@ class NsrTaxonController extends NsrController
 
 		$canChange=true;
 
-		$data=$this->rGetId();
+		$data=$this->GetAll();
 
 		if ( $this->getConceptId() )
 		{
@@ -2506,7 +2506,7 @@ class NsrTaxonController extends NsrController
 	private function doParentChange()
 	{
 		// preliminairies
-		$data=$this->rGetId();
+		$data=$this->GetAll();
 
 		if ( $this->getConceptId() )
 		{

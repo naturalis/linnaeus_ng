@@ -576,9 +576,9 @@ class MatrixKeyController extends Controller
 		{
             $filesToSave = $this->getUploadedMediaFiles();
 
-            if (!$this->verifyData($this->rGetId(), $filesToSave))
+            if (!$this->verifyData($this->GetAll(), $filesToSave))
 			{
-                $state = $this->rGetId();
+                $state = $this->GetAll();
             }
             else
 			{

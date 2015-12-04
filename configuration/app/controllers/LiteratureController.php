@@ -4,6 +4,8 @@ include_once ('Controller.php');
 
 class LiteratureController extends Controller
 {
+
+
     public $usedModels = array(
 		'literature',
 		'literature_taxa',
@@ -12,7 +14,6 @@ class LiteratureController extends Controller
     );
 
     public $controllerPublicName = 'Literary references';
-    public $modelNameOverride = 'Literature2Model';
 
 	public $cssToLoad = array(
 		'literature.css'
@@ -410,12 +411,58 @@ class LiteratureController extends Controller
 		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
 		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
 
-		$l = $this->models->Literature2Model->getLookupList(array(
-            'project_id' => $this->getCurrentProjectId(),
-    		'search' => $search,
-    		'match_start' => $matchStartOnly,
-    		'get_all' => $getAll
-		));
+//		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search) && !$getAll) return;
+
+		if ($matchStartOnly)
+			$match = mysql_real_escape_string($search).'%';
+		else
+			$match = '%'.mysql_real_escape_string($search).'%';
+
+		$l = $this->models->Literature->_get(
+			array('id' =>
+				'select
+					id,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						),
+						\', \',
+						if(isnull(`year`)!=1,`year`,\'\'),
+						if(isnull(suffix)!=1,suffix,\'\'),
+						if(isnull(year_2)!=1,
+							concat(
+								if(year_separator!=\'-\',
+									concat(
+										\' \',
+										year_separator,
+										\' \'
+									),
+									year_separator
+								),
+								year_2,
+								if(isnull(suffix_2)!=1,
+									suffix_2,
+									\'\')
+								)
+								,\'\'
+							)
+					) as label,
+					lower(author_first) as _a1,
+					lower(author_second) as _a2,
+					`year`
+				from %table%
+				where project_id = '.
+					$this->getCurrentProjectId().
+					(!$getAll ? ' and (author_first like "'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
+				order by _a1,_a2,`year`'
+			)
+		);
 
 		$this->smarty->assign(
 			'returnText',
@@ -429,8 +476,6 @@ class LiteratureController extends Controller
 		return $l;
 
 	}
-
-
 
 }
 

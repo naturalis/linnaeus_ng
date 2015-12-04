@@ -1047,12 +1047,7 @@ class Controller extends BaseClass
         return $this->rGetVal('id');
     }
 
-    public function rGetAll()
-    {
-		return isset($this->requestData) ? $this->requestData : null;
-    }
-
-    public function getPreferredName($id)
+	public function getPreferredName($id)
 	{
 	    $name = $this->models->ControllerModel->getPreferredName(array(
     	    'predicatePreferredName' => PREDICATE_PREFERRED_NAME,

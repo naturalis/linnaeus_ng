@@ -76,11 +76,11 @@ class TreeController extends Controller
 
         if ($this->rHasVal('action', 'get_lookup_list'))
 		{
-            $return=$this->getLookupList($this->rGetId());
+            $return=$this->getLookupList($this->GetAll());
         } else
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
-			$return=json_encode($this->getTreeNode($this->rGetId()));
+			$return=json_encode($this->getTreeNode($this->GetAll()));
         }
 		else
 		if ($this->rHasVal('action', 'store_tree'))

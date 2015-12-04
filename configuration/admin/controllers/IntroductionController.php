@@ -108,7 +108,7 @@ class IntroductionController extends Controller
 			else
 			if ($this->rHasVal('action','preview'))
 			{
-				$this->saveAllContent($this->rGetId());
+				$this->saveAllContent($this->GetAll());
 				$this->redirect('preview.php?id=' . $this->rGetId());
 			}
 
@@ -292,7 +292,7 @@ class IntroductionController extends Controller
 
         if ($this->rHasVal('action', 'save_content'))
 		{
-            if ($this->saveContent($this->rGetId()))
+            if ($this->saveContent($this->GetAll()))
 				$this->smarty->assign('returnText', 'saved');
         }
 		else if ($this->rHasVal('action', 'get_content'))
