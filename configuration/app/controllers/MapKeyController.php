@@ -60,6 +60,8 @@ class MapKeyController extends Controller
 
 		$this->smarty->assign('mapType',$this->getSetting('maptype'));
 
+		$this->initTaxaWithOcc();
+
     }
 
     /**
@@ -1037,7 +1039,7 @@ class MapKeyController extends Controller
 		return $taxa;
 
 	}
-
+/*
 	public function getLookupList($p)
 	{
 
@@ -1097,7 +1099,80 @@ class MapKeyController extends Controller
 		);
 
 	}
+*/
+	public function getLookupList($p)
+	{
 
+		$search = isset($p['search']) ? $p['search'] : null;
+		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
+		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
+
+		/*
+		$l2MustHaveGeo = false;
+
+		if (isset($p['vars'])) {
+
+			foreach((array)$p['vars'] as $val) {
+
+				if ($val[0]=='l2_must_have_geo' && $val[1]=='1') $l2MustHaveGeo = true;
+
+			}
+
+		}
+		*/
+
+		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search) && !$getAll) return;
+
+		if ($matchStartOnly)
+		{
+			$regexp = '/^'.preg_quote($search).'/i';
+		}
+		else
+		{
+			$regexp = '/'.preg_quote($search).'/i';
+		}
+
+		$l = array();
+
+		/*
+		if ($l2MustHaveGeo)
+		{
+			$taxa=$this->getAllTaxaWithOcc();
+		}
+		else
+		{
+			$taxa=$this->getAllTaxa();
+		}
+		*/
+
+		$taxa=$this->getAllTaxaWithOcc();
+
+		foreach((array)$taxa as $key => $val)
+		{
+			if ($getAll || preg_match($regexp,$val['taxon'])==1)
+			{
+				$l[] = array(
+					'id' => $val['id'],
+					'label' => '<i>' . $val['taxon'] . '</i>'// $this->formatTaxon($val) // TOO F*N SLOW!
+				);
+			}
+		}
+
+		$this->customSortArray($l,array('key' => 'taxon','maintainKeys' => true));
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(array(
+				'data'=>$l,
+				'module'=>'species',
+				'url'=>'../mapkey/examine_species.php?id=%s',
+				'sortData'=>true
+			))
+		);
+
+	}
 	private function getAdjacentItems($id)
 	{
 
@@ -1256,7 +1331,7 @@ class MapKeyController extends Controller
 		return $d[0]['map_id'];
 
 	}
-
+/*
 	private function l2getAdjacentItems($id)
 	{
 
@@ -1288,6 +1363,32 @@ class MapKeyController extends Controller
 
 		return;
 
+	}
+*/
+	private function l2getAdjacentItems($id)
+	{
+		$taxa = $this->getAllTaxaWithOcc();
+
+		if (empty($taxa))
+			return;
+
+		reset($taxa);
+
+		$prev = $next = null;
+
+		while (list($key, $val) = each($taxa))
+		{
+			if ($val['id']==$id)
+			{
+				$next = current($taxa); // current = next because the pointer has already shifted forward
+				return array(
+					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
+					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
+				);
+			}
+			$prev = $val;
+		}
+		return;
 	}
 
 
@@ -1476,7 +1577,7 @@ class MapKeyController extends Controller
 		return isset($id) ? $m[$id] : $m;
 
 	}
-
+/*
 	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)
 	{
 
@@ -1496,17 +1597,6 @@ class MapKeyController extends Controller
 		else
 			$ot = $this->_l2GetTaxonOccurrencesPerSquare($d);
 
-		/*
-			v1			v2
-			68.553ms	2.8732ms
-			45.755ms	2.8363ms
-			92.8979ms	2.7211ms
-			32.9481ms	3.212ms
-			1.9209ms	1.2671ms
-			66.4689ms	3.5623ms
-
-			factor 17!
-		*/
 
 		$dataTypes = array();
 		$dt = $this->getGeodataTypes();
@@ -1519,6 +1609,55 @@ class MapKeyController extends Controller
 			$ot[$key]['type_title'] = $d['title'];
 			$ot[$key]['colour'] = $d['colour'];
 
+		}
+
+		// why the count??
+		return array('occurrences' => $ot, 'count' => count((array)$ot));
+
+	}
+*/
+	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)
+	{
+
+		if (!isset($id) || !isset($mapId)) return;
+
+		$d = array(
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $id,
+			'map_id' => $mapId
+		);
+
+		if (isset($typeId)) $d['type_id'] = $typeId;
+
+
+		if ($this->l2HasTaxonOccurrencesCompacted())
+		{
+			$dummy=$this->_l2GetTaxonOccurrencesCompacted($d);
+			$ot=array();
+			foreach((array)$dummy as $key=>$val)
+			{
+				$boom=explode(",",$key);
+				foreach((array)$boom as $b)
+				{
+					$ot[$b]=$val;
+					$ot[$b]['square_number']=$b;
+				}
+			}
+		}
+		else
+		{
+			$ot = $this->_l2GetTaxonOccurrencesPerSquare($d);
+		}
+
+		$dataTypes = array();
+		$dt=$this->getGeodataTypes();
+
+		foreach((array)$ot as $key => $val)
+		{
+			$dataTypes[$val['type_id']] = $val['type_id'];
+			$d = $dt[$val['type_id']];
+			$ot[$key]['type_title'] = $d['title'];
+			$ot[$key]['colour'] = $d['colour'];
 		}
 
 		// why the count??
@@ -1911,7 +2050,8 @@ class MapKeyController extends Controller
 
 	private function getIdToDisplay()
 	{
-		$d=array_shift($this->getAllTaxaWithOcc());
+		$d = $this->getAllTaxaWithOcc();
+		$d=array_shift($d);
 		return $d['id'];
 	}
 
