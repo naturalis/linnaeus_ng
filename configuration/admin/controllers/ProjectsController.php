@@ -534,7 +534,7 @@ class ProjectsController extends Controller
         }
 
         if (!is_null($this->rGetId()))
-            $this->smarty->assign('data', $this->GetAll());
+            $this->smarty->assign('data', $this->rGetAll());
 
         $this->smarty->assign('languages', $this->getAvailableLanguages());
 

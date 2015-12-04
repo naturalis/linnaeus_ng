@@ -36,7 +36,7 @@ class NsrActivityLogController extends NsrController
 
         $this->setPageName($this->translate('Activity log'));
 
-		$search=(null!==$this->GetAll() ? $this->GetAll() : null);
+		$search=(null!==$this->rGetAll() ? $this->rGetAll() : null);
 
 		$results=$this->getLogLines($search);
 
@@ -141,11 +141,11 @@ class NsrActivityLogController extends NsrController
 
 	private function reconstructQueryString($ignore)
 	{
-		if (null===$this->GetAll()) return;
+		if (null===$this->rGetAll()) return;
 
 		$querystring=null;
 
-		foreach((array)$this->GetAll() as $key=>$val)
+		foreach((array)$this->rGetAll() as $key=>$val)
 		{
 			if (in_array($key,$ignore)) continue;
 

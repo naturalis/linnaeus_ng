@@ -69,7 +69,7 @@ class NsrTreeController extends NsrController
 
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
-			$return=json_encode($this->getTreeNode($this->GetAll()));
+			$return=json_encode($this->getTreeNode($this->rGetAll()));
         }
 		else
 		if ($this->rHasVal('action', 'store_tree'))

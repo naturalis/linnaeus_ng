@@ -270,7 +270,7 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('term') && $this->rHasVal('definition') && !$this->rHasVal('action','browse') && !$this->isFormResubmit()) {
 
-			$data = $this->GetAll();
+			$data = $this->rGetAll();
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
@@ -282,7 +282,7 @@ class GlossaryController extends Controller
 
 				$this->addError($this->translate('Glossary term already exists.'));
 
-				$gloss = $this->GetAll();
+				$gloss = $this->rGetAll();
 
 				$activeLanguage = $this->rGetVal('language_id');
 

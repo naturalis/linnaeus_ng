@@ -135,7 +135,7 @@ class LiteratureController extends Controller
 		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text') && !$this->isFormResubmit())
 		{
 
-			$data = $this->GetAll();
+			$data = $this->rGetAll();
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
