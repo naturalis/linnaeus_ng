@@ -2112,6 +2112,12 @@ class Controller extends BaseClass
         }
     }
 
+    protected function extendUsedModels ()
+    {
+        if (isset($this->usedModelsExtended) && is_array($this->usedModelsExtended)) {
+            $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
+        }
+    }
 
 
     /**

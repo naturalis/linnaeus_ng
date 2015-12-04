@@ -35,7 +35,7 @@ class SpeciesControllerNSR extends SpeciesController
     public function __construct()
     {
         // Add specific models for this extended class to $usedModels
-        $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
+        $this->extendUsedModels();
 
         parent::__construct();
 		$this->initialise();
