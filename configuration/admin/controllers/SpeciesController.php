@@ -1332,7 +1332,7 @@ class SpeciesController extends Controller
 
             }
         }
-        else if (null!==$this->GetAll() && !$this->isFormResubmit()) {
+        else if (null!==$this->rGetAll() && !$this->isFormResubmit()) {
             // list of taxa and ranks to be saved detected: save taxa
 
             if ($this->rHasVal('rows') && isset($_SESSION['admin']['system']['csv_data'])) {
@@ -1735,7 +1735,7 @@ class SpeciesController extends Controller
 
         if ($this->rGetVal('action') == 'save_taxon') {
 
-            $c = $this->saveTaxon($this->GetAll());
+            $c = $this->saveTaxon($this->rGetAll());
 
             if (!$c)
                 $this->smarty->assign('returnText', '<msg>Empty taxa are not shown');
@@ -1850,7 +1850,7 @@ class SpeciesController extends Controller
         }
         else if ($this->rHasVal('action', 'get_lookup_list') && $this->rHasVal('search')) {
 
-            $list=$this->getLookupList($this->GetAll());
+            $list=$this->getLookupList($this->rGetAll());
 			$this->smarty->assign('returnText',$list);
 
         }
@@ -2133,7 +2133,7 @@ class SpeciesController extends Controller
 
         $this->setPageName($this->translate('Assign taxa to collaborators'));
 
-        if (null!==$this->GetAll() && !$this->isFormResubmit()) {
+        if (null!==$this->rGetAll() && !$this->isFormResubmit()) {
 
             if ($this->rHasVal('delete')) {
 

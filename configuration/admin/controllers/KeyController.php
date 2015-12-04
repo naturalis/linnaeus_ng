@@ -837,7 +837,7 @@ class KeyController extends Controller
         else
 		if ($this->rGetVal('action')=='save_keystep_content')
 		{
-            $this->saveKeystepContent($this->GetAll());
+            $this->saveKeystepContent($this->rGetAll());
         }
         else
 		if ($this->rGetVal('action')=='get_key_choice_content')
@@ -847,7 +847,7 @@ class KeyController extends Controller
         else
 		if ($this->rGetVal('action')=='save_key_choice_content')
 		{
-            $this->saveKeystepChoiceContent($this->GetAll());
+            $this->saveKeystepChoiceContent($this->rGetAll());
         }
 
         $this->printPage();
