@@ -61,34 +61,34 @@ final class Literature2Model extends AbstractModel
 			from %PRE%literature2 _a
 
 			left join %PRE%literature2 _c
-				on _a.publishedin_id = _c.id 
+				on _a.publishedin_id = _c.id
 				and _a.project_id=_c.project_id
-				
+
 			left join %PRE%literature2 _d
-				on _a.periodical_id = _d.id 
+				on _a.periodical_id = _d.id
 				and _a.project_id=_d.project_id
-				
+
 			left join %PRE%labels_languages _e
-				on _a.language_id = _e.language_id 
+				on _a.language_id = _e.language_id
 				and _a.project_id=_e.project_id
 				and _e.label_language_id = ".$language_id."
 
 			left join %PRE%literature2_publication_types _l2pt
-				on _a.publication_type_id = _l2pt.id 
+				on _a.publication_type_id = _l2pt.id
 				and _a.project_id=_l2pt.project_id
-			
+
 			left join %PRE%literature2_publication_types_labels _l2ptl
-				on _a.publication_type_id = _l2ptl.publication_type_id 
+				on _a.publication_type_id = _l2ptl.publication_type_id
 				and _a.project_id=_l2ptl.project_id
 				and _l2ptl.language_id = ".$language_id."
-				
+
 			where _a.project_id = ".$project_id."
 			and _a.id =".$literature2_id
-		;	
+		;
 
 		$d=$this->freeQuery( $query );
 		$data=$d[0];
-		
+
 		$query="
 			select
 				_b.name
@@ -96,7 +96,7 @@ final class Literature2Model extends AbstractModel
 			from %PRE%literature2_authors _a
 
 			left join %PRE%actors _b
-				on _a.actor_id = _b.id 
+				on _a.actor_id = _b.id
 				and _a.project_id=_b.project_id
 
 			where
@@ -104,11 +104,71 @@ final class Literature2Model extends AbstractModel
 				and _a.literature2_id =".$literature2_id."
 			order by _a.sort_order,_b.name
 		";
-		
+
 		$data['authors']=$this->freeQuery( $query );
 
 		return $data;
 	}
+
+    // Used in original LiteratureController
+	public function getLookupList ($params)
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$search = isset($params['search']) ? $params['search'] : null;
+		$matchStartOnly = isset($params['match_start']) ? $params['match_start']=='1' : false;
+		$getAll = isset($params['get_all']) ? $params['get_all']=='1' : false;
+
+		if (is_null($project_id) || is_null($search)) {
+			return;
+		}
+
+		$match = $matchStartOnly ?
+            mysqli_real_escape_string($this->databaseConnection, $search).'%' :
+		    '%'.mysqli_real_escape_string($this->databaseConnection, $search).'%';
+
+		$query = '
+    		select
+            id,
+            concat(
+            	author_first,
+            	(
+            		if(multiple_authors=1,
+            			\' et al.\',
+            			if(author_second!=\'\',concat(\' & \',author_second),\'\')
+            		)
+            	),
+            	\', \',
+            	if(isnull(`year`)!=1,`year`,\'\'),
+            	if(isnull(suffix)!=1,suffix,\'\'),
+            	if(isnull(year_2)!=1,
+            		concat(
+            			if(year_separator!=\'-\',
+            				concat(
+            					\' \',
+            					year_separator,
+            					\' \'
+            				),
+            				year_separator
+            			),
+            			year_2,
+            			if(isnull(suffix_2)!=1,
+            				suffix_2,
+            				\'\')
+            			)
+            			,\'\'
+            		)
+            ) as label,
+            lower(author_first) as _a1,
+            lower(author_second) as _a2,
+            `year`
+            from %PRE%literature
+            where project_id = '.
+            	$project_id .
+            	(!$getAll ? ' and (author_first like "'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
+            order by _a1,_a2,`year`';
+
+		return $this->freeQuery($query);
+    }
 
 
 }

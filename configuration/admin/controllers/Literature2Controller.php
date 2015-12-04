@@ -125,7 +125,7 @@ class Literature2Controller extends NsrController
     {
         if (!$this->rHasVal('action')) return;
 		$return=null;
-		$return=$this->getReferenceLookupList($this->GetAll());
+		$return=$this->getReferenceLookupList($this->rGetId());
         $this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();
@@ -156,7 +156,7 @@ class Literature2Controller extends NsrController
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$this->smarty->assign('reference',$this->GetAll());
+			$this->smarty->assign('reference',$this->rGetId());
 			$this->saveReference();
 		}
 		if ($this->rHasId())

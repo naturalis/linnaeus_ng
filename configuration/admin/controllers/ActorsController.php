@@ -68,7 +68,7 @@ class ActorsController extends NsrController
     {
         if (!$this->rHasVar('action')) return;
 		$return=null;
-		$return=$this->getActorLookupList($this->GetAll());
+		$return=$this->getActorLookupList($this->rGetId());
         $this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();
@@ -100,7 +100,7 @@ class ActorsController extends NsrController
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$this->smarty->assign('reference',$this->GetAll());
+			$this->smarty->assign('reference',$this->rGetId());
 			$this->saveActor();
 		}
 
