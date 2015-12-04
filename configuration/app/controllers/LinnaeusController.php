@@ -301,7 +301,7 @@ class LinnaeusController extends Controller
 
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->requestData);
+            $this->getLookupList($this->rGetAll());
 
         }
 

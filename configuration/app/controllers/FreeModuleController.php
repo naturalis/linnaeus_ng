@@ -60,7 +60,7 @@ class FreeModuleController extends Controller
         // set a new module id, if any (switching between multiple modules)
         if ($this->rHasVal('modId')) {
 
-            $this->setCurrentModule($this->getFreeModule($this->requestData['modId']));
+            $this->setCurrentModule($this->getFreeModule($this->rGetVal('modId')));
         }
 
         // if no module has been set, raise an error

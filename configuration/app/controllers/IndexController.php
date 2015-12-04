@@ -105,7 +105,7 @@ class IndexController extends Controller
 	{
 		$querystring=null;
 
-		foreach((array)$this->requestData as $key=>$val)
+		foreach((array)$this->rGetAll() as $key=>$val)
 		{
 			if (isset($ignore) && in_array($key,$ignore)) continue;
 

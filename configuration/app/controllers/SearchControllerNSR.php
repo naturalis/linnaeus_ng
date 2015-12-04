@@ -101,7 +101,7 @@ class SearchControllerNSR extends SearchController
     {
 		if ($this->rHasVal('search'))
 		{
-			$search=$this->requestData;
+			$search=$this->rGetAll();
 			$results=$this->doSearch($search);
 
 			$search['search']=htmlspecialchars($search['search']);
@@ -139,7 +139,7 @@ class SearchControllerNSR extends SearchController
 
     public function searchExtendedAction()
     {
-		$search=isset($this->requestData) ? $this->requestData : null;
+		$search=$this->rGetAll();
 
 		if ($this->rHasVal('action','export'))
 		{
@@ -241,7 +241,7 @@ class SearchControllerNSR extends SearchController
 
     public function recentPicturesAction()
     {
-		$search=$this->requestData;
+		$search=$this->rGetAll();
 		$results = $this->doPictureSearch($search);
 		$this->smarty->assign('search',$search);
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
@@ -274,27 +274,27 @@ class SearchControllerNSR extends SearchController
         if ($this->rHasVal('action','group_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
-			$this->smarty->assign('returnText',json_encode($this->getSuggestionsGroup($this->requestData)));
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsGroup($this->rGetAll())));
         } else
         if ($this->rHasVal('action','author_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
-			$this->smarty->assign('returnText',json_encode($this->getSuggestionsAuthor($this->requestData)));
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsAuthor($this->rGetAll())));
         } else
         if ($this->rHasVal('action','photographer_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
-			$this->smarty->assign('returnText',json_encode($this->getSuggestionsPhotographer($this->requestData)));
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsPhotographer($this->rGetAll())));
         } else
         if ($this->rHasVal('action','validator_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
-			$this->smarty->assign('returnText',json_encode($this->getSuggestionsValidator($this->requestData)));
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsValidator($this->rGetAll())));
         } else
         if ($this->rHasVal('action','name_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
-			$this->smarty->assign('returnText',json_encode($this->getSuggestionsName($this->requestData)));
+			$this->smarty->assign('returnText',json_encode($this->getSuggestionsName($this->rGetAll())));
         }
 
         $this->printPage();
@@ -760,7 +760,7 @@ class SearchControllerNSR extends SearchController
 
 		$querystring=null;
 
-		foreach((array)$this->requestData as $key=>$val)
+		foreach((array)$this->rGetAll() as $key=>$val)
 		{
 			if (in_array($key,$ignore)) continue;
 
