@@ -39,6 +39,7 @@ class MapKeyController extends Controller
 		);
 
 	private $_mapType = 'lng';
+	private $_allTaxa;
 
 
     /**
@@ -1836,6 +1837,7 @@ class MapKeyController extends Controller
 
 	}
 
+	/*
 	private function getIdToDisplay()
 	{
 
@@ -1905,6 +1907,122 @@ class MapKeyController extends Controller
 		}
 
 	}
+	*/
+
+	private function getIdToDisplay()
+	{
+		$d=array_shift($this->getAllTaxaWithOcc());
+		return $d['id'];
+	}
+
+
+	public function setAllTaxa( $t )
+	{
+		$this->_allTaxa=$t;
+	}
+
+	public function getAllTaxa()
+	{
+		return $this->_allTaxa;
+	}
+
+	public function getAllTaxaWithOcc()
+	{
+		$d=array();
+		foreach((array)$this->_allTaxa as $val)
+		{
+			if ( $val['total']>0 ) $d[]=$val;
+		}
+		return $d;
+	}
+
+	private function initTaxaWithOcc()
+	{
+
+		$d=isset($_SESSION['app']['user']['map']['all_taxa']) ? $_SESSION['app']['user']['map']['all_taxa'] : null;
+
+		if ( !empty($d) )
+		{
+			$this->setAllTaxa($d);
+			return;
+		}
+
+		if ($this->_mapType=='l2')
+		{
+			$d=
+				$this->models->Taxa->freeQuery("
+					select
+						_a.id,
+						_a.parent_id,
+						_a.rank_id,
+						_a.taxon,
+						count(_b.id) as total
+					from
+						%PRE%taxa _a
+
+					left join
+						%PRE%l2_occurrences_taxa_combi _b
+						on _a.project_id =_b.project_id
+						and _a.id =_b.taxon_id
+
+					left join
+						%PRE%projects_ranks _c
+						on _a.project_id =_c.project_id
+						and _a.rank_id =_c.id
+
+					where
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _c.lower_taxon=1
+
+					group by
+						_a.id
+
+					order by
+						_a.taxon
+				");
+		}
+		else
+		{
+			// SLOOOOOOOOOOW! (?)
+			$d=
+				$this->models->Taxa->freeQuery("
+					select
+						_a.id,
+						_a.parent_id,
+						_a.rank_id,
+						_a.taxon,
+						count(_b.id) as total
+					from
+						%PRE%taxa _a
+
+					left join
+						%PRE%occurrences_taxa _b
+						on _a.project_id =_b.project_id
+						and _a.id =_b.taxon_id
+
+					left join
+						%PRE%projects_ranks _c
+						on _a.project_id =_c.project_id
+						and _a.rank_id =_c.id
+
+					where
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _c.lower_taxon=1
+
+					group by
+						_a.id
+
+					order by
+						_a.taxon
+				");
+		}
+
+		$this->setAllTaxa($d);
+		$_SESSION['app']['user']['map']['all_taxa']=$d;
+
+	}
+
+
 
 
 }
