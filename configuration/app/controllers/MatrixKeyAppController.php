@@ -58,7 +58,7 @@ class MatrixKeyAppController extends Controller
         else
 		if ($this->rHasVal('action', 'query'))
 		{
-			$data = $this->requestData;
+			$data = $this->rGetAll();
 
 			$functions = array(
 				'states' => '_appControllerGetStates',
