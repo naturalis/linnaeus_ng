@@ -81,11 +81,11 @@ class NsrPaspoortController extends NsrController
 		
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->savePassportMeta($this->GetAll());
+			$this->savePassportMeta($this->rGetId());
 		} else
 		if ($this->rHasVal('action','delete') && $this->rHasVal('tab') && !$this->isFormResubmit())
 		{
-			$this->deletePassportMeta($this->GetAll());
+			$this->deletePassportMeta($this->rGetId());
 		}
 
         $this->setPageName($this->translate('Edit taxon passport'));
@@ -105,7 +105,7 @@ class NsrPaspoortController extends NsrController
 
 		if ($this->rHasVal('action', 'save_passport'))
 		{
-			$return=$this->savePassport($this->GetAll());
+			$return=$this->savePassport($this->rGetId());
         }
 		
         $this->allowEditPageOverlay=false;

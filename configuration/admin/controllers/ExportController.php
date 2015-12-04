@@ -210,7 +210,7 @@ class ExportController extends Controller
 		if ($this->rHasVal('action','export'))
 		{
 
-			$this->smarty->assign('requestData',$this->GetAll());
+			$this->smarty->assign('requestData',$this->rGetId());
 
 			set_time_limit(4800); // RIGHT!
 

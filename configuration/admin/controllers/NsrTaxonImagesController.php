@@ -106,9 +106,9 @@ class NsrTaxonImagesController extends NsrController
 
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->updateTaxonImageMetaData($this->GetAll());
-			$this->updateTaxonImageTaxonId($this->GetAll());
-			$this->updateTaxonImageOverviewState($this->GetAll());
+			$this->updateTaxonImageMetaData($this->rGetId());
+			$this->updateTaxonImageTaxonId($this->rGetId());
+			$this->updateTaxonImageOverviewState($this->rGetId());
 			$this->addMessage( 'Meta-data opgeslagen.' );
 		}
 

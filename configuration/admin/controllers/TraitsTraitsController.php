@@ -76,13 +76,13 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','add'))
 		{
-			$this->addDatatypeToProject($this->GetAll());
+			$this->addDatatypeToProject($this->rGetId());
 			$this->addMessage('Data type added to project.');
 		}
 		else
 		if ($this->rHasVal('action','remove'))
 		{
-			$this->removeDatatypeFromProject($this->GetAll());
+			$this->removeDatatypeFromProject($this->rGetId());
 			$this->addMessage('Data type removed project.');
 		}
 
@@ -99,7 +99,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','saveorder'))
 		{
-			$i=$this->saveTraitgroupOrder($this->GetAll());
+			$i=$this->saveTraitgroupOrder($this->rGetId());
 			if ($i>0) $this->addMessage('New order saved.');
 		}
 
@@ -114,14 +114,14 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','save'))
 		{
-			$this->saveTraitgroup($this->GetAll());
+			$this->saveTraitgroup($this->rGetId());
 			$this->helpers->SessionMessages->setMessage('Saved.');
 			$this->redirect('traitgroups.php');
 		}
 		else 
 		if ($this->rHasVal('action','delete'))
 		{
-			$this->deleteTraitgroup($this->GetAll());
+			$this->deleteTraitgroup($this->rGetId());
 			$this->helpers->SessionMessages->setMessage('Group deleted.');
 			$this->redirect('traitgroups.php');
 		}
@@ -155,7 +155,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','saveorder'))
 		{
-			$i=$this->saveTraitgroupTraitsOrder($this->GetAll());
+			$i=$this->saveTraitgroupTraitsOrder($this->rGetId());
 			if ($i>0) $this->addMessage('New order saved.');
 		}
 
@@ -189,7 +189,7 @@ class TraitsTraitsController extends TraitsController
 		if ($this->rHasVal('action','save'))
 		{
 
-			$r=$this->saveTraitgroupTrait($this->GetAll());
+			$r=$this->saveTraitgroupTrait($this->rGetId());
 			
 			if ($r)
 			{
@@ -214,7 +214,7 @@ class TraitsTraitsController extends TraitsController
 		else
 		if ($this->rHasVal('action','delete') && $this->rHasId())
 		{
-			$this->deleteTraitgroupTrait($this->GetAll());
+			$this->deleteTraitgroupTrait($this->rGetId());
 			$this->helpers->SessionMessages->setMessage('Trait deleted.');
 			$this->redirect('traitgroup_traits.php?group='.$group['id']);
 		}
@@ -239,7 +239,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','save'))
 		{
-			$this->saveTraitgroupTraitValues($this->GetAll());
+			$this->saveTraitgroupTraitValues($this->rGetId());
 		}
 
 		if ($this->rHasVar('trait'))
