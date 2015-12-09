@@ -48,11 +48,12 @@ function makeJoinExample(col)
 	<div style="padding-bottom:10px;margin-bottom:20px;">
 
         {foreach from=$new_ref item=line key=k}{if !$ignorefirst || ($ignorefirst && $k>0)}
-        <div class="match" data-id="{$k}" style="{if $i>1}display:none;{/if}border-bottom:1px dotted #666;padding-bottom:5px;margin-top:0">
 
-		<script>
-        storeElement( {$k} );
-        </script>
+            <div class="match" data-id="{$k}" style="{if $i>1}display:none;{/if}border-bottom:1px dotted #666;padding-bottom:5px;margin-top:0">
+    
+            <script>
+            storeElement( {$k} );
+            </script>
 
         	{assign var=line value=$lines[{$k}]}
 
@@ -196,8 +197,8 @@ function makeJoinExample(col)
                                 </label>
                                 <select name="new_publishedin_language[{$k}][{$field_publishedin}][{$kk}]">
                                     <option value="">-</option>
-                                    {foreach from=$languages item=v key=k}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-                                    {if $v.sort_criterium==0 && $languages[$k-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
+                                    {foreach from=$languages item=v key=l}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+                                    {if $v.sort_criterium==0 && $languages[$l-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
                                     <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
                                     {/if}{/foreach}
                                 </select>
@@ -253,8 +254,8 @@ function makeJoinExample(col)
 									/>
                                     <select name="new_periodical_language[{$k}][{$field_publishedin}][{$kk}]">
                                         <option value="">-</option>
-                                        {foreach from=$languages item=v key=k}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
-                                        {if $v.sort_criterium==0 && $languages[$k-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
+                                        {foreach from=$languages item=v key=l}{if $v.id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC}
+                                        {if $v.sort_criterium==0 && $languages[$l-1].sort_criterium!=0}<option value="" disabled="disabled"></option>{/if}
                                         <option value="{$v.id}"{if $v.id==$default_language} selected="selected"{/if}>{$v.label}</option>
                                         {/if}{/foreach}
                                     </select>
