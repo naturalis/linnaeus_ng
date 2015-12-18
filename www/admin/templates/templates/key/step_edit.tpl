@@ -81,7 +81,7 @@
 				type="button"
 				onclick="
 					{if $session.admin.project.languages|@count>1}keySaveStepContent('other');{/if} 
-					keySaveStepContent('default','$(\'#theForm\').submit()');"
+					keySaveStepContent('default',$('#theForm').submit());"
 					value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 		</td>

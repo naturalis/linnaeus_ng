@@ -160,7 +160,7 @@ function keySaveData(id,language,content,action,postFunction)
 		async: allAjaxAsynchMode ,
 		success: function (data) {
 			allSetMessage(data);
-			if (postFunction) eval(postFunction+'(data)');
+			if (postFunction) postFunction(data);
 		}
 	});
 }
