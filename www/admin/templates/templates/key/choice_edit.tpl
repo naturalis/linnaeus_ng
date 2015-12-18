@@ -119,9 +119,9 @@
 					if (keyChoiceContentCheck()) {
 						{if $session.admin.project.languages|@count>1}
 						keySaveChoiceContent('default');
-						keySaveChoiceContent('other','$(\'#theForm\').submit();');
+						keySaveChoiceContent('other',$('#theForm').submit());
 						{else}
-						keySaveChoiceContent('default','$(\'#theForm\').submit();');
+						keySaveChoiceContent('default',$('#theForm').submit());
 						{/if}
 					} " 
 				value="{t}save{/t}" />
