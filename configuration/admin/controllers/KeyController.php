@@ -830,22 +830,22 @@ class KeyController extends Controller
         if (!$this->rHasVal('action'))
             return;
 
-        if ($this->rGetVal('action','get_keystep_content'))
+        if ($this->rHasVal('action','get_keystep_content'))
 		{
             $this->getKeystepContent();
         }
         else
-		if ($this->rGetVal('action','save_keystep_content'))
+		if ($this->rHasVal('action','save_keystep_content'))
 		{
             $this->saveKeystepContent($this->rGetAll());
         }
         else
-		if ($this->rGetVal('action','get_key_choice_content'))
+		if ($this->rHasVal('action','get_key_choice_content'))
 		{
             $this->getKeystepChoiceContent();
         }
         else
-		if ($this->rGetVal('action','save_key_choice_content'))
+		if ($this->rHasVal('action','save_key_choice_content'))
 		{
             $this->saveKeystepChoiceContent($this->rGetAll());
         }
