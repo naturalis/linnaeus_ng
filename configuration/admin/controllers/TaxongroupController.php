@@ -109,7 +109,7 @@ class TaxongroupController extends Controller
 
 		if ($this->rHasVal('action','save'))
 		{
-			$this->saveGroup($this->rGetId());
+			$this->saveGroup($this->rGetAll());
 			$this->helpers->SessionMessages->setMessage('Saved.');
 			$this->redirect('taxongroups.php');
 		}
