@@ -2884,6 +2884,7 @@ class Controller extends BaseClass
 
 		// Load controller-specific model
         $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
+
         if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
 		{
             require_once dirname(__FILE__) . '/../models/' . $t . '.php';

@@ -13,7 +13,7 @@ include_once ('Controller.php');
 class UsersController extends Controller
 {
 
-    public $usedModels = array();
+    public $usedModels = array( 'timezones' );
 
 	public $cssToLoad = array(
         'users.css',
