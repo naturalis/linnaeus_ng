@@ -202,7 +202,7 @@ final class TaxonGroupModel extends AbstractModel
 
 	public function getAllCommonnames ($projectId)
     {
-        if (!$projectId)) {
+        if (!$projectId) {
 			return null;
 		}
 
@@ -223,9 +223,9 @@ final class TaxonGroupModel extends AbstractModel
 
 
 
-	public getOrphanedTaxonGroupTaxa ($projectId)
+	public function getOrphanedTaxonGroupTaxa ($projectId)
     {
-        if (!$projectId)) {
+        if (!$projectId) {
 			return null;
 		}
 
@@ -247,9 +247,9 @@ final class TaxonGroupModel extends AbstractModel
 	}
 
 
-	public getOrphanedTaxonGroups ($projectId)
+	public function getOrphanedTaxonGroups ($projectId)
     {
-        if (!$projectId)) {
+        if (!$projectId) {
 			return null;
 		}
 

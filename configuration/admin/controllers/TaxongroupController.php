@@ -67,6 +67,8 @@ class TaxongroupController extends Controller
     public $usedHelpers = array(
         'session_messages'
     );
+	
+	public $modelNameOverride='TaxonGroupModel';
 
     public function __construct ()
     {
@@ -297,7 +299,7 @@ class TaxongroupController extends Controller
 			'parent_id'=>$parent_id,
 			'sys_label'=>$sys_label
 		));
-
+		
 		if (empty($id)) $id=$this->models->Taxongroups->getNewId();
 
 		if (!$id) return;
