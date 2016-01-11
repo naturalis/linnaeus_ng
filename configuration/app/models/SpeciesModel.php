@@ -847,10 +847,56 @@ class SpeciesModel extends AbstractModel
 				".($distributionMaps?
 					"_map1.meta_data as meta_map_source,
 					 _map2.meta_data as meta_map_description,": "")."
-				date_format(_meta1.meta_date,'%e %M %Y') as meta_datum,
+
+				case
+					when 
+						date_format(_meta1.meta_date,'%e %M %Y') is not null
+						and DAYOFMONTH(_meta1.meta_date)!='0'
+					then
+						date_format(_meta1.meta_date,'%e %M %Y')
+					when 
+						date_format(_meta1.meta_date,'%M %Y') is not null
+					then
+						date_format(_meta1.meta_date,'%M %Y')
+					when 
+						date_format(_meta1.meta_date,'%Y') is not null
+						and YEAR(_meta1.meta_date)!='0000'
+					then
+						date_format(_meta1.meta_date,'%Y')
+					when 
+						YEAR(_meta1.meta_date)='0000'
+					then
+						null
+					else
+						_meta1.meta_date
+				end as meta_datum,
+
 				_meta2.meta_data as meta_short_desc,
 				_meta3.meta_data as meta_geografie,
-				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing,
+
+				case
+					when 
+						date_format(_meta4.meta_date,'%e %M %Y') is not null
+						and DAYOFMONTH(_meta4.meta_date)!=0
+					then
+						date_format(_meta4.meta_date,'%e %M %Y')
+					when 
+						date_format(_meta4.meta_date,'%M %Y') is not null
+					then
+						date_format(_meta4.meta_date,'%M %Y')
+					when 
+						date_format(_meta4.meta_date,'%Y') is not null
+						and YEAR(_meta4.meta_date)!='0000'
+					then
+						date_format(_meta4.meta_date,'%Y')
+					when 
+						YEAR(_meta4.meta_date)='0000'
+					then
+						null
+					else
+						_meta4.meta_date
+				end as meta_datum_plaatsing,
+
 				_meta5.meta_data as meta_copyrights,
 				_meta6.meta_data as meta_validator,
 				_meta7.meta_data as meta_adres_maker,
