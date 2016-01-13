@@ -10,8 +10,8 @@
     {if $modules[i]._rights && $modules[i].show_in_menu==1}
         {assign var=i value=$i+1}
             <td>
-                <a href="views/{$modules[i].controller}/">
-                    <img src="{$baseUrl}admin/media/system/module_icons/{$modules[i].icon}" style="width:32px;border:0px" />
+                <a href="../{$modules[i].controller}/">
+                    <img src="{$baseUrl}admin/media/system/module_icons/{$modules[i].icon}" style="width:32px;border:0px;" />
                 </a>
             </td>
             <td>
@@ -24,7 +24,7 @@
     {/if}
     {/section}
         </tr>
-        
+
 	{if $freeModules|@count>0}
         <tr><td colspan="2">&nbsp;</td></tr>
         <tr>
@@ -78,7 +78,7 @@ NOTICES
 	<li><a href="../import/export.php">{t}Generic export{/t}</a></li>
 	<li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
 	<li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
-    
+
 </ul>
 {/if}
 </div>
