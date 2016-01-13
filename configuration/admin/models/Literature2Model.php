@@ -73,7 +73,8 @@ final class Literature2Model extends AbstractModel
 			from
 				%PRE%literature2 _a
 			where
-				_a.project_id = ".$projectId;
+				_a.project_id = " . $projectId . "
+			order by letter";
 
         return $this->freeQuery($query);
     }
