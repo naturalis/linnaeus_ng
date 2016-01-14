@@ -366,13 +366,12 @@ class AbstractModel extends BaseClass
 		    return false;
 		}
 
-        $this->freeQuery("SET lc_time_names = '". mysqli_real_escape_string($this->databaseConnection, $locale)."'");
+        $this->freeQuery("SET lc_time_names = '".
+            mysqli_real_escape_string($this->databaseConnection, $locale)."'");
     }
 
-    public function getLanguagesUsed ($projectId)
+    public function getLanguagesUsed ($projectId = null)
     {
-        $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
-
         if (is_null($projectId)) {
 			return null;
 		}

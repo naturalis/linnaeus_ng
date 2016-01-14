@@ -187,7 +187,6 @@ class Literature2Controller extends NsrController
 
 		$this->smarty->assign('gepubliceerd_in_ids',$gepubliceerd_in_ids);
 		$this->smarty->assign('periodiek_ids',$periodiek_ids);
-
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('publicationTypes',$publicationTypes);
