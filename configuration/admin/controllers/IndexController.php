@@ -148,7 +148,7 @@ class IndexController extends Controller
 
         $this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Index: comon names'));
+        $this->setPageName($this->translate('Index: common names'));
 
 		$languages = $this->models->Languages->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
