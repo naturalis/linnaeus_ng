@@ -175,21 +175,9 @@ function showVideo(url,name) {
 var allIsDialogOpen = false;
 
 function showDialog(title,content,vars,resize) {
-
 	if ($('#jDialog').length!=0) {
 
 		$('#jDialog').html(null);
-
-		/*		
-		var buttons = {
-			// callback functions must exist in the dialog's html (or elsewhere within scope)
-			"ok": function() {jDialogOk();},
-			"close": function() {jDialogCancel();}
-		};
-		
-		if (!vars.showOk) 
-			delete buttons.ok;
-		*/
 
 		var buttons = [];
 
@@ -207,18 +195,14 @@ function showDialog(title,content,vars,resize) {
 			width: "auto",
 			position: { my: "center", at: "center", of: window }
 		});
-		
+
 		$("#jDialog").html(content);
 		$("#jDialog").dialog( "open" );
-
-
 	} else {
-
 		if (!vars) {
 			vars = {};
 			vars.width = 350;
 		}
-	
 		vars.title = title ? title : '';
 	
 		$.modaldialog.prompt(content,vars);
@@ -227,25 +211,13 @@ function showDialog(title,content,vars,resize) {
 			$('#dialog-content-inner').css('min-height',0);
 			$('#lookup-DialogContent').css('height','auto');
 		}
-		
 	}
 
 	allIsDialogOpen = true;
-
 }
 
 function closeDialog() {
-
-	if (!allIsDialogOpen) return;
-
-	if ($('#jDialog').length!=0)
-		$('#jDialog').dialog( "close" );
-	else
-		$('#dialog-close').click()
-
-	allIsDialogOpen = false;
-
-
+	$('#filterDialogContainer').hide();
 }
 
 function getTimestamp() {
