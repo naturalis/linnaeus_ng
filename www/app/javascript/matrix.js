@@ -75,7 +75,7 @@ var openGroups=Array();
 var searchedfor="";
 
 var	labels={
-	details: __('onderscheidende kenmerken'),
+	details: __('kenmerken'),
 	similar: __('gelijkende soorten'),
 	show_all: __('toon alle kenmerken'),
 	hide_all: __('kenmerken verbergen'),
@@ -229,7 +229,6 @@ function shouldDisableEmergentChar( id )
 
 function printMenu()
 {
-	
 	if (typeof hook_prePrintMenu == 'function') { hook_prePrintMenu(); }
 	
 	$('#facet-categories-menu').html('');
@@ -242,7 +241,6 @@ function printMenu()
 	for (var i in menu)
 	{
 		var item = menu[i];
-
 		var s="";
 		
 		if (item.type=='group')
@@ -255,7 +253,6 @@ function printMenu()
 			for (var j in item.chars)
 			{
 				if (matrixsettings.groupsAlwaysOpen) openGroups.push(item.id);
-				
 				var char=item.chars[j];
 
 				char.disabled = shouldDisableChar(char.id);
@@ -277,8 +274,7 @@ function printMenu()
 							.replace('%VALUE%',(state.value ? state.value : ''))
 							.replace('%LABEL%',(state.label ? state.label : ''))
 							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
-							.replace('%STATE-ID%',state.val)
-							.replace('%IMG-URL%',matrixsettings.imageRootSkin+'clearSelection.gif');
+							.replace('%STATE-ID%',state.val);
 					}
 					
 					l=menuSelStatesHtmlTpl.replace('%STATES%',t);
@@ -297,7 +293,6 @@ function printMenu()
 				else
 				if (char.emergent_disabled==true)
 				{
-
 					//var charactercounts=getCharacterCounts(char.id);
 					//console.log(char.label,charactercounts.taxon_count);
 					
@@ -319,7 +314,7 @@ function printMenu()
 						.replace('%SELECTED%',l);
 				}
 			}
-			
+
 			s=menuGroupHtmlTpl
 				.replace(/%ID%/g,item.id)
 				.replace('%LABEL%',item.label)
@@ -347,7 +342,6 @@ function printMenu()
 						.replace('%LABEL%',(state.label ? state.label : ''))
 						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 						.replace('%STATE-ID%',state.val)
-						.replace('%IMG-URL%',matrixsettings.imageRootSkin+'clearSelection.gif');
 				}
 				
 				l=menuSelStatesHtmlTpl.replace('%STATES%',t);
@@ -383,6 +377,7 @@ function printMenu()
 					.replace('%VALUE%',(item.value?' '+item.value:''))
 					.replace('%SELECTED%',l);
 			}
+
 		}
 		
 		buffer.push(s);
@@ -452,11 +447,11 @@ function printResultsExpanded()
 
 			printed++;
 
-			if (++d==matrixsettings.perLine)
-			{
-				s=s+resultsLineEndHtmlTpl;
-				d=0;
-			}
+			// if (++d==matrixsettings.perLine)
+			// {
+			// 	s=s+resultsLineEndHtmlTpl;
+			// 	d=0;
+			// }
 		}
 	}
 
@@ -510,7 +505,6 @@ function printResultsPaginated()
 			}
 		}
 	}
-
 	$('#results-container').html(resultsHtmlTpl.replace('%RESULTS%',s));
 }
 
@@ -633,7 +627,10 @@ function formatResult( data )
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	
-
+		var nameScientific = data.taxon;
+		if (typeof(data.taxon) == 'object') {
+			nameScientific = data.taxon.taxon;
+		}
 	var resultHtml=
 		resultHtmlTpl
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
@@ -657,11 +654,13 @@ function formatResult( data )
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
 					.replace('%TITLE%', __('meer informatie'))
 					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
+					.replace('%NAMESCIENTIFIC%', nameScientific)
+					.replace('%NAMECOMMON%', commonName)
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
 				iconUrlHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
-			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',__('onderscheidende kenmerken')) : "")
+			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',__('kenmerken')) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
 				iconInfoHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
@@ -680,6 +679,12 @@ function formatResult( data )
 			.replace('%SCORE%', matrixsettings.showScores && data.score ? resultScoreHtmlTpl.replace( '%SCORE%', data.score) : "")
 			;
 
+
+	if (data.info != undefined) {
+		resultHtml = resultHtml.replace('%PHOTOGRAPHER%',(data.info.photographer ?  data.info.photographer: ''));
+	} else {
+		resultHtml = resultHtml.replace('%PHOTOGRAPHER%', "");
+	}
 	return resultHtml;
 }
 
@@ -851,10 +856,28 @@ function toggleGroup( id, forceOpen )
 	}
 } 
 
+function showAjaxLoader() {
+	$('#ajaxloader').show();
+}
+
+function hideAjaxLoader() {
+	$('#ajaxloader').hide();
+}
+
+function closeOverlay() {
+	$('#filterDialogContainer').hide();
+}
+
+function showOverlay(label, html) {
+	var container = $('#filterDialogContainer');
+	container.find('.title').html(label);
+	container.find('.content').html(html);
+	container.show();
+}
+
 function showStates(id)
 {
-	setCursor('wait');
-
+	showAjaxLoader();
 	$.ajax({
 		url : 'character_states.php',
 		type: 'GET',
@@ -867,11 +890,10 @@ function showStates(id)
 		success : function( page )
 		{
 			var char=getCharacter(id);
-			showDialog(char.label,page,{showOk:(char.type=='media' || char.type=='text' ? false : true)});
-			setCursor();
+			showOverlay(char.label,page,{showOk:(char.type=='media' || char.type=='text' ? false : true)});
+			hideAjaxLoader();
 		}
 	});
-
 }
 
 function clearStateValue(state)
@@ -896,7 +918,7 @@ function setStateValue(state)
 
 function setState( p )
 {
-	setCursor('wait');
+	showAjaxLoader();
 
 	$.ajax({
 		url : 'ajax_interface.php',
@@ -927,7 +949,7 @@ function setState( p )
 			printResults();
 			printMenu();
 
-			setCursor();
+			hideAjaxLoader();
 		}
 	});
 }
@@ -1060,7 +1082,7 @@ function applyFound()
 
 function setSimilar( p )
 {
-	setCursor('wait');
+	showAjaxLoader();
 
 	$.ajax({
 		url : 'ajax_interface.php',
@@ -1095,7 +1117,7 @@ function setSimilar( p )
 			printResults();
 			printSimilarHeader();
 			window.scroll(0,0);
-			setCursor();
+			hideAjaxLoader();
 			showRestartButton();
 		}
 	});
@@ -1232,9 +1254,12 @@ function setSearch( p )
 {
 	var s=$('#inlineformsearchInput').val();
 	
-	if (s.length==0) return;
+	if (s.length==0) {
+		resetMatrix();
+		return;
+	}
 	
-	setCursor('wait');
+	showAjaxLoader();
 	
 	searchedfor=s;
 
@@ -1270,7 +1295,7 @@ function setSearch( p )
 			printResults();
 			printSearchHeader();
 			window.scroll(0,0);
-			setCursor();
+			hideAjaxLoader();
 			showRestartButton();
 		}
 	});
@@ -1334,27 +1359,25 @@ function prettyPhotoInit()
 
 function bindDialogKeyUp()
 {
-    $("#state-value").keydown(function(event)
+  $("#state-value").keydown(function(event)
 	{
-        // Allow: backspace, delete, tab, escape, and enter
-        if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
-             // Allow: Ctrl+A
-            (event.keyCode==65 && event.ctrlKey===true) || 
-             // Allow: home, end, left, right
-            (event.keyCode>=35 && event.keyCode<=39))
+		// Allow: backspace, delete, tab, escape, and enter
+		if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
+			 // Allow: Ctrl+A
+			(event.keyCode==65 && event.ctrlKey===true) || 
+			 // Allow: home, end, left, right
+			(event.keyCode>=35 && event.keyCode<=39))
 		{
 			// let it happen, don't do anything
 			return;
-        }
-        else
-		{
+    } else {
 			// Ensure that it is a number or a dot and stop the keypress
 			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105) && event.keyCode!=190)
 			{
 				event.preventDefault(); 
 			}   
-        }
-    });
+    }
+  });
 
 	$('#state-value').keyup(function(e)
 	{
@@ -1539,17 +1562,13 @@ function disableShowMoreButton()
 	$('#show-more-button').prop('disabled',true);
 }
 
-function doRemoteLink( url, name )
+function doRemoteLink( url, name, nameScientific, nameCommon )
 {
 	if (matrixsettings.generalSpeciesInfoUrl.length>0)
 	{
-		setCursor('wait');
-
 		var iurl=matrixsettings.generalSpeciesInfoUrl
 			.replace('%PID%',matrixsettings.projectId)
 			.replace('%TAXON%',name);
-			
-		//console.log( iurl );
 			
 		$.ajax({
 			url : iurl,
@@ -1557,14 +1576,13 @@ function doRemoteLink( url, name )
 			dataType: "jsonp",
 			success : function ( data )
 			{
-				//console.dir( data );
-
-				printInfo( 
+				// data = {"pId":1,"taxon":"Ablattaria laevigata","cat":"163","striptags":false,"project":"Nederlands Soortenregister","exported":"2015-11-30T14:33:32+01:00","page":{"title":"Tekst determinatiesleutels","body":"<p><strong>Herkenning <\/strong>Te herkennen aan het zeer kleine formaat, ten hoogste 8 mm. Lijkt op een&nbsp;kleine versie van de gewone oorworm, met achtervleugels die onder de dekschilden&nbsp;uitsteken. De tangen van het mannetje zijn gebogen met enkele kleine knobbels, bij het&nbsp;vrouwtje vrij kort.&nbsp;<\/p>\n\n<p><strong>Voorkomen<\/strong> Waarschijnlijk vrij algemeen in heel Nederland, maar wordt, door het kleine&nbsp;formaat, onopvallende gedrag en afwijkend biotoop, weinig gezien.<\/p>\n\n<p><strong>Biotoop<\/strong> Planten zich voort in broeiende afvalhopen, mesthopen e.d. Worden, t.o.v.&nbsp;andere oorwormen relatief vaak vliegend waargenomen. &nbsp;&nbsp;<\/p>\n\n<p><strong>Fenologie adult<\/strong> Van april tot oktober, met een piek in hoogzomer.<\/p>\n","rdf":null}};
+				showMoreInfoOverlay( 
 					data.page.body, 
-					__('Meer informatie'),
-					url
+					url,
+					nameScientific,
+					nameCommon
 				);
-				setCursor();
 			}
 		});
 	}
@@ -1598,15 +1616,14 @@ function matrixInit()
 
 	setCursor('wait');
 
-	applyScores();
-	sortResults();
-	clearResults();
-	printResults();
-
 	if ( getMenu()=="" ) 
 		initMenu();
 	else
 		printMenu();
 
+	applyScores();
+	sortResults();
+	clearResults();
+	printResults();
 	setCursor();
 }
