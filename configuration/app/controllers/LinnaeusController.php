@@ -343,7 +343,7 @@ class LinnaeusController extends Controller
 			$this->makeLookupList(array(
 				'data'=>$data,
 				'module'=>$this->controllerBaseName,
-				'sortData'=>true
+				'sortData'=>false
 			))
 		);
 
