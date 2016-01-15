@@ -156,8 +156,20 @@ class VersatileExportController extends Controller
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId()
 			),
-			'columns'=>'id,nametype,substring(substring(name_types.nametype,3),1,length(name_types.nametype)-4) as nametype_hr',
-			'fieldAsIndex'=>'nametype'
+			'columns'=>"
+				id,
+				nametype,substring(substring(name_types.nametype,3),1,length(name_types.nametype)-4) as nametype_hr,
+				case
+					when
+						nametype = 'isPreferredNameOf'
+					then 0
+					when
+						nametype = 'isAlternativeNameOf'
+					then 1
+					else 2
+				end as sortfield",
+				'fieldAsIndex'=>'nametype',
+				'order'=>'sortfield,nametype'
 		));
 	}
 
