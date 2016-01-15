@@ -895,15 +895,6 @@ class SpeciesController extends Controller
 			'case' => 'i'
 		);
 
-<<<<<<< HEAD
-=======
-		$sortBy = array(
-			'key' => 'sort_order',
-			'dir' => 'asc',
-			'case' => 'i'
-		);
-
->>>>>>> refs/remotes/origin/development
         $this->customSortArray($mt, $sortBy);
 
 */
