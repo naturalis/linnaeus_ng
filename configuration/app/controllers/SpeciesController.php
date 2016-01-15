@@ -873,7 +873,7 @@ class SpeciesController extends Controller
 			));
 
 
-//            $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
+//          $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
 			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
 
 			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ? $this->controllerSettings['mime_types'][$val['mime_type']] : null;
@@ -885,7 +885,7 @@ class SpeciesController extends Controller
 		}
 
 		$this->loadControllerConfig();
-
+/*
 		$sortBy = array(
 			'key' => array(
 				'mime_show_order',
@@ -895,7 +895,9 @@ class SpeciesController extends Controller
 			'case' => 'i'
 		);
 
-		$this->customSortArray($mt, $sortBy);
+        $this->customSortArray($mt, $sortBy);
+
+*/
 
 		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
 
