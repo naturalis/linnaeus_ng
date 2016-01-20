@@ -178,16 +178,16 @@ class IntroductionController extends Controller
 			$d = $this->getPageHeaders();
 
 			$this->customSortArray($d, array(
-				'label' => 'name',
+				'key' => 'label',
 				'dir' => 'asc',
 				'case' => 'i'
 			));
 
 			foreach((array)$d as $key => $val)
 			{
-				 $this->models->IntroductionPage->update(
+				 $this->models->IntroductionPages->update(
 					array(
-						'show_order' => $key,
+						'show_order' => $key + 1,
 					),
 					array(
 						'project_id' => $this->getCurrentProjectId(),
