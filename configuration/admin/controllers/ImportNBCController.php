@@ -23,7 +23,7 @@ class ImportNBCController extends ImportController
     private $_defaultKingdom = 'Animalia';
     private $_defaultLanguageId = 24; // dutch, hardcoded
     private $_defaultImgExtension = 'jpg';
-    private $_defaultSkinName = 'nbc_default';
+    private $_defaultSkinName = 'responsive_matrix';//'nbc_default';
 	private $_defaultGroupName = 'NBC default soortgroep';
 	private $_nbcColumns = array(
 		'sekse' => 'gender',
