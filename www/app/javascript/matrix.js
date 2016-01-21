@@ -137,10 +137,17 @@ function initMenu()
 function resetMatrix()
 {
 	clearStateValue();
+
+	setScores( null );
+	setResultSet( null );
+	setStates( null );
+
 	openGroups.splice(0,openGroups.length);
 	closeSimilar();
 	closeSearch();
 	printCountHeader();
+
+
 }
 
 function printResults()
@@ -963,8 +970,6 @@ function applyScores()
 	var states=getStates();
 	var dataset=getDataSet();
 	var resultset=getResultSet();
-
-console.dir( scores );
 
 	// scores are sorted in the controller
 	
