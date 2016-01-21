@@ -146,8 +146,6 @@ function resetMatrix()
 	closeSimilar();
 	closeSearch();
 	printCountHeader();
-
-
 }
 
 function printResults()
@@ -970,6 +968,8 @@ function applyScores()
 	var states=getStates();
 	var dataset=getDataSet();
 	var resultset=getResultSet();
+
+	console.dir( scores );
 
 	// scores are sorted in the controller
 	
