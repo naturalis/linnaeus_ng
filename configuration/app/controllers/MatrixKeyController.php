@@ -195,9 +195,7 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('returnText', json_encode($this->getFacetMenu()));
         }	
 		
-        else					
-
-
+        else		
 
 		if ($this->rHasVal('action', 'get_data_set'))
 		{
@@ -292,6 +290,14 @@ class MatrixKeyController extends Controller
 					'characters'=>$this->getCharacterCounts(),
 					'statecount'=>$this->setRemainingStateCount()
 				)));
+		}
+
+
+		else
+		
+		if ($this->rHasVal('action', 'reset_scores'))
+		{
+			$this->resetScores();
 		}
 
 		$this->printPage();	
@@ -1226,6 +1232,11 @@ class MatrixKeyController extends Controller
     private function getScores()
     {
 		return $this->_scores;
+    }
+
+    private function resetScores()
+    {
+		unset($this->_scores);
     }
 	
 	/*
@@ -2307,3 +2318,4 @@ class MatrixKeyController extends Controller
 
 
 }	
+
