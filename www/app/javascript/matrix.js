@@ -964,6 +964,8 @@ function applyScores()
 	var dataset=getDataSet();
 	var resultset=getResultSet();
 
+console.dir( scores );
+
 	// scores are sorted in the controller
 	
 	// clean slate (also include states to be sure it's not a selection that returns zero matches)
