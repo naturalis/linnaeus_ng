@@ -136,27 +136,11 @@ function initMenu()
 
 function resetMatrix()
 {
-	setCursor('wait');
-
-	$.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'reset_scores',
-			time : getTimestamp(),
-			key : matrixsettings.matrixId,
-			p : matrixsettings.projectId
-		}),
-		success : function (data)
-		{
-			clearStateValue();
-			openGroups.splice(0,openGroups.length);
-			closeSimilar();
-			closeSearch();
-			printCountHeader();
-			setCursor();
-		}
-	});
+	clearStateValue();
+	openGroups.splice(0,openGroups.length);
+	closeSimilar();
+	closeSearch();
+	printCountHeader();
 }
 
 function printResults()
