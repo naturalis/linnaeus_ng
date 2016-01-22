@@ -8,14 +8,18 @@
 <body style="font: 12px Verdana; width: 800px;">
 
 <?php
-//	$cfg = 'configuration/admin/configuration.php';
-	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
+	$cfg = '/var/www/linnaeusng/configuration/admin/configuration.php';
+//	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
 
 	// Get external settings
 	if (!file_exists($cfg)) die("Unable to locate $cfg. This script should be in the root of a linnaeus NG-installation");
 	include($cfg);
 	$c = new configuration;
 	$s = $c->getDatabaseSettings();
+
+ 	$d = mysqli_connect($s['host'],$s['user'],$s['password'], $s['database']);
+	mysqli_set_charset($d, 'utf8');
+	mysqli_query($d, 'SET sql_mode = ""');
 
 	$nameTypes = array(
         'isValidNameOf',
@@ -29,11 +33,12 @@
         'isInvalidNameOf'
 	);
 
-	echo '<h3>Update Names</h3>';
+	$q = 'select id from languages where language="scientific" group by language';
+	$r = mysqli_query($d, $q) or die($q . mysqli_error($d));
+	$row = mysqli_fetch_row($r);
+	$scientificId = $row[0];
 
- 	$d = mysqli_connect($s['host'],$s['user'],$s['password'], $s['database']);
-	mysqli_set_charset($d, 'utf8');
-	mysqli_query($d, 'SET sql_mode = ""');
+	echo '<h3>Update Names</h3>';
 
 	if (!isset($_GET['go'])) {
 		echo '<p>This script copies data from the tables Taxa, Synonyms and Commonnames to Names.</p>';
@@ -54,6 +59,9 @@
 
         echo 'Inserting taxa...<br>';
         insertTaxa($projectIds);
+
+        echo 'Updating (infra)species names...<br>';
+        updateTaxa();
 
         echo 'Inserting synonyms...<br>';
         insertSynonyms($projectIds);
@@ -99,6 +107,9 @@
 
 	function clearNames ($projectIds) {
 	    global $d;
+	    mysqli_query($d, 'truncate table names') or die($q . mysqli_error($d));
+	    /*
+	     *
 	    $queries = array(
             "delete from names where
             	taxon_id in (select id from taxa)
@@ -119,18 +130,19 @@
                 mysqli_query($d, $q) or die($q . mysqli_error($d));
             }
         }
+        */
 	}
 
 	function insertTaxa ($projectIds) {
-	    global $d;
+	    global $d, $scientificId;
 	    $q = "insert into names (project_id,taxon_id,language_id,type_id,name,authorship,created)
         	select
         		[id],
         		_a.id,
-        		_c.id,
+            	$scientificId,
         		_b.id,
         		_a.taxon,
-        		_a.author ,
+        		_a.author,
         		now()
         	from
         		taxa _a
@@ -139,26 +151,57 @@
         		on _a.project_id=_b.project_id
         		and _b.nametype = 'isValidNameOf'
 
-        	left join languages _c
-        		on _c.language='scientific'
-
         	where
         		_a.project_id=[id]
         		and _a.taxon is not null";
 
 	    foreach ($projectIds as $id) {
 	        $q = str_replace('[id]', $id, $q);
-            mysqli_query($d, $q) or die($q . mysqli_error($d));
+	        mysqli_query($d, $q) or die($q . mysqli_error($d));
         }
 	}
 
-	function insertSynonyms ($projectIds) {
+	function updateTaxa () {
 	    global $d;
+	    $abbreviations = array();
+	    // First get genera and lower for all projects; species = 74
+	    $q = 'select t1.id, t2.abbreviation from projects_ranks as t1
+            left join ranks as t2 on t2.id = t1.rank_id
+            where t1.rank_id >= 63';
+	    mysqli_query($d, $q) or die($q . mysqli_error($d));
+	    $r = mysqli_query($d, $q) or die($q . mysqli_error($d));
+	    while ($row = mysqli_fetch_assoc($r)) {
+            $rankIds[] = $row['id'];
+            if (!empty($row['abbreviation'])) {
+                $abbreviations[] = $row['abbreviation'];
+            }
+	    }
+	    $q = 'select id, taxon from taxa where rank_id in (' . implode(',', $rankIds) . ') order by project_id';
+	    $r = mysqli_query($d, $q) or die($q . mysqli_error($d));
+		while ($row = mysqli_fetch_assoc($r)) {
+            $parts = explode(' ', $row['taxon']);
+            $q2 = 'update `names` set uninomial = "' . mysqli_real_escape_string($d, $parts[0]) . '"';
+            if (isset($parts[1])) {
+                $q2 .=  ', specific_epithet = "' . mysqli_real_escape_string($d, $parts[1]) . '"';
+            }
+            $infra = 'null';
+		    if (isset($parts[2]) && !in_array($parts[2], $abbreviations)) {
+		        $infra = '"' . mysqli_real_escape_string($d, $parts[2]) . '"';
+            } else if (isset($parts[2]) && in_array($parts[2], $abbreviations) && isset($parts[3])) {
+                $infra = '"' . mysqli_real_escape_string($d, $parts[3]) . '"';
+            }
+            $q2 .=  ', infra_specific_epithet = ' . $infra . ' where taxon_id = '. $row['id'] . ' and type_id = 1';
+		    mysqli_query($d, $q2) or die($q2 . mysqli_error($d));
+		}
+	}
+
+	function insertSynonyms ($projectIds) {
+	    global $d, $scientificId;
 	    $q = "insert into names (project_id,taxon_id,language_id,type_id,name,authorship,created)
         	select
         		[id],
         		_a.taxon_id,
-        		_c.id,
+        		$scientificId,
         		_b.id,
         		_a.synonym,
         		_a.author ,

@@ -7,8 +7,8 @@
 <body style="font: 12px Verdana; width: 800px;">
 
 <?php
-//	$cfg = 'configuration/admin/configuration.php';
-	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
+	$cfg = '/var/www/linnaeusng/configuration/admin/configuration.php';
+//	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
 
 	// Get external settings
 	if (!file_exists($cfg)) die("Unable to locate $cfg. This script should be in the root of a linnaeus NG-installation");
