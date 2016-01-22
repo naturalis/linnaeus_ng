@@ -940,6 +940,8 @@ function setState( p )
 		{
 			var d=$.parseJSON(data);
 
+console.dir(d);
+
 			setScores(d.scores);
 			setStates(d.states);
 			setStateCount(d.statecount);
