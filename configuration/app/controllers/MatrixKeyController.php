@@ -1563,11 +1563,6 @@ class MatrixKeyController extends Controller
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
 
-
-//		print_r($this->models->MatrixTaxonState->q()); die();
-
-
-
 		/*
 			"unknowns" are taxa for which *no* state has been defined within a certain character.
 			note that this is different froam having a *different* state within that character. if
