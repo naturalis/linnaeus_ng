@@ -73,22 +73,35 @@ final class SearchNSRModel extends AbstractModel
 		
 		if ( is_null($project_id) ||  is_null($taxon_id) )
 			return;
-		
+
 		$query="
 			select
-				_a.file_name
-			from
-				%PRE%media_taxon _a, %PRE%media_meta _b
+
+				_m.file_name
+			
+			from  %PRE%media_taxon _m
+
+			left join %PRE%media_meta _meta4
+				on _m.id=_meta4.media_id
+				and _m.project_id=_meta4.project_id
+				and _meta4.sys_label='beeldbankDatumAanmaak'
+			
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+			
 			where
-				_a.project_id=" .$project_id . "
-				and _a.taxon_id=". $taxon_id ."
-				and _a.id=_b.media_id
-				and _a.project_id=_b.project_id
-				and _b.sys_label='beeldbankDatumAanmaak'
-				order by overview_image desc,meta_date desc
+				_m.project_id=".$project_id."
+				and _m.taxon_id=".$taxon_id."
+				and ifnull(_meta9.meta_data,0)!=1
+
+			order by 
+				_m.overview_image desc,_meta4.meta_date desc
+
 			limit 1
 		";
-
+			
 		$d=$this->freeQuery( $query );
 		return (isset($d[0]) && isset($d[0]['file_name']))  ? $d[0]['file_name'] : null;
 
