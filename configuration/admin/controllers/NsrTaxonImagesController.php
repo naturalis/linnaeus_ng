@@ -313,7 +313,7 @@ class NsrTaxonImagesController extends NsrController
 			return;
 
 		$overview=isset($p['overview']) ? $p['overview'] : false;
-		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
+		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image desc,_meta4.meta_date desc';

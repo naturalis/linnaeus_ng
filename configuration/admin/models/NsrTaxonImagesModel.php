@@ -57,7 +57,7 @@ final class NsrTaxonImagesModel extends AbstractModel
 				_z.name as common_name,
 				_j.name,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
-				".($distribution_maps?
+				".($distribution_maps!==false?
 					"_map1.meta_data as meta_map_source,
 					 _map2.meta_data as meta_map_description,": "")."
 
@@ -203,7 +203,7 @@ final class NsrTaxonImagesModel extends AbstractModel
 			where
 				_m.project_id=".$project_id."
 				".($taxon_id ? "and _m.taxon_id=". $this->escapeString( $taxon_id ) : "")."
-				and ifnull(_meta9.meta_data,0)!=".($distribution_maps?'0':'1')."
+				".($distribution_maps!==null ? "and ifnull(_meta9.meta_data,0)!=".($distribution_maps?'0':'1') : "" )."
 				".($overview ? "and _m.overview_image=1" : "")."
 				".($media_id ? "and _m.id=". $this->escapeString( $media_id ) : "")."
 
