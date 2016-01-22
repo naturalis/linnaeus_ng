@@ -940,8 +940,6 @@ function setState( p )
 		{
 			var d=$.parseJSON(data);
 
-console.dir(d);
-
 			setScores(d.scores);
 			setStates(d.states);
 			setStateCount(d.statecount);
@@ -970,8 +968,6 @@ function applyScores()
 	var states=getStates();
 	var dataset=getDataSet();
 	var resultset=getResultSet();
-
-	console.dir( scores );
 
 	// scores are sorted in the controller
 	
