@@ -1564,8 +1564,7 @@ class MatrixKeyController extends Controller
         $results = $this->models->MatrixTaxonState->freeQuery($q);
 
 
-		print_r($this->models->MatrixTaxonState->q());
-		die();
+//		print_r($this->models->MatrixTaxonState->q()); die();
 
 
 
