@@ -306,7 +306,7 @@ class WebservicesModel extends AbstractModel
 				%PRE%media_meta _a
 
 			left join %PRE%media_meta _meta9
-				on _a.id=_meta9.media_id
+				on _a.media_id=_meta9.media_id
 				and _a.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
 
