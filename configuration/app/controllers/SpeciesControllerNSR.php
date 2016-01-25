@@ -1263,7 +1263,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getDistributionMaps($id)
 	{
-		return $this->getTaxonMedia(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing','limit'=>1));
+		return $this->getTaxonMedia(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing'));
 	}
 
 	private function getVerspreidingsatlasData($id)
