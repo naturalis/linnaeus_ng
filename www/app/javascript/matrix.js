@@ -407,7 +407,9 @@ function printMenu()
 	else
 	{
 		showRestartButton();
-	}	
+	}
+	
+	bindSecretlyClickable();
 	
 	if (typeof hook_postPrintMenu == 'function') { hook_postPrintMenu(); }
 	
@@ -515,6 +517,8 @@ function printResultsPaginated()
 
 function formatResult( data )
 {
+	console.dir( data );
+	
 	if ( data.type=='taxon' )
 	{
 		var sciName='<i>'+data.taxon+'</i>';
@@ -1615,20 +1619,33 @@ function printInfo( info, title, url )
 	}
 }
 
+function bindSecretlyClickable()
+{
+	$('.secretlyclickable').on('dblclick',function(event)
+	{
+		if (event.ctrlKey)
+		{
+			showStates($(this).attr('data-id'));
+		}
+	});
+		
+}
+
 function matrixInit()
 {
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
 
 	setCursor('wait');
+	applyScores();
 
 	if ( getMenu()=="" ) 
 		initMenu();
 	else
 		printMenu();
 
-	applyScores();
 	sortResults();
 	clearResults();
 	printResults();
 	setCursor();
+	bindSecretlyClickable();
 }

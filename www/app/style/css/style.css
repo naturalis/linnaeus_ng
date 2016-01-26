@@ -40,6 +40,7 @@ table {
   border-spacing: 0; }
 
 .imageOverlayContainer p {
+  line-height: 1.5;
   margin-bottom: 8px; }
 
 #header {

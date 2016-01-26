@@ -1,0 +1,15 @@
+<svg id="List_icon" data-name="List icon" xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #009ee0;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" width="38" height="16"/>
+  <rect class="cls-1" y="22" width="38" height="16"/>
+  <rect class="cls-1" y="44" width="38" height="16"/>
+  <rect class="cls-1" x="44" width="16" height="16"/>
+  <rect class="cls-1" x="44" y="22" width="16" height="16"/>
+  <rect class="cls-1" x="44" y="44" width="16" height="16"/>
+</svg>

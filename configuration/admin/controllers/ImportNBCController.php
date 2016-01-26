@@ -551,6 +551,22 @@ class ImportNBCController extends ImportController
 				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
 			}
+			
+			// current matrix always becomes the default
+			$this->models->Matrix->update(
+				array('default' => '0'),
+				array('project_id' => $this->getNewProjectId())
+			);
+
+			$this->models->Matrix->update(
+				array('default' => '1'),
+				array(
+					'project_id' => $this->getNewProjectId(), 
+					'id' => $mId
+				)
+			);
+
+
 
             $data = $this->storeCharacterGroups($_SESSION['admin']['system']['import']['data'], $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['chargroups'] . ' character groups.');
@@ -872,6 +888,7 @@ class ImportNBCController extends ImportController
 							)
 						);	
 					
+						/*
 						if ($d && count((array)$d)>1)
 							$this->addError(
 								$this->storeError(
@@ -882,13 +899,16 @@ class ImportNBCController extends ImportController
 									'Matrix states'
 								)
 							);
+						*/
 						
 					}
 
 					// if a char is found...					
-					if (!empty($d[0]['characteristic_id'])) {
+					//if (!empty($d[0]['characteristic_id'])) {
+					foreach( array($d) as $char )
+					{
 
-						$cId = $d[0]['characteristic_id'];
+						$cId=$char['characteristic_id'];
 
 						// ...find all its states
 						$states = $this->models->CharacteristicState->_get(array(
