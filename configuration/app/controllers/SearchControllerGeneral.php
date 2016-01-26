@@ -119,8 +119,7 @@ class SearchControllerGeneral extends SearchController
 	);
 
 	public $jsToLoad = array('all' => array(
-		'main.js',
-		'search.js'
+		'main.js'
 	));
 
 
@@ -132,20 +131,20 @@ class SearchControllerGeneral extends SearchController
 
 	private function initialize()
 	{
-		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3)); 
-		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50)); 
+		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3));
+		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50));
 
 		$this->_excerptPostMatchLength=
 			null !== $this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) ?
-				$this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) : 
+				$this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) :
 				35;
-		$this->_excerptPreMatchLength = 
+		$this->_excerptPreMatchLength =
 			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) ?
-				$this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) : 
+				$this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) :
 				35;
-		$this->_excerptPrePostMatchString = 
-			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ? 
-				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) : 
+		$this->_excerptPrePostMatchString =
+			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ?
+				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) :
 				'';
 
 		$this->_searchResultSort=
@@ -195,7 +194,7 @@ class SearchControllerGeneral extends SearchController
 
 			if ($this->validateSearchString($this->rGetVal('search')))
 			{
-				
+
 				if ($this->rHasVal('extended','1'))
 				{
 					$results =
