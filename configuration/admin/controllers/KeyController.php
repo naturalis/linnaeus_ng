@@ -1137,12 +1137,10 @@ class KeyController extends Controller
     {
         if (is_null($id))
 		{
-            $step=$this->getKeystep($this->getStartKeystepId());
+            $id = $this->getStartKeystepId();
         }
-        else
-		{
-            $step=$this->getKeystep($id);
-        }
+
+        $step=$this->getKeystep($id);
 
 		if (!isset($this->_tempList[$step['id']]))
 		{
