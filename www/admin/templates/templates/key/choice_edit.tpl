@@ -23,8 +23,8 @@
 		<td>{t}Text:{/t}</td>
 		<td colspan="2">
 			<textarea
-				name="contentDefault" 
-				id="contentDefault" 
+				name="contentDefault"
+				id="contentDefault"
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('default')" /></textarea>
 		</td>
@@ -40,8 +40,8 @@
 		<td></td>
 		<td>
 			<textarea
-				name="contentOther" 
-				id="contentOther" 
+				name="contentOther"
+				id="contentOther"
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('other')" /></textarea>
 		</td>
@@ -54,7 +54,7 @@
 		{if $data.choice_img}
 			<img
 				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}','{$data.choice_img}');"
-				src="{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}" 
+				src="{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}"
 				class="key-choice-image-normal" /><br />
 			<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 			{if $data.choice_image_params!=''}
@@ -79,7 +79,7 @@
 				</option>
 			{/if}
 				{foreach $steps v i}
-				<option value="{$v.id}"{if $steps[i].id==$data.res_keystep_id} selected="selected"{/if}>{$v.number}. {$v.title}</option>
+				<option value="{$v.id}"{if $v.id==$data.res_keystep_id} selected="selected"{/if}>{$v.number}. {$v.title}</option>
 				{/foreach}
 			</select>
 			({t}step{/t})
@@ -113,7 +113,7 @@
 	<tr style="vertical-align:top">
 		<td colspan="3">
 			<input
-				type="button" 
+				type="button"
 				onclick="
 					keyCallRemoveDeadEndChoice({$data.id});
 					if (keyChoiceContentCheck()) {
@@ -123,7 +123,7 @@
 						{else}
 						keySaveChoiceContent('default',$('#theForm').submit());
 						{/if}
-					} " 
+					} "
 				value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 		</td>
