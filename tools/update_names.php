@@ -9,7 +9,7 @@
 
 <?php
 	$cfg = '/var/www/linnaeusng/configuration/admin/configuration.php';
-//	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
+	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
 
 	// Get external settings
 	if (!file_exists($cfg)) die("Unable to locate $cfg. This script should be in the root of a linnaeus NG-installation");
@@ -212,9 +212,6 @@
         	left join name_types _b
         		on _a.project_id=_b.project_id
         		and _b.nametype = 'isSynonymOf'
-
-        	left join languages _c
-        		on _c.language='scientific'
 
         	where
         		_a.project_id=[id]
