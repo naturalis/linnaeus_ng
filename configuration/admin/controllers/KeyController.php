@@ -558,7 +558,10 @@ class KeyController extends Controller
             $step = $this->getKeystep($res['newStepId']);
 
 			// remove last keyPath entry
-			array_pop($_SESSION['admin']['system']['keyPath']);
+			//array_pop($_SESSION['admin']['system']['keyPath']);
+			$path = $this->getKeyPath();
+            unset($path[count($path) - 1]);
+            $this->setKeyPath($path);
 
             $this->updateKeyPath(
             array(
