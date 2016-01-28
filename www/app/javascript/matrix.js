@@ -517,7 +517,7 @@ function printResultsPaginated()
 
 function formatResult( data )
 {
-	console.dir( data );
+	//console.dir( data );
 	
 	if ( data.type=='taxon' )
 	{
