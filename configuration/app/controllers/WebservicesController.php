@@ -7,6 +7,7 @@ class WebservicesController extends Controller
     private $_usage=null;
 	private $_fromDate=null;
 	private $_taxonId=null;
+	private $_taxon=null;
 	private $_project=null;
 	private $_matchType=null;
 	private $_taxonUrl='/linnaeus_ng/app/views/species/nsr_taxon.php?epi=1&id=%s';
@@ -175,7 +176,7 @@ parameters:
 			return;
 		}
 
-		$this->checkTaxonId();
+		$this->resolveTaxonName();
 		
 		if (is_null($this->getTaxonId())) {
 			$this->sendErrors();
@@ -327,7 +328,7 @@ parameters:
 			return;
 		}
 		
-		$this->checkTaxonId();
+		$this->resolveTaxonName();
 
 		if (is_null($this->getTaxonId()))
 		{
@@ -384,11 +385,15 @@ parameters:
 				}
 			}
 		}
+		
+		$taxon=$this->getTaxon();
 
 		$result=
 			array(
 				'pId'=>$this->getCurrentProjectId(),
-				'taxon'=>$this->rGetVal('taxon'),
+				'request'=>$this->rGetVal('taxon'),
+				'taxon'=>$taxon['taxon'],
+				'match'=>$this->getMatchType(),
 				'cat'=>$this->rGetVal('cat'),
 				'striptags'=>$this->rHasVal('striptags','1'),
 			);
@@ -1163,7 +1168,7 @@ parameters:
 		return $this->_fromDate;
 	}
 
-	private function checkTaxonId()
+	private function resolveTaxonName()
 	{
 		if (!$this->rHasVal('taxon'))
 		{
@@ -1185,7 +1190,7 @@ parameters:
 
 			if (!$t)
 			{
-				$this->setMatchType('name only');
+				$this->setMatchType('valid name without authorship');
 
 				$t = $this->models->Names->freeQuery("
 					select
@@ -1202,12 +1207,39 @@ parameters:
 		
 			if (!$t)
 			{
+				$this->setMatchType('other name type (literal)');
+
+				$t = $this->models->Names->freeQuery("
+					select
+						_a.taxon_id as id, _a.name
+					from %PRE%names _a
+					left join %PRE%name_types _b 
+						on _a.type_id=_b.id and _a.project_id=_b.project_id
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.name='". mysql_real_escape_string($taxon) ."'
+						and _b.nametype != 'isValidNameOf'"
+				);
+			}
+		
+			if (!$t)
+			{
 				$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
 			} 
 			else
 			{
 				$this->setTaxonId($t[0]['id']);
-				return $t;
+				
+				$t = $this->models->Taxon->_get(array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $this->getTaxonId()
+					)
+				));
+				
+				$this->setTaxon($t[0]);
+				
+				//return $t;
 			}
 		}
 		return false;
@@ -1245,7 +1277,6 @@ parameters:
 	}
 
 
-
 	private function setTaxonId($id)
 	{
 		$this->_taxonId=$id;
@@ -1256,6 +1287,15 @@ parameters:
 		return $this->_taxonId;
 	}
 	
+	private function setTaxon($taxon)
+	{
+		$this->_taxon=$taxon;
+	}
+
+	private function getTaxon()
+	{
+		return $this->_taxon;
+	}	
 
 	private function setMatchType($t)
 	{
