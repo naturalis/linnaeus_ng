@@ -633,12 +633,12 @@ class MatrixKeyController extends Controller
 			$d=$this->getTaxonById( $val['taxon_id'] );
 			
 			if (
-				($this->settings->allow_empty_species) ||
+				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species) ||
 				(!isset($val['is_empty'])) ||
 				(!$this->settings->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
-				if ($this->settings->suppress_details!=1)
+				if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
 				{
 					$d['states']=$this->getTaxonStates( $val['taxon_id'] );
 				}
@@ -697,7 +697,7 @@ class MatrixKeyController extends Controller
 		{
 			$m[$key]['taxon']=$this->getTaxonById( $val['taxon_id'] );
 			$m[$key]['gender']=$this->extractGenderTag( $val['label'] );
-			if ($this->settings->suppress_details!=1)
+			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
 			{
 				$m[$key]['states']=$this->getVariationStates( $val['id'] );
 			}
@@ -2241,48 +2241,58 @@ class MatrixKeyController extends Controller
 
 	private function setIntroductionLinks()
     {
-		$a=$this->models->ContentIntroduction->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->settings->introduction_topic_colophon_citation
-				),
-				'columns'=>'page_id,topic,content'
-			)
-		);
+	
+		if ( isset($this->settings->introduction_topic_colophon_citation) )
+		{
+			$a=$this->models->ContentIntroduction->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'topic' => $this->settings->introduction_topic_colophon_citation
+					),
+					'columns'=>'page_id,topic,content'
+				)
+			);
+			
+			$content_a=strip_tags($a[0]['content']);
+			$this->_introductionLinks[$this->settings->introduction_topic_colophon_citation]=($a && (!empty($content_a)) ? $a[0] : null);
+		}
 
-		$b=$this->models->ContentIntroduction->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->settings->introduction_topic_versions
-				),
-				'columns'=>'page_id,topic,content'
-			)
-		);
+		if ( isset($this->settings->introduction_topic_versions) )
+		{
+			$b=$this->models->ContentIntroduction->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'topic' => $this->settings->introduction_topic_versions
+					),
+					'columns'=>'page_id,topic,content'
+				)
+			);
+	
+			$content_b=strip_tags($b[0]['content']);
+			$this->_introductionLinks[$this->settings->introduction_topic_versions]=($b && (!empty($content_b)) ? $b[0] : null);
+		}
 
-		$c=$this->models->ContentIntroduction->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'topic' => $this->settings->introduction_topic_inline_info
-				),
-				'columns'=>'page_id,topic,content'
-			)
-		);
+		if ( isset($this->settings->introduction_topic_inline_info) )
+		{
+			$c=$this->models->ContentIntroduction->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'topic' => $this->settings->introduction_topic_inline_info
+					),
+					'columns'=>'page_id,topic,content'
+				)
+			);
+	
+			$content_c=strip_tags($c[0]['content']);
+			$this->_introductionLinks[$this->settings->introduction_topic_inline_info]=($c && (!empty($content_c)) ? $c[0] : null);
+		}
 
-		$content_a=strip_tags($a[0]['content']);
-		$content_b=strip_tags($b[0]['content']);
-		$content_c=strip_tags($c[0]['content']);
-
-		$this->_introductionLinks=array(
-			$this->settings->introduction_topic_colophon_citation=>$a && (!empty($content_a)) ? $a[0] : null,
-			$this->settings->introduction_topic_versions=>$b && (!empty($content_b)) ? $b[0] : null,
-			$this->settings->introduction_topic_inline_info=>$c && (!empty($content_c)) ? $c[0] : null,
-		);
     }
 	
 	private function getIntroductionLinks()
