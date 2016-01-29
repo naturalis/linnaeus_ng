@@ -38,7 +38,6 @@
 $(document).ready(function()
 {
 
-	
 	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
 	
 	__translations = [

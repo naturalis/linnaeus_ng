@@ -32,7 +32,7 @@ function closeImageOverlay() {
 }
 
 function showMoreInfoOverlay(info, url, nameScientific, nameCommon) {
-	var moreInfo = "<div><a href='"+url+"' target='_blank'>Meer informatie</a></div>";
+	var moreInfo = "<div><a href='"+url+"' target='_blank'>"+labels.popup_species_link+"</a></div>";
 	$('.imageOverlayContainer .name').html('<span class="result-name-scientific" title="'+nameScientific+'"><i>'+nameScientific+'</i></span><br><span class="result-name-common" title="'+nameCommon+'">'+nameCommon+'</span>');
 	$('.imageOverlayContainer .image').html(info + moreInfo);
 	$('.imageOverlayContainer .version').html('');
