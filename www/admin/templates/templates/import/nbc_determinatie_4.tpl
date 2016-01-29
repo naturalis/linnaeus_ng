@@ -11,20 +11,27 @@
 <p>
 Map extra fields:
 <table cellpadding="0" cellspacing="0">
+
 {foreach from=$hidden item=h key=k}
 {if ($nbcColumns[$k] && $nbcColumns[$k]!='-') || !$nbcColumns[$k]}
+
+{assign var=bla value=$nbcColumns[$k]}
+{if $bla=='' && $k|in_array:$nbcColumns}
+{assign var=bla value=$k}
+{/if}
+
 	<tr>
     	<td>{$k}</td>
         <td>
-        	<input type="text" name="nbcColumns[{$k}]" value="{$nbcColumns[$k]}" {if $nbcColumns[$k]==''} style="background:#fcc"{/if}>
+        	<input type="text" name="nbcColumns[{$k}]" value="{$bla}" {if $bla==''} style="background:#fcc"{/if}>
 		</td>
 	</tr>
 {/if}
 {/foreach}
 </table>
 <p>
-Possible values: {foreach from=$nbcColumns item=h key=k}
-{if $h!='-'}"{$h}", {/if}
+Possible values: {foreach from=$nbcColumns|@array_flip item=h key=k}
+{if $k!='-'}"{$k}", {/if}
 {/foreach}
 </p>
 
