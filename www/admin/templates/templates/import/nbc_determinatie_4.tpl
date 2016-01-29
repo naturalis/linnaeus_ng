@@ -15,15 +15,15 @@ Map extra fields:
 {foreach from=$hidden item=h key=k}
 {if ($nbcColumns[$k] && $nbcColumns[$k]!='-') || !$nbcColumns[$k]}
 
-{assign var=bla value=$nbcColumns[$k]}
-{if $bla=='' && $k|in_array:$nbcColumns}
-{assign var=bla value=$k}
+{assign var=val value=$nbcColumns[$k]}
+{if $val=='' && $k|in_array:$nbcColumns}
+{assign var=val value=$k}
 {/if}
 
 	<tr>
     	<td>{$k}</td>
         <td>
-        	<input type="text" name="nbcColumns[{$k}]" value="{$bla}" {if $bla==''} style="background:#fcc"{/if}>
+        	<input type="text" name="nbcColumns[{$k}]" value="{$val}" {if $val==''} style="background:#fcc"{/if}>
 		</td>
 	</tr>
 {/if}
