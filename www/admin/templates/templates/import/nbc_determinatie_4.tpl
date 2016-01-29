@@ -19,7 +19,6 @@ Map extra fields:
 {if $bla=='' && $k|in_array:$nbcColumns}
 {assign var=bla value=$k}
 {/if}
-
 	<tr>
     	<td>{$k}</td>
         <td>
