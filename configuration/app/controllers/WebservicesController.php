@@ -393,6 +393,7 @@ parameters:
 				'pId'=>$this->getCurrentProjectId(),
 				'request'=>$this->rGetVal('taxon'),
 				'taxon'=>$taxon['taxon'],
+				'nametype'=>$taxon['nametype'],
 				'match'=>$this->getMatchType(),
 				'cat'=>$this->rGetVal('cat'),
 				'striptags'=>$this->rHasVal('striptags','1'),
@@ -1188,13 +1189,15 @@ parameters:
 				)
 			));
 
+			if ($t) $nametype='isValidNameOf';
+
 			if (!$t)
 			{
 				$this->setMatchType('valid name without authorship');
 
 				$t = $this->models->Names->freeQuery("
 					select
-						_a.taxon_id as id, _a.name
+						_a.taxon_id as id, _a.name, _b.nametype
 					from %PRE%names _a
 					left join %PRE%name_types _b 
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
@@ -1203,15 +1206,17 @@ parameters:
 						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
 						and _b.nametype = 'isValidNameOf'"
 				);
+				
+				if ($t) $nametype='isValidNameOf';
 			}
-		
+
 			if (!$t)
 			{
 				$this->setMatchType('other name type (literal)');
 
 				$t = $this->models->Names->freeQuery("
 					select
-						_a.taxon_id as id, _a.name
+						_a.taxon_id as id, _a.name, _b.nametype
 					from %PRE%names _a
 					left join %PRE%name_types _b 
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
@@ -1220,11 +1225,33 @@ parameters:
 						and _a.name='". mysql_real_escape_string($taxon) ."'
 						and _b.nametype != 'isValidNameOf'"
 				);
+
+				if ($t) $nametype=$t[0]['nametype'];
+			}
+
+			if (!$t)
+			{
+				$this->setMatchType('other name type (without authorship)');
+
+				$t = $this->models->Names->freeQuery("
+					select
+						_a.taxon_id as id, _a.name, _b.nametype
+					from %PRE%names _a
+					left join %PRE%name_types _b 
+						on _a.type_id=_b.id and _a.project_id=_b.project_id
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
+						and _b.nametype != 'isValidNameOf'"
+				);
+
+				if ($t) $nametype=$t[0]['nametype'];
 			}
 		
 			if (!$t)
 			{
 				$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
+				$nametype=null;
 			} 
 			else
 			{
@@ -1236,12 +1263,14 @@ parameters:
 						'id' => $this->getTaxonId()
 					)
 				));
-				
+
+				$t[0]['nametype']=strtolower(rtrim(ltrim($nametype,'is'),'Of'));
+
 				$this->setTaxon($t[0]);
-				
-				//return $t;
+
 			}
 		}
+
 		return false;
 	}
 
