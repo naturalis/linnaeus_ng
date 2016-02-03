@@ -75,7 +75,7 @@ class AbstractModel extends BaseClass
 
     public function setRetainQuery ($state)
     {
-        if (is_bool($state)) $this->retainQuery = $state;
+        if (is_bool($state)) $this->_retainQuery = $state;
     }
 
     public function freeQuery($params)
