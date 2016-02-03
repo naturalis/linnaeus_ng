@@ -483,6 +483,9 @@ class SpeciesController extends Controller
 
     public function editAction()
     {
+	
+		die( 'disabled (will be replaced with NSR-style editor)' );
+	
         $this->checkAuthorisation();
 
         if (!$this->rHasId())
@@ -746,6 +749,9 @@ class SpeciesController extends Controller
 
     public function newAction ()
     {
+		
+		die( 'disabled (will be replaced with NSR-style editor)' );
+	
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('New taxon'));
@@ -1028,7 +1034,10 @@ class SpeciesController extends Controller
 
     public function orphansAction ()
     {
-        $this->checkAuthorisation();
+
+		die( 'disabled (should be replaced with NSR-style editor)' );
+	 
+	    $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Orphaned taxa'));
 
@@ -2123,6 +2132,9 @@ class SpeciesController extends Controller
 
     public function collaboratorsAction ()
     {
+		
+		die( 'disabled (might be replaced with new rights-function)' );
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Assign taxa to collaborators'));
@@ -3224,6 +3236,9 @@ class SpeciesController extends Controller
 
     private function deleteTaxonBranch ($id)
     {
+
+		die( 'disabled (will be replaced with NSR-style editor)' );
+
         if (!$id)
             return;
 
