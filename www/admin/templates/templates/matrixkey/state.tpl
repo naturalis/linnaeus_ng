@@ -8,7 +8,7 @@
 <input type="hidden" name="char" value="{$characteristic.id}" />
 <input type="hidden" name="type" value="{$characteristic.type.name}" />
 <p>
-{t _s1=$characteristic.type.name _s2=$characteristic.label _s3=$matrix.sys_name}Editing a state of the type "%s" for the character "%s" of matrix "%s".{/t}
+{t _s1=$characteristic.type.name _s2=$characteristic.label _s3=$matrix.label}Editing a state of the type "%s" for the character "%s" of matrix "%s".{/t}
 </p>
 <table>
 	<tr>

@@ -9,7 +9,7 @@
 
 <div id="page-main">
 <p>
-{t _s1=$matrix.sys_name}Editing matrix "%s"{/t}<br />
+{t _s1=$matrix.label}Editing matrix "%s"{/t}<br />
 {t _s1=$characteristic.label}Sort states of characteristic "%s".{/t}
 </p>
 {t}Drag and drop to sort, click 'save' to store new order.{/t}<br />

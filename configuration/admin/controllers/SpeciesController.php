@@ -196,10 +196,7 @@ class SpeciesController extends Controller
 
 		$id=$this->getFirstTaxonId();
 
-		if (!$this->userHasTaxon($id))
-			$this->redirect('collaborators.php');
-		else
-			$this->redirect('taxon.php?id='.$id);
+		$this->redirect('taxon.php?id='.$id);
 	}
 
 
@@ -490,9 +487,6 @@ class SpeciesController extends Controller
 
         if (!$this->rHasId())
             $this->redirect('new.php');
-
-        if (!$this->userHasTaxon($this->rGetId()))
-            $this->redirect('index.php');
 
         $data = $this->getTaxonById();
 

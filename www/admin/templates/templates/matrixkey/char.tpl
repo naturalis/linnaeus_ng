@@ -4,9 +4,9 @@
 <p>
 <span class="matrix-header">
 {if $characteristic.label}
-{t _s1=$characteristic.label _s2=$matrix.sys_name}Editing character "%s" for matrix "%s"{/t}
+{t _s1=$characteristic.label _s2=$matrix.label}Editing character "%s" for matrix "%s"{/t}
 {else}
-{t _s1=$matrix.sys_name}New charcteristic for matrix "%s"{/t}
+{t _s1=$matrix.label}New charcteristic for matrix "%s"{/t}
 {/if}
 </span>
 </p>

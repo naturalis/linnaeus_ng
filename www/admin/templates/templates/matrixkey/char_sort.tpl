@@ -3,7 +3,7 @@
 <div id="page-main">
 <p>
 <span class="matrix-header">
-	{t _s1=$matrix.sys_name}Editing matrix "%s"{/t}
+	{t _s1=$matrix.label}Editing matrix "%s"{/t}
 </span>
 </p>
 {t}Sort characters{/t}
