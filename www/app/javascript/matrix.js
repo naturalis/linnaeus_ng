@@ -521,13 +521,15 @@ function formatResult( data )
 	
 	if ( data.type=='taxon' )
 	{
-		var sciName='<i>'+data.taxon+'</i>';
+		var sciName=data.taxon;
+		var sciNameDisplay='<i>'+sciName+'</i>';
 		var commonName=data.commonname ? data.commonname : "";
 	}
 	else
 	if ( data.type=='variation' )
 	{
-		var sciName='<i>'+data.taxon.taxon+'</i>';
+		var sciName=data.taxon.taxon;
+		var sciNameDisplay='<i>'+sciName+'</i>';
 		// variation labels might contain a repetition of the full common name ("Bloedrode smalboktor vrouw") which is filtered out
 		if (data.label && data.taxon.commonname) data.label=data.label.replace(data.taxon.commonname,'').trim();
 		var commonName=(data.taxon.commonname ? data.taxon.commonname : "" ) + " " + (data.label ? "(" + data.label + ")" : "");
@@ -536,8 +538,8 @@ function formatResult( data )
 	else
 	if ( data.type=='matrix' )
 	{
-		//var sciName=data.taxon.label;
-		var sciName='<i>'+data.label+'</i>';
+		//var sciName=data.abel;
+		var sciNameDisplay='<i>'+data.label+'</i>';
 		var commonName="";
 	}
 
@@ -616,7 +618,7 @@ function formatResult( data )
 
 	var photoLabelHtml=
 		photoLabelHtmlTpl
-			.replace('%SCI-NAME%',sciName)
+			.replace('%SCI-NAME%',sciNameDisplay)
 			.replace('%GENDER%',(data.gender && data.gender.gender ?
 				photoLabelGenderHtmlTpl
 					.replace('%IMG-SRC%', matrixsettings.imageRootSkin + data.gender.gender+'.png')
@@ -636,10 +638,6 @@ function formatResult( data )
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	
-		var nameScientific = data.taxon;
-		if (typeof(data.taxon) == 'object') {
-			nameScientific = data.taxon.taxon;
-		}
 	var resultHtml=
 		resultHtmlTpl
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
@@ -650,8 +648,8 @@ function formatResult( data )
 					.replace('%GENDER-LABEL%', data.gender.gender_label) 
 				: "" )
 			)
-			.replace('%SCI-NAME%', sciName)
-			.replace('%SCI-NAME-TITLE%', addSlashes(stripTags(sciName)) )
+			.replace('%SCI-NAME%', sciNameDisplay)
+			.replace('%SCI-NAME-TITLE%', addSlashes(sciName) )
 			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
 				matrixLinkHtmlTpl.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
 				: ""))
@@ -662,8 +660,8 @@ function formatResult( data )
 				remoteLinkClickHtmlTpl
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
 					.replace('%TITLE%', __('meer informatie'))
-					.replace('%SCI-NAME%', encodeURIComponent(data.taxon))
-					.replace('%NAMESCIENTIFIC%', nameScientific)
+					.replace('%SCI-NAME%', encodeURIComponent(sciName))
+					.replace('%NAMESCIENTIFIC%', sciName)
 					.replace('%NAMECOMMON%', commonName)
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
