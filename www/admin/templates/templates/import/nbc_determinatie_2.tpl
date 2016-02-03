@@ -31,7 +31,7 @@
 			<label for="id4">Keep the project, just delete matrix-data before importing new data (<u>choose this when first uploading a new matrix into an existing project</u>).
 		</label><br />
 		<input type="radio" id="id2" name="action" value="merge_data" checked="checked" />
-			<label for="id2">Keep the project and keep all data (<u>choose this when uploading the next matrices from a multi-matrix key</u>)<br />
+			<label for="id2">Keep the project and keep all data (<u>choose this when updating the data of an existing matrix</u> or <u>when uploading the next matrices from a multi-matrix key</u>)<br />
 			(you'll get the chance to replace the specific matrix later on in this wizard)
 		</label><br />
 		<input type="radio" id="id1" name="action" value="replace_data" />
