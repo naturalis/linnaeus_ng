@@ -210,7 +210,7 @@ class MatrixKeyController extends Controller
 
         $matrix=$this->getMatrix($this->getCurrentMatrixId());
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['sys_name']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
 
         if ($this->rHasVal('char')) $this->smarty->assign('activeCharacteristic', $this->rGetVal('char'));
         $this->smarty->assign('characteristics', $this->getCharacteristics());
@@ -259,7 +259,7 @@ class MatrixKeyController extends Controller
 
         $matrix = $this->getMatrix($this->getCurrentMatrixId());
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['sys_name']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
 
         $this->smarty->assign('characteristics', $this->getCharacteristics());
         $this->smarty->assign('matrix', $matrix);
@@ -279,7 +279,7 @@ class MatrixKeyController extends Controller
 
         $matrix=$this->getMatrix($this->getCurrentMatrixId());
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['sys_name']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
 
         if ($this->rHasVal('delete') && !$this->isFormResubmit())
 		{
@@ -341,7 +341,7 @@ class MatrixKeyController extends Controller
 
         $matrix = $this->getMatrix($this->getCurrentMatrixId());
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['sys_name']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
 
 		if ($this->rHasVal('order') && !$this->isFormResubmit())
 		{
@@ -492,10 +492,14 @@ class MatrixKeyController extends Controller
             $this->addMessage(sprintf($this->translate('Taxon added.')));
         }
 
-        $this->newGetTaxonTree();
+        $taxa=$this->models->MatrixkeyModel->getAllTaxaAndMatrixPresence(
+			array(
+                'project_id' => $this->getCurrentProjectId(),
+                'matrix_id' => $this->getCurrentMatrixId()
+			));
+//		q($taxa,1);
 
-        if (isset($this->treeList))
-            $this->smarty->assign('taxa', $this->treeList);
+		$this->smarty->assign('taxa', $taxa);
 
         if ($this->_useVariations)
             $this->smarty->assign('variations', $this->getVariations());
@@ -696,7 +700,7 @@ class MatrixKeyController extends Controller
 
         $matrix = $this->getMatrix($mId);
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['sys_name']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
         $this->smarty->assign('characteristic', $this->getCharacteristic($this->rGetVal('sId')));
         $this->smarty->assign('states', $this->getCharacteristicStates($this->rGetVal('sId')));
         $this->smarty->assign('matrix', $matrix);
@@ -706,11 +710,9 @@ class MatrixKeyController extends Controller
 
     public function linksAction ()
     {
+        if ($this->getCurrentMatrixId() == null) $this->redirect('matrices.php');
+
         $this->checkAuthorisation();
-
-        if ($this->getCurrentMatrixId() == null)
-            $this->redirect('matrices.php');
-
         $this->setPageName($this->translate('Taxon-state links'));
 
         if ($this->rHasVal('taxon'))
@@ -724,13 +726,19 @@ class MatrixKeyController extends Controller
                 'case' => 'i'
             ));
         }
+		
+		$taxa=$this->models->MatrixkeyModel->getTaxaInMatrix(
+			array(
+                'project_id' => $this->getCurrentProjectId(),
+                'matrix_id' => $this->getCurrentMatrixId()
+			));
 
-        $this->getTaxonTree();
 
-        if (isset($this->treeList)) $this->smarty->assign('taxa', $this->getTaxa());
-        if (isset($links)) $this->smarty->assign('links', $links);
-        if ($this->rHasVal('taxon'))  $this->smarty->assign('taxon', $this->rGetVal('taxon'));
         $this->smarty->assign('matrix', $this->getMatrix($this->getCurrentMatrixId()));
+		$this->smarty->assign('taxa', $taxa );
+
+        if ( isset($links) ) $this->smarty->assign('links', $links);
+        if ($this->rHasVal('taxon'))  $this->smarty->assign('taxon', $this->rGetVal('taxon'));
 
         $this->printPage();
     }
@@ -912,7 +920,8 @@ class MatrixKeyController extends Controller
             'fieldAsIndex' => 'language_id'
         ));
 
-        $m[0]['names'] = $mn;
+        $m[0]['names']=$mn;
+        $m[0]['label']=isset($mn[$this->getDefaultProjectLanguage()]['name']) ? $mn[$this->getDefaultProjectLanguage()]['name'] : $m[0]['sys_name'];
 
         return $m[0];
     }
@@ -1751,29 +1760,12 @@ class MatrixKeyController extends Controller
 
     private function getTaxa()
     {
-        $mt = $this->models->MatricesTaxa->_get(
-        array(
-            'id' => array(
+		$t=$this->models->MatrixkeyModel->getTaxaInMatrix(
+			array(
                 'project_id' => $this->getCurrentProjectId(),
                 'matrix_id' => $this->getCurrentMatrixId()
-            ),
-            'columns' => 'taxon_id'
-        ));
+			));
 
-        $this->getTaxonTree();
-
-        foreach ((array) $mt as $key => $val) {
-            if (isset($this->treeList[$val['taxon_id']])) {
-                $t[] = array(
-                    'id' => $this->treeList[$val['taxon_id']]['id'],
-                    'taxon' => $this->treeList[$val['taxon_id']]['taxon']
-                );
-            }
-        }
-
-        $this->customSortArray($t, array(
-            'key' => 'taxon'
-        ));
         return isset($t) ? $t : null;
     }
 

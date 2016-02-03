@@ -26,6 +26,77 @@ class MatrixKeyModel extends AbstractModel
         parent::__destruct();
     }
 
+
+    public function getTaxaInMatrix( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		
+		if ( is_null($project_id) || is_null($matrix_id) )
+			return;
+		
+		$query="
+			select
+				_b.id,
+				_b.taxon
+	
+			from %PRE%matrices_taxa _a
+	
+			left join %PRE%taxa _b
+				on _a.project_id=_b.project_id
+				and _a.taxon_id = _b.id
+	
+			where 
+				_a.project_id = ". $project_id ."
+				and _a.matrix_id = ". $matrix_id."
+
+			order by
+				_b.taxon
+			"
+			;
+
+		return $this->freeQuery( $query );
+
+    }
+
+    public function getAllTaxaAndMatrixPresence( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		
+		if ( is_null($project_id) || is_null($matrix_id) )
+			return;
+		
+		$query="
+			select
+			
+				_b.id,
+				_b.taxon,
+				_c.keypath_endpoint,
+				if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
+	
+			from %PRE%taxa _b
+
+			left join %PRE%matrices_taxa _a
+				on _a.project_id=_b.project_id
+				and _a.taxon_id = _b.id
+				and _a.matrix_id = ". $matrix_id."
+
+			left join %PRE%projects_ranks _c
+				on _b.project_id=_c.project_id
+				and _b.rank_id = _c.id
+
+			where 
+				_b.project_id = ". $project_id ."
+
+			order by
+				_b.taxon
+			";
+			
+		return $this->freeQuery( $query );
+
+    }
+
 	public function getCharactersNotInGroups( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
