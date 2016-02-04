@@ -73,7 +73,7 @@ class SearchControllerNSR extends SearchController
 		$this->NSRFunctions=new NSRFunctionsController;
 
 		$this->_suppressTab_DNA_BARCODES = $this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
-		$this->_search_presence_help_url = $this->getSetting( "nbc_search_presence_help_url" );
+		$this->_search_presence_help_url = $this->getSetting( "url_help_search_presence" );
 
 		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );

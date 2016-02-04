@@ -150,7 +150,7 @@ class TraitsDataController extends TraitsController
 
 		if ( isset($f['traitgroup']) )
 		{
-			$this->getSettings( $f['traitgroup'] );
+			$this->getTraitsSettings();
 			$this->matchTraits();
 			$this->matchSpecies();
 			$this->matchValues();
@@ -177,7 +177,7 @@ class TraitsDataController extends TraitsController
 		$this->checkAuthorisation();
 
 		$f=$this->getDataSession();
-		$this->getSettings($f['traitgroup']);
+		$this->getTraitsSettings();
 
 		if ( $this->rHasVal('action','save') )
 		{

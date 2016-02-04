@@ -1,6 +1,7 @@
 <?php
 
 include_once ('NsrController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class NsrTaxonImagesController extends NsrController
 {
@@ -290,7 +291,9 @@ class NsrTaxonImagesController extends NsrController
 		array_unshift($this->availableMetaDataFields,$this->sys_label_NSR_ID);
 		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
 
-		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/original/" );
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
+		
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
 	}
 

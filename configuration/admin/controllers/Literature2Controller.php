@@ -2,6 +2,7 @@
 
 include_once ('NsrController.php');
 include_once ('RdfController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class Literature2Controller extends NsrController
 {
@@ -92,7 +93,10 @@ class Literature2Controller extends NsrController
     private function initialise()
     {
 		$this->Rdf = new RdfController;
-		$this->_matchThresholdDefault=$this->getSetting('literature2_import_match_threshold',$this->_matchThresholdDefault);
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->_matchThresholdDefault=$this->moduleSettings->getModuleSetting( array( 'setting'=>'literature2_import_match_threshold','subst'=>$this->_matchThresholdDefault));
+
 		$this->setPublicationTypes();
     }
 

@@ -1,10 +1,7 @@
 <?php
 
 /*
-
-	set upload maximum for media uploads per projects
 	deleting of language should delete glossary terms
-
 */
 
 include_once ('Controller.php');
@@ -39,62 +36,6 @@ class ProjectsController extends Controller
         )
     );
 
-	// REFAC2015 --> most need to go to module settings
-	private $_availableProjectSettings = array(
-		array('keytype','l2 / lng','lng','single access-key type'),
-		array('maptype','l2 / lng','l2','map type: L2 or Google'),
-		array('matrixtype','lng / nbc','nbc','multi entry-key type'),
-		array('taxa_use_variations','bool',0),
-		array('taxon_tree_type','[recursive*|unfolding]','unfolding'),
-		array('taxon_page_ext_classification','bool',1),
-		array('skin','[name]','nbc_default'),
-		array('skin_mobile','[name]','nbc_default_mobile'),
-		//array('suppress_splash','bool',0,'bypass splash screen'),
-		array('start_page','[url]',null,'default start page of project'),
-		array('nbc_image_root','[url]',null,'for system images'),
-
-		//array('matrix_use_character_groups','bool',0),
-		//array('matrix_browse_style','paginate / expand','expand'),
-		//array('matrix_items_per_line','int',4),
-		//array('matrix_items_per_page','int',16),
-		//array('matrix_state_image_per_row','int',4,'number of images on a line in NBC character pop up'),
-		//array('matrix_state_image_max_height','[size in px]',200), // should be done through project specific stylesheet
-		//array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
-		//array('matrix_use_emerging_characters','bool',0,'treat characters that are specified for only some species as "emerging" (default=true)'),  // nbc only
-		//array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
-		//array('matrix_calc_char_h_val','bool',0,'false: do not calculate characters H-value; enhances performance'),
-		//array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
-
-		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
-		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
-
-		array('species_default_tab','[id]',-1,'id of the tab ("page") to open with by default'),
-		array('species_tab_translate','{a:b},{c:d}',null,'automatically changes tab id a into b etc.'), // to change TAB_MEDIA to default category 'media' etc
-		array('species_suppress_autotab_names','bool',1,'suppress automatically generated tab "names" in runtime'),
-		array('species_suppress_autotab_classification','bool',1,'suppress automatically generated tab "classification" in runtime'),
-		array('species_suppress_autotab_literature','bool',1,'suppress automatically generated tab "literature" in runtime'),
-		array('species_suppress_autotab_media','bool',1,'suppress automatically generated tab "media" in runtime'),
-		array('species_suppress_autotab_dna_barcodes','bool',1,'suppress automatically generated tab "dna_barcodes" in runtime (and in extensive search)'),
-
-		array('literature2_import_match_threshold','int',75),
-
-		array('include_overview_in_media','bool',0,'show overview image in species media'),
-		array('app_search_result_sort','alpha / token_count','token_count','variable to sort search results by'),
-		array('admin_species_allow_embedded_images','bool',1,'id.'),
-		array('nbc_search_presence_help_url','[URL]',null,'id.'),
-
-
-
-	);
-
-/*
-		array('matrixtype','lng / nbc','nbc','multi entry-key type'),
-			should use
-		if (!defined('MATRIX_STYLE_LNG')) define('MATRIX_STYLE_LNG','lng');
-		if (!defined('MATRIX_STYLE_NBC')) define('MATRIX_STYLE_NBC','nbc');
-
-*/
-
 
     /**
      * Constructor, calls parent's constructor
@@ -104,9 +45,6 @@ class ProjectsController extends Controller
     public function __construct ()
     {
         parent::__construct();
-
-		$this->initialize();
-
 	}
 
 
@@ -121,7 +59,6 @@ class ProjectsController extends Controller
     }
 
 
-
     /**
 	* Index, showing menu of options
 	*
@@ -130,13 +67,9 @@ class ProjectsController extends Controller
     public function indexAction ()
     {
         $this->checkAuthorisation();
-
         $this->setPageName($this->translate('Index'));
-
         $this->printPage();
     }
-
-
 
 
     /**
@@ -150,7 +83,8 @@ class ProjectsController extends Controller
 
         $this->setPageName($this->translate('Project modules'));
 
-        if ($this->rHasVal('module_new')) {
+        if ($this->rHasVal('module_new'))
+		{
 
             $fmp = $this->models->FreeModulesProjects->_get(array(
                 'id' => array(
@@ -362,84 +296,6 @@ class ProjectsController extends Controller
 
         $this->printPage();
     }
-
-    public function settingsAction ()
-    {
-        $this->checkAuthorisation();
-
-        $this->setPageName($this->translate('Project settings'));
-
-        if ($this->rHasVal('action','save') && !$this->isFormResubmit()) {
-
-			$c=0;
-
-			if ($this->rHasVar('setting')) {
-
-				foreach((array)$this->rGetVal('setting') as $key => $val) {
-
-					$val = trim($val);
-
-					if (empty($val) && $val!=='0') {
-
-						$c += $this->saveSetting(array('name' => $key,'delete' => true));
-
-					} else {
-
-						$c += $this->saveSetting(array('name' => $key,'value' => $val));
-
-					}
-
-				}
-
-			}
-
-			if ($this->rHasVal('new_setting')) {
-
-				$v = $this->getSetting($this->rGetVal('new_setting'));
-
-				if (is_null($v)) {
-
-					if ($this->rHasVal('new_setting') && !$this->rHasVal('new_value')) {
-						$this->addError(sprintf($this->translate('A value is required for "%s".'),$this->rGetVal('new_setting')));
-						$this->smarty->assign('new_setting',$this->rGetVal('new_setting'));
-					} else
-					if ($this->rHasVal('new_setting') && $this->rHasVal('new_value')) {
-
-						$c += $this->saveSetting(array('name' => $this->rGetVal('new_setting'),'value' => $this->rGetVal('new_value')));
-
-					}
-
-				} else {
-
-					$this->addError(sprintf($this->translate('A setting with the name "%s" already exists.'),$this->rGetVal('new_setting')));
-					$this->smarty->assign('new_setting',$this->rGetVal('new_setting'));
-					$this->smarty->assign('new_value',$this->rGetVal('new_value'));
-
-				}
-
-			}
-
-			if ($c>0)
-				$this->addMessage('Data saved.');
-
-        }
-
-		$s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-            ),
-            'columns' => 'setting,value',
-			'order' => 'setting'
-        ));
-
-
-        $this->smarty->assign('settingsAvailable',$this->_availableProjectSettings);
-        $this->smarty->assign('settings',$s);
-
-        $this->printPage();
-    }
-
 
     /**
 	* General interface for all AJAX-calls
@@ -890,14 +746,14 @@ class ProjectsController extends Controller
 
     private function ajaxActionCollaborators ($moduleType, $action, $moduleId, $userId)
     {
-        if ($moduleType == 'free') {
-
-            if ($action == 'add') {
-
-                if (is_array($userId)) {
-
-                    foreach ((array) $userId as $key => $val) {
-
+        if ($moduleType == 'free')
+		{
+            if ($action == 'add')
+			{
+                if (is_array($userId))
+				{
+                    foreach ((array) $userId as $key => $val)
+					{
                         $this->models->FreeModulesProjectsUsers->save(
                         array(
                             'id' => null,
@@ -907,8 +763,8 @@ class ProjectsController extends Controller
                         ));
                     }
                 }
-                else {
-
+                else
+				{
                     $this->models->FreeModulesProjectsUsers->save(
                     array(
                         'id' => null,
@@ -918,8 +774,8 @@ class ProjectsController extends Controller
                     ));
                 }
             }
-            else if ($action == 'remove') {
-
+            elseif ($action == 'remove')
+			{
                 $this->models->FreeModulesProjectsUsers->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -928,14 +784,14 @@ class ProjectsController extends Controller
                 ));
             }
         }
-        elseif ($moduleType == 'regular') {
-
-            if ($action == 'add') {
-
-                if (is_array($userId)) {
-
-                    foreach ((array) $userId as $key => $val) {
-
+        elseif ($moduleType == 'regular')
+		{
+            if ($action == 'add')
+			{
+                if (is_array($userId))
+				{
+                    foreach ((array) $userId as $key => $val)
+					{
                         $this->models->ModulesProjectsUsers->save(
                         array(
                             'id' => null,
@@ -945,8 +801,8 @@ class ProjectsController extends Controller
                         ));
                     }
                 }
-                else {
-
+                else
+				{
                     $this->models->ModulesProjectsUsers->save(
                     array(
                         'id' => null,
@@ -956,8 +812,8 @@ class ProjectsController extends Controller
                     ));
                 }
             }
-            else if ($action == 'remove') {
-
+            elseif ($action == 'remove')
+			{
                 $this->models->ModulesProjectsUsers->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -974,8 +830,8 @@ class ProjectsController extends Controller
 
     private function ajaxActionLanguages ($action, $languageId)
     {
-        if ($action == 'add') {
-
+        if ($action == 'add')
+		{
             $lp = $this->models->LanguagesProjects->_get(array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId()
@@ -996,8 +852,8 @@ class ProjectsController extends Controller
             if ($this->models->LanguagesProjects->getNewId() == '')
                 $this->addError($this->translate('Language already assigned.'));
         }
-        elseif ($action == 'default') {
-
+        elseif ($action == 'default')
+		{
             $this->models->LanguagesProjects->update(array(
                 'def_language' => 0
             ), array(
@@ -1011,8 +867,8 @@ class ProjectsController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
-        elseif ($action == 'deactivate' || $action == 'reactivate') {
-
+        elseif ($action == 'deactivate' || $action == 'reactivate')
+		{
             $this->models->LanguagesProjects->update(array(
                 'active' => ($action == 'deactivate' ? 'n' : 'y')
             ), array(
@@ -1020,8 +876,8 @@ class ProjectsController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
-        elseif ($action == 'delete') {
-
+        elseif ($action == 'delete')
+		{
             $this->models->ContentTaxa->delete(array(
                 'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
@@ -1032,8 +888,8 @@ class ProjectsController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
-        elseif ($action == 'translated' || $action == 'untranslated') {
-
+        elseif ($action == 'translated' || $action == 'untranslated')
+		{
             $this->models->LanguagesProjects->update(array(
                 'tranlation_status' => ($action == 'translated' ? 1 : 0)
             ), array(
@@ -1071,10 +927,8 @@ class ProjectsController extends Controller
 
     private function doDeleteProjectAction ($pId)
     {
-
 		$pDel = new ProjectDeleteController;
 		$pDel->doDeleteProjectAction($pId);
-
     }
 
 	private function doDeleteOrphanedData()
@@ -1086,8 +940,8 @@ class ProjectsController extends Controller
 		$prefix = $this->models->Projects->getTablePrefix();
 		$pInUse = array();
 
-		foreach((array)$data as $val) {
-
+		foreach((array)$data as $val)
+		{
 			$table = ($val[$key]);
 
 			if (substr($table,0,strlen($prefix))!==$prefix)
@@ -1098,9 +952,6 @@ class ProjectsController extends Controller
 
 			foreach((array)$d as $dVal)
 				$pInUse[$dVal['project_id']]=$dVal['project_id'];
-
-			//echo $table;q($d);
-
 		}
 
 		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
@@ -1114,18 +965,16 @@ class ProjectsController extends Controller
 
 		$d = $this->models->Projects->_get(array('id' => '*'));
 
-		foreach((array)$d as $val) {
-
+		foreach((array)$d as $val)
+		{
 			unset($pInUse[$val['id']]);
 			$this->addMessage(sprintf('Ignoring "%s"',$val['sys_name']));
-
 		}
 
-		foreach((array)$pInUse as $val) {
-
+		foreach((array)$pInUse as $val)
+		{
 			$this->doDeleteProjectAction($val);
 			$this->addMessage(sprintf('Deleted data for orphan ID %s',$val));
-
 		}
 
 	}
@@ -1139,8 +988,8 @@ class ProjectsController extends Controller
 		$prefix = $this->models->Projects->getTablePrefix();
 		$pInUse = array();
 
-		foreach((array)$data as $val) {
-
+		foreach((array)$data as $val)
+		{
 			$table = ($val[$key]);
 
 			if (substr($table,0,strlen($prefix))!==$prefix)
@@ -1148,13 +997,11 @@ class ProjectsController extends Controller
 
 			$d = $this->models->Projects->freeQuery('select count(*) as total from '.$table.' where project_id = '.$oldId);
 
-			if ($d[0]['total']>0) {
-
+			if ($d[0]['total']>0)
+			{
 				$this->models->Projects->freeQuery('update '.$table.' set project_id = '.$newId.' where project_id = '.$oldId);
 				$this->addMessage('Updated '.$table);
-
 			}
-
 		}
 
 		rename(
@@ -1175,10 +1022,10 @@ class ProjectsController extends Controller
 
 	private function saveProjectData($data)
 	{
-
 		$data['id'] = $this->getCurrentProjectId();
 
-		if (!$this->isCurrentUserSysAdmin() && isset($data['sys_name'])) {
+		if (!$this->isCurrentUserSysAdmin() && isset($data['sys_name']))
+		{
 			unset($this->requestData['sys_name']);
 		}
 
@@ -1193,63 +1040,33 @@ class ProjectsController extends Controller
 			array('id'=>$data['id'])
 		);
 
-		if (isset($data['sys_name'])) {
-
+		if (isset($data['sys_name']))
+		{
             $p = $this->models->Projects->_get(array(
                 'id' => array('id !=' => $data['id'],'sys_name'=>$data['sys_name']),
             ));
 
-			if ($p) {
-
+			if ($p)
+			{
 				$this->addError('A project with that internal name alreasy exists.');
 				unset($this->requestData['sys_name']);
-
 			}
-
 		}
 
-		if (isset($data['short_name'])) {
-
+		if (isset($data['short_name']))
+		{
             $p = $this->models->Projects->_get(array(
                 'id' => array('id !=' => $data['id'],'short_name'=>$data['short_name']),
             ));
 
-			if ($p) {
-
+			if ($p)
+			{
 				$this->addError(sprintf('A project with that shortname already exists (%s).',$p[0]['sys_name']));
 				unset($this->requestData['short_name']);
-
 			}
-
 		}
 
 		$this->models->Projects->save($data);
-
-	}
-
-	private function initialize()
-	{
-
-		foreach((array)$this->_availableProjectSettings as $key=>$val) {
-
-			$this->_availableProjectSettings[$key][2] =
-				preg_replace_callback(
-					'/\%(.*)\%/',
-					function($m)
-					{
-						switch ($m[1]) {
-							case 'MEDIA_DIR' :
-								return isset($_SESSION['admin']['project']['urls']['project_media']) ? $_SESSION['admin']['project']['urls']['project_media'] : $m[1];
-								break;
-							case 'ID' :
-								return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : $m[1];
-								break;
-							default:
-								return $m[1];
-						}
-					},
-					$val[2]);
-	    }
 
 	}
 
