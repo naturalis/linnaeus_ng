@@ -8,6 +8,8 @@
 <a href="edit.php?action=new" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
 <a href="../search/index.php">Extensive search</a>
+&nbsp;
+<a href="../../../app/views/{$controllerBaseName}/" style="color:#999;margin-left:10px" target="_project">view project</a>
 <p>
 {if $alpha|@count>0}
 <div id="alphabet">
