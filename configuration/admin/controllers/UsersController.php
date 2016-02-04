@@ -81,6 +81,10 @@ class UsersController extends Controller
         foreach ((array) $pru as $key => $val)
 		{
             $u = $this->models->Users->_get(array('id'=>$val['user_id']));
+            // Skip sysadmin as requested in LINNG-752
+            if ($u['superuser'] == 1) {
+                continue;
+            }
             $r = $this->models->Roles->_get(array('id'=>$val['role_id']));
 
             $u['role'] = $r['role'];
@@ -403,7 +407,13 @@ class UsersController extends Controller
 
         $this->setPageName($this->translate('All users'));
 
-		$users = $this->models->Users->_get(array('id'=>'*','order' => 'last_name,first_name'));
+        // Skip sysadmin as requested in LINNG-752
+        $users = $this->models->Users->_get(
+            array(
+                'order' => 'last_name,first_name',
+                'where' => 'superuser = 0'
+            )
+		);
 
         $userProjectCount = $this->models->ProjectsRolesUsers->_get(
 			array(
@@ -604,6 +614,9 @@ class UsersController extends Controller
 			{
 				$data=$this->sanitizeUserData($this->rGetAll());
 
+				// get the current role of the collaborator in the current project
+				$upr = $this->getUserProjectRole($this->rGetId(), $this->getCurrentProjectId());
+
 				$passwordsUnchanged = empty($data['password']) && empty($data['password_2']);
 
 				if (
@@ -614,11 +627,8 @@ class UsersController extends Controller
 					($passwordsUnchanged || $this->isPasswordCorrect($data['password'])) &&
 					$this->isEmailAddressCorrect($data['email_address']) &&
 					$this->isEmailAddressUnique($data['email_address'],$user['id']) &&
-					$this->isRoleAssignable($data['role_id'])
+					$this->isRoleAssignable($upr['role_id'])
 					) {
-
-					// get the current role of the collaborator in the current project
-					$upr = $this->getUserProjectRole($this->rGetId(), $this->getCurrentProjectId());
 
 					// if collaborator has a regular role (or the current user is sysadmin), update to the new role...
 					if (
