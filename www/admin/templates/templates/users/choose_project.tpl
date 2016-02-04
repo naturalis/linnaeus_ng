@@ -12,7 +12,7 @@
             <a href="?project_id={$v.id}" {if !$v.published}style="color:#779"{/if}>{if $v.title!=''}{$v.title}{else}{$v.name}{/if}</a>
             {if !$v.member}<span title="you are not actually asssigned to this project">(*)</span>{/if}
             {if $session.admin.project.id==$v.id}<span title="current active project">{t}(current){/t}</span>{/if}
-            <a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px">view</a>
+            <a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px" target="_project">view</a>
         </li>
     {/if}
     {/foreach}
@@ -43,7 +43,7 @@
         <li>
             <a href="?project_id={$v.id}">{if $v.title!=''}{$v.title}{else}{$v.name}{/if}</a>
             {if $session.admin.project.id==$v.id}<span title="current active project">{t}(current){/t}</span>{/if}
-			<a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px">view</a>
+			<a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px" target="_project">view</a>
         </li>
         {/if}
     {/foreach}
