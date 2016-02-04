@@ -604,6 +604,9 @@ class UsersController extends Controller
 			{
 				$data=$this->sanitizeUserData($this->rGetAll());
 
+				// get the current role of the collaborator in the current project
+				$upr = $this->getUserProjectRole($this->rGetId(), $this->getCurrentProjectId());
+
 				$passwordsUnchanged = empty($data['password']) && empty($data['password_2']);
 
 				if (
@@ -614,11 +617,8 @@ class UsersController extends Controller
 					($passwordsUnchanged || $this->isPasswordCorrect($data['password'])) &&
 					$this->isEmailAddressCorrect($data['email_address']) &&
 					$this->isEmailAddressUnique($data['email_address'],$user['id']) &&
-					$this->isRoleAssignable($data['role_id'])
+					$this->isRoleAssignable($upr['role_id'])
 					) {
-
-					// get the current role of the collaborator in the current project
-					$upr = $this->getUserProjectRole($this->rGetId(), $this->getCurrentProjectId());
 
 					// if collaborator has a regular role (or the current user is sysadmin), update to the new role...
 					if (
