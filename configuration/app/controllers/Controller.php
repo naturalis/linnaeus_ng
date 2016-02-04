@@ -224,7 +224,7 @@ class Controller extends BaseClass
 
         if ($this->getCheckForProjectId())
 		{
-            $this->checkForProjectId();
+		    $this->checkForProjectId();
         }
 
         $this->startModuleSession();
@@ -293,7 +293,12 @@ class Controller extends BaseClass
 
         $d = $this->getCurrentProjectId();
 
-        if ($d == null)
+        $p = $this->models->Projects->_get(array(
+            'id' => $d
+        ));
+
+        // Also check if project is published
+        if ($d == null || $p['published'] == 0)
             $this->redirect($this->generalSettings['urlNoProjectId']);
 
 		if ($pB != $d)
