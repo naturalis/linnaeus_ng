@@ -293,12 +293,8 @@ class Controller extends BaseClass
 
         $d = $this->getCurrentProjectId();
 
-        $p = $this->models->Projects->_get(array(
-            'id' => $d
-        ));
-
         // Also check if project is published
-        if ($d == null || $p['published'] == 0)
+        if ($d == null || !$this->projectIsPublished($d))
             $this->redirect($this->generalSettings['urlNoProjectId']);
 
 		if ($pB != $d)
@@ -307,6 +303,17 @@ class Controller extends BaseClass
         $this->setCurrentProjectData();
         $this->setUrls();
         $this->setProjectLanguages();
+    }
+
+    public function projectIsPublished ($pId)
+    {
+        if ($pId) {
+            $p = $this->models->Projects->_get(array(
+                'id' => (int)$pId
+            ));
+            return $p['published'] == 1;
+        }
+        return false;
     }
 
     public function resolveProjectId ()
