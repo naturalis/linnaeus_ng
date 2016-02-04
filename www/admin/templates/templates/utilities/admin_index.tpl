@@ -67,7 +67,7 @@ NOTICES
 <ul>
 	<li><a href="../projects/">{t}Project administration{/t}</a></li>
 	<li><a href="../users/">{t}User administration{/t}</a></li>
-	<li><a href="../module_settings/">{t}Module settings{/t}</a></li>
+	<li><a href="../module_settings/">{t}Settings{/t}</a></li>
 </ul>
 <ul>
 	<li><a href="../hotwords/">{t}Hotwords{/t}</a></li>

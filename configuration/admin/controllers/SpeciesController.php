@@ -56,6 +56,7 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
 */
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class SpeciesController extends Controller
 {
@@ -161,9 +162,14 @@ class SpeciesController extends Controller
         $this->smarty->assign('isHigherTaxa', $this->getIsHigherTaxa());
 
         $this->includeLocalMenu = true;
+
+		
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->useVariations=$this->moduleSettings->getModuleSetting( array( 'setting'=>'use_taxon_variations','subst'=>false) );
+		$matrixtype=$this->moduleSettings->getModuleSetting( array( 'setting'=>'matrixtype','module'=>'matrixkey','subst'=>'l2') );
         // variations & related are only shown for NBC matrix projects
-        $this->_useNBCExtras = $this->useRelated = $this->useVariations = ($this->getSetting('matrixtype')=='nbc');
-        $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
+        $this->_useNBCExtras = $this->useRelated =  ($matrixtype=='nbc');
+        $this->_lookupListMaxResults=$this->_lookupListMaxResults;
 
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -172,7 +178,6 @@ class SpeciesController extends Controller
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
-
     }
 
 
@@ -3211,8 +3216,11 @@ class SpeciesController extends Controller
 
     }
 
-    private function filterContent ($content)
+    private function filterContent($content)
     {
+		return $content;
+		
+		/*
         if (!$this->controllerSettings['filterContent'])
             return $content;
 
@@ -3221,6 +3229,10 @@ class SpeciesController extends Controller
         if ($this->controllerSettings['filterContent']['html']['doFilter'])
 		{
 			$allowedtags=$this->controllerSettings['filterContent']['html']['allowedTags'];
+
+
+
+
 			if ($this->getSetting('admin_species_allow_embedded_images',false))
 			{
 				$allowedtags.='<img>';
@@ -3232,6 +3244,7 @@ class SpeciesController extends Controller
             'content' => $modified,
             'modified' => $content != $modified
         );
+		*/
     }
 
     private function deleteTaxonBranch ($id)

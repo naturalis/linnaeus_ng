@@ -67,7 +67,6 @@ class Controller extends BaseClass
 		'rights',
 		'rights_roles',
 		'roles',
-		'settings',
 		'taxa',
 		'taxa_variations',
 		'users_taxa',
@@ -1586,84 +1585,10 @@ class Controller extends BaseClass
         $this->_breadcrumbRootName = $name;
     }
 
-
-
     public function getBreadcrumbRootName ()
     {
         return $this->_breadcrumbRootName;
     }
-
-
-
-    public function getSetting ($name,$default=null)
-    {
-        $s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'setting' => $name
-            ),
-            'columns' => 'value',
-            'limit' => 1
-        ));
-
-        if (isset($s[0]))
-            return $s[0]['value'];
-        else
-            return isset($default) ? $default : null;
-    }
-
-
-
-    public function saveSetting ($p)
-    {
-        if (!isset($p['name']))
-            return;
-
-        $name = $p['name'];
-        $value = isset($p['value']) ? $p['value'] : null;
-        $delete = isset($p['delete']) ? $p['delete'] : false;
-        $pId = isset($p['pId']) ? $p['pId'] : $this->getCurrentProjectId();
-
-        if ($delete) {
-
-            $this->models->Settings->delete(array(
-                'project_id' => $pId,
-                'setting' => $name
-            ));
-        }
-        else {
-
-            $d = $this->getSetting($name);
-
-            if (isset($d['value']) && $d['value']==$value)
-                return;
-
-            if (is_null($d)) {
-
-                $s = $this->models->Settings->save(array(
-                    'id' => null,
-                    'project_id' => $pId,
-                    'setting' => $name,
-                    'value' => $value
-                ));
-            }
-            else {
-
-                $s = $this->models->Settings->update(array(
-                    'value' => is_null($value) ? 'null' : $value
-                ), array(
-                    'project_id' => $pId,
-                    'setting' => $name
-                ));
-            }
-        }
-
-		return $this->models->Settings->getAffectedRows();
-
-    }
-
-
 
     public function addModuleToProject ($mId, $pId = null, $showOrder = 0)
     {
@@ -1691,14 +1616,10 @@ class Controller extends BaseClass
         ));
     }
 
-
-
     public function getProjectFSCode ($p)
     {
         return sprintf('%04s', $p);
     }
-
-
 
     public function createProjectCssFile ($id, $title)
     {

@@ -17,6 +17,7 @@
 */
 
 include_once ('NsrController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class NsrTaxonController extends NsrController
 {
@@ -90,9 +91,9 @@ class NsrTaxonController extends NsrController
 			'fieldAsIndex'=>'rank_id'
 		));
 
-		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
-
 	}
 
     public function taxonNewAction()

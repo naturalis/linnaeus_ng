@@ -146,9 +146,6 @@ class SearchControllerGeneral extends SearchController
 			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ?
 				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) :
 				'';
-
-		$this->_searchResultSort=
-			$this->getSetting('app_search_result_sort','alpha');
 	}
 
     public function __destruct ()

@@ -20,6 +20,8 @@ class ModuleSettingsReaderController extends Controller
     {
         parent::__construct($p);
 
+		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
+
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
@@ -52,6 +54,32 @@ class ModuleSettingsReaderController extends Controller
 		if ( empty($setting) ) return;
 
 		foreach((array)$this->getModuleSettingsValues() as $val)
+		{
+			if ($val['setting']==$setting && !is_null($val['value']))
+			{
+				return $val['value'];
+			}
+		}
+
+		if ( isset($subst) )
+		{
+			return $subst;
+		}
+    }
+
+    public function getGeneralSetting( $p )
+    {
+		if ( is_array( $p ))
+		{
+			$setting=isset($p['setting']) ? $p['setting'] : null;
+			$subst=isset($p['subst']) ? $p['subst'] : null;
+		}
+		else
+		{
+			$setting=$p;
+		}
+
+		foreach((array)$this->getGeneralSettingsValues() as $val)
 		{
 			if ($val['setting']==$setting && !is_null($val['value']))
 			{
@@ -107,8 +135,6 @@ class ModuleSettingsReaderController extends Controller
 		return $this->_usedefaultwhennovalue;
     }
 
-
-
     private function setModuleController( $m )
     {
 		$this->_modulecontroller=$m;
@@ -147,25 +173,6 @@ class ModuleSettingsReaderController extends Controller
             'projectId' => $this->getCurrentProjectId(),
 		    'moduleId' => $this->getModuleId()
 		));
-/*
-		$this->_settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
-			select
-				_a.value as value,
-				_b.setting,
-				_b.default_value as default_value
-
-			from
-				%PRE%module_settings _b
-
-			left join
-				%PRE%module_settings_values _a
-				on _b.id=_a.setting_id
-				and _a.project_id = " . $this->getCurrentProjectId() . "
-
-			where
-				_b.module_id = " . $this->getModuleId() . "
-			");
-*/
 	}
 
 	private function getModuleSettingsValues()
@@ -177,28 +184,9 @@ class ModuleSettingsReaderController extends Controller
 	{
 		$this->_generalsettingsvalues = $this->models->ModuleSettingsModel->setModuleReaderSettingValues(array(
             'projectId' => $this->getCurrentProjectId(),
-		    'moduleId' => -1
+		    'moduleId' => GENERAL_SETTINGS_ID
 		));
-/*
-	    $this->_generalsettingsvalues=$this->models->ModuleSettingsValues->freeQuery("
-			select
-				_a.value as value,
-				_b.setting,
-				_b.default_value as default_value
-
-			from
-				%PRE%module_settings _b
-
-			left join
-				%PRE%module_settings_values _a
-				on _b.id=_a.setting_id
-				and _a.project_id = " . $this->getCurrentProjectId() . "
-
-			where
-				_b.module_id = -1
-			");
-*/
-		}
+	}
 
 	private function getGeneralSettingsValues()
 	{
@@ -224,26 +212,6 @@ class ModuleSettingsReaderController extends Controller
 		    'moduleId' => $moduleid,
 		    'setting' => $setting
 		));
-/*
-		$settingsvalues=$this->models->ModuleSettingsValues->freeQuery("
-			select
-				_a.value as value,
-				_b.setting,
-				_b.default_value as default_value
-
-			from
-				%PRE%module_settings _b
-
-			left join
-				%PRE%module_settings_values _a
-				on _b.id=_a.setting_id
-				and _a.project_id = " . $this->getCurrentProjectId() . "
-
-			where
-				_b.module_id = " . $moduleid . "
-				and _b.setting = '" . $setting . "'
-			");
-*/
 
 		if ( $settingsvalues )
 		{

@@ -36,7 +36,7 @@ class TraitsController extends Controller
         parent::__destruct();
     }
 
-	public function getSettings($group)
+	public function getTraitsSettings()
 	{
         $s=$this->models->TraitsSettings->_get(
 			array(
