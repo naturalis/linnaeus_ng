@@ -81,6 +81,10 @@ class UsersController extends Controller
         foreach ((array) $pru as $key => $val)
 		{
             $u = $this->models->Users->_get(array('id'=>$val['user_id']));
+            // Skip sysadmin as requested in LINNG-752
+            if ($u['superuser'] == 1) {
+                continue;
+            }
             $r = $this->models->Roles->_get(array('id'=>$val['role_id']));
 
             $u['role'] = $r['role'];
@@ -403,7 +407,13 @@ class UsersController extends Controller
 
         $this->setPageName($this->translate('All users'));
 
-		$users = $this->models->Users->_get(array('id'=>'*','order' => 'last_name,first_name'));
+        // Skip sysadmin as requested in LINNG-752
+        $users = $this->models->Users->_get(
+            array(
+                'order' => 'last_name,first_name',
+                'where' => 'superuser = 0'
+            )
+		);
 
         $userProjectCount = $this->models->ProjectsRolesUsers->_get(
 			array(
