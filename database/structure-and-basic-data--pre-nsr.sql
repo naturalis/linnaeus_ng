@@ -1092,7 +1092,6 @@ CREATE TABLE IF NOT EXISTS `literature_taxa` (
 CREATE TABLE IF NOT EXISTS `matrices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
-  `got_names` tinyint(1) DEFAULT '0',
   `default` tinyint(1) NOT NULL DEFAULT '0',
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created` datetime NOT NULL,

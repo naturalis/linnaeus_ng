@@ -53,9 +53,51 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
 
 	[new litref] is hardcoded
 
+
+
+        return array(
+            'defaultCategories' =>
+                array(
+                    0 => array(
+                        'name' => 'Description',
+                        'default' => true,
+                        'mandatory' => true,
+                        'sections' => array ('General description','Biology')
+                    ),
+                    1 => array(                    
+                        'name' => 'Detailed Description',
+                        'sections' => array ('Behaviour','Cytology','Diagnostic Description',
+                            'Genetics','Look Alikes','Molecular Biology','Morphology','Physiology',
+                            'Size','Taxon Biology')
+                    ),
+                    2 => array(                    
+                        'name' => 'Ecology',
+                        'sections' => array ('Associations','Cyclicity','Dispersal','Distribution',
+                            'Ecology','Habitat','Life Cycle','Life Expectancy','Migration','Trophic Strategy')
+                    ),
+                    3 => array(                    
+                        'name' => 'Conservation',
+                        'sections' => array ('Conservation Status','Legislation','Management','Procedures',
+                            'Threats','Trends')
+                    ),
+                    4 => array(                    
+                        'name' => 'Relevance',
+                        'sections' => array ('Diseases','Risk Statement','Uses')
+                    ),
+                    5 => array(                    
+                        'name' => 'Reproductive',
+                        'sections' => array ('Population Biology','Reproduction')
+                    )
+                )
+            );
+ 
+	
+	
+	
 */
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class SpeciesController extends Controller
 {
@@ -129,6 +171,7 @@ class SpeciesController extends Controller
     public $controllerPublicName = 'Species module';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
+	private $maxCategories = 50;
 
 
 	/* initialise */
@@ -161,9 +204,14 @@ class SpeciesController extends Controller
         $this->smarty->assign('isHigherTaxa', $this->getIsHigherTaxa());
 
         $this->includeLocalMenu = true;
+
+		
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->useVariations=$this->moduleSettings->getModuleSetting( array( 'setting'=>'use_taxon_variations','subst'=>false) );
+		$matrixtype=$this->moduleSettings->getModuleSetting( array( 'setting'=>'matrixtype','module'=>'matrixkey','subst'=>'l2') );
         // variations & related are only shown for NBC matrix projects
-        $this->_useNBCExtras = $this->useRelated = $this->useVariations = ($this->getSetting('matrixtype')=='nbc');
-        $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
+        $this->_useNBCExtras = $this->useRelated =  ($matrixtype=='nbc');
+        $this->_lookupListMaxResults=$this->_lookupListMaxResults;
 
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -172,7 +220,6 @@ class SpeciesController extends Controller
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
-
     }
 
 
@@ -473,7 +520,7 @@ class SpeciesController extends Controller
         }
 
         $this->smarty->assign('nextShowOrder', $nextShowOrder);
-        $this->smarty->assign('maxCategories', $this->generalSettings['maxCategories']);
+        $this->smarty->assign('maxCategories', $this->maxCategories);
         $this->smarty->assign('languages', $lp);
         $this->smarty->assign('pages', $pages);
         $this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
@@ -3211,8 +3258,11 @@ class SpeciesController extends Controller
 
     }
 
-    private function filterContent ($content)
+    private function filterContent($content)
     {
+		return $content;
+		
+		/*
         if (!$this->controllerSettings['filterContent'])
             return $content;
 
@@ -3221,6 +3271,10 @@ class SpeciesController extends Controller
         if ($this->controllerSettings['filterContent']['html']['doFilter'])
 		{
 			$allowedtags=$this->controllerSettings['filterContent']['html']['allowedTags'];
+
+
+
+
 			if ($this->getSetting('admin_species_allow_embedded_images',false))
 			{
 				$allowedtags.='<img>';
@@ -3232,6 +3286,7 @@ class SpeciesController extends Controller
             'content' => $modified,
             'modified' => $content != $modified
         );
+		*/
     }
 
     private function deleteTaxonBranch ($id)

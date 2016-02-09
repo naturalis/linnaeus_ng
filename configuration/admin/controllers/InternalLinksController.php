@@ -286,8 +286,7 @@ class InternalLinksController extends Controller
 		$m = $this->models->Matrices->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'got_names' => 1
+					'project_id' => $this->getCurrentProjectId()
 				),
 				'columns' => 'count(*) as total'
 			)
@@ -303,8 +302,7 @@ class InternalLinksController extends Controller
 		$m = $this->models->Matrices->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'got_names' => 1
+					'project_id' => $this->getCurrentProjectId()
 				)
 			)
 		);

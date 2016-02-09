@@ -67,7 +67,6 @@ class Controller extends BaseClass
 		'rights',
 		'rights_roles',
 		'roles',
-		'settings',
 		'taxa',
 		'taxa_variations',
 		'users_taxa',
@@ -101,8 +100,6 @@ class Controller extends BaseClass
 
 
         $this->setTimeZone();
-
-        $this->setDebugMode();
 
         $this->startSession();
 
@@ -1586,84 +1583,10 @@ class Controller extends BaseClass
         $this->_breadcrumbRootName = $name;
     }
 
-
-
     public function getBreadcrumbRootName ()
     {
         return $this->_breadcrumbRootName;
     }
-
-
-
-    public function getSetting ($name,$default=null)
-    {
-        $s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'setting' => $name
-            ),
-            'columns' => 'value',
-            'limit' => 1
-        ));
-
-        if (isset($s[0]))
-            return $s[0]['value'];
-        else
-            return isset($default) ? $default : null;
-    }
-
-
-
-    public function saveSetting ($p)
-    {
-        if (!isset($p['name']))
-            return;
-
-        $name = $p['name'];
-        $value = isset($p['value']) ? $p['value'] : null;
-        $delete = isset($p['delete']) ? $p['delete'] : false;
-        $pId = isset($p['pId']) ? $p['pId'] : $this->getCurrentProjectId();
-
-        if ($delete) {
-
-            $this->models->Settings->delete(array(
-                'project_id' => $pId,
-                'setting' => $name
-            ));
-        }
-        else {
-
-            $d = $this->getSetting($name);
-
-            if (isset($d['value']) && $d['value']==$value)
-                return;
-
-            if (is_null($d)) {
-
-                $s = $this->models->Settings->save(array(
-                    'id' => null,
-                    'project_id' => $pId,
-                    'setting' => $name,
-                    'value' => $value
-                ));
-            }
-            else {
-
-                $s = $this->models->Settings->update(array(
-                    'value' => is_null($value) ? 'null' : $value
-                ), array(
-                    'project_id' => $pId,
-                    'setting' => $name
-                ));
-            }
-        }
-
-		return $this->models->Settings->getAffectedRows();
-
-    }
-
-
 
     public function addModuleToProject ($mId, $pId = null, $showOrder = 0)
     {
@@ -1691,14 +1614,10 @@ class Controller extends BaseClass
         ));
     }
 
-
-
     public function getProjectFSCode ($p)
     {
         return sprintf('%04s', $p);
     }
-
-
 
     public function createProjectCssFile ($id, $title)
     {
@@ -2242,7 +2161,6 @@ class Controller extends BaseClass
     {
         $this->setBreadcrumbs();
 
-        $this->smarty->assign('debugMode', $this->debugMode);
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('database', $this->config->getDatabaseSettings());
         $this->smarty->assign('baseUrl', $this->baseUrl);
@@ -2265,9 +2183,6 @@ class Controller extends BaseClass
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
         $this->smarty->assign('currentUserRole', $this->getCurrentUserRole());
-
-        $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
-        $this->smarty->assign('autoSaveFrequency', $this->generalSettings['autoSaveFrequency']);
 
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -2348,19 +2263,6 @@ class Controller extends BaseClass
     {
         date_default_timezone_set($this->generalSettings['serverTimeZone']);
     }
-
-
-
-    /**
-     * Sets a global 'debug' mode, based on a general setting in the config file
-     *
-     * @access     private
-     */
-    private function setDebugMode ()
-    {
-        $this->debugMode = $this->generalSettings['debugMode'];
-    }
-
 
 
     /**

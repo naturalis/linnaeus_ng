@@ -1,6 +1,7 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class SpeciesController extends Controller
 {
@@ -78,16 +79,16 @@ class SpeciesController extends Controller
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
-		$this->_suppressTab_NAMES=$this->getSetting('species_suppress_autotab_names',0)==1;
-		$this->_suppressTab_CLASSIFICATION=$this->getSetting('species_suppress_autotab_classification',0)==1;
-		$this->_suppressTab_LITERATURE=$this->getSetting('species_suppress_autotab_literature',0)==1;
-		$this->_suppressTab_MEDIA=$this->getSetting('species_suppress_autotab_media',0)==1;
-		$this->_suppressTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
+		$this->moduleSettings=new ModuleSettingsReaderController;
 
-        $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
-        $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
-		$this->_defaultSpeciesTab=$this->getSetting('species_default_tab',CTAB_CLASSIFICATION);
-
+		$this->_suppressTab_NAMES=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_names','subst'=>0) )==1;
+		$this->_suppressTab_CLASSIFICATION=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_classification','subst'=>0) )==1;
+		$this->_suppressTab_LITERATURE=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_literature','subst'=>0) )==1;
+		$this->_suppressTab_MEDIA=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_media','subst'=>0) )==1;
+		$this->_suppressTab_DNA_BARCODES=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_dna_barcodes','subst'=>0) )==1;
+        $this->_lookupListMaxResults=$this->moduleSettings->getModuleSetting( array( 'setting'=>'lookup_list_species_max_results','subst'=>$this->_lookupListMaxResults) );
+        $this->_includeOverviewImageInMedia=$this->moduleSettings->getModuleSetting( array( 'setting'=>'include_overview_in_media','subst'=>true) );
+		$this->_defaultSpeciesTab=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_default_tab','subst'=>CTAB_CLASSIFICATION) );
     }
 
     /* Dynamically set proper model name (species/highertaxa) */

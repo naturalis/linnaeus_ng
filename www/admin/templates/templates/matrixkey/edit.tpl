@@ -45,11 +45,12 @@
 			<option id="var-{$v.id}" value="var-{$v.id}">{$v.label}</option>
 			{/foreach}
 			{/if}
-			
-			{if $matrices}
+			{if $matrices && $matrices|@count>1}
 			<option disabled="disabled">----------------------------------------------------------------------------------------------------</option>
 			{foreach from=$matrices item=v}
+            {if $matrix.id!=$v.id}
 			<option id="mx-{$v.id}" value="mx-{$v.id}">{$v.default_name}</option>
+            {/if}
 			{/foreach}
 			{/if}
 			</select>

@@ -15,11 +15,7 @@
 		{foreach name=taxonloop from=$taxa key=k item=v}
 		<tr class="highlight">
 
-			{if $useJavascriptLinks}
-			<td class="a" onclick="goMap({$v.id})" style="width:250px;">{$v.taxon}</td>
-			{else}
 			<td style="width:250px;"><a href="../mapkey/examine_species.php?id={$v.id}">{$v.taxon}</a></td>
-			{/if}
 
 			<td style="text-align:right">
 				{$v.total}

@@ -86,7 +86,6 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 	{if $gloss.synonyms}
 		{section name=i loop=$gloss.synonyms}
 		glossAddSynonymToList('{$gloss.synonyms[i].synonym|@addslashes}');

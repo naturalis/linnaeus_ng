@@ -125,21 +125,6 @@ class MatrixKeyModel extends AbstractModel
 		return $this->freeQuery(array('query'=>$query,'fieldAsIndex' => 'characteristic_id'));
 	}
 
-	public function deleteObsoleteMatrices( $params )
-	{
-		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
-
-		if ( is_null($project_id) )
-			return;
-
-		$query='delete from %PRE%matrices
-			where project_id =  ' . $project_id . '
-			and got_names = 0
-			and created < DATE_ADD(now(), INTERVAL -7 DAY)';
-		
-		return $this->freeQuery($query);
-	}
-
 	public function deleteObsoleteCharacters( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;

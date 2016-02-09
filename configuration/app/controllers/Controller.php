@@ -185,6 +185,7 @@ class Controller extends BaseClass
         'basics.css',
         'lookup.css'
     );
+	private $_maxBackSteps=100;
 
 
 
@@ -201,8 +202,6 @@ class Controller extends BaseClass
         parent::__construct();
 
         $this->setControllerParams($p);
-
-        $this->setDebugMode();
 
         $this->startSession();
 
@@ -1221,22 +1220,16 @@ class Controller extends BaseClass
     }
 
 
-    public function getSetting($name,$substitute=null)
+    public function getSetting($setting,$substitute=null)
     {
-        $s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'setting' => $name
-            ),
-            'columns' => 'value',
-            'limit' => 1
-        ));
-
-        if (isset($s[0]))
-            return $s[0]['value'];
-        else
-            return isset($substitute) ? $substitute : null;
+		return $this->models->ControllerModel->getGeneralSetting(		
+			array(
+				'module_id'=>ModuleSettingsReaderController::getGeneralSettingsId(),
+				'project_id' => $this->getCurrentProjectId(),
+				'setting'=>$setting,
+				'substitute'=>$substitute
+			)
+		);
     }
 
     public function formatTaxon($p=null) //($taxon,$ranks=null)
@@ -1789,16 +1782,6 @@ class Controller extends BaseClass
     }
 
     /**
-     * Sets a global 'debug' mode, based on a general setting in the config file
-     *
-     * @access     private
-     */
-    private function setDebugMode ()
-    {
-        $this->debugMode = $this->generalSettings['debugMode'];
-    }
-
-    /**
      * Starts the user's session
      *
      * @access     private
@@ -1855,7 +1838,6 @@ class Controller extends BaseClass
         $this->smarty->assign('menu', $this->getMainMenu());
         $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
         $this->smarty->assign('customTemplatePaths', $this->getProjectDependentTemplates());
-        $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
@@ -2350,9 +2332,9 @@ class Controller extends BaseClass
             $_SESSION['app']['user']['history'][] = $thisPage;
 
             // see if a maximum number of steps to store is defined; if so, slice off the excess
-        if (count((array) $_SESSION['app']['user']['history']) > $this->generalSettings['maxBackSteps']) {
+        if (count((array) $_SESSION['app']['user']['history']) > $this->_maxBackSteps) {
 
-            $_SESSION['app']['user']['history'] = array_slice($_SESSION['app']['user']['history'], count((array) $_SESSION['app']['user']['history']) - $this->generalSettings['maxBackSteps']);
+            $_SESSION['app']['user']['history'] = array_slice($_SESSION['app']['user']['history'], count((array) $_SESSION['app']['user']['history']) - $this->_maxBackSteps);
         }
     }
 
@@ -2847,6 +2829,5 @@ class Controller extends BaseClass
 		}
 		return $c;
 	}
-
 
 }

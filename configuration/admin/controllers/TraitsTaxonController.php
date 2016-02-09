@@ -197,7 +197,7 @@ class TraitsTaxonController extends TraitsController
 
 		$existing=$this->getTaxonValues(array('taxon'=>$taxon,'trait'=>$trait));
 		$t=$this->getTraitgroupTrait(array('trait'=>$trait));
-		$this->getSettings($t['trait_group_id']);
+		$this->getTraitsSettings();
 
 		if ($existing)
 		{

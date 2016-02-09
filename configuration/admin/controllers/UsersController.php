@@ -30,6 +30,61 @@ class UsersController extends Controller
 
     public $controllerPublicName = 'User administration';
 
+	private $dataChecks=
+		array(
+			'username' => array('minLength' => 2,'maxLength' => 32),
+			'password' => array('minLength' => 6,'maxLength' => 24,''=>8),
+			'first_name' => array('minLength' => 1,'maxLength' => 32),
+			'last_name' => array('minLength' => 1,'maxLength' => 32),
+			'email_address' => array(
+					'minLength' => 1,
+					'maxLength' => 64,
+					'regexp' => '/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/'
+				)
+		);
+		
+	private $emailSettings=
+		array(
+			'smtp_server' => 'mail.naturalis.nl',
+			'mailfrom_address' => 'linnaeus@eti.uva.nl',
+			'mailfrom_name' => 'linnaeus-system',
+			'mails' =>
+				array(
+					'newuser' =>
+						array(
+							'subject' => 'Your username and password for Linnaeus NG', 
+							'plain' =>
+'Below are your username and password for access to the Linnaeus NG administration:
+Username: %s
+Password: %s
+You can access Linnaeus NG at:
+[[url]]',
+							'html' =>
+'<html>Below are your username and password for access to the Linnaeus NG administration:<br />
+Username: %s<br />
+Password: %s<br />
+<br />
+You can access Linnaeus NG at:<br />
+<a href="[[url]]">[[url]]</a>',
+						),
+					'resetpassword' =>
+						array(
+							'subject' => 'Your new password for Linnaeus NG', 
+							'plain' =>
+'Your password has been reset. Below is your new password for access to the Linnaeus NG administration:
+Password: %s
+You can access Linnaeus NG at:
+[[url]]',
+							'html' =>
+'<html>Your password has been reset. Below is your new password for access to the Linnaeus NG administration:<br />
+Password: %s<br />
+<br />
+You can access Linnaeus NG at:<br />
+<a href="[[url]]">[[url]]</a>',
+						),
+				)
+		);
+
 
     /**
      * Constructor, calls parent's constructor
@@ -350,11 +405,11 @@ class UsersController extends Controller
         }
 
 		$maxLengths = array(
-			'username' => $this->controllerSettings['dataChecks']['username']['maxLength'],
-			'password' => $this->controllerSettings['dataChecks']['password']['maxLength'],
-			'first_name' => $this->controllerSettings['dataChecks']['first_name']['maxLength'],
-			'last_name' => $this->controllerSettings['dataChecks']['last_name']['maxLength'],
-			'email_address' => $this->controllerSettings['dataChecks']['email_address']['maxLength'],
+			'username' => $this->dataChecks['username']['maxLength'],
+			'password' => $this->dataChecks['password']['maxLength'],
+			'first_name' => $this->dataChecks['first_name']['maxLength'],
+			'last_name' => $this->dataChecks['last_name']['maxLength'],
+			'email_address' => $this->dataChecks['email_address']['maxLength'],
 		);
 
 		$modules = $this->getProjectModules();
@@ -1352,8 +1407,8 @@ class UsersController extends Controller
 
 	private function getPasswordStrength($password)
 	{
-		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
-		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
+		$min = $this->dataChecks['password']['minLength'];
+		$max = $this->dataChecks['password']['maxLength'];
 
 		if (strlen($password) > $max)
 		{
@@ -1646,8 +1701,8 @@ class UsersController extends Controller
     {
         if (!$username) return false;
 
-		$min = $this->controllerSettings['dataChecks']['username']['minLength'];
-		$max = $this->controllerSettings['dataChecks']['username']['maxLength'];
+		$min = $this->dataChecks['username']['minLength'];
+		$max = $this->dataChecks['username']['maxLength'];
 
         $result = true;
 
@@ -1664,8 +1719,8 @@ class UsersController extends Controller
         }
 		else
         if (
-			isset($this->controllerSettings['dataChecks']['username']['regexp']) &&
-			!preg_match($this->controllerSettings['dataChecks']['username']['regexp'],$username)
+			isset($this->dataChecks['username']['regexp']) &&
+			!preg_match($this->dataChecks['username']['regexp'],$username)
 		)
 		{
             $this->addError($this->translate('Username has incorrect format.'));
@@ -1690,8 +1745,8 @@ class UsersController extends Controller
     {
         if (empty($password)) return false;
 
-		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
-		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
+		$min = $this->dataChecks['password']['minLength'];
+		$max = $this->dataChecks['password']['maxLength'];
 
         $result = true;
 
@@ -1708,8 +1763,8 @@ class UsersController extends Controller
         }
 		else
         if (
-			isset($this->controllerSettings['dataChecks']['password']['regexp']) &&
-			!preg_match($this->controllerSettings['dataChecks']['password']['regexp'],$password)
+			isset($this->dataChecks['password']['regexp']) &&
+			!preg_match($this->dataChecks['password']['regexp'],$password)
 			)
 		{
             $this->addError($this->translate('Password has incorrect format.'));
@@ -1743,8 +1798,8 @@ class UsersController extends Controller
     {
 		if (empty($email_address)) return false;
 
-		$min = $this->controllerSettings['dataChecks']['email_address']['minLength'];
-		$max = $this->controllerSettings['dataChecks']['email_address']['maxLength'];
+		$min = $this->dataChecks['email_address']['minLength'];
+		$max = $this->dataChecks['email_address']['maxLength'];
 
         $result = true;
 
@@ -1891,14 +1946,13 @@ class UsersController extends Controller
 
 	private function generateRandomPassword()
 	{
-		$chars = $this->controllerSettings['randomPassword']['chars'];
-
+		$chars='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 		srand((double)microtime()*1000000);
 
 		$i = 0;
 		$pass = '' ;
 
-		while ($i <= $this->controllerSettings['randomPassword']['length'])
+		while ($i <= $this->dataChecks['password']['default_length'])
 		{
 			$num = rand()%33;
 			$tmp = substr($chars, $num, 1);

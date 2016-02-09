@@ -74,7 +74,8 @@ class ProjectDeleteController extends Controller
 		'users_taxa',
 		'variations_labels',
 		'variation_relations',
-		'gui_menu_order'
+		'gui_menu_order',
+		'module_settings_values'
     );
 
     public function __construct ()
@@ -572,7 +573,7 @@ class ProjectDeleteController extends Controller
 
     public function deleteProjectSettings ($id)
     {
-        $this->models->Settings->delete(array(
+        $this->models->ModuleSettingsValues->delete(array(
             'project_id' => $id
         ));
     }

@@ -21,17 +21,10 @@
         {assign var=i value=$i+1}
         {elseif $v.show_in_public_menu==1}
         <td class="grid">
-            {if $useJavascriptLinks}
-            <span class="a" onclick="goMenuModule({$v.id});">
-                <div class="module-icon custom custom-{$v.id}"></div>
-                <p>{t}{$v.module}{/t}</p>
-            </span>
-            {else}
             <a class="menu-item" href="../module/?modId={$v.id}">
                 <div class="module-icon custom custom-{$v.id}"></div>
                 <div>{t}{$v.module}{/t}</div>
             </a>
-            {/if}
         </td>
         {assign var=i value=$i+1}
         {/if}

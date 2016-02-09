@@ -12,11 +12,7 @@
             {assign var=first value=false}
         {/if}
     {elseif $v.show_in_public_menu==1}
-        {if $useJavascriptLinks}
-            <li><span class="main-menu{if $v.id == $module.id}-selected{/if}" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span></li>
-        {else}
-            <li><a class="main-menu{if $v.id == $module.id}-selected{/if}" href="../module/?modId={$v.id}">{t}{$v.module}{/t}</a></li>
-        {/if}
+        <li><a class="main-menu{if $v.id == $module.id}-selected{/if}" href="../module/?modId={$v.id}">{t}{$v.module}{/t}</a></li>
         {assign var=first value=false}
     {/if}
 {/foreach}
