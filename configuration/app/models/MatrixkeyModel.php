@@ -52,7 +52,6 @@ final class MatrixKeyModel extends AbstractModel
 	
 				where
 					_a.project_id = " .  $project_id ."
-					and _a.got_names = 1
 					" . ( isset($matrix_id) && $matrix_id!='*' ? "and _a.id = " . $matrix_id : "" ) . "
 				order by
 					_a.default desc

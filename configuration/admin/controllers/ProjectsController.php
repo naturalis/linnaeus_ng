@@ -35,6 +35,7 @@ class ProjectsController extends Controller
             'lookup.js'
         )
     );
+	private $freeModulesMax=5;
 
 
     /**
@@ -92,7 +93,7 @@ class ProjectsController extends Controller
                 )
             ));
 
-            if (count((array) $fmp) < $this->controllerSettings['freeModulesMax'] && !$this->isFormResubmit()) {
+            if (count((array) $fmp) < $this->freeModulesMax && !$this->isFormResubmit()) {
 
                 $this->models->FreeModulesProjects->save(
                 array(
@@ -104,7 +105,7 @@ class ProjectsController extends Controller
             }
             else {
 
-                $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->controllerSettings['freeModulesMax']));
+                $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->freeModulesMax));
             }
         }
 
@@ -139,7 +140,7 @@ class ProjectsController extends Controller
 
         $this->smarty->assign('freeModules', $freeModules);
 
-        $this->smarty->assign('freeModuleMax', $this->controllerSettings['freeModulesMax']);
+        $this->smarty->assign('freeModuleMax', $this->freeModulesMax);
 
         $this->printPage();
     }

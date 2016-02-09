@@ -62,6 +62,8 @@ class KeyController extends Controller
 	private $killSwitchTriggered=false;
 	private $taxaInBranch=array();
 	private $branchStartStepId=null;  //step id
+	
+	private $maxChoicesPerKeystep=16;
 
 	/**
 	* constructor
@@ -222,7 +224,7 @@ class KeyController extends Controller
 
             $this->smarty->assign('step', $step);
             $this->smarty->assign('choices', $choices);
-            $this->smarty->assign('maxChoicesPerKeystep', $this->controllerSettings['maxChoicesPerKeystep']);
+            $this->smarty->assign('maxChoicesPerKeystep', $this->maxChoicesPerKeystep);
         }
         else
 		{

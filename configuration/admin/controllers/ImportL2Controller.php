@@ -104,6 +104,8 @@ class ImportL2Controller extends ImportController
 
 	private $_tempTeller = 0;
 
+	private $defaultProjectCss = '../../style/import-default-stylesheet.css';
+
 
     /**
      * Constructor, calls parent's constructor
@@ -230,6 +232,8 @@ class ImportL2Controller extends ImportController
 
         $this->smarty->assign('isSharedMediaDirWritable', is_writable($this->generalSettings['directories']['mediaDirProject']));
 
+		$this->setWarning('PLEASE NOTE: two calls to "$this->saveSetting()" have been disabled, please check and fix manually (feb 2016).');
+
         $this->printPage();
     }
 
@@ -274,7 +278,7 @@ class ImportL2Controller extends ImportController
                 'title' => $projectTitle,
                 'version' => trim((string) $d->version),
                 'sys_description' => 'Created by import from a Linnaeus 2-export.',
-                'css_url' => $this->controllerSettings['defaultProjectCss']
+                'css_url' => $this->defaultProjectCss
             ));
 
             $_SESSION['admin']['system']['import']['moduleCount'] = 0;
@@ -956,11 +960,13 @@ class ImportL2Controller extends ImportController
 
                         $this->addModuleToProject(MODCODE_KEY, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
                         $this->grantModuleAccessRights(MODCODE_KEY, $this->getNewProjectId());
+						/*
                         $this->saveSetting(array(
                             'name' => 'keytype',
                             'value' => 'l2',
                             'pId' => $this->getNewProjectId()
                         ));
+						*/
 
                         $this->_sawModule = false;
 
@@ -1104,11 +1110,13 @@ class ImportL2Controller extends ImportController
 
                     $this->addModuleToProject(MODCODE_DISTRIBUTION, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
                     $this->grantModuleAccessRights(MODCODE_DISTRIBUTION, $this->getNewProjectId());
+					/*
                     $this->saveSetting(array(
                         'name' => 'maptype',
                         'value' => 'l2',
                         'pId' => $this->getNewProjectId()
                     ));
+					*/
 
                     $this->addMessage('Imported ' . $_SESSION['admin']['system']['import']['loaded']['map']['saved'] . ' map items.');
 
@@ -3493,8 +3501,7 @@ class ImportL2Controller extends ImportController
 
             $this->models->Matrices->save(array(
                 'id' => null,
-                'project_id' => $this->getNewProjectId(),
-                'got_names' => 1
+                'project_id' => $this->getNewProjectId()
             ));
 
 
@@ -4186,18 +4193,9 @@ class ImportL2Controller extends ImportController
 
                 $cnt = $controllers[$d[0]];
 
-                if ($this->generalSettings['useJavascriptLinks']) {
+				$href = '../' . $cnt['controller'] . '/' . (isset($cnt['url']) ? $controllers[$d[0]]['url'] : 'index.php') . (isset($cnt['param']) ? (strpos($cnt['url'], '?') === false ? '?' : '&') . $cnt['param'] . '=' . $id : null);
 
-                    $href = "goIntLink('" . $cnt['controller'] . "'," . "'" . (isset($cnt['url']) ? $cnt['url'] : 'index.php') . "'" . (isset($cnt['param']) ? ",['" . $cnt['param'] . ":" . $id . "']" : null) . ");";
-
-                    return '<span class="internal-link" onclick="' . $href . '">' . trim($d[2]) . '</span>';
-                }
-                else {
-
-                    $href = '../' . $cnt['controller'] . '/' . (isset($cnt['url']) ? $controllers[$d[0]]['url'] : 'index.php') . (isset($cnt['param']) ? (strpos($cnt['url'], '?') === false ? '?' : '&') . $cnt['param'] . '=' . $id : null);
-
-                    return '<a class="internal-link" href="' . $href . '">' . trim($d[2]) . '</a>';
-                }
+				return '<a class="internal-link" href="' . $href . '">' . trim($d[2]) . '</a>';
             }
         }
         else if (isset($d[0]) && isset($_SESSION['admin']['system']['import']['lookupArrays']['modules'][$d[0]][$d[1]])) {
@@ -4206,18 +4204,9 @@ class ImportL2Controller extends ImportController
 
             if (isset($id) && isset($d[2])) {
 
-                if ($this->generalSettings['useJavascriptLinks']) {
+				$href = '../module/topic.php?modId=' . $ids['moduleId'] . '&id=' . $ids['pageId'];
 
-                    $href = "goIntLink('module','topic.php',['modId:" . $ids['moduleId'] . "','id:" . $ids['pageId'] . "'])";
-
-                    return '<span class="internal-link" onclick="' . $href . '">' . trim($d[2]) . '</span>';
-                }
-                else {
-
-                    $href = '../module/topic.php?modId=' . $ids['moduleId'] . '&id=' . $ids['pageId'];
-
-                    return '<a class="internal-link" href="' . $href . '">' . trim($d[2]) . '</a>';
-                }
+				return '<a class="internal-link" href="' . $href . '">' . trim($d[2]) . '</a>';
             }
         }
 

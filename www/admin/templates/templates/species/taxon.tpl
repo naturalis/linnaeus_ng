@@ -108,14 +108,13 @@ $(document).ready(function(){
 	
 		taxonActiveTaxonId = $('#taxon_id').val();
 
-		allSetAutoSaveFreq({$autoSaveFrequency});
-		taxonRunAutoSave();
+		//allSetAutoSaveFreq({$autoSaveFrequency});
+		//taxonRunAutoSave();
 
 		initTinyMce('{$literature}','{$media}');
 	{/if}
 
 
-	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 	allLookupNavigateOverrideUrl('taxon.php?id=%s&cat=');
 
 {literal}	

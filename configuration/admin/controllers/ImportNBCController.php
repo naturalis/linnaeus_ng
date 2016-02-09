@@ -13,6 +13,7 @@
 
 include_once ('ProjectDeleteController.php');
 include_once ('ImportController.php');
+include_once ('ModuleSettingsController.php');
 
 class ImportNBCController extends ImportController
 {
@@ -44,6 +45,7 @@ class ImportNBCController extends ImportController
 		'Sexe op foto' => 'gender_photo'
 	);
     private $_stdVariantColumns = array('sekse','variant');
+	private $defaultProjectCss = '../../style/import-default-stylesheet.css';
 
     public $usedModelsExtended = array(
 		'gui_menu_order',
@@ -68,23 +70,50 @@ class ImportNBCController extends ImportController
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct()
     {
-
         // Add specific models for this extended class to $usedModels
         $this->extendUsedModels();
 
         parent::__construct();
+		
+		$this->initialize();
+	}
+	
+	private function initialize()
+	{
 
 		define('MATRIX_SCIENTIFIC_NAME_STUB','(matrix)');
 
 		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
-
         $this->setBreadcrumbRootName($this->translate($this->controllerPublicName));
-
         $this->setSuppressProjectInBreadcrumbs();
-
 		$this->isAuthorisedForImport();
+
+die();
+			$settings = array(
+				'matrixtype' => 'nbc',
+				'matrix_allow_empty_species' => true,
+				'matrix_use_character_groups' => true,
+				'taxa_use_variations' => true,
+				'start_page' => '../../../app/views/matrixkey/identify.php',
+				//'suppress_splash' => '1',
+				'skin' => $this->_defaultSkinName
+			);
+
+			foreach((array)$settings as $key => $val)
+				$this->saveSetting(array('name' => $key, 'value' => $val, 'pId' => $this->getNewProjectId()));
+
+			if ($this->rHasVar('settings'))
+			{
+				foreach((array)$this->rGetVal('settings') as $key => $val)
+				{
+					if (!empty($val)) $this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));
+				}
+			}
+			
+			
+			
     }
 
 
@@ -261,7 +290,7 @@ class ImportNBCController extends ImportController
 					'title' => $pTitle,
 					'version' => '1',
 					'sys_description' => 'Created by import from a NBC-export.',
-					'css_url' => $this->controllerSettings['defaultProjectCss'],
+					'css_url' => $this->defaultProjectCss,
 					'group' => $pGroup,
 					'published' => 1
 				));
@@ -1878,8 +1907,7 @@ class ImportNBCController extends ImportController
 
         $this->models->Matrices->save(array(
             'id' => null,
-            'project_id' => $this->getNewProjectId(),
-            'got_names' => 1
+            'project_id' => $this->getNewProjectId()
         ));
 
         $id = $this->models->Matrices->getNewId();

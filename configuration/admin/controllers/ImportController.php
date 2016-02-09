@@ -184,8 +184,7 @@ class ImportController extends Controller
 
 		$this->models->Matrices->save(array(
 			'id' => null,
-			'project_id' => $this->getCurrentProjectId(),
-			'got_names' => 1
+			'project_id' => $this->getCurrentProjectId()
 		));
 
 		$mId = $this->models->Matrices->getNewId();
