@@ -5,7 +5,7 @@
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" id="id" value="{$matrix.id}" />
-<input type="hidden" name="action" id="action" value="" />
+<input type="hidden" name="action" id="action" value="save" />
 
 <p>
 {t}Edit matrix names:{/t}
@@ -30,5 +30,20 @@
 
 </form>
 
+</p>
+
+</div>
+
 {include file="../shared/admin-messages.tpl"}
+
+<script>
+$(document).ready(function(e)
+{
+	$('#page-block-messages').fadeOut(3000);    
+});
+
+
+</script>
+
+
 {include file="../shared/admin-footer.tpl"}
