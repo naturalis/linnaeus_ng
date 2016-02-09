@@ -12,6 +12,7 @@ include_once ('TraitsController.php');
 class TraitsTraitsController extends TraitsController
 {
 
+    public $modelNameOverride='TraitsTraitsModel';
 	private $_lookupListMaxResults=99999;
 	
     public $usedModels = array(
