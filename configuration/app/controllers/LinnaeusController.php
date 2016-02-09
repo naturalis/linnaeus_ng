@@ -13,44 +13,14 @@
 	*/
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class LinnaeusController extends Controller
 {
 
     public $usedModels = array(
 		'content'
-
-/*
-        'content_taxa',
-		'content_free_modules',
-        'page_taxon',
-        'page_taxon_title',
-        'media_taxon',
-        'media_descriptions_taxon',
-		'synonym',
-		'commonname',
-		'content_introduction',
-		'literature',
-
-		'choice_content_keystep',
-		'content_keystep',
-		'choice_keystep',
-		'keystep',
-		'literature',
-		'glossary_media',
-		'matrix',
-		'matrix_name',
-		'matrix_taxon_state',
-		'characteristic',
-		'characteristic_label',
-		'characteristic_label_state',
-		'characteristic_matrix',
-		'characteristic_label_state',
-		'characteristic_state',
-		'occurrence_taxon',
-		'names'
-*/
-		    );
+	);
 
     public $usedHelpers = array(
     );
@@ -74,9 +44,8 @@ class LinnaeusController extends Controller
      */
     public function __construct($p=null)
     {
-
         parent::__construct($p);
-
+		$this->initialize();
     }
 
     /**
@@ -86,9 +55,13 @@ class LinnaeusController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
+    }
 
+
+    private function initialize()
+    {
+		$this->moduleSettings=new ModuleSettingsReaderController;
     }
 
 
@@ -105,37 +78,30 @@ class LinnaeusController extends Controller
 
 		$this->resolveProjectId();
 
-		if (!$this->getCurrentProjectId()) {
-
+		if (!$this->getCurrentProjectId())
+		{
 			$this->addError($this->translate('Unknown project or invalid project ID.'));
-
 	        $this->printPage();
-
-		} else {
-
+		} 
+		else 
+		{
 	        $this->setUrls();
-
 			$this->setCurrentProjectData();
-
 			$this->setCssFiles();
 
-			if ($this->rHasVal('r')) {
-
+			if ($this->rHasVal('r'))
+			{
 				$url = $this->rGetVal('r');
-
-			} else {
-
-				$url = $this->getSetting('start_page');
-
+			} 
+			else 
+			{
+				$url=$this->moduleSettings->getGeneralSetting( 'start_page' );
 				if (empty($url))
 					$url = 'index.php';
-
 			}
 
 			$this->redirect($url);
-
 		}
-
     }
 
 
@@ -146,19 +112,15 @@ class LinnaeusController extends Controller
      */
     public function indexAction ()
     {
-
-		if ($this->rHasVal('show','icongrid')) {
-
+		if ($this->rHasVal('show','icongrid'))
+		{
 			$this->printPage();
-
-		} else {
-
+		} 
+		else 
+		{
 			$this->setStoreHistory(false);
-
 			$this->redirect('../linnaeus/content.php?sub=Welcome');
-
 		}
-
     }
 
     /**
@@ -239,10 +201,10 @@ class LinnaeusController extends Controller
 	{
 
 		// see note at top of file
-		if ($sub==$this->controllerSettings['contentAboutETI']['sub']) {
+		if ($sub=='About ETI') {
 
 			$d = array(
-				'project_id' => $this->controllerSettings['contentAboutETI']['projectID'],
+				'project_id' => -10,
 				'language_id' => $this->getCurrentLanguageId()
 			);
 

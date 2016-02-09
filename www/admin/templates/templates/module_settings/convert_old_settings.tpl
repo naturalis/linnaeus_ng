@@ -17,7 +17,7 @@
         <td>{$v.old_value}</td>
         <td>{$v.new_setting}</td>
         <td>{if $v.new_setting}<input name="values[]" value="{$v.old_value_id}" type="checkbox"{if $v.new_value==''} checked="checked"{/if}>{else}-{/if}</td>
-        <td>{if $v.new_value!=''}a value already exists ({$v.new_value})! will be overridden if you choose.{/if}</td>
+        <td>{if $v.new_value!=''}a value already exists ('{$v.new_value}')! will be overridden if you choose.{/if}</td>
     </tr>
     {/foreach}
 </table>

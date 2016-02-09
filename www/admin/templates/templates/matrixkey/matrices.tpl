@@ -8,7 +8,7 @@
 <tr class="tr-highlight">
 	<td style="width:300px">
 	    <span class="a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">
-		{$val.names[$activeLanguage].name}
+		{if $val.names[$activeLanguage].name}{$val.names[$activeLanguage].name}{else}{$val.label}{/if}
         </span>
 		{if $val.default==1}<span title="default">*</span>{/if}
 	</td>

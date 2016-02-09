@@ -28,6 +28,12 @@ class ModuleSettingsReaderController extends Controller
 		$this->setGeneralSettingsValues();
     }
 
+    public static function getGeneralSettingsId()
+    {
+		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
+		return GENERAL_SETTINGS_ID;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

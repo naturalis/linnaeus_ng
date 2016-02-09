@@ -12,11 +12,7 @@
 		
 		<div id="map_options">
 			<b>
-			{if $useJavascriptLinks}			
-			<span onclick="goTaxon({$taxon.id})" class="a">{$taxon.taxon}</span>
-			{else}
 			<a href="../species/taxon.php?id={$taxon.id}">{$taxon.taxon}</a>
-			{/if}
 			</b><br/><br/>
 			{*{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
 			<hr style="height:1px;color:#999" />*}

@@ -19,6 +19,7 @@ TAB_NAAMGEVING wordt omgeleid naar CTAB_NAMES
 include_once ('SpeciesController.php');
 include_once ('RdfController.php');
 include_once ('NSRFunctionsController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class SpeciesControllerNSR extends SpeciesController
 {
@@ -49,17 +50,16 @@ class SpeciesControllerNSR extends SpeciesController
     private function initialise()
     {
 		$this->NSRFunctions=new NSRFunctionsController;
+		$this->moduleSettings=new ModuleSettingsReaderController;
 
-		$this->_taxon_base_url_images_main = $this->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
-		$this->_taxon_base_url_images_thumb = $this->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
-		$this->_taxon_base_url_images_overview = $this->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
-		$this->_taxon_fetch_ez_data = $this->getSetting( "taxon_fetch_ez_data", false );
+		$this->_taxon_base_url_images_main = $this->moduleSettings->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
+		$this->_taxon_base_url_images_thumb = $this->moduleSettings->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
+		$this->_taxon_base_url_images_overview = $this->moduleSettings->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
+		$this->_taxon_fetch_ez_data = $this->moduleSettings->getSetting( "taxon_fetch_ez_data", false );
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
-
-		//$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
 
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(

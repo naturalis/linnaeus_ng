@@ -4,15 +4,10 @@
 
 	to do technical:
 	- admin: replace $this->saveSetting(...);
-	- app: replace $this->getSetting(...);
-	- app: replace $this->saveSetting(...);
-	- admin: include settings from file
-			$this->generalSettings['directories']['mediaDirProject'] etc.
-		if they are actually used!
-	- app: idem
-	- admin & app: maybe also move CONSTANTS there
+
 	- create default settings-set as base data
 	- create default value set for new projects
+
 	- find out what the hell this does:
 	
 			private function initProjectSettings()
@@ -477,7 +472,7 @@ class ModuleSettingsController extends Controller
 
 
 	/*
-		below are two semi-manual conversion functions that can be removed once all active 
+		below are semi-manual conversion functions that can be removed once all active 
 		projects have run it once. if you do remove them, be sure to also remove:
 		- convert_old_settings.tpl
 		- convert_old_settings.php

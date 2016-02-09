@@ -38,9 +38,13 @@ class MapKeyController extends Controller
 			)
 		);
 
-	private $_mapType = 'lng';
+	private $_mapType='lng';
 	private $_allTaxa;
-
+	
+	private $l2DiversityIndexNumOfClasses=8;
+	private $l2MaxMapWidth=600;
+	private $SRID=4326;
+	private $urlToCheckConnectivity='http://maps.google.com/maps/api/js?sensor=false';
 
     /**
      * Constructor, calls parent's constructor
@@ -49,6 +53,8 @@ class MapKeyController extends Controller
      */
     public function __construct($p=null)
     {
+		
+		die( 'to be replaced' );
 
         parent::__construct($p);
 
@@ -97,7 +103,7 @@ class MapKeyController extends Controller
 
 		$this->setPageName($this->translate('Choose a species'));
 
-		$pagination = $this->getPagination($this->getTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
+		$pagination = $this->getPagination($this->getTaxaWithOccurrences(),25);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 
@@ -114,7 +120,7 @@ class MapKeyController extends Controller
 
 		$this->setPageName($this->translate('Choose a species'));
 
-		$pagination = $this->getPagination($this->l2GetTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
+		$pagination = $this->getPagination($this->l2GetTaxaWithOccurrences(),25);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 
@@ -677,7 +683,7 @@ class MapKeyController extends Controller
 	private function checkRemoteServerAccessibility()
 	{
 
-		$f = @fopen($this->controllerSettings['urlToCheckConnectivity'], 'r');
+		$f = @fopen($this->urlToCheckConnectivity, 'r');
 
 		if (!$f) return false;
 
@@ -994,7 +1000,7 @@ class MapKeyController extends Controller
 						where project_id = '.$this->getCurrentProjectId().'
 						and (
 							Intersects(
-								GeomFromText(\'POLYGON(('.$geoStr.'))\','.$this->controllerSettings['SRID'].') ,
+								GeomFromText(\'POLYGON(('.$geoStr.'))\','.$this->SRID.') ,
 								if(type=\'polygon\',boundary,coordinate)
 							)=1
 						)
@@ -1534,12 +1540,12 @@ class MapKeyController extends Controller
 			{
 				$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
 
-				if ($this->controllerSettings['l2MaxMapWidth'] > 0 &&
-						$m[$key]['size'][0] > $this->controllerSettings['l2MaxMapWidth']) {
+				if ($l2MaxMapWidth > 0 &&
+						$m[$key]['size'][0] > $l2MaxMapWidth) {
 
-					$tmpHeight = $m[$key]['size'][1]*($this->controllerSettings['l2MaxMapWidth']/$m[$key]['size'][0]);
+					$tmpHeight = $m[$key]['size'][1]*($l2MaxMapWidth/$m[$key]['size'][0]);
 
-					$m[$key]['cellWidth'] = (floor($this->controllerSettings['l2MaxMapWidth']/$val['cols']))-1;
+					$m[$key]['cellWidth'] = (floor($l2MaxMapWidth/$val['cols']))-1;
 					$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
 
 					// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
@@ -1899,8 +1905,8 @@ class MapKeyController extends Controller
 			$thisMax =
 			$max +
 			(
-					($val - $this->controllerSettings['l2DiversityIndexNumOfClasses']) *
-					($max / $this->controllerSettings['l2DiversityIndexNumOfClasses'])
+					($val - $this->l2DiversityIndexNumOfClasses) *
+					($max / $this->l2DiversityIndexNumOfClasses)
 			);
 
 			$legend[$key] =

@@ -185,11 +185,10 @@ class ExportAppController extends Controller
 		$m = $this->models->Matrices->_get(
 		array(
 			'id' => array(
-				'project_id' => $this->getCurrentProjectId(),
-				'got_names' => 1
+				'project_id' => $this->getCurrentProjectId()
 			),
 			'fieldAsIndex' => 'id',
-			'columns' => 'id,got_names,\'matrix\' as type, `default`'
+			'columns' => 'id,\'matrix\' as type, `default`'
 		));
 
 		foreach ((array) $m as $key => $val) {

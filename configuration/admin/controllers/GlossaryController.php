@@ -57,6 +57,8 @@ class GlossaryController extends Controller
 			'dialog/jquery.modaldialog.js'
 		)
 	);
+	
+	private $termsPerPage=20;
 
     /**
      * Constructor, calls parent's constructor
@@ -170,7 +172,7 @@ class GlossaryController extends Controller
 
 			}
 
-			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
+			$pagination = $this->getPagination($gloss,$this->termsPerPage);
 
 			$gloss = $pagination['items'];
 
@@ -1179,6 +1181,10 @@ class GlossaryController extends Controller
 
     private function filterContent($content)
     {
+		
+		return array('content' => $content, 'modified' => false);
+		 
+		/*
 
         if (!$this->controllerSettings['filterContent'])
             return $content;
@@ -1192,6 +1198,7 @@ class GlossaryController extends Controller
         }
 
         return array('content' => $modified, 'modified' => $content!=$modified);
+		*/
 
     }
 

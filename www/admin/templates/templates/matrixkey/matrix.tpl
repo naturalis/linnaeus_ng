@@ -6,73 +6,29 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" id="id" value="{$matrix.id}" />
 <input type="hidden" name="action" id="action" value="" />
-<table>
-{if $languages|@count > 1}
-	<tr>
-		<td>
-		</td>
-		<td>
-		<span id="taxon-language-default-language">
-{foreach $languages v i}
-{if $v.def_language=='1'}{$v.language}{/if}
-{/foreach}		
-		</span>
-		</td>
-		<td>
-			<span id="project-language-tabs"></span>
-		</td>
-{/if}
-	</tr>
-	<tr>
-		<td>
-			{t}Matrix name:{/t}
-		</td>
-		<td>
-			<input
-				type="text"
-				id="matrix-default" 
-				onblur="matrixSaveMatrixName(allDefaultLanguage)"
-				maxlength="64" />
-		</td>
-{if $languages|@count > 1}
-		<td>
-			<input
-				type="text"
-				id="matrix-other" 
-				onblur="matrixSaveMatrixName(allActiveLanguage)"
-				maxlength="64" />
-		</td>
-{/if}
-	</tr>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<input type="button" onclick="matrixSaveMatrixNameAll();window.open('matrices.php','_top')" value="{t}save{/t}" />&nbsp;
-			{if $matrix.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
-			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.admin.system.referer.url}','_top')" />
-		</td>
-	</tr>
-</table>
-</form>
-</p>
-</div>
 
-<script type="text/JavaScript">
-$(document).ready(function()
-{
-	allActiveView = 'matrixname';
+<p>
+{t}Edit matrix names:{/t}
+</p>
+
+<table>
+	<tr>
+    	<td>{t}Internal name{/t}:</td>
+        <td><input type="text" name="sys_name" value="{$matrix.sys_name}" maxlength="64" /></td>
+	</tr>                
 {foreach $languages v i}
-	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
-{/foreach}
-	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-	allDrawLanguages();
-	
-	matrixGetMatrixName(allDefaultLanguage);
-	matrixGetMatrixName(allActiveLanguage);
-});
-</script>
+	<tr>
+    	<td>{$v.language} {t}name{/t}:</td>
+        <td><input type="text" name="name[{$v.language_id}]" value="{$matrix.names[$v.language_id].name}" maxlength="64" /></td>
+	</tr>                
+{/foreach}		
+</table>
+
+<p>
+	<input type="submit" value="{t}save{/t}" />
+</p>
+
+</form>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

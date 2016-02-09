@@ -160,11 +160,12 @@ class SearchController extends Controller
 		define('__CONCAT_RESULT__','__CONCAT_RESULT__');
 		define('V_RESULT_LIMIT_PER_CAT',200);
 
-		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3));
-		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50));
-		$this->_excerptPreMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre-match_length','subst'=>35));
-		$this->_excerptPostMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_post-match_length','subst'=>35));
-		$this->_excerptPrePostMatchString=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre_post_match_string','subst'=>'...'));
+		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3,'module'=>'utilities'));
+		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50,'module'=>'utilities'));
+		$this->_excerptPreMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre-match_length','subst'=>35,'module'=>'utilities'));
+		$this->_excerptPostMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_post-match_length','subst'=>35,'module'=>'utilities'));
+		$this->_excerptPrePostMatchString=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre_post_match_string','subst'=>'...','module'=>'utilities'));
+		
 	}
 
     public function indexAction ()
