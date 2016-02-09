@@ -45,7 +45,8 @@
 
 
 include_once ('Controller.php');
-include_once ('ModuleSettingsController.php');
+include_once ('ModuleSettingsReaderController.php');
+
 class MatrixKeyController extends Controller
 {
 
@@ -78,6 +79,7 @@ class MatrixKeyController extends Controller
 
 	private $_totalEntityCount=0;
 	private $_activeMatrix=null;
+	private $_useCorrectedHValue=true;
 
 //	private $_characters=null;
 	private $_dataSet=null;
@@ -92,7 +94,7 @@ class MatrixKeyController extends Controller
 	private $_master_matrix;
 	private $settings;
 
-	private $_nbc_image_root=true;
+	private $image_root_skin=true;
 
 
     public $cssToLoad = array('matrix.css');
@@ -116,7 +118,7 @@ class MatrixKeyController extends Controller
 
     private function initialize()
     {
-		$this->moduleSettings=new ModuleSettingsController;
+		$this->moduleSettings=new ModuleSettingsReaderController;
 
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
 		$this->moduleSettings->assignModuleSettings( $this->settings );
@@ -131,15 +133,19 @@ class MatrixKeyController extends Controller
 
 		$this->setIntroductionLinks();
 
-		$this->_nbc_image_root = $this->getSetting('nbc_image_root');
-
-		$this->smarty->assign( 'image_root_skin', $this->_nbc_image_root );
+		$this->_search_presence_help_url = $this->moduleSettings->getModuleSetting( array('setting'=>'url_help_search_presence','module'=>'utilities') );
+		$this->image_root_skin = $this->moduleSettings->getModuleSetting( 'image_root_skin');
+		
+		$this->smarty->assign( 'image_root_skin', $this->image_root_skin );
 		$this->smarty->assign( 'introduction_links', $this->getIntroductionLinks() );
 		$this->smarty->assign( 'settings', $this->settings );
 
 		$this->setFacetMenu();
 		$this->setIncUnknowns( false );
 	}
+	
+	
+	
 
     public function indexAction()
     {
@@ -463,7 +469,7 @@ class MatrixKeyController extends Controller
 
 		$corrFactor = $uniqueTaxa / $tot;
 
-        return $hValue * ($this->controllerSettings['useCorrectedHValue'] == true ? $corrFactor : 1);
+        return $hValue * ($this->_useCorrectedHValue == true ? $corrFactor : 1);
     }
 
     private function setDataSet()

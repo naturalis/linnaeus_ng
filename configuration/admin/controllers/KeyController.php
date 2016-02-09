@@ -62,6 +62,8 @@ class KeyController extends Controller
 	private $killSwitchTriggered=false;
 	private $taxaInBranch=array();
 	private $branchStartStepId=null;  //step id
+	
+	private $maxChoicesPerKeystep=16;
 
 	/**
 	* constructor
@@ -222,7 +224,7 @@ class KeyController extends Controller
 
             $this->smarty->assign('step', $step);
             $this->smarty->assign('choices', $choices);
-            $this->smarty->assign('maxChoicesPerKeystep', $this->controllerSettings['maxChoicesPerKeystep']);
+            $this->smarty->assign('maxChoicesPerKeystep', $this->maxChoicesPerKeystep);
         }
         else
 		{
@@ -467,11 +469,6 @@ class KeyController extends Controller
 
             if ($this->models->ChoicesKeysteps->getAffectedRows() > 0)
 			{
-                if ($this->rGetVal('res_taxon_id') !== '0')
-				{
-                    $this->setKeyTaxaChanged();
-                }
-
                 $choice['res_keystep_id'] = $this->rGetVal('res_keystep_id');
 
                 $choice['res_taxon_id'] = $this->rGetVal('res_taxon_id');
@@ -764,8 +761,6 @@ class KeyController extends Controller
 
             if ($k===true)
 			{
-                $this->setKeyTaxaChanged();
-
                 $this->addMessage($this->translate('Key tree saved'));
 
                 if ($this->rHasVal('step'))
@@ -1187,14 +1182,6 @@ class KeyController extends Controller
         return isset($step) ? $step : null;
     }
 
-    private function setKeyTaxaChanged()
-    {
-        $this->saveSetting(array(
-            'name' => 'keyTaxaChanged',
-            'value' => time()
-        ));
-    }
-
     private function getKeyTree( $p=null )
     {
 		$refId = isset($p['ref_id']) ? $p['ref_id'] : null;
@@ -1447,8 +1434,6 @@ class KeyController extends Controller
             'project_id' => $this->getCurrentProjectId(),
             'id' => $id
         ));
-
-        $this->setKeyTaxaChanged();
     }
 
     private function deleteKeystep($id)
@@ -1467,9 +1452,6 @@ class KeyController extends Controller
             $hadTaxa = $hadTaxa == true || !empty($val['res_taxon_id']);
             $this->deleteKeystepChoice($val['choice_id']);
         }
-
-        if ($hadTaxa)
-            $this->setKeyTaxaChanged();
 
         $this->models->ChoicesKeysteps->update(array(
             'res_keystep_id' => 'null'
@@ -1940,8 +1922,6 @@ class KeyController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'id' => $val['id']
 			));
-
-			$this->setKeyTaxaChanged();
 		}
     }
 
@@ -1980,24 +1960,6 @@ class KeyController extends Controller
             'keystep' => $d2[0],
             'choice' => $d3[0]
         );
-    }
-
-    private function didKeyTaxaChange()
-    {
-        $d = $this->getSetting('keyTaxaChanged');
-
-        if ($d == null)
-            return true;
-
-        $k = $this->models->Keytrees->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
-        ));
-
-        return $k[0]['date_x'] < $d;
     }
 
     private function getLookupList()

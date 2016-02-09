@@ -26,6 +26,51 @@ final class ControllerModel extends AbstractModel
         parent::__destruct();
     }
 
+    public function getGeneralSetting( $params )
+    {
+		/*
+			this would be in the ModuleSettingsReaderController, were it not
+			that it already extends Controller, causing infinite recursion .
+		*/
+		
+	    $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
+	    $module_id = isset($params['module_id']) ? $params['module_id'] :  null;
+	    $setting = isset($params['setting']) ? $params['setting'] :  null;
+        $substitute = isset($params['substitute']) ? $params['substitute'] : null;
+
+        if ( is_null($project_id) || is_null($module_id) || is_null($setting) )
+		{
+			return null;
+		}
+
+        $query = "
+			select value
+			from %PRE%module_settings _a
+			
+			left join %PRE%module_settings_values _b
+				on _a.id=_b.setting_id
+				
+			where
+				_a.module_id = " . $module_id . "
+				and _a.setting = '" . $setting . "'
+				and _b.project_id = " . $project_id ."
+		
+		";
+		
+		$d=$this->freeQuery($query);
+		
+		if (isset($d[0]) && !empty($d[0]['value']) )
+		{
+			return $d[0]['value'];
+		}
+		else
+		{
+			return $substitute;
+		}
+	}
+
+
+
     public function getTaxonById ($params)
     {
 		if (!$params) {
@@ -265,8 +310,6 @@ final class ControllerModel extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
-
 
 }
 

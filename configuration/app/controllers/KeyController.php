@@ -1,12 +1,14 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsController.php');
 
 class KeyController extends Controller
 {
     private $_taxaStepList;
 	private $_choiceList = array();
     private $_tempList = array();
+	private $_keyPathMaxItems=3;
 	public $currentKeyStepId;
 
     public $usedModels = array(
@@ -46,6 +48,7 @@ class KeyController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
+        $this->initialize();
     }
 
     /**
@@ -57,6 +60,12 @@ class KeyController extends Controller
     {
         parent::__destruct();
     }
+
+
+    private function initialize()
+    {
+		$this->moduleSettings=new ModuleSettingsController;
+	}
 
     /**
      * Main procedure for key
@@ -139,8 +148,8 @@ class KeyController extends Controller
 
 		$taxa = $this->getTaxonDivision($step['id']);
 
-        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
-		$this->smarty->assign('keyType',$this->getSetting('keytype'));
+        $this->smarty->assign('keyPathMaxItems', $this->_keyPathMaxItems);
+		$this->smarty->assign('keyType',$this->getKeytype());
 		$this->smarty->assign('taxaState',$this->getTaxaState());
 		$this->smarty->assign('remaining',$taxa['remaining']);
 		$this->smarty->assign('excluded',$taxa['excluded']);
@@ -206,8 +215,8 @@ class KeyController extends Controller
         	$this->setTaxaState('excluded');
         }
 
-        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
-		$this->smarty->assign('keyType',$this->getSetting('keytype'));
+        $this->smarty->assign('keyPathMaxItems', $this->_keyPathMaxItems);
+		$this->smarty->assign('keyType',$this->getKeytype());
 
         $this->printPage();
     }
@@ -812,7 +821,7 @@ class KeyController extends Controller
 	/* the rest */
 	private function getKeytype()
 	{
-		return $this->getSetting('keytype');
+		return $this->moduleSettings->getSetting('keytype');
 	}
 
 	private function choicesHaveL2Attributes($choices)

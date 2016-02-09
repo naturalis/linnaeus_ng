@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('RdfController.php');
+include_once ('ModuleSettingsReaderController.php');
 class WebservicesController extends Controller
 {
     private $_usage=null;
@@ -18,9 +19,7 @@ class WebservicesController extends Controller
 	private $_JSON=null;
 
     public $usedModels = array(
-		'taxon',
-		'commonname',
-		'synonym',
+		'taxa',
 		'names',
 		'media_taxon',
 		'nsr_ids',
@@ -667,7 +666,7 @@ parameters:
 		}
 
 
-        $d=$this->models->Taxon->freeQuery("
+        $d=$this->models->Taxa->freeQuery("
 			select
 				count(*) as total,
 				_h.id as presence_id,
@@ -825,7 +824,7 @@ parameters:
 		*/
 	
 
-		$d=$this->models->Taxon->freeQuery("
+		$d=$this->models->Taxa->freeQuery("
 			select count(distinct id) as total from
 			(
 				select
@@ -899,7 +898,7 @@ parameters:
 
 		$exotenGroupId=1;
 
-        $d=$this->models->Taxon->freeQuery("
+        $d=$this->models->Taxa->freeQuery("
 			select
 				_a.id
 			from taxa _a
@@ -994,7 +993,7 @@ parameters:
 				(int)$this->requestData['max'] : 
 				$max;
 
-		$taxa=$this->models->Taxon->freeQuery("
+		$taxa=$this->models->Taxa->freeQuery("
 			select
 				_a.name,
 				_b.nametype,
@@ -1081,7 +1080,8 @@ parameters:
     private function initialise()
     {
 		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
-		
+		$this->moduleSettings=new ModuleSettingsReaderController;
+	
 		$this->useCache=false;
 		$this->checkProject();
 
@@ -1091,7 +1091,7 @@ parameters:
 		} 
 		else 
 		{
-			$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
+			$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array( 'setting'=>'db_lc_time_names','subst'=>'nl_NL'))."'");
 			$this->checkJSONPCallback();
 		}
     }
@@ -1107,9 +1107,8 @@ parameters:
 
 		}
 		else
-		 {
-
-			$p = $this->models->Project->_get(array(
+		{
+			$p = $this->models->Projects->_get(array(
 				'id' => $this->requestData['pid']
 			));
 		
@@ -1141,18 +1140,21 @@ parameters:
 
 	private function checkFromDate()
 	{
-		if (!$this->rHasVal('from')) {
-
+		if (!$this->rHasVal('from'))
+		{
 			$this->addError('no starttime specified of retrieval window.');
-
-		} else {
-
+		} 
+		else 
+		{
 			$d=str_split($this->requestData['from'],2);
 
-			if (strlen($this->requestData['from'])==8 && checkdate($d[2],$d[3],$d[0].$d[1])) {
+			if (strlen($this->requestData['from'])==8 && checkdate($d[2],$d[3],$d[0].$d[1]))
+			{
 				$this->setFromDate($this->requestData['from']);
 				return true;
-			} else {
+			}
+			else 
+			{
 				$this->addError('illegal date: '.$this->requestData['from'].'.');
 			}
 		}
@@ -1182,7 +1184,7 @@ parameters:
 			
 			$this->setMatchType('literal');
 
-			$t = $this->models->Taxon->_get(array(
+			$t = $this->models->Taxa->_get(array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon' => $taxon
@@ -1257,7 +1259,7 @@ parameters:
 			{
 				$this->setTaxonId($t[0]['id']);
 				
-				$t = $this->models->Taxon->_get(array(
+				$t = $this->models->Taxa->_get(array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $this->getTaxonId()
@@ -1276,12 +1278,12 @@ parameters:
 
 	private function checkNsrId()
 	{
-		if (!$this->rHasVal('nsr')) {
-
+		if (!$this->rHasVal('nsr'))
+		{
 			$this->addError('no NSR-id specified.');
-
-		} else {
-			
+		} 
+		else
+		{
 			$nsr=trim($this->requestData['nsr']);
 			
 			$this->setMatchType('literal');

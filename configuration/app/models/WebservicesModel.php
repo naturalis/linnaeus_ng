@@ -27,18 +27,6 @@ class WebservicesModel extends AbstractModel
         parent::__destruct();
     }
 
-    public function initDb( $params )
-	{
-		$db_lc_time_names = isset($params['db_lc_time_names']) ? $params['db_lc_time_names'] : null;
-		
-		if ( is_null($db_lc_time_names) )
-			return;
-		
-		$query="SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'";
-
-		$this->freeQuery( $query );
-	}
-
     public function getNames( $params )
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
