@@ -3004,5 +3004,38 @@ class Controller extends BaseClass
         }
 	}
 
+    /*
+     * Used to pull external data from an api using a curl request. Parameter can
+     * either be a url or an array with additional parameters (post data and timeout).
+     */
+	protected function getCurlResult ($p)
+	{
+        $url = is_array($p) && isset($p['url']) ? $p['url'] : (!empty($p) ? $p : false);
+        $post = isset($p['post']) ? $p['post'] : false;
+        $timeout = isset($p['timeout']) ? $p['timeout'] : 10;
 
+        if (!$url) {
+           return '';
+        }
+
+		$ch=curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+		if ($post) {
+            curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+		if ($timeout) {
+		    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+		}
+
+		$result=curl_exec($ch);
+		curl_close($ch);
+
+		$output = json_decode($result);
+		// Return raw output if result is no (valid) json
+		return !is_null($output) ? $output : $result;
+	}
 }
