@@ -218,43 +218,32 @@ class MatrixKeyController extends Controller
 
         if ( $this->rHasId() )
 		{
-
 			if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 			{
 				if ( $this->rHasVar( 'sys_name' ) && !empty($this->rGetVal( 'sys_name' ) ) )
 				{
-					$id=$this->createNewMatrix( $this->rGetVal( 'sys_name' ) );
-	
-					if ( $id )
-					{
-						$names=$this->rGetVal( 'name' );
-	
-						foreach((array)$names as $language_id => $name)
-						{
-							$this->saveMatrixName( array(
-								'matrix_id' => $id,
-								'language_id' =>  $language_id,
-								'name' => $name
-							));
-						}
-						
-						$this->redirect('matrix.php?id=' . $id);
-					}
-					else
-					{
-						$this->addError( $this->translate('Could not create new matrix.') );
-					}
+					$n=$this->saveMatrixSysName( array(
+						'matrix_id' => $this->rGetId(),
+						'name' => $this->rGetVal( 'sys_name' )
+					));
+					
+					if ($n>0) $this->addMessage( sprintf( 'Saved "%s".', $this->rGetVal( 'sys_name' ) ) );
 				}
-				else
+	
+				$names=$this->rGetVal( 'name' );
+
+				foreach((array)$names as $language_id => $name)
 				{
-					$this->addError( 'Internal name is required.' );
-					$this->smarty->assign( 'name' ,  $this->rGetVal( 'name' ) );
+					$n=$this->saveMatrixName( array(
+						'matrix_id' => $this->rGetId(),
+						'language_id' =>  $language_id,
+						'name' => $name
+					));
+					
+					if ($n>0) $this->addMessage( sprintf( 'Saved "%s".', $name ) );
 				}
+
 			}
-
-
-
-
 
             $matrix=$this->getMatrix(  $this->rGetId() );
 			$this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['names'][$this->getDefaultProjectLanguage()]['name']));
@@ -265,17 +254,7 @@ class MatrixKeyController extends Controller
     }
 
 
-
-
-
-
-
-
-
-
-
-
-    public function editAction ()
+	public function editAction ()
     {
         $this->checkAuthorisation();
 
@@ -293,7 +272,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('taxa', $this->getTaxa());
         if ($this->_useVariations) $this->smarty->assign('variations', $this->getVariationsInMatrix());
         $this->smarty->assign('matrix', $matrix);
-        $this->smarty->assign('matrices', $this->getMatrices(true));
+        $this->smarty->assign('matrices', $this->getMatrices());
         $this->printPage();
     }
 
@@ -1030,20 +1009,11 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function getMatrices($skipCurrent = false)
+    private function getMatrices()
     {
-        $d = array(
-            'project_id' => $this->getCurrentProjectId()
-        );
-
-        if ($skipCurrent)
-            $d['id !='] = $this->getCurrentMatrixId();
-
-        $m = $this->models->Matrices->_get(array(
-            'id' => $d
-        ));
-
-        foreach ((array) $m as $key => $val)
+        $m = $this->models->Matrices->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
+		
+        foreach ((array)$m as $key => $val)
 		{
             $mn = $this->models->MatricesNames->_get(
             array(
@@ -1068,7 +1038,7 @@ class MatrixKeyController extends Controller
             $m[$key]['default_name'] = $d;
             $m[$key]['label'] = (!empty($m[$key]['default_name']) ? $m[$key]['default_name'] : (!empty($m[$key]['sys_name']) ? $m[$key]['sys_name'] : '(matrix)' ) );
         }
-
+	
         $this->customSortArray($m, array(
             'key' => 'default_name',
             'case' => 'i'
@@ -1105,7 +1075,33 @@ class MatrixKeyController extends Controller
 			'matrix_id' => $matrix_id,
 			'name' => $name
 		));
+		
+		return $this->models->MatricesNames->getAffectedRows();
 	}
+
+    private function saveMatrixSysName( $p )
+	{
+		$matrix_id = isset($p['matrix_id']) ? $p['matrix_id'] : null;
+		$name = isset($p['name']) ? $p['name'] : null;
+
+		if ( is_null($matrix_id) || is_null($name) )
+			return;
+		
+        $this->models->Matrices->update(
+			array(
+				'sys_name' => $name
+			),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $matrix_id
+			)
+		);
+
+		return $this->models->Matrices->getAffectedRows();
+    }
+
+
+
 
     private function ajaxSaveMatrixName()
     {

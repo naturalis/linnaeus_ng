@@ -82,38 +82,12 @@ class ImportNBCController extends ImportController
 	
 	private function initialize()
 	{
-
 		define('MATRIX_SCIENTIFIC_NAME_STUB','(matrix)');
 
 		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
         $this->setBreadcrumbRootName($this->translate($this->controllerPublicName));
         $this->setSuppressProjectInBreadcrumbs();
 		$this->isAuthorisedForImport();
-
-die();
-			$settings = array(
-				'matrixtype' => 'nbc',
-				'matrix_allow_empty_species' => true,
-				'matrix_use_character_groups' => true,
-				'taxa_use_variations' => true,
-				'start_page' => '../../../app/views/matrixkey/identify.php',
-				//'suppress_splash' => '1',
-				'skin' => $this->_defaultSkinName
-			);
-
-			foreach((array)$settings as $key => $val)
-				$this->saveSetting(array('name' => $key, 'value' => $val, 'pId' => $this->getNewProjectId()));
-
-			if ($this->rHasVar('settings'))
-			{
-				foreach((array)$this->rGetVal('settings') as $key => $val)
-				{
-					if (!empty($val)) $this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));
-				}
-			}
-			
-			
-			
     }
 
 
