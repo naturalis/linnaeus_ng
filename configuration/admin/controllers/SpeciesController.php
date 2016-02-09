@@ -56,6 +56,7 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
 */
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 class SpeciesController extends Controller
 {
@@ -124,6 +125,7 @@ class SpeciesController extends Controller
             'dialog/jquery.modaldialog.js',
             'lookup.js',
             'jqTree/tree.jquery.js',
+            'media.js'
         )
     );
     public $controllerPublicName = 'Species module';
@@ -137,6 +139,8 @@ class SpeciesController extends Controller
     {
         parent::__construct();
         $this->initialize();
+
+        $media = new MediaController();
     }
 
 
@@ -483,9 +487,9 @@ class SpeciesController extends Controller
 
     public function editAction()
     {
-	
+
 		die( 'disabled (will be replaced with NSR-style editor)' );
-	
+
         $this->checkAuthorisation();
 
         if (!$this->rHasId())
@@ -749,9 +753,9 @@ class SpeciesController extends Controller
 
     public function newAction ()
     {
-		
+
 		die( 'disabled (will be replaced with NSR-style editor)' );
-	
+
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('New taxon'));
@@ -1036,7 +1040,7 @@ class SpeciesController extends Controller
     {
 
 		die( 'disabled (should be replaced with NSR-style editor)' );
-	 
+
 	    $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Orphaned taxa'));
@@ -2132,7 +2136,7 @@ class SpeciesController extends Controller
 
     public function collaboratorsAction ()
     {
-		
+
 		die( 'disabled (might be replaced with new rights-function)' );
 
         $this->checkAuthorisation();
