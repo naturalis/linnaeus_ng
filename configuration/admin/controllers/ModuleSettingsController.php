@@ -3,8 +3,6 @@
 /*
 
 	to do technical:
-	- admin: replace $this->saveSetting(...);
-
 	- create default settings-set as base data
 	- create default value set for new projects
 
@@ -212,7 +210,7 @@ class ModuleSettingsController extends Controller
 
 		if ( $this->rHasVal('action','save') )
 		{
-			$this->saveModuleSettingValues();
+			$this->saveModuleSettingValues( $this->rGetVal('value') );
 			$this->setModuleSettingValues();
 		}
 
@@ -419,10 +417,10 @@ class ModuleSettingsController extends Controller
 		}
 	}
 
-	private function saveModuleSettingValues()
+	private function saveModuleSettingValues( $values )
 	{
 
-		foreach((array)$this->rGetVal('value') as $setting_id => $val)
+		foreach((array)$values as $setting_id => $val)
 		{
 			if ( empty($setting_id) ) continue;
 
@@ -430,10 +428,10 @@ class ModuleSettingsController extends Controller
 
 			if ( $val!="" && !empty($curr) && $val != $curr['value'] )
 			{
-                $this->models->ModuleSettingsValues->update(array(
+                $this->models->ModuleSettingsValues->update(
                     array('value' => $val),
                     array('project_id' => $this->getCurrentProjectId(), 'id' => $curr['value_id'])
-                ));
+                );
 
 				$this->addMessage( sprintf( $this->translate( 'value updated to %s.' ),  $val ) );
 			}

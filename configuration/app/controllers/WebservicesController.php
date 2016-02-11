@@ -1079,7 +1079,7 @@ parameters:
 
     private function initialise()
     {
-		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
+		$this->Rdf = new RdfController(array('checkForProjectId'=>false));
 		$this->moduleSettings=new ModuleSettingsReaderController;
 	
 		$this->useCache=false;

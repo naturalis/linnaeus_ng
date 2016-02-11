@@ -569,14 +569,14 @@ class ImportNBCController extends ImportController
 		$this->smarty->assign('projectExists',$_SESSION['admin']['system']['import']['projectExists']);
 
         $this->smarty->assign('characters', $data['characters']);
-        $this->smarty->assign('skin', $this->_defaultSkinName);
-        $this->smarty->assign('matrix_state_image_per_row', 4);
-        $this->smarty->assign('matrix_state_image_max_height', 300);
-        $this->smarty->assign('matrix_items_per_page', 16);
-        $this->smarty->assign('matrix_items_per_line', 4);
-        $this->smarty->assign('matrix_use_sc_as_weight', 1);
-        $this->smarty->assign('matrix_browse_style', 'expand');	//paginate|expand
-        $this->smarty->assign('nbc_image_root', '../../media/system/skins/'.$this->_defaultSkinName.'/');
+        //$this->smarty->assign('skin', $this->_defaultSkinName);
+        //$this->smarty->assign('matrix_state_image_per_row', 4);
+        //$this->smarty->assign('matrix_state_image_max_height', 300);
+        $this->smarty->assign('items_per_page', 16);
+        $this->smarty->assign('items_per_line', 4);
+        //$this->smarty->assign('matrix_use_sc_as_weight', 1);
+        $this->smarty->assign('browse_style', 'expand');	//paginate|expand
+       	//$this->smarty->assign('image_root_skin', '../../media/system/skins/'.$this->_defaultSkinName.'/');
 
         $this->printPage();
     }
@@ -610,6 +610,51 @@ class ImportNBCController extends ImportController
 			$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
 			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 			*/
+
+
+/*
+
+			// WORK IN PROGRESS
+
+			$modules=array(
+				'matrix'=>array(
+					'matrixtype'=>'nbc',
+					'allow_empty_species'=>true,
+					'use_character_groups'=>true,
+				),
+				'species'=>array(
+					'use_taxon_variations'=>true,
+				),
+				'general'=>array(
+					'start_page'=>'../../../app/views/matrixkey/identify.php',
+					'skin'=>$this->_defaultSkinName,
+					'image_root_skin'=>'../../media/system/skins/'.$this->_defaultSkinName.'/'
+				),
+			);
+
+			foreach((array)$modules as $settings)
+			{
+				foreach((array)$settings as $key => $val)
+				{
+					$this->saveSetting(array('name' => $key, 'value' => $val, 'pId' => $this->getNewProjectId()));
+				}
+			}
+
+
+
+			if ($this->rHasVar('settings'))
+			{
+				foreach((array)$this->rGetVal('settings') as $key => $val)
+				{
+					if (!empty($val)) $this->saveSetting(array('name' => $key,'value' => $val,'pId' => $this->getNewProjectId()));
+				}
+			}
+			
+
+*/
+
+
+
 
 			$settings = array(
 				'matrixtype' => 'nbc',

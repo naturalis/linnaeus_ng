@@ -42,10 +42,10 @@ class LinnaeusController extends Controller
      *
      * @access     public
      */
-    public function __construct($p=null)
+    public function __construct( $p=null )
     {
-        parent::__construct($p);
-		$this->initialize();
+        parent::__construct( $p );
+		$this->initialize( $p );
     }
 
     /**
@@ -59,9 +59,9 @@ class LinnaeusController extends Controller
     }
 
 
-    private function initialize()
+    private function initialize( $p )
     {
-		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->moduleSettings=new ModuleSettingsReaderController( $p );
     }
 
 
