@@ -124,7 +124,6 @@ class Controller extends BaseClass
     private $_fullPath;
     private $_fullPathRelative;
     private $_checkForProjectId = true;
-    private $_checkForSplash = true;
     private $_allowEditOverlay = true; // true
     private $_currentGlossaryId = false;
     private $_currentHotwordLink = false;

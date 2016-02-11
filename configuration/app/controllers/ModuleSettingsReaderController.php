@@ -16,9 +16,9 @@ class ModuleSettingsReaderController extends Controller
 	private $_usedefaultwhennovalue=false;
 	public $modelNameOverride = 'ModuleSettingsModel';
 
-    public function __construct($p = null)
+    public function __construct( $p=null )
     {
-        parent::__construct($p);
+        parent::__construct( $p );
 
 		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
 
