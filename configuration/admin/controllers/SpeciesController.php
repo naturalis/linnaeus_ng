@@ -64,40 +64,42 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
                         'mandatory' => true,
                         'sections' => array ('General description','Biology')
                     ),
-                    1 => array(                    
+                    1 => array(
                         'name' => 'Detailed Description',
                         'sections' => array ('Behaviour','Cytology','Diagnostic Description',
                             'Genetics','Look Alikes','Molecular Biology','Morphology','Physiology',
                             'Size','Taxon Biology')
                     ),
-                    2 => array(                    
+                    2 => array(
                         'name' => 'Ecology',
                         'sections' => array ('Associations','Cyclicity','Dispersal','Distribution',
                             'Ecology','Habitat','Life Cycle','Life Expectancy','Migration','Trophic Strategy')
                     ),
-                    3 => array(                    
+                    3 => array(
                         'name' => 'Conservation',
                         'sections' => array ('Conservation Status','Legislation','Management','Procedures',
                             'Threats','Trends')
                     ),
-                    4 => array(                    
+                    4 => array(
                         'name' => 'Relevance',
                         'sections' => array ('Diseases','Risk Statement','Uses')
                     ),
-                    5 => array(                    
+                    5 => array(
                         'name' => 'Reproductive',
                         'sections' => array ('Population Biology','Reproduction')
                     )
                 )
             );
- 
-	
-	
-	
+
+
+
+
 */
 
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
+include_once ('MediaController.php');
+
 
 class SpeciesController extends Controller
 {
@@ -180,6 +182,9 @@ class SpeciesController extends Controller
     {
         parent::__construct();
         $this->initialize();
+
+        $media = new MediaController();
+        die(print_r($media->getMediaList()));
     }
 
 
@@ -205,7 +210,7 @@ class SpeciesController extends Controller
 
         $this->includeLocalMenu = true;
 
-		
+
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->useVariations=$this->moduleSettings->getModuleSetting( array( 'setting'=>'use_taxon_variations','subst'=>false) );
 		$matrixtype=$this->moduleSettings->getModuleSetting( array( 'setting'=>'matrixtype','module'=>'matrixkey','subst'=>'l2') );
@@ -530,9 +535,9 @@ class SpeciesController extends Controller
 
     public function editAction()
     {
-	
+
 		die( 'disabled (will be replaced with NSR-style editor)' );
-	
+
         $this->checkAuthorisation();
 
         if (!$this->rHasId())
@@ -796,9 +801,9 @@ class SpeciesController extends Controller
 
     public function newAction ()
     {
-		
+
 		die( 'disabled (will be replaced with NSR-style editor)' );
-	
+
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('New taxon'));
@@ -1083,7 +1088,7 @@ class SpeciesController extends Controller
     {
 
 		die( 'disabled (should be replaced with NSR-style editor)' );
-	 
+
 	    $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Orphaned taxa'));
@@ -2179,7 +2184,7 @@ class SpeciesController extends Controller
 
     public function collaboratorsAction ()
     {
-		
+
 		die( 'disabled (might be replaced with new rights-function)' );
 
         $this->checkAuthorisation();
@@ -3261,7 +3266,7 @@ class SpeciesController extends Controller
     private function filterContent($content)
     {
 		return $content;
-		
+
 		/*
         if (!$this->controllerSettings['filterContent'])
             return $content;
