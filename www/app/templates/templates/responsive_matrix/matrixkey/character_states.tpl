@@ -93,9 +93,9 @@
                         {if !$irrelevant}
                             </a>
                         {/if}
-                        <a id="full-size-link-{$key}" rel="prettyPhoto[states]" href="{$projectUrls.projectMedia}{$v.file_name}" pTitle="{$character.label|@escape}: {$v.label|@escape}" title="" style="display:none;">
+                        <!-- a id="full-size-link-{$key}" rel="prettyPhoto[states]" href="{$projectUrls.projectMedia}{$v.file_name}" pTitle="{$character.label|@escape}: {$v.label|@escape}" title="" style="display:none;">
                             <img class="full-size-icon" src="{$image_root_skin}full-size-icon.png">
-                        </a>
+                        </a -->
 
                     </div>
                     
@@ -180,7 +180,7 @@ $(document).ready(function()
 
         if (actualHeight<img.height || actualWidth<img.width)
         {
-            $("#full-size-link-"+$(this).attr("key")).toggle(true);
+            //$("#full-size-link-"+$(this).attr("key")).toggle(true);
         }
     })
 });
