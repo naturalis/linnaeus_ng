@@ -134,12 +134,8 @@
                             {/if}
                             closeDialog();
                             return false;" >
-                        {/if}
-                            <img 
-                                src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png" 
-                                style="margin-right:10px"
-                            >{$v.label}
-                        {if !$irrelevant}
+                        {/if}<img src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png" 
+                                style="margin-right:10px">{$v.label}{if !$irrelevant}
                         </a>
                         {/if}
                     </span>

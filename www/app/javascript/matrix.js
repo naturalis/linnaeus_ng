@@ -642,6 +642,7 @@ function formatResult( data )
 		resultHtmlTpl
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
+			.replace('%MATRIX-LINK-CLASS%',(data.type=='matrix' ? "matrixLink" : ""))
 			.replace('%GENDER%',(data.gender && data.gender.gender ? 
 				genderHtmlTpl
 					.replace('%ICON-URL%', matrixsettings.imageRootSkin+data.gender.gender+'.png') 

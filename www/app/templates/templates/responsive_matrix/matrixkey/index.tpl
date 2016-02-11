@@ -38,6 +38,7 @@
 $(document).ready(function()
 {
 
+	
 	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
 	
 	__translations = [
@@ -125,7 +126,7 @@ var imageHtmlTpl = '\
 //var genderHtmlTpl = '<img class="result-gender-icon" src="%ICON-URL%" title="%GENDER-LABEL%" />';
 var genderHtmlTpl = '';
 
-var matrixLinkHtmlTpl = '<br /><a href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT%</a>';
+var matrixLinkHtmlTpl = '<a class="goToMatrixLink" href="?mtrx=%MATRIX-ID%"><i class="ion-chevron-right"></i></a>';
 
 //var remoteLinkClickHtmlTpl = 'onclick="window.open(\'%REMOTE-LINK%\',\'_blank\');" title="%TITLE%"';
 var remoteLinkClickHtmlTpl = 'onclick="doRemoteLink(\'%REMOTE-LINK%\',\'%SCI-NAME%\', \'%NAMESCIENTIFIC%\', \'%NAMECOMMON%\');" title="%TITLE%"';
@@ -148,7 +149,7 @@ var statesJoinHtmlTpl = '</li><li>';
 var speciesStateItemHtmlTpl = '<span class="result-detail-label">%GROUP% %CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>';
 
 var resultHtmlTpl = '\
-<div class="result%CLASS-HIGHLIGHT%" id="res-%LOCAL-ID%"> \
+<div class="result%CLASS-HIGHLIGHT% %MATRIX-LINK-CLASS%" id="res-%LOCAL-ID%"> \
 	<div class="result-result"> \
 		<div class="result-image-container"> \
 			%IMAGE-HTML% \
@@ -157,7 +158,6 @@ var resultHtmlTpl = '\
 		<div class="result-labels"> \
 			%GENDER% \
 			<span class="result-name-scientific" title="%SCI-NAME-TITLE%">%SCI-NAME%</span> \
-			%MATRIX-LINK% \
 			<span class="result-name-common" title="%COMMON-NAME-TITLE%"><br />%COMMON-NAME%</span> \
 			%SCORE% \
 			</div> \
@@ -172,6 +172,7 @@ var resultHtmlTpl = '\
 			<div class="result-icon%RELATED-CLASS% related" \
 				%RELATED-CLICK% \
 			>%RELATED-ICON%</div> \
+			%MATRIX-LINK% \
         </div>%STATES% \
     </div> \
 ';
@@ -210,9 +211,17 @@ var menuLoneCharHtmlTpl='\
 </li> \
 ';
 var menuLoneCharDisabledHtmlTpl=
-	'<li class="inner ungrouped %CLASS% disabled secretlyclickable" title="%TITLE%" data-id="%ID%">%LABEL%%VALUE%	%SELECTED% </li>';
+	'<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>';
+/*
+var menuLoneCharEmergentDisabledHtmlTpl='\
+<li class="inner ungrouped %CLASS%" title="%TITLE%"> \
+	<a class="facetLink emergent_disabled" href="#" ondblclick="showStates(%ID%);return false;">(%LABEL%%VALUE%)</a> \
+	%SELECTED% \
+</li> \
+';
+*/
 var menuLoneCharEmergentDisabledHtmlTpl=
-	'<li class="inner emergent_disabled %CLASS% secretlyclickable" title="%TITLE%" data-id="%ID%">(%LABEL%%VALUE%) %SELECTED% </li>';
+	'<li class="inner emergent_disabled %CLASS%" title="%TITLE%" ondblclick="showStates(%ID%);return false;">(%LABEL%%VALUE%) %SELECTED% </li>';
 var menuCharHtmlTpl=menuLoneCharHtmlTpl.replace('ungrouped ','');
 var menuCharDisabledHtmlTpl=menuLoneCharDisabledHtmlTpl.replace('ungrouped ','');
 var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace('ungrouped ','');
@@ -231,8 +240,18 @@ var iconUrlHtmlTpl = iconInfoHtmlTpl.replace(' icon-info','');
 var iconSimilarTpl = iconInfoHtmlTpl.replace(' icon-info',' icon-similar');
 
 var similarHeaderHtmlTpl='\
-<div class="headerText">%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span><span class="result-count"> (%NUMBER-START%-%NUMBER-END%) </span></div> \
+<div class="headerText similarHeader"> \
+<a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;"><i class="ion-chevron-left"></i></a> \
+<span class="similarSpeciesText">%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span><span class="result-count"> (%NUMBER-START%-%NUMBER-END%) </span></span></div> \
 ';
+
+// var similarHeaderHtmlTpl='\
+// %HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span> <span class="result-count">(%NUMBER-START%-%NUMBER-END%)</span> \
+// <br /> \
+// <a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;">%BACK-TEXT%</a> \
+// <span id="show-all-divider"> | </span> \
+// <a class="clearSimilarSelection" href="#" onclick="toggleAllDetails();return false;" id="showAllLabel">%SHOW-STATES-TEXT%</a> \
+// ';
 
 var searchHeaderHtmlTpl='\
 <div class="headerText">%HEADER-TEXT% <span id="similarSpeciesName">%SEARCH-TERM%</span> <span class="result-count"> (%NUMBER-START%-%NUMBER-END% %OF-TEXT% %NUMBER-TOTAL%) </span></div> \
