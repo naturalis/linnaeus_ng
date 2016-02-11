@@ -24,20 +24,29 @@
                     {$matrix.name}    
                 </span>
             </div>
-            {if $introduction_links[$settings->introduction_topic_colophon_citation]}
+           
+            {if $introduction_links[$settings->introduction_topic_colophon_citation] || $introduction_links[$settings->introduction_topic_versions]}
                 <div class="colofonLink">
                     <a href="#" onClick="
+    	        {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                     .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
+                {/if}
+                {if $introduction_links[$settings->introduction_topic_versions]}
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
                     .success(function(data) { colofonVersion( data ,'Versiegeschiedenis'); } ) ;
+				{/if}
                     ">{t}Colofon en citatie{/t}</a>
                 </div>
             <a href="#" onClick="
+            {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                 .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
+			{/if}
+            {if $introduction_links[$settings->introduction_topic_versions]}
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
                 .success(function(data) { colofonVersion( data ,'Versiegeschiedenis'); } ) ;
+			{/if}
                 " class="info"><i class="ion-ios-information-outline info"></i></a>
 			{/if}
         </div>
