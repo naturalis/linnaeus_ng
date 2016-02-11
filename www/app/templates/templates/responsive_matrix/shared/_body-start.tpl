@@ -26,18 +26,20 @@
             </div>
             {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                 <div class="colofonLink">
-                    <a href="#" onClick="
+                    <a href="#" onclick="
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                     .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
+                    $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
+                    .success(function(data) { colofonVersion( data ,'Versiegeschiedenis'); } ) ;
                     ">{t}Colofon en citatie{/t}</a>
                 </div>
             {/if}
-            {if $introduction_links[$settings->introduction_topic_versions]}
-            <a href="#" onClick="
+            <a href="#" onclick="
+                $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
+                .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
                 .success(function(data) { colofonVersion( data ,'Versiegeschiedenis'); } ) ;
-                " class="info"><i class="ion-ios-information-outline info"></i></a>????
-            {/if}
+                " class="info"><i class="ion-ios-information-outline info"></i></a>
         </div>
     </div>
     <span id="searchToggle">
