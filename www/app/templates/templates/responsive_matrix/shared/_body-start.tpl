@@ -28,6 +28,7 @@
             {if $introduction_links[$settings->introduction_topic_colophon_citation] || $introduction_links[$settings->introduction_topic_versions]}
                 <div class="colofonLink">
                     <a href="#" onClick="
+                    overlayOpen();
     	        {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                     .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
@@ -39,6 +40,7 @@
                     ">{t}Colofon en citatie{/t}</a>
                 </div>
             <a href="#" onClick="
+	            overlayOpen();
             {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
                 .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;

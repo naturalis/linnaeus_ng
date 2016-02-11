@@ -6,10 +6,14 @@ function closeSearchBox() {
 	$('body').removeClass('searchOpen');
 }
 
+function overlayOpen() {
+	$('body').addClass('imageOverlayContainer-open');		
+}
+
 function colofonOverlay(data, title) {
 	$('.imageOverlayContainer .image').html(data);
 	$('.imageOverlayContainer .name').html('<span class="colofonTitle">'+title+'</span>');
-	$('body').addClass('imageOverlayContainer-open');		
+	//$('body').addClass('imageOverlayContainer-open');		
 }
 
 function colofonVersion(data, title) {
