@@ -1,0 +1,108 @@
+#header
+	width: 100%
+	background-color: #fff
+	position: relative
+	max-width: $maxContainerWidth
+	overflow: hidden
+	margin: 0 auto
+	padding-left: $filterWidthLarge
+	@media screen and (max-width: $large)
+		display: none
+
+.topBarContainer
+	width: 100%
+	position: relative
+	z-index: 300
+	background-color: #000
+.topBar
+	height: 52px
+	background-color: #000
+	width: 100%
+	max-width: $maxContainerWidth
+	display: block
+	padding-left: 15px
+	padding-right: 15px
+	line-height: 52px
+	z-index: 100
+	margin: 0 auto
+	position: relative
+	font-size: 18px
+	.backLink, .info
+		color: #fff
+		text-decoration: none
+		outline-width: 0
+		vertical-align: middle
+		position: absolute
+		left: 0
+		padding: 0 15px
+		width: 52px
+		z-index: 100 
+		text-align: center 
+	.info
+		left: initial
+		display: none
+		right: 0px
+		@media screen and (max-width: $large)
+			display: block
+		i
+			font-size: 30px
+	.backIcon
+		font-size: 30px
+		vertical-align: middle
+	.pageTitleContainer
+		height: 52px
+		position: absolute
+		top: 0
+		left: 299px
+		display: table
+		@media screen and (max-width: $large)
+			left: 0
+			width: 100%
+	.pageTitle
+		color: #fff
+		display: table-cell
+		vertical-align: middle
+		@media screen and (max-width: $large)
+			text-align: center
+			width: 100%
+			padding: 0 52px 0 52px
+
+
+#logo-container
+	display: table
+	width: $filterWidthLarge
+	left: 0
+	position: absolute
+	height: 260px
+	text-align: center
+	vertical-align: middle
+	a
+		position: absolute
+		top: 50%
+		transform: translateY(-50%)
+		left: 20px
+		display: block
+		img
+			display: block
+	
+.headerImage
+	display: inline-block
+	float: left
+	position: relative
+	img
+		display: block
+	h1
+		color: #fff
+		position: absolute
+		left: 15px
+		bottom: 15px
+		font-family: 'platform-medium'
+		font-size: 50px
+	.determinatiesleutel
+		font-family: 'platform-regular'
+		font-size: 43px
+
+.topBar .pageTitle
+	display: none
+	@media screen and (max-width: $large)
+		display: table-cell	
