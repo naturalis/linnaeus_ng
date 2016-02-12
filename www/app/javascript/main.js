@@ -72,6 +72,7 @@ function getPageScroll() {
 }
 
 function addSlashes(str) {
+	if (!str) return;
 	str=str.replace(/\\/g,'\\\\');
 	str=str.replace(/\'/g,'\\\'');
 	str=str.replace(/\"/g,'\\"');
@@ -80,6 +81,7 @@ function addSlashes(str) {
 }
 
 function stripSlashes(str) {
+	if (!str) return;
 	str=str.replace(/\\'/g,'\'');
 	str=str.replace(/\\"/g,'"');
 	str=str.replace(/\\0/g,'\0');

@@ -7,7 +7,7 @@ function closeSearchBox() {
 }
 
 function overlayOpen() {
-	$('body').addClass('imageOverlayContainer-open');		
+	$('body').addClass('imageOverlayContainer-open');
 }
 
 function colofonOverlay(data, title) {
