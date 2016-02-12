@@ -1625,6 +1625,7 @@ function bindSecretlyClickable()
 		if (event.ctrlKey)
 		{
 			showStates($(this).attr('data-id'));
+			return false;
 		}
 	});
 		
