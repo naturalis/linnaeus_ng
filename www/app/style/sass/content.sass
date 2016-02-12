@@ -1,0 +1,148 @@
+#content
+	padding-bottom: 15px
+
+#dialogRidge
+	width: 100%
+	max-width: $maxContainerWidth
+	margin: 0 auto
+	padding-left: $filterWidthLarge
+	padding-bottom: 10px
+	overflow: hidden
+	background-color: #fff
+	@media screen and (max-width: $large)
+		padding-top: 0
+		padding-left: 0
+	.photographerName
+		display: none
+	#content
+		padding-left: 15px
+		padding-right: 15px
+		display: inline-block
+		float: left
+		width: 100%
+	#results
+		margin-top: 8px
+	.matrixLink
+		.result-icons
+			padding-right: 50px
+			position: relative
+		.goToMatrixLink
+			position: absolute
+			width: 50px
+			line-height: 50px
+			text-align: center
+			color: #fff
+			background-color: #009ee0
+			bottom: 0
+			right: 0
+	#results-container
+		margin-left: -7px
+		margin-right: -7px
+		overflow: hidden
+		.result
+			margin-bottom: 14px
+			display: inline-block
+			float: left
+			padding-left: 7px
+			padding-right: 7px
+			width: 33.33%
+			&:nth-child(3n+1)
+				clear: both
+			@media screen and (max-width: $medium)
+				width: 50%
+				&:nth-child(3n+1)
+					clear: none
+				&:nth-child(2n+1)
+					clear: both
+			@media screen and (max-width: 450px)
+				width: 100%
+				&:nth-child(1n+1)
+					clear: both
+		.result-image
+			width: 100%
+			display: block
+		.result-labels
+			background-color: $grey
+			padding: 10px
+			padding-bottom: 0
+			// min-height: 41px
+		.result-name-scientific
+			color: $blue
+			font-weight: bold
+			line-height: 1.5
+		.result-name-common
+			line-height: 1.5
+		.result-detail
+			background-color: $grey
+			padding: 10px
+			&.hidden
+				display: none
+			ul
+				font-size: 14px
+				line-height: 1.2
+				list-style-type: disc
+				padding-left: 20px
+				li
+					margin-bottom: 5px
+		.result-icons
+			background-color: $grey
+			overflow: hidden
+		.result-icon
+			display: inline-block
+			float: left
+			width: 33.33%
+			padding: 10px
+			border-bottom: 2px solid transparent
+			cursor: pointer
+			img
+				display: block
+				margin: 0 auto
+				width: 100%
+				max-width: 30px
+			&:hover
+				border-bottom-color: $blue
+			&.no-content
+				display: none
+	.headerText
+		padding: 18px 92px 18px 92px
+		text-align: center
+		min-height: 52px
+		font-size: 16px
+		position: relative
+		@media screen and (max-width: 650px)
+			padding: 18px 40px 18px 40px
+			&.similarHeader
+				padding: 18px 40px 18px 80px
+	#similarSpeciesHeader
+		position: relative
+		.clearSimilarSelection
+			position: absolute
+			top: 0
+			left: 0
+			line-height: 52px
+			text-align: center
+			width: 40px
+			color: #009ee0
+			font-size: 18px
+			z-index: 10
+			@media screen and (max-width: 980px)
+				left: 37px
+	#show-more-button
+		width: 100%
+		height: 52px
+		-webkit-appearance: none
+		background-color: $blue
+		border-radius: 0
+		color: #fff
+		border: 0
+		outline-width: 0
+		cursor: pointer
+		font-size: 14px
+	.noResults
+		text-align: center
+		margin-top: 150px
+	.icon-resemblance:empty
+		display: none!important
+
+.versionContent
+	padding: 0 20px 20px 20px

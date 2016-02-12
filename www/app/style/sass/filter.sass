@@ -1,0 +1,219 @@
+#left
+	width: $filterWidthLarge
+	margin-left: -$filterWidthLarge
+	float: left
+
+.filterToggle
+	font-size: 30px
+	background-color: $blue
+	display: none
+	color: #fff
+	position: absolute
+	right: 0
+	top: 52px
+	z-index: 400
+	cursor: pointer
+	width: 52px
+	height: 52px
+	i
+		position: absolute
+		top: 50%
+		left: 50%
+		margin-left: -11px
+		margin-top: -16px
+	@media screen and (max-width: $large)
+		display: block	
+
+@media screen and (max-width: $large)
+	.menuOpen 
+		#facets
+			margin-right: 0
+			z-index: 400
+		.filterToggle
+			color: $blue
+			background-color: rgb(255, 255, 255)  
+			background-color: rgba(255, 255, 255, 0.8)
+			border-left-width: 3px 
+			border-bottom-width: 3px 
+			border-style: solid
+			border-color: rgb(0,0,0)
+			border-color: rgba(0,0,0, 0.1)	
+			right: $filterWidthLarge
+			@media screen and (max-width: $small)
+				right: $filterWidthSmall
+		.forceScrollbar
+			height: 100.4%
+		#menuOverlay	
+			display: block
+			position: fixed
+			top: 0
+			bottom: 0
+			left: 0
+			right: 0
+			z-index: 110
+			cursor: pointer
+			// opacity: 0.5
+			// background-color: red
+
+#menuOverlay
+	display: none
+	overflow-y: scroll
+	-webkit-overflow-scrolling: touch
+	-webkit-box-flex: 1
+	.menuOverlayScroll
+		height: 101%
+
+#facets
+	background-color: rgb(255, 255, 255)  
+	background-color: rgba(255, 255, 255, 0.8)
+	width: $filterWidthLarge
+	position: relative
+	z-index: 200
+	h2
+		padding: 20px
+		font-weight: bold
+		color: $blue
+		@media screen and (max-width: $large)
+			text-align: center
+	@media screen and (max-width: $large)
+		position: fixed
+		right: 0
+		top: 52px
+		bottom: 0
+		margin-right: -$filterWidthLarge
+		.scrollable
+			border-left-width: 3px 
+			border-left-style: solid
+			border-color: rgb(0,0,0)
+			border-color: rgba(0,0,0, 0.1)	
+			position: absolute
+			overflow-y: scroll
+			width: 100%
+			top: 49px
+			bottom: 0
+	@media screen and (max-width: $small)
+		width: $filterWidthSmall
+		margin-right: -$filterWidthSmall
+	.clearSelectionBtn
+		padding: 10px
+		margin-bottom: 10px
+		#clearSelectionLink
+			text-decoration: none
+			color: #000
+			padding: 10px
+			display: block
+			background-color: $grey
+			i
+				float: right
+	
+#facet-categories-menu
+	width: 100%
+	display: block
+	@media screen and (max-width: $large)
+		overflow-y: auto
+	> ul
+		padding: 0 10px
+		width: 100%
+		@media screen and (max-width: $large)
+			padding-top: 10px
+		> li
+			width: 100%
+			> a
+				width: 100%
+				background-color: $blue
+				color: #fff
+				display: block
+				padding: 10px
+				text-decoration: none
+				padding-right: 20px
+				position: relative
+				margin-bottom: 10px
+				.menuToggleIcon
+					position: absolute
+					right: 10px
+			&:last-child .last:last-child
+				margin-bottom: 0
+	.closed 
+		.down
+			display: block
+		.up
+			display: none
+	.open
+		.down
+			display: none
+		.up
+			display: block
+	[id^=character-group]
+		padding: 0 10px
+		&.hidden
+			display: none
+	.inner
+		display: block
+		margin-bottom: 10px
+		a, &.disabled, &.emergent_disabled
+			display: block
+			padding: 10px
+			width: 100%
+			background-color: $grey
+			text-decoration: none
+			color: #000
+			outline-width: 0
+
+		&.disabled
+			color: #aaa
+			text-decoration: line-through
+		&.emergent_disabled
+			color: #aaa
+		.removeBtn
+			padding-right: 34px
+			color: $blue
+			position: relative
+			i
+				color: $pink
+				position: absolute
+				top: 10px
+				right: 10px
+	.facetValueHolder
+		background-color: $grey
+		color: $blue
+		position: relative
+
+#legendContainer
+	padding-left: 20px
+	margin-bottom: 25px
+	h2
+		color: $blue
+		margin-bottom: 20px
+		font-weight: bold
+	ul
+		padding-left: 10px
+	li
+		vertical-align: middle
+		margin-bottom: 10px
+	img
+		width: 30px
+		vertical-align: middle
+		margin-right: 20px
+		display: inline-block
+#dataSourceContainer
+	padding-left: 20px
+	margin-bottom: 25px
+	h2
+		color: #009ee0
+		margin-bottom: 20px
+		font-weight: bold
+	img
+		margin-left: 10px
+
+.colofon
+	padding-left: 10px
+	padding-bottom: 10px
+	a
+		text-decoration: none
+		color: #000
+		padding: 10px
+		display: block
+		background-color: $grey
+
+.state-image-caption
+	line-height: 1.5

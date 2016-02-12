@@ -1,0 +1,85 @@
+@import "reset"
+@import "variables"
+@import "header"
+@import "filter"
+@import "search"
+@import "content"
+@import "footer"
+@import "overlay"
+@import "ajaxloader"
+@import "prettyPhoto"
+
+@font-face
+	font-family: 'platform-medium'
+	src: url('../fonts/platform-medium-alternate-webfont.ttf') format('truetype')
+	font-weight: normal
+	font-style: normal
+
+@font-face
+	font-family: 'platform-regular'
+	src: url('../fonts/platform-regular-alternate-webfont.ttf') format('truetype')
+	font-weight: normal
+	font-style: normal
+
+body
+	font-family: Arial, Helvetica, sans-serif
+	background-color: $grey
+	font-size: 14px
+
+#scrollContainer
+	overflow: hidden
+	width: 100%
+	position: absolute
+	top: 52px
+	left: 0
+	right: 0
+	bottom: 0
+	overflow-y: scroll
+	-webkit-overflow-scrolling: touch
+	-webkit-box-flex: 1
+
+#container
+	max-width: $maxContainerWidth
+	margin: 0 auto
+	box-shadow: 12px 0 15px -4px rgba(0,0,0,0.05), -12px 0 8px -4px rgba(0,0,0,0.05)
+
+#logo-container
+	img
+		height: 190px
+		
+.versionContent
+	b
+		font-weight: bold
+	ul
+		padding-left: 15px
+		list-style-type: disc
+
+.imageOverlayContainer
+	strong
+		font-weight: bold
+		display: block
+
+.adminLink
+	float: right
+	margin-right: 15px
+	padding-top: 10px
+	line-height: 15px
+	span
+		vertical-align: top
+		line-height: 50px
+		color: #fff
+	.linnaeus
+		color: $blue
+	@media screen and (max-width: $large)
+		float: none
+		display: block
+.adminLink:hover .linnaeus
+	color: #e3004a
+
+.colofonLink a
+	float: right
+	color: #fff
+	text-decoration: none
+	margin-right: 10px
+	@media screen and (max-width: $large)
+		display: none
