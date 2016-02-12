@@ -211,10 +211,10 @@ var menuLoneCharHtmlTpl='\
 </li> \
 ';
 var menuLoneCharDisabledHtmlTpl=
-	'<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="">%LABEL%%VALUE%	%SELECTED% </li>';
+	'<li class="inner ungrouped %CLASS% disabled secretlyclickable" title="%TITLE%">%LABEL%%VALUE%	%SELECTED% </li>';
 
 var menuLoneCharEmergentDisabledHtmlTpl=
-	'<li class="inner emergent_disabled %CLASS%" title="%TITLE%" ondblclick="">(%LABEL%%VALUE%) %SELECTED% </li>';
+	'<li class="inner emergent_disabled %CLASS% secretlyclickable" title="%TITLE%">(%LABEL%%VALUE%) %SELECTED% </li>';
 var menuCharHtmlTpl=menuLoneCharHtmlTpl.replace('ungrouped ','');
 var menuCharDisabledHtmlTpl=menuLoneCharDisabledHtmlTpl.replace('ungrouped ','');
 var menuCharEmergentDisabledHtmlTpl=menuLoneCharEmergentDisabledHtmlTpl.replace('ungrouped ','');
