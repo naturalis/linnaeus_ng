@@ -1,6 +1,8 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
+
 class SpeciesMediaController extends Controller
 {
     public $usedModels = array(
@@ -40,12 +42,27 @@ class SpeciesMediaController extends Controller
     public function __construct ()
     {
         parent::__construct();
+
+        $media = new MediaController();
+        $media->getMediaList();
     }
 
     public function __destruct()
     {
         parent::__destruct();
     }
+
+
+    public function attachMediaAction ()
+    {
+        $this->smarty->assign('id', $taxon['id']);
+
+
+        $this->printPage();
+    }
+
+
+
 
 
     public function mediaAction()
