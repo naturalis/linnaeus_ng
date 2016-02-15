@@ -29,6 +29,10 @@ class SpeciesMediaController extends Controller
     public $controllerPublicName = 'Species module';
     public $includeLocalMenu = false;
 
+
+    public $media;
+
+
 	private $_mimeTypes=
 		array(
 			'jpg'=>'image/jpeg',
@@ -43,19 +47,23 @@ class SpeciesMediaController extends Controller
     {
         parent::__construct();
 
-        $media = new MediaController();
-        $media->getMediaList();
+        $this->media = new MediaController();
+
     }
 
     public function __destruct()
     {
         parent::__destruct();
+        $this->media = new MediaController();
     }
 
 
     public function attachMediaAction ()
     {
-        $this->smarty->assign('id', $taxon['id']);
+        //$this->smarty->assign('id', $taxon['id']);
+        $this->smarty->assign('media', $this->media->getMediaList());
+        //print_r($this->media->getMediaList());
+
 
 
         $this->printPage();

@@ -3,19 +3,23 @@
 {include file="../shared/admin-messages.tpl"}
 
 <style>
-#container ul {
+#page-main {
+	overflow: auto;
+	width: 100%;
+}
+#page-main ul {
 	list-style: none;
 }
-#container .buttons {
+#page-main .buttons {
 	margin-bottom: 20px;
 }
-#container .list li {
+#page-main .list li {
 	width: 100%;
 	border-bottom: 1px dotted #CCC;
 	margin-bottom: 10px;
 	padding-bottom: 10px;
 }
-#container .grid li {
+#page-main .grid li {
 	float: left;
 	width: 20%;
 	height: 50px;
@@ -28,8 +32,8 @@
 
 <div id="page-main">
     <div class="buttons">
-        <button class="list">List</button>
-        <button class="grid">Grid</button>
+        <input type="button" class="list" value="{t}list{/t}" />
+        <input type="button" class="grid" value="{t}grid{/t}" />
     </div>
 
 	<form id="theForm" method="post">
@@ -38,14 +42,10 @@
     <input type="hidden" id="subject" name="subject" value="" />
 
     <ul class="list">
-   <!-- {foreach from=$media item=v} -->
-	<li>Item 1</li>
-    <li>Item 2</li>
-    <li>Item 3</li>
-	<li>Item 4</li>
-    <li>Item 5</li>
-    <li>Item 6</li>
-  <!--  {/foreach} -->
+
+	{foreach from=$media.images item=v}
+ 	<li><img src="{$v.thumbnails.small}" />{$v.file_name}</li>
+    {/foreach}
 
     </ul>
     </form>
@@ -55,7 +55,7 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function() {
-	$('button').on('click',function(e) {
+	$('input:button').on('click',function(e) {
 	    if ($(this).hasClass('grid')) {
 	        $('#theForm ul').removeClass('list').addClass('grid');
 	    }
