@@ -584,6 +584,11 @@ class MatrixKeyController extends Controller
 				$variations[$key]['info']=isset($info['variation'][$val['id']]) ? $info['variation'][$val['id']] : null;
 				$this->induceThumbNailFromImage( $variations[$key]['info'] );
 			}
+			foreach((array)$matrices as $key=>$val)
+			{
+				$matrices[$key]['info']=isset($info['matrix'][$val['id']]) ? $info['matrix'][$val['id']] : null;
+				$this->induceThumbNailFromImage( $matrices[$key]['info'] );
+			}
 		}
 
 		if ( isset($this->settings->use_overview_image) && $this->settings->use_overview_image )
@@ -628,7 +633,7 @@ class MatrixKeyController extends Controller
 
 		$taxa=array();
 
-        foreach ( (array)$m as $key=>$val )
+        foreach ((array)$m as $key=>$val)
 		{
 			$d=$this->getTaxonById( $val['taxon_id'] );
 			

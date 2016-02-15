@@ -220,8 +220,6 @@ class Controller extends BaseClass
 
         $this->setPhpIniVars();
 
-        $this->setDebugMode();
-
         $this->startSession();
 
         $this->loadHelpers();
@@ -2192,18 +2190,6 @@ class Controller extends BaseClass
 
 
     /**
-     * Sets a global 'debug' mode, based on a general setting in the config file
-     *
-     * @access     private
-     */
-    private function setDebugMode ()
-    {
-        $this->debugMode = $this->generalSettings['debugMode'];
-    }
-
-
-
-    /**
      * Starts the user's session
      *
      * @access     private
@@ -2264,7 +2250,6 @@ class Controller extends BaseClass
         $this->smarty->assign('menu', $this->getMainMenu());
         $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
         $this->smarty->assign('customTemplatePaths', $this->getProjectDependentTemplates());
-        $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
@@ -2904,11 +2889,6 @@ class Controller extends BaseClass
         if (!isset($prevPage) || $thisPage != $prevPage)
             $_SESSION['app']['user']['history'][] = $thisPage;
 
-            // see if a maximum number of steps to store is defined; if so, slice off the excess
-        if (count((array) $_SESSION['app']['user']['history']) > $this->generalSettings['maxBackSteps']) {
-
-            $_SESSION['app']['user']['history'] = array_slice($_SESSION['app']['user']['history'], count((array) $_SESSION['app']['user']['history']) - $this->generalSettings['maxBackSteps']);
-        }
     }
 
 

@@ -383,7 +383,7 @@ class UtilitiesController extends Controller
 
     private function cleanUpHeartbeats()
     {
-
+		return;
         $this->models->Heartbeat->cleanUp(
         	$this->getCurrentProjectId(),
         	($this->generalSettings['heartbeatFrequency'])

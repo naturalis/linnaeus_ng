@@ -1370,28 +1370,25 @@ class ImportNBCController extends ImportController
 
     private function resolveSpeciesAndVariationsAndMatrices ($data)
     {
-
         $d = array();
 
-        foreach ((array) $data['species'] as $key => $val) {
-
-			if (empty($val['naam SCI'])) {
-
+        foreach ((array) $data['species'] as $key => $val)
+		{
+			if (empty($val['naam SCI']))
+			{
 				$this->addError($this->storeError('Skipping species without scientific name ('.@$val['label'].').', 'Species import'));
 				continue;
-
 			}
 			
-			if ($val['naam SCI']==MATRIX_SCIENTIFIC_NAME_STUB) {
-				
+			if ($val['naam SCI']==MATRIX_SCIENTIFIC_NAME_STUB)
+			{
 				$sciName = $val['label'];
 				$d[$sciName]['isMatrix'] = true;
-
-			} else {
-				
+			} 
+			else
+			{
 				$sciName = $val['naam SCI'];
 				$d[$sciName]['isMatrix'] = false;
-
 			}
 
 			$d[$sciName]['taxon'] = $sciName;
@@ -1405,23 +1402,21 @@ class ImportNBCController extends ImportController
 		//$variantColumns = isset($_SESSION['admin']['system']['import']['variantColumns']) ? $_SESSION['admin']['system']['import']['variantColumns'] : null;
 		$variantColumns = $this->_stdVariantColumns;
 
-        foreach ((array) $d as $key => $val) {
-            
-			
-			if (isset($val['variations'])) {
-			
-				foreach ((array)$val['variations'] as $sKey => $sVal) {
-			  
+        foreach ((array) $d as $key => $val)
+		{
+			if (isset($val['variations']))
+			{
+				foreach ((array)$val['variations'] as $sKey => $sVal)
+				{
 					$str = null;
 	
-					foreach ((array) $variantColumns as $hVal) {
-	
+					foreach ((array) $variantColumns as $hVal)
+					{
 						//if (!isset($data['characters'][$hVal]['code']) || !isset($sVal[$data['characters'][$hVal]['code']]))
 						if (!isset($sVal[$hVal]))
 							continue;
 	
 						$str .= $sVal[$hVal]. ' ';
-						
 					}
 	
 					$d[$key]['variations'][$sKey]['add-on'] = trim($str);
@@ -1434,15 +1429,14 @@ class ImportNBCController extends ImportController
 					if a species has only one variation, it should not be stored (ie, species & variation identical)
 				   if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0)
 				*/
-				if (count((array) $d[$key]['variations']) == 1) {
-					
-					foreach((array)$d[$key]['variations'][0] as $vKey => $vVal) {
-						
+				if (count((array) $d[$key]['variations']) == 1)
+				{
+					foreach((array)$d[$key]['variations'][0] as $vKey => $vVal)
+					{
 						if ($vKey=='id' || $vKey=='label' || $vKey=='add-on' || $vKey=='variant')
 							continue;
 						
 						$d[$key][$vKey] = $vVal;
-						
 					}
 					
 					/*
@@ -1454,9 +1448,7 @@ class ImportNBCController extends ImportController
 					*/
 	
 					unset($d[$key]['variations']);
-	
 				}
-				
 			}
         }
 
@@ -1489,9 +1481,44 @@ class ImportNBCController extends ImportController
 	}
 
 
+	private function deleteNbcExtras( $p )
+	{
+		$ref_id=isset($p['ref_id']) ? $p['ref_id'] : null;
+		$ref_type=isset($p['ref_type']) ? $p['ref_type'] : null;
+		
+		if ( empty($ref_id) || empty($ref_type) ) return;
+		
+		$this->models->NbcExtras->delete(
+			array(
+				'project_id' => $this->getNewProjectId(), 
+				'ref_id' => $ref_id, 
+				'ref_type' => $ref_type
+			));
+	}
+	
+	private function saveNbcExtra( $p )
+	{
+		$ref_id=isset($p['ref_id']) ? $p['ref_id'] : null;
+		$ref_type=isset($p['ref_type']) ? $p['ref_type'] : null;
+		$name=isset($p['name']) ? $p['name'] : null;
+		$value=isset($p['value']) ? $p['value'] : null;
+		
+		if ( empty($ref_id) || empty($ref_type) || empty($name) || empty($value) ) return;
+		
+		$this->models->NbcExtras->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getNewProjectId(), 
+				'ref_id' => $ref_id, 
+				'ref_type' => $ref_type, 
+				'name' => $name, 
+				'value' => $value
+			)
+		);
+	}
+
     private function storeSpeciesAndVariationsAndMatrices ($data)
     {
-
         $_SESSION['admin']['system']['import']['loaded']['species'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['variations'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['matrices'] = 0;
@@ -1503,14 +1530,15 @@ class ImportNBCController extends ImportController
 			array(
 				'project_id' => $this->getNewProjectId(), 
 				'taxon' => $this->_defaultKingdom
-			)));
+			))
+		);
 
-		if ($d) { 
-
+		if ($d)
+		{ 
 			$kingdomId = $d[0]['id'];
-		
-		} else {
-
+		} 
+		else
+		{
 			// default kingdom
 			$this->models->Taxon->save(
 			array(
@@ -1525,28 +1553,47 @@ class ImportNBCController extends ImportController
 			));
 			
 			$kingdomId = $this->models->Taxon->getNewId();
-			
 		}
         
         $i = 1;
 
-		// save all taxa
+		// save all taxa / new referenced matrices
         foreach ((array) $species as $key => $val)
 		{
 			
-			if ($val['isMatrix']==true) {
-				
+			if ($val['isMatrix']==true)
+			{
 				$d=$this->createMatrixIfNotExists($key);
 				$species[$key]['lng_id'] = $d['id'];
-				if ($d['type']=='new')
-					$this->addMessage(sprintf('Added new referenced matrix "%s" (name only)',$key));
+
+				if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns']))
+				{
+					$this->deleteNbcExtras(array(
+						'ref_id' => $d['id'], 
+						'ref_type' => 'matrix'
+					));
+					
+					foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal)
+					{
+						if (!empty($cVal) && isset($val[$cKey]))
+						{
+							$this->saveNbcExtra(array(
+								'ref_id' => $d['id'], 
+								'ref_type' => 'matrix', 
+								'name' => $cVal, 
+								'value' => $val[$cKey]
+							));
+						}
+					}
+				}
+
+				if ($d['type']=='new') $this->addMessage(sprintf('Added new referenced matrix "%s" (name only)',$key));
+
 				continue;
-				
 			}
 			
 			if (isset($val['parent_name']))
 			{
-
 				// find parent by sci name
 				$d = $this->getTaxonByName($val['parent_name']);
 					
@@ -1557,7 +1604,6 @@ class ImportNBCController extends ImportController
 				} 
 				else
 				{
-
 					// find taxon by common name
 					$d = $this->models->Commonname->_get(array('id' =>
 					array(
@@ -1566,12 +1612,12 @@ class ImportNBCController extends ImportController
 						'commonname' => $val['parent_name']
 					)));					
 					
-					if ($d) {
-
+					if ($d)
+					{
 						$parent = $d[0]['taxon_id'];
-
-					} else {
-
+					} 
+					else 
+					{
 						// create the parent taxon
 						$this->models->Taxon->save(
 						array(
@@ -1586,16 +1632,13 @@ class ImportNBCController extends ImportController
 						));
 						
 						$parent = $this->models->Taxon->getNewId();
-						
 					}
-
 				}
-
-			} else {
-				
+			} 
+			else 
+			{
 				// give the topmost the default uppermost parent
 				$parent = $kingdomId;
-				
 			}
 	
 			// does taxon already exist?
@@ -1606,12 +1649,12 @@ class ImportNBCController extends ImportController
 					'taxon' => $key
 				)));
 					
-			if ($d) { 
-
+			if ($d)
+			{ 
 				$species[$key]['lng_id'] = $d[0]['id'];
-			
-			} else {
-
+			} 
+			else
+			{
 				// save new taxon
 				$this->models->Taxon->save(
 				array(
@@ -1626,34 +1669,28 @@ class ImportNBCController extends ImportController
 				));
 				
 				$species[$key]['lng_id'] = $this->models->Taxon->getNewId();
-
 			}
 				
-			// if it's not a matrix and if NBC-data columns have been defined, save the NBC-data
-			if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
-
-				$this->models->NbcExtras->delete(
-					array(
-						'project_id' => $this->getNewProjectId(), 
-						'ref_id' => $species[$key]['lng_id'], 
-						'ref_type' => 'taxon'
-					));
+			// (if it's not a matrix and) if NBC-data columns have been defined, save the NBC-data
+			if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns']))
+			{
+				$this->deleteNbcExtras(array(
+					'ref_id' => $species[$key]['lng_id'], 
+					'ref_type' => 'taxon'
+				));
 				
-				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
-				
+				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal)
+				{
 					if (!empty($cVal) && isset($val[$cKey]))
-						$this->models->NbcExtras->save(
-							array(
-								'id' => null, 
-								'project_id' => $this->getNewProjectId(), 
-								'ref_id' => $species[$key]['lng_id'], 
-								'ref_type' => 'taxon', 
-								'name' => $cVal, 
-								'value' => $val[$cKey]
-							));
-				
+					{
+						$this->saveNbcExtra(array(
+							'ref_id' => $species[$key]['lng_id'], 
+							'ref_type' => 'taxon', 
+							'name' => $cVal, 
+							'value' => $val[$cKey]
+						));
+					}
 				}
-				
 			}
 
 			$_SESSION['admin']['system']['import']['loaded']['species']++;
@@ -1730,30 +1767,25 @@ class ImportNBCController extends ImportController
 
 					}
 					
-					if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
-
-						$this->models->NbcExtras->delete(
-							array(
-								'project_id' => $this->getNewProjectId(), 
-								'ref_id' => $vId, 
-								'ref_type' => 'variation'
-							));
-				
-						foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
-						
+					if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns']))
+					{
+						$this->deleteNbcExtras(array(
+							'ref_id' => $vId, 
+							'ref_type' => 'variation'
+						));
+								
+						foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal)
+						{
 							if (isset($vVal[$cKey]))
-								$this->models->NbcExtras->save(
-									array(
-										'id' => null, 
-										'project_id' => $this->getNewProjectId(), 
-										'ref_id' => $vId, 
-										'ref_type' => 'variation', 
-										'name' => $cVal, 
-										'value' => $vVal[$cKey]
-									));
-						
+							{
+								$this->saveNbcExtra(array(
+									'ref_id' => $vId, 
+									'ref_type' => 'variation', 
+									'name' => $cVal, 
+									'value' => $vVal[$cKey]
+								));
+							}
 						}
-
 					}
 
 					$_SESSION['admin']['system']['import']['loaded']['variations']++;
@@ -1777,14 +1809,14 @@ class ImportNBCController extends ImportController
 		}
 
 		// save relations
-        foreach ((array) $species as $key => $val) {
-            
-            if (!isset($val['variations'])) {
-                
-                if (isset($val['related'])) {
-                    
-                    foreach ((array) $val['related'] as $rKey => $rVal) {
-						
+        foreach ((array) $species as $key => $val)
+		{
+            if (!isset($val['variations']))
+			{
+                if (isset($val['related']))
+				{
+                    foreach ((array) $val['related'] as $rKey => $rVal)
+					{
 						$rValId = $this->resolveSimilarIdentifier($rVal,$tmpIndex);
                         
                         if (!isset($tmpIndex[$rValId]) || $val['lng_id']==$tmpIndex[$rValId]['id'])
@@ -1813,14 +1845,14 @@ class ImportNBCController extends ImportController
                     }
                 }
             }
-            else {
-                
-                foreach ((array) $val['variations'] as $vKey => $vVal) {
-                    
-                    if (isset($vVal['related'])) {
-                        
-                        foreach ((array) $vVal['related'] as $rKey => $rVal) {
-                            
+            else
+			{
+                foreach ((array) $val['variations'] as $vKey => $vVal)
+				{
+                    if (isset($vVal['related']))
+					{
+                        foreach ((array) $vVal['related'] as $rKey => $rVal)
+						{
 							$rValId = $this->resolveSimilarIdentifier($rVal,$tmpIndex);
 
                             if (!isset($tmpIndex[$rValId]) || !isset($vVal['lng_id']) || $vVal['lng_id']==$tmpIndex[$rValId]['id'])

@@ -21,6 +21,7 @@
     <!-- <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/style/nbc_soortenregister/20120928_layout.css" /> -->
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/style.css">
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
     
     <!--[if lte IE 7]>
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_ie7.css" />
@@ -70,6 +71,7 @@
     
     <script type="text/javascript" src="{$baseUrl}app/javascript/scrollfix.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/script.js"></script>
+    <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
     
     
 {if $javascriptsToLoad}
