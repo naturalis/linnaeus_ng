@@ -174,7 +174,7 @@ function printResults()
 	
 	if (resultset.length==0)
 	{
-		$('#results-container').html(noResultHtmlTpl.replace('%MESSAGE%',__('Geen resultaten.')));
+		$('#results-container').html( fetchTemplate( 'noResultHtmlTpl' ).replace('%MESSAGE%',__('Geen resultaten.')));
 	}
 
 	clearOverhead();
@@ -275,19 +275,19 @@ function printMenu()
 					for (var k in activestates)
 					{
 						var state = activestates[k];
-						t=t+menuSelStateHtmlTpl
+						t=t+fetchTemplate( 'menuSelStateHtmlTpl' )
 							.replace('%VALUE%',(state.value ? state.value : ''))
 							.replace('%LABEL%',(state.label ? state.label : ''))
 							.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 							.replace('%STATE-ID%',state.val);
 					}
 					
-					l=menuSelStatesHtmlTpl.replace('%STATES%',t);
+					l=fetchTemplate( 'menuSelStatesHtmlTpl' ).replace('%STATES%',t);
 				}
 
 				if (char.disabled==true)
 				{
-					c=c+menuCharDisabledHtmlTpl
+					c=c+fetchTemplate( 'menuCharDisabledHtmlTpl' )
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
@@ -301,7 +301,7 @@ function printMenu()
 					//var charactercounts=getCharacterCounts(char.id);
 					//console.log(char.label,charactercounts.taxon_count);
 					
-					c=c+menuCharEmergentDisabledHtmlTpl
+					c=c+fetchTemplate( 'menuCharEmergentDisabledHtmlTpl' )
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
@@ -311,7 +311,7 @@ function printMenu()
 				}
 				else
 				{
-					c=c+menuCharHtmlTpl
+					c=c+fetchTemplate( 'menuCharHtmlTpl' )
 						.replace('%CLASS%',(j==(item.chars.length-1)?' last':''))
 						.replace('%ID%',char.id)
 						.replace('%LABEL%',char.label) //  + ':' + charactercounts.taxon_count
@@ -320,7 +320,7 @@ function printMenu()
 				}
 			}
 
-			s=menuGroupHtmlTpl
+			s=fetchTemplate( 'menuGroupHtmlTpl' )
 				.replace(/%ID%/g,item.id)
 				.replace('%LABEL%',item.label)
 				.replace('%CHARACTERS%',c);
@@ -342,19 +342,19 @@ function printMenu()
 				for (var k in activestates)
 				{
 					var state=activestates[k];
-					t=t+menuSelStateHtmlTpl
+					t=t+fetchTemplate( 'menuSelStateHtmlTpl' )
 						.replace('%VALUE%',(state.value ? state.value : ''))
 						.replace('%LABEL%',(state.label ? state.label : ''))
 						.replace('%COEFF%',(state.separationCoefficient ? '('+state.separationCoefficient+') ' : ''))
 						.replace('%STATE-ID%',state.val)
 				}
 				
-				l=menuSelStatesHtmlTpl.replace('%STATES%',t);
+				l=fetchTemplate( 'menuSelStatesHtmlTpl' ).replace('%STATES%',t);
 			}
 			
 			if (item.disabled==true)
 			{
-				s=menuLoneCharDisabledHtmlTpl
+				s=fetchTemplate( 'menuLoneCharDisabledHtmlTpl' )
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
@@ -365,7 +365,7 @@ function printMenu()
 			else
 			if (item.emergent_disabled==true)
 			{
-				s=menuLoneCharEmergentDisabledHtmlTpl
+				s=fetchTemplate( 'menuLoneCharEmergentDisabledHtmlTpl' )
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
@@ -375,7 +375,7 @@ function printMenu()
 			}
 			else
 			{
-				s=menuLoneCharHtmlTpl
+				s=fetchTemplate( 'menuLoneCharHtmlTpl' )
 					.replace('%CLASS%',"")
 					.replace('%ID%',item.id)
 					.replace('%LABEL%',item.label)
@@ -391,7 +391,7 @@ function printMenu()
 
 	if (groupcount==1 && lastgroupid) openGroups.push(lastgroupid);
 	
-	$('#facet-categories-menu').html( menuOuterHtmlTpl.replace('%MENU%',buffer.join('\n') ) );
+	$('#facet-categories-menu').html( fetchTemplate( 'menuOuterHtmlTpl' ).replace('%MENU%',buffer.join('\n') ) );
 	
 	for(var i in $.unique(openGroups))
 	{
@@ -451,21 +451,14 @@ function printResultsExpanded()
 		if (i < matrixsettings.expandedShowing+matrixsettings.perPage)
 		{
 			s=s+formatResult(resultset[i]);
-
 			printed++;
-
-			// if (++d==matrixsettings.perLine)
-			// {
-			// 	s=s+resultsLineEndHtmlTpl;
-			// 	d=0;
-			// }
 		}
 	}
 
 	$('#results-container').html(
-		resultBatchHtmlTpl
+		fetchTemplate( 'resultBatchHtmlTpl' )
 			.replace('%STYLE%',"")
-			.replace('%RESULTS%', resultsHtmlTpl.replace('%RESULTS%',s))
+			.replace('%RESULTS%', fetchTemplate( 'resultsHtmlTpl' ).replace('%RESULTS%',s))
 	);
 
 	// parallel processing using show() causes mayhem when clicking the 'show more'-button fast.
@@ -478,7 +471,7 @@ function printResultsExpanded()
 	{
 		if (!$("#show-more-").is(':visible'))
 		{
-			$("#paging-footer").append( buttonMoreHtmlTpl.replace('%LABEL%',__('meer resultaten laden')) );
+			$("#paging-footer").append( fetchTemplate( 'buttonMoreHtmlTpl' ).replace('%LABEL%',__('meer resultaten laden')) );
 			$("#footerPagination").addClass('noline');
 		}
 	}
@@ -507,12 +500,12 @@ function printResultsPaginated()
 			s=s+formatResult(resultset[i]);
 			if (++d==matrixsettings.perLine)
 			{
-				s=s+resultsLineEndHtmlTpl;
+				s=s+fetchTemplate( 'resultsLineEndHtmlTpl' );
 				d=0;
 			}
 		}
 	}
-	$('#results-container').html(resultsHtmlTpl.replace('%RESULTS%',s));
+	$('#results-container').html( fetchTemplate( 'resultsHtmlTpl' ).replace('%RESULTS%',s));
 }
 
 function formatResult( data )
@@ -581,7 +574,7 @@ function formatResult( data )
 			}
 
 			states.push(
-				speciesStateItemHtmlTpl
+				fetchTemplate( 'speciesStateItemHtmlTpl' )
 					.replace('%GROUP%', state.group_label ? state.group_label + ' > ' : '')
 					.replace('%CHARACTER%',t)
 					.replace('%STATE%',l)
@@ -617,34 +610,34 @@ function formatResult( data )
 	var showStates = states && states.length > 0;
 
 	var photoLabelHtml=
-		photoLabelHtmlTpl
+		fetchTemplate( 'photoLabelHtmlTpl' )
 			.replace('%SCI-NAME%',sciNameDisplay)
 			.replace('%GENDER%',(data.gender && data.gender.gender ?
-				photoLabelGenderHtmlTpl
+				fetchTemplate( 'photoLabelGenderHtmlTpl' )
 					.replace('%IMG-SRC%', matrixsettings.imageRootSkin + data.gender.gender+'.png')
 					.replace('%GENDER-LABEL%', data.gender.gender_label)
 				: "" ))
-			.replace('%COMMON-NAME%',(commonName ? brHtmlTpl + commonName : ""))
+			.replace('%COMMON-NAME%', commonName )
 			.replace('%PHOTO-DETAILS%',(data.info && data.info.photographer ? 
-				photoLabelPhotographerHtmlTpl
+				fetchTemplate( 'photoLabelPhotographerHtmlTpl' )
 					.replace('%PHOTO-LABEL%', __('foto')+' &copy;' )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
 				: ""));
 
 	var imageHtml=
-		imageHtmlTpl
+		fetchTemplate( 'imageHtmlTpl' )
 			.replace('%IMAGE-URL%',image)
 			.replace('%THUMB-URL%',thumb)
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
 		;	
 	var resultHtml=
-		resultHtmlTpl
+		fetchTemplate( 'resultHtmlTpl' )
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
 			.replace('%IMAGE-HTML%',(image ? imageHtml : ""))
 			.replace('%MATRIX-LINK-CLASS%',(data.type=='matrix' ? "matrixLink" : ""))
 			.replace('%GENDER%',(data.gender && data.gender.gender ? 
-				genderHtmlTpl
+				fetchTemplate( 'genderHtmlTpl' )
 					.replace('%ICON-URL%', matrixsettings.imageRootSkin+data.gender.gender+'.png') 
 					.replace('%GENDER-LABEL%', data.gender.gender_label) 
 				: "" )
@@ -652,13 +645,13 @@ function formatResult( data )
 			.replace('%SCI-NAME%', sciNameDisplay)
 			.replace('%SCI-NAME-TITLE%', addSlashes(sciName) )
 			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
-				matrixLinkHtmlTpl.replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
+				fetchTemplate( 'matrixLinkHtmlTpl' ).replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
 				: ""))
 			.replace(/%COMMON-NAME%/g, commonName ? addSlashes(commonName) : "" )
 			.replace('%COMMON-NAME-TITLE%', addSlashes(commonName) )
 			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
-			.replace('%REMOTE-LINK-CLICK%', data.info && data.info.url_external_page ?  
-				remoteLinkClickHtmlTpl
+			.replace(/%REMOTE-LINK-CLICK%/i, data.info && data.info.url_external_page ?  
+				fetchTemplate( 'remoteLinkClickHtmlTpl' )
 					.replace('%REMOTE-LINK%', data.info.url_external_page)
 					.replace('%TITLE%', __('meer informatie'))
 					.replace('%SCI-NAME%', encodeURIComponent(sciName))
@@ -666,25 +659,25 @@ function formatResult( data )
 					.replace('%NAMECOMMON%', commonName)
 				: "")
 			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
-				iconUrlHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
+				fetchTemplate( 'iconUrlHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
 			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
-			.replace('%SHOW-STATES-CLICK%', showStates ?  statesClickHtmlTpl.replace('%TITLE%',__('kenmerken')) : "")
+			.replace(/%SHOW-STATES-CLICK%/i, showStates ?  fetchTemplate( 'statesClickHtmlTpl' ).replace('%TITLE%',__('kenmerken')) : "")
 			.replace('%SHOW-STATES-ICON%', showStates ?
-				iconInfoHtmlTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
+				fetchTemplate( 'iconInfoHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
 			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
-			.replace('%RELATED-CLICK%', (data.related_count>0 ?  
-				relatedClickHtmlTpl
+			.replace(/%RELATED-CLICK%/i, (data.related_count>0 ?  
+				fetchTemplate( 'relatedClickHtmlTpl' )
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
 					.replace('%TITLE%', __('gelijkende soorten'))
 				: "" )
 			)
 			.replace('%RELATED-ICON%', data.related_count>0 ?
-				iconSimilarTpl.replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
-			.replace('%STATES%', showStates ? statesHtmlTpl.replace( '%STATES%',states.join(statesJoinHtmlTpl)) : "")
+				fetchTemplate( 'iconSimilarTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
+			.replace('%STATES%', showStates ? fetchTemplate( 'statesHtmlTpl' ).replace( '%STATES%',states.join( fetchTemplate( 'statesJoinHtmlTpl' ) ) ) : "" )
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
-			.replace('%SCORE%', matrixsettings.showScores && data.score ? resultScoreHtmlTpl.replace( '%SCORE%', data.score) : "")
+			.replace('%SCORE%', matrixsettings.showScores && data.score ? fetchTemplate( 'resultScoreHtmlTpl' ).replace( '%SCORE%', data.score) : "")
 			;
 
 
@@ -710,7 +703,7 @@ function printCountHeader()
 	if (matrixsettings.browseStyle=='expand')
 	{
 		$('#result-count').html(
-			counterExpandHtmlTpl
+			fetchTemplate( 'counterExpandHtmlTpl' )
 				.replace('%START-NUMBER%',(matrixsettings.expandedShowing > 1 ? "1-" : "" ))
 				.replace('%NUMBER-SHOWING%',matrixsettings.expandedShowing)
 				.replace('%FROM-LABEL%',__('van'))
@@ -721,7 +714,7 @@ function printCountHeader()
 	if (matrixsettings.browseStyle=='paginate')
 	{
 		$('#result-count').html(
-			counterPaginateHtmlTpl
+			fetchTemplate( 'counterPaginateHtmlTpl' )
 				.replace('%FIRST-NUMBER%', (matrixsettings.start+1))
 				.replace('%LAST-NUMBER%',(matrixsettings.start+matrixsettings.perPage))
 				.replace('%NUMBER-LABEL%',__('van'))
@@ -731,7 +724,7 @@ function printCountHeader()
 	else
 	{
 		$('#result-count').html(
-			counterPaginateHtmlTpl
+			fetchTemplate( 'counterPaginateHtmlTpl' )
 				.replace('%FIRST-NUMBER%',1)
 				.replace('%LAST-NUMBER%',resultset.length)
 				.replace('%NUMBER-LABEL%',"")
@@ -760,7 +753,7 @@ function printPaging()
 
 	if (matrixsettings.lastPage > 1 && matrixsettings.currPage!=0)
 	{
-		$("#paging-header").append( pagePrevHtmlTpl );
+		$("#paging-header").append( fetchTemplate( 'pagePrevHtmlTpl' ) );
 	}
 	
 	if (matrixsettings.lastPage>1)
@@ -769,18 +762,18 @@ function printPaging()
 		{
 			if (i==matrixsettings.currPage)
 			{
-				$("#paging-header").append( pageCurrHtmlTpl.replace('%NR%',(i+1)) );
+				$("#paging-header").append( fetchTemplate( 'pageCurrHtmlTpl' ).replace('%NR%',(i+1)) );
 			}
 		    else
 			{
-				$("#paging-header").append( pageNumberHtmlTpl.replace('%NR%',(i+1)).replace('%INDEX%',i) );
+				$("#paging-header").append( fetchTemplate( 'pageNumberHtmlTpl' ).replace('%NR%',(i+1)).replace('%INDEX%',i) );
 			}
 		}
 	}
 
 	if (matrixsettings.lastPage > 1 && matrixsettings.currPage<matrixsettings.lastPage-1)
 	{
-		$("#paging-header").append( pageNextHtmlTpl );
+		$("#paging-header").append( fetchTemplate( 'pageNextHtmlTpl' ) );
 	}
 
 	$("#paging-footer").html($("#paging-header").html());
@@ -1224,7 +1217,7 @@ function printSimilarHeader()
 	var resultset = getResultSet();
 
 	$('#similarSpeciesHeader').html(
-		similarHeaderHtmlTpl
+		fetchTemplate( 'similarHeaderHtmlTpl' )
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
 			.replace('%SPECIES-NAME%', resultset[0].label)
 			.replace('%BACK-TEXT%', __('terug'))
@@ -1313,7 +1306,7 @@ function setSearch( p )
 function printSearchHeader()
 {
 	$('#similarSpeciesHeader').html(
-		searchHeaderHtmlTpl
+		fetchTemplate( 'searchHeaderHtmlTpl' )
 			.replace('%HEADER-TEXT%', __('Zoekresultaten voor'))
 			.replace('%SEARCH-TERM%', searchedfor)
 			.replace('%BACK-TEXT%', __('terug'))
@@ -1607,10 +1600,10 @@ function printInfo( info, title, url )
 	{
 		showDialog(
 			title,
-			infoDialogHtmlTpl
+			fetchTemplate( 'infoDialogHtmlTpl' )
 				.replace('%BODY%',info)
 				.replace('%URL%', url ? 
-					infoDialogUrlHtmlTpl
+					fetchTemplate( 'infoDialogUrlHtmlTpl' )
 						.replace('%URL%',url)
 						.replace('%LINK-LABEL%',__('Meer informatie'))
 					 : "" ),
@@ -1620,9 +1613,9 @@ function printInfo( info, title, url )
 
 function bindSecretlyClickable()
 {
-	$('.secretlyclickable').on('dblclick',function(event)
+	$( '.secretlyclickable' ).on( 'dblclick' , function(event)
 	{
-		if (event.ctrlKey)
+		if ( event.ctrlKey )
 		{
 			showStates($(this).attr('data-id'));
 			return false;
@@ -1634,11 +1627,13 @@ function bindSecretlyClickable()
 function matrixInit()
 {
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
+	
+	acquireInlineTemplates();
 
 	setCursor('wait');
 	applyScores();
 
-	if ( getMenu()=="" ) 
+	if ( getMenu()=="" )
 		initMenu();
 	else
 		printMenu();
@@ -1647,5 +1642,5 @@ function matrixInit()
 	clearResults();
 	printResults();
 	setCursor();
-	bindSecretlyClickable();
+	bindSecretlyClickable();	
 }

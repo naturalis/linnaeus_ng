@@ -94,8 +94,6 @@ class Controller extends BaseClass
 
         $this->setTimeZone();
 
-        $this->setDebugMode();
-
         $this->startSession();
 
         $this->loadHelpers();
@@ -2826,7 +2824,6 @@ class Controller extends BaseClass
     {
         $this->setBreadcrumbs();
 
-        $this->smarty->assign('debugMode', $this->debugMode);
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('database', $this->config->getDatabaseSettings());
         $this->smarty->assign('baseUrl', $this->baseUrl);
@@ -2850,9 +2847,6 @@ class Controller extends BaseClass
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
         $this->smarty->assign('currentUserRole', $this->getCurrentUserRole());
-
-        $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
-        $this->smarty->assign('autoSaveFrequency', $this->generalSettings['autoSaveFrequency']);
 
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -2937,18 +2931,6 @@ class Controller extends BaseClass
     private function setTimeZone ()
     {
         date_default_timezone_set($this->generalSettings['serverTimeZone']);
-    }
-
-
-
-    /**
-     * Sets a global 'debug' mode, based on a general setting in the config file
-     *
-     * @access     private
-     */
-    private function setDebugMode ()
-    {
-        $this->debugMode = $this->generalSettings['debugMode'];
     }
 
 
