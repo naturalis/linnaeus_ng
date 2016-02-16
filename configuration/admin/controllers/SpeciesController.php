@@ -182,9 +182,6 @@ class SpeciesController extends Controller
     {
         parent::__construct();
         $this->initialize();
-
-        $media = new MediaController();
-        die(print_r($media->getMediaList()));
     }
 
 
