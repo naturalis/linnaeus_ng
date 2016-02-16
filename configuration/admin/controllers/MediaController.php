@@ -166,6 +166,9 @@ class MediaController extends Controller
                 $image['alt_files'] = $altFiles;
             }
 
+            // add flag if image is already attached to entity
+            $image['attached'] = 1;
+
             $list['images'][$i] = $image;
         }
         return $list;
