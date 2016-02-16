@@ -622,7 +622,8 @@ function formatResult( data )
 				fetchTemplate( 'photoLabelPhotographerHtmlTpl' )
 					.replace('%PHOTO-LABEL%', __('foto')+' &copy;' )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
-				: ""));
+				: ""))
+		;
 
 	var imageHtml=
 		fetchTemplate( 'imageHtmlTpl' )
@@ -630,7 +631,8 @@ function formatResult( data )
 			.replace('%THUMB-URL%',thumb)
 			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
 			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
-		;	
+		;
+
 	var resultHtml=
 		fetchTemplate( 'resultHtmlTpl' )
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
@@ -678,13 +680,15 @@ function formatResult( data )
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
 			.replace('%SCORE%', matrixsettings.showScores && data.score ? fetchTemplate( 'resultScoreHtmlTpl' ).replace( '%SCORE%', data.score) : "")
-			;
+		;
 
-
-	if (data.info != undefined) {
-		resultHtml = resultHtml.replace('%PHOTOGRAPHER%',(data.info.photographer ?  data.info.photographer: ''));
-	} else {
-		resultHtml = resultHtml.replace('%PHOTOGRAPHER%', "");
+	if (data.info != undefined)
+	{
+		resultHtml=resultHtml.replace('%PHOTOGRAPHER%',(data.info.photographer ?  data.info.photographer: ''));
+	} 
+	else
+	{
+		resultHtml=resultHtml.replace('%PHOTOGRAPHER%', "");
 	}
 	return resultHtml;
 }
