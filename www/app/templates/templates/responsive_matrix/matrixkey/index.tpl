@@ -154,17 +154,13 @@ $(document).ready(function()
 <div class="inline-templates" id="statesHtmlTpl">
     <div id="det-%LOCAL-ID%" class="result-detail hidden">
         <ul>
-            <li>%STATES%</li>
+			%STATES%
         </ul>
     </div>
 </div>
 
-<div class="inline-templates" id="statesJoinHtmlTpl">
-	</li><li>
-</div>
-
 <div class="inline-templates" id="speciesStateItemHtmlTpl">
-	<span class="result-detail-label">%GROUP% %CHARACTER%:</span> <span class="result-detail-value">%STATE%</span>
+	<li><span class="result-detail-label">%GROUP% %CHARACTER%:</span> <span class="result-detail-value">%STATE%</span></li>
 </div>
 
 <div class="inline-templates" id="resultHtmlTpl">
@@ -227,7 +223,7 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="menuOuterHtmlTpl">
-	<ul>%MENU%</ul>'
+	<ul>%MENU%</ul>
 </div>
 
 <div class="inline-templates" id="menuGroupHtmlTpl">
