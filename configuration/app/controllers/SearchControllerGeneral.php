@@ -145,7 +145,7 @@ class SearchControllerGeneral extends SearchController
 		$this->_excerptPrePostMatchString =
 			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ?
 				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) :
-				'';
+				'...';
 	}
 
     public function __destruct ()
