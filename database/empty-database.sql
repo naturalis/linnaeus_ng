@@ -16,7 +16,7 @@ BEGIN
 END$$
 
 DROP FUNCTION IF EXISTS `fnStripTags`$$
-CREATE DEFINER=`linnaeus_user`@`localhost` FUNCTION `fnStripTags`( Dirty varchar(4000) ) RETURNS varchar(4000) CHARSET latin1
+CREATE DEFINER=`linnaeus_user`@`localhost` FUNCTION `fnStripTags`( Dirty varchar(64000) ) RETURNS varchar(64000) CHARSET latin1
     DETERMINISTIC
 BEGIN
   DECLARE iStart, iEnd, iLength int;
