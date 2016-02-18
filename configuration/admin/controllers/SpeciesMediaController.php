@@ -23,7 +23,7 @@ class SpeciesMediaController extends Controller
     public $jsToLoad = array(
         'all' => array(
             'taxon.js',
-            'prettyPhoto/jquery.prettyPhoto.js',
+            'prettyPhoto/jquery.prettyPhoto.js'
         )
     );
     public $controllerPublicName = 'Species module';
