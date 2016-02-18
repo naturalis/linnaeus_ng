@@ -643,7 +643,7 @@ class MatrixKeyController extends Controller
 				(!$this->settings->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
-				if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
+				if ( ( isset($this->settings->suppress_details) && $this->settings->suppress_details!=1 ) || !isset($this->settings->suppress_details) )
 				{
 					$d['states']=$this->getTaxonStates( $val['taxon_id'] );
 				}
@@ -702,7 +702,7 @@ class MatrixKeyController extends Controller
 		{
 			$m[$key]['taxon']=$this->getTaxonById( $val['taxon_id'] );
 			$m[$key]['gender']=$this->extractGenderTag( $val['label'] );
-			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
+			if ( ( isset($this->settings->suppress_details) && $this->settings->suppress_details!=1 ) || !isset($this->settings->suppress_details) )
 			{
 				$m[$key]['states']=$this->getVariationStates( $val['id'] );
 			}
@@ -735,7 +735,7 @@ class MatrixKeyController extends Controller
 			
 		foreach((array)$matrices as $key=>$val)
 		{
-			if ($this->settings->suppress_details!=1)
+			if ( ( isset($this->settings->suppress_details) && $this->settings->suppress_details!=1 ) || !isset($this->settings->suppress_details) )
 			{
 				$matrices[$key]['states']=$this->getMatrixStates( $val['id'] );
 			}

@@ -139,16 +139,21 @@ $(document).ready(function()
 	<a class="goToMatrixLink" href="?mtrx=%MATRIX-ID%"><i class="ion-chevron-right"></i></a>
 </div>
 
-<div class="inline-templates" id="remoteLinkClickHtmlTpl">
-	onClick="doRemoteLink('%REMOTE-LINK%','%SCI-NAME%', '%NAMESCIENTIFIC%', '%NAMECOMMON%');" title="%TITLE%"
+<div class="inline-templates" id="noActionIconHtmlTpl">
+	<div class="result-icon no-content"></div>
 </div>
 
-<div class="inline-templates" id="statesClickHtmlTpl">
-	onClick="toggleDetails('%LOCAL-ID%');return false;"title="%TITLE%"
+
+<div class="inline-templates" id="remoteLinkIconHtmlTpl">
+	<div class="result-icon" onClick="doRemoteLink('%LINK%','%SCI-NAME%', '%NAMESCIENTIFIC%', '%NAMECOMMON%');" title="%TITLE%">%REMOTE-LINK-ICON%</div>
 </div>
 
-<div class="inline-templates" id="relatedClickHtmlTpl">
-	onClick="setSimilar({ id:%ID%,type:'%TYPE%' });return false;" title="%TITLE%"
+<div class="inline-templates" id="statesIconHtmlTpl">
+	<div class="result-icon icon-details" id="tog-%LOCAL-ID%" onClick="toggleDetails('%LOCAL-ID%');return false;" title="%TITLE%">%SHOW-STATES-ICON%</div>
+</div>
+
+<div class="inline-templates" id="relatedIconHtmlTpl">
+	<div class="result-icon icon-resemblance" onClick="setSimilar({ id:%ID%,type:'%TYPE%' });return false;" title="%TITLE%">%RELATED-ICON%</div>
 </div>
 
 <div class="inline-templates" id="statesHtmlTpl">
@@ -178,9 +183,9 @@ $(document).ready(function()
 			</div>
         </div>
         <div class="result-icons">
-            <div class="result-icon%REMOTE-LINK-CLASS%" %REMOTE-LINK-CLICK%>%REMOTE-LINK-ICON%</div>
-            <div class="result-icon%SHOW-STATES-CLASS%" id="tog-%LOCAL-ID%" %SHOW-STATES-CLICK%>%SHOW-STATES-ICON%</div>
-            <div class="result-icon%RELATED-CLASS% related" %RELATED-CLICK%>%RELATED-ICON%</div>
+        	%REMOTE-LINK%
+            %SHOW-STATES%
+            %RELATED-TAXA%
             %MATRIX-LINK%
         </div>%STATES%
     </div>

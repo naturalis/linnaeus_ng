@@ -651,37 +651,40 @@ function formatResult( data )
 				: ""))
 			.replace(/%COMMON-NAME%/g, commonName ? addSlashes(commonName) : "" )
 			.replace('%COMMON-NAME-TITLE%', addSlashes(commonName) )
-			.replace('%REMOTE-LINK-CLASS%', data.info && data.info.url_external_page ? "" : " no-content")
-			.replace(/%REMOTE-LINK-CLICK%/i, data.info && data.info.url_external_page ?  
-				fetchTemplate( 'remoteLinkClickHtmlTpl' )
-					.replace('%REMOTE-LINK%', data.info.url_external_page)
+			.replace(/%REMOTE-LINK%/i, data.info && data.info.url_external_page ?  
+				fetchTemplate( 'remoteLinkIconHtmlTpl' )
+					.replace('%LINK%', data.info.url_external_page)
 					.replace('%TITLE%', __('meer informatie'))
 					.replace('%SCI-NAME%', encodeURIComponent(sciName))
 					.replace('%NAMESCIENTIFIC%', sciName)
 					.replace('%NAMECOMMON%', commonName)
-				: "")
-			.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
-				fetchTemplate( 'iconUrlHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") : "")
-			.replace('%SHOW-STATES-CLASS%', showStates ? " icon-details" : " no-content")
-			.replace(/%SHOW-STATES-CLICK%/i, showStates ?  fetchTemplate( 'statesClickHtmlTpl' ).replace('%TITLE%',__('kenmerken')) : "")
-			.replace('%SHOW-STATES-ICON%', showStates ?
-				fetchTemplate( 'iconInfoHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") : "")
-			.replace('%RELATED-CLASS%', data.related_count>0 ? " icon-resemblance" : " no-content")
-			.replace(/%RELATED-CLICK%/i, (data.related_count>0 ?  
-				fetchTemplate( 'relatedClickHtmlTpl' )
+					.replace('%REMOTE-LINK-ICON%', data.info && data.info.url_external_page ?
+						fetchTemplate( 'iconUrlHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"information_grijs.png") :
+					"")
+				: fetchTemplate( 'noActionIconHtmlTpl' ) )
+			.replace(/%SHOW-STATES%/i, showStates ?  
+				fetchTemplate( 'statesIconHtmlTpl' )
+					.replace('%TITLE%',__('kenmerken'))
+					.replace('%SHOW-STATES-ICON%', showStates ?
+						fetchTemplate( 'iconInfoHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") :
+					"")
+				: fetchTemplate( 'noActionIconHtmlTpl' ) )
+			.replace(/%RELATED-TAXA%/i, (data.related_count>0 ?  
+				fetchTemplate( 'relatedIconHtmlTpl' )
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
 					.replace('%TITLE%', __('gelijkende soorten'))
+					.replace('%RELATED-ICON%', data.related_count>0 ?
+						fetchTemplate( 'iconSimilarTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
 				: "" )
 			)
-			.replace('%RELATED-ICON%', data.related_count>0 ?
-				fetchTemplate( 'iconSimilarTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
 			.replace('%STATES%', showStates ? fetchTemplate( 'statesHtmlTpl' ).replace( '%STATES%',states.join( fetchTemplate( 'statesJoinHtmlTpl' ) ) ) : "" )
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
 			.replace('%SCORE%', matrixsettings.showScores && data.score ? fetchTemplate( 'resultScoreHtmlTpl' ).replace( '%SCORE%', data.score) : "")
 		;
 
+		
 	if (data.info != undefined)
 	{
 		resultHtml=resultHtml.replace('%PHOTOGRAPHER%',(data.info.photographer ?  data.info.photographer: ''));
