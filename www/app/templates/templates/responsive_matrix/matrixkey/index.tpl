@@ -66,6 +66,7 @@ $(document).ready(function()
 		{ key : 'Filter op kenmerken', translation : '{t}Filter op kenmerken{/t}' },
 		{ key : 'determinatiesleutel', translation : '{t}determinatiesleutel{/t}' },
 		{ key : 'Kenmerken', translation : '{t}Kenmerken{/t}' },
+		{ key : 'kenmerken', translation : '{t}kenmerken{/t}' },
 		{ key : 'Versiegeschiedenis', translation : '{t}Versiegeschiedenis{/t}' },
 	];
 
