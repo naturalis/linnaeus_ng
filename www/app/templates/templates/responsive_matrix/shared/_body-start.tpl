@@ -31,11 +31,11 @@
                     overlayOpen();
     	        {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
-                    .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
+                    .success(function(data) { colofonOverlay( data ,'{t}Colofon en citatie{/t}'); } ) ;
                 {/if}
                 {if $introduction_links[$settings->introduction_topic_versions]}
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
-                    .success(function(data) { colofonVersion( data ,'Versiegeschiedenis'); } ) ;
+                    .success(function(data) { colofonVersion( data ,'{t}Versiegeschiedenis{/t}'); } ) ;
 				{/if}
                     ">{t}Colofon en citatie{/t}</a>
                 </div>
@@ -43,11 +43,11 @@
 	            overlayOpen();
             {if $introduction_links[$settings->introduction_topic_colophon_citation]}
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_colophon_citation].page_id}&format=plain' )
-                .success(function(data) { colofonOverlay( data ,'Colofon en citatie'); } ) ;
+                .success(function(data) { colofonOverlay( data ,'{t}Colofon en citatie{/t}'); } ) ;
 			{/if}
             {if $introduction_links[$settings->introduction_topic_versions]}
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
-                .success(function(data) { colofonVersion( data ,'Versiegeschiedenis'); } ) ;
+                .success(function(data) { colofonVersion( data ,'{t}Versiegeschiedenis{/t}'); } ) ;
 			{/if}
                 " class="info"><i class="ion-ios-information-outline info"></i></a>
 			{/if}
@@ -91,7 +91,7 @@
         <div class="headerImage">
             <img src="{$session.app.system.urls.systemMedia}placeholderheader.png" alt="">
             <h1 class="pageTitle">
-                <span class="determinatiesleutel">determinatiesleutel</span><br />
+                <span class="determinatiesleutel">{t}determinatiesleutel{/t}</span><br />
                 {$matrix.name}
             </h1>
         </div>    

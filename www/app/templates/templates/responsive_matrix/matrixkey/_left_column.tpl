@@ -48,9 +48,9 @@
         <div id="legendContainer">
             <h2><span id="legendHeader">{t}Legenda{/t}</span></h2>
             <ul class="legend">
-                <li><img class="legend-icon-image icon-nsr" alt="Informatie" src="{$image_root_skin}information_grijs.png" />{t}Informatie{/t}</li>
-                <li><img class="legend-icon-image icon-info" alt="Kenmerken" src="{$image_root_skin}lijst_grijs.png" />{t}Kenmerken{/t}</li>
-                <li><img class="legend-icon-image icon-similar" alt="Gelijkende soorten" src="{$image_root_skin}gelijk_grijs.png" />{t}Gelijkende soorten{/t}</li>
+                <li><img class="legend-icon-image icon-nsr" alt="{t}Informatie{/t}" src="{$image_root_skin}information_grijs.png" />{t}Informatie{/t}</li>
+                <li><img class="legend-icon-image icon-info" alt="{t}Kenmerken{/t}" src="{$image_root_skin}lijst_grijs.png" />{t}Kenmerken{/t}</li>
+                <li><img class="legend-icon-image icon-similar" alt="{t}Gelijkende soorten{/t}" src="{$image_root_skin}gelijk_grijs.png" />{t}Gelijkende soorten{/t}</li>
             </ul>
         </div>  
 

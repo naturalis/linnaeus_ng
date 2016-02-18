@@ -62,6 +62,11 @@ $(document).ready(function()
 		{ key : 'onderscheidende kenmerken', translation : '{t}onderscheidende kenmerken{/t}' },
 		{ key : 'terug', translation : '{t}terug{/t}' },
 		{ key : 'van', translation : '{t}van{/t}' },
+		{ key : 'Informatie', translation : '{t}Informatie{/t}' },
+		{ key : 'Filter op kenmerken', translation : '{t}Filter op kenmerken{/t}' },
+		{ key : 'determinatiesleutel', translation : '{t}determinatiesleutel{/t}' },
+		{ key : 'Kenmerken', translation : '{t}Kenmerken{/t}' },
+		{ key : 'Versiegeschiedenis', translation : '{t}Versiegeschiedenis{/t}' },
 	];
 
 	setSetting({
