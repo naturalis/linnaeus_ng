@@ -91,7 +91,7 @@
         <div class="headerImage">
             <img src="{$session.app.system.urls.systemMedia}placeholderheader.png" alt="">
             <h1 class="pageTitle">
-                <span class="determinatiesleutel">{t}determinatiesleutel{/t}</span><br />
+                <span class="determinatiesleutel">{t}soortzoeker{/t}</span><br />
                 {$matrix.name}
             </h1>
         </div>    
