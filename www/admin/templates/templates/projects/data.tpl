@@ -3,6 +3,7 @@
 <div id="page-main">
 <form enctype="multipart/form-data" id="theForm" action="" method="post">
 <input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="action" value="save" />
 <input type="hidden" name="deleteLogo" id="deleteLogo" value="0" />
 <table>
 	<tr>
