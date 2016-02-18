@@ -262,10 +262,10 @@ class ProjectsController extends Controller
 
         $this->setPageName($this->translate('Project data'));
 
-        if (isset($this->requestData) && !$this->isFormResubmit()) {
+        if ( $this->rHasVal('action','save') && !$this->isFormResubmit() ) {
             // saving all data (except the logo image)
 
-			$this->saveProjectData($this->requestData);
+			$this->saveProjectData( $this->rGetAll() );
         }
 
         $this->setCurrentProjectData();
