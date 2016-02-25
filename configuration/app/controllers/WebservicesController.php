@@ -15,6 +15,7 @@ class WebservicesController extends Controller
 	private $_thumbBaseUrl='http://images.naturalis.nl/160x100/';
 	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
 	private $_nsrOriginalImageBaseUrl='http://images.naturalis.nl/original/';
+	private $_domainNamePatch="www.nederlandsesoorten.nl"; // HTTP_HOST is unreliable (reverse proxy); must become setting REFAC2015
 	private $_JSONPCallback=false;
 	private $_JSON=null;
 
@@ -618,7 +619,7 @@ parameters:
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
 
-		$result['url_recent_images']='http://'.$_SERVER['HTTP_HOST'].'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
+		$result['url_recent_images']='http://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
 	
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
