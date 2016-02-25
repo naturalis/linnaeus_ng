@@ -57,7 +57,7 @@ class Literature2Controller extends NsrController
 		'Website'
 	);
 
-	private $publicationTypesSortOrder=" ifnull(_b.label,_a.sys_label)";
+	private $publicationTypesSortOrder;
 
 	private $lit2Columns=
 		array(
@@ -97,6 +97,7 @@ class Literature2Controller extends NsrController
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_matchThresholdDefault=$this->moduleSettings->getModuleSetting( array( 'setting'=>'literature2_import_match_threshold','subst'=>$this->_matchThresholdDefault));
 
+		$this->setPublicationTypesSortOrder( 'ifnull(_b.label,_a.sys_label)' );
 		$this->setPublicationTypes();
     }
 
@@ -347,7 +348,6 @@ class Literature2Controller extends NsrController
 			// publication_type -> publication_type_id
 			if (in_array('publication_type',$fields))
 			{
-				$this->setPublicationTypes();
 				$these_keys=array_keys($fields,'publication_type');
 
 				foreach((array)$lines as $key=>$cols)
@@ -1535,21 +1535,27 @@ class Literature2Controller extends NsrController
 
     private function setPublicationTypes()
     {
-		$this->publicationTypes =
+		$d = 
             $this->models->Literature2Model->getPublicationTypes(array(
                 'projectId' => $this->getCurrentProjectId(),
                 'languageId' => $this->getDefaultProjectLanguage(),
                 'sortOrder' => $this->getPublicationTypesSortOrder()
             ));
 
-		foreach((array)$this->publicationTypes as $key=>$val)
+
+		if ($d)
 		{
-			$this->publicationTypes[$key]['translations']=
-				$this->models->Literature2PublicationTypesLabels->_get(array('id'=>
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'publication_type_id' => $val['id'],
-				),'fieldAsIndex'=>'language_id','columns'=>'label'));
+			$this->publicationTypes=$d;
+		
+			foreach((array)$this->publicationTypes as $key=>$val)
+			{
+				$this->publicationTypes[$key]['translations']=
+					$this->models->Literature2PublicationTypesLabels->_get(array('id'=>
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'publication_type_id' => $val['id'],
+					),'fieldAsIndex'=>'language_id','columns'=>'label'));
+			}
 		}
 	}
 
