@@ -25,7 +25,7 @@
 {/if}
 
 {if $backlink}
-    <a class="navigation-icon icon-nav-back" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
+    <a class="navigation-icon icon-nav-back" id="back-icon" href="javascript:history.back()" back-url="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
 {else}
     <span class="navigation-icon icon-nav-back icon-inactive" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
