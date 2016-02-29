@@ -338,6 +338,14 @@ class VersatileExportController extends Controller
 		if ( !$this->getDoSynonyms() )
 			return;
 
+		//,replace(_c.nsr_id,'tn.nlsr.name/','') as nsr_id
+		/*
+			left join %PRE%nsr_ids _c
+				on _names.project_id = _c.project_id
+				and _names.id = _c.lng_id
+				and _c.item_type = 'name'
+		*/
+		
 		$this->query="
 			SELECT
 				_names.id,
@@ -376,22 +384,20 @@ class VersatileExportController extends Controller
 		{
 			$all_synonyms=array();
 			$q=str_replace('%ID-CLAUSE%','',$this->query);
-			
-			$synonyms=$this->models->VersatileExportModel->doSynonymsQuery( array("query"=>$q) );
-
+			$synonyms=$this->models->Names->freeQuery( $q );
 			foreach((array)$synonyms as $key=>$val)
 			{
 				$all_synonyms[$val['_taxon_id']][]=$val;
 			}
 			unset($synonyms);
 		}
-			
+
 		foreach( (array)$this->names as $key=>$val )
 		{
 			if ( !$get_all )
 			{
 				$q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
-				$synonyms=$this->models->VersatileExportModel->doSynonymsQuery( array("query"=>$q) );
+				$synonyms=$this->models->Names->freeQuery( $q );
 			}
 			else
 			{
@@ -404,36 +410,37 @@ class VersatileExportController extends Controller
 
 				if ( $this->hasCol( 'name_parts' ) )
 				{
-					if (isset($row['uninomial'])) $tmp['uninomial']=$row['uninomial'];
-					if (isset($row['specific_epithet'])) $tmp['specific_epithet']=$row['specific_epithet'];
-					if (isset($row['infra_specific_epithet'])) $tmp['infra_specific_epithet']=$row['infra_specific_epithet'];
-					if (isset($row['authorship'])) $tmp['authorship']=$row['authorship'];
-					if (isset($row['name_author'])) $tmp['name_author']=$row['name_author'];
-					if (isset($row['authorship_year'])) $tmp['authorship_year']=$row['authorship_year'];
+					foreach($this->getNameParts() as $name_part=>$name_part_state)
+					{
+						$tmp[$name_part]=isset($row[$name_part]) ? $row[$name_part] : null;
+					}
 				}
 				if ( $this->hasCol( 'database_id' ) )
 				{
 					if (isset($row['database_id'])) $tmp['database_id']=$row['database_id'];
 				}
+				
+				$d=
+					array(
+						'synoniem'=>isset($row['name']) ? $row['name'] : null,
+						'type_synoniem'=>isset($row['nametype']) ? $row['nametype'] : null,
+						'taal'=>isset($row['language']) ? $row['language'] : null,
+						'taxon'=>isset($val['wetenschappelijke_naam']) ? $val['wetenschappelijke_naam'] : null,
+					);
+
+				if (isset($val['nsr_id']))
+				{
+					$d['taxon_nsr_id'] = $val['nsr_id'];
+				}
 
 				array_push(
 					$this->synonyms,
-					array_merge(
-						array(
-							'synoniem'=>$row['name'],
-							//'nsr_id'=>$row['nsr_id'],
-							'type_synoniem'=>$row['nametype'],
-							'taal'=>$row['language'],
-							'taxon'=>$val['wetenschappelijke_naam'],
-							'taxon_nsr_id'=>$val['nsr_id'],
-						),
-						$tmp
-					)
+					array_merge($d,$tmp)
 				);
+
+				unset( $d );
 			}
-
 		}
-
 	}
 
 	private function doOutput()
