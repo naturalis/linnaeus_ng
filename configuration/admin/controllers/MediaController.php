@@ -19,7 +19,6 @@ class MediaController extends Controller
     private $_rsCollectionId;
     private $_rsSearchApi;
     private $_rsUploadApi;
-
     private $_rsSearchUrl;
     private $_rsUploadUrl;
     private $_rsNewUserUrl;
@@ -27,7 +26,9 @@ class MediaController extends Controller
     private $_result;
     private $_files;
     private $_uploaded;
-    private $_maxFileUploads;
+
+    private $moduleId;
+    private $termId;
 
     public $usedModels = array(
         'media',
@@ -49,16 +50,21 @@ class MediaController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct ($moduleId = false, $itemId = false)
     {
         parent::__construct();
-        $this->setConfigSettings();
-        $this->setRsApiUrls();
-    }
+        $this->setExternalIds($moduleId, $itemId);
+        $this->setRsSettings();
+     }
 
     public function __destruct ()
     {
         parent::__destruct();
+    }
+
+    private function setExternalIds ($moduleId, $itemId) {
+        $this->moduleId = $moduleId;
+        $this->itemId = $itemId;
     }
 
     private function setRsBaseUrl ()
@@ -110,7 +116,7 @@ class MediaController extends Controller
         $this->_rsUploadApi =  'api_upload_lng';
     }
 
-    private function resetResult ()
+    private function resetMediaController ()
     {
         $this->_uploaded = $this->_result = $this->_files = $this->errors = array();
     }
@@ -120,14 +126,8 @@ class MediaController extends Controller
         $this->_uploaded[] = $e;
     }
 
-    private function setMaxFileUploads ()
+    private function setRsSettings ()
     {
-        $this->_maxFileUploads =  ini_get('max_file_uploads');
-    }
-
-    private function setConfigSettings ()
-    {
-        $this->setMaxFileUploads();
         $this->setRsBaseUrl();
         $this->setRsMasterKey();
         $this->setRsUserKey();
@@ -135,19 +135,14 @@ class MediaController extends Controller
         $this->setRsSearchApi();
         $this->setRsNewUserApi();
         $this->setRsUploadApi();
-    }
 
-    private function setRsApiUrls ()
-    {
         // Search url: &search=[term]* to be appended
         $this->_rsSearchUrl = $this->_rsBaseUrl . $this->_rsSearchApi . '/?' .
             'key=' . $this->_rsUserKey . '&prettyfieldnames=true&collection=' .
             $this->_rsCollectionId;
-
-        // Upload url: &field8=[title] to be appended
+       // Upload url: &field8=[title] to be appended
         $this->_rsUploadUrl = $this->_rsBaseUrl . $this->_rsUploadApi . '/?' .
             'key=' . $this->_rsUserKey . '&collection=' . $this->_rsCollectionId;
-
         // New user url; newuser appended in createUser()
         $this->_rsNewUserUrl = $this->_rsBaseUrl . $this->_rsNewUserApi . '/?' .
             'key=' . $this->_rsMasterKey;
@@ -156,22 +151,40 @@ class MediaController extends Controller
     public function ajaxInterfaceAction ()
     {
         if ($this->rHasVal('action', 'upload_progress')) {
-
             $this->smarty->assign('returnText', $this->getUploadProgress('media'));
-
         }
         return false;
     }
 
-    public function selectAction ()
+    public function indexAction ()
     {
-        $this->resetResult();
+        $this->checkAuthorisation();
+        $this->printPage();
+    }
 
-        $this->smarty->assign('id', $this->rGetId());
+    public function selectRsAction ()
+    {
+        $this->checkAuthorisation();
+        $this->resetMediaController();
 
         // global get module id?
         //$this->smarty->assign('module_id', $this->getCurrentModuleId());
-        $this->smarty->assign('media', $this->getList());
+        $this->smarty->assign('media', $this->getRsMediaList());
+        //print_r($this->media->getMediaList());
+
+        $this->printPage();
+    }
+
+    public function selectAction ()
+    {
+        $this->checkAuthorisation();
+        $this->resetMediaController();
+
+        die(print_r($this->getMediaList()));
+
+        // global get module id?
+        //$this->smarty->assign('module_id', $this->getCurrentModuleId());
+        $this->smarty->assign('media', $this->getMediaList());
         //print_r($this->media->getMediaList());
 
         $this->printPage();
@@ -179,16 +192,21 @@ class MediaController extends Controller
 
     public function uploadAction ()
     {
-        $this->resetResult();
-
-        //  $this->uploadHasFiles()
+        $this->checkAuthorisation();
+        $this->resetMediaController();
+        $activeLanguage = $this->rHasVar('language_id') ?
+            $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
 
         if ($this->rHasVal('action', 'upload') && !$this->isFormResubmit()
             && $this->uploadHasFiles()) {
 
             $this->setFiles($_FILES['files']);
-
             foreach ($this->_files as $i => $file) {
+
+                // Check mime type, file size, etc.
+                if (!$this->uploadedFileIsValid($file)) {
+                    continue;
+                }
 
                 $this->upload(array(
                     'file' => array(
@@ -202,8 +220,9 @@ class MediaController extends Controller
                 // Store data
                 if (empty($this->_result->error)) {
 
-                    $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1000) . ' KB)');
+                    $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1024) . ' KB)');
 
+                    // Store core data
                     $media = $this->_result->resource;
                     $this->models->Media->save(array(
                         'id' => null,
@@ -220,7 +239,46 @@ class MediaController extends Controller
                         'rs_thumb_large' => $media->thumbnails->large
                     ));
 
+                    // Store associated metadata
+                    $mediaId = $this->models->Media->getNewId();
+                    foreach (array('title', 'location', 'photographer') as $meta) {
+                        if ($this->rHasVal($meta)) {
+                            $this->models->MediaMetadata->save(array(
+                                'id' => null,
+                                'project_id' => $this->getCurrentProjectId(),
+                                'media_id' => $mediaId,
+                                'language_id' => $activeLanguage,
+                                'sys_label' => $meta,
+                                'metadata' => $this->rGetVal($meta)
+                             ));
+                        }
+                    }
 
+                    // Store tags
+                    if ($this->rHasVal('tags')) {
+                        $tags = explode(',', $this->rGetVal('tags'));
+                        foreach (array_unique($tags) as $tag) {
+                            $this->models->MediaTags->save(array(
+                                'id' => null,
+                                'project_id' => $this->getCurrentProjectId(),
+                                'media_id' => $mediaId,
+                                'language_id' => $activeLanguage,
+                                'tag' => trim($tag)
+                             ));
+                        }
+                    }
+
+                    // If module_id and item_id have been set, save
+                    // contextual link
+                    if ($this->rHasVal('module_id') && $this->rHasVal('item_id')) {
+                        $this->models->MediaMetadata->save(array(
+                            'id' => null,
+                            'project_id' => $this->getCurrentProjectId(),
+                            'media_id' => $mediaId,
+                            'module_id' => $this->rGetVal('module_id'),
+                            'item_id' => $this->rGetVal('item_id')
+                         ));
+                    }
                 } else {
                     $this->addError(_('Could not upload media') . ': ' . $this->_result->error);
                 }
@@ -232,12 +290,36 @@ class MediaController extends Controller
         }
 
         $this->smarty->assign('upload_max_filesize', ini_get('upload_max_filesize'));
-        $this->smarty->assign('max_file_uploads', $this->_maxFileUploads);
+        $this->smarty->assign('max_file_uploads', ini_get('max_file_uploads'));
         $this->smarty->assign('post_max_size', ini_get('post_max_size'));
+        $this->smarty->assign('action', htmlentities($_SERVER['PHP_SELF']));
         $this->smarty->assign('session_upload_progress_name', ini_get('session.upload_progress.name'));
+		$this->smarty->assign('languages', $this->getProjectLanguages());
+		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
+		$this->smarty->assign('language_id', $activeLanguage);
+		$this->smarty->assign('module_id', $this->moduleId);
+		$this->smarty->assign('item_id', $this->itemId);
 
-        $this->printPage();
+		$this->printPage();
     }
+
+    private function uploadedFileIsValid ($file)
+    {
+        // Check mime type
+
+        // Check errors in file
+        switch ($file['error']) {
+            case 1:
+            case 2:
+                $this->addError(_('File too large') . ': ' . $file['name']);
+                return false;
+            case 3:
+                $this->addError(_('File upload incomplete') . ': ' . $file['name']);
+                return false;
+        }
+        return true;
+    }
+
 
     public function createUserAction ()
     {
@@ -249,7 +331,7 @@ class MediaController extends Controller
 
     private function uploadHasFiles ()
     {
-        if (isset($_FILES['files']['error'][0]) && $_FILES['files']['error'][0] === 0) {
+        if (isset($_FILES['files']['name'][0]) && !empty($_FILES['files']['name'][0])) {
             return true;
         }
         return false;
@@ -273,7 +355,7 @@ class MediaController extends Controller
         return 100;
     }
 
-    private function getList ($p = false)
+    private function getRsMediaList ($p = false)
     {
         $search = isset($p['search']) ? $p['search'] : false; // empty to return everything
         $sort = isset($p['sort']) ? $p['sort'] : false; // asc (default)/desc
@@ -283,10 +365,36 @@ class MediaController extends Controller
             ($sort ? '&sort=' . urlencode($sort) : '');
         $this->_result = $this->getCurlResult($url);
 
-        return $this->parseList();
+        return $this->parseRsMediaList();
     }
 
-    private function parseList ()
+    private function getMediaList ($p = false)
+    {
+        $search = isset($p['search']) ? $p['search'] : false; // empty to return everything
+        $sort = isset($p['sort']) ? $p['sort'] : false; // asc (default)/desc
+
+        $media = $this->models->Media->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+			)
+		));
+
+        if (!empty($this->moduleId) && !empty($this->itemId)) {
+            $mediaModule = $this->models->MediaModules->_get(array(
+    			'id' => array(
+    				'project_id' => $this->getCurrentProjectId(),
+    				'module_id' => $this->moduleId,
+    				'item_id' => $this->itemId,
+    			)
+    		));
+        }
+
+        return $media;
+    }
+
+
+
+    private function parseRsMediaList ()
     {
         if (!isset($this->_result) || empty($this->_result)) {
             return false;
