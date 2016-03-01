@@ -64,14 +64,13 @@
     </div>
 
 	<form id="theForm" method="post">
-    <input type="hidden" name="taxon_id" value="{$taxon.id}" />
-    <input type="hidden" id="action" name="action" value="save" />
-    <input type="hidden" id="subject" name="subject" value="" />
+    <input type="hidden" name="module_id" value="{$module_id}" />
+    <input type="hidden" id="action" name="action" value="delete" />
 
     <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.
 
     {if $media.total > 0}
-	    {t}Selected images will be attached{/t}.</p>
+	    {t}Selected images will be deleted{/t}.</p>
 
 	    <ul class="list">
 	    <li class="header">
@@ -87,12 +86,14 @@
 	 	<li id="li_rs_id_{$v.rs_id}">
 	 		<div class="list-grid-info">
 				<input type="checkbox" name="rs_id_{$v.rs_id}" id="rs_id_{$v.rs_id}" {if $v.attached==1}checked disabled{/if}>
-	 			<img class="thumbnail" src="{$v.thumbnails.normal}" />
+	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
+	 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
+	 			</a>
 	 			<span class="file-name">{$v.file_name}</span>
 	 		</div>
 	 		<div class="list-info">
 	 			<span class="column">{$v.modified}</span>
-	 			<span class="column">{$v.height} x {$v.width} px</span>
+	 			<span class="column">{$v.width} x {$v.height} px</span>
 	 			<span>{$v.title}</span>
 	 		</div>
 	 	</li>
@@ -100,7 +101,7 @@
 	    {/foreach}
 	    </ul>
 		<div class="clear" />
-	    <input type="button" class="list" value="{t}attach selected{/t}" />
+	    <input type="submit" id="delete" value="{t}delete selected{/t}" />
 	    </form>
 
 	{else}
@@ -120,6 +121,11 @@ $(document).ready(function() {
 	        $('#theForm ul').removeClass('grid').addClass('list');
 	    }
 	});
+
+	$('input:submit#delete').on('click',function(e) {
+		if (!allDoubleDeleteConfirm('the selected media files','this project')) return;
+	});
+
 });
 </script>
 {/literal}
