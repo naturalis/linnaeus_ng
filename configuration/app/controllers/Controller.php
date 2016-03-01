@@ -346,7 +346,7 @@ class Controller extends BaseClass
 					array_walk($d,function(&$a,$b){$a=trim($a);});
 					if (in_array($pName,$d)) {
 						$this->setCurrentProjectId($val['id']);
-						exit;
+						//exit;
 					}
 				}
 			}
