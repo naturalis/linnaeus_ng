@@ -58,34 +58,6 @@ class SpeciesMediaController extends Controller
     }
 
 
-    public function attachMediaAction ()
-    {
-        $this->smarty->assign('id', $this->rGetId());
-
-        // global get module id?
-        //$this->smarty->assign('module_id', $this->getCurrentModuleId());
-        $this->smarty->assign('media', $this->media->getMediaList());
-        //print_r($this->media->getMediaList());
-
-
-
-        $this->printPage();
-    }
-
-    public function uploadMediaAction ()
-    {
-        $this->smarty->assign('id', $this->rGetId());
-
-        // global get module id?
-        //$this->smarty->assign('module_id', $this->getCurrentModuleId());
-        $this->smarty->assign('media', $this->media->getMediaList());
-        //print_r($this->media->getMediaList());
-
-
-
-        $this->printPage();
-    }
-
 
 
 	private function getCurrentModuleId()
