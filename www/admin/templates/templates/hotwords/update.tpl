@@ -14,7 +14,7 @@ The application will collect the following hotwords:
 </ul>
 Where relevant, language is taken into account. As there can be only one instance of a hotword per language, possible doubles will be ignored.
 The application processes hotwords in the order as listed above. For instance, should a step exist in the key with a title identical to that of a topic in the introduction, occurrences of the title in texts will be linked to the introduction topic, not to the key.<br />
-You can suppress the automatic linking through hotwords by placing text betweeb [no][/no] tags.
+You can suppress the automatic linking through hotwords by placing text between [no][/no] tags.
 </p>
 <p>
 Click the button below to update the hotwords table. Last update: {if $last_created}{$last_created}{else}(never){/if}
