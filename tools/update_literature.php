@@ -21,6 +21,7 @@
  	$d = mysqli_connect($s['host'],$s['user'],$s['password'], $s['database']);
 	mysqli_set_charset($d, 'utf8');
 	mysqli_query($d, 'SET sql_mode = ""');
+	$error = array();
 
 	if (!isset($_GET['go'])) {
 		echo '<p>This script copies data from the table Literature to Literature2.</p>';
@@ -67,7 +68,7 @@
             } else {
                 $date = $label = null;
                 $author = $full;
-                echo "<span style='color: red;'>Reference \"$full\" cannot be properly parsed</span><br>";
+                $error[] = $full;
             }
             $q = 'INSERT INTO `literature2` (`id`, `project_id`, `language_id`, `actor_id`, `label`,
                       `date`, `author`, `created`)
@@ -112,6 +113,14 @@
 
 	}
 	echo '</p>';
+	if (!empty($error)) {
+        echo "<p>The following references could not be parsed properly. The complete text has
+            been stored in the author field. These references can be identified by actor_id = -1:<br>";
+        foreach($errors as $error) {
+            echo "$error<br>";
+        }
+        echo "</p>";
+	}
 	if (!isset($_GET['go'])) {
 		echo '<a href="?go" style="margin-top: 30px; font-weight: bold; text-decoration: none;">Do it!</a></p>';
 	} else {
