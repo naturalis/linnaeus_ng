@@ -180,12 +180,15 @@ class MediaController extends Controller
         $this->checkAuthorisation();
         $this->resetMediaController();
 
-        die(print_r($this->getMediaList()));
+        if ($this->rHasVal('action', 'delete')) {
+            $this->deleteMedia();
+        }
+
+        //die(print_r($this->getMediaList()));
 
         // global get module id?
         //$this->smarty->assign('module_id', $this->getCurrentModuleId());
         $this->smarty->assign('media', $this->getMediaList());
-        //print_r($this->media->getMediaList());
 
         $this->printPage();
     }
@@ -229,13 +232,16 @@ class MediaController extends Controller
                         'project_id' => $this->getCurrentProjectId(),
                         'rs_id' => $media->ref,
                         'name' => $file['name'],
+                        'title' => $media->field8,
+                        'width' => $media->files[0]->width,
+                        'height' => $media->files[0]->height,
                         'mime_type' => $file['type'],
                         'file_size' => $file['size'],
                         'rs_original' => $media->files[0]->src,
                         'rs_resized_1' => isset($media->files[1]->src) ? $media->files[1]->src : null,
                         'rs_resized_1' => isset($media->files[2]->src) ? $media->files[2]->src : null,
                         'rs_thumb_small' => $media->thumbnails->small,
-                        'rs_thumb_medium' => $media->thumbnails->normal,
+                        'rs_thumb_medium' => $media->thumbnails->medium,
                         'rs_thumb_large' => $media->thumbnails->large
                     ));
 
@@ -320,6 +326,24 @@ class MediaController extends Controller
         return true;
     }
 
+    private function deleteMedia ()
+    {
+        $i = 0;
+        foreach ($this->requestData as $k => $v) {
+            if (strpos($k, 'rs_id_') === 0 && $v == 'on') {
+                $i++;
+                $rsId = substr($k, 6);
+                $this->models->Media->update(
+        			array('deleted' => 1),
+        			array('rs_id' => $rsId, 'project_id' => $this->getCurrentProjectId())
+        		);
+            }
+        }
+        if ($i > 0) {
+            $this->addMessage(sprintf(_('Deleted %s files.'), $i));
+        }
+    }
+
 
     public function createUserAction ()
     {
@@ -376,11 +400,14 @@ class MediaController extends Controller
         $media = $this->models->Media->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
+			    'deleted' => 0
 			)
 		));
 
+        $attached = array();
         if (!empty($this->moduleId) && !empty($this->itemId)) {
-            $mediaModule = $this->models->MediaModules->_get(array(
+            $attached = $this->models->MediaModules->getLookupTable(array(
+                'columns' => 'media_id',
     			'id' => array(
     				'project_id' => $this->getCurrentProjectId(),
     				'module_id' => $this->moduleId,
@@ -389,7 +416,36 @@ class MediaController extends Controller
     		));
         }
 
-        return $media;
+        $list['total'] = count($media);
+        foreach ($media as $i => $resource) {
+            $image['rs_id'] = $resource['rs_id'];
+            $image['title'] = $resource['title'];
+            $image['file_name'] = $resource['name'];
+            $image['height'] = $resource['height'];
+            $image['width'] = $resource['width'];
+            $image['source'] = $resource['rs_original'];
+            $image['modified'] = $resource['last_change'];
+            $image['thumbnails'] = array(
+                'small' => $resource['rs_thumb_small'],
+                'medium' => $resource['rs_thumb_medium'],
+                'large' => $resource['rs_thumb_large']
+            );
+
+            $image['alt_files'] = '';
+            foreach (array('rs_resized_1', 'rs_resized_2') as $alt) {
+                if (!empty($resource[$alt])) {
+                    $image['alt_files'][] = $resource[$alt];
+                }
+            }
+
+            // add flag if image is already attached to entity
+            $image['attached'] = in_array($resource['id'], $attached) ? 1 : 0;
+
+            $list['images'][$i] = $image;
+
+        }
+
+        return $list;
     }
 
 
