@@ -1250,6 +1250,8 @@ class ImportL2Controller extends ImportController
 
     public function goNewProject ()
     {
+		die( 'should redirect to choose_project.php' );
+		
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
