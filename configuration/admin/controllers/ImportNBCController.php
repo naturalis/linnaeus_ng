@@ -692,6 +692,9 @@ class ImportNBCController extends ImportController
 
     public function nbcDeterminatie7Action()
     {
+
+		die( 'should redirect to choose_project.php' );
+		
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();

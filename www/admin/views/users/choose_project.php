@@ -1,8 +1,3 @@
 <?php
-
-require_once ('../../../../configuration/admin/controllers/UsersController.php');
-
-$c = new UsersController();
-
-$c->chooseProjectAction();
+	header('location:../projects/choose_project.php');
 
