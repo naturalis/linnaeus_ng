@@ -2,6 +2,8 @@
 
 /*
 
+	(view) ergens heen verplaatsen
+
 	must hide sysadmin! (set "hidden" in set users)
 	implement last_password_change
 	webservice
@@ -26,6 +28,7 @@ class UsersController extends Controller
 	private $_user;
 	private $_newuserdata;
 	private $_newuserdatasave=false;
+	private $_newuserpasswordsave=false;
 
     public $usedModels = array( 
 		'user_module_access',
@@ -193,6 +196,16 @@ class UsersController extends Controller
 		return $this->_newuserdatasave;
 	}
 
+	private function setNewUserPasswordSave( $state )
+	{
+		$this->_newuserpasswordsave=$state;
+	}
+
+	private function getNewUserPasswordSave()
+	{
+		return $this->_newuserpasswordsave;
+	}
+
 	private function sanitizeNewUserData()
     {
 		$data=$this->getNewUserData();
@@ -290,6 +303,9 @@ class UsersController extends Controller
 		$this->removeUserFromCurrentProject();
 		$this->redirect('index.php');
     }
+
+
+
 
     private function isNameCorrect()
     {
@@ -402,27 +418,43 @@ class UsersController extends Controller
         if ($p1!=$p2)
 		{
             $this->addError($this->translate('Passwords not the same.'));
-			$this->setNewUserDataSave( false );
+			$this->setNewUserPasswordSave( false );
         }
 		else
         if (strlen($p1) < $this->checksPassword['min'])
 		{
             $this->addError( $str );
-			$this->setNewUserDataSave( false );
+			$this->setNewUserPasswordSave( false );
         }
 		else
         if (strlen($p1) > $this->checksPassword['max'])
 		{
             $this->addError( $str );
-			$this->setNewUserDataSave( false );
+			$this->setNewUserPasswordSave( false );
         }
 		else
         if (isset($this->checksPassword['regExp']) && !preg_match($this->checksPassword['regExp'],$p1) )
 		{
             $this->addError( $this->translate('Password has incorrect format.') );
-			$this->setNewUserDataSave( false );
+			$this->setNewUserPasswordSave( false );
         }
     }
+
+
+	private function userDataSave()
+	{
+		if ( $this->getNewUserDataSave()==false )
+		{
+            $this->addMessage( $this->translate('Data not saved.') );
+			return;
+		}
+	}
+
+	private function userPasswordSave()
+	{
+	}
+
+
 
 	private function userDataCheck()
 	{
@@ -436,6 +468,9 @@ class UsersController extends Controller
 
 	private function userPasswordCheck()
 	{
+		
+		
+		$this->setNewUserPasswordSave( true );
 		$this->isPasswordCorrect();
 	}
 					
@@ -459,6 +494,8 @@ class UsersController extends Controller
 			$this->userDataCheck();
 			$this->userPasswordCheck();
 
+			$this->userDataSave();
+			$this->userPasswordSave();
 
 
 		
