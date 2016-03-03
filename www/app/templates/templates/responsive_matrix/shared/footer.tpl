@@ -8,9 +8,10 @@
                 <img src="{$session.app.system.urls.systemMedia}lng.png" id="lng-logo">
                 <span class="linnaeus">Linnaeus NG</span>
             </a>
+		</div>
+	</div>
 </div>
-</div>
-</div>
+
 <div id="jDialog" title="" class="ui-helper-hidden"></div>
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
 

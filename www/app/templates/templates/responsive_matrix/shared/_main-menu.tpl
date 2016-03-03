@@ -1,4 +1,5 @@
 <div id="main-menu">
+
 <ul>
 <li><a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/"></a></li>
 {assign var=first value=true}
@@ -21,6 +22,5 @@
     {/if}
 {/foreach}
 </ul>
-
 
 </div>
