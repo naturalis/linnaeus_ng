@@ -183,14 +183,15 @@ class NsrPaspoortController extends NsrController
 				$start=$val['id'];
 			}
 
+			// categories need to be configurable! REFAC2015
 			$categories[$key]['obsolete']=
-				$val['id']==TAB_ALGEMEEN || 
-				$val['id']==TAB_BESCHERMING || 
-				$val['id']==TAB_DESCRIPTION || 
-				$val['id']==TAB_HABITAT || 
-				$val['id']==TAB_GELIJKENDE_SOORTEN || 
-				$val['id']==TAB_VERPLAATSING
-				;
+				( defined('TAB_ALGEMEEN') ? $val['id']==TAB_ALGEMEEN : false ) || 
+				( defined('TAB_BESCHERMING') ? $val['id']==TAB_BESCHERMING : false ) || 
+				( defined('TAB_DESCRIPTION') ? $val['id']==TAB_DESCRIPTION : false ) || 
+				( defined('TAB_HABITAT') ? $val['id']==TAB_HABITAT : false ) || 
+				( defined('TAB_GELIJKENDE_SOORTEN') ? $val['id']==TAB_GELIJKENDE_SOORTEN : false ) || 
+				( defined('TAB_VERPLAATSING') ? $val['id']==TAB_VERPLAATSING : false )
+			;
 
 			if ($val['content_id'])
 			{
