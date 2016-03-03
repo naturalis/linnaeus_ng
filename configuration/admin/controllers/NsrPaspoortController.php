@@ -154,7 +154,7 @@ class NsrPaspoortController extends NsrController
 
 		if (!$categories) $categories=array();
 
-		$d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
+		if ( defined('TAB_VERSPREIDING') ) $d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
 
 		$order=$this->models->TabOrder->_get(
 		array(
