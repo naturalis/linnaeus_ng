@@ -71,7 +71,7 @@ table.collaborators th {
     </table>
     
     <p>
-        <a href="create.php">{t}Create new user{/t}</a>
+        <a href="create.php">{t}create new user{/t}</a>
     </p>
 
 </div>

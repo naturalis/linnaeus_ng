@@ -217,6 +217,8 @@ class UsersController extends Controller
 
         foreach ((array) $data as $key => $val)
 		{
+			if ($key=='password' || $key=='password_repeat') continue;
+
 			if (is_array($val))
 			{
 		        foreach ((array) $val as $key2 => $val2)
@@ -336,8 +338,6 @@ class UsersController extends Controller
             $this->addError( $str2 );
 			$this->setNewUserDataSave( false );
         }
-
-
     }
 
     private function isUsernameCorrect()
@@ -440,21 +440,37 @@ class UsersController extends Controller
         }
     }
 
-
 	private function userDataSave()
 	{
 		if ( $this->getNewUserDataSave()==false )
 		{
             $this->addMessage( $this->translate('Data not saved.') );
-			return;
+		}
+		else
+		{
+			$data=$this->getNewUserData();
+			unset($data['password']);
+			$this->models->Users->save( $data );
+            $this->addMessage( $this->translate('Data saved.') );
 		}
 	}
 
 	private function userPasswordSave()
 	{
+		$password=$this->getNewUserData()['password'];
+
+		if ( !empty($password) && $this->getNewUserPasswordSave()==false )
+		{
+            $this->addMessage( $this->translate('Password not saved.') );
+		}
+		else
+		if ( !empty($password) )
+		{
+			$password=$this->userPasswordEncode( $password );
+			$this->models->Users->save( array('id'=>$this->getUserId(),'password'=>$password) );
+            $this->addMessage( $this->translate('Password saved.') );
+		}
 	}
-
-
 
 	private function userDataCheck()
 	{
@@ -468,8 +484,6 @@ class UsersController extends Controller
 
 	private function userPasswordCheck()
 	{
-		
-		
 		$this->setNewUserPasswordSave( true );
 		$this->isPasswordCorrect();
 	}
@@ -484,70 +498,51 @@ class UsersController extends Controller
 		$this->setUserId( $this->rGetId() );
 		$this->setUser();
 
-		if ($this->rHasVal('action','update') )
-		
-		
-//		 && !$this->isFormResubmit())
+		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->setNewUserData( $this->rGetAll() );
 			$this->sanitizeNewUserData();
 			$this->userDataCheck();
 			$this->userPasswordCheck();
-
 			$this->userDataSave();
 			$this->userPasswordSave();
-
-
-		
-			
-			
 			$this->setUser();
 		}
-
 
 		$this->smarty->assign( 'user', $this->getUser() );
 
 		$this->printPage();
-
-		return;
-
-//$this->isRoleAssignable($upr['role_id'])
-//$data['active']=1;
-//$this->userPasswordEncode($data['password']);
-//$this->models->Users->save($data);
-
-	
-		$this->printPage();
-
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Creating a new collaborator
-     *
-     * See function code for detailed comments on the function's flow
-     *
-     * @access    public
-     */
     public function createAction ()
     {
 
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Create new collaborator'));
+		$this->setUserId( null );
+
+		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->setNewUserData( $this->rGetAll() );
+			$this->sanitizeNewUserData();
+			$this->userDataCheck();
+			$this->userPasswordCheck();
+			$this->userDataSave();
+			
+			need to set user id to make saving of password possoble
+			form for new user cannot save without complete data incl. passwords
+			
+			$this->userPasswordSave();
+			$this->setUser();
+		}
+		
+		$this->smarty->assign('user', $this->rGetAll() );
+		
+		$this->printPage( 'edit' );
+		
+		return;
 
         if ($this->rHasVal('action','create') && !$this->isFormResubmit())
 		{
@@ -1029,41 +1024,6 @@ class UsersController extends Controller
 		{
 			$this->sendNewUserEmail($_SESSION['admin']['data']['new_user']);
 			unset($_SESSION['admin']['data']['new_user']);
-		}
-	}
-
-	private function saveNewUser($data)
-	{
-		$data['password'] = $this->userPasswordEncode($data['password']);
-		$data['active'] = '1';
-		$data['id'] = null;
-		$data['created_by'] = $this->getCurrentUserId();
-
-		$r = $this->models->Users->save($data);
-
-		if ($r !== true)
-		{
-			$this->addError($this->translate('Failed to save user.'),2);
-			$this->log(serialize($data));
-			return false;
-		}
-		else
-		{
-			// if saving was succesful, save new role
-			$newUserId = $this->models->Users->getNewId();
-
-			$this->models->ProjectsRolesUsers->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getCurrentProjectId(),
-					'role_id' => $data['role_id'],
-					'user_id' => $newUserId,
-					'active' => '1'
-				)
-			);
-
-			$this->saveUsersModuleData($data,$newUserId);
-			return true;
 		}
 	}
 

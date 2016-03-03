@@ -9,11 +9,16 @@ table tr th {
 
 <div id="page-main">
 
+	{if $user}
     <h2>{t}edit{/t} {$user.first_name} {$user.last_name}</h2>
+	{else}
+    <h2>{t}new user{/t}</h2>
+    {/if}
+
     
     <form method="post">
     <input name="id" value="{$user.id}" type="hidden" />
-    <input type="hidden" name="action" id="action" value="update"  />
+    <input type="hidden" name="action" id="action" value="save"  />
     <input type="hidden" name="rnd" value="{$rnd}" />
     
     <table>
@@ -36,8 +41,8 @@ table tr th {
         <tr>
             <th>{t}Active:{/t}</th>
             <td>
-                <input type="radio" value="1" name="active" {if $user.active=='1'} checked="checked"{/if} />y
-                <input type="radio" value="0" name="active" {if $user.active!='1'} checked="checked"{/if} />n
+                <input type="radio" value="1" name="active" {if $user.active!='0'} checked="checked"{/if} />y
+                <input type="radio" value="0" name="active" {if $user.active=='0'} checked="checked"{/if} />n
             </td>
         </tr>
         <tr>
@@ -63,7 +68,6 @@ table tr th {
             <td>{$user.project_role.role}</td>
         </tr>
 
-    
     <p>
         <a href="view.php?id={$user.id}">{t}back{/t}</a>
     </p>
@@ -75,230 +79,11 @@ table tr th {
 
 {include file="../shared/admin-messages.tpl"}
 
-
-
-
-
-<div id="page-main">
-{if $data}
-<form method="post" action="" name="theForm" id="theForm">
-	<input name="id" value="{$data.id}" type="hidden" />
-	<input type="hidden" name="action" id="action" value="update"  />
-	<input type="hidden" name="rnd" value="{$rnd}" />
-	<input name="userProjectRole" value="{$userRole.id}" type="hidden" />
-<table>
-	<tr>
-		<td>{t}Username:{/t}</td>
-		<td>
-			<input
-				type="text" 
-				name="username" 
-				id="username" 
-				value="{$data.username}" 
-				maxlength="16" 
-				onblur="userRemoteValueCheck(this.id,[this.value],['e','f'],userid)" 
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="username-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>{t}Password:{/t}</td>
-		<td>
-			<input 
-				type="password" 
-				name="password" 
-				id="password" 
-				value="" 
-				maxlength="16" 
-				onkeyup="userRemoteValueCheck(this.id,[this.value],['f'],userid);"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="password-message" class="password-neutral">(leave blank to leave unchanged)</span>
-		</td>
-	</tr>
-	<tr>
-		<td>{t}Password (repeat):{/t}</td>
-		<td>
-			<input 
-				type="password" 
-				name="password_2" 
-				id="password_2" 
-				value="" 
-				maxlength="16" 
-				onblur="userRemoteValueCheck(this.id,[this.value,$('#password').val()],['f','q'],userid);"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="password_2-message" class="password-neutral">(leave blank to leave unchanged)</span>
-		</td>
-	</tr>
-	<tr>
-		<td>{t}First name:{/t}</td>
-		<td>
-			<input 
-				type="text" 
-				name="first_name" 
-				id="first_name" 
-				value="{$data.first_name}" 
-				maxlength="32"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f'],userid)"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="first_name-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>{t}Last name:{/t}</td>
-		<td>
-			<input 
-				type="text" 
-				name="last_name" 
-				id="last_name" 
-				value="{$data.last_name}" 
-				maxlength="32"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f'],userid)"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="last_name-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>{t}E-mail address:{/t}</td>
-		<td>
-			<input 
-				type="text" 
-				name="email_address" 
-				id="email_address" 
-				value="{$data.email_address}" 
-				maxlength="64"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f','e'],userid)"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="email_address-message" class=""></span>
-		</td>
-	</tr>
-
-	<tr>
-		<td>{t}Timezone:{/t}</td>
-		<td>
-			<select name="timezone_id">
-			{section name=i loop=$zones}
-				<option 
-					value="{$zones[i].id}"
-					{if $zones[i].id==$data.timezone_id} selected class="option-selected" {/if}
-				>{$zones[i].timezone}: {$zones[i].locations}</option>
-			{/section}
-			</select>
-	</td>
-	</tr>
-	<tr>
-		<td>{t}Send e-mail notifications:{/t}</td>
-		<td>
-			<label for="email_notifications-y">
-				<input
-					type="radio" 
-					id="email_notifications-y" 
-					name="email_notifications" 
-					value="1"
-					{if $data.email_notifications=='1'}checked="checked"{/if}/>y
-			</label>
-			<label for="email_notifications-n">
-				<input
-					type="radio" 
-					id="email_notifications-n" 
-					name="email_notifications" 
-					value="0" 
-					{if $data.email_notifications!='1'}checked="checked"{/if} />n
-			</label>
-		</td>
-	</tr>
-	<tr>
-		<td>{t}Project role:{/t}</td>
-		<td>
-		{if $isLeadExpert}Lead expert{else}
-			<select name="role_id">
-			{section name=i loop=$roles}
-				<option 
-					title="{$roles[i].role}: {$roles[i].description}{if $roles[i].id==$userRole.role.id} (current){/if}" 
-					value="{$roles[i].id}"
-					{if $roles[i].id==$userRole.role.id} selected class="option-selected" {/if}
-				>{$roles[i].role}</option>
-			{/section}
-			</select>
-		{/if}
-	</td>
-	</tr>
-	{if $session.admin.user.currentRole == $smarty.const.ID_ROLE_SYS_ADMIN || $session.admin.user.currentRole == $smarty.const.ID_ROLE_LEAD_EXPERT}
-	<tr>
-		<td>{t}Active{/t}</td>
-		<td>
-			<label for="active-y">
-				<input
-					type="radio" 
-					id="active-y" 
-					name="active" 
-					value="1"
-					{if $isLeadExpert && $session.admin.user.currentRole != $smarty.const.ID_ROLE_SYS_ADMIN} disabled="disabled"{/if} 
-					{if $data.active=='1'}checked="checked"{/if}/>y
-			</label>
-			<label for="active-n">
-				<input
-					type="radio" 
-					id="active-n" 
-					name="active" 
-					value="0" 
-					{if $isLeadExpert && $session.admin.user.currentRole != $smarty.const.ID_ROLE_SYS_ADMIN} disabled="disabled"{/if} 
-					{if $data.active!='1'}checked="checked"{/if} />n
-			</label>
-		</td>
-	</tr>
-	{/if}
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="2">{t}Select the modules that will be assigned to this collaborator:{/t}</td>
-	</tr>
-{section name=i loop=$modules}
-<tr><td><label for="module-{$modules[i].module_id}">{$modules[i].module}</label></td><td><input id="module-{$modules[i].module_id}" type="checkbox" value="{$modules[i].module_id}" name="modules[]"  {if $modules[i].isAssigned}checked="checked"{/if}/></td></tr>
-{/section}
-	<tr>
-	</tr>
-{section name=i loop=$freeModules}
-<tr><td><label for="freemodule-{$freeModules[i].id}">{$freeModules[i].module}</label></td><td><input id="freemodule-{$freeModules[i].id}" type="checkbox" value="{$freeModules[i].id}" name="freeModules[]"  {if $freeModules[i].isAssigned}checked="checked"{/if}/></td></tr>
-{/section}
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>	
-	<tr>
-		<td colspan="2">
-			<input type="submit" value="{t}save{/t}" />
-			{if $canDelete}
-			<input type="button" value="{t}delete{/t}" onclick="{literal}if (confirm('Are you sure?')) { $('#delForm').submit(); }{/literal}" />
-			{/if}
-		</td>
-	</tr>
-</table>
-</form>
-{/if}
-</div>
-{if $canDelete}
-<form id="delForm" method="post" action="delete.php">
-	<input name="id" value="{$data.id}" type="hidden" />
-	<input type="hidden" name="rnd" value="{$rnd}" />
-</form>
-{/if}
-{literal}
 <script type="text/JavaScript">
-
-$(document).ready(function(){
-
-	userid = '{$data.id}';
+$(document).ready(function()
+{
 	$('#username').focus();
-
 });
-
 </script>
-{/literal}
 
 {include file="../shared/admin-footer.tpl"}
