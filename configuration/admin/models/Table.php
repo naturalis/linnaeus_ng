@@ -365,7 +365,7 @@ final class Table extends AbstractModel
      * array(0 => x, 1 => y). This can be handy to quickly generate
      * lookup tables.
      */
-    public function getLookupTable ($params) {
+    public function getSingleColumn ($params) {
         $r = $this->_get($params);
         if ($r && !empty($r)) {
             foreach ($r as $k => $v) {

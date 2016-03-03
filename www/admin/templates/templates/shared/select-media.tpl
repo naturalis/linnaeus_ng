@@ -65,13 +65,12 @@
 
 	<form id="theForm" method="post">
     <input type="hidden" name="module_id" value="{$module_id}" />
-    <input type="hidden" id="action" name="action" value="delete" />
+    <input type="hidden" name="module_id" value="{$item_id}" />
+    <input type="hidden" id="action" name="action" value="edit" />
 
     <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.
 
     {if $media.total > 0}
-	    {t}Selected images will be deleted{/t}.</p>
-
 	    <ul class="list">
 	    <li class="header">
 	    	<div class="list-grid-info bold">file name</div>
@@ -83,9 +82,16 @@
 	 	</li>
 		{foreach from=$media.images item=v}
 		<label>
-	 	<li id="li_rs_id_{$v.rs_id}">
+		{if $v.media_id != ''}
+			{assign var=id_type value=""}
+			{assign var=id value=$v.media_id}
+		{else}
+			{assign var=id_type value="rs_"}
+			{assign var=id value=$v.rs_id}
+		{/if}
+	 	<li id="li_{$id_type}id_{$id}">
 	 		<div class="list-grid-info">
-				<input type="checkbox" name="rs_id_{$v.rs_id}" id="rs_id_{$v.rs_id}" {if $v.attached==1}checked disabled{/if}>
+				<input type="checkbox" name="{$id_type}id_{$id}" id="{$id_type}id_{$id}" {if $v.attached==1}checked disabled{/if}>
 	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
 	 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
 	 			</a>
@@ -101,11 +107,12 @@
 	    {/foreach}
 	    </ul>
 		<div class="clear" />
-	    <input type="submit" id="delete" value="{t}delete selected{/t}" />
+	    <input type="submit" id="edit" value="{t}edit{/t}" />
+	    <input type="submit" id="delete" value="{t}delete{/t}" />
 	    </form>
 
 	{else}
-		You must first <a href="upload.php">upload images to attach</a>.</p>
+		{t}You must first{/t} <a href="upload.php">{t}upload images{/t}</a>.</p>
 	{/if}
 
 </div>
@@ -122,8 +129,15 @@ $(document).ready(function() {
 	    }
 	});
 
-	$('input:submit#delete').on('click',function(e) {
+	$('input:submit#delete').on('click',function() {
 		if (!allDoubleDeleteConfirm('the selected media files','this project')) return;
+		// set action to delete
+		$('input[name=action]').val('delete');
+	});
+
+	$('input:submit#edit').on('click',function() {
+		$('#theForm').attr('action', 'edit.php?' +
+			$('#theForm input:checked').attr('id').replace('id_', 'id='));
 	});
 
 });
