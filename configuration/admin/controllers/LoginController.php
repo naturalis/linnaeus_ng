@@ -45,14 +45,13 @@ class LoginController extends Controller
         // user previously set remember me: auto-login
         $user=$this->getRememberedUser();
 
-         if ( $user )
-		 {
+		if ( $user && $user['active']==1 )
+		{
 			$this->setUser( $user );
-            $this->doLogin();
-            $this->doRememberMe( array('remember'=>true) );
-            // determine and redirect to the default start page after logging in
-            $this->redirect($this->getLoginStartPage());
-        }
+			$this->doLogin();
+			$this->doRememberMe( array('remember'=>true) );
+			$this->redirect($this->getLoginStartPage());
+		}
 
         $this->setPageName( $this->translate('Login') );
 
@@ -63,17 +62,18 @@ class LoginController extends Controller
 		{
             if ( $this->authenticateUser( array( 'username'=>$this->rGetVal('username'),'password'=> $this->rGetVal('password') ) ) )
 			{
-				$remeber=(null!==$this->rGetVal('remember_me') && $this->rGetVal('remember_me')=='1');
+				$user=$this->getUserByUsername( $this->rGetVal('username') );
 
-				$this->setUser( $this->getUserByUsername( $this->rGetVal('username') ) );
-				$this->doLogin();
-				$this->doRememberMe( array('remember'=>$remeber) );
-				$this->redirect( $this->getLoginStartPage() );
+				if ( $user['active']==1 )
+				{
+					$this->setUser( $user );
+					$this->doLogin();
+					$this->doRememberMe( array('remember'=>(null!==$this->rGetVal('remember_me') && $this->rGetVal('remember_me')=='1') ) );
+					$this->redirect( $this->getLoginStartPage() );
+				}
 			}
-			else
-			{
-                $this->addError( $this->translate('Login failed.') );
-            }
+
+			$this->addError( $this->translate('Login failed.') );
         }
 
         $this->printPage();
