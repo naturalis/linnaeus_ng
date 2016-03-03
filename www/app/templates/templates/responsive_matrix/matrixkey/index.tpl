@@ -1,4 +1,5 @@
-	{include file="../shared/header.tpl"}
+{include file="../shared/header.tpl"}
+
 	<div id="dialogRidge">
 
 		{include file="_left_column.tpl"}
@@ -32,13 +33,10 @@
 	    </div>
 
 	</div>
-
     
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-
-	
 	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
 	
 	__translations = [
@@ -99,10 +97,8 @@ $(document).ready(function()
 	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 			
 	matrixInit();
-
 });
 </script>
-
 
 <!-- templates -->
 
@@ -334,7 +330,5 @@ $(document).ready(function()
 </div>
 
 <!-- /templates -->
-
-
 
 {include file="../shared/footer.tpl"}

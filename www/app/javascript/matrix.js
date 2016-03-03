@@ -195,16 +195,11 @@ function printResults()
 
 function shouldDisableChar( id )
 {
-	/*	
-	if the character has states that are already selected, we don't disable
-	*/
+	//if the character has states that are already selected, we don't disable
 	var activestates=getActiveStates(id);
 	if (activestates && activestates.length>=1) return false;
 
-
-	/*
-	if there is no or just one taxon left that "has" a state from this character, we disable
-	*/
+	//if there is no or just one taxon left that "has" a state from this character, we disable
 	var charactercounts=getCharacterCounts(id);
 	return (charactercounts.distinct_state_count<=1);
 }
@@ -511,7 +506,8 @@ function printResultsPaginated()
 function formatResult( data )
 {
 	//console.dir( data );
-	
+	//console.log( matrixsettings.mode );
+
 	if ( data.type=='taxon' )
 	{
 		var sciName=data.taxon;
@@ -669,7 +665,7 @@ function formatResult( data )
 						fetchTemplate( 'iconInfoHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"lijst_grijs.png") :
 					"")
 				: fetchTemplate( 'noActionIconHtmlTpl' ) )
-			.replace(/%RELATED-TAXA%/i, (data.related_count>0 ?  
+			.replace(/%RELATED-TAXA%/i, (data.related_count>0 & matrixsettings.mode!="similar" ?
 				fetchTemplate( 'relatedIconHtmlTpl' )
 					.replace('%TYPE%', data.type)
 					.replace('%ID%', data.id)
@@ -801,7 +797,6 @@ function browsePage( id )
 	printResults();
 	clearPaging();
 	printPaging();
-
 }
 
 function getActiveStates( id )
@@ -1116,7 +1111,7 @@ function setSimilar( p )
 			setSetting({expandedShowing:0});
 			setSetting({browseStyle:'show_all'});
 			setSetting({showSpeciesDetails: true});
-			
+
 			clearPaging();
 			clearResults();
 
@@ -1177,7 +1172,6 @@ function peersHaveIdenticalValues(fcharacter,fvalues)
 
 function removeSimilarCharacters()
 {
-
 	if (matrixsettings.similarSpeciesShowDistinctDetailsOnly!=1)
 		return;
 	
@@ -1222,11 +1216,28 @@ function clearSimilarHeader()
 function printSimilarHeader()
 {
 	var resultset = getResultSet();
+	
+	var nr_0=resultset[0];
+
+	if ( nr_0.type=='taxon' )
+	{
+		var label = nr_0.commonname ? nr_0.commonname : '<i>'+nr_0.taxon+'</i>';
+	}
+	else
+	if ( nr_0.type=='variation' )
+	{
+		var label=(nr_0.taxon.commonname ? nr_0.taxon.commonname : '<i>'+nr_0.taxon.taxon+'</i>' ) + " " + (nr_0.label ? "(" + nr_0.label + ")" : "");
+	}
+	else
+	if ( nr_0.type=='matrix' )
+	{
+		var label='<i>'+nr_0.label+'</i>';
+	}
 
 	$('#similarSpeciesHeader').html(
 		fetchTemplate( 'similarHeaderHtmlTpl' )
 			.replace('%HEADER-TEXT%', __('Gelijkende soorten van'))
-			.replace('%SPECIES-NAME%', resultset[0].label)
+			.replace('%SPECIES-NAME%', label )
 			.replace('%BACK-TEXT%', __('terug'))
 			.replace('%SHOW-STATES-TEXT%', __('toon alle kenmerken'))
 			.replace('%NUMBER-START%', matrixsettings.start+1)
@@ -1234,12 +1245,10 @@ function printSimilarHeader()
 	).removeClass('hidden').addClass('visible');
 	
 	$('.result-icon.related').find('img').remove();
-
 }
 
 function toggleAllDetails()
 {
-
 	if ($('.result-detail:visible').length < getResultSet().length)
 	{
 		$('.result-detail').toggle(true);
@@ -1250,7 +1259,6 @@ function toggleAllDetails()
 		$('.result-detail').toggle(false);
 		$('#showAllLabel').html(__('toon alle kenmerken'));
 	}
-
 }
 
 function toggleDetails(id)
@@ -1367,37 +1375,39 @@ function prettyPhotoInit()
 
 function bindDialogKeyUp()
 {
-  $("#state-value").keydown(function(event)
+	$("#state-value").keydown(function(event)
 	{
-		// Allow: backspace, delete, tab, escape, and enter
-		if (event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
-			 // Allow: Ctrl+A
+		if
+		(
+			// Allow: backspace, delete, tab, escape, and enter
+			event.keyCode==46 || event.keyCode==8 || event.keyCode==9 || event.keyCode==27 || event.keyCode==13 || 
+			// Allow: Ctrl+A
 			(event.keyCode==65 && event.ctrlKey===true) || 
-			 // Allow: home, end, left, right
-			(event.keyCode>=35 && event.keyCode<=39))
+			// Allow: home, end, left, right
+			(event.keyCode>=35 && event.keyCode<=39)
+		)
 		{
-			// let it happen, don't do anything
+		// let it happen, don't do anything
 			return;
-    } else {
+		} else {
 			// Ensure that it is a number or a dot and stop the keypress
 			if (event.shiftKey || (event.keyCode<48 || event.keyCode>57) && (event.keyCode<96 || event.keyCode>105) && event.keyCode!=190)
 			{
 				event.preventDefault(); 
 			}   
-    }
-  });
-
+		}
+	});
+	
 	$('#state-value').keyup(function(e)
 	{
+		// enter
 		if (e.keyCode==13)
 		{
-			// return
 			setStateValue();
 			closeDialog();
 		}
 		return;
 	});
-
 }
 
 function jDialogOk()
