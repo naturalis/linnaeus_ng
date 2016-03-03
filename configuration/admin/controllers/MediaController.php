@@ -26,9 +26,12 @@ class MediaController extends Controller
     private $_result;
     private $_files;
     private $_uploaded;
+    private $_rsIds;
 
     private $moduleId;
     private $termId;
+
+    public static $metadataFields = array('title', 'location', 'photographer');
 
     public $usedModels = array(
         'media',
@@ -70,15 +73,15 @@ class MediaController extends Controller
     private function setRsBaseUrl ()
     {
         // To do: get from config
-        //$this->_rsBaseUrl = 'http://134.213.149.111/resourcespace/plugins/';
-        $this->_rsBaseUrl = 'http://localhost/resourcespace/plugins/';
+        $this->_rsBaseUrl = 'https://rs.naturalis.nl/plugins/';
+        //$this->_rsBaseUrl = 'http://localhost/resourcespace/plugins/';
     }
 
     private function setRsMasterKey ()
     {
         // To do: get from config
-        //$this->_rsMasterKey = 'cmVpbHtlcCciJT9mcDk9ZCUpcHFyLGtjITUxZHZ4JnMkI29kITI2ZyctdyZ0LTU8IGNgZnAgcnZ1IGgwKmU8ZC0sIycpIg,,';
-        $this->_rsMasterKey = 'LDpWw7lzzeM5Vbck0K5N2JBjn2nQiobY6Qxr195NPzqXxXNfeDIjqd96JuomeuIo1Gi8TsM7JjR8d7WgCvX-a8P3mz7WWHgfnZIyJ5KF1UAKAkV3VCjk0zt3Qyo3I4jM';
+        $this->_rsMasterKey = 'cmVpbHtldSVyLDs0KjEyZCd4ciwncGlhITY1ZHErJi0hJGw0cjlmZnMtJCRydzVkdjFnZHR7LXAhJD9gIzhmNXcucSIiJg,,';
+        //$this->_rsMasterKey = 'LDpWw7lzzeM5Vbck0K5N2JBjn2nQiobY6Qxr195NPzqXxXNfeDIjqd96JuomeuIo1Gi8TsM7JjR8d7WgCvX-a8P3mz7WWHgfnZIyJ5KF1UAKAkV3VCjk0zt3Qyo3I4jM';
     }
 
     private function setRsUserKey ()
@@ -86,16 +89,16 @@ class MediaController extends Controller
         // To do: get from config
 
         // user: Diaspididae of the World 2.0 @ localhost
-        // password: 7e8324c7
-       // $this->_rsUserKey = 'V2hldmVwcHx0dGglfGckcX18NEJ_Z2FhMzMqNTVZNHl_dmxpe253cWkhci0lczU8I2Q0NnR4JHAnIm81dzM8YHcqLCUpc2w8d2AwYyF7dXMkLW5gIzk2ZyctJCx2dDs3IzkwNyYpIyUg';
-        $this->_rsUserKey = 'mgnwUMXYDrxXQIWaA5V-ZzioDNExJhVwHQ-8scfwAawkfFAf8su4znTstVSIkMATeNA0pMhPQYok0C_if_k-sKNOL7uZ9o_VCesg6_Wi5j8Dbcs7yUud2tu05N4gGKMk';
+        // password: 96b5f659
+        $this->_rsUserKey = 'V2hldmVwcHx0dGglfGckcX18NEJ_Z2FhMzMqNTVZNHl_dmxpe253cWl9IS0jIzxmIjJmMCwvcXAoJjw1IGIyNCYrcSEmd2wzIThgYSEhd3BzIGkycjliMSUqLCwgcGtnKjRlNyIsJy0o';
+        //$this->_rsUserKey = 'mgnwUMXYDrxXQIWaA5V-ZzioDNExJhVwHQ-8scfwAawkfFAf8su4znTstVSIkMATeNA0pMhPQYok0C_if_k-sKNOL7uZ9o_VCesg6_Wi5j8Dbcs7yUud2tu05N4gGKMk';
     }
 
     private function setRsCollectionId ()
     {
         // To do: get from config
-        //$this->_rsCollectionId = 3;
-        $this->_rsCollectionId = 5;
+        $this->_rsCollectionId = 2;
+        //$this->_rsCollectionId = 5;
     }
 
     private function setRsSearchApi ()
@@ -118,7 +121,8 @@ class MediaController extends Controller
 
     private function resetMediaController ()
     {
-        $this->_uploaded = $this->_result = $this->_files = $this->errors = array();
+        $this->_uploaded = $this->_result = $this->_files =
+            $this->errors = $this->_rsIds = array();
     }
 
     private function addUploaded ($e)
@@ -193,6 +197,47 @@ class MediaController extends Controller
         $this->printPage();
     }
 
+    public function editAction ()
+    {
+        $this->checkAuthorisation();
+        $this->resetMediaController();
+
+        $id = $this->rGetVal('id');
+        $activeLanguage = $this->rHasVar('language_id') ?
+            $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
+
+        // Save button has been pushed (language switch should not trigger save)
+        if ($this->rHasVal('save', $this->translate('save'))) {
+            $this->saveMetadata(array(
+                'media_id' => $id,
+                'language_id' => $activeLanguage
+            ));
+             $this->saveTags(array(
+                'media_id' => $id,
+                'language_id' => $activeLanguage
+            ));
+        }
+
+        $media = $this->getMedia(array(
+            'id' => $id,
+            'language_id' => $activeLanguage
+        ));
+        //print_r($media); print_r($_POST);
+
+		$this->smarty->assign('source', $media['rs_original']);
+		$this->smarty->assign('name', $media['name']);
+		$this->smarty->assign('metadata', $this->setMetadataFields($media['metadata']));
+		$this->smarty->assign('tags', implode(', ', $media['tags']));
+		$this->smarty->assign('languages', $this->getProjectLanguages());
+		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
+		$this->smarty->assign('language_id', $activeLanguage);
+		$this->smarty->assign('module_id', $this->moduleId);
+		$this->smarty->assign('rs_id', $media['rs_id']);
+		$this->smarty->assign('item_id', $this->itemId);
+
+		$this->printPage();
+    }
+
     public function uploadAction ()
     {
         $this->checkAuthorisation();
@@ -200,7 +245,8 @@ class MediaController extends Controller
         $activeLanguage = $this->rHasVar('language_id') ?
             $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
 
-        if ($this->rHasVal('action', 'upload') && !$this->isFormResubmit()
+        // Only upload if upload button has been pushed!
+        if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()
             && $this->uploadHasFiles()) {
 
             $this->setFiles($_FILES['files']);
@@ -217,7 +263,7 @@ class MediaController extends Controller
                         'mimetype' => $file['type'],
                         'postname' => $file['name']
                     ),
-                    'title' => 'test'
+                    'title' => $this->rHasVal('title') ? $this->rGetVal('title') : ''
                 ));
 
                 // Store data
@@ -247,32 +293,16 @@ class MediaController extends Controller
 
                     // Store associated metadata
                     $mediaId = $this->models->Media->getNewId();
-                    foreach (array('title', 'location', 'photographer') as $meta) {
-                        if ($this->rHasVal($meta)) {
-                            $this->models->MediaMetadata->save(array(
-                                'id' => null,
-                                'project_id' => $this->getCurrentProjectId(),
-                                'media_id' => $mediaId,
-                                'language_id' => $activeLanguage,
-                                'sys_label' => $meta,
-                                'metadata' => $this->rGetVal($meta)
-                             ));
-                        }
-                    }
+                    $this->saveMetadata(array(
+                        'media_id' => $mediaId,
+                        'language_id' => $activeLanguage
+                    ));
 
                     // Store tags
-                    if ($this->rHasVal('tags')) {
-                        $tags = explode(',', $this->rGetVal('tags'));
-                        foreach (array_unique($tags) as $tag) {
-                            $this->models->MediaTags->save(array(
-                                'id' => null,
-                                'project_id' => $this->getCurrentProjectId(),
-                                'media_id' => $mediaId,
-                                'language_id' => $activeLanguage,
-                                'tag' => trim($tag)
-                             ));
-                        }
-                    }
+                     $this->saveTags(array(
+                        'media_id' => $mediaId,
+                        'language_id' => $activeLanguage
+                    ));
 
                     // If module_id and item_id have been set, save
                     // contextual link
@@ -304,6 +334,7 @@ class MediaController extends Controller
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $activeLanguage);
 		$this->smarty->assign('module_id', $this->moduleId);
+		$this->smarty->assign('metadata', $this->setMetadataFields());
 		$this->smarty->assign('item_id', $this->itemId);
 
 		$this->printPage();
@@ -328,19 +359,15 @@ class MediaController extends Controller
 
     private function deleteMedia ()
     {
-        $i = 0;
-        foreach ($this->requestData as $k => $v) {
-            if (strpos($k, 'rs_id_') === 0 && $v == 'on') {
-                $i++;
-                $rsId = substr($k, 6);
+        $this->setPostedRsIds();
+        if ($this->_rsIds) {
+            foreach ($this->_rsIds as $id) {
                 $this->models->Media->update(
         			array('deleted' => 1),
-        			array('rs_id' => $rsId, 'project_id' => $this->getCurrentProjectId())
+        			array('rs_id' => $id, 'project_id' => $this->getCurrentProjectId())
         		);
             }
-        }
-        if ($i > 0) {
-            $this->addMessage(sprintf(_('Deleted %s files.'), $i));
+            $this->addMessage(sprintf(_('Deleted %s files.'), count($this->_rsIds)));
         }
     }
 
@@ -406,7 +433,7 @@ class MediaController extends Controller
 
         $attached = array();
         if (!empty($this->moduleId) && !empty($this->itemId)) {
-            $attached = $this->models->MediaModules->getLookupTable(array(
+            $attached = $this->models->MediaModules->getSingleColumn(array(
                 'columns' => 'media_id',
     			'id' => array(
     				'project_id' => $this->getCurrentProjectId(),
@@ -417,37 +444,98 @@ class MediaController extends Controller
         }
 
         $list['total'] = count($media);
-        foreach ($media as $i => $resource) {
-            $image['rs_id'] = $resource['rs_id'];
-            $image['title'] = $resource['title'];
-            $image['file_name'] = $resource['name'];
-            $image['height'] = $resource['height'];
-            $image['width'] = $resource['width'];
-            $image['source'] = $resource['rs_original'];
-            $image['modified'] = $resource['last_change'];
-            $image['thumbnails'] = array(
-                'small' => $resource['rs_thumb_small'],
-                'medium' => $resource['rs_thumb_medium'],
-                'large' => $resource['rs_thumb_large']
-            );
 
-            $image['alt_files'] = '';
-            foreach (array('rs_resized_1', 'rs_resized_2') as $alt) {
-                if (!empty($resource[$alt])) {
-                    $image['alt_files'][] = $resource[$alt];
+        if ($list['total'] > 0) {
+
+            foreach ($media as $i => $resource) {
+                $image['rs_id'] = $resource['rs_id'];
+                $image['media_id'] = $resource['id'];
+                $image['title'] = $resource['title'];
+                $image['file_name'] = $resource['name'];
+                $image['height'] = $resource['height'];
+                $image['width'] = $resource['width'];
+                $image['source'] = $resource['rs_original'];
+                $image['modified'] = $resource['last_change'];
+                $image['thumbnails'] = array(
+                    'small' => $resource['rs_thumb_small'],
+                    'medium' => $resource['rs_thumb_medium'],
+                    'large' => $resource['rs_thumb_large']
+                );
+
+                $image['alt_files'] = '';
+                foreach (array('rs_resized_1', 'rs_resized_2') as $alt) {
+                    if (!empty($resource[$alt])) {
+                        $image['alt_files'][] = $resource[$alt];
+                    }
                 }
+
+                // add flag if image is already attached to entity
+                $image['attached'] = in_array($resource['id'], $attached) ? 1 : 0;
+
+                $list['images'][$i] = $image;
             }
-
-            // add flag if image is already attached to entity
-            $image['attached'] = in_array($resource['id'], $attached) ? 1 : 0;
-
-            $list['images'][$i] = $image;
-
         }
 
         return $list;
     }
 
+    private function getMedia ($p)
+    {
+        $id = isset($p['id']) && !empty($p['id']) ? $p['id'] : false;
+        $languageId = isset($p['language_id']) && !empty($p['language_id']) ?
+            $p['language_id'] : false;
+
+        if (!$id || !$languageId) {
+            return false;
+        }
+
+        $d = $this->models->Media->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+			    'id' => $id
+			)
+		));
+
+        if (!empty($d)) {
+            $media = $d[0];
+
+            foreach ($this::$metadataFields as $f) {
+                $media['metadata'][$f] = '';
+            }
+            $media['tags'] = array();
+
+            $metadata = $this->models->MediaMetadata->_get(array(
+    			'id' => array(
+    				'project_id' => $this->getCurrentProjectId(),
+    				'language_id' => $languageId,
+    			    'media_id' => $id
+    			)
+    		));
+
+            if (!empty($metadata)) {
+                foreach ($metadata as $d) {
+                    $media['metadata'][$d['sys_label']] = $d['metadata'];
+                }
+            }
+
+            $tags = $this->models->MediaTags->_get(array(
+    			'id' => array(
+    				'project_id' => $this->getCurrentProjectId(),
+    				'language_id' => $languageId,
+    			    'media_id' => $id
+    			)
+    		));
+
+            if (!empty($tags)) {
+                foreach ($tags as $d) {
+                    $media['tags'][] = $d['tag'];
+                }
+            }
+
+            return $media;
+        }
+        return false;
+    }
 
 
     private function parseRsMediaList ()
@@ -481,7 +569,6 @@ class MediaController extends Controller
 
             // add flag if image is already attached to entity
             $image['attached'] = 0;
-
             $list['images'][$i] = $image;
         }
         return $list;
@@ -509,10 +596,8 @@ class MediaController extends Controller
         );
 
         // Set title
-        $post['field8'] = 'No title';
-        if (isset($p['title']) && empty($p['title'])) {
-            $post['field8'] = $p['title'];
-        }
+        $post['field8'] = isset($p['title']) && !empty($p['title']) ?
+            $p['title'] : $this->translate('No title');
 
         // Store RS response in $this->_result
         $this->_result = $this->getCurlResult(array(
@@ -553,4 +638,158 @@ class MediaController extends Controller
         return $this->_files;
     }
 
+    private function saveMetadata ($p)
+    {
+        $mediaId = isset($p['media_id']) && !empty($p['media_id']) ?
+            $p['media_id'] : false;
+        $languageId = isset($p['language_id']) && !empty($p['language_id']) ?
+            $p['language_id'] : false;
+
+        if (!$mediaId || !$languageId) {
+            return false;
+        }
+
+        foreach ($this::$metadataFields as $meta) {
+
+            $val = $this->getMetadataField(array(
+                'project_id' => $this->getCurrentProjectId(),
+    		    'media_id' => $mediaId,
+                'language_id' => $languageId,
+                'label' => $meta
+            ));
+
+            // Data matches value in database; do nothing
+            if ($val == $this->rGetVal($meta)) {
+                continue;
+            // No data entered yet; insert
+            } else if (!$val && $this->rHasVal($meta)) {
+                 $this->models->MediaMetadata->insert(array(
+                    'id' => null,
+                    'project_id' => $this->getCurrentProjectId(),
+                    'media_id' => $mediaId,
+                    'language_id' => $languageId,
+                    'sys_label' => $meta,
+                    'metadata' => $this->rGetVal($meta)
+                ));
+            // Data has been updated
+            } else if ($val != $this->rGetVal($meta) && $this->rHasVal($meta)) {
+                $this->models->MediaMetadata->update(
+        			array('metadata' => $this->rGetVal($meta)),
+        			array(
+            			'project_id' => $this->getCurrentProjectId(),
+                        'media_id' => $mediaId,
+                        'language_id' => $languageId,
+                        'sys_label' => $meta
+        		    )
+                );
+            // Data has been deleted
+            } else if ($val && !$this->rHasVal($meta)) {
+                $this->models->MediaMetadata->delete(array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'media_id' => $mediaId,
+                    'language_id' => $languageId,
+                    'sys_label' => $meta
+                ));
+            }
+        }
+    }
+
+    private function getMetadataField ($p)
+    {
+        // No $p check, only used internally
+        $metadata = $this->models->MediaMetadata->getSingleColumn(array(
+            'columns' => 'metadata',
+            'id' => array(
+				'project_id' => $p['project_id'],
+			    'media_id' => $p['media_id'],
+                'language_id' => $p['language_id'],
+                'sys_label' => $p['label']
+			)
+		));
+        return isset($metadata) ? $metadata[0] : false;
+    }
+
+    private function saveTags ($p)
+    {
+        $mediaId = isset($p['media_id']) && !empty($p['media_id']) ?
+            $p['media_id'] : false;
+        $languageId = isset($p['language_id']) && !empty($p['language_id']) ?
+            $p['language_id'] : false;
+
+        if (!$mediaId || !$languageId) {
+            return false;
+        }
+
+        $tags = $this->getTags(array(
+            'project_id' => $this->getCurrentProjectId(),
+		    'media_id' => $mediaId,
+            'language_id' => $languageId
+        ));
+        $postedTags =
+            array_unique(array_map('trim', explode(',', $this->rGetVal('tags'))));
+
+        // Insert values present only in posted
+        $insert = array_diff($postedTags, $tags);
+        if (!empty($insert)) {
+            foreach ($insert as $tag) {
+                $this->models->MediaTags->insert(array(
+                    'id' => null,
+                    'project_id' => $this->getCurrentProjectId(),
+                    'media_id' => $mediaId,
+                    'language_id' => $languageId,
+                    'tag' => $tag
+                 ));
+            }
+        }
+        // Delete values present only in database
+        $delete = array_diff($tags, $postedTags);
+        if (!empty($delete)) {
+            foreach ($delete as $tag) {
+                $this->models->MediaTags->delete(array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'media_id' => $mediaId,
+                    'language_id' => $languageId,
+                    'tag' => $tag
+                 ));
+            }
+        }
+    }
+
+    private function getTags ($p)
+    {
+        // No $p check, only used internally
+        $tags = $this->models->MediaTags->_get(array(
+            'id' => array(
+				'project_id' => $p['project_id'],
+			    'media_id' => $p['media_id'],
+                'language_id' => $p['language_id']
+			)
+		));
+        if (!empty($tags)) {
+            foreach ($tags as $d) {
+                $r[] = $d['tag'];
+            }
+            return $r;
+        }
+        return array();
+    }
+
+    /* Input is associative array */
+    private function setMetadataFields ($v = array())
+    {
+        foreach ($this::$metadataFields as $f) {
+            $d[$f] = isset($v[$f]) ? $v[$f] : null;
+        }
+        return $d;
+    }
+
+
+    private function setPostedRsIds ()
+    {
+        foreach ($this->requestData as $k => $v) {
+            if (strpos($k, 'rs_id_') === 0 && $v == 'on') {
+                $this->_rsIds[] = substr($k, 6);
+             }
+        }
+    }
 }

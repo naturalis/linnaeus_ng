@@ -225,7 +225,7 @@
 
 	function insertCommonNames () {
 	    global $d;
-	    $q = "SELECT * FROM `commonnames` ORDER BY project_id, language_id, show_order";
+	    $q = "SELECT * FROM `commonnames` ORDER BY project_id, taxon_id, language_id, show_order";
 	    $r = mysqli_query($d, $q) or die($q . mysqli_error($d));
 	    $oldTest = false;
 	    while ($row = mysqli_fetch_assoc($r)) {

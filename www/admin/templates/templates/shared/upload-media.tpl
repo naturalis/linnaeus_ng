@@ -68,18 +68,14 @@ input[type=text], textarea {
     {/if}
     </td>
 	</tr>
+
+	{foreach from=$metadata key=field item=value}
 	<tr>
-		<td>{t}title{/t}:</td>
-		<td><input type="text" name="title" value="" /></td>
+		<td>{t}{$field}{/t}:</td>
+		<td><input type="text" name="{$field}" value="{$value}" /></td>
 	</tr>
-	<tr>
-		<td>{t}location{/t}:</td>
-		<td><input type="text" name="location" value="" /></td>
-	</tr>
-	<tr>
-		<td>{t}photographer{/t}:</td>
-		<td><input type="text" name="photographer" value="" /></td>
-	</tr>
+	{/foreach}
+
 	<tr>
 		<td>{t}tags{/t}:</td>
 		<td><textarea name="tags" placeholder="{t}enter multiple tags separated by comma's{/t}" rows="3"></textarea></td>
