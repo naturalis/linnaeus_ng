@@ -17,7 +17,7 @@ input[type=text], textarea {
 
 <div id="page-main">
 
-	<form id="theForm" method="post">
+	<form id="searchForm" method="post">
 	<input type="hidden" name="action" value="search" />
 	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input type="hidden" name="module_id" value="{$module_id}" />

@@ -65,18 +65,18 @@ final class MediaModel extends AbstractModel
         if ($this->arrayHasData($search['metadata'])) {
             foreach ($search['metadata'] as $k => $v) {
                 if ($v != '') {
-                    $a[] = "t2.`sys_label` = '" . $this->escapeString($k) .
-                        "' and t2.`metadata` like '" . $this->escapeString($v) . "%'";
+                    $a[] = "t2.`sys_label` = '" . $this->escapeString(trim($k)) .
+                        "' and t2.`metadata` like '" . $this->escapeString(trim($v)) . "%'";
                 }
             }
         }
         if ($this->arrayHasData($search['tags'])) {
             foreach ($search['tags'] as $tag) {
-                $a[] = "t3.`tag` like '" . $this->escapeString($tag) . "%'";
+                $a[] = "t3.`tag` like '" . $this->escapeString(trim($tag)) . "%'";
             }
         }
         if ($search['file_name'] != '') {
-            $a[] = "t1.`name` like '" . $this->escapeString($search['file_name']) . "%'";
+            $a[] = "t1.`name` like '" . $this->escapeString(trim($search['file_name'])) . "%'";
         }
         return isset($a) ? ' and ' . implode(' and ', $a) : null;
     }
