@@ -80,24 +80,6 @@ final class MediaModel extends AbstractModel
         }
         return isset($a) ? ' and ' . implode(' and ', $a) : null;
     }
-
-    public function getItemName ($p)
-    {
-        $moduleId = isset($p['module_id']) && !empty($p['module_id']) ?
-            $p['module_id'] : false;
-        $itemId = isset($p['item_id']) && !empty($p['item_id']) ?
-            $p['item_id'] : false;
-        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
-            $p['project_id'] : false;
-
-        if (!$moduleId || !$itemId || !$projectId) {
-            return false;
-        }
-
-        $
-
-    }
-
 }
 
 ?>
