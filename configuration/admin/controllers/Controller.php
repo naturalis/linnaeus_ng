@@ -3043,7 +3043,8 @@ class Controller extends BaseClass
         foreach ($p as $k => $v) {
             if (is_array($v)) {
                 $this->arrayHasData($v);
-            } else if ($v != '') {
+            }
+            if ($v != '') {
                 return true;
             }
         }

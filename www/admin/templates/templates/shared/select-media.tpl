@@ -8,7 +8,7 @@
     </div>
     {/if}
 
-	<form id="theForm" method="post">
+	<form id="mediaForm" method="post">
     <input type="hidden" name="module_id" value="{$module_id}" />
     <input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" id="action" name="action" value="edit" />
@@ -67,10 +67,10 @@
 $(document).ready(function() {
 	$('input:button').on('click',function(e) {
 	    if ($(this).hasClass('grid')) {
-	        $('#theForm ul').removeClass('list').addClass('grid');
+	        $('#mediaForm ul').removeClass('list').addClass('grid');
 	    }
 	    else if($(this).hasClass('list')) {
-	        $('#theForm ul').removeClass('grid').addClass('list');
+	        $('#mediaForm ul').removeClass('grid').addClass('list');
 	    }
 	});
 
@@ -81,8 +81,8 @@ $(document).ready(function() {
 	});
 
 	$('input:submit#edit').on('click',function() {
-		$('#theForm').attr('action', 'edit.php?' +
-			$('#theForm input:checked').attr('id').replace('id_', 'id='));
+		$('#mediaForm').attr('action', 'edit.php?' +
+			$('#mediaForm input:checked').attr('id').replace('id_', 'id='));
 	});
 
 });
