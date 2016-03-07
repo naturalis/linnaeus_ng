@@ -26,7 +26,7 @@ final class MediaModel extends AbstractModel
 
     public function search ($p)
     {
-        $search = isset($p['search']) && !empty($p['search']) ?
+        $search = isset($p['search']) && $p['search'] != '' ?
             $p['search'] : false;
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;
@@ -79,6 +79,23 @@ final class MediaModel extends AbstractModel
             $a[] = "t1.`name` like '" . $this->escapeString(trim($search['file_name'])) . "%'";
         }
         return isset($a) ? ' and ' . implode(' and ', $a) : null;
+    }
+
+    public function getItemName ($p)
+    {
+        $moduleId = isset($p['module_id']) && !empty($p['module_id']) ?
+            $p['module_id'] : false;
+        $itemId = isset($p['item_id']) && !empty($p['item_id']) ?
+            $p['item_id'] : false;
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$moduleId || !$itemId || !$projectId) {
+            return false;
+        }
+
+        $
+
     }
 
 }

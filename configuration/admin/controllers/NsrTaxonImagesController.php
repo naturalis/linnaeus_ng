@@ -93,6 +93,9 @@ class NsrTaxonImagesController extends NsrController
 		$this->smarty->assign('concept',$this->getConcept($this->rGetId()));
 		$this->smarty->assign('images',$this->getTaxonMedia());
 
+		$this->smarty->assign('module_id', $this->getCurrentModuleId());
+		$this->smarty->assign('item_id', $this->rGetId());
+
 		$this->checkMessage();
 		$this->printPage();
 	}
@@ -293,7 +296,7 @@ class NsrTaxonImagesController extends NsrController
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
-		
+
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
 	}
 

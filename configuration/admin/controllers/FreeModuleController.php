@@ -760,7 +760,7 @@ class FreeModuleController extends Controller
 
 	}
 
-	private function getCurrentModuleId()
+	protected function getCurrentModuleId()
 	{
 
 		$activeModule = $this->moduleSession->getModuleSetting('activeModule');
