@@ -10,6 +10,8 @@
  */
 
 include_once ('Controller.php');
+include_once ('ModuleIdentifierController.php');
+
 class MediaController extends Controller
 {
 
@@ -29,7 +31,7 @@ class MediaController extends Controller
     private $_rsIds;
 
     private $moduleId;
-    private $termId;
+    private $itemId;
 
     public static $metadataFields = array('title', 'location', 'photographer');
 
@@ -53,11 +55,10 @@ class MediaController extends Controller
      *
      * @access     public
      */
-    public function __construct ($moduleId = false, $itemId = false)
+    public function __construct ()
     {
         parent::__construct();
-        $this->setExternalIds($moduleId, $itemId);
-        $this->setRsSettings();
+        $this->initialize();
      }
 
     public function __destruct ()
@@ -65,9 +66,11 @@ class MediaController extends Controller
         parent::__destruct();
     }
 
-    private function setExternalIds ($moduleId, $itemId) {
-        $this->moduleId = $moduleId;
-        $this->itemId = $itemId;
+    private function initialize ()
+    {
+        $this->moduleId = $this->rHasVal('module_id') ? $this->rGetVal('module_id') : -1;
+        $this->itemId = $this->rHasVal('item_id') ? $this->rGetVal('item_id') : -1;
+        $this->setRsSettings();
     }
 
     private function setRsBaseUrl ()
@@ -275,6 +278,17 @@ class MediaController extends Controller
         $activeLanguage = $this->rHasVar('language_id') ?
             $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
 
+        // Verify module_id and item_id if set
+        if ($this->rHasVal('module_id') && $this->rHasVal('item_id')) {
+
+            $mi = new ModuleIdentifierController();
+            $mi->setModuleId($this->moduleId);
+            $mi->setItemId($this->itemId);
+
+            $this->smarty->assign('module_name', $mi->getModuleName());
+            $this->smarty->assign('item_name', $mi->getItemName());
+        }
+
         // Only upload if upload button has been pushed!
         if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()
             && $this->uploadHasFiles()) {
@@ -363,9 +377,9 @@ class MediaController extends Controller
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $activeLanguage);
-		$this->smarty->assign('module_id', $this->moduleId);
 		$this->smarty->assign('metadata', $this->setMetadataFields());
-		$this->smarty->assign('item_id', $this->itemId);
+		$this->smarty->assign('module_id', $this->rGetVal('module_id'));
+		$this->smarty->assign('item_id', $this->rGetVal('item_id'));
 
 		$this->printPage();
     }
@@ -817,5 +831,32 @@ class MediaController extends Controller
                 $this->_rsIds[] = substr($k, 6);
              }
         }
+    }
+
+
+    /* Currently there is no mapping between controller and main table from which
+     * to query the name. This has provisionally been incorporated into the
+     * Table model, which is called here through Media.
+     */
+    public function getItemName ()
+    {
+        $pm = $this->getProjectModules();
+        $controller = false;
+
+        foreach ($pm['modules'] as $m) {
+            if ($m['module_id'] == $this->moduleId) {
+                $controller = $m['controller'];
+            }
+        }
+
+        if ($controller) {
+            return $this->models->Media->getItemName(array(
+                'project_id' => $this->getCurrentProjectId(),
+                'item_id' => $this->itemId,
+                'controller' => $controller
+            ));
+        }
+
+        return false;
     }
 }

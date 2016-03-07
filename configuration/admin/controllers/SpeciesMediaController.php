@@ -59,8 +59,8 @@ class SpeciesMediaController extends Controller
 
 
 
-
-	private function getCurrentModuleId()
+/*
+	protected function getCurrentModuleId()
 	{
 
 		$activeModule = $this->moduleSession->getModuleSetting('activeModule');
@@ -68,7 +68,7 @@ class SpeciesMediaController extends Controller
 	    return isset($activeModule['id']) ? $activeModule['id'] : false;
 
 	}
-
+*/
 
 
 
