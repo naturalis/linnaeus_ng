@@ -833,30 +833,4 @@ class MediaController extends Controller
         }
     }
 
-
-    /* Currently there is no mapping between controller and main table from which
-     * to query the name. This has provisionally been incorporated into the
-     * Table model, which is called here through Media.
-     */
-    public function getItemName ()
-    {
-        $pm = $this->getProjectModules();
-        $controller = false;
-
-        foreach ($pm['modules'] as $m) {
-            if ($m['module_id'] == $this->moduleId) {
-                $controller = $m['controller'];
-            }
-        }
-
-        if ($controller) {
-            return $this->models->Media->getItemName(array(
-                'project_id' => $this->getCurrentProjectId(),
-                'item_id' => $this->itemId,
-                'controller' => $controller
-            ));
-        }
-
-        return false;
-    }
 }
