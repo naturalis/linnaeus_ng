@@ -43,12 +43,12 @@ final class MediaModel extends AbstractModel
                 t1.*
             from
                 %PRE%media as t1 ' .
-        ($this->hasData($search['metadata']) ?
+        ($this->arrayHasData($search['metadata']) ?
             'left join
                 %PRE%media_metadata as t2
                 on t1.`id` = t2.`media_id` ' : ''
         ) .
-        ($this->hasData($search['tags']) ?
+        ($this->arrayHasData($search['tags']) ?
             'left join
                 %PRE%media_tags as t3
                 on t1.`id` = t3.`media_id` ' : ''
@@ -62,7 +62,7 @@ final class MediaModel extends AbstractModel
     }
 
     private function appendSearchWhere ($search) {
-        if ($this->HasData($search['metadata'])) {
+        if ($this->arrayHasData($search['metadata'])) {
             foreach ($search['metadata'] as $k => $v) {
                 if ($v != '') {
                     $a[] = "t2.`sys_label` = '" . $this->escapeString($k) .
@@ -70,7 +70,7 @@ final class MediaModel extends AbstractModel
                 }
             }
         }
-        if ($this->HasData($search['tags'])) {
+        if ($this->arrayHasData($search['tags'])) {
             foreach ($search['tags'] as $tag) {
                 $a[] = "t3.`tag` like '" . $this->escapeString($tag) . "%'";
             }
