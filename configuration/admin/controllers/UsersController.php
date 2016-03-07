@@ -410,8 +410,9 @@ class UsersController extends Controller
     {
 		$p1=$this->getNewUserData()['password'];
 		$p2=$this->getNewUserData()['password_repeat'];
+		$id=$this->getNewUserData()['id'];
 
-        if ( empty($p1) && empty($p2) ) return;
+        if ( !empty($id) && ( empty($p1) && empty($p2) ) ) return;
 		
 		$str=sprintf($this->translate('Password should be between %s and %s characters.'),$this->checksPassword['min'],$this->checksPassword['max']);
 
@@ -531,8 +532,8 @@ class UsersController extends Controller
 			$this->userPasswordCheck();
 			$this->userDataSave();
 			
-			need to set user id to make saving of password possoble
-			form for new user cannot save without complete data incl. passwords
+//			need to set user id to make saving of password possible
+//			form for new user cannot save without complete data incl. passwords
 			
 			$this->userPasswordSave();
 			$this->setUser();
