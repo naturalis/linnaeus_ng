@@ -41,7 +41,7 @@ class MediaController extends Controller
         'media_tags'
     );
 
-    public $cssToLoad = array();
+    public $cssToLoad = array('media.css');
 
     public $jsToLoad = array();
 
@@ -209,7 +209,7 @@ class MediaController extends Controller
             array_unique(array_map('trim', explode(',', $this->rGetVal('tags'))));
         $search['file_name'] = $this->rGetVal('file_name');
 
-        if ($this->rHasVal('action', 'search')) {
+        if ($this->rHasVal('action', 'search') && $this->arrayHasData($search)) {
             $result = $this->getMediaList(array('search' => $search));
             $this->smarty->assign('media', $result);
         }

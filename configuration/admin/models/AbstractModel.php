@@ -387,15 +387,16 @@ class AbstractModel extends BaseClass
 
     }
 
-    public function hasData ($p = array())
+    public function arrayHasData ($p = array())
     {
-        foreach ($p as $v) {
-            if ($v != '') {
+        foreach ($p as $k => $v) {
+            if (is_array($v)) {
+                $this->arrayHasData($v);
+            } else if ($v != '') {
                 return true;
             }
         }
         return false;
     }
-
 
 }

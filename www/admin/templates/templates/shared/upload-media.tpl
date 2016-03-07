@@ -1,19 +1,4 @@
-<style>
-.bar {
-    height: 18px;
-    background: green;
-}
-tr td:first-child {
-	text-align: right;
-}
-tr:last-child td {
-	padding-top: 15px;
-}
-input[type=text], textarea {
-	width: 300px;
-}
-
-</style>
+<style></style>
 
 <div id="page-main">
 

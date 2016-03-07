@@ -1,71 +1,16 @@
-<style>
-#page-main {
-	overflow: auto;
-	width: 100%;
-}
-#page-main ul {
-	list-style: none;
-	margin: 30px 0;
-	padding: 0;
-	overflow: auto;
-}
-#page-main .buttons {
-	margin-bottom: 20px;
-}
-#page-main .list li {
-	width: auto;
-	border-bottom: 1px dotted #CCC;
-	margin-bottom: 3px;
-	padding: 3px;
-}
-#page-main .grid li {
-	float: left;
-	width: 20%;
-	height: 150px;
-	border-right: 1px dotted #CCC;
-	border-bottom: 1px dotted #CCC;
-	padding: 20px;
-}
-#page-main .grid li img {
-	max-width: 150px;
-	max-height: 130px;
-}
-#page-main .list li .list-grid-info {
-	display: inline-block;
-	width: 300px;
-}
-#page-main .grid li .file-name {
-	display: block;
-}
-#page-main .grid li .list-info, #page-main .list li .thumbnail,
-	#page-main .grid li.header {
-	display: none;
-}
-#page-main .list li .list-info {
-	display: inline;
-}
-#page-main .list li .column {
-	display: inline-block;
-	width: 15%;
-	padding-right: 20px;
-}
-.clear {
-	clear:both;
-}
-.bold {
-	font-weight: bold;
-}
-</style>
+<style></style>
 
 <div id="page-main">
+    {if $media.total > 0}
     <div class="buttons">
         <input type="button" class="list" value="{t}list{/t}" />
         <input type="button" class="grid" value="{t}grid{/t}" />
     </div>
+    {/if}
 
 	<form id="theForm" method="post">
     <input type="hidden" name="module_id" value="{$module_id}" />
-    <input type="hidden" name="module_id" value="{$item_id}" />
+    <input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" id="action" name="action" value="edit" />
 
     <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.

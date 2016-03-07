@@ -3037,4 +3037,19 @@ class Controller extends BaseClass
 		// Return raw output if result is no (valid) json
 		return !is_null($output) ? $output : $result;
 	}
+
+    public function arrayHasData ($p = array())
+    {
+        foreach ($p as $k => $v) {
+            if (is_array($v)) {
+                $this->arrayHasData($v);
+            } else if ($v != '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
 }
