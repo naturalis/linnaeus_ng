@@ -90,13 +90,14 @@ final class UsersModel extends AbstractModel
 
 		$query = "
 		    select
+				_a.id,
 				_a.role_id,
 				_a.active,
 				_a.last_project_select,
 				_a.project_selects,
 				_e.role,
 				_e.description,
-				_e.assignable
+				_e.hidden
 			from %PRE%projects_roles_users _a
 
 			left join %PRE%roles _e
