@@ -5,12 +5,11 @@
 	(view) ergens heen verplaatsen
 
 	must hide sysadmin! (set "hidden" in set users)
-	implement last_password_change
 	webservice
 	user in multiple projects
 	free modules!
 	isCurrentUserSysAdmin!!!
-	llog for REDESIGN RIGHTS
+	log for REDESIGN RIGHTS
 	
 	removeUserFromCurrentProject
 		needs deletiog of referenced rights etc
@@ -21,7 +20,6 @@ include_once ('Controller.php');
 
 class UsersController extends Controller
 {
-	
 	private $_expertroleid;
 	private $_allprojectusers;
 	private $_userid;
@@ -29,6 +27,7 @@ class UsersController extends Controller
 	private $_newuserdata;
 	private $_newuserdatasave=false;
 	private $_newuserpasswordsave=false;
+	private $_newuserrolesave=false;
 
     public $usedModels = array( 
 		'user_module_access',
@@ -61,7 +60,6 @@ class UsersController extends Controller
     public function __construct ()
     {
         parent::__construct();
-		
 		$this->initialize();
     }
 
@@ -206,6 +204,16 @@ class UsersController extends Controller
 		return $this->_newuserpasswordsave;
 	}
 
+	private function setNewUserRoleSave( $state )
+	{
+		$this->_newuserrolesave=$state;
+	}
+
+	private function getNewUserRoleSave()
+	{
+		return $this->_newuserrolesave;
+	}
+
 	private function sanitizeNewUserData()
     {
 		$data=$this->getNewUserData();
@@ -305,9 +313,6 @@ class UsersController extends Controller
 		$this->removeUserFromCurrentProject();
 		$this->redirect('index.php');
     }
-
-
-
 
     private function isNameCorrect()
     {
@@ -411,67 +416,42 @@ class UsersController extends Controller
 		$p1=$this->getNewUserData()['password'];
 		$p2=$this->getNewUserData()['password_repeat'];
 		$id=$this->getNewUserData()['id'];
-
+		
+		// existing user not entering new passwords: no change
         if ( !empty($id) && ( empty($p1) && empty($p2) ) ) return;
 		
 		$str=sprintf($this->translate('Password should be between %s and %s characters.'),$this->checksPassword['min'],$this->checksPassword['max']);
 
-        if ($p1!=$p2)
+        if ( $p1!=$p2 )
 		{
-            $this->addError($this->translate('Passwords not the same.'));
+            $this->addError( $this->translate('Passwords not the same.') );
 			$this->setNewUserPasswordSave( false );
         }
 		else
-        if (strlen($p1) < $this->checksPassword['min'])
+        if ( empty($id) && empty($p1) && empty($p2) )
+		{
+            $this->addError( $this->translate('Passwords is required.') );
+			$this->setNewUserPasswordSave( false );
+        }
+		else
+        if ( strlen($p1) < $this->checksPassword['min'] )
 		{
             $this->addError( $str );
 			$this->setNewUserPasswordSave( false );
         }
 		else
-        if (strlen($p1) > $this->checksPassword['max'])
+        if ( strlen($p1) > $this->checksPassword['max'] )
 		{
             $this->addError( $str );
 			$this->setNewUserPasswordSave( false );
         }
 		else
-        if (isset($this->checksPassword['regExp']) && !preg_match($this->checksPassword['regExp'],$p1) )
+        if ( isset($this->checksPassword['regExp']) && !preg_match($this->checksPassword['regExp'],$p1) )
 		{
             $this->addError( $this->translate('Password has incorrect format.') );
 			$this->setNewUserPasswordSave( false );
         }
     }
-
-	private function userDataSave()
-	{
-		if ( $this->getNewUserDataSave()==false )
-		{
-            $this->addMessage( $this->translate('Data not saved.') );
-		}
-		else
-		{
-			$data=$this->getNewUserData();
-			unset($data['password']);
-			$this->models->Users->save( $data );
-            $this->addMessage( $this->translate('Data saved.') );
-		}
-	}
-
-	private function userPasswordSave()
-	{
-		$password=$this->getNewUserData()['password'];
-
-		if ( !empty($password) && $this->getNewUserPasswordSave()==false )
-		{
-            $this->addMessage( $this->translate('Password not saved.') );
-		}
-		else
-		if ( !empty($password) )
-		{
-			$password=$this->userPasswordEncode( $password );
-			$this->models->Users->save( array('id'=>$this->getUserId(),'password'=>$password) );
-            $this->addMessage( $this->translate('Password saved.') );
-		}
-	}
 
 	private function userDataCheck()
 	{
@@ -483,12 +463,137 @@ class UsersController extends Controller
 		$this->isEmailAddressUnique();
 	}
 
+	private function userDataSave()
+	{
+		if ( $this->getNewUserDataSave()==false )
+		{
+            $this->addMessage( $this->translate('Data not saved.') );
+			return;
+		}
+
+		$data=$this->getNewUserData();
+
+		unset($data['password']);
+
+		$this->models->Users->save( $data );
+
+		if ( empty($data['id']) )
+		{
+			$this->setUserId( $this->models->Users->getNewId() );
+			$this->addMessage( $this->translate('New user created.') );
+		}
+		else
+		{
+			$this->addMessage( $this->translate('Data saved.') );
+		}
+	}
+
 	private function userPasswordCheck()
 	{
 		$this->setNewUserPasswordSave( true );
 		$this->isPasswordCorrect();
 	}
-					
+
+	private function userPasswordSave()
+	{
+		$password=$this->getNewUserData()['password'];
+
+		if ( !empty($password) && $this->getNewUserPasswordSave()==false )
+		{
+            $this->addMessage( $this->translate('Password not saved.') );
+		}
+		else
+		if ( !empty($password) && empty($this->getUserId()) )
+		{
+            $this->addMessage( $this->translate('Cannot save password (empty user ID).') );
+		}
+		else
+		if ( !empty($password) && !empty($this->getUserId()) )
+		{
+			$password=$this->userPasswordEncode( $password );
+			$this->models->Users->save( array('id'=>$this->getUserId(),'password'=>$password) );
+            $this->addMessage( $this->translate('Password saved.') );
+			$this->models->Users->save( array('id'=>$this->getUserId(),'password_changed'=>'now()') );
+		}
+	}
+
+	private function userRoleCheck()
+	{
+		$this->setNewUserRoleSave( true );
+	}
+
+	private function userRoleSave()
+	{
+		if ( $this->getNewUserRoleSave()==false )
+		{
+            $this->addMessage( $this->translate('Data not saved.') );
+			return;
+		}
+
+		$role_id=$this->getNewUserData()['role_id'];
+
+		$user=$this->getUser();
+		
+		if ( $role_id==$user['project_role']['role_id'] )
+		{
+			return;
+		}
+
+		if ( empty($role_id) )
+		{
+            $this->addMessage( $this->translate('Cannot save empty role ID).') );
+		}
+		else
+		if ( empty($user['project_role']['id']) )
+		{
+			$this->models->ProjectsRolesUsers->save(array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'role_id' => $role_id,
+				'user_id' => $this->getUserId(),
+				'active' => 1
+			));
+
+            $this->addMessage( $this->translate('Saved role.') );
+		}
+		else
+		{
+			$this->models->ProjectsRolesUsers->save(array(
+				'id' => $user['project_role']['id'],
+				'project_id' => $this->getCurrentProjectId(),
+				'role_id' => $role_id,
+				'user_id' => $this->getUserId(),
+				'active' => 1
+			));
+
+            $this->addMessage( $this->translate('Updated role.') );
+		}
+	}
+
+
+    public function createAction ()
+    {
+        $this->checkAuthorisation();
+
+        $this->setPageName($this->translate('Create new collaborator'));
+		$this->setUserId( null );
+
+		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->setNewUserData( $this->rGetAll() );
+			$this->sanitizeNewUserData();
+			$this->userDataCheck();
+			$this->userPasswordCheck();
+			$this->userDataSave();
+			$this->userPasswordSave();
+			$this->setUser();
+		}
+		
+		$this->smarty->assign('user', $this->rGetAll() );
+		
+		$this->printPage( 'edit' );
+    }
+
     public function editAction ()
     {
         $this->checkAuthorisation();
@@ -504,118 +609,47 @@ class UsersController extends Controller
 			$this->setNewUserData( $this->rGetAll() );
 			$this->sanitizeNewUserData();
 			$this->userDataCheck();
-			$this->userPasswordCheck();
 			$this->userDataSave();
+			$this->userPasswordCheck();
 			$this->userPasswordSave();
+			$this->userRoleCheck();
+			$this->userRoleSave();
 			$this->setUser();
 		}
 
 		$this->smarty->assign( 'user', $this->getUser() );
+		$this->smarty->assign( 'roles', $this->getRoles() );
+		$this->smarty->assign( 'modules', $this->getProjectModulesUser() );
 
 		$this->printPage();
     }
+	
+	private function getRoles()
+	{
+		return $this->models->Roles->_get( array( 'id' => array('hidden'=>'0') ) );
+	}
 
+	private function getProjectModulesUser()
+	{
+		$d=$this->getProjectModules();
 
-    public function createAction ()
-    {
-
-        $this->checkAuthorisation();
-
-        $this->setPageName($this->translate('Create new collaborator'));
-		$this->setUserId( null );
-
-		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
+		$u=$this->models->UserModuleAccess->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'user_id'=>$this->getUserId()
+			),
+			'fieldAsIndex'=>'module_id'
+		));
+		
+		foreach((array)$d['modules'] as $key=>$val)
 		{
-			$this->setNewUserData( $this->rGetAll() );
-			$this->sanitizeNewUserData();
-			$this->userDataCheck();
-			$this->userPasswordCheck();
-			$this->userDataSave();
-			
-//			need to set user id to make saving of password possible
-//			form for new user cannot save without complete data incl. passwords
-			
-			$this->userPasswordSave();
-			$this->setUser();
+			$d['modules'][$key]['access']=isset($u[$val['module_id']]) ? $u[$val['module_id']] : null;
 		}
 		
-		$this->smarty->assign('user', $this->rGetAll() );
-		
-		$this->printPage( 'edit' );
-		
-		return;
+		return $d;
+	}
 
-        if ($this->rHasVal('action','create') && !$this->isFormResubmit())
-		{
-			$data=$this->sanitizeUserData($this->rGetAll());
 
-			if (
-				$this->isUserDataComplete($data) &&
-				$this->isUsernameCorrect($this->rGetVal('username')) &&
-				$this->isUsernameUnique($this->rGetVal('username')) &&
-				$this->arePasswordsIdentical($this->rGetVal('password'),$this->rGetVal('password_2')) &&
-				$this->isPasswordCorrect($this->rGetVal('password')) &&
-				$this->isEmailAddressCorrect($this->rGetVal('email_address')) &&
-				$this->isEmailAddressUnique($this->rGetVal('email_address')) &&
-				$this->isRoleAssignable($this->rGetVal('role_id'))
-			)
-			{
-				$d = $this->saveNewUser($data);
-
-				if ($d===true)
-				{
-					$this->sendNewUserEmail($data);
-					$this->redirect('index.php');
-				}
-				else
-				{
-					$this->addError($this->translate('Failed to save user ('.$d.').'));
-				}
-			}
-        }
-
-		$maxLengths = array(
-			'username' => $this->dataChecks['username']['maxLength'],
-			'password' => $this->dataChecks['password']['maxLength'],
-			'first_name' => $this->dataChecks['first_name']['maxLength'],
-			'last_name' => $this->dataChecks['last_name']['maxLength'],
-			'email_address' => $this->dataChecks['email_address']['maxLength'],
-		);
-
-		$modules = $this->getProjectModules();
-
-		$zones = $this->models->Timezones->_get(array('id'=>'*'));
-
-		if ($this->isCurrentUserSysAdmin())
-		{
-			$d=array('id !='=>ID_ROLE_SYS_ADMIN);
-		}
-		else
-		{
-			$d=array('assignable'=>'y');
-		}
-
-        $roles = $this->models->Roles->_get(array('id'=>$d));
-
-		$this->smarty->assign('maxLengths', $maxLengths);
-		$this->smarty->assign('zones', $zones);
-        $this->smarty->assign('roles', $roles);
-        $this->smarty->assign('modules', $modules['modules']);
-        $this->smarty->assign('freeModules', $modules['freeModules']);
-
-        if (null!==$this->rGetAll() && isset($data) && $this->rGetAll()!=$data)
-		{
-			$this->smarty->assign('data', $data);
-		}
-		else
-        if (null!==$this->rGetAll())
-		{
-			$this->smarty->assign('data', $this->rGetAll());
-		}
-
-        $this->printPage();
-
-    }
 
 
     public function deleteAction ()
