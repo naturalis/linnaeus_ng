@@ -1,7 +1,6 @@
 <?php
 
 include_once ('Controller.php');
-include_once ('UserRightsController.php');
 
 class LoginController extends Controller
 {
@@ -26,7 +25,6 @@ class LoginController extends Controller
 	
 	private function initialize()
 	{
-		$this->UserRights = new UserRights;
 	}
 
     public function loginAction ()
@@ -221,10 +219,6 @@ class LoginController extends Controller
                 'logins' => 'logins+1'
             )
         );
-
-		$this->UserRights->setUserId( $user['id'] );
-
-		//$cur = $this->UserRights->getUserRights();
 
 
         $this->initUserSession( array('user'=>$user) );
