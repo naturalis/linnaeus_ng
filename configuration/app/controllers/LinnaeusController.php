@@ -194,14 +194,11 @@ class LinnaeusController extends Controller
 	
     public function rootIndexAction()
 	{
+		if (defined('FIXED_PROJECT_ID')) $this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
 
-		if (defined('FIXED_PROJECT_ID'))
-			$this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
-
-		$id = $this->resolveProjectShortName();
+		$id=$this->resolveProjectShortName();
 		
-		if ($id)
-			$this->redirect('app/views/linnaeus/set_project.php?p='.$id);
+		if ($id) $this->redirect('app/views/linnaeus/set_project.php?p='.$id);
 		
 		$projects = $this->models->Project->_get(
 			array(
@@ -210,12 +207,32 @@ class LinnaeusController extends Controller
 			)
 		);
 
-		if ($this->rHasVar('nopid'))
-			$this->smarty->assign('error',$this->translate('No or illegal project ID specified.'));
+		if ($this->rHasVar('nopid')) $this->smarty->assign('error',$this->translate('No or illegal project ID specified.'));
+
+
+		
+
+		if ( isset($this->generalSettings['project_index_texts']) )
+		{
+			$texts=$this->generalSettings['project_index_texts'];
+		}
+		else
+		{
+			$texts=
+				array(
+					'page_title'=>'Select a project to work on',
+					'page_header'=>'Select a project to work on',
+					'search_placeholder'=>'',
+					'left_bar_title'=>'',
+					'left_bar_text'=>'',
+				);
+		}
+
 		$this->smarty->assign('hasEntryProgram',$this->doesEntryProgramExist());
 		$this->smarty->assign('showEntryProgramLink',$this->generalSettings['showEntryProgramLink']);
 		$this->smarty->assign('projects',$projects);
 		$this->smarty->assign('excludeLogout',true);
+		$this->smarty->assign('texts',$texts);
 
         $this->printPage('root_index');
 	
@@ -223,16 +240,7 @@ class LinnaeusController extends Controller
 
     public function noProjectAction()
 	{
-
 		$this->redirect($this->baseUrl.'?nopid');
-		/*
-		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
-
-		$this->smarty->assign('excludeLogout',true);
-
-        $this->printPage();
-		*/
-	
 	}
 
 	public function getContent($sub=null,$id=null)
@@ -374,51 +382,7 @@ class LinnaeusController extends Controller
 			if ($val['source']=='species')
 				$data[$key]['label']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['label'],'rank_id'=>$val['rank_id']),'rankpos'=>'post'));
 		}
-		
-		
-/*
 
-			union
-	
-				select
-					id,term as label,'glossary' as source, concat('../glossary/term.php?id=',id) as url
-				from
-					%PRE%glossary
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and term like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-			union
-	
-				select
-					taxon_id as id,commonname as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
-				from
-					%PRE%commonnames
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and commonname like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-			union
-	
-				select
-					taxon_id as id,synonym as label,'species' as source, concat('../species/taxon.php?cat=names&id=',taxon_id) as url
-				from
-					%PRE%synonyms
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-			union
-	
-				select
-					glossary_id as id,synonym as label,'glossary' as source, concat('../glossary/term.php?id=',glossary_id) as url
-				from
-					%PRE%glossary_synonyms
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and synonym like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-*/
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(array(

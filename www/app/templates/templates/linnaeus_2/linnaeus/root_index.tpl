@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-	<title>Select a project to work on</title>
+	<title>{$texts.page_title}</title>
 	<link href="admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
   <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/ionicons.min.css">
@@ -21,7 +21,7 @@
 	<div class="headerBar">
 		<div class="headerContainer">
 			<div class="headerText">
-				Soortzoekers Natuur van Nederland
+				{$texts.page_title}
 			</div>
 		</div>
 	</div>
@@ -34,22 +34,22 @@
 			</div>
 			<div class="headerImage">
 				<img src="app/style/img/placeholderheader.png" alt="">
-				<h1>Soortzoekers <br/> Natuur van Nederland</h1>
+				<h1>{$texts.page_header}</h1>
 			</div>
 		</div>
 		<div class="contentContainer">
 			<div class="sidebar">
 				<div class="search">
 					<form action="" class="filterForm">
-						<input type="text" name="" value="" placeholder="Zoek op soortgroep">
+						<input type="text" name="" value="" placeholder="{$texts.search_placeholder}">
 						<button><i class="ion-search"></i></button>
 					</form>
 				</div>
 				<div class="sidebarContent">
 					<h3>
-						Soort determineren?
+						{$texts.left_bar_title}
 					</h3>
-					<p>Selecteer de betreffende soortgroep om uw vondst(en) op naam te brengen.</p>
+					<p>{$texts.left_bar_text}</p>
 				</div>
 			</div>
 			<div class="content">
@@ -65,11 +65,9 @@
 	</div>
 	<div class="footerContainer">
 		<div class="footer">
-			<span class="copyright">© Naturalis en partners</span>
-			<a href="admin/views/users/login.php" class="adminLink">
-				<span class="powered">Powered by</span>
-				<img src="app/style/img/lng.png" id="lng-logo">
-				<span class="linnaeus">Linnaeus NG</span>
+			<!-- span class="copyright">© Naturalis en partners</span -->
+			<a href=" https://science.naturalis.nl/en/ict/products/linnaeus-ng/" target="_blank" class="adminLink">
+				<span class="powered">Powered by Naturalis Biodiversity Center & Linnaeus NG</span>
 			</a>
 		</div>
 	</div>
