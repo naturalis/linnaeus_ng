@@ -7,7 +7,7 @@ class Controller extends BaseClass
 {
 	private $_smartySettings;
 	private $_viewName;
-	private $_fullPath;
+	private $_fullPath;	
 	private $_fullPathRelative;
 	private $_prevTreeId = null;
 	private $_breadcrumbRootName = null;
