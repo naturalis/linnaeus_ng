@@ -1,8 +1,8 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/UsersController.php');
+require_once ('../../../../configuration/admin/controllers/LoginController.php');
 
-$c = new UsersController();
+$c = new LoginController();
 
 $c->setExcludeFromReferer(true);
 

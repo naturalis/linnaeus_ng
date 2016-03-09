@@ -10,7 +10,7 @@
 	</div>
 
 	<div class="header-user">
-		{if !$excludeLogout && $session.admin.user._logged_in}
+		{if $session.admin.user._logged_in}
 		{t}Logged in as{/t}
 		<a href="{$baseUrl}admin/views/users/edit.php?id={$session.admin.user.id}">
             {$session.admin.user.first_name} {$session.admin.user.last_name}
