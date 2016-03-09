@@ -50,7 +50,6 @@ class Controller extends BaseClass
 	private $usedModelsBase = array(
 		'activity_log',
 		'free_modules_projects',
-		'free_modules_projects_users',
 		'interface_texts',
 		'interface_translations',
 		'labels_projects_ranks',
@@ -58,13 +57,10 @@ class Controller extends BaseClass
 		'languages_projects',
 		'modules',
 		'modules_projects',
-		'modules_projects_users',
 		'projects',
 		'projects_ranks',
 		'projects_roles_users',
 		'ranks',
-		'rights',
-		'rights_roles',
 		'roles',
 		'taxa',
 		'taxa_variations',
@@ -391,68 +387,6 @@ class Controller extends BaseClass
 
 
     /**
-     * Returns the projects the current user has been assigned to
-     *
-     * @return     array    array of project's id's, names and user's active states
-     * @access     public
-     */
-    public function getCurrentUserProjects()
-    {
-
-		$this->reInitUserRolesAndRights();
-
-		$p = $this->models->Projects->_get(array('id'=>'*','fieldAsIndex'=>'id'));
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val)
-		{
-            $r = array(
-                'id' => $val['project_id'],
-                'name' => $val['project_name'],
-                'title' => $val['project_title'],
-                'active' => $val['active'],
-                'member' => $val['member'],
-				'published' => isset($p[$val['project_id']]['published']) ? $p[$val['project_id']]['published']=='1' : false
-            );
-
-            if (!isset($cup) || !in_array($r, (array) $cup))
-			{
-                $cup[$val['project_id']] = $r;
-            }
-        }
-
-        $this->customSortArray($cup, array(
-            'key' => 'title',
-            'dir' => 'asc',
-            'case' => 'i'
-        ));
-
-        return isset($cup) ? $cup : false;
-    }
-
-
-
-    /**
-     * Sets the active project's id as class variable
-     *
-     * @param      integer    $id    new active project's id
-     * @access     public
-     */
-    public function setCurrentProjectId($id)
-    {
-        $_SESSION['admin']['project']['id'] = $id;
-
-        $this->models->ProjectsRolesUsers->update(array(
-            'last_project_select' => 'now()',
-            'project_selects' => 'project_selects+1'
-        ), array(
-            'user_id' => $this->getCurrentUserId(),
-            'project_id' => $this->getCurrentProjectId()
-        ));
-    }
-
-
-
-    /**
      * Returns the active project's id class variable
      *
      * @return     integer    active project's id
@@ -461,59 +395,6 @@ class Controller extends BaseClass
     public function getCurrentProjectId()
     {
         return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : null;
-    }
-
-
-
-    /**
-     * Sets the active project's data as a session variable
-     *
-     * @access     public
-     */
-    public function setCurrentProjectData ($data = null)
-    {
-        if ($data == null)
-		{
-            $id = $this->getCurrentProjectId();
-
-            if (isset($id))
-			{
-                $data = $this->models->Projects->_get(array(
-                    'id' => $id
-                ));
-
-                $pru = $this->models->ProjectsRolesUsers->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $id,
-                        'role_id' => ID_ROLE_LEAD_EXPERT
-                    ),
-                    'columns' => 'user_id'
-                ));
-
-                foreach ((array) $pru as $key => $val)
-				{
-                    $u = $this->models->Users->_get(
-                    array(
-                        'id' => array(
-                            'id' => $val['user_id'],
-                            'active' => 1
-                        )
-                    ));
-
-                    $pru[$key]['first_name'] = $u[0]['first_name'];
-                    $pru[$key]['last_name'] = $u[0]['last_name'];
-                    $pru[$key]['email_address'] = $u[0]['email_address'];
-                }
-
-                $_SESSION['admin']['project']['lead_experts'] = $pru;
-            }
-        }
-
-        foreach ((array) $data as $key => $val)
-		{
-            $_SESSION['admin']['project'][$key] = $val;
-        }
     }
 
 
@@ -530,183 +411,11 @@ class Controller extends BaseClass
 
 
 
-    /**
-     * Sets the default project for the current user
-     *
-     * After logging in, the app requires an active project is set, the project the user actually works on.
-     * If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
-     * the choice should be automatic. This function decides what project should be the active one, and sets it.
-     *
-     * @access     public
-     */
-    public function setDefaultProject ()
-    {
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val)
-		{
-            if ($val['active'] == '1') $d[] = $val;
-        }
-
-        // if user has no roles, do nothing
-        if (!isset($d)) return;
-
-		// if user has only one role, set the corresponding project as the active project
-        if (count($d) == 1)
-		{
-            $this->setCurrentProjectId($d[0]['project_id']);
-        }
-        else
-		{
-            // if user has more than one project assigned, he has to choose himself
-            return;
-        }
-
-        $this->setCurrentProjectData();
-    }
-
-
-
-    /**
-     * Retrieves all rights and roles of the current user. Results are stored in the user's session.
-     *
-     * @return     array    array of roles, rights and the number of projects the user is involved with
-     * @access     public
-     */
-    public function getUserRights ($id = false)
-    {
-        $pru = $this->models->ProjectsRolesUsers->_get(
-        array(
-            'id' => array(
-                'user_id' => $id ? $id : $this->getCurrentUserId()
-            ),
-            'columns' => 'project_id,role_id,active,\'1\' as member',
-            'fieldAsIndex' => 'project_id'
-        ));
-
-
-        if ($this->isCurrentUserSysAdmin())
-		{
-            $p = $this->models->Projects->_get(array(
-                'id' => '*'
-            ));
-
-            foreach ((array) $p as $val)
-			{
-                if (!isset($pru[$val['id']]))
-				{
-                    $pru[$val['id']] = array(
-                        'project_id' => $val['id'],
-                        'role_id' => (string) ID_ROLE_SYS_ADMIN,
-                        'active' => (string) 1,
-                        'member' => 0
-                    );
-                }
-            }
-        }
-
-        foreach ((array) $pru as $key => $val)
-		{
-            $p = $this->models->Projects->_get(array(
-                'id' => $val['project_id']
-            ));
-
-            // $val['project_id']==0 is the stub for all round system admin
-            if ($p || $val['project_id'] == 0)
-			{
-                $r = $this->models->Roles->_get(array(
-                    'id' => $val['role_id']
-                ));
-
-                if ($r) {
-
-                    $userProjectRoles[] = array_merge($val,
-                    array(
-                        'project_name' => $p['sys_name'],
-                        'project_title' => $p['title'],
-                        'role_name' => $r['role'],
-                        'role_description' => $r['description']
-                    ));
-
-                    $rr = $this->models->RightsRoles->_get(array(
-                        'id' => array(
-                            'role_id' => $val['role_id']
-                        )
-                    ));
-
-                    foreach ((array) $rr as $rr_key => $rr_val)
-					{
-                        $r = $this->models->Rights->_get(array(
-                            'id' => $rr_val['right_id']
-                        ));
-
-                        $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-                    }
-
-                    $projectCount[$val['project_id']] = $val['project_id'];
-                }
-            }
-        }
-
-
-        $fmpu = $this->models->FreeModulesProjectsUsers->_get(array(
-            'id' => array(
-                'user_id' => $id ? $id : $this->getCurrentUserId()
-            )
-        ));
-
-        foreach ((array) $fmpu as $key => $val)
-		{
-            $rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
-        }
-
-        $d = $this->getCurrentProjectId();
-
-        return array(
-            'roles' => isset($userProjectRoles) ? $userProjectRoles : null,
-            'rights' => isset($rs) ? $rs : null,
-            'number_of_projects' => isset($projectCount) ? count((array) $projectCount) : 0
-        );
-    }
-
-
-
-    /**
-     * Sets the user session var that holds the rights per view per project array
-     *
-     * @access     public
-     */
-    public function setUserSessionRights($rights)
-    {
-        $_SESSION['admin']['user']['_rights'] = $rights;
-    }
-
-
-
-    /**
-     * Sets the user session var that holds the roles per project array
-     *
-     * @access     public
-     */
-    public function setUserSessionRoles($roles)
-    {
-        $_SESSION['admin']['user']['_roles'] = $roles;
-    }
-
-
-
-    /**
-     * Sets the user session var that describes the number of projects the user has been assigned to
-     *
-     * @access     public
-     */
-    public function setUserSessionNumberOfProjects($numberOfProjects)
-    {
-        $_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
-    }
-
-
-
     public function setCurrentUserRoleId()
     {
+		die( 'REDESIGN RIGHTS 1' );
+		
+		
         if (!isset($_SESSION['admin']['user']['_roles']))
 		{
             $_SESSION['admin']['user']['currentRole'] = null;
@@ -767,6 +476,9 @@ class Controller extends BaseClass
      */
     public function checkAuthorisation($allowNoProjectId = false)
     {
+		
+		return true;
+		
         // check if user is logged in, otherwise redirect to login page
         if ($this->isUserLoggedIn())
 		{
@@ -810,27 +522,6 @@ class Controller extends BaseClass
     }
 
 
-
-    /**
-     * Judges whether the user is authorized to work at a specific project
-     *
-     * @param      integer    $id    project id
-     * @return     boolean    is or is not authorized
-     * @access     public
-     */
-    public function isCurrentUserAuthorizedForProject ($id)
-    {
-        foreach ((array) $this->getCurrentUserProjects() as $key => $val)
-		{
-            if ($val['id'] == $id && $val['active'] == '1')
-                return true;
-        }
-
-        return false;
-    }
-
-
-
     /**
      * Returns whether the active user is a general sysadmin (i.e., sysadmin rights for project 0)
      *
@@ -839,6 +530,9 @@ class Controller extends BaseClass
      */
     public function isCurrentUserSysAdmin ()
     {
+		
+		return true;
+		
         if (!isset($_SESSION['admin']['user']))
 		{
             $u = $this->models->Users->_get(array(
@@ -888,6 +582,8 @@ class Controller extends BaseClass
      */
     public function reInitUserRolesAndRights ($userId = null)
     {
+		die( 'REDESIGN RIGHTS 2' );
+		
         $cur = $this->getUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
         $this->setUserSessionRights($cur['rights']);
         $this->setUserSessionRoles($cur['roles']);
@@ -1248,61 +944,6 @@ class Controller extends BaseClass
 		return $this->helpers->Paginator->getItems();
     }
 
-    public function sendEmail ($params)
-    {
-
-        /*
-			params:
-
-			mailto_address
-			mailto_name
-			mailfrom_address
-			mailfrom_name
-			subject
-			plain
-			html
-			smtp_server
-			debug (boolean; optional)
-			mail_name (for identification in the log file; optional)
-
-		*/
-        $d = isset($params['mail_name']) ? ' "' . $params['mail_name'] . '"' : '';
-
-        if (!isset($params['mailto_address']) || !isset($params['mailfrom_address']) || (!isset($params['plain']) && !isset($params['html'])) || !isset($params['smtp_server'])) {
-
-            if (!isset($params['mailto_address']))
-                $this->log('Can\'t send email' . $d . ': lacking rcpt address)', 1);
-            if (!isset($params['mailfrom_address']))
-                $this->log('Can\'t send email' . $d . ': lacking sender address)', 1);
-            if (!isset($params['plain']) && !isset($params['html']))
-                $this->log('Can\'t send email' . $d . ': lacking body)', 1);
-            if (!isset($params['smtp_server']))
-                $this->log('Can\'t send email' . $d . ': lacking server)', 1);
-
-            return false;
-        }
-
-        $res = $this->helpers->EmailHelper->send(
-        array(
-            'mailto_address' => $params['mailto_address'],
-            'mailto_name' => isset($params['mailto_name']) ? $params['mailto_name'] : null,
-            'mailfrom_address' => $params['mailfrom_address'],
-            'mailfrom_name' => isset($params['mailfrom_name']) ? $params['mailfrom_name'] : null,
-            'subject' => $params['subject'],
-            'plain' => isset($params['plain']) ? $params['plain'] : null,
-            'html' => isset($params['html']) ? $params['html'] : null,
-            'smtp_server' => $params['smtp_server'],
-            'debug' => isset($params['debug']) ? $params['debug'] : false
-        ));
-
-        if (!$res)
-            $this->log('Failed sending email' . $d, 1);
-
-        return $res;
-    }
-
-
-
     public function createProject ($d)
     {
         $d['id'] = null;
@@ -1311,46 +952,6 @@ class Controller extends BaseClass
         $p = $this->models->Projects->save($d);
 
         return ($p) ? $this->models->Projects->getNewId() : false;
-    }
-
-
-
-    public function addUserToProject ($uid, $pId, $roleId, $active = 1, $addToAllModules = true)
-    {
-        $this->models->ProjectsRolesUsers->save(array(
-            'id' => null,
-            'project_id' => $pId,
-            'role_id' => $roleId,
-            'user_id' => $uid,
-            'active' => $active
-        ));
-
-        if ($addToAllModules === false)
-            return;
-
-        $d = array(
-            'id' => null,
-            'user_id' => $uid,
-            'project_id' => $pId
-        );
-
-        $modules = $this->getProjectModules(array(
-            'project_id' => $pId
-        ));
-
-        foreach ((array) $modules['modules'] as $key => $val) {
-
-            $d['module_id'] = $val['module_id'];
-            $this->models->ModulesProjectsUsers->save($d);
-        }
-
-        unset($d['module_id']);
-
-        foreach ((array) $modules['freeModules'] as $key => $val) {
-
-            $d['free_module_id'] = $val['id'];
-            $this->models->FreeModulesProjectsUsers->save($d);
-        }
     }
 
 

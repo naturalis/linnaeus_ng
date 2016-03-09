@@ -37,42 +37,55 @@ class ProjectsController extends Controller
     );
 	private $freeModulesMax=5;
 
-
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct ()
     {
         parent::__construct();
 	}
 
-
-    /**
-	* Destroys
-	*
-	* @access     public
-	*/
     public function __destruct ()
     {
         parent::__destruct();
     }
 
+	public function chooseProjectAction ()
+	{
+        $this->checkDefaultProjectSelect();
+        $this->checkAuthorisation();
+        $this->setPageName($this->translate('Select a project to work on'));
 
-    /**
-	* Index, showing menu of options
-	*
-	* @access     public
-	*/
+        if ( $this->rHasVal('project_id') && $this->isCurrentUserAuthorizedForProject($this->rGetVal('project_id')) )
+		{
+			$this->doSetProject( $this->rGetVal('project_id') );
+			$this->redirect( $this->getLoggedInMainIndex() );
+		}
+		else
+		{
+			$this->redirect('choose_project.php');
+		}
+
+        $this->smarty->assign('projects', $this->getCurrentUserProjects());
+        $this->printPage();
+    }
+
     public function indexAction ()
     {
         $this->checkAuthorisation();
-        $this->setPageName($this->translate('Index'));
+        $this->setPageName( $this->translate('Index') );
+        $this->printPage();
+    }
+
+    public function overviewAction ()
+    {
+        $this->checkAuthorisation();
+        $this->setPageName($this->translate('Project overview'));
+        $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
         $this->printPage();
     }
 
 
+
+  	
+	
     /**
 	* List of available modules, standard and self-defined, plus possibility of (de)activation
 	*
@@ -634,6 +647,7 @@ class ProjectsController extends Controller
 
     }
 
+
     private function ajaxActionModules ($moduleType, $action, $moduleId)
     {
         if ($moduleType == 'free') {
@@ -1070,5 +1084,124 @@ class ProjectsController extends Controller
 		$this->models->Projects->save($data);
 
 	}
+
+
+	private function getCurrentUserProjects()
+	{
+		return $this->models->ProjectsModel->getUserProjects(array(
+			'user_id'=>$this->getCurrentUserId()
+		));
+	}
+
+	private function isCurrentUserAuthorizedForProject($id)
+	{
+		foreach ((array) $this->getCurrentUserProjects() as $key => $val)
+		{
+			if ($val['id'] == $id && $val['user_project_active'] == '1')
+				return true;
+		}
+
+		return false;
+	}
+
+    private function setCurrentProjectId($id)
+    {
+        $_SESSION['admin']['project']['id'] = $id;
+
+        $this->models->ProjectsRolesUsers->update(array(
+            'last_project_select' => 'now()',
+            'project_selects' => 'project_selects+1'
+        ), array(
+            'user_id' => $this->getCurrentUserId(),
+            'project_id' => $this->getCurrentProjectId()
+        ));
+    }
+
+	private function doSetProject( $id )
+	{
+		$this->unsetProjectSessionData();
+		$this->setCurrentProjectId( $id );
+		$this->setCurrentProjectData();
+		//$this->setCurrentUserRoleId();
+	}
+
+    private function checkDefaultProjectSelect()
+    {
+		$p=null;
+
+		foreach((array)$this->getCurrentUserProjects() as $key=>$val)
+		{
+			if ( $val['user_project_active']==1 )
+			{
+				if ( is_null($p) )
+				{
+					$p=$val['id'];
+				}
+				else
+				{
+					$p=false;
+				}
+			}
+		}
+
+		if ( $p && $this->isCurrentUserAuthorizedForProject( $p ) )
+		{
+			$this->doSetProject( $p );
+			$this->redirect( $this->getLoggedInMainIndex() );
+		}
+    }
+
+    private function setCurrentProjectData ($data = null)
+    {
+        if ($data == null)
+		{
+            $id = $this->getCurrentProjectId();
+
+            if (isset($id))
+			{
+                $data = $this->models->Projects->_get(array(
+                    'id' => $id
+                ));
+
+                $pru = $this->models->ProjectsRolesUsers->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $id,
+                        'role_id' => ID_ROLE_LEAD_EXPERT
+                    ),
+                    'columns' => 'user_id'
+                ));
+
+                foreach ((array) $pru as $key => $val)
+				{
+                    $u = $this->models->Users->_get(
+                    array(
+                        'id' => array(
+                            'id' => $val['user_id'],
+                            'active' => 1
+                        )
+                    ));
+
+                    $pru[$key]['first_name'] = $u[0]['first_name'];
+                    $pru[$key]['last_name'] = $u[0]['last_name'];
+                    $pru[$key]['email_address'] = $u[0]['email_address'];
+                }
+
+                $_SESSION['admin']['project']['lead_experts'] = $pru;
+            }
+        }
+
+        foreach ((array) $data as $key => $val)
+		{
+            $_SESSION['admin']['project'][$key] = $val;
+        }
+    }
+
+
+
+
+
+
+
 
 }

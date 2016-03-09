@@ -1,173 +1,108 @@
-function userConnectExistingUser() {
+var userTaxa=Array();
 
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'connect_existing' ,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			if(data=='<ok>') {
-				window.open('index.php','_self');
-			}
-		}
-	});
-
-}
-
-function userCreateUserFromSession() {
-
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'create_from_session' ,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			if(data=='<ok>') {
-				window.open('index.php','_self');
-			}
-		}
-	});
-
-}
-
-function userDeleteUser(id) {
-
-	if (confirm(_('Are you sure?'))) { 
-		$('#delete').val('1'); 
-		$('#id').val(id); 
-		$('#deleteForm').submit(); 
-	}
-
-}
-
-
-function userRemoteValueCheck(ele,values,tests,idti) {
-
-	if (values[0].length==0) {
-
-		$('#'+ele+'-message').html(ele=='password' || ele=='password_2' ? _('(leave blank to leave unchanged)') : '');
-		$('#'+ele+'-message').removeClass().addClass('password-neutral');
-		return;
-
-	}
-
-	var action = false;
-
-	switch(ele) {
-		case 'username' : 
-			action = 'check_username';
-			break;
-		case 'password' :
-			action = 'check_password';
-			break;
-		case 'password_2' :
-			action = 'check_passwords';
-			break;
-		case 'first_name' :
-			action = 'check_first_name';
-			break;
-		case 'last_name' :
-			action = 'check_last_name';
-			break;
-		case 'email_address' :
-			action = 'check_email_address';
-			break;
-	}
-
-	if (!action) return;
-
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : action ,
-			'values' : values ,
-			'tests' : tests ,
-			'id_to_ignore' : idti ,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			if (ele=='password') {
-				if (data.match(/\<*\>/)) {
-					$('#'+ele+'-message').removeClass().addClass('password-'+data.replace(/[<>]/gi,''));
-					$('#'+ele+'-message').html(_('Password strength:')+' '+data.replace(/[<>]/gi,''));
-				} else {
-					$('#'+ele+'-message').removeClass().addClass('password-neutral');
-					$('#'+ele+'-message').html(data);
-				}
-			} else {
-				$('#'+ele+'-message').html(data);
-			}
-		}
-	});
-
-}
-
-function userChangeRoleRight(ele) {
-
-	if (confirm(_('Are you sure?'))) {
-		
-		var d = ele.id.split('-');
-				  
-		$('#right').val(d[1]);
-		$('#wrong').val(d[2]);
+function deleteUser()
+{
+	if ( confirm(_('Are you sure?')) )
+	{
+		$('#action').val('delete');
+		$('#theForm').attr('onsubmit','');
+		$('#theForm').attr('action','delete.php');
 		$('#theForm').submit();
-				  
+	}
+}
+
+
+function submitUserEditForm()
+{
+	var msg=Array();
+
+	if ( $('#id').val().length==0 )
+	{
+		if ( $('#password').val().length==0 && $('#password_repeat').val().length==0 )
+		{
+			msg.push(_('A password is required.'));
+		}
 	}
 
+	if ( $('#username').val().trim().length==0 )
+	{
+		msg.push(_('A username is required.'));
+	}
+
+	if ( $('#first_name').val().trim().length==0 )
+	{
+		msg.push(_('First name is required.'));
+	}
+
+	if ( $('#last_name').val().trim().length==0 )
+	{
+		msg.push(_('Last name is required.'));
+	}
+
+	if ( $('#email_address').val().trim().length==0 )
+	{
+		msg.push(_('Email address is required.'));
+	}
+
+	if ( $('#password').val() != $('#password_repeat').val() )
+	{
+		msg.push(_('Passwords not the same.'));
+	}
+	
+	if ( msg.length>0 ) 
+	{
+		alert( msg.join('\n') );
+		return false;
+	}
+	else
+	{
+		if ( userTaxa )
+		{
+			for(var i=0;i<userTaxa.length;i++)
+			{
+				$('#theForm').append('<input type="hidden" name="taxon[]" value="' + userTaxa[i].id +'" />');
+			}
+		}
+
+		return true;
+	}
 }
 
-
-function userAddToProject(uid,returnUrl) {
-
-	showDialog(_('Add collaborator'));
-	$('#dialog-content-inner').load('add_user.php?uid='+uid+(returnUrl?'&returnUrl='+returnUrl:''));
-
+function addTaxaToUserList( taxon )
+{
+	for(var i=0;i<userTaxa.length;i++)
+	{
+		if (userTaxa[i].id==taxon.id) return;
+	}
+	userTaxa.push( taxon );
 }
 
+function removeTaxonFromUserList( id )
+{
+	var index=-1;
 
-function userRemoveFromProject(uid,returnUrl) {
+	for(var i=0;i<userTaxa.length;i++)
+	{
+		if (userTaxa[i].id==id) index=i;
+	}
 
-	showDialog(_('Remove collaborator'));
-	$('#dialog-content-inner').load('remove_user.php?uid='+uid+(returnUrl?'&returnUrl='+returnUrl:''));
-
+	if (index > -1) userTaxa.splice(index, 1);
 }
 
-function userAddToModule(uid,modId,returnUrl) {
-
-	showDialog(_('Assign collaborator to module'));
-	$('#dialog-content-inner').load('add_user_module.php?uid='+uid+'&modId='+modId+(returnUrl?'&returnUrl='+returnUrl:''));
-
+function taxonToUserList()
+{
+	addTaxaToUserList( { id: $('#taxon_id').val(), name: $('#taxon').html() } );
+	buildTaxaUserList()
 }
 
-function userRemoveFromModule(uid,modId,returnUrl) {
+function buildTaxaUserList()
+{
+	$('#taxa').empty();	
 
-	showDialog(_('Remove collaborator from module'));
-	$('#dialog-content-inner').load('remove_user_module.php?uid='+uid+'&modId='+modId+(returnUrl?'&returnUrl='+returnUrl:''));
-
+	for(var i=0;i<userTaxa.length;i++)
+	{
+		$('#taxa').append( '<li data-id="' + userTaxa[i].id + '">' + userTaxa[i].name +' <a href="#" onclick="removeTaxonFromUserList(' + userTaxa[i].id + ');buildTaxaUserList();return false;">x</a></li>' );
+	}
 }
-
-function userAddToFreeModule(uid,modId,returnUrl) {
-
-	showDialog(_('Assign collaborator to module'));
-	$('#dialog-content-inner').load('add_user_module.php?uid='+uid+'&modId='+modId+'&type=free'+(returnUrl?'&returnUrl='+returnUrl:''));
-
-}
-
-function userRemoveFromFreeModule(uid,modId,returnUrl) {
-
-	showDialog(_('Remove collaborator from module'));
-	$('#dialog-content-inner').load('remove_user_module.php?uid='+uid+'&modId='+modId+'&type=free'+(returnUrl?'&returnUrl='+returnUrl:''));
-
-}
-
-
-
 
 
