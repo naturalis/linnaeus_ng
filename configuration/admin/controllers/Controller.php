@@ -2,6 +2,7 @@
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+include_once ('UserRightsController.php');
 
 class Controller extends BaseClass
 {
@@ -93,7 +94,6 @@ class Controller extends BaseClass
     {
         parent::__construct();
 
-
         $this->setTimeZone();
 
         $this->startSession();
@@ -118,6 +118,8 @@ class Controller extends BaseClass
 
         $this->loadModels();
 
+        $this->initUserRights();
+
         $this->setRandomValue();
 
         $this->setLanguages();
@@ -135,7 +137,6 @@ class Controller extends BaseClass
         $this->setProjectLanguages();
 
 		$this->initTranslator();
-
     }
 
     /**
@@ -143,7 +144,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function __destruct ()
+    public function __destruct()
     {
         $this->setLastVisitedPage();
 
@@ -160,7 +161,7 @@ class Controller extends BaseClass
      * @return     string    application name
      * @access     public
      */
-    public function getAppName ()
+    public function getAppName()
     {
         return isset($this->appName) ? $this->appName : false;
     }
@@ -171,7 +172,7 @@ class Controller extends BaseClass
      * @return     string    controller's base name
      * @access     public
      */
-    public function getControllerBaseName ()
+    public function getControllerBaseName()
     {
         return $this->controllerBaseName;
     }
@@ -182,7 +183,7 @@ class Controller extends BaseClass
      * @return     string    current view's name
      * @access     public
      */
-    public function getViewName ()
+    public function getViewName()
     {
         return $this->_viewName;
     }
@@ -192,7 +193,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function printPage ($templateName = null)
+    public function printPage($templateName = null)
     {
         $this->preparePage();
 
@@ -204,7 +205,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function fetchPage ($templateName = null)
+    public function fetchPage($templateName = null)
     {
         $this->preparePage();
 
@@ -217,7 +218,7 @@ class Controller extends BaseClass
      * @param      string    $url    url to redirect to; can be false, in which case HTTP_REFERER is used
      * @access     public
      */
-    public function redirect ($url = false)
+    public function redirect($url = false)
     {
         if (!$url && isset($_SERVER['HTTP_REFERER']))
 		{
@@ -246,7 +247,7 @@ class Controller extends BaseClass
      * @param      string or array    $error    the error(s)
      * @access     public
      */
-    public function addError ($error, $writeToLog = false)
+    public function addError($error, $writeToLog = false)
     {
 		if (empty($error)) return;
 
@@ -273,7 +274,7 @@ class Controller extends BaseClass
      * @return     boolean    errors or not
      * @access     public
      */
-    public function hasErrors ()
+    public function hasErrors()
     {
         return (count((array) $this->errors) > 0);
     }
@@ -284,12 +285,12 @@ class Controller extends BaseClass
      * @return     array    stack of errors
      * @access     public
      */
-    public function getErrors ()
+    public function getErrors()
     {
         return $this->errors;
     }
 
-    public function clearErrors ()
+    public function clearErrors()
     {
         $this->errors = array();
     }
@@ -300,7 +301,7 @@ class Controller extends BaseClass
      * @param      type    $message    the message
      * @access     public
      */
-    public function addMessage ($d)
+    public function addMessage($d)
     {
 		if (empty($d)) return;
 
@@ -314,7 +315,7 @@ class Controller extends BaseClass
 		}
     }
 
-    public function getMessages ()
+    public function getMessages()
     {
         return $this->messages;
     }
@@ -339,13 +340,10 @@ class Controller extends BaseClass
         return $this->warnings;
     }
 
-    public function hasWarnings ()
+    public function hasWarnings()
     {
         return (count((array) $this->warnings) > 0);
     }
-
-
-
 
     /**
      * Sets the name of the current page, for display purposes, in a class variable 'pageName'.
@@ -353,12 +351,10 @@ class Controller extends BaseClass
      * @param      string    $name    the page's name
      * @access     public
      */
-    public function setPageName ($name)
+    public function setPageName($name)
     {
         $this->pageName = $name;
     }
-
-
 
     /**
      * Returns the name of the current page.
@@ -366,12 +362,10 @@ class Controller extends BaseClass
      * @return     string    the page's name
      * @access     public
      */
-    public function getPageName ()
+    public function getPageName()
     {
         return $this->pageName;
     }
-
-
 
     /**
      * Returns the current user's id class variable
@@ -384,8 +378,6 @@ class Controller extends BaseClass
         return isset($_SESSION['admin']['user']['id']) ? $_SESSION['admin']['user']['id'] : null;
     }
 
-
-
     /**
      * Returns the active project's id class variable
      *
@@ -397,204 +389,38 @@ class Controller extends BaseClass
         return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : null;
     }
 
-
-
     /**
      * Rerturns the active project's data
      *
      * @access     public
      */
-    public function getCurrentProjectData ()
+    public function getCurrentProjectData()
     {
         return isset($_SESSION['admin']['project']) ? $_SESSION['admin']['project'] : null;
     }
 
-
-
     public function setCurrentUserRoleId()
     {
-		die( 'REDESIGN RIGHTS 1' );
-		
-		
-        if (!isset($_SESSION['admin']['user']['_roles']))
-		{
-            $_SESSION['admin']['user']['currentRole'] = null;
-        }
-        else
-		{
-            $d = $this->getCurrentProjectId();
-
-            if (is_null($d))
-			{
-                $_SESSION['admin']['user']['currentRole'] = null;
-            }
-            else
-			{
-                foreach ((array) $_SESSION['admin']['user']['_roles'] as $val)
-				{
-                    if ($val['project_id'] == $d)
-                        $_SESSION['admin']['user']['currentRole'] = $val["role_id"];
-                }
-            }
-        }
+		$this->UserRights->setUserRoleId();
     }
 
-    public function getCurrentUserRoleId()
-    {
-        return isset($_SESSION['admin']['user']['currentRole']) ? $_SESSION['admin']['user']['currentRole'] : null;
-    }
-
-    public function getCurrentUserIsSuperuser ()
-    {
-        return $_SESSION['admin']['user']['superuser'] == 1;
-    }
-
-
-    /**
-     * Checks whether a user is logged in
-     *
-     * @return     boolean        logged in or not
-     * @access     public
-     */
-    public function isUserLoggedIn()
-    {
-        return (!empty($_SESSION['admin']['user']['id']));
-    }
-
-
-
-    /**
-     * Checks whether a user is authorized to view/use a certain page and redirects if necessary
-     *
-     * Subsequently checks:
-     * Is the user logged in?
-     * Has the user selected an active project?
-     * Is the user authorized to see a specific page?
-     *
-     * @return     boolean        returns true if authorized, or redirects if not
-     * @access     public
-     */
     public function checkAuthorisation($allowNoProjectId = false)
     {
-		
-		return true;
-		
-        // check if user is logged in, otherwise redirect to login page
-        if ($this->isUserLoggedIn())
-		{
-            // check if there is an active project, otherwise redirect to choose project page
-            if ($this->getCurrentProjectId() || $allowNoProjectId)
-			{
-                // check if the user is authorised for the combination of current page / current project
-                if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin())
-				{
-                    return true;
-                }
-                else
-				{
-                    $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
-
-                    /*
-						user is not authorized and redirected to the index.page;
-						if he already *is* on the index.page (and not authorized to be there),
-						he is logged out to avoid circular reference.
-					*/
-                    if ($this->getViewName() == 'Index')
-					{
-                        $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['logout']);
-                    }
-                    else
-					{
-                        $this->redirect('index.php');
-                    }
-                }
-            }
-            else
-			{
-                $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject']);
-            }
-        }
-        else
-		{
-            $this->setLoginStartPage();
-            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['login']);
-        }
+		$this->UserRights->isAuthorized();
     }
 
-
-    /**
-     * Returns whether the active user is a general sysadmin (i.e., sysadmin rights for project 0)
-     *
-     * @return     boolean	true or false
-     * @access     public
-     */
     public function isCurrentUserSysAdmin ()
     {
-		
-		return true;
-		
-        if (!isset($_SESSION['admin']['user']))
-		{
-            $u = $this->models->Users->_get(array(
-                'id' => $this->getCurrentUserId()
-            ));
-
-            return $u['superuser'] == '1';
-        }
-
-        if ($_SESSION['admin']['user']['superuser'] == 1)
-            return true;
-
-        if (!isset($_SESSION['admin']['user']['_roles']))
-            return false;
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val)
-		{
-            if ($val['project_id'] == 0 && $val['role_id'] == ID_ROLE_SYS_ADMIN)
-                return true;
-        }
-
-        return false;
+		return $this->UserRights->isSysAdmin();
     }
 
-
-
-    public function isCurrentUserLeadExpert ()
+    public function reInitUserRolesAndRights()
     {
-        if (!isset($_SESSION['admin']['user']['_roles']))
-            return false;
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
-
-            if ($val['project_id'] == $this->getCurrentProjectId() && $val['role_id'] == ID_ROLE_LEAD_EXPERT)
-                return true;
-        }
-
-        return false;
+		$this->UserRights->reInitializeRights();
     }
 
-
-
-    /**
-     * Re-initialises the user's projects and roles, without loggin out and in
-     *
-     * @access     public
-     */
-    public function reInitUserRolesAndRights ($userId = null)
+    public function getProjectModules($params = null)
     {
-		die( 'REDESIGN RIGHTS 2' );
-		
-        $cur = $this->getUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
-        $this->setUserSessionRights($cur['rights']);
-        $this->setUserSessionRoles($cur['roles']);
-        $this->setUserSessionNumberOfProjects($cur['number_of_projects']);
-    }
-
-
-
-    public function getProjectModules ($params = null)
-    {
-
 		$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
 
 		if (isset($params['active']) && ($params['active'] == 'y' || $params['active'] == 'n'))
@@ -646,6 +472,7 @@ class Controller extends BaseClass
 
     public function checkModuleActivationStatus ()
     {
+		// REFAC2015
         if ($this->getModuleActivationStatus() == -1) {
 
             $_SESSION['admin']['system']['last_module_name'] = $this->controllerPublicName;
@@ -1782,7 +1609,6 @@ class Controller extends BaseClass
         $this->smarty->assign('useRelated', $this->useRelated);
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
-        $this->smarty->assign('currentUserRole', $this->getCurrentUserRole());
 
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -1822,7 +1648,7 @@ class Controller extends BaseClass
 
 
 
-    private function getModuleActivationStatus ()
+    private function getModuleActivationStatus()
     {
 
 		// NEEDS TO BE REPAIRED!
@@ -1852,14 +1678,14 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function startSession ()
+    private function startSession()
     {
         if (!isset($_SESSION)) session_start();
     }
 
 
 
-    private function setTimeZone ()
+    private function setTimeZone()
     {
         date_default_timezone_set($this->generalSettings['serverTimeZone']);
     }
@@ -1876,7 +1702,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setNames ()
+    private function setNames()
     {
         $this->appName = $this->generalSettings['app']['pathName'];
 
@@ -1933,7 +1759,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setSmartySettings ()
+    private function setSmartySettings()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
 
@@ -1969,7 +1795,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setRequestData ()
+    private function setRequestData()
     {
         $this->requestData = false;
 
@@ -2018,7 +1844,7 @@ class Controller extends BaseClass
 
 
 
-    private function doLanguageChange ($unsetRequestVar = true)
+    private function doLanguageChange($unsetRequestVar = true)
     {
         if ($this->isMultiLingual)
 		{
@@ -2054,7 +1880,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function loadModels ()
+    private function loadModels()
     {
         if (isset($this->usedModelsBase) && isset($this->usedModels))
 		{
@@ -2114,7 +1940,7 @@ class Controller extends BaseClass
         }
     }
 
-    protected function extendUsedModels ()
+    protected function extendUsedModels()
     {
         if (isset($this->usedModelsExtended) && is_array($this->usedModelsExtended)) {
             $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
@@ -2130,7 +1956,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function loadHelpers ()
+    private function loadHelpers()
     {
         if (isset($this->usedHelpersBase) && isset($this->usedHelpers))
 		{
@@ -2171,18 +1997,16 @@ class Controller extends BaseClass
 
 
 
-    private function initLogging ()
+    private function initLogging()
     {
         $fn = $this->getAppName() ? $this->getAppName() : 'general';
-
         $this->helpers->LoggingHelper->setLogFile($this->generalSettings['directories']['log'] . '/' . $fn . '.log');
-
         $this->helpers->LoggingHelper->setLevel(0);
     }
 
 
 
-    private function setLanguages ()
+    private function setLanguages()
     {
         foreach ((array) $this->generalSettings['uiLanguages'] as $key => $val)
 		{
@@ -2207,7 +2031,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function makePathNames ($p)
+    public function makePathNames($p)
     {
         if ($p)
             return array(
@@ -2227,7 +2051,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setPaths ()
+    private function setPaths()
     {
         $p = $this->getCurrentProjectId();
 
@@ -2264,7 +2088,7 @@ class Controller extends BaseClass
 	 * @todo	take out hard reference to /media/
      * @access     private
      */
-    private function setUrls ()
+    private function setUrls()
     {
         $p = $this->getCurrentProjectId();
 
@@ -2284,8 +2108,10 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setLastVisitedPage ()
+    private function setLastVisitedPage()
     {
+		if (!isset($this->baseSession)) return;
+		
         if (!$this->excludeFromReferer)
 		{
             if (null!==$this->baseSession->getModuleSetting( 'referer_url' ))
@@ -2306,7 +2132,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function checkLastVisitedPage ()
+    private function checkLastVisitedPage()
     {
         if (
 			null!==$this->baseSession->getModuleSetting( 'referer_url' ) &&
@@ -2330,14 +2156,14 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setLoginStartPage ()
+    private function setLoginStartPage()
     {
         $_SESSION['admin']['login_start_page'] = $this->_fullPath;
     }
 
 
 
-    public function setSuppressProjectInBreadcrumbs ($state = true)
+    public function setSuppressProjectInBreadcrumbs($state = true)
     {
         $this->suppressProjectInBreadcrumbs = $state;
     }
@@ -2349,7 +2175,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setBreadcrumbs ()
+    private function setBreadcrumbs()
     {
         if (!isset($this->appName))
             return;
@@ -2431,49 +2257,20 @@ class Controller extends BaseClass
      * @access     private
      * @return    array    breadcrumb trail: array of crumbname => crumbpath
      */
-    private function getBreadcrumbs ()
+    private function getBreadcrumbs()
     {
         if (isset($this->breadcrumbs)) return $this->breadcrumbs;
     }
 
 
 
-    /**
-     * Checks whether a user is authorized to view/use a page within a project
-     *
-     * @return     boolean        authorized or not
-     * @access     private
-     */
-    private function isUserAuthorisedForProjectPage ()
-    {
-        $controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName());
-
-        // is no controller base name is set, we are in /admin/views/utilities/admin_index.php, which is the portal to the modules
-        if ($controllerBaseName == '')
-            return true;
-
-        if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName])) {
-
-            $d = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName];
-
-            foreach ((array) $d as $key => $val) {
-
-                if ($val == '*' || $val == $this->getViewName()) {
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Sets a random integer value for general use
      *
      * @access     private
      */
-    private function setRandomValue ()
+    private function setRandomValue()
     {
         $this->randomValue = mt_rand(99999, mt_getrandmax());
     }
@@ -2486,44 +2283,26 @@ class Controller extends BaseClass
      * @return integer    anything between 99999 and mt_getrandmax()
      * @access     private
      */
-    private function getRandomValue ()
+    private function getRandomValue()
     {
         return $this->randomValue;
     }
 
-    private function saveFormResubmitVal ()
+    private function saveFormResubmitVal()
     {
+		if (!isset($this->baseSession)) return;
+		
         if (!$this->noResubmitvalReset)
 			$this->baseSession->setModuleSetting( array('setting'=>'last_rnd','value'=>$this->rHasVal('rnd') ? $this->rGetVal('rnd') : null ) );
     }
 
-	private function getCurrentUserRole()
-	{
-
-		$pId = $this->getCurrentProjectId();
-
-		if (empty($pId))
-			return;
-
-		   $pru = $this->models->ProjectsRolesUsers->_get(
-			array(
-				'id' => array(
-					'project_id' => $pId,
-					'user_id' => $this->getCurrentUserId()
-				)
-			));
-
-		return $pru[0]['role_id'];
-
-	}
-
-    private function loadSmartyConfig ()
+    private function loadSmartyConfig()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
     }
 
 
-    private function checkWriteableDirectories ()
+    private function checkWriteableDirectories()
     {
         $paths = array(
             $this->_smartySettings['dir_compile'] => 'www/admin/templates/templates_c',
@@ -2572,7 +2351,7 @@ class Controller extends BaseClass
 		return $this->translator->translate($content);
 	}
 
-	public function smartyTranslate ($params, $content, &$smarty, &$repeat)
+	public function smartyTranslate($params, $content, &$smarty, &$repeat)
 	{
 		$c = $this->translator->translate($content);
 
@@ -2596,6 +2375,7 @@ class Controller extends BaseClass
 	 * e.g. the methods for ModuleSettingsReaderController are available in ModuleSettingsModel rather
 	 * than in its own model.
 	 */
+	// REFAC2015  doesn't seem to be used anywhere
 	protected function loadExternalModel ($model)
 	{
         if (file_exists(dirname(__FILE__) . "/../models/{$model}.php")) {
@@ -2638,4 +2418,17 @@ class Controller extends BaseClass
 		// Return raw output if result is no (valid) json
 		return !is_null($output) ? $output : $result;
 	}
+
+	protected function initUserRights()
+	{
+		$this->UserRights = new UserRights([
+			'model' => $this->models->Users, 
+			'userid' => $this->getCurrentUserId(),
+			'projectid' => $this->getCurrentProjectId(),
+			'controller' => $this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName()
+		]);
+	}
+
+
+
 }
