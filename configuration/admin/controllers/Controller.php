@@ -2,6 +2,7 @@
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+include_once ('UserRightsController.php');
 
 class Controller extends BaseClass
 {
