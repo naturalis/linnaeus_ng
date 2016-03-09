@@ -2,17 +2,14 @@
 
 /*
 
-	(view) ergens heen verplaatsen
-
-
 	logging!
 	
 	must hide sysadmin! (set "hidden" in set users)
 	webservice
 	user in multiple projects
-	free modules!
+
 	isCurrentUserSysAdmin!!!
-	log for REDESIGN RIGHTS
+	look project-wide for REDESIGN RIGHTS
 	
 	removeUserFromCurrentProject
 		needs deletiog of referenced rights etc
