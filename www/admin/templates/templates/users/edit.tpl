@@ -19,7 +19,7 @@ table tr th {
     {/if}
 
     
-    <form method="post" onsubmit="return checkform();">
+    <form id="theForm" method="post" onsubmit="return submitUserEditForm();">
     <input id="id" name="id" value="{$user.id}" type="hidden" />
     <input type="hidden" name="action" id="action" value="save"  />
     <input type="hidden" name="rnd" value="{$rnd}" />
@@ -58,13 +58,21 @@ table tr th {
         </tr>
 
         <tr>
-            <th>{t}Role:{/t}</th>
+            <th>{t}Project role:{/t}</th>
             <td>
             	<select id="roles" name="role_id">
                 {foreach $roles v}
                 <option value="{$v.id}"{if $v.id==$user.project_role.role_id} selected="selected"{/if}>{$v.role}</option>
                 {/foreach}
                 </select>
+            </td>
+        </tr>
+
+        <tr>
+            <th>{t}Can publish:{/t}</th>
+            <td>
+            	<label><input type="radio" value="1" name="can_publish" {if $user.can_publish} checked="checked"{/if} />{t}yes{/t}</label>
+            	<label><input type="radio" value="0" name="can_publish" {if !$user.can_publish} checked="checked"{/if} />{t}no{/t}</label>
             </td>
         </tr>
 
@@ -75,29 +83,24 @@ table tr th {
 				{include file="_module_access.tpl"}
             </td>
         </tr>
+        <tr>
+            <th>{t}Taxa:{/t}</th>
+            <td>
+				{include file="_taxon_access.tpl"}
+            </td>
+        </tr>
 	    {/if}
 
     </table>
     
     <p>
-		<input type="submit" value="save" />
+		<input type="submit" value="save" /> &nbsp;&nbsp; <input type="button" value="delete user" onclick="deleteUser();" />
     </p>
-
 
     </form>
     
-    
-    item_access
-        <tr>
-            <th>{t}Project role:{/t}</th>
-            <td>{$user.project_role.role}</td>
-        </tr>
-
     <p>
-        <a href="view.php?id={$user.id}">{t}back{/t}</a>
-    </p>
-    <p>
-        <a href="index.php">{t}index{/t}</a>
+        <a href="view.php?id={$user.id}">{t}back{/t}</a> | <a href="index.php">{t}index{/t}</a>
     </p>
 
 </div>
@@ -108,54 +111,17 @@ table tr th {
 $(document).ready(function()
 {
 	$('#username').focus();
-});
-
-function checkform()
-{
-	var msg=Array();
-
-	if ( $('#id').val().length==0 )
-	{
-		if ( $('#password').val().length==0 && $('#password_repeat').val().length==0 )
-		{
-			msg.push('{t}A password is required.{/t}');
-		}
-	}
-
-	if ( $('#username').val().trim().length==0 )
-	{
-		msg.push('{t}A username is required.{/t}');
-	}
-
-	if ( $('#first_name').val().trim().length==0 )
-	{
-		msg.push('{t}First name is required.{/t}');
-	}
-
-	if ( $('#last_name').val().trim().length==0 )
-	{
-		msg.push('{t}Last name is required.{/t}');
-	}
-
-	if ( $('#email_address').val().trim().length==0 )
-	{
-		msg.push('{t}Email address is required.{/t}');
-	}
-
-	if ( $('#password').val() != $('#password_repeat').val() )
-	{
-		msg.push('{t}Passwords not the same.{/t}');
-	}
 	
-	if ( msg.length>0 ) 
+	$('#roles').on('change',function()
 	{
-		alert( msg.join('\n') );
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
+		$('[name=can_publish]').prop('disabled',($('#roles :selected').val() < {$expert_role_id} ));
+	});
+	
+	$('#roles').trigger('change');
+	
+	$('#page-block-messages').fadeOut(3000);
+	
+});
 </script>
+
+{include file="../shared/admin-footer.tpl"}

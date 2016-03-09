@@ -50,7 +50,6 @@ class Controller extends BaseClass
 	private $usedModelsBase = array(
 		'activity_log',
 		'free_modules_projects',
-		'free_modules_projects_users',
 		'interface_texts',
 		'interface_translations',
 		'labels_projects_ranks',
@@ -58,7 +57,6 @@ class Controller extends BaseClass
 		'languages_projects',
 		'modules',
 		'modules_projects',
-		'modules_projects_users',
 		'projects',
 		'projects_ranks',
 		'projects_roles_users',

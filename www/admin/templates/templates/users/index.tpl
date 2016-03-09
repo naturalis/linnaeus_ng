@@ -39,6 +39,9 @@ h4.inlineHeader {
 table.collaborators th {
 	color:#666;
 }
+table.collaborators th {
+	text-align:left;
+}
 </style>
 
 <div id="page-main">

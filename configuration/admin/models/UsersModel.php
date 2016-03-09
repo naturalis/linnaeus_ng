@@ -30,8 +30,7 @@ final class UsersModel extends AbstractModel
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
-		if( !isset( $project_id ) )
-			return;
+		if( is_null($project_id) ) return;
 		
 		$query="
 				select
@@ -55,8 +54,7 @@ final class UsersModel extends AbstractModel
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
-		if( !isset( $project_id ) )
-			return;
+		if( is_null($project_id) ) return;
 		
 		$query="
 				select
@@ -79,14 +77,12 @@ final class UsersModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 	
-	public function getUserProjectRole ($params)
+	public function getUserProjectRole( $params )
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
         $user_id = isset($params['user_id']) ? $params['user_id'] : null;
 
-        if (is_null($project_id) || is_null($user_id)) {
-			return null;
-		}
+        if (is_null($project_id) || is_null($user_id)) return;
 
 		$query = "
 		    select
@@ -110,6 +106,69 @@ final class UsersModel extends AbstractModel
         $d = $this->freeQuery( $query );
 		
 		if ( $d ) return $d[0];
+	}
+
+	public function getUserModuleAccess( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
+        $user_id = isset($params['user_id']) ? $params['user_id'] : null;
+
+        if (is_null($project_id) || is_null($user_id)) return;
+
+		$query = "
+			select
+				_a.module_id,
+				if(_a.module_type='standard',_b.module,_c.module) as module,
+				_a.module_type,
+				_a.can_read,
+				_a.can_write,
+				_a.can_publish
+			from 
+				%PRE%user_module_access _a
+			
+			left join %PRE%modules _b
+				on _a.module_id=_b.id
+				and _a.module_type='standard'
+
+			left join %PRE%free_modules_projects _c
+				on _a.module_id=_c.id
+				and _a.module_type='custom'
+
+			where
+				_a.project_id = " . $project_id."
+				and _a.user_id = " . $user_id;
+
+		return $this->freeQuery( $query );
+	}
+
+	public function getUserItemAccess( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
+        $user_id = isset($params['user_id']) ? $params['user_id'] : null;
+
+        if (is_null($project_id) || is_null($user_id))
+			return null;
+
+		$query = "
+			select
+				_a.id,
+				_a.item_type,
+				_b.taxon,
+				_b.rank_id,
+				_b.id as taxon_id
+
+			from 
+				%PRE%user_item_access _a
+
+			left join %PRE%taxa _b
+				on _a.item_id = _b.id
+				and _a.item_type = 'taxon'
+			
+			where
+				_a.project_id = " . $project_id."
+				and _a.user_id = " . $user_id;
+
+		return $this->freeQuery( $query );
 	}
 
 }

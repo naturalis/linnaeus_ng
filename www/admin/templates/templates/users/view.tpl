@@ -34,23 +34,47 @@ table tr th {
 		<td>{if $user.active=='1'}y{else}n{/if}</td>
 	</tr>
 	<tr>
-		<th>{t}Project role:{/t}</th>
-		<td>{$user.project_role.role}</td>
-	</tr>
-	<tr>
 		<th>{t}Last login:{/t}</th>
 		<td>{$user.last_login}</td>
 	</tr>
+	<tr>
+		<th>{t}Project role:{/t}</th>
+		<td>{$user.project_role.role}</td>
+	</tr>
+    <tr>
+        <th>{t}Can publish:{/t}</th>
+        <td>
+        	{if $user.can_publish==1}{t}yes{/t}{else}{t}no{/t}{/if}
+        </td>
+    </tr>
+    <tr>
+        <th>{t}Modules:{/t}</th>
+        <td>
+            <table style="border-collapse:collapse">
+            {foreach $user.module_access  v}
+                <tr>
+                    <td>
+                        {$v.module} ({if $v.can_read}read{/if}{if $v.can_read && $v.can_write}/{/if}{if $v.can_write}write{/if})
+                    </td>
+                </tr>
+            {/foreach}
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <th>{t}Taxa:{/t}</th>
+        <td>
+            {foreach $user.item_access v}
+            {$v.taxon}<br />
+            {/foreach}
+        </td>
+    </tr>
+
+
 </table>
 
-module_access
-item_access
-
 <p>
-	<a href="edit.php?id={$user.id}">{t}edit{/t}</a>
-</p>
-<p>
-	<a href="index.php">{t}back{/t}</a>
+	<a href="edit.php?id={$user.id}">{t}edit{/t}</a> | <a href="index.php">{t}index{/t}</a>
 </p>
 
 </div>
