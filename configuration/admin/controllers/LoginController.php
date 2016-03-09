@@ -1,7 +1,6 @@
 <?php
 
 include_once ('Controller.php');
-include_once ('UserRightsController.php');
 
 class LoginController extends Controller
 {
@@ -13,23 +12,12 @@ class LoginController extends Controller
 	private $UserRights;
 	private $_user;
 
-	
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct ()
     {
         parent::__construct();
 		$this->initialize();
     }
 
-    /**
-     * Destroys!
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
         parent::__destruct();
@@ -37,12 +25,10 @@ class LoginController extends Controller
 	
 	private function initialize()
 	{
-		$this->UserRights = new UserRights;
 	}
 
     public function loginAction ()
     {
-        // user previously set remember me: auto-login
         $user=$this->getRememberedUser();
 
 		if ( $user && $user['active']==1 )
@@ -103,43 +89,19 @@ class LoginController extends Controller
 		return $startpage;
     }
 
-
-
-    /**
-     * Logging out
-     *
-     * @access    public
-     */
     public function logoutAction ()
     {
         $this->setPageName($this->translate('Logout'));
-
         $this->destroyUserSession();
-
         $this->unsetRememberMeCookie();
-
         $this->redirect('login.php');
     }
 
-
-
-    /**
-     * Destroys a user's session (when logging out)
-     *
-     * @access     public
-     */
     private function destroyUserSession ()
     {
 		unset($_SESSION['admin']);
         session_destroy();
     }
-
-
-
-
-
-
-
 
     private function setUser( $user )
     {
@@ -258,9 +220,12 @@ class LoginController extends Controller
             )
         );
 
-		$this->UserRights->setUserId( $user['id'] );
-		$cur = $this->UserRights->getUserRights();
-		
+
+        $this->initUserSession( array('user'=>$user) );
+
+
+
+		/*
         // save all relevant data to the session
         $this->initUserSession(array(
 			'user'=>$user, 
@@ -268,6 +233,7 @@ class LoginController extends Controller
 			'rights'=>$cur['rights'], 
 			'number_of_projects'=>$cur['number_of_projects']
 		));
+		*/
 
         // determine and set the default active project
         //$this->setDefaultProject();
@@ -280,7 +246,6 @@ class LoginController extends Controller
 	{
 		$remember=isset($p['remember']) ? $p['remember'] : null;
 
-        // set 'remember me' cookie
         if ( $remember )
 		{
             $this->setRememberMeCookie();
@@ -294,9 +259,9 @@ class LoginController extends Controller
     private function initUserSession( $p )
     {
 		$user=isset($p['user']) ? $p['user'] : null;
-		$roles=isset($p['roles']) ? $p['roles'] : null;
-		$rights=isset($p['rights']) ? $p['rights'] : null;
-		$number_of_projects=isset($p['number_of_projects']) ? $p['number_of_projects'] : null;
+//		$roles=isset($p['roles']) ? $p['roles'] : null;
+//		$rights=isset($p['rights']) ? $p['rights'] : null;
+//		$number_of_projects=isset($p['number_of_projects']) ? $p['number_of_projects'] : null;
 		
         if (!$user) return;
 
@@ -304,89 +269,6 @@ class LoginController extends Controller
         $_SESSION['admin']['user']['_login']['time'] = time();
         $_SESSION['admin']['user']['_said_welcome'] = false;
         $_SESSION['admin']['user']['_logged_in'] = true;
-
-//		$this->setUserSessionRights($rights);
-//		$this->setUserSessionRoles($roles);
-//		$this->setUserSessionNumberOfProjects($number_of_projects);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    public function setUserSessionRights($rights)
-    {
-        $_SESSION['admin']['user']['_rights'] = $rights;
-    }
-
-
-    public function setUserSessionRoles($roles)
-    {
-        $_SESSION['admin']['user']['_roles'] = $roles;
-    }
-
-    public function setUserSessionNumberOfProjects($numberOfProjects)
-    {
-        $_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
-    }
-
-*/
-
-    public function setCurrentUserRoleId()
-    {
-        if (!isset($_SESSION['admin']['user']['_roles']))
-		{
-            $_SESSION['admin']['user']['currentRole'] = null;
-        }
-        else
-		{
-            $d = $this->getCurrentProjectId();
-
-            if (is_null($d))
-			{
-                $_SESSION['admin']['user']['currentRole'] = null;
-            }
-            else
-			{
-                foreach ((array) $_SESSION['admin']['user']['_roles'] as $val)
-				{
-                    if ($val['project_id'] == $d)
-                        $_SESSION['admin']['user']['currentRole'] = $val["role_id"];
-                }
-            }
-        }
-    }
-
 
 }
