@@ -17,106 +17,66 @@ class UserRights extends Controller
 		return $this->_userid;
     }
 
-    public function getUserRights()
-    {
 
+	public function isAuthorized()
+	{
+		$proj=$this->getCurrentProjectId();
+		$user=$this->getCurrentUserId();
 
-
-
-
-
-
-
-		return;
-
-        $pru = $this->models->ProjectsRolesUsers->_get(
-        array(
-            'id' => array(
-                'user_id' => $id ? $id : $this->getCurrentUserId()
-            ),
-            'columns' => 'project_id,role_id,active,\'1\' as member',
-            'fieldAsIndex' => 'project_id'
-        ));
-
-
-        if ($this->isCurrentUserSysAdmin())
-		{
-            $p = $this->models->Projects->_get(array(
-                'id' => '*'
-            ));
-
-            foreach ((array) $p as $val)
-			{
-                if (!isset($pru[$val['id']]))
-				{
-                    $pru[$val['id']] = array(
-                        'project_id' => $val['id'],
-                        'role_id' => (string) ID_ROLE_SYS_ADMIN,
-                        'active' => (string) 1,
-                        'member' => 0
-                    );
-                }
-            }
-        }
-
-        foreach ((array) $pru as $key => $val)
-		{
-            $p = $this->models->Projects->_get(array(
-                'id' => $val['project_id']
-            ));
-
-            // $val['project_id']==0 is the stub for all round system admin
-            if ($p || $val['project_id'] == 0)
-			{
-                $r = $this->models->Roles->_get(array(
-                    'id' => $val['role_id']
-                ));
-
-                if ($r) {
-
-                    $userProjectRoles[] = array_merge($val,
-                    array(
-                        'project_name' => $p['sys_name'],
-                        'project_title' => $p['title'],
-                        'role_name' => $r['role'],
-                        'role_description' => $r['description']
-                    ));
-
-                    foreach ((array) $rr as $rr_key => $rr_val)
-					{
-                        $r = $this->models->Rights->_get(array(
-                            'id' => $rr_val['right_id']
-                        ));
-
-                        $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-                    }
-
-                    $projectCount[$val['project_id']] = $val['project_id'];
-                }
-            }
-        }
-
-
-        $fmpu = $this->models->FreeModulesProjectsUsers->_get(array(
-            'id' => array(
-                'user_id' => $id ? $id : $this->getCurrentUserId()
-            )
-        ));
-
-        foreach ((array) $fmpu as $key => $val)
-		{
-            $rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
-        }
-
-        $d = $this->getCurrentProjectId();
-
-        return array(
-            'roles' => isset($userProjectRoles) ? $userProjectRoles : null,
-            'rights' => isset($rs) ? $rs : null,
-            'number_of_projects' => isset($projectCount) ? count((array) $projectCount) : 0
-        );
-    		
+		$role
+		$modu
+		$item
+		$acti
 		
-    }
+		if ( !project_id ) return true;
+		if ( project_id && ( !user_id || !isLoggedIn(user_id) ) ) return false;
+		if ( !module_id ) return true;
+		if ( module_id && !hasModule(project_id,module_id) ) return false;
+	
+		if ( canAccessAllModules(role_id) ) return true;
+		if ( !canAccessModule(project_id,module_id,user_id) ) return false;
+		if ( !canUserPerformAction(project_id, module_id, user_id, item_id, item_id) ) return false;
+
+		return true;
+}
+
+
+
+/*
+
+Maarten:
+Logic:
+
+user logged in? y → user_id
+select a project (project_id, user_id) → project_id, role_id
+available modules per project (project_id, module_id) → (print list)
+access module (project_id, module_id, user_id) → ControllerBaseName
+
+within a module:
+
+access item (action R) (project_id, module_id, user_id) → (display item)
+access item (action CUD) (project_id, module_id, user_id, item_id) → (add, alter, remove item; R implicit)
+
+function in pseudo code:
+
+public boolean function isAuthorized( project_id, user_id, role_id, module_id, item_id, action )
+{
+    if ( !project_id ) return true;
+    if ( project_id && ( !user_id || !isLoggedIn(user_id) ) ) return false;
+    if ( !module_id ) return true;
+    if ( module_id && !hasModule(project_id,module_id) ) return false;
+
+    if ( canAccessAllModules(role_id) ) return true;
+    if ( !canAccessModule(project_id,module_id,user_id) ) return false;
+    if ( !canUserPerformAction(project_id, module_id, user_id, item_id, item_id) )
+return false;
+
+return true;
+}
+
+
+*/
+
+
 
 }
