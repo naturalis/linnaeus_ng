@@ -104,6 +104,10 @@
 		titles--0024.html
 	and if that doesn't exist, for
 		titles.html
+	if none of these exist, the system will subsequently look if the non-language
+	specific or the language specific file (in that order) exists in the general snippets
+	folder:
+		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/
 	please note the files are included "as is", and are not run through any server-side
 	interperter; therefore php or smarty-codes won't work. javascript will, however, so
 	it can be used for google analytics-codes, which can be different per project.
@@ -1597,6 +1601,7 @@ class Controller extends BaseClass
     public function setUrls ()
     {
         $_SESSION['app']['system']['urls']['systemMedia'] = $this->baseUrl . $this->getAppName() . '/media/system/skins/' . $this->getSkinName() . '/';
+        $_SESSION['app']['system']['urls']['snippets'] = $this->baseUrl . 'app/media/project/_snippets/' ;
 
         $p = $this->getCurrentProjectId();
 
@@ -1614,6 +1619,7 @@ class Controller extends BaseClass
         }
 
         $u['uploadedMediaThumbs'] = $u['uploadedMedia'] . 'thumbs/';
+        $u['cache'] = $this->baseUrl . 'shared/cache/' . $pCode . '/';
 
         // urls of the directory containing project specific media part of the interface, but not of the content (background etc)
         $u['projectMedia'] = $this->baseUrl . 'shared/media/project/' . $pCode . '/';
@@ -1642,7 +1648,7 @@ class Controller extends BaseClass
             $u['projectCSS'] = $u['cssRootDir'] . 'default/' . $this->getSkinName() . '/';
         }
 
-        $u['projectSnippets'] =  $this->baseUrl . 'app/media/project/_snippets/' . $pCode . '/';
+        $u['projectSnippets'] =  $_SESSION['app']['system']['urls']['snippets'] . $pCode . '/';
 
 
         // home
