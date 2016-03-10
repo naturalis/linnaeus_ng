@@ -75,14 +75,15 @@ class LoginController extends Controller
 		{
 			$startpage = $this->baseUrl . $this->getAppName();
 
-			if (isset($_SESSION['admin']['user']) && $_SESSION['admin']['user']['_number_of_projects']==1)
-			{
-				$startpage.=$this->generalSettings['paths']['projectIndex'];
-			}
-			else
+//			if (isset($_SESSION['admin']['user']) && $_SESSION['admin']['user']['_number_of_projects']==1)
+//			{
+//				$startpage.=$this->generalSettings['paths']['projectIndex'];
+//			}
+//			else
 			{
 				$startpage.=$this->generalSettings['paths']['chooseProject'];
 			}
+
         }
 
 		return $startpage;
