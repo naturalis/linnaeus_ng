@@ -8,8 +8,9 @@ if (file_exists(dirname(__FILE__) . "/constants.php"))
 
 class BaseClass
 {
-    
+
     public $config;
+    public $customConfig;
     public $generalSettings;
 
     public function __construct ()
@@ -42,6 +43,11 @@ class BaseClass
             	default-config.php can be adapted.'));
         
         }
+
+        if (class_exists('customConfiguration'))
+		{
+            $this->customConfig=new customConfiguration();
+        }    
     
     }
 
