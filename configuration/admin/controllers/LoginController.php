@@ -9,7 +9,6 @@ class LoginController extends Controller
         'password_encoder',
     );
 	
-	private $UserRights;
 	private $_user;
 
     public function __construct ()
