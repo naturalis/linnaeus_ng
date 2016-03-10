@@ -1,6 +1,21 @@
 <style></style>
 
 <div id="page-main">
+	<h3>{t}Upload media{/t}
+	{if $module_name != '' && $item_name != ''}
+		 {t}for{/t} {$item_name} {t}in{/t} {$module_name}</h3>
+		 <p><a href="{$back_url}">back to {$item_name}</a></p>
+	{else}
+		</h3>
+	{/if}
+
+	{if $uploaded|@count > 0}
+	<p>The following files were uploaded successfully:<ul>
+	{foreach from=$uploaded item=v}
+		<li style="color: green;">{$v}</li>
+	{/foreach}
+	</ul></p>
+	{/if}
 
 	<p>Text about file mime types and size. If you upload multiple files, the metadata
 		provided will be used for all uploaded files.</p>
@@ -18,13 +33,6 @@
 	    Maximum total batch size: {$post_max_size}
     </p>
 
-	{if $uploaded|@count > 0}
-	<p>The following files were uploaded successfully:<ul>
-	{foreach from=$uploaded item=v}
-		<li style="color: green;">{$v}</li>
-	{/foreach}
-	</ul></p>
-	{/if}
 
 	<div id="progress">
 	    <div class="bar" style="width: 0%;"></div>
@@ -36,6 +44,7 @@
 	<input type="hidden" name="{$session_upload_progress_name}" value="media" />
 	<input type="hidden" name="module_id" value="{$module_id}" />
 	<input type="hidden" name="item_id" value="{$item_id}" />
+    <input type="hidden" name="back_url" value="{$back_url}" />
 
 
 	<table>

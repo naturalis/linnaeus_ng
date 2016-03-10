@@ -1,13 +1,8 @@
 <style></style>
 
 <div id="page-main">
-	<h3>{t}Attach media{/t}
-	{if $module_name != '' && $item_name != ''}
-		 {t}to{/t} {$item_name} {t}in{/t} {$module_name}</h3>
-		 <p><a href="{$back_url}">back to {$item_name}</a></p>
-	{else}
-		</h3>
-	{/if}
+	<h3>{t}Browse media on ResourceSpace server{/t}</h3>
+	<p>Info about credentials to log in?</p>
 
     {if $media.total > 0}
     <div class="buttons">
@@ -18,11 +13,10 @@
 
 	<form id="mediaForm" method="post">
     <input type="hidden" name="module_id" value="{$module_id}" />
-    <input type="hidden" name="back_url" value="{$back_url}" />
     <input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" id="action" name="action" value="edit" />
 
-    <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.
+    <p>{t}A total of{/t} {$media.total} {t}media item(s) is stored for this project{/t}.
 
     {if $media.total > 0}
 	    <ul class="list">
@@ -54,13 +48,6 @@
 	    {/foreach}
 	    </ul>
 		<div class="clear" />
-
-		{if $module_name != '' && $item_name != ''}
-			 <input type="submit" id="attach" value="{t}attach{/t}" />
-		{else}
-		    <input type="submit" id="edit" value="{t}edit{/t}" />
-		    <input type="submit" id="delete" value="{t}delete{/t}" />
-		{/if}
 
 	    </form>
 
@@ -94,7 +81,8 @@ $(document).ready(function() {
 	});
 
 	$('input:submit#attach').on('click',function() {
-		$('input[name=action]').val('attach');
+		$('#mediaForm').attr('action', 'edit.php?' +
+			$('#mediaForm input:checked').attr('id').replace('id_', 'id='));
 	});
 
 

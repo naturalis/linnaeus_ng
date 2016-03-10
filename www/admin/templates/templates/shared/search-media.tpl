@@ -22,6 +22,7 @@ input[type=text], textarea {
 	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input type="hidden" name="module_id" value="{$module_id}" />
 	<input type="hidden" name="item_id" value="{$item_id}" />
+    <input type="hidden" name="back_url" value="{$back_url}" />
 
 	<h3>{$name}</h3>
 	<p><img src="{$source}" alt="{$name}" /></p>
