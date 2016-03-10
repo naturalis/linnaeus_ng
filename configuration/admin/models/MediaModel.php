@@ -80,6 +80,39 @@ final class MediaModel extends AbstractModel
         }
         return isset($a) ? ' and ' . implode(' and ', $a) : null;
     }
+
+
+    public function getItemMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+        $moduleId = isset($p['module_id']) && !empty($p['module_id']) ?
+            $p['module_id'] : false;
+        $itemId = isset($p['item_id']) && !empty($p['item_id']) ?
+            $p['item_id'] : false;
+
+        $query = "
+            select
+                t1.id,
+                t2.sort_order,
+                t2.overview_image
+            from media as t1
+            left join
+                media_modules as t2 on t1.id = t2.media_id
+            where
+                t2.module_id = " . $this->escapeString($moduleId) . " and
+                t2.item_id = " . $this->escapeString($itemId) . " and
+                t2.project_id = " . $this->escapeString($projectId) . " and
+                t1.deleted = 0
+            order by
+                t2.sort_order,
+                t1.name";
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+
+    }
 }
 
 ?>

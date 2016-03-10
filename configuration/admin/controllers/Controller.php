@@ -8,7 +8,7 @@ class Controller extends BaseClass
 {
 	private $_smartySettings;
 	private $_viewName;
-	private $_fullPath;	
+	private $_fullPath;
 	private $_fullPathRelative;
 	private $_prevTreeId = null;
 	private $_breadcrumbRootName = null;
@@ -2111,7 +2111,7 @@ class Controller extends BaseClass
     private function setLastVisitedPage()
     {
 		if (!isset($this->baseSession)) return;
-		
+
         if (!$this->excludeFromReferer)
 		{
             if (null!==$this->baseSession->getModuleSetting( 'referer_url' ))
@@ -2291,7 +2291,7 @@ class Controller extends BaseClass
     private function saveFormResubmitVal()
     {
 		if (!isset($this->baseSession)) return;
-		
+
         if (!$this->noResubmitvalReset)
 			$this->baseSession->setModuleSetting( array('setting'=>'last_rnd','value'=>$this->rHasVal('rnd') ? $this->rGetVal('rnd') : null ) );
     }
@@ -2422,12 +2422,35 @@ class Controller extends BaseClass
 	protected function initUserRights()
 	{
 		$this->UserRights = new UserRights([
-			'model' => $this->models->Users, 
+			'model' => $this->models->Users,
 			'userid' => $this->getCurrentUserId(),
 			'projectid' => $this->getCurrentProjectId(),
 			'controller' => $this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName()
 		]);
 	}
+
+    public function arrayHasData ($p = array())
+    {
+        foreach ($p as $k => $v) {
+            if (is_array($v)) {
+                $this->arrayHasData($v);
+            }
+            if ($v != '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function getCurrentModuleId ()
+    {
+		$d = $this->models->Modules->_get(array(
+            "id" => array("controller"=>$this->getControllerBaseName())
+		));
+
+		return $d ? $d[0]['id'] : false;
+    }
+
 
 
 
