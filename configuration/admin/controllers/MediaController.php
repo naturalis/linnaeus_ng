@@ -28,7 +28,6 @@ class MediaController extends Controller
     private $_result;
     private $_files;
     private $_uploaded;
-    private $_rsIds;
 
     private $moduleId;
     private $itemId;
@@ -208,16 +207,19 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
         $this->resetMediaController();
+        $this->setItemTemplate();
 
         if ($this->rHasVal('action', 'delete')) {
             $this->deleteMedia();
         }
 
-        //die(print_r($this->getMediaList()));
+        if ($this->rHasVal('action', 'attach')) {
+            $this->attachMedia();
+        }
 
-        // global get module id?
-        //$this->smarty->assign('module_id', $this->getCurrentModuleId());
         $this->smarty->assign('media', $this->getMediaList());
+        $this->smarty->assign('module_id', $this->rGetVal('module_id'));
+        $this->smarty->assign('item_id', $this->rGetVal('item_id'));
 
         $this->printPage();
     }
@@ -238,11 +240,6 @@ class MediaController extends Controller
             $result = $this->getMediaList(array('search' => $search));
             $this->smarty->assign('media', $result);
         }
-
-        //die(print_r($this->getMediaList()));
-
-        // global get module id?
-        //$this->smarty->assign('module_id', $this->getCurrentModuleId());
 
 		$this->smarty->assign('metadata', $search['metadata']);
 		$this->smarty->assign('tags', $this->rGetVal('tags'));
@@ -284,19 +281,7 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
         $this->resetMediaController();
-
-        // Verify module_id and item_id if set
-        if ($this->rHasVal('module_id') && $this->rHasVal('item_id')) {
-
-            $mi = new ModuleIdentifierController();
-            $mi->setModuleId($this->moduleId);
-            $mi->setItemId($this->itemId);
-
-            $this->smarty->assign('module_name', $mi->getModuleName());
-            $this->smarty->assign('item_name', $mi->getItemName());
-            $this->smarty->assign('back_url',
-                $this->rHasVal('back_url') ? $this->rGetVal('back_url') : $_SERVER['HTTP_REFERER']);
-        }
+        $this->setItemTemplate();
 
         // Only upload if upload button has been pushed!
         if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()
@@ -387,6 +372,22 @@ class MediaController extends Controller
 		$this->printPage();
     }
 
+    private function setItemTemplate ()
+    {
+        // Verify module_id and item_id if set
+        if ($this->rHasVal('module_id') && $this->rHasVal('item_id')) {
+
+            $mi = new ModuleIdentifierController();
+            $mi->setModuleId($this->moduleId);
+            $mi->setItemId($this->itemId);
+
+            $this->smarty->assign('module_name', $mi->getModuleName());
+            $this->smarty->assign('item_name', $mi->getItemName());
+            $this->smarty->assign('back_url',
+                $this->rHasVal('back_url') ? $this->rGetVal('back_url') : $_SERVER['HTTP_REFERER']);
+        }
+    }
+
     public function setSortOrder ($p)
     {
         $mediaId = isset($p['media_id']) ? $p['media_id'] : false;
@@ -427,16 +428,42 @@ class MediaController extends Controller
 
     private function deleteMedia ()
     {
-        $this->setPostedRsIds();
-        if ($this->_rsIds) {
-            foreach ($this->_rsIds as $id) {
-                $this->models->Media->update(
-        			array('deleted' => 1),
-        			array('rs_id' => $id, 'project_id' => $this->getCurrentProjectId())
-        		);
-            }
-            $this->addMessage(sprintf(_('Deleted %s files.'), count($this->_rsIds)));
+        if (empty($this->rGetVal('media_ids'))) {
+            return false;
         }
+
+        $mediaIds = $this->rGetVal('media_ids');
+
+        foreach ($mediaIds as $k => $v) {
+            $this->models->Media->update(
+    			array('deleted' => 1),
+    			array('id' => $k, 'project_id' => $this->getCurrentProjectId())
+    		);
+        }
+
+        $this->addMessage(sprintf(_('Deleted %s file(s).'), count($mediaIds)));
+    }
+
+    private function attachMedia ()
+    {
+        if (empty($this->rGetVal('media_ids'))) {
+            return false;
+        }
+
+        $mediaIds = $this->rGetVal('media_ids');
+
+        foreach ($mediaIds as $k => $v) {
+            $this->models->MediaModules->insert(array(
+                'id' => null,
+                'project_id' => $this->getCurrentProjectId(),
+                'media_id' => $k,
+                'module_id' => $this->moduleId,
+                'item_id' => $this->itemId
+            ));
+        }
+
+        $this->addMessage(sprintf(_('Attached %s file(s).'), count($mediaIds)));
+
     }
 
     public function deleteItemMedia ($mediaId = false)
@@ -545,33 +572,24 @@ class MediaController extends Controller
         $search = isset($p['search']) ? $p['search'] : false; // empty to return everything
         $sort = isset($p['sort']) ? $p['sort'] : false; // asc (default)/desc
 
-        // Get media for specific item
-        if ($moduleId && $itemId) {
-            $media = $this->models->Media->_get(array(
-    			'id' => array(
-    				'project_id' => $this->getCurrentProjectId(),
-    			    'deleted' => 0
-    			)
-    		));
         // Search
-        } else if (!empty($search)) {
+        if (!empty($search)) {
             $media = $this->models->MediaModel->search(array(
                 'search' => $search,
                 'sort' => $sort,
                 'project_id' => $this->getCurrentProjectId()
             ));
-        // Return everything
+        // Return everything for item or general
         } else {
             $media = $this->models->Media->_get(array(
     			'id' => array(
     				'project_id' => $this->getCurrentProjectId(),
     			    'deleted' => 0
-    			)
+    			),
+                'order' => 'name'
     		));
-
         }
 
-        $attached = array();
         if (!empty($this->moduleId) && !empty($this->itemId)) {
             $attached = $this->models->MediaModules->getSingleColumn(array(
                 'columns' => 'media_id',
@@ -610,7 +628,8 @@ class MediaController extends Controller
                 }
 
                 // add flag if image is already attached to entity
-                $image['attached'] = in_array($resource['id'], $attached) ? 1 : 0;
+                $image['attached'] = isset($attached) && is_array($attached) &&
+                    in_array($resource['id'], $attached) ? 1 : 0;
 
                 $list['images'][$i] = $image;
             }
@@ -974,14 +993,5 @@ class MediaController extends Controller
         return $d;
     }
 
-
-    private function setPostedRsIds ()
-    {
-        foreach ($this->requestData as $k => $v) {
-            if (strpos($k, 'rs_id_') === 0 && $v == 'on') {
-                $this->_rsIds[] = substr($k, 6);
-             }
-        }
-    }
 
 }

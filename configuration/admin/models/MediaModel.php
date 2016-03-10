@@ -31,7 +31,7 @@ final class MediaModel extends AbstractModel
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;
         $sort = isset($p['sort']) && !empty($p['sort']) ?
-            $p['sort'] : false;
+            $p['sort'] : 'name';
 
         if (!isset($search['metadata']) && !isset($search['tags']) &&
             !isset($search['file_name']) || !$projectId) {

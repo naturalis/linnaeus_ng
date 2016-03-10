@@ -27,7 +27,7 @@ textarea {
 <div id="page-main">
     <p>
         <a href="../media/upload.php?item_id={$taxon.id}&amp;module_id={$module_id}">{t}upload media{/t}</a><br />
-        <a href="taxon.php?id={$taxon.id}">{t}main page{/t}</a>
+        <a href="../media/select.php?item_id={$taxon.id}&amp;module_id={$module_id}">{t}attach media{/t}</a><br />
     </p>
 
 	<form id="theForm" method="post">
@@ -35,7 +35,9 @@ textarea {
     <input type="hidden" id="action" name="action" value="save" />
     <input type="hidden" id="subject" name="subject" value="" />
 
-    {if $languages|@count>1}
+	{assign var=total value=$media|@count-1}
+
+    {if $languages|@count>1 && $total > 0}
     <p>
     See captions in:
     <select id="language_id" name="language_id" onchange="$('#action').val('language_change');$('#theForm').submit();">
@@ -53,9 +55,7 @@ textarea {
 
 
 
-	{assign var=total value=$media|@count-1}
     {foreach from=$media key=key item=v}
-
         <p>
             <table>
                 <tr>
