@@ -1,14 +1,8 @@
 </div>
 <div class="footerContainer">
 	<div id="footer">
-		<div id="footerInfo">
-			<span class="copyright">© Naturalis en partners</span>
-			<a href="admin/views/users/login.php" class="adminLink">
-                <span class="powered">Powered by</span>
-                <img src="{$session.app.system.urls.systemMedia}lng.png" id="lng-logo">
-                <span class="linnaeus">Linnaeus NG</span>
-            </a>
-		</div>
+        <span class="copyright"><a href="https://science.naturalis.nl/en/ict/products/linnaeus-ng/">Powered by Naturalis Biodiversity Center & Linnaeus NG</a>
+        </span>
 	</div>
 </div>
 
