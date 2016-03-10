@@ -1916,12 +1916,13 @@ class Controller extends BaseClass
             $this->models->$t = new $t;
         }
 
-		// Load controller-specific model by override
+        // Load controller-specific model by override
 		if ( isset($this->modelNameOverride) )
 		{
-			if (file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
+			if (!isset($this->models->{$this->modelNameOverride}) &&
+                file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
 			{
-				require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
+			    require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
 				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
 			}
 		}
@@ -1938,6 +1939,7 @@ class Controller extends BaseClass
                  $this->models->$t->setLogger($this->helpers->LoggingHelper);
             }
         }
+
     }
 
     protected function extendUsedModels()
