@@ -103,7 +103,7 @@
 	there is the concept of the snippet. snippets are bit of html-code that are included
 	in template if they exist for the current project. they are included like this:
 		{snippet}matrix_main_menu.html{/snippet}
-	after which the function smartyTranslateGetSnippet searches for the specified file
+	after which the function smartyGetSnippet searches for the specified file
 	in the projects snippet-folder, which is
 		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/[project-code]/
 	if the file (or the directory) doesn't exist, nothing is included, and no error is
@@ -122,6 +122,10 @@
 		titles--0024.html
 	and if that doesn't exist, for
 		titles.html
+	if none of these exist, the system will subsequently look if the non-language
+	specific or the language specific file (in that order) exists in the general snippets
+	folder:
+		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/
 	please note the files are included "as is", and are not run through any server-side
 	interperter; therefore php or smarty-codes won't work. javascript will, however, so
 	it can be used for google analytics-codes, which can be different per project.
@@ -1826,25 +1830,32 @@ class Controller extends BaseClass
     }
 
 
-	public function smartyTranslateGetSnippet($params, $content, &$smarty, &$repeat)
+	public function smartyGetSnippet($params, $content, &$smarty, &$repeat)
 	{
+		if ( is_null($content) ) return;
+		
+		$pu = $this->getProjectUrl('projectSnippets'); // project-specific dir
+		$gu = $_SESSION['app']['system']['urls']['snippets']; // general dir
+		
+		$possibilities[1] = $pu . $content;
 
-		if (is_null($content)) return;
-
-		$file=$this->getProjectUrl('projectSnippets').$content;
-
-		if(isset($params['language'])) {
-			$d=pathinfo($file);
-			$translated=$this->getProjectUrl('projectSnippets').$d["filename"].'--'.sprintf('%04s',$params['language']).'.'.$d["extension"];
-			if (file_exists($translated)) {
-				$file=$translated;
-			}
+		if( isset($params['language']) )
+		{
+			$d=pathinfo( $possibilities[1] );
+			$possibilities[0] = $pu . $d["filename"] . '--' . sprintf('%04s',$params['language']) . '.' . $d["extension"];
 		}
+		
+		$possibilities[3] = $gu . $content;
 
-		if (file_exists($file)) {
-			return @file_get_contents($file);
-		} else {
-			return;
+		if( isset($params['language']) )
+		{
+			$d=pathinfo( $possibilities[3] );
+			$possibilities[2] = $gu . $d["filename"] . '--' . sprintf('%04s',$params['language']) . '.' . $d["extension"];
+		}
+		
+		foreach($possibilities as $file)
+		{
+			if (file_exists($file)) return @file_get_contents($file);
 		}
 	}
 
@@ -1995,6 +2006,7 @@ class Controller extends BaseClass
     public function setUrls ()
     {
         $_SESSION['app']['system']['urls']['systemMedia'] = $this->baseUrl . $this->getAppName() . '/media/system/skins/' . $this->getSkinName() . '/';
+        $_SESSION['app']['system']['urls']['snippets'] = $this->baseUrl . 'app/media/project/_snippets/' ;
 
         $p = $this->getCurrentProjectId();
 
@@ -2041,7 +2053,7 @@ class Controller extends BaseClass
             $u['projectCSS'] = $u['cssRootDir'] . 'default/' . $this->getSkinName() . '/';
         }
 
-        $u['projectSnippets'] =  $this->baseUrl . 'app/media/project/_snippets/' . $pCode . '/';
+        $u['projectSnippets'] =  $_SESSION['app']['system']['urls']['snippets'] . $pCode . '/';
 
 
         // home
@@ -2537,7 +2549,7 @@ class Controller extends BaseClass
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
 		$this->smarty->registerPlugin("block","t", array($this,"smartyTranslate"));
-		$this->smarty->registerPlugin("block","snippet", array($this,"smartyTranslateGetSnippet"));
+		$this->smarty->registerPlugin("block","snippet", array($this,"smartyGetSnippet"));
 		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
 
