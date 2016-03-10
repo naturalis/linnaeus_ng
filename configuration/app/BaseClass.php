@@ -8,8 +8,9 @@ if (file_exists(dirname(__FILE__) . "/constants.php"))
 
 class BaseClass
 {
-    
+
     public $config;
+    public $customConfig;
     public $generalSettings;
 
     public function __construct ()
@@ -37,11 +38,16 @@ class BaseClass
         
         } else {
             
-            die(_('Cannot load app configuration file. Make sure the file config.php is present in both 
+            die(_('Cannot load admin configuration file. Make sure the file config.php is present in both 
             	configuration/admin and configuration/app. In both directories, the template file 
             	default-config.php can be adapted.'));
         
         }
+
+        if (class_exists('customConfiguration'))
+		{
+            $this->customConfig=new customConfiguration();
+        }    
     
     }
 

@@ -209,12 +209,9 @@ class LinnaeusController extends Controller
 
 		if ($this->rHasVar('nopid')) $this->smarty->assign('error',$this->translate('No or illegal project ID specified.'));
 
-
-		
-
-		if ( isset($this->generalSettings['project_index_texts']) )
+		if ( method_exists( $this->customConfig , 'getProjectIndexTexts' ) ) 
 		{
-			$texts=$this->generalSettings['project_index_texts'];
+			$texts=$this->customConfig->getProjectIndexTexts();
 		}
 		else
 		{
