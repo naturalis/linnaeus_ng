@@ -54,8 +54,6 @@
 </p>
 
 <p>
-	<a href="../media/upload.php?module_id={$module_id}&amp;item_id={$item_id}">upload media</a><br>
-	<a href="">select uploaded media</a><br>
 	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat=media&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr">afbeeldingen bekijken in het Soortenregister (nieuw venster)</a><br />
 
 </p>
