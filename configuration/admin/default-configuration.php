@@ -1,7 +1,7 @@
 <?php
 
 ini_set('memory_limit', '512M');
-
+if(file_exists( __DIR__ . '/custom-configuration.php')) include_once( __DIR__ . '/custom-configuration.php' );
 class configuration
 {
     
