@@ -498,10 +498,25 @@ class MediaController extends Controller
 
     public function createUserAction ()
     {
-        $this->createUser();
+        $this->checkAuthorisation();
 
-        die(print_r($this->_result));
-        // Save $this->_result data to Linnaeus
+        if ($this->rHasVal('action', 'create')) {
+            $this->createUser();
+
+            if (!empty($this->_result->error)) {
+
+                $this->smarty->assign('result', $this->_result->error);
+
+            } else {
+                // Save $this->_result data to Linnaeus!
+               $this->smarty->assign('result', $this->_result);
+
+            }
+
+
+        }
+
+        $this->printPage();
     }
 
     private function uploadHasFiles ()
