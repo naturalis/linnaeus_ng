@@ -20,6 +20,13 @@
 	<a href="../import/export_versatile.php">multi-purpose export</a><br />
 	<a href="image_meta_bulk.php">image meta-data bulk upload</a><br />
 </p>
+
+<p>
+	<a href="tabs.php">tabs</a><br />
+	<a href="sections.php">secties</a><br />
+	<a href="ranks.php">rangen</a><br />
+</p>
+
 </div>
 
 <script>

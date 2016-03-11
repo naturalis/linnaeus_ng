@@ -772,6 +772,7 @@ class SpeciesModel extends AbstractModel
 		$hasRedirectTo = isset($params['hasRedirectTo']) ? $params['hasRedirectTo'] : false;
 		$hasCheckQuery = isset($params['hasCheckQuery']) ? $params['hasCheckQuery'] : false;
 		$hasAlwaysHide = isset($params['hasAlwaysHide']) ? $params['hasAlwaysHide'] : false;
+		$hasExternalReference = isset($params['hasExternalReference']) ? $params['hasExternalReference'] : false;
 
         $query = "
 			select
@@ -783,6 +784,7 @@ class SpeciesModel extends AbstractModel
 			".($hasRedirectTo ? '_a.redirect_to,' : '')."
 			".($hasCheckQuery ? '_a.check_query,' : '')."
 			".($hasAlwaysHide ? '_a.always_hide,' : '')."
+			".($hasExternalReference ? '_a.external_reference,' : '')."
 				_a.show_order
 			from
 				%PRE%pages_taxa _a
@@ -1233,14 +1235,16 @@ class SpeciesModel extends AbstractModel
     }
 
 
-    public function categoryIsEmptyNsr ($query)
+    public function checkQueryResult( $query )
     {
-		if (!$query) {
-		    return null;
+		if (!$query) return;
+
+        $d = $this->freeQuery($query);
+
+		if ($d)
+		{
+			return $d[0]['result']!=1;
 		}
-
-        return $this->freeQuery($query);
-
     }
 
 
