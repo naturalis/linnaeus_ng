@@ -199,7 +199,6 @@ class SpeciesController extends Controller
 
 		$this->setHigherTaxaControllerMask();
 
-        $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
         $this->smarty->assign('useNBCExtras', $this->_useNBCExtras);
         $this->smarty->assign('useRelated', $this->useRelated);
         $this->smarty->assign('useVariations', $this->useVariations);
@@ -479,8 +478,11 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
+
     public function pageAction()
     {
+		die( 'disabled (will be replaced with NSR-style editor)' );
+
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Define categories'));
 
@@ -1961,6 +1963,9 @@ class SpeciesController extends Controller
 
     public function ranksAction ()
     {
+		
+		die( 'disabled (will be replaced with NSR-style editor)' );
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Taxonomic ranks'));
@@ -2093,6 +2098,8 @@ class SpeciesController extends Controller
 
     public function ranklabelsAction ()
     {
+		die( 'disabled (will be replaced with NSR-style editor)' );
+		
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Taxonomic ranks: labels'));
@@ -2110,6 +2117,8 @@ class SpeciesController extends Controller
 
     public function sectionsAction ()
     {
+		die( 'disabled (will be replaced with NSR-style editor)' );
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Define sections'));
@@ -3017,19 +3026,6 @@ class SpeciesController extends Controller
 
 
 
-    private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
-    {
-        $d=$this->models->PagesTaxa->save(
-        array(
-            'id' => null,
-            'page' => $name,
-            'show_order' => $show_order !== false ? $show_order : 0,
-            'project_id' => $this->getCurrentProjectId(),
-            'def_page' => $isDefault ? '1' : '0'
-        ));
-		$this->logChange($this->models->PagesTaxa->getDataDelta());
-		return $d;
-    }
 
 
 
