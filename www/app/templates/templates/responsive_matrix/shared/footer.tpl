@@ -25,7 +25,7 @@ $(document).ready(function()
 </script>
 
 {snippet}{"google_analytics-`$smarty.server.SERVER_NAME`.html"}{/snippet}
-
+<!-- {$smarty.server.SERVER_NAME} -->
 </div>
 </body>
 </html>
