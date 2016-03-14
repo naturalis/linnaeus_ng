@@ -118,6 +118,8 @@ class Controller extends BaseClass
 
         $this->loadModels();
 
+        $this->activateBasicModules();
+
         $this->initUserRights();
 
         $this->setRandomValue();
@@ -406,7 +408,15 @@ class Controller extends BaseClass
 
     public function checkAuthorisation($allowNoProjectId = false)
     {
-		$this->UserRights->isAuthorized();
+		if ( !$this->UserRights->isAuthorized() )
+		{
+			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getMessage();
+			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+		}
+		else
+		{
+			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
+		}
     }
 
     public function isCurrentUserSysAdmin ()
@@ -2417,6 +2427,48 @@ class Controller extends BaseClass
 		$output = json_decode($result);
 		// Return raw output if result is no (valid) json
 		return !is_null($output) ? $output : $result;
+	}
+	
+	protected function activateBasicModules()
+	{
+		$d=$this->models->Modules->_get(
+			array(
+				'id'=> array('controller in #'=>"('users','projects')")
+			));
+
+		foreach((array)$d as $key=>$val)
+		{
+			$m=$this->models->ModulesProjects->_get(
+				array(
+					'id'=> array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'module_id'=>$val['id']
+					),
+				));
+				
+			if ($m && $m[0]['active']=='y') continue;
+			
+			if ($m && $m[0]['active']=='n')
+			{
+				$this->models->ModulesProjects->update(
+					array('active'=>'y'),
+					array('id'=>$m[0]['id'])
+				);				
+			}
+			else
+			if (!$m)
+			{
+				$this->models->ModulesProjects->save(array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'module_id'=>$val['id'],
+					'show_order'=>99,
+					'active'=>'y',
+					'created'=>'now()'
+				));
+			}
+		
+		}
+		
 	}
 
 	protected function initUserRights()

@@ -1,5 +1,8 @@
 <?php
 
+/// freemoduleid???
+// overrule no project 
+
 class UserRights
 {
 	/*
@@ -9,47 +12,93 @@ class UserRights
 		setModel();
 	*/
 
+	// available constants
+	// ID_ROLE_SYS_ADMIN
+	// ID_ROLE_LEAD_EXPERT
+
+
 	private $model;
 	private $userid;
+	private $user;
 	private $projectid;
 	private $controller;
 	private $moduleid;
+	
+	private $authorizestate;
+	private $message;
 
     public function __construct( $p )
     {
+		$this->setAuthorizeState( false );
 		$this->setModel( isset( $p['model'] ) ? $p['model'] : null );
-
 		$this->setUserId( isset( $p['userid'] ) ? $p['userid'] : null );
 		$this->setProjectId( isset( $p['projectid'] ) ? $p['projectid'] : null );
 		$this->setController( isset( $p['controller'] ) ? $p['controller'] : null );
+		$this->setUser();
 		$this->setModuleId();
     }
 
     public function isAuthorized()
     {
-		// no project id = outside -> open access
-		if ( !isset( $this->projectid ) ) return true;
-
-		// no user id = not logged in / project id set -> shouldn't happen -> unauthorized
-		if ( isset( $this->projectid ) && !isset($this->userid) ) return false;
-
-		// logged in, project selected, but not within any module yet -> authorized (shouldn't actually happen, though)
-		if ( isset( $this->projectid ) && isset($this->userid)  && !isset($this->moduleid) ) return true;
-
-		// logged in, project selected, within a module
-
-/*
-		if ( module_id && !hasModule(project_id,module_id) ) return false;
-		if ( canAccessAllModules(role_id) ) return true;
-		if ( !canAccessModule(project_id,module_id,user_id) ) return false;
-		if ( !canUserPerformAction(project_id, module_id, user_id, item_id, item_id) ) return false;
-*/
+		$p=isset( $this->projectid );
+		$u=isset( $this->userid );
+		$c=isset( $this->controller );
+		$m=isset( $this->moduleid );
 		
+		if ( $u && $this->isSysAdmin() ) 
+		{
+			$this->setMessage( 'sysadmin (full access)' );
+			$this->setAuthorizeState( true );
+		}
+		else
+		if ( !$p ) 
+		{
+			$this->setMessage( 'no project selected (no project ID set)' );
+			$this->setAuthorizeState( false );
+		} 
+		else
+		if ( $p && !$u ) 
+		{
+			$this->setMessage( 'attempting to access a project page without being logged in (project ID set, user ID not set)' );
+			$this->setAuthorizeState( false );
+		}
+		else
+		if ( $p && $u  && !$c && !$m )
+		{
+			$this->setMessage( 'accessing non-module page (project ID set, user ID set, no controller & module ID set)' );
+			$this->setAuthorizeState( true );
+		}
+		else
+		if ( $p && $u  && $c && !$m )
+		{
+			$this->setMessage( 'attempting access to uknown module (project ID set, user ID set, controller set, module ID not set)' );
+			$this->setAuthorizeState( false );
+		}
+		else
+		if ( $p && $u && $c && $m && !$this->canUserAccessModule() )
+		{
+			$this->setMessage( 'attempting access to module without proper rights (project ID set, user ID set, module ID set, no rights or can_read is false)' );
+			$this->setAuthorizeState( false );
+		}
+		else
+		if ( $p && $u && $c && $m && $this->canUserAccessModule() )
+		{
+			$this->setMessage( 'accessing module (project ID set, user ID set, module ID set, can_read is true)' );
+			$this->setAuthorizeState( true );
+		}
 
-		return true;
-
+		return $this->getAuthorizeState();
     }
 
+	public function isSysAdmin()
+	{
+		return isset($this->user['role_id']) && $this->user['role_id']==ID_ROLE_SYS_ADMIN ? true : false;
+	}
+
+    public function getMessage()
+	{
+		return $this->message;
+	}
 
 
 
@@ -58,13 +107,41 @@ class UserRights
 
 
 
+	
 
 
+	private function getUserModuleStatus()
+	{
+		$d=$this->model->freeQuery( "
+			select
+				* 
+			from
+				%PRE%user_module_access 
+			where
+				project_id = " . $this->projectid ." 
+				and user_id = " . $this->userid ." 
+				and module_id = " . $this->moduleid ." 
+				and module_type ='standard'
+		");
 
+		return $d ? $d[0] : null;
+	}
+	
+	private function canUserAccessModule()
+	{
+		$d=$this->getUserModuleStatus();
+		return isset($d['can_read']) && $d['can_read']==1 ? true : false;
+	}
 
+    private function setAuthorizeState( $state )
+	{
+		$this->authorizestate=$state;
+	}
 
-
-
+    private function getAuthorizeState()
+	{
+		return $this->authorizestate;
+	}
 
     private function setModel( $model )
     {
@@ -105,58 +182,50 @@ class UserRights
 		}
     }
 
+    private function setUser()
+    {
+		$d=$this->model->freeQuery( "
+			select
+				_a.username,
+				_a.first_name,
+				_a.last_name,
+				_a.email_address,
+				_a.active,
+				_a.last_login,
+				_a.logins,
+				_a.last_password_change,
+				_b.role_id,
+				_c.role
+			from
+				%PRE%users _a
+				
+			left join
+				%PRE%projects_roles_users _b
+				on _a.id=_b.user_id
+				
+			left join
+				%PRE%roles _c
+				on _b.role_id=_c.id
+				
+			where
+				_a.id = " . $this->userid
+		);
 
+		$this->user = $d ? $d[0] : null;
+    }
 
-
-
-
-
-	// OLD
-    private function checkAuthorisation($allowNoProjectId = false)
+    private function setMessage( $message )
 	{
+		$this->message=$message;
+	}
 
-		
-        // check if user is logged in, otherwise redirect to login page
-        if ($this->isUserLoggedIn())
-		{
-            // check if there is an active project, otherwise redirect to choose project page
-            if ($this->getCurrentProjectId() || $allowNoProjectId)
-			{
-                // check if the user is authorised for the combination of current page / current project
-                if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin())
-				{
-                    return true;
-                }
-                else
-				{
-                    $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 
-                    /*
-						user is not authorized and redirected to the index.page;
-						if he already *is* on the index.page (and not authorized to be there),
-						he is logged out to avoid circular reference.
-					*/
-                    if ($this->getViewName() == 'Index')
-					{
-                        $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['logout']);
-                    }
-                    else
-					{
-                        $this->redirect('index.php');
-                    }
-                }
-            }
-            else
-			{
-                $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject']);
-            }
-        }
-        else
-		{
-            $this->setLoginStartPage();
-            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['login']);
-        }
-}
+
+
+
+
+
+
 		
 /*
 
@@ -192,69 +261,6 @@ return true;
 
 
 */
-
-
-    /**
-     * Checks whether a user is authorized to view/use a page within a project
-     *
-     * @return     boolean        authorized or not
-     * @access     private
-     */
-    private function isUserAuthorisedForProjectPage ()
-    {
-		
-        $controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName());
-
-        // is no controller base name is set, we are in /admin/views/utilities/admin_index.php, which is the portal to the modules
-        if ($controllerBaseName == '')
-            return true;
-
-        if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName])) {
-
-            $d = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName];
-
-            foreach ((array) $d as $key => $val) {
-
-                if ($val == '*' || $val == $this->getViewName()) {
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-
-
-
-    public function isSysAdmin()
-	{
-		return true;
-		
-        if (!isset($_SESSION['admin']['user']))
-		{
-            $u = $this->models->Users->_get(array(
-                'id' => $this->getCurrentUserId()
-            ));
-
-            return $u['superuser'] == '1';
-        }
-
-        if ($_SESSION['admin']['user']['superuser'] == 1)
-            return true;
-
-        if (!isset($_SESSION['admin']['user']['_roles']))
-            return false;
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val)
-		{
-            if ($val['project_id'] == 0 && $val['role_id'] == ID_ROLE_SYS_ADMIN)
-                return true;
-        }
-
-        return false;
-	}
 
     public function reInitializeRights()
     {
