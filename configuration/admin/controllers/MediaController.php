@@ -7,10 +7,26 @@
  * - check max_file_uploads, memory_limit, post_max_size
  *
  *
+ *
+ *
+ *
+ *server credentials
+(
+    [password] => cd94a56a
+    [username] => Diaspididae of the World 2.0 @ 145.136.240.186
+    [user_id] => 3
+    [collection_id] => 3
+    [error] =>
+    [authentification_key] => V2hldmVwcHx0dGglfGckcX18NEJ_Z2FhMzMqNTVZNCQkICM0IDcqNyEpOiQoI3FhKzFhNiQsLC0nIWs1djdgZyZ4Jyx2Jmg1Jzk1ZnZ6JiIhIjQ3IDgzZnYgcSdzJ2hjJzQ0M3QoLHckIz01Kzc3
+)
+
+ *
+ *
  */
 
 include_once ('Controller.php');
 include_once ('ModuleIdentifierController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class MediaController extends Controller
 {
@@ -21,6 +37,7 @@ class MediaController extends Controller
     private $_rsCollectionId;
     private $_rsSearchApi;
     private $_rsUploadApi;
+    private $_rsNewUserApi;
     private $_rsSearchUrl;
     private $_rsUploadUrl;
     private $_rsNewUserUrl;
@@ -143,12 +160,6 @@ class MediaController extends Controller
         $this->_rsUploadApi =  'api_upload_lng';
     }
 
-    private function resetMediaController ()
-    {
-        $this->_uploaded = $this->_result = $this->_files =
-            $this->errors = $this->_rsIds = array();
-    }
-
     private function addUploaded ($e)
     {
         $this->_uploaded[] = $e;
@@ -156,13 +167,21 @@ class MediaController extends Controller
 
     private function setRsSettings ()
     {
-        $this->setRsBaseUrl();
-        $this->setRsMasterKey();
-        $this->setRsUserKey();
-        $this->setRsCollectionId();
-        $this->setRsSearchApi();
-        $this->setRsNewUserApi();
-        $this->setRsUploadApi();
+        $msr = new ModuleSettingsReaderController();
+//print_r($msr->getModuleSetting('rs_base_url')); die();
+
+
+        $this->_rsBaseUrl = $msr->getModuleSetting('rs_base_url');
+        $this->_rsUserKey = $msr->getModuleSetting('rs_user_key');
+        $this->_rsCollectionId = $msr->getModuleSetting('rs_collection_id');
+        $this->_rsUploadApi = $msr->getModuleSetting('rs_upload_api');
+        $this->_rsNewUserApi = $msr->getModuleSetting('rs_new_user_api');
+        $this->_rsSearchApi = $msr->getModuleSetting('rs_search_api');
+
+        if (empty($this->_rsCollectionId) || empty($this->_rsUserKey)) {
+            $this->addError(_('ResourceSpace collection ID and/or user key are not set.
+                First <a href="create_user.php">create a user</a> for this project.'));
+        }
 
         // Search url: &search=[term]* to be appended
         $this->_rsSearchUrl = $this->_rsBaseUrl . $this->_rsSearchApi . '/?' .
@@ -173,7 +192,7 @@ class MediaController extends Controller
             'key=' . $this->_rsUserKey . '&collection=' . $this->_rsCollectionId;
         // New user url; newuser appended in createUser()
         $this->_rsNewUserUrl = $this->_rsBaseUrl . $this->_rsNewUserApi . '/?' .
-            'key=' . $this->_rsMasterKey;
+            'key=' . $this->rGetVal('rs_master_key');
     }
 
     public function ajaxInterfaceAction ()
@@ -193,7 +212,6 @@ class MediaController extends Controller
     public function selectRsAction ()
     {
         $this->checkAuthorisation();
-        $this->resetMediaController();
 
         // global get module id?
         //$this->smarty->assign('module_id', $this->getCurrentModuleId());
@@ -206,7 +224,6 @@ class MediaController extends Controller
     public function selectAction ()
     {
         $this->checkAuthorisation();
-        $this->resetMediaController();
         $this->setItemTemplate();
 
         if ($this->rHasVal('action', 'delete')) {
@@ -227,7 +244,6 @@ class MediaController extends Controller
     public function searchAction ()
     {
         $this->checkAuthorisation();
-        $this->resetMediaController();
 
         foreach ($this::$metadataFields as $f) {
             $search['metadata'][$f] = $this->rGetVal($f);
@@ -251,7 +267,6 @@ class MediaController extends Controller
     public function editAction ()
     {
         $this->checkAuthorisation();
-        $this->resetMediaController();
 
         $id = $this->rGetVal('id');
 
@@ -280,7 +295,6 @@ class MediaController extends Controller
     public function uploadAction ()
     {
         $this->checkAuthorisation();
-        $this->resetMediaController();
         $this->setItemTemplate();
 
         // Only upload if upload button has been pushed!
@@ -500,20 +514,32 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 
-        if ($this->rHasVal('action', 'create')) {
+        // Reset errors to avoid message set during initialisation
+        $this->errors = array();
+
+        if ($this->rHasVal('action', 'create') && $this->rHasVal('rs_master_key')) {
+
             $this->createUser();
-echo 'result: '; print_r($this->_result); die();
 
-            if (!empty($this->_result->error)) {
+            // Test response; RS does not always return neat response...
+            $error = is_string($this->_result) ?
+                ucfirst($this->_result) : $this->_result->error;
 
-                $this->smarty->assign('result', $this->_result->error);
+            if (!empty($error)) {
+
+                $this->addError($error);
 
             } else {
                 // Save $this->_result data to Linnaeus!
-               $this->smarty->assign('result', $this->_result);
+                // For now printing on screen should suffice(?)
+                $d = array(
+                    'rs_collection_id' => $this->_result->collection_id,
+                    'rs_user_key' => $this->_result->authentification_key,
+                    'rs_user_name' => $this->_result->username,
+                    'rs_password' => $this->_result->password
+                );
+                $this->smarty->assign('result', $d);
             }
-
-
         }
 
         $this->printPage();
