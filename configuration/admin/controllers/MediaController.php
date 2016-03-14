@@ -502,6 +502,7 @@ class MediaController extends Controller
 
         if ($this->rHasVal('action', 'create')) {
             $this->createUser();
+echo 'result: '; print_r($this->_result); die();
 
             if (!empty($this->_result->error)) {
 
@@ -510,7 +511,6 @@ class MediaController extends Controller
             } else {
                 // Save $this->_result data to Linnaeus!
                $this->smarty->assign('result', $this->_result);
-
             }
 
 
