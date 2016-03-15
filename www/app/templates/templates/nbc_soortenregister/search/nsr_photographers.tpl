@@ -18,7 +18,7 @@
 		<h4>{t}Fotograaf (foto’s/soorten){/t}</h4>
 		<br>
 			<ol>
-			{foreach from=$photographers item=v}
+			{foreach $photographers v}
 				<li>
 					<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total} / {$v.taxon_count})</a>
 				</li>
@@ -34,9 +34,8 @@
 {include file="../shared/footer.tpl"}
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html('{t}Overzicht fotografen{/t} - '+$('title').html());
-
 });
 </script>

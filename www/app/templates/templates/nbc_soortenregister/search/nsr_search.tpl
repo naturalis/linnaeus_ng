@@ -30,7 +30,7 @@
 			<p>
 				{if $results.data}
 				{assign var=i value=0}
-				{foreach from=$results.data item=v}
+				{foreach $results.data v}
 				<div class="result" sort_name="{$v.taxon}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
 					{if $v.overview_image}
 					<img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}"/>
@@ -55,9 +55,6 @@
 				{t}Niets gevonden.{/t}
 				{/if}
 
-
-
-
 			</p>
 		</div>
 		
@@ -71,9 +68,8 @@
 {include file="../shared/footer.tpl"}
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html('{t}Zoekresultaten{/t} - '+$('title').html());
-
 });
 </script>

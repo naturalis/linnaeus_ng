@@ -15,15 +15,13 @@ class NsrPaspoortController extends NsrController
 {
     public $usedModels = array(
 		'actors',
-		'content_taxon',
-		'page_taxon',
-		'page_taxon_title',
+		'content_taxa',
+		'pages_taxa',
 		'tab_order',
 		'nsr_ids',
 		'trash_can'
 	);
     public $usedHelpers = array();
-    public $cacheFiles = array();
     public $cssToLoad = array(
         'lookup.css',
 		'nsr_taxon_beheer.css'
@@ -34,6 +32,7 @@ class NsrPaspoortController extends NsrController
 			'nsr_taxon_beheer.js'
         )
     );
+    public $modelNameOverride='NsrPaspoortModel';
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
 	private $taxonId;
@@ -48,25 +47,6 @@ class NsrPaspoortController extends NsrController
     {
         parent::__destruct();
     }
-
-    private function initialize()
-    {
-		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
-		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page)
-		{
-			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
-			if (!defined('TAB_'.$p)) {
-				define('TAB_'.$p,$page['id']);
-			}
-		}
-		if (!defined('CTAB_NAMES')) define('CTAB_NAMES','names');
-		if (!defined('CTAB_CLASSIFICATION')) define('CTAB_CLASSIFICATION','classification');
-		if (!defined('CTAB_TAXON_LIST')) define('CTAB_TAXON_LIST','list');
-		if (!defined('CTAB_LITERATURE')) define('CTAB_LITERATURE','literature');
-		if (!defined('CTAB_MEDIA')) define('CTAB_MEDIA','media');
-		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
-		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
-	}
 
     public function paspoortAction()
     {
@@ -101,11 +81,11 @@ class NsrPaspoortController extends NsrController
 		
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->savePassportMeta($this->requestData);
+			$this->savePassportMeta($this->rGetAll());
 		} else
 		if ($this->rHasVal('action','delete') && $this->rHasVal('tab') && !$this->isFormResubmit())
 		{
-			$this->deletePassportMeta($this->requestData);
+			$this->deletePassportMeta($this->rGetAll());
 		}
 
         $this->setPageName($this->translate('Edit taxon passport'));
@@ -125,7 +105,7 @@ class NsrPaspoortController extends NsrController
 
 		if ($this->rHasVal('action', 'save_passport'))
 		{
-			$return=$this->savePassport($this->requestData);
+			$return=$this->savePassport($this->rGetAll());
         }
 		
         $this->allowEditPageOverlay=false;
@@ -135,6 +115,24 @@ class NsrPaspoortController extends NsrController
         $this->printPage('ajax_interface');
     }
 
+    private function initialize()
+    {
+		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
+		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page)
+		{
+			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
+			if (!defined('TAB_'.$p)) {
+				define('TAB_'.$p,$page['id']);
+			}
+		}
+		if (!defined('CTAB_NAMES')) define('CTAB_NAMES','names');
+		if (!defined('CTAB_CLASSIFICATION')) define('CTAB_CLASSIFICATION','classification');
+		if (!defined('CTAB_TAXON_LIST')) define('CTAB_TAXON_LIST','list');
+		if (!defined('CTAB_LITERATURE')) define('CTAB_LITERATURE','literature');
+		if (!defined('CTAB_MEDIA')) define('CTAB_MEDIA','media');
+		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
+		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
+	}
 
 	private function setTaxonId($id)
 	{
@@ -146,45 +144,17 @@ class NsrPaspoortController extends NsrController
 		return isset($this->TaxonId) ? $this->TaxonId : false;
 	}
 
-
     private function getPassportCategories()
     {
-		$categories=$this->models->PageTaxon->freeQuery("
-			select
-				_a.id,
-				ifnull(_b.title,_a.page) as title,
-				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
-				_a.show_order,
-				_c.content,
-				_c.id as content_id,
-				_c.publish,
-				_a.def_page,
-				_a.always_hide
-
-			from 
-				%PRE%pages_taxa _a
-				
-			left join %PRE%pages_taxa_titles _b
-				on _a.project_id=_b.project_id
-				and _a.id=_b.page_id
-				and _b.language_id = ". $this->getDefaultProjectLanguage() ."
-				
-			left join %PRE%content_taxa _c
-				on _a.project_id=_c.project_id
-				and _a.id=_c.page_id
-				and _c.taxon_id =".$this->getTaxonId()."
-				and _c.language_id = ". $this->getDefaultProjectLanguage() ."
-
-			where 
-				_a.project_id=".$this->getCurrentProjectId()."
-
-			order by 
-				_a.show_order
-		");
+		$categories=$this->models->NsrPaspoortModel->getPassportCategories(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"taxon_id"=>$this->getTaxonId(),
+			"project_id"=>$this->getCurrentProjectId()
+		));
 
 		if (!$categories) $categories=array();
 
-		$d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
+		if ( defined('TAB_VERSPREIDING') ) $d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
 
 		$order=$this->models->TabOrder->_get(
 		array(
@@ -213,14 +183,15 @@ class NsrPaspoortController extends NsrController
 				$start=$val['id'];
 			}
 
+			// categories need to be configurable! REFAC2015
 			$categories[$key]['obsolete']=
-				$val['id']==TAB_ALGEMEEN || 
-				$val['id']==TAB_BESCHERMING || 
-				$val['id']==TAB_DESCRIPTION || 
-				$val['id']==TAB_HABITAT || 
-				$val['id']==TAB_GELIJKENDE_SOORTEN || 
-				$val['id']==TAB_VERPLAATSING
-				;
+				( defined('TAB_ALGEMEEN') ? $val['id']==TAB_ALGEMEEN : false ) || 
+				( defined('TAB_BESCHERMING') ? $val['id']==TAB_BESCHERMING : false ) || 
+				( defined('TAB_DESCRIPTION') ? $val['id']==TAB_DESCRIPTION : false ) || 
+				( defined('TAB_HABITAT') ? $val['id']==TAB_HABITAT : false ) || 
+				( defined('TAB_GELIJKENDE_SOORTEN') ? $val['id']==TAB_GELIJKENDE_SOORTEN : false ) || 
+				( defined('TAB_VERPLAATSING') ? $val['id']==TAB_VERPLAATSING : false )
+			;
 
 			if ($val['content_id'])
 			{
@@ -307,7 +278,7 @@ class NsrPaspoortController extends NsrController
                     'page_id' => $category
                 );
 
-                $ct = $this->models->ContentTaxon->_get(array(
+                $ct = $this->models->ContentTaxa->_get(array(
                     'id' => $d, 
                 ));
 
@@ -325,7 +296,6 @@ class NsrPaspoortController extends NsrController
 
 		return array('content'=>$content,'rdf'=>$rdf,'publish'=>$publish);
     }
-
 
 	private function doDeletePassportMeta($id)
 	{
@@ -348,7 +318,7 @@ class NsrPaspoortController extends NsrController
 
 		if (empty($content))
 		{
-			$r=$this->models->ContentTaxon->delete(array(
+			$r=$this->models->ContentTaxa->delete(array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id'=>$taxon,
 				'language_id'=>$this->getDefaultProjectLanguage(),
@@ -361,7 +331,7 @@ class NsrPaspoortController extends NsrController
 		}
 		else
 		{
-			$d=$this->models->ContentTaxon->_get(array(
+			$d=$this->models->ContentTaxa->_get(array(
 				'id'=>array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id'=>$taxon,
@@ -372,7 +342,7 @@ class NsrPaspoortController extends NsrController
 			
 			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
 
-			$r=$this->models->ContentTaxon->save(array(
+			$r=$this->models->ContentTaxa->save(array(
 				'id'=>$id,
 				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$taxon,

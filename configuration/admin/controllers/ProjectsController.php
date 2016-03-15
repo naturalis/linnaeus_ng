@@ -1,10 +1,7 @@
 <?php
 
 /*
-
-	set upload maximum for media uploads per projects
 	deleting of language should delete glossary terms
-
 */
 
 include_once ('Controller.php');
@@ -13,16 +10,16 @@ include_once ('ProjectDeleteController.php');
 class ProjectsController extends Controller
 {
     public $usedModels = array(
-        'commonname', 
-        'content_keystep', 
-        'content_taxon', 
-		'free_module_page', 
-		'glossary', 
-		'literature', 
-		'matrix', 
-		'media_taxon', 
-		'occurrence_taxon', 
-		'synonym', 
+        'commonnames',
+        'content_keysteps',
+        'content_taxa',
+		'free_modules_pages',
+		'glossary',
+		'literature',
+		'matrices',
+		'media_taxon',
+		'occurrences_taxa',
+		'synonyms',
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -33,112 +30,59 @@ class ProjectsController extends Controller
     );
     public $jsToLoad = array(
         'all' => array(
-            'project.js', 
-            'module.js', 
+            'project.js',
+            'module.js',
             'lookup.js'
         )
     );
+	private $freeModulesMax=5;
 
-	// REFAC2015 --> most need to go to module settings
-	private $_availableProjectSettings = array(
-		array('keytype','l2 / lng','lng','single access-key type'),
-		array('maptype','l2 / lng','l2','map type: L2 or Google'),
-		array('matrixtype','lng / nbc','nbc','multi entry-key type'),					
-		array('taxa_use_variations','bool',0),
-		array('taxon_tree_type','[recursive*|unfolding]','unfolding'),
-		array('taxon_page_ext_classification','bool',1),
-		array('skin','[name]','nbc_default'),
-		array('skin_mobile','[name]','nbc_default_mobile'),
-		array('suppress_splash','bool',0,'bypass splash screen'),
-		array('start_page','[url]',null,'default start page of project'),
-		array('nbc_image_root','[url]',null,'for system images'),
-
-		//array('matrix_use_character_groups','bool',0),
-		//array('matrix_browse_style','paginate / expand','expand'),
-		//array('matrix_items_per_line','int',4),
-		//array('matrix_items_per_page','int',16),
-		//array('matrix_state_image_per_row','int',4,'number of images on a line in NBC character pop up'),
-		//array('matrix_state_image_max_height','[size in px]',200), // should be done through project specific stylesheet
-		//array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
-		//array('matrix_use_emerging_characters','bool',0,'treat characters that are specified for only some species as "emerging" (default=true)'),  // nbc only
-		//array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
-		//array('matrix_calc_char_h_val','bool',0,'false: do not calculate characters H-value; enhances performance'),
-		//array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
-
-		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
-		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
-
-		array('species_default_tab','[id]',-1,'id of the tab ("page") to open with by default'),
-		array('species_tab_translate','{a:b},{c:d}',null,'automatically changes tab id a into b etc.'), // to change TAB_MEDIA to default category 'media' etc
-		array('species_suppress_autotab_names','bool',1,'suppress automatically generated tab "names" in runtime'),
-		array('species_suppress_autotab_classification','bool',1,'suppress automatically generated tab "classification" in runtime'),
-		array('species_suppress_autotab_literature','bool',1,'suppress automatically generated tab "literature" in runtime'),
-		array('species_suppress_autotab_media','bool',1,'suppress automatically generated tab "media" in runtime'),
-		array('species_suppress_autotab_dna_barcodes','bool',1,'suppress automatically generated tab "dna_barcodes" in runtime (and in extensive search)'),
-
-		array('literature2_import_match_threshold','int',75),
-
-		array('include_overview_in_media','bool',0,'show overview image in species media'),
-		array('app_search_result_sort','alpha / token_count','token_count','variable to sort search results by'),
-		array('admin_species_allow_embedded_images','bool',1,'id.'),
-		array('nbc_search_presence_help_url','[URL]',null,'id.'),
-		
-
-
-	);
-
-/*
-		array('matrixtype','lng / nbc','nbc','multi entry-key type'),
-			should use
-		if (!defined('MATRIX_STYLE_LNG')) define('MATRIX_STYLE_LNG','lng');
-		if (!defined('MATRIX_STYLE_NBC')) define('MATRIX_STYLE_NBC','nbc');
-
-*/
-
-
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct ()
     {
         parent::__construct();
-
-		$this->initialize();
-
 	}
 
-
-    /**
-	* Destroys
-	*
-	* @access     public
-	*/
     public function __destruct ()
     {
         parent::__destruct();
     }
 
+	public function chooseProjectAction ()
+	{
+        $this->checkDefaultProjectSelect();
+		$this->UserRights->setAllowNoProjectId( true );
+		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Select a project to work on'));
 
+        if ( $this->rHasVal('project_id') && $this->isCurrentUserAuthorizedForProject($this->rGetVal('project_id')) )
+		{
+			$this->doSetProject( $this->rGetVal('project_id') );
+			$this->redirect( $this->getLoggedInMainIndex() );
+		}
 
-    /**
-	* Index, showing menu of options
-	*
-	* @access     public
-	*/
+        $this->smarty->assign('projects', $this->getCurrentUserProjects());
+        $this->printPage();
+    }
+
     public function indexAction ()
     {
         $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Index'));
-        
+        $this->setPageName( $this->translate('Index') );
+        $this->printPage();
+    }
+
+    public function overviewAction ()
+    {
+        $this->checkAuthorisation();
+        $this->setPageName($this->translate('Project overview'));
+        $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
         $this->printPage();
     }
 
 
 
-
+  	
+	
     /**
 	* List of available modules, standard and self-defined, plus possibility of (de)activation
 	*
@@ -147,66 +91,67 @@ class ProjectsController extends Controller
     public function modulesAction ()
     {
         $this->checkAuthorisation();
-        
+
         $this->setPageName($this->translate('Project modules'));
-        
-        if ($this->rHasVal('module_new')) {
-            
-            $fmp = $this->models->FreeModuleProject->_get(array(
+
+        if ($this->rHasVal('module_new'))
+		{
+
+            $fmp = $this->models->FreeModulesProjects->_get(array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId()
                 )
             ));
-            
-            if (count((array) $fmp) < $this->controllerSettings['freeModulesMax'] && !$this->isFormResubmit()) {
-                
-                $this->models->FreeModuleProject->save(
+
+            if (count((array) $fmp) < $this->freeModulesMax && !$this->isFormResubmit()) {
+
+                $this->models->FreeModulesProjects->save(
                 array(
-                    'id' => null, 
-                    'module' => $this->requestData['module_new'], 
-                    'project_id' => $this->getCurrentProjectId(), 
+                    'id' => null,
+                    'module' => $this->rGetVal('module_new'),
+                    'project_id' => $this->getCurrentProjectId(),
                     'active' => 'n'
                 ));
             }
             else {
-                
-                $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->controllerSettings['freeModulesMax']));
+
+                $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->freeModulesMax));
             }
         }
-        
-        $modules = $this->models->Module->_get(array(
+
+        $modules = $this->models->Modules->_get(array(
             'id' => array(
                 '1' => '1'
-            ), 
+            ),
             'order' => 'show_order'
         ));
-        
+
         foreach ((array) $modules as $key => $val) {
-            
-            $mp = $this->models->ModuleProject->_get(
+
+            $mp = $this->models->ModulesProjects->_get(
             array(
                 'id' => array(
-                    'module_id' => $val['id'], 
+                    'module_id' => $val['id'],
                     'project_id' => $this->getCurrentProjectId()
                 )
             ));
-            
+
             $modules[$key]['module_project_id'] = $mp[0]['id'] ? $mp[0]['id'] : false;
             $modules[$key]['active'] = $mp[0]['id'] ? $mp[0]['active'] : false;
         }
-        
-        $freeModules = $this->models->FreeModuleProject->_get(array(
+
+        $freeModules = $this->models->FreeModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             )
         ));
-        
+
         $this->smarty->assign('modules', $modules);
-        
+
         $this->smarty->assign('freeModules', $freeModules);
-        
-        $this->smarty->assign('freeModuleMax', $this->controllerSettings['freeModulesMax']);
-        
+
+        $this->smarty->assign('freeModuleMax', $this->freeModulesMax);
+
         $this->printPage();
     }
 
@@ -220,96 +165,96 @@ class ProjectsController extends Controller
     public function collaboratorsAction ()
     {
         $this->checkAuthorisation();
-        
+
         $this->setPageName($this->translate('Assign collaborator to modules'));
-        
-        $modules = $this->models->ModuleProject->_get(array(
+
+        $modules = $this->models->ModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'order' => 'module_id asc'
         ));
-        
+
         foreach ((array) $modules as $key => $val) {
-            
-            $mp = $this->models->Module->_get(array(
+
+            $mp = $this->models->Modules->_get(array(
                 'id' => $val['module_id']
             ));
-            
+
             $modules[$key]['module'] = $mp['module'];
-            
+
             $modules[$key]['description'] = $mp['description'];
-            
-            $mpu = $this->models->ModuleProjectUser->_get(
+
+            $mpu = $this->models->ModulesProjectsUsers->_get(
             array(
                 'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
+                    'project_id' => $this->getCurrentProjectId(),
                     'module_id' => $val['module_id']
                 )
             ));
-            
+
             foreach ((array) $mpu as $k => $v) {
-                
+
                 $modules[$key]['collaborators'][$v['user_id']] = $v;
             }
         }
-        
-        $free_modules = $this->models->FreeModuleProject->_get(array(
+
+        $free_modules = $this->models->FreeModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             )
         ));
-        
+
         foreach ((array) $free_modules as $key => $val) {
-            
-            $fpu = $this->models->FreeModuleProjectUser->_get(
+
+            $fpu = $this->models->FreeModulesProjectsUsers->_get(
             array(
                 'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
+                    'project_id' => $this->getCurrentProjectId(),
                     'free_module_id' => $val['id']
                 )
             ));
-            
+
             foreach ((array) $fpu as $k => $v) {
-                
+
                 $free_modules[$key]['collaborators'][$v['user_id']] = $v;
             }
         }
-        
-        $pru = $this->models->ProjectRoleUser->_get(array(
+
+        $pru = $this->models->ProjectsRolesUsers->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'distinct user_id, role_id'
         ));
-        
+
         foreach ((array) $pru as $key => $val) {
-            
-            $u = $this->models->User->_get(array(
+
+            $u = $this->models->Users->_get(array(
                 'id' => $val['user_id']
             ));
-            
-            $r = $this->models->Role->_get(array(
+
+            $r = $this->models->Roles->_get(array(
                 'id' => $val['role_id']
             ));
-            
+
             $u['role'] = $r['role'];
-            
+
             $users[] = $u;
         }
-        
+
         $this->customSortArray($users, array(
-            'key' => 'last_name', 
-            'dir' => 'asc', 
+            'key' => 'last_name',
+            'dir' => 'asc',
             'case' => 'i'
         ));
-        
+
         $this->smarty->assign('users', $users);
-        
+
         $this->smarty->assign('free_modules', $free_modules);
-        
+
         $this->smarty->assign('modules', $modules);
-        
+
         $this->printPage();
     }
 
@@ -322,123 +267,46 @@ class ProjectsController extends Controller
 	*/
     public function dataAction ()
     {
+
         $this->checkAuthorisation();
-        
+
         $this->setPageName($this->translate('Project data'));
 
-        if (isset($this->requestData) && !$this->isFormResubmit()) {
+        if ( $this->rHasVal('action','save') && !$this->isFormResubmit() ) {
             // saving all data (except the logo image)
-			
-			$this->saveProjectData($this->requestData);
+
+			$this->saveProjectData( $this->rGetAll() );
         }
-        
+
         $this->setCurrentProjectData();
-        
+
         $languages = $this->getAvailableLanguages();
-        
+
         foreach ((array) $languages as $key => $val) {
-            
-            $lp = $this->models->LanguageProject->_get(
+
+            $lp = $this->models->LanguagesProjects->_get(
             array(
                 'id' => array(
-                    'language_id' => $val['id'], 
+                    'language_id' => $val['id'],
                     'project_id' => $this->getCurrentProjectId()
                 )
             ));
-            
+
             $languages[$key]['language_project_id'] = $lp[0]['id'];
-            
+
             $languages[$key]['is_project_default'] = ($lp[0]['def_language'] == 1);
-            
+
             $languages[$key]['is_active'] = ($lp[0]['active'] == 'y');
-            
+
             $languages[$key]['tranlation_status'] = $lp[0]['tranlation_status'];
         }
-        
+
         $this->smarty->assign('data', $this->getCurrentProjectData());
-        
+
         $this->smarty->assign('languages', $languages);
-        
+
         $this->printPage();
     }
-
-    public function settingsAction ()
-    {
-        $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Project settings'));
-
-        if ($this->rHasVal('action','save') && !$this->isFormResubmit()) {
-			
-			$c=0;
-			
-			if ($this->rHasVar('setting')) {
-			
-				foreach((array)$this->requestData['setting'] as $key => $val) {
-					
-					$val = trim($val);
-					
-					if (empty($val) && $val!=='0') {
-						
-						$c += $this->saveSetting(array('name' => $key,'delete' => true));
-						
-					} else {
-	
-						$c += $this->saveSetting(array('name' => $key,'value' => $val));
-	
-					}
-					
-				}
-				
-			}
-
-			if ($this->rHasVal('new_setting')) {
-
-				$v = $this->getSetting($this->requestData['new_setting']);
-
-				if (is_null($v)) {
-			
-					if ($this->rHasVal('new_setting') && !$this->rHasVal('new_value')) {
-						$this->addError(sprintf($this->translate('A value is required for "%s".'),$this->requestData['new_setting']));
-						$this->smarty->assign('new_setting',$this->requestData['new_setting']);
-					} else
-					if ($this->rHasVal('new_setting') && $this->rHasVal('new_value')) {
-				
-						$c += $this->saveSetting(array('name' => $this->requestData['new_setting'],'value' => $this->requestData['new_value']));
-					
-					}
-
-				} else {
-	
-					$this->addError(sprintf($this->translate('A setting with the name "%s" already exists.'),$this->requestData['new_setting']));
-					$this->smarty->assign('new_setting',$this->requestData['new_setting']);
-					$this->smarty->assign('new_value',$this->requestData['new_value']);
-	
-				}
-
-			}
-			
-			if ($c>0)
-				$this->addMessage('Data saved.');
-
-        }
-		
-		$s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-            ),
-            'columns' => 'setting,value',
-			'order' => 'setting'
-        ));
-
-
-        $this->smarty->assign('settingsAvailable',$this->_availableProjectSettings);
-        $this->smarty->assign('settings',$s);
-        
-        $this->printPage();
-    }
-
 
     /**
 	* General interface for all AJAX-calls
@@ -453,37 +321,37 @@ class ProjectsController extends Controller
     {
         if (!$this->rHasVal('view'))
             return;
-        
+
         if ($this->rHasVal('view', 'modules')) {
-            
-            $this->ajaxActionModules($this->requestData['type'], $this->requestData['action'], $this->requestData['id']);
+
+            $this->ajaxActionModules($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId());
         }
         else if ($this->rHasVal('view', 'collaborators')) {
-            
-            $this->ajaxActionCollaborators($this->requestData['type'], $this->requestData['action'], $this->requestData['id'], $this->requestData['user']);
+
+            $this->ajaxActionCollaborators($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId(), $this->rGetVal('user'));
         }
         else if ($this->rHasVal('view', 'languages')) {
-            
-            $this->ajaxActionLanguages($this->requestData['action'], $this->requestData['id']);
+
+            $this->ajaxActionLanguages($this->rGetVal('action'), $this->rGetId());
         }
-        
+
         $this->printPage();
     }
 
     public function createAction ()
     {
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Create new project'));
-        
+
         $this->setBreadcrumbRootName($this->translate('System administration'));
-        
+
         $this->setSuppressProjectInBreadcrumbs();
-        
+
         if (isset($this->requestData) && !$this->isFormResubmit()) {
-            
+
             if (!$this->rHasVal('title') || !$this->rHasVal('sys_description') || !$this->rHasVal('language')) {
-                
+
                 if (!$this->rHasVal('title'))
                     $this->addError($this->translate('A title is required.'));
                 if (!$this->rHasVal('sys_description'))
@@ -492,116 +360,116 @@ class ProjectsController extends Controller
                     $this->addError($this->translate('A default language is required.'));
             }
             else {
-                
+
                 $id = $this->createProject(
                 array(
-                    'title' => $this->requestData['title'], 
-                    'version' => isset($this->requestData['version']) ? $this->requestData['version'] : null, 
-                    'sys_description' => $this->requestData['sys_description']
+                    'title' => $this->rGetVal('title'),
+                    'version' => !is_null($this->rGetVal('version')) ? $this->rGetVal('version') : null,
+                    'sys_description' => $this->rGetVal('sys_description')
                 ));
-                
+
                 if ($id) {
-                    
-                    $this->models->LanguageProject->save(
+
+                    $this->models->LanguagesProjects->save(
                     array(
-                        'id' => null, 
-                        'language_id' => $this->requestData['language'], 
-                        'project_id' => $id, 
-                        'def_language' => 1, 
+                        'id' => null,
+                        'language_id' => $this->rGetVal('language'),
+                        'project_id' => $id,
+                        'def_language' => 1,
                         'active' => 'y'
                     ));
-                    
-                    $this->createProjectCssFile($id, $this->requestData['title']);
-                    
+
+                    $this->createProjectCssFile($id, $this->rGetVal('title'));
+
                     $this->addAllModulesToProject($id);
                     $this->addUserToProject($this->getCurrentUserId(), $id, ID_ROLE_SYS_ADMIN);
-                    
+
                     $this->unsetProjectSessionData();
                     $this->reInitUserRolesAndRights();
                     $this->setCurrentProjectId($id);
                     $this->setCurrentProjectData();
                     $this->setCurrentUserRoleId();
-                    
+
                     $this->smarty->assign('saved', true);
-                    $this->addMessage(sprintf($this->translate('Project \'%s\' saved.'), $this->requestData['title']));
+                    $this->addMessage(sprintf($this->translate('Project \'%s\' saved.'), $this->rGetVal('title')));
                     $this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
                 }
                 else {
-                    
+
                     $this->addError($this->translate('Could not save project (duplicate name?).'));
                 }
             }
         }
-        
+
         if (isset($this->requestData))
             $this->smarty->assign('data', $this->requestData);
-        
+
         $this->smarty->assign('languages', $this->getAvailableLanguages());
-        
+
         $this->printPage();
     }
 
     public function deleteAction ()
     {
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Delete a project'));
-        
+
         $this->setBreadcrumbRootName($this->translate('System administration'));
-        
+
         $this->setSuppressProjectInBreadcrumbs();
-        
+
         if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
-            
-            $this->doDeleteProjectAction($this->requestData['id']);
-            
+
+            $this->doDeleteProjectAction($this->rGetId());
+
             $this->reInitUserRolesAndRights();
-            
+
             $this->addMessage('Project deleted.');
         }
         else {
-            
+
             $d = $this->rHasVal('p') ? array(
-                'id' => $this->requestData['p']
+                'id' => $this->rGetVal('p')
             ) : '*';
-            
-            $projects = $this->models->Project->_get(array(
-                'id' => $d, 
+
+            $projects = $this->models->Projects->_get(array(
+                'id' => $d,
                 'order' => 'title'
             ));
-            
+
             if ($this->rHasVal('p')) {
-                
+
                 $this->smarty->assign('project', $projects[0]);
             }
             else {
-                
+
                 $this->smarty->assign('projects', $projects);
             }
         }
-        
+
         $this->printPage();
     }
 
     public function deleteOrphanAction ()
     {
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Delete orphaned project'));
-        
+
         $this->setBreadcrumbRootName($this->translate('System administration'));
-        
+
         $this->setSuppressProjectInBreadcrumbs();
-        
+
         if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit()) {
-           
-			$this->doDeleteOrpahnedData();
+
+			$this->doDeleteOrphanedData();
 
             $this->addMessage('Deleted orphaned data.');
 			$this->smarty->assign('processed',true);
 
         }
-		
+
         $this->printPage();
 
     }
@@ -609,258 +477,237 @@ class ProjectsController extends Controller
     public function getInfoAction ()
     {
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Project info'));
-        
-        $this->smarty->assign('commonname', 
-        $this->models->Commonname->_get(array(
+
+        $this->smarty->assign('commonname',
+        $this->models->Commonnames->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('contentkeystep', 
-        $this->models->ContentKeystep->_get(array(
+
+        $this->smarty->assign('contentkeystep',
+        $this->models->ContentKeysteps->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('contenttaxon', 
-        $this->models->ContentTaxon->_get(array(
+
+        $this->smarty->assign('contenttaxon',
+        $this->models->ContentTaxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('freemodulepage', 
-        $this->models->FreeModulePage->_get(array(
+
+        $this->smarty->assign('freemodulepage',
+        $this->models->FreeModulesPages->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('freemoduleproject', 
-        $this->models->FreeModuleProject->_get(array(
+
+        $this->smarty->assign('freemoduleproject',
+        $this->models->FreeModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('glossary', 
+
+        $this->smarty->assign('glossary',
         $this->models->Glossary->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('literature', 
+
+        $this->smarty->assign('literature',
         $this->models->Literature->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('matrix', $this->models->Matrix->_get(array(
+
+        $this->smarty->assign('matrix',
+        $this->models->Matrices->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('mediataxon', 
+
+        $this->smarty->assign('mediataxon',
         $this->models->MediaTaxon->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('occurrencetaxon', 
-        $this->models->OccurrenceTaxon->_get(array(
+
+        $this->smarty->assign('occurrencetaxon',
+        $this->models->OccurrencesTaxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('synonym', 
-        $this->models->Synonym->_get(array(
+
+        $this->smarty->assign('synonym',
+        $this->models->Synonyms->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
-        
-        $this->smarty->assign('taxon', $this->models->Taxon->_get(array(
+
+        $this->smarty->assign('taxon',
+        $this->models->Taxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
 
 
-        $this->smarty->assign('variations', $this->models->TaxonVariation->_get(array(
+        $this->smarty->assign('variations',
+        $this->models->TaxaVariations->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
-            ), 
+            ),
             'columns' => 'count(*) as total'
         )));
 
-        
+
         $this->printPage();
     }
 
 	public function changeIdAction()
     {
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Change a project ID'));
-        
+
         $this->setBreadcrumbRootName($this->translate('System administration'));
-        
+
         $this->setSuppressProjectInBreadcrumbs();
 
-		$projects = $this->models->Project->_get(array(
+		$projects = $this->models->Projects->_get(array(
 			'id' => '*'
 		));
-		
+
 		if ($this->rHasVal('newId') && !$this->isFormResubmit()) {
-                
-            $p = $this->models->Project->_get(array(
-                'id' => array('id' => $this->requestData['newId']),
+
+            $p = $this->models->Projects->_get(array(
+                'id' => array('id' => $this->rGetVal('newId')),
             ));
-			
+
 			if ($p) {
-				
-				 $this->addError(sprintf($this->translate('A project with ID %s already exists (%s).'),$this->requestData['newId'],$p[0]['title']));
+
+				 $this->addError(sprintf($this->translate('A project with ID %s already exists (%s).'),$this->rGetVal('newId'),$p[0]['title']));
 
 			} else {
 
 
 				if ($this->rHasVal('action','change')) {
-					
-					$this->doChangeProjectId($this->requestData['p'],$this->requestData['newId']);
-					
+
+					$this->doChangeProjectId($this->rGetVal('p'),$this->rGetVal('newId'));
+
 					$this->smarty->assign('done', true);
 
 				} else {
-					
-					$projects = $this->models->Project->_get(array(
-						'id' => array('id' => $this->requestData['p']),
+
+					$projects = $this->models->Projects->_get(array(
+						'id' => array('id' => $this->rGetVal('p')),
 					));
-								
-					$this->smarty->assign('newId', $this->requestData['newId']);
-					
+
+					$this->smarty->assign('newId', $this->rGetVal('newId'));
+
 				}
-				
-				$this->smarty->assign('oldId', $this->requestData['p']);
-				
+
+				$this->smarty->assign('oldId', $this->rGetVal('p'));
+
 			}
-			
+
         }
-		
+
 		$this->smarty->assign('projects', $projects);
-        
+
         $this->printPage();
 
     }
-	
-	public function clearCacheAction()
-    {
-        $this->checkAuthorisation(true);
-        
-        $this->setPageName($this->translate('Clear project cache'));
-        
-		if ($this->rHasVal('action','clear') && !$this->isFormResubmit()) {
-                
-			$this->emptyCacheFolder();
-			
-			$this->addMessage('Cleared project cache.');
-
-	        $this->smarty->assign('cleared', true);
-
-        }
-		
-        $this->printPage();
-
-    }
-
-
-
-
 
 
     private function ajaxActionModules ($moduleType, $action, $moduleId)
     {
         if ($moduleType == 'free') {
-            
+
             if ($action == 'module_publish') {
-                
-                $this->models->FreeModuleProject->update(array(
+
+                $this->models->FreeModulesProjects->update(array(
                     'active' => 'y'
                 ), array(
-                    'id' => $moduleId, 
+                    'id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
             elseif ($action == 'module_unpublish') {
-                
-                $this->models->FreeModuleProject->update(array(
+
+                $this->models->FreeModulesProjects->update(array(
                     'active' => 'n'
                 ), array(
-                    'id' => $moduleId, 
+                    'id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
             elseif ($action == 'module_delete' && isset($moduleId)) {
-                
-				$pDel = new ProjectDeleteController;	
+
+				$pDel = new ProjectDeleteController;
 				$pDel->deleteFreeModules($this->getCurrentProjectId(), $moduleId);
 
             }
         }
         elseif ($moduleType == 'regular') {
-            
+
             if ($action == 'module_activate') {
-                
-                $this->models->ModuleProject->save(
+
+                $this->models->ModulesProjects->save(
                 array(
-                    'id' => null, 
-                    'module_id' => $moduleId, 
-                    'active' => 'n', 
+                    'id' => null,
+                    'module_id' => $moduleId,
+                    'active' => 'n',
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
             elseif ($action == 'module_publish') {
-                
-                $this->models->ModuleProject->update(array(
+
+                $this->models->ModulesProjects->update(array(
                     'active' => 'y'
                 ), array(
-                    'module_id' => $moduleId, 
+                    'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
             elseif ($action == 'module_unpublish') {
-                
-                $this->models->ModuleProject->update(array(
+
+                $this->models->ModulesProjects->update(array(
                     'active' => 'n'
                 ), array(
-                    'module_id' => $moduleId, 
+                    'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
             elseif ($action == 'module_delete') {
 
 				$pDel = new ProjectDeleteController;
-	
+
 				if ($moduleId==MODCODE_INTRODUCTION) {
 			        $pDel->deleteIntroduction($this->getCurrentProjectId());
 				} else
@@ -896,13 +743,13 @@ class ProjectsController extends Controller
 			        $pDel->deleteProjectContent($this->getCurrentProjectId());
 				}
 
-                $this->models->ModuleProjectUser->delete(array(
-                    'project_id' => $this->getCurrentProjectId(), 
+                $this->models->ModulesProjectsUsers->delete(array(
+                    'project_id' => $this->getCurrentProjectId(),
                     'module_id' => $moduleId
                 ));
-                
-                $this->models->ModuleProject->delete(array(
-                    'module_id' => $moduleId, 
+
+                $this->models->ModulesProjects->delete(array(
+                    'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
                 ));
             }
@@ -911,154 +758,154 @@ class ProjectsController extends Controller
 
     private function ajaxActionCollaborators ($moduleType, $action, $moduleId, $userId)
     {
-        if ($moduleType == 'free') {
-            
-            if ($action == 'add') {
-                
-                if (is_array($userId)) {
-                    
-                    foreach ((array) $userId as $key => $val) {
-                        
-                        $this->models->FreeModuleProjectUser->save(
+        if ($moduleType == 'free')
+		{
+            if ($action == 'add')
+			{
+                if (is_array($userId))
+				{
+                    foreach ((array) $userId as $key => $val)
+					{
+                        $this->models->FreeModulesProjectsUsers->save(
                         array(
-                            'id' => null, 
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'free_module_id' => $moduleId, 
+                            'id' => null,
+                            'project_id' => $this->getCurrentProjectId(),
+                            'free_module_id' => $moduleId,
                             'user_id' => $val[0]
                         ));
                     }
                 }
-                else {
-                    
-                    $this->models->FreeModuleProjectUser->save(
+                else
+				{
+                    $this->models->FreeModulesProjectsUsers->save(
                     array(
-                        'id' => null, 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'free_module_id' => $moduleId, 
+                        'id' => null,
+                        'project_id' => $this->getCurrentProjectId(),
+                        'free_module_id' => $moduleId,
                         'user_id' => $userId
                     ));
                 }
             }
-            else if ($action == 'remove') {
-                
-                $this->models->FreeModuleProjectUser->delete(
+            elseif ($action == 'remove')
+			{
+                $this->models->FreeModulesProjectsUsers->delete(
                 array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'free_module_id' => $moduleId, 
+                    'project_id' => $this->getCurrentProjectId(),
+                    'free_module_id' => $moduleId,
                     'user_id' => $userId
                 ));
             }
         }
-        elseif ($moduleType == 'regular') {
-            
-            if ($action == 'add') {
-                
-                if (is_array($userId)) {
-                    
-                    foreach ((array) $userId as $key => $val) {
-                        
-                        $this->models->ModuleProjectUser->save(
+        elseif ($moduleType == 'regular')
+		{
+            if ($action == 'add')
+			{
+                if (is_array($userId))
+				{
+                    foreach ((array) $userId as $key => $val)
+					{
+                        $this->models->ModulesProjectsUsers->save(
                         array(
-                            'id' => null, 
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'module_id' => $moduleId, 
+                            'id' => null,
+                            'project_id' => $this->getCurrentProjectId(),
+                            'module_id' => $moduleId,
                             'user_id' => $val[0]
                         ));
                     }
                 }
-                else {
-                    
-                    $this->models->ModuleProjectUser->save(
+                else
+				{
+                    $this->models->ModulesProjectsUsers->save(
                     array(
-                        'id' => null, 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'module_id' => $moduleId, 
+                        'id' => null,
+                        'project_id' => $this->getCurrentProjectId(),
+                        'module_id' => $moduleId,
                         'user_id' => $userId
                     ));
                 }
             }
-            else if ($action == 'remove') {
-                
-                $this->models->ModuleProjectUser->delete(
+            elseif ($action == 'remove')
+			{
+                $this->models->ModulesProjectsUsers->delete(
                 array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'module_id' => $moduleId, 
+                    'project_id' => $this->getCurrentProjectId(),
+                    'module_id' => $moduleId,
                     'user_id' => $userId
                 ));
             }
         }
-        
+
         $cur = $this->getUserRights($this->getCurrentUserId());
-        
+
         $this->setUserSessionRights($cur['rights']);
     }
 
     private function ajaxActionLanguages ($action, $languageId)
     {
-        if ($action == 'add') {
-            
-            $lp = $this->models->LanguageProject->_get(array(
+        if ($action == 'add')
+		{
+            $lp = $this->models->LanguagesProjects->_get(array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId()
                 )
             ));
-            
+
             $make_default = (count((array) $lp) == 0);
-            
-            $this->models->LanguageProject->save(
+
+            $this->models->LanguagesProjects->save(
             array(
-                'id' => null, 
-                'language_id' => $languageId, 
-                'project_id' => $this->getCurrentProjectId(), 
-                'def_language' => $make_default ? 1 : 0, 
+                'id' => null,
+                'language_id' => $languageId,
+                'project_id' => $this->getCurrentProjectId(),
+                'def_language' => $make_default ? 1 : 0,
                 'active' => 'n'
             ));
-            
-            if ($this->models->LanguageProject->getNewId() == '')
+
+            if ($this->models->LanguagesProjects->getNewId() == '')
                 $this->addError($this->translate('Language already assigned.'));
         }
-        elseif ($action == 'default') {
-            
-            $this->models->LanguageProject->update(array(
+        elseif ($action == 'default')
+		{
+            $this->models->LanguagesProjects->update(array(
                 'def_language' => 0
             ), array(
                 'project_id' => $this->getCurrentProjectId()
             ));
-            
-            $this->models->LanguageProject->update(array(
+
+            $this->models->LanguagesProjects->update(array(
                 'def_language' => 1
             ), array(
-                'language_id' => $languageId, 
+                'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
-        elseif ($action == 'deactivate' || $action == 'reactivate') {
-            
-            $this->models->LanguageProject->update(array(
+        elseif ($action == 'deactivate' || $action == 'reactivate')
+		{
+            $this->models->LanguagesProjects->update(array(
                 'active' => ($action == 'deactivate' ? 'n' : 'y')
             ), array(
-                'language_id' => $languageId, 
+                'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
-        elseif ($action == 'delete') {
-            
-            $this->models->ContentTaxon->delete(array(
-                'language_id' => $languageId, 
+        elseif ($action == 'delete')
+		{
+            $this->models->ContentTaxa->delete(array(
+                'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
             ));
-            
-            $this->models->LanguageProject->delete(array(
-                'language_id' => $languageId, 
+
+            $this->models->LanguagesProjects->delete(array(
+                'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
-        elseif ($action == 'translated' || $action == 'untranslated') {
-            
-            $this->models->LanguageProject->update(array(
+        elseif ($action == 'translated' || $action == 'untranslated')
+		{
+            $this->models->LanguagesProjects->update(array(
                 'tranlation_status' => ($action == 'translated' ? 1 : 0)
             ), array(
-                'language_id' => $languageId, 
+                'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
             ));
         }
@@ -1066,64 +913,59 @@ class ProjectsController extends Controller
 
     private function getAvailableLanguages ()
     {
-        return array_merge((array) $this->models->Language->_get(array(
+        return array_merge((array) $this->models->Languages->_get(array(
             'id' => array(
                 'show_order is not' => null
-            ), 
+            ),
             'order' => 'show_order asc'
-        )), (array) $this->models->Language->_get(array(
+        )), (array) $this->models->Languages->_get(array(
             'id' => array(
                 'show_order is' => null
-            ), 
+            ),
             'order' => 'language asc'
         )));
     }
 
     private function addAllModulesToProject ($id)
     {
-        $m = $this->models->Module->_get(array(
-            'id' => '*', 
+        $m = $this->models->Modules->_get(array(
+            'id' => '*',
             'order' => 'show_order'
         ));
-        
+
         foreach ((array) $m as $val)
             $this->addModuleToProject($val['id'], $id);
     }
 
     private function doDeleteProjectAction ($pId)
     {
-		
 		$pDel = new ProjectDeleteController;
 		$pDel->doDeleteProjectAction($pId);
-
     }
 
-	private function doDeleteOrpahnedData()
+	private function doDeleteOrphanedData()
 	{
-		
-		$data = $this->models->Project->freeQuery('show tables');
+
+		$data = $this->models->Projects->freeQuery('show tables');
 
 		$key = key($data[0]);
-		$prefix = $this->models->Project->getTablePrefix();
+		$prefix = $this->models->Projects->getTablePrefix();
 		$pInUse = array();
 
-		foreach((array)$data as $val) {
-
+		foreach((array)$data as $val)
+		{
 			$table = ($val[$key]);
 
 			if (substr($table,0,strlen($prefix))!==$prefix)
 				continue;
 
 			// all user tables, infrastructural tables and the project table itself lack a project_id column.
-			$d = $this->models->Project->freeQuery('select distinct project_id from '.$table);
+			$d = $this->models->Projects->freeQuery('select distinct project_id from '.$table);
 
 			foreach((array)$d as $dVal)
 				$pInUse[$dVal['project_id']]=$dVal['project_id'];
-				
-			//echo $table;q($d);
-
 		}
-		
+
 		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
 			if(is_dir($file)) {
 				$boom = explode('/',$file);
@@ -1132,60 +974,48 @@ class ProjectsController extends Controller
 					$pInUse[intval($boom)] = intval($boom);
 			}
 		}
-		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
-			if(is_dir($file)) {
-				$boom = explode('/',$file);
-				$boom = array_pop($boom);
-				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
-			}
-		}
 
-		$d = $this->models->Project->_get(array('id' => '*'));
-		
-		foreach((array)$d as $val) {
+		$d = $this->models->Projects->_get(array('id' => '*'));
 
+		foreach((array)$d as $val)
+		{
 			unset($pInUse[$val['id']]);
 			$this->addMessage(sprintf('Ignoring "%s"',$val['sys_name']));
-
 		}
-		
-		foreach((array)$pInUse as $val) {
-	
+
+		foreach((array)$pInUse as $val)
+		{
 			$this->doDeleteProjectAction($val);
 			$this->addMessage(sprintf('Deleted data for orphan ID %s',$val));
-
 		}
-		
+
 	}
 
 	private function doChangeProjectId($oldId,$newId)
 	{
 
-		$data = $this->models->Project->freeQuery('show tables');
+		$data = $this->models->Projects->freeQuery('show tables');
 
 		$key = key($data[0]);
-		$prefix = $this->models->Project->getTablePrefix();
+		$prefix = $this->models->Projects->getTablePrefix();
 		$pInUse = array();
 
-		foreach((array)$data as $val) {
-
+		foreach((array)$data as $val)
+		{
 			$table = ($val[$key]);
 
 			if (substr($table,0,strlen($prefix))!==$prefix)
 				continue;
 
-			$d = $this->models->Project->freeQuery('select count(*) as total from '.$table.' where project_id = '.$oldId);
-			
-			if ($d[0]['total']>0) {
-			
-				$this->models->Project->freeQuery('update '.$table.' set project_id = '.$newId.' where project_id = '.$oldId);
-				$this->addMessage('Updated '.$table);
-				
-			}
+			$d = $this->models->Projects->freeQuery('select count(*) as total from '.$table.' where project_id = '.$oldId);
 
+			if ($d[0]['total']>0)
+			{
+				$this->models->Projects->freeQuery('update '.$table.' set project_id = '.$newId.' where project_id = '.$oldId);
+				$this->addMessage('Updated '.$table);
+			}
 		}
-	
+
 		rename(
 			$this->generalSettings['directories']['mediaDirProject'].'/'.$this->getProjectFSCode($oldId),
 			$this->generalSettings['directories']['mediaDirProject'].'/'.$this->getProjectFSCode($newId)
@@ -1193,32 +1023,25 @@ class ProjectsController extends Controller
 
 		$this->addMessage('Renamed media directory');
 
-		rename(
-			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($oldId),
-			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($newId)
-		);
-
-		$this->addMessage('Renamed cache directory');
-
-		$this->models->Project->update(
+		$this->models->Projects->update(
 			array('id'=>$newId),
 			array('id'=>$oldId)
 		);
 
 		$this->addMessage('Updated project table');
-	
+
 	}
 
 	private function saveProjectData($data)
 	{
-
 		$data['id'] = $this->getCurrentProjectId();
-			
-		if (!$this->isCurrentUserSysAdmin() && isset($data['sys_name'])) {
+
+		if (!$this->isCurrentUserSysAdmin() && isset($data['sys_name']))
+		{
 			unset($this->requestData['sys_name']);
 		}
-			
-		$p = $this->models->Project->update(
+
+		$p = $this->models->Projects->update(
 			array(
 				'short_name' => 'null',
 				'css_url' => 'null',
@@ -1228,65 +1051,165 @@ class ProjectsController extends Controller
 			),
 			array('id'=>$data['id'])
 		);
-		
-		if (isset($data['sys_name'])) {
 
-            $p = $this->models->Project->_get(array(
+		if (isset($data['sys_name']))
+		{
+            $p = $this->models->Projects->_get(array(
                 'id' => array('id !=' => $data['id'],'sys_name'=>$data['sys_name']),
             ));
-			
-			if ($p) {
-				
+
+			if ($p)
+			{
 				$this->addError('A project with that internal name alreasy exists.');
 				unset($this->requestData['sys_name']);
-				
 			}
-
 		}
 
-		if (isset($data['short_name'])) {
-
-            $p = $this->models->Project->_get(array(
+		if (isset($data['short_name']))
+		{
+            $p = $this->models->Projects->_get(array(
                 'id' => array('id !=' => $data['id'],'short_name'=>$data['short_name']),
             ));
-			
-			if ($p) {
-				
+
+			if ($p)
+			{
 				$this->addError(sprintf('A project with that shortname already exists (%s).',$p[0]['sys_name']));
 				unset($this->requestData['short_name']);
-				
 			}
-
 		}
 
-		$this->models->Project->save($data);
-		
+		$this->models->Projects->save($data);
+
 	}
 
-	private function initialize()
+	private function getCurrentUserProjects()
 	{
+		$d=array( 'user_id'=>$this->getCurrentUserId() );
 
-		foreach((array)$this->_availableProjectSettings as $key=>$val) {
-			
-			$this->_availableProjectSettings[$key][2] = 
-				preg_replace_callback(
-					'/\%(.*)\%/',
-					function($m)
-					{
-						switch ($m[1]) {
-							case 'MEDIA_DIR' : 
-								return isset($_SESSION['admin']['project']['urls']['project_media']) ? $_SESSION['admin']['project']['urls']['project_media'] : $m[1];
-								break;
-							case 'ID' : 
-								return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : $m[1];
-								break;
-							default:
-								return $m[1];
-						}	
-					},
-					$val[2]);
-	    }
+		if ( $this->UserRights->isSysAdmin() )
+		{
+			$d['show_all']=true;
+		}
 		
+		return $this->models->ProjectsModel->getUserProjects( $d );
 	}
-	
+
+	private function isCurrentUserAuthorizedForProject($id)
+	{
+		if ( $this->UserRights->isSysAdmin() ) return true;
+		
+		foreach ((array) $this->getCurrentUserProjects() as $key => $val)
+		{
+			if ($val['id'] == $id && $val['user_project_active'] == '1')
+				return true;
+		}
+
+		return false;
+	}
+
+    private function setCurrentProjectId($id)
+    {
+        $_SESSION['admin']['project']['id'] = $id;
+
+        $this->models->ProjectsRolesUsers->update(array(
+            'last_project_select' => 'now()',
+            'project_selects' => 'project_selects+1'
+        ), array(
+            'user_id' => $this->getCurrentUserId(),
+            'project_id' => $this->getCurrentProjectId()
+        ));
+    }
+
+	private function doSetProject( $id )
+	{
+		$this->unsetProjectSessionData();
+		$this->setCurrentProjectId( $id );
+		$this->setCurrentProjectData();
+		//$this->setCurrentUserRoleId();
+	}
+
+    private function checkDefaultProjectSelect()
+    {
+		$projects=$this->getCurrentUserProjects();
+		
+		if ( $this->UserRights->isSysAdmin() && count((array)$projects)>1)
+			return;
+		
+		$p=null;
+
+		foreach((array)$projects as $key=>$val)
+		{
+			if ( $val['user_project_active']==1 )
+			{
+				if ( is_null($p) )
+				{
+					$p=$val['id'];
+				}
+				else
+				{
+					$p=false;
+				}
+			}
+		}
+
+		if ( $p && $this->isCurrentUserAuthorizedForProject( $p ) )
+		{
+			$this->doSetProject( $p );
+			$this->redirect( $this->getLoggedInMainIndex() );
+		}
+    }
+
+    private function setCurrentProjectData ($data = null)
+    {
+        if ($data == null)
+		{
+            $id = $this->getCurrentProjectId();
+
+            if (isset($id))
+			{
+                $data = $this->models->Projects->_get(array(
+                    'id' => $id
+                ));
+
+                $pru = $this->models->ProjectsRolesUsers->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $id,
+                        'role_id' => ID_ROLE_LEAD_EXPERT
+                    ),
+                    'columns' => 'user_id'
+                ));
+
+                foreach ((array) $pru as $key => $val)
+				{
+                    $u = $this->models->Users->_get(
+                    array(
+                        'id' => array(
+                            'id' => $val['user_id'],
+                            'active' => 1
+                        )
+                    ));
+
+                    $pru[$key]['first_name'] = $u[0]['first_name'];
+                    $pru[$key]['last_name'] = $u[0]['last_name'];
+                    $pru[$key]['email_address'] = $u[0]['email_address'];
+                }
+
+                $_SESSION['admin']['project']['lead_experts'] = $pru;
+            }
+        }
+
+        foreach ((array) $data as $key => $val)
+		{
+            $_SESSION['admin']['project'][$key] = $val;
+        }
+    }
+
+
+
+
+
+
+
+
 }

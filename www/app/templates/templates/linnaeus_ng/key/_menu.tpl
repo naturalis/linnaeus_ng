@@ -1,8 +1,8 @@
 {assign var=selectedChoice value=$keypath|@end}
+
 <script type="text/javascript">
 	allLookupSetSelectedId({$selectedChoice.id});
 </script>
-
 
 <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
@@ -13,7 +13,7 @@
 <script type="text/javascript">
     var decisionPath = '<div id="lookup-DialogContent">';
     {if $keypath|@count > 1}
-        {foreach from=$keypath key=k item=v name=pathPopup}
+        {foreach $keypath v k pathPopup}
             {if !$smarty.foreach.pathPopup.last}
             decisionPath = decisionPath + 
                 '<p class="row">'+
@@ -30,34 +30,18 @@
 <span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon icon-book" />
 {t}Contents{/t}</span>
 
-{if $useJavascriptLinks}
-    {if $totalSteps > 1}
-        <a class="navigation-icon icon-nav-first" id="first-icon" onclick="keyDoStep($keypath.0.id);" title="{t}Return to first step{/t}">{t}First{/t}</a>
-    {else}
-        <span class="navigation-icon icon-nav-first icon-inactive" id="first-icon-inactive"  title="{t}Return to first step{/t}">{t}First{/t}</span>
-    {/if} 
-    <span
-    {if $totalSteps > 1}
-        onclick="keyDoStep({$keypath.$previousStep.id});" id="previous-icon" 
-        title="{t}Previous{/t} {t}step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}"
-    {else}
-        id="previous-icon-inactive"
-    {/if} 
-    class="navigation-icon icon-book" />{t}Previous{/t}</span>
+{if $totalSteps > 1}
+    <a class="navigation-icon icon-nav-first" id="first-icon" href="../key/index.php?step={$keypath.0.id}" title="{t}Return to first step{/t}">{t}First{/t}</a>
+    <a class="navigation-icon icon-nav-prev" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
+    title="{t}Previous{/t} {t}step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
+    {t}Previous{/t}</a>
 {else}
-    {if $totalSteps > 1}
-        <a class="navigation-icon icon-nav-first" id="first-icon" href="../key/index.php?step={$keypath.0.id}" title="{t}Return to first step{/t}">{t}First{/t}</a>
-        <a class="navigation-icon icon-nav-prev" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
-        title="{t}Previous{/t} {t}step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
-        {t}Previous{/t}</a>
-    {else}
-        <span class="navigation-icon icon-nav-first icon-inactive" id="first-icon-inactive">{t}First{/t}</span>
-        <span class="navigation-icon icon-nav-prev icon-inactive" id="previous-icon-inactive">{t}Previous{/t}</span>
-    {/if}
+    <span class="navigation-icon icon-nav-first icon-inactive" id="first-icon-inactive">{t}First{/t}</span>
+    <span class="navigation-icon icon-nav-prev icon-inactive" id="previous-icon-inactive">{t}Previous{/t}</span>
 {/if}
 
 {if $backlink}
-    <a class="navigation-icon icon-nav-back" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
+    <a class="navigation-icon icon-nav-back" id="back-icon" href="javascript:history.back()" back-url="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
 {else}
     <span class="navigation-icon icon-nav-back icon-inactive" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}

@@ -20,11 +20,11 @@
 <p>
 <b>{t}Allowed MIME-types{/t}</b><br />
 {t}Files of the following MIME-types are allowed:{/t}<ul>
-{section name=i loop=$allowedFormats}
+{foreach $allowedFormats v k}
 <li>
-	{$allowedFormats[i].mime}
-	({t _s1=$allowedFormats[i].media_name}%s{/t}; {t}max.{/t} {math equation="x/y" x=$allowedFormats[i].maxSize y=1000000 format="%.0fM"} {t}per file{/t}{if $allowedFormats[i].media_type=='archive'}; {t}see below for information on uploading archives{/t}{/if})</li>
-{/section}
+	{$v.mime}
+	({t _s1=$v.media_name}%s{/t}; {t}max.{/t} {math equation="x/y" x=$v.maxSize y=1000000 format="%.0fM"} {t}per file{/t}{if $v.media_type=='archive'}; {t}see below for information on uploading archives{/t}{/if})</li>
+{/foreach}
 </ul>
 </p>
 <p>

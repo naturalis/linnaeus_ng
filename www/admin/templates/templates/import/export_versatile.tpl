@@ -364,7 +364,7 @@ function doSubmit()
             <div class=nametypes style="display:none">
             {foreach $nametypes v}
             
-            {if $v.nametype!=$smarty.const.PREDICATE_VALID_NAME && $v.nametype!=$smarty.const.PREDICATE_PREFERRED_NAME}
+            {if $v.nametype!=$smarty.const.PREDICATE_VALID_NAME} {* && $v.nametype!=$smarty.const.PREDICATE_PREFERRED_NAME *}
             <label>
             	<input 
                 	class=nametypes

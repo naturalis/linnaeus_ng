@@ -10,84 +10,87 @@ include_once ('Controller.php');
 class ProjectDeleteController extends Controller
 {
     public $usedModels = array(
-		'characteristic', 
-		'characteristic_chargroup', 
-		'characteristic_label', 
-		'characteristic_label_state', 
-		'characteristic_matrix', 
-		'characteristic_state', 
-		'chargroup', 
-		'chargroup_label', 
-		'choice_content_keystep', 
-		'choice_content_keystep_undo',
-		'choice_keystep', 
-		'commonname', 
-		'content', 
-		'content_free_module', 
-		'content_introduction', 
-		'content_keystep', 
-		'content_taxon', 
-		'content_taxon_undo', 
-		'free_module_media', 
-		'free_module_page', 
-		'free_module_project', 
-		'free_module_project', 
-		'free_module_project_user', 
-		'free_module_project_user', 
-		'geodata_type', 
-		'geodata_type_title', 
-		'glossary', 
+		'characteristics',
+		'characteristics_chargroups',
+		'characteristics_labels',
+		'characteristics_labels_states',
+		'characteristics_matrices',
+		'characteristics_states',
+		'chargroups',
+		'chargroups_labels',
+		'choices_content_keysteps',
+		'choices_keysteps',
+		'commonnames',
+		'content',
+		'content_free_modules',
+		'content_introduction',
+		'content_keysteps',
+		'content_taxa',
+		'free_module_media',
+		'free_modules_pages',
+		'free_modules_projects',
+		'free_modules_projects_users',
+		'geodata_types',
+		'geodata_types_titles',
+		'glossary',
 		'glossary_media',
 		'glossary_media_captions',
-		'glossary_synonym', 
-		'heartbeat',
-		'hotword',
-		'introduction_media', 
-		'introduction_page', 
-		'keystep', 
-		'keytree',
+		'glossary_synonyms',
+		'hotwords',
+		'introduction_media',
+		'introduction_pages',
+		'keysteps',
+		'keytrees',
 		'l2_diversity_index',
-		'l2_map',
-		'l2_occurrence_taxon',
-		'l2_occurrence_taxon_combi',
-		'language', 
-		'language_project', 
-		'literature', 
-		'literature_taxon', 
-		'matrix', 
-		'matrix_name', 
-		'matrix_taxon', 
-		'matrix_taxon_state', 
-		'matrix_variation', 
-		'media_descriptions_taxon', 
-		'media_taxon', 
-		'module', 
-		'module_project', 
-		'module_project_user', 
+		'l2_maps',
+		'l2_occurrences_taxa',
+		'l2_occurrences_taxa_combi',
+		'languages',
+		'languages_projects',
+		'literature',
+		'literature_taxa',
+		'matrices',
+		'matrices_names',
+		'matrices_taxa',
+		'matrices_taxa_states',
+		'matrices_variations',
+		'media_descriptions_taxon',
+		'media_taxon',
+		'modules',
+		'modules_projects',
+		'modules_projects_users',
 		'nbc_extras',
-		'occurrence_taxon', 
-		'page_taxon', 
-		'page_taxon_title', 
-		'project', 
-		'project_role_user', 
-		'role', 
-		'section',
-		'synonym', 
-		'taxa_relations', 
-		'taxon_variation',
-		'taxon_variation', 
-		'user', 
-		'user_taxon', 
-		'variation_label', 
-		'variation_relations', 
-		'gui_menu_order'
+		'occurrences_taxa',
+		'pages_taxa',
+		'pages_taxa_titles',
+		'projects',
+		'projects_roles_users',
+		'roles',
+		'sections',
+		'synonyms',
+		'taxa_relations',
+		'taxa_variations',
+		'users',
+		'users_taxa',
+		'variations_labels',
+		'variation_relations',
+		'gui_menu_order',
+		'module_settings_values'
     );
 
     public function __construct ()
     {
         parent::__construct();
+        $this->initialize();
     }
 
+    private function initialize ()
+    {
+        // Disable retaining query results, as this will cause memory errors for large tables
+        foreach ($this->models as $model) {
+            $model->setRetainQuery(false);
+        }
+    }
 
     public function __destruct ()
     {
@@ -96,13 +99,13 @@ class ProjectDeleteController extends Controller
 
     public function doDeleteProjectAction ($projectId)
     {
-		
+
 		set_time_limit(600);
 		$this->doDeleteAllButProjectItself($projectId);
 		$this->doDeleteProjectItself($projectId);
-		
+
 	}
-		
+
     public function doDeleteAllButProjectItself ($projectId)
     {
         $this->deleteNBCKeydata($projectId);
@@ -143,7 +146,7 @@ class ProjectDeleteController extends Controller
         $this->models->ContentIntroduction->delete(array(
             'project_id' => $id
         ));
-        $this->models->IntroductionPage->delete(array(
+        $this->models->IntroductionPages->delete(array(
             'project_id' => $id
         ));
         $this->models->IntroductionMedia->delete(array(
@@ -153,23 +156,23 @@ class ProjectDeleteController extends Controller
 
     public function deleteGeoData ($id)
     {
-        $this->models->OccurrenceTaxon->delete(array(
+        $this->models->OccurrencesTaxa->delete(array(
             'project_id' => $id
         ));
-        $this->models->GeodataTypeTitle->delete(array(
+        $this->models->GeodataTypesTitles->delete(array(
             'project_id' => $id
         ));
-        $this->models->GeodataType->delete(array(
+        $this->models->GeodataTypes->delete(array(
             'project_id' => $id
         ));
-        
-        $this->models->L2Map->delete(array(
+
+        $this->models->L2Maps->delete(array(
             'project_id' => $id
         ));
-        $this->models->L2OccurrenceTaxon->delete(array(
+        $this->models->L2OccurrencesTaxa->delete(array(
             'project_id' => $id
         ));
-        $this->models->L2OccurrenceTaxonCombi->delete(array(
+        $this->models->L2OccurrencesTaxaCombi->delete(array(
             'project_id' => $id
         ));
         $this->models->L2DiversityIndex->delete(array(
@@ -185,78 +188,75 @@ class ProjectDeleteController extends Controller
         $this->models->GuiMenuOrder->delete(array(
             'project_id' => $id
         ));
-        $this->models->MatrixVariation->delete(array(
+        $this->models->MatricesVariations->delete(array(
             'project_id' => $id
         ));
-        $this->models->MatrixTaxonState->delete(array(
+        $this->models->MatricesTaxaStates->delete(array(
             'project_id' => $id
         ));
-        $this->models->MatrixTaxon->delete(array(
+        $this->models->MatricesTaxa->delete(array(
             'project_id' => $id
         ));
-        $this->models->CharacteristicLabelState->delete(array(
+        $this->models->CharacteristicsLabelsStates->delete(array(
             'project_id' => $id
         ));
-		
+
 		if (!$keepFiles) {
-		
-			$cs = $this->models->CharacteristicState->_get(array(
+
+			$cs = $this->models->CharacteristicsStates->_get(array(
 				'id' => array(
 					'project_id' => $id
 				)
 			));
-	
+
 			foreach ((array) $cs as $key => $val) {
-				
+
 				if (isset($val['file_name'])) {
-					
+
 					@unlink($_SESSION['admin']['project']['paths']['project_media'] . $val['file_name']);
 				}
 			}
-			
+
 		}
-        
-        $this->models->CharacteristicState->delete(array(
+
+        $this->models->CharacteristicsStates->delete(array(
             'project_id' => $id
         ));
-        $this->models->CharacteristicMatrix->delete(array(
+        $this->models->CharacteristicsMatrices->delete(array(
             'project_id' => $id
         ));
-        $this->models->CharacteristicLabel->delete(array(
+        $this->models->CharacteristicsLabels->delete(array(
             'project_id' => $id
         ));
-        $this->models->Characteristic->delete(array(
+        $this->models->Characteristics->delete(array(
             'project_id' => $id
         ));
-        $this->models->MatrixName->delete(array(
+        $this->models->MatricesNames->delete(array(
             'project_id' => $id
         ));
-        $this->models->Matrix->delete(array(
+        $this->models->Matrices->delete(array(
             'project_id' => $id
         ));
-		
+
     }
 
 
 
     public function deleteDichotomousKey ($id)
     {
-        $this->models->ChoiceContentKeystep->delete(array(
+        $this->models->ChoicesContentKeysteps->delete(array(
             'project_id' => $id
         ));
-        $this->models->ChoiceKeystep->delete(array(
+        $this->models->ChoicesKeysteps->delete(array(
             'project_id' => $id
         ));
-        $this->models->ContentKeystep->delete(array(
+        $this->models->ContentKeysteps->delete(array(
             'project_id' => $id
         ));
-        $this->models->Keystep->delete(array(
+        $this->models->Keysteps->delete(array(
             'project_id' => $id
         ));
-        $this->models->ChoiceContentKeystepUndo->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->Keytree->delete(array(
+        $this->models->Keytrees->delete(array(
             'project_id' => $id
         ));
     }
@@ -265,25 +265,25 @@ class ProjectDeleteController extends Controller
     public function deleteGlossary ($id, $keepFiles=false)
     {
         $paths = $this->makePathNames($id);
-        
+
 		if (!$keepFiles) {
-		
+
 			$mt = $this->models->GlossaryMedia->_get(array(
 				'id' => array(
 					'project_id' => $id
 				)
 			));
-			
+
 			foreach ((array) $mt as $val) {
-				
+
 				if (isset($val['file_name']))
 					@unlink($paths['project_media'] . $val['file_name']);
 				if (isset($val['thumb_name']))
 					@unlink($paths['project_thumbs'] . $val['thumb_name']);
 			}
-			
+
 		}
-        
+
         $this->models->GlossaryMedia->delete(array(
             'project_id' => $id
         ));
@@ -292,7 +292,7 @@ class ProjectDeleteController extends Controller
             'project_id' => $id
         ));
 
-        $this->models->GlossarySynonym->delete(array(
+        $this->models->GlossarySynonyms->delete(array(
             'project_id' => $id
         ));
         $this->models->Glossary->delete(array(
@@ -303,7 +303,7 @@ class ProjectDeleteController extends Controller
 
     public function deleteLiterature ($id)
     {
-        $this->models->LiteratureTaxon->delete(array(
+        $this->models->LiteratureTaxa->delete(array(
             'project_id' => $id
         ));
         $this->models->Literature->delete(array(
@@ -324,25 +324,25 @@ class ProjectDeleteController extends Controller
     public function deleteSpeciesMedia ($id,$keepFiles=false)
     {
         $paths = $this->makePathNames($id);
-        
+
 		if (!$keepFiles) {
-        
+
 			$mt = $this->models->MediaTaxon->_get(array(
 				'id' => array(
 					'project_id' => $id
 				)
 			));
-			
+
 			foreach ((array) $mt as $val) {
-				
+
 				if (isset($val['file_name']))
 					@unlink($paths['project_media'] . $val['file_name']);
 				if (isset($val['thumb_name']))
 					@unlink($paths['project_thumbs'] . $val['thumb_name']);
 			}
-		
+
 		}
-        
+
         $this->models->MediaTaxon->delete(array(
             'project_id' => $id
         ));
@@ -353,7 +353,7 @@ class ProjectDeleteController extends Controller
 
     public function deleteCommonnames ($id)
     {
-        $this->models->Commonname->delete(array(
+        $this->models->Commonnames->delete(array(
             'project_id' => $id
         ));
     }
@@ -362,7 +362,7 @@ class ProjectDeleteController extends Controller
 
     public function deleteSynonyms ($id)
     {
-        $this->models->Synonym->delete(array(
+        $this->models->Synonyms->delete(array(
             'project_id' => $id
         ));
     }
@@ -371,10 +371,10 @@ class ProjectDeleteController extends Controller
 
     public function deleteStandardCat ($id)
     {
-        $this->models->PageTaxonTitle->delete(array(
+        $this->models->PagesTaxaTitles->delete(array(
             'project_id' => $id
         ));
-        $this->models->PageTaxon->delete(array(
+        $this->models->PagesTaxa->delete(array(
             'project_id' => $id
         ));
     }
@@ -383,15 +383,12 @@ class ProjectDeleteController extends Controller
 
     public function deleteSpeciesContent ($id,$deleteGeneralData=true)
     {
-        $this->models->ContentTaxon->delete(array(
+        $this->models->ContentTaxa->delete(array(
             'project_id' => $id
         ));
-        $this->models->ContentTaxonUndo->delete(array(
-            'project_id' => $id
-        ));
-		
+
 		if ($deleteGeneralData) {
-			$this->models->Section->delete(array(
+			$this->models->Sections->delete(array(
 				'project_id' => $id
 			));
 		}
@@ -400,7 +397,7 @@ class ProjectDeleteController extends Controller
 
     public function deleteSpecies ($id)
     {
-        $this->models->Taxon->delete(array(
+        $this->models->Taxa->delete(array(
             'project_id' => $id
         ));
     }
@@ -409,10 +406,10 @@ class ProjectDeleteController extends Controller
 
     public function deleteProjectRanks ($id)
     {
-        $this->models->LabelProjectRank->delete(array(
+        $this->models->LabelsProjectsRanks->delete(array(
             'project_id' => $id
         ));
-        $this->models->ProjectRank->delete(array(
+        $this->models->ProjectsRanks->delete(array(
             'project_id' => $id
         ));
     }
@@ -421,13 +418,13 @@ class ProjectDeleteController extends Controller
 
     public function deleteProjectUsers ($id)
     {
-        $this->models->UserTaxon->delete(array(
+        $this->models->UsersTaxa->delete(array(
             'project_id' => $id
         ));
-        $this->models->ProjectRoleUser->delete(array(
+        $this->models->ProjectsRolesUsers->delete(array(
             'project_id' => $id
         ));
-        $this->models->ModuleProjectUser->delete(array(
+        $this->models->ModulesProjectsUsers->delete(array(
             'project_id' => $id
         ));
     }
@@ -436,7 +433,7 @@ class ProjectDeleteController extends Controller
 
     public function deleteProjectLanguage ($id)
     {
-        $this->models->LanguageProject->delete(array(
+        $this->models->LanguagesProjects->delete(array(
             'project_id' => $id
         ));
     }
@@ -447,31 +444,31 @@ class ProjectDeleteController extends Controller
     {
         if (empty($projectId) || empty($pageId))
             return;
-        
+
 		if (!$keepFiles) {
-        
+
 			$fmm = $this->models->FreeModuleMedia->_get(array(
 				'id' => array(
-					'project_id' => $projectId, 
+					'project_id' => $projectId,
 					'page_id' => $pageId
 				)
 			));
-			
+
 			if (file_exists($paths['project_media'] . $fmm[0]['file_name'])) {
-				
+
 				if (@unlink($paths['project_media'] . $fmm[0]['file_name'])) {
-					
+
 					if ($fmm[0]['thumb_name'] && file_exists($paths['project_thumbs'] . $fmm[0]['thumb_name'])) {
-						
+
 						@unlink($paths['project_thumbs'] . $fmm[0]['thumb_name']);
 					}
 				}
 			}
-			
+
 		}
-        
+
         $this->models->FreeModuleMedia->delete(array(
-            'project_id' => $projectId, 
+            'project_id' => $projectId,
             'page_id' => $pageId
         ));
     }
@@ -482,53 +479,53 @@ class ProjectDeleteController extends Controller
     {
         if ($id == null)
             return;
-        
+
         $d['project_id'] = $id;
-        
+
         if (isset($moduleId))
             $d['module_id'] = $moduleId;
-        
-        $this->models->ContentFreeModule->delete($d);
-        
-        $fmp = $this->models->FreeModulePage->_get(array(
+
+        $this->models->ContentFreeModules->delete($d);
+
+        $fmp = $this->models->FreeModulesPages->_get(array(
             'id' => $d
         ));
 
 
         $paths = $this->makePathNames($id);
-        
+
         foreach ((array) $fmp as $key => $val) {
-            
+
             $this->deleteFreeModuleMedia($id, $val['id'], $paths);
         }
-        
-        $this->models->FreeModulePage->delete($d);
+
+        $this->models->FreeModulesPages->delete($d);
         $this->models->FreeModuleMedia->delete($d);
-        
+
         unset($d);
-        
+
         $d['project_id'] = $id;
-        
+
         if (isset($moduleId))
             $d['free_module_id'] = $moduleId;
-        
-        $this->models->FreeModuleProjectUser->delete($d);
-        
+
+        $this->models->FreeModulesProjectsUsers->delete($d);
+
         unset($d);
-        
+
         $d['project_id'] = $id;
-        
+
         if (isset($moduleId))
             $d['id'] = $moduleId;
-        
-        $this->models->FreeModuleProject->delete($d);
+
+        $this->models->FreeModulesProjects->delete($d);
     }
 
 
 
     public function deleteModulesFromProject ($id)
     {
-        $this->models->ModuleProject->delete(array(
+        $this->models->ModulesProjects->delete(array(
             'project_id' => $id
         ));
     }
@@ -549,20 +546,16 @@ class ProjectDeleteController extends Controller
     public function deleteProjectDirectories ($id)
     {
         $paths = $this->makePathNames($id);
-        
+
         $this->rrmdir($paths['project_media_l2_maps']);
         $this->rrmdir($paths['project_thumbs']);
         $this->rrmdir($paths['project_media']);
-		
-		$this->clearAllCaches();
-		
-        $this->rrmdir($paths['cache']);
     }
 
 
     public function deleteProject ($id)
     {
-        $p = $this->models->Project->delete(array(
+        $p = $this->models->Projects->delete(array(
             'id' => $id
         ));
     }
@@ -570,17 +563,17 @@ class ProjectDeleteController extends Controller
 
     public function deleteProjectCssFile ($id)
     {
-        $p = $this->models->Project->_get(array(
+        $p = $this->models->Projects->_get(array(
             'id' => $id
         ));
-        
+
         @unlink($this->makeCustomCssFileName($id, $p['title']));
     }
 
 
     public function deleteProjectSettings ($id)
     {
-        $this->models->Settings->delete(array(
+        $this->models->ModuleSettingsValues->delete(array(
             'project_id' => $id
         ));
     }
@@ -588,31 +581,28 @@ class ProjectDeleteController extends Controller
 
     public function deleteOtherStuff ($id)
     {
-        $this->models->Heartbeat->delete(array(
-        'project_id' => $id
-        ));
-        $this->models->Hotword->delete(array(
+        $this->models->Hotwords->delete(array(
         'project_id' => $id
         ));
 
     }
-    
-    
+
+
     public function deleteNBCKeydata ($id)
     {
-        $this->models->ChargroupLabel->delete(array(
+        $this->models->ChargroupsLabels->delete(array(
             'project_id' => $id
         ));
-        $this->models->Chargroup->delete(array(
+        $this->models->Chargroups->delete(array(
             'project_id' => $id
         ));
-        $this->models->CharacteristicChargroup->delete(array(
+        $this->models->CharacteristicsChargroups->delete(array(
             'project_id' => $id
         ));
-        $this->models->TaxonVariation->delete(array(
+        $this->models->TaxaVariations->delete(array(
             'project_id' => $id
         ));
-        $this->models->VariationLabel->delete(array(
+        $this->models->VariationsLabels->delete(array(
             'project_id' => $id
         ));
         $this->models->TaxaRelations->delete(array(
@@ -621,18 +611,18 @@ class ProjectDeleteController extends Controller
         $this->models->VariationRelations->delete(array(
             'project_id' => $id
         ));
-        $this->models->MatrixVariation->delete(array(
+        $this->models->MatricesVariations->delete(array(
             'project_id' => $id
         ));
         $this->models->NbcExtras->delete(array(
             'project_id' => $id
         ));
     }
-	
-	
-	public function doDeleteOrpahnedData()
+
+
+	public function doDeleteOrphanedData()
 	{
-		
+
 		$data = $this->models->Project->freeQuery('show tables');
 
 		$key = key($data[0]);
@@ -651,20 +641,12 @@ class ProjectDeleteController extends Controller
 
 			foreach((array)$d as $dVal)
 				$pInUse[$dVal['project_id']]=$dVal['project_id'];
-				
+
 			//echo $table;q($d);
 
 		}
-		
+
 		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
-			if(is_dir($file)) {
-				$boom = explode('/',$file);
-				$boom = array_pop($boom);
-				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
-			}
-		}
-		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
 			if(is_dir($file)) {
 				$boom = explode('/',$file);
 				$boom = array_pop($boom);
@@ -674,22 +656,22 @@ class ProjectDeleteController extends Controller
 		}
 
 		$d = $this->models->Project->_get(array('id' => '*'));
-		
+
 		foreach((array)$d as $val) {
 
 			unset($pInUse[$val['id']]);
 			$this->addMessage(sprintf('Ignoring "%s"',$val['sys_name']));
 
 		}
-		
+
 		foreach((array)$pInUse as $val) {
-	
+
 			$this->doDeleteProjectAction($val);
 			$this->addMessage(sprintf('Deleted data for orphan ID %s',$val));
 
 		}
-		
+
 	}
 
-	
+
 }

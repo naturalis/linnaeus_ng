@@ -12,16 +12,15 @@ class ActorsController extends NsrController
 		'literature2',
 		'names',
 		'actors',
+        'rdf',
+        'nsr_ids',
 		'presence_taxa',
-		'content_taxon',
+		'content_taxa',
 		'literature2_authors'
     );
-   
+
     public $controllerPublicName = 'Actoren';
 
-    public $cacheFiles = array(
-    );
-    
     public $cssToLoad = array(
 		'lookup.css',
 		'nsr_taxon_beheer.css'
@@ -35,7 +34,7 @@ class ActorsController extends NsrController
 				'actors.js',
 			)
 		);
-		
+
 	private $actorBefore;
 
     public function __construct ()
@@ -67,9 +66,9 @@ class ActorsController extends NsrController
 
     public function ajaxInterfaceAction ()
     {
-        if (!isset($this->requestData['action'])) return;
+        if (!$this->rHasVar('action')) return;
 		$return=null;
-		$return=$this->getActorLookupList($this->requestData);
+		$return=$this->getActorLookupList($this->rGetAll());
         $this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();
@@ -88,7 +87,7 @@ class ActorsController extends NsrController
 			$this->setActorId(null);
 			$this->logNsrChange(array('before'=>$this->getActorBefore(),'note'=>'deleted actor '.$this->getActorBefore('name')));
 			$template='_delete_result';
-		} 
+		}
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
@@ -96,19 +95,19 @@ class ActorsController extends NsrController
 			$this->setActorId($this->rGetId());
 			$this->setActorBefore();
 			$this->updateActor();
-			$this->logNsrChange(array('before'=>$this->getActorBefore(),'after'=>$this->getActor(),'note'=>'updated actor '.$this->getActorBefore('name')));		
-		} 
+			$this->logNsrChange(array('before'=>$this->getActorBefore(),'after'=>$this->getActor(),'note'=>'updated actor '.$this->getActorBefore('name')));
+		}
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-			$this->smarty->assign('reference',$this->requestData);
+			$this->smarty->assign('reference',$this->rGetAll());
 			$this->saveActor();
 		}
 
 		if ($this->rHasId())
 		{
 			$this->setActorId($this->rGetId());
-		} 
+		}
 
 		if ($this->getActorId())
 		{
@@ -136,7 +135,7 @@ class ActorsController extends NsrController
 	private function saveActor()
 	{
 		$name=$this->rGetVal('name');
-					
+
 		if (empty($name))
 		{
 			$this->addError('Geen naam. Actor niet opgeslagen.');
@@ -149,7 +148,7 @@ class ActorsController extends NsrController
 			'project_id' => $this->getCurrentProjectId(),
 			'name' => $name
 		));
-		
+
 		if ($d)
 		{
 			$this->setActorId($this->models->Actors->getNewId());
@@ -158,7 +157,7 @@ class ActorsController extends NsrController
 			$this->updateActor();
 			$this->logNsrChange(array('after'=>$this->getActor(),'note'=>'new actor '.$name));
 		}
-		else 
+		else
 		{
 			$this->addError('Aanmaak nieuwe actor mislukt.');
 		}
@@ -166,7 +165,7 @@ class ActorsController extends NsrController
 
 	private function updateActor()
 	{
-		$f=array( 
+		$f=array(
 			'name' => 'Naam',
 			'name_alt' => 'Alternatieve naam',
 			'gender' => 'Geslacht',
@@ -174,8 +173,8 @@ class ActorsController extends NsrController
 			'homepage' => 'Homepage',
 			'employee_of_id' => '"Werkzaam bij"'
 		);
-		
-		foreach($f as $field=>$label) 
+
+		foreach($f as $field=>$label)
 		{
 			if ($this->rHasVar($field))
 			{
@@ -209,7 +208,10 @@ class ActorsController extends NsrController
 			$this->addError("Geen ID.");
 			return;
 		}
-		
+
+		/*
+		 * Free queries should be update/delete statements! Rewritten
+		 *
         $this->models->Names->freeQuery(
 			"update %PRE%names set expert_id = null where project_id = ".$this->getCurrentProjectId()." and expert_id = ".$id
 		);
@@ -242,7 +244,51 @@ class ActorsController extends NsrController
 		$this->models->Actors->freeQuery("delete from %PRE%nsr_ids where project_id = ".$this->getCurrentProjectId()." and lng_id=".$id." and item_type='actor'");
 		$this->addMessage("Actor NSR ID verwijderd.");
 
-		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");	
+		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");
+		$this->addMessage("Actor verwijderd.");
+		*/
+
+		$this->models->Names->update(
+			array('expert' => null),
+			array('expert_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Expert verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
+
+		$this->models->Names->update(
+		    array('organisation_id' => null),
+		    array('organisation_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Organisatie verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
+
+        $this->models->PresenceTaxa->update(
+		    array('actor_id' => null),
+		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Expert verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
+
+		$this->models->PresenceTaxa->update(
+		    array('actor_org_id' => null),
+		    array('actor_org_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Organisatie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
+
+		$this->models->Literature2Authors->delete(
+		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Auteur ontkoppeld van ".$this->models->Literature2Authors->getAffectedRows()." literatuurreferenties.");
+
+		$this->models->Rdf->delete(
+		    array('object_id'=>$id,'object_type'=>'actor')
+		);
+		$this->addMessage("Auteur verwijderd van ".$this->models->Rdf->getAffectedRows()." tabbladen.");
+
+		$this->models->NsrIds->delete(
+		    array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>'actor')
+		);
+		$this->addMessage("Actor NSR ID verwijderd.");
+
+		// Left this one because of the limit 1
+		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");
 		$this->addMessage("Actor verwijderd.");
 
 	}
@@ -252,7 +298,7 @@ class ActorsController extends NsrController
 		$alpha=$this->models->Actors->freeQuery("
 			select
 				distinct if(ord(substr(lower(name),1,1))<97||ord(substr(lower(name),1,1))>122,'#',substr(lower(name),1,1)) as letter
-			from			
+			from
 				%PRE%actors
 			where
 				project_id = ".$this->getCurrentProjectId()."
@@ -265,18 +311,7 @@ class ActorsController extends NsrController
 
 	private function getIndividualAlphabet()
 	{
-		$alpha=$this->models->Actors->freeQuery("
-			select
-				distinct if(ord(substr(lower(name),1,1))<97||ord(substr(lower(name),1,1))>122,'#',substr(lower(name),1,1)) as letter
-			from			
-				%PRE%actors
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				and is_company != 1
-			order by letter
-		");
-
-		return $alpha;
+		return $this->models->ActorsModel->getCompanyAlphabet($this->getCurrentProjectId());
 	}
 
 	private function getActor($id=null)
@@ -287,33 +322,16 @@ class ActorsController extends NsrController
 		if (empty($id))
 			return;
 
-		$l=$this->models->Actors->freeQuery("
-			select
-				_a.*,
-				_e.name as employer_name,
-				nsr_id
-				
-			from %PRE%actors _a
-
-			left join %PRE%actors _e
-				on _a.employee_of_id = _e.id 
-				and _a.project_id=_e.project_id
-
-			left join %PRE%nsr_ids _ids
-				on _a.id =_ids.lng_id 
-				and _a.project_id = _ids.project_id
-				and _ids.item_type = 'actor'
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.id = ".$id
-		);	
+		$l = $this->models->ActorsModel->getIndividualAlphabet(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'actorId' => $id
+		));
 
 		if ($l)
 		{
 
 			$actor=$l[0];
-			
+
 			// catching up...
 			if ( empty($actor['nsr_id']) )
 			{
@@ -334,42 +352,14 @@ class ActorsController extends NsrController
 
         if (empty($search))
             return;
-			
-		if ($matchStartOnly && $search=='#')
-		{
-			$fetchNonAlpha=true;
-		}
-		else
-		{
-			$fetchNonAlpha=false;
-		}
 
-		$data=$this->models->Actors->freeQuery("
-			select
-				_a.*, _e.name as employer_name
-				
-			from %PRE%actors _a
+		return $this->models->ActorsModel->getAllActors(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'search' => $search,
+    		'isCompany' => $isCompany,
+    		'matchStartOnly' => $matchStartOnly
+		));
 
-			left join %PRE%actors _e
-				on _a.employee_of_id = _e.id 
-				and _a.project_id=_e.project_id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.is_company = ".($isCompany ? '1' : '0' )."
-				". ($search!='*' ? "	
-					and (
-						_a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' or
-						_a.name_alt like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%' 
-					)" : "")."
-
-			order by _a.name
-			");	
-
-//						or _a.name_alt like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-
-		return $data;
-		
 	}
 
     private function getActorLookupList( $p )
@@ -388,13 +378,13 @@ class ActorsController extends NsrController
 			));
 
     }
-	
+
     private function getActorLinks( $p )
     {
         $id = isset($p['id']) ? $p['id'] : null;
         $name = isset($p['name']) ? $p['name'] : null;
         $name_alt = isset($p['name_alt']) ? $p['name_alt'] : null;
-		
+
 		if ( empty($id) && empty($name) && empty($name_alt) )
 		{
 			$id=$this->getActorId();
@@ -404,128 +394,39 @@ class ActorsController extends NsrController
 			return;
 
 		// NAMES
-        $names=$this->models->Names->freeQuery("
-			select
-				_a.taxon_id,
-				_a.name,
-				_b.nametype,
-				_c.language,
-				_d.label as language_label,
-				_g.taxon
+		$names = $this->models->ActorsModel->getActorNames(array(
+    		'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getDefaultProjectLanguage(),
+    		'expertId' => $id
+		));
 
-			from %PRE%names _a 
-
-			left join %PRE%name_types _b
-				on _a.type_id=_b.id 
-				and _a.project_id=_b.project_id
-
-			left join %PRE%languages _c
-				on _a.language_id=_c.id
-
-			left join %PRE%labels_languages _d
-				on _a.language_id=_d.language_id
-				and _a.project_id=_d.project_id
-				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%taxa _g
-				on _a.taxon_id = _g.id 
-				and _a.project_id=_g.project_id
-
-		where
-			_a.project_id = ".$this->getCurrentProjectId()."
-			and (
-				_a.expert_id=".$id." or 
-				_a.organisation_id=".$id.
-			")"
-		);
-		
 		foreach((array)$names as $key=>$val)
 		{
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 		}
 
 		// PRESENCE
-		$presences=$this->models->PresenceTaxa->freeQuery(
-			"select
-				_a.taxon_id,
-				_g.taxon,
-				_a.presence_id,
-				_b.label as presence_label,
-				_a.reference_id
-				
-			from %PRE%presence_taxa _a
+		$presences = $this->models->ActorsModel->getActorPresences(array(
+    		'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getDefaultProjectLanguage(),
+    		'expertId' => $id
+		));
 
-			left join %PRE%taxa _g
-				on _a.taxon_id = _g.id 
-				and _a.project_id=_g.project_id
-
-			left join %PRE%presence_labels _b
-				on _a.presence_id = _b.presence_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
-
-			where _a.project_id = ".$this->getCurrentProjectId()."
-				and (
-				_a.actor_id=".$id." or 
-				_a.actor_org_id=".$id.
-			")"
-		);	
-		
 		// PASSPORTS
-		$passports=$this->models->ContentTaxon->freeQuery("
-			select
-				_a.id,
-				_a.subject_type,
-				_a.predicate,
-				_c.taxon,
-				_d.title,
-				_b.taxon_id
-			from
-				%PRE%rdf _a
+		$passports = $this->models->ActorsModel->getActorPassports(array(
+    		'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getDefaultProjectLanguage(),
+    		'expertId' => $id
+		));
 
-			left join %PRE%content_taxa _b
-				on _a.project_id = _b.project_id
-				and _a.subject_id = _b.id
-				
-			left join %PRE%pages_taxa_titles _d
-				on _a.project_id = _d.project_id
-				and _b.page_id = _d.page_id
-				and _d.language_id = ".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%taxa _c
-				on _a.project_id = _b.project_id
-				and _b.taxon_id = _c.id
-			where
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and _a.object_id=".$id."
-				and _a.object_type='actor'
-				and _a.subject_type='passport'
-			order by taxon, title
-		");
-		
 		// LITERATURE
-		$literature=$this->models->Literature2Authors->freeQuery("
-				select
-					distinct
-					_b.id,
-					_b.label,
-					_b.citation
-				from
-					%PRE%literature2_authors _a
-	
-				left join %PRE%literature2 _b
-					on _a.literature2_id = _b.id 
-					and _a.project_id=_b.project_id
-	
-				where
-					_a.project_id = ".$this->getCurrentProjectId()."
-					and (
-						_a.actor_id =".$id."
-						".( !empty($name) ? "or _b.author like '%". mysql_real_escape_string($name) ."%'" : "" )."
-						".( !empty($name_alt) ? "or _b.author like '%". mysql_real_escape_string($name_alt) ."%'" : "" )." 
-					)
-			");	
-			
+		$literature = $this->models->ActorsModel->getActorLiterature(array(
+    		'projectId' => $this->getCurrentProjectId(),
+    		'expertId' => $id,
+		    'name' => $name,
+		    'nameAlt' => $name_alt
+		));
+
 		return
 			array(
 				'names' => $names,
@@ -534,10 +435,10 @@ class ActorsController extends NsrController
 				'literature'=>$literature,
 			);
 	}
-	
+
 	private function setActorBefore()
 	{
-		$this->actorBefore=$this->getActor();	
+		$this->actorBefore=$this->getActor();
 	}
 
 	private function getActorBefore( $f=null )
@@ -553,6 +454,6 @@ class ActorsController extends NsrController
 	}
 
 
-	
+
 }
 

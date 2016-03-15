@@ -19,13 +19,13 @@ class BaseClass
         $this->loadConfiguration();
 
         $this->setGeneralSettings();
-    
+
     }
 
 
     public function __destruct ()
     {
-    
+
     }
 
 
@@ -33,29 +33,24 @@ class BaseClass
     {
 
         if (class_exists('configuration')) {
-            
+
             $this->config = new configuration();
-        
+
         } else {
-            
-            die(_('Cannot load admin configuration file. Make sure the file config.php is present in both 
-            	configuration/admin and configuration/app. In both directories, the template file 
+
+            die(_('Cannot load admin configuration file. Make sure the file config.php is present in both
+            	configuration/admin and configuration/app. In both directories, the template file
             	default-config.php can be adapted.'));
-        
+
         }
 
-        if (class_exists('customConfiguration'))
-		{
-            $this->customConfig=new customConfiguration();
-        }    
-    
     }
 
     private function setGeneralSettings ()
     {
-        
+
         $this->generalSettings = $this->config->getGeneralSettings();
-    
+
     }
 
 }

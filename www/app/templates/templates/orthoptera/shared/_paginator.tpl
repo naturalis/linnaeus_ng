@@ -44,10 +44,10 @@
 		{/if}
 	</ul>
 </div>
-{literal}
+
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	{math assign=temp equation="(x*y)" x=$currPage y=$pgnResultsPerPage}
 	$('#resultcount-header').html(
 		{math equation="((x-1)*y)+1" x=$currPage y=$pgnResultsPerPage}+
@@ -57,19 +57,14 @@ $(document).ready(function(){
 		{$pgnResultCount}+
 		({$pgnResultCount}==1 ? ' {t}resultaat{/t}' : ' {t}resultaten{/t}')
 	);
-{literal}
 });
 </script>
-{/literal}
 {else}
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	$('#resultcount-header').html({$pgnResultCount}+({$pgnResultCount}==1 ? ' {t}resultaat{/t}' : ' {t}resultaten{/t}'));
-{literal}
 });
 </script>
-{/literal}
 
 {/if}

@@ -1,22 +1,10 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-.remark {
-	color:#888;
-	font-size:0.8em;
-}
-.taxon-list {
-	width:300px;
-	height:150px;
-	overflow-y:scroll;
-}
-</style>
-
 {if !$suppressPath}{include file="_keypath.tpl"}{/if}
 
 {include file="../shared/admin-messages.tpl"}
 
-<div id="page-main">
+<div id="page-main" class="key">
 
 <fieldset>
     <legend id="key-step-title">{t}Step{/t} {$step.number}{if $step.title}: {$step.title}{/if}</legend>
@@ -26,7 +14,7 @@
     {if $step.image}
     <p>
         <img src="{$session.admin.project.urls.project_media}{$step.image}?rnd={$rnd}" /><br />
-        <span style="color:red">Please note: this image is a legacy feature inherited from Linnaeus 2. It cannot be changed.</span><br />
+        <span style="color:red">{t}Please note: this image is a legacy feature inherited from Linnaeus 2. It cannot be changed.{/t}</span><br />
         <a href="#" onclick="keyDeleteImage();return false;">{t}delete image{/t}</a> | 
         <a href="#" onclick="keyDeleteAllImages()return false;;">{t}delete all images{/t}</a>
     </p>
@@ -38,11 +26,11 @@
         <a href="preview.php?step={$step.id}">{t}preview{/t}</a>
     </p>
 
-    <span class="remark">
-        Steps leading to this one:
+    <span class="small-remark">
+        {t}Steps leading to this one:{/t}
         <ul style="list-style-position:inside;padding:0;margin-top:0">
         {foreach from=$stepsLeadingToThisOne item=v}
-            <li><a href="step_show.php?id={$v.id}">Step {$v.number}{if $v.title}: {$v.title}{/if}</a></li>
+            <li><a href="step_show.php?id={$v.id}">{t}Step{/t} {$v.number}{if $v.title}: {$v.title}{/if}</a></li>
         {/foreach}
         </ul>
     </span>
@@ -60,7 +48,7 @@
             <th style="width:90px;">{t}image{/t}</th>
             <th style="width:100px;">{t}choice leads to{/t}</th>
             <th style="width:80px;" class="key-choice-arrow">{t}move{/t}</th>
-            <th style="width:30px;"><!-- span class="a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
+            <th style="width:30px;"></th>
             <th style="width:30px;"></th>
         </tr>
 
@@ -106,7 +94,7 @@
                 {/if}
             </td>
             <td class="key-choice-edit">
-                <a href="#" onclick="$('#id2').val({$v.id});$('#choiceForm').submit();return false;">{t}edit{/t}</a>
+                <a href="choice_edit.php?id={$v.id}&step={$step.id}">{t}edit{/t}</a>
             </td>
             <td class="key-choice-edit">
                 <a href="#" onclick="keyChoiceDelete({$v.id});return false;">{t}delete{/t}</a>
@@ -129,7 +117,7 @@
         <tr>
             {if $choices|@count < $maxChoicesPerKeystep}
             <td colspan="8">
-                <a href="#" onclick="$('#choiceForm').submit();return false;">{t}add new choice{/t}</a>
+                <a href="choice_edit.php?step={$step.id}">{t}add new choice{/t}</a>
             </td>
             {else}
             <td colspan="8">
@@ -179,22 +167,17 @@
 
 </div>
 
-<form method="get" action="" id="moveForm">
+<form method="post" action="" id="moveForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$step.id}" />
 <input type="hidden" name="move" id="move" value="" />
 <input type="hidden" name="direction" id="direction" value="" />
 </form>
 
-<form method="get" action="choice_edit.php" id="choiceForm">
-<input type="hidden" name="id" id="id2" value="" />
-<input type="hidden" name="step" value="{$step.id}" />
-</form>
-
-<form method="get" action="choice_edit.php" id="delChoiceForm">
+<form method="post" action="step_edit.php" id="theForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
-<input type="hidden" name="id" id="id3" value="" />
-<input type="hidden" name="action" value="delete" />
+<input type="hidden" name="id" value="{$step.id}" />
+<input type="hidden" id="action" name="action" value="" />
 </form>
 
 {include file="../shared/admin-footer.tpl"}

@@ -1,67 +1,44 @@
-function keyDoChoice(id) {
+function keyDoChoice(id)
+{
 	window.open('../key/index.php?choice='+id+'&step=','_self');
 }
 
-function keyDoStep(id) {
+function keyDoStep(id)
+{
 	window.open('../key/index.php?choice=&step='+id,'_self');
 }
 
-var keyFullPathVisibility = false;
-
-function keyToggleFullPath() {
-
-	var id = '#path-full';
-
-	if (keyFullPathVisibility) {
-
-		$(id).removeClass().addClass('full-invisible');
-
-	} else {
-
-		var pos = $('#toggle').position();
-		$(id).removeClass().addClass('full');
-		$(id).offset({ left: pos.left, top: pos.top+23});
-
-	}
-
-	keyFullPathVisibility = !keyFullPathVisibility;
-
-}
-
-function getData(action) {
-
+function getData(action)
+{
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
 			'action' : action 
 		}),
-		success : function (data) {
-			//alert(data);
+		success : function (data)
+		{
 			obj = $.parseJSON(data);
 		}
-	})
-	
+	})	
 }
 
-function showRemaining() {
-
+function showRemaining()
+{
 	$('#excluded').css('display','none');
 	$('#remaining').css('display','block');
 	$('#eLi').removeClass('category-active');
 	$('#rLi').addClass('category-active');
 	getData('store_remaining');
-
 }
 
-function showExcluded() {
-
+function showExcluded()
+{
 	$('#remaining').css('display','none');
 	$('#excluded').css('display','block');
 	$('#rLi').removeClass('category-active');
 	$('#eLi').addClass('category-active');
 	getData('store_excluded');
-
 }
 
 var keyListAttr='name_sci';
@@ -75,10 +52,10 @@ function keyCompare(a,b)
 
 function keyListsort(list)
 {
-	
 	var items=[];
 
-	$('#'+list+' li').each(function() {
+	$('#'+list+' li').each(function()
+	{
 		items.push($(this).html());
 	});
 
@@ -89,7 +66,6 @@ function keyListsort(list)
 		$('#'+list).append('<li>'+items[i]+'</li>');
 
 	$('#'+list).html('<li>'+items.join('</li><li>')+'</li>');
-	
 }
 
 function keyNameswitch(ele)
@@ -107,10 +83,4 @@ function keyNameswitch(ele)
 	$("[data-type=name_common]").toggle(true);
 	$("[data-type=name_sci]").toggle(true);
 	$("[data-type="+keyListAttr+"]").toggle(false);
-
-	//setSessionVar(variable,value);
-	//getSessionVar(variable,callback);
-
 }
-
-

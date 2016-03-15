@@ -3,7 +3,7 @@
 /*
 	TAB_VERSPREIDING::$this->getPresenceData($taxon)
 	TAB_BEDREIGING_EN_BESCHERMING::EZ
-	CTAB_LITERATURE			
+	CTAB_LITERATURE
 	CTAB_MEDIA
 	CTAB_DNA_BARCODES
 */
@@ -13,6 +13,9 @@ include_once ('RdfController.php');
 
 class NsrController extends Controller
 {
+
+//    public $modelNameOverride='NsrTreeModel';
+
     public function __construct()
     {
         parent::__construct();
@@ -31,51 +34,18 @@ class NsrController extends Controller
 
 	public function getActors()
 	{
-		return $this->models->Actors->freeQuery(
-			"select
-				_e.id,
-				_e.name as label,
-				_e.name_alt,
-				_e.homepage,
-				_e.gender,
-				_e.is_company,
-				_e.employee_of_id,
-				_f.name as company_of_name,
-				_f.name_alt as company_of_name_alt,
-				_f.homepage as company_of_homepage
-
-			from %PRE%actors _e
-
-			left join %PRE%actors _f
-				on _e.employee_of_id = _f.id 
-				and _e.project_id=_f.project_id
-
-			where
-				_e.project_id = ".$this->getCurrentProjectId()."
-
-			order by
-				_e.is_company, _e.name
-		");	
+		return $this->models->ControllerModel->getActors($this->getCurrentProjectId());
 	}
 
 	public function getTaxonParentage($id)
 	{
 		if (is_null($id))
 			return;
-			
-		//$this->saveTaxonParentage($id);
 
-		$d=$this->models->TaxonQuickParentage->freeQuery("
-			select
-				parentage
-			from
-				%PRE%taxon_quick_parentage
-			where 
-				project_id = ".$this->getCurrentProjectId()." 
-				and taxon_id = ".$id
-		);
-
-		return explode(' ',$d[0]['parentage']);
+		return $this->models->ControllerModel->getTaxonParentage(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'taxonId' => $id
+		));
 
 	}
 
@@ -83,40 +53,14 @@ class NsrController extends Controller
 	{
 		/*
 			get the top taxon = no parent
-			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks 
+			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks
 		*/
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_r.rank
-			from
-				%PRE%taxa _a
-
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-					
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
-
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and ifnull(_trash.is_deleted,0)=0
-				and _a.parent_id is null
-				and _r.id < 10
-
-		");
+		$p = $this->models->ControllerModel->treeGetTop($this->getCurrentProjectId());
 
 		if ($p && count((array)$p)==1)
 		{
 			$p=$p[0]['id'];
-		} 
+		}
 		else
 		{
 			$p=null;
@@ -129,8 +73,8 @@ class NsrController extends Controller
 
 		return $p;
 	}
-	
-	
+
+
 	private function storeParentage($p)
 	{
 		if (empty($p['id'])||empty($p['parentage']))
@@ -143,11 +87,11 @@ class NsrController extends Controller
 			'parentage' => implode(' ',$p['parentage'])
 		));
 	}
-	
-	
+
+
 	public function getProgeny($parent,$level,$family)
 	{
-		$result = $this->models->Taxon->_get(
+		$result = $this->models->Taxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -189,8 +133,10 @@ class NsrController extends Controller
 
 			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId())); // ??? crashes
 
-			$this->models->TaxonQuickParentage->freeQuery("delete from %PRE%taxon_quick_parentage where  project_id = ".$this->getCurrentProjectId());
-		
+			$this->models->ControllerModel->deleteTaxonParentage(array(
+                'projectId' => $this->getCurrentProjectId()
+            ));
+
 			$this->tmp=0;
 			$this->getProgeny($t,0,array());
 			$i=$this->tmp;
@@ -201,10 +147,10 @@ class NsrController extends Controller
 			$t=$this->getTaxonById($id);
 			$this->getParents($t['parent_id'],0,array());
 			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
-			$this->models->TaxonQuickParentage->freeQuery("
-				delete from %PRE%taxon_quick_parentage where  project_id = ".$this->getCurrentProjectId()." and taxon_id = ".$id
-			);
-
+			$this->models->ControllerModel->deleteTaxonParentage(array(
+                'projectId' => $this->getCurrentProjectId(),
+			    'taxonId' => $id
+            ));
 
 			$qp=array_pop($this->tmp);
 			$this->storeParentage(array('id'=>$id,'parentage'=>array_reverse($qp['parentage'])));
@@ -217,7 +163,7 @@ class NsrController extends Controller
 
 	private function getParents($parent,$level,$family)
 	{
-		$result = $this->models->Taxon->_get(
+		$result = $this->models->Taxa->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -266,28 +212,28 @@ class NsrController extends Controller
 
 		return str_replace('tn.nlsr.concept/','',$data[0]['nsr_id']);
 	}
-		
+
 	public function getConcept($id)
 	{
 		$c=$this->getTaxonById($id);
-		
+
 		if ( !empty($c) )
 		{
 			$c['nsr_id']=$this->getNsrId(array('id'=>$c['id'],'item_type'=>'taxon'));
 			$c['parent']=$this->getTaxonById($c['parent_id']);
-	
+
 			$d=$this->models->TrashCan->_get(array('id'=>
 			array(
 				'project_id'=>$this->getCurrentProjectId(),
 				'lng_id'=>$id,
 				'item_type'=>'taxon'
 			)));
-	
+
 			$c['is_deleted']=($d[0]['is_deleted']==1);
 		}
 
 		return $c;
-	}		
+	}
 
 
 
@@ -297,7 +243,7 @@ class NsrController extends Controller
 		$id=isset($p['id']) ? $p['id'] : null;
 		$type=isset($p['type']) ? $p['type'] : null;
 		$subtype=isset($p['subtype']) ? $p['subtype'] : null;
-		
+
 		if (empty($id) || empty($type))	return;
 
 		$d=$this->models->NsrIds->_get(array('id'=>
@@ -326,18 +272,18 @@ class NsrController extends Controller
 		}
 
 		if (empty($rdf) && empty($nsr)) return;
-		
+
 		if (!empty($rdf) && !empty($nsr))
 		{
 			$this->models->NsrIds->insert(
 				array(
-					'project_id'=>$this->getCurrentProjectId(), 
+					'project_id'=>$this->getCurrentProjectId(),
 					'rdf_id'=>$rdf,
 					'nsr_id'=>$nsr,
 					'lng_id'=>$id,
 					'item_type'=>$type
-				)); 
-				
+				));
+
 			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
 
 		}
@@ -359,7 +305,7 @@ class NsrController extends Controller
 
 			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
 		}
-		
+
 		return array(
 			'rdf_id' => !empty($rdf) ? $rdf : null,
 			'nsr_id' => !empty($nsr) ? $nsr : null,
@@ -376,7 +322,7 @@ class NsrController extends Controller
 		}
 		return str_pad($r,12,'0',STR_PAD_LEFT);
 	}
-	
+
 	private function createNsrCode( $prefix )
 	{
 		/*
@@ -387,7 +333,7 @@ class NsrController extends Controller
 		actor (indiv.)	nlsr.person/
 		actor (comp.)	nlsr.organization/
 		reference		tn.nlsr.reference/
-		
+
 		to be determined (item_type exists in table, but ID's never issued)
 		-------------------------------------------------------------------
 		taxon_presence
@@ -403,14 +349,11 @@ class NsrController extends Controller
 		while( $exists )
 		{
 			$code=$prefix."/".$this->generateNsrCode();
-			$d=$this->models->NsrIds->freeQuery("
-				select count(*) as total
-				from %PRE%nsr_ids
-				where
-					project_id = ".$this->getCurrentProjectId()."
-					and nsr_id = '".$code."'
-			");
-			
+			$d = $this->models->ControllerModel->checkNsrCode(array(
+                'projectId' => $this->getCurrentProjectId(),
+    			'nsrCode' => $code
+			));
+
 			if ( $d[0]['total']==0 )
 			{
 				$exists=false;
@@ -422,7 +365,7 @@ class NsrController extends Controller
 			}
 			$i++;
 		}
-		
+
 		return $code;
 	}
 
@@ -437,7 +380,7 @@ class NsrController extends Controller
 
 		return substr($r,0,8).'-'.substr($r,8,4).'-'.substr($r,12,4).'-'.substr($r,16,4).'-'.substr($r,20);
 	}
-	
+
 	private function createRdfId()
 	{
 		$exists=true;
@@ -446,14 +389,11 @@ class NsrController extends Controller
 		while($exists)
 		{
 			$code=$this->generateRdfId();
-			$d=$this->models->NsrIds->freeQuery("
-				select count(*) as total
-				from %PRE%nsr_ids
-				where
-					project_id = ".$this->getCurrentProjectId()."
-					and rdf_id = 'http://data.nederlandsesoorten.nl/".$code."'"
-			);
-			
+			$d = $this->models->ControllerModel->checkRdfId(array(
+                'projectId' => $this->getCurrentProjectId(),
+			    'rdfId' => 'http://data.nederlandsesoorten.nl/' . $code
+			));
+
 			if ($d[0]['total']==0)
 			{
 				$exists=false;
@@ -465,7 +405,7 @@ class NsrController extends Controller
 			}
 			$i++;
 		}
-		
+
 		return $code;
 	}
 

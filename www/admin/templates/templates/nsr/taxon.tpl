@@ -1,5 +1,5 @@
 {function name=makeNameLink nametype=0}
-{if 
+{if
 	$nametype==$smarty.const.PREDICATE_VALID_NAME ||
 	$nametype==$smarty.const.PREDICATE_HOMONYM ||
 	$nametype==$smarty.const.PREDICATE_BASIONYM ||
@@ -42,7 +42,7 @@
 		</tr>
 		<tr><th>rang:</th>
 			<td>
-				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach} 
+				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">edit</a>
 				<span class="editspan">
 				<select id="concept_rank_id" onchange="storedata(this);" >
@@ -118,7 +118,7 @@
 				{else}n.v.t.{/if}
 				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_expert_id">edit</a>
 				<span class="editspan" id="expert">
-				
+
                 <select id="presence_expert_id">
 					<option value="-1" selected="selected">n.v.t.</option>
 				{foreach from=$actors item=v key=k}
@@ -126,8 +126,8 @@
 					<option value="{$v.id}" {if $v.id==$presence.expert_id} selected="selected"{/if}>{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
-                                
+				</select>
+
 				</span>
 			</td>
 		</tr>
@@ -147,8 +147,8 @@
 					<option value="{$v.id}" {if $v.id==$presence.organisation_id} selected="selected"{/if}>{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
-                                
+				</select>
+
 				</span>
 				<input type="hidden" id="" value="{$presence.organisation_id}" />
 			</td>
@@ -173,13 +173,13 @@
 <p>
 
 	<h4>namen</h4>
-		
+
 	<ul>
 	{foreach from=$names.list item=v}
 		<li>
 		{$v.name_no_tags}
 		{if $v.addition[$main_language_name_language_id].addition}({$v.addition[$main_language_name_language_id].addition}){/if}
-        <i>({$v.nametype_label})</i> 
+        <i>({$v.nametype_label})</i>
         <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
 		</li>
 	{/foreach}
@@ -204,12 +204,13 @@
 <p>
 	<a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">paspoort</a><br />
 
-	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">afbeeldingen</a><br />
-	
+	<a href="media.php?id={$concept.id}" class="edit" style="margin:0">media</a><br />
+	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">afbeeldingen (NSR-only)</a><br />
+
     {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
 	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
     {/if}{/foreach}
-		
+
 	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
     {if !$concept.is_deleted}
     <br />
@@ -244,7 +245,7 @@
     <a href="index.php">terug</a>
 {/if}
     </p>
-    
+
 </div>
 
 
@@ -270,8 +271,8 @@ $(document).ready(function()
 	{if !$concept}
 	// if new concept, trigger all edit-clicks
 	$('a.edit').each(function() {
-		$(this).trigger('click'); 
-		//$(this).remove(); 
+		$(this).trigger('click');
+		//$(this).remove();
 	} );
 	{/if}
 

@@ -7,12 +7,14 @@ class IntroductionController extends Controller
 
     public $usedModels = array(
 		'content_introduction',
-		'introduction_page',
-		'introduction_media'
+		'introduction_media',
+		'introduction_pages'
     );
-   
+
     public $usedHelpers = array(
-        'file_upload_helper','image_thumber_helper'
+        'file_upload_helper',
+		'image_thumber_helper',
+		'session_module_settings'
     );
 
     public $controllerPublicName = 'Introduction';
@@ -33,194 +35,130 @@ class IntroductionController extends Controller
 		)
 	);
 
-
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct ()
     {
-        
         parent::__construct();
-		
 		$this->cleanUpEmptyPages();
-
     }
 
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
-        
         parent::__destruct();
-    
     }
 
-    /**
-     * Contents (page overview)
-     *
-     * @access    public
-     */
     public function contentsAction()
     {
-    
         $this->checkAuthorisation();
-    
+
         $this->setPageName($this->translate('Contents'));
-    
+
         $pagination = $this->getPagination($this->getPageHeaders(),25);
-    
+
         $this->smarty->assign('prevStart', $pagination['prevStart']);
-    
         $this->smarty->assign('nextStart', $pagination['nextStart']);
-    
         $this->smarty->assign('pages',$pagination['items']);
-    
+
         $this->printPage();
-    
     }
-    
-    
-    /**
-     * Module index
-     *
-     * @access    public
-     */
+
     public function indexAction()
     {
-
         $this->checkAuthorisation();
-		
-		if (!$this->rHasVal('page')) {
 
-			$this->redirect('edit.php?id='.$this->getFirstPageId());
-
-		} else {
-
-			$this->redirect('edit.php?id='.$this->requestData['page']);
-
+		if (!$this->rHasVal('page'))
+		{
+			$this->redirect('edit.php?id=' . $this->getFirstPageId());
 		}
-
+		else
+		{
+			$this->redirect('edit.php?id=' . $this->rGetVal('page'));
+		}
     }
 
-    /**
-     * Create new page or edit existing
-     *
-     * @access    public
-     */
     public function editAction()
     {
-
 		$this->checkAuthorisation();
 
-		if (!$this->rHasId()) {
-
+		if (!$this->rHasId())
+		{
 			$id = $this->createPage();
 
 			// redirecting to protect against resubmits
-			if ($id) {
-
-				$this->redirect('edit.php?id='.$id);
-
-			} else {
-
+			if ($id)
+			{
+				$this->redirect('edit.php?id=' . $id);
+			}
+			else
+			{
 				$this->addError($this->translate('Could not create page.'));
-
 			}
-
-		} else {
-
-			if ($this->rHasVal('action','delete')) {
-
+		}
+		else
+		{
+			if ($this->rHasVal('action','delete'))
+			{
 				$this->deletePage();
-				
 				$this->redirect('index.php');
-
-			} else
-			if ($this->rHasVal('action','deleteImage')) {
-
+			}
+			else
+			if ($this->rHasVal('action','deleteImage'))
+			{
 				$this->deleteMedia();
-
-			} else
-			if ($this->rHasVal('action','preview')) {
-
-				$this->saveAllContent($this->requestData);
-
-				$this->redirect('preview.php?id='.$this->requestData['id']);
-
+			}
+			else
+			if ($this->rHasVal('action','preview'))
+			{
+				$this->saveAllContent($this->rGetAll());
+				$this->redirect('preview.php?id=' . $this->rGetId());
 			}
 
-			$page = $this->getPage();
+			$page=$this->getPage();
 
-			if ($page['got_content']==0) {
-
+			if ($page['got_content']==0)
+			{
 		        $this->setPageName($this->translate('Creating new page'));
-
-			} else {
-
-		        $this->setPageName($this->translate('Editing page'));
-
 			}
-
+			else
+			{
+		        $this->setPageName($this->translate('Editing page'));
+			}
 		}
 
 		$navList = $this->getPageNavList(true);
-	
+
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-			$this->smarty->assign('navCurrentId',isset($this->requestData['id']) ? $this->requestData['id'] : null);
-
-		$this->smarty->assign('id', $this->rHasId() ? $this->requestData['id'] : $id);
-
+			$this->smarty->assign('navCurrentId',$this->rHasId() ? $this->rGetId() : null);
 		if (isset($page)) $this->smarty->assign('page', $page);
-
+		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
 		$this->smarty->assign('languages', $this->getProjectLanguages());
-		
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
-
 		$this->smarty->assign('includeHtmlEditor', true);
 
         $this->printPage();
-    
     }
 
-
-    /**
-     * Create new page or edit existing
-     *
-     * @access    public
-     */
     public function previewAction()
     {
-
 		$this->redirect(
 			'../../../app/views/introduction/topic.php?p='.$this->getCurrentProjectId().
-			'&id='.$this->requestData['id'].
+			'&id='.$this->rGetId().
 			'&lan='.$this->getDefaultProjectLanguage()
 		);
 
 	}
 
-    /**
-     * Change page display order
-     *
-     * @access    public
-     */
     public function orderAction()
     {
-    
+
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Change page order'));
-		
-		if ($this->rHasVal('newOrder') && !$this->isFormResubmit()) {
-		
-			foreach((array)$this->requestData['newOrder'] as $key => $val) {
-			
-				 $this->models->IntroductionPage->update(
+
+		if ($this->rHasVal('newOrder') && !$this->isFormResubmit())
+		{
+			foreach((array)$this->rGetVal('newOrder') as $key=>$val)
+			{
+				 $this->models->IntroductionPages->update(
 					array(
 						'show_order' => $key,
 					),
@@ -229,96 +167,89 @@ class IntroductionController extends Controller
 						'id' => $val
 					)
 				);
-
 			}
-			
+
 			$this->addMessage($this->translate('New order saved.'));
 
-		} else
-		if ($this->rHasVal('sortAlpha')   ) { // && !$this->isFormResubmit()) {
-
+		}
+		else
+		if ($this->rHasVal('sortAlpha') && !$this->isFormResubmit())
+		{
 			$d = $this->getPageHeaders();
 
 			$this->customSortArray($d, array(
-				'label' => 'name', 
-				'dir' => 'asc', 
+				'key' => 'label',
+				'dir' => 'asc',
 				'case' => 'i'
 			));
-			
-			foreach((array)$d as $key => $val) {
-			
-				 $this->models->IntroductionPage->update(
+
+			foreach((array)$d as $key => $val)
+			{
+				 $this->models->IntroductionPages->update(
 					array(
-						'show_order' => $key,
+						'show_order' => $key + 1,
 					),
 					array(
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $val['id']
 					)
 				);
-
 			}
-			
+
 			$this->addMessage($this->translate('Alphabetic order saved.'));
 
 		}
 
 		$this->smarty->assign('pages',$this->getPageHeaders());
-
         $this->printPage();
 
 	}
 
-
-    /**
-     * Upload media for a glossary term
-     *
-     * @access    public
-     */
-    public function mediaUploadAction ()
+    public function mediaUploadAction()
     {
 
 		$this->checkAuthorisation();
-		
+
 		$this->setPageName($this->translate('New image'));
-		
+
 		$this->loadControllerConfig('Module');
-		
-		if ($this->requestDataFiles && !$this->isFormResubmit()) {
-		
+
+		if ($this->requestDataFiles && !$this->isFormResubmit())
+		{
 			$filesToSave =  $this->getUploadedMediaFiles();
-			
+
 			$firstInsert = false;
-			
-			if ($filesToSave && $this->rHasId()) {
-			
-				foreach((array)$filesToSave as $key => $file) {
-				
+
+			if ($filesToSave && $this->rHasId())
+			{
+				foreach((array)$filesToSave as $key => $file)
+				{
+
 					$thumb = false;
-					
+
 					if (
-					$this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
-					$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
+						$this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
+						$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
 					) {
-					
+
 						$pi = pathinfo($file['name']);
 						$this->helpers->ImageThumberHelper->size_width(150);
-						
+
 						if ($this->helpers->ImageThumberHelper->save(
 						$this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
 						)) {
-						
+
 							$thumb = $pi['filename'].'-thumb.'.$pi['extension'];
-						
+
 						}
-					
+
 					}
-					
+
 					$fmm = $this->models->IntroductionMedia->save(
 						array(
 							'id' => null,
 							'project_id' => $this->getCurrentProjectId(),
-							'page_id' => $this->requestData['id'],
+							'page_id' => $this->rGetId(),
 							'file_name' => $file['name'],
 							'original_name' => $file['original_name'],
 							'mime_type' => $file['mime_type'],
@@ -326,27 +257,24 @@ class IntroductionController extends Controller
 							'thumb_name' => $thumb ? $thumb : null,
 						)
 					);
-					
-					if ($fmm) {
-					
+
+					if ($fmm)
+					{
 						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-					
-					} else {
-					
-						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
-					
 					}
-				
+					else
+					{
+						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
+					}
+
 				}
 
 			}
-		
+
 		}
 
-		$this->smarty->assign('id',$this->requestData['id']);
-		
+		$this->smarty->assign('id',$this->rGetId());
 		$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
-		
 		$this->smarty->assign('iniSettings',
 			array(
 				'upload_max_filesize' => ini_get('upload_max_filesize'),
@@ -355,46 +283,35 @@ class IntroductionController extends Controller
 		);
 
 		$this->printPage();
-    
+
     }
 
-
-	/**
-	* General interface for all AJAX-calls
-	*
-	* @access     public
-	*/
-    public function ajaxInterfaceAction ()
+    public function ajaxInterfaceAction()
     {
-
         if (!$this->rHasVal('action')) return;
-        
-        if ($this->requestData['action'] == 'save_content') {
-            
-            if ($this->saveContent($this->requestData))
+
+        if ($this->rHasVal('action', 'save_content'))
+		{
+            if ($this->saveContent($this->rGetAll()))
 				$this->smarty->assign('returnText', 'saved');
-        
-        } else
-        if ($this->requestData['action'] == 'get_content') {
-            
+        }
+		else if ($this->rHasVal('action', 'get_content'))
+		{
             $this->ajaxActionGetContent();
-        
         }
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
-
-            $this->getLookupList($this->requestData['search']);
-
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search')))
+		{
+            $this->getLookupList($this->rGetVal('search'));
         }
-		
+
 		$this->allowEditPageOverlay = false;
-		
+
         $this->printPage();
-    
+
     }
 
-	private function saveAllContent($p=null)
+	private function saveAllContent( $p=null )
 	{
-
 		if (!isset($p['id']) || !isset($p['language-default']))
 			return;
 
@@ -406,9 +323,9 @@ class IntroductionController extends Controller
 				'content' => $p['content-default']
 			)
 		);
-		
-		if (isset($p['language-other'])) {
 
+		if (isset($p['language-other']))
+		{
 			$this->saveContent(
 				array(
 					'id' => $p['id'],
@@ -417,56 +334,54 @@ class IntroductionController extends Controller
 					'content' => $p['content-other']
 				)
 			);
-					
 		}
-		
+
 		return true;
-		
+
 	}
 
-	private function saveContent($p=null)
+	private function saveContent( $p=null )
 	{
-		
 		$id = isset($p['id']) ? $p['id'] : null;
 		$language = isset($p['language']) ? $p['language'] : null;
 		$topic = isset($p['topic']) ? $p['topic'] : null;
 		$content = isset($p['content']) ? $p['content'] : null;
 
-       if (!isset($id) || !isset($language)) {
-            
-            return;
-        
-        } else {
-            
-            if (!isset($topic) && !isset($content)) {
-                
+		if (!isset($id) || !isset($language))
+		{
+			return;
+		}
+		else
+		{
+            if (!isset($topic) && !isset($content))
+			{
                 $this->models->ContentIntroduction->delete(
 					array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $language, 
+						'language_id' => $language,
 						'page_id' => $id
 					)
                 );
-				
-				$this->setPageGotContent($id);
-            
-            } else {
 
+				$this->setPageGotContent($id);
+            }
+			else
+			{
                 $cfm = $this->models->ContentIntroduction->_get(
 					array(
 						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $language, 
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $language,
 							'page_id' => $id
 						)
 					)
 				);
-                
+
                 $this->models->ContentIntroduction->save(
 					array(
-						'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null, 
+						'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null,
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $language, 
+						'language_id' => $language,
 						'page_id' => $id,
 						'topic' => trim($topic),
 						'content' => trim($content)
@@ -476,9 +391,9 @@ class IntroductionController extends Controller
 				$this->setPageGotContent($id,true);
 
             }
-			
-			unset($_SESSION['admin']['system']['introduction']['navList']);
-			
+
+			$this->moduleSession->setModuleSetting( array('setting'=>'navList' ) );
+
 			return true;
 
         }
@@ -487,33 +402,29 @@ class IntroductionController extends Controller
 
 	private function ajaxActionGetContent()
 	{
-
-        if (!$this->rHasVal('id') || !$this->rHasVal('language')) {
-            
+        if (!$this->rHasVal('id') || !$this->rHasVal('language'))
+		{
             return;
-        
-        } else {
-
+        }
+		else
+		{
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
-						'page_id' => $this->requestData['id'],
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->rGetVal('language'),
+						'page_id' => $this->rGetId(),
 						)
 				)
 			);
-                
-            $this->smarty->assign('returnText', json_encode(array('topic' => $cfm[0]['topic'],'content' => $cfm[0]['content'])));
-        
-        }
 
+            $this->smarty->assign('returnText', json_encode(array('topic' => $cfm[0]['topic'],'content' => $cfm[0]['content'])));
+        }
 	}
-	
+
 	private function getNextShowOrderValue()
 	{
-	
-		$ip =  $this->models->IntroductionPage->_get(
+		$ip=$this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -524,43 +435,38 @@ class IntroductionController extends Controller
 		);
 
 		return $ip[0]['next'];
-	
 	}
 
 	private function createPage()
 	{
-	
-		$this->models->IntroductionPage->save(
+		$this->models->IntroductionPages->save(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'show_order' => $this->getNextShowOrderValue()
 			)
 		);
 
-		return $this->models->IntroductionPage->getNewId();
-
+		return $this->models->IntroductionPages->getNewId();
 	}
 
 	private function setPageGotContent($id,$state=null)
 	{
-
-		if ($state==null) {
-
+		if ($state==null)
+		{
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
+						'project_id' => $this->getCurrentProjectId(),
 						'page_id' => $id
 					),
 					'columns' => 'count(*) as total'
 				)
 			);
 
-			$state = ($cfm[0]['total']==0 ? false : true);
-
+			$state=($cfm[0]['total']==0 ? false : true);
 		}
 
-		$this->models->IntroductionPage->update(
+		$this->models->IntroductionPages->update(
 			array(
 				'got_content' => ($state==false ? '0' : '1'),
 			),
@@ -569,13 +475,11 @@ class IntroductionController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 			)
 		);
-
 	}
 
 	private function getPageHeaders()
 	{
-
-		$ip =  $this->models->IntroductionPage->_get(
+		$ip =  $this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -585,36 +489,32 @@ class IntroductionController extends Controller
 			)
 		);
 
-
-		foreach((array)$ip as $key => $val) {
-
+		foreach((array)$ip as $key => $val)
+		{
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->getDefaultProjectLanguage(), 
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getDefaultProjectLanguage(),
 						'page_id' => $val['id']
 					),
 					'columns' => 'topic',
 				)
 			);
-			
+
 			$ip[$key]['topic'] = $ip[$key]['label'] = $cfm[0]['topic'];
-
 		}
-		
-		return $ip;
 
+		return $ip;
 	}
 
 	private function getPage($id=null,$languageId=null)
 	{
+		$id = isset($id) ? $id : $this->rGetId();
 
-		$id = isset($id) ? $id : $this->requestData['id'];
-		
 		if (!isset($id)) return;
 
-		$pfm = $this->models->IntroductionPage->_get(
+		$pfm = $this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'id' => $id,
@@ -623,24 +523,22 @@ class IntroductionController extends Controller
 			)
 		);
 
-		if ($pfm) {
-
+		if ($pfm)
+		{
 			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => isset($languageId) ? $languageId : $this->getDefaultProjectLanguage(), 
-						'page_id' => $this->requestData['id'],
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => isset($languageId) ? $languageId : $this->getDefaultProjectLanguage(),
+						'page_id' => $this->rGetId(),
 						)
 				)
 			);
-				
-			if ($cfm) {
 
+			if ($cfm)
+			{
 				$pfm[0]['content'] = $cfm[0]['content'];
-
 				$pfm[0]['topic'] = $cfm[0]['topic'];
-
 			}
 
 			$fmm = $this->models->IntroductionMedia->_get(
@@ -651,29 +549,25 @@ class IntroductionController extends Controller
 					)
 				)
 			);
-			
-			if ($fmm) {
 
+			if ($fmm)
+			{
 				$pfm[0]['image']['file_name'] = $fmm[0]['file_name'];
-
 				$pfm[0]['image']['thumb_name'] = $fmm[0]['thumb_name'];
-
 			}
 
 			return $pfm[0];
-		
-		} else {
-
-			return null;
 
 		}
-
+		else
+		{
+			return null;
+		}
 	}
 
 	private function getFirstPageId()
 	{
-
-		$ip =  $this->models->IntroductionPage->_get(
+		$ip=$this->models->IntroductionPages->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -685,27 +579,23 @@ class IntroductionController extends Controller
 			)
 		);
 
-
 		return isset($ip[0]['id']) ? $ip[0]['id'] : null;
-		
 	}
 
 	private function cleanUpEmptyPages()
 	{
-
 		// delete all pages with no content that are over 7 days old
-		$this->models->IntroductionPage->delete('delete from %table% 
-			where project_id =  '.$this->getCurrentProjectId().'
-			and got_content = 0
-			and created < DATE_ADD(now(), INTERVAL -7 DAY)');
-
+		$this->models->IntroductionPages->delete(array(
+			'project_id'=> $this->getCurrentProjectId(),
+			'got_content'=> 0,
+			'created #' => '< DATE_ADD(now(), INTERVAL -7 DAY)'
+		));
 	}
 
 	private function deleteMedia($id=null)
 	{
-	
-		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
-		
+		$id = isset($id) ? $id : ($this->rHasId() ? $this->rGetId() : null);
+
 		if ($id == null) return;
 
 		$fmm = $this->models->IntroductionMedia->_get(
@@ -716,19 +606,12 @@ class IntroductionController extends Controller
 				)
 			)
 		);
-			
-		if (file_exists($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
 
-			if (unlink($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
-			
-				if ($fmm[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name'])) {
-				
-					unlink($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name']);
+		$f=$this->getProjectsMediaStorageDir() . $fmm[0]['file_name'];
+		$t=$this->getProjectsThumbsStorageDir() . $fmm[0]['thumb_name'];
 
-				}
-			}
-
-		}
+		if (file_exists($f)) unlink($f);
+		if (file_exists($t)) unlink($t);
 
 		$this->models->IntroductionMedia->delete(
 			array(
@@ -736,14 +619,12 @@ class IntroductionController extends Controller
 				'page_id' => $id
 			)
 		);
-
-	}	
+	}
 
 	private function deletePage($id=null)
 	{
-	
-		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
-		
+		$id = isset($id) ? $id : ($this->rHasId() ? $this->rGetId() : null);
+
 		if ($id == null) return;
 
 		$this->deleteMedia($id);
@@ -761,39 +642,35 @@ class IntroductionController extends Controller
 				'project_id' => $this->getCurrentProjectId()
 			)
 		);
-
-	}	
+	}
 
 	private function getPageNavList($forceLookup=false)
 	{
+		if (null!==$this->moduleSession->getModuleSetting( 'navList' ) || $forceLookup)
+		{
 
-		if (empty($_SESSION['admin']['system']['introduction']['navList']) || $forceLookup) {
-		
 			$d = $this->getPageHeaders();
 
-			foreach((array)$d as $key => $val) {
-
+			foreach((array)$d as $key => $val)
+			{
 				$res[$val['id']] = array(
 					'prev' => array('id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null),
 					'next' => array('id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null),
 				);
-
 			}
 
 			if (isset($res))
-				$_SESSION['admin']['system']['introduction']['navList'] = $res;
+				$this->moduleSession->setModuleSetting( array('setting'=>'navList','value'=>$res ) );
 			else
-				$_SESSION['admin']['system']['introduction']['navList'] = null;
-		
+				$this->moduleSession->setModuleSetting( array('setting'=>'navList' ) );
 		}
-		
-		return $_SESSION['admin']['system']['introduction']['navList'];
+
+		return $this->moduleSession->getModuleSetting( 'navList' );
 
 	}
 
 	private function getLookupList($search)
 	{
-
 		if (empty($search)) return;
 
 		$cfm = $this->models->ContentIntroduction->_get(
@@ -817,7 +694,7 @@ class IntroductionController extends Controller
 				'sortData'=>true
 			))
 		);
-		
+
 	}
 
 }

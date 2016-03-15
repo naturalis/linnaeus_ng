@@ -6,7 +6,6 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" id="id" value="{$gloss.id}" />
 <input type="hidden" name="action" id="action" value="" />
-<input type="hidden" name="letter" id="letter" value="" />
 {if $languages|@count==1}
 <input type="hidden" name="language_id" id="language_id" value="{$languages[0].language_id}" />
 {/if}
@@ -27,10 +26,11 @@
             <td>{t}Language:{/t}</td>
             <td>
                 <select name="language_id" id="language">
-                {section name=i loop=$languages}
-                    {if $languages[i].language!=''}<option value="{$languages[i].language_id}"{if $languages[i].language_id==$activeLanguage} selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
+                {foreach $languages v i}
+                    {if $v.language!=''}
+                    	<option value="{$v.language_id}"{if $v.language_id==$activeLanguage} selected="selected"{/if}>{$v.language}{if $v.language_id==$defaultLanguage} *{/if}</option>
                     {/if}
-                {/section}
+                {/foreach}
                 </select> *
             </td>
         </tr>
@@ -84,8 +84,8 @@
 </div>
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
+$(document).ready(function()
+{
 	{if $gloss.synonyms}
 		{section name=i loop=$gloss.synonyms}
 		glossAddSynonymToList('{$gloss.synonyms[i].synonym|@addslashes}');

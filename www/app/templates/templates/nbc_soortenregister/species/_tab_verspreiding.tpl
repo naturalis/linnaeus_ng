@@ -13,16 +13,21 @@
 				</table>
 			</p>
 
-			{if $distributionMaps.count>0}
+			{if $distributionMaps.data|@count>0}
 			<h2>{t}Verspreiding{/t}</h2>
 			{foreach from=$distributionMaps.data item=v}
 
+            <p style="border-bottom:1px solid #ddd;padding-bottom:4px;">
+
 			<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
 			{if $v.meta_map_source && $v.meta_map_description}<br />{/if}{if $v.meta_map_source}{t}Bron:{/t} {$v.meta_map_source}{/if}">
-				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="{$taxon_base_url_images_main}{$v.image}" />
+				<img class="verspreidingskaartje" style="max-height:{math equation="round(a/b)" a=500 b=$distributionMaps.data|@count}px;" title="Foto {$v.photographer}" src="{$taxon_base_url_images_main}{$v.image}" />
 			</a>
 			{if $v.meta_map_description}<br />{$v.meta_map_description|@ucfirst}{/if}
 			{if $v.meta_map_source}<br />{t}Bron{/t}: {$v.meta_map_source}{/if}
+            
+            </p>
+
 			{/foreach}
 			{/if}
 

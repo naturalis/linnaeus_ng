@@ -9,14 +9,15 @@
 	van een uiteindelijk niet geïmplementeerde aanpasing door trezorix.
 	(betreft invoerveld in taxon en taxon_new, plus de verwerking van de
 	waarde in updateConcept() -> updateConceptIsIndigeous())
-	
-	
+
+
 	REFAC2015: need language names adjectives throughout! search for
 	"Nederlandse" and replace with an adjectivized resolved language_id
 
 */
 
 include_once ('NsrController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class NsrTaxonController extends NsrController
 {
@@ -37,8 +38,6 @@ class NsrTaxonController extends NsrController
     );
     public $usedHelpers = array(
     );
-    public $cacheFiles = array(
-    );
     public $cssToLoad = array(
         'lookup.css',
 		'nsr_taxon_beheer.css'
@@ -49,17 +48,18 @@ class NsrTaxonController extends NsrController
 			'nsr_taxon_beheer.js'
         )
     );
+    public $modelNameOverride='NsrTaxonModel';
     public $controllerPublicName = 'Soortenregister beheer';
     public $includeLocalMenu = false;
 
 	private $_nameTypeIds;
 	private $_projectRankIds;
-	
+
 	private $conceptId=null;
 	private $nameId=null;
-	
+
 	private $_resPicsPerPage=100;
-	
+
 
     public function __construct()
     {
@@ -83,7 +83,7 @@ class NsrTaxonController extends NsrController
 			'fieldAsIndex'=>'nametype'
 		));
 
-		$this->_projectRankIds=$this->models->ProjectRank->_get(array(
+		$this->_projectRankIds=$this->models->ProjectsRanks->_get(array(
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId()
 			),
@@ -91,9 +91,9 @@ class NsrTaxonController extends NsrController
 			'fieldAsIndex'=>'rank_id'
 		));
 
-		$this->_taxon_main_image_base_url = $this->getSetting( "taxon_main_image_base_url", "http://images.naturalis.nl/comping/" );
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
-
 	}
 
     public function taxonNewAction()
@@ -104,7 +104,7 @@ class NsrTaxonController extends NsrController
 
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-		
+
 			$this->saveConcept();
 
 			if ( $this->getConceptId() )
@@ -113,15 +113,15 @@ class NsrTaxonController extends NsrController
 				$this->checkMainLanguageCommonName();
 				$this->saveMainLanguageCommonName();
 				$this->saveTaxonParentage( $this->getConceptId() );
-				
+
 				$this->redirect('taxon.php?id='.$this->getConceptId());
-			}		
+			}
 			else
 			{
-				$data=$this->requestData;
+				$data=$this->rGetAll();
 				array_walk($data, function(&$val, $key){if (isset($val['new'])) $val=$val['new'];});
 				unset($data['action']);
-				
+
 				if (isset($data['parent_taxon_id']))
 				{
 					$d=$this->getConcept($data['parent_taxon_id']);
@@ -175,22 +175,22 @@ class NsrTaxonController extends NsrController
 
 		$this->printPage();
 	}
-	
+
     public function taxonAction()
     {
 		$this->checkAuthorisation();
-		
+
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
 
         $this->setPageName($this->translate('Edit taxon concept'));
-	
+
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
 			$this->setConceptId( $this->rGetId() );
 			$this->toggleConceptDeleted(true);
 			$this->setMessage('Concept gemarkeerd als verwijderd.');
 			$this->resetTree();
-		} 
+		}
 		else
 		if ($this->rHasId() && $this->rHasVal('action','undelete') && !$this->isFormResubmit())
 		{
@@ -198,7 +198,7 @@ class NsrTaxonController extends NsrController
 			$this->toggleConceptDeleted(false);
 			$this->setMessage('Concept niet langer gemarkeerd als verwijderd.');
 			$this->resetTree();
-		} 
+		}
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
@@ -221,7 +221,6 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId( $this->rGetId() );
 		}
-	
 
 		if ($this->rHasId())
 		{
@@ -230,7 +229,7 @@ class NsrTaxonController extends NsrController
 			$this->doNameReferentialChecks($this->getConcept( $this->getConceptId() ));
 
 			$rankIdSpecies=!empty($this->_projectRankIds[SPECIES_RANK_ID]['id']) ? $this->_projectRankIds[SPECIES_RANK_ID]['id'] : -1;
-			$rankIdSubSpecies=!empty($this->_projectRankIds[SUBSPECIES_RANK_ID]['id']) ? $this->_projectRankIds[SUBSPECIES_RANK_ID]['id'] : -1; 
+			$rankIdSubSpecies=!empty($this->_projectRankIds[SUBSPECIES_RANK_ID]['id']) ? $this->_projectRankIds[SUBSPECIES_RANK_ID]['id'] : -1;
 
 			$this->smarty->assign('concept',$concept);
 			$this->smarty->assign('names',$this->getNames($concept));
@@ -274,12 +273,12 @@ class NsrTaxonController extends NsrController
 			$this->deleteName();
 			$this->setMessage('Naam verwijderd.');
 			$this->redirect('taxon.php?id='.$name['taxon_id']);
-		} 
+		}
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
 			$this->setNameId($this->rGetId());
-			
+
 			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
 			{
 				$this->doParentChange();
@@ -292,7 +291,7 @@ class NsrTaxonController extends NsrController
 				$this->updateConceptBySciName();
 				$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
 			}
-		} 
+		}
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
@@ -300,13 +299,13 @@ class NsrTaxonController extends NsrController
 			$this->saveName();
 			$this->updateConceptBySciName();
 			$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
-		} 
+		}
 		else
 		{
 			$this->setNameId($this->rGetId());
 		}
-	
-		
+
+
 		if ($this->getNameId())
 		{
 			$name=$this->getName(array('id'=>$this->getNameId()));
@@ -348,7 +347,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->addError('Geen ID.');
 		}
-		
+
 		if (isset($concept))
 		{
 			$this->smarty->assign('concept',$concept);
@@ -374,7 +373,7 @@ class NsrTaxonController extends NsrController
 
         $this->setPageName( $this->translate('Naam concept direct aanpassen') );
 		$this->setConceptId( $this->rGetId() );
-		
+
 		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			if ($this->updateConceptTaxon(array('new'=>$this->rGetVal('taxon'))))
@@ -409,12 +408,12 @@ class NsrTaxonController extends NsrController
 
 		$this->setConceptId( $name['taxon_id'] );
 		$concept=$this->getConcept($this->getConceptId());
-		
+
 		if ($name['type_id']!=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])
 		{
 			$this->redirect('synonym.php');
 		}
-		
+
 		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->updateName();
@@ -426,7 +425,6 @@ class NsrTaxonController extends NsrController
 		$this->smarty->assign('name',$this->getName(array('id'=>$this->getNameId())));
 		$this->printPage();
 	}
-
 
     public function taxonDeletedAction()
     {
@@ -446,97 +444,61 @@ class NsrTaxonController extends NsrController
 			$this->saveTaxonParentage();
 			$this->addMessage('Tabel bijgewerkt');
 		}
-		
+
 		$this->printPage();
 	}
 
     public function nsrIdResolverAction()
     {
-
 		$this->checkAuthorisation();
-		
+
         $this->setPageName($this->translate('NSR ID resolver'));
 
 		if ( ($this->rHasVal('action','resolve') || $this->rHasVal('action','download')) && $this->rHasVal('codes') )
 		{
-			$t="%PRE%_tmp_".substr( "abcdefghijklmnopqrstuvwxyz", mt_rand( 0, 25 ), 1 ) .substr( md5( time() ), 1 );
+			$t="_tmp_" . substr( "abcdefghijklmnopqrstuvwxyz", mt_rand( 0, 25 ), 1 ) .substr( md5( time() ), 1 ) . "_p". $this->getCurrentProjectId();
 
-			$this->models->NsrIds->freeQuery("drop table ".$t);
-			$this->models->NsrIds->freeQuery("
-				create table ".$t." (
-					`id` int(11) not null primary key,
-					`code_1` varchar(16) not null, 
-					`code_2` varchar(32) not null, 
-					key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))");
+			$this->models->NsrTaxonModel->dropTempTable(array(
+				'table_name'=>$t
+			));
+
+			$this->models->NsrTaxonModel->createTempTable(array(
+				'table_name'=>$t
+			));
 
 			$codes=explode(PHP_EOL,trim($this->rGetVal('codes')));
 			array_walk($codes,function(&$val,$key){ $val=substr(str_pad(trim($val),12,"0", STR_PAD_LEFT),-12);});
 
-			$pre='tn.nlsr.concept/';
-			$buffer=array();
-			foreach((array)$codes as $line=>$code)
-			{
-				$buffer[]= "(".$line.",'" . mysql_real_escape_string( $code ) . "','". mysql_real_escape_string( $pre . $code ) . "')";
-				if ($line > 0 && ($line % 500)==0)
-				{
-					$this->models->NsrIds->freeQuery("insert into ".$t." values ".implode(",",$buffer));
-					$buffer=array();
-				}
-			}
+			$this->models->NsrTaxonModel->fillTempTable(array(
+				'table_name'=>$t,
+				'id_prefix'=>'tn.nlsr.concept/',
+				'codes'=>$codes
+			));
 
-			$this->models->NsrIds->freeQuery("insert into ".$t." values ".implode(",",$buffer));
+			$result=$this->models->NsrTaxonModel->getResolvedCodes(array(
+				'table_name'=>$t,
+				'project_id'=>$this->getCurrentProjectId()
+			));
 
-			$result=$this->models->NsrIds->freeQuery("
-				select
-					_a.id as line,
-					_a.code_1 as code,
-					ifnull(_b.lng_id,_c.lng_id) as lng_id,
-					ifnull(_t1.taxon,_t2.taxon) as taxon
-					
-				from ".$t." _a
-
-				left join %PRE%nsr_ids _b
-					on _a.code_1 = _b.nsr_id
-					and _b.project_id = ".$this->getCurrentProjectId()."
-					and _b.item_type = 'taxon'
-					and _b.lng_id is not null
-
-				left join %PRE%nsr_ids _c
-					on _a.code_2 = _c.nsr_id
-					and _c.project_id = ".$this->getCurrentProjectId()."
-					and _c.item_type = 'taxon'
-					and _c.lng_id is not null
-
-				left join %PRE%taxa _t1
-					on _b.lng_id = _t1.id
-					and _t1.project_id = ".$this->getCurrentProjectId()."
-					
-				left join %PRE%taxa _t2
-					on _c.lng_id = _t2.id
-					and _t2.project_id = ".$this->getCurrentProjectId()."
-					
-				group by _a.id
-
-				order by _a.id
-			");
-				
-			@$this->models->NsrIds->freeQuery("drop table ".$t);
+			$this->models->NsrTaxonModel->dropTempTable(array(
+				'table_name'=>$t
+			));
 
 			if ($this->rHasVal('action','download'))
 			{
 				header('Content-Type: text/plain');
 				header('Content-Disposition: attachment; filename=nsr_id-lng_id-match--'.date('Ymd-His').'.txt');
-				header('Pragma: no-cache');	
-	
+				header('Pragma: no-cache');
+
 				foreach($result as $val)
 				{
-					echo 
-						$val["line"] . chr(9) . 
-						$val["code"] . chr(9) . 
-						$val["lng_id"] . chr(9) . 
+					echo
+						$val["line"] . chr(9) .
+						$val["code"] . chr(9) .
+						$val["lng_id"] . chr(9) .
 						$val["taxon"] . PHP_EOL;
-				}	
-				die();		
+				}
+				die();
 			}
 		}
 
@@ -549,17 +511,19 @@ class NsrTaxonController extends NsrController
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVal('action'))
+		{
             return;
+		}
 
 		if (
-			$this->rHasVal('action', 'get_lookup_list') || 
+			$this->rHasVal('action', 'get_lookup_list') ||
 			$this->rHasVal('action', 'species_lookup') ||
 			$this->rHasVal('action', 'taxon_id') ||
 			$this->rHasVal('action', 'parent_taxon_id')
 		)
 		{
-            $return=$this->getSpeciesLookupList($this->requestData);
-        } 
+            $return=$this->getSpeciesLookupList($this->rGetAll());
+        }
 		else
 		if (
 			$this->rHasVal('action', 'expert_lookup') ||
@@ -571,14 +535,14 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'presence_organisation_id')
 		)
 		{
-            $return=$this->getExpertsLookupList($this->requestData);
+            $return=$this->getExpertsLookupList($this->rGetAll());
         }
 		else
 		if ($this->rHasVal('action', 'get_inheritable_name'))
 		{
-			$return=$this->getInheritableName(array('id'=>$this->rGetVal('id')));
+			$return=$this->getInheritableName(array('id'=>$this->rGetId()));
         }
-		
+
 
         $this->allowEditPageOverlay=false;
 
@@ -586,10 +550,6 @@ class NsrTaxonController extends NsrController
 
         $this->printPage();
     }
-
-
-
-
 
 	private function setConceptId($id)
 	{
@@ -640,150 +600,37 @@ class NsrTaxonController extends NsrController
 	private function getName($p)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
-		$taxonId=isset($p['taxon_id']) ? $p['taxon_id'] : null;
-		$typeId=isset($p['type_id']) ? $p['type_id'] : null;
-		$languageId=isset($p['language_id']) ? $p['language_id'] : null;
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$type_id=isset($p['type_id']) ? $p['type_id'] : null;
+		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
+
+        $name=$this->models->NsrTaxonModel->getName(array(
+			'label_language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon_id,
+			'language_id'=>$language_id,
+			'type_id'=>$type_id,
+			'name_id'=>$id
+		));
 		
-        $name=$this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.id,
-						_a.taxon_id,
-						_a.name,
-						_a.uninomial,
-						_a.specific_epithet,
-						_a.infra_specific_epithet,
-						_a.authorship,
-						_a.name_author,
-						_a.authorship_year,
-						_a.reference,
-						_a.reference_id,
-						_h.label as reference_name,
-						_a.expert,
-						_a.expert_id,
-						_f.name as expert_name,
-						_a.organisation,
-						_a.organisation_id,
-						_g.name as organisation_name,
-						_a.type_id,
-						_b.nametype,
-						_a.language_id,
-						_c.language,
-						_d.label as language_label,
-						replace(_ids.nsr_id,'tn.nlsr.name/','') as nsr_id
+		if ( isset($name['id']) )
+		{
+			$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
+		}
 
-					from %PRE%names _a 
-
-					left join %PRE%name_types _b
-						on _a.type_id=_b.id 
-						and _a.project_id=_b.project_id
-
-					left join %PRE%languages _c
-						on _a.language_id=_c.id
-
-					left join %PRE%labels_languages _d
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id
-						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-					left join %PRE%actors _f
-						on _a.expert_id = _f.id 
-						and _a.project_id=_f.project_id
-		
-					left join %PRE%actors _g
-						on _a.organisation_id = _g.id 
-						and _a.project_id=_g.project_id
-		
-					left join  %PRE%literature2 _h
-						on _a.reference_id = _h.id 
-						and _a.project_id=_h.project_id
-
-					left join %PRE%nsr_ids _ids
-						on _a.id =_ids.lng_id 
-						and _a.project_id = _ids.project_id
-						and _ids.item_type = 'name'
-
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						".(isset($taxonId) ? "and _a.taxon_id=".$taxonId: "" )."
-						".(isset($languageId) ? "and _a.language_id=".$languageId: "" )."
-						".(isset($typeId) ? "and _a.type_id=".$typeId: "" )."
-						".(isset($id) ? "and _a.id=".$id: "" )
-			)
-		);
-
-		$name=$name[0];
-		
-		$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
-		
 		return $name;
 	}
 
 	private function getNames($p)
 	{
-		$id=isset($p['id']) ? $p['id'] : null;
+		$taxon_id=isset($p['id']) ? $p['id'] : null;
 		$base_rank_id=isset($p['base_rank']) ? $p['base_rank'] : null;
 
-        $names=$this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.id,
-						_a.name,
-						_a.uninomial,
-						_a.specific_epithet,
-						_a.infra_specific_epithet,
-						_a.authorship,
-						_a.name_author,
-						_a.authorship_year,
-						_a.reference,
-						_a.reference_id,
-						_a.expert,
-						_a.expert_id,
-						_a.organisation,
-						_a.organisation_id,
-						_b.nametype,
-						_a.language_id,
-						_c.language,
-						ifnull(_d.label,_c.language) as language_label,
-						case
-							when _b.nametype = '".PREDICATE_VALID_NAME."' then 11
-							when _b.nametype = '".PREDICATE_PREFERRED_NAME."' then 10
-							when _b.nametype = '".PREDICATE_ALTERNATIVE_NAME."' then 9
-							when _b.nametype = '".PREDICATE_SYNONYM."' then 7
-							when _b.nametype = '".PREDICATE_SYNONYM_SL."' then 6
-
-							when _b.nametype = '".PREDICATE_HOMONYM."' then 5
-							when _b.nametype = '".PREDICATE_MISSPELLED_NAME."' then 4
-							when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
-							else 0
-						end as sort_criterium
-
-					from %PRE%names _a 
-
-					left join %PRE%name_types _b
-						on _a.type_id=_b.id 
-						and _a.project_id=_b.project_id
-
-					left join %PRE%languages _c
-						on _a.language_id=_c.id
-
-					left join %PRE%labels_languages _d
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id
-						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.taxon_id=".$id."
-					order by 
-						sort_criterium desc
-						",
-				'fieldAsIndex' => 'id'
-			)
-		);
-		
+        $names=$this->models->NsrTaxonModel->getNames(array(
+			'label_language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon_id
+		));
 
 		$prefferedname=null;
 		$scientific_name=null;
@@ -809,7 +656,7 @@ class NsrTaxonController extends NsrController
 			{
 				$scientific_name=trim($val['name']);
 				$nomen=trim($val['uninomial']).' '.trim($val['specific_epithet']).' '.trim($val['infra_specific_epithet']);
-				
+
 				if (strlen(trim($nomen))==0)
 					$nomen=trim(str_replace($val['authorship'],'',$val['name']));
 
@@ -836,108 +683,32 @@ class NsrTaxonController extends NsrController
 			);
 	}
 
-	private function getPreferredNames($concept)
+	private function getPreferredNames( $taxon_id )
 	{
-		
-		if (empty($concept))
+		if (empty($taxon_id))
+		{
 			return;
+		}
 
-        $names=$this->models->Names->freeQuery(
-			array(
-				'query' => "
-					select
-						_a.id,
-						_a.name,
-						_a.language_id,
-						_c.language,
-						ifnull(_d.label,_c.language) as language_label
-
-					from %PRE%names _a 
-
-					left join %PRE%languages _c
-						on _a.language_id=_c.id
-
-					left join %PRE%labels_languages _d
-						on _a.language_id=_d.language_id
-						and _a.project_id=_d.project_id
-						and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.taxon_id = ".$concept."
-						and _a.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-						"
-			)
-		);
-		
-		return $names;
-
+        return $this->models->NsrTaxonModel->getPreferredNames(array(
+			'label_language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon_id,
+			'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']
+		));
 	}
 
 	private function getPresenceData($id)
 	{
-		$data=$this->models->PresenceTaxa->freeQuery(
-			"select
-				_a.presence_id,
-				_a.presence82_id,
-				_a.reference_id,
-				_b.label as presence_label,
-				_b.information as presence_information,
-				_b.information_title as presence_information_title,
-				_b.index_label as presence_index_label,
-				_c.label as presence82_label,
-				_d.habitat_id,
-				_d.label as habitat_label,
-				_e.id as expert_id,
-				_f.id as organisation_id,
-				_e.name as expert_name,
-				_f.name as organisation_name,
-				_a.reference_id,
-				_g.label as reference_label,
-				_gg.name as reference_author,
-				_g.date as reference_date
-				
-			from %PRE%presence_taxa _a
+		$data=$this->models->NsrTaxonModel->getPresenceData(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"taxon_id"=>$id
+		));
 
-			left join %PRE%presence_labels _b
-				on _a.presence_id = _b.presence_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
+		$data['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data['presence_information']);
 
-			left join %PRE%presence_labels _c
-				on _a.presence82_id = _c.presence_id 
-				and _a.project_id=_c.project_id 
-				and _c.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%habitat_labels _d
-				on _a.habitat_id = _d.habitat_id 
-				and _a.project_id=_d.project_id 
-				and _d.language_id=".$this->getDefaultProjectLanguage()."
-
-			left join %PRE%actors _e
-				on _a.actor_id = _e.id 
-				and _a.project_id=_e.project_id
-
-			left join %PRE%actors _f
-				on _a.actor_org_id = _f.id 
-				and _a.project_id=_f.project_id
-
-			left join %PRE%literature2 _g
-				on _a.reference_id = _g.id 
-				and _a.project_id=_g.project_id
-
-			left join %PRE%actors _gg
-				on _g.actor_id = _gg.id 
-				and _g.project_id=_gg.project_id
-
-
-			where _a.project_id = ".$this->getCurrentProjectId()."
-				and _a.taxon_id =".$id
-		);	
-		
-		$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
-		
-		return $data[0];
+		return $data;
 	}
 
 	private function getActor($id)
@@ -947,7 +718,7 @@ class NsrTaxonController extends NsrController
 				'project_id'=>$this->getCurrentProjectId(),
 				'id'=>$id
 			)
-		));	
+		));
 		return $data[0];
 	}
 
@@ -963,49 +734,20 @@ class NsrTaxonController extends NsrController
 			they, and they alone, have no actual index_label, and are
 			subsequently excluded from the list in the wehre-statement.
 		*/
-		
-		$data=$this->models->PresenceTaxa->freeQuery(
-			"select
-            	_a.id,
-            	_b.label,
-            	_b.information,
-            	_b.information_short,
-            	_b.information_title,
-            	ifnull(_b.index_label,99) as index_label
 
-			from %PRE%presence _a
+		return $this->models->NsrTaxonModel->getStatuses(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId()
+		));
 
-			left join %PRE%presence_labels _b
-				on _a.id = _b.presence_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
-
-			where _a.project_id = ".$this->getCurrentProjectId()."
-			and index_label != 99
-			order by index_label"
-		);	
-
-		return $data;
 	}
 
 	private function getHabitats()
 	{
-		$data=$this->models->PresenceTaxa->freeQuery(
-			"select
-            	_a.id,
-            	ifnull(_b.label,_a.sys_label) as label
-
-			from %PRE%habitats _a
-
-			left join %PRE%habitat_labels _b
-				on _a.id = _b.habitat_id 
-				and _a.project_id=_b.project_id 
-				and _b.language_id=".$this->getDefaultProjectLanguage()."
-
-			where _a.project_id = ".$this->getCurrentProjectId()
-		);	
-		
-		return $data;
+		return $this->models->NsrTaxonModel->getHabitats(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
 	private function getNameTypes()
@@ -1015,83 +757,30 @@ class NsrTaxonController extends NsrController
 				'project_id'=>$this->getCurrentProjectId()
 			)
 		));
-		
+
 
 		foreach((array)$types as $key=>$val)
 		{
 			$types[$key]['nametype_label']=$this->Rdf->translatePredicate($val['nametype'],true);
 			$types[$key]['noNameParts']= in_array($val['nametype'],array(PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME)) ? true : false ;
 		}
-		
+
 		return $types;
 	}
 
 	private function getLanguages()
 	{
-        $languages=$this->models->Language->freeQuery("
-			select
-				_c.id,
-				_c.language,
-				ifnull(_d.label,_c.language) as label,
-				case
-					when _c.id= " . LANGUAGE_ID_SCIENTIFIC. " then 99
-					when _c.id= " . $this->getDefaultProjectLanguage() . " then 98
-					when _c.id= " . LANGUAGE_ID_DUTCH . " then 97
-					when _c.id= " . LANGUAGE_ID_ENGLISH . " then 97
-					else 0 
-				end as sort_criterium
-
-			from %PRE%languages _c
-
-			left join %PRE%labels_languages _d
-				on _c.id=_d.language_id
-				and _d.project_id = ".$this->getCurrentProjectId()."
-				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-				order by sort_criterium desc, label asc
-			");
-			
-		return $languages;
+        return $this->models->NsrTaxonModel->getLanguages(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"label_language_id"=>$this->getDefaultProjectLanguage()
+		));
 	}
 
 	private function getDeletedSpeciesList()
 	{
-		$taxa=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_q.rank,
-				concat(_user.first_name,' ',_user.last_name) as deleted_by,
-				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
-			
-			from %PRE%taxa _a
-			
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-
-			left join %PRE%users _user
-				on _trash.user_id = _user.id
-				
-			left join %PRE%projects_ranks _f
-				on _a.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
-			left join %PRE%ranks _q
-				on _f.rank_id=_q.id
-
-			left join %PRE%nsr_ids _ids
-				on _a.id =_ids.lng_id 
-				and _a.project_id = _ids.project_id
-				and _ids.item_type = 'taxon'
-
-			where _a.project_id =".$this->getCurrentProjectId()."
-				and ifnull(_trash.is_deleted,0)=1
-
-			order by _trash.created desc
-		");
-
-		return $taxa;
+		return $this->models->NsrTaxonModel->getDeletedSpeciesList(array(
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
 	private function getSpeciesList($p)
@@ -1106,172 +795,33 @@ class NsrTaxonController extends NsrController
         $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
 		$limit=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
         $haveDeleted = isset($p['have_deleted']) ? $p['have_deleted'] : 'no'; // yes, no, only
-		
+        $sort = isset($p['sort']) ? $p['sort'] : null;
+        $offset = isset($p['offset']) ? $p['offset'] : null;
+
 		$search=trim($search);
-		
+
 		if (empty($search) && empty($id) && $haveDeleted!='only')
 		{
 			return null;
 		}
 
-		$taxa=$this->models->Names->freeQuery("
-			select
-				_a.taxon_id as id,
-				concat(_a.name,' [',ifnull(_q.label,_x.rank),'%s]') as label,
-				_e.rank_id,
-				_e.taxon,
-				_a.name,
-				_common.name as common_name,
-				_f.rank_id as base_rank_id,
-				_x.rank,
-				_a.uninomial,
-				_a.specific_epithet,
-				_b.nametype,
-				ifnull(_d.label,_c.language) as language_label,
-				ifnull(_trash.is_deleted,0) as is_deleted,
-	
-				case
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."$' = 1
-						or
-						trim(concat(
-							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
-							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
-							if(_a.infra_specific_epithet is null,'',concat(_a.infra_specific_epithet,' '))
-						)) REGEXP '^".mysql_real_escape_string($search)."$' = 1
-					then 100
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 95
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 90
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 85
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 80
-					when 
-						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id >= ".SPECIES_RANK_ID."
-					then 75
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 70
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."[[:>:]](.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 65
-					when
-						_a.name REGEXP '^".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 60
-					when
-						_a.name REGEXP '^(.*)[[:<:]]".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 55
-					when 
-						_a.name REGEXP '^(.*)".mysql_real_escape_string($search)."(.*)$' = 1 
-						and
-						_f.rank_id < ".SPECIES_RANK_ID."
-					then 50
-
-					else 10
-				end as match_percentage,
-	
-				case
-					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
-					else 50
-				end as adjusted_rank
-				
-			from %PRE%names _a
-
-			left join %PRE%languages _c
-				on _a.language_id=_c.id
-
-			left join %PRE%labels_languages _d
-				on _a.language_id=_d.language_id
-				and _a.project_id=_d.project_id
-				and _d.label_language_id=".$this->getDefaultProjectLanguage()."
-			
-			left join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-
-			left join %PRE%names _common
-				on _e.id = _common.taxon_id
-				and _e.project_id = _common.project_id
-				and _common.type_id = ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _common.language_id=".$this->getDefaultProjectLanguage()."
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-
-			left join %PRE%ranks _x
-				on _f.rank_id=_x.id
-
-			left join %PRE%labels_projects_ranks _q
-				on _e.rank_id=_q.project_rank_id
-				and _a.project_id = _q.project_id
-				and _q.language_id=".$this->getDefaultProjectLanguage()."
-			
-			left join %PRE%name_types _b 
-				on _a.type_id=_b.id 
-				and _a.project_id = _b.project_id
-
-			left join %PRE%trash_can _trash
-				on _e.project_id = _trash.project_id
-				and _e.id = _trash.lng_id
-				and _trash.item_type='taxon'
-
-			where _a.project_id =".$this->getCurrentProjectId()."
-				and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
-				and _b.nametype in (
-					'".PREDICATE_PREFERRED_NAME."',
-					'".PREDICATE_VALID_NAME."',
-					'".PREDICATE_ALTERNATIVE_NAME."',
-					'".PREDICATE_SYNONYM."',
-					'".PREDICATE_SYNONYM_SL."',
-					'".PREDICATE_HOMONYM."',
-					'".PREDICATE_BASIONYM."',
-					'".PREDICATE_MISSPELLED_NAME."'
-				)
-
-			".($taxaOnly ? "and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : "" )."
-			".($rankAbove ? "and _f.rank_id < ".$rankAbove : "" )."
-			".($rankEqualAbove ? "and _f.rank_id <= ".$rankEqualAbove : "" )."
-			".($id ? "and _a.taxon_id = ".$id : "" )."
-			".($nametype ? "and _b.nametype = ".$nametype : "" )."
-			".($haveDeleted=='no' ? "and ifnull(_trash.is_deleted,0)=0" :  "" )."
-			".($haveDeleted=='only' ? "and ifnull(_trash.is_deleted,0)=1" : "" )."
-		
-			order by 
-				match_percentage desc, 
-				_e.taxon asc, 
-				_f.rank_id asc, ".
-				(!empty($p['sort']) && $p['sort']=='preferredNameNl' ?
-					"common_name" :
-					"taxon" 
-				)."
-			".(isset($limit) ? "limit ".(int)$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
-		);
+		$taxa=$this->models->NsrTaxonModel->getSpeciesList(array(
+			"search"=>$search,
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
+			"type_id_valid"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"project_id"=>$this->getCurrentProjectId(),
+			"match_start_only"=>$matchStartOnly,
+			"taxa_only"=>$taxaOnly,
+			"rank_above"=>$rankAbove,
+			"rank_equal_above"=>$rankEqualAbove,
+			"taxon_id"=>$id,
+			"nametype"=>$nametype,
+			"have_deleted"=>$haveDeleted,
+			"sort"=>$sort,
+			"limit"=>$limit,
+			"offset"=>$offset,
+		));
 
 
 		foreach ((array) $taxa as $key => $val)
@@ -1294,7 +844,7 @@ class NsrTaxonController extends NsrController
 			unset($taxa[$key]['adjusted_rank']);
 			unset($taxa[$key]['uninomial']);
 			unset($taxa[$key]['specific_epithet']);
-			
+
 			if ($val['nametype']!=PREDICATE_VALID_NAME && $val['nametype']!=PREDICATE_PREFERRED_NAME)
 			{
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'; '.sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']));
@@ -1316,28 +866,12 @@ class NsrTaxonController extends NsrController
 		if (empty($taxonId))
 			return null;
 
-		$taxa=$this->models->Names->freeQuery("
-			select
-				_a.*, _f.rank_id as base_rank_id
-			from
-				%PRE%names _a
-			
-			left join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
+		$val=$this->models->NsrTaxonModel->getInheritableName(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"taxon_id"=>$taxonId
+		));
 
-			where
-				_a.project_id =".$this->getCurrentProjectId()."
-				and _a.type_id = ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and _a.taxon_id =".$taxonId
-		);
-		
-		$val=$taxa[0];
-		
 		if ($val['base_rank_id']==GENUS_RANK_ID)
 		{
 			$inheritableName=$val['uninomial'];
@@ -1384,32 +918,12 @@ class NsrTaxonController extends NsrController
         if (empty($search))
             return;
 
-		$data=$this->models->Actors->freeQuery(
-			"select
-				_e.id,
-				_e.name as label,
-				_e.name_alt,
-				_e.homepage,
-				_e.gender,
-				_e.is_company,
-				_e.employee_of_id,
-				_f.name as company_of_name,
-				_f.name_alt as company_of_name_alt,
-				_f.homepage as company_of_homepage
-
-			from %PRE%actors _e
-
-			left join %PRE%actors _f
-				on _e.employee_of_id = _f.id 
-				and _e.project_id=_f.project_id
-
-			where
-				_e.project_id = ".$this->getCurrentProjectId()."
-				".(!$getAll ? "and _e.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'" : "")."
-
-			order by
-				_e.is_company, _e.name
-		");	
+		$data=$this->models->NsrTaxonModel->getExpertsLookupList(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"get_all"=>$getAll,
+			"match_start_only"=>$matchStartOnly,
+			"search"=>$search
+		));
 
 		return
 			$this->makeLookupList(array(
@@ -1426,15 +940,15 @@ class NsrTaxonController extends NsrController
 	{
 		$d=$this->getTaxonById($parent_id);
 		$parent_base_rank=$d['base_rank'];
-		
-		$ranks=$this->models->Rank->_get(array(
+
+		$ranks=$this->models->Ranks->_get(array(
 			'id'=>'*',
 			'columns'=>'id,rank',
 			'fieldAsIndex'=>'id'
 		));
-		
+
 		$error=null;
-		
+
 		if ($child_base_rank>SPECIES_RANK_ID && $parent_base_rank!=SPECIES_RANK_ID)
 		{
 			/*
@@ -1445,7 +959,7 @@ class NsrTaxonController extends NsrController
 			ondersoort moet onder soort
 			*/
 			$error=array($ranks[SPECIES_RANK_ID]['rank']);
-		} 
+		}
 		else
 		if (($child_base_rank==SPECIES_RANK_ID && $parent_base_rank!=GENUS_RANK_ID) &&
 			($child_base_rank==SPECIES_RANK_ID && $ranks[$parent_base_rank]['rank']!='subgenus'))
@@ -1496,14 +1010,14 @@ class NsrTaxonController extends NsrController
 		else
 		if (($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='subclassis') &&
 			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='classis') &&
-			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='superorder') 
+			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='superorder')
 			)
 		{
 			// orde moet onder subklasse, klasse of superorder
 			$error=array('subclassis','classis','superorder');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='classis') && 
+		if (($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='classis') &&
 			($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='subclassis'))
 		{
 			// superordo moet onder klasse of subclassis
@@ -1608,7 +1122,7 @@ class NsrTaxonController extends NsrController
 				$this->addError("Wetenschappelijke naam kan geen derde naamdeel hebben. Concept niet opgeslagen.");
 				return false;
 			}
-		
+
 		}
 		else
 		if ($baseRank>SPECIES_RANK_ID)
@@ -1621,28 +1135,17 @@ class NsrTaxonController extends NsrController
 		}
 
 		return true;
-			
+
 	}
 
 	private function checkNameUniqueness($name,$childRankId,$parentId)
 	{
-		$d=$this->models->Taxon->freeQuery("
-			select
-				_a.*,ifnull(_trash.is_deleted,0) as is_deleted
-			from
-				%PRE%taxa _a
-	
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-	
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.taxon like '". mysql_real_escape_string($name) ."'
-				and _a.rank_id = ". mysql_real_escape_string($childRankId) ."
-				and _a.parent_id = ". mysql_real_escape_string($parentId)
-			);
+		$d=$this->models->NsrTaxonModel->checkNameUniqueness(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"name"=>$name,
+			"child_rank_id"=>$childRankId,
+			"parent_id"=>$parentId
+		));
 
 		if ($d)
 		{
@@ -1654,9 +1157,9 @@ class NsrTaxonController extends NsrController
 			return false;
 		}
 
-		return true;		
+		return true;
 	}
-		
+
 
 
 	private function saveConcept()
@@ -1684,7 +1187,7 @@ class NsrTaxonController extends NsrController
 		$presenceExpertId=trim($presenceExpertId['new']);
 		$presenceOrganisationId=trim($presenceOrganisationId['new']);
 		$presenceReferenceId=trim($presenceReferenceId['new']);
-		
+
 		foreach((array)$this->_projectRankIds as $val)
 		{
 			if ($val['id']==$rank)
@@ -1737,7 +1240,7 @@ class NsrTaxonController extends NsrController
 			return;
 		} else
 		if (
-			(empty($presencePresenceId) || empty($presenceExpertId) || empty($presenceOrganisationId) || empty($presenceReferenceId)) && 
+			(empty($presencePresenceId) || empty($presenceExpertId) || empty($presenceOrganisationId) || empty($presenceReferenceId)) &&
 
 			$rank>=SPECIES_RANK_ID
 		)
@@ -1749,36 +1252,36 @@ class NsrTaxonController extends NsrController
 		{
 			$this->addWarning("Geen auteurschap. Concept wel opgeslagen.");
 		}
-			
-		
+
+
 		// we passed the tests!
-		$d=$this->models->Taxon->save(
+		$d=$this->models->Taxa->save(
 		array(
 			'project_id' => $this->getCurrentProjectId(),
 			'is_empty' =>'0',
 			'rank_id' => $rank,
 			'taxon' => $name,
 		));
-		
+
 		if ($d)
 		{
-			$this->setConceptId($this->models->Taxon->getNewId());
+			$this->setConceptId($this->models->Taxa->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
 			$this->logNsrChange(array('after'=>array('id'=>$this->getConceptId(),'taxon'=>$name,'rank_id' =>$rank),'note'=>'new concept '.$name));
 			//$this->setIsNewRecord(true);
 			$this->updateConcept();
 		}
-		else 
+		else
 		{
 			$this->addError('Aanmaak nieuw concept mislukt.');
 		}
 	}
 
 	private function updateConcept()
-	{	
+	{
 		$this->createConceptNsrIds();
 		$this->createConceptPresence();
-		
+
 		$before=$this->getConcept($this->rGetId());
 		$before['presence']=$this->getPresenceData($this->rGetId());
 
@@ -1885,19 +1388,19 @@ class NsrTaxonController extends NsrController
 
 	private function updateConceptTaxon($values)
 	{
-		$before=$this->models->Taxon->_get(array(
+		$before=$this->models->Taxa->_get(array(
 			'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 			'columns'=>'taxon'
 		));
-		
-		$result=$this->models->Taxon->update(
+
+		$result=$this->models->Taxa->update(
 			array('taxon'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 
-		if ($result && $this->models->Taxon->getAffectedRows()!=0)
+		if ($result && $this->models->Taxa->getAffectedRows()!=0)
 		{
-			$after=$this->models->Taxon->_get(array(
+			$after=$this->models->Taxa->_get(array(
 				'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'taxon'
 			));
@@ -1911,15 +1414,15 @@ class NsrTaxonController extends NsrController
 			{
 				$this->addError(sprintf('Naam bestaat al voor een <a target="_new" href="taxon.php?id=%s">ander taxonconcept</a>.',$exist['id']));
 			}
-		
+
 			$this->addError('Update naam taxon concept mislukt.');
 			return false;
 		}
 	}
-	
+
 	private function updateConceptRankId($values)
 	{
-		return $this->models->Taxon->update(
+		return $this->models->Taxa->update(
 			array('rank_id'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
@@ -1927,7 +1430,7 @@ class NsrTaxonController extends NsrController
 
 	private function updateParentId($values)
 	{
-		return $this->models->Taxon->update(
+		return $this->models->Taxa->update(
 			array('parent_id'=>trim($values['new'])),
 			array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
@@ -1938,7 +1441,7 @@ class NsrTaxonController extends NsrController
 		$d=$this->models->PresenceTaxa->_get(array(
 			'id'=>
 				array(
-					'project_id'=>$this->getCurrentProjectId(), 
+					'project_id'=>$this->getCurrentProjectId(),
 					'taxon_id'=>$this->getConceptId()
 				),
 			'columns'=>'count(*) as total'
@@ -1948,13 +1451,13 @@ class NsrTaxonController extends NsrController
 
 		$this->models->PresenceTaxa->insert(
 			array(
-				'project_id'=>$this->getCurrentProjectId(), 
+				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$this->getConceptId()
 			));
 
 		return $this->models->PresenceTaxa->getNewId();
 	}
-	
+
 	private function updateConceptPresenceId($values)
 	{
 		return $this->models->PresenceTaxa->update(
@@ -2017,7 +1520,7 @@ class NsrTaxonController extends NsrController
 				'language_id' => trim($language['new']),
 				'type_id' => trim($type['new'])
 			));
-		
+
 		if ($d)
 		{
 			$this->setNameId($this->models->Names->getNewId());
@@ -2025,7 +1528,7 @@ class NsrTaxonController extends NsrController
 			$this->setIsNewRecord(true);
 			$this->updateName();
 		}
-		else 
+		else
 		{
 			$this->addError('Aanmaak nieuwe naam mislukt.');
 		}
@@ -2037,19 +1540,10 @@ class NsrTaxonController extends NsrController
 
 		if (!isset($name['new'])) return;
 
-		$d=$this->models->Names->freeQuery("
-			select
-				_a.id, 
-				_b.taxon
-			from 
-				%PRE%names _a
-			left join %PRE%taxa _b
-				on _a.project_id = _b.project_id
-				and _a.taxon_id=_b.id
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and lower(_a.name) = '" . mysql_real_escape_string(trim($name['new'])) . "'
-		");
+		$d=$this->models->NsrTaxonModel->checkMainLanguageCommonName(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"name"=>$name['new']
+		));
 
 		if ($d)
 		{
@@ -2067,7 +1561,7 @@ class NsrTaxonController extends NsrController
 		$name=$this->rGetVal('main_language_name');
 
 		if (!isset($name['new'])) return;
-		
+
 		if ($this->rHasVal('main_language_name_language_id'))
 		{
 			$d=$this->rGetVal('main_language_name_language_id');
@@ -2102,7 +1596,7 @@ class NsrTaxonController extends NsrController
 					$this->addError('Nederlandse naam: referentie niet opgeslagen.');
 				}
 			}
-	
+
 			if ($this->rHasVar('main_language_name_expert_id'))
 			{
 				if (!$this->updateNameExpertId($this->rGetVal('main_language_name_expert_id')))
@@ -2110,7 +1604,7 @@ class NsrTaxonController extends NsrController
 					$this->addError('Nederlandse naam: expert niet opgeslagen.');
 				}
 			}
-	
+
 			if ($this->rHasVar('main_language_name_organisation_id'))
 			{
 				if (!$this->updateNameOrganisationId($this->rGetVal('main_language_name_organisation_id')))
@@ -2120,14 +1614,12 @@ class NsrTaxonController extends NsrController
 			}
 
 		}
-		else 
+		else
 		{
 			$this->addError('Aanmaak Nederlandse naam mislukt.');
 		}
 
 	}
-
-
 
 	private function updateName($new=false)
 	{
@@ -2160,7 +1652,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('Uninomiaal niet opgeslagen.');
 			}
 		}
-		
+
 		if ($this->rHasVar('name_specific_epithet'))
 		{
 			if ($this->updateNameSpecificEpithet($this->rGetVal('name_specific_epithet')))
@@ -2184,7 +1676,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('Infra specifiek epithet niet opgeslagen.');
 			}
 		}
-		
+
 		if ($this->rHasVar('name_authorship'))
 		{
 			if ($this->updateNameAuthorship($this->rGetVal('name_authorship')))
@@ -2196,7 +1688,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('"Authorship" niet opgeslagen.');
 			}
 		}
-		
+
 		if ($this->rHasVar('name_name_author'))
 		{
 			if ($this->updateNameAuthor($this->rGetVal('name_name_author')))
@@ -2208,7 +1700,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('Naam auteur niet opgeslagen.');
 			}
 		}
-		
+
 		if ($this->rHasVar('name_authorship_year'))
 		{
 			if ($this->updateNameAuthorshipYear($this->rGetVal('name_authorship_year')))
@@ -2220,7 +1712,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('Jaar niet opgeslagen.');
 			}
 		}
-		
+
 		if ($this->rHasVar('name_type_id'))
 		{
 			if ($this->updateNameTypeId($this->rGetVal('name_type_id')))
@@ -2232,7 +1724,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('Type niet opgeslagen.');
 			}
 		}
-		
+
 		if ($this->rHasVar('name_language_id'))
 		{
 			if ($this->updateNameLanguageId($this->rGetVal('name_language_id')))
@@ -2312,7 +1804,7 @@ class NsrTaxonController extends NsrController
 		);
 		$before=$this->models->Names->_get(array('id'=>$p));
 		$d=$this->models->Names->delete($p);
-	
+
 		if ($d)
 		{
 			$this->models->NsrIds->delete(array('project_id'=>$this->getCurrentProjectId(),'lng_id'=>$this->getNameId(),'item_type'=>'name'));
@@ -2413,7 +1905,6 @@ class NsrTaxonController extends NsrController
 
 	private function updateNameReferenceId($values)
 	{
-
 		return $this->models->Names->update(
 			array('reference_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
@@ -2444,7 +1935,7 @@ class NsrTaxonController extends NsrController
 				'fieldAsIndex'=>'language_id'
 			)
 		);
-		
+
 		$results=array();
 		foreach((array)$values as $language_id=>$vals)
 		{
@@ -2452,7 +1943,7 @@ class NsrTaxonController extends NsrController
 				$new=trim($vals['new']);
 			else
 				$new=null;
-			
+
 			if ( !isset($current[$language_id]) )
 			{
 				//insert
@@ -2482,11 +1973,11 @@ class NsrTaxonController extends NsrController
 					array( 'project_id'=>$this->getCurrentProjectId(), 'id'=>$current[$language_id]['id'] )
 				);
 			}
-			
+
 		}
-		
+
 		return ( !in_array(false,$results) );
-		
+
 	}
 
 	private function doNameIntegrityChecks($name)
@@ -2511,7 +2002,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->addWarning("Aan dit concept is geen wetenschappelijke naam gekoppeld.");
 		}
-		
+
 		if (!$this->checkIfConceptRetainsNameInMainProjectLanguage($concept['id']) && $concept['base_rank']>=SPECIES_RANK_ID)
 		{
 			$this->addWarning("Aan dit concept is geen Nederlandse voorkeursnaam gekoppeld.");
@@ -2521,7 +2012,7 @@ class NsrTaxonController extends NsrController
 	private function checkNamePartsMatchName($name)
 	{
 		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
-		
+
 		if (
 			trim(str_replace('  ',' ',
 				(!empty($name['uninomial']) ? $name['uninomial'].' ' : null).
@@ -2563,7 +2054,7 @@ class NsrTaxonController extends NsrController
 			'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
 			'language_id'=>LANGUAGE_ID_SCIENTIFIC
 		));
-		
+
 		return count((array)$d)>0;
 	}
 
@@ -2574,10 +2065,10 @@ class NsrTaxonController extends NsrController
 			'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 			'language_id'=>$this->getDefaultProjectLanguage()
 		));
-		
+
 		return count((array)$d)>0;
 	}
-	
+
 	private function setMessage($m=null)
 	{
 		if (empty($m))
@@ -2597,7 +2088,7 @@ class NsrTaxonController extends NsrController
 		if ($m) $this->addMessage($m);
 		$this->setMessage();
 	}
-	
+
 	private function toggleConceptDeleted($delete)
 	{
 		$concept=$this->getConcept($this->rGetId());
@@ -2611,7 +2102,7 @@ class NsrTaxonController extends NsrController
 				'lng_id'=>$this->rGetId(),
 				'item_type'=>'taxon'
 			)));
-			
+
 			$this->models->TrashCan->save(
 			array(
 				'id' => isset($d[0]['id']) ? $d[0]['id'] : null,
@@ -2620,7 +2111,7 @@ class NsrTaxonController extends NsrController
 				'item_type'=>'taxon',
 				'user_id'=>$this->getCurrentUserId(),
 				'is_deleted'=>1
-			));		
+			));
 
 			$after['is_deleted']=1;
 
@@ -2633,7 +2124,7 @@ class NsrTaxonController extends NsrController
 			);
 
 		}
-		else 
+		else
 		{
 			$d=$this->models->TrashCan->delete(
 			array(
@@ -2655,52 +2146,24 @@ class NsrTaxonController extends NsrController
 		}
 	}
 
-	private function getReference($id=null)
+	private function getReference($literature_id=null)
 	{
-		if (empty($id))
+		if (empty($literature_id))
 			return;
 
-		$l=$this->models->Literature2->freeQuery(
-			"select
-				_a.*,
-				_h.label as publishedin_label,
-				_i.label as periodical_label
-
-			from %PRE%literature2 _a
-
-			left join  %PRE%literature2 _h
-				on _a.publishedin_id = _h.id 
-				and _a.project_id=_h.project_id
-
-			left join %PRE%literature2 _i 
-				on _a.periodical_id = _i.id 
-				and _a.project_id=_i.project_id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.id = ".$id
-		);
-
-		return $l[0];
+		return $this->models->NsrTaxonModel->getReference(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"literature_id"=>$literature_id
+		));
 	}
-	
-	private function getTaxonBranch($parent)
+
+	private function getTaxonBranch( $parent )
 	{
-		return $this->models->Taxon->freeQuery("
-			select
-				_b.*
-			from 
-				%PRE%taxon_quick_parentage _a
-
-			left join %PRE%names _b
-				on _a.project_id = _b.project_id
-				and _a.taxon_id = _b.taxon_id
-				and _b.type_id =".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()."
-				and MATCH(_a.parentage) AGAINST ('".$parent['id']."' in boolean mode)
-		");
+		return $this->models->NsrTaxonModel->getTaxonBranch(array(
+			"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"project_id"=>$this->getCurrentProjectId(),
+			"parent_id"=>$parent['id']
+		));
 	}
 
 	private function checkIfNameExistsInConceptsKingdom($intendedNewConceptName,$concept)
@@ -2713,32 +2176,18 @@ class NsrTaxonController extends NsrController
 			kwestie op: deze test maakt onderdeel uit van een test die uitmaakt of een
 			taxon van parent kan veranderen. maar verandering van parent kan in principe
 			het kingdom waar het taxon toe behoort wijzigen, waardoor de uitkomst van deze
-			test anders zou kunnen zijn. gemakshalve wordt er van uit gegaan dat een 
-			bestaand taxon nooit van kingdom verandert, zodat alleen hoeft te worden 
+			test anders zou kunnen zijn. gemakshalve wordt er van uit gegaan dat een
+			bestaand taxon nooit van kingdom verandert, zodat alleen hoeft te worden
 			getest de overlappende namen wel of niet in hetzelfde kingdom vallen waar het
 			ongewijzigde concept valt.
 		*/
-		
-		$d=$this->models->Taxon->freeQuery("		
-			select
-				*
-			from
-				%PRE%names
-			where 
-				project_id = ".$this->getCurrentProjectId()."
-				and type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-				and language_id=".LANGUAGE_ID_SCIENTIFIC."
-				and (
-					trim(replace(name,ifnull(authorship,''),'')) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-						or
-					concat(
-						if(uninomial is null,'',concat(uninomial,' ')),
-						if(specific_epithet is null,'',concat(specific_epithet,' ')),
-						if(infra_specific_epithet is null,'',infra_specific_epithet)
-					) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-				)
-				and taxon_id != ".mysql_real_escape_string($concept['id'])."
-		");
+
+		$d=$this->models->NsrTaxonModel->checkIfNameExistsInConceptsKingdom(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+			"intended_new_concept_name"=>$intendedNewConceptName,
+			"taxon_id"=>$concept['id']
+		));
 
 		if ($d)
 		{
@@ -2747,16 +2196,11 @@ class NsrTaxonController extends NsrController
 			foreach((array)$d as $key=>$val)
 				$a[]=$val['taxon_id'];
 
-			$parentage=$this->models->Taxon->freeQuery(array(
-				"query" => "
-					select
-						taxon_id,parentage
-					from 
-						%PRE%taxon_quick_parentage
-					where 
-						project_id = ".$this->getCurrentProjectId()."
-						and taxon_id in (".implode(",",$a).")",
-				"fieldAsIndex"=>"taxon_id"
+			$parentage=$this->models->TaxonQuickParentage->_get(
+				array(
+					"columns" => "taxon_id,parentage",
+					"id"=> array("project_id"=>$this->getCurrentProjectId(),"taxon_id #"=>"in (".implode(",",$a).")"),
+					"fieldAsIndex"=>"taxon_id"
 				)
 			);
 
@@ -2767,14 +2211,14 @@ class NsrTaxonController extends NsrController
 			+----------+--------------------------------------------------+
 			|   138998 | 116297 116298 138384 138887 138978 138985 138997 |
 			|   138999 | 116297 116298 138384 138887 138978               |
-			+----------+--------------------------------------------------+				
+			+----------+--------------------------------------------------+
 			first two parts are realm (life) and kingdom (plantae, animalia, funghi)
-			*/		
+			*/
 
 			if (isset($parentage[$concept['id']]))
 			{
 				$d1=explode(' ',$parentage[$concept['id']]['parentage']);
-			
+
 				foreach((array)$parentage as $key=> $val)
 				{
 					$d2=explode(' ',$val['parentage']);
@@ -2785,7 +2229,7 @@ class NsrTaxonController extends NsrController
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -2796,8 +2240,8 @@ class NsrTaxonController extends NsrController
 			- edit concept	-> $this->getConceptId()
 			- edit name		-> $this->getNameId()
 		*/
-		
-		$data=$this->requestData;
+
+		$data=$this->rGetAll();
 
 		if ( $this->getConceptId() )
 		{
@@ -2807,7 +2251,7 @@ class NsrTaxonController extends NsrController
 			// A. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE PARENT WORDT GEWIJZIGD.
 			if (
 				$taxon['base_rank']>=SPECIES_RANK_ID &&
-				isset($data['parent_taxon_id']['new']) && 
+				isset($data['parent_taxon_id']['new']) &&
 				$data['parent_taxon_id']['new']!=$taxon['parent_id']
 			)
 			{
@@ -2825,27 +2269,27 @@ class NsrTaxonController extends NsrController
 
 
 			if (
-				!isset($data['name_uninomial']['new']) && 
-				!isset($data['name_specific_epithet']['new']) && 
+				!isset($data['name_uninomial']['new']) &&
+				!isset($data['name_specific_epithet']['new']) &&
 				!isset($data['name_infra_specific_epithet']['new'])
 			)
 			{
 				// nothing relevant changed
 				return;
 			}
-			
+
 			$name=$this->getName(array('id'=>$this->getNameId()));
 			$concept=$this->getConcept($name['taxon_id']);
-			
+
 			if ($concept['base_rank']>SPECIES_RANK_ID &&
-				!isset($data['name_uninomial']['new']) && 
+				!isset($data['name_uninomial']['new']) &&
 				!isset($data['name_specific_epithet']['new'])
 			)
 			{
 				// nothing relevant changed
 				return;
 			}
-			
+
 			// B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
 			if ($concept['base_rank']>=SPECIES_RANK_ID) return 'B';
 			// C. WANNEER VAN EEN BESTAAND GENUS DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
@@ -2860,17 +2304,17 @@ class NsrTaxonController extends NsrController
 	{
 		return $this->getParentChangeStyle()!=null;
 	}
-	
+
 	private function canParentChange()
 	{
 		// preliminairies
 		$style=$this->getParentChangeStyle();
-		
+
 		if (is_null($style)) return true;
-		
+
 		$canChange=true;
 
-		$data=$this->requestData;
+		$data=$this->rGetAll();
 
 		if ( $this->getConceptId() )
 		{
@@ -2893,8 +2337,8 @@ class NsrTaxonController extends NsrController
 
 
 		/*
-		A. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE PARENT WORDT GEWIJZIGD.		
-		1. stel de beoogde nieuwe naam (BNN; sorry) samen op basis van 
+		A. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE PARENT WORDT GEWIJZIGD.
+		1. stel de beoogde nieuwe naam (BNN; sorry) samen op basis van
 		NIEUWE (maar wel al bestaande) ouder (uninominaal) & BESTAANDE epithet (& infra sp. eph.)
 		*/
 		if ($style=='A')
@@ -2929,7 +2373,7 @@ class NsrTaxonController extends NsrController
 				$this->addError('Geldige naam beoogde ouder heeft geen los specifiek epithet.');
 				$canChange=false;
 			}
-			
+
 			if (!$canChange) return false;
 
 			// creating the intended new name based on the intended new parents name
@@ -2951,36 +2395,36 @@ class NsrTaxonController extends NsrController
 
 
 		/*
-		B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD	
+		B. WANNEER VAN EEN BESTAANDE (ONDER)SOORT DE GEACCEPETEERDE NAAM WORDT GEWIJZIGD
 		*/
 		if ($style=='B')
 		{
 			$spcEpithet=
-				(isset($data['name_specific_epithet']['new']) ? 
-					trim($data['name_specific_epithet']['new']) : 
+				(isset($data['name_specific_epithet']['new']) ?
+					trim($data['name_specific_epithet']['new']) :
 					$name['specific_epithet']);
 
 			$infraSpEp=
-				(isset($data['name_infra_specific_epithet']['new']) ? 
+				(isset($data['name_infra_specific_epithet']['new']) ?
 					trim($data['name_infra_specific_epithet']['new']) :
 					$name['infra_specific_epithet']);
 
 
 			// creating the intended new name
 			$intendedNewConceptName=
-				(isset($data['name_uninomial']['new']) ? 
-					trim($data['name_uninomial']['new']) : 
+				(isset($data['name_uninomial']['new']) ?
+					trim($data['name_uninomial']['new']) :
 					$name['uninomial']).
 				(!empty($spcEpithet) ? ' '.$spcEpithet : '').
 				(!empty($infraSpEp) ? ' '.$infraSpEp : '');
-		
+
 		}
 
 
 		/*
 		2. bestaat BNN al in de database? test op volledige naam zonder authorship en inclusief de grandparent (kingdom)
 		(we zouden het liefst zoeken op uninomial=uninomial, specific_epithet=specific_epithet etc, maar helaas zijn in
-		de productiedatabase de losse naamdelen niet altijd volledig ingevuld. derhalve zoeken we ook op 
+		de productiedatabase de losse naamdelen niet altijd volledig ingevuld. derhalve zoeken we ook op
 		beoogde_naam=volledge_geldige_naam.replace(auhorship,'').
 		als ook de auhorship niet bestaat, dan... ??? (we miss out)
 		*/
@@ -3009,32 +2453,13 @@ class NsrTaxonController extends NsrController
 
 			$intendedNewConceptName=$data['name_uninomial']['new'];
 
-			$d=$this->models->Taxon->freeQuery("		
-				select
-					_a.*
-				from
-					%PRE%names _a
-				
-				left join %PRE%taxa _b
-					on _a.project_id = _b.project_id
-					and _a.taxon_id = _b.id
-				
-				where 
-					_a.project_id = ".$this->getCurrentProjectId()."
-					and _a.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
-					and _a.language_id=".LANGUAGE_ID_SCIENTIFIC."
-					and (
-						trim(replace(name,ifnull(_a.authorship,''),'')) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-							or
-						concat(
-							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
-							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
-							if(_a.infra_specific_epithet is null,'',_a.infra_specific_epithet)
-						) = '". mysql_real_escape_string($intendedNewConceptName) ."'
-					)
-					and _b.parent_id = ".mysql_real_escape_string($concept['parent_id'])."
-					and _b.id != ".mysql_real_escape_string($concept['id'])."
-			");
+			$d=$this->models->NsrTaxonModel->checkIfGenusWithSameNameExists(array(
+				"project_id"=>$this->getCurrentProjectId(),
+				"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+				"intended_new_concept_name"=>$intendedNewConceptName,
+				"parent_id"=>$concept['parent_id'],
+				"taxon_id"=>$concept['id']
+			));
 
 			if ($d)
 			{
@@ -3051,7 +2476,7 @@ class NsrTaxonController extends NsrController
 		$children=$this->getTaxonBranch($concept);
 
 		/*
-		4. doorloop alle taxa uit die tak en doe eenzelfde test: maak een beoogde nieuwe naam 
+		4. doorloop alle taxa uit die tak en doe eenzelfde test: maak een beoogde nieuwe naam
 		op basis van de nieuwe uninominaal en de bestaande epithet (& infra sp. eph.), maar geen auteur, en kijk of ze al bestaan.
 		BNN + grandparent (realm)
 		*/
@@ -3059,11 +2484,11 @@ class NsrTaxonController extends NsrController
 		{
 			$unin=(isset($data['name_uninomial']['new']) ? trim($data['name_uninomial']['new']) : trim($val['uninomial']));
 			$spEp=(isset($data['name_specific_epithet']['new']) ? trim($data['name_specific_epithet']['new']) : trim($val['specific_epithet']));
-			
+
 			$iName=
 				(!empty($unin) ? $unin : '').
 				(!empty($spEp) ? ' '.$spEp : '').
-				(isset($val['infra_specific_epithet']) ? ' '.trim($val['infra_specific_epithet']) : null);			
+				(isset($val['infra_specific_epithet']) ? ' '.trim($val['infra_specific_epithet']) : null);
 
 			$d=$this->checkIfNameExistsInConceptsKingdom($iName,$val);
 
@@ -3078,11 +2503,11 @@ class NsrTaxonController extends NsrController
 
 		return true;
 	}
-	
+
 	private function doParentChange()
 	{
 		// preliminairies
-		$data=$this->requestData;
+		$data=$this->rGetAll();
 
 		if ( $this->getConceptId() )
 		{
@@ -3112,7 +2537,7 @@ class NsrTaxonController extends NsrController
 			);
 		}
 
-		
+
 		/*
 		3. taxon + hele taxonomische tak onder het te wijzigen taxon.
 		*/
@@ -3136,51 +2561,48 @@ class NsrTaxonController extends NsrController
 			zo ja, meld het en negeer dat BNS verder (maar ga door met de transactie)
 			zo nee => iii
 			iii. verander hun geaccepteerde naam van type naar synoniem.
-		
-		b) maak een nieuwe geaccepteerde naam aan op basis van BNN + authorship van de oude geaccepeerde naam; 
+
+		b) maak een nieuwe geaccepteerde naam aan op basis van BNN + authorship van de oude geaccepeerde naam;
 			als authorship nog geen haakjes had, krijgt hij die nu.
 
 		c) update de naam van het concept op basis van de nieuwe geaccepeerde naam.
 		*/
-		
+
 		foreach((array)$taxa as $key=>$val)
 		{
-			
+
 			$newSynonym=$val['name'];
 
-			$d=$this->models->Names->freeQuery("
-				select
-					*
-				from
-					%PRE%names
-				where 
-					project_id = ".$this->getCurrentProjectId()."
-					and taxon_id = ".$val['taxon_id']."
-					and name = '". mysql_real_escape_string($newSynonym) ."'
-					and type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
-			);
+			$d=$this->models->Names->_get(array(
+				"id"=>
+					array(
+						"project_id"=>$this->getCurrentProjectId(),
+						"taxon_id"=>$val['taxon_id'],
+						"name"=>$this->models->Names->escapeString($newSynonym),
+						"type_id"=>$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
+					)
+			));
 
 			if ($d)
 			{
 				$this->addWarning("Synoniem \"".$newSynonym."\" bestaat al; duplicaat synoniem aangemaakt.");
 			}
 
-			$this->models->Names->freeQuery("
-				update
-					%PRE%names
-				set
-					type_id = ".$this->_nameTypeIds[PREDICATE_SYNONYM]['id']."
-				where 
-					project_id = ".$this->getCurrentProjectId()."
-					and id = ".$val['id']."
-				limit 1
-			");	
+			$this->models->Names->update(
+				array(
+					"type_id"=>$this->_nameTypeIds[PREDICATE_SYNONYM]['id']
+				),
+				array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"id"=>$val['id']
+				)
+			);
 
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
 			$this->logNsrChange(array('before'=>$name,'after'=>$after[0],'note'=>'changed valid name '.$newSynonym.' to synonym'));
 			$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
-			
-			
+
+
 			if (isset($data['name_uninomial']['new']))
 			{
 				$uninomial=trim($data['name_uninomial']['new']);
@@ -3194,7 +2616,7 @@ class NsrTaxonController extends NsrController
 			{
 				$uninomial=$val['uninomial'];
 			}
-			
+
 			if (isset($data['name_specific_epithet']['new']))
 			{
 				$specificEpithet=trim($data['name_specific_epithet']['new']);
@@ -3225,7 +2647,7 @@ class NsrTaxonController extends NsrController
 
 			$authorship=
 				trim(!empty($authorship) ? '('.$authorship.')' : '');
-				
+
 			$newName=
 				trim(
 					$uninomial.
@@ -3271,7 +2693,7 @@ class NsrTaxonController extends NsrController
 					de ouder van deze "ondertaxa" is van parent gewijzigd, parentage
 					opnieuw vaststellen (en vooral *niet* de parent van deze ondertaxa
 					ook wijzigen)
-					
+
 				*/
 				$this->saveTaxonParentage($val['taxon_id']);
 			}
@@ -3288,64 +2710,17 @@ class NsrTaxonController extends NsrController
 		$parent=isset($p['parent']) ? $p['parent'] : null;
 		$level=isset($p['level']) ? $p['level'] : 0;
 		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
-		
-		$g=$this->models->TraitsGroups->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as description,
-				count(_tt.id) as trait_count,
-				count(_ttf.id) as taxon_freevalue_count,
-				count(_ttv.id) as taxon_value_count,
-				count(_ttf.id)+count(_ttv.id) as taxon_count
 
-			from
-				%PRE%traits_groups _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
+		$g=$this->models->NsrTaxonModel->getTraitgroups(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"taxon_id"=>$this->getConceptId(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"parent_id"=>$parent
+		));
 
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.description_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-				
-			left join 
-				%PRE%traits_traits _tt
-				on _a.project_id=_tt.project_id
-				and _a.id=_tt.trait_group_id
-
-			left join 
-				%PRE%traits_taxon_freevalues _ttf
-				on _tt.project_id=_ttf.project_id
-				and _tt.id=_ttf.trait_id
-				and _ttf.taxon_id =". $this->getConceptId() ."
-
-			left join 
-				%PRE%traits_values _tv
-				on _tt.project_id=_tv.project_id
-				and _tt.id=_tv.trait_id
-
-			left join 
-				%PRE%traits_taxon_values _ttv
-				on _tv.project_id=_ttv.project_id
-				and _tv.id=_ttv.value_id
-				and _ttv.taxon_id =". $this->getConceptId() ."
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
-			group by _a.id
-			order by _a.show_order, _a.sysname
-		");
-		
 		foreach((array)$g as $key=>$val)
 		{
-			$g[$key]['level']=$level;	
+			$g[$key]['level']=$level;
 			//$g[$key]['taxa']=$this->getTaxongroupTaxa($val['id']);
 			if (!is_null($stopLevel) && $stopLevel<=$level)
 			{
@@ -3353,7 +2728,7 @@ class NsrTaxonController extends NsrController
 			}
 			$g[$key]['children']=$this->getTraitgroups(array('parent'=>$val['id'],'level'=>$level+1,'stop_level'=>$stopLevel));
 		}
-		
+
 		return $g;
 	}
 

@@ -1,21 +1,22 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsController.php');
 
 class KeyController extends Controller
 {
-
     private $_taxaStepList;
 	private $_choiceList = array();
     private $_tempList = array();
+	private $_keyPathMaxItems=3;
 	public $currentKeyStepId;
 
     public $usedModels = array(
-		'keystep',
-		'keytree',
-		'content_keystep',
-		'choice_keystep',
-		'choice_content_keystep',
+		'keysteps',
+		'keytrees',
+		'content_keysteps',
+		'choices_keysteps',
+		'choices_content_keysteps',
     );
 
     public $controllerPublicName = 'Dichotomous key';
@@ -46,9 +47,8 @@ class KeyController extends Controller
      */
     public function __construct($p=null)
     {
-
         parent::__construct($p);
-
+        $this->initialize();
     }
 
     /**
@@ -58,10 +58,14 @@ class KeyController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
-
     }
+
+
+    private function initialize()
+    {
+		$this->moduleSettings=new ModuleSettingsController;
+	}
 
     /**
      * Main procedure for key
@@ -70,8 +74,7 @@ class KeyController extends Controller
      */
     public function indexAction()
     {
-
-    	$q = $this->getKeyTree();
+    	$this->getKeyTree();
 
         $this->setPageName( $this->translate('Index'));
 
@@ -84,34 +87,31 @@ class KeyController extends Controller
 		/*
 			if user directly access a specific step or choice while there is no keypath (thru bookmark),
 			a possible decision path is created from the key tree
-			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. use forcetree=1 to force
+			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. use forcetree=1 to force.
 		*/
-		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || ($this->rHasVal('forcetree','1') || $this->rHasVal('r'))) {
-
+		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || ($this->rHasVal('forcetree','1') || $this->rHasVal('r')))
+		{
 			$this->createPathInstantly(
-				($this->rHasVal('step') ? $this->requestData['step'] : null),
-				($this->rHasVal('choice') ? $this->requestData['choice'] : null)
+				($this->rHasVal('step') ? $this->rGetVal('step') : null),
+				($this->rHasVal('choice') ? $this->rGetVal('choice') : null)
 			);
-
 		}
 
-		// step points at a specific step, from keypath
-		if ($this->rHasVal('step')) {
-
-			$step = $this->getKeystep($this->requestData['step']);
-
+		if ($this->rHasVal('step'))
+		{
+			// step points at a specific step, from keypath
+			$step = $this->getKeystep($this->rGetVal('step'));
 			$this->updateKeyPath(array('step' => $step,'fromPath' => true));
-
-		} else
-
-		// choice is choice clicked by user
-		if ($this->rHasVal('choice')) {
-
-			$choice = $this->getKeystepChoice($this->requestData['choice']);
+		}
+		else
+		if ($this->rHasVal('choice'))
+		{
+			// choice is choice clicked by user
+			$choice = $this->getKeystepChoice($this->rGetVal('choice'));
 
 			// choice points to a taxon
-			if (!empty($choice['res_taxon_id'])) {
-
+			if (!empty($choice['res_taxon_id']))
+			{
 				$this->updateKeyPath(
 					array(
 						'step' => $step,
@@ -123,46 +123,35 @@ class KeyController extends Controller
 				);
 
 				$this->redirect('../taxon/taxon.id?id='.$choice['res_taxon_id']);
-
 			}
-			// choice points to a next step
-			else {
-
+			else
+			{
+				// choice points to a next step
 				$step = $this->getKeystep($choice['res_keystep_id']);
-
 				$this->updateKeyPath(array('step' => $step,'choice' => $choice));
-
 			}
-
-		} else
-		// restore previous state
-		if (!$this->rHasVal('start','1') && !empty($keyPath)) {
-
+		}
+		else
+		if (!$this->rHasVal('start','1') && !empty($keyPath))
+		{
+			// restore previous state
 			$d = array_pop($keyPath);
 			$step = $this->getKeystep($d['id']);
-
 		}
-		// no step or choice specified, must be the start of the key
-		else {
-
+		else
+		{
+			// no step or choice specified, must be the start of the key
 			$this->resetKeyPath();
-
 			$step = $this->getKeystep($this->getStartKeystepId());
-
 			$this->updateKeyPath(array('step' => $step));
-
 		}
 
 		$taxa = $this->getTaxonDivision($step['id']);
 
-        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
-
-		$this->smarty->assign('keyType',$this->getSetting('keytype'));
-
+        $this->smarty->assign('keyPathMaxItems', $this->_keyPathMaxItems);
+		$this->smarty->assign('keyType',$this->getKeytype());
 		$this->smarty->assign('taxaState',$this->getTaxaState());
-
 		$this->smarty->assign('remaining',$taxa['remaining']);
-
 		$this->smarty->assign('excluded',$taxa['excluded']);
 
 		$this->setPageName(sprintf($this->translate('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
@@ -175,9 +164,7 @@ class KeyController extends Controller
 		if (isset($step)) $choices = $this->getKeystepChoices($step['id']);
 
 		if (isset($step)) $this->smarty->assign('step',$step);
-
 		if (isset($choices)) $this->smarty->assign('choices',$choices);
-
 		$this->smarty->assign('keypath',$this->getKeyPath());
 
 		$this->printPage($this->setStepType(isset($choices) ? $choices : null));
@@ -199,11 +186,10 @@ class KeyController extends Controller
 
 		*/
 
-        foreach ((array)$choices as $choice) {
-
+        foreach ((array)$choices as $choice)
+		{
             if (!empty($choice['choice_image_params']))
                 return 'index_l2_pct';
-
         }
 
 		return 'index_l2_txt';
@@ -212,66 +198,45 @@ class KeyController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','get_lookup_list')) {
-
+        if ($this->rHasVal('action','get_lookup_list'))
+		{
             $this->getLookupList();
-
         }
 
-        if ($this->rHasVal('action','store_remaining')) {
-
+        if ($this->rHasVal('action','store_remaining'))
+		{
         	$this->setTaxaState('remaining');
-
         }
 
-        if ($this->rHasVal('action','store_excluded')) {
-
+        if ($this->rHasVal('action','store_excluded'))
+		{
         	$this->setTaxaState('excluded');
-
         }
 
-        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
-
-		$this->smarty->assign('keyType',$this->getSetting('keytype'));
+        $this->smarty->assign('keyPathMaxItems', $this->_keyPathMaxItems);
+		$this->smarty->assign('keyType',$this->getKeytype());
 
         $this->printPage();
-
     }
 
 	/* function exists sole for the benefit of the preview overlay's "back to editing"-button */
 	public function getCurrentKeyStepId()
 	{
-
 		return $this->currentKeyStepId;
-
 	}
 
 	public function getKeyTree()
 	{
-
-		$tree = $this->getCache('tree-keyTree');
-		$this->_choiceList = $this->getCache('tree-choiceList');
-
-		if (!$tree || !$this->_choiceList) {
-
-			$tree = $this->setKeyTree();
-			$this->saveCache('tree-keyTree', $tree);
-			$this->saveCache('tree-choiceList', $this->_choiceList);
-
-		}
-
+		$tree = $this->setKeyTree();
 		return $tree;
-
 	}
 
 	private function setKeyTree()
 	{
-
 		// get stored tree from database
-		$kt = $this->models->Keytree->_get(
+		$kt = $this->models->Keytrees->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId()
@@ -281,32 +246,27 @@ class KeyController extends Controller
 		);
 
 		// if it doesn't exist, generate it anew (shouldn't happen!)
-		if (empty($kt[0]['keytree'])) {
-
+		if (empty($kt[0]['keytree']))
+		{
 			unset($this->_tempList);
-
 			$d = $this->generateKeyTree();
-
 			unset($this->_tempList);
-
 		}
 		// store tree in session
-		else {
-
+		else
+		{
 			$tree = $choiceList = '';
 
-			foreach((array)$kt as $val) {
-
+			foreach((array)$kt as $val)
+			{
 				if ($val['chunk']!=999)
 					$tree .= trim($val['keytree']);
 				else
 					$choiceList = $val['keytree'];
-
 			}
 
 			$this->_choiceList = unserialize(utf8_decode($choiceList));
 			$d = unserialize(utf8_decode($tree));
-
 		}
 
 		return $d;
@@ -317,10 +277,10 @@ class KeyController extends Controller
 	{
 
 		// choice ID present: probably a bookmarked step in the key
-		if (!is_null($choiceId)) {
-
+		if (!is_null($choiceId))
+		{
 			// get choice requested
-			$d = $this->models->ChoiceKeystep->_get(
+			$d = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -340,8 +300,8 @@ class KeyController extends Controller
 				function works backward, the adding of the last - current - step is the very
 				first action, done when the keypath is still empty.
 			*/
-			if (count((array)$this->tmp['results'])==0) {
-
+			if (count((array)$this->tmp['results'])==0)
+			{
 				$step = $this->getKeystep($d[0]['res_keystep_id']);
 
 				array_push(
@@ -362,7 +322,7 @@ class KeyController extends Controller
 			$step = $this->getKeystep($d[0]['keystep_id']);
 
 			// find the choice that lead to this step, i.e., the previous step in the path
-			$prevChoice = $this->models->ChoiceKeystep->_get(
+			$prevChoice = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -372,7 +332,7 @@ class KeyController extends Controller
 			);
 
 			$choice = $this->getKeystepChoice($choiceId);
-			$choiceMarker = $this->showOrderToMarker($d[0]['show_order']);
+			$choiceMarker = chr($d[0]['show_order'] + 96);
 
 			// add step & choice to the path
 			array_unshift(
@@ -389,8 +349,8 @@ class KeyController extends Controller
 
 		} else
 		// no choice, just a step ID defined: most likely a link in the text migrated from L2
-		if (!is_null($stepId)) {
-
+		if (!is_null($stepId))
+		{
 			// get current step
 			$step = $this->getKeystep($stepId);
 
@@ -408,7 +368,7 @@ class KeyController extends Controller
 			);
 
 			// find the choice that lead to this step, i.e., the previous step in the path
-			$prevChoice = $this->models->ChoiceKeystep->_get(
+			$prevChoice = $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -416,53 +376,54 @@ class KeyController extends Controller
 					)
 				)
 			);
-
-
-		} else {
-
+		}
+		else
+		{
 			return null;
-
 		}
 
 		// and iterate to the previous choice
 		$this->_createPathInstantly(null,$prevChoice[0]['id']);
-
 	}
 
 	private function createPathInstantly($step=null,$choice=null)
 	{
-
 		$this->tmp = array();
 		$this->tmp['results'] = array();
 
 		$this->_createPathInstantly(
-			($this->rHasVal('step') ? $this->requestData['step'] : null),
-			($this->rHasVal('choice') ? $this->requestData['choice'] : null)
+			($this->rHasVal('step') ? $this->rGetVal('step') : null),
+			($this->rHasVal('choice') ? $this->rGetVal('choice') : null)
 		);
 
 		$this->setKeyPath($this->tmp['results']);
-
 	}
 
 
 	// be aware that this function also exists in the app controller and should have identical output there!
 	private function generateKeyTree($id=null,$level=0)
 	{
+<<<<<<< HEAD
         // Ruud 14-10-15: removed utf_decode() from 'title' => $step['title'] and
         // $d['choice_marker'] = $val['marker'] as these fucked up the getLookupList().
 
 		if (is_null($id)) {
 
+=======
+		if (is_null($id))
+		{
+>>>>>>> development-WEG
 			$id = $this->getStartKeystepId();
-
 		}
 
 		$d = $this->getKeystep($id);
 
-
-		if (!isset($this->_tempList[$d['id']])) {
+		if (!isset($this->_tempList[$d['id']]))
+		{
 			$this->_tempList[$d['id']] = true;
-		} else {
+		}
+		else
+		{
 			//$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$d['id']));
 			return null;
 		}
@@ -478,8 +439,8 @@ class KeyController extends Controller
 
 		$step['choices'] = $this->getKeystepChoices($id,null,false);
 
-		foreach((array)$step['choices'] as $key => $val) {
-
+		foreach((array)$step['choices'] as $key => $val)
+		{
 			$this->_choiceList[] = $val['id'];
 
 			$d['choice_id'] = $val['id'];
@@ -490,7 +451,6 @@ class KeyController extends Controller
 			$step['choices'][$key] = $d;
 
 			if ($val['res_keystep_id']) $step['choices'][$key]['step'] = $this->generateKeyTree($val['res_keystep_id'],($level+1));
-
 		}
 
 		return isset($step) ? $step : null;
@@ -504,12 +464,12 @@ class KeyController extends Controller
 
         if (empty($id))  return;
 
-		$k = $this->models->Keystep->_get(
+		$k = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'id' => $id,
-					)
+					'id' => $id
+				)
 			)
 		);
 
@@ -517,7 +477,7 @@ class KeyController extends Controller
 
 		$step = $k[0];
 
-		$ck = $this->models->ContentKeystep->_get(
+		$ck = $this->models->ContentKeysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -529,25 +489,19 @@ class KeyController extends Controller
 		);
 
 		$step['title'] = $ck[0]['title'];
-
 		$step['content'] = $this->matchGlossaryTerms($ck[0]['content']);
-		//$step['content'] = $this->matchHotwords($step['content']);
 
 		return $step;
-
 	}
 
 	private function setCurrentKeyStepId($id)
 	{
-
 		$this->currentKeyStepId = $id;
-
 	}
 
 	public function getStartKeystepId()
 	{
-
-		$k = $this->models->Keystep->_get(
+		$k = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -557,16 +511,14 @@ class KeyController extends Controller
 		);
 
 		if ($k) return $k[0]['id'];
-
 	}
 
 	private function getKeystepChoices($step,$choice=null,$includeContent=true)
 	{
-
-		if ($choice == null) {
-
+		if ($choice == null)
+		{
 			// get all choices available for this keystep
-			$choices =  $this->models->ChoiceKeystep->_get(
+			$choices =  $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -575,11 +527,11 @@ class KeyController extends Controller
 					'order' => 'show_order'
 				)
 			);
-
-		} else {
-
+		}
+		else
+		{
 			// get single choice
-			$choices =  $this->models->ChoiceKeystep->_get(
+			$choices =  $this->models->ChoicesKeysteps->_get(
 				array(
 					'id' => array(
 						'id' => $choice,
@@ -587,15 +539,14 @@ class KeyController extends Controller
 					)
 				)
 			);
-
 		}
 
-		foreach((array)$choices as $key => $val) {
-
-			if ($includeContent) {
-
+		foreach((array)$choices as $key => $val)
+		{
+			if ($includeContent)
+			{
 				// get the actual language-sensitive content for each choice
-				$cck = $this->models->ChoiceContentKeystep->_get(
+				$cck = $this->models->ChoicesContentKeysteps->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
@@ -606,106 +557,85 @@ class KeyController extends Controller
 					)
 				);
 
-
 				if (isset($cck[0]['title'])) $choices[$key]['title'] = trim($cck[0]['title']);
 
-				if (isset($cck[0]['choice_txt'])) {
-
+				if (isset($cck[0]['choice_txt']))
+				{
 					$choices[$key]['choice_txt'] = $cck[0]['choice_txt'];
 					$choices[$key]['choice_txt'] = $this->matchGlossaryTerms(trim($choices[$key]['choice_txt']));
 					$choices[$key]['choice_txt'] = $this->matchHotwords($choices[$key]['choice_txt']);
-
 				}
-
 			}
 
 			// resolve the targets to either a next step or a taxon
-			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0) {
-
-				if ($val['res_keystep_id']=='-1') {
-				//unfinished target (shouldn't happen)
-
+			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0)
+			{
+				if ($val['res_keystep_id']=='-1')
+				{
+					//unfinished target (shouldn't happen)
 					$choices[$key]['target'] = null;
-
-				} else {
-				// target is a next step
-
-					$k = $this->getKeystep($val['res_keystep_id']);
-
-					if (isset($k['title'])) $choices[$key]['target'] = $k['title'];
-
-					if (isset($k['number'])) $choices[$key]['target_number'] = $k['number'];
-
 				}
+				else
+				{
+					// target is a next step
+					$k = $this->getKeystep($val['res_keystep_id']);
+					if (isset($k['title'])) $choices[$key]['target'] = $k['title'];
+					if (isset($k['number'])) $choices[$key]['target_number'] = $k['number'];
+				}
+			} else
+			if (!empty($val['res_taxon_id']))
+			{
+				// target is a taxon
+				if ($includeContent)
+				{
+					$t = $this->models->Taxa->_get(array('id' => $val['res_taxon_id']));
 
-			} elseif (!empty($val['res_taxon_id'])) {
-			// target is a taxon
-
-				if ($includeContent) {
-
-					$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
-
-					if (isset($t['taxon'])) {
-
+					if (isset($t['taxon']))
+					{
 						$choices[$key]['target'] = $this->formatTaxon($t);
 						$choices[$key]['is_hybrid'] = $t['is_hybrid'];
-
 					}
-
 				}
-
-			} else {
-
+			}
+			else
+			{
 				$choices[$key]['target'] = null;
-
 			}
 
-			$choices[$key]['marker'] = $this->showOrderToMarker($val['show_order']);
+			$choices[$key]['marker'] = chr($val['show_order'] + 96);
 
-			if ($val['choice_image_params']!='') {
-
+			if ($val['choice_image_params']!='')
+			{
 				foreach((array)json_decode($val['choice_image_params']) as $pKey => $pVal) $params[$pKey] = (string)$pVal;
 				$choices[$key]['choice_image_params'] = $params;
 				unset($params);
-
 			}
-
 		}
 
 		return $choice == null ? $choices : $choices[0];
-
 	}
 
 	private function getKeystepChoice($id)
 	{
-
 		return $this->getKeystepChoices(null,$id);
-
 	}
 
 
 	/* the path */
 	private function resetKeyPath()
 	{
-
-		unset($_SESSION['app']['user']['key']['path']);
-
+		$this->moduleSession->setModuleSetting(array('setting'=>'path'));
 	}
 
 	private function getKeyPath()
 	{
-
-		return isset($_SESSION['app']['user']['key']['path']) ? $_SESSION['app']['user']['key']['path'] : null;
-
+		return !is_null($this->moduleSession->getModuleSetting('path')) ? $this->moduleSession->getModuleSetting('path') : null;
 	}
 
 	private function setKeyPath($path)
 	{
-
 		$this->resetKeyPath();
-
-		$_SESSION['app']['user']['key']['path'] = $path;
-
+		$this->moduleSession->setModuleSetting(array('setting' => 'path', 'value' => $path));
 	}
 
 	private function updateKeyPath($params)
@@ -715,39 +645,33 @@ class KeyController extends Controller
 		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
 		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
 
-		if (!isset($_SESSION['app']['user']['key']['path'])) {
-
+		if (is_null($this->moduleSession->getModuleSetting('path')))
+		{
 			//$this->setStoredKeypath($step);
-
 		}
 
-
-		if (isset($_SESSION['app']['user']['key']['path'])) {
-		// keypath already exists...
-
-			if ($fromPath) {
-			// ...user clicked somewhere in the path, so we copy the existing path up to the step he clicked
-
-				foreach((array)$_SESSION['app']['user']['key']['path'] as $key => $val) {
-
+		if (!is_null($this->moduleSession->getModuleSetting('path')))
+		{
+			// keypath already exists...
+			if ($fromPath)
+			{
+				// ...user clicked somewhere in the path, so we copy the existing path up to the step he clicked
+				foreach((array)$this->moduleSession->getModuleSetting('path') as $key => $val)
+				{
 					if ($val['id']==$step['id']) break;
-
 					if (!empty($val['id'])) $d[] = $val;
-
 				}
-
-			} else {
-			// user clicked a choice, existing path remains as it is
-
-				$d = $_SESSION['app']['user']['key']['path'];
-
 			}
-
+			else
+			{
+				// user clicked a choice, existing path remains as it is
+				$d = $this->moduleSession->getModuleSetting('path');
+			}
 		}
 
-		if (!isset($d) || (isset($d) && $d[count((array)$d)-1]['id']!=$step['id'])) {
-		// if we have no path, or have a path whose previous step is not the same as the current one, we add the current step
-
+		if (!isset($d) || (isset($d) && $d[count((array)$d)-1]['id']!=$step['id']))
+		{
+			// if we have no path, or have a path whose previous step is not the same as the current one, we add the current step
 			$d[] = array(
 				'id' => $step['id'],
 				'step_number' => $step['number'],
@@ -759,9 +683,9 @@ class KeyController extends Controller
 		}
 
 
-		if (!empty($choice) && (count((array)$d)>1)) {
-		// the choice clicked to reach the current step belongs to the previous step, and ahs to be added there
-
+		if (!empty($choice) && (count((array)$d)>1))
+		{
+			// the choice clicked to reach the current step belongs to the previous step, and ahs to be added there
 			$d[count((array)$d)-2]['choice_marker'] = $choice['marker'];
 			$d[count((array)$d)-2]['choice_txt'] = $this->formatPathChoice(
 				$choice,
@@ -771,11 +695,9 @@ class KeyController extends Controller
 
 		}
 
-		$_SESSION['app']['user']['key']['path'] = $d;
+		$this->moduleSession->setModuleSetting(array('setting' => 'path', 'value' => $d));
 
 	}
-
-
 
 	private $choiceKeystepTable;
 	private $stepsDone;
@@ -807,15 +729,7 @@ class KeyController extends Controller
 
 	private function setChoiceKeystepTable()
 	{
-		$d=$this->models->ChoiceKeystep->freeQuery("
-			select
-				res_keystep_id, keystep_id
-			from
-				%PRE%choices_keysteps
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				and res_keystep_id is not null
-			");
+		$d = $this->models->KeyModel->setChoiceKeystepTable($this->getCurrentProjectId());
 
 		foreach((array)$d as $key=>$val)
 		{
@@ -827,37 +741,10 @@ class KeyController extends Controller
 	{
 		$this->setChoiceKeystepTable();
 
-		$choiceLeadingToATaxon=$this->models->ChoiceKeystep->freeQuery("
-			select
-				_ck.res_taxon_id,
-				_ck.keystep_id,
-				_a.taxon,
-				_c.commonname
-
-			from
-				%PRE%choices_keysteps _ck
-
-			left join %PRE%taxa _a
-				on _ck.project_id=_a.project_id
-				and _ck.res_taxon_id=_a.id
-
-			left join %PRE%commonnames _c
-				on _ck.project_id=_c.project_id
-				and _c.id=
-					(select
-						id
-					from
-						%PRE%commonnames
-					where
-						project_id=_ck.project_id
-						and taxon_id=_ck.res_taxon_id
-						and language_id = ". $this->getCurrentLanguageId() ."
-						limit 1
-					)
-			where
-				_ck.project_id = ".$this->getCurrentProjectId()."
-				and _ck.res_taxon_id is not null
-			");
+		$choiceLeadingToATaxon = $this->models->KeyModel->getChoicesLeadingToATaxon(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'languageId' => $this->getCurrentLanguageId()
+		));
 
 		$stepsByTarget=array();
 
@@ -913,8 +800,6 @@ class KeyController extends Controller
 		$allsteps=$this->getAllStepsByTarget();
 		$start=$this->getStartKeystepId();
 		$this->startStep=$start;
-		//q($step);q($allsteps,1);
-
 
 		foreach($allsteps as $key=>$val)
 		{
@@ -944,7 +829,7 @@ class KeyController extends Controller
 	/* the rest */
 	private function getKeytype()
 	{
-		return $this->getSetting('keytype');
+		return $this->moduleSettings->getSetting('keytype');
 	}
 
 	private function choicesHaveL2Attributes($choices)
@@ -994,14 +879,14 @@ class KeyController extends Controller
 
 	private function setTaxaState ($state)
 	{
-		$_SESSION['app']['user']['key']['taxaState'] = $state;
+		$this->moduleSession->setModuleSetting(array('setting' => 'taxaState', 'value' => $state));
 	}
 
 	private function getTaxaState ()
 	{
 		return
-			(isset($_SESSION['app']['user']['key']['taxaState']) ?
-				$_SESSION['app']['user']['key']['taxaState'] :
+			(!empty($this->moduleSession->getModuleSetting('taxaState')) ?
+				$this->moduleSession->getModuleSetting('taxaState') :
 				'remaining');
 	}
 
@@ -1012,5 +897,16 @@ class KeyController extends Controller
 		$toSpace = array('<br />', '<br>');
 		return str_replace($remove, '', strip_tags(str_replace($toSpace, ' ', $choice['choice_txt'])));
 	}
+
+
+
+    private function showOrderToMarker ($showOrder)
+    {
+        return ;
+    }
+
+
+
+
 
 }

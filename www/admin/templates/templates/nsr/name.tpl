@@ -21,16 +21,6 @@
 
 <table>
 	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
-	<tr><th>type:</th><td>
-		<select id="name_type_id" mandatory="mandatory" label="type">
-			<option value="" id="nametype-none" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
-		{foreach from=$nametypes item=v key=k}
-			{if $v.noNameParts}
-			<option  value="{$v.id}" id="nametype-{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype_label}</option>
-			{/if}
-		{/foreach}
-		</select> *
-	</td></tr>
 	<tr><th>taal:</th><td>
 		<select id="name_language_id" mandatory="mandatory" label="taal" onchange="checkprefnameavail()">
 			{assign var=first value=true}
@@ -46,6 +36,16 @@
 		{/foreach}
 		</select> *
         <span></span>
+	</td></tr>
+	<tr><th>type:</th><td>
+		<select id="name_type_id" mandatory="mandatory" label="type">
+			<option value="" id="nametype-none" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
+		{foreach from=$nametypes item=v key=k}
+			{if $v.noNameParts}
+			<option  value="{$v.id}" id="nametype-{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype_label}</option>
+			{/if}
+		{/foreach}
+		</select> *
 	</td></tr>
 
 	{* if $name.type_id==$preferrednameid || $name.type_id==$alternativenameid *}

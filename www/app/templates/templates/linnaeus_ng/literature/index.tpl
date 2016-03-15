@@ -3,15 +3,11 @@
 {if $alpha}
 	<div id="alphabet">
 		
-		{foreach from=$alpha key=k item=v}
+		{foreach $alpha v k}
 			{if $letter==$v}
 				<span class="letter-active">{$v}</span>
 			{else}
-				{if $useJavascriptLinks}
-					<span class="letter" onclick="goAlpha('{$v}')">{$v}</span>
-				{else}
-					<a class="letter" href="?letter={$v}">{$v}</a>
-				{/if}
+                <a class="letter" href="?letter={$v}">{$v}</a>
 			{/if}
 		{/foreach}
 
@@ -33,18 +29,12 @@
 			</thead>
 
 			<tbody>
-				{foreach from=$refs key=k item=v}
+				{foreach $refs v k}
 
 					<tr class="highlight">
-						{if $useJavascriptLinks}
-						<td class="a" onclick="goLiterature({$v.id})">
-							{$v.author_full}
-						</td>
-						{else}
 						<td>
 							<a href="../literature/reference.php?id={$v.id}">{$v.author_full}</a>
 						</td>
-						{/if}
 						<td>
 							{$v.year}
 						</td>

@@ -477,3 +477,14 @@ tr[type=drag-row] {
 	color:red;
 	font-size:0.8em;
 }
+
+.small-remark {
+	color:#888;
+	font-size:0.8em;
+}
+
+#key-taxa-list-remain .taxon-list {
+	width:300px;
+	height:150px;
+	overflow-y:scroll;
+}

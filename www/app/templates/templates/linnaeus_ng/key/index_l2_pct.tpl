@@ -6,13 +6,14 @@
 {include file="_taxa.tpl"}
 	<div id="step">
 		<div id="img-choices">		
-{foreach from=$choices key=k item=v}
+	{foreach $choices v k}
 	{if $v.choice_img}
+
         <div class="choice-img-wrapper" 
         {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+            onclick="window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'"
         {elseif $v.res_taxon_id!=''}
-            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+            onclick="window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'"
         {/if}
         style="
             position: absolute;
@@ -27,20 +28,18 @@
 			<span class="text-choice-img">{$v.choice_txt|nl2br}</span>
 		</div>
 		</div>
-		
+	
 	{/if}
-{/foreach}
+	{/foreach}
 		</div>
 	</div>
 </div>
 
-{literal}
 <script>
-$(".inline-image").click(function (e) {
+$(".inline-image").click(function (e)
+{
     e.stopPropagation();
 });
 </script>
-{/literal}
-
 
 {include file="../shared/footer.tpl"}

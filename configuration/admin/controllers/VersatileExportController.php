@@ -11,6 +11,7 @@ class VersatileExportController extends Controller
 		'name_types'
     );
    
+    public $modelNameOverride='VersatileExportModel';
     public $controllerPublicName = 'Export';
 
     public $cssToLoad = array(
@@ -137,48 +138,16 @@ class VersatileExportController extends Controller
 
 	private function getPresenceStatuses()
 	{
-		return $this->models->Presence->freeQuery("
-			select
-				_b.index_label,
-				_b.label,
-				_a.established
-			from
-				%PRE%presence _a
-			left join %PRE%presence_labels _b
-				on _a.project_id=_b.project_id
-				and _a.id=_b.presence_id
-				and _b.language_id=".LANGUAGE_ID_DUTCH."
-			where
-				_a.project_id = ". $this->getCurrentProjectId() ." 
-					and _b.index_label!=''
-			order by
-				_b.index_label
-			");
+		return $this->models->VersatileExportModel->getPresenceStatuses(array(
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
 	private function getRanks()
 	{
-		return $this->models->ProjectRank->freeQuery(array("query"=>"
-			select
-				_a.*,
-				ifnull(_c.label,_a.rank) as label
-			from
-				%PRE%projects_ranks _b
-				
-			right join %PRE%ranks _a
-				on _a.id=_b.rank_id
-				
-			left join %PRE%labels_projects_ranks _c
-				on _b.project_id=_c.project_id 
-				and _b.id=_c.project_rank_id
-				and _c.language_id = " . LANGUAGE_ID_DUTCH . "
-
-			where 
-				_b.project_id = ". $this->getCurrentProjectId() ."
-
-			order by
-				_a.id
-			", "fieldAsIndex"=>"id"));
+		return $this->models->VersatileExportModel->getRanks(array(
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
 	private function setNameTypeIds()
@@ -187,8 +156,20 @@ class VersatileExportController extends Controller
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId()
 			),
-			'columns'=>'id,nametype,substring(substring(name_types.nametype,3),1,length(name_types.nametype)-4) as nametype_hr',
-			'fieldAsIndex'=>'nametype'
+			'columns'=>"
+				id,
+				nametype,substring(substring(name_types.nametype,3),1,length(name_types.nametype)-4) as nametype_hr,
+				case
+					when
+						nametype = 'isPreferredNameOf'
+					then 0
+					when
+						nametype = 'isAlternativeNameOf'
+					then 1
+					else 2
+				end as sortfield",
+				'fieldAsIndex'=>'nametype',
+				'order'=>'sortfield,nametype'
 		));
 	}
 
@@ -306,12 +287,7 @@ class VersatileExportController extends Controller
 			
 			";
 
-		//q($this->query,1);
-
-		if ( !empty($this->query) )
-		{
-			$this->names=$this->models->Taxon->freeQuery( $this->query );
-		}
+		$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );		
 
 	}
 
@@ -319,20 +295,11 @@ class VersatileExportController extends Controller
 	{
 		if ( !isset($this->parentRegister[$id]) )
 		{
-			$r=$this->models->Taxon->freeQuery("
-				select
-					_t.taxon,_t.id, _t.parent_id, _f.rank_id
-				from
-					taxa  _t
-				left join projects_ranks _f
-					on _t.rank_id=_f.id
-					and _t.project_id=_f.project_id
-				where 
-					_t.project_id=1
-					and _t.id = ".$id
-			);
+			$row=$this->models->VersatileExportModel->findAncestor(array(
+				"project_id"=>$this->getCurrentProjectId(),
+				"taxon_id"=>$id
+			));
 
-			$row=$r[0];
 			$this->parentRegister[$id]=$row;
 		}
 		else
@@ -424,7 +391,7 @@ class VersatileExportController extends Controller
 			}
 			unset($synonyms);
 		}
-			
+
 		foreach( (array)$this->names as $key=>$val )
 		{
 			if ( !$get_all )
@@ -443,36 +410,37 @@ class VersatileExportController extends Controller
 
 				if ( $this->hasCol( 'name_parts' ) )
 				{
-					if (isset($row['uninomial'])) $tmp['uninomial']=$row['uninomial'];
-					if (isset($row['specific_epithet'])) $tmp['specific_epithet']=$row['specific_epithet'];
-					if (isset($row['infra_specific_epithet'])) $tmp['infra_specific_epithet']=$row['infra_specific_epithet'];
-					if (isset($row['authorship'])) $tmp['authorship']=$row['authorship'];
-					if (isset($row['name_author'])) $tmp['name_author']=$row['name_author'];
-					if (isset($row['authorship_year'])) $tmp['authorship_year']=$row['authorship_year'];
+					foreach($this->getNameParts() as $name_part=>$name_part_state)
+					{
+						$tmp[$name_part]=isset($row[$name_part]) ? $row[$name_part] : null;
+					}
 				}
 				if ( $this->hasCol( 'database_id' ) )
 				{
 					if (isset($row['database_id'])) $tmp['database_id']=$row['database_id'];
 				}
+				
+				$d=
+					array(
+						'synoniem'=>isset($row['name']) ? $row['name'] : null,
+						'type_synoniem'=>isset($row['nametype']) ? $row['nametype'] : null,
+						'taal'=>isset($row['language']) ? $row['language'] : null,
+						'taxon'=>isset($val['wetenschappelijke_naam']) ? $val['wetenschappelijke_naam'] : null,
+					);
+
+				if (isset($val['nsr_id']))
+				{
+					$d['taxon_nsr_id'] = $val['nsr_id'];
+				}
 
 				array_push(
 					$this->synonyms,
-					array_merge(
-						array(
-							'synoniem'=>$row['name'],
-							//'nsr_id'=>$row['nsr_id'],
-							'type_synoniem'=>$row['nametype'],
-							'taal'=>$row['language'],
-							'taxon'=>$val['wetenschappelijke_naam'],
-							'taxon_nsr_id'=>$val['nsr_id'],
-						),
-						$tmp
-					)
+					array_merge($d,$tmp)
 				);
+
+				unset( $d );
 			}
-
 		}
-
 	}
 
 	private function doOutput()

@@ -273,7 +273,6 @@ $('body').click(function(e) {
 
 {/literal}
 
-{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 initTinyMce(false,false);
 
 {foreach from=$ref.taxa item=v}

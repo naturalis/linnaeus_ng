@@ -2,83 +2,85 @@
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+include_once ('UserRightsController.php');
+
 class Controller extends BaseClass
 {
-    private $_smartySettings;
-    private $_viewName;
-    private $_fullPath;
-    private $_fullPathRelative;
-    private $_helpTexts;
-    private $_prevTreeId = null;
-    private $_breadcrumbRootName = null;
-	public $useCache = true;
-    public $useVariations = false;
-    public $useRelated = false;
-    public $tmp;
-    public $smarty;
-    public $requestData;
-    public $requestDataFiles;
-    public $data;
-    public $randomValue;
-    public $breadcrumbIncludeReferer;
+	private $_smartySettings;
+	private $_viewName;
+	private $_fullPath;
+	private $_fullPathRelative;
+	private $_prevTreeId = null;
+	private $_breadcrumbRootName = null;
+	private $translator;
+	public $useVariations = false;
+	public $useRelated = false;
+	public $tmp;
+	public $smarty;
+	public $requestData;
+	public $requestDataFiles;
+	public $data;
+	public $randomValue;
+	public $breadcrumbIncludeReferer;
 
-    public $errors=array();
-    public $messages=array();
+	public $errors=array();
+	public $messages=array();
 	public $warnings=array();
 
-    public $controllerBaseName;
-    public $controllerBaseNameMask = false;
-    public $pageName;
-    public $controllerPublicName;
-    public $controllerPublicNameMask = false;
-    public $sortField;
-    public $sortDirection;
-    public $sortCaseSensitivity;
-    public $findField;
-    public $findValue;
-    public $baseUrl;
-    public $excludeFromReferer = false;
-    public $noResubmitvalReset = false;
-    public $isMultiLingual = true;
-    public $uiLanguages;
-    public $uiDefaultLanguage;
-    public $treeList;
-    public $suppressProjectInBreadcrumbs;
-    public $includeLocalMenu = true;
-    public $printBreadcrumbs = true;
-    private $usedModelsBase = array(
-		'dump', // debug!
+	public $controllerBaseName;
+	public $controllerBaseNameMask = false;
+	public $pageName;
+	public $controllerPublicName;
+	public $controllerPublicNameMask = false;
+	public $sortField;
+	public $sortDirection;
+	public $sortCaseSensitivity;
+	public $findField;
+	public $findValue;
+	public $baseUrl;
+	public $excludeFromReferer = false;
+	public $noResubmitvalReset = false;
+	public $isMultiLingual = true;
+	public $uiLanguages;
+	public $uiDefaultLanguage;
+	public $treeList;
+	public $suppressProjectInBreadcrumbs;
+	public $includeLocalMenu = true;
+	public $printBreadcrumbs = true;
+
+	private $usedModelsBase = array(
 		'activity_log',
-        'free_module_project',
-        'free_module_project_user',
-        'interface_text',
-        'interface_translation',
-        'label_project_rank',
-        'language',
-        'language_project',
-        'module',
-        'module_project',
-        'module_project_user',
-        'project',
-        'project_rank',
-        'project_role_user',
-        'rank',
-        'right',
-        'right_role',
-        'role',
-        'settings',
-        'taxon',
-        'taxon_variation',
-        'user',
-        'variation_label',
-		'nsr_ids'
-     );
+		'free_modules_projects',
+		'interface_texts',
+		'interface_translations',
+		'labels_projects_ranks',
+		'languages',
+		'languages_projects',
+		'modules',
+		'modules_projects',
+		'projects',
+		'projects_ranks',
+		'projects_roles_users',
+		'ranks',
+		'roles',
+		'taxa',
+		'taxa_variations',
+		'users_taxa',
+		'users',
+		'variations_labels'
+	);
+
     private $usedHelpersBase = array(
+		'session_module_settings',
         'logging_helper',
         'email_helper',
-		'log_changes'
+		'log_changes',
+		'custom_array_sort',
+		'paginator'
     );
 
+	protected $moduleSession;
+	protected $baseSession;
 
 
     /**
@@ -102,6 +104,8 @@ class Controller extends BaseClass
 
         $this->setNames();
 
+        $this->startModuleSession();
+
         $this->loadControllerConfig();
 
         $this->loadSmartyConfig();
@@ -114,16 +118,15 @@ class Controller extends BaseClass
 
         $this->loadModels();
 
-        //$this->setHelpTexts();
+        $this->activateBasicModules();
 
+        $this->initUserRights();
 
         $this->setRandomValue();
 
         $this->setLanguages();
 
         $this->checkLastVisitedPage();
-
-        $this->setSessionActivePageValues();
 
         $this->setSmartySettings();
 
@@ -134,16 +137,16 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
 
         $this->setProjectLanguages();
+
+		$this->initTranslator();
     }
-
-
 
     /**
      * Destroys!
      *
      * @access     public
      */
-    public function __destruct ()
+    public function __destruct()
     {
         $this->setLastVisitedPage();
 
@@ -154,22 +157,16 @@ class Controller extends BaseClass
         parent::__destruct();
     }
 
-
-
     /**
      * Returns the application name
      *
      * @return     string    application name
      * @access     public
      */
-    public function getAppName ()
+    public function getAppName()
     {
         return isset($this->appName) ? $this->appName : false;
     }
-
-
-
-
 
     /**
      * Returns the controller's base name
@@ -177,12 +174,10 @@ class Controller extends BaseClass
      * @return     string    controller's base name
      * @access     public
      */
-    public function getControllerBaseName ()
+    public function getControllerBaseName()
     {
         return $this->controllerBaseName;
     }
-
-
 
     /**
      * Returns the current view's name
@@ -190,40 +185,34 @@ class Controller extends BaseClass
      * @return     string    current view's name
      * @access     public
      */
-    public function getViewName ()
+    public function getViewName()
     {
         return $this->_viewName;
     }
-
-
 
     /**
      * Renders and displays the page
      *
      * @access     public
      */
-    public function printPage ($templateName = null)
+    public function printPage($templateName = null)
     {
         $this->preparePage();
 
         $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
     }
 
-
-
     /**
      * Renders and returns the page
      *
      * @access     public
      */
-    public function fetchPage ($templateName = null)
+    public function fetchPage($templateName = null)
     {
         $this->preparePage();
 
         return $this->smarty->fetch(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
     }
-
-
 
     /**
      * Redirects the user to another page (and avoids circular redirection)
@@ -231,31 +220,28 @@ class Controller extends BaseClass
      * @param      string    $url    url to redirect to; can be false, in which case HTTP_REFERER is used
      * @access     public
      */
-    public function redirect ($url = false)
+    public function redirect($url = false)
     {
-        if (!$url && isset($_SERVER['HTTP_REFERER'])) {
-
+        if (!$url && isset($_SERVER['HTTP_REFERER']))
+		{
             $url = $_SERVER['HTTP_REFERER'];
         }
 
-        if (basename($url) == $url) {
-
+        if (basename($url) == $url)
+		{
             $circular = (basename($this->_fullPath) == $url);
         }
-        else {
-
+        else
+		{
             $circular = ($this->_fullPath == $url) || ($this->_fullPathRelative == $url);
         }
 
-        if ($url && !$circular) {
-
+        if ($url && !$circular)
+		{
             header('Location:' . $url);
-
             die();
         }
     }
-
-
 
     /**
      * Adds an error to the class's stack of errors stored in class variable 'errors'
@@ -263,30 +249,26 @@ class Controller extends BaseClass
      * @param      string or array    $error    the error(s)
      * @access     public
      */
-    public function addError ($error, $writeToLog = false)
+    public function addError($error, $writeToLog = false)
     {
 		if (empty($error)) return;
 
-        if (!is_array($error)) {
-
+        if (!is_array($error))
+		{
             $this->errors[] = $error;
 
             if ($writeToLog !== false)
                 $this->log($error, $writeToLog);
         }
-        else {
-
-            foreach ($error as $key => $val) {
-
+        else
+		{
+            foreach ($error as $key => $val)
+			{
                 $this->errors[] = $val;
-
-                if ($writeToLog !== false)
-                    $this->log($val, $writeToLog);
+                if ($writeToLog !== false) $this->log($val, $writeToLog);
             }
         }
     }
-
-
 
     /**
      * Returns whether there are errors or not
@@ -294,12 +276,10 @@ class Controller extends BaseClass
      * @return     boolean    errors or not
      * @access     public
      */
-    public function hasErrors ()
+    public function hasErrors()
     {
         return (count((array) $this->errors) > 0);
     }
-
-
 
     /**
      * Returns the class's stack of errors stored in class variable 'errors'
@@ -307,19 +287,15 @@ class Controller extends BaseClass
      * @return     array    stack of errors
      * @access     public
      */
-    public function getErrors ()
+    public function getErrors()
     {
         return $this->errors;
     }
 
-
-
-    public function clearErrors ()
+    public function clearErrors()
     {
         $this->errors = array();
     }
-
-
 
     /**
      * Adds a message to the class's stack of messages stored in class variable 'messages'
@@ -327,17 +303,21 @@ class Controller extends BaseClass
      * @param      type    $message    the message
      * @access     public
      */
-    public function addMessage ($d)
+    public function addMessage($d)
     {
 		if (empty($d)) return;
 
 		if (is_array($d))
+		{
 			$this->messages=array_merge($this->messages,$d);
+		}
 		else
+		{
 	        $this->messages[]=$d;
+		}
     }
 
-    public function getMessages ()
+    public function getMessages()
     {
         return $this->messages;
     }
@@ -348,9 +328,13 @@ class Controller extends BaseClass
 		if (empty($d)) return;
 
 		if (is_array($d))
+		{
 			$this->warnings=array_merge($this->warnings,$d);
+		}
 		else
+		{
 	        $this->warnings[]=$d;
+		}
     }
 
     public function getWarnings()
@@ -358,13 +342,10 @@ class Controller extends BaseClass
         return $this->warnings;
     }
 
-    public function hasWarnings ()
+    public function hasWarnings()
     {
         return (count((array) $this->warnings) > 0);
     }
-
-
-
 
     /**
      * Sets the name of the current page, for display purposes, in a class variable 'pageName'.
@@ -372,12 +353,10 @@ class Controller extends BaseClass
      * @param      string    $name    the page's name
      * @access     public
      */
-    public function setPageName ($name)
+    public function setPageName($name)
     {
         $this->pageName = $name;
     }
-
-
 
     /**
      * Returns the name of the current page.
@@ -385,12 +364,10 @@ class Controller extends BaseClass
      * @return     string    the page's name
      * @access     public
      */
-    public function getPageName ()
+    public function getPageName()
     {
         return $this->pageName;
     }
-
-
 
     /**
      * Returns the current user's id class variable
@@ -398,74 +375,10 @@ class Controller extends BaseClass
      * @return     integer    user id
      * @access     public
      */
-    public function getCurrentUserId ()
+    public function getCurrentUserId()
     {
         return isset($_SESSION['admin']['user']['id']) ? $_SESSION['admin']['user']['id'] : null;
     }
-
-
-
-    /**
-     * Returns the projects the current user has been assigned to
-     *
-     * @return     array    array of project's id's, names and user's active states
-     * @access     public
-     */
-    public function getCurrentUserProjects ()
-    {
-
-		$this->reInitUserRolesAndRights();
-
-		$p = $this->models->Project->_get(array('id'=>'*','fieldAsIndex'=>'id'));
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
-
-            $r = array(
-                'id' => $val['project_id'],
-                'name' => $val['project_name'],
-                'title' => $val['project_title'],
-                'active' => $val['active'],
-                'member' => $val['member'],
-				'published' => isset($p[$val['project_id']]['published']) ? $p[$val['project_id']]['published']=='1' : false
-            );
-
-            if (!isset($cup) || !in_array($r, (array) $cup)) {
-
-                $cup[$val['project_id']] = $r;
-            }
-        }
-
-        $this->customSortArray($cup, array(
-            'key' => 'title',
-            'dir' => 'asc',
-            'case' => 'i'
-        ));
-
-        return isset($cup) ? $cup : false;
-    }
-
-
-
-    /**
-     * Sets the active project's id as class variable
-     *
-     * @param      integer    $id    new active project's id
-     * @access     public
-     */
-    public function setCurrentProjectId ($id)
-    {
-        $_SESSION['admin']['project']['id'] = $id;
-
-        $this->models->ProjectRoleUser->update(array(
-            'last_project_select' => 'now()',
-            'project_selects' => 'project_selects+1'
-        ), array(
-            'user_id' => $this->getCurrentUserId(),
-            'project_id' => $this->getCurrentProjectId()
-        ));
-    }
-
-
 
     /**
      * Returns the active project's id class variable
@@ -473,483 +386,51 @@ class Controller extends BaseClass
      * @return     integer    active project's id
      * @access     public
      */
-    public function getCurrentProjectId ()
+    public function getCurrentProjectId()
     {
         return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : null;
     }
-
-
-
-    /**
-     * Sets the active project's data as a session variable
-     *
-     * @access     public
-     */
-    public function setCurrentProjectData ($data = null)
-    {
-        if ($data == null) {
-
-            $id = $this->getCurrentProjectId();
-
-            if (isset($id)) {
-
-                $data = $this->models->Project->_get(array(
-                    'id' => $id
-                ));
-
-                $pru = $this->models->ProjectRoleUser->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $id,
-                        'role_id' => ID_ROLE_LEAD_EXPERT
-                    ),
-                    'columns' => 'user_id'
-                ));
-
-                foreach ((array) $pru as $key => $val) {
-
-                    $u = $this->models->User->_get(
-                    array(
-                        'id' => array(
-                            'id' => $val['user_id'],
-                            'active' => 1
-                        )
-                    ));
-
-                    $pru[$key]['first_name'] = $u[0]['first_name'];
-                    $pru[$key]['last_name'] = $u[0]['last_name'];
-                    $pru[$key]['email_address'] = $u[0]['email_address'];
-                }
-
-                $_SESSION['admin']['project']['lead_experts'] = $pru;
-            }
-        }
-
-        foreach ((array) $data as $key => $val) {
-
-            $_SESSION['admin']['project'][$key] = $val;
-        }
-    }
-
-
 
     /**
      * Rerturns the active project's data
      *
      * @access     public
      */
-    public function getCurrentProjectData ()
+    public function getCurrentProjectData()
     {
         return isset($_SESSION['admin']['project']) ? $_SESSION['admin']['project'] : null;
     }
 
-
-
-    /**
-     * Sets the default project for the current user
-     *
-     * After logging in, the app requires an active project is set, the project the user actually works on.
-     * If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
-     * the choice should be automatic. This function decides what project should be the active one, and sets it.
-     *
-     * @access     public
-     */
-    public function setDefaultProject ()
+    public function setCurrentUserRoleId()
     {
-
-        //$d = (array) $_SESSION['admin']['user']['_roles'];
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
-
-            if ($val['active'] == '1')
-                $d[] = $val;
-        }
-
-        // if user has no roles, do nothing
-        if (!isset($d))
-            return;
-
-            // if user has only one role, set the corresponding project as the active project
-        if (count($d) == 1) {
-
-            $this->setCurrentProjectId($d[0]['project_id']);
-        }
-        else {
-            // new plan: if user has more than one project assigned, he has to choose himself
-
-
-
-
-            return;
-
-            // old plan: if user has more roles, set the project in which he has the lowest role_id as the active project
-            // (this assumes that the roles with the most permissions have the lowest ids)
-
-
-
-
-            $t = false;
-
-            foreach ((array) $d as $key => $val) {
-
-                if (!$t || $val['role_id'] < $t) {
-
-                    $t = $val['role_id'];
-
-                    $p = $val['project_id'];
-                }
-            }
-
-            $this->setCurrentProjectId($p);
-            $this->setCurrentUserRoleId();
-        }
-
-        $this->setCurrentProjectData();
+		$this->UserRights->setUserRoleId();
     }
 
-
-
-    /**
-     * Retrieves all rights and roles of the current user. Results are stored in the user's session.
-     *
-     * @return     array    array of roles, rights and the number of projects the user is involved with
-     * @access     public
-     */
-    public function getUserRights ($id = false)
+    public function checkAuthorisation($allowNoProjectId = false)
     {
-        $pru = $this->models->ProjectRoleUser->_get(
-        array(
-            'id' => array(
-                'user_id' => $id ? $id : $this->getCurrentUserId()
-            ),
-            'columns' => 'project_id,role_id,active,\'1\' as member',
-            'fieldAsIndex' => 'project_id'
-        ));
-
-
-        if ($this->isCurrentUserSysAdmin()) {
-
-            $p = $this->models->Project->_get(array(
-                'id' => '*'
-            ));
-
-            foreach ((array) $p as $val) {
-
-                if (!isset($pru[$val['id']])) {
-
-                    $pru[$val['id']] = array(
-                        'project_id' => $val['id'],
-                        'role_id' => (string) ID_ROLE_SYS_ADMIN,
-                        'active' => (string) 1,
-                        'member' => 0
-                    );
-                }
-            }
-        }
-
-        foreach ((array) $pru as $key => $val) {
-
-            $p = $this->models->Project->_get(array(
-                'id' => $val['project_id']
-            ));
-
-            // $val['project_id']==0 is the stub for all round system admin
-            if ($p || $val['project_id'] == 0) {
-
-                $r = $this->models->Role->_get(array(
-                    'id' => $val['role_id']
-                ));
-
-                if ($r) {
-
-                    $userProjectRoles[] = array_merge($val,
-                    array(
-                        'project_name' => $p['sys_name'],
-                        'project_title' => $p['title'],
-                        'role_name' => $r['role'],
-                        'role_description' => $r['description']
-                    ));
-
-                    $rr = $this->models->RightRole->_get(array(
-                        'id' => array(
-                            'role_id' => $val['role_id']
-                        )
-                    ));
-
-                    foreach ((array) $rr as $rr_key => $rr_val) {
-
-                        $r = $this->models->Right->_get(array(
-                            'id' => $rr_val['right_id']
-                        ));
-
-                        $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-                    }
-
-                    $projectCount[$val['project_id']] = $val['project_id'];
-                }
-            }
-        }
-
-
-        $fmpu = $this->models->FreeModuleProjectUser->_get(array(
-            'id' => array(
-                'user_id' => $id ? $id : $this->getCurrentUserId()
-            )
-        ));
-
-        foreach ((array) $fmpu as $key => $val) {
-
-            $rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
-        }
-
-        $d = $this->getCurrentProjectId();
-
-        return array(
-            'roles' => isset($userProjectRoles) ? $userProjectRoles : null,
-            'rights' => isset($rs) ? $rs : null,
-            'number_of_projects' => isset($projectCount) ? count((array) $projectCount) : 0
-        );
+		if ( !$this->UserRights->isAuthorized() )
+		{
+			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getMessage();
+			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+		}
+		else
+		{
+			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
+		}
     }
 
-
-
-    /**
-     * Sets the user session var that holds the rights per view per project array
-     *
-     * @access     public
-     */
-    public function setUserSessionRights ($rights)
-    {
-        $_SESSION['admin']['user']['_rights'] = $rights;
-    }
-
-
-
-    /**
-     * Sets the user session var that holds the roles per project array
-     *
-     * @access     public
-     */
-    public function setUserSessionRoles ($roles)
-    {
-        $_SESSION['admin']['user']['_roles'] = $roles;
-    }
-
-
-
-    /**
-     * Sets the user session var that describes the number of projects the user has been assigned to
-     *
-     * @access     public
-     */
-    public function setUserSessionNumberOfProjects ($numberOfProjects)
-    {
-        $_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
-    }
-
-
-
-    public function setCurrentUserRoleId ()
-    {
-        if (!isset($_SESSION['admin']['user']['_roles'])) {
-
-            $_SESSION['admin']['user']['currentRole'] = null;
-        }
-        else {
-
-            $d = $this->getCurrentProjectId();
-
-            if (is_null($d)) {
-
-                $_SESSION['admin']['user']['currentRole'] = null;
-            }
-            else {
-
-                foreach ((array) $_SESSION['admin']['user']['_roles'] as $val) {
-
-                    if ($val['project_id'] == $d)
-                        $_SESSION['admin']['user']['currentRole'] = $val["role_id"];
-                }
-            }
-        }
-    }
-
-
-
-    public function getCurrentUserRoleId ()
-    {
-        return isset($_SESSION['admin']['user']['currentRole']) ? $_SESSION['admin']['user']['currentRole'] : null;
-    }
-
-
-
-    public function getCurrentUserIsSuperuser ()
-    {
-        return $_SESSION['admin']['user']['superuser'] == 1;
-    }
-
-
-
-    /**
-     * Checks whether a user is logged in
-     *
-     * @return     boolean        logged in or not
-     * @access     public
-     */
-    public function isUserLoggedIn ()
-    {
-        return (!empty($_SESSION['admin']['user']['id']));
-    }
-
-
-
-    /**
-     * Checks whether a user is authorized to view/use a certain page and redirects if necessary
-     *
-     * Subsequently checks:
-     * Is the user logged in?
-     * Has the user selected an active project?
-     * Is the user authorized to see a specific page?
-     *
-     * @return     boolean        returns true if authorized, or redirects if not
-     * @access     public
-     */
-    public function checkAuthorisation ($allowNoProjectId = false)
-    {
-
-        // check if user is logged in, otherwise redirect to login page
-        if ($this->isUserLoggedIn()) {
-
-            // check if there is an active project, otherwise redirect to choose project page
-            if ($this->getCurrentProjectId() || $allowNoProjectId) {
-
-
-                // check if the user is authorised for the combination of current page / current project
-                if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin()) {
-
-                    return true;
-                }
-                else {
-
-                    $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
-
-                    /*
-						user is not authorized and redirected to the index.page;
-						if he already *is* on the index.page (and not authorized to be there),
-						he is logged out to avoid circular reference.
-					*/
-                    if ($this->getViewName() == 'Index') {
-
-                        $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['logout']);
-                    }
-                    else {
-
-                        $this->redirect('index.php');
-                    }
-                }
-            }
-            else {
-
-                $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject']);
-            }
-        }
-        else {
-
-            $this->setLoginStartPage();
-
-            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['login']);
-        }
-    }
-
-
-
-    /**
-     * Judges whether the user is authorized to work at a specific project
-     *
-     * @param      integer    $id    project id
-     * @return     boolean    is or is not authorized
-     * @access     public
-     */
-    public function isCurrentUserAuthorizedForProject ($id)
-    {
-        foreach ((array) $this->getCurrentUserProjects() as $key => $val) {
-
-            if ($val['id'] == $id && $val['active'] == '1')
-                return true;
-        }
-
-        return false;
-    }
-
-
-
-    /**
-     * Returns whether the active user is a general sysadmin (i.e., sysadmin rights for project 0)
-     *
-     * @return     boolean	true or false
-     * @access     public
-     */
     public function isCurrentUserSysAdmin ()
     {
-        if (!isset($_SESSION['admin']['user'])) {
-
-            $u = $this->models->User->_get(array(
-                'id' => $this->getCurrentUserId()
-            ));
-
-            return $u['superuser'] == '1';
-        }
-
-        if ($_SESSION['admin']['user']['superuser'] == 1)
-            return true;
-
-        if (!isset($_SESSION['admin']['user']['_roles']))
-            return false;
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
-
-            if ($val['project_id'] == 0 && $val['role_id'] == ID_ROLE_SYS_ADMIN)
-                return true;
-        }
-
-        return false;
+		return $this->UserRights->isSysAdmin();
     }
 
-
-
-    public function isCurrentUserLeadExpert ()
+    public function reInitUserRolesAndRights()
     {
-        if (!isset($_SESSION['admin']['user']['_roles']))
-            return false;
-
-        foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
-
-            if ($val['project_id'] == $this->getCurrentProjectId() && $val['role_id'] == ID_ROLE_LEAD_EXPERT)
-                return true;
-        }
-
-        return false;
+		$this->UserRights->reInitializeRights();
     }
 
-
-
-    /**
-     * Re-initialises the user's projects and roles, without loggin out and in
-     *
-     * @access     public
-     */
-    public function reInitUserRolesAndRights ($userId = null)
+    public function getProjectModules($params = null)
     {
-        $cur = $this->getUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
-        $this->setUserSessionRights($cur['rights']);
-        $this->setUserSessionRoles($cur['roles']);
-        $this->setUserSessionNumberOfProjects($cur['number_of_projects']);
-    }
-
-
-
-    public function getProjectModules ($params = null)
-    {
-
 		$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
 
 		if (isset($params['active']) && ($params['active'] == 'y' || $params['active'] == 'n'))
@@ -963,22 +444,19 @@ class Controller extends BaseClass
 		if (isset($params['ignore']))
 			$p['ignore'] = $params['ignore'];
 
-		$modules = $this->models->ModuleProject->_get($p);
+		$modules = $this->models->ModulesProjects->_get($p);
 
-		foreach ((array) $modules as $key => $val) {
-
+		foreach ((array) $modules as $key => $val)
+		{
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
 
-			$mp = $this->models->Module->_get(array(
+			$mp = $this->models->Modules->_get(array(
 				'id' => $val['module_id']
 			));
 
 			$modules[$key]['module'] = $mp['module'];
-
 			$modules[$key]['description'] = $mp['description'];
-
 			$modules[$key]['controller'] = $mp['controller'];
-
 			$modules[$key]['show_order'] = $mp['show_order'];
 		}
 
@@ -987,7 +465,7 @@ class Controller extends BaseClass
 			'maintainKeys' => true
 		));
 
-		$freeModules = $this->models->FreeModuleProject->_get(array(
+		$freeModules = $this->models->FreeModulesProjects->_get(array(
 			'id' => array(
 				'project_id' => $d['project_id']
 			)
@@ -1004,6 +482,7 @@ class Controller extends BaseClass
 
     public function checkModuleActivationStatus ()
     {
+		// REFAC2015
         if ($this->getModuleActivationStatus() == -1) {
 
             $_SESSION['admin']['system']['last_module_name'] = $this->controllerPublicName;
@@ -1036,7 +515,7 @@ class Controller extends BaseClass
      */
     public function getProjectsMediaStorageDir ()
     {
-        return isset($_SESSION['admin']['project']['paths']['project_media']) ? $_SESSION['admin']['project']['paths']['project_media'] : null;
+		return $this->baseSession->getModuleSetting( 'project_media_path' );
     }
 
 
@@ -1049,7 +528,7 @@ class Controller extends BaseClass
      */
     public function getProjectsThumbsStorageDir ()
     {
-        return isset($_SESSION['admin']['project']['paths']['project_thumbs']) ? $_SESSION['admin']['project']['paths']['project_thumbs'] : null;
+		return $this->baseSession->getModuleSetting( 'project_thumbs_path' );
     }
 
 
@@ -1086,7 +565,7 @@ class Controller extends BaseClass
 	*/
     public function setBreadcrumbIncludeReferer ($value = true)
     {
-        $this->breadcrumbIncludeReferer = $value;
+        $this->breadcrumbIncludeReferer=$value;
     }
 
 
@@ -1107,12 +586,10 @@ class Controller extends BaseClass
      */
     public function isFormResubmit ()
     {
-        $result = false;
-
-        if (isset($this->requestData['rnd']) && isset($_SESSION['admin']['system']['last_rnd']) && ($_SESSION['admin']['system']['last_rnd'] == $this->requestData['rnd']))
-            $result = true;
-
-        return $result;
+		return
+			$this->rHasVal('rnd') &&
+			null!==$this->baseSession->getModuleSetting( 'last_rnd' ) &&
+			($this->baseSession->getModuleSetting( 'last_rnd' ) == $this->rGetVal('rnd'));
     }
 
 
@@ -1156,7 +633,7 @@ class Controller extends BaseClass
         if (isset($_SESSION['admin']['user']['currentLanguage']) && $languageId == $_SESSION['admin']['user']['currentLanguage'])
             return;
 
-        $l = $this->models->Language->_get(array(
+        $l = $this->models->Languages->_get(array(
             'id' => array(
                 'id' => $languageId
             )
@@ -1172,71 +649,6 @@ class Controller extends BaseClass
         $_SESSION['admin']['user']['currentLanguage'] = $languageId;
     }
 
-
-
-    /**
-	 * Gettext wrapper, to be called from javascript (through the utilities controller)
-	 *
-	 * @access     public
-	 */
-    public function javascriptTranslate ($content)
-    {
-        if (empty($content))
-            return;
-
-        $this->saveInterfaceText($content);
-
-        return $this->doTranslate($content);
-    }
-
-
-
-    /**
-     * Gettext wrapper, to be called from a registered block function within Smarty
-     *
-	 * parametrization: {t _s1='one' _s2='two' _s3='three'}The 1st parameter is %s, the 2nd is %s and the 3nd %s.{/t}
-	 *
-     * @access     public
-     */
-    public function smartyTranslate ($params, $content, &$smarty, &$repeat)
-    {
-        if (empty($content))
-            return;
-
-        $c = $this->getControllerBaseName();
-
-        $this->saveInterfaceText($content);
-
-        $c = $this->doTranslate($content);
-
-        if (isset($params)) {
-
-            foreach ((array) $params as $key => $val) {
-
-                if (substr($key, 0, 2) == '_s' && isset($val)) {
-
-                    $c = preg_replace('/\%s/', $val, $c, 1);
-                }
-            }
-        }
-
-        return $c;
-    }
-
-
-
-    public function translate ($content)
-    {
-        if (empty($content))
-            return;
-
-        $this->saveInterfaceText($content);
-
-        return $this->doTranslate($content);
-    }
-
-
-
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
      *
@@ -1246,77 +658,21 @@ class Controller extends BaseClass
      */
     public function customSortArray (&$array, $sortBy)
     {
-        $d = array();
-
-        if (!isset($array) || !is_array($array))
-            return;
-
-        if (isset($sortBy['key']))
-            $this->setSortField($sortBy['key']);
-
-        if (isset($sortBy['dir']))
-            $this->setSortDirection($sortBy['dir']);
-
-        if (isset($sortBy['case']))
-            $this->setSortCaseSensitivity($sortBy['case']);
-
-        $maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys'] === true);
-
-        if ($maintainKeys) {
-
-            $keys = array();
-
-            $f = md5(uniqid(null, true));
-
-            foreach ((array) $array as $key => $val) {
-
-                $x = md5(json_encode($val) . $key);
-                $array[$key][$f] = $x;
-                $keys[$x] = $key;
-            }
-        }
-
-        usort($array, array(
-            $this,
-            'doCustomSortArray'
-        ));
-
-        if ($maintainKeys) {
-
-            foreach ((array) $array as $val) {
-
-                if (is_array($val)) {
-
-                    $y = array();
-
-                    foreach ($val as $key2 => $val2) {
-
-                        if ($key2 != $f)
-                            $y[$key2] = $val2;
-                    }
-
-                    $d[$keys[$val[$f]]] = $y;
-                }
-                else {
-
-                    $d[$keys[$val[$f]]] = $val;
-                }
-            }
-
-            $array = $d;
-        }
+		$this->helpers->CustomArraySort->setSortyBy( $sortBy );
+		$this->helpers->CustomArraySort->sortArray( $array );
+		$array=$this->helpers->CustomArraySort->getSortedArray();
     }
 
 
     public function getTaxonById ($id = false)
     {
 
-        $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
+        $id = $id===false ? ($this->rGetId() ? $this->rGetId() : null) : $id;
 
         if (empty($id) || $id == 0)
             return;
 
-		$t = $this->models->Taxon->_get(array(
+		$t = $this->models->Taxa->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 				'id' => $id
@@ -1330,7 +686,7 @@ class Controller extends BaseClass
 
 		$t[0]['label'] = $this->formatTaxon($t[0]);
 
-		$pr = $this->models->ProjectRank->_get(
+		$pr = $this->models->ProjectsRanks->_get(
 		array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
@@ -1353,7 +709,7 @@ class Controller extends BaseClass
         if (empty($name))
             return;
 
-		$t=$this->models->Taxon->_get(array(
+		$t=$this->models->Taxa->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon' => $name
@@ -1362,40 +718,6 @@ class Controller extends BaseClass
 		return isset($t[0]) ? $t[0] : null;
 
     }
-
-
-    /**
-     * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")
-     *
-     * function at the same time maintains a second, non-recursive list of taxa ($this->treeList)
-     *
-     * @param      array    $params    parameters for tree formatting
-     * @access     public
-     */
-    public function getTaxonTree ($params = null, $forceLookup = false)
-    {
-        if (!$forceLookup && isset($_SESSION['admin']['system']['taxonTree']) && isset($_SESSION['admin']['system']['treeList']) && ((isset($_SESSION['admin']['system']['treeParams']) && $_SESSION['admin']['system']['treeParams'] == $params) ||
-         $params == null)) {
-
-            $this->treeList = $_SESSION['admin']['system']['treeList'];
-
-            return $_SESSION['admin']['system']['taxonTree'];
-        }
-        else {
-
-            $_SESSION['admin']['system']['taxonTree'] = $this->_getTaxonTree($params);
-
-            if (isset($this->treeList))
-                $_SESSION['admin']['system']['treeList'] = $this->treeList;
-
-            if (isset($params))
-                $_SESSION['admin']['system']['treeParams'] = $params;
-
-            return $_SESSION['admin']['system']['taxonTree'];
-        }
-    }
-
-
 
     /**
      * Catches and saves uploaded files
@@ -1449,167 +771,24 @@ class Controller extends BaseClass
         }
     }
 
-
-
     public function getPagination ($items, $maxPerPage = 25)
     {
+        $this->helpers->Paginator->setItemsPerPage($maxPerPage);
+		$this->helpers->Paginator->setStart($this->rHasVal('start') ? $this->rGetVal('start') : 0);
+		$this->helpers->Paginator->setItems($items);
+		$this->helpers->Paginator->paginate();
 
-        /*
-
-			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
-
-			$gloss = $pagination['items'];
-
-			$this->smarty->assign('prevStart', $pagination['prevStart']);
-
-			$this->smarty->assign('nextStart', $pagination['nextStart']);
-
-
-		{if $prevStart!=-1 || $nextStart!=-1}
-			<div id="navigation">
-				{if $prevStart!=-1}
-				<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
-				{/if}
-				{if $nextStart!=-1}
-				<span class="a" onclick="goNavigate({$nextStart});">next ></span>
-				{/if}
-			</div>
-		{/if}
-
-		//goNavigate(val,formName) formname default = 'theForm'
-
-		<form action="" method="post" id="theForm" action="">
-		</form>
-
-		*/
-        if (!isset($items))
-            return;
-
-            // determine index of the first taxon to show
-        $start = $this->rHasVal('start') ? $this->requestData['start'] : 0;
-
-        //determine index of the first taxon to show on the previous page (if any)
-        $prevStart = $start == 0 ? -1 : (($start - $maxPerPage < 1) ? 0 : ($start - $maxPerPage));
-
-        //determine index of the first taxon to show on the next page (if any)
-        $nextStart = ($start + $maxPerPage >= count((array) $items)) ? -1 : ($start + $maxPerPage);
-
-        // slice out only the taxa we need (faster than looping the entire thing in smarty)
-        $items = array_slice($items, $start, $maxPerPage);
-
-        return array(
-            'items' => $items,
-            'prevStart' => $prevStart,
-            'currStart' => $start,
-            'nextStart' => $nextStart
-        );
+		return $this->helpers->Paginator->getItems();
     }
-
-
-
-    public function sendEmail ($params)
-    {
-
-        /*
-			params:
-
-			mailto_address
-			mailto_name
-			mailfrom_address
-			mailfrom_name
-			subject
-			plain
-			html
-			smtp_server
-			debug (boolean; optional)
-			mail_name (for identification in the log file; optional)
-
-		*/
-        $d = isset($params['mail_name']) ? ' "' . $params['mail_name'] . '"' : '';
-
-        if (!isset($params['mailto_address']) || !isset($params['mailfrom_address']) || (!isset($params['plain']) && !isset($params['html'])) || !isset($params['smtp_server'])) {
-
-            if (!isset($params['mailto_address']))
-                $this->log('Can\'t send email' . $d . ': lacking rcpt address)', 1);
-            if (!isset($params['mailfrom_address']))
-                $this->log('Can\'t send email' . $d . ': lacking sender address)', 1);
-            if (!isset($params['plain']) && !isset($params['html']))
-                $this->log('Can\'t send email' . $d . ': lacking body)', 1);
-            if (!isset($params['smtp_server']))
-                $this->log('Can\'t send email' . $d . ': lacking server)', 1);
-
-            return false;
-        }
-
-        $res = $this->helpers->EmailHelper->send(
-        array(
-            'mailto_address' => $params['mailto_address'],
-            'mailto_name' => isset($params['mailto_name']) ? $params['mailto_name'] : null,
-            'mailfrom_address' => $params['mailfrom_address'],
-            'mailfrom_name' => isset($params['mailfrom_name']) ? $params['mailfrom_name'] : null,
-            'subject' => $params['subject'],
-            'plain' => isset($params['plain']) ? $params['plain'] : null,
-            'html' => isset($params['html']) ? $params['html'] : null,
-            'smtp_server' => $params['smtp_server'],
-            'debug' => isset($params['debug']) ? $params['debug'] : false
-        ));
-
-        if (!$res)
-            $this->log('Failed sending email' . $d, 1);
-
-        return $res;
-    }
-
-
 
     public function createProject ($d)
     {
         $d['id'] = null;
         $d['sys_name'] = $d['title'];// . (isset($d['version']) ? ' v' . $d['version'] : $d['version']);
 
-        $p = $this->models->Project->save($d);
+        $p = $this->models->Projects->save($d);
 
-        return ($p) ? $this->models->Project->getNewId() : false;
-    }
-
-
-
-    public function addUserToProject ($uid, $pId, $roleId, $active = 1, $addToAllModules = true)
-    {
-        $this->models->ProjectRoleUser->save(array(
-            'id' => null,
-            'project_id' => $pId,
-            'role_id' => $roleId,
-            'user_id' => $uid,
-            'active' => $active
-        ));
-
-        if ($addToAllModules === false)
-            return;
-
-        $d = array(
-            'id' => null,
-            'user_id' => $uid,
-            'project_id' => $pId
-        );
-
-        $modules = $this->getProjectModules(array(
-            'project_id' => $pId
-        ));
-
-        foreach ((array) $modules['modules'] as $key => $val) {
-
-            $d['module_id'] = $val['module_id'];
-            $this->models->ModuleProjectUser->save($d);
-        }
-
-        unset($d['module_id']);
-
-        foreach ((array) $modules['freeModules'] as $key => $val) {
-
-            $d['free_module_id'] = $val['id'];
-            $this->models->FreeModuleProjectUser->save($d);
-        }
+        return ($p) ? $this->models->Projects->getNewId() : false;
     }
 
 
@@ -1678,49 +857,12 @@ class Controller extends BaseClass
     public function newGetProjectRanks ($p = null)
     {
         $includeLanguageLabels = isset($p['includeLanguageLabels']) ? $p['includeLanguageLabels'] : false;
-        //$lowerTaxonOnly = isset($p['lowerTaxonOnly']) ? $p['lowerTaxonOnly'] : false;
-        //$forceLookup = isset($p['forceLookup']) ? $p['forceLookup'] : false;
-        //$keypathEndpoint = isset($p['keypathEndpoint']) ? $p['keypathEndpoint'] : false;
-        $idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
         $pId = isset($p['pId']) ? $p['pId'] :  $this->getCurrentProjectId();
 
-		$pr = $this->models->ProjectRank->freeQuery(
-			array(
-				"query"=>"
-					select
-						_p.id,
-						_p.project_id,
-						_p.rank_id,
-						_p.parent_id,
-						_p.lower_taxon,
-						_p.keypath_endpoint,
-						_r.rank,
-						_r.abbreviation,
-						_r.can_hybrid,
-						_pr.id as ideal_parent_id,
-						replace(ifnull(_q.label,_r.rank),'_',' ') as label
-					from
-						%PRE%projects_ranks _p
-
-					left join %PRE%ranks _r
-						on _p.rank_id = _r.id
-
-					left join %PRE%projects_ranks _pr
-						on _p.project_id= _pr.project_id
-						and _r.ideal_parent_id = _pr.rank_id
-
-					left join %PRE%labels_projects_ranks _q
-						on _p.id=_q.project_rank_id
-						and _p.project_id = _q.project_id
-						and _q.language_id=".$this->getDefaultProjectLanguage()."
-
-					where
-						_p.project_id = ".$pId."
-						order by _p.rank_id
-					",
-				"fieldAsIndex"=>"id"
-			)
-		);
+		$pr = $this->models->ControllerModel->getProjectRanks(array(
+			'project_id'=>$pId,
+			'language_id'=>$this->getDefaultProjectLanguage()
+		));
 
 		if ($includeLanguageLabels)
 		{
@@ -1731,7 +873,7 @@ class Controller extends BaseClass
 				foreach ((array) $this->getProjectLanguages() as $langaugekey => $language)
 				{
 
-					$lpr = $this->models->LabelProjectRank->_get(
+					$lpr = $this->models->LabelsProjectsRanks->_get(
 						array(
 							'id' => array(
 								'project_id' => $pId,
@@ -1749,18 +891,6 @@ class Controller extends BaseClass
         return $pr;
     }
 
-    public function newGetTaxonTree ($p=null)
-    {
-
-		$d = $this->_newGetTaxonTree($p);
-
-		if(!empty($this->treeList))
-			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
-
-		return $d;
-
-    }
-
 	public function setActiveTaxonId($id=null)
 	{
 		if (is_null($id))
@@ -1773,19 +903,6 @@ class Controller extends BaseClass
 	{
 		return isset($_SESSION['admin']['system']['activeTaxon']) ? $_SESSION['admin']['system']['activeTaxon'] : null;
 	}
-
-
-    public function emptyCacheFolder($pId=null)
-    {
-		$cachePath = $this->makeCachePath($pId);
-
-		if (empty($cachePath))
-			return;
-
-        if (file_exists($cachePath))
-			array_map('unlink', glob($cachePath.'/*'));
-    }
-
 
 	public function logChange($p)
 	{
@@ -1835,7 +952,7 @@ class Controller extends BaseClass
 			if ($alphabeticalTree)
 				$p['order'] = 'taxon';
 
-            $d = $this->models->Taxon->_get($p);
+            $d = $this->models->Taxa->_get($p);
 
             foreach((array)$d as $val)
 			{
@@ -1848,169 +965,11 @@ class Controller extends BaseClass
 
     }
 
-    private function _newGetTaxonTree ( $p=null )
-    {
-        $pId = isset($p['pId']) ? $p['pId'] : null;
-        $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
-        $depth = isset($p['depth']) ? $p['depth'] : 0;
-        $alphabeticalTree = isset($p['alphabeticalTree']) ? $p['alphabeticalTree'] : false;
-
-        if (!isset($p['depth']))
-            unset($this->treeList);
-
-        $t = $this->getTaxonChildren($pId,$alphabeticalTree);
-
-        foreach ((array) $t as $key => $val)
-		{
-            $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
-            $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
-            $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
-            $t[$key]['sibling_count'] = count((array) $t);
-            $t[$key]['depth'] = $t[$key]['level'] = $depth;
-            $t[$key]['taxon_formatted'] = $this->formatTaxon(array('taxon'=>$val,'ranks'=>$ranks));
-
-            $this->treeList[$key] = $t[$key];
-
-            $t[$key]['children'] = $this->_newGetTaxonTree(array(
-                'pId' => $val['id'],
-                'ranks' => $ranks,
-                'depth' => $depth + 1,
-				'alphabeticalTree' => $alphabeticalTree
-            ));
-
-            $this->treeList[$key]['child_count'] = count((array) $t[$key]['children']);
-        }
-
-        return $t;
-    }
-
-    public function newGetUserTaxa ()
-    {
-
-		return $this->models->UserTaxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'user_id' => $this->getCurrentUserId()
-                ),
-                'fieldAsIndex' => 'taxon_id'
-            ));
-
-    }
-
-    public function newSetTaxaUserAllowable ($p)
-    {
-        $taxa = isset($p['taxa']) ? $p['taxa'] : null;
-        $userTaxa = isset($p['userTaxa']) ? $p['userTaxa'] : null;
-        $prevAllowed = isset($p['prevAllowed']) ? $p['prevAllowed'] : false;
-        $prevDepth = isset($p['prevDepth']) ? $p['prevDepth'] : null;
-        $allowAll = isset($p['allowAll']) ? $p['allowAll'] : false;
-
-        if (is_null($taxa) || (is_null($userTaxa) && !$allowAll))
-            return null;
-
-        foreach ((array) $taxa as $tKey => $tVal) {
-
-            if ($allowAll) {
-
-                $this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = true;
-            }
-            else if (isset($userTaxa[$tKey]) || ($prevAllowed == true && $tVal['depth'] > $prevDepth)) {
-
-                $this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = true;
-            }
-            else {
-
-                $this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = false;
-            }
-
-            $taxa[$tKey]['children'] = $this->newSetTaxaUserAllowable(
-            array(
-                'taxa' => $tVal['children'],
-                'userTaxa' => $userTaxa,
-                'prevAllowed' => $taxa[$tKey]['user_allowed'],
-                'prevDepth' => $tVal['depth'],
-                'allowAll' => $allowAll
-            ));
-        }
-
-        return $taxa;
-    }
-
-    public function newGetUserAssignedTaxonTree ($p)
-    {
-        $taxa = $this->newGetTaxonTree($p);
-
-        $userTaxa = $this->newGetUserTaxa();
-
-        $taxa = $this->newSetTaxaUserAllowable(array(
-            'taxa' => $taxa,
-            'userTaxa' => $userTaxa,
-            'allowAll' => $this->isCurrentUserLeadExpert() || $this->isCurrentUserSysAdmin()
-	        ));
-
-        return $taxa;
-    }
-
-    public function newGetUserAssignedTaxonTreeList ($p = null)
-    {
-        $this->newGetUserAssignedTaxonTree($p);
-
-        if (!isset($this->treeList))
-            return null;
-
-        $incHigher = isset($p['includeHigher']) ? $p['includeHigher'] : false;
-        $higherOnly = isset($p['higherOnly']) ? $p['higherOnly'] : false;
-
-        $prevId = $prevTitle = null;
-
-        foreach ((array) $this->treeList as $key => $val) {
-
-            if (isset($val['user_allowed']) && $val['user_allowed'] === true && ((($val['lower_taxon'] == 1 || $incHigher == true) && $higherOnly == false) || ($val['lower_taxon'] == 0 && $higherOnly == true))) {
-
-                $d[$key] = $val;
-
-                if (isset($prevId)) {
-                    $d[$key]['prev'] = array('id' => $prevId, 'title' => $prevTitle);
-                    $d[$prevId]['next'] = array('id' => $key, 'title' => $val['taxon']);
-                }
-
-                $prevId = $key;
-                $prevTitle = $val['taxon'];
-            }
-        }
-
-        return isset($d) ? $d : null;
-    }
-
-    public function userHasTaxon ($taxonId, $userId = null)
-    {
-
-		return true;
-
-
-        if ($this->isCurrentUserLeadExpert() || $this->isCurrentUserSysAdmin())
-            return true;
-
-        $ut = $this->models->UserTaxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'user_id' => is_null($userId) ? $this->getCurrentUserId() : $userId,
-                'taxon_id' => $taxonId
-            ),
-            'columns' => 'count(*) as tot'
-        ));
-
-        return $ut[0]['tot'] != 0;
-    }
-
-
     public function getProjectUsers ($pId = null)
     {
         $pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
 
-        $pru = $this->models->ProjectRoleUser->_get(array(
+        $pru = $this->models->ProjectsRolesUsers->_get(array(
             'id' => array(
                 'project_id' => $pId,
                 'role_id !=' => '1',
@@ -2022,11 +981,11 @@ class Controller extends BaseClass
 
         foreach ((array) $pru as $key => $val) {
 
-            $u = $this->models->User->_get(array(
+            $u = $this->models->Users->_get(array(
                 'id' => $val['user_id']
             ));
 
-            $r = $this->models->Role->_get(array(
+            $r = $this->models->Roles->_get(array(
                 'id' => $val['role_id']
             ));
 
@@ -2039,7 +998,7 @@ class Controller extends BaseClass
         }
 
         // adding superusers (don't need assigned roles)
-        $superusers = $this->models->User->_get(array(
+        $superusers = $this->models->Users->_get(array(
             'id' => array(
                 'superuser' => '1'
             ),
@@ -2061,84 +1020,10 @@ class Controller extends BaseClass
         $this->_breadcrumbRootName = $name;
     }
 
-
-
     public function getBreadcrumbRootName ()
     {
         return $this->_breadcrumbRootName;
     }
-
-
-
-    public function getSetting ($name,$default=null)
-    {
-        $s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'setting' => $name
-            ),
-            'columns' => 'value',
-            'limit' => 1
-        ));
-
-        if (isset($s[0]))
-            return $s[0]['value'];
-        else
-            return isset($default) ? $default : null;
-    }
-
-
-
-    public function saveSetting ($p)
-    {
-        if (!isset($p['name']))
-            return;
-
-        $name = $p['name'];
-        $value = isset($p['value']) ? $p['value'] : null;
-        $delete = isset($p['delete']) ? $p['delete'] : false;
-        $pId = isset($p['pId']) ? $p['pId'] : $this->getCurrentProjectId();
-
-        if ($delete) {
-
-            $this->models->Settings->delete(array(
-                'project_id' => $pId,
-                'setting' => $name
-            ));
-        }
-        else {
-
-            $d = $this->getSetting($name);
-
-            if (isset($d['value']) && $d['value']==$value)
-                return;
-
-            if (is_null($d)) {
-
-                $s = $this->models->Settings->save(array(
-                    'id' => null,
-                    'project_id' => $pId,
-                    'setting' => $name,
-                    'value' => $value
-                ));
-            }
-            else {
-
-                $s = $this->models->Settings->update(array(
-                    'value' => is_null($value) ? 'null' : $value
-                ), array(
-                    'project_id' => $pId,
-                    'setting' => $name
-                ));
-            }
-        }
-
-		return $this->models->Settings->getAffectedRows();
-
-    }
-
-
 
     public function addModuleToProject ($mId, $pId = null, $showOrder = 0)
     {
@@ -2156,7 +1041,7 @@ class Controller extends BaseClass
 			11 | Index
 			12 | Search
 		*/
-        $this->models->ModuleProject->save(
+        $this->models->ModulesProjects->save(
         array(
             'id' => null,
             'project_id' => is_null($pId) ? $this->getCurrentProjectId() : $pId,
@@ -2166,14 +1051,10 @@ class Controller extends BaseClass
         ));
     }
 
-
-
     public function getProjectFSCode ($p)
     {
         return sprintf('%04s', $p);
     }
-
-
 
     public function createProjectCssFile ($id, $title)
     {
@@ -2342,7 +1223,7 @@ class Controller extends BaseClass
 
     public function grantModuleAccessRights ($mId, $pId, $uId = null)
     {
-        $this->models->ModuleProjectUser->save(array(
+        $this->models->ModulesProjectsUsers->save(array(
             'id' => null,
             'project_id' => $pId,
             'module_id' => $mId,
@@ -2354,7 +1235,7 @@ class Controller extends BaseClass
 
     public function addUserToProjectAsLeadExpert ($pId, $uId = null)
     {
-        $this->models->ProjectRoleUser->save(
+        $this->models->ProjectsRolesUsers->save(
         array(
             'id' => null,
             'project_id' => $pId,
@@ -2375,7 +1256,7 @@ class Controller extends BaseClass
         if (isset($tId))
             $d['taxon_id'] = $tId;
 
-        $tv = $this->models->TaxonVariation->_get(array(
+        $tv = $this->models->TaxaVariations->_get(array(
             'id' => $d,
             'columns' => 'id,taxon_id,label',
             'order' => 'label'
@@ -2385,7 +1266,7 @@ class Controller extends BaseClass
 
             $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
 
-            $tv[$key]['labels'] = $this->models->VariationLabel->_get(
+            $tv[$key]['labels'] = $this->models->VariationsLabels->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -2403,7 +1284,7 @@ class Controller extends BaseClass
     public function getVariation ($id)
     {
 
-        $tv = $this->models->TaxonVariation->_get(
+        $tv = $this->models->TaxaVariations->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -2412,7 +1293,7 @@ class Controller extends BaseClass
             'columns' => 'id,taxon_id,label'
         ));
 
-        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        $tv[0]['labels'] = $this->models->VariationsLabels->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -2428,7 +1309,7 @@ class Controller extends BaseClass
 
     private function getFrontEndMainMenu ()
     {
-        $modules = $this->models->ModuleProject->_get(
+        $modules = $this->models->ModulesProjects->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -2439,7 +1320,7 @@ class Controller extends BaseClass
 
         foreach ((array) $modules as $key => $val) {
 
-            $mp = $this->models->Module->_get(array(
+            $mp = $this->models->Modules->_get(array(
                 'id' => $val['module_id']
             ));
 
@@ -2449,7 +1330,7 @@ class Controller extends BaseClass
             $modules[$key]['controller'] = $mp['controller'];
         }
 
-        $freeModules = $this->models->FreeModuleProject->_get(array(
+        $freeModules = $this->models->FreeModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'active' => 'y'
@@ -2464,105 +1345,6 @@ class Controller extends BaseClass
 
         return $modules;
     }
-
-
-
-    private function _getTaxonTree ($params)
-    {
-
-        // the parent_id to start with
-        $pId = isset($params['pId']) ? $params['pId'] : null;
-        // the current level of depth in the tree
-        $level = isset($params['level']) ? $params['level'] : 0;
-        // a specific rank_id to stop the recursion; taxa below this rank are omitted from the tree
-        $stopAtRankId = isset($params['stopAtRankId']) ? $params['stopAtRankId'] : null;
-        // taxa without a parent_id that are not of the uppermost rank are orphans; these can be excluded from the tree
-        $includeOrphans = isset($params['includeOrphans']) ? $params['includeOrphans'] : true;
-
-        // get all ranks defined within the project
-        $pr = $this->getProjectRanks();
-
-        // $this->treeList an additional non-recursive list of taxa
-        if ($level == 0)
-            unset($this->treeList);
-
-        // setting the parameters for the taxon search
-        $id['project_id'] = $this->getCurrentProjectId();
-
-        if ($pId === null) {
-
-            $id['parent_id is'] = $pId;
-        }
-        else {
-
-            $id['parent_id'] = $pId;
-        }
-
-        // decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually 'kingdom')
-        if ($pId === null && $includeOrphans === false) {
-
-            $id['rank_id'] = $pr[0]['id'];
-        }
-
-        // get the child taxa of the current parent
-        $t = $this->models->Taxon->_get(array(
-            'id' => $id,
-            'order' => 'taxon_order'
-        ));
-
-        foreach ((array) $t as $key => $val) {
-
-            // for each taxon, look whether they a) belong to the lower taxa, and b) can be the endpoint of the key
-            foreach ((array) $pr as $rankkey => $rank) {
-
-                if ($rank['id'] == $val['rank_id']) {
-
-                    $val['rank'] = $rank['rank'];
-
-                    $val['lower_taxon'] = $rank['lower_taxon'];
-
-                    $val['keypath_endpoint'] = $rank['keypath_endpoint'];
-
-                    $val['ideal_parent_id'] = $rank['ideal_parent_id'];
-
-                    break;
-                }
-            }
-
-            // level is effectively the recursive depth of the taxon within the tree
-            $val['level'] = $level;
-
-            // count taxa on the same level
-            $val['sibling_count'] = count((array) $t);
-
-            // sibling_pos reflects the position amongst taxa on the same level
-            $val['sibling_pos'] = ($key == 0 ? 'first' : ($key == count((array) $t) - 1 ? 'last' : '-'));
-
-            // fill the treelist (which is a global var)
-            $this->treeList[$val['id']] = $val;
-
-            $t[$key]['level'] = $level;
-
-            // and call the next recursion for each of the children
-            if (!isset($stopAtRankId) || (isset($stopAtRankId) && $stopAtRankId != $val['rank_id'])) {
-
-                $children = $this->getTaxonTree(array(
-                    'pId' => $val['id'],
-                    'level' => $level + 1,
-                    'stopAtRankId' => $stopAtRankId
-                ));
-
-                $t[$key]['child_count'] = $this->treeList[$val['id']]['child_count'] = isset($children) ? count((array) $children) : 0;
-
-                $t[$key]['children'] = $children;
-            }
-        }
-
-
-        return $t;
-    }
-
-
 
     public function getProjectRanks ($params = false)
     {
@@ -2615,11 +1397,11 @@ class Controller extends BaseClass
                 $p['fieldAsIndex'] = 'id';
             }
 
-            $pr = $this->models->ProjectRank->_get($p);
+            $pr = $this->models->ProjectsRanks->_get($p);
 
             foreach ((array) $pr as $rankkey => $rank) {
 
-                $r = $this->models->Rank->_get(array(
+                $r = $this->models->Ranks->_get(array(
                     'id' => $rank['rank_id']
                 ));
 
@@ -2635,7 +1417,7 @@ class Controller extends BaseClass
 
                     foreach ((array) $this->getProjectLanguages() as $langaugekey => $language) {
 
-                        $lpr = $this->models->LabelProjectRank->_get(
+                        $lpr = $this->models->LabelsProjectsRanks->_get(
                         array(
                             'id' => array(
                                 'project_id' => $this->getCurrentProjectId(),
@@ -2663,15 +1445,15 @@ class Controller extends BaseClass
 
         /*
         $languages = array_merge(
-			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')),
-	        $this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
+			$this->models->Languages->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')),
+	        $this->models->Languages->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
 		);
 		*/
 
         //		unset($_SESSION['admin']['project']['system']['languages']);
         if (!isset($_SESSION['admin']['project']['system']['languages'])) {
 
-            $_SESSION['admin']['project']['system']['languages'] = $this->models->Language->_get(array(
+            $_SESSION['admin']['project']['system']['languages'] = $this->models->Languages->_get(array(
                 'id' => '*',
                 'fieldAsIndex' => 'id'
             ));
@@ -2684,7 +1466,7 @@ class Controller extends BaseClass
 
     public function setProjectLanguages()
     {
-        $lp = $this->models->LanguageProject->_get(array(
+        $lp = $this->models->LanguagesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ),
@@ -2693,7 +1475,7 @@ class Controller extends BaseClass
 
         foreach ((array) $lp as $key => $val) {
 
-            $l = $this->models->Language->_get(array(
+            $l = $this->models->Languages->_get(array(
                 'id' => $val['language_id']
             ));
 
@@ -2756,6 +1538,11 @@ class Controller extends BaseClass
     }
 
 
+    public function rGetAll()
+    {
+		return isset($this->requestData) ? $this->requestData : null;
+    }
+
 
     public function rHasId ()
     {
@@ -2802,19 +1589,6 @@ class Controller extends BaseClass
         }
     }
 
-	public function makeCachePath($pId=null)
-	{
-
-        $p = isset($pId) ? $pId : $this->getCurrentProjectId();
-
-        if (!$p)
-            return;
-
-        return $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
-
-	}
-
-
     /**
      * Assigns basic Smarty variables
      *
@@ -2835,7 +1609,6 @@ class Controller extends BaseClass
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('warnings', $this->getWarnings());
-        $this->smarty->assign('helpTexts', $this->getHelpTexts());
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
 
@@ -2846,7 +1619,6 @@ class Controller extends BaseClass
         $this->smarty->assign('useRelated', $this->useRelated);
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
-        $this->smarty->assign('currentUserRole', $this->getCurrentUserRole());
 
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -2886,10 +1658,11 @@ class Controller extends BaseClass
 
 
 
-    private function getModuleActivationStatus ()
+    private function getModuleActivationStatus()
     {
 
 		// NEEDS TO BE REPAIRED!
+		// REFAC2015
 		return 1;
 
 
@@ -2897,7 +1670,7 @@ class Controller extends BaseClass
         if (!isset($this->controllerBaseName))
             return 1;
 
-        $mp = $this->models->ModuleProject->_get(array(
+        $mp = $this->models->ModulesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'module_id' => $this->controllerModuleId
@@ -2915,24 +1688,17 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function startSession ()
+    private function startSession()
     {
-
-        //session_name('lng-administration');
-        if (!isset($_SESSION))
-            session_start();
-
-            /* DEBUG */
-        $_SESSION['admin']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+        if (!isset($_SESSION)) session_start();
     }
 
 
 
-    private function setTimeZone ()
+    private function setTimeZone()
     {
         date_default_timezone_set($this->generalSettings['serverTimeZone']);
     }
-
 
 
     /**
@@ -2946,7 +1712,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setNames ()
+    private function setNames()
     {
         $this->appName = $this->generalSettings['app']['pathName'];
 
@@ -2988,13 +1754,22 @@ class Controller extends BaseClass
     }
 
 
+    private function startModuleSession()
+	{
+		$this->moduleSession=$this->helpers->SessionModuleSettings;
+		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
+
+		$this->baseSession=$this->helpers->SessionModuleSettings;
+		$this->baseSession->setModule( array('environment'=>'admin','controller'=>'base') );
+	}
+
 
     /**
      * Sets general Smarty variables (paths, compilder directives)
      *
      * @access     private
      */
-    private function setSmartySettings ()
+    private function setSmartySettings()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
 
@@ -3030,7 +1805,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setRequestData ()
+    private function setRequestData()
     {
         $this->requestData = false;
 
@@ -3079,27 +1854,27 @@ class Controller extends BaseClass
 
 
 
-    private function doLanguageChange ($unsetRequestVar = true)
+    private function doLanguageChange($unsetRequestVar = true)
     {
-        if ($this->isMultiLingual) {
-
-            if (isset($this->requestData['uiLang'])) {
-
-                $this->setLocale($this->requestData['uiLang']);
+        if ($this->isMultiLingual)
+		{
+            if ($this->rHasVar('uiLang'))
+			{
+                $this->setLocale($this->rGetVal('uiLang'));
             }
         }
-        else {
-
-            $this->log('Attempt to set language ' . $this->requestData['uiLang'] . ' for non-mulitlanguage page', 1);
+        else
+		{
+            $this->log('Attempt to set language ' . $this->rGetVal('uiLang') . ' for non-mulitlanguage page', 1);
         }
 
-        if ($unsetRequestVar) {
-
+        if ($unsetRequestVar)
+		{
             unset($this->requestData['uiLang']);
 
-            if (empty($this->requestData)) {
-
-                unset($this->requestData);
+            if (empty($this->requestData ))
+			{
+                unset($this->requestData );
             }
         }
     }
@@ -3115,58 +1890,74 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function loadModels ()
+    private function loadModels()
     {
-        if (isset($this->usedModelsBase) && isset($this->usedModels)) {
-
+        if (isset($this->usedModelsBase) && isset($this->usedModels))
+		{
             $d = array_unique(array_merge((array) $this->usedModelsBase, (array) $this->usedModels));
         }
-        elseif (isset($this->usedModelsBase)) {
-
+        else
+		if (isset($this->usedModelsBase))
+		{
             $d = $this->usedModelsBase;
         }
-        elseif (isset($this->usedModels)) {
-
+        else
+		if (isset($this->usedModels))
+		{
             $d = $this->usedModels;
         }
-        else {
-
+        else
+		{
             return;
         }
 
         $this->models = new stdClass();
 
-        foreach ((array) $d as $key) {
+        // Load base controller model first
+		require_once dirname(__FILE__) . '/../models/ControllerModel.php';
+		$this->models->ControllerModel = new ControllerModel;
 
-            if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
+		// Load controller-specific model
+        $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
 
-                require_once (dirname(__FILE__) . '/../models/' . $key . '.php');
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
+		{
+            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+            $this->models->$t = new $t;
+        }
 
-                $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+        // Load controller-specific model by override
+		if ( isset($this->modelNameOverride) )
+		{
+			if (!isset($this->models->{$this->modelNameOverride}) &&
+                file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
+			{
+			    require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
+				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
+			}
+		}
 
+        // Load models for each table, as specified in used models
+        require_once dirname(__FILE__) . '/../models/Table.php';
+        foreach ((array) $d as $key)
+		{
+            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            $this->models->$t = new Table($key);
 
-                if (class_exists($t)) {
-
-                    $this->models->$t = new $t();
-
-                    if (isset($this->helpers->LoggingHelper))
-                        $this->models->$t->setLogger($this->helpers->LoggingHelper);
-
-                    //echo $t.chr(10);
-                }
-                else {
-
-                    $this->log('Attempted to initiate non-existing model class "' . $t . '"', 2);
-                }
-            }
-            else {
-
-                $this->log('Attempted to load non-existing model file "' . $key . '"', 2);
+            if (isset($this->helpers->LoggingHelper))
+			{
+                 $this->models->$t->setLogger($this->helpers->LoggingHelper);
             }
         }
+
     }
 
-
+    protected function extendUsedModels()
+    {
+        if (isset($this->usedModelsExtended) && is_array($this->usedModelsExtended)) {
+            $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
+        }
+    }
 
     /**
      * Loads the required helpers (separate multi-use classes)
@@ -3177,37 +1968,39 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function loadHelpers ()
+    private function loadHelpers()
     {
-        if (isset($this->usedHelpersBase) && isset($this->usedHelpers)) {
-
+        if (isset($this->usedHelpersBase) && isset($this->usedHelpers))
+		{
             $d = array_unique(array_merge((array) $this->usedHelpersBase, (array) $this->usedHelpers));
         }
-        elseif (isset($this->usedHelpersBase)) {
-
+        else
+		if (isset($this->usedHelpersBase))
+		{
             $d = $this->usedHelpersBase;
         }
-        elseif (isset($this->usedHelpers)) {
-
+        else
+		if (isset($this->usedHelpers))
+		{
             $d = $this->usedHelpers;
         }
-        else {
-
+        else
+		{
             return;
         }
 
         $this->helpers = new stdClass();
 
-        foreach ((array) $d as $key) {
-
-            if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
-
+        foreach ((array) $d as $key)
+		{
+            if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php'))
+			{
                 require_once (dirname(__FILE__) . '/../helpers/' . $key . '.php');
 
                 $d = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
-                if (class_exists($d)) {
-
+                if (class_exists($d))
+				{
                     $this->helpers->$d = new $d();
                 }
             }
@@ -3216,25 +2009,23 @@ class Controller extends BaseClass
 
 
 
-    private function initLogging ()
+    private function initLogging()
     {
         $fn = $this->getAppName() ? $this->getAppName() : 'general';
-
         $this->helpers->LoggingHelper->setLogFile($this->generalSettings['directories']['log'] . '/' . $fn . '.log');
-
         $this->helpers->LoggingHelper->setLevel(0);
     }
 
 
 
-    private function setLanguages ()
+    private function setLanguages()
     {
-        foreach ((array) $this->generalSettings['uiLanguages'] as $key => $val) {
-
+        foreach ((array) $this->generalSettings['uiLanguages'] as $key => $val)
+		{
             if ($key == 0)
                 $this->uiDefaultLanguage = $val;
 
-            $l = $this->models->Language->_get(array(
+            $l = $this->models->Languages->_get(array(
                 'id' => array(
                     'id' => $val
                 ),
@@ -3248,43 +2039,11 @@ class Controller extends BaseClass
 
 
     /**
-     * Loads the help texts for the current view into the class variable 'helpTexts'
-     *
-     * @access     private
-     */
-    private function setHelpTexts ()
-    {
-        $this->_helpTexts = $this->models->Helptext->_get(
-        array(
-            'id' => array(
-                'controller' => $this->getControllerBaseName() ? $this->getControllerBaseName() : '-',
-                'view' => $this->getViewName()
-            ),
-            'order' => 'show_order'
-        ));
-    }
-
-
-
-    /**
-     * Returns the class variable 'helptexts', which contains all the pages's help texts
-     *
-     * @return     array    array with all help texts
-     * @access     private
-     */
-    private function getHelpTexts ()
-    {
-        return $this->_helpTexts;
-    }
-
-
-
-    /**
      * Makes project paths for image uploads etc.
      *
      * @access     public
      */
-    public function makePathNames ($p)
+    public function makePathNames($p)
     {
         if ($p)
             return array(
@@ -3292,7 +2051,6 @@ class Controller extends BaseClass
                 'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/',
                 'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/l2_maps/',
                 'media_url' => $this->generalSettings['paths']['mediaBasePath'] . '/' . $this->getProjectFSCode($p) . '/',
-                'cache' => $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p) . '/'
             );
         else
             return null;
@@ -3305,7 +2063,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setPaths ()
+    private function setPaths()
     {
         $p = $this->getCurrentProjectId();
 
@@ -3314,12 +2072,12 @@ class Controller extends BaseClass
             $paths = $this->makePathNames($p);
 
             $_SESSION['admin']['project']['paths']['project_media'] = $paths['project_media'];
-
             $_SESSION['admin']['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
-
             $_SESSION['admin']['project']['paths']['project_media_l2_maps'] = $paths['project_media_l2_maps'];
 
-            $_SESSION['admin']['project']['paths']['cache'] = $paths['cache'];
+			$this->baseSession->setModuleSetting( array( 'setting'=>'project_media_path', 'value' => $paths['project_media'] ) );
+			$this->baseSession->setModuleSetting( array( 'setting'=>'project_thumbs_path', 'value' => $paths['project_thumbs'] ) );
+			$this->baseSession->setModuleSetting( array( 'setting'=>'project_media_l2_maps_path', 'value' => $paths['project_media_l2_maps'] ) );
 
             foreach ((array) $_SESSION['admin']['project']['paths'] as $key => $val) {
 
@@ -3342,7 +2100,7 @@ class Controller extends BaseClass
 	 * @todo	take out hard reference to /media/
      * @access     private
      */
-    private function setUrls ()
+    private function setUrls()
     {
         $p = $this->getCurrentProjectId();
 
@@ -3362,20 +2120,20 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setLastVisitedPage ()
+    private function setLastVisitedPage()
     {
-        if (!$this->excludeFromReferer) {
+		if (!isset($this->baseSession)) return;
 
-            if (isset($_SESSION['admin']['system']['referer'])) {
+        if (!$this->excludeFromReferer)
+		{
+            if (null!==$this->baseSession->getModuleSetting( 'referer_url' ))
+				$this->baseSession->setModuleSetting( array('setting'=>'prev_referer_url','value'=>$this->baseSession->getModuleSetting( 'referer_url' ) ) );
 
-                $_SESSION['admin']['system']['prev_referer']['url'] = $_SESSION['admin']['system']['referer']['url'];
+            if (null!==$this->baseSession->getModuleSetting( 'referer_name' ))
+				$this->baseSession->setModuleSetting( array('setting'=>'prev_referer_name','value'=>$this->baseSession->getModuleSetting( 'referer_name' ) ) );
 
-                $_SESSION['admin']['system']['prev_referer']['name'] = $_SESSION['admin']['system']['referer']['name'];
-            }
-
-            $_SESSION['admin']['system']['referer']['url'] = $_SERVER['REQUEST_URI'];
-
-            $_SESSION['admin']['system']['referer']['name'] = $this->getPageName();
+			$this->baseSession->setModuleSetting( array('setting'=>'referer_url','value'=> $_SERVER['REQUEST_URI'] ));
+			$this->baseSession->setModuleSetting( array('setting'=>'referer_name','value'=> $this->getPageName() ));
         }
     }
 
@@ -3386,35 +2144,18 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function checkLastVisitedPage ()
+    private function checkLastVisitedPage()
     {
-        if (isset($_SESSION['admin']['system']['referer']) && isset($_SESSION['admin']['system']['prev_referer']) && $_SESSION['admin']['system']['referer']['url'] == $_SERVER['REQUEST_URI']) {
-
-            $_SESSION['admin']['system']['referer'] = $_SESSION['admin']['system']['prev_referer'];
-
-            unset($_SESSION['admin']['system']['prev_referer']);
+        if (
+			null!==$this->baseSession->getModuleSetting( 'referer_url' ) &&
+			null!==$this->baseSession->getModuleSetting( 'prev_referer_url' ) &&
+			$this->baseSession->getModuleSetting( 'referer_url' )==$_SERVER['REQUEST_URI'])
+		{
+			$this->baseSession->setModuleSetting( array('setting'=>'referer_url','value'=> $this->baseSession->getModuleSetting( 'prev_referer_url' ) ) );
+			$this->baseSession->setModuleSetting( array('setting'=>'referer_name','value'=> $this->baseSession->getModuleSetting( 'prev_referer_name' ) ) );
+			$this->baseSession->setModuleSetting( array('setting'=>'prev_referer_url') );
+			$this->baseSession->setModuleSetting( array('setting'=>'prev_referer_name') );
         }
-    }
-
-
-
-    /**
-     * Stores current page's name etc. in the session for easy access by smarty for js lock out-function
-     *
-     * @access     private
-     */
-    private function setSessionActivePageValues ()
-    {
-        $_SESSION['admin']['system']['active_page']['url'] = $this->_fullPath;
-
-        if (isset($this->appName))
-            $_SESSION['admin']['system']['active_page']['appName'] = $this->appName;
-
-        if (isset($this->controllerBaseName))
-            $_SESSION['admin']['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
-
-        if (isset($this->_viewName))
-            $_SESSION['admin']['system']['active_page']['viewName'] = $this->_viewName;
     }
 
 
@@ -3427,14 +2168,14 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setLoginStartPage ()
+    private function setLoginStartPage()
     {
         $_SESSION['admin']['login_start_page'] = $this->_fullPath;
     }
 
 
 
-    public function setSuppressProjectInBreadcrumbs ($state = true)
+    public function setSuppressProjectInBreadcrumbs($state = true)
     {
         $this->suppressProjectInBreadcrumbs = $state;
     }
@@ -3446,7 +2187,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setBreadcrumbs ()
+    private function setBreadcrumbs()
     {
         if (!isset($this->appName))
             return;
@@ -3491,8 +2232,8 @@ class Controller extends BaseClass
                     if ($this->breadcrumbIncludeReferer === true) {
 
                         $this->breadcrumbs[] = array(
-                            'name' => $_SESSION['admin']['system']['referer']['name'],
-                            'url' => $_SESSION['admin']['system']['referer']['url']
+                            'name' => $this->baseSession->getModuleSetting( 'referer_name' ),
+                            'url' => $this->baseSession->getModuleSetting( 'referer_url' )
                         );
                     }
                     elseif (is_array($this->breadcrumbIncludeReferer)) {
@@ -3507,12 +2248,10 @@ class Controller extends BaseClass
                 }
             }
         }
-        else if ($this->_fullPathRelative != $cp) {
+        else
+		if ($this->_fullPathRelative != $cp)
+		{
             // for special cases in which no project has been set (like 'create project')
-
-
-
-
             $curl = $this->baseUrl . $this->appName . '/views/' . $controllerBaseName;
 
             $this->breadcrumbs[] = array(
@@ -3530,173 +2269,11 @@ class Controller extends BaseClass
      * @access     private
      * @return    array    breadcrumb trail: array of crumbname => crumbpath
      */
-    private function getBreadcrumbs ()
+    private function getBreadcrumbs()
     {
-        if (isset($this->breadcrumbs))
-            return $this->breadcrumbs;
+        if (isset($this->breadcrumbs)) return $this->breadcrumbs;
     }
 
-
-
-    /**
-     * Checks whether a user is authorized to view/use a page within a project
-     *
-     * @return     boolean        authorized or not
-     * @access     private
-     */
-    private function isUserAuthorisedForProjectPage ()
-    {
-        $controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName());
-
-        // is no controller base name is set, we are in /admin/views/utilities/admin_index.php, which is the portal to the modules
-        if ($controllerBaseName == '')
-            return true;
-
-        if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName])) {
-
-            $d = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName];
-
-            foreach ((array) $d as $key => $val) {
-
-                if ($val == '*' || $val == $this->getViewName()) {
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-
-
-    /**
-     * Sets key to sort by for doCustomSortArray
-     *
-     * @param string    name of the field to sort by
-     * @access     private
-     */
-    private function setSortField ($field)
-    {
-        $this->sortField = $field;
-    }
-
-
-
-    /**
-     * Returns key to sort by; called by doCustomSortArray
-     *
-     * @return string    name of the field to sort by; defaults to 'id'
-     * @access     private
-     */
-    private function getSortField ()
-    {
-        return !empty($this->sortField) ? $this->sortField : 'id';
-    }
-
-
-
-    /**
-     * Sets sort direction for doCustomSortArray
-     *
-     * @param string    $a    asc or desc
-     * @access     private
-     */
-    private function setSortDirection ($dir)
-    {
-        $this->sortDirection = $dir;
-    }
-
-
-
-    /**
-     * Returns direction to sort in; called by doCustomSortArray
-     *
-     * @return string    asc or desc
-     * @access     private
-     */
-    private function getSortDirection ()
-    {
-        return !empty($this->sortDirection) ? $this->sortDirection : 'asc';
-    }
-
-
-
-    /**
-     * Sets case sensitivity for doCustomSortArray
-     *
-     * @param string    $a    i(nsensitive) or s(ensitive)
-     * @access     private
-     */
-    private function setSortCaseSensitivity ($sens)
-    {
-        $this->sortCaseSensitivity = $sens;
-    }
-
-
-
-    /**
-     * Returns setting for case-sensitivity while sorting; called by doCustomSortArray
-     *
-     * @return string    i(nsensitive) or s(ensitive)
-     * @access     private
-     */
-    private function getSortCaseSensitivity ()
-    {
-        return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
-    }
-
-
-
-    /**
-     * Performs the actual usort; called by customSortArray
-     *
-     * @param array    $a    value of one array-element
-     * @param array    $b    value of the other
-     * @access     private
-     */
-    private function doCustomSortArray ($a, $b)
-    {
-        $f = $this->getSortField();
-
-        $d = $this->getSortDirection();
-
-        $c = $this->getSortCaseSensitivity();
-
-        if (!isset($a[$f]) || !isset($b[$f]))
-            return;
-
-        if ($c != 's') {
-
-            $a[$f] = strtolower($a[$f]);
-            $b[$f] = strtolower($b[$f]);
-        }
-
-        return ($a[$f] > $b[$f] ? ($d == 'asc' ? 1 : -1) : ($a[$f] < $b[$f] ? ($d == 'asc' ? -1 : 1) : 0));
-    }
-
-
-
-    private function _doMultiArrayFind ($var)
-    {
-        return (isset($var[$this->findField]) && $var[$this->findField] == $this->findValue);
-    }
-
-
-
-    public function doMultiArrayFind ($array, $field, $value)
-    {
-        if ($field == null || $value == null)
-            return;
-
-        $this->findField = $field;
-        $this->findValue = $value;
-
-        return array_filter($array, array(
-            $this,
-            '_doMultiArrayFind'
-        ));
-    }
 
 
 
@@ -3705,7 +2282,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setRandomValue ()
+    private function setRandomValue()
     {
         $this->randomValue = mt_rand(99999, mt_getrandmax());
     }
@@ -3718,221 +2295,36 @@ class Controller extends BaseClass
      * @return integer    anything between 99999 and mt_getrandmax()
      * @access     private
      */
-    private function getRandomValue ()
+    private function getRandomValue()
     {
         return $this->randomValue;
     }
 
-
-
-    private function saveFormResubmitVal ()
+    private function saveFormResubmitVal()
     {
+		if (!isset($this->baseSession)) return;
+
         if (!$this->noResubmitvalReset)
-            $_SESSION['admin']['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+			$this->baseSession->setModuleSetting( array('setting'=>'last_rnd','value'=>$this->rHasVal('rnd') ? $this->rGetVal('rnd') : null ) );
     }
 
-
-
-    public function clearAllCaches ()
-    {
-        if ($this->getCurrentProjectId()) {
-
-            $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
-
-            if (is_dir($cacheDir)) {
-
-                $files = scandir($cacheDir);
-
-                foreach ($files as $file) {
-
-                    if ($file != "." && $file != "..") {
-
-                        unlink($cacheDir . '/' . $file);
-                    }
-                }
-            }
-        }
-    }
-
-	protected function saveCache ($key, $data)
-	{
-		if ($this->useCache == false)
-		return;
-
-		$cacheFile=$_SESSION['admin']['project']['paths']['cache'].$key;
-
-		if (!file_put_contents($cacheFile, serialize($data))) {
-			die('Cannot write to cache folder '.$_SESSION['admin']['project']['paths']['cache']);
-		}
-	}
-
-    // Timeout in seconds
-    // Key something like path in session, e.g. 'species-tree'
-    protected function getCache ($key, $timeOut = false)
-    {
-        if ($this->useCache == false)
-            return false;
-
-        $cacheFile=$_SESSION['admin']['project']['paths']['cache'].$key;
-
-        if (file_exists($cacheFile)) {
-            // Timeout provided and expired
-            if ($timeOut && time() - $timeOut >= filemtime($cacheFile)) {
-                // Delete from cache
-                unlink($cacheFile);
-                return false;
-            }
-            return unserialize(file_get_contents($cacheFile));
-        }
-        return false;
-    }
-
-
-
-    protected function clearCache ($files)
-    {
-        $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
-
-        if (empty($files))
-            return;
-
-        if (!is_array($files))
-            $files = array(
-                $files
-            );
-
-        if ($this->getCurrentProjectId()) {
-
-            foreach ($files as $file) {
-
-                // Wildcard * provided in file name; remove all
-                if (strpos($file, '*') !== false) {
-
-                    $wildCardFiles = glob($cacheDir . $file);
-
-                    foreach ($wildCardFiles as $wildcardFile) {
-
-                        unlink($wildcardFile);
-                    }
-
-                    // Regular file
-                }
-                else if (file_exists($cacheDir . '/' . $file)) {
-
-                    unlink($cacheDir . '/' . $file);
-                }
-            }
-        }
-    }
-
-
-
-    private function saveInterfaceText ($text)
-    {
-        @$this->models->InterfaceText->save(array(
-            'id' => null,
-            'text' => $text,
-            'env' => $this->getAppName()
-        ));
-
-        /*
-        $bt = debug_backtrace();
-        $caller = array_shift($bt);
-        $caller = array_shift($bt);
-        echo $caller['file'].'::'.$caller['line'];
-        */
-    }
-
-
-
-    private function doTranslate ($text)
-    {
-
-        /*
-        // get id of the text
-        $i = $this->models->InterfaceText->_get(array(
-            'id' => array(
-                'text' => $text,
-                'env' => $this->getAppName()
-            ),
-            'columns' => 'id'
-        ));
-        */
-
-        // get id of the text
-        $i = $this->models->InterfaceText->_get(
-        array(
-            'id' => 'select id
-						from %table%
-						where
-							text = "' . mysql_real_escape_string($text) . '"
-							and env = "' . $this->getAppName() . '"'
-        ));
-
-        // if not found, return unchanged
-        if (empty($i[0]['id']))
-            return $text;
-
-        // resolve language id
-        $languageId = $this->getCurrentUiLanguage();
-        // fetch appropriate translation
-        $it = $this->models->InterfaceTranslation->_get(
-        array(
-            'id' => array(
-                'interface_text_id' => $i[0]['id'],
-                'language_id' => $languageId
-            ),
-            'columns' => 'translation'
-        ));
-
-        // if not found, return unchanged
-        if (empty($it[0]['translation']))
-            return $text;
-
-            // return translation
-        return $it[0]['translation'];
-    }
-
-
-
-	private function getCurrentUserRole()
-	{
-
-		$pId = $this->getCurrentProjectId();
-
-		if (empty($pId))
-			return;
-
-		   $pru = $this->models->ProjectRoleUser->_get(
-			array(
-				'id' => array(
-					'project_id' => $pId,
-					'user_id' => $this->getCurrentUserId()
-				)
-			));
-
-		return $pru[0]['role_id'];
-
-	}
-
-    private function loadSmartyConfig ()
+    private function loadSmartyConfig()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
     }
 
 
-    private function checkWriteableDirectories ()
+    private function checkWriteableDirectories()
     {
         $paths = array(
             $this->_smartySettings['dir_compile'] => 'www/admin/templates/templates_c',
             $this->_smartySettings['dir_cache'] => 'www/admin/templates/cache',
-            $this->generalSettings['directories']['cache'] => 'www/shared/cache',
             $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
             $this->generalSettings['directories']['log'] => 'log'
         );
 
-        foreach ((array) $paths as $val => $display) {
-
+        foreach ((array) $paths as $val => $display)
+		{
             if ((!file_exists($val) || !is_writable($val)) && @!mkdir($val)) {
                  $fixPaths[] = $display;
             }
@@ -3955,21 +2347,165 @@ class Controller extends BaseClass
 
     }
 
-	// DEBUG!!!!!
-	// $this->dump($this->getNewProjectId(),null,'waypoint COMMON',$indexName);
-	public function dump($pId,$int=null,$var=null,$txt=null)
+	private function initTranslator()
 	{
-
-        $this->models->Dump->save(
-        array(
-            'id' => null,
-            'p' => $pId,
-            'i_int' => $int,
-            'v_varchar' => $var,
-            't_text' => $txt,
-        ));
-
+		include_once ('TranslatorController.php');
+		$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage());
 	}
+
+	public function translate($content)
+	{
+		return $this->translator->translate($content);
+	}
+
+	public function javascriptTranslate($content)
+	{
+		return $this->translator->translate($content);
+	}
+
+	public function smartyTranslate($params, $content, &$smarty, &$repeat)
+	{
+		$c = $this->translator->translate($content);
+
+		if (isset($params))
+		{
+			foreach ((array) $params as $key => $val)
+			{
+				if (substr($key, 0, 2) == '_s' && isset($val))
+				{
+					$c = preg_replace('/\%s/', $val, $c, 1);
+				}
+			}
+		}
+		return $c;
+	}
+
+
+	/*
+	 * Used to load an external model. Useful if the required methods of a controller's
+	 * model are more logically stored in a model associated with a different controller;
+	 * e.g. the methods for ModuleSettingsReaderController are available in ModuleSettingsModel rather
+	 * than in its own model.
+	 */
+	// REFAC2015  doesn't seem to be used anywhere
+	protected function loadExternalModel ($model)
+	{
+        if (file_exists(dirname(__FILE__) . "/../models/{$model}.php")) {
+            include_once dirname(__FILE__) . "/../models/{$model}.php";
+            $this->models->{$model} = new $model;
+        }
+	}
+
+    /*
+     * Used to pull external data from an api using a curl request. Parameter can
+     * either be a url or an array with additional parameters (post data and timeout).
+     */
+	protected function getCurlResult ($p)
+	{
+        $url = is_array($p) && isset($p['url']) ? $p['url'] : (!empty($p) ? $p : false);
+        $post = isset($p['post']) ? $p['post'] : false;
+        $timeout = isset($p['timeout']) ? $p['timeout'] : 10;
+
+        if (!$url) {
+           return '';
+        }
+
+		$ch=curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+		if ($post) {
+            curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+		if ($timeout) {
+		    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+		}
+
+		$result=curl_exec($ch);
+		curl_close($ch);
+
+		$output = json_decode($result);
+		// Return raw output if result is no (valid) json
+		return !is_null($output) ? $output : $result;
+	}
+	
+	protected function activateBasicModules()
+	{
+		$d=$this->models->Modules->_get(
+			array(
+				'id'=> array('controller in #'=>"('users','projects')")
+			));
+
+		foreach((array)$d as $key=>$val)
+		{
+			$m=$this->models->ModulesProjects->_get(
+				array(
+					'id'=> array(
+						'project_id'=>$this->getCurrentProjectId(),
+						'module_id'=>$val['id']
+					),
+				));
+				
+			if ($m && $m[0]['active']=='y') continue;
+			
+			if ($m && $m[0]['active']=='n')
+			{
+				$this->models->ModulesProjects->update(
+					array('active'=>'y'),
+					array('id'=>$m[0]['id'])
+				);				
+			}
+			else
+			if (!$m)
+			{
+				$this->models->ModulesProjects->save(array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'module_id'=>$val['id'],
+					'show_order'=>99,
+					'active'=>'y',
+					'created'=>'now()'
+				));
+			}
+		
+		}
+		
+	}
+
+	protected function initUserRights()
+	{
+		$this->UserRights = new UserRights([
+			'model' => $this->models->Users,
+			'userid' => $this->getCurrentUserId(),
+			'projectid' => $this->getCurrentProjectId(),
+			'controller' => $this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName()
+		]);
+	}
+
+    public function arrayHasData ($p = array())
+    {
+        foreach ($p as $k => $v) {
+            if (is_array($v)) {
+                $this->arrayHasData($v);
+            }
+            if ($v != '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function getCurrentModuleId ()
+    {
+		$d = $this->models->Modules->_get(array(
+            "id" => array("controller"=>$this->getControllerBaseName())
+		));
+
+		return $d ? $d[0]['id'] : false;
+    }
+
+
 
 
 }

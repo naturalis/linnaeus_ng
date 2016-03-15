@@ -19,6 +19,10 @@ Map extra fields:
 {if $val=='' && $k|in_array:$nbcColumns}
 {assign var=val value=$k}
 {/if}
+<<<<<<< HEAD
+=======
+
+>>>>>>> development-WEG
 	<tr>
     	<td>{$k}</td>
         <td>

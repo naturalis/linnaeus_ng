@@ -11,22 +11,20 @@
 {if $prevStart!=-1 || $nextStart!=-1}
 	<div id="navigation">
 		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
+		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
 		{/if}
 		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">next ></span>
+		<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
 		{/if}
 	</div>
 {/if}
 
 </div>
+
 <form id="theForm" method="post">
 <input type="hidden" id="id" name="id" value="" />
 <input type="hidden" id="action" name="action" value="" />
 <input type="hidden" id="c" name="c" value="{$controller}" />
 </form>
-
-
-</div>
 
 {include file="../shared/admin-footer.tpl"}

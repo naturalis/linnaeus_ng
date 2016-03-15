@@ -19,10 +19,9 @@ class TraitsTaxonController extends TraitsController
 		'literature2_authors'
     );
    
+    public $modelNameOverride='TraitsTaxonModel';
     public $controllerPublicName = 'Kenmerken';
 
-    public $cacheFiles = array();
-    
     public $cssToLoad = array(
 		'traits.css',
 //		'taxon_groups.css',
@@ -44,7 +43,7 @@ class TraitsTaxonController extends TraitsController
     public function __construct ()
     {
         parent::__construct();
-		$this->initialise();
+		$this->initialize();
     }
 
     public function __destruct ()
@@ -52,7 +51,7 @@ class TraitsTaxonController extends TraitsController
         parent::__destruct();
     }
 
-    private function initialise()
+    private function initialize()
     {
     }
 	
@@ -111,10 +110,10 @@ class TraitsTaxonController extends TraitsController
 
 		if ($this->rHasVal('action','get_taxon_trait'))
 		{
-			$d=$this->getTaxonValues($this->requestData);
+			$d=$this->getTaxonValues($this->rGetId());
 
 			$this->smarty->assign('returnText',json_encode(array(
-				'trait'=>$this->getTraitgroupTrait($this->requestData),
+				'trait'=>$this->getTraitgroupTrait($this->rGetId()),
 				'taxon_values'=>isset($d[0]) ? $d[0] : null,
 				'default_project_language' => $this->getDefaultProjectLanguage()
 			)));
@@ -139,160 +138,12 @@ class TraitsTaxonController extends TraitsController
 			return;
 		}
 
-		$r=$this->models->TraitsTaxonValues->freeQuery("
-			select * from (
-			
-				select
-					_a.id,
-					_b.id as value_id,
-					_b.trait_id,
-					_c.sysname as trait_sysname,
-					if(length(ifnull(_t1.translation,''))=0,_c.sysname,_t1.translation) as trait_name,
-					_t2.translation as trait_code,
-					_t3.translation as trait_description,
-					_g.sysname as trait_type_sysname,
-					(CASE 
-						WHEN locate('string',_g.sysname)=1 THEN 
-							if(length(ifnull(_t4.translation,''))=0,_b.string_value,_t4.translation)
-						WHEN (locate('int',_g.sysname)=1 || locate('float',_g.sysname)=1) THEN
-							_b.numerical_value
-						WHEN locate('date',_g.sysname)=1 THEN
-							_b.date
-						ELSE null
-					END) AS value_start,
-					(CASE 
-						WHEN (locate('int',_g.sysname)=1 || locate('float',_g.sysname)=1) THEN _b.numerical_value_end
-						WHEN locate('date',_g.sysname)=1 THEN _b.date_end
-						ELSE null
-					END) AS value_end,
-
-					_b.date as _date_value,
-					_b.date_end as _date_value_end,
-					_e.format as _date_format,
-					
-					_c.show_order as _show_order_1,
-					_b.show_order as _show_order_2,
-					'fixed' as type
-			
-				from
-					%PRE%traits_taxon_values _a
-				
-				left join %PRE%traits_values _b
-					on _a.project_id=_b.project_id
-					and _a.value_id=_b.id
-			
-				left join %PRE%traits_traits _c
-					on _a.project_id=_c.project_id
-					and _b.trait_id=_c.id
-			
-				left join %PRE%text_translations _t1
-					on _c.project_id=_t1.project_id
-					and _c.name_tid=_t1.text_id
-					and _t1.language_id=".$language."
-			
-				left join %PRE%text_translations _t2
-					on _c.project_id=_t2.project_id
-					and _c.code_tid=_t2.text_id
-					and _t2.language_id=".$language."
-			
-				left join %PRE%text_translations _t3
-					on _c.project_id=_t3.project_id
-					and _c.description_tid=_t3.text_id
-					and _t3.language_id=".$language."
-			
-				left join %PRE%text_translations _t4
-					on _b.project_id=_t4.project_id
-					and _b.string_label_tid=_t4.text_id
-					and _t4.language_id=".$language."
-			
-				left join %PRE%traits_project_types _f
-					on _c.project_id=_f.project_id
-					and _c.project_type_id=_f.id
-			
-				left join  %PRE%traits_types _g
-					on _f.type_id=_g.id
-
-				left join 
-					%PRE%traits_date_formats _e
-					on _c.date_format_id=_e.id
-							
-				where
-					_a.project_id=".$this->getCurrentProjectId()."
-					and _a.taxon_id=".$taxon."
-					and _b.trait_id is not null
-			
-				union
-			
-				select
-					_a.id,
-					null as value_id,
-					_a.trait_id,
-					_c.sysname as trait_sysname,
-					if(length(ifnull(_t1.translation,''))=0,_c.sysname,_t1.translation) as trait_name,
-					_t2.translation as trait_code,
-					_t3.translation as trait_description,
-					_g.sysname as trait_type_sysname,
-					(CASE 
-						WHEN locate('string',_g.sysname)=1 THEN string_value
-						WHEN (locate('int',_g.sysname)=1 || locate('float',_g.sysname)=1) THEN numerical_value
-						WHEN locate('date',_g.sysname)=1 THEN date_value
-						ELSE null
-					END) AS value_start,
-					(CASE 
-						WHEN (locate('int',_g.sysname)=1 || locate('float',_g.sysname)=1) THEN numerical_value_end
-						WHEN locate('date',_g.sysname)=1 THEN date_value_end
-						ELSE null
-					END) AS value_end,
-
-					date_value as _date_value,
-					date_value_end as _date_value_end,
-					_e.format as _date_format,
-			
-					_c.show_order as _show_order_1,
-					null as _show_order_2,
-					'free' as type
-					
-				from
-					%PRE%traits_taxon_freevalues _a
-				
-				left join %PRE%traits_traits _c
-					on _a.project_id=_c.project_id
-					and _a.trait_id=_c.id
-				
-				left join %PRE%text_translations _t1
-					on _c.project_id=_t1.project_id
-					and _c.name_tid=_t1.text_id
-					and _t1.language_id=".$language."
-				
-				left join %PRE%text_translations _t2
-					on _c.project_id=_t2.project_id
-					and _c.code_tid=_t2.text_id
-					and _t2.language_id=".$language."
-				
-				left join %PRE%text_translations _t3
-					on _c.project_id=_t3.project_id
-					and _c.description_tid=_t3.text_id
-					and _t3.language_id=".$language."
-				
-				left join %PRE%traits_project_types _f
-					on _c.project_id=_f.project_id
-					and _c.project_type_id=_f.id
-				
-				left join %PRE%traits_types _g
-					on _f.type_id=_g.id
-
-				left join 
-					%PRE%traits_date_formats _e
-					on _c.date_format_id=_e.id
-				
-				where
-					_a.project_id=".$this->getCurrentProjectId()."
-					and _a.taxon_id=".$taxon."
-			
-			) as unionized
-			".( $trait ? "where trait_id =".$trait : "" )."
-			order by _show_order_1,_show_order_2
-		");
+		$r=$this->models->TraitsTaxonModel->getTraitsTaxonValues(array(
+			'language_id'=>$language,
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon,
+			'trait_id'=>$trait
+		));
 	
 		$d=array();
 		
@@ -346,7 +197,7 @@ class TraitsTaxonController extends TraitsController
 
 		$existing=$this->getTaxonValues(array('taxon'=>$taxon,'trait'=>$trait));
 		$t=$this->getTraitgroupTrait(array('trait'=>$trait));
-		$this->getSettings($t['trait_group_id']);
+		$this->getTraitsSettings();
 
 		if ($existing)
 		{
@@ -520,49 +371,24 @@ class TraitsTaxonController extends TraitsController
 		if ( empty($taxon) || empty($group) )
 			return;
 
-		$l=$this->models->Literature2->freeQuery("
-			select
-				_ttr.id,
-				_a.id as literature_id,
-				_a.label,
-				_a.citation
-
-			from %PRE%literature2 _a
-
-			right join %PRE%traits_taxon_references _ttr
-				on _a.id = _ttr.reference_id 
-				and _a.project_id=_ttr.project_id
-				and _ttr.trait_group_id=".$group."
-
-			where
-				_a.project_id=".$this->getCurrentProjectId()." 
-				and _ttr.taxon_id=".$taxon
-		);
+		$l=$this->models->TraitsTaxonModel->getLiterature2(array(
+			'trait_group_id'=>$group,
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon
+		));
 
 		foreach((array)$l as $key=>$val)
 		{
-			$authors=$this->models->Literature2Authors->freeQuery("
-				select
-					_a.actor_id, _b.name
-	
-				from %PRE%literature2_authors _a
-	
-				left join %PRE%actors _b
-					on _a.actor_id = _b.id 
-					and _a.project_id=_b.project_id
-	
-				where
-					_a.project_id = ".$this->getCurrentProjectId()."
-					and _a.literature2_id =".$val['literature_id']."
-				order by _b.name
-			");
+			$authors=$this->models->TraitsTaxonModel->getLiterature2Authors(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'literature2_id'=>$val['literature_id']
+			));
 		
 			$l[$key]['authors']=$authors;
 			
 		}
 	
 		return $l;
-
 	}
 
 	private function saveReferences( $p )
@@ -587,14 +413,11 @@ class TraitsTaxonController extends TraitsController
 				$keep[]=$d[0];
 		}
 
-		$this->models->Literature2->freeQuery("
-			delete from 
-				%PRE%traits_taxon_references
-			where
-				project_id=".$this->getCurrentProjectId()." 
-				and taxon_id=".$taxon."
-				and id not in (".implode(",",$keep).")
-		");
+		$this->models->TraitsTaxonReferences->delete(array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'taxon_id'=>$taxon,
+			'id not in #'=>'('.implode(',',$keep).')'
+		));
 		
 		foreach((array)$new as $val)
 		{

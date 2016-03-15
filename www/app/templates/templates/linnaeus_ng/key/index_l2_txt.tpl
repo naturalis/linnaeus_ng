@@ -21,20 +21,20 @@
 		</div>
 		<div id="choices">
 
-{if $choices|@count > 2}
+	{if $choices|@count > 2}
     <table id="choice-grid"><tr><td>
-{/if}
+	{/if}
 
-{foreach from=$choices key=k item=v}
+	{foreach $choices v k}
     {if $k==2}
         </td><td>
     {/if}
 
     <div class="l2_choice" 
         {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+            onclick="window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'"
         {elseif $v.res_taxon_id!=''}
-            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+            onclick="window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'"
         {/if}
     >
 		
@@ -50,24 +50,19 @@
 			{/if}
 			</div>
 		</div>
-{/foreach}
-{if $choices|@count > 2}
-    </td></tr></table>
-{/if}
-		
-		
-		
+	{/foreach}
+	{if $choices|@count > 2}
+    	</td></tr></table>
+	{/if}
 		</div>
 	</div>
 </div>
 
-
-{literal}
 <script>
-$(".inline-image").click(function (e) {
+$(".inline-image").click(function (e)
+{
     e.stopPropagation();
 });
 </script>
-{/literal}
 
 {include file="../shared/footer.tpl"}

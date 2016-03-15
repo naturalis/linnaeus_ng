@@ -1,4 +1,5 @@
 {include file="../shared/admin-header.tpl"}
+
 <div id="page-main">
 <ul>
 {if $totalCount > 0}
@@ -7,7 +8,6 @@
 {/if}
 	<li><a href="edit.php">{t}Create new glossary term{/t}</a></li>
 </ul>
-
 </div>
 
 {include file="../shared/admin-footer.tpl"}

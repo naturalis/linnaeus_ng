@@ -23,8 +23,8 @@
 		<td>{t}Text:{/t}</td>
 		<td colspan="2">
 			<textarea
-				name="contentDefault" 
-				id="contentDefault" 
+				name="contentDefault"
+				id="contentDefault"
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('default')" /></textarea>
 		</td>
@@ -40,8 +40,8 @@
 		<td></td>
 		<td>
 			<textarea
-				name="contentOther" 
-				id="contentOther" 
+				name="contentOther"
+				id="contentOther"
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('other')" /></textarea>
 		</td>
@@ -54,16 +54,15 @@
 		{if $data.choice_img}
 			<img
 				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}','{$data.choice_img}');"
-				src="{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}" 
+				src="{$session.admin.project.urls.project_media}{$data.choice_img}?rnd={$rnd}"
 				class="key-choice-image-normal" /><br />
 			<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 			{if $data.choice_image_params!=''}
 				<br />
 				<span style="color:red">
-					Please note: this image has specific attributes for size and positioning,<br/>
-					which were inherited from Linnaeus 2. These cannot be changed, and will be<br/>
-					erased if you delete the image.
-				</span>{/if}
+					{t}Please note: this image has specific attributes for size and positioning, which were inherited from Linnaeus 2. These cannot be changed, and will be erased if you delete the image.{/t}
+				</span>
+			{/if}
 		{else}
 			<input type="file" name="image" />
 		{/if}
@@ -79,9 +78,9 @@
 				<option value="-1" disabled="disabled">
 				</option>
 			{/if}
-				{section name=i loop=$steps}
-				<option value="{$steps[i].id}"{if $steps[i].id==$data.res_keystep_id} selected="selected"{/if}>{$steps[i].number}. {$steps[i].title}</option>
-				{/section}
+				{foreach $steps v i}
+				<option value="{$v.id}"{if $v.id==$data.res_keystep_id} selected="selected"{/if}>{$v.number}. {$v.title}</option>
+				{/foreach}
 			</select>
 			({t}step{/t})
 		</td>
@@ -114,17 +113,17 @@
 	<tr style="vertical-align:top">
 		<td colspan="3">
 			<input
-				type="button" 
+				type="button"
 				onclick="
 					keyCallRemoveDeadEndChoice({$data.id});
-					if (keyChoiceContentCheck()){literal}{{/literal}
+					if (keyChoiceContentCheck()) {
 						{if $session.admin.project.languages|@count>1}
 						keySaveChoiceContent('default');
-						keySaveChoiceContent('other','$(\'#theForm\').submit();');
+						keySaveChoiceContent('other',$('#theForm').submit());
 						{else}
-						keySaveChoiceContent('default','$(\'#theForm\').submit();');
+						keySaveChoiceContent('default',$('#theForm').submit());
 						{/if}
-					{literal}}{/literal}" 
+					} "
 				value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 		</td>
@@ -147,14 +146,13 @@
 </div>
 
 <script type="text/javascript">
-{literal}
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	initTinyMce(false,false);
 	allActiveView = 'choiceedit';
-{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
+{foreach $languages v i}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
 	allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 	keyChoiceId = {if $data.id}{$data.id}{else}-1{/if};
@@ -162,18 +160,14 @@ $(document).ready(function(){
 	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
-	
-	// temporarily for huub's orchids!
-	$('#res_taxon_id').focus();
-	
-{literal}
 });
 
-function onInitTinyMce() {
+function onInitTinyMce()
+{
 	if (allDefaultLanguage) keyGetChoiceContent(allDefaultLanguage);
 	if (allActiveLanguage) keyGetChoiceContent(allActiveLanguage);
 }
-{/literal}
+
 </script>
 
 {include file="../shared/admin-footer.tpl"}

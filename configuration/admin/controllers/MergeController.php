@@ -3,79 +3,73 @@
 include_once ('Controller.php');
 class MergeController extends Controller
 {
-	
+
 	private $_mediaToMove = array();
-	
+
     public $usedModels = array(
-        'project', 
-        'module', 
-        'project_role_user', 
-        'user', 
-        'role', 
-        'module_project', 
-        'free_module_project', 
-        'module_project_user', 
-        'free_module_project_user', 
-        'language', 
-        'language_project', 
-        'content_taxon', 
-        'page_taxon', 
-        'page_taxon_title', 
-        'commonname', 
-        'synonym', 
-        'media_taxon', 
-        'media_descriptions_taxon', 
-        'content', 
-        'literature', 
-        'literature_taxon', 
-        'keystep', 
-        'content_keystep', 
-        'choice_keystep', 
-        'choice_content_keystep', 
-        'matrix', 
-        'matrix_name', 
-        'matrix_taxon', 
-        'matrix_taxon_state', 
-        'characteristic', 
-        'characteristic_matrix', 
-        'characteristic_label', 
-        'characteristic_state', 
-        'characteristic_label_state', 
-        'glossary', 
-        'glossary_synonym', 
-        'glossary_media', 
-        'free_module_project', 
-        'free_module_project_user', 
-        'free_module_page', 
-        'free_module_media', 
-        'content_free_module', 
-        'occurrence_taxon', 
-        'geodata_type', 
-        'geodata_type_title', 
-        'l2_occurrence_taxon', 
-        'l2_map',
-		'l2_occurrence_taxon_combi',
+        'projects',
+        'modules',
+        'projects_roles_users',
+        'users',
+        'roles',
+        'modules_projects',
+        'free_modules_projects',
+        'modules_projects_users',
+        'free_modules_projects_users',
+        'languages',
+        'languages_projects',
+        'content_taxa',
+        'pages_taxa',
+        'pages_taxa_titles',
+        'commonnames',
+        'synonyms',
+        'media_taxon',
+        'media_descriptions_taxon',
+        'content',
+        'literature',
+        'literature_taxa',
+        'keysteps',
+        'content_keysteps',
+        'choices_keysteps',
+        'choices_content_keysteps',
+        'matrices',
+        'matrices_names',
+        'matrices_taxa',
+        'matrices_taxa_states',
+        'characteristics',
+        'characteristics_matrices',
+        'characteristics_labels',
+        'characteristics_states',
+        'characteristics_labels_states',
+        'glossary',
+        'glossary_synonyms',
+        'glossary_media',
+        'free_modules_pages',
+        'free_module_media',
+        'content_free_modules',
+        'occurrences_taxa',
+        'geodata_types',
+        'geodata_types_titles',
+        'l2_occurrences_taxa',
+        'l2_maps',
+		'l2_occurrences_taxa_combi',
 		'l2_diversity_index',
-        'content_introduction', 
-        'introduction_page', 
-        'introduction_media', 
-        'user_taxon', 
-        'chargroup_label', 
-        'chargroup', 
-        'characteristic_chargroup', 
-        'variation_label', 
-        'taxon_variation', 
-        'taxa_relations', 
-        'variation_relations', 
-        'matrix_variation', 
+        'content_introduction',
+        'introduction_pages',
+        'introduction_media',
+        'users_taxa',
+        'chargroups_labels',
+        'chargroups',
+        'characteristics_chargroups',
+        'variations_labels',
+        'taxa_variations',
+        'taxa_relations',
+        'variation_relations',
+        'matrices_variations',
         'nbc_extras',
-        'heartbeat',
-        'taxon_variation',
-		'hotword',
-        'content_taxon_undo', 
-		'choice_content_keystep_undo',
-        'section',
-		'keytree'
+		'hotwords',
+        'sections',
+		'keytrees'
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -116,17 +110,17 @@ class MergeController extends Controller
     {
 
         $this->checkAuthorisation(true);
-        
+
         $this->setPageName($this->translate('Merge project'));
-        
+
         if ($this->rHasVal('id')) {
 
-			$merge = $this->models->Project->_get(array(
-				'id' => array('id' => $this->requestData['id']),
+			$merge = $this->models->Projects->_get(array(
+				'id' => array('id' => $this->rGetId()),
 				'order' => 'title'
-			));        
+			));
 
-			$modules = $this->getProjectModules(array('project_id'=>$this->requestData['id']));
+			$modules = $this->getProjectModules(array('project_id'=>$this->rGetId()));
 
 
 			$moduleInfo = array(
@@ -145,40 +139,40 @@ class MergeController extends Controller
 			$this->smarty->assign('modulesToIgnore',array(MODCODE_INDEX,MODCODE_UTILITIES,MODCODE_CONTENT,MODCODE_HIGHERTAXA));
 			$this->smarty->assign('moduleInfo',$moduleInfo);
 
-        }		
+        }
 
         if ($this->rHasVal('action', 'merge') && $this->rHasVal('id')) {// && !$this->isFormResubmit()) {
 
 			$res = $this->doMergeProject(
 				array(
-					'sourceId' => $this->requestData['id'],
+					'sourceId' => $this->rGetId(),
 					'targetId' => $this->getCurrentProjectId(),
 					'postfix' => ' ('.$merge[0]['title'].')',
-					'modules' => isset($this->requestData['modules']) ? $this->requestData['modules'] : null,
-					'freeModules' => isset($this->requestData['freeModules']) ? $this->requestData['freeModules'] : null,
+					'modules' => $this->rHasVar('modules') ? $this->rGetVal('modules') : null,
+					'freeModules' => $this->rHasVar('freeModules') ? $this->rGetVal('freeModules') : null
 				)
 			);
-			
+
 			if ($res) {
-        
+
 				$this->reInitUserRolesAndRights();
-				
+
 				$this->addMessage('Project merged.');
-				
+
 			} else {
 
 				$this->addError('Project merge failed.');
 
 			}
-			
+
 			$this->smarty->assign('processed',true);
 
         }
 
-		$projects = $this->models->Project->_get(array(
+		$projects = $this->models->Projects->_get(array(
 			'id' => array('id !=' => $this->getCurrentProjectId()),
 			'order' => 'title'
-		));        
+		));
 
 		$this->smarty->assign('current', $_SESSION['admin']['project']['title']);
 		$this->smarty->assign('projects', $projects);
@@ -190,16 +184,16 @@ class MergeController extends Controller
     {
 
 		$d = $this->models->IntroductionMedia->_get(array('id' => array('project_id' => $p['s'])));
-		
+
 		foreach((array)$d as $val) {
-			if (!empty($val['file_name'])) 
+			if (!empty($val['file_name']))
 				$this->_mediaToMove['files'][] = $val['file_name'];
 		}
         $this->models->ContentIntroduction->update(
-			array('project_id' => $p['t'],'topic' => '#concat(topic,\''.mysql_real_escape_string($p['p']).'\')'),
+			array('project_id' => $p['t'],'topic' => '#concat(topic,\''.$p['p'].'\')'),
 			array('project_id' => $p['s'])
 		);
-        $this->models->IntroductionPage->update(
+        $this->models->IntroductionPages->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -207,7 +201,7 @@ class MergeController extends Controller
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-		
+
 		$this->addMessage('Merged introduction.');
 
     }
@@ -216,9 +210,9 @@ class MergeController extends Controller
     {
 
 		$d = $this->models->GlossaryMedia->_get(array('id' => array('project_id' => $p['s'])));
-		
+
 		foreach((array)$d as $val) {
-			if (!empty($val['file_name'])) 
+			if (!empty($val['file_name']))
 				$this->_mediaToMove['files'][] = $val['file_name'];
 		}
 
@@ -226,7 +220,7 @@ class MergeController extends Controller
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->GlossarySynonym->update(
+        $this->models->GlossarySynonyms->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -241,7 +235,7 @@ class MergeController extends Controller
 
     private function mergeLiterature ($p)
     {
-        $this->models->LiteratureTaxon->update(
+        $this->models->LiteratureTaxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -258,17 +252,17 @@ class MergeController extends Controller
 	{
 
 		// all source categories
-        $oldCats = $this->models->PageTaxon->_get(array(
+        $oldCats = $this->models->PagesTaxa->_get(array(
             'id' => array('id' => $p['s']),
 			'fieldAsIndex' => 'id'
         ));
-		
+
 		$del = array();
-		
+
 		// see if any source categories already exist by name in the target
 		foreach((array)$oldCats as $key => $oldCat) {
 
-			$d = $this->models->PageTaxon->_get(array(
+			$d = $this->models->PagesTaxa->_get(array(
 				'id' => array('id' => $p['t'],'page' => $oldCat['page'])
 			));
 
@@ -281,35 +275,35 @@ class MergeController extends Controller
 		}
 		if (!empty($del)) {
 			// delete the duplicate categories in the source
-			$this->models->PageTaxonTitle->delete(
+			$this->models->PagesTaxaTitles->delete(
 				array(
 					'project_id' => $p['s'],
 					'page_id in'=> '('.implode(',',$del).')'
 				)
 			);
-			$this->models->PageTaxon->delete(
+			$this->models->PagesTaxa->delete(
 				array(
 					'project_id' => $p['s'],
 					'id in'=> '('.implode(',',$del).')'
 				)
 			);
 		}
-				
+
 		// update the rest to the target
-		$this->models->PageTaxon->update(
+		$this->models->PagesTaxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-		
-		$this->models->PageTaxonTitle->update(
+
+		$this->models->PagesTaxaTitles->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-		
+
 		foreach((array)$oldCats as $key => $val) {
 
 			// set new category for the pages of the now deleted source categories
-			$this->models->ContentTaxon->update(
+			$this->models->ContentTaxa->update(
 				array('page_id' => $val['id']),
 				array(
 					'project_id' => $p['s'],
@@ -318,26 +312,21 @@ class MergeController extends Controller
 			);
 
 		}
-	
+
 		// update the rest to the target
-        $this->models->ContentTaxon->update(
+        $this->models->ContentTaxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
 
-		// to hell with the undo
-        $this->models->ContentTaxonUndo->delete(array(
+		// and the sections (they're just templates anyway)
+        $this->models->Sections->delete(array(
             'project_id' => $p['s']
         ));
 
-		// and the sections (they're just templates anyway)
-        $this->models->Section->delete(array(
-            'project_id' => $p['s']
-        ));
-		
 		$this->addMessage('Merged taxon content.');
 
-	}			
+	}
 
     private function mergeTaxa ($p)
     {
@@ -346,11 +335,11 @@ class MergeController extends Controller
 		$oldranks = $this->newGetProjectRanks(array('pId'=>$p['s']));
 
 		// get top rank in target
-		$d = $this->models->ProjectRank->_get(array('id' => array('project_id' => $p['t'], 'parent_id is' => 'null'), 'columns' => 'id'));
+		$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['t'], 'parent_id is' => 'null'), 'columns' => 'id'));
 		$newTopRankProjectId = $d[0]['id'];
-				
+
 		$resolvedRanks = array();
-		
+
 		// go through old ranks
 		foreach((array)$oldranks as $key => $val) {
 
@@ -359,74 +348,74 @@ class MergeController extends Controller
 				continue;
 
 			// get the corresponding project rank id in the target
-			$d = $this->models->ProjectRank->_get(
+			$d = $this->models->ProjectsRanks->_get(
 			array(
 				'id' => array(
-					'project_id' => $p['t'], 
+					'project_id' => $p['t'],
 					'rank_id' => $val['rank_id']
-				), 
+				),
 				'columns' => 'id'
 			));
-			
+
 			// if found, remember
 			if (!empty($d[0]['id'])) {
-				
+
 				$resolvedRanks[$key] = $d[0]['id'];
 
-			} 
+			}
 			// if not found, create it in the target and remember
 			else {
 
-				$this->models->ProjectRank->save(
+				$this->models->ProjectsRanks->save(
 				array(
-					'id' => null, 
-					'project_id' => $p['t'], 
-					'rank_id' => $val['rank_id'], 
+					'id' => null,
+					'project_id' => $p['t'],
+					'rank_id' => $val['rank_id'],
 					'parent_id' => $newTopRankProjectId, // i know, but soit, no one will ever notice as they parent-child relations in project ranks are unused
 					'lower_taxon' => $val['lower_taxon'],
 					'keypath_endpoint' => $val['keypath_endpoint']
 				));
 
-				$resolvedRanks[$key] = $this->models->ProjectRank->getNewId();
+				$resolvedRanks[$key] = $this->models->ProjectsRanks->getNewId();
 
 			}
 
 		}
 
 		// checking for a top taxon in the source
-		$d = $this->models->ProjectRank->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => EMPIRE_RANK_ID), 'columns' => 'id'));
+		$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => EMPIRE_RANK_ID), 'columns' => 'id'));
 		if (empty($d[0]['id']))
-			$d = $this->models->ProjectRank->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => KINGDOM_RANK_ID), 'columns' => 'id'));
+			$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => KINGDOM_RANK_ID), 'columns' => 'id'));
 
 		if (!empty($d[0]['id'])) {
-					
-			$taxonToIgnore = $this->models->Taxon->_get(array(
+
+			$taxonToIgnore = $this->models->Taxa->_get(array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'rank_id' => $d[0]['id']
 				)
 			));
-			
+
 			if (!empty($taxonToIgnore[0]['id'])) {
 				$taxonToIgnore = $taxonToIgnore[0]['id'];
 
-				$this->models->Taxon->update(
+				$this->models->Taxa->update(
 					array('parent_id' => 'null'),
 					array('project_id' => $p['s'],'parent_id' => $taxonToIgnore)
 				);
-	
+
 			}
-			
+
 		}
 
-        $this->models->Taxon->update(
+        $this->models->Taxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-		
+
 		if (isset($taxonToIgnore)) {
 
-			$this->models->Taxon->update(
+			$this->models->Taxa->update(
 				array('project_id' => $p['s']),
 				array('project_id' => $p['t'],'id' => $taxonToIgnore)
 			);
@@ -435,8 +424,8 @@ class MergeController extends Controller
 
 		foreach((array)$resolvedRanks as $key => $val) {
 
-			// set new rank_id for the taxa 
-			$this->models->Taxon->update(
+			// set new rank_id for the taxa
+			$this->models->Taxa->update(
 				array('rank_id' => $val),
 				array('project_id' => $p['t'],'rank_id' => $key)
 			);
@@ -451,19 +440,19 @@ class MergeController extends Controller
 	{
 
 		$d = $this->models->MediaTaxon->_get(array('id' => array('project_id' => $p['s'])));
-	
+
 		foreach((array)$d as $val) {
-			if (!empty($val['file_name'])) 
+			if (!empty($val['file_name']))
 				$this->_mediaToMove['files'][] = $val['file_name'];
-			if (!empty($val['thumb_name'])) 
+			if (!empty($val['thumb_name']))
 				$this->_mediaToMove['thumbs'][] = $val['thumb_name'];
 		}
-	
-        $this->models->Commonname->update(
+
+        $this->models->Commonnames->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->Synonym->update(
+        $this->models->Synonyms->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -479,7 +468,7 @@ class MergeController extends Controller
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->TaxonVariation->update(
+        $this->models->TaxaVariations->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -487,7 +476,7 @@ class MergeController extends Controller
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->VariationLabel->update(
+        $this->models->VariationsLabels->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -499,33 +488,33 @@ class MergeController extends Controller
     private function mergeKey ($p)
 	{
 
-		$d = $this->models->ChoiceKeystep->_get(array('id' => array('project_id' => $p['s'])));
-		
+		$d = $this->models->ChoicesKeysteps->_get(array('id' => array('project_id' => $p['s'])));
+
 		foreach((array)$d as $val) {
-			if (!empty($val['choice_img'])) 
+			if (!empty($val['choice_img']))
 				$this->_mediaToMove['files'][] = $val['choice_img'];
 		}
 
-		$d = $this->models->Keystep->_get(array('id' => array('project_id' => $p['s'])));
-		
+		$d = $this->models->Keysteps->_get(array('id' => array('project_id' => $p['s'])));
+
 		foreach((array)$d as $val) {
-			if (!empty($val['image'])) 
+			if (!empty($val['image']))
 				$this->_mediaToMove['files'][] = $val['image'];
 		}
-	 
-        $this->models->Keystep->update(
+
+        $this->models->Keysteps->update(
 			array('project_id' => $p['t'],'is_start' => 0),
 			array('project_id' => $p['s'])
 		);
-        $this->models->ContentKeystep->update(
+        $this->models->ContentKeysteps->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->ChoiceKeystep->update(
+        $this->models->ChoicesKeysteps->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->ChoiceContentKeystep->update(
+        $this->models->ChoicesContentKeysteps->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -537,62 +526,62 @@ class MergeController extends Controller
     private function mergeMatrices ($p)
 	{
 
-		$d = $this->models->CharacteristicState->_get(array('id' => array('project_id' => $p['s'])));
-		
+		$d = $this->models->CharacteristicsStates->_get(array('id' => array('project_id' => $p['s'])));
+
 		foreach((array)$d as $val) {
-			if (!empty($val['file_name'])) 
+			if (!empty($val['file_name']))
 				$this->_mediaToMove['files'][] = $val['file_name'];
 		}
 
-        $this->models->Matrix->update(
+        $this->models->Matrices->update(
 			array('project_id' => $p['t'],'default' => 0),
 			array('project_id' => $p['s'])
 		);
-        $this->models->MatrixName->update(
-			array('project_id' => $p['t'],'name' => '#concat(name,\''.mysql_real_escape_string($p['p']).'\')'),
+        $this->models->MatricesNames->update(
+			array('project_id' => $p['t'],'name' => '#concat(name,\''.$p['p'].'\')'),
 			array('project_id' => $p['s'])
 		);
-        $this->models->MatrixTaxon->update(
+        $this->models->MatricesTaxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->MatrixTaxonState->update(
+        $this->models->MatricesTaxaStates->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->Characteristic->update(
+        $this->models->Characteristics->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->CharacteristicMatrix->update(
+        $this->models->CharacteristicsMatrices->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->CharacteristicLabel->update(
+        $this->models->CharacteristicsLabels->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->CharacteristicState->update(
+        $this->models->CharacteristicsStates->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->CharacteristicLabelState->update(
+        $this->models->CharacteristicsLabelsStates->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->ChargroupLabel->update(
+        $this->models->ChargroupsLabels->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->Chargroup->update(
+        $this->models->Chargroups->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->CharacteristicChargroup->update(
+        $this->models->CharacteristicsChargroups->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->MatrixVariation->update(
+        $this->models->MatricesVariations->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -607,30 +596,30 @@ class MergeController extends Controller
     private function mergeDistribution ($p)
 	{
 
-		$d = $this->models->L2Map->_get(array('id' => array('project_id' => $p['s'])));
-		
+		$d = $this->models->L2Maps->_get(array('id' => array('project_id' => $p['s'])));
+
 		foreach((array)$d as $val) {
-			if (!empty($val['image'])) 
+			if (!empty($val['image']))
 				$this->_mediaToMove['l2maps'][] = $val['image'];
 		}
 
-        $this->models->OccurrenceTaxon->update(
+        $this->models->OccurrencesTaxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->GeodataType->update(
+        $this->models->GeodataTypes->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->GeodataTypeTitle->update(
+        $this->models->GeodataTypesTitles->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->L2OccurrenceTaxon->update(
+        $this->models->L2OccurrencesTaxa->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->L2OccurrenceTaxonCombi->update(
+        $this->models->L2OccurrencesTaxaCombi->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -638,7 +627,7 @@ class MergeController extends Controller
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
-        $this->models->L2Map->update(
+        $this->models->L2Maps->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);
@@ -650,36 +639,36 @@ class MergeController extends Controller
     private function mergeFreeModule ($p)
     {
 
-		$d = $this->models->FreeModulePage->_get(array('id' => array('project_id' => $p['s'],'module_id' => $p['mId'])));
-		
+		$d = $this->models->FreeModulesPages->_get(array('id' => array('project_id' => $p['s'],'module_id' => $p['mId'])));
+
 		foreach((array)$d as $val) {
-			if (!empty($val['image'])) 
+			if (!empty($val['image']))
 				$this->_mediaToMove['files'][] = $val['image'];
 		}
 
-		$fmp = $this->models->FreeModuleProject->_get(
+		$fmp = $this->models->FreeModulesProjects->_get(
 			array(
 				'id' => array('project_id' => $p['s'],'id' => $p['mId'])
 			)
 		);
 
-        $this->models->ContentFreeModule->update(
+        $this->models->ContentFreeModules->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'],'module_id' => $p['mId'])
 		);
 
-        $this->models->FreeModulePage->update(
+        $this->models->FreeModulesPages->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'],'module_id' => $p['mId'])
 		);
 
-        $this->models->FreeModuleProjectUser->update(
+        $this->models->FreeModulesProjectsUsers->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'],'free_module_id' => $p['mId'])
 		);
 
-        $this->models->FreeModuleProject->update(
-			array('project_id' => $p['t'],'module' => '#concat(module,\''.mysql_real_escape_string($p['p']).'\')'),
+        $this->models->FreeModulesProjects->update(
+			array('project_id' => $p['t'],'module' => '#concat(module,\''.$p['p'].'\')'),
 			array('project_id' => $p['s'],'id' => $p['mId'])
 		);
 
@@ -703,12 +692,12 @@ class MergeController extends Controller
 
 
 
-		
+
 	private function doMergeProject($p)
 	{
-		
+
 		/*
-		
+
 			we MIGHT need a duplicate doorverwijs system (glossary etc)? sod off, just use hotwords.
 
 		*/
@@ -718,7 +707,7 @@ class MergeController extends Controller
 		$modules = isset($p['modules']) ? $p['modules'] : null;
 		$freeModules = isset($p['freeModules']) ? $p['freeModules'] : null;
 		$postfix = isset($p['postfix']) ? $p['postfix'] : null;
-		
+
 		if (empty($sourceId))
 			$this->addError('No source project specified.');
 		if (empty($targetId))
@@ -728,15 +717,15 @@ class MergeController extends Controller
 
 		if (empty($sourceId) || empty($targetId) || (empty($modules) && empty($freeModules)))
 			return false;
-			
+
 		$p = array('s' => $sourceId,'t' => $targetId,'p' => $postfix);
-		
+
 		set_time_limit(900);
-        
+
 		foreach((array)$modules as $val) {
 
 			/*
-			
+
 			v MODCODE_INTRODUCTION => 'Pages will be added to current introduction pages, with altered titles',
 			v MODCODE_GLOSSARY => 'Items will be added to current glossary, <b>without</b> checking for duplicates',
 			v MODCODE_LITERATURE => 'Items will be added to current glossary, <b>without</b> checking for duplicates',
@@ -745,9 +734,9 @@ class MergeController extends Controller
 			v MODCODE_MATRIXKEY => 'Matrix key(s) will be imported as extra matrices, with altered titles',
 			v MODCODE_DISTRIBUTION => 'Will be imported <i>as is</i>, with relation to species in tact',
 			v 'free' => 'Additional ("free") modules will be imported <i>as is</i>, with altered module names'
-			
+
 			*/
-	
+
 			switch($val) {
 
 				case MODCODE_INTRODUCTION:
@@ -773,44 +762,44 @@ class MergeController extends Controller
 				case MODCODE_DISTRIBUTION:
 					$this->mergeDistribution($p);
 					break;
-				
+
 			}
 
-	        $d = $this->models->ModuleProject->_get(array(
+	        $d = $this->models->ModulesProjects->_get(array(
 				'id' =>
 					array(
-						'project_id' => $targetId, 
-						'module_id' => $val, 
+						'project_id' => $targetId,
+						'module_id' => $val,
 					)
 			));
-			
+
 			if (empty($d)) {
-			
+
 				$this->addModuleToProject($val,$targetId,99);
 				$this->grantModuleAccessRights($val,$targetId);
-				
+
 			}
 
 		}
 
 		foreach((array)$freeModules as $val) {
-			
-			
-			
+
+
+
 			$p['mId'] = $val;
 	        $this->mergeFreeModule($p);
-			$this->models->FreeModuleProjectUser->save(
+			$this->models->FreeModulesProjectsUsers->save(
 			array(
-				'id' => null, 
+				'id' => null,
 				'project_id' => $p['t'],
-				'free_module_id' => $p['mId'], 
+				'free_module_id' => $p['mId'],
 				'user_id' => $this->getCurrentUserId()
 			));
 		}
-		
+
 		$srcPaths = $this->makePathNames($sourceId);
 		$tgtPaths = $this->makePathNames($targetId);
-		
+
 		if (isset($this->_mediaToMove['files'])) {
 
 			$i=0;
@@ -820,9 +809,9 @@ class MergeController extends Controller
 					$tgtPaths['project_media'].$file
 				)) $i++;
 			}
-			
+
 			$this->addMessage(sprintf('Moved %s images.',$i));
-			
+
 		}
 
 
@@ -835,7 +824,7 @@ class MergeController extends Controller
 					$tgtPaths['project_thumbs'].$file
 				)) $i++;
 			}
-	
+
 			$this->addMessage(sprintf('Moved %s thumbs.',$i));
 
 		}
@@ -850,11 +839,11 @@ class MergeController extends Controller
 					$tgtPaths['project_media_l2_maps'].$file
 				)) $i++;
 			}
-	
+
 			$this->addMessage(sprintf('Moved %s Linnaues 2-maps.',$i));
 
 		}
-		
+
 		return true;
 
 	}

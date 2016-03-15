@@ -47,8 +47,6 @@ class TraitsDataController extends TraitsController
    
     public $controllerPublicName = 'Kenmerken';
 
-    public $cacheFiles = array();
-    
     public $cssToLoad = array(
 		'traits.css',
 //		'taxon_groups.css'
@@ -68,7 +66,7 @@ class TraitsDataController extends TraitsController
     public function __construct ()
     {
         parent::__construct();
-		$this->initialise();
+		$this->initialize();
     }
 
     public function __destruct ()
@@ -76,7 +74,7 @@ class TraitsDataController extends TraitsController
         parent::__destruct();
     }
 
-    private function initialise()
+    private function initialize()
     {
 		$this->smarty->assign('sysColSpecies',$this->_sysColSpecies);
 		$this->smarty->assign('sysColReferences',$this->_sysColReferences);
@@ -152,7 +150,7 @@ class TraitsDataController extends TraitsController
 
 		if ( isset($f['traitgroup']) )
 		{
-			$this->getSettings( $f['traitgroup'] );
+			$this->getTraitsSettings();
 			$this->matchTraits();
 			$this->matchSpecies();
 			$this->matchValues();
@@ -179,7 +177,7 @@ class TraitsDataController extends TraitsController
 		$this->checkAuthorisation();
 
 		$f=$this->getDataSession();
-		$this->getSettings($f['traitgroup']);
+		$this->getTraitsSettings();
 
 		if ( $this->rHasVal('action','save') )
 		{
@@ -212,89 +210,68 @@ class TraitsDataController extends TraitsController
 		$this->printPage();
     }
 
-
-
 	private function setJoinrows($data)
 	{
-		unset($_SESSION['admin']['traits']['data']['joinrows']);
+		$this->moduleSession->setModuleSetting( array('setting'=>'joinrows' ) );
 		if (!is_null($data))
 		{
+			$data=array();
 			foreach((array)$data as $val)
 			{
 				$d=explode(",",trim($val,'[]'));
-				$_SESSION['admin']['traits']['data']['joinrows'][$d[0]]=$d[1];
+				$data[$d[0]]=$d[1];
 			}
+			$this->moduleSession->setModuleSetting( array('setting'=>'joinrows','value'=>$data ) );
 		}	
 	}
 
 	private function getJoinrows()
 	{
-		return isset($_SESSION['admin']['traits']['data']['joinrows']) ? $_SESSION['admin']['traits']['data']['joinrows'] : false;
+		return null!==$this->moduleSession->getModuleSetting( 'joinrows' ) ? 
+			$this->moduleSession->getModuleSetting( 'joinrows' ) : 
+			false;
 	}
 
 	private function setIsRotated($state)
 	{
-		if (is_null($state))
-		{
-			unset($_SESSION['admin']['traits']['data']['rotated']);
-		}
-		else
-		{
-			$_SESSION['admin']['traits']['data']['rotated']=$state;
-		}	
+		$this->moduleSession->setModuleSetting( array('setting'=>'rotated','value'=>$state ) );
 	}
 
 	private function getIsRotated()
 	{
-		return isset($_SESSION['admin']['traits']['data']['rotated']) ? $_SESSION['admin']['traits']['data']['rotated'] : false;
+		return null!==$this->moduleSession->getModuleSetting( 'rotated' ) ? 
+			$this->moduleSession->getModuleSetting( 'rotated' ) :
+			false;
 	}
 
-	private function setDataSession($p)
+	private function setDataSession($data)
 	{
-		if (is_null($p))
-		{
-			unset($_SESSION['admin']['traits']['data']);
-		}
-		else
-		{
-			$_SESSION['admin']['traits']['data']=$p;
-		}
+		$this->moduleSession->setModuleSetting( array('setting'=>'data','data'=>$data ) );
 	}
 
 	private function getDataSession()
 	{
-		return isset($_SESSION['admin']['traits']['data']) ? $_SESSION['admin']['traits']['data'] : null;
+		return $this->moduleSession->getModuleSetting( 'data' );
 	}
 
 	private function setSessionLines($lines)
 	{
-		if (is_null($lines))
-		{
-			unset($_SESSION['admin']['traits']['data']['lines']);
-		}
-		else
-		{
-			$_SESSION['admin']['traits']['data']['lines']=$lines;
-		}
+		$this->moduleSession->setModuleSetting( array('setting'=>'lines','value'=>$lines) );
 	}
 
 	private function getSessionLines()
 	{
-		return
-			isset($_SESSION['admin']['traits']['data']['lines']) ? 
-				$_SESSION['admin']['traits']['data']['lines'] : 
-				null;
+		return $this->moduleSession->getModuleSetting( 'lines' );
 	}
 
 	private function setReferenceListSession( $p )
 	{
-		unset($_SESSION['admin']['traits']['reference_list']);
-		if ( !is_null($p) ) $_SESSION['admin']['traits']['reference_list']=$p;
+		$this->moduleSession->setModuleSetting( array('setting'=>'reference_list','value'=>$p ) );
 	}
 
 	private function getReferenceListSession()
 	{
-		return isset($_SESSION['admin']['traits']['reference_list']) ? $_SESSION['admin']['traits']['reference_list'] : null;
+		return $this->moduleSession->getModuleSetting( 'reference_list' );
 	}
 
 	private function array_rotate($array)
@@ -601,49 +578,16 @@ class TraitsDataController extends TraitsController
 		}
 
 		$existingTaxonValues=
-			$this->models->TraitsTaxonValues->freeQuery(array("query"=>"
-				select
-					_ttv.taxon_id, count(_ttv.id) as total
-				from
-					%PRE%traits_traits _tt
-	
-				left join 
-					%PRE%traits_values _tv
-					on _tt.project_id=_tv.project_id
-					and _tt.id=_tv.trait_id
-	
-				left join 
-					%PRE%traits_taxon_values _ttv
-					on _tv.project_id=_ttv.project_id
-					and _tv.id=_ttv.value_id
-	
-				where
-					_tt.project_id=". $this->getCurrentProjectId()."
-					and _tt.trait_group_id=".$data['traitgroup']."
-					and _ttv.taxon_id is not null
-				group by _ttv.taxon_id 
-	
-			","fieldAsIndex"=>"taxon_id"));
+			$this->models->TraitsDataModel->getExistingTaxonValueCount(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'trait_group_id'=>$data['traitgroup']
+			));
 
 		$existingTaxonFreeValues=
-			$this->models->TraitsTaxonFreevalues->freeQuery(array("query"=>"
-				select
-					_ttf.taxon_id, count(_ttf.id) as total
-				from
-					%PRE%traits_traits _tt
-	
-				left join 
-					%PRE%traits_taxon_freevalues _ttf
-					on _tt.project_id=_ttf.project_id
-					and _tt.id=_ttf.trait_id
-
-				where
-					_tt.project_id=". $this->getCurrentProjectId()."
-					and _tt.trait_group_id=".$data['traitgroup']."
-					and _ttf.taxon_id is not null
-				group by _ttf.taxon_id 
-	
-			","fieldAsIndex"=>"taxon_id"));
+			$this->models->TraitsDataModel->getExistingTaxonFreeValueCount(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'trait_group_id'=>$data['traitgroup']
+			));
 			
 		$any_existing_values=false;
 
@@ -856,24 +800,20 @@ class TraitsDataController extends TraitsController
 			$this->addMessage(sprintf($this->translate('Resolved reference # %s to "%s"'),$key,$val));
 		}
 
-		//q($references,1);
-
 		$data['references']=$references;
 		
 		$this->setDataSession($data);
 	}
 
-
-
 	private function getLiterature2ById( $iets )
 	{
-		$r=$this->models->Literature2->freeQuery("
-			select
-				* 
-			from %PRE%literature2
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				and id = ".$iets);
+		$r=$this->models->Literature2->_get(array(
+			'id'=>
+				array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'id'=>$iets
+				)
+		));
 
 		if ( $r )
 		{
@@ -919,8 +859,6 @@ class TraitsDataController extends TraitsController
 		$this->setReferenceListSession( $d );
 
 	}
-
-
 
 	private function saveValues()
 	{
@@ -1108,20 +1046,11 @@ class TraitsDataController extends TraitsController
 		{
 			if (isset($val['trait_id']) && !isset($deletedtraits[$val['taxon_id']][$val['trait_id']]))
 			{
-				$this->models->TraitsTaxonValues->freeQuery("
-					delete from 
-						%PRE%traits_taxon_values
-					where
-						project_id=".$val['project_id']."
-						and taxon_id=".$val['taxon_id']."
-						and value_id in (
-							select id 
-							from %PRE%traits_values 
-							where
-								project_id=".$val['project_id']."
-								and trait_id=".$val['trait_id']."
-							)
-				");
+				$this->models->TraitsDataModel->deleteTraitsTaxonValues(array(
+					'project_id'=>$val['project_id'],
+					'taxon_id'=>$val['taxon_id'],
+					'trait_id'=>$val['trait_id']
+				));
 				$deletedtraits[$val['taxon_id']][$val['trait_id']]=true;
 			}
 

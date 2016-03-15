@@ -22,7 +22,7 @@
 						{else if  $activeCategory=='external' && $ext_tab==$v.id}
 						{$v.title}
                         {else}
-						<a href="{if $v.redirect_to}{$v.redirect_to}&ext_tab={$v.id}{else}../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}{/if}" class="{$v.className}">
+						<a href="{if $v.redirect_to}{$v.redirect_to}&ext_tab={$v.id}{else}../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}{/if}" class="{$v.className}" {if $v.external_reference->link_embed=='link_new'} target="_blank"{/if}>
                         	{$v.title}
 						</a>	
 						{/if}

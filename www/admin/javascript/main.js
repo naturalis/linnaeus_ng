@@ -113,9 +113,15 @@ function _(text) {
 	        data: ({text: text, action: 'translate'})
 	        }).responseText;
 
-	allTranslations[allTranslations.length]=[text,translation];
-
-	return translation;
+	if (translation.length>0)
+	{
+		allTranslations[allTranslations.length]=[text,translation];
+		return translation;
+	}
+	else
+	{
+		return text;
+	}
 
 }
 
