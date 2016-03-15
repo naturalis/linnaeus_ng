@@ -179,12 +179,7 @@ class MediaController extends Controller
     public function selectRsAction ()
     {
         $this->checkAuthorisation();
-
-        // global get module id?
-        //$this->smarty->assign('module_id', $this->getCurrentModuleId());
         $this->smarty->assign('media', $this->getRsMediaList());
-        //print_r($this->media->getMediaList());
-
         $this->printPage();
     }
 
@@ -292,6 +287,7 @@ class MediaController extends Controller
 
                     // Store core data
                     $media = $this->_result->resource;
+
                     $this->models->Media->save(array(
                         'id' => null,
                         'project_id' => $this->getCurrentProjectId(),
@@ -393,7 +389,7 @@ class MediaController extends Controller
     private function uploadedFileIsValid ($file)
     {
         // Check mime type
-        if (!!$this->getMimeTypeCategory($file['type'])) {
+        if (!$this->getMimeTypeCategory($file['type'])) {
             $this->addError(_('Mime type') . ' ' . $file['type'] . ' ' .
                 _('not supported') . ': ' . $file['name']);
             return false;
@@ -619,32 +615,44 @@ class MediaController extends Controller
         if ($list['total'] > 0) {
 
             foreach ($media as $i => $resource) {
-                $image['rs_id'] = $resource['rs_id'];
-                $image['media_id'] = $resource['id'];
-                $image['title'] = $resource['title'];
-                $image['file_name'] = $resource['name'];
-                $image['height'] = $resource['height'];
-                $image['width'] = $resource['width'];
-                $image['source'] = $resource['rs_original'];
-                $image['modified'] = $resource['last_change'];
-                $image['thumbnails'] = array(
-                    'small' => $resource['rs_thumb_small'],
-                    'medium' => $resource['rs_thumb_medium'],
-                    'large' => $resource['rs_thumb_large']
-                );
+                $file['rs_id'] = $resource['rs_id'];
+                $file['media_id'] = $resource['id'];
+                $file['title'] = $resource['title'];
+                $file['file_name'] = $resource['name'];
+                $file['mime_type'] = $resource['mime_type'];
+                $file['file_type'] = $this->getMimeTypeCategory($resource['mime_type']);
+                $file['height'] = $resource['height'];
+                $file['width'] = $resource['width'];
+                $file['source'] = $resource['rs_original'];
+                $file['modified'] = $resource['last_change'];
 
-                $image['alt_files'] = '';
+                // Set default image
+                if ($file['file_type'] == 'audio' || $file['file_type'] == 'video') {
+                    $file['thumbnails'] = array(
+                        'small' => $resource['rs_thumb_small'],
+                        'medium' => $resource['rs_thumb_medium'],
+                        'large' => $resource['rs_thumb_large']
+                    );
+                } else {
+                    $file['thumbnails'] = array(
+                        'small' => $resource['rs_thumb_small'],
+                        'medium' => $resource['rs_thumb_medium'],
+                        'large' => $resource['rs_thumb_large']
+                    );
+                }
+
+                $file['alt_files'] = '';
                 foreach (array('rs_resized_1', 'rs_resized_2') as $alt) {
                     if (!empty($resource[$alt])) {
-                        $image['alt_files'][] = $resource[$alt];
+                        $file['alt_files'][] = $resource[$alt];
                     }
                 }
 
                 // add flag if image is already attached to entity
-                $image['attached'] = isset($attached) && is_array($attached) &&
+                $file['attached'] = isset($attached) && is_array($attached) &&
                     in_array($resource['id'], $attached) ? 1 : 0;
 
-                $list['images'][$i] = $image;
+                $list['files'][$i] = $file;
             }
         }
 
@@ -699,29 +707,28 @@ class MediaController extends Controller
         $r = $this->_result;
         $list['total'] = $r->total;
         foreach ($r->resources as $i => $resource) {
-            $files = $resource->files;
-            $image['rs_id'] = $resource->ref;
-            $image['title'] = $resource->Title;
-            $image['file_name'] = $resource->Original_filename;
-            $image['height'] = $resource->files[0]->height;
-            $image['width'] = $resource->files[0]->width;
-            $image['extension'] = $resource->files[0]->extension;
-            $image['source'] = $resource->files[0]->src;
-            $image['modified'] = $resource->file_modified;
-            $image['thumbnails'] = (array)$resource->thumbnails;
+            $file['rs_id'] = $resource->ref;
+            $file['title'] = $resource->Title;
+            $file['file_name'] = $resource->Original_filename;
+            $file['height'] = $resource->files[0]->height;
+            $file['width'] = $resource->files[0]->width;
+            $file['extension'] = $resource->files[0]->extension;
+            $file['source'] = $resource->files[0]->src;
+            $file['modified'] = $resource->file_modified;
+            $file['thumbnails'] = (array)$resource->thumbnails;
 
-            $image['alt_files'] = '';
+            $file['alt_files'] = '';
             $nrAltFiles = count($resource->files) - 1;
             if ($nrAltFiles > 0) {
                 for ($j = 1; $nrAltFiles + 1; $j++) {
                     $altFiles[] = (array)$resource->files[$j];
                 }
-                $image['alt_files'] = $altFiles;
+                $file['alt_files'] = $altFiles;
             }
 
             // add flag if image is already attached to entity
-            $image['attached'] = 0;
-            $list['images'][$i] = $image;
+            $file['attached'] = 0;
+            $list['files'][$i] = $file;
         }
         return $list;
     }
@@ -1010,7 +1017,7 @@ class MediaController extends Controller
     private function getMimeTypeCategory ($mime)
     {
         foreach ($this::$mimeTypes as $category => $types) {
-            foreach ($this::$mimeTypes as $extension => $type) {
+            foreach ($types as $extension => $type) {
                 if ($mime == $type) {
                     return $category;
                 }

@@ -31,7 +31,7 @@
 }
 #page-main .list li .list-grid-info {
 	display: inline-block;
-	width: 300px;
+	width: 30%;
 }
 #page-main .grid li .file-name {
 	display: block;
@@ -45,7 +45,7 @@
 }
 #page-main .list li .column {
 	display: inline-block;
-	width: 15%;
+	width: 20%;
 	padding-right: 20px;
 }
 .clear {

@@ -1,7 +1,4 @@
-<style></style>
-
 <div id="page-main">
-	<h3>{t}Attach media{/t}
 	{if $module_name != '' && $item_name != ''}
 		 {t}to{/t} {$item_name} {t}in{/t} {$module_name}</h3>
 		 <p><a href="{$back_url}">back to {$item_name}</a></p>
@@ -29,25 +26,25 @@
 	    <li class="header">
 	    	<div class="list-grid-info bold">file name</div>
 	    	<div class="list-info">
+	 			<span class="column bold">title</span>
 	 			<span class="column bold">modified</span>
 	 			<span class="column bold">dimension</span>
-	 			<span class="bold">title</span>
 	 		</div>
 	 	</li>
-		{foreach from=$media.images item=v}
+		{foreach from=$media.files item=v}
 		<label>
 	 	<li id="li_{$id_type}id_{$id}">
 	 		<div class="list-grid-info">
 				<input type="checkbox" name="media_ids[{$v.media_id}]" id="id_{$v.media_id}" {if $v.attached==1}checked disabled{/if}>
 	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
-	 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
+		 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
 	 			</a>
 	 			<span class="file-name">{$v.file_name}</span>
 	 		</div>
 	 		<div class="list-info">
+	 			<span class="column">{$v.title}</span>
 	 			<span class="column">{$v.modified}</span>
 	 			<span class="column">{$v.width} x {$v.height} px</span>
-	 			<span>{$v.title}</span>
 	 		</div>
 	 	</li>
 	 	</label>

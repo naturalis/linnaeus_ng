@@ -1,7 +1,6 @@
 <style></style>
 
 <div id="page-main">
-	<h3>{t}Upload media{/t}
 	{if $module_name != '' && $item_name != ''}
 		 {t}for{/t} {$item_name} {t}in{/t} {$module_name}</h3>
 		 <p><a href="{$back_url}">back to {$item_name}</a></p>

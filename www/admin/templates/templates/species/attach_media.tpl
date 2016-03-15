@@ -71,7 +71,7 @@
 
     <ul class="list">
 
-	{foreach from=$media.images item=v}
+	{foreach from=$media.files item=v}
 	<label>
  	<li id="li_rs_id_{$v.rs_id}">
 
