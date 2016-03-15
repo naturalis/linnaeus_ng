@@ -288,10 +288,11 @@ class ModuleSettingsController extends Controller
 
 	private function setModuleSettings()
 	{
-		$this->_settings=$this->models->ModuleSettings->_get(array("id"=>
-			array(
-				"module_id"=>$this->getModuleId()
-			)));
+		$this->_settings=$this->models->ModuleSettings->_get(array(
+			"id"=> array("module_id"=>$this->getModuleId()),
+			"order"=>"setting"
+		));
+
 	}
 
 	private function getModuleSettings()

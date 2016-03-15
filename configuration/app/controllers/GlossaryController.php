@@ -97,17 +97,9 @@ class GlossaryController extends Controller
 		{
 			$term=$this->getGlossaryTerm($this->rGetId());
 
-<<<<<<< HEAD
-		if ($this->rHasId()) {
-
-			$term = $this->getGlossaryTerm($this->requestData['id']);
-
-			if (isset($term['term'])) {
-
-=======
 			if (isset($term['term']))
 			{
->>>>>>> development-WEG
+
 				$letter = strtolower(substr($term['term'],0,1));
 				$this->setPageName(sprintf($this->translate('Glossary: "%s"'),$term['term']));
 			}
@@ -308,11 +300,7 @@ class GlossaryController extends Controller
 
 	private function getGlossaryAlphabet()
 	{
-<<<<<<< HEAD
-		
-		// patch, oct 2015 
-		$forceLookup=true;
-=======
+
 		$g = $this->models->Glossary->_get(
 			array(
 				'id' => array(
@@ -323,7 +311,6 @@ class GlossaryController extends Controller
 				'order' => 'letter'
 			)
 		);
->>>>>>> development-WEG
 
 		foreach((array)$g as $key => $val)
 		{

@@ -118,6 +118,8 @@
 
 */
 
+if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
+
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
 
@@ -1227,8 +1229,8 @@ class Controller extends BaseClass
     {
 		return $this->models->ControllerModel->getGeneralSetting(		
 			array(
-				'module_id'=>ModuleSettingsReaderController::getGeneralSettingsId(),
-				'project_id' => $this->getCurrentProjectId(),
+				'module_id'=>GENERAL_SETTINGS_ID,
+				'project_id'=>$this->getCurrentProjectId(),
 				'setting'=>$setting,
 				'substitute'=>$substitute
 			)

@@ -403,16 +403,8 @@ class KeyController extends Controller
 	// be aware that this function also exists in the app controller and should have identical output there!
 	private function generateKeyTree($id=null,$level=0)
 	{
-<<<<<<< HEAD
-        // Ruud 14-10-15: removed utf_decode() from 'title' => $step['title'] and
-        // $d['choice_marker'] = $val['marker'] as these fucked up the getLookupList().
-
-		if (is_null($id)) {
-
-=======
 		if (is_null($id))
 		{
->>>>>>> development-WEG
 			$id = $this->getStartKeystepId();
 		}
 

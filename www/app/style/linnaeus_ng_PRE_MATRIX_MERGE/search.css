@@ -1,0 +1,61 @@
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\000036}}
+h3, h4, h5, h6 {
+  font-weight: 400; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000310}}
+.result {
+  margin-top: 1em; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000314}}
+#search-results h4 a {
+  color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000319}}
+#search-header #results-string {
+  font-size: 150%;
+  color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000324}}
+#search-header #buttons {
+  margin: 1em 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000332}}
+#search-header {
+  margin-bottom: 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000336}}
+#search-header #results-string {
+  margin-bottom: 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000341}}
+#search-results h2 {
+  font-weight: bold;
+  margin-bottom: 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000346}}
+#search-results h3 {
+  font-weight: bold;
+  margin-bottom: 2px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000355}}
+#search-results h5 {
+  font-style: italic; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000359}}
+#search-results .result-count {
+  font-weight: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000363}}
+#search-results .result {
+  margin-bottom: 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000367}}
+#search-results .module {
+  margin-bottom: 15px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000371}}
+#search-results .search-match {
+  background-color: #ffa; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000375}}
+#search-results .search-match {
+  background-color: #ffed00; }

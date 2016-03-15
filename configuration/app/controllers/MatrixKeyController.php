@@ -25,14 +25,14 @@
 	for each of compared items $a and $b the first existing field from the list above
 	is used for comparison (theoretically, a variation's label could be compared with
 	a taxon's scientific name)
-	sorting after selection of states is done by score (matching percentage).
-	data.scores sorted this way, causing data.resultset to be sorted in the same way.
+	sorting after selection of states is done by score (matching percentage). data.scores
+	is sorted this way, causing the filtered data.resultset to be sorted in the same way.
 	should the setting 'always_sort_by_initial' be true, them data.resultset is
 	re-sorted in JS::sortResults(), using the field defined by 'initial_sort_column'.
 	this way, the score sort can be overridden. additionally, there is a hook-function
 	hook_postSortResults() which is called after sortResults(), allowing specific
 	implementations to further alter the results' order (function is called regardless
-	of the values of 'always_sort_by_initial' or 'initial_sort_column'.
+	of the values of 'always_sort_by_initial' or 'initial_sort_column').
 
 */
 
@@ -80,8 +80,6 @@ class MatrixKeyController extends Controller
 	private $_totalEntityCount=0;
 	private $_activeMatrix=null;
 	private $_useCorrectedHValue=true;
-
-//	private $_characters=null;
 	private $_dataSet=null;
 	private $_facetmenu=null;
 	private $_scores=null;
@@ -90,12 +88,9 @@ class MatrixKeyController extends Controller
 	private $_searchResults=null;
 	private $_introductionLinks=array();
 	private $_incUnknowns=false;
-
 	private $_master_matrix;
 	private $settings;
-
 	private $image_root_skin=true;
-
 
     public $cssToLoad = array('matrix.css');
 
@@ -151,22 +146,22 @@ class MatrixKeyController extends Controller
     {
 		$matrix=$this->getActivematrix();
 
-        $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
+        $this->setPageName( sprintf( $this->translate('Matrix "%s": identify'), $matrix['name'] ) );
 
 		$this->setMasterMatrix();
 		$this->setDataSet();
 		$this->setScores();
 
-		$this->smarty->assign('session_scores',json_encode( $this->getScores() ));
-		$this->smarty->assign('session_states',json_encode( $this->getSessionStates() ));
-		$this->smarty->assign('session_characters',json_encode( $this->getCharacterCounts() ));
-		$this->smarty->assign('session_statecount',json_encode( $this->setRemainingStateCount() ));
-		$this->smarty->assign('session_menu',json_encode( $this->getFacetMenu() ));
-		$this->smarty->assign('full_dataset',json_encode( $this->getDataSet() ));
-        $this->smarty->assign('matrix', $matrix);
-		$this->smarty->assign('master_matrix', $this->getMasterMatrix() );
-		$this->smarty->assign('facetmenu', $this->getFacetMenu() );
-		$this->smarty->assign('states', $this->getCharacterStates(array("id"=>"*")) );
+		$this->smarty->assign( 'session_scores', json_encode( $this->getScores() ) );
+		$this->smarty->assign( 'session_states', json_encode( $this->getSessionStates() ) );
+		$this->smarty->assign( 'session_characters', json_encode( $this->getCharacterCounts() ) );
+		$this->smarty->assign( 'session_statecount', json_encode( $this->setRemainingStateCount() ) );
+		$this->smarty->assign( 'session_menu', json_encode( $this->getFacetMenu() ) );
+		$this->smarty->assign( 'full_dataset', json_encode( $this->getDataSet() ) );
+        $this->smarty->assign( 'matrix', $matrix );
+		$this->smarty->assign( 'master_matrix', $this->getMasterMatrix() );
+		$this->smarty->assign( 'facetmenu', $this->getFacetMenu() );
+		$this->smarty->assign( 'states', $this->getCharacterStates( array("id"=>"*") ) );
 
         $this->printPage();
     }
@@ -543,8 +538,36 @@ class MatrixKeyController extends Controller
 				}
 			}
 		}
+		
+		$all=array_merge((array)$taxa,(array)$variations);
 
-		$all=array_merge((array)$taxa,(array)$variations,(array)$matrices);
+		if ( isset($this->settings->species_module_link) || isset($this->settings->species_module_link_force) )
+		{
+			foreach((array)$all as $key=>$val)
+			{
+				if ( $val['type']=='taxon' )
+				{
+					$id=$val['id'];
+				}
+				else
+				if ( $val['type']=='variation' )
+				{
+					$id=$val['taxon']['id'];
+				}
+				
+				if ( $this->settings->species_module_link_force )
+				{
+					$all[$key]['info']['url_external_page']=sprintf( $this->settings->species_module_link_force, $id );
+				}
+				else
+				if ( !isset($val['info']['url_external_page']) && isset($this->settings->species_module_link) )
+				{
+					$all[$key]['info']['url_external_page']=sprintf( $this->settings->species_module_link, $id );
+				}
+			}
+		}
+
+		$all=array_merge((array)$all,(array)$matrices);
 
 		if ($all)
 		{
@@ -578,11 +601,7 @@ class MatrixKeyController extends Controller
 				(!$this->settings->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
-<<<<<<< HEAD
-				if ( ( isset($this->settings->suppress_details) && $this->settings->suppress_details!=1 ) || !isset($this->settings->suppress_details) )
-=======
 				if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
->>>>>>> development-WEG
 				{
 					$d['states']=$this->getTaxonStates( $val['taxon_id'] );
 				}
@@ -615,11 +634,7 @@ class MatrixKeyController extends Controller
 		{
 			$m[$key]['taxon']=$this->getTaxonById( $val['taxon_id'] );
 			$m[$key]['gender']=$this->extractGenderTag( $val['label'] );
-<<<<<<< HEAD
-			if ( ( isset($this->settings->suppress_details) && $this->settings->suppress_details!=1 ) || !isset($this->settings->suppress_details) )
-=======
 			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
->>>>>>> development-WEG
 			{
 				$m[$key]['states']=$this->getVariationStates( $val['id'] );
 			}
@@ -639,11 +654,7 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$m as $key=>$val)
 		{
-<<<<<<< HEAD
-			if ( ( isset($this->settings->suppress_details) && $this->settings->suppress_details!=1 ) || !isset($this->settings->suppress_details) )
-=======
 			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
->>>>>>> development-WEG
 			{
 				$m[$key]['states']=$this->getMatrixStates( $val['id'] );
 			}
@@ -1478,121 +1489,43 @@ class MatrixKeyController extends Controller
 
 	private function setIntroductionLinks()
     {
-<<<<<<< HEAD
-	
+		$topics=array();
+		
 		if ( isset($this->settings->introduction_topic_colophon_citation) )
 		{
-			$a=$this->models->ContentIntroduction->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'topic' => $this->settings->introduction_topic_colophon_citation
-					),
-					'columns'=>'page_id,topic,content'
-				)
-			);
-			
-			$content_a=strip_tags($a[0]['content']);
-			$this->_introductionLinks[$this->settings->introduction_topic_colophon_citation]=($a && (!empty($content_a)) ? $a[0] : null);
+			array_push($topics,$this->settings->introduction_topic_colophon_citation);
 		}
 
 		if ( isset($this->settings->introduction_topic_versions) )
 		{
-			$b=$this->models->ContentIntroduction->_get(
-=======
+			array_push($topics,$this->settings->introduction_topic_versions);
+		}
+
+		if ( isset($this->settings->introduction_topic_inline_info) )
+		{
+			array_push($topics,$this->settings->introduction_topic_inline_info);
+		}
 
 		$this->_introductionLinks=array();
-
-		if ( isset($this->settings->introduction_topic_colophon_citation) )
+		
+		foreach((array)$topics as $topic)
 		{
-			$a=$this->models->ContentIntroduction->_get(
->>>>>>> development-WEG
+			$d=$this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getCurrentLanguageId(),
-<<<<<<< HEAD
-						'topic' => $this->settings->introduction_topic_versions
-=======
-						'topic' => $this->settings->introduction_topic_colophon_citation
->>>>>>> development-WEG
+						'topic' => $topic
 					),
 					'columns'=>'page_id,topic,content'
 				)
 			);
-<<<<<<< HEAD
-	
-			$content_b=strip_tags($b[0]['content']);
-			$this->_introductionLinks[$this->settings->introduction_topic_versions]=($b && (!empty($content_b)) ? $b[0] : null);
-		}
 
-		if ( isset($this->settings->introduction_topic_inline_info) )
-		{
-			$c=$this->models->ContentIntroduction->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'topic' => $this->settings->introduction_topic_inline_info
-					),
-					'columns'=>'page_id,topic,content'
-				)
-			);
-	
-			$content_c=strip_tags($c[0]['content']);
-			$this->_introductionLinks[$this->settings->introduction_topic_inline_info]=($c && (!empty($content_c)) ? $c[0] : null);
-		}
-
-=======
-
-			if ($a)
+			if ($d)
 			{
-				$this->_introductionLinks[$this->settings->introduction_topic_colophon_citation]=
-					!empty(strip_tags($a[0]['content'])) ? $a[0] : null;
+				$this->_introductionLinks[$topic]=!empty(strip_tags($d[0]['content'])) ? $d[0] : null;
 			}
 		}
-
-		if ( isset($this->settings->introduction_topic_versions) )
-		{
-			$b=$this->models->ContentIntroduction->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'topic' => $this->settings->introduction_topic_versions
-					),
-					'columns'=>'page_id,topic,content'
-				)
-			);
-
-			if ($b)
-			{
-				$this->_introductionLinks[$this->settings->introduction_topic_versions]=
-					!empty(strip_tags($b[0]['content'])) ? $b[0] : null;
-			}
-		}
-
-		if ( isset($this->settings->introduction_topic_inline_info) )
-		{
-			$c=$this->models->ContentIntroduction->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'topic' => $this->settings->introduction_topic_inline_info
-					),
-					'columns'=>'page_id,topic,content'
-				)
-			);
-
-			if ($c)
-			{
-				$this->_introductionLinks[$this->settings->introduction_topic_inline_info]=
-					!empty(strip_tags($c[0]['content'])) ? $c[0] : null;
-			}
-		}
->>>>>>> development-WEG
     }
 
 	private function getIntroductionLinks()

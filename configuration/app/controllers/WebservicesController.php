@@ -393,10 +393,7 @@ parameters:
 				'pId'=>$this->getCurrentProjectId(),
 				'request'=>$this->rGetVal('taxon'),
 				'taxon'=>$taxon['taxon'],
-<<<<<<< HEAD
-=======
 				'nametype'=>$taxon['nametype'],
->>>>>>> development-WEG
 				'match'=>$this->getMatchType(),
 				'cat'=>$this->rGetVal('cat'),
 				'striptags'=>$this->rHasVal('striptags','1'),
@@ -1280,28 +1277,16 @@ parameters:
 			{
 				$this->setTaxonId($t[0]['id']);
 				
-<<<<<<< HEAD
-				$t = $this->models->Taxon->_get(array(
-=======
 				$t = $this->models->Taxa->_get(array(
->>>>>>> development-WEG
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $this->getTaxonId()
 					)
 				));
-<<<<<<< HEAD
-				
-				$this->setTaxon($t[0]);
-				
-				//return $t;
-=======
 
 				$t[0]['nametype']=strtolower(rtrim(ltrim($nametype,'is'),'Of'));
 
 				$this->setTaxon($t[0]);
-
->>>>>>> development-WEG
 			}
 		}
 
