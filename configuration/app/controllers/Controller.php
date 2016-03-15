@@ -206,11 +206,6 @@ class Controller extends BaseClass
 
         $this->setControllerParams($p);
 
-<<<<<<< HEAD
-        $this->setPhpIniVars();
-
-=======
->>>>>>> development-WEG
         $this->startSession();
 
         $this->loadHelpers();
@@ -1505,77 +1500,6 @@ class Controller extends BaseClass
         //$this->previewOverlay(); // not implemented in (the rarely used) fetch
     }
 
-<<<<<<< HEAD
-
-
-    /**
-	 * Gettext wrapper, to be called from javascript (through the utilities controller)
-	 *
-	 * @access     public
-	 */
-    public function javascriptTranslate ($content)
-    {
-        if (empty($content))
-            return;
-
-		if (is_array($content)) {
-
-			$results = array();
-
-			foreach((array)$content as $val) {
-
-				$this->saveInterfaceText($val);
-
-				$results[] = $this->doTranslate($val);
-			}
-
-			return $results;
-
-		} else  {
-
-			$this->saveInterfaceText($content);
-
-			return $this->doTranslate($content);
-
-		}
-
-    }
-
-
-
-    /**
-     * Gettext wrapper, to be called from a registered block function within Smarty
-     *
-	 * parametrization: {t _s1='one' _s2='two' _s3='three'}The 1st parameter is %s, the 2nd is %s and the 3nd %s.{/t}
-	 *
-     * @access     public
-     */
-    public function smartyTranslate ($params, $content, &$smarty, &$repeat)
-    {
-        if (empty($content))
-            return;
-
-        $this->saveInterfaceText($content);
-
-        $c = $this->doTranslate($content);
-
-        if (isset($params)) {
-
-            foreach ((array) $params as $key => $val) {
-
-                if (substr($key, 0, 2) == '_s' && isset($val)) {
-
-                    $c = preg_replace('/\%s/', $val, $c, 1);
-                }
-            }
-        }
-
-        return $c;
-    }
-
-
-=======
->>>>>>> development-WEG
 	public function smartyGetSnippet($params, $content, &$smarty, &$repeat)
 	{
 		if ( is_null($content) ) return;
@@ -1691,67 +1615,6 @@ class Controller extends BaseClass
         if (!$p)
             return;
 
-<<<<<<< HEAD
-            foreach ((array) $array as $key => $val) {
-
-                $x = md5(json_encode($val) . $key);
-                $array[$key][$f] = $x;
-                $keys[$x] = $key;
-            }
-        }
-
-        usort($array, array(
-            $this,
-            'doCustomSortArray'
-        ));
-
-        if ($maintainKeys) {
-
-            foreach ((array) $array as $val) {
-
-                if (is_array($val)) {
-
-                    $y = array();
-
-                    foreach ($val as $key2 => $val2) {
-
-                        if ($key2 != $f)
-                            $y[$key2] = $val2;
-                    }
-
-                    $d[$keys[$val[$f]]] = $y;
-                }
-                else {
-
-                    $d[$keys[$val[$f]]] = $val;
-                }
-            }
-
-            if (isset($d))
-                $array = $d;
-        }
-    }
-
-
-
-    /**
-     * Sets project URL for project images
-     *
-	 * @todo	take out hard reference to /media/
-     * @access     public
-     */
-    public function setUrls ()
-    {
-        $_SESSION['app']['system']['urls']['systemMedia'] = $this->baseUrl . $this->getAppName() . '/media/system/skins/' . $this->getSkinName() . '/';
-        $_SESSION['app']['system']['urls']['snippets'] = $this->baseUrl . 'app/media/project/_snippets/' ;
-
-        $p = $this->getCurrentProjectId();
-
-        if (!$p)
-            return;
-
-=======
->>>>>>> development-WEG
         $pCode = $this->getProjectFSCode($p);
 
         // url of the directory containing user-uploaded media files
@@ -1930,19 +1793,6 @@ class Controller extends BaseClass
 		return isset($d[0]) ? true : false;
     }
 
-<<<<<<< HEAD
-
-    private function setPhpIniVars ()
-    {
-
-        // avoid "page expired" messages on using browser's "back"-button
-        //ini_set('session.cache_limiter', 'private');
-    }
-
-
-
-=======
->>>>>>> development-WEG
     /**
      * Starts the user's session
      *
@@ -2493,14 +2343,6 @@ class Controller extends BaseClass
         if (!isset($prevPage) || $thisPage != $prevPage)
             $_SESSION['app']['user']['history'][] = $thisPage;
 
-<<<<<<< HEAD
-=======
-            // see if a maximum number of steps to store is defined; if so, slice off the excess
-        if (count((array) $_SESSION['app']['user']['history']) > $this->_maxBackSteps) {
-
-            $_SESSION['app']['user']['history'] = array_slice($_SESSION['app']['user']['history'], count((array) $_SESSION['app']['user']['history']) - $this->_maxBackSteps);
-        }
->>>>>>> development-WEG
     }
 
 

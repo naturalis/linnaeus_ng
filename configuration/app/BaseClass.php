@@ -38,27 +38,18 @@ class BaseClass
             $this->config = new configuration();
 
         } else {
-<<<<<<< HEAD
-            
-            die(_('Cannot load admin configuration file. Make sure the file config.php is present in both 
-            	configuration/admin and configuration/app. In both directories, the template file 
-=======
 
             die(_('Cannot load app configuration file. Make sure the file config.php is present in both
             	configuration/admin and configuration/app. In both directories, the template file
->>>>>>> development-WEG
             	default-config.php can be adapted.'));
 
         }
 
-<<<<<<< HEAD
         if (class_exists('customConfiguration'))
 		{
             $this->customConfig=new customConfiguration();
         }    
     
-=======
->>>>>>> development-WEG
     }
 
     private function setGeneralSettings ()
