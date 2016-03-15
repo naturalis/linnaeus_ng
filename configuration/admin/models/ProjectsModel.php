@@ -29,9 +29,9 @@ final class ProjectsModel extends AbstractModel
 	public function getUserProjects( $params )
 	{
 		$user_id=isset($params['user_id']) ? $params['user_id'] : null;
+		$show_all=isset($params['show_all']) ? $params['show_all'] : false;
 
-		if( !isset( $user_id ) )
-			return;
+		if( !isset( $user_id ) ) return;
 		
 		$query="
 				select
@@ -45,15 +45,25 @@ final class ProjectsModel extends AbstractModel
 
 				from
 					%PRE%projects _a
-
+				";
+				
+		if ( $show_all ) 
+		{
+			$query .= "
+				left join %PRE%projects_roles_users _b
+					on _a.id=_b.project_id
+					and _b.user_id = " . $user_id ;
+		}
+		else
+		{
+			$query .= "
 				right join %PRE%projects_roles_users _b
 					on _a.id=_b.project_id
-
 				where _b.user_id = " . $user_id . "
 			";
+		}
 
 		return $this->freeQuery( $query );
-	
 	}
 	
 	public function getProjectModules( $params )

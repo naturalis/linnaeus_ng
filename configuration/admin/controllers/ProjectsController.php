@@ -50,17 +50,14 @@ class ProjectsController extends Controller
 	public function chooseProjectAction ()
 	{
         $this->checkDefaultProjectSelect();
-        $this->checkAuthorisation();
+		$this->UserRights->setAllowNoProjectId( true );
+		$this->checkAuthorisation();
         $this->setPageName($this->translate('Select a project to work on'));
 
         if ( $this->rHasVal('project_id') && $this->isCurrentUserAuthorizedForProject($this->rGetVal('project_id')) )
 		{
 			$this->doSetProject( $this->rGetVal('project_id') );
 			$this->redirect( $this->getLoggedInMainIndex() );
-		}
-		else
-		{
-			$this->redirect('choose_project.php');
 		}
 
         $this->smarty->assign('projects', $this->getCurrentUserProjects());
@@ -1085,16 +1082,22 @@ class ProjectsController extends Controller
 
 	}
 
-
 	private function getCurrentUserProjects()
 	{
-		return $this->models->ProjectsModel->getUserProjects(array(
-			'user_id'=>$this->getCurrentUserId()
-		));
+		$d=array( 'user_id'=>$this->getCurrentUserId() );
+
+		if ( $this->UserRights->isSysAdmin() )
+		{
+			$d['show_all']=true;
+		}
+		
+		return $this->models->ProjectsModel->getUserProjects( $d );
 	}
 
 	private function isCurrentUserAuthorizedForProject($id)
 	{
+		if ( $this->UserRights->isSysAdmin() ) return true;
+		
 		foreach ((array) $this->getCurrentUserProjects() as $key => $val)
 		{
 			if ($val['id'] == $id && $val['user_project_active'] == '1')
@@ -1127,9 +1130,14 @@ class ProjectsController extends Controller
 
     private function checkDefaultProjectSelect()
     {
+		$projects=$this->getCurrentUserProjects();
+		
+		if ( $this->UserRights->isSysAdmin() && count((array)$projects)>1)
+			return;
+		
 		$p=null;
 
-		foreach((array)$this->getCurrentUserProjects() as $key=>$val)
+		foreach((array)$projects as $key=>$val)
 		{
 			if ( $val['user_project_active']==1 )
 			{
