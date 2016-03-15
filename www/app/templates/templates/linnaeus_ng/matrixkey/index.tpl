@@ -1,4 +1,5 @@
-{include file="../shared/header.tpl"}
+{include file="../shared/_matrix_head.tpl"}
+{include file="../shared/_matrix_body-start.tpl"}
 
 	<div id="dialogRidge">
 
@@ -329,4 +330,4 @@ $(document).ready(function()
 
 <!-- /templates -->
 
-{include file="../shared/footer.tpl"}
+{include file="../shared/_matrix_footer.tpl"}
