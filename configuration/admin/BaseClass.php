@@ -44,6 +44,11 @@ class BaseClass
 
         }
 
+        if (class_exists('customConfiguration'))
+		{
+            $this->customConfig=new customConfiguration();
+        }    
+
     }
 
     private function setGeneralSettings ()
