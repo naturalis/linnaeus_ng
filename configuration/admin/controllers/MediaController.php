@@ -6,21 +6,7 @@
  * - check mime type on upload
  * - check max_file_uploads, memory_limit, post_max_size
  *
- *
- *
- *
- *
- *server credentials
-(
-    [password] => cd94a56a
-    [username] => Diaspididae of the World 2.0 @ 145.136.240.186
-    [user_id] => 3
-    [collection_id] => 3
-    [error] =>
-    [authentification_key] => V2hldmVwcHx0dGglfGckcX18NEJ_Z2FhMzMqNTVZNCQkICM0IDcqNyEpOiQoI3FhKzFhNiQsLC0nIWs1djdgZyZ4Jyx2Jmg1Jzk1ZnZ6JiIhIjQ3IDgzZnYgcSdzJ2hjJzQ0M3QoLHckIz01Kzc3
-)
-
- *
+ * $this->_rsMasterKey = 'cmVpbHtldSVyLDs0KjEyZCd4ciwncGlhITY1ZHErJi0hJGw0cjlmZnMtJCRydzVkdjFnZHR7LXAhJD9gIzhmNXcucSIiJg,,';
  *
  */
 
@@ -50,7 +36,39 @@ class MediaController extends Controller
     private $itemId;
     private $languageId;
 
-    public static $metadataFields = array('title', 'location', 'photographer');
+    public static $metadataFields = array(
+        'title',
+        'location',
+        'photographer'
+    );
+
+    public static $mimeTypes = array(
+        'image' => array(
+            'png' => 'image/png',
+            'jpe' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'gif' => 'image/gif'
+        ),
+        'audio' => array(
+            'mp3' => 'audio/mpeg'
+        ),
+        'video' => array(
+            'mp4' => 'video/mp4'
+        ),
+        'pdf' => array(
+            'pdf' => 'application/pdf',
+        ),
+        'text' => array(
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'odt' => 'application/vnd.oasis.opendocument.text',
+            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+            'rtf' => 'text/rtf',
+            'txt' => 'text/plain',
+            'csv' => 'text/comma-separated-values'
+        )
+    );
 
     public $usedModels = array(
         'media',
@@ -111,55 +129,6 @@ class MediaController extends Controller
             $id : $this->getDefaultProjectLanguage();
     }
 
-    private function setRsBaseUrl ()
-    {
-        // To do: get from config
-        $this->_rsBaseUrl = 'https://rs.naturalis.nl/plugins/';
-        //$this->_rsBaseUrl = 'http://localhost/resourcespace/plugins/';
-    }
-
-    private function setRsMasterKey ()
-    {
-        // To do: get from config
-        $this->_rsMasterKey = 'cmVpbHtldSVyLDs0KjEyZCd4ciwncGlhITY1ZHErJi0hJGw0cjlmZnMtJCRydzVkdjFnZHR7LXAhJD9gIzhmNXcucSIiJg,,';
-        //$this->_rsMasterKey = 'LDpWw7lzzeM5Vbck0K5N2JBjn2nQiobY6Qxr195NPzqXxXNfeDIjqd96JuomeuIo1Gi8TsM7JjR8d7WgCvX-a8P3mz7WWHgfnZIyJ5KF1UAKAkV3VCjk0zt3Qyo3I4jM';
-    }
-
-    private function setRsUserKey ()
-    {
-        // To do: get from config
-
-        // user: Diaspididae of the World 2.0 @ localhost
-        // password: 96b5f659
-        $this->_rsUserKey = 'V2hldmVwcHx0dGglfGckcX18NEJ_Z2FhMzMqNTVZNHl_dmxpe253cWl9IS0jIzxmIjJmMCwvcXAoJjw1IGIyNCYrcSEmd2wzIThgYSEhd3BzIGkycjliMSUqLCwgcGtnKjRlNyIsJy0o';
-        //$this->_rsUserKey = 'mgnwUMXYDrxXQIWaA5V-ZzioDNExJhVwHQ-8scfwAawkfFAf8su4znTstVSIkMATeNA0pMhPQYok0C_if_k-sKNOL7uZ9o_VCesg6_Wi5j8Dbcs7yUud2tu05N4gGKMk';
-    }
-
-    private function setRsCollectionId ()
-    {
-        // To do: get from config
-        $this->_rsCollectionId = 2;
-        //$this->_rsCollectionId = 5;
-    }
-
-    private function setRsSearchApi ()
-    {
-        // To do: get from config
-        $this->_rsSearchApi = 'api_search_lng';
-    }
-
-    private function setRsNewUserApi ()
-    {
-        // To do: get from config
-        $this->_rsNewUserApi =  'api_new_user_lng';
-    }
-
-    private function setRsUploadApi ()
-    {
-        // To do: get from config
-        $this->_rsUploadApi =  'api_upload_lng';
-    }
-
     private function addUploaded ($e)
     {
         $this->_uploaded[] = $e;
@@ -168,8 +137,6 @@ class MediaController extends Controller
     private function setRsSettings ()
     {
         $msr = new ModuleSettingsReaderController();
-//print_r($msr->getModuleSetting('rs_base_url')); die();
-
 
         $this->_rsBaseUrl = $msr->getModuleSetting('rs_base_url');
         $this->_rsUserKey = $msr->getModuleSetting('rs_user_key');
@@ -301,7 +268,7 @@ class MediaController extends Controller
         if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()
             && $this->uploadHasFiles()) {
 
-            $this->setFiles($_FILES['files']);
+            $this->setFiles();
             foreach ($this->_files as $i => $file) {
 
                 // Check mime type, file size, etc.
@@ -331,8 +298,8 @@ class MediaController extends Controller
                         'rs_id' => $media->ref,
                         'name' => $file['name'],
                         'title' => $media->field8,
-                        'width' => $media->files[0]->width,
-                        'height' => $media->files[0]->height,
+                        'width' => is_int($media->files[0]->width) ? $media->files[0]->width : -1,
+                        'height' => is_int($media->files[0]->height) ? $media->files[0]->height : -1,
                         'mime_type' => $file['type'],
                         'file_size' => $file['size'],
                         'rs_original' => $media->files[0]->src,
@@ -426,6 +393,11 @@ class MediaController extends Controller
     private function uploadedFileIsValid ($file)
     {
         // Check mime type
+        if (!!$this->getMimeTypeCategory($file['type'])) {
+            $this->addError(_('Mime type') . ' ' . $file['type'] . ' ' .
+                _('not supported') . ': ' . $file['name']);
+            return false;
+        }
 
         // Check errors in file
         switch ($file['error']) {
@@ -801,8 +773,9 @@ class MediaController extends Controller
     /*
     * Reformat $_FILES array into something more logical
     */
-    private function setFiles (&$filePost)
+    private function setFiles ()
     {
+        $filePost = $_FILES['files'];
         $this->_files = array();
         $multiple = is_array($filePost['name']);
 
@@ -1034,5 +1007,16 @@ class MediaController extends Controller
         return $d;
     }
 
+    private function getMimeTypeCategory ($mime)
+    {
+        foreach ($this::$mimeTypes as $category => $types) {
+            foreach ($this::$mimeTypes as $extension => $type) {
+                if ($mime == $type) {
+                    return $category;
+                }
+            }
+        }
+        return false;
+    }
 
 }
