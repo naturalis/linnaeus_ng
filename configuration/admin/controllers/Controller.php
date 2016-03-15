@@ -410,8 +410,15 @@ class Controller extends BaseClass
     {
 		if ( !$this->UserRights->isAuthorized() )
 		{
-			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getMessage();
-			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+			if ( null!==$this->getCurrentUserId() )
+			{
+				$this->redirect('login.php');
+			}
+			else
+			{
+				$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getMessage();
+				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+			}
 		}
 		else
 		{

@@ -50,6 +50,12 @@ class UserRights
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
 
+		if ( !$u ) 
+		{
+			$this->setMessage( '9: user not logged in' );
+			$this->setAuthorizeState( false );
+		}
+		else
 		if ( $u && $this->isSysAdmin() ) 
 		{
 			$this->setMessage( '1: user logged in, is sysadmin (full access)' );
