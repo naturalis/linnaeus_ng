@@ -28,7 +28,7 @@
 	 			<span class="bold">title</span>
 	 		</div>
 	 	</li>
-		{foreach from=$media.images item=v}
+		{foreach from=$media.files item=v}
 		<label>
 	 	<li id="li_{$id_type}id_{$id}">
 	 		<div class="list-grid-info">
