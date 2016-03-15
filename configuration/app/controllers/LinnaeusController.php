@@ -158,13 +158,6 @@ class LinnaeusController extends Controller
 	{
 		if (defined('FIXED_PROJECT_ID')) $this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
 
-<<<<<<< HEAD
-		$id=$this->resolveProjectShortName();
-		
-		if ($id) $this->redirect('app/views/linnaeus/set_project.php?p='.$id);
-		
-		$projects = $this->models->Project->_get(
-=======
 		if (defined('FIXED_PROJECT_ID'))
 			$this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
 
@@ -174,7 +167,6 @@ class LinnaeusController extends Controller
 			$this->redirect('app/views/linnaeus/set_project.php?p='.$id);
 
 		$projects = $this->models->Projects->_get(
->>>>>>> development-WEG
 			array(
 				'id' => array('published' => 1),
 				'order' => 'title'
@@ -212,8 +204,6 @@ class LinnaeusController extends Controller
     public function noProjectAction()
 	{
 		$this->redirect($this->baseUrl.'?nopid');
-<<<<<<< HEAD
-=======
 		/*
 		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
 
@@ -221,8 +211,6 @@ class LinnaeusController extends Controller
 
         $this->printPage();
 		*/
-
->>>>>>> development-WEG
 	}
 
 	public function getContent($sub=null,$id=null)
