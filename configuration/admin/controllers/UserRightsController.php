@@ -27,6 +27,7 @@ class UserRights
 	private $projectid;
 	private $controller;
 	private $moduleid;
+	private $allowNoProjectId=false;
 	
 	private $authorizestate;
 	private $message;
