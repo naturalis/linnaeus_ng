@@ -45,9 +45,6 @@ class UserRights
 
     public function isAuthorized()
     {
-		
-		return true;
-		
 		$p=isset( $this->projectid );
 		$u=isset( $this->userid );
 		$c=isset( $this->controller );
