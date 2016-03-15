@@ -63,6 +63,10 @@ final class ProjectsModel extends AbstractModel
 			";
 		}
 
+		$query .= "
+			order by title, sys_name
+		";
+
 		return $this->freeQuery( $query );
 	}
 	
