@@ -10,7 +10,7 @@
     <table id="module-grid">
         <tr>
         {assign var=i value=1}
-        {foreach from=$menu key=k item=v}
+        {foreach $menu v k}
         {if $v.type=='regular' && $v.show_in_public_menu==1}
         <td class="grid">
             <a class="menu-item" href="../{$v.controller}/">
@@ -21,17 +21,10 @@
         {assign var=i value=$i+1}
         {elseif $v.show_in_public_menu==1}
         <td class="grid">
-            {if $useJavascriptLinks}
-            <span class="a" onclick="goMenuModule({$v.id});">
-                <div class="module-icon custom custom-{$v.id}"></div>
-                <p>{t}{$v.module}{/t}</p>
-            </span>
-            {else}
             <a class="menu-item" href="../module/?modId={$v.id}">
                 <div class="module-icon custom custom-{$v.id}"></div>
                 <div>{t}{$v.module}{/t}</div>
             </a>
-            {/if}
         </td>
         {assign var=i value=$i+1}
         {/if}
@@ -43,11 +36,10 @@
 	{$content}
 	</div>
 </div>
-{literal}
+
 <script type="text/JavaScript">
-$(document).ready(function(){
-//	allLookupContentOverrideUrl('../search/ajax_interface.php');
-allLookupAlwaysFetch=true;
+$(document).ready(function()
+{
+	allLookupAlwaysFetch=true;
 });
 </script>
-{/literal}

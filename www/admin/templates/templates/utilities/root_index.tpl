@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<!-- meta name="viewport" content="initial-scale=1.0, user-scalable=no" / --><!-- might be required for google map -->
@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="admin/javascript/jquery.tools.min.js"></script>
 	<script type="text/javascript" src="admin/javascript/sprintf-0.7-beta1.js"></script>
-	<script type="text/javascript" src="admin/javascript/main.js"></script>	
+	<script type="text/javascript" src="admin/javascript/main.js"></script>
 </head>
 <body><div id="body-container">
 <div id="header-container">

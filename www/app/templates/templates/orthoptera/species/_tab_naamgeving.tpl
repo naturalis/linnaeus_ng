@@ -2,7 +2,7 @@
 		<h2 id="name-header">{t}Naamgeving{/t}</h2>
 
 		<table id="names-table">
-			{foreach from=$names.list item=v}
+			{foreach $names.list v}
 				{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
 				{if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
 				{if $v.nametype=='isValidNameOf' && $taxon.base_rank_id<$smarty.const.SPECIES_RANK_ID}
@@ -36,7 +36,7 @@
 	<p>
 		<h2>{t}Indeling{/t}</h2>
 		<ul class="taxonoverzicht">
-			{foreach from=$classification item=v key=x}
+			{foreach $classification v x}
 			{if $v.parent_id!=null}
 			<li>
 	            <span class="classification-preffered-name"><a href="nsr_taxon.php?id={$v.id}">{$v.taxon}</a></span>
@@ -46,7 +46,7 @@
 				<ul class="taxonoverzicht">
 			{/if}
 			{/foreach}
-			{foreach from=$classification item=v key=x}
+			{foreach $classification v x}
 			{if $v.parent_id!=null}
 				</li></ul>
             {/if}

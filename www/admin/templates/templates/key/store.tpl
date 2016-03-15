@@ -16,9 +16,9 @@
 {t}Please note that, depending on the size of your key, this might take a few minutes.{/t}
 </p>
 <p>
-Key tree last generated on: {if $keyinfo.keytree.date_hr}{$keyinfo.keytree.date_hr}{else}(never){/if}<br /><br />
-Last change to a keystep on: {if $keyinfo.keystep.date_hr}{$keyinfo.keystep.date_hr}{else}(never){/if} (deletes are not logged!)<br />
-Last change to a keystep choice on: {if $keyinfo.choice.date_hr}{$keyinfo.choice.date_hr}{else}(never){/if} (deletes are not logged!)<br />
+{t}Key tree last generated on:{/t} {if $keyinfo.keytree.date_hr}{$keyinfo.keytree.date_hr}{else}{t}(never){/t}{/if}<br /><br />
+{t}Last change to a keystep on:{/t} {if $keyinfo.keystep.date_hr}{$keyinfo.keystep.date_hr}{else}{t}(never){/t}{/if} {t}(deletes are not logged!){/t}<br />
+{t}Last change to a keystep choice on:{/t} {if $keyinfo.choice.date_hr}{$keyinfo.choice.date_hr}{else}{t}(never){/t}{/if} {t}(deletes are not logged!){/t}<br />
 {if $keyinfo.keystep.date_x > $keyinfo.keytree.date_x || $keyinfo.choice.date_x > $keyinfo.keytree.date_x || $didKeyTaxaChange}
 </p>
 <p>

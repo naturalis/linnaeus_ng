@@ -1,6 +1,5 @@
 {include file="../shared/header.tpl"}
 {include file="_search-main-no-tabs.tpl"}
-{* include file="../shared/_search-main.tpl" *}
 
 <div id="page-main">
 
@@ -24,20 +23,18 @@
 
 	<div id="search-results">
 
-	<!-- h2>Results <span class="result-count">({$results.count})</span></h2 -->
-
 {if $results.count>0}
 
-	{foreach from=$results.data item=v}
+	{foreach $results.data v}
 		{if $v.numOfResults>0}
-			{foreach from=$v.results item=r}
+			{foreach $v.results r}
 				{if $r.numOfResults>0}
 					<div class="module">
 						<h3>{if $r.label!=$v.label}{$v.label}: {/if}{$r.label} <span class="result-count">({$r.data|@count})</span></h3>
 						{foreach from=$r.data item=d}
 						<div class="result">
 							<h4><a href="{$r.url|sprintf:$d.id|replace:'#CAT#':$d.cat}">{$d.label}</a>{* <span class="result-count">({$d.matches|@count})*}</span></h4>
-							{foreach from=$d.matches item=match}
+							{foreach $d.matches match}
 							<h5>{$match}</h5>
 							{/foreach}
 						</div>
@@ -69,7 +66,7 @@
         {t}In modules:{/t}
 	</p>
 	<p>
-        {foreach from=$modules.modules item=v}
+        {foreach $modules.modules v}
         {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search' && $v.module!=''}
         <label>
             <input
@@ -81,7 +78,7 @@
         </label><br />
         {/if}
         {/foreach}
-        {foreach from=$modules.freeModules item=v}
+        {foreach $modules.freeModules v}
         <label>
         	<input type="checkbox" name="freeModules[{$v.id}]" value="{$v.id}" {if $search.freeModules[$v.id]==$v.id || $search.modules==null || $search.modules=='*'}checked="checked"{/if} />
 	        {t}{$v.module}{/t}

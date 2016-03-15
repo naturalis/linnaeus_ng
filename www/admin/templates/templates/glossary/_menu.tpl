@@ -8,6 +8,8 @@
 <a href="edit.php?action=new" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
 <a href="../search/index.php">Extensive search</a>
+&nbsp;
+<a href="../../../app/views/{$controllerBaseName}/" style="color:#999;margin-left:10px" target="_project">view project</a>
 <span id="message-container" style="float:right"></span>
 <p>
 {if $alpha|@count==0}
@@ -18,8 +20,13 @@
 {if $alpha[i]==$letter}
 <span class="alphabet-active-letter">{$alpha[i]}</span>
 {else}
-<span class="alphabet-letter" onclick="$('#action').val('browse');$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
+<span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#navForm').submit();">{$alpha[i]}</span>
 {/if}
 {/section}
 {/if}
 </p>
+<form action="" method="post" id="navForm" action="edit.php">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="action" value="browse" />
+<input type="hidden" name="letter" id="letter" value="" />
+</form>

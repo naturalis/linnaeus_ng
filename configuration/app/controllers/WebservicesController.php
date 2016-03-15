@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('RdfController.php');
+include_once ('ModuleSettingsReaderController.php');
 class WebservicesController extends Controller
 {
     private $_usage=null;
@@ -14,13 +15,12 @@ class WebservicesController extends Controller
 	private $_thumbBaseUrl='http://images.naturalis.nl/160x100/';
 	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
 	private $_nsrOriginalImageBaseUrl='http://images.naturalis.nl/original/';
+	private $_domainNamePatch="www.nederlandsesoorten.nl"; // HTTP_HOST is unreliable (reverse proxy); must become setting REFAC2015
 	private $_JSONPCallback=false;
 	private $_JSON=null;
 
     public $usedModels = array(
-		'taxon',
-		'commonname',
-		'synonym',
+		'taxa',
 		'names',
 		'media_taxon',
 		'nsr_ids',
@@ -393,6 +393,10 @@ parameters:
 				'pId'=>$this->getCurrentProjectId(),
 				'request'=>$this->rGetVal('taxon'),
 				'taxon'=>$taxon['taxon'],
+<<<<<<< HEAD
+=======
+				'nametype'=>$taxon['nametype'],
+>>>>>>> development-WEG
 				'match'=>$this->getMatchType(),
 				'cat'=>$this->rGetVal('cat'),
 				'striptags'=>$this->rHasVal('striptags','1'),
@@ -618,7 +622,7 @@ parameters:
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
 
-		$result['url_recent_images']='http://'.$_SERVER['HTTP_HOST'].'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
+		$result['url_recent_images']='http://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
 	
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
@@ -666,7 +670,7 @@ parameters:
 		}
 
 
-        $d=$this->models->Taxon->freeQuery("
+        $d=$this->models->Taxa->freeQuery("
 			select
 				count(*) as total,
 				_h.id as presence_id,
@@ -824,7 +828,7 @@ parameters:
 		*/
 	
 
-		$d=$this->models->Taxon->freeQuery("
+		$d=$this->models->Taxa->freeQuery("
 			select count(distinct id) as total from
 			(
 				select
@@ -898,7 +902,7 @@ parameters:
 
 		$exotenGroupId=1;
 
-        $d=$this->models->Taxon->freeQuery("
+        $d=$this->models->Taxa->freeQuery("
 			select
 				_a.id
 			from taxa _a
@@ -993,7 +997,7 @@ parameters:
 				(int)$this->requestData['max'] : 
 				$max;
 
-		$taxa=$this->models->Taxon->freeQuery("
+		$taxa=$this->models->Taxa->freeQuery("
 			select
 				_a.name,
 				_b.nametype,
@@ -1079,8 +1083,9 @@ parameters:
 
     private function initialise()
     {
-		$this->Rdf = new RdfController(array('checkForProjectId'=>false,'checkForSplash'=>false));
-		
+		$this->Rdf = new RdfController(array('checkForProjectId'=>false));
+		$this->moduleSettings=new ModuleSettingsReaderController;
+	
 		$this->useCache=false;
 		$this->checkProject();
 
@@ -1090,7 +1095,7 @@ parameters:
 		} 
 		else 
 		{
-			$this->models->Taxon->freeQuery("SET lc_time_names = '".$this->getSetting('db_lc_time_names','nl_NL')."'");
+			$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array( 'setting'=>'db_lc_time_names','subst'=>'nl_NL'))."'");
 			$this->checkJSONPCallback();
 		}
     }
@@ -1106,9 +1111,8 @@ parameters:
 
 		}
 		else
-		 {
-
-			$p = $this->models->Project->_get(array(
+		{
+			$p = $this->models->Projects->_get(array(
 				'id' => $this->requestData['pid']
 			));
 		
@@ -1140,18 +1144,21 @@ parameters:
 
 	private function checkFromDate()
 	{
-		if (!$this->rHasVal('from')) {
-
+		if (!$this->rHasVal('from'))
+		{
 			$this->addError('no starttime specified of retrieval window.');
-
-		} else {
-
+		} 
+		else 
+		{
 			$d=str_split($this->requestData['from'],2);
 
-			if (strlen($this->requestData['from'])==8 && checkdate($d[2],$d[3],$d[0].$d[1])) {
+			if (strlen($this->requestData['from'])==8 && checkdate($d[2],$d[3],$d[0].$d[1]))
+			{
 				$this->setFromDate($this->requestData['from']);
 				return true;
-			} else {
+			}
+			else 
+			{
 				$this->addError('illegal date: '.$this->requestData['from'].'.');
 			}
 		}
@@ -1181,12 +1188,14 @@ parameters:
 			
 			$this->setMatchType('literal');
 
-			$t = $this->models->Taxon->_get(array(
+			$t = $this->models->Taxa->_get(array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon' => $taxon
 				)
 			));
+
+			if ($t) $nametype='isValidNameOf';
 
 			if (!$t)
 			{
@@ -1194,7 +1203,7 @@ parameters:
 
 				$t = $this->models->Names->freeQuery("
 					select
-						_a.taxon_id as id, _a.name
+						_a.taxon_id as id, _a.name, _b.nametype
 					from %PRE%names _a
 					left join %PRE%name_types _b 
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
@@ -1203,6 +1212,46 @@ parameters:
 						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
 						and _b.nametype = 'isValidNameOf'"
 				);
+				
+				if ($t) $nametype='isValidNameOf';
+			}
+
+			if (!$t)
+			{
+				$this->setMatchType('other name type (literal)');
+
+				$t = $this->models->Names->freeQuery("
+					select
+						_a.taxon_id as id, _a.name, _b.nametype
+					from %PRE%names _a
+					left join %PRE%name_types _b 
+						on _a.type_id=_b.id and _a.project_id=_b.project_id
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and _a.name='". mysql_real_escape_string($taxon) ."'
+						and _b.nametype != 'isValidNameOf'"
+				);
+
+				if ($t) $nametype=$t[0]['nametype'];
+			}
+
+			if (!$t)
+			{
+				$this->setMatchType('other name type (without authorship)');
+
+				$t = $this->models->Names->freeQuery("
+					select
+						_a.taxon_id as id, _a.name, _b.nametype
+					from %PRE%names _a
+					left join %PRE%name_types _b 
+						on _a.type_id=_b.id and _a.project_id=_b.project_id
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
+						and _b.nametype != 'isValidNameOf'"
+				);
+
+				if ($t) $nametype=$t[0]['nametype'];
 			}
 		
 			if (!$t)
@@ -1225,34 +1274,48 @@ parameters:
 			if (!$t)
 			{
 				$this->addError('taxon name "'.$this->rGetVal('taxon').'" not found in this project.');
+				$nametype=null;
 			} 
 			else
 			{
 				$this->setTaxonId($t[0]['id']);
 				
+<<<<<<< HEAD
 				$t = $this->models->Taxon->_get(array(
+=======
+				$t = $this->models->Taxa->_get(array(
+>>>>>>> development-WEG
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $this->getTaxonId()
 					)
 				));
+<<<<<<< HEAD
 				
 				$this->setTaxon($t[0]);
 				
 				//return $t;
+=======
+
+				$t[0]['nametype']=strtolower(rtrim(ltrim($nametype,'is'),'Of'));
+
+				$this->setTaxon($t[0]);
+
+>>>>>>> development-WEG
 			}
 		}
+
 		return false;
 	}
 
 	private function checkNsrId()
 	{
-		if (!$this->rHasVal('nsr')) {
-
+		if (!$this->rHasVal('nsr'))
+		{
 			$this->addError('no NSR-id specified.');
-
-		} else {
-			
+		} 
+		else
+		{
 			$nsr=trim($this->requestData['nsr']);
 			
 			$this->setMatchType('literal');

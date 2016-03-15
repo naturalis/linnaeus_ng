@@ -2,7 +2,7 @@
 
 	/*
 
-	the content for 'About ETI' is the same for all projects. it is stored in the same table 
+	the content for 'About ETI' is the same for all projects. it is stored in the same table
 	as the project specific content, using project ID=-10 (defined in the configuration file).
 	it needs to be available in the same language(s) that the project uses in order for
 	it to be displayed.
@@ -13,44 +13,14 @@
 	*/
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class LinnaeusController extends Controller
 {
 
     public $usedModels = array(
-		'content',
-        'content_taxon', 
-		'content_free_module',
-
-/*
-        'page_taxon', 
-        'page_taxon_title', 
-        'media_taxon',
-        'media_descriptions_taxon',
-		'synonym',
-		'commonname',
-		'content_introduction',
-		'literature',
-		
-		'choice_content_keystep',
-		'content_keystep',
-		'choice_keystep',
-		'keystep',
-		'literature',
-		'glossary_media',
-		'matrix',
-		'matrix_name',
-		'matrix_taxon_state',
-		'characteristic',
-		'characteristic_label',
-		'characteristic_label_state',
-		'characteristic_matrix',
-		'characteristic_label_state',
-		'characteristic_state',
-		'occurrence_taxon',
-		'names'
-*/	
-		    );
+		'content'
+	);
 
     public $usedHelpers = array(
     );
@@ -64,19 +34,18 @@ class LinnaeusController extends Controller
 		'lookup.js',
 		'dialog/jquery.modaldialog.js'
 	));
-	
+
 	public $controllerBaseName = 'linnaeus';
-		
+
     /**
      * Constructor, calls parent's constructor
      *
      * @access     public
      */
-    public function __construct($p=null)
+    public function __construct( $p=null )
     {
-
-        parent::__construct($p);
-
+        parent::__construct( $p );
+		$this->initialize( $p );
     }
 
     /**
@@ -86,9 +55,13 @@ class LinnaeusController extends Controller
      */
     public function __destruct ()
     {
-        
         parent::__destruct();
-    
+    }
+
+
+    private function initialize( $p )
+    {
+		$this->moduleSettings=new ModuleSettingsReaderController( $p );
     }
 
 
@@ -105,37 +78,30 @@ class LinnaeusController extends Controller
 
 		$this->resolveProjectId();
 
-		if (!$this->getCurrentProjectId()) {
-
+		if (!$this->getCurrentProjectId())
+		{
 			$this->addError($this->translate('Unknown project or invalid project ID.'));
-
 	        $this->printPage();
-
-		} else {
-
+		} 
+		else 
+		{
 	        $this->setUrls();
-
 			$this->setCurrentProjectData();
-			
 			$this->setCssFiles();
-		
-			if ($this->rHasVal('r')) {
 
-				$url = $this->requestData['r'];
-
-			} else {
-				
-				$url = $this->getSetting('start_page');
-				
+			if ($this->rHasVal('r'))
+			{
+				$url = $this->rGetVal('r');
+			} 
+			else 
+			{
+				$url=$this->moduleSettings->getGeneralSetting( 'start_page' );
 				if (empty($url))
 					$url = 'index.php';
-
 			}
-			
+
 			$this->redirect($url);
-
 		}
-
     }
 
 
@@ -146,19 +112,15 @@ class LinnaeusController extends Controller
      */
     public function indexAction ()
     {
-
-		if ($this->rHasVal('show','icongrid')) {
-
+		if ($this->rHasVal('show','icongrid'))
+		{
 			$this->printPage();
-
-		} else {
-
+		} 
+		else 
+		{
 			$this->setStoreHistory(false);
-
 			$this->redirect('../linnaeus/content.php?sub=Welcome');
-		
 		}
-
     }
 
     /**
@@ -173,10 +135,10 @@ class LinnaeusController extends Controller
 			$d = $this->getContent('Welcome');
 
 		} else {
-		
+
 			$d = $this->getContent(
-				(isset($this->requestData['sub']) ? $this->requestData['sub'] : null),
-				(isset($this->requestData['id']) ? $this->requestData['id'] : null)
+				($this->rHasVar('sub') ? $this->rGetVal('sub') : null),
+				($this->rHasVar('id') ? $this->rGetId() : null)
 			);
 
 		}
@@ -189,18 +151,30 @@ class LinnaeusController extends Controller
 		//$this->smarty->assign('content',$d['content']);
 
         $this->printPage();
-  
+
     }
-	
+
     public function rootIndexAction()
 	{
 		if (defined('FIXED_PROJECT_ID')) $this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
 
+<<<<<<< HEAD
 		$id=$this->resolveProjectShortName();
 		
 		if ($id) $this->redirect('app/views/linnaeus/set_project.php?p='.$id);
 		
 		$projects = $this->models->Project->_get(
+=======
+		if (defined('FIXED_PROJECT_ID'))
+			$this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
+
+		$id = $this->resolveProjectShortName();
+
+		if ($id)
+			$this->redirect('app/views/linnaeus/set_project.php?p='.$id);
+
+		$projects = $this->models->Projects->_get(
+>>>>>>> development-WEG
 			array(
 				'id' => array('published' => 1),
 				'order' => 'title'
@@ -232,22 +206,33 @@ class LinnaeusController extends Controller
 		$this->smarty->assign('texts',$texts);
 
         $this->printPage('root_index');
-	
+
 	}
 
     public function noProjectAction()
 	{
 		$this->redirect($this->baseUrl.'?nopid');
+<<<<<<< HEAD
+=======
+		/*
+		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
+
+		$this->smarty->assign('excludeLogout',true);
+
+        $this->printPage();
+		*/
+
+>>>>>>> development-WEG
 	}
 
 	public function getContent($sub=null,$id=null)
 	{
 
 		// see note at top of file
-		if ($sub==$this->controllerSettings['contentAboutETI']['sub']) {
+		if ($sub=='About ETI') {
 
 			$d = array(
-				'project_id' => $this->controllerSettings['contentAboutETI']['projectID'],
+				'project_id' => -10,
 				'language_id' => $this->getCurrentLanguageId()
 			);
 
@@ -257,17 +242,17 @@ class LinnaeusController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'language_id' => $this->getCurrentLanguageId()
 			);
-			
+
 			if ($id!=null) $d['id'] = $id;
 			elseif ($sub!=null) $d['subject'] = $sub;
 			else return;
-		
+
 		}
-		
+
 		$c = $this->models->Content->_get(array('id' => $d));
 
 		return isset($c[0]) ? $c[0] : null;
-	
+
 	}
 
 	private function resolveProjectShortName()
@@ -277,7 +262,7 @@ class LinnaeusController extends Controller
 
 		if ($n!=$this->getAppName() && $n!='linnaeus_ng') {
 
-            $p = $this->models->Project->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
+            $p = $this->models->Projects->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
 
 			if ($p) {
 				foreach((array)$p as $val) {
@@ -294,9 +279,9 @@ class LinnaeusController extends Controller
 
 
 		}
-		
+
 		return null;
-		
+
 	}
 
     public function ajaxInterfaceAction ()
@@ -304,80 +289,43 @@ class LinnaeusController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->requestData);
+            $this->getLookupList($this->rGetAll());
 
         }
 
 		$this->allowEditPageOverlay = false;
-		
+
         $this->printPage();
-    
+
     }
 
 	// general
 	public function getLookupList($p)
 	{
-		
+
 		$search=isset($p['search']) ? $p['search'] : null;
-		$match_start=isset($p['match_start']) ? $p['match_start']==1 : false;
+		$matchStart=isset($p['match_start']) ? $p['match_start']==1 : false;
 
-		$data=$this->models->Taxon->freeQuery("
-			select * from
-			(
-				select
-					id,taxon as label,'species' as source, concat('../species/taxon.php?id=',id) as url, rank_id
-				from
-					%PRE%taxa
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and taxon like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
+		/* Method moved to ControllerModel as it's kind of generic; ControllerModel included in $usedModels() */
+		$data = $this->models->ControllerModel->getLookupList(array(
+            'search' => $search,
+    		'matchStart' => $matchStart,
+    		'projectId' => $this->getCurrentProjectId()
+		));
 
-			union
-			
-				select
-					id,concat(
-						author_first,
-						if(multiple_authors=1,
-							' et al.',
-							if(author_second!='',concat(' & ',author_second),'')
-						),
-						', ',
-						year,
-						ifnull(suffix,'')
-					) as label,'literature' as source, concat('../literature/reference.php?id=',id) as url, null as rank_id
-				from %PRE%literature
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "
-						and (
-							author_first like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%' or
-							author_second like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%' or
-							year like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'
-						)
-					")."
-					
-			union
-
-				select 
-					id,topic as label,'introduction' as source, concat('../introduction/topic.php?id=',id) as url, null as rank_id
-				from
-					%PRE%content_introduction
-				where
-					project_id = ".$this->getCurrentProjectId() ."
-					".($search=='*' ? "" : "and topic like '".(!$match_start ? '%' : ''). mysql_real_escape_string($search)."%'" )."
-
-
-			) as unification
-			order by label
-			limit 100
-		");
-		
 		foreach((array)$data as $key=>$val)
 		{
 			if ($val['source']=='species')
-				$data[$key]['label']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['label'],'rank_id'=>$val['rank_id']),'rankpos'=>'post'));
+				$data[$key]['label']=$this->formatTaxon(array(
+				    'taxon'=>array(
+				        'taxon'=>$val['label'],
+				        'rank_id'=>$val['rank_id']
+				    ),
+				     'rankpos'=>'post'
+
+				));
 		}
 
 		$this->smarty->assign(
@@ -385,13 +333,13 @@ class LinnaeusController extends Controller
 			$this->makeLookupList(array(
 				'data'=>$data,
 				'module'=>$this->controllerBaseName,
-				'sortData'=>true
+				'sortData'=>false
 			))
-		); 
-			
+		);
+
 	}
 
 
-	
+
 
 }

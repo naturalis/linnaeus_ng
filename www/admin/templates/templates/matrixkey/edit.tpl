@@ -3,13 +3,14 @@
 <div id="page-main">
 <p>
 <span class="matrix-header">
-	{t _s1=$matrix.matrix}Editing matrix "%s"{/t}
+
+	{t _s1=$matrix.label}Editing matrix "%s"{/t}
 	(<a href="preview.php">{t}preview{/t}</a>) (<a href="matrices.php">{t}select another matrix{/t}</a>)<br />
 	{if $matrices|@count> 1}
 		{if $matrix.default==1}
-			(this is the default matrix)
+			{t}(this is the default matrix){/t}
 		{else}
-			(this is not currently the default matrix; <a href="?action=def&id={$matrix.id}">make this matrix the default matrix</a>)
+			{t}(this is not currently the default matrix;{/t} <a href="?action=def&id={$matrix.id}">{t}make this matrix the default matrix{/t}</a>)
 		{/if}
 		<br />
 	{/if}
@@ -44,11 +45,12 @@
 			<option id="var-{$v.id}" value="var-{$v.id}">{$v.label}</option>
 			{/foreach}
 			{/if}
-			
-			{if $matrices}
+			{if $matrices && $matrices|@count>1}
 			<option disabled="disabled">----------------------------------------------------------------------------------------------------</option>
 			{foreach from=$matrices item=v}
+            {if $matrix.id!=$v.id}
 			<option id="mx-{$v.id}" value="mx-{$v.id}">{$v.default_name}</option>
+            {/if}
 			{/foreach}
 			{/if}
 			</select>
@@ -89,16 +91,13 @@
 </div>
 
 {if $activeCharacteristic}
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-matrixSetActiveState({$activeCharacteristic});
-matrixCharacteristicsChange();
-{literal}
+$(document).ready(function()
+{
+	matrixSetActiveState({$activeCharacteristic});
+	matrixCharacteristicsChange();
 });
 </script>
-{/literal}
 {/if}
 
 {include file="../shared/admin-messages.tpl"}

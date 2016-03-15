@@ -11,9 +11,9 @@
 	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold">
 		<span id="taxon-language-default-language">
 {if $languages|@count>1}
-{section name=i loop=$languages}
-{if $languages[i].def_language=='1'}{$languages[i].language}{/if}
-{/section}
+{foreach $languages v k}
+{if $v.def_language=='1'}{$v.language}{/if}
+{/foreach}
 {/if}
 		</span>
 	</div>
@@ -60,33 +60,28 @@
 <form action="media_upload.php" method="post" id="imgForm">
 <input type="hidden" name="id" id="id" value="{$id}" />
 </form>
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	allActiveView = 'freemodule';
-{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
+{foreach $languages v k}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
 	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 
-	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
-
 	initTinyMce(false,false);
 
-	allSetAutoSaveFreq({$autoSaveFrequency});
-	freemodRunAutoSave();
-
-{literal}	
+	//allSetAutoSaveFreq({$autoSaveFrequency});
+	//freemodRunAutoSave();
 });
 
-function onInitTinyMce() {
+function onInitTinyMce()
+{
 	freemodGetDataAll();
 }
 
 </script>
-{/literal}
 
 </div>
 

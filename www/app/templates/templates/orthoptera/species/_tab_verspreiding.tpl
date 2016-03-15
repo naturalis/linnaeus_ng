@@ -14,7 +14,7 @@
 
 			{if $distributionMaps.count>0}
 			<h2>{t}Verspreiding{/t}</h2>
-			{foreach from=$distributionMaps.data item=v}
+			{foreach $distributionMaps.data v}
 
 			<a class="zoomimage" rel="prettyPhoto[gallery]" href="http://images.naturalis.nl/original/{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
 			{if $v.meta_map_source && $v.meta_map_description}<br />{/if}{if $v.meta_map_source}Bron: {$v.meta_map_source}{/if}">
@@ -50,8 +50,7 @@
 			</div>
 		
 			{/if}
-		
-			
+
 			{assign var=trendByYear value=$trendData.byYear|@count>0}
 			{assign var=trendByTrend value=$trendData.byTrend|@count>0}
 			{assign var=trendSources value=$trendData.sources|@count>0}
@@ -64,14 +63,14 @@
 				<div id="graph" style="height:300px;"></div>
 				{/if}
 				{if $trendByTrend}
-				{foreach from=$trendData.byTrend item=v}
+				{foreach $trendData.byTrend v}
 				{$v.trend_label}: {$v.trend}<br />
 				{/foreach}
 				{/if}
 				{if $trendSources}
 				<br />
 				{t}Bron:{/t}
-				{foreach from=$trendData.sources item=v key=k}
+				{foreach $trendData.sources v k}
 				{if $k>0}, {/if}{$v}
 				{/foreach}
 				(via <a href="http://www.netwerkecologischemonitoring.nl" target="_blank">Netwerk Ecologische Monitoring</a>)
@@ -98,7 +97,7 @@
 				Morris.Bar({
 				  element: 'graph',
 				  data: [
-				  {foreach from=$trendData.byYear item=v}
+				  {foreach $trendData.byYear v}
 					{ y: '{$v.trend_year}', a: {$v.trend} },
 				  {/foreach}
 				  ],

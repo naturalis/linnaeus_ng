@@ -19,13 +19,13 @@
 $(document).ready(function(){
 {/literal}
 {assign var=first value=true}
-{section name=i loop=$projectRanks}
-	keyAddRank({$projectRanks[i].rank_id},'{$projectRanks[i].rank}');
-	{if $first && $projectRanks[i].keypath_endpoint == 1}
-	keyRankBorder = {$projectRanks[i].rank_id};
+{foreach $projectRanks v i}
+	keyAddRank({$v.rank_id},'{$v.rank}');
+	{if $first && $v.keypath_endpoint == 1}
+	keyRankBorder = {$v.rank_id};
 	{assign var=first value=false}
 	{/if}
-{/section}
+{/foreach}
 	keyShowRanks();
 {literal}
 });

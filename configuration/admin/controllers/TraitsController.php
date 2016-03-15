@@ -26,11 +26,9 @@ class TraitsController extends Controller
 	public $_inputFileFieldEncloser='"';
 	public $_inputFileReferenceSeparators=";";
 
-
     public function __construct ()
     {
         parent::__construct();
-		$this->initialise();
     }
 
     public function __destruct ()
@@ -38,12 +36,7 @@ class TraitsController extends Controller
         parent::__destruct();
     }
 
-    private function initialise()
-    {
-    }
-
-
-	public function getSettings($group)
+	public function getTraitsSettings()
 	{
         $s=$this->models->TraitsSettings->_get(
 			array(
@@ -97,38 +90,16 @@ class TraitsController extends Controller
 		
 	}
 
-
 	public function getTraitgroup($id)
 	{
 		if (empty($id)) return;
 
-		$d=$this->models->TraitsGroups->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as description
-			from
-				%PRE%traits_groups _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.text_id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.description_tid=_c.text_id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.id=".$id."
-		");
+		$r=$this->models->TraitsModel->getTraitgroup(array(
+			'language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'group_id'=>$id
+		));
 		
-		$r=$d[0];
-
 		if (isset($r['name_tid'])) $r['names']=$this->getTextTranslations(array('text_id'=>$r['name_tid']));
 		if (isset($r['description_tid'])) $r['descriptions']=$this->getTextTranslations(array('text_id'=>$r['description_tid']));
 		if (isset($r['all_link_text_tid'])) $r['all_link_texts']=$this->getTextTranslations(array('text_id'=>$r['all_link_text_tid']));
@@ -145,31 +116,11 @@ class TraitsController extends Controller
 		$level=isset($p['level']) ? $p['level'] : 0;
 		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
 		
-		$g=$this->models->TraitsGroups->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as description
-			from
-				%PRE%traits_groups _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.description_tid=_c.id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.parent_id ".(is_null($parent) ? "is null" : "=".$parent)."
-				order by _a.show_order, _a.sysname
-		");
+		$g=$this->models->TraitsModel->getTraitgroups(array(
+			'language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'parent_id'=>$parent
+		));
 		
 		foreach((array)$g as $key=>$val)
 		{
@@ -189,164 +140,25 @@ class TraitsController extends Controller
 	{
 		if (empty($group)) return;
 
-		$r=$this->models->TraitsTraits->freeQuery("
-			select
-				_a.*,
-				_b.translation as name,
-				_c.translation as code,
-				_d.translation as description,
-				_e.sysname as date_format_name,
-				_e.format as date_format_format,
-				_e.format_hr as date_format_format_hr,
-				_g.sysname as type_sysname,
-				_g.allow_values as type_allow_values,
-				_g.allow_select_multiple as type_allow_select_multiple,
-				_g.allow_max_length as type_allow_max_length,
-				_g.allow_unit as type_allow_unit,
-				count(_v.id) as value_count
-
-			from
-				%PRE%traits_traits _a
-				
-			left join 
-				%PRE%text_translations _b
-				on _a.project_id=_b.project_id
-				and _a.name_tid=_b.text_id
-				and _b.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _c
-				on _a.project_id=_c.project_id
-				and _a.code_tid=_c.text_id
-				and _c.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%text_translations _d
-				on _a.project_id=_d.project_id
-				and _a.description_tid=_d.text_id
-				and _d.language_id=". $this->getDefaultProjectLanguage() ."
-
-			left join 
-				%PRE%traits_date_formats _e
-				on _a.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _a.project_id=_f.project_id
-				and _a.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-				
-			left join
-				%PRE%traits_values _v
-				on _a.project_id=_v.project_id
-				and _a.id=_v.trait_id
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.trait_group_id=".$group."
-			group by _a.id
-			order by _a.show_order,_a.sysname
-		");
+		$r=$this->models->TraitsModel->getTraitgroupTraits(array(
+			'language_id'=>$this->getDefaultProjectLanguage(),
+			'project_id'=>$this->getCurrentProjectId(),
+			'trait_group_id'=>$group
+		));
 
 		return $r;
 	}
-
-
-	private function getTraitgroupTraitValuesTaxonCount( $values )
-	{
-		if ( empty($values) )
-			return $values;
-		
-		$r=$this->models->TraitsValues->freeQuery(
-			array(
-				"query"=>"
-					select
-						count(distinct taxon_id) as taxon_count,
-						count(taxon_id) as total_count,
-						value_id
-					from
-						%PRE%traits_taxon_values
-					where 
-						project_id = " . $this->getCurrentProjectId() . "
-					group by
-						value_id
-					",
-				"fieldAsIndex"=>"value_id"
-			)
-		);
-		
-		foreach( $values as $key=>$val )
-		{
-			$values[$key]['usage_taxon_count']=@$r[$val['id']]['taxon_count'];
-			$values[$key]['usage_total_count']=@$r[$val['id']]['total_count'];
-		}
-		
-		return $values;
-	}
-
-	private function getTraitgroupTraitFreeValueTaxonCount( $trait )
-	{
-		if ( empty($trait) )
-			return $trait;
-			
-		$r=$this->models->TraitsValues->freeQuery("
-			select
-				count(distinct taxon_id) as taxon_count,
-				count(taxon_id) as total_count
-			from
-				%PRE%traits_taxon_freevalues
-			where 
-				project_id = " . $this->getCurrentProjectId() . "
-				and trait_id = ". $trait['id']
-		);
-		
-		$trait['freevalue_taxon_count']=$r[0]['taxon_count'];
-		$trait['freevalue_total_count']=$r[0]['total_count'];
-
-		return $trait;
-	}
-
-
-
-
 
 	public function getTraitgroupTrait($p)
 	{
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 
 		if (empty($trait)) return;
-		
-		$r=$this->models->TraitsTraits->freeQuery("
-			select
-				_a.*,
-				_e.sysname as date_format_name,
-				_e.format as date_format_format,
-				_e.format_hr as date_format_format_hr,
-				_g.sysname as type_sysname,
-				_g.verification_function_name as type_verification_function_name
-			from
-				%PRE%traits_traits _a
 
-			left join 
-				%PRE%traits_date_formats _e
-				on _a.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _a.project_id=_f.project_id
-				and _a.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-
-			where
-				_a.project_id=". $this->getCurrentProjectId()."
-				and _a.id=".$trait."
-		");
+		$r=$this->models->TraitsModel->getTraitgroupTrait(array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'trait_id'=>$trait
+		));
 
 		$r = isset($r[0]) ? $r[0] : null;
 	
@@ -383,51 +195,10 @@ class TraitsController extends Controller
 
 		if (empty($trait)) return;
 
-		$r=$this->models->TraitsValues->freeQuery("
-			select
-				_a.id,
-				_a.trait_id,
-				_a.string_value,
-				_a.string_label_tid,
-				_a.numerical_value,
-				_a.numerical_value_end,
-				_a.date,
-				_a.date_end,
-				_a.is_lower_limit,
-				_a.is_upper_limit,
-				_a.lower_limit_label,
-				_a.upper_limit_label,						
-				_g.allow_fractures,
-				_e.format as date_format_format
-
-			from 
-				%PRE%traits_values _a
-				
-			left join 
-				%PRE%traits_traits _b
-				on _a.project_id=_b.project_id
-				and _a.trait_id=_b.id
-
-			left join 
-				%PRE%traits_date_formats _e
-				on _b.date_format_id=_e.id
-
-			left join 
-				%PRE%traits_project_types _f
-				on _b.project_id=_f.project_id
-				and _b.project_type_id=_f.id
-
-			left join 
-				%PRE%traits_types _g
-				on _f.type_id=_g.id
-
-			where
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and _a.trait_id = ".$trait." 
-			order by 
-				_a.show_order
-		
-		");
+		$r=$this->models->TraitsModel->getTraitgroupTraitValues(array(
+			'project_id'=>$this->getCurrentProjectId(),
+			'trait_id'=>$trait
+		));
 		
 		foreach((array)$r as $key=>$val)
 		{
@@ -473,8 +244,6 @@ class TraitsController extends Controller
 		return $r;
 	}
 
-
-
 	public function __null_check($value,$trait)
 	{
 		if (empty($value))
@@ -493,7 +262,6 @@ class TraitsController extends Controller
 
 	public function __string_list_check($value,$trait)
 	{
-		
 		foreach((array)$trait['values'] as $val)
 		{
 			if ($value==$val['string_value'])
@@ -572,8 +340,6 @@ class TraitsController extends Controller
 			return array('pass'=>true,'value'=>$value);
 		}
 	}
-		
-
 
 	public function check_boolean($p)
 	{
@@ -753,8 +519,6 @@ class TraitsController extends Controller
 
 	}
 
-
-
 	public function formatDbDate($date,$format)
 	{
 		return is_null($date) ? null : date_format(date_create($date),$format);
@@ -776,6 +540,48 @@ class TraitsController extends Controller
 			;
 		}
 	}
+
+
+
+	private function getTraitgroupTraitValuesTaxonCount( $values )
+	{
+		if ( empty($values) )
+			return $values;
+
+		$ra=$this->models->TraitsTaxonValues->_get(
+			array(
+				'columns'=>'count(distinct taxon_id) as taxon_count,count(taxon_id) as total_count',
+				'id'=>array('project_id'=>$this->getCurrentProjectId()),
+				'group'=>'value_id',
+				'fieldAsIndex'=>'value_id'
+			)
+		);
+
+		foreach( $values as $key=>$val )
+		{
+			$values[$key]['usage_taxon_count']=@$r[$val['id']]['taxon_count'];
+			$values[$key]['usage_total_count']=@$r[$val['id']]['total_count'];
+		}
+		
+		return $values;
+	}
+
+	private function getTraitgroupTraitFreeValueTaxonCount( $trait )
+	{
+		if ( empty($trait) )
+			return $trait;
+			
+		$r=$this->models->TraitsTaxonFreevalues->_get(array(
+			'columns'=>'count(distinct taxon_id) as taxon_count,count(taxon_id) as total_count',
+			'id'=>array('project_id'=>$this->getCurrentProjectId(),'trait_id'=>$trait['id'])
+		));
+		
+		$trait['freevalue_taxon_count']=$r[0]['taxon_count'];
+		$trait['freevalue_total_count']=$r[0]['total_count'];
+
+		return $trait;
+	}
+
 
 }
 

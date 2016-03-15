@@ -3,22 +3,22 @@
 /*
 
 	NEXUS IMPORT
-	
+
 	while exporting from L2, choose the version with tabs, not the "standard"
-	
-	multiple states are assigned in the matrix as {023} for 0,2,3. i have no idea what 
-	happens when characters have more than 9 states. the import simply assumes 
+
+	multiple states are assigned in the matrix as {023} for 0,2,3. i have no idea what
+	happens when characters have more than 9 states. the import simply assumes
 	it doesn't happen.
 
 	also, in the header:
 	FORMAT MISSING=?  GAP=- SYMBOLS= " 0 1 2 3";
 	is ignored. the application uses ? as symbol for missing values (hardcoded).
-	
+
 	for cleaning up names before resolving (reducing "Genus Flickingeria" to "Flickingeria")
 	program blindly assumes english ranks names. ranks are not checked to be valid when names are
 	found. obviously, the taxa already need to exist to be found! the import does NOT create
 	any taxa. if resolvement fails, the user is notified and the taxon is ignored.
-	
+
 	there is no check if there is another matrix with the same name (but import will work nonetheless)
 
 */
@@ -44,15 +44,15 @@ class ImportNexusController extends Controller
 
 		define('NEXUS_START_TAG','#NEXUS');
 		define('NEXUS_DEFAULT_CHARTYPE','text');
-	
+
         $this->checkAuthorisation();
-        
+
         $this->setPageName($this->translate('Nexus file upload'));
-        
+
         if ($this->requestDataFiles) {
-            
+
 			$buffer=trim(file_get_contents($this->requestDataFiles[0]["tmp_name"]));
-			
+
 			if (substr($buffer,0,strlen(NEXUS_START_TAG))!==NEXUS_START_TAG) {
 
 				$this->addError('Not a valid nexus-file (files lacks start-tag "'.NEXUS_START_TAG.'")');
@@ -60,9 +60,9 @@ class ImportNexusController extends Controller
 			} else {
 
 				$matrixname = ucwords(basename(strtolower($this->requestDataFiles[0]["name"]),'.nex'));
-				
+
 				$d=preg_split('/(BEGIN DATA;)/s',$buffer); // 0: header block, 1 data
-				
+
 				$data=trim($d[1]);
 				$h=preg_split('/\n/',$data);
 				$dimensions=$format=null;
@@ -90,7 +90,7 @@ class ImportNexusController extends Controller
 					$val=explode(' ',trim(preg_replace(array('/\s/','/(\[|\])/'),array(' ',''),$val)));
 					$charlabels[(int)trim($val[0])]=str_replace('_',' ',$val[1]);
 				}
-				
+
 				//statelabels
 				preg_match('/(STATELABELS)(.+?)(;)(.+)(MATRIX)/s',$data,$matches);
 				$d=$matches[0];
@@ -101,7 +101,7 @@ class ImportNexusController extends Controller
 					if (strlen($val)==0 || strpos($val,'[')===false || strpos($val,']')===false)
 						continue;
 					$val=explode(' ',trim(preg_replace(array('/\s/','/(\[|\])/'),array(' ',''),trim($val))));
-					
+
 					if (count($val)==3) {
 						$prev=$charid=$val[0];
 						$stateid=$val[1];
@@ -141,7 +141,7 @@ class ImportNexusController extends Controller
 					}
 					$taxa[] = array('label'=>str_replace('_',' ',$boom[0]),'states'=> $states);
 				}
-						
+
 				if ($dimensions['taxa']!=count((array)$taxa))
 					$this->addError('Number of actual taxa does not match header ('.count((array)$taxa).' vs '.$dimensions['taxa'].')');
 
@@ -155,56 +155,56 @@ class ImportNexusController extends Controller
 				//saving characters
 				$showOrder=0;
 				foreach ((array) $charlabels as $cKey => $cVal) {
-					
+
 					$id=$this->createMatrixCharacter(
 						array(
-							'type'=>NEXUS_DEFAULT_CHARTYPE, 
+							'type'=>NEXUS_DEFAULT_CHARTYPE,
 							'label'=>$cVal,
 							'matrix_id'=>$mId,
 							'showOrder'=>$show_order++
 						)
 					);
-	
+
 					$charlabels[$cKey] = array('id'=>$id,'label'=>$cVal);
 
 				}
-								
+
 				//saving states
 				foreach ((array)$statelabels as $lKey => $statelabel) {
 
 					foreach ((array)$statelabel as $sKey => $sVal) {
 
-						$this->models->CharacteristicState->save(
+						$this->models->CharacteristicsStates->save(
 						array(
-							'id' => null, 
-							'project_id' => $this->getCurrentProjectId(), 
-							'characteristic_id' => $charlabels[$lKey]['id'], 
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'characteristic_id' => $charlabels[$lKey]['id'],
 							'got_labels' => 1
 						));
-						
-						$statelabels[$lKey][$sKey]=array('id'=>$this->models->CharacteristicState->getNewId(),'label'=>$sVal);
-                    
-						$this->models->CharacteristicLabelState->save(
+
+						$statelabels[$lKey][$sKey]=array('id'=>$this->models->CharacteristicsStates->getNewId(),'label'=>$sVal);
+
+						$this->models->CharacteristicsLabelsStates->save(
 						array(
-							'id' => null, 
-							'project_id' => $this->getCurrentProjectId(), 
-							'state_id' => $statelabels[$lKey][$sKey]['id'], 
-							'language_id' => $this->getDefaultProjectLanguage(), 
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'state_id' => $statelabels[$lKey][$sKey]['id'],
+							'language_id' => $this->getDefaultProjectLanguage(),
 							'label' => $sVal
 						));
-						
+
 					}
 
 				}
-				
+
 				//resolving & connecting taxa
 				$ranks=array();
 				$pr=$this->newGetProjectRanks();
 				foreach((array)$pr as $val)
 					$ranks[]=$val['rank'];
-				
+
 				foreach((array)$taxa as $key=>$val) {
-					
+
 					$t=$this->getTaxonByName($val['label']);
 					if (empty($t)) {
 						$t=$this->getTaxonByName(str_replace($ranks,'',$val['label']));
@@ -216,48 +216,48 @@ class ImportNexusController extends Controller
 
 					$taxonId=$t['id'];
 
-					$this->models->MatrixTaxon->save(
+					$this->models->MatricesTaxa->save(
 					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'matrix_id' => $mId, 
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $mId,
 						'taxon_id' => $taxonId
 					));
-					
+
 					foreach((array)$val['states'] as $sKey=>$sVal) {
-						
+
 						foreach((array)$sVal as $tKey=>$tVal) {
-							
+
 							if ($tVal=='?') //missing value
 								continue;
-					
-							$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
+
+							$this->models->MatricesTaxaStates->setNoKeyViolationLogging(true);
 
 							$cId=$charlabels[$sKey]['id'];
 							$sId=$statelabels[$sKey][$tVal]['id'];
-						
-							$this->models->MatrixTaxonState->save(
+
+							$this->models->MatricesTaxaStates->save(
 							array(
-								'id' => null, 
-								'project_id' => $this->getCurrentProjectId(), 
-								'matrix_id' => $mId, 
-								'characteristic_id' => $cId, 
-								'state_id' => $sId, 
+								'id' => null,
+								'project_id' => $this->getCurrentProjectId(),
+								'matrix_id' => $mId,
+								'characteristic_id' => $cId,
+								'state_id' => $sId,
 								'taxon_id' => $taxonId
-							));		
-						
+							));
+
 						}
-					
+
 					}
 
 					$this->addMessage('Saved states for taxon "'.$val['label'].'".');
-					
+
 				}
-				
+
 			}
-				
+
 		}
-       
+
         $this->printPage('nexus_import');
 
     }

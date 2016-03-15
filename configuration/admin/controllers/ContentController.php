@@ -76,8 +76,14 @@ class ContentController extends Controller
     public function introductionAction()
     {
 
-		$_SESSION['admin']['system']['content']['current-subject'] = 'Introduction';
-		$_SESSION['admin']['system']['content']['is-free-module'] = false;
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'current-subject',
+            'value' => 'Introduction'
+        ));
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'is-free-module',
+            'value' => false
+        ));
 
 		$this->redirect('content.php');
 
@@ -92,8 +98,14 @@ class ContentController extends Controller
     public function contributorsAction()
     {
 
-		$_SESSION['admin']['system']['content']['current-subject'] = 'Contributors';
-		$_SESSION['admin']['system']['content']['is-free-module'] = false;
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'current-subject',
+            'value' => 'Contributors'
+        ));
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'is-free-module',
+            'value' => false
+        ));
 
 		$this->redirect('content.php');
 
@@ -124,8 +136,14 @@ class ContentController extends Controller
     public function welcomeAction()
     {
 
-		$_SESSION['admin']['system']['content']['current-subject'] = 'Welcome';
-		$_SESSION['admin']['system']['content']['is-free-module'] = false;
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'current-subject',
+            'value' => 'Welcome'
+        ));
+		$this->moduleSession->setModuleSetting(array(
+            'setting' => 'is-free-module',
+            'value' => false
+        ));
 
 		$this->redirect('content.php');
 
@@ -138,22 +156,25 @@ class ContentController extends Controller
 
 		if ($this->rHasId()) {
 
-			$d = $this->getContentById($this->requestData['id'],$_SESSION['admin']['project']['default_language_id']);
-			$_SESSION['admin']['system']['content']['current-subject'] = $d['subject'];
+		    $d = $this->getContentById($this->rGetId(), $this->getDefaultProjectLanguage());
+		    $this->moduleSession->setModuleSetting(array(
+                'setting' => 'current-subject',
+                'value' => $d['subject']
+            ));
 
 		}
 
 		$currentSubject =
-			isset($_SESSION['admin']['system']['content']['current-subject']) ?
-			$_SESSION['admin']['system']['content']['current-subject'] :
-			'Introduction';
+			!is_null($this->moduleSession->getModuleSetting('current-subject')) ?
+			    $this->moduleSession->getModuleSetting('current-subject') : 'Introduction';
 
         $this->setPageName($this->translate($currentSubject));
 
-		$this->smarty->assign('isFreeModule', isset($_SESSION['admin']['system']['content']['is-free-module']) ? $_SESSION['admin']['system']['content']['is-free-module'] : false);
+		$this->smarty->assign('isFreeModule', isset($_SESSION['admin']['system']['content']['is-free-module']) ?
+            $_SESSION['admin']['system']['content']['is-free-module'] : false);
 
-		if (isset($_SESSION['admin']['system']['content']['free-module-id']))
-			$this->smarty->assign('freeModuleId',$_SESSION['admin']['system']['content']['free-module-id']);
+		if (!is_null($this->moduleSession->getModuleSetting('free-module-id')))
+			$this->smarty->assign('freeModuleId', $this->moduleSession->getModuleSetting('free-module-id'));
 
 		$this->smarty->assign('subject', $currentSubject);
 
@@ -161,7 +182,7 @@ class ContentController extends Controller
 
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 
-		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -172,7 +193,7 @@ class ContentController extends Controller
     public function previewAction ()
     {
 
-		$this->redirect('../../../app/views/linnaeus/index.php?p='.$this->getCurrentProjectId().'&sub='.$this->requestData['subject']);
+		$this->redirect('../../../app/views/linnaeus/index.php?p='.$this->getCurrentProjectId().'&sub='.$this->rGetVal('subject'));
 
     }
 
@@ -187,12 +208,12 @@ class ContentController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->requestData['action'] == 'save_content') {
+        if ($this->rGetVal('action') == 'save_content') {
 
             $this->ajaxActionSaveContent();
 
         } else
-        if ($this->requestData['action'] == 'get_content') {
+        if ($this->rGetVal('action') == 'get_content') {
 
             $this->ajaxActionGetContent();
 
@@ -216,8 +237,8 @@ class ContentController extends Controller
                 $this->models->Content->delete(
                     array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'],
-                        'subject' => $this->requestData['id']
+                        'language_id' => $this->rGetVal('language'),
+                        'subject' => $this->rGetId()
                     )
                 );
 
@@ -227,8 +248,8 @@ class ContentController extends Controller
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							'language_id' => $this->requestData['language'],
-							'subject' => $this->requestData['id']
+							'language_id' => $this->rGetVal('language'),
+							'subject' => $this->rGetId()
 						)
 					)
 				);
@@ -237,9 +258,9 @@ class ContentController extends Controller
 					array(
 						'id' => isset($ls[0]['id']) ? $ls[0]['id'] : null,
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->requestData['language'],
-						'subject' => $this->requestData['id'],
-						'content' => trim($this->requestData['content'])
+						'language_id' => $this->rGetVal('language'),
+						'subject' => $this->rGetId(),
+						'content' => trim($this->rGetVal('content'))
 					));
 
             }
@@ -297,7 +318,7 @@ class ContentController extends Controller
 
         } else {
 
-			$d = $this->getContentBySubject($this->requestData['id'],$this->requestData['language']);
+			$d = $this->getContentBySubject($this->rGetId(), $this->rGetVal('language'));
 
             $this->smarty->assign('returnText', $d['content']);
 

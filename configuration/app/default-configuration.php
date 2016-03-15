@@ -55,7 +55,6 @@ class configuration
     {
 
         return array(
-            'debugMode' => false,
             'app' => array(
 				'name' => 'Linnaeus NG',
 				'version' => '0.1-dev.r001',
@@ -72,18 +71,15 @@ class configuration
 			//'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
 			'urlNoProjectId' => '../../../app/views/linnaeus/no_project.php',
 			'urlUploadedProjectMedia' => '../../../shared/media/project/',
-			'urlSplashScreen' => '../../../app/views/linnaeus/splash.php',
+			//'urlSplashScreen' => '../../../app/views/linnaeus/splash.php',
 			'lngFileRoot' => $this->_appFileRoot,
-            'maxSessionHistorySteps' => 10,
             'paths' => array(
             ),
             'directories' => array(
 				'log' => $this->_appFileRoot . 'log',
-				'cache' => $this->_appFileRoot . 'www/shared/cache',
 				'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project',
 				'customStyle' => $this->_appFileRoot . 'www/app/style/custom'
             ),
-			'maxBackSteps' => 100,
 			'urlsToAdminEdit' => array(
 				'introduction:topic' => '../../../admin/views/introduction/edit.php?id=%s',
 				'glossary:term' => '../../../admin/views/glossary/edit.php?id=%s',
@@ -98,41 +94,14 @@ class configuration
 				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
 				'key:index' => '../../../admin/views/key/step_show.php?id=%s',
 			),
-			'useJavascriptLinks' => false,
 			'useGlossaryPostIts' => false,
 			'addedProjectIDParam' => 'epi',
-			'splashDelay' => 3 //seconds
         );
 
     }
 
-    public function getControllerSettingsLinnaeus()
-    {
-
-        return array(
-            'minimumSearchStringLength' => 3,
-            'visibleSearchResultsPerCategory' => 10,
-			'contentAboutETI' =>
-				array(
-					'sub' => 'About ETI',
-					'projectID' => -10
-				)
-		);
-
-	}
-
-    public function getControllerSettingsKey ()
-    {
-
-        return array(
-            'keyPathMaxItems' => 3
-		);
-
-	}
-
     public function getControllerSettingsSpecies ()
     {
-
         return array(
             'speciesPerPage' => 25,
 			'mime_types' => array(
@@ -173,54 +142,5 @@ class configuration
 		);
 
 	}
-
-    public function getControllerSettingsMatrixKey()
-    {
-
-		return array(
-			'useCorrectedHValue' => true,
-		);
-
-    }
-
-    public function getControllerSettingsMapKey()
-    {
-
-		return array(
-			'speciesPerPage' => 20,
-            'maxTypes' => 10,
-			'urlToCheckConnectivity' =>'http://maps.google.com/maps/api/js?sensor=false',
-			'SRID' => 4326,
-			'l2DiversityIndexNumOfClasses' => 8, // be aware that increasing this does *not* automatically create extra css classes
-			'l2MaxMapWidth' => 600 // maps exceeding this size are automatically resized, set to 0 to ignore
-		);
-
-    }
-
-	private function _setConstants()
-	{
-
-		if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
-		if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);
-		if (!defined('MODCODE_SPECIES')) define('MODCODE_SPECIES',4);
-		if (!defined('MODCODE_HIGHERTAXA')) define('MODCODE_HIGHERTAXA',5);
-		if (!defined('MODCODE_KEY')) define('MODCODE_KEY',6);
-		if (!defined('MODCODE_MATRIXKEY')) define('MODCODE_MATRIXKEY',7);
-		if (!defined('MODCODE_DISTRIBUTION')) define('MODCODE_DISTRIBUTION',8);
-		if (!defined('MODCODE_CONTENT')) define('MODCODE_CONTENT',10);
-		if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
-		if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
-
-		if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
-		if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
-		if (!defined('GRAFT_CHIMERA_RANK_ID')) define('GRAFT_CHIMERA_RANK_ID',88);
-
-		if (!defined('PREDICATE_VALID_NAME')) define('PREDICATE_VALID_NAME','isValidNameOf');
-		if (!defined('PREDICATE_PREFERRED_NAME')) define('PREDICATE_PREFERRED_NAME','isPreferredNameOf');
-
-
-	}
-
 
 }

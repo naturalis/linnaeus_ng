@@ -39,10 +39,9 @@
 <!--/.page -->
 
 <script type="text/JavaScript">
-$(document).ready(function() {
-	
+$(document).ready(function()
+{
 	$('title').html('{$name.name|@strip_tags|@escape} - '+$('title').html());
-
 });
 </script>
 

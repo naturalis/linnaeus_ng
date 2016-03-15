@@ -432,22 +432,6 @@ function goIntLink(controller,url,params) {
 
 }
 
-function doBackForm(url,data) {
-	//?
-	data = unescape(data);
-	obj = $.parseJSON(data);
-
-	for (var i=0;i<obj.length;i++) {
-
-		addFormVal(obj[i].vari,obj[i].val);
-
-	}
-
-	addFormVal('backstep','1');
-	goForm(url);
-
-}
-
 var allHidden = true;
 
 function showAllToggle() {

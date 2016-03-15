@@ -1,10 +1,3 @@
-<style>
-.name_switch {
-	font-size:11px;
-	font-weight:normal;
-}
-</style>
-
 <div id="panel">
 	<div id="categories">
 	<ul>
@@ -24,7 +17,7 @@
 		</p>
 
 		<ul id="ul-remaining">
-		{foreach from=$remaining key=k item=v}
+		{foreach $remaining v k}
 			<li><a class="taxon-links" href="../species/taxon.php?id={$v.id}" name_common="{$v.commonname|@escape}" name_sci="{$v.taxon|@escape}">{$v.taxon}</a></li>
 		{/foreach}
 		</ul>
@@ -40,7 +33,7 @@
 		</p>
 
 		<ul id="ul-excluded">
-		{foreach from=$excluded key=k item=v}
+		{foreach $excluded v k}
 			<li><a class="taxon-links" href="../species/taxon.php?id={$v.id}" name_common="{$v.commonname|@escape}" name_sci="{$v.taxon|@escape}">{$v.taxon}</a></li>
 		{/foreach}
 		</ul>

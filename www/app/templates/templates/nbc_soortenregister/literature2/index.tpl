@@ -14,7 +14,6 @@
 		{t}Referentie niet gevonden.{/t}
 		</div>
 
-
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
@@ -23,11 +22,9 @@
 
 {include file="../shared/footer.tpl"}
 
-
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html('Literatuur - '+$('title').html());
-
 });
 </script>

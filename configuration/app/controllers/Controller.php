@@ -54,24 +54,6 @@
 	 specific stylesheet either called "0023.css" or "0023--imaginary-beings.css",
 	 where 23 is the project ID and "imaginary beings" is the project's system name.
 
-
-	on caching:
-	the cache-folder can be found at:
-		[htdocs]/linnaeus_ng/www/shared/cache/[project-code]/
-	'project-code' being the system project-code (formatted as '0023').
-	to clear the cache, add
-		clearcache=1
-	to the url. this will delete all the project's cache-files. please note that in
-	many cases, the application will immediately create one or more new cache-files, so
-	don't be fooled into thinking clearing of the cache hasn't worked because there are
-	still files in the directory. make sure to remove the "clearcache" from the URL
-	afterwards, otherwise it will propagate through your session, deleting the
-	cache-files at every next page.
-	to suppress caching, set the variable $useCache to false. doing so will stop the
-	application from both storing and retrieving data from the cache. existing cache-
-	files will remain intact.
-
-
 	on translations:
 	after repeated problems with the "official" getText() functions, the function has
 	been replaced with a custom one:
@@ -146,7 +128,6 @@ class Controller extends BaseClass
     private $_fullPath;
     private $_fullPathRelative;
     private $_checkForProjectId = true;
-    private $_checkForSplash = true;
     private $_allowEditOverlay = true; // true
     private $_currentGlossaryId = false;
     private $_currentHotwordLink = false;
@@ -155,7 +136,6 @@ class Controller extends BaseClass
     private $_hotwordNoLinks = array();
     private $_tmpTree = null;
 
-    public $useCache = false;//true;
     public $viewName;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
@@ -173,38 +153,42 @@ class Controller extends BaseClass
     public $allowEditPageOverlay = true;
     public $tmp;
     private $usedModelsBase = array(
-        'settings',
-        'project',
-        'language_project',
-        'module',
-        'module_project',
-        'free_module_project',
-        'language',
-        'interface_text',
-        'interface_translation',
-        'taxon',
-        'project_rank',
-        'label_project_rank',
-        'rank',
-        'glossary',
-        'glossary_synonym',
-        'hotword',
-        'variation_label',
-        'taxon_variation',
-        'taxa_relations',
-		'names',
-		'trash_can'
+		'commonnames',
+		'free_modules_projects',
+		'glossary',
+		'glossary_synonyms',
+		'hotwords',
+		'interface_texts',
+		'interface_translations',
+		'labels_projects_ranks',
+		'languages',
+		'languages_projects',
+		'modules',
+		'modules_projects',
+		'nbc_extras',
+		'projects',
+		'projects_ranks',
+		'ranks',
+		'settings',
+		'taxa',
+		'taxa_variations',
+		'trash_can',
+		'variations_labels'
     );
     private $usedHelpersBase = array(
+		'session_module_settings',
         'logging_helper',
         'debug_tools',
 		'user_agent',
-		'functions'
+		'functions',
+		'custom_array_sort',
+		'paginator'
     );
     public $cssToLoadBase = array(
         'basics.css',
         'lookup.css'
     );
+	private $_maxBackSteps=100;
 
 
 
@@ -222,13 +206,18 @@ class Controller extends BaseClass
 
         $this->setControllerParams($p);
 
+<<<<<<< HEAD
         $this->setPhpIniVars();
 
+=======
+>>>>>>> development-WEG
         $this->startSession();
 
         $this->loadHelpers();
 
-		$this->initLogging();
+        $this->initLogging();
+
+        $this->setNames();
 
         $this->loadModels();
 
@@ -238,17 +227,14 @@ class Controller extends BaseClass
 
         $this->checkWriteableDirectories();
 
-        $this->setNames();
-
         $this->setRequestData();
 
-        if ($this->getCheckForProjectId()) {
-
-            $this->checkForProjectId();
-
+        if ($this->getCheckForProjectId())
+		{
+		    $this->checkForProjectId();
         }
 
-		$this->emptyCacheFolderByRequest();
+        $this->startModuleSession();
 
         $this->restoreState();
 
@@ -256,21 +242,17 @@ class Controller extends BaseClass
 
         $this->setCurrentLanguageId();
 
-        $this->checkBackStep();
+		$this->initTranslator();
 
 		$this->setSkinName();
 
 		$this->setUrls();
-
-		$this->createCacheFolder();
 
 		$this->setSmartySettings();
 
 		$this->setCssFiles();
 
 		$this->setOtherStuff();
-
-		//$this->splashScreen();
 
     }
 
@@ -301,20 +283,6 @@ class Controller extends BaseClass
 			return 'p-'.$p;
 	}
 
-
-	protected function saveCache ($key, $data)
-	{
-		if ($this->useCache == false)
-		return;
-
-		$cacheFile=$this->getProjectUrl('cache').$key;
-
-		if (!file_put_contents($cacheFile, serialize($data))) {
-			die('Cannot write to cache folder '.$this->getProjectUrl('cache'));
-		}
-	}
-
-
     public function checkForProjectId ()
     {
         $pB = $this->getCurrentProjectId();
@@ -332,7 +300,8 @@ class Controller extends BaseClass
 
         $d = $this->getCurrentProjectId();
 
-        if ($d == null)
+        // Also check if project is published
+        if ($d == null || !$this->projectIsPublished($d))
             $this->redirect($this->generalSettings['urlNoProjectId']);
 
 		if ($pB != $d)
@@ -343,31 +312,40 @@ class Controller extends BaseClass
         $this->setProjectLanguages();
     }
 
-
+    public function projectIsPublished ($pId)
+    {
+        if ($pId) {
+            $p = $this->models->Projects->_get(array(
+                'id' => (int)$pId
+            ));
+            return $p['published'] == 1;
+        }
+        return false;
+    }
 
     public function resolveProjectId ()
     {
         if (!$this->rHasVal('p'))
             $this->setCurrentProjectId(null);
 
-        if (is_numeric($this->requestData['p'])) {
+        if (is_numeric($this->rGetVal('p'))) {
 
-            $p = $this->models->Project->_get(array(
-                'id' => $this->requestData['p']
+            $p = $this->models->Projects->_get(array(
+                'id' => $this->rGetVal('p')
             ));
 
             if (!$p)
                 $this->setCurrentProjectId(null);
             else
-                $this->setCurrentProjectId(intval($this->requestData['p']));
+                $this->setCurrentProjectId(intval($this->rGetVal('p')));
         }
         else {
 
-            $pName = str_replace('_', ' ', strtolower($this->requestData['p']));
+            $pName = str_replace('_', ' ', strtolower($this->rGetVal('p')));
 
 			$this->setCurrentProjectId(null);
 
-            $p = $this->models->Project->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
+            $p = $this->models->Projects->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
 
 			if ($p) {
 				foreach((array)$p as $val) {
@@ -384,22 +362,6 @@ class Controller extends BaseClass
         }
     }
 
-
-
-    /**
-     * Makes a numeric show order into another list marker
-     *
-     * Used in the dich. key and in the search results, hence it's inclusion here
-     *
-     * @access     public
-     */
-    public function showOrderToMarker ($showOrder)
-    {
-        return chr($showOrder + 96);
-    }
-
-
-
     public function getVariations ($tId = null)
     {
         $d = array(
@@ -409,7 +371,7 @@ class Controller extends BaseClass
         if (isset($tId))
             $d['taxon_id'] = $tId;
 
-        $tv = $this->models->TaxonVariation->_get(array(
+        $tv = $this->models->TaxaVariations->_get(array(
             'id' => $d,
             'columns' => 'id,taxon_id,label',
             'order' => 'label'
@@ -419,7 +381,7 @@ class Controller extends BaseClass
 
             $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
 
-            $tv[$key]['labels'] = $this->models->VariationLabel->_get(
+            $tv[$key]['labels'] = $this->models->VariationsLabels->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -432,8 +394,6 @@ class Controller extends BaseClass
         return $tv;
     }
 
-
-
     public function _buildTaxonTree ($p = null)
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
@@ -445,21 +405,8 @@ class Controller extends BaseClass
 
         $t = $this->getTaxonChildren($pId);
 
-        /*
-        $t = $this->models->Taxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'parent_id' . (is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
-            ),
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author',
-            'fieldAsIndex' => 'id',
-            'order' => 'taxon_order,id'
-        ));
-        */
-
-        foreach ((array) $t as $key => $val) {
-
+        foreach ((array) $t as $key => $val)
+		{
             $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
             $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
             $t[$key]['sibling_count'] = count((array) $t);
@@ -484,114 +431,62 @@ class Controller extends BaseClass
         return $t;
     }
 
-
-
     public function getProjectRanks ()
     {
-        $pr = $this->getCache('tree-ranks');
+		$pr = $this->models->ProjectsRanks->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			),
+			'fieldAsIndex' => 'id',
+			'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
+		));
 
-        if (!$pr) {
+		$pl = $this->getProjectLanguages();
 
-            $pr = $this->models->ProjectRank->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ),
-                'fieldAsIndex' => 'id',
-                'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
-            ));
+		foreach ((array) $pr as $rankkey => $rank)
+		{
+			if (empty($rank['rank_id']))
+				continue;
 
-            $pl = $this->getProjectLanguages();
+			$r = $this->models->Ranks->_get(array(
+				'id' => $rank['rank_id']
+			));
 
-            foreach ((array) $pr as $rankkey => $rank) {
+			$pr[$rankkey]['rank'] = $r['rank'];
+			$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+			$pr[$rankkey]['abbreviation'] = $r['abbreviation'];
 
-                if (empty($rank['rank_id']))
-                    continue;
+			foreach ((array) $pl as $val) {
 
-                $r = $this->models->Rank->_get(array(
-                    'id' => $rank['rank_id']
-                ));
+				$lpr = $this->models->LabelsProjectsRanks->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'project_rank_id' => $rank['id'],
+						'language_id' => $val['language_id']
+					),
+					'columns' => 'label'
+				));
 
-                $pr[$rankkey]['rank'] = $r['rank'];
-
-                $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-
-                $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
-
-                foreach ((array) $pl as $val) {
-
-                    $lpr = $this->models->LabelProjectRank->_get(
-                    array(
-                        'id' => array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'project_rank_id' => $rank['id'],
-                            'language_id' => $val['language_id']
-                        ),
-                        'columns' => 'label'
-                    ));
-
-                    $pr[$rankkey]['labels'][$val['id']] = $lpr[0]['label'];
-                }
-            }
-
-            $this->saveCache('tree-ranks', $pr);
-        }
+				$pr[$rankkey]['labels'][$val['id']] = $lpr[0]['label'];
+			}
+		}
 
         return $pr;
     }
-
-
 
     public function getTaxonById ($id)
     {
         if (empty($id) || !is_numeric($id) || $id==0)
             return;
 
-		$t=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_a.author,
-				_a.parent_id,
-				_a.rank_id,
-				_a.taxon_order,
-				_a.is_hybrid,
-				_a.list_level,
-				_a.is_empty,
-				_b.lower_taxon,
-				_c.commonname,
-				_b.rank_id as base_rank_id
-			from %PRE%taxa _a
-
-		".($this->models->TrashCan->getTableExists() ? "
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id =  _trash.lng_id
-				and _trash.item_type='taxon'
-			" : "")."
-
-			left join %PRE%projects_ranks _b
-				on _a.project_id=_b.project_id
-				and _a.rank_id=_b.id
-
-			left join %PRE%commonnames _c
-				on _a.project_id=_c.project_id
-				and _c.id=
-					(select
-						id
-					from
-						%PRE%commonnames
-					where
-						project_id = ".$this->getCurrentProjectId()."
-						and taxon_id=".$id."
-						and language_id = ". $this->getCurrentLanguageId() ."
-						limit 1
-					)
-			where
-				_a.id=".$id."
-				and _a.project_id=".$this->getCurrentProjectId()."
-				".($this->models->TrashCan->getTableExists() ? " and ifnull(_trash.is_deleted,0)=0" : "")
-		);
+		$t = $this->models->ControllerModel->getTaxonById(array(
+            'trashCanExists' => $this->models->TrashCan->getTableExists(),
+		    'projectId' => $this->getCurrentProjectId(),
+		    'languageId'=> $this->getCurrentLanguageId(),
+		    'taxonId' => $id
+		));
 
 		$taxon=$t[0];
 
@@ -600,31 +495,19 @@ class Controller extends BaseClass
         return $taxon;
     }
 
-	public function printGenericError($message=null)
-	{
-        $this->smarty->assign('message',(!empty($message) ? $message : $this->translate('An error occurred.')));
-        $this->printPage('../shared/generic-error');
-	}
-
-
 	public function setSearchResultIndexActive($id)
 	{
-
 		$_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] = $id;
-
 	}
 
 	public function getSearchResultIndexActive()
 	{
-
 		return isset($_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive']) ? $_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] : null;
-
 	}
 
-
+	//REFAC2015
 	public function getNbcExtras($p=null)
 	{
-
         $id = isset($p['id']) ? $p['id'] : null;
         $type = isset($p['type']) ? $p['type'] : 'taxon';
         $name = isset($p['name']) ? $p['name'] : null;
@@ -658,12 +541,6 @@ class Controller extends BaseClass
 
 	}
 
-    public function generateRandomHexString ($pre=null,$post=null)
-    {
-        return $pre.substr(md5(rand()), 0, 16).$post;
-    }
-
-
     public function getTreeList ($p = null)
     {
 
@@ -688,27 +565,14 @@ class Controller extends BaseClass
 
 
 
-    public function buildTaxonTree ($p = null)
+    public function buildTaxonTree($p = null)
     {
+		$this->_buildTaxonTree();
 
-        if (!$this->getCache('species-treeList')) {
-
-            $this->_buildTaxonTree();
-
-			if (isset($this->treeList))
-				uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
-
-            $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
-        }
-        else {
-
-            $this->treeList = $this->getCache('species-treeList');
-
-        }
+		if (isset($this->treeList))
+			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
 
         return $this->getTreeList($p);
-
-        //return $this->getCache('species-tree'); // return value is unused!
     }
 
 
@@ -721,50 +585,15 @@ class Controller extends BaseClass
 		return $this->tmp;
     }
 
-
-
     public function getPagination ($items, $maxPerPage = 25)
     {
+		$this->helpers->Paginator->setItemsPerPage( $maxPerPage );
+		$this->helpers->Paginator->setStart( $this->rHasVal('start') ? $this->rGetVal('start') : 0 );
+		$this->helpers->Paginator->setItems( $items );
+		$this->helpers->Paginator->paginate();
 
-        /*
-
-		{if $prevStart!=-1 || $nextStart!=-1}
-			<div id="navigation">
-				{if $prevStart!=-1}
-				<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
-				{/if}
-				{if $nextStart!=-1}
-				<span class="a" onclick="goNavigate({$nextStart});">next ></span>
-				{/if}
-			</div>
-		{/if}
-
-		//goNavigate(val,formName) formname default = 'theForm'
-
-		*/
-        if (!isset($items))
-            return;
-
-            // determine index of the first taxon to show
-        $start = $this->rHasVal('start') ? $this->requestData['start'] : 0;
-
-        //determine index of the first taxon to show on the previous page (if any)
-        $prevStart = $start == 0 ? -1 : (($start - $maxPerPage < 1) ? 0 : ($start - $maxPerPage));
-
-        //determine index of the first taxon to show on the next page (if any)
-        $nextStart = ($start + $maxPerPage >= count((array) $items)) ? -1 : ($start + $maxPerPage);
-
-        // slice out only the taxa we need (faster than looping the entire thing in smarty)
-        $items = array_slice($items, $start, $maxPerPage);
-
-        return array(
-            'items' => $items,
-            'prevStart' => $prevStart,
-            'nextStart' => $nextStart
-        );
+		return $this->helpers->Paginator->getItems();
     }
-
-
 
     public function matchGlossaryTerms ($text, $forceLookup = false)
     {
@@ -991,7 +820,7 @@ class Controller extends BaseClass
 
             if (isset($id)) {
 
-                $data = $this->models->Project->_get(array(
+                $data = $this->models->Projects->_get(array(
                     'id' => $id
                 ));
             }
@@ -1020,7 +849,7 @@ class Controller extends BaseClass
 
     public function setProjectLanguages()
     {
-        $lp = $this->models->LanguageProject->_get(array(
+        $lp = $this->models->LanguagesProjects->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId()
             ),
@@ -1030,7 +859,7 @@ class Controller extends BaseClass
         foreach ((array) $lp as $key => $val)
 		{
 
-            $l = $this->models->Language->_get(array(
+            $l = $this->models->Languages->_get(array(
                 'id' => $val['language_id']
             ));
 
@@ -1099,7 +928,8 @@ class Controller extends BaseClass
 
     public function getDefaultLanguageId()
     {
-        return isset($_SESSION['app'][$this->spid()]['project']['default_language_id']) ? $_SESSION['app'][$this->spid()]['project']['default_language_id'] : null;
+        return isset($_SESSION['app'][$this->spid()]['project']['default_language_id']) ?
+            $_SESSION['app'][$this->spid()]['project']['default_language_id'] : null;
     }
 
 
@@ -1108,13 +938,15 @@ class Controller extends BaseClass
     {
         if ($l)
 		{
-            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $l;
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] =
+                $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $l;
             $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $l;
         }
         else if ($this->rHasVal('languageId'))
 		{
-            $_SESSION['app'][$this->spid()]['user']['languageChanged'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $this->requestData['languageId'];
-            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->requestData['languageId'];
+            $_SESSION['app'][$this->spid()]['user']['languageChanged'] =
+                $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] != $this->rGetVal('languageId');
+            $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->rGetVal('languageId');
         }
         else
 		{
@@ -1135,7 +967,7 @@ class Controller extends BaseClass
         unset($this->requestData['languageId']);
 
         $_SESSION['app']['user']['currentLanguage'] = $_SESSION['app'][$this->spid()]['project']['activeLanguageId'];
-		
+
 		if ( isset($_SESSION['app']['user']['currentLanguage']) )
 		$this->setDatabaseLocaleSettings( $_SESSION['app']['user']['currentLanguage'] );
     }
@@ -1234,43 +1066,26 @@ class Controller extends BaseClass
         return $this->rGetVal('id');
     }
 
+    public function rGetAll()
+    {
+		return isset($this->requestData) ? $this->requestData : null;
+    }
 
-	public function getCommonname($tId)
+    public function getPreferredName($id)
 	{
-
-		$c = $this->models->Commonname->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $tId,
-				'language_id' => $this->getCurrentLanguageId()
-			)
-		));
-
-		return $c[0]['commonname'];
-
-	}
-
-	public function getPreferredName($id)
-	{
-		$name = $this->models->Names->freeQuery(
-			"select * from %PRE%names _a
-			  left join %PRE%name_types _b
-			  	on _a.type_id=_b.id
-				and _a.project_id=_b.project_id
-				and _b.nametype = '".PREDICATE_PREFERRED_NAME."'
-			  where _a.project_id =".$this->getCurrentProjectId()."
-			    and _a.taxon_id =".$id."
-				and language_id =".$this->getCurrentLanguageId()."
-				limit 1"
-		);
+	    $name = $this->models->ControllerModel->getPreferredName(array(
+    	    'predicatePreferredName' => PREDICATE_PREFERRED_NAME,
+    		'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getCurrentLanguageId(),
+    		'taxonId' => $id
+	    ));
 
 		return $name[0]['name'];
 	}
 
     public function getVariation ($id)
     {
-        $tv = $this->models->TaxonVariation->_get(
+        $tv = $this->models->TaxaVariations->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1279,7 +1094,7 @@ class Controller extends BaseClass
             'columns' => 'id,taxon_id,label'
         ));
 
-        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        $tv[0]['labels'] = $this->models->VariationsLabels->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1413,22 +1228,16 @@ class Controller extends BaseClass
     }
 
 
-    public function getSetting($name,$substitute=null)
+    public function getSetting($setting,$substitute=null)
     {
-        $s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'setting' => $name
-            ),
-            'columns' => 'value',
-            'limit' => 1
-        ));
-
-        if (isset($s[0]))
-            return $s[0]['value'];
-        else
-            return isset($substitute) ? $substitute : null;
+		return $this->models->ControllerModel->getGeneralSetting(		
+			array(
+				'module_id'=>ModuleSettingsReaderController::getGeneralSettingsId(),
+				'project_id' => $this->getCurrentProjectId(),
+				'setting'=>$setting,
+				'substitute'=>$substitute
+			)
+		);
     }
 
     public function formatTaxon($p=null) //($taxon,$ranks=null)
@@ -1582,49 +1391,6 @@ class Controller extends BaseClass
         return '<span class="italics">' . $name . '</span>';
     }
 
-
-
-    public function splashScreen()
-    {
-
-		// admin editors that are previewing get no splash
-		if ($this->isLoggedInAdmin()) {
-			$_SESSION['app']['project']['showedSplash']=true;
-            return;
-		}
-
-		// systematically suppressed splash, which is set in view (so the splash screen won't redirect to itself)
-        if ($this->getCheckForSplash()==false) {
-			$_SESSION['app']['project']['showedSplash']=true;
-            return;
-		}
-
-		// already showed splash screen
-        if (isset($_SESSION['app']['project']['showedSplash']) && $_SESSION['app']['project']['showedSplash']===true) {
-            return;
-        }
-
-		// no splash screen has been defined
-        if (!isset($this->generalSettings['urlSplashScreen'])) {
-			return;
-		}
-
-		// optionally suppressed splash, set in project settings
-		if ($this->getSetting('suppress_splash')==1) {
-			$_SESSION['app']['project']['showedSplash']=true;
-            return;
-		}
-
-		// saving the current url for post-splash redirectingh
-		$_SESSION['app']['project']['splashEntryUrl']=$_SERVER['REQUEST_URI'];
-		$_SESSION['app']['project']['showedSplash']=true;
-
-		$this->redirect($this->generalSettings['urlSplashScreen']);
-
-    }
-
-
-
     private function getMainMenu ()
     {
 		$modules=$this->getProjectModules();
@@ -1650,32 +1416,11 @@ class Controller extends BaseClass
 
     private function setControllerParams ($p)
     {
-        if (isset($p['checkForSplash']))
-		{
-            $this->setCheckForSplash($p['checkForSplash']);
-		}
         if (isset($p['checkForProjectId']))
 		{
             $this->setCheckForProjectId($p['checkForProjectId']);
 		}
     }
-
-
-
-    private function setCheckForSplash ($state)
-    {
-        if (is_bool($state))
-            $this->_checkForSplash = $state;
-    }
-
-
-
-    private function getCheckForSplash ()
-    {
-        return $this->_checkForSplash;
-    }
-
-
 
     private function setCheckForProjectId ($state)
     {
@@ -1697,20 +1442,18 @@ class Controller extends BaseClass
         if ($this->_allowEditOverlay === false)
             return;
 
-		$this->useCache=false;
-
         $d = $this->controllerBaseName . ':' . $this->viewName;
 
-        if (isset($this->requestData['cat']) && !is_numeric($this->requestData['cat']) && isset($this->generalSettings['urlsToAdminEdit'][$d . ':' . $this->requestData['cat']])) {
+        if ($this->rHasVar('cat') && !is_numeric($this->rGetVal('cat')) && isset($this->generalSettings['urlsToAdminEdit'][$d . ':' . $this->rGetVal('cat')])) {
 
-            $d = $d . ':' . $this->requestData['cat'];
+            $d = $d . ':' . $this->rGetVal('cat');
         }
 
         if ($this->isLoggedInAdmin() && $this->allowEditPageOverlay && isset($this->generalSettings['urlsToAdminEdit'][$d])) {
 
-            if (isset($this->requestData['id'])) {
+            if ($this->rHasId()) {
 
-                $id = $this->requestData['id'];
+                $id = $this->rGetId();
 
                 if ($this->controllerBaseName == 'module') {
                     $modId = $this->getCurrentModule();
@@ -1724,7 +1467,7 @@ class Controller extends BaseClass
                 }
 
                 $this->smarty->assign('urlBackToAdmin',
-                sprintf($this->generalSettings['urlsToAdminEdit'][$d], $id, (isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? $this->requestData['cat'] : ($this->controllerBaseName == 'module' ? $modId : null))));
+                sprintf($this->generalSettings['urlsToAdminEdit'][$d], $id, ($this->rHasVar('cat') && is_numeric($this->rGetVal('cat')) ? $this->rGetVal('cat') : ($this->controllerBaseName == 'module' ? $modId : null))));
                 $this->smarty->display('../shared/preview-overlay.tpl');
             }
         }
@@ -1762,6 +1505,7 @@ class Controller extends BaseClass
         //$this->previewOverlay(); // not implemented in (the rarely used) fetch
     }
 
+<<<<<<< HEAD
 
 
     /**
@@ -1830,6 +1574,8 @@ class Controller extends BaseClass
     }
 
 
+=======
+>>>>>>> development-WEG
 	public function smartyGetSnippet($params, $content, &$smarty, &$repeat)
 	{
 		if ( is_null($content) ) return;
@@ -1859,19 +1605,6 @@ class Controller extends BaseClass
 		}
 	}
 
-
-
-    public function translate ($content)
-    {
-        if (empty($content))
-            return;
-
-        $this->saveInterfaceText($content);
-
-        return $this->doTranslate($content);
-    }
-
-
     public function getProjectModules ($params = null)
     {
 
@@ -1888,13 +1621,13 @@ class Controller extends BaseClass
 		if (isset($params['ignore']))
 			$p['ignore'] = $params['ignore'];
 
-		$modules = $this->models->ModuleProject->_get($p);
+		$modules = $this->models->ModulesProjects->_get($p);
 
 		foreach ((array) $modules as $key => $val) {
 
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
 
-			$mp = $this->models->Module->_get(array(
+			$mp = $this->models->Modules->_get(array(
 				'id' => $val['module_id']
 			));
 
@@ -1910,7 +1643,7 @@ class Controller extends BaseClass
 			'maintainKeys' => true
 		));
 
-		$freeModules = $this->models->FreeModuleProject->_get(array(
+		$freeModules = $this->models->FreeModulesProjects->_get(array(
 			'id' => array(
 				'project_id' => $d['project_id']
 			)
@@ -1935,26 +1668,30 @@ class Controller extends BaseClass
      */
     public function customSortArray (&$array, $sortBy)
     {
-        if (!isset($array) || !is_array($array))
+		$this->helpers->CustomArraySort->setSortyBy( $sortBy );
+		$this->helpers->CustomArraySort->sortArray( $array );
+		$array=$this->helpers->CustomArraySort->getSortedArray();
+    }
+
+
+
+    /**
+     * Sets project URL for project images
+     *
+	 * @todo	take out hard reference to /media/
+     * @access     public
+     */
+    public function setUrls ()
+    {
+        $_SESSION['app']['system']['urls']['systemMedia'] = $this->baseUrl . $this->getAppName() . '/media/system/skins/' . $this->getSkinName() . '/';
+        $_SESSION['app']['system']['urls']['snippets'] = $this->baseUrl . 'app/media/project/_snippets/' ;
+
+        $p = $this->getCurrentProjectId();
+
+        if (!$p)
             return;
 
-        if (isset($sortBy['key']))
-            $this->setSortField($sortBy['key']);
-
-        if (isset($sortBy['dir']))
-            $this->setSortDirection($sortBy['dir']);
-
-        if (isset($sortBy['case']))
-            $this->setSortCaseSensitivity($sortBy['case']);
-
-        $maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys'] === true);
-
-        if ($maintainKeys) {
-
-            $keys = array();
-
-            $f = md5(uniqid(null, true));
-
+<<<<<<< HEAD
             foreach ((array) $array as $key => $val) {
 
                 $x = md5(json_encode($val) . $key);
@@ -2013,6 +1750,8 @@ class Controller extends BaseClass
         if (!$p)
             return;
 
+=======
+>>>>>>> development-WEG
         $pCode = $this->getProjectFSCode($p);
 
         // url of the directory containing user-uploaded media files
@@ -2164,8 +1903,6 @@ class Controller extends BaseClass
         return $encode ? json_encode($d) : $d;
     }
 
-
-
     public function isLoggedInAdmin ()
     {
         if (!isset($_SESSION['admin']['project']['id']))
@@ -2173,8 +1910,6 @@ class Controller extends BaseClass
         else
             return $this->getCurrentProjectId() == $_SESSION['admin']['project']['id'];
     }
-
-
 
     public function doesEntryProgramExist ()
     {
@@ -2184,13 +1919,18 @@ class Controller extends BaseClass
          file_exists($this->generalSettings['lngFileRoot'] . 'www/admin/views/utilities/admin_index.php'));
     }
 
-
     public function doesCurrentProjectHaveModule ($mpCode)
     {
-		$d=$this->models->ModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'active' => 'y','module_id'=>$mpCode)));
+		$d=$this->models->ModulesProjects->_get(array(
+		  'id'=> array(
+		      'project_id' => $this->getCurrentProjectId(),'
+		      active' => 'y',
+		      'module_id'=>$mpCode)
+		));
 		return isset($d[0]) ? true : false;
     }
 
+<<<<<<< HEAD
 
     private function setPhpIniVars ()
     {
@@ -2201,6 +1941,8 @@ class Controller extends BaseClass
 
 
 
+=======
+>>>>>>> development-WEG
     /**
      * Starts the user's session
      *
@@ -2216,8 +1958,6 @@ class Controller extends BaseClass
             /* DEBUG */
         $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
     }
-
-
 
     private function getProjectDependentTemplates ()
     {
@@ -2241,8 +1981,6 @@ class Controller extends BaseClass
 
         return $r;
     }
-
-
 
     /**
      * Assigns basic Smarty variables
@@ -2280,8 +2018,6 @@ class Controller extends BaseClass
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
     }
 
-
-
     public function loadControllerConfig ($controllerBaseName = null)
     {
         if (isset($controllerBaseName))
@@ -2299,14 +2035,10 @@ class Controller extends BaseClass
         }
     }
 
-
-
     private function loadSmartyConfig ()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
     }
-
-
 
     /**
      * Sets class variables, based on a page's url
@@ -2363,7 +2095,15 @@ class Controller extends BaseClass
 
     }
 
-
+    private function startModuleSession()
+	{
+		$this->moduleSession=$this->helpers->SessionModuleSettings;
+		$this->moduleSession->setModule(array(
+            'environment' => 'app',
+		    'controller' => $this->controllerBaseName,
+		    'projectId' => $this->spid()
+		));
+	}
 
 	private function getCurrentPathWithProjectlessQuery()
 	{
@@ -2380,7 +2120,6 @@ class Controller extends BaseClass
 		return '../' . $this->controllerBaseName . '/' . $this->viewName . '.php' . (count($d)>0 ? '?'.implode('&',$d) : '');
 
 	}
-
 
     private function setSkinName ()
     {
@@ -2427,18 +2166,16 @@ class Controller extends BaseClass
 
     }
 
-
-
     private function doesSkinExist ($skin)
     {
-
 		$d = array(
 			$this->baseUrl . $this->getAppName() . '/style/' . $skin . '/',
 			$this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/',
 			$this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/'
 		);
 
-		if (false) {
+		if (false)
+		{
 			echo '<!-- template folders:'.chr(10);
 			foreach((array)$d as $val)
 				echo '  '.$val.': '.(file_exists($val) ? 'ok' : 'missing' ).chr(10);
@@ -2494,38 +2231,49 @@ class Controller extends BaseClass
 
         $this->models = new stdClass();
 
-        foreach ((array) $d as $key) {
+        // Load base controller model first
+		require_once dirname(__FILE__) . '/../models/ControllerModel.php';
+		$this->models->ControllerModel = new ControllerModel;
 
-            if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
+        $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
 
-                require_once (dirname(__FILE__) . '/../models/' . $key . '.php');
+        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
+		{
+            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+            $this->models->$t = new $t;
+        }
 
-                $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+		// Load controller-specific model by override
+		if ( isset($this->modelNameOverride) )
+		{
+			if (file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
+			{
+				require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
+				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
+			}
+		}
 
+        require_once dirname(__FILE__) . '/../models/Table.php';
 
-                if (class_exists($t)) {
+        foreach ((array) $d as $key)
+		{
+            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
-                    $this->models->$t = new $t();
+            $this->models->$t = new Table($key);
 
-
-
-                    if (isset($this->helpers->LoggingHelper))
-                        $this->models->$t->setLogger($this->helpers->LoggingHelper);
-
-                    //echo $t.chr(10);
-                }
-                else {
-
-                    $this->log('Attempted to initiate non-existing model class "' . $t . '"', 2);
-                }
-            }
-            else {
-
-                $this->log('Attempted to load non-existing model file "' . $key . '"', 2);
+            if (isset($this->helpers->LoggingHelper))
+			{
+                 $this->models->$t->setLogger($this->helpers->LoggingHelper);
             }
         }
     }
 
+    protected function extendUsedModels ()
+    {
+        if (isset($this->usedModelsExtended) && is_array($this->usedModelsExtended)) {
+            $this->usedModels = array_unique(array_merge((array) $this->usedModels, (array) $this->usedModelsExtended));
+        }
+    }
 
 
     /**
@@ -2606,140 +2354,6 @@ class Controller extends BaseClass
         }
 
     }
-
-
-
-    /**
-     * Sets key to sort by for doCustomSortArray
-     *
-     * @param string    name of the field to sort by
-     * @access     private
-     */
-    private function setSortField ($field)
-    {
-        $this->sortField = $field;
-    }
-
-
-
-    /**
-     * Returns key to sort by; called by doCustomSortArray
-     *
-     * @return string    name of the field to sort by; defaults to 'id'
-     * @access     private
-     */
-    private function getSortField ()
-    {
-        return !empty($this->sortField) ? $this->sortField : 'id';
-    }
-
-
-
-    /**
-     * Sets sort direction for doCustomSortArray
-     *
-     * @param string    $a    asc or desc
-     * @access     private
-     */
-    private function setSortDirection ($dir)
-    {
-        $this->sortDirection = $dir;
-    }
-
-
-
-    /**
-     * Returns direction to sort in; called by doCustomSortArray
-     *
-     * @return string    asc or desc
-     * @access     private
-     */
-    private function getSortDirection ()
-    {
-        return !empty($this->sortDirection) ? $this->sortDirection : 'asc';
-    }
-
-
-
-    /**
-     * Sets case sensitivity for doCustomSortArray
-     *
-     * @param string    $a    i(nsensitive) or s(ensitive)
-     * @access     private
-     */
-    private function setSortCaseSensitivity ($sens)
-    {
-        $this->sortCaseSensitivity = $sens;
-    }
-
-
-
-    /**
-     * Returns setting for case-sensitivity while sorting; called by doCustomSortArray
-     *
-     * @return string    i(nsensitive) or s(ensitive)
-     * @access     private
-     */
-    private function getSortCaseSensitivity ()
-    {
-        return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
-    }
-
-
-
-    /**
-     * Performs the actual usort; called by customSortArray
-     *
-     * @param array    $a    value of one array-element
-     * @param array    $b    value of the other
-     * @access     private
-     */
-    private function doCustomSortArray ($a, $b)
-    {
-        $f = $this->getSortField();
-
-        $d = $this->getSortDirection();
-
-        $c = $this->getSortCaseSensitivity();
-
-        if (!is_array($f))
-            $f = array(
-                $f
-            );
-
-        $res = 0;
-
-        $dir = !is_array($d) ? $d : null;
-
-        foreach ($f as $key => $val) {
-
-            if (!isset($a[$val]) || !isset($b[$val]))
-                continue;
-
-            if (is_array($d) && isset($d[$key]))
-                $dir = $d[$key];
-
-                // should be parametrized
-            $a[$val] = strip_tags($a[$val]);
-            $b[$val] = strip_tags($b[$val]);
-
-            if ($c != 's') {
-
-                $a[$val] = strtolower($a[$val]);
-                $b[$val] = strtolower($b[$val]);
-            }
-
-            $res = ($a[$val] > $b[$val] ? ($dir == 'asc' ? 1 : -1) : ($a[$val] < $b[$val] ? ($dir == 'asc' ? -1 : 1) : 0));
-
-
-            if ($res != 0)
-                return $res;
-        }
-
-        return $res;
-    }
-
-
 
     /**
      * Loads the required helpers (separate multi-use classes)
@@ -2825,30 +2439,8 @@ class Controller extends BaseClass
         ), '', $url);
     }
 
-
-
-    private function checkBackStep ()
-    {
-
-        // check whether this is a clicked "back"-link
-        if ($this->rHasVal('backstep', '1')) {
-
-            // take off the last page from the history (the one the user clicked "back" from)
-            array_pop($_SESSION['app']['user']['history']);
-
-            // remove the variable from the requestdata to avoid its accidental inclusion in any constructed URL's
-            unset($this->requestData['backstep']);
-
-            // as this page was already retrieved from history, it should not be added again
-            $this->storeHistory = false;
-        }
-    }
-
-
-
     private function getBackLink ()
     {
-
         // if there is no history, there is no going back
         if (!isset($_SESSION['app']['user']['history']))
             return;
@@ -2901,6 +2493,14 @@ class Controller extends BaseClass
         if (!isset($prevPage) || $thisPage != $prevPage)
             $_SESSION['app']['user']['history'][] = $thisPage;
 
+<<<<<<< HEAD
+=======
+            // see if a maximum number of steps to store is defined; if so, slice off the excess
+        if (count((array) $_SESSION['app']['user']['history']) > $this->_maxBackSteps) {
+
+            $_SESSION['app']['user']['history'] = array_slice($_SESSION['app']['user']['history'], count((array) $_SESSION['app']['user']['history']) - $this->_maxBackSteps);
+        }
+>>>>>>> development-WEG
     }
 
 
@@ -2918,7 +2518,7 @@ class Controller extends BaseClass
                 'columns' => 'id,term as word,\'term\' as source'
             ));
 
-            $synonyms = $this->models->GlossarySynonym->_get(
+            $synonyms = $this->models->GlossarySynonyms->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -2970,49 +2570,39 @@ class Controller extends BaseClass
 
 
 
-    private function getHotwords ($forceUpdate = false)
+    private function getHotwords()
     {
-
-		$d = $this->getCache('hotwords-'.$this->getCurrentLanguageId());
-
-		if ($forceUpdate || !$d) {
-
-            $d = $this->models->Hotword->_get(
-            array(
-                'id' =>
-					'select
-						hotword,
-						controller,
-						view,
-						params,
-						length(hotword) as `length`,
-						(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
-					from
-						%table%
-					where
-						project_id = ' . $this->getCurrentProjectId() .'
-						and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
-					order by
-						num_of_words desc,
-						`length` desc'
-            ));
-
-            $this->saveCache('hotwords-'.$this->getCurrentLanguageId(),$d);
-        }
-
-        return $d;
+		return $this->models->Hotwords->_get(
+		array(
+			'id' =>
+				'select
+					hotword,
+					controller,
+					view,
+					params,
+					length(hotword) as `length`,
+					(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
+				from
+					%PRE%hotwords
+				where
+					project_id = ' . $this->getCurrentProjectId() .'
+					and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
+				order by
+					num_of_words desc,
+					`length` desc'
+		));
     }
 
 
 
     private function embedNoLink ($matches)
     {
-        if (trim($matches[0]) == '') {
-
+        if (trim($matches[0]) == '')
+		{
             return $matches[0];
         }
-        else {
-
+        else
+		{
             $d = $this->generateRandomHexString('###','###');
 
             while (isset($this->_hotwordNoLinks[$d])) {
@@ -3032,15 +2622,16 @@ class Controller extends BaseClass
 
     private function embedHotwordLink ($matches)
     {
-        if (trim($matches[0]) == '') {
-
+        if (trim($matches[0]) == '')
+		{
             return $matches[0];
         }
-        else {
-
+        else
+		{
             $d = $this->generateRandomHexString('@@@','@@@');
 
-            while (isset($this->_hotwordTempLinks[$d])) {
+            while (isset($this->_hotwordTempLinks[$d]))
+			{
                 $this->generateRandomHexString('@@@','@@@');
             }
 
@@ -3058,8 +2649,8 @@ class Controller extends BaseClass
     {
         $this->_hotwordTempLinks = array_reverse($this->_hotwordTempLinks);
 
-        foreach ((array) $this->_hotwordTempLinks as $val) {
-
+        foreach ((array) $this->_hotwordTempLinks as $val)
+		{
             $txt = str_replace($val['str'], $val['link'], $txt);
         }
 
@@ -3072,8 +2663,8 @@ class Controller extends BaseClass
 
     private function restoreNoLinks ($txt)
     {
-        foreach ((array) $this->_hotwordNoLinks as $val) {
-
+        foreach ((array) $this->_hotwordNoLinks as $val)
+		{
             $txt = str_replace($val['str'], str_ireplace(array(
                 '[no]',
                 '[/no]'
@@ -3120,14 +2711,14 @@ class Controller extends BaseClass
 
         $d = null;
 
-        if ($this->rHasVal('id'))
-            $d['id'] = $this->requestData['id'];
+        if ($this->rHasId())
+            $d['id'] = $this->rGetId();
         if ($this->rHasVal('cat'))
-            $d['cat'] = $this->requestData['cat'];
+            $d['cat'] = $this->rGetVal('cat');
         if ($this->rHasVal('m'))
-            $d['m'] = $this->requestData['m'];
+            $d['m'] = $this->rGetVal('m');
         if ($this->rHasVal('letter'))
-            $d['letter'] = $this->requestData['letter'];
+            $d['letter'] = $this->rGetVal('letter');
 
         $d['lastPage'] = $_SERVER['REQUEST_URI'];
 
@@ -3176,85 +2767,15 @@ class Controller extends BaseClass
             $this->redirect($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']);
         }
 
-        if (isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()])) {
-
-            foreach ((array) $_SESSION['app']['user']['states'][$this->getControllerBaseName()] as $key => $val) {
-
+        if (isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]))
+		{
+            foreach ((array) $_SESSION['app']['user']['states'][$this->getControllerBaseName()] as $key => $val)
+			{
                 if (!isset($this->requestData[$key]) && $key!='lastPage')
                     $this->requestData[$key] = $val;
             }
         }
     }
-
-    // Timeout in seconds
-    // Key something like path in session, e.g. 'species-tree'
-    protected function getCache ($key, $timeOut = false)
-    {
-        if ($this->useCache == false)
-            return false;
-
-        $cacheFile=$this->getProjectUrl('cache').$key;
-
-        if (file_exists($cacheFile)) {
-            // Timeout provided and expired
-            if ($timeOut && time() - $timeOut >= filemtime($cacheFile)) {
-                // Delete from cache
-                unlink($cacheFile);
-                return false;
-            }
-            return unserialize(file_get_contents($cacheFile));
-        }
-        return false;
-    }
-
-
-
- 	private function makeCachePath()
-	{
-
-        $p = $this->getCurrentProjectId();
-
-        if (!$p)
-            return;
-
-        return $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
-
-	}
-
-
-    private function createCacheFolder ()
-    {
-
-		$cachePath = $this->makeCachePath();
-
-		if (empty($cachePath))
-			return;
-
-        if (!file_exists($cachePath))
-            mkdir($cachePath);
-    }
-
-
-
-    private function emptyCacheFolderByRequest ()
-    {
-
-		if (!$this->rHasVal('clearcache','1'))
-			return;
-
-		$cachePath = $this->makeCachePath();
-
-		if (empty($cachePath))
-			return;
-
-        if (file_exists($cachePath))
-			array_map('unlink', glob($cachePath.'/*'));
-
-		unset($this->requestData['clearcache']);
-
-    }
-
-
 
     private function checkWriteableDirectories ()
     {
@@ -3262,7 +2783,6 @@ class Controller extends BaseClass
         $paths = array(
             $this->_smartySettings['dir_compile'] => 'www/app/templates/templates_c',
             $this->_smartySettings['dir_cache'] => 'www/app/templates/cache',
-            $this->generalSettings['directories']['cache'] => 'www/shared/cache',
             $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
             $this->generalSettings['directories']['log'] => 'log',
             //$this->generalSettings['directories']['customStyle'] => 'www/app/style/custom'
@@ -3270,40 +2790,30 @@ class Controller extends BaseClass
 
         $p = $this->getCurrentProjectId();
 
-        if ($p) {
-        	$paths[$this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)] =
-        	    'www/shared/media/project/' . $this->getProjectFSCode($p);
-         }
-
-        foreach ((array) $paths as $val => $display) {
-
-            if ((!file_exists($val) || !is_writable($val)) && @!mkdir($val)) {
+        foreach ((array) $paths as $val => $display)
+		{
+            if ((!file_exists($val) || !is_writable($val)) && @!mkdir($val))
+			{
                  $fixPaths[] = $display;
             }
-
         }
 
-        if (isset($fixPaths)) {
+        if (isset($fixPaths))
+		{
+        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot proceed until this has been corrected:</p>';
 
-        	echo '<p>Some required paths do not exist or are not writeable.
-        	    Linnaeus NG cannot proceed until this has been corrected:</p>';
-
-        	foreach ($fixPaths as $message) {
+        	foreach ($fixPaths as $message)
+			{
         		echo $message . '<br>';
         	}
 
         	die();
-
         }
-
     }
-
-
-
 
     private function saveInterfaceText ($text)
     {
-        @$this->models->InterfaceText->save(array(
+        @$this->models->InterfaceTexts->save(array(
             'id' => null,
             'text' => $text,
             'env' => $this->getAppName()
@@ -3318,7 +2828,7 @@ class Controller extends BaseClass
         //return strrev($text);
 
         // get id of the text
-        $i = $this->models->InterfaceText->_get(array(
+        $i = $this->models->InterfaceTexts->_get(array(
             'id' => array(
                 'text' => $text,
                 'env' => $this->getAppName()
@@ -3336,7 +2846,7 @@ class Controller extends BaseClass
             $languageId = $this->getDefaultLanguageId();
 
 		// fetch appropriate translation
-        $it = $this->models->InterfaceTranslation->_get(
+        $it = $this->models->InterfaceTranslations->_get(
         array(
             'id' => array(
                 'interface_text_id' => $i[0]['id'],
@@ -3356,7 +2866,7 @@ class Controller extends BaseClass
 
 	private function projectHasTaxa()
 	{
-		$t = $this->models->Taxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()), 'columns' => 'count(*) as total'));
+		$t = $this->models->Taxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()), 'columns' => 'count(*) as total'));
 		return ($t[0]['total']>0);
 	}
 
@@ -3364,30 +2874,16 @@ class Controller extends BaseClass
     {
         if (is_null($this->_tmpTree)) {
 
-            $d = $this->models->Taxon->freeQuery("
-				select
-					_a.id,
-					_a.taxon,
-					_a.parent_id,
-					_a.rank_id,
-					_a.taxon_order,
-					_a.is_hybrid,
-					_a.list_level,
-					_a.is_empty,
-					_a.author
-				from %PRE%taxa _a
-				where
-					_a.project_id = ".$this->getCurrentProjectId()
-            );
+            $d = $this->models->ControllerModel->getTaxa(array(
+                'projectId' => $this->getCurrentProjectId()
+            ));
 
             foreach ((array) $d as $val) {
 
-				$val['commonnames']=$this->models->Taxon->freeQuery("
-					select language_id, commonname, transliteration
-					from %PRE%commonnames
-					where project_id = ".$this->getCurrentProjectId()."
-					and taxon_id=".$val['id']
-				);
+				$val['commonnames'] = $this->models->ControllerModel->getTaxonCommonNames(array(
+				    'projectId' => $this->getCurrentProjectId(),
+    				'taxonId' => $val['id']
+				));
 
                 $this->_tmpTree[$val['parent_id']][$val['id']] = $val;
             }
@@ -3399,13 +2895,11 @@ class Controller extends BaseClass
 
 	private function setOtherStuff()
 	{
-
         $this->setRandomValue();
 
-		if ($this->rHasVar('sidx')) {
-
-			$this->setSearchResultIndexActive($this->requestData['sidx']);
-
+		if ($this->rHasVar('sidx'))
+		{
+			$this->setSearchResultIndexActive($this->rGetVal('sidx'));
 		}
 	}
 
@@ -3453,16 +2947,52 @@ class Controller extends BaseClass
 
 	private function setDatabaseLocaleSettings( $language_id )
 	{
-		$lng=$this->models->Language->_get(array("id"=>array("id"=>$language_id)));
+		$lng=$this->models->Languages->_get(array("id"=>array("id"=>$language_id)));
+
 		$locale=
-			isset($lng) && !empty($lng[0]['locale_lin']) ? 
-				$lng[0]['locale_lin'] : 
+			isset($lng) && !empty($lng[0]['locale_lin']) ?
+				$lng[0]['locale_lin'] :
 				$this->getSetting('db_lc_time_names','nl_NL');
 
-		$this->models->Project->freeQuery("SET lc_time_names = '".$locale."'");
-
+		$this->models->ControllerModel->setLocale($locale);
 	}
 
+    private function generateRandomHexString ($pre=null,$post=null)
+    {
+        return $pre.substr(md5(rand()), 0, 16).$post;
+    }
 
+	private function initTranslator()
+	{
+		include_once ('TranslatorController.php');
+		$this->translator = new TranslatorController('app',$this->getDefaultLanguageId());
+	}
+
+	public function translate($content)
+	{
+		return $this->translator->translate($content);
+	}
+
+	public function javascriptTranslate($content)
+	{
+		return $this->translator->translate($content);
+	}
+
+	public function smartyTranslate ($params, $content, &$smarty, &$repeat)
+	{
+		$c = $this->translator->translate($content);
+
+		if (isset($params))
+		{
+			foreach ((array) $params as $key => $val)
+			{
+				if (substr($key, 0, 2) == '_s' && isset($val))
+				{
+					$c = preg_replace('/\%s/', $val, $c, 1);
+				}
+			}
+		}
+		return $c;
+	}
 
 }

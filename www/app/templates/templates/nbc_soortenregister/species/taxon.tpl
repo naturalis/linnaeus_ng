@@ -50,6 +50,14 @@
 		
 			{include file=$ext_template}
 
+		{elseif $external_content && $external_content->template}
+        
+			{include file=$external_content->template}
+
+		{elseif $external_content}
+        
+			{include file='_webservice.tpl'}
+
 		{else}
 
 			{if $content|@is_array}
@@ -80,7 +88,8 @@
 
 
 <script type="text/JavaScript">
-$(document).ready(function() {
+$(document).ready(function()
+{
 	
 	$( 'title' ).html( $('<p>' + $('.main-display-name').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
 	

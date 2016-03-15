@@ -29,16 +29,16 @@
 
             <td style="width:160px">
             	<div class="{if $v.overview_image==1}overview_image{else}regular_image{/if}">
-                    <a class="zoomimage" 
-                        rel="prettyPhoto[gallery]" 
-                        href="{$taxon_main_image_base_url}{$v.image}" 
+                    <a class="zoomimage"
+                        rel="prettyPhoto[gallery]"
+                        href="{$taxon_main_image_base_url}{$v.image}"
                         pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>"
                     >
                         <img alt="Foto {$v.photographer}" title="Foto {$v.photographer}{if $v.overview_image==1}; banner-afbeelding{/if}" src="http://images.naturalis.nl/160x100/{$v.thumb}" />
                     </a>
-                    
-                    
-                    
+
+
+
                     <div style="font-size:10px;padding:0 2px 1px 2px">
                         {$v.label}<br />
                         Geplaatst: {$v.meta_datum_plaatsing}<br />
@@ -66,11 +66,11 @@
 
 <script type="text/JavaScript">
 $(document).ready(function() {
-	
+
 	if(jQuery().prettyPhoto) {
-		
-	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 
-	 		opacity: 0.70, 
+
+	 	$("a[rel^='prettyPhoto']").prettyPhoto( {
+	 		opacity: 0.70,
 			animation_speed:50,
 			show_title: false,
 	 		overlay_gallery: false,
@@ -80,7 +80,7 @@ $(document).ready(function() {
 	}
 
 	$('#page-block-messages').fadeOut(3000);
-	
+
 } );
 </script>
 

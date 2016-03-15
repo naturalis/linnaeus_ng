@@ -8,6 +8,8 @@ class TreeController extends Controller
 		'name_types'
     );
 	
+    public $modelNameOverride = 'TreeModel';
+
 	private $_idPreferredName=0;
 	private $_idValidName=0;
 		
@@ -62,7 +64,7 @@ class TreeController extends Controller
 		*/
 
 		$tree=$this->restoreTree();
-//q($this->getTreeNode(array('node'=>false,'count'=>'species')),1);
+
 		if (is_null($tree))
 		{
 			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
@@ -86,12 +88,12 @@ class TreeController extends Controller
         
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
-			$return=json_encode($this->getTreeNode(array('node'=>$this->requestData['node'],'count'=>$this->requestData['count'])));
+			$return=json_encode($this->getTreeNode(array('node'=>$this->rGetVal('node'),'count'=>$this->rGetVal('count'))));
         }
 		else
 		if ($this->rHasVal('action', 'store_tree'))
 		{	
-	        $_SESSION['app'][$this->spid()]['species']['tree']=$this->requestData['tree'];
+			$this->moduleSession->getModuleSetting( array( 'setting'=>'tree','value'=>$this->rGetVal('tree') ) );
 			$return='saved';
         }
 		else
@@ -109,42 +111,12 @@ class TreeController extends Controller
 	
 	private function restoreTree()
 	{
-		return isset($_SESSION['app'][$this->spid()]['species']['tree']) ?  $_SESSION['app'][$this->spid()]['species']['tree'] : null;
+		return $this->moduleSession->getModuleSetting( 'tree' );
 	}
 
-	private function treeGetTop()
+	private function getTreeTop()
 	{
-		/*
-			get the top taxon = no parent
-			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks 
-		*/
-		$p=$this->models->Taxon->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_r.rank
-			from
-				%PRE%taxa _a
-
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id = _trash.lng_id
-				and _trash.item_type='taxon'
-					
-			left join %PRE%projects_ranks _p
-				on _a.project_id=_p.project_id
-				and _a.rank_id=_p.id
-
-			left join %PRE%ranks _r
-				on _p.rank_id=_r.id
-
-			where 
-				_a.project_id = ".$this->getCurrentProjectId()." 
-				and ifnull(_trash.is_deleted,0)=0
-				and _a.parent_id is null
-				and _r.id < 10
-
-		");
+		$p=$this->models->TreeModel->getTreeTop(array("project_id"=>$this->getCurrentProjectId()));
 
 		if ($p && count((array)$p)==1)
 		{
@@ -173,7 +145,7 @@ class TreeController extends Controller
 		}
 		else
 		{
-			$node=$this->treeGetTop();
+			$node=$this->getTreeTop();
 			$isTop=true;
 		}
 		
@@ -183,139 +155,34 @@ class TreeController extends Controller
 			return;
 
 		$taxa=
-			$this->models->Taxon->freeQuery("
-				select
-					_a.id,
-					_a.parent_id,
-					_a.is_hybrid,
-					_a.rank_id,
-					_a.taxon,
-					ifnull(_k.name,_l.commonname) as name,
-					_m.authorship,
-					_r.rank,
-					_q.label as rank_label,
-					_p.rank_id as base_rank
+			$this->models->TreeModel->getTreeBranch(array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'language_id'=>$this->getCurrentLanguageId(),
+				'type_id_preferred'=>$this->_idPreferredName,
+				'type_id_valid'=>$this->_idValidName,
+				'node'=>$node
+			));
 
-				from
-					%PRE%taxa _a
-
-				left join %PRE%trash_can _trash
-					on _a.project_id = _trash.project_id
-					and _a.id = _trash.lng_id
-					and _trash.item_type='taxon'
-
-				left join %PRE%projects_ranks _p
-					on _a.project_id=_p.project_id
-					and _a.rank_id=_p.id
-
-				left join %PRE%labels_projects_ranks _q
-					on _a.rank_id=_q.project_rank_id
-					and _a.project_id = _q.project_id
-					and _q.language_id=".$this->getCurrentLanguageId()."
-
-				left join %PRE%ranks _r
-					on _p.rank_id=_r.id
-
-				left join %PRE%commonnames _l
-					on _a.id=_l.taxon_id
-					and _a.project_id=_l.project_id
-					and _l.language_id=".$this->getCurrentLanguageId()."
-
-				left join %PRE%names _k
-					on _a.id=_k.taxon_id
-					and _a.project_id=_k.project_id
-					and _k.type_id=".$this->_idPreferredName."
-					and _k.language_id=".$this->getCurrentLanguageId()."
-	
-				left join %PRE%names _m
-					on _a.id=_m.taxon_id
-					and _a.project_id=_m.project_id
-					and _m.type_id=".$this->_idValidName."
-	
-				where 
-					_a.project_id = ".$this->getCurrentProjectId()." 
-					and ifnull(_trash.is_deleted,0)=0
-					and (_a.id = ".$node." or _a.parent_id = ".$node.")
-
-				order by
-					label
-			");
-			
 		$taxon=$progeny=array();
 
 		foreach((array)$taxa as $key=>$val)
 		{
 			if ($count=='taxon') 
 			{
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(*) as total
-					from
-						%PRE%taxon_quick_parentage _sq
-
-						left join %PRE%taxa _e
-							on _sq.taxon_id = _e.id
-							and _sq.project_id = _e.project_id
-
-						left join %PRE%trash_can _trash
-							on _e.project_id = _trash.project_id
-							and _e.id = _trash.lng_id
-							and _trash.item_type='taxon'
-
-					where 
-						_sq.project_id = ".$this->getCurrentProjectId()." 
-						and ifnull(_trash.is_deleted,0)=0
-						and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
-					");
-					
-				$val['child_count']['taxon']=$d[0]['total'];
+				$val['child_count']['taxon']=$this->models->TreeModel->getBranchTaxonCount(array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"node"=>$val['id']
+				));
 			}
 			else
 			if ($count=='species') 
 			{
 	
-				$d=$this->models->Taxon->freeQuery(array(
-					'query'=> "
-						select
-							count(_sq.taxon_id) as total,
-							_sq.taxon_id,
-							_sp.presence_id,
-							ifnull(_sr.established,'undefined') as established
-						from 
-							%PRE%taxon_quick_parentage _sq
-						
-						left join %PRE%presence_taxa _sp
-							on _sq.project_id=_sp.project_id
-							and _sq.taxon_id=_sp.taxon_id
-						
-						left join %PRE%presence _sr
-							on _sp.project_id=_sr.project_id
-							and _sp.presence_id=_sr.id
-		
-						left join %PRE%taxa _e
-							on _sq.taxon_id = _e.id
-							and _sq.project_id = _e.project_id
-
-						left join %PRE%trash_can _trash
-							on _e.project_id = _trash.project_id
-							and _e.id = _trash.lng_id
-							and _trash.item_type='taxon'
-
-						left join %PRE%projects_ranks _f
-							on _e.rank_id=_f.id
-							and _e.project_id = _f.project_id
-						
-						where
-							_sq.project_id=".$this->getCurrentProjectId()."
-							and ifnull(_trash.is_deleted,0)=0
-							and _sp.presence_id is not null
-							and _f.rank_id".($val['base_rank']>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-							and MATCH(_sq.parentage) AGAINST ('".$val['id']."' in boolean mode)
-							
-						group by _sr.established",
-					'fieldAsIndex' =>"established"
-					)
-				);
+				$d=$this->models->TreeModel->getBranchSpeciesCount(array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"base_rank_id"=>$val['base_rank'],
+					"node"=>$val['id']
+				));
 	
 				$val['child_count']=
 					array(
@@ -362,24 +229,11 @@ class TreeController extends Controller
 			}
 			else 
 			{
-				$d=$this->models->Taxon->freeQuery("
-					select
-						count(*) as total
-					from
-						%PRE%taxa _a
+				$val['has_children']=$this->models->TreeModel->hasChildren(array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"node"=>$val['id']
+				));
 
-					left join %PRE%trash_can _trash
-						on _a.project_id = _trash.project_id
-						and _a.id = _trash.lng_id
-						and _trash.item_type='taxon'
-
-					where 
-						_a.project_id = ".$this->getCurrentProjectId()." 
-						and ifnull(_trash.is_deleted,0)=0
-						and _a.parent_id = ".$val['id']
-					);
-					
-				$val['has_children']=$d[0]['total']>0;
 				$progeny[]=$val;
 			}
 		}

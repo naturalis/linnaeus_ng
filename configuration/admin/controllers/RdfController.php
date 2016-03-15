@@ -8,7 +8,7 @@
 	| passport     |
 	+--------------+
 	1 row in set (0.05 sec)
-	
+
 	mysql> select distinct predicate from rdf;
 	+--------------------+
 	| predicate          |
@@ -23,7 +23,7 @@
 	| hasRightsStatement |
 	+--------------------+
 	8 rows in set (0.07 sec)
-	
+
 	mysql> select distinct object_type from rdf;
 	+-------------+
 	| object_type |
@@ -41,7 +41,9 @@ class RdfController extends Controller
 {
 
     public $usedModels = array(
-		'rdf','actors','literature2'
+		'rdf',
+        'actors',
+        'literature2'
     );
 
     public $controllerPublicName = 'RDF';
@@ -54,7 +56,7 @@ class RdfController extends Controller
 
 	public $jsToLoad = array('all' => array(
 	));
-	
+
     public function __construct ()
     {
         parent::__construct();
@@ -88,7 +90,7 @@ class RdfController extends Controller
 					));
 					break;
 				case 'taxon' :
-					$data=$this->models->Taxon->_get(array(
+					$data=$this->models->Taxa->_get(array(
 						'id' => array(
 							'project_id'=>$this->getCurrentProjectId(),
 							'id'=>$val['object_id']
@@ -105,17 +107,17 @@ class RdfController extends Controller
 					break;
 				default : $data=null;
 			}
-			
+
 			$rdf[$key]['data']=$data[0];
-			
+
 		}
 
 		return $rdf;
 	}
-	
+
 	public function translatePredicate($predicate,$removelanguageparam=false)
 	{
-	
+
 		$predicateTranslations=array(
 			24 => array(
 				PREDICATE_VALID_NAME=>'geldige naam',
@@ -134,7 +136,7 @@ class RdfController extends Controller
 				PREDICATE_HOMONYM=>'homonym',
 				PREDICATE_BASIONYM=>'basionym',
 				PREDICATE_SYNONYM=>'synonym',
-				PREDICATE_SYNONYM_SL=>'synonym',
+				PREDICATE_SYNONYM_SL=>'synoniem sensu lato',
 				PREDICATE_MISSPELLED_NAME=>'misspelled name',
 				PREDICATE_INVALID_NAME=>'invalid name',
 				PREDICATE_ALTERNATIVE_NAME=>'alternative %s name'
@@ -142,7 +144,7 @@ class RdfController extends Controller
 		);
 
 		$d=isset($predicateTranslations[$this->getDefaultProjectLanguage()][$predicate]) ?
-			$predicateTranslations[$this->getDefaultProjectLanguage()][$predicate] : 
+			$predicateTranslations[$this->getDefaultProjectLanguage()][$predicate] :
 			$predicate;
 
 		if ($removelanguageparam && $this->getDefaultProjectLanguage()==24) $d=str_replace('%se ','',$d);
@@ -150,7 +152,7 @@ class RdfController extends Controller
 
 		return $d;
 	}
-		
+
 	public function deleteRdfValue($p)
 	{
 		$subject_id = isset($p['subject_id']) ? $p['subject_id'] : null;
@@ -162,7 +164,7 @@ class RdfController extends Controller
 		if (empty($subject_id) && empty($object_id)) return;
 
 		$r=$this->models->Rdf->freeQuery("
-			delete 
+			delete
 				from %PRE%rdf
 			where
 				project_id = ".$this->getCurrentProjectId()."
@@ -175,7 +177,7 @@ class RdfController extends Controller
 
 		return $r;
 	}
-	
+
 	public function saveRdfValue($p)
 	{
 		$subject_id = isset($p['subject_id']) ? $p['subject_id'] : null;
@@ -210,7 +212,7 @@ class RdfController extends Controller
 
 		return $r;
 	}
-	
+
 
 
 }

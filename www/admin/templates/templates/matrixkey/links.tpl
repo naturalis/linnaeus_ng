@@ -2,7 +2,7 @@
 
 <div id="page-main">
 <p>
-<span class="matrix-header">{t _s1=$matrix.matrix}Viewing taxon-state links in the matrix "%s"{/t} (<a href="edit.php">{t}view matrix{/t}</a>)</span>
+<span class="matrix-header">{t _s1=$matrix.label}Viewing taxon-state links in the matrix "%s"{/t} (<a href="edit.php">{t}view matrix{/t}</a>)</span>
 </p>
 
 <form id="theForm" method="post" action="">

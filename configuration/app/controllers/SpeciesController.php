@@ -1,6 +1,7 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class SpeciesController extends Controller
 {
@@ -8,40 +9,22 @@ class SpeciesController extends Controller
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
 
+	protected $_model;
+
     public $usedModels = array(
-        'content_taxon',
-        'section',
-        'label_section',
-        'page_taxon',
-        'page_taxon_title',
-        'media_taxon',
-        'media_descriptions_taxon',
-        'hybrid',
-        'synonym',
-        'commonname',
-        'label_language',
-        'literature',
-        'literature_taxon',
-		'nbc_extras',
-		'content_free_module',
-        'taxa_relations',
-        'variation_relations',
-		'names',
-		'name_types',
-		'actors',
+        'commonnames',
+        'content_taxa',
 		'dna_barcodes',
-		'presence_taxa',
-		'media_meta',
-		'tab_order',
-		'nsr_ids',
-		'taxon_trend_years',
-		'taxon_trends',
-		'external_orgs',
-		'external_ids',
-		'taxon_quick_parentage',
-		'literature2',
-		'literature2_authors',
-		'names_additions'
+        'labels_languages',
+        'literature',
+        'literature_taxa',
+        'media_descriptions_taxon',
+        'media_taxon',
+        'pages_taxa',
+        'pages_taxa_titles',
+        'synonyms',
+        'tab_order',
+        'taxa_relations'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -57,9 +40,6 @@ class SpeciesController extends Controller
         ),
         'IE' => array()
     );
-
-	public $useCache=false;
-
 
 	/* init */
     public function __construct ()
@@ -77,9 +57,10 @@ class SpeciesController extends Controller
 
     private function initialise ()
     {
+        $this->setModel();
 
-		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
-		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
+        // creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
+		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
 
 			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
 
@@ -98,16 +79,22 @@ class SpeciesController extends Controller
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
-		$this->_suppressTab_NAMES=$this->getSetting('species_suppress_autotab_names',0)==1;
-		$this->_suppressTab_CLASSIFICATION=$this->getSetting('species_suppress_autotab_classification',0)==1;
-		$this->_suppressTab_LITERATURE=$this->getSetting('species_suppress_autotab_literature',0)==1;
-		$this->_suppressTab_MEDIA=$this->getSetting('species_suppress_autotab_media',0)==1;
-		$this->_suppressTab_DNA_BARCODES=$this->getSetting('species_suppress_autotab_dna_barcodes',0)==1;
+		$this->moduleSettings=new ModuleSettingsReaderController;
 
-        $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
-        $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
-		$this->_defaultSpeciesTab=$this->getSetting('species_default_tab',CTAB_CLASSIFICATION);
+		$this->_suppressTab_NAMES=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_names','subst'=>0) )==1;
+		$this->_suppressTab_CLASSIFICATION=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_classification','subst'=>0) )==1;
+		$this->_suppressTab_LITERATURE=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_literature','subst'=>0) )==1;
+		$this->_suppressTab_MEDIA=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_media','subst'=>0) )==1;
+		$this->_suppressTab_DNA_BARCODES=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_suppress_autotab_dna_barcodes','subst'=>0) )==1;
+        $this->_lookupListMaxResults=$this->moduleSettings->getModuleSetting( array( 'setting'=>'lookup_list_species_max_results','subst'=>$this->_lookupListMaxResults) );
+        $this->_includeOverviewImageInMedia=$this->moduleSettings->getModuleSetting( array( 'setting'=>'include_overview_in_media','subst'=>true) );
+		$this->_defaultSpeciesTab=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_default_tab','subst'=>CTAB_CLASSIFICATION) );
+    }
 
+    /* Dynamically set proper model name (species/highertaxa) */
+    private function setModel ()
+    {
+       $this->_model = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
     }
 
 
@@ -116,7 +103,12 @@ class SpeciesController extends Controller
     public function setTaxonType ($type)
     {
 		//public as it needs to be callable from the view
-        $_SESSION['app'][$this->spid()]['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
+        //$_SESSION['app'][$this->spid()]['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
+
+        $this->moduleSession->setModuleSetting(array(
+            'setting' => 'type',
+            'value' => ($type == 'higher') ? 'higher' : 'lower'
+        ));
     }
 
 
@@ -124,6 +116,7 @@ class SpeciesController extends Controller
 
     public function indexAction ()
     {
+
         $this->setPageName($this->translate('Species module index'));
 
         $this->setTaxonType('lower');
@@ -272,7 +265,7 @@ class SpeciesController extends Controller
     {
 		$return='error';
 
-        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->rGetVal('search'))) {
 
             $return=$this->getLookupList($this->requestData);
 
@@ -308,7 +301,7 @@ class SpeciesController extends Controller
 			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
 			$related[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_thumbnail'));
 		}
-		$children=$this->models->Taxon->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+		$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
 		foreach((array)$children as $key => $val)
 		{
 			$d = $this->getCommonname($val['id']);
@@ -323,7 +316,7 @@ class SpeciesController extends Controller
 		$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
 		$parent = $this->getTaxonById($taxon['parent_id']);
 		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
-		$content = $this->models->ContentTaxon->_get(array(
+		$content = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
 				'taxon_id' => $this->rGetVal('id'),
 				'project_id' => $this->getCurrentProjectId(),
@@ -340,7 +333,7 @@ class SpeciesController extends Controller
 
 		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
 
-		$contentparent = $this->models->ContentTaxon->_get(array(
+		$contentparent = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
 				'taxon_id' => $parent['id'],
 				'project_id' => $this->getCurrentProjectId(),
@@ -374,7 +367,8 @@ class SpeciesController extends Controller
 
     private function getTaxonType()
     {
-        return isset($_SESSION['app'][$this->spid()]['species']['type']) ? $_SESSION['app'][$this->spid()]['species']['type'] : 'lower';
+        return !is_null($this->moduleSession->getModuleSetting('type')) ?
+            $this->moduleSession->getModuleSetting('type') : 'lower';
     }
 
 
@@ -390,13 +384,26 @@ class SpeciesController extends Controller
     {
         if (!is_null($id)) {
 
-            $_SESSION['app'][$this->spid()]['species']['lastTaxon'] = $id;
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'lastTaxon',
+                'value' => $id
+            ));
 
-            unset($_SESSION['app']['user']['mapkey']['state']);
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'state',
+                'module' => 'mapkey',
+                'projectId' => $this->spid()
+            ));
+
+            //unset($_SESSION['app']['user']['mapkey']['state']);
         }
         else {
 
-            unset($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'lastTaxon'
+            ));
+
+            //unset($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
         }
     }
 
@@ -404,19 +411,20 @@ class SpeciesController extends Controller
     private function getlastVisitedCategory($taxon,$category)
     {
 
-		if (!$this->useCache)
+		if (is_null($this->moduleSession->getModuleSetting('last_visited'))) {
 			return false;
+		}
 
-        if (isset($_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category])) {
-            return $_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category];
+		$lastVisited = $this->moduleSession->getModuleSetting('last_visited');
+
+        if (isset($lastVisited[$taxon][$category])) {
+            return $lastVisited[$taxon][$category];
         }
 
-        if (isset($_SESSION['app'][$this->spid()]['species']['last_visited'])) {
+        $storedTaxon = key($lastVisited);
+        if ($storedTaxon != $taxon) {
 
-            $storedTaxon = key($_SESSION['app'][$this->spid()]['species']['last_visited']);
-            if ($storedTaxon != $taxon) {
-                unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
-            }
+            unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
         }
 
         return false;
@@ -425,57 +433,65 @@ class SpeciesController extends Controller
 
     private function setlastVisitedCategory($taxon,$category,$d)
     {
-        $_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category] = $d;
+        $this->moduleSession->setModuleSetting(array(
+            'setting' => 'last_visited',
+            'value' => array(
+                $taxon => array(
+                    $category => $d
+                )
+            )
+        ));
+
+        //$_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category] = $d;
     }
 
 
     public function getFirstTaxonId()
     {
-
-        $t = $this->models->Taxon->freeQuery(
-        array(
-			'query' => '
-				select _a.id
-				from %PRE%taxa _a
-				left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-				left join %PRE%ranks _c on _b.rank_id=_c.id
-				where _a.project_id = '.$this->getCurrentProjectId().'
-				and _b.lower_taxon = '.($this->getTaxonType() == 'higher' ? 0 : 1).'
-				order by _a.taxon_order, _a.taxon
-				limit 1'
+        return $this->models->{$this->_model}->getFirstTaxonId(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonType' => $this->getTaxonType()
         ));
-
-		return isset($t) ? $t[0]['id'] : null;
     }
 
 
 	private function getAdjacentTaxa($id)
     {
 
-		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
+        $browseOrder = $this->moduleSession->getModuleSetting('browse_order');
+/*
+        if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
-			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]=
-				$this->models->Taxon->freeQuery(
-					array(
-						'query' => '
-							select _a.id,_a.taxon
-							from %PRE%taxa _a
-							left join %PRE%projects_ranks _b on _a.rank_id=_b.id
-							where _a.project_id = '.$this->getCurrentProjectId().'
-							and _b.lower_taxon = '.($this->getTaxonType() == 'higher' ? 0 : 1).'
-							order by _a.taxon_order, _a.taxon
-							'
-					));
+			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()] =
+				$this->models->{$this->_model}->getBrowseOrder(array(
+                    'projectId' => $this->getCurrentProjectId(),
+                    'taxonType' => $this->getTaxonType()
+				));
+		}
+*/
+        if (!isset($browseOrder[$this->getTaxonType()])) {
+
+            $browseOrder[$this->getTaxonType()] = $this->models->{$this->_model}->getBrowseOrder(array(
+                'projectId' => $this->getCurrentProjectId(),
+                'taxonType' => $this->getTaxonType()
+		    ));
+
+            $this->moduleSession->setModuleSetting(array(
+                'setting' => 'browse_order',
+                'value' => array(
+                    $this->getTaxonType() => $browseOrder[$this->getTaxonType()]
+                )
+            ));
 
 		}
 
 		$prev=$next=false;
-		while (list ($key, $val) = each($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
+		while (list ($key, $val) = each($browseOrder[$this->getTaxonType()])) {
 
 			if ($val['id']==$id) {
 
 				// current = next because the pointer has already shifted forward
-				$next = current($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]);
+				$next = current($browseOrder[$this->getTaxonType()]);
 
 				return array(
 					'prev' => $prev!==false ? array(
@@ -499,7 +515,7 @@ class SpeciesController extends Controller
 
     private function getTaxonNextLevel($id)
     {
-        $t = $this->models->Taxon->_get(
+        $t = $this->models->Taxa->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -533,7 +549,7 @@ class SpeciesController extends Controller
 		$stdCats=array();
 
 		// get the defined categories (just the page definitions, no content yet)
-		$tp = $this->models->PageTaxon->_get(
+		$tp = $this->models->PagesTaxa->_get(
 		array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId()
@@ -545,14 +561,22 @@ class SpeciesController extends Controller
 		foreach ((array) $tp as $key => $val)
 		{
 
-			if (!isset($_SESSION['app'][$this->spid()]['species']['defaultCategory'])) {
-                $_SESSION['app'][$this->spid()]['species']['defaultCategory'] = $val['id'];
+		    if (is_null($this->moduleSession->getModuleSetting('defaultCategory'))) {
+                $this->moduleSession->setModuleSetting(array(
+                    'setting' => 'defaultCategory',
+                    'value' => $val['id']
+                ));
 			}
+
 			$tp[$key]['title'] = $this->getCategoryName($val['id']);
 			$tp[$key]['tabname'] = 'TAB_'.str_replace(' ','_',strtoupper($val['page']));
 
-			if ($val['def_page'] == 1)
-				$_SESSION['app'][$this->spid()]['species']['defaultCategory'] = $val['id'];
+			if ($val['def_page'] == 1) {
+                $this->moduleSession->setModuleSetting(array(
+                    'setting' => 'defaultCategory',
+                    'value' => $val['id']
+                ));
+			}
 		}
 
 
@@ -580,7 +604,7 @@ class SpeciesController extends Controller
 			{
                 $val['is_empty'] = 1;
 
-                $ct = $this->models->ContentTaxon->_get(
+                $ct = $this->models->ContentTaxa->_get(
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(),
@@ -591,14 +615,16 @@ class SpeciesController extends Controller
                     'columns' => 'page_id,publish,content'
                 ));
 
-                if (($ct[0]['publish'] == '1' || $allowUnpublished) && strlen($ct[0]['content']) > 0)
+                if (($ct[0]['publish'] == '1' || $allowUnpublished) && strlen($ct[0]['content']) > 0) {
                     $val['is_empty'] = 0;
+                }
 
                 $d[$key] = $val;
 
-                if ($ct[0]['page_id'] == $_SESSION['app'][$this->spid()]['species']['defaultCategory'])
-                    $defCat = $_SESSION['app'][$this->spid()]['species']['defaultCategory'];
-            }
+                if ($ct[0]['page_id'] == $this->moduleSession->getModuleSetting('defaultCategory')) {
+                    $defCat = $this->moduleSession->getModuleSetting('defaultCategory');
+                }
+			}
 
 			foreach ((array) $d as $key => $val) {
 				$categoryList[$key] = $val['title'];
@@ -700,7 +726,7 @@ class SpeciesController extends Controller
 
 		return array(
             'categories' => $tp,
-			'defaultCategory' => isset($defCat) ? $defCat : $_SESSION['app'][$this->spid()]['species']['defaultCategory'],
+			'defaultCategory' => isset($defCat) ? $defCat : $this->moduleSession->getModuleSetting('defaultCategory'),
 			'categoryList' => isset($categoryList) ? $categoryList : null,
 			'categorySysList' => isset($categorySysList) ? $categorySysList : null,
 			'emptinessList' => isset($emptinessList) ? $emptinessList : null
@@ -713,7 +739,7 @@ class SpeciesController extends Controller
     {
 		if (is_numeric($id)) {
 
-			$tpt = $this->models->PageTaxonTitle->_get(
+			$tpt = $this->models->PagesTaxaTitles->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -725,7 +751,7 @@ class SpeciesController extends Controller
 
 			if (empty($tpt[0]['title'])) {
 
-				$tpt = $this->models->PageTaxon->_get(
+				$tpt = $this->models->PagesTaxa->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -794,7 +820,7 @@ class SpeciesController extends Controller
                 if (!$allowUnpublished)
                     $d['publish'] = '1';
 
-                $ct = $this->models->ContentTaxon->_get(array(
+                $ct = $this->models->ContentTaxa->_get(array(
                     'id' => $d,
                 ));
 
@@ -848,7 +874,7 @@ class SpeciesController extends Controller
 			));
 
 
-//            $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
+//          $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
 			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
 
 			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ? $this->controllerSettings['mime_types'][$val['mime_type']] : null;
@@ -860,7 +886,7 @@ class SpeciesController extends Controller
 		}
 
 		$this->loadControllerConfig();
-
+/*
 		$sortBy = array(
 			'key' => array(
 				'mime_show_order',
@@ -870,7 +896,9 @@ class SpeciesController extends Controller
 			'case' => 'i'
 		);
 
-		$this->customSortArray($mt, $sortBy);
+        $this->customSortArray($mt, $sortBy);
+
+*/
 
 		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
 
@@ -882,7 +910,7 @@ class SpeciesController extends Controller
         if ($refs = $this->getlastVisitedCategory($tId, CTAB_LITERATURE))
             return $refs;
 
-        $lt = $this->models->LiteratureTaxon->_get(array(
+        $lt = $this->models->LiteratureTaxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'taxon_id' => $tId
@@ -967,7 +995,7 @@ class SpeciesController extends Controller
 
     private function getTaxonSynonyms($tId)
     {
-        $s = $this->models->Synonym->_get(array(
+        $s = $this->models->Synonyms->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
                 'taxon_id' => $tId
@@ -997,7 +1025,7 @@ class SpeciesController extends Controller
         if (isset($languageId))
             $d['language_id'] = $languageId;
 
-        $c = $this->models->Commonname->_get(array(
+        $c = $this->models->Commonnames->_get(array(
             'id' => $d,
             'columns' => 'language_id,commonname,transliteration',
             'order' => 'show_order,commonname'
@@ -1007,38 +1035,31 @@ class SpeciesController extends Controller
 
             foreach ((array) $c as $key => $val) {
 
-                if (isset($_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()])) {
+               $ll = $this->models->LabelsLanguages->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'label_language_id' => $val['language_id'],
+                        'language_id' => $this->getCurrentLanguageId()
+                    ),
+                    'columns' => 'label'
+                ));
 
-                    $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()];
+                if ($ll) {
+
+                    $c[$key]['language_name'] = $ll[0]['label'];
                 }
                 else {
 
-                    $ll = $this->models->LabelLanguage->_get(
+                    $l = $this->models->Languages->_get(
                     array(
                         'id' => array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'label_language_id' => $val['language_id'],
-                            'language_id' => $this->getCurrentLanguageId()
+                            'id' => $val['language_id']
                         ),
-                        'columns' => 'label'
+                        'columns' => 'language'
                     ));
 
-                    if ($ll) {
-
-                        $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = $ll[0]['label'];
-                    }
-                    else {
-
-                        $l = $this->models->Language->_get(
-                        array(
-                            'id' => array(
-                                'id' => $val['language_id']
-                            ),
-                            'columns' => 'language'
-                        ));
-
-                        $c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = $l[0]['language'];
-                    }
+                    $c[$key]['language_name'] = $l[0]['language'];
                 }
             }
         }
@@ -1083,7 +1104,7 @@ class SpeciesController extends Controller
 
     private function getTaxonSynonymCount($id)
     {
-        $s = $this->models->Synonym->_get(
+        $s = $this->models->Synonyms->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1098,7 +1119,7 @@ class SpeciesController extends Controller
 
     private function getTaxonCommonnameCount($id)
     {
-        $c = $this->models->Commonname->_get(
+        $c = $this->models->Commonnames->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1128,7 +1149,7 @@ class SpeciesController extends Controller
 
     private function getTaxonLiteratureCount($id)
     {
-        $lt = $this->models->LiteratureTaxon->_get(
+        $lt = $this->models->LiteratureTaxa->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1210,28 +1231,13 @@ class SpeciesController extends Controller
         if (empty($search) && !$getAll)
             return;
 
-		$regexp = ($matchStartOnly?'^':'').preg_quote($search);
-
-        $taxa = $this->models->Taxon->freeQuery(
-			array(
-				'query' => "
-					select
-						SQL_CALC_FOUND_ROWS
-						_a.id, _a.taxon, _a.rank_id, _a.parent_id, _a.is_hybrid
-					from
-						%PRE%taxa _a
-					left join %PRE%projects_ranks _b
-						on _a.rank_id=_b.id
-					where
-						_a.project_id = ".$this->getCurrentProjectId()."
-						and _b.lower_taxon = ".($this->getTaxonType() == 'higher' ? 0 : 1)."
-						".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
-					order by taxon
-					".(!empty($listMax) ? "limit ".$listMax : "")
-			));
-
-		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
-		$total=$count[0]['total'];
+        list($taxa, $total) = $this->models->{$this->_model}->getTaxa(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonType' => $this->getTaxonType(),
+            'getAll' => $getAll,
+            'listMax' => $listMax,
+            'regExp' => ($matchStartOnly?'^':'').preg_quote($search)
+        ));
 
 		$ranks=$this->getProjectRanks();
 
@@ -1333,9 +1339,12 @@ class SpeciesController extends Controller
 
     private function _indexAction ()
     {
-        if (!$this->rHasVal('id')) {
+
+        if (!$this->rHasId()) {
 
             $id = $this->getFirstTaxonId();
+
+            //die('id ' . $id);
 
         }
         else {
@@ -1363,7 +1372,7 @@ class SpeciesController extends Controller
 			$this->redirect($base.'index.php');
 
 		// try literal
-		$t = $this->models->Taxon->_get(array(
+		$t = $this->models->Taxa->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon' => $name
@@ -1381,19 +1390,28 @@ class SpeciesController extends Controller
 		if (is_null($id))
 			return;
 
-		$d=$this->models->TaxonQuickParentage->freeQuery("
-			select
-				parentage
-			from
-				%PRE%taxon_quick_parentage
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				and taxon_id = ".$id
-		);
-
-		return explode(' ',$d[0]['parentage']);
+		return $this->models->{$this->_model}->getTaxonParentage(array(
+            'projectId' => $this->getCurrentProjectId(),
+		    'taxonId' => $id
+		));
 
 	}
+
+	private function getCommonname($tId)
+	{
+		$c = $this->models->Commonnames->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $tId,
+				'language_id' => $this->getCurrentLanguageId()
+			)
+		));
+
+		return $c[0]['commonname'];
+
+	}
+
 
 
 

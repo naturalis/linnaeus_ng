@@ -4,7 +4,7 @@
 
 	make sure that if there are multiple parameters, they are in alphabetical
 	order (this is assumed while matching with the current URL in the app).
-	so: 
+	so:
 
 		$this->saveHotword(
 			array(
@@ -13,7 +13,7 @@
 				'params' => 'id='. $val['id'].'&modId='.$val['module_id']
 			)
 		)
-		
+
 	good,
 
 		$this->saveHotword(
@@ -23,7 +23,7 @@
 				'params' => 'modId='.$val['module_id'].'&id='. $val['id']
 			)
 		)
-		
+
 	bad.
 
 
@@ -35,24 +35,19 @@ class HotwordController extends Controller
 {
 
     public $usedModels = array(
-		'hotword',
+		'hotwords',
 		'content_introduction',
 		'glossary',
-		'glossary_synonym',
-		'content_keystep',
+		'glossary_synonyms',
+		'content_keysteps',
 		'literature',
-		'content_free_module',
-		'commonname'
+		'content_free_modules',
+		'commonnames'
     );
-   
+
     public $controllerPublicName = 'Hotwords';
 
 	public $jsToLoad = array('all' => array('hotwords.js'));
-
-    public $cacheFiles = array(
-        'hotwords-*'
-    );
-
 
     /**
      * Constructor, calls parent's constructor
@@ -61,7 +56,7 @@ class HotwordController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
 
     }
@@ -73,7 +68,7 @@ class HotwordController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
 
     }
@@ -85,7 +80,7 @@ class HotwordController extends Controller
      */
     public function indexAction()
     {
-    
+
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Hotwords'));
@@ -93,22 +88,22 @@ class HotwordController extends Controller
 		if ($this->rHasVal('action','delete_all') && !$this->isFormResubmit()) {
 
 			$this->clearHotwords();
-			$this->clearCache($this->cacheFiles);
+
 
 		}
 
-		$c = $this->models->Hotword->_get(
+		$c = $this->models->Hotwords->_get(
 			array('id'=>
 				array('project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'count(*) as tot, controller',
 				'group' => 'controller'
 			)
 		);
-	
+
 		$this->smarty->assign('controllers',$c);
 
         $this->printPage();
-	
+
 	}
 
     /**
@@ -118,15 +113,15 @@ class HotwordController extends Controller
      */
     public function updateAction()
     {
-    
+
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Update hotwords'));
 
 		if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
-		
+
 			$this->clearHotwords();
-			$this->clearCache($this->cacheFiles);
+
 			$this->addMessage('Deleted old hotwords.');
 			$this->addMessage('Added '.$this->updateIntroduction().' hotwords from Introduction.');
 			$this->addMessage('Added '.$this->updateGlossary().' hotwords from Glossary.');
@@ -135,22 +130,22 @@ class HotwordController extends Controller
 			$this->addMessage('Added '.$this->updateCommonNames().' hotwords from Common names.');
 			$this->addMessage('Added '.$this->updateKey().' hotwords from Dichotomous key.');
 			$this->addMessage('Added '.$this->updateFreeModules().' hotwords from free modules.');
-		
+
 		}
-		
-		$h = $this->models->Hotword->_get(
+
+		$h = $this->models->Hotwords->_get(
 			array('id'=>
 				array('project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'date_format(max(created),\'%d-%m-%Y %H:%i:%s\') as last_created'
 			)
 		);
-		
+
 		$this->smarty->assign('last_created',$h[0]['last_created']);
 
         $this->printPage();
-	
+
 	}
-	
+
 	/**
      * Delete
      *
@@ -158,72 +153,72 @@ class HotwordController extends Controller
      */
     public function browseAction()
     {
-    
+
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Browse hotwords'));
-		
+
 		$id = array('project_id' => $this->getCurrentProjectId());
-						
+
 		if ($this->rHasVal('c')) {
 
-			$id['controller'] = $this->requestData['c'];
+			$id['controller'] = $this->rGetVal('c');
 
-			$this->smarty->assign('controller',$this->requestData['c']);
+			$this->smarty->assign('controller',$this->rGetVal('c'));
 
 		}
-				
+
 		if ($this->rHasVal('id') && $this->rHasVal('action','delete')) {
 
-			$this->models->Hotword->delete(array_merge($id,array('id' => $this->requestData['id'])));
-			$this->clearCache($this->cacheFiles);
+			$this->models->Hotwords->delete(array_merge($id,array('id' => $this->rGetId())));
+
 
 		} else
 		if ($this->rHasVal('action','delete_module')) {
 
-			$this->models->Hotword->delete($id);
-			$this->clearCache($this->cacheFiles);
+			$this->models->Hotwords->delete($id);
+
 
 		}
 
-		$h = $this->models->Hotword->_get(array('id' => $id,'order' => 'hotword'));
+		$h = $this->models->Hotwords->_get(array('id' => $id,'order' => 'hotword'));
 
 		$pagination = $this->getPagination($h,20);
 
 		$slice = $pagination['items'];
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
-	
+
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
-		
+
 		$this->smarty->assign('num',count((array)$h));
 
 		$this->smarty->assign('hotwords',$slice);
-		
+
         $this->printPage();
-	
+
 	}
-	
-	
-	
-	
+
+
+
+
 	private function clearHotwords()
 	{
-	
-		$r = $this->models->Hotword->delete(array('project_id' => $this->getCurrentProjectId()));
-	
+
+		$r = $this->models->Hotwords->delete(array('project_id' => $this->getCurrentProjectId()));
+
 		//if ($r!=1) echo $r.'<br />';
-	
+
 	}
 
 	private function saveHotword($p)
 	{
-	
+
 		$p['hotword'] = trim($p['hotword']);
-	
+
 		if (is_numeric($p['hotword']) || empty($p['hotword'])) return;
-	
-		return @$this->models->Hotword->save(
+
+		return @$this->models->Hotwords->save(
 			array(
 				'id' => null,
 				'project_id' => $p['project_id'],
@@ -241,7 +236,7 @@ class HotwordController extends Controller
 	{
 
 		$res = 0;
-	
+
 		$d = $this->models->ContentIntroduction->_get(array('id' =>array('project_id' => $this->getCurrentProjectId())));
 
 		foreach((array)$d as $key => $val) {
@@ -258,16 +253,16 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}
 
 	private function updateGlossary()
 	{
-	
+
 		$res = 0;
-	
+
 		$d = $this->models->Glossary->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
 
 		foreach((array)$d as $key => $val) {
@@ -284,8 +279,8 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
-		$d = $this->models->GlossarySynonym->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
+
+		$d = $this->models->GlossarySynonyms->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
 
 		foreach((array)$d as $key => $val) {
 
@@ -301,11 +296,11 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}
-	
+
 	private function updateLiterature()
 	{
 
@@ -370,7 +365,7 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}
@@ -379,8 +374,8 @@ class HotwordController extends Controller
 	{
 
 		$res = 0;
-	
-		$d = $this->models->Taxon->_get(array('id' =>array('project_id' => $this->getCurrentProjectId(),'is_empty'=>0)));
+
+		$d = $this->models->Taxa->_get(array('id' =>array('project_id' => $this->getCurrentProjectId(),'is_empty'=>0)));
 
 		foreach((array)$d as $key => $val) {
 
@@ -396,7 +391,7 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}
@@ -404,9 +399,9 @@ class HotwordController extends Controller
 	private function updateCommonNames()
 	{
 		$res = 0;
-	
-		$c = $this->models->Commonname->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
-		
+
+		$c = $this->models->Commonnames->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+
 		foreach((array)$c as $key => $val) {
 
 			if ($this->saveHotword(
@@ -432,17 +427,17 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}
 
 	private function updateKey()
 	{
-	
+
 		$res = 0;
-	
-		$d = $this->models->ContentKeystep->_get(array('id' =>array('project_id' => $this->getCurrentProjectId())));
+
+		$d = $this->models->ContentKeysteps->_get(array('id' =>array('project_id' => $this->getCurrentProjectId())));
 
 		foreach((array)$d as $key => $val) {
 
@@ -458,7 +453,7 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}
@@ -467,8 +462,8 @@ class HotwordController extends Controller
 	{
 
 		$res = 0;
-	
-		$d = $this->models->ContentFreeModule->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+
+		$d = $this->models->ContentFreeModules->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
 
 		foreach((array)$d as $key => $val) {
 
@@ -484,7 +479,7 @@ class HotwordController extends Controller
 			)===true) $res++;
 
 		}
-		
+
 		return $res;
 
 	}

@@ -79,7 +79,7 @@
             </div>
 
    			<div>
-				{foreach from=$results.data item=v}
+				{foreach $results.data v}
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
 							<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$taxon_base_url_images_main}{$v.image}" pTitle="<div style='margin-left:125px;'>{$v.meta_data|@escape}</div>">
@@ -113,20 +113,16 @@
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
-	
-	<!-- div>
-		tijdelijke link t.b.v. test:<br />
-		<a href="nsr_recent_pictures.php">Recente afbeeldingen</a>
-	</div -->
 
 </div>
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html("{t}Foto's zoeken{/t} - "+$('title').html());
 
-	if(jQuery().prettyPhoto) {
+	if(jQuery().prettyPhoto)
+	{
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
 	 		opacity: 0.70, 
 			animation_speed:50,
@@ -139,6 +135,5 @@ $(document).ready(function(){
 	bindKeys();
 });
 </script>
-
 
 {include file="../shared/footer.tpl"}

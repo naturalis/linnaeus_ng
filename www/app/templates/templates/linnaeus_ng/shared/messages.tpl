@@ -1,14 +1,14 @@
 {if !empty($errors)}
 <div id="errors">
-{section name=error loop=$errors}
-<span class="error">{$errors[error]}</span><br />
-{/section}
+{foreach $errors v}
+<span class="error">{$v}</span><br />
+{/foreach}
 </div>
 {/if}
 {if !empty($messages)}
 <div id="messages">
-{section name=i loop=$messages}
-<span class="message">{$messages[i]}</span><br />
-{/section}
+{foreach $messages v}
+<span class="message">{$v}</span><br />
+{/foreach}
 </div>
 {/if}

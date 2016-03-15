@@ -19,7 +19,6 @@
 		</td>
 		<td>
 			<input type="text" name="number" id="number" value="{$step.number}" style="width:40px;text-align:right" />
-			{*$step.number*}
 		</td>
 	</tr>
 	<tr style="vertical-align:top;">
@@ -82,7 +81,7 @@
 				type="button"
 				onclick="
 					{if $session.admin.project.languages|@count>1}keySaveStepContent('other');{/if} 
-					keySaveStepContent('default','$(\'#theForm\').submit()');"
+					keySaveStepContent('default',$('#theForm').submit());"
 					value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 		</td>
@@ -106,21 +105,19 @@
 </div>
 
 <script type="text/javascript">
-{literal}
-$(document).ready(function(){
-{/literal}
+$(document).ready(function()
+{
 	allActiveView = 'keystepedit';
-{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
+{foreach $languages v i}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
 	allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 	keyStepId = {if $step.id}{$step.id}{else}-1{/if};
 	keyGetKeystepContent(allDefaultLanguage);
 	keyGetKeystepContent(allActiveLanguage);
-{literal}
+
 });
-{/literal}
 </script>
 
 {include file="../shared/admin-footer.tpl"}

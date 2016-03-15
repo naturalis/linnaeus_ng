@@ -58,6 +58,6 @@ class NSRFunctionsController extends Controller
 		}
 		
 		return  $data;
-	
 	}
+
 }

@@ -12,6 +12,7 @@ include_once ('TraitsController.php');
 class TraitsTraitsController extends TraitsController
 {
 
+    public $modelNameOverride='TraitsTraitsModel';
 	private $_lookupListMaxResults=99999;
 	
     public $usedModels = array(
@@ -20,14 +21,15 @@ class TraitsTraitsController extends TraitsController
 		'traits_types',
 		'traits_project_types',
 		'traits_traits',
+		'traits_values',
+		'traits_taxon_values',
+		'traits_taxon_freevalues',
+		'traits_date_formats',
 		'text_translations',
-		'traits_values'
     );
    
     public $controllerPublicName = 'Kenmerken';
 
-    public $cacheFiles = array();
-    
     public $cssToLoad = array(
 		'traits.css',
 //		'taxon_groups.css'
@@ -44,7 +46,7 @@ class TraitsTraitsController extends TraitsController
     public function __construct ()
     {
         parent::__construct();
-		$this->initialise();
+		$this->initialize();
     }
 
     public function __destruct ()
@@ -52,7 +54,7 @@ class TraitsTraitsController extends TraitsController
         parent::__destruct();
     }
 
-    private function initialise()
+    private function initialize()
     {
 		$this->smarty->assign('defaultMaxLengthStringValue',$this->_defaultMaxLengthStringValue);
 		$this->smarty->assign('defaultMaxLengthIntegerValue',$this->_defaultMaxLengthIntegerValue);
@@ -75,13 +77,13 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','add'))
 		{
-			$this->addDatatypeToProject($this->requestData);
+			$this->addDatatypeToProject($this->rGetAll());
 			$this->addMessage('Data type added to project.');
 		}
 		else
 		if ($this->rHasVal('action','remove'))
 		{
-			$this->removeDatatypeFromProject($this->requestData);
+			$this->removeDatatypeFromProject($this->rGetAll());
 			$this->addMessage('Data type removed project.');
 		}
 
@@ -98,7 +100,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','saveorder'))
 		{
-			$i=$this->saveTraitgroupOrder($this->requestData);
+			$i=$this->saveTraitgroupOrder($this->rGetAll());
 			if ($i>0) $this->addMessage('New order saved.');
 		}
 
@@ -113,14 +115,14 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','save'))
 		{
-			$this->saveTraitgroup($this->requestData);
+			$this->saveTraitgroup($this->rGetAll());
 			$this->helpers->SessionMessages->setMessage('Saved.');
 			$this->redirect('traitgroups.php');
 		}
 		else 
 		if ($this->rHasVal('action','delete'))
 		{
-			$this->deleteTraitgroup($this->requestData);
+			$this->deleteTraitgroup($this->rGetAll());
 			$this->helpers->SessionMessages->setMessage('Group deleted.');
 			$this->redirect('traitgroups.php');
 		}
@@ -154,7 +156,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','saveorder'))
 		{
-			$i=$this->saveTraitgroupTraitsOrder($this->requestData);
+			$i=$this->saveTraitgroupTraitsOrder($this->rGetAll());
 			if ($i>0) $this->addMessage('New order saved.');
 		}
 
@@ -188,7 +190,7 @@ class TraitsTraitsController extends TraitsController
 		if ($this->rHasVal('action','save'))
 		{
 
-			$r=$this->saveTraitgroupTrait($this->requestData);
+			$r=$this->saveTraitgroupTrait($this->rGetAll());
 			
 			if ($r)
 			{
@@ -213,7 +215,7 @@ class TraitsTraitsController extends TraitsController
 		else
 		if ($this->rHasVal('action','delete') && $this->rHasId())
 		{
-			$this->deleteTraitgroupTrait($this->requestData);
+			$this->deleteTraitgroupTrait($this->rGetAll());
 			$this->helpers->SessionMessages->setMessage('Trait deleted.');
 			$this->redirect('traitgroup_traits.php?group='.$group['id']);
 		}
@@ -238,7 +240,7 @@ class TraitsTraitsController extends TraitsController
 
 		if ($this->rHasVal('action','save'))
 		{
-			$this->saveTraitgroupTraitValues($this->requestData);
+			$this->saveTraitgroupTraitValues($this->rGetAll());
 		}
 
 		if ($this->rHasVar('trait'))
@@ -284,89 +286,26 @@ class TraitsTraitsController extends TraitsController
     }
 	
 
-
-
-
-
-
-
-
-
-
-
 	private function getDatatypes()
 	{
-		$g=$this->models->TraitsTypes->freeQuery("
-			select
-				_a.*,
-				_d.translation as name,
-				_e.translation as description,
-				_b.id as project_type_id
-			from
-				%PRE%traits_types _a
-
-			left join 
-				%PRE%text_translations _d
-				on _a.name_tid=_d.text_id
-				and _d.language_id=". $this->getDefaultProjectLanguage() ."
-				and _d.project_id is null
-
-			left join 
-				%PRE%text_translations _e
-				on _a.description_tid=_e.text_id
-				and _e.language_id=". $this->getDefaultProjectLanguage() ."
-				and _e.project_id is null
-				
-			left join 
-				%PRE%traits_project_types _b
-				on _a.id=_b.type_id
-				and _b.project_id=". $this->getCurrentProjectId()."
-			order by _a.id
-		");
-
-		return $g;
+		return $this->models->TraitsTraitsModel->getDatatypes(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId()
+		));
 	}
 
-	private function getProjectDatatype($id)
+	private function getProjectDatatype($type_id)
 	{
-		if (empty($id)) return;
-		
-		$t=$this->models->TraitsTypes->freeQuery("
-			select
-				_a.*,
-				_d.translation as name,
-				_e.translation as description,
-				_b.id as project_type_id
-			from
-				%PRE%traits_types _a
-
-			left join 
-				%PRE%text_translations _d
-				on _a.name_tid=_d.id
-				and _d.language_id=". $this->getDefaultProjectLanguage() ."
-				and _d.project_id is null
-
-			left join 
-				%PRE%text_translations _e
-				on _a.description_tid=_e.id
-				and _e.language_id=". $this->getDefaultProjectLanguage() ."
-				and _e.project_id is null
-				
-			left join 
-				%PRE%traits_project_types _b
-				on _a.id=_b.type_id
-				and _b.project_id=". $this->getCurrentProjectId()."
-			where _b.id =".$id."
-		");
-		
-		$t=isset($t[0]) ? $t[0] : null;
-
-		return $t;
+		return $this->models->TraitsTraitsModel->getProjectDatatype(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"type_id"=>$type_id
+		));
 	}
 
 	private function getDateFormats()
 	{
-		return $this->models->TraitsTypes->freeQuery("select * from %PRE%traits_date_formats order by show_order");
+		return $this->models->TraitsDateFormats->_get(array('id'=>'*','order'=>'show_order'));
 	}
 
 	private function addDatatypeToProject($p)
@@ -889,9 +828,10 @@ class TraitsTraitsController extends TraitsController
 
 	private function getNextTextId()
 	{
-		$d=$this->models->TextTranslations->freeQuery("
-			select ifnull(max(text_id)+1,1) as next from %TABLE%  where project_id = ".$this->getCurrentProjectId()
-		);
+		$d=$this->models->TextTranslations->_get(array(
+			'columns'=>'ifnull(max(text_id)+1,1) as next',
+			'id'=>array('project_id'=>$this->getCurrentProjectId())
+		));
 		return $d[0]['next'];
 	}
 

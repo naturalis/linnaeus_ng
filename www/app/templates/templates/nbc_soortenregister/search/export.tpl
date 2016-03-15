@@ -21,7 +21,7 @@
 	<td><b>{t}link naar afbeelding{/t}</b></td>
 </tr>
 <tbody>
-{foreach from=$results.data item=v}
+{foreach $results.data v}
 <tr>
 	<td>{$v.taxon}</td>
 	<td>{$v.common_name}</td>
