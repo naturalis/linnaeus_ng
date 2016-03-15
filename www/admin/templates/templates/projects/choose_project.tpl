@@ -7,13 +7,11 @@
 
     <ul class="admin-list">
     {foreach $projects v}
-    {if $v.user_project_active==1}
-        <li>
-            <a href="?project_id={$v.id}" {if !$v.published}style="color:#779"{/if}>{if $v.title!=''}{$v.title}{else}{$v.sys_name}{/if}</a>
-            {if $session.admin.project.id==$v.id}<span title="current active project">{t}(current){/t}</span>{/if}
-            <a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px" target="_project">view</a>
-        </li>
-    {/if}
+    <li>
+        <a href="?project_id={$v.id}" {if !$v.published}style="color:#779"{/if}>{if $v.title!=''}{$v.title}{else}{$v.sys_name}{/if}</a>
+        {if $session.admin.project.id==$v.id}<span title="current active project">{t}(current){/t}</span>{/if}
+        <a href="../../../app/views/linnaeus/set_project.php?p={$v.id}" style="color:#999;margin-left:10px" target="_project">view</a>
+    </li>
     {/foreach}
     </ul>
 

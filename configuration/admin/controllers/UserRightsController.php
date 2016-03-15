@@ -1,7 +1,6 @@
 <?php
 
 /// freemoduleid???
-// overrule no project 
 
 class UserRights
 {
@@ -10,6 +9,11 @@ class UserRights
 		Controller itself. therefore, in order to allow it to perform database
 		queries, an instantiated model from another class is required; hence
 		setModel();
+
+		for pages that allow for the absence of a project ID, call
+			$this->UserRights->setAllowNoProjectId( true );
+		before
+			$this->checkAuthorisation();
 	*/
 
 	// available constants
@@ -40,60 +44,69 @@ class UserRights
 
     public function isAuthorized()
     {
-		return true;
-		
-		// multiple projects fails!!!
-		
-		
 		$p=isset( $this->projectid );
 		$u=isset( $this->userid );
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
-		
+
 		if ( $u && $this->isSysAdmin() ) 
 		{
-			$this->setMessage( 'sysadmin (full access)' );
+			$this->setMessage( '1: user logged in, is sysadmin (full access)' );
+			$this->setAuthorizeState( true );
+		}
+		else
+		if ( $u && $this->getAllowNoProjectId() )
+		{
+			$this->setMessage( '8: user logged in, page allows absence of project ID' );
 			$this->setAuthorizeState( true );
 		}
 		else
 		if ( !$p ) 
 		{
-			$this->setMessage( 'no project selected (no project ID set)' );
+			$this->setMessage( '2: no project selected (no project ID set)' );
 			$this->setAuthorizeState( false );
 		} 
 		else
 		if ( $p && !$u ) 
 		{
-			$this->setMessage( 'attempting to access a project page without being logged in (project ID set, user ID not set)' );
+			$this->setMessage( '3: attempting to access a project page without being logged in (project ID set, user ID not set)' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $p && $u  && !$c && !$m )
 		{
-			$this->setMessage( 'accessing non-module page (project ID set, user ID set, no controller & module ID set)' );
+			$this->setMessage( '4: accessing non-module page (project ID set, user ID set, no controller & module ID set)' );
 			$this->setAuthorizeState( true );
 		}
 		else
 		if ( $p && $u  && $c && !$m )
 		{
-			$this->setMessage( 'attempting access to uknown module (project ID set, user ID set, controller set, module ID not set)' );
+			$this->setMessage( '5: attempting access to uknown module (project ID set, user ID set, controller set, module ID not set)' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $p && $u && $c && $m && !$this->canUserAccessModule() )
 		{
-			$this->setMessage( 'attempting access to module without proper rights (project ID set, user ID set, module ID set, no rights or can_read is false)' );
+			$this->setMessage( '6: attempting access to module without proper rights (project ID set, user ID set, module ID set, no rights or can_read is false)' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $p && $u && $c && $m && $this->canUserAccessModule() )
 		{
-			$this->setMessage( 'accessing module (project ID set, user ID set, module ID set, can_read is true)' );
+			$this->setMessage( '7: accessing module (project ID set, user ID set, module ID set, can_read is true)' );
 			$this->setAuthorizeState( true );
 		}
 
 		return $this->getAuthorizeState();
     }
+
+	public function setAllowNoProjectId( $state )
+	{
+		if ( is_bool($state) )
+		{
+			$this->allowNoProjectId=$state;
+		}
+	}
 
 	public function isSysAdmin()
 	{
@@ -222,6 +235,11 @@ class UserRights
     private function setMessage( $message )
 	{
 		$this->message=$message;
+	}
+
+	private function getAllowNoProjectId()
+	{
+		return $this->allowNoProjectId;
 	}
 
 
