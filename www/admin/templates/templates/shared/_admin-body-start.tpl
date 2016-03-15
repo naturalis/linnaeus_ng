@@ -32,39 +32,42 @@
 	
 {if $breadcrumbs && $printBreadcrumbs}
 	<div id="breadcrumbs">
-	{section name=i loop=$breadcrumbs}
+	{foreach $breadcrumbs v}
 		{assign var=n value=$n+1}
 		{if $hideControllerPublicName}
 			{if $n<2}
-				<span class="crumb"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
+				<span class="crumb"><a href="{$v.url}">{$v.name}</a></span>
 				<span class="crumb-arrow">&rarr;</span>
 			{elseif $n==2}
-				<span class="crumb-current"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
+				<span class="crumb-current"><a href="{$v.url}">{$v.name}</a></span>
 				<span class="crumb-arrow">&nbsp;</span>
 			{/if}
 		{else}
 			{if $n==$breadcrumbs|@count}
-				<span id="crumb-current">{$breadcrumbs[i].name}</span>
+				<span id="crumb-current">{$v.name}</span>
 				<span class="crumb-arrow">&nbsp;</span>
 			{else}
-				<span class="crumb"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
+				<span class="crumb"><a href="{$v.url}">{$v.name}</a></span>
 				<span class="crumb-arrow">&rarr;</span>
 			{/if}
 		{/if}
-	{/section}
-{if $isMultiLingual && $uiLanguages|@count>1}
-	<span style="float:right">
-	{section name=i loop=$uiLanguages}
-	{if $uiLanguages[i].id == $uiCurrentLanguage}
-		<span class="active-language">{$uiLanguages[i].language}</span>&nbsp;
-	{else}
-		<span class="a" onClick="$('#uiLang').val('{$uiLanguages[i].id}');$('#langForm').submit()">{$uiLanguages[i].language}</span>&nbsp;
-	{/if}
-	{/section}
-	</span>
-	<br />
-	<form id="langForm" method="post" action=""><input id="uiLang" type="hidden" name="uiLang" value="" /></form>
-{/if}
+	{/foreach}
+    
+     <a href="../../../app/views/linnaeus/set_project.php?p={$session.admin.project.id}" style="color:#999;margin-left:10px" target="_project">view</a>
+
+    {if $isMultiLingual && $uiLanguages|@count>1}
+        <span style="float:right">
+        {section name=i loop=$uiLanguages}
+        {if $uiLanguages[i].id == $uiCurrentLanguage}
+            <span class="active-language">{$uiLanguages[i].language}</span>&nbsp;
+        {else}
+            <span class="a" onClick="$('#uiLang').val('{$uiLanguages[i].id}');$('#langForm').submit()">{$uiLanguages[i].language}</span>&nbsp;
+        {/if}
+        {/section}
+        </span>
+        <br />
+        <form id="langForm" method="post" action=""><input id="uiLang" type="hidden" name="uiLang" value="" /></form>
+    {/if}
 	</div>
 {/if}
 </div>

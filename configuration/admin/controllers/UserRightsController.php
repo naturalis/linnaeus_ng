@@ -86,9 +86,9 @@ class UserRights
 			$this->setAuthorizeState( true );
 		}
 		else
-		if ( $p && $u  && $c && !$m )
+		if ( $p && $u && $c && !$m )
 		{
-			$this->setMessage( '5: attempting access to uknown module (project ID set, user ID set, controller set, module ID not set)' );
+			$this->setMessage( '5: attempting access to unknown module (project ID set, user ID set, controller set, module ID not set)' );
 			$this->setAuthorizeState( false );
 		}
 		else

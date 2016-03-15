@@ -20,8 +20,6 @@ class ModuleSettingsReaderController extends Controller
     {
         parent::__construct( $p );
 
-		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
-
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
@@ -30,7 +28,6 @@ class ModuleSettingsReaderController extends Controller
 
     public static function getGeneralSettingsId()
     {
-		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
 		return GENERAL_SETTINGS_ID;
     }
 

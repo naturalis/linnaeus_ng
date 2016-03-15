@@ -50,6 +50,7 @@ var matrixsettings={
 	mode: "identify", // similar, search
 	groupsAlwaysOpen: false,
 	generalSpeciesInfoUrl: "",
+	infoLinkTarget: "",
 	initialSortColumn: "",
 	alwaysSortByInitial: 0,
 };
@@ -677,7 +678,7 @@ function formatResult( data )
 			.replace('%STATES%', showStates ? fetchTemplate( 'statesHtmlTpl' ).replace( '%STATES%',states.join( fetchTemplate( 'statesJoinHtmlTpl' ) ) ) : "" )
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
-			.replace('%SCORE%', matrixsettings.showScores && data.score ? fetchTemplate( 'resultScoreHtmlTpl' ).replace( '%SCORE%', data.score) : "")
+			.replace('%SCORE%', matrixsettings.showScores ? fetchTemplate( 'resultScoreHtmlTpl' ).replace( '%SCORE%', data.score ? data.score : 100 ) : "")
 		;
 
 		
@@ -735,10 +736,10 @@ function printCountHeader()
 		);
 	}
 	
-	if (resultset.length==0)
+	if (resultset.length==0 || matrixsettings.scoreThreshold==0)
 	{
 		$('#result-count').html("");
-	};	
+	};
 }
 
 function clearPaging()
@@ -1606,7 +1607,7 @@ function doRemoteLink( url, name, nameScientific, nameCommon )
 	else
 	if (url.length>0)
 	{
-		window.open( url, "_blank" );
+		window.open( url, matrixsettings.infoLinkTarget );
 	}
 }
 
