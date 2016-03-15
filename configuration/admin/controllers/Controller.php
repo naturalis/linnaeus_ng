@@ -412,7 +412,7 @@ class Controller extends BaseClass
 		{
 			if ( null==$this->getCurrentUserId() )
 			{
-				$this->redirect('login.php');
+				$this->redirect( '../users/login.php' );
 			}
 			else
 			{
