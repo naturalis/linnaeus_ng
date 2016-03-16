@@ -678,7 +678,7 @@ class MediaController extends Controller
             $media = $d[0];
 
             // A few LNG additions
-            $media['media_type'] = $this->getMediaType($resource['mime_type']);
+            $media['media_type'] = $this->getMediaType($media['mime_type']);
             $media['file_size_hr'] =
                 $this->helpers->HrFilesizeHelper->convert($media['file_size']);
 
