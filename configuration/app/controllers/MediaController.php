@@ -24,8 +24,6 @@ class MediaController extends Controller
 	public $controllerPublicName = 'Media';
     public $modelNameOverride = 'MediaModel';
 
-    public $usedHelpers = array('hr_filesize_helper');
-
     public static $metadataFields = array(
         'title',
         'location',
@@ -40,11 +38,11 @@ class MediaController extends Controller
             'jpg' => 'image/jpeg',
             'gif' => 'image/gif'
         ),
-        'audio' => array(
-            'mp3' => 'audio/mpeg'
-        ),
         'video' => array(
             'mp4' => 'video/mp4'
+        ),
+        'audio' => array(
+            'mp3' => 'audio/mpeg'
         ),
         'pdf' => array(
             'pdf' => 'application/pdf',
@@ -113,6 +111,24 @@ class MediaController extends Controller
         return array();
     }
 
+    public function getItemMediaFileCount ()
+    {
+        // Module and item id must have been set using the setters
+        if ($this->moduleId == -1 || $this->itemId == -1) {
+            $this->addError('Module and or item id not set');
+            return false;
+        }
+
+        $m = $this->models->MediaModel->getItemMediaFiles(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'module_id' => $this->moduleId,
+            'item_id' => $this->itemId
+        ));
+
+        return !empty($m) ? count($m) : 0;
+    }
+
+
     private function getMediaFile ($mediaId = false)
     {
         if (!$mediaId || !is_numeric($mediaId)) {
@@ -130,9 +146,7 @@ class MediaController extends Controller
             $media = $d[0];
 
             // A few LNG additions
-            $media['media_type'] = $this->getMediaType($resource['mime_type']);
-            $media['file_size_hr'] =
-                $this->helpers->HrFilesizeHelper->convert($media['file_size']);
+            $media['media_type'] = $this->getMediaType($media['mime_type']);
 
             foreach ($this::$metadataFields as $f) {
                 $media['metadata'][$f] =
@@ -150,6 +164,21 @@ class MediaController extends Controller
 
         return false;
     }
+
+    private function getMediaModulesId ($mediaId)
+    {
+        $mm = $this->models->MediaModules->getSingleColumn(array(
+            'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+			    'media_id' => $mediaId,
+			    'module_id' => $this->moduleId,
+                'item_id' => $this->itemId
+			)
+		));
+
+        return isset($mm) ? $mm[0] : false;
+    }
+
 
     private function getMetadataField ($p)
     {
@@ -185,7 +214,7 @@ class MediaController extends Controller
 
     }
 
-    private function getMediaType ($mime)
+    public function getMediaType ($mime)
     {
         foreach ($this::$mimeTypes as $category => $types) {
             foreach ($types as $extension => $type) {
@@ -195,6 +224,18 @@ class MediaController extends Controller
             }
         }
         return false;
+    }
+
+    public function getMimeShowOrder ($mime)
+    {
+        foreach ($this::$mimeTypes as $category => $types) {
+            foreach ($types as $extension => $type) {
+                if ($mime == $type) {
+                    return array_search($category, array_keys($this::$mimeTypes));
+                }
+            }
+        }
+        return 99;
     }
 
 

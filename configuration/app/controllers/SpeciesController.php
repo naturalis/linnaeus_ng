@@ -2,12 +2,14 @@
 
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
+include_once ('MediaController.php');
 
 class SpeciesController extends Controller
 {
 	private $_lookupListMaxResults=100;
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
+	private $_mc;
 
 	protected $_model;
 
@@ -58,6 +60,7 @@ class SpeciesController extends Controller
     private function initialise ()
     {
         $this->setModel();
+        $this->setMediaController();
 
         // creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
 		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
@@ -144,7 +147,7 @@ class SpeciesController extends Controller
         if ($this->rHasId()) {
 
             // get taxon
-            $taxon = $this->getTaxonById($this->requestData['id']);
+            $taxon = $this->getTaxonById($this->rGetId());
 		}
         if (!empty($taxon))
 		{
@@ -832,10 +835,9 @@ class SpeciesController extends Controller
 		return array('content'=>$content);
     }
 
-
+/*
     private function getTaxonMedia($p)
     {
-
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$id=isset($p['id']) ? $p['id'] : null;
 		$inclOverviewImage=isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
@@ -886,24 +888,32 @@ class SpeciesController extends Controller
 		}
 
 		$this->loadControllerConfig();
-/*
-		$sortBy = array(
-			'key' => array(
-				'mime_show_order',
-				'sort_order'
-			),
-			'dir' => 'asc',
-			'case' => 'i'
-		);
-
-        $this->customSortArray($mt, $sortBy);
-
-*/
 
 		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
 
         return $mt;
     }
+*/
+
+	private function getTaxonMedia ($p)
+	{
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
+		$id = isset($p['id']) ? $p['id'] : null;
+		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
+
+        if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA)) {
+            return $mt;
+        }
+
+	    $this->_mc->setItemId(isset($taxon) ? $taxon : $id);
+	    $mt = $this->_mc->getItemMediaFiles();
+		$this->postProcessMediaControllerOutput($mt, $inclOverviewImage);
+
+//print_r($mt);
+		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
+
+		return $mt;
+	}
 
     private function getTaxonLiterature($tId)
     {
@@ -1131,7 +1141,7 @@ class SpeciesController extends Controller
         return isset($c) ? $c[0]['total'] : 0;
     }
 
-
+/*
     private function getTaxonMediaCount($id)
     {
         $mt = $this->models->MediaTaxon->_get(
@@ -1144,6 +1154,12 @@ class SpeciesController extends Controller
         ));
 
         return isset($mt) ? $mt[0]['total'] : 0;
+    }
+*/
+
+    private function getTaxonMediaCount($id)
+    {
+        return $this->_mc->getItemMediaFileCount();
     }
 
 
@@ -1412,7 +1428,30 @@ class SpeciesController extends Controller
 
 	}
 
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId('species'));
+        $this->_mc->setItemId($this->rGetId());
+	}
 
+    private function postProcessMediaControllerOutput (&$d, $displayOverview = true)
+    {
+        foreach ($d as $i => $m) {
+
+            $d[$i]['mime_show_order'] = $this->_mc->getMimeShowOrder($m['mime_type']);
+            $d[$i]['full_path'] = $m['rs_original'];
+            $d[$i]['description'] = $m['caption'];
+            $d[$i]['file_name'] = $d[$i]['original_name'] = $m['name'];
+            $d[$i]['mime'] = $d[$i]['category'] = $m['media_type'];
+
+            if ($d[$i]['overview_image'] == 1 && !$displayOverview) {
+                unset($d[$i]);
+            }
+        }
+
+        return $d;
+    }
 
 
 

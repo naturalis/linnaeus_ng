@@ -2853,10 +2853,22 @@ class Controller extends BaseClass
         return false;
     }
 
-    protected function getCurrentModuleId ()
+    protected function getCurrentModuleId ($remapModule = false)
     {
-		$d = $this->models->Modules->_get(array(
-            "id" => array("controller"=>$this->getControllerBaseName())
+		$remap = array(
+            'species' => 'nsr',
+		    'literature' => 'literature2'
+		);
+
+        $c = $this->getControllerBaseName();
+
+        // Required to map app controller to admin equivalent
+		if ($remapModule && isset($remap[$remapModule])) {
+            $c = $remap[$remapModule];
+        }
+
+        $d = $this->models->Modules->_get(array(
+            "id" => array("controller" => $c)
 		));
 
 		return $d ? $d[0]['id'] : false;

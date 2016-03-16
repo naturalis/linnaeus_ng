@@ -953,6 +953,17 @@ class MediaController extends Controller
             return false;
         }
 
+        // First reset all overviews
+		$this->models->MediaModules->update(
+            array('overview_image' => 0),
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                'module_id' => $this->moduleId,
+    		    'item_id' => $this->itemId
+            )
+		);
+
+        // Then update
 		$this->models->MediaModules->update(
             array('overview_image' => 1),
             array(
