@@ -77,6 +77,8 @@ class Literature2Controller extends Controller
 
     public function indexAction()
     {
+		$this->smarty->assign( 'authorAlphabet', $this->getAuthorAlphabet() );
+		$this->smarty->assign( 'titleAlphabet', $this->getTitleAlphabet() );
         $this->printPage();
     }
 
@@ -88,6 +90,19 @@ class Literature2Controller extends Controller
 			"literature2_id"=>$id
 		));
 	}
+
+
+	private function getTitleAlphabet()
+	{
+		return $this->models->Literature2Model->getTitleAlphabet( array( 'project_id'=>$this->getCurrentProjectId() ) );
+	}
+
+	private function getAuthorAlphabet()
+	{
+		return $this->models->Literature2Model->getAuthorAlphabet(array( 'project_id'=>$this->getCurrentProjectId() ) );
+	}
+
+
 
 
 }

@@ -119,7 +119,8 @@ final class Literature2Model extends AbstractModel
 		$matchStartOnly = isset($params['match_start']) ? $params['match_start']=='1' : false;
 		$getAll = isset($params['get_all']) ? $params['get_all']=='1' : false;
 
-		if (is_null($project_id) || is_null($search)) {
+		if (is_null($project_id) || is_null($search))
+		{
 			return;
 		}
 
@@ -170,6 +171,71 @@ final class Literature2Model extends AbstractModel
 
 		return $this->freeQuery($query);
     }
+
+
+    public function getTitleAlphabet($params)
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+
+		if ( is_null($project_id) )
+			return;
+
+        $query = "
+            select
+				distinct
+                    if(
+                        ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122,
+                        '#',
+                        substr(lower(_a.label),1,1)
+                    )
+                as letter
+			from
+				%PRE%literature2 _a
+			where
+				_a.project_id = " . $project_id . "
+			order by letter";
+
+        return $this->freeQuery( $query );
+    }
+
+
+    public function getAuthorAlphabet($params)
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+
+		if ( is_null($project_id) )
+			return;
+
+        $query = "
+            select distinct * from (
+				select
+					distinct if(ord(substr(lower(_a.author),1,1))<97||ord(substr(lower(_a.author),1,1))>122,'#',substr(lower(_a.author),1,1)) as letter
+				from
+					%PRE%literature2 _a
+				where
+					_a.project_id = ".$project_id."
+			union
+				select
+					distinct if(ord(substr(lower(_f.name),1,1))<97||ord(substr(lower(_f.name),1,1))>122,'#',substr(lower(_f.name),1,1)) as letter
+
+				from
+					%PRE%literature2 _a
+
+				left join %PRE%actors _f
+					on _a.actor_id = _f.id
+					and _a.project_id=_f.project_id
+
+				where
+					_a.project_id = ".$project_id."
+			) as unification
+			order by letter";
+
+        return $this->freeQuery( $query );
+    }
+
+
+
+
 	
 }
 ?>
