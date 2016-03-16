@@ -82,7 +82,7 @@ final class MediaModel extends AbstractModel
     }
 
 
-    public function getItemMedia ($p)
+    public function getItemMediaFiles ($p)
     {
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;

@@ -44,7 +44,7 @@ class NsrTaxonMediaController extends NsrController
 	private $_resPicsPerPage=100;
 	private $sys_label_NSR_ID='NSR ID';
 	private $sys_label_file_name='file name';
-	*/
+
 
     private
 		$_mime_types = array(
@@ -60,7 +60,7 @@ class NsrTaxonMediaController extends NsrController
 			'svg' => 'image/svg+xml',
 			'svgz' => 'image/svg+xml',
 		);
-
+*/
     public function __construct()
     {
         parent::__construct();
@@ -226,7 +226,7 @@ class NsrTaxonMediaController extends NsrController
 	// Wrapper function to avoid calling $_mc directly
     private function getTaxonMedia ()
     {
-        return $this->_mc->getItemMedia();
+        return $this->_mc->getItemMediaFiles();
     }
 
 	// Wrapper function to avoid calling $_mc directly

@@ -249,7 +249,7 @@ class FreeModuleController extends Controller
      *
      * @access    private
      */
-    private function getCurrentModuleId ()
+    protected function getCurrentModuleId ()
     {
         return isset($_SESSION['app']['user']['module']['activeModule']['id']) ? $_SESSION['app']['user']['module']['activeModule']['id'] : null;
     }

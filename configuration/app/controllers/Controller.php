@@ -1227,7 +1227,7 @@ class Controller extends BaseClass
 
     public function getSetting($setting,$substitute=null)
     {
-		return $this->models->ControllerModel->getGeneralSetting(		
+		return $this->models->ControllerModel->getGeneralSetting(
 			array(
 				'module_id'=>GENERAL_SETTINGS_ID,
 				'project_id'=>$this->getCurrentProjectId(),
@@ -1505,10 +1505,10 @@ class Controller extends BaseClass
 	public function smartyGetSnippet($params, $content, &$smarty, &$repeat)
 	{
 		if ( is_null($content) ) return;
-		
+
 		$pu = $this->getProjectUrl('projectSnippets'); // project-specific dir
 		$gu = $_SESSION['app']['system']['urls']['snippets']; // general dir
-		
+
 		$possibilities[1] = $pu . $content;
 
 		if( isset($params['language']) )
@@ -1516,7 +1516,7 @@ class Controller extends BaseClass
 			$d=pathinfo( $possibilities[1] );
 			$possibilities[0] = $pu . $d["filename"] . '--' . sprintf('%04s',$params['language']) . '.' . $d["extension"];
 		}
-		
+
 		$possibilities[3] = $gu . $content;
 
 		if( isset($params['language']) )
@@ -1524,7 +1524,7 @@ class Controller extends BaseClass
 			$d=pathinfo( $possibilities[3] );
 			$possibilities[2] = $gu . $d["filename"] . '--' . sprintf('%04s',$params['language']) . '.' . $d["extension"];
 		}
-		
+
 		foreach($possibilities as $file)
 		{
 			if (file_exists($file)) return @file_get_contents($file);
@@ -2838,5 +2838,28 @@ class Controller extends BaseClass
 		}
 		return $c;
 	}
+
+
+    public function arrayHasData ($p = array())
+    {
+        foreach ($p as $k => $v) {
+            if (is_array($v)) {
+                $this->arrayHasData($v);
+            }
+            if ($v != '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function getCurrentModuleId ()
+    {
+		$d = $this->models->Modules->_get(array(
+            "id" => array("controller"=>$this->getControllerBaseName())
+		));
+
+		return $d ? $d[0]['id'] : false;
+    }
 
 }
