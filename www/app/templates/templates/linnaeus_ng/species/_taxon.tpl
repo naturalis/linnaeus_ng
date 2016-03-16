@@ -84,6 +84,12 @@
 		{assign var=mediaCat value=false}
 		{foreach $content v k}
 
+			{if $v.rs_id == ''}
+				{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
+			{else}
+				{capture name="fullImgUrl"}{$v.full_path}{/capture}
+			{/if}
+
 			{assign var=mediaCat value=$v.category}
 
 			{if $requestData.disp==$v.id}
@@ -92,53 +98,71 @@
 			{/if}
 
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
-				<a 
+				<a
 					rel   = "prettyPhoto[gallery]"
 					class = "image-wrap "
 					title = "{$v.file_name}"
-					href  = "{$projectUrls.uploadedMedia}{$v.file_name}"
+					href  = "{$smarty.capture.fullImgUrl}"
 					alt   = "{$v.description}"
 					>
 
-					{if $v.category=='image'}
-						{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
-						<div>
-							{if $v.thumb_name != ''}
+
+					{if $v.rs_id == ''}
+
+						{if $v.category=='image'}
+							<div>
 								<img
 									id    = "media-{$k}"
 									alt   = "{$v.description}"
 									title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-									src   = "{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}"
-									class = "image-thumb" />
-							{else}
-								<img
-									id    = "media-{$k}"
-									alt   = "{$v.description}"
-									title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-									src   = "{$projectUrls.uploadedMedia}{$v.file_name}"
+									src   = "{$smarty.capture.fullImgUrl}"
 									class = "image-full" />
-							{/if}
-						</div>
-					{elseif $v.category=='video'}
-							<img
-								id="media-{$k}"
-								alt="{$v.description}"
-								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-								src="{$projectUrls.systemMedia}video.png"
-								onclick="showMedia('{$projectUrls.uploadedMedia}{$v.file_name}','{$v.original_name}');"
-								class="media-video-icon" />
-					{elseif $v.category=='audio'}
-							<object
-								id="media-{$k}"
-								alt="{$v.description}"
-								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-								type="application/x-shockwave-flash"
-								data="{$soundPlayerPath}{$soundPlayerName}"
-								width="130"
-								height="20">
-								<param name="movie" value="{$soundPlayerName}" />
-								<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
-							</object>
+							</div>
+						{elseif $v.category=='video'}
+								<img
+									id="media-{$k}"
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src="{$projectUrls.systemMedia}video.png"
+									onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
+									class="media-video-icon" />
+						{elseif $v.category=='audio'}
+								<object
+									id="media-{$k}"
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									type="application/x-shockwave-flash"
+									data="{$soundPlayerPath}{$soundPlayerName}"
+									width="130"
+									height="20">
+									<param name="movie" value="{$soundPlayerName}" />
+									<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
+								</object>
+						{/if}
+
+					{else}
+
+						{if $v.category=='image'}
+							<div>
+								<img
+									id    = "media-{$k}"
+									alt   = "{$v.description}"
+									title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src   = "{$smarty.capture.fullImgUrl}"
+									class = "image-full" />
+							</div>
+						{else}
+							<div>
+								<img
+									id="media-{$k}"
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src="{$v.rs_thumb_medium}"
+									onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
+									class="media-video-icon" />
+							</div>
+						{/if}
+
 					{/if}
 				</a>
 				<div id="caption-{$k}" class="media-caption">
