@@ -145,9 +145,14 @@ class MediaController extends Controller
         $this->_rsNewUserApi = $msr->getModuleSetting('rs_new_user_api');
         $this->_rsSearchApi = $msr->getModuleSetting('rs_search_api');
 
+        if (empty($this->_rsBaseUrl) || empty($this->_rsUploadApi) || empty($this->_rsNewUserApi) ||
+            empty($this->_rsSearchApi)) {
+            $this->addError(_('ResourceSpace settings for Media module are missing.'));
+        }
+
         if (empty($this->_rsCollectionId) || empty($this->_rsUserKey)) {
             $this->addError(_('ResourceSpace collection ID and/or user key are not set.
-                First <a href="create_user.php">create a user</a> for this project.'));
+                You may still need to <a href="create_user.php">create a user</a> for this project.'));
         }
 
         // Search url: &search=[term]* to be appended
@@ -196,7 +201,7 @@ class MediaController extends Controller
             $this->attachMedia();
         }
 
-        $this->smarty->assign('media', $this->getMediaList());
+        $this->smarty->assign('media', $this->getMediaFiles());
         $this->smarty->assign('module_id', $this->rGetVal('module_id'));
         $this->smarty->assign('item_id', $this->rGetVal('item_id'));
 
@@ -215,7 +220,7 @@ class MediaController extends Controller
         $search['file_name'] = $this->rGetVal('file_name');
 
         if ($this->rHasVal('action', 'search') && $this->arrayHasData($search)) {
-            $result = $this->getMediaList(array('search' => $search));
+            $result = $this->getMediaFiles(array('search' => $search));
             $this->smarty->assign('media', $result);
         }
 
@@ -238,8 +243,9 @@ class MediaController extends Controller
             $this->saveTags($id);
         }
 
-        $media = $this->getMedia($id);
+        $media = $this->getMediaFile($id);
 
+		$this->smarty->assign('media_type', $this->getMediaType($media['mime_type']));
 		$this->smarty->assign('source', $media['rs_original']);
 		$this->smarty->assign('name', $media['name']);
 		$this->smarty->assign('metadata', $this->setMetadataFields($media['metadata']));
@@ -260,8 +266,8 @@ class MediaController extends Controller
         $this->setItemTemplate();
 
         // Only upload if upload button has been pushed!
-        if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()
-            && $this->uploadHasFiles()) {
+        if ($this->rHasVal('upload', $this->translate('upload')) &&
+            !$this->isFormResubmit() && $this->uploadHasFiles()) {
 
             $this->setFiles();
             foreach ($this->_files as $i => $file) {
@@ -294,13 +300,17 @@ class MediaController extends Controller
                         'rs_id' => $media->ref,
                         'name' => $file['name'],
                         'title' => $media->field8,
-                        'width' => is_int($media->files[0]->width) ? $media->files[0]->width : -1,
-                        'height' => is_int($media->files[0]->height) ? $media->files[0]->height : -1,
+                        'width' => is_int($media->files[0]->width) ?
+                            $media->files[0]->width : -1,
+                        'height' => is_int($media->files[0]->height) ?
+                            $media->files[0]->height : -1,
                         'mime_type' => $file['type'],
                         'file_size' => $file['size'],
                         'rs_original' => $media->files[0]->src,
-                        'rs_resized_1' => isset($media->files[1]->src) ? $media->files[1]->src : null,
-                        'rs_resized_1' => isset($media->files[2]->src) ? $media->files[2]->src : null,
+                        'rs_resized_1' => isset($media->files[1]->src) ?
+                            $media->files[1]->src : null,
+                        'rs_resized_1' => isset($media->files[2]->src) ?
+                            $media->files[2]->src : null,
                         'rs_thumb_small' => $media->thumbnails->small,
                         'rs_thumb_medium' => $media->thumbnails->medium,
                         'rs_thumb_large' => $media->thumbnails->large
@@ -338,7 +348,8 @@ class MediaController extends Controller
         $this->smarty->assign('max_file_uploads', ini_get('max_file_uploads'));
         $this->smarty->assign('post_max_size', ini_get('post_max_size'));
         $this->smarty->assign('action', htmlentities($_SERVER['PHP_SELF']));
-        $this->smarty->assign('session_upload_progress_name', ini_get('session.upload_progress.name'));
+        $this->smarty->assign('session_upload_progress_name',
+            ini_get('session.upload_progress.name'));
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $this->languageId);
@@ -389,7 +400,7 @@ class MediaController extends Controller
     private function uploadedFileIsValid ($file)
     {
         // Check mime type
-        if (!$this->getMimeTypeCategory($file['type'])) {
+        if (!$this->getMediaType($file['type'])) {
             $this->addError(_('Mime type') . ' ' . $file['type'] . ' ' .
                 _('not supported') . ': ' . $file['name']);
             return false;
@@ -552,7 +563,7 @@ class MediaController extends Controller
         return $this->parseRsMediaList();
     }
 
-    public function getItemMedia ()
+    public function getItemMediaFiles ()
     {
         // Module and item id must have been set using the setters
         if ($this->moduleId == -1 || $this->itemId == -1) {
@@ -560,7 +571,7 @@ class MediaController extends Controller
             return false;
         }
 
-        $m = $this->models->MediaModel->getItemMedia(array(
+        $m = $this->models->MediaModel->getItemMediaFiles(array(
             'project_id' => $this->getCurrentProjectId(),
             'module_id' => $this->moduleId,
             'item_id' => $this->itemId
@@ -568,7 +579,7 @@ class MediaController extends Controller
 
         if (!empty($m)) {
             foreach ($m as $k => $v) {
-                $media[] = array_merge($v, $this->getMedia($v['id']));
+                $media[] = array_merge($v, $this->getMediaFile($v['id']));
             }
             return $media;
         }
@@ -576,7 +587,7 @@ class MediaController extends Controller
         return array();
     }
 
-    private function getMediaList ($p = false)
+    private function getMediaFiles ($p = false)
     {
         $search = isset($p['search']) ? $p['search'] : false; // empty to return everything
         $sort = isset($p['sort']) ? $p['sort'] : false; // asc (default)/desc
@@ -620,34 +631,25 @@ class MediaController extends Controller
                 $file['title'] = $resource['title'];
                 $file['file_name'] = $resource['name'];
                 $file['mime_type'] = $resource['mime_type'];
-                $file['file_type'] = $this->getMimeTypeCategory($resource['mime_type']);
+                $file['media_type'] = $this->getMediaType($resource['mime_type']);
                 $file['height'] = $resource['height'];
                 $file['width'] = $resource['width'];
                 $file['source'] = $resource['rs_original'];
                 $file['modified'] = $resource['last_change'];
 
-                // Set default image
-                if ($file['file_type'] == 'audio' || $file['file_type'] == 'video') {
-                    $file['thumbnails'] = array(
-                        'small' => $resource['rs_thumb_small'],
-                        'medium' => $resource['rs_thumb_medium'],
-                        'large' => $resource['rs_thumb_large']
-                    );
-                } else {
-                    $file['thumbnails'] = array(
-                        'small' => $resource['rs_thumb_small'],
-                        'medium' => $resource['rs_thumb_medium'],
-                        'large' => $resource['rs_thumb_large']
-                    );
-                }
-
+                $file['thumbnails'] = array(
+                    'small' => $resource['rs_thumb_small'],
+                    'medium' => $resource['rs_thumb_medium'],
+                    'large' => $resource['rs_thumb_large']
+                );
+/*
                 $file['alt_files'] = '';
                 foreach (array('rs_resized_1', 'rs_resized_2') as $alt) {
                     if (!empty($resource[$alt])) {
                         $file['alt_files'][] = $resource[$alt];
                     }
                 }
-
+*/
                 // add flag if image is already attached to entity
                 $file['attached'] = isset($attached) && is_array($attached) &&
                     in_array($resource['id'], $attached) ? 1 : 0;
@@ -659,7 +661,7 @@ class MediaController extends Controller
         return $list;
     }
 
-    private function getMedia ($mediaId = false)
+    private function getMediaFile ($mediaId = false)
     {
         if (!$mediaId || !is_numeric($mediaId)) {
             return false;
@@ -676,7 +678,7 @@ class MediaController extends Controller
             $media = $d[0];
 
             // A few LNG additions
-            $media['media_type'] = substr($media['mime_type'], 0, strpos($media['mime_type'], '/'));
+            $media['media_type'] = $this->getMediaType($resource['mime_type']);
             $media['file_size_hr'] =
                 $this->helpers->HrFilesizeHelper->convert($media['file_size']);
 
@@ -716,15 +718,6 @@ class MediaController extends Controller
             $file['source'] = $resource->files[0]->src;
             $file['modified'] = $resource->file_modified;
             $file['thumbnails'] = (array)$resource->thumbnails;
-
-            $file['alt_files'] = '';
-            $nrAltFiles = count($resource->files) - 1;
-            if ($nrAltFiles > 0) {
-                for ($j = 1; $nrAltFiles + 1; $j++) {
-                    $altFiles[] = (array)$resource->files[$j];
-                }
-                $file['alt_files'] = $altFiles;
-            }
 
             // add flag if image is already attached to entity
             $file['attached'] = 0;
@@ -1014,7 +1007,7 @@ class MediaController extends Controller
         return $d;
     }
 
-    private function getMimeTypeCategory ($mime)
+    private function getMediaType ($mime)
     {
         foreach ($this::$mimeTypes as $category => $types) {
             foreach ($types as $extension => $type) {

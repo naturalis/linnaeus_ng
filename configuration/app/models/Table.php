@@ -668,5 +668,22 @@ final class Table extends AbstractModel
 		}
     }
 
+    /*
+     * Returns single column from result as non-associative array:
+     * array(0 => array(param => x), 1 => array(param => y)) becomes
+     * array(0 => x, 1 => y). This can be handy to quickly generate
+     * lookup tables.
+     */
+    public function getSingleColumn ($params) {
+        $r = $this->_get($params);
+        if ($r && !empty($r)) {
+            foreach ($r as $k => $v) {
+                $o[] = reset($v);
+            }
+            return isset($o) ? $o : false;
+        }
+        return false;
+    }
+
 
 }

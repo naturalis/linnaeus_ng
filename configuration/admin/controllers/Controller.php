@@ -2437,7 +2437,7 @@ class Controller extends BaseClass
 		// Return raw output if result is no (valid) json
 		return !is_null($output) ? $output : $result;
 	}
-	
+
 	protected function activateBasicModules()
 	{
 		$d=$this->models->Modules->_get(
@@ -2454,15 +2454,15 @@ class Controller extends BaseClass
 						'module_id'=>$val['id']
 					),
 				));
-				
+
 			if ($m && $m[0]['active']=='y') continue;
-			
+
 			if ($m && $m[0]['active']=='n')
 			{
 				$this->models->ModulesProjects->update(
 					array('active'=>'y'),
 					array('id'=>$m[0]['id'])
-				);				
+				);
 			}
 			else
 			if (!$m)
@@ -2475,9 +2475,9 @@ class Controller extends BaseClass
 					'created'=>'now()'
 				));
 			}
-		
+
 		}
-		
+
 	}
 
 	protected function initUserRights()
