@@ -151,18 +151,6 @@ class MediaController extends Controller
         return false;
     }
 
-    private function getMediaType ($mime)
-    {
-        foreach ($this::$mimeTypes as $category => $types) {
-            foreach ($types as $extension => $type) {
-                if ($mime == $type) {
-                    return $category;
-                }
-            }
-        }
-        return false;
-    }
-
     private function getMetadataField ($p)
     {
         // No $p check, only used internally
@@ -195,6 +183,18 @@ class MediaController extends Controller
 
         return isset($caption) ? $caption[0] : false;
 
+    }
+
+    private function getMediaType ($mime)
+    {
+        foreach ($this::$mimeTypes as $category => $types) {
+            foreach ($types as $extension => $type) {
+                if ($mime == $type) {
+                    return $category;
+                }
+            }
+        }
+        return false;
     }
 
 
