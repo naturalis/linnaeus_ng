@@ -77,7 +77,7 @@ $(document).ready(function()
 		// defaultSpeciesImages: { portrait: '{$image_root_skin}noImagePortrait.jpg', landscape: '{$image_root_skin}noImage.png' } ,
 		imageOrientation: '{$settings->image_orientation}',
 		browseStyle: '{$settings->browse_style}',
-		scoreThreshold: {if (int)$settings->score_threshold>-1 && (int)$settings->score_threshold<101}{$settings->score_threshold}{else}100{/if},
+		scoreThreshold: {if (int)$settings->score_threshold>-1 && (int)$settings->score_threshold<101}{$settings->score_threshold+0}{else}100{/if},
 		alwaysShowDetails: {if $settings->always_show_details}{$settings->always_show_details}{else}0{/if},
 		perPage: {if $settings->items_per_page}{$settings->items_per_page}{else}15{/if},
 		perLine: {if $settings->items_per_line}{$settings->items_per_line}{else}3{/if},
