@@ -238,5 +238,24 @@ class MediaController extends Controller
         return 99;
     }
 
+    public function reformatOutput (&$d, $displayOverview = true)
+    {
+        foreach ($d as $i => $m) {
+
+            $d[$i]['mime_show_order'] = $this->getMimeShowOrder($m['mime_type']);
+            $d[$i]['full_path'] = $m['rs_original'];
+            $d[$i]['description'] = $m['caption'];
+            $d[$i]['file_name'] = $d[$i]['original_name'] = $m['name'];
+            $d[$i]['mime'] = $d[$i]['category'] = $m['media_type'];
+
+            if ($d[$i]['overview_image'] == 1 && !$displayOverview) {
+                unset($d[$i]);
+            }
+        }
+
+        return $d;
+    }
+
+
 
 }

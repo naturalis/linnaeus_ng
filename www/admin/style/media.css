@@ -67,4 +67,11 @@ tr:last-child td {
 input[type=text], textarea {
 	width: 300px;
 }
+.image-preview, .av-preview {
+	max-width: 300px;
+	max-height: 250px;
+}
+.image-preview {
+	border: 1px solid #ddd;
+}
 

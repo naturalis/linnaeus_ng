@@ -907,7 +907,7 @@ class SpeciesController extends Controller
 
 	    $this->_mc->setItemId(isset($taxon) ? $taxon : $id);
 	    $mt = $this->_mc->getItemMediaFiles();
-		$this->postProcessMediaControllerOutput($mt, $inclOverviewImage);
+		$this->_mc->reformatOutput($mt, $inclOverviewImage);
 
 //print_r($mt);
 		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
@@ -1434,24 +1434,6 @@ class SpeciesController extends Controller
         $this->_mc->setModuleId($this->getCurrentModuleId('species'));
         $this->_mc->setItemId($this->rGetId());
 	}
-
-    private function postProcessMediaControllerOutput (&$d, $displayOverview = true)
-    {
-        foreach ($d as $i => $m) {
-
-            $d[$i]['mime_show_order'] = $this->_mc->getMimeShowOrder($m['mime_type']);
-            $d[$i]['full_path'] = $m['rs_original'];
-            $d[$i]['description'] = $m['caption'];
-            $d[$i]['file_name'] = $d[$i]['original_name'] = $m['name'];
-            $d[$i]['mime'] = $d[$i]['category'] = $m['media_type'];
-
-            if ($d[$i]['overview_image'] == 1 && !$displayOverview) {
-                unset($d[$i]);
-            }
-        }
-
-        return $d;
-    }
 
 
 

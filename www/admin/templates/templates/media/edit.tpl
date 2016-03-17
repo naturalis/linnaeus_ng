@@ -4,4 +4,9 @@
 
 {include file="../shared/edit-media.tpl"}
 
-{include file="../shared/admin-footer.tpl"}
+<script type="text/JavaScript">
+$(document).ready(function(){
+	$('#page-block-messages').fadeOut(1500);
+});
+
+</script>{include file="../shared/admin-footer.tpl"}

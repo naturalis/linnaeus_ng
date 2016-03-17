@@ -11,7 +11,9 @@ class ModuleIdentifierController extends Controller
     /*
     * Currently incomplete; extend this for modules requiring info!
     */public $usedModels = array(
-        'taxa'
+        'taxa',
+        'glossary',
+        'content_introduction'
     );
 
     /**
@@ -63,6 +65,13 @@ class ModuleIdentifierController extends Controller
                 case 'nsr':
                     $r = $this->models->Taxa->_get(array('id'=>array('id'=>$this->itemId)));
                     return $r[0]['taxon'];
+                case 'glossary':
+                    $r = $this->models->Glossary->_get(array('id'=>array('id'=>$this->itemId)));
+                    return $r[0]['term'];
+                case 'introduction':
+                    $r = $this->models->ContentIntroduction->_get(array('id'=>array('id'=>$this->itemId)));
+                    return $r[0]['topic'];
+
                 default:
                     return false;
             }

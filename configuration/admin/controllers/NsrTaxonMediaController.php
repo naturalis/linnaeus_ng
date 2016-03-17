@@ -76,7 +76,8 @@ class NsrTaxonMediaController extends NsrController
     {
         $this->checkAuthorisation();
 
-//print_r($this->getTaxonMedia());
+		$taxon = $this->getTaxonById();
+		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
 
         if (!$this->rHasId()) {
 			$this->redirect('index.php');
@@ -99,17 +100,13 @@ class NsrTaxonMediaController extends NsrController
 			}
 		}
 
-		$taxon=$this->getTaxonById();
-		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
-
-		$this->smarty->assign('media', $this->getTaxonMedia());
+		$this->smarty->assign('media', $this->_mc->getItemMediaFiles());
 		$this->smarty->assign('taxon', $taxon);
-        $this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
-        $this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $this->languageId);
 		$this->smarty->assign('module_id', $this->getCurrentModuleId());
+		$this->smarty->assign('item_id', $taxon['id']);
 
         $this->printPage();
     }
@@ -145,11 +142,11 @@ class NsrTaxonMediaController extends NsrController
 			return;
 		}
 
-		$media = $this->getTaxonMedia();
+		$media =  $this->_mc->getItemMediaFiles();
 
 		foreach ($media as $key => $val) {
 
-		    $this->setSortOrder(array(
+		    $this->_mc->setSortOrder(array(
                 'media_id' => $val['id'],
                 'order' => $key
 		    ));
@@ -165,12 +162,12 @@ class NsrTaxonMediaController extends NsrController
 				if ($key == 0 && $direction == 'up') continue;
 				if ($key == (count($media)-1) && $direction == 'down') continue;
 
-    		    $this->setSortOrder(array(
+    		    $this->_mc->setSortOrder(array(
                     'media_id' => $val['id'],
                     'order' => ($key+($direction=='up'?-1:1))
     		    ));
 
-    		    $this->setSortOrder(array(
+    		    $this->_mc->setSortOrder(array(
                     'media_id' => $media[$key+($direction=='up'?-1:1)]['id'],
                     'order' => ($key+($direction=='up'?1:-1))
     		    ));
@@ -201,7 +198,7 @@ class NsrTaxonMediaController extends NsrController
 
 		foreach((array)$captions as $mediaId => $caption) {
 
-		    $this->saveCaption(array(
+		    $this->_mc->saveCaption(array(
 		        'media_id' => $mediaId,
                 'caption' => $caption
 		    ));
@@ -218,36 +215,6 @@ class NsrTaxonMediaController extends NsrController
 
     }
 
-
-
-
-
-
-	// Wrapper function to avoid calling $_mc directly
-    private function getTaxonMedia ()
-    {
-        return $this->_mc->getItemMediaFiles();
-    }
-
-	// Wrapper function to avoid calling $_mc directly
-    private function setSortOrder ($p)
-    {
-        $this->_mc->setSortOrder(array(
-            'media_id' => $p['media_id'],
-            'order' => $p['order']
-        ));
-    }
-
-	// Wrapper function to avoid calling $_mc directly
-    private function saveCaption ($p)
-    {
-        $this->_mc->saveCaption(array(
-            'media_id' => $p['media_id'],
-            'caption' => $p['caption']
-        ));
-    }
-
-	// Wrapper function to avoid calling $_mc directly
     private function deleteItemMedia ($mediaId)
     {
         $r = $this->_mc->deleteItemMedia($mediaId);
