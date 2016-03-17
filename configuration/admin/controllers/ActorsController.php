@@ -117,9 +117,13 @@ class ActorsController extends NsrController
 			$this->smarty->assign('links',$this->getActorLinks( $actor ));
 		}
 
-		$this->smarty->assign('companies',$this->getAllActors(array('is_company'=>true,'search'=>'*')));
+		$this->smarty->assign( 'companies', $this->getAllActors(array('is_company'=>true,'search'=>'*')));
+		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
+
 		$this->printPage(isset($template) ? $template : null);
 	}
+
+
 
     public function ajaxInterfaceAction ()
     {

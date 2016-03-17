@@ -57,6 +57,7 @@ class IntroductionController extends Controller
         $this->smarty->assign('prevStart', $pagination['prevStart']);
         $this->smarty->assign('nextStart', $pagination['nextStart']);
         $this->smarty->assign('pages',$pagination['items']);
+		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 
         $this->printPage();
     }
@@ -81,6 +82,9 @@ class IntroductionController extends Controller
 
 		if (!$this->rHasId())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
+			
 			$id = $this->createPage();
 
 			// redirecting to protect against resubmits
@@ -97,12 +101,16 @@ class IntroductionController extends Controller
 		{
 			if ($this->rHasVal('action','delete'))
 			{
+				$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+				$this->checkAuthorisation();
 				$this->deletePage();
 				$this->redirect('index.php');
 			}
 			else
 			if ($this->rHasVal('action','deleteImage'))
 			{
+				$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+				$this->checkAuthorisation();
 				$this->deleteMedia();
 			}
 			else
@@ -127,12 +135,13 @@ class IntroductionController extends Controller
 		$navList = $this->getPageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-			$this->smarty->assign('navCurrentId',$this->rHasId() ? $this->rGetId() : null);
+		$this->smarty->assign('navCurrentId',$this->rHasId() ? $this->rGetId() : null);
 		if (isset($page)) $this->smarty->assign('page', $page);
 		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('includeHtmlEditor', true);
+		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 
         $this->printPage();
     }
@@ -144,12 +153,11 @@ class IntroductionController extends Controller
 			'&id='.$this->rGetId().
 			'&lan='.$this->getDefaultProjectLanguage()
 		);
-
 	}
 
     public function orderAction()
     {
-
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Change page order'));
@@ -207,7 +215,7 @@ class IntroductionController extends Controller
 
     public function mediaUploadAction()
     {
-
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('New image'));
@@ -292,22 +300,32 @@ class IntroductionController extends Controller
 
         if ($this->rHasVal('action', 'save_content'))
 		{
-            if ($this->saveContent($this->rGetAll()))
-				$this->smarty->assign('returnText', 'saved');
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( $this->getAuthorisationState() )
+			{
+	            if ($this->saveContent($this->rGetAll()))
+				{
+					$this->smarty->assign('returnText', 'saved');
+				}
+			}
         }
 		else if ($this->rHasVal('action', 'get_content'))
 		{
-            $this->ajaxActionGetContent();
+			if ( $this->getAuthorisationState() )
+			{
+	            $this->ajaxActionGetContent();
+			}
         }
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search')))
 		{
-            $this->getLookupList($this->rGetVal('search'));
+			if ( $this->getAuthorisationState() )
+			{
+	    	    $this->getLookupList($this->rGetVal('search'));
+			}
         }
 
 		$this->allowEditPageOverlay = false;
-
         $this->printPage();
-
     }
 
 	private function saveAllContent( $p=null )
