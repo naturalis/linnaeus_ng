@@ -84,6 +84,12 @@ table tr th {
             </td>
         </tr>
         <tr>
+            <td></td>
+            <td>
+                <a href="#" onclick="resetPermissions();return false;">reset permissions to role defaults</a>
+            </td>
+        </tr>
+        <tr>
             <th>{t}Taxa:{/t}</th>
             <td>
 				{include file="_taxon_access.tpl"}

@@ -167,7 +167,15 @@ class UsersController extends Controller
 			$this->userRightsSave();
 			$this->userTaxaSave();
 			$this->setUser();
-		} else
+		} 
+		else
+		if ($this->rHasVal('action','reset_permissions') && !$this->isFormResubmit())
+		{
+			$this->setNewUserData( $this->rGetAll() );
+			$this->resetUserPermissions();
+			$this->setUser();
+		} 
+		else
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
 			$this->removeUserFromCurrentProject();
@@ -573,7 +581,7 @@ class UsersController extends Controller
 		{
 			$can_read=isset($data['module_read']) && isset($data['module_read'][$key]) ? $data['module_read'][$key]=='on' : false;
 			$can_write=isset($data['module_write']) && isset($data['module_write'][$key]) ? $data['module_write'][$key]=='on' : false;
-			
+
 			$this->models->UserModuleAccess->save(
 				array(
 					'id'=>null,
@@ -607,7 +615,6 @@ class UsersController extends Controller
 		}
 		
 		$this->addMessage( $this->translate('Updated rights.') );
-		
 	}
 
 	private function userTaxaSave()
@@ -952,6 +959,69 @@ class UsersController extends Controller
 		}
 
 		return $pass;
+	}
+	
+	private function resetUserPermissions()
+	{
+
+		$modules=array();
+		$custom=array();
+		$module_read=array();
+		$module_write=array();
+		$custom_read=array();
+		$custom_write=array();
+
+		$d=$this->getProjectModulesUser();
+
+		foreach((array)$d['modules'] as $val)
+		{
+			$modules[$val['module_id']]='on';
+			$module_read[$val['module_id']]='on';
+		}
+		
+		foreach((array)$d['freeModules'] as $val)
+		{
+			$custom[$val['id']]='on';
+			$custom_read[$val['id']]='on';
+		}
+
+		/*		
+		if( $this->getUser()['project_role']['role_id']==ID_ROLE_SYS_ADMIN )
+		{
+			// unnecessary, ID_ROLE_SYS_ADMIN has default full access
+		}
+		else
+		*/
+		if( $this->getUser()['project_role']['role_id']==ID_ROLE_LEAD_EXPERT )
+		{
+			foreach((array)$d['modules'] as $val)
+			{
+				
+				$module_write[$val['module_id']]='on';
+			}
+			
+			foreach((array)$d['freeModules'] as $val)
+			{
+				$custom_write[$val['id']]='on';
+			}
+			$can_publish='1';
+		}
+		else
+		if( $this->getUser()['project_role']['role_id']==ID_ROLE_EDITOR )
+		{
+			$can_publish='0';
+		}	
+
+		$this->_newuserdata['module']=$modules;
+		$this->_newuserdata['custom']=$custom;
+		$this->_newuserdata['module_read']=$module_read;
+		$this->_newuserdata['module_write']=$module_write;
+		$this->_newuserdata['custom_read']=$custom_read;
+		$this->_newuserdata['custom_write']=$custom_write;
+		$this->_newuserdata['can_publish']=$can_publish;
+			
+		$this->userRightsSave();
+
 	}
 
 
