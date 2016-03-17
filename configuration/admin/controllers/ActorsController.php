@@ -43,44 +43,39 @@ class ActorsController extends NsrController
 		$this->initialise();
     }
 
-    public function __destruct ()
-    {
-        parent::__destruct();
-    }
-
     private function initialise()
     {
 		$this->Rdf = new RdfController;
     }
 
+    public function __destruct ()
+    {
+        parent::__destruct();
+    }
 
 
     public function indexAction()
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Index'));
+	
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
+
 		$this->smarty->assign('individualAlphabet',$this->getIndividualAlphabet());
 		$this->smarty->assign('companyAlphabet',$this->getCompanyAlphabet());
 		$this->printPage();
 	}
 
-    public function ajaxInterfaceAction ()
-    {
-        if (!$this->rHasVar('action')) return;
-		$return=null;
-		$return=$this->getActorLookupList($this->rGetAll());
-        $this->allowEditPageOverlay = false;
-		$this->smarty->assign('returnText',$return);
-        $this->printPage();
-    }
-
     public function editAction()
 	{
-		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Edit actor'));
 
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
+
 			$this->setActorId($this->rGetId());
 			$this->setActorBefore();
 			$this->deleteActor();
@@ -91,6 +86,9 @@ class ActorsController extends NsrController
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$before=$this->getActor();
 			$this->setActorId($this->rGetId());
 			$this->setActorBefore();
@@ -100,6 +98,9 @@ class ActorsController extends NsrController
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
+
 			$this->smarty->assign('reference',$this->rGetAll());
 			$this->saveActor();
 		}
@@ -119,6 +120,20 @@ class ActorsController extends NsrController
 		$this->smarty->assign('companies',$this->getAllActors(array('is_company'=>true,'search'=>'*')));
 		$this->printPage(isset($template) ? $template : null);
 	}
+
+    public function ajaxInterfaceAction ()
+    {
+        if (!$this->rHasVar('action')) return;
+
+		if ( !$this->getAuthorisationState() )
+			return;
+
+		$return=null;
+		$return=$this->getActorLookupList($this->rGetAll());
+        $this->allowEditPageOverlay = false;
+		$this->smarty->assign('returnText',$return);
+        $this->printPage();
+    }
 
 
 

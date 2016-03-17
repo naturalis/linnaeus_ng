@@ -23,6 +23,7 @@ class NsrActivityLogController extends NsrController
     public function __construct()
     {
         parent::__construct();
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
     }
 
     public function __destruct()
