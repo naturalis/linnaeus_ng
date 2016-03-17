@@ -90,6 +90,9 @@ table tr th {
             </td>
         </tr>
         <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
             <th>{t}Taxa:{/t}</th>
             <td>
 				{include file="_taxon_access.tpl"}

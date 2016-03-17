@@ -1,3 +1,9 @@
+<style>
+table tr .active-n {
+	color:#999;
+}
+</style>
+
 <table>
 {assign "k" "0"}
 {foreach $modules.modules v}
@@ -5,7 +11,7 @@
     {assign "read" $v.access.can_read==1}
     {assign "write" $v.access.can_write==1}
     <tr class="tr-highlight">
-        <td>
+        <td class="active-{$v.active}"
             <label><input type="checkbox" id="m{$k}" class="modules" name="module[{$v.module_id}]" {if $access} checked="checked"{/if} />{$v.module}</label>
         </td>
         <td>
@@ -16,6 +22,9 @@
     {assign "k" $k+1}
 {/foreach}
 {if $modules.freeModules|@count>0}
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
 {foreach $modules.freeModules v}
     {assign "access" $v.access.id!=null}
     {assign "read" $v.access.can_read==1}

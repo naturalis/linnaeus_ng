@@ -490,6 +490,7 @@ class Controller extends BaseClass
 			$modules[$key]['description'] = $mp['description'];
 			$modules[$key]['controller'] = $mp['controller'];
 			$modules[$key]['show_order'] = $mp['show_order'];
+			$modules[$key]['show_in_menu'] = $mp['show_in_menu'];
 		}
 
 		$this->customSortArray($modules, array(

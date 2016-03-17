@@ -72,7 +72,8 @@ final class ProjectsModel extends AbstractModel
 	
 	public function getProjectModules( $params )
 	{
-        $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $include_hidden = isset($params['include_hidden']) ? $params['include_hidden'] : false;
 
         if ( is_null($project_id) )
 			return;
@@ -92,7 +93,8 @@ final class ProjectsModel extends AbstractModel
 				on _a.module_id = _b.id
 			
 			where 
-				_a.project_id = " . $project_id ." 
+				_a.project_id = " . $project_id ."
+			" . (!$include_hidden ? "and _b.show_in_menu=1 " : "") . " 
 			order by _b.module asc
 			";
 

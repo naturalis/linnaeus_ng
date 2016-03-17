@@ -2,6 +2,10 @@
 
 /*
 
+	fails:
+	http://localhost/linnaeus_ng/admin/views/utilities/admin_index.php
+	WHY!?
+
 	logging!
 	
 	must hide sysadmin! (set "hidden" in set users)
@@ -364,6 +368,14 @@ class UsersController extends Controller
 	private function getProjectModulesUser()
 	{
 		$d=$this->getProjectModules();
+		
+		foreach((array)$d['modules'] as $key=>$val)
+		{
+			if ( $val['show_in_menu']==0 )
+			{
+				unset( $d['modules'][$key] );
+			}
+		}
 
 		$u=$this->models->UserModuleAccess->_get(array(
 			'id'=>array(
