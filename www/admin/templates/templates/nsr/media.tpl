@@ -3,18 +3,28 @@
 {include file="../shared/admin-messages.tpl"}
 
 <style>
-table tr td {
-	vertical-align:top;
-}
 table {
-	padding-bottom:10px;
-	border-bottom:1px solid #ddd;
+	border-collapse: collapse;
 }
-.image {
-	max-width:150px;
+table tr td {
+	vertical-align: top;
 }
-.thumb {
-	max-width:75px;
+td.media-header {
+	vertical-align: bottom;
+	font-weight: bold;
+	padding: 10px 0 5px 0;
+}
+td.media-cell {
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 10px;
+	padding-right: 10px;
+}
+.image-preview, .av-preview {
+	max-width: 300px;
+	max-height: 250px;
+}
+.image-preview {
+	border: 1px solid #ddd;
 }
 textarea {
 	width:250px;
@@ -26,12 +36,12 @@ textarea {
 
 <div id="page-main">
     <p>
-        <a href="../media/upload.php?item_id={$taxon.id}&amp;module_id={$module_id}">{t}upload media{/t}</a><br />
-        <a href="../media/select.php?item_id={$taxon.id}&amp;module_id={$module_id}">{t}attach media{/t}</a><br />
+        <a href="../media/upload.php?item_id={$item_id}&amp;module_id={$module_id}">{t}upload media{/t}</a><br />
+        <a href="../media/select.php?item_id={$item_id}&amp;module_id={$module_id}">{t}attach media{/t}</a><br />
     </p>
 
 	<form id="theForm" method="post">
-    <input type="hidden" name="taxon_id" value="{$taxon.id}" />
+    <input type="hidden" name="id" value="{$item_id}" />
     <input type="hidden" id="action" name="action" value="save" />
     <input type="hidden" id="subject" name="subject" value="" />
 
@@ -51,64 +61,71 @@ textarea {
     {/if}
 
 
-    <div>
-
-
-
+    <table>
     {foreach from=$media key=key item=v}
-        <p>
-            <table>
-                <tr>
-                    <th colspan="3">
-                        {$v.name} ({$v.media_type})
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <a
-                            rel="prettyPhoto[gallery]"
-                            title="{$v.caption}"
-                            href="{$v.rs_original}">
+         <tr>
+            <td class="media-header">
+                {$v.name} ({$v.media_type})
+            </td>
+            <td class="media-header">
+            	{t}Caption{/t}
+            </td>
+        </tr>
+        <tr>
+            <td class="media-cell">
 
-                            {if $v.media_type=='image'}
-                            <img src="{$v.rs_original}" class="image" />
-                            {elseif $v.media_type=='video'}
-                            <img src="{$baseUrl}admin/media/system/icons/video.jpg" />
-                            {elseif $v.media_type=='sound'}
-                            <img src="{$baseUrl}admin/media/system/icons/audio.jpg" />
-                            {/if}
-                        </a><br />
-                        ({$v.mime_type}, {$v.file_size_hr})
+                {if $v.media_type=='image'}
+                    <a
+                        rel="prettyPhoto[gallery]"
+                        title="{$v.caption}"
+                        href="{$v.rs_original}">
+						<img src="{$v.rs_original}" class="image-preview" />
+                    </a>
 
-                    </td>
-                    <td>
-                        <textarea name="captions[{$v.id}]">{$v.caption}</textarea><br />
-                        {if $v.media_type=='image'}
-                        <label>
-                            <input type="radio" name="overview-image" value="{$v.id}" {if $v.overview_image=='1'} checked="checked"{/if} />
-                            is overview image
-                        </label>
-                        {/if}
-                        <br /><br />
-                        <input type="submit" value="{t}save{/t}" title="{t}save all captions{/t}" />
-                        {if $key > 0}
-                        <input type="button" value="&uarr;" title="{t}move image up{/t}"
-                            onclick="$('#subject').val({$v.id});$('#action').val('up');$('#theForm').submit();" />
-                        {/if}
-                        {if $key < $total}
-                        <input type="button" value="&darr;" title="{t}move image down{/t}"
-                            onclick="$('#subject').val({$v.id});$('#action').val('down');$('#theForm').submit();" />
-                        {/if}
-                        <input type="button" value="{t}detach{/t}" title="{t}detach media{/t}"
-                            onclick="if (!confirm('{t}Are you sure?{/t}')) { return; } $('#subject').val({$v.id});$('#action').val('delete');$('#theForm').submit();" />
-                    </td>
-                </tr>
- 			</table>
-        </p>
+				{else if $v.media_type == 'audio' or $v.media_type == 'video'}
+					<{$v.media_type} src="{$v.rs_original}" alt="{$v.caption}" class="av-preview" controls />
+						<a href="{$v.rs_original}">Play {$v.caption}</a>
+					</{$v.media_type}><br>
 
-    {/foreach}
+				{else}
+					<a href="{$v.rs_original}">
+						<img src="{$v.rs_thumb_medium}" alt="{$v.caption}" /><br>
+					</a>
 
-    </div>
+				{/if}
+
+               <br />
+                ({$v.file_size_hr})
+
+            </td>
+            <td class="media-cell">
+                <textarea name="captions[{$v.id}]">{$v.caption}</textarea><br />
+                {if $v.media_type=='image'}
+                <label>
+                    <input type="radio" name="overview-image" value="{$v.id}" {if $v.overview_image=='1'} checked="checked"{/if} />
+                    is overview image
+                </label>
+                <br />
+                {/if}
+                <br />
+                <input type="submit" value="{t}save{/t}" title="{t}save all captions{/t}" />
+                {if $key > 0}
+                <input type="button" value="&uarr;" title="{t}move image up{/t}"
+                    onclick="$('#subject').val({$v.id});$('#action').val('up');$('#theForm').submit();" />
+                {/if}
+                {if $key < $total}
+                <input type="button" value="&darr;" title="{t}move image down{/t}"
+                    onclick="$('#subject').val({$v.id});$('#action').val('down');$('#theForm').submit();" />
+                {/if}
+                <input type="button" value="{t}detach{/t}" title="{t}detach media{/t}"
+                    onclick="if (!confirm('{t}Are you sure?{/t}')) { return; } $('#subject').val({$v.id});$('#action').val('delete');$('#theForm').submit();" />
+            </td>
+        </tr>
+
+	{/foreach}
+	</table>
+
+
     </form>
 
 </div>

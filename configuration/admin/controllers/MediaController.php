@@ -241,11 +241,13 @@ class MediaController extends Controller
         if ($this->rHasVal('save', $this->translate('save'))) {
             $this->saveMetadata($id);
             $this->saveTags($id);
+			$this->addMessage($this->translate('Saved'));
         }
 
         $media = $this->getMediaFile($id);
 
 		$this->smarty->assign('media_type', $this->getMediaType($media['mime_type']));
+		$this->smarty->assign('thumbnail', $media['rs_thumb_medium']);
 		$this->smarty->assign('source', $media['rs_original']);
 		$this->smarty->assign('name', $media['name']);
 		$this->smarty->assign('metadata', $this->setMetadataFields($media['metadata']));
@@ -1018,7 +1020,7 @@ class MediaController extends Controller
         return $d;
     }
 
-    private function getMediaType ($mime)
+    public function getMediaType ($mime)
     {
         foreach ($this::$mimeTypes as $category => $types) {
             foreach ($types as $extension => $type) {
@@ -1028,6 +1030,18 @@ class MediaController extends Controller
             }
         }
         return false;
+    }
+
+    public function getMimeShowOrder ($mime)
+    {
+        foreach ($this::$mimeTypes as $category => $types) {
+            foreach ($types as $extension => $type) {
+                if ($mime == $type) {
+                    return array_search($category, array_keys($this::$mimeTypes));
+                }
+            }
+        }
+        return 99;
     }
 
 }

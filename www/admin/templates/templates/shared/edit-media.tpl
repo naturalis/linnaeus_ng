@@ -1,20 +1,3 @@
-<style>
-.bar {
-    height: 18px;
-    background: green;
-}
-tr td:first-child {
-	text-align: right;
-}
-tr:last-child td {
-	padding-top: 15px;
-}
-input[type=text], textarea {
-	width: 300px;
-}
-
-</style>
-
 <div id="page-main">
 
 	<form id="theForm" method="post">
@@ -23,8 +6,28 @@ input[type=text], textarea {
 	<input type="hidden" name="module_id" value="{$module_id}" />
 	<input type="hidden" name="item_id" value="{$item_id}" />
 
-	<h3>{$name}</h3>
-	<p><img src="{$source}" alt="{$name}" /></p>
+	<p>
+		{if $media_type == 'image'}
+			<a href="{$source}" rel="prettyPhoto">
+			<img src="{$source}" alt="{$name}" class="image-preview" />
+			</a><br/>
+			{$name}
+
+		{else if $media_type == 'audio' or $media_type == 'video'}
+			<{$media_type} src="{$source}" alt="{$name}" class="av-preview" controls />
+				<a href="{$source}">Play {$name}</a>
+			</{$media_type}><br>
+			{$name}
+
+		{else}
+			<a href="{$source}">
+			<img src="{$thumbnail}" alt="{$name}" /><br>
+			{$name}
+			</a>
+
+		{/if}
+
+	</p>
 	<table>
     {if $languages|@count>1}
     <tr>

@@ -21,6 +21,7 @@
 */
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 class GlossaryController extends Controller
 {
@@ -57,8 +58,9 @@ class GlossaryController extends Controller
 			'dialog/jquery.modaldialog.js'
 		)
 	);
-	
-	private $termsPerPage=20;
+
+    private $_mc;
+    private $termsPerPage=20;
 
     /**
      * Constructor, calls parent's constructor
@@ -69,7 +71,7 @@ class GlossaryController extends Controller
     {
 
         parent::__construct();
-
+        $this->initialize();
     }
 
     /**
@@ -83,6 +85,23 @@ class GlossaryController extends Controller
         parent::__destruct();
 
     }
+
+
+    private function initialize()
+    {
+        $this->setMediaController();
+	}
+
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getActiveLanguage());
+	}
+
+
 
     /**
      * Index of all glossary actions
@@ -508,7 +527,7 @@ class GlossaryController extends Controller
 
     }
 
-
+/*
     public function mediaAction ()
     {
 
@@ -588,6 +607,60 @@ class GlossaryController extends Controller
 
 		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
 		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
+
+        $this->printPage();
+
+    }
+*/
+
+    public function mediaAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		if (!$this->rHasId()) {
+		    $this->redirect('index.php');
+		}
+
+		$gloss = $this->getGlossaryTerm($this->rGetId());
+
+		$this->setBreadcrumbIncludeReferer(
+			array(
+				'name' => $this->translate('Editing glossary term'),
+				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
+			)
+		);
+
+		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']));
+
+        if (!$this->rHasId()) {
+			$this->redirect('index.php');
+		}
+
+		if ($this->rHasVal('action','delete')) {
+			$r = $this->detachMedia();
+			$this->addMessage($r);
+		}
+
+		if ($this->rHasVal('action','save')) {
+			$this->setOverviewImage();
+			$this->saveCaptions();
+			$this->addMessage('Saved');
+		}
+
+		if ($this->rHasVal('action','up') || $this->rHasVal('action','down')) {
+		    if ($this->moveImageInOrder()) {
+				$this->addMessage('New media order saved');
+			}
+		}
+
+		$this->smarty->assign('media', $this->_mc->getItemMediaFiles());
+		$this->smarty->assign('name', $gloss['term']);
+		$this->smarty->assign('languages', $this->getProjectLanguages());
+		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
+		$this->smarty->assign('language_id', $this->getActiveLanguage());
+		$this->smarty->assign('module_id', $this->getCurrentModuleId());
+		$this->smarty->assign('item_id', $this->rGetId());
 
         $this->printPage();
 
@@ -1041,6 +1114,10 @@ class GlossaryController extends Controller
 
 			return $this->rGetVal('activeLanguage');
 
+		} else if ($this->rHasVal('language_id')) {
+
+			return $this->rGetVal('language_id');
+
 		} else if(!is_null($this->getDefaultProjectLanguage())) {
 
 			return $this->getDefaultProjectLanguage();
@@ -1181,9 +1258,9 @@ class GlossaryController extends Controller
 
     private function filterContent($content)
     {
-		
+
 		return array('content' => $content, 'modified' => false);
-		 
+
 		/*
 
         if (!$this->controllerSettings['filterContent'])
@@ -1231,6 +1308,95 @@ class GlossaryController extends Controller
 
 	}
 
+    private function moveImageInOrder()
+    {
+		$mediaId = $this->rHasVal('subject') ? $this->rGetVal('subject') : false;
+		$direction = $this->rHasVal('action') ? $this->rGetVal('action') : false;
+
+		if (!$mediaId || !$direction || ($direction!='up' && $direction!='down')) {
+			return;
+		}
+
+		$media =  $this->_mc->getItemMediaFiles();
+
+		foreach ($media as $key => $val) {
+
+		    $this->_mc->setSortOrder(array(
+                'media_id' => $val['id'],
+                'order' => $key
+		    ));
+
+		}
+
+		$r = null;
+
+		foreach ($media as $key => $val) {
+
+		    if ($val['id'] == $mediaId) {
+
+				if ($key == 0 && $direction == 'up') continue;
+				if ($key == (count($media)-1) && $direction == 'down') continue;
+
+    		    $this->_mc->setSortOrder(array(
+                    'media_id' => $val['id'],
+                    'order' => ($key+($direction=='up'?-1:1))
+    		    ));
+
+    		    $this->_mc->setSortOrder(array(
+                    'media_id' => $media[$key+($direction=='up'?-1:1)]['id'],
+                    'order' => ($key+($direction=='up'?1:-1))
+    		    ));
+
+				$r = true;
+
+			}
+		}
+
+		return $r;
+
+    }
+
+    private function detachMedia ()
+    {
+    	$mediaId = $this->rHasVal('subject') ? $this->rGetVal('subject') : false;
+
+		if (!$mediaId) {
+			return;
+		}
+
+		return $this->deleteItemMedia($mediaId);
+    }
+
+    private function saveCaptions ()
+    {
+		$captions = $this->rHasVal('captions') ? $this->rGetVal('captions') : array();
+
+		foreach((array)$captions as $mediaId => $caption) {
+
+		    $this->_mc->saveCaption(array(
+		        'media_id' => $mediaId,
+                'caption' => $caption
+		    ));
+
+		}
+    }
+
+    private function setOverviewImage ()
+    {
+        $mediaId = $this->rHasVal('overview-image') ?
+            $this->rGetVal('overview-image') : -1;
+
+        $this->_mc->setOverviewImage($mediaId);
+
+    }
+
+    private function deleteItemMedia ($mediaId)
+    {
+        $r = $this->_mc->deleteItemMedia($mediaId);
+
+        return $r ?  $this->translate('Detached file') :
+            $this->translate('Could not detach file');
+    }
 
 
 }
