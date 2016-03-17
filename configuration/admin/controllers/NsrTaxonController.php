@@ -104,7 +104,6 @@ class NsrTaxonController extends NsrController
 
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
-
 			$this->saveConcept();
 
 			if ( $this->getConceptId() )
@@ -178,9 +177,11 @@ class NsrTaxonController extends NsrController
 
     public function taxonAction()
     {
-		$this->checkAuthorisation();
-
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
+
+		$this->UserRights->setItemId( $this->rGetId() );
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+		$this->checkAuthorisation();
 
         $this->setPageName($this->translate('Edit taxon concept'));
 
@@ -250,7 +251,7 @@ class NsrTaxonController extends NsrController
 
     public function synonymAction()
     {
-		$this->checkAuthorisation();
+		//$this->checkAuthorisation();
         $this->setPageName($this->translate('Bewerk wetenschappelijke naam'));
 		$this->_nameAndSynonym();
 		$this->printPage();
@@ -258,7 +259,7 @@ class NsrTaxonController extends NsrController
 
     public function nameAction()
     {
-		$this->checkAuthorisation();
+		//$this->checkAuthorisation();
         $this->setPageName($this->translate('Bewerk naam'));
 		$this->_nameAndSynonym();
 		$this->printPage();
@@ -266,6 +267,16 @@ class NsrTaxonController extends NsrController
 
     private function _nameAndSynonym()
     {
+
+		if ( $this->rHasId() )
+		{
+			$this->setNameId($this->rGetId());
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$this->UserRights->setItemId( $name['taxon_id'] );
+		}
+
+		$this->checkAuthorisation();
+		
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			$this->setNameId($this->rGetId());
@@ -367,9 +378,10 @@ class NsrTaxonController extends NsrController
 
     public function taxonEditConceptDirectAction()
     {
-		$this->checkAuthorisation();
-
 		if ( !$this->rHasId() ) $this->redirect('taxon_new.php');
+
+		$this->UserRights->setItemId( $this->rGetId() );
+		$this->checkAuthorisation();
 
         $this->setPageName( $this->translate('Naam concept direct aanpassen') );
 		$this->setConceptId( $this->rGetId() );
@@ -397,8 +409,6 @@ class NsrTaxonController extends NsrController
 
     public function taxonEditSynonymDirectAction()
     {
-		$this->checkAuthorisation();
-
 		if ( !$this->rHasId() ) $this->redirect('synonym.php');
 
         $this->setPageName( $this->translate('Geldige naam direct aanpassen') );
@@ -407,7 +417,10 @@ class NsrTaxonController extends NsrController
 		$name=$this->getName(array('id'=>$this->getNameId()));
 
 		$this->setConceptId( $name['taxon_id'] );
-		$concept=$this->getConcept($this->getConceptId());
+		$concept=$this->getConcept( $this->getConceptId() );
+
+		$this->UserRights->setItemId( $this->getConceptId() );
+		$this->checkAuthorisation();
 
 		if ($name['type_id']!=$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'])
 		{
@@ -1159,8 +1172,6 @@ class NsrTaxonController extends NsrController
 
 		return true;
 	}
-
-
 
 	private function saveConcept()
 	{
