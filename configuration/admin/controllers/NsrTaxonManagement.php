@@ -83,6 +83,7 @@ class NsrTaxonManagement extends NsrController
 
     private function initialize()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
 	}
 
     public function tabsAction()
@@ -363,7 +364,7 @@ class NsrTaxonManagement extends NsrController
 
 
 
-    private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
+    private function createTaxonCategory($name, $show_order = false, $isDefault = false)
     {
         $d=$this->models->PagesTaxa->save(
         array(

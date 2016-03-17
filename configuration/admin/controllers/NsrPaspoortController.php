@@ -50,13 +50,15 @@ class NsrPaspoortController extends NsrController
 
     public function paspoortAction()
     {
-		$this->checkAuthorisation();
-		
 		if (!$this->rHasId())
 		{
 			$this->redirect('index.php');
 		}
 		
+		$this->UserRights->setItemId( $this->rGetId() );
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		$this->checkAuthorisation();
+
 		$this->setTaxonId($this->rGetId());
 
         $this->setPageName($this->translate('Edit taxon passport'));
@@ -65,18 +67,23 @@ class NsrPaspoortController extends NsrController
 		$this->smarty->assign('tabs',$this->getPassportCategories());	
 		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));	
 
+		$this->UserRights->setActionType( $this->UserRights->getActionPublish() );
+		$this->smarty->assign( 'can_publish', $this->getAuthorisationState() );
+
 		$this->printPage();
 	}
 
     public function paspoortMetaAction()
     {
-		$this->checkAuthorisation();
-		
 		if (!$this->rHasId())
 		{
 			$this->redirect('index.php');
 		}
 		
+		$this->UserRights->setItemId( $this->rGetId() );
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		$this->checkAuthorisation();
+
 		$this->setTaxonId($this->rGetId());
 		
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
@@ -99,13 +106,23 @@ class NsrPaspoortController extends NsrController
 
     public function ajaxInterfaceAction ()
     {
-		
         if (!$this->rHasVal('action'))
             return;
 
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		if ( $this->getAuthorisationState()==false ) return;
+
 		if ($this->rHasVal('action', 'save_passport'))
 		{
-			$return=$this->savePassport($this->rGetAll());
+			$p=$this->rGetAll();
+
+			$this->UserRights->setActionType( $this->UserRights->getActionPublish() );
+			if ( $this->getAuthorisationState()==false )
+			{
+				unset($p['publish']);
+			}
+			
+			$return=$this->savePassport( $p );
         }
 		
         $this->allowEditPageOverlay=false;
@@ -121,7 +138,8 @@ class NsrPaspoortController extends NsrController
 		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page)
 		{
 			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
-			if (!defined('TAB_'.$p)) {
+			if (!defined('TAB_'.$p))
+			{
 				define('TAB_'.$p,$page['id']);
 			}
 		}
