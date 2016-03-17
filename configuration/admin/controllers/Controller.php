@@ -391,11 +391,6 @@ class Controller extends BaseClass
         return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : null;
     }
 
-    /**
-     * Rerturns the active project's data
-     *
-     * @access     public
-     */
     public function getCurrentProjectData()
     {
         return isset($_SESSION['admin']['project']) ? $_SESSION['admin']['project'] : null;
@@ -424,6 +419,13 @@ class Controller extends BaseClass
 		{
 			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
 		}
+		
+
+		if ( !$this->UserRights->canManageItem() )
+		{
+			die( $this->UserRights->getMessage() );
+		}
+		
     }
 
     public function isCurrentUserSysAdmin ()

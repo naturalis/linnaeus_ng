@@ -5,14 +5,14 @@ include_once ('Controller.php');
 class FreeModuleController extends Controller
 {
 
-    public $usedModels = array(
-		'free_modules_projects',
-		'free_modules_projects_users',
-		'free_modules_pages',
-		'content_free_modules',
-		'free_module_media'
-    );
-
+    public $usedModels=
+		array(
+			'free_modules_projects',
+			'free_modules_pages',
+			'content_free_modules',
+			'free_module_media'
+		);
+	
     public $usedHelpers = array(
         'file_upload_helper',
         'image_thumber_helper',
@@ -45,11 +45,9 @@ class FreeModuleController extends Controller
      */
     public function __construct ()
     {
-
         parent::__construct();
-
+		$this->UserRights->setModuleType( $this->UserRights->getModuleTypeCustom() );
 		$this->controllerPublicName = $this->getActiveModuleName();
-
     }
 
     /**
@@ -59,36 +57,8 @@ class FreeModuleController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
-
     }
-
-	public function checkAuthorisation($allowNoProjectId = false)
-	{
-
-		// check if user is logged in, otherwise redirect to login page
-		if (!$this->isUserLoggedIn()) return false;
-
-		// check if there is an active project, otherwise redirect to choose project page
-		if (!$this->getCurrentProjectId() && !$allowNoProjectId) return false;
-
-		if ($this->isCurrentUserSysAdmin()) return true;
-
-		if ($this->rHasVal('freeId')) {
-
-			if (!$this->isUserAuthorizedForFreeModule())
-				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
-
-		} else {
-
-			if (is_null($this->getActiveModule()))
-				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
-
-		}
-
-	}
-
 
     /**
      * Module index
@@ -100,22 +70,22 @@ class FreeModuleController extends Controller
 
         $this->checkAuthorisation();
 
-		if ($this->getActiveModule()==null || $this->rHasVal('freeId')) {
-
+		if ($this->getActiveModule()==null || $this->rHasVal('freeId'))
+		{
 			$this->setActiveModule($this->getFreeModule());
-
 			$this->controllerPublicName = $this->getActiveModuleName();
-
 		}
 
 		$this->cleanUpEmptyPages();
 
 		if (!$this->rHasVal('page'))
+		{
 			$this->redirect('edit.php?id='.$this->getFirstPageId());
+		}
 		else
+		{
 			$this->redirect('edit.php?id='.$this->rGetVal('page'));
-
-
+		}
     }
 
     /**
@@ -125,116 +95,80 @@ class FreeModuleController extends Controller
      */
     public function contentsAction()
     {
-
         $this->checkAuthorisation();
-
         $this->setPageName($this->translate('Contents'));
 
         $pagination = $this->getPagination($this->getPages(),25);
 
         $this->smarty->assign('prevStart', $pagination['prevStart']);
-
         $this->smarty->assign('nextStart', $pagination['nextStart']);
-
         $this->smarty->assign('pages',$pagination['items']);
 
         $this->printPage();
 
     }
 
+    public function createPageAction()
+    {
+		$this->checkAuthorisation();
+		$this->redirect('edit.php?id=' . $this->createPage());
+	}
 
-    /**
-     * Create new page or edit existing
-     *
-     * @access    public
-     */
     public function editAction()
     {
 
 		$this->checkAuthorisation();
 
-		if (!$this->rHasId()) {
-
-			$id = $this->createPage();
-
-			// redirecting to protect against resubmits
-			if ($id) {
-
-				$this->redirect('edit.php?id='.$id);
-
-			} else {
-
-				$this->addError($this->translate('Could not create page.'));
-
-			}
-
-		} else {
-
-			if ($this->rHasVal('action','delete')) {
-
-				$this->deletePage();
-
-				$this->redirect('index.php');
-
-			} else
-			if ($this->rHasVal('action','deleteImage')) {
-
-				$this->deleteMedia();
-
-			} else
-			if ($this->rHasVal('action','preview')) {
-
-				$this->redirect('preview.php?id='.$this->rGetId());
-
-			}
-
-			$page = $this->getPage();
-
-			if ($page['got_content']==0) {
-
-		        $this->setPageName($this->translate('Creating new page'));
-
-			} else {
-
-		        $this->setPageName($this->translate('Editing page'));
-
-			}
-
+		if ($this->rHasVal('action','delete'))
+		{
+			$this->deletePage();
+			$this->redirect('index.php');
+		} 
+		else
+		if ($this->rHasVal('action','deleteImage'))
+		{
+			$this->deleteMedia();
+		} 
+		else
+		if ($this->rHasVal('action','preview'))
+		{
+			$this->redirect('preview.php?id='.$this->rGetId());
 		}
 
-//die(print_r($page));
+		$page = $this->getPage();
+
+		if ($page['got_content']==0)
+		{
+			$this->setPageName($this->translate('New page'));
+		} 
+		else 
+		{
+			$this->setPageName($this->translate('Editing page'));
+		}
 
 		$navList = $this->getModulePageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-
-		$this->smarty->assign('navCurrentId', $this->rGetId() ? $this->rGetId() : null);
-
-		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
-
 		if (isset($page)) $this->smarty->assign('page', $page);
 
+		$this->smarty->assign('navCurrentId', $this->rGetId() ? $this->rGetId() : null);
+		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
 		$this->smarty->assign('languages', $this->getProjectLanguages());
-
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
-
 		$this->smarty->assign('includeHtmlEditor', true);
 
         $this->printPage();
-
     }
 
 
     public function previewAction()
     {
-
 		$this->redirect(
 			'../../../app/views/module/topic.php?p='.$this->getCurrentProjectId().
 			'&modId='.$this->getCurrentModuleId().
 			'&id='.$this->rGetId().
 			'&lan='.$this->getDefaultProjectLanguage()
 		);
-
     }
 
     public function browseAction()
@@ -249,18 +183,14 @@ class FreeModuleController extends Controller
 		if (!$this->rHasVal('letter') && isset($alpha))
 			$this->requestData['letter'] = current($alpha);
 
-		if ($this->rHasVal('letter')) {
-
+		if ($this->rHasVal('letter'))
+		{
 		    $alphaIndex = $this->moduleSession->getModuleSetting('alphaIndex');
-
 		    $refs = $alphaIndex[$this->rGetVal('letter')];
-
 		    $this->smarty->assign('letter', $alphaIndex[$this->rGetVal('letter')]);
-
 		}
 
 		if (isset($alpha)) $this->smarty->assign('alpha',$alpha);
-
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 
         $this->printPage();
@@ -275,39 +205,32 @@ class FreeModuleController extends Controller
      */
     public function mediaUploadAction ()
     {
-
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('New image'));
 
-		if ($this->requestDataFiles && !$this->isFormResubmit()) {
-
+		if ($this->requestDataFiles && !$this->isFormResubmit())
+		{
 			$filesToSave =  $this->getUploadedMediaFiles();
-
 			$firstInsert = false;
 
-			if ($filesToSave && $this->rHasId()) {
-
-				foreach((array)$filesToSave as $key => $file) {
+			if ($filesToSave && $this->rHasId())
+			{
+				foreach((array)$filesToSave as $key => $file)
+				{
 
 					$thumb = false;
 
-					if (
-					$this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
-					$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
-					) {
-
-						$pi = pathinfo($file['name']);
+					if ($this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
+						$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name']))
+					{
+						$pi=pathinfo($file['name']);
 						$this->helpers->ImageThumberHelper->size_width(150);
 
-						if ($this->helpers->ImageThumberHelper->save(
-						$this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
-						)) {
-
+						if ($this->helpers->ImageThumberHelper->save($this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']))
+						{
 							$thumb = $pi['filename'].'-thumb.'.$pi['extension'];
-
 						}
-
 					}
 
 					$fmm = $this->models->FreeModuleMedia->save(
@@ -323,20 +246,16 @@ class FreeModuleController extends Controller
 						)
 					);
 
-					if ($fmm) {
-
+					if ($fmm)
+					{
 						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-
-					} else {
-
+					} 
+					else
+					{
 						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
-
 					}
-
 				}
-
 			}
-
 		}
 
 		$this->smarty->assign('id',$this->rGetId());
@@ -367,9 +286,10 @@ class FreeModuleController extends Controller
 
 		$this->setPageName($this->translate('Management'));
 
-		if ($this->rHasVal('submit')) {
-
-			$d = array(
+		if ($this->rHasVal('submit'))
+		{
+			$d = 
+				array(
 					'id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId(),
 					'show_alpha' => $this->rGetVal('show_alpha'),
@@ -380,17 +300,13 @@ class FreeModuleController extends Controller
 			if (!empty($m)) $d['module'] = $m;
 
 			$this->models->FreeModulesProjects->save($d);
-
 			$module = $this->getFreeModule();
-
 			$this->setActiveModule($module);
-
 			$this->addMessage('Settings saved');
-
-		} else {
-
+		} 
+		else
+		{
 			$module = $this->getFreeModule();
-
 		}
 
 		$this->smarty->assign('module',$module);
@@ -406,27 +322,23 @@ class FreeModuleController extends Controller
      */
     public function orderAction()
     {
-
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Change page order'));
 
-		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
-
-
-
+		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit())
+		{
 			$d = $this->getPages();
-
 			$lowerNext = $prev = false;
 
-			foreach((array)$d as $key => $val) {
-
+			foreach((array)$d as $key => $val)
+			{
 				$newOrder = $key;
 
-				if ($val['id'] == $this->rGetId()) {
-
-					if ($this->rHasVar('dir', 'up') && $prev) {
-
+				if ($val['id'] == $this->rGetId())
+				{
+					if ($this->rHasVar('dir', 'up') && $prev)
+					{
 						$newOrder = $key - 1;
 
 						 $this->models->FreeModulesPages->update(
@@ -440,24 +352,20 @@ class FreeModuleController extends Controller
 						);
 
 					} else
-					if ($this->rHasVar('dir', 'down')) {
-
+					if ($this->rHasVar('dir', 'down'))
+					{
 						$newOrder = $key + 1;
-
-					} else {
-
+					} 
+					else
+					{
 						$newOrder = $key;
-
 					}
-
 				}
 
-				if ($lowerNext) {
-
+				if ($lowerNext)
+				{
 					$newOrder = $key - 1;
-
 					$lowerNext = false;
-
 				}
 
 				 $this->models->FreeModulesPages->update(
@@ -470,22 +378,17 @@ class FreeModuleController extends Controller
 					)
 				);
 
-				if ($val['id'] == $this->rGetId() && $this->rHasVar('dir', 'down')) {
-
+				if ($val['id'] == $this->rGetId() && $this->rHasVar('dir', 'down'))
+				{
 					$lowerNext = true;
-
 				}
 
 				$prev = $val['id'];
-
 			}
-
 		}
 
 		$this->smarty->assign('pages',$this->getPages());
-
         $this->printPage();
-
 	}
 
 

@@ -36,7 +36,7 @@ ul.management li {
     
     <ul class="modules">
     {foreach $modules.custom v}
-    <li><a href="../{$v.controller}/">{$v.module}</a></li>
+    <li><a href="../module/?freeId={$v.id}">{$v.module}</a></li>
     {/foreach}
     </ul>
 

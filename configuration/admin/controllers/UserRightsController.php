@@ -1,6 +1,14 @@
 <?php
 
-/// freemoduleid???
+/*
+	read/write
+
+	implement roles
+	always include projects
+	
+	INDEXES!
+
+*/
 
 class UserRights
 {
@@ -27,10 +35,21 @@ class UserRights
 	private $projectid;
 	private $controller;
 	private $moduleid;
+	private $moduletype;
+	private $itemid;
+	private $itemtype;
+	private $action;
 	private $allowNoProjectId=false;
-	
 	private $authorizestate;
+	private $manageItemState;
 	private $message;
+	private $useritems;
+	private $subjacentitems;
+
+	protected $C_moduleTypes=array('standard','custom');
+	protected $C_itemTypes=array('taxon');
+	protected $C_actions=array('create','read','update','delete','reference');
+
 
     public function __construct( $p )
     {
@@ -39,6 +58,8 @@ class UserRights
 		$this->setUserId( isset( $p['userid'] ) ? $p['userid'] : null );
 		$this->setProjectId( isset( $p['projectid'] ) ? $p['projectid'] : null );
 		$this->setController( isset( $p['controller'] ) ? $p['controller'] : null );
+		$this->setModuleType( $this->getModuleTypeStandard() );
+		$this->setActionType( $this->getActionRead() );
 		$this->setUser();
 		$this->setModuleId();
     }
@@ -103,15 +124,77 @@ class UserRights
 			$this->setMessage( '7: accessing module (project ID set, user ID set, module ID set, can_read is true)' );
 			$this->setAuthorizeState( true );
 		}
-
+		
 		return $this->getAuthorizeState();
     }
+
+    public function canManageItem()
+    {
+		if( is_null( $this->itemid ) )
+		{
+			$this->setManageItemState( true );
+			$this->setMessage( 's1: no item specified, nothing to test against (access)' );
+		}
+		else
+		{
+			$this->setUserItems( true );
+			
+			if ( count((array)$this->useritems)==0 )
+			{
+				$this->setManageItemState( true );
+				$this->setMessage( 's2: item specified, no user items defined (access by default) ' );
+			}
+			else
+			{
+				$this->setUserSubjacentItems();
+				$d=$this->isCurrentItemInUserOrSubjacentItems();
+				$this->setManageItemState( $d );
+				$this->setMessage( sprintf('s3: item specified, user items defined (result: %s)', ( $d ? 'access' : 'no access' ) ) );
+			}
+		}
+		
+		return $this->getManageItemState();
+    }
+
+
+
 
 	public function setAllowNoProjectId( $state )
 	{
 		if ( is_bool($state) )
 		{
 			$this->allowNoProjectId=$state;
+		}
+	}
+
+	public function setModuleType( $type )
+	{
+		if ( in_array($type,$this->C_moduleTypes) )
+		{
+			$this->moduletype=$type;
+		}
+	}
+
+	public function setItemId( $id )
+	{
+		/*
+			be aware: currently we recognize only a single legal
+			itemType ('taxon') so for convenience sake, the item
+			type is set automatically whenever someone sets an
+			item ID. should there ever be other item types, either
+			all existing calls to setItemId() should be preceded
+			by a call to setItemType('taxon'), or 'taxon' should 
+			be made the default value of item type.
+		*/
+		$this->itemid=$id;
+		$this->setItemType( $this->getItemTypeTaxon() );
+	}
+
+	public function setItemType( $type )
+	{
+		if ( in_array( $type, $this->C_itemTypes ) )
+		{
+			$this->itemtype=$type;
 		}
 	}
 
@@ -124,15 +207,55 @@ class UserRights
 	{
 		return $this->message;
 	}
-
-
-
-
-
-
-
-
 	
+	public function getModuleTypeStandard()
+	{
+		return $this->C_moduleTypes[array_search('standard',$this->C_moduleTypes)];
+	}
+
+	public function getModuleTypeCustom()
+	{
+		return $this->C_moduleTypes[array_search('custom',$this->C_moduleTypes)];
+	}
+
+	public function getItemTypeTaxon()
+	{
+		return $this->C_itemTypes[array_search('taxon',$this->C_itemTypes)];
+	}
+
+	public function getActionCreate()
+	{
+		return $this->C_actions[array_search('create',$this->C_itemTypes)];
+	}
+
+	public function getActionRead()
+	{
+		return $this->C_actions[array_search('read',$this->C_itemTypes)];
+	}
+
+	public function getActionUpdate()
+	{
+		return $this->C_actions[array_search('update',$this->C_itemTypes)];
+	}
+
+	public function getActionDelete()
+	{
+		return $this->C_actions[array_search('delete',$this->C_itemTypes)];
+	}
+
+	public function getActionReference()
+	{
+		return $this->C_actions[array_search('reference',$this->C_itemTypes)];
+	}
+
+	public function setActionType( $action )
+	{
+		if ( in_array( $action, $this->C_actions ) )
+		{
+			$this->action=$action;
+		}
+	}
+
 
 
 	private function getUserModuleStatus()
@@ -143,12 +266,12 @@ class UserRights
 			from
 				%PRE%user_module_access 
 			where
-				project_id = " . $this->projectid ." 
-				and user_id = " . $this->userid ." 
-				and module_id = " . $this->moduleid ." 
-				and module_type ='standard'
+				project_id = " . $this->projectid . " 
+				and user_id = " . $this->userid . " 
+				and module_id = " . $this->moduleid . " 
+				and module_type ='" . $this->moduletype . "'
 		");
-
+		
 		return $d ? $d[0] : null;
 	}
 	
@@ -166,6 +289,16 @@ class UserRights
     private function getAuthorizeState()
 	{
 		return $this->authorizestate;
+	}
+
+    private function setManageItemState( $state )
+	{
+		$this->manageItemState=$state;
+	}
+
+    private function getManageItemState()
+	{
+		return $this->manageItemState;
 	}
 
     private function setModel( $model )
@@ -187,6 +320,16 @@ class UserRights
     {
 		$this->controller=$controller;
     }
+
+    private function setMessage( $message )
+	{
+		$this->message=$message;
+	}
+
+	private function getAllowNoProjectId()
+	{
+		return $this->allowNoProjectId;
+	}
 
     private function setModuleId()
     {
@@ -239,17 +382,54 @@ class UserRights
 		$this->user = $d ? $d[0] : null;
     }
 
-    private function setMessage( $message )
+    private function setUserItems()
 	{
-		$this->message=$message;
+		$this->useritems=array();
+		
+		$d=$this->model->freeQuery( "
+			select
+				item_id
+			from
+				%PRE%user_item_access
+			where
+				project_id = " . $this->projectid . " 
+				and user_id = " . $this->userid . " 
+				and item_type ='" . $this->itemtype . "'
+		");
+
+		foreach((array)$d as $val)
+		{
+			array_push( $this->useritems,$val['item_id'] );
+		}
 	}
 
-	private function getAllowNoProjectId()
+    private function setUserSubjacentItems()
 	{
-		return $this->allowNoProjectId;
+		$this->subjacentitems=array();
+		
+		foreach((array)$this->useritems as $item)
+		{
+			$d=$this->model->freeQuery( "
+				select
+					taxon_id
+				from
+					%PRE%taxon_quick_parentage _sq
+				where
+					_sq.project_id = " . $this->projectid . " 
+					and MATCH(_sq.parentage) AGAINST ('" . $item . "' in boolean mode)
+			");
+			
+			foreach((array)$d as $val)
+			{
+				array_push( $this->subjacentitems, $val['taxon_id'] );
+			}		
+		}
 	}
-
-
+	
+	private function isCurrentItemInUserOrSubjacentItems()
+	{
+		return in_array( $this->itemid, (array)$this->useritems ) || in_array( $this->itemid, (array)$this->subjacentitems );
+	}
 
 
 
@@ -292,42 +472,5 @@ return true;
 
 */
 
-    public function reInitializeRights()
-    {
-		die('UserRights::reInitializeRights');
-
-        $cur = $this->getUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
-        $this->setUserSessionRights($cur['rights']);
-        $this->setUserSessionRoles($cur['roles']);
-        $this->setUserSessionNumberOfProjects($cur['number_of_projects']);
-    }
-
-    public function setUserRoleId()
-    {
-		die('UserRights::setUserRoleId');
-	
-		
-        if (!isset($_SESSION['admin']['user']['_roles']))
-		{
-            $_SESSION['admin']['user']['currentRole'] = null;
-        }
-        else
-		{
-            $d = $this->getCurrentProjectId();
-
-            if (is_null($d))
-			{
-                $_SESSION['admin']['user']['currentRole'] = null;
-            }
-            else
-			{
-                foreach ((array) $_SESSION['admin']['user']['_roles'] as $val)
-				{
-                    if ($val['project_id'] == $d)
-                        $_SESSION['admin']['user']['currentRole'] = $val["role_id"];
-                }
-            }
-        }
-    }
 
 }

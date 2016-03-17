@@ -5,7 +5,7 @@
 &nbsp;
 <a href="contents.php" class="allLookupLink">{t}Contents{/t}</a>
 &nbsp;
-<a href="edit.php" class="allLookupLink">{t}Create new{/t}</a>
+<a href="create_page.php" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
