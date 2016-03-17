@@ -46,8 +46,10 @@
 		<th>NSR ID:</th>
 		<td>{if $actor.id}{$actor.nsr_id}{else}(wordt automatisch gegenereerd){/if}</td>
 	</tr>
+{if ($actor.id && $CRUDstates.can_update) || (!$actor.id && $CRUDstates.can_create)}
 	<tr><th><input type="submit" value="save" /></th><td></td></tr>
-{if $actor.id}
+{/if}
+{if $actor.id && $CRUDstates.can_delete}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 	<tr><th><a href="#" onclick="doDelete('Weet u zeker dat u &quot;{$actor.name|@escape}&quot; wilt verwijderen?\nEr zijn {$links.presences|@count} statussen, {$links.names|@count} namen en {$links.passports|@count} tabbladen aan deze persoon gekoppeld.');return false;">actor verwijderen</a></th><td></td></tr>
 {/if}

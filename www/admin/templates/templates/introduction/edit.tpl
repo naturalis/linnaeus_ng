@@ -1,10 +1,13 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <form name="theForm" id="theForm" method="post" action="edit.php" >
+{if $CRUDstates.can_update}
 <input type="button" value="{t}save{/t}" onclick="freemodSaveContentAll()" style="margin-right:5px" />
 <input type="button" value="{t}save and preview{/t}" onclick="freemodDoPreview()" style="margin-right:5px" />
-{*<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" style="margin-right:15px" />*}
+{/if}
+{if $CRUDstates.can_delete}
 <input type="button" value="{t}delete{/t}" onclick="freemodDeletePage()" />
+{/if}
 <input type="hidden" name="id" id="id" value="{$id}" />
 <input type="hidden" name="action" id="action" value="" />
 <div style="width:890px;height:610px;border:1px solid #aaf;margin-top:10px;">
@@ -50,10 +53,15 @@
 <img
 	onclick="allShowMedia('{$session.admin.project.urls.project_media}{$page.image.file_name}','{$page.image.file_name}');"
 	style="cursor:pointer"
-	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" /><br />
+	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" />
+    {if $CRUDstates.can_update}
+    <br />
 	<span class="a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
+    {/if}
 {else}
+{if $CRUDstates.can_update}
 <span class="a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}Add an image to this page{/t}</span>
+{/if}
 {/if}
 </p>
 </form>

@@ -11,6 +11,8 @@
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
 
+		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
+		{$CRUDstates.can_delete}
 
 
 

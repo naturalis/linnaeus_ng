@@ -436,6 +436,21 @@ class Controller extends BaseClass
 			$this->UserRights->hasAppropriateLevel()==true;
 	}
 
+    public function getCRUDstates()
+    {
+		$d=array();
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$d['can_create']=$this->getAuthorisationState();
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+		$d['can_read']=$this->getAuthorisationState();
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		$d['can_update']=$this->getAuthorisationState();
+		$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+		$d['can_delete']=$this->getAuthorisationState();
+		return $d;
+	}
+
+
     public function isCurrentUserSysAdmin ()
     {
 		return $this->UserRights->isSysAdmin();
