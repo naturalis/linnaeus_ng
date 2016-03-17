@@ -401,9 +401,9 @@ class Controller extends BaseClass
 		$this->UserRights->setUserRoleId();
     }
 
-    public function checkAuthorisation($allowNoProjectId = false)
+    public function checkAuthorisation( )
     {
-		if ( !$this->UserRights->isAuthorized() )
+		if ( !$this->UserRights->canAccessModule() )
 		{
 			if ( null==$this->getCurrentUserId() )
 			{
@@ -411,22 +411,29 @@ class Controller extends BaseClass
 			}
 			else
 			{
-				$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getMessage();
+				$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 			}
+		}
+		else
+		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction() )
+		{
+			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
+			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 		}
 		else
 		{
 			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
 		}
-		
-
-		if ( !$this->UserRights->canManageItem() )
-		{
-			die( $this->UserRights->getMessage() );
-		}
-		
     }
+
+    public function getAuthorisationState()
+    {
+		return
+			$this->UserRights->canAccessModule()==true &&
+			$this->UserRights->canManageItem()==true &&
+			$this->UserRights->canPerformAction()==true;
+	}
 
     public function isCurrentUserSysAdmin ()
     {

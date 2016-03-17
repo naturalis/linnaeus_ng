@@ -1,12 +1,24 @@
 <?php
 
 /*
+
+	export!!!
+		getActionExport
+
 	read/write
 
 	implement roles
 	always include projects
 	
 	INDEXES!
+
+		$this->UserRights->setItemId( $this->rGetId() );
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		$this->checkAuthorisation(); // redirects
+
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+		if ( $this->getAuthorisationState()==false ) return; // just true or false
+
 
 */
 
@@ -36,20 +48,21 @@ class UserRights
 	private $controller;
 	private $moduleid;
 	private $moduletype;
+	private $usermoduleaccess;
 	private $itemid;
 	private $itemtype;
 	private $action;
 	private $allowNoProjectId=false;
 	private $authorizestate;
-	private $manageItemState;
-	private $message;
+	private $manageitemstate;
+	private $actionstate;
+	private $status;
 	private $useritems;
 	private $subjacentitems;
 
 	protected $C_moduleTypes=array('standard','custom');
 	protected $C_itemTypes=array('taxon');
-	protected $C_actions=array('create','read','update','delete','reference');
-
+	protected $C_actions=array('create','read','update','delete','publish','export');
 
     public function __construct( $p )
     {
@@ -62,9 +75,11 @@ class UserRights
 		$this->setActionType( $this->getActionRead() );
 		$this->setUser();
 		$this->setModuleId();
+		$this->setUserModuleAccess();
     }
 
-    public function isAuthorized()
+
+    public function canAccessModule()
     {
 		$p=isset( $this->projectid );
 		$u=isset( $this->userid );
@@ -73,55 +88,55 @@ class UserRights
 
 		if ( !$u ) 
 		{
-			$this->setMessage( '9: user not logged in' );
+			$this->setStatus( 'no access: user not logged in' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $u && $this->isSysAdmin() ) 
 		{
-			$this->setMessage( '1: user logged in, is sysadmin (full access)' );
+			$this->setStatus( 'access: user logged in, is sysadmin' );
 			$this->setAuthorizeState( true );
 		}
 		else
 		if ( $u && $this->getAllowNoProjectId() )
 		{
-			$this->setMessage( '8: user logged in, page allows absence of project ID' );
+			$this->setStatus( 'access: user logged in, page allows absence of project ID' );
 			$this->setAuthorizeState( true );
 		}
 		else
 		if ( !$p ) 
 		{
-			$this->setMessage( '2: no project selected (no project ID set)' );
+			$this->setStatus( 'no access: no project selected' );
 			$this->setAuthorizeState( false );
 		} 
 		else
 		if ( $p && !$u ) 
 		{
-			$this->setMessage( '3: attempting to access a project page without being logged in (project ID set, user ID not set)' );
+			$this->setStatus( 'no access: attempting to access a project page without being logged in' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $p && $u  && !$c && !$m )
 		{
-			$this->setMessage( '4: accessing non-module page (project ID set, user ID set, no controller & module ID set)' );
+			$this->setStatus( 'access: accessing non-module page' );
 			$this->setAuthorizeState( true );
 		}
 		else
 		if ( $p && $u && $c && !$m )
 		{
-			$this->setMessage( '5: attempting access to unknown module (project ID set, user ID set, controller set, module ID not set)' );
+			$this->setStatus( 'no access: attempting access to unknown module' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $p && $u && $c && $m && !$this->canUserAccessModule() )
 		{
-			$this->setMessage( '6: attempting access to module without proper rights (project ID set, user ID set, module ID set, no rights or can_read is false)' );
+			$this->setStatus( 'no access: attempting access to module without proper rights' );
 			$this->setAuthorizeState( false );
 		}
 		else
 		if ( $p && $u && $c && $m && $this->canUserAccessModule() )
 		{
-			$this->setMessage( '7: accessing module (project ID set, user ID set, module ID set, can_read is true)' );
+			$this->setStatus( 'access: accessing module' );
 			$this->setAuthorizeState( true );
 		}
 		
@@ -133,7 +148,7 @@ class UserRights
 		if( is_null( $this->itemid ) )
 		{
 			$this->setManageItemState( true );
-			$this->setMessage( 's1: no item specified, nothing to test against (access)' );
+			$this->setStatus( 'access: no item specified, nothing to test against' );
 		}
 		else
 		{
@@ -142,21 +157,36 @@ class UserRights
 			if ( count((array)$this->useritems)==0 )
 			{
 				$this->setManageItemState( true );
-				$this->setMessage( 's2: item specified, no user items defined (access by default) ' );
+				$this->setStatus( 'access: item specified, no user items defined' );
 			}
 			else
 			{
 				$this->setUserSubjacentItems();
 				$d=$this->isCurrentItemInUserOrSubjacentItems();
 				$this->setManageItemState( $d );
-				$this->setMessage( sprintf('s3: item specified, user items defined (result: %s)', ( $d ? 'access' : 'no access' ) ) );
+				$this->setStatus( sprintf('%s to item for user', ( $d ? 'access' : 'no access' ) ) );
 			}
 		}
 		
 		return $this->getManageItemState();
     }
-
-
+	
+    public function canPerformAction()
+    {
+		if( is_null( $this->action ) )
+		{
+			$this->setActionState( true );
+			$this->setStatus( 'access: no action specified, nothing to test against' );
+		}
+		else
+		{
+			$d=$this->canUserPerformAction();
+			$this->setActionState( $d );
+			$this->setStatus( sprintf("action '%s' %s for user", $this->action , ( $d ? 'allowed' : 'not allowed' ) ) );
+		}
+		
+		return $this->getActionState();
+    }
 
 
 	public function setAllowNoProjectId( $state )
@@ -203,9 +233,9 @@ class UserRights
 		return isset($this->user['role_id']) && $this->user['role_id']==ID_ROLE_SYS_ADMIN ? true : false;
 	}
 
-    public function getMessage()
+    public function getStatus()
 	{
-		return $this->message;
+		return $this->status;
 	}
 	
 	public function getModuleTypeStandard()
@@ -225,27 +255,32 @@ class UserRights
 
 	public function getActionCreate()
 	{
-		return $this->C_actions[array_search('create',$this->C_itemTypes)];
+		return $this->C_actions[array_search('create',$this->C_actions)];
 	}
 
 	public function getActionRead()
 	{
-		return $this->C_actions[array_search('read',$this->C_itemTypes)];
+		return $this->C_actions[array_search('read',$this->C_actions)];
 	}
 
 	public function getActionUpdate()
 	{
-		return $this->C_actions[array_search('update',$this->C_itemTypes)];
+		return $this->C_actions[array_search('update',$this->C_actions)];
 	}
 
 	public function getActionDelete()
 	{
-		return $this->C_actions[array_search('delete',$this->C_itemTypes)];
+		return $this->C_actions[array_search('delete',$this->C_actions)];
 	}
 
-	public function getActionReference()
+	public function getActionPublish()
 	{
-		return $this->C_actions[array_search('reference',$this->C_itemTypes)];
+		return $this->C_actions[array_search('publish',$this->C_actions)];
+	}
+
+	public function getActionExport()
+	{
+		return $this->C_actions[array_search('export',$this->C_actions)];
 	}
 
 	public function setActionType( $action )
@@ -253,33 +288,9 @@ class UserRights
 		if ( in_array( $action, $this->C_actions ) )
 		{
 			$this->action=$action;
-		}
+		}	
 	}
 
-
-
-	private function getUserModuleStatus()
-	{
-		$d=$this->model->freeQuery( "
-			select
-				* 
-			from
-				%PRE%user_module_access 
-			where
-				project_id = " . $this->projectid . " 
-				and user_id = " . $this->userid . " 
-				and module_id = " . $this->moduleid . " 
-				and module_type ='" . $this->moduletype . "'
-		");
-		
-		return $d ? $d[0] : null;
-	}
-	
-	private function canUserAccessModule()
-	{
-		$d=$this->getUserModuleStatus();
-		return isset($d['can_read']) && $d['can_read']==1 ? true : false;
-	}
 
     private function setAuthorizeState( $state )
 	{
@@ -293,14 +304,24 @@ class UserRights
 
     private function setManageItemState( $state )
 	{
-		$this->manageItemState=$state;
+		$this->manageitemstate=$state;
 	}
 
     private function getManageItemState()
 	{
-		return $this->manageItemState;
+		return $this->manageitemstate;
 	}
 
+	private function setActionState( $state )
+	{
+		$this->actionstate=$state;
+	}
+
+	private function getActionState()
+	{
+		return $this->actionstate;
+	}
+	
     private function setModel( $model )
     {
 		$this->model=$model;
@@ -321,9 +342,9 @@ class UserRights
 		$this->controller=$controller;
     }
 
-    private function setMessage( $message )
+    private function setStatus( $status )
 	{
-		$this->message=$message;
+		$this->status=$status;
 	}
 
 	private function getAllowNoProjectId()
@@ -381,7 +402,37 @@ class UserRights
 
 		$this->user = $d ? $d[0] : null;
     }
+	
+	private function setUserModuleAccess()
+	{
+		if ( is_null($this->moduleid) || is_null($this->moduletype) )
+			return;
+		
+		$d=$this->model->freeQuery( "
+			select
+				can_read,
+				can_write,
+				can_publish
+			from
+				%PRE%user_module_access 
+			where
+				project_id = " . $this->projectid . " 
+				and user_id = " . $this->userid . " 
+				and module_id = " . $this->moduleid . " 
+				and module_type ='" . $this->moduletype . "'
+		");
+		
+		if ( $d )
+		{
+			$this->usermoduleaccess=$d[0];
+		}
+	}
 
+	private function canUserAccessModule()
+	{
+		return isset($this->usermoduleaccess['can_read']) && $this->usermoduleaccess['can_read']==1 ? true : false;
+	}
+	
     private function setUserItems()
 	{
 		$this->useritems=array();
@@ -425,52 +476,21 @@ class UserRights
 			}		
 		}
 	}
-	
+
 	private function isCurrentItemInUserOrSubjacentItems()
 	{
 		return in_array( $this->itemid, (array)$this->useritems ) || in_array( $this->itemid, (array)$this->subjacentitems );
 	}
 
-
-
-
-
-
-		
-/*
-
-Maarten:
-Logic:
-
-user logged in? y → user_id
-select a project (project_id, user_id) → project_id, role_id
-available modules per project (project_id, module_id) → (print list)
-access module (project_id, module_id, user_id) → ControllerBaseName
-
-within a module:
-
-access item (action R) (project_id, module_id, user_id) → (display item)
-access item (action CUD) (project_id, module_id, user_id, item_id) → (add, alter, remove item; R implicit)
-
-function in pseudo code:
-
-public boolean function isAuthorized( project_id, user_id, role_id, module_id, item_id, action )
-{
-    if ( !project_id ) return true;
-    if ( project_id && ( !user_id || !isLoggedIn(user_id) ) ) return false;
-    if ( !module_id ) return true;
-    if ( module_id && !hasModule(project_id,module_id) ) return false;
-
-    if ( canAccessAllModules(role_id) ) return true;
-    if ( !canAccessModule(project_id,module_id,user_id) ) return false;
-    if ( !canUserPerformAction(project_id, module_id, user_id, item_id, item_id) )
-return false;
-
-return true;
-}
-
-
-*/
+	private function canUserPerformAction()
+	{
+		if ( $this->action==$this->getActionCreate() && $this->usermoduleaccess['can_write']==1 ) return true;
+		if ( $this->action==$this->getActionRead() && $this->usermoduleaccess['can_read']==1 ) return true;
+		if ( $this->action==$this->getActionUpdate() && $this->usermoduleaccess['can_write']==1 ) return true;
+		if ( $this->action==$this->getActionDelete() && $this->usermoduleaccess['can_write']==1 ) return true;
+		if ( $this->action==$this->getActionPublish() && $this->usermoduleaccess['can_publish']==1 ) return true;
+		return false;
+	}
 
 
 }
