@@ -36,9 +36,11 @@
 		</tr>
 	</table>
 
+	{if $can_create}
 	<p>
 		<a href="edit.php">nieuwe actor aanmaken</a>
 	</p>
+    {/if}
 
 	<p>
 		<div id="actor-result-list"></div>

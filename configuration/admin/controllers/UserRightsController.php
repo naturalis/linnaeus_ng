@@ -2,6 +2,18 @@
 
 /*
 
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
+
+
+
+
 	workings:
 	UserRights-object is initiated in:
 		Controller::initUserRights()
