@@ -6,6 +6,7 @@
 <style>
 
 ul {
+	margin-top:-10px;
 	padding-left:0px;
 }
 
@@ -55,8 +56,6 @@ NOTICES
     <h3>{t}Management tasks{/t}</h3>
 
     <ul class="management">
-        <li><a href="../projects/">{t}Project administration{/t}</a></li>
-        <li><a href="../users/">{t}User administration{/t}</a></li>
         <li><a href="../module_settings/">{t}Settings{/t}</a></li>
     </ul>
 
