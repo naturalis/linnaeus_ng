@@ -11,6 +11,15 @@ function deleteUser()
 	}
 }
 
+function resetPermissions()
+{
+	if ( confirm(_('Are you sure?')) )
+	{
+		$('#action').val('reset_permissions');
+		$('#theForm').attr('onsubmit','');
+		$('#theForm').submit();
+	}	
+}
 
 function submitUserEditForm()
 {
@@ -104,5 +113,4 @@ function buildTaxaUserList()
 		$('#taxa').append( '<li data-id="' + userTaxa[i].id + '">' + userTaxa[i].name +' <a href="#" onclick="removeTaxonFromUserList(' + userTaxa[i].id + ');buildTaxaUserList();return false;">x</a></li>' );
 	}
 }
-
 
