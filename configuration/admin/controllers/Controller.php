@@ -416,7 +416,7 @@ class Controller extends BaseClass
 			}
 		}
 		else
-		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction() )
+		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction()  || !$this->UserRights->hasAppropriateLevel() )
 		{
 			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
 			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
@@ -432,7 +432,8 @@ class Controller extends BaseClass
 		return
 			$this->UserRights->canAccessModule()==true &&
 			$this->UserRights->canManageItem()==true &&
-			$this->UserRights->canPerformAction()==true;
+			$this->UserRights->canPerformAction()==true &&
+			$this->UserRights->hasAppropriateLevel()==true;
 	}
 
     public function isCurrentUserSysAdmin ()

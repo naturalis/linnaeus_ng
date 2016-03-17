@@ -9,6 +9,7 @@
 <h3>paspoort</h3>
 
 <p>
+
 <form>
 <input type="hidden" id="taxon_id" value="{$concept.id}" />
 <input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
@@ -36,7 +37,11 @@
 
 			<a href="#" class="edit" id="edit{$k}" onclick="openeditor(this);return false;" style="margin-left:0;">edit</a>
             <div id="button-container{$k}" class="button-container" style="display:none">
+            {if $can_publish}
             <input id="publish{$k}" type="checkbox" value="publiceren" {if $v.publish==1}checked="checked"{/if} />publiceren?
+            {else}
+            ({if $v.publish==1}{t}published{/t}{else}{t}unpublished{/t}{/if})
+			{/if}
             </p>
             <p>
             <input id="save{$k}" value="opslaan" type="button" onclick="saveeditordata(this);">

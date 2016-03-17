@@ -2,6 +2,7 @@
 
 	if (!defined('ID_ROLE_SYS_ADMIN')) define('ID_ROLE_SYS_ADMIN',1);
 	if (!defined('ID_ROLE_LEAD_EXPERT')) define('ID_ROLE_LEAD_EXPERT',2);
+	if (!defined('ID_ROLE_EDITOR')) define('ID_ROLE_EDITOR',3);
 	
 	if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
 	

@@ -2,45 +2,55 @@
 
 /*
 
-	export!!!
-		getActionExport
+	workings:
+	UserRights-object is initiated in:
+		Controller::initUserRights()
+	as parameters, it takes
+		getCurrentUserId()
+		getCurrentProjectId()
+		getControllerBaseName()
+	and an arbitrary Table-model (see note below).
 
-	read/write
+	on the database model:
+	class cannot extend Controller class, as it needs to be instantiated in
+	Controller itself. therefore, in order to allow it to perform database
+	queries, an instantiated model from another class is required; hence
+	setModel();
+
+	Controller::checkAuthorisation() performs several tests:
+		canAccessModule()		-> checks access to specific module
+		canManageItem()			-> checks specific assigned taxa
+		canPerformAction()		-> checks specific actions (CRUD, publish)
+		hasAppropriateLevel()	-> check based on role only
+	and redirects to a 'not authorized' page when a check fails. there is a second 
+	function
+		$this->getAuthorisationState()
+	which performs the same checks as checkAuthorisation() but only returns true/false
+
+	set a taxon:	$this->UserRights->setItemId( $this->rGetId() );
+	set an action: 	$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	set a level:	$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+
+	for pages that allow for the absence of a project ID, call
+		$this->UserRights->setAllowNoProjectId( true );
+
+
+	not all of CRUD is implemented; translates to read (R) / write (CUD),
+	ref user_module_access.can_read, user_module_access.can_write
+			
+	export is not an action, but implemented based on hasAppropriateLevel()
+			
+			
+
 
 	implement roles
 	always include projects
 	
-	INDEXES!
-
-		$this->UserRights->setItemId( $this->rGetId() );
-		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-		$this->checkAuthorisation(); // redirects
-
-		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
-		if ( $this->getAuthorisationState()==false ) return; // just true or false
-
 
 */
 
 class UserRights
 {
-	/*
-		class cannot extend Controller class, as it needs to be instantiated in
-		Controller itself. therefore, in order to allow it to perform database
-		queries, an instantiated model from another class is required; hence
-		setModel();
-
-		for pages that allow for the absence of a project ID, call
-			$this->UserRights->setAllowNoProjectId( true );
-		before
-			$this->checkAuthorisation();
-	*/
-
-	// available constants
-	// ID_ROLE_SYS_ADMIN
-	// ID_ROLE_LEAD_EXPERT
-
-
 	private $model;
 	private $userid;
 	private $user;
@@ -52,17 +62,21 @@ class UserRights
 	private $itemid;
 	private $itemtype;
 	private $action;
+	private $requiredlevel;
 	private $allowNoProjectId=false;
 	private $authorizestate;
 	private $manageitemstate;
 	private $actionstate;
+	private $levelstate;
 	private $status;
 	private $useritems;
 	private $subjacentitems;
 
-	protected $C_moduleTypes=array('standard','custom');
-	protected $C_itemTypes=array('taxon');
-	protected $C_actions=array('create','read','update','delete','publish','export');
+	protected $C_moduleTypes=array( 'standard','custom' );
+	protected $C_itemTypes=array( 'taxon' );
+	protected $C_actions=array( 'create','read','update','delete','publish' );
+	protected $C_levels=array( ID_ROLE_SYS_ADMIN,ID_ROLE_LEAD_EXPERT,ID_ROLE_EDITOR );
+
 
     public function __construct( $p )
     {
@@ -73,6 +87,7 @@ class UserRights
 		$this->setController( isset( $p['controller'] ) ? $p['controller'] : null );
 		$this->setModuleType( $this->getModuleTypeStandard() );
 		$this->setActionType( $this->getActionRead() );
+		$this->setRequiredLevel( ID_ROLE_EDITOR );
 		$this->setUser();
 		$this->setModuleId();
 		$this->setUserModuleAccess();
@@ -145,10 +160,10 @@ class UserRights
 
     public function canManageItem()
     {
-		if( is_null( $this->itemid ) )
+		if( is_null( $this->itemid ) || $this->isSysAdmin() )
 		{
 			$this->setManageItemState( true );
-			$this->setStatus( 'access: no item specified, nothing to test against' );
+			$this->setStatus( 'access: no item specified' );
 		}
 		else
 		{
@@ -173,10 +188,10 @@ class UserRights
 	
     public function canPerformAction()
     {
-		if( is_null( $this->action ) )
+		if( is_null( $this->action ) || $this->isSysAdmin() )
 		{
 			$this->setActionState( true );
-			$this->setStatus( 'access: no action specified, nothing to test against' );
+			$this->setStatus( 'access: no action specified' );
 		}
 		else
 		{
@@ -186,6 +201,23 @@ class UserRights
 		}
 		
 		return $this->getActionState();
+    }
+
+    public function hasAppropriateLevel()
+    {
+		if( is_null( $this->requiredlevel ) )
+		{
+			$this->setLevelState( true );
+			$this->setStatus( 'access: no minimum required level specified' );
+		}
+		else
+		{
+			$d=$this->doesUserHaveAppropriateLevel();
+			$this->setLevelState( $d );
+			$this->setStatus( sprintf("minmum required role %s", $this->translateRole( $this->requiredlevel ) ) );
+		}
+		
+		return $this->getLevelState();
     }
 
 
@@ -278,11 +310,6 @@ class UserRights
 		return $this->C_actions[array_search('publish',$this->C_actions)];
 	}
 
-	public function getActionExport()
-	{
-		return $this->C_actions[array_search('export',$this->C_actions)];
-	}
-
 	public function setActionType( $action )
 	{
 		if ( in_array( $action, $this->C_actions ) )
@@ -290,6 +317,16 @@ class UserRights
 			$this->action=$action;
 		}	
 	}
+
+	public function setRequiredLevel( $level )
+	{
+		if ( in_array( $level, $this->C_levels ) )
+		{
+			$this->requiredlevel=$level;
+		}	
+	}
+
+
 
 
     private function setAuthorizeState( $state )
@@ -320,6 +357,16 @@ class UserRights
 	private function getActionState()
 	{
 		return $this->actionstate;
+	}
+	
+	private function setLevelState( $state )
+	{
+		$this->levelstate=$state;
+	}
+
+	private function getLevelState()
+	{
+		return $this->levelstate;
 	}
 	
     private function setModel( $model )
@@ -492,5 +539,61 @@ class UserRights
 		return false;
 	}
 
+	private function doesUserHaveAppropriateLevel()
+	{
+		if ( isset($this->user['role_id']) )
+		{
+			return (int)$this->user['role_id'] <= $this->requiredlevel;
+		}
+		return false;
+	}
+	
+	private function translateRole( $role_id )
+	{
+		switch( $role_id )
+		{
+			case ID_ROLE_SYS_ADMIN:
+				return 'system administrator';
+				break;
+			case ID_ROLE_LEAD_EXPERT:
+				return 'lead expert';
+				break;
+			case ID_ROLE_EDITOR:
+				return 'editor';
+				break;
+			default:
+				return $role_id;
+		}
+	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
