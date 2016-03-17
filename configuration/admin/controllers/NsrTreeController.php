@@ -41,13 +41,28 @@ class NsrTreeController extends NsrController
         $this->initialize();
     }
 
+    private function initialize()
+    {
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
+    }
+
     public function __destruct()
     {
         parent::__destruct();
     }
 
+
     public function indexAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+		$this->checkAuthorisation();
+
 		$tree=$this->restoreTree();
 
 		if (is_null($tree) || $this->rHasVar('tree-reset'))
@@ -66,6 +81,10 @@ class NsrTreeController extends NsrController
     {
         if (!$this->rHasVal('action'))
             return;
+
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+		if ( $this->getAuthorisationState()==false )
+			return;
 
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
@@ -96,16 +115,6 @@ class NsrTreeController extends NsrController
         $this->printPage('ajax_interface');
     }
 
-    private function initialize()
-    {
-		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
-			'id'=>array(
-				'project_id'=>$this->getCurrentProjectId()
-			),
-			'columns'=>'id,nametype',
-			'fieldAsIndex'=>'nametype'
-		));
-    }
 
 	private function restoreTree()
 	{

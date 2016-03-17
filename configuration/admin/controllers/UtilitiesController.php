@@ -62,12 +62,15 @@ class UtilitiesController extends Controller
     {
         $this->smarty->assign('hideControllerPublicName', true);
 
-		$message=$this->translate('You are not authorized to do that.');
-		
-		if ( isset($_SESSION['admin']['user']['authorization_fail_message']) )
-	        $message.='<span style="display:none">' . $_SESSION['admin']['user']['authorization_fail_message'] . '</span>' ;
+	
+        $this->addError( $this->translate('You are not authorized to do that.') );
 
-        $this->addError( $message );
+		if ( isset($_SESSION['admin']['user']['authorization_fail_message']) )
+		{
+	        //$message.='<span style="display:none">' . $_SESSION['admin']['user']['authorization_fail_message'] . '</span>' ;
+			$this->addError( '(' . $_SESSION['admin']['user']['authorization_fail_message'] . ')' );
+		}
+
 
 
 		if (isset($_SESSION['admin']['project']['lead_experts']))
