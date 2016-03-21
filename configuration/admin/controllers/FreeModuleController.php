@@ -110,28 +110,36 @@ class FreeModuleController extends Controller
 
     public function createPageAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 		$this->redirect('edit.php?id=' . $this->createPage());
 	}
 
     public function editAction()
     {
-
 		$this->checkAuthorisation();
 
 		if ($this->rHasVal('action','delete'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
+
 			$this->deletePage();
 			$this->redirect('index.php');
 		} 
 		else
 		if ($this->rHasVal('action','deleteImage'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$this->deleteMedia();
 		} 
 		else
 		if ($this->rHasVal('action','preview'))
 		{
+			$this->checkAuthorisation();
+
 			$this->redirect('preview.php?id='.$this->rGetId());
 		}
 
@@ -152,7 +160,7 @@ class FreeModuleController extends Controller
 		if (isset($page)) $this->smarty->assign('page', $page);
 
 		$this->smarty->assign('navCurrentId', $this->rGetId() ? $this->rGetId() : null);
-		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
+		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : null );
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('includeHtmlEditor', true);
@@ -173,7 +181,6 @@ class FreeModuleController extends Controller
 
     public function browseAction()
     {
-
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Browsing pages'));
@@ -194,7 +201,6 @@ class FreeModuleController extends Controller
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 
         $this->printPage();
-
 	}
 
 
@@ -281,7 +287,7 @@ class FreeModuleController extends Controller
      */
     public function manageAction()
     {
-
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Management'));
@@ -322,6 +328,7 @@ class FreeModuleController extends Controller
      */
     public function orderAction()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Change page order'));
@@ -399,7 +406,7 @@ class FreeModuleController extends Controller
      */
     public function importAction ()
     {
-
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('CSV data import'));
@@ -489,26 +496,26 @@ class FreeModuleController extends Controller
 	*/
     public function ajaxInterfaceAction ()
     {
-
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action', 'save_content')) {
-
+        if ($this->rHasVal('action', 'save_content'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxSaveContent();
-
-        } else if ($this->rHasVal('action', 'get_content')) {
-
-            $this->ajaxActionGetContent();
-
         }
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
-
+		elseif ($this->rHasVal('action', 'get_content'))
+		{
+			if ( !$this->getAuthorisationState() ) return;
+            $this->ajaxActionGetContent();
+        }
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search')))
+		{
+			if ( !$this->getAuthorisationState() ) return;
             $this->getLookupList($this->rGetVal('search'));
-
         }
 
         $this->printPage();
-
     }
 
 	private function setActiveModule($data)
