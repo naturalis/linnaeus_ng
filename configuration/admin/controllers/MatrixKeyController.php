@@ -110,7 +110,6 @@ class MatrixKeyController extends Controller
 
 		// there's no matrices! let's make one.
 		$this->redirect( 'new.php' );
-
     }
 
     public function manageAction ()
@@ -126,6 +125,7 @@ class MatrixKeyController extends Controller
 
     public function newAction ()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
         $this->checkAuthorisation();
 
         $this->setPageName( $this->translate( 'New matrix' ) );
@@ -174,6 +174,7 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasVal('default'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
             $this->setDefaultMatrix($this->rGetVal('default'));
 		}
 
@@ -186,11 +187,17 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasVal('imgdim'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	        $this->checkAuthorisation();
+
 			$this->reacquireStateImageDimensions($this->rGetVal('imgdim'));
 		}
 
         if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+	        $this->checkAuthorisation();
+
             $this->deleteMatrix($this->rGetId());
 
             if ($this->getCurrentMatrixId()==$this->rGetId())
@@ -203,6 +210,9 @@ class MatrixKeyController extends Controller
         else
 		if ($this->rHasVal('action','activate') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	        $this->checkAuthorisation();
+
             $this->setCurrentMatrixId($this->rGetId());
             $this->redirect('edit.php');
         }
@@ -220,6 +230,10 @@ class MatrixKeyController extends Controller
 		{
 			if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 			{
+
+				$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+				$this->checkAuthorisation();
+
 				if ( $this->rHasVar( 'sys_name' ) && !empty($this->rGetVal( 'sys_name' ) ) )
 				{
 					$n=$this->saveMatrixSysName( array(
@@ -245,14 +259,13 @@ class MatrixKeyController extends Controller
 
 			}
 
-            $matrix=$this->getMatrix(  $this->rGetId() );
+            $matrix=$this->getMatrix( $this->rGetId() );
 			$this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['names'][$this->getDefaultProjectLanguage()]['name']));
             $this->smarty->assign('matrix', $matrix);
         }
 
         $this->printPage();
     }
-
 
 	public function editAction ()
     {
@@ -278,13 +291,16 @@ class MatrixKeyController extends Controller
 
     public function charSortAction ()
     {
-        $this->checkAuthorisation();
+		$this->checkAuthorisation();
 
         if ($this->getCurrentMatrixId() == null)
             $this->redirect('matrices.php');
 
         if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             $c = $this->getCharacteristics();
 
             foreach ((array) $c as $key => $val)
@@ -338,6 +354,9 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasVal('delete') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$this->deleteCharacteristicFromGroup(array('groupId'=>$this->rGetVal('delete')));
 			$this->deleteCharacterGroup(array('groupId'=>$this->rGetVal('delete')));
 			$this->deleteGUIMenuOrder();
@@ -345,6 +364,9 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasVal('chars') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$this->deleteCharacteristicFromGroup();
 
 			foreach((array)$this->rGetVal('chars') as $key => $val)
@@ -359,6 +381,9 @@ class MatrixKeyController extends Controller
 
 		if ($this->rHasVal('new') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$c = $this->getCharacterGroups(array('label'=>$this->rGetVal('new')));
 
 			if (!empty($c))
@@ -374,8 +399,8 @@ class MatrixKeyController extends Controller
 
 		}
 
-		$g = $this->getCharacterGroups();
-		$c = $this->getCharactersNotInGroups();
+		$g=$this->getCharacterGroups();
+		$c=$this->getCharactersNotInGroups();
 
 		$this->smarty->assign('groups', $g);
         $this->smarty->assign('characteristics', $c);
@@ -400,6 +425,9 @@ class MatrixKeyController extends Controller
 
 		if ($this->rHasVal('order') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$this->deleteGUIMenuOrder();
 
 			foreach((array)$this->rGetVal('order') as $key => $val)
@@ -433,18 +461,20 @@ class MatrixKeyController extends Controller
         if ($this->getCurrentMatrixId() == null)
             $this->redirect('matrices.php');
 
-        if (!$this->rHasId()) {
+        if (!$this->rHasId())
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
 
             $id = $this->createCharacteristic();
 
-            if ($id) {
-
+            if ($id)
+			{
                 $this->addCharacteristicToMatrix($id);
-
                 $this->redirect('char.php?id=' . $id);
             }
-            else {
-
+            else
+			{
                 $this->addError($this->translate('Could not create character.'));
             }
         }
@@ -459,6 +489,9 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasId() && $this->rHasVal('action', 'delete'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             // delete the char from this matrix (and automatically delete the char itself if it isn't used in any other matrix)
             $this->deleteCharacteristic();
             $this->renumberCharShowOrder();
@@ -467,6 +500,9 @@ class MatrixKeyController extends Controller
         else
 		if ($this->rHasVal('existingChar') && $this->rHasVal('action', 'use'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             $this->addCharacteristicToMatrix($this->rGetVal('existingChar'));
             $this->renumberCharShowOrder();
             $this->redirect('edit.php');
@@ -512,6 +548,9 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasVal('taxon') || $this->rHasVal('variation'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             if ($this->rHasVal('taxon'))
 			{
                 foreach ((array) $this->rGetVal('taxon') as $val) {
@@ -552,7 +591,6 @@ class MatrixKeyController extends Controller
                 'project_id' => $this->getCurrentProjectId(),
                 'matrix_id' => $this->getCurrentMatrixId()
 			));
-//		q($taxa,1);
 
 		$this->smarty->assign('taxa', $taxa);
 
@@ -571,12 +609,18 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasId() && $this->rHasVal('action', 'delete'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             $this->deleteCharacteristicState();
             $this->redirect('edit.php');
         }
         else
 		if ($this->rHasId() && $this->rHasVal('action', 'deleteimage'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             $this->deleteCharacteristicStateImage();
         }
         else
@@ -598,6 +642,9 @@ class MatrixKeyController extends Controller
             }
             else
 			{
+				$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+				$this->checkAuthorisation();
+
                 $id = $this->createState();
 
                 if ($id)
@@ -633,6 +680,9 @@ class MatrixKeyController extends Controller
 
         if (($this->rHasVal('action', 'save') || $this->rHasVal('action', 'repeat')) && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             $filesToSave = $this->getUploadedMediaFiles();
 
             if (!$this->verifyData($this->rGetAll(), $filesToSave))
@@ -692,6 +742,8 @@ class MatrixKeyController extends Controller
 
         if ($this->rHasVal('states') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 
 			$i=0;
 			foreach((array)$this->rGetVal('states') as $val)
@@ -704,6 +756,9 @@ class MatrixKeyController extends Controller
 		} else
         if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit())
 		{
+
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 
             $c = $this->getCharacteristicStates($this->rGetVal('sId'));
 
@@ -811,6 +866,9 @@ class MatrixKeyController extends Controller
 
         if ($this->rGetVal('action') == 'save_matrix_name')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->ajaxSaveMatrixName();
         }
         else
@@ -821,6 +879,9 @@ class MatrixKeyController extends Controller
         else
 		if ($this->rGetVal('action') == 'save_characteristic_label')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->ajaxActionSaveCharacteristicLabel();
         }
         else
@@ -841,16 +902,25 @@ class MatrixKeyController extends Controller
         else
 		if ($this->rGetVal('action') == 'save_state_label')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->ajaxActionSaveCharacteristicStateLabel();
         }
         else
 		if ($this->rGetVal('action') == 'save_state_text')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->ajaxActionSaveCharacteristicStateText();
         }
         else
 		if ($this->rGetVal('action') == 'remove_taxon')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->removeTaxon();
             $d = $this->getMatrices();
 
@@ -876,11 +946,17 @@ class MatrixKeyController extends Controller
         else
 		if ($this->rGetVal('action') == 'add_link')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->addLink();
         }
         else
 		if ($this->rGetVal('action') == 'delete_link')
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
+
             $this->deleteLinks(array(
                 'id' => $this->rGetId()
             ));
