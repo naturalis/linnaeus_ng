@@ -10,6 +10,7 @@
 
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
+		if ( !$this->getAuthorisationState() ) return;
 
 		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 		{$CRUDstates.can_delete}
@@ -59,6 +60,9 @@
 
 	implement roles
 	always include projects
+	EXPORTS!
+	ref key ends?
+	ref matrices?
 	
 
 */
