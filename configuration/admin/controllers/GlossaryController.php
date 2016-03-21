@@ -69,9 +69,8 @@ class GlossaryController extends Controller
      */
     public function __construct ()
     {
-
         parent::__construct();
-        $this->initialize();
+        $this->setMediaController();
     }
 
     /**
@@ -81,17 +80,8 @@ class GlossaryController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
-
     }
-
-
-    private function initialize()
-    {
-        $this->setMediaController();
-	}
-
 
 	private function setMediaController()
 	{
@@ -643,13 +633,12 @@ class GlossaryController extends Controller
 		}
 
 		if ($this->rHasVal('action','save')) {
-			$this->setOverviewImage();
 			$this->saveCaptions();
 			$this->addMessage('Saved');
 		}
 
 		if ($this->rHasVal('action','up') || $this->rHasVal('action','down')) {
-		    if ($this->moveImageInOrder()) {
+		    if ($this->moveMediaInOrder()) {
 				$this->addMessage('New media order saved');
 			}
 		}
@@ -1308,7 +1297,7 @@ class GlossaryController extends Controller
 
 	}
 
-    private function moveImageInOrder()
+    private function moveMediaInOrder()
     {
 		$mediaId = $this->rHasVal('subject') ? $this->rGetVal('subject') : false;
 		$direction = $this->rHasVal('action') ? $this->rGetVal('action') : false;
@@ -1379,15 +1368,6 @@ class GlossaryController extends Controller
 		    ));
 
 		}
-    }
-
-    private function setOverviewImage ()
-    {
-        $mediaId = $this->rHasVal('overview-image') ?
-            $this->rGetVal('overview-image') : -1;
-
-        $this->_mc->setOverviewImage($mediaId);
-
     }
 
     private function deleteItemMedia ($mediaId)
