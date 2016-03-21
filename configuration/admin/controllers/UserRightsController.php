@@ -58,7 +58,8 @@
 			
 implementatie is niet leterlijk: delete iets == right delete; subdelen (zoals states) vallen 9onde update
 
-
+laten zien welke dingen op basis van ro zijn
+	
 
 	implement roles
 	always include projects
