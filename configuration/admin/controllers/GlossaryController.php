@@ -600,14 +600,9 @@ class GlossaryController extends Controller
 
 		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']));
 
-        if (!$this->rHasId())
-		{
-			$this->redirect('index.php');
-		}
-
 		if ($this->rHasVal('action','delete'))
 		{
-			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
 			$r = $this->detachMedia();
