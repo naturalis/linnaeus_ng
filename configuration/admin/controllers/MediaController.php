@@ -36,6 +36,13 @@ class MediaController extends Controller
     private $itemId;
     private $languageId;
 
+    public static $singleMediaFileModules = array(
+        'Introduction',
+        'Key',
+        'Matrix',
+        'Freemodule'
+    );
+
     public static $metadataFields = array(
         'title',
         'location',
@@ -289,7 +296,7 @@ class MediaController extends Controller
                 ));
 
                 // Store data
-                if (empty($this->_result->error)) {
+                if (!empty($this->_result) && empty($this->_result->error)) {
 
                     $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1024) . ' KB)');
 
@@ -337,7 +344,8 @@ class MediaController extends Controller
                          ));
                     }
                 } else {
-                    $this->addError(_('Could not upload media') . ': ' . $this->_result->error);
+                    $this->addError(_('Could not upload media') .
+                    (isset($this->_result->error) ? ': ' . $this->_result->error : ''));
                 }
             }
 
@@ -364,17 +372,21 @@ class MediaController extends Controller
 
     private function setItemTemplate ()
     {
-        // Verify module_id and item_id if set
+        // Verify module_id and item_id are set
         if ($this->rHasVal('module_id') && $this->rHasVal('item_id')) {
 
             $mi = new ModuleIdentifierController();
             $mi->setModuleId($this->moduleId);
             $mi->setItemId($this->itemId);
 
-            $this->smarty->assign('module_name', $mi->getModuleName());
+            $moduleName = $mi->getModuleName();
+            $inputType = in_array($moduleName, $this::$singleMediaFileModules) ?
+                'single' : 'multiple';
+
+            $this->smarty->assign('module_name', $moduleName);
             $this->smarty->assign('item_name', $mi->getItemName());
-            $this->smarty->assign('back_url',
-                $this->rHasVal('back_url') ? $this->rGetVal('back_url') : $_SERVER['HTTP_REFERER']);
+            $this->smarty->assign('back_url', $this->setBackUrl());
+            $this->smarty->assign('input_type', $inputType);
         }
     }
 
@@ -397,6 +409,19 @@ class MediaController extends Controller
 			)
         );
 
+    }
+
+    private function setBackUrl ()
+    {
+        if ($this->rHasVal('back_url')) {
+            return $this->rGetVal('back_url');
+        }
+        $url = $_SERVER['HTTP_REFERER'];
+        // Append id if this is not present in the referrer
+        if (strpos($url, 'id=') === false) {
+            $url .= (strpos($url, '?') === false ? '?' : "&") . 'id=' . $this->itemId;
+        }
+        return $url;
     }
 
     private function uploadedFileIsValid ($file)
@@ -445,7 +470,9 @@ class MediaController extends Controller
             return false;
         }
 
-        $mediaIds = $this->rGetVal('media_ids');
+        // media_ids is single value if coming from radio form; transform to array
+        $mediaIds = is_array($this->rGetVal('media_ids')) ? $this->rGetVal('media_ids') :
+            array($this->rGetVal('media_ids') => 'on');
 
         foreach ($mediaIds as $k => $v) {
             $this->models->MediaModules->insert(array(
