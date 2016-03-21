@@ -956,7 +956,6 @@ class MatrixKeyController extends Controller
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			if ( !$this->getAuthorisationState() ) return;
-
             $this->deleteLinks(array(
                 'id' => $this->rGetId()
             ));
