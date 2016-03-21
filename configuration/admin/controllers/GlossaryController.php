@@ -218,100 +218,89 @@ class GlossaryController extends Controller
      */
     public function editAction()
     {
-
         $this->checkAuthorisation();
 
-		if ($this->rHasVal('letter')) {
-
+		if ($this->rHasVal('letter'))
+		{
 			$gloss = $this->getFirstGlossaryTerm($this->rGetVal('letter'));
-
-		} else
-		if ($this->rHasId()) {
-
+		} 
+		else
+		if ($this->rHasId())
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	        $this->checkAuthorisation();
 			$gloss = $this->getGlossaryTerm($this->rGetId());
-
-		} else
-		if (!$this->rHasVal('action','new')) {
-
+		} 
+		else
+		if (!$this->rHasVal('action','new'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+	        $this->checkAuthorisation();
 			$gloss = $this->getFirstGlossaryTerm();
-
 		}
 
-		if (isset($gloss['term'])) {
-
+		if (isset($gloss['term']))
+		{
 			$gloss['media'] = $this->getGlossaryMedia($gloss['id']);
-
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($gloss['term'],0,1))));
-
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLanguage','value'=>$gloss['language_id']));
-
     	    $this->setPageName(sprintf($this->translate('Editing glossary term "%s"'),$gloss['term']));
-
 			$navList = $this->getGlossaryTermsNavList();
-
-		} else {
-
+		} 
+		else
+		{
     	    $this->setPageName($this->translate('New glossary term'));
-
 		}
 
-		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
-
-
+		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit())
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+	        $this->checkAuthorisation();
 
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($this->rGetVal('term'),0,1))));
-
 			$this->moduleSession->setModuleSetting( array('setting'=>'activeLanguage','value'=> $this->rGetVal('language_id')));
 
 			$this->deleteGlossaryTerm($this->rGetId());
-
 			$d = $this->getFirstGlossaryTerm();
-
 			$navList = $this->getGlossaryTermsNavList(true);
-
 			$this->redirect('edit.php?id='.$d['id']);
-
-			//$this->redirect('browse.php');
-
 		}
 
-		if ($this->rHasVal('activeLanguage')) {
-
+		if ($this->rHasVal('activeLanguage'))
+		{
 			$activeLanguage = $this->rGetVal('activeLanguage');
-
-		} elseif (isset($gloss)) {
-
+		}
+		elseif (isset($gloss))
+		{
 			$activeLanguage = $gloss['language_id'];
-
-		} else {
-
+		} 
+		else
+		{
 			$activeLanguage = $this->getDefaultProjectLanguage();
-
 		}
 
-		if ($this->rHasVal('term') && $this->rHasVal('definition') && !$this->rHasVal('action','browse') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('term') && $this->rHasVal('definition') && !$this->rHasVal('action','browse') && !$this->isFormResubmit())
+		{
+
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	        $this->checkAuthorisation();
 
 			$data = $this->rGetAll();
 
 			$data['project_id'] = $this->getCurrentProjectId();
-
 			$data['id'] =  $this->rHasId() ? $this->rGetId() : null;
-
             $data['definition'] = $this->cleanUpRichContent($data['definition']);
 
-			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id']))) {
-
+			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id'])))
+			{
 				$this->addError($this->translate('Glossary term already exists.'));
-
 				$gloss = $this->rGetAll();
-
 				$activeLanguage = $this->rGetVal('language_id');
-
-			} else
-			if ($this->models->Glossary->save($data)) {
-
+			} 
+			else
+			if ($this->models->Glossary->save($data))
+			{
 				$navList = $this->getGlossaryTermsNavList(true);
-
 				$id = $this->rHasId() ? $this->rGetId() : $this->models->Glossary->getNewId();
 
 				$this->models->GlossarySynonyms->delete(
@@ -321,10 +310,10 @@ class GlossaryController extends Controller
 					)
 				);
 
-				if ($this->rHasVal('synonyms')) {
-
-					foreach((array)$this->rGetVal('synonyms') as $key => $val) {
-
+				if ($this->rHasVal('synonyms'))
+				{
+					foreach((array)$this->rGetVal('synonyms') as $key => $val)
+					{
 						$this->models->GlossarySynonyms->save(
 							array(
 								'project_id' => $this->getCurrentProjectId(),
@@ -333,40 +322,31 @@ class GlossaryController extends Controller
 								'synonym' => rawurldecode($val)
 							)
 						);
-
 					}
-
 				}
 
 				$this->clearTempValues();
 
-				if ($this->rHasVal('action','media')) {
-
+				if ($this->rHasVal('action','media'))
+				{
 					$this->redirect('media.php?id='.$id);
-
-				} else
-				if ($this->rHasVal('action','preview')) {
-
+				} 
+				else
+				if ($this->rHasVal('action','preview'))
+				{
 					$this->redirect('preview.php?id='.$id);
-
-				} else {
-
+				} 
+				else 
+				{
 				    $this->moduleSession->setModuleSetting( array('setting'=>'activeLetter','value'=> strtolower(substr($this->rGetVal('term'),0,1))));
-
 				    $this->moduleSession->setModuleSetting( array('setting'=>'activeLanguage','value'=> $this->rGetVal('language_id')));
-
 					$this->redirect('edit.php?id='.$id);
-
-					//$this->redirect('browse.php');
-
 				}
-
-			} else {
-
-				$this->addError($this->translate('Could not save glossary term.'));
-
 			}
-
+			else 
+			{
+				$this->addError($this->translate('Could not save glossary term.'));
+			}
 		}
 
 		$alpha = $this->getActualAlphabet($this->getActiveLanguage());
@@ -379,11 +359,8 @@ class GlossaryController extends Controller
 		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
-
 		$this->smarty->assign('activeLanguage', $activeLanguage);
-
 		$this->smarty->assign('backUrl', $this->rHasId() ? 'browse.php' : 'index.php');
-
 		$this->smarty->assign('alpha', $alpha);
 
         $this->printPage();
@@ -398,15 +375,17 @@ class GlossaryController extends Controller
     public function mediaUploadAction ()
     {
 
-        $this->checkAuthorisation();
+		$this->checkAuthorisation();
 
-        if ($this->rHasId()) {
-        // get existing glossary
+        if ($this->rHasId())
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 
             $gloss = $this->getGlossaryTerm($this->rGetId());
 
-            if ($gloss['id']) {
-
+            if ($gloss['id'])
+			{
 				$this->setBreadcrumbIncludeReferer(
 					array(
 						'name' => $this->translate('Editing glossary term'),
@@ -416,20 +395,18 @@ class GlossaryController extends Controller
 
                 $this->setPageName(sprintf($this->translate('New media for "%s"'),$gloss['term']));
 
-                if ($this->requestDataFiles && !$this->isFormResubmit()) {
-
+                if ($this->requestDataFiles && !$this->isFormResubmit())
+				{
                     $filesToSave =  $this->getUploadedMediaFiles();
-
 					$firstInsert = false;
 
-                    if ($filesToSave) {
-
-                        foreach((array)$filesToSave as $key => $file) {
-
+                    if ($filesToSave)
+					{
+                        foreach((array)$filesToSave as $key => $file)
+						{
                             $thumb = false;
 
-                            if (
-                                $this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
+                            if ($this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
                                 $this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
                             ) {
 
@@ -439,11 +416,8 @@ class GlossaryController extends Controller
                                 if ($this->helpers->ImageThumberHelper->save(
                                     $this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
                                 )) {
-
                                     $thumb = $pi['filename'].'-thumb.'.$pi['extension'];
-
                                 }
-
                             }
 
                             $mt = $this->models->GlossaryMedia->save(
@@ -459,26 +433,23 @@ class GlossaryController extends Controller
                                 )
                             );
 
-							if (!$firstInsert) {
-
+							if (!$firstInsert)
+							{
 								$firstInsert = array('id'=>$this->models->GlossaryMedia->getNewId(),'name'=>$file['name']);
-
 							}
 
-                            if ($mt) {
-
+                            if ($mt)
+							{
                                 $this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-
-                            } else {
-
+                            } 
+							else
+							{
                                 $this->addError($this->translate('Failed writing uploaded file to database.'),1);
-
                             }
-
                         }
 
-						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>') {
-
+						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>')
+						{
 							$_SESSION['admin']['system']['media']['newRef'] =
 								'<span class="inline-'.substr($file['mime_type'],0,strpos($file['mime_type'],'/')).'" onclick="showMedia(\''.addslashes($_SESSION['admin']['project']['urls']['project_media'].$file['name']).'\',\''.addslashes($file['name']).'\');">'.
 									$firstInsert['name'].
@@ -492,14 +463,13 @@ class GlossaryController extends Controller
 
                 }
 
-            } else {
-
-                $this->addError($this->translate('Unknown glossary term.'));
-
+            } 
+			else
+			{
+				$this->addError($this->translate('Unknown glossary term.'));
             }
 
             $this->smarty->assign('id',$this->rGetId());
-
             $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
             $this->smarty->assign('iniSettings',
@@ -511,17 +481,14 @@ class GlossaryController extends Controller
 
 
 			$this->smarty->assign('alpha', $this->getActualAlphabet($this->getActiveLanguage()));
-
 			$this->smarty->assign('navList', $this->getGlossaryTermsNavList());
-
 			$this->smarty->assign('navCurrentId',$gloss['id']);
 
-        } else {
-
+        } 
+		else 
+		{
             $this->addError($this->translate('No glossary term specified.'));
-
         }
-
 
         $this->printPage();
 
@@ -615,10 +582,10 @@ class GlossaryController extends Controller
 
     public function mediaAction ()
     {
-
         $this->checkAuthorisation();
 
-		if (!$this->rHasId()) {
+		if (!$this->rHasId())
+		{
 		    $this->redirect('index.php');
 		}
 
@@ -633,23 +600,37 @@ class GlossaryController extends Controller
 
 		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']));
 
-        if (!$this->rHasId()) {
+        if (!$this->rHasId())
+		{
 			$this->redirect('index.php');
 		}
 
-		if ($this->rHasVal('action','delete')) {
+		if ($this->rHasVal('action','delete'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
+
 			$r = $this->detachMedia();
 			$this->addMessage($r);
 		}
 
-		if ($this->rHasVal('action','save')) {
+		if ($this->rHasVal('action','save'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$this->setOverviewImage();
 			$this->saveCaptions();
 			$this->addMessage('Saved');
 		}
 
-		if ($this->rHasVal('action','up') || $this->rHasVal('action','down')) {
-		    if ($this->moveImageInOrder()) {
+		if ($this->rHasVal('action','up') || $this->rHasVal('action','down'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
+		    if ($this->moveImageInOrder())
+			{
 				$this->addMessage('New media order saved');
 			}
 		}
@@ -663,7 +644,6 @@ class GlossaryController extends Controller
 		$this->smarty->assign('item_id', $this->rGetId());
 
         $this->printPage();
-
     }
 
 
@@ -674,37 +654,46 @@ class GlossaryController extends Controller
      */
     public function ajaxInterfaceAction ()
     {
-
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','delete_media')) {
-
+        if ($this->rHasVal('action','delete_media'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			if (!$this->getAuthorisationState() ) return;
             $this->deleteMedia();
-
-        } else if ($this->rHasVal('action','save_media_desc')) {
-
+        } 
+		elseif ($this->rHasVal('action','save_media_desc'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if (!$this->getAuthorisationState() ) return;
             $this->ajaxActionSaveMediaDescription();
-
-        } else if ($this->rHasVal('action','get_media_desc')) {
-
+        }
+		elseif ($this->rHasVal('action','get_media_desc'))
+		{
+			if (!$this->getAuthorisationState() ) return;
             $this->ajaxActionGetMediaDescription();
-
-        } else if ($this->rHasVal('action','get_media_descs')) {
-
+        }
+		elseif ($this->rHasVal('action','get_media_descs'))
+		{
+			if (!$this->getAuthorisationState() ) return;
             $this->ajaxActionGetMediaDescriptions();
-
-        } else if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
-
+        } 
+		elseif ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search')))
+		{
+			if (!$this->getAuthorisationState() ) return;
             $this->getLookupList($this->rGetVal('search'));
-
-        } else if ($this->rHasVal('action','save_synonym') && $this->rHasId() && $this->rHasVal('synonym')) {
-
+        } 
+		elseif ($this->rHasVal('action','save_synonym') && $this->rHasId() && $this->rHasVal('synonym'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if (!$this->getAuthorisationState() ) return;
 			$this->saveSynonym($this->rGetId(),$this->rGetVal('language_id'),$this->rGetVal('synonym'));
-
-        } else if ($this->rHasVal('action','delete_synonym') && $this->rHasId() && $this->rHasVal('synonym')) {
-
+        } 
+		elseif ($this->rHasVal('action','delete_synonym') && $this->rHasId() && $this->rHasVal('synonym'))
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			if (!$this->getAuthorisationState() ) return;
 			$this->deleteSynonymByName($this->rGetId(),$this->rGetVal('language_id'),$this->rGetVal('synonym'));
-
         }
 
         $this->printPage();
