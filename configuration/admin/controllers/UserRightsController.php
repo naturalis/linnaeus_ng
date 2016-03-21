@@ -56,6 +56,8 @@
 	export is not an action, but implemented based on hasAppropriateLevel()
 			
 			
+implementatie is niet leterlijk: delete iets == right delete; subdelen (zoals states) vallen 9onde update
+
 
 
 	implement roles
