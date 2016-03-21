@@ -143,6 +143,9 @@ class Literature2Controller extends NsrController
 
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
+
 			$this->setReferenceId($this->rGetId());
 			$this->setReferenceBefore();
 			$this->deleteReference();
@@ -153,6 +156,9 @@ class Literature2Controller extends NsrController
 		else
 		if ($this->rHasId() && $this->rHasVal('action','save'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$this->setReferenceId($this->rGetId());
 			$this->setReferenceBefore();
 			$this->updateReference();
@@ -161,9 +167,13 @@ class Literature2Controller extends NsrController
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
+
 			$this->smarty->assign('reference',$this->rGetAll());
 			$this->saveReference();
 		}
+
 		if ($this->rHasId())
 		{
 			$this->setReferenceId($this->rGetId());
@@ -205,14 +215,22 @@ class Literature2Controller extends NsrController
 
 		if ( $this->rHasVal('action','save') )
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 			$this->savePublicationType();
-		} else
+		} 
+		else
 		if ( $this->rHasVal('action','save_translations') )
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 			$this->savePublicationTypeTranslations();
-		} else
+		} 
+		else
 		if ( $this->rHasId() && $this->rHasVal('action','delete') )
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
 			$this->deletePublicationType();
 		}
 
@@ -226,7 +244,9 @@ class Literature2Controller extends NsrController
 
 	public function bulkUploadAction()
 	{
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
+
 		$this->setPageName($this->translate('Bulk upload (matching)'));
 
 		$raw=null;
@@ -454,7 +474,9 @@ class Literature2Controller extends NsrController
 
     public function bulkProcessAction()
 	{
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
+
 		$this->setPageName($this->translate('Bulk upload (further matching)'));
 
 		$matches=null;
@@ -604,7 +626,9 @@ class Literature2Controller extends NsrController
 
     public function bulkSaveAction()
 	{
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
+
 		$this->setPageName($this->translate('Bulk upload (saving)'));
 
 		if (!$this->isFormResubmit())
@@ -925,6 +949,7 @@ class Literature2Controller extends NsrController
 
 	public function bulkUploadDownloadAction()
 	{
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 
 		$literature_id_index=$this->moduleSession->getModuleSetting('literature_id_index');
