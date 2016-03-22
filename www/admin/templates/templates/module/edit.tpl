@@ -1,3 +1,11 @@
+<style>
+.image-preview {
+	max-width: 300px;
+	max-height: 250px;
+	border: 1px solid #ddd;
+}
+</style>
+
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <form name="theForm" id="theForm" method="post" action="" >
@@ -13,7 +21,7 @@
 		<span id="taxon-language-default-language">
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}{$languages[i].language}{/if}
-{/section}		
+{/section}
 		</span>
 {/if}
 	</div>
@@ -44,18 +52,21 @@
 	</div>
 </div>
 {/if}
+
 <p>
 {if $page.image}
-{t}current image for this page:{/t}<br />
-<img
-	onclick="allShowMedia('{$session.admin.project.urls.project_media}{$page.image.file_name}','{$page.image.file_name}');"
-	style="cursor:pointer"
-	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" /><br />
-	<span class="a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
+	<input type="hidden" name="media_id" id="media_id" value="{$page.image.id}" />
+	{t}current image for this page:{/t}<br />
+	<a href="{$page.image.rs_original}" title="{$page.image.name}" rel="prettyPhoto">
+		<img src="{$page.image.rs_original}" alt="{$page.image.caption}" class="image-preview" />
+	</a><br />
+	<span class="a" onclick="freemodDeletePageImage('{$page.image.id}')">{t}(click to detach image){/t}</span>
 {else}
-<span class="a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}add an image to this page{/t}</span>
+	<a href="../media/upload.php?item_id={$id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
+	<a href="../media/select.php?item_id={$id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
 {/if}
 </p>
+
 </form>
 <form action="media_upload.php" method="post" id="imgForm">
 <input type="hidden" name="id" id="id" value="{$id}" />
@@ -76,7 +87,7 @@ $(document).ready(function(){
 	//allSetAutoSaveFreq({$autoSaveFrequency});
 	//freemodRunAutoSave();
 
-{literal}	
+{literal}
 });
 
 function onInitTinyMce() {
