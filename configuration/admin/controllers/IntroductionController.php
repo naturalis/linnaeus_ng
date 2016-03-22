@@ -116,7 +116,7 @@ class IntroductionController extends Controller
 			if ($this->rHasVal('action','deleteImage'))
 			{
 				//$this->deleteMedia();
-				$this->detachMedia();
+				$this->detachAllMedia();
 			}
 			else
 			if ($this->rHasVal('action','preview'))
@@ -648,7 +648,8 @@ class IntroductionController extends Controller
 
 		if ($id == null) return;
 
-		$this->deleteMedia($id);
+		//$this->deleteMedia($id);
+		$this->detachAllMedia();
 
 		$this->models->ContentIntroduction->delete(
 			array(
@@ -719,16 +720,17 @@ class IntroductionController extends Controller
 	}
 
 
-    private function detachMedia ()
+    private function detachAllMedia ()
     {
-    	$mediaId = $this->rHasVal('media_id') ? $this->rGetVal('media_id') : false;
+        $media = $this->_mc->getItemMediaFiles();
 
-		if (!$mediaId) {
-			return;
-		}
-
-		return $this->_mc->deleteItemMedia($mediaId);
+        if (!empty($media)) {
+            foreach ($media as $item) {
+                $this->_mc->deleteItemMedia($item['id']);
+            }
+        }
     }
+
 
 
 }

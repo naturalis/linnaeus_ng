@@ -54,22 +54,6 @@
 </div>
 {/if}
 
-
-<!--
-<p>
-{if $page.image}
-{t}current image for this page:{/t}<br />
-<img
-	onclick="allShowMedia('{$session.admin.project.urls.project_media}{$page.image.file_name}','{$page.image.file_name}');"
-	style="cursor:pointer"
-	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" /><br />
-	<span class="a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
-{else}
-<span class="a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}Add an image to this page{/t}</span>
-{/if}
-</p>
--->
-
 <p>
 {if $page.image}
 	<input type="hidden" name="media_id" id="media_id" value="{$page.image.id}" />

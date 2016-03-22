@@ -24,6 +24,9 @@ class ModuleIdentifierController extends Controller
     public function __construct ()
     {
         parent::__construct();
+
+        $this->loadExternalModel('ModuleIdentifierModel');
+
         $this->setProjectModules();
     }
 
@@ -52,7 +55,12 @@ class ModuleIdentifierController extends Controller
         return $this->getModuleProperty('module');
     }
 
-	public function getItemName ()
+    public function getModuleController ()
+    {
+        return $this->getModuleProperty('controller');
+    }
+
+    public function getItemName ()
 	{
         if (!$this->moduleId || !$this->itemId) {
             return false;
@@ -71,6 +79,13 @@ class ModuleIdentifierController extends Controller
                 case 'introduction':
                     $r = $this->models->ContentIntroduction->_get(array('id'=>array('id'=>$this->itemId)));
                     return $r[0]['topic'];
+                case 'key':
+                    $r = $this->models->ModuleIdentifierModel->getChoiceName(array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'choice_id' => $this->itemId
+                    ));
+                    return $this->translate('choice') . ' ' . $r['choice_number'] . ' ' .
+                        $this->translate('of step') . ' ' . $r['keystep_number'];
 
                 default:
                     return false;

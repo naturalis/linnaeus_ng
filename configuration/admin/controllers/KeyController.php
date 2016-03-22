@@ -1,6 +1,7 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 /**
 * KeyController
@@ -17,6 +18,7 @@ class KeyController extends Controller
         'content_keysteps',
         'choices_keysteps',
         'choices_content_keysteps',
+        'media_modules'
     );
 
 	public $usedHelpers = array(
@@ -62,7 +64,7 @@ class KeyController extends Controller
 	private $killSwitchTriggered=false;
 	private $taxaInBranch=array();
 	private $branchStartStepId=null;  //step id
-	
+
 	private $maxChoicesPerKeystep=16;
 
 	/**
@@ -97,6 +99,8 @@ class KeyController extends Controller
     {
 		$this->setEndPointsExist();
 
+		$this->setMediaController();
+
         if ($this->rHasVal('action','suppress_division'))
 		{
 			$this->setSuppressTaxonDivision( $this->rGetVal( "suppress_division" )=="on" );
@@ -117,7 +121,17 @@ class KeyController extends Controller
 
     }
 
-	/**
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
+	}
+
+
+
+    /**
 	* indexAction
 	*
 	* renders the index page
@@ -423,8 +437,12 @@ class KeyController extends Controller
         if ($this->rHasVal('action', 'delete'))
         // delete the complete choice, incl image (if any)
 		{
-            if (!empty($choice['choice_img']))
+
+		    // Leave old code just in case...
+		    if (!empty($choice['choice_img']))
                 @unlink($_SESSION['admin']['project']['paths']['project_media'] . $choice['choice_img']);
+
+		    $this->detachAllMedia();
 
             $this->deleteKeystepChoice($choice['id']);
 
@@ -437,7 +455,8 @@ class KeyController extends Controller
 		if ($this->rHasVal('action', 'deleteImage'))
 		// delete just the image
 		{
-            if (!empty($choice['choice_img']))
+		    // Leave old code just in case...
+		    if (!empty($choice['choice_img']))
                 @unlink($_SESSION['admin']['project']['paths']['project_media'] . $choice['choice_img']);
 
             $this->models->ChoicesKeysteps->save(array(
@@ -447,7 +466,9 @@ class KeyController extends Controller
             ));
 
             unset($choice['choice_img']);
-        }
+
+		    $this->detachAllMedia();
+		}
 
         if (($this->rHasVal('res_keystep_id') || $this->rHasVal('res_taxon_id')) && !$this->isFormResubmit())
 		// save new target
@@ -516,6 +537,8 @@ class KeyController extends Controller
 		$this->smarty->assign('taxa', $this->getTaxaInKey( array( "order"=>"taxon" ) ));
 		$this->smarty->assign('keyPath', $this->getKeyPath());
         $this->smarty->assign('includeHtmlEditor', true);
+		$this->smarty->assign('module_id', $this->getCurrentModuleId());
+        $this->smarty->assign('item_id', $id);
 
         $this->printPage();
 
@@ -1558,6 +1581,12 @@ class KeyController extends Controller
 
         $choice = $ck[0];
 
+    	// Append image to choice
+        $img = $this->_mc->getItemMediaFiles();
+        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+            $choice['choice_img'] = $img[0]['rs_original'];
+        }
+
         $k = $this->models->Keysteps->_get(array(
             'id' => $choice['keystep_id']
         ));
@@ -1603,6 +1632,11 @@ class KeyController extends Controller
         $choice['marker'] = $choice['show_order'];
 
         return $choice;
+    }
+
+    private function getChoiceImage ($choiceId)
+    {
+
     }
 
     private function saveKeystepChoiceContent($data)
@@ -2040,5 +2074,18 @@ class KeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 				));
 	}
+
+
+    private function detachAllMedia ()
+    {
+        $media = $this->_mc->getItemMediaFiles();
+
+        if (!empty($media)) {
+            foreach ($media as $i => $item) {
+                $this->_mc->deleteItemMedia($item['id']);
+            }
+        }
+    }
+
 
 }

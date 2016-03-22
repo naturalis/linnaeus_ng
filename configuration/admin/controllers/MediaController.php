@@ -36,11 +36,11 @@ class MediaController extends Controller
     private $itemId;
     private $languageId;
 
-    public static $singleMediaFileModules = array(
-        'Introduction',
-        'Key',
-        'Matrix',
-        'Freemodule'
+    public static $singleMediaFileControllers = array(
+        'introduction',
+        'key',
+        'matrix',
+        'free_module'
     );
 
     public static $metadataFields = array(
@@ -379,15 +379,26 @@ class MediaController extends Controller
             $mi->setModuleId($this->moduleId);
             $mi->setItemId($this->itemId);
 
-            $moduleName = $mi->getModuleName();
-            $inputType = in_array($moduleName, $this::$singleMediaFileModules) ?
-                'single' : 'multiple';
-
-            $this->smarty->assign('module_name', $moduleName);
+            $this->smarty->assign('module_name', $mi->getModuleName());
             $this->smarty->assign('item_name', $mi->getItemName());
             $this->smarty->assign('back_url', $this->setBackUrl());
-            $this->smarty->assign('input_type', $inputType);
+            $this->smarty->assign('input_type', $this->setInputType());
         }
+    }
+
+    private function setInputType ()
+    {
+        $mi = new ModuleIdentifierController();
+        $mi->setModuleId($this->moduleId);
+        $mi->setItemId($this->itemId);
+
+        $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
+            'single' : 'multiple';
+
+        unset($mi);
+
+        return $type;
+
     }
 
     public function setSortOrder ($p)

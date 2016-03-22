@@ -48,11 +48,6 @@
 	</td>
 	{/if}
 	</tr>
-
-
-
-	<!--
-
 	<tr style="vertical-align:bottom">
 		<td style="padding-top:30px;">{t}Image:{/t}</td>
 		<td colspan="2">
@@ -73,34 +68,6 @@
 		{/if}
 		</td>
 	</tr>
-
-	-->
-
-	<tr style="vertical-align:bottom">
-		<td style="padding-top:30px;">{t}Image:{/t}</td>
-		<td colspan="2">
-		{if $data.choice_img}
-			<img
-				onclick="allShowMedia('{$data.choice_img}?rnd={$rnd}','');"
-				src="{$data.choice_img}?rnd={$rnd}"
-				class="key-choice-image-normal" /><br />
-			<span class="a" onclick="keyDeleteImage();">{t}detach image{/t}</span>
-			{if $data.choice_image_params!=''}
-				<br />
-				<span style="color:red">
-					{t}Please note: this image has specific attributes for size and positioning, which were inherited from Linnaeus 2. These cannot be changed, and will be erased if you delete the image.{/t}
-				</span>
-			{/if}
-		{else}
-			<a href="../media/upload.php?item_id={$item_id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
-			<a href="../media/select.php?item_id={$item_id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
-		{/if}
-		</td>
-	</tr>
-
-
-
-
 	<tr style="vertical-align:bottom">
 		<td style="padding-top:30px;">{t}Target:{/t}</td>
 		<td>
