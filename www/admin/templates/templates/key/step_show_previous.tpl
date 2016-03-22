@@ -59,8 +59,8 @@
             <td>
             {if $v.choice_img}
                 <img
-                onclick="allShowMedia('{$v.choice_img}?rnd={$rnd}','');"
-                src="{$v.choice_img}?rnd={$rnd}"
+                onclick="allShowMedia('{$session.admin.project.urls.project_media}{$v.choice_img}?rnd={$rnd}','{$v.choice_img}');"
+                src="{$session.admin.project.urls.project_media}{$v.choice_img}?rnd={$rnd}"
                 class="key-choice-image-small" />
             {/if}
             </td>
