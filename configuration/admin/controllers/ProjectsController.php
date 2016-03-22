@@ -52,6 +52,7 @@ class ProjectsController extends Controller
         $this->checkDefaultProjectSelect();
 		$this->UserRights->setAllowNoProjectId( true );
 		$this->checkAuthorisation();
+
         $this->setPageName($this->translate('Select a project to work on'));
 
         if ( $this->rHasVal('project_id') && $this->isCurrentUserAuthorizedForProject($this->rGetVal('project_id')) )
@@ -78,10 +79,6 @@ class ProjectsController extends Controller
         $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
         $this->printPage();
     }
-
-
-
-  	
 	
     /**
 	* List of available modules, standard and self-defined, plus possibility of (de)activation
@@ -90,13 +87,13 @@ class ProjectsController extends Controller
 	*/
     public function modulesAction ()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Project modules'));
 
         if ($this->rHasVal('module_new'))
 		{
-
             $fmp = $this->models->FreeModulesProjects->_get(array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId()
@@ -155,111 +152,6 @@ class ProjectsController extends Controller
         $this->printPage();
     }
 
-
-
-    /**
-	* Assigning collaborator to modules (a listing, mainly; he actual connecting is done through AJAX-calls)
-	*
-	* @access     public
-	*/
-    public function collaboratorsAction ()
-    {
-        $this->checkAuthorisation();
-
-        $this->setPageName($this->translate('Assign collaborator to modules'));
-
-        $modules = $this->models->ModulesProjects->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'order' => 'module_id asc'
-        ));
-
-        foreach ((array) $modules as $key => $val) {
-
-            $mp = $this->models->Modules->_get(array(
-                'id' => $val['module_id']
-            ));
-
-            $modules[$key]['module'] = $mp['module'];
-
-            $modules[$key]['description'] = $mp['description'];
-
-            $mpu = $this->models->ModulesProjectsUsers->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'module_id' => $val['module_id']
-                )
-            ));
-
-            foreach ((array) $mpu as $k => $v) {
-
-                $modules[$key]['collaborators'][$v['user_id']] = $v;
-            }
-        }
-
-        $free_modules = $this->models->FreeModulesProjects->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            )
-        ));
-
-        foreach ((array) $free_modules as $key => $val) {
-
-            $fpu = $this->models->FreeModulesProjectsUsers->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'free_module_id' => $val['id']
-                )
-            ));
-
-            foreach ((array) $fpu as $k => $v) {
-
-                $free_modules[$key]['collaborators'][$v['user_id']] = $v;
-            }
-        }
-
-        $pru = $this->models->ProjectsRolesUsers->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'distinct user_id, role_id'
-        ));
-
-        foreach ((array) $pru as $key => $val) {
-
-            $u = $this->models->Users->_get(array(
-                'id' => $val['user_id']
-            ));
-
-            $r = $this->models->Roles->_get(array(
-                'id' => $val['role_id']
-            ));
-
-            $u['role'] = $r['role'];
-
-            $users[] = $u;
-        }
-
-        $this->customSortArray($users, array(
-            'key' => 'last_name',
-            'dir' => 'asc',
-            'case' => 'i'
-        ));
-
-        $this->smarty->assign('users', $users);
-
-        $this->smarty->assign('free_modules', $free_modules);
-
-        $this->smarty->assign('modules', $modules);
-
-        $this->printPage();
-    }
-
-
-
     /**
 	* Interface to the project settings
 	*
@@ -267,14 +159,14 @@ class ProjectsController extends Controller
 	*/
     public function dataAction ()
     {
-
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Project data'));
 
-        if ( $this->rHasVal('action','save') && !$this->isFormResubmit() ) {
+        if ( $this->rHasVal('action','save') && !$this->isFormResubmit() )
+		{
             // saving all data (except the logo image)
-
 			$this->saveProjectData( $this->rGetAll() );
         }
 
@@ -322,16 +214,16 @@ class ProjectsController extends Controller
         if (!$this->rHasVal('view'))
             return;
 
-        if ($this->rHasVal('view', 'modules')) {
-
+        if ($this->rHasVal('view', 'modules'))
+		{
+			$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxActionModules($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId());
         }
-        else if ($this->rHasVal('view', 'collaborators')) {
-
-            $this->ajaxActionCollaborators($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId(), $this->rGetVal('user'));
-        }
-        else if ($this->rHasVal('view', 'languages')) {
-
+        elseif ($this->rHasVal('view', 'languages'))
+		{
+			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxActionLanguages($this->rGetVal('action'), $this->rGetId());
         }
 
@@ -340,7 +232,9 @@ class ProjectsController extends Controller
 
     public function createAction ()
     {
-        $this->checkAuthorisation(true);
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setAllowNoProjectId( true );
+        $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Create new project'));
 
@@ -348,10 +242,10 @@ class ProjectsController extends Controller
 
         $this->setSuppressProjectInBreadcrumbs();
 
-        if (isset($this->requestData) && !$this->isFormResubmit()) {
-
-            if (!$this->rHasVal('title') || !$this->rHasVal('sys_description') || !$this->rHasVal('language')) {
-
+        if (isset($this->requestData) && !$this->isFormResubmit())
+		{
+            if (!$this->rHasVal('title') || !$this->rHasVal('sys_description') || !$this->rHasVal('language'))
+			{
                 if (!$this->rHasVal('title'))
                     $this->addError($this->translate('A title is required.'));
                 if (!$this->rHasVal('sys_description'))
@@ -359,8 +253,8 @@ class ProjectsController extends Controller
                 if (!$this->rHasVal('language'))
                     $this->addError($this->translate('A default language is required.'));
             }
-            else {
-
+            else
+			{
                 $id = $this->createProject(
                 array(
                     'title' => $this->rGetVal('title'),
@@ -368,8 +262,8 @@ class ProjectsController extends Controller
                     'sys_description' => $this->rGetVal('sys_description')
                 ));
 
-                if ($id) {
-
+                if ($id)
+				{
                     $this->models->LanguagesProjects->save(
                     array(
                         'id' => null,
@@ -394,8 +288,8 @@ class ProjectsController extends Controller
                     $this->addMessage(sprintf($this->translate('Project \'%s\' saved.'), $this->rGetVal('title')));
                     $this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
                 }
-                else {
-
+                else
+				{
                     $this->addError($this->translate('Could not save project (duplicate name?).'));
                 }
             }
@@ -403,7 +297,6 @@ class ProjectsController extends Controller
 
         if (isset($this->requestData))
             $this->smarty->assign('data', $this->requestData);
-
         $this->smarty->assign('languages', $this->getAvailableLanguages());
 
         $this->printPage();
@@ -411,7 +304,9 @@ class ProjectsController extends Controller
 
     public function deleteAction ()
     {
-        $this->checkAuthorisation(true);
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setAllowNoProjectId( true );
+        $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Delete a project'));
 
@@ -419,16 +314,14 @@ class ProjectsController extends Controller
 
         $this->setSuppressProjectInBreadcrumbs();
 
-        if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
-
+        if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit())
+		{
             $this->doDeleteProjectAction($this->rGetId());
-
             $this->reInitUserRolesAndRights();
-
             $this->addMessage('Project deleted.');
         }
-        else {
-
+        else
+		{
             $d = $this->rHasVal('p') ? array(
                 'id' => $this->rGetVal('p')
             ) : '*';
@@ -438,12 +331,12 @@ class ProjectsController extends Controller
                 'order' => 'title'
             ));
 
-            if ($this->rHasVal('p')) {
-
+            if ($this->rHasVal('p'))
+			{
                 $this->smarty->assign('project', $projects[0]);
             }
-            else {
-
+            else
+			{
                 $this->smarty->assign('projects', $projects);
             }
         }
@@ -453,7 +346,9 @@ class ProjectsController extends Controller
 
     public function deleteOrphanAction ()
     {
-        $this->checkAuthorisation(true);
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setAllowNoProjectId( true );
+        $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Delete orphaned project'));
 
@@ -461,13 +356,11 @@ class ProjectsController extends Controller
 
         $this->setSuppressProjectInBreadcrumbs();
 
-        if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit()) {
-
+        if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit())
+		{
 			$this->doDeleteOrphanedData();
-
             $this->addMessage('Deleted orphaned data.');
 			$this->smarty->assign('processed',true);
-
         }
 
         $this->printPage();

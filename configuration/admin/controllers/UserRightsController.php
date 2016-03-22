@@ -10,6 +10,7 @@
 
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
+		if ( !$this->getAuthorisationState() ) return;
 
 		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 		{$CRUDstates.can_delete}
@@ -55,10 +56,16 @@
 	export is not an action, but implemented based on hasAppropriateLevel()
 			
 			
+implementatie is niet leterlijk: delete iets == right delete; subdelen (zoals states) vallen 9onde update
 
+laten zien welke dingen op basis van ro zijn
+	
 
 	implement roles
 	always include projects
+	EXPORTS!
+	ref key ends?
+	ref matrices?
 	
 
 */

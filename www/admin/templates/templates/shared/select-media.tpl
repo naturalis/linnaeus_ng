@@ -35,11 +35,7 @@
 		<label>
 	 	<li id="li_{$id_type}id_{$id}">
 	 		<div class="list-grid-info">
-	 			{if $input_type == 'single'}
-					<input type="radio" name="media_ids" value="{$v.media_id}" id="id_{$v.media_id}" {if $v.attached==1}checked disabled{/if}>
-	 			{else}
-					<input type="checkbox" name="media_ids[{$v.media_id}]" id="id_{$v.media_id}" {if $v.attached==1}checked disabled{/if}>
-	 			{/if}
+				<input type="checkbox" name="media_ids[{$v.media_id}]" id="id_{$v.media_id}" {if $v.attached==1}checked disabled{/if}>
 	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
 		 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
 	 			</a>
