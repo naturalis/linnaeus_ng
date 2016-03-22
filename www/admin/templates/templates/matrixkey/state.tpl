@@ -1,3 +1,11 @@
+<style>
+.image-preview {
+	max-width: 300px;
+	max-height: 250px;
+	border: 1px solid #ddd;
+}
+</style>
+
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
@@ -27,15 +35,15 @@
 		<td>{t}Name:{/t}</td>
 		<td>
 			<input
-				type="text" 
-				name="label" 
+				type="text"
+				name="label"
 				id="label-default"
 				onblur="matrixSaveStateLabel(allDefaultLanguage)" />
 		</td>
 	{if $languages|@count>1}
 		<td>
 			<input
-				type="text" 
+				type="text"
 				id="label-other"
 				onblur="matrixSaveStateLabel(allActiveLanguage)" />
 		</td>
@@ -46,7 +54,7 @@
 		<td>{t}Text:{/t}</td>
 		<td>
 			<textarea
-				style="width:400px;height:300px;" 
+				style="width:400px;height:300px;"
 				name="text"
 				id="text-default"
 				onblur="matrixSaveStateText(allDefaultLanguage)"
@@ -55,7 +63,7 @@
 		{if $languages|@count>1}
 		<td>
 			<textarea
-				style="width:400px;height:300px;" 
+				style="width:400px;height:300px;"
 				id="text-other"
 				onblur="matrixSaveStateText(allActiveLanguage)"
 				></textarea>
@@ -68,34 +76,20 @@
 		{if $state.file_name}
 		{t}Current image:{/t}
 		{else}
-		{t}Choose a file to upload:{/t}
+		{t}Choose a file:{/t}
 		{/if}
 		</td>
 		<td{if $languages|@count>1} colspan="2"{/if}>
 		{if $state.file_name}
-			<img src="{$session.admin.project.urls.project_media}{$state.file_name}" onclick="allShowMedia('{$session.admin.project.urls.project_media}{$state.file_name}','{$state.file_name}');" 
-				style="width:250px;border:1px solid black;margin:5px 0px 5px 0px;cursor:pointer" />
+			<img src="{$state.file_name}" onclick="allShowMedia('{$state.file_name}','');" class="image-preview" />
 			<input type="hidden" name="existing_file" value="{$state.file_name}" /><br />
 			<span class="a" onclick="matrixDeleteStateImage();">{t}delete image{/t}</span>
 		{else}
-			<input name="uploadedfile" id="uploadedfile" type="file" /><br />
+			<a href="../media/upload.php?item_id={$state.id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
+			<a href="../media/select.php?item_id={$state.id}&amp;module_id={$module_id}">{t}attach media{/t}</a> {t}to this state{/t}.
 		{/if}
 		</td>
 	</tr>
-	{if !$state.file_name}
-	<tr>
-		<td>&nbsp;</td>
-		<td{if $languages|@count>1} colspan="2"{/if}>
-			{t}Allowed formats:{/t}<ul>
-			{section name=i loop=$allowedFormats}
-			<li>
-				{$allowedFormats[i].mime}
-				({t _s1=$allowedFormats[i].media_name}%s{/t}; {t}max.{/t} {math equation="x/y" x=$allowedFormats[i].maxSize y=1000000 format="%.0fM"} {t}per file{/t}{if $allowedFormats[i].media_type=='archive'}; {t}see below for information on uploading archives{/t}{/if})</li>
-			{/section}
-			</ul>
-		</td>
-	</tr>
-	{/if}
 {elseif $characteristic.type.name=='range'}
 	<tr>
 		<td>{t}Lower limit (inclusive):{/t}</td>

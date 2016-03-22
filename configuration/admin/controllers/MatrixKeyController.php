@@ -1,11 +1,14 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 include_once ('ModuleSettingsReaderController.php');
 
 class MatrixKeyController extends Controller
 {
+    private $_mc;
     private $_useCharacterGroups = false;
+
     public $usedModels = array(
         'matrices',
         'matrices_names',
@@ -48,8 +51,8 @@ class MatrixKeyController extends Controller
 		array('name'=>'range','info'=>'a value range, defined by a lowest and a highest value.'),
 		array('name'=>'distribution','info'=>'a value distribution, defined by a mean and values for one and two standard deviations.')
 	);
-		
-		
+
+
     public function __construct ()
     {
         parent::__construct();
@@ -72,12 +75,21 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
 		$this->cleanUpEmptyVariables();
+		$this->setMediaController();
     }
 
     public function __destruct ()
     {
         parent::__destruct();
     }
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
+	}
 
     public function indexAction ()
     {
@@ -148,7 +160,7 @@ class MatrixKeyController extends Controller
 							'name' => $name
 						));
 					}
-					
+
 					$this->redirect('matrix.php?id=' . $id);
 				}
 				else
@@ -179,7 +191,7 @@ class MatrixKeyController extends Controller
 		}
 
         $matrices=$this->getMatrices();
-		
+
         if (count((array)$matrices)==0)
 		{
             $this->redirect('matrix.php');
@@ -240,10 +252,10 @@ class MatrixKeyController extends Controller
 						'matrix_id' => $this->rGetId(),
 						'name' => $this->rGetVal( 'sys_name' )
 					));
-					
+
 					if ($n>0) $this->addMessage( sprintf( 'Saved "%s".', $this->rGetVal( 'sys_name' ) ) );
 				}
-	
+
 				$names=$this->rGetVal( 'name' );
 
 				foreach((array)$names as $language_id => $name)
@@ -253,7 +265,7 @@ class MatrixKeyController extends Controller
 						'language_id' =>  $language_id,
 						'name' => $name
 					));
-					
+
 					if ($n>0) $this->addMessage( sprintf( 'Saved "%s".', $name ) );
 				}
 
@@ -621,7 +633,8 @@ class MatrixKeyController extends Controller
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
-            $this->deleteCharacteristicStateImage();
+            //$this->deleteCharacteristicStateImage();
+            $this->detachAllMedia();
         }
         else
 		if ($this->rHasId())
@@ -696,15 +709,15 @@ class MatrixKeyController extends Controller
                     'id' => ($this->rHasId() ? $this->rGetId() : null),
                     'project_id' => $this->getCurrentProjectId(),
                     'characteristic_id' => $this->rGetVal('char'),
-                    'file_name' => null !== ($filesToSave[0]['name']) ? $filesToSave[0]['name'] : null,
+                    //'file_name' => null !== ($filesToSave[0]['name']) ? $filesToSave[0]['name'] : null,
                     'lower' => null !== $this->rGetVal('lower') ? $this->rGetVal('lower') : null,
                     'upper' => null !== $this->rGetVal('upper') ? $this->rGetVal('upper') : null,
                     'mean' => null !== $this->rGetVal('mean') ? $this->rGetVal('mean') : null,
                     'sd' => null !== $this->rGetVal('sd') ? $this->rGetVal('sd') : null
                 ));
 
-				$this->saveStateImageDimensions($state);
-				$this->reacquireStateImageDimensions();
+				//$this->saveStateImageDimensions($state);
+				//$this->reacquireStateImageDimensions();
 
                 unset($state);
 
@@ -724,6 +737,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('allowedFormats', $this->controllerSettings['media']['allowedFormats']);
         if (isset($state))  $this->smarty->assign('state', $state);
         $this->smarty->assign('characteristic', $characteristic);
+        $this->smarty->assign('module_id', $this->getCurrentModuleId());
 
         $this->printPage();
     }
@@ -836,7 +850,7 @@ class MatrixKeyController extends Controller
                 'case' => 'i'
             ));
         }
-		
+
 		$taxa=$this->models->MatrixkeyModel->getTaxaInMatrix(
 			array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -985,7 +999,7 @@ class MatrixKeyController extends Controller
     private function createNewMatrix( $sys_name )
     {
 		if ( empty($sys_name) ) return;
-		
+
         $this->models->Matrices->save(array(
             'project_id' => $this->getCurrentProjectId(),
 			'sys_name' => $sys_name
@@ -1023,7 +1037,7 @@ class MatrixKeyController extends Controller
         ));
 
         if (!$m) return;
-		
+
 		$matrix=$m[0];
 
         $matrix['names']=
@@ -1037,8 +1051,8 @@ class MatrixKeyController extends Controller
 				));
 
 		$matrix['label']=
-			isset($mn[$this->getDefaultProjectLanguage()]['name']) ? 
-				$mn[$this->getDefaultProjectLanguage()]['name'] : 
+			isset($mn[$this->getDefaultProjectLanguage()]['name']) ?
+				$mn[$this->getDefaultProjectLanguage()]['name'] :
 					isset($m[0]['sys_name']) ?
 						$m[0]['sys_name'] :
 						'(matrix)'
@@ -1087,7 +1101,7 @@ class MatrixKeyController extends Controller
     private function getMatrices()
     {
         $m = $this->models->Matrices->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
-		
+
         foreach ((array)$m as $key => $val)
 		{
             $mn = $this->models->MatricesNames->_get(
@@ -1113,7 +1127,7 @@ class MatrixKeyController extends Controller
             $m[$key]['default_name'] = $d;
             $m[$key]['label'] = (!empty($m[$key]['default_name']) ? $m[$key]['default_name'] : (!empty($m[$key]['sys_name']) ? $m[$key]['sys_name'] : '(matrix)' ) );
         }
-	
+
         $this->customSortArray($m, array(
             'key' => 'default_name',
             'case' => 'i'
@@ -1121,9 +1135,9 @@ class MatrixKeyController extends Controller
 
         return $m;
     }
-	
 
-	
+
+
 	private function saveMatrixName( $p )
 	{
 		$matrix_id = isset($p['matrix_id']) ? $p['matrix_id'] : null;
@@ -1150,7 +1164,7 @@ class MatrixKeyController extends Controller
 			'matrix_id' => $matrix_id,
 			'name' => $name
 		));
-		
+
 		return $this->models->MatricesNames->getAffectedRows();
 	}
 
@@ -1161,7 +1175,7 @@ class MatrixKeyController extends Controller
 
 		if ( is_null($matrix_id) || is_null($name) )
 			return;
-		
+
         $this->models->Matrices->update(
 			array(
 				'sys_name' => $name
@@ -1608,6 +1622,11 @@ class MatrixKeyController extends Controller
             $state['label'] = $d['label'];
         }
 
+        // Override media
+        $media = $this->getStateMedia();
+        $state['file_name'] = $media['file_name'];
+        $state['file_dimensions'] = $media['file_dimensions'];
+
         return $state;
     }
 
@@ -1889,7 +1908,8 @@ class MatrixKeyController extends Controller
         if (!isset($id))
             return;
 
-        $this->deleteCharacteristicStateImage($id);
+        //$this->deleteCharacteristicStateImage($id);
+        $this->detachAllMedia();
 
         $this->models->CharacteristicsLabelsStates->delete(array(
             'project_id' => $this->getCurrentProjectId(),
@@ -2615,5 +2635,32 @@ class MatrixKeyController extends Controller
 		return $d;
 
 	}
+
+
+    private function detachAllMedia ()
+    {
+        $media = $this->_mc->getItemMediaFiles();
+
+        if (!empty($media)) {
+            foreach ($media as $item) {
+                $this->_mc->deleteItemMedia($item['id']);
+            }
+        }
+    }
+
+    private function getStateMedia ()
+    {
+        $media = $this->_mc->getItemMediaFiles();
+
+        if (!empty($media)) {
+            return array(
+                'file_name' => $media[0]['rs_original'],
+                'file_dimensions' => $media[0]['width'] . ':' . $media[0]['height']
+            );
+        }
+
+        return false;
+    }
+
 
 }

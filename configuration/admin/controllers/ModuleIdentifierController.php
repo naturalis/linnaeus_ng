@@ -6,6 +6,7 @@ class ModuleIdentifierController extends Controller
 
     private $moduleId;
     private $itemId;
+    private $languageId;
     private $projectModules;
     private $projectFreeModules;
 
@@ -52,7 +53,12 @@ class ModuleIdentifierController extends Controller
 	    $this->itemId = $id;
 	}
 
-    public function getModuleName ()
+	public function setLanguageId ($id)
+	{
+	    $this->languageId = $id;
+	}
+
+	public function getModuleName ()
     {
         return $this->getModuleProperty('module');
     }
@@ -101,12 +107,18 @@ class ModuleIdentifierController extends Controller
                     ));
                     return $this->translate('choice') . ' ' . $r['choice_number'] . ' ' .
                         $this->translate('of step') . ' ' . $r['keystep_number'];
-
+                case 'matrixkey':
+                    $r = $this->models->ModuleIdentifierModel->getStateName(array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'language_id' => $this->languageId,
+                        'state_id' => $this->itemId
+                    ));
+                    return $this->translate('state') . ' ' . $r['state_label'] . ' ' .
+                        $this->translate('of characteristic') . ' ' . $r['characteristic_label'];
                 case 'free_module':
                     $r = $this->models->ContentFreeModules
                         ->_get(array('id'=>array('id'=>$this->itemId)));
                     return $r[0]['topic'];
-
                 default:
                     return false;
             }
