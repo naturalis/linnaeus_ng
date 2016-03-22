@@ -1,9 +1,12 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 class IntroductionController extends Controller
 {
+
+    private $_mc;
 
     public $usedModels = array(
 		'content_introduction',
@@ -39,12 +42,21 @@ class IntroductionController extends Controller
     {
         parent::__construct();
 		$this->cleanUpEmptyPages();
+		$this->setMediaController();
     }
 
     public function __destruct ()
     {
         parent::__destruct();
     }
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
+	}
 
     public function contentsAction()
     {
@@ -135,7 +147,13 @@ class IntroductionController extends Controller
 			}
 		}
 
-		$navList = $this->getPageNavList(true);
+    	// Append image to page
+        $img = $this->_mc->getItemMediaFiles();
+        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+            $page['image'] = $img[0];
+        }
+
+        $navList = $this->getPageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 		$this->smarty->assign('navCurrentId',$this->rHasId() ? $this->rGetId() : null);
@@ -144,6 +162,7 @@ class IntroductionController extends Controller
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('includeHtmlEditor', true);
+		$this->smarty->assign('module_id', $this->getCurrentModuleId());
 		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 
         $this->printPage();
