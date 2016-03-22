@@ -72,6 +72,7 @@
 	<a href="../media/select.php?item_id={$id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
 {/if}
 </p>
+
 </form>
 <form action="media_upload.php" method="post" id="imgForm">
 <input type="hidden" name="id" id="id" value="{$id}" />

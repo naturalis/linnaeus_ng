@@ -7,13 +7,15 @@ class ModuleIdentifierController extends Controller
     private $moduleId;
     private $itemId;
     private $projectModules;
+    private $projectFreeModules;
 
     /*
     * Currently incomplete; extend this for modules requiring info!
     */public $usedModels = array(
         'taxa',
         'glossary',
-        'content_introduction'
+        'content_introduction',
+        'content_free_modules'
     );
 
     /**
@@ -57,7 +59,19 @@ class ModuleIdentifierController extends Controller
 
     public function getModuleController ()
     {
-        return $this->getModuleProperty('controller');
+        $c = $this->getModuleProperty('controller');
+
+        // Return free module controller as free_module
+        if (empty($c)) {
+            foreach ($this->projectFreeModules as $m) {
+                if ($m['id'] == $this->moduleId) {
+                    return 'free_module';
+                }
+            }
+            return false;
+        }
+
+        return $c;
     }
 
     public function getItemName ()
@@ -66,7 +80,7 @@ class ModuleIdentifierController extends Controller
             return false;
         }
 
-        $controller = $this->getModuleProperty('controller');
+        $controller = $this->getModuleController();
 
         if ($controller) {
             switch ($controller) {
@@ -77,7 +91,8 @@ class ModuleIdentifierController extends Controller
                     $r = $this->models->Glossary->_get(array('id'=>array('id'=>$this->itemId)));
                     return $r[0]['term'];
                 case 'introduction':
-                    $r = $this->models->ContentIntroduction->_get(array('id'=>array('id'=>$this->itemId)));
+                    $r = $this->models->ContentIntroduction
+                        ->_get(array('id'=>array('id'=>$this->itemId)));
                     return $r[0]['topic'];
                 case 'key':
                     $r = $this->models->ModuleIdentifierModel->getChoiceName(array(
@@ -86,6 +101,11 @@ class ModuleIdentifierController extends Controller
                     ));
                     return $this->translate('choice') . ' ' . $r['choice_number'] . ' ' .
                         $this->translate('of step') . ' ' . $r['keystep_number'];
+
+                case 'free_module':
+                    $r = $this->models->ContentFreeModules
+                        ->_get(array('id'=>array('id'=>$this->itemId)));
+                    return $r[0]['topic'];
 
                 default:
                     return false;
@@ -102,6 +122,11 @@ class ModuleIdentifierController extends Controller
                 return isset($m[$prop]) ? $m[$prop] : false;
             }
         }
+        foreach ($this->projectFreeModules as $m) {
+            if ($m['id'] == $this->moduleId) {
+                return isset($m[$prop]) ? $m[$prop] : false;
+            }
+        }
         return false;
     }
 
@@ -109,6 +134,7 @@ class ModuleIdentifierController extends Controller
 	{
         $pm = $this->getProjectModules();
         $this->projectModules = $pm['modules'];
+        $this->projectFreeModules = $pm['freeModules'];
 	}
 
 }
