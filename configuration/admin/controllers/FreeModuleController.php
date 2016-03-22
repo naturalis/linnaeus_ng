@@ -1,9 +1,12 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 class FreeModuleController extends Controller
 {
+
+    private $_mc;
 
     public $usedModels=
 		array(
@@ -12,7 +15,7 @@ class FreeModuleController extends Controller
 			'content_free_modules',
 			'free_module_media'
 		);
-	
+
     public $usedHelpers = array(
         'file_upload_helper',
         'image_thumber_helper',
@@ -48,6 +51,7 @@ class FreeModuleController extends Controller
         parent::__construct();
 		$this->UserRights->setModuleType( $this->UserRights->getModuleTypeCustom() );
 		$this->controllerPublicName = $this->getActiveModuleName();
+		$this->setMediaController();
     }
 
     /**
@@ -59,6 +63,14 @@ class FreeModuleController extends Controller
     {
         parent::__destruct();
     }
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
+	}
 
     /**
      * Module index
@@ -126,15 +138,17 @@ class FreeModuleController extends Controller
 
 			$this->deletePage();
 			$this->redirect('index.php');
-		} 
+		}
 		else
 		if ($this->rHasVal('action','deleteImage'))
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
-			$this->deleteMedia();
-		} 
+			//$this->deleteMedia();
+			$this->detachAllMedia();
+
+		}
 		else
 		if ($this->rHasVal('action','preview'))
 		{
@@ -148,13 +162,16 @@ class FreeModuleController extends Controller
 		if ($page['got_content']==0)
 		{
 			$this->setPageName($this->translate('New page'));
-		} 
-		else 
+		}
+		else
 		{
 			$this->setPageName($this->translate('Editing page'));
 		}
 
-		$navList = $this->getModulePageNavList(true);
+        // Override image
+        $page['image'] = $this->getPageImage();
+
+        $navList = $this->getModulePageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 		if (isset($page)) $this->smarty->assign('page', $page);
@@ -164,6 +181,7 @@ class FreeModuleController extends Controller
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('includeHtmlEditor', true);
+		$this->smarty->assign('module_id', $this->getCurrentModuleId());
 
         $this->printPage();
     }
@@ -255,7 +273,7 @@ class FreeModuleController extends Controller
 					if ($fmm)
 					{
 						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-					} 
+					}
 					else
 					{
 						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
@@ -287,14 +305,14 @@ class FreeModuleController extends Controller
      */
     public function manageAction()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Management'));
 
 		if ($this->rHasVal('submit'))
 		{
-			$d = 
+			$d =
 				array(
 					'id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId(),
@@ -309,7 +327,7 @@ class FreeModuleController extends Controller
 			$module = $this->getFreeModule();
 			$this->setActiveModule($module);
 			$this->addMessage('Settings saved');
-		} 
+		}
 		else
 		{
 			$module = $this->getFreeModule();
@@ -328,7 +346,7 @@ class FreeModuleController extends Controller
      */
     public function orderAction()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
 		$this->setPageName($this->translate('Change page order'));
@@ -362,7 +380,7 @@ class FreeModuleController extends Controller
 					if ($this->rHasVar('dir', 'down'))
 					{
 						$newOrder = $key + 1;
-					} 
+					}
 					else
 					{
 						$newOrder = $key;
@@ -406,7 +424,7 @@ class FreeModuleController extends Controller
      */
     public function importAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 		$this->checkAuthorisation();
 
 		$this->setPageName($this->translate('CSV data import'));
@@ -964,7 +982,8 @@ class FreeModuleController extends Controller
 
 		if ($id == null || !$this->getCurrentModuleId()) return;
 
-		$this->deleteMedia($id);
+		//$this->deleteMedia($id);
+		$this->detachAllMedia();
 
 		$this->models->ContentFreeModules->delete(
 			array(
@@ -1049,5 +1068,28 @@ class FreeModuleController extends Controller
 		);
 
 	}
+
+    private function detachAllMedia ()
+    {
+        $media = $this->_mc->getItemMediaFiles();
+
+        if (!empty($media)) {
+            foreach ($media as $item) {
+                $this->_mc->deleteItemMedia($item['id']);
+            }
+        }
+    }
+
+    private function getPageImage ()
+    {
+        $img = $this->_mc->getItemMediaFiles();
+
+        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+            return $img[0];
+        }
+
+        return null;
+    }
+
 
 }

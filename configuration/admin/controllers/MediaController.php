@@ -296,7 +296,7 @@ class MediaController extends Controller
                 ));
 
                 // Store data
-                if (empty($this->_result->error)) {
+                if (!empty($this->_result) && empty($this->_result->error)) {
 
                     $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1024) . ' KB)');
 
@@ -344,7 +344,8 @@ class MediaController extends Controller
                          ));
                     }
                 } else {
-                    $this->addError(_('Could not upload media') . ': ' . $this->_result->error);
+                    $this->addError(_('Could not upload media') .
+                    (isset($this->_result->error) ? ': ' . $this->_result->error : ''));
                 }
             }
 
@@ -421,6 +422,19 @@ class MediaController extends Controller
 
     }
 
+    private function setBackUrl ()
+    {
+        if ($this->rHasVal('back_url')) {
+            return $this->rGetVal('back_url');
+        }
+        $url = $_SERVER['HTTP_REFERER'];
+        // Append id if this is not present in the referrer
+        if (strpos($url, 'id=') === false) {
+            $url .= (strpos($url, '?') === false ? '?' : "&") . 'id=' . $this->itemId;
+        }
+        return $url;
+    }
+
     private function uploadedFileIsValid ($file)
     {
         // Check mime type
@@ -467,8 +481,10 @@ class MediaController extends Controller
             return false;
         }
 
-        $mediaIds = $this->rGetVal('media_ids');
-
+        // media_ids is single value if coming from radio form; transform to array
+        $mediaIds = is_array($this->rGetVal('media_ids')) ? $this->rGetVal('media_ids') :
+            array($this->rGetVal('media_ids') => 'on');
+        
         foreach ($mediaIds as $k => $v) {
             $this->models->MediaModules->insert(array(
                 'id' => null,

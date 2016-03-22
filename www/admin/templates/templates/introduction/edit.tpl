@@ -1,3 +1,12 @@
+<style>
+.image-preview {
+	max-width: 300px;
+	max-height: 250px;
+	border: 1px solid #ddd;
+}
+</style>
+
+
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <form name="theForm" id="theForm" method="post" action="edit.php" >
@@ -61,6 +70,7 @@
 {else}
 	<a href="../media/upload.php?item_id={$id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
 	<a href="../media/select.php?item_id={$id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
+{/if}
 </p>
 </form>
 <form action="media_upload.php" method="post" id="imgForm">

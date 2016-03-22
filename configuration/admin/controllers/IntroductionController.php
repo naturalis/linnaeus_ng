@@ -147,13 +147,10 @@ class IntroductionController extends Controller
 			}
 		}
 
-    	// Append image to page
-        $img = $this->_mc->getItemMediaFiles();
-        if (!empty($img) && $img[0]['media_type'] ==  'image') {
-            $page['image'] = $img[0];
-        }
+        // Override image
+        $page['image'] = $this->getPageImage();
 
-        $navList = $this->getPageNavList(true);
+		$navList = $this->getPageNavList(true);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 		$this->smarty->assign('navCurrentId',$this->rHasId() ? $this->rGetId() : null);
@@ -750,6 +747,15 @@ class IntroductionController extends Controller
         }
     }
 
+    private function getPageImage ()
+    {
+        $img = $this->_mc->getItemMediaFiles();
 
+        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+            return $img[0];
+        }
+
+        return null;
+    }
 
 }
