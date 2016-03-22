@@ -1,19 +1,13 @@
-<style>
-.image-preview {
-	max-width: 300px;
-	max-height: 250px;
-	border: 1px solid #ddd;
-}
-</style>
-
-
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <form name="theForm" id="theForm" method="post" action="edit.php" >
+{if $CRUDstates.can_update}
 <input type="button" value="{t}save{/t}" onclick="freemodSaveContentAll()" style="margin-right:5px" />
 <input type="button" value="{t}save and preview{/t}" onclick="freemodDoPreview()" style="margin-right:5px" />
-{*<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" style="margin-right:15px" />*}
+{/if}
+{if $CRUDstates.can_delete}
 <input type="button" value="{t}delete{/t}" onclick="freemodDeletePage()" />
+{/if}
 <input type="hidden" name="id" id="id" value="{$id}" />
 <input type="hidden" name="action" id="action" value="" />
 <div style="width:890px;height:610px;border:1px solid #aaf;margin-top:10px;">
@@ -61,13 +55,13 @@
 	<a href="{$page.image.rs_original}" title="{$page.image.name}" rel="prettyPhoto">
 		<img src="{$page.image.rs_original}" alt="{$page.image.caption}" class="image-preview" />
 	</a><br />
+{if $CRUDstates.can_update}
 	<span class="a" onclick="freemodDeletePageImage('{$page.image.id}')">{t}(click to detach image){/t}</span>
+{/if}
 {else}
 	<a href="../media/upload.php?item_id={$id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
 	<a href="../media/select.php?item_id={$id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
-{/if}
 </p>
-
 </form>
 <form action="media_upload.php" method="post" id="imgForm">
 <input type="hidden" name="id" id="id" value="{$id}" />

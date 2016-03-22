@@ -95,7 +95,7 @@ class NsrTaxonMediaController extends NsrController
 		}
 
 		if ($this->rHasVal('action','up') || $this->rHasVal('action','down')) {
-		    if ($this->moveMediaInOrder()) {
+		    if ($this->moveImageInOrder()) {
 				$this->addMessage('New media order saved');
 			}
 		}
@@ -133,7 +133,7 @@ class NsrTaxonMediaController extends NsrController
 	}
 
 
-    private function moveMediaInOrder()
+    private function moveImageInOrder()
     {
 		$mediaId = $this->rHasVal('subject') ? $this->rGetVal('subject') : false;
 		$direction = $this->rHasVal('action') ? $this->rGetVal('action') : false;

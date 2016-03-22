@@ -1,3 +1,5 @@
+<style></style>
+
 <div id="page-main">
 	{if $module_name != '' && $item_name != ''}
 		 {t}for{/t} {$item_name} {t}in{/t} {$module_name}</h3>
@@ -73,7 +75,7 @@
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="file" name="files[]" {if $input_type != 'single'}multiple{/if} /></td>
+		<td><input type="file" name="files[]" multiple /></td>
 	</tr>
 	<tr>
 		<td></td>
@@ -83,3 +85,8 @@
     </form>
 </div>
 
+{literal}
+<script>
+
+</script>
+{/literal}

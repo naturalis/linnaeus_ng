@@ -200,6 +200,8 @@ class KeyController extends Controller
 			// didn't find it, create it
             if (!$id)
 			{
+				$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+				$this->checkAuthorisation();
 				$id=$this->createNewKeystep(array('is_start' => 1));
                 $this->redirect('step_edit.php?id=' . $id );
             }
@@ -211,6 +213,9 @@ class KeyController extends Controller
 
 		if ($step)
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             // move choices up and down
             if ($this->rHasVal('move') && $this->rHasVal('direction') && !$this->isFormResubmit())
 			{
@@ -270,11 +275,12 @@ class KeyController extends Controller
 	*/
     public function stepEditAction()
     {
-        $this->checkAuthorisation();
-
         // create a new step when no id is specified
         if (!$this->rHasId())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
+
             $id = $this->createNewKeystep();
 
             $this->renumberKeySteps(array(
@@ -308,6 +314,9 @@ class KeyController extends Controller
         // id present
         else
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             // delete L2-legacy image
             if ($this->rHasVal('action', 'deleteImage') || $this->rHasVal('action', 'deleteAllImages'))
 			{
@@ -410,11 +419,12 @@ class KeyController extends Controller
 	*/
     public function choiceEditAction ()
     {
-        $this->checkAuthorisation();
-
 		// create a new choice when no id is specified
         if (!$this->rHasId())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
+
             // need a step to which the choice belongs
             if (!$this->rHasVal('step'))
                 $this->redirect('step_show.php');
@@ -438,8 +448,11 @@ class KeyController extends Controller
         // delete the complete choice, incl image (if any)
 		{
 
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
+
 		    // Leave old code just in case...
-		    if (!empty($choice['choice_img']))
+			if (!empty($choice['choice_img']))
                 @unlink($_SESSION['admin']['project']['paths']['project_media'] . $choice['choice_img']);
 
 		    $this->detachAllMedia();
@@ -455,8 +468,11 @@ class KeyController extends Controller
 		if ($this->rHasVal('action', 'deleteImage'))
 		// delete just the image
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 		    // Leave old code just in case...
-		    if (!empty($choice['choice_img']))
+			if (!empty($choice['choice_img']))
                 @unlink($_SESSION['admin']['project']['paths']['project_media'] . $choice['choice_img']);
 
             $this->models->ChoicesKeysteps->save(array(
@@ -473,6 +489,9 @@ class KeyController extends Controller
         if (($this->rHasVal('res_keystep_id') || $this->rHasVal('res_taxon_id')) && !$this->isFormResubmit())
 		// save new target
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			if ($this->rHasVal('res_keystep_id','-1'))
 				$newStepId = $this->createNewKeystep();
 			else
@@ -504,6 +523,9 @@ class KeyController extends Controller
 		if ($choice['id'] && isset($this->requestDataFiles) && !$this->isFormResubmit())
 		{
 
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
 			$filesToSave = $this->getUploadedMediaFiles();
 
 			if ($filesToSave)
@@ -528,9 +550,7 @@ class KeyController extends Controller
 			}
 		}
 
-        if (isset($choice))
-            $this->smarty->assign('data', $choice);
-
+        if (isset($choice)) $this->smarty->assign('data', $choice);
         $this->smarty->assign('languages', $this->getProjectLanguages());
         $this->smarty->assign('defaultLanguage', $_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()]);
 		$this->smarty->assign('steps', $this->getKeysteps( array("exclude" => $choice['keystep_id']) ));
@@ -541,7 +561,6 @@ class KeyController extends Controller
         $this->smarty->assign('item_id', $id);
 
         $this->printPage();
-
     }
 
     public function contentsAction ()
@@ -563,7 +582,8 @@ class KeyController extends Controller
 
     public function insertAction ()
     {
-        $this->checkAuthorisation();
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->checkAuthorisation();
 
 		if (!$this->rGetId()) $this->redirect('step_show.php');
 
@@ -632,12 +652,15 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-    public function sectionAction ()
+    public function sectionAction()
     {
         $this->checkAuthorisation();
 
         if ($this->rHasVal('action', 'setstart') && $this->rHasId())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
             $this->setKeyStartStep($this->rGetId());
             $this->redirect('step_show.php');
         }
@@ -645,6 +668,9 @@ class KeyController extends Controller
 		// start a new subsection: create a new step and redirect to edit
 		if ($this->rHasVal('action', 'new'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+			$this->checkAuthorisation();
+
 			$id=$this->createNewKeystep();
             $this->redirect('step_edit.php?id=' . $id);
         }
@@ -673,9 +699,10 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-    public function rankAction ()
+    public function rankAction()
     {
-        $this->checkAuthorisation();
+
+		$this->checkAuthorisation();
 
         $this->setPageName($this->translate('Taxon ranks in key'));
 
@@ -685,6 +712,8 @@ class KeyController extends Controller
 
         if ($this->rHasVal('keyRankBorder') && isset($pr) && !$this->isFormResubmit())
 		{
+			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+			$this->checkAuthorisation();
 
             $endPoint = false;
 
@@ -713,37 +742,29 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-    public function orphansAction ()
+    public function orphansAction()
     {
         $this->checkAuthorisation();
-
         $this->setPageName($this->translate('Taxa not part of the key'));
-
         $this->smarty->assign('taxa', $this->getTaxaInKey( array( "order"=>"rank" ) ));
-
         $this->printPage();
     }
 
     public function deadEndsAction ()
     {
         $this->checkAuthorisation();
-
         $this->setPageName($this->translate('Key validation'));
-
 		$this->cleanUpChoices();
 
         $k = $this->getKeysteps();
 
 		$deadSteps =  $sadSteps = array();
 
-        foreach ((array) $k as $key => $val) {
-
+        foreach ((array) $k as $key => $val)
+		{
             $kc = $this->getKeystepChoices($val['id']);
-
-            if (count((array) $kc) == 0)
-                $deadSteps[] = $val;
-            if (count((array) $kc) == 1)
-                $sadSteps[] = $val;
+            if (count((array) $kc) == 0) $deadSteps[] = $val;
+            if (count((array) $kc) == 1) $sadSteps[] = $val;
         }
 
 		$deadChoices = $this->models->KeyModel->getDeadEndChoicesKeysteps(
@@ -754,11 +775,8 @@ class KeyController extends Controller
 		);
 
         $this->smarty->assign('deadSteps',$deadSteps);
-
         $this->smarty->assign('sadSteps',$sadSteps);
-
         $this->smarty->assign('deadChoices', $deadChoices);
-
         $this->printPage();
     }
 
@@ -779,7 +797,6 @@ class KeyController extends Controller
 
         if ($this->rHasVal('action', 'store') && !$this->isFormResubmit())
 		{
-
             $k = $this->saveKeyTree();
 
             if ($k===true)
@@ -848,26 +865,31 @@ class KeyController extends Controller
 	*/
     public function ajaxInterfaceAction ()
     {
-        if (!$this->rHasVal('action'))
-            return;
+        if (!$this->rHasVal('action')) return;
 
         if ($this->rHasVal('action','get_keystep_content'))
 		{
+			if ( !$this->getAuthorisationState() ) return;
             $this->getKeystepContent();
         }
         else
 		if ($this->rHasVal('action','save_keystep_content'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
             $this->saveKeystepContent($this->rGetAll());
         }
         else
 		if ($this->rHasVal('action','get_key_choice_content'))
 		{
+			if ( !$this->getAuthorisationState() ) return;
             $this->getKeystepChoiceContent();
         }
         else
 		if ($this->rHasVal('action','save_key_choice_content'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			if ( !$this->getAuthorisationState() ) return;
             $this->saveKeystepChoiceContent($this->rGetAll());
         }
 

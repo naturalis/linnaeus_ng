@@ -75,15 +75,10 @@ class UsersController extends Controller
 	{
 		$this->setExpertRoleId();
 
-		if ( empty($this->getExpertRoleId()) )
+		if ( empty( $this->getExpertRoleId() ) )
 		{
 			$this->addWarning( $this->translate('No ID for the editor-role defined.') );
 		}
-	}
-
-	private function deleteUser()
-	{
-		$this->models->Users->delete(array('id' => $this->getUserId()));
 	}
 
     public function indexAction()
@@ -99,7 +94,9 @@ class UsersController extends Controller
     public function viewAction()
     {
         $this->checkAuthorisation();
+		
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
+
         $this->setPageName($this->translate('Project collaborator data'));
 		$this->setUserId( $this->rGetId() );
 		$this->setUser();
@@ -109,8 +106,11 @@ class UsersController extends Controller
 
     public function addUserAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
         $this->checkAuthorisation();
+		
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
+
 		$this->setUserId( $this->rGetId() );
 		$this->addUserToCurrentProject();
 		$this->redirect('index.php');
@@ -118,8 +118,11 @@ class UsersController extends Controller
 
     public function removeUserAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
         $this->checkAuthorisation();
+
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
+
 		$this->setUserId( $this->rGetId() );
 		$this->removeUserFromCurrentProject();
 		$this->redirect('index.php');
@@ -127,6 +130,7 @@ class UsersController extends Controller
 
     public function createAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Create new collaborator'));
@@ -144,12 +148,12 @@ class UsersController extends Controller
 		}
 		
 		$this->smarty->assign('user', $this->rGetAll() );
-		
 		$this->printPage( 'edit' );
     }
 
     public function editAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
         $this->checkAuthorisation();
 
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
@@ -197,6 +201,7 @@ class UsersController extends Controller
 	
     public function deleteAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
         $this->checkAuthorisation();
 
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
@@ -217,7 +222,6 @@ class UsersController extends Controller
 
     public function passwordAction()
     {
-
         $this->setPageName($this->translate('Reset password'));
 
 		if ($this->rHasVal('email') && !$this->isFormResubmit())
@@ -260,8 +264,8 @@ class UsersController extends Controller
 
 	public function rightsMatrixAction()
 	{
-
-        $this->checkAuthorisation(true);
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
+        $this->checkAuthorisation();
 
 		$this->setBreadcrumbRootName($this->translate('System administration'));
 
@@ -1035,6 +1039,12 @@ class UsersController extends Controller
 		$this->userRightsSave();
 
 	}
+
+	private function deleteUser()
+	{
+		$this->models->Users->delete(array('id' => $this->getUserId()));
+	}
+
 
 
 }
