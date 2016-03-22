@@ -1545,6 +1545,14 @@ class KeyController extends Controller
         foreach ((array) $choices as $key => $val)
 		{
 
+            // Override image, but only when size has not been set!
+            if (empty($val['choice_image_params'])) {
+                $choices[$key]['choice_img'] = $this->getChoiceImage($val['id']);
+            } else {
+                $choices[$key]['choice_img'] =
+                    $_SESSION['admin']['project']['urls']['project_media'] . $val['choice_img'];
+            }
+
             $kcc = $this->getKeystepChoiceContent($this->getDefaultProjectLanguage(), $val['id']);
 
             if (isset($kcc['title']))
@@ -1603,11 +1611,8 @@ class KeyController extends Controller
 
         $choice = $ck[0];
 
-    	// Append image to choice
-        $img = $this->_mc->getItemMediaFiles();
-        if (!empty($img) && $img[0]['media_type'] ==  'image') {
-            $choice['choice_img'] = $img[0]['rs_original'];
-        }
+    	// Override choice image
+        $choice['choice_img'] = $this->getChoiceImage();
 
         $k = $this->models->Keysteps->_get(array(
             'id' => $choice['keystep_id']
@@ -1654,11 +1659,6 @@ class KeyController extends Controller
         $choice['marker'] = $choice['show_order'];
 
         return $choice;
-    }
-
-    private function getChoiceImage ($choiceId)
-    {
-
     }
 
     private function saveKeystepChoiceContent($data)
@@ -2109,5 +2109,21 @@ class KeyController extends Controller
         }
     }
 
+    private function getChoiceImage ($itemId = false)
+    {
+        if (!$itemId) {
+            $itemId = $this->rGetId();
+        }
 
+        $this->_mc->setItemId($itemId);
+
+    	// Append image to choice
+        $img = $this->_mc->getItemMediaFiles();
+
+        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+            return $img[0]['rs_original'];
+        }
+
+        return null;
+    }
 }
