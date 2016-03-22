@@ -751,7 +751,7 @@ class IntroductionController extends Controller
     {
         $img = $this->_mc->getItemMediaFiles();
 
-        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+        if (!empty($img) && $img[0]['media_type'] == 'image') {
             return $img[0];
         }
 

@@ -39,7 +39,7 @@ class MediaController extends Controller
     public static $singleMediaFileControllers = array(
         'introduction',
         'key',
-        'matrix',
+        'matrixkey',
         'free_module'
     );
 
@@ -378,6 +378,7 @@ class MediaController extends Controller
             $mi = new ModuleIdentifierController();
             $mi->setModuleId($this->moduleId);
             $mi->setItemId($this->itemId);
+            $mi->setLanguageId($this->languageId);
 
             $this->smarty->assign('module_name', $mi->getModuleName());
             $this->smarty->assign('item_name', $mi->getItemName());
@@ -484,7 +485,7 @@ class MediaController extends Controller
         // media_ids is single value if coming from radio form; transform to array
         $mediaIds = is_array($this->rGetVal('media_ids')) ? $this->rGetVal('media_ids') :
             array($this->rGetVal('media_ids') => 'on');
-        
+
         foreach ($mediaIds as $k => $v) {
             $this->models->MediaModules->insert(array(
                 'id' => null,
