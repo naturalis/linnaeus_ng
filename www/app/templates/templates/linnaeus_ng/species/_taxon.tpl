@@ -179,8 +179,10 @@
 
 <div id="content" class="proze" >
 
-	{if $isTaxonStartPage && $overviewImage}
+	{if $isTaxonStartPage && $overviewImage.image}
 		<div id="overview-image" style="background: url('{$projectUrls.uploadedMedia}{$overviewImage.image}');"></div>
+	{else if $isTaxonStartPage && $overview}
+		<div id="overview-image" style="background: url('{$overview}');"></div>
 	{/if}
 
 {$content}

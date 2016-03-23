@@ -55,7 +55,7 @@ final class MediaModel extends AbstractModel
         ) . '
             where
                 t1.`deleted` = 0 and
-                t1.`project_id` = ' . $projectId .
+                t1.`project_id` = ' . $this->escapeString($projectId) .
                 $this->appendSearchWhere($search);
 
         return $this->freeQuery($query);

@@ -45,6 +45,7 @@
 
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 include_once ('ModuleSettingsReaderController.php');
 
 class MatrixKeyController extends Controller
@@ -92,6 +93,9 @@ class MatrixKeyController extends Controller
 	private $settings;
 	private $image_root_skin=true;
 
+	private $_mc;
+	private $_smc;
+
     public $cssToLoad = array('matrix.css');
 
     public $jsToLoad = array(
@@ -130,17 +134,29 @@ class MatrixKeyController extends Controller
 
 		$this->_search_presence_help_url = $this->moduleSettings->getModuleSetting( array('setting'=>'url_help_search_presence','module'=>'utilities') );
 		$this->image_root_skin = $this->moduleSettings->getModuleSetting( 'image_root_skin');
-		
+
 		$this->smarty->assign( 'image_root_skin', $this->image_root_skin );
 		$this->smarty->assign( 'introduction_links', $this->getIntroductionLinks() );
 		$this->smarty->assign( 'settings', $this->settings );
 
 		$this->setFacetMenu();
 		$this->setIncUnknowns( false );
+		$this->setMediaControllers();
 	}
-	
-	
-	
+
+
+	private function setMediaControllers()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+
+        // Dedicated controller for taxa
+	    $this->_smc = new MediaController();
+        $this->_smc->setModuleId($this->getCurrentModuleId('species'));
+	}
+
+
 
     public function indexAction()
     {
@@ -399,12 +415,47 @@ class MatrixKeyController extends Controller
 		if (is_null($id) && is_null($char))
 			return;
 
-        return  $this->models->MatrixkeyModel->getCharacterStates(array(
+        $states = $this->models->MatrixkeyModel->getCharacterStates(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"state_id"=>$id,
 			"characteristic_id"=>$char
 		));
+
+        // getCharacterStates may return array of records or single record...
+        if (isset($states[0])) {
+            foreach ($states as $i => $state) {
+                $this->_mc->setItemId($state['id']);
+                $media = $this->_mc->getItemMediaFiles();
+
+                $states[$i]['file_name'] = $states[$i]['file_dimensions'] =
+                    $states[$i]['img_dimensions'] = null;
+
+                if (!empty($media)) {
+                    $states[$i]['file_name'] = $media[0]['rs_original'];
+                    $states[$i]['file_dimensions'] =
+                        $media[0]['width'] . ':' . $media[0]['height'];
+                    $states[$i]['img_dimensions'] =
+                        array($media[0]['width'], $media[0]['height']);
+                }
+            }
+        } else if (isset($states['id'])) {
+            $this->_mc->setItemId($states['id']);
+            $media = $this->_mc->getItemMediaFiles();
+
+            $states['file_name'] = $states['file_dimensions'] =
+                $states['img_dimensions'] = null;
+
+                $states['file_name'] = $media[0]['rs_original'];
+            $states['file_dimensions'] =
+                $media[0]['width'] . ':' . $media[0]['height'];
+            $states['img_dimensions'] =
+                array($media[0]['width'], $media[0]['height']);
+        }
+
+        //print_r($states);
+
+        return $states;
     }
 
     private function getCharacteristicHValue( $p )
@@ -525,7 +576,8 @@ class MatrixKeyController extends Controller
 		{
 			foreach((array)$taxa as $key=>$val)
 			{
-				$d=$this->models->MediaTaxon->_get(array("id"=>
+				/*
+				 $d=$this->models->MediaTaxon->_get(array("id"=>
 					array(
 						"taxon_id"=>$val['id'],
 						"project_id" => $this->getCurrentProjectId(),
@@ -536,9 +588,14 @@ class MatrixKeyController extends Controller
 				{
 					$taxa[$key]['info']['url_image']=$d[0]['file_name'];
 				}
+				*/
+
+			    $this->_smc->setItemId($val['id']);
+			    $taxa[$key]['info']['url_image'] = $this->_smc->getOverview();
+
 			}
 		}
-		
+
 		$all=array_merge((array)$taxa,(array)$variations);
 
 		if ( isset($this->settings->species_module_link) || isset($this->settings->species_module_link_force) )
@@ -554,7 +611,7 @@ class MatrixKeyController extends Controller
 				{
 					$id=$val['taxon']['id'];
 				}
-				
+
 				if ( $this->settings->species_module_link_force )
 				{
 					$all[$key]['info']['url_external_page']=sprintf( $this->settings->species_module_link_force, $id );
@@ -901,13 +958,14 @@ class MatrixKeyController extends Controller
 
                 if ($d[0]=='c' && isset($d[2]))
 				{
-                    $d = $this->getCharacterStates( array('id'=>$d[2]) );
+				    $d = $this->getCharacterStates( array('id'=>$d[2]) );
                     $states[$key]['type'] = 'c';
                     $states[$key]['id'] = $d['id'];
                     $states[$key]['characteristic_id'] = $d['characteristic_id'];
                     $states[$key]['label'] = $d['label'];
-                    $states[$key]['file_name'] = $d['file_name'];
-                }
+                    //$states[$key]['file_name'] = $d['file_name'];
+
+				}
                 else
 				if ($d[0]=='f' && isset($d[2]))
 				{
@@ -1490,7 +1548,7 @@ class MatrixKeyController extends Controller
 	private function setIntroductionLinks()
     {
 		$topics=array();
-		
+
 		if ( isset($this->settings->introduction_topic_colophon_citation) )
 		{
 			array_push($topics,$this->settings->introduction_topic_colophon_citation);
@@ -1507,7 +1565,7 @@ class MatrixKeyController extends Controller
 		}
 
 		$this->_introductionLinks=array();
-		
+
 		foreach((array)$topics as $topic)
 		{
 			$d=$this->models->ContentIntroduction->_get(

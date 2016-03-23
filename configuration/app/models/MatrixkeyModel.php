@@ -3,7 +3,7 @@ include_once (dirname(__FILE__) . "/AbstractModel.php");
 
 final class MatrixKeyModel extends AbstractModel
 {
-	
+
 	private $remainingCountClauses;
 
     public function __construct ()
@@ -33,23 +33,23 @@ final class MatrixKeyModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
-		
+
 		if ( is_null($project_id)  ||  is_null($language_id) )
 			return;
-		
+
 		$query="
-			select 
+			select
 					_a.id,
 					_a.default,
 					_b.name
 				from
 					%PRE%matrices _a
-					
+
 				left join %PRE%matrices_names _b
 					on _a.project_id = _b.project_id
 					and _a.id = _b.matrix_id
 					and _b.language_id = " . $language_id ."
-	
+
 				where
 					_a.project_id = " .  $project_id ."
 					" . ( isset($matrix_id) && $matrix_id!='*' ? "and _a.id = " . $matrix_id : "" ) . "
@@ -58,22 +58,22 @@ final class MatrixKeyModel extends AbstractModel
 		";
 
 		$d=$this->freeQuery( array( "query"=>$query, "fieldAsIndex"=>"id") );
-		
+
 		return ( isset($matrix_id) && $matrix_id!='*' && isset($d[$matrix_id]) ? $d[$matrix_id] : ( isset($d) ? $d  : null ) );
 	}
-	
+
     public function getCharacterStates( $params )
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$state_id = isset($params['state_id']) ? $params['state_id'] : null;
 		$characteristic_id = isset($params['characteristic_id']) ? $params['characteristic_id'] : null;
-		
+
 		if ( is_null($project_id)  ||  is_null($language_id) )
 			return;
-		
+
 		$query="
-			select 
+			select
 				_a.id,
 				_a.characteristic_id,
 				_a.file_name,
@@ -87,9 +87,9 @@ final class MatrixKeyModel extends AbstractModel
 				_b.type,
 				_c.label,
 				_c.text
-				
+
 			from %PRE%characteristics_states _a
-			
+
 			left join %PRE%characteristics _b
 				on _a.characteristic_id = _b.id
 				and _a.project_id=_b.project_id
@@ -99,12 +99,12 @@ final class MatrixKeyModel extends AbstractModel
 				and _a.project_id=_c.project_id
 				and _c.language_id=".$language_id."
 
-			where 
-				_a.project_id=".$project_id." 
-				".( empty($state_id) || $state_id=='*' ? "" : "and _a.id=" . $state_id )." 
-				".( empty($characteristic_id) ? "" : "and _a.characteristic_id=" . $characteristic_id )." 
+			where
+				_a.project_id=".$project_id."
+				".( empty($state_id) || $state_id=='*' ? "" : "and _a.id=" . $state_id )."
+				".( empty($characteristic_id) ? "" : "and _a.characteristic_id=" . $characteristic_id )."
 
-			order by 
+			order by
 				_a.show_order
 			"
 		;
@@ -117,17 +117,17 @@ final class MatrixKeyModel extends AbstractModel
 		}
 
         return (isset($state_id) && $state_id!='*' && isset($d[0]) ? $d[0] : $d);
-    }	
+    }
 
     public function getVariationsInMatrix( $params )
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
-		
+
 		if ( is_null($project_id) || is_null($language_id) || is_null($matrix_id) )
 			return;
-		
+
 		$query="
 			select
 				_b.id,
@@ -137,19 +137,19 @@ final class MatrixKeyModel extends AbstractModel
 				_c.label,
 				_c.label_type,
 				'variation' as type
-	
+
 			from %PRE%matrices_variations _a
-	
+
 			left join %PRE%taxa_variations _b
 				on _a.project_id=_b.project_id
 				and _a.variation_id = _b.id
-	
+
 			left join %PRE%variations_labels _c
 				on _a.project_id=_c.project_id
 				and _a.variation_id = _c.variation_id
 				and _c.language_id = ". $language_id ."
-		
-			where 
+
+			where
 				_a.project_id = ". $project_id ."
 				and _a.matrix_id = ". $matrix_id."
 			order by
@@ -165,16 +165,16 @@ final class MatrixKeyModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
-		
+
 		if ( is_null($project_id) || is_null($language_id) || is_null($matrix_id) )
 			return;
-		
+
 		$query="
-			select 
+			select
 				distinct _a.ref_matrix_id as id,
 				_b.name as label,
-				'matrix' as type 
-			from 
+				'matrix' as type
+			from
 				%PRE%matrices_taxa_states _a
 
 			left join %PRE%matrices_names _b
@@ -182,14 +182,14 @@ final class MatrixKeyModel extends AbstractModel
 				and _a.ref_matrix_id = _b.matrix_id
 				and _b.language_id = " . $language_id . "
 
-			where 
-				_a.project_id = " . $project_id . " 
-				and _a.matrix_id = " . $matrix_id . " 
+			where
+				_a.project_id = " . $project_id . "
+				and _a.matrix_id = " . $matrix_id . "
 				and _a.ref_matrix_id is not null
 			";
-			
+
 		return $this->freeQuery( $query );
-    }	
+    }
 
     public function getEntityStates( $params )
     {
@@ -203,7 +203,7 @@ final class MatrixKeyModel extends AbstractModel
 			return;
 
 		$query="
-			select 
+			select
 				_c.label as characteristic,
 				_b.type,
 				_b.type,
@@ -218,22 +218,22 @@ final class MatrixKeyModel extends AbstractModel
 				_d.got_labels,
 				_e.label,
 				ifnull(_g.label,_gg.label) as group_label
-				
+
 			from %PRE%matrices_taxa_states _a
-			
+
 			left join %PRE%characteristics_states _d
 				on _a.project_id=_d.project_id
 				and _a.state_id=_d.id
-	
+
 			left join %PRE%characteristics _b
 				on _a.project_id=_b.project_id
 				and _a.characteristic_id=_b.id
-	
+
 			left join %PRE%characteristics_labels _c
 				on _a.project_id=_c.project_id
 				and _a.characteristic_id=_c.characteristic_id
 				and _c.language_id=".$language_id."
-	
+
 			left join %PRE%characteristics_labels_states _e
 				on _a.state_id = _e.state_id
 				and _a.project_id=_e.project_id
@@ -242,7 +242,7 @@ final class MatrixKeyModel extends AbstractModel
 			left join %PRE%characteristics_chargroups _f
 				on _a.project_id=_f.project_id
 				and _a.characteristic_id=_f.characteristic_id
-			
+
 			left join %PRE%chargroups _gg
 				on _f.project_id=_gg.project_id
 				and _f.chargroup_id=_gg.id
@@ -252,14 +252,14 @@ final class MatrixKeyModel extends AbstractModel
 				and _f.chargroup_id=_g.chargroup_id
 				and _g.language_id=".$language_id."
 
-			where 
-				_a.project_id = ".$project_id." 
-				and _a.matrix_id = ".$matrix_id." 
+			where
+				_a.project_id = ".$project_id."
+				and _a.matrix_id = ".$matrix_id."
 				and _a.".($type=="variation" ? "variation_id" : ($type=="matrix" ? "ref_matrix_id" : "taxon_id"))."=".$id
 		;
-		
+
 		$m=$this->freeQuery( $query );
-		
+
 		$res=array();
 		foreach((array)$m as $val)
 		{
@@ -280,7 +280,7 @@ final class MatrixKeyModel extends AbstractModel
 				'label'=>$val['label']
 			);
 		}
-		
+
 		return $res;
     }
 
@@ -294,29 +294,29 @@ final class MatrixKeyModel extends AbstractModel
 			return;
 
 		$query="
-			select 
+			select
 				id,
 				label,
 				type,
 				show_order_main,
 				show_order_sub
 			 from (
-		
-				select 
+
+				select
 					_a.id,
 					ifnull(_c.label,_cdef.label) as label,
 					'char' as type,
 					_gmo.show_order as show_order_main,
 					_b.show_order as show_order_sub
-	
+
 				from
 					%PRE%characteristics _a
-				
+
 				right join %PRE%characteristics_matrices _b
 					on _a.id = _b.characteristic_id
 					and _a.project_id = _b.project_id
 					and _b.matrix_id = " . $matrix_id . "
-	
+
 				right join %PRE%characteristics_labels _c
 					on _a.project_id = _c.project_id
 					and _a.id = _c.characteristic_id
@@ -326,58 +326,58 @@ final class MatrixKeyModel extends AbstractModel
 					on _a.project_id = _cdef.project_id
 					and _a.id = _cdef.characteristic_id
 					and _cdef.language_id = ". $language_id."
-					
+
 				left join %PRE%characteristics_chargroups _d
 					on _a.project_id = _d.project_id
 					and _a.id = _d.characteristic_id
-					
+
 				left join %PRE%chargroups _e
 					on _d.project_id = _e.project_id
 					and _d.chargroup_id = _e.id
 					and _e.matrix_id = " . $matrix_id . "
-					
+
 				left join %PRE%gui_menu_order _gmo
 					on _a.project_id = _gmo.project_id
 					and _gmo.matrix_id = " . $matrix_id . "
 					and _gmo.ref_id = _a.id
 					and _gmo.ref_type='char'
-					
-				where 
-					_a.project_id = " . $project_id . " 
+
+				where
+					_a.project_id = " . $project_id . "
 					and _d.id is null
-	
-				union		
-	
-				select 
+
+				union
+
+				select
 					_a.id,
 					ifnull(_c.label,_a.label) as label,
 					'group' as type,
 					_gmo.show_order as show_order_main,
 					_a.show_order as show_order_sub
-	
+
 				from
 					%PRE%chargroups _a
-	
+
 				left join %PRE%chargroups_labels _c
 					on _a.project_id = _c.project_id
 					and _a.id = _c.chargroup_id
 					and _c.language_id = ". $language_id."
-	
+
 				left join %PRE%gui_menu_order _gmo
 					on _a.project_id = _gmo.project_id
 					and _gmo.matrix_id = " . $matrix_id . "
 					and _gmo.ref_id = _a.id
 					and _gmo.ref_type='group'
-	
-				where 
-					_a.project_id = " . $project_id . " 
-					and _a.matrix_id = " . $matrix_id ." 			
-			
+
+				where
+					_a.project_id = " . $project_id . "
+					and _a.matrix_id = " . $matrix_id ."
+
 			) as unionized
-			
+
 			order by show_order_main, show_order_sub, label
 		";
-		
+
 		return $this->freeQuery( $query );
 
 	}
@@ -392,13 +392,13 @@ final class MatrixKeyModel extends AbstractModel
 			return;
 
 		$query="
-			select 
+			select
 				_a.id,
 				_a.type,
 				_c.label,
 				if (_a.type='media'||_a.type='text','c','f') as prefix
 
-			from 
+			from
 				%PRE%characteristics _a
 
 			left join %PRE%characteristics_labels _c
@@ -406,26 +406,26 @@ final class MatrixKeyModel extends AbstractModel
 				and _a.id=_c.characteristic_id
 				and _c.language_id=".$language_id."
 
-			where 
+			where
 				_a.project_id = " . $project_id . "
 				and _a.id = " . $characteristic_id . "
 		";
-		
+
 		$d=$this->freeQuery( $query );
-		
-		return isset($d[0]) ? $d[0] : null;        
+
+		return isset($d[0]) ? $d[0] : null;
     }
-	
+
 
 	/*
 		DOES NOT WORK YET - WORK IN PROGRESS
-	
+
 		states within the same charachters expand the result set,
 		selected states across characters restrict the result set
 		example: (red OR black) AND round
-		
+
 		REFAC2015: finish!
-		
+
 	*/
     public function getScoresLiberal( $params )
 	{
@@ -445,7 +445,7 @@ final class MatrixKeyModel extends AbstractModel
         $n = $stateCount + ($incUnknowns ? 1 : 0);
         $s = implode(',', $state_ids);
         $c = implode(',', $character_ids);
-        
+
 		$query="
         	select 'taxon' as type, _a.taxon_id as id, _b.state_id, _b.characteristic_id,
        				_c.is_hybrid as h, trim(_c.taxon) as l
@@ -477,7 +477,7 @@ final class MatrixKeyModel extends AbstractModel
 			union all
 			select 'variation' as type, _a.variation_id as id, _b.state_id, _b.characteristic_id,
 				0 as h, trim(_c.label) as l
-				from  %PRE%matrices_variations _a        		
+				from  %PRE%matrices_variations _a
 				left join %PRE%matrices_taxa_states _b
 					on _a.project_id = _b.project_id
 					and _a.matrix_id = _b.matrix_id
@@ -543,8 +543,8 @@ final class MatrixKeyModel extends AbstractModel
 
         	select
 				'matrix' as type,
-				_a.id as id, 
-				count(_b.state_id) as matching_states, 
+				_a.id as id,
+				count(_b.state_id) as matching_states,
 				round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as score,
 				trim(_c.name) as label
 
@@ -566,21 +566,21 @@ final class MatrixKeyModel extends AbstractModel
 				_a.project_id = " . $project_id . "
 				and _a.id != " . $matrix_id . "
 
-			group by id" . 
-			
+			group by id" .
+
 			( $matrixVariationExists ? "
 
 				union all
-	
+
 				select
 					'variation' as type,
-					_a.variation_id as id, 
-					count(_b.state_id) as matching_states, 
+					_a.variation_id as id,
+					count(_b.state_id) as matching_states,
 					round((if(count(_b.state_id)>" . $n . "," . $n . ", count(_b.state_id))/" . $n . ")*100,0) as score,
 					trim(_d.taxon) as label
 
 				from
-					%PRE%matrices_variations _a        		
+					%PRE%matrices_variations _a
 
 				left join %PRE%matrices_taxa_states _b
 					on _a.project_id = _b.project_id
@@ -610,9 +610,9 @@ final class MatrixKeyModel extends AbstractModel
 		/*
 			"unknowns" are taxa for which *no* state has been defined within a certain character.
 			note that this is different froam having a *different* state within that character. if
-			there is a character "colour", and taxon A has the state "green", taxon B has the 
-			state "brown" and taxon C has no state for colour, then selecting "brown" with 'Treat 
-			unknowns as matches' set to false will yield A:0%, B:100%, C:0%. selecting "brown" 
+			there is a character "colour", and taxon A has the state "green", taxon B has the
+			state "brown" and taxon C has no state for colour, then selecting "brown" with 'Treat
+			unknowns as matches' set to false will yield A:0%, B:100%, C:0%. selecting "brown"
 			with 'Treat unknowns as matches' set to true will yield A:0%, B:100%, C:100%.
 			it can be seen as a 'rather safe than sorry' setting.
 		*/
@@ -622,12 +622,12 @@ final class MatrixKeyModel extends AbstractModel
 			$c = implode(',', $character_ids);
 
 			$unknowns=array('taxon'=>array(),'matrix'=>array(),'variation'=>array());
-			
+
 			foreach((array)$c as $character)
 			{
 				$q = "
 					select
-						'taxon' as type, 
+						'taxon' as type,
 						_a.taxon_id as id,
 						trim(_c.taxon) as label
 					from
@@ -657,7 +657,7 @@ final class MatrixKeyModel extends AbstractModel
 				union all
 
 					select
-						'matrix' as type, 
+						'matrix' as type,
 						_a.id as id,
 						trim(_c.name) as label
 					from
@@ -684,11 +684,11 @@ final class MatrixKeyModel extends AbstractModel
 						count(_b.id)=0
 
 				".( $matrixVariationExists ? "
-		
+
 				union all
 
 					select
-						'variation' as type, 
+						'variation' as type,
 						_a.variation_id as id,
 						trim(_d.taxon) as label
 
@@ -727,33 +727,33 @@ final class MatrixKeyModel extends AbstractModel
 				{
 					switch($r['type'])
 					{
-						case 'taxon': 
+						case 'taxon':
 							$unknowns['taxon'][$r['id']]=$r;
 							isset($unknowns['taxon'][$r['id']]['matching_states']) ?
-								$unknowns['taxon'][$r['id']]['matching_states']++ : 
+								$unknowns['taxon'][$r['id']]['matching_states']++ :
 								$unknowns['taxon'][$r['id']]['matching_states']=1;
 
-							$unknowns['taxon'][$r['id']]['score'] = 
+							$unknowns['taxon'][$r['id']]['score'] =
 								round(($unknowns['taxon'][$r['id']]['matching_states']/$n)*100);
 							break;
 
 						case 'matrix':
 							$unknowns['matrix'][$r['id']]=$r;
 							isset($unknowns['matrix'][$r['id']]['matching_states']) ?
-								$unknowns['matrix'][$r['id']]['matching_states']++ : 
+								$unknowns['matrix'][$r['id']]['matching_states']++ :
 								$unknowns['matrix'][$r['id']]['matching_states']=1;
 
-							$unknowns['matrix'][$r['id']]['score'] = 
+							$unknowns['matrix'][$r['id']]['score'] =
 								round(($unknowns['matrix'][$r['id']]['matching_states']/$n)*100);
 							break;
 
 						case 'variation':
 							$unknowns['variation'][$r['id']]=$r;
 							isset($unknowns['variation'][$r['id']]['matching_states']) ?
-								$unknowns['variation'][$r['id']]['matching_states']++ : 
+								$unknowns['variation'][$r['id']]['matching_states']++ :
 								$unknowns['variation'][$r['id']]['matching_states']=1;
 
-							$unknowns['variation'][$r['id']]['score'] = 
+							$unknowns['variation'][$r['id']]['score'] =
 								round(($unknowns['variation'][$r['id']]['matching_states']/$n)*100);
 							break;
 					}
@@ -770,7 +770,7 @@ final class MatrixKeyModel extends AbstractModel
 					unset($unknowns[$val['type']][$val['id']]);
 				}
 			}
-	
+
 			foreach((array)$unknowns as $type)
 			{
 				foreach((array)$type as $key => $val)
@@ -787,7 +787,7 @@ final class MatrixKeyModel extends AbstractModel
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
-		
+
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
 
@@ -798,7 +798,7 @@ final class MatrixKeyModel extends AbstractModel
 		$dV = $c['dV'];
 		$fsV = $c['fsV'];
 		$dM = $c['dM'];
-		$fsM = $c['fsM'];	
+		$fsM = $c['fsM'];
 
 		$s = array();
 
@@ -807,9 +807,9 @@ final class MatrixKeyModel extends AbstractModel
         have the already selected states, unless no states have been selected at all, in which case we just
         return them all
         */
-        
+
         $query = "
-        	select sum(tot) as tot, state_id, characteristic_id 
+        	select sum(tot) as tot, state_id, characteristic_id
         	from (
         		select count(distinct _a.taxon_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 	        		from %PRE%matrices_taxa_states _a
@@ -838,7 +838,7 @@ final class MatrixKeyModel extends AbstractModel
 					group by _a.state_id
 
 
-			) as q1 
+			) as q1
 			group by q1.state_id
 			";
 
@@ -849,7 +849,7 @@ final class MatrixKeyModel extends AbstractModel
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
-		
+
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
 
@@ -864,13 +864,13 @@ final class MatrixKeyModel extends AbstractModel
 
         $query = "
         	select
-				sum(taxon_count) as taxon_count, 
-				sum(distinct_state_count) as distinct_state_count, 
-				characteristic_id 
+				sum(taxon_count) as taxon_count,
+				sum(distinct_state_count) as distinct_state_count,
+				characteristic_id
         	from (
         		select
 					_a.characteristic_id as characteristic_id,
-					count(distinct _a.taxon_id) as taxon_count, 
+					count(distinct _a.taxon_id) as taxon_count,
 					count(distinct _a.state_id) as distinct_state_count
 				from
 					%PRE%matrices_taxa_states _a
@@ -883,12 +883,12 @@ final class MatrixKeyModel extends AbstractModel
 						(select taxon_id from %PRE%taxa_variations where project_id = " . $project_id . ")
 				group by
 					_a.characteristic_id
-				
+
 				union all
 
-				select 
+				select
 					_a.characteristic_id as characteristic_id,
-					count(distinct _a.variation_id) as taxon_count, 
+					count(distinct _a.variation_id) as taxon_count,
 					count(distinct _a.state_id) as distinct_state_count
 				from
 					%PRE%matrices_taxa_states _a
@@ -902,9 +902,9 @@ final class MatrixKeyModel extends AbstractModel
 
 				union all
 
-				select 
+				select
 					_a.characteristic_id as characteristic_id,
-					count(distinct _a.ref_matrix_id) as taxon_count, 
+					count(distinct _a.ref_matrix_id) as taxon_count,
 					count(distinct _a.state_id) as distinct_state_count
 				from
 					%PRE%matrices_taxa_states _a
@@ -916,7 +916,7 @@ final class MatrixKeyModel extends AbstractModel
 				group by
 					_a.characteristic_id
 
-			) as q1 
+			) as q1
 			group by q1.characteristic_id
 			";
 
@@ -944,56 +944,56 @@ final class MatrixKeyModel extends AbstractModel
 					_a.variation_id as id,
 					trim(_c.label) as label,
 					_c.taxon_id as taxon_id,
-					_d.taxon as taxon, 
+					_d.taxon as taxon,
 					null as commonname
-	
-				from 
-					%PRE%matrices_variations _a        		
-	
+
+				from
+					%PRE%matrices_variations _a
+
 				left join %PRE%matrices_taxa_states _b
 					on _a.matrix_id = _b.matrix_id
 					and _a.variation_id = _b.variation_id
 					and _b.project_id = " . $project_id . "
-	
+
 				left join %PRE%taxa_variations _c
 					on _a.variation_id = _c.id
 					and _c.project_id = " . $project_id . "
-	
+
 				left join %PRE%taxa _d
-					on _c.taxon_id = _d.id						
+					on _c.taxon_id = _d.id
 					and _d.project_id = " . $project_id . "
-	
+
 				where _a.project_id = " . $project_id . "
 					and _a.matrix_id = " . $matrix_id . "
 					and (lower(_c.label) like '%". $search ."%' or lower(_d.taxon) like '%". $search ."%')
-	
+
 				union
-	
-				select 
+
+				select
 					'taxon' as type,
-					_a.taxon_id as id, 
-					trim(_c.taxon) as label, 
+					_a.taxon_id as id,
+					trim(_c.taxon) as label,
 					_a.taxon_id as taxon_id,
-					_c.taxon as taxon, 
+					_c.taxon as taxon,
 					_d.commonname as commonname
-	
+
 				from
 					%PRE%matrices_taxa _a
-	
+
 				left join %PRE%matrices_taxa_states _b
 					on _a.matrix_id = _b.matrix_id
 					and _a.taxon_id = _b.taxon_id
 					and _b.project_id = " . $project_id . "
-	
+
 				left join %PRE%taxa _c
 					on _a.taxon_id = _c.id
 					and _c.project_id = " . $project_id . "
-	
+
 				left join %PRE%commonnames _d
 					on _a.taxon_id = _d.taxon_id
-					and _d.language_id = ".$language_id ." 
+					and _d.language_id = ".$language_id ."
 					and _d.project_id = " . $project_id . "
-	
+
 				where _a.project_id = " . $project_id . "
 					and _a.matrix_id = " . $matrix_id . "
 					and (lower(_c.taxon) like '%". $search ."%' or lower(_d.commonname) like '%". $search ."%')
@@ -1019,7 +1019,7 @@ final class MatrixKeyModel extends AbstractModel
 	}
 
 
-		
+
 }
 
 
