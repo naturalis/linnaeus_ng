@@ -73,9 +73,8 @@ class ExportController extends Controller
      */
     public function __construct ()
     {
-
         parent::__construct();
-
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
     }
 
     /**
@@ -85,9 +84,7 @@ class ExportController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
-
     }
 
     /**

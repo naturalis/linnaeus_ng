@@ -136,6 +136,8 @@ class ModuleSettingsController extends Controller
 	{
 		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
 
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+
 		$this->setModules();
 	}
 
@@ -152,6 +154,7 @@ class ModuleSettingsController extends Controller
 
     public function settingsAction()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYSASDMIN );	
         $this->checkAuthorisation();
 
 		$this->setModuleId( $this->rGetId() );
@@ -227,6 +230,9 @@ class ModuleSettingsController extends Controller
 
     public function ajaxInterfaceAction ()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYSASDMIN );	
+		if ( !$this->getAuthorisationState() ) return;
+
 		if ( $this->rHasVal('action', 'update_info') && $this->rHasId() )
 		{
 			$this->updateModuleInfo( array( "id"=>$this->rGetId(), "info"=>$this->rGetVal("value") ) );

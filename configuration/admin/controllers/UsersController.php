@@ -8,7 +8,6 @@
 
 	logging!
 	
-	must hide sysadmin! (set "hidden" in set users)
 	webservice
 	user in multiple projects
 
@@ -186,9 +185,21 @@ class UsersController extends Controller
 		else
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
-			$this->removeUserFromCurrentProject();
-			$this->deleteUser();
-			$this->redirect( 'index.php ');
+
+			if ( $this->getUserId()==$this->getCurrentUserId() )
+			{
+				$this->addError($this->translate('You cannot delete yourself.'));
+			}
+			elseif ( $this->getUser()['is_sysadmin'] )
+			{
+				$this->addError($this->translate('You cannot delete a system administrator.'));
+			}
+			else
+			{
+				$this->removeUserFromCurrentProject();
+				$this->deleteUserIfWithoutProjects();
+				$this->redirect( 'index.php ');
+			}
 		}
 
 		$this->smarty->assign( 'user', $this->getUser() );
@@ -208,12 +219,24 @@ class UsersController extends Controller
 
 		$this->setPageName($this->translate('Deleting user'));
 		$this->setUserId( $this->rGetId() );
+		$this->setUser();
 
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
-			$this->removeUserFromCurrentProject();
-			$this->deleteUser();
-			$this->addMessage($this->translate('User deleted.'));
+			if ( $this->getUserId()==$this->getCurrentUserId() )
+			{
+				$this->addError($this->translate('You cannot delete yourself.'));
+			}
+			elseif ( $this->getUser()['is_sysadmin'] )
+			{
+				$this->addError($this->translate('You cannot delete a system administrator.'));
+			}
+			else
+			{
+				$this->removeUserFromCurrentProject();
+				$this->deleteUserIfWithoutProjects();
+				$this->addMessage( $this->translate('User deleted.') );
+			}
 		}
 
 		$this->printPage();
@@ -363,7 +386,12 @@ class UsersController extends Controller
 
 		return $d ? $d[0]['can_publish']==1 : false;
 	}			
-		
+
+	private function getUserIsSysadmin( $userid )
+	{
+		return $this->getUserProjectRole( $userid )['role_id']==ID_ROLE_SYS_ADMIN;
+	}			
+
 	private function getRoles()
 	{
 		return $this->models->Roles->_get( array( 'id' => array('hidden'=>'0') ) );
@@ -835,6 +863,8 @@ class UsersController extends Controller
 			$this->_allprojectusers[$key]['item_access']=$this->getUserItemAccess( $user['id'] );
 			$this->_allprojectusers[$key]['project_role']=$this->getUserProjectRole( $user['id'] );
 			$this->_allprojectusers[$key]['can_publish']=$this->getUserCanPublish( $user['id'] );
+			$this->_allprojectusers[$key]['is_sysadmin']=$this->getUserIsSysadmin( $user['id'] );
+			$this->_allprojectusers[$key]['hidden']=$this->getUserIsSysadmin( $user['id'] );
 		}
 	}
 
@@ -867,6 +897,7 @@ class UsersController extends Controller
 			$this->_user['item_access']=$this->getUserItemAccess( $this->getUserId() );
 			$this->_user['project_role']=$this->getUserProjectRole( $this->getUserId() );
 			$this->_user['can_publish']=$this->getUserCanPublish( $this->getUserId() );
+			$this->_user['is_sysadmin']=$this->getUserIsSysadmin( $this->getUserId() );
 		}
 		else
 		{
@@ -979,7 +1010,6 @@ class UsersController extends Controller
 	
 	private function resetUserPermissions()
 	{
-
 		$modules=array();
 		$custom=array();
 		$module_read=array();
@@ -1045,6 +1075,17 @@ class UsersController extends Controller
 		$this->models->Users->delete(array('id' => $this->getUserId()));
 	}
 
+	private function deleteUserIfWithoutProjects()
+	{
+        $d=$this->models->ProjectsRolesUsers->_get( array(
+			'id'=> array('user_id' => $this->getUserId()),
+			'columns'=>'count(*) as total'
+		));
 
+		if ( $d[0]['total']==0 )
+		{
+			$this->deleteUser();
+		}
+	}
 
 }

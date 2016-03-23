@@ -85,14 +85,13 @@ class VersatileExportController extends Controller
 	
 	private function initialize()
 	{
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+        $this->checkAuthorisation();
 		$this->setNameTypeIds();
     }
 
     public function exportAction()
     {
-    
-        $this->checkAuthorisation();
-       
         $this->setPageName( $this->translate('Multi-purpose export') );
 		
 		if ($this->rHasVal('action','export'))

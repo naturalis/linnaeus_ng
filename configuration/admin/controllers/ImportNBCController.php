@@ -87,7 +87,8 @@ class ImportNBCController extends ImportController
 		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
         $this->setBreadcrumbRootName($this->translate($this->controllerPublicName));
         $this->setSuppressProjectInBreadcrumbs();
-		$this->isAuthorisedForImport();
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+        $this->checkAuthorisation();
     }
 
 
