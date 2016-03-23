@@ -27,6 +27,8 @@
         {else}
         [ <a href="add_user.php?id={$v.id}">{t}add to project{/t}</a> ]
         {/if}
+        {if $v.id==$currentUserId}<span title="you">&deg;</span>{/if}
+        {if $v.hidden}<span title="user normally hidden">!</span>{/if}
         </td>
     </tr>
 {/function}
@@ -54,7 +56,7 @@ table.collaborators th {
         {table_head}
     
         {foreach $users v}
-        {if $v.hidden!=true}
+        {if $v.hidden!=true || $isSysAdmin}
             {table_row data=$v}
         {/if}
         {/foreach}

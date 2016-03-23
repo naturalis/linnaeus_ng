@@ -77,6 +77,20 @@ final class UsersModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 	
+	public function getAllUsers()
+	{
+		$query="
+				select
+					_a.*
+				from
+					%PRE%users _a
+				order by
+					_a.last_name, _a.first_name
+			";
+
+		return $this->freeQuery( $query );
+	}
+	
 	public function getUserProjectRole( $params )
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] :  null;

@@ -73,7 +73,6 @@ class Controller extends BaseClass
     private $usedHelpersBase = array(
 		'session_module_settings',
         'logging_helper',
-        'email_helper',
 		'log_changes',
 		'custom_array_sort',
 		'paginator'
@@ -1652,6 +1651,7 @@ class Controller extends BaseClass
         $this->smarty->assign('useRelated', $this->useRelated);
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
+        $this->smarty->assign('currentUserId', $this->getCurrentUserId());
 
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -1967,6 +1967,20 @@ class Controller extends BaseClass
 			{
 			    require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
 				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
+			}
+		}
+
+        // Load some more models
+		if ( isset($this->extraModels) )
+		{
+			foreach ((array) $this->extraModels as $key)
+			{
+				if (!isset($this->models->{$key}) &&
+					file_exists(dirname(__FILE__) . '/../models/' . $key . '.php'))
+				{
+					require_once dirname(__FILE__) . '/../models/' . $key . '.php';
+					$this->models->{$key} = new $key;
+				}
 			}
 		}
 

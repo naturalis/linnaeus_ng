@@ -123,9 +123,9 @@ class ImportL2Controller extends ImportController
         $this->setSuppressProjectInBreadcrumbs();
 
 		set_time_limit(2400); // RIGHT!
-
-        $this->isAuthorisedForImport();
-
+		
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+        $this->checkAuthorisation();
     }
 
 
