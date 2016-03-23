@@ -15,9 +15,12 @@
 */
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 class GlossaryController extends Controller
 {
+	private $_mc;
+
     public $usedModels = array(
 		'glossary_synonyms',
 		'labels_languages',
@@ -52,6 +55,7 @@ class GlossaryController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
+		$this->setMediaController();
     }
 
     /**
@@ -63,6 +67,13 @@ class GlossaryController extends Controller
     {
         parent::__destruct();
     }
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+	}
 
     /**
      * Index of glossary
@@ -270,7 +281,7 @@ class GlossaryController extends Controller
 			'language_id' => $this->getCurrentLanguageId()
 		));
 	}
-
+/*
 	private function getGlossaryMedia($id)
 	{
 		$gm=$this->models->GlossaryModel->getGlossaryMedia(array(
@@ -297,6 +308,15 @@ class GlossaryController extends Controller
 
 		return $gm;
 	}
+*/
+
+	private function getGlossaryMedia ($id)
+	{
+	    $this->_mc->setItemId($id);
+	    $media = $this->_mc->getItemMediaFiles();
+		return $this->_mc->reformatOutput($media);
+	}
+
 
 	private function getGlossaryAlphabet()
 	{
@@ -368,6 +388,8 @@ class GlossaryController extends Controller
 		return null;
 
 	}
+
+
 
 
 }

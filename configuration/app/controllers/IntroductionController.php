@@ -53,6 +53,13 @@ class IntroductionController extends Controller
         parent::__destruct();
     }
 
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+	}
+
     /**
      * Index: sets the current module and displays an index of that module's topics
      *
@@ -371,13 +378,6 @@ class IntroductionController extends Controller
 		);
 
 		return $d ? $d[0]['page_id'] : null;
-	}
-
-	private function setMediaController()
-	{
-        $this->_mc = new MediaController();
-        $this->_mc->setModuleId($this->getCurrentModuleId());
-        $this->_mc->setItemId($this->rGetId());
 	}
 
 
