@@ -1,9 +1,12 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
 
 class IntroductionController extends Controller
 {
+
+	private $_mc;
 
     public $usedModels = array(
 		'content_introduction',
@@ -37,6 +40,7 @@ class IntroductionController extends Controller
     public function __construct($p=null)
     {
 		parent::__construct($p);
+		$this->setMediaController();
     }
 
     /**
@@ -224,6 +228,7 @@ class IntroductionController extends Controller
 				$page['content'] = $cfm[0]['content'];
 			}
 
+			/*
 			$fmm = $this->models->IntroductionMedia->_get(
 				array(
 					'id' => array(
@@ -237,7 +242,14 @@ class IntroductionController extends Controller
 			{
 				$page['image']['file_name'] = $fmm[0]['file_name'];
 				$page['image']['thumb_name'] = $fmm[0]['thumb_name'];
-			}
+			}*/
+
+            $this->_mc->setItemId($id);
+            $media = $this->_mc->getItemMediaFiles();
+
+            if ($media) {
+                $page['image']['file_name'] = $media[0]['rs_original'];
+            }
 
 			return $page;
 
@@ -360,5 +372,13 @@ class IntroductionController extends Controller
 
 		return $d ? $d[0]['page_id'] : null;
 	}
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+	}
+
 
 }
