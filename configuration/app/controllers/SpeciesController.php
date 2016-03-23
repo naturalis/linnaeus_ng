@@ -1433,6 +1433,7 @@ class SpeciesController extends Controller
         $this->_mc = new MediaController();
         $this->_mc->setModuleId($this->getCurrentModuleId('species'));
         $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getCurrentLanguageId());
 	}
 
 

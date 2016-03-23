@@ -2532,7 +2532,7 @@ class Controller extends BaseClass
    protected function getCurrentModuleId ()
     {
 		$d = $this->models->Modules->_get(array(
-            "id" => array("controller"=>$this->getControllerBaseName())
+            "id" => array("controller" => $this->getControllerBaseName())
 		));
 
 		return $d ? $d[0]['id'] : false;

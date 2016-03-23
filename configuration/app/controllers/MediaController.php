@@ -74,6 +74,7 @@ class MediaController extends Controller
     {
         $this->moduleId = $this->rHasVal('module_id') ? $this->rGetVal('module_id') : -1;
         $this->itemId = $this->rHasVal('id') ? $this->rGetVal('id') : -1;
+        $this->languageId = $this->getCurrentLanguageId();
     }
 
 
@@ -85,6 +86,11 @@ class MediaController extends Controller
     public function setItemId ($id)
     {
         $this->itemId = isset($id) && is_numeric($id) ? $id : -1;
+    }
+
+    public function setLanguageId ($id)
+    {
+        $this->languageId = isset($id) && is_numeric($id) ? $id : -1;
     }
 
     public function getItemMediaFiles ()
@@ -206,7 +212,7 @@ class MediaController extends Controller
             'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
 			    'media_modules_id' => $this->getMediaModulesId($mediaId),
-                'language_id' => $this->getCurrentLanguageId()
+                'language_id' => $this->languageId
 			)
 		));
 
