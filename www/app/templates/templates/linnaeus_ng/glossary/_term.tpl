@@ -5,13 +5,13 @@
 	<div id="definition">
 		{$term.definition}
 		{if $term.synonyms}
-	 	<p id="synonyms"><span id="synonyms-title">{if $term.synonyms|@count > 1}{t}Synonyms{/t}{else}{t}Synonym{/t}{/if} {t}for{/t} {$term.term}</span>: 
+	 	<p id="synonyms"><span id="synonyms-title">{if $term.synonyms|@count > 1}{t}Synonyms{/t}{else}{t}Synonym{/t}{/if} {t}for{/t} {$term.term}</span>:
 			{foreach from=$term.synonyms key=k item=v name=synonyms}{$v.synonym}{if $v.language && $v.language_id!=$currentLanguageId} ({$v.language}){/if}{if !$smarty.foreach.synonyms.last}, {/if}{/foreach}.
-	     </p>  
+	     </p>
 	     {/if}
 	</div>
 
-     
+
 	{if $term.media}
 		<div id="media">
 		{assign var=widthInCells value=2}
@@ -19,60 +19,94 @@
 				{assign var=mediaCat value=false}
 				{foreach $term.media v k}
 
-					{assign var=mediaCat value=$v.category}
-					{if $requestData.disp==$v.id}
-						{assign var=dispUrl value=$smarty.capture.fullImgUrl}
-						{assign var=dispName value=$v.original_name}
-					{/if}
-					
-					<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
-						<a 
-							rel          = "prettyPhoto[gallery]"
-							class        = "image-wrap"
-							title        = "{$v.file_name}"
-							alt          = "{$v.alt}"
-							href         = "{$projectUrls.uploadedMedia}{$v.file_name}"
+				{if $v.rs_id == ''}
+					{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
+				{else}
+					{capture name="fullImgUrl"}{$v.full_path}{/capture}
+				{/if}
 
-							>
+					{assign var=mediaCat value=$v.category}
+
+				<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
+
+					{if $v.rs_id == ''}
+
+						<a
+						rel   = "prettyPhoto[gallery]"
+						class = "image-wrap "
+						title = "{$v.file_name}"
+						href  = "{$smarty.capture.fullImgUrl}"
+						alt   = "{$v.description}"
+						>
 
 						{if $v.category=='image'}
-							{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
-                            <img
-                                id="media-{$k}"
-                                alt="{$v.alt}" 
-                                src="{$v.full_path}"
-                                class="image-full" />
+							<div>
+								<img
+									id    = "media-{$k}"
+									alt   = "{$v.description}"
+									title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src   = "{$smarty.capture.fullImgUrl}"
+									class = "image-full" />
+							</div>
 						{elseif $v.category=='video'}
-								<img 
+								<img
 									id="media-{$k}"
-									alt="{$v.description}" 
-									src="{$projectUrls.systemMedia}video.png" 
-									onclick="showMedia('{$v.full_path}','{$v.original_name}');" 
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									src="{$projectUrls.systemMedia}video.png"
+									onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 									class="media-video-icon" />
 						{elseif $v.category=='audio'}
-								<object 
+								<object
 									id="media-{$k}"
-									alt="{$v.description}" 
-									type="application/x-shockwave-flash" 
-									data="{$soundPlayerPath}{$soundPlayerName}" 
-									width="130" 
+									alt="{$v.description}"
+									title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+									type="application/x-shockwave-flash"
+									data="{$soundPlayerPath}{$soundPlayerName}"
+									width="130"
 									height="20">
 									<param name="movie" value="{$soundPlayerName}" />
-									<param name="FlashVars" value="mp3={$v.full_path}" />
+									<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
 								</object>
 						{/if}
+
 						</a>
 
-						<div id="caption-{$k}" class="media-caption">
-							<p >{$v.description}</p>
-						</div>
-					</div><!-- /.media-cell -->
+					{else}
+
+						{if $v.category == 'image'}
+							<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto">
+							<img src="{$smarty.capture.fullImgUrl}" alt="{$v.original_name}" id="media-{$k}" class="image-full" />
+							</a><br/>
+							{$name}
+
+						{else if $v.category == 'audio' or $v.category == 'video'}
+							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$name}" id="media-{$k}" controls />
+								<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
+							</{$v.category}><br>
+							{$name}
+
+						{else}
+							<a href="{$smarty.capture.fullImgUrl}">
+							<img src="{$v.rs_thumb_medium}" alt="{$v.original_name}" /><br>
+							{$name}
+							</a>
+
+						{/if}
+
+					{/if}
+
+					<div id="caption-{$k}" class="media-caption">
+						<p >{$v.description}</p>
+					</div>
+
+				</div><!-- /.media-cell -->
 
 				{/foreach}
-							
-			</div> <!-- /#media-grid -->	
-	
-	
+
+			</div> <!-- /#media-grid -->
+
+
 	</div><!-- /#media -->
 	{/if}
 </div>
@@ -81,13 +115,13 @@
 $(document).ready(function()
 {
 {if $dispUrl && $dispName}
-	showMedia('{$dispUrl}','{$dispName}'); 
+	showMedia('{$dispUrl}','{$dispName}');
 {/if}
 
 	$('[id^=media-]').each(function(e)
 	{
 		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
 	});
-	
+
 });
 </script>
