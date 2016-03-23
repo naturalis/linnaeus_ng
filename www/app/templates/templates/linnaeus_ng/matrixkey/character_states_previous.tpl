@@ -7,13 +7,13 @@
     <p id="dialogSelectorWindow">
 
         <div id="dialog-content-inner-inner">
-
+        
             {if $character.info}
             <p id="state-info">{$character.info}</p>
             {/if}
-
+        
         {if $character.type=='range'}
-
+        
             <div>
 
                 <p>
@@ -24,7 +24,7 @@
                     <p id="state-value-extra">
                         {t _s1=$character.min_display _s2=$character.max_display _s3=$character.unit}Kies een waarde tussen %s en %s%s.{/t}
                     </p>
-
+                    
                     <script>
                     $('#state-value').bind('keyup',function()
                     {
@@ -58,19 +58,19 @@
             <div class="state-images-container">
 
             {foreach from=$states item=v name=foo key=key}
-
+            
                 {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
                     {assign var=irrelevant value=true}
                 {else}
                     {assign var=irrelevant value=false}
                 {/if}
-
+                
                 {if isset($states_selected[{$v.id}])}
                     {assign var=selected value=true}
                 {else}
                     {assign var=selected value=false}
                 {/if}
-
+           
                 <div class="state-image-container{if $selected} state-image-selected{/if}{if $irrelevant} state-image-irrelevant{/if}">
                     <div class="state-image-buffer">
                         {if !$irrelevant}
@@ -80,7 +80,7 @@
                                 <a href="#" class="state-image-link" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                             {/if}
                         {/if}
-                        <img class="state-image" key="{$key}" {if $v.file_name} src="{$v.file_name}" {else} src="{$image_root_skin}missing.jpg" {/if} />
+                        <img class="state-image" key="{$key}" {if $v.file_name} src="{$projectUrls.projectMedia}{$v.file_name}" {else} src="{$image_root_skin}missing.jpg" {/if} />
                         <div class="state-image-caption">
                             {$v.label}
                             {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
@@ -98,11 +98,11 @@
                         </a -->
 
                     </div>
-
+                    
                 </div>
-
+                
             {/foreach}
-
+            
             </div>
 
         {elseif $character.type=='text'}
@@ -110,13 +110,13 @@
             <ul class="facetListType">
 
                 {foreach from=$states item=v key=foo}
-
+                    
                 {if $states_remain_count!=null && !isset($states_remain_count[{$v.id}])}
                     {assign var=irrelevant value=true}
                 {else}
                     {assign var=irrelevant value=false}
                 {/if}
-
+                
                 {if isset($states_selected[{$v.id}])}
                     {assign var=selected value=true}
                 {else}
@@ -126,7 +126,7 @@
                 <li class="{if $irrelevant}irrelevant{/if}">
                     <span class="selected" {if $selected}style="font-weight:bold"{/if}>
                         {if !$irrelevant}
-                        <a href="#"
+                        <a href="#" 
                             onclick="{if $selected}
                             clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');
                             {else}
@@ -134,7 +134,7 @@
                             {/if}
                             closeDialog();
                             return false;" >
-                        {/if}<img src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png"
+                        {/if}<img src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png" 
                                 style="margin-right:10px">{$v.label}{if !$irrelevant}
                         </a>
                         {/if}
@@ -143,7 +143,7 @@
                 </li>
                 {/foreach}
             </ul>
-
+    
         {/if}
 
         </div>
@@ -161,12 +161,12 @@ $(document).ready(function()
     {
         prettyPhotoInit();
     }
-
+    
     bindDialogKeyUp();
 
     $('#state-value').focus();
     $('#state-value').select();
-
+    
     $(".state-image").load(function()
     {
         // dimensions as shown

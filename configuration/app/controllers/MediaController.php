@@ -262,6 +262,13 @@ class MediaController extends Controller
         return $d;
     }
 
-
+    public function getOverview ()
+    {
+        return $this->models->MediaModel->getOverview(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'module_id' =>$this->moduleId,
+            'item_id' => $this->itemId
+        ));
+    }
 
 }
