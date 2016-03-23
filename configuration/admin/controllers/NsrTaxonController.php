@@ -475,7 +475,7 @@ class NsrTaxonController extends NsrController
 
     public function nsrIdResolverAction()
     {
-		$this->UserRights->setActionType( $this->UserRights->getActionExport() );
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 		$this->checkAuthorisation();
 
         $this->setPageName($this->translate('NSR ID resolver'));

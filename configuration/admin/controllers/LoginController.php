@@ -26,7 +26,7 @@ class LoginController extends Controller
 	{
 	}
 
-    public function loginAction ()
+    public function loginAction()
     {
         $user=$this->getRememberedUser();
 
@@ -63,6 +63,24 @@ class LoginController extends Controller
 
         $this->printPage();
     }
+
+	public function loginUser( $p )
+	{
+		if ( $this->authenticateUser( $p ) )
+		{
+			$user=$this->getUserByUsername( $p['username'] );
+
+			if ( $user['active']==1 )
+			{
+				$this->setUser( $user );
+				$this->doLogin();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
     private function getLoginStartPage()
     {

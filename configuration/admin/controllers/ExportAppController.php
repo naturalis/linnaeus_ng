@@ -98,6 +98,7 @@ class ExportAppController extends Controller
         parent::__construct();
 		define('APP_SUMMARY_TAB_NAME','APP_SUMMARY');
         $this->_exportDump = new stdClass();
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
     }
 
     public function __destruct ()

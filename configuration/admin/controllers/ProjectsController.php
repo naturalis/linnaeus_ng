@@ -47,7 +47,7 @@ class ProjectsController extends Controller
         parent::__destruct();
     }
 
-	public function chooseProjectAction ()
+	public function chooseProjectAction()
 	{
         $this->checkDefaultProjectSelect();
 		$this->UserRights->setAllowNoProjectId( true );
@@ -65,14 +65,22 @@ class ProjectsController extends Controller
         $this->printPage();
     }
 
-    public function indexAction ()
+	public function doChooseProject( $project_id )
+	{
+        if ( $project_id && $this->isCurrentUserAuthorizedForProject($project_id) )
+		{
+			$this->doSetProject( $project_id );
+		}
+    }
+
+    public function indexAction()
     {
         $this->checkAuthorisation();
         $this->setPageName( $this->translate('Index') );
         $this->printPage();
     }
 
-    public function overviewAction ()
+    public function overviewAction()
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Project overview'));
@@ -87,7 +95,7 @@ class ProjectsController extends Controller
 	*/
     public function modulesAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Project modules'));
