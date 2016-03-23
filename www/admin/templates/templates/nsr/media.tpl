@@ -119,6 +119,18 @@ textarea {
                 {/if}
                 <input type="button" value="{t}detach{/t}" title="{t}detach media{/t}"
                     onclick="if (!confirm('{t}Are you sure?{/t}')) { return; } $('#subject').val({$v.id});$('#action').val('delete');$('#theForm').submit();" />
+
+             	<table style="margin-top: 15px;">
+            	<tr>
+            		<td class="media-header">{t}Metadata{/t}</td>
+            		<td class="media-header"><a href="../media/edit.php?id={$v.id}&amp;language_id={$language_id}">{t}edit{/t}</a></td>
+            	</tr>
+				{foreach from=$v.metadata key=label item=val}
+					<tr><td>{$label}:</td><td>{if $val != ''}{$val}{else}-{/if}</td></tr>
+				{/foreach}
+				</table>
+
+
             </td>
         </tr>
 

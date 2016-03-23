@@ -265,6 +265,7 @@ class MediaController extends Controller
 		$this->smarty->assign('module_id', $this->moduleId);
 		$this->smarty->assign('rs_id', $media['rs_id']);
 		$this->smarty->assign('item_id', $this->itemId);
+		$this->smarty->assign('back_url', $this->setBackUrl());
 
 		$this->printPage();
     }
@@ -432,6 +433,9 @@ class MediaController extends Controller
         // Append id if this is not present in the referrer
         if (strpos($url, 'id=') === false) {
             $url .= (strpos($url, '?') === false ? '?' : "&") . 'id=' . $this->itemId;
+        }
+        if (strpos($url, 'language_id=') === false) {
+            $url .= (strpos($url, '?') === false ? '?' : "&") . 'language_id=' . $this->languageId;
         }
         return $url;
     }
