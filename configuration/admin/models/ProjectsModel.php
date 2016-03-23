@@ -30,6 +30,7 @@ final class ProjectsModel extends AbstractModel
 	{
 		$user_id=isset($params['user_id']) ? $params['user_id'] : null;
 		$show_all=isset($params['show_all']) ? $params['show_all'] : false;
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
 		if( !isset( $user_id ) ) return;
 		
@@ -52,7 +53,8 @@ final class ProjectsModel extends AbstractModel
 			$query .= "
 				left join %PRE%projects_roles_users _b
 					on _a.id=_b.project_id
-					and _b.user_id = " . $user_id ;
+					and _b.user_id = " . $user_id  ."
+				where 1=1 ";
 		}
 		else
 		{
@@ -63,6 +65,12 @@ final class ProjectsModel extends AbstractModel
 			";
 		}
 
+		if ( isset($project_id) ) 
+		{
+			$query .= "
+				and _a.id = " . $project_id ;
+		}
+		
 		$query .= "
 			order by title, sys_name
 		";

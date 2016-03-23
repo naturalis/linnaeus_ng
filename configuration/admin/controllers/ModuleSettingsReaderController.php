@@ -22,6 +22,7 @@ class ModuleSettingsReaderController extends Controller
 
 		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
 
+		$this->UserRights->setRequiredLevel( ID_ROLE_EDITOR );
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
@@ -35,6 +36,8 @@ class ModuleSettingsReaderController extends Controller
 
     public function getModuleSetting( $p )
     {
+		if ( !$this->getAuthorisationState() ) return;
+
 		if ( is_array( $p ))
 		{
 			$setting=isset($p['setting']) ? $p['setting'] : null;
@@ -69,6 +72,8 @@ class ModuleSettingsReaderController extends Controller
 
     public function getGeneralSetting( $p )
     {
+		if ( !$this->getAuthorisationState() ) return;
+
 		if ( is_array( $p ))
 		{
 			$setting=isset($p['setting']) ? $p['setting'] : null;
@@ -95,6 +100,8 @@ class ModuleSettingsReaderController extends Controller
 
 	public function assignModuleSettings( &$settings )
 	{
+		if ( !$this->getAuthorisationState() ) return;
+
 		$settings = new stdClass();
 		foreach((array)$this->getModuleSettingsValues() as $val)
 		{
@@ -111,6 +118,8 @@ class ModuleSettingsReaderController extends Controller
 
 	public function assignGeneralSettings( &$settings )
 	{
+		if ( !$this->getAuthorisationState() ) return;
+
 		$settings = new stdClass();
 		foreach((array)$this->getGeneralSettingsValues() as $val)
 		{
@@ -127,8 +136,10 @@ class ModuleSettingsReaderController extends Controller
 
     public function setUseDefaultWhenNoValue( $state )
     {
+		if ( !$this->getAuthorisationState() ) return;
 		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
     }
+
 
     private function getUseDefaultWhenNoValue()
     {

@@ -62,7 +62,8 @@ class ImportController extends Controller
     public function __construct ()
     {
         parent::__construct();
-
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+        $this->checkAuthorisation();
     }
 
     public function __destruct ()
@@ -77,29 +78,9 @@ class ImportController extends Controller
      */
     public function indexAction ()
     {
-        $this->isAuthorisedForImport();
-
         $this->setPageName($this->translate('Data import options'));
-
         $this->printPage();
     }
-
-	public function isAuthorisedForImport()
-	{
-
-		$d = $this->models->ProjectsRolesUsers->_get(
-		array(
-			'id' => array(
-				'user_id' => $this->getCurrentUserId(),
-				'role_id' => ID_ROLE_LEAD_EXPERT
-			),
-			'columns' => 'count(*) as total'
-		));
-
-		return $d[0]['total']>0;
-
-	}
-
 
     protected function mimeContentType ($filename)
     {

@@ -37,11 +37,11 @@ class ImportNexusController extends Controller
     public function __destruct ()
     {
         parent::__destruct();
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
     }
 
     public function indexAction ()
     {
-
 		define('NEXUS_START_TAG','#NEXUS');
 		define('NEXUS_DEFAULT_CHARTYPE','text');
 
