@@ -101,15 +101,6 @@ textarea {
             </td>
             <td class="media-cell">
                 <textarea name="captions[{$v.id}]">{$v.caption}</textarea><br />
-                <!--
-                {if $v.media_type=='image'}
-                <label>
-                    <input type="radio" name="overview-image" value="{$v.id}" {if $v.overview_image=='1'} checked="checked"{/if} />
-                    is overview image
-                </label>
-                <br />
-                {/if}
-                -->
                 <br />
                 <input type="submit" value="{t}save{/t}" title="{t}save all captions{/t}" />
                 {if $key > 0}
@@ -122,6 +113,17 @@ textarea {
                 {/if}
                 <input type="button" value="{t}detach{/t}" title="{t}detach media{/t}"
                     onclick="if (!confirm('{t}Are you sure?{/t}')) { return; } $('#subject').val({$v.id});$('#action').val('delete');$('#theForm').submit();" />
+
+             	<table style="margin-top: 15px;">
+            	<tr>
+            		<td class="media-header">{t}Metadata{/t}</td>
+            		<td class="media-header"><a href="../media/edit.php?id={$v.id}&amp;language_id={$language_id}">{t}edit{/t}</a></td>
+            	</tr>
+				{foreach from=$v.metadata key=label item=val}
+					<tr><td>{$label}:</td><td>{if $val != ''}{$val}{else}-{/if}</td></tr>
+				{/foreach}
+				</table>
+
             </td>
         </tr>
 
