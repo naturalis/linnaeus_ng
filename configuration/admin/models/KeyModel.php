@@ -138,38 +138,99 @@ class KeyModel extends AbstractModel
     {
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$order=isset($params['order']) ? $params['order'] : null;
+		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
 
 		if ( is_null($project_id) )
 			return;
 
-        return $this->freeQuery("
-			select
-				_a.id,
-				_a.taxon,
-				_a.rank_id,
-				_b.res_taxon_id,
-				_d.rank,
-				_c.lower_taxon,
-				_c.keypath_endpoint
+		if ( isset($branch_tops) )
+		{
+			$taxa=array();
 
-			from %PRE%taxa _a
+			foreach((array)$branch_tops as $top)
+			{
+				$taxa+=$this->freeQuery("
+					select
+						_a.id,
+						_a.taxon,
+						_a.rank_id,
+						_b.res_taxon_id,
+						_d.rank,
+						_c.lower_taxon,
+						_c.keypath_endpoint
+		
+					from %PRE%taxa _a
+		
+					left join %PRE%choices_keysteps _b
+						on _a.id = _b.res_taxon_id
+						and _a.project_id = _b.project_id
+		
+					left join %PRE%projects_ranks _c
+						on _a.rank_id = _c.id
+						and _a.project_id = _c.project_id
+		
+					left join %PRE%ranks _d
+						on _c.rank_id = _d.id
+		
+					right join %PRE%taxon_quick_parentage _sq
+						on _a.id = _sq.taxon_id
+						and _sq.project_id = " . $project_id . " 
 
-			left join %PRE%choices_keysteps _b
-				on _a.id = _b.res_taxon_id
-				and _a.project_id = _b.project_id
+					where
+						_a.project_id = " . $project_id . "
+						and (
+							MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+							or _a.id=" . $top . " 
+						)	
+				");
+			}
+			
+			foreach ($taxa as $key => $row)
+			{
+				$rank_id[$key]  = $row['rank_id'];
+				$taxon[$key] = $row['taxon'];
+			}
 
-			left join %PRE%projects_ranks _c
-				on _a.rank_id = _c.id
-				and _a.project_id = _c.project_id
-
-			left join %PRE%ranks _d
-				on _c.rank_id = _d.id
-
-			where _a.project_id = " . $project_id . "
-
-			order by ".($order=='rank' ? '_c.rank_id,_a.taxon' : '_a.taxon')
-		);
-
+			if ($order=='rank')
+			{
+				array_multisort( $rank_id, SORT_ASC, $taxon, SORT_ASC , $taxa );
+			}
+			else
+			{
+				array_multisort( $taxon, SORT_ASC , $taxa );
+			}
+		}
+		else
+		{
+			$taxa=$this->freeQuery("
+				select
+					_a.id,
+					_a.taxon,
+					_a.rank_id,
+					_b.res_taxon_id,
+					_d.rank,
+					_c.lower_taxon,
+					_c.keypath_endpoint
+	
+				from %PRE%taxa _a
+	
+				left join %PRE%choices_keysteps _b
+					on _a.id = _b.res_taxon_id
+					and _a.project_id = _b.project_id
+	
+				left join %PRE%projects_ranks _c
+					on _a.rank_id = _c.id
+					and _a.project_id = _c.project_id
+	
+				left join %PRE%ranks _d
+					on _c.rank_id = _d.id
+	
+				where _a.project_id = " . $project_id . "
+	
+				order by ".($order=='rank' ? '_c.rank_id,_a.taxon' : '_a.taxon')
+			);
+		}
+		
 		return $taxa;
 
     }

@@ -26,74 +26,176 @@ class MatrixKeyModel extends AbstractModel
         parent::__destruct();
     }
 
-
     public function getTaxaInMatrix( $params )
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
-		
+		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
+
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
+
+		if ( isset($branch_tops) )
+		{
+			$taxa=array();
+
+			foreach((array)$branch_tops as $top)
+			{
+
+				$taxa+=$this->freeQuery( "
+					select
+						_b.id,
+						_b.taxon
+			
+					from %PRE%matrices_taxa _a
+			
+					left join %PRE%taxa _b
+						on _a.project_id=_b.project_id
+						and _a.taxon_id = _b.id
+
+					right join %PRE%taxon_quick_parentage _sq
+						on _a.taxon_id = _sq.taxon_id
+						and _sq.project_id = " . $project_id . " 
+			
+					where 
+						_a.project_id = ". $project_id ."
+						and _a.matrix_id = ". $matrix_id."
+						and (
+								MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+								or _a.taxon_id=" . $top . " 
+							)		
+					order by
+						_b.taxon
+					");
+
+			}
+
+			foreach ($taxa as $key => $row)
+			{
+				$taxon[$key] = $row['taxon'];
+			}
+
+			array_multisort( $taxon, SORT_ASC , $taxa );
+
+		}
+		else
+		{
+
+			$taxa=$this->freeQuery( "
+				select
+					_b.id,
+					_b.taxon
 		
-		$query="
-			select
-				_b.id,
-				_b.taxon
+				from %PRE%matrices_taxa _a
+		
+				left join %PRE%taxa _b
+					on _a.project_id=_b.project_id
+					and _a.taxon_id = _b.id
+		
+				where 
+					_a.project_id = ". $project_id ."
+					and _a.matrix_id = ". $matrix_id."
 	
-			from %PRE%matrices_taxa _a
-	
-			left join %PRE%taxa _b
-				on _a.project_id=_b.project_id
-				and _a.taxon_id = _b.id
-	
-			where 
-				_a.project_id = ". $project_id ."
-				and _a.matrix_id = ". $matrix_id."
+				order by
+					_b.taxon
+				");
 
-			order by
-				_b.taxon
-			"
-			;
+		}
 
-		return $this->freeQuery( $query );
-
+		return $taxa;
     }
 
     public function getAllTaxaAndMatrixPresence( $params )
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
 		
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
+
+		if ( isset($branch_tops) )
+		{
+			$taxa=array();
+
+			foreach((array)$branch_tops as $top)
+			{
+
+				$taxa+=$this->freeQuery( "
+					select
+					
+						_b.id,
+						_b.taxon,
+						_c.keypath_endpoint,
+						if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
+			
+					from %PRE%taxa _b
 		
-		$query="
-			select
-			
-				_b.id,
-				_b.taxon,
-				_c.keypath_endpoint,
-				if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
+					left join %PRE%matrices_taxa _a
+						on _a.project_id=_b.project_id
+						and _a.taxon_id = _b.id
+						and _a.matrix_id = ". $matrix_id."
+		
+					left join %PRE%projects_ranks _c
+						on _b.project_id=_c.project_id
+						and _b.rank_id = _c.id
+
+					right join %PRE%taxon_quick_parentage _sq
+						on _b.id = _sq.taxon_id
+						and _sq.project_id = " . $project_id . " 
+
+					where 
+						_b.project_id = ". $project_id ."
+						and (
+								MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+								or _b.id=" . $top . " 
+							)			
+					order by
+						_b.taxon
+					" );
+
+			}
+
+			foreach ($taxa as $key => $row)
+			{
+				$taxon[$key] = $row['taxon'];
+			}
+
+			array_multisort( $taxon, SORT_ASC , $taxa );
+
+		}
+		else
+		{
+		
+			$taxa=$this->freeQuery( "
+				select
+				
+					_b.id,
+					_b.taxon,
+					_c.keypath_endpoint,
+					if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
+		
+				from %PRE%taxa _b
 	
-			from %PRE%taxa _b
+				left join %PRE%matrices_taxa _a
+					on _a.project_id=_b.project_id
+					and _a.taxon_id = _b.id
+					and _a.matrix_id = ". $matrix_id."
+	
+				left join %PRE%projects_ranks _c
+					on _b.project_id=_c.project_id
+					and _b.rank_id = _c.id
+	
+				where 
+					_b.project_id = ". $project_id ."
+	
+				order by
+					_b.taxon
+			");
 
-			left join %PRE%matrices_taxa _a
-				on _a.project_id=_b.project_id
-				and _a.taxon_id = _b.id
-				and _a.matrix_id = ". $matrix_id."
+		}
 
-			left join %PRE%projects_ranks _c
-				on _b.project_id=_c.project_id
-				and _b.rank_id = _c.id
-
-			where 
-				_b.project_id = ". $project_id ."
-
-			order by
-				_b.taxon
-			";
-			
-		return $this->freeQuery( $query );
+		return $taxa;
 
     }
 

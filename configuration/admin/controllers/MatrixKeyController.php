@@ -598,11 +598,21 @@ class MatrixKeyController extends Controller
             $this->addMessage(sprintf($this->translate('Taxon added.')));
         }
 
-        $taxa=$this->models->MatrixkeyModel->getAllTaxaAndMatrixPresence(
-			array(
-                'project_id' => $this->getCurrentProjectId(),
-                'matrix_id' => $this->getCurrentMatrixId()
-			));
+
+		$d=array(
+			'project_id' => $this->getCurrentProjectId(),
+			'matrix_id' => $this->getCurrentMatrixId()
+		);
+			
+		$this->UserRights->setUserItems();
+		$this->userItems=$this->UserRights->getUserItems();
+
+		if ( !empty($this->userItems) )
+		{
+			$d['branch_tops']=$this->userItems;
+		}
+
+        $taxa=$this->models->MatrixkeyModel->getAllTaxaAndMatrixPresence( $d );
 
 		$this->smarty->assign('taxa', $taxa);
 
@@ -851,16 +861,8 @@ class MatrixKeyController extends Controller
             ));
         }
 
-		$taxa=$this->models->MatrixkeyModel->getTaxaInMatrix(
-			array(
-                'project_id' => $this->getCurrentProjectId(),
-                'matrix_id' => $this->getCurrentMatrixId()
-			));
-
-
-        $this->smarty->assign('matrix', $this->getMatrix( $this->getCurrentMatrixId() ));
-		$this->smarty->assign('taxa', $taxa );
-
+        $this->smarty->assign( 'matrix', $this->getMatrix( $this->getCurrentMatrixId() ) );
+		$this->smarty->assign( 'taxa', $this->getTaxa() );
         if ( isset($links) ) $this->smarty->assign('links', $links);
         if ($this->rHasVal('taxon'))  $this->smarty->assign('taxon', $this->rGetVal('taxon'));
 
@@ -1946,13 +1948,22 @@ class MatrixKeyController extends Controller
 
     private function getTaxa()
     {
-		$t=$this->models->MatrixkeyModel->getTaxaInMatrix(
-			array(
-                'project_id' => $this->getCurrentProjectId(),
-                'matrix_id' => $this->getCurrentMatrixId()
-			));
+		$d=array(
+			'project_id' => $this->getCurrentProjectId(),
+			'matrix_id' => $this->getCurrentMatrixId()
+		);
+			
+		$this->UserRights->setUserItems();
+		$this->userItems=$this->UserRights->getUserItems();
 
-        return isset($t) ? $t : null;
+		if ( !empty($this->userItems) )
+		{
+			$d['branch_tops']=$this->userItems;
+		}
+
+		$taxa=$this->models->MatrixkeyModel->getTaxaInMatrix( $d );
+
+        return isset($taxa) ? $taxa : null;
     }
 
     private function removeTaxon($id = null)
