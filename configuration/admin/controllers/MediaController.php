@@ -397,8 +397,6 @@ class MediaController extends Controller
             // Store data
             if (!empty($this->_result) && empty($this->_result->error)) {
 
-                $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1024) . ' KB)');
-
                 // Store core data
                 $media = $this->_result->resource;
 
@@ -442,6 +440,10 @@ class MediaController extends Controller
                         'item_id' => $this->rGetVal('item_id')
                      ));
                 }
+
+                $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1024) . ' KB)
+                    -- <a target="_blank" href="edit.php?id=' . $this->mediaId . '">edit</a>');
+
             } else {
                 $this->addError(_('Could not upload media') .
                 (isset($this->_result->error) ? ': ' . $this->_result->error : ''));
