@@ -377,6 +377,7 @@ class MediaController extends Controller
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $this->languageId);
+		$this->smarty->assign('metadata', $this->setMetadataFields());
 		$this->smarty->assign('module_id', $this->rGetVal('module_id'));
 		$this->smarty->assign('item_id', $this->rGetVal('item_id'));
 
@@ -957,7 +958,7 @@ class MediaController extends Controller
     {
         $mediaId = isset($p['media_id']) ? $p['media_id'] : false;
         $languageId = isset($p['language_id']) ? $p['language_id'] : $this->languageId;
-        $metadata = isset($p['metadata']) ? $p['metadata'] : $this->setMetadataFieldsFromPost();
+        $metadata = isset($p['metadata']) ? $p['metadata'] : $this->setMetadataFields();
 
         if (!$mediaId || !is_numeric($mediaId)) {
             return false;
@@ -1189,7 +1190,7 @@ class MediaController extends Controller
         return isset($mm) ? $mm[0] : false;
     }
 
-    private function setMetadataFieldsFromPost ()
+    private function setMetadataFields ()
     {
         foreach ($this::$metadataFields as $f) {
             $d[$f] = $this->rHasVal($f) ? $this->rGetVal($f) : null;
