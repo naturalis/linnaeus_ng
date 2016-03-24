@@ -1,17 +1,17 @@
 <div id="page-main">
-	{if $module_name != '' && $item_name != ''}
-		 {t}to{/t} {$item_name} {t}in{/t} {$module_name}</h3>
-		 <p><a href="{$back_url}">back to {$item_name}</a></p>
-	{else}
-		</h3>
-	{/if}
 
     {if $media.total > 0}
-    <div class="buttons">
-        <input type="button" class="grid" value="{t}grid{/t}" />
-        <input type="button" class="list" value="{t}list{/t}" />
-    </div>
+	    {if $from == 'search'}<div class="search-results-separator"></div>{/if}
+	    <div class="buttons">
+	        <input type="button" class="grid" value="{t}grid{/t}" />
+	        <input type="button" class="list" value="{t}list{/t}" />
+	    </div>
+	    {if $from == 'search'}<p>{t}A total of{/t} {$media.total} {t}media files has been found{/t}:</p>{/if}
     {/if}
+
+	{if $module_name != '' && $item_name != ''}
+		 <p><a href="{$back_url}">back to {$item_name} ({$module_name})</a></p>
+	{/if}
 
 	<form id="mediaForm" method="post">
     <input type="hidden" name="module_id" value="{$module_id}" />
@@ -19,7 +19,11 @@
     <input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" id="action" name="action" value="edit" />
 
-    <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.
+    <p>
+	{if $from != 'search'}
+    	{t}A total of{/t} {$media.total} {t}media files has been uploaded for this project{/t}.
+	{/if}
+    </p>
 
     {if $media.total > 0}
 	    <ul class="{$session.admin.user.media.display}">
@@ -64,7 +68,7 @@
 
 	    </form>
 
-	{else}
+	{else if $from != 'search'}
 		{t}You must first{/t} <a href="upload.php">{t}upload images{/t}</a>.</p>
 	{/if}
 
@@ -88,6 +92,7 @@ $(document).ready(function() {
 		if (!allDoubleDeleteConfirm('the selected media files','this project')) return;
 		// set action to delete
 		$('input[name=action]').val('delete');
+		$('#mediaForm').attr('action', 'select.php');
 	});
 
 	$('input:submit#edit').on('click',function() {
