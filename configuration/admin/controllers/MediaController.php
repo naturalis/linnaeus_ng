@@ -90,7 +90,11 @@ class MediaController extends Controller
 
     public $cssToLoad = array('media.css');
 
-    public $jsToLoad = array();
+    public $jsToLoad = array(
+		'all' => array(
+			'media.js',
+		)
+	);
 
     public $controllerPublicName = 'Media';
     public $modelNameOverride = 'MediaModel';
@@ -119,6 +123,10 @@ class MediaController extends Controller
             $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
 
         $this->setRsSettings();
+
+        if (!isset($_SESSION['admin']['user']['media']['display'])) {
+            $_SESSION['admin']['user']['media']['display'] = 'grid';
+        }
     }
 
     public function setModuleId ($id)
@@ -184,6 +192,9 @@ class MediaController extends Controller
     {
         if ($this->rHasVal('action', 'upload_progress')) {
             $this->smarty->assign('returnText', $this->getUploadProgress('media'));
+        }
+        if ($this->rHasVal('action', 'display_preference')) {
+             $_SESSION['admin']['user']['media']['display'] = $this->rGetVal('type');
         }
         return false;
     }
@@ -441,8 +452,9 @@ class MediaController extends Controller
                      ));
                 }
 
-                $this->addUploaded($file['name'] . ' (' . ceil($file['size']/1024) . ' KB)
-                    -- <a target="_blank" href="edit.php?id=' . $this->mediaId . '">edit</a>');
+                $this->addUploaded('<span class="green">' . $file['name'] . '</span>
+                    (' . ceil($file['size']/1024) . ' KB)
+                    (<a target="_blank" href="edit.php?id=' . $this->mediaId . '">edit</a>)');
 
             } else {
                 $this->addError(_('Could not upload media') .

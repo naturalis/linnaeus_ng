@@ -6,8 +6,8 @@
 
     {if $media.total > 0}
     <div class="buttons">
-        <input type="button" class="list" value="{t}list{/t}" />
-        <input type="button" class="grid" value="{t}grid{/t}" />
+       <input type="button" class="grid" value="{t}grid{/t}" />
+       <input type="button" class="list" value="{t}list{/t}" />
     </div>
     {/if}
 
@@ -19,7 +19,7 @@
     <p>{t}A total of{/t} {$media.total} {t}media item(s) is stored for this project{/t}.
 
     {if $media.total > 0}
-	    <ul class="media-list">
+	    <ul class="{$session.admin.user.media.display}">
 	    <li class="header">
 	    	<div class="list-grid-info bold">file name</div>
 	    	<div class="list-info">
@@ -63,29 +63,13 @@ $(document).ready(function() {
 	$('input:button').on('click',function(e) {
 	    if ($(this).hasClass('grid')) {
 	        $('#mediaForm ul').removeClass('list').addClass('grid');
+	        saveDisplayPreference('grid');
 	    }
 	    else if($(this).hasClass('list')) {
 	        $('#mediaForm ul').removeClass('grid').addClass('list');
+	        saveDisplayPreference('list');
 	    }
 	});
-
-	$('input:submit#delete').on('click',function() {
-		if (!allDoubleDeleteConfirm('the selected media files','this project')) return;
-		// set action to delete
-		$('input[name=action]').val('delete');
-	});
-
-	$('input:submit#edit').on('click',function() {
-		$('#mediaForm').attr('action', 'edit.php?' +
-			$('#mediaForm input:checked').attr('id').replace('id_', 'id='));
-	});
-
-	$('input:submit#attach').on('click',function() {
-		$('#mediaForm').attr('action', 'edit.php?' +
-			$('#mediaForm input:checked').attr('id').replace('id_', 'id='));
-	});
-
-
 });
 </script>
 {/literal}

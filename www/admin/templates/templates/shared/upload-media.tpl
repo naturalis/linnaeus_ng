@@ -7,11 +7,12 @@
 	{/if}
 
 	{if $uploaded|@count > 0}
-	<p>The following files were uploaded successfully:<ul>
+	<p>The following files were uploaded successfully:</p>
+	<ul id="file-list">
 	{foreach from=$uploaded item=v}
-		<li style="color: green;">{$v}</li>
+		<li>{$v}</li>
 	{/foreach}
-	</ul></p>
+	</ul>
 	{/if}
 
 	<p>Text about file mime types and size. If you upload multiple files, the metadata
