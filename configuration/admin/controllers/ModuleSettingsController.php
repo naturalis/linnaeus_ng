@@ -154,7 +154,7 @@ class ModuleSettingsController extends Controller
 
     public function settingsAction()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYSASDMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
         $this->checkAuthorisation();
 
 		$this->setModuleId( $this->rGetId() );
@@ -230,7 +230,7 @@ class ModuleSettingsController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYSASDMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
 		if ( !$this->getAuthorisationState() ) return;
 
 		if ( $this->rHasVal('action', 'update_info') && $this->rHasId() )

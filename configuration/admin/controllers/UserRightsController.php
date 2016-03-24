@@ -2,76 +2,67 @@
 
 /*
 
-		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
-
-		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
-		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-		$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
-
-		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
-		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
-		if ( !$this->getAuthorisationState() ) return;
-
-		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
-		{$CRUDstates.can_delete}
-
-
-
-		$this->UserRights->setDisableUserAccesModuleCheck( true );
-        $this->checkAuthorisation();
-
-
-
-	workings:
+	[ initialization ]
 	UserRights-object is initiated in:
 		Controller::initUserRights()
 	as parameters, it takes
 		getCurrentUserId()
 		getCurrentProjectId()
 		getControllerBaseName()
-	and an arbitrary Table-model (see note below).
+	and an arbitrary Table-model for queries (the UserRighrs-class cannot
+	extend Controller class, as it needs to be instantiated in Controller
+	itself. therefore, in order to allow it to perform database queries,
+	some instantiated Table-model is required; hence setModel()).
 
-	on the database model:
-	class cannot extend Controller class, as it needs to be instantiated in
-	Controller itself. therefore, in order to allow it to perform database
-	queries, an instantiated model from another class is required; hence
-	setModel();
 
-	Controller::checkAuthorisation() performs several tests:
-		canAccessModule()		-> checks access to specific module
-		canManageItem()			-> checks specific assigned taxa
-		canPerformAction()		-> checks specific actions (CRUD, publish)
-		hasAppropriateLevel()	-> check based on role only
-	and redirects to a 'not authorized' page when a check fails. there is a second 
-	function
-		$this->getAuthorisationState()
-	which performs the same checks as checkAuthorisation() but only returns true/false
+	[ implementation in Controller ]
+	Controller::checkAuthorisation( ) 	--> redirects when fail
+	Controller::getAuthorisationState()	--> returns boolean
+	Controller::getCRUDstates()			--> returns array of booleans: [can_create,can_read,can_update,can_delete]
+	checkAuthorisation() & getAuthorisationState() perform several tests:
+		$this->UserRights->canAccessModule()		-> checks access to a specific module
+		$this->UserRights->canManageItem()			-> checks specific assigned taxa
+		$this->UserRights->canPerformAction()		-> checks specific actions (CRUD, publish)
+		$this->UserRights->hasAppropriateLevel()	-> check based on role only
+	- access and read/write-rights for individual modules, as well as
+	  general right to publish set in users/edit.php.
+	- access to items is restricted to access to specific taxa and 
+	  subjacent taxa (i.e., branches), also set in users/edit.php (no
+	  specified items for a user means access to all taxa).
+	- for CRUD actions, see below (specofoc action types). 
 
-	set a taxon:	$this->UserRights->setItemId( $this->rGetId() );
-	set an action: 	$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-	set a level:	$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
 
-	for pages that allow for the absence of a project ID, call
+	[ "in situ" configuration options ]
+	to be used anywhere (set before call to checkAuthorisation() or 
+	getAuthorisationState())
+	- set a specific action type (checked in canPerformAction()):
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+	  there are five action types:
+		$this->UserRights->getActionRead()
+		$this->UserRights->getActionCreate()
+		$this->UserRights->getActionUpdate()
+		$this->UserRights->getActionDelete()
+		$this->UserRights->getActionPublish()
+	  however, currently there are only two assignable action-rights
+	  per module, 'read' and 'write'. getActionRead() resolves to 'read',
+	  ...Create, ...Update and ...Delete to 'write'.
+	  the right to publish is set for the entire project, not per module
+	  (even if it is stored for each module, and only implemented in the
+	  SpeciesModule for the publishing of "taxon passport pages").
+	  please note that CUD-rights are sometimes implemented in a non-literal
+	  sense: for instance, deletion of an image that belongs with a
+	  glossary-item is interpreted as an update action of that glossary-item.
+	  default getActionRead()
+	- set a specific item/taxon (checked in canManageItem()):
+		$this->UserRights->setItemId( $this->rGetId() );
+	  default null.
+	- set a level (checked in hasAppropriateLevel()):
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+	  default ID_ROLE_EDITOR
+	- disable check for module access:
+		$this->UserRights->setDisableUserAccesModuleCheck( true );
+	- for pages that allow for the absence of a project ID, call
 		$this->UserRights->setAllowNoProjectId( true );
-
-
-	not all of CRUD is implemented; translates to read (R) / write (CUD),
-	ref user_module_access.can_read, user_module_access.can_write
-			
-	export is not an action, but implemented based on hasAppropriateLevel()
-			
-			
-implementatie is niet leterlijk: delete iets == right delete; subdelen (zoals states) vallen 9onde update
-
-laten zien welke dingen op basis van ro zijn
-	
-
-	implement roles
-	always include projects
-
-	ref key ends?
-	ref matrices?
-	
 
 */
 
@@ -617,4 +608,3 @@ class UserRights
 	}
 
 }
-
