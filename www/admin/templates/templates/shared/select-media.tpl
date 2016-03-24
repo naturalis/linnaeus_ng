@@ -22,7 +22,7 @@
     <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.
 
     {if $media.total > 0}
-	    <ul class="list">
+	    <ul class="media-list">
 	    <li class="header">
 	    	<div class="list-grid-info bold">file name</div>
 	    	<div class="list-info">
