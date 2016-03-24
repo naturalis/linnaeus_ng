@@ -209,6 +209,7 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
         $this->smarty->assign('media', $this->getRsMediaList());
+		$this->smarty->assign('from', 'select_rs');
         $this->printPage();
     }
 
@@ -228,6 +229,7 @@ class MediaController extends Controller
         $this->smarty->assign('media', $this->getMediaFiles());
         $this->smarty->assign('module_id', $this->rGetVal('module_id'));
         $this->smarty->assign('item_id', $this->rGetVal('item_id'));
+		$this->smarty->assign('from', 'select');
 
         $this->printPage();
     }
@@ -251,6 +253,7 @@ class MediaController extends Controller
 		$this->smarty->assign('metadata', $search['metadata']);
 		$this->smarty->assign('tags', $this->rGetVal('tags'));
 		$this->smarty->assign('file_name', $search['file_name']);
+		$this->smarty->assign('from', 'search');
 
 		$this->printPage();
     }
@@ -751,7 +754,7 @@ class MediaController extends Controller
     		));
         }
 
-        if (!empty($this->moduleId) && !empty($this->itemId)) {
+        if ($this->moduleId != -1 && $this->itemId != 1) {
             $attached = $this->models->MediaModules->getSingleColumn(array(
                 'columns' => 'media_id',
     			'id' => array(

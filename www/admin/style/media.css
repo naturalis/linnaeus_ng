@@ -81,3 +81,7 @@ ul#file-list {
 	margin: 0 0 0 15px;
 	padding: 0;
 }
+.search-results-separator {
+	margin: 20px 0;
+	border-bottom: 1px dotted #ccc;
+}

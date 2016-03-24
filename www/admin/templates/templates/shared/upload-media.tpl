@@ -1,9 +1,6 @@
 <div id="page-main">
 	{if $module_name != '' && $item_name != ''}
-		 {t}for{/t} {$item_name} {t}in{/t} {$module_name}</h3>
-		 <p><a href="{$back_url}">back to {$item_name}</a></p>
-	{else}
-		</h3>
+		 <p><a href="{$back_url}">back to {$item_name} ({$module_name})</a></p>
 	{/if}
 
 	{if $uploaded|@count > 0}
