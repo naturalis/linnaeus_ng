@@ -8,8 +8,8 @@
 
     {if $media.total > 0}
     <div class="buttons">
-        <input type="button" class="list" value="{t}list{/t}" />
         <input type="button" class="grid" value="{t}grid{/t}" />
+        <input type="button" class="list" value="{t}list{/t}" />
     </div>
     {/if}
 
@@ -22,7 +22,7 @@
     <p>{t}A total of{/t} {$media.total} {t}images has been uploaded for this project{/t}.
 
     {if $media.total > 0}
-	    <ul class="media-list">
+	    <ul class="{$session.admin.user.media.display}">
 	    <li class="header">
 	    	<div class="list-grid-info bold">file name</div>
 	    	<div class="list-info">
@@ -43,7 +43,7 @@
 	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
 		 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
 	 			</a>
-	 			<span class="file-name">{$v.file_name}</span>
+	 			<span class="file-name">{$v.file_name} (<a href="edit.php?id={$v.media_id}">{t}edit{/t}</a>)</span>
 	 		</div>
 	 		<div class="list-info">
 	 			<span class="column">{$v.title}</span>
@@ -59,7 +59,6 @@
 		{if $module_name != '' && $item_name != ''}
 			 <input type="submit" id="attach" value="{t}attach{/t}" />
 		{else}
-		    <input type="submit" id="edit" value="{t}edit{/t}" />
 		    <input type="submit" id="delete" value="{t}delete{/t}" />
 		{/if}
 
@@ -77,9 +76,11 @@ $(document).ready(function() {
 	$('input:button').on('click',function(e) {
 	    if ($(this).hasClass('grid')) {
 	        $('#mediaForm ul').removeClass('list').addClass('grid');
+	        saveDisplayPreference('grid');
 	    }
 	    else if($(this).hasClass('list')) {
 	        $('#mediaForm ul').removeClass('grid').addClass('list');
+	        saveDisplayPreference('list');
 	    }
 	});
 
@@ -97,8 +98,6 @@ $(document).ready(function() {
 	$('input:submit#attach').on('click',function() {
 		$('input[name=action]').val('attach');
 	});
-
-
 });
 </script>
 {/literal}
