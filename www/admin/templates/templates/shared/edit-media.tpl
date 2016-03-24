@@ -1,6 +1,6 @@
 <div id="page-main">
 
-	<form id="theForm" method="post">
+	<form id="theForm" enctype="multipart/form-data" method="post">
 	<input type="hidden" name="action" value="edit" />
 	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input type="hidden" name="module_id" value="{$module_id}" />
@@ -13,24 +13,23 @@
 		{if $media_type == 'image'}
 			<a href="{$source}" rel="prettyPhoto">
 			<img src="{$source}" alt="{$name}" class="image-preview" />
-			</a><br/>
-			{$name}
+			</a>
 
 		{else if $media_type == 'audio' or $media_type == 'video'}
 			<{$media_type} src="{$source}" alt="{$name}" class="av-preview" controls />
 				<a href="{$source}">Play {$name}</a>
-			</{$media_type}><br>
-			{$name}
+			</{$media_type}>
 
 		{else}
 			<a href="{$source}">
-			<img src="{$thumbnail}" alt="{$name}" /><br>
-			{$name}
+			<img src="{$thumbnail}" alt="{$name}" />
 			</a>
 
 		{/if}
+		<br><strong>{$name}</strong><br>
 
 	</p>
+
 	<table>
     {if $languages|@count>1}
     <tr>
@@ -60,12 +59,17 @@
 	</tr>
 	<tr>
 		<td></td>
+		<td style="padding: 15px 0 5px 0;">{t}Optionally, you can replace this media file with a different file.{/t}<br>
+			{t}The metadata and tags will be retained.{/t}</td>
+	</tr>
+	<tr>
+		<td>{t}replace with{/t}:</td>
+		<td><input type="file" name="files[]" /></td>
+	</tr>
+	<tr>
+		<td></td>
 		<td><input type="submit" name="save" value="{t}save{/t}" /></td>
 	</tr>
 	</table>
     </form>
 </div>
-
-{literal}
-<script></script>
-{/literal}
