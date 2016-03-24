@@ -1032,12 +1032,21 @@ class KeyController extends Controller
 
     private function getTaxaInKey( $p )
     {
-		return
-			$this->models->KeyModel->getTaxaInKey(
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'order' => isset($p['order']) ? $p['order'] : null,
-				));
+		$d=
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'order' => isset($p['order']) ? $p['order'] : null,
+			);
+		
+		$this->UserRights->setUserItems();
+		$this->userItems=$this->UserRights->getUserItems();
+
+		if ( !empty($this->userItems) )
+		{
+			$d['branch_tops']=$this->userItems;
+		}
+
+		return $this->models->KeyModel->getTaxaInKey($d);
     }
 
     private function getKeysteps( $p=null )

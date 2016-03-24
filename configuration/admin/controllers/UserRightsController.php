@@ -17,6 +17,11 @@
 
 
 
+		$this->UserRights->setDisableUserAccesModuleCheck( true );
+        $this->checkAuthorisation();
+
+
+
 	workings:
 	UserRights-object is initiated in:
 		Controller::initUserRights()
@@ -85,6 +90,7 @@ class UserRights
 	private $action;
 	private $requiredlevel;
 	private $allowNoProjectId=false;
+	private $disableUserAccesModuleCheck=false;
 	private $authorizestate;
 	private $manageitemstate;
 	private $actionstate;
@@ -107,6 +113,7 @@ class UserRights
 		$this->setProjectId( isset( $p['projectid'] ) ? $p['projectid'] : null );
 		$this->setController( isset( $p['controller'] ) ? $p['controller'] : null );
 		$this->setModuleType( $this->getModuleTypeStandard() );
+		$this->setItemType( $this->getItemTypeTaxon() );
 		$this->setActionType( $this->getActionRead() );
 		$this->setRequiredLevel( ID_ROLE_EDITOR );
 		$this->setUser();
@@ -164,18 +171,18 @@ class UserRights
 			$this->setAuthorizeState( false );
 		}
 		else
-		if ( $p && $u && $c && $m && !$this->canUserAccessModule() )
+		if ( $p && $u && $c && $m && !$this->getDisableUserAccesModuleCheck() && !$this->canUserAccessModule() )
 		{
 			$this->setStatus( 'no access: attempting access to module without proper rights' );
 			$this->setAuthorizeState( false );
 		}
 		else
-		if ( $p && $u && $c && $m && $this->canUserAccessModule() )
+		if ( $p && $u && $c && $m && ( $this->getDisableUserAccesModuleCheck() || $this->canUserAccessModule() ) )
 		{
 			$this->setStatus( 'access: accessing module' );
 			$this->setAuthorizeState( true );
 		}
-		
+
 		return $this->getAuthorizeState();
     }
 
@@ -214,6 +221,11 @@ class UserRights
 			$this->setActionState( true );
 			$this->setStatus( 'access: no action specified' );
 		}
+		elseif ( isset( $this->moduleid ) && $this->getDisableUserAccesModuleCheck() )
+		{
+			$this->setActionState( true );
+			$this->setStatus( 'access: module check disabled' );
+		}
 		else
 		{
 			$d=$this->canUserPerformAction();
@@ -242,11 +254,45 @@ class UserRights
     }
 
 
+    public function setUserItems()
+	{
+		$this->useritems=array();
+		
+		$d=$this->model->freeQuery( "
+			select
+				item_id
+			from
+				%PRE%user_item_access
+			where
+				project_id = " . $this->projectid . " 
+				and user_id = " . $this->userid . " 
+				and item_type ='" . $this->itemtype . "'
+		");
+
+		foreach((array)$d as $val)
+		{
+			array_push( $this->useritems,$val['item_id'] );
+		}
+	}
+
+	public function getUserItems()
+	{
+		return $this->useritems;
+	}
+
 	public function setAllowNoProjectId( $state )
 	{
 		if ( is_bool($state) )
 		{
 			$this->allowNoProjectId=$state;
+		}
+	}
+
+	public function setDisableUserAccesModuleCheck( $state )
+	{
+		if ( is_bool($state) )
+		{
+			$this->disableUserAccesModuleCheck=$state;
 		}
 	}
 
@@ -263,14 +309,13 @@ class UserRights
 		/*
 			be aware: currently we recognize only a single legal
 			itemType ('taxon') so for convenience sake, the item
-			type is set automatically whenever someone sets an
-			item ID. should there ever be other item types, either
-			all existing calls to setItemId() should be preceded
-			by a call to setItemType('taxon'), or 'taxon' should 
-			be made the default value of item type.
+			type is set automatically at initialization. should 
+			there ever be other item types, either all existing
+			calls to setItemId() should be preceded by a call to
+			setItemType('taxon'), or 'taxon' should  be made the
+			default value of item type.
 		*/
 		$this->itemid=$id;
-		$this->setItemType( $this->getItemTypeTaxon() );
 	}
 
 	public function setItemType( $type )
@@ -336,7 +381,7 @@ class UserRights
 		if ( in_array( $action, $this->C_actions ) )
 		{
 			$this->action=$action;
-		}	
+		}
 	}
 
 	public function setRequiredLevel( $level )
@@ -420,6 +465,11 @@ class UserRights
 		return $this->allowNoProjectId;
 	}
 
+	private function getDisableUserAccesModuleCheck()
+	{
+		return $this->disableUserAccesModuleCheck;
+	}
+
     private function setModuleId()
     {
 		if ( empty($this->controller) ) return;
@@ -501,27 +551,6 @@ class UserRights
 		return isset($this->usermoduleaccess['can_read']) && $this->usermoduleaccess['can_read']==1 ? true : false;
 	}
 	
-    private function setUserItems()
-	{
-		$this->useritems=array();
-		
-		$d=$this->model->freeQuery( "
-			select
-				item_id
-			from
-				%PRE%user_item_access
-			where
-				project_id = " . $this->projectid . " 
-				and user_id = " . $this->userid . " 
-				and item_type ='" . $this->itemtype . "'
-		");
-
-		foreach((array)$d as $val)
-		{
-			array_push( $this->useritems,$val['item_id'] );
-		}
-	}
-
     private function setUserSubjacentItems()
 	{
 		$this->subjacentitems=array();
@@ -588,33 +617,4 @@ class UserRights
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
