@@ -1,13 +1,46 @@
 <?php
 
+
+/*
+	$bla=array(
+		'url' => 'https://www.google.com/fusiontables/embedviz?q=select+col1+from+1peUpp5pUbKsmkXz-LiCNib-609QygRxfoiERtGZj+where+col7+%3D+&#39;%SCI_NAME%&#39;&amp;viz=MAP&amp;h=false&amp;lat=52.025825899425136&amp;lng=6.06602441406244&amp;t=2&amp;z=7&amp;l=col1&amp;y=3&amp;tmplt=4&amp;hml=TWO_COL_LAT_LNG',
+		'substitute' => array('%SCI_NAME%'=>'taxon'),
+		'link_embed' => 'embed',
+		'check_type' => 'none',
+		'query' => 'select 1 as result',
+		'template' => '_verspreiding.tpl',
+	);
+
+	echo json_encode($bla);
+
+
+rawurlencode
+or 
+urlencode
+
+update pages_taxa set external_reference = '{"url":"https:\/\/www.google.com\/fusiontables\/embedviz?q=select+col1+from+1peUpp5pUbKsmkXz-LiCNib-609QygRxfoiERtGZj+where+col7+%3D+&#39;%SCI_NAME%&#39;&amp;viz=MAP&amp;h=false&amp;lat=52.025825899425136&amp;lng=6.06602441406244&amp;t=2&amp;z=7&amp;l=col1&amp;y=3&amp;tmplt=4&amp;hml=TWO_COL_LAT_LNG","substitute":{"%SCI_NAME%":"taxon"},"link_embed":"embed","check_type":"none","query":"select 1 as result","template":"_verspreiding.tpl"}'
+where id= 164;
+
+	die();
+*/
+
+
+
+
+
 /*
 	$params=array(
 		'sci_name'=>'taxon'
 	);
 	
+	$subst=array(
+		'%SCI_NAME%'=>'taxon'
+	);
+	
 	$bla=array(
 		'url' => 'https://leiden.maps.arcgis.com/apps/Embed/index.html?webmap=137d9ed9a52149d7b6b48fa722421dc1&extent=-27.631,-5.2922,39.2762,25.2059&home=true&zoom=true&scale=true&search=true&searchextent=false&legend=true&disable_scroll=false&theme=dark',
 		'parameters' => $params,
+		'substitute' => $subst,
 		'link_embed' => 'embed',
 		'check_type' => 'none',
 		'query' => 'select 1 as result',
@@ -22,27 +55,34 @@
 /*
 	'url' => URL (as is)
 	'parameters' => array of dynamic params (see below)
+	'substitute' => array of strings to replace in the url (alternative for params)
 	'link_embed' => embed / link (*) / link_new   [ embedded, link (same window), link (new window) ]
 	'check_type' => none (*) / query
 	'query' => 'select 1 as show', (should return one row with one field called 'show' with value 1 or 0)
 	'template' => full local template name (when embedding; defaults to general _webservice.tpl )
 	
-	params: name /value
+	params / subst: name /value
 		make list of names
 		for now it's just 'taxon' which resolves to the full scientific name, so:
 
-		$params=array(
-			'sci_name'=>'taxon'
-		)	
-
 		$bla=array(
 			'url' => 'https://webservice.com/?get_info
-			'parameters' => $params,
+			'parameters' => array('sci_name'=>'taxon')
 		);
 	
 		would result in 
-		
-		https://webservice.com/?get_info&sci_name=Meles meles (Linnaeus, 1758)
+		https://webservice.com/?get_info&sci_name=Meles+meles+(Linnaeus,+1758)
+
+
+		$bla=array(
+			'url' => 'https://webservice.com/get_info/%SCI_NAME%
+			'substitute' => array('%SCI_NAME%'=>'taxon')
+		);
+		would result in 
+		https://webservice.com/get_info/Meles+meles+(Linnaeus,+1758)
+
+
+	goes into pages_taxa.external_reference
 	
 
 	normal title + content applies as well!

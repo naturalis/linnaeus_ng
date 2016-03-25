@@ -385,20 +385,38 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ( is_null($taxon) || is_null($reference) ) return;
 		
-		$query_string=null;
-
-		foreach((array)$reference->parameters as $key=>$val)
+		if ( isset($reference->substitute) )
 		{
-			if ( isset($taxon[$val]) )
+			foreach((array)$reference->substitute as $key=>$val)
 			{
-				$query_string .= $key .'=' . rawurlencode( $taxon[$val] ) . '&';
+				if ( isset($taxon[$val]) )
+				{
+					$reference->url = str_replace( $key, urlencode( $taxon[$val] ), $reference->url );
+				}
+				else
+				{
+					$reference->url = str_replace( $key, "" , $reference->url );
+				}
+				
 			}
 		}
-		
+				
+		$query_string=null;
+
+		if ( isset($reference->parameters) )
+		{
+			foreach((array)$reference->parameters as $key=>$val)
+			{
+				if ( isset($taxon[$val]) )
+				{
+					$query_string .= $key .'=' . rawurlencode( $taxon[$val] ) . '&';
+				}
+			}
+		}
+
 		$parts=parse_url( $reference->url );
 
 		$full_url=$reference->url . ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' );
-		
 		
 		$is_empty=null;
 		
