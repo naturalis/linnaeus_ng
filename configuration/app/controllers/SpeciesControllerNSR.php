@@ -135,7 +135,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$ref=$requestedCategory['external_reference'];
 
-				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='link' )
+				if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 				{
 					$this->redirect( $ref->full_url );
 				} 
@@ -373,13 +373,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function getFirstTaxonIdNsr()
 	{
-
 		return $this->models->{$this->_model}->getFirstTaxonIdNsr($this->getCurrentProjectId());
-
 	}
 	
 	private function parseExternalReference( $p )
 	{
+
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$reference = isset($p['reference']) ? $p['reference'] : null;
 
@@ -391,7 +390,14 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				if ( isset($taxon[$val]) )
 				{
-					$reference->url = str_replace( $key, urlencode( $taxon[$val] ), $reference->url );
+					$sval=$taxon[$val];
+
+					if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
+					{
+						$sval=call_user_func($reference->substitute_encode, $sval );
+					}
+
+					$reference->url = str_replace( $key, $sval, $reference->url );
 				}
 				else
 				{
@@ -409,7 +415,16 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				if ( isset($taxon[$val]) )
 				{
-					$query_string .= $key .'=' . rawurlencode( $taxon[$val] ) . '&';
+					$sval=$taxon[$val];
+
+					if ( isset($reference->parameter_encode) && $reference->parameter_encode!='none' && is_callable( $reference->parameter_encode ) )
+					{
+						$sval=call_user_func($reference->parameter_encode, $sval );
+					}
+
+					$reference->url = str_replace( $key, $sval, $reference->url );
+
+					$query_string .= $key .'=' . rawurlencode( $sval ) . '&';
 				}
 			}
 		}
@@ -498,6 +513,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$ref->full_url=$d['full_url'];
 					$categories[$key]['external_reference']=$ref;
 					$categories[$key]['is_empty']=$d['is_empty'];
+					
 				}
 			
 			}

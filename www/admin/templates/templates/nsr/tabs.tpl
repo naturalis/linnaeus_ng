@@ -19,15 +19,17 @@
 	<p>
 		<table>
 			<tr>
-                <th>{t}Category{/t}</th>
+                <th>{t}category{/t}</th>
                 {foreach from=$languages item=v}
                 {if $v.def_language=='1'}
-                    <td>{$v.language} *</td>
+				<td>{$v.language} *</td>
                 {/if}
                 {/foreach}
                 {if $languages|@count > 1}
-	                <td colspan="2" id="project-language-tabs">(languages)</td>
+                <td id="project-language-tabs">(languages)</td>
                 {/if}
+                <td></td>
+                <td>{t}attributes{/t}</td>
 			</tr>
 
             {foreach from=$pages item=v}
@@ -52,10 +54,12 @@
                 </td>
                 {/if}
                 <td class="cell-page-delete" onclick="taxonPageDelete({$v.id},'{$v.page}');"></td>
-                <td>{if $v.always_hide==1}(id={$v.id}){/if}</td>
                 <td>
-                {if $v.external_reference}<span class="tab-redirect"><span class="tab-redirect-label">{t}external reference:{/t}</span> {$v.external_reference}</span>{/if}</td>
-                {if $v.redirect_to}<span class="tab-redirect"><span class="tab-redirect-label">{t}redirects to:{/t}</span> {$v.redirect_to}</span>{/if}</td>
+                	{if $v.always_hide==1}{t}always hidden{/t} (id={$v.id}){/if}
+                	{if $v.external_reference}{t}external reference{/t}{/if}
+                	{if $v.redirect_to}{t}redirects{/t}{/if}
+                	<a class="edit" href="tab.php?id={$v.id}">{t}edit{/t}</a>
+                </td>
             </tr>
 
             {/foreach}
