@@ -1,57 +1,7 @@
 <?php
 
 
-/*
-	$bla=array(
-		'url' => 'https://www.google.com/fusiontables/embedviz?q=select+col1+from+1peUpp5pUbKsmkXz-LiCNib-609QygRxfoiERtGZj+where+col7+%3D+&#39;%SCI_NAME%&#39;&amp;viz=MAP&amp;h=false&amp;lat=52.025825899425136&amp;lng=6.06602441406244&amp;t=2&amp;z=7&amp;l=col1&amp;y=3&amp;tmplt=4&amp;hml=TWO_COL_LAT_LNG',
-		'substitute' => array('%SCI_NAME%'=>'taxon'),
-		'link_embed' => 'embed',
-		'check_type' => 'none',
-		'query' => 'select 1 as result',
-		'template' => '_verspreiding.tpl',
-	);
 
-	echo json_encode($bla);
-
-
-rawurlencode
-or 
-urlencode
-
-update pages_taxa set external_reference = '{"url":"https:\/\/www.google.com\/fusiontables\/embedviz?q=select+col1+from+1peUpp5pUbKsmkXz-LiCNib-609QygRxfoiERtGZj+where+col7+%3D+&#39;%SCI_NAME%&#39;&amp;viz=MAP&amp;h=false&amp;lat=52.025825899425136&amp;lng=6.06602441406244&amp;t=2&amp;z=7&amp;l=col1&amp;y=3&amp;tmplt=4&amp;hml=TWO_COL_LAT_LNG","substitute":{"%SCI_NAME%":"taxon"},"link_embed":"embed","check_type":"none","query":"select 1 as result","template":"_verspreiding.tpl"}'
-where id= 164;
-
-	die();
-*/
-
-
-
-
-
-/*
-	$params=array(
-		'sci_name'=>'taxon'
-	);
-	
-	$subst=array(
-		'%SCI_NAME%'=>'taxon'
-	);
-	
-	$bla=array(
-		'url' => 'https://leiden.maps.arcgis.com/apps/Embed/index.html?webmap=137d9ed9a52149d7b6b48fa722421dc1&extent=-27.631,-5.2922,39.2762,25.2059&home=true&zoom=true&scale=true&search=true&searchextent=false&legend=true&disable_scroll=false&theme=dark',
-		'parameters' => $params,
-		'substitute' => $subst,
-		'link_embed' => 'embed',
-		'check_type' => 'none',
-		'query' => 'select 1 as result',
-		'template' => '_verspreiding.tpl',
-	);
-
-	echo json_encode($bla);
-
-	die();
-
-*/
 /*
 	'url' => URL (as is)
 	'parameters' => array of dynamic params (see below)
@@ -81,14 +31,10 @@ where id= 164;
 		would result in 
 		https://webservice.com/get_info/Meles+meles+(Linnaeus,+1758)
 
-
 	goes into pages_taxa.external_reference
 	
-
 	normal title + content applies as well!
 	make _webservice.tpl
-
-	
 
 */
 		
@@ -173,6 +119,35 @@ class NsrTaxonManagement extends NsrController
         $this->smarty->assign('languages', $lp);
         $this->smarty->assign('pages', $pages);
         $this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
+
+        $this->printPage();
+    }
+	
+    public function tabAction()
+    {
+        $this->checkAuthorisation();
+
+        $this->setPageName($this->translate('Category'));
+
+		if ( !$this->rHasId() ) $this->redirect('tabs.php');
+
+        if ($this->rHasVal('action','save') ) //&& !$this->isFormResubmit())
+		{
+			$d=$this->models->PagesTaxa->update(
+				array( 'always_hide' => (( isset($this->rGetAll()['always_hide']) && $this->rGetAll()['always_hide']=='on' ) ? '1' : '0' ) ),
+				array( 'project_id' => $this->getCurrentProjectId(), 'id' => $this->rGetId() )
+			);
+
+			$this->logChange($this->models->PagesTaxa->getDataDelta());
+			$this->saveExternalReference();
+			$this->addMessage( $this->translate( 'Saved.' ) );
+        }
+
+        $this->smarty->assign( 'page', $this->getPage( $this->rGetId() ) );
+        $this->smarty->assign( 'dynamic_fields', [['field'=>'taxon','label'=>'scientific name']] );
+        $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
+        $this->smarty->assign( 'link_embed', [['field'=>'embed','label'=>'embed'],['field'=>'link','label'=>'link'],['field'=>'link_new','label'=>'link (new window)']] );
+        $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
 
         $this->printPage();
     }
@@ -418,7 +393,73 @@ class NsrTaxonManagement extends NsrController
 		return $d;
     }
 
+	private function getPage( $id )
+	{
+        $page=$this->models->PagesTaxa->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(),
+                'id' => $this->rGetId()
+            )
+        ));
+		
+		$page=$page ? $page[0] : null;
+		
+		if ( !empty($page['external_reference']) )
+		{
+			$page['external_reference_decoded']=json_decode($page['external_reference']);
+		}
+		
+		return $page;
 
+	}
+
+	private function saveExternalReference()
+	{
+		$data=$this->rGetAll()['external_reference'];
+		
+		if ( empty($data['url']) )
+		{
+			$d=$this->models->PagesTaxa->update(
+				array(
+					'external_reference'=> 'null'
+				),
+				array(
+					'id' => $this->rGetId(),
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			);
+		}
+		else
+		{
+			$d=array();
+			foreach((array)$data['substitute']['name'] as $key=>$val)
+			{
+				if ( empty($val) ) continue;
+				$d[$val]=$data['substitute']['value'][$key];
+			}
+			$data['substitute']=$d;
+			
+			$d=array();
+			foreach((array)$data['parameters']['name'] as $key=>$val)
+			{
+				if ( empty($val) ) continue;
+				$d[$val]=$data['parameters']['value'][$key];
+			}
+			$data['parameters']=$d;
+	
+			$d=$this->models->PagesTaxa->update(
+				array(
+					'external_reference'=> json_encode($data)
+				),
+				array(
+					'id' => $this->rGetId(),
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			);
+		}
+		$this->logChange($this->models->PagesTaxa->getDataDelta());
+		
+	}
 
 }
 
