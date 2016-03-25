@@ -7,6 +7,6 @@
     </p>
     {/if}
             
-	<iframe style="width:510px;height:500px;" src="{$external_content->full_url}"></iframe>
+	<iframe width="500" height="300" scrolling="no" frameborder="no" src="{$external_content->full_url}"></iframe>
 
 </p>

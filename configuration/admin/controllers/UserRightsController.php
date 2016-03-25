@@ -156,7 +156,7 @@ class UserRights
 			$this->setAuthorizeState( true );
 		}
 		else
-		if ( $p && $u && $c && !$m )
+		if ( $p && $u && $c && !$m && !$this->getDisableUserAccesModuleCheck() )
 		{
 			$this->setStatus( 'no access: attempting access to unknown module' );
 			$this->setAuthorizeState( false );
@@ -173,6 +173,8 @@ class UserRights
 			$this->setStatus( 'access: accessing module' );
 			$this->setAuthorizeState( true );
 		}
+		
+		//echo "getAuthorizeState(): " . ( $this->getAuthorizeState() ? "y" : "n" ) . " (" . $this->getStatus() . ")"; die();
 
 		return $this->getAuthorizeState();
     }
