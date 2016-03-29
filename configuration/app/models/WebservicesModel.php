@@ -695,10 +695,38 @@ class WebservicesModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
+    public function getNsrId( $params )
+	{
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$nsr_id = isset($params['nsr_id']) ? $params['nsr_id'] : null;
+		$item_type = isset($params['item_type']) ? $params['item_type'] : 'taxon';
+		
+		if ( is_null($project_id) || is_null($nsr_id) )
+			return;
+		
+		$query="
+			select
+				* 
+			from
+				%PRE%nsr_ids
+			where 
+				project_id = " . $project_id . "
+				and nsr_id = 'tn.nlsr.concept/". str_pad( $this->escapeString($nsr_id) ,12,'0',STR_PAD_LEFT) . "'
+				and item_type = '" . $item_type ."'
+			";
+
+		return $this->freeQuery( $query );			
+	}
+
+
 	private function format_number($n)
 	{
 		return number_format($n,0,',','.');
 	}
+
+			
+		
+
 
 
 }

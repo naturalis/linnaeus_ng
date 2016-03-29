@@ -151,7 +151,8 @@ class NsrTaxonManagement extends NsrController
 				['field'=>'taxon','label'=>'scientific name'],
 				['field'=>'id','label'=>'taxon ID'],
 				['field'=>'project_id','label'=>'project ID'],
-				['field'=>'language_id','label'=>'language ID']
+				['field'=>'language_id','label'=>'language ID'],
+				['field'=>'nsr_id','label'=>'NSR ID']
 			] );
         $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
         $this->smarty->assign( 'link_embed', [['field'=>'embed','label'=>'embed'],['field'=>'link','label'=>'link'],['field'=>'link_new','label'=>'link (new window)']] );
