@@ -493,6 +493,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
 			// this should be changed to a generalized method, using 'redirect_to'
+			// REFAC2015
 			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1 && $this->_taxon_fetch_ez_data)
 			{
 				$ezData=$this->getEzData($taxon_id);
@@ -1459,6 +1460,13 @@ class SpeciesControllerNSR extends SpeciesController
 		));
 
 	}
+
+    public function getTaxonById( $id )
+    {
+        $taxon=parent::getTaxonById( $id );
+		$taxon['nsr_id']=$this->getNSRId( array('id'=>$id) );
+		return $taxon;
+    }
 
 
 
