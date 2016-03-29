@@ -19,11 +19,9 @@
     <input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" id="action" name="action" value="edit" />
 
-    <p>
 	{if $from != 'search'}
-    	{t}A total of{/t} {$media.total} {t}media files has been uploaded for this project{/t}.
+    	<p>{t}A total of{/t} {$media.total} {t}media files has been uploaded for this project{/t}.</p>
 	{/if}
-    </p>
 
     {if $media.total > 0}
 	    <ul class="{$session.admin.user.media.display}">
@@ -58,7 +56,7 @@
 	 	</label>
 	    {/foreach}
 	    </ul>
-		<div class="clear" />
+		<div class="clear"></div>
 
 		{if $module_name != '' && $item_name != ''}
 			 <input type="submit" id="attach" value="{t}attach{/t}" />
@@ -68,8 +66,16 @@
 
 	    </form>
 
-	{else if $from != 'search'}
-		{t}You must first{/t} <a href="upload.php">{t}upload images{/t}</a>.</p>
+	{else}
+
+		<p>
+		{if $from != 'search'}
+			{t}You must first{/t} <a href="upload.php">{t}upload images{/t}</a>.
+		{else}
+			{t}Nothing found (yet)!{/t}
+		{/if}
+		</p>
+
 	{/if}
 
 </div>
