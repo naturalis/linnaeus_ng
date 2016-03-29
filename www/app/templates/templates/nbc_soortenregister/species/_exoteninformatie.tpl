@@ -27,9 +27,9 @@ ul.exotica li {
 	<div style="margin-bottom:10px">
 
 
-        {if $passport_content.content}
+        {if $content}
         <div>
-            {$passport_content.content}
+            {$content}
         </div>
         {/if}
         
@@ -45,7 +45,8 @@ ul.exotica li {
         </h2>
 
 		<table class="exotica">
-        {foreach from=$content->result->data item=v}
+
+        {foreach from=$external_content->content_json_decoded->result->data item=v}
         	{foreach from=$v->values item=l key=k}
             {capture "value"}{$l->value_start}{if $l->value_end} - {$l->value_end}{/if}{/capture}
 			<tr>
@@ -57,13 +58,13 @@ ul.exotica li {
         {/foreach}
 		</table>
 
-		{if $content->result->references}
+		{if $external_content->content_json_decoded->result->references}
         <br />
-        <h4 class="source">{t}Publicatie{if $content->result->references|@count>1}s{/if}{/t}</h4>
+        <h4 class="source">{t}Publicatie{if $external_content->content_json_decoded->result->references|@count>1}s{/if}{/t}</h4>
 		<ul class="exotica">
         
-        {foreach from=$content->result->references item=v}
-	        {if $content->result->references|@count>1}<li>{/if}
+        {foreach from=$external_content->content_json_decoded->result->references item=v}
+	        {if $external_content->content_json_decoded->result->references|@count>1}<li>{/if}
                 <a href="../literature2/reference.php?id={$v->id}">
                 {capture authors}
                 {foreach from=$v->authors item=author key=ak}{if $ak>0}, {/if}{$author->name|@trim}{/foreach}
@@ -76,7 +77,7 @@ ul.exotica li {
                 {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
                 {if $v->publisher}{$v->publisher}.{/if}      
                 </a>
-	        {if $content->result->references|@count>1}</li>{/if}
+	        {if $external_content->content_json_decoded->result->references|@count>1}</li>{/if}
         {/foreach}
 		{/if}
         </ul>

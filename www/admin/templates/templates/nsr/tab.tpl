@@ -34,6 +34,12 @@ textarea {
 	margin:1px 0 2px 0;
 	text-align:justify;
 }
+
+.explanation ul {
+	padding-left:10px;
+	margin:0 0 0 0;
+}
+
 </style>
 
 <div id="page-main">
@@ -72,23 +78,27 @@ textarea {
 
                 <div class="explanation">
                     URL to point to an external page or webservice. parametrization can be done through substitution and/or parameters. these achieve
-                    similar goal, but work slightly different. use substitutions to replace placeholders in the URL itself with taxon-dependent values
-                    at runtime; parameters will be added as name/value pairs to the query string of the URL. the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
+                    similar goals, but work slightly different:
+                    <ul>
+                        <li>use substitutions to replace placeholders in the URL itself with taxon-dependent values at runtime;</li>
+                        <li>parameters will be added as name/value pairs to the query string of the URL.</li>
+                    </ul>
+                    the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
                     available). when 'no check' is selected, the tab is always displayed. the reference can be implemented as an actual link, navigating away from the site (or opening in a new window), or as embedded, in
-                    which case a template can be defined in which to display the retrieved data.
+                    which case a template should be defined in which to display the retrieved data.
                 </div>
             
             	<table>
-                	<tr class="tr-highlight">
+                	<tr>
                     	<td class="sublabel">link</td>
                         <td>
                         	<table class="subsublabel">
-                            	<tr>
+                            	<tr class="tr-highlight">
                                     <td>URL:</td>
                                     <td><textarea name="external_reference[url]">{$page.external_reference_decoded->url}</textarea></td>
                                 </tr>
 
-                                <tr>
+                                <tr class="tr-highlight">
                                     <td>
                                     	substitutions:<br />
 										<a href="#" onclick="add_subst();return false;">add</a>                                        
@@ -102,7 +112,7 @@ textarea {
                                     	{/foreach}
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr class="tr-highlight">
                                     <td>
                                     	parameters:<br />
 										<a href="#" onclick="add_param();return false;">add</a>
@@ -118,11 +128,11 @@ textarea {
                             </table>
 						</td>
 					</tr>
-                    <tr class="tr-highlight">
+                    <tr>
                     	<td class="sublabel">data check</td>
                     	<td>
                         	<table class="subsublabel">
-                                <tr>
+                                <tr class="tr-highlight">
                                     <td>check type:</td>
                                     <td>
                                     	<select name="external_reference[check_type]">
@@ -132,7 +142,7 @@ textarea {
                                         </select>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr class="tr-highlight">
                                     <td>
                                     	"check by" query:
                                     </td>
@@ -142,18 +152,18 @@ textarea {
                                         query can take two parameters, <code>%pid%</code> for project ID and <code>%tid%</code> for taxon ID.<br />
                                         query is expected to return one row with a column called <code>result</code> that has a value of either 1
                                         (data present) or 0 (no data present).<br />
-                                        and yes, queries are run "as is" and have the potential to destroy your entire databas, so don't mess around.
+										queries are run "as is" and have the potential to destroy your entire databas, so don't mess around.
                                         </div>
 									</td>
                                 </tr>
 							</table>
 						</td>
 					</tr>
-                    <tr class="tr-highlight">
+                    <tr>
                     	<td class="sublabel">presentation</td>
                     	<td>
                         	<table class="subsublabel">
-                                <tr>
+                                <tr class="tr-highlight">
                                     <td>link or embed:</td>
                                     <td>
                                     	<select name="external_reference[link_embed]">
@@ -163,7 +173,7 @@ textarea {
                                         </select>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr class="tr-highlight">
                                     <td>template:<br />(when embedding)</td>
                                     <td><input type="text" name="external_reference[template]" value="{$page.external_reference_decoded->template}" /></td>
                                 </tr>
@@ -174,24 +184,6 @@ textarea {
 			</td>
 		</tr>
 
-    	<tr><td>&nbsp;</td></tr>
-
-    	<tr><td>TWO BELOW NEED TO BE COLLAPSED INTO THE ONE ABOVE</td></tr>
-
-    	<tr>
-            <td>
-            	<u>{t}redirects to{/t}</u> {$page.redirect_to}
-			</td>
-		</tr>
-
-    	<tr><td>&nbsp;</td></tr>
-    	<tr>
-            <td>
-            	<u>{t}check query{/t}</u> {$page.check_query}
-			</td>
-		</tr>
-
-    	<tr><td>&nbsp;</td></tr>
 	</table>
     
     <input type="submit" value="save" />
@@ -231,7 +223,7 @@ function print_susbt()
 	for(var i=0;i<subst.length;i++)
 	{
 		var slct=$('#select_substitute').html().replace('%VALUE%',subst[i].value);
-		buffer.push('<input type="text" class="subst_name" name="external_reference[substitute][name][]" value="'+subst[i].name+'" /> &rarr; ' + slct + '<br />');
+		buffer.push('<input type="text" placeholder="placeholder" class="subst_name" name="external_reference[substitute][name][]" value="'+subst[i].name+'" /> &rarr; ' + slct + '<br />');
 	}
 	$('#substitutions').html( buffer.join("\n") );
 
@@ -263,7 +255,7 @@ function print_param()
 	for(var i=0;i<param.length;i++)
 	{
 		var slct=$('#select_parameter').html().replace('%VALUE%',param[i].value);
-		buffer.push('<input type="text" class="param_name" name="external_reference[parameters][name][]" value="'+param[i].name+'" /> &rarr; ' + slct + '<br />');
+		buffer.push('<input type="text" placeholder="parameter" class="param_name" name="external_reference[parameters][name][]" value="'+param[i].name+'" /> &rarr; ' + slct + '<br />');
 	}
 	$('#parameters').html( buffer.join("\n") );
 

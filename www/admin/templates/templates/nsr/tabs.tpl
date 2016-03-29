@@ -56,8 +56,8 @@
                 <td class="cell-page-delete" onclick="taxonPageDelete({$v.id},'{$v.page}');"></td>
                 <td>
                 	{if $v.always_hide==1}{t}always hidden{/t} (id={$v.id}){/if}
+                	{if $v.external_reference && $v.always_hide==1}; {/if}
                 	{if $v.external_reference}{t}external reference{/t}{/if}
-                	{if $v.redirect_to}{t}redirects{/t}{/if}
                 	<a class="edit" href="tab.php?id={$v.id}">{t}edit{/t}</a>
                 </td>
             </tr>
