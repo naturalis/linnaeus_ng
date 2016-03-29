@@ -1305,22 +1305,24 @@ parameters:
 			
 			$this->setMatchType('literal');
 
-			$t = $this->models->NsrIds->_get(array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'nsr_id' => 'tn.nlsr.concept/'.str_pad(mysql_real_escape_string($nsr),12,'0',STR_PAD_LEFT),
-					'item_type' => 'taxon'
-				)
+			$t = $this->models->WebservicesModel->getNsrId(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'nsr_id' => $nsr,
+				'item_type' => 'taxon'
 			));
 			
 		
-			if (!$t) {
+			if (!$t)
+			{
 				$this->addError('NSR-id "'.$this->requestData['nsr'].'" not found in this project.');
-			} else {
+			} 
+			else
+			{
 				$this->setTaxonId($t[0]['lng_id']);
 				return $t;
 			}
 		}
+
 		return false;
 	}
 
