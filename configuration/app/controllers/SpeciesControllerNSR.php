@@ -155,49 +155,7 @@ class SpeciesControllerNSR extends SpeciesController
 						'isLower' =>  $taxon['lower_taxon']
 					)
 				);
-									
-			}
-			else
-			if ( $reqCatId=='external' && $this->rHasVal('source'))
-			{
-				// REFAC2015  this needs to be replaced with the external_referece method
-				$source_url=
-					base64_decode($this->rGetVal('source'))
-					.'&project='.$this->getCurrentProjectId()
-					.'&language='.$this->getCurrentLanguageId();
-
-				foreach((array)$this->requestData as $key=>$val)
-				{
-					$source_url=str_replace('%'.$key.'%',$val,$source_url);
-				}
-
-				$content['url']=$source_url;
-				$content['raw']=file_get_contents($content['url']);
-				$content['content']=json_decode( $content['raw']);
-				$ext_tab=$this->rGetVal('ext_tab');
-				$additional_content=null;
-
-				if ( !empty($ext_tab) )
-				{
-					$passport_content=
-						$this->getTaxonContent(
-							array(
-								'taxon' => $taxon['id'],
-								'category' => $this->rGetVal('ext_tab'),
-								'allowUnpublished' => $this->isLoggedInAdmin(),
-								'isLower' =>  $taxon['lower_taxon']
-							)
-						);
-				}
-
-				$ext_name = $this->rHasVal('name') ? $this->rGetVal('name') : $this->translate("Kenmerken");
-				$ext_template = $this->rHasVal('name') ? '_tab_ext_' . $this->rGetVal('name') . '.tpl' : '_tab_ext_generic.tpl';
-
-				$this->smarty->assign( 'passport_content', $passport_content );
-				$this->smarty->assign( 'ext_template', $ext_template );
-				$this->smarty->assign( 'ext_tab', $ext_tab );
-				$this->smarty->assign( 'ext_name', ucfirst($ext_name) );
-
+		
 			}
 			else
 			{
@@ -413,10 +371,26 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			foreach((array)$reference->parameters as $key=>$val)
 			{
+
+				$sval=null;
+
+				if ( $val=='project_id' )
+				{
+					$sval=$this->getCurrentProjectId();
+				}
+				else
+				if ( $val=='language_id' )
+				{
+					$sval=$this->getCurrentLanguageId();
+				}
+				else
 				if ( isset($taxon[$val]) )
 				{
 					$sval=$taxon[$val];
-
+				}
+				
+				if ( !empty($sval) ) 
+				{
 					if ( isset($reference->parameter_encode) && $reference->parameter_encode!='none' && is_callable( $reference->parameter_encode ) )
 					{
 						$sval=call_user_func($reference->parameter_encode, $sval );
@@ -444,7 +418,8 @@ class SpeciesControllerNSR extends SpeciesController
 			else
 			if ( $reference->check_type=='query' && !empty($reference->query) )
 			{
-				$is_empty=$this->models->{$this->_model}->checkQueryResult( $reference->query );
+				$query = str_replace( array('%pid%','%tid%'), array($this->getCurrentProjectId(), $taxon['id']), $reference->query );
+				$is_empty=$this->models->{$this->_model}->checkQueryResult( $query );
 			}
 		}
 		
@@ -488,32 +463,13 @@ class SpeciesControllerNSR extends SpeciesController
 					$dummy=$key;
 				}
 
-				if (isset($val['check_query']))
-				{
-					$categories[$key]['is_empty']=
-						$this->models->{$this->_model}->checkQueryResult(
-						   str_replace(
-							   array('%pid%','%tid%'),
-							   array($this->getCurrentProjectId(),$taxon_id),
-							   $val['check_query']
-						));
-
-					unset($categories[$key]['check_query']);
-				}
-
-				if (isset($val['redirect_to']))
-				{
-					$categories[$key]['redirect_to']=str_replace('%tid%',$taxon_id,$val['redirect_to']);
-				}
-				
-				if (isset($val['external_reference']))
+				if ( isset($val['external_reference']) )
 				{
 					$ref=json_decode( $val['external_reference'] );
 					$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref) );
 					$ref->full_url=$d['full_url'];
 					$categories[$key]['external_reference']=$ref;
 					$categories[$key]['is_empty']=$d['is_empty'];
-					
 				}
 			
 			}

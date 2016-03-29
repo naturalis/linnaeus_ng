@@ -125,6 +125,8 @@ class NsrTaxonManagement extends NsrController
 	
     public function tabAction()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Category'));
@@ -144,7 +146,13 @@ class NsrTaxonManagement extends NsrController
         }
 
         $this->smarty->assign( 'page', $this->getPage( $this->rGetId() ) );
-        $this->smarty->assign( 'dynamic_fields', [['field'=>'taxon','label'=>'scientific name']] );
+        $this->smarty->assign( 'dynamic_fields',
+			[
+				['field'=>'taxon','label'=>'scientific name'],
+				['field'=>'id','label'=>'taxon ID'],
+				['field'=>'project_id','label'=>'project ID'],
+				['field'=>'language_id','label'=>'language ID']
+			] );
         $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
         $this->smarty->assign( 'link_embed', [['field'=>'embed','label'=>'embed'],['field'=>'link','label'=>'link'],['field'=>'link_new','label'=>'link (new window)']] );
         $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
@@ -446,7 +454,7 @@ class NsrTaxonManagement extends NsrController
 				$d[$val]=$data['parameters']['value'][$key];
 			}
 			$data['parameters']=$d;
-	
+
 			$d=$this->models->PagesTaxa->update(
 				array(
 					'external_reference'=> json_encode($data)
@@ -457,6 +465,7 @@ class NsrTaxonManagement extends NsrController
 				)
 			);
 		}
+
 		$this->logChange($this->models->PagesTaxa->getDataDelta());
 		
 	}
