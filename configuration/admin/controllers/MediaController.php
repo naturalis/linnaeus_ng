@@ -27,6 +27,8 @@ class MediaController extends Controller
     private $_rsSearchUrl;
     private $_rsUploadUrl;
     private $_rsNewUserUrl;
+    private $_rsUserName;
+    private $_rsPassword;
 
     private $_result;
     private $_files;
@@ -36,6 +38,42 @@ class MediaController extends Controller
     private $itemId;
     private $languageId;
     private $mediaId;
+
+    // Used to setup RS
+    public static $rsSetupParameters = array(
+        'rs_base_url' => array(
+            'default' => 'https://rs.naturalis.nl/plugins/',
+            'info' => 'Base url to ResourceSpace server'
+        ),
+        'rs_new_user_api' => array(
+            'default' => 'api_new_user_lng',
+            'info' => 'Name of RS API to create new RS user'
+        ),
+        'rs_upload_api' => array(
+            'default' => 'rs_upload_api',
+            'info' => 'Name of RS API to upload to RS'
+        ),
+        'rs_search_api' => array(
+            'default' => 'rs_search_api',
+            'info' => 'Name of RS API to search RS'
+        ),
+        'rs_user_key' => array(
+            'default' => '',
+            'info' => 'RS API user key for current project (set dynamically when user is created)'
+        ),
+        'rs_collection_id' => array(
+            'default' => '',
+            'info' => 'RS collection ID for current project (set dynamically when user is created)'
+        ),
+        'rs_password' => array(
+            'default' => '',
+            'info' => 'RS password (set dynamically when user is created)'
+        ),
+        'rs_user_name' => array(
+            'default' => '',
+            'info' => 'RS user name (project name @ server name)'
+        ),
+    );
 
     public static $singleMediaFileControllers = array(
         'introduction',
@@ -83,7 +121,9 @@ class MediaController extends Controller
         'media_metadata',
         'media_modules',
         'media_captions',
-        'media_tags'
+        'media_tags',
+        'module_settings',
+        'module_settings_values'
     );
 
     public $usedHelpers = array('hr_filesize_helper');
@@ -165,15 +205,15 @@ class MediaController extends Controller
         $this->_rsUploadApi = $msr->getModuleSetting('rs_upload_api');
         $this->_rsNewUserApi = $msr->getModuleSetting('rs_new_user_api');
         $this->_rsSearchApi = $msr->getModuleSetting('rs_search_api');
+        $this->_rsUserName = $msr->getModuleSetting('rs_user_name');
+        $this->_rsPassword = $msr->getModuleSetting('rs_password');
 
-        if (empty($this->_rsBaseUrl) || empty($this->_rsUploadApi) || empty($this->_rsNewUserApi) ||
-            empty($this->_rsSearchApi)) {
-            $this->addError(_('ResourceSpace settings for Media module are missing.'));
-        }
-
-        if (empty($this->_rsCollectionId) || empty($this->_rsUserKey)) {
-            $this->addError(_('ResourceSpace collection ID and/or user key are not set.
-                You may still need to <a href="create_user.php">create a user</a> for this project.'));
+        foreach ($this::$rsSetupParameters as $p => $v) {
+            $s = $this->{'_' . lcfirst(implode('', array_map('ucfirst', explode('_', $p))))};
+            if (empty($s) && strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
+                die('FATAL: no connection to ResourceSpace server.
+                <a href="setup_rs.php">Setup ResourceSpace</a> to continue.');
+            }
         }
 
         // Search url: &search=[term]* to be appended
@@ -186,6 +226,53 @@ class MediaController extends Controller
         // New user url; newuser appended in createUser()
         $this->_rsNewUserUrl = $this->_rsBaseUrl . $this->_rsNewUserApi . '/?' .
             'key=' . $this->rGetVal('rs_master_key');
+    }
+
+    private function saveRsSetting ($setting, array $values)
+    {
+        $d = $this->models->ModuleSettings->getSingleColumn(array(
+            'columns' => 'id',
+			'id' => array(
+                'module_id' => $this->getCurrentModuleId(),
+                'setting' => $setting
+             )
+		));
+
+        if (!empty($d)) {
+
+            $id = $d[0];
+
+        } else {
+
+            $this->models->ModuleSettings->insert(array(
+                'id' => !empty($d) ? $d[0] : null,
+                'module_id' => $this->getCurrentModuleId(),
+                'setting' => $setting,
+                'info' => $values['info'],
+                'default_value' => !empty($values['default']) ? $values['default'] : null
+            ));
+
+            $id = $this->models->ModuleSettings->getNewId();
+
+        }
+
+        if (!empty($values['default'])){
+
+            $d = $this->models->ModuleSettingsValues->getSingleColumn(array(
+                'columns' => 'id',
+    			'id' => array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'setting_id' => $id
+                 )
+    		));
+
+            $this->models->ModuleSettingsValues->save(array(
+                'id' => !empty($d) ? $d[0] : null,
+                'project_id' => $this->getCurrentProjectId(),
+                'setting_id' => $id,
+                'value' => $values['default']
+            ));
+        }
     }
 
     public function ajaxInterfaceAction ()
@@ -202,6 +289,15 @@ class MediaController extends Controller
     public function indexAction ()
     {
         $this->checkAuthorisation();
+
+        // Only send data when user is sysadmin!!
+        $p  = explode('/', $this->_rsBaseUrl);
+
+        $this->smarty->assign('action', implode('/', array_slice($p, 0, 3)) . '/login.php');
+        $this->smarty->assign('username', $this->_rsUserName);
+        $this->smarty->assign('password', $this->_rsPassword);
+
+
         $this->printPage();
     }
 
@@ -633,12 +729,17 @@ class MediaController extends Controller
     }
 
 
-    public function createUserAction ()
+    public function setupRsAction ()
     {
         $this->checkAuthorisation();
 
-        // Reset errors to avoid message set during initialisation
-        $this->errors = array();
+        foreach ($this::$rsSetupParameters as $p => $v) {
+            $this->saveRsSetting($p, $v);
+        }
+
+        // Basic RS settings have been saved at this point;
+        // next step is to set dynamic settings
+        $this->setRsSettings();
 
         if ($this->rHasVal('action', 'create') && $this->rHasVal('rs_master_key')) {
 
@@ -650,17 +751,30 @@ class MediaController extends Controller
 
             if (!empty($error)) {
 
-                $this->addError($error);
+                 $this->addError($error);
 
             } else {
-                // Save $this->_result data to Linnaeus!
-                // For now printing on screen should suffice(?)
+
+                $this->saveRsSetting('rs_collection_id', array(
+                    'default' => $this->_result->collection_id
+                ));
+                $this->saveRsSetting('rs_user_key', array(
+                    'default' => $this->_result->authentification_key
+                ));
+                $this->saveRsSetting('rs_user_name', array(
+                    'default' => $this->_result->username
+                ));
+                $this->saveRsSetting('rs_password', array(
+                    'default' => $this->_result->password
+                ));
+
                 $d = array(
                     'rs_collection_id' => $this->_result->collection_id,
                     'rs_user_key' => $this->_result->authentification_key,
                     'rs_user_name' => $this->_result->username,
                     'rs_password' => $this->_result->password
                 );
+
                 $this->smarty->assign('result', $d);
             }
         }
@@ -1224,5 +1338,6 @@ class MediaController extends Controller
         }
         return 99;
     }
+
 
 }

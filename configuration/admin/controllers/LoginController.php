@@ -8,7 +8,7 @@ class LoginController extends Controller
     public $usedHelpers = array(
         'password_encoder',
     );
-	
+
 	private $_user;
 
     public function __construct ()
@@ -21,7 +21,7 @@ class LoginController extends Controller
     {
         parent::__destruct();
     }
-	
+
 	private function initialize()
 	{
 	}
@@ -173,9 +173,9 @@ class LoginController extends Controller
 	{
 		$username=isset($p['username']) ? $p['username'] : null;
 		$password=isset($p['password']) ? $p['password'] : null;
-		
+
 		if ( is_null($username) || is_null($password) ) return false;
-		
+
 		$user = $this->getUserByUsername( $username );
 
 		// unknown user or user without password
@@ -217,7 +217,7 @@ class LoginController extends Controller
 	private function getUserByUsername( $username )
 	{
 		if ( empty($username) ) return;
-		
+
 		$d=$this->models->Users->_get( array( 'id' => array('username' => $username ) ) );
 
 		return isset($d[0]) ? $d[0] : null;
@@ -226,9 +226,9 @@ class LoginController extends Controller
     private function doLogin()
     {
 		$user=$this->getUser();
-		
+
 		if ( !isset($user) ) return;
-		
+
         // update last and number of logins
         $this->models->Users->save(
             array(
@@ -246,9 +246,9 @@ class LoginController extends Controller
 		/*
         // save all relevant data to the session
         $this->initUserSession(array(
-			'user'=>$user, 
-			'roles'=>$cur['roles'], 
-			'rights'=>$cur['rights'], 
+			'user'=>$user,
+			'roles'=>$cur['roles'],
+			'rights'=>$cur['rights'],
 			'number_of_projects'=>$cur['number_of_projects']
 		));
 		*/
@@ -256,7 +256,7 @@ class LoginController extends Controller
         // determine and set the default active project
         //$this->setDefaultProject();
 		//$this->setCurrentUserRoleId();
-		
+
 		 return isset($_SESSION['admin']['user']['id']) ? $_SESSION['admin']['user']['id'] : null;
 	}
 
@@ -280,7 +280,7 @@ class LoginController extends Controller
 //		$roles=isset($p['roles']) ? $p['roles'] : null;
 //		$rights=isset($p['rights']) ? $p['rights'] : null;
 //		$number_of_projects=isset($p['number_of_projects']) ? $p['number_of_projects'] : null;
-		
+
         if (!$user) return;
 
         $_SESSION['admin']['user'] = $user;
