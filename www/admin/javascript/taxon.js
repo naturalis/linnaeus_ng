@@ -1037,33 +1037,31 @@ function taxonMoveBorder(id) {
 
 }
 
-function taxonShowSelectedRanks() {
-
+function taxonShowSelectedRanks()
+{
 	var first = true;
 	var b= '';
 
-	if (taxonRankBorder==false && taxonAddedRanks.length>1) {
-
+	if (taxonRankBorder==false && taxonAddedRanks.length>1)
+	{
 		taxonRankBorder = taxonAddedRanks[(taxonAddedRanks.length)-1][0];
-
 	}
 
-	for (var i=0;i<taxonAddedRanks.length;i++) {
-
+	for (var i=0;i<taxonAddedRanks.length;i++)
+	{
 //		if (taxonAddedRanks[i][2]==true && first==true) {
 //			b = b + '<tr><td>------------------------------------</td</tr>'+"\n";
 //			first = false;
 //		}
 
-		if (taxonAddedRanks[i][0]==taxonRankBorder) {
-
+		if (taxonAddedRanks[i][0]==taxonRankBorder)
+		{
 			b = b +
 					'<tr>'+
 						'<td id="sub1" colspan="2" class="rankRedLine"></td>'+
 						'<td class="rankRedLineEnd"></td>'+
 					'</tr>'+
 					"\n";
-
 		}
 
 		b = b +
@@ -1080,40 +1078,32 @@ function taxonShowSelectedRanks() {
 				'</td>'+
 			'</tr>'+
 			"\n";
-
-
 	}
 
 	$('#selected-ranks').html('<table id="selectedRanksTable">'+b+'</table>');
-
 }
 
-function taxonSaveRanks() {
-
-	for (var i=0;i<taxonAddedRanks.length;i++) {
-
+function taxonSaveRanks()
+{
+	for (var i=0;i<taxonAddedRanks.length;i++)
+	{
 		$('<input type="hidden" name="ranks[]" value="'+taxonAddedRanks[i][0]+'">').appendTo('#theForm');
-
 	}
-
 	$('<input type=hidden name="higherTaxaBorder" value="'+taxonRankBorder+'">').appendTo('#theForm');
-
-
-
 	$('#theForm').submit();
-
 }
 
-function taxonAddRankId(rank) {
-
+function taxonAddRankId(rank)
+{
 	taxonRanks[taxonRanks.length] = rank;
-
 }
 
-function taxonGeneralSave(id,label,type,action) {
+function taxonGeneralSave(id,label,type,action,alturl)
+{
+	url=alturl ? alturl : "ajax_interface.php";
 
 	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
+		url : url,
 		type: "POST",
 		data : ({
 			'action' : action ,
@@ -1123,62 +1113,68 @@ function taxonGeneralSave(id,label,type,action) {
 			'time' : allGetTimestamp()
 		}),
 		async: allAjaxAsynchMode,
-		success : function (data) {
+		success : function (data)
+		{
 			allSetMessage(data);
 		}
 	});
 
 }
 
-function taxonGeneralSetLabels(obj,language,idField,labelField) {
-
-	for(var i=0;i<taxonRanks.length;i++) {
-		if (language==allDefaultLanguage) {
+function taxonGeneralSetLabels(obj,language,idField,labelField)
+{
+	for(var i=0;i<taxonRanks.length;i++)
+	{
+		if (language==allDefaultLanguage)
+		{
 			$('#default-'+taxonRanks[i]).val('');
-		} else {
+		} 
+		else 
+		{
 			$('#other-'+taxonRanks[i]).val('');
 		}
 	}
 
-	if (obj) {
-
-		for(var i=0;i<obj.length;i++) {
+	if (obj)
+	{
+		for(var i=0;i<obj.length;i++)
+		{
 			var id = eval('obj[i].'+idField);
 			var val = eval('obj[i].'+labelField);
 
-			if (language==allDefaultLanguage) {
+			if (language==allDefaultLanguage)
+			{
 				$('#default-'+id).val(val);
 				if (obj[i].direction) $('#default-'+id).attr('dir',obj[i].direction);
-			} else {
+			} 
+			else 
+			{
 				$('#other-'+id).val(val);
 				if (obj[i].direction) $('#other-'+id).attr('dir',obj[i].direction);
 			}
 		}
-
 	}
-
 }
 
-function taxonSaveRankLabel(id,label,type) {
+var ajaxAltUrl;
 
-	taxonGeneralSave(id,label,type,'save_rank_label');
-
+function taxonSaveRankLabel(id,label,type)
+{
+	taxonGeneralSave(id,label,type,'save_rank_label','ajax_interface_mgmt.php');
 }
 
-function taxonSetRankLabels(obj,language) {
-
+function taxonSetRankLabels(obj,language)
+{
 	taxonGeneralSetLabels(obj,language,'project_rank_id','label');
-
 }
 
-function taxonGetRankLabels(language) {
-
-	allGeneralGetLabels(language,'get_rank_labels','taxonSetRankLabels');
-
+function taxonGetRankLabels(language)
+{
+	allGeneralGetLabels(language,'get_rank_labels','taxonSetRankLabels',null,'ajax_interface_mgmt.php');
 }
 
-function taxonGetRankByParent(nomessage) {
-
+function taxonGetRankByParent(nomessage)
+{
 	var id = $('#parent-id option:selected').val();
 
 	if (id==-1 || id==undefined) return;

@@ -9,6 +9,7 @@
 {t}On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />
 {t}Text you enter is automatically saved when you leave the input field.{/t}
 <br /><br />
+<span id="message-container" style="float:right"></span>
 <table>
 <tr>
 	<th style="width:150px">{t}Rank{/t}</th>
@@ -49,23 +50,22 @@
 
 
 <script type="text/javascript">
-{literal}
-$(document).ready(function(){
-{/literal}
+
+$(document).ready(function()
+{
 	allActiveView = 'ranklabels';
-{section name=i loop=$projectRanks}
-	taxonAddRankId({$projectRanks[i].id});
-{/section}
-{section name=i loop=$languages}
-	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
+{foreach $projectRanks v}
+	taxonAddRankId({$v.id});
+{/foreach}
+{foreach $languages v}
+	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
+{/foreach}
 	allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 	taxonGetRankLabels(allDefaultLanguage);
 	taxonGetRankLabels(allActiveLanguage);
-{literal}
 });
-{/literal}
+
 </script>
 
 {include file="../shared/admin-messages.tpl"}

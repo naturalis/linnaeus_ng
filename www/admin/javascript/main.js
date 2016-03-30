@@ -183,11 +183,10 @@ function allDoubleDeleteConfirm(element,name) {
 
 }
 
-function allSetMessage(msg,delay) {
-
+function allSetMessage(msg,delay)
+{
 	$('#message-container').show();
 	$('#message-container').html(msg).delay(delay==undefined?1000:delay).fadeOut(500);
-
 }
 
 function allAjaxAbort(handle) {
@@ -372,7 +371,8 @@ function allSwitchLanguage(language) {
 
 }
 
-function allGeneralGetLabels(language,action,postFunction,id) {
+function allGeneralGetLabels(language,action,postFunction,id,alturl)
+{
 
 	/*
 		please take note that it depends on the url of the file
@@ -389,9 +389,11 @@ function allGeneralGetLabels(language,action,postFunction,id) {
 	*/
 
 	allShowLoadingDiv();
+	
+	url=alturl ? alturl : "ajax_interface.php";
 
 	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
+		url : url,
 		type: "POST",
 		data : ({
 			'action' : action ,
@@ -401,7 +403,6 @@ function allGeneralGetLabels(language,action,postFunction,id) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
-			//alert(data);
 			obj = $.parseJSON(data);
 			eval(postFunction+'(obj,language)');
 			allHideLoadingDiv();
