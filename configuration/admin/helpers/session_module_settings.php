@@ -176,13 +176,13 @@ class SessionModuleSettings
 
     private function initialize()
     {
-		if ( empty($this->getEnvironment()) )
+		if ( !$this->getEnvironment() )
 			die( 'no environment' );
 
-		if ( empty($this->getController()) )
+		if ( !$this->getController() )
 			die( 'no controller' );
 
-		if (empty($this->getSetting()) )
+		if (!$this->getSetting() )
 			die( 'no setting' );
     }
 
