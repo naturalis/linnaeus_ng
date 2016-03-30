@@ -51,6 +51,12 @@ class NsrTaxonManagement extends NsrController
         'pages_taxa_titles',
         'sections',
     );
+
+    public $jsToLoad = array(
+        'all' => array(
+            'taxon.js'
+        )
+    );
 	
     public $controllerPublicName = 'Soortenregister beheer';
 
@@ -163,15 +169,13 @@ class NsrTaxonManagement extends NsrController
 
     public function ranksAction()
     {
-		
-		die('to be done');
-		
+	
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Taxonomic ranks'));
 
-        if ($this->rHasVal('ranks') && !$this->isFormResubmit()) {
-
+        if ($this->rHasVal('ranks') && !$this->isFormResubmit())
+		{
 			$pr = $this->newGetProjectRanks();
 
             $parent = 'null';
@@ -285,12 +289,9 @@ class NsrTaxonManagement extends NsrController
             'fieldAsIndex' => 'id'
         )));
 
-        $pr = $this->newGetProjectRanks(array(
-            'forceLookup' => true
-        ));
+        $pr = $this->newGetProjectRanks();
 
         $this->smarty->assign('ranks', $r);
-
         $this->smarty->assign('projectRanks', $pr);
 
         $this->printPage();
@@ -386,7 +387,24 @@ class NsrTaxonManagement extends NsrController
         $this->printPage();
     }
 
+    public function ajaxInterfaceAction()
+    {
+        if (!$this->rHasVal('action')) return;
 
+		if ($this->rGetVal('action')=='get_rank_labels')
+		{
+			$d=$this->getRankLabels( array('language_id'=>$this->rGetVal('language') ) );
+			$this->smarty->assign('returnText', json_encode($d));
+        }
+        else 
+		if ($this->rGetVal('action') == 'save_rank_label')
+		{
+			$d=$this->saveRankLabel( array('id'=>$this->rGetId(),'language_id'=>$this->rGetVal('language'),'label'=>$this->rGetVal('label') ) );
+			$this->smarty->assign('returnText', $d ? 'saved' : 'failed');
+        }
+
+        $this->printPage('ajax_interface');
+    }
 
     private function createTaxonCategory($name, $show_order = false, $isDefault = false)
     {
@@ -470,6 +488,72 @@ class NsrTaxonManagement extends NsrController
 		$this->logChange($this->models->PagesTaxa->getDataDelta());
 		
 	}
+
+    private function saveRankLabel( $p )
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
+		$label=isset($p['label']) ? trim($p['label']) : null;
+		
+		if ( !isset($id) || !isset($language_id) ) return;
+
+		if ( empty($label) )
+		{
+			$this->models->LabelsProjectsRanks->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $language_id,
+				'project_rank_id' => $id
+			));
+		}
+		else
+		{
+			$lpr = $this->models->LabelsProjectsRanks->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $language_id,
+					'project_rank_id' => $id
+				)
+			));
+
+			$this->models->LabelsProjectsRanks->save(
+			array(
+				'id' => isset($lpr[0]['id']) ? $lpr[0]['id'] : null,
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $language_id,
+				'project_rank_id' => $id,
+				'label' => $label
+			));
+
+			$this->logChange($this->models->LabelsProjectsRanks->getDataDelta());
+        }
+		
+		return true;
+		
+    }
+
+    private function getRankLabels( $p )
+    {
+		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
+		
+		if ( !isset($language_id) ) return;
+
+		$l = $this->models->Languages->_get(array(
+			'id' =>$language_id,
+			'columns' => 'direction'
+		));
+
+		return $this->models->LabelsProjectsRanks->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $language_id
+				),
+				'columns' => '*, \'' . $l['direction'] . '\' as direction'
+			));
+
+    }
 
 }
 
