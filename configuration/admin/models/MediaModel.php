@@ -96,9 +96,9 @@ final class MediaModel extends AbstractModel
                 t1.id,
                 t2.sort_order,
                 t2.overview_image
-            from media as t1
+            from %PRE%media as t1
             left join
-                media_modules as t2 on t1.id = t2.media_id
+                %PRE%media_modules as t2 on t1.id = t2.media_id
             where
                 t2.module_id = " . $this->escapeString($moduleId) . " and
                 t2.item_id = " . $this->escapeString($itemId) . " and
@@ -113,6 +113,168 @@ final class MediaModel extends AbstractModel
         return isset($d) ? $d : array();
 
     }
+
+    public function getConverterMatrixMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                id,
+                file_name
+            from
+                %PRE%characterictics_states
+            where
+                file_name != '' and file_name is not null and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+    public function getConverterKeystepsMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                id as item_id,
+                image as file_name
+            from
+                %PRE%keysteps
+            where
+                image != '' and image is not null and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+    public function getConverterKeychoicesMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                id as item_id,
+                file_name
+            from
+                %PRE%characteristics_states
+            where
+                file_name != '' and file_name is not null and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+    public function getConverterFreeModuleMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                id as item_id,
+                module_id,
+                image as file_name
+            from
+                %PRE%free_module_pages
+            where
+                image != '' and image is not null and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+    public function getConverterGlossaryMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                glossary_id as item_id,
+                original_name as file_name,
+                file_name as backup_name
+            from
+                %PRE%glossary_media
+            where
+                ((file_name != '' and file_name is not null) or
+                (original_name != '' and original_name is not null)) and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+    public function getConverterIntroductionMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                page_id as item_id,
+                original_name as file_name
+            from
+                %PRE%introduction_media
+            where
+                file_name != '' and file_name is not null and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+    public function getConverterTaxonMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                taxon_id as item_id,
+                original_name as file_name,
+                file_name as backup_name
+        from
+                %PRE%media_taxon
+            where
+                ((file_name != '' and file_name is not null) or
+                (original_name != '' and original_name is not null)) and
+                project_id = " . $projectId;
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : array();
+    }
+
+
+
 }
 
 ?>

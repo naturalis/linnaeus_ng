@@ -199,20 +199,44 @@ class MediaController extends Controller
     {
         $msr = new ModuleSettingsReaderController();
 
-        $this->_rsBaseUrl = $msr->getModuleSetting('rs_base_url');
-        $this->_rsUserKey = $msr->getModuleSetting('rs_user_key');
-        $this->_rsCollectionId = $msr->getModuleSetting('rs_collection_id');
-        $this->_rsUploadApi = $msr->getModuleSetting('rs_upload_api');
-        $this->_rsNewUserApi = $msr->getModuleSetting('rs_new_user_api');
-        $this->_rsSearchApi = $msr->getModuleSetting('rs_search_api');
-        $this->_rsUserName = $msr->getModuleSetting('rs_user_name');
-        $this->_rsPassword = $msr->getModuleSetting('rs_password');
+        $this->_rsBaseUrl = $msr->getModuleSetting(array(
+            'setting' =>'rs_base_url',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsUserKey = $msr->getModuleSetting(array(
+            'setting' =>'rs_user_key',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsCollectionId = $msr->getModuleSetting(array(
+            'setting' =>'rs_collection_id',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsUploadApi = $msr->getModuleSetting(array(
+            'setting' =>'rs_upload_api',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsNewUserApi = $msr->getModuleSetting(array(
+            'setting' =>'rs_new_user_api',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsSearchApi = $msr->getModuleSetting(array(
+            'setting' =>'rs_search_api',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsUserName = $msr->getModuleSetting(array(
+            'setting' =>'rs_user_name',
+            'module' => $this->controllerPublicName
+        ));
+        $this->_rsPassword = $msr->getModuleSetting(array(
+            'setting' =>'rs_password',
+            'module' => $this->controllerPublicName
+        ));
 
         foreach ($this::$rsSetupParameters as $p => $v) {
             $s = $this->{'_' . lcfirst(implode('', array_map('ucfirst', explode('_', $p))))};
             if (empty($s) && strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
-                die('FATAL: no connection to ResourceSpace server.
-                <a href="setup_rs.php">Setup ResourceSpace</a> to continue.');
+                die('FATAL: ' . $p . ' not set.
+                <a href="../media/setup_rs.php">Setup ResourceSpace</a> to continue.');
             }
         }
 
@@ -659,7 +683,7 @@ class MediaController extends Controller
 
     private function deleteMedia ()
     {
-        if (empty($this->rGetVal('media_ids'))) {
+        if (!$this->rHasVal('media_ids')) {
             return false;
         }
 
@@ -677,7 +701,7 @@ class MediaController extends Controller
 
     private function attachMedia ()
     {
-        if (empty($this->rGetVal('media_ids'))) {
+        if (!$this->rHasVal('media_ids')) {
             return false;
         }
 
