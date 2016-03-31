@@ -226,6 +226,8 @@ class Controller extends BaseClass
 
         $this->checkWriteableDirectories();
 
+		$this->setRankIdConstants();
+
         $this->setRequestData();
 
         if ($this->getCheckForProjectId())
@@ -1394,7 +1396,7 @@ class Controller extends BaseClass
             return $name;
         }
 
-        $marker = ($rankId == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
+        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? '+' : '&#215;');
 
         // intergeneric hybrid
         if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID) {
@@ -2881,27 +2883,30 @@ class Controller extends BaseClass
     }
 
 
-	public function addHybridMarker( $taxon )
+	public function addHybridMarker( $p )
 	{
-		if ( $taxon['base_rank_id']==NOTHOGENUS_RANK_ID )
+		$name=isset($p['name']) ? $p['name'] : null;
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
+		
+		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{
-			return $this->_hybridMarker . ' ' . $taxon['taxon'];
+			return $this->_hybridMarker . $name;
 		}
 		else
-		if ( $taxon['base_rank_id']==NOTHOSPECIES_RANK_ID ||
-			 $taxon['base_rank_id']==NOTHOSUBSPECIES_RANK_ID ||
-			 $taxon['base_rank_id']==NOTHOVARIETAS_RANK_ID )
+		if ( $base_rank_id==NOTHOSPECIES_RANK_ID ||
+			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
+			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-			$ied=explode(' ', $taxon['taxon'], 2);
+			$ied=explode(' ', $name, 2);
 			return $ied[0]. '  ' .$this->_hybridMarker . $ied[1];
 		}
 		else
 		{
-			return $taxon['taxon'];
+			return $name;
 		}
 	}
 		
-	private function setRankIdConstants()
+	protected function setRankIdConstants()
 	{
 		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
 		{

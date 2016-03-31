@@ -165,7 +165,7 @@ function checkNameAgainstRank()
 		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
 	}
 	else
-	if ( ( rank>=getRankId( 'genus' ) && rank<getRankId( 'species' ) ) || rank==getRankId( 'nothogenus' ) )
+	if ( ( rank>=getRankId( 'genus' ) && rank<getRankId( 'species' ) ) )
 	{
 		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
 		if (p2!=0) buffer.push( sprintf(_("Een %s kan geen soortsnaam bevatten."), ranklabel ) );

@@ -346,7 +346,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( $val );
+			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -436,7 +436,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( $val );
+			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -538,7 +538,8 @@ class SearchControllerNSR extends SearchController
 		{
 			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
 			if ($d) $group_id=$d[0];
-		} else
+		} 
+		else
 		if (!empty($p['group_id']))
 		{
 			$group_id=intval($p['group_id']);
@@ -585,6 +586,9 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
+			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['validName']=$this->addHybridMarker( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
+
 			$meta=$this->models->MediaMeta->_get(array("id"=>
 				array(
 					"project_id" => $this->getCurrentProjectId(),
@@ -667,18 +671,26 @@ class SearchControllerNSR extends SearchController
 				if ( $n['type_id']==$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] && $n['language_id']==$this->getCurrentLanguageId() )
 				{
 					$data[$key]['common_name']=$n['name'];
-				} else
+				}
+				else
 				if ( $n['type_id']==$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] && $n['language_id']==LANGUAGE_ID_SCIENTIFIC )
 				{
 					$data[$key]['uninomial']=$n['uninomial'];
 					$data[$key]['specific_epithet']=$n['specific_epithet'];
 					$data[$key]['infra_specific_epithet']=$n['infra_specific_epithet'];
 					$data[$key]['authorship']=$n['authorship'];
-					$data[$key]['nomen']=trim(str_replace($n['authorship'],'',$n['name']));
+					$data[$key]['nomen']=
+						$this->addHybridMarker(array('name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id']));
 					$data[$key]['name']=
-						(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
-						(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .
-						(empty($n['infra_specific_epithet']) ? '' : $n['infra_specific_epithet']);
+						$this->addHybridMarker(
+							array( 'name'=>
+										(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
+										(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .
+										(empty($n['infra_specific_epithet']) ? '' : $n['infra_specific_epithet']),
+									'base_rank_id'=>
+										$val['base_rank_id']
+									)
+							);
 				}
 			}
 		}

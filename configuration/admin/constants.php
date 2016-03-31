@@ -24,6 +24,7 @@
 	if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
 	if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
 	
+	/*
 	if (!defined('EMPIRE_RANK_ID')) define('EMPIRE_RANK_ID',1);
 	if (!defined('KINGDOM_RANK_ID')) define('KINGDOM_RANK_ID',2);
 	if (!defined('PHYLUM_RANK_ID')) define('PHYLUM_RANK_ID',7);
@@ -35,6 +36,7 @@
 	if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
 	if (!defined('SUBSPECIES_RANK_ID')) define('SUBSPECIES_RANK_ID',77);
 	if (!defined('GRAFT_CHIMERA_RANK_ID')) define('GRAFT_CHIMERA_RANK_ID',88);
+	*/
 
 	if (!defined('PREDICATE_VALID_NAME')) define('PREDICATE_VALID_NAME','isValidNameOf');
 	if (!defined('PREDICATE_PREFERRED_NAME')) define('PREDICATE_PREFERRED_NAME','isPreferredNameOf');

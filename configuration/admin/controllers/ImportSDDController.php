@@ -556,7 +556,7 @@ class ImportSDDController extends ImportController
 					$pr = $this->models->ProjectsRanks->_get(array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							'rank_id' => KINGDOM_RANK_ID
+							'rank_id' => REGNUM_RANK_ID
 						)
 					));
 

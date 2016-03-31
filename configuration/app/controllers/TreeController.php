@@ -180,7 +180,7 @@ class TreeController extends Controller
 	
 				$d=$this->models->TreeModel->getBranchSpeciesCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
-					"base_rank_id"=>$val['base_rank'],
+					"base_rank_id"=>$val['base_rank_id'],
 					"node"=>$val['id']
 				));
 	
@@ -200,14 +200,14 @@ class TreeController extends Controller
 			{
 				$val['child_count']=null;
 			}
-			
-			if ($val['base_rank']>=SPECIES_RANK_ID)
+
+			if ($val['base_rank_id']>=SPECIES_RANK_ID && $val['base_rank_id']!=NOTHOGENUS_RANK_ID )
 			{
 				if ($val['authorship']!='')
 				{
 					$val['taxon']=
 						'<i>'.
-						str_replace($val['authorship'],'',$val['taxon']).
+						$this->addHybridMarker(array('name'=>str_replace($val['authorship'],'',$val['taxon']),'base_rank_id'=>$val['base_rank_id'])).
 						'</i>'.' '.$val['authorship'];
 				}
 				else
@@ -215,13 +215,17 @@ class TreeController extends Controller
 					$val['taxon']=$this->formatTaxon($val);
 				}
 			}
+			else
+			{
+				$val['taxon']=$this->addHybridMarker(array('name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id']));
+			}
 
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 
 			unset($val['parent_id']);
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
-			unset($val['base_rank']);
+			unset($val['base_rank_id']);
 
 			if ($val['id']==$node)
 			{

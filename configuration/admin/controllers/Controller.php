@@ -121,6 +121,8 @@ class Controller extends BaseClass
 
         $this->initUserRights();
 
+		$this->setRankIdConstants();
+
         $this->setRandomValue();
 
         $this->setLanguages();
@@ -1240,7 +1242,7 @@ class Controller extends BaseClass
             return $name;
         }
 
-        $marker = ($rankId == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
+        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? '+' : '&#215;');
 
         // intergeneric hybrid
         if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID) {
@@ -2560,6 +2562,15 @@ class Controller extends BaseClass
 		return $d ? $d[0]['id'] : false;
     }
 
+
+	protected function setRankIdConstants()
+	{
+		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
+		{
+			$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'])).'_RANK_ID';
+			if (!defined($const)) define($const,$val['id']);
+		}
+	}
 
 
 

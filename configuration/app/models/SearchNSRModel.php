@@ -627,7 +627,7 @@ final class SearchNSRModel extends AbstractModel
 				_m.taxon_id,
 				_m.file_name as image,
 				_m.file_name as thumb,
-
+				_f.rank_id as base_rank_id,
 				_k.taxon,
 				_k.taxon as validName,
 
@@ -638,6 +638,10 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%taxa _k
 				on _m.taxon_id=_k.id
 				and _m.project_id=_k.project_id
+
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
 
 			left join %PRE%trash_can _trash
 				on _k.project_id = _trash.project_id

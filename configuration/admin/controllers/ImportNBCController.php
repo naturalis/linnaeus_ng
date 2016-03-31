@@ -1391,9 +1391,9 @@ class ImportNBCController extends ImportController
             $id = $this->addProjectRank($val['default_label'], $val['id'], ($val['id'] == SPECIES_RANK_ID), $id);
             if ($val['id'] == SPECIES_RANK_ID)
                 $projectSpeciesId = $id;
-            if ($val['id'] == KINGDOM_RANK_ID)
+            if ($val['id'] == REGNUM_RANK_ID)
                 $projectKingdomId = $id;
-            if ($val['id'] == FAMILY_RANK_ID)
+            if ($val['id'] == FAMILIA_RANK_ID)
                 $projectFamilyId = $id;
 
         }

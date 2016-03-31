@@ -979,12 +979,6 @@ class NsrTaxonController extends NsrController
 
 		$error=null;
 
-		if ($child_base_rank==NOTHOGENUS_RANK_ID && $parent_base_rank!=FAMILY_RANK_ID)
-		{
-			// notogenus moet onder familie
-			$error=array($ranks[FAMILY_RANK_ID]['rank']);
-		}
-		else
 		if ($child_base_rank==NOTHOSPECIES_RANK_ID && $parent_base_rank!=NOTHOGENUS_RANK_ID)
 		{
 			$error=array($ranks[NOTHOGENUS_RANK_ID]['rank']);
@@ -1026,22 +1020,22 @@ class NsrTaxonController extends NsrController
 			$error=array($ranks[GENUS_RANK_ID]['rank']);
 		}
 		else
-		if (($child_base_rank==GENUS_RANK_ID && $ranks[$parent_base_rank]['rank']!='subfamilia') &&
-			($child_base_rank==GENUS_RANK_ID && $parent_base_rank!=FAMILY_RANK_ID))
+		if (($child_base_rank==NOTHOGENUS_RANK_ID || $child_base_rank==GENUS_RANK_ID) &&
+			($parent_base_rank!=FAMILIA_RANK_ID && $parent_base_rank!=SUBFAMILIA_RANK_ID))
 		{
 			// genus moet onder subfamilie of familie
-			$error=array('subfamilia',$ranks[FAMILY_RANK_ID]['rank']);
+			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank']);
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subfamilia' && $parent_base_rank!=FAMILY_RANK_ID)
+		if ($child_base_rank==SUBFAMILIA_RANK_ID && $parent_base_rank!=FAMILIA_RANK_ID)
 		{
 			// subfamilie moet onder familie
-			$error=array($ranks[FAMILY_RANK_ID]['rank']);
+			$error=array($ranks[FAMILIA_RANK_ID]['rank']);
 		}
 		else
-		if (($child_base_rank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='subordo') &&
-			($child_base_rank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='ordo') &&
-			($child_base_rank==FAMILY_RANK_ID && $ranks[$parent_base_rank]['rank']!='superfamilia'))
+		if (($child_base_rank==FAMILIA_RANK_ID && $ranks[$parent_base_rank]['rank']!='subordo') &&
+			($child_base_rank==FAMILIA_RANK_ID && $ranks[$parent_base_rank]['rank']!='ordo') &&
+			($child_base_rank==FAMILIA_RANK_ID && $ranks[$parent_base_rank]['rank']!='superfamilia'))
 		{
 			// familie moet onder suborde, orde of superfamilia
 			$error=array('subordo','ordo','superfamilia');
@@ -1139,22 +1133,15 @@ class NsrTaxonController extends NsrController
 
 	private function checkNamePartsMatchRank($baseRank,$uninomial,$specificEpithet,$infraSpecificEpithet)
 	{
-		/*
-		NOTHOGENUS_RANK_ID
-		NOTHOSPECIES_RANK_ID
-		NOTHOSUBSPECIES_RANK_ID
-		NOTHOVARIETAS_RANK_ID
-		*/
-
-		if ( $baseRank<SPECIES_RANK_ID || $baseRank==NOTHOGENUS_RANK_ID )
+		if ( $baseRank<SPECIES_RANK_ID )
 		{
-			if ( empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID && $baseRank!=NOTHOGENUS_RANK_ID) )
+			if ( empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID) )
 			{
 				$this->addError("Wetenschappelijke naam: genus ontbreekt. Concept niet opgeslagen.");
 				return false;
 			}
 			else
-			if ( empty($uninomial) && ($baseRank<GENUS_RANK_ID || $baseRank==NOTHOGENUS_RANK_ID) )
+			if ( empty($uninomial) && $baseRank<GENUS_RANK_ID )
 			{
 				$this->addError("Wetenschappelijke naam: uninomial ontbreekt. Concept niet opgeslagen.");
 				return false;

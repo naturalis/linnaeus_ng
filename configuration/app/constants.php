@@ -18,11 +18,13 @@
 	if (!defined('LANGUAGE_ID_ENGLISH')) define('LANGUAGE_ID_ENGLISH',26);
 	if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 
+	/*
 	if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
 	if (!defined('SUBGENUS_RANK_ID')) define('SUBGENUS_RANK_ID',64);
 	if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
 	if (!defined('SECTION_RANK_ID')) define('SECTION_RANK_ID',66);
 	if (!defined('GRAFT_CHIMERA_RANK_ID')) define('GRAFT_CHIMERA_RANK_ID',88);
+	*/
 
 	if (!defined('PREDICATE_VALID_NAME')) define('PREDICATE_VALID_NAME','isValidNameOf');
 	if (!defined('PREDICATE_PREFERRED_NAME')) define('PREDICATE_PREFERRED_NAME','isPreferredNameOf');
