@@ -14,11 +14,24 @@ var searchdata=
 		url: "ajax_interface.php"
 	};
 var main_language_display_label="nederlandse naam";
+var baseRanks=Array();
+
 function toggleedit(ele)
 {
 	var mode=$(ele).next('span').is(':visible') ? 'cancel' : 'edit';
 	$(ele).html(mode=='edit' ? 'cancel' : 'edit');
 	$(ele).next().toggle();
+}
+
+function getRankId( rank )
+{
+	for(var i=0;i<baseRanks.length;i++)
+	{
+		if (baseRanks[i].rank==rank && baseRanks[i].rank)
+		{
+			return baseRanks[i].id;
+		}
+	}
 }
 
 function setnewvalue(p)
@@ -125,7 +138,7 @@ function checkAuthorshipAgainstRankGenus()
 	var buffer=[];
 
 	//if (rank=<genusBaseRankid)
-	if (rank==genusBaseRankid)
+	if ( rank==getRankId( 'genus' ) )
 	{
 		if (p1==0) buffer.push("Auteurschap");
 	}
@@ -145,32 +158,32 @@ function checkNameAgainstRank()
 	var result=true;
 	var buffer=[];
 
-	if (rank<genusBaseRankid)
+	if (rank<getRankId( 'genus' ))
 	{
-		if (p1==0) buffer.push("Uninomial is niet ingevuld.");
-		if (p2!=0) buffer.push("Een "+ranklabel+" kan geen soortsnaam bevatten.");
-		if (p3!=0) buffer.push("Een "+ranklabel+" kan geen derde naamdeel bevatten.");
+		if (p1==0) buffer.push( _("Uninomial is niet ingevuld.") );
+		if (p2!=0) buffer.push( sprintf(_("Een %s kan geen soortsnaam bevatten."), ranklabel ) );
+		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
 	}
 	else
-	if (rank>=genusBaseRankid && rank<speciesBaseRankid)
+	if ( ( rank>=getRankId( 'genus' ) && rank<getRankId( 'species' ) ) || rank==getRankId( 'nothogenus' ) )
 	{
-		if (p1==0) buffer.push("Genus is niet ingevuld.");
-		if (p2!=0) buffer.push("Een "+ranklabel+" kan geen soortsnaam bevatten.");
-		if (p3!=0) buffer.push("Een "+ranklabel+" kan geen derde naamdeel bevatten.");
+		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
+		if (p2!=0) buffer.push( sprintf(_("Een %s kan geen soortsnaam bevatten."), ranklabel ) );
+		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
 	}
 	else
-	if (rank==speciesBaseRankid)
+	if ( rank==getRankId( 'species' ) || rank==getRankId( 'nothospecies' ) )
 	{
-		if (p1==0) buffer.push("Genus is niet ingevuld.");
-		if (p2==0) buffer.push("Soortsnaam is niet ingevuld.");
-		if (p3!=0) buffer.push("Een "+ranklabel+" kan geen derde naamdeel bevatten.");
+		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
+		if (p2==0) buffer.push( _("Soortsnaam is niet ingevuld.") );
+		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
 	}
 	else
-	if (rank>speciesBaseRankid)
+	if ( rank>getRankId( 'species' ) )
 	{
-		if (p1==0) buffer.push("Genus is niet ingevuld.");
-		if (p2==0) buffer.push("Soortsnaam is niet ingevuld.");
-		if (p3==0) buffer.push("Derde naamdeel is niet ingevuld.");
+		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
+		if (p2==0) buffer.push( _("Soortsnaam is niet ingevuld.") );
+		if (p3==0) buffer.push( _("Derde naamdeel is niet ingevuld.") );
 	}
 
 	if (buffer.length>0) alert(buffer.join("\n"));
