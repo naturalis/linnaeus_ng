@@ -346,6 +346,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
+			$data[$key]['taxon']=$this->addHybridMarker( $val );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -369,7 +370,7 @@ class SearchControllerNSR extends SearchController
 		}
 
 		$ancestor=$d ? $d[0] : null;
-
+		
 		$images_on=(!empty($p['images_on']) && $p['images_on']=='on' ? true : null);
 		$images_off=(!empty($p['images_off']) && $p['images_off']=='on' ? true : null);
 		$images=!is_null($images_on) || !is_null($images_off);
@@ -435,6 +436,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
+			$data[$key]['taxon']=$this->addHybridMarker( $val );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -694,7 +696,7 @@ class SearchControllerNSR extends SearchController
 	{
 		return $this->models->SearchNSRModel->getSuggestionsGroup(array(
 			"match"=>$p['match'],
-			"search"=>$p['search'],
+			"search"=>$p['match']=='id'? $p['id'] : $p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
 			"language_id"=>$this->getCurrentLanguageId(),
 			"limit"=>$this->_suggestionListItemMax,

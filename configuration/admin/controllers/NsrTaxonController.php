@@ -979,7 +979,29 @@ class NsrTaxonController extends NsrController
 
 		$error=null;
 
-		if ($child_base_rank>SPECIES_RANK_ID && $parent_base_rank!=SPECIES_RANK_ID)
+		if ($child_base_rank==NOTHOGENUS_RANK_ID && $parent_base_rank!=FAMILY_RANK_ID)
+		{
+			// notogenus moet onder familie
+			$error=array($ranks[FAMILY_RANK_ID]['rank']);
+		}
+		else
+		if ($child_base_rank==NOTHOSPECIES_RANK_ID && $parent_base_rank!=NOTHOGENUS_RANK_ID)
+		{
+			$error=array($ranks[NOTHOGENUS_RANK_ID]['rank']);
+		}
+		else
+		if (($child_base_rank==NOTHOSUBSPECIES_RANK_ID || $child_base_rank==NOTHOVARIETAS_RANK_ID) && $parent_base_rank!=NOTHOSPECIES_RANK_ID)
+		{
+			$error=array($ranks[NOTHOSPECIES_RANK_ID]['rank']);
+		}
+		else
+		if (
+			$child_base_rank>SPECIES_RANK_ID && 
+				$child_base_rank!=NOTHOGENUS_RANK_ID && 
+				$child_base_rank!=NOTHOSPECIES_RANK_ID && 
+				$child_base_rank!=NOTHOSUBSPECIES_RANK_ID && 
+				$child_base_rank!=NOTHOVARIETAS_RANK_ID && 
+			$parent_base_rank!=SPECIES_RANK_ID)
 		{
 			/*
 			forma moet onder soort
@@ -1117,37 +1139,43 @@ class NsrTaxonController extends NsrController
 
 	private function checkNamePartsMatchRank($baseRank,$uninomial,$specificEpithet,$infraSpecificEpithet)
 	{
+		/*
+		NOTHOGENUS_RANK_ID
+		NOTHOSPECIES_RANK_ID
+		NOTHOSUBSPECIES_RANK_ID
+		NOTHOVARIETAS_RANK_ID
+		*/
 
-		if ($baseRank<SPECIES_RANK_ID)
+		if ( $baseRank<SPECIES_RANK_ID || $baseRank==NOTHOGENUS_RANK_ID )
 		{
-			if (empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID))
+			if ( empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID && $baseRank!=NOTHOGENUS_RANK_ID) )
 			{
 				$this->addError("Wetenschappelijke naam: genus ontbreekt. Concept niet opgeslagen.");
 				return false;
 			}
 			else
-			if (empty($uninomial) && $baseRank<GENUS_RANK_ID)
+			if ( empty($uninomial) && ($baseRank<GENUS_RANK_ID || $baseRank==NOTHOGENUS_RANK_ID) )
 			{
 				$this->addError("Wetenschappelijke naam: uninomial ontbreekt. Concept niet opgeslagen.");
 				return false;
 			}
 			else
-			if (!empty($specificEpithet) || !empty($infraSpecificEpithet))
+			if ( !empty($specificEpithet) || !empty($infraSpecificEpithet) )
 			{
 				$this->addError("Wetenschappelijke naam kan maar uit één deel bestaan. Concept niet opgeslagen.");
 				return false;
 			}
 		}
 		else
-		if ($baseRank==SPECIES_RANK_ID)
+		if ( $baseRank==SPECIES_RANK_ID || $baseRank==NOTHOSPECIES_RANK_ID )
 		{
-			if (empty($uninomial) || empty($specificEpithet))
+			if ( empty($uninomial) || empty($specificEpithet) )
 			{
 				$this->addError("Wetenschappelijke naam incompleet. Concept niet opgeslagen.");
 				return false;
 			}
 			else
-			if (!empty($infraSpecificEpithet))
+			if ( !empty($infraSpecificEpithet) )
 			{
 				$this->addError("Wetenschappelijke naam kan geen derde naamdeel hebben. Concept niet opgeslagen.");
 				return false;
@@ -1155,7 +1183,7 @@ class NsrTaxonController extends NsrController
 
 		}
 		else
-		if ($baseRank>SPECIES_RANK_ID)
+		if ( $baseRank>SPECIES_RANK_ID )
 		{
 			if (empty($uninomial) || empty($specificEpithet) || empty($infraSpecificEpithet))
 			{

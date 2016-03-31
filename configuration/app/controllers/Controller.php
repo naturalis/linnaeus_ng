@@ -191,6 +191,8 @@ class Controller extends BaseClass
         'lookup.css'
     );
 	private $_maxBackSteps=100;
+	public $_hybridMarker='×';
+	
 
 
 
@@ -1277,16 +1279,18 @@ class Controller extends BaseClass
         $rankId = $r[$taxon['rank_id']]['rank_id'];
         $rankName = ucfirst($d);
         $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
+		
+		$result = null;
 
         // Rank level is above genus; no formatting
-        if ($rankId < GENUS_RANK_ID) {
-			return ($rankpos=='post' ? ($taxon['taxon'].', '.$rankName) : ($rankName . ' ' . $taxon['taxon']));
-            //return $rankName . ' ' . $taxon['taxon'];
+        if ($rankId < GENUS_RANK_ID)
+		{
+			$result = ($rankpos=='post' ? ($taxon['taxon'].', '.$rankName) : ($rankName . ' ' . $taxon['taxon']));
         }
 
           // Genus or subgenus; add italics
-        if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
-
+        if ( is_null($result) && ($rankId < SPECIES_RANK_ID && count($e) == 1))
+		{
             $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
 
             // Species case for subgenus and section: append genus name
@@ -1303,63 +1307,84 @@ class Controller extends BaseClass
             }
 
   			$name = ($rankpos=='post' ? $name . ', ' . $rankName : $rankName . ' ' . $name);
-            return $name;
+            $result = $name;
         }
 
         // Species
-        if ($rankId > GENUS_RANK_ID && count($e) == 2) {
+        if (is_null($result) && ($rankId > GENUS_RANK_ID && count($e) == 2))
+		{
             $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
         }
 
         // Regular infraspecies, name consists of three parts
-        if (count($e) == 3) {
+        if (is_null($result) && count($e) == 3)
+		{
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
         }
 
         // Single infraspecies with subgenus
-        if (count($e) == 4 && $e[1][0] == '(') {
+        if (is_null($result) && count($e) == 4 && $e[1][0] == '(')
+		{
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
 
         // Return now if name has been set
-        if (isset($name)) {
-            return $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
+        if ( is_null($result) && isset($name) )
+		{
+            $result = $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
 
         // Now we're handling more complicated cases. We need the parent before continuing
 
         // Say goodbye to the orphans #1
-		if (empty($taxon['parent_id']))
+		if ( is_null($result) && empty($taxon['parent_id']))
 		{
-            return $taxon['taxon'];
+            $result = $taxon['taxon'];
 		}
-        $parent = $this->getTaxonById($taxon['parent_id']);
+
+		if ( is_null($result) )
+		{
+	        $parent = $this->getTaxonById($taxon['parent_id']);
+		}
+
         // Say goodbye to the orphans #2
-        if (empty($parent['rank_id'])) {
-            return $taxon['taxon'];
+        if ( is_null($result) && empty($parent['rank_id']))
+		{
+            $result = $taxon['taxon'];
         }
-        $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
+
+		if ( is_null($result) )
+		{
+	        $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
+		}
 
         // Double infraspecies
-        if (count($e) == 4) {
+        if ( is_null($result) && count($e) == 4)
+		{
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
              (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
 
         // Double infraspecies with subgenus
-        if (count($e) == 5 && $e[1][0] == '(') {
+        if ( is_null($result) && count($e) == 5 && $e[1][0] == '(')
+		{
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
              (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
         }
 
         // Return now if name has been set
-        if (isset($name)) {
-            return $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
+        if ( is_null($result) && isset($name))
+		{
+            $result = $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
 
         // If we end up here something must be wrong, just return name sans formatting
-        return $taxon['taxon'];
-
+        if ( is_null($result) )
+		{
+            $result = $taxon['taxon'];
+        }
+			
+		return $result;
     }
 
 
@@ -2745,6 +2770,8 @@ class Controller extends BaseClass
 		{
 			$this->setSearchResultIndexActive($this->rGetVal('sidx'));
 		}
+
+		$this->setRankIdConstants();
 	}
 
 
@@ -2852,6 +2879,36 @@ class Controller extends BaseClass
         }
         return false;
     }
+
+
+	public function addHybridMarker( $taxon )
+	{
+		if ( $taxon['base_rank_id']==NOTHOGENUS_RANK_ID )
+		{
+			return $this->_hybridMarker . ' ' . $taxon['taxon'];
+		}
+		else
+		if ( $taxon['base_rank_id']==NOTHOSPECIES_RANK_ID ||
+			 $taxon['base_rank_id']==NOTHOSUBSPECIES_RANK_ID ||
+			 $taxon['base_rank_id']==NOTHOVARIETAS_RANK_ID )
+		{
+			$ied=explode(' ', $taxon['taxon'], 2);
+			return $ied[0]. '  ' .$this->_hybridMarker . $ied[1];
+		}
+		else
+		{
+			return $taxon['taxon'];
+		}
+	}
+		
+	private function setRankIdConstants()
+	{
+		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
+		{
+			$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'])).'_RANK_ID';
+			if (!defined($const)) define($const,$val['id']);
+		}
+	}
 
     protected function getCurrentModuleId ($remapModule = false)
     {
