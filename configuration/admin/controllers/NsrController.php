@@ -30,7 +30,6 @@ class NsrController extends Controller
     private function initialize()
     {
 		$this->Rdf = new RdfController;
-		$this->setRankIdConstants();
 	}
 
 	public function getActors()
@@ -410,13 +409,4 @@ class NsrController extends Controller
 		return $code;
 	}
 	
-	private function setRankIdConstants()
-	{
-		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
-		{
-			$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'])).'_RANK_ID';
-			if (!defined($const)) define($const,$val['id']);
-		}
-	}
-
 }

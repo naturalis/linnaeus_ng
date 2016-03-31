@@ -1112,7 +1112,7 @@ var exportedVariables = {
     PROJECT_ID : ".$this->getCurrentProjectId().",
     LANGUAGE_ID : ".$this->_projectLanguage.",
     SPECIES_RANK_ID : ".SPECIES_RANK_ID.",
-    FAMILY_RANK_ID : ".FAMILY_RANK_ID.",
+    FAMILY_RANK_ID : ".FAMILIA_RANK_ID.",
     CONTENT_TAB_ID : ".$this->_summaryTabId.",
     ".( !empty($this->_imgRootPlaceholder) ? "IMAGE_ROOT_PLACEHOLDER : '".addslashes($this->_imgRootPlaceholder)."', " : "" )."
     ".( $this->_hasMatrix ? "DEFAULT_MATRIX_ID : ".$this->_defaultMatrixId.", " : "" )."

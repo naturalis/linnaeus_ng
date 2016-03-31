@@ -383,9 +383,9 @@ class MergeController extends Controller
 		}
 
 		// checking for a top taxon in the source
-		$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => EMPIRE_RANK_ID), 'columns' => 'id'));
+		$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => REGIO_RANK_ID), 'columns' => 'id'));
 		if (empty($d[0]['id']))
-			$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => KINGDOM_RANK_ID), 'columns' => 'id'));
+			$d = $this->models->ProjectsRanks->_get(array('id' => array('project_id' => $p['s'], 'rank_id' => REGNUM_RANK_ID), 'columns' => 'id'));
 
 		if (!empty($d[0]['id'])) {
 
