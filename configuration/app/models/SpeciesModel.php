@@ -210,7 +210,9 @@ class SpeciesModel extends AbstractModel
 				and _a.id=".$taxonId."
 				and ifnull(_trash.is_deleted,0)=0";
 
-        return $this->freeQuery($query);
+        $d=$this->freeQuery($query);
+		
+		return $d ? $d[0] : null;
     }
 
 
@@ -385,13 +387,22 @@ class SpeciesModel extends AbstractModel
 				_f.name as organisation_name,
 				_g.label as reference_label,
 				_g.author as reference_author,
-				_g.date as reference_date
+				_g.date as reference_date,
+				_p.rank_id as base_rank_id
 
 			from %PRE%names _a
 
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id
 				and _a.project_id = _b.project_id
+
+			left join %PRE%taxa _t
+				on _a.taxon_id=_t.id
+				and _a.project_id=_t.project_id
+		
+			left join %PRE%projects_ranks _p
+				on _t.rank_id=_p.id
+				and _t.project_id=_p.project_id
 
 			left join %PRE%languages _c
 				on _a.language_id=_c.id
@@ -473,7 +484,7 @@ class SpeciesModel extends AbstractModel
 				end as sort_criterium_language
 
 			from %PRE%names _a
-
+		
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id

@@ -1385,7 +1385,9 @@ class Controller extends BaseClass
 		{
             $result = $taxon['taxon'];
         }
-			
+
+		//$result=$this->addHybridMarker(array('name'=> $result,'base_rank_id'=>$rankId));
+
 		return $result;
     }
 
@@ -2897,8 +2899,15 @@ class Controller extends BaseClass
 			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
 			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-			$ied=explode(' ', $name, 2);
-			return $ied[0]. '  ' .$this->_hybridMarker . $ied[1];
+			if ( empty($name) )
+			{
+				return $this->_hybridMarker;
+			}
+			else
+			{
+				$ied=explode(' ', $name, 2);
+				return $ied[0]. '  ' .$this->_hybridMarker . $ied[1];
+			}
 		}
 		else
 		{

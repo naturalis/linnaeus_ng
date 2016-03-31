@@ -1014,7 +1014,7 @@ class NsrTaxonController extends NsrController
 			$error=array($ranks[GENUS_RANK_ID]['rank'],'subgenus');
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subgenus' && $parent_base_rank!=GENUS_RANK_ID)
+		if ($child_base_rank==SUBGENUS_RANK_ID && $parent_base_rank!=GENUS_RANK_ID)
 		{
 			// subgenus moet onder genus
 			$error=array($ranks[GENUS_RANK_ID]['rank']);
@@ -1033,22 +1033,22 @@ class NsrTaxonController extends NsrController
 			$error=array($ranks[FAMILIA_RANK_ID]['rank']);
 		}
 		else
-		if (($child_base_rank==FAMILIA_RANK_ID && $ranks[$parent_base_rank]['rank']!='subordo') &&
-			($child_base_rank==FAMILIA_RANK_ID && $ranks[$parent_base_rank]['rank']!='ordo') &&
-			($child_base_rank==FAMILIA_RANK_ID && $ranks[$parent_base_rank]['rank']!='superfamilia'))
+		if (($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID) &&
+			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=ORDO_RANK_ID) &&
+			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUPERFAMILIA_RANK_ID))
 		{
 			// familie moet onder suborde, orde of superfamilia
 			$error=array('subordo','ordo','superfamilia');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='superfamilia' && $ranks[$parent_base_rank]['rank']!='ordo') &&
-			($ranks[$child_base_rank]['rank']=='superfamilia' && $ranks[$parent_base_rank]['rank']!='subordo'))
+		if (($child_base_rank==superfamilia && $parent_base_rank!=ORDO_RANK_ID) &&
+			($child_base_rank==superfamilia && $parent_base_rank!=SUBORDO_RANK_ID))
 		{
 			// superfamilia moet onder orde of subordo
 			$error=array('ordo','subordo');
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subordo' && $ranks[$parent_base_rank]['rank']!='ordo')
+		if ($child_base_rank==SUBORDO_RANK_ID && $parent_base_rank!=ORDO_RANK_ID)
 		{
 			// suborde moet onder orde
 			$error=array('ordo');
