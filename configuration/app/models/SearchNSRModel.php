@@ -142,6 +142,7 @@ final class SearchNSRModel extends AbstractModel
 				_b.nametype,
 				_e.taxon,
 				_e.rank_id,
+				_x.id as base_rank_id,
 				_f.lower_taxon,
 				_k.name as common_name,
 				ifnull(_q.label,_x.rank) as common_rank,
@@ -327,7 +328,7 @@ final class SearchNSRModel extends AbstractModel
 		$limit=isset($params['limit']) ? $params['limit'] : null;
 		$offset=isset($params['offset']) ? $params['offset'] : null;
 		$this->_operators=isset($params['operators']) ? $params['operators'] : null;
-		
+
 		if ( is_null($project_id) ||  is_null($language_id) || is_null($type_id_preferred) || is_null($type_id_valid) )
 			return;
 
@@ -339,6 +340,7 @@ final class SearchNSRModel extends AbstractModel
 				SQL_CALC_FOUND_ROWS
 				_a.id,
 				_a.id as taxon_id,
+				_f.rank_id as base_rank_id,
 				_a.taxon,
 				_k.name as common_name,
 				".( $images ? "ifnull(_i.number_of_images,0) as number_of_images," : "" )."
@@ -477,7 +479,7 @@ final class SearchNSRModel extends AbstractModel
 				_a.project_id =".$project_id."
 				and _f.lower_taxon=1
 				and ifnull(_trash.is_deleted,0)=0
-				".(isset($ancestor['id']) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor_id."' in boolean mode)" : "")."
+				".(isset($ancestor_id) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor_id."' in boolean mode)" : "")."
 				".(isset($presence) ? "and _g.presence_id in (".implode(',',$presence).")" : "")."
 				".(isset($auth) ? "and _m.authorship like '". $this->escapeString($auth)."%'" : "")."
 				".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
@@ -767,6 +769,7 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%name_types _b 
 				on _a.type_id=_b.id 
 				and _a.project_id = _b.project_id
+				and _b.nametype='".PREDICATE_PREFERRED_NAME."'
 
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
@@ -799,7 +802,6 @@ final class SearchNSRModel extends AbstractModel
 		;
 
 		return $this->freeQuery( $query );
-		
 	}
 
 	public function getSuggestionsAuthor( $params )

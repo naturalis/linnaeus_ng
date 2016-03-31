@@ -60,7 +60,4 @@ class SearchController extends Controller
 			(strlen($s)>=$this->_minSearchLength) &&  // is it long enough?
 			(strlen($s)<=$this->_maxSearchLength);    // is it short enough?
 	}
-
-
-
 }

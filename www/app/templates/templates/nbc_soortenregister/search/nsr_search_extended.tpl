@@ -283,7 +283,9 @@
                 {/if}
                 <strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
                 {if $v.common_name}{$v.common_name}<br />{/if}
+				{if $v.presence_information_index_label || $v.presence_information_title}
                 {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
+                {/if}
             </div>
 			{/foreach}
 		</div>

@@ -279,6 +279,15 @@ $(document).ready(function()
 	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
 	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
 
+	baseRanks.push(
+		{ rank: 'species',id: {$smarty.const.SPECIES_RANK_ID} } ,
+		{ rank: 'genus',id: {$smarty.const.GENUS_RANK_ID} } ,
+		{ rank: 'nothogenus',id: {$smarty.const.NOTHOGENUS_RANK_ID} } ,
+		{ rank: 'nothospecies',id: {$smarty.const.NOTHOSPECIES_RANK_ID} } ,
+		{ rank: 'nothosubspecies',id: {$smarty.const.NOTHOSUBSPECIES_RANK_ID}  } ,
+		{ rank: 'nothovarietas',id: {$smarty.const.NOTHOVARIETAS_RANK_ID} } 
+	);
+	
 	$('#data :input[type!=button]').each(function(key,value)
 	{
 		var set={ 
