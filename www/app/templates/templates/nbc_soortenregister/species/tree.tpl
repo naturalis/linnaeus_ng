@@ -26,8 +26,8 @@
 
 <script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister-tree.js"></script>
 <script type="text/JavaScript">
-$(document).ready(function() {
-	
+$(document).ready(function()
+{
 	$('title').html('{t}Taxonomische boom{/t} - '+$('title').html());
 	
 	{if $session.admin.project.title}
@@ -45,7 +45,6 @@ $(document).ready(function() {
 	{if $expand}
 		setAutoExpand({$expand});
 	{/if}
-	
 });
 </script>
 

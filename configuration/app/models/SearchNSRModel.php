@@ -743,11 +743,11 @@ final class SearchNSRModel extends AbstractModel
 				_a.taxon_id as id,
 				_a.name,
 				_b.nametype,
-				_g.label as rank,
+				ifnull(_g.label,_r.default_label) as rank,
 				_k.name as dutch_name,
 				if (_b.nametype='".PREDICATE_VALID_NAME."',
-						concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',_g.label,']'),
-						concat(_a.name,'',' [',_g.label,']')
+						concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',ifnull(_g.label,_r.default_label),']'),
+						concat(_a.name,'',' [',ifnull(_g.label,_r.default_label),']')
 					)  as label
 
 			from %PRE%names _a
@@ -769,6 +769,9 @@ final class SearchNSRModel extends AbstractModel
 				on _e.rank_id=_g.project_rank_id
 				and _a.project_id = _g.project_id
 				and _g.language_id=".$language_id."
+
+			left join ranks _r
+				on _f.rank_id=_r.id
 
 			left join %PRE%name_types _b 
 				on _a.type_id=_b.id 

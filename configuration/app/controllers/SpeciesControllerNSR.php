@@ -607,7 +607,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return array('start'=>$start,'categories'=>$categories);
     }
 
-	private function getNames($p)
+	private function getNames( $p )
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
@@ -617,7 +617,7 @@ class SpeciesControllerNSR extends SpeciesController
     		'languageId' => $this->getDefaultLanguageId(),
     		'taxonId' => $id
 		));
-
+		
 		$preferredname=null;
 		$scientific_name=null;
 		$nomen=null;
@@ -653,21 +653,25 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
-					$nomen='<i>'.trim($nomen).'</i>';
+					$nomen='<i>'.$this->addHybridMarker( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</i>';
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 
-				$scientific_name=trim($val['name']);
-
+				$scientific_name=$this->addHybridMarker( array('name'=>trim($val['name']),'base_rank_id'=>$base_rank_id) );
+				
 			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
 
 			if (!empty($val['expert_id']))
+			{
 				$names[$key]['expert']=$this->getActor($val['expert_id']);
+			}
 
 			if (!empty($val['organisation_id']))
+			{
 				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
+			}
 
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 
@@ -718,13 +722,14 @@ class SpeciesControllerNSR extends SpeciesController
 			});
 			array_splice($names,$synonymStartIndex,0,$synonyms);
 		}
-
+		
 		return
 			array(
 				'scientific_name'=>$scientific_name,
 				'nomen'=>$nomen,
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
 				'preffered_name'=>$preferredname,
+				'hybrid_marker'=>$this->addHybridMarker( array('base_rank_id'=>$base_rank_id) ),
 				'list'=>$names,
 				'language_has_preferredname'=>$language_has_preferredname
 			);
@@ -829,10 +834,13 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $id
 		));
 
-		array_unshift($this->tmp,$taxon[0]);
+		$taxon['name']=$this->addHybridMarker(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['taxon']=$this->addHybridMarker(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
 
-		if (!empty($taxon[0]['parent_id'])) {
-			$this->_getTaxonClassification($taxon[0]['parent_id']);
+		array_unshift($this->tmp,$taxon);
+
+		if (!empty($taxon['parent_id'])) {
+			$this->_getTaxonClassification($taxon['parent_id']);
 		}
 
 	}
@@ -949,6 +957,8 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $taxonId,
     		'nameId' => $nameId
 		));
+
+		$d['name']=$this->addHybridMarker( array('name'=>$d['name'],'base_rank_id'=>$d['base_rank_id']) );
 
 		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));
 
@@ -1464,7 +1474,6 @@ class SpeciesControllerNSR extends SpeciesController
     public function getTaxonById( $id )
     {
         $taxon=parent::getTaxonById( $id );
-		$taxon['nsr_id']=$this->getNSRId( array('id'=>$id) );
 		return $taxon;
     }
 
