@@ -2,7 +2,6 @@
 
 <div id="page-main">
 	<h3>{t}Browse media on ResourceSpace server{/t}</h3>
-	<p>Info about credentials to log in?</p>
 
     {if $media.total > 0}
     <div class="buttons">

@@ -4,8 +4,6 @@
 
 <div id="page-main">
 
-	{if $totals.converted == 0}
-
 	<p>Convert {$totals.total} local media files to the ResourceSpace infrastructure:</p>
 
 	<ul id="file-list">
@@ -16,23 +14,22 @@
 	{/foreach}
 	</ul>
 
-	{else}
+	{if $totals.converted > 0}
 
 	<p>A total of {$totals.converted} media files was converted previously.</p>
 
 	{/if}
 
-<p style="margin-top: 25px;">
-<form id="theForm" action="../../views/media/conversion_progress.php?start" target="hidden">
-<input type="hidden" name="action" value="convert">
-</form>
-<input id="submit" type="button" value="{if $totals.converted == 0}{t}start{/t}{else}{t}continue{/t}{/if}" />
-</p>
+	<p style="margin-top: 25px;">
+	<form id="theForm" action="../../views/media/conversion_progress.php" target="hidden">
+	<input type="hidden" name="action" value="convert">
+	</form>
+	<input id="submit" type="button" value="{if $totals.converted == 0}{t}start{/t}{else}{t}continue{/t}{/if}" />
+	</p>
 
-
-<iframe id="conversion_progress" width="90%" name="hidden" scrolling="auto" frameborder="0"
-	style="margin-top: 25px;" height="500" scr="../../views/media/conversion_progress.php">
-</iframe>
+	<iframe id="conversion_progress" width="90%" name="hidden" scrolling="auto" frameborder="0"
+		style="margin-top: 25px;" height="500" scr="../../views/media/conversion_progress.php">
+	</iframe>
 
 </div>
 

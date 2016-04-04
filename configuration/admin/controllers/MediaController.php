@@ -30,14 +30,15 @@ class MediaController extends Controller
     private $_rsUserName;
     private $_rsPassword;
 
-    private $_result;
-    private $_files;
     private $_uploaded;
 
     private $moduleId;
     private $itemId;
     private $languageId;
-    private $mediaId;
+
+    protected $_result;
+    protected $_files;
+    protected $mediaId;
 
     // Used to setup RS
     public static $rsSetupParameters = array(
@@ -507,7 +508,7 @@ class MediaController extends Controller
 		$this->printPage();
     }
 
-    private function uploadFiles ()
+    protected function uploadFiles ()
     {
         if (empty($this->_files)) {
             return false;
@@ -571,8 +572,10 @@ class MediaController extends Controller
                         'id' => null,
                         'project_id' => $this->getCurrentProjectId(),
                         'media_id' => $this->mediaId,
-                        'module_id' => $this->rGetVal('module_id'),
-                        'item_id' => $this->rGetVal('item_id')
+                        'module_id' => $this->rHasVal('module_id') ?
+                             $this->rGetVal('module_id') : $this->moduleId,
+                        'item_id' => $this->rHasVal('item_id') ?
+                            $this->rGetVal('item_id') : $this->itemId
                      ));
                 }
 

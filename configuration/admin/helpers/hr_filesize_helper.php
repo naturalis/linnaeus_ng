@@ -5,9 +5,9 @@ class HrFilesizeHelper
 
 	public function convert($x)
 	{
-	
+
 		return $this->size_readable($x);
-	
+
 	}
 
 	/**
@@ -29,22 +29,34 @@ class HrFilesizeHelper
 		$systems['bi']['prefix'] = array('B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB');
 		$systems['bi']['size']   = 1024;
 		$sys = isset($systems[$system]) ? $systems[$system] : $systems['si'];
-	 
+
 		// Max unit to display
 		$depth = count($sys['prefix']) - 1;
 		if ($max && false !== $d = array_search($max, $sys['prefix'])) {
 			$depth = $d;
 		}
-	 
+
 		// Loop
 		$i = 0;
 		while ($size >= $sys['size'] && $i < $depth) {
 			$size /= $sys['size'];
 			$i++;
 		}
-	 
+
 		return sprintf($retstring, $size, $sys['prefix'][$i]);
 	}
+
+
+    public function returnBytes ($size_str)
+    {
+        switch (substr($size_str, -1))
+        {
+            case 'M': case 'm': return (int)$size_str * 1048576;
+            case 'K': case 'k': return (int)$size_str * 1024;
+            case 'G': case 'g': return (int)$size_str * 1073741824;
+            default: return $size_str;
+        }
+    }
 
 }
 
