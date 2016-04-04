@@ -1,8 +1,8 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/SpeciesMediaController.php');
+require_once ('../../../../configuration/admin/controllers/MediaController.php');
 
-$c = new MediaConverterController();
+$c = new MediaController();
 
-$c->convertAction();
+$c->uploadAction();
 

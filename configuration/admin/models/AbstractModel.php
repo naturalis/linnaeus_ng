@@ -90,7 +90,6 @@ class AbstractModel extends BaseClass
             $query = isset($params) ? $params : null;
             $fieldAsIndex = false;
         }
-
         if (empty($query))
 		{
             $this->log('Called freeQuery with an empty query',1);
@@ -106,8 +105,7 @@ class AbstractModel extends BaseClass
         $this->setLastQuery($query);
 		$this->setAffectedRows();
 
-        unset($this->data);
-
+		unset($this->data);
         while($row=@mysqli_fetch_assoc($set))
 		{
             if($fieldAsIndex!==false && isset($row[$fieldAsIndex]))

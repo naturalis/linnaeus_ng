@@ -123,10 +123,11 @@ final class MediaModel extends AbstractModel
 
         $query = "
             select
-                id,
-                file_name
+                id as item_id,
+                file_name,
+                '' as original_name
             from
-                %PRE%characterictics_states
+                %PRE%characteristics_states
             where
                 file_name != '' and file_name is not null and
                 project_id = " . $projectId;
@@ -146,7 +147,8 @@ final class MediaModel extends AbstractModel
         $query = "
             select
                 id as item_id,
-                image as file_name
+                image as file_name,
+                '' as original_name
             from
                 %PRE%keysteps
             where
@@ -168,7 +170,8 @@ final class MediaModel extends AbstractModel
         $query = "
             select
                 id as item_id,
-                file_name
+                file_name,
+                '' as original_name
             from
                 %PRE%characteristics_states
             where
@@ -184,19 +187,23 @@ final class MediaModel extends AbstractModel
     {
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;
+        $moduleId = isset($p['module_id']) && !empty($p['module_id']) ?
+            $p['module_id'] : false;
 
-        if (!$projectId) return false;
+        if (!$projectId || $moduleId) return false;
 
         $query = "
             select
                 id as item_id,
                 module_id,
-                image as file_name
+                image as file_name,
+                '' as original_name
             from
                 %PRE%free_module_pages
             where
                 image != '' and image is not null and
-                project_id = " . $projectId;
+                project_id = " . $projectId . " and
+                module_id = " . $moduleId;
 
         $d = $this->freeQuery($query);
 
@@ -213,13 +220,14 @@ final class MediaModel extends AbstractModel
         $query = "
             select
                 glossary_id as item_id,
-                original_name as file_name,
-                file_name as backup_name
+                id as media_id,
+                original_name,
+                file_name
             from
                 %PRE%glossary_media
             where
-                ((file_name != '' and file_name is not null) or
-                (original_name != '' and original_name is not null)) and
+                file_name != '' and
+                file_name is not null and
                 project_id = " . $projectId;
 
         $d = $this->freeQuery($query);
@@ -237,11 +245,13 @@ final class MediaModel extends AbstractModel
         $query = "
             select
                 page_id as item_id,
-                original_name as file_name
+                original_name,
+                file_name
             from
                 %PRE%introduction_media
             where
-                file_name != '' and file_name is not null and
+                file_name != '' and
+                file_name is not null and
                 project_id = " . $projectId;
 
         $d = $this->freeQuery($query);
@@ -258,19 +268,20 @@ final class MediaModel extends AbstractModel
 
         $query = "
             select
+                id as media_id,
                 taxon_id as item_id,
-                original_name as file_name,
-                file_name as backup_name
-        from
+                original_name,
+                file_name
+            from
                 %PRE%media_taxon
             where
-                ((file_name != '' and file_name is not null) or
-                (original_name != '' and original_name is not null)) and
+                file_name != '' and
+                file_name is not null and
                 project_id = " . $projectId;
 
         $d = $this->freeQuery($query);
 
-        return isset($d) ? $d : array();
+        return isset($d) ? $d : null;
     }
 
 
