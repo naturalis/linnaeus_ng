@@ -108,6 +108,18 @@ class TreeController extends Controller
 
         $this->printPage('ajax_interface');
     }
+
+
+	var $max_rank_id=36;
+	
+	public function jsonTreeAction()
+	{
+		$node=$this->rHasVal('node') ? $this->rGetVal('node') : $this->getTreeTop();
+		$this->max_rank_id=$this->rHasVal('rank') ? $this->rGetVal('rank') : 36;
+		$top=$this->getTaxonById( $node );
+		$c=array('name'=>$top['taxon']=='Leven' ? 'Life' : $top['taxon'],'children'=>$this->aBranch( $node ));
+		echo json_encode($c);
+	}
 	
 	private function restoreTree()
 	{
@@ -259,5 +271,94 @@ class TreeController extends Controller
 			);
 		
 	}
+
+	private function aBranch( $node, $level=0 )
+	{
+		/*
+		
+		116298 | Animalia
+		116299 | Plantae
+		116300 | Fungi
+		
+		*/
+		
+		$children=
+			$this->models->Taxa->freeQuery("
+				select
+					_a.id,
+					concat(ifnull(ifnull(_k.name,_l.commonname),_a.taxon),' [',_q.label,']') as dutch_name,
+					concat(_r.rank,' ',_a.taxon) as name,
+					_p.rank_id,
+					" . $level . " as level,
+					case 
+					 when instr(_qp.parentage,'116298') || _a.id='116298' != 0 then 'Animalia'
+					 when instr(_qp.parentage,'116299') || _a.id='116299' != 0 then 'Plantae'
+					 when instr(_qp.parentage,'116300') || _a.id='116300' != 0 then 'Fungi'
+					 else 'Unknown'
+					end as kingdom
+				from
+					%PRE%taxa _a
+
+				left join %PRE%taxon_quick_parentage _qp
+					on _a.id = _qp.taxon_id
+					and _a.project_id = _qp.project_id
+
+				left join %PRE%trash_can _trash
+					on _a.project_id = _trash.project_id
+					and _a.id = _trash.lng_id
+					and _trash.item_type='taxon'
+
+				left join %PRE%projects_ranks _p
+					on _a.project_id=_p.project_id
+					and _a.rank_id=_p.id
+
+				left join %PRE%labels_projects_ranks _q
+					on _a.rank_id=_q.project_rank_id
+					and _a.project_id = _q.project_id
+					and _q.language_id=".$this->getCurrentLanguageId()."
+
+				left join %PRE%ranks _r
+					on _p.rank_id=_r.id
+
+				left join %PRE%commonnames _l
+					on _a.id=_l.taxon_id
+					and _a.project_id=_l.project_id
+					and _l.language_id=".$this->getCurrentLanguageId()."
+
+				left join %PRE%names _k
+					on _a.id=_k.taxon_id
+					and _a.project_id=_k.project_id
+					and _k.type_id=".$this->_idPreferredName."
+					and _k.language_id=".$this->getCurrentLanguageId()."
+	
+				left join %PRE%names _m
+					on _a.id=_m.taxon_id
+					and _a.project_id=_m.project_id
+					and _m.type_id=".$this->_idValidName."
+	
+				where 
+					_a.project_id = ".$this->getCurrentProjectId()." 
+					and ifnull(_trash.is_deleted,0)=0
+					and _a.parent_id = ".$node."
+
+				order by
+					label
+			");	
+
+		foreach((array)$children as $key=>$val)
+		{
+			if ( $val['rank_id'] <= $this->max_rank_id )
+			{
+				$children[$key]['children']=$this->aBranch( $val['id'], $level+1 );
+				$children[$key]['size']=count($children[$key]['children']);
+			}
+		}
+		
+	
+		return $children;
+	
+	}
+
+
 
 }

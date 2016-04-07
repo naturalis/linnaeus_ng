@@ -630,13 +630,16 @@ taxonTraits.taxonTraitFormInit=function( data )
 {
 	taxonTraits.setData( data );
 	taxonTraits.setDefaultLanguage( data.default_project_language );
-	taxonTraits.setTrait( data.trait.id );
-	taxonTraits.setTraitType( data.trait.type_sysname );
-	taxonTraits.setTraitName( data.trait.sysname );
-	taxonTraits.setCanSelectMultiple( data.trait.can_select_multiple==1 );
-	taxonTraits.setCanBeNull( data.trait.can_be_null==1 );
-	taxonTraits.setCanHaveRange( data.trait.can_have_range==1 );
-	taxonTraits.setSetDateFormat( { format:data.trait.date_format_format,format_hr:data.trait.date_format_format_hr } );
+	if ( data.trait ) 
+	{
+		taxonTraits.setTrait( data.trait.id );
+		taxonTraits.setTraitType( data.trait.type_sysname );
+		taxonTraits.setTraitName( data.trait.sysname );
+		taxonTraits.setCanSelectMultiple( data.trait.can_select_multiple==1 );
+		taxonTraits.setCanBeNull( data.trait.can_be_null==1 );
+		taxonTraits.setCanHaveRange( data.trait.can_have_range==1 );
+		taxonTraits.setSetDateFormat( { format:data.trait.date_format_format,format_hr:data.trait.date_format_format_hr } );
+	}
 }
 
 taxonTraits.taxonTraitForm=function()
