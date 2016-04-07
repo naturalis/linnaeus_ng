@@ -205,7 +205,7 @@ class LoginController extends Controller
 			// updating
 			$this->models->Users->update(
 				array( 'password'=>$this->helpers->PasswordEncoder->getHash() ),
-				array( 'id'=>$d['id'],'username'=>$username )
+				array( 'id'=>$user['id'],'username'=>$username )
 			);
 
 			return true;
