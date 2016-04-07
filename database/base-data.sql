@@ -1,25 +1,24 @@
-INSERT IGNORE INTO `modules` VALUES (1, 'Introduction', 'Comprehensive project introduction', 'introduction', 'introduction.png', 0, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (2, 'Glossary', 'Project glossary', 'glossary', 'glossary.png', 2, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (3, 'Literature', 'Literary references', 'literature', 'literature.png', 3, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (4, 'Species', 'Detailed pages for taxa', 'species', 'species.png', 4, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (5, 'Higher taxa', 'Detailed pages for higher taxa', 'highertaxa', 'highertaxa.png', 5, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (6, 'Dichotomous key', 'Dichotomic key based on pictures and text', 'key', 'dichotomouskey.png', 6, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (7, 'Matrix key', 'Key based on attributes', 'matrixkey', 'matrixkey.png', 7, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (8, 'Distribution', 'Key based on species distribution', 'mapkey', 'mapkey.png', 8, 1, 1,NOW(),NOW());
-INSERT IGNORE INTO `modules` VALUES (10, 'Additional texts', 'Welcome, About ETI, etc', 'content', NULL, 9, 0, 0, NOW(), NOW());
-INSERT IGNORE INTO `modules` VALUES (11, 'Index', 'Index module', 'index', 'index.png', 1, 1, 1, NOW(), NOW());
-INSERT IGNORE INTO `modules` VALUES (12, 'Search', 'Search and replace within all modules.', 'utilities', NULL, 10, 0, 0, NOW(), NOW());
-INSERT IGNORE INTO `modules` VALUES (13, 'Literatuur (v2)', 'Literary references', 'literature2', 'literature.png', 4, 1, 1, NOW(), NOW());
-INSERT IGNORE INTO `modules` VALUES (14, 'Beheer Soortenregister', 'Beheer Soortenregister', 'nsr', 'index.png', 0, 1, 0, NOW(), NOW());
-INSERT IGNORE INTO `modules` VALUES (15, 'Actoren', 'Actoren: personen & organisaties', 'actors', 'index.png', 0, 1, 0, NOW(), NOW());
+INSERT IGNORE INTO `modules` VALUES (1, 'Introduction', 'Comprehensive project introduction', 'introduction', 0, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (2, 'Glossary', 'Project glossary', 'glossary', 2, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (3, 'Literature', 'Literary references', 'literature', 3, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (4, 'Species', 'Detailed pages for taxa', 'species', 4, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (5, 'Media', 'Media management', 'media', 5, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (6, 'Dichotomous key', 'Dichotomic key based on pictures and text', 'key', 6, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (7, 'Matrix key', 'Key based on attributes', 'matrixkey',  7, 1, 1,NOW(),NOW());
+INSERT IGNORE INTO `modules` VALUES (10, 'Additional texts', 'Welcome, About ETI, etc', 'content', 0, 0, 0, NOW(), NOW());
+INSERT IGNORE INTO `modules` VALUES (11, 'Index', 'Index module', 'index', 0, 1, 1, NOW(), NOW());
+INSERT IGNORE INTO `modules` VALUES (12, 'Search', 'Search and replace within all modules.', 'utilities', 0, 0, 0, NOW(), NOW());
+INSERT IGNORE INTO `modules` VALUES (13, 'Literatuur (v2)', 'Literary references', 'literature2', 4, 1, 1, NOW(), NOW());
+INSERT IGNORE INTO `modules` VALUES (14, 'Beheer Soortenregister', 'Beheer Soortenregister', 'nsr', 0, 1, 0, NOW(), NOW());
+INSERT IGNORE INTO `modules` VALUES (15, 'Actoren', 'Actoren: personen & organisaties', 'actors', 0, 1, 0, NOW(), NOW());
+insert IGNORE into `modules` values (16,'Project management','Project management','projects',99,1,0,now(),now());
+insert IGNORE into `modules` values (17,'User management','User management','users',99,1,0,now(),now());
 
-
-INSERT IGNORE INTO `roles` VALUES (1, 'System administrator', 'ETI admin; creates new projects and lead experts', 'sysadmin', 'n', NOW());
-INSERT IGNORE INTO `roles` VALUES (2, 'Lead expert', 'General manager of a project', 'lead ex', 'n', NOW());
-INSERT IGNORE INTO `roles` VALUES (3, 'Expert', 'Content manager of a project', 'expert', 'y', NOW());
-INSERT IGNORE INTO `roles` VALUES (4, 'Editor', 'Edits specific parts of a project', 'editor', 'y', NOW());
-INSERT IGNORE INTO `roles` VALUES (5, 'Contributor', 'Contributes to a project but cannot edit', 'contrib', 'y', NOW());
-
+INSERT IGNORE INTO `roles` VALUES (1, 'System administrator', 'ETI admin; creates new projects and lead experts', 'sysadmin', NOW());
+INSERT IGNORE INTO `roles` VALUES (2, 'Lead expert', 'General manager of a project', 'lead ex', NOW());
+INSERT IGNORE INTO `roles` VALUES (3, 'Expert', 'Content manager of a project', 'expert', NOW());
+INSERT IGNORE INTO `roles` VALUES (4, 'Editor', 'Edits specific parts of a project', 'editor', NOW());
+INSERT IGNORE INTO `roles` VALUES (5, 'Contributor', 'Contributes to a project but cannot edit', 'contrib', NOW());
 
 INSERT IGNORE INTO `ranks` VALUES (1, 'regio', NULL, 'Empire', NULL, NULL, 0, 0, NULL, NOW(), NOW());
 INSERT IGNORE INTO `ranks` VALUES (2, 'regnum', NULL, 'Kingdom', NULL, 1, 1, 0, NULL, NOW(), NOW());
@@ -239,80 +238,6 @@ INSERT IGNORE INTO `languages` VALUES (122, 'Zulu', 'zul', 'zu', 'Zulu', 'zu_ZA'
 INSERT IGNORE INTO `languages` VALUES (123, 'Scientific', 'sci', NULL, NULL, NULL, 'ltr', NULL, NOW());
 
 
-INSERT IGNORE INTO `timezones` VALUES (1, 'GMT-12:00', 'International Date Line West', NOW());
-INSERT IGNORE INTO `timezones` VALUES (2, 'GMT-11:00', 'Midway Island, Samoa', NOW());
-INSERT IGNORE INTO `timezones` VALUES (3, 'GMT-10:00', 'Hawaii', NOW());
-INSERT IGNORE INTO `timezones` VALUES (4, 'GMT-09:00', 'Alaska', NOW());
-INSERT IGNORE INTO `timezones` VALUES (5, 'GMT-08:00', 'Pacific Time U& Canada); Tijuana', NOW());
-INSERT IGNORE INTO `timezones` VALUES (6, 'GMT-07:00', 'Arizona', NOW());
-INSERT IGNORE INTO `timezones` VALUES (7, 'GMT-07:00', 'Mountain Time U& Canada)', NOW());
-INSERT IGNORE INTO `timezones` VALUES (8, 'GMT-07:00', 'Chihuahua, La Paz, Mazatlan', NOW());
-INSERT IGNORE INTO `timezones` VALUES (9, 'GMT-06:00', 'Central America', NOW());
-INSERT IGNORE INTO `timezones` VALUES (10, 'GMT-06:00', 'Saskatchewan', NOW());
-INSERT IGNORE INTO `timezones` VALUES (11, 'GMT-06:00', 'Guadalajara, Mexico City, Monterrey', NOW());
-INSERT IGNORE INTO `timezones` VALUES (12, 'GMT-06:00', 'Central Time U& Canada)', NOW());
-INSERT IGNORE INTO `timezones` VALUES (13, 'GMT-05:00', 'Indiana East)', NOW());
-INSERT IGNORE INTO `timezones` VALUES (14, 'GMT-05:00', 'Bogota, Lima, Quito', NOW());
-INSERT IGNORE INTO `timezones` VALUES (15, 'GMT-05:00', 'Eastern Time U & Canada)', NOW());
-INSERT IGNORE INTO `timezones` VALUES (16, 'GMT-04:00', 'Caracas, La Paz', NOW());
-INSERT IGNORE INTO `timezones` VALUES (17, 'GMT-04:00', 'Santiago', NOW());
-INSERT IGNORE INTO `timezones` VALUES (18, 'GMT-04:00', 'Atlantic Time Canada)', NOW());
-INSERT IGNORE INTO `timezones` VALUES (19, 'GMT-03:30', 'Newfoundland', NOW());
-INSERT IGNORE INTO `timezones` VALUES (20, 'GMT-03:00', 'Buenos Aires, Georgetown', NOW());
-INSERT IGNORE INTO `timezones` VALUES (21, 'GMT-03:00', 'Greenland', NOW());
-INSERT IGNORE INTO `timezones` VALUES (22, 'GMT-03:00', 'Brasilia', NOW());
-INSERT IGNORE INTO `timezones` VALUES (23, 'GMT-02:00', 'Mid-Atlantic', NOW());
-INSERT IGNORE INTO `timezones` VALUES (24, 'GMT-01:00', 'Cape Verde Is.', NOW());
-INSERT IGNORE INTO `timezones` VALUES (25, 'GMT-01:00', 'Azores', NOW());
-INSERT IGNORE INTO `timezones` VALUES (26, 'GMT', 'Casablanca, Monrovia', NOW());
-INSERT IGNORE INTO `timezones` VALUES (27, 'GMT+01:00', 'West Central Africa', NOW());
-INSERT IGNORE INTO `timezones` VALUES (28, 'GMT+01:00', 'Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna', NOW());
-INSERT IGNORE INTO `timezones` VALUES (29, 'GMT+01:00', 'Brussels, Copenhagen, Madrid, Paris', NOW());
-INSERT IGNORE INTO `timezones` VALUES (30, 'GMT+01:00', 'Sarajevo, Skopje, Warsaw, Zagreb', NOW());
-INSERT IGNORE INTO `timezones` VALUES (31, 'GMT+01:00', 'Belgrade, Bratislava, Budapest, Ljubljana, Prague', NOW());
-INSERT IGNORE INTO `timezones` VALUES (32, 'GMT+02:00', 'Harare, Pretoria', NOW());
-INSERT IGNORE INTO `timezones` VALUES (33, 'GMT+02:00', 'Jerusalem', NOW());
-INSERT IGNORE INTO `timezones` VALUES (34, 'GMT+02:00', 'Athens, Istanbul, Minsk', NOW());
-INSERT IGNORE INTO `timezones` VALUES (35, 'GMT+02:00', 'Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius', NOW());
-INSERT IGNORE INTO `timezones` VALUES (36, 'GMT+02:00', 'Cairo', NOW());
-INSERT IGNORE INTO `timezones` VALUES (37, 'GMT+02:00', 'Bucharest', NOW());
-INSERT IGNORE INTO `timezones` VALUES (38, 'GMT+03:00', 'Nairobi', NOW());
-INSERT IGNORE INTO `timezones` VALUES (39, 'GMT+03:00', 'Kuwait, Riyadh', NOW());
-INSERT IGNORE INTO `timezones` VALUES (40, 'GMT+03:00', 'Moscow, St. Petersburg, Volgograd', NOW());
-INSERT IGNORE INTO `timezones` VALUES (41, 'GMT+03:00', 'Baghdad', NOW());
-INSERT IGNORE INTO `timezones` VALUES (42, 'GMT+03:30', 'Tehran', NOW());
-INSERT IGNORE INTO `timezones` VALUES (43, 'GMT+04:00', 'Abu Dhabi, Muscat', NOW());
-INSERT IGNORE INTO `timezones` VALUES (44, 'GMT+04:00', 'Baku, Tbilisi, Yerevan', NOW());
-INSERT IGNORE INTO `timezones` VALUES (45, 'GMT+04:30', 'Kabul', NOW());
-INSERT IGNORE INTO `timezones` VALUES (46, 'GMT+05:00', 'Islamabad, Karachi, Tashkent', NOW());
-INSERT IGNORE INTO `timezones` VALUES (47, 'GMT+05:00', 'Ekaterinburg', NOW());
-INSERT IGNORE INTO `timezones` VALUES (48, 'GMT+05:30', 'Chennai, Kolkata, Mumbai, New Delhi', NOW());
-INSERT IGNORE INTO `timezones` VALUES (49, 'GMT+05:45', 'Kathmandu', NOW());
-INSERT IGNORE INTO `timezones` VALUES (50, 'GMT+06:00', 'Sri Jayawardenepura', NOW());
-INSERT IGNORE INTO `timezones` VALUES (51, 'GMT+06:00', 'Astana, Dhaka', NOW());
-INSERT IGNORE INTO `timezones` VALUES (52, 'GMT+06:00', 'Almaty, Novosibirsk', NOW());
-INSERT IGNORE INTO `timezones` VALUES (53, 'GMT+06:30', 'Rangoon', NOW());
-INSERT IGNORE INTO `timezones` VALUES (54, 'GMT+07:00', 'Bangkok, Hanoi, Jakarta', NOW());
-INSERT IGNORE INTO `timezones` VALUES (55, 'GMT+07:00', 'Krasnoyarsk', NOW());
-INSERT IGNORE INTO `timezones` VALUES (56, 'GMT+08:00', 'Perth', NOW());
-INSERT IGNORE INTO `timezones` VALUES (57, 'GMT+08:00', 'Taipei', NOW());
-INSERT IGNORE INTO `timezones` VALUES (58, 'GMT+08:00', 'Kuala Lumpur, Singapore', NOW());
-INSERT IGNORE INTO `timezones` VALUES (59, 'GMT+08:00', 'Beijing, Chongqing, Hong Kong, Urumqi', NOW());
-INSERT IGNORE INTO `timezones` VALUES (60, 'GMT+08:00', 'Irkutsk, Ulaan Bataar', NOW());
-INSERT IGNORE INTO `timezones` VALUES (61, 'GMT+09:00', 'Osaka, Sapporo, Tokyo', NOW());
-INSERT IGNORE INTO `timezones` VALUES (62, 'GMT+09:00', 'Seoul', NOW());
-INSERT IGNORE INTO `timezones` VALUES (63, 'GMT+09:00', 'Yakutsk', NOW());
-INSERT IGNORE INTO `timezones` VALUES (64, 'GMT+09:30', 'Darwin', NOW());
-INSERT IGNORE INTO `timezones` VALUES (65, 'GMT+09:30', 'Adelaide', NOW());
-INSERT IGNORE INTO `timezones` VALUES (66, 'GMT+10:00', 'Guam, Port Moresby', NOW());
-INSERT IGNORE INTO `timezones` VALUES (67, 'GMT+10:00', 'Brisbane', NOW());
-INSERT IGNORE INTO `timezones` VALUES (68, 'GMT+10:00', 'Vladivostok', NOW());
-INSERT IGNORE INTO `timezones` VALUES (69, 'GMT+10:00', 'Hobart', NOW());
-INSERT IGNORE INTO `timezones` VALUES (70, 'GMT+10:00', 'Canberra, Melbourne, Sydney', NOW());
-INSERT IGNORE INTO `timezones` VALUES (71, 'GMT+11:00', 'Magadan, Solomon Is., New Caledonia', NOW());
-INSERT IGNORE INTO `timezones` VALUES (72, 'GMT+12:00', 'Fiji, Kamchatka, Marshall Is.', NOW());
-INSERT IGNORE INTO `timezones` VALUES (73, 'GMT+12:00', 'Auckland, Wellington', NOW());
-INSERT IGNORE INTO `timezones` VALUES (74, 'GMT+13:00', 'Nuku''alofa', NOW());
 
 
 INSERT IGNORE INTO `interface_texts` VALUES (1, 'Select a project to work on', 'admin', NOW());
@@ -1491,7 +1416,6 @@ INSERT IGNORE INTO `interface_texts` VALUES (1295, 'Missing email address.', 'ad
 INSERT IGNORE INTO `interface_texts` VALUES (1296, 'Edit actor', 'admin', NOW());
 INSERT IGNORE INTO `interface_texts` VALUES (1297, 'Taxon images', 'admin', NOW());
 
-
 INSERT IGNORE INTO `interface_translations` VALUES (3, 75, 24, '%s %s uitgesloten:');
 INSERT IGNORE INTO `interface_translations` VALUES (4, 74, 24, '%s mogelijk %s resterend:');
 INSERT IGNORE INTO `interface_translations` VALUES (5, 43, 24, 'Over ETI');
@@ -1602,7 +1526,6 @@ INSERT IGNORE INTO `interface_translations` VALUES (142, 841, 24, 'man');
 INSERT IGNORE INTO `interface_translations` VALUES (144, 66, 24, 'Naamgeving');
 INSERT IGNORE INTO `interface_translations` VALUES (146, 64, 24, 'Beeld en geluid');
 
-
 INSERT IGNORE INTO `literature2_publication_types` VALUES (1, 1, 'Artikel', NOW(), NOW());
 INSERT IGNORE INTO `literature2_publication_types` VALUES (2, 1, 'Persoonlijke mededeling', NOW(), NOW());
 INSERT IGNORE INTO `literature2_publication_types` VALUES (3, 1, 'Boek (deel)', NOW(), NOW());
@@ -1617,7 +1540,6 @@ INSERT IGNORE INTO `literature2_publication_types` VALUES (11, 1, 'Tijdschrift',
 INSERT IGNORE INTO `literature2_publication_types` VALUES (12, 1, 'Literatuur', NOW(), NOW());
 INSERT IGNORE INTO `literature2_publication_types` VALUES (13, 1, 'Hoofdstuk', NOW(), NOW());
 INSERT IGNORE INTO `literature2_publication_types` VALUES (14, 1, 'Manuscript', NOW(), NOW());
-
 
 INSERT IGNORE INTO `literature2_publication_types_labels` VALUES (1,1,'1',24,'Artikel',NOW(),NOW());
 INSERT IGNORE INTO `literature2_publication_types_labels` VALUES (2,1,'4',24,'Boek',NOW(),NOW());
@@ -1634,12 +1556,8 @@ INSERT IGNORE INTO `literature2_publication_types_labels` VALUES (12,1,'11',24,'
 INSERT IGNORE INTO `literature2_publication_types_labels` VALUES (13,1,'6',24,'Verslag',NOW(),NOW());
 INSERT IGNORE INTO `literature2_publication_types_labels` VALUES (14,1,'5',24,'Website',NOW(),NOW());
 
-
-
-
 INSERT IGNORE INTO `traits_date_formats` VALUES (1,'year','Y','JJJJ','%Y',0,NOW(),NOW());
 INSERT IGNORE INTO `traits_date_formats` VALUES (2,'fulldate','d-m-Y','DD-MM-JJJJ','%Y-%m-%d',1,NOW(),NOW());
-
 
 INSERT IGNORE INTO `traits_types` VALUES (1,'boolean',1,2,'check_boolean',0,0,0,0,0,0,0,NOW(),NOW());
 INSERT IGNORE INTO `traits_types` VALUES (2,'stringlist',3,4,'check_stringlist',1,1,1,0,1,0,0,NOW(),NOW());
@@ -1723,3 +1641,20 @@ INSERT IGNORE INTO `module_settings_values` VALUES (6,3,61,'1','2016-03-15 14:56
 INSERT IGNORE INTO `module_settings_values` VALUES (7,3,4,'0','2016-03-15 14:59:20','2016-03-15 13:59:20');
 INSERT IGNORE INTO `module_settings_values` VALUES (8,3,62,'../species/nsr_taxon.php?id=%s','2016-03-15 15:14:48','2016-03-15 14:14:48');
 INSERT IGNORE INTO `module_settings_values` VALUES (9,3,64,'_top','2016-03-15 15:31:25','2016-03-15 14:31:25');
+
+
+/* Updates for previous versions */
+delete from roles where id in (4,5);
+update roles set role='Editor' where id =3;
+update roles set description='System administrator',hidden=1 where id =1;
+update roles set description='Project administrator' where id =2;
+update roles set description='Project editor' where id =3;
+
+delete from modules where controller = 'mapkey';
+delete from modules where controller = 'highertaxa';
+update modules set show_in_menu = 0 where controller in ('index','utilities','content');
+
+set @tab = 'Exoteninformatie';
+select @tab_id := id FROM pages_taxa WHERE page = @tab;
+update pages_taxa set external_reference = '{"url":"http:\/\/www.nederlandsesoorten.nl\/linnaeus_ng\/app\/views\/traits\/get.php?group=1","substitute":[],"substitute_encode":"none","parameters":{"taxon":"id","project":"project_id","language":"language_id"},"parameter_encode":"none","check_type":"query","query":"select if(sum(tot)>0,1,0) as `result` from (select count(*) as tot from traits_taxon_values _a left join traits_values _b on _a.project_id=_b.project_id and _a.value_id=_b.id left join traits_traits _c on _b.project_id=_c.project_id and _b.trait_id=_c.id where _a.project_id = %pid% and _a.taxon_id = %tid% and _c.trait_group_id = 1 union select count(*) as tot from traits_taxon_freevalues _a left join traits_traits _c on _a.project_id=_c.project_id and _a.trait_id=_c.id where _a.project_id = %pid% and _a.taxon_id = %tid% and _c.trait_group_id = 1) as u ","link_embed":"embed","template":"_exoteninformatie.tpl"}'
+where id = @tab_id;

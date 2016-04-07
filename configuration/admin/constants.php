@@ -1,17 +1,17 @@
 <?php
 
+	if (!defined('ID_ROLE_EDITOR')) define('ID_ROLE_EDITOR',3);
 	if (!defined('ID_ROLE_SYS_ADMIN')) define('ID_ROLE_SYS_ADMIN',1);
 	if (!defined('ID_ROLE_LEAD_EXPERT')) define('ID_ROLE_LEAD_EXPERT',2);
-	if (!defined('ID_ROLE_EDITOR')) define('ID_ROLE_EDITOR',3);
-	
+
 	if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
-	
+
 	if (!defined('LANGUAGE_ID_DUTCH')) define('LANGUAGE_ID_DUTCH',24);
 	if (!defined('LANGUAGE_ID_ENGLISH')) define('LANGUAGE_ID_ENGLISH',26);
 	if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 	if (!defined('LANGUAGECODE_DUTCH')) define('LANGUAGECODE_DUTCH',LANGUAGE_ID_DUTCH);
 	if (!defined('LANGUAGECODE_ENGLISH')) define('LANGUAGECODE_ENGLISH',LANGUAGE_ID_ENGLISH);
-	
+
 	if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
 	if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
 	if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);
@@ -23,7 +23,7 @@
 	if (!defined('MODCODE_CONTENT')) define('MODCODE_CONTENT',10);
 	if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
 	if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
-	
+
 	/*
 	if (!defined('EMPIRE_RANK_ID')) define('EMPIRE_RANK_ID',1);
 	if (!defined('KINGDOM_RANK_ID')) define('KINGDOM_RANK_ID',2);
@@ -47,6 +47,6 @@
 	if (!defined('PREDICATE_MISSPELLED_NAME')) define('PREDICATE_MISSPELLED_NAME','isMisspelledNameOf');
 	if (!defined('PREDICATE_INVALID_NAME')) define('PREDICATE_INVALID_NAME','isInvalidNameOf');
 	if (!defined('PREDICATE_ALTERNATIVE_NAME')) define('PREDICATE_ALTERNATIVE_NAME','isAlternativeNameOf');
-	
+
 	if (!defined('MATRIX_STYLE_DEFAULT')) define('MATRIX_STYLE_DEFAULT','default');
 	if (!defined('MATRIX_STYLE_NBC')) define('MATRIX_STYLE_NBC','nbc');
