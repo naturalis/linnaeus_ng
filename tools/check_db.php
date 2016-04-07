@@ -139,7 +139,7 @@
             echo "\n\n";
         }
         if ($includeBaseDataUpdate) {
-            echo "#Base data update:\n" . file_get_contents($path . 'base-data.sql');
+            echo "#Base data update:\n" . file_get_contents($path . 'base-data.sql') . "\n\n\n";
         }
     // Same
     } else {
@@ -194,13 +194,13 @@
 
 	function displayOrphanColumns($columns0, $columns1, $dbName, $dbType)
 	{
-		global $queries;
+		global $queries, $db0;
 		$orphans = array_udiff($columns0, $columns1, function ($col0, $col1) {
 			return strcmp($col0[COLUMN_NAME], $col1[COLUMN_NAME]);
 		});
 		foreach ($orphans as $k => $orphan) {
 			// Add column
-            if (count($columns1) > count($columns0)) {
+		    if ($orphan['TABLE_SCHEMA'] != $db0) {
                 $queries['Columns added'][] = printUpdateTable($orphan, 'create');
             // Drop column
             } else {
@@ -275,22 +275,26 @@
 	    $output = "ALTER TABLE `$table` " .
 	       ($action == 'update' ?
 	           "CHANGE `$col` `$col` " :
-	           "ADD `$col` ") .
-	        strtoupper($definition['DATA_TYPE']) .
-            (!empty($definition['CHARACTER_MAXIMUM_LENGTH']) ?
-                ' (' . $definition['CHARACTER_MAXIMUM_LENGTH'] . ')' :
-                '') .
-            (!empty($definition['NUMERIC_PRECISION']) ?
-                ' (' . ($definition['NUMERIC_PRECISION'] + 1) . ')' :
-                '') .
-            ' ' .
+	           "ADD `$col` ");
+        // ENUM exception
+        if (strtolower($definition['DATA_TYPE']) == 'enum') {
+            $output .= $definition['COLUMN_TYPE'];
+        } else {
+            $output .= (strtoupper($definition['DATA_TYPE']) .
+                (!empty($definition['CHARACTER_MAXIMUM_LENGTH']) ?
+                    ' (' . $definition['CHARACTER_MAXIMUM_LENGTH'] . ')' :
+                    '') .
+                (!empty($definition['NUMERIC_PRECISION']) ?
+                    ' (' . ($definition['NUMERIC_PRECISION'] + 1) . ')' :
+                    ''));
+        }
+        $output .= ' ' .
             (strtolower($definition['IS_NULLABLE']) == 'no' ?
                 ' NOT NULL' :
                 '') .
             (strtolower($definition['EXTRA']) == 'auto_increment' ?
                 ' AUTO_INCREMENT' :
-                '')
-	        ;
+                '');
 	    $default =  setDefault($definition['COLUMN_DEFAULT']);
         if (strtolower($definition['IS_NULLABLE']) == 'no' && $default == 'NULL') {
             return $output . ";\n";
