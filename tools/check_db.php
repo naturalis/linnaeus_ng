@@ -6,8 +6,8 @@
 	// $cfg = 'configuration/admin/configuration.php';
 	// $dumpPath = 'database/empty-database.sql';
 	// $mysqlPath = 'mysql';
-	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
-	$path = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/database/';
+	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
+	$path = dirname(__FILE__) . '/../database/';
 	$dumpPath = $path . 'empty-database.sql';
 	$emptyDatabaseFile = file_get_contents($dumpPath);
     $mysqlPath = '/Applications/MAMP/Library/bin/mysql';
