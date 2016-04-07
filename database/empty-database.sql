@@ -1253,7 +1253,6 @@ CREATE TABLE IF NOT EXISTS `modules` (
   `module` varchar(64) NOT NULL,
   `description` text NOT NULL,
   `controller` varchar(32) NOT NULL,
-  `icon` varchar(32) DEFAULT NULL,
   `show_order` int(2) NOT NULL,
   `show_in_menu` tinyint(1) NOT NULL DEFAULT '1',
   `show_in_public_menu` tinyint(1) NOT NULL DEFAULT '1',
@@ -1582,12 +1581,10 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` varchar(32) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `abbrev` varchar(10) DEFAULT NULL,
-  `assignable` enum('y','n') NOT NULL,
+  `hidden` bool NOT NULL DEFAULT 0,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `role` (`role`),
-  KEY `role_2` (`role`)
+  UNIQUE KEY `role` (`role`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `sections`;
@@ -1784,16 +1781,6 @@ CREATE TABLE `text_translations` (
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `timezones`;
-CREATE TABLE IF NOT EXISTS `timezones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timezone` varchar(9) NOT NULL,
-  `locations` varchar(255) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `timezone` (`timezone`,`locations`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `traits_date_formats`;
 CREATE TABLE `traits_date_formats` (
@@ -2001,21 +1988,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `last_name` varchar(32) NOT NULL,
   `email_address` varchar(54) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
-  `superuser` tinyint(1) NOT NULL DEFAULT '0',
-  `timezone_id` int(11) DEFAULT NULL,
-  `photo_path` varchar(255) DEFAULT NULL,
-  `email_notifications` tinyint(1) NOT NULL DEFAULT '0',
   `last_login` datetime DEFAULT NULL,
   `logins` int(11) NOT NULL DEFAULT '0',
-  `password_changed` datetime DEFAULT NULL,
+  `last_password_change` datetime DEFAULT NULL,
   `created_by` int(11) NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`,`email_address`),
   UNIQUE KEY `username_2` (`username`),
-  KEY `password` (`password`),
-  KEY `superuser` (`superuser`)
+  KEY `password` (`password`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `users_taxa`;
@@ -2031,8 +2013,8 @@ CREATE TABLE IF NOT EXISTS `users_taxa` (
   KEY `project_id_2` (`project_id`,`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-drop table if exists user_module_access;
-create table user_module_access (
+DROP TABLE IF EXISTS `user_module_access`;
+CREATE TABLE `user_module_access` (
 	id int(11) not null primary key auto_increment,
 	project_id int(11) not null,
 	user_id int(11) not null,
@@ -2046,8 +2028,8 @@ create table user_module_access (
 	UNIQUE KEY user_module_access_u1 (project_id,module_id,module_type,user_id)
 );
 
-drop table if exists user_item_access;
-create table user_item_access (
+DROP TABLE IF EXISTS `user_item_access`;
+CREATE TABLE `user_item_access` (
 	id int(11) not null primary key auto_increment,
 	project_id int(11) not null,
 	user_id int(11) not null,

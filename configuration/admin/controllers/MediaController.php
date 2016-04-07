@@ -235,7 +235,8 @@ class MediaController extends Controller
 
         foreach ($this::$rsSetupParameters as $p => $v) {
             $s = $this->{'_' . lcfirst(implode('', array_map('ucfirst', explode('_', $p))))};
-            if (empty($s) && strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
+            if (!empty($this->getCurrentProjectId()) && empty($s) &&
+                strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
                 die('FATAL: ' . $p . ' not set.
                 <a href="../media/setup_rs.php">Setup ResourceSpace</a> to continue.');
             }
