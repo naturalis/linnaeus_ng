@@ -24,13 +24,7 @@
 
 	{else}
 
-	<p>The following information has been saved:</p>
-
-	<ul>
-	{foreach from=$result key=setting item=value}
-		<li><strong>{$setting}</strong>: {$value}</li>
-	{/foreach}
-	</ul>
+	<p>The settings have been saved! <a href="index.php">Add media</a></p>
 
 	{/if}
 
