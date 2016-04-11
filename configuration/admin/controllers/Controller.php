@@ -1645,6 +1645,8 @@ class Controller extends BaseClass
         $this->smarty->assign('warnings', $this->getWarnings());
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
+		$this->smarty->assign('viewName', $this->getViewName());
+		$this->smarty->assign('wikiUrl', $this->getWikiUrl());
 
         $this->smarty->assign('uiLanguages', $this->uiLanguages);
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
@@ -2571,7 +2573,21 @@ class Controller extends BaseClass
 			if (!defined($const)) define($const,$val['id']);
 		}
 	}
+	
+	protected function getWikiUrl()
+	{
+		$base=$this->models->ControllerModel->getGeneralSettingValue(
+		array(
+			'project_id' => $this->getCurrentProjectId(),
+			'setting' => 'wiki_base_url'
+		));
 
-
+		return
+			str_replace(
+				['%module%','%page%'],
+				[str_replace(' ','',ucwords($this->controllerPublicName)),str_replace(' ','_',$this->getPageName())],
+				$base
+			);
+	}
 
 }
