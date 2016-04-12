@@ -290,7 +290,7 @@ class SpeciesController extends Controller
 
             // replace possible [new litref] and [new media] tags with links to newly created reference of media
             $this->filterInternalTags($this->rGetId());
-//            $taxon=$this->getTaxonById();
+//            $taxon=$this->getTaxonById($this->rGetId());
 
 			$this->setActiveTaxonId($taxon['id']);
 			$this->setPageName(sprintf($this->translate('Editing "%s"'),$this->formatTaxon($taxon)));
@@ -542,7 +542,7 @@ class SpeciesController extends Controller
         if (!$this->rHasId())
             $this->redirect('new.php');
 
-        $data = $this->getTaxonById();
+        $data = $this->getTaxonById($this->rGetId());
 
         $pr = $this->newGetProjectRanks();
 
@@ -743,11 +743,11 @@ class SpeciesController extends Controller
                     if ($this->rHasVal('next', 'main'))
                         $this->redirect('taxon.php?id=' . $this->rGetId());
 
-                    $d = $this->getTaxonById();
+                    $d = $this->getTaxonById($this->rGetId());
 
                     $this->addMessage(sprintf($this->translate('"%s" saved.'), $this->formatTaxon($d)));
 
-					$data = $this->getTaxonById();
+					$data = $this->getTaxonById($this->rGetId());
 
                     $this->smarty->assign('data', $d);
 
@@ -1046,7 +1046,7 @@ class SpeciesController extends Controller
         }
         elseif ($this->rHasId()) {
 
-            $taxon = $this->getTaxonById();
+            $taxon = $this->getTaxonById( $this->rGetId() );
 
             if (isset($taxon)) {
 
@@ -1165,7 +1165,7 @@ class SpeciesController extends Controller
         if ($this->rHasId()) {
             // get existing taxon name
 
-            $taxon = $this->getTaxonById();
+            $taxon = $this->getTaxonById( $this->rGetId() );
 
 			$this->setActiveTaxonId($taxon['id']);
 
@@ -2253,7 +2253,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasId()) {
 
-            $taxon = $this->getTaxonById();
+            $taxon = $this->getTaxonById( $this->rGetId() );
 
             if ($this->getIsHigherTaxa()) {
 
@@ -2396,7 +2396,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasId()) {
 
-            $taxon = $this->getTaxonById();
+            $taxon = $this->getTaxonById( $this->rGetId() );
 
             if ($this->getIsHigherTaxa()) {
 
@@ -2557,7 +2557,7 @@ class SpeciesController extends Controller
             $taxon = $this->getTaxonById($d['taxon_id']);
         }
         else {
-            $taxon = $this->getTaxonById();
+            $taxon = $this->getTaxonById( $this->rGetId() );
         }
 
         $this->setPageName(sprintf($this->translate('Variations for "%s"'), $taxon['taxon']));
@@ -2639,7 +2639,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
 
-        $taxon = $this->getTaxonById();
+        $taxon = $this->getTaxonById( $this->rGetId() );
 
         $this->setPageName(sprintf($this->translate('Additional NBC data for "%s"'), $taxon['taxon']));
 

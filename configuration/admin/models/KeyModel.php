@@ -3,10 +3,8 @@ include_once (dirname(__FILE__) . "/AbstractModel.php");
 
 class KeyModel extends AbstractModel
 {
-
     public function __construct ()
     {
-
         parent::__construct();
 
         $this->connectToDatabase() or die(_('Failed to connect to database '.
@@ -14,7 +12,6 @@ class KeyModel extends AbstractModel
         	' with user ' . $this->databaseSettings['user'] . '. ' .
             mysqli_connect_error() . '. Correct the getDatabaseSettings() settings
         	in configuration/admin/config.php.'));
-
      }
 
     public function __destruct ()
@@ -156,6 +153,7 @@ class KeyModel extends AbstractModel
 						_a.rank_id,
 						_b.res_taxon_id,
 						_d.rank,
+						_c.rank_id as base_rank_id,
 						_c.lower_taxon,
 						_c.keypath_endpoint
 		
@@ -209,6 +207,7 @@ class KeyModel extends AbstractModel
 					_a.rank_id,
 					_b.res_taxon_id,
 					_d.rank,
+					_c.rank_id as base_rank_id,
 					_c.lower_taxon,
 					_c.keypath_endpoint
 	
@@ -269,12 +268,19 @@ class KeyModel extends AbstractModel
 			"query" => "
 				select
 					_a.id,
-					_a.taxon
+					_a.taxon,
+					_c.rank_id as base_rank_id
 				from
 					%PRE%taxa _a
+
+				left join %PRE%projects_ranks _c
+					on _a.rank_id = _c.id
+					and _a.project_id = _c.project_id
+
 				right join %PRE%choices_keysteps _b
 					on _a.id=_b.res_taxon_id
 					and _a.project_id=_b.project_id
+
 				where
 					_a.project_id = " . $project_id,
 			"fieldAsIndex" => "id"

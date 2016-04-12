@@ -76,12 +76,12 @@ class NsrTaxonMediaController extends NsrController
     {
         $this->checkAuthorisation();
 
-		$taxon = $this->getTaxonById();
-		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
-
         if (!$this->rHasId()) {
 			$this->redirect('index.php');
 		}
+
+		$taxon = $this->getTaxonById($this->rGetId());
+		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
 
 		if ($this->rHasVal('action','delete')) {
 			$r = $this->detachMedia();

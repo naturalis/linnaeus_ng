@@ -17,7 +17,7 @@ final class ControllerModel extends AbstractModel
 
      }
 
-    public function __destruct ()
+    public function __destruct()
     {
         if ($this->databaseConnection)
 		{
@@ -26,7 +26,46 @@ final class ControllerModel extends AbstractModel
         parent::__destruct();
     }
 
-    public function getProjectRanks ($params)
+    public function getTaxon( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+        $name = isset($params['name']) ? $params['name'] : null;
+
+		if ( is_null($project_id) || ( is_null($taxon_id) && is_null($name) ) ) return;
+
+        $query = "
+            select
+				_a.id,
+				_a.taxon,
+				_a.author,
+				_a.parent_id,
+				_a.rank_id,
+				_a.taxon_order,
+				_a.is_hybrid,
+				_a.list_level,
+				_p.rank_id as base_rank,
+				_p.rank_id as base_rank_id,
+				_p.lower_taxon as lower_taxon
+
+			from
+				%PRE%taxa _a
+
+			left join %PRE%projects_ranks _p
+				on _a.project_id= _p.project_id
+				and _a.rank_id = _p.id
+
+			where
+				_a.project_id = " . $project_id . "
+				and " . ( is_null($taxon_id) ? "_a.taxon = '" . $this->escapeString($name) ."'" : "_a.id = " . $taxon_id ) . "
+			";
+
+		$d=$this->freeQuery( $query );
+
+		return $d ? $d[0] : null;
+	}
+
+    public function getProjectRanks($params)
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
         $language_id = isset($params['language_id']) ? $params['language_id'] : null;
@@ -73,8 +112,7 @@ final class ControllerModel extends AbstractModel
 			));
 	}
 
-
-	public function getActors ($projectId)
+	public function getActors($projectId)
 	{
  		if (!isset($projectId))
 			return null;
@@ -107,8 +145,7 @@ final class ControllerModel extends AbstractModel
         return $this->freeQuery($query);
 	}
 
-
-    public function getTaxonParentage ($params)
+    public function getTaxonParentage($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
@@ -131,8 +168,7 @@ final class ControllerModel extends AbstractModel
         return isset($d[0]) ? explode(' ',$d[0]['parentage']) : null;
 	}
 
-
-    public function treeGetTop ($projectId)
+    public function treeGetTop($projectId)
     {
 		if (is_null($projectId)) {
 			return null;
@@ -167,8 +203,7 @@ final class ControllerModel extends AbstractModel
         return $this->freeQuery($query);
 	}
 
-
-	public function deleteTaxonParentage ($params)
+	public function deleteTaxonParentage($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
@@ -186,8 +221,7 @@ final class ControllerModel extends AbstractModel
         $this->freeQuery($query);
 	}
 
-
-	public function checkNsrCode ($params)
+	public function checkNsrCode($params)
 	{
 	    $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $nsrCode = isset($params['nsrCode']) ? $params['nsrCode'] : null;
@@ -207,7 +241,7 @@ final class ControllerModel extends AbstractModel
 
 	}
 
-	public function checkRdfId ($params)
+	public function checkRdfId($params)
 	{
 	    $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $rdfId = isset($params['rdfId']) ? $params['rdfId'] : null;
@@ -226,10 +260,11 @@ final class ControllerModel extends AbstractModel
         return $this->freeQuery($query);
 
 	}
+	
+	
 
 
 	// Used in IndexController but maybe useful elsewhere too? Moved to model as it requires db connection
-
 	public function makeRegExpCompatSearchString ($s)
 	{
 
@@ -251,7 +286,6 @@ final class ControllerModel extends AbstractModel
 		return '('.mysqli_real_escape_string($this->databaseConnection, $s).')';
 
 	}
-
 
 	public function getGeneralSettingValue( $params )
 	{
@@ -279,8 +313,6 @@ final class ControllerModel extends AbstractModel
         $d=$this->freeQuery($query);
 		return $d ? $d[0]['value'] : null;
 	}
-
-
 
 }
 
