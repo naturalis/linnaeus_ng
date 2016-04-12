@@ -1274,7 +1274,6 @@ class Literature2Controller extends NsrController
 
 			return $l[0];
 		}
-
 	}
 
     private function getReferences($p)
@@ -1454,12 +1453,14 @@ class Literature2Controller extends NsrController
     		'languageId' => $this->getDefaultProjectLanguage(),
     		'literatureId' => $id
 		));
-
+		
 		foreach((array)$names as $key=>$val)
 		{
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
+			$names[$key]['name']=
+				$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'nametype'=>$val['nametype'] ) );
 		}
-		// NAMES
+
 
 		// PRESENCE
 		$presences = $this->models->Literature2Model->getReferenceLinksPresences(array(
@@ -1467,7 +1468,12 @@ class Literature2Controller extends NsrController
     		'languageId' => $this->getDefaultProjectLanguage(),
     		'literatureId' => $id
 		));
-		// PRESENCE
+
+		foreach((array)$presences as $key=>$val)
+		{
+			$presences[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+
 
 		// TRAITS
 		$d = $this->models->Literature2Model->getReferenceLinksTraits(array(
@@ -1482,10 +1488,10 @@ class Literature2Controller extends NsrController
 				array(
 					'group_id'=>$val['trait_group_id'],
 					'taxon_id'=>$val['taxon_id'],
-					'taxon'=>$val['taxon']
+					'taxon'=>$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) )
 				);
 		}
-		// TRAITS
+
 
 		// RDF > PASSPORTS
 		$passports = $this->models->Literature2Model->getReferenceLinksPassports(array(
@@ -1493,7 +1499,12 @@ class Literature2Controller extends NsrController
     		'languageId' => $this->getDefaultProjectLanguage(),
     		'literatureId' => $id
 		));
-		// RDF > PASSPORTS
+
+		foreach((array)$passports as $key=>$val)
+		{
+			$passports[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+
 
 		return array(
 			'names' => $names,
@@ -1591,7 +1602,6 @@ class Literature2Controller extends NsrController
 
     private function savePublicationType()
     {
-
 		$type=trim($this->rGetVal('type'));
 
 		if (empty($type))

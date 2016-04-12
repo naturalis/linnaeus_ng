@@ -6,7 +6,6 @@ final class Literature2Model extends AbstractModel
 
     public function __construct ()
     {
-
         parent::__construct();
 
         $this->connectToDatabase() or die(_('Failed to connect to database '.
@@ -14,7 +13,6 @@ final class Literature2Model extends AbstractModel
         	' with user ' . $this->databaseSettings['user'] . '. ' .
             mysqli_connect_error() . '. Correct the getDatabaseSettings() settings
         	in configuration/admin/config.php.'));
-
     }
 
     public function __destruct ()
@@ -25,7 +23,6 @@ final class Literature2Model extends AbstractModel
         }
         parent::__destruct();
     }
-
 
     public function getReferenceAuthors ($params)
     {
@@ -79,7 +76,6 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getAuthorAlphabet ($projectId)
     {
         if (!$projectId) {
@@ -113,7 +109,6 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getReference ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
@@ -145,7 +140,6 @@ final class Literature2Model extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
 
     public function getReferences ($params)
     {
@@ -197,19 +191,21 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getReferenceLinksNames ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-        if (is_null($projectId) || is_null($languageId) || is_null($literatureId)) {
+        if ( is_null($projectId) || is_null($languageId) || is_null($literatureId) )
+		{
 			return null;
 		}
 
-        $query = "select
+        $query = "
+			select
 				_a.taxon_id,
+				_p.rank_id as base_rank_id,
 				_a.name,
 				_b.nametype,
 				_c.language,
@@ -234,9 +230,14 @@ final class Literature2Model extends AbstractModel
 				on _a.taxon_id = _g.id
 				and _a.project_id=_g.project_id
 
-		where
-			_a.project_id = ".$projectId."
-			and _a.reference_id=".$literatureId;
+			left join %PRE%projects_ranks _p
+				on _g.project_id=_p.project_id
+				and _g.rank_id=_p.id
+
+			where
+				_a.project_id = ".$projectId."
+				and _a.reference_id=".$literatureId
+		;
 
         return $this->freeQuery($query);
     }
@@ -252,9 +253,10 @@ final class Literature2Model extends AbstractModel
 			return null;
 		}
 
-        $query = "elect
+        $query = "select
 				_a.taxon_id,
 				_g.taxon,
+				_p.rank_id as base_rank_id,
 				_a.presence_id,
 				_b.label as presence_label,
 				_a.reference_id
@@ -264,6 +266,10 @@ final class Literature2Model extends AbstractModel
 			left join %PRE%taxa _g
 				on _a.taxon_id = _g.id
 				and _a.project_id=_g.project_id
+
+			left join %PRE%projects_ranks _p
+				on _g.project_id=_p.project_id
+				and _g.rank_id=_p.id
 
 			left join %PRE%presence_labels _b
 				on _a.presence_id = _b.presence_id
@@ -288,6 +294,7 @@ final class Literature2Model extends AbstractModel
         $query = "select
 				_a.taxon_id,
 				_b.taxon,
+				_p.rank_id as base_rank_id,
 				_a.trait_group_id,
 				_c.sysname
 			from
@@ -296,6 +303,10 @@ final class Literature2Model extends AbstractModel
 			left join %PRE%taxa _b
 				on _a.project_id=_b.project_id
 				and _a.taxon_id=_b.id
+
+			left join %PRE%projects_ranks _p
+				on _b.project_id=_p.project_id
+				and _b.rank_id=_p.id
 
 			left join %PRE%traits_groups _c
 				on _a.project_id=_c.project_id
@@ -321,32 +332,35 @@ final class Literature2Model extends AbstractModel
 		}
 
         $query = "
-            select _b.taxon_id, _e.taxon, _d.title
+            select
+				_b.taxon_id,
+				_e.taxon,
+				_p.rank_id as base_rank_id,
+				_d.title
 			from
 				%PRE%rdf _a
 
-			left join
-				%PRE% content_taxa _b
+			left join %PRE% content_taxa _b
 				on _a.subject_id=_b.id
 				and _a.project_id=_b.project_id
 				and _b.language_id=".$languageId."
 
-			left join
-				%PRE% taxa _e
+			left join %PRE% taxa _e
 				on _b.taxon_id=_e.id
 				and _a.project_id=_e.project_id
 
-			left join
-				%PRE% pages_taxa _c
+			left join %PRE%projects_ranks _p
+				on _e.project_id=_p.project_id
+				and _e.rank_id=_p.id
+
+			left join %PRE% pages_taxa _c
 				on _b.page_id=_c.id
 				and _a.project_id=_c.project_id
 
-			left join
-				%PRE% pages_taxa_titles _d
+			left join %PRE% pages_taxa_titles _d
 				on _c.id=_d.page_id
 				and _c.project_id=_d.project_id
 				and _d.language_id=".$languageId."
-
 
 			where
 				_a.project_id=".$projectId."
@@ -360,10 +374,10 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getActors ($projectId)
     {
-        if (!$projectId) {
+        if (!$projectId)
+		{
 			return null;
 		}
 
@@ -459,8 +473,4 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
-
 }
-
-?>

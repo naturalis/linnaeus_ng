@@ -6,7 +6,6 @@ final class ActorsModel extends AbstractModel
 
     public function __construct ()
     {
-
         parent::__construct();
 
         $this->connectToDatabase() or die(_('Failed to connect to database '.
@@ -25,7 +24,6 @@ final class ActorsModel extends AbstractModel
         }
         parent::__destruct();
     }
-
 
     public function getCompanyAlphabet ($projectId)
     {
@@ -79,7 +77,6 @@ final class ActorsModel extends AbstractModel
         return $this->freeQuery($query);
 	}
 
-
     public function getAllActors ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
@@ -117,7 +114,6 @@ final class ActorsModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getActorNames ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
@@ -135,7 +131,8 @@ final class ActorsModel extends AbstractModel
 				_b.nametype,
 				_c.language,
 				_d.label as language_label,
-				_g.taxon
+				_g.taxon,
+				_p.rank_id as base_rank_id
 
 			from %PRE%names _a
 
@@ -155,6 +152,10 @@ final class ActorsModel extends AbstractModel
 				on _a.taxon_id = _g.id
 				and _a.project_id=_g.project_id
 
+			left join %PRE%projects_ranks _p
+				on _g.rank_id = _p.id
+				and _g.project_id=_p.project_id
+
     		where
     			_a.project_id = ".$projectId."
     			and (
@@ -164,8 +165,6 @@ final class ActorsModel extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
-
 
     public function getActorPresences ($params)
     {
@@ -183,7 +182,8 @@ final class ActorsModel extends AbstractModel
 				_g.taxon,
 				_a.presence_id,
 				_b.label as presence_label,
-				_a.reference_id
+				_a.reference_id,
+				_p.rank_id as base_rank_id
 
 			from %PRE%presence_taxa _a
 
@@ -196,6 +196,10 @@ final class ActorsModel extends AbstractModel
 				and _a.project_id=_b.project_id
 				and _b.language_id=".$languageId."
 
+			left join %PRE%projects_ranks _p
+				on _g.rank_id = _p.id
+				and _g.project_id=_p.project_id
+
 			where _a.project_id = ".$projectId."
 				and (
 				_a.actor_id=".$expertId." or
@@ -204,7 +208,6 @@ final class ActorsModel extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
 
     public function getActorPassports ($params)
     {
@@ -223,7 +226,9 @@ final class ActorsModel extends AbstractModel
 				_a.predicate,
 				_c.taxon,
 				_d.title,
-				_b.taxon_id
+				_b.taxon_id,
+				_p.rank_id as base_rank_id
+
 			from
 				%PRE%rdf _a
 
@@ -239,6 +244,11 @@ final class ActorsModel extends AbstractModel
 			left join %PRE%taxa _c
 				on _a.project_id = _b.project_id
 				and _b.taxon_id = _c.id
+
+			left join %PRE%projects_ranks _p
+				on _c.rank_id = _p.id
+				and _c.project_id=_p.project_id
+
 			where
 				_a.project_id = ".$projectId."
 				and _a.object_id=".$expertId."
@@ -248,7 +258,6 @@ final class ActorsModel extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
 
     public function getActorLiterature ($params)
     {
@@ -287,7 +296,4 @@ final class ActorsModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
 }
-
-?>

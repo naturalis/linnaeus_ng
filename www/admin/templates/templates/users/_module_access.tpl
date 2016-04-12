@@ -40,8 +40,8 @@ table tr .active-n {
     </tr>
     {assign "k" $k+1}
 {/foreach}
-</table>
 {/if}
+</table>
 
 <script type="text/JavaScript">
 $(document).ready(function()

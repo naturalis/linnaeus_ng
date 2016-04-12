@@ -2,31 +2,20 @@
 
 class TranslatorController
 {
-
-    public $usedModels = array(
-		'interface_texts',
-		'interface_translations'
-    );
-
-	private $_environment=null;
-	private $_languageid=null;
-	private $models;
-	private $_text=null;
-	private $_translation=null;
+	private $_environment;
+	private $_languageid;
+	private $_model;
+	private $_text;
+	private $_translation;
 	private $_didtranslate=false;
 	private $_isnewstring=false;
 	private $_newStrings=array();
 
-    public function __construct( $env, $languageid )
+    public function __construct( $p )
     {
-		$this->_environment=$env;
-		$this->_languageid=$languageid;
-		$this->loadModels();
-    }
-
-    public function __destruct ()
-    {
-		//$this->saveNewStrings();
+		$this->_model= isset( $p['model'] ) ? $p['model'] : null ;
+		$this->_environment= isset( $p['envirnonment'] ) ? $p['envirnonment'] : null ;
+		$this->_languageid= isset( $p['language_id'] ) ? $p['language_id'] : null ;
     }
 
     public function translate( $s )
@@ -76,19 +65,6 @@ class TranslatorController
 		}
     }
 	
-    private function loadModels ()
-    {
-        $this->models = new stdClass();
-
-        require_once dirname(__FILE__) . '/../models/Table.php';
-
-        foreach ((array) $this->usedModels as $key)
-		{
-            $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            $this->models->$t = new Table($key);
-        }
-    }
-
     private function doTranslate()
     {
 		$this->_didtranslate=false;
@@ -101,13 +77,15 @@ class TranslatorController
 			return;
 
         // get id of the text
-        $i = $this->models->InterfaceTexts->_get(array(
-            'id' => array(
-                'text' => $this->_text,
-                'env' => $this->_environment
-            ),
-            'columns' => 'id'
-        ));
+        $i = $this->_model->freeQuery("
+			select
+				id
+			from
+				%PRE%interface_texts
+			where
+				text = '" .   $this->escapeString( $this->_text ) . "'
+				and env = '" .  $this->escapeString( $this->_environment ) . "'
+        ");
 
         // if not found, return unchanged
         if (empty($i[0]['id']))
@@ -117,16 +95,16 @@ class TranslatorController
 		}
 	
 		// fetch appropriate translation
-		$it = $this->models->InterfaceTranslations->_get(
-			array(
-				'id' => array(
-					'interface_text_id' => $i[0]['id'],
-					'language_id' => $this->_languageid
-				),
-				'columns' => 'id,translation',
-				'limit' => 1
-			));
-			
+        $it = $this->_model->freeQuery("
+			select
+				id,translation
+			from
+				%PRE%interface_translations
+			where
+				interface_text_id = " . $i[0]['id'] . " 
+				and language_id = ". $this->_languageid ."
+        ");
+
 		// if not found, return unchanged
 		if ( empty($it[0]['id']) )
 			return;
@@ -138,8 +116,7 @@ class TranslatorController
 
 	private function rememberNewString()
 	{
-		if (!$this->_didtranslate)
-			array_push($this->_newStrings,$this->_text);
+		if (!$this->_didtranslate) array_push($this->_newStrings,$this->_text);
 	}
 
     private function saveNewStrings()
@@ -148,13 +125,31 @@ class TranslatorController
 
 		foreach($this->_newStrings as $text)
 		{
-			$d=$this->models->InterfaceTexts->_get(array('id'=>array('text' => $text,'env' => $this->_environment)));
+			$d=$this->_model->freeQuery("
+				select
+					id
+				from
+					%PRE%interface_texts
+				where
+					text = '" . $this->escapeString( $text ) . "'
+					and env = '" . $this->escapeString( $this->_environment ) . "'
+			");
 
 			if (!$d)
 			{
-				$this->models->InterfaceTexts->save(array('id' => null,'text' => $text,'env' => $this->_environment));
+				$d=$this->_model->freeQuery("
+					insert into %PRE%interface_texts
+						(text,env)
+					values
+						('" . $this->escapeString( $text ) . "','" . $this->escapeString( $this->_environment ) . "')
+				");
 			}
 		}
     }
+	
+	private function escapeString( $s )
+	{
+		return mysqli_real_escape_string(  $this->_model->databaseConnection, $s );
+	}
 
 }

@@ -169,7 +169,8 @@ final class UsersModel extends AbstractModel
 				_a.item_type,
 				_b.taxon,
 				_b.rank_id,
-				_b.id as taxon_id
+				_b.id as taxon_id,
+				_p.rank_id as base_rank_id
 
 			from 
 				%PRE%user_item_access _a
@@ -177,7 +178,11 @@ final class UsersModel extends AbstractModel
 			left join %PRE%taxa _b
 				on _a.item_id = _b.id
 				and _a.item_type = 'taxon'
-			
+
+			left join %PRE%projects_ranks _p
+				on _b.rank_id = _p.id
+				and _b.project_id=_p.project_id
+		
 			where
 				_a.project_id = " . $project_id."
 				and _a.user_id = " . $user_id;

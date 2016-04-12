@@ -64,10 +64,9 @@ table.collaborators th {
         {if $non_users|@count>0}
         <tr><td colspan="9"></td></tr>
         <tr><td colspan="9"><h4 class="inlineHeader">Users currently not assigned to {$session.admin.project.sys_name}</h4></td></tr>
-        {/if}
-    
         {table_head}
-    
+        {/if}
+
         {foreach $non_users v}
         {if $v.hidden!=true}
             {table_row data=$v}

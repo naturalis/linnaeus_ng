@@ -6,7 +6,6 @@ class MatrixKeyModel extends AbstractModel
 
     public function __construct ()
     {
-
         parent::__construct();
 
         $this->connectToDatabase() or die(_('Failed to connect to database '.
@@ -45,13 +44,18 @@ class MatrixKeyModel extends AbstractModel
 				$taxa+=$this->freeQuery( "
 					select
 						_b.id,
-						_b.taxon
+						_b.taxon,
+						_c.rank_id as base_rank_id
 			
 					from %PRE%matrices_taxa _a
 			
 					left join %PRE%taxa _b
 						on _a.project_id=_b.project_id
 						and _a.taxon_id = _b.id
+
+					left join %PRE%projects_ranks _c
+						on _b.project_id=_c.project_id
+						and _b.rank_id = _c.id
 
 					right join %PRE%taxon_quick_parentage _sq
 						on _a.taxon_id = _sq.taxon_id
@@ -84,14 +88,19 @@ class MatrixKeyModel extends AbstractModel
 			$taxa=$this->freeQuery( "
 				select
 					_b.id,
-					_b.taxon
+					_b.taxon,
+					_c.rank_id as base_rank_id
 		
 				from %PRE%matrices_taxa _a
 		
 				left join %PRE%taxa _b
 					on _a.project_id=_b.project_id
 					and _a.taxon_id = _b.id
-		
+
+				left join %PRE%projects_ranks _c
+					on _b.project_id=_c.project_id
+					and _b.rank_id = _c.id		
+
 				where 
 					_a.project_id = ". $project_id ."
 					and _a.matrix_id = ". $matrix_id."
@@ -110,7 +119,7 @@ class MatrixKeyModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
 		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
-		
+
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
 
@@ -127,6 +136,8 @@ class MatrixKeyModel extends AbstractModel
 						_b.id,
 						_b.taxon,
 						_c.keypath_endpoint,
+						_c.lower_taxon,
+						_c.rank_id as base_rank_id,
 						if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
 			
 					from %PRE%taxa _b
@@ -166,13 +177,14 @@ class MatrixKeyModel extends AbstractModel
 		}
 		else
 		{
-		
 			$taxa=$this->freeQuery( "
 				select
 				
 					_b.id,
 					_b.taxon,
+					_c.lower_taxon,
 					_c.keypath_endpoint,
+					_c.rank_id as base_rank_id,
 					if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
 		
 				from %PRE%taxa _b
@@ -188,13 +200,13 @@ class MatrixKeyModel extends AbstractModel
 	
 				where 
 					_b.project_id = ". $project_id ."
-	
+
 				order by
 					_b.taxon
 			");
-
+		
 		}
-
+		
 		return $taxa;
 
     }
