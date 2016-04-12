@@ -36,6 +36,7 @@ class VersatileExportController extends Controller
 	private $name_parts;
 	private $ancestors;
 	private $doSynonyms;
+	private $doHybridMarker;
 	private $field_sep;
 	private $new_line;
 	private $no_quotes;
@@ -71,6 +72,23 @@ class VersatileExportController extends Controller
 	
 	private $EOFMarker='(end of file)';
 
+	private $columnHeaders=[
+		'sci_name'=>'wetenschappelijke_naam',
+		'dutch_name'=>'nederlandse_naam',
+		'rank'=>'rang',
+		'nsr_id'=>'nsr_id',
+		'presence_status'=>'voorkomens_status',
+		'habitat'=>'habitat',
+		'concept_url'=>'concept_url',
+		'database_id'=>'database_id',
+		'uninomial'=>'uninomial',
+		'specific_epithet'=>'specific_epithet',
+		'infra_specific_epithet'=>'infra_specific_epithet',
+		'authorship'=>'authorship',
+		'name_author'=>'name_author',
+		'authorship_year'=>'authorship_year',
+	];
+
 
     public function __construct ()
     {
@@ -103,6 +121,7 @@ class VersatileExportController extends Controller
 			$this->setSelectedRanks( $this->rGetVal('selected_ranks') );
 			$this->setRankOperator( $this->rGetVal('rank_operator') );
 			$this->setCols( $this->rGetVal('cols') );
+			$this->setDoHybridMarker( $this->rGetVal('add_hybrid_marker') );
 			$this->setNameParts( $this->rGetVal('name_parts') );
 			$this->setAncestors( $this->rGetVal('ancestors') );
 			$this->setDoSynonyms( $this->rGetVal('synonyms') );
@@ -174,16 +193,17 @@ class VersatileExportController extends Controller
 
 	private function doMainQuery()
 	{
+
 		$this->query_bit_name_parts='';
 		
 		if ( $this->hasCol( 'name_parts' ) ) 
 		{
 			foreach($this->getNameParts() as $key=>$val)
 			{
-				$this->query_bit_name_parts.='_names.'.$key.' as '.$key.', ';
+				$this->query_bit_name_parts.='_names.'.$key.' as ' .  $this->columnHeaders[$key] . ', ';
 			}
 		}
-		
+
 		$ranks_clause="";
 		if ( !$this->getAllRanks() )
 		{
@@ -196,20 +216,22 @@ class VersatileExportController extends Controller
 		{
 			$presence_status_clause="and _h.index_label in ('".implode("','",$p)."') ";
 		}
+		
 
 		$this->query="
 			select
-				".( $this->hasCol( 'sci_name' ) ? " _t.taxon as wetenschappelijke_naam, " : "" )."
+				".( $this->hasCol( 'sci_name' ) ? " _t.taxon as " . $this->columnHeaders['sci_name'] . ", " : "" )."
 				".( $this->query_bit_name_parts )."
-				".( $this->hasCol( 'dutch_name' ) ? " _z.name as nederlandse_naam, " : "" )."
-				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as rang, " : "" )."
-				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as nsr_id, " : "" )."
-				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as voorkomens_status, " : "" )."
-				".( $this->hasCol( 'habitat' ) ? " _hab.label as habitat, " : "" )."
-				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as concept_url, " : "" )."
-				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as database_id, " : "" )."
+				".( $this->hasCol( 'dutch_name' ) ? " _z.name as " . $this->columnHeaders['dutch_name'] . ", " : "" )."
+				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."
+				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as " . $this->columnHeaders['nsr_id'] . ", " : "" )."
+				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as " . $this->columnHeaders['presence_status'] . ", " : "" )."
+				".( $this->hasCol( 'habitat' ) ? " _hab.label as " . $this->columnHeaders['habitat'] . ", " : "" )."
+				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as " . $this->columnHeaders['concept_url'] . ", " : "" )."
+				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as " . $this->columnHeaders['database_id'] . ", " : "" )."
 				_q.taxon_id as _taxon_id,
-				_t.parent_id as _parent_id
+				_t.parent_id as _parent_id,
+				_r.id as _base_rank_id
 
 			from %PRE%taxon_quick_parentage _q
 			
@@ -287,6 +309,15 @@ class VersatileExportController extends Controller
 			";
 
 		$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );		
+		
+		if ( $this->hasCol( 'sci_name' ) && $this->getDoHybridMarker() )
+		{
+			foreach((array)$this->names as $key=>$val)
+			{
+				$this->names[$key]['wetenschappelijke_naam']=
+					$this->addHybridMarker( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
+			}
+		}
 
 	}
 
@@ -734,6 +765,16 @@ class VersatileExportController extends Controller
 	private function getDoSynonyms()
 	{
 		return $this->doSynonyms;
+	}
+
+	private function setDoHybridMarker( $state )
+	{
+		$this->doHybridMarker=isset($state) && $state=='on';
+	}
+
+	private function getDoHybridMarker()
+	{
+		return $this->doHybridMarker;
 	}
 
 	private function setSelectedSynonymTypes( $selected_synonym_types )

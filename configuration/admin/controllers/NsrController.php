@@ -230,13 +230,14 @@ class NsrController extends Controller
 			)));
 
 			$c['is_deleted']=($d[0]['is_deleted']==1);
+
+			if ( isset($c['label']) )
+				$c['label']=$this->addHybridMarker( array( 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'] ) );
+			if ( isset($c['parent']['label']) )
+				$c['parent']['label']=$this->addHybridMarker( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
+	
 		}
 		
-		$c['taxon']=$this->addHybridMarker( array( 'name'=>$c['taxon'],'base_rank_id'=>$c['base_rank'] ) );
-		$c['label']=$this->addHybridMarker( array( 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'] ) );
-		$c['parent']['taxon']=$this->addHybridMarker( array( 'name'=>$c['parent']['taxon'],'base_rank_id'=>$c['parent']['base_rank'] ) );
-		$c['parent']['label']=$this->addHybridMarker( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
-
 		return $c;
 	}
 
