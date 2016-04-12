@@ -145,6 +145,7 @@ class NsrTreeController extends NsrController
 
 		foreach((array)$taxa as $key=>$val)
 		{
+
 			if ($count=='taxon') 
 			{
 				$d=$this->models->NsrTreeModel->getTaxonCount(array(
@@ -196,7 +197,9 @@ class NsrTreeController extends NsrController
 				}
 			}
 
+			$val['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
+
 
 			//unset($val['parent_id']);
 			unset($val['is_hybrid']);

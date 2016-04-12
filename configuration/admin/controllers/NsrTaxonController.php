@@ -1041,8 +1041,8 @@ class NsrTaxonController extends NsrController
 			$error=array('subordo','ordo','superfamilia');
 		}
 		else
-		if (($child_base_rank==superfamilia && $parent_base_rank!=ORDO_RANK_ID) &&
-			($child_base_rank==superfamilia && $parent_base_rank!=SUBORDO_RANK_ID))
+		if (($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=ORDO_RANK_ID) &&
+			($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID))
 		{
 			// superfamilia moet onder orde of subordo
 			$error=array('ordo','subordo');
@@ -1054,17 +1054,17 @@ class NsrTaxonController extends NsrController
 			$error=array('ordo');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='subclassis') &&
-			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='classis') &&
-			($ranks[$child_base_rank]['rank']=='ordo' && $ranks[$parent_base_rank]['rank']!='superorder')
+		if (($child_base_rank==ORDO_RANK_ID && $parent_base_rank!=SUBCLASSIS_RANK_ID) &&
+			($child_base_rank==ORDO_RANK_ID && $parent_base_rank!=CLASSIS_RANK_ID) &&
+			($child_base_rank==ORDO_RANK_ID && $parent_base_rank!=SUPERORDER_RANK_ID)
 			)
 		{
 			// orde moet onder subklasse, klasse of superorder
 			$error=array('subclassis','classis','superorder');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='classis') &&
-			($ranks[$child_base_rank]['rank']=='superorder' && $ranks[$parent_base_rank]['rank']!='subclassis'))
+		if (($child_base_rank==SUPERORDER_RANK_ID && $parent_base_rank!=CLASSIS_RANK_ID) &&
+			($child_base_rank==SUPERORDER_RANK_ID && $parent_base_rank!=SUBCLASSIS_RANK_ID))
 		{
 			// superordo moet onder klasse of subclassis
 			$error=array('classis','subclassis');

@@ -308,7 +308,7 @@ class SpeciesModel extends AbstractModel
 					)
 				) as name,
 				_f.rank_id,
-				ifnull(_g.label,_gg.label) as rank_label,
+				ifnull(_g.label,_r.rank) as rank_label,
 				_k.uninomial,
 				_k.specific_epithet,
 				_k.infra_specific_epithet,
@@ -331,10 +331,8 @@ class SpeciesModel extends AbstractModel
 				and _a.project_id = _g.project_id
 				and _g.language_id=". $languageId."
 
-			left join %PRE%labels_projects_ranks _gg
-				on _a.rank_id=_gg.project_rank_id
-				and _a.project_id = _gg.project_id
-				and _gg.language_id=". LANGUAGE_ID_DUTCH."
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -851,6 +849,7 @@ class SpeciesModel extends AbstractModel
 				SQL_CALC_FOUND_ROWS
 				_m.id,
 				_m.taxon_id,
+				_f.rank_id as base_rank_id,
 				file_name as image,
 				file_name as thumb,
 				_k.taxon,
