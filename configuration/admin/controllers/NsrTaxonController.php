@@ -371,6 +371,7 @@ class NsrTaxonController extends NsrController
 		if (isset($concept))
 		{
 			$this->smarty->assign('concept',$concept);
+			$this->smarty->assign('ranks',$this->newGetProjectRanks());
 			$this->smarty->assign('preferrednames',$this->getPreferredNames($concept['id']));
 			$this->smarty->assign('preferrednameid',$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']);
 			$this->smarty->assign('alternativenameid',$this->_nameTypeIds[PREDICATE_ALTERNATIVE_NAME]['id']);

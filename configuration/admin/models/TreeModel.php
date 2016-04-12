@@ -17,7 +17,7 @@ final class TreeModel extends AbstractModel
 
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         if ($this->databaseConnection)
 		{
@@ -27,7 +27,7 @@ final class TreeModel extends AbstractModel
     }
 
 
-	public function getTreeTop ($projectId)
+	public function getTreeTop($projectId)
     {
          if (!$projectId) {
 			return null;
@@ -56,7 +56,7 @@ final class TreeModel extends AbstractModel
         return $this->freeQuery($query);
 	}
 
-    public function getTreeNode ($params)
+    public function getTreeNode($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -103,7 +103,7 @@ final class TreeModel extends AbstractModel
     }
 
 
-    public function countChildrenTaxon ($params)
+    public function countChildrenTaxon($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $parentId = isset($params['parentId']) ? $params['parentId'] : null;
@@ -129,7 +129,7 @@ final class TreeModel extends AbstractModel
 
 
 
-    public function countChildrenSpecies ($params)
+    public function countChildrenSpecies($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $parentId = isset($params['parentId']) ? $params['parentId'] : null;
@@ -166,7 +166,7 @@ final class TreeModel extends AbstractModel
     }
 
 
-    public function hasChildren ($params)
+    public function hasChildren($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $parentId = isset($params['parentId']) ? $params['parentId'] : null;
@@ -190,5 +190,3 @@ final class TreeModel extends AbstractModel
     }
 
 }
-
-?>
