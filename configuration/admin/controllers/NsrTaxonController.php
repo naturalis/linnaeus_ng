@@ -856,6 +856,10 @@ class NsrTaxonController extends NsrController
 
 		foreach ((array) $taxa as $key => $val)
 		{
+
+			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['label']=$this->addHybridMarker( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+
 			if ($val['base_rank_id']==GENUS_RANK_ID)
 			{
 				$taxa[$key]['inheritable_name']=$val['uninomial'];
@@ -883,6 +887,7 @@ class NsrTaxonController extends NsrController
 			{
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'');
 			}
+			
 		}
 
 		return $taxa;

@@ -85,7 +85,7 @@ class MatrixKeyController extends Controller
 
 	private function setMediaController()
 	{
-        $this->_mc = new MediaController();
+        $this->_mc = new MediaController( ['module_settings_reader'=>$this->moduleSettings] );
         $this->_mc->setModuleId($this->getCurrentModuleId());
         $this->_mc->setItemId($this->rGetId());
         $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
@@ -554,7 +554,9 @@ class MatrixKeyController extends Controller
         $this->checkAuthorisation();
 
         if ($this->getCurrentMatrixId() == null)
+		{
             $this->redirect('matrices.php');
+		}
 
         $this->setPageName($this->translate('Adding taxa'));
 
@@ -590,8 +592,8 @@ class MatrixKeyController extends Controller
             }
 
 
-            if ($this->rGetVal('action') != 'repeat') {
-
+            if ($this->rGetVal('action') != 'repeat')
+			{
                 $this->redirect('edit.php');
             }
 
@@ -613,6 +615,11 @@ class MatrixKeyController extends Controller
 		}
 
         $taxa=$this->models->MatrixkeyModel->getAllTaxaAndMatrixPresence( $d );
+
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
 
 		$this->smarty->assign('taxa', $taxa);
 
@@ -1962,6 +1969,11 @@ class MatrixKeyController extends Controller
 		}
 
 		$taxa=$this->models->MatrixkeyModel->getTaxaInMatrix( $d );
+		
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
 
         return isset($taxa) ? $taxa : null;
     }

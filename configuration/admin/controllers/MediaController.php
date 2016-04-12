@@ -40,6 +40,8 @@ class MediaController extends Controller
     protected $_files;
     protected $mediaId;
 
+    protected $_moduleSettingsReader;
+
     // Used to setup RS
     public static $rsSetupParameters = array(
         'rs_base_url' => array(
@@ -145,10 +147,10 @@ class MediaController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct ( $p=null )
     {
-        parent::__construct();
-        $this->initialize();
+        parent::__construct( $p );
+        $this->initialize( $p );
      }
 
     public function __destruct ()
@@ -156,16 +158,25 @@ class MediaController extends Controller
         parent::__destruct();
     }
 
-    private function initialize ()
+    private function initialize( $p )
     {
         $this->moduleId = $this->rHasVal('module_id') ? $this->rGetVal('module_id') : -1;
         $this->itemId = $this->rHasVal('item_id') ? $this->rGetVal('item_id') : -1;
-        $this->languageId = $this->rHasVar('language_id') ?
-            $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
+        $this->languageId = $this->rHasVar('language_id') ? $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
 
+		if ( isset($p['module_settings_reader']) )
+		{
+			$this->_moduleSettingsReader=$p['module_settings_reader'];
+		}
+		else
+		{
+			$this->_moduleSettingsReader=new ModuleSettingsReaderController();
+		}
+		
         $this->setRsSettings();
 
-        if (!isset($_SESSION['admin']['user']['media']['display'])) {
+        if (!isset($_SESSION['admin']['user']['media']['display']))
+		{
             $_SESSION['admin']['user']['media']['display'] = 'grid';
         }
     }
@@ -187,8 +198,7 @@ class MediaController extends Controller
 
     public function setLanguageId ($id)
     {
-        $this->languageId = isset($id) && is_numeric($id) ?
-            $id : $this->getDefaultProjectLanguage();
+        $this->languageId = isset($id) && is_numeric($id) ? $id : $this->getDefaultProjectLanguage();
     }
 
     private function addUploaded ($e)
@@ -198,37 +208,35 @@ class MediaController extends Controller
 
     private function setRsSettings ()
     {
-        $msr = new ModuleSettingsReaderController();
-
-        $this->_rsBaseUrl = $msr->getModuleSetting(array(
+        $this->_rsBaseUrl = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_base_url',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsUserKey = $msr->getModuleSetting(array(
+        $this->_rsUserKey = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_user_key',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsCollectionId = $msr->getModuleSetting(array(
+        $this->_rsCollectionId = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_collection_id',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsUploadApi = $msr->getModuleSetting(array(
+        $this->_rsUploadApi = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_upload_api',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsNewUserApi = $msr->getModuleSetting(array(
+        $this->_rsNewUserApi = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_new_user_api',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsSearchApi = $msr->getModuleSetting(array(
+        $this->_rsSearchApi = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_search_api',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsUserName = $msr->getModuleSetting(array(
+        $this->_rsUserName = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_user_name',
             'module' => $this->controllerPublicName
         ));
-        $this->_rsPassword = $msr->getModuleSetting(array(
+        $this->_rsPassword = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_password',
             'module' => $this->controllerPublicName
         ));

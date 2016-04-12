@@ -2,7 +2,9 @@
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+
 include_once ('UserRightsController.php');
+include_once ('TranslatorController.php');
 
 class Controller extends BaseClass
 {
@@ -1631,6 +1633,7 @@ class Controller extends BaseClass
      */
     private function preparePage ()
     {
+
         $this->setBreadcrumbs();
 
         $this->smarty->assign('session', $_SESSION);
@@ -2262,7 +2265,6 @@ class Controller extends BaseClass
             'url' => $cp
         );
 
-
         // controller name can be overridden
         $controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
         $controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
@@ -2373,7 +2375,6 @@ class Controller extends BaseClass
         $this->_smartySettings = $this->config->getSmartySettings();
     }
 
-
     private function checkWriteableDirectories()
     {
         $paths = array(
@@ -2409,18 +2410,21 @@ class Controller extends BaseClass
 
 	private function initTranslator()
 	{
-		include_once ('TranslatorController.php');
-		$this->translator = new TranslatorController('admin',$this->getDefaultProjectLanguage());
+		$this->translator = new TranslatorController([
+			'model' => $this->models->Taxa,
+			'envirnonment'=>'admin',
+			'language_id'=>$this->getDefaultProjectLanguage()
+		]);
 	}
 
-	public function translate($content)
+	public function translate( $content )
 	{
-		return $this->translator->translate($content);
+		return $this->translator->translate( $content );
 	}
 
-	public function javascriptTranslate($content)
+	public function javascriptTranslate( $content )
 	{
-		return $this->translator->translate($content);
+		return $this->translator->translate( $content );
 	}
 
 	public function smartyTranslate($params, $content, &$smarty, &$repeat)
@@ -2447,7 +2451,6 @@ class Controller extends BaseClass
 	 * e.g. the methods for ModuleSettingsReaderController are available in ModuleSettingsModel rather
 	 * than in its own model.
 	 */
-	// REFAC2015  doesn't seem to be used anywhere
 	protected function loadExternalModel ($model)
 	{
         if (file_exists(dirname(__FILE__) . "/../models/{$model}.php")) {
@@ -2556,7 +2559,7 @@ class Controller extends BaseClass
         return false;
     }
 
-   protected function getCurrentModuleId ()
+	protected function getCurrentModuleId ()
     {
 		$d = $this->models->Modules->_get(array(
             "id" => array("controller" => $this->getControllerBaseName())
@@ -2564,7 +2567,6 @@ class Controller extends BaseClass
 
 		return $d ? $d[0]['id'] : false;
     }
-
 
 	protected function setRankIdConstants()
 	{
@@ -2597,6 +2599,12 @@ class Controller extends BaseClass
 		$name=isset($p['name']) ? $p['name'] : null;
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+		$nametype=isset($p['nametype']) ? $p['nametype'] : null;
+		
+		if ( isset($nametype) && $nametype!=PREDICATE_VALID_NAME)
+		{
+			return $name;
+		}
 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{
