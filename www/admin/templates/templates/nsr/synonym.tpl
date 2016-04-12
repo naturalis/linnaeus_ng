@@ -62,26 +62,43 @@
         <input type="hidden" id="name_name" value="" />
     </td></tr>
 
-
 	<tr><th colspan="2">&nbsp;</td></tr>
-	<tr><th>type:
-    
-    
-    
-    </th><td>
-		<select id="name_type_id" mandatory="mandatory" label="type" >
-			<option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
-		{foreach from=$nametypes item=v key=k}
-		{if !$v.noNameParts}
-			<option
-            	value="{$v.id}"
-                {if $v.id==$name.type_id}selected="selected"{/if}
-                {if $hasvalidname && $v.id==$validnameid && $v.id!=$name.type_id}disabled="disabled"{/if}
-                >{$v.nametype_label}</option>
-		{/if}
-		{/foreach}
-		</select> *
-	</td></tr>
+
+	<tr>
+    	<th>type:</th>
+        <td>
+            <select id="name_type_id" mandatory="mandatory" label="type" >
+                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
+            {foreach from=$nametypes item=v key=k}
+            {if !$v.noNameParts}
+                <option
+                    value="{$v.id}"
+                    {if $v.id==$name.type_id}selected="selected"{/if}
+                    {if $hasvalidname && $v.id==$validnameid && $v.id!=$name.type_id}disabled="disabled"{/if}
+                    >{$v.nametype_label}</option>
+            {/if}
+            {/foreach}
+            </select> *
+		</td>
+	</tr>
+
+    <tr>
+    	<th>rang:</th>
+        <td>
+            {foreach from=$ranks item=v}{if $v.id==$name.rank_id}{$v.label}{/if}{/foreach}
+			{if $name.type_id!=$validnameid}
+                <select id="rank_id">
+                <option value="" {if $name.rank_id==''} selected="selected"{/if}>n.v.t.</option>
+                {foreach from=$ranks item=v}
+                <option value="{$v.id}" {if $v.id==$name.rank_id} selected="selected"{/if}>{$v.label}</option>
+                {/foreach}
+                </select>
+            {/if}
+            BUT IS ISN't SAVED YET!
+        </td>
+    </tr>
+
+
 
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>literatuur:</th><td>
