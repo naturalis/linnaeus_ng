@@ -2592,7 +2592,7 @@ class Controller extends BaseClass
 			else
 			{
 				$ied=explode(' ', $name, 2);
-				return $ied[0]. '  ' .$this->_hybridMarker . $ied[1];
+				return $ied[0]. ' ' .$this->_hybridMarker . $ied[1];
 			}
 		}
 		else

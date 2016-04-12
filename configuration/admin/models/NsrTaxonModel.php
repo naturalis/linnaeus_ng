@@ -392,16 +392,14 @@ final class NsrTaxonModel extends AbstractModel
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
-		if( !isset( $project_id ) )
-		{
-			return;
-		}
+		if( is_null( $project_id ) ) return;
 		
 		$query="
 			select
 				_a.id,
 				_a.taxon,
 				_q.rank,
+				_q.id as base_rank_id,
 				concat(_user.first_name,' ',_user.last_name) as deleted_by,
 				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
 			

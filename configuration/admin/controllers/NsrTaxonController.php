@@ -808,9 +808,14 @@ class NsrTaxonController extends NsrController
 
 	private function getDeletedSpeciesList()
 	{
-		return $this->models->NsrTaxonModel->getDeletedSpeciesList(array(
+		$taxa=$this->models->NsrTaxonModel->getDeletedSpeciesList(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+		return $taxa;
 	}
 
 	private function getSpeciesList($p)

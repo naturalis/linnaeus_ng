@@ -277,8 +277,14 @@ function doSubmit()
 			<h4>Standaardkolommen</h4>
             <table>
                 <tr>
-                    <td><input class=col id=col_sci_name type=checkbox name=cols[sci_name] checked="checked" /></td>
-                    <td><label for=col_sci_name>wetenschappelijke naam</label></td>
+                    <td><input class=col id=col_sci_name type=checkbox name=cols[sci_name] checked="checked" onclick="
+                        $( '.hybrid_options' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) ) 
+                    "/></td>
+                    <td><label for=col_sci_name>wetenschappelijke naam</label>
+                    <div class=hybrid_options style="display:none">
+                    <label><input class=hybrid_options id=add_hybrid_marker type=checkbox name=add_hybrid_marker checked="checked" /> × toevoegen aan hybriden</label><br />
+                    </div>
+                    </td>
                 </tr>
                 <tr>
                     <td><input class=col id=col_dutch_name type=checkbox name=cols[dutch_name] checked="checked" /></td>
@@ -316,12 +322,12 @@ function doSubmit()
                     " /></td>
                     <td><label for=col_nameparts>losse naamdelen<span class=remark> (indien beschikbaar!)</span></label>
                     <div class=namepart style="display:none">
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[uninomial] checked=checked>uninomial</label><br />
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[specific_epithet] checked=checked>specific epithet</label><br />
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[infra_specific_epithet] checked=checked>infra specific epithet</label><br />
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship] checked=checked>authorship</label><br />
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[name_author]>authorship author</label><br />
-                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship_year]>authorship year</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[uninomial] checked=checked> uninomial</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[specific_epithet] checked=checked> specific epithet</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[infra_specific_epithet] checked=checked> infra specific epithet</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship] checked=checked> authorship</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[name_author]> authorship author</label><br />
+                    <label><input class=namepart disabled=disabled type=checkbox name=name_parts[authorship_year]> authorship year</label><br />
                     <span class=remark>(geldt ook voor synoniemen, als die ook geëxporteerd worden)</span>
                     </div>
                     </td>
@@ -333,13 +339,13 @@ function doSubmit()
                     " /></td>
                     <td><label for=col_ancestry>taxonomische ouders</label>
                     <div class=ancestry style="display:none">
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[rijk] checked=checked value="{$smarty.const.REGNUM_RANK_ID}" />rijk</label><br />
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[phylum] checked=checked value="{$smarty.const.PHYLUM_RANK_ID}" />phylum</label><br />
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[klasse] checked=checked value="{$smarty.const.CLASSIS_RANK_ID}" />klasse</label><br />
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[orde] checked=checked value="{$smarty.const.ORDO_RANK_ID}" />orde</label><br />
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[familie] checked=checked value="{$smarty.const.FAMILIA_RANK_ID}" />familie</label><br />
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[genus] checked=checked value="{$smarty.const.GENUS_RANK_ID}" />genus</label><br />
-                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[species] checked=checked value="{$smarty.const.SPECIES_RANK_ID}" />species</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[rijk] checked=checked value="{$smarty.const.REGNUM_RANK_ID}" /> rijk</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[phylum] checked=checked value="{$smarty.const.PHYLUM_RANK_ID}" /> phylum</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[klasse] checked=checked value="{$smarty.const.CLASSIS_RANK_ID}" /> klasse</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[orde] checked=checked value="{$smarty.const.ORDO_RANK_ID}" /> orde</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[familie] checked=checked value="{$smarty.const.FAMILIA_RANK_ID}" /> familie</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[genus] checked=checked value="{$smarty.const.GENUS_RANK_ID}" /> genus</label><br />
+                    <label><input class=ancestry disabled=disabled type=checkbox name=ancestors[species] checked=checked value="{$smarty.const.SPECIES_RANK_ID}" /> species</label><br />
                     <span class=remark> (worden, indien van toepassing, opgenomen als extra cellen aan het eind van iedere regel)</span>
                     </div>
                     </td>
@@ -494,6 +500,7 @@ $(document).ready(function()
 	$( '#parent_taxon_id' ).val( {$branch_top.id} );
 	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
 	{/if}
+	$('#col_sci_name').trigger('click').prop('checked',true);
 });
 </script>
 
