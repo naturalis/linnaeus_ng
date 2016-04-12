@@ -58,7 +58,7 @@ class TraitsTaxonController extends TraitsController
     public function taxonAction()
     {
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Taxon trait data'));
+		$this->setPageName( $this->translate('Taxon trait data') );
 
 		//$this->isFormResubmit()
 		//q( $this->requestData );
@@ -110,10 +110,10 @@ class TraitsTaxonController extends TraitsController
 
 		if ($this->rHasVal('action','get_taxon_trait'))
 		{
-			$d=$this->getTaxonValues($this->rGetId());
+			$d=$this->getTaxonValues( $this->rGetAll() );
 
 			$this->smarty->assign('returnText',json_encode(array(
-				'trait'=>$this->getTraitgroupTrait($this->rGetId()),
+				'trait'=>$this->getTraitgroupTrait( $this->rGetAll() ),
 				'taxon_values'=>isset($d[0]) ? $d[0] : null,
 				'default_project_language' => $this->getDefaultProjectLanguage()
 			)));

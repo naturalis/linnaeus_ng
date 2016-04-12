@@ -142,7 +142,7 @@ li.values:hover {
 </script>
 
 <script id="stringfree_template_two" language="text">
-<textarea class="__stringfree" style="width:100%;height:350px" name="values[]">%VALUE%</textarea>
+<textarea class="__stringfree" style="width:100%;height:50px" name="values[]">%VALUE%</textarea>
 </script>
 
 <script id="datefree_template_one" language="text">

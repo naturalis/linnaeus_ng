@@ -417,7 +417,7 @@ class KeyController extends Controller
 	* @return void
 	* @access public
 	*/
-    public function choiceEditAction ()
+    public function choiceEditAction()
     {
 		// create a new choice when no id is specified
         if (!$this->rHasId())
@@ -563,7 +563,7 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-    public function contentsAction ()
+    public function contentsAction()
     {
         $this->checkAuthorisation();
 
@@ -580,7 +580,7 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-    public function insertAction ()
+    public function insertAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
@@ -686,25 +686,20 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-    public function mapAction ()
+    public function mapAction()
     {
         $this->checkAuthorisation();
-
         $this->setPageName($this->translate('Key map'));
-
         $key = $this->getKeyTree();
-
         $this->smarty->assign('json', json_encode($key));
-
         $this->printPage();
     }
 
     public function rankAction()
     {
-
 		$this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Taxon ranks in key'));
+        $this->setPageName( $this->translate('Taxon ranks in key') );
 
         $pr = $this->getProjectRanks(array(
             'lowerTaxonOnly' => false
@@ -746,11 +741,11 @@ class KeyController extends Controller
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Taxa not part of the key'));
-        $this->smarty->assign('taxa', $this->getTaxaInKey( array( "order"=>"rank" ) ));
+        $this->smarty->assign('taxa', $this->getTaxaInKey());
         $this->printPage();
     }
 
-    public function deadEndsAction ()
+    public function deadEndsAction()
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Key validation'));
@@ -789,7 +784,7 @@ class KeyController extends Controller
 	* @return void
 	* @access public
 	*/
-    public function storeAction ()
+    public function storeAction()
     {
         $this->checkAuthorisation();
 
@@ -839,7 +834,7 @@ class KeyController extends Controller
 	* @return void
 	* @access public
 	*/
-    public function cleanUpAction ()
+    public function cleanUpAction()
     {
         $this->checkAuthorisation();
 
@@ -952,14 +947,16 @@ class KeyController extends Controller
 
 		foreach((array)$this->taxaInBranch as $key=>$val)
 		{
-			$this->taxaInBranch[$key]=$taxa[$key]["taxon"];
+			$this->taxaInBranch[$key]=
+				$this->addHybridMarker( array( 'name'=>$taxa[$key]["taxon"],'base_rank_id'=>$taxa[$key]["base_rank_id"] ) );
 			unset( $taxa[$key] );
 		}
 
 		$remaining=array();
 		foreach((array)$taxa as $key=>$val)
 		{
-			$remaining[$key]=$val['taxon'];
+			$remaining[$key]=
+				$this->addHybridMarker( array( 'name'=>$val["taxon"],'base_rank_id'=>$val["base_rank_id"] ) );
 		}
 
 		asort( $this->taxaInBranch );
@@ -1030,7 +1027,7 @@ class KeyController extends Controller
 		}
 	}
 
-    private function getTaxaInKey( $p )
+    private function getTaxaInKey( $p=null )
     {
 		$d=
 			array(
@@ -1046,7 +1043,14 @@ class KeyController extends Controller
 			$d['branch_tops']=$this->userItems;
 		}
 
-		return $this->models->KeyModel->getTaxaInKey($d);
+		$taxa=$this->models->KeyModel->getTaxaInKey($d);
+		
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+		
+		return $taxa;
     }
 
     private function getKeysteps( $p=null )
@@ -2105,7 +2109,6 @@ class KeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 				));
 	}
-
 
     private function detachAllMedia ()
     {

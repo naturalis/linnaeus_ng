@@ -102,7 +102,7 @@ class SpeciesMediaController extends Controller
 				$this->addMessage('New media order saved');
 		}
 
-		$taxon=$this->getTaxonById();
+		$taxon=$this->getTaxonById( $this->rGetId() );
 		$media=$this->getTaxonMedia(array('id'=>$this->rGetId(),'language_id'=>$activeLanguage));
 
 		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
@@ -140,7 +140,7 @@ class SpeciesMediaController extends Controller
 		// get existing taxon name
         if ($this->rHasId())
 		{
-            $taxon = $this->getTaxonById();
+            $taxon = $this->getTaxonById( $this->rGetId() );
 
             if ($taxon['id']) {
 

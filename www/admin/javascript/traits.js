@@ -774,6 +774,8 @@ taxonTraits.editTaxonTrait = function( d )
 {
 	d.time=allGetTimestamp();
 	d.action='get_taxon_trait';
+	
+	//console.dir( d );
 
 	$.ajax({
 		url: "ajax_taxon.php",

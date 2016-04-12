@@ -700,60 +700,20 @@ class Controller extends BaseClass
 		$array=$this->helpers->CustomArraySort->getSortedArray();
     }
 
-
-    public function getTaxonById ($id = false)
+    public function getTaxonById( $id )
     {
-
-        $id = $id===false ? ($this->rGetId() ? $this->rGetId() : null) : $id;
-
-        if (empty($id) || $id == 0)
-            return;
-
-		$t = $this->models->Taxa->_get(array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id' => $id
-			),
-			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
-		));
-
-
-        if (empty($t))
-            return;
-
-		$t[0]['label'] = $this->formatTaxon($t[0]);
-
-		$pr = $this->models->ProjectsRanks->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id' => $t[0]['rank_id']
-			)
-		));
-
-		$t[0]['lower_taxon'] = $pr[0]['lower_taxon'];
-		$t[0]['base_rank'] = $pr[0]['rank_id'];
-
-		return $t[0];
-
-
+		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id]);
+		if ( !empty($taxon['taxon']) )
+			$taxon['taxon']=$this->addHybridMarker( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+		return $taxon;
     }
-
 
     public function getTaxonByName($name)
     {
-		$name=trim($name);
-        if (empty($name))
-            return;
-
-		$t=$this->models->Taxa->_get(array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon' => $name
-			)
-		));
-		return isset($t[0]) ? $t[0] : null;
-
+		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'name'=>trim($name)]);
+		if ( !empty($taxon['taxon']) )
+			$taxon['taxon']=$this->addHybridMarker( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+		return $taxon;
     }
 
     /**

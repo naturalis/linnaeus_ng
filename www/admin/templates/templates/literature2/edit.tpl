@@ -171,6 +171,7 @@
 	{/if}
     
 	{if $links.names|@count > 0}
+    <div>
 	<a href="#" onclick="$('#links-names').toggle();return false;">Gekoppelde namen ({$links.names|@count})</a>
 	<div id="links-names" style="display:none">
 		<ul class="small">
@@ -179,10 +180,11 @@
 			{/foreach}
 		</ul>
 	</div>
-	<br />
+    </div>
 	{/if}
 
 	{if $links.presences|@count > 0}
+    <div>
 	<a href="#" onclick="$('#links-presences').toggle();return false;">Gekoppelde voorkomensstatussen ({$links.presences|@count})</a>
 	<div id="links-presences" style="display:none">
 		<ul class="small">
@@ -191,30 +193,31 @@
 			{/foreach}
 		</ul>
 	</div>
-    <br />
+    </div>
 	{/if}
 
 	{if $links.passports|@count > 0}
+    <div>
 	<a href="#" onclick="$('#links-passports').toggle();return false;">Gekoppelde paspoorten ({$links.passports|@count})</a>
 	<div id="links-passports" style="display:none">
 		<ul class="small">
 			{foreach from=$links.passports key=k item=v}{if $v.taxon_id!=$links.passports[$k-1].taxon_id}
             {if $k>0}</li>{/if}
-			<li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a>: {/if}{if $v.taxon_id==$links.passports[$k-1].taxon_id}, {/if}{$v.title}{/foreach}
-            </li>
+			<li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a>: {/if}{if $v.taxon_id==$links.passports[$k-1].taxon_id}, {/if}{$v.title}{/foreach}</li>
 		</ul>
 	</div>
-    <br />
+   	</div>
 	{/if}
 
 	{if $links.traits|@count > 0}
+    <div>
 	<a href="#" onclick="$('#links-traits').toggle();return false;">Gekoppelde kenmerken (<span id="trait-total">0</span>)</a>
 	<div id="links-traits" style="display:none">
     	<ul>
             {foreach from=$links.traits item=vv key=trait}
         	<li>
-            	<a href="#" onclick="$('#links-traits-{$trait}').toggle();return false;">{$trait} ({$vv|@count})</a>
-                <ul class="small" id="links-traits-{$trait}" style="display:none">
+            	<a href="#" onclick="$('#links-traits-{$vv.id}').toggle();return false;">{$trait} ({$vv|@count})</a>
+                <ul class="small" id="links-traits-{$vv.id}" style="display:none">
                     {foreach from=$vv item=v}
                     <li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a></li>
                     {/foreach}
@@ -226,7 +229,7 @@
             {/foreach}
 		</ul>
 	</div>
-    <br />
+    </div>
 	{/if}
 
 </div>
