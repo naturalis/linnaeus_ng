@@ -784,6 +784,13 @@ class SpeciesControllerNSR extends SpeciesController
     		'predicateValidNameId' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id']
 		));
 
+		foreach((array)$data as $key=>$val)
+		{
+			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['name']=$this->addHybridMarker( array( 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['nomen']=$this->addHybridMarker( array( 'name'=>$val['nomen'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+
 		return
 			array(
 				'count'=>$total,
@@ -836,6 +843,8 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$taxon['name']=$this->addHybridMarker(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
 		$taxon['taxon']=$this->addHybridMarker(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['uninomial']=$this->addHybridMarker(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['specific_epithet']=$this->addHybridMarker(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
 
 		array_unshift($this->tmp,$taxon);
 
@@ -894,13 +903,15 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $id
 		));
 
-		if ($include_count) {
-
-			foreach((array)$data as $key=>$val)
-			{
+		foreach((array)$data as $key=>$val)
+		{
+			$data[$key]['name']=$this->addHybridMarker(array('name'=>$val['name'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['taxon']=$this->addHybridMarker(array('name'=>$val['taxon'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['uninomial']=$this->addHybridMarker(array('uninomial'=>$val['uninomial'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['specific_epithet']=$this->addHybridMarker(array('specific_epithet'=>$val['specific_epithet'],'base_rank_id'=>$val['rank_id']));
+	
+			if ($include_count)
 				$data[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
-			}
-
 		}
 
 		return $data;

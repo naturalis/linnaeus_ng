@@ -80,6 +80,7 @@ class Controller extends BaseClass
 
 	protected $moduleSession;
 	protected $baseSession;
+	protected $_hybridMarker='×';
 
 
     /**
@@ -2590,4 +2591,45 @@ class Controller extends BaseClass
 			);
 	}
 
+	protected function addHybridMarker( $p )
+	{
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
+		$name=isset($p['name']) ? $p['name'] : null;
+		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
+		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+
+		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
+		{
+			return $this->_hybridMarker . ( isset($uninomial) ? $uninomial : $name );
+		}
+		else
+		if ( $base_rank_id==NOTHOSPECIES_RANK_ID ||
+			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
+			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		{
+			if ( !empty($specific_epithet) )
+			{
+				return $this->_hybridMarker . $specific_epithet;
+			}
+			else
+			if ( !empty($uninomial) )
+			{
+				return $this->_hybridMarker . $uninomial;
+			}
+			else
+			if ( empty($name) )
+			{
+				return $this->_hybridMarker;
+			}
+			else
+			{
+				$ied=explode(' ', $name, 2);
+				return $ied[0]. '  ' .$this->_hybridMarker . $ied[1];
+			}
+		}
+		else
+		{
+			return $name;
+		}
+	}
 }
