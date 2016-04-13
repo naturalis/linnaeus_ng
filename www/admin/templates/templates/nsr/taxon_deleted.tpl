@@ -2,7 +2,7 @@
 
 <div id="page-main">
 
-<h2>Taxa gemarkeerd als verwijderd <span style="font-size:12px;font-style:normal">({$concepts|@count})</span></h2>
+<h2>{t}Taxa gemarkeerd als verwijderd{/t} <span style="font-size:12px;font-style:normal">({$concepts|@count})</span></h2>
 
 <p>
 	<ul>
@@ -12,7 +12,7 @@
     </ul>
 </p>
 <p>
-	<a href="index.php">terug</a>
+	<a href="index.php">{t}terug{/t}</a>
 </p>
 
 </div>

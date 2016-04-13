@@ -80,7 +80,6 @@
                         <span class="classification-rank" title="">[{$classification[taxon].rank_label}]</span>
                         
 					</span>
-                    
 
                     {if $classification[taxon].species_count.total>0}
                     {if $smarty.section.taxon.index==$start}

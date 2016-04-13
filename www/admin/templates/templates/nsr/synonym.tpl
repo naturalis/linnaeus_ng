@@ -85,16 +85,16 @@
     <tr>
     	<th>rang:</th>
         <td>
-            {foreach from=$ranks item=v}{if $v.id==$name.rank_id}{$v.label}{/if}{/foreach}
 			{if $name.type_id!=$validnameid}
-                <select id="rank_id">
+                <select id="name_rank_id">
                 <option value="" {if $name.rank_id==''} selected="selected"{/if}>n.v.t.</option>
                 {foreach from=$ranks item=v}
                 <option value="{$v.id}" {if $v.id==$name.rank_id} selected="selected"{/if}>{$v.label}</option>
                 {/foreach}
                 </select>
+            {else}
+                {foreach from=$ranks item=v}{if $v.id==$name.rank_id}{$v.label}{/if}{/foreach}
             {/if}
-            BUT IS ISN't SAVED YET!
         </td>
     </tr>
 

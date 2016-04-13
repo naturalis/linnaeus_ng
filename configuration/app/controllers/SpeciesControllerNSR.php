@@ -96,11 +96,11 @@ class SpeciesControllerNSR extends SpeciesController
     {
 		$taxon = $this->getTaxonById($this->rGetId());
 
-        if (empty($taxon))
+        if ( empty($taxon) )
 		{
 			//REFAC2015 --> make this configurable
-			$this->smarty->assign('title','Pagina niet gevonden');
-			$this->smarty->assign('text','De gevraagde pagina kon niet worden gevonden.');
+			$this->smarty->assign( 'title', $this->translate( 'Pagina niet gevonden' ) );
+			$this->smarty->assign( 'text', $this->translate( 'De gevraagde pagina kon niet worden gevonden.' ) );
 	        $this->printPage('../shared/404');
 		}
 		else
@@ -117,7 +117,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$names=$this->getNames( $taxon );
 
 			$classification=$this->getTaxonClassification($taxon['id']);
-
+			
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
@@ -419,7 +419,7 @@ class SpeciesControllerNSR extends SpeciesController
 			if ( $reference->check_type=='query' && !empty($reference->query) )
 			{
 				$query = str_replace( array('%pid%','%tid%'), array($this->getCurrentProjectId(), $taxon['id']), $reference->query );
-				$is_empty=$this->models->{$this->_model}->checkQueryResult( $query );
+				$is_empty=$this->models->{$this->_model}->runCheckQuery( $query );
 			}
 		}
 		
@@ -617,7 +617,7 @@ class SpeciesControllerNSR extends SpeciesController
     		'languageId' => $this->getDefaultLanguageId(),
     		'taxonId' => $id
 		));
-		
+
 		$preferredname=null;
 		$scientific_name=null;
 		$nomen=null;
@@ -1476,8 +1476,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->models->{$this->_model}->doesLanguageHavePreferredNameNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'taxonId' => $taxon_id,
-    		'languageId' => $language_id,
-    		'predicatePreferredName' => PREDICATE_PREFERRED_NAME
+    		'languageId' => $language_id
 		));
 
 	}

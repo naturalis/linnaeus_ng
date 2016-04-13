@@ -87,6 +87,10 @@ class VersatileExportController extends Controller
 		'authorship'=>'authorship',
 		'name_author'=>'name_author',
 		'authorship_year'=>'authorship_year',
+		'synonym'=>'synoniem',
+		'synonym_type'=>'type_synoniem',
+		'language'=>'taal',
+		'taxon'=>'taxon',
 	];
 
 
@@ -179,10 +183,10 @@ class VersatileExportController extends Controller
 				nametype,substring(substring(name_types.nametype,3),1,length(name_types.nametype)-4) as nametype_hr,
 				case
 					when
-						nametype = 'isPreferredNameOf'
+						nametype = '" . PREDICATE_PREFERRED_NAME . "'
 					then 0
 					when
-						nametype = 'isAlternativeNameOf'
+						nametype = '" . PREDICATE_ALTERNATIVE_NAME . "'
 					then 1
 					else 2
 				end as sortfield",
@@ -382,6 +386,7 @@ class VersatileExportController extends Controller
 				_names.name,
 				".( $this->query_bit_name_parts )."	
 				".( $this->hasCol( 'database_id' ) ? " _names.id as database_id, " : "" )."
+				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."                
 				_b.nametype,
 				_c.language,
 				_names.taxon_id as _taxon_id
@@ -395,6 +400,18 @@ class VersatileExportController extends Controller
 			
 			left join %PRE%languages _c
 				on _names.language_id=_c.id
+
+			left join %PRE%projects_ranks _f
+				on _names.rank_id=_f.id
+				and _names.project_id=_f.project_id
+
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
+
+			left join %PRE%labels_projects_ranks _lpr
+				on _f.project_id=_lpr.project_id 
+				and _f.id=_lpr.project_rank_id
+				and _lpr.language_id = " . LANGUAGE_ID_DUTCH . "
 
 			where
 				_names.project_id=".$this->getCurrentProjectId()." 
@@ -447,15 +464,20 @@ class VersatileExportController extends Controller
 				}
 				if ( $this->hasCol( 'database_id' ) )
 				{
-					if (isset($row['database_id'])) $tmp['database_id']=$row['database_id'];
+					if (isset($row[$this->columnHeaders['database_id']])) $tmp[$this->columnHeaders['database_id']]=$row[$this->columnHeaders['database_id']];
+				}
+
+				if ( $this->hasCol( 'rank' ) )
+				{
+					if (isset($row[$this->columnHeaders['rank']])) $tmp[$this->columnHeaders['rank']]=$row[$this->columnHeaders['rank']];
 				}
 				
 				$d=
 					array(
-						'synoniem'=>isset($row['name']) ? $row['name'] : null,
-						'type_synoniem'=>isset($row['nametype']) ? $row['nametype'] : null,
-						'taal'=>isset($row['language']) ? $row['language'] : null,
-						'taxon'=>isset($val['wetenschappelijke_naam']) ? $val['wetenschappelijke_naam'] : null,
+						$this->columnHeaders['synonym']=>isset($row['name']) ? $row['name'] : null,
+						$this->columnHeaders['synonym_type']=>isset($row['nametype']) ? $row['nametype'] : null,
+						$this->columnHeaders['language']=>isset($row['language']) ? $row['language'] : null,
+						$this->columnHeaders['taxon']=>isset($val['wetenschappelijke_naam']) ? $val['wetenschappelijke_naam'] : null,
 					);
 
 				if (isset($val['nsr_id']))
@@ -576,7 +598,7 @@ class VersatileExportController extends Controller
 
 		$d = $this->getTaxonById( $this->getBranchTopId() );
 		echo
-			"top",
+			$this->translate( "top" ),
 			$this->getFieldSep(),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
 			$d['taxon'],
@@ -588,15 +610,15 @@ class VersatileExportController extends Controller
 			if(in_array($val["id"],(array)$this->getSelectedRanks( )))
 				$d[]=$val["rank"];
 		echo
-			"rangen",
+			$this->translate( "rangen" ),
 			$this->getFieldSep(),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-			$this->getAllRanks() ? "(alle)" : $this->operators[$this->getRankOperator()]," ",implode(", ",$d),
+			$this->getAllRanks() ? $this->translate( "(alle)" ) : $this->operators[$this->getRankOperator()]," ",implode(", ",$d),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
 		$this->printNewLine();
 
 		echo
-			"statussen",
+			$this->translate( "statussen" ),
 			$this->getFieldSep(),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
 
@@ -607,7 +629,7 @@ class VersatileExportController extends Controller
 			}
 			else
 			{
-				echo "(alle)";
+				echo $this->translate( "(alle)" );
 			}
 			echo ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
 

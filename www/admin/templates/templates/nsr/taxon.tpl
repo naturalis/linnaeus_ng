@@ -179,6 +179,7 @@
 		<li>
 		{$v.name_no_tags}
 		{if $v.addition[$main_language_name_language_id].addition}({$v.addition[$main_language_name_language_id].addition}){/if}
+        {if $v.rank_label} [{$v.rank_label}]{/if}
         <i>({$v.nametype_label})</i>
         <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
 		</li>
@@ -186,7 +187,6 @@
 	</ul>
 	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">niet-wetenschappelijke naam toevoegen</a><br />
 	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0" title="toevoegen van geldige naam, synoniem, etc.">wetenschappelijke naam toevoegen</a>
-
 
 </p>
 {/if}
