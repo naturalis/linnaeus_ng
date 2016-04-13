@@ -192,8 +192,6 @@ class Controller extends BaseClass
     );
 	private $_maxBackSteps=100;
 	public $_hybridMarker='×';
-	
-
 
 
     /**
@@ -205,56 +203,30 @@ class Controller extends BaseClass
      */
     public function __construct ($p=null)
     {
-
         parent::__construct();
 
         $this->setControllerParams($p);
-
         $this->startSession();
-
         $this->loadHelpers();
-
         $this->initLogging();
-
         $this->setNames();
-
         $this->loadModels();
-
         $this->loadControllerConfig();
-
         $this->loadSmartyConfig();
-
         $this->checkWriteableDirectories();
-
 		$this->setRankIdConstants();
-
         $this->setRequestData();
-
-        if ($this->getCheckForProjectId())
-		{
-		    $this->checkForProjectId();
-        }
-
+		$this->checkForProjectId();
         $this->startModuleSession();
-
         $this->restoreState();
-
         $this->setProjectLanguages();
-
         $this->setCurrentLanguageId();
-
 		$this->initTranslator();
-
 		$this->setSkinName();
-
 		$this->setUrls();
-
 		$this->setSmartySettings();
-
 		$this->setCssFiles();
-
 		$this->setOtherStuff();
-
     }
 
 
@@ -266,7 +238,6 @@ class Controller extends BaseClass
     public function __destruct ()
     {
         $this->storePageHistory();
-
         $this->storeState();
 
         session_write_close();
@@ -286,6 +257,8 @@ class Controller extends BaseClass
 
     public function checkForProjectId ()
     {
+		if (!$this->getCheckForProjectId()) return;
+		
         $pB = $this->getCurrentProjectId();
 
         if ($this->rHasVal('p'))
@@ -315,7 +288,8 @@ class Controller extends BaseClass
 
     public function projectIsPublished ($pId)
     {
-        if ($pId) {
+        if ($pId)
+		{
             $p = $this->models->Projects->_get(array(
                 'id' => (int)$pId
             ));
@@ -553,8 +527,8 @@ class Controller extends BaseClass
 
         $d = array();
 
-        foreach ((array) $this->treeList as $key => $val) {
-
+        foreach ((array) $this->treeList as $key => $val)
+		{
             if (!isset($p['includeEmpty']) && $p['includeEmpty'] !== true && $val['is_empty'] == '1')
                 continue;
 
@@ -563,8 +537,6 @@ class Controller extends BaseClass
 
         return isset($d) ? $d : null;
     }
-
-
 
     public function buildTaxonTree($p = null)
     {
@@ -575,7 +547,6 @@ class Controller extends BaseClass
 
         return $this->getTreeList($p);
     }
-
 
     public function getTaxonClassification ($taxonId)
     {
@@ -623,8 +594,6 @@ class Controller extends BaseClass
         return $processed;
     }
 
-
-
     /**
      * Sets the name of the current page, for display purposes, in a class variable 'pageName'.
      *
@@ -635,8 +604,6 @@ class Controller extends BaseClass
     {
         $this->pageName = $name;
     }
-
-
 
     /**
      * Returns the name of the current page.
@@ -649,8 +616,6 @@ class Controller extends BaseClass
         return $this->pageName;
     }
 
-
-
     /**
      * Returns the application name
      *
@@ -662,12 +627,10 @@ class Controller extends BaseClass
         return isset($this->appName) ? $this->appName : false;
     }
 
-
     public function getfullPath ()
     {
         return isset($this->_fullPath) ? $this->_fullPath : null;
     }
-
 
     /**
      * Adds an error to the class's stack of errors stored in class variable 'errors'
@@ -699,8 +662,6 @@ class Controller extends BaseClass
         }
     }
 
-
-
     /**
      * Returns whether there are errors or not
      *
@@ -711,8 +672,6 @@ class Controller extends BaseClass
     {
         return (count((array) $this->errors) > 0);
     }
-
-
 
     /**
      * Returns the class's stack of errors stored in class variable 'errors'
@@ -725,8 +684,6 @@ class Controller extends BaseClass
         return $this->errors;
     }
 
-
-
     /**
      * Adds a message to the class's stack of messages stored in class variable 'messages'
      *
@@ -737,8 +694,6 @@ class Controller extends BaseClass
     {
         $this->messages[] = $message;
     }
-
-
 
     /**
      * Returns the class's stack of messages stored in class variable 'messages'
@@ -751,8 +706,6 @@ class Controller extends BaseClass
         return $this->messages;
     }
 
-
-
     /**
      * Returns the current view's name
      *
@@ -763,8 +716,6 @@ class Controller extends BaseClass
     {
         return $this->viewName;
     }
-
-
 
     /**
      * Redirects the user to another page (and avoids circular redirection)
@@ -806,8 +757,6 @@ class Controller extends BaseClass
         }
     }
 
-
-
     /**
      * Sets the active project's name as a session variable (for display purposes)
      *
@@ -845,8 +794,6 @@ class Controller extends BaseClass
             ''
         ), $_SESSION['app']['project']['sys_name']));
     }
-
-
 
     public function setProjectLanguages()
     {
@@ -888,14 +835,10 @@ class Controller extends BaseClass
         //        if (isset($list)) $_SESSION['app']['project']['languageList'] = $list;
     }
 
-
-
     public function getProjectLanguages()
     {
         return isset($_SESSION['app'][$this->spid()]['project']['languages']) ? $_SESSION['app'][$this->spid()]['project']['languages'] : null;
     }
-
-
 
     /**
      * Sets the active project's id as class variable
@@ -908,14 +851,10 @@ class Controller extends BaseClass
         $_SESSION['app']['project']['id'] = $id;
     }
 
-
-
     public function didActiveLanguageChange()
     {
         return isset($_SESSION['app'][$this->spid()]['user']['languageChanged']) ? $_SESSION['app'][$this->spid()]['user']['languageChanged'] : false;
     }
-
-
 
     public function getCurrentLanguageId()
     {
@@ -925,15 +864,11 @@ class Controller extends BaseClass
         return $_SESSION['app'][$this->spid()]['project']['activeLanguageId'];
     }
 
-
-
     public function getDefaultLanguageId()
     {
         return isset($_SESSION['app'][$this->spid()]['project']['default_language_id']) ?
             $_SESSION['app'][$this->spid()]['project']['default_language_id'] : null;
     }
-
-
 
     public function setCurrentLanguageId ($l = null)
     {
@@ -973,8 +908,6 @@ class Controller extends BaseClass
 		$this->setDatabaseLocaleSettings( $_SESSION['app']['user']['currentLanguage'] );
     }
 
-
-
     /**
      * Returns the controller's base name
      *
@@ -985,8 +918,6 @@ class Controller extends BaseClass
     {
         return $this->controllerBaseName;
     }
-
-
 
     /**
      * Returns the active project's id class variable
@@ -1005,8 +936,6 @@ class Controller extends BaseClass
         	return isset($_SESSION['app']['project']['id']) ? $_SESSION['app']['project']['id'] : null;
 		}
     }
-
-
 
     public function log ($msg, $severity = 0)
     {
@@ -1037,7 +966,6 @@ class Controller extends BaseClass
 
     }
 
-
     public function rHasVal($var, $val = null)
     {
         if ($val !== null) {
@@ -1054,8 +982,6 @@ class Controller extends BaseClass
     {
 		return isset($this->requestData[$var]) ? $this->requestData[$var] : null;
     }
-
-
 
     public function rHasId()
     {
@@ -1108,7 +1034,6 @@ class Controller extends BaseClass
 
         return $tv[0];
     }
-
 
 	public function matchHotwords ($text, $forceLookup = false)
 	{
@@ -1227,7 +1152,6 @@ class Controller extends BaseClass
 
         return $processed;
     }
-
 
     public function getSetting($setting,$substitute=null)
     {
@@ -1391,7 +1315,6 @@ class Controller extends BaseClass
 		return $result;
     }
 
-
    private function setHybridMarker($name, $rankId, $isHybrid)
     {
         if ($isHybrid == 0) {
@@ -1409,8 +1332,6 @@ class Controller extends BaseClass
         return implode(' ' . $marker . ' ', explode(' ', $name, 3));
 
     }
-
-
 
     public function formatSynonym ($name)
     {
@@ -1454,14 +1375,10 @@ class Controller extends BaseClass
             $this->_checkForProjectId = $state;
     }
 
-
-
     private function getCheckForProjectId ()
     {
         return $this->_checkForProjectId;
     }
-
-
 
     private function previewOverlay ()
     {
@@ -1499,8 +1416,6 @@ class Controller extends BaseClass
         }
     }
 
-
-
     /**
      * Renders and displays the page
      *
@@ -1514,8 +1429,6 @@ class Controller extends BaseClass
 
         $this->previewOverlay();
     }
-
-
 
     /**
      * Renders and returns the page
@@ -1611,9 +1524,6 @@ class Controller extends BaseClass
 
     }
 
-
-
-
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
      *
@@ -1627,8 +1537,6 @@ class Controller extends BaseClass
 		$this->helpers->CustomArraySort->sortArray( $array );
 		$array=$this->helpers->CustomArraySort->getSortedArray();
     }
-
-
 
     /**
      * Sets project URL for project images
@@ -1711,8 +1619,6 @@ class Controller extends BaseClass
         else
             return $this->baseUrl . $this->getAppName() . '/style/custom/' . $this->getProjectFSCode($p) . '.css';
     }
-
-
 
     public function setCssFiles ()
     {
@@ -2070,8 +1976,6 @@ class Controller extends BaseClass
 
     }
 
-
-
     public function getSkinName ()
     {
         if (!isset($_SESSION['app']['system']['skinName']))
@@ -2079,8 +1983,6 @@ class Controller extends BaseClass
 
         return $_SESSION['app']['system']['skinName'];
     }
-
-
 
     /**
      * Loads the required models (database abstraction classes for the various tables)
@@ -2156,7 +2058,6 @@ class Controller extends BaseClass
         }
     }
 
-
     /**
      * Sets general Smarty variables (paths, compilder directives)
      *
@@ -2181,8 +2082,6 @@ class Controller extends BaseClass
 		$this->smarty->registerPlugin("block","snippet", array($this,"smartyGetSnippet"));
 		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
-
-
 
     /**
      * Assigns POST and GET variables to a class variable 'requestData'; posted files to 'requestDataFiles'
@@ -2282,7 +2181,6 @@ class Controller extends BaseClass
         }
     }
 
-
     private function initLogging ()
     {
 
@@ -2309,8 +2207,6 @@ class Controller extends BaseClass
         $this->helpers->LoggingHelper->setLogFile($logDir . $logFile );
         $this->helpers->LoggingHelper->setLevel(0);
     }
-
-
 
     private function removeBackstepFromUrl ($url)
     {
@@ -2347,8 +2243,6 @@ class Controller extends BaseClass
         return $page;
     }
 
-
-
     private function storePageHistory ()
     {
 
@@ -2375,8 +2269,6 @@ class Controller extends BaseClass
             $_SESSION['app']['user']['history'][] = $thisPage;
 
     }
-
-
 
     private function getWordList ($forceUpdate = false)
     {
@@ -2406,8 +2298,6 @@ class Controller extends BaseClass
         return $_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'];
     }
 
-
-
     private function embedGlossaryLink ($matches)
     {
         if (trim($matches[0]) == '')
@@ -2415,8 +2305,6 @@ class Controller extends BaseClass
         else
             return '<span class="glossary-term-highlight" onmouseover="glossTextOver(' . $this->_currentGlossaryId . ',this)">' . $matches[0] . '</span>';
     }
-
-
 
     /**
      * Sets a random integer value for general use
@@ -2428,8 +2316,6 @@ class Controller extends BaseClass
         $this->randomValue = mt_rand(99999, mt_getrandmax());
     }
 
-
-
     /**
      * Returns random integer value
      *
@@ -2440,8 +2326,6 @@ class Controller extends BaseClass
     {
         return $this->randomValue;
     }
-
-
 
     private function getHotwords()
     {
@@ -2466,8 +2350,6 @@ class Controller extends BaseClass
 		));
     }
 
-
-
     private function embedNoLink ($matches)
     {
         if (trim($matches[0]) == '')
@@ -2490,8 +2372,6 @@ class Controller extends BaseClass
             return $d;
         }
     }
-
-
 
     private function embedHotwordLink ($matches)
     {
@@ -2516,8 +2396,6 @@ class Controller extends BaseClass
         }
     }
 
-
-
     private function effectuateHotwordLinks ($txt)
     {
         $this->_hotwordTempLinks = array_reverse($this->_hotwordTempLinks);
@@ -2531,8 +2409,6 @@ class Controller extends BaseClass
 
         return $txt;
     }
-
-
 
     private function restoreNoLinks ($txt)
     {
@@ -2548,8 +2424,6 @@ class Controller extends BaseClass
 
         return $txt;
     }
-
-
 
     public function getProjectFSCode($p = null)
     {
@@ -2692,8 +2566,6 @@ class Controller extends BaseClass
             'env' => $this->getAppName()
         ));
     }
-
-
 
     private function doTranslate ($text)
     {
@@ -2870,7 +2742,6 @@ class Controller extends BaseClass
 		return $c;
 	}
 
-
     public function arrayHasData ($p = array())
     {
         foreach ($p as $k => $v) {
@@ -2883,7 +2754,6 @@ class Controller extends BaseClass
         }
         return false;
     }
-
 
 	public function addHybridMarker( $p )
 	{
@@ -2923,7 +2793,19 @@ class Controller extends BaseClass
 		}
 		else
 		{
-			return $name;
+			if ( !empty($specific_epithet) )
+			{
+				return $specific_epithet;
+			}
+			else
+			if ( !empty($uninomial) )
+			{
+				return $uninomial;
+			}
+			else
+			{
+				return $name;
+			}
 		}
 	}
 		
