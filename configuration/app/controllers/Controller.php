@@ -298,7 +298,7 @@ class Controller extends BaseClass
         return false;
     }
 
-    public function resolveProjectId ()
+    public function resolveProjectId()
     {
         if (!$this->rHasVal('p'))
             $this->setCurrentProjectId(null);

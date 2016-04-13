@@ -20,7 +20,7 @@ class Literature2Controller extends NsrController
 		'literature2_publication_types_labels'
     );
 
-    public $controllerPublicName = 'Literatuur (v2)';
+    public $controllerPublicName = 'Literature';
     public $usedHelpers = array('csv_parser_helper');
     public $cssToLoad = array('nsr_taxon_beheer.css','literature2.css');
 
@@ -139,7 +139,6 @@ class Literature2Controller extends NsrController
     public function editAction()
 	{
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Edit reference'));
 
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
@@ -181,8 +180,13 @@ class Literature2Controller extends NsrController
 
 		if ($this->getReferenceId())
 		{
+			$this->setPageName($this->translate('Edit reference'));
 			$this->smarty->assign('reference',$this->getReference());
 			$this->smarty->assign('links',$this->getReferenceLinks());
+		}
+		else
+		{
+			$this->setPageName($this->translate('New reference'));
 		}
 
 		$publicationTypes=$this->getPublicationTypes();
@@ -211,7 +215,7 @@ class Literature2Controller extends NsrController
     public function publicationTypesAction()
 	{
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Publicatievormen'));
+		$this->setPageName($this->translate('Publication types'));
 
 		if ( $this->rHasVal('action','save') )
 		{

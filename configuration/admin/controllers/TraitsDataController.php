@@ -45,7 +45,7 @@ class TraitsDataController extends TraitsController
 		'literature2'
     );
    
-    public $controllerPublicName = 'Kenmerken';
+    public $controllerPublicName = 'Traits';
 
     public $cssToLoad = array(
 		'traits.css',

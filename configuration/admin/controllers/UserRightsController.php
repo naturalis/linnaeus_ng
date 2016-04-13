@@ -58,7 +58,7 @@
 	  default null.
 	- set a level (checked in hasAppropriateLevel()):
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
-	  default ID_ROLE_EDITOR
+	  default ID_ROLE_EDITOR (other: ID_ROLE_SYS_ADMIN, ID_ROLE_LEAD_EXPERT) 
 	- disable check for module access:
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
 	- for pages that allow for the absence of a project ID, call

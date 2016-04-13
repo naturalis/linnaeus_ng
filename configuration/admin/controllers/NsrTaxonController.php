@@ -49,7 +49,7 @@ class NsrTaxonController extends NsrController
         )
     );
     public $modelNameOverride='NsrTaxonModel';
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 
 	private $_nameTypeIds;
@@ -254,7 +254,7 @@ class NsrTaxonController extends NsrController
     public function synonymAction()
     {
 		//$this->checkAuthorisation();
-        $this->setPageName($this->translate('Bewerk wetenschappelijke naam'));
+        $this->setPageName($this->translate('Edit scientific name'));
 		$this->_nameAndSynonym();
 		$this->printPage();
     }
@@ -262,7 +262,7 @@ class NsrTaxonController extends NsrController
     public function nameAction()
     {
 		//$this->checkAuthorisation();
-        $this->setPageName($this->translate('Bewerk naam'));
+        $this->setPageName($this->translate('Edit common name'));
 		$this->_nameAndSynonym();
 		$this->printPage();
 	}
@@ -394,7 +394,7 @@ class NsrTaxonController extends NsrController
 		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
 
-        $this->setPageName( $this->translate('Naam concept direct aanpassen') );
+        $this->setPageName( $this->translate('Direct renaming taxon concept') );
 		$this->setConceptId( $this->rGetId() );
 
 		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
@@ -454,7 +454,7 @@ class NsrTaxonController extends NsrController
     public function taxonDeletedAction()
     {
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Taxa gemarkeerd als verwijderd'));
+        $this->setPageName($this->translate('Taxa marked as deleted'));
 		$this->smarty->assign('concepts',$this->getDeletedSpeciesList());
 		$this->printPage();
 	}
@@ -463,7 +463,7 @@ class NsrTaxonController extends NsrController
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Indextabel bijwerken'));
+        $this->setPageName($this->translate('Update index table'));
 
 		if ($this->rHasVal('action','update') && !$this->isFormResubmit())
 		{

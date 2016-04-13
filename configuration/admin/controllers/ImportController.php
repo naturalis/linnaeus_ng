@@ -22,7 +22,6 @@ class ImportController extends Controller
         'content_taxa',
         'free_modules_pages',
         'free_modules_projects',
-        'free_modules_projects_users',
         'geodata_types',
         'geodata_types_titles',
         'glossary',

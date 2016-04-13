@@ -31,7 +31,7 @@ class NsrTreeController extends NsrController
     );
 
     public $modelNameOverride='NsrTreeModel';
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
 

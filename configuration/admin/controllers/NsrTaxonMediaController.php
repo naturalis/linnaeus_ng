@@ -37,7 +37,7 @@ class NsrTaxonMediaController extends NsrController
 
     /*
     public $modelNameOverride = 'NsrTaxonMediaModel';
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
 	private $conceptId=null;

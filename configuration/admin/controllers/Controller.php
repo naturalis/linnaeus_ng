@@ -2229,7 +2229,8 @@ class Controller extends BaseClass
         $controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
         $controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
 
-        if ($this->_fullPathRelative != $cp && isset($_SESSION['admin']['project']['title']) && !$this->suppressProjectInBreadcrumbs) {
+        if ($this->_fullPathRelative != $cp && isset($_SESSION['admin']['project']['title']) && !$this->suppressProjectInBreadcrumbs)
+		{
 
             $this->breadcrumbs[] = array(
                 'name' => $_SESSION['admin']['project']['title'],
@@ -2237,8 +2238,8 @@ class Controller extends BaseClass
             );
 
 
-            if (!empty($controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
-
+            if (!empty($controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex())
+			{
                 $curl = $this->baseUrl . $this->appName . '/views/' . $controllerBaseName;
 
                 $this->breadcrumbs[] = array(
@@ -2246,20 +2247,21 @@ class Controller extends BaseClass
                     'url' => $curl
                 );
 
-                if ($this->getViewName() != 'index') {
-
+                //if ($this->getViewName() != 'index')
+				{
                     // all views are on the same level, but sometimes we might want another level to the trail when
                     // moving one view to the next, for logic's sake (for instance: taxon list -> edit taxon, two views
                     // that are on the same level, but are perceived by the user to be on different levels)
-                    if ($this->breadcrumbIncludeReferer === true) {
-
+                    if ($this->breadcrumbIncludeReferer === true)
+					{
                         $this->breadcrumbs[] = array(
                             'name' => $this->baseSession->getModuleSetting( 'referer_name' ),
                             'url' => $this->baseSession->getModuleSetting( 'referer_url' )
                         );
                     }
-                    elseif (is_array($this->breadcrumbIncludeReferer)) {
-
+                    else
+					if (is_array($this->breadcrumbIncludeReferer))
+					{
                         $this->breadcrumbs[] = $this->breadcrumbIncludeReferer;
                     }
 
@@ -2539,17 +2541,19 @@ class Controller extends BaseClass
 	
 	protected function getWikiUrl()
 	{
-		$base=$this->models->ControllerModel->getGeneralSettingValue(
-		array(
-			'project_id' => $this->getCurrentProjectId(),
-			'setting' => 'wiki_base_url'
-		));
+		$wiki_base_url=$this->models->ControllerModel->getGeneralSettingValue(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'setting' => 'wiki_base_url'
+			));
+
+		$basename=!empty($this->controllerPublicNameMask) ? $this->controllerPublicNameMask : $this->controllerPublicName;
 
 		return
 			str_replace(
 				['%module%','%page%'],
-				[str_replace(' ','',ucwords($this->controllerPublicName)),str_replace(' ','_',$this->getPageName())],
-				$base
+				[str_replace(' ','',ucwords($basename)),str_replace(' ','_',$this->getPageName())],
+				$wiki_base_url
 			);
 	}
 
