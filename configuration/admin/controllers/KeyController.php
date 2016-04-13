@@ -624,9 +624,17 @@ class KeyController extends Controller
             $this->redirect('step_show.php');
         }
 
-        $step = $this->getKeystep($this->rGetId());
+        $step=$this->getKeystep($this->rGetId());
 
-        $this->setPageName(sprintf($this->translate('Insert a step before step %s'), $step['number']));
+		if ($this->rGetId()==$this->getStartKeystepId())
+		{
+	        $this->setPageName(sprintf($this->translate('Insert a step before step %s'), $step['number']));
+		}
+		else
+		{
+			$prevstep=$this->getKeystep($this->rHasVal('c'));
+    	    $this->setPageName(sprintf($this->translate('Insert a step between step %s and %s'), $prevstep['number'], $step['number']));
+		}
 
         $ck = $this->models->ChoicesKeysteps->_get(
         array(

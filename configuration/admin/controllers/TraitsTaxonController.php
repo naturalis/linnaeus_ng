@@ -20,7 +20,7 @@ class TraitsTaxonController extends TraitsController
     );
    
     public $modelNameOverride='TraitsTaxonModel';
-    public $controllerPublicName = 'Kenmerken';
+    public $controllerPublicName = 'Traits';
 
     public $cssToLoad = array(
 		'traits.css',

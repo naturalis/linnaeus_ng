@@ -19,9 +19,9 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">conceptkaart:</span> {$concept.taxon}</h2>
-{if $concept.is_deleted}<span style="color:red;font-weight:bold">CONCEPT IS GEMARKEERD ALS VERWIJDERD</span><br />
-<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">verwijdering ongedaan maken</a>
+<h2><span style="font-size:12px;font-style:normal">{t}conceptkaart:{/t}</span> {$concept.taxon}</h2>
+{if $concept.is_deleted}<span style="color:red;font-weight:bold">{t}CONCEPT IS GEMARKEERD ALS VERWIJDERD{/t}</span><br />
+<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">{t}verwijdering ongedaan maken{/t}</a>
 {/if}
 
 <form id="data" onsubmit="return false;">
@@ -32,18 +32,18 @@
 	<table>
 		<tr>
 			<td></td>
-			<td><i>concept</i></td>
+			<td><i>{t}concept{/t}</i></td>
 		</tr>
 		<tr>
-			<th>naam:</th>
+			<th>{t}naam:{/t}</th>
 			<td>
 				{$concept.taxon}
 			</td>
 		</tr>
-		<tr><th>rang:</th>
+		<tr><th>{t}rang:{/t}</th>
 			<td>
 				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">edit</a>
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">{t}edit{/t}</a>
 				<span class="editspan">
 				<select id="concept_rank_id" onchange="storedata(this);" >
 				{foreach from=$ranks item=v}
@@ -53,32 +53,32 @@
 				</span> *
 			</td>
 		</tr>
-		<tr><th>ouder:</th>
+		<tr><th>{t}ouder:{/t}</th>
 			<td>
                 <span id="parent_taxon"><a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a></span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">edit</a> *
-				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="ouder" droplistminlength="3" />
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
+				<input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}ouder{/t}" droplistminlength="3" />
 			</td>
 		</tr>
 
-		<tr><th>nsr id:</th><td>{if $concept}{$concept.nsr_id}{else}(auto){/if}</td></tr>
+		<tr><th>{t}nsr id:{/t}</th><td>{if $concept}{$concept.nsr_id}{else}{t}(auto){/t}{/if}</td></tr>
 
 		<tr><th>&nbsp;</td></tr>
 
 		<tr>
 			<td></td>
-			<td><i>voorkomen</i></td>
+			<td><i>{t}voorkomen{/t}</i></td>
 		</tr>
 		<tr>
-			<th>status:</th>
+			<th>{t}status:{/t}</th>
 			<td>
 				{if $presence.presence_id}
 					<span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
 				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">edit</a>
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">{t}edit{/t}</a>
 				<span class="editspan">
 					<select id="presence_presence_id" onchange="storedata(this);" >
-					<option value="-1" {if $presence.presence_id==''} selected="selected"{/if}>n.v.t.</option>
+					<option value="-1" {if $presence.presence_id==''} selected="selected"{/if}>{t}n.v.t.{/t}</option>
 					{assign var=first value=true}
 					{foreach from=$statuses item=v}
 						{if $v.index_label==99 && $first==true}
@@ -92,15 +92,15 @@
 			</td>
 		</tr>
 
-		<tr><th>habitat:</th>
+		<tr><th>{t}habitat:{/t}</th>
 			<td>
 				{if $presence.habitat_id!=''}
 					{$presence.habitat_label}
-				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_habitat_id">edit</a>
+				{else}{t}n.v.t.{/t}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_habitat_id">{t}edit{/t}</a>
 				<span class="editspan">
 					<select id="presence_habitat_id" onchange="storedata(this);" >
-						<option value="-1" {if $presence.habitat_id==''} selected="selected"{/if}>n.v.t.</option>
+						<option value="-1" {if $presence.habitat_id==''} selected="selected"{/if}>{t}n.v.t.{/t}</option>
 					{foreach from=$habitats item=v}
 						<option value="{$v.id}" {if $v.id==$presence.habitat_id} selected="selected"{/if}>{$v.label}</option>
 					{/foreach}
@@ -111,16 +111,16 @@
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 
-		<tr><th>expert:</th>
+		<tr><th>{t}expert:{/t}</th>
 			<td>
 				{if $presence.expert_id!=''}
 					{$presence.expert_name}
-				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_expert_id">edit</a>
+				{else}{t}n.v.t.{/t}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_expert_id">{t}edit{/t}</a>
 				<span class="editspan" id="expert">
 
                 <select id="presence_expert_id">
-					<option value="-1" selected="selected">n.v.t.</option>
+					<option value="-1" selected="selected">{t}n.v.t.{/t}</option>
 				{foreach from=$actors item=v key=k}
 				{if $v.is_company=='0'}
 					<option value="{$v.id}" {if $v.id==$presence.expert_id} selected="selected"{/if}>{$v.label}</option>
@@ -132,16 +132,16 @@
 			</td>
 		</tr>
 
-		<tr><th>organisatie:</th>
+		<tr><th>{t}organisatie:{/t}</th>
 			<td>
 				{if $presence.organisation_id!=''}
 					{$presence.organisation_name}
-				{else}n.v.t.{/if}
-				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_organisation_id">edit</a>
+				{else}{t}n.v.t.{/t}{/if}
+				<a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_organisation_id">{t}edit{/t}</a>
 				<span class="editspan" id="organisation">
 
 				<select id="presence_organisation_id">
-					<option value="-1" selected="selected">n.v.t.</option>
+					<option value="-1" selected="selected">{t}n.v.t.{/t}</option>
 				{foreach from=$actors item=v key=k}
 				{if $v.is_company=='1'}
 					<option value="{$v.id}" {if $v.id==$presence.organisation_id} selected="selected"{/if}>{$v.label}</option>
@@ -154,11 +154,10 @@
 			</td>
 		</tr>
 
-		<tr><th>publicatie:</th>
+		<tr><th>{t}publicatie:{/t}</th>
 			<td>
-
                 <span id="presence_reference">{if $presence.reference_id!=''}{$presence.reference_label}{/if}</span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">edit</a> *
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">{t}edit{/t}</a> *
 				<input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
 			</td>
 		</tr>
@@ -172,7 +171,7 @@
 {if $concept}
 <p>
 
-	<h4>namen</h4>
+	<h4>{t}namen{/t}</h4>
 
 	<ul>
 	{foreach from=$names.list item=v}
@@ -181,12 +180,12 @@
 		{if $v.addition[$main_language_name_language_id].addition}({$v.addition[$main_language_name_language_id].addition}){/if}
         {if $v.rank_label} [{$v.rank_label}]{/if}
         <i>({$v.nametype_label})</i>
-        <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">edit</a>
+        <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">{t}edit{/t}</a>
 		</li>
 	{/foreach}
 	</ul>
-	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">niet-wetenschappelijke naam toevoegen</a><br />
-	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0" title="toevoegen van geldige naam, synoniem, etc.">wetenschappelijke naam toevoegen</a>
+	<a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">{t}niet-wetenschappelijke naam toevoegen{/t}</a><br />
+	<a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0" title="{t}toevoegen van geldige naam, synoniem, etc.{/t}">{t}wetenschappelijke naam toevoegen{/t}</a>
 
 </p>
 {/if}
@@ -194,34 +193,34 @@
 
 <p>
 	{if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">soort toevoegen aan {$concept.taxon}</a><br />
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">{t _s1=$concept.taxon}soort toevoegen aan "%s"{/t}</a><br />
 	{elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}" class="edit" style="margin:0">ondersoort toevoegen aan "{$concept.taxon}"</a><br />
+		<a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}" class="edit" style="margin:0">{t _s1=$concept.taxon}ondersoort toevoegen aan "%s"{/t}</a><br />
 	{elseif $concept.base_rank < $smarty.const.GENUS_RANK_ID}
-		<a href="taxon_new.php?parent={$concept.id}" class="edit" style="margin:0">onderliggend taxon toevoegen aan "{$concept.taxon}"</a><br />
+		<a href="taxon_new.php?parent={$concept.id}" class="edit" style="margin:0">{t _s1=$concept.taxon}onderliggend taxon toevoegen aan "%s"{/t}</a><br />
 	{/if}
 </p>
 <p>
-	<a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">paspoort</a><br />
+	<a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">{t}paspoort{/t}</a><br />
 
-	<a href="media.php?id={$concept.id}" class="edit" style="margin:0">media</a><br />
-	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">afbeeldingen (NSR-only)</a><br />
+	<a href="media.php?id={$concept.id}" class="edit" style="margin:0">{t}media{/t}</a><br />
+	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
 
     {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
 	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
     {/if}{/foreach}
 
-	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">taxon bekijken in het Soortenregister (nieuw venster)</a><br />
+	<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">{t}taxon bekijken in front-end (nieuw venster){/t}</a><br />
     {if !$concept.is_deleted}
     <br />
-    <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">taxon markeren als verwijderd</a>
+    <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">{t}taxon markeren als verwijderd{/t}</a>
 	{/if}
     <br />
-    <a href="taxon_edit_concept_direct.php?id={$concept.id}" class="edit" style="margin:0">naam taxon concept direct aanpassen</a>
+    <a href="taxon_edit_concept_direct.php?id={$concept.id}" class="edit" style="margin:0">{t}naam taxon concept direct aanpassen{/t}</a>
 
     {assign var=k value=0}
     {foreach $traitgroups v}{if $v.taxon_count==0}
-   	{if $k==0}<br /><br /><span class="small">Kenmerken toevoegen:</span><br />{/if}
+   	{if $k==0}<br /><br /><span class="small">{t}kenmerken toevoegen:{/t}</span><br />{/if}
 	<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
     {assign var=k value=$k+1}
     {/if}{/foreach}
@@ -239,10 +238,10 @@
 <div class="page-generic-div">
     <p>
 {if $concept.is_deleted}
-    <a href="taxon_deleted.php" style="margin:0">overzicht verwijderde taxa</a><br />
-    <a href="index.php">index</a>
+    <a href="taxon_deleted.php" style="margin:0">{t}overzicht verwijderde taxa{/t}</a><br />
+    <a href="index.php">{t}index{/t}</a>
 {else}
-    <a href="index.php">terug</a>
+    <a href="index.php">{t}terug{/t}</a>
 {/if}
     </p>
 
@@ -261,7 +260,8 @@ $(document).ready(function()
 	dataid={$concept.id};
 	taxonrank={$concept.base_rank};
 	{/if}
-	$('#data :input[type!=button]').each(function(key,value) {
+	$('#data :input[type!=button]').each(function(key,value)
+	{
 		values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
 		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
 	});
@@ -270,10 +270,11 @@ $(document).ready(function()
 
 	{if !$concept}
 	// if new concept, trigger all edit-clicks
-	$('a.edit').each(function() {
+	$('a.edit').each(function()
+	{
 		$(this).trigger('click');
 		//$(this).remove();
-	} );
+	});
 	{/if}
 
 	$('th[title]').each(function(key,value)

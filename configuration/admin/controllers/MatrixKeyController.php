@@ -342,7 +342,7 @@ class MatrixKeyController extends Controller
 
         $matrix = $this->getMatrix( $this->getCurrentMatrixId() );
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
+        $this->setPageName( $this->translate('Editing matrix: sort characters') );
 
         $this->smarty->assign('characteristics', $this->getCharacteristics());
         $this->smarty->assign('matrix', $matrix);
@@ -841,7 +841,8 @@ class MatrixKeyController extends Controller
 
         $matrix = $this->getMatrix( $mId );
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
+        $this->setPageName( $this->translate('Editing matrix: sort states') );
+
         $this->smarty->assign('characteristic', $this->getCharacteristic($this->rGetVal('sId')));
         $this->smarty->assign('states', $this->getCharacteristicStates($this->rGetVal('sId')));
         $this->smarty->assign('matrix', $matrix);
@@ -876,12 +877,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-
-    /**
-     * AJAX interface for this class
-     *
-     * @access    public
-     */
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVal('action'))

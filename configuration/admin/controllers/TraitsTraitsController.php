@@ -28,7 +28,7 @@ class TraitsTraitsController extends TraitsController
 		'text_translations',
     );
    
-    public $controllerPublicName = 'Kenmerken';
+    public $controllerPublicName = 'Traits';
 
     public $cssToLoad = array(
 		'traits.css',
@@ -111,7 +111,6 @@ class TraitsTraitsController extends TraitsController
     public function traitgroupAction()
     {
 		$this->checkAuthorisation();
-        $this->setPageName($this->translate('Trait group'));
 
 		if ($this->rHasVal('action','save'))
 		{
@@ -130,12 +129,14 @@ class TraitsTraitsController extends TraitsController
 		if (!$this->rHasId())
 		{
 			$this->smarty->assign('newgroup',true);
+			$this->setPageName($this->translate('New trait group'));
 		}
 		else
 		if ($this->rHasId())
 		{
 			$this->smarty->assign('group',$this->getTraitgroup($this->rGetId()));
 			$this->smarty->assign('newgroup',false);
+			$this->setPageName($this->translate('Edit trait group'));
 		}
 		else
 		{

@@ -172,10 +172,12 @@ class SearchController extends Controller
     {
 		$this->checkAuthorisation();
 
-		$this->setPageName($this->translate('Extensive search'));
+		$this->setPageName( $this->translate('Extensive search') );
 
 		if ($this->rHasVal('search'))
 		{
+			$this->setPageName( $this->translate('Results') );
+			
 			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$this->rGetVal('search')) );
 			$this->moduleSession->setModuleSetting( array('setting'=>'modules','value'=>($this->rHasVal('modules') ? $this->rGetVal('modules') : null)) );
 			$this->moduleSession->setModuleSetting( array('setting'=>'freeModules','value'=>($this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null)) );
@@ -217,6 +219,7 @@ class SearchController extends Controller
 				)
 			);
 		}
+
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->_minSearchLength);
 

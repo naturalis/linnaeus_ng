@@ -37,97 +37,39 @@ class LinnaeusController extends Controller
 
 	public $controllerBaseName = 'linnaeus';
 
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct( $p=null )
     {
         parent::__construct( $p );
 		$this->initialize( $p );
     }
 
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
-
     private function initialize( $p )
     {
 		$this->moduleSettings=new ModuleSettingsReaderController( $p );
     }
-
-
-    /**
-     * Set the active project ID
-     *
-     * @access    public
-     */
-    public function setProjectAction ()
+	
+    public function setProjectAction()
     {
-
-		unset($_SESSION['app']['project']);
-		unset($_SESSION['app']['user']);
-
+		$this->unsetProjectSession();
+		$this->unsetUserSession();
 		$this->resolveProjectId();
-
-		if (!$this->getCurrentProjectId())
-		{
-			$this->addError($this->translate('Unknown project or invalid project ID.'));
-	        $this->printPage();
-		} 
-		else 
-		{
-	        $this->setUrls();
-			$this->setCurrentProjectData();
-			$this->setCssFiles();
-
-			if ($this->rHasVal('r'))
-			{
-				$url = $this->rGetVal('r');
-			} 
-			else 
-			{
-				$url=$this->moduleSettings->getGeneralSetting( 'start_page' );
-				if (empty($url))
-					$url = 'index.php';
-			}
-
-			$this->redirect($url);
-		}
+		$this->defaultToFirstPublishedProject();
+		$this->setProjectData();
+		$this->redirectProjectUrl();
+		$this->addError($this->translate('No published projects available.'));
+		$this->printPage();
     }
 
-
-    /**
-     * Index of project: introduction (or other content pages)
-     *
-     * @access    public
-     */
-    public function indexAction ()
+    public function indexAction()
     {
-		if ($this->rHasVal('show','icongrid'))
-		{
-			$this->printPage();
-		} 
-		else 
-		{
-			$this->setStoreHistory(false);
-			$this->redirect('../linnaeus/content.php?sub=Welcome');
-		}
+		$this->printPage();
     }
 
-    /**
-     * Index of project: introduction (or other content pages)
-     *
-     * @access    public
-     */
     public function contentAction ()
     {
 		if (!$this->rHasVal('sub') && !$this->rHasVal('id')) {
@@ -325,6 +267,61 @@ class LinnaeusController extends Controller
 			))
 		);
 
+	}
+
+
+	private function unsetProjectSession()
+	{
+		unset($_SESSION['app']['project']);
+	}
+
+	private function unsetUserSession()
+	{
+		unset($_SESSION['app']['user']);
+	}
+
+	private function defaultToFirstPublishedProject()
+	{
+		if ($this->getCurrentProjectId()) return;
+		
+		$d=$this->models->Projects->_get(array(
+			'id'=>array('published'=>1),
+			'order'=>'title,sys_name',
+			'limit'=>1
+		));
+	
+		if ($d)
+		{
+			$this->setCurrentProjectId( $d[0]['id'] );
+		}
+	}
+
+	private function setProjectData()
+	{
+		if (!$this->getCurrentProjectId()) return;
+		
+		$this->setUrls();
+		$this->setCurrentProjectData();
+		$this->setCssFiles();
+	}
+
+	private function redirectProjectUrl()
+	{
+		if (!$this->getCurrentProjectId()) return;
+
+		$url='index.php';
+
+		if ($this->rHasVal('r'))
+		{
+			$url = $this->rGetVal('r');
+		} 
+		else
+		if ( !empty($this->moduleSettings->getGeneralSetting( 'start_page' )) )
+		{
+			$url=$this->moduleSettings->getGeneralSetting( 'start_page' );
+		}
+
+		$this->redirect($url);
 	}
 
 

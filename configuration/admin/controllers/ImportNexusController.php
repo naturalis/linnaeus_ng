@@ -27,8 +27,11 @@
 include_once ('ImportController.php');
 class ImportNexusController extends Controller
 {
+	
+	public $controllerPublicName="NexusImport ";
+	public $controllerPublicNameMask="Matrix key";
 
-    public function __construct ()
+	public function __construct ()
     {
         parent::__construct();
     }
@@ -45,9 +48,10 @@ class ImportNexusController extends Controller
 		define('NEXUS_START_TAG','#NEXUS');
 		define('NEXUS_DEFAULT_CHARTYPE','text');
 
+
         $this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Nexus file upload'));
+        $this->setPageName($this->translate('Nexus import'));
 
         if ($this->requestDataFiles) {
 

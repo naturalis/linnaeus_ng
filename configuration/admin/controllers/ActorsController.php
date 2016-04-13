@@ -19,7 +19,7 @@ class ActorsController extends NsrController
 		'literature2_authors'
     );
 
-    public $controllerPublicName = 'Actoren';
+    public $controllerPublicName = 'Actors';
 
     public $cssToLoad = array(
 		'lookup.css',
@@ -69,8 +69,6 @@ class ActorsController extends NsrController
 
     public function editAction()
 	{
-		$this->setPageName($this->translate('Edit actor'));
-
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
@@ -112,9 +110,14 @@ class ActorsController extends NsrController
 
 		if ($this->getActorId())
 		{
+			$this->setPageName($this->translate('Edit actor'));
 			$actor=$this->getActor();
 			$this->smarty->assign('actor',$actor);
 			$this->smarty->assign('links',$this->getActorLinks( $actor ));
+		}
+		else
+		{
+			$this->setPageName($this->translate('New actor'));
 		}
 
 		$this->smarty->assign( 'companies', $this->getAllActors(array('is_company'=>true,'search'=>'*')));

@@ -58,7 +58,7 @@ class NsrTaxonManagement extends NsrController
         )
     );
 	
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Taxon editor';
 
 	private $maxCategories = 50;
 	

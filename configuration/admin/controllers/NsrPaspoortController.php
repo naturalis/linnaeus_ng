@@ -33,7 +33,7 @@ class NsrPaspoortController extends NsrController
         )
     );
     public $modelNameOverride='NsrPaspoortModel';
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $taxonId;
 
@@ -95,7 +95,7 @@ class NsrPaspoortController extends NsrController
 			$this->deletePassportMeta($this->rGetAll());
 		}
 
-        $this->setPageName($this->translate('Edit taxon passport'));
+        $this->setPageName($this->translate('Edit meta-data'));
 
 		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('tabs',$this->getPassportCategories());	

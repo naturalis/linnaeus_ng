@@ -311,6 +311,8 @@ class MediaController extends Controller
 
     public function ajaxInterfaceAction ()
     {
+		if ( !$this->getAuthorisationState() ) return;
+		
         if ($this->rHasVal('action', 'upload_progress')) {
             $this->smarty->assign('returnText', $this->getUploadProgress('media'));
         }
@@ -322,6 +324,7 @@ class MediaController extends Controller
 
     public function indexAction ()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
         $this->checkAuthorisation();
 
         // Only send data when user is sysadmin!!
@@ -338,6 +341,9 @@ class MediaController extends Controller
     public function selectRsAction ()
     {
         $this->checkAuthorisation();
+
+		$this->setPageName($this->translate('Browse Media on ResourceSpace server'));
+
         $this->smarty->assign('media', $this->getRsMediaList());
 		$this->smarty->assign('from', 'select_rs');
         $this->printPage();
@@ -346,6 +352,9 @@ class MediaController extends Controller
     public function selectAction ()
     {
         $this->checkAuthorisation();
+		
+		$this->setPageName($this->translate('Browse Media'));
+
         $this->setItemTemplate();
 
         if ($this->rHasVal('action', 'delete')) {
@@ -367,6 +376,8 @@ class MediaController extends Controller
     public function searchAction ()
     {
         $this->checkAuthorisation();
+
+		$this->setPageName($this->translate('Search Media'));
 
         foreach ($this::$metadataFields as $f) {
             $search['metadata'][$f] = $this->rGetVal($f);
@@ -487,6 +498,9 @@ class MediaController extends Controller
     public function uploadAction ()
     {
         $this->checkAuthorisation();
+
+		$this->setPageName($this->translate('Upload media'));
+
         $this->setItemTemplate();
 
         // Only upload if upload button has been pushed!

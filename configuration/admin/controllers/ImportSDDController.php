@@ -31,6 +31,7 @@ class ImportSDDController extends ImportController
 
 	private $_defaultKingdom = '(import generated master taxon)';
     public $controllerPublicName = 'SDD file Import';
+	public $controllerPublicNameMask="Matrix key";
 	private $_useGroupsAsUpperTreeLevel = false;//true;
 
     /**
@@ -40,28 +41,15 @@ class ImportSDDController extends ImportController
      */
     public function __construct ()
     {
-
         parent::__construct();
-
         error_reporting(E_ERROR | E_PARSE);
-
 		set_time_limit(2400); // RIGHT!
-
     }
 
-
-
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
         parent::__destruct();
     }
-
-
 
     public function sddImport1Action ()
     {
@@ -71,10 +59,10 @@ class ImportSDDController extends ImportController
         if ($this->rHasVal('process', '1'))
             $this->redirect('sdd_import_2.php');
 
-        $this->setPageName($this->translate('Specify file'));
+        $this->setPageName($this->translate('SDD Import'));
 
-        if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file')) {
-
+        if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file'))
+		{
             $tmp = tempnam(sys_get_temp_dir(), 'lng');
 
             if (copy($this->requestDataFiles[0]['tmp_name'], $tmp)) {
@@ -85,41 +73,43 @@ class ImportSDDController extends ImportController
                     'src' => 'upload'
                 );
             }
-            else {
-
+            else
+			{
                 unset($_SESSION['admin']['system']['import']['file']);
             }
         }
-        else if ($this->rHasVal('serverFile') && !$this->rHasVal('clear', 'file')) {
-
-            if (file_exists($this->rGetVal('serverFile'))) {
-
+        else 
+		if ($this->rHasVal('serverFile') && !$this->rHasVal('clear', 'file'))
+		{
+            if (file_exists($this->rGetVal('serverFile')))
+			{
                 $_SESSION['admin']['system']['import']['file'] = array(
                     'path' => $this->rGetVal('serverFile'),
                     'name' => $this->rGetVal('serverFile'),
                     'src' => 'existing'
                 );
             }
-            else {
-
+            else
+			{
                 $this->addError('File "' . $this->rGetVal('serverFile') . '" does not exist.');
                 unset($_SESSION['admin']['system']['import']['file']);
             }
         }
 
-        if ($this->rHasVal('imagePath') || $this->rHasVal('noImages')) {
-
-            if ($this->rHasVal('noImages')) {
-
+        if ($this->rHasVal('imagePath') || $this->rHasVal('noImages'))
+		{
+            if ($this->rHasVal('noImages'))
+			{
                 $_SESSION['admin']['system']['import']['imagePath'] = false;
             }
-            else if (file_exists($this->rGetVal('imagePath'))) {
-
+            else 
+			if (file_exists($this->rGetVal('imagePath')))
+			{
                 $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->rGetVal('imagePath'), '/') . '/';
 
             }
-            else {
-
+            else
+			{
                 $this->addError('Image path "' . $this->rGetVal('imagePath') . '" does not exist or unreachable.');
                 unset($_SESSION['admin']['system']['import']['imagePath']);
             }
@@ -127,17 +117,17 @@ class ImportSDDController extends ImportController
 
 		$_SESSION['admin']['system']['import']['thumbsPath'] = false;
 
-        if ($this->rHasVal('clear', 'file')) {
-
+        if ($this->rHasVal('clear', 'file'))
+		{
             unset($_SESSION['admin']['system']['import']['file']);
             unset($_SESSION['admin']['system']['import']['raw']);
         }
 
         if ($this->rHasVal('clear', 'imagePath'))
             unset($_SESSION['admin']['system']['import']['imagePath']);
+
         if ($this->rHasVal('clear', 'thumbsPath'))
             unset($_SESSION['admin']['system']['import']['thumbsPath']);
-
 
         if (isset($_SESSION['admin']['system']['import']))
             $this->smarty->assign('s', $_SESSION['admin']['system']['import']);

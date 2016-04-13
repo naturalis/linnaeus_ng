@@ -26,7 +26,7 @@ class NsrTaxonImagesController extends NsrController
         )
     );
     public $modelNameOverride='NsrTaxonImagesModel';
-    public $controllerPublicName = 'Soortenregister beheer';
+    public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
 	private $conceptId=null;
