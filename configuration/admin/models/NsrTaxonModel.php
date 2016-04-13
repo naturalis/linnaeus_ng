@@ -61,6 +61,7 @@ final class NsrTaxonModel extends AbstractModel
 				_a.organisation_id,
 				_g.name as organisation_name,
 				_a.type_id,
+				_a.rank_id,
 				_b.nametype,
 				_a.language_id,
 				_c.language,
@@ -152,10 +153,11 @@ final class NsrTaxonModel extends AbstractModel
 					when _b.nametype = '".PREDICATE_MISSPELLED_NAME."' then 4
 					when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
 					else 0
-				end as sort_criterium
+				end as sort_criterium,
+				ifnull(_q.label,_r.rank) as rank_label
 	
 			from %PRE%names _a 
-	
+
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id 
 				and _a.project_id=_b.project_id
@@ -167,7 +169,19 @@ final class NsrTaxonModel extends AbstractModel
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
 				and _d.label_language_id=".$label_language_id."
-	
+
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id = _f.project_id
+		
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
+		
+			left join %PRE%labels_projects_ranks _q
+				on _f.id=_q.project_rank_id
+				and _f.project_id = _q.project_id
+				and _q.language_id=".$label_language_id."
+			
 			where
 				_a.project_id = ".$project_id."
 				and _a.taxon_id=".$taxon_id."
@@ -1001,10 +1015,10 @@ final class NsrTaxonModel extends AbstractModel
 
 		$query="
 			create table %PRE%".$table_name." (
-				`id` int(11) not null primary key,
-				`code_1` varchar(16) not null, 
-				`code_2` varchar(32) not null, 
-				key `key_code_1` (`code_1`), key `key_code_2` (`code_2`))";
+				{t}id{t} int(11) not null primary key,
+				{t}code_1{t} varchar(16) not null, 
+				{t}code_2{t} varchar(32) not null, 
+				key {t}key_code_1{t} ({t}code_1{t}), key {t}key_code_2{t} ({t}code_2{t}))";
 
 		$this->freeQuery( $query );
 	}

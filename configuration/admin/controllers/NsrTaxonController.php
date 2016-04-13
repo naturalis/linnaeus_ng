@@ -1779,6 +1779,19 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
+
+		if ($this->rHasVar('name_rank_id'))
+		{
+			if ($this->updateNameRankId($this->rGetVal('name_rank_id')))
+			{
+				$this->addMessage('Rang opgeslagen.');
+			}
+			else
+			{
+				$this->addError('Rang niet opgeslagen.');
+			}
+		}
+
 		if ($this->rHasVar('name_language_id'))
 		{
 			if ($this->updateNameLanguageId($this->rGetVal('name_language_id')))
@@ -1945,6 +1958,14 @@ class NsrTaxonController extends NsrController
 	{
 		return $this->models->Names->update(
 			array('type_id'=>trim($values['new'])),
+			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
+		);
+	}
+
+	private function updateNameRankId($values)
+	{
+		return $this->models->Names->update(
+			array('rank_id'=>empty($values['new']) ? 'null' : trim($values['new'])),
 			array('id'=>$this->getNameId(),'taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
 	}

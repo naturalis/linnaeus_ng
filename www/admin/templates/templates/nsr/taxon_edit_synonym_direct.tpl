@@ -39,14 +39,14 @@ function doSynDirectForm()
 
 <div id="page-main">
 
-<h2><span style="font-size:12px">naamkaart:</span> {$name.name}</h2>
-<h3><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h3>
+<h2><span style="font-size:12px">{t}naamkaart:{/t}</span> {$name.name}</h2>
+<h3><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h3>
 
 <p>
-    <h3>Let op!</h3>
-    Via dit scherm kunnen alle delen van de geldige naam direct worden aangepast, zonder checks. 
+    <h3>{t}Let op!{/t}</h3>
+    {t}Via dit scherm kunnen alle delen van de geldige naam direct worden aangepast, zonder checks. 
     Doet dit alleen in uitzonderingsgevallen waarin er een discrepantie bestaat tussen de conceptnaam en de geldige naam.<br />
-    Let op dat alle delen los moeten worden ingevoerd, er wordt niets automatisch samengevoegd!
+    Let op dat alle delen los moeten worden ingevoerd, er wordt niets automatisch samengevoegd!{/t}
 </p>
 
 <form method="post" onsubmit="return false;">
@@ -57,32 +57,32 @@ function doSynDirectForm()
     <p>
         <table>
             <tr>
-                <th>samengestelde naam:</th>
+                <th>{t}samengestelde naam:{/t}</th>
                 <td><input type="text" class="medium" id="name_name" value="{$name.name}" /></td>
             </tr>
             <tr>
-                <th>genus / uninomial:</th>
+                <th>{t}genus / uninomial:{/t}</th>
                 <td><input type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" /></td>
             </tr>
             <tr>
-                <th>soort:</th>
+                <th>{t}soort:{/t}</th>
                 <td><input type="text" class="medium" id="name_specific_epithet" value="{$name.specific_epithet}" /></td>
             </tr>
             <tr>
-                <th>derde naamdeel:</th>
+                <th>{t}derde naamdeel:{/t}</th>
                 <td><input type="text" class="medium" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td>
             </tr>
         
             <tr>
-                <th>auteurschap:</th>
+                <th>{t}auteurschap:{/t}</th>
                 <td><input type="text" class="medium" id="name_authorship" value="{$name.authorship}" /></td>
             </tr>
             <tr>
-                <th>auteur(s):</th>
+                <th>{t}auteur(s):{/t}</th>
                 <td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" /></td>
             </tr>	
             <tr>
-                <th>jaar:</th>
+                <th>{t}jaar:{/t}</th>
                 <td><input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" /></td>
             </tr>	
         
@@ -93,13 +93,13 @@ function doSynDirectForm()
 
     
     <p>
-        <input type="button" value="opslaan" onclick="doSynDirectForm()"/>
+        <input type="button" value="{t}opslaan{/t}" onclick="doSynDirectForm()"/>
     </p>
 
     </form>
 
     <p>
-        <a href="synonym.php?id={$name.id}">terug</a>
+        <a href="synonym.php?id={$name.id}">{t}terug{/t}</a>
     </p>
 
 </div>

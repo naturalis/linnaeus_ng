@@ -4,9 +4,8 @@ include_once (dirname(__FILE__) . "/AbstractModel.php");
 class SpeciesModel extends AbstractModel
 {
 
-    public function __construct ()
+    public function __construct()
     {
-
         parent::__construct();
 
         $this->connectToDatabase() or die(_('Failed to connect to database '.
@@ -17,8 +16,7 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function __destruct ()
+    public function __destruct()
     {
         if ($this->databaseConnection)
 		{
@@ -27,15 +25,12 @@ class SpeciesModel extends AbstractModel
         parent::__destruct();
     }
 
-
-    public function getFirstTaxonId ($params)
+    public function getFirstTaxonId($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : false;
+		if ( is_null($projectId) || is_null($taxonType) ) return;
 
         $query = "
 			select _a.id
@@ -52,15 +47,12 @@ class SpeciesModel extends AbstractModel
        	return isset($t) ? $t[0]['id'] : null;
     }
 
-
-    public function getBrowseOrder ($params)
+    public function getBrowseOrder($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : false;
+		if ( is_null($projectId) || is_null($taxonType) ) return;
 
         $query = '
 			select _a.id,_a.taxon
@@ -73,18 +65,15 @@ class SpeciesModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
-    public function getTaxa ($params)
+    public function getTaxa($params)
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonType = isset($params['taxonType']) ? $params['taxonType'] : null;
         $getAll = isset($params['getAll']) ? $params['getAll'] : false;
-        $listMax = isset($params['listMax']) ? $params['listMax'] : false;
-        $regExp = isset($params['regExp']) ? $params['regExp'] : false;
+        $listMax = isset($params['listMax']) ? $params['listMax'] : null;
+        $regExp = isset($params['regExp']) ? $params['regExp'] : null;
+
+		if ( is_null($projectId) || is_null($taxonType) ) return;
 
         $query = "
 			select
@@ -110,15 +99,12 @@ class SpeciesModel extends AbstractModel
 		return array($taxa, $total);
     }
 
-
-    public function getTaxonParentage ($params)
+    public function getTaxonParentage($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		if ( is_null($projectId) || is_null($taxonId) ) return;
 
         $query = "
 			select
@@ -134,18 +120,16 @@ class SpeciesModel extends AbstractModel
 		return !empty($d) ? explode(' ',$d[0]['parentage']) : null;
     }
 
-
-    public function getTaxonNsr ($params)
+    public function getTaxonNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
 		$predicatePreferredNameId =
-            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+
+		if ( is_null($projectId) || is_null($predicatePreferredNameId) || is_null($languageId)  || is_null($taxonId) ) return;
+
 
         $query = "
 			select
@@ -215,17 +199,14 @@ class SpeciesModel extends AbstractModel
 		return $d ? $d[0] : null;
     }
 
-
-    public function getSpeciesCountNsr ($params)
+    public function getSpeciesCountNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+		$rankId = isset($params['rankId']) ? $params['rankId'] : null;
+		$speciesRankId = isset($params['speciesRankId']) ? $params['speciesRankId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-		$rankId = isset($params['rankId']) ? $params['rankId'] : false;
-		$speciesRankId = isset($params['speciesRankId']) ? $params['speciesRankId'] : false;
+		if ( is_null($projectId) || is_null($taxonId) || is_null($rankId)  || is_null($speciesRankId) ) return;
 
         $query = "
 			select
@@ -270,19 +251,15 @@ class SpeciesModel extends AbstractModel
 		));
     }
 
-
-
-    public function getTaxonChildrenNsr ($params)
+    public function getTaxonChildrenNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
 		$predicateValidNameId =
-            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+
+		if ( is_null($projectId) || is_null($predicateValidNameId) || is_null($languageId)  || is_null($taxonId) ) return;
 
         $query = "
             select
@@ -348,18 +325,15 @@ class SpeciesModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
-    public function getNameNsr ($params)
+    public function getNameNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$predicateType = isset($params['predicateType']) ? $params['predicateType'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+		$nameId = isset($params['nameId']) ? $params['nameId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$predicateType = isset($params['predicateType']) ? $params['predicateType'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-		$nameId = isset($params['nameId']) ? $params['nameId'] : false;
+		if ( is_null($projectId) || is_null($languageId) ) return;
 
         $query = "
             select
@@ -432,16 +406,13 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getNamesNsr ($params)
+    public function getNamesNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		if ( is_null($projectId) || is_null($languageId) || is_null($taxonId) ) return;
 
         $query = "
             select
@@ -479,7 +450,8 @@ class SpeciesModel extends AbstractModel
 					when _a.language_id = ".LANGUAGE_ID_DUTCH." then 10
 					when _a.language_id = ".LANGUAGE_ID_SCIENTIFIC." then 0
 					else 5
-				end as sort_criterium_language
+				end as sort_criterium_language,
+				ifnull(_q.label,_r.rank) as rank_label
 
 			from %PRE%names _a
 		
@@ -494,9 +466,22 @@ class SpeciesModel extends AbstractModel
 				on _a.language_id=_d.language_id
 				and _d.label_language_id=".$languageId."
 
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id = _f.project_id
+		
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
+		
+			left join %PRE%labels_projects_ranks _q
+				on _f.id=_q.project_rank_id
+				and _f.project_id = _q.project_id
+				and _q.language_id=".$languageId."
+			
 			where
 				_a.project_id = ".$projectId."
 				and _a.taxon_id=".$taxonId."
+
 			order by
 				sort_criterium_language desc,
 				language_label,
@@ -508,16 +493,13 @@ class SpeciesModel extends AbstractModel
         ));
     }
 
-
-    public function getPresenceDataNsr ($params)
+    public function getPresenceDataNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		if ( is_null($projectId) || is_null($languageId) || is_null($taxonId) ) return;
 
         $query = "
             select
@@ -573,15 +555,12 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getTrendDataByYear ($params)
+    public function getTrendDataByYear($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		if ( is_null($projectId) || is_null($taxonId) ) return;
 
         $query = "
 			select
@@ -603,15 +582,13 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getTrendDataByTrend ($params)
+    public function getTrendDataByTrend($params)
     {
-		if (!$params) {
-		    return false;
-		}
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+
+		if ( is_null($projectId) || is_null($taxonId) ) return;
 
         $query = "
 			select
@@ -633,16 +610,12 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-
-    public function getReferenceAuthorsNsr ($params)
+    public function getReferenceAuthorsNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$literatureId = isset($params['literatureId']) ? $params['literatureId'] : false;
+		if ( is_null($projectId) || is_null($literatureId) ) return;
 
         $query = "
 			select
@@ -663,15 +636,12 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getReferenceNsr ($params)
+    public function getReferenceNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$literatureId = isset($params['literatureId']) ? $params['literatureId'] : false;
+		if ( is_null($projectId) || is_null($literatureId) ) return;
 
         $query = "
 			select
@@ -698,18 +668,13 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function doesLanguageHavePreferredNameNsr ($params)
+    public function doesLanguageHavePreferredNameNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$predicatePreferredName =
-            isset($params['predicatePreferredName']) ? $params['predicatePreferredName'] : false;
+		if ( is_null($projectId) || is_null($taxonId) || is_null($languageId) ) return;
 
         $query = "
 			select
@@ -725,7 +690,7 @@ class SpeciesModel extends AbstractModel
 				_a.project_id = " . $projectId . "
 				and _a.taxon_id=" . $taxonId . "
 				and _a.language_id=" . $languageId . "
-				and _b.nametype= '".$predicatePreferredName . "'";
+				and _b.nametype= 'PREDICATE_PREFERRED_NAME'";
 
         $d = $this->freeQuery($query);
 
@@ -733,13 +698,9 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getFirstTaxonIdNsr ($projectId)
+    public function getFirstTaxonIdNsr($projectId)
     {
-
-		if (!$projectId) {
-		    return false;
-		}
+		if (!$projectId) return;
 
         $query = "
 			select
@@ -768,20 +729,17 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getCategoriesNsr ($params)
+    public function getCategoriesNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
 		$hasRedirectTo = isset($params['hasRedirectTo']) ? $params['hasRedirectTo'] : false;
 		$hasCheckQuery = isset($params['hasCheckQuery']) ? $params['hasCheckQuery'] : false;
 		$hasAlwaysHide = isset($params['hasAlwaysHide']) ? $params['hasAlwaysHide'] : false;
 		$hasExternalReference = isset($params['hasExternalReference']) ? $params['hasExternalReference'] : false;
+
+		if ( is_null($projectId) || is_null($taxonId)  || is_null($languageId) ) return;
 
         $query = "
 			select
@@ -824,25 +782,30 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function getTaxonMediaNsr ($params)
+    public function getTaxonMediaNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 		$overview = isset($params['overview']) ? $params['overview'] : false;
         $distributionMaps = isset($params['distributionMaps']) ? $params['distributionMaps'] : false;
-        $limit = isset($params['limit']) ? $params['limit'] : false;
-        $offset = isset($params['offset']) ? $params['offset'] : false;
-        $sort = isset($params['sort']) ? $params['sort'] : false;
+        $limit = isset($params['limit']) ? $params['limit'] : null;
+        $offset = isset($params['offset']) ? $params['offset'] : null;
+        $sort = isset($params['sort']) ? $params['sort'] : null;
         $predicatePreferredNameId =
-            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : false;
+            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
         $predicateValidNameId =
-            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : false;
+            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+
+
+		if ( 
+			is_null($projectId) || 
+			is_null($languageId) || 
+			is_null($taxonId) || 
+			is_null($predicatePreferredNameId) || 
+			is_null($predicateValidNameId)
+		) return;
 
         $query = "
 			select
@@ -1029,22 +992,25 @@ class SpeciesModel extends AbstractModel
 		return array($media, $total);
     }
 
-
-    public function getCollectedLowerTaxonMediaNsr ($params)
+    public function getCollectedLowerTaxonMediaNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-        $limit = isset($params['limit']) ? $params['limit'] : false;
-        $offset = isset($params['offset']) ? $params['offset'] : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+        $limit = isset($params['limit']) ? $params['limit'] : null;
+        $offset = isset($params['offset']) ? $params['offset'] : null;
         $predicatePreferredNameId =
-            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : false;
+            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
         $predicateValidNameId =
-            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : false;
+            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+
+		if ( 
+			is_null($projectId) || 
+			is_null($languageId) || 
+			is_null($taxonId) || 
+			is_null($predicatePreferredNameId) || 
+			is_null($predicateValidNameId)
+		) return;
 
         $query = "
             select
@@ -1193,15 +1159,12 @@ class SpeciesModel extends AbstractModel
 		return array($media, $total);
     }
 
-
-    public function taxonMediaCountNsr ($params)
+    public function taxonMediaCountNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		if ( is_null($projectId) || is_null($taxonId) ) return;
 
         $query = "
 			select
@@ -1244,8 +1207,7 @@ class SpeciesModel extends AbstractModel
 
     }
 
-
-    public function checkQueryResult( $query )
+    public function runCheckQuery( $query )
     {
 		if (!$query) return;
 
@@ -1257,16 +1219,13 @@ class SpeciesModel extends AbstractModel
 		}
     }
 
-
     public function getExternalIdNsr ($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+		$organisation = isset($params['organisation']) ?$params['organisation'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
-		$organisation = isset($params['organisation']) ? $this->escapeString($params['organisation']) : false;
+		if ( is_null($projectId) || is_null($taxonId) || is_null($organisation) ) return;
 
         $query = "
 			select
@@ -1284,21 +1243,18 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_a.project_id = ".$projectId."
-				and lower(_a.name) = '". $organisation ."'";
+				and lower(_a.name) = '" .  $this->escapeString( $organisation ) ."'";
 
         return $this->freeQuery($query);
 
     }
 
-
-    public function getExternalOrgNsr ($params)
+    public function getExternalOrgNsr($params)
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$organisation = isset($params['organisation']) ? $this->escapeString($params['organisation']) : false;
+		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
+		$organisation = isset($params['organisation']) ? $params['organisation'] : null;
+		
+		if ( is_null($projectId) || is_null($organisation) ) return;
 
         $query = "
 			select
@@ -1309,12 +1265,10 @@ class SpeciesModel extends AbstractModel
 			from %PRE%external_orgs
 			where
 				project_id = ".$projectId."
-				and lower(name) = '".$organisation ."'";
+				and lower(name) = '". $this->escapeString( $organisation ) ."'";
 
         return $this->freeQuery($query);
 
     }
 
 }
-
-?>

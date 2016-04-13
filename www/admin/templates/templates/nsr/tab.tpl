@@ -45,7 +45,7 @@ textarea {
 <div id="page-main">
 
 	<h2>{$page.page}</h2>
-	<h3>special attributes</h3>
+	<h3>{t}special attributes{/t}</h3>
 
 	<!-- (id {$page.id}) -->
    
@@ -62,10 +62,10 @@ textarea {
             <td>
 				<label><input type="checkbox" name="always_hide"{if $page.always_hide==1} checked="checked"{/if} /> {t}always hide{/t}</label>
                 <div class="explanation">
-                    hides the tab from the public menu, even if it contains published content. tab can still be accessed 
+                    {t}hides the tab from the public menu, even if it contains published content. tab can still be accessed 
                     directly. useful to directly retrieve specific content for a taxon, for instance for external use in a associated
-                    project.<br />
-                    use <code>http://your.domain/linnaeus_ng/app/views/species/nsr_taxon.php?cat={$page.id}&id=[taxon id]</code> to access the tab.
+                    project.{/t}<br />
+                    {t}use{/t} <code>http://your.domain/linnaeus_ng/app/views/species/nsr_taxon.php?cat={$page.id}&id=[taxon id]</code> {t}to access the tab.{/t}
                 </div>
 			</td>
 		</tr>
@@ -77,15 +77,15 @@ textarea {
             	<u>{t}external reference{/t}</u>
 
                 <div class="explanation">
-                    URL to point to an external page or webservice. parametrization can be done through substitution and/or parameters. these achieve
-                    similar goals, but work slightly different:
+                    {t}URL to point to an external page or webservice. parametrization can be done through substitution and/or parameters. these achieve
+                    similar goals, but work slightly different:{/t}
                     <ul>
-                        <li>use substitutions to replace placeholders in the URL itself with taxon-dependent values at runtime;</li>
-                        <li>parameters will be added as name/value pairs to the query string of the URL.</li>
+                        <li>{t}use substitutions to replace placeholders in the URL itself with taxon-dependent values at runtime;{/t}</li>
+                        <li>{t}parameters will be added as name/value pairs to the query string of the URL.{/t}</li>
                     </ul>
-                    the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
+                    {t}the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
                     available). when 'no check' is selected, the tab is always displayed. the reference can be implemented as an actual link, navigating away from the site (or opening in a new window), or as embedded, in
-                    which case a template should be defined in which to display the retrieved data.
+                    which case a template should be defined in which to display the retrieved data.{/t}
                 </div>
             
             	<table>
@@ -94,18 +94,18 @@ textarea {
                         <td>
                         	<table class="subsublabel">
                             	<tr class="tr-highlight">
-                                    <td>URL:</td>
+                                    <td>{t}URL:{/t}</td>
                                     <td><textarea name="external_reference[url]">{$page.external_reference_decoded->url}</textarea></td>
                                 </tr>
 
                                 <tr class="tr-highlight">
                                     <td>
-                                    	substitutions:<br />
-										<a href="#" onclick="add_subst();return false;">add</a>                                        
+                                    	{t}substitutions:{/t}<br />
+										<a href="#" onclick="add_subst();return false;">{t}add{/t}</a>                                        
                                     </td>
                                     <td>
                                     	<div id="substitutions"></div>
-                                    	encoding method:
+                                    	{t}encoding method:{/t}
                                     	{foreach $encoding_methods v k}
                                     	<label>
                                         	<input type="radio" name="external_reference[substitute_encode]" value="{$v}" {if $page.external_reference_decoded->substitute_encode==$v || (!$page.external_reference_decoded->substitute_encode && $k==1) } checked="checked"{/if} />{$v}</label>
@@ -114,12 +114,12 @@ textarea {
                                 </tr>
                                 <tr class="tr-highlight">
                                     <td>
-                                    	parameters:<br />
-										<a href="#" onclick="add_param();return false;">add</a>
+                                    	{t}parameters:{/t}<br />
+										<a href="#" onclick="add_param();return false;">{t}add{/t}</a>
 									</td>
                                     <td>
                                     	<div id="parameters"></div>
-                                    	encoding method:
+                                    	{t}encoding method:{/t}
                                     	{foreach $encoding_methods v k}
                                     	<label><input type="radio" name="external_reference[parameter_encode]" value="{$v}" {if $page.external_reference_decoded->parameter_encode==$v || (!$page.external_reference_decoded->parameter_encode && $k==1) } checked="checked"{/if} />{$v}</label>
                                     	{/foreach}
@@ -129,11 +129,11 @@ textarea {
 						</td>
 					</tr>
                     <tr>
-                    	<td class="sublabel">data check</td>
+                    	<td class="sublabel">{t}data check{/t}</td>
                     	<td>
                         	<table class="subsublabel">
                                 <tr class="tr-highlight">
-                                    <td>check type:</td>
+                                    <td>{t}check type:{/t}</td>
                                     <td>
                                     	<select name="external_reference[check_type]">
                                             {foreach $check_types v k}
@@ -144,15 +144,15 @@ textarea {
                                 </tr>
                                 <tr class="tr-highlight">
                                     <td>
-                                    	"check by" query:
+                                    	{t}"check by" query:{/t}
                                     </td>
                                     <td>
                                     	<textarea name="external_reference[query]">{$page.external_reference_decoded->query}</textarea>
                                         <div class="explanation">
-                                        query can take two parameters, <code>%pid%</code> for project ID and <code>%tid%</code> for taxon ID.<br />
+                                        {t}query can take two parameters, <code>%pid%</code> for project ID and <code>%tid%</code> for taxon ID.<br />
                                         query is expected to return one row with a column called <code>result</code> that has a value of either 1
                                         (data present) or 0 (no data present).<br />
-										queries are run "as is" and have the potential to destroy your entire databas, so don't mess around.
+										queries are run "as is" and have the potential to destroy your entire databas, so don't mess around.{/t}
                                         </div>
 									</td>
                                 </tr>
@@ -160,11 +160,11 @@ textarea {
 						</td>
 					</tr>
                     <tr>
-                    	<td class="sublabel">presentation</td>
+                    	<td class="sublabel">{t}presentation{/t}</td>
                     	<td>
                         	<table class="subsublabel">
                                 <tr class="tr-highlight">
-                                    <td>link or embed:</td>
+                                    <td>{t}link or embed:{/t}</td>
                                     <td>
                                     	<select name="external_reference[link_embed]">
                                             {foreach $link_embed v k}
@@ -174,7 +174,7 @@ textarea {
                                     </td>
                                 </tr>
                                 <tr class="tr-highlight">
-                                    <td>template:<br />(when embedding)</td>
+                                    <td>{t}template:<br />(when embedding){/t}</td>
                                     <td><input type="text" name="external_reference[template]" value="{$page.external_reference_decoded->template}" /></td>
                                 </tr>
 							</table>

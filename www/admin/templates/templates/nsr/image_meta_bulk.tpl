@@ -184,15 +184,15 @@ th {
 					{assign var=message value="field will not be stored as meta-data"}
                 {else}
 					{assign var=class value=""}
-					{assign var=message value="field will be stored as `$fields[$lk]`"}
+					{assign var=message value="field will be stored as {t}$fields[$lk]{t}"}
                 {/if}
                 
                 {if $wontsaverow && $lk!=$col_NSR_ID} 
-					{assign var=class value="`$class` row-wont-save"}
+					{assign var=class value="{t}$class{t} row-wont-save"}
                 {/if}
                 
                 {if !$checks[$lsk][$lk]|@is_null && $checks[$lsk][$lk].pass==false}
-					{assign var=class value="`$class` meta-data-format-error"}
+					{assign var=class value="{t}$class{t} meta-data-format-error"}
                     {assign var=message value="format error; field will not be saved"}
                 {/if }
                 
