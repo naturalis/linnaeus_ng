@@ -272,7 +272,7 @@ class MatrixKeyController extends Controller
 			}
 
             $matrix=$this->getMatrix( $this->rGetId() );
-			$this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['names'][$this->getDefaultProjectLanguage()]['name']));
+			$this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['names'][$this->getDefaultProjectLanguage()]['name']), $this->translate('Editing matrix'));
             $this->smarty->assign('matrix', $matrix);
         }
 
@@ -290,7 +290,7 @@ class MatrixKeyController extends Controller
 
         $matrix=$this->getMatrix( $this->getCurrentMatrixId() );
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']), $this->translate('Editing matrix'));
 
         if ($this->rHasVal('char')) $this->smarty->assign('activeCharacteristic', $this->rGetVal('char'));
         $this->smarty->assign('characteristics', $this->getCharacteristics());
@@ -362,7 +362,7 @@ class MatrixKeyController extends Controller
 
         $matrix=$this->getMatrix( $this->getCurrentMatrixId() );
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']), $this->translate('Editing matrix'));
 
         if ($this->rHasVal('delete') && !$this->isFormResubmit())
 		{
@@ -433,7 +433,7 @@ class MatrixKeyController extends Controller
 
         $matrix = $this->getMatrix( $this->getCurrentMatrixId() );
 
-        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']), $this->translate('Editing matrix'));
 
 		if ($this->rHasVal('order') && !$this->isFormResubmit())
 		{
@@ -526,7 +526,7 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('characteristic', $c);
             if (isset($c['label']))
 			{
-                $this->setPageName(sprintf($this->translate('Editing character "%s"'), $c['label']));
+                $this->setPageName(sprintf($this->translate('Editing character "%s"'), $c['label']), $this->translate('Editing character'));
             }
             else
 			{
@@ -700,12 +700,12 @@ class MatrixKeyController extends Controller
          // existing state
         if ($state['label'])
 		{
-            $this->setPageName(sprintf($this->translate('Editing state for "%s"'), $characteristic['label']));
+            $this->setPageName(sprintf($this->translate('Editing state for "%s"'), $characteristic['label']), $this->translate('Editing state'));
         }
         // new state
         else
 		{
-            $this->setPageName(sprintf($this->translate('New state for "%s"'), $characteristic['label']));
+            $this->setPageName(sprintf($this->translate('New state for "%s"'), $characteristic['label']), $this->translate('New state'));
         }
 
         if (($this->rHasVal('action', 'save') || $this->rHasVal('action', 'repeat')) && !$this->isFormResubmit())

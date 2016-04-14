@@ -60,7 +60,7 @@ class ImportNBCController extends ImportController
     public $usedHelpers = array(
         'file_upload_helper'
     );
-    public $controllerPublicName = 'NBC multi-entry key import';
+    public $controllerPublicName = 'Matrix Import';
     public $cssToLoad = array();
     public $jsToLoad = array();
 

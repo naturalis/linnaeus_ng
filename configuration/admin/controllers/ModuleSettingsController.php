@@ -185,7 +185,7 @@ class ModuleSettingsController extends Controller
 
 		$m=$this->getModule();
 
-        $this->setPageName( sprintf( $this->translate('Module settings: %s ') , $m['module'] ));
+        $this->setPageName( sprintf( $this->translate('Module settings: %s ') , $m['module'] ), $this->translate('Module settings') );
 
 		$this->smarty->assign( 'module', $this->getModule() );
 		$this->smarty->assign( 'settings', $this->getModuleSettings() );
@@ -219,7 +219,7 @@ class ModuleSettingsController extends Controller
 
 		$m=$this->getModule();
 
-        $this->setPageName( sprintf( $this->translate('Module settings: %s ') , $m['module'] ));
+        $this->setPageName( sprintf( $this->translate('Module settings: %s ') , $m['module'] ), $this->translate('Module settings') );
 
 		$this->smarty->assign( 'module', $this->getModule() );
 		$this->smarty->assign( 'settings', $this->getModuleSettings() );

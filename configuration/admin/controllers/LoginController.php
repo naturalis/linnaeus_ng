@@ -11,6 +11,8 @@ class LoginController extends Controller
 
 	private $_user;
 
+	public $controllerPublicName = 'Login';
+
     public function __construct ()
     {
         parent::__construct();

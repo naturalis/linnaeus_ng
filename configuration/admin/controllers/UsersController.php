@@ -284,64 +284,6 @@ class UsersController extends Controller
 
     }
 
-	public function rightsMatrixAction()
-	{
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
-        $this->checkAuthorisation();
-
-		$this->setBreadcrumbRootName($this->translate('System administration'));
-
-        $this->setPageName($this->translate('Rights matrix'));
-
-		if ($this->rHasVal('right') && $this->rHasVal('role') && !$this->isFormResubmit())
-		{
-			$d = $this->models->RightsRoles->_get(
-				array(
-					'id' => array('right_id' => $this->rGetVal('right'),'role_id' => $this->rGetVal('role'))
-				)
-			);
-
-			if (isset($d))
-			{
-				$this->models->RightsRoles->delete(array('right_id' => $this->rGetVal('right'),'role_id' => $this->rGetVal('role')));
-			}
-			else
-			{
-				$this->models->RightsRoles->save(
-					array(
-						'id' => null,
-						'right_id' => $this->rGetVal('right'),
-						'role_id' => $this->rGetVal('role')
-					)
-				);
-			}
-		}
-
-		$roles = $this->models->Roles->_get(array('id' => '*'));
-		$rights = $this->models->Rights->_get(array('id' => '*','order' => 'controller'));
-
-		foreach((array)$rights as $iKey => $iVal)
-		{
-			foreach((array)$roles as $oKey => $oVal)
-			{
-				$d = $this->models->RightsRoles->_get(
-					array(
-						'id' => array('right_id' => $iVal['id'],'role_id' => $oVal['id'])
-					)
-				);
-
-				$rights[$iKey]['roles'][] = array('id' => $oVal['id'], 'state' => $d[0]['id']);
-			}
-		}
-
-        $this->smarty->assign('roles', $roles);
-        $this->smarty->assign('rights', $rights);
-
-        $this->printPage();
-
-	}
-
-
 	private function getUserProjectRole( $userid )
 	{
 		return $this->models->UsersModel->getUserProjectRole(array(

@@ -105,7 +105,7 @@ class SpeciesMediaController extends Controller
 		$taxon=$this->getTaxonById( $this->rGetId() );
 		$media=$this->getTaxonMedia(array('id'=>$this->rGetId(),'language_id'=>$activeLanguage));
 
-		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']), $this->translate('Media'));
 
 		$this->smarty->assign('media',$media);
 		$this->smarty->assign('taxon',$taxon);
@@ -144,7 +144,7 @@ class SpeciesMediaController extends Controller
 
             if ($taxon['id']) {
 
-                $this->setPageName(sprintf($this->translate('New media for "%s"'), $taxon['taxon']));
+                $this->setPageName(sprintf($this->translate('New media for "%s"'), $taxon['taxon']), $this->translate('New media'));
 
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
 
