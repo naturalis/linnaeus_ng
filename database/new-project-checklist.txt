@@ -1,0 +1,77 @@
+new project checklist
+
+== SERVER ==
+have a server with:
+* accessible database
+* fresh checkout from https://github.com/naturalis/linnaeus_ng
+  (both automated by puppet)
+* SSH-access
+  
+
+== COMMAND LINE ==
+connect through SSH and:
+* make sure database user & password are correct in 
+	- /var/www/linnaeusng/configuration/admin/configuration.php
+	- /var/www/linnaeusng/configuration/app/configuration.php
+  this is automated by puppet so you can probably skip this step
+	
+* access database and create project, sysadmin and project role.
+  there are statement templates in the comment section at the top of:
+	/var/www/linnaeusng/database/empty-prepped-database.sql
+  replace 
+	'Project internal name'
+	'Project description'
+	'Project visible title'
+  in the "insert into projects..." statements with the appropriate values and execute.
+  "insert into users..." and "insert into projects_roles_users..." can be
+  executed as is.
+  if there is more than one project to be created, run the "insert into projects..." and
+  "insert into projects_roles_users..." statements multiple times with the appropriate
+  values.
+
+* optional: if there will be only one project, edit
+	/var/www/linnaeusng/configuration/app/constants.php
+  and remove the comment prefix // from the line
+	//define('FIXED_PROJECT_ID',1);
+  this will cause LNG to automatically forward to the project when someone accesses 
+	http://my.domain/linnaeus_ng/
+
+	
+== LINNAEUS NG ADMIN ==
+go to http://my.domain/linnaeus_ng/admin/ and log in with sysadmin/sysadmin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

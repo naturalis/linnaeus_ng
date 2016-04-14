@@ -30,7 +30,8 @@ final class Table extends AbstractModel
         $this->getTableColumnInfo();
 
         if (!$this->getTableExists()) {
-            die(_('FATAL: table "' . $this->tableName . '" does not exist'));
+			// fatal stop disabled while we are transitioning from old to new LNG modules
+            //die(_('FATAL: table "' . $this->tableName . '" does not exist'));
         }
 
     }
