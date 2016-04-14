@@ -12,6 +12,8 @@ class NsrTaxonMediaController extends NsrController
 {
 	private $_lookupListMaxResults=99999;
 
+	public $controllerPublicName = 'Taxon editor';
+
     public $usedModels = array(
 		'name_types',
 		'nsr_ids',
@@ -81,7 +83,7 @@ class NsrTaxonMediaController extends NsrController
 		}
 
 		$taxon = $this->getTaxonById($this->rGetId());
-		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']), $this->translate('Media'));
 
 		if ($this->rHasVal('action','delete')) {
 			$r = $this->detachMedia();
