@@ -58,7 +58,9 @@
             {/foreach}
         {/if}
         
+        {if $session.admin.project.id}
         <a href="../../../app/views/linnaeus/set_project.php?p={$session.admin.project.id}" style="color:#999;margin-left:10px" target="_project">view</a>
+        {/if}
         
         {if $isMultiLingual && $uiLanguages|@count>1}
             <span style="float:right">
