@@ -9,6 +9,7 @@
 */
 
 include_once ('NsrController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class NsrTreeController extends NsrController
 {
@@ -50,6 +51,11 @@ class NsrTreeController extends NsrController
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
+
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->_tree_show_upper_taxon=$this->moduleSettings->getModuleSetting( 'tree_show_upper_taxon' );
+		$this->smarty->assign( 'tree_show_upper_taxon',$this->_tree_show_upper_taxon, false );
     }
 
     public function __destruct()
@@ -68,7 +74,7 @@ class NsrTreeController extends NsrController
 
 		$tree=$this->restoreTree();
 
-		if (is_null($tree) || $this->rHasVar('tree-reset'))
+		if ( empty($tree) || $this->rHasVar('tree-reset'))
 		{
 			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
 		}

@@ -126,15 +126,6 @@ taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$v.id};
 {/if}
 {/foreach}
 
-allSetHeartbeatFreq({$heartbeatFrequency});
-taxonSetHeartbeat(
-	'{$session.admin.user.id}',
-	'{$session.admin.system.active_page.appName}',
-	'{$session.admin.system.active_page.controllerBaseName}',
-	'{$session.admin.system.active_page.viewName}',
-	'{$taxon.id}'
-);
-
 allLookupNavigateOverrideUrl('edit.php?id=%s');
 
 

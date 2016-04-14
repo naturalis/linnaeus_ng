@@ -96,16 +96,6 @@ $(document).ready(function(){
 		taxonUpdatePageBlock();
 	//	taxonPublishStates  = {if $content.publish!=''}{$content.publish}{else}0{/if};
 		taxonDrawPublishBlocks();
-	
-		allSetHeartbeatFreq({$heartbeatFrequency});
-		taxonSetHeartbeat(
-			'{$session.admin.user.id}',
-			'{$session.admin.system.active_page.appName}',
-			'{$session.admin.system.active_page.controllerBaseName}',
-			'{$session.admin.system.active_page.viewName}',
-			'{$taxon.id}'
-		);
-	
 		taxonActiveTaxonId = $('#taxon_id').val();
 
 		//allSetAutoSaveFreq({$autoSaveFrequency});

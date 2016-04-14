@@ -57,6 +57,7 @@ class NsrTaxonController extends NsrController
 
 	private $conceptId=null;
 	private $nameId=null;
+	private $firstTaxon=false;
 
 	private $_resPicsPerPage=100;
 
@@ -122,6 +123,7 @@ class NsrTaxonController extends NsrController
 				$data=$this->rGetAll();
 				array_walk($data, function(&$val, $key){if (isset($val['new'])) $val=$val['new'];});
 				unset($data['action']);
+				$texts=null;
 
 				if (isset($data['parent_taxon_id']))
 				{
@@ -543,6 +545,9 @@ class NsrTaxonController extends NsrController
 		}
 
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+		
+		$return=null;
+		
 		if ( $this->getAuthorisationState()==false ) return;
 
 		if (
@@ -1250,7 +1255,7 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
-		if (empty($name) || empty($rank) || empty($parent) || empty($uninomial))
+		if (empty($name) || empty($rank) || empty($uninomial))
 		{
 			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
 			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
@@ -1260,13 +1265,30 @@ class NsrTaxonController extends NsrController
 			return;
 		}
 
+		if ( empty($parent) )
+		{
+			$num=$this->models->NsrTaxonModel->getNumberOfUndeletedTaxa(['project_id'=>$this->getCurrentProjectId()]);
+			$this->firstTaxon=($num==0);
+
+			if ( !$this->firstTaxon )
+			{
+				$this->addError('Geen ouder. Concept niet opgeslagen.');
+				$this->setConceptId(null);
+				return;
+			}
+			else
+			{
+				$this->addWarning('Concept opgeslagen zonder ouder.');
+			}
+		}
+
 		if (!$this->checkAuthorshipAgainstRank($baseRank,$authorship))
 		{
 			$this->setConceptId(null);
 			return;
 		}
 
-		if (!$this->checkParentChildRelationship($baseRank,$parent))
+		if (!$this->firstTaxon && !$this->checkParentChildRelationship($baseRank,$parent))
 		{
 			$this->setConceptId(null);
 			return;
@@ -1308,7 +1330,7 @@ class NsrTaxonController extends NsrController
 		}
 
 
-		// we passed the tests!
+		// we passed all tests!
 		$d=$this->models->Taxa->save(
 		array(
 			'project_id' => $this->getCurrentProjectId(),
@@ -1321,7 +1343,10 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->models->Taxa->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
-			$this->logNsrChange(array('after'=>array('id'=>$this->getConceptId(),'taxon'=>$name,'rank_id' =>$rank),'note'=>'new concept '.$name));
+			$this->logNsrChange(array(
+				'after'=>array('id'=>$this->getConceptId(),
+				'taxon'=>$name,'rank_id' =>$rank),
+				'note'=>'new concept '.$name . ($this->firstTaxon ? ' (first taxon)' : '' )));
 			//$this->setIsNewRecord(true);
 			$this->updateConcept();
 		}
@@ -1336,8 +1361,8 @@ class NsrTaxonController extends NsrController
 		$this->createConceptNsrIds();
 		$this->createConceptPresence();
 
-		$before=$this->getConcept($this->rGetId());
-		$before['presence']=$this->getPresenceData($this->rGetId());
+		$before=$this->getConcept($this->getConceptId());
+		$before['presence']=$this->getPresenceData($this->getConceptId());
 
 		if ($this->rHasVar('concept_taxon'))
 		{

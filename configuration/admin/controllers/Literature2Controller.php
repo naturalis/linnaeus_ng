@@ -41,7 +41,9 @@ class Literature2Controller extends NsrController
 
 	private $referenceId=null;
 
-	private $publicationTypes=array(
+	private $publicationTypes=array();
+
+	private $basePubTypes=array(
 		'Artikel',
 		'Boek',
 		'Boek (deel)',
@@ -82,7 +84,7 @@ class Literature2Controller extends NsrController
     public function __construct ()
     {
         parent::__construct();
-		$this->initialise();
+		$this->initialize();
     }
 
     public function __destruct ()
@@ -90,13 +92,14 @@ class Literature2Controller extends NsrController
         parent::__destruct();
     }
 
-    private function initialise()
+    private function initialize()
     {
 		$this->Rdf = new RdfController;
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_matchThresholdDefault=$this->moduleSettings->getModuleSetting( array( 'setting'=>'literature2_import_match_threshold','subst'=>$this->_matchThresholdDefault));
 
+		$this->initializePublicationTypes();
 		$this->setPublicationTypesSortOrder( 'ifnull(_b.label,_a.sys_label)' );
 		$this->setPublicationTypes();
     }
@@ -1599,6 +1602,28 @@ class Literature2Controller extends NsrController
 		}
 	}
 
+    private function initializePublicationTypes()
+    {
+		$d = 
+            $this->models->Literature2Model->getPublicationTypes(array(
+                'projectId' => $this->getCurrentProjectId(),
+                'languageId' => $this->getDefaultProjectLanguage(),
+                'sortOrder' => $this->getPublicationTypesSortOrder()
+            ));
+			
+		if ( empty($d) )
+		{
+			foreach((array)$this->basePubTypes as $val)
+			{
+				$this->models->Literature2PublicationTypes->insert(array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'sys_label'=>$val,
+					'created'=>'now()'
+				));
+			}
+		}
+	}
+	
     private function getPublicationTypes()
     {
 		return $this->publicationTypes;

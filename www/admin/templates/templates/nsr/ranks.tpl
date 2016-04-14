@@ -81,7 +81,7 @@ $(document).ready(function()
 	taxonKingdom = [{$ranks[0].id},'{$ranks[0].rank}'];
 {foreach $ranks v}
 {if $v.in_col==1}
-	taxonCoLRanks[taxonCoLRanks.length]=[{$ranks[i].id},'{$ranks[i].rank}'];
+	taxonCoLRanks[taxonCoLRanks.length]=[{$v.id},'{$v.rank}'];
 {/if}
 {/foreach}
 

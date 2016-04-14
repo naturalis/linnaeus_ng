@@ -155,17 +155,6 @@ $(document).ready(function(){
 
 	allActiveLanguage = {$defaultLanguage};
 	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
-
-{*
-	allSetHeartbeatFreq({$heartbeatFrequency});
-	taxonSetHeartbeat(
-		'{$session.admin.user.id}',
-		'{$session.admin.system.active_page.appName}',
-		'{$session.admin.system.active_page.controllerBaseName}',
-		'{$session.admin.system.active_page.viewName}',
-		'{$taxon.id}'
-	);
-*}
 	allHideLoadingDiv();
 //	allLookupNavigateOverrideUrl('media.php?id=%s');
 */

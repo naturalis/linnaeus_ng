@@ -3,28 +3,27 @@
 
 <p>
 	<form>
-		naam zoeken: <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="typ een naam" autocomplete="off" />
+		{t}search for a name:{/t} <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="{t}type a name{/t}" autocomplete="off" />
 	</form>
 </p>
 <p>
-	taxonomische boom:
+	{t}taxonomic tree:{/t}
 	<div id="tree-container"></div>
 </p>
 <p>
-	taken:<br />
-	<a href="taxon_new.php">nieuw taxonconcept maken</a><br />
-	<a href="taxon_deleted.php">verwijderde taxonconcepten</a><br />
-	<a href="update_parentage.php">indextabel bijwerken</a><br />
-	<a href="activity_log.php">editor log</a><br /><br />
-	<a href="nsr_id_resolver.php">NSR ID resolver</a><br />
-	<a href="../import/export_versatile.php">multi-purpose export</a><br />
-	<a href="image_meta_bulk.php">image meta-data bulk upload</a><br />
+	{t}tasks:{/t}<br />
+	<a href="taxon_new.php">{t}new taxon concept{/t}</a><br />
+	<a href="taxon_deleted.php">{t}taxon concepts marked as deleted{/t}</a><br />
+	<a href="update_parentage.php">{t}update index table{/t}</a><br />
+	<a href="activity_log.php">{t}editor log{/t}</a><br /><br />
+	<a href="nsr_id_resolver.php">{t}NSR ID resolver{/t}</a><br />
+	<a href="../import/export_versatile.php">{t}multi-purpose export{/t}</a><br />
+	<a href="image_meta_bulk.php">{t}image meta-data bulk upload{/t}</a><br />
 </p>
-
 <p>
-	<a href="tabs.php">tabs</a><br />
-	<a href="sections.php">secties</a><br />
-	<a href="ranks.php">rangen</a><br />
+	<a href="tabs.php">{t}passport categories ("tabs"){/t}</a><br />
+	<a href="sections.php">{t}page sections{/t}</a><br />
+	<a href="ranks.php">{t}taxonomic ranks{/t}</a><br />
 </p>
 
 </div>
@@ -37,7 +36,6 @@ function localList(obj,txt)
 
 	if (obj && obj.results)
 	{
-		
 		for(var i=0;i<obj.results.length;i++) {
 			
 			var d = obj.results[i];
@@ -60,9 +58,10 @@ function localList(obj,txt)
 
 $(document).ready(function()
 {
-
-	setAjaxTreeUrl('tree_ajax_interface.php');
 	
+	
+	setAjaxTreeUrl('tree_ajax_interface.php');
+	setShowUpperTaxon({$tree_show_upper_taxon});
 	{if $session.admin.project.title}
 	setRootNodeLabel('{$session.admin.project.title|@escape}');
 	{/if}

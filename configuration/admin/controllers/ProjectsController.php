@@ -645,11 +645,6 @@ class ProjectsController extends Controller
 			        $pDel->deleteProjectContent($this->getCurrentProjectId());
 				}
 
-                $this->models->ModulesProjectsUsers->delete(array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'module_id' => $moduleId
-                ));
-
                 $this->models->ModulesProjects->delete(array(
                     'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()

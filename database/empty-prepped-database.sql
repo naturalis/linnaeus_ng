@@ -2512,6 +2512,9 @@ INSERT INTO `module_settings` VALUES (1,7,'calc_char_h_val','do or don\'t calcul
 /*!40000 ALTER TABLE `module_settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
+insert into module_settings (`module_id`, `setting`, `info`, created) values (-1, 'tree_show_upper_taxon', 'Show the most upper taxon in the taxonomic trees; if set to false, the top of the tree will display the name of the project instead.', CURRENT_TIMESTAMP)
+
+
 
 --
 -- Dumping data for table `module_settings_values`
@@ -2604,7 +2607,6 @@ UNLOCK TABLES;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

@@ -19,10 +19,10 @@ var taxonSubmitButtonLabel = null;;
 var taxonSubGenusRankId = null;
 
 //GENERAL
-function taxonGeneralDeleteLabels(id,action) {
-
+function taxonGeneralDeleteLabels(id,action)
+{
 	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
+		url : "ajax_interface_mgmt.php",
 		type: "POST",
 		data : ({
 			'action' : action ,
@@ -30,57 +30,11 @@ function taxonGeneralDeleteLabels(id,action) {
 			'time' : allGetTimestamp()
 		}),
 		async: allAjaxAsynchMode,
-		success : function (data) {
+		success : function (data)
+		{
 			$('#theForm').submit();
 		}
 	});
-
-}
-
-
-//HEARTBEAT & USAGE
-function taxonSetHeartbeat(userid,app,ctrllr,view,taxonid) {
-
-	var params = Array();
-
-	params[0] = ['taxon_id',taxonid];
-
-	heartbeatParams = params;
-
-	allSetHeartbeat(userid,app,ctrllr,view);
-
-}
-
-function taxonClearAllUsageCells() {
-
-	$("td[id*='usage']").html('');
-
-}
-
-function taxonCheckLockOutStates() {
-
-	$.ajax({
-		url : "../utilities/ajax_interface.php",
-		type: "GET",
-		data : ({
-			'action' : 'get_taxa_edit_states',
-			'time': allGetTimestamp()
-		}),
-		async: allAjaxAsynchMode,
-		success : function (data) {
-			taxonClearAllUsageCells();
-			if (data) {
-				obj = $.parseJSON(data);
-				for(var i=0;i<obj.length;i++) {
-					if (obj[i].first_name.length > 0 || obj[i].last_name.length > 0) {
-						$('#usage-'+obj[i].taxon_id).html(obj[i].first_name+' '+obj[i].last_name);
-					}
-				}
-			}
-		}
-	});
-
-	setTimeout ("taxonCheckLockOutStates()", heartbeatFreq/2);
 
 }
 
@@ -1170,7 +1124,7 @@ function taxonSetRankLabels(obj,language)
 
 function taxonGetRankLabels(language)
 {
-	allGeneralGetLabels(language,'get_rank_labels','taxonSetRankLabels',null,'ajax_interface_mgmt.php');
+	allGeneralGetLabels(language,'get_rank_labels',taxonSetRankLabels,null,'ajax_interface_mgmt.php');
 }
 
 function taxonGetRankByParent(nomessage)
@@ -1251,10 +1205,9 @@ function taxonSetPageLabels(obj,language) {
 
 }
 
-function taxonGetPageLabels(language) {
-
-	allGeneralGetLabels(language,'get_page_labels','taxonSetPageLabels');
-
+function taxonGetPageLabels(language)
+{
+	allGeneralGetLabels(language,'get_page_labels',taxonSetPageLabels,'ajax_interface_mgmt.php');
 }
 
 function taxonSaveSectionTitle(id,label,type) {
@@ -1280,7 +1233,7 @@ function taxonSetSectionLabels(obj,language) {
 
 function taxonGetSectionLabels(language) {
 
-	allGeneralGetLabels(language,'get_section_titles','taxonSetSectionLabels');
+	allGeneralGetLabels(language,'get_section_titles',taxonSetSectionLabels);
 
 }
 
@@ -1359,7 +1312,7 @@ function taxonSetCommonnameLabels(obj,language) {
 
 function taxonGetCommonnameLabels(language) {
 
-	allGeneralGetLabels(language,'get_language_labels','taxonSetCommonnameLabels');
+	allGeneralGetLabels(language,'get_language_labels',taxonSetCommonnameLabels);
 
 }
 
