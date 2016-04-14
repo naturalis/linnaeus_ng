@@ -44,7 +44,7 @@ drop table l2_occurrences_taxa;
 drop table l2_occurrences_taxa_combi;
 drop table literature;
 drop table names_temp;
-drop table nbc_extras;
+/* drop table nbc_extras; */
 drop table occurrences_taxa;
 drop table settings;
 drop table taxon_trend_years;
@@ -2422,6 +2422,24 @@ CREATE TABLE `variations_labels` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `nbc_extras`
+--
+DROP TABLE IF EXISTS `nbc_extras`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `nbc_extras` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `ref_id` int(11) NOT NULL,
+  `ref_type` enum('taxon','variation') NOT NULL DEFAULT 'taxon',
+  `name` varchar(64) NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`,`ref_id`,`ref_type`),
+  KEY `project_id_2` (`project_id`,`ref_id`,`ref_type`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 
