@@ -283,7 +283,7 @@ class LinnaeusController extends Controller
 
 	private function defaultToFirstPublishedProject()
 	{
-		if ($this->getCurrentProjectId()) return;
+		if (!is_null($this->getCurrentProjectId())) return;
 		
 		$d=$this->models->Projects->_get(array(
 			'id'=>array('published'=>1),
@@ -299,7 +299,7 @@ class LinnaeusController extends Controller
 
 	private function checkIfProjectIsPublisehd()
 	{
-		if (!$this->getCurrentProjectId()) return;
+		if (is_null($this->getCurrentProjectId())) return;
 		
 		$d=$this->models->Projects->_get(array(
 			'id'=>array('id'=>$this->getCurrentProjectId()),
@@ -315,7 +315,7 @@ class LinnaeusController extends Controller
 
 	private function setProjectData()
 	{
-		if (!$this->getCurrentProjectId()) return;
+		if (is_null($this->getCurrentProjectId())) return;
 		
 		$this->setUrls();
 		$this->setCurrentProjectData();
@@ -324,7 +324,7 @@ class LinnaeusController extends Controller
 
 	private function redirectProjectUrl()
 	{
-		if (!$this->getCurrentProjectId()) return;
+		if (is_null($this->getCurrentProjectId())) return;
 
 		$url='index.php';
 
