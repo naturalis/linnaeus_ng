@@ -59,7 +59,6 @@ class LinnaeusController extends Controller
 		$this->unsetUserSession();
 		$this->resolveProjectId();
 		$this->defaultToFirstPublishedProject();
-		$this->checkIfProjectIsPublisehd();
 		$this->setProjectData();
 		$this->redirectProjectUrl();
 		$this->addError($this->translate('No published projects available.'));
@@ -283,7 +282,7 @@ class LinnaeusController extends Controller
 
 	private function defaultToFirstPublishedProject()
 	{
-		if (!is_null($this->getCurrentProjectId())) return;
+		if ($this->getCurrentProjectId()) return;
 		
 		$d=$this->models->Projects->_get(array(
 			'id'=>array('published'=>1),
@@ -297,25 +296,9 @@ class LinnaeusController extends Controller
 		}
 	}
 
-	private function checkIfProjectIsPublisehd()
-	{
-		if (is_null($this->getCurrentProjectId())) return;
-		
-		$d=$this->models->Projects->_get(array(
-			'id'=>array('id'=>$this->getCurrentProjectId()),
-		));
-	
-		if (!$d || $d[0]['published']==0)
-		{
-			$this->setCurrentProjectId(null);
-		}
-	}
-
-
-
 	private function setProjectData()
 	{
-		if (is_null($this->getCurrentProjectId())) return;
+		if (!$this->getCurrentProjectId()) return;
 		
 		$this->setUrls();
 		$this->setCurrentProjectData();
@@ -324,7 +307,9 @@ class LinnaeusController extends Controller
 
 	private function redirectProjectUrl()
 	{
-		if (is_null($this->getCurrentProjectId())) return;
+		if (!$this->getCurrentProjectId()) return;
+		// extra check for FIXED_PROJECT_ID projects
+		if ($_SESSION['app']['project']['published']!==1) return;
 
 		$url='index.php';
 
