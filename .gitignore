@@ -51,7 +51,6 @@ __notes.txt
 __scratch.txt
 _pwd.txt
 apps
-database
 dumps
 generate_parentage_table.php
 graveyard
@@ -107,6 +106,7 @@ database/rights.php
 database/shared.php
 database/taxon.php
 database/users.php
+database/schema_changes
 configuration/admin/controllers/Literature2Controller.php
 configuration/admin/controllers/SearchController-ORG.php
 www/app/style/linnaeus_ng/.sass-cache
