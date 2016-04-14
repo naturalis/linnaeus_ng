@@ -39,7 +39,6 @@ www/admin/templates/templates_c
 www/app/javascript/colorbox
 www/app/javascript/jquery-1.4.2.min.js
 www/app/javascript/jquery-1.7.2.min.js
-www/admin/media
 www/admin/style/admin--ORG.css
 www/admin/style/localhost.css
 www/app/views/matrixkey/_get_unit_scores.php
