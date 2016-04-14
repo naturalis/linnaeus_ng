@@ -743,7 +743,7 @@ final class NsrTaxonModel extends AbstractModel
 
     }
 
-	public  function checkNameUniqueness( $params )
+	public function checkNameUniqueness( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$name=isset($params['name']) ? $params['name'] : null;
@@ -777,7 +777,7 @@ final class NsrTaxonModel extends AbstractModel
 
 	}
 
-	public  function checkMainLanguageCommonName( $params )
+	public function checkMainLanguageCommonName( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$name=isset($params['name']) ? $params['name'] : null;
@@ -805,7 +805,7 @@ final class NsrTaxonModel extends AbstractModel
 
 	}
 
-	public  function getReference( $params )
+	public function getReference( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$literature_id=isset($params['literature_id']) ? $params['literature_id'] : null;
@@ -840,7 +840,7 @@ final class NsrTaxonModel extends AbstractModel
 		return isset($d[0]) ? $d[0] : null;
 	}
 	
-	public  function getTaxonBranch( $params )
+	public function getTaxonBranch( $params )
 	{
 		$type_id=isset($params['type_id']) ? $params['type_id'] : null;
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
@@ -908,7 +908,7 @@ final class NsrTaxonModel extends AbstractModel
 
 	}
 
-	public  function checkIfGenusWithSameNameExists( $params )
+	public function checkIfGenusWithSameNameExists( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$type_id=isset($params['type_id']) ? $params['type_id'] : null;
@@ -1134,14 +1134,39 @@ final class NsrTaxonModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
+	public function getSubstitutableTraits( $params )
+	{
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
+		if( is_null( $project_id )  ) return;
 
+		$query="
+			select
+				concat(_a.sysname,': ',_b.sysname) as label,
 
+			from
+				%PRE%traits_groups _a
 
+			left join
+				%PRE%traits_traits _b
+				on _a.id=_b.trait_group_id
+				and _a.project_id=_b.project_id
+				
+			left join
+				%PRE%traits_project_types _c
+				on _b.project_type_id=_c.id
+				and _b.project_id=_c.project_id
+				
+			left join
+				%PRE%traits_types _d
+				on _c.type_id=_d.id
 
+			where
+				_a.project_id = " .$project_id  ."
+				and _d.sysname in ('stringfree','stringlist','stringlistfree')
+		";
 
-
-
-
+		return $this->freeQuery( $query );
+	}
 
 }
