@@ -61,7 +61,10 @@ class NsrTreeController extends NsrController
     public function indexAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+
 		$this->checkAuthorisation();
+
+        $this->setPageName($this->translate('Index'));
 
 		$tree=$this->restoreTree();
 

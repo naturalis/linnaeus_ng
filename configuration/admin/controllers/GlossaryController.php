@@ -244,7 +244,7 @@ class GlossaryController extends Controller
 			$gloss['media'] = $this->getGlossaryMedia($gloss['id']);
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($gloss['term'],0,1))));
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLanguage','value'=>$gloss['language_id']));
-    	    $this->setPageName(sprintf($this->translate('Editing glossary term "%s"'),$gloss['term']));
+    	    $this->setPageName(sprintf($this->translate('Editing glossary term "%s"'),$gloss['term']), $this->translate('Editing glossary term'));
 			$navList = $this->getGlossaryTermsNavList();
 		} 
 		else
@@ -393,7 +393,7 @@ class GlossaryController extends Controller
 					)
 				);
 
-                $this->setPageName(sprintf($this->translate('New media for "%s"'),$gloss['term']));
+                $this->setPageName(sprintf($this->translate('New media for "%s"'),$gloss['term']), $this->translate('New media'));
 
                 if ($this->requestDataFiles && !$this->isFormResubmit())
 				{
@@ -598,7 +598,7 @@ class GlossaryController extends Controller
 			)
 		);
 
-		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']));
+		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']), $this->translate('Media'));
 
 		if ($this->rHasVal('action','delete'))
 		{

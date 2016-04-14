@@ -12,11 +12,11 @@ class Controller extends BaseClass
 	private $_viewName;
 	private $_fullPath;
 	private $_fullPathRelative;
-	private $_prevTreeId = null;
-	private $_breadcrumbRootName = null;
+	private $_prevTreeId;
+	private $_breadcrumbRootName;
 	private $translator;
-	public $useVariations = false;
-	public $useRelated = false;
+	public $useVariations=false;
+	public $useRelated=false;
 	public $tmp;
 	public $smarty;
 	public $requestData;
@@ -30,25 +30,26 @@ class Controller extends BaseClass
 	public $warnings=array();
 
 	public $controllerBaseName;
-	public $controllerBaseNameMask = false;
+	public $controllerBaseNameMask=false;
 	public $pageName;
+	public $pageNameAltName;
 	public $controllerPublicName;
-	public $controllerPublicNameMask = false;
+	public $controllerPublicNameMask=false;
 	public $sortField;
 	public $sortDirection;
 	public $sortCaseSensitivity;
 	public $findField;
 	public $findValue;
 	public $baseUrl;
-	public $excludeFromReferer = false;
-	public $noResubmitvalReset = false;
-	public $isMultiLingual = true;
+	public $excludeFromReferer=false;
+	public $noResubmitvalReset=false;
+	public $isMultiLingual=true;
 	public $uiLanguages;
 	public $uiDefaultLanguage;
 	public $treeList;
 	public $suppressProjectInBreadcrumbs;
-	public $includeLocalMenu = true;
-	public $printBreadcrumbs = true;
+	public $includeLocalMenu=true;
+	public $printBreadcrumbs=true;
 
 	private $usedModelsBase = array(
 		'activity_log',
@@ -95,53 +96,29 @@ class Controller extends BaseClass
     public function __construct ()
     {
         parent::__construct();
-
         $this->setTimeZone();
-
         $this->startSession();
-
         $this->loadHelpers();
-
         $this->initLogging();
-
         $this->setNames();
-
         $this->startModuleSession();
-
         $this->loadControllerConfig();
-
         $this->loadSmartyConfig();
-
         $this->checkWriteableDirectories();
-
         $this->setPaths();
-
         $this->setUrls();
-
         $this->loadModels();
-
         $this->activateBasicModules();
-
         $this->initUserRights();
-
 		$this->setRankIdConstants();
-
         $this->setRandomValue();
-
         $this->setLanguages();
-
         $this->checkLastVisitedPage();
-
         $this->setSmartySettings();
-
         $this->setRequestData();
-
         $this->doLanguageChange();
-
         $this->checkModuleActivationStatus();
-
         $this->setProjectLanguages();
-
 		$this->initTranslator();
     }
 
@@ -357,9 +334,10 @@ class Controller extends BaseClass
      * @param      string    $name    the page's name
      * @access     public
      */
-    public function setPageName($name)
+    public function setPageName($name,$pageName=null)
     {
-        $this->pageName = $name;
+		$this->pageName=$name;
+		$this->pageNameAltName=$pageName;
     }
 
     /**
@@ -2549,10 +2527,14 @@ class Controller extends BaseClass
 
 		$basename=!empty($this->controllerPublicNameMask) ? $this->controllerPublicNameMask : $this->controllerPublicName;
 
+		if ( empty($basename) ) return;
+
+		$pagename=!empty($this->pageNameAltName) ? $this->pageNameAltName : $this->getPageName();
+		
 		return
 			str_replace(
 				['%module%','%page%'],
-				[str_replace(' ','',ucwords($basename)),str_replace(' ','_',$this->getPageName())],
+				[str_replace(' ','',ucwords($basename)),str_replace(' ','_',$pagename)],
 				$wiki_base_url
 			);
 	}

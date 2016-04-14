@@ -75,6 +75,8 @@ class MergeController extends Controller
         'file_upload_helper'
     );
     public $controllerPublicName = 'Project merge';
+    public $controllerPublicNameMask = 'Project administration';
+
     public $cssToLoad = array(
         'lookup.css'
     );

@@ -150,7 +150,7 @@ class ImportSDDController extends ImportController
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('sdd_import_1.php');
 
-        $this->setPageName($this->translate('Results'));
+        $this->setPageName($this->translate('SDD Import Results'));
 
         if ($_SESSION['admin']['system']['import']['file']['path']  && !$this->isFormResubmit()) {
 

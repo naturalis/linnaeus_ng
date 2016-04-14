@@ -106,14 +106,14 @@ class NsrTaxonImagesController extends NsrController
 
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
 
-        $this->setPageName($this->translate('Meta-data'));
+        $this->setPageName($this->translate('Media meta-data'));
 
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->updateTaxonImageMetaData($this->rGetAll());
 			$this->updateTaxonImageTaxonId($this->rGetAll());
 			$this->updateTaxonImageOverviewState($this->rGetAll());
-			$this->addMessage( 'Meta-data opgeslagen.' );
+			$this->addMessage( $this->translate('Meta-data opgeslagen.') );
 		}
 
 		$image=$this->getTaxonMedia(array('media_id'=>$this->rGetId()));
@@ -133,7 +133,7 @@ class NsrTaxonImagesController extends NsrController
     public function imageMetaBulkAction()
 	{
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Meta-data bulk'));
+		$this->setPageName($this->translate('Media meta-data bulk'));
 
 		$raw=null;
 		$ignorefirst=false;
@@ -269,7 +269,7 @@ class NsrTaxonImagesController extends NsrController
     public function imageMetaBulkSaveAction()
 	{
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Meta-data bulk'));
+		$this->setPageName($this->translate('Media meta-data bulk'));
 
 		if ( !$this->isFormResubmit() )
 		{

@@ -116,7 +116,7 @@ class Literature2Controller extends NsrController
 
 		if (!$this->rHasId()) $this->redirect('publication_types.php');
 
-		$this->setPageName($this->translate('Index per publicatievorm'));
+		$this->setPageName($this->translate('Index by publication type'));
 
 		foreach((array)$this->getPublicationTypes() as $val)
 			if ($val['id']==$this->rGetId()) $publicationType=$val['sys_label'];

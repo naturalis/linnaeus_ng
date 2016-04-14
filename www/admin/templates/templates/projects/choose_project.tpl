@@ -27,7 +27,6 @@
     </ul>
     <ul>
         <li><a href="../../views/users/all.php">{t}Collaborator overview{/t}</a></li>
-        <li><a href="../../views/users/rights_matrix.php">{t}Rights matrix{/t}</a></li>
     </ul>
     <ul>
         <li><a href="../../views/interface/index.php">{t}Interface translations{/t}</a></li>

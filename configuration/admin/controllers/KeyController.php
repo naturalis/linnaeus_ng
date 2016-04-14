@@ -250,7 +250,7 @@ class KeyController extends Controller
             $this->addError($this->translate('Non-existant keystep ID. Please go back and change the target for the choice.'));
         }
 
-        $this->setPageName(sprintf($this->translate('Show key step %s'), $step['number']));
+        $this->setPageName(sprintf($this->translate('Show key step %s'), $step['number']), $this->translate('Show key step'));
 
         $this->smarty->assign('stepsLeadingToThisOne', $this->getStepsLeadingToThisOne($step['id']));
         $this->smarty->assign('suppressPath', $this->rHasVal('nopath','1'));
@@ -335,7 +335,7 @@ class KeyController extends Controller
 
             // get step data
             $step = $this->getKeystep($this->rGetId());
-            $this->setPageName(sprintf($this->translate('Edit step %s'), $step['number']));
+            $this->setPageName(sprintf($this->translate('Edit step %s'), $step['number']), $this->translate('Edit step'));
 
             //// saving the number (all the rest is done through ajax)
             // number can now no longer be edited
@@ -442,7 +442,7 @@ class KeyController extends Controller
         $choice = $this->getKeystepChoice($id);
         $step = $this->getKeystep($choice['keystep_id']);
 
-        $this->setPageName(sprintf($this->translate('Edit choice "%s" for step %s'), $choice['show_order'], $step['number'], $step['title']));
+        $this->setPageName(sprintf($this->translate('Edit choice "%s" for step %s'), $choice['show_order'], $step['number'], $step['title']), $this->translate('Edit choice'));
 
         if ($this->rHasVal('action', 'delete'))
         // delete the complete choice, incl image (if any)
@@ -628,12 +628,12 @@ class KeyController extends Controller
 
 		if ($this->rGetId()==$this->getStartKeystepId())
 		{
-	        $this->setPageName(sprintf($this->translate('Insert a step before step %s'), $step['number']));
+	        $this->setPageName(sprintf($this->translate('Insert a step before step %s'), $step['number']), $this->translate('Insert a step before step x'));
 		}
 		else
 		{
 			$prevstep=$this->getKeystep($this->rHasVal('c'));
-    	    $this->setPageName(sprintf($this->translate('Insert a step between step %s and %s'), $prevstep['number'], $step['number']));
+    	    $this->setPageName(sprintf($this->translate('Insert a step between step %s and %s'), $prevstep['number'], $step['number']), $this->translate('Insert a step between step x and y'));
 		}
 
         $ck = $this->models->ChoicesKeysteps->_get(

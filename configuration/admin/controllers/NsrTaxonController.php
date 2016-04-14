@@ -394,7 +394,7 @@ class NsrTaxonController extends NsrController
 		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
 
-        $this->setPageName( $this->translate('Direct renaming taxon concept') );
+        $this->setPageName( $this->translate('Rename taxon concept directly') );
 		$this->setConceptId( $this->rGetId() );
 
 		if ( $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit())
@@ -422,7 +422,7 @@ class NsrTaxonController extends NsrController
     {
 		if ( !$this->rHasId() ) $this->redirect('synonym.php');
 
-        $this->setPageName( $this->translate('Geldige naam direct aanpassen') );
+        $this->setPageName( $this->translate('Edit common name directly') );
 
 		$this->setNameId( $this->rGetId() );
 		$name=$this->getName(array('id'=>$this->getNameId()));
@@ -479,7 +479,7 @@ class NsrTaxonController extends NsrController
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 		$this->checkAuthorisation();
 
-        $this->setPageName($this->translate('NSR ID resolver'));
+        $this->setPageName($this->translate('External ID resolver'));
 
 		if ( ($this->rHasVal('action','resolve') || $this->rHasVal('action','download')) && $this->rHasVal('codes') )
 		{

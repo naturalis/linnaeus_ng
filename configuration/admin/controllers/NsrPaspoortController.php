@@ -95,7 +95,7 @@ class NsrPaspoortController extends NsrController
 			$this->deletePassportMeta($this->rGetAll());
 		}
 
-        $this->setPageName($this->translate('Edit meta-data'));
+        $this->setPageName($this->translate('Edit taxon passport meta-data'));
 
 		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('tabs',$this->getPassportCategories());	
