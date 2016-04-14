@@ -51,10 +51,6 @@ class NsrController extends Controller
 
 	public function treeGetTop()
 	{
-		/*
-			get the top taxon = no parent
-			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks
-		*/
 		$p = $this->models->ControllerModel->treeGetTop($this->getCurrentProjectId());
 
 		if ($p && count((array)$p)==1)

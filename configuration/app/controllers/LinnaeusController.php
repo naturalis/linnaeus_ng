@@ -309,7 +309,8 @@ class LinnaeusController extends Controller
 	{
 		if (!$this->getCurrentProjectId()) return;
 		// extra check for FIXED_PROJECT_ID projects
-		if ($_SESSION['app']['project']['published']!==1) return;
+
+		if ($_SESSION['app']['project']['published']!=1) return;
 
 		$url='index.php';
 

@@ -134,29 +134,28 @@ function moduleDeleteFreeModule(id) {
 
 }
 
-function moduleChangeStatus(id,action,type) {
-
-	if (action == 'module_delete') {
-		
-		if (type=='regular') {
-		
-			for (var j=0;j<moduleModules.length;j++) {
+function moduleChangeStatus(id,action,type)
+{
+	if (action=='module_delete')
+	{
+		if (type=='regular')
+		{
+			for (var j=0;j<moduleModules.length;j++)
+			{
 				if (moduleModules[j][0]==id) var n = moduleModules[j][1];
 			}
-	
-		} else {
-
-			for (var j=0;j<moduleFreeModules.length;j++) {
+		} 
+		else
+		{
+			for (var j=0;j<moduleFreeModules.length;j++)
+			{
 				if (moduleFreeModules[j][0]==id) var n = moduleFreeModules[j][1];
 			}
-
 		}
-
 		if (!altKeyDown)
 		{
 			if (!allDoubleDeleteConfirm('the module',n)) return;
 		}
-
 	}
 
 	$.post(
@@ -168,10 +167,13 @@ function moduleChangeStatus(id,action,type) {
 			'view' : 'modules' ,
 			'time' : allGetTimestamp()			
 		},
-		function(data){
-			if (data=='<ok>') {
-				if (type=='regular') {
-				//[id,name,desc,[active,[id in project]]]
+		function(data)
+		{
+			if (data=='<ok>')
+			{
+				if (type=='regular')
+				{
+					//[id,name,desc,[active,[id in project]]]
 					for(var i=0;i<moduleModules.length;i++) {
 						if (id==moduleModules[i][0]) {
 							switch (action) {
@@ -193,15 +195,21 @@ function moduleChangeStatus(id,action,type) {
 						}
 					}
 					moduleDrawModuleBlock();
-				} else
-				if (type=='free') {
+				} 
+				else
+				if (type=='free')
+				{
 					//[id,name,active]
-					for(var i=0;i<moduleFreeModules.length;i++) {
-						if (id==moduleFreeModules[i][0]) {
-							switch (action) {
+					for(var i=0;i<moduleFreeModules.length;i++)
+					{
+						if (id==moduleFreeModules[i][0])
+						{
+							switch (action)
+							{
 								case 'module_delete' :
 									var t = Array();
-									for (var j=0;j<moduleFreeModules.length;j++) {
+									for (var j=0;j<moduleFreeModules.length;j++)
+									{
 										if (moduleFreeModules[j][0]!=id) t[t.length]=moduleFreeModules[j];
 									}
 									moduleFreeModules = t;

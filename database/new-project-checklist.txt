@@ -38,12 +38,31 @@ connect through SSH and:
 
 	
 == LINNAEUS NG ADMIN ==
-go to http://my.domain/linnaeus_ng/admin/ and log in with sysadmin/sysadmin
+-- first things first --
+* go to http://my.domain/linnaeus_ng/admin/ and log in with sysadmin/sysadmin
+* access User management, change the password for sysadmin 
+
+-- project management
+* access Project management > Manage basic project information, add a language, click "save"
+* access Project management > Manage project modules, add all relevant modules (as well as any free modules)
+
+-- taxon basics -- 
+* access Taxon editor > taxonomic ranks
+	- select the ranks to use in the project
+	- manoeuver the red line to mark the boundary between higher and lower taxa
+	- click "save selected ranks"
+	- optionally, click "change the ranks' names and provide translations." and add labels and translations, if applicable
+* access Taxon editor > passport categories, add the appropriate categories and add translations, if applicable
+
+-- dichotomous key --
+* Dichotomous key > Define ranks that can appear in key, and set what ranks can appear in your key
+
+-- settings
+* ResourceSpace
+* lots of things...
 
 
-
-
-
+PUBLISH AND SEE!
 
 
 

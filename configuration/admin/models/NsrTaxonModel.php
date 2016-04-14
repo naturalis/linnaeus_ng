@@ -670,6 +670,36 @@ final class NsrTaxonModel extends AbstractModel
 		return isset($d[0]) ? $d[0] : null;
 	}
 
+	public function getNumberOfUndeletedTaxa( $params )
+	{
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+
+		if( is_null($project_id) ) return;
+		
+		$query="
+			select
+				count(*) as total
+			
+			from %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
+
+			left join %PRE%trash_can _trash
+				on _e.project_id = _trash.project_id
+				and _e.id = _trash.lng_id
+				and _trash.item_type='taxon'
+
+			where
+				_a.project_id =".$project_id."
+				and ifnull(_trash.is_deleted,0)=0
+		";
+
+		$d=$this->freeQuery( $query );
+		
+		return $d ? $d[0]['total'] : null;
+
+	}
+
     public function getExpertsLookupList( $params )
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
@@ -1103,5 +1133,15 @@ final class NsrTaxonModel extends AbstractModel
 
 		return $this->freeQuery( $query );
 	}
+
+
+
+
+
+
+
+
+
+
 
 }

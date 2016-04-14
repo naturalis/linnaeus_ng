@@ -202,50 +202,9 @@ function allAjaxAbort(handle) {
 
 }
 
-var heartbeatUserId = false;
-var heartbeatApp = false;
-var heartbeatCtrllr = false;
-var heartbeatView = false;
-var heartbeatParams = Array();
-var heartbeatFreq = 120000;
 var autoSaveFreq = 120000;
 var autoSaveInit = true;
 
-
-function allSetHeartbeatFreq(freq) {
-
-	heartbeatFreq = freq;
-
-}
-
-function allSetHeartbeat(userid,app,ctrllr,view,params) {
-
-	if (userid) heartbeatUserId = userid;
-	if (app) heartbeatApp = app;
-	if (ctrllr) heartbeatCtrllr = ctrllr;
-	if (view) heartbeatView = view;
-	if (params) heartbeatParams = params;
-
-	$.ajax({
-		url : "../utilities/ajax_interface.php",
-		type: "GET",
-		data : ({
-			'user_id' : heartbeatUserId ,
-			'app' : heartbeatApp ,
-			'ctrllr' : heartbeatCtrllr ,
-			'view' : heartbeatView ,
-			'params' : heartbeatParams ,
-			'action' : 'heartbeat',
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-		}
-	});
-
-	setTimeout ("allSetHeartbeat()", heartbeatFreq);
-
-}
 
 function allSetAutoSaveFreq(freq) {
 
@@ -373,7 +332,6 @@ function allSwitchLanguage(language) {
 
 function allGeneralGetLabels(language,action,postFunction,id,alturl)
 {
-
 	/*
 		please take note that it depends on the url of the file
 		calling this function exactly *which* version of 
@@ -402,9 +360,11 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 			'time' : allGetTimestamp()
 		}),
 		async: allAjaxAsynchMode,
-		success : function (data) {
+		success : function (data)
+		{
+			//console.log( data);
 			obj = $.parseJSON(data);
-			eval(postFunction+'(obj,language)');
+			postFunction(obj,language);
 			allHideLoadingDiv();
 		}
 	})

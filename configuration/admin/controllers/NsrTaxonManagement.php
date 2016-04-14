@@ -50,6 +50,7 @@ class NsrTaxonManagement extends NsrController
         'pages_taxa',
         'pages_taxa_titles',
         'sections',
+		'content_taxa'
     );
 
     public $jsToLoad = array(
@@ -120,7 +121,7 @@ class NsrTaxonManagement extends NsrController
             $nextShowOrder = $page['show_order'] + 1;
         }
 
-        $this->smarty->assign('nextShowOrder', $nextShowOrder);
+        $this->smarty->assign('nextShowOrder', isset($nextShowOrder) ? $nextShowOrder : 0 );
         $this->smarty->assign('maxCategories', $this->maxCategories);
         $this->smarty->assign('languages', $lp);
         $this->smarty->assign('pages', $pages);
@@ -397,10 +398,21 @@ class NsrTaxonManagement extends NsrController
 			$this->smarty->assign('returnText', json_encode($d));
         }
         else 
-		if ($this->rGetVal('action') == 'save_rank_label')
+		if ($this->rGetVal('action')=='save_rank_label')
 		{
 			$d=$this->saveRankLabel( array('id'=>$this->rGetId(),'language_id'=>$this->rGetVal('language'),'label'=>$this->rGetVal('label') ) );
 			$this->smarty->assign('returnText', $d ? 'saved' : 'failed');
+        }
+        else 
+		if ($this->rGetVal('action')=='delete_page')
+		{
+            $this->deletePage( array('id'=>$this->rGetId() ) );
+        }
+        else 
+		if ($this->rGetVal('action')=='get_page_labels')
+		{
+            $d=$this->getPageTitles( array('language_id'=>$this->rGetVal('language') ) );
+			$this->smarty->assign('returnText', json_encode($d));
         }
 
         $this->printPage('ajax_interface');
@@ -554,6 +566,50 @@ class NsrTaxonManagement extends NsrController
 			));
 
     }
+
+    private function deletePage( $p )
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		
+		if ( !isset($id) ) return;
+
+		$this->models->ContentTaxa->delete(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'page_id' => $id
+		));
+
+		$this->models->PagesTaxaTitles->delete(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'page_id' => $id
+		));
+
+		$this->models->Sections->delete(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'page_id' => $id
+		));
+
+		$this->models->PagesTaxa->delete(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $id
+		));
+    }
+
+    private function getPageTitles( $p )
+    {
+		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
+		
+		if ( !isset($language_id) ) return;
+
+		return $this->models->PagesTaxaTitles->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->rGetVal('language')
+			),
+			'columns' => 'id,title,page_id,language_id'
+		));
+
+    }
+
 
 }
 

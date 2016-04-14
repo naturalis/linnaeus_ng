@@ -170,9 +170,7 @@ final class ControllerModel extends AbstractModel
 
     public function treeGetTop($projectId)
     {
-		if (is_null($projectId)) {
-			return null;
-		}
+		if ( is_null($projectId) ) return;
 
         $query = "
            select
@@ -198,9 +196,20 @@ final class ControllerModel extends AbstractModel
 				_a.project_id = ".$projectId."
 				and ifnull(_trash.is_deleted,0)=0
 				and _a.parent_id is null
-				and _r.id < 10";
+			";
 
-        return $this->freeQuery($query);
+		// avoiding low-hanging orphans (if any...
+		$rankClause = "and _r.id < 10";
+			
+		$top=$this->freeQuery( $query . $rankClause );
+		
+		// ...apparently not)
+		if ( count($top)==0 )
+		{
+			$top=$this->freeQuery( $query );
+		}
+
+        return $top;
 	}
 
 	public function deleteTaxonParentage($params)

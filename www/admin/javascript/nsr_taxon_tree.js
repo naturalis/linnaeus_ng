@@ -5,7 +5,7 @@ var taxonTargetUrl='taxon.php?id=%s';
 var autoExpandArray=Array();
 var highlightNodes=Array();
 var nodeCountType='species'; // species, taxon, none
-var rootNodeLabel='Nederlands Soortenregister';
+var rootNodeLabel='Taxonomy';
 
 function setAjaxTreeUrl(url)
 {
@@ -27,6 +27,15 @@ function getRootNodeLabel()
 	return rootNodeLabel;
 }
 
+function setShowUpperTaxon(state)
+{
+	showUpperTaxon=state;
+}
+
+function getShowUpperTaxon()
+{
+	return showUpperTaxon;
+}
 
 function shouldHighlightNode(node)
 {
@@ -119,10 +128,10 @@ function growbranches(data)
 		'<ul class="top">'+
 			'<li class="child">'+
 				(!activeNode ?
-					'<a href="#" onclick="buildtree(false);return false">'+(getRootNodeLabel()!="" ? getRootNodeLabel() : data.node.label)+'</a>' :
+					'<a href="#" onclick="buildtree(false);return false">'+(getShowUpperTaxon()==false && getRootNodeLabel()!="" ? getRootNodeLabel() : data.node.label)+'</a>' :
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
-				(data.node.rank_label ? 
+				(data.node.rank_label && getShowUpperTaxon()==true? 
 					'<span class="rank">'+data.node.rank_label+'</span>' : 
 					'' 
 				)+
@@ -142,7 +151,7 @@ function growbranches(data)
 					'<span class="child-count">'+data.node.child_count+'</span>' :
 					'' 
 				)+
-				(!activeNode ?
+				(!activeNode && getShowUpperTaxon()==false ?
 					'':
 					'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'" class="detail-link">&rarr;</a>'
 				)+
