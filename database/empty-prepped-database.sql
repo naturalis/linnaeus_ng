@@ -3,46 +3,26 @@
 	basic data
 	no projects
 	no users
-	
-insert into projects (
-	id,
-	sys_name,
-	sys_description,
-	short_name,
-	title,
-	css_url,includes_hybrids,keywords,description,group,published,created,last_change
-) values (
-	1,
-	'Project internal name',
-	'Project description',
-	'project slug name (make null)',
-	'Project visible title',
-	NULL,0,NULL,NULL,NULL,0,now(),now()
-);
 
-insert into users (
-	id,
-	username,
-	password,
-	first_name,
-	last_name,
-	email_address,
-	active,
-	last_login,logins,last_password_change,created_by,last_change,created
-) values (
-	1,
-	'sysadmin',
-	'48a365b4ce1e322a55ae9017f3daf0c0',
-	'sys',
-	'admin',
-	'sy@admin.com',
-	1,
-	null,0,null,-1,now(),now()
-);
 	
-	
-	
-	
+insert into projects
+  (id,sys_name,sys_description,title,short_name,css_url,includes_hybrids,keywords,description,`group`,published,created,last_change)
+values
+  (1,'Project internal name','Project description','Project visible title',null,NULL,0,NULL,NULL,NULL,0,now(),now())
+;
+
+insert into users
+	(id,username,password,first_name,last_name,email_address,active,last_login,logins,last_password_change,created_by,last_change,created) 
+values
+	(1,'sysadmin','48a365b4ce1e322a55ae9017f3daf0c0','sys','admin','sy@admin.com',1,null,0,null,-1,now(),now())
+;
+
+insert into projects_roles_users
+	(id,project_id,role_id,user_id,active,last_project_select,project_selects,created)
+values
+	(1,1,1,1,1,null,0,now())
+;
+
 */
 
 drop table beelduitwisselaar_batches;
@@ -2603,8 +2583,6 @@ INSERT INTO `roles` VALUES (1,'System administrator','ETI admin; creates new pro
 
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
