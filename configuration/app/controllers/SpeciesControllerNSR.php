@@ -361,6 +361,32 @@ class SpeciesControllerNSR extends SpeciesController
 					$reference->url = str_replace( $key, $sval, $reference->url );
 				}
 				else
+				if( strpos($val,'trait:')!==false )
+				{
+					// 	val={trait:[traits_traits.trait_group_id]:[traits_traits.id]}
+					$trait=explode(':',$val);
+					$sval=$this->models->{$this->_model}->getTaxonTraitValue( array(
+						"project_id" => $this->getCurrentProjectId(),
+						"taxon_id" => $taxon['id'],
+						"trait_group_id" => $trait[1],
+						"trait_id" => $trait[2]
+					));
+					
+					if ( !empty($sval) )
+					{
+						if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
+						{
+							$sval=call_user_func($reference->substitute_encode, $sval );
+						}
+	
+						$reference->url = str_replace( $key, $sval, $reference->url );
+					}
+					else
+					{
+						$reference->url = str_replace( $key, "" , $reference->url );
+					}
+				}
+				else
 				{
 					$reference->url = str_replace( $key, "" , $reference->url );
 				}
@@ -425,7 +451,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$is_empty=$this->models->{$this->_model}->runCheckQuery( $query );
 			}
 		}
-		
+
 		return
 			array(
 				'full_url'=>$full_url,

@@ -81,7 +81,7 @@ textarea {
                     similar goals, but work slightly different:{/t}
                     <ul>
                         <li>{t}use substitutions to replace placeholders in the URL itself with taxon-dependent values at runtime;{/t}</li>
-                        <li>{t}parameters will be added as name/value pairs to the query string of the URL.{/t}</li>
+                        <li>{t}use parameters to add name/value pairs to the query string of the URL.{/t}</li>
                     </ul>
                     {t}the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
                     available). when 'no check' is selected, the tab is always displayed. the reference can be implemented as an actual link, navigating away from the site (or opening in a new window), or as embedded, in
@@ -255,7 +255,7 @@ function print_param()
 	for(var i=0;i<param.length;i++)
 	{
 		var slct=$('#select_parameter').html().replace('%VALUE%',param[i].value);
-		buffer.push('<input type="text" placeholder="parameter" class="param_name" name="external_reference[parameters][name][]" value="'+param[i].name+'" /> &rarr; ' + slct + '<br />');
+		buffer.push('<input type="text" placeholder="parameter" class="param_name" name="external_reference[parameters][name][]" value="'+param[i].name+'" /> &nbsp;=&nbsp; ' + slct + '<br />');
 	}
 	$('#parameters').html( buffer.join("\n") );
 

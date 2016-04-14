@@ -45,6 +45,8 @@ include_once ('ModuleSettingsReaderController.php');
 class NsrTaxonManagement extends NsrController
 {
 
+    public $modelNameOverride='NsrTaxonModel';
+
     public $usedModels = array(
         'labels_sections',
         'pages_taxa',
@@ -62,6 +64,18 @@ class NsrTaxonManagement extends NsrController
     public $controllerPublicName = 'Taxon editor';
 
 	private $maxCategories = 50;
+
+	private $basicSubstitutionFields=
+		[
+			['field'=>'taxon','label'=>'scientific name'],
+			['field'=>'id','label'=>'taxon ID'],
+			['field'=>'project_id','label'=>'project ID'],
+			['field'=>'language_id','label'=>'language ID'],
+			['field'=>'nsr_id','label'=>'NSR ID']
+		];
+			
+
+
 	
     public function __construct()
     {
@@ -140,7 +154,7 @@ class NsrTaxonManagement extends NsrController
 
 		if ( !$this->rHasId() ) $this->redirect('tabs.php');
 
-        if ($this->rHasVal('action','save') ) //&& !$this->isFormResubmit())
+        if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$d=$this->models->PagesTaxa->update(
 				array( 'always_hide' => (( isset($this->rGetAll()['always_hide']) && $this->rGetAll()['always_hide']=='on' ) ? '1' : '0' ) ),
@@ -152,15 +166,10 @@ class NsrTaxonManagement extends NsrController
 			$this->addMessage( $this->translate( 'Saved.' ) );
         }
 
+		$traits=$this->models->{$this->modelNameOverride}->getSubstitutableTraits(array('project_id'=>$this->getCurrentProjectId()));
+
         $this->smarty->assign( 'page', $this->getPage( $this->rGetId() ) );
-        $this->smarty->assign( 'dynamic_fields',
-			[
-				['field'=>'taxon','label'=>'scientific name'],
-				['field'=>'id','label'=>'taxon ID'],
-				['field'=>'project_id','label'=>'project ID'],
-				['field'=>'language_id','label'=>'language ID'],
-				['field'=>'nsr_id','label'=>'NSR ID']
-			] );
+        $this->smarty->assign( 'dynamic_fields', $this->basicSubstitutionFields+$traits );
         $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
         $this->smarty->assign( 'link_embed', [['field'=>'embed','label'=>'embed'],['field'=>'link','label'=>'link'],['field'=>'link_new','label'=>'link (new window)']] );
         $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );

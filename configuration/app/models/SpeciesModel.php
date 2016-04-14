@@ -1271,4 +1271,56 @@ class SpeciesModel extends AbstractModel
 
     }
 
+    public function getTaxonTraitValue( $params )
+	{
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+		$trait_group_id = isset($params['trait_group_id']) ? $params['trait_group_id'] : null;
+		$trait_id = isset($params['trait_id']) ? $params['trait_id'] : null;
+		
+		if ( is_null($project_id) || is_null($taxon_id) || is_null($trait_group_id) || is_null($trait_id) ) return;
+
+        $query = "
+			select value from
+			(
+				select
+					_b.string_value as value
+	
+				from 
+					%PRE%traits_taxon_values _a
+	
+				left join
+					%PRE%traits_values _b
+					on _a.project_id=_b.project_id
+					and _a.value_id=_b.id
+	
+				where
+					_a.project_id = ".$project_id."
+					and _a.taxon_id = ".$taxon_id."
+					and _b.trait_id  = ".$trait_id."
+	
+				union
+
+				select
+					_a.string_value as value
+	
+				from 
+					%PRE%traits_taxon_freevalues _a
+	
+				where
+					_a.project_id = ".$project_id."
+					and _a.taxon_id = ".$taxon_id."
+					and _a.trait_id  = ".$trait_id."
+
+			) as unionized
+			limit 1
+		";
+
+        $d=$this->freeQuery($query);
+
+		return $d ? $d[0]['value'] : null;
+
+	}
+					
+					
 }

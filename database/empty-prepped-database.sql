@@ -1592,8 +1592,7 @@ CREATE TABLE `pages_taxa` (
   `page` varchar(32) NOT NULL,
   `show_order` int(11) DEFAULT NULL,
   `def_page` tinyint(1) NOT NULL DEFAULT '0',
-  `redirect_to` varchar(512) DEFAULT NULL,
-  `check_query` varchar(4000) DEFAULT NULL,
+  `external_reference` varchar(4000) DEFAULT NULL,
   `always_hide` tinyint(1) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -2433,13 +2432,51 @@ CREATE TABLE `nbc_extras` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `ref_id` int(11) NOT NULL,
-  `ref_type` enum('taxon','variation') NOT NULL DEFAULT 'taxon',
+  `ref_type` enum('taxon','variation','matrix') NOT NULL DEFAULT 'taxon',
   `name` varchar(64) NOT NULL,
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`ref_id`,`ref_type`),
   KEY `project_id_2` (`project_id`,`ref_id`,`ref_type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+--
+-- Procedure `country_hos`
+-- Function `fnStripTags`
+--
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `country_hos`$$
+CREATE DEFINER=`linnaeus_user`@`localhost` PROCEDURE `country_hos`(IN con CHAR(20))
+BEGIN
+SELECT Name, HeadOfState FROM Country
+WHERE Continent = con;
+END$$
+
+DROP FUNCTION IF EXISTS `fnStripTags`$$
+CREATE DEFINER=`linnaeus_user`@`localhost` FUNCTION `fnStripTags`( Dirty varchar(64000) ) RETURNS varchar(64000) CHARSET latin1
+DETERMINISTIC
+BEGIN
+DECLARE iStart, iEnd, iLength int;
+WHILE Locate( '<', Dirty ) > 0 And Locate( '>', Dirty, Locate( '<', Dirty )) > 0 DO
+BEGIN
+SET iStart = Locate( '<', Dirty ), iEnd = Locate( '>', Dirty, Locate('<', Dirty ));
+SET iLength = ( iEnd - iStart) + 1;
+IF iLength > 0 THEN
+BEGIN
+SET Dirty = Insert( Dirty, iStart, iLength, '');
+END;
+END IF;
+END;
+END WHILE;
+RETURN Dirty;
+END$$
+
+DELIMITER ;
+
+
 
 
 
