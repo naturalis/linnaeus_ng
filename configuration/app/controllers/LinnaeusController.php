@@ -59,6 +59,7 @@ class LinnaeusController extends Controller
 		$this->unsetUserSession();
 		$this->resolveProjectId();
 		$this->defaultToFirstPublishedProject();
+		$this->checkIfProjectIsPublisehd();
 		$this->setProjectData();
 		$this->redirectProjectUrl();
 		$this->addError($this->translate('No published projects available.'));
@@ -295,6 +296,22 @@ class LinnaeusController extends Controller
 			$this->setCurrentProjectId( $d[0]['id'] );
 		}
 	}
+
+	private function checkIfProjectIsPublisehd()
+	{
+		if (!$this->getCurrentProjectId()) return;
+		
+		$d=$this->models->Projects->_get(array(
+			'id'=>array('id'=>$this->getCurrentProjectId()),
+		));
+	
+		if (!$d || $d[0]['published']==0)
+		{
+			$this->setCurrentProjectId(null);
+		}
+	}
+
+
 
 	private function setProjectData()
 	{
