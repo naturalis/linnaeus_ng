@@ -1143,6 +1143,7 @@ final class NsrTaxonModel extends AbstractModel
 		$query="
 			select
 				concat(_a.sysname,': ',_b.sysname) as label,
+				concat('trait',':',_b.trait_group_id,':',_b.id) as field
 
 			from
 				%PRE%traits_groups _a
