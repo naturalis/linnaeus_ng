@@ -764,18 +764,17 @@ class Controller extends BaseClass
      */
     public function setCurrentProjectData($data = null)
     {
-        if ($data == null) {
-
+        if ($data == null)
+		{
             $id = $this->getCurrentProjectId();
-
-            if (isset($id)) {
-
+            if (isset($id))
+			{
                 $data = $this->models->Projects->_get(array(
                     'id' => $id
                 ));
             }
-            else {
-
+            else
+			{
                 return;
             }
         }

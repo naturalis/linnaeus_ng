@@ -423,15 +423,18 @@ class MatrixKeyController extends Controller
 		));
 
         // getCharacterStates may return array of records or single record...
-        if (isset($states[0])) {
-            foreach ($states as $i => $state) {
+        if (isset($states[0]))
+		{
+            foreach ($states as $i => $state)
+			{
                 $this->_mc->setItemId($state['id']);
                 $media = $this->_mc->getItemMediaFiles();
 
                 $states[$i]['file_name'] = $states[$i]['file_dimensions'] =
                     $states[$i]['img_dimensions'] = null;
 
-                if (!empty($media)) {
+                if (!empty($media))
+				{
                     $states[$i]['file_name'] = $media[0]['rs_original'];
                     $states[$i]['file_dimensions'] =
                         $media[0]['width'] . ':' . $media[0]['height'];
@@ -439,18 +442,23 @@ class MatrixKeyController extends Controller
                         array($media[0]['width'], $media[0]['height']);
                 }
             }
-        } else if (isset($states['id'])) {
+        } else
+		if (isset($states['id']))
+		{
             $this->_mc->setItemId($states['id']);
             $media = $this->_mc->getItemMediaFiles();
 
             $states['file_name'] = $states['file_dimensions'] =
                 $states['img_dimensions'] = null;
 
+			if (!empty($media))
+			{
                 $states['file_name'] = $media[0]['rs_original'];
             $states['file_dimensions'] =
                 $media[0]['width'] . ':' . $media[0]['height'];
             $states['img_dimensions'] =
                 array($media[0]['width'], $media[0]['height']);
+			}
         }
 
         //print_r($states);

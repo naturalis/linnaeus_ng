@@ -532,6 +532,12 @@ function formatResult( data )
 		var sciNameDisplay='<i>'+data.label+'</i>';
 		var commonName="";
 	}
+	
+	// design fix for displaying of percentages without a common name
+	if ( commonName.length==0 && matrixsettings.showScores)
+	{
+		commonName='&nbsp;';
+	}
 
 	if (matrixsettings.showSpeciesDetails && data.states)
 	{
@@ -681,7 +687,6 @@ function formatResult( data )
 			.replace('%SCORE%', matrixsettings.showScores ? fetchTemplate( 'resultScoreHtmlTpl' ).replace( '%SCORE%', data.score ? data.score : 100 ) : "")
 		;
 
-		
 	if (data.info != undefined)
 	{
 		resultHtml=resultHtml.replace('%PHOTOGRAPHER%',(data.info.photographer ?  data.info.photographer: ''));
@@ -937,6 +942,7 @@ function setState( p )
 		}),
 		success : function(data)
 		{
+			//console.log(data);
 			var d=$.parseJSON(data);
 
 			setScores(d.scores);
@@ -973,6 +979,10 @@ function applyScores()
 	if ((!states || states.length==0) && (!scores || scores.length==0))
 	{
 		resultset=dataset.slice();
+		for(var i=0;i<resultset.length;i++)
+		{
+			resultset[i].score=100;
+		}
 	}
 	else
 	{
