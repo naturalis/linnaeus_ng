@@ -53,6 +53,15 @@ function isArray(obj) {
 
 }
 
+function runFunction(name, arguments)
+{
+    var fn = window[name];
+    if(typeof fn !== 'function')
+        return;
+
+    fn.apply(window, arguments);
+}
+
 /*
 	usage:
 	var example_template = "<div><span>%TITLE%</span>%CONTENT%</div>";
@@ -364,7 +373,7 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 		{
 			//console.log( data);
 			obj = $.parseJSON(data);
-			postFunction(obj,language);
+			runFunction(postFunction,[obj,language]);
 			allHideLoadingDiv();
 		}
 	})

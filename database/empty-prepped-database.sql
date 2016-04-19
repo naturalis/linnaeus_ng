@@ -2639,6 +2639,24 @@ INSERT INTO `roles` VALUES (1,'System administrator','ETI admin; creates new pro
 
 
 
+
+--
+-- Dumping data for table `traits_date_formats`
+--
+LOCK TABLES `traits_date_formats` WRITE;
+/*!40000 ALTER TABLE `traits_date_formats` DISABLE KEYS */;
+INSERT INTO `traits_date_formats` VALUES (1,'year','Y','JJJJ','%Y',0,'2015-03-13 10:34:03','2015-03-13 10:34:03'),(2,'fulldate','d-m-Y','DD-MM-JJJJ','%Y-%m-%d',1,'2015-03-13 10:34:03','2015-03-13 10:34:03');
+/*!40000 ALTER TABLE `traits_date_formats` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+--
+-- Dumping data for table `traits_types`
+--
+INSERT INTO `traits_types` VALUES (1,'boolean',1,2,'check_boolean',0,0,0,0,0,0,0,'2015-03-13 10:33:49','2015-03-13 10:33:58'),(2,'stringlist',3,4,'check_stringlist',1,1,1,0,1,0,0,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(3,'stringlistfree',5,6,'check_stringlistfree',1,1,1,0,1,0,0,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(4,'stringfree',7,8,'check_stringfree',0,1,1,0,0,0,0,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(5,'intlist',9,NULL,'check_intlist',1,1,1,0,1,1,1,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(6,'intlistfree',10,11,'check_intlistfree',1,1,1,0,1,1,1,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(7,'intfree',12,13,'check_intfree',0,1,1,0,0,1,1,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(8,'intfreelimit',14,15,'check_intfreelimit',1,1,1,0,0,1,1,'2015-03-13 10:33:50','2015-03-13 10:33:58'),(9,'floatlist',16,17,'check_floatlist',1,1,0,1,1,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(10,'floatlistfree',18,19,'check_floatlistfree',1,1,0,1,1,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(11,'floatfree',20,21,'check_floatfree',0,1,0,1,0,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(12,'floatfreelimit',22,23,'check_floatfreelimit',1,1,0,1,0,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(13,'datelist',24,NULL,'check_datelist',1,0,0,0,1,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(14,'datelistfree',25,26,'check_datelistfree',1,0,0,0,1,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(15,'datefree',27,NULL,'check_datefree',0,0,0,0,0,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58'),(16,'datefreelimit',28,29,'check_datefreelimit',1,0,0,0,0,1,1,'2015-03-13 10:33:54','2015-03-13 10:33:58');
+
+
+
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -2647,5 +2665,7 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
 
 
