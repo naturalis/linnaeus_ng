@@ -2530,11 +2530,13 @@ class Controller extends BaseClass
 		if ( empty($basename) ) return;
 
 		$pagename=!empty($this->pageNameAltName) ? $this->pageNameAltName : $this->getPageName();
+		$pagename=preg_replace('/[^A-Za-z0-9 ]/', '', $pagename);
+		$pagename=str_replace(' ','_',$pagename);
 		
 		return
 			str_replace(
 				['%module%','%page%'],
-				[str_replace(' ','',ucwords($basename)),str_replace(' ','_',$pagename)],
+				[str_replace(' ','',ucwords($basename)),$pagename],
 				$wiki_base_url
 			);
 	}
