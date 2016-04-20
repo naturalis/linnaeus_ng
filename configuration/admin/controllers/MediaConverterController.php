@@ -36,7 +36,9 @@ class MediaConverterController extends MediaController
         'media_tags',
         'media_conversion_log',
         'media_descriptions_taxon',
-        'glossary_media_captions'
+        'glossary_media_captions',
+        'modules',
+        'modules_projects'
     );
 
     public $usedHelpers = array('hr_filesize_helper');
@@ -142,16 +144,13 @@ class MediaConverterController extends MediaController
     private function setProjectMedia ()
     {
         // Determine if process was interrupted
-        $converted = $this->models->MediaConversionLog->_get(array(
-            'columns' => 'count(*) as total',
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            )
-        ));
-        $this->totals['converted'] = $converted[0]['total'];
+        $this->totals['converted'] =
+            $this->models->MediaModel->getConvertedMediaCount(
+                array('project_id' => $this->getCurrentProjectId()
+            ));
 
         // Matrix
-        $moduleId = $this->getModuleId('Multi-entry key');
+        $moduleId = $this->getModuleId('matrixkey');
         if ($moduleId) {
            $media = $this->models->MediaModel->getConverterMatrixMedia(
                 array('project_id' => $this->getCurrentProjectId()
@@ -164,7 +163,7 @@ class MediaConverterController extends MediaController
         }
 
         // Key: keysteps and choices
-        $moduleId = $this->getModuleId('Single-access key');
+        $moduleId = $this->getModuleId('key');
         if ($moduleId) {
             // Steps
             $media = $this->models->MediaModel->getConverterKeystepsMedia(
@@ -191,7 +190,7 @@ class MediaConverterController extends MediaController
         }
 
         // Glossary
-        $moduleId = $this->getModuleId('Glossary');
+        $moduleId = $this->getModuleId('glossary');
         if ($moduleId) {
             $media = $this->models->MediaModel->getConverterGlossaryMedia(
                 array('project_id' => $this->getCurrentProjectId()
@@ -204,7 +203,7 @@ class MediaConverterController extends MediaController
         }
 
         // Introduction
-        $moduleId = $this->getModuleId('Introduction');
+        $moduleId = $this->getModuleId('introduction');
         if ($moduleId) {
             $media = $this->models->MediaModel->getConverterIntroductionMedia(
                 array('project_id' => $this->getCurrentProjectId()
@@ -217,16 +216,16 @@ class MediaConverterController extends MediaController
         }
 
         // Taxa
-        $moduleId = $this->getModuleId('Beheer Soortenregister');
+        $moduleId = $this->getModuleId('nsr');
         if ($moduleId) {
             $media = $this->models->MediaModel->getConverterTaxonMedia(
                 array('project_id' => $this->getCurrentProjectId()
             ));
-            $this->media['modules']['Taxa'] = array(
+            $this->media['modules']['Taxon Editor'] = array(
                 'id' => $moduleId,
                 'media' => $media
             );
-            $this->totals['modules']['Taxa'] = count($media);
+            $this->totals['modules']['Taxon Editor'] = count($media);
         }
 
         // Free module(s)
@@ -260,12 +259,31 @@ class MediaConverterController extends MediaController
 
         // Set simplified array
         foreach ($d['modules'] as $m) {
-            $this->projectModules['modules'][$m['module_id']] = $m['module'];
+            $this->projectModules['modules'][$m['module_id']] = $m['controller'];
         }
         if (isset($d['freeModules'])) {
             foreach ($d['freeModules'] as $m) {
                 $this->projectModules['freeModules'][$m['id']] = $m['module'];
             }
+        }
+
+        // Test if Species is active and Taxon Editor isn't;
+        // if so, add the latter to the list of projects
+        if ($this->getModuleId('species') && !$this->getModuleId('nsr')) {
+            $d = $this->models->Modules->_get(array(
+                'columns' => 'id',
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'controller' => 'nsr'
+                 )
+            ));
+
+            $this->models->ModulesProjects->insert(array(
+                'module_id' => $d[0]['id'],
+                'project_id' => $this->getCurrentProjectId(),
+                'show_order' => 0,
+                'active' => 'y'
+            ));
         }
     }
 
@@ -300,29 +318,23 @@ class MediaConverterController extends MediaController
 
     private function fileHasBeenConverted ()
     {
-        $d = $this->models->MediaConversionLog->_get(array(
-            'columns' => 'media_id, new_file',
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'old_file' => $this->_currentFileName
-             )
+        $d = $this->models->MediaModel->getConvertedFileName(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'old_file' => $this->_currentFileName
         ));
 
         $this->_currentMediaId = !empty($d) ? $d[0]['media_id'] : false;
-        $this->_rsFile = $d[0]['new_file'];
+        $this->_rsFile = !empty($d) ? $d[0]['new_file'] : false;
 
         return $this->_currentMediaId !== false;
     }
 
     private function itemHasBeenConverted ()
     {
-        $d = $this->models->MediaConversionLog->getSingleColumn(array(
-            'columns' => 'media_id',
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'module' => $this->_currentModule,
-                'item_id' => $this->_currentItemId,
-             )
+        $d = $this->models->MediaModel->getMediaItem(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'module' => $this->_currentModule,
+            'item_id' => $this->_currentItemId,
         ));
 
         return !empty($d);
@@ -462,8 +474,7 @@ class MediaConverterController extends MediaController
 
         $this->_files = array(
             array(
-                'name' => !empty($this->_originalFileName) ?
-                    $this->_originalFileName : $this->_currentFileName,
+                'name' => $this->_currentFileName,
                 'type' => $type,
                 'tmp_name' => $tmp_name,
                 'error' => $error,
