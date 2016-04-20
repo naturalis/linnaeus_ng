@@ -64,6 +64,7 @@ class MediaConverterController extends MediaController
     private function initialize ()
     {
         $this->setProjectModules();
+        $this->setTaxonEditorModule();
         $this->setFilePath();
         $this->setMaxFileSize();
     }
@@ -267,8 +268,10 @@ class MediaConverterController extends MediaController
             }
         }
 
-        // Test if Species is active and Taxon Editor isn't;
-        // if so, add the latter to the list of projects
+    }
+
+    private function setTaxonEditorModule ()
+    {
         if ($this->getModuleId('species') && !$this->getModuleId('nsr')) {
             $d = $this->models->Modules->_get(array(
                 'columns' => 'id',
@@ -284,6 +287,8 @@ class MediaConverterController extends MediaController
                 'show_order' => 0,
                 'active' => 'y'
             ));
+
+            $this->setProjectModules();
         }
     }
 
