@@ -30,7 +30,7 @@
 
 	</p>
 
-	<table>
+	<table style="margin-top: 35px;">
     {if $languages|@count>1}
     <tr>
     <td>{t}language{/t}:</td>
@@ -72,4 +72,21 @@
 	</tr>
 	</table>
     </form>
+
+	<p style="margin-top: 35px;">
+	{if $links|@count>0}
+	{t}Media file attached to{/t}:</p>
+	{foreach from=$links key=module item=module_links}
+		<p><b>{$module}</b>:<br/>
+		{foreach from=$module_links item=link}
+		{$link}<br>
+		{/foreach}
+		</p>
+	{/foreach}
+
+	{else}
+		{t}Media file not attached to any module{/t}
+	{/if}
+	</p>
+
 </div>

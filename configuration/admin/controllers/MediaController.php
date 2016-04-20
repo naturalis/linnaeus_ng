@@ -436,6 +436,7 @@ class MediaController extends Controller
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $this->languageId);
+		$this->smarty->assign('links', $this->getMediaLinks($id));
 		$this->smarty->assign('module_id', $this->moduleId);
 		$this->smarty->assign('rs_id', $media['rs_id']);
 		$this->smarty->assign('item_id', $this->itemId);
@@ -493,6 +494,39 @@ class MediaController extends Controller
                 'item_id' => $this->itemId
 			)
         );
+    }
+
+    private function getMediaLinks ($mediaId)
+    {
+        if (!$mediaId || !is_numeric($mediaId)) {
+            return false;
+        }
+
+        $d = $this->models->MediaModules->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+			    'media_id' => $mediaId
+			),
+            'order' => 'module_id'
+		));
+
+        if (!empty($d)) {
+
+            $mi = new ModuleIdentifierController();
+            $mi->setLanguageId($this->languageId);
+
+            foreach ($d as $row) {
+                $mi->setModuleId($row['module_id']);
+                $mi->setItemId($row['item_id']);
+
+                $links[$mi->getModuleName()][] = '<a href="../' . $mi->getModuleController() .
+                    '/' . $mi->getItemEditPage() . $row['item_id'] . '">' . $mi->getItemName() . '</a>';
+            }
+
+            return $links;
+       }
+
+       return false;
     }
 
     public function uploadAction ()

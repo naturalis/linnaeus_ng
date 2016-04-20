@@ -169,13 +169,13 @@ final class MediaModel extends AbstractModel
 
         $query = "
             select
-                id as item_id,
-                file_name,
+                keystep_id as item_id,
+                choice_img as file_name,
                 '' as original_name
             from
-                %PRE%characteristics_states
+                %PRE%choices_keysteps
             where
-                file_name != '' and file_name is not null and
+                choice_img != '' and choice_img is not null and
                 project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
