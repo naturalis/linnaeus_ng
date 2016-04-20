@@ -23,7 +23,12 @@
 			{t}Internal project description:{/t}
 		</td>
 		<td colspan="2">
+        {if $isSysAdmin}
+        	<textarea name="sys_description" style="width:300px;font-family:inherit;font-size:0.9em">{$data.sys_description}</textarea>
+        {else}
 			{$data.sys_description}
+		{/if}          
+			
 		</td>
 	</tr>
 	<tr>

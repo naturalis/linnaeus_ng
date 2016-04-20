@@ -929,40 +929,32 @@ class ProjectsController extends Controller
 
 	}
 
-	private function saveProjectData($data)
+	private function saveProjectData( $data )
 	{
-		$data['id'] = $this->getCurrentProjectId();
 
-		if (!$this->isCurrentUserSysAdmin() && isset($data['sys_name']))
+		$data['id']=$this->getCurrentProjectId();
+
+		if ( !$this->isCurrentUserSysAdmin() )
 		{
-			unset($this->requestData['sys_name']);
+			if ( isset($data['sys_name'])) unset($data['sys_name']);
+			if ( isset($data['sys_description'])) unset($data['sys_description']);
 		}
 
-		$p = $this->models->Projects->update(
-			array(
-				'short_name' => 'null',
-				'css_url' => 'null',
-				'keywords' => 'null',
-				'description' => 'null',
-				'group' => 'null'
-			),
-			array('id'=>$data['id'])
-		);
-
-		if (isset($data['sys_name']))
+		if ( isset($data['sys_name']) )
 		{
-            $p = $this->models->Projects->_get(array(
-                'id' => array('id !=' => $data['id'],'sys_name'=>$data['sys_name']),
+            $p=$this->models->Projects->_get(array('id' => array(
+				'id !=' => $data['id'],
+				'sys_name'=>$data['sys_name']),
             ));
 
 			if ($p)
 			{
-				$this->addError('A project with that internal name alreasy exists.');
-				unset($this->requestData['sys_name']);
+				$this->addError( sprintf( $this->translate('A project with the internal name "%s" already exists.'), $data['sys_name'] ) );
+				unset($data['sys_name']);
 			}
 		}
 
-		if (isset($data['short_name']))
+		if ( isset($data['short_name']) )
 		{
             $p = $this->models->Projects->_get(array(
                 'id' => array('id !=' => $data['id'],'short_name'=>$data['short_name']),
@@ -970,12 +962,12 @@ class ProjectsController extends Controller
 
 			if ($p)
 			{
-				$this->addError(sprintf('A project with that shortname already exists (%s).',$p[0]['sys_name']));
-				unset($this->requestData['short_name']);
+				$this->addError( sprintf( $this->translate('A project with the shortname "%s" already exists (project: %s).'), $data['short_name'], $p[0]['sys_name'] ) );
+				unset($data['short_name']);
 			}
 		}
 
-		$this->models->Projects->save($data);
+		$this->models->Projects->save( $data );
 
 	}
 
