@@ -313,12 +313,11 @@ class TraitsTraitsController extends TraitsController
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
 
-		if (empty($id))
-			return false;
+		if ( is_null($id) ) return false;
 
 		$this->models->TraitsProjectTypes->save(array(
 			'project_id'=>$this->getCurrentProjectId(),
-			'type_id'=>mysql_real_escape_string($id)
+			'type_id'=>(int)$id
 		));
 
 		return true;
@@ -328,12 +327,11 @@ class TraitsTraitsController extends TraitsController
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
 
-		if (empty($id))
-			return false;
+		if ( is_null($id) ) return false;
 
 		$this->models->TraitsProjectTypes->delete(array(
 			'project_id'=>$this->getCurrentProjectId(),
-			'id'=>mysql_real_escape_string($id)
+			'id'=>(int)$id
 		));
 		
 		return true;
@@ -351,17 +349,18 @@ class TraitsTraitsController extends TraitsController
 		$show_show_all_link=isset($p['show_show_all_link']) && in_array($p['show_show_all_link'],array('0','1'))? $p['show_show_all_link'] : null;
 		$help_link_url=!empty($p['help_link_url']) ? $p['help_link_url'] : 'null';
 
-		if (empty($sysname))
-			return false;
+		if ( is_null($sysname) ) return false;
+
+
 
 		$this->models->TraitsGroups->save(array(
 			'id'=>$id,
 			'project_id'=>$this->getCurrentProjectId(),
-			'parent_id'=>mysql_real_escape_string($parent_id),
-			'sysname'=>mysql_real_escape_string($sysname),
+			'parent_id'=>(int)$parent_id,
+			'sysname'=>$this->models->TraitsTraitsModel->escapeString($sysname),
 			'show_in_search'=>$show_in_search,
 			'show_show_all_link'=>$show_show_all_link,
-			'help_link_url'=>mysql_real_escape_string($help_link_url)
+			'help_link_url'=>$this->models->TraitsTraitsModel->escapeString($help_link_url)
 		));
 
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
@@ -414,15 +413,14 @@ class TraitsTraitsController extends TraitsController
 			return false;
 		
 		$g=$this->getTraitgroup($id);
-		
-		// REFAC2015: are these statments correct? shouldn't 'id'=> be 'text_id' =>
+
 		$this->models->TextTranslations->delete(array(
 			'project_id'=>$this->getCurrentProjectId(),
-			'id'=>$g['name_tid']
+			'text_id'=>$g['name_tid']
 		));		
 		$this->models->TextTranslations->delete(array(
 			'project_id'=>$this->getCurrentProjectId(),
-			'id'=>$g['description_tid']
+			'text_id'=>$g['description_tid']
 		));		
 					
 		$this->models->TraitsGroups->delete(array(
@@ -432,7 +430,7 @@ class TraitsTraitsController extends TraitsController
 
 		$this->models->TraitsGroups->update(
 			array('parent_id'=>'null'),
-			array('project_id'=>$this->getCurrentProjectId(),'parent_id'=>mysql_real_escape_string($id))
+			array('project_id'=>$this->getCurrentProjectId(),'parent_id'=>(int)$id)
 		);
 
 		return true;
