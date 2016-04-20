@@ -130,7 +130,7 @@ final class MediaModel extends AbstractModel
                 %PRE%characteristics_states
             where
                 file_name != '' and file_name is not null and
-                project_id = " . $projectId;
+                project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
@@ -153,7 +153,7 @@ final class MediaModel extends AbstractModel
                 %PRE%keysteps
             where
                 image != '' and image is not null and
-                project_id = " . $projectId;
+                project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
@@ -176,7 +176,7 @@ final class MediaModel extends AbstractModel
                 %PRE%characteristics_states
             where
                 file_name != '' and file_name is not null and
-                project_id = " . $projectId;
+                project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
@@ -202,8 +202,8 @@ final class MediaModel extends AbstractModel
                 %PRE%free_module_pages
             where
                 image != '' and image is not null and
-                project_id = " . $projectId . " and
-                module_id = " . $moduleId;
+                project_id = " . $this->escapeString($projectId) . " and
+                module_id = " . $this->escapeString($moduleId);
 
         $d = $this->freeQuery($query);
 
@@ -228,7 +228,7 @@ final class MediaModel extends AbstractModel
             where
                 file_name != '' and
                 file_name is not null and
-                project_id = " . $projectId;
+                project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
@@ -252,7 +252,7 @@ final class MediaModel extends AbstractModel
             where
                 file_name != '' and
                 file_name is not null and
-                project_id = " . $projectId;
+                project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
@@ -277,7 +277,7 @@ final class MediaModel extends AbstractModel
             where
                 file_name != '' and
                 file_name is not null and
-                project_id = " . $projectId;
+                project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
@@ -285,6 +285,80 @@ final class MediaModel extends AbstractModel
     }
 
 
+    public function getConvertedMediaCount ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+
+        if (!$projectId) return false;
+
+        $query = "
+            select
+                count(*) as total
+            from
+                %PRE%media_conversion_log
+            where
+                `media_id` > -1 and
+                `new_file` != 'failed' and
+                `project_id` = " . $this->escapeString($projectId);
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d[0]['total'] : 0;
+    }
+
+
+    public function getConvertedFileName ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+        $oldFile = isset($p['old_file']) && !empty($p['old_file']) ?
+            $p['old_file'] : false;
+
+        if (!$projectId || !$oldFile) return false;
+
+        $query = "
+            select
+                `media_id`, `new_file`
+            from
+                %PRE%media_conversion_log
+            where
+                `media_id` > -1 and
+                `new_file` != 'failed' and
+                `old_file` = '" . $this->escapeString($oldFile) . "' and
+                `project_id` = " . $this->escapeString($projectId);
+
+        return $this->freeQuery($query);
+    }
+
+    public function getMediaItem ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+        $module = isset($p['module']) && !empty($p['module']) ?
+            $p['module'] : false;
+        $itemId = isset($p['item_id']) && !empty($p['item_id']) ?
+            $p['item_id'] : false;
+
+        if (!$projectId || !$module || !$itemId) return false;
+
+        $query = "
+            select
+                `media_id`
+            from
+                %PRE%media_conversion_log
+            where
+                `media_id` > -1 and
+                `new_file` != 'failed' and
+                `module` = '" . $this->escapeString($module) . "' and
+                `item_id` = " . $this->escapeString($itemId) . " and
+                `project_id` = " . $this->escapeString($projectId);
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d[0]['media_id'] : false;
+
+    }
 
 }
 

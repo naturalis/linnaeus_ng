@@ -53,11 +53,11 @@ class MediaController extends Controller
             'info' => 'Name of RS API to create new RS user'
         ),
         'rs_upload_api' => array(
-            'default' => 'rs_upload_api',
+            'default' => 'api_upload_lng',
             'info' => 'Name of RS API to upload to RS'
         ),
         'rs_search_api' => array(
-            'default' => 'rs_search_api',
+            'default' => 'api_search_lng',
             'info' => 'Name of RS API to search RS'
         ),
         'rs_user_key' => array(
@@ -172,7 +172,7 @@ class MediaController extends Controller
 		{
 			$this->_moduleSettingsReader=new ModuleSettingsReaderController();
 		}
-		
+
         $this->setRsSettings();
 
         if (!isset($_SESSION['admin']['user']['media']['display']))
@@ -312,7 +312,7 @@ class MediaController extends Controller
     public function ajaxInterfaceAction ()
     {
 		if ( !$this->getAuthorisationState() ) return;
-		
+
         if ($this->rHasVal('action', 'upload_progress')) {
             $this->smarty->assign('returnText', $this->getUploadProgress('media'));
         }
@@ -324,7 +324,7 @@ class MediaController extends Controller
 
     public function indexAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->checkAuthorisation();
 
         // Only send data when user is sysadmin!!
@@ -352,7 +352,7 @@ class MediaController extends Controller
     public function selectAction ()
     {
         $this->checkAuthorisation();
-		
+
 		$this->setPageName($this->translate('Browse Media'));
 
         $this->setItemTemplate();
@@ -581,8 +581,10 @@ class MediaController extends Controller
                     'rs_thumb_large' => $media->thumbnails->large
                 ));
 
-                // Store associated metadata
                 $this->setMediaId($this->models->Media->getNewId());
+
+
+                // Store associated metadata
                 $this->saveMetadata(array('media_id' => $this->mediaId));
 
                 // Store tags
@@ -691,6 +693,11 @@ class MediaController extends Controller
         if (!$this->getMediaType($file['type'])) {
             $this->addError(_('Mime type') . ' ' . $file['type'] . ' ' .
                 _('not supported') . ': ' . $file['name']);
+            return false;
+        }
+
+        // Check file name
+        if (!$this->checkFileExtension($file)) {
             return false;
         }
 
@@ -1363,6 +1370,20 @@ class MediaController extends Controller
             $d[$f] = $this->rHasVal($f) ? $this->rGetVal($f) : null;
         }
         return $d;
+    }
+
+    private function checkFileExtension ($file)
+    {
+        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+
+        foreach ($this::$mimeTypes as $category => $types) {
+            foreach ($types as $extension => $type) {
+                if ($ext == $extension) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public function getMediaType ($mime)
