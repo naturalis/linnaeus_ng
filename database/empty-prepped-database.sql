@@ -2657,6 +2657,43 @@ INSERT INTO `traits_types` VALUES (1,'boolean',1,2,'check_boolean',0,0,0,0,0,0,0
 
 
 
+--
+-- Base data for table `text_translations`
+--
+insert into text_translations values (1,NULL,1,24,'Boolean',now(),now());
+insert into text_translations values (2,NULL,2,24,'Ja of Nee',now(),now());
+insert into text_translations values (3,NULL,3,24,'Lijst van termen',now(),now());
+insert into text_translations values (4,NULL,4,24,'Lijst van termen, tekst, max. 1000 karakters per term',now(),now());
+insert into text_translations values (5,NULL,5,24,'Lijst van termen plus optie eigen antwoord',now(),now());
+insert into text_translations values (6,NULL,6,24,'Lijst van termen, tekst, max. 1000 karakters per term, plus optie eigen antwoord ("Anders, namelijk:")',now(),now());
+insert into text_translations values (7,NULL,7,24,'Vrije invoer tekst',now(),now());
+insert into text_translations values (8,NULL,8,24,'Vrije invoer, tekst, max. 1000 karakters',now(),now());
+insert into text_translations values (9,NULL,9,24,'Numerieke lijst, gehele getallen',now(),now());
+insert into text_translations values (10,NULL,10,24,'Numerieke lijst, gehele getallen, plus optie eigen antwoord',now(),now());
+insert into text_translations values (11,NULL,11,24,'Numerieke lijst, gehele getallen (maximale precisie: 12,5), plus optie eigen antwoord ("Anders, namelijk:")',now(),now());
+insert into text_translations values (12,NULL,12,24,'Vrije invoer geheel getal',now(),now());
+insert into text_translations values (13,NULL,13,24,'Vrije invoer, geheel getal, zonder begrenzing',now(),now());
+insert into text_translations values (14,NULL,14,24,'Vrije invoer geheel getal, begrensd',now(),now());
+insert into text_translations values (15,NULL,15,24,'Vrije invoer, geheel getal, met boven- en/of ondergrens',now(),now());
+insert into text_translations values (16,NULL,16,24,'Numerieke lijst, decimale getallen',now(),now());
+insert into text_translations values (17,NULL,17,24,'Numerieke lijst, decimale getallen (maximale precisie: 12,5)',now(),now());
+insert into text_translations values (18,NULL,18,24,'Numerieke lijst, decimale getallen, plus optie eigen antwoord',now(),now());
+insert into text_translations values (19,NULL,19,24,'Numerieke lijst, decimale getallen, plus optie eigen antwoord ("Anders, namelijk:") (maximale precisie: 12,5)',now(),now());
+insert into text_translations values (20,NULL,20,24,'Vrije invoer decimaal getal',now(),now());
+insert into text_translations values (21,NULL,21,24,'Vrije invoer, decimaal getal, zonder begrenzing (maximale precisie: 12,5)',now(),now());
+insert into text_translations values (22,NULL,22,24,'Vrije invoer decimaal getal, begrensd',now(),now());
+insert into text_translations values (23,NULL,23,24,'Vrije invoer, decimaal getal, met boven- en/of ondergrens (maximale precisie: 12,5)',now(),now());
+insert into text_translations values (24,NULL,24,24,'Datumlijst (verschillende datumformaten)',now(),now());
+insert into text_translations values (25,NULL,25,24,'Datumlijst, plus optie eigen antwoord',now(),now());
+insert into text_translations values (26,NULL,26,24,'Datumlijst, plus optie eigen antwoord ("Anders, namelijk:"), verschillende datumformaten',now(),now());
+insert into text_translations values (27,NULL,27,24,'Vrije invoer datum (verschillende datumformaten)',now(),now());
+insert into text_translations values (28,NULL,28,24,'Vrije invoer datum, begrensd',now(),now());
+insert into text_translations values (29,NULL,29,24,'Vrije invoer, datum, met boven- en/of ondergrens (verschillende datumformaten)',now(),now());
+
+
+
+
+
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

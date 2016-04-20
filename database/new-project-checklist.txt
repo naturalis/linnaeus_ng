@@ -57,8 +57,12 @@ connect through SSH and:
 -- dichotomous key --
 * Dichotomous key > Define ranks that can appear in key, and set what ranks can appear in your key
 
+-- traits ("kenmerken")
+* 
+
 -- settings
 * ResourceSpace
+
 * lots of things...
 
 
