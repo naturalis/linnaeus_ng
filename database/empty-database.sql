@@ -1097,6 +1097,32 @@ CREATE TABLE IF NOT EXISTS `matrices_variations` (
   UNIQUE KEY `project_id` (`project_id`,`matrix_id`,`variation_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `media`;
+CREATE TABLE `media` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `rs_id` int(11) NOT NULL,
+  `name` varchar(128) NOT NULL,
+  `original_name` varchar(128) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `width` int(11) NOT NULL,
+  `height` int(11) NOT NULL,
+  `mime_type` varchar(100) NOT NULL,
+  `file_size` int(11) NOT NULL,
+  `rs_original` varchar(255) NOT NULL,
+  `rs_resized_1` varchar(255) DEFAULT NULL,
+  `rs_resized_2` varchar(255) DEFAULT NULL,
+  `rs_thumb_small` varchar(255) NOT NULL,
+  `rs_thumb_medium` varchar(255) NOT NULL,
+  `rs_thumb_large` varchar(255) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  KEY `name` (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
 DROP TABLE IF EXISTS `media_descriptions_taxon`;
 CREATE TABLE IF NOT EXISTS `media_descriptions_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
