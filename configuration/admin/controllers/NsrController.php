@@ -14,6 +14,11 @@ include_once ('RdfController.php');
 class NsrController extends Controller
 {
 
+    public $usedModels = array(
+		'nsr_ids',
+		'trash_can',
+    );
+
 //    public $modelNameOverride='NsrTreeModel';
 
     public function __construct()

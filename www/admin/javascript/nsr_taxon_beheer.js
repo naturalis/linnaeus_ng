@@ -15,6 +15,8 @@ var searchdata=
 	};
 var main_language_display_label="nederlandse naam";
 var baseRanks=Array();
+var dropListSelectedTextStyle='concise'; // 'full';
+var closeDialogAfterSelect=true;
 
 function toggleedit(ele)
 {
@@ -640,6 +642,9 @@ function doNsrDropList(p)
 		search: value,
 		time: allGetTimestamp()
 	}
+
+	if (p.params.dropListSelectedTextStyle=='full') dropListSelectedTextStyle='full';
+	if (p.params.closeDialogAfterSelect===false) closeDialogAfterSelect=p.params.closeDialogAfterSelect
 	
 	if (p.params) $.extend(data, p.params);
 
@@ -660,6 +665,7 @@ function setNsrDropListValue(ele,variable)
 {
 	// don't change order of lines
 	$('#'+variable.replace(/(_id)$/,'')).html( $(ele).attr('display-text') ? $.trim($(ele).attr('display-text')) : $(ele).text() );
+	$('#'+variable.replace(/(_id)$/,'')).val( $(ele).attr('display-text') ? $.trim($(ele).attr('display-text')) : $(ele).text() );
 	$('#'+variable).val($(ele).attr('value')).trigger('change');
 }
 
@@ -686,7 +692,7 @@ function buildDropList(data,variable)
 			if (variable=='name_organisation_id' && t.is_company!='1') continue;
 			if (variable=='name_expert_id' && t.is_company=='1') continue;
 			
-			if (1==1 || variable.indexOf('reference_id')!=-1)
+			if (variable.indexOf('reference_id')!=-1)
 			{
 				var label=
 					(t.author ? t.author+", " : "")+
@@ -697,11 +703,16 @@ function buildDropList(data,variable)
 			{
 				var label=t.label;
 			}
-	
+
 			if (t.label && t.id)
 			{
+				var disptext = dropListSelectedTextStyle=='full'? label.replace(/'/g,"\'") : t.label.replace(/'/g,"\'");
 				buffer.push(
-					'<li><a href="#" display-text="'+t.label.replace(/'/g,"\'")+'" title="'+label.replace(/'/g,"\'")+'" onclick="setNsrDropListValue(this,\''+variable+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" value="'+t.id+'">'+label+'</a></li>'
+					'<li><a href="#" display-text="'+disptext+'" title="'+label.replace(/'/g,"\'")+'" onclick="\
+						setNsrDropListValue(this,\''+variable+'\');\
+						' + (closeDialogAfterSelect ? '$( \'#dialog-message\' ).dialog( \'close\' );' : '') + '\
+						return false;\
+						" value="'+t.id+'">'+label+'</a></li>'
 				);
 			}
 		}
