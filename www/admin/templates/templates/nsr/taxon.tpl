@@ -202,8 +202,8 @@
 </p>
 <p>
 	<a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">{t}paspoort{/t}</a><br />
-
 	<a href="media.php?id={$concept.id}" class="edit" style="margin:0">{t}media{/t}</a><br />
+	<a href="literature.php?id={$concept.id}" class="edit" style="margin:0">{t}literatuur{/t}</a><br />
 	<a href="images.php?id={$concept.id}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
 
     {foreach from=$traitgroups item=v}{if $v.taxon_count>0}

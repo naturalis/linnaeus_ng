@@ -4,7 +4,7 @@ include_once (dirname(__FILE__) . "/AbstractModel.php");
 final class Literature2Model extends AbstractModel
 {
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
 
@@ -15,7 +15,7 @@ final class Literature2Model extends AbstractModel
         	in configuration/admin/config.php.'));
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         if ($this->databaseConnection)
 		{
@@ -24,7 +24,7 @@ final class Literature2Model extends AbstractModel
         parent::__destruct();
     }
 
-    public function getReferenceAuthors ($params)
+    public function getReferenceAuthors($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
@@ -52,7 +52,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getTitleAlphabet ($projectId)
+    public function getTitleAlphabet($projectId)
     {
         if (!$projectId) {
 			return null;
@@ -76,7 +76,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getAuthorAlphabet ($projectId)
+    public function getAuthorAlphabet($projectId)
     {
         if (!$projectId) {
 			return null;
@@ -141,7 +141,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getReferences ($params)
+    public function getReferences($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $publicationTypeId = isset($params['publicationTypeId']) ? $params['publicationTypeId'] : null;
@@ -191,7 +191,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getReferenceLinksNames ($params)
+    public function getReferenceLinksNames($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -242,8 +242,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
-    public function getReferenceLinksPresences ($params)
+    public function getReferenceLinksPresences($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -282,7 +281,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getReferenceLinksTraits ($params)
+    public function getReferenceLinksTraits($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
@@ -321,7 +320,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getReferenceLinksPassports ($params)
+    public function getReferenceLinksPassports($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -374,7 +373,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getActors ($projectId)
+    public function getActors($projectId)
     {
         if (!$projectId)
 		{
@@ -409,7 +408,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getLanguages ($params)
+    public function getLanguages($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -436,7 +435,7 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
-    public function getPublicationTypes ($params)
+    public function getPublicationTypes($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -472,5 +471,54 @@ final class Literature2Model extends AbstractModel
 
         return $this->freeQuery($query);
     }
+
+    public function getTaxonReferences( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+
+        if ( is_null($project_id) || is_null($taxon_id) ) return;
+
+        $query = "
+            select
+				_a.id,
+				_a.language_id,
+				_a.label,
+				_a.alt_label,
+				_a.alt_label_language_id,
+				_a.date,
+				_a.author,
+				_a.publication_type,
+				_a.citation,
+				_a.source,
+				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
+				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
+				_a.pages,
+				_a.volume,
+				_a.external_link
+
+			from %PRE%literature2 _a
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i
+				on _a.periodical_id = _i.id
+				and _a.project_id=_i.project_id
+
+			right join %PRE%literature_taxa _t
+				on _a.project_id=_t.project_id
+				and _a.id=_t.literature_id
+				
+			where
+				_a.project_id = ".$project_id."
+				and _t.taxon_id= " . $taxon_id . " 
+			";
+
+        return $this->freeQuery($query);
+    }
+
+
 
 }
