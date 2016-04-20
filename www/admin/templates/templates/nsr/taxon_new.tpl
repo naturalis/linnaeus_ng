@@ -250,9 +250,12 @@
 
 <input type="button" value="{t}opslaan{/t}" onclick="savenewconcept();" />
 </form>
-
 <p>
+	{if $parent.id}
+	<a href="taxon.php?id={$parent.id}">{t}terug{/t}</a>
+    {else}
 	<a href="index.php">{t}terug{/t}</a>
+    {/if}
 </p>
 
 </div>
