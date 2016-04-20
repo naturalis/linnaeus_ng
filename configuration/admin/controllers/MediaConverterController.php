@@ -165,11 +165,13 @@ class MediaConverterController extends MediaController
 
         // Key: keysteps and choices
         $moduleId = $this->getModuleId('key');
+
         if ($moduleId) {
             // Steps
             $media = $this->models->MediaModel->getConverterKeystepsMedia(
                 array('project_id' => $this->getCurrentProjectId()
             ));
+
             if (!empty($media)) {
                 $this->media['modules']['Dichotomous key steps'] = array(
                     'id' => $moduleId,
@@ -177,10 +179,12 @@ class MediaConverterController extends MediaController
                 );
                 $this->totals['modules']['Dichotomous key steps'] = count($media);
             }
+
             // Choices
             $media = $this->models->MediaModel->getConverterKeychoicesMedia(
                 array('project_id' => $this->getCurrentProjectId()
             ));
+
             if (!empty($media)) {
                 $this->media['modules']['Dichotomous key choices'] = array(
                     'id' => $moduleId,

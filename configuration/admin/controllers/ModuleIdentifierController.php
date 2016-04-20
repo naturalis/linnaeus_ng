@@ -80,6 +80,28 @@ class ModuleIdentifierController extends Controller
         return $c;
     }
 
+    public function getItemEditPage ()
+    {
+        if (!$this->moduleId || !$this->itemId) {
+            return false;
+        }
+
+        $controller = $this->getModuleController();
+
+        if ($controller) {
+            switch ($controller) {
+                case 'nsr':
+                    return 'taxon.php?id=';
+                case 'key':
+                    return 'choice_edit.php?id=';
+                case 'matrixkey':
+                    return 'state.php?id=';
+                default:
+                    return 'edit.php?id=';
+            }
+        }
+    }
+
     public function getItemName ()
 	{
         if (!$this->moduleId || !$this->itemId) {
