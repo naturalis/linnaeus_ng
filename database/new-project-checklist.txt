@@ -14,20 +14,14 @@ connect through SSH and:
 	- /var/www/linnaeusng/configuration/admin/configuration.php
 	- /var/www/linnaeusng/configuration/app/configuration.php
   this is automated by puppet so you can probably skip this step
+
+* access database and create tables & base data:
+	/var/www/linnaeusng/database/empty_database.sql
+	/var/www/linnaeusng/database/base_data.sql
+  partly automated by puppet, but very probably not up to date
 	
-* access database and create project, sysadmin and project role.
-  there are statement templates in the comment section at the top of:
-	/var/www/linnaeusng/database/empty-prepped-database.sql
-  replace 
-	'Project internal name'
-	'Project description'
-	'Project visible title'
-  in the "insert into projects..." statements with the appropriate values and execute.
-  "insert into users..." and "insert into projects_roles_users..." can be
-  executed as is.
-  if there is more than one project to be created, run the "insert into projects..." and
-  "insert into projects_roles_users..." statements multiple times with the appropriate
-  values.
+* access database and create project, sysadmin and project role:
+	/var/www/linnaeusng/database/new_project_and_user.sql
 
 * optional: if there will be only one project, edit
 	/var/www/linnaeusng/configuration/app/constants.php
@@ -41,10 +35,18 @@ connect through SSH and:
 -- first things first --
 * go to http://my.domain/linnaeus_ng/admin/ and log in with sysadmin/sysadmin
 * access User management, change the password for sysadmin 
+* access Project management > Manage basic project information, change the basic data of the project by replacing
+	Internal project name
+	Internal project description
+	Project title
+  (must be sysadmin to do this!)
 
 -- project management
 * access Project management > Manage basic project information, add a language, click "save"
 * access Project management > Manage project modules, add all relevant modules (as well as any free modules)
+
+-- user management
+* access User management, create a Lead Expert for the actual product owner
 
 -- taxon basics -- 
 * access Taxon editor > taxonomic ranks
@@ -57,40 +59,12 @@ connect through SSH and:
 -- dichotomous key --
 * Dichotomous key > Define ranks that can appear in key, and set what ranks can appear in your key
 
--- settings
+-- traits ("kenmerken")
+* Traits > Select project data types, add the relevant types to use in the project (or all, when unsure)
+
+-- media
 * ResourceSpace
+
+-- settings
 * lots of things...
-
-
-PUBLISH AND SEE!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
