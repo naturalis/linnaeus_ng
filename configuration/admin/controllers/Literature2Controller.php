@@ -1493,7 +1493,7 @@ class Literature2Controller extends NsrController
 
 
 		// TAXA
-		$taxa = $this->models->Literature2Model->getReferenceTaxa(array(
+		$taxa = $this->models->Literature2Model->getReferencedTaxa(array(
             'project_id' => $this->getCurrentProjectId(),
     		'literature_id' => $id
 		));

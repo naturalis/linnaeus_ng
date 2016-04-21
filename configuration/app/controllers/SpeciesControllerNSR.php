@@ -1135,6 +1135,8 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function hasTaxonLiterature($id)
     {
+		
+		/*
         $d=$this->models->LiteratureTaxa->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(),
@@ -1143,7 +1145,20 @@ class SpeciesControllerNSR extends SpeciesController
 			'columns' => 'count(*) as total'
         ));
 
-        return $d[0]['total']>1;
+        return $d[0]['total']>0;
+		*/
+		$d=$this->getTaxonLiterature( $id );
+		
+		if (count((array)$d)==0)
+		{
+			$d=$this->getInheritedTaxonLiterature( $id );
+			return count((array)$d)>0;
+		}
+		else
+		{
+			return count((array)$d)>0;
+		}
+		
     }
 
     private function hasTaxonBarcodes($id)

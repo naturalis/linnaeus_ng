@@ -524,7 +524,7 @@ final class Literature2Model extends AbstractModel
 			order by
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
-
+			
         return $this->freeQuery($query);
     }
 
@@ -569,7 +569,7 @@ final class Literature2Model extends AbstractModel
 		$this->freeQuery($query);
     }
 
-    public function getReferenceTaxa( $params )
+    public function getReferencedTaxa( $params )
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
         $literature_id = isset($params['literature_id']) ? $params['literature_id'] : null;
