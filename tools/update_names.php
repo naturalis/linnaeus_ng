@@ -1,15 +1,5 @@
-<?php session_start(); ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Update Names</title>
-</head>
-<body style="font: 12px Verdana; width: 800px;">
-
 <?php
-	$cfg = '/var/www/linnaeusng/configuration/admin/configuration.php';
-	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
+	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
 
 	// Get external settings
 	if (!file_exists($cfg)) die("Unable to locate $cfg. This script should be in the root of a linnaeus NG-installation");
@@ -33,48 +23,38 @@
         'isInvalidNameOf'
 	);
 
+    echo "Updating global settings...\n";
+    updateSettings();
+
 	$q = 'select id from languages where language="scientific" group by language';
 	$r = mysqli_query($d, $q) or die($q . mysqli_error($d));
 	$row = mysqli_fetch_row($r);
 	$scientificId = $row[0];
 
-	echo '<h3>Update Names</h3>';
+    echo "Updating name types...\n";
+    $q = 'SELECT `id` FROM `projects`';
+    $r = mysqli_query($d, $q);
+    while ($row = mysqli_fetch_assoc($r)) {
+        $projectIds[] = $row['id'];
+    }
+    setNameTypes($projectIds);
 
-	if (!isset($_GET['go'])) {
-		echo '<p>This script copies data from the tables Taxa, Synonyms and Commonnames to Names.</p>';
-	} else {
-	    echo '<p>Updating global Linnaeus settings...<br>';
-	    updateSettings();
+    echo "Clearing previously inserted names...\n";
+    clearNames($projectIds);
 
-	    echo 'Updating name types...<br>';
-	    $q = 'SELECT `id` FROM `projects`';
-	    $r = mysqli_query($d, $q);
-	    while ($row = mysqli_fetch_assoc($r)) {
-            $projectIds[] = $row['id'];
-	    }
-        setNameTypes($projectIds);
+    echo "Inserting taxa...\n";
+    insertTaxa($projectIds);
 
-	    echo 'Clearing previously inserted names...<br>';
-        clearNames($projectIds);
+    echo "Updating (infra)species names...\n";
+    updateTaxa();
 
-        echo 'Inserting taxa...<br>';
-        insertTaxa($projectIds);
+    echo "Inserting synonyms...\n";
+    insertSynonyms($projectIds);
 
-        echo 'Updating (infra)species names...<br>';
-        updateTaxa();
+    echo "Inserting common names...\n";
+    insertCommonNames();
 
-        echo 'Inserting synonyms...<br>';
-        insertSynonyms($projectIds);
-
-        echo 'Inserting common names...<br>';
-        insertCommonNames();
-	}
-	echo '</p>';
-	if (!isset($_GET['go'])) {
-		echo '<a href="?go" style="margin-top: 30px; font-weight: bold; text-decoration: none;">Do it!</a></p>';
-	} else {
-		echo "<p>Ready!";
-	}
+    echo "Ready!\n\n";
 
 
 	function getYear ($s) {
@@ -85,9 +65,6 @@
 	function updateSettings () {
 	    global $d;
         $queries = array(
-            "INSERT IGNORE INTO modules (id,module,description,controller,icon,show_order,show_in_menu,show_in_public_menu,created,last_change)
-                VALUES (15,'Beheer Soortenregister','Beheer Soortenregister','nsr','index.png',0,1,0,NOW(),NOW());",
-            "INSERT IGNORE INTO rights (controller,view,view_description,created) VALUES ('nsr','*','full access',NOW());",
             "INSERT IGNORE INTO languages (language,iso3,direction,created) VALUES ('Scientific','sci','ltr',NOW());"
         );
         foreach ($queries as $q) {
@@ -108,29 +85,6 @@
 	function clearNames ($projectIds) {
 	    global $d;
 	    mysqli_query($d, 'truncate table names') or die($q . mysqli_error($d));
-	    /*
-	     *
-	    $queries = array(
-            "delete from names where
-            	taxon_id in (select id from taxa)
-            	and type_id =
-            		(select id from name_types where project_id=[id] and nametype ='isValidNameOf');",
-            "delete from names where
-            	taxon_id in (select taxon_id from commonnames)
-            	and type_id =
-            		(select id from name_types where project_id=[id] and nametype ='isPreferredNameOf');",
-            "delete from names where
-            	taxon_id in (select taxon_id from synonyms)
-            	and type_id =
-            		(select id from name_types where project_id=[id] and nametype ='isSynonymOf');"
-        );
-        foreach ($projectIds as $id) {
-    	    foreach ($queries as $q) {
-    	        $q = str_replace('[id]', $id, $q);
-                mysqli_query($d, $q) or die($q . mysqli_error($d));
-            }
-        }
-        */
 	}
 
 	function insertTaxa ($projectIds) {
@@ -257,5 +211,3 @@
 
 
 ?>
-</body>
-</html>
