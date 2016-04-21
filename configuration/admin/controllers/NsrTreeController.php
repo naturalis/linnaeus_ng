@@ -72,6 +72,21 @@ class NsrTreeController extends NsrController
 
         $this->setPageName($this->translate('Index'));
 
+		$this->_growTree();
+    }
+
+    public function treeAction()
+    {
+		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
+
+		$this->checkAuthorisation();
+
+		$this->_growTree( 'tree' );
+    }
+
+
+    private function _growTree( $tpl=null )
+    {
 		$tree=$this->restoreTree();
 
 		if ( empty($tree) || $this->rHasVar('tree-reset'))
@@ -83,8 +98,9 @@ class NsrTreeController extends NsrController
 			$this->smarty->assign('tree',json_encode($tree));
 		}
 
-		$this->printPage();
+		$this->printPage( $tpl );
     }
+
 
     public function ajaxInterfaceAction()
     {
