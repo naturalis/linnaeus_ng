@@ -1,5 +1,58 @@
 {include file="../shared/admin-header.tpl"}
 
+<script type="text/JavaScript">
+
+var new_taxa=Array();
+
+function add_taxon()
+{
+	var new_id=$('#taxon_id').val();
+	var new_label=$('#taxon').val();
+
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		if (new_taxa[i].id==new_id) return;
+	}
+
+	new_taxa.push( { id:new_id, label:new_label } )
+}
+
+function remove_taxon( id )
+{
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		if (new_taxa[i].id==id) 
+		{
+			new_taxa.splice(i,1);
+			return;
+		}
+	}
+}
+
+function print_taxa()
+{
+	$('#new_taxa').html('');
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		$('#new_taxa').append(
+			'<li>' + new_taxa[i].label + '<a href="#" onclick="remove_taxon('+new_taxa[i].id+');print_taxa();return false;" style="padding:0 5px 0 5px"> x </a></li>' );
+	}
+}
+
+function saveLitForm()
+{
+	var form=$('#theForm');
+
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		form.append('<input type=hidden name=new_taxa[] value="'+new_taxa[i].id+'" />');
+	}
+
+	form.submit();
+}
+	
+</script>	
+
 <div id="page-main">
 <p>
 <h2>{$reference.label}</h2>
@@ -85,8 +138,8 @@
             <!-- verbatim: {$reference.publication_type} -->
 		</td>
 	</tr>
-	<tr><th>citatie:</th><td><input class="large" type="text" name="citation" value="{$reference.citation|@escape}" /></td></tr>
-	<tr><th>bron:</th><td><input class="medium" type="text" name="source" value="{$reference.source|@escape}" /></td></tr>
+	<tr><th>{t}citatie:{/t}</th><td><input class="large" type="text" name="citation" value="{$reference.citation|@escape}" /></td></tr>
+	<tr><th>{t}bron:{/t}</th><td><input class="medium" type="text" name="source" value="{$reference.source|@escape}" /></td></tr>
 
 	<tr>
 		<th title="gebruik dit veld voor delen/hoofdstukken van boeken en voor onderdelen van websites.">gepubliceerd in:</th>
@@ -102,7 +155,7 @@
 
 	{if $reference.publishedin}
 	<tr>
-    	<th>gepubliceerd in (verbatim):</th>
+    	<th>{t}gepubliceerd in (verbatim):{/t}</th>
         <td>
         	<input class="large" type="text" name="publishedin" value="{$reference.publishedin}" /><br />
             <span class="small-warning">
@@ -124,7 +177,7 @@
 	</tr>
 	{if $reference.periodical}
 	<tr>
-    	<th>periodiek (verbatim):</th>
+    	<th>{t}periodiek (verbatim):{/t}</th>
         <td>
         	<input type="text" name="periodical" value="{$reference.periodical}" /><br />
             <span class="small-warning">
@@ -137,19 +190,33 @@
 
     
 	<tr>
-    	<th>pagina(s):</th>
+    	<th>{t}pagina(s):{/t}</th>
         <td><input class="small" type="text" name="pages" value="{$reference.pages}" /></td>
 	</tr>
 	<tr>
-    	<th>volume:</th>
+    	<th>{t}volume:{/t}</th>
         <td><input class="small" type="text" name="volume" value="{$reference.volume}" /></td>
 	</tr>
 	<tr>
-    	<th>link:</th>
+    	<th>{t}link:{/t}</th>
         <td><input class="large" type="text" name="external_link" value="{$reference.external_link}" /></td>
 	</tr>
+
 	<tr>
-    	<th><input type="submit" value="save" /></th>
+    	<th>
+        	{t}taxa koppelen:{/t}
+        </th>
+    	<td>
+            <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'{t}Taxon{/t}', { closeDialogAfterSelect: false } );return false;" rel="taxon_id">{t}add{/t}</a>
+            <input type="hidden" id="taxon_id" value="" onchange="add_taxon();print_taxa();" />
+            <input type="hidden" id="taxon" value="" />
+            <ul id="new_taxa">
+            </ul>        
+		</td>
+	</tr>
+
+	<tr>
+    	<th><input type="button" value="save" onclick="saveLitForm();" /></th>
         <td></td>
 	</tr>
 
@@ -166,7 +233,7 @@
 <div>
 	<b>Koppelingen</b><br />
 
-	{if $links.presences|@count==0 && $links.names|@count==0 && $links.traits|@count==0 && $links.passports|@count==0}
+	{if $links.presences|@count==0 && $links.names|@count==0 && $links.traits|@count==0 && $links.passports|@count==0 && $links.taxa|@count==0}
 	(geen koppelingen)
 	{/if}
     
@@ -209,6 +276,19 @@
    	</div>
 	{/if}
 
+	{if $links.taxa|@count > 0}
+    <div>
+	<a href="#" onclick="$('#links-taxa').toggle();return false;">Gekoppelde taxa ({$links.taxa|@count})</a>
+	<div id="links-taxa" style="display:none">
+		<ul class="small">
+			{foreach from=$links.taxa item=v}
+			<li><a href="../nsr/taxon.php?id={$v.id}">{$v.taxon} [{$v.rank}]</a></li>
+			{/foreach}
+		</ul>
+	</div>
+    </div>
+	{/if}
+
 	{if $links.traits|@count > 0}
     <div>
 	<a href="#" onclick="$('#links-traits').toggle();return false;">Gekoppelde kenmerken (<span id="trait-total">0</span>)</a>
@@ -231,7 +311,7 @@
 	</div>
     </div>
 	{/if}
-
+    
 </div>
 </p>
 <p>
