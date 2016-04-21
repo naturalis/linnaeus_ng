@@ -353,7 +353,7 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 
-		$this->setPageName($this->translate('Browse Media'));
+		$this->setPageName($this->translate('Browse media'));
 
         $this->setItemTemplate();
 
@@ -377,7 +377,7 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 
-		$this->setPageName($this->translate('Search Media'));
+		$this->setPageName($this->translate('Search media'));
 
         foreach ($this::$metadataFields as $f) {
             $search['metadata'][$f] = $this->rGetVal($f);
@@ -403,7 +403,9 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 
-        $id = $this->rGetVal('id');
+		$this->setPageName($this->translate('Edit media'));
+
+		$id = $this->rGetVal('id');
 
         // Save button has been pushed (language switch should not trigger save)
         if ($this->rHasVal('save', $this->translate('save'))) {
