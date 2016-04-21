@@ -1119,7 +1119,7 @@ CREATE TABLE `media` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`),
+  KEY `idx_1` (`project_id`, `deleted`, `name`),
   KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 

@@ -74,7 +74,8 @@
     </form>
 
 	<p style="margin-top: 35px;">
-	{if $links|@count>0}
+
+	{if $links}
 	{t}Media file attached to{/t}:</p>
 	{foreach from=$links key=module item=module_links}
 		<p><b>{$module}</b>:<br/>

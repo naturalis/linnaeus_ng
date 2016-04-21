@@ -530,11 +530,7 @@ class MediaController extends Controller
                     '/' . $mi->getItemEditPage() . $row['item_id'] . '">' . $mi->getItemName() . '</a>';
             }
 
-//print_r($links);
-
             return $links;
-
-
        }
 
        return false;
@@ -628,7 +624,6 @@ class MediaController extends Controller
 
                 $this->setMediaId($this->models->Media->getNewId());
 
-
                 // Store associated metadata
                 $this->saveMetadata(array('media_id' => $this->mediaId));
 
@@ -637,7 +632,7 @@ class MediaController extends Controller
 
                 // If module_id and item_id have been set, save
                 // contextual link
-                if ($this->moduleId && $this->itemId) {
+                if ($this->moduleId != -1 && $this->itemId != -1) {
                      $this->models->MediaModules->insert(array(
                         'id' => null,
                         'project_id' => $this->getCurrentProjectId(),
@@ -969,6 +964,7 @@ class MediaController extends Controller
                 'sort' => $sort,
                 'project_id' => $this->getCurrentProjectId()
             ));
+
         // Return everything for item or general
         } else {
             $media = $this->models->Media->_get(array(
@@ -1012,15 +1008,8 @@ class MediaController extends Controller
                     'medium' => $resource['rs_thumb_medium'],
                     'large' => $resource['rs_thumb_large']
                 );
-/*
-                $file['alt_files'] = '';
-                foreach (array('rs_resized_1', 'rs_resized_2') as $alt) {
-                    if (!empty($resource[$alt])) {
-                        $file['alt_files'][] = $resource[$alt];
-                    }
-                }
-*/
-                // add flag if image is already attached to entity
+
+                // Add flag if image is already attached to entity
                 $file['attached'] = isset($attached) && is_array($attached) &&
                     in_array($resource['id'], $attached) ? 1 : 0;
 
