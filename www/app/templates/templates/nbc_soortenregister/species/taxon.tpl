@@ -46,6 +46,10 @@
 		
 			{include file="_tab_bedreiging.tpl"}
 
+		{elseif $activeCategory==$smarty.const.CTAB_LITERATURE}
+		
+			{include file="_tab_literatuur.tpl"}
+
 		{elseif $ext_template}
 		
 			{include file=$ext_template}
@@ -59,6 +63,11 @@
 			{include file='_webservice.tpl'}
 
 		{else}
+        
+        <h1>{$activeCategory}</h1>
+
+
+
 
 			{if $content|@is_array}
 			<ul>

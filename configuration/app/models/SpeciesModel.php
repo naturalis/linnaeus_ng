@@ -1322,5 +1322,59 @@ class SpeciesModel extends AbstractModel
 
 	}
 					
-					
+    public function getTaxonReferences( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+
+        if ( is_null($project_id) || is_null($taxon_id) ) return;
+
+        $query = "
+            select
+				_t.id as literature_taxa_id,
+				_a.id,
+				_a.language_id,
+				_a.label,
+				_a.alt_label,
+				_a.alt_label_language_id,
+				_a.date,
+				_a.author,
+				_a.publication_type,
+				_a.citation,
+				_a.source,
+				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
+				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
+				_a.pages,
+				_a.volume,
+				_a.external_link,
+				ifnull(_b.name,_a.author) as author_name
+
+			from %PRE%literature2 _a
+
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i
+				on _a.periodical_id = _i.id
+				and _a.project_id=_i.project_id
+
+			right join %PRE%literature_taxa _t
+				on _a.project_id=_t.project_id
+				and _a.id=_t.literature_id
+
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id
+				and _a.project_id=_b.project_id
+
+			where
+				_a.project_id = ".$project_id."
+				and _t.taxon_id= " . $taxon_id . " 
+			order by
+				ifnull(_b.name,_a.author), _a.date, _a.label
+			";
+
+        return $this->freeQuery($query);
+    }
+
 }

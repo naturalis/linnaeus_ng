@@ -50,6 +50,7 @@ class Controller extends BaseClass
 	public $suppressProjectInBreadcrumbs;
 	public $includeLocalMenu=true;
 	public $printBreadcrumbs=true;
+	public $wikiPageOverride;
 
 	private $usedModelsBase = array(
 		'activity_log',
@@ -2524,14 +2525,28 @@ class Controller extends BaseClass
 				'project_id' => $this->getCurrentProjectId(),
 				'setting' => 'wiki_base_url'
 			));
-
-		$basename=!empty($this->controllerPublicNameMask) ? $this->controllerPublicNameMask : $this->controllerPublicName;
+			
+		if ( isset($this->wikiPageOverride['basename']) )
+		{
+			$basename=$this->wikiPageOverride['basename'];
+		}
+		else
+		{
+			$basename=!empty($this->controllerPublicNameMask) ? $this->controllerPublicNameMask : $this->controllerPublicName;
+		}
 
 		if ( empty($basename) ) return;
 
-		$pagename=!empty($this->pageNameAltName) ? $this->pageNameAltName : $this->getPageName();
-		$pagename=preg_replace('/[^A-Za-z0-9 ]/', '', $pagename);
-		$pagename=str_replace(' ','_',$pagename);
+		if ( isset($this->wikiPageOverride['pagename']) )
+		{
+			$pagename=$this->wikiPageOverride['pagename'];
+		}
+		else
+		{
+			$pagename=!empty($this->pageNameAltName) ? $this->pageNameAltName : $this->getPageName();
+			$pagename=preg_replace('/[^A-Za-z0-9 ]/', '', $pagename);
+			$pagename=str_replace(' ','_',$pagename);
+		}
 		
 		return
 			str_replace(
