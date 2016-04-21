@@ -487,7 +487,8 @@ class MediaConverterController extends MediaController
                 'type' => $type,
                 'tmp_name' => $tmp_name,
                 'error' => $error,
-                'size' => $size
+                'size' => $size,
+                'title' => !empty($this->_originalFileName) ? $this->_originalFileName : ''
             )
         );
     }

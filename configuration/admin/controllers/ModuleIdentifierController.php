@@ -120,7 +120,7 @@ class ModuleIdentifierController extends Controller
                     return $r[0]['term'];
                 case 'introduction':
                     $r = $this->models->ContentIntroduction
-                        ->_get(array('id'=>array('id'=>$this->itemId)));
+                        ->_get(array('id'=>array('page_id'=>$this->itemId)));
                     return $r[0]['topic'];
                 case 'key':
                     $r = $this->models->ModuleIdentifierModel->getChoiceName(array(

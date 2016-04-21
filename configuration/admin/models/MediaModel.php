@@ -169,7 +169,7 @@ final class MediaModel extends AbstractModel
 
         $query = "
             select
-                keystep_id as item_id,
+                id as item_id,
                 choice_img as file_name,
                 '' as original_name
             from
