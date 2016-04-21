@@ -19,6 +19,8 @@ class NsrController extends Controller
 		'trash_can',
     );
 
+	public $conceptId=null;
+
 //    public $modelNameOverride='NsrTreeModel';
 
     public function __construct()
@@ -74,6 +76,17 @@ class NsrController extends Controller
 
 		return $p;
 	}
+
+	public function setConceptId($id)
+	{
+		$this->conceptId=$id;
+	}
+
+	public function getConceptId()
+	{
+		return isset($this->conceptId) ? $this->conceptId : false;
+	}
+
 
 
 	private function storeParentage($p)
