@@ -51,6 +51,15 @@
 				{if $ref.external_link}<tr><td>{t}Link{/t}</td><td><a href="{$ref.external_link}" target="_blank">{$ref.external_link}</a></td></tr>{/if}
 				</tbody>
 			</table>
+            
+            {if $taxa}
+            <ul>
+            {foreach $taxa v k}
+            <li><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></li>
+            {/foreach}
+            </ul>
+            {/if}
+            
 		</div>
 	</div>
 

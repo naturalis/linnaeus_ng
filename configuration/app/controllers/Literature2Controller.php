@@ -54,7 +54,7 @@ class Literature2Controller extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
     
     }
@@ -63,13 +63,12 @@ class Literature2Controller extends Controller
     {
 		if (!$this->rHasId()) $this->redirect('index.php');
 
-		$ref=$this->getReference($this->rGetId());
-
-		if (!$ref['id']) $this->redirect('index.php');
+		$ref=$this->getReference( $this->rGetId() );
 
 		$this->setPageName($ref['label'].', '.$ref['source']);
 
-		$this->smarty->assign('ref', $ref);
+		$this->smarty->assign( 'ref', $ref );
+		$this->smarty->assign( 'taxa', $this->getReferencedTaxa( $this->rGetId() ) );
 
         $this->printPage();
 
@@ -91,6 +90,13 @@ class Literature2Controller extends Controller
 		));
 	}
 
+	private function getReferencedTaxa( $id )
+	{
+		return $this->models->Literature2Model->getReferencedTaxa(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'literature_id' => $id
+		));
+	}
 
 	private function getTitleAlphabet()
 	{
@@ -101,9 +107,6 @@ class Literature2Controller extends Controller
 	{
 		return $this->models->Literature2Model->getAuthorAlphabet(array( 'project_id'=>$this->getCurrentProjectId() ) );
 	}
-
-
-
 
 }
 

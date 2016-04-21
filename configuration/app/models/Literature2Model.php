@@ -234,8 +234,44 @@ final class Literature2Model extends AbstractModel
     }
 
 
+    public function getReferencedTaxa( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $literature_id = isset($params['literature_id']) ? $params['literature_id'] : null;
 
+        if ( is_null($project_id) || is_null($literature_id) ) return;
 
-	
+        $query = "
+            select
+
+				_a.id,
+				_a.taxon,
+				_r.id as base_rank_id,
+				_r.rank
+
+			from %PRE%taxa _a
+
+			right join %PRE%literature_taxa _t
+				on _a.project_id=_t.project_id
+				and _a.id=_t.taxon_id
+
+			left join %PRE%projects_ranks _p
+				on _a.project_id=_p.project_id
+				and _a.rank_id=_p.id
+
+			left join %PRE%ranks _r
+				on _p.rank_id=_r.id
+
+			where
+				_a.project_id = ".$project_id."
+				and _t.literature_id= " . $literature_id . " 
+
+			order by
+				_a.taxon
+			";
+
+        return $this->freeQuery($query);
+    }
+
 }
 ?>
