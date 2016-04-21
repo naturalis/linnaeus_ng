@@ -300,16 +300,6 @@ class NsrTaxonImagesController extends NsrController
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
 	}
 
-	private function setConceptId($id)
-	{
-		$this->conceptId=$id;
-	}
-
-	private function getConceptId()
-	{
-		return isset($this->conceptId) ? $this->conceptId : false;
-	}
-
     private function getTaxonMedia( $p=null )
     {
 		$id=isset($p['id']) ? $p['id'] : $this->getConceptId();
