@@ -71,6 +71,7 @@ class MediaConverterController extends MediaController
 
     public function initAction ()
     {
+		$this->setPageName($this->translate('Convert media'));
         $this->smarty->assign('totals', $this->setProjectMedia());
         $this->printPage();
     }
