@@ -30,7 +30,8 @@ class SpeciesControllerNSR extends SpeciesController
 		'actors',
 		'name_types',
 		'names_additions',
-		'nsr_ids'
+		'nsr_ids',
+		'taxon_quick_parentage'
 	);
 
     public function __construct()
@@ -1079,7 +1080,6 @@ class SpeciesControllerNSR extends SpeciesController
         switch ($category)
 		{
             case CTAB_CLASSIFICATION:
-                //$content=$this->getTaxonClassification($taxon);
                 $content=
 					array(
 						'classification'=>$this->getTaxonClassification($taxon),
@@ -1092,7 +1092,11 @@ class SpeciesControllerNSR extends SpeciesController
                 break;
 
             case CTAB_LITERATURE:
-                $content=$this->getTaxonLiterature($taxon);
+                $content=
+					array(
+						'literature'=>$this->getTaxonLiterature($taxon),
+						'inherited_literature'=>$this->getInheritedTaxonLiterature($taxon)
+					);
                 break;
 
             case CTAB_DNA_BARCODES:
@@ -1516,7 +1520,49 @@ class SpeciesControllerNSR extends SpeciesController
 		return $taxon;
     }
 
+    private function getTaxonLiterature( $taxon_id )
+    {
+		return $this->models->{$this->_model}->getTaxonReferences(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'taxon_id' => $taxon_id,
+		));		
+    }
 
+    private function getInheritedTaxonLiterature( $taxon_id )
+    {
+		$p=$this->models->TaxonQuickParentage->_get(array("id"=>
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $taxon_id,
+				)
+		));	
+		
+		$res=array();
+				
+		if ($p)
+		{
+			$p=explode(' ',$p[0]['parentage']);
+
+			foreach($p as $val)
+			{
+				$d=$this->models->{$this->_model}->getTaxonReferences(array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $val,
+				));		
+				if ($d)
+				{
+					foreach((array)$d as $dkey=>$dval)
+					{
+						$d[$dkey]['referencing_taxon']=$this->getTaxonById( $val );
+					}
+					$res=array_merge($res,$d);
+				}
+			}
+		}
+
+		return $res;
+
+    }
 
 
 }

@@ -85,6 +85,9 @@ class ProjectsController extends Controller
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Project overview'));
+		
+		$this->wikiPageOverride['basename']='ProjectOverview';
+		
         $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
         $this->printPage();
     }
