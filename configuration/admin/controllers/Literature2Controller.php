@@ -108,8 +108,9 @@ class Literature2Controller extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Index'));
-		$this->smarty->assign('authorAlphabet',$this->getAuthorAlphabet());
-		$this->smarty->assign('titleAlphabet',$this->getTitleAlphabet());
+		$this->smarty->assign( 'prevSearch', $this->moduleSession->getModuleSetting('lookup_params') );
+		$this->smarty->assign( 'authorAlphabet', $this->getAuthorAlphabet() );
+		$this->smarty->assign( 'titleAlphabet', $this->getTitleAlphabet() );
 		$this->printPage();
 	}
 
@@ -134,9 +135,10 @@ class Literature2Controller extends NsrController
         if (!$this->rHasVal('action')) return;
 		$return=null;
 		$return=$this->getReferenceLookupList($this->rGetAll());
-        $this->allowEditPageOverlay = false;
+		$this->moduleSession->setModuleSetting(array('setting'=>'lookup_params','value'=>$this->rGetAll()));
+		$this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
-        $this->printPage();
+		$this->printPage();
     }
 
     public function editAction()
@@ -1443,6 +1445,12 @@ class Literature2Controller extends NsrController
 			{
 				$aa=isset($a['authors'][0]['name']) ? $a['authors'][0]['name'] : $a['author'];
 				$bb=isset($b['authors'][0]['name']) ? $b['authors'][0]['name'] : $b['author'];
+				
+				if (strtolower($aa)==strtolower($bb))
+				{
+					return strtolower($a['label'])>strtolower($b['label']);
+				}
+
 				return strtolower($aa)>strtolower($bb);
 			});
 		}
@@ -1561,7 +1569,6 @@ class Literature2Controller extends NsrController
 				'encode'=>true,
 				'isFullSet'=>count($data)<$maxResults
 			));
-
     }
 
 	private function getLanguages()
