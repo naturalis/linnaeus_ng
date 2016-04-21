@@ -517,13 +517,22 @@ class MediaController extends Controller
 
             foreach ($d as $row) {
                 $mi->setModuleId($row['module_id']);
+
+                // Item id should be adapted for key...
+                $itemId = $mi->getModuleController() == 'key' ? :
+                    $row['item_id'];
+
                 $mi->setItemId($row['item_id']);
 
                 $links[$mi->getModuleName()][] = '<a href="../' . $mi->getModuleController() .
                     '/' . $mi->getItemEditPage() . $row['item_id'] . '">' . $mi->getItemName() . '</a>';
             }
 
+//print_r($links);
+
             return $links;
+
+
        }
 
        return false;
@@ -584,7 +593,7 @@ class MediaController extends Controller
                     'mimetype' => $file['type'],
                     'postname' => $file['name']
                 ),
-                'title' => $this->rHasVal('title') ? $this->rGetVal('title') : ''
+                'title' => $this->setFileTitle($file)
             ));
 
             // Store data
@@ -647,6 +656,16 @@ class MediaController extends Controller
                 (isset($this->_result->error) ? ': ' . $this->_result->error : ''));
             }
         }
+    }
+
+    private function setFileTitle ($file)
+    {
+        if ($this->rHasVal('title')) {
+            return $this->rGetVal('title');
+        } else if (isset($file['title'])) {
+            return $file['title'];
+        }
+        return '';
     }
 
     private function setItemTemplate ()
