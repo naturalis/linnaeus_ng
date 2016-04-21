@@ -55,7 +55,6 @@ class NsrTaxonController extends NsrController
 	private $_nameTypeIds;
 	private $_projectRankIds;
 
-	private $conceptId=null;
 	private $nameId=null;
 	private $firstTaxon=false;
 
@@ -585,17 +584,6 @@ class NsrTaxonController extends NsrController
 
         $this->printPage();
     }
-
-
-	private function setConceptId($id)
-	{
-		$this->conceptId=$id;
-	}
-
-	private function getConceptId()
-	{
-		return isset($this->conceptId) ? $this->conceptId : false;
-	}
 
 	private function setNameId($id)
 	{

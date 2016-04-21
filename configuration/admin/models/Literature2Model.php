@@ -35,7 +35,8 @@ final class Literature2Model extends AbstractModel
 
         $query = "
             select
-				_a.actor_id, _b.name
+				_a.actor_id,
+				_b.name
 
 			from %PRE%literature2_authors _a
 
@@ -481,6 +482,7 @@ final class Literature2Model extends AbstractModel
 
         $query = "
             select
+				_t.id as literature_taxa_id,
 				_a.id,
 				_a.language_id,
 				_a.label,
@@ -495,7 +497,8 @@ final class Literature2Model extends AbstractModel
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,
 				_a.volume,
-				_a.external_link
+				_a.external_link,
+				ifnull(_b.name,_a.author) as author_name
 
 			from %PRE%literature2 _a
 
@@ -510,10 +513,96 @@ final class Literature2Model extends AbstractModel
 			right join %PRE%literature_taxa _t
 				on _a.project_id=_t.project_id
 				and _a.id=_t.literature_id
-				
+
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id
+				and _a.project_id=_b.project_id
+
 			where
 				_a.project_id = ".$project_id."
 				and _t.taxon_id= " . $taxon_id . " 
+			order by
+				ifnull(_b.name,_a.author), _a.date, _a.label
+			";
+
+        return $this->freeQuery($query);
+    }
+
+    public function saveTaxonReference( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+        $literature_id = isset($params['literature_id']) ? $params['literature_id'] : null;
+        $sort_order = isset($params['sort_order']) ? $params['sort_order'] : 99;
+
+        if ( is_null($project_id) || is_null($taxon_id) || is_null($literature_id) ) return;
+
+        $query = "
+			insert into %PRE%literature_taxa
+				(project_id,taxon_id,literature_id,sort_order)
+			values
+				(".$project_id.",".$taxon_id.",".$literature_id.",".$sort_order.") 
+			";
+			
+		$this->freeQuery($query);
+		
+		return $this->getAffectedRows();
+    }
+
+    public function deleteTaxonReference( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+        $literature_taxa_id = isset($params['literature_taxa_id']) ? $params['literature_taxa_id'] : null;
+
+        if ( is_null($project_id) || is_null($taxon_id) || is_null($literature_taxa_id) ) return;
+
+        $query = "
+			delete from
+				%PRE%literature_taxa
+			where
+				id = " . $literature_taxa_id . "
+				and project_id = " . $project_id . "
+				and taxon_id = " . $taxon_id . "
+			";
+			
+		$this->freeQuery($query);
+    }
+
+    public function getReferenceTaxa( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $literature_id = isset($params['literature_id']) ? $params['literature_id'] : null;
+
+        if ( is_null($project_id) || is_null($literature_id) ) return;
+
+        $query = "
+            select
+
+				_a.id,
+				_a.taxon,
+				_r.id as base_rank_id,
+				_r.rank
+
+			from %PRE%taxa _a
+
+			right join %PRE%literature_taxa _t
+				on _a.project_id=_t.project_id
+				and _a.id=_t.taxon_id
+
+			left join %PRE%projects_ranks _p
+				on _a.project_id=_p.project_id
+				and _a.rank_id=_p.id
+
+			left join %PRE%ranks _r
+				on _p.rank_id=_r.id
+
+			where
+				_a.project_id = ".$project_id."
+				and _t.literature_id= " . $literature_id . " 
+
+			order by
+				_a.taxon
 			";
 
         return $this->freeQuery($query);

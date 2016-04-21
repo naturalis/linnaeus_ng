@@ -19,7 +19,7 @@ class Literature2Controller extends NsrController
 		'literature2_publication_types',
 		'literature2_publication_types_labels'
     );
-
+	
     public $controllerPublicName = 'Literature';
     public $usedHelpers = array('csv_parser_helper');
     public $cssToLoad = array('nsr_taxon_beheer.css','literature2.css');
@@ -164,6 +164,7 @@ class Literature2Controller extends NsrController
 			$this->setReferenceId($this->rGetId());
 			$this->setReferenceBefore();
 			$this->updateReference();
+			$this->saveReferenceTaxa();
 			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));
 		}
 		else
@@ -947,13 +948,6 @@ class Literature2Controller extends NsrController
 		$this->printPage();
 	}
 
-	private function downloadHeaders( $file )
-	{
-		header( 'Content-Type: text/plain; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename=' . $file );
-		header( 'Pragma: no-cache' );
-	}
-
 	public function bulkUploadDownloadAction()
 	{
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
@@ -1023,6 +1017,18 @@ class Literature2Controller extends NsrController
 		echo implode( chr(10), $buffer );
 	}
 
+	public function getActors()
+	{
+		return $this->models->Literature2Model->getActors($this->getCurrentProjectId());
+	}
+
+	private function downloadHeaders( $file )
+	{
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=' . $file );
+		header( 'Pragma: no-cache' );
+	}
+
 	private function parseRawCsvData($raw)
 	{
 		$this->helpers->CsvParserHelper->setFieldDelimiter("\t");
@@ -1068,6 +1074,7 @@ class Literature2Controller extends NsrController
 			$this->setReferenceId($this->models->Literature2->getNewId());
 			$this->addMessage('Nieuw referentie aangemaakt.');
 			$this->updateReference();
+			$this->saveReferenceTaxa();
 			$this->logNsrChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));
 		}
 		else
@@ -1144,9 +1151,7 @@ class Literature2Controller extends NsrController
 					$this->addMessage('Auteur toegevoegd.');
 				}
 			}
-
 		}
-
 	}
 
 	private function updateReferenceValue($name,$value)
@@ -1178,6 +1183,10 @@ class Literature2Controller extends NsrController
             array('project_id' => $this->getCurrentProjectId(), 'reference_id' => $id)
 		);
 		$this->addMessage("Referentie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
+
+		$this->deleteReferenceTaxa();
+
+		$this->addMessage("Taxa ontkoppeld.");
 
 		$this->deleteReferenceAuthors();
 
@@ -1482,6 +1491,20 @@ class Literature2Controller extends NsrController
 		}
 
 
+
+		// TAXA
+		$taxa = $this->models->Literature2Model->getReferenceTaxa(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'literature_id' => $id
+		));
+		
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=
+				$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+		
+
 		// TRAITS
 		$d = $this->models->Literature2Model->getReferenceLinksTraits(array(
             'projectId' => $this->getCurrentProjectId(),
@@ -1513,12 +1536,14 @@ class Literature2Controller extends NsrController
 		}
 
 
-		return array(
-			'names' => $names,
-			'presences'=>$presences,
-			'traits'=>$traits,
-			'passports'=>$passports,
-		);
+		return
+			array(
+				'names' => $names,
+				'presences'=>$presences,
+				'traits'=>$traits,
+				'passports'=>$passports,
+				'taxa'=>$taxa,
+			);
 
 	}
 
@@ -1538,11 +1563,6 @@ class Literature2Controller extends NsrController
 			));
 
     }
-
-	public function getActors()
-	{
-		return $this->models->Literature2Model->getActors($this->getCurrentProjectId());
-	}
 
 	private function getLanguages()
 	{
@@ -2080,5 +2100,34 @@ class Literature2Controller extends NsrController
 			return $this->referenceBefore;
 		}
 	}
+
+	private function saveReferenceTaxa()
+	{
+		foreach((array)$this->rGetVal( 'new_taxa' ) as $taxon_id)
+		{
+			$this->models->Literature2Model->saveTaxonReference(array(
+				"project_id"=>$this->getCurrentProjectId(),
+				"taxon_id"=>$taxon_id,
+				"literature_id"=>$this->getReferenceId()
+			));			
+		}
+	}
+
+	private function deleteReferenceTaxa()
+	{
+		$id=$this->getReferenceId();
+
+		if (empty($id))
+		{
+			$this->addError("Geen ID.");
+			return;
+		}
+
+		$this->models->LiteratureTaxa->delete(array(
+			"project_id"=>$this->getCurrentProjectId(),
+			"literature_id"=>$id
+		));	
+	}
+
 
 }
