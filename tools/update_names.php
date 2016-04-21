@@ -31,6 +31,9 @@
 	$row = mysqli_fetch_row($r);
 	$scientificId = $row[0];
 
+	$q = 'ALTER TABLE `names` ADD INDEX `delete_me` (`taxon_id`, `type_id`)';
+	$r = mysqli_query($d, $q) or die($q . mysqli_error($d));
+
     echo "Updating name types...\n";
     $q = 'SELECT `id` FROM `projects`';
     $r = mysqli_query($d, $q);
@@ -53,6 +56,9 @@
 
     echo "Inserting common names...\n";
     insertCommonNames();
+
+	$q = 'ALTER TABLE `names` DROP INDEX `delete_me`';
+	$r = mysqli_query($d, $q) or die($q . mysqli_error($d));
 
     echo "Ready!\n\n";
 
