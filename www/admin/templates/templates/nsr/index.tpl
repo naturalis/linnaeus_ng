@@ -58,8 +58,6 @@ function localList(obj,txt)
 
 $(document).ready(function()
 {
-	
-	
 	setAjaxTreeUrl('tree_ajax_interface.php');
 	setShowUpperTaxon({$tree_show_upper_taxon});
 	{if $session.admin.project.title}
