@@ -1381,8 +1381,9 @@ class SpeciesModel extends AbstractModel
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
         $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+        $language_id = isset($params['language_id']) ? $params['language_id'] : null;
 
-        if ( is_null($project_id) || is_null($taxon_id) ) return;
+        if ( is_null($project_id) || is_null($taxon_id) || is_null($language_id) ) return;
 
         $query = "
 			select
@@ -1393,6 +1394,11 @@ class SpeciesModel extends AbstractModel
 			right join %PRE%keysteps_taxa _b
 				on _a.project_id=_b.project_id
 				and _a.id=_b.keystep_id
+
+			left join %PRE%content_keysteps _c
+				on _a.project_id=_c.project_id
+				and _a.id=_c.keystep_id
+				and _c.language_id= " . $language_id . " 
 
 			where
 				_a.project_id = " . $project_id ."
