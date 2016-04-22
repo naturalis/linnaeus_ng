@@ -23,7 +23,8 @@
     <p>
         <a href="step_edit.php?id={$step.id}">{t}edit{/t}</a> |
         <a href="#" onclick="keyDeleteKeyStep();return false;">{t}delete{/t}</a> |
-        <a href="preview.php?step={$step.id}">{t}preview{/t}</a>
+        <!-- a href="preview.php?step={$step.id}">{t}preview{/t}</a -->
+        <a href="taxa.php?id={$step.id}">{t}linked taxa{/t}</a>
     </p>
 
     <span class="small-remark">
@@ -33,6 +34,17 @@
             <li><a href="step_show.php?id={$v.id}">{t}Step{/t} {$v.number}{if $v.title}: {$v.title}{/if}</a></li>
         {/foreach}
         </ul>
+    </span>
+
+    <span class="small-remark">
+        {t}Linked taxa:{/t}
+        <ul style="list-style-position:inside;padding:0;margin-top:0">
+        {foreach $taxa v k}
+        <li>
+        <a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a>
+		</li>
+	    {/foreach}
+    	</ul>
     </span>
 
 </fieldset>

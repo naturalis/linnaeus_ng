@@ -433,7 +433,7 @@ class KeyModel extends AbstractModel
 
     }
 
-    public function getInternalLinksKeysteps ($params)
+    public function getInternalLinksKeysteps( $params )
     {
 		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
 		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
@@ -460,4 +460,34 @@ class KeyModel extends AbstractModel
 
     }
 
+    public function getLinkedTaxa( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$keystep_id = isset($params['keystep_id']) ? $params['keystep_id'] : null;
+
+		if (is_null($project_id) || is_null($keystep_id))
+			return;
+
+		return $this->freeQuery("
+			select
+				_b.id,
+				_b.taxon_id,
+				_a.taxon
+			from
+				%PRE%taxa _a
+
+			right join %PRE%keysteps_taxa _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.taxon_id
+
+			where
+				_a.project_id = " . $project_id ."
+				and _b.keystep_id = " . $keystep_id ."
+				order by _a.taxon
+			");
+			
+	}
+
 }
+
+

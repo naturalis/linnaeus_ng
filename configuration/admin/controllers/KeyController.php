@@ -18,7 +18,8 @@ class KeyController extends Controller
         'content_keysteps',
         'choices_keysteps',
         'choices_content_keysteps',
-        'media_modules'
+        'media_modules',
+		'keysteps_taxa'
     );
 
 	public $usedHelpers = array(
@@ -32,7 +33,8 @@ class KeyController extends Controller
             'jit/key-tree.js',
             'prettyPhoto/jquery.prettyPhoto.js',
             'int-link.js',
-			'dialog/jquery.modaldialog.js'
+			'dialog/jquery.modaldialog.js',
+			'nsr_taxon_beheer.js',
         ),
         'IE' => array(
             'jit/Extras/excanvas.js'
@@ -44,7 +46,9 @@ class KeyController extends Controller
         'rank-list.css',
         'key-tree.css',
         'prettyPhoto/prettyPhoto.css',
-        'dialog/jquery.modaldialog.css'
+        'dialog/jquery.modaldialog.css',
+		'nsr_taxon_beheer.css',
+		'literature2.css'
     );
 
     public $controllerPublicName = 'Dichotomous key';
@@ -255,6 +259,7 @@ class KeyController extends Controller
         $this->smarty->assign('stepsLeadingToThisOne', $this->getStepsLeadingToThisOne($step['id']));
         $this->smarty->assign('suppressPath', $this->rHasVal('nopath','1'));
         $this->smarty->assign('suppressDivision', $this->getSuppressTaxonDivision());
+        $this->smarty->assign('taxa', $this->getLinkedTaxa( $this->rGetId() ) );
 
 		if ( !$this->getSuppressTaxonDivision() )
 		{
@@ -559,6 +564,30 @@ class KeyController extends Controller
         $this->smarty->assign('includeHtmlEditor', true);
 		$this->smarty->assign('module_id', $this->getCurrentModuleId());
         $this->smarty->assign('item_id', $id);
+
+        $this->printPage();
+    }
+
+    public function taxaAction()
+    {
+        $this->checkAuthorisation();
+
+		$this->setPageName( $this->translate('Linked taxa') );
+		
+		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->saveLinkedTaxa( $this->rGetall() );
+			$this->addMessage( $this->translate( 'Saved.' ) );
+		}
+		else
+		if ($this->rHasVar('link_id') && $this->rHasVal('action','delete') && !$this->isFormResubmit())
+		{
+			$this->deleteLinkedTaxa( $this->rGetall() );
+			$this->addMessage( $this->translate( 'Deleted.' ) );
+		}
+
+        $this->smarty->assign('id', $this->rGetId() );
+        $this->smarty->assign('taxa', $this->getLinkedTaxa( $this->rGetId() ) );
 
         $this->printPage();
     }
@@ -2146,4 +2175,46 @@ class KeyController extends Controller
 
         return null;
     }
+	
+	private function getLinkedTaxa( $id )
+	{
+		return
+			$this->models->KeyModel->getLinkedTaxa(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $id,
+				));		
+	}
+	
+	private function saveLinkedTaxa( $data )
+	{
+		if ( !isset($data['id']) ) return;
+		if ( !isset($data['new_taxa']) ) return;
+	
+		foreach((array)$data['new_taxa'] as $val)
+		{
+			$this->models->KeystepsTaxa->save([
+				'project_id' => $this->getCurrentProjectId(),
+				'keystep_id' => $data['id'],
+				'taxon_id' => $val
+			]);
+		}
+	}
+	
+	private function deleteLinkedTaxa( $data )
+	{
+		if ( !isset($data['link_id']) ) return;
+	
+		$this->models->KeystepsTaxa->delete([
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $data['link_id']
+		]);
+	}
+	
+	
+	
+	
+	
+	
+	
 }

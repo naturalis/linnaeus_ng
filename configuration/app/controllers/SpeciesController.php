@@ -81,6 +81,7 @@ class SpeciesController extends Controller
 		if (!defined('CTAB_MEDIA')) define('CTAB_MEDIA','media');
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
+		if (!defined('CTAB_DICH_KEY_LINKS')) define('CTAB_DICH_KEY_LINKS','key_links');
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 
