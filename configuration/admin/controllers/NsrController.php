@@ -202,18 +202,6 @@ class NsrController extends Controller
 		unset($_SESSION['admin']['user']['species']['tree']);
 	}
 
-	public function logNsrChange($p)
-	{
-		if (!isset($p['changed']))
-		{
-			$before=serialize((isset($p['before']) ? $p['before'] : null));
-			$after=serialize((isset($p['after']) ? $p['after'] : null));
-			$p['changed']=md5($before)!=md5($after);
-		}
-
-		$this->logChange($p);
-	}
-
 	private function getNsrId($p)
 	{
 		$data=$this->models->NsrIds->_get(array(
@@ -304,7 +292,7 @@ class NsrController extends Controller
 					'item_type'=>$type
 				));
 
-			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
+			$this->logChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
 
 		}
 		else
@@ -323,7 +311,7 @@ class NsrController extends Controller
 				array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>$type)
 			);
 
-			$this->logNsrChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
+			$this->logChange(array('after'=>$nsr,'note'=>'created NSR ID '.$nsr));
 		}
 
 		return array(

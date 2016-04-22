@@ -882,6 +882,13 @@ class Controller extends BaseClass
 
 	public function logChange($p)
 	{
+		if (!isset($p['changed']))
+		{
+			$b=serialize((isset($p['before']) ? $p['before'] : null));
+			$a=serialize((isset($p['after']) ? $p['after'] : null));
+			$p['changed']=md5($b)!=md5($a);
+		}
+		
 		$changed=isset($p['changed']) ? $p['changed'] : true;
 		$note=isset($p['note']) ? $p['note'] : null;
 		$before=isset($p['before']) ? $p['before'] : null;

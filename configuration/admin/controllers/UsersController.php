@@ -58,6 +58,7 @@ class UsersController extends Controller
 	private $checksUsername=array('min' => 4,'max' => 32); // regExp => 
 	private $checksPassword=array('min' => 8,'max' => 32); // regExp => 
 	private $checksName=array('min' => 1,'max' => 64);
+	private $_userBefore;
 
     public function __construct ()
     {
@@ -111,7 +112,9 @@ class UsersController extends Controller
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
 
 		$this->setUserId( $this->rGetId() );
+		$this->setUserBefore();
 		$this->addUserToCurrentProject();
+		$this->logUserChange( $this->translate('added user to project') );
 		$this->redirect('index.php');
     }
 
@@ -123,7 +126,9 @@ class UsersController extends Controller
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
 
 		$this->setUserId( $this->rGetId() );
+		$this->setUserBefore();
 		$this->removeUserFromCurrentProject();
+		$this->logUserChange( $this->translate('removed user from project') );
 		$this->redirect('index.php');
     }
 
@@ -134,6 +139,7 @@ class UsersController extends Controller
 
         $this->setPageName($this->translate('Create new collaborator'));
 		$this->setUserId( null );
+		$this->setUserBefore();
 
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
@@ -144,6 +150,7 @@ class UsersController extends Controller
 			$this->userDataSave();
 			$this->userPasswordSave();
 			$this->setUser();
+			$this->logUserChange( $this->translate('created user') );
 		}
 		
 		$this->smarty->assign('user', $this->rGetAll() );
@@ -160,6 +167,7 @@ class UsersController extends Controller
 		$this->setPageName($this->translate('Edit project collaborator'));
 		$this->setUserId( $this->rGetId() );
 		$this->setUser();
+		$this->setUserBefore();
 
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
@@ -174,12 +182,14 @@ class UsersController extends Controller
 			$this->userRightsSave();
 			$this->userTaxaSave();
 			$this->setUser();
+			$this->logUserChange( $this->translate('edited user') );
 		} 
 		else
 		if ($this->rHasVal('action','reset_permissions') && !$this->isFormResubmit())
 		{
 			$this->setNewUserData( $this->rGetAll() );
 			$this->resetUserPermissions();
+			$this->logUserChange( $this->translate('reset user permissions') );
 			$this->setUser();
 		} 
 		else
@@ -196,7 +206,8 @@ class UsersController extends Controller
 			else
 			{
 				$this->removeUserFromCurrentProject();
-				$this->deleteUserIfWithoutProjects();
+				$this->logUserChange( $this->translate('removed user from current project') );
+				if ( $this->deleteUserIfWithoutProjects() ) $this->logUserChange( $this->translate('deleted user') );
 				$this->redirect( 'index.php ');
 			}
 		}
@@ -219,6 +230,7 @@ class UsersController extends Controller
 		$this->setPageName($this->translate('Deleting user'));
 		$this->setUserId( $this->rGetId() );
 		$this->setUser();
+		$this->setUserBefore();
 
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
@@ -233,14 +245,14 @@ class UsersController extends Controller
 			else
 			{
 				$this->removeUserFromCurrentProject();
-				$this->deleteUserIfWithoutProjects();
+				$this->logUserChange( $this->translate('removed user from current project') );
+				if ( $this->deleteUserIfWithoutProjects() ) $this->logUserChange( $this->translate('deleted user') );
 				$this->addMessage( $this->translate('User deleted.') );
 			}
 		}
 
 		$this->printPage();
     }
-	
 
     public function passwordAction()
     {
@@ -384,9 +396,6 @@ class UsersController extends Controller
 		
 		return $d;
 	}
-
-
-
 
     private function addUserToCurrentProject()
     {
@@ -1028,7 +1037,72 @@ class UsersController extends Controller
 		if ( $d[0]['total']==0 )
 		{
 			$this->deleteUser();
+			return true;
+		}
+	}
+	
+	private function setUserBefore()
+	{
+		if ( is_null($this->getUserId()) )
+		{
+			$this->_userBefore=null;
+		}
+		else
+		{
+			$this->_userBefore=$this->getUser();
 		}
 	}
 
+	private function getUserBefore()
+	{
+		return $this->_userBefore;
+	}
+	
+	private function logUserChange( $note )
+	{
+		$this->setUser();
+		$b=$this->getUserBefore();
+		$a=$this->getUser();
+		unset($b['password']);
+		unset($a['password']);
+		$this->logChange(array('before'=>$b,'after'=>$a,'note'=>$note));
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
