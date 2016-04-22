@@ -1,19 +1,12 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-{if $session.admin.matrixkey.id}
-<ul>
-	<li><a href="matrices.php">{t}Matrices{/t}</a></li>
-	<li><a href="edit.php">{t}Edit active matrix{/t}</a></li>
-	<li><a href="links.php">{t}Display current links per taxon{/t}</a></li>
-</ul>
-{else}
-{t}You have to choose an active matrix to edit. Click below to choose an active matrix.{/t}
-<ul>
-	<li><a href="matrices.php">{t}Matrices{/t}</a></li>
-</ul>
-{/if}
-
+    <ul>
+        <li><a href="matrices.php">{t}Available matrices{/t}</a></li>
+        <li><a href="new.php">{t}Create a new matrix{/t}</a></li>
+        <li><a href="nexus_import.php">{t}Import Nexus file{/t}</a></li>
+        <li><a href="sdd_import_1.php">{t}Import SDD file{/t}</a></li>
+    </ul>
 </div>
 
 {include file="../shared/admin-footer.tpl"}
