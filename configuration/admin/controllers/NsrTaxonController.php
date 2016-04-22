@@ -1331,7 +1331,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId($this->models->Taxa->getNewId());
 			$this->addMessage('Nieuw concept aangemaakt.');
-			$this->logNsrChange(array(
+			$this->logChange(array(
 				'after'=>array('id'=>$this->getConceptId(),
 				'taxon'=>$name,'rank_id' =>$rank),
 				'note'=>'new concept '.$name . ($this->firstTaxon ? ' (first taxon)' : '' )));
@@ -1450,7 +1450,7 @@ class NsrTaxonController extends NsrController
 
 		$after=$this->getConcept($this->rGetId());
 		$after['presence']=$this->getPresenceData($this->rGetId());
-		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$before['taxon']));
+		$this->logChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$before['taxon']));
 	}
 
 	private function updateConceptTaxon($values)
@@ -1471,7 +1471,7 @@ class NsrTaxonController extends NsrController
 				'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 				'columns'=>'taxon'
 			));
-			$this->logNsrChange(array('before'=>$before[0],'after'=>$after[0],'note'=>'updated concept name '.$before[0]['taxon']));
+			$this->logChange(array('before'=>$before[0],'after'=>$after[0],'note'=>'updated concept name '.$before[0]['taxon']));
 			return true;
 		}
 		else
@@ -1654,7 +1654,7 @@ class NsrTaxonController extends NsrController
 			$this->addMessage('Nederlandse naam aangemaakt.');
 
 			$newname=$this->getName(array('id'=>$this->getNameId()));
-			$this->logNsrChange(array('after'=>$newname,'note'=>'new main language name '.$newname['name']));
+			$this->logChange(array('after'=>$newname,'note'=>'new main language name '.$newname['name']));
 
 			if ($this->rHasVar('main_language_name_reference_id'))
 			{
@@ -1866,7 +1866,7 @@ class NsrTaxonController extends NsrController
 		}
 
 		$after=$this->getName(array('id'=>$this->getNameId()));
-		$this->logNsrChange(
+		$this->logChange(
 			array(
 				'before'=>(!$this->getIsNewRecord() ? $name : null),
 				'after'=>$after,
@@ -1888,7 +1888,7 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->models->NsrIds->delete(array('project_id'=>$this->getCurrentProjectId(),'lng_id'=>$this->getNameId(),'item_type'=>'name'));
-			$this->logNsrChange(array('before'=>$before,'note'=>'deleted name '.$before[0]['name']));
+			$this->logChange(array('before'=>$before,'note'=>'deleted name '.$before[0]['name']));
 		}
 		return $d;
 	}
@@ -2203,7 +2203,7 @@ class NsrTaxonController extends NsrController
 
 			$after['is_deleted']=1;
 
-			$this->logNsrChange(
+			$this->logChange(
 				array(
 					'before'=>$before,
 					'after'=>$after,
@@ -2223,7 +2223,7 @@ class NsrTaxonController extends NsrController
 
 			$after['is_deleted']=0;
 
-			$this->logNsrChange(
+			$this->logChange(
 				array(
 					'before'=>$before,
 					'after'=>$after,
@@ -2687,7 +2687,7 @@ class NsrTaxonController extends NsrController
 			);
 
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
-			$this->logNsrChange(array('before'=>$name,'after'=>$after[0],'note'=>'changed valid name '.$newSynonym.' to synonym'));
+			$this->logChange(array('before'=>$name,'after'=>$after[0],'note'=>'changed valid name '.$newSynonym.' to synonym'));
 			$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
 
 
@@ -2768,7 +2768,7 @@ class NsrTaxonController extends NsrController
 			$id=$this->models->Names->getNewId();
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$id)));
 
-			$this->logNsrChange(array('after'=>$after[0],'note'=>'created new valid name '.$newName));
+			$this->logChange(array('after'=>$after[0],'note'=>'created new valid name '.$newName));
 			$this->addMessage('Nieuwe geaccepteerde naam aangemaakt.');
 
 			$this->setConceptId($val['taxon_id']);

@@ -154,7 +154,7 @@ class Literature2Controller extends NsrController
 			$this->setReferenceBefore();
 			$this->deleteReference();
 			$this->setReferenceId(null);
-			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'note'=>'deleted reference '.$this->getReferenceBefore('label')));
+			$this->logChange(array('before'=>$this->getReferenceBefore(),'note'=>'deleted reference '.$this->getReferenceBefore('label')));
 			$template='_delete_result';
 		}
 		else
@@ -167,7 +167,7 @@ class Literature2Controller extends NsrController
 			$this->setReferenceBefore();
 			$this->updateReference();
 			$this->saveReferenceTaxa();
-			$this->logNsrChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));
+			$this->logChange(array('before'=>$this->getReferenceBefore(),'after'=>$this->getReference(),'note'=>'updated reference '.$this->getReferenceBefore('label')));
 		}
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
@@ -1077,7 +1077,7 @@ class Literature2Controller extends NsrController
 			$this->addMessage('Nieuw referentie aangemaakt.');
 			$this->updateReference();
 			$this->saveReferenceTaxa();
-			$this->logNsrChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));
+			$this->logChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));
 		}
 		else
 		{

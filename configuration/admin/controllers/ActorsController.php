@@ -78,7 +78,7 @@ class ActorsController extends NsrController
 			$this->setActorBefore();
 			$this->deleteActor();
 			$this->setActorId(null);
-			$this->logNsrChange(array('before'=>$this->getActorBefore(),'note'=>'deleted actor '.$this->getActorBefore('name')));
+			$this->logChange(array('before'=>$this->getActorBefore(),'note'=>'deleted actor '.$this->getActorBefore('name')));
 			$template='_delete_result';
 		}
 		else
@@ -91,7 +91,7 @@ class ActorsController extends NsrController
 			$this->setActorId($this->rGetId());
 			$this->setActorBefore();
 			$this->updateActor();
-			$this->logNsrChange(array('before'=>$this->getActorBefore(),'after'=>$this->getActor(),'note'=>'updated actor '.$this->getActorBefore('name')));
+			$this->logChange(array('before'=>$this->getActorBefore(),'after'=>$this->getActor(),'note'=>'updated actor '.$this->getActorBefore('name')));
 		}
 		else
 		if (!$this->rHasId() && $this->rHasVal('action','save'))
@@ -177,7 +177,7 @@ class ActorsController extends NsrController
 			$this->createNsrIds(array('id'=>$this->getActorId(),'type'=> 'actor', 'subtype'=> ( $this->rHasVal('is_company','1') ? 'organization' : 'person' )));
 			$this->addMessage('Nieuw actor aangemaakt.');
 			$this->updateActor();
-			$this->logNsrChange(array('after'=>$this->getActor(),'note'=>'new actor '.$name));
+			$this->logChange(array('after'=>$this->getActor(),'note'=>'new actor '.$name));
 		}
 		else
 		{

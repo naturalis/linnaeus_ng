@@ -343,7 +343,7 @@ class NsrPaspoortController extends NsrController
 				'page_id'=>$page
 			));
 
-			$this->logNsrChange(array('before'=>$before,'note'=>'deleted passport tabpage from '.$concept['taxon']));
+			$this->logChange(array('before'=>$before,'note'=>'deleted passport tabpage from '.$concept['taxon']));
 			return $r;
 
 		}
@@ -372,7 +372,7 @@ class NsrPaspoortController extends NsrController
 			
 			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
 
-			$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' from '.$concept['taxon']));
+			$this->logChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' from '.$concept['taxon']));
 			
 			return $r;
 			

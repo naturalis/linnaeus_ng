@@ -383,7 +383,7 @@ class NsrTaxonImagesController extends NsrController
 		);
 		$data=$this->models->MediaMeta->_get(array('id'=>$p));
 		$this->models->MediaMeta->delete($p);
-		$this->logNsrChange(array('before'=>$data,'note'=>'deleted media meta-data'));
+		$this->logChange(array('before'=>$data,'note'=>'deleted media meta-data'));
 
 		$p=array(
 			'project_id'=>$this->getCurrentProjectId(),
@@ -392,7 +392,7 @@ class NsrTaxonImagesController extends NsrController
 		);
 		$data=$this->models->MediaTaxon->_get(array('id'=>$p));
 		$this->models->MediaTaxon->delete($p);
-		$this->logNsrChange(array('before'=>$data,'note'=>'disconnected media from taxon'));
+		$this->logChange(array('before'=>$data,'note'=>'disconnected media from taxon'));
 	}
 
 	private function updateTaxonImageMetaData($p)
@@ -438,7 +438,7 @@ class NsrTaxonImagesController extends NsrController
 				));
 			}
 
-			$this->logNsrChange(
+			$this->logChange(
 				array(
 					'before'=>$before,
 					'after'=>$after,
@@ -486,7 +486,7 @@ class NsrTaxonImagesController extends NsrController
 				'project_id' => $this->getCurrentProjectId()
 			));
 
-			$this->logNsrChange(
+			$this->logChange(
 				array(
 					'after'=>$after,
 					'note'=>sprintf( 'new metadata %s for image %s',$after['sys_label'],$image['file_name'])
@@ -526,7 +526,7 @@ class NsrTaxonImagesController extends NsrController
 
 		$after['taxon']=$this->getTaxonById( $after['taxon_id'] );
 
-		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('changed taxon of image %s',$before['file_name'])));
+		$this->logChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('changed taxon of image %s',$before['file_name'])));
 
 	}
 
@@ -589,7 +589,7 @@ class NsrTaxonImagesController extends NsrController
 		$before['taxon']=$after['taxon']=$this->getTaxonById( $before['taxon_id'] );
 
 
-		$this->logNsrChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('altered banner status of image %s',$before['file_name'])));
+		$this->logChange(array('before'=>$before,'after'=>$after,'note'=> sprintf('altered banner status of image %s',$before['file_name'])));
 
 	}
 
@@ -844,7 +844,7 @@ class NsrTaxonImagesController extends NsrController
 					$this->addMessage( sprintf('Wrote "%s" with %s meta-data fields.',$filename,$fieldssaved) );
 
 					$d['meta-data']=$allmeta;
-					$this->logNsrChange(array('after'=>$d,'note'=> sprintf('wrote "%s" (bulk upload).',$filename)));
+					$this->logChange(array('after'=>$d,'note'=> sprintf('wrote "%s" (bulk upload).',$filename)));
 
 				}
 				else
