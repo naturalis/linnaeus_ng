@@ -1,12 +1,17 @@
 {include file="../shared/_header-titles.tpl"}
 
 <div id="categories">
+
+
+
 <ul>
 	{foreach $categories v k}
+    	{if !$v.is_empty}
 		<li id="ctb-{$v.id}">
-			<a {if $v.is_empty==0}href="../species/taxon.php?id={$taxon.id}&cat={$v.id}"{/if} class="{$v.className}">{$v.title}</a>
+			<a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if} class="{$v.className}">{$v.title}</a>
 		</li>
 		{if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
+    	{/if}
 	{/foreach}
 </ul>
 </div>
@@ -22,12 +27,12 @@
 	{foreach $content.classification v k classification}
 	{if $v.do_display}
 
-		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
 
 		{* if $smarty.foreach.classification.last || $v.is_empty==1}
 			{$v.label}
 		{else}
-			<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+			<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
 		{/if *}
 		<br />
 	{/if}
@@ -38,7 +43,7 @@
 	<p>
 	<b>{$taxon.label} {t}contains the following taxa{/t}:</b><br/>
 	{foreach $content.taxonlist v k list}
-		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
 		{if $v.commonname} ({$v.commonname}){/if}
 		<br />
 	{/foreach}
@@ -176,6 +181,11 @@
 	</div><!-- /#media-grid -->
 </div><!-- /#media -->
 {/if}
+
+{elseif $activeCategory=='key_links'}
+
+<h1>?</h1>
+
 {else}
 
 <div id="content" class="proze" >

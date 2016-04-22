@@ -1377,4 +1377,30 @@ class SpeciesModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
+    public function getTaxonKeyLinks( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+
+        if ( is_null($project_id) || is_null($taxon_id) ) return;
+
+        $query = "
+			select
+				*
+			from
+				%PRE%keysteps _a
+
+			right join %PRE%keysteps_taxa _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.keystep_id
+
+			where
+				_a.project_id = " . $project_id ."
+				and _b.taxon_id = " . $taxon_id ."
+				order by _a.number
+			";
+
+        return $this->freeQuery($query);
+    }
+
 }

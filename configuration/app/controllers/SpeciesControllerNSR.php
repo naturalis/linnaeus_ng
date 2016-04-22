@@ -588,6 +588,22 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
+			
+			
+			//if (!$this->_suppressTab_DNA_DICH_KEY_LINKS)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_DICH_KEY_LINKS,
+						'title' => $this->translate('Key links'),
+						'is_empty' => !$this->hasTaxonKeyLinks($taxon_id),
+						'tabname' => 'CTAB_DICH_KEY_LINKS'
+					)
+				);
+			}
+			
+			
+			
 
 		}
 
@@ -1103,6 +1119,10 @@ class SpeciesControllerNSR extends SpeciesController
                 $content=$this->getDNABarcodes($taxon);
                 break;
 
+            case CTAB_DICH_KEY_LINKS:
+                $content=$this->getTaxonKeyLinks( $taxon );
+                break;
+
             default:
 
                 $d = array(
@@ -1175,6 +1195,7 @@ class SpeciesControllerNSR extends SpeciesController
 
         return $d[0]['total']>0;
     }
+	
 
 	private function reconstructQueryString()
 	{
@@ -1574,9 +1595,21 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 		}
-
 		return $res;
+    }
 
+    private function getTaxonKeyLinks( $taxon_id )
+    {
+		return $this->models->{$this->_model}->getTaxonKeyLinks(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'taxon_id' => $taxon_id,
+		));		
+    }	
+
+    private function hasTaxonKeyLinks( $taxon_id )
+    {
+		$d=$this->getTaxonKeyLinks( $taxon_id );
+        return count((array)$d)>0;
     }
 
 

@@ -642,9 +642,14 @@ function doNsrDropList(p)
 		search: value,
 		time: allGetTimestamp()
 	}
+	
+	try {
+		if (p.params.dropListSelectedTextStyle=='full') dropListSelectedTextStyle='full';
+	} catch (e) {}
 
-	if (p.params.dropListSelectedTextStyle=='full') dropListSelectedTextStyle='full';
-	if (p.params.closeDialogAfterSelect===false) closeDialogAfterSelect=p.params.closeDialogAfterSelect
+	try {
+		if (p.params.closeDialogAfterSelect===false) closeDialogAfterSelect=p.params.closeDialogAfterSelect
+	} catch (e) {}
 	
 	if (p.params) $.extend(data, p.params);
 

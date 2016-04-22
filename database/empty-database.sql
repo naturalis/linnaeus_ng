@@ -1632,7 +1632,7 @@ CREATE TABLE IF NOT EXISTS `taxa` (
   KEY `taxon_order` (`taxon_order`),
   KEY `id` (`id`,`project_id`),
   FULLTEXT KEY `fulltext` (`taxon`)
-) ENGINE=MyISAM AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM AUTO_INCREMENT=1758 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `taxa_relations`;
 CREATE TABLE IF NOT EXISTS `taxa_relations` (
