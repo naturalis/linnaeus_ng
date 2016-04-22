@@ -1,7 +1,8 @@
 <?php
+//require_once ('../../../../configuration/app/controllers/SpeciesController.php');
+//$c = new SpeciesController();
+require_once ('../../../../configuration/app/controllers/SpeciesControllerNSR.php');
 
-require_once ('../../../../configuration/app/controllers/SpeciesController.php');
-
-$c = new SpeciesController();
+$c = new SpeciesControllerNSR();
 
 $c->taxonAction();

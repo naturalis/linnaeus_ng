@@ -1603,6 +1603,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->models->{$this->_model}->getTaxonKeyLinks(array(
             'project_id' => $this->getCurrentProjectId(),
     		'taxon_id' => $taxon_id,
+    		'language_id' => $this->getCurrentLanguageId(),
 		));		
     }	
 
