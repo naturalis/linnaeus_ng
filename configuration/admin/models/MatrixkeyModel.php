@@ -254,4 +254,37 @@ class MatrixKeyModel extends AbstractModel
 		return $this->freeQuery($query);
 	}
 
+    public function getCharactersInMatrix( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
+
+		if ( is_null($project_id) || is_null($matrix_id) )
+			return;
+
+		$query ="
+			select
+				_b.id,
+				_b.type,
+				_b.sys_name
+
+			from %PRE%characteristics_matrices _a
+			
+			left join %PRE%characteristics _b
+				on _a.project_id=_b.project_id
+				and _a.characteristic_id=_b.id
+
+			where 
+				_a.project_id = ". $project_id ."
+				and _a.matrix_id = ". $matrix_id."
+
+			order by
+				_a.show_order
+
+			";
+
+		return $this->freeQuery( $query );
+    }
+
+
 }

@@ -5,7 +5,7 @@
 <span class="matrix-header">
 
 	{t _s1=$matrix.label}Editing matrix "%s"{/t}
-	(<a href="preview.php">{t}preview{/t}</a>) (<a href="matrices.php">{t}select another matrix{/t}</a>)<br />
+	<!-- (<a href="preview.php">{t}preview{/t}</a>) -->(<a href="matrices.php">{t}select another matrix{/t}</a>)<br />
 	{if $matrices|@count> 1}
 		{if $matrix.default==1}
 			{t}(this is the default matrix){/t}
@@ -14,7 +14,7 @@
 		{/if}
 		<br />
 	{/if}
-	<a href="matrices.php?imgdim={$matrix.id}">{t}Get and save state image dimensions (for newly imported matrices){/t}</a>
+	<!-- a href="matrices.php?imgdim={$matrix.id}">{t}Get and save state image dimensions (for newly imported matrices){/t}</a -->
 
 
 
@@ -25,9 +25,9 @@
 		<td colspan="2">
 			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>{if $useCharacterGroups}; <a href="char_groups.php">{t}edit character groups{/t}</a>{/if})
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
-			{section name=i loop=$characteristics}
-			<option value="{$characteristics[i].id}" id="char-{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].label} ({$characteristics[i].type.name})</option>
-			{/section}
+			{foreach $characteristics v k}
+			<option value="{$v.id}" id="char-{$v.id}" ondblclick="window.open('char.php?id={$v.id}','_self');">{$v.sys_name} ({$v.type})</option>
+			{/foreach}
 			</select>
 		</td>
 		<td>

@@ -28,6 +28,8 @@
 	<input type="submit" value="{t}save{/t}" />
 </p>
 
+<a href="edit?id={$matrix.id}">{t}edit matrix{/t}</a>
+
 </form>
 
 </p>

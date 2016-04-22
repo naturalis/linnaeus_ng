@@ -76,22 +76,10 @@ function matrixSaveMatrixName(language)
 	matrixSaveContent(language, 'save_matrix_name',$('#'+src).val());
 }
 
-function matrixSaveCharacteristicLabel(language)
-{
-	var src = language==allActiveLanguage ? 'characteristic-other' : 'characteristic-default';
-	matrixSaveContent(language, 'save_characteristic_label',$('#'+src).val());
-}
-
 function matrixSaveMatrixNameAll()
 {
 	matrixSaveMatrixName(allDefaultLanguage);
 	matrixSaveMatrixName(allActiveLanguage);
-}
-
-function matrixSaveCharacteristicLabelAll()
-{
-	matrixSaveCharacteristicLabel(allDefaultLanguage);
-	matrixSaveCharacteristicLabel(allActiveLanguage);
 }
 
 function matrixSaveStateLabel(language)
@@ -144,20 +132,6 @@ function matrixGetStates(id)
 			if (obj) matrixSetStates(obj);
 		}
 	});
-}
-
-function matrixSaveCharacteristic()
-{
-	if ($('#characteristic-default').val()=='')
-	{
-		alert(_('You must enter a name.'));
-		$('#characteristic-default').focus();
-	} 
-	else 
-	{
-		matrixSaveCharacteristicLabelAll();
-		$('#theForm').submit();
-	}
 }
 
 function matrixDeleteCharacteristic(name)
