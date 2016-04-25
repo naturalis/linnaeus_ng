@@ -33,7 +33,11 @@
 <script>
 $(document).ready(function()
 {
+	{if $noautoexpand}
 	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php' );	
+	{else}
+	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php?node=' + {$concept.id} );	
+	{/if}
 });
 </script>
 

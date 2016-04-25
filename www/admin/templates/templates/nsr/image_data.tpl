@@ -1,5 +1,9 @@
 {include file="../shared/admin-header.tpl"}
 
+{assign $concept.id=$image.taxon.id}
+
+{include file="../shared/left_column_tree.tpl"}
+
 {assign image $image.data[0]}
 
 <div id="page-main">

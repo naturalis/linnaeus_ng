@@ -14,9 +14,7 @@
 *}
 {/function}
 
-
 {include file="../shared/admin-header.tpl"}
-
 
 {include file="../shared/left_column_tree.tpl"}
 
@@ -229,7 +227,7 @@
     
     </p>
 
-{if 1==1 || $concept.is_deleted}
+{if $concept.is_deleted}
     <a href="taxon_deleted.php" style="margin:0">{t}overzicht verwijderde taxa{/t}</a><br />
 {/if}
 
@@ -243,6 +241,8 @@
     </p -->
 
 </div>
+
+
 
 {include file="../shared/admin-messages.tpl"}
 
@@ -283,6 +283,7 @@ $(document).ready(function()
 	});
 
 	$('#page-block-messages').fadeOut(3000);
+
 
 });
 </script>

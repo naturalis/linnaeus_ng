@@ -6,6 +6,7 @@ var autoExpandArray=Array();
 var highlightNodes=Array();
 var nodeCountType='species'; // species, taxon, none
 var rootNodeLabel='Taxonomy';
+var useHighLight=true;
 
 function setAjaxTreeUrl(url)
 {
@@ -102,7 +103,7 @@ function growbranches(data)
 		if (d.id==undefined)
 			continue;
 			
-		var shouldHighlight=shouldHighlightNode(d.id);
+		var shouldHighlight=(useHighLight===true && shouldHighlightNode(d.id));
 
 		progeny+=
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
@@ -118,7 +119,7 @@ function growbranches(data)
 					''
 				)+
 				(shouldHighlight ? '</span>' : '' )+
-				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'" class="detail-link">&rarr;</a> \
+				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'&noautoexpand=1" class="detail-link">&rarr;</a> \
 			</li>';
 	}
 	
@@ -153,7 +154,7 @@ function growbranches(data)
 				)+
 				(!activeNode && getShowUpperTaxon()==false ?
 					'':
-					'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'" class="detail-link">&rarr;</a>'
+					'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'&noautoexpand=1" class="detail-link">&rarr;</a>'
 				)+
 				progeny+
 			'</li>'+

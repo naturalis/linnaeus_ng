@@ -1,5 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="../shared/left_column_tree.tpl"}
+
 <div id="page-main">
 
 <h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe wetenschappelijke naam{else}{$name.name}{/if}</h2>

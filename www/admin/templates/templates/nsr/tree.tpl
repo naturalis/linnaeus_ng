@@ -13,7 +13,7 @@
 
 <p>
 	<form>
-		{t}search for a name:{/t} <input type="text" id="allLookupBox" onkeyup="allLookup()" placeholder="{t}type a name{/t}" autocomplete="off" />
+		{t}search for a name:{/t} <input type="text" id="allLookupBox" onKeyUp="allLookup()" placeholder="{t}type a name{/t}" autocomplete="off" />
 	</form>
 	<br />
 	<div id="tree-container"></div>
@@ -51,6 +51,8 @@ function localList(obj,txt)
 
 $(document).ready(function()
 {
+	useHighLight=false;
+
 	setAjaxTreeUrl('tree_ajax_interface.php');
 	setShowUpperTaxon({$tree_show_upper_taxon});
 	{if $session.admin.project.title}
@@ -81,5 +83,10 @@ $(document).ready(function()
 			}
 		});
 	});	
+
+	{if $node}
+	setAutoExpand({$node});
+	{/if}
+
 });
 </script>
