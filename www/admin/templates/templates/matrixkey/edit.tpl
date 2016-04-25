@@ -26,7 +26,7 @@
 			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>{if $useCharacterGroups}; <a href="char_groups.php">{t}edit character groups{/t}</a>{/if})
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{foreach $characteristics v k}
-			<option value="{$v.id}" id="char-{$v.id}" ondblclick="window.open('char.php?id={$v.id}','_self');">{$v.sys_name} ({$v.type})</option>
+			<option value="{$v.id}" id="char-{$v.id}" ondblclick="window.open('char.php?id={$v.id}','_self');">{$v.label} ({$v.type})</option>
 			{/foreach}
 			</select>
 		</td>

@@ -14,62 +14,40 @@
 <input type="hidden" name="action" id="action" value="save" />
 <input type="hidden" name="id" id="id" value="{$state.id}" />
 <input type="hidden" name="char" value="{$characteristic.id}" />
-<input type="hidden" name="type" value="{$characteristic.type.name}" />
+<input type="hidden" name="type" value="{$characteristic.type}" />
 <p>
-{t _s1=$characteristic.type.name _s2=$characteristic.label _s3=$matrix.label}Editing a state of the type "%s" for the character "%s" of matrix "%s".{/t}
+{t _s1=$characteristic.type _s2=$characteristic.label _s3=$matrix.label}Editing a state of the type "%s" for the character "%s" of matrix "%s".{/t}
 </p>
-<table>
-	<tr>
-		<td>
-		</td>
-{if $languages|@count>1}
-    {foreach $languages v k}
-    {if $v.def_language=='1'}
-        <td>{$v.language} *</td>
-    {/if}
-    {/foreach}
-	<td colspan="2" id="project-language-tabs">(languages)</td>
-{/if}
-	</tr>
-	<tr>
-		<td>{t}Name:{/t}</td>
-		<td>
-			<input
-				type="text"
-				name="label"
-				id="label-default"
-				onblur="matrixSaveStateLabel(allDefaultLanguage)" />
-		</td>
-	{if $languages|@count>1}
-		<td>
-			<input
-				type="text"
-				id="label-other"
-				onblur="matrixSaveStateLabel(allActiveLanguage)" />
-		</td>
-	{/if}
-	</tr>
-	{if $characteristic.type.name=='text'}
-	<tr style="vertical-align:top">
-		<td>{t}Text:{/t}</td>
-		<td>
-			<textarea
-				style="width:400px;height:300px;"
-				name="text"
-				id="text-default"
-				onblur="matrixSaveStateText(allDefaultLanguage)"
-				></textarea>
-		</td>
-		{if $languages|@count>1}
-		<td>
-			<textarea
-				style="width:400px;height:300px;"
-				id="text-other"
-				onblur="matrixSaveStateText(allActiveLanguage)"
-				></textarea>
-		</td>
-		{/if}
-	</tr>
+
+    <table>
+        <tr>
+            <td>{t}Internal name{/t}:</td>
+            <td><input type="text" name="sys_name" value="{$state.sys_name}" maxlength="32" /></td>
+        </tr>                
+    {foreach $languages v i}
+        <tr>
+            <td>{$v.language} {t}name{/t}:</td>
+            <td><input type="text" name="labels[{$v.language_id}]" value="{$state.labels[$v.language_id].label}" maxlength="64" /></td>
+        </tr>                
+    {/foreach}		
+
+    <tr>
+        <td></td>
+        <td style="padding-top:10px">Value</td>
+    </tr>                
+
+	{if $characteristic.type=='text'}
+
+    {foreach $languages v i}
+        <tr style="vertical-align:top">
+            <td>{$v.language}:</td>
+            <td><textarea
+				style="width:400px;height:150px;"
+				name="texts[{$v.language_id}]"
+				>{$state.texts[{$v.language_id}].text}</textarea></td>
+        </tr>                
+    {/foreach}		
+
 	{elseif $characteristic.type.name=='media'}
 	<tr style="vertical-align:top">
 		<td>
@@ -90,7 +68,9 @@
 		{/if}
 		</td>
 	</tr>
-{elseif $characteristic.type.name=='range'}
+    
+	{elseif $characteristic.type.name=='range'}
+
 	<tr>
 		<td>{t}Lower limit (inclusive):{/t}</td>
 		<td{if $languages|@count>1} colspan="2"{/if}>
@@ -103,7 +83,9 @@
 			<input type="text" name="upper" id="upper" autocomplete="off" style="text-align:right;width:75px;" value="{$state.upper}" />
 		</td>
 	</tr>
-{elseif $characteristic.type.name=='distribution'}
+
+	{elseif $characteristic.type.name=='distribution'}
+
 	<tr>
 		<td>{t}Mean:{/t}</td>
 		<td{if $languages|@count>1} colspan="2"{/if}>
@@ -116,8 +98,11 @@
 			<input type="text" name="sd" id="sd" autocomplete="off" style="text-align:right;width:50px;" value="{$state.sd}" />
 		</td>
 	</tr>
-{/if}
+
+	{/if}
+
 </table>
+
 <table>
 	<tr>
 		<td colspan="2">&nbsp;</td>
@@ -131,27 +116,9 @@
 		</td>
 	</tr>
 </table>
+
 </form>
 </div>
-
-<script type="text/JavaScript">
-$(document).ready(function()
-{
-	allActiveView = 'matrixstate';
-{foreach $languages v k}
-	allAddLanguage([{$v.language_id},'{$v.language}',{if $v.def_language=='1'}1{else}0{/if}]);
-{/foreach}
-	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-	allDrawLanguages();
-
-	matrixGetStateLabel(allDefaultLanguage);
-	matrixGetStateLabel(allActiveLanguage);
-{if $characteristic.type.name=='text'}
-	matrixGetStateText(allDefaultLanguage);
-	matrixGetStateText(allActiveLanguage);
-{/if}
-});
-</script>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

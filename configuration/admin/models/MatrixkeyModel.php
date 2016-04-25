@@ -258,33 +258,138 @@ class MatrixKeyModel extends AbstractModel
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+		$id = isset($params['id']) ? $params['id'] : null;
 
-		if ( is_null($project_id) || is_null($matrix_id) )
+		if ( is_null($project_id) || is_null($matrix_id) || is_null($language_id) )
 			return;
 
 		$query ="
 			select
 				_b.id,
 				_b.type,
-				_b.sys_name
+				_b.sys_name,
+				ifnull(_c.label,_b.sys_name) as label
 
 			from %PRE%characteristics_matrices _a
 			
-			left join %PRE%characteristics _b
+			right join %PRE%characteristics _b
 				on _a.project_id=_b.project_id
 				and _a.characteristic_id=_b.id
+
+			left join %PRE%characteristics_labels _c
+				on _b.project_id=_c.project_id
+				and _b.id=_c.characteristic_id
+				and _c.language_id=" . $language_id . "
 
 			where 
 				_a.project_id = ". $project_id ."
 				and _a.matrix_id = ". $matrix_id."
+				" . ( !is_null($id)  ? "and _b.id = " . $id : "" ) ."
 
 			order by
 				_a.show_order
 
 			";
 
-		return $this->freeQuery( $query );
+		$d=$this->freeQuery( $query );
+		
+		if ($d)
+		{
+			foreach((array)$d as $key=>$val)
+			{
+				$query ="
+					select
+						*
+					from
+						%PRE%characteristics_labels
+					where
+						project_id = ". $project_id ."
+						and characteristic_id = " . $val['id'] . "
+					";
+
+				$d[$key]['labels']=$this->freeQuery( ["query"=>$query,"fieldAsIndex"=>"language_id"] );
+
+				if (strpos($val['label'],'|')!==false)
+				{
+					$d = explode('|',$label);
+					$d[$key]['short_label']=$d[0];
+				}
+				else
+				{
+					$d[$key]['short_label']=$val['label'];
+				}
+			}
+			
+			return  !is_null($id) ? $d[0] : $d;
+		}
     }
 
+    public function getStates( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+		$character_id = isset($params['character_id']) ? $params['character_id'] : null;
+		$id = isset($params['id']) ? $params['id'] : null;
 
+		if ( is_null($project_id) || is_null($language_id) )
+			return;
+
+		$query ="
+			select
+				_a.id,
+				_a.sys_name,
+				_a.characteristic_id,
+				_a.file_name,
+				_a.file_dimensions,
+				_a.lower,
+				_a.upper,
+				_a.mean,
+				_a.sd,
+				ifnull(_b.label,_a.sys_name) as label,
+				_b.text
+
+			from %PRE%characteristics_states _a
+
+			left join %PRE%characteristics_labels_states _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.state_id
+				and _b.language_id=" . $language_id . "
+
+			where 
+				_a.project_id = ". $project_id ."
+				" . ( !is_null($character_id)  ? "and _a.character_id = " . $character_id : "" ) ."
+				" . ( !is_null($id)  ? "and _a.id = " . $id : "" ) ."
+			order by
+				show_order
+			";
+
+		$d=$this->freeQuery( $query );
+		
+		if ($d)
+		{
+			foreach((array)$d as $key=>$val)
+			{
+				$query ="
+					select
+						text,
+						label,
+						language_id
+					from
+						%PRE%characteristics_labels_states
+					where
+						project_id = ". $project_id ."
+						and state_id = " . $val['id'] . "
+					";
+
+				$t=$this->freeQuery( ["query"=>$query,"fieldAsIndex"=>"language_id"] );
+				$d[$key]['labels']=array_map(function($val){ unset($val['text'],$val['language_id']); return $val;},(array)$t);
+				$d[$key]['texts']=array_map(function($val){ unset($val['label'],$val['language_id']); return $val;},(array)$t);
+
+
+			}
+			
+			return  !is_null($id) ? $d[0] : $d;
+		}
+    }
 }
