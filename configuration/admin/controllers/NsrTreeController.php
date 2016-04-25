@@ -81,6 +81,8 @@ class NsrTreeController extends NsrController
 
 		$this->checkAuthorisation();
 
+		if ( $this->rHasVal('node') ) $this->smarty->assign('node',$this->rGetVal('node'));
+
 		$this->_growTree( 'tree' );
     }
 

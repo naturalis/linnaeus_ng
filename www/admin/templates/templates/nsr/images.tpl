@@ -1,5 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="../shared/left_column_tree.tpl"}
+
 <div id="page-main">
 
 <style>

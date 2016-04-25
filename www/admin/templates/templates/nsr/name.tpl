@@ -1,5 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="../shared/left_column_tree.tpl"}
+
 <style>
 .language-labels {
     -ont-size: 0.9em;

@@ -1,5 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="../shared/left_column_tree.tpl"}
+
 {assign var=hasContent value=false}
 {foreach from=$tabs item=v key=k}
 {if !($v.obsolete && $v.content|@strlen==0) && $v.content|@strlen!=0}

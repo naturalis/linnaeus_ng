@@ -1,5 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="../shared/left_column_tree.tpl"}
+
 <script type="text/JavaScript">
 
 var new_refs=Array();
