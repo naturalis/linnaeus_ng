@@ -1596,11 +1596,11 @@ class ImportNBCController extends ImportController
 				{
 
 					// find taxon by common name
-					$d = $this->models->Commonnames->_get(array('id' =>
+					$d = $this->models->Names->_get(array('id' =>
 					array(
 						'project_id' => $this->getNewProjectId(),
 						//'language_id' => $this->getNewDefaultLanguageId(),
-						'commonname' => $val['parent_name']
+						'name' => $val['parent_name']
 					)));
 
 					if ($d) {
@@ -1697,23 +1697,25 @@ class ImportNBCController extends ImportController
 
 			if (isset($val['common name'])) {
 
-				$d = $this->models->Commonnames->_get(array('id' =>
+				$d = $this->models->Names->_get(array('id' =>
 				array(
 					'project_id' => $this->getNewProjectId(),
 					'taxon_id' => $species[$key]['lng_id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
-					'commonname' => $val['common name']
+					'name' => $val['common name'],
+					'type_id'=> PREDICATE_PREFERRED_NAME
 				)));
 
 				if (!$d) {
 
-					$this->models->Commonnames->save(
+					$this->models->Name->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'taxon_id' => $species[$key]['lng_id'],
 						'language_id' => $this->getNewDefaultLanguageId(),
-						'commonname' => $val['common name']
+						'name' => $val['common name'],
+						'type_id'=> PREDICATE_PREFERRED_NAME
 					));
 
 				}
@@ -1930,7 +1932,8 @@ class ImportNBCController extends ImportController
 
         $this->models->Matrices->save(array(
             'id' => null,
-            'project_id' => $this->getNewProjectId()
+            'project_id' => $this->getNewProjectId(),
+			'sys_name' => $name
         ));
 
         $id = $this->models->Matrices->getNewId();
@@ -2022,7 +2025,7 @@ class ImportNBCController extends ImportController
                 'id' => null,
                 'project_id' => $this->getNewProjectId(),
                 'type' => $type,
-                'got_labels' => 1
+                'sys_name' => $cVal['code']
             ));
 
             $data['characters'][$cKey]['id'] = $this->models->Characteristics->getNewId();
@@ -2139,7 +2142,7 @@ class ImportNBCController extends ImportController
                         'characteristic_id' => $cId,
                         'lower' => isset($statemin) ? $statemin : null,
                         'upper' => isset($statemax) ? $statemax : null,
-                        'got_labels' => 1,
+						'sys_name' => $cVal
                         //'file_name' => $type == 'media' ? $cVal . '.' . $this->_defaultImgExtension : null
                     ));
 
@@ -2507,7 +2510,7 @@ class ImportNBCController extends ImportController
         ));
 
         // delete commonnames
-        $this->models->Commonnames->delete(array(
+        $this->models->Names->delete(array(
             'project_id' => $pId,
             'taxon_id' => $id
         ));
