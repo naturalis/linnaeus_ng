@@ -37,6 +37,7 @@ class NsrController extends Controller
     private function initialize()
     {
 		$this->Rdf = new RdfController;
+		$this->smarty->assign( 'noautoexpand', $this->rHasVal('noautoexpand','1') );
 	}
 
 	public function getActors()

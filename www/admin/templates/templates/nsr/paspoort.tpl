@@ -7,8 +7,11 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h2>
-<h3>paspoort</h3>
+<h2><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h2>
+<h3>{t}passport{/t}</h3>
+
+<a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;">{t}show all{/t}</a>
+<a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;" style="display:none" href="">{t}hide all{/t}</a>
 
 <p>
 
@@ -21,7 +24,7 @@
 	{if !($v.obsolete && $v.content|@strlen==0)}
 	<li>
 		<span class="passport-title">
-        	{if $v.always_hide}({/if}<a href="#" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="verborgen tab"{/if}>{$v.title}</a>{if $v.always_hide}){/if}
+        	{if $v.always_hide}({/if}<a href="#" class="passport-toggles" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="verborgen tab"{/if}>{$v.title}</a>{if $v.always_hide}){/if}
             {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Verouderde paspoorttitel</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
