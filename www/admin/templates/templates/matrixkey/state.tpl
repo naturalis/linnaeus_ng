@@ -12,6 +12,7 @@
 <form enctype="multipart/form-data" id="theForm" method="post" action="state.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="action" id="action" value="save" />
+<input type="hidden" name="repeat" id="repeat" value="0" />
 <input type="hidden" name="id" id="id" value="{$state.id}" />
 <input type="hidden" name="char" value="{$characteristic.id}" />
 <input type="hidden" name="type" value="{$characteristic.type}" />
@@ -110,7 +111,7 @@
 	<tr>
 		<td colspan="2">
 			<input type="button" onclick="matrixCheckStateForm()" value="{t}save and return to matrix{/t}" />&nbsp;
-			<input type="button" onclick="$('#action').val('repeat');matrixCheckStateForm();" value="{t _s1=$characteristic.label}save and add another state for &quot;%s&quot;{/t}" />&nbsp;
+			<input type="button" onclick="$('#repeat').val('1');matrixCheckStateForm();" value="{t _s1=$characteristic.label}save and add another state for &quot;%s&quot;{/t}" />&nbsp;
 			{if $state.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
 			<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_top')" />
 		</td>

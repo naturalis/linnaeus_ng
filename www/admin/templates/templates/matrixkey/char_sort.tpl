@@ -1,26 +1,57 @@
 {include file="../shared/admin-header.tpl"}
 
+<style>
+#sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+#sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; height: 18px; width:auto;}
+</style>
+
 <div id="page-main">
+
 <p>
 <span class="matrix-header">
 	{t _s1=$matrix.label}Editing matrix "%s"{/t}
 </span>
 </p>
 {t}Sort characters{/t}
-<table>
-{foreach $characteristics v k}
-	<tr>
-		<td>{$v.show_order+1}.</td>
-		<td>{$v.label} ({$v.type.name})</td>
-		<td title="{t}move up{/t}">{if $k>0}<a href="?id={$v.id}&r=u&rnd={$rnd}">&nbsp;&uarr;&nbsp;</a>{/if}</td>
-		<td title="{t}move down{/t}">{if $k<$characteristics|@count-1}<a href="?id={$v.id}&r=d&rnd={$rnd}">&nbsp;&darr;&nbsp;</a>{/if}</td>
-	</tr>
-{/foreach}
-</table>
+
+{t}Drag and drop to sort, click 'save' to store new order.{/t}<br />
+
+<!-- 
+{t}Sort all at once:{/t} <span class="a" onclick="matrixDoMoveState(-1,'alph');">{t}alphabetically{/t}</span> {t}or{/t} <span class="a" onclick="matrixDoMoveState(-1,'num');">{t}numerically{/t}</span>.
+-->
+
 <p>
-	<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
+
+<ul id="sortable" class="sortable-drag-list">
+{foreach $characteristics v k}
+	<li id="character-{$v.id}" class="ui-state-default">{$v.label} ({$v.type})</li>
+{/foreach}
+</ul>
+
+<div style="clear:both;border-bottom:1px dotted #ddd;width:500px;margin-bottom:10px"></div>
+
+
+<form method="post" id="theForm">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="button" value="{t}save{/t}" onclick="matrixSaveOrder('character')" />
+<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
+</form>
+
 </p>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function()
+{
+	$( "#sortable" ).sortable({
+		opacity: 0.6, 
+		cursor: 'move',
+	}).disableSelection();
+
+	$('#page-block-messages').fadeOut(3000);
+
+});
+</script>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

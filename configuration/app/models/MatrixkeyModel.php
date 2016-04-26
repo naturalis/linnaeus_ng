@@ -82,7 +82,6 @@ final class MatrixKeyModel extends AbstractModel
 				_a.upper,
 				_a.mean,
 				_a.sd,
-				_a.got_labels,
 				_a.show_order,
 				_b.type,
 				_c.label,

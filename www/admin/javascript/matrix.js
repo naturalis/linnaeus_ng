@@ -340,6 +340,7 @@ function matrixGetLinks()
 		async: allAjaxAsynchMode,
 		success : function (data)
 		{
+			console.log(data);
 			matrixSetLinks($.parseJSON(data));
 		}
 	});
@@ -413,7 +414,8 @@ function matrixSaveCharGroupOrder()
 
 function matrixDeleteGroup(id)
 {
-	if (confirm(_('Are you sure?'))) {
+	if (confirm(_('Are you sure?')))
+	{
 		$('#theForm').append('<input type="hidden" name="delete" value="'+id+'">').val(id);
 		$('#theForm').submit();
 	}
@@ -426,11 +428,12 @@ function matrixDoMoveState(id,r)
 	$('#theForm').submit();
 }
 
-function matrixSaveStateOrder()
+function matrixSaveOrder( id )
 {
-	$('li[id^=state-]').each(function () {
-		var val = $(this).attr('id').replace('state-','');
-		$('#theForm').append('<input type="hidden" name="states[]" value="'+val+'">').val(val);
+	$('li[id^='+id+'-]').each(function ()
+	{
+		var val = $(this).attr('id').replace(id+'-','');
+		$('#theForm').append('<input type="hidden" name="'+id+'s[]" value="'+val+'">').val(val);
 	})
 
 	$('#theForm').submit();

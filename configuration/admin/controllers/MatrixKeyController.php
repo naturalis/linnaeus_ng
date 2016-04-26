@@ -52,13 +52,13 @@ class MatrixKeyController extends Controller
 		array('name'=>'distribution','info'=>'a value distribution, defined by a mean and values for one and two standard deviations.')
 	);
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->initialize();
     }
 
-    private function initialize ()
+    private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
@@ -76,7 +76,7 @@ class MatrixKeyController extends Controller
 		$this->setMediaController();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
@@ -89,7 +89,7 @@ class MatrixKeyController extends Controller
         $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
 	}
 
-    public function indexAction ()
+    public function indexAction()
     {
         $this->checkAuthorisation();
 
@@ -122,7 +122,7 @@ class MatrixKeyController extends Controller
 		$this->redirect( 'new.php' );
     }
 
-    public function manageAction ()
+    public function manageAction()
     {
         $this->checkAuthorisation();
 
@@ -133,7 +133,7 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    public function newAction ()
+    public function newAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 
@@ -179,7 +179,7 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    public function matricesAction ()
+    public function matricesAction()
     {
         $this->checkAuthorisation();
 
@@ -280,7 +280,7 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-	public function editAction ()
+	public function editAction()
     {
         $this->checkAuthorisation();
 
@@ -302,44 +302,27 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    public function charSortAction ()
+    public function charSortAction()
     {
 		$this->checkAuthorisation();
 
         if ($this->getCurrentMatrixId() == null)
             $this->redirect('matrices.php');
 
-        if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit())
+        if ($this->rHasVal('characters') && !$this->isFormResubmit())
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
-            $c = $this->getCharacteristics();
-
-            foreach ((array) $c as $key => $val)
+			$i=0;
+			foreach((array)$this->rGetVal('characters') as $val)
 			{
-                if ($this->rGetId()==$val['id'])
-				{
-                    if ($this->rHasVal('r', 'u'))
-					{
-                        if (isset($c[$key-1])) $this->updateCharShowOrder($c[$key-1]['id'], $c[$key-1]['show_order']+1);
-                        $this->updateCharShowOrder($this->rGetId(), $val['show_order']-1);
-                        break;
-                    }
-                    else
-					if ($this->rHasVal('r', 'd'))
-					{
-                        if (isset($c[$key+1]))
-                            $this->updateCharShowOrder($c[$key+1]['id'], $c[$key+1]['show_order']-1);
-                        $this->updateCharShowOrder($this->rGetId(), $val['show_order']+1);
+				$this->updateCharShowOrder($val,$i++);
+			}
 
-                        break;
-                    }
-                }
-            }
-
-            $this->renumberCharShowOrder();
-        }
+			$this->addMessage('New state order saved.');
+			//$this->renumberCharShowOrder();
+		}
 
         $matrix = $this->getMatrix( $this->getCurrentMatrixId() );
 
@@ -351,7 +334,7 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    public function charGroupsAction ()
+    public function charGroupsAction()
     {
         $this->checkAuthorisation();
 
@@ -422,7 +405,7 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    public function charGroupsSortAction ()
+    public function charGroupsSortAction()
     {
         $this->checkAuthorisation();
 
@@ -466,7 +449,7 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    public function charAction ()
+    public function charAction()
     {
         $this->checkAuthorisation();
 
@@ -628,50 +611,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-    private function saveState( $params )
-    {
-		$id = isset($params['id']) ? $params['id'] : null;
-		$labels = isset($params['labels']) ? $params['labels'] : null;
-		$texts = isset($params['texts']) ? $params['texts'] : null;
-		$sys_name = isset($params['sys_name']) ? $params['sys_name'] : null;
-
-		if ( is_null($id) )
-			return;
-
-		$this->models->CharacteristicsStates->save([
-			'project_id' => $this->getCurrentProjectId(),
-			'id' => $id,
-			'sys_name' => trim($sys_name)
-		]);
-
-		$d=			
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'state_id' => $id,
-			);
-		
-		foreach((array)$labels as $language_id=>$val)
-		{
-            $c=$this->models->CharacteristicsLabelsStates->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'state_id' => $id,
-                    'language_id' => $language_id
-                )
-            ));
-			
-			$d['id'] = $c ? $c[0]['id'] : null;
-			$d['label'] = trim($val);
-			$d['text'] = isset($texts[$language_id]) ? trim($texts[$language_id]) : null;
-			$d['language_id'] = $language_id;
-
-            $this->models->CharacteristicsLabelsStates->save($d);
-		
-		}
-    }
-
-
     public function stateAction()
     {
         $this->checkAuthorisation();
@@ -686,6 +625,15 @@ class MatrixKeyController extends Controller
 			$d=$this->rGetAll();
 			$d['id']=$this->createState();
 			$this->saveState( $d );
+			
+			if ($this->rHasVal('repeat', '0'))
+			{
+				$this->redirect('edit.php');
+			}
+			else
+			{
+				$this->redirect('state.php?char=' . $this->rGetVal('char') );
+			}
 		}
         else
         if ( $this->rHasId() && $this->rHasVal('action', 'save') )
@@ -693,6 +641,15 @@ class MatrixKeyController extends Controller
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 			$this->saveState( $this->rGetAll() );
+
+			if ($this->rHasVal('repeat','0'))
+			{
+				$this->redirect('edit.php');
+			}
+			else
+			{
+				$this->redirect('state.php?char=' . $this->rGetVal('char') );
+			}
         }
         else
         if ( $this->rHasId() && $this->rHasVal('action', 'delete') )
@@ -708,7 +665,6 @@ class MatrixKeyController extends Controller
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
-
             //$this->deleteCharacteristicStateImage();
             $this->detachAllMedia();
         }
@@ -723,6 +679,7 @@ class MatrixKeyController extends Controller
 			}
         }
         else
+		if (!$this->rHasVal('char'))
 		{
 			$this->redirect('edit.php');
         }
@@ -736,7 +693,7 @@ class MatrixKeyController extends Controller
         $state=$this->getState( $this->rGetId() );
 
          // existing state
-        if ($state['label'])
+        if (isset($state['label']))
 		{
             $this->setPageName(sprintf($this->translate('Editing state for "%s"'), $characteristic['label']), $this->translate('Editing state'));
         }
@@ -823,10 +780,10 @@ class MatrixKeyController extends Controller
 
 			$this->addMessage('New state order saved.');
 
-		} else
+		}
+		else
         if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit())
 		{
-
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
@@ -954,7 +911,11 @@ class MatrixKeyController extends Controller
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			if ( !$this->getAuthorisationState() ) return;
 
-            $this->addLink();
+            $this->addLink([
+				'characteristic_id'=>$this->rGetVal('characteristic'),
+				'taxon_id'=>$this->rGetVal('taxon'),
+				'state_id'=>$this->rGetVal('state'),
+			]);
         }
         else
 		if ($this->rGetVal('action') == 'delete_link')
@@ -1298,51 +1259,25 @@ class MatrixKeyController extends Controller
 		]);
     }
 
-    private function getAllCharacteristics($matrixToExclude = null)
+    private function getAllCharacteristics( $matrixToExclude )
     {
-        if (isset($matrixToExclude))
+        if ( isset($matrixToExclude) )
 		{
             $ce = $this->getCharacteristics($matrixToExclude);
 
-            if (isset($ce))
+			foreach ((array) $ce as $key => $val)
 			{
-                $b = null;
-
-                foreach ((array) $ce as $key => $val)
-				{
-                    $b .= $val['id'] . ', ';
-                }
-
-                $b = '(' . rtrim($b, ', ') . ')';
-
-                $id['id not in'] = $b;
-            }
+				$b[]=$val['id'];
+			}
         }
 
-        $id['project_id'] = $this->getCurrentProjectId();
-
-        $id['got_labels'] = '1';
-
-        $c = $this->models->Characteristics->_get(array(
-            'id' => $id
-        ));
-
-        foreach ((array) $c as $key => $val)
-		{
-			// SATAN
-            $d = $this->getCharacteristicLabels($val['id']);
-            $c[$key]['label'] = $d['label'];
-        }
-
+        $c = $this->models->MatrixkeyModel->getCharacters([
+			'project_id' => $this->getCurrentProjectId(),
+			'not_id' => isset($b) ? $b : null,
+			'language_id' => $this->getDefaultProjectLanguage()
+		]);
+		
         return $c;
-    }
-
-    private function getCharacteristicType($type)
-    {
-        foreach ((array) $this->characteristicTypes as $key => $val)
-		{
-            if ($val['name'] == $type) return $val;
-        }
     }
 
     private function createState()
@@ -1356,23 +1291,6 @@ class MatrixKeyController extends Controller
         ));
 
         return $this->models->CharacteristicsStates->getNewId();
-    }
-
-    private function getCharacteristicStateLabels($id)
-    {
-        $cls = $this->models->CharacteristicsLabelsStates->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'state_id' => $id
-            ),
-            'fieldAsIndex' => 'language_id'
-        ));
-
-        return array(
-            'label' => $cls[$this->getDefaultProjectLanguage()]['label'],
-            'labels' => $cls
-        );
     }
 
     private function getState( $id )
@@ -1537,30 +1455,6 @@ class MatrixKeyController extends Controller
         return $type == 'text' ? $cls[0]['text'] : $cls[0]['label'];
     }
 
-    private function setCharacteristicStateGotLabels($id, $state = null)
-    {
-        if ($state == null)
-		{
-            $cl = $this->models->CharacteristicsLabelsStates->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'state_id' => $id
-                ),
-                'columns' => 'count(*) as total'
-            ));
-
-            $state = ($cl[0]['total'] == 0 ? false : true);
-        }
-
-        $this->models->CharacteristicsStates->update(array(
-            'got_labels' => ($state == false ? '0' : '1')
-        ), array(
-            'id' => $id,
-            'project_id' => $this->getCurrentProjectId()
-        ));
-    }
-
     private function deleteCharacteristicStateImage($id = null)
     {
         $id = isset($id) ? $id : $this->rGetId();
@@ -1683,19 +1577,19 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function addLink($charId = null, $taxonId = null, $stateId = null)
+    private function addLink( $params )
     {
-        $charId = isset($charId) ? $charId : $this->rGetVal('characteristic');
-        $taxonId = isset($taxonId) ? $taxonId : $this->rGetVal('taxon');
-        $stateId = isset($stateId) ? $stateId : $this->rGetVal('state');
+		$charId = isset($params['characteristic_id']) ? $params['characteristic_id'] : null;
+		$taxonId = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+		$stateId = isset($params['state_id']) ? $params['state_id'] : null;
 
-        if (strpos($taxonId, 'mx-') === 0)
+        if (strpos($taxonId, 'mx-')===0)
 		{
             $refMatrixId = str_replace('mx-', '', $taxonId);
             $taxonId = null;
         }
         else
-		if (strpos($taxonId, 'var-') === 0)
+		if (strpos($taxonId, 'var-')===0)
 		{
             $variationId = str_replace('var-', '', $taxonId);
             $taxonId = null;
@@ -1708,19 +1602,18 @@ class MatrixKeyController extends Controller
         if (!isset($charId) || (!isset($taxonId) && !isset($refMatrixId) && !isset($variationId)) || !isset($stateId))
             return;
 
-        $this->models->MatricesTaxaStates->save(
-        array(
-            'project_id' => $this->getCurrentProjectId(),
-            'matrix_id' => $this->getCurrentMatrixId(),
-            'taxon_id' => (isset($taxonId) ? $taxonId : null),
-            'ref_matrix_id' => (isset($refMatrixId) ? $refMatrixId : null),
-            'variation_id' => (isset($variationId) ? $variationId : null),
-            'characteristic_id' => $charId,
-            'state_id' => $stateId
-        ));
+        $this->models->MatricesTaxaStates->save([
+			'project_id' => $this->getCurrentProjectId(),
+			'matrix_id' => $this->getCurrentMatrixId(),
+			'taxon_id' => (isset($taxonId) ? $taxonId : null),
+			'ref_matrix_id' => (isset($refMatrixId) ? $refMatrixId : null),
+			'variation_id' => (isset($variationId) ? $variationId : null),
+			'characteristic_id' => $charId,
+			'state_id' => $stateId
+        ]);
     }
 
-    private function deleteLinks($params = null)
+    private function deleteLinks( $params )
     {
         if (isset($params['id']))
             $d['id'] = $params['id'];
@@ -1743,7 +1636,7 @@ class MatrixKeyController extends Controller
         $this->models->MatricesTaxaStates->delete($d);
     }
 
-    private function getLinks($params = null)
+    private function getLinks( $params )
     {
         if (isset($params['id']))
             $d['id'] = $params['id'];
@@ -1775,26 +1668,28 @@ class MatrixKeyController extends Controller
             'id' => $d
         ));
 
-        foreach ((array) $mts as $key => $val) {
+        foreach ((array) $mts as $key => $val)
+		{
 
-            $cs = $this->models->CharacteristicsStates->_get(
-            array(
-                'id' => array(
-                    'id' => $val['state_id'],
-                    'project_id' => $this->getCurrentProjectId()
-                ),
-                'columns' => 'characteristic_id',
-                'order' => 'show_order'
-            ));
-			// SATAN
-            $mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'], $this->getDefaultProjectLanguage());
-            $mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'], $this->getDefaultProjectLanguage());
+            $a=$this->models->MatrixkeyModel->getStates([
+				'id' => $val['state_id'],
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id'=>$this->getDefaultProjectLanguage()
+			]);
+            $b=$this->models->MatrixkeyModel->getCharacters([
+				'id' => $val['characteristic_id'],
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id'=>$this->getDefaultProjectLanguage()
+			]);		
+
+            $mts[$key]['state'] = $a['sys_name'];
+            $mts[$key]['characteristic'] = $b['sys_name'];
         }
 
         return $mts;
     }
 
-    private function updateCharShowOrder ($id, $val)
+    private function updateCharShowOrder($id, $val)
     {
         $this->models->CharacteristicsMatrices->update(array(
             'show_order' => $val
@@ -1805,7 +1700,7 @@ class MatrixKeyController extends Controller
         ));
     }
 
-    private function renumberCharShowOrder ()
+    private function renumberCharShowOrder()
     {
         $c = $this->getCharacteristics();
 
@@ -1813,7 +1708,7 @@ class MatrixKeyController extends Controller
             $this->updateCharShowOrder($val['id'], $key);
     }
 
-    private function setDefaultMatrix ($id = null)
+    private function setDefaultMatrix($id = null)
     {
         if (isset($id))
 		{
@@ -1861,7 +1756,7 @@ class MatrixKeyController extends Controller
         }
     }
 
-    private function getDefaultMatrixId ()
+    private function getDefaultMatrixId()
     {
 		$m = $this->models->Matrices->_get(
 		array(
@@ -1875,7 +1770,7 @@ class MatrixKeyController extends Controller
 		return isset($m[0]['id']) ? $m[0]['id'] : null;
     }
 
-    private function updateStateShowOrder ($id, $val)
+    private function updateStateShowOrder($id, $val)
     {
         $this->models->CharacteristicsStates->update(array(
             'show_order' => $val
@@ -1885,7 +1780,7 @@ class MatrixKeyController extends Controller
         ));
 	}
 
-    private function renumberStateShowOrder ($id)
+    private function renumberStateShowOrder($id)
     {
         $c = $this->getCharacteristicStates($id);
 
@@ -1893,7 +1788,7 @@ class MatrixKeyController extends Controller
             $this->updateStateShowOrder($val['id'], $key);
     }
 
-    private function getVariationsInMatrix ()
+    private function getVariationsInMatrix()
     {
         if (!$this->_useVariations)
             return;
@@ -2099,31 +1994,16 @@ class MatrixKeyController extends Controller
         return (!isset($groupId) ? $cg : (isset($cg[0]) ? $cg[0] : null));
     }
 
-    private function getCharactersNotInGroups ($mId = null)
+    private function getCharactersNotInGroups( $mId=null )
     {
         $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
 
-        $mc = $this->models->MatrixkeyModel->getCharactersNotInGroups(
+		return $this->models->MatrixkeyModel->getCharactersNotInGroups(
 			array(
 				'project_id'=>$this->getCurrentProjectId(),
-				'matrix_id'=>$mId
+				'matrix_id'=>$mId,
+				'language_id' => $this->getDefaultProjectLanguage()
 			));
-
-        foreach ((array) $mc as $key => $val)
-		{
-			// SATAN
-            $labels = $this->getCharacteristicLabels($val['characteristic_id']);
-
-            if (isset($labels['label']))
-			{
-                $d[$key] = array_merge($this->getCharacteristic($val['characteristic_id']), $labels, array(
-                    'show_order' => $val['show_order']
-                ));
-            }
-        }
-
-        return isset($d) ? $d : null;
-
     }
 
 	private function saveStateImageDimensions($state)
@@ -2294,6 +2174,49 @@ class MatrixKeyController extends Controller
         }
 
         return false;
+    }
+
+    private function saveState( $params )
+    {
+		$id = isset($params['id']) ? $params['id'] : null;
+		$labels = isset($params['labels']) ? $params['labels'] : null;
+		$texts = isset($params['texts']) ? $params['texts'] : null;
+		$sys_name = isset($params['sys_name']) ? $params['sys_name'] : null;
+
+		if ( is_null($id) )
+			return;
+
+		$this->models->CharacteristicsStates->save([
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $id,
+			'sys_name' => trim($sys_name)
+		]);
+
+		$d=			
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'state_id' => $id,
+			);
+		
+		foreach((array)$labels as $language_id=>$val)
+		{
+            $c=$this->models->CharacteristicsLabelsStates->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'state_id' => $id,
+                    'language_id' => $language_id
+                )
+            ));
+			
+			$d['id'] = $c ? $c[0]['id'] : null;
+			$d['label'] = trim($val);
+			$d['text'] = isset($texts[$language_id]) ? trim($texts[$language_id]) : null;
+			$d['language_id'] = $language_id;
+
+            $this->models->CharacteristicsLabelsStates->save($d);
+		
+		}
     }
 
 
