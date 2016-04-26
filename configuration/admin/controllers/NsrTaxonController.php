@@ -94,9 +94,6 @@ class NsrTaxonController extends NsrController
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
-
-		$this->smarty->assign( 'noautoexpand', $this->rHasVal('noautoexpand','1') );
-
 	}
 
     public function taxonNewAction()

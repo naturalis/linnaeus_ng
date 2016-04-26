@@ -180,31 +180,30 @@
             {if $v.addition[$main_language_name_language_id].addition}({$v.addition[$main_language_name_language_id].addition}){/if}
             {if $v.rank_label} [{$v.rank_label}]{/if}
             <i>({$v.nametype_label})</i>
-            <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}" class="edit">{t}edit{/t}</a>
+            <a href="{makeNameLink nametype=$v.nametype}?id={$v.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit">{t}edit{/t}</a>
             </li>
         {/foreach}
         </ul>
-        <a href="name.php?taxon={$concept.id}" class="edit" style="margin:0">{t}niet-wetenschappelijke naam toevoegen{/t}</a><br />
-        <a href="synonym.php?taxon={$concept.id}" class="edit" style="margin:0" title="{t}toevoegen van geldige naam, synoniem, etc.{/t}">{t}wetenschappelijke naam toevoegen{/t}</a>
+        <a href="name.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}niet-wetenschappelijke naam toevoegen{/t}</a><br />
+        <a href="synonym.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0" title="{t}toevoegen van geldige naam, synoniem, etc.{/t}">{t}wetenschappelijke naam toevoegen{/t}</a>
     
     </p>
     {/if}
     
-    
     <p>
         {if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}" class="edit" style="margin:0">{t _s1=$concept.taxon}soort toevoegen aan "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}soort toevoegen aan "%s"{/t}</a><br />
         {elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}" class="edit" style="margin:0">{t _s1=$concept.taxon}ondersoort toevoegen aan "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}ondersoort toevoegen aan "%s"{/t}</a><br />
         {elseif $concept.base_rank < $smarty.const.GENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}" class="edit" style="margin:0">{t _s1=$concept.taxon}onderliggend taxon toevoegen aan "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}onderliggend taxon toevoegen aan "%s"{/t}</a><br />
         {/if}
     </p>
     <p>
-        <a href="paspoort.php?id={$concept.id}" class="edit" style="margin:0">{t}paspoort{/t}</a><br />
-        <a href="media.php?id={$concept.id}" class="edit" style="margin:0">{t}media{/t}</a><br />
-        <a href="literature.php?id={$concept.id}" class="edit" style="margin:0">{t}literatuur{/t}</a><br />
-        <a href="images.php?id={$concept.id}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
+        <a href="paspoort.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}paspoort{/t}</a><br />
+        <a href="media.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}media{/t}</a><br />
+        <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literatuur{/t}</a><br />
+        <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
     
         {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
@@ -216,7 +215,7 @@
         <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">{t}taxon markeren als verwijderd{/t}</a>
         {/if}
         <br />
-        <a href="taxon_edit_concept_direct.php?id={$concept.id}" class="edit" style="margin:0">{t}naam taxon concept direct aanpassen{/t}</a>
+        <a href="taxon_edit_concept_direct.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}naam taxon concept direct aanpassen{/t}</a>
     
         {assign var=k value=0}
         {foreach $traitgroups v}{if $v.taxon_count==0}
