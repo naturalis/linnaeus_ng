@@ -2150,7 +2150,6 @@ class MatrixKeyController extends Controller
 
 	}
 
-
     private function detachAllMedia()
     {
         $media = $this->_mc->getItemMediaFiles();
