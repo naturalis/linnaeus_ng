@@ -190,12 +190,12 @@ function saveLitForm()
 
     
 	<tr>
-    	<th>{t}pagina(s):{/t}</th>
-        <td><input class="small" type="text" name="pages" value="{$reference.pages}" /></td>
+    	<th title="{t}volumenummer en eventueel issuenummer tussen haakjes, bijv. 53(1){/t}">{t}volume:{/t}</th>
+        <td><input class="small" type="text" name="volume" value="{$reference.volume}" /></td>
 	</tr>
 	<tr>
-    	<th>{t}volume:{/t}</th>
-        <td><input class="small" type="text" name="volume" value="{$reference.volume}" /></td>
+    	<th>{t}pagina(s):{/t}</th>
+        <td><input class="small" type="text" name="pages" value="{$reference.pages}" /></td>
 	</tr>
 	<tr>
     	<th>{t}link:{/t}</th>

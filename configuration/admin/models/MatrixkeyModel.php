@@ -215,28 +215,60 @@ class MatrixKeyModel extends AbstractModel
 	{
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id=isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
 
-		if ( is_null($project_id) || is_null($matrix_id) )
+		if ( is_null($project_id) || is_null($matrix_id) || is_null($language_id) )
 			return;
 
 		$query="
 			select
-				_a.characteristic_id, _a.show_order, _c.id as characteristic_chargroup_id 
+				_a.characteristic_id, 
+				_a.show_order, 
+				_d.id as characteristic_chargroup_id ,
+				_b.sys_name,
+				ifnull(_c.label,_b.sys_name) as label
 
 			from %PRE%characteristics_matrices _a
 
-			left join %PRE%characteristics_chargroups _c
-				on _c.characteristic_id = _a.characteristic_id
-				and _c.project_id = _a.project_id
+			left join %PRE%characteristics_chargroups _d
+				on _d.characteristic_id = _a.characteristic_id
+				and _d.project_id = _a.project_id
+
+			left join %PRE%characteristics _b
+				on _a.project_id=_b.project_id
+				and _a.characteristic_id=_b.id
+
+			left join %PRE%characteristics_labels _c
+				on _b.project_id=_c.project_id
+				and _b.id=_c.characteristic_id
+				and _c.language_id=" . $language_id . "
 
 			where
 				_a.matrix_id =" . $matrix_id . "
 				and _a.project_id =" . $project_id . "
-
-			and _c.id is null
+				and _d.id is null
 		";
 		
-		return $this->freeQuery(array('query'=>$query,'fieldAsIndex' => 'characteristic_id'));
+		$d=$this->freeQuery(array('query'=>$query,'fieldAsIndex' => 'characteristic_id'));
+		
+		if ($d)
+		{
+			foreach((array)$d as $key=>$val)
+			{
+				if (strpos($val['label'],'|')!==false)
+				{
+					$d = explode('|',$label);
+					$d[$key]['short_label']=$d[0];
+				}
+				else
+				{
+					$d[$key]['short_label']=$val['label'];
+				}
+			}
+			
+			return $d;
+		}		
+		
 	}
 
 	public function deleteObsoleteCharacters( $params )
@@ -269,7 +301,8 @@ class MatrixKeyModel extends AbstractModel
 				_b.id,
 				_b.type,
 				_b.sys_name,
-				ifnull(_c.label,_b.sys_name) as label
+				ifnull(_c.label,_b.sys_name) as label,
+				_a.show_order
 
 			from %PRE%characteristics_matrices _a
 			
@@ -392,4 +425,68 @@ class MatrixKeyModel extends AbstractModel
 			return  !is_null($id) ? $d[0] : $d;
 		}
     }
+
+    public function getCharacters( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+		$id = isset($params['id']) ? $params['id'] : null;
+		$not_id = isset($params['not_id']) ? $params['not_id'] : null;
+
+		if ( is_null($project_id) || is_null($language_id) )
+			return;
+
+		$query ="
+			select
+				_b.id,
+				_b.type,
+				_b.sys_name,
+				ifnull(_c.label,_b.sys_name) as label
+
+			from %PRE%characteristics _b
+
+			left join %PRE%characteristics_labels _c
+				on _b.project_id=_c.project_id
+				and _b.id=_c.characteristic_id
+				and _c.language_id=" . $language_id . "
+
+			where 
+				_b.project_id = ". $project_id ."
+				" . ( !is_null($id) ? "and _b.id = " . $id : "" ) ."
+				" . ( !is_null($not_id) ? "and _b.id not in (" . implode(",",$not_id)  .")" : "" ) ."
+			";
+
+		$d=$this->freeQuery( $query );
+
+		if ($d)
+		{
+			foreach((array)$d as $key=>$val)
+			{
+				$query ="
+					select
+						*
+					from
+						%PRE%characteristics_labels
+					where
+						project_id = ". $project_id ."
+						and characteristic_id = " . $val['id'] . "
+					";
+
+				$d[$key]['labels']=$this->freeQuery( ["query"=>$query,"fieldAsIndex"=>"language_id"] );
+
+				if (strpos($val['label'],'|')!==false)
+				{
+					$d = explode('|',$label);
+					$d[$key]['short_label']=$d[0];
+				}
+				else
+				{
+					$d[$key]['short_label']=$val['label'];
+				}
+			}
+			
+			return  !is_null($id) ? $d[0] : $d;
+		}
+    }
+
 }
