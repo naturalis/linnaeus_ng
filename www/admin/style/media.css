@@ -85,3 +85,6 @@ ul#file-list {
 	margin: 20px 0;
 	border-bottom: 1px dotted #ccc;
 }
+input.link {
+	width: 170px;
+}
