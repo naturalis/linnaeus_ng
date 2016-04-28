@@ -7,15 +7,15 @@
 <div id="categories">
 	<ul>
 		<li>
-			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasSpecies==1}" href="?type=lower"{else} category-no-content"{/if}>
+			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
 			{t}Species and lower taxa{/t}</a>
 		</li>
 		<li>
-			<a class="category{if $type=='higher'}-active{/if}{if $hasHigherTaxa==1}" href="?type=higher"{else} category-no-content"{/if}>
+			<a class="category{if $type=='higher'}-active{/if}{if $hasHigherTaxa==1}" href="higher.php"{else} category-no-content"{/if}>
 			{t}Higher taxa{/t}</a>
 		</li>
 		<li>
-			<a class="category{if $type=='common'}-active{/if} category-last{if $hasCommonNames==1}" href="?type=common"{else} category-no-content"{/if}>
+			<a class="category{if $type=='common'}-active{/if} category-last{if $hasCommonNames==1}" href="common.php"{else} category-no-content"{/if}>
 			{t}Common names{/t}</a>
 		</li>
 	</ul>
@@ -35,8 +35,6 @@
 	</div>
 	{/if}
 </div>
-
-{include file="../shared/_search-main.tpl"}
 
 <div id="alphabet" class="test">
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />

@@ -82,16 +82,19 @@ class GlossaryController extends Controller
      */
     public function indexAction()
     {
-		if (!$this->rHasId())
+		if ( !$this->rHasId() )
 		{
-			$d=$this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->rGetVal('letter') : null);
-			$id=(isset($d['id']) ? $d['id'] : null);
+			$this->redirect( 'contents.php' );
+			//$d=$this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->rGetVal('letter') : null);
+			//$id=(isset($d['id']) ? $d['id'] : null);
 		}
 		else
 		{
-			$id = $this->rGetId();
+			$this->redirect( 'term.php?id=' . $this->rGetId() );
+			//$id = $this->rGetId();
 		}
-
+		
+		/*
 		if ($id)
 		{
 			$this->setStoreHistory(false);
@@ -99,7 +102,7 @@ class GlossaryController extends Controller
 		}
 
         $this->printPage();
-
+		*/
     }
 
     public function termAction()

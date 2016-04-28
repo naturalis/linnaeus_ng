@@ -1,9 +1,13 @@
 {include file="../shared/header.tpl"}
-{include file="_search-main-no-tabs.tpl"}
 
 <div id="page-main">
     {include file="_taxa.tpl"}
 	<div id="step">
+
+    <p id="header-titles-small">
+    	<span id="header-title">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
+    </p>
+  
 		<div id="question">
 
         {if $step.image}

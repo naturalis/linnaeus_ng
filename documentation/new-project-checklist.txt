@@ -65,6 +65,39 @@ connect through SSH and:
 -- media
 * ResourceSpace
 
--- settings
-* lots of things...
+== settings
+-- General
+* start_page	/linnaeus_ng/app/views/introduction/topic.php?id=8 (take actual first page from introduction!)
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

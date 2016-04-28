@@ -1,10 +1,14 @@
 {* linnaeus 2 Picture key; l2 Text key is handled in index.tpl! *}	
 
 {include file="../shared/header.tpl"}
-{include file="_search-main-no-tabs.tpl"}
 <div id="page-main">
 {include file="_taxa.tpl"}
 	<div id="step">
+
+    <p id="header-titles-small">
+    	<span id="header-title">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
+    </p>
+
 		<div id="img-choices">		
 	{foreach $choices v k}
 	{if $v.choice_img}

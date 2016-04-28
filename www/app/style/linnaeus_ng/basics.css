@@ -2509,7 +2509,8 @@ body {
   width: 20.83333%;
   padding-left: 2.08333%;
   margin-right: 2.08333%;
-  padding-top: 4em; }
+  padding-bottom: 2em;
+  padding-top: 2em; }
   @media screen and (max-width: 799px) {
     #main-menu {
       margin-top: 10px;
@@ -2600,8 +2601,7 @@ body {
       margin-top: 0.75em; } }
 
 #search {
-  max-width: 80%;
-  margin-top: 1.5em; }
+  max-width: 80%; }
   @media screen and (max-width: 799px) {
     #search {
       padding: 5px; } }
@@ -2725,3 +2725,7 @@ body {
 #buttons input[value="Search >>"] {
   background-color: #009ee0 !important; }
 
+.system-warning {
+	font-size:0.9em;
+	color:red;
+}

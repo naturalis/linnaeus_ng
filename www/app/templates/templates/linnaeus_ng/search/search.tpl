@@ -1,11 +1,13 @@
 {include file="../shared/header.tpl"}
-{include file="_search-main-no-tabs.tpl"}
 
 <div id="page-main">
 
 {if $results}
 
 	<div id="search-header">
+
+	 	<p id="header-titles-small">{t}Search results{/t}</p>
+
 		<div id="results-string">
 		{if $results.count==0}
 			{t _s1=$search.search|replace:'"':''}Your search for "%s" produced no results.{/t}

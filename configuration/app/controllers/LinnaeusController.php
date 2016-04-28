@@ -65,6 +65,11 @@ class LinnaeusController extends Controller
 		$this->printPage();
     }
 
+    public function homeAction()
+    {
+		$this->redirectProjectUrl();
+    }
+
     public function indexAction()
     {
 		$this->printPage();

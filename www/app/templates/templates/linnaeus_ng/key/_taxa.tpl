@@ -1,4 +1,5 @@
 <div id="panel">
+	<br /><br />
 	<div id="categories">
 	<ul>
 		<li><a id="rLi" href="javascript:showRemaining();" class="category-first{if $taxaState=='remaining' || $excluded|@count==0} category-active{/if}">{t}Remaining{/t}</a></li>

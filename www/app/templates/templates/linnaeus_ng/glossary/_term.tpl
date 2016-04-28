@@ -1,7 +1,11 @@
-{include file="_search-main-no-tabs.tpl"}
+ <div id="page-main">
 
-<div id="page-main">
+     <p id="header-titles-small">
+	    <span id="mini-header-title">{$term.term}</span>
+    </p>
+
 	{include file="_alphabet.tpl"}
+
 	<div id="definition">
 		{$term.definition}
 		{if $term.synonyms}
@@ -10,7 +14,6 @@
 	     </p>
 	     {/if}
 	</div>
-
 
 	{if $term.media}
 		<div id="media">

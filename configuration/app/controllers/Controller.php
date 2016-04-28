@@ -1489,7 +1489,7 @@ class Controller extends BaseClass
 			$p['ignore'] = $params['ignore'];
 
 		$modules = $this->models->ModulesProjects->_get($p);
-
+		
 		foreach ((array) $modules as $key => $val) {
 
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
@@ -1594,10 +1594,6 @@ class Controller extends BaseClass
         }
 
         $u['projectSnippets'] =  $_SESSION['app']['system']['urls']['snippets'] . $pCode . '/';
-
-
-        // home
-        $u['projectHome'] = $this->baseUrl . $this->getAppName() . '/views/' . $this->generalSettings['defaultController'] . '/';
 
         $_SESSION['app']['project'][$this->spid()]['urls'] = $u;
     }

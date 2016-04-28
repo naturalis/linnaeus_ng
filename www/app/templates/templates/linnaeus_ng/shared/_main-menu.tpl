@@ -1,6 +1,20 @@
 <div id="main-menu">
 <ul>
-<li><a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/">{t}Home{/t}</a></li>
+<li>
+
+<input
+    type="search"
+    name="search"
+    id="search"
+    class="search-box"
+	placeholder="{t}Search...{/t}"
+    value="{if $search.search}{$search.search}{/if}"
+	onkeyup="if (event.keyCode==13) { doSearch(); }"
+	required
+/>
+<img onclick="doSearch()" src="{$projectUrls.systemMedia}search.gif" class="search-icon" />
+
+<a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/home.php">{t}Home{/t}</a></li>
 {assign var=first value=true}
 {foreach $menu v k}
     {if $v.type=='regular' && $v.show_in_public_menu==1}
@@ -16,7 +30,6 @@
         {assign var=first value=false}
     {/if}
 {/foreach}
-	<li><a href="../search/search.php">{t}Advanced search{/t}</a></li>
 </ul>
 
 

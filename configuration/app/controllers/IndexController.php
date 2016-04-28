@@ -68,7 +68,6 @@ class IndexController extends Controller
 
 		$alphaNav['next']=($alphaNav['next']==$letter?null:$alphaNav['next']);
 
-
         $this->setPageName($this->translate('Index: '.($type=='higher' ? 'Higher taxa' : ($type=='common' ? 'Common names' : 'Species and lower taxa'))));
 
 		if ($type=='common')
@@ -83,7 +82,6 @@ class IndexController extends Controller
 		$this->smarty->assign('alpha',$alpha);
 		$this->smarty->assign('letter',$letter);
 		$this->smarty->assign('list',$this->getList($type,$letter,$language));
-
 		$this->smarty->assign('hasSpecies', $this->moduleSession->getModuleSetting('hasSpecies'));
 		$this->smarty->assign('hasHigherTaxa', $this->moduleSession->getModuleSetting('hasHigherTaxa'));
 		$this->smarty->assign('hasCommonNames', $this->moduleSession->getModuleSetting('hasCommonNames'));
@@ -128,7 +126,6 @@ class IndexController extends Controller
     {
 		if ($type=='common')
 		{
-
 		    $alpha = $this->models->IndexModel->getCommonNamesAlphabet(array(
                 'projectId' => $this->getCurrentProjectId(),
 		        'languageId' => $language
