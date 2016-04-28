@@ -26,11 +26,11 @@
     {if $media.total > 0}
 	    <ul class="{$session.admin.user.media.display}">
 	    <li class="header">
-	    	<div class="list-grid-info bold">file name</div>
+	    	<div class="list-grid-info bold">{t}file name{/t}</div>
 	    	<div class="list-info">
-	 			<span class="column bold">title</span>
-	 			<span class="column bold">modified</span>
-	 			<span class="column bold">dimension</span>
+	 			<span class="column bold">{t}title{/t}</span>
+	 			<span class="column bold">{t}modified{/t}</span>
+	 			<span class="column bold">{t}link (click & copy){/t}</span>
 	 		</div>
 	 	</li>
 		{foreach from=$media.files item=v}
@@ -50,7 +50,7 @@
 	 		<div class="list-info">
 	 			<span class="column">{$v.title}</span>
 	 			<span class="column">{$v.modified}</span>
-	 			<span class="column">{$v.width} x {$v.height} px</span>
+	 			<span class="column"><input type="text" class="link" value="{$v.source}"></span>
 	 		</div>
 	 	</li>
 	 	</label>
@@ -108,6 +108,10 @@ $(document).ready(function() {
 
 	$('input:submit#attach').on('click',function() {
 		$('input[name=action]').val('attach');
+	});
+
+	$('input:text.link').focus().click(function(){
+		$(this).select();
 	});
 });
 </script>
