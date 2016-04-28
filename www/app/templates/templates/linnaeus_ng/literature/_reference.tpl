@@ -1,11 +1,13 @@
-{include file="_search-main-no-tabs.tpl"}
-
 <div id="page-main" class="template-reference">
 
 	{include file="_alphabet.tpl"}
 
 
 	<div id="content">
+
+    <p id="header-titles-small">
+    	<span id="mini-header-title">{$ref.author_full}, {$ref.year_full}</span>
+    </p>
 
 		<div id="reference">
 			<div id="text">{$ref.text}</div>

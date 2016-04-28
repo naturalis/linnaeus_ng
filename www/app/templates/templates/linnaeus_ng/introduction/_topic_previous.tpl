@@ -1,4 +1,3 @@
-{include file="../shared/_search-main-no-tabs.tpl"}
 <div id="page-main">
 	<div id="content" class="proze">
 		{if $page.image.file_name}
