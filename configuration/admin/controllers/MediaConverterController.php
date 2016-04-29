@@ -14,6 +14,7 @@ class MediaConverterController extends MediaController
     private $projectModules;
     private $totals = array();
     private $media = array();
+    private $uploadInternalMedia = array();
 
     private $_currentModule;
     private $_currentModuleId;
@@ -27,6 +28,8 @@ class MediaConverterController extends MediaController
     private $_maxFileSize;
     private $_filePath;
     private $_error;
+    private $_cli = false;
+    private $_br = '<br>';
 
     public $usedModels = array(
         'media',
@@ -76,8 +79,10 @@ class MediaConverterController extends MediaController
         $this->printPage();
     }
 
-    public function printConversionProgressAction ()
+    public function printConversionProgressAction ($cli = false)
     {
+        if ($cli) $this->setCli();
+
         $this->setProjectMedia();
 
         foreach ($this->media['modules'] as $name => $module) {
@@ -86,7 +91,8 @@ class MediaConverterController extends MediaController
                 'name' => $name,
                 'id' => $module['id']
             ));
-            echo "<p><strong>$name</strong><br>";
+
+            echo $this->_cli ? "\n$name\n" : "<p><strong>$name</strong><br>";
 
             foreach ($module['media'] as $row) {
 
@@ -98,12 +104,12 @@ class MediaConverterController extends MediaController
 
                     // Item has already been converted
                     if ($this->itemHasBeenConverted()) {
-                        echo "Already converted: $this->_currentFileName<br>";
+                        echo "Already converted: $this->_currentFileName $this->_br";
 
                     // File has been converted but not yet attached to item
                     } else {
                         $this->attachFile();
-                        echo "Attached: $this->_currentFileName<br>";
+                        echo "Attached: $this->_currentFileName $this->_br";
                     }
 
                 // Upload file
@@ -113,20 +119,124 @@ class MediaConverterController extends MediaController
 
                     // Oops
                     if (!empty($this->_error)) {
-                        echo '<span class="error">ERROR</span>: ' . $this->_error . '<br>';
+                        echo 'ERROR: ' . $this->_error .  $this->_br;
 
                     // Success!
                     } else {
-                        echo "Uploaded: $this->_currentFileName<br>";
+                        echo "Uploaded: $this->_currentFileName $this->_br";
                     }
                 }
             }
 
-            echo '</p>';
+            echo $this->_cli ? "\n\nConverting internal media links\n" :
+                '</p><p><b>Converting internal media links</b><br>';
+
+            $this->convertInternalMediaLinks();
         }
     }
 
+    private function convertInternalMediaLinks ()
+    {
+        $modules = array(
+            'Taxon editor' => array(
+                'column' => 'content',
+                'table' => 'content_taxa'
+            ),
+            'Dichotomous key' => array(
+                'column' => 'content',
+                'table' => 'content_keysteps'
+            ),
+            'Introduction' => array(
+                'column' => 'content',
+                'table' => 'content_introduction'
+            ),
+            'Free modules' => array(
+                'column' => 'content',
+                'table' => 'content_free_modules'
+            ),
+            'Glossary' => array(
+                'column' => 'definition',
+                'table' => 'glossary'
+            )
+        );
 
+        foreach ($modules as $name => $module) {
+
+            echo 'Updating links in ' . $name . '...' . $this->_br;
+
+            $data = $this->getInternalMediaLinks(array(
+                'column' => $module['column'],
+                'table' => $module['table']
+            ));
+
+            $this->updateInternalMediaLinks(array(
+                'column' => $module['column'],
+                'table' => $module['table'],
+                'data' => $data
+            ));
+        }
+    }
+
+    private function updateInternalMediaLinks ($p)
+    {
+        $column = isset($p['column']) ? $p['column'] : false;
+        $table = isset($p['table']) ? $p['table'] : false;
+        $data = isset($p['data']) ? $p['data'] : false;
+
+        if (!$column || !$table || empty($data)) return false;
+
+        $regExp = '/(..\/..\/..\/shared\/media\/project\/' .
+            str_pad($this->getCurrentProjectId(), 4, "0", STR_PAD_LEFT) .
+            '\/)((.*?)\.jpg)/i';
+
+        foreach ($data as $row) {
+
+            $this->resetProperties();
+
+            $newContent = $row['content'];
+            preg_match_all($regExp, $row['content'], $matches, PREG_SET_ORDER);
+
+            foreach ($matches as $match) {
+
+                $newFile = $this->getRsFile($match[2]);
+
+                // File exists; replace path
+                if (!empty($newFile)) {
+                    $newContent = str_replace($match[0], $newFile, $newContent);
+
+                // File still has to be uploaded (should be exceptional!)
+                } else {
+
+                    $this->setCurrentFileName($match[2]);
+                    $this->setFiles();
+
+                    if (empty($this->_error) &&
+                        !empty($this->_result->resource->files[0]->src)) {
+
+                        $this->uploadFiles();
+                        $newContent = str_replace($match[0],
+                            $this->_result->resource->files[0]->src, $newContent);
+
+                        echo "Uploaded: $this->_currentFileName $this->_br";
+
+                    } else {
+
+                        echo "ERROR: could not upload $this->_currentFileName (" .
+                            $this->_error . ')' . $this->_br;
+
+                    }
+                }
+            }
+
+            $this->models->MediaModel->updateInternalMediaLinks(array(
+                'id' => $row['id'],
+                'content' => $newContent,
+                'table' => $table,
+                'column' => $column
+            ));
+
+        }
+    }
 
     private function setMaxFileSize ()
     {
@@ -141,6 +251,12 @@ class MediaConverterController extends MediaController
     private function setFilePath ()
     {
         $this->_filePath = $this->getProjectsMediaStorageDir();
+    }
+
+    private function setCli ()
+    {
+        $this->_cli = true;
+        $this->_br = "\n";
     }
 
     private function setProjectMedia ()
@@ -227,11 +343,11 @@ class MediaConverterController extends MediaController
             $media = $this->models->MediaModel->getConverterTaxonMedia(
                 array('project_id' => $this->getCurrentProjectId()
             ));
-            $this->media['modules']['Taxon Editor'] = array(
+            $this->media['modules']['Taxon editor'] = array(
                 'id' => $moduleId,
                 'media' => $media
             );
-            $this->totals['modules']['Taxon Editor'] = count($media);
+            $this->totals['modules']['Taxon editor'] = count($media);
         }
 
         // Free module(s)
@@ -256,6 +372,34 @@ class MediaConverterController extends MediaController
         $this->totals['total'] = array_sum($this->totals['modules']);
 
         return $this->totals;
+    }
+
+    private function getInternalMediaLinks ($p)
+    {
+        $column = isset($p['column']) ? $p['column'] : false;
+        $table = isset($p['table']) ? $p['table'] : false;
+
+        if (!$column || !$table) return false;
+
+        return $this->models->MediaModel->getInternalMediaLinks(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'table' => $table,
+            'column' => $column
+        ));
+
+    }
+
+    private function getRsFile ($file)
+    {
+        $d = $this->models->Media->_get(array(
+            'columns' => 'rs_original',
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(),
+                'name' => $file
+             )
+        ));
+
+        return isset($d[0]) ? $d[0]['rs_original'] : null;
     }
 
 
@@ -317,6 +461,11 @@ class MediaConverterController extends MediaController
         $this->_originalFileName = $row['original_name'];
         $this->_currentItemId = $row['item_id'];
         $this->_originalMediaId = isset($row['media_id']) ? $row['media_id'] : false;
+    }
+
+    private function setCurrentFileName ($name)
+    {
+        $this->_currentFileName = $name;
     }
 
     private function resetProperties ()

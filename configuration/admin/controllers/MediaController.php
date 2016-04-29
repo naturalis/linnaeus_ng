@@ -1108,7 +1108,7 @@ class MediaController extends Controller
     }
 
 
-    private function upload ($p)
+    protected function upload ($p)
     {
         // File should contain path, mime type and name
         $file = isset($p['file']) ? $p['file'] : false;
