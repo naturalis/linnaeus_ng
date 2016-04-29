@@ -595,7 +595,8 @@ class MediaController extends Controller
             ));
 
             // Store data
-            if (!empty($this->_result) && empty($this->_result->error)) {
+            if (!empty($this->_result) && empty($this->_result->error) &&
+                is_object($this->_result)) {
 
                 // Store core data
                 $media = $this->_result->resource;
@@ -649,8 +650,11 @@ class MediaController extends Controller
                     (<a target="_blank" href="edit.php?id=' . $this->mediaId . '">edit</a>)');
 
             } else {
-                $this->addError(_('Could not upload media') .
-                (isset($this->_result->error) ? ': ' . $this->_result->error : ''));
+
+                $error = isset($this->_result->error) ?
+                    $this->_result->error : $this->_result;
+
+                $this->addError(_('Could not upload media') . $error);
             }
         }
     }
