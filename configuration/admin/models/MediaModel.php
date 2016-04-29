@@ -284,7 +284,6 @@ final class MediaModel extends AbstractModel
         return isset($d) ? $d : null;
     }
 
-
     public function getConvertedMediaCount ($p)
     {
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
@@ -357,9 +356,48 @@ final class MediaModel extends AbstractModel
         $d = $this->freeQuery($query);
 
         return isset($d) ? $d[0]['media_id'] : false;
-
     }
 
+    public function getInternalMediaLinks ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $this->escapeString($p['project_id']) : false;
+        $table = isset($p['table']) && !empty($p['table']) ?
+            $this->escapeString($p['table']) : false;
+        $column = isset($p['column']) && !empty($p['column']) ?
+            $this->escapeString($p['column']) : false;
+
+        if (!$projectId || !$table || !$column) return false;
+
+        $query = "
+            select
+            	`id`, `" . $column . "` as content
+            from
+            	%PRE%" . $table . "
+            where
+            	$column REGEXP '../../../shared/media/project/" .
+            	   str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/(.*).jpg'";
+
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d : false;
+    }
+
+    public function updateInternalMediaLinks ($p)
+    {
+        $id = isset($p['id']) && !empty($p['id']) ?
+            $this->escapeString($p['id']) : false;
+        $content = isset($p['content']) && !empty($p['content']) ?
+            $this->escapeString($p['content']) : false;
+        $table = isset($p['table']) && !empty($p['table']) ?
+            $this->escapeString($p['table']) : false;
+        $column = isset($p['column']) && !empty($p['column']) ?
+            $this->escapeString($p['column']) : false;
+
+        $query = "update $table set $column = '$content' where id = $id";
+
+        return $this->freeQuery($query);
+    }
 }
 
 ?>
