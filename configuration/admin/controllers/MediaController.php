@@ -654,7 +654,7 @@ class MediaController extends Controller
                 $error = isset($this->_result->error) ?
                     $this->_result->error : $this->_result;
 
-                $this->addError(_('Could not upload media') . $error);
+                $this->addError(_('Could not upload media') . ': ' . $error);
             }
         }
     }
