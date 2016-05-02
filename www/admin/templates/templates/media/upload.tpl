@@ -12,6 +12,6 @@
 
 {include file="../shared/admin-messages.tpl"}
 
-{include file="../shared/upload-media.tpl"}
+{include file="upload-media.tpl"}
 
 {include file="../shared/admin-footer.tpl"}

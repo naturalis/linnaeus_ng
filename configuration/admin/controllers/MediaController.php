@@ -414,6 +414,17 @@ class MediaController extends Controller
         $this->printPage();
     }
 
+    public function mediaOverlayAction ()
+    {
+        $this->checkAuthorisation();
+
+		$this->setPageName($this->translate('Browse media'));
+
+        $this->smarty->assign('media', $this->getMediaFiles());
+
+        $this->printPage();
+    }
+
     public function searchAction ()
     {
         $this->checkAuthorisation();

@@ -2,7 +2,7 @@
 
 {include file="../shared/admin-messages.tpl"}
 
-{include file="../shared/search-media.tpl"}
+{include file="search-media.tpl"}
 
 {include file="../shared/select-media.tpl"}
 

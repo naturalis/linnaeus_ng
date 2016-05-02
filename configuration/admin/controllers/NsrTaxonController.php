@@ -277,7 +277,7 @@ class NsrTaxonController extends NsrController
 			$name=$this->getName(array('id'=>$this->getNameId()));
 			$this->UserRights->setItemId( $name['taxon_id'] );
 		}
-		
+
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
@@ -544,9 +544,9 @@ class NsrTaxonController extends NsrController
 		}
 
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
-		
+
 		$return=null;
-		
+
 		if ( $this->getAuthorisationState()==false ) return;
 
 		if (
@@ -636,7 +636,7 @@ class NsrTaxonController extends NsrController
 			'type_id'=>$type_id,
 			'name_id'=>$id
 		));
-		
+
 		if ( isset($name['id']) )
 		{
 			$name['addition']=$this->getNameAddition(array('name_id'=>$name['id']));
@@ -886,7 +886,7 @@ class NsrTaxonController extends NsrController
 			{
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'');
 			}
-			
+
 		}
 
 		return $taxa;
@@ -994,11 +994,11 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		if (
-			$child_base_rank>SPECIES_RANK_ID && 
-				$child_base_rank!=NOTHOGENUS_RANK_ID && 
-				$child_base_rank!=NOTHOSPECIES_RANK_ID && 
-				$child_base_rank!=NOTHOSUBSPECIES_RANK_ID && 
-				$child_base_rank!=NOTHOVARIETAS_RANK_ID && 
+			$child_base_rank>SPECIES_RANK_ID &&
+				$child_base_rank!=NOTHOGENUS_RANK_ID &&
+				$child_base_rank!=NOTHOSPECIES_RANK_ID &&
+				$child_base_rank!=NOTHOSUBSPECIES_RANK_ID &&
+				$child_base_rank!=NOTHOVARIETAS_RANK_ID &&
 			$parent_base_rank!=SPECIES_RANK_ID)
 		{
 			/*
