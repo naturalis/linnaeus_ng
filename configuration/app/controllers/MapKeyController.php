@@ -53,12 +53,9 @@ class MapKeyController extends Controller
      */
     public function __construct($p=null)
     {
-		
-		die( 'to be replaced' );
-
         parent::__construct($p);
 
-		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
+		//$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
 		$this->_mapType = $this->getDistributionMapType();
 
@@ -67,7 +64,6 @@ class MapKeyController extends Controller
 		$this->smarty->assign('mapType',$this->getSetting('maptype'));
 
 		$this->initTaxaWithOcc();
-
     }
 
     /**
@@ -1215,7 +1211,7 @@ class MapKeyController extends Controller
 	private function getDistributionMapType()
 	{
 
-		return $this->getSetting('maptype');
+		return $this->getSetting('maptype','l2');
 
 	}
 
@@ -1540,12 +1536,12 @@ class MapKeyController extends Controller
 			{
 				$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
 
-				if ($l2MaxMapWidth > 0 &&
-						$m[$key]['size'][0] > $l2MaxMapWidth) {
+				if ($this->l2MaxMapWidth > 0 &&
+						$m[$key]['size'][0] > $this->l2MaxMapWidth) {
 
-					$tmpHeight = $m[$key]['size'][1]*($l2MaxMapWidth/$m[$key]['size'][0]);
+					$tmpHeight = $m[$key]['size'][1]*($this->l2MaxMapWidth/$m[$key]['size'][0]);
 
-					$m[$key]['cellWidth'] = (floor($l2MaxMapWidth/$val['cols']))-1;
+					$m[$key]['cellWidth'] = (floor($this->l2MaxMapWidth/$val['cols']))-1;
 					$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
 
 					// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
