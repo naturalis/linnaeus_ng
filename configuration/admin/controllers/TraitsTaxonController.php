@@ -416,6 +416,7 @@ class TraitsTaxonController extends TraitsController
 		$this->models->TraitsTaxonReferences->delete(array(
 			'project_id'=>$this->getCurrentProjectId(),
 			'taxon_id'=>$taxon,
+			'trait_group_id'=>$group,
 			'id not in #'=>'('.implode(',',$keep).')'
 		));
 		
