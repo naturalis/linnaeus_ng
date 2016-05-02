@@ -11,6 +11,9 @@
 		<tr><td><a href="search.php">Search an area on the map</a></td></tr>
 	</table>
 {/if}
+
+{include file="_phased-out.tpl"}
+
 </div>
 
 {include file="../shared/footer.tpl"}

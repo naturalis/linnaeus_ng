@@ -88,6 +88,8 @@
 
 	</div>
 
+	{include file="_phased-out.tpl"}
+
 </div>
 
 {literal}
