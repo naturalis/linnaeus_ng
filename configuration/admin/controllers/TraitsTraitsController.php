@@ -631,6 +631,7 @@ class TraitsTraitsController extends TraitsController
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		$values=isset($p['values']) ? $p['values'] : null;
 		$valuelabels=isset($p['valuelabels']) ? $p['valuelabels'] : null;
+		$sortable=isset($p['sortable']) ? $p['sortable'] : null;
 
 		if (empty($trait))
 		{
@@ -656,10 +657,10 @@ class TraitsTraitsController extends TraitsController
 		{
 
 			$index=array();
-			$showorder=0;
+			//$showorder=0;
 			foreach((array)$values as $key=>$val)
 			{
-				$base['show_order']=$showorder++;
+				//$base['show_order']=$showorder++;
 				$base['string_value']=trim($val);
 				
 				if ($key>=0)
@@ -717,7 +718,7 @@ class TraitsTraitsController extends TraitsController
 				}
 			}
 
-			$this->addMessage(sprintf($this->translate('%s values saved'),$showorder));
+			$this->addMessage( ($this->translate('Values saved' ) ) );
 		}
 		else
 		if (
@@ -808,7 +809,18 @@ class TraitsTraitsController extends TraitsController
 
 		}
 
+		if ( !is_null($sortable) )
+		{
+			foreach((array)$sortable as $key=>$val)
+			{
+				$this->models->TraitsValues->update(
+					[ 'show_order'=>$key ],
+					[ 'project_id'=>$this->getCurrentProjectId(),'id'=>$val, 'trait_id'=>$trait['id'] ]
+				);
+			}
 
+			$this->addMessage( $this->translate('Saved show order.') );
+		}
 	}
 
 	private function verifyDate($date,$format)

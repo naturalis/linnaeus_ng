@@ -231,7 +231,7 @@ function updateValueList()
 		}
 
 		b.push(
-			'<li data-id="'+i+'">'+
+			'<li id="sortable'+val.id+'" data-id="'+i+'">'+
 			val.value+' \
 			<a href="#" class="edit" onclick="if(!verifyTraitValueRemoval('+val.usage_count+'))return;removeTraitValue('+i+');updateValueList();updateValueCount();return false;">'+
 			_('remove')+
@@ -326,7 +326,12 @@ function saveValues()
 			}
 		}
 	}
-	
+
+	$( "li[id^=sortable]").each(function( index )
+	{
+		form.append('<input type="hidden" name="sortable[]" value="'+$(this).attr('id').replace('sortable','')+'" />');
+	});
+
 	form.submit();
 }
 
