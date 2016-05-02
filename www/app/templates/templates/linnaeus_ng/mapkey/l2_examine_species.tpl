@@ -6,7 +6,6 @@
     </span>
 </div>
 {include file="_categories.tpl"}
-{include file="../shared/_search-main.tpl"}
 
 {assign var=map value=$maps[$mapId]}
 
