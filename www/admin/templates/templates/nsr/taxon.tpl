@@ -218,11 +218,11 @@
         <a href="taxon_edit_concept_direct.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}naam taxon concept direct aanpassen{/t}</a>
     
         {assign var=k value=0}
-        {foreach $traitgroups v}{if $v.taxon_count==0}
+        {foreach $traitgroups v}
         {if $k==0}<br /><br /><span class="small">{t}kenmerken toevoegen:{/t}</span><br />{/if}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {assign var=k value=$k+1}
-        {/if}{/foreach}
+		{/foreach}
     
     </p>
 
