@@ -39,6 +39,10 @@
 
 
 {/if}
+
+{include file="_phased-out.tpl"}
+
+
 </div>
 
 {include file="../shared/footer.tpl"}

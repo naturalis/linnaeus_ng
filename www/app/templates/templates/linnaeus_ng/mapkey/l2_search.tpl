@@ -95,6 +95,9 @@
 
 </table>
 </form>
+
+{include file="_phased-out.tpl"}
+
 </div>
 
 {/if}

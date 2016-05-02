@@ -42,6 +42,9 @@
 		</div><!-- /#map_options -->
 
 	</div><!-- /#map-canvas -->
+    
+    {include file="_phased-out.tpl"}
+
 
 {literal}
 <script type="text/JavaScript">
