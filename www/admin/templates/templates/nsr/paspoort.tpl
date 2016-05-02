@@ -10,6 +10,8 @@
 <h2><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h2>
 <h3>{t}passport{/t}</h3>
 
+<a id="media-overlay-link" href="#">Media overlay</a><br>
+
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;">{t}show all{/t}</a>
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;" style="display:none" href="">{t}hide all{/t}</a>
 
@@ -91,14 +93,30 @@ Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe pasp
 
 </div>
 
+<div id="media-overlay" style=""></div>
+
 <script>
 $(document).ready(function(e) {
 	{foreach from=$tabs item=v key=k}
 	currentpublish[{$k}]={if $v.publish==1}true{else}false{/if};
 	{/foreach}
-	
+
 	$('#page-block-messages').fadeOut(3000);
-	
+
+	{literal}
+	$('#media-overlay-link').click(function(e) {
+		e.preventDefault();
+		$.get("../media/media-overlay.php", function(r) {
+			prettyDialog({
+				content : r,
+				width: 1000,
+				height: 800,
+				title: _('Browse media')
+			});
+		});
+	});
+	{/literal}
+
 });
 </script>
 

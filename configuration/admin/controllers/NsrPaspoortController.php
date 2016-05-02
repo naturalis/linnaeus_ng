@@ -3,7 +3,7 @@
 /*
 	TAB_VERSPREIDING::$this->getPresenceData($taxon)
 	TAB_BEDREIGING_EN_BESCHERMING::EZ
-	CTAB_LITERATURE			
+	CTAB_LITERATURE
 	CTAB_MEDIA
 	CTAB_DNA_BARCODES
 */
@@ -24,7 +24,8 @@ class NsrPaspoortController extends NsrController
     public $usedHelpers = array();
     public $cssToLoad = array(
         'lookup.css',
-		'nsr_taxon_beheer.css'
+		'nsr_taxon_beheer.css',
+        'media.css'
     );
     public $jsToLoad = array(
         'all' => array(
@@ -54,7 +55,7 @@ class NsrPaspoortController extends NsrController
 		{
 			$this->redirect('index.php');
 		}
-		
+
 		$this->UserRights->setItemId( $this->rGetId() );
 		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
@@ -64,8 +65,8 @@ class NsrPaspoortController extends NsrController
         $this->setPageName($this->translate('Edit taxon passport'));
 
 		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('tabs',$this->getPassportCategories());	
-		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));	
+		$this->smarty->assign('tabs',$this->getPassportCategories());
+		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));
 
 		$this->UserRights->setActionType( $this->UserRights->getActionPublish() );
 		$this->smarty->assign( 'can_publish', $this->getAuthorisationState() );
@@ -79,13 +80,13 @@ class NsrPaspoortController extends NsrController
 		{
 			$this->redirect('index.php');
 		}
-		
+
 		$this->UserRights->setItemId( $this->rGetId() );
 		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
 
 		$this->setTaxonId($this->rGetId());
-		
+
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->savePassportMeta($this->rGetAll());
@@ -98,8 +99,8 @@ class NsrPaspoortController extends NsrController
         $this->setPageName($this->translate('Edit taxon passport meta-data'));
 
 		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('tabs',$this->getPassportCategories());	
-		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));	
+		$this->smarty->assign('tabs',$this->getPassportCategories());
+		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));
 
 		$this->printPage();
 	}
@@ -121,10 +122,10 @@ class NsrPaspoortController extends NsrController
 			{
 				unset($p['publish']);
 			}
-			
+
 			$return=$this->savePassport( $p );
         }
-		
+
         $this->allowEditPageOverlay=false;
 
 		$this->smarty->assign('returnText',$return);
@@ -183,14 +184,14 @@ class NsrPaspoortController extends NsrController
 			'fieldAsIndex'=>'tabname',
 			'order'=>'start_order'
 		));
-		
+
 		$start=null;
 		$firstNonEmpty=null;
 
 		foreach((array)$categories as $key=>$val)
 		{
 			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 999999;
-			
+
 			if (is_null($firstNonEmpty) && empty($val['is_empty']))
 				$firstNonEmpty=$val['id'];
 
@@ -203,18 +204,18 @@ class NsrPaspoortController extends NsrController
 
 			// categories need to be configurable! REFAC2015
 			$categories[$key]['obsolete']=
-				( defined('TAB_ALGEMEEN') ? $val['id']==TAB_ALGEMEEN : false ) || 
-				( defined('TAB_BESCHERMING') ? $val['id']==TAB_BESCHERMING : false ) || 
-				( defined('TAB_DESCRIPTION') ? $val['id']==TAB_DESCRIPTION : false ) || 
-				( defined('TAB_HABITAT') ? $val['id']==TAB_HABITAT : false ) || 
-				( defined('TAB_GELIJKENDE_SOORTEN') ? $val['id']==TAB_GELIJKENDE_SOORTEN : false ) || 
+				( defined('TAB_ALGEMEEN') ? $val['id']==TAB_ALGEMEEN : false ) ||
+				( defined('TAB_BESCHERMING') ? $val['id']==TAB_BESCHERMING : false ) ||
+				( defined('TAB_DESCRIPTION') ? $val['id']==TAB_DESCRIPTION : false ) ||
+				( defined('TAB_HABITAT') ? $val['id']==TAB_HABITAT : false ) ||
+				( defined('TAB_GELIJKENDE_SOORTEN') ? $val['id']==TAB_GELIJKENDE_SOORTEN : false ) ||
 				( defined('TAB_VERPLAATSING') ? $val['id']==TAB_VERPLAATSING : false )
 			;
 
 			if ($val['content_id'])
 			{
 				$rdf=$this->Rdf->getRdfValues($val['content_id']);
-				
+
 				foreach((array)$rdf as $rVal)
 				{
 					if ($rVal['predicate']=='hasPublisher')
@@ -274,15 +275,15 @@ class NsrPaspoortController extends NsrController
 						'taxonlist'=>$this->getTaxonNextLevel($taxon)
 					);
                 break;
-            
+
             case CTAB_TAXON_LIST:
                 $content=$this->getTaxonNextLevel($taxon);
                 break;
-            
+
             case CTAB_LITERATURE:
                 $content=$this->getTaxonLiterature($taxon);
                 break;
-            
+
             case CTAB_DNA_BARCODES:
                 $content=$this->getDNABarcodes($taxon);
                 break;
@@ -290,14 +291,14 @@ class NsrPaspoortController extends NsrController
             default:
 
                 $d = array(
-                    'taxon_id' => $taxon, 
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->getDefaultProjectLanguage(), 
+                    'taxon_id' => $taxon,
+                    'project_id' => $this->getCurrentProjectId(),
+                    'language_id' => $this->getDefaultProjectLanguage(),
                     'page_id' => $category
                 );
 
                 $ct = $this->models->ContentTaxa->_get(array(
-                    'id' => $d, 
+                    'id' => $d,
                 ));
 
 				$content = isset($ct) ? $ct[0] : null;
@@ -330,7 +331,7 @@ class NsrPaspoortController extends NsrController
 		$page = isset($p['page']) ? $p['page'] : null;
 		$content = isset($p['content']) ? $p['content'] : null;
 		$publish = isset($p['publish']) && $p['publish']==1 ? '1' : '0';
-		
+
 		$concept=$this->getConcept($taxon);
 		$before=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
 
@@ -357,7 +358,7 @@ class NsrPaspoortController extends NsrController
 					'page_id'=>$page
 				)
 			));
-			
+
 			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
 
 			$r=$this->models->ContentTaxa->save(array(
@@ -369,13 +370,13 @@ class NsrPaspoortController extends NsrController
 				'content' => $content,
 				'publish' => $publish
 			));
-			
+
 			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
 
 			$this->logChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' from '.$concept['taxon']));
-			
+
 			return $r;
-			
+
 		}
 
 	}
@@ -397,7 +398,7 @@ class NsrPaspoortController extends NsrController
 
 			bestaande meta-gegevens van de geselecteerde tab(s) worden overschreven!
 		*/
-		
+
 		$categories=$this->getPassportCategories();
 		$shouldUpdate=array();
 
@@ -405,7 +406,7 @@ class NsrPaspoortController extends NsrController
 		{
 			if ($val['obsolete']==1 && strlen($val['content'])==0)
 				continue;
-				
+
 			if ($updatereach=="all-text")
 			{
 				// alle huidige tabbladen met tekst
@@ -429,17 +430,17 @@ class NsrPaspoortController extends NsrController
 			}
 
 		}
-		
+
 		foreach((array)$shouldUpdate as $val)
 		{
-			
+
 			$this->doDeletePassportMeta($val);
-		
+
 			$d=array(
 				'subject_type'=>'passport',
 				'subject_id'=>$val,
 			);
-			
+
 			foreach((array)$actors as $actor)
 			{
 				$d['predicate']='hasAuthor';
@@ -463,12 +464,12 @@ class NsrPaspoortController extends NsrController
 				$d['object_id']=$reference;
 				$this->Rdf->saveRdfValue($d);
 			}
-			
-			
+
+
 		}
 
 	}
-	
+
 	private function deletePassportMeta($p)
 	{
 		$tab=isset($p['tab']) ? $p['tab'] : null;
@@ -487,8 +488,8 @@ class NsrPaspoortController extends NsrController
 		{
 			$this->doDeletePassportMeta($tab);
 		}
-		
+
 	}
-		
+
 
 }
