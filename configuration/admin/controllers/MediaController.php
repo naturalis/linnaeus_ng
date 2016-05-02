@@ -158,25 +158,21 @@ class MediaController extends Controller
         parent::__destruct();
     }
 
-    private function initialize( $p )
+    private function initialize($p)
     {
         $this->moduleId = $this->rHasVal('module_id') ? $this->rGetVal('module_id') : -1;
         $this->itemId = $this->rHasVal('item_id') ? $this->rGetVal('item_id') : -1;
         $this->languageId = $this->rHasVar('language_id') ? $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
 
-		if ( isset($p['module_settings_reader']) )
-		{
-			$this->_moduleSettingsReader=$p['module_settings_reader'];
-		}
-		else
-		{
-			$this->_moduleSettingsReader=new ModuleSettingsReaderController();
+		if (isset($p['module_settings_reader'])) {
+			$this->_moduleSettingsReader = $p['module_settings_reader'];
+		} else {
+			$this->_moduleSettingsReader = new ModuleSettingsReaderController();
 		}
 
         $this->setRsSettings();
 
-        if (!isset($_SESSION['admin']['user']['media']['display']))
-		{
+        if (!isset($_SESSION['admin']['user']['media']['display'])) {
             $_SESSION['admin']['user']['media']['display'] = 'grid';
         }
     }
@@ -241,14 +237,7 @@ class MediaController extends Controller
             'module' => $this->controllerPublicName
         ));
 
-        foreach ($this::$rsSetupParameters as $p => $v) {
-            $s = $this->{'_' . lcfirst(implode('', array_map('ucfirst', explode('_', $p))))};
-            if (!empty($this->getCurrentProjectId()) && empty($s) &&
-                strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
-                die('FATAL: ' . $p . ' not set.
-                <a href="../media/setup_rs.php">Setup ResourceSpace</a> to continue.');
-            }
-        }
+        $this->bootstrap();
 
         // Search url: &search=[term]* to be appended
         $this->_rsSearchUrl = $this->_rsBaseUrl . $this->_rsSearchApi . '/?' .
@@ -260,6 +249,58 @@ class MediaController extends Controller
         // New user url; newuser appended in createUser()
         $this->_rsNewUserUrl = $this->_rsBaseUrl . $this->_rsNewUserApi . '/?' .
             'key=' . $this->rGetVal('rs_master_key');
+    }
+
+    private function bootstrap ()
+    {
+        // As checking urls takes time, do this only once per session
+        if (isset($_SESSION['admin']['user']['media']['bootstrap_passed']) &&
+            $_SESSION['admin']['user']['media']['bootstrap_passed'] == 1) {
+            return true;
+        }
+
+        // Die and redirect to setup if settings have not been set
+        foreach ($this::$rsSetupParameters as $p => $v) {
+            $s = $this->{'_' . lcfirst(implode('', array_map('ucfirst', explode('_', $p))))};
+            if (!empty($this->getCurrentProjectId()) && empty($s) &&
+                strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
+                die('FATAL: ' . $p . ' not set.
+                    <a href="../media/setup_rs.php">Setup ResourceSpace</a> to continue.');
+            }
+        }
+
+        // Test base url
+        $headers = get_headers($this->_rsBaseUrl);
+        if (substr($headers[0], 9, 3) != 403) {
+            die('FATAL: ResourceSpace base url is incorrect.
+                <a href="../module_settings/values.php?id=' . $this->getMediaModuleId() .
+                '">Correct settings</a> to continue.');
+        }
+
+        // Test plugin urls
+        foreach (array($this->_rsUploadApi, $this->_rsNewUserApi, $this->_rsSearchApi) as $plugin) {
+            $headers = get_headers($this->_rsBaseUrl . $plugin);
+            if (substr($headers[0], 9, 3) != 301) {
+                die('FATAL: ResourceSpace plugin "' . $plugin . '" returns ' . $headers[0] . '.
+                    <a href="../module_settings/values.php?id=' . $this->getMediaModuleId() .
+                    '">Correct settings</a> to continue.');
+            }
+        }
+
+        $_SESSION['admin']['user']['media']['bootstrap_passed'] = 1;
+    }
+
+    private function getMediaModuleId ()
+    {
+        $d = $this->getProjectModules();
+
+        foreach ($d['modules'] as $m) {
+            if ($m['controller'] == 'media') {
+                return $m['module_id'];
+            }
+        }
+
+        return false;
     }
 
     private function saveRsSetting ($setting, array $values)
