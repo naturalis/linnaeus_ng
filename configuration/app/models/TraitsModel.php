@@ -32,8 +32,9 @@ class TraitsModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
-		
-		if ( is_null($project_id) || is_null($language_id)  || is_null($taxon_id) )
+		$group_id = isset($params['group_id']) ? $params['group_id'] : null;
+
+		if ( is_null($project_id) || is_null($language_id) || is_null($taxon_id) || is_null($group_id) )
 			return;
 		
 		$query="
@@ -114,6 +115,7 @@ class TraitsModel extends AbstractModel
 					_a.project_id=".$project_id."
 					and _a.taxon_id=".$taxon_id."
 					and _b.trait_id is not null
+					and _c.trait_group_id = ".$group_id."
 			
 				union
 			
@@ -179,6 +181,7 @@ class TraitsModel extends AbstractModel
 				where
 					_a.project_id=".$project_id."
 					and _a.taxon_id=".$taxon_id."
+					and _c.trait_group_id = ".$group_id."
 			
 			) as unionized
 			order by _show_order_1,_show_order_2
