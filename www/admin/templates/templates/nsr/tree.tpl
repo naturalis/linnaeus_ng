@@ -3,7 +3,6 @@
     <link rel="stylesheet" type="text/css" href="../../../admin/style/rank-list.css">
     <link rel="stylesheet" type="text/css" href="../../../admin/style/lookup.css">
     <link rel="stylesheet" type="text/css" href="../../../admin/style/nsr_taxon_tree.css">
-	<script type="text/javascript" src="../../../admin/javascript/jquery-1.8.3.min.js"></script>
 	<script type="text/javascript" src="../../../admin/javascript/lookup.js"></script>
 	<script type="text/javascript" src="../../../admin/javascript/nsr_taxon_tree.js"></script>
 </head>
