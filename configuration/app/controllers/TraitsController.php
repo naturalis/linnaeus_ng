@@ -68,7 +68,8 @@ class TraitsController extends Controller
 		$r=$this->models->TraitsModel->getTraitsTaxonValues(array(
 			"language_id"=>$language,
 			"project_id"=>$project,
-			"taxon_id"=>$taxon
+			"taxon_id"=>$taxon,
+			"group_id"=>$group,
 		));
 	
 		$d=array();
