@@ -48,7 +48,7 @@ class TraitsController extends Controller
 
 	private function formatDbDate($date,$format)
 	{
-		return is_null($date) ? null : date_format(date_create($date),$format);
+		return is_null($date) ? null : ltrim(date_format(date_create($date),$format),'0');
 	}
 
     public function getAction()
