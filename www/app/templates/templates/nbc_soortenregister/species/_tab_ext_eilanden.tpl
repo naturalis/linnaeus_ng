@@ -1,3 +1,29 @@
+<style>
+table.insulae {
+	width:510px;	
+	border-collapse:collapse;
+}
+table.insulae td {
+	padding:1px 0 1px 0;
+}
+table.insulae td li {
+	list-style-position: inside;
+}
+.legend-cell {
+	width:200px;
+}
+.last-row {
+	border-bottom:1px solid #eee;
+	padding-bottom:0px;
+}
+ul.insulae {
+	list-style-type: disc;
+	list-style-position: inherit;
+}
+ul.insulae li {
+	margin-left:12px;
+}
+</style>
 	<div style="margin-bottom:10px">
 
         {if $passport_content.content}
@@ -9,7 +35,7 @@
         <div>
 		<h2 id="name-header">{t}Voorkomen{/t}</h2>
 
-		<table>
+		<table class="insulae">
         {foreach from=$content->result->data item=v}
         	{foreach from=$v->values item=l key=k}
             {capture "value"}{$l->value_start}{if $l->value_end} - {$l->value_end}{/if}{/capture}
@@ -25,7 +51,7 @@
 		{if $content->result->references}
         <br />
         <h4 class="source">{t}Publicatie{if $content->result->references|@count>1}s{/if}{/t}</h4>
-		<ul class="exotica">
+		<ul class="insulae">
         
         {foreach from=$content->result->references item=v}
 	        {if $content->result->references|@count>1}<li>{/if}
