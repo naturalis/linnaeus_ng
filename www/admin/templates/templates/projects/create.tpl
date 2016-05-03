@@ -3,6 +3,10 @@
 
 <div id="page-main">
 
+(disabled)
+
+{*
+
 {if !$saved}
 <div class="text-block">
 {t}Enter the project's name, description and version below, and click 'save' to create the project.{/t}<br />
@@ -58,5 +62,7 @@
 {else}
 {t _s1='<a href="../utilities/admin_index.php">' _s2='</a>'}%sAdministrate the new project.%s{/t}
 {/if}
+*}
+
 </div>
 {include file="../shared/admin-footer.tpl"}

@@ -17,7 +17,7 @@
 
     {t}System administration tasks:{/t}
     <ul>
-        <li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li>
+        <!-- li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li -->
         <li><a href="../../views/projects/delete.php">{t}Delete a project{/t}</a></li>
         <li><a href="../../views/projects/change_id.php">{t}Change a project ID{/t}</a></li>
     </ul>
