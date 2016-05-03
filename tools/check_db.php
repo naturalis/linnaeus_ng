@@ -8,10 +8,10 @@
 	// $mysqlPath = 'mysql';
 	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
 	$path = dirname(__FILE__) . '/../database/';
-	$dumpPath = $path . 'empty-database.sql';
+	$dumpPath = $path . 'empty_database.sql';
 	$emptyDatabaseFile = file_get_contents($dumpPath);
     $mysqlPath = '/Applications/MAMP/Library/bin/mysql';
-    $includeBaseDataUpdate = true;
+    $includeBaseDataUpdate = false;
 
 	include($cfg);
 	$c = new configuration;
@@ -139,7 +139,7 @@
             echo "\n\n";
         }
         if ($includeBaseDataUpdate) {
-            echo "#Base data update:\n" . file_get_contents($path . 'base-data.sql') . "\n\n\n";
+            echo "#Base data update:\n" . file_get_contents($path . 'base_data.sql') . "\n\n\n";
         }
     // Same
     } else {

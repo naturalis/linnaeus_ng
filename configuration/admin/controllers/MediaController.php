@@ -269,25 +269,28 @@ class MediaController extends Controller
             }
         }
 
-        // Test base url
-        $headers = get_headers($this->_rsBaseUrl);
-        if (substr($headers[0], 9, 3) != 403) {
-            die('FATAL: ResourceSpace base url is incorrect.
-                <a href="../module_settings/values.php?id=' . $this->getMediaModuleId() .
-                '">Correct settings</a> to continue.');
-        }
-
-        // Test plugin urls
-        foreach (array($this->_rsUploadApi, $this->_rsNewUserApi, $this->_rsSearchApi) as $plugin) {
-            $headers = get_headers($this->_rsBaseUrl . $plugin);
-            if (substr($headers[0], 9, 3) != 301) {
-                die('FATAL: ResourceSpace plugin "' . $plugin . '" returns ' . $headers[0] . '.
+        // Check RS settings for all pages but RS setup
+        if (strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
+            // Test base url
+            $headers = get_headers($this->_rsBaseUrl);
+            if (substr($headers[0], 9, 3) != 403) {
+                die('FATAL: ResourceSpace base url is incorrect.
                     <a href="../module_settings/values.php?id=' . $this->getMediaModuleId() .
                     '">Correct settings</a> to continue.');
             }
-        }
 
-        $_SESSION['admin']['user']['media']['bootstrap_passed'] = 1;
+            // Test plugin urls
+            foreach (array($this->_rsUploadApi, $this->_rsNewUserApi, $this->_rsSearchApi) as $plugin) {
+                $headers = get_headers($this->_rsBaseUrl . $plugin);
+                if (substr($headers[0], 9, 3) != 301) {
+                    die('FATAL: ResourceSpace plugin "' . $plugin . '" returns ' . $headers[0] . '.
+                        <a href="../module_settings/values.php?id=' . $this->getMediaModuleId() .
+                        '">Correct settings</a> to continue.');
+                }
+            }
+
+            $_SESSION['admin']['user']['media']['bootstrap_passed'] = 1;
+        }
     }
 
     private function getMediaModuleId ()
