@@ -2,7 +2,7 @@
 
 {include file="../shared/admin-messages.tpl"}
 
-{include file="../shared/edit-media.tpl"}
+{include file="edit-media.tpl"}
 
 <script type="text/JavaScript">
 $(document).ready(function(){

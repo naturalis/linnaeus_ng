@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `characteristics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `type` varchar(16) NOT NULL,
-  `got_labels` tinyint(1) NOT NULL DEFAULT '0',
+  `sys_name` varchar(64) not null,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_states` (
   `upper` float(23,3) DEFAULT NULL,
   `mean` float(23,3) DEFAULT NULL,
   `sd` float(23,3) DEFAULT NULL,
-  `got_labels` tinyint(1) DEFAULT '0',
+  `sys_name` varchar(64) not null,
   `show_order` tinyint(4) NOT NULL DEFAULT '-1',
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -501,16 +501,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects` (
   KEY `project_id` (`project_id`,`module`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `free_modules_projects_users`;
-CREATE TABLE IF NOT EXISTS `free_modules_projects_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `free_module_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`user_id`,`free_module_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 DROP TABLE IF EXISTS `free_module_media`;
 CREATE TABLE IF NOT EXISTS `free_module_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -769,6 +759,15 @@ CREATE TABLE IF NOT EXISTS `keysteps` (
   KEY `idxKeystepsNumber` (`project_id`,`number`),
   KEY `project_id` (`project_id`),
   KEY `project_id_2` (`project_id`,`is_start`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS keysteps_taxa (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`project_id` int(11) NOT NULL,
+`keystep_id` int(11) NOT NULL,
+`taxon_id` int(11) DEFAULT NULL,
+PRIMARY KEY (`id`),
+KEY `project_id` (`project_id`,`keystep_id`,`taxon_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `keytrees`;
@@ -1184,14 +1183,13 @@ CREATE TABLE IF NOT EXISTS `modules` (
   `module` varchar(64) NOT NULL,
   `description` text NOT NULL,
   `controller` varchar(32) NOT NULL,
-  `icon` varchar(32) DEFAULT NULL,
   `show_order` int(2) NOT NULL,
   `show_in_menu` tinyint(1) NOT NULL DEFAULT '1',
   `show_in_public_menu` tinyint(1) NOT NULL DEFAULT '1',
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `module` (`module`)
+  UNIQUE KEY `module` (`module`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `modules_projects`;
@@ -1205,17 +1203,6 @@ CREATE TABLE IF NOT EXISTS `modules_projects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`module_id`),
   KEY `project_id_2` (`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `modules_projects_users`;
-CREATE TABLE IF NOT EXISTS `modules_projects_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `module_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`),
-  KEY `project_id_2` (`project_id`,`module_id`,`user_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `module_settings`;
@@ -1519,28 +1506,6 @@ CREATE TABLE IF NOT EXISTS `rdf` (
   KEY `project_id` (`project_id`,`subject_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `rights`;
-CREATE TABLE IF NOT EXISTS `rights` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `controller` varchar(32) NOT NULL,
-  `view` varchar(32) NOT NULL,
-  `view_description` varchar(64) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `controller` (`controller`,`view`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `rights_roles`;
-CREATE TABLE IF NOT EXISTS `rights_roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `right_id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `created` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `right_id_2` (`right_id`,`role_id`),
-  KEY `right_id` (`right_id`,`role_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1749,16 +1714,6 @@ CREATE TABLE `text_translations` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `timezones`;
-CREATE TABLE IF NOT EXISTS `timezones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timezone` varchar(9) NOT NULL,
-  `locations` varchar(255) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `timezone` (`timezone`,`locations`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 DROP TABLE IF EXISTS `traits_date_formats`;
 CREATE TABLE `traits_date_formats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1965,21 +1920,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `last_name` varchar(32) NOT NULL,
   `email_address` varchar(54) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
-  `superuser` tinyint(1) NOT NULL DEFAULT '0',
-  `timezone_id` int(11) DEFAULT NULL,
-  `photo_path` varchar(255) DEFAULT NULL,
-  `email_notifications` tinyint(1) NOT NULL DEFAULT '0',
   `last_login` datetime DEFAULT NULL,
   `logins` int(11) NOT NULL DEFAULT '0',
-  `password_changed` datetime DEFAULT NULL,
+  `last_password_change` datetime DEFAULT NULL,
   `created_by` int(11) NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`,`email_address`),
   UNIQUE KEY `username_2` (`username`),
-  KEY `password` (`password`),
-  KEY `superuser` (`superuser`)
+  KEY `password` (`password`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `users_taxa`;
@@ -1994,6 +1944,33 @@ CREATE TABLE IF NOT EXISTS `users_taxa` (
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`user_id`),
   KEY `project_id_2` (`project_id`,`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+drop table if exists user_module_access;
+create table user_module_access (
+	id int(11) not null primary key auto_increment,
+	project_id int(11) not null,
+	user_id int(11) not null,
+	module_id int(11) not null,
+	module_type enum('standard','custom') default 'standard' not null,
+	can_read bool default 1 not null,
+	can_write bool default 0 not null,
+	can_publish bool default 1 not null,
+	last_change timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	created datetime NOT NULL,
+	UNIQUE KEY user_module_access_u1 (project_id,module_id,module_type,user_id)
+);
+
+drop table if exists user_item_access;
+create table user_item_access (
+	id int(11) not null primary key auto_increment,
+	project_id int(11) not null,
+	user_id int(11) not null,
+	item_id int(11) not null,
+	item_type enum('taxon') not null,
+	last_change timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	created datetime NOT NULL,
+	UNIQUE KEY user_item_access_u1 (project_id,user_id,item_id,item_type)
+);
 
 DROP TABLE IF EXISTS `variations_labels`;
 CREATE TABLE IF NOT EXISTS `variations_labels` (
