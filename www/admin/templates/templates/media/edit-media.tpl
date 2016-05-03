@@ -1,4 +1,4 @@
-<div id="page-main">
+<div id="media-main">
 
 	<form id="theForm" enctype="multipart/form-data" method="post">
 	<input type="hidden" name="action" value="edit" />

@@ -1,4 +1,4 @@
-<div id="page-main">
+<div id="media-main">
 	{if $module_name != '' && $item_name != ''}
 		 <p><a href="{$back_url}">back to {$item_name} ({$module_name})</a></p>
 	{/if}
@@ -80,4 +80,3 @@
 	</table>
     </form>
 </div>
-

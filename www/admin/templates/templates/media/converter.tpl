@@ -2,7 +2,7 @@
 
 {include file="../shared/admin-messages.tpl"}
 
-<div id="page-main">
+<div id="media-main">
 
 	<p>Convert {$totals.total} local media files to the ResourceSpace infrastructure:</p>
 

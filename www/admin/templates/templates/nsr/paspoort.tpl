@@ -10,8 +10,6 @@
 <h2><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h2>
 <h3>{t}passport{/t}</h3>
 
-<a id="media-overlay-link" href="#">Media overlay</a><br>
-
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;">{t}show all{/t}</a>
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;" style="display:none" href="">{t}hide all{/t}</a>
 
@@ -85,6 +83,8 @@ Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe pasp
 
 <p>
 	<a href="paspoort_meta.php?id={$concept.id}" class="edit"  style="margin:0">meta-gegevens</a><br />
+	<a id="media-overlay-links" href="#" class="edit" style="margin:0">media overlay</a><br>
+
 </p>
 
 <p>
@@ -92,8 +92,6 @@ Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe pasp
 </p>
 
 </div>
-
-<div id="media-overlay" style=""></div>
 
 <script>
 $(document).ready(function(e) {
@@ -104,7 +102,7 @@ $(document).ready(function(e) {
 	$('#page-block-messages').fadeOut(3000);
 
 	{literal}
-	$('#media-overlay-link').click(function(e) {
+	$('#media-overlay-links').click(function(e) {
 		e.preventDefault();
 		$.get("../media/media-overlay.php", function(r) {
 			prettyDialog({

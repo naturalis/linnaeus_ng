@@ -8,7 +8,7 @@
 	}
 </style>
 
-<div id="page-main">
+<div id="media-main">
 
     {if $media.total > 0}
 	    {if $from == 'search'}<div class="search-results-separator"></div>{/if}

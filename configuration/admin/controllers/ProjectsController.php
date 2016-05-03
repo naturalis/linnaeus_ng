@@ -85,13 +85,13 @@ class ProjectsController extends Controller
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Project overview'));
-		
+
 		$this->wikiPageOverride['basename']='ProjectOverview';
-		
+
         $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
         $this->printPage();
     }
-	
+
     /**
 	* List of available modules, standard and self-defined, plus possibility of (de)activation
 	*
@@ -99,7 +99,7 @@ class ProjectsController extends Controller
 	*/
     public function modulesAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Project modules'));
@@ -171,7 +171,7 @@ class ProjectsController extends Controller
 	*/
     public function dataAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Project data'));
@@ -228,13 +228,13 @@ class ProjectsController extends Controller
 
         if ($this->rHasVal('view', 'modules'))
 		{
-			$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+			$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxActionModules($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId());
         }
         elseif ($this->rHasVal('view', 'languages'))
 		{
-			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxActionLanguages($this->rGetVal('action'), $this->rGetId());
         }
@@ -244,7 +244,7 @@ class ProjectsController extends Controller
 
     public function createAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 		$this->UserRights->setAllowNoProjectId( true );
         $this->checkAuthorisation();
 
@@ -316,7 +316,7 @@ class ProjectsController extends Controller
 
     public function deleteAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 		$this->UserRights->setAllowNoProjectId( true );
         $this->checkAuthorisation();
 
@@ -358,7 +358,7 @@ class ProjectsController extends Controller
 
     public function deleteOrphanAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 		$this->UserRights->setAllowNoProjectId( true );
         $this->checkAuthorisation();
 
@@ -982,14 +982,14 @@ class ProjectsController extends Controller
 		{
 			$d['show_all']=true;
 		}
-		
+
 		return $this->models->ProjectsModel->getUserProjects( $d );
 	}
 
 	private function isCurrentUserAuthorizedForProject($id)
 	{
 		if ( $this->UserRights->isSysAdmin() ) return true;
-		
+
 		foreach ((array) $this->getCurrentUserProjects() as $key => $val)
 		{
 			if ($val['id'] == $id && $val['user_project_active'] == '1')
@@ -1023,10 +1023,10 @@ class ProjectsController extends Controller
     private function checkDefaultProjectSelect()
     {
 		$projects=$this->getCurrentUserProjects();
-		
+
 		if ( $this->UserRights->isSysAdmin() && count((array)$projects)>1)
 			return;
-		
+
 		$p=null;
 
 		foreach((array)$projects as $key=>$val)

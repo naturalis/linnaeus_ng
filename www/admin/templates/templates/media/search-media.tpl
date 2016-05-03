@@ -15,7 +15,7 @@ input[type=text], textarea {
 
 </style>
 
-<div id="page-main">
+<div id="media-main">
 
 	<form id="searchForm" method="post">
 	<input type="hidden" name="action" value="search" />
