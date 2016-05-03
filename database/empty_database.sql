@@ -217,22 +217,6 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
   FULLTEXT KEY `fulltext` (`choice_txt`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `choices_content_keysteps_undo`;
-CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `choice_content_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `choice_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `choice_txt` text,
-  `choice_content_created` datetime NOT NULL,
-  `choice_last_change` datetime NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `choice_content_id` (`choice_content_id`,`project_id`,`choice_id`,`language_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 DROP TABLE IF EXISTS `choices_keysteps`;
 CREATE TABLE IF NOT EXISTS `choices_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -332,23 +316,6 @@ CREATE TABLE IF NOT EXISTS `content_keysteps` (
   FULLTEXT KEY `fulltext` (`title`,`content`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `content_keysteps_undo`;
-CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `keystep_content_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `keystep_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `title` varchar(64) DEFAULT NULL,
-  `content` text,
-  `keystep_content_created` datetime NOT NULL,
-  `keystep_content_last_change` datetime NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `keystep_content_id` (`keystep_content_id`,`project_id`,`keystep_id`,`language_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 DROP TABLE IF EXISTS `content_taxa`;
 CREATE TABLE IF NOT EXISTS `content_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -365,26 +332,6 @@ CREATE TABLE IF NOT EXISTS `content_taxa` (
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`language_id`,`page_id`),
   KEY `project_id_2` (`project_id`,`publish`),
   FULLTEXT KEY `content` (`content`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `content_taxa_undo`;
-CREATE TABLE IF NOT EXISTS `content_taxa_undo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `content_taxa_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `page_id` int(11) NOT NULL,
-  `content` longtext,
-  `title` varchar(64) DEFAULT NULL,
-  `publish` tinyint(1) NOT NULL DEFAULT '0',
-  `content_taxa_created` datetime NOT NULL,
-  `content_last_change` datetime NOT NULL,
-  `save_type` enum('auto','manual') DEFAULT NULL,
-  `save_label` varchar(64) DEFAULT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `content_taxa_id` (`content_taxa_id`,`project_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `diversity_index`;
@@ -432,15 +379,6 @@ CREATE TABLE IF NOT EXISTS `dna_barcodes` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`taxon_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `dump`;
-CREATE TABLE IF NOT EXISTS `dump` (
-  `p` int(11) DEFAULT NULL,
-  `i_int` int(11) DEFAULT NULL,
-  `v_varchar` varchar(255) DEFAULT NULL,
-  `t_text` text,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `external_ids`;
 CREATE TABLE IF NOT EXISTS `external_ids` (
@@ -643,35 +581,6 @@ CREATE TABLE IF NOT EXISTS `habitat_labels` (
   KEY `id` (`id`,`project_id`,`habitat_id`,`language_id`),
   KEY `project_id` (`project_id`,`label`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `heartbeats`;
-CREATE TABLE IF NOT EXISTS `heartbeats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `app` varchar(32) NOT NULL,
-  `ctrllr` varchar(32) NOT NULL,
-  `view` varchar(32) NOT NULL,
-  `params` varchar(255) DEFAULT NULL,
-  `params_hash` varchar(32) NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `created` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`user_id`,`app`,`ctrllr`,`view`,`params_hash`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `helptexts`;
-CREATE TABLE IF NOT EXISTS `helptexts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `controller` varchar(32) NOT NULL,
-  `view` varchar(32) NOT NULL,
-  `subject` varchar(64) NOT NULL,
-  `helptext` text NOT NULL,
-  `show_order` int(3) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `hotwords`;
 CREATE TABLE IF NOT EXISTS `hotwords` (
