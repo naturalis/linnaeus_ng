@@ -247,7 +247,7 @@ class ProjectsController extends Controller
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 		$this->UserRights->setAllowNoProjectId( true );
         $this->checkAuthorisation();
-
+		
         $this->setPageName($this->translate('Create new project'));
 
         $this->setBreadcrumbRootName($this->translate('System administration'));
