@@ -1,6 +1,6 @@
 <style></style>
 
-<div id="page-main">
+<div id="media-main">
 	<h3>{t}Browse media on ResourceSpace server{/t}</h3>
 
     {if $media.total > 0}

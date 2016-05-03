@@ -1,11 +1,11 @@
 Array.prototype.inArray = function(value,key) {
 	if (key==undefined) {
-		for (var i in this) { 
-			if (this[i]==value) return i; 
+		for (var i in this) {
+			if (this[i]==value) return i;
 		}
 	} else {
-		for (var i in this) { 
-			if (this[i][key]==value) return i; 
+		for (var i in this) {
+			if (this[i][key]==value) return i;
 		}
 	}
 	return -1;
@@ -45,7 +45,7 @@ function stripSlashes(str) {
 }
 
 function isArray(obj) {
-	
+
    if (obj.constructor.toString().indexOf("Array") == -1)
       return false;
    else
@@ -86,7 +86,7 @@ function prettyDialog(p)
 {
 	var b=[{ text: p.closetext ? p.closetext : _('Close'), click:function() { $( this ).dialog( "close" ); } }];
 	if (p.buttons) b=p.buttons;
-	
+
 	$( "#dialog-message" ).dialog({
 		draggable: false,
 		resizable: false,
@@ -98,7 +98,7 @@ function prettyDialog(p)
 	});
 
 	$( "#dialog-message-body-content" ).html(p.content);
-	
+
 };
 
 
@@ -106,7 +106,7 @@ var allShouldTranslate = true;
 var allTranslations = Array();
 
 function _(text) {
-	
+
 	if (!allShouldTranslate) return text;
 
 	for(var i=0;i<allTranslations.length;i++) {
@@ -177,13 +177,13 @@ function allDoubleDeleteConfirm(element,name) {
 		sprintf(_('Are you sure you want to delete %s "%s"?'),element,name)+"\n"+
 		_('Deletion will be irreversible.')
 		)) {
-	
+
 		return (confirm(
 			_('Final confirmation:')+"\n"+
 			sprintf(_('Are you sure you want to delete %s "%s"?'),element,name)+"\n"+
 			_('DELETION WILL BE IRREVERSIBLE.')
 			));
-	
+
 	} else {
 
 		return false;
@@ -205,7 +205,7 @@ function allAjaxAbort(handle) {
 	} else
 	if (allAjaxHandle) {
 		alert(_('Aborting'))
-		allAjaxHandle.abort(); 
+		allAjaxHandle.abort();
 		allAjaxAborted = true;
 	}
 
@@ -247,7 +247,7 @@ var allActiveLanguage = false;
 function allAddLanguage(lan) {
 	//[id,name,default?]
 	allLanguages[allLanguages.length] = lan;
-	
+
 	if (lan[2]==1) allDefaultLanguage = lan[0];
 
 }
@@ -259,11 +259,11 @@ function allDrawLanguages() {
 
 	for(var i=0;i<allLanguages.length;i++) {
 		if (allLanguages[i][2]!=1) {
-			b = b + 
+			b = b +
 				'<span class="project-language'+
 					(allLanguages[i][0]==allActiveLanguage ? '-active' : '' )+
-					'" onclick="allSwitchLanguage('+ allLanguages[i][0] +')">' + 
-				allLanguages[i][1] + 
+					'" onclick="allSwitchLanguage('+ allLanguages[i][0] +')">' +
+				allLanguages[i][1] +
 				'</span>&nbsp;';
 		} else {
 			allDefaultLanguage = allLanguages[i][0];
@@ -283,11 +283,11 @@ function allSwitchLanguage(language) {
 		case 'introduction':
 			allAjaxAsynchMode = false;
 			contentSaveContentActive();
-			break;			
+			break;
 		case 'freemodule':
 			allAjaxAsynchMode = false;
 			freemodSaveContentActive();
-			break;			
+			break;
 	}
 
 	allActiveLanguage = language;
@@ -303,7 +303,7 @@ function allSwitchLanguage(language) {
 			break;
 		case 'sections':
 			taxonGetSectionLabels(allActiveLanguage);
-			break;			
+			break;
 		case 'commonnames':
 			taxonGetCommonnameLabels(allActiveLanguage);
 			break;
@@ -312,7 +312,7 @@ function allSwitchLanguage(language) {
 			break;
 		case 'choiceedit':
 			keyGetChoiceContent(allActiveLanguage);
-			break;			
+			break;
 		case 'introduction':
 			contentGetContentActive();
 			allAjaxAsynchMode = true;
@@ -320,20 +320,20 @@ function allSwitchLanguage(language) {
 		case 'freemodule':
 			freemodGetContentActive();
 			allAjaxAsynchMode = true;
-			break;			
+			break;
 		case 'matrixname':
 			matrixGetMatrixName(allActiveLanguage);
-			break;			
+			break;
 		case 'matrixchar':
 			matrixGetCharacteristicLabel(allActiveLanguage);
-			break;			
+			break;
 		case 'matrixstate':
 			matrixGetStateLabel(allActiveLanguage);
 			matrixGetStateText(allActiveLanguage);
-			break;			
+			break;
 		case 'geotypes':
 			mapGetTypeLabels(allActiveLanguage);
-			break;			
+			break;
 
 	}
 
@@ -343,12 +343,12 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 {
 	/*
 		please take note that it depends on the url of the file
-		calling this function exactly *which* version of 
-		ajax_interface.php is called. for instance, called from 
+		calling this function exactly *which* version of
+		ajax_interface.php is called. for instance, called from
 		  /admin/views/key/step_show.php
 		it will be
 		  /admin/views/key/ajax_interface.php
-		while called from 
+		while called from
 		  /admin/views/species/ranklabels.php
 		it will be
 		  /admin/views/species/ajax_interface.php
@@ -356,7 +356,7 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 	*/
 
 	allShowLoadingDiv();
-	
+
 	url=alturl ? alturl : "ajax_interface.php";
 
 	allAjaxHandle = $.ajax({
@@ -365,7 +365,7 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 		data : ({
 			'action' : action ,
 			'language' : language ,
-			'id' : (id ? id : false) , 
+			'id' : (id ? id : false) ,
 			'time' : allGetTimestamp()
 		}),
 		async: allAjaxAsynchMode,
@@ -377,7 +377,7 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 			allHideLoadingDiv();
 		}
 	})
-	
+
 }
 
 
@@ -388,7 +388,7 @@ function allShowMedia(url,name) {
 	$.colorbox({
 		href:url,
 		title: name ? name : url,
-		transition:"elastic", 
+		transition:"elastic",
 		maxWidth:800,
 		width:"100%",
 		opacity:0
@@ -399,7 +399,7 @@ function allShowMedia(url,name) {
 }
 
 function goNavigate(val,form) {
-	
+
 	var formId = form ? '#'+form : '#theForm';
 
 	$('<input type="hidden" name="start">').val(val).appendTo(formId);
@@ -427,7 +427,7 @@ function prettyPhotoInit()
  	$("a[rel^='prettyPhoto']").prettyPhoto({
 		allow_resize:true,
 		animation_speed:50,
- 		opacity: 0.70, 
+ 		opacity: 0.70,
 		show_title: false,
  		overlay_gallery: false,
  		social_tools: false
@@ -443,9 +443,9 @@ function allSaveDragOrder(form,vari)
 		<tr type="drag-row" drag-id="{id}">
 
 		$(document).ready(function(){
-		
+
 			allInitDragtable();
-		
+
 		})
 
 	*/
@@ -471,7 +471,7 @@ function allInitDragtable(functionOnDrop)
 	$("#drag-list tbody").sortable({
 		helper: fixHelper
 	}).disableSelection();
-	
+
 	if (functionOnDrop) {
 		$("#drag-list tbody").sortable({
 			deactivate:function(event,ui) {
@@ -515,17 +515,17 @@ function allStickElementUnderElement(ele1,ele2,resize)
 	fieldDiv.css("position","absolute");
 	fieldDiv.css("left", sf_left);
 	fieldDiv.css("top", sf_top + sf_height + 6);
-	
+
 	if (resize===true)
 	{
 		var sf_width  = inputField.width();
 		fieldDiv.css("width", sf_width);
 	}
-	
+
 }
 
 
 $(document).ready(function()
 {
-	$('<div id="dialog-message" title="title" style="display:none"><div id="dialog-message-body-content"></div></div>').appendTo('body');
+	$('<div id="dialog-message" title="title" style="display:none;"><div id="dialog-message-body-content"></div></div>').appendTo('body');
 });
