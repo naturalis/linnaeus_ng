@@ -657,10 +657,10 @@ class TraitsTraitsController extends TraitsController
 		{
 
 			$index=array();
-			//$showorder=0;
+			$showorder=0;
 			foreach((array)$values as $key=>$val)
 			{
-				//$base['show_order']=$showorder++;
+				$base['show_order']=$showorder++;
 				$base['string_value']=trim($val);
 				
 				if ($key>=0)
@@ -691,12 +691,12 @@ class TraitsTraitsController extends TraitsController
 					$this->models->TraitsValues->save($base);
 					$id=$this->models->TraitsValues->getNewId();
 					
-					if (isset($valuelabels[$id]))
+					if (isset($valuelabels[$key]))
 					{
 						$textids=$this->storeTranslations(
 							array(
 								'record'=>array('string_label_tid'=>null), // all new values, none have a text_id yet
-								'data'=>array('string_label_tid'=>$valuelabels[$id],)
+								'data'=>array('string_label_tid'=>$valuelabels[$key],)
 							)
 						);
 				
