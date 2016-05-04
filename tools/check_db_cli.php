@@ -582,9 +582,9 @@
 
 	$db = new dbCheck;
 
-	$db->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
-	$db->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
-	$db->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
+	//$db->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
+	//$db->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
+	//$db->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
 	//$db->setOutputFile( 'C:\tmp\out.sql' );
 
 	$db->run();
