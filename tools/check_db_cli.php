@@ -11,6 +11,7 @@
 
 		private $start;
 
+		private $dbCfg;
 		private $conn0;
 		private $conn1;
 		private $dbDb0;
@@ -121,21 +122,21 @@
 			include_once( $this->cfgFile );
 
 			$c = new configuration;
-			$db = $c->getDatabaseSettings(); // host, user, password
+			$this->dbCfg = $c->getDatabaseSettings(); // host, user, password
 
-			$this->dbDb0=$db['database'];
-			$this->dbDb0tablePrefix=$db['tablePrefix'];
+			$this->dbDb0=$this->dbCfg['database'];
+			$this->dbDb0tablePrefix=$this->dbCfg['tablePrefix'];
 
-			$this->conn0=@mysqli_connect( $db['host'], $db['user'], $db['password']) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$db['user'], $db['host'], $db['password']) );
-			$this->conn1=@mysqli_connect( $db['host'], $db['user'], $db['password']) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$db['user'], $db['host'], $db['password']) );
+			$this->conn0=@mysqli_connect( $this->dbCfg['host'], $this->dbCfg['user'], $this->dbCfg['password']) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbCfg['user'], $this->dbCfg['host'], $this->dbCfg['password']) );
+			$this->conn1=@mysqli_connect( $this->dbCfg['host'], $this->dbCfg['user'], $this->dbCfg['password']) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbCfg['user'], $this->dbCfg['host'], $this->dbCfg['password']) );
 
-			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( 'abnormal program termination: could not select database %s', $this->dbDb0 ) );
+			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database %s\n", $this->dbDb0 ) );
 		
 			$sqlMode=mysqli_fetch_object( mysqli_query( $this->conn0, "SELECT @@GLOBAL.sql_mode as mode;" ) );
 			
 			if ( $sqlMode->mode !== '')
 			{
-				die( "abnormal program termination: disable MySQL STRICT mode (SET GLOBAL sql_mode = '')" );
+				die( "abnormal program termination: disable MySQL STRICT mode (SET GLOBAL sql_mode = '')\n" );
 			}
 
 			$this->start=new DateTime();
@@ -146,6 +147,7 @@
 		private function printParameters()
 		{
 			$buffer[]=sprintf( "comparing database '%s' with '%s'", $this->dbDb0 , $this->emptyDbFile );
+			$buffer[]=sprintf( "database user: %s", $this->dbCfg['user'].'@'.$this->dbCfg['host'] );
 			$buffer[]=sprintf( 'output file: %s', $this->outputFile );
 			$buffer[]=sprintf( 'error file: %s', $this->errorFile );
 			echo implode( "\n", $buffer ) , "\n";
@@ -170,10 +172,10 @@
 
 			if ( !mysqli_query( $this->conn1, 'CREATE DATABASE `' . $this->dbDb1 . '`' ) )
 			{
-				die( sprintf( 'abnormal program termination: could not create test database %s',  $this->dbDb1 ) );
+				die( sprintf( "abnormal program termination: could not create test database %s\n",  $this->dbDb1 ) );
 			}
 
-			mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( 'abnormal program termination: could not select database %s', $this->dbDb1 ) );
+			mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( "abnormal program termination: could not select database %s\n", $this->dbDb1 ) );
 		}
 		
 		private function createTestTables()
