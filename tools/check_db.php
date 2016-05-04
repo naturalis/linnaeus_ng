@@ -1,4 +1,5 @@
 <?php
+
 	// Output is utf8
 	header('Content-type: text/html; charset=UTF-8');
 
@@ -6,12 +7,19 @@
 	// $cfg = 'configuration/admin/configuration.php';
 	// $dumpPath = 'database/empty-database.sql';
 	// $mysqlPath = 'mysql';
+
+	include_once( dirname(__FILE__) . '/../configuration/admin/constants.php' );
+
 	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
 	$path = dirname(__FILE__) . '/../database/';
 	$dumpPath = $path . 'empty_database.sql';
 	$emptyDatabaseFile = file_get_contents($dumpPath);
-    $mysqlPath = '/Applications/MAMP/Library/bin/mysql';
+    //$mysqlPath = '/Applications/MAMP/Library/bin/mysql';
+    //$mysqlPath = 'C:/wamp/bin/mysql/mysql5.6.17/bin/mysql.exe'; // windows
+    $mysqlPath = 'mysql'; // windows
     $includeBaseDataUpdate = false;
+	//$cmd = "%s -h %s -u %s --password='%s' %s < '%s'";
+    $cmd = '%s -h %s -u %s -p%s %s < "%s"'; // windows
 
 	include($cfg);
 	$c = new configuration;
@@ -32,7 +40,7 @@
 
 	$db0 = $s['database'];
 	// Better use name that's unlikely to already exist...
-	$db1 = 'linnaeus_ng_diff_test_HENKIEBOY';
+	$db1 = '____TEMP_lng_test_database';
 
 	$showDetails = false;
 	$ignoreComments = true;
@@ -110,14 +118,17 @@
     if (!mysql_query('CREATE DATABASE `' . $db1 . '`', $conn1)) {
         die("Cannot create test database, please check MySQL credentials\n");
     }
-    $cmd = "$mysqlPath -h $host1 -u $user1 --password='$pw1' $db1 < '$dumpPath'";
+
+    $cmd = sprintf($cmd,$mysqlPath, $host1, $user1, $pw1, $db1, $dumpPath);
+
     // Can we import the dump via the command line?
     exec($cmd, $m, $s);
+
     if ($s !== 0) {
         die('Cannot import the dump file through exec(); check $mysqlPath variable');
     }
-
-
+	
+	echo '<pre>';
 
 	// Disabe MySQL STRICT mode if this has been set
 	$res = mysql_query("SELECT @@GLOBAL.sql_mode;", $conn0);
