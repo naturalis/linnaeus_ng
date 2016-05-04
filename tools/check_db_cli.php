@@ -1,7 +1,6 @@
 <?php
 
-
-	class DbCheck {
+	class DatabaseTableCompare {
 
 		private $constFile='/var/www/linnaeusng/configuration/admin/constants.php';
 		private $cfgFile='/var/www/linnaeusng/configuration/admin/configuration.php';
@@ -12,6 +11,12 @@
 		private $start;
 
 		private $dbCfg;
+		private $dbUserOverride;
+
+		private $dbHost; 
+		private $dbUser;
+		private $dbPassword;
+		
 		private $conn0;
 		private $conn1;
 		private $dbDb0;
@@ -81,11 +86,17 @@
 			$this->outputFile=$p;
 		}
 
+		public function setDbUserOverride( $p )
+		{
+			$this->dbUserOverride=$p;
+		}
+
 		public function run()
 		{
 			$this->checkFiles();
 			$this->initialize();
 			$this->printParameters();
+			$this->connectDatabase();
 			$this->initTestDatabase();
 			$this->createTestTables();
 			$this->compareTables();
@@ -97,6 +108,8 @@
 		
 		private function checkFiles()
 		{
+			echo "checking config files\n";
+			
 			$stat=[];
 			foreach ([$this->constFile,$this->cfgFile,$this->emptyDbFile] as $file)
 			{
@@ -127,8 +140,21 @@
 			$this->dbDb0=$this->dbCfg['database'];
 			$this->dbDb0tablePrefix=$this->dbCfg['tablePrefix'];
 
-			$this->conn0=@mysqli_connect( $this->dbCfg['host'], $this->dbCfg['user'], $this->dbCfg['password']) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbCfg['user'], $this->dbCfg['host'], $this->dbCfg['password']) );
-			$this->conn1=@mysqli_connect( $this->dbCfg['host'], $this->dbCfg['user'], $this->dbCfg['password']) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbCfg['user'], $this->dbCfg['host'], $this->dbCfg['password']) );
+			$this->dbHost=isset($this->dbUserOverride['host']) ? $this->dbUserOverride['host'] : $this->dbCfg['host']; 
+			$this->dbUser=isset($this->dbUserOverride['user']) ? $this->dbUserOverride['user'] : $this->dbCfg['user'];
+			$this->dbPassword=isset($this->dbUserOverride['password']) ? $this->dbUserOverride['password'] : $this->dbCfg['password'];
+
+			$this->start=new DateTime();
+			$this->outputFile = sprintf( $this->outputFile , $this->dbDb0, $this->start->format('Y-m-d_H-i-s') );
+			$this->errorFile = $this->outputFile . "-errors.txt";
+		}
+		
+		private function connectDatabase()
+		{
+			echo "connecting to database\n";
+			
+			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbUser, $this->dbHost, $this->dbPassword) );
+			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbUser, $this->dbHost, $this->dbPassword) );
 
 			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database %s\n", $this->dbDb0 ) );
 		
@@ -139,15 +165,12 @@
 				die( "abnormal program termination: disable MySQL STRICT mode (SET GLOBAL sql_mode = '')\n" );
 			}
 
-			$this->start=new DateTime();
-			$this->outputFile = sprintf( $this->outputFile , $this->dbDb0, $this->start->format('Y-m-d_H-i-s') );
-			$this->errorFile = $this->outputFile . "-errors.txt";
 		}
 		
 		private function printParameters()
 		{
 			$buffer[]=sprintf( "comparing database '%s' with '%s'", $this->dbDb0 , $this->emptyDbFile );
-			$buffer[]=sprintf( "database user: %s", $this->dbCfg['user'].'@'.$this->dbCfg['host'] );
+			$buffer[]=sprintf( "database user: %s", $this->dbUser.'@'.$this->dbHost );
 			$buffer[]=sprintf( 'output file: %s', $this->outputFile );
 			$buffer[]=sprintf( 'error file: %s', $this->errorFile );
 			echo implode( "\n", $buffer ) , "\n";
@@ -155,6 +178,8 @@
 
 		private function dropTestDatabase()
 		{
+			echo "dropping test database\n";
+
 			if ( !mysqli_query( $this->conn1, 'DROP DATABASE `' . $this->dbDb1 . '`' ) )
 			{
 				die( sprintf( 'abnormal program termination: failed to drop old test database %s',  $this->dbDb1 ) );
@@ -582,11 +607,13 @@
 
 	}
 
-	$db = new dbCheck;
+	$compare = new DatabaseTableCompare;
 
+	// example configuration statments:
 	//$db->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
 	//$db->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
 	//$db->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
 	//$db->setOutputFile( 'C:\tmp\out.sql' );
+	//$db->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
 
-	$db->run();
+	$compare->run();
