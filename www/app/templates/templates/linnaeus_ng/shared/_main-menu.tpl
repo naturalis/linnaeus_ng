@@ -25,7 +25,7 @@
             <li><a href="../{$v.controller}/">{t}{$v.module}{/t}</a></li>
             {assign var=first value=false}
         {/if}
-    {elseif $v.show_in_public_menu==1}
+    {elseif $v.show_in_public_menu==1 && $v.active=='y'}
         <li><a class="main-menu{if $v.id == $module.id}-selected{/if}" href="../module/?modId={$v.id}">{t}{$v.module}{/t}</a></li>
         {assign var=first value=false}
     {/if}
