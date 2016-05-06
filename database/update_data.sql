@@ -45,6 +45,8 @@ ALTER TABLE modules DROP INDEX module;
 ALTER TABLE modules ADD UNIQUE INDEX (module);
 update modules set module='Taxon editor' where controller = 'nsr';
 update modules set show_in_menu = 0 where controller in ('index','utilities','content');
+update modules set module='Literature (old)' where controller = 'literature';
+update modules set module='Literature' where controller = 'literature2';
 insert into modules values (null,'Project management','Project management','projects',99,1,0,now(),now());
 insert into modules values (null,'User management','User management','users',99,1,0,now(),now());
 insert into modules values (null,'Media','Media management','media',99,1,0,now(),now());
@@ -62,7 +64,7 @@ update roles set description='Project editor' where id =3;
 alter table roles drop column abbrev;
 alter table roles drop column assignable;
 alter table roles add column hidden bool not null default 0 after description;
-update projects_roles_users set role_id = 1 where user_id = (select id from users where username = 'sysadmin')
+update projects_roles_users set role_id = 1 where user_id = (select id from users where username = 'sysadmin');
 
 
 
