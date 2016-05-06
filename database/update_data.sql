@@ -74,7 +74,7 @@ update characteristics_states _a set _a.sys_name = (select _b.label from charact
 
 
 
-/* Update module settings
+/* Update module settings */
 TRUNCATE TABLE `module_settings`;
 LOCK TABLES `module_settings` WRITE;
 INSERT IGNORE INTO `module_settings` VALUES
