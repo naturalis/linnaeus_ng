@@ -114,14 +114,10 @@
                             {$label|replace:$lastname:''|replace:'()':''}
                         {/if}
                     {else}
-                        {if $v.name|@strlen>0}
-                            {$v.name}
-                        {else}
-                            {$v.taxon}
-                        {/if}
+                        {$v.name}
                     {/if}
                     {/capture}
-                	<a class="small-taxonomy-tree-taxon" title="" href="?id={$v.id}">{$smarty.capture.item|@trim}</a>
+                	<a class="small-taxonomy-tree-taxon" title="" href="?id={$v.id}">{if $smarty.capture.item|@trim|@strlen>0}{$smarty.capture.item|@trim}{else}{if $v.name|@strlen>0}{$v.name}{else}{$v.taxon}{/if}{/if}</a>
 				</span>
 				<span class="classification-rank" title="">[{$v.rank_label}]</span>
 				{if $v.species_count.total>0}
