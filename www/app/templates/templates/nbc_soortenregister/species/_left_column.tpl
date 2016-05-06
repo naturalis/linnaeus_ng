@@ -114,7 +114,11 @@
                             {$label|replace:$lastname:''|replace:'()':''}
                         {/if}
                     {else}
-                        {$v.name}
+                        {if $v.name|@strlen>0}
+                            {$v.name}
+                        {else}
+                            {$v.taxon}
+                        {/if}
                     {/if}
                     {/capture}
                 	<a class="small-taxonomy-tree-taxon" title="" href="?id={$v.id}">{$smarty.capture.item|@trim}</a>
