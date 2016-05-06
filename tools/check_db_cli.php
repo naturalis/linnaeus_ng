@@ -210,7 +210,7 @@
 				if ( mysqli_query( $this->conn1, $stmnt ) !=1 )
 				{
 					//echo mysqli_error( $this->conn1 );
-					$this->errors[]=$stmnt;
+					$this->errors[]=$stmnt . ";";
 				}
 				
 			}
