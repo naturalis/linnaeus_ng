@@ -56,6 +56,7 @@ class MapKeyController extends Controller
         parent::__construct($p);
 
 		//$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
+		$this->smarty->assign( 'isOnline', true );
 
 		$this->_mapType = $this->getDistributionMapType();
 
