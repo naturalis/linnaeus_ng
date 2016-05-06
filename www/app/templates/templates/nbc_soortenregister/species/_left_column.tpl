@@ -69,8 +69,13 @@
                                 {/if}
                                 {assign var=lastname value="`$classification[taxon].uninomial` `$classification[taxon].specific_epithet`"}
                             {else}
-                                {$classification[taxon].name}
-                                {assign var=lastname value=$classification[taxon].name}
+                                {if $classification[taxon].name|@strlen>0}
+                                    {$classification[taxon].name}
+                                    {assign var=lastname value=$classification[taxon].name}
+                                {else}
+                                    {$classification[taxon].taxon}
+                                    {assign var=lastname value=$classification[taxon].taxon}
+                                {/if}
                             {/if}
                         {/capture}
                         <a class="small-taxonomy-tree-taxon" title="" href="nsr_taxon.php?id={$classification[taxon].id}">{$smarty.capture.item|@trim}</a>
