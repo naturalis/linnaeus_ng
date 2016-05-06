@@ -142,7 +142,7 @@
 
 			$this->dbHost=isset($this->dbUserOverride['host']) ? $this->dbUserOverride['host'] : $this->dbCfg['host']; 
 			$this->dbUser=isset($this->dbUserOverride['user']) ? $this->dbUserOverride['user'] : $this->dbCfg['user'];
-			$this->dbPassword=isset($this->dbUserOverride['password']) ? $this->dbUserOverride['password'] : $this->dbCfg['password'];
+			$this->dbPassword=array_key_exists('password',$this->dbUserOverride) ? $this->dbUserOverride['password'] : $this->dbCfg['password'];
 
 			$this->start=new DateTime();
 			$this->outputFile = sprintf( $this->outputFile , $this->dbDb0, $this->start->format('Y-m-d_H-i-s') );
@@ -153,8 +153,8 @@
 		{
 			echo "connecting to database\n";
 			
-			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbUser, $this->dbHost, $this->dbPassword) );
-			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( 'abnormal program termination: could not connect to mysql (%s@%s)',$this->dbUser, $this->dbHost, $this->dbPassword) );
+			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
+			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
 
 			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database %s\n", $this->dbDb0 ) );
 		
@@ -610,10 +610,10 @@
 	$compare = new DatabaseTableCompare;
 
 	// example configuration statments:
-	//$db->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
-	//$db->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
-	//$db->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
-	//$db->setOutputFile( 'C:\tmp\out.sql' );
-	//$db->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
+	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
+	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
+	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
+	//$compare->setOutputFile( 'C:\tmp\out.sql' );
+	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
 
 	$compare->run();
