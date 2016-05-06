@@ -670,13 +670,14 @@ CREATE TABLE IF NOT EXISTS `keysteps` (
   KEY `project_id_2` (`project_id`,`is_start`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS keysteps_taxa (
-`id` int(11) NOT NULL AUTO_INCREMENT,
-`project_id` int(11) NOT NULL,
-`keystep_id` int(11) NOT NULL,
-`taxon_id` int(11) DEFAULT NULL,
-PRIMARY KEY (`id`),
-KEY `project_id` (`project_id`,`keystep_id`,`taxon_id`)
+DROP TABLE IF EXISTS `keysteps_taxa`;
+CREATE TABLE IF NOT EXISTS `keysteps_taxa` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`project_id` int(11) NOT NULL,
+	`keystep_id` int(11) NOT NULL,
+	`taxon_id` int(11) DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	KEY `project_id` (`project_id`,`keystep_id`,`taxon_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `keytrees`;
@@ -1265,7 +1266,7 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`page`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1758 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `pages_taxa_titles`;
 CREATE TABLE IF NOT EXISTS `pages_taxa_titles` (
@@ -1855,8 +1856,9 @@ CREATE TABLE IF NOT EXISTS `users_taxa` (
   KEY `project_id_2` (`project_id`,`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-drop table if exists user_module_access;
-create table user_module_access (
+
+DROP TABLE IF EXISTS `user_module_access`;
+CREATE TABLE IF NOT EXISTS `user_module_access` (
 	id int(11) not null primary key auto_increment,
 	project_id int(11) not null,
 	user_id int(11) not null,
@@ -1870,8 +1872,8 @@ create table user_module_access (
 	UNIQUE KEY user_module_access_u1 (project_id,module_id,module_type,user_id)
 );
 
-drop table if exists user_item_access;
-create table user_item_access (
+DROP TABLE IF EXISTS `user_item_access`;
+CREATE TABLE IF NOT EXISTS `user_item_access` (
 	id int(11) not null primary key auto_increment,
 	project_id int(11) not null,
 	user_id int(11) not null,
