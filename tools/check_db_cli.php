@@ -634,8 +634,8 @@
 	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
 	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
 	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
-	//$compare->setOutputFile( 'C:\tmp\out.sql' );
+	$compare->setOutputFile( '/home/maarten.schermer/testdata/%s-modify-%s.sql' );
 	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
-	//$compare->setDoNotCreateTempDatabase( true );
+	$compare->setDoNotCreateTempDatabase( true );
 
 	$compare->run();
