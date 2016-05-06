@@ -17,7 +17,7 @@
 <a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/home.php">{t}Home{/t}</a></li>
 {assign var=first value=true}
 {foreach $menu v k}
-    {if $v.type=='regular' && $v.show_in_public_menu==1}
+    {if $v.type=='regular' && $v.show_in_public_menu==1 && $v.active=='y'}
         {if $v.controller == $controllerBaseName}
             <li><a class="main-menu-selected" href="../{$v.controller}/">{t}{$v.module}{/t}</a></li>
             {assign var=first value=false}
