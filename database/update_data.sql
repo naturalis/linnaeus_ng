@@ -168,4 +168,4 @@ INSERT INTO `module_settings_values` VALUES
 (23,1,80,'api_search_lng',NOW(),NOW()),
 (24,1,78,'api_upload_lng',NOW(),NOW());
 UNLOCK TABLES;
-*/
+
