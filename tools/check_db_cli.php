@@ -12,6 +12,7 @@
 
 		private $dbCfg;
 		private $dbUserOverride;
+		private $doNotCreateTempDatabase=false;
 
 		private $dbHost; 
 		private $dbUser;
@@ -91,6 +92,11 @@
 			$this->dbUserOverride=$p;
 		}
 
+		public function setDoNotCreateTempDatabase( $p )
+		{
+			$this->doNotCreateTempDatabase=$p;
+		}
+
 		public function run()
 		{
 			$this->checkFiles();
@@ -156,7 +162,7 @@
 			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
 			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
 
-			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database %s\n", $this->dbDb0 ) );
+			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb0 ) );
 		
 			$sqlMode=mysqli_fetch_object( mysqli_query( $this->conn0, "SELECT @@GLOBAL.sql_mode as mode;" ) );
 			
@@ -171,6 +177,8 @@
 		{
 			$buffer[]=sprintf( "comparing database '%s' with '%s'", $this->dbDb0 , $this->emptyDbFile );
 			$buffer[]=sprintf( "database user: %s", $this->dbUser.'@'.$this->dbHost );
+			$buffer[]=sprintf( "automatically create test database: %s", $this->doNotCreateTempDatabase ? sprintf( "n (requires accessible test database '%s' to be present)",  $this->dbDb1 ) : 'y' );
+		 
 			$buffer[]=sprintf( 'output file: %s', $this->outputFile );
 			$buffer[]=sprintf( 'error file: %s', $this->errorFile );
 			echo implode( "\n", $buffer ) , "\n";
@@ -178,6 +186,12 @@
 
 		private function dropTestDatabase()
 		{
+			if ( $this->doNotCreateTempDatabase )
+			{
+				echo "please drop test database manually\n";
+				return;
+			}
+
 			echo "dropping test database\n";
 
 			if ( !mysqli_query( $this->conn1, 'DROP DATABASE `' . $this->dbDb1 . '`' ) )
@@ -188,6 +202,13 @@
 
 		private function initTestDatabase()
 		{
+			if ( $this->doNotCreateTempDatabase )
+			{
+				echo "using existing test database\n";
+				mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb1 ) );
+				return;
+			}
+			
 			echo "setting up test database\n";
 			
 			if ( mysqli_select_db( $this->conn1, $this->dbDb1 ) )
@@ -615,5 +636,6 @@
 	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
 	//$compare->setOutputFile( 'C:\tmp\out.sql' );
 	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
+	//$compare->setDoNotCreateTempDatabase( true );
 
 	$compare->run();
