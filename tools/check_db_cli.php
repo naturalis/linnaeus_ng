@@ -218,10 +218,10 @@
 
 			if ( !mysqli_query( $this->conn1, 'CREATE DATABASE `' . $this->dbDb1 . '`' ) )
 			{
-				die( sprintf( "abnormal program termination: could not create test database %s\n",  $this->dbDb1 ) );
+				die( sprintf( "abnormal program termination: could not create test database '%s'\n",  $this->dbDb1 ) );
 			}
 
-			mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( "abnormal program termination: could not select database %s\n", $this->dbDb1 ) );
+			mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb1 ) );
 		}
 		
 		private function createTestTables()

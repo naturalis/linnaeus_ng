@@ -1259,7 +1259,6 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `page` varchar(32) NOT NULL,
   `show_order` int(11) DEFAULT NULL,
   `def_page` tinyint(1) NOT NULL DEFAULT '0',
-  `always_hide` tinyint(1) NOT NULL DEFAULT '0',
   `external_reference` varchar(4000) DEFAULT NULL,
   `always_hide` tinyint(1) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
