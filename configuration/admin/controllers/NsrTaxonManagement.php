@@ -169,7 +169,7 @@ class NsrTaxonManagement extends NsrController
 		$traits=$this->models->{$this->modelNameOverride}->getSubstitutableTraits(array('project_id'=>$this->getCurrentProjectId()));
 
         $this->smarty->assign( 'page', $this->getPage( $this->rGetId() ) );
-        $this->smarty->assign( 'dynamic_fields', $this->basicSubstitutionFields+$traits );
+        $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
         $this->smarty->assign( 'link_embed', [['field'=>'embed','label'=>'embed'],['field'=>'link','label'=>'link'],['field'=>'link_new','label'=>'link (new window)']] );
         $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
