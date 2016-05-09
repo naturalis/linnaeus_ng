@@ -1032,6 +1032,36 @@ CREATE TABLE `media` (
   KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+DROP TABLE IF EXISTS `media_captions`;
+CREATE TABLE `media_captions` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `media_modules_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `caption` varchar(500) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`,`media_modules_id`,`language_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+DROP TABLE IF EXISTS `media_conversion_log`;
+CREATE TABLE `media_conversion_log` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `module` varchar(50) NOT NULL,
+  `media_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `old_file` varchar(255) NOT NULL,
+  `new_file` varchar(255) NOT NULL,
+  `error` varchar(255) DEFAULT NULL,
+  `converted` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `old_file` (`project_id`,`old_file`),
+  KEY `item_id` (`project_id`,`module`,`item_id`),
+  KEY `error` (`error`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `media_descriptions_taxon`;
 CREATE TABLE IF NOT EXISTS `media_descriptions_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1065,6 +1095,41 @@ CREATE TABLE IF NOT EXISTS `media_meta` (
   KEY `project_id_4` (`project_id`,`media_id`,`language_id`,`sys_label`),
   KEY `project_id_5` (`project_id`,`sys_label`,`meta_date`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `media_metadata`;
+CREATE TABLE `media_metadata` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `media_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `sys_label` varchar(64) NOT NULL,
+  `metadata` varchar(1024) DEFAULT NULL,
+  `metadata_date` datetime DEFAULT NULL,
+  `metadata_number` float(16,8) DEFAULT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id_4` (`project_id`,`media_id`,`language_id`,`sys_label`),
+  KEY `project_id` (`project_id`,`media_id`),
+  KEY `project_id_2` (`project_id`,`sys_label`),
+  KEY `project_id_3` (`project_id`,`media_id`,`sys_label`),
+  KEY `project_id_5` (`project_id`,`sys_label`,`metadata_date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+DROP TABLE IF EXISTS `media_modules`;
+CREATE TABLE `media_modules` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `media_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT '0',
+  `overview_image` tinyint(1) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`,`media_id`,`module_id`,`item_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 DROP TABLE IF EXISTS `media_taxon`;
 CREATE TABLE IF NOT EXISTS `media_taxon` (

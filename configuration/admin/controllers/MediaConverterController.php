@@ -131,8 +131,9 @@ class MediaConverterController extends MediaController
             echo $this->_cli ? "\n\nConverting internal media links\n" :
                 '</p><p><b>Converting internal media links</b><br>';
 
-            $this->convertInternalMediaLinks();
         }
+
+        $this->convertInternalMediaLinks();
     }
 
     private function convertInternalMediaLinks ()
