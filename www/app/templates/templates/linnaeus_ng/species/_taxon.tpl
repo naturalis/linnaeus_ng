@@ -6,7 +6,7 @@
 	{foreach $categories v k}
     	{if !$v.is_empty}
 		<li id="ctb-{$v.id}">
-			<a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
+			<a {if $v.is_empty==0}href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.id}"{/if}
 	        {if $activeCategory==$v.id}
             class="category-active"
             {/if}                
@@ -27,12 +27,12 @@
 	{foreach $content.classification v k classification}
 	{if $v.do_display}
 
-		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
+		<a href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$v.id}">{$v.label}</a>
 
 		{* if $smarty.foreach.classification.last || $v.is_empty==1}
 			{$v.label}
 		{else}
-			<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
+			<a href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
 		{/if *}
 		<br />
 	{/if}
@@ -43,7 +43,7 @@
 	<p>
 	<b>{$taxon.label} {t}contains the following taxa{/t}:</b><br/>
 	{foreach $content.taxonlist v k list}
-		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/nsr_taxon.php?id={$v.id}">{$v.label}</a>
+		<a href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$v.id}">{$v.label}</a>
 		{if $v.commonname} ({$v.commonname}){/if}
 		<br />
 	{/foreach}
