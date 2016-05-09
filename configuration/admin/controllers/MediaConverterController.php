@@ -492,10 +492,7 @@ class MediaConverterController extends MediaController
             'old_file' => $this->_currentFileName
         ));
 
-        $this->_currentMediaId = !empty($d) ? $d[0]['media_id'] : false;
-        $this->_rsFile = !empty($d) ? $d[0]['new_file'] : false;
-
-        return $this->_currentMediaId !== false;
+        return !empty($d);
     }
 
     private function itemHasBeenAttached ()
