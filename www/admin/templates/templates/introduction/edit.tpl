@@ -30,12 +30,8 @@
 	</div>
 {/if}
 	<div style="width:100%;padding:10px">
-    
-    {$page.hide_from_index}
-    
-    
 		{t}Topic:{/t} <input type="text" id="topic-default" name="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" /><br />
-        <span style="font-size:0.9em;"><label><input type="checkbox" id="hide_from_index" />{t}hide page from the public introduction index{/t}</label></span>
+        <span style="font-size:0.9em;"><label><input type="checkbox" id="hide_from_index"{if $page.hide_from_index==1} checked="checked"{/if}/>{t}hide page from the public introduction index{/t}</label></span>
 		<textarea
 			name="content-default"
 			style="width:870px;height:500px;"

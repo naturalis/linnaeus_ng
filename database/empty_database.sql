@@ -649,6 +649,7 @@ CREATE TABLE IF NOT EXISTS `introduction_pages` (
   `project_id` int(11) NOT NULL,
   `got_content` tinyint(1) NOT NULL DEFAULT '0',
   `show_order` int(11) DEFAULT NULL,
+  `hide_from_index` tinyint(1) DEFAULT NULL,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

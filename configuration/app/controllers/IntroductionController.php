@@ -41,6 +41,7 @@ class IntroductionController extends Controller
     {
 		parent::__construct($p);
 		$this->setMediaController();
+		$this->getPageHeaders();
     }
 
     /**
@@ -168,34 +169,12 @@ class IntroductionController extends Controller
 
 	private function getPageHeaders()
 	{
-		$ip =  $this->models->IntroductionPages->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'got_content' => 1
-				),
-				'order' => 'show_order,created'
-			)
-		);
-
-		foreach((array)$ip as $key => $val)
-		{
-			$cfm = $this->models->ContentIntroduction->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getDefaultLanguageId(),
-						'page_id' => $val['id']
-					),
-					'columns' => 'topic',
-				)
-			);
-
-			$ip[$key]['topic'] = $ip[$key]['label'] = $cfm[0]['topic'];
-		}
-
-		return $ip;
-
+		return $this->models->IntroductionModel->getIntroductionPages([
+			'project_id' => $this->getCurrentProjectId(),
+			'language_id' => $this->getCurrentLanguageId(),
+			'got_content' => true,
+			'include_hidden' => false
+		]);		
 	}
 
 	private function getPage($id=null)

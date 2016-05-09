@@ -42,7 +42,7 @@ class IntroductionController extends Controller
     {
         parent::__construct();
 		$this->cleanUpEmptyPages();
-//		$this->setMediaController();
+		$this->setMediaController();
     }
 
     public function __destruct ()
@@ -757,7 +757,7 @@ class IntroductionController extends Controller
 
     private function getPageImage ()
     {
-return;        $img = $this->_mc->getItemMediaFiles();
+		$img = $this->_mc->getItemMediaFiles();
 
         if (!empty($img) && $img[0]['media_type'] == 'image') {
             return $img[0];
