@@ -72,6 +72,50 @@ class LinnaeusController extends Controller
 
     public function indexAction()
     {
+
+		$this->moduleSettings=new ModuleSettingsReaderController();
+
+		$start_page=$this->moduleSettings->getGeneralSetting( 'start_page' );
+
+		if ( !empty($start_page) )
+		{
+			if (( strtolower($start_page) !== '/linnaeus_ng/app/views/linnaeus/' ) && 
+				( strtolower($start_page) !== '/linnaeus_ng/app/views/linnaeus/index.php' ))
+			{
+				$this->redirect( $start_page );
+			}
+		}
+
+		$welcome_topic=$this->moduleSettings->getModuleSetting( [ 'module'=>'introduction', 'setting'=>'welcome_topic' ] );
+
+		if ( !empty($welcome_topic) )
+		{
+			$id = $this->models->LinnaeusModel->getIntroductionTopicId(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'topic' => $welcome_topic
+			));	
+
+			$this->redirect( '../introduction/topic.php?id=' . $id );
+		}
+
+		if ($this->doesCurrentProjectHaveModule(MODCODE_INTRODUCTION))
+		{
+			$id = $this->models->LinnaeusModel->getFirstIntroductionTopicId(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'topic' => $welcome_topic
+			));	
+			
+			if ( $id) 
+			{
+				$this->redirect( '../introduction/topic.php?id=' . $id );
+			}
+		}
+		
+		if ( $this->doesCurrentProjectHaveModule(MODCODE_INDEX))
+		{
+			$this->redirect( '../index/' );
+		}
+
 		$this->printPage();
     }
 

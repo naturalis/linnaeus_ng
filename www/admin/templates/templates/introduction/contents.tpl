@@ -4,7 +4,7 @@
 <table>
 {foreach $pages v k}
 	<tr class="tr-highlight">
-		<td><a href="edit.php?id={$v.id}">{$v.topic}</a></td>
+		<td>{if $v.hide_from_index==1}({/if}<a href="edit.php?id={$v.id}">{$v.topic}</a>{if $v.hide_from_index==1}){/if}</td>
 	</tr>
 {/foreach}
 </table>
