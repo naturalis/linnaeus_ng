@@ -77,11 +77,14 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function indexAction()
     {
-        if (!$this->rHasVal('id')) {
-			$id = $this->getFirstTaxonIdNsr();
+        if ( $this->rHasVal('id') )
+		{
+			$id = $this->rGetId();
         }
         else
-			$id = $this->rGetId();
+		{
+			$id = $this->getFirstTaxonIdNsr();
+		}
 
         $this->setStoreHistory(false);
 
@@ -102,10 +105,12 @@ class SpeciesControllerNSR extends SpeciesController
 
         if ( empty($taxon) )
 		{
-			//REFAC2015 --> make this configurable
-			$this->smarty->assign( 'title', $this->translate( 'Pagina niet gevonden' ) );
-			$this->smarty->assign( 'text', $this->translate( 'De gevraagde pagina kon niet worden gevonden.' ) );
-	        $this->printPage('../shared/404');
+			$content_404=json_decode($this->moduleSettings->getSetting( "404_content", '{"title":"Page not found","body":"The requested page could not be found."}' ));
+
+			$this->smarty->assign( 'title', $this->translate( $content_404->title ) );
+			$this->smarty->assign( 'body', $this->translate( $content_404->body ) );
+
+	        $this->printPage( '../shared/404' );
 		}
 		else
 		{

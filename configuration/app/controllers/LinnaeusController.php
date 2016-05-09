@@ -324,9 +324,13 @@ class LinnaeusController extends Controller
 			$url = $this->rGetVal('r');
 		} 
 		else
-		if ( !empty($this->moduleSettings->getGeneralSetting( 'start_page' )) )
 		{
-			$url=$this->moduleSettings->getGeneralSetting( 'start_page' );
+			$this->moduleSettings=new ModuleSettingsReaderController();
+
+			if ( !empty($this->moduleSettings->getGeneralSetting( 'start_page' )) )
+			{
+				$url=$this->moduleSettings->getGeneralSetting( 'start_page' );
+			}
 		}
 
 		$this->redirect($url);
