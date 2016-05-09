@@ -4,6 +4,6 @@
 
 {include file="search-media.tpl"}
 
-{include file="../shared/select-media.tpl"}
+{include file="select-media.tpl"}
 
 {include file="../shared/admin-footer.tpl"}
