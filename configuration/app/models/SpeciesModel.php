@@ -698,14 +698,13 @@ class SpeciesModel extends AbstractModel
 
     }
 
-    public function getFirstTaxonIdNsr($projectId)
+    public function getFirstTaxonIdNsr( $projectId )
     {
-		if (!$projectId) return;
+		if ( is_null($projectId) ) return;
 
         $query = "
 			select
-				_a.id,
-				_a.taxon
+				_a.id
 
 			from %PRE%taxa _a
 
@@ -714,10 +713,15 @@ class SpeciesModel extends AbstractModel
 				and _a.id =  _trash.lng_id
 				and _trash.item_type='taxon'
 
+			left join %PRE%projects_ranks _p
+				on _a.project_id = _p.project_id
+				and _a.rank_id =  _p.id
+
 			where
 				_a.project_id =".$projectId."
 				and _a.taxon <>''
 				and ifnull(_trash.is_deleted,0)=0
+				and _p.lower_taxon=1
 
 			order by
 				_a.taxon
@@ -725,7 +729,7 @@ class SpeciesModel extends AbstractModel
 
         $d = $this->freeQuery($query);
 
-        return $d[0]['id'];
+        return isset($d[0]) && isset($d[0]['id']) ? $d[0]['id'] : null;
 
     }
 
