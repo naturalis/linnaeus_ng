@@ -1008,7 +1008,7 @@ CREATE TABLE IF NOT EXISTS `matrices_variations` (
 
 DROP TABLE IF EXISTS `media`;
 CREATE TABLE `media` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `rs_id` int(11) NOT NULL,
   `name` varchar(128) NOT NULL,
@@ -1034,7 +1034,7 @@ CREATE TABLE `media` (
 
 DROP TABLE IF EXISTS `media_captions`;
 CREATE TABLE `media_captions` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `media_modules_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
@@ -1047,7 +1047,7 @@ CREATE TABLE `media_captions` (
 
 DROP TABLE IF EXISTS `media_conversion_log`;
 CREATE TABLE `media_conversion_log` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `module` varchar(50) NOT NULL,
   `media_id` int(11) NOT NULL,
@@ -1098,7 +1098,7 @@ CREATE TABLE IF NOT EXISTS `media_meta` (
 
 DROP TABLE IF EXISTS `media_metadata`;
 CREATE TABLE `media_metadata` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `media_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
@@ -1118,7 +1118,7 @@ CREATE TABLE `media_metadata` (
 
 DROP TABLE IF EXISTS `media_modules`;
 CREATE TABLE `media_modules` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `media_id` int(11) NOT NULL,
   `module_id` int(11) NOT NULL,
