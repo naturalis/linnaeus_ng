@@ -84,7 +84,7 @@ class MediaConverterController extends MediaController
         if ($cli) $this->setCli();
 
         $this->setProjectMedia();
-/*
+
         foreach ($this->media['modules'] as $name => $module) {
 
             $this->setCurrentModule(array(
@@ -129,7 +129,7 @@ class MediaConverterController extends MediaController
             }
 
         }
-*/
+
         echo $this->_cli ? "\n\nConverting internal media links\n" :
             '</p><p><b>Converting internal media links</b><br>';
 
