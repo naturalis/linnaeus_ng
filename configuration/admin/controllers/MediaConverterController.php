@@ -92,40 +92,44 @@ class MediaConverterController extends MediaController
                 'id' => $module['id']
             ));
 
-            echo $this->_cli ? "\n$name\n" : "<p><strong>$name</strong><br>";
+            if (isset($module['media']) && !empty($module['media'])) {
 
-            foreach ($module['media'] as $row) {
+                echo $this->_cli ? "\n$name\n" : "<p><strong>$name</strong><br>";
 
-                $this->resetProperties();
-                $this->setCurrentItem($row);
+                foreach ($module['media'] as $row) {
 
-                // File name is present; check if already attached
-                if ($this->fileHasBeenConverted()) {
+                    $this->resetProperties();
+                    $this->setCurrentItem($row);
 
-                    // Item has already been converted
-                    if ($this->itemHasBeenAttached()) {
-                        echo "Already attached: $this->_currentFileName $this->_br";
+                    // File name is present; check if already attached
+                    if ($this->fileHasBeenConverted()) {
 
-                    // File has been converted but not yet attached to item
+                        // Item has already been converted
+                        if ($this->itemHasBeenAttached()) {
+                            echo "Already attached: $this->_currentFileName $this->_br";
+
+                        // File has been converted but not yet attached to item
+                        } else {
+                            $this->attachFile();
+                            echo "Attached: $this->_currentFileName $this->_br";
+                        }
+
+                    // Upload file
                     } else {
-                        $this->attachFile();
-                        echo "Attached: $this->_currentFileName $this->_br";
-                    }
 
-                // Upload file
-                } else {
+                        $this->uploadFile();
 
-                    $this->uploadFile();
+                        // Oops
+                        if (!empty($this->_error)) {
+                            echo 'ERROR: ' . $this->_error .  $this->_br;
 
-                    // Oops
-                    if (!empty($this->_error)) {
-                        echo 'ERROR: ' . $this->_error .  $this->_br;
-
-                    // Success!
-                    } else {
-                        echo "Uploaded: $this->_currentFileName $this->_br";
+                        // Success!
+                        } else {
+                            echo "Uploaded: $this->_currentFileName $this->_br";
+                        }
                     }
                 }
+
             }
 
         }
