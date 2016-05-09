@@ -84,7 +84,7 @@ class MediaConverterController extends MediaController
         if ($cli) $this->setCli();
 
         $this->setProjectMedia();
-
+/*
         foreach ($this->media['modules'] as $name => $module) {
 
             $this->setCurrentModule(array(
@@ -129,7 +129,7 @@ class MediaConverterController extends MediaController
             }
 
         }
-
+*/
         echo $this->_cli ? "\n\nConverting internal media links\n" :
             '</p><p><b>Converting internal media links</b><br>';
 
@@ -211,14 +211,23 @@ class MediaConverterController extends MediaController
                     $this->setCurrentFileName($match[2]);
                     $this->setFiles();
 
-                    if (empty($this->_error) &&
-                        !empty($this->_result->resource->files[0]->src)) {
+                     if (empty($this->_error)) {
 
                         $this->uploadFiles();
-                        $newContent = str_replace($match[0],
-                            $this->_result->resource->files[0]->src, $newContent);
 
-                        echo "Uploaded: $this->_currentFileName $this->_br";
+                        if (!empty($this->_result->resource->files[0]->src)) {
+
+                            $newContent = str_replace($match[0],
+                                $this->_result->resource->files[0]->src, $newContent);
+
+                            echo "Uploaded: $this->_currentFileName $this->_br";
+
+                        } else {
+
+                            echo "ERROR: could not upload $this->_currentFileName (" .
+                                $this->_result->error . ')' . $this->_br;
+
+                        }
 
                     } else {
 
