@@ -6,7 +6,7 @@
 	{foreach $categories v k}
     	{if !$v.is_empty}
 		<li id="ctb-{$v.id}">
-			<a {if $v.is_empty==0}href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.id}"{/if}
+			<a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.id}"{/if}
 	        {if $activeCategory==$v.id}
             class="category-active"
             {/if}                
@@ -16,6 +16,7 @@
     	{/if}
 	{/foreach}
 </ul>
+
 </div>
 
 <div id="page-main">
