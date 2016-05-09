@@ -19,18 +19,23 @@
 {/if}
 <input type="hidden" name="id" id="id" value="{$id}" />
 <input type="hidden" name="action" id="action" value="" />
-<div style="width:890px;height:610px;border:1px solid #aaf;margin-top:10px;">
+<div style="width:890px;border:1px solid #aaf;margin-top:10px;">
+{if $languages|@count>1}
 	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold">
 		<span id="taxon-language-default-language">
-{if $languages|@count>1}
-{foreach $languages v k}
-{if $v.def_language=='1'}{$v.language}{/if}
-{/foreach}
-{/if}
+        {foreach $languages v k}
+        {if $v.def_language=='1'}{$v.language}{/if}
+        {/foreach}
 		</span>
 	</div>
+{/if}
 	<div style="width:100%;padding:10px">
-		{t}Topic:{/t} <input type="text" id="topic-default" name="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" />
+    
+    {$page.hide_from_index}
+    
+    
+		{t}Topic:{/t} <input type="text" id="topic-default" name="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" /><br />
+        <span style="font-size:0.9em;"><label><input type="checkbox" id="hide_from_index" />{t}hide page from the public introduction index{/t}</label></span>
 		<textarea
 			name="content-default"
 			style="width:870px;height:500px;"
@@ -77,6 +82,9 @@
 <form action="media_upload.php" method="post" id="imgForm">
 <input type="hidden" name="id" id="id" value="{$id}" />
 </form>
+
+
+
 <script type="text/JavaScript">
 $(document).ready(function()
 {
