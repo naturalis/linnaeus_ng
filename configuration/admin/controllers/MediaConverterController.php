@@ -188,7 +188,7 @@ class MediaConverterController extends MediaController
 
         $regExp = '/(..\/..\/..\/shared\/media\/project\/' .
             str_pad($this->getCurrentProjectId(), 4, "0", STR_PAD_LEFT) .
-            '\/)((.*?)\.jpg)/i';
+            '\/)((.[^,]?)\.jpg)/i';
 
         foreach ($data as $row) {
 
