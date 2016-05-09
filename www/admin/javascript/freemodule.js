@@ -1,4 +1,7 @@
-function freemodSaveContent(language,type) {
+
+
+function freemodSaveContent(language,type)
+{
 
 	var id = $('#id').val();
 
@@ -9,7 +12,8 @@ function freemodSaveContent(language,type) {
 
 	var topic = $('#topic-'+type).val();
 	var content = tinyMCE.get('content-'+type).getContent();
-
+	var hide_from_index = $('#hide_from_index' ).prop( 'checked' ) ? 1 : 0;
+	
 	$.ajax({
 		url : "ajax_interface.php" ,
 		type: "POST",
@@ -19,10 +23,12 @@ function freemodSaveContent(language,type) {
 			'language' : language ,
 			'topic' : topic,
 			'content' : content ,
+			'hide_from_index' : hide_from_index ,
 			'time' : allGetTimestamp()			
 		}),
-		success : function (data) {
-			//alert(data);
+		success : function (data)
+		{
+			//console.log(data);
 			allSetMessage(data);
 		}
 	});

@@ -53,6 +53,7 @@ insert into modules values (null,'Media','Media management','media',99,1,0,now()
 insert into modules values (null,'Taxon editor','Taxon editor','nsr',99,1,0,now(),now());
 delete from modules where controller = 'highertaxa';
 insert into modules values (null,'Higher taxa','Placeholder module for backward compatibility','highertaxa',99,0,1,now(),now());
+insert into modules values (null,'Actors','Actors: persons & organizations','actors',99,1,0,now(),now());
 
 
 /* Update roles */
@@ -71,6 +72,22 @@ update projects_roles_users set role_id = 1 where user_id = (select id from user
 /* Matrix */
 update characteristics _a set _a.sys_name = (select _b.label from characteristics_labels _b where _a.id=_b.characteristic_id limit 1);
 update characteristics_states _a set _a.sys_name = (select _b.label from characteristics_labels_states _b where _a.id=_b.state_id limit 1);
+
+
+
+/* moving welcome and contributors content to introduction */
+select @welcome_content := content, @language_id := language_id , @project_id := project_id from content where subject = 'Welcome';
+select @contributors_content := content from content where subject = 'Contributors';
+
+set @welcome_subject := 'Welcome';
+set @contributors_subject := 'Contributors';
+
+select ifnull(max(id)+1,0) into @next_intro_page_id from introduction_pages;
+insert into introduction_pages values (@next_intro_page_id,@project_id,1,99,1,now(),now());
+insert into introduction_pages values (@next_intro_page_id+1,@project_id,1,99,1,now(),now());
+insert into content_introduction values (null,@project_id,@next_intro_page_id,@language_id,@welcome_subject,@welcome_content,now(),now());
+insert into content_introduction values (null,@project_id,@next_intro_page_id+1,@language_id,@contributors_subject,@contributors_content,now(),now());
+
 
 
 
@@ -106,7 +123,7 @@ INSERT IGNORE INTO `module_settings` VALUES
 (32,-1,'skin_gsm','styling of graphical interface of application front-end, specific for mobile phones (overrides \'skin_mobile\').',NULL,NOW(),NOW()),
 (33,-1,'force_skin_mobile','force the use of skin_mobile (if defined), even if values for skin or skin_gsm have been defined.','0',NOW(),NOW()),
 (34,-1,'suppress_restore_state','suppress the restoring of a module\'s earlier state from the same session when re-accessing the module (front-end only).','0',NOW(),NOW()),
-(35,-1,'start_page','specific URL (relative) to redirect to when a user first opens the application (front-end).',NULL,NOW(),NOW()),
+(35,-1,'start_page','specific URL (relative) to redirect to when a user first opens the application (front-end).','/linnaeus_ng/app/views/linnaeus/',NOW(),NOW()),
 (36,-1,'db_lc_time_names','MySQL locale for date and time names.','nl_NL',NOW(),NOW()),
 (37,12,'url_help_search_presence','URL of the user help for the search category \"presence\" (NSR specific).',NULL,NOW(),NOW()),
 (38,4,'use_taxon_variations','allow the use of taxon variations (currently in use in the matrix key only)',NULL,NOW(),NOW()),
@@ -143,7 +160,13 @@ INSERT IGNORE INTO `module_settings` VALUES
 (80,19,'rs_search_api','Name of RS API to search RS','api_search_lng',NOW(),NOW()),
 (81,19,'rs_user_name','RS user name (project name @ server name)',NULL,NOW(),NOW()),
 (82,19,'rs_password','RS password (set dynamically when user is created)',NULL,NOW(),NOW()),
-(83,-1, 'tree_show_upper_taxon', 'Show the most upper taxon in the taxonomic tree; if set to false, the top of the tree will display the name of the project instead.', NULL, NOW(), NOW());
+(83,-1, 'tree_show_upper_taxon', 'Show the most upper taxon in the taxonomic tree; if set to false, the top of the tree will display the name of the project instead.', NULL, NOW(), NOW()),
+(null,1, 'welcome_topic', 'Name of the page with the old migrated welcome-page', @syspage_Welcome, NOW(), NOW()),
+(null,1, 'contributors_topic', 'Name of the page with the old migrated contributors-page', @syspage_Contributors, NOW(), NOW())
+;
+
+
+
 UNLOCK TABLES;
 
 

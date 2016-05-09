@@ -125,8 +125,6 @@ class IntroductionController extends Controller
 				$this->checkAuthorisation();
 				//$this->deleteMedia();
 				$this->detachAllMedia();
-
-
 			}
 			else
 			if ($this->rHasVal('action','preview'))
@@ -152,14 +150,15 @@ class IntroductionController extends Controller
 
 		$navList = $this->getPageNavList(true);
 
-		if (isset($navList)) $this->smarty->assign('navList', $navList);
-		$this->smarty->assign('navCurrentId',$this->rHasId() ? $this->rGetId() : null);
-		if (isset($page)) $this->smarty->assign('page', $page);
-		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : $id);
-		$this->smarty->assign('languages', $this->getProjectLanguages());
-		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
-		$this->smarty->assign('includeHtmlEditor', true);
-		$this->smarty->assign('module_id', $this->getCurrentModuleId());
+		if ( isset($navList) ) $this->smarty->assign('navList', $navList);
+		if ( isset($page) ) $this->smarty->assign('page', $page);
+
+		$this->smarty->assign( 'navCurrentId', $this->rHasId() ? $this->rGetId() : null );
+		$this->smarty->assign( 'id', $this->rHasId() ? $this->rGetId() : $id );
+		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
+		$this->smarty->assign( 'activeLanguage', $this->getDefaultProjectLanguage() );
+		$this->smarty->assign( 'includeHtmlEditor', true );
+		$this->smarty->assign( 'module_id', $this->getCurrentModuleId() );
 		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 
         $this->printPage();
@@ -383,6 +382,7 @@ class IntroductionController extends Controller
 		$language = isset($p['language']) ? $p['language'] : null;
 		$topic = isset($p['topic']) ? $p['topic'] : null;
 		$content = isset($p['content']) ? $p['content'] : null;
+		$hide_from_index = isset($p['hide_from_index']) ? $p['hide_from_index']==1 : false;
 
 		if (!isset($id) || !isset($language))
 		{
@@ -424,10 +424,18 @@ class IntroductionController extends Controller
 						'content' => trim($content)
 					)
 				);
-
+				
 				$this->setPageGotContent($id,true);
 
             }
+
+			$this->models->IntroductionPages->save(
+				array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+					'hide_from_index' => $hide_from_index ? '1' : 'null'
+				)
+			);
 
 			$this->moduleSession->setModuleSetting( array('setting'=>'navList' ) );
 
@@ -749,7 +757,7 @@ class IntroductionController extends Controller
 
     private function getPageImage ()
     {
-        $img = $this->_mc->getItemMediaFiles();
+		$img = $this->_mc->getItemMediaFiles();
 
         if (!empty($img) && $img[0]['media_type'] == 'image') {
             return $img[0];
