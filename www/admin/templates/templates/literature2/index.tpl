@@ -12,7 +12,7 @@
 			</td>
 			<td>
 				{foreach from=$titleAlphabet item=v}
-				<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');">{$v.letter|@strtoupper}</a>
+				<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');return false;">{$v.letter|@strtoupper}</a>
 				{/foreach}
 			</td>
 		</tr>
@@ -26,7 +26,7 @@
 			<td>
 				{foreach from=$authorAlphabet item=v}
 				{if $v.letter}
-				<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_author_letter','{$v.letter}');">{$v.letter|@strtoupper}</a>
+				<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_author_letter','{$v.letter}');return false;">{$v.letter|@strtoupper}</a>
 				{/if}
 				{/foreach}
 			</td>

@@ -1,12 +1,6 @@
 {include file="../shared/header.tpl"}
 
-<div id="dialogRidge">
-
-	<div id="left">
-        <div>
-            <h2>&nbsp;</h2>
-        </div>
-	</div>
+<div id="dialogRidge" style="margin-left:225px">
 	
 	<div id="content" class="literature">
 

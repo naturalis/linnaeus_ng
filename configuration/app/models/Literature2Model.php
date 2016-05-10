@@ -110,68 +110,55 @@ final class Literature2Model extends AbstractModel
 		return $data;
 	}
 
-
-    // Used in original LiteratureController
-	public function getLookupList ($params)
+    public function getReferences($params)
     {
-		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
-		$search = isset($params['search']) ? $params['search'] : null;
-		$matchStartOnly = isset($params['match_start']) ? $params['match_start']=='1' : false;
-		$getAll = isset($params['get_all']) ? $params['get_all']=='1' : false;
+        $projectId = isset($params['projectId']) ? $params['projectId'] : null;
+        $publicationTypeId = isset($params['publicationTypeId']) ? $params['publicationTypeId'] : null;
 
-		if (is_null($project_id) || is_null($search))
-		{
-			return;
+        if (is_null($projectId)) {
+			return null;
 		}
 
-		$match = $matchStartOnly ?
-            mysqli_real_escape_string($this->databaseConnection, $search).'%' :
-		    '%'.mysqli_real_escape_string($this->databaseConnection, $search).'%';
+        $query = "
+            select
+				_a.id,
+				_a.language_id,
+				_a.label,
+				_a.alt_label,
+				_a.alt_label_language_id,
+				_a.date,
+				_a.author,
+				_a.publication_type,
+				_a.citation,
+				_a.source,
+				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
+				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
+				_a.pages,
+				_a.volume,
+				_a.external_link
 
-		$query = '
-    		select
-            id,
-            concat(
-            	author_first,
-            	(
-            		if(multiple_authors=1,
-            			\' et al.\',
-            			if(author_second!=\'\',concat(\' & \',author_second),\'\')
-            		)
-            	),
-            	\', \',
-            	if(isnull(`year`)!=1,`year`,\'\'),
-            	if(isnull(suffix)!=1,suffix,\'\'),
-            	if(isnull(year_2)!=1,
-            		concat(
-            			if(year_separator!=\'-\',
-            				concat(
-            					\' \',
-            					year_separator,
-            					\' \'
-            				),
-            				year_separator
-            			),
-            			year_2,
-            			if(isnull(suffix_2)!=1,
-            				suffix_2,
-            				\'\')
-            			)
-            			,\'\'
-            		)
-            ) as label,
-            lower(author_first) as _a1,
-            lower(author_second) as _a2,
-            `year`
-            from %PRE%literature
-            where project_id = '.
-            	$project_id .
-            	(!$getAll ? ' and (author_first like "'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
-            order by _a1,_a2,`year`';
+			from %PRE%literature2 _a
 
-		return $this->freeQuery($query);
+			left join  %PRE%literature2 _h
+				on _a.publishedin_id = _h.id
+				and _a.project_id=_h.project_id
+
+			left join %PRE%literature2 _i
+				on _a.periodical_id = _i.id
+				and _a.project_id=_i.project_id
+
+			where
+				_a.project_id = ".$projectId."
+				".(!is_null($publicationTypeId) ?
+					"and ".
+					(is_array($publicationTypeId) ?
+						"_a.publication_type_id in (" . implode(",",array_map('intval',$publicationTypeId)). ")" :
+						"_a.publication_type_id = " .
+					        mysqli_real_escape_string($this->databaseConnection, intval($publicationTypeId)) ) :
+					"" )."";
+
+        return $this->freeQuery($query);
     }
-
 
     public function getTitleAlphabet($params)
     {
@@ -197,7 +184,6 @@ final class Literature2Model extends AbstractModel
 
         return $this->freeQuery( $query );
     }
-
 
     public function getAuthorAlphabet($params)
     {
@@ -232,7 +218,6 @@ final class Literature2Model extends AbstractModel
 
         return $this->freeQuery( $query );
     }
-
 
     public function getReferencedTaxa( $params )
     {
@@ -273,5 +258,33 @@ final class Literature2Model extends AbstractModel
         return $this->freeQuery($query);
     }
 
+    public function getReferenceAuthors($params)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
+        $literatureId = isset($params['literatureId']) ? $params['literatureId'] : null;
+
+        if (is_null($projectId) || is_null($literatureId)) {
+			return null;
+		}
+
+        $query = "
+            select
+				_a.actor_id,
+				_b.name
+
+			from %PRE%literature2_authors _a
+
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id
+				and _a.project_id=_b.project_id
+
+			where
+				_a.project_id = ".$projectId."
+				and _a.literature2_id =".$literatureId."
+
+			order by _a.sort_order,_b.name";
+
+        return $this->freeQuery($query);
+    }
+	
 }
-?>
