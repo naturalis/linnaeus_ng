@@ -108,6 +108,11 @@ class NsrTaxonManagement extends NsrController
             }
         }
 
+        if ($this->rHasVal('action','save') && !$this->isFormResubmit())
+		{
+			$this->savePageTitles( $this->rGetAll()['pages_taxa_titles'] );
+        }		
+
         $lp=$this->getProjectLanguages();
 
         $pages = $this->models->PagesTaxa->_get(array(
@@ -616,8 +621,60 @@ class NsrTaxonManagement extends NsrController
 			),
 			'columns' => 'id,title,page_id,language_id'
 		));
-
     }
+	
+	
+	
+	private function savePageTitles( $titles )
+	{
+		foreach((array)$titles as $page_id=>$languages)
+		{
+			foreach((array)$languages as $language_id=>$label)
+			{
+				$label=trim($label);
+
+	            if ( empty($label) )
+				{
+					$this->models->PagesTaxaTitles->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $language_id,
+						'page_id' => $page_id
+					));
+
+					$this->addMessage( $this->translate( 'Label deleted.' ) );
+
+            	}
+	            else
+				{
+					$d = $this->models->PagesTaxaTitles->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $language_id,
+							'page_id' => $page_id
+						)
+					));
+
+					$this->models->PagesTaxaTitles->save(
+					array(
+						'id' => isset($d[0]['id']) ? $d[0]['id'] : null,
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $language_id,
+						'page_id' => $page_id,
+						'title' => $label
+					));
+
+					if ($this->models->PagesTaxaTitles->getAffectedRows()>0)
+						$this->addMessage( $this->translate( isset($d[0]['id']) ? 'Label updated.' : 'Label added.' ) );
+
+					$change=$this->models->PagesTaxaTitles->getDataDelta();
+					$this->logChange(['before'=>@$change['before'][0],'after'=>@$change['after'][0],'note'=>'altered tab label']);
+
+				}
+			}
+		}
+	}
 
 
 }

@@ -7,6 +7,10 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
+
+    <link href="{$baseUrl}app/style/naturalis/images/favicon.ico" rel="shortcut icon" >
+    <link href="{$baseUrl}app/style/naturalis/images/favicon.ico" rel="icon" type="image/x-icon">
+
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
 {if $cssToLoad}
