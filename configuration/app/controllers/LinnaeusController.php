@@ -105,8 +105,13 @@ class LinnaeusController extends Controller
 				$this->redirect( '../introduction/topic.php?id=' . $id );
 			}
 		}
-		
-		if ( $this->doesCurrentProjectHaveModule(MODCODE_INDEX) )
+
+		if ( $this->doesCurrentProjectHaveModule(MODCODE_SPECIES) )
+		{
+			$this->redirect( '../species/' );
+		}
+	
+		if ( $this->doesCurrentProjectHaveModule(MODCODE_SPECIES) )
 		{
 			$this->redirect( '../index/' );
 		}
