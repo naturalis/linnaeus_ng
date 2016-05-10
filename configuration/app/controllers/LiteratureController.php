@@ -410,7 +410,7 @@ class LiteratureController extends Controller
 		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
 		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
 
-		$l = $this->models->Literature2Model->getLookupList(array(
+		$l = $this->reallyGetLookupList(array(
             'project_id' => $this->getCurrentProjectId(),
     		'search' => $search,
     		'match_start' => $matchStartOnly,
@@ -430,6 +430,68 @@ class LiteratureController extends Controller
 
 	}
 
-	
+
+
+    // Used in original LiteratureController
+	public function reallyGetLookupList ($params)
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$search = isset($params['search']) ? $params['search'] : null;
+		$matchStartOnly = isset($params['match_start']) ? $params['match_start']=='1' : false;
+		$getAll = isset($params['get_all']) ? $params['get_all']=='1' : false;
+
+		if (is_null($project_id) || is_null($search))
+		{
+			return;
+		}
+
+		$match = $matchStartOnly ?
+            mysqli_real_escape_string($this->databaseConnection, $search).'%' :
+		    '%'.mysqli_real_escape_string($this->databaseConnection, $search).'%';
+
+		$query = '
+    		select
+            id,
+            concat(
+            	author_first,
+            	(
+            		if(multiple_authors=1,
+            			\' et al.\',
+            			if(author_second!=\'\',concat(\' & \',author_second),\'\')
+            		)
+            	),
+            	\', \',
+            	if(isnull(`year`)!=1,`year`,\'\'),
+            	if(isnull(suffix)!=1,suffix,\'\'),
+            	if(isnull(year_2)!=1,
+            		concat(
+            			if(year_separator!=\'-\',
+            				concat(
+            					\' \',
+            					year_separator,
+            					\' \'
+            				),
+            				year_separator
+            			),
+            			year_2,
+            			if(isnull(suffix_2)!=1,
+            				suffix_2,
+            				\'\')
+            			)
+            			,\'\'
+            		)
+            ) as label,
+            lower(author_first) as _a1,
+            lower(author_second) as _a2,
+            `year`
+            from %PRE%literature
+            where project_id = '.
+            	$project_id .
+            	(!$getAll ? ' and (author_first like "'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
+            order by _a1,_a2,`year`';
+
+		return $this->freeQuery($query);
+    }
+
 }
 

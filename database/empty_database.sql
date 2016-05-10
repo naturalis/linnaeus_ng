@@ -1488,12 +1488,10 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` varchar(32) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `abbrev` varchar(10) DEFAULT NULL,
-  `assignable` enum('y','n') NOT NULL,
+  `hidden` tinyint(1) null default 0,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `role` (`role`),
-  KEY `role_2` (`role`)
+  UNIQUE KEY `role` (`role`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `sections`;

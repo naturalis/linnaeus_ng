@@ -24,8 +24,8 @@
 	{if !($v.obsolete && $v.content|@strlen==0)}
 	<li>
 		<span class="passport-title">
-        	{if $v.always_hide}({/if}<a href="#" class="passport-toggles" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="verborgen tab"{/if}>{$v.title}</a>{if $v.always_hide}){/if}
-            {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Verouderde paspoorttitel</span>{/if}
+        	{if $v.always_hide}({/if}<a href="#" class="passport-toggles" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="{t}hidden tab{/t}"{/if}>{$v.title}</a>{if $v.always_hide}){/if}
+            {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">{t}Obsolete passport entry{/t}</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
                 <span title="heeft content, is gepubliceerd" class="passport-published">{$v.content|@strlen} tekens</span>
@@ -65,46 +65,47 @@
 
 {if $hasObsolete}
 <p>
-<span class="passport-waarschuwing">Verouderde paspoorttitels</span><br/>
-Dit zijn oude paspoorttitels die overlappen met nieuwe titels.<br />
-Verplaats voor de consistentie de tekst s.v.p. van het oude naar het nieuwe paspoort:
+<span class="passport-waarschuwing">{t}Obsolete passport entries{/t}</span><br/>
+{t}These are old passport entries that overlap with newer ones, or are obsolete.{/t}
+<br />
+{t}For the sake of consistency, please move the content from old to new entries following this schema:{/t}
 <ul>
-    <li>Algemeen > Samenvatting</li>
-    <li>Bescherming > Bedreiging en bescherming</li>
-    <li>Description > Summary</li>
-    <li>Habitat > Biotopen</li>
-    <li>Gelijkende soorten > Herkenning</li>
-    <li>Verplaatsing > Verspreiding</li>
+{foreach $obsolete_tabs v k}
+    <li>{$v.old} > {if $v.new}{$v.new}{else}{t}(obsolete){/t}{/if}</li>
+{/foreach}
 </ul>
 </p>
 {/if}
 
-</p>
-
-<p>
-	<a href="paspoort_meta.php?id={$concept.id}" class="edit"  style="margin:0">meta-gegevens</a><br />
-	<a id="media-overlay-links" href="#" class="edit" style="margin:0">media overlay</a><br>
 
 </p>
 
 <p>
-	<a href="taxon.php?id={$concept.id}">terug</a>
+	<a href="paspoort_meta.php?id={$concept.id}" class="edit"  style="margin:0">{t}meta-data{/t}</a><br />
+	<a id="media-overlay-links" href="#" class="edit" style="margin:0">{t}media overlay{/t}</a><br>
+
+</p>
+
+<p>
+	<a href="taxon.php?id={$concept.id}">{t}back{/t}</a>
 </p>
 
 </div>
 
 <script>
-$(document).ready(function(e) {
+$(document).ready(function(e)
+{
 	{foreach from=$tabs item=v key=k}
 	currentpublish[{$k}]={if $v.publish==1}true{else}false{/if};
 	{/foreach}
 
 	$('#page-block-messages').fadeOut(3000);
 
-	{literal}
-	$('#media-overlay-links').click(function(e) {
+	$('#media-overlay-links').click(function(e)
+	{
 		e.preventDefault();
-		$.get("../media/media-overlay.php", function(r) {
+		$.get("../media/media-overlay.php", function(r)
+		{
 			prettyDialog({
 				content : r,
 				width: 1000,
@@ -113,8 +114,6 @@ $(document).ready(function(e) {
 			});
 		});
 	});
-	{/literal}
-
 });
 </script>
 
