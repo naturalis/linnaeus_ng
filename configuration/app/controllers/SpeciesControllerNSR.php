@@ -466,7 +466,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 	}
 	
-
     private function getCategories($p=null)
     {
 		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
@@ -490,7 +489,9 @@ class SpeciesControllerNSR extends SpeciesController
 			foreach((array)$categories as $key=>$val)
 			{
 				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
+				{
 					$categories[$key]['is_empty']=true;
+				}
 
 				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
 				{

@@ -76,19 +76,14 @@ update characteristics_states _a set _a.sys_name = (select _b.label from charact
 
 
 /* moving welcome and contributors content to introduction */
-select @welcome_content := content, @language_id := language_id , @project_id := project_id from content where subject = 'Welcome';
-select @contributors_content := content from content where subject = 'Contributors';
-
-set @welcome_subject := 'Welcome';
-set @contributors_subject := 'Contributors';
+select @welcome_subject := subject, @welcome_content := content, @language_id := language_id , @project_id := project_id from content where subject = 'Welcome';
+select @contributors_subject := subject, @contributors_content := content from content where subject = 'Contributors';
 
 select ifnull(max(id)+1,0) into @next_intro_page_id from introduction_pages;
 insert into introduction_pages values (@next_intro_page_id,@project_id,1,99,1,now(),now());
 insert into introduction_pages values (@next_intro_page_id+1,@project_id,1,99,1,now(),now());
 insert into content_introduction values (null,@project_id,@next_intro_page_id,@language_id,@welcome_subject,@welcome_content,now(),now());
 insert into content_introduction values (null,@project_id,@next_intro_page_id+1,@language_id,@contributors_subject,@contributors_content,now(),now());
-
-
 
 
 /* Update module settings */
@@ -161,16 +156,13 @@ INSERT IGNORE INTO `module_settings` VALUES
 (81,19,'rs_user_name','RS user name (project name @ server name)',NULL,NOW(),NOW()),
 (82,19,'rs_password','RS password (set dynamically when user is created)',NULL,NOW(),NOW()),
 (83,-1, 'tree_show_upper_taxon', 'Show the most upper taxon in the taxonomic tree; if set to false, the top of the tree will display the name of the project instead.', NULL, NOW(), NOW()),
-(null,1, 'welcome_topic', 'Name of the page with the old migrated welcome-page', @syspage_Welcome, NOW(), NOW()),
-(null,1, 'contributors_topic', 'Name of the page with the old migrated contributors-page', @syspage_Contributors, NOW(), NOW()),
+(null,1, 'welcome_topic_id', 'ID of the page with the old migrated welcome-page', null, NOW(), NOW()),
 (null,4,'obsolete_passport_tabs','Legacy tab titles that should be flagged as obsolete in the passport editor (use JSON-string: {"Old":"New","Totally obsolete":null})',NULL,NOW(),NOW()),
 ;
 
 UNLOCK TABLES;
 
-{"Old":"New","Totally obsolete"} 
-
-
+/*
 TRUNCATE TABLE `module_settings_values`;
 LOCK TABLES `module_settings_values` WRITE;
 INSERT INTO `module_settings_values` VALUES
@@ -193,3 +185,4 @@ INSERT INTO `module_settings_values` VALUES
 (24,1,78,'api_upload_lng',NOW(),NOW());
 UNLOCK TABLES;
 
+*/
