@@ -95,7 +95,10 @@ class LinnaeusController extends Controller
 				'topic' => $welcome_topic
 			));	
 
-			$this->redirect( '../introduction/topic.php?id=' . $id );
+			if ( !is_null($id) )
+			{
+				$this->redirect( '../introduction/topic.php?id=' . $id );
+			}
 		}
 
 		if ($this->doesCurrentProjectHaveModule(MODCODE_INTRODUCTION))
@@ -105,13 +108,13 @@ class LinnaeusController extends Controller
 				'topic' => $welcome_topic
 			));	
 			
-			if ( $id) 
+			if ( !is_null($id) ) 
 			{
 				$this->redirect( '../introduction/topic.php?id=' . $id );
 			}
 		}
 		
-		if ( $this->doesCurrentProjectHaveModule(MODCODE_INDEX))
+		if ( $this->doesCurrentProjectHaveModule(MODCODE_INDEX) )
 		{
 			$this->redirect( '../index/' );
 		}
