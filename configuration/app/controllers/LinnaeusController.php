@@ -86,19 +86,11 @@ class LinnaeusController extends Controller
 			}
 		}
 
-		$welcome_topic=$this->moduleSettings->getModuleSetting( [ 'module'=>'introduction', 'setting'=>'welcome_topic' ] );
+		$welcome_topic_id=$this->moduleSettings->getModuleSetting( [ 'module'=>'introduction', 'setting'=>'welcome_topic_id' ] );
 
-		if ( !empty($welcome_topic) )
+		if ( !empty($welcome_topic_id) )
 		{
-			$id = $this->models->LinnaeusModel->getIntroductionTopicId(array(
-				'project_id' => $this->getCurrentProjectId(),
-				'topic' => $welcome_topic
-			));	
-
-			if ( !is_null($id) )
-			{
-				$this->redirect( '../introduction/topic.php?id=' . $id );
-			}
+			$this->redirect( '../introduction/topic.php?id=' . $welcome_topic_id );
 		}
 
 		if ($this->doesCurrentProjectHaveModule(MODCODE_INTRODUCTION))
