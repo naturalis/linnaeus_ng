@@ -11,6 +11,9 @@
 
 
 <div id="page-main">
+	<form method="post">
+    <input type="hidden" name="rnd" value="{$rnd}" />
+    <input type="hidden" name="action" value="save" />
 	<p>
         {t _s1=$maxCategories _s2=$pages[0].page}Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory.{/t}<br />
         {t}Below, you can specify the correct label of each category in the language or languages defined in your project. On the left hand side, the labels in the default language are displayed. On the right hand side, the labels in the other languages are displayed. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />
@@ -21,38 +24,29 @@
 			<tr>
                 <th>{t}category{/t}</th>
                 {foreach from=$languages item=v}
-                {if $v.def_language=='1'}
 				<td>{$v.language} *</td>
-                {/if}
                 {/foreach}
-                {if $languages|@count > 1}
-                <td id="project-language-tabs">(languages)</td>
-                {/if}
                 <td></td>
                 <td>{t}attributes{/t}</td>
 			</tr>
 
-            {foreach from=$pages item=v}
+            {foreach $pages v}
+            
             <tr class="tr-highlight">
                 <td>
                     <span class="{if $v.always_hide==1}hidden-tab{/if}" title="{if $v.always_hide==1}hidden tab{/if}">{$v.page}</span>
                 </td>
-                <td>
-                    <input 
-                        type="text" 
-                        id="default-{$v.id}" 
-                        maxlength="64" 
-                        onblur="taxonSavePageTitle({$v.id},this.value,'default')" />
-                </td>
-                {if $languages|@count > 1}
+                {foreach $languages l}
                 <td>
                     <input 
                         type="text" 
                         id="other-{$v.id}" 
                         maxlength="64" 
-                        onblur="taxonSavePageTitle({$v.id},this.value,'other')" />
+                        name="pages_taxa_titles[{$v.id}][{$l.language_id}]"
+                        value="{$v.page_titles[$l.language_id]}" />
                 </td>
-                {/if}
+                {/foreach}
+
                 <td class="cell-page-delete" onclick="taxonPageDelete({$v.id},'{$v.page}');"></td>
                 <td>
                 	{if $v.always_hide==1}{t}always hidden{/t} (id={$v.id}){/if}
@@ -64,6 +58,9 @@
 
             {/foreach}
         </table>
+        <input type="submit" value="{t}save{/t}" />
+		</form>
+
 	</p>
 	<p>
         {if $languages|@count==0}
@@ -75,7 +72,7 @@
             <input type="text" maxlength="32" id="new_page" name="new_page" value="" />
             <input type="hidden" name="rnd" value="{$rnd}" />
             <input type="hidden" name="show_order" value="{$nextShowOrder}" />
-            <input type="submit" value="{t}save{/t}" />
+            <input type="submit" value="{t}add{/t}" />
             {/if}
 		</form>
 	</p>
