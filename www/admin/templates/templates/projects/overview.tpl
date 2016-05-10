@@ -8,6 +8,7 @@
 ul {
 	margin-top:-10px;
 	padding-left:0px;
+	margin-bottom:25px;
 }
 
 ul.modules li {
@@ -43,34 +44,42 @@ ul.management li {
 
 {/if}
 
-
-<!--
-NOTICES
-- acquire images for matrix
-- compress dich key
-- define /shortname/
-- project ubpublished
--->
 	<br />
+
 
     <h3>{t}Management tasks{/t}</h3>
 
     <ul class="management">
         <li><a href="../module_settings/">{t}Settings{/t}</a></li>
+        <li><a href="../hotwords/">{t}Hotwords{/t}</a></li>
+        <!-- li><a href="../utilities/mass_upload.php">{t}Mass upload images{/t}</a></li -->
+        <!-- li><a href="../projects/clear_cache.php">{t}Clear cache{/t}</a></li -->
     </ul>
 
     <ul class="management">
-        <li><a href="../hotwords/">{t}Hotwords{/t}</a></li>
-        <li><a href="../utilities/mass_upload.php">{t}Mass upload images{/t}</a></li>
-        <li><a href="../projects/clear_cache.php">{t}Clear cache{/t}</a></li>
+        <li><a href="../import/index.php">{t}Import data{/t}</a></li>
+        <li><a href="../projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
     </ul>
 
     <ul class="management">
         <li><a href="../import/export.php">{t}Generic export{/t}</a></li>
         <li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
         <li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
-    
     </ul>
+
+	{if $show_sys_management_modules}
+
+	<ul class="management">
+        <!-- li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li -->
+        <li><a href="../projects/delete.php">{t}Delete a project{/t}</a></li>
+        <li><a href="../projects/change_id.php">{t}Change a project ID{/t}</a></li>
+    </ul>
+    
+    <ul class="management">
+        <li><a href="../interface/index.php">{t}Interface translations{/t}</a></li>
+    </ul>
+
+	{/if}
     
 </div>
 
