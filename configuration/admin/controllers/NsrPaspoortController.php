@@ -10,6 +10,7 @@
 
 
 include_once ('NsrController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class NsrPaspoortController extends NsrController
 {
@@ -37,6 +38,7 @@ class NsrPaspoortController extends NsrController
     public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $taxonId;
+	private $obsoleteTabs=array();
 
     public function __construct()
     {
@@ -64,9 +66,10 @@ class NsrPaspoortController extends NsrController
 
         $this->setPageName($this->translate('Edit taxon passport'));
 
-		$this->smarty->assign('actors',$this->getActors());
-		$this->smarty->assign('tabs',$this->getPassportCategories());
-		$this->smarty->assign('concept',$this->getTaxonById($this->getTaxonId()));
+		$this->smarty->assign( 'actors', $this->getActors() );
+		$this->smarty->assign( 'tabs', $this->getPassportCategories() );
+		$this->smarty->assign( 'concept', $this->getTaxonById($this->getTaxonId()) );
+		$this->smarty->assign( 'obsolete_tabs', $this->obsoleteTabs );
 
 		$this->UserRights->setActionType( $this->UserRights->getActionPublish() );
 		$this->smarty->assign( 'can_publish', $this->getAuthorisationState() );
@@ -151,6 +154,19 @@ class NsrPaspoortController extends NsrController
 		if (!defined('CTAB_MEDIA')) define('CTAB_MEDIA','media');
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		
+		 $this->setObsoleteTabs();
+	}
+
+	private function setObsoleteTabs()
+	{
+		foreach((array)json_decode($this->moduleSettings->getModuleSetting( ['setting'=>'obsolete_passport_tabs','module'=> 'species' ] ) ) as $key=>$val)
+		{
+			$tab='TAB_' . str_replace(' ','_',strtoupper($key));
+			if ( defined( $tab ) ) $this->obsoleteTabs[constant($tab)]=['old'=>$key,'new'=>$val];
+		}
 	}
 
 	private function setTaxonId($id)
@@ -202,15 +218,7 @@ class NsrPaspoortController extends NsrController
 				$start=$val['id'];
 			}
 
-			// categories need to be configurable! REFAC2015
-			$categories[$key]['obsolete']=
-				( defined('TAB_ALGEMEEN') ? $val['id']==TAB_ALGEMEEN : false ) ||
-				( defined('TAB_BESCHERMING') ? $val['id']==TAB_BESCHERMING : false ) ||
-				( defined('TAB_DESCRIPTION') ? $val['id']==TAB_DESCRIPTION : false ) ||
-				( defined('TAB_HABITAT') ? $val['id']==TAB_HABITAT : false ) ||
-				( defined('TAB_GELIJKENDE_SOORTEN') ? $val['id']==TAB_GELIJKENDE_SOORTEN : false ) ||
-				( defined('TAB_VERPLAATSING') ? $val['id']==TAB_VERPLAATSING : false )
-			;
+			$categories[$key]['obsolete']=array_key_exists( $val['id'] , $this->obsoleteTabs );
 
 			if ($val['content_id'])
 			{
