@@ -88,6 +88,10 @@ class ProjectsController extends Controller
 
 		$this->wikiPageOverride['basename']='ProjectOverview';
 
+
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+        $this->smarty->assign('show_sys_management_modules', $this->UserRights->hasAppropriateLevel() );
+
         $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
         $this->printPage();
     }
