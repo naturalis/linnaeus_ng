@@ -2073,6 +2073,7 @@ class MapKeyController extends Controller
 	public function getAllTaxaWithOcc()
 	{
 		$d=array();
+		
 		foreach((array)$this->_allTaxa as $val)
 		{
 			if ( $val['total']>0 ) $d[]=$val;
@@ -2082,6 +2083,7 @@ class MapKeyController extends Controller
 
 	private function initTaxaWithOcc()
 	{
+		/*
 
 		$d=isset($_SESSION['app']['user']['map']['all_taxa']) ? $_SESSION['app']['user']['map']['all_taxa'] : null;
 
@@ -2090,6 +2092,7 @@ class MapKeyController extends Controller
 			$this->setAllTaxa($d);
 			return;
 		}
+
 
 		if ($this->_mapType=='l2')
 		{
@@ -2126,6 +2129,7 @@ class MapKeyController extends Controller
 				");
 		}
 		else
+		*/
 		{
 			// SLOOOOOOOOOOW! (?)
 			$d=
@@ -2162,7 +2166,7 @@ class MapKeyController extends Controller
 		}
 
 		$this->setAllTaxa($d);
-		$_SESSION['app']['user']['map']['all_taxa']=$d;
+		//$_SESSION['app']['user']['map']['all_taxa']=$d;
 
 	}
 
