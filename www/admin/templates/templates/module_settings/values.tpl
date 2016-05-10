@@ -61,7 +61,7 @@ tr.info-line {
 	<tr class="tr-highlight{if $value==""} empty-value{/if}">
     	<td class="setting-name" title="{$v.info|@escape}">{$v.setting}</td>
     	<td class="setting-value">
-        	<input type="text"  name="value[{$v.id}]" id="value-{$v.id}" value="{$value}" />
+        	<input type="text"  name="value[{$v.id}]" id="value-{$v.id}" value="{$value|@escape}" />
         </td>
     	<td class="setting-delete" title="{$v.default_value|@escape}">
         	{if $v.default_value!=""}

@@ -162,12 +162,13 @@ INSERT IGNORE INTO `module_settings` VALUES
 (82,19,'rs_password','RS password (set dynamically when user is created)',NULL,NOW(),NOW()),
 (83,-1, 'tree_show_upper_taxon', 'Show the most upper taxon in the taxonomic tree; if set to false, the top of the tree will display the name of the project instead.', NULL, NOW(), NOW()),
 (null,1, 'welcome_topic', 'Name of the page with the old migrated welcome-page', @syspage_Welcome, NOW(), NOW()),
-(null,1, 'contributors_topic', 'Name of the page with the old migrated contributors-page', @syspage_Contributors, NOW(), NOW())
+(null,1, 'contributors_topic', 'Name of the page with the old migrated contributors-page', @syspage_Contributors, NOW(), NOW()),
+(null,4,'obsolete_passport_tabs','Legacy tab titles that should be flagged as obsolete in the passport editor (use JSON-string: {"Old":"New","Totally obsolete":null})',NULL,NOW(),NOW()),
 ;
 
-
-
 UNLOCK TABLES;
+
+{"Old":"New","Totally obsolete"} 
 
 
 TRUNCATE TABLE `module_settings_values`;
