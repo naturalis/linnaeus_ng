@@ -93,11 +93,10 @@ class LinnaeusController extends Controller
 			$this->redirect( '../introduction/topic.php?id=' . $welcome_topic_id );
 		}
 
-		if ($this->doesCurrentProjectHaveModule(MODCODE_INTRODUCTION))
+		if ( $this->doesCurrentProjectHaveModule(MODCODE_INTRODUCTION) )
 		{
 			$id = $this->models->LinnaeusModel->getFirstIntroductionTopicId(array(
-				'project_id' => $this->getCurrentProjectId(),
-				'topic' => $welcome_topic
+				'project_id' => $this->getCurrentProjectId()
 			));	
 			
 			if ( !is_null($id) ) 
