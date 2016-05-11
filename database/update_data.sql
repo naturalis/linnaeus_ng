@@ -62,9 +62,6 @@ update roles set role='Editor' where id = 3;
 update roles set description='System administrator' where id =1;
 update roles set description='Project administrator' where id =2;
 update roles set description='Project editor' where id =3;
-alter ignore table roles drop column abbrev;
-alter ignore table roles drop column assignable;
-alter ignore table roles add column hidden bool not null default 0 after description;
 update projects_roles_users set role_id = 1 where user_id = (select id from users where username = 'sysadmin');
 
 
