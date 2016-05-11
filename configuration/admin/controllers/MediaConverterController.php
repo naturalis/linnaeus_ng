@@ -24,6 +24,7 @@ class MediaConverterController extends MediaController
     private $_currentFileName;
     private $_originalFileName;
     private $_rsFile;
+    private $_overview;
 
     private $_maxFileSize;
     private $_filePath;
@@ -475,6 +476,7 @@ class MediaConverterController extends MediaController
         $this->_originalFileName = $row['original_name'];
         $this->_currentItemId = $row['item_id'];
         $this->_originalMediaId = isset($row['media_id']) ? $row['media_id'] : false;
+        $this->_overview = isset($row['overview_image']) ? $row['overview_image'] : 0;
     }
 
     private function setCurrentFileName ($name)
@@ -487,6 +489,7 @@ class MediaConverterController extends MediaController
         $this->_currentMediaId = $this->_files = $this->_result =
             $this->originalMediaId = $this->mediaId = $this->rsFile =
             $this->_originalFileName = $this->_error = false;
+        $this->_overview = 0;
     }
 
     private function fileHasBeenConverted ()
@@ -517,7 +520,8 @@ class MediaConverterController extends MediaController
                 'module_id' => $this->_currentModuleId,
                 'media_id' => $this->_currentMediaId,
                 'project_id' => $this->getCurrentProjectId(),
-                'item_id' => $this->_currentItemId
+                'item_id' => $this->_currentItemId,
+                'overview_image' => $this->_overview
             ));
         }
         $this->saveCaptions();
@@ -533,7 +537,9 @@ class MediaConverterController extends MediaController
             $this->setItemId($this->_currentItemId);
             $this->setModuleId($this->_currentModuleId);
 
-            $this->uploadFiles();
+            $this->uploadFiles(array(
+                'overview' => $this->_overview
+            ));
 
             // Upload errors are stored in $this->errors
             if (!empty($this->errors)) {
@@ -554,7 +560,7 @@ class MediaConverterController extends MediaController
         }
 
         // Captions for Taxa item
-        if ($this->_currentModule == 'Taxa') {
+        if ($this->_currentModule == 'Taxon editor') {
             $captions = $this->models->MediaDescriptionsTaxon->_get(array(
                 'columns' => 'description as caption, language_id',
                 'id' => array(

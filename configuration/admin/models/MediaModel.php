@@ -271,7 +271,8 @@ final class MediaModel extends AbstractModel
                 id as media_id,
                 taxon_id as item_id,
                 original_name,
-                file_name
+                file_name,
+                overview_image
             from
                 %PRE%media_taxon
             where

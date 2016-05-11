@@ -627,7 +627,7 @@ class MediaController extends Controller
 		$this->printPage();
     }
 
-    protected function uploadFiles ()
+    protected function uploadFiles ($p)
     {
         if (empty($this->_files)) {
             return false;
@@ -687,7 +687,8 @@ class MediaController extends Controller
                 $this->saveTags(array('media_id' => $this->mediaId));
 
                 // If module_id and item_id have been set, save
-                // contextual link
+                // contextual link. Overview is set only during
+                // conversion in MediaConverterController
                 if ($this->moduleId != -1 && $this->itemId != -1) {
                      $this->models->MediaModules->insert(array(
                         'id' => null,
@@ -696,7 +697,9 @@ class MediaController extends Controller
                         'module_id' => $this->rHasVal('module_id') ?
                              $this->rGetVal('module_id') : $this->moduleId,
                         'item_id' => $this->rHasVal('item_id') ?
-                            $this->rGetVal('item_id') : $this->itemId
+                            $this->rGetVal('item_id') : $this->itemId,
+                        'overview_image' => isset($p['overview']) ?
+                            $p['overview'] : 0
                      ));
                 }
 
