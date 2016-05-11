@@ -31,7 +31,8 @@ class NsrPaspoortController extends NsrController
     public $jsToLoad = array(
         'all' => array(
             'lookup.js',
-			'nsr_taxon_beheer.js'
+			'nsr_taxon_beheer.js',
+            'media.js'
         )
     );
     public $modelNameOverride='NsrPaspoortModel';
@@ -156,7 +157,7 @@ class NsrPaspoortController extends NsrController
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
-		
+
 		 $this->setObsoleteTabs();
 	}
 

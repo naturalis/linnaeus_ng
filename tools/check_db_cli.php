@@ -11,13 +11,13 @@
 		private $start;
 
 		private $dbCfg;
-		private $dbUserOverride;
+		private $dbUserOverride = array();
 		private $doNotCreateTempDatabase=false;
 
-		private $dbHost; 
+		private $dbHost;
 		private $dbUser;
 		private $dbPassword;
-		
+
 		private $conn0;
 		private $conn1;
 		private $dbDb0;
@@ -26,7 +26,9 @@
 
 		private $queries=[];
 		private $errors=[];
-	
+		private $preflightQueries=[];
+		private $postflightQueries=[];
+
 		// When comparing column differences we don't consider the following
 		// attributes, because column name and table name will always be the
 		// same (that's why we compare the columns in the first place), while
@@ -54,7 +56,7 @@
 			'CHARACTER_SET_NAME',
 			'COLLATION_NAME',
 		];
-	
+
 		// Used to reorder queries
 		private $printOrder=[
 			'Tables created',
@@ -63,7 +65,7 @@
 			'Columns updated',
 			'Indices updated'
 		];
-	
+
 		// Keep track of database with dropped/recreated indices
 		private $droppedIndices=[];
 
@@ -97,6 +99,16 @@
 			$this->doNotCreateTempDatabase=$p;
 		}
 
+		public function setPreflightQueries($p)
+		{
+            $this->preflightQueries = $p;
+		}
+
+		public function setPostflightQueries($p)
+		{
+            $this->postflightQueries = $p;
+		}
+
 		public function run()
 		{
 			$this->checkFiles();
@@ -111,11 +123,11 @@
 			$this->writeErrors();
 			$this->finish();
 		}
-		
+
 		private function checkFiles()
 		{
 			echo "checking config files\n";
-			
+
 			$stat=[];
 			foreach ([$this->constFile,$this->cfgFile,$this->emptyDbFile] as $file)
 			{
@@ -124,7 +136,7 @@
 					$stat[]=sprintf("file does not exist: %s",$file);
 				}
 			}
-			
+
 			if ( count($stat)!=0 )
 			{
 				echo "initialization error(s):\n";
@@ -136,7 +148,7 @@
 		private function initialize()
 		{
 			echo "initializing\n";
-			
+
 			include_once( $this->constFile );
 			include_once( $this->cfgFile );
 
@@ -146,7 +158,7 @@
 			$this->dbDb0=$this->dbCfg['database'];
 			$this->dbDb0tablePrefix=$this->dbCfg['tablePrefix'];
 
-			$this->dbHost=isset($this->dbUserOverride['host']) ? $this->dbUserOverride['host'] : $this->dbCfg['host']; 
+			$this->dbHost=isset($this->dbUserOverride['host']) ? $this->dbUserOverride['host'] : $this->dbCfg['host'];
 			$this->dbUser=isset($this->dbUserOverride['user']) ? $this->dbUserOverride['user'] : $this->dbCfg['user'];
 			$this->dbPassword=array_key_exists('password',$this->dbUserOverride) ? $this->dbUserOverride['password'] : $this->dbCfg['password'];
 
@@ -154,31 +166,31 @@
 			$this->outputFile = sprintf( $this->outputFile , $this->dbDb0, $this->start->format('Y-m-d_H-i-s') );
 			$this->errorFile = $this->outputFile . "-errors.txt";
 		}
-		
+
 		private function connectDatabase()
 		{
 			echo "connecting to database\n";
-			
+
 			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
 			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
 
 			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb0 ) );
-		
+
 			$sqlMode=mysqli_fetch_object( mysqli_query( $this->conn0, "SELECT @@GLOBAL.sql_mode as mode;" ) );
-			
+
 			if ( $sqlMode->mode !== '')
 			{
 				die( "abnormal program termination: disable MySQL STRICT mode (SET GLOBAL sql_mode = '')\n" );
 			}
 
 		}
-		
+
 		private function printParameters()
 		{
 			$buffer[]=sprintf( "comparing database '%s' with '%s'", $this->dbDb0 , $this->emptyDbFile );
 			$buffer[]=sprintf( "database user: %s", $this->dbUser.'@'.$this->dbHost );
 			$buffer[]=sprintf( "automatically create test database: %s", $this->doNotCreateTempDatabase ? sprintf( "n (requires accessible test database '%s' to be present)",  $this->dbDb1 ) : 'y' );
-		 
+
 			$buffer[]=sprintf( 'output file: %s', $this->outputFile );
 			$buffer[]=sprintf( 'error file: %s', $this->errorFile );
 			echo implode( "\n", $buffer ) , "\n";
@@ -208,9 +220,9 @@
 				mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb1 ) );
 				return;
 			}
-			
+
 			echo "setting up test database\n";
-			
+
 			if ( mysqli_select_db( $this->conn1, $this->dbDb1 ) )
 			{
 				$this->dropTestDatabase();
@@ -223,7 +235,7 @@
 
 			mysqli_select_db( $this->conn1, $this->dbDb1 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb1 ) );
 		}
-		
+
 		private function createTestTables()
 		{
 			foreach ( explode( ";", file_get_contents( $this->emptyDbFile ) ) as $stmnt )
@@ -233,10 +245,10 @@
 					//echo mysqli_error( $this->conn1 );
 					$this->errors[]=$stmnt . ( substr(trim($stmnt),-1)!=";" ? ";" : "" );
 				}
-				
+
 			}
 		}
-		
+
 		private function compareTables()
 		{
 			echo "comparing tables\n";
@@ -292,17 +304,17 @@
 				return false;
 			}
 			$sourceColumns = $this->getColumns($table, $this->dbDb0, $this->conn0);
-		
+
 			$diffCount = $this->displayOrphanColumns($sourceColumns, $targetColumns, $this->dbDb0, 'source');
 			$diffCount += $this->displayOrphanColumns($targetColumns, $sourceColumns, $this->dbDb1, 'target');
-		
+
 			// Index target column definitions by name, so we can quickly
 			// retrieve them while iterating over the source columns.
 			$index = array();
 			foreach($targetColumns as $col) {
 				$index[$col['COLUMN_NAME']] = $col;
 			}
-		
+
 			foreach($sourceColumns as $sourceColumn) {
 				$name = $sourceColumn['COLUMN_NAME'];
 				if (!isset($index[$name])) {
@@ -311,7 +323,7 @@
 				$targetColumn = $index[$name];
 				$diffCount += $this->displayColumnDifferences($sourceColumn, $targetColumn);
 			}
-		
+
 			return true;
 		}
 
@@ -322,7 +334,7 @@
 
 			if ( $result=mysqli_query( $conn, "SELECT * FROM COLUMNS WHERE TABLE_SCHEMA='$db' AND TABLE_NAME='{$table}'" ) )
 			{
-				while( $row=$result->fetch_array(MYSQLI_ASSOC) ) 
+				while( $row=$result->fetch_array(MYSQLI_ASSOC) )
 				{
 					$columns[] = $row;
 				}
@@ -330,7 +342,7 @@
 
 			return count((array)$columns)==0 ? false : $columns;
 		}
-		
+
 		private function displayOrphanColumns($columns0, $columns1, $dbName, $dbType)
 		{
 			$orphans = array_udiff($columns0, $columns1, function ($col0, $col1)
@@ -344,7 +356,7 @@
 				if ($orphan['TABLE_SCHEMA'] != $this->dbDb0)
 				{
 					$this->queries['Columns added'][] = $this->printUpdateTable($orphan, 'create');
-				} 
+				}
 				// Drop column
 				else
 				{
@@ -359,14 +371,14 @@
 		{
 			$table = $this->dbDb0tablePrefix . $definition['TABLE_NAME'];
 			$col = $definition['COLUMN_NAME'];
-	
+
 			// Exception for updating existing table with NOT NULL DATETIME column
 			if ($action != 'update' && strtolower($definition['DATA_TYPE']) == 'datetime' &&
 				$definition['IS_NULLABLE'] == 'NO') {
 				return "ALTER TABLE `$table` ADD `created` DATETIME NOT NULL DEFAULT '" .
 					date('Y-m-d H:i:s') . "';\n";
 			}
-	
+
 			$output = "ALTER TABLE `$table` " .
 			   ($action == 'update' ?
 				   "CHANGE `$col` `$col` " :
@@ -410,7 +422,7 @@
 			} else {
 				return "'$s'";
 			}
-		}		
+		}
 
 		// Display column definition differences between two columns.
 		// Returns 0 if no differences were found, 1 otherwise.
@@ -426,15 +438,15 @@
 				strpos(strtolower($col1['EXTRA']), 'current_timestamp') !== false) {
 				unset($col0['EXTRA'], $col1['EXTRA']);
 			}
-	
+
 			$attrs = array_keys(array_diff_assoc($col0, $col1));
 			$attrs = array_diff($attrs, $this->ignoredAttributes);
 			if (count($attrs) === 0) {
 				return 0;
 			}
-	
+
 			$attributeTypes = array('COLUMN_DEFAULT', 'IS_NULLABLE', 'NUMERIC_SCALE', 'COLUMN_TYPE', 'EXTRA');
-	
+
 			foreach ($attrs as $attr) {
 				// Index has changed
 				if ($attr == 'COLUMN_KEY') {
@@ -455,7 +467,7 @@
 				}
 			}
 			return 1;
-	
+
 		}
 
 		private function printDeleteKeys( $table )
@@ -465,11 +477,11 @@
 
 			if ( $result=mysqli_query( $this->conn0,  "SHOW INDEX FROM `$table`" ) )
 			{
-				while( $row=$result->fetch_array(MYSQLI_ASSOC) ) 
+				while( $row=$result->fetch_array(MYSQLI_ASSOC) )
 				{
 					$keys[$row['Key_name']] = '';
 				}
-				
+
 				if ( !isset($keys) ) return false;
 
 				$output = '';
@@ -492,7 +504,7 @@
 
 			if ( $result=mysqli_query( $this->conn1,  "SHOW INDEX FROM `$table`" ) )
 			{
-				while( $row=$result->fetch_array(MYSQLI_ASSOC) ) 
+				while( $row=$result->fetch_array(MYSQLI_ASSOC) )
 				{
 					$keys[$row['Key_name']]['column'][] = '`' . $row['Column_name'] . '`' .
 					  (!empty($row['Sub_part']) ? ' (' . $row['Sub_part'] . ')' : '');
@@ -505,7 +517,7 @@
 					}
 					$keys[$row['Key_name']]['type'] = $type;
 				}
-				
+
 				if ( !isset($keys) ) return false;
 
 				$output = '';
@@ -548,7 +560,7 @@
 				}
 			}
 		}
-		
+
 		private function writeQueries()
 		{
 			function sortArrayByArray ($array, $orderArray)
@@ -564,17 +576,26 @@
 				}
 				return $ordered + $array;
 			}
-					
+
 			// There are differences: list these plus base-data, which may contain updates
 			if ( !empty($this->queries) )
 			{
 				$this->queries = sortArrayByArray($this->queries, $this->printOrder);
 
 				$fp=fopen( $this->outputFile, 'w' );
-				
+
 				if ( $fp )
 				{
 					echo sprintf( "writing queries to '%s'\n", $this->outputFile );
+
+					if (!empty($this->preflightQueries)) {
+						fwrite( $fp, "#Pre-flight queries: " . count($this->preflightQueries) . "\n" );
+					    foreach ($this->preflightQueries as $query) {
+                            fwrite( $fp, $query ."\n" );
+                        }
+						fwrite( $fp, "\n\n" );
+					}
+
 					foreach ($this->queries as $type => $list)
 					{
 						fwrite( $fp, "#$type: " . count($this->queries[$type]) . "\n" );
@@ -584,25 +605,34 @@
 						}
 						fwrite( $fp, "\n\n" );
 					}
+
+					if (!empty($this->postflightQueries)) {
+						fwrite( $fp, "#Post-flight queries: " . count($this->postflightQueries) . "\n" );
+					    foreach ($this->postflightQueries as $query) {
+                            fwrite( $fp, $query ."\n" );
+                        }
+						fwrite( $fp, "\n\n" );
+					}
+
 					fclose( $fp );
 				}
-				else 
+				else
 				{
 					die( sprintf( "abnormal program termnination: could not open '%s' for writing", $this->outputFile ) );
 				}
-			} 
+			}
 			else
 			{
 				echo "databases are the same (no queries written)\n";
 			}
 		}
-		
+
 		private function writeErrors()
 		{
 			if ( !empty($this->errors) )
 			{
 				$fp=fopen( $this->errorFile, 'w' );
-				
+
 				if ( $fp )
 				{
 					echo sprintf( "writing loading errors to '%s'\n(these are probably stored procedures; be sure to check these by hand)\n", $this->errorFile );
@@ -612,23 +642,27 @@
 					}
 					fclose( $fp );
 				}
-				else 
+				else
 				{
 					die( sprintf( "abnormal program termnination: could not open '%s' for writing", $this->errorFile ) );
 				}
 			}
 		}
-		
+
 		private function finish()
 		{
 			mysqli_close( $this->conn0 );
 			mysqli_close( $this->conn1 );
-			echo "done";
+			echo "done\n\n";
 		}
 
 	}
 
 	$compare = new DatabaseTableCompare;
+
+
+	/* Linnaeus server settings */
+
 
 	// example configuration statments:
 	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
@@ -637,5 +671,28 @@
 	$compare->setOutputFile( '/home/maarten.schermer/testdata/%s-modify-%s.sql' );
 	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
 	$compare->setDoNotCreateTempDatabase( true );
+	$compare->setPreflightQueries(array(
+        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+	));
+	$compare->setPostflightQueries(array(
+        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+	));
+
+
+
+	/* Ruud local settings */
+/*
+	$compare->setConstFile(dirname(__FILE__) . '/../configuration/admin/constants.php');
+	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
+	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
+	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
+	$compare->setDoNotCreateTempDatabase(false);
+	$compare->setPreflightQueries(array(
+        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+	));
+	$compare->setPostflightQueries(array(
+        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+	));
+*/
 
 	$compare->run();
