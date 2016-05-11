@@ -9,6 +9,7 @@
 		private $imageBaseUrl;
 		private $fileNameBase="export--";
 		private $fileName;
+		private $fileNameDate;
 		private $exportFolder;
 		private $taxa;
 		private $limit;
@@ -149,7 +150,8 @@
 				$this->generateFileName();
 				$this->checkEssentials();
 				$this->connectDatabase();
-				$this->doExport();
+				$this->setTaxa();
+				$this->writeData();
 				$this->printStats();
 				$this->cleanUp();
 			} 
@@ -176,11 +178,17 @@
 			$this->feedback( "running exporter for NBA import" );
 			$this->feedback(  date(DATE_RFC2822) );
 		}
-		
+
 		private function generateFileName()
 		{
-			$this->filename = $this->fileNameBase . date('Y-m-d_Hi') .  "-" . sprintf('%02s', $this->filecounter) . '.xml';
-			$this->filecounter++;
+			if ( $this->filecounter==0 )
+			{
+				$this->fileNameDate = date('Y-m-d_Hi');
+			}
+			
+			$this->filename = $this->fileNameBase . "--" . $this->fileNameDate . "--" . sprintf( '%02s', $this->filecounter++ ) . '.xml';
+
+			$this->feedback( sprintf("writing to %s", $this->filename ) );
 		}
 
 		private function checkEssentials()
@@ -216,7 +224,6 @@
 
 				$this->mysqli->query('SET NAMES ' . $this->connector->character_set );
 				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->character_set );
-
 			}
 		}
 		
@@ -229,6 +236,7 @@
 		
 		private function setTaxa()
 		{
+			$this->feedback( "fetching taxa");
 			
 			$ranks=null;
 			
@@ -297,6 +305,7 @@
 
 				left join ".$this->connector->prefix."actors _e2
 					on _g.actor_org_id = _e2.id 
+
 					and _g.project_id=_e2.project_id
 
 				left join ".$this->connector->prefix."taxon_quick_parentage _q
@@ -567,12 +576,12 @@
 			}
 		}		
 
-		private function doExport()
+		private function writeData()
 		{
+			$this->feedback( "writing data" );
+
 			set_time_limit( $this->executionTimeOut );
 			
-			$this->setTaxa();
-
 			if ( empty($this->taxa) )
 			{
 				throw new Exception( 'Found no taxa.' );
@@ -714,7 +723,7 @@
 
 		private function printStats()
 		{
-			$this->feedback( sprintf("wrote %s taxa to %s (%s files)",$this->number_written, $this->exportFolder . $this->filename, $this->filecounter ) );
+			$this->feedback( sprintf("wrote %s taxa (%s files in %s)",$this->number_written, $this->filecounter, $this->exportFolder ) );
 		}
 		
 		private function cleanUp()
@@ -739,13 +748,13 @@
 	$b = new taxonXmlExporter;
 	$b->setConnectData( $conn );
 	$b->setLanguageId( 24 );  // 24 dutch, 26 english (affects image metadata)
-	$b->setIdsToSuppressInClassification( [116297] );
+	$b->setIdsToSuppressInClassification( [116297] ); // excluding "life"
 	$b->setImageBaseUrl( 'http://images.naturalis.nl/original/' );
 	$b->setValidNameTypeId( 1 );
-	$b->setRanksToExport( ['ranks'=>74,'style'=>'and_lower'] );
-	//$b->setLimit( 1000 );  // limit on number of taxa
+//	$b->setRanksToExport( ['ranks'=>74,'style'=>'and_lower'] );
+//	$b->setLimit( 1000 );  // limit on number of taxa
 	$b->setXmlRootelementName( 'nederlands_soortenregister' );
-	$b->setFileNameBase( "nsr-export--" );
+	$b->setFileNameBase( "nsr-export" );
 	$b->setMaxBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
 //	$b->setExportFolder( "C:\\data\\export\\" );
 	$b->setExportFolder( "/home/maarten.schermer/export/" );
