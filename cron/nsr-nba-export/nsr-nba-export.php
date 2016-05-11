@@ -1,63 +1,35 @@
 <?php
 
-	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
-	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
-
-//	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
-	
-	class nsrNbaExporter
+	class taxonXmlExporter
 	{
 		private $connector;
 		private $mysqli;
 		private $executionTimeOut=3600; //sec
 		private $languageId;
-		private $imageBaseUrl="http://images.naturalis.nl/original/";
-		private $fileNameRoot="lng-export--";
+		private $imageBaseUrl;
+		private $fileNameBase="export--";
 		private $fileName;
 		private $exportFolder;
 		private $taxa;
 		private $limit;
+		private $maxBatchSize=5000;
 
-		private $VALID_NAME_ID=1;
-		private $idsToSuppressInClassification=array(116297); // top of the tree ("life") which is somewhat unofficial
-		private $rootelement='nederlands_soortenregister';
+		private $ranksToExport;
+		private $ranksToExportStyle='equals';
+
+		private $validNameId=1;
+		private $idsToSuppressInClassification=[];
+		private $xmlRootelement='root';
 
 		private $includeDescriptions=true;
 		private $includeNames=true;
 		private $includeImages=true;
 		private $includeClassification=true;
 		private $prettify=true;
-		
+
+		private $filecounter=0;
 		private $number_written=0;
 	
-
-		public function __construct()
-		{
-		}
-		
-		public function __destruct()
-		{
-		}
-
-		public function go()
-		{
-			try
-			{
-				$this->printHeader();
-				$this->generateFileName();
-				$this->checkEssentials();
-				$this->connectDatabase();
-				$this->doExport();
-				$this->printStats();
-				$this->cleanUp();
-			} 
-			catch (Exception $e)
-			{
-				$this->handleException($e);
-			}
-		}
-		
 		public function setConnectData( $data )
 		{
 			try
@@ -87,9 +59,14 @@
 			$this->limit = $limit;
 		}
 
-		public function setFileNameRoot( $filenameroot )
+		public function setMaxBatchSize( $size )
 		{
-			$this->fileNameRoot = $filenameroot;
+			$this->maxBatchSize = intval($size);
+		}
+
+		public function setFileNameBase( $fileNameBase )
+		{
+			$this->fileNameBase = (string)$fileNameBase;
 		}
 
 		public function setExportFolder( $folder )
@@ -97,6 +74,91 @@
 			$this->exportFolder = $folder;
 		}
 
+		public function setRanksToExport( $p )
+		{
+			/*
+				ranks: 74 or [74,75,76]
+				style: equal | lower | and_lower | higher | and_higher (whn ranks is an array, style always defaults to equal)
+			*/
+
+			if ( isset($p['ranks']) )
+			{
+				$this->ranksToExport = $p['ranks'];
+
+				if ( is_array($this->ranksToExport) )
+				{
+					array_walk($this->ranksToExport,function(&$a,$i) { $a = intval( $a ); } );
+					$this->ranksToExport=array_unique($this->ranksToExport);
+					if (count((array)$this->ranksToExport)==1) $this->ranksToExport=$this->ranksToExport[0];
+				}
+				else
+				{
+					$this->ranksToExport = intval( $this->ranksToExport );
+				}
+			}
+
+			if ( isset($p['style']) )
+			{
+				switch ($p['style']) {
+					case "lower" :
+						$this->ranksToExportStyle = ">";
+						break;
+					case "and_lower" :
+						$this->ranksToExportStyle = ">=";
+						break;
+					case "higher" :
+						$this->ranksToExportStyle = "<";
+						break;
+					case "and_higher" :
+						$this->ranksToExportStyle = "<=";
+						break;
+					case "equal" :
+					case "equals" :
+						$this->ranksToExportStyle = "=";
+						break;
+				}
+			}
+
+		}
+	
+		public function setValidNameTypeId( $id )
+		{
+			$this->validNameId=(int)$id;
+		}
+	
+		public function setIdsToSuppressInClassification( $ids )
+		{
+			$this->idsToSuppressInClassification=(array)$ids;
+		}
+	
+		public function setXmlRootelementName( $name )
+		{
+			$this->xmlRootelement=(string)$name;
+		}
+
+		public function setImageBaseUrl( $url )
+		{
+			$this->imageBaseUrl=(string)$url;
+		}
+	
+		public function run()
+		{
+			try
+			{
+				$this->printHeader();
+				$this->generateFileName();
+				$this->checkEssentials();
+				$this->connectDatabase();
+				$this->doExport();
+				$this->printStats();
+				$this->cleanUp();
+			} 
+			catch (Exception $e)
+			{
+				$this->handleException($e);
+			}
+		}
+		
 		private function feedback( $m )
 		{
 			echo $m,"\n";
@@ -117,7 +179,8 @@
 		
 		private function generateFileName()
 		{
-			$this->filename = $this->fileNameRoot . date('Y-m-d_Hi') . '.xml';
+			$this->filename = $this->fileNameBase . date('Y-m-d_Hi') .  "-" . sprintf('%02s', $this->filecounter) . '.xml';
+			$this->filecounter++;
 		}
 
 		private function checkEssentials()
@@ -156,9 +219,8 @@
 
 			}
 		}
-
 		
-		private function xmlHeader()
+		private function startXmlDocument()
 		{
 			$this->xmlWriter = new XMLWriter();
 			$this->xmlWriter->openMemory();
@@ -167,6 +229,21 @@
 		
 		private function setTaxa()
 		{
+			
+			$ranks=null;
+			
+			if ( !is_null($this->ranksToExport) )
+			{
+				if ( is_array($this->ranksToExport) )
+				{
+					$ranks = "and _f.rank_id in (" . implode(",",$this->ranksToExport) .")";
+				}
+				else
+				{
+					$ranks = "and _f.rank_id " . $this->ranksToExportStyle . $this->ranksToExport;
+				}
+			}
+		
 			$query="
 				select
 					_t.taxon as name,
@@ -234,8 +311,10 @@
 				where
 					_t.project_id = " . $this->connector->project_id . "
 					and ifnull(_trash.is_deleted,0)=0
+					" . ( $ranks ? $ranks : "" ) ."
 				" . ( !empty( $this->limit ) ? "limit " . $this->limit : "" ) . "
 			";
+
 
 			
 			$result=$this->mysqli->query( $query );
@@ -352,7 +431,7 @@
 		{
 			$query="		
 				select
-					concat('".$this->imageBaseUrl."',_m.file_name) as url,
+					_m.file_name as file_name,
 					_m.mime_type as mime_type,
 					_c.meta_data as photographer_name,
 					date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
@@ -399,7 +478,8 @@
 					and _meta7.sys_label='beeldbankAdresMaker'
 					and _meta7.language_id=".$this->languageId."
 	
-				where _m.project_id = ".$this->connector->project_id."
+				where
+					_m.project_id = ".$this->connector->project_id."
 					and _m.taxon_id = ".$id
 			;
 
@@ -412,6 +492,7 @@
 			{
 				while( $row=$result->fetch_assoc() )
 				{
+					$row['url'] = $this->imageBaseUrl . urlencode($row['file_name']);
 					$d[]=$row;
 				}
 			}
@@ -437,7 +518,7 @@
 				left join ".$this->connector->prefix."names _names
 					on _t.project_id=_f.project_id
 					and _t.id=_names.taxon_id
-					and _names.type_id=".$this->VALID_NAME_ID."
+					and _names.type_id=".$this->validNameId."
 	
 				left join ".$this->connector->prefix."ranks _r
 					on _f.rank_id=_r.id
@@ -497,10 +578,13 @@
 				throw new Exception( 'Found no taxa.' );
 			}
 			
-			$this->xmlHeader();
+			$this->startXmlDocument();
+			
+			$batch=0;
 			
 			foreach((array)$this->taxa as $key=>$val)
 			{
+			
 				if ( $this->includeDescriptions )
 				{
 					$pages=$this->getDescriptions( $val['id'] );
@@ -537,7 +621,6 @@
 				$val['names']=@$names;
 				$val['classification']=@explode(' ',$val['classification']);
 				$val['images']=@$images;
-
 
 				if ( $this->includeClassification )
 				{
@@ -596,9 +679,9 @@
 					$out=$simpleXmlObject->asXML();
 				}
 	
-				if ($key==0)
+				if ($batch==0)
 				{
-					$this->xmlWriter->writeRaw ( '<'.$this->rootelement.' exportdate="'.date('c').'">' . "\n" . '<taxa>' );	
+					$this->xmlWriter->writeRaw ( '<'.$this->xmlRootelement.' exportdate="'.date('c').'">' . "\n" . '<taxa>' );	
 				}
 			
 				$this->xmlWriter->writeRaw ( str_replace('<?xml version="1.0"?>' , '' , $out ) );
@@ -610,20 +693,28 @@
 				{
 					file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
 				}
-
-
-			}
-	
-			$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->rootelement.'>' );	
-	
-			file_put_contents( $this->exportFolder . $this->filename , $this->	xmlWriter->flush(true), FILE_APPEND);
 			
+				if (++$batch==$this->maxBatchSize)
+				{
+					$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->xmlRootelement.'>' );	
+					file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
+					$this->startXmlDocument();
+					$this->generateFileName();
+					$batch=0;
+				}
+			}
+			
+			if ( $batch>0 )
+			{
+				$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->xmlRootelement.'>' );	
+				file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
+			}
 
 		}
 
 		private function printStats()
 		{
-			$this->feedback( sprintf("wrote %s taxa to %s",$this->number_written, $this->exportFolder . $this->filename ) );
+			$this->feedback( sprintf("wrote %s taxa to %s (%s files)",$this->number_written, $this->exportFolder . $this->filename, $this->filecounter ) );
 		}
 		
 		private function cleanUp()
@@ -636,18 +727,28 @@
 	}
 
 
+	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
+	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
+//	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
+//	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
+
 	$c=new configuration;
 	$conn=$c->getDatabaseSettings();
 	$conn['project_id']=1;
 
-	$b = new nsrNbaExporter;
+	$b = new taxonXmlExporter;
 	$b->setConnectData( $conn );
-	$b->setLanguageId( 24 );
-//	$b->setLimit( 100 );
-	$b->setFileNameRoot( "nsr-export--" );
+	$b->setLanguageId( 24 );  // 24 dutch, 26 english (affects image metadata)
+	$b->setIdsToSuppressInClassification( [116297] );
+	$b->setImageBaseUrl( 'http://images.naturalis.nl/original/' );
+	$b->setValidNameTypeId( 1 );
+	$b->setRanksToExport( ['ranks'=>74,'style'=>'and_lower'] );
+	//$b->setLimit( 1000 );  // limit on number of taxa
+	$b->setXmlRootelementName( 'nederlands_soortenregister' );
+	$b->setFileNameBase( "nsr-export--" );
+	$b->setMaxBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
+//	$b->setExportFolder( "C:\\data\\export\\" );
 	$b->setExportFolder( "/home/maarten.schermer/export/" );
-//	$b->setExportFolder( "C:\\tmp\\bla\\" );
-	$b->go();
-
+	$b->run();
 
 
