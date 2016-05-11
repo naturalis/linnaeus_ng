@@ -3,7 +3,7 @@
 		font-family: Trebuchet MS,​Arial,​Helvetica,​sans-serif;
 		font-size: 12px;
 	}
-	#page-main {
+	#media-main {
 		width: 100%;
 	}
 </style>
