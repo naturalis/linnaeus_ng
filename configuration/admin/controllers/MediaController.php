@@ -627,7 +627,7 @@ class MediaController extends Controller
 		$this->printPage();
     }
 
-    protected function uploadFiles ($p)
+    protected function uploadFiles ($p = false)
     {
         if (empty($this->_files)) {
             return false;

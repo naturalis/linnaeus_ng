@@ -663,7 +663,7 @@
 
 	/* Linnaeus server settings */
 
-
+	/*
 	// example configuration statments:
 	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
 	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
@@ -678,10 +678,11 @@
         'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
 	));
 
+	*/
 
 
 	/* Ruud local settings */
-/*
+
 	$compare->setConstFile(dirname(__FILE__) . '/../configuration/admin/constants.php');
 	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
 	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
@@ -693,6 +694,6 @@
 	$compare->setPostflightQueries(array(
         'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
 	));
-*/
+
 
 	$compare->run();
