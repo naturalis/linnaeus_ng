@@ -142,6 +142,8 @@ textarea {
 
     </form>
 
+    <p><a href="taxon.php?id={$item_id}">{t}back{/t}</a></p>
+
 </div>
 
 <script type="text/JavaScript">

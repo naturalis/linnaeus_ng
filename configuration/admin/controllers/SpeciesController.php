@@ -1963,7 +1963,7 @@ class SpeciesController extends Controller
 
     public function ranksAction ()
     {
-		
+
 		die( 'disabled (will be replaced with NSR-style editor)' );
 
         $this->checkAuthorisation();
@@ -2099,7 +2099,7 @@ class SpeciesController extends Controller
     public function ranklabelsAction ()
     {
 		die( 'disabled (will be replaced with NSR-style editor)' );
-		
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Taxonomic ranks: labels'));
