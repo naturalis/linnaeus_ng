@@ -149,8 +149,8 @@
 				$this->printHeader();
 				$this->checkEssentials();
 				$this->connectDatabase();
-				$this->generateFileName();
 				$this->setTaxa();
+				$this->generateFileName();
 				$this->writeData();
 				$this->printStats();
 				$this->cleanUp();
