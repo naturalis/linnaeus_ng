@@ -501,7 +501,7 @@
 			{
 				while( $row=$result->fetch_assoc() )
 				{
-					$row['url'] = $this->imageBaseUrl . urlencode($row['file_name']);
+					$row['url'] = $this->imageBaseUrl . rawurlencode($row['file_name']);
 					$d[]=$row;
 				}
 			}
