@@ -147,9 +147,9 @@
 			try
 			{
 				$this->printHeader();
-				$this->generateFileName();
 				$this->checkEssentials();
 				$this->connectDatabase();
+				$this->generateFileName();
 				$this->setTaxa();
 				$this->writeData();
 				$this->printStats();
@@ -200,7 +200,7 @@
 			if ( is_null($this->languageId) ) $b[]="missing language id";
 			if ( is_null($this->exportFolder) ) $b[]="missing export folder";
 			if ( !is_writable($this->exportFolder) ) $b[]="export folder not writable";
-			if ( is_null($this->filename) ) $b[]="missing export filename";
+			if ( is_null($this->fileNameBase) ) $b[]="missing export filename";
 
 			if ( !empty( $b ) ) throw new Exception( implode("\n",$b) );
 		}
