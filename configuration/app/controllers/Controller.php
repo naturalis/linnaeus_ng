@@ -258,7 +258,7 @@ class Controller extends BaseClass
     public function checkForProjectId ()
     {
 		if (!$this->getCheckForProjectId()) return;
-		
+
         $pB = $this->getCurrentProjectId();
 
         if ($this->rHasVal('p'))
@@ -1204,7 +1204,7 @@ class Controller extends BaseClass
         $rankId = $r[$taxon['rank_id']]['rank_id'];
         $rankName = ucfirst($d);
         $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
-		
+
 		$result = null;
 
         // Rank level is above genus; no formatting
@@ -1360,6 +1360,21 @@ class Controller extends BaseClass
 
 	}
 
+	private function getContactLink()
+	{
+        $d = $this->models->ControllerModel->getProjectLeadExpert(array(
+            'projectId' => $this->getCurrentProjectId()
+        ));
+        $email = 'linnaeus@naturalis.nl';
+        if (!empty($d)) {
+            $email = rawurlencode($d['first_name'] . ' ' . $d['last_name'] .
+                '<' . $d['email_address'] . '>');
+        }
+        return str_rot13('<a href="mailto:' . $email . '?subject=' .
+            rawurlencode($_SESSION['app']['project']['title']) .
+            '" rel="nofollow">' . $this->translate('contact') . '</a>');
+	}
+
     private function setControllerParams ($p)
     {
         if (isset($p['checkForProjectId']))
@@ -1489,7 +1504,7 @@ class Controller extends BaseClass
 			$p['ignore'] = $params['ignore'];
 
 		$modules = $this->models->ModulesProjects->_get($p);
-		
+
 		foreach ((array) $modules as $key => $val) {
 
 			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
@@ -1798,6 +1813,7 @@ class Controller extends BaseClass
         $this->smarty->assign('searchResultIndexActive', $this->getSearchResultIndexActive());
         $this->smarty->assign('spid', $this->spid());
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
+        $this->smarty->assign('contact', $this->getContactLink());
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -2803,7 +2819,7 @@ class Controller extends BaseClass
 			}
 		}
 	}
-		
+
 	protected function setRankIdConstants()
 	{
 		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)

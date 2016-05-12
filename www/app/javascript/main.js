@@ -5,15 +5,15 @@ var projectId=null;
     $.fn.removeClassRegEx = function(regex)
     {
         var classes = $(this).attr('class');
-        
+
         if(!classes || !regex) return false;
-        
+
         var classArray = [];
         classes = classes.split(' ');
-        
+
         for(var i=0, len=classes.length; i<len; i++)
             if(!classes[i].match(regex)) classArray.push(classes[i])
-        
+
         $(this).attr('class', classArray.join(' '));
     };
 })(jQuery);
@@ -103,11 +103,11 @@ function allGetTimestamp() {
 }
 
 function setCursor(type,ele) {
-	
+
 	ele = ele ? '#'+ele.replace('#','') : 'body';
 
 	$(ele).css('cursor',type ? type : 'default' );
-	
+
 }
 
 function glossTextOver(id,caller) {
@@ -125,7 +125,7 @@ function glossTextOver(id,caller) {
 	$('#hint-balloon').load('../glossary/hint.php?id='+id);
 
 	$('#hint-balloon').hover(
-		  function () {}, 
+		  function () {},
 		  function () {
 			$('#hint-balloon').hide();
 		  }
@@ -134,7 +134,7 @@ function glossTextOver(id,caller) {
 }
 
 function _(text) {
-	
+
 	// can be single string or array; returns single string or array.
 	// needs local caching.
 	var translation = $.ajax({
@@ -152,7 +152,7 @@ function _(text) {
 
 function getCurrentProjectId()
 {
-	return $('meta[name="lng-project-id"]').attr("content");	
+	return $('meta[name="lng-project-id"]').attr("content");
 }
 
 
@@ -206,7 +206,7 @@ function showDialog(title,content,vars,resize) {
 			vars.width = 350;
 		}
 		vars.title = title ? title : '';
-	
+
 		$.modaldialog.prompt(content,vars);
 		if (resize) {
 			$('#dialog-content').css('min-height',0);
@@ -391,11 +391,11 @@ function addRequestVar(key,val) {
 function doLanguageChange(languageId) {
 
 	if (languageId) {
-		
+
 		addFormVal('languageId',languageId);
-	
+
 	} else {
-		
+
 		addFormVal('languageId',$('#languageSelect').val());
 	}
 
@@ -416,7 +416,7 @@ function goIntLink(controller,url,params) {
 	if (params) {
 
 		for(i in params) {
-			
+
 			var x = params[i].split(':');
 
 			if (x[0]=='url')
@@ -447,7 +447,7 @@ function toggleAllHidden() {
 		$('div[id^=hidden-]').removeClass('invisible').addClass('visible');
 		$('div[id^=switch-]').removeClass('showHidden').addClass('hideHidden');
 		allHidden = false;
-	} else { 
+	} else {
 		$('div[id^=hidden-]').removeClass('visible').addClass('invisible');
 		$('div[id^=switch-]').removeClass('hideHidden').addClass('showHidden');
 		allHidden = true;
@@ -461,7 +461,7 @@ function toggleHidden(id) {
 		$('#hidden-'+id).removeClass('visible').addClass('invisible');
 		$('#switch-'+id).removeClass('hideHidden').addClass('showHidden');
 		$('#hidden-'+id).attr('visible','0');
-	} else { 
+	} else {
 		$('#hidden-'+id).removeClass('invisible').addClass('visible');
 		$('#switch-'+id).removeClass('showHidden').addClass('hideHidden');
 		$('#hidden-'+id).attr('visible','1');
@@ -470,15 +470,15 @@ function toggleHidden(id) {
 }
 
 function chkPIDInLink(h,p) {
-	
+
 	/*
 		h: url to check
 		p: paramter & value ("p=123") to check for
 	*/
-	
+
 	if (h && h.indexOf('javascript:')==-1) {
 
-		var url = $.url(h); // pass in a URI as a string and parse that 
+		var url = $.url(h); // pass in a URI as a string and parse that
 
 		/*
 			source - the whole url being parsed
@@ -491,16 +491,16 @@ function chkPIDInLink(h,p) {
 			file - the basename of the file eg. index.html
 			query - the entire querystring if it exists, eg. item=value&item2=value2
 			fragment (also available as anchor) - the entire string after the # symbol
-			
+
 			bug! none of these retain the first '..' in a href '../glossary/term.php?id=105238'
 			hence the juggling with fragments below
-			
+
 		*/
 
 		if (url.attr('fragment').length!==0) {
-		
+
 			h = h.replace('#'+url.attr('fragment'),'');
-		
+
 		}
 
 		if (url.attr('query').length==0) {
@@ -513,9 +513,9 @@ function chkPIDInLink(h,p) {
 		h = h + (url.attr('fragment').length!==0 ? '#'+url.attr('fragment') : '');
 
 		return h;
-		
+
 	}
-		
+
 }
 
 function chkPIDInLinks(pid,par) {
@@ -525,7 +525,7 @@ function chkPIDInLinks(pid,par) {
 	$('a').each(function() {
 
 		$(this).attr('href',chkPIDInLink($(this).attr('href'),p));
-		
+
 	});
 
 }
@@ -549,7 +549,7 @@ function showSearchIndex() {
 			if (searchResultIndexActive)
 				allLookupScrollToSelectedId();
 		}
-	});	
+	});
 
 }
 
@@ -587,7 +587,7 @@ function setSessionVar(variable,value) {
 			'val' : value,
 			'time' : allGetTimestamp()
 		})
-	});	
+	});
 
 }
 
@@ -606,6 +606,27 @@ function getSessionVar(variable,callback) {
 		{
 			if (callback) callback(data);
 		}
-	});	
+	});
 
 }
+
+$(function() {
+    $('.decode').each( function(count,enc) { //foreach encoded DOM element
+        encodedData = jQuery(enc).html(); //grab encoded text
+        decodedData = encodedData.replace(/[a-zA-Z]/g, function(char){ //foreach character
+            return String.fromCharCode( //decode string
+                /**
+                 * char is equal/less than 'Z' (i.e. a  capital letter), then compare upper case Z unicode
+                 * else compare lower case Z unicode.
+                 *
+                 * if 'Z' unicode greater/equal than current char (i.e. char is 'Z','z' or a symbol) then
+                 * return it, else transpose unicode by 26 to return decoded letter
+                 *
+                 * can't remember where I found this, and yes it makes my head hurt a little!
+                 */
+                (char<="Z"?90:122)>=(char=char.charCodeAt(0)+13)?char:char -26
+            );
+        });
+        $(enc).html(decodedData); // replace text
+    });
+});
