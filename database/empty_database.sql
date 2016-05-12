@@ -1132,6 +1132,19 @@ CREATE TABLE `media_modules` (
   UNIQUE KEY `project_id` (`project_id`,`media_id`,`module_id`,`item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+DROP TABLE IF EXISTS `media_tags`;
+CREATE TABLE `media_tags` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `media_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `tag` varchar(100) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`,`media_id`,`language_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `media_taxon`;
 CREATE TABLE IF NOT EXISTS `media_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
