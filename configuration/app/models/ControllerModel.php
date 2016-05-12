@@ -32,7 +32,7 @@ final class ControllerModel extends AbstractModel
 			this would be in the ModuleSettingsReaderController, were it not
 			that it already extends Controller, causing infinite recursion .
 		*/
-		
+
 	    $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
 	    $module_id = isset($params['module_id']) ? $params['module_id'] :  null;
 	    $setting = isset($params['setting']) ? $params['setting'] :  null;
@@ -46,19 +46,19 @@ final class ControllerModel extends AbstractModel
         $query = "
 			select value
 			from %PRE%module_settings _a
-			
+
 			left join %PRE%module_settings_values _b
 				on _a.id=_b.setting_id
-				
+
 			where
 				_a.module_id = " . $module_id . "
 				and _a.setting = '" . $setting . "'
 				and _b.project_id = " . $project_id ."
-		
+
 		";
-		
+
 		$d=$this->freeQuery($query);
-		
+
 		if (isset($d[0]) && !empty($d[0]['value']) )
 		{
 			return $d[0]['value'];
@@ -309,6 +309,32 @@ final class ControllerModel extends AbstractModel
         */
 
         return $this->freeQuery($query);
+    }
+
+    public function getProjectLeadExpert ($params)
+    {
+    	if (!$params) return false;
+
+        $projectId = isset($params['projectId']) ? $params['projectId'] : -1;
+
+        $query = '
+            select
+                t2.first_name,
+                t2.last_name,
+                t2.email_address
+            from
+                %PRE%projects_roles_users as t1
+            left join
+                %PRE%users as t2 on t1.user_id = t2.id
+            where
+                t1.project_id = ' . $projectId . ' and
+                t1.role_id = 2 and
+                t2.active = 1
+            limit 1';
+
+         $d = $this->freeQuery($query);
+
+         return isset($d) ? $d[0] : false;
     }
 
 }
