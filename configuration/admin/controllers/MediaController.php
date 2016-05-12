@@ -810,6 +810,8 @@ class MediaController extends Controller
 
         // Check file name
         if (!$this->checkFileExtension($file)) {
+            $this->addError(_('Extension') . ' ' . $this->getFileExtenstion($file['name']) .
+                ' ' . _('not supported') . ': ' . $file['name']);
             return false;
         }
 
@@ -1346,6 +1348,7 @@ class MediaController extends Controller
                  ));
             }
         }
+
     }
 
 
@@ -1478,9 +1481,14 @@ class MediaController extends Controller
         return $d;
     }
 
+    private function getFileExtenstion ($name)
+    {
+        return pathinfo($name, PATHINFO_EXTENSION);
+    }
+
     private function checkFileExtension ($file)
     {
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $ext = strtolower($this->getFileExtenstion($file['name']));
 
         foreach ($this::$mimeTypes as $category => $types) {
             foreach ($types as $extension => $type) {
