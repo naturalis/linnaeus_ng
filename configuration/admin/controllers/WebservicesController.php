@@ -17,7 +17,7 @@ class WebservicesController extends Controller
 
 	private $_JSONPCallback=false;
 	private $_JSON=null;
-	
+
     public $usedHelpers = array(
         'http_basic_authentication'
     );
@@ -27,7 +27,7 @@ class WebservicesController extends Controller
         'UsersModel'
     );
 
-	private $_services = array(		
+	private $_services = array(
 		'projects.php'=>array(
 			'description'=>'all projects on this server'
 		),
@@ -41,9 +41,9 @@ class WebservicesController extends Controller
 			'description'=>'all users on this server'
 		),
 	);
-	
+
 	private $_generalParameters=array('callback'=>array('mandatory'=>false,'description'=>'name of JSONP callback function'));
-		
+
     public function __construct($p=null)
     {
         parent::__construct( $p );
@@ -62,18 +62,18 @@ class WebservicesController extends Controller
 		$this->smarty->assign( 'base_url', 'http://' . '%AUTH%' . $_SERVER['HTTP_HOST'] . pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' );
 		$this->smarty->assign( 'services', $this->_services );
 		$this->smarty->assign( 'general_parameters', $this->_generalParameters );
-		
+
 		$this->printPage();
 	}
-	
 
 
-	
+
+
 	public function projectsAction()
 	{
 		$this->_head->service='projects';
 		$this->_head->description='list of all projects on this server';
-		
+
 		foreach($this->models->ProjectsModel->getUserProjects( array( 'user_id'=>$this->getCurrentUserId(), 'show_all'=>true ) ) as $project)
 		{
 			$d=new stdClass;
@@ -89,7 +89,7 @@ class WebservicesController extends Controller
 
 		$this->printOutput();
 	}
-	
+
 	public function projectUsersAction()
 	{
 		$this->authenticateProject();
@@ -142,9 +142,9 @@ class WebservicesController extends Controller
 	{
 		$this->loginController=new LoginController;
 
-		$this->helpers->HttpBasicAuthentication->setVerificationCallback( 
+		$this->helpers->HttpBasicAuthentication->setVerificationCallback(
 			function($username,$password)
-			{ 
+			{
 				return $this->loginController->loginUser(array('username'=>$username,'password'=>$password));
 			}
 		);
@@ -153,14 +153,14 @@ class WebservicesController extends Controller
 	}
 
 	private function authenticateProject()
-	{	
+	{
 		if ( is_null($this->getProjectId()) ) die('no project id');
 
 		$this->_head->projectId=$this->getProjectId();
 		$this->setProject();
-		
+
 		if ( !$this->_project ) die('unknown project id');
-		
+
 		$this->projectsController=new ProjectsController;
 		$this->projectsController->doChooseProject( $this->getProjectId() );
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
@@ -173,8 +173,8 @@ class WebservicesController extends Controller
 		$this->_server=new stdClass;
 		$this->_server->address=$_SERVER['SERVER_ADDR'];
 		$this->_server->name=$_SERVER['SERVER_NAME'];
-		$this->_server->host_name=$_SERVER['HTTP_HOST'];	
-		
+		$this->_server->host_name=$_SERVER['HTTP_HOST'];
+
 		$this->_JSON=json_encode(array_merge((array)$this->_head,array("results"=>(array)$this->_data,(array)$this->_server)));
 
 		if ( $this->hasJSONPCallback() )
@@ -182,7 +182,7 @@ class WebservicesController extends Controller
 			$this->_JSON = $this->getJSONPCallback() . '(' . $this->_JSON .');';
 		}
 
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 
 		echo $this->_JSON;
 	}
@@ -194,7 +194,7 @@ class WebservicesController extends Controller
 			$this->setJSONPCallback($this->rGetVal('callback'));
 		}
 	}
-	
+
 	private function setJSONPCallback($callback)
 	{
 		$this->_JSONPCallback=$callback;
@@ -204,7 +204,7 @@ class WebservicesController extends Controller
 	{
 		return $this->_JSONPCallback;
 	}
-	
+
 	private function hasJSONPCallback()
 	{
 		return $this->getJSONPCallback()!=false;
