@@ -111,7 +111,26 @@ class WebservicesController extends Controller
 		$this->printOutput();
 	}
 
+    public function imAction ()
+    {
+        exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $o);
+        $branch = $o[0];
 
+        exec('git rev-parse --verify HEAD 2> /dev/null', $p);
+        $hash = $p[0];
+
+    	$data = $this->models->ProjectsModel->getProjectsWithUsers();
+
+    	foreach ($data as $i => $row) {
+            $data[$i]['git_branch'] = $branch;
+            $data[$i]['git_hash'] = $hash;
+    	}
+
+		$this->_head->service = 'projects and users';
+		$this->_head->description = sprintf('"flat file" list of all projects and their users');
+		$this->_data = $data;
+		$this->printOutput();
+    }
 
 	private function setProjectId()
 	{
