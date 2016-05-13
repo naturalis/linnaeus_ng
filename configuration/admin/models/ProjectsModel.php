@@ -33,7 +33,7 @@ final class ProjectsModel extends AbstractModel
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
 		if( !isset( $user_id ) ) return;
-		
+
 		$query="
 				select
 					_a.id,
@@ -47,8 +47,8 @@ final class ProjectsModel extends AbstractModel
 				from
 					%PRE%projects _a
 				";
-				
-		if ( $show_all ) 
+
+		if ( $show_all )
 		{
 			$query .= "
 				left join %PRE%projects_roles_users _b
@@ -65,19 +65,19 @@ final class ProjectsModel extends AbstractModel
 			";
 		}
 
-		if ( isset($project_id) ) 
+		if ( isset($project_id) )
 		{
 			$query .= "
 				and _a.id = " . $project_id ;
 		}
-		
+
 		$query .= "
 			order by title, sys_name
 		";
 
 		return $this->freeQuery( $query );
 	}
-	
+
 	public function getProjectModules( $params )
 	{
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
@@ -85,7 +85,7 @@ final class ProjectsModel extends AbstractModel
 
         if ( is_null($project_id) )
 			return;
-		
+
 		$query = "
 			select
 				_a.module_id,
@@ -96,13 +96,13 @@ final class ProjectsModel extends AbstractModel
 				_a.active
 			from
 				%PRE%modules_projects _a
-				
+
 			left join %PRE%modules _b
 				on _a.module_id = _b.id
-			
-			where 
+
+			where
 				_a.project_id = " . $project_id ."
-			" . (!$include_hidden ? "and _b.show_in_menu=1 " : "") . " 
+			" . (!$include_hidden ? "and _b.show_in_menu=1 " : "") . "
 			order by _b.module asc
 			";
 
@@ -114,7 +114,7 @@ final class ProjectsModel extends AbstractModel
 			from
 				%PRE%free_modules_projects
 			where
-				project_id = " . $project_id ." 
+				project_id = " . $project_id ."
 			";
 
 		$custom=$this->freeQuery( $query );
@@ -123,5 +123,32 @@ final class ProjectsModel extends AbstractModel
 
 	}
 
+    public function getProjectsWithUsers ()
+    {
+        $query = '
+            select
+                t1.sys_name as project,
+                t1.published as project_published,
+                t3.username as user_name,
+                t3.first_name,
+                t3.last_name,
+                t4.description as role,
+                t3.email_address,
+                t3.active,
+                t3.last_login,
+                t2.last_project_select,
+                t3.last_password_change
+            from
+                projects as t1
+            left join
+                projects_roles_users as t2 on t1.id = t2.project_id
+            left join
+                users as t3 on t2.user_id = t3.id
+            left join
+                roles as t4 on t2.role_id = t4.id
+            order by
+                t1.sys_name, t3.username';
 
+        return $this->freeQuery($query);
+    }
 }
