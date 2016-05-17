@@ -178,6 +178,9 @@
                     $row['lastest_git_hash'] = $lastestHash;
                     $row['code_up_to_date'] =
                         ($row['git_hash'] == $lastestHash) ? 1 : 0;
+                    $row['server_ip'] = $this->_server;
+                    $row['server_name'] = gethostbyaddr($this->_server);
+                    $row['check_date'] = date("Y-m-d H:m:s");
                     // Write header?
                     if (!$this->_csvHeader) {
                         fputcsv($this->_fp, array_keys($row));
