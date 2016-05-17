@@ -127,17 +127,20 @@ final class ProjectsModel extends AbstractModel
     {
         $query = '
             select
+                ' . $_SERVER['SERVER_ADDR'] . ' as server_ip,
+                ' . $_SERVER['SERVER_NAME'] . ' as server_name,
+                ' . date("Y-m-d H:m:s") . ' as check_date,
                 t1.sys_name as project,
-                t1.published as project_published,
+                t1.published as project_is_published,
                 t3.username as user_name,
                 t3.first_name,
                 t3.last_name,
                 t4.description as role,
                 t3.email_address,
-                t3.active,
+                t3.active as user_is_active,
                 t3.last_login,
-                t2.last_project_select,
-                t3.last_password_change
+                t2.last_project_select as project_last_selected,
+                t3.last_password_change as last_password_change
             from
                 projects as t1
             left join
