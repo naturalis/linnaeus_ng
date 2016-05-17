@@ -137,7 +137,7 @@ final class ProjectsModel extends AbstractModel
                 t3.active as user_is_active,
                 t3.last_login,
                 t2.last_project_select as project_last_selected,
-                t3.last_password_change as last_password_change
+                t3.last_password_change as password_last_changed
             from
                 projects as t1
             left join
