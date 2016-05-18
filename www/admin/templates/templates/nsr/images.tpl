@@ -81,8 +81,6 @@ $(document).ready(function() {
 	 	} );
 	}
 
-	$('#page-block-messages').fadeOut(3000);
-
 } );
 </script>
 

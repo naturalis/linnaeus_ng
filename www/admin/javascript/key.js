@@ -206,58 +206,6 @@ function keyDeleteKeyStep()
 	$('#theForm').submit();
 }
 
-function keySaveChoiceContent(type,postFunction)
-{
-	if (type=='default')
-		//content = ['',$('#contentDefault').val()];
-		content = ['',tinyMCE.get('contentDefault').getContent()];
-	else
-		//content = ['',$('#contentOther').val()];
-		content = ['',tinyMCE.get('contentOther').getContent()];
-
-	keySaveData(
-		keyChoiceId,
-		type=='default' ? allDefaultLanguage : allActiveLanguage,
-		content,
-		'save_key_choice_content',
-		postFunction
-	);
-}
-
-function keyGetChoiceContent(language)
-{
-	allShowLoadingDiv();
-
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'get_key_choice_content' ,
-			'language' : language ,
-			'id' : (keyChoiceId ? keyChoiceId : false) , 
-			'time' : allGetTimestamp()
-		}),
-		async: allAjaxAsynchMode,
-		success : function (data) {
-			//alert(language);
-			obj = $.parseJSON(data);
-			keySetChoiceContent(obj,language);
-			allHideLoadingDiv();
-		}
-	})
-}
-
-function keySetChoiceContent(obj,language)
-{
-	if (language==allDefaultLanguage)
-		var editor='contentDefault';
-	else
-		var editor='contentOther';
-
-	tinyMCE.get(editor).setContent(obj ? obj.choice_txt : '');
-	tMCEFirstUndoPurge(editor);
-}
-
 function keySetMapInfoLabel(node)
 {
 	id = node.id;
@@ -279,39 +227,3 @@ function keySetMapInfoLabel(node)
 	$('#info').html(d);
 }
 
-function keyRestoreChoice(obj,language)
-{
-	if (obj==null)
-	{
-		allSetMessage(_('nothing to restore'));
-		return;
-	}
-
-	if (obj.language_id==allDefaultLanguage)
-	{
-		tinyMCE.get('contentDefault').setContent(obj ? obj.choice_txt : '');
-	} 
-	else
-	{
-		allActiveLanguage = obj.language_id;
-		allDrawLanguages();
-		tinyMCE.get('contentOther').setContent(obj ? obj.choice_txt : '');
-	}
-
-	allSetMessage(_('restored'));
-}
-
-function keyRemoveDeadEndChoice(id)
-{
-	$('#choice-'+id).remove();
-}
-
-function keyCallRemoveDeadEndChoice(id)
-{
-	if (
-		($('#res_taxon_id').val() > 0 || $('#res_keystep_id').val() > 0) &&
-		(window.opener) &&
-		(typeof window.opener.keyRemoveDeadEndChoice == 'function')
-	)
-		window.opener.keyRemoveDeadEndChoice(id);
-}

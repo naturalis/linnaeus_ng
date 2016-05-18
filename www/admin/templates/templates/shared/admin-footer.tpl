@@ -37,9 +37,10 @@ var hasSearchResults=true;
 </script>
 {/if *}
 
-{literal}
 <script type="text/JavaScript">
-$(document).ready(function(){
+
+$(document).ready(function()
+{
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
 			animation_speed:50,
@@ -49,24 +50,30 @@ $(document).ready(function(){
 	 		social_tools: false
 	 	});
 	}
-	if (hasSearchResults===true) {
+
+	if (hasSearchResults===true)
+	{
 	
 		function positionSearchFloat(pos) {
 			if(!pos || pos[0]<0 || pos[1]<0) pos=[115,568];
-			$('#search-float').css({top:pos[0]+'px',left:pos[1]+'px'});
+			$('#search-float').css( { top:pos[0]+'px',left:pos[1]+'px' } );
 		}
 		var pos=allGetSomething('search-float-position',positionSearchFloat);
 		$('#search-float').css('visibility','visible');
 
-		$('#search-float').draggable({stop: function(event, ui) {
+		$('#search-float').draggable( { stop: function(event, ui)
+		{
 			var pos = $(this).position();
 			allSetSomething('search-float-position',[pos.top,pos.left]);
 		}, cancel:'#werwerwerwe'});
 	}
 	
+	$('#page-block-messages').fadeOut(3000);	
+
 })
+
 </script>
-{/literal}
+
 
 </body>
 </html>

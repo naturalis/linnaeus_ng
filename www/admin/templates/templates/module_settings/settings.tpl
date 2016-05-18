@@ -164,7 +164,6 @@ input[type=text] {
 <script>
 $(document).ready(function()
 {
-	$('#page-block-messages').fadeOut(3000);
 	bindDblClick();
 });
 </script>

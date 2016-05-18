@@ -310,9 +310,6 @@ function allSwitchLanguage(language) {
 		case 'keystepedit':
 			keyGetKeystepContent(allActiveLanguage);
 			break;
-		case 'choiceedit':
-			keyGetChoiceContent(allActiveLanguage);
-			break;
 		case 'introduction':
 			contentGetContentActive();
 			allAjaxAsynchMode = true;

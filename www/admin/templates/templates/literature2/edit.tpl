@@ -334,9 +334,6 @@ $(document).ready(function()
 	{
 		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
 	});
-	
-	$('#page-block-messages').fadeOut(3000);
-
 });
 </script>
 

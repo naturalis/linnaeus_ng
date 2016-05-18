@@ -131,8 +131,7 @@ $(document).ready(function()
 	
 	$('#roles').trigger('change');
 	
-	$('#page-block-messages').fadeOut(3000);
-	
+
 });
 </script>
 
