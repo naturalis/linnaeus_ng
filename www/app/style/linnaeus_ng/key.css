@@ -77,6 +77,9 @@
   margin: 5px;
   font-size: 90%; }
 
+.l2_choice.no_image {
+  width: 535px; }
+
 #choice-table .choice-picture {
   width: auto; }
 
