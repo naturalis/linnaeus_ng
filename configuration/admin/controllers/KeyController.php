@@ -490,38 +490,13 @@ class KeyController extends Controller
 
 		    $this->detachAllMedia();
 		}
-
-        if (($this->rHasVal('res_keystep_id') || $this->rHasVal('res_taxon_id')) && !$this->isFormResubmit())
-		// save new target
+        else
+        if ($this->rHasVal('action', 'save'))
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
-
-			if ($this->rHasVal('res_keystep_id','-1'))
-				$newStepId = $this->createNewKeystep();
-			else
-				$newStepId = $this->rGetVal('res_keystep_id');
-
-
-            $ck = $this->models->ChoicesKeysteps->update(
-            array(
-                'res_keystep_id' => $newStepId === '0' ? 'null' : $newStepId,
-                'res_taxon_id' => $newStepId !== '0' ? 'null' : ($this->rGetVal('res_taxon_id') === '0' ? 'null' : $this->rGetVal('res_taxon_id'))
-            ), array(
-                'id' => $this->rGetId(),
-                'project_id' => $this->getCurrentProjectId()
-            ));
-
-            if ($this->models->ChoicesKeysteps->getAffectedRows() > 0)
-			{
-                $choice['res_keystep_id'] = $this->rGetVal('res_keystep_id');
-
-                $choice['res_taxon_id'] = $this->rGetVal('res_taxon_id');
-
-               	$this->addMessage($this->translate('Data saved.'));
-            }
-
-			// $this->redirect('step_show.php?id=' . $step['id']);
+			$this->updateChoice( $this->rGetAll() );
+	        $choice = $this->getKeystepChoice($id);
         }
 
 		// save choice image
@@ -555,15 +530,16 @@ class KeyController extends Controller
 			}
 		}
 
-        if (isset($choice)) $this->smarty->assign('data', $choice);
-        $this->smarty->assign('languages', $this->getProjectLanguages());
-        $this->smarty->assign('defaultLanguage', $_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()]);
-		$this->smarty->assign('steps', $this->getKeysteps( array("exclude" => $choice['keystep_id']) ));
-		$this->smarty->assign('taxa', $this->getTaxaInKey( array( "order"=>"taxon" ) ));
-		$this->smarty->assign('keyPath', $this->getKeyPath());
-        $this->smarty->assign('includeHtmlEditor', true);
-		$this->smarty->assign('module_id', $this->getCurrentModuleId());
-        $this->smarty->assign('item_id', $id);
+		$this->smarty->assign( 'choice', $choice );
+		$this->smarty->assign( 'step', $this->getKeystep($choice['keystep_id']) );
+        $this->smarty->assign( 'languages', $this->getProjectLanguages() );
+        $this->smarty->assign( 'defaultLanguage', $_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()] );
+		$this->smarty->assign( 'steps', $this->getKeysteps( array("exclude" => $choice['keystep_id']) ) );
+		$this->smarty->assign( 'taxa', $this->getTaxaInKey( array( "order"=>"taxon" ) ) );
+		$this->smarty->assign( 'keyPath', $this->getKeyPath() );
+        $this->smarty->assign( 'includeHtmlEditor', true );
+		$this->smarty->assign( 'module_id', $this->getCurrentModuleId() );
+        $this->smarty->assign( 'item_id', $id );
 
         $this->printPage();
     }
@@ -910,19 +886,6 @@ class KeyController extends Controller
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			if ( !$this->getAuthorisationState() ) return;
             $this->saveKeystepContent($this->rGetAll());
-        }
-        else
-		if ($this->rHasVal('action','get_key_choice_content'))
-		{
-			if ( !$this->getAuthorisationState() ) return;
-            $this->getKeystepChoiceContent();
-        }
-        else
-		if ($this->rHasVal('action','save_key_choice_content'))
-		{
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-			if ( !$this->getAuthorisationState() ) return;
-            $this->saveKeystepChoiceContent($this->rGetAll());
         }
 
         $this->printPage();
@@ -1670,10 +1633,17 @@ class KeyController extends Controller
 
         $choice['keystep_number'] = $k['number'];
 
-        $kcc = $this->getKeystepChoiceContent($this->getDefaultProjectLanguage(), $choice['id']);
+		$choice['content'] = $this->models->ChoicesContentKeysteps->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'choice_id' => $id,
+			),
+			'columns' => 'language_id,choice_txt',
+			'fieldAsIndex'=>'language_id'
+		));
 
-        if (isset($kcc['choice_txt']))
-            $choice['choice_txt'] = $kcc['choice_txt'];
+		$choice['choice_txt'] = $choice['content'][$this->getDefaultProjectLanguage()]['choice_txt'];
 
         if (!empty($choice['res_keystep_id']) && $choice['res_keystep_id'] != 0)
 		{
@@ -1688,7 +1658,9 @@ class KeyController extends Controller
                 ));
 
                 if (isset($k['number']))
+				{
                     $choice['target_number'] = $k['number'];
+				}
             }
         }
         else
@@ -1699,7 +1671,9 @@ class KeyController extends Controller
             ));
 
             if (isset($t['taxon']))
+			{
                 $choice['target'] = $t['taxon'];
+			}
         }
         else
 		{
@@ -1709,38 +1683,6 @@ class KeyController extends Controller
         $choice['marker'] = $choice['show_order'];
 
         return $choice;
-    }
-
-    private function saveKeystepChoiceContent($data)
-    {
-        if (empty($data['language'])) {
-
-            return;
-        }
-        else {
-
-            $ck = $this->models->ChoicesContentKeysteps->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'choice_id' => $data['id'],
-                    'language_id' => $data['language']
-                )
-            ));
-
-            $d = array(
-                'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null,
-                'project_id' => $this->getCurrentProjectId(),
-                'choice_id' => $data['id'],
-                'language_id' => $data['language'],
-                'choice_txt' => trim($data['content'][1])
-            );
-
-            // save choice
-            $this->models->ChoicesContentKeysteps->save($d);
-
-            $this->smarty->assign('returnText', $this->models->ChoicesContentKeysteps->getAffectedRows() > 0 ? $this->translate('saved') : '');
-        }
     }
 
     private function getKeystepChoiceContent($language = null, $id = null)
@@ -2212,9 +2154,85 @@ class KeyController extends Controller
 	}
 	
 	
+	private function updateChoice( $data )
+	{
+		$id=isset($data['id']) ? $data['id'] : null;
+		//$step=isset($data['id']) ? $data['id'] : null;
+		$choice_txt=isset($data['choice_txt']) ? $data['choice_txt'] : null;
+		$res_keystep_id=isset($data['res_keystep_id']) ? $data['res_keystep_id'] : null;
+		$res_taxon_id=isset($data['res_taxon_id']) ? $data['res_taxon_id'] : null;
+
+		if ( is_null($id) ) return;
+
+		if ( $res_keystep_id==-1 )
+			$next_step_id = $this->createNewKeystep();
+		else
+			$next_step_id = $res_keystep_id;
+
+		$changes=0;
+
+
+		$this->models->ChoicesKeysteps->update(
+			array(
+				'res_keystep_id' => $next_step_id === '0' ? 'null' : $next_step_id,
+				'res_taxon_id' => $next_step_id !== '0' ? 'null' : ( $res_taxon_id === '0' ? 'null' : $res_taxon_id )
+			), 
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+		
+		$changes+=$this->models->ChoicesKeysteps->getAffectedRows();
+		
+		foreach((array)$choice_txt as $language_id=>$txt)
+		{
+			$txt=trim($txt);
+			
+			if (strlen(preg_replace(array('/^\<[^\*?]\/\>/','/\<[^\*?]\/\>$/'),'',$txt))==0)
+			{
+				$this->models->ChoicesContentKeysteps->delete(
+					array(
+						'choice_id' => $id,
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $language_id
+					)
+				);
+			}
+			else
+			{
+
+				$c=$this->models->ChoicesContentKeysteps->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'choice_id' => $id,
+						'language_id' => $language_id
+					)
+				));
+
+				$d = array(
+					'id' => isset($c[0]['id']) ? $c[0]['id'] : null,
+					'project_id' => $this->getCurrentProjectId(),
+					'choice_id' => $id,
+					'language_id' => $language_id,
+					'choice_txt' => $txt
+				);
 	
-	
-	
+				$this->models->ChoicesContentKeysteps->save( $d );
+
+			}
+
+			$changes+=$this->models->ChoicesContentKeysteps->getAffectedRows();
+
+		}
+
+		if ( $changes>0 )
+		{
+			$this->addMessage( $this->translate('Saved.') );
+		}
+
+	}
 	
 	
 }

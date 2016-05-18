@@ -280,7 +280,6 @@ $(document).ready(function()
 {
 	print_susbt();
 	print_param();
-	$('#page-block-messages').fadeOut(3000);
 });
 </script>
 

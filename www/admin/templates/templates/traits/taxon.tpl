@@ -185,8 +185,6 @@ $(document).ready(function()
 	{/foreach}
 	taxonTraits.printReferences();
 
-	$('#page-block-messages').fadeOut(3000);
-
 });
 </script>
 

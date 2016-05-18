@@ -98,7 +98,7 @@ $(document).ready(function()
 {else}
 	taxonAddRank(taxonKingdom[0]);
 {/if}
-	$('#page-block-messages').fadeOut(3000);
+
 });
 
 </script>

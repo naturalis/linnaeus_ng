@@ -99,8 +99,6 @@ $(document).ready(function(e)
 	currentpublish[{$k}]={if $v.publish==1}true{else}false{/if};
 	{/foreach}
 
-	$('#page-block-messages').fadeOut(3000);
-
 	$('#media-overlay-links').click(function(e)
 	{
 		e.preventDefault();

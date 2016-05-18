@@ -35,12 +35,4 @@
 </div>
 
 {include file="../shared/admin-messages.tpl"}
-
-<script>
-$(document).ready(function()
-{
-	$('#page-block-messages').fadeOut(3000);
-});
-</script>
-
 {include file="../shared/admin-footer.tpl"}

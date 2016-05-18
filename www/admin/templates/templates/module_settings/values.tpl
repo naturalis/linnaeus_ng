@@ -114,9 +114,7 @@ tr.info-line {
 <script>
 $(document).ready(function()
 {
-	$('#page-block-messages').fadeOut(3000);
 	$('td.setting-name').on('click',function() { $(this).closest('tr').next('tr').toggle(); } );
-	
 });
 </script>
 

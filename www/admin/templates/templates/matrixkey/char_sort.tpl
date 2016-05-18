@@ -47,9 +47,6 @@ $(document).ready(function()
 		opacity: 0.6, 
 		cursor: 'move',
 	}).disableSelection();
-
-	$('#page-block-messages').fadeOut(3000);
-
 });
 </script>
 

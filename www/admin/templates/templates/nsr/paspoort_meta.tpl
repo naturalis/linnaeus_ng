@@ -159,7 +159,8 @@ toevoegen aan:<br />
 </div>
 
 <script>
-$(document).ready(function(e) {
+$(document).ready(function(e)
+{
 	{foreach from=$actors item=v key=k}
 	{if $v.is_company!='1'}
 	storeAuthor({ id: {$v.id},name:'{$v.label|@escape}'});
@@ -167,9 +168,6 @@ $(document).ready(function(e) {
 	storeOrganisation({ id: {$v.id},name:'{$v.label|@escape}'});
 	{/if}
 	{/foreach}
-
-	$('#page-block-messages').fadeOut(3000);
-
 });
 </script>
 
