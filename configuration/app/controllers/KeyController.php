@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('ModuleSettingsController.php');
+include_once ('MediaController.php');
 
 class KeyController extends Controller
 {
@@ -65,6 +66,7 @@ class KeyController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsController;
+        $this->setMediaController();
 	}
 
     /**
@@ -162,13 +164,11 @@ class KeyController extends Controller
 
 		// get step's choices
 		if (isset($step)) $choices = $this->getKeystepChoices($step['id']);
-
 		if (isset($step)) $this->smarty->assign('step',$step);
 		if (isset($choices)) $this->smarty->assign('choices',$choices);
 		$this->smarty->assign('keypath',$this->getKeyPath());
 
-		$this->printPage($this->setStepType(isset($choices) ? $choices : null));
-
+		$this->printPage();
     }
 
 
@@ -532,9 +532,12 @@ class KeyController extends Controller
 				)
 			);
 		}
-
+		
 		foreach((array)$choices as $key => $val)
 		{
+			
+			$choices[$key]['choice_img'] = $this->getChoiceImage($val['id']);
+
 			if ($includeContent)
 			{
 				// get the actual language-sensitive content for each choice
@@ -897,7 +900,31 @@ class KeyController extends Controller
         return ;
     }
 
+    private function getChoiceImage($itemId = false)
+    {
+        if (!$itemId) {
+            $itemId = $this->rGetId();
+        }
 
+        $this->_mc->setItemId($itemId);
+
+    	// Append image to choice
+        $img = $this->_mc->getItemMediaFiles();
+
+        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+            return $img[0]['rs_original'];
+        }
+
+        return null;
+    }
+	
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId('species'));
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getCurrentLanguageId());
+	}
 
 
 
