@@ -1,201 +1,99 @@
+{* if $contentCount.media>0 *}
+<div id="media">
+{assign var=widthInCells value=5}
+	<div id="media-grid">
+		{assign var=mediaCat value=false}
+		{foreach $content v k}
 
-
-{*
-<div>
-
-<style>
-.speciesimage {
-	max-width:150px;
-}
-.media-active, .media-not-active {
-	width:50%;
-	border-top:4px solid #666;
-	padding-top:5px;
-	font-weight:bold;
-}
-.media-not-active {
-	border-top:1px solid #999;
-	padding-top:8px;
-	color:#666;
-	font-weight:normal;
-}
-</style>
-
-	{if $mediaOwn.count>0 && $mediaCollected.species>0}
-
-	<div style="width:510px;margin-bottom:10px;text-align:center;font-family:Georgia;">
-        <div class="{if $requestData.media=='collected' || $requestData.media==''}media-active{else}media-not-active{/if}">
-	        {if $requestData.media=='collected' || $requestData.media==''}
-	            {t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
+			{if $v.rs_id == ''}
+				{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
 			{else}
-            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
-                	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
-				</a>
+				{capture name="fullImgUrl"}{$v.full_path}{/capture}
 			{/if}
-        </div>
-        <div class="{if $requestData.media=='own'}media-active{else}media-not-active{/if}">
-	        {if $requestData.media=='own'}
-            	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
-			{else}
-            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
-                	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
-				</a>
+
+			{assign var=mediaCat value=$v.category}
+
+			{if $requestData.disp==$v.id}
+				{assign var=dispUrl value=$smarty.capture.fullImgUrl}
+				{assign var=dispName value=$v.original_name}
 			{/if}
-        </div>
-    </div>
-    
-    {/if}
 
-    <div style="width:100%">
+			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
 
-		{if !($mediaOwn.count>0 && $mediaCollected.species>0)}
+				{if $v.rs_id == ''}
 
-		{if $mediaOwn.count>0 && $requestData.media!='collected'}
-        <h4>
-            {t}Totaal aantal afbeeldingen:{/t} <span class="total-image-count"></span>
-        </h4>
-        {elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
-        <h4>
-			{t}Soorten/taxa met afbeelding(en):{/t} {$mediaCollected.species}
-        </h4>
-        {/if}
-        
-        {/if}
-        
-        <div id="images-container">
-        </div>
-        
-        <input 
-        	id="more-images-button" 
-            type="button" 
-            value="{t}Meer afbeeldingen{/t}"
-            style="font-size:0.9em;width:100%;margin-top:10px;display:none;"
-		/>
-    </div>
-</div>
+					<a
+					rel   = "prettyPhoto[gallery]"
+					class = "image-wrap "
+					title = "{$v.file_name}"
+					href  = "{$smarty.capture.fullImgUrl}"
+					alt   = "{$v.description}"
+					>
 
-<script type="text/JavaScript">
-$(document).ready(function()
-{
-	{if $mediaCollected.species>0 &&  $requestData.media!='own'}
-	var action='get_collected_batch';
-	{elseif $mediaOwn.count>0 && $requestData.media!='collected'}
-	var action='get_media_batch';
-	{/if}
-	var page=0;
-	var id={$taxon.id};
-	
-	function setTotalImageCount(i)
-	{
-		$('.total-image-count').html(i);
-	}
-	
-	function setMoreImagesButton(total)
-	{
-		$('#more-images-button').toggle($('.thumbContainer').length<total);
-	}
-	
-	function setImageBatch(images)
-	{
-		if (!images) return;
+					{if $v.category=='image'}
+						<div>
+							<img
+								id    = "media-{$k}"
+								alt   = "{$v.description}"
+								title = "{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+								src   = "{$smarty.capture.fullImgUrl}"
+								class = "image-full" />
+						</div>
+					{elseif $v.category=='video'}
+							<img
+								id="media-{$k}"
+								alt="{$v.description}"
+								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+								src="{$projectUrls.systemMedia}video.png"
+								onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
+								class="media-video-icon" />
+					{elseif $v.category=='audio'}
+							<object
+								id="media-{$k}"
+								alt="{$v.description}"
+								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+								type="application/x-shockwave-flash"
+								data="{$soundPlayerPath}{$soundPlayerName}"
+								width="130"
+								height="20">
+								<param name="movie" value="{$soundPlayerName}" />
+								<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
+							</object>
+					{/if}
 
-		var template=
-			(action=='get_collected_batch' ?
-				$('#template-image-cell-collected').html() :
-				$('#template-image-cell').html()
-			).replace('<!--','').replace('-->','');
+					</a>
 
-		var buffer=Array();
-		for(var i=0;i<images.length;i++)
-		{
-			var image=images[i];
-			buffer.push(
-				template
-					.replace( /%image%/g, image.image ? image.image : '' )
-					.replace( /%meta_data%/g, image.meta_data ? escape(image.meta_data) : '' )
-					.replace( /%photographer%/g, image.photographer ? image.photographer : '' )
-					.replace( /%thumb%/g, image.thumb ? image.thumb : '' )
-					.replace( /%id%/g, image.taxon_id ? image.taxon_id : '' )
-					.replace( /%name%/g, image.name ? image.name : '')
-					.replace( /%taxon%/g, image.taxon ? image.taxon : '' )
-			);
-		}
-		
-		if (page==1)
-		{
-			$('#images-container').append(buffer.join("\n"));
-		}
-		else
-		{
-			$('#images-container').append("<span class='image-batch' style='display:none'>"+buffer.join("\n")+"</span>");
-			$('.image-batch:hidden').show('slow');
-		}
-		
-		nbcPrettyPhotoInit();
-	}
+				{else}
 
-	function getMediaBatch()
-	{
-		$.ajax({
-			url : 'ajax_interface_nsr.php',
-			type: "POST",
-			data : ({
-				action : action,
-				id : id,
-				page : page,
-				time : allGetTimestamp()
-			}),
-			success : function (data) {
-				var data=$.parseJSON(data)
-				//console.dir(data);
-				setTotalImageCount(data.count);
-				setImageBatch(data.data);
-				setMoreImagesButton(data.count);
-			}
-		});	
-	}
-	
-	function getMediaNextBatch()
-	{
-		page++;
-		getMediaBatch();
-	}
+					{if $v.category == 'image'}
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto">
+						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.original_name}" id="media-{$k}" class="image-full" />
+						</a><br/>
+						{$name}
 
-	$('#more-images-button').on('click',function() { getMediaNextBatch(); } );
+					{else if $v.category == 'audio' or $v.category == 'video'}
+						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$name}" id="media-{$k}" controls />
+							<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
+						</{$v.category}><br>
+						{$name}
 
-	getMediaNextBatch();	
-		
-});
-</script>
+					{else}
+						<a href="{$smarty.capture.fullImgUrl}">
+						<img src="{$v.rs_thumb_medium}" alt="{$v.original_name}" /><br>
+						{$name}
+						</a>
 
+					{/if}
 
-<span style="display:none" id="template-image-cell">
-<!--
-<div class="imageInGrid3 taxon-page">
-    <div class="thumbContainer">
-        <a class="zoomimage" rel="prettyPhoto[gallery]" href="{$projectUrls['projectMedia']}%image%" pTitle="<div style='margin-left:125px;'>%meta_data%</div>">
-            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$projectUrls['projectMedia']}%thumb%" />
-        </a>
-    </div>
-    <dl>
-        <dt>{t}Foto{/t}</dt><dd>%photographer%</dd>
-    </dl>
-</div>
--->
-</span>
-<span style="display:none" id="template-image-cell-collected">
-<!--
-<div class="imageInGrid3 taxon-page collected">
-    <div class="thumbContainer">
-        <a href="nsr_taxon.php?id=%id%&cat=media">
-            <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$projectUrls['projectMedia']}%thumb%" />
-        </a>
-    </div>
-    <dl>
-		<dd>%name%</dd>
-        <dd><i>%taxon%</i></dd>
-    </dl>
-</div>
--->
-</span>
-*}
+				{/if}
+
+				<div id="caption-{$k}" class="media-caption">
+					<p >{$v.description}</p>
+				</div>
+
+			</div><!-- /.media-cell -->
+		{/foreach}
+
+	</div><!-- /#media-grid -->
+</div><!-- /#media -->
+{* /if *}
