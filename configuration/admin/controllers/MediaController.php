@@ -100,7 +100,10 @@ class MediaController extends Controller
             'gif' => 'image/gif'
         ),
         'audio' => array(
-            'mp3' => 'audio/mpeg'
+            'mp3' => array(
+                'audio/mpeg',
+                'audio/mp3'
+            )
         ),
         'video' => array(
             'mp4' => 'video/mp4'
@@ -1504,7 +1507,8 @@ class MediaController extends Controller
     {
         foreach ($this::$mimeTypes as $category => $types) {
             foreach ($types as $extension => $type) {
-                if ($mime == $type) {
+                $type = is_array($type) ? $type : array($type);
+                if (in_array($mime, $type)) {
                     return $category;
                 }
             }
@@ -1516,7 +1520,8 @@ class MediaController extends Controller
     {
         foreach ($this::$mimeTypes as $category => $types) {
             foreach ($types as $extension => $type) {
-                if ($mime == $type) {
+                $type = is_array($type) ? $type : array($type);
+                if (in_array($mime, $type)) {
                     return array_search($category, array_keys($this::$mimeTypes));
                 }
             }
