@@ -131,13 +131,16 @@ function freemodDeletePage(id) {
 
 function freemodDoPreview() {
 
-//	freemodSaveContentAll();
+	freemodSaveContentAll();
 
 	if (allDefaultLanguage)
 		$('#theForm').append('<input type="hidden" name="language-default" value="'+allDefaultLanguage+'">').val(allDefaultLanguage);
 
 	if (allActiveLanguage)
 		$('#theForm').append('<input type="hidden" name="language-other" value="'+allActiveLanguage+'">').val(allActiveLanguage);
+
+	var hide_from_index = $('#hide_from_index' ).prop( 'checked' ) ? '1' : '0'
+	$('#theForm').append('<input type="hidden" name="hide_from_index" value="'+hide_from_index+'">').val(hide_from_index);
 
 	$("#action").val('preview');
 	$('#theForm').submit();
