@@ -48,6 +48,7 @@
 
 
 		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
+        
 
 			{include file="_tab_media.tpl"}
 			
