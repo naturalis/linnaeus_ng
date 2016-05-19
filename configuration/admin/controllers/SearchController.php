@@ -714,31 +714,36 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('names'), // when changing the label 'Species names', do the same in searchMap()
-					'url' => '../species/edit.php?id=%s',
+					//'url' => '../species/edit.php?id=%s',
+					'url' => '../nsr/taxon.php?id=%s',
 					'data' => $taxa,
 					'numOfResults' => count((array)$taxa)
 				),
 				array(
 					'label' => $this->translate('descriptions'),
-					'url' => '../species/taxon.php?id=%s&page=%s',
+					//'url' => '../species/taxon.php?id=%s&page=%s',
+					'url' => '../nsr/paspoort.php?id=%s',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				),
 				array(
 					'label' => $this->translate('synonyms'),
-					'url' => '../species/synonyms.php?id=%s',
+					//'url' => '../species/synonyms.php?id=%s',
+					'url' => '../nsr/taxon.php?id=%s',
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				),
 				array(
 					'label' => $this->translate('common names'),
-					'url' => '../species/common.php?id=%s',
+					//'url' => '../species/common.php?id=%s',
+					'url' => '../nsr/taxon.php?id=%s',
 					'data' => $commonnames,
 					'numOfResults' => count((array)$commonnames)
 				),
 				array(
 					'label' => $this->translate('media'),
-					'url' => '../species/media.php?id=%s',
+					//'url' => '../species/media.php?id=%s',
+					'url' => '../nsr/media.php?id=%s',
 					'data' => $media,
 					'numOfResults' => count((array)$media)
 				),
