@@ -899,7 +899,7 @@ class SpeciesController extends Controller
     }
 */
 
-	private function getTaxonMedia ($p)
+	protected function getTaxonMedia ($p)
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$id = isset($p['id']) ? $p['id'] : null;
@@ -1145,22 +1145,6 @@ class SpeciesController extends Controller
         return isset($c) ? $c[0]['total'] : 0;
     }
 
-/*
-    private function getTaxonMediaCount($id)
-    {
-        $mt = $this->models->MediaTaxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'taxon_id' => $id
-            ),
-            'columns' => 'count(*) as total'
-        ));
-
-        return isset($mt) ? $mt[0]['total'] : 0;
-    }
-*/
-
     private function getTaxonMediaCount($id)
     {
         return $this->_mc->getItemMediaFileCount();
@@ -1211,7 +1195,7 @@ class SpeciesController extends Controller
     }
     */
 
-	private function getTaxonOverviewImage()
+	protected function getTaxonOverviewImage()
     {
         return $this->_mc->getOverView();
     }
