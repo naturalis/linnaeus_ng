@@ -642,7 +642,8 @@ class NsrTaxonManagement extends NsrController
 						'page_id' => $page_id
 					));
 
-					$this->addMessage( $this->translate( 'Label deleted.' ) );
+					if ($this->models->PagesTaxaTitles->getAffectedRows()>0)
+						$this->addMessage( $this->translate( 'Label deleted.' ) );
 
             	}
 	            else
