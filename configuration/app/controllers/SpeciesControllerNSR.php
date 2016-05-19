@@ -25,6 +25,7 @@ class SpeciesControllerNSR extends SpeciesController
 {
 	private $_resPicsPerPage=12;
 	private $_nameTypeIds;
+	private $_isNsr = false;
 
 	public $usedModelsExtended = array(
 		'actors',
@@ -61,7 +62,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
-		
+
 		// not actually implemented to do anything yet
 		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( "tree_show_upper_taxon", 0 ) );
 
@@ -99,6 +100,11 @@ class SpeciesControllerNSR extends SpeciesController
 		}
     }
 
+    public function setIsNsr ()
+    {
+        $this->_isNsr = true;
+    }
+
     public function taxonAction()
     {
 		$taxon = $this->getTaxonById($this->rGetId());
@@ -126,7 +132,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$names=$this->getNames( $taxon );
 
 			$classification=$this->getTaxonClassification($taxon['id']);
-			
+
 			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
@@ -139,7 +145,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$requestedCategory=$val;
 				}
 			}
-			
+
 			if ( !empty($requestedCategory['external_reference']) )
 			{
 				$ref=$requestedCategory['external_reference'];
@@ -147,7 +153,7 @@ class SpeciesControllerNSR extends SpeciesController
 				if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 				{
 					$this->redirect( $ref->full_url );
-				} 
+				}
 				else
 				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
 				{
@@ -155,7 +161,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$external_content->content_raw=file_get_contents(  $ref->full_url  );
 					$external_content->content_json_decoded=json_decode( $external_content->content_raw );
 				}
-				
+
 				$content=$this->getTaxonContent(
 					array(
 						'taxon' => $taxon['id'],
@@ -164,7 +170,7 @@ class SpeciesControllerNSR extends SpeciesController
 						'isLower' =>  $taxon['lower_taxon']
 					)
 				);
-		
+
 			}
 			else
 			{
@@ -174,12 +180,12 @@ class SpeciesControllerNSR extends SpeciesController
 					$categories['start']='media';
 				}
 
-				if ($categories['start']==CTAB_MEDIA)
+				if ($categories['start']==CTAB_MEDIA && $this->_isNsr)
 				{
 					$this->smarty->assign('search',$this->requestData);
 					$this->smarty->assign('querystring',$this->reconstructQueryString());
-					$this->smarty->assign('mediaOwn',$this->getTaxonMedia($this->requestData));
-					$this->smarty->assign('mediaCollected',$this->getCollectedLowerTaxonMedia($this->requestData));
+					$this->smarty->assign('mediaOwn',$this->getTaxonMediaNsr($this->requestData));
+					$this->smarty->assign('mediaCollected',$this->getCollectedLowerTaxonMediaNsr($this->requestData));
 				}
 				else
 				{
@@ -276,6 +282,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 			}
 
+			$overview = $this->_isNsr ? $this->getTaxonOverviewImageNsr($taxon['id']) :
+                $this->getTaxonOverviewImage();
+
 			$this->setPageName($taxon['label']);
 
 			$this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
@@ -289,8 +298,9 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('classification',$classification);
 			$this->smarty->assign('children',$children);
 			$this->smarty->assign('names',$names);
-			$this->smarty->assign('overviewImage',$this->getTaxonOverviewImage($taxon['id']));
-            $this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
+			$this->smarty->assign('overviewImage',$this->_isNsr ? $overview['image'] : $overview);
+			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
+            $this->smarty->assign('is_nsr', $this->_isNsr);
 
 	        $this->printPage('taxon');
 
@@ -326,11 +336,11 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ($this->rHasVal('action', 'get_media_batch') && $this->rHasId())
 		{
-			$return=json_encode($this->getTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+			$return=json_encode($this->getTaxonMediaNsr(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
         } else
 		if ($this->rHasVal('action', 'get_collected_batch') && $this->rHasId())
 		{
-			$return=json_encode($this->getCollectedLowerTaxonMedia(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
+			$return=json_encode($this->getCollectedLowerTaxonMediaNsr(array('id'=>$this->rGetId(),'page'=>$this->rGetVal('page'))));
         }
 
         $this->allowEditPageOverlay = false;
@@ -342,7 +352,7 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		return $this->models->{$this->_model}->getFirstTaxonIdNsr($this->getCurrentProjectId());
 	}
-	
+
 	private function parseExternalReference( $p )
 	{
 
@@ -350,7 +360,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$reference = isset($p['reference']) ? $p['reference'] : null;
 
 		if ( is_null($taxon) || is_null($reference) ) return;
-		
+
 		if ( isset($reference->substitute) )
 		{
 			foreach((array)$reference->substitute as $key=>$val)
@@ -377,14 +387,14 @@ class SpeciesControllerNSR extends SpeciesController
 						"trait_group_id" => $trait[1],
 						"trait_id" => $trait[2]
 					));
-					
+
 					if ( !empty($sval) )
 					{
 						if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
 						{
 							$sval=call_user_func($reference->substitute_encode, $sval );
 						}
-	
+
 						$reference->url = str_replace( $key, $sval, $reference->url );
 					}
 					else
@@ -396,10 +406,10 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$reference->url = str_replace( $key, "" , $reference->url );
 				}
-				
+
 			}
 		}
-				
+
 		$query_string=null;
 
 		if ( isset($reference->parameters) )
@@ -423,8 +433,8 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$sval=$taxon[$val];
 				}
-				
-				if ( !empty($sval) ) 
+
+				if ( !empty($sval) )
 				{
 					if ( isset($reference->parameter_encode) && $reference->parameter_encode!='none' && is_callable( $reference->parameter_encode ) )
 					{
@@ -441,9 +451,9 @@ class SpeciesControllerNSR extends SpeciesController
 		$parts=parse_url( $reference->url );
 
 		$full_url=$reference->url . ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' );
-		
+
 		$is_empty=null;
-		
+
 		if ( isset($reference->check_type) )
 		{
 			if ( $reference->check_type=='none' )
@@ -465,7 +475,7 @@ class SpeciesControllerNSR extends SpeciesController
 			);
 
 	}
-	
+
     private function getCategories($p=null)
     {
 		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
@@ -485,7 +495,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if ( isset($taxon_id) )
 		{
 			$taxon=$this->getTaxonById( $taxon_id );
-			
+
 			foreach((array)$categories as $key=>$val)
 			{
 				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
@@ -507,7 +517,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$categories[$key]['external_reference']=$ref;
 					$categories[$key]['is_empty']=$d['is_empty'];
 				}
-			
+
 			}
 
 			if (defined('TAB_VERSPREIDING'))
@@ -562,14 +572,14 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if (!$this->_suppressTab_MEDIA)
 			{
-				$d=$this->getTaxonMedia(array('id'=>$taxon_id,'limit'=>1));
+				$d=$this->getTaxonMediaNsr(array('id'=>$taxon_id,'limit'=>1));
 				if ($d['count']>0)
 				{
 					$isEmpty=0;
 				}
 				else
 				{
-					$d=$this->getCollectedLowerTaxonMedia(array('id'=>$taxon_id));
+					$d=$this->getCollectedLowerTaxonMediaNsr(array('id'=>$taxon_id));
 					$isEmpty=(count((array)$d['data'])==0);
 				}
 
@@ -594,8 +604,8 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-			
-			
+
+
 			//if (!$this->_suppressTab_DNA_DICH_KEY_LINKS)
 			{
 				array_push($categories,
@@ -607,9 +617,9 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-			
-			
-			
+
+
+
 
 		}
 
@@ -710,7 +720,7 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 
 				$scientific_name=$this->addHybridMarker( array('name'=>trim($val['name']),'base_rank_id'=>$base_rank_id) );
-				
+
 			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
@@ -774,7 +784,7 @@ class SpeciesControllerNSR extends SpeciesController
 			});
 			array_splice($names,$synonymStartIndex,0,$synonyms);
 		}
-		
+
 		return
 			array(
 				'scientific_name'=>$scientific_name,
@@ -798,19 +808,19 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data[0];
 	}
 
-    private function getTaxonOverviewImage($id)
+    private function getTaxonOverviewImageNsr($id)
 	{
-		$d=$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1,'overview'=>true));
+		$d=$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1,'overview'=>true));
 
 		if ( empty($d['data']) )
 		{
-			$d=(array)$this->getTaxonMedia(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
+			$d=(array)$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
 		}
 
 		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 
-    private function getTaxonMedia($p)
+    private function getTaxonMediaNsr ($p)
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 
@@ -852,7 +862,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     }
 
-    private function getCollectedLowerTaxonMedia($p)
+    private function getCollectedLowerTaxonMediaNsr($p)
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
@@ -883,6 +893,20 @@ class SpeciesControllerNSR extends SpeciesController
 				'perpage'=>$this->_resPicsPerPage
 			);
 	}
+
+    private function getTaxonMediaCountNsr($id)
+    {
+        $mt = $this->models->MediaTaxon->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $id
+            ),
+            'columns' => 'count(*) as total'
+        ));
+
+        return isset($mt) ? $mt[0]['total'] : 0;
+    }
 
 	private function _getTaxonClassification($id)
 	{
@@ -961,7 +985,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$data[$key]['taxon']=$this->addHybridMarker(array('name'=>$val['taxon'],'base_rank_id'=>$val['rank_id']));
 			$data[$key]['uninomial']=$this->addHybridMarker(array('uninomial'=>$val['uninomial'],'base_rank_id'=>$val['rank_id']));
 			$data[$key]['specific_epithet']=$this->addHybridMarker(array('specific_epithet'=>$val['specific_epithet'],'base_rank_id'=>$val['rank_id']));
-	
+
 			if ($include_count)
 				$data[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
 		}
@@ -1094,6 +1118,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$isLower = isset($p['isLower']) ? $p['isLower'] : true;
 		$limit=isset($p['limit']) ? $p['limit'] : null;
 		$offset=isset($p['offset']) ? $p['offset'] : null;
+		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 
 		$content=$rdf=null;
 
@@ -1101,7 +1126,15 @@ class SpeciesControllerNSR extends SpeciesController
 
         switch ($category)
 		{
-            case CTAB_CLASSIFICATION:
+            case CTAB_MEDIA:
+                $content = $this->getTaxonMedia(array(
+                    'taxon'=>$taxon,
+                    'inclOverviewImage'=>$inclOverviewImage,
+                    'isLower'=>$isLower
+                ));
+                break;
+
+		    case CTAB_CLASSIFICATION:
                 $content=
 					array(
 						'classification'=>$this->getTaxonClassification($taxon),
@@ -1161,7 +1194,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function hasTaxonLiterature($id)
     {
-		
+
 		/*
         $d=$this->models->LiteratureTaxa->_get(array(
             'id' => array(
@@ -1174,7 +1207,7 @@ class SpeciesControllerNSR extends SpeciesController
         return $d[0]['total']>0;
 		*/
 		$d=$this->getTaxonLiterature( $id );
-		
+
 		if (count((array)$d)==0)
 		{
 			$d=$this->getInheritedTaxonLiterature( $id );
@@ -1184,7 +1217,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			return count((array)$d)>0;
 		}
-		
+
     }
 
     private function hasTaxonBarcodes($id)
@@ -1201,7 +1234,7 @@ class SpeciesControllerNSR extends SpeciesController
 
         return $d[0]['total']>0;
     }
-	
+
 
 	private function reconstructQueryString()
 	{
@@ -1445,7 +1478,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getDistributionMaps($id)
 	{
-		return $this->getTaxonMedia(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing'));
+		return $this->getTaxonMediaNsr(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing'));
 	}
 
 	private function getVerspreidingsatlasData($id)
@@ -1567,7 +1600,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->models->{$this->_model}->getTaxonReferences(array(
             'project_id' => $this->getCurrentProjectId(),
     		'taxon_id' => $taxon_id,
-		));		
+		));
     }
 
     private function getInheritedTaxonLiterature( $taxon_id )
@@ -1577,10 +1610,10 @@ class SpeciesControllerNSR extends SpeciesController
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $taxon_id,
 				)
-		));	
-		
+		));
+
 		$res=array();
-				
+
 		if ($p)
 		{
 			$p=explode(' ',$p[0]['parentage']);
@@ -1590,7 +1623,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$d=$this->models->{$this->_model}->getTaxonReferences(array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $val,
-				));		
+				));
 				if ($d)
 				{
 					foreach((array)$d as $dkey=>$dval)
@@ -1610,8 +1643,8 @@ class SpeciesControllerNSR extends SpeciesController
             'project_id' => $this->getCurrentProjectId(),
     		'taxon_id' => $taxon_id,
     		'language_id' => $this->getCurrentLanguageId(),
-		));		
-    }	
+		));
+    }
 
     private function hasTaxonKeyLinks( $taxon_id )
     {
