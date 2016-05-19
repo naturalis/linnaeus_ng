@@ -234,6 +234,10 @@ class SearchControllerGeneral extends SearchController
 				);
 			}
 		}
+		else
+		{
+			$this->moduleSession->setModuleSetting( array('setting'=>'results') );
+		}
 
 		$this->smarty->assign('CONSTANTS',
 			array(
