@@ -54,10 +54,10 @@
 {else}
 
 
-<form id="theForm" method="get" action="" onsubmit="return searchDoSearchForm()" >
-<input type="hidden" name="extended" value="1" />
+    <form id="theForm" method="get" action="" onsubmit="return searchDoSearchForm()" >
+    <input type="hidden" name="extended" value="1" />
 
-	<div class="page-generic-div">
+	<div class="page-generic-div" style="margin-top:25px;">
 		<p>
 			{t}Search for:{/t} <input type="text" id="search" name="search" value="{$search.search|@escape}" /><br />
 			<i>{t}Enclose multiple words with double quotes (") to search for a literal string.{/t}</i>
@@ -93,7 +93,6 @@
 
 {/if}   
 
-</div>
 </div>
 
 {include file="../shared/footer.tpl"}
