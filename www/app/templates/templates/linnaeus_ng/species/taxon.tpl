@@ -9,7 +9,7 @@
 				{if $names.preffered_name}
 					<h1 class="main-display-name">{$names.preffered_name}</h1>
 					<h2>{$names.nomen}</h2>
-                    
+
 				{else}
 					<h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
 					<h2></h2>
@@ -18,7 +18,7 @@
 		</div>
 
         <div id="categories">
-        
+
         <ul>
             {foreach $categories v k}
                 {if !$v.is_empty}
@@ -26,43 +26,51 @@
                     <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
                     {if $activeCategory==$v.id}
                     class="category-active"
-                    {/if}                
+                    {/if}
                     >{$v.title}</a>
                 </li>
                 {if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
                 {/if}
             {/foreach}
         </ul>
-        
+
         </div>
-        
+
         <div style="margin-left:160px;padding-left:25px;">
 
-        {if $overviewImage.image && !($activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA)}
-        <div id="taxonImage" style="float:right">
-            <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
-            <div id="taxonImageCredits">
-                <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label} 
-            </div>
-        </div>
+        {if $overviewImage && !($activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA)}
+
+	        {if $is_nsr}
+		        <div id="taxonImage" style="float:right">
+		            <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
+		            <div id="taxonImageCredits">
+		                <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label}
+		            </div>
+		        </div>
+	        {else}
+	 	       <div id="overview-image" style="background: url('{$overviewImage}');"></div>
+	        {/if}
+
         {/if}
 
+ 		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
 
-		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
-        
+			{if $is_nsr !== false}
+				{include file="_tab_media_nsr.tpl"}
+			{else}
+				{include file="_tab_media.tpl"}
+			{/if}
 
-			{include file="_tab_media.tpl"}
-			
 		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NAAMGEVING}
-					
+
 			{include file="_tab_naamgeving.tpl"}
 
 		{elseif $activeCategory==$smarty.const.CTAB_LITERATURE}
-		
+
 			{include file="_tab_literatuur.tpl"}
 
 		{else}
-        
+
 			{if $content|@is_array}
 			<ul>
 				{foreach from=$content item=v key=k}
@@ -82,7 +90,7 @@
 			{include file="_rdf_data.tpl"}
 
 		{/if}
-        
+
         </div>
 
 	</div>
@@ -93,12 +101,12 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	
+
 	$( 'title' ).html( $('<p>' + $('.main-display-name').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
-	
+
 	if(jQuery().prettyPhoto) {
-	 	$("a[rel^='prettyPhoto']").prettyPhoto( { 
-	 		opacity: 0.70, 
+	 	$("a[rel^='prettyPhoto']").prettyPhoto( {
+	 		opacity: 0.70,
 			animation_speed:50,
 			show_title: false,
 	 		overlay_gallery: false,
@@ -106,12 +114,12 @@ $(document).ready(function()
 			changepicturecallback:function() { prettyPhotoCycle(); }
 	 	} );
 	}
-	
+
 	$('img[class=intern]').each(function() { $(this).remove(); } )
 
 	{if $taxon.NsrId!=''}
-	$('#name-header').on( 'click' , function(event) { 
-	
+	$('#name-header').on( 'click' , function(event) {
+
 		if ($('#nsr-id-row').html()==undefined)
 		{
 			if (event.altKey!==true) return;
@@ -123,11 +131,11 @@ $(document).ready(function()
 		}
 	});
 	{/if}
-	
+
 	{if $pp_popup}
 	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
-	
+
 } );
 </script>
 
