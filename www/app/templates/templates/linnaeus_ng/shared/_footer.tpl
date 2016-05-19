@@ -17,7 +17,7 @@
 
 <div id="footer">
 	<div id="footer-container" class="container">
-		<div id="col-logo"> 
+		<div id="col-logo" style="visibility:hidden"> 
 			<img  src='{$projectUrls.systemMedia}logo_lng.png'>
 		</div>
 
