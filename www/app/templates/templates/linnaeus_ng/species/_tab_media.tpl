@@ -1,5 +1,5 @@
 {* if $contentCount.media>0 *}
-<div id="media">
+<!--<div id="media"> -->
 {assign var=widthInCells value=5}
 	<div id="media-grid">
 		{assign var=mediaCat value=false}
@@ -95,5 +95,5 @@
 		{/foreach}
 
 	</div><!-- /#media-grid -->
-</div><!-- /#media -->
+<!-- </div> /#media -->
 {* /if *}
