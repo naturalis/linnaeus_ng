@@ -46,7 +46,7 @@ final class NsrTreeModel extends AbstractModel
 					_a.is_hybrid,
 					_a.rank_id,
 					_a.taxon,
-					ifnull(_k.name,_l.commonname) as name,
+					_k.name,
 					_m.authorship,
 					_r.rank,
 					ifnull(_q.label,_r.rank) as rank_label,
@@ -72,11 +72,6 @@ final class NsrTreeModel extends AbstractModel
 				left join %PRE%ranks _r
 					on _p.rank_id=_r.id
 
-				left join %PRE%commonnames _l
-					on _a.id=_l.taxon_id
-					and _a.project_id=_l.project_id
-					and _l.language_id=".$language_id."
-
 				left join %PRE%names _k
 					on _a.id=_k.taxon_id
 					and _a.project_id=_k.project_id
@@ -94,7 +89,8 @@ final class NsrTreeModel extends AbstractModel
 					and (_a.id = ".$node_id." or _a.parent_id = ".$node_id.")
 
 				order by
-					label
+					name desc,
+					_p.rank_id asc
 			";
 
 			return $this->freeQuery( $query );
