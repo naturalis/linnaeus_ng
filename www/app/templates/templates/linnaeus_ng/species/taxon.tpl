@@ -104,6 +104,7 @@ $(document).ready(function()
 
 	$( 'title' ).html( $('<p>' + $('.main-display-name').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
 
+	{if $is_nsr}
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto( {
 	 		opacity: 0.70,
@@ -114,6 +115,7 @@ $(document).ready(function()
 			changepicturecallback:function() { prettyPhotoCycle(); }
 	 	} );
 	}
+	{/if}
 
 	$('img[class=intern]').each(function() { $(this).remove(); } )
 
