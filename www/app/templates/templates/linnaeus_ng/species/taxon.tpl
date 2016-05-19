@@ -9,6 +9,7 @@
 				{if $names.preffered_name}
 					<h1 class="main-display-name">{$names.preffered_name}</h1>
 					<h2>{$names.nomen}</h2>
+                    
 				{else}
 					<h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
 					<h2></h2>
@@ -22,7 +23,7 @@
             {foreach $categories v k}
                 {if !$v.is_empty}
                 <li id="ctb-{$v.id}">
-                    <a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.id}"{/if}
+                    <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
                     {if $activeCategory==$v.id}
                     class="category-active"
                     {/if}                
