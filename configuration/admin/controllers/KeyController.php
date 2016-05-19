@@ -288,9 +288,7 @@ class KeyController extends Controller
 
             $id = $this->createNewKeystep();
 
-            $this->renumberKeySteps(array(
-                0 => $this->getKeyTree()
-            ));
+            $this->renumberKeySteps([$this->getKeyTree()]);
 
             if ($this->rHasVal('insert'))
 			{
@@ -596,9 +594,7 @@ class KeyController extends Controller
 		{
             $res = $this->insertKeyStepBeforeKeyStep($this->rGetVal('source'), $this->rGetVal('step'));
 
-            $this->renumberKeySteps(array(
-                0 => $this->getKeyTree()
-            ));
+            $this->renumberKeySteps([$this->getKeyTree()]);
 
             $step = $this->getKeystep($res['newStepId']);
 
@@ -622,9 +618,7 @@ class KeyController extends Controller
         else
 		if ($this->rHasVal('action', 'renumber') && !$this->isFormResubmit())
 		{
-            $this->renumberKeySteps(array(
-                0 => $this->getKeyTree()
-            ));
+            $this->renumberKeySteps([$this->getKeyTree()]);
 
             $this->redirect('step_show.php');
         }
@@ -1299,7 +1293,7 @@ class KeyController extends Controller
 				{
                     $t = $this->getTaxonById($val['res_taxon_id']);
 
-					$t['label']=htmlspecialchars($t['label']);
+					$t['taxon']=htmlspecialchars($t['taxon']);
 
                     $this->tmp = is_null($this->tmp) ? 0 : $this->tmp;
 
@@ -1310,7 +1304,7 @@ class KeyController extends Controller
                         'data' => array(
                             'number' => 't' . $t['id'],
                             'title' => '&rarr; ' . $t['taxon'],
-                            'taxon' => $t['label'],
+                            'taxon' => $t['taxon'],
                             'id' => $t['id']
                         ),
                         'name' => '(' . $val['show_order'] . ') ' . '<i>' . $t['taxon'] . '</i>'
@@ -1793,9 +1787,7 @@ class KeyController extends Controller
             'id' => $newChoice
         ));
 
-        $this->renumberKeySteps(array(
-            0 => $this->getKeyTree()
-        ));
+        $this->renumberKeySteps([$this->getKeyTree()]);
     }
 
     // inserting between a step and the choice that led to it

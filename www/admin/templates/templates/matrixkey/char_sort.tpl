@@ -30,11 +30,10 @@
 
 <div style="clear:both;border-bottom:1px dotted #ddd;width:500px;margin-bottom:10px"></div>
 
-
 <form method="post" id="theForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="button" value="{t}save{/t}" onclick="matrixSaveOrder('character')" />
-<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
+<input type="button" value="{t}back{/t}" onclick="window.open('index.php?id={$matrix.id}','_self')" />
 </form>
 
 </p>

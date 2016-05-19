@@ -682,7 +682,7 @@ class IntroductionController extends Controller
 			)
 		);
 
-		$this->models->IntroductionPage->delete(
+		$this->models->IntroductionPages->delete(
 			array(
 				'id' => $id,
 				'project_id' => $this->getCurrentProjectId()
