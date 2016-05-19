@@ -18,10 +18,12 @@ connect through SSH and:
 * access database and create tables & base data:
 	/var/www/linnaeusng/database/empty_database.sql
 	/var/www/linnaeusng/database/base_data.sql
-  partly automated by puppet, but very probably not up to date
 	
 * access database and create project, sysadmin and project role:
 	/var/www/linnaeusng/database/new_project_and_user.sql
+
+* udpate some values
+	/var/www/linnaeusng/database/update_data.sql
 
 * optional: if there will be only one project, edit
 	/var/www/linnaeusng/configuration/app/constants.php

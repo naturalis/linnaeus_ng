@@ -155,6 +155,11 @@ class SpeciesControllerNSR extends SpeciesController
 					$this->redirect( $ref->full_url );
 				}
 				else
+				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed_link' )
+				{
+					$external_content=$ref;
+				}
+				else
 				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
 				{
 					$external_content=$ref;
