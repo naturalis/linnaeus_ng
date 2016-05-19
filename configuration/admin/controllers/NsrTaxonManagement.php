@@ -6,7 +6,7 @@
 	'url' => URL (as is)
 	'parameters' => array of dynamic params (see below)
 	'substitute' => array of strings to replace in the url (alternative for params)
-	'link_embed' => embed / link (*) / link_new   [ embedded, link (same window), link (new window) ]
+	'link_embed' => embed / embed_link / link (*) / link_new  [ embedded (fetch actual content), embedded (just hand parametrized URL to template), link (same window), link (new window) ]
 	'check_type' => none (*) / query
 	'query' => 'select 1 as show', (should return one row with one field called 'show' with value 1 or 0)
 	'template' => full local template name (when embedding; defaults to general _webservice.tpl )
@@ -73,9 +73,14 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'language_id','label'=>'language ID'],
 			['field'=>'nsr_id','label'=>'NSR ID']
 		];
-			
 
-
+	private $linkEmbedTypes=
+		[
+			['field'=>'embed','label'=>'embed fetched content'],
+			['field'=>'embed_link','label'=>'embed parametrized URL only (no content, better performance)'],
+			['field'=>'link','label'=>'link'],
+			['field'=>'link_new','label'=>'link (new window)']
+		];
 	
     public function __construct()
     {
@@ -176,7 +181,7 @@ class NsrTaxonManagement extends NsrController
         $this->smarty->assign( 'page', $this->getPage( $this->rGetId() ) );
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
-        $this->smarty->assign( 'link_embed', [['field'=>'embed','label'=>'embed'],['field'=>'link','label'=>'link'],['field'=>'link_new','label'=>'link (new window)']] );
+        $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
         $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
 
         $this->printPage();
