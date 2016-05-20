@@ -53,6 +53,7 @@ var matrixsettings={
 	infoLinkTarget: "",
 	initialSortColumn: "",
 	alwaysSortByInitial: 0,
+	noTaxonImages: false
 };
 
 var data={
@@ -587,26 +588,32 @@ function formatResult( data )
 
 	var image="";
 
-	if (data.info && data.info.url_image)
+	if ( !matrixsettings.noTaxonImages )
 	{
-		image=data.info.url_image;
-		if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=matrixsettings.imageRootProject+image;
-	}
-	else
-	{
-		if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
+		if (data.info && data.info.url_image)
+		{
+			image=data.info.url_image;
+			if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=matrixsettings.imageRootProject+image;
+		}
+		else
+		{
+			if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
+		}
 	}
 
 	var thumb="";
 
-	if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
+	if ( !matrixsettings.noTaxonImages )
 	{
-		thumb=data.info.url_thumbnail ? data.info.url_thumbnail : data.info.url_thumb;
-		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=matrixsettings.imageRootProject+thumb;
-	}
-	else
-	{
-		thumb=image;
+		if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
+		{
+			thumb=data.info.url_thumbnail ? data.info.url_thumbnail : data.info.url_thumb;
+			if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=matrixsettings.imageRootProject+thumb;
+		}
+		else
+		{
+			thumb=image;
+		}
 	}
 	
 	var id = data.type+'-'+data.id;

@@ -70,6 +70,7 @@ $(document).ready(function()
 	setSetting({
 		matrixId: {$matrix.id},
 		projectId: {$session.app.project.id},
+		noTaxonImages: {if $settings->no_taxon_images==1}true{else}false{/if},
 		imageRootSkin: '{$image_root_skin}',
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {if $settings->use_emerging_characters}{$settings->use_emerging_characters}{else}0{/if},
@@ -88,6 +89,8 @@ $(document).ready(function()
 		alwaysSortByInitial: {if $settings->always_sort_by_initial}{$settings->always_sort_by_initial}{else}0{/if},
 		similarSpeciesShowDistinctDetailsOnly: {if $settings->similar_species_show_distinct_details_only}{$settings->similar_species_show_distinct_details_only}{else}0{/if},
 	});
+	
+	//console.dir( matrixsettings );
 
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
