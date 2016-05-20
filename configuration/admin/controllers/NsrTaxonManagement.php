@@ -49,6 +49,7 @@ class NsrTaxonManagement extends NsrController
 
     public $usedModels = array(
         'labels_sections',
+        'tab_order',
         'pages_taxa',
         'pages_taxa_titles',
         'sections',
@@ -98,10 +99,91 @@ class NsrTaxonManagement extends NsrController
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
 	}
 
+	private $cTabs=[
+		'CTAB_NAMES'=>'Naamgeving',
+		'CTAB_MEDIA'=>'Media',	
+		'CTAB_CLASSIFICATION'=>'names',
+		'CTAB_TAXON_LIST'=>'list',	// $this->getTaxonNextLevel($taxon); (children?)
+		'CTAB_LITERATURE'=>'Literature',
+		'CTAB_DNA_BARCODES'=>'DNA barcodes',
+		'CTAB_DICH_KEY_LINKS'=>'Key links',
+//		'CTAB_NOMENCLATURE'=>'Nomenclature',
+	];
+
+    private function getCategories()
+    {
+		return;
+
+		$categories=$this->models->NsrTaxonModel->getCategories(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'language_id' => $this->getDefaultProjectLanguage()
+		));
+		
+		$standard_categories=$this->cTabs;
+		array_walk($standard_categories,function(&$a,$b){
+
+			$a=['tabname'=>$b,'id'=>'auto','title'=>$this->translate($a)];});
+
+		$order=$this->models->TabOrder->_get([
+			'id'=>['project_id' => $this->getCurrentProjectId()],
+			'columns'=>'tabname,show_order,start_order',
+			'fieldAsIndex'=>'tabname',
+			'order'=>'start_order'			
+		]);
+		
+		//q($order,1);
+
+/*		
+if (!$this->_suppressTab_NAMES)
+if (!$this->_suppressTab_LITERATURE)
+if (!$this->_suppressTab_MEDIA)
+if (!$this->_suppressTab_DNA_BARCODES)
+*/
+		$combined=[];
+
+		foreach(array_merge($categories,$standard_categories) as $val)
+		{
+			continue;
+			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
+
+			if (is_null($firstNonEmpty) && empty($val['is_empty']))
+			{
+				$firstNonEmpty=$val['id'];
+			}
+
+			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty']))
+			{
+				$start=$val['id'];
+			}
+			else
+			if (!isset($requestedTab) && !empty($order[$val['tabname']]['start_order']) &&  empty($val['is_empty']) &&
+				(
+					is_null($start) ||
+					$order[$val['tabname']]['start_order']<$start
+				))
+			{
+				$start=$val['id'];
+			}
+		}
+
+		$this->customSortArray($categories,array('key' => 'show_order'));
+
+		if (is_null($start)) $start=$firstNonEmpty;
+
+		if ($requestedTab=='external') $start=$requestedTab;
+
+		return array('start'=>$start,'categories'=>$categories);
+    }
+
+
+
+
     public function tabsAction()
     {
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Define categories'));
+
+		//$this->getCategories();
 
         if ($this->rHasVal('new_page') && !$this->isFormResubmit())
 		{

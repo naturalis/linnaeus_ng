@@ -9,8 +9,6 @@ class configuration
 
     public function __construct ()
     {
-		$this->_setConstants();
-
         $d = $this->getGeneralSettings();
         $d['app']['pathName'];
         $this->_appFileRoot = dirname(__FILE__);

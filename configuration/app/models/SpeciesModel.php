@@ -738,10 +738,6 @@ class SpeciesModel extends AbstractModel
 		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
 		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
-		$hasRedirectTo = isset($params['hasRedirectTo']) ? $params['hasRedirectTo'] : false;
-		$hasCheckQuery = isset($params['hasCheckQuery']) ? $params['hasCheckQuery'] : false;
-		$hasAlwaysHide = isset($params['hasAlwaysHide']) ? $params['hasAlwaysHide'] : false;
-		$hasExternalReference = isset($params['hasExternalReference']) ? $params['hasExternalReference'] : false;
 
 		if ( is_null($projectId) || is_null($taxonId)  || is_null($languageId) ) return;
 
@@ -752,10 +748,10 @@ class SpeciesModel extends AbstractModel
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
 				".(isset($taxonId) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
 				_a.def_page,
-			".($hasRedirectTo ? '_a.redirect_to,' : '')."
-			".($hasCheckQuery ? '_a.check_query,' : '')."
-			".($hasAlwaysHide ? '_a.always_hide,' : '')."
-			".($hasExternalReference ? '_a.external_reference,' : '')."
+				_a.redirect_to,
+				_a.check_query,
+				_a.always_hide,
+				_a.external_reference,
 				_a.show_order
 			from
 				%PRE%pages_taxa _a
@@ -775,7 +771,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_a.project_id=".$projectId."
-				".($hasAlwaysHide ? 'and _a.always_hide = 0' : '')."
+				and _a.always_hide = 0
 
 			order by
 				_a.show_order";

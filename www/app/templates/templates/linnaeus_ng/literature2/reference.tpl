@@ -1,12 +1,19 @@
 {include file="../shared/header.tpl"}
 
+
 <div id="dialogRidge" style="margin-left:225px">
-	
+
 	<div id="content" class="literature">
 
-		<h2 style="margin-top: 17px; margin-bottom: 6px">{$ref.label}</h2>
+    <p id="header-titles-small">
+    	<span id="mini-header-title">{$ref.author}, {$ref.date}</span>
+    </p>
+    
+    <div>
+			{if $ref.label}<div id="text">{$ref.label}</div>{/if}
 
 			<table>
+
 				{if $ref.publication_type}<tr><td>{t}Type{/t}</td><td>{$ref.publication_type}</td></tr>{/if}
 
 				{capture authors}

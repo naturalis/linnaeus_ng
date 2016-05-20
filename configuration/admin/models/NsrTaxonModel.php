@@ -1170,4 +1170,39 @@ final class NsrTaxonModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
+    public function getCategories( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+
+		if ( is_null($project_id) || is_null($language_id) ) return;
+
+        $query = "
+			select
+				_a.id,
+				ifnull(_b.title,_a.page) as title,
+				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
+				_a.def_page,
+				_a.always_hide,
+				_a.external_reference
+			from
+				%PRE%pages_taxa _a
+
+			left join %PRE%pages_taxa_titles _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.page_id
+				and _b.language_id = ". $language_id ."
+
+			where
+				_a.project_id=".$project_id."
+
+			order by
+				_a.show_order";
+
+		return $this->freeQuery($query);
+
+    }
+
+
+
 }
