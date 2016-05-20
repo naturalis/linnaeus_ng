@@ -77,15 +77,31 @@ textarea {
             	<u>{t}external reference{/t}</u>
 
                 <div class="explanation">
+                	<p>
                     {t}URL to point to an external page or webservice. parametrization can be done through substitution and/or parameters. these achieve
                     similar goals, but work slightly different:{/t}
+                    </p>
+                    <p>
                     <ul>
                         <li>{t}use substitutions to replace placeholders in the URL itself with taxon-dependent values at runtime;{/t}</li>
                         <li>{t}use parameters to add name/value pairs to the query string of the URL.{/t}</li>
                     </ul>
+                    </p>
+                    <p>
                     {t}the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
                     available). when 'no check' is selected, the tab is always displayed. the reference can be implemented as an actual link, navigating away from the site (or opening in a new window), or as embedded, in
-                    which case a template should be defined in which to display the retrieved data.{/t}
+                    which case a template should be defined in which to display the retrieved data.{/t}<br />
+                    </p>
+					<p>
+                    {t}please note that when used as direct link, or for retrieving remote data, the full URL will have to be valid at run-time.{/t}
+                    </p>
+					<p>
+                    {t}the URL can be "abused" for the transportation of multiple data-values to a template. for instance, multiple parametrized
+                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parametrized URL only", those would 
+                    be supplied to the template as the <code>$external_content->full_url</code> template-variable, which could then be split and processed
+                    further. in this way, multiple URL's could be supplied at once, which can be useful for things like loading multiple layers on a map.{/t}
+                    {t}(ps, if you do this, you will likely get an 'Invalid URL'-warning, which can be ignored){/t}
+                    </p>
                 </div>
             
             	<table>
@@ -175,7 +191,12 @@ textarea {
                                 </tr>
                                 <tr class="tr-highlight">
                                     <td>{t}template:<br />(when embedding){/t}</td>
-                                    <td><input type="text" name="external_reference[template]" value="{$page.external_reference_decoded->template}" /></td>
+                                    <td>
+                                    	<input type="text" name="external_reference[template]" value="{$page.external_reference_decoded->template}" /><br />
+                                        <div class="explanation">
+                                        {t}enter the template name including the extension. the system will not check if the template actually exists. if it does not, no content will be displayed.{/t}
+                                        </div>
+                                    </td>
                                 </tr>
 							</table>
 						</td>
@@ -188,6 +209,11 @@ textarea {
     
     <input type="submit" value="save" />
     </form>
+</div>
+
+{include file="../shared/admin-messages.tpl"}
+
+<div class="page-generic-div">
     
     <a href="tabs.php">{t}back{/t}</a>
 
@@ -283,5 +309,4 @@ $(document).ready(function()
 });
 </script>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
