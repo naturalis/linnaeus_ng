@@ -509,11 +509,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$categories = $this->models->{$this->_model}->getCategoriesNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'taxonId' => $taxon_id,
-    		'languageId' => $this->getCurrentLanguageId(),
-    		'hasRedirectTo' => isset($this->models->PagesTaxa->columns['redirect_to']),
-    		'hasCheckQuery' => isset($this->models->PagesTaxa->columns['check_query']),
-    		'hasAlwaysHide' => isset($this->models->PagesTaxa->columns['always_hide']),
-    		'hasExternalReference' => isset($this->models->PagesTaxa->columns['external_reference'])
+    		'languageId' => $this->getCurrentLanguageId()
 		));
 
 		if ( isset($taxon_id) )
