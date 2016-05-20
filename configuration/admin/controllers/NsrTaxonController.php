@@ -1163,6 +1163,12 @@ class NsrTaxonController extends NsrController
 			if ( empty($uninomial) || empty($specificEpithet) )
 			{
 				$this->addError("Wetenschappelijke naam incompleet. Concept niet opgeslagen.");
+
+			if ( empty($uninomial) )
+				$this->addError("uninomial mist.");
+			if ( empty($specificEpithet) )
+				$this->addError("specificEpithet mist");
+
 				return false;
 			}
 			else
