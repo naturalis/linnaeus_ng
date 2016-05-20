@@ -150,21 +150,31 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$ref=$requestedCategory['external_reference'];
 
+				$external_content=$ref;
+
 				if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 				{
-					$this->redirect( $ref->full_url );
-				}
-				else
-				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed_link' )
-				{
-					$external_content=$ref;
+					if ( $ref->full_url_valid )
+					{
+						$this->redirect( $ref->full_url );
+					}
+					else
+					{
+						//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
+					}
 				}
 				else
 				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
 				{
-					$external_content=$ref;
-					$external_content->content_raw=file_get_contents(  $ref->full_url  );
-					$external_content->content_json_decoded=json_decode( $external_content->content_raw );
+					if ( $ref->full_url_valid ) 
+					{
+						$external_content->content_raw=@file_get_contents(  $ref->full_url  );
+						$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
+					}
+					else
+					{
+						//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
+					}
 				}
 
 				$content=$this->getTaxonContent(
@@ -373,7 +383,15 @@ class SpeciesControllerNSR extends SpeciesController
 				if ( isset($taxon[$val]) )
 				{
 					$sval=$taxon[$val];
+				}
+				else
+				if ( $val=='project_id' )
+				{
+					$sval=$this->getCurrentProjectId();
+				}
 
+				if ( isset($sval) )
+				{
 					if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
 					{
 						$sval=call_user_func($reference->substitute_encode, $sval );
@@ -411,9 +429,9 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$reference->url = str_replace( $key, "" , $reference->url );
 				}
-
 			}
 		}
+
 
 		$query_string=null;
 
@@ -455,7 +473,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$parts=parse_url( $reference->url );
 
-		$full_url=$reference->url . ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' );
+		$full_url=$reference->url . ( !empty($query_string) ? ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' ) : "" );
 
 		$is_empty=null;
 
@@ -476,6 +494,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return
 			array(
 				'full_url'=>$full_url,
+				'full_url_valid'=>filter_var($full_url, FILTER_VALIDATE_URL),
 				'is_empty'=>$is_empty
 			);
 
@@ -519,6 +538,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$ref=json_decode( $val['external_reference'] );
 					$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref) );
 					$ref->full_url=$d['full_url'];
+					$ref->full_url_valid=$d['full_url_valid'];
 					$categories[$key]['external_reference']=$ref;
 					$categories[$key]['is_empty']=$d['is_empty'];
 				}

@@ -474,6 +474,8 @@ class NsrTaxonManagement extends NsrController
 	private function saveExternalReference()
 	{
 		$data=$this->rGetAll()['external_reference'];
+
+		$data['url']=trim($data['url']);
 		
 		if ( empty($data['url']) )
 		{
@@ -489,6 +491,18 @@ class NsrTaxonManagement extends NsrController
 		}
 		else
 		{
+			/*
+				would be more acurate when checking the URL including the 
+				substitution of values of an actual taxon. however, if the
+				parameters include traits, actual values might not have
+				been entered into the system yet at the time of saving this
+				URL.
+			*/
+			if ( !filter_var($data['url'], FILTER_VALIDATE_URL) )
+			{
+				$this->addWarning( $this->translate( 'Invalid URL (might be by design).' ) );
+			}
+			
 			$d=array();
 			foreach((array)$data['substitute']['name'] as $key=>$val)
 			{
