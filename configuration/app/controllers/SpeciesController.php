@@ -63,14 +63,13 @@ class SpeciesController extends Controller
         $this->setMediaController();
 
         // creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
-		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
-
+		foreach((array)$this->models->PagesTaxa->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page)
+		{
 			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
-
-			if (!defined('TAB_'.$p)) {
+			if (!defined('TAB_'.$p))
+			{
 				define('TAB_'.$p,$page['id']);
 			}
-
 		}
 
 		// fixed tabs
@@ -93,6 +92,9 @@ class SpeciesController extends Controller
         $this->_lookupListMaxResults=$this->moduleSettings->getModuleSetting( array( 'setting'=>'lookup_list_species_max_results','subst'=>$this->_lookupListMaxResults) );
         $this->_includeOverviewImageInMedia=$this->moduleSettings->getModuleSetting( array( 'setting'=>'include_overview_in_media','subst'=>true) );
 		$this->_defaultSpeciesTab=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_default_tab','subst'=>CTAB_CLASSIFICATION) );
+		$this->_inclHigherTaxaRankPrefix=$this->moduleSettings->getModuleSetting( array( 'setting'=>'higher_taxa_rank_prefix','subst'=>0) )==1;
+		
+		$this->smarty->assign('inclHigherTaxaRankPrefix',$this->_inclHigherTaxaRankPrefix);
     }
 
     /* Dynamically set proper model name (species/highertaxa) */

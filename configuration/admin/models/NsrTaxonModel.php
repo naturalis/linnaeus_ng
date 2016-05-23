@@ -1181,6 +1181,7 @@ final class NsrTaxonModel extends AbstractModel
 			select
 				_a.id,
 				ifnull(_b.title,_a.page) as title,
+				_a.page,
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
 				_a.def_page,
 				_a.always_hide,
