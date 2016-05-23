@@ -308,7 +308,7 @@ final class MediaModel extends AbstractModel
     }
 
 
-    public function getConvertedFileName ($p)
+    public function getMediaId ($p)
     {
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;
@@ -319,7 +319,7 @@ final class MediaModel extends AbstractModel
 
         $query = "
             select
-                `media_id`, `new_file`
+                `media_id`
             from
                 %PRE%media_conversion_log
             where
@@ -328,10 +328,12 @@ final class MediaModel extends AbstractModel
                 `old_file` = '" . $this->escapeString($oldFile) . "' and
                 `project_id` = " . $this->escapeString($projectId);
 
-        return $this->freeQuery($query);
+        $d = $this->freeQuery($query);
+
+        return isset($d) ? $d[0]['media_id'] : false;
     }
 
-    public function getMediaItem ($p)
+    public function getMediaConversionId ($p)
     {
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;
@@ -339,27 +341,25 @@ final class MediaModel extends AbstractModel
             $p['module'] : false;
         $itemId = isset($p['item_id']) && !empty($p['item_id']) ?
             $p['item_id'] : false;
-        $oldFile = isset($p['old_file']) && !empty($p['old_file']) ?
-            $p['old_file'] : false;
+        $mediaId = isset($p['media_id']) && !empty($p['media_id']) ?
+            $p['media_id'] : false;
 
-        if (!$projectId || !$module || !$itemId) return false;
+        if (!$projectId || !$module || !$itemId || !$mediaId) return false;
 
         $query = "
             select
-                `media_id`
+                `id`
             from
                 %PRE%media_conversion_log
             where
-                `media_id` > -1 and
-                `new_file` != 'failed' and
+                `media_id` = " . $this->escapeString($mediaId) . " and
                 `module` = '" . $this->escapeString($module) . "' and
-                `old_file` = '" . $this->escapeString($oldFile) . "' and
                 `item_id` = " . $this->escapeString($itemId) . " and
                 `project_id` = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
-        return isset($d) ? $d[0]['media_id'] : false;
+        return isset($d) ? $d[0]['id'] : false;
     }
 
     public function getInternalMediaLinks ($p)
