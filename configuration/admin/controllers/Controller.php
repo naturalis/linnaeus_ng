@@ -79,7 +79,8 @@ class Controller extends BaseClass
         'logging_helper',
 		'log_changes',
 		'custom_array_sort',
-		'paginator'
+		'paginator',
+        'paginator_with_links'
     );
 
 	protected $moduleSession;
@@ -757,6 +758,16 @@ class Controller extends BaseClass
 		return $this->helpers->Paginator->getItems();
     }
 
+    public function getPaginationWithPager ($items, $maxPerPage = 25)
+    {
+        $this->helpers->Paginator->setItemsPerPage($maxPerPage);
+		$this->helpers->Paginator->setStart($this->rHasVal('start') ? $this->rGetVal('start') : 0);
+		$this->helpers->Paginator->setItems($items);
+		$this->helpers->Paginator->getItemsWithPrintedPager();
+
+		return $this->helpers->Paginator->getItems();
+    }
+
     public function createProject ($d)
     {
         $d['id'] = null;
@@ -888,7 +899,7 @@ class Controller extends BaseClass
 			$a=serialize((isset($p['after']) ? $p['after'] : null));
 			$p['changed']=md5($b)!=md5($a);
 		}
-		
+
 		$changed=isset($p['changed']) ? $p['changed'] : true;
 		$note=isset($p['note']) ? $p['note'] : null;
 		$before=isset($p['before']) ? $p['before'] : null;
@@ -2524,7 +2535,7 @@ class Controller extends BaseClass
 			if (!defined($const)) define($const,$val['id']);
 		}
 	}
-	
+
 	protected function getWikiUrl()
 	{
 		$wiki_base_url=$this->models->ControllerModel->getGeneralSettingValue(
@@ -2532,7 +2543,7 @@ class Controller extends BaseClass
 				'project_id' => $this->getCurrentProjectId(),
 				'setting' => 'wiki_base_url'
 			));
-			
+
 		if ( isset($this->wikiPageOverride['basename']) )
 		{
 			$basename=$this->wikiPageOverride['basename'];
@@ -2554,7 +2565,7 @@ class Controller extends BaseClass
 			$pagename=preg_replace('/[^A-Za-z0-9 ]/', '', $pagename);
 			$pagename=str_replace(' ','_',$pagename);
 		}
-		
+
 		return
 			str_replace(
 				['%module%','%page%'],
@@ -2570,7 +2581,7 @@ class Controller extends BaseClass
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$nametype=isset($p['nametype']) ? $p['nametype'] : null;
-		
+
 		if ( isset($nametype) && $nametype!=PREDICATE_VALID_NAME)
 		{
 			return $name;

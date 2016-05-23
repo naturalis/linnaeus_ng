@@ -13,17 +13,19 @@
 		 <p><a href="{$back_url}">back to {$item_name} ({$module_name})</a></p>
 	{/if}
 
-	<form id="mediaForm" method="post">
-    <input type="hidden" name="module_id" value="{$module_id}" />
-    <input type="hidden" name="back_url" value="{$back_url}" />
-    <input type="hidden" name="item_id" value="{$item_id}" />
-    <input type="hidden" id="action" name="action" value="edit" />
-
 	{if $from != 'search'}
     	<p>{t}A total of{/t} {$media.total} {t}media files has been uploaded for this project{/t}.</p>
 	{/if}
 
     {if $media.total > 0}
+ 		{$media.pager}
+
+		<form id="mediaForm" method="post">
+	    <input type="hidden" name="module_id" value="{$module_id}" />
+	    <input type="hidden" name="back_url" value="{$back_url}" />
+	    <input type="hidden" name="item_id" value="{$item_id}" />
+	    <input type="hidden" id="action" name="action" value="edit" />
+
 	    <ul class="{$session.admin.user.media.display}">
 	    <li class="header">
 	    	<div class="list-grid-info bold">{t}file name{/t}</div>
@@ -65,6 +67,8 @@
 		{/if}
 
 	    </form>
+
+ 		{$media.pager}
 
 	{else}
 
@@ -110,9 +114,10 @@ $(document).ready(function() {
 		$('input[name=action]').val('attach');
 	});
 
-	$('input:text.link').focus().click(function(){
+	$('input:text.link').click(function(){
 		$(this).select();
 	});
+
 });
 </script>
 {/literal}
