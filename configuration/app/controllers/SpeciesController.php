@@ -242,7 +242,6 @@ class SpeciesController extends Controller
 				$content=$d['content'];
 
 				if ($activeCategory!=CTAB_MEDIA) {
-					$content = $this->matchGlossaryTerms($content);
 					$content = $this->matchHotwords($content);
 				}
 

@@ -567,33 +567,6 @@ class Controller extends BaseClass
 		return $this->helpers->Paginator->getItems();
     }
 
-    public function matchGlossaryTerms ($text, $forceLookup = false)
-    {
-        if ($this->generalSettings['useGlossaryPostIts'] === false || empty($text) || !is_string($text))
-            return $text;
-
-        $wordlist = $this->getWordList($forceLookup);
-
-        $processed = $text;
-
-        foreach ((array) $wordlist as $key => $val) {
-
-            if ($val['word'] == '')
-                continue;
-
-            $this->_currentGlossaryId = $val['id'];
-
-            $expr = '|\b(' . $val['word'] . ')\b|i';
-
-            $processed = preg_replace_callback($expr, array(
-                $this,
-                'embedGlossaryLink'
-            ), $processed);
-        }
-
-        return $processed;
-    }
-
     /**
      * Sets the name of the current page, for display purposes, in a class variable 'pageName'.
      *
@@ -2283,42 +2256,6 @@ class Controller extends BaseClass
         if (!isset($prevPage) || $thisPage != $prevPage)
             $_SESSION['app']['user']['history'][] = $thisPage;
 
-    }
-
-    private function getWordList ($forceUpdate = false)
-    {
-        if ($forceUpdate || !isset($_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
-
-            $terms = $this->models->Glossary->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->getCurrentLanguageId()
-                ),
-                'columns' => 'id,term as word,\'term\' as source'
-            ));
-
-            $synonyms = $this->models->GlossarySynonyms->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->getCurrentLanguageId()
-                ),
-                'columns' => 'glossary_id as id,synonym as word,\'synonym\' as source'
-            ));
-
-            $_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge((array) $terms, (array) $synonyms);
-        }
-
-        return $_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'];
-    }
-
-    private function embedGlossaryLink ($matches)
-    {
-        if (trim($matches[0]) == '')
-            return $matches[0];
-        else
-            return '<span class="glossary-term-highlight" onmouseover="glossTextOver(' . $this->_currentGlossaryId . ',this)">' . $matches[0] . '</span>';
     }
 
     /**
