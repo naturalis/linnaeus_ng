@@ -214,7 +214,6 @@ final class MatrixKeyModel extends AbstractModel
 				_d.upper,
 				_d.mean,
 				_d.sd,
-				_d.got_labels,
 				_e.label,
 				ifnull(_g.label,_gg.label) as group_label
 
@@ -275,7 +274,6 @@ final class MatrixKeyModel extends AbstractModel
 				'upper'=>$val['upper'],
 				'mean'=>$val['mean'],
 				'sd'=>$val['sd'],
-				'got_labels'=>$val['got_labels'],
 				'label'=>$val['label']
 			);
 		}
