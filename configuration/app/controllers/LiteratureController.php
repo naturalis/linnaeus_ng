@@ -76,7 +76,6 @@ class LiteratureController extends Controller
 		{
 			$ref = $this->getReference($this->requestData['id']);
 
-			$ref['text'] = $this->matchGlossaryTerms($ref['text']);
 			$ref['text'] = $this->matchHotwords($ref['text']);
 
 			$letter = strtolower(substr($ref['author_first'],0,1));

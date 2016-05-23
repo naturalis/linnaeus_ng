@@ -135,8 +135,8 @@ class LinnaeusController extends Controller
 
 		$this->setPageName($this->translate($d['subject']));
 
-		$this->smarty->assign('subject',$this->matchHotwords($this->matchGlossaryTerms($d['subject'])));
-		$this->smarty->assign('content',$this->matchHotwords($this->matchGlossaryTerms($d['content'])));
+		$this->smarty->assign('subject',$this->matchHotwords($d['subject']));
+		$this->smarty->assign('content',$this->matchHotwords($d['content']));
 		//$this->smarty->assign('subject',$d['subject']);
 		//$this->smarty->assign('content',$d['content']);
 

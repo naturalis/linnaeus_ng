@@ -112,7 +112,6 @@ class IntroductionController extends Controller
 
 			$page = $this->getPage($id);
 
-			$page['content'] = $this->matchGlossaryTerms($page['content']);
 			$page['content'] = $this->matchHotwords($page['content']);
 
 			$this->setPageName($page['topic']);
