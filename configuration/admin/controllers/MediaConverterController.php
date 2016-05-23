@@ -102,10 +102,10 @@ class MediaConverterController extends MediaController
                     $this->resetProperties();
                     $this->setCurrentItem($row);
 
-                    // File name is present; check if already attached
+                    // Check if file has already been converted
                     if ($this->fileHasBeenConverted()) {
 
-                        // Item has already been converted
+                        // Item has already been attached to specific item in a previous conversion
                         if ($this->itemHasBeenAttached()) {
                             echo "Already attached: $this->_currentFileName $this->_br";
 
@@ -494,21 +494,25 @@ class MediaConverterController extends MediaController
 
     private function fileHasBeenConverted ()
     {
-        $d = $this->models->MediaModel->getConvertedFileName(array(
+        $d = $this->models->MediaModel->getMediaId(array(
             'project_id' => $this->getCurrentProjectId(),
             'old_file' => $this->_currentFileName
         ));
+
+        if (!empty($d)) {
+            $this->_currentMediaId = $d;
+        }
 
         return !empty($d);
     }
 
     private function itemHasBeenAttached ()
     {
-        $d = $this->models->MediaModel->getMediaItem(array(
+        $d = $this->models->MediaModel->getMediaConversionId(array(
             'project_id' => $this->getCurrentProjectId(),
             'module' => $this->_currentModule,
             'item_id' => $this->_currentItemId,
-            'old_file' => $this->_currentFileName
+            'media_id' => $this->_currentMediaId
         ));
 
         return !empty($d);
