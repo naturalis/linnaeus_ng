@@ -508,6 +508,7 @@ class MediaConverterController extends MediaController
             'project_id' => $this->getCurrentProjectId(),
             'module' => $this->_currentModule,
             'item_id' => $this->_currentItemId,
+            'old_file' => $this->_currentFileName
         ));
 
         return !empty($d);

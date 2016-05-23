@@ -339,6 +339,8 @@ final class MediaModel extends AbstractModel
             $p['module'] : false;
         $itemId = isset($p['item_id']) && !empty($p['item_id']) ?
             $p['item_id'] : false;
+        $oldFile = isset($p['old_file']) && !empty($p['old_file']) ?
+            $p['old_file'] : false;
 
         if (!$projectId || !$module || !$itemId) return false;
 
@@ -351,6 +353,7 @@ final class MediaModel extends AbstractModel
                 `media_id` > -1 and
                 `new_file` != 'failed' and
                 `module` = '" . $this->escapeString($module) . "' and
+                `old_file` = '" . $this->escapeString($oldFile) . "' and
                 `item_id` = " . $this->escapeString($itemId) . " and
                 `project_id` = " . $this->escapeString($projectId);
 
