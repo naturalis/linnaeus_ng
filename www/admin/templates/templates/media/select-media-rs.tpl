@@ -51,7 +51,7 @@
 	    </form>
 
 	{else}
-		{t}You must first{/t} <a href="upload.php">{t}upload images{/t}</a>.</p>
+		{t}You must first{/t} <a href="upload.php">{t}upload media files{/t}</a>.</p>
 	{/if}
 
 </div>

@@ -25,3 +25,36 @@
 #paginator .current-page {
 	color:#F60;
 }
+
+
+
+.paginator ul {
+	margin-top:5px;
+	margin-left:-40px;
+	display:block;
+	float:left;
+	border-bottom: 0;
+}
+
+.paginator li {
+    display: block;
+    float: left;
+    list-style: none inside none;
+	margin:0;
+	border-right:1px solid #aaa;
+}
+
+.paginator li a, .cell {
+	padding:0 10px 0 10px;
+}
+
+.paginator li.no-border, .paginator li:last-child {
+	border-right:none;
+	padding-right:1px;
+}
+
+.paginator li.current-page a {
+	color:#F60;
+}
+
+

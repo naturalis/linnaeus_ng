@@ -12,7 +12,7 @@
 	</ul>
 	{/if}
 
-	<p>Text about file mime types and size. If you upload multiple files, the metadata
+	<p>If you upload multiple files, the metadata
 		provided will be used for all uploaded files.</p>
 	<p>Tags are used to classify types of multimedia. You can enter multiple tags separated
 		by commas.

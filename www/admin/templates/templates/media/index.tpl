@@ -13,7 +13,7 @@
     <p>
  		Sysadmin:<br>
  	    <a href="converter.php">convert existing local media</a><br/>
- 	    <a href="select_rs.php">browse media on ResourceSpace server</a><br/>
+ 	    <!-- <a href="select_rs.php">browse media on ResourceSpace server</a><br/> -->
 		{if $action != '' && $username != '' && $password != ''}
 		 	<a id="rsLogin" href="">login to ResourceSpace</a>
 		{/if}

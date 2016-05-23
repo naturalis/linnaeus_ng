@@ -17,9 +17,8 @@ input[type=text], textarea {
 
 <div id="media-main">
 
-	<form id="searchForm" method="post">
+	<form id="searchForm" method="get">
 	<input type="hidden" name="action" value="search" />
-	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input type="hidden" name="module_id" value="{$module_id}" />
 	<input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" name="back_url" value="{$back_url}" />

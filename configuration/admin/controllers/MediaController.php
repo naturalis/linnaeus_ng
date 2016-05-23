@@ -35,6 +35,7 @@ class MediaController extends Controller
     private $moduleId;
     private $itemId;
     private $languageId;
+    private $itemsPerPage = 100;
 
     protected $_result;
     protected $_files;
@@ -134,7 +135,10 @@ class MediaController extends Controller
 
     public $usedHelpers = array('hr_filesize_helper');
 
-    public $cssToLoad = array('media.css');
+    public $cssToLoad = array(
+        'media.css',
+        'paginator.css'
+    );
 
     public $jsToLoad = array(
 		'all' => array(
@@ -165,7 +169,9 @@ class MediaController extends Controller
     {
         $this->moduleId = $this->rHasVal('module_id') ? $this->rGetVal('module_id') : -1;
         $this->itemId = $this->rHasVal('item_id') ? $this->rGetVal('item_id') : -1;
-        $this->languageId = $this->rHasVar('language_id') ? $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
+        $this->languageId = $this->rHasVar('language_id') ?
+            $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
+        $this->offset = $this->rHasVar('offset') ? $this->rGetVal('offset') : 0;
 
 		if (isset($p['module_settings_reader'])) {
 			$this->_moduleSettingsReader = $p['module_settings_reader'];
@@ -1022,7 +1028,7 @@ class MediaController extends Controller
     private function getMediaFiles ($p = false)
     {
         $search = isset($p['search']) ? $p['search'] : false; // empty to return everything
-        $sort = isset($p['sort']) ? $p['sort'] : false; // asc (default)/desc
+        $sort = isset($p['sort']) ? $p['sort'] : 'name';
 
         // Search
         if (!empty($search)) {
@@ -1039,7 +1045,7 @@ class MediaController extends Controller
     				'project_id' => $this->getCurrentProjectId(),
     			    'deleted' => 0
     			),
-                'order' => 'name'
+                'order' => $sort
     		));
         }
 
@@ -1080,9 +1086,15 @@ class MediaController extends Controller
                 $file['attached'] = isset($attached) && is_array($attached) &&
                     in_array($resource['id'], $attached) ? 1 : 0;
 
-                $list['files'][$i] = $file;
+                $files[] = $file;
+                //$list['files'][$i] = $file;
             }
         }
+
+        $d = $this->getPaginationWithPager($files, $this->itemsPerPage);
+        $list['files'] = $d['items'];
+        unset($d['items']);
+        $list = array_merge($list, $d);
 
         return $list;
     }
