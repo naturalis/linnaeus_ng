@@ -223,7 +223,18 @@ function allLookupSetExtraVars(name,value) {
 
 }
 
-function allLookupBuildList(obj,txt) {
+var lookupDialogItemDefTpl= '<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%"><span class="italics" style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span></p>';
+
+function allLookupBuildList(obj,txt)
+{
+	
+	//fetchTemplate( 'noResultHtmlTpl' ).replace('%MESSAGE%',__('Geen resultaten.')));
+
+	var tpl=fetchTemplate( 'lookupDialogItem' );
+	if ( tpl.length==0 )
+	{
+		tpl=lookupDialogItemDefTpl;
+	}
 
 	allLookupRowCount = 0;
 	
@@ -245,14 +256,14 @@ function allLookupBuildList(obj,txt) {
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
 				textToAppend[i] = 
-					'<p id="allLookupListCell-'+i+'" class="row'+
-						(allLookupIndicateSelectedId && allLookupSelectedId==d.id ? ' allLookupListCellSelected' : '' )+
-						'" lookupId="'+d.id+'" onclick="window.open(\''+
-						(d.url ? d.url : url.replace('%s',d.id)) +
-						'\',\'_self\');">'+
-						d.label +
-						(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
-					'</p>';
+					tpl
+						.replace('%COUNTER%', i)
+						.replace('%ROW-CLASS%', (allLookupIndicateSelectedId && allLookupSelectedId==d.id ? ' allLookupListCellSelected' : '' ))
+						.replace(/%ID%/g, d.id)
+						.replace('%ONCLICK%', "window.open('"+(d.url ? d.url : url.replace('%s',d.id))+"','_self');")
+						.replace('%LABEL%', d.label)
+						.replace('%SOURCE-STYLE%', (d.source ? "" : "display:none" ))
+						.replace('%SOURCE%', (d.source ? d.source : "" ));
 
 				allLookupRowCount++;
 
@@ -484,6 +495,14 @@ $(document).ready(function(){
 });
 
 
-function allLookupSetListMax(n) {
+function allLookupSetListMax(n)
+{
 	allListMax=n;
 }
+
+$(document).ready(function()
+{
+	acquireInlineTemplates();
+});
+
+
