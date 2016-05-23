@@ -2546,6 +2546,13 @@ body {
     #alphabet {
       width: 100%; } }
 
+#categories {
+	float:none;
+	width:100%;
+	height:48px;
+ }
+
+
 .module-index #content {
   text-align: left; }
 
