@@ -23,23 +23,23 @@
             {/if}
 			</div>
 		</div>
-
+        
         <div id="categories">
 
-        <ul>
-            {foreach $categories v k}
-                {if !$v.is_empty}
-                <li id="ctb-{$v.id}">
-                    <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
-                    {if $activeCategory==$v.id}
-                    class="category-active"
+            <ul>
+                {foreach $categories v k}
+                    {if !$v.is_empty}
+                    <li id="ctb-{$v.id}">
+                        <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
+                        {if $activeCategory==$v.id}
+                        class="category-active"
+                        {/if}
+                        >{$v.title}</a>
+                    </li>
+                    {if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
                     {/if}
-                    >{$v.title}</a>
-                </li>
-                {if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
-                {/if}
-            {/foreach}
-        </ul>
+                {/foreach}
+            </ul>
 
         </div>
 

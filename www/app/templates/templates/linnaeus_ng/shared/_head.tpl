@@ -14,6 +14,7 @@
 
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
 {if $cssToLoad}
 {foreach $cssToLoad v}
 	<link rel="stylesheet" type="text/css" media="screen" href="{$v}" />
