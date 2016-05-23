@@ -131,7 +131,6 @@ class Controller extends BaseClass
     private $_fullPathRelative;
     private $_checkForProjectId = true;
     private $_allowEditOverlay = true; // true
-    private $_currentGlossaryId = false;
     private $_currentHotwordLink = false;
     private $_hotwordTempLinks = array();
     private $_hotwordMightBeHotwords = array();
@@ -1007,80 +1006,32 @@ class Controller extends BaseClass
         return $tv[0];
     }
 
-	public function matchHotwords ($text, $forceLookup = false)
+	public function matchHotwords( $text )
 	{
-
-        if (empty($text) || !is_string($text))
-            return $text;
+        if ( empty($text) || !is_string($text) ) return $text;
 
         $processed = $text;
 
         // get all hotwords from database
-        $wordlist = $this->getHotwords($forceLookup);
-
+        $wordlist = $this->getHotwords();
 
         // replace the not-to-be-linked words with a unique numbered string
         $exprNoLink = '|(\[no\])(.*)(\[\/no\])|i';
-        $processed = preg_replace_callback($exprNoLink, array(
-            $this,
-            'embedNoLink'
-        ), $processed);
+        $processed = preg_replace_callback($exprNoLink, array($this,'embedNoLink'), $processed);
 
+		// replacing existing open-tags
+		$expr = '/<([A-Z][A-Z0-9]*)\b[^>]*>/siU';
+		$processed = preg_replace_callback($expr, array($this,'embedNoLink'), $processed);
 
-		/*
-		// replace words that have tags inside them with a unique string, if present
-		$exprMaybe='/\b\w+(<\w+(.*)>)(\w)(<\/(.*)>)\w+\b/iU';
-		$hasPossibles = (preg_match($exprMaybe,$processed,$m)===1);
-		if ($hasPossibles) {
-			$processed = preg_replace_callback(
-				$exprMaybe,
-				array($this,'generate_rnd_string'),
-				$processed
-			);
-
-		}
-
-		private function generate_rnd_string($m)
-		{
-
-			$d = $this->generateRandomHexString('%%%','%%%');
-
-			while (isset($this->_hotwordMightBeHotwords[$d]))
-				$d = $this->generateRandomHexString('%%%','%%%');
-
-			$this->_hotwordMightBeHotwords[$d]=$m[0];
-
-			return $d;
-
-		}
-
-
-		*/
 
 		$currUrl = $this->getCurrentPathWithProjectlessQuery();
 
 		// loop through wordlist
-        foreach ((array) $wordlist as $key => $val) {
+        foreach ((array) $wordlist as $key => $val)
+		{
+            if ( $val['hotword']=='' ) continue;
 
-            if ($val['hotword'] == '')
-                continue;
-
-            if (strpos($processed,$val['hotword'])===false)
-                continue;
-
-            // replace hotwords that are already linked words with a unique string
-            $expr = '|(<a (.*)>)(' . $val['hotword'] . ')(<\/a>)|i';
-            $processed = preg_replace_callback($expr, array(
-                $this,
-                'embedNoLink'
-            ), $processed);
-
-			$expr='|(<span[^>]*onclick[^>]*>)('.$val['hotword'].')(.*?)(<\/span>)|is';
-            $processed = preg_replace_callback($expr, array(
-                $this,
-                'embedNoLink'
-            ), $processed);
-
+            if ( stripos($processed,$val['hotword'])===false ) continue;
 
 			// compile the link for the given hotword
             $this->_currentHotwordLink = '../' . $val['controller'] . '/' . $val['view'] . '.php' . (!empty($val['params']) ? '?' . $val['params'] : '');
@@ -1090,37 +1041,12 @@ class Controller extends BaseClass
 				continue;
 
 			// replace occurrences of the hotword
-            $exprHot = '|\b(' . $val['hotword'] . ')\b|i';
-            $processed = preg_replace_callback($exprHot, array(
-                $this,
-                'embedHotwordLink'
-            ), $processed);
+            $exprHot = '/\b(' . preg_quote($val['hotword'],'/') . ')\b/i';
+            $processed = preg_replace_callback($exprHot, array($this,'embedHotwordLink'), $processed);
         }
 
-        $processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
-
-		/*
-		if ($hasPossibles) {
-
-			foreach($this->_hotwordMightBeHotwords as $tKey => $tVal) {
-
-				foreach($wordlist as $wKey => $wVal) {
-
-					if (strtolower(strip_tags($tVal))==strtolower($wVal['hotword'])) {
-
-						// compile the link for the given hotword
-						$this->_currentHotwordLink = '../' . $wVal['controller'] . '/' . $wVal['view'] . '.php' . (!empty($wVal['params']) ? '?' . $wVal['params'] : '');
-
-						$processed = preg_replace('/'.$tKey.'/iU','<a href="'.$this->_currentHotwordLink.'">'.$tVal.'</a>',$processed);
-
-					}
-
-				}
-
-			}
-
-		}
-		*/
+        $processed = $this->effectuateHotwordLinks($processed);
+        $processed = $this->restoreNoLinks($processed);
 
         return $processed;
     }
@@ -2281,25 +2207,11 @@ class Controller extends BaseClass
 
     private function getHotwords()
     {
-		return $this->models->Hotwords->_get(
-		array(
-			'id' =>
-				'select
-					hotword,
-					controller,
-					view,
-					params,
-					length(hotword) as `length`,
-					(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
-				from
-					%PRE%hotwords
-				where
-					project_id = ' . $this->getCurrentProjectId() .'
-					and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
-				order by
-					num_of_words desc,
-					`length` desc'
-		));
+		return $this->models->Hotwords->_get([
+			'id' => ['project_id'=>$this->getCurrentProjectId(),'language_id'=>$this->getCurrentLanguageId() ],
+			'columns'=> 'hotword,controller,view,params,length(hotword) as `length`,(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words',
+			'order' => 'num_of_words desc,`length` desc'
+		]);
     }
 
     private function embedNoLink ($matches)
@@ -2312,20 +2224,18 @@ class Controller extends BaseClass
 		{
             $d = $this->generateRandomHexString('###','###');
 
-            while (isset($this->_hotwordNoLinks[$d])) {
+            while (isset($this->_hotwordNoLinks[$d]))
+			{
                 $d = $this->generateRandomHexString('###','###');
             }
 
-            $this->_hotwordNoLinks[$d] = array(
-                'str' => $d,
-                'orig' => $matches[0]
-            );
+            $this->_hotwordNoLinks[$d] = array('str'=>$d,'orig'=>$matches[0]);
 
             return $d;
         }
     }
 
-    private function embedHotwordLink ($matches)
+    private function embedHotwordLink( $matches )
     {
         if (trim($matches[0]) == '')
 		{
@@ -2348,10 +2258,9 @@ class Controller extends BaseClass
         }
     }
 
-    private function effectuateHotwordLinks ($txt)
+    private function effectuateHotwordLinks( $txt )
     {
         $this->_hotwordTempLinks = array_reverse($this->_hotwordTempLinks);
-
         foreach ((array) $this->_hotwordTempLinks as $val)
 		{
             $txt = str_replace($val['str'], $val['link'], $txt);
@@ -2362,7 +2271,7 @@ class Controller extends BaseClass
         return $txt;
     }
 
-    private function restoreNoLinks ($txt)
+    private function restoreNoLinks( $txt )
     {
         foreach ((array) $this->_hotwordNoLinks as $val)
 		{
@@ -2376,6 +2285,7 @@ class Controller extends BaseClass
 
         return $txt;
     }
+
 
     public function getProjectFSCode($p = null)
     {
