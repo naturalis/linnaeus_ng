@@ -150,6 +150,7 @@ class UsersController extends Controller
 			$this->userDataSave();
 			$this->userPasswordSave();
 			$this->setUser();
+			$this->addUserToCurrentProject();
 			$this->logUserChange( $this->translate('created user') );
 		}
 		
@@ -400,7 +401,14 @@ class UsersController extends Controller
 
     private function addUserToCurrentProject()
     {
-		if ( empty($this->getExpertRoleId()))
+		if ( is_null($this->getUserId()) )
+		{
+			return;
+		}
+		
+		$role_id = isset($this->getNewUserData['role_id']) ? $this->getNewUserData['role_id'] : $this->getExpertRoleId();
+		
+		if ( is_null($role_id) )
 		{
 			$this->addError( $this->translate('Cannot add user without role ID.') );
 			return;
@@ -409,10 +417,12 @@ class UsersController extends Controller
         $this->models->ProjectsRolesUsers->save(array(
             'id' => null,
             'project_id' => $this->getCurrentProjectId(),
-            'role_id' => $this->getExpertRoleId(),
+            'role_id' => $role_id,
             'user_id' => $this->getUserId(),
             'active' => 1
         ));
+		
+		$this->addMessage( $this->translate('Added user to current project.') );
     }
 
 	private function removeUserFromCurrentProject()
@@ -1070,40 +1080,4 @@ class UsersController extends Controller
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
