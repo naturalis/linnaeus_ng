@@ -735,21 +735,19 @@ class SpeciesModel extends AbstractModel
 
     public function getCategoriesNsr($params)
     {
-		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 
-		if ( is_null($projectId) || is_null($taxonId)  || is_null($languageId) ) return;
+		if ( is_null($project_id) || is_null($taxon_id)  || is_null($language_id) ) return;
 
         $query = "
 			select
 				_a.id,
 				ifnull(_b.title,_a.page) as title,
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
-				".(isset($taxonId) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
+				".(isset($taxon_id) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
 				_a.def_page,
-				_a.redirect_to,
-				_a.check_query,
 				_a.always_hide,
 				_a.external_reference,
 				_a.show_order
@@ -759,18 +757,18 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%pages_taxa_titles _b
 				on _a.project_id=_b.project_id
 				and _a.id=_b.page_id
-				and _b.language_id = ". $languageId ."
+				and _b.language_id = ". $language_id ."
 
-			".(isset($taxonId) ? "
+			".(isset($taxon_id) ? "
 				left join %PRE%content_taxa _c
 					on _a.project_id=_c.project_id
 					and _a.id=_c.page_id
-					and _c.taxon_id =".$taxonId."
-					and _c.language_id = ". $languageId ."
+					and _c.taxon_id =".$taxon_id."
+					and _c.language_id = ". $language_id ."
 				" : "")."
 
 			where
-				_a.project_id=".$projectId."
+				_a.project_id=".$project_id."
 				and _a.always_hide = 0
 
 			order by
