@@ -155,7 +155,8 @@ INSERT IGNORE INTO `module_settings` VALUES
 (83,-1, 'tree_show_upper_taxon', 'Show the most upper taxon in the taxonomic tree; if set to false, the top of the tree will display the name of the project instead.', NULL, NOW(), NOW()),
 (null,1, 'welcome_topic_id', 'ID of the page with the old migrated welcome-page', null, NOW(), NOW()),
 (null,4,'obsolete_passport_tabs','Legacy tab titles that should be flagged as obsolete in the passport editor (use JSON-string: {"Old":"New","Totally obsolete":null})',NULL,NOW(),NOW()),
-(null,7,'no_taxon_images','Make no attempt to show images for taxa',1,NOW(),NOW())
+(null,7,'no_taxon_images','Make no attempt to show images for taxa',1,NOW(),NOW()),
+(null,4,'higher_taxa_rank_prefix','Always prefix the taxon name with the rank for higher species',1,NOW(),NOW())
 ;
 
 

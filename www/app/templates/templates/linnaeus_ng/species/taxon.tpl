@@ -4,16 +4,23 @@
 
 	<div id="content" class="taxon-detail">
 
+
+
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="full">
-				{if $names.preffered_name}
-					<h1 class="main-display-name">{$names.preffered_name}</h1>
-					<h2>{$names.nomen}</h2>
-
-				{else}
-					<h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
-					<h2></h2>
-				{/if}
+            {if $inclHigherTaxaRankPrefix && $taxon.lower_taxon==0}
+                <h1 class="no-subtitle main-display-name">{$taxon.label}</h1>
+                <h2></h2>
+            {else}
+                {if $names.preffered_name}
+                    <h1 class="main-display-name">{$names.preffered_name}</h1>
+                    <h2>{$names.nomen}</h2>
+                
+                {else}
+                    <h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
+                    <h2></h2>
+                {/if}
+            {/if}
 			</div>
 		</div>
 
