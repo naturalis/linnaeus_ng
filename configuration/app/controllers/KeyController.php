@@ -481,7 +481,7 @@ class KeyController extends Controller
 		);
 
 		$step['title'] = $ck[0]['title'];
-		$step['content'] = $this->matchGlossaryTerms($ck[0]['content']);
+		$step['content'] = $ck[0]['content'];
 
 		return $step;
 	}
@@ -557,8 +557,7 @@ class KeyController extends Controller
 				if (isset($cck[0]['choice_txt']))
 				{
 					$choices[$key]['choice_txt'] = $cck[0]['choice_txt'];
-					$choices[$key]['choice_txt'] = $this->matchGlossaryTerms(trim($choices[$key]['choice_txt']));
-					$choices[$key]['choice_txt'] = $this->matchHotwords($choices[$key]['choice_txt']);
+					$choices[$key]['choice_txt'] = $this->matchHotwords(trim($choices[$key]['choice_txt']));
 				}
 			}
 
