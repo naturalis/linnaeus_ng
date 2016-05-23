@@ -77,11 +77,11 @@ class UtilitiesController extends Controller
 		{
 			if (count((array)$_SESSION['admin']['project']['lead_experts'])==1)
 			{
-				$this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
+				$this->addWarning($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
 			}
 			else
 			{
-				$this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
+				$this->addWarning($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
 			}
 
 			foreach((array)$_SESSION['admin']['project']['lead_experts'] as $key => $val)

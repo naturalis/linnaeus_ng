@@ -105,7 +105,7 @@ table tr th {
     <p>
 		<input type="submit" value="save" /> &nbsp;&nbsp;
 	{if $currentUserId == $user.id || $isSysAdmin}
-		<input type="submit" value="save" /> &nbsp;&nbsp; <input type="button" value="delete user" onclick="deleteUser();" />
+		<input type="button" value="delete user" onclick="deleteUser();" />
     {/if}
     </p>
 
