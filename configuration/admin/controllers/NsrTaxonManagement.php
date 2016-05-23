@@ -112,17 +112,28 @@ class NsrTaxonManagement extends NsrController
 
     private function getCategories()
     {
-		return;
-
 		$categories=$this->models->NsrTaxonModel->getCategories(array(
             'project_id' => $this->getCurrentProjectId(),
     		'language_id' => $this->getDefaultProjectLanguage()
 		));
 		
 		$standard_categories=$this->cTabs;
-		array_walk($standard_categories,function(&$a,$b){
 
-			$a=['tabname'=>$b,'id'=>'auto','title'=>$this->translate($a)];});
+		array_walk($standard_categories,function(&$a,$b) {
+				$a=['tabname'=>$b,'id'=>'auto','page'=>$a];
+		});
+		
+/*
+id!?
+
+array (size=5)
+  'id' => string 'media' (length=5)
+  'title' => string 'Media' (length=5)
+  'is_empty' => int 0
+  'tabname' => string 'CTAB_MEDIA' (length=10)
+  'show_order' => int 99
+
+*/		$all_categories=array_merge($categories,$standard_categories);
 
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
@@ -130,8 +141,30 @@ class NsrTaxonManagement extends NsrController
 			'fieldAsIndex'=>'tabname',
 			'order'=>'start_order'			
 		]);
+
+        $lp=$this->getProjectLanguages();
+
+        foreach((array)$all_categories as $key=>$page)
+		{
+            foreach((array)$lp as $k=>$language)
+			{
+                $tpt = $this->models->PagesTaxaTitles->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'page_id' => $page['id'],
+                        'language_id' => $language['language_id']
+                    )
+                ));
+
+                $all_categories[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
+            }
+        }
+
+		return $all_categories;
 		
-		//q($order,1);
+
+
 
 /*		
 if (!$this->_suppressTab_NAMES)
@@ -183,8 +216,6 @@ if (!$this->_suppressTab_DNA_BARCODES)
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Define categories'));
 
-		//$this->getCategories();
-
         if ($this->rHasVal('new_page') && !$this->isFormResubmit())
 		{
             $tp=$this->createTaxonCategory($this->rGetVal('new_page'), $this->rGetVal('show_order'));
@@ -199,6 +230,7 @@ if (!$this->_suppressTab_DNA_BARCODES)
 		{
 			$this->savePageTitles( $this->rGetAll()['pages_taxa_titles'] );
         }		
+
 
         $lp=$this->getProjectLanguages();
 
@@ -226,10 +258,13 @@ if (!$this->_suppressTab_DNA_BARCODES)
             }
             $nextShowOrder = $page['show_order'] + 1;
         }
+	
+
+		//$pages=$this->getCategories();
 
         $this->smarty->assign('nextShowOrder', isset($nextShowOrder) ? $nextShowOrder : 0 );
         $this->smarty->assign('maxCategories', $this->maxCategories);
-        $this->smarty->assign('languages', $lp);
+        $this->smarty->assign('languages', $this->getProjectLanguages());
         $this->smarty->assign('pages', $pages);
         $this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 

@@ -750,7 +750,8 @@ class SpeciesModel extends AbstractModel
 				_a.def_page,
 				_a.always_hide,
 				_a.external_reference,
-				_a.show_order
+				_a.show_order,
+				0 as auto_tab
 			from
 				%PRE%pages_taxa _a
 

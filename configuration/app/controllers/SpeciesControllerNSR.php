@@ -574,7 +574,8 @@ class SpeciesControllerNSR extends SpeciesController
 						'id' => CTAB_NAMES,
 						'title' => $this->translate('Naamgeving'),
 						'is_empty' => false,
-						'tabname' => 'CTAB_NAMES'
+						'tabname' => 'CTAB_NAMES',
+						'auto_tab' => 1
 					)
 				);
 			}
@@ -586,7 +587,8 @@ class SpeciesControllerNSR extends SpeciesController
 						'id' => CTAB_LITERATURE,
 						'title' => $this->translate('Literature'),
 						'is_empty' => !$this->hasTaxonLiterature($taxon_id),
-						'tabname' => 'CTAB_LITERATURE'
+						'tabname' => 'CTAB_LITERATURE',
+						'auto_tab' => 1
 					)
 				);
 			}
@@ -609,7 +611,8 @@ class SpeciesControllerNSR extends SpeciesController
 						'id' => CTAB_MEDIA,
 						'title' => $this->translate('Media'),
 						'is_empty' => $isEmpty,
-						'tabname' => 'CTAB_MEDIA'
+						'tabname' => 'CTAB_MEDIA',
+						'auto_tab' => 1
 					)
 				);
 			}
@@ -621,7 +624,8 @@ class SpeciesControllerNSR extends SpeciesController
 						'id' => CTAB_DNA_BARCODES,
 						'title' => $this->translate('DNA barcodes'),
 						'is_empty' => !$this->hasTaxonBarcodes($taxon_id),
-						'tabname' => 'CTAB_DNA_BARCODES'
+						'tabname' => 'CTAB_DNA_BARCODES',
+						'auto_tab' => 1
 					)
 				);
 			}
@@ -634,7 +638,8 @@ class SpeciesControllerNSR extends SpeciesController
 						'id' => CTAB_DICH_KEY_LINKS,
 						'title' => $this->translate('Key links'),
 						'is_empty' => !$this->hasTaxonKeyLinks($taxon_id),
-						'tabname' => 'CTAB_DICH_KEY_LINKS'
+						'tabname' => 'CTAB_DICH_KEY_LINKS',
+						'auto_tab' => 1
 					)
 				);
 			}
@@ -660,6 +665,7 @@ class SpeciesControllerNSR extends SpeciesController
 		foreach((array)$categories as $key=>$val)
 		{
 			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
+			$categories[$key]['show_overview_image']=false;
 
 			if (is_null($firstNonEmpty) && empty($val['is_empty']))
 			{
@@ -679,9 +685,19 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$start=$val['id'];
 			}
+			
 		}
 
 		$this->customSortArray($categories,array('key' => 'show_order'));
+
+		foreach((array)$categories as $key=>$val)
+		{
+			if ( $val['auto_tab']!=1 && $val['is_empty']!=1 )
+			{
+				$categories[$key]['show_overview_image']=true;
+				break;
+			}
+		}
 
 		if (is_null($start)) $start=$firstNonEmpty;
 

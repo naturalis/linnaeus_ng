@@ -38,19 +38,15 @@
 
         <div style="margin-left:160px;padding-left:25px;">
 
-        {if $overviewImage && !($activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA)}
-
-	        {if $is_nsr}
-		        <div id="taxonImage" style="float:right">
-		            <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
-		            <div id="taxonImageCredits">
-		                <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label}
-		            </div>
-		        </div>
-	        {else}
-	 	       <div id="overview-image" style="background: url('{$overviewImage}');"></div>
-	        {/if}
-
+        {if $is_nsr && $overviewImage && !($activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA)}
+            <div id="taxonImage" style="float:right">
+                <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
+                <div id="taxonImageCredits">
+                    <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label}
+                </div>
+            </div>
+        {elseif $overviewImage && $requested_category.show_overview_image}
+           <div id="overview-image" style="background: url('{$overviewImage}');"></div>
         {/if}
 
  		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
