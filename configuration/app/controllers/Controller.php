@@ -466,7 +466,7 @@ class Controller extends BaseClass
 		$taxon=$t[0];
 
 		if ($taxon) $taxon['label']=$this->formatTaxon($taxon);
-
+		
         return $taxon;
     }
 
