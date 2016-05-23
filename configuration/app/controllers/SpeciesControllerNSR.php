@@ -507,9 +507,9 @@ class SpeciesControllerNSR extends SpeciesController
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 
 		$categories = $this->models->{$this->_model}->getCategoriesNsr(array(
-            'projectId' => $this->getCurrentProjectId(),
-    		'taxonId' => $taxon_id,
-    		'languageId' => $this->getCurrentLanguageId()
+            'project_id' => $this->getCurrentProjectId(),
+    		'taxon_id' => $taxon_id,
+    		'language_id' => $this->getCurrentLanguageId()
 		));
 
 		if ( isset($taxon_id) )
