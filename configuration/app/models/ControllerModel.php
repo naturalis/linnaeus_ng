@@ -96,6 +96,7 @@ final class ControllerModel extends AbstractModel
 				_b.lower_taxon,
 				_c.commonname,
 				_b.rank_id as base_rank_id
+
 			from %PRE%taxa _a
 
 		".($trashCanExists ? "
