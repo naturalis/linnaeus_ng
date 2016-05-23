@@ -1370,9 +1370,13 @@ class Controller extends BaseClass
             $email = rawurlencode($d['first_name'] . ' ' . $d['last_name'] .
                 '<' . $d['email_address'] . '>');
         }
-        return str_rot13('<a href="mailto:' . $email . '?subject=' .
-            rawurlencode($_SESSION['app']['project']['title']) .
-            '" rel="nofollow">' . $this->translate('contact') . '</a>');
+		
+		if ( isset($_SESSION['app']['project']) && isset($_SESSION['app']['project']['title']) )
+		{
+			return str_rot13('<a href="mailto:' . $email . '?subject=' .
+				rawurlencode($_SESSION['app']['project']['title']) .
+				'" rel="nofollow">' . $this->translate('contact') . '</a>');
+		}
 	}
 
     private function setControllerParams ($p)

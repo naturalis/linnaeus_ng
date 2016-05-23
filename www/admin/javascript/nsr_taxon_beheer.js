@@ -478,7 +478,14 @@ function partstoname()
 
 	if (yearstart!=-1)
 	{
-		year=author.substr(yearstart);
+		year=author.substr(yearstart).trim();
+
+		// in botany, authorship van be "L. (1753)"
+		if (year.indexOf('(')==0 && year.lastIndexOf(')')==year.length-1)
+		{
+			year=year.substring(1,year.length-1);
+		}
+
 		if (isNaN(year))
 		{
 			year="";
