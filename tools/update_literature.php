@@ -7,7 +7,7 @@
 	$c = new configuration;
 	$s = $c->getDatabaseSettings();
 
- 	$d = mysqli_connect($s['host'],$s['user'],$s['password'], $s['database']);
+ 	$d = mysqli_connect($s['host'], $s['user'], $s['password'], $s['database']);
 	mysqli_set_charset($d, 'utf8');
 	mysqli_query($d, 'SET sql_mode = ""');
 	$errors = array();
@@ -15,100 +15,114 @@
     echo "Clearing Literature2 tables...\n";
     clearLit2();
 
-    echo "Getting project(s) language...\n";
-    $q = 'SELECT `id`, `language_id` FROM `languages_projects` WHERE `def_language` = 1';
+    $q = 'SELECT `id`, `title` FROM `projects` ORDER BY `title`';
     $r = mysqli_query($d, $q);
     while ($row = mysqli_fetch_assoc($r)) {
-        $languages[$row['id']] = $row['language_id'];
+        $projects[$row['id']] = $row['title'];
     }
 
-	echo "Copying literature...\n";
-    $q = 'SELECT * FROM `literature`';
-    $r = mysqli_query($d, $q);
-    while ($row = mysqli_fetch_assoc($r)) {
-        $actors = array();
-        // Remove paragraph but leave other html markup
-        $full = str_replace(array('<p>', '</p>'), '', $row['text']);
-        // Save authors as actors
-       	$actors[] = $row['author_first'];
-        if (!empty($row['author_second']) && !in_array($row['author_second'], $actors)) {
-            $actors[] = $row['author_second'];
+    foreach ($projects as $projectId => $projectTitle) {
+
+        echo "Getting language for project $projectTitle...\n";
+        $q = "SELECT `id`, `language_id` FROM `languages_projects` WHERE `project_id` = $projectId AND `def_language` = 1";
+        $r = mysqli_query($d, $q);
+        while ($row = mysqli_fetch_assoc($r)) {
+            $languages[$row['id']] = $row['language_id'];
         }
-        // Year is set properly
-        if (!empty($row['year'])) {
-            $date = $row['year'] . (!empty($row['suffix']) ? $row['suffix'] : '');
-            if (!empty($row['year_2'])) {
-                $date .= '-' . $row['year_2'] . (!empty($row['suffix_2']) ? $row['suffix_2'] : '');
+
+    	echo "Copying literature...\n";
+        $q = "SELECT * FROM `literature` WHERE `project_id` = $projectId";
+        $r = mysqli_query($d, $q);
+        while ($row = mysqli_fetch_assoc($r)) {
+            $actors = array();
+            // Remove paragraph but leave other html markup
+            $full = str_replace(array('<p>', '</p>'), '', $row['text']);
+            // Save authors as actors
+           	$actors[] = $row['author_first'];
+            if (!empty($row['author_second']) && !in_array($row['author_second'], $actors)) {
+                $actors[] = $row['author_second'];
             }
-        // If not we have to extract it from the full reference
-        } else {
-            $date = getYear($full);
-        }
-        // If date is set properly we can split the reference in author and label
-        if ($date && strpos($full, $date) !== false) {
-            list($author, $label) = explode($date, $full);
-            $author = rtrim($author, ' ,');
-            $label = ltrim($label, ' .,');
-        // Give up and store everything in author column
-        // These (more or less) failed inserts can be identified by actor_id = -1
-        } else {
-            $date = $label = null;
-            $author = $full;
-            $errors[] = $full;
-        }
-
-        // language_id may be missing in languages_projects; if so default to English
-        $language_id = isset($languages[$row['project_id']]) ? $languages[$row['project_id']] : 26;
-
-
-        $q = 'INSERT INTO `literature2` (`id`, `project_id`, `language_id`, `actor_id`, `label`,
-                  `date`, `author`, `created`)
-              VALUES (' .
-                 $row['id'] . ', ' .
-                 $row['project_id'] . ', ' .
-                 $language_id . ', ' .
-                 (is_null($label) ? -1 : 'NULL') . ',
-                 "' . mysqli_real_escape_string($d, $label). '",
-                 "' . mysqli_real_escape_string($d, $date). '",
-                 "' . mysqli_real_escape_string($d, $author). '",
-                 CURRENT_TIMESTAMP' .
-              ')';
-        mysqli_query($d, $q) or die($q . mysqli_error($d));
-
-        foreach ($actors as $i => $actor) {
-            $q2 = 'SELECT `id` FROM `actors` WHERE `name` = "' . mysqli_real_escape_string($d, $actor) . '"';
-            $r2 = mysqli_query($d, $q2);
-            if (mysqli_num_rows($r2) > 0) {
-                $row2 = mysqli_fetch_assoc($r2);
-                $actor_id = $row2['id'];
+            // Year is set properly
+            if (!empty($row['year'])) {
+                $date = $row['year'] . (!empty($row['suffix']) ? $row['suffix'] : '');
+                if (!empty($row['year_2'])) {
+                    $date .= '-' . $row['year_2'] . (!empty($row['suffix_2']) ? $row['suffix_2'] : '');
+                }
+            // If not we have to extract it from the full reference
             } else {
-                $q3 = 'INSERT INTO `actors` (`project_id`, `name`, `created`) VALUES (' .
-                    $row['project_id'] . ', "' .
-                    mysqli_real_escape_string($d, $actor) . '",
-                    CURRENT_TIMESTAMP
-                )';
-                mysqli_query($d, $q3) or die($q3. mysqli_error($d));
-                $actor_id = mysqli_insert_id($d);
+                $date = getYear($full);
             }
-            $q4 = 'INSERT INTO `literature2_authors`
-                (`project_id`, `literature2_id`, `actor_id`, `sort_order`) VALUES (' .
-                    $row['project_id'] . ', ' .
-                    $row['id'] . ', ' .
-                    $actor_id . ', ' .
-                    ($i + 1) .
-                ')';
-            mysqli_query($d, $q4) or die($q4 . mysqli_error($d));
+            // If date is set properly we can split the reference in author and label
+            if ($date && strpos($full, $date) !== false) {
+                list($author, $label) = explode($date, $full);
+                $author = rtrim($author, ' ,');
+                $label = ltrim($label, ' .,');
+            // Give up and store everything in author column
+            // These (more or less) failed inserts can be identified by actor_id = -1
+            } else {
+                $date = $label = null;
+                $author = $full;
+                $errors[$projectId][] = $full;
+            }
+
+            // language_id may be missing in languages_projects; if so default to English
+            $language_id = isset($languages[$row['project_id']]) ? $languages[$row['project_id']] : 26;
+
+            $q = 'INSERT INTO `literature2` (`id`, `project_id`, `language_id`, `actor_id`, `label`,
+                      `date`, `author`, `created`)
+                  VALUES (' .
+                     $row['id'] . ', ' .
+                     $row['project_id'] . ', ' .
+                     $language_id . ', ' .
+                     (is_null($label) ? -1 : 'NULL') . ',
+                     "' . mysqli_real_escape_string($d, $label). '",
+                     "' . mysqli_real_escape_string($d, $date). '",
+                     "' . mysqli_real_escape_string($d, $author). '",
+                     CURRENT_TIMESTAMP' .
+                  ')';
+            mysqli_query($d, $q) or die($q . mysqli_error($d));
+
+            foreach ($actors as $i => $actor) {
+                $q2 = 'SELECT `id` FROM `actors` WHERE `name` = "' . mysqli_real_escape_string($d, $actor) . '"';
+                $r2 = mysqli_query($d, $q2);
+                if (mysqli_num_rows($r2) > 0) {
+                    $row2 = mysqli_fetch_assoc($r2);
+                    $actor_id = $row2['id'];
+                } else {
+                    $q3 = 'INSERT INTO `actors` (`project_id`, `name`, `created`) VALUES (' .
+                        $row['project_id'] . ', "' .
+                        mysqli_real_escape_string($d, $actor) . '",
+                        CURRENT_TIMESTAMP
+                    )';
+                    mysqli_query($d, $q3) or die($q3. mysqli_error($d));
+                    $actor_id = mysqli_insert_id($d);
+                }
+                $q4 = 'INSERT INTO `literature2_authors`
+                    (`project_id`, `literature2_id`, `actor_id`, `sort_order`) VALUES (' .
+                        $row['project_id'] . ', ' .
+                        $row['id'] . ', ' .
+                        $actor_id . ', ' .
+                        ($i + 1) .
+                    ')';
+                mysqli_query($d, $q4) or die($q4 . mysqli_error($d));
+            }
         }
+        echo "\n";
     }
+
 
 
 	if (!empty($errors)) {
-        echo "\n\nThe following references could not be parsed properly. The complete text has " .
-            "been stored in the author field. These references can be identified by actor_id = -1:\n";
-        foreach($errors as $error) {
-            echo "$error\n";
+        echo "\nThe following references could not be parsed properly. The complete text has " .
+            "been stored in the author field. These references can be identified by actor_id = -1:\n\n";
+        foreach ($errors as $projectId => $d) {
+            echo $projects[$projectId] . "\n";
+            foreach ($d as $error) {
+                echo "$error\n";
+            }
+            echo "\n\n";
         }
-        echo "Ready!\n";
+        echo "Ready!\n\n\n";
 	}
 
 
