@@ -153,6 +153,7 @@ class UsersController extends Controller
 			$this->logUserChange( $this->translate('created user') );
 		}
 		
+		$this->smarty->assign( 'roles', $this->getRoles() );
 		$this->smarty->assign('user', $this->rGetAll() );
 		$this->printPage( 'edit' );
     }
