@@ -34,7 +34,12 @@
             
             <tr class="tr-highlight">
                 <td>
-                    <span class="{if $v.always_hide==1}hidden-tab{/if}" title="{if $v.always_hide==1}hidden tab{/if}">{$v.page}</span>
+                    <span 
+                    	class="{if $v.id=='auto'}auto-tab{/if} {if $v.always_hide==1}hidden-tab{/if}" 
+                        title="{if $v.id=='auto'}automatic{/if}; {if $v.always_hide==1}hidden tab{/if}"
+					>
+                    	{$v.page}
+					</span>
                 </td>
                 {foreach $languages l}
                 <td>
