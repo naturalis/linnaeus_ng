@@ -66,20 +66,20 @@
 				{else}
 
 					{if $v.category == 'image'}
-						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto">
-						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.original_name}" id="media-{$k}" class="image-full" />
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto" alt="{$v.description}">
+						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
 
 					{else if $v.category == 'audio' or $v.category == 'video'}
-						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$name}" id="media-{$k}" controls />
+						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls />
 							<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
 						</{$v.category}><br>
 						{$name}
 
 					{else}
 						<a href="{$smarty.capture.fullImgUrl}">
-						<img src="{$v.rs_thumb_medium}" alt="{$v.original_name}" /><br>
+						<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 						{$name}
 						</a>
 
@@ -88,7 +88,7 @@
 				{/if}
 
 				<div id="caption-{$k}" class="media-caption">
-					<p >{$v.description}</p>
+					<p>{$v.description}</p>
 				</div>
 
 			</div><!-- /.media-cell -->
