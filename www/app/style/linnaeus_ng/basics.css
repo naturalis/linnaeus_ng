@@ -1989,10 +1989,19 @@ b, .title {
     content: ")"; }
 
 /* --- --- CATEGORIES (tabs) --- */
+
+/* 
 @media (max-width: 799px) {
   #categories {
     text-align: center;
     font-size: 14px; } }
+*/
+
+#categories {
+	display:block;
+}
+
+
 #categories ul {
   margin: 0;
   padding: 0;
@@ -2001,10 +2010,12 @@ b, .title {
   list-style: none inside none;
   display: block;
   float: left; }
+/*   
   @media (max-width: 799px) {
     #categories li {
       margin-right: 0.5em;
       font-weight: 400; } }
+*/
 #categories a {
   display: block;
   color: #e3004a;
