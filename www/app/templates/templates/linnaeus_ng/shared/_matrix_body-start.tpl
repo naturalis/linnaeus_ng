@@ -17,11 +17,11 @@
             {if $master_matrix.id}
                 <a href="?mtrx={$master_matrix.id}" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a><br />
             {else}
-                <a href="#" onClick="history.go(-1);" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
+                <a href="#" onClick="history.go(-1);return false;" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {/if}
             <div class="pageTitleContainer">
-                <span class="pageTitle">
-                    {$matrix.name}    
+                <span class="pageTitle" onclick="window.open('../../','_self');">
+	                {$session.app.project.title|@strip_tags:false}
                 </span>
             </div>
            
