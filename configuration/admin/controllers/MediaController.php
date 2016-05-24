@@ -480,7 +480,7 @@ class MediaController extends Controller
 
                 $this->uploadFiles();
                 $this->reattachMediaFile($id, $this->mediaId);
-                $this->redirect('edit.php?id=' . $this->mediaId);
+                $this->redirect($this->setBackUrl());
 
             } else {
 
@@ -517,48 +517,26 @@ class MediaController extends Controller
             return false;
         }
 
-        // Metadata and tags have been saved for one language;
-        // check if data for another language is present for the old file
-        $pl = $this->getProjectLanguages();
-        if (count($pl) > 1) {
+        // Get data from original media file
+        $d = $this->getMediaFile($oldId);
 
-            foreach ($pl as $l) {
-                $languageIds[] = $l['language_id'];
-            }
+        // Delete original file
+        $this->models->Media->delete(array(
+    		'project_id' => $this->getCurrentProjectId(),
+    		'id' => $oldId
+		));
 
-            $languageIds = array_diff($languageIds, array($this->languageId));
-
-            foreach ($languageIds as $languageId) {
-
-                $this->saveMetadata(array(
-                    'media_id' => $newId,
-                    'language_id' => $languageId,
-                    'metadata' => $this->getMetadata(array(
-                        'media_id' => $oldId,
-                        'language_id' => $languageId
-                    ))
-                ));
-
-                $this->saveTags(array(
-                    'media_id' => $newId,
-                    'language_id' => $languageId,
-                    'tags' => $this->getTags(array(
-                        'media_id' => $oldId,
-                        'language_id' => $languageId
-                    ))
-                ));
-            }
-        }
-
-        // Reset link in media_modules
-        $this->models->MediaModules->update(
-			array('media_id' => $newId),
-			array(
-                'project_id' => $this->getCurrentProjectId(),
-                'media_id' => $oldId,
-                'module_id' => $this->moduleId,
-                'item_id' => $this->itemId
-			)
+        // Update new file
+        $this->models->Media->update(
+            array(
+                'id' => $d['id'],
+        		'name' => $d['name'],
+        		'original_name' => $d['original_name'],
+                'title' => $d['title']
+    		), array (
+        		'project_id' => $this->getCurrentProjectId(),
+        		'id' => $newId
+    		)
         );
     }
 
