@@ -85,7 +85,7 @@ class MediaConverterController extends MediaController
         if ($cli) $this->setCli();
 
         $this->setProjectMedia();
-
+/*
         foreach ($this->media['modules'] as $name => $module) {
 
             $this->setCurrentModule(array(
@@ -117,8 +117,6 @@ class MediaConverterController extends MediaController
 
                     // Upload file
                     } else {
-
-continue;
                         $this->uploadFile();
 
                         // Oops
@@ -135,7 +133,7 @@ continue;
             }
 
         }
-
+*/
         echo $this->_cli ? "\n\nConverting internal media links\n" :
             '</p><p><b>Converting internal media links</b><br>';
 
@@ -208,6 +206,7 @@ continue;
             foreach ($matches as $match) {
 
                 $newFile = $this->getRsFile($match[2]);
+                $this->_error = false;
 
                 // File exists; replace path
                 if (!empty($newFile)) {
@@ -219,7 +218,7 @@ continue;
                     $this->setCurrentFileName($match[2]);
                     $this->setFiles();
 
-                     if (empty($this->_error)) {
+                    if (empty($this->_error)) {
 
                         $this->uploadFiles();
 
@@ -240,7 +239,7 @@ continue;
                     } else {
 
                         echo "ERROR: could not upload $this->_currentFileName (" .
-                            $this->_error . ')' . $this->_br;
+                            $this->_error . ')' . $newFile . $this->_br;
 
                     }
                 }
@@ -645,12 +644,12 @@ continue;
         // It's not there!
         if (!file_exists($file)) {
             $error = 4;
-            $this->_error = "Local file $this->_currentFileName cannot be found";
+            $this->_error = "Local file $file cannot be found";
 
         // It's too large!
         } else if (filesize($file) > $this->_maxFileSize) {
             $error = 1;
-            $this->_error = "Size of $this->_currentFileName exceeds maximum file size";
+            $this->_error = "Size of $file exceeds maximum file size";
 
         // It's OK!
         } else {
