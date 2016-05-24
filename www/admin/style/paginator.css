@@ -44,8 +44,8 @@
 	border-right:1px solid #aaa;
 }
 
-.paginator li a, .cell {
-	padding:0 10px 0 10px;
+.paginator li a, .paginator li.disabled {
+	padding: 0 10px 0 10px;
 }
 
 .paginator li.no-border, .paginator li:last-child {
@@ -57,4 +57,7 @@
 	color:#F60;
 }
 
+.paginator li.disabled span {
+	margin: 3px 0;
+}
 
