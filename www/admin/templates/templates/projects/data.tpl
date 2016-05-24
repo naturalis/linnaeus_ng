@@ -8,6 +8,14 @@
 <table>
 	<tr>
 		<td>
+			{t}Project title:{/t}
+		</td>
+		<td colspan="2">
+			<input type="text" name="title" value="{$data.title}" style="width:300px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
 			{t}Internal project name:{/t}
 		</td>
 		<td colspan="2">
@@ -15,7 +23,7 @@
         	<input type="text" name="sys_name" value="{$data.sys_name}" style="width:300px;" />
         {else}
 			{$data.sys_name}
-		{/if}          
+		{/if}
 		</td>
 	</tr>
 	<tr>
@@ -27,8 +35,8 @@
         	<textarea name="sys_description" style="width:300px;font-family:inherit;font-size:0.9em">{$data.sys_description}</textarea>
         {else}
 			{$data.sys_description}
-		{/if}          
-			
+		{/if}
+
 		</td>
 	</tr>
 	<tr>
@@ -37,14 +45,6 @@
 		</td>
 		<td colspan="2">
 			{$data.id}
-		</td>
-	</tr>
-	<tr>
-		<td>
-			{t}Project title:{/t}
-		</td>
-		<td colspan="2">
-			<input type="text" name="title" value="{$data.title}" style="width:300px;" />
 		</td>
 	</tr>
 	<tr>
@@ -116,18 +116,18 @@
 			<select name="language-select" id="language-select">
 			{assign var=first value=true}
 			{section name=i loop=$languages}
-				{if $first && $languages[i].show_order==''}				
+				{if $first && $languages[i].show_order==''}
 				<option disabled="disabled" class="language-select-item-disabled">
 					&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;
 				</option>{assign var=first value=false}{/if}
-				<option 
+				<option
 					value="{$languages[i].id}"
 					class="language-select-item{if $languages[i].language_project_id!=''}-active{/if}"
 					>{$languages[i].language}</option>
 			{/section}
 			</select>
-			<span 
-				class="a" 
+			<span
+				class="a"
 				onclick="projectSaveLanguage('add',[$('#language-select :selected').val(),$('#language-select :selected').text()])">
 				{t}add language{/t}
 			</span>
@@ -145,16 +145,16 @@
 				<input type="radio" name="published" value="0" {if $data.published!='1'} checked="checked"{/if}/> {t}no{/t}
 			</label>
 		</td>
-	</tr>		
+	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
-	</tr>		
+	</tr>
 	<tr>
 		<td colspan="2">
 			<input type="submit" value="save" />
 			<input type="button" value="back" onclick="window.open('{$session.admin.system.referer.url}','_top')" />
 		</td>
-	</tr>		
+	</tr>
 </table>
 </form>
 </div>
