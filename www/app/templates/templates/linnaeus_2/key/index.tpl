@@ -8,12 +8,12 @@
 		{if $step.content && $step.content!=$step.title}<div id="content">{$step.content}</div>{/if}
 		</div>
 		<div id="choices">
-		
+
     <table id="choice-table">
 	{foreach from=$choices key=k item=v name=henk}
 		 <tr><td class="choice_cell">
-			
-		    <div class="choice{if $v.choice_img} choice-picture"{else}"{/if} 
+
+		    <div class="choice{if $v.choice_img} choice-picture"{else}"{/if}
 		        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 		            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
 		        {elseif $v.res_taxon_id!=''}
@@ -26,7 +26,7 @@
 			<span class="marker">{$step.number}{$v.marker}</span>.
 				<div class="text">{$v.choice_txt}</div>
 			</div>
-		
+
 		</td>
 		{if $v.choice_img}
 			<td class="image-cell" rowspan="2">
@@ -35,7 +35,7 @@
 						alt="{t}Choice{/t} {$step.number}{$v.marker}"
 						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
 						class="choice-image"
-						onclick="showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
+						onclick="showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');"
 						src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
 						/>
 				{else}
@@ -47,7 +47,7 @@
 						src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
 					/>
 					</a>
-				{/if}	
+				{/if}
 			</td>
 		{/if}
 		</tr>
@@ -65,15 +65,15 @@
 		</td>
 		{if $v.choice_img}<td></td>{/if}
 		</tr></table>
-		
+
 		{if not $smarty.foreach.henk.last}<tr><td class="separator"></td></tr>{/if}
 
 {/foreach}
-   
+
     </td></tr></table>
-		
-		
-		
+
+
+
 		</div>
 	</div>
 </div>
@@ -93,9 +93,9 @@
 
 	var panelTop = $('#panel').offset().top;
 	$('#page-main').scroll(function() {
-		//alert(panelTop);  
+		//alert(panelTop);
 		$('#panel').offset({top: panelTop});
-	  });	
+	  });
   });
 
 </script>
