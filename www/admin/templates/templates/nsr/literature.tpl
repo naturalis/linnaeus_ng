@@ -10,6 +10,8 @@ function add_ref()
 {
 	var new_id=$('#taxon_reference_id').val();
 	var new_label=$('#taxon_reference').val();
+	
+	if (new_id.length==0) return;
 
 	for (var i=0;i<new_refs.length;i++)
 	{
