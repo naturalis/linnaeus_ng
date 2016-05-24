@@ -1,4 +1,9 @@
 {include file="../shared/header.tpl"}
+<style>
+#categories {
+	width:75%;
+ }
+</style>
 
 <div id="header-titles">
 	<span id="header-title">{t}Index{/t}</span>
