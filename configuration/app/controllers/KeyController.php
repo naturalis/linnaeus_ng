@@ -532,10 +532,10 @@ class KeyController extends Controller
 				)
 			);
 		}
-		
+
 		foreach((array)$choices as $key => $val)
 		{
-			
+
 			$choices[$key]['choice_img'] = $this->getChoiceImage($val['id']);
 
 			if ($includeContent)
@@ -909,18 +909,17 @@ class KeyController extends Controller
 
     	// Append image to choice
         $img = $this->_mc->getItemMediaFiles();
-
-        if (!empty($img) && $img[0]['media_type'] ==  'image') {
+        if (!empty($img) && $img[0]['media_type'] == 'image') {
             return $img[0]['rs_original'];
         }
 
         return null;
     }
-	
+
 	private function setMediaController()
 	{
         $this->_mc = new MediaController();
-        $this->_mc->setModuleId($this->getCurrentModuleId('species'));
+        $this->_mc->setModuleId($this->getCurrentModuleId('key'));
         $this->_mc->setItemId($this->rGetId());
         $this->_mc->setLanguageId($this->getCurrentLanguageId());
 	}
