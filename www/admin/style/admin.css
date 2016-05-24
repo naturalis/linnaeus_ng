@@ -145,6 +145,7 @@ a:hover, .a:hover {
   border: 0px; }
 
 #page-header-titles {
+  width:900px;
   margin-left: 0px;
   margin-top: 10px;
   padding-bottom: 10px;

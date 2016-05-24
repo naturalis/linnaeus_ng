@@ -31,7 +31,7 @@
 	<span id="page-header-locality" style="color:#CC0000">[localhost]</span>
 	{/if}
 
-	{if $wikiUrl}
+	{if $wikiUrl}<br>
 	<div style="float:right;margin-top:auto;margin-bottom:auto">
     <a href="{$wikiUrl}" target="_blank">
     	<img src="../../media/system/qm_grey.png" style="width:15px;border:0" />
