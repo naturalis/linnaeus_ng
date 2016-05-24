@@ -788,6 +788,17 @@ class MediaController extends Controller
 
     private function uploadedFileIsValid ($file)
     {
+        // Check errors in file
+        switch ($file['error']) {
+            case 1:
+            case 2:
+                $this->addError(_('File too large') . ': ' . $file['name']);
+                return false;
+            case 3:
+                $this->addError(_('File upload incomplete') . ': ' . $file['name']);
+                return false;
+        }
+
         // Check mime type
         if (!$this->getMediaType($file['type'])) {
             $this->addError(_('Mime type') . ' ' . $file['type'] . ' ' .
@@ -802,16 +813,6 @@ class MediaController extends Controller
             return false;
         }
 
-        // Check errors in file
-        switch ($file['error']) {
-            case 1:
-            case 2:
-                $this->addError(_('File too large') . ': ' . $file['name']);
-                return false;
-            case 3:
-                $this->addError(_('File upload incomplete') . ': ' . $file['name']);
-                return false;
-        }
         return true;
     }
 
