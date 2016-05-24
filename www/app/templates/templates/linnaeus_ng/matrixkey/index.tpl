@@ -229,7 +229,7 @@ $(document).ready(function()
 </div>
     
 <div class="inline-templates" id="counterPaginateHtmlTpl">
-	%FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%
+	%FIRST-NUMBER%%DIVIDER%%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%
 </div>
 
 <div class="inline-templates" id="menuOuterHtmlTpl">
