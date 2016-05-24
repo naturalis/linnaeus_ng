@@ -319,7 +319,8 @@ final class MediaModel extends AbstractModel
 
         $query = "
             select
-                `media_id`
+                `media_id`,
+                `new_file`
             from
                 %PRE%media_conversion_log
             where
@@ -330,7 +331,7 @@ final class MediaModel extends AbstractModel
 
         $d = $this->freeQuery($query);
 
-        return isset($d) ? $d[0]['media_id'] : false;
+        return isset($d) ? $d[0] : false;
     }
 
     public function getMediaConversionId ($p)

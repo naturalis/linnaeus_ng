@@ -118,6 +118,7 @@ class MediaConverterController extends MediaController
                     // Upload file
                     } else {
 
+continue;
                         $this->uploadFile();
 
                         // Oops
@@ -500,7 +501,8 @@ class MediaConverterController extends MediaController
         ));
 
         if (!empty($d)) {
-            $this->_currentMediaId = $d;
+            $this->_currentMediaId = $d['media_id'];
+            $this->_rsFile = $d['new_file'];
         }
 
         return !empty($d);
@@ -563,6 +565,9 @@ class MediaConverterController extends MediaController
         if (!$this->_originalMediaId)  {
             return false;
         }
+
+        $this->setItemId($this->_currentItemId);
+        $this->setModuleId($this->_currentModuleId);
 
         // Captions for Taxa item
         if ($this->_currentModule == 'Taxon editor') {
