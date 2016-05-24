@@ -196,8 +196,6 @@ continue;
             str_pad($this->getCurrentProjectId(), 4, "0", STR_PAD_LEFT) .
             '\/)(([^,]+?)\.jpg)/i';
 
-        $regExp = '/(..\/..\/..\/shared\/media\/project\/0029\/)(([^,]+?)\.jpg)/i';
-
         foreach ($data as $row) {
 
             $this->resetProperties();
