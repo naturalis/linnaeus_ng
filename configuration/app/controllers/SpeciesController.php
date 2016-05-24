@@ -521,7 +521,7 @@ class SpeciesController extends Controller
     }
 
 
-    private function getTaxonNextLevel($id)
+    public function getTaxonNextLevel($id)
     {
         $t = $this->models->Taxa->_get(
         array(

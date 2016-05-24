@@ -567,6 +567,21 @@ class SpeciesControllerNSR extends SpeciesController
 				$categories[$dummy]['is_empty']=empty($ezData);
 			}
 
+
+
+			if (!$this->_suppressTab_CLASSIFICATION)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_CLASSIFICATION,
+						'title' => $this->translate('Classificatie'),
+						'is_empty' => false,
+						'tabname' => 'CTAB_CLASSIFICATION',
+						'auto_tab' => 1
+					)
+				);
+			}
+
 			if (!$this->_suppressTab_NAMES)
 			{
 				array_push($categories,
