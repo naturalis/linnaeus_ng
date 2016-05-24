@@ -156,7 +156,7 @@ table {
     font-size: 43px; }
 
 .topBar .pageTitle {
-  display: none; }
+  -isplay: none; }
   @media screen and (max-width: 980px) {
     .topBar .pageTitle {
       display: table-cell; } }

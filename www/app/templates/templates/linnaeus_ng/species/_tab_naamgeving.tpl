@@ -70,7 +70,7 @@
 		</table>
 	</p>
 
-	<p>
+	<!-- p>
 		<h2>{t}Classification{/t}</h2>
 
 		<ul class="taxonoverzicht">
@@ -92,7 +92,7 @@
 			{/foreach}
 			</li>				
 		</ul>
-	</p>
+	</p -->
 
 	<p>
 		{$content}

@@ -748,7 +748,8 @@ function printCountHeader()
 		);
 	}
 	
-	if (resultset.length==0 || matrixsettings.scoreThreshold==0)
+//	if (resultset.length==0 || matrixsettings.scoreThreshold==0)
+	if (resultset.length==0)
 	{
 		$('#result-count').html("");
 	};
