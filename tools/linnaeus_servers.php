@@ -204,7 +204,7 @@
 	// Alternatively it may be easier to do:
 	// $ls->addIpRange('http://145.136.240.*');
 	$ls->setGitUser('ruud-altenburg');
-	$ls->setGitPassword('ydlad>S2');
+	$ls->setGitPassword('password');
 	$ls->setCsvFile(dirname(__FILE__) . '/output/linnaeus_servers.csv');
 	$ls->run();
 
