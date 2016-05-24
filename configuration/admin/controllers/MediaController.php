@@ -1223,7 +1223,7 @@ class MediaController extends Controller
     private function createUser ()
     {
         $project = $this->getCurrentProjectData();
-        $newUser = $project['title'] . ' @ ' . $_SERVER['SERVER_NAME'];
+        $newUser = $project['sys_name'] . ' @ ' . $_SERVER['SERVER_NAME'];
         $this->_result =
             $this->getCurlResult($this->_rsNewUserUrl . '&newuser=' . urlencode($newUser));
         return $this->_result;
