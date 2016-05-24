@@ -85,7 +85,7 @@ class MediaConverterController extends MediaController
         if ($cli) $this->setCli();
 
         $this->setProjectMedia();
-/*
+
         foreach ($this->media['modules'] as $name => $module) {
 
             $this->setCurrentModule(array(
@@ -133,7 +133,7 @@ class MediaConverterController extends MediaController
             }
 
         }
-*/
+
         echo $this->_cli ? "\n\nConverting internal media links\n" :
             '</p><p><b>Converting internal media links</b><br>';
 
@@ -193,8 +193,6 @@ class MediaConverterController extends MediaController
         $regExp = '/(..\/..\/..\/shared\/media\/project\/' .
             str_pad($this->getCurrentProjectId(), 4, "0", STR_PAD_LEFT) .
             '\/)(([^,]+?)\.jpg)/i';
-
-        $regExp = '/(..\/..\/..\/shared\/media\/project\/0029\/)(([^,]+?)\.jpg)/i';
 
         foreach ($data as $row) {
 
