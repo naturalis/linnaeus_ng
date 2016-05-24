@@ -1,6 +1,6 @@
 {include file="../shared/_header-titles.tpl"}
 
-<div id="categories">
+<div id="categories" style="width:90%">
 
 <ul>
 	{foreach $categories v k}
@@ -50,9 +50,8 @@
 	{/foreach}
 	</p>
 	{/if}
-
-
 </div>
+
 {elseif $activeCategory=='literature'}
 {if $contentCount.literature>0}
 <div id="literature">
