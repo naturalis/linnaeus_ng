@@ -19,7 +19,7 @@ class Literature2Controller extends NsrController
 		'literature2_publication_types',
 		'literature2_publication_types_labels'
     );
-	
+
     public $controllerPublicName = 'Literature';
     public $usedHelpers = array('csv_parser_helper');
     public $cssToLoad = array('nsr_taxon_beheer.css','literature2.css');
@@ -111,6 +111,7 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign( 'prevSearch', $this->moduleSession->getModuleSetting('lookup_params') );
 		$this->smarty->assign( 'authorAlphabet', $this->getAuthorAlphabet() );
 		$this->smarty->assign( 'titleAlphabet', $this->getTitleAlphabet() );
+		$this->smarty->assign('incomplete', count($this->getIncompleteReferences()));
 		$this->printPage();
 	}
 
@@ -129,6 +130,18 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('references',$this->getReferences(array('publication_type'=>$this->rGetId(),'search'=>'*')));
 		$this->printPage();
 	}
+
+    public function checkAction()
+	{
+		$this->checkAuthorisation();
+
+		$this->setPageName($this->translate('Incompletely parsed references'));
+
+		$this->smarty->assign('references',$this->getIncompleteReferences());
+		$this->printPage();
+	}
+
+
 
     public function ajaxInterfaceAction ()
     {
@@ -228,14 +241,14 @@ class Literature2Controller extends NsrController
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 			$this->savePublicationType();
-		} 
+		}
 		else
 		if ( $this->rHasVal('action','save_translations') )
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 			$this->savePublicationTypeTranslations();
-		} 
+		}
 		else
 		if ( $this->rHasId() && $this->rHasVal('action','delete') )
 		{
@@ -1123,6 +1136,8 @@ class Literature2Controller extends NsrController
 			}
 		}
 
+		// Always set actor_id to null (incompletely parsed references have value -1)
+        $this->updateReferenceValue('actor_id', null);
 
 		// we'll generalize this once another one-many relation appears
 		//if ($this->rHasVar('actor_id'))  // no if, or the last quthor won't delete
@@ -1294,6 +1309,18 @@ class Literature2Controller extends NsrController
 		}
 	}
 
+	private function getIncompleteReferences ()
+	{
+		$data = $this->models->Literature2Model->getReferences(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'incomplete' => true
+		));
+		foreach ((array)$data as $key => $val) {
+			$data['authors'] = $this->getReferenceAuthors($val['id']);
+    	}
+    	return $data;
+	}
+
     private function getReferences($p)
     {
         $search=isset($p['search']) ? $p['search'] : null;
@@ -1445,7 +1472,7 @@ class Literature2Controller extends NsrController
 			{
 				$aa=isset($a['authors'][0]['name']) ? $a['authors'][0]['name'] : $a['author'];
 				$bb=isset($b['authors'][0]['name']) ? $b['authors'][0]['name'] : $b['author'];
-				
+
 				if (strtolower($aa)==strtolower($bb))
 				{
 					return strtolower($a['label'])>strtolower($b['label']);
@@ -1477,7 +1504,7 @@ class Literature2Controller extends NsrController
     		'languageId' => $this->getDefaultProjectLanguage(),
     		'literatureId' => $id
 		));
-		
+
 		foreach((array)$names as $key=>$val)
 		{
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
@@ -1505,13 +1532,13 @@ class Literature2Controller extends NsrController
             'project_id' => $this->getCurrentProjectId(),
     		'literature_id' => $id
 		));
-		
+
 		foreach((array)$taxa as $key=>$val)
 		{
 			$taxa[$key]['taxon']=
 				$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
-		
+
 
 		// TRAITS
 		$d = $this->models->Literature2Model->getReferenceLinksTraits(array(
@@ -1605,7 +1632,7 @@ class Literature2Controller extends NsrController
 
     private function setPublicationTypes()
     {
-		$d = 
+		$d =
             $this->models->Literature2Model->getPublicationTypes(array(
                 'projectId' => $this->getCurrentProjectId(),
                 'languageId' => $this->getDefaultProjectLanguage(),
@@ -1616,7 +1643,7 @@ class Literature2Controller extends NsrController
 		if ($d)
 		{
 			$this->publicationTypes=$d;
-		
+
 			foreach((array)$this->publicationTypes as $key=>$val)
 			{
 				$this->publicationTypes[$key]['translations']=
@@ -1631,13 +1658,13 @@ class Literature2Controller extends NsrController
 
     private function initializePublicationTypes()
     {
-		$d = 
+		$d =
             $this->models->Literature2Model->getPublicationTypes(array(
                 'projectId' => $this->getCurrentProjectId(),
                 'languageId' => $this->getDefaultProjectLanguage(),
                 'sortOrder' => $this->getPublicationTypesSortOrder()
             ));
-			
+
 		if ( empty($d) )
 		{
 			foreach((array)$this->basePubTypes as $val)
@@ -1650,7 +1677,7 @@ class Literature2Controller extends NsrController
 			}
 		}
 	}
-	
+
     private function getPublicationTypes()
     {
 		return $this->publicationTypes;
@@ -2116,7 +2143,7 @@ class Literature2Controller extends NsrController
 				"project_id"=>$this->getCurrentProjectId(),
 				"taxon_id"=>$taxon_id,
 				"literature_id"=>$this->getReferenceId()
-			));			
+			));
 		}
 	}
 
@@ -2133,7 +2160,7 @@ class Literature2Controller extends NsrController
 		$this->models->LiteratureTaxa->delete(array(
 			"project_id"=>$this->getCurrentProjectId(),
 			"literature_id"=>$id
-		));	
+		));
 	}
 
 
