@@ -146,6 +146,7 @@ final class Literature2Model extends AbstractModel
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $publicationTypeId = isset($params['publicationTypeId']) ? $params['publicationTypeId'] : null;
+        $incomplete = isset($params['incomplete']) ? $params['incomplete'] : null;
 
         if (is_null($projectId)) {
 			return null;
@@ -187,7 +188,9 @@ final class Literature2Model extends AbstractModel
 						"_a.publication_type_id in (" . implode(",",array_map('intval',$publicationTypeId)). ")" :
 						"_a.publication_type_id = " .
 					        mysqli_real_escape_string($this->databaseConnection, intval($publicationTypeId)) ) :
-					"" )."";
+					"" )."" .
+
+                ($incomplete ? ' and _a.actor_id = -1' : '');
 
         return $this->freeQuery($query);
     }
@@ -520,11 +523,11 @@ final class Literature2Model extends AbstractModel
 
 			where
 				_a.project_id = ".$project_id."
-				and _t.taxon_id= " . $taxon_id . " 
+				and _t.taxon_id= " . $taxon_id . "
 			order by
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
-			
+
         return $this->freeQuery($query);
     }
 
@@ -541,11 +544,11 @@ final class Literature2Model extends AbstractModel
 			insert into %PRE%literature_taxa
 				(project_id,taxon_id,literature_id,sort_order)
 			values
-				(".$project_id.",".$taxon_id.",".$literature_id.",".$sort_order.") 
+				(".$project_id.",".$taxon_id.",".$literature_id.",".$sort_order.")
 			";
-			
+
 		$this->freeQuery($query);
-		
+
 		return $this->getAffectedRows();
     }
 
@@ -565,7 +568,7 @@ final class Literature2Model extends AbstractModel
 				and project_id = " . $project_id . "
 				and taxon_id = " . $taxon_id . "
 			";
-			
+
 		$this->freeQuery($query);
     }
 
@@ -599,7 +602,7 @@ final class Literature2Model extends AbstractModel
 
 			where
 				_a.project_id = ".$project_id."
-				and _t.literature_id= " . $literature_id . " 
+				and _t.literature_id= " . $literature_id . "
 
 			order by
 				_a.taxon

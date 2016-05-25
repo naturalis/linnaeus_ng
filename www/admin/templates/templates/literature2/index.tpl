@@ -8,7 +8,7 @@
 			</td>
 			<td>
 				<input type="text" name="" id="lookup-input-title" onkeyup="lit2Lookup(this,'lookup_title');" />
-				
+
 			</td>
 			<td>
 				{foreach from=$titleAlphabet item=v}
@@ -37,6 +37,9 @@
 		<a href="edit.php">nieuwe literatuurreferentie aanmaken</a><br />
 		<a href="bulk_upload.php">bulk upload & matching</a><br />
 		<a href="publication_types.php">publicatievormen</a>
+		{if $incomplete > 0}
+			<br /><a href="check.php">{t}incompletely parsed references{/t}</a>
+		{/if}
 	</p>
 
 	<p>
