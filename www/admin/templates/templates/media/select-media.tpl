@@ -44,9 +44,9 @@
 	 			{else}
 					<input type="checkbox" name="media_ids[{$v.media_id}]" id="id_{$v.media_id}" {if $v.attached==1}checked disabled{/if}>
 	 			{/if}
-	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
-		 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
-	 			</a>
+	 			{if $v.media_type=="image"}<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">{/if}
+		 			<img class="thumbnail" src="{$v.thumbnails.medium}" alt="{$v.file_name}" />
+	 			{if $v.media_type=="image"}</a>{/if}
 	 			<span class="file-name">{$v.file_name} (<a href="edit.php?id={$v.media_id}">{t}edit{/t}</a>)</span>
 	 		</div>
 	 		<div class="list-info">

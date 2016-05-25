@@ -39,9 +39,9 @@
 		<label>
 	 	<li id="li_{$id_type}id_{$id}">
 	 		<div class="list-grid-info">
-	 			<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">
-		 			<img class="thumbnail" src="{$v.thumbnails.medium}" />
-	 			</a>
+	 			{if $v.media_type=="image"}<a href="{$v.source}" rel="prettyPhoto" title="{$v.file_name}">{/if}
+		 			<img class="thumbnail" src="{$v.thumbnails.medium}" alt="{$v.file_name}" />
+	 			{if $v.media_type=="image"}</a>{/if}
 	 			<span class="file-name">{$v.file_name}</span>
 	 		</div>
 	 		<div class="list-info">
@@ -85,7 +85,7 @@ $(document).ready(function() {
 	    }
 	});
 
-	$('input:text.link').focus().click(function(){
+	$('input:text.link').click(function(){
 		$(this).select();
 	});
 });
