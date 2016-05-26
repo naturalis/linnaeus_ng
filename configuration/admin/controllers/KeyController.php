@@ -590,8 +590,11 @@ class KeyController extends Controller
 
 		if (!$this->rGetId()) $this->redirect('step_show.php');
 
+
+
+
         if ($this->rHasVal('step') && $this->rHasVal('source') && $this->rHasVal('action', 'insert') && !$this->isFormResubmit())
-		{
+		{			
             $res = $this->insertKeyStepBeforeKeyStep($this->rGetVal('source'), $this->rGetVal('step'));
 
             $this->renumberKeySteps([$this->getKeyTree()]);
