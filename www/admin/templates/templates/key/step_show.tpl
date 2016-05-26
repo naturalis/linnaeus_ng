@@ -6,6 +6,8 @@
 
 <div id="page-main" class="key">
 
+<!-- step.id: {$step.id} -->
+
 <fieldset>
     <legend id="key-step-title">{t}Step{/t} {$step.number}{if $step.title}: {$step.title}{/if}</legend>
 
