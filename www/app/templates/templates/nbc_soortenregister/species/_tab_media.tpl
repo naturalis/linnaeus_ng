@@ -73,7 +73,7 @@ $(document).ready(function()
 {
 	{if $mediaCollected.species>0 &&  $requestData.media!='own'}
 	var action='get_collected_batch';
-	{elseif $mediaOwn.count>0 && $requestData.media!='collected'}
+	{else}
 	var action='get_media_batch';
 	{/if}
 	var page=0;

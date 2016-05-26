@@ -69,6 +69,10 @@ class NsrTaxonManagement extends NsrController
 	private $basicSubstitutionFields=
 		[
 			['field'=>'taxon','label'=>'scientific name'],
+			['field'=>'name:nomen','label'=>'nomen (scientific name w/o author)'],
+			['field'=>'name:uninomial','label'=>'uninomial (valid name 1st part)'],
+			['field'=>'name:specific_epithet','label'=>'specific epithet (valid name 2nd part)'],
+			['field'=>'name:infra_specific_epithet','label'=>'infra specific epithet (valid name 3rd part)'],
 			['field'=>'id','label'=>'taxon ID'],
 			['field'=>'project_id','label'=>'project ID'],
 			['field'=>'language_id','label'=>'language ID'],

@@ -502,7 +502,7 @@ function allLookupSetListMax(n)
 
 $(document).ready(function()
 {
-	acquireInlineTemplates();
+	if (typeof acquireInlineTemplates == 'function') acquireInlineTemplates();
 });
 
 

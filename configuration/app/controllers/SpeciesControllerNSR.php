@@ -32,6 +32,7 @@ class SpeciesControllerNSR extends SpeciesController
 		'name_types',
 		'names_additions',
 		'nsr_ids',
+		'names',
 		'taxon_quick_parentage'
 	);
 
@@ -367,6 +368,75 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		return $this->models->{$this->_model}->getFirstTaxonIdNsr($this->getCurrentProjectId());
 	}
+	
+	private function resolveSubstField( $p )
+	{
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
+		$val = isset($p['val']) ? $p['val'] : null;
+		$valid_name = isset($p['valid_name']) ? $p['valid_name'] : null;
+		
+		if (is_null($taxon) || is_null($val) ) return;
+
+		/*
+		['field'=>'taxon','label'=>'scientific name'],
+		['field'=>'name:nomen','label'=>'nomen (scientific name w/o author)'],
+		['field'=>'name:uninomial','label'=>'uninomial (valid name 1st part)'],
+		['field'=>'name:specific_epithet','label'=>'specific epithet (valid name 2nd part)'],
+		['field'=>'name:infra_specific_epithet','label'=>'infra specific epithet (valid name 3rd part)'],
+		['field'=>'id','label'=>'taxon ID'],
+		['field'=>'project_id','label'=>'project ID'],
+		['field'=>'language_id','label'=>'language ID'],
+		['field'=>'nsr_id','label'=>'NSR ID']
+		+
+		trait:...
+		*/
+
+		$sval=null;
+
+		if ( $val=='project_id' )
+		{
+			$sval=$this->getCurrentProjectId();
+		}
+		else
+		if ( $val=='language_id' )
+		{
+			$sval=$this->getCurrentLanguageId();
+		}
+		else
+		if( strpos($val,'name:')===0 )
+		{
+			$val=substr($val,strlen('name:'));
+
+			if ($val=='nomen')
+			{
+				$sval=trim(str_replace($valid_name['authorship'],'',$valid_name['name']));
+			}
+			else
+			if ( isset($valid_name[$val]) )
+			{
+				$sval=$valid_name[$val];
+			}
+		}
+		else
+		if( strpos($val,'trait:')!==false )
+		{
+			// 	val={trait:[traits_traits.trait_group_id]:[traits_traits.id]}
+			$trait=explode(':',$val);
+			$sval=$this->models->{$this->_model}->getTaxonTraitValue( array(
+				"project_id" => $this->getCurrentProjectId(),
+				"taxon_id" => $taxon['id'],
+				"trait_group_id" => $trait[1],
+				"trait_id" => $trait[2]
+			));
+		}
+		else
+		if ( isset($taxon[$val]) )
+		{
+			$sval=$taxon[$val];
+		}
+
+		return $sval;
+	}
 
 	private function parseExternalReference( $p )
 	{
@@ -376,19 +446,25 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ( is_null($taxon) || is_null($reference) ) return;
 
+		$valid_name=null;
+		foreach((array)$reference->substitute+(array)$reference->parameters as $val)
+		{
+			if (strpos($val,'name:')===0)
+			{
+				$valid_name=@$this->models->Names->_get(["id"=>[
+						"project_id"=>$this->getCurrentProjectId(),
+						"taxon_id"=>$taxon['id'],
+						"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']]
+					])[0];
+				break;
+			}
+		}
+
 		if ( isset($reference->substitute) )
 		{
 			foreach((array)$reference->substitute as $key=>$val)
 			{
-				if ( isset($taxon[$val]) )
-				{
-					$sval=$taxon[$val];
-				}
-				else
-				if ( $val=='project_id' )
-				{
-					$sval=$this->getCurrentProjectId();
-				}
+				$sval=$this->resolveSubstField(['taxon'=>$taxon,'val'=>$val,'valid_name'=>$valid_name]);
 
 				if ( isset($sval) )
 				{
@@ -400,38 +476,11 @@ class SpeciesControllerNSR extends SpeciesController
 					$reference->url = str_replace( $key, $sval, $reference->url );
 				}
 				else
-				if( strpos($val,'trait:')!==false )
-				{
-					// 	val={trait:[traits_traits.trait_group_id]:[traits_traits.id]}
-					$trait=explode(':',$val);
-					$sval=$this->models->{$this->_model}->getTaxonTraitValue( array(
-						"project_id" => $this->getCurrentProjectId(),
-						"taxon_id" => $taxon['id'],
-						"trait_group_id" => $trait[1],
-						"trait_id" => $trait[2]
-					));
-
-					if ( !empty($sval) )
-					{
-						if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
-						{
-							$sval=call_user_func($reference->substitute_encode, $sval );
-						}
-
-						$reference->url = str_replace( $key, $sval, $reference->url );
-					}
-					else
-					{
-						$reference->url = str_replace( $key, "" , $reference->url );
-					}
-				}
-				else
 				{
 					$reference->url = str_replace( $key, "" , $reference->url );
 				}
 			}
 		}
-
 
 		$query_string=null;
 
@@ -439,23 +488,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			foreach((array)$reference->parameters as $key=>$val)
 			{
-
-				$sval=null;
-
-				if ( $val=='project_id' )
-				{
-					$sval=$this->getCurrentProjectId();
-				}
-				else
-				if ( $val=='language_id' )
-				{
-					$sval=$this->getCurrentLanguageId();
-				}
-				else
-				if ( isset($taxon[$val]) )
-				{
-					$sval=$taxon[$val];
-				}
+				$sval=$this->resolveSubstField(['taxon'=>$taxon,'val'=>$val,'valid_name'=>$valid_name]);
 
 				if ( !empty($sval) )
 				{
@@ -464,13 +497,11 @@ class SpeciesControllerNSR extends SpeciesController
 						$sval=call_user_func($reference->parameter_encode, $sval );
 					}
 
-					$reference->url = str_replace( $key, $sval, $reference->url );
-
 					$query_string .= $key .'=' . rawurlencode( $sval ) . '&';
 				}
 			}
 		}
-
+		
 		$parts=parse_url( $reference->url );
 
 		$full_url=$reference->url . ( !empty($query_string) ? ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' ) : "" );

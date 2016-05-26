@@ -10,7 +10,7 @@
 			url : "http://localhost/linnaeus_ng/shared/tools/remote_service.php",
 			type: "POST",
 			data : ({
-				url : encodeURIComponent('https://drive.google.com/uc?export=download&id=0B6lEuEkvUQ7PaXE1a1hKWUZlNjQ')',
+				url : encodeURIComponent('https://drive.google.com/uc?export=download&id=0B6lEuEkvUQ7PaXE1a1hKWUZlNjQ'),
 				original_headers : 1
 			}),
 			success : function( response )

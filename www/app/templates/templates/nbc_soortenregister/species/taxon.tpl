@@ -66,9 +66,6 @@
         
         <h1>{$activeCategory}</h1>
 
-
-
-
 			{if $content|@is_array}
 			<ul>
 				{foreach from=$content item=v key=k}
@@ -99,7 +96,6 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	
 	$( 'title' ).html( $('<p>' + $('.main-display-name').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
 	
 	if(jQuery().prettyPhoto) {
@@ -133,6 +129,8 @@ $(document).ready(function()
 	{if $pp_popup}
 	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
+
+	if (typeof acquireInlineTemplates == 'function') acquireInlineTemplates();
 	
 } );
 </script>
