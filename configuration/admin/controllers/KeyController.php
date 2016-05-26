@@ -288,8 +288,6 @@ class KeyController extends Controller
 
             $id = $this->createNewKeystep();
 
-            $this->renumberKeySteps([$this->getKeyTree()]);
-
             if ($this->rHasVal('insert'))
 			{
                 $this->insertKeyStep($id, $this->rGetVal('insert'));
@@ -583,6 +581,21 @@ class KeyController extends Controller
         $this->printPage();
     }
 
+    public function renumberAction()
+    {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->checkAuthorisation();
+
+        if ($this->rHasVal('action', 'renumber') && !$this->isFormResubmit())
+		{			
+			$this->renumberKeySteps([$this->getKeyTree()]);
+			$this->addMessage($this->translate('Renumbered steps.'));
+        }
+
+        $this->printPage();
+    }
+
+
     public function insertAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
@@ -590,12 +603,19 @@ class KeyController extends Controller
 
 		if (!$this->rGetId()) $this->redirect('step_show.php');
 
-        if ($this->rHasVal('step') && $this->rHasVal('source') && $this->rHasVal('action', 'insert') && !$this->isFormResubmit())
-		{
+        if ($this->rHasVal('step') && $this->rHasVal('action', 'insert') && !$this->isFormResubmit())
+		{			
             $res = $this->insertKeyStepBeforeKeyStep($this->rGetVal('source'), $this->rGetVal('step'));
-
-            $this->renumberKeySteps([$this->getKeyTree()]);
-
+			
+			if ( $res['newStepId'] && $this->rHasVal('step_title') )
+			{
+				$this->saveKeystepContent([
+					'id'=>$res['newStepId'],
+					'language'=>$this->getDefaultProjectLanguage(),
+					'title'=>$this->rGetVal('step_title')
+				]);
+			}
+					
             $step = $this->getKeystep($res['newStepId']);
 
 			// remove last keyPath entry
@@ -614,13 +634,6 @@ class KeyController extends Controller
             ));
 
             $this->redirect('step_show.php?id=' . $res['newStepId']);
-        }
-        else
-		if ($this->rHasVal('action', 'renumber') && !$this->isFormResubmit())
-		{
-            $this->renumberKeySteps([$this->getKeyTree()]);
-
-            $this->redirect('step_show.php');
         }
 
         $step=$this->getKeystep($this->rGetId());
@@ -1382,38 +1395,51 @@ class KeyController extends Controller
 
     private function saveKeystepContent($data)
     {
-        if (empty($data['language']))
+		$keystep_id = isset($data['id']) ? $data['id'] : null;
+		$language_id = isset($data['language']) ? $data['language'] : null;
+		
+		if ( isset($data['content']) ) 
+		{
+			$title = isset($data['content'][0]) ? $data['content'][0] : null;
+			$content = isset($data['content'][1]) ? $data['content'][1] : null;
+		}
+		else
+		{
+			$title = isset($data['title']) ? $data['title'] : null;
+			$content = isset($data['content']) ? $data['content'] : null;
+		}
+		
+		
+        if ( is_null($keystep_id) || is_null($language_id) )
 		{
             return;
         }
-        else
-		{
-            $ck = $this->models->ContentKeysteps->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'keystep_id' => $data['id'],
-                    'language_id' => $data['language']
-                )
-            ));
 
-            $newContent = trim($data['content'][1]) == '' ? 'null' : trim($data['content'][1]);
-            $newTitle = trim($data['content'][0]) == '' ? 'null' : trim($data['content'][0]);
+		$ck = $this->models->ContentKeysteps->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'keystep_id' => $keystep_id,
+				'language_id' => $language_id
+			)
+		));
 
-            $d = array(
-                'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null,
-                'project_id' => $this->getCurrentProjectId(),
-                'keystep_id' => $data['id'],
-                'language_id' => $data['language'],
-                'title' => $newTitle,
-                'content' => $newContent
-            );
+		$newTitle = trim($title) == '' ? 'null' : trim($title);
+		$newContent = trim($content) == '' ? 'null' : trim($content);
 
-            // save step
-            $this->models->ContentKeysteps->save($d);
+		$d = array(
+			'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null,
+			'project_id' => $this->getCurrentProjectId(),
+			'keystep_id' => $keystep_id,
+			'language_id' => $language_id,
+			'title' => $newTitle,
+			'content' => $newContent
+		);
 
-            $this->smarty->assign('returnText', $this->models->ContentKeysteps->getAffectedRows() > 0 ? $this->translate('saved') : '');
-        }
+		// save step
+		$this->models->ContentKeysteps->save($d);
+
+		$this->smarty->assign('returnText', $this->models->ContentKeysteps->getAffectedRows() > 0 ? $this->translate('saved') : '');
     }
 
     private function deleteLegacyImage($step)
@@ -1787,7 +1813,6 @@ class KeyController extends Controller
             'id' => $newChoice
         ));
 
-        $this->renumberKeySteps([$this->getKeyTree()]);
     }
 
     // inserting between a step and the choice that led to it
