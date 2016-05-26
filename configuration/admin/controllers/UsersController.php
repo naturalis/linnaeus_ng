@@ -126,9 +126,12 @@ class UsersController extends Controller
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
 
 		$this->setUserId( $this->rGetId() );
-		$this->setUserBefore();
-		$this->removeUserFromCurrentProject();
-		$this->logUserChange( $this->translate('removed user from project') );
+		if ( $this->canRemoveUser() )
+		{
+			$this->setUserBefore();
+			$this->removeUserFromCurrentProject();
+			$this->logUserChange( $this->translate('removed user from project') );
+		}
 		$this->redirect('index.php');
     }
 
@@ -1068,7 +1071,13 @@ class UsersController extends Controller
 	{
 		return $this->_userBefore;
 	}
-	
+
+	private function canRemoveUser()
+	{
+		$this->setUser();
+		return $this->getUser()['is_sysadmin']!=true;
+	}
+
 	private function logUserChange( $note )
 	{
 		$this->setUser();
