@@ -535,8 +535,6 @@ class MediaController extends Controller
         $this->models->Media->update(
             array(
                 'id' => $d['id'],
-        		'name' => $d['name'],
-        		'original_name' => $d['original_name'],
                 'title' => $d['title']
     		), array (
         		'project_id' => $this->getCurrentProjectId(),
