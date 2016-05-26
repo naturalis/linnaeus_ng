@@ -15,7 +15,6 @@
 	<a href="taxon_new.php">{t}new taxon concept{/t}</a><br />
 	<a href="taxon_deleted.php">{t}taxon concepts marked as deleted{/t}</a><br />
 	<a href="update_parentage.php">{t}update index table{/t}</a><br />
-	<a href="activity_log.php">{t}editor log{/t}</a><br /><br />
 	<a href="nsr_id_resolver.php">{t}NSR ID resolver{/t}</a><br />
 	<a href="../import/export_versatile.php">{t}multi-purpose export{/t}</a><br />
 	<a href="image_meta_bulk.php">{t}image meta-data bulk upload{/t}</a><br />

@@ -41,6 +41,9 @@ function getSpecimens()
 
 function processBaseData()
 {
+	
+	if (!basedata.searchResults) return;
+	
 	for(var i=0; i<basedata.searchResults.length; i++)
 	{
 		var r=basedata.searchResults[i].result;
