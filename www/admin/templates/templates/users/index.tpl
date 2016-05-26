@@ -18,17 +18,19 @@
         <td>{$v.first_name}</td>
         <td>{$v.last_name}</td>
         <td>{$v.email_address}</td>
-        <td>{$v.active}</td>
+        <td>{if $v.active==1}y{else}n{/if}</td>
         <td>{$v.last_login}</td>
         <td>
         [ <a href="view.php?id={$v.id}">{t}view{/t}</a> ]
         {if $v.project_role}
+       	{if $currentUserId != $v.id && !$v.is_sysadmin}
         [ <a href="remove_user.php?id={$v.id}">{t}remove from project{/t}</a> ]
+        {/if}
         {else}
         [ <a href="add_user.php?id={$v.id}">{t}add to project{/t}</a> ]
         {/if}
-        {if $v.id==$currentUserId}<span title="you">&deg;</span>{/if}
         {if $v.hidden}<span title="user normally hidden">!</span>{/if}
+        {if $v.id==$currentUserId}<span title="you">&deg;</span>{/if}
         </td>
     </tr>
 {/function}
@@ -63,7 +65,7 @@ table.collaborators th {
     
         {if $non_users|@count>0}
         <tr><td colspan="9"></td></tr>
-        <tr><td colspan="9"><h4 class="inlineHeader">Users currently not assigned to {$session.admin.project.sys_name}</h4></td></tr>
+        <tr><td colspan="9"><h4 class="inlineHeader">{t _s=$session.admin.project.sys_name}Users currently not assigned to %s{/t}</h4></td></tr>
         {table_head}
         {/if}
 
