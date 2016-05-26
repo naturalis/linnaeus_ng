@@ -69,6 +69,7 @@ $(document).ready(function()
 		$("a[rel^='prettyPhoto']").prettyDialog();
 	}
 
+	/*
 	if( jQuery().shrinkText )
 	{
 		$("#title a").shrinkText();
@@ -80,6 +81,7 @@ $(document).ready(function()
 			$("#header-title").shrinkText();
 		});
 	}
+	*/
 
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
 	{foreach from=$requestData key=k item=v}
