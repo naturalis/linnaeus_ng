@@ -27,9 +27,7 @@ class ModuleIdentifierController extends Controller
     public function __construct ()
     {
         parent::__construct();
-
         $this->loadExternalModel('ModuleIdentifierModel');
-
         $this->setProjectModules();
     }
 
