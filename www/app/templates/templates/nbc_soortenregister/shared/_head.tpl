@@ -41,7 +41,7 @@
     <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}morris.css" />
-
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
@@ -65,6 +65,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/morris.js-0.4.3/morris.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/raphael/raphael-min.js"></script>
+    <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 
 
 	{if $javascriptsToLoad}

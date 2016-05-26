@@ -173,6 +173,11 @@ textarea {
 									</td>
                                 </tr>
 							</table>
+                            need to add:
+                            <ul>
+                            	<li>show only for certain ranks</li>
+                            	<li>somehow check remotely</li>
+                            </ul>
 						</td>
 					</tr>
                     <tr>
