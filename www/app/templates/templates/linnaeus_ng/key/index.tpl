@@ -6,7 +6,7 @@
 	<div id="step">
 
     <p id="header-titles-small">
-    	<span id="header-title">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
+    	<span id="header-title" style="white-space:normal">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
     </p>
 
 		<div id="question"  style="width:550px;">

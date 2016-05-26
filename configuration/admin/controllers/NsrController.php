@@ -38,6 +38,11 @@ class NsrController extends Controller
     {
 		$this->Rdf = new RdfController;
 		$this->smarty->assign( 'noautoexpand', $this->rHasVal('noautoexpand','1') );
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+		$this->smarty->assign( 'show_nsr_specific_stuff',$this->show_nsr_specific_stuff );
+	
 	}
 
 	public function getActors()

@@ -52,7 +52,6 @@ class KeyModel extends AbstractModel
 				and _c.language_id = " . $language_id . "
 
 			where _a.project_id = " . $project_id . "
-				and _a.is_start = 0
 				and _b.res_keystep_id = " . $res_keystep_id . "
 
 			order by
