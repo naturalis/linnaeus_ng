@@ -117,7 +117,7 @@ final class MediaModel extends AbstractModel
                 t1.`project_id` = ' . $this->escapeString($projectId) .
                 $this->appendSearchWhere($search, $searchType) .
         ($groupBy ? '
-            group by `' . $groupBy : '') . '
+            group by `' . $groupBy . '`' : '') . '
             order by t1.`' .  $sort  . '`' .
         ($limit ? '
             limit ' . $limit : ''
