@@ -23,6 +23,39 @@ final class MediaModel extends AbstractModel
         parent::__destruct();
     }
 
+    // Alternative for Table->_get as this crashed on large result sets
+    public function getAllMediaFiles ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $p['project_id'] : false;
+        $sort = isset($p['sort']) && !empty($p['sort']) ?
+            $p['sort'] : 'name';
+
+        if (!$projectId) return false;
+
+        $query = '
+            select
+                `rs_id`,
+                `id`,
+                `title`,
+                `name`,
+                `mime_type`,
+                `height`,
+                `width`,
+                `rs_original`,
+                `last_change`,
+                `rs_thumb_small`,
+                `rs_thumb_medium`,
+                `rs_thumb_large`
+            from
+                %PRE%media
+            where
+                `deleted` = 0 and
+                `project_id` = ' . $this->escapeString($projectId) . '
+            order by `' . $this->escapeString($sort) . '`';
+
+        return $this->freeQuery($query);
+    }
 
     public function search ($p)
     {
@@ -46,7 +79,7 @@ final class MediaModel extends AbstractModel
                 'file_name' => $v
             );
             // Bit of a hack but whatever
-            $groupBy = 't1.id';
+            $groupBy = 't1.`id`';
         }
 
         if (!isset($search['metadata']) && !isset($search['tags']) &&
@@ -56,7 +89,18 @@ final class MediaModel extends AbstractModel
 
         $query = '
             select
-                t1.*
+                t1.`rs_id`,
+                t1.`id`,
+                t1.`title`,
+                t1.`name`,
+                t1.`mime_type`,
+                t1.`height`,
+                t1.`width`,
+                t1.`rs_original`,
+                t1.`last_change`,
+                t1.`rs_thumb_small`,
+                t1.`rs_thumb_medium`,
+                t1.`rs_thumb_large`
             from
                 %PRE%media as t1 ' .
         ($this->arrayHasData($search['metadata']) ? '
@@ -73,8 +117,8 @@ final class MediaModel extends AbstractModel
                 t1.`project_id` = ' . $this->escapeString($projectId) .
                 $this->appendSearchWhere($search, $searchType) .
         ($groupBy ? '
-            group by ' . $groupBy : '') . '
-            order by t1.' .  $sort  .
+            group by `' . $groupBy : '') . '`
+            order by t1.`' .  $sort  . '`' .
         ($limit ? '
             limit ' . $limit : ''
         );

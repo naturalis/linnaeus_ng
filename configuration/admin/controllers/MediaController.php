@@ -430,8 +430,8 @@ class MediaController extends Controller
         }
 
         $this->smarty->assign('media', $this->getMediaFiles());
-        $this->smarty->assign('module_id', $this->rGetVal('module_id'));
-        $this->smarty->assign('item_id', $this->rGetVal('item_id'));
+        $this->smarty->assign('module_id', $this->moduleId);
+        $this->smarty->assign('item_id', $this->itemId);
 		$this->smarty->assign('from', 'select');
 
         $this->printPage();
@@ -586,9 +586,7 @@ class MediaController extends Controller
     public function uploadAction ()
     {
         $this->checkAuthorisation();
-
 		$this->setPageName($this->translate('Upload media'));
-
         $this->setItemTemplate();
 
         // Only upload if upload button has been pushed!
@@ -722,33 +720,21 @@ class MediaController extends Controller
     private function setItemTemplate ()
     {
         // Verify module_id and item_id if set
-        if ($this->rHasVal('module_id') && $this->rHasVal('item_id')) {
+        if ($this->moduleId != -1 && $this->itemId != -1) {
 
             $mi = new ModuleIdentifierController();
             $mi->setModuleId($this->moduleId);
             $mi->setItemId($this->itemId);
             $mi->setLanguageId($this->languageId);
 
+            $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
+                'single' : 'multiple';
+
             $this->smarty->assign('module_name', $mi->getModuleName());
             $this->smarty->assign('item_name', $mi->getItemName());
             $this->smarty->assign('back_url', $this->setBackUrl());
-            $this->smarty->assign('input_type', $this->setInputType());
+            $this->smarty->assign('input_type', $type);
         }
-    }
-
-    private function setInputType ()
-    {
-        $mi = new ModuleIdentifierController();
-        $mi->setModuleId($this->moduleId);
-        $mi->setItemId($this->itemId);
-
-        $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
-            'single' : 'multiple';
-
-        unset($mi);
-
-        return $type;
-
     }
 
     public function setSortOrder ($p)
@@ -1027,13 +1013,10 @@ class MediaController extends Controller
 
         // Return everything for item or general
         } else {
-            $media = $this->models->Media->_get(array(
-    			'id' => array(
-    				'project_id' => $this->getCurrentProjectId(),
-    			    'deleted' => 0
-    			),
-                'order' => $sort
-    		));
+            $media = $this->models->MediaModel->getAllMediaFiles(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sort' => $sort
+            ));
         }
 
         if ($this->moduleId != -1 && $this->itemId != 1) {
@@ -1074,7 +1057,6 @@ class MediaController extends Controller
                     in_array($resource['id'], $attached) ? 1 : 0;
 
                 $files[] = $file;
-                //$list['files'][$i] = $file;
             }
         }
 
