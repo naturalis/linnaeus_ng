@@ -137,12 +137,14 @@ class MediaController extends Controller
 
     public $cssToLoad = array(
         'media.css',
-        'paginator.css'
+        'paginator.css',
+        'inline_templates.css'
     );
 
     public $jsToLoad = array(
 		'all' => array(
 			'media.js',
+		    'inline_templates.js'
 		)
 	);
 
@@ -364,13 +366,25 @@ class MediaController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-		if ( !$this->getAuthorisationState() ) return;
+        if ( !$this->getAuthorisationState() ) return;
 
         if ($this->rHasVal('action', 'upload_progress')) {
             $this->smarty->assign('returnText', $this->getUploadProgress('media'));
+            $this->printPage();
         }
         if ($this->rHasVal('action', 'display_preference')) {
-             $_SESSION['admin']['user']['media']['display'] = $this->rGetVal('type');
+            $_SESSION['admin']['user']['media']['display'] = $this->rGetVal('type');
+        }
+        if ($this->rHasVal('action', 'type_to_find')) {
+            $result = $this->getMediaFiles(array(
+                'search' => $this->rGetVal('search'),
+                'limit' => $this->itemsPerPage
+            ));
+            $this->smarty->assign('returnText', json_encode(array(
+                'total' => $result['total'],
+                'files' => $result['files']
+            )));
+            $this->printPage();
         }
         return false;
     }
@@ -394,7 +408,6 @@ class MediaController extends Controller
     public function selectRsAction ()
     {
         $this->checkAuthorisation();
-
 		$this->setPageName($this->translate('Browse Media on ResourceSpace server'));
 
         $this->smarty->assign('media', $this->getRsMediaList());
@@ -405,9 +418,7 @@ class MediaController extends Controller
     public function selectAction ()
     {
         $this->checkAuthorisation();
-
 		$this->setPageName($this->translate('Browse media'));
-
         $this->setItemTemplate();
 
         if ($this->rHasVal('action', 'delete')) {
@@ -429,18 +440,14 @@ class MediaController extends Controller
     public function mediaOverlayAction ()
     {
         $this->checkAuthorisation();
-
 		$this->setPageName($this->translate('Browse media'));
-
         $this->smarty->assign('media', $this->getMediaFiles());
-
         $this->printPage();
     }
 
     public function searchAction ()
     {
         $this->checkAuthorisation();
-
 		$this->setPageName($this->translate('Search media'));
 
         foreach ($this::$metadataFields as $f) {
@@ -466,9 +473,7 @@ class MediaController extends Controller
     public function editAction ()
     {
         $this->checkAuthorisation();
-
 		$this->setPageName($this->translate('Edit media'));
-
 		$id = $this->rGetVal('id');
 
         // Save button has been pushed (language switch should not trigger save)
@@ -1008,13 +1013,16 @@ class MediaController extends Controller
     {
         $search = isset($p['search']) ? $p['search'] : false; // empty to return everything
         $sort = isset($p['sort']) ? $p['sort'] : 'name';
+        $limit = isset($p['limit']) ? $p['limit'] : false;
 
         // Search
         if (!empty($search)) {
             $media = $this->models->MediaModel->search(array(
                 'search' => $search,
                 'sort' => $sort,
-                'project_id' => $this->getCurrentProjectId()
+                'project_id' => $this->getCurrentProjectId(),
+                'limit' => $limit,
+                'search_type' => 'or'
             ));
 
         // Return everything for item or general
@@ -1070,10 +1078,14 @@ class MediaController extends Controller
             }
         }
 
-        $d = $this->getPaginationWithPager($files, $this->itemsPerPage);
-        $list['files'] = $d['items'];
-        unset($d['items']);
-        $list = array_merge($list, $d);
+        if (isset($files)) {
+            $d = $this->getPaginationWithPager($files, $this->itemsPerPage);
+            $list['files'] = $d['items'];
+            unset($d['items']);
+            $list = array_merge($list, $d);
+        } else {
+            $list['files'] = array();
+        }
 
         return $list;
     }
@@ -1342,7 +1354,6 @@ class MediaController extends Controller
                  ));
             }
         }
-
     }
 
 

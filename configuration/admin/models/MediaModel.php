@@ -32,6 +32,22 @@ final class MediaModel extends AbstractModel
             $p['project_id'] : false;
         $sort = isset($p['sort']) && !empty($p['sort']) ?
             $p['sort'] : 'name';
+        $searchType = isset($p['search_type']) && !empty($p['search_type']) &&
+            in_array($p['search_type'], array('and', 'or')) ? $p['search_type'] : 'and';
+        $limit = isset($p['limit']) && !empty($p['limit']) ? $p['limit'] : false;
+
+        // Cast search to appropriate array if it is a string
+        $groupBy = false;
+        if ($search && !is_array($search)) {
+            $v = $search;
+            $search = array(
+                'metadata' => array($v),
+                'tags' => array($v),
+                'file_name' => $v
+            );
+            // Bit of a hack but whatever
+            $groupBy = 't1.id';
+        }
 
         if (!isset($search['metadata']) && !isset($search['tags']) &&
             !isset($search['file_name']) || !$projectId) {
@@ -43,30 +59,35 @@ final class MediaModel extends AbstractModel
                 t1.*
             from
                 %PRE%media as t1 ' .
-        ($this->arrayHasData($search['metadata']) ?
-            'left join
+        ($this->arrayHasData($search['metadata']) ? '
+            left join
                 %PRE%media_metadata as t2
                 on t1.`id` = t2.`media_id` ' : ''
         ) .
-        ($this->arrayHasData($search['tags']) ?
-            'left join
+        ($this->arrayHasData($search['tags']) ? '
+            left join
                 %PRE%media_tags as t3
-                on t1.`id` = t3.`media_id` ' : ''
-        ) . '
+                on t1.`id` = t3.`media_id` ' : '') . '
             where
                 t1.`deleted` = 0 and
                 t1.`project_id` = ' . $this->escapeString($projectId) .
-                $this->appendSearchWhere($search);
+                $this->appendSearchWhere($search, $searchType) .
+        ($groupBy ? '
+            group by ' . $groupBy : '') . '
+            order by t1.' .  $sort  .
+        ($limit ? '
+            limit ' . $limit : ''
+        );
 
         return $this->freeQuery($query);
     }
 
-    private function appendSearchWhere ($search) {
+    private function appendSearchWhere ($search, $searchType = 'and') {
         if ($this->arrayHasData($search['metadata'])) {
             foreach ($search['metadata'] as $k => $v) {
                 if ($v != '') {
                     $a[] = "t2.`sys_label` = '" . $this->escapeString(trim($k)) .
-                        "' and t2.`metadata` like '" . $this->escapeString(trim($v)) . "%'";
+                        "' and t2.`metadata` like '%" . $this->escapeString(trim($v)) . "%'";
                 }
             }
         }
@@ -76,9 +97,9 @@ final class MediaModel extends AbstractModel
             }
         }
         if ($search['file_name'] != '') {
-            $a[] = "t1.`name` like '" . $this->escapeString(trim($search['file_name'])) . "%'";
+            $a[] = "t1.`name` like '%" . $this->escapeString(trim($search['file_name'])) . "%'";
         }
-        return isset($a) ? ' and ' . implode(' and ', $a) : null;
+        return isset($a) ? ' and ' . implode(' ' . $searchType . ' ', $a) : null;
     }
 
 
