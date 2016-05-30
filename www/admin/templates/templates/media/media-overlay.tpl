@@ -7,7 +7,9 @@
 		width: 100%;
 	}
 </style>
+{include file="select-media.tpl"}
 
+<!--
 <div id="media-main">
 
     {if $media.total > 0}
@@ -91,3 +93,4 @@ $(document).ready(function() {
 });
 </script>
 {/literal}
+-->
