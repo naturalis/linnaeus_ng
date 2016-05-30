@@ -82,7 +82,7 @@
 
 <p>
 	<a href="paspoort_meta.php?id={$concept.id}" class="edit"  style="margin:0">{t}meta-data{/t}</a><br />
-	<a id="media-overlay-links" href="#" class="edit" style="margin:0">{t}media overlay{/t}</a><br>
+	<!--<a id="media-overlay-links" href="#" class="edit" style="margin:0">{t}media overlay{/t}</a><br>-->
 
 </p>
 
