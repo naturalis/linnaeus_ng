@@ -31,9 +31,11 @@
         </tr>                
         <tr>
             <td>{t}Character type{/t}:</td>
-            <td>	<select name="type" id="type">
+            <td>	
+            <select name="type" id="type">
                 {foreach $charTypes v k}
-                    <option value="{$v.name}" {if $characteristic.type.name==$v.name}selected="selected"{/if}>{t}{$v.name}{/t}</option>
+                {$v.name|@var_dump}
+                    <option value="{$v.name}" {if $characteristic.type==$v.name}selected="selected"{/if}>{t}{$v.name}{/t}</option>
                 {/foreach}
                 </select>
     		</td>
