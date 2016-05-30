@@ -106,6 +106,12 @@ function printBaseData()
 			.replace('%SHOWING%', maxresults)
 			.replace('%TOTAL%', results.length)
 	}
+
+		header=fetchTemplate( 'resultHeaderTpl' )
+			.replace('%SHOWING%', maxresults)
+			.replace('%TOTAL%', results.length)
+	
+	urlHeaderTpl
 	
 	$('#results').html( header + buffer.join( "\n" ) );
 	
@@ -157,10 +163,18 @@ $(document).ready(function()
 	getSpecimens();
 });
 </script>
+<p style="display:none"><code id=url></code></p>
+
 
 <div class="inline-templates" id="resultHeaderTpl">
 <!--
 	<p><b>{t}Showing %SHOWING% of %TOTAL% specimen{/t}</b></p>
+-->
+</div>
+
+<div class="inline-templates" id="urlHeaderTpl">
+<!--
+	<p><a href="%URL%" target=_blank>see all</a></p>
 -->
 </div>
 
@@ -178,3 +192,4 @@ $(document).ready(function()
 	</div>
 -->
 </div>
+
