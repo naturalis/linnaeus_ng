@@ -100,6 +100,29 @@ class ModuleIdentifierController extends Controller
         }
     }
 
+    public function setMediaBackUrl ()
+    {
+        if (!$this->moduleId || !$this->itemId) {
+            return false;
+        }
+
+        $controller = $this->getModuleController();
+
+        if ($controller) {
+            switch ($controller) {
+                case 'nsr':
+                case 'glossary':
+                    return '../' . $controller. '/media.php?id=' . $this->itemId;
+                case 'key':
+                    return '../' . $controller. '/choice_edit.php?id=' . $this->itemId;
+                case 'matrixkey':
+                    return '../' . $controller. '/state.php?id=' . $this->itemId;
+                default:
+                    return '../' . $controller. '/edit.php?id=' . $this->itemId;
+            }
+        }
+    }
+
     public function getItemName ()
 	{
         if (!$this->moduleId || !$this->itemId) {

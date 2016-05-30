@@ -432,7 +432,8 @@ class MediaController extends Controller
 
             $this->smarty->assign('module_name', $mi->getModuleName());
             $this->smarty->assign('item_name', $mi->getItemName());
-            $this->smarty->assign('back_url', $this->setBackUrl());
+            //$this->smarty->assign('back_url', $this->setBackUrl());
+            $this->smarty->assign('back_url', $mi->setMediaBackUrl());
             $this->smarty->assign('input_type', $type);
         }
 
@@ -777,10 +778,10 @@ class MediaController extends Controller
         if (isset($_SERVER['HTTP_REFERER'])) {
             $url = $_SERVER['HTTP_REFERER'];
             // Append id if this is not present in the referrer
-            if (strpos($url, 'id=') === false) {
+            if (strpos($url, 'id=') === false && $this->itemId != -1) {
                 $url .= (strpos($url, '?') === false ? '?' : "&") . 'id=' . $this->itemId;
             }
-            if (strpos($url, 'language_id=') === false) {
+            if (strpos($url, 'language_id=') === false && $this->languageId != -1) {
                 $url .= (strpos($url, '?') === false ? '?' : "&") . 'language_id=' . $this->languageId;
             }
             return $url;
