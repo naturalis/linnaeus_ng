@@ -438,7 +438,7 @@ final class MediaModel extends AbstractModel
             $this->escapeString($p['column']) : false;
 
         if (!$projectId || !$table || !$column) return false;
-/*
+
         $query = "
             select
             	`id`, `" . $column . "` as content
@@ -447,14 +447,7 @@ final class MediaModel extends AbstractModel
             where
             	$column REGEXP '../../../shared/media/project/" .
             	   str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/(.*).jpg'";
-*/
-        $query = "
-            select
-            	`id`, `" . $column . "` as content
-            from
-            	%PRE%" . $table . "
-            where
-            	$column REGEXP '../../../shared/media/project/0029/(.*).jpg'";
+
         $d = $this->freeQuery($query);
 
         return isset($d) ? $d : false;
@@ -474,6 +467,34 @@ final class MediaModel extends AbstractModel
         $query = "update $table set $column = '$content' where id = $id";
 
         return $this->freeQuery($query);
+    }
+
+    public function replaceInternalMediaLinks ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $this->escapeString($p['project_id']) : false;
+        $table = isset($p['table']) && !empty($p['table']) ?
+            $this->escapeString($p['table']) : false;
+        $column = isset($p['column']) && !empty($p['column']) ?
+            $this->escapeString($p['column']) : false;
+        $oldMedia = isset($p['old_media']) && !empty($p['old_media']) ?
+            $this->escapeString($p['old_media']) : false;
+        $newMedia = isset($p['new_media']) && !empty($p['new_media']) ?
+            $this->escapeString($p['new_media']) : false;
+
+        $path = 'onclick="showMedia(\'%s\',\'%s\');';
+        $oldUrl = sprintf($path, $oldMedia['rs_original'], $oldMedia['name']);
+        $newUrl = sprintf($path, $newMedia['rs_original'], $newMedia['name']);
+
+        $query = "
+            update
+                `$table`
+            replace(`$column`, '$oldUrl', '$newUrl')
+            where
+                `$column` like '%$oldUrl%' and
+                `project_id` = $projectId";
+
+        $this->freeQuery($query);
     }
 }
 
