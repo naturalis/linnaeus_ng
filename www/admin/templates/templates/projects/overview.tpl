@@ -52,7 +52,7 @@ ul.management li {
     <ul class="management">
         <li><a href="../module_settings/">{t}Settings{/t}</a></li>
         <li><a href="../hotwords/">{t}Hotwords{/t}</a></li>
-        <li><a href="../nsr/activity_log.">{t}Editor log{/t}</a></li>
+        <li><a href="../nsr/activity_log.php">{t}Activity log{/t}</a></li>
         <!-- li><a href="../utilities/mass_upload.php">{t}Mass upload images{/t}</a></li -->
         <!-- li><a href="../projects/clear_cache.php">{t}Clear cache{/t}</a></li -->
     </ul>

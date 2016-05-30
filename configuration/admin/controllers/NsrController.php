@@ -10,6 +10,7 @@
 
 include_once ('Controller.php');
 include_once ('RdfController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class NsrController extends Controller
 {
