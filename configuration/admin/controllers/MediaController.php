@@ -419,7 +419,22 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Browse media'));
-        $this->setItemTemplate();
+
+        if ($this->moduleId != -1 && $this->itemId != -1) {
+
+            $mi = new ModuleIdentifierController();
+            $mi->setModuleId($this->moduleId);
+            $mi->setItemId($this->itemId);
+            $mi->setLanguageId($this->languageId);
+
+            $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
+                'single' : 'multiple';
+
+            $this->smarty->assign('module_name', $mi->getModuleName());
+            $this->smarty->assign('item_name', $mi->getItemName());
+            $this->smarty->assign('back_url', $this->setBackUrl());
+            $this->smarty->assign('input_type', $type);
+        }
 
         if ($this->rHasVal('action', 'delete')) {
             $this->deleteMedia();
@@ -485,15 +500,12 @@ class MediaController extends Controller
 
                 $this->uploadFiles();
                 $this->reattachMediaFile($id, $this->mediaId);
-                $this->redirect($this->setBackUrl());
-
-            } else {
-
-                $this->saveMetadata(array('media_id' => $id));
-                $this->saveTags(array('media_id' => $id));
-    			$this->addMessage($this->translate('Saved'));
 
             }
+
+            $this->saveMetadata(array('media_id' => $id));
+            $this->saveTags(array('media_id' => $id));
+			$this->addMessage($this->translate('Saved'));
         }
 
         $media = $this->getMediaFile($id);
@@ -522,8 +534,8 @@ class MediaController extends Controller
             return false;
         }
 
-        // Get data from original media file
-        $d = $this->getMediaFile($oldId);
+        $oldMedia = $this->getMediaFile($oldId);
+        $newMedia = $this->getMediaFile($newId);
 
         // Delete original file
         $this->models->Media->delete(array(
@@ -534,13 +546,19 @@ class MediaController extends Controller
         // Update new file
         $this->models->Media->update(
             array(
-                'id' => $d['id'],
-                'title' => $d['title']
+                'id' => $oldId,
+                'title' => $oldMedia['title']
     		), array (
         		'project_id' => $this->getCurrentProjectId(),
         		'id' => $newId
     		)
         );
+
+        // Replace internal links
+        $this->replaceInternalMediaLinks(array(
+            'old_media' => $oldMedia,
+            'new_media' => $newMedia
+        ));
     }
 
     private function getMediaLinks ($mediaId)
@@ -585,7 +603,22 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Upload media'));
-        $this->setItemTemplate();
+
+        if ($this->moduleId != -1 && $this->itemId != -1) {
+
+            $mi = new ModuleIdentifierController();
+            $mi->setModuleId($this->moduleId);
+            $mi->setItemId($this->itemId);
+            $mi->setLanguageId($this->languageId);
+
+            $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
+                'single' : 'multiple';
+
+            $this->smarty->assign('module_name', $mi->getModuleName());
+            $this->smarty->assign('item_name', $mi->getItemName());
+            $this->smarty->assign('back_url', $this->setBackUrl());
+            $this->smarty->assign('input_type', $type);
+        }
 
         // Only upload if upload button has been pushed!
         if ($this->rHasVal('upload', $this->translate('upload')) &&
@@ -713,26 +746,6 @@ class MediaController extends Controller
             return $file['title'];
         }
         return '';
-    }
-
-    private function setItemTemplate ()
-    {
-        // Verify module_id and item_id if set
-        if ($this->moduleId != -1 && $this->itemId != -1) {
-
-            $mi = new ModuleIdentifierController();
-            $mi->setModuleId($this->moduleId);
-            $mi->setItemId($this->itemId);
-            $mi->setLanguageId($this->languageId);
-
-            $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
-                'single' : 'multiple';
-
-            $this->smarty->assign('module_name', $mi->getModuleName());
-            $this->smarty->assign('item_name', $mi->getItemName());
-            $this->smarty->assign('back_url', $this->setBackUrl());
-            $this->smarty->assign('input_type', $type);
-        }
     }
 
     public function setSortOrder ($p)
@@ -1511,5 +1524,46 @@ class MediaController extends Controller
         return 99;
     }
 
+    private function replaceInternalMediaLinks ($p)
+    {
+        $oldMedia = isset($p['old_media']) ? $p['old_media'] : false;
+        $newMedia = isset($p['new_media']) ? $p['new_media'] : false;
+
+        if (!$oldMedia || !$newMedia) return false;
+
+        $modules = array(
+            'Taxon editor' => array(
+                'column' => 'content',
+                'table' => 'content_taxa'
+            ),
+            'Dichotomous key' => array(
+                'column' => 'content',
+                'table' => 'content_keysteps'
+            ),
+            'Introduction' => array(
+                'column' => 'content',
+                'table' => 'content_introduction'
+            ),
+            'Free modules' => array(
+                'column' => 'content',
+                'table' => 'content_free_modules'
+            ),
+            'Glossary' => array(
+                'column' => 'definition',
+                'table' => 'glossary'
+            )
+        );
+
+        foreach ($modules as $name => $module) {
+
+            $this->models->MediaModel->replaceInternalMediaLinks(array(
+                'project_id' => $this->getCurrentProjectId(),
+                'column' => $module['column'],
+                'table' => $module['table'],
+                'old_media' => $oldMedia,
+                'new_media' => $newMedia
+            ));
+        }
+    }
 
 }
