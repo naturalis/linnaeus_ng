@@ -605,6 +605,12 @@ class MediaController extends Controller
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Upload media'));
 
+        // Early check for files that are too large
+        if ($_SERVER['CONTENT_LENGTH'] > 0 && empty($_FILES)) {
+             $this->addError(_('File size') . ' ' . $_SERVER['CONTENT_LENGTH']  . ' ' .
+             _('exceeds maximum file size') . ' ' . $this->setMaxFileSize());
+        }
+
         if ($this->moduleId != -1 && $this->itemId != -1) {
 
             $mi = new ModuleIdentifierController();
@@ -623,17 +629,15 @@ class MediaController extends Controller
 
         // Only upload if upload button has been pushed!
         if ($this->rHasVal('upload', $this->translate('upload')) &&
-            !$this->isFormResubmit()) {
+            !$this->isFormResubmit() && $this->uploadHasFiles()) {
 
-        print_r($_SERVER);
-
-                $this->setFiles();
+            $this->setFiles();
             $this->uploadFiles();
 
-            $this->smarty->assign('errors', $this->errors);
             $this->smarty->assign('uploaded', $this->_uploaded);
         }
 
+        $this->smarty->assign('errors', $this->errors);
         $this->smarty->assign('upload_max_filesize', ini_get('upload_max_filesize'));
         $this->smarty->assign('max_file_uploads', ini_get('max_file_uploads'));
         $this->smarty->assign('post_max_size', ini_get('post_max_size'));
