@@ -40,6 +40,7 @@
 	<input type="hidden" name="module_id" value="{$module_id}" />
 	<input type="hidden" name="item_id" value="{$item_id}" />
     <input type="hidden" name="back_url" value="{$back_url}" />
+    <input type="hidden" name="MAX_FILE_SIZE" value="{$form_max_file_size}" />
 
 
 	<table>
