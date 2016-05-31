@@ -626,6 +626,10 @@ class MediaController extends Controller
             !$this->isFormResubmit() && $this->uploadHasFiles()) {
 
             $this->setFiles();
+            if (empty($this->_files) && intval($_SERVER['CONTENT_LENGTH']) > 0 && count($_POST) === 0) {
+                throw new Exception('PHP discarded POST data because of request exceeding post_max_size.');
+            }
+
             $this->uploadFiles();
 
             $this->smarty->assign('errors', $this->errors);
@@ -813,21 +817,6 @@ class MediaController extends Controller
         if (!$this->checkFileExtension($file)) {
             $this->addError(_('Extension') . ' ' . $this->getFileExtenstion($file['name']) .
                 ' ' . _('not supported') . ': ' . $file['name']);
-            return false;
-        }
-
-        // Check size
-        $uploadMax = $this->helpers->HrFilesizeHelper->returnBytes(ini_get('upload_max_filesize'));
-        if ($file['size'] > $uploadMax) {
-            $this->addError(_('File size') . ' ' . ($file['size']) . ' ' .
-                _('exceeds PHP upload maximum file size') . ' ' . $uploadMax);
-            return false;
-        }
-
-        $postMax = $this->helpers->HrFilesizeHelper->returnBytes(ini_get('post_max_size'));
-        if ($file['size'] > $postMax) {
-            $this->addError(_('File size') . ' ' . ($file['size']) . ' ' .
-                _('exceeds PHP post maximum size') . ' ' . $postMax);
             return false;
         }
 
