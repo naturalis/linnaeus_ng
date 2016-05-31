@@ -404,8 +404,8 @@ if (!$this->_suppressTab_DNA_BARCODES)
 
             if (isset($_SESSION['admin']['project']['ranklist']))
                 unset($_SESSION['admin']['project']['ranklist']);
-            if (isset($_SESSION['admin']['user']['species']['tree']))
-                unset($_SESSION['admin']['user']['species']['tree']);
+            if (isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']))
+                unset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']);
 
             $this->addMessage($this->translate('Ranks saved.'));
         }
