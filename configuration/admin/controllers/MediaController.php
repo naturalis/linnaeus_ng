@@ -625,6 +625,8 @@ class MediaController extends Controller
         if ($this->rHasVal('upload', $this->translate('upload')) &&
             !$this->isFormResubmit() && $this->uploadHasFiles()) {
 
+                echo 'test: ' . $_SERVER['CONTENT_LENGTH'];
+
     if ( !empty($_SERVER['CONTENT_LENGTH']) && empty($_FILES) && empty($_POST) )
 	echo 'The uploaded zip was too large. You must upload a file smaller than ' . ini_get("upload_max_filesize");
 
