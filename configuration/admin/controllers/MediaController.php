@@ -622,8 +622,7 @@ class MediaController extends Controller
         }
 
         // Only upload if upload button has been pushed!
-        if ($this->rHasVal('upload', $this->translate('upload')) &&
-            !$this->isFormResubmit() && $this->uploadHasFiles()) {
+        if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()) {
 
                 die( 'test: ' . $_SERVER['CONTENT_LENGTH']);
 
