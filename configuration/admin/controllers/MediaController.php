@@ -602,8 +602,6 @@ class MediaController extends Controller
 
     public function uploadAction ()
     {
-        print_r($_SERVER);
-
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Upload media'));
 
@@ -627,7 +625,9 @@ class MediaController extends Controller
         if ($this->rHasVal('upload', $this->translate('upload')) &&
             !$this->isFormResubmit()) {
 
-            $this->setFiles();
+        print_r($_SERVER);
+
+                $this->setFiles();
             $this->uploadFiles();
 
             $this->smarty->assign('errors', $this->errors);
