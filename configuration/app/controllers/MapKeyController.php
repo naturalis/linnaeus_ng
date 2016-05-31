@@ -53,6 +53,8 @@ class MapKeyController extends Controller
      */
     public function __construct($p=null)
     {
+		die();
+
         parent::__construct($p);
 
 		//$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
