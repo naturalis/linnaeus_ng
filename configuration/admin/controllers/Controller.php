@@ -1626,7 +1626,8 @@ class Controller extends BaseClass
 
         $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
 
-        if (isset($_SESSION['admin']['user']) && !$_SESSION['admin']['user']['_said_welcome'])
+        if (isset($_SESSION['admin']['user']) && isset($_SESSION['admin']['user']['_said_welcome']) &&
+            !$_SESSION['admin']['user']['_said_welcome'])
 		{
 
             $msg=
