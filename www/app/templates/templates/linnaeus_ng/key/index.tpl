@@ -26,7 +26,7 @@
 
                 <div class="l2_text">
                 	{$v.choice_txt}
-                    {if $v.choice_img}<img style="width:100%" src="{$v.choice_img}">{/if}
+                    {if $v.choice_img}<img style="max-width:100%" src="{$v.choice_img}">{/if}
 				</div>
 
                 <div class="target">
