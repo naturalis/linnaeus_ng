@@ -206,7 +206,7 @@ class NsrController extends Controller
 
 	public function resetTree()
 	{
-		unset($_SESSION['admin']['user']['species']['tree']);
+		unset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']);
 	}
 
 	private function getNsrId($p)

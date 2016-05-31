@@ -85,7 +85,7 @@ class TreeController extends Controller
 		else
 		if ($this->rHasVal('action', 'store_tree'))
 		{
-	        $_SESSION['admin']['user']['species']['tree']=$this->rGetVal('tree');
+	        $_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']=$this->rGetVal('tree');
 			$return='saved';
         }
 		else
@@ -104,12 +104,12 @@ class TreeController extends Controller
 
 	private function restoreTree()
 	{
-		return isset($_SESSION['admin']['user']['species']['tree']) ?  $_SESSION['admin']['user']['species']['tree'] : null;
+		return isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']) ?  $_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'] : null;
 	}
 
 	private function unsetTree()
 	{
-		unset($_SESSION['admin']['user']['species']['tree']);
+		unset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']);
 	}
 
 	private function treeGetTop()
