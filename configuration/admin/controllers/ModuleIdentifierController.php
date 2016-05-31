@@ -111,6 +111,7 @@ class ModuleIdentifierController extends Controller
         if ($controller) {
             switch ($controller) {
                 case 'nsr':
+                    return '../' . $controller. '/media.php?id=' . $this->itemId . '&noautoexpand=1';
                 case 'glossary':
                     return '../' . $controller. '/media.php?id=' . $this->itemId;
                 case 'key':
