@@ -602,6 +602,8 @@ class MediaController extends Controller
 
     public function uploadAction ()
     {
+        print_r($_SERVER);
+
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Upload media'));
 
@@ -622,24 +624,20 @@ class MediaController extends Controller
         }
 
         // Only upload if upload button has been pushed!
-        if ($this->rHasVal('upload', $this->translate('upload')) && !$this->isFormResubmit()) {
-
-                die( 'test: ' . $_SERVER['CONTENT_LENGTH']);
-
-    if ( !empty($_SERVER['CONTENT_LENGTH']) && empty($_FILES) && empty($_POST) )
-	echo 'The uploaded zip was too large. You must upload a file smaller than ' . ini_get("upload_max_filesize");
+        if ($this->rHasVal('upload', $this->translate('upload')) &&
+            !$this->isFormResubmit()) {
 
             $this->setFiles();
             $this->uploadFiles();
 
             $this->smarty->assign('errors', $this->errors);
             $this->smarty->assign('uploaded', $this->_uploaded);
-
         }
 
         $this->smarty->assign('upload_max_filesize', ini_get('upload_max_filesize'));
         $this->smarty->assign('max_file_uploads', ini_get('max_file_uploads'));
         $this->smarty->assign('post_max_size', ini_get('post_max_size'));
+        $this->smarty->assign('form_max_file_size', $this->setMaxFileSize());
         $this->smarty->assign('action', htmlentities($_SERVER['PHP_SELF']));
         $this->smarty->assign('session_upload_progress_name',
             ini_get('session.upload_progress.name'));
@@ -741,6 +739,13 @@ class MediaController extends Controller
                 $this->addError(_('Could not upload media') . ': ' . $error);
             }
         }
+    }
+
+    private function setMaxFileSize ()
+    {
+        $a = $this->helpers->HrFilesizeHelper->returnBytes(ini_get('upload_max_filesize'));
+        $b = $this->helpers->HrFilesizeHelper->returnBytes(ini_get('post_max_size'));
+        return max(array($a, $b));
     }
 
     private function setFileTitle ($file)
