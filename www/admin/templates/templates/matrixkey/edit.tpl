@@ -5,7 +5,7 @@
 <span class="matrix-header">
 
 	{t _s1=$matrix.label}Editing matrix "%s"{/t}
-	<!-- (<a href="preview.php">{t}preview{/t}</a>) -->(<a href="matrices.php">{t}select another matrix{/t}</a>)<br />
+	{* (<a href="preview.php">{t}preview{/t}</a>) *} (<a href="matrices.php">{t}select another matrix{/t}</a>)<br />
 	{if $matrices|@count> 1}
 		{if $matrix.default==1}
 			{t}(this is the default matrix){/t}

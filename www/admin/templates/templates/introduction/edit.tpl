@@ -12,7 +12,7 @@
 <form name="theForm" id="theForm" method="post" action="edit.php" >
 {if $CRUDstates.can_update}
 <input type="button" value="{t}save{/t}" onclick="freemodSaveContentAll()" style="margin-right:5px" />
-<!-- input type="button" value="{t}save and preview{/t}" onclick="freemodDoPreview()" style="margin-right:5px" / -->
+{* <input type="button" value="{t}save and preview{/t}" onclick="freemodDoPreview()" style="margin-right:5px" /> *}
 {/if}
 {if $CRUDstates.can_delete}
 <input type="button" value="{t}delete{/t}" onclick="freemodDeletePage()" />

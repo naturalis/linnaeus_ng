@@ -19,7 +19,7 @@
         <tr>
             <td colspan="2">
                 <input type="button" value="{t}save{/t}" onclick="litCheckForm(this)" />
-                <input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');litCheckForm(this)" />
+                {* <input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');litCheckForm(this)" /> *}
                 {* if $session.admin.system.literature.taxon.taxon_id!=''}
                 <input type="button" value="{t}back{/t}" onclick="window.open('../species/literature.php?id={$session.admin.system.literature.taxon.taxon_id}','_top')" />
                 {else}

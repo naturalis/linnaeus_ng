@@ -13,7 +13,7 @@
         <tr>
             <td colspan="2">
                 <input type="button" value="{t}save{/t}" onclick="$('#action').val('save');glossCheckForm();" />
-                <input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm();" />
+                {* <input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm();" /> *}
                 {if $gloss.id}
                 <input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
                 {/if}
