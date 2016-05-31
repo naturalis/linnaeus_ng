@@ -635,10 +635,6 @@ class UsersController extends Controller
 		{
 			$taxa=$d['taxon'];
 		}
-		else
-		{
-			return;
-		}
 
 		$this->models->UserItemAccess->delete(
 			array(
@@ -646,20 +642,28 @@ class UsersController extends Controller
 				'project_id' => $this->getCurrentProjectId()
 			));
 			
+
+		if ( $this->models->UserItemAccess->getAffectedRows() > 0 )
+			$this->addMessage( $this->translate('Updated taxa.') );
 	
-		foreach((array)$taxa as $key=>$val)
+		if ( isset($taxa) ) 
 		{
-			$this->models->UserItemAccess->save(
-				array(
-					'id'=>null,
-					'project_id' => $this->getCurrentProjectId(),
-					'user_id' => $this->getUserId(),
-					'item_id' => $val,
-					'item_type'=>'taxon'
-				));
+			foreach((array)$taxa as $key=>$val)
+			{
+				$this->models->UserItemAccess->save(
+					array(
+						'id'=>null,
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->getUserId(),
+						'item_id' => $val,
+						'item_type'=>'taxon'
+					));
+			}
+			
+			if ( $this->models->UserItemAccess->getAffectedRows() > 0 )
+				$this->addMessage( $this->translate('Updated taxa.') );
 		}
 		
-		$this->addMessage( $this->translate('Updated taxa.') );
 
 	}
 

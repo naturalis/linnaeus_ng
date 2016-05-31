@@ -400,7 +400,7 @@ class Controller extends BaseClass
 			}
 		}
 		else
-		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction()  || !$this->UserRights->hasAppropriateLevel() )
+		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction() || !$this->UserRights->hasAppropriateLevel() )
 		{
 			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
 			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);

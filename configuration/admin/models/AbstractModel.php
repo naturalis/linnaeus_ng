@@ -236,7 +236,8 @@ class AbstractModel extends BaseClass
 
     protected function disconnectFromDatabase ()
     {
-        @mysqli_close($this->databaseConnection);
+		//sometimes causes errors
+		//@mysqli_close($this->databaseConnection);
     }
 
 	protected function reEngineerQuery($query)
