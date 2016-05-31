@@ -791,6 +791,11 @@ class MediaController extends Controller
 
     private function uploadedFileIsValid ($file)
     {
+        print_r($file);
+        echo ini_get('upload_max_filesize') . ' | ' .
+        ini_get('post_max_size');
+        die();
+
         // Check errors in file
         switch ($file['error']) {
             case 1:
