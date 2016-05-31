@@ -2,7 +2,7 @@
 <div id="page-main" style="height:{if $languages|@count > 1}1200px{else}670px{/if}">
 <form name="theForm" id="theForm">
 	<input type="button" value="{t}save{/t}" onclick="contentSaveContentAll()" style="margin-right:5px" />
-	<input type="button" value="{t}save and preview{/t}" onclick="contentPreviewContent()" style="margin-right:5px" />
+	{* <input type="button" value="{t}save and preview{/t}" onclick="contentPreviewContent()" style="margin-right:5px" /> *}
 	{*<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />*}
 	<input type="hidden" name="subject" id="subject" value="{$subject}" />
 </form>

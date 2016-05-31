@@ -23,7 +23,7 @@
     <p>
         <a href="step_edit.php?id={$step.id}">{t}edit{/t}</a> |
         <a href="#" onclick="keyDeleteKeyStep();return false;">{t}delete{/t}</a> |
-        <a href="preview.php?step={$step.id}">{t}preview{/t}</a>
+        {* <a href="preview.php?step={$step.id}">{t}preview{/t}</a> *}
     </p>
 
     <span class="small-remark">
