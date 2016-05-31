@@ -602,7 +602,6 @@ class MediaController extends Controller
 
     public function uploadAction ()
     {
-print_r($_FILES);
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Upload media'));
 
@@ -792,11 +791,6 @@ print_r($_FILES);
 
     private function uploadedFileIsValid ($file)
     {
-        print_r($file);
-        echo ini_get('upload_max_filesize') . ' | ' .
-        ini_get('post_max_size');
-        die();
-
         // Check errors in file
         switch ($file['error']) {
             case 1:
