@@ -1646,6 +1646,26 @@ function printInfo( info, title, url )
 	}
 }
 
+var matrices=Array();
+
+function matrixSelectPopUp( current )
+{
+	var tpl=fetchTemplate( 'matrixSelectItem' );
+	var buffer=Array();
+
+	for(var i=0; i<matrices.length; i++)
+	{
+		var v=matrices[i];
+		buffer.push( tpl.replace('%ID%',v.id).replace('%LABEL%',v.label).replace('%CLASS%', v.current ? " active-item" : "") );
+	}
+
+	showOverlay(_('Kies matrix'),fetchTemplate( 'matrixSelectList' ).replace('%LINES%',buffer.join("\n")));
+
+}
+                
+                
+				
+
 function bindSecretlyClickable()
 {
 	$( '.secretlyclickable' ).on( 'dblclick' , function(event)

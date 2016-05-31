@@ -20,7 +20,7 @@
                 <a href="#" onClick="history.go(-1);return false;" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {/if}
             <div class="pageTitleContainer">
-                <span class="pageTitle" onclick="window.open('../../','_self');">
+                <span class="pageTitle" onClick="window.open('../../','_self');">
 	                {$session.app.project.title|@strip_tags:false}
                 </span>
             </div>
@@ -92,8 +92,14 @@
             <img src="{$session.app.system.urls.systemMedia}placeholderheader.png" alt="">
             <h1 class="pageTitle">
                 <span class="determinatiesleutel">{snippet}matrix_main_title_header.html{/snippet}</span><br />
-                {$matrix.name}
-            </h1>
+                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onclick="matrixSelectPopUp();">{t}kies andere matrix{/t}</span>
+<script>
+{foreach $matrices v}
+matrices.push( { id: {$v.id} ,label: '{$v.label|@escape}', current: {$matrix.id}=={$v.id} } );
+{/foreach}
+</script>
+                {/if}
+            </h1>            
         </div>    
     </div>
 

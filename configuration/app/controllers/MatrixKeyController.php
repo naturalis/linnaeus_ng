@@ -175,6 +175,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign( 'session_menu', json_encode( $this->getFacetMenu() ) );
 		$this->smarty->assign( 'full_dataset', json_encode( $this->getDataSet() ) );
         $this->smarty->assign( 'matrix', $matrix );
+        $this->smarty->assign( 'matrices', $this->getAllMatrices() );
 		$this->smarty->assign( 'master_matrix', $this->getMasterMatrix() );
 		$this->smarty->assign( 'facetmenu', $this->getFacetMenu() );
 		$this->smarty->assign( 'states', $this->getCharacterStates( array("id"=>"*") ) );
@@ -727,6 +728,14 @@ class MatrixKeyController extends Controller
 		}
 
         return $m;
+    }
+
+    private function getAllMatrices()
+    {
+		return $this->models->MatrixkeyModel->getAllMatrices(array(
+			"language_id"=>$this->getCurrentLanguageId(),
+			"project_id"=>$this->getCurrentProjectId(),
+		));
     }
 
 	// REFAC2015: should be moved to kenmerkenmodule!!!!!
