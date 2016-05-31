@@ -625,11 +625,10 @@ class MediaController extends Controller
         if ($this->rHasVal('upload', $this->translate('upload')) &&
             !$this->isFormResubmit() && $this->uploadHasFiles()) {
 
-            $this->setFiles();
-            if (empty($this->_files) && intval($_SERVER['CONTENT_LENGTH']) > 0 && count($_POST) === 0) {
-                throw new Exception('PHP discarded POST data because of request exceeding post_max_size.');
-            }
+    if ( !empty($_SERVER['CONTENT_LENGTH']) && empty($_FILES) && empty($_POST) )
+	echo 'The uploaded zip was too large. You must upload a file smaller than ' . ini_get("upload_max_filesize");
 
+            $this->setFiles();
             $this->uploadFiles();
 
             $this->smarty->assign('errors', $this->errors);
