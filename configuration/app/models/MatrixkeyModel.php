@@ -1001,10 +1001,6 @@ final class MatrixKeyModel extends AbstractModel
         return $this->freeQuery( $query );
     }
 
-
-
-
-
     public function setRemainingCountClauses( $clause )
     {
 		$this->remainingCountClauses=$clause;
@@ -1015,26 +1011,33 @@ final class MatrixKeyModel extends AbstractModel
 		return $this->remainingCountClauses;
 	}
 
+    public function getAllMatrices( $params )
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+
+		if ( is_null($project_id) || is_null($language_id) )
+			return;
+
+		$query="
+			select
+				_a.id,
+				_b.name as label
+			from
+				%PRE%matrices _a
+
+			left join %PRE%matrices_names _b
+				on _a.project_id = _b.project_id
+				and _a.id = _b.matrix_id
+				and _b.language_id = " . $language_id . "
+
+			where
+				_a.project_id = " . $project_id . "
+			";
+
+		return $this->freeQuery( $query );
+    }
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

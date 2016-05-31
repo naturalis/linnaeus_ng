@@ -1,6 +1,31 @@
 {include file="../shared/_matrix_head.tpl"}
 {include file="../shared/_matrix_body-start.tpl"}
 
+<style>
+.matrix-links {
+	text-align:left;
+    color: #009ee0;
+    font-weight: bold;
+}
+.matrix-links a {
+	text-decoration:none;
+    color: #009ee0;
+	line-height:1.5em;
+}
+.matrix-links a:hover {
+	text-decoration:underline;
+}
+.matrix-links a.active-item {
+    color: black;
+	cursor: default;
+}
+.matrix-links a.active-item:hover {
+	text-decoration:none;
+}
+
+
+</style>
+
 	<div id="dialogRidge">
 
 		{include file="_left_column.tpl"}
@@ -329,6 +354,18 @@ $(document).ready(function()
 
 <div class="inline-templates" id="infoDialogUrlHtmlTpl">
 	<a href="%URL%" class="popup-link" target="_blank">%LINK-LABEL%</a>
+</div>
+
+<div class="inline-templates" id="matrixSelectList">
+<!--
+	<ul class="matrix-links">%LINES%</ul>
+-->
+</div>
+
+<div class="inline-templates" id="matrixSelectItem">
+<!--
+	<li><a href="index.php?mtrx=%ID%" class="matrix-link%CLASS%">%LABEL%</a></li>
+-->
 </div>
 
 <!-- /templates -->
