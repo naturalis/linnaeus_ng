@@ -626,7 +626,7 @@ class MediaController extends Controller
             !$this->isFormResubmit() && $this->uploadHasFiles()) {
 
             $this->setFiles();
-print_r($this->_files); die();
+print_r($_FILES['files']); die();
             $this->uploadFiles();
 
             $this->smarty->assign('errors', $this->errors);
