@@ -248,7 +248,9 @@ class MediaController extends Controller
             'module' => $this->controllerPublicName
         ));
 
-        $this->bootstrap();
+        if ($this->getAuthorisationState()) {
+            $this->checkRsSettings();
+        }
 
         // Search url: &search=[term]* to be appended
         $this->_rsSearchUrl = $this->_rsBaseUrl . $this->_rsSearchApi . '/?' .
@@ -262,7 +264,7 @@ class MediaController extends Controller
             'key=' . $this->rGetVal('rs_master_key');
     }
 
-    private function bootstrap ()
+    private function checkRsSettings ()
     {
         // As checking urls takes time, do this only once per session
         if (isset($_SESSION['admin']['user']['media']['bootstrap_passed']) &&
@@ -606,7 +608,7 @@ class MediaController extends Controller
 		$this->setPageName($this->translate('Upload media'));
 
         // Early check for files that are too large
-        if ($_SERVER['CONTENT_LENGTH'] > 0 && empty($_FILES)) {
+        if (isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_FILES)) {
              $this->addError(_('File size') . ' ' . $_SERVER['CONTENT_LENGTH']  . ' ' .
              _('exceeds maximum file size') . ' ' . $this->setMaxFileSize());
         }
