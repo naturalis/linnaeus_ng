@@ -791,6 +791,11 @@ class MediaController extends Controller
 
     private function uploadedFileIsValid ($file)
     {
+        print_r($file);
+        echo ini_get('upload_max_filesize') . ' | ' .
+        ini_get('post_max_size');
+        die();
+
         // Check errors in file
         switch ($file['error']) {
             case 1:
@@ -813,6 +818,21 @@ class MediaController extends Controller
         if (!$this->checkFileExtension($file)) {
             $this->addError(_('Extension') . ' ' . $this->getFileExtenstion($file['name']) .
                 ' ' . _('not supported') . ': ' . $file['name']);
+            return false;
+        }
+
+        // Check size
+        $uploadMax = $this->helpers->HrFilesizeHelper->returnBytes(ini_get('upload_max_filesize'));
+        if ($file['size'] > $uploadMax) {
+            $this->addError(_('File size') . ' ' . ($file['size']) . ' ' .
+                _('exceeds PHP upload maximum file size') . ' ' . $uploadMax);
+            return false;
+        }
+
+        $postMax = $this->helpers->HrFilesizeHelper->returnBytes(ini_get('post_max_size'));
+        if ($file['size'] > $postMax) {
+            $this->addError(_('File size') . ' ' . ($file['size']) . ' ' .
+                _('exceeds PHP post maximum size') . ' ' . $postMax);
             return false;
         }
 
