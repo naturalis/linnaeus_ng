@@ -267,8 +267,8 @@ class MediaController extends Controller
     private function checkRsSettings ()
     {
         // As checking urls takes time, do this only once per session
-        if (isset($_SESSION['admin']['user']['media']['bootstrap_passed']) &&
-            $_SESSION['admin']['user']['media']['bootstrap_passed'] == 1) {
+        if (isset($_SESSION['admin']['user'][$this->getCurrentProjectId()]['media']['bootstrap_passed']) &&
+            $_SESSION['admin']['user'][$this->getCurrentProjectId()]['media']['bootstrap_passed'] == 1) {
             return true;
         }
 
@@ -302,7 +302,7 @@ class MediaController extends Controller
                 }
             }
 
-            $_SESSION['admin']['user']['media']['bootstrap_passed'] = 1;
+            $_SESSION['admin']['user'][$this->getCurrentProjectId()]['media']['bootstrap_passed'] = 1;
         }
     }
 
