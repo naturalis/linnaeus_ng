@@ -340,7 +340,7 @@ class TraitsTraitsController extends TraitsController
 	private function saveTraitgroup($p)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
-		$parent_id=!empty($p['parent_id']) ? $p['parent_id'] : 'null';
+		$parent_id=!empty($p['parent_id']) ? (int)$p['parent_id'] : 'null';
 		$sysname=isset($p['sysname']) ? $p['sysname'] : null;
 		$names=isset($p['names']) ? $p['names'] : null;
 		$descriptions=isset($p['descriptions']) ? $p['descriptions'] : null;
@@ -351,12 +351,10 @@ class TraitsTraitsController extends TraitsController
 
 		if ( is_null($sysname) ) return false;
 
-
-
 		$this->models->TraitsGroups->save(array(
 			'id'=>$id,
 			'project_id'=>$this->getCurrentProjectId(),
-			'parent_id'=>(int)$parent_id,
+			'parent_id'=> $parent_id,
 			'sysname'=>$this->models->TraitsTraitsModel->escapeString($sysname),
 			'show_in_search'=>$show_in_search,
 			'show_show_all_link'=>$show_show_all_link,

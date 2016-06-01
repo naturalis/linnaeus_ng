@@ -72,7 +72,7 @@ class UtilitiesController extends Controller
 		}
 
 
-
+		/*
 		if (isset($_SESSION['admin']['project']['lead_experts']))
 		{
 			if (count((array)$_SESSION['admin']['project']['lead_experts'])==1)
@@ -90,6 +90,7 @@ class UtilitiesController extends Controller
 			}
 
 		}
+		*/
 
         $this->printPage();
     }
