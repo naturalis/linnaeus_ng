@@ -41,7 +41,7 @@ class MatrixKeyModel extends AbstractModel
 			foreach((array)$branch_tops as $top)
 			{
 
-				$taxa+=$this->freeQuery( "
+				$taxa=array_merge($taxa,$this->freeQuery( "
 					select
 						_b.id,
 						_b.taxon,
@@ -70,7 +70,7 @@ class MatrixKeyModel extends AbstractModel
 							)		
 					order by
 						_b.taxon
-					");
+					"));
 
 			}
 

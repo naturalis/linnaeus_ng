@@ -138,7 +138,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 
-
 			foreach((array)$categories['categories'] as $val)
 			{
 				if ( $val['id']==$reqCatId )
