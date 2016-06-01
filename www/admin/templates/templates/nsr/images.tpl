@@ -2,6 +2,8 @@
 
 {include file="../shared/left_column_tree.tpl"}
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <style>
@@ -85,4 +87,7 @@ $(document).ready(function() {
 </script>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}

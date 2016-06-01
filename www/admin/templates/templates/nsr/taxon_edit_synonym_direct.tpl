@@ -9,7 +9,7 @@ function doSynDirectForm()
 {
 	form = $("<form method=post></form>");
 	form.append('<input type="hidden" name="action" value="save" />');
-	
+
 	$( 'input' ).each(function()
 	{
 		var id=$(this).attr('id')
@@ -40,6 +40,8 @@ function doSynDirectForm()
 
 </script>
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px">{t}naamkaart:{/t}</span> {$name.name}</h2>
@@ -47,7 +49,7 @@ function doSynDirectForm()
 
 <p>
     <h3>{t}Let op!{/t}</h3>
-    {t}Via dit scherm kunnen alle delen van de geldige naam direct worden aangepast, zonder checks. 
+    {t}Via dit scherm kunnen alle delen van de geldige naam direct worden aangepast, zonder checks.
     Doet dit alleen in uitzonderingsgevallen waarin er een discrepantie bestaat tussen de conceptnaam en de geldige naam.<br />
     Let op dat alle delen los moeten worden ingevoerd, er wordt niets automatisch samengevoegd!{/t}
 </p>
@@ -75,7 +77,7 @@ function doSynDirectForm()
                 <th>{t}derde naamdeel:{/t}</th>
                 <td><input type="text" class="medium" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" /></td>
             </tr>
-        
+
             <tr>
                 <th>{t}auteurschap:{/t}</th>
                 <td><input type="text" class="medium" id="name_authorship" value="{$name.authorship}" /></td>
@@ -83,18 +85,18 @@ function doSynDirectForm()
             <tr>
                 <th>{t}auteur(s):{/t}</th>
                 <td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" /></td>
-            </tr>	
+            </tr>
             <tr>
                 <th>{t}jaar:{/t}</th>
                 <td><input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" /></td>
-            </tr>	
-        
+            </tr>
+
         </table>
     </p>
-    
-    
 
-    
+
+
+
     <p>
         <input type="button" value="{t}opslaan{/t}" onclick="doSynDirectForm()"/>
     </p>
@@ -108,4 +110,7 @@ function doSynDirectForm()
 </div>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}

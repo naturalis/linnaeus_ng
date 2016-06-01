@@ -15,7 +15,7 @@
 	width:750px;
 }
 
-#page-main, #page-block-warnings, .page-generic-div {
+#page-container-div {
 	float:left;
 }
 
@@ -34,9 +34,9 @@
 $(document).ready(function()
 {
 	{if $noautoexpand}
-	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php' );	
+	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php' );
 	{else}
-	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php?node=' + {$concept.id} );	
+	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php?node=' + {$concept.id} );
 	{/if}
 });
 </script>

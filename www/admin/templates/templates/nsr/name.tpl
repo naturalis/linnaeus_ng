@@ -13,6 +13,8 @@
 }
 </style>
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe naam{else}{$name.name}{/if}</h2>
@@ -56,7 +58,7 @@
 	{foreach from=$projectlanguages item=v}
 	<span class="language-labels">{if $projectlanguages|@count>1}{$v.language}: {/if}
     <input type="text" value="{$name.addition[{$v.language_id}].addition}" id="aanvulling[{$v.language_id}]" name="aanvulling[{$v.language_id}]" /></span>
-	{/foreach}		
+	{/foreach}
 	</td></tr>
 
 	{* /if *}
@@ -77,13 +79,13 @@
     	<span id="name_reference">
 		{if $name.reference_id!=''}
 			{$name.reference_name}
-		{else}n.v.t.{/if}	
+		{else}n.v.t.{/if}
         </span>
         <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
         <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 		</td>
 	</tr>
-	
+
 	<tr><th>expert:</th><td>
 		<select id="name_expert_id">
 			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.v.t.</option>
@@ -92,7 +94,7 @@
 			<option value="{$v.id}" {if $v.id==$name.expert_id} selected="selected"{/if}>{$v.label}</option>
 		{/if}
 		{/foreach}
-		</select> 
+		</select>
 	</td></tr>
 
 	<tr><th>organisatie:</th><td>
@@ -103,9 +105,9 @@
 			<option value="{$v.id}" {if $v.id==$name.organisation_id} selected="selected"{/if}>{$v.label}</option>
 		{/if}
 		{/foreach}
-		</select> 
+		</select>
 	</td></tr>
-	
+
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>
 		{if $name.reference}<tr><th>literatuur (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
@@ -143,10 +145,10 @@ $(document).ready(function()
 	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
 
 	{if $newname}
-	
-	
-	
-	
+
+
+
+
 	$("#name_language_id").val({$defaultprojectlanguage}).trigger('change');
 	{/if}
 
@@ -168,4 +170,7 @@ $(document).ready(function()
 </script>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}
