@@ -32,10 +32,13 @@
 	$row = mysqli_fetch_row($r);
 	$scientificId = $row[0];
 
+	$q = 'truncate table `names`';
+	$r = mysqli_query($d, $q) or die($q . mysqli_error($d));
+
 	$q = 'ALTER TABLE `names` ADD INDEX `delete_me` (`taxon_id`, `type_id`)';
 	$r = mysqli_query($d, $q) or die($q . mysqli_error($d));
 
-    echo "Updating name types...\n";
+	echo "Updating name types...\n";
     $q = 'SELECT `id`, `title` FROM `projects` ORDER BY `title`';
     $r = mysqli_query($d, $q);
     while ($row = mysqli_fetch_assoc($r)) {
@@ -89,11 +92,6 @@
             $q = "INSERT IGNORE INTO `name_types` VALUES (NULL,$projectId,'$type',NOW(),NOW());";
             mysqli_query($d, $q) or die($q . mysqli_error($d));
         }
-	}
-
-	function clearNames () {
-	    global $d;
-	    mysqli_query($d, 'truncate table names') or die($q . mysqli_error($d));
 	}
 
 	function insertTaxa ($projectId) {
