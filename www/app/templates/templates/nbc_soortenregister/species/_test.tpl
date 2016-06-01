@@ -8,8 +8,6 @@ var zoomlevel = null;
 
 //var kmlUrl;//="http://www.leidenuniv.nl/cml/mashup/kml_kmz/S_aristida_adscensionis_kleur.kmz";
 var urls=Array();
-	
-
 
 function GMapInitialize()
 {

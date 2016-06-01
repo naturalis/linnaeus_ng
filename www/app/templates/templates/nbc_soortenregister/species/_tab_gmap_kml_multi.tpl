@@ -1,4 +1,3 @@
-
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;" type="text/javascript"></script>
 <script type="text/javascript">
 var gmap = null;
@@ -7,7 +6,8 @@ var geoXml = null;
 var centerat = null;
 var zoomlevel = null;
 
-var kmlUrl;//="http://www.leidenuniv.nl/cml/mashup/kml_kmz/S_aristida_adscensionis_kleur.kmz";
+//var kmlUrl;//="http://www.leidenuniv.nl/cml/mashup/kml_kmz/S_aristida_adscensionis_kleur.kmz";
+var urls=Array();
 
 function GMapInitialize()
 {
@@ -33,19 +33,34 @@ function GMapInitialize()
   gmap.addControl(new GNavLabelControl (), topLeft);
   gmap.setCenter(centerat, 4);
 
-  geoXml = new GGeoXml( kmlUrl );
-  // alert (geoXml.IconStyle)
-  gmap.addOverlay(geoXml);
+	for(var i=0;i<urls.length;i++)
+	{
+		geoXml = new GGeoXml( urls[i] );
+		gmap.addOverlay(geoXml);
+	}
+
   gmap.enableScrollWheelZoom();
+
 }
 
 $(document).ready(function()
 {
 	$('body').on('unload',function() { GUnload(); } );
-	kmlUrl = '{$external_content->full_url|@escape}';
-	GMapInitialize();
-});
 
+	{foreach item=v from="\n"|explode:$external_content->full_url}
+    urls.push('{$v|@trim|@escape}');
+    {/foreach} 
+	
+	$(urls).each(function(index, value)
+	{
+		$('#urls').append('<li>'+value+'</li>');
+	});
+	
+	GMapInitialize();
+
+	//console.dir(urls);
+
+});
 </script>
 
 
@@ -58,8 +73,9 @@ $(document).ready(function()
     </p>
     {/if}
     
-    {$external_content->full_url|@escape}
-            
+    <ul id=urls>
+    </ul>
+
 	<div id="gmap" border=1 style="width:500px; height:600px;"></div>
 
 </p>
