@@ -854,8 +854,6 @@ print_r($parent); die($this->rGetVal('parent'));
 			"offset"=>$offset,
 		));
 
-die($this->getCurrentProjectId() . $this->models->NsrTaxonModel->q());
-
 		foreach ((array) $taxa as $key => $val)
 		{
 
