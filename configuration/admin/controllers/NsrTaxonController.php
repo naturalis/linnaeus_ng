@@ -153,8 +153,6 @@ class NsrTaxonController extends NsrController
 		{
 			$parent=$this->getSpeciesList(array('id'=>$this->rGetVal('parent'),'taxa_only'=>true));
 
-print_r($parent); die($this->rGetVal('parent'));
-
 			if (isset($parent[0]))
 			{
 				$this->smarty->assign('parent',$parent[0]);
