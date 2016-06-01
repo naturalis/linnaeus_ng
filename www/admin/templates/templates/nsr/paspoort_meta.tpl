@@ -25,6 +25,8 @@ select {
 }
 </style>
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h2>
@@ -40,7 +42,7 @@ select {
 {if !$hasContent}
 
 Meta-gegevens kunnen alleen worden toegewezen aan tabbladen met tekst.
-Geen van de tabbladen bevat tekst. Voeg eerst teksten toe, alvorens 
+Geen van de tabbladen bevat tekst. Voeg eerst teksten toe, alvorens
 meta-gegevens toe te wijzen.
 
 {else}
@@ -49,7 +51,7 @@ meta-gegevens toe te wijzen.
     	<th style="width:225px;">Auteur(s)</th>
     	<th style="width:225px;">Organisatie(s)</th>
     	<th style="width:400px;">Publicatie(s)</th>
-	</tr>        
+	</tr>
     <tr>
     	<td>
             <a class="edit" style="margin-left:0px;" href="#" onclick="addAuthorField();return false;">auteur toevoegen</a><br />
@@ -144,7 +146,7 @@ toevoegen aan:<br />
     </ul>
     </p>
     {/if}
-    
+
     {/if}
 </p>
 
@@ -172,4 +174,7 @@ $(document).ready(function(e)
 </script>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}

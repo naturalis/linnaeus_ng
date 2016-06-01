@@ -2,6 +2,8 @@
 
 {include file="../shared/left_column_tree.tpl"}
 
+<div id="page-container-div">
+
 {include file="../shared/admin-messages.tpl"}
 
 <style>
@@ -143,6 +145,8 @@ textarea {
     </form>
 
     <p><a href="taxon.php?id={$item_id}">{t}back{/t}</a></p>
+
+</div>
 
 </div>
 

@@ -16,7 +16,7 @@
 		<tr>
         	<th>{t}rang:{/t}</th>
 			<td>
-				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach} 
+				{foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.rank}{/if}{/foreach}
 				<select id="concept_rank_id" onchange="storedata(this);" mandatory="mandatory" label="{t}rang{/t}">
 				<option value=""></option>
 				{foreach from=$ranks item=v}
@@ -55,17 +55,17 @@
 		</tr>
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
-		
+
 		<tr>
-			<th title="{t}vul de volledige waarde voor 'auteurschap' in, inclusief komma, jaartal en haakjes; het programma leidt de waarden voor auteur en jaar automatisch af.{/t}">	
+			<th title="{t}vul de volledige waarde voor 'auteurschap' in, inclusief komma, jaartal en haakjes; het programma leidt de waarden voor auteur en jaar automatisch af.{/t}">
 				{t}auteurschap:{/t}
 			</th>
             <td>
             	<input type="text" class="medium" id="name_authorship" value="" label="{t}auteurschap{/t}" />
 			</td>
 		</tr>
-		<tr><th>{t}auteur(s):{/t}</th><td><input type="text" class="medium" id="name_name_author" value="" disabled="disabled" label="{t}auteur{/t}" /></td></tr>	
-		<tr><th>{t}jaar:{/t}</th><td><input type="text" class="small" id="name_authorship_year" value="" disabled="disabled" label="{t}jaar{/t}" /></td></tr>	
+		<tr><th>{t}auteur(s):{/t}</th><td><input type="text" class="medium" id="name_name_author" value="" disabled="disabled" label="{t}auteur{/t}" /></td></tr>
+		<tr><th>{t}jaar:{/t}</th><td><input type="text" class="small" id="name_authorship_year" value="" disabled="disabled" label="{t}jaar{/t}" /></td></tr>
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 
@@ -79,10 +79,10 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
+				</select>
 			</td>
 		</tr>
-	
+
 		<tr>
 			<th>{t}organisatie:{/t}</th>
 			<td>
@@ -93,7 +93,7 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
+				</select>
 			</td>
 		</tr>
 
@@ -104,7 +104,7 @@
                 <input type="hidden" id="name_reference_id" value="" />
 			</td>
 		</tr>
-		
+
 
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
@@ -147,10 +147,10 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
+				</select>
 			</td>
 		</tr>
-	
+
 		<tr>
 			<th>{t}organisatie:{/t}</th>
 			<td>
@@ -161,7 +161,7 @@
 					<option value="{$v.id}">{$v.label}</option>
 				{/if}
 				{/foreach}
-				</select> 
+				</select>
 			</td>
 		</tr>
 
@@ -221,7 +221,7 @@
 				</select>
 			</td>
 		</tr>
-	
+
 		<tr>
 			<th>{t}organisatie:{/t}</th>
 			<td>
@@ -235,7 +235,7 @@
 				</select>
 			</td>
 		</tr>
-	
+
 		<tr>
         	<th>{t}publicatie:{/t}</th>
 			<td style="vertical-align:bottom">
@@ -269,7 +269,7 @@ $(document).ready(function()
 	{else}
 	main_language_display_label='{t}Nederlandse naam{/t}';
 	{/if}
-	
+
 	$('#main_language_display').html( main_language_display_label.toLowerCase() );
 
 	$('#name_uninomial').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
@@ -278,7 +278,7 @@ $(document).ready(function()
 	$('#name_authorship').on('paste',function() { setTimeout(function() { partstoname(); },100); } ).on('keyup',function() { partstoname(); } );
 
 	//allLookupNavigateOverrideUrl('taxon.php?id=%s');
-	
+
 	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
 	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
 
@@ -288,15 +288,15 @@ $(document).ready(function()
 		{ rank: 'nothogenus',id: {$smarty.const.NOTHOGENUS_RANK_ID} } ,
 		{ rank: 'nothospecies',id: {$smarty.const.NOTHOSPECIES_RANK_ID} } ,
 		{ rank: 'nothosubspecies',id: {$smarty.const.NOTHOSUBSPECIES_RANK_ID}  } ,
-		{ rank: 'nothovarietas',id: {$smarty.const.NOTHOVARIETAS_RANK_ID} } 
+		{ rank: 'nothovarietas',id: {$smarty.const.NOTHOVARIETAS_RANK_ID} }
 	);
-	
+
 	$('#data :input[type!=button]').each(function(key,value)
 	{
-		var set={ 
+		var set={
 			name:$(this).attr('id'),
 			label:$(this).attr('label'),
-			current:$(this).val(), 
+			current:$(this).val(),
 			mandatory:$(this).attr('mandatory')=='mandatory',
 			hidden:$(this).attr('type')=='hidden'
 		};
@@ -326,7 +326,7 @@ $(document).ready(function()
 	$('[havedroplist=true]').each(function()
 	{
 		$(this).attr('autocomplete','off');
-		$(this).bind('keyup', function(e) { 
+		$(this).bind('keyup', function(e) {
 			doNsrDropList({ e:e, id: $(this).attr('id') } )
 		} );
 	});
@@ -351,7 +351,7 @@ $(document).ready(function()
 	{
 		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
 	});
-	
+
 
 });
 </script>

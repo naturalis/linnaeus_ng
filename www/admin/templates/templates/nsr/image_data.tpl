@@ -6,6 +6,8 @@
 
 {assign image $image.data[0]}
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px">afbeelding:</span> {$image.image}</h2>
@@ -74,7 +76,7 @@
                 </span>
 			</td>
         </tr>
-        {/foreach}        
+        {/foreach}
 	</table>
     <input type="submit" value="opslaan" />
     </form>
@@ -88,4 +90,7 @@
 </div>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}

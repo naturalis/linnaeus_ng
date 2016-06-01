@@ -1,4 +1,5 @@
 {include file="../shared/admin-header.tpl"}
+
 <div id="page-main">
 
 <p>
@@ -36,9 +37,9 @@ function localList(obj,txt)
 	if (obj && obj.results)
 	{
 		for(var i=0;i<obj.results.length;i++) {
-			
+
 			var d = obj.results[i];
-			
+
 			if (d.id && d.label)
 			{
 				buffer.push(
@@ -62,12 +63,12 @@ $(document).ready(function()
 	{if $session.admin.project.title}
 	setRootNodeLabel('{$session.admin.project.title|@escape}');
 	{/if}
-	
+
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
 	{elseif $nodes}
 		growbranches( {$nodes} );
-		storetree();	
+		storetree();
 	{else}
 		buildtree(false);
 		//restoretree();
@@ -75,7 +76,7 @@ $(document).ready(function()
 
 	allLookupNavigateOverrideUrl(taxonTargetUrl);
 	allLookupNavigateOverrideListFunction(localList);
-	
+
 	$(document).ready(function()
 	{
 		$(window).keydown(function(event)
@@ -86,7 +87,7 @@ $(document).ready(function()
 				return false;
 			}
 		});
-	});	
+	});
 });
 </script>
 

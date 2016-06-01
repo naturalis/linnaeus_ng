@@ -2,13 +2,15 @@
 
 {include file="../shared/left_column_tree.tpl"}
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h2>
 
 <p>
     <h3>{t}Let op!{/t}</h3>
-    {t}Via dit scherm kan de conceptnaam direct worden aangepast, zonder checks. 
+    {t}Via dit scherm kan de conceptnaam direct worden aangepast, zonder checks.
     Doet dit alleen in uitzonderingsgevallen waarin er een discrepantie bestaat tussen de conceptnaam en de geldige naam.
     De correcte manier om de naam van een concept aan te passen is via{/t} <a href="synonym.php?id={$validname.id}">{t}de geldige naam{/t}</a>.
 </p>
@@ -35,4 +37,7 @@
 </div>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}

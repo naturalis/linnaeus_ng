@@ -10,7 +10,7 @@ function add_ref()
 {
 	var new_id=$('#taxon_reference_id').val();
 	var new_label=$('#taxon_reference').val();
-	
+
 	if (new_id.length==0) return;
 
 	for (var i=0;i<new_refs.length;i++)
@@ -25,7 +25,7 @@ function remove_ref( id )
 {
 	for (var i=0;i<new_refs.length;i++)
 	{
-		if (new_refs[i].id==id) 
+		if (new_refs[i].id==id)
 		{
 			new_refs.splice(i,1);
 			return;
@@ -66,9 +66,11 @@ function del_ref( id )
 		form.submit();
 	};
 }
-	
-</script>	
-	
+
+</script>
+
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">{t}literatuur:{/t}</span> {$concept.taxon}</h2>
@@ -108,6 +110,8 @@ function del_ref( id )
 </div>
 
 {include file="../shared/admin-messages.tpl"}
+
+</div>
 
 <script type="text/JavaScript">
 

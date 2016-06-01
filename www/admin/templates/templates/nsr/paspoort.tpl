@@ -5,6 +5,8 @@
 <script type="text/javascript" src="../../../admin/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="../../../admin/javascript/nsr_passport.js"></script>
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h2>
@@ -115,7 +117,8 @@ $(document).ready(function(e)
 });
 </script>
 
-
-
 {include file="../shared/admin-messages.tpl"}
+
+</div>
+
 {include file="../shared/admin-footer.tpl"}

@@ -18,6 +18,8 @@
 
 {include file="../shared/left_column_tree.tpl"}
 
+<div id="page-container-div">
+
 <div id="page-main">
 
 <h2><span style="font-size:12px;font-style:normal">{t}conceptkaart:{/t}</span> {$concept.taxon}</h2>
@@ -170,9 +172,9 @@
 
     {if $concept}
     <p>
-    
+
         <h4>{t}namen{/t}</h4>
-    
+
         <ul>
         {foreach from=$names.list item=v}
             <li>
@@ -186,10 +188,10 @@
         </ul>
         <a href="name.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}niet-wetenschappelijke naam toevoegen{/t}</a><br />
         <a href="synonym.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0" title="{t}toevoegen van geldige naam, synoniem, etc.{/t}">{t}wetenschappelijke naam toevoegen{/t}</a>
-    
+
     </p>
     {/if}
-    
+
     <p>
         {if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
             <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}soort toevoegen aan "%s"{/t}</a><br />
@@ -204,11 +206,11 @@
         <a href="media.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}media{/t}</a><br />
         <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literatuur{/t}</a><br />
         <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
-    
+
         {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {/if}{/foreach}
-    
+
         <a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">{t}taxon bekijken in front-end (nieuw venster){/t}</a><br />
         {if !$concept.is_deleted}
         <br />
@@ -216,14 +218,14 @@
         {/if}
         <br />
         <a href="taxon_edit_concept_direct.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}naam taxon concept direct aanpassen{/t}</a>
-    
+
         {assign var=k value=0}
         {foreach $traitgroups v}
         {if $k==0}<br /><br /><span class="small">{t}kenmerken toevoegen:{/t}</span><br />{/if}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {assign var=k value=$k+1}
 		{/foreach}
-    
+
     </p>
 
 {if $concept.is_deleted}
@@ -241,11 +243,9 @@
 
 </div>
 
-
-
 {include file="../shared/admin-messages.tpl"}
 
-
+</div>
 
 <script>
 $(document).ready(function()
