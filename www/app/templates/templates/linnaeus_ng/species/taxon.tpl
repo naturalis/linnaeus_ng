@@ -13,7 +13,7 @@
                 {if $names.preffered_name}
                     <h1 class="main-display-name">{$names.preffered_name}</h1>
                     <h2>{$names.nomen}</h2>
-                
+
                 {else}
                     <h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
                     <h2></h2>
@@ -21,7 +21,7 @@
             {/if}
 			</div>
 		</div>
-        
+
         <div id="categories">
 
             <ul>

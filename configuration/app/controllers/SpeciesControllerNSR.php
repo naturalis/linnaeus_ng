@@ -166,7 +166,7 @@ class SpeciesControllerNSR extends SpeciesController
 				else
 				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
 				{
-					if ( $ref->full_url_valid ) 
+					if ( $ref->full_url_valid )
 					{
 						$external_content->content_raw=@file_get_contents(  $ref->full_url  );
 						$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
@@ -302,6 +302,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$this->setPageName($taxon['label']);
 
+			// Ruud LINNA-372, volgorde van tabs is een beetje een zooitje
+		    // Ga ervanuit dat bij $reqCatId == null de eerste categorie de gewenste is
+            if (!isset($requestedCategory)) {
+                $requestedCategory = $categories['categories'][0];
+            }
+
 			$this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
 			$this->smarty->assign('requested_category',isset($requestedCategory) ? $requestedCategory : null);
 			$this->smarty->assign('content',isset($content['content']) ? $content['content'] : null);
@@ -367,13 +373,13 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		return $this->models->{$this->_model}->getFirstTaxonIdNsr($this->getCurrentProjectId());
 	}
-	
+
 	private function resolveSubstField( $p )
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$val = isset($p['val']) ? $p['val'] : null;
 		$valid_name = isset($p['valid_name']) ? $p['valid_name'] : null;
-		
+
 		if (is_null($taxon) || is_null($val) ) return;
 
 		/*
@@ -500,7 +506,7 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 		}
-		
+
 		$parts=parse_url( $reference->url );
 
 		$full_url=$reference->url . ( !empty($query_string) ? ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' ) : "" );
@@ -730,7 +736,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$start=$val['id'];
 			}
-			
+
 		}
 
 		$this->customSortArray($categories,array('key' => 'show_order'));
