@@ -24,18 +24,18 @@
         <tr>
             <td>{t}Internal name{/t}:</td>
             <td><input type="text" name="sys_name" value="{$state.sys_name}" maxlength="32" /></td>
-        </tr>                
+        </tr>
     {foreach $languages v i}
         <tr>
             <td>{$v.language} {t}name{/t}:</td>
             <td><input type="text" name="labels[{$v.language_id}]" value="{$state.labels[$v.language_id].label}" maxlength="64" /></td>
-        </tr>                
-    {/foreach}		
+        </tr>
+    {/foreach}
 
     <tr>
         <td></td>
         <td style="padding-top:10px">Value</td>
-    </tr>                
+    </tr>
 
 	{if $characteristic.type=='text'}
 
@@ -46,10 +46,10 @@
 				style="width:400px;height:150px;"
 				name="texts[{$v.language_id}]"
 				>{$state.texts[{$v.language_id}].text}</textarea></td>
-        </tr>                
-    {/foreach}		
+        </tr>
+    {/foreach}
 
-	{elseif $characteristic.type.name=='media'}
+	{elseif $characteristic.type=='media'}
 	<tr style="vertical-align:top">
 		<td>
 		{if $state.file_name}
@@ -69,8 +69,8 @@
 		{/if}
 		</td>
 	</tr>
-    
-	{elseif $characteristic.type.name=='range'}
+
+	{elseif $characteristic.type=='range'}
 
 	<tr>
 		<td>{t}Lower limit (inclusive):{/t}</td>
@@ -85,7 +85,7 @@
 		</td>
 	</tr>
 
-	{elseif $characteristic.type.name=='distribution'}
+	{elseif $characteristic.type=='distribution'}
 
 	<tr>
 		<td>{t}Mean:{/t}</td>
