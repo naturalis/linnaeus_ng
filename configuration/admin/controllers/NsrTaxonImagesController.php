@@ -29,7 +29,7 @@ class NsrTaxonImagesController extends NsrController
     public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
-	private $conceptId=null;
+	public $conceptId=null;
 	private $_resPicsPerPage=100;
 	private $sys_label_NSR_ID='NSR ID';
 	private $sys_label_file_name='file name';
