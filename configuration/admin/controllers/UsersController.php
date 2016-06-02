@@ -155,6 +155,7 @@ class UsersController extends Controller
 			$this->setUser();
 			$this->addUserToCurrentProject();
 			$this->logUserChange( $this->translate('created user') );
+			$this->redirect('index.php');
 		}
 		
 		$this->smarty->assign( 'roles', $this->getRoles() );
