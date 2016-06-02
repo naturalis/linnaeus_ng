@@ -72,17 +72,18 @@ class ModuleSettingsReaderController extends Controller
 
     public function getGeneralSetting( $p )
     {
-		if ( !$this->getAuthorisationState() ) return;
-
 		if ( is_array( $p ))
 		{
 			$setting=isset($p['setting']) ? $p['setting'] : null;
 			$subst=isset($p['subst']) ? $p['subst'] : null;
+			$no_auth_check=isset($p['no_auth_check']) && $p['no_auth_check']===true ? true : false;
 		}
 		else
 		{
 			$setting=$p;
 		}
+
+		if ( !$no_auth_check && !$this->getAuthorisationState() ) return;
 
 		foreach((array)$this->getGeneralSettingsValues() as $val)
 		{
