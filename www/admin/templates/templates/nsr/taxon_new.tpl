@@ -67,6 +67,8 @@
 		<tr><th>{t}auteur(s):{/t}</th><td><input type="text" class="medium" id="name_name_author" value="" disabled="disabled" label="{t}auteur{/t}" /></td></tr>
 		<tr><th>{t}jaar:{/t}</th><td><input type="text" class="small" id="name_authorship_year" value="" disabled="disabled" label="{t}jaar{/t}" /></td></tr>
 
+		{if $show_nsr_specific_stuff}
+
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 
 		<tr>
@@ -104,6 +106,8 @@
                 <input type="hidden" id="name_reference_id" value="" />
 			</td>
 		</tr>
+        
+		{/if}
 
 
 		<tr><td colspan="2">&nbsp;</td></tr>
@@ -118,9 +122,14 @@
 				<input type="hidden" id="name_name" value="" mandatory="mandatory" />
 			</td>
 		</tr>
+
+        {if $show_nsr_specific_stuff}
+
 		<tr>
         	<th>{t}nsr id:{/t}</th><td>{t}(wordt automatisch gegenereerd){/t}</td>
 		</tr>
+
+        {/if}
 
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
@@ -134,6 +143,8 @@
 				<input type="text" id="main_language_name" value="" onchange="" />
 			</td>
 		</tr>
+        
+        {if $show_nsr_specific_stuff}
 
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 
@@ -174,6 +185,10 @@
 		</tr>
 
 		<tr><td colspan="2">&nbsp;</td></tr>
+        
+        {/if}
+        
+		{if $show_nsr_specific_stuff}
 
 		<tr>
 			<th></th>
@@ -244,6 +259,9 @@
                 <input type="hidden" id="presence_reference_id" value="" />
 			</td>
 		</tr>
+        
+		{/if}
+        
 	</table>
 </p>
 
