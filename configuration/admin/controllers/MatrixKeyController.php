@@ -183,52 +183,45 @@ class MatrixKeyController extends Controller
     {
         $this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Matrices'));
-
-        if ($this->rHasVal('default'))
-		{
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-            $this->setDefaultMatrix($this->rGetVal('default'));
-		}
-
-        $matrices=$this->getMatrices();
-
-        if (count((array)$matrices)==0)
-		{
-            $this->redirect('matrix.php');
-		}
-
-        if ($this->rHasVal('imgdim'))
+        if ($this->rHasVal('default') && !$this->isFormResubmit())
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 	        $this->checkAuthorisation();
-
-			$this->reacquireStateImageDimensions($this->rGetVal('imgdim'));
+			$this->setDefaultMatrix($this->rGetVal('default'));
+			$this->redirect('matrices.php?');
 		}
+
+		if ($this->rHasVal('action','activate') && !$this->isFormResubmit())
+		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	        $this->checkAuthorisation();
+            $this->setCurrentMatrixId($this->rGetId());
+            $this->redirect('edit.php?');
+        }
 
         if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 	        $this->checkAuthorisation();
-
-            if ($this->getCurrentMatrixId()==$this->rGetId())
-			{
-                $this->setCurrentMatrixId( null );
-			}
-
+            if ($this->getCurrentMatrixId()==$this->rGetId()) $this->setCurrentMatrixId( null );
             $this->deleteMatrix( $this->rGetId() );
-
-            $matrices=$this->getMatrices();
+			$this->redirect('matrices.php?');
         }
-        else
-		if ($this->rHasVal('action','activate') && !$this->isFormResubmit())
+		
+        $matrices=$this->getMatrices();
+
+        if (count((array)$matrices)==0) $this->redirect('matrix.php');
+
+		/*
+        if ($this->rHasVal('imgdim'))
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 	        $this->checkAuthorisation();
-
-            $this->setCurrentMatrixId($this->rGetId());
-            $this->redirect('edit.php');
-        }
+			$this->reacquireStateImageDimensions($this->rGetVal('imgdim'));
+		}
+		*/
+		
+        $this->setPageName($this->translate('Matrices'));
 
         $this->smarty->assign('matrices', $matrices);
 
@@ -276,6 +269,10 @@ class MatrixKeyController extends Controller
 			$this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['names'][$this->getDefaultProjectLanguage()]['name']), $this->translate('Editing matrix'));
             $this->smarty->assign('matrix', $matrix);
         }
+		else
+		{
+			$this->redirect('new.php');
+		}
 
         $this->printPage();
     }
