@@ -30,6 +30,19 @@ table tr th {
             <td><input type="text" id="username" name="username" value="{$user.username}" /></td>
         </tr>
         <tr>
+            <th>{t}Password:{/t}</th>
+            <td><input type="password" id="password" name="password" value="" /></td>
+        </tr>
+        <tr>
+            <th>{t}Password (repeat):{/t}</th>
+            <td><input type="password" id="password_repeat" name="password_repeat" value="" /></td>
+        </tr>
+
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+
+        <tr>
             <th>{t}First name:{/t}</th>
             <td><input type="text" id="first_name" name="first_name" value="{$user.first_name}" /></td>
         </tr>
@@ -41,20 +54,17 @@ table tr th {
             <th>{t}E-mail address:{/t}</th>
             <td><input type="text" id="email_address" name="email_address" value="{$user.email_address}" /></td>
         </tr>
+
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+
         <tr>
             <th>{t}Active:{/t}</th>
             <td>
                 <input type="radio" value="1" name="active" {if $user.active!='0'} checked="checked"{/if} />y
                 <input type="radio" value="0" name="active" {if $user.active=='0'} checked="checked"{/if} />n
             </td>
-        </tr>
-        <tr>
-            <th>{t}Password:{/t}</th>
-            <td><input type="password" id="password" name="password" value="" /></td>
-        </tr>
-        <tr>
-            <th>{t}Password (repeat):{/t}</th>
-            <td><input type="password" id="password_repeat" name="password_repeat" value="" /></td>
         </tr>
 
         <tr>
