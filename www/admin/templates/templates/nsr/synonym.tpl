@@ -102,7 +102,7 @@
         </td>
     </tr>
 
-
+	{if $show_nsr_specific_stuff}
 
 	<tr><th colspan="2">&nbsp;</td></tr>
 	<tr><th>literatuur:</th><td>
@@ -137,12 +137,15 @@
 		</select>
 	</td></tr>
 
+    {/if}
+
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>
 		{if $name.reference}<tr><th>literatuur (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
 		{if $name.reference}<tr><th>expert (alt.):</th><td><input type="text" id="name_expert" value="{$name.expert}" /></td></tr>{/if}
 		{if $name.reference}<tr><th>organisatie (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
 	{/if}
+
 </table>
 </p>
 

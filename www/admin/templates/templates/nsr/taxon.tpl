@@ -63,6 +63,8 @@
                 <input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}ouder{/t}" droplistminlength="3" />
             </td>
         </tr>
+        
+        {if $show_nsr_specific_stuff}
 
         <tr><th>{t}nsr id:{/t}</th><td>{if $concept}{$concept.nsr_id}{else}{t}(auto){/t}{/if}</td></tr>
 
@@ -164,6 +166,9 @@
                 <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
             </td>
         </tr>
+        
+        {/if}
+        
         </table>
     </p>
     <input type="button" value="opslaan" onclick="saveconcept();" />
