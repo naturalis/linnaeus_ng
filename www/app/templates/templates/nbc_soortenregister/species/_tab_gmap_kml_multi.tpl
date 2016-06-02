@@ -8,6 +8,7 @@ var zoomlevel = null;
 
 //var kmlUrl;//="http://www.leidenuniv.nl/cml/mashup/kml_kmz/S_aristida_adscensionis_kleur.kmz";
 var urls=Array();
+var layers=[];
 
 function GMapInitialize()
 {
@@ -37,10 +38,19 @@ function GMapInitialize()
 	{
 		geoXml = new GGeoXml( urls[i] );
 		gmap.addOverlay(geoXml);
+		layers[i]=geoXml;
 	}
 
   gmap.enableScrollWheelZoom();
 
+}
+
+function toggleLayer(i)
+{
+	if(layers[i].getMap()===null)
+		layers[i].setMap(gmap)
+	else
+		layers[i].setMap(null)
 }
 
 $(document).ready(function()
@@ -53,13 +63,10 @@ $(document).ready(function()
 	
 	$(urls).each(function(index, value)
 	{
-		$('#urls').append('<li>'+value+'</li>');
+		$('#urls').append('<li onclick="toggleLayer('+index+');">'+value+'</li>');
 	});
 	
 	GMapInitialize();
-
-	//console.dir(urls);
-
 });
 </script>
 
