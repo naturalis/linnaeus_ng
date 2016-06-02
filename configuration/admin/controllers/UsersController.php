@@ -150,12 +150,16 @@ class UsersController extends Controller
 			$this->sanitizeNewUserData();
 			$this->userDataCheck();
 			$this->userPasswordCheck();
-			$this->userDataSave();
-			$this->userPasswordSave();
-			$this->setUser();
-			$this->addUserToCurrentProject();
-			$this->logUserChange( $this->translate('created user') );
-			$this->redirect('index.php');
+			
+			if ( $this->getNewUserDataSave() && $this->getNewUserPasswordSave() )
+			{
+				$this->userDataSave();
+				$this->userPasswordSave();
+				$this->setUser();
+				$this->addUserToCurrentProject();
+				$this->logUserChange( $this->translate('created user') );
+				$this->redirect('index.php');
+			}
 		}
 		
 		$this->smarty->assign( 'roles', $this->getRoles() );
