@@ -47,10 +47,7 @@ function GMapInitialize()
 
 function toggleLayer(i)
 {
-	if(layers[i].getMap()===null)
-		layers[i].setMap(gmap)
-	else
-		layers[i].setMap(null)
+	//not implemented yet
 }
 
 $(document).ready(function()
