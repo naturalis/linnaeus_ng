@@ -80,6 +80,7 @@ class ModuleSettingsReaderController extends Controller
 		}
 		else
 		{
+			$no_auth_check=false;
 			$setting=$p;
 		}
 
