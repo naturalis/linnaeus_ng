@@ -91,7 +91,6 @@ class MatrixKeyController extends Controller
 	private $_incUnknowns=false;
 	private $_master_matrix;
 	private $settings;
-	private $image_root_skin=true;
 
 	private $_mc;
 	private $_smc;
@@ -133,9 +132,8 @@ class MatrixKeyController extends Controller
 		$this->setIntroductionLinks();
 
 		$this->_search_presence_help_url = $this->moduleSettings->getModuleSetting( array('setting'=>'url_help_search_presence','module'=>'utilities') );
-		$this->image_root_skin = $this->moduleSettings->getModuleSetting( 'image_root_skin');
 
-		$this->smarty->assign( 'image_root_skin', $this->image_root_skin );
+		$this->smarty->assign( 'image_root_skin', $this->getProjectUrl('systemMedia') );
 		$this->smarty->assign( 'introduction_links', $this->getIntroductionLinks() );
 		$this->smarty->assign( 'settings', $this->settings );
 
