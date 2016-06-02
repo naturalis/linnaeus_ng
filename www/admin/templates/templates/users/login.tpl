@@ -24,8 +24,8 @@
 <p>
 {t}Unable to log in? What is the problem you are experiencing?{/t}
 <ul>
-  <li>{t _s1='<a href="password.php">' _s2='</a>'}I forgot my password and/or username: %sreset my password%s.{/t}</li>
-  <li>{t _s1='<a href="mailto:support@eti.uva.nl">' _s2='</a>'}My password doesn't work or my account may have been compromised: please %scontact the helpdesk%s.{/t}</li>
+  <li>{t}I forgot my password and/or username:{/t} <a href="password.php">{t}reset my password{/t}</a>.</li>
+  <li>{t}My password doesn't work or my account may have been compromised: please{/t} <a href="mailto:{$support_email}">{t}contact the helpdesk{/t}</a>.</li>
 </ul>
 </p>
 <p>
@@ -33,12 +33,12 @@
 </p>
 </div>
 
-{literal}
+
 <script type="text/JavaScript">
-$(document).ready(function(){
+$(document).ready(function()
+{
 	$('#username').focus();
 });
 </script>
-{/literal}
 
 {include file="../shared/admin-footer.tpl"}
