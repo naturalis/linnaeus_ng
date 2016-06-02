@@ -25,6 +25,7 @@
 <form id="theForm" method="post" action="">
 <input type="hidden" name="id" id="id" value="" />
 <input type="hidden" name="action" id="action" value="" />
+<input type="hidden" name="rnd" value="{$rnd}" />
 </form>
 </div>
 
