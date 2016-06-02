@@ -86,7 +86,7 @@ table tr th {
             </td>
         </tr>
 
-		{if $user}
+		{if $user.id}
         <tr>
             <th>{t}Modules:{/t}</th>
             <td>
