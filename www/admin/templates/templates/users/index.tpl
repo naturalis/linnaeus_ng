@@ -6,8 +6,9 @@
         <th>first name</th>
         <th>last name</th>
         <th>email address</th>
+        <th>role</th>
         <th>active</th>
-        <th>last login</th>
+        <!-- th>last login</th -->
         <th></th>
     </tr>
 {/function}
@@ -18,8 +19,9 @@
         <td>{$v.first_name}</td>
         <td>{$v.last_name}</td>
         <td>{$v.email_address}</td>
+        <td>{$v.project_role.role}</td>
         <td>{if $v.active==1}y{else}n{/if}</td>
-        <td>{$v.last_login}</td>
+        <!-- td>{$v.last_login}</td -->
         <td>
         [ <a href="view.php?id={$v.id}">{t}view{/t}</a> ]
         {if $v.project_role}
