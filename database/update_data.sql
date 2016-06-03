@@ -165,6 +165,8 @@ INSERT IGNORE INTO `module_settings` VALUES
 (null,-1,'show_nsr_specific_stuff','Show or hide(*) various NSR-specific function',1,NOW(),NOW()),
 (null,-1,'show_automatic_hybrid_markers','Show or hide automatic × marker for taxa of hybrid ranks',1,NOW(),NOW()),
 (null,-1,'show_automatic_infixes','Show or hide automatic infixes "var.", "subsp." and "f." for taxa of appropriate ranks',1,NOW(),NOW()),
+(null,-1,'concept_url','Base URL for concepts (requires the project generates NSR-style pseudo PURLs)',null,NOW(),NOW())
+
 ;
 
 
