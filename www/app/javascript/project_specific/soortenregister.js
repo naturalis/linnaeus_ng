@@ -296,6 +296,7 @@ function printParameters()
 		$('#search-parameters').
 			append(
 				$(
+					'<li>' + _('Taxa met') + ' ' + getTraitGroupName() +
 					' <a href="#" onclick="setTraitGroup(null);submitSearchParams();return false;"> X </a></li>'));
 	}
 
