@@ -1,5 +1,7 @@
 <?php
 
+	if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
+
 	if (!defined('ID_ROLE_EDITOR')) define('ID_ROLE_EDITOR',3);
 	if (!defined('ID_ROLE_SYS_ADMIN')) define('ID_ROLE_SYS_ADMIN',1);
 	if (!defined('ID_ROLE_LEAD_EXPERT')) define('ID_ROLE_LEAD_EXPERT',2);

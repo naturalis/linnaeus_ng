@@ -115,8 +115,6 @@ class Controller extends BaseClass
         $this->loadModels();
         $this->activateBasicModules();
         $this->initUserRights();
-		$this->setRankIdConstants();
-        $this->setRandomValue();
         $this->setLanguages();
         $this->checkLastVisitedPage();
         $this->setSmartySettings();
@@ -125,6 +123,7 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
         $this->setProjectLanguages();
 		$this->initTranslator();
+        $this->setOtherStuff();
     }
 
     /**
@@ -2578,6 +2577,14 @@ class Controller extends BaseClass
 			);
 	}
 
+	private function setOtherStuff()
+	{
+        $this->setRandomValue();
+		$this->setRankIdConstants();
+		$this->setShowAutomaticHybridMarkers();
+		$this->setShowAutomaticInfixes();
+	}
+
 	public function addHybridMarkerAndInfixes( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
@@ -2603,6 +2610,21 @@ class Controller extends BaseClass
 		if ( $base_rank_id==FORMA_RANK_ID || $base_rank_id==FORMA_SPECIALIS_RANK_ID  )
 		{
 			return $this->addFormaInfix( $p );
+		}
+
+		if ( !empty($p['specific_epithet']) )
+		{
+			return $p['specific_epithet'];
+		}
+		else
+		if ( !empty($p['uninomial']) )
+		{
+			return $p['uninomial'];
+		}
+		else
+		if ( !empty($p['name']) )
+		{
+			return $p['name'];
 		}
 	}
 
@@ -2681,8 +2703,9 @@ class Controller extends BaseClass
 			else
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
-				$ied=explode( ' ',  strrev($name), 2 );
-				return strrev( $ied[1] . strrev($marker) . ' ' . $ied[0] );
+				$ied=explode( ' ',  $name );
+				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+				return implode(' ',$ied);
 			}
 		}
 		return $name;
@@ -2707,8 +2730,9 @@ class Controller extends BaseClass
 			else
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
-				$ied=explode( ' ',  strrev($name), 2 );
-				return strrev( $ied[1] . strrev($marker) . ' ' . $ied[0] );
+				$ied=explode( ' ',  $name );
+				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+				return implode(' ',$ied);
 			}
 		}
 		return $name;
@@ -2733,12 +2757,44 @@ class Controller extends BaseClass
 			else
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
-				$ied=explode( ' ',  strrev($name), 2 );
-				return strrev( $ied[1] . strrev($marker) . ' ' . $ied[0] );
+				$ied=explode( ' ',  $name );
+				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+				return implode(' ',$ied);
 			}
 		}
 		return $name;
 	}
+
+	protected function setShowAutomaticHybridMarkers()
+	{
+		$this->_showAutomaticHybridMarkers =
+			$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'show_automatic_hybrid_markers'
+		))==1;
+	}
+
+	protected function setShowAutomaticInfixes()
+	{
+		$this->_showAutomaticInfixes =
+			$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'show_automatic_infixes'
+		))==1;
+	}
+
+	protected function getShowAutomaticHybridMarkers()
+	{
+		return $this->_showAutomaticHybridMarkers;
+	}
+
+	protected function getShowAutomaticInfixes()
+	{
+		return $this->_showAutomaticInfixes;
+	}
+
 
 
 }

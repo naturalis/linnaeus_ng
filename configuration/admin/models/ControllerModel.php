@@ -270,6 +270,38 @@ final class ControllerModel extends AbstractModel
 
 	}
 	
+	public function getSetting($params)
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $module_id = isset($params['module_id']) ? $params['module_id'] : null;
+        $setting = isset($params['setting']) ? $params['setting'] : null;
+
+        if (is_null($project_id) || is_null($module_id) || is_null($setting)) return;
+
+		$query = "
+			select
+				_b.id as setting_id,
+				_a.id as value_id,
+				_a.value as value,
+				_b.default_value as default_value
+
+			from
+				%PRE%module_settings_values _a
+
+			left join
+				%PRE%module_settings _b
+				on _b.id=_a.setting_id
+
+			where
+				_a.project_id = " . $project_id . "
+				and _b.setting = '" . $setting ."'
+				and _b.module_id = " . $module_id;
+
+        $d=$this->freeQuery($query);
+
+		return $d ? $d[0]['value'] : null;
+	}
+
 	
 
 

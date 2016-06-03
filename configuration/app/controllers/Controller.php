@@ -2624,6 +2624,7 @@ class Controller extends BaseClass
         return false;
     }
 
+
 	public function addHybridMarkerAndInfixes( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
@@ -2805,6 +2806,37 @@ class Controller extends BaseClass
 	}
 
 
+	protected function setShowAutomaticHybridMarkers()
+	{
+		$this->_showAutomaticHybridMarkers =
+			$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'show_automatic_hybrid_markers'
+		))==1;
+	}
+
+	protected function setShowAutomaticInfixes()
+	{
+		$this->_showAutomaticInfixes =
+			$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'show_automatic_infixes'
+		))==1;
+	}
+
+	protected function getShowAutomaticHybridMarkers()
+	{
+		return $this->_showAutomaticHybridMarkers;
+	}
+
+	protected function getShowAutomaticInfixes()
+	{
+		return $this->_showAutomaticInfixes;
+	}
+
+
 	protected function setRankIdConstants()
 	{
 		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
@@ -2835,34 +2867,5 @@ class Controller extends BaseClass
 		return $d ? $d[0]['id'] : false;
     }
 
-	protected function setShowAutomaticHybridMarkers()
-	{
-		$this->_showAutomaticHybridMarkers =
-			$this->models->ControllerModel->getSetting(array(
-			'project_id' => $this->getCurrentProjectId(),
-			'module_id' => GENERAL_SETTINGS_ID,
-			'setting' => 'show_automatic_hybrid_markers'
-		))==1;
-	}
-
-	protected function setShowAutomaticInfixes()
-	{
-		$this->_showAutomaticInfixes =
-			$this->models->ControllerModel->getSetting(array(
-			'project_id' => $this->getCurrentProjectId(),
-			'module_id' => GENERAL_SETTINGS_ID,
-			'setting' => 'show_automatic_infixes'
-		))==1;
-	}
-
-	protected function getShowAutomaticHybridMarkers()
-	{
-		return $this->_showAutomaticHybridMarkers;
-	}
-
-	protected function getShowAutomaticInfixes()
-	{
-		return $this->_showAutomaticInfixes;
-	}
 
 }

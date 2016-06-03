@@ -20,8 +20,6 @@ class ModuleSettingsReaderController extends Controller
     {
         parent::__construct($p);
 
-		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
-
 		$this->UserRights->setRequiredLevel( ID_ROLE_EDITOR );
 		$this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
