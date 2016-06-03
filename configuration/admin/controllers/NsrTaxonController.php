@@ -675,7 +675,6 @@ class NsrTaxonController extends NsrController
 
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 
-
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
 				$scientific_name=trim($val['name']);
@@ -692,6 +691,16 @@ class NsrTaxonController extends NsrController
 			}
 
 			$names[$key]['name_no_tags']=strip_tags($names[$key]['name']);
+
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
+			{
+				$names[$key]['name_no_tags']=$this->addHybridMarker( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id ) );
+			}
+			else
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']!=PREDICATE_VALID_NAME && isset($val['rank_id']))
+			{
+				$names[$key]['name_no_tags']=$this->addHybridMarker( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'] ) );
+			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
 
