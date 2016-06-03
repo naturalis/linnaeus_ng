@@ -25,7 +25,7 @@ class SpeciesControllerNSR extends SpeciesController
 {
 	private $_resPicsPerPage=12;
 	private $_nameTypeIds;
-	private $_isNsr = false;
+	private $show_nsr_specific_stuff=false;
 
 	public $usedModelsExtended = array(
 		'actors',
@@ -67,6 +67,8 @@ class SpeciesControllerNSR extends SpeciesController
 		// not actually implemented to do anything yet
 		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( "tree_show_upper_taxon", 0 ) );
 
+		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -99,11 +101,6 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('message','Geen taxon ID gevonden.');
 			$this->printPage('../shared/generic-error');
 		}
-    }
-
-    public function setIsNsr ()
-    {
-        $this->_isNsr = true;
     }
 
     public function taxonAction()
@@ -195,7 +192,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$categories['start']='media';
 				}
 
-				if ($categories['start']==CTAB_MEDIA && $this->_isNsr)
+				if ($categories['start']==CTAB_MEDIA && $this->show_nsr_specific_stuff)
 				{
 					$this->smarty->assign('search',$this->requestData);
 					$this->smarty->assign('querystring',$this->reconstructQueryString());
@@ -297,7 +294,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			}
 
-			$overview = $this->_isNsr ? $this->getTaxonOverviewImageNsr($taxon['id']) :
+			$overview = $this->show_nsr_specific_stuff ? $this->getTaxonOverviewImageNsr($taxon['id']) :
                 $this->getTaxonOverviewImage();
 
 			$this->setPageName($taxon['label']);
@@ -319,9 +316,10 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('classification',$classification);
 			$this->smarty->assign('children',$children);
 			$this->smarty->assign('names',$names);
-			$this->smarty->assign('overviewImage',$this->_isNsr ? $overview['image'] : $overview);
+			//$this->smarty->assign('overviewImage',$this->show_nsr_specific_stuff ? $overview['image'] : $overview);
+			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
-            $this->smarty->assign('is_nsr', $this->_isNsr);
+            $this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
 
 	        $this->printPage('taxon');
 
