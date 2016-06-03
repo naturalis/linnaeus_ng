@@ -605,7 +605,18 @@ class SpeciesControllerNSR extends SpeciesController
 				$categories[$dummy]['is_empty']=empty($ezData);
 			}
 
-
+			if (!$this->_suppressTab_NAMES)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_NAMES,
+						'title' => $this->translate('Naamgeving'),
+						'is_empty' => false,
+						'tabname' => 'CTAB_NAMES',
+						'auto_tab' => 1
+					)
+				);
+			}
 
 			if (!$this->_suppressTab_CLASSIFICATION)
 			{
@@ -615,19 +626,6 @@ class SpeciesControllerNSR extends SpeciesController
 						'title' => $this->translate('Classificatie'),
 						'is_empty' => false,
 						'tabname' => 'CTAB_CLASSIFICATION',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_NAMES)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_NAMES,
-						'title' => $this->translate('Naamgeving'),
-						'is_empty' => false,
-						'tabname' => 'CTAB_NAMES',
 						'auto_tab' => 1
 					)
 				);
@@ -696,9 +694,6 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-
-
-
 
 		}
 
