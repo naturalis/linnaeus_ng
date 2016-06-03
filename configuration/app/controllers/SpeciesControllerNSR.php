@@ -335,8 +335,12 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$name=$this->getName(array('nameId'=>$this->rGetId()));
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
+
+			$taxon=$this->getTaxonById($name['taxon_id']);
+			$taxon['taxon']=$this->addHybridMarker( array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id']) );
+			
 			$this->smarty->assign('name',$name);
-			$this->smarty->assign('taxon',$this->getTaxonById($name['taxon_id']));
+			$this->smarty->assign('taxon',$taxon);
 
 		}
         $this->printPage();
