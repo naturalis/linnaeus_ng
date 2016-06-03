@@ -2747,3 +2747,7 @@ body {
 	font-size:0.9em;
 	color:red;
 }
+
+.no-italics {
+	font-style:normal;
+}

@@ -350,7 +350,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -440,7 +440,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -590,8 +590,8 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['validName']=$this->addHybridMarker( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
 
 			$meta=$this->models->MediaMeta->_get(array("id"=>
 				array(
@@ -684,9 +684,9 @@ class SearchControllerNSR extends SearchController
 					$data[$key]['infra_specific_epithet']=$n['infra_specific_epithet'];
 					$data[$key]['authorship']=$n['authorship'];
 					$data[$key]['nomen']=
-						$this->addHybridMarker(array('name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id']));
+						$this->addHybridMarkerAndInfixes(array('name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id']));
 					$data[$key]['name']=
-						$this->addHybridMarker(
+						$this->addHybridMarkerAndInfixes(
 							array( 'name'=>
 										(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
 										(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .

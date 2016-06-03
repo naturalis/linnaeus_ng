@@ -85,8 +85,11 @@ class Controller extends BaseClass
 
 	protected $moduleSession;
 	protected $baseSession;
-	protected $_hybridMarker='×';
 
+	protected $_hybridMarker='×';
+	protected $_varietyMarker='var.';
+	protected $_subspeciesMarker='subsp.';
+	protected $_formaMarker='f.';
 
     /**
      * Constructor, calls parent's constructor and all initialisation functions
@@ -684,7 +687,7 @@ class Controller extends BaseClass
     {
 		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id]);
 		if ( !empty($taxon['taxon']) )
-			$taxon['taxon']=$this->addHybridMarker( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
 		return $taxon;
     }
 
@@ -692,7 +695,7 @@ class Controller extends BaseClass
     {
 		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'name'=>trim($name)]);
 		if ( !empty($taxon['taxon']) )
-			$taxon['taxon']=$this->addHybridMarker( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
 		return $taxon;
     }
 
@@ -2575,23 +2578,46 @@ class Controller extends BaseClass
 			);
 	}
 
-	protected function addHybridMarker( $p )
+	public function addHybridMarkerAndInfixes( $p )
+	{
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
+
+		if ( $base_rank_id==NOTHOGENUS_RANK_ID ||
+			 $base_rank_id==NOTHOSPECIES_RANK_ID ||
+			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
+			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		{
+			return $this->addHybridMarker( $p );
+		}
+		else
+		if ( $base_rank_id==VARIETAS_RANK_ID  )
+		{
+			return $this->addVarietasInfix( $p );
+		}
+		else
+		if ( $base_rank_id==SUBSPECIES_RANK_ID  )
+		{
+			return $this->addSubspeciesInfix( $p );
+		}
+		else
+		if ( $base_rank_id==FORMA_RANK_ID || $base_rank_id==FORMA_SPECIALIS_RANK_ID  )
+		{
+			return $this->addFormaInfix( $p );
+		}
+	}
+
+	public function addHybridMarker( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 		$name=isset($p['name']) ? $p['name'] : null;
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
-		$nametype=isset($p['nametype']) ? $p['nametype'] : null;
+		
+		$marker = $this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
 
-		if ( isset($nametype) && $nametype!=PREDICATE_VALID_NAME)
-		{
-			// must also handle synonyms, ...
-			//return $name;
-		}
-			 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{
-			return $this->_hybridMarker . ( isset($uninomial) ? $uninomial : $name );
+			return $marker . ( isset($uninomial) ? $uninomial : $name );
 		}
 		else
 		if ( $base_rank_id==NOTHOSPECIES_RANK_ID ||
@@ -2600,27 +2626,119 @@ class Controller extends BaseClass
 		{
 			if ( !empty($specific_epithet) )
 			{
-				return $this->_hybridMarker . $specific_epithet;
+				return $marker . $specific_epithet;
 			}
 			else
 			if ( !empty($uninomial) )
 			{
-				return $this->_hybridMarker . $uninomial;
+				return $marker . $uninomial;
 			}
 			else
 			if ( empty($name) )
 			{
-				return $this->_hybridMarker;
+				return $marker;
 			}
 			else
 			{
 				$ied=explode(' ', $name, 2);
-				return $ied[0]. ' ' .$this->_hybridMarker . $ied[1];
+				return $ied[0]. '  ' . $marker . $ied[1];
 			}
 		}
 		else
 		{
-			return $name;
+			if ( !empty($specific_epithet) )
+			{
+				return $specific_epithet;
+			}
+			else
+			if ( !empty($uninomial) )
+			{
+				return $uninomial;
+			}
+			else
+			{
+				return $name;
+			}
 		}
 	}
+
+	public function addVarietasInfix( $p )
+	{
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
+		$name=isset($p['name']) ? $p['name'] : null;
+		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
+		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
+		
+		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker . ' ' : '';
+
+		if ( $base_rank_id==VARIETAS_RANK_ID )
+		{
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  strrev($name), 2 );
+				return strrev( $ied[1] . strrev($marker) . ' ' . $ied[0] );
+			}
+		}
+		return $name;
+	}
+
+	public function addSubspeciesInfix( $p )
+	{
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
+		$name=isset($p['name']) ? $p['name'] : null;
+		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
+		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
+
+		$marker=$this->getShowAutomaticInfixes() ? $this->_subspeciesMarker . ' ' : '';
+
+		if ( $base_rank_id==SUBSPECIES_RANK_ID )
+		{
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  strrev($name), 2 );
+				return strrev( $ied[1] . strrev($marker) . ' ' . $ied[0] );
+			}
+		}
+		return $name;
+	}
+
+	public function addFormaInfix( $p )
+	{
+		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
+		$name=isset($p['name']) ? $p['name'] : null;
+		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
+		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
+
+		$marker=$this->getShowAutomaticInfixes() ? $this->_formaMarker . ' ' : '';
+
+		if ( $base_rank_id==FORMA_RANK_ID || $base_rank_id==FORMA_SPECIALIS_RANK_ID )
+		{
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  strrev($name), 2 );
+				return strrev( $ied[1] . strrev($marker) . ' ' . $ied[0] );
+			}
+		}
+		return $name;
+	}
+
+
 }
