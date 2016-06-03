@@ -319,7 +319,7 @@ class VersatileExportController extends Controller
 			foreach((array)$this->names as $key=>$val)
 			{
 				$this->names[$key]['wetenschappelijke_naam']=
-					$this->addHybridMarker( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
+					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
 			}
 		}
 

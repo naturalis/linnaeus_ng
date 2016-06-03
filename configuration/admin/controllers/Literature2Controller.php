@@ -1509,7 +1509,7 @@ class Literature2Controller extends NsrController
 		{
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 			$names[$key]['name']=
-				$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'nametype'=>$val['nametype'] ) );
+				$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'nametype'=>$val['nametype'] ) );
 		}
 
 
@@ -1522,7 +1522,7 @@ class Literature2Controller extends NsrController
 
 		foreach((array)$presences as $key=>$val)
 		{
-			$presences[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 
@@ -1536,7 +1536,7 @@ class Literature2Controller extends NsrController
 		foreach((array)$taxa as $key=>$val)
 		{
 			$taxa[$key]['taxon']=
-				$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+				$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 
@@ -1553,7 +1553,7 @@ class Literature2Controller extends NsrController
 				array(
 					'group_id'=>$val['trait_group_id'],
 					'taxon_id'=>$val['taxon_id'],
-					'taxon'=>$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) )
+					'taxon'=>$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) )
 				);
 		}
 
@@ -1567,7 +1567,7 @@ class Literature2Controller extends NsrController
 
 		foreach((array)$passports as $key=>$val)
 		{
-			$passports[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$passports[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 
