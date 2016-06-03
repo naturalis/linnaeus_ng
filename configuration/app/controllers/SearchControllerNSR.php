@@ -179,8 +179,10 @@ class SearchControllerNSR extends SearchController
 			foreach((array)$this->traitGroupsToInclude as $val)
 			{
 				$traits=$traits+$this->getTraits($val['id']);
+				if ($val['group_id']==$search['trait_group']) $search['trait_group_name']=$val['group_name'];
 			}
 
+			$this->smarty->assign('trait_group_name',$search['trait_group_name']);
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
@@ -366,6 +368,7 @@ class SearchControllerNSR extends SearchController
 		if (!empty($p['group_id']))
 		{
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
+			q($d,1);
 		}
 		else
 		if (!empty($p['group']))

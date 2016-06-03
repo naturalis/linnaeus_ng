@@ -370,6 +370,7 @@ $(document).ready(function()
 
 	{if $search.trait_group!=''}
 		setTraitGroup({$search.trait_group});
+		setTraitGroupName('{$trait_group_name}');
 		printParameters();
 	{/if}
 

@@ -354,8 +354,8 @@ final class SearchNSRModel extends AbstractModel
 
 			from %PRE%taxa _a
 			
-			".$trait_joins."
-			".$traitgroup_joins."
+			" . $trait_joins . "
+			" . ( isset($traitgroup_joins['join']) ? $traitgroup_joins['join'] : "" ) . "
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -501,9 +501,11 @@ final class SearchNSRModel extends AbstractModel
 					".(!is_null($trend_on) && !is_null($trend_off) ? " or " : "" )."
 					".(!is_null($trend_off) ? "ifnull(_trnd.number_of_trend_years,0) = 0" : "" )."
 				) " : "" )."
+				
+				" . ( isset($traitgroup_joins['where']) ? $traitgroup_joins['where'] : "" ) . "
+				" . ( !empty($trait_joins) || !empty($traitgroup_joins) ? "group by _a.id" : "" ) . "
+				" . ( isset($traitgroup_joins['having']) ? $traitgroup_joins['having'] : "" ) . "
 
-				".(!empty($trait_joins) || !empty($traitgroup_joins) ? "group by _a.id" : "" )."
-				".(!empty($traitgroup_joins) ? "having count(_ttv.id)+count(_ttf.id) > 0" : "" )."
 			order by ".
 				(isset($sort) && $sort=='name-pref-nl' ? "common_name,_a.taxon" : "_a.taxon")."
 			".(isset($limit) ? "limit ".$limit : "")."
@@ -511,6 +513,7 @@ final class SearchNSRModel extends AbstractModel
 		;
 
 		$data=$this->freeQuery( $query );
+	
 		$count=$this->freeQuery( "select found_rows() as total" );
 
 		return array('data'=>$data,'count'=>$count[0]['total']);
@@ -1299,8 +1302,6 @@ final class SearchNSRModel extends AbstractModel
 
 	}
 
-
-
 	private function getTraitJoins( $traits )
 	{
 		if (empty($traits))	return;
@@ -1497,30 +1498,33 @@ final class SearchNSRModel extends AbstractModel
 	{
 		if (empty($group))	return;
 		
-		return "
-			left join %PRE%traits_taxon_values _ttv
-				on _a.project_id = _ttv.project_id
-				and _a.id = _ttv.taxon_id
-
-			left join %PRE%traits_values _tv
-				on _ttv.project_id = _tv.project_id
-				and _ttv.value_id = _tv.id
-
-			left join %PRE%traits_traits _tt
-				on _tv.project_id = _tt.project_id
-				and _tv.trait_id = _tt.id
-				and _tt.trait_group_id=".$group."
-
-
-			left join %PRE%traits_taxon_freevalues _ttf
-				on _a.project_id = _ttf.project_id
-				and _a.id = _ttf.taxon_id
-
-			left join %PRE%traits_traits _tt2
-				on _ttf.project_id = _tt2.project_id
-				and _ttf.trait_id = _tt2.id
-				and _tt2.trait_group_id=".$group."
-			";
+		return
+			[ "join"=>
+				 "left join %PRE%traits_taxon_values _ttv
+						on _a.project_id = _ttv.project_id
+						and _a.id = _ttv.taxon_id
+		
+					left join %PRE%traits_values _tv
+						on _ttv.project_id = _tv.project_id
+						and _ttv.value_id = _tv.id
+		
+					left join %PRE%traits_traits _tt
+						on _tv.project_id = _tt.project_id
+						and _tv.trait_id = _tt.id
+		
+					left join %PRE%traits_taxon_freevalues _ttf
+						on _a.project_id = _ttf.project_id
+						and _a.id = _ttf.taxon_id
+		
+					left join %PRE%traits_traits _tt2
+						on _ttf.project_id = _tt2.project_id
+						and _ttf.trait_id = _tt2.id
+					",
+				"where"=> "
+					and ( _tt.trait_group_id=".$group."  or _tt2.trait_group_id=".$group.")",
+				"having"=>
+					"having count(_ttv.id)+count(_ttf.id) > 0"
+			 ];
 	}
 
 
