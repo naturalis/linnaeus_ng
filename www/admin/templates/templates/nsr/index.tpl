@@ -19,7 +19,7 @@
     {if $show_nsr_specific_stuff}
 	<a href="nsr_id_resolver.php">{t}NSR ID resolver{/t}</a><br />
     {/if}
-	<a href="../import/export_versatile.php">{t}multi-purpose export{/t}</a><br />
+	<a href="export_versatile.php">{t}multi-purpose export{/t}</a><br />
 	<a href="image_meta_bulk.php">{t}image meta-data bulk upload{/t}</a><br />
 </p>
 <p>
