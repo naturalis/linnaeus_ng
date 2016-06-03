@@ -93,9 +93,10 @@ final class ControllerModel extends AbstractModel
 				_a.is_hybrid,
 				_a.list_level,
 				_a.is_empty,
-				_b.lower_taxon,
+				_f.lower_taxon,
 				_c.commonname,
-				_b.rank_id as base_rank_id
+				_f.rank_id as base_rank_id,
+				ifnull(_q.label,_r.rank) as rank_label
 
 			from %PRE%taxa _a
 
@@ -106,10 +107,18 @@ final class ControllerModel extends AbstractModel
 				and _trash.item_type='taxon'
 			" : "")."
 
-			left join %PRE%projects_ranks _b
-				on _a.project_id=_b.project_id
-				and _a.rank_id=_b.id
-
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id = _f.project_id
+		
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
+		
+			left join %PRE%labels_projects_ranks _q
+				on _f.id=_q.project_rank_id
+				and _f.project_id = _q.project_id
+				and _q.language_id=".$languageId."
+				
 			left join %PRE%commonnames _c
 				on _a.project_id=_c.project_id
 				and _c.id=
