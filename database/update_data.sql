@@ -38,9 +38,11 @@ update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by ra
 select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
 insert into ranks values (@this_id+1,'nothovarietas',null,'Nothovarietas',null,@parent_id,0,1,null,now(),now());
 
-
-update ranks set additional ='botany, used for hybrid taxa' where rank in ('nothogenus','nothospecies','nothosubspecies','nothovarietas');
-
+update ranks set rank = 'forma specialis' where rank = 'forma_specialis';
+update ranks set additional = 'fungi' where rank = 'forma specialis';
+update ranks set additional = 'botany' where rank in ('cultivar','cultivar group');
+update ranks set additional = 'botany, used for taxa of hybrid origin' where rank in ('nothogenus','nothospecies','nothosubspecies','nothovarietas');
+delete from ranks where rank = 'subsubforma';
 
 
 /* Update modules */
