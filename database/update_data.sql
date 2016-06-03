@@ -39,6 +39,9 @@ select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
 insert into ranks values (@this_id+1,'nothovarietas',null,'Nothovarietas',null,@parent_id,0,1,null,now(),now());
 
 
+update ranks set additional ='botany, used for hybrid taxa' where rank in ('nothogenus','nothospecies','nothosubspecies','nothovarietas');
+
+
 
 /* Update modules */
 ALTER TABLE modules DROP INDEX module;

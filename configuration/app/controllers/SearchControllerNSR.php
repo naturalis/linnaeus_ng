@@ -101,6 +101,10 @@ class SearchControllerNSR extends SearchController
 		if ($this->rHasVal('search'))
 		{
 			$search=$this->rGetAll();
+
+			$search['search_original']=$search['search'];
+			$search['search']=str_replace($this->_hybridMarker,'',$search['search']);
+
 			$results=$this->doSearch($search);
 
 			$search['search']=htmlspecialchars($search['search']);

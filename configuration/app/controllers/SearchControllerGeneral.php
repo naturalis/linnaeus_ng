@@ -185,11 +185,13 @@ class SearchControllerGeneral extends SearchController
     {
 		if ($this->rHasVal('search'))
 		{
-			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$this->rGetVal('search')) );
+			$modified_search=str_replace($this->_hybridMarker,'',$this->rGetVal('search'));
+			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$modified_search) );
+			$this->moduleSession->setModuleSetting( array('setting'=>'search_original','value'=>$this->rGetVal('search')) );
 			$this->moduleSession->setModuleSetting( array('setting'=>'modules','value'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null) );
 			$this->moduleSession->setModuleSetting( array('setting'=>'freeModules','value'=>$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null) );
 
-			if ($this->validateSearchString($this->rGetVal('search')))
+			if ($this->validateSearchString($modified_search))
 			{
 
 				if ($this->rHasVal('extended','1'))
@@ -197,7 +199,7 @@ class SearchControllerGeneral extends SearchController
 					$results =
 						$this->doSearch(
 							array(
-								'search'=>$this->rGetVal('search'),
+								'search'=>$modified_search,
 								'modules'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null ,
 								'freeModules'=>$this->rHasVal('freeModules') ? $this->rGetVal('freeModules') : null,
 								'extended'=>true
@@ -206,7 +208,7 @@ class SearchControllerGeneral extends SearchController
 				}
 				else
 				{
-					$search='"'.trim($this->rGetVal('search'),'"').'"';
+					$search='"'.trim($modified_search,'"').'"';
 
 					$results=
 						$this->doSearch(

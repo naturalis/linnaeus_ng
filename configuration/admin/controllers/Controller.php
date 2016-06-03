@@ -2585,9 +2585,10 @@ class Controller extends BaseClass
 
 		if ( isset($nametype) && $nametype!=PREDICATE_VALID_NAME)
 		{
-			return $name;
+			// must also handle synonyms, ...
+			//return $name;
 		}
-
+			 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{
 			return $this->_hybridMarker . ( isset($uninomial) ? $uninomial : $name );

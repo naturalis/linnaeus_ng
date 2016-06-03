@@ -154,6 +154,7 @@ final class NsrTaxonModel extends AbstractModel
 					when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
 					else 0
 				end as sort_criterium,
+				_f.rank_id,
 				ifnull(_q.label,_r.rank) as rank_label
 	
 			from %PRE%names _a 
