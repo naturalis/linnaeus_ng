@@ -296,7 +296,6 @@ function printParameters()
 		$('#search-parameters').
 			append(
 				$(
-					'<li>Taxa met exotenpaspoort '+
 					' <a href="#" onclick="setTraitGroup(null);submitSearchParams();return false;"> X </a></li>'));
 	}
 
@@ -361,6 +360,16 @@ function setTraitGroup(id)
 function getTraitGroup()
 {
 	return trait_group;
+}
+
+function setTraitGroupName(name)
+{
+	trait_group_name=name;
+}
+
+function getTraitGroupName()
+{
+	return trait_group_name;
 }
 
 function toggle_panel(ele)
