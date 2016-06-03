@@ -16,6 +16,7 @@
 					<h2></h2>
 				{/if}
 			</div>
+
 			{if $overviewImage.image}
 			<div id="taxonImage">
 				<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
@@ -64,8 +65,6 @@
 
 		{else}
         
-        <h1>{$activeCategory}</h1>
-
 			{if $content|@is_array}
 			<ul>
 				{foreach from=$content item=v key=k}
