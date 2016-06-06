@@ -180,7 +180,8 @@
 
 			if ( $sqlMode->mode !== '')
 			{
-				die( "abnormal program termination: disable MySQL STRICT mode (SET GLOBAL sql_mode = '')\n" );
+				//die( "abnormal program termination: disable MySQL STRICT mode (SET GLOBAL sql_mode = '')\n" );
+				mysqli_query($this->conn0, "SET sql_mode = '';");
 			}
 
 		}
