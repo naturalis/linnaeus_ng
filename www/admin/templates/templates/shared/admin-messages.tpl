@@ -5,9 +5,6 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	console.log(typeof noMessageFade);
-	
-	
 	if (typeof noMessageFade == 'undefined' || noMessageFade!=true)
 	{
 		$('#page-block-messages').fadeOut({$adminMessageFadeOutDelay});	

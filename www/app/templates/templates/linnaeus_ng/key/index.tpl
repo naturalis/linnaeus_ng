@@ -1,5 +1,11 @@
 {include file="../shared/header.tpl"}
 
+<style>
+.l2_choice {
+	cursor:default;
+}
+</style>
+
 <div id="page-main">
 
     {include file="_taxa.tpl"}
@@ -18,18 +24,27 @@
 
 		{foreach $choices v k}
 
-            {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+            {* if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 			<div class="l2_choice{if !$step.image} no_image{/if}" onclick="window.open('../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
             {elseif $v.res_taxon_id!=''}
 			<div class="l2_choice{if !$step.image} no_image{/if}" onclick="window.open('../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
-            {/if}
+            {/if *}
+
+			<div class="l2_choice{if !$step.image} no_image{/if}">
 
                 <div class="l2_text">
                 	{$v.choice_txt}
                     {if $v.choice_img}<img style="max-width:100%" src="{$v.choice_img}">{/if}
 				</div>
 
-                <div class="target">
+                {* <div class="target"> *}
+
+                {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+                <div class="target" onclick="window.open('../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
+                {elseif $v.res_taxon_id!=''}
+                <div class="target" onclick="window.open('../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
+                {/if}
+    
                 {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
                     {if $v.target_number}
                     <span class="arrow">&rarr;</span>
@@ -38,7 +53,9 @@
                 {elseif $v.res_taxon_id!=''}
                     <span class="arrow">&rarr;</span><span>{$v.target}</span>
                 {/if}
+
                 </div>
+                
             </div>
 
 		{/foreach}
