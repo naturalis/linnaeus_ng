@@ -6,16 +6,7 @@
 
     <p id="header-titles-small">
         <span id="header-title" class="set-as-title">
-            {if $inclHigherTaxaRankPrefix && $taxon.lower_taxon==0}
-				{$taxon.label}
-            {else}
-                {if $names.preffered_name}
-                    {$names.preffered_name}
-                    <h2>{$names.nomen}</h2>
-                {else}
-					{$names.nomen}
-                {/if}
-            {/if}
+            {$taxon.label}
         </span>
     </p>
 
@@ -69,7 +60,7 @@
 
 		{elseif $activeCategory==$smarty.const.CTAB_CLASSIFICATION}
 
-			{include file="_tab_classificatie.tpl"}
+			{include file="../species/_tab_classificatie.tpl"}
 
 		{else}
 
