@@ -7,13 +7,13 @@
 	WHY!?
 
 	logging!
-	
+
 	webservice
 	user in multiple projects
 
 	isCurrentUserSysAdmin!!!
 	look project-wide for REDESIGN RIGHTS
-	
+
 	removeUserFromCurrentProject
 		needs deletiog of referenced rights etc
 
@@ -32,7 +32,7 @@ class UsersController extends Controller
 	private $_newuserpasswordsave=false;
 	private $_newuserrolesave=false;
 
-    public $usedModels = array( 
+    public $usedModels = array(
 		'user_module_access',
 		'user_item_access'
 	);
@@ -54,9 +54,9 @@ class UsersController extends Controller
     );
 
     public $controllerPublicName='User administration';
-	
-	private $checksUsername=array('min' => 4,'max' => 32); // regExp => 
-	private $checksPassword=array('min' => 8,'max' => 32); // regExp => 
+
+	private $checksUsername=array('min' => 4,'max' => 32); // regExp =>
+	private $checksPassword=array('min' => 8,'max' => 32); // regExp =>
 	private $checksName=array('min' => 1,'max' => 64);
 	private $_userBefore;
 
@@ -94,7 +94,7 @@ class UsersController extends Controller
     public function viewAction()
     {
         $this->checkAuthorisation();
-		
+
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
 
         $this->setPageName($this->translate('Project collaborator data'));
@@ -108,7 +108,7 @@ class UsersController extends Controller
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
         $this->checkAuthorisation();
-		
+
 		if (!$this->rHasId()) $this->redirect( 'index.php' );
 
 		$this->setUserId( $this->rGetId() );
@@ -150,7 +150,7 @@ class UsersController extends Controller
 			$this->sanitizeNewUserData();
 			$this->userDataCheck();
 			$this->userPasswordCheck();
-			
+
 			if ( $this->getNewUserDataSave() && $this->getNewUserPasswordSave() )
 			{
 				$this->userDataSave();
@@ -161,7 +161,7 @@ class UsersController extends Controller
 				$this->redirect('index.php');
 			}
 		}
-		
+
 		$this->smarty->assign( 'roles', $this->getRoles() );
 		$this->smarty->assign('user', $this->rGetAll() );
 		$this->printPage( 'edit' );
@@ -193,7 +193,7 @@ class UsersController extends Controller
 			$this->userTaxaSave();
 			$this->setUser();
 			$this->logUserChange( $this->translate('edited user') );
-		} 
+		}
 		else
 		if ($this->rHasVal('action','reset_permissions') && !$this->isFormResubmit())
 		{
@@ -201,7 +201,7 @@ class UsersController extends Controller
 			$this->resetUserPermissions();
 			$this->logUserChange( $this->translate('reset user permissions') );
 			$this->setUser();
-		} 
+		}
 		else
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
@@ -226,10 +226,10 @@ class UsersController extends Controller
 		$this->smarty->assign( 'roles', $this->getRoles() );
 		$this->smarty->assign( 'expert_role_id', $this->getExpertRoleId() );
 		$this->smarty->assign( 'modules', $this->getProjectModulesUser() );
-		
+
 		$this->printPage();
     }
-	
+
     public function deleteAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
@@ -328,7 +328,7 @@ class UsersController extends Controller
 			'project_id'=>$this->getCurrentProjectId(),
 			'user_id'=>$userid
 		));
-		
+
 		foreach((array)$d as $key=>$val)
 		{
 			$d[$key]['label']=$this->formatTaxon( $val );
@@ -350,12 +350,12 @@ class UsersController extends Controller
 		));
 
 		return $d ? $d[0]['can_publish']==1 : false;
-	}			
+	}
 
 	private function getUserIsSysadmin( $userid )
 	{
 		return $this->getUserProjectRole( $userid )['role_id']==ID_ROLE_SYS_ADMIN;
-	}			
+	}
 
 	private function getRoles()
 	{
@@ -365,7 +365,7 @@ class UsersController extends Controller
 	private function getProjectModulesUser()
 	{
 		$d=$this->getProjectModules();
-		
+
 		foreach((array)$d['modules'] as $key=>$val)
 		{
 			if ( $val['show_in_menu']==0 )
@@ -382,13 +382,13 @@ class UsersController extends Controller
 			),
 			'fieldAsIndex'=>'module_id'
 		));
-		
+
 		foreach((array)$d['modules'] as $key=>$val)
 		{
 			$d['modules'][$key]['access']=
 				isset($u[$val['module_id']]) && $u[$val['module_id']]['module_type']=='standard' ? $u[$val['module_id']] : null;
 		}
-		
+
 		$u=$this->models->UserModuleAccess->_get(array(
 			'id'=>array(
 				'project_id'=>$this->getCurrentProjectId(),
@@ -397,13 +397,13 @@ class UsersController extends Controller
 			),
 			'fieldAsIndex'=>'module_id'
 		));
-		
+
 		foreach((array)$d['freeModules'] as $key=>$val)
 		{
 			$d['freeModules'][$key]['access']=
 				isset($u[$val['id']]) && $u[$val['id']]['module_type']=='custom' ? $u[$val['id']] : null;
 		}
-		
+
 		return $d;
 	}
 
@@ -413,15 +413,15 @@ class UsersController extends Controller
 		{
 			return;
 		}
-		
+
 		$role_id = isset($this->getNewUserData['role_id']) ? $this->getNewUserData['role_id'] : $this->getExpertRoleId();
-		
+
 		if ( is_null($role_id) )
 		{
 			$this->addError( $this->translate('Cannot add user without role ID.') );
 			return;
 		}
-		
+
         $this->models->ProjectsRolesUsers->save(array(
             'id' => null,
             'project_id' => $this->getCurrentProjectId(),
@@ -429,7 +429,7 @@ class UsersController extends Controller
             'user_id' => $this->getUserId(),
             'active' => 1
         ));
-		
+
 		$this->addMessage( $this->translate('Added user to current project.') );
     }
 
@@ -439,7 +439,7 @@ class UsersController extends Controller
 			'user_id' => $this->getUserId(),
 			'project_id' => $this->getCurrentProjectId(),
 		);
-			
+
         $this->models->ProjectsRolesUsers->delete( $d );
         $this->models->UserModuleAccess->delete( $d );
         $this->models->UserItemAccess->delete( $d );
@@ -474,7 +474,7 @@ class UsersController extends Controller
 		unset( $data['custom_write'] );
 		unset( $data['role_id'] );
 		unset( $data['can_publish'] );
-	
+
 		$this->models->Users->save( $data );
 
 		if ( empty($data['id']) )
@@ -533,7 +533,7 @@ class UsersController extends Controller
 		$role_id=$this->getNewUserData()['role_id'];
 
 		$user=$this->getUser();
-		
+
 		if ( $role_id==$user['project_role']['role_id'] )
 		{
 			return;
@@ -573,16 +573,16 @@ class UsersController extends Controller
 	private function userRightsSave()
 	{
 		$data=$this->getNewUserData();
-		
+
 		$this->models->UserModuleAccess->delete(
 			array(
 				'user_id' => $this->getUserId(),
 				'project_id' => $this->getCurrentProjectId()
 			));
-			
+
 		$modules=isset($data['module']) ? $data['module'] : null;
 		$custom=isset($data['custom']) ? $data['custom'] : null;
-		
+
 		if ( $data['role_id']>=$this->getExpertRoleId() )
 		{
 			$can_publish=isset($data['can_publish']) ? $data['can_publish'] : '0';
@@ -591,7 +591,7 @@ class UsersController extends Controller
 		{
 			$can_publish='1';
 		}
-		
+
 		foreach((array)$modules as $key=>$val)
 		{
 			$can_read=isset($data['module_read']) && isset($data['module_read'][$key]) ? $data['module_read'][$key]=='on' : false;
@@ -615,7 +615,7 @@ class UsersController extends Controller
 		{
 			$can_read=isset($data['custom_read']) && isset($data['custom_read'][$key]) ? $data['custom_read'][$key]=='on' : false;
 			$can_write=isset($data['custom_write']) && isset($data['custom_write'][$key]) ? $data['custom_write'][$key]=='on' : false;
-			
+
 			$this->models->UserModuleAccess->save(
 				array(
 					'id'=>null,
@@ -628,7 +628,7 @@ class UsersController extends Controller
 					'can_publish' => $can_publish,
 				));
 		}
-		
+
 		$this->addMessage( $this->translate('Updated rights.') );
 	}
 
@@ -646,12 +646,12 @@ class UsersController extends Controller
 				'user_id' => $this->getUserId(),
 				'project_id' => $this->getCurrentProjectId()
 			));
-			
+
 
 		if ( $this->models->UserItemAccess->getAffectedRows() > 0 )
 			$this->addMessage( $this->translate('Updated taxa.') );
-	
-		if ( isset($taxa) ) 
+
+		if ( isset($taxa) )
 		{
 			foreach((array)$taxa as $key=>$val)
 			{
@@ -664,11 +664,11 @@ class UsersController extends Controller
 						'item_type'=>'taxon'
 					));
 			}
-			
+
 			if ( $this->models->UserItemAccess->getAffectedRows() > 0 )
 				$this->addMessage( $this->translate('Updated taxa.') );
 		}
-		
+
 
 	}
 
@@ -676,7 +676,7 @@ class UsersController extends Controller
     {
 		$first_name=$this->getNewUserData()['first_name'];
 		$last_name=$this->getNewUserData()['last_name'];
-		
+
 		$str1=sprintf($this->translate('First name should be between %s and %s characters.'),$this->checksName['min'],$this->checksName['max']);
 		$str2=sprintf($this->translate('Last name should be between %s and %s characters.'),$this->checksName['min'],$this->checksName['max']);
 
@@ -706,7 +706,7 @@ class UsersController extends Controller
     private function isUsernameCorrect()
     {
 		$username=$this->getNewUserData()['username'];
-		
+
 		$str=sprintf($this->translate('Username should be between %s and %s characters.'),$this->checksUsername['min'],$this->checksUsername['max']);
 
         if ( strlen($username) < $this->checksUsername['min'] )
@@ -731,7 +731,7 @@ class UsersController extends Controller
 		$username=$this->getNewUserData()['username'];
 
 		$d=$this->models->Users->_get(array(
-			'id'=>array( 'username'=>$username, 'id !='=>$this->getUserId() ),
+			'id'=>array( 'username'=>$username),
 			'columns'=>'count(*) as total'
 		));
 
@@ -774,10 +774,10 @@ class UsersController extends Controller
 		$p1=$this->getNewUserData()['password'];
 		$p2=$this->getNewUserData()['password_repeat'];
 		$id=$this->getNewUserData()['id'];
-		
+
 		// existing user not entering new passwords: no change
         if ( !empty($id) && ( empty($p1) && empty($p2) ) ) return;
-		
+
 		$str=sprintf($this->translate('Password should be between %s and %s characters.'),$this->checksPassword['min'],$this->checksPassword['max']);
 
         if ( $p1!=$p2 )
@@ -831,7 +831,7 @@ class UsersController extends Controller
 		$this->_allprojectusers=$this->models->UsersModel->getProjectUsers(array(
 			'project_id'=>$this->getCurrentProjectId()
 		));
-		
+
 		foreach((array)$this->_allprojectusers as $key=>$user)
 		{
 			$this->_allprojectusers[$key]['module_access']=$this->getUserModuleAccess( $user['id'] );
@@ -864,8 +864,8 @@ class UsersController extends Controller
 			'id' => array( 'id' => $this->getUserId() ),
 			'columns' => '*, datediff(curdate(),created) as days_active'
 		));
-		
-		if ( $this->_user ) 
+
+		if ( $this->_user )
 		{
 			$this->_user=$this->_user[0];
 			$this->_user['module_access']=$this->getUserModuleAccess( $this->getUserId() );
@@ -879,7 +879,7 @@ class UsersController extends Controller
 			$this->_user=null;
 		}
 	}
-			
+
 	private function getUser()
 	{
 		return $this->_user;
@@ -982,7 +982,7 @@ class UsersController extends Controller
 
 		return $pass;
 	}
-	
+
 	private function resetUserPermissions()
 	{
 		$modules=array();
@@ -999,14 +999,14 @@ class UsersController extends Controller
 			$modules[$val['module_id']]='on';
 			$module_read[$val['module_id']]='on';
 		}
-		
+
 		foreach((array)$d['freeModules'] as $val)
 		{
 			$custom[$val['id']]='on';
 			$custom_read[$val['id']]='on';
 		}
 
-		/*		
+		/*
 		if( $this->getUser()['project_role']['role_id']==ID_ROLE_SYS_ADMIN )
 		{
 			// unnecessary, ID_ROLE_SYS_ADMIN has default full access
@@ -1017,10 +1017,10 @@ class UsersController extends Controller
 		{
 			foreach((array)$d['modules'] as $val)
 			{
-				
+
 				$module_write[$val['module_id']]='on';
 			}
-			
+
 			foreach((array)$d['freeModules'] as $val)
 			{
 				$custom_write[$val['id']]='on';
@@ -1031,7 +1031,7 @@ class UsersController extends Controller
 		if( $this->getUser()['project_role']['role_id']==ID_ROLE_EDITOR )
 		{
 			$can_publish='0';
-		}	
+		}
 
 		$this->_newuserdata['module']=$modules;
 		$this->_newuserdata['custom']=$custom;
@@ -1040,7 +1040,7 @@ class UsersController extends Controller
 		$this->_newuserdata['custom_read']=$custom_read;
 		$this->_newuserdata['custom_write']=$custom_write;
 		$this->_newuserdata['can_publish']=$can_publish;
-			
+
 		$this->userRightsSave();
 
 	}
@@ -1063,7 +1063,7 @@ class UsersController extends Controller
 			return true;
 		}
 	}
-	
+
 	private function setUserBefore()
 	{
 		if ( is_null($this->getUserId()) )
