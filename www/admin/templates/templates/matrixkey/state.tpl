@@ -34,7 +34,11 @@
 
     <tr>
         <td></td>
+        {if $characteristic.type == 'media' && $state.id == ''}
+        <td></td>
+        {else}
         <td style="padding-top:10px">Value</td>
+        {/if}
     </tr>
 
 	{if $characteristic.type=='text'}
@@ -49,7 +53,8 @@
         </tr>
     {/foreach}
 
-	{elseif $characteristic.type=='media'}
+	{elseif $characteristic.type=='media' && $state.id != ''}
+
 	<tr style="vertical-align:top">
 		<td>
 		{if $state.file_name}
@@ -110,10 +115,14 @@
 	</tr>
 	<tr>
 		<td colspan="2">
-			<input type="button" onclick="matrixCheckStateForm()" value="{t}save and return to matrix{/t}" />&nbsp;
-			<input type="button" onclick="$('#repeat').val('1');matrixCheckStateForm();" value="{t _s1=$characteristic.label}save and add another state for &quot;%s&quot;{/t}" />&nbsp;
-			{if $state.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
-			<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_top')" />
+			{if $characteristic.type == 'media' && $state.id == ''}
+				<input type="button" onclick="$('#repeat').val('2'); matrixCheckStateForm()" value="{t}save and add media{/t}" />&nbsp;
+			{else}
+				<input type="button" onclick="matrixCheckStateForm()" value="{t}save and return to matrix{/t}" />&nbsp;
+				<input type="button" onclick="$('#repeat').val('1');matrixCheckStateForm();" value="{t _s1=$characteristic.label}save and add another state for &quot;%s&quot;{/t}" />&nbsp;
+				{if $state.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
+				<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_top')" />
+			{/if}
 		</td>
 	</tr>
 </table>
