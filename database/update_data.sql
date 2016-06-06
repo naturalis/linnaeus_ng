@@ -60,6 +60,11 @@ delete from modules where controller = 'highertaxa';
 insert ignore into modules values (null,'Higher taxa','Placeholder module for backward compatibility','highertaxa',99,0,1,now(),now());
 insert ignore into modules values (null,'Actors','Actors: persons & organizations','actors',99,1,0,now(),now());
 
+update modules set show_in_menu=0, description='Front-end implementation of the Taxon Editor' where controller='species';
+update modules set description='Taxon editor, back-end implementation of Species module' where controller='nsr';
+update modules set show_in_menu=0 where controller='literature';
+
+
 
 /* Update roles */
 delete from roles where id in (4,5);
