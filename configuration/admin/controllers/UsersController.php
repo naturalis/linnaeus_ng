@@ -332,8 +332,8 @@ class UsersController extends Controller
 		foreach((array)$d as $key=>$val)
 		{
 			$d[$key]['label']=$this->formatTaxon( $val );
-   			$d[$key]['label']=$this->addHybridMarker( array( 'name'=>$d[$key]['label'],'base_rank_id'=>$val['base_rank_id'] ) );
-   			$d[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+   			$d[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$d[$key]['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+   			$d[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 		return $d;

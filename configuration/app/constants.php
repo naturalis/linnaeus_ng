@@ -2,6 +2,8 @@
 
 	//define('FIXED_PROJECT_ID',1);
 
+	if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
+
 	if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
 	if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
 	if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);

@@ -2,14 +2,14 @@
 
 <div id="page-main">
 
-<h2>Ovezicht Soortenregister edits{if $search.search} - "{$search.search}"{/if}</h2>
-<h3>Aantal edits: {$results.count}</h3>
+<h2>{t}Activity log{/t}{if $search.search} - "{$search.search}"{/if}</h2>
+<h3>{t}Aantal edits:{/t} {$results.count}</h3>
 
 <p>
 <form method="post" action="activity_log.php">
 <input type="text" value="{$search.search}" name="search" id="search"  style="width:300px;" />
 <input type="submit" value="zoeken" />
-{if $search.search} <a style="margin-left:10px" href="activity_log.php">alles tonen</a>{/if}
+{if $search.search} <a style="margin-left:10px" href="activity_log.php">{t}alles tonen{/t}</a>{/if}
 </form>
 </p>
 

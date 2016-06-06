@@ -63,6 +63,8 @@
                 <input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}ouder{/t}" droplistminlength="3" />
             </td>
         </tr>
+        
+        {if $show_nsr_specific_stuff}
 
         <tr><th>{t}nsr id:{/t}</th><td>{if $concept}{$concept.nsr_id}{else}{t}(auto){/t}{/if}</td></tr>
 
@@ -164,6 +166,9 @@
                 <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
             </td>
         </tr>
+        
+        {/if}
+        
         </table>
     </p>
     <input type="button" value="opslaan" onclick="saveconcept();" />
@@ -205,8 +210,9 @@
         <a href="paspoort.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}paspoort{/t}</a><br />
         <a href="media.php?id={$concept.id}&noautoexpand=1" class="edit" style="margin:0">{t}media{/t}</a><br />
         <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literatuur{/t}</a><br />
+        {if $show_nsr_specific_stuff}
         <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
-
+		{/if}
         {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {/if}{/foreach}

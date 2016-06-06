@@ -31,7 +31,7 @@
 				{if $results.data}
 				{assign var=i value=0}
 				{foreach $results.data v}
-				<div class="result" sort_name="{$v.taxon}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
+				<div class="result" sort_name="{$v.taxon|strip_tags:false}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
 					{if $v.overview_image}
 					<img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}"/>
 					{/if}

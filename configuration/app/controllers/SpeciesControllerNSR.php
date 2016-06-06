@@ -25,7 +25,7 @@ class SpeciesControllerNSR extends SpeciesController
 {
 	private $_resPicsPerPage=12;
 	private $_nameTypeIds;
-	private $_isNsr = false;
+	private $show_nsr_specific_stuff=false;
 
 	public $usedModelsExtended = array(
 		'actors',
@@ -67,6 +67,8 @@ class SpeciesControllerNSR extends SpeciesController
 		// not actually implemented to do anything yet
 		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( "tree_show_upper_taxon", 0 ) );
 
+		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -99,11 +101,6 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('message','Geen taxon ID gevonden.');
 			$this->printPage('../shared/generic-error');
 		}
-    }
-
-    public function setIsNsr ()
-    {
-        $this->_isNsr = true;
     }
 
     public function taxonAction()
@@ -195,7 +192,7 @@ class SpeciesControllerNSR extends SpeciesController
 					$categories['start']='media';
 				}
 
-				if ($categories['start']==CTAB_MEDIA && $this->_isNsr)
+				if ($categories['start']==CTAB_MEDIA && $this->show_nsr_specific_stuff)
 				{
 					$this->smarty->assign('search',$this->requestData);
 					$this->smarty->assign('querystring',$this->reconstructQueryString());
@@ -297,7 +294,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			}
 
-			$overview = $this->_isNsr ? $this->getTaxonOverviewImageNsr($taxon['id']) :
+			$overview = $this->show_nsr_specific_stuff ? $this->getTaxonOverviewImageNsr($taxon['id']) :
                 $this->getTaxonOverviewImage();
 
 			$this->setPageName($taxon['label']);
@@ -319,9 +316,10 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('classification',$classification);
 			$this->smarty->assign('children',$children);
 			$this->smarty->assign('names',$names);
-			$this->smarty->assign('overviewImage',$this->_isNsr ? $overview['image'] : $overview);
+			//$this->smarty->assign('overviewImage',$this->show_nsr_specific_stuff ? $overview['image'] : $overview);
+			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
-            $this->smarty->assign('is_nsr', $this->_isNsr);
+            $this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
 
 	        $this->printPage('taxon');
 
@@ -335,8 +333,12 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$name=$this->getName(array('nameId'=>$this->rGetId()));
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
+
+			$taxon=$this->getTaxonById($name['taxon_id']);
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id']) );
+			
 			$this->smarty->assign('name',$name);
-			$this->smarty->assign('taxon',$this->getTaxonById($name['taxon_id']));
+			$this->smarty->assign('taxon',$taxon);
 
 		}
         $this->printPage();
@@ -603,7 +605,18 @@ class SpeciesControllerNSR extends SpeciesController
 				$categories[$dummy]['is_empty']=empty($ezData);
 			}
 
-
+			if (!$this->_suppressTab_NAMES)
+			{
+				array_push($categories,
+					array(
+						'id' => CTAB_NAMES,
+						'title' => $this->translate('Naamgeving'),
+						'is_empty' => false,
+						'tabname' => 'CTAB_NAMES',
+						'auto_tab' => 1
+					)
+				);
+			}
 
 			if (!$this->_suppressTab_CLASSIFICATION)
 			{
@@ -613,19 +626,6 @@ class SpeciesControllerNSR extends SpeciesController
 						'title' => $this->translate('Classificatie'),
 						'is_empty' => false,
 						'tabname' => 'CTAB_CLASSIFICATION',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_NAMES)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_NAMES,
-						'title' => $this->translate('Naamgeving'),
-						'is_empty' => false,
-						'tabname' => 'CTAB_NAMES',
 						'auto_tab' => 1
 					)
 				);
@@ -694,9 +694,6 @@ class SpeciesControllerNSR extends SpeciesController
 					)
 				);
 			}
-
-
-
 
 		}
 
@@ -803,11 +800,11 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
-					$nomen='<i>'.$this->addHybridMarker( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</i>';
+					$nomen='<i>'.$this->addHybridMarkerAndInfixes( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</i>';
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 
-				$scientific_name=$this->addHybridMarker( array('name'=>trim($val['name']),'base_rank_id'=>$base_rank_id) );
+				$scientific_name=$this->addHybridMarkerAndInfixes( array('name'=>trim($val['name']),'base_rank_id'=>$base_rank_id) );
 
 			}
 
@@ -879,7 +876,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'nomen'=>$nomen,
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
 				'preffered_name'=>$preferredname,
-				'hybrid_marker'=>$this->addHybridMarker( array('base_rank_id'=>$base_rank_id) ),
+				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( array('base_rank_id'=>$base_rank_id) ),
 				'list'=>$names,
 				'language_has_preferredname'=>$language_has_preferredname
 			);
@@ -936,9 +933,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['name']=$this->addHybridMarker( array( 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['nomen']=$this->addHybridMarker( array( 'name'=>$val['nomen'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['name']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['nomen'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 		return
@@ -1005,10 +1002,10 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $id
 		));
 
-		$taxon['name']=$this->addHybridMarker(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
-		$taxon['taxon']=$this->addHybridMarker(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
-		$taxon['uninomial']=$this->addHybridMarker(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
-		$taxon['specific_epithet']=$this->addHybridMarker(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['name']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
+		$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
 
 		array_unshift($this->tmp,$taxon);
 
@@ -1069,10 +1066,10 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['name']=$this->addHybridMarker(array('name'=>$val['name'],'base_rank_id'=>$val['rank_id']));
-			$data[$key]['taxon']=$this->addHybridMarker(array('name'=>$val['taxon'],'base_rank_id'=>$val['rank_id']));
-			$data[$key]['uninomial']=$this->addHybridMarker(array('uninomial'=>$val['uninomial'],'base_rank_id'=>$val['rank_id']));
-			$data[$key]['specific_epithet']=$this->addHybridMarker(array('specific_epithet'=>$val['specific_epithet'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['name']=$this->addHybridMarkerAndInfixes(array('name'=>$val['name'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$val['taxon'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$val['uninomial'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$val['specific_epithet'],'base_rank_id'=>$val['rank_id']));
 
 			if ($include_count)
 				$data[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
@@ -1133,7 +1130,7 @@ class SpeciesControllerNSR extends SpeciesController
     		'nameId' => $nameId
 		));
 
-		$d['name']=$this->addHybridMarker( array('name'=>$d['name'],'base_rank_id'=>$d['base_rank_id']) );
+		$d['name']=$this->addHybridMarkerAndInfixes( array('name'=>$d['name'],'base_rank_id'=>$d['base_rank_id']) );
 
 		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));
 

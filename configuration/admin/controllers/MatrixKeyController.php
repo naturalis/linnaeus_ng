@@ -597,7 +597,7 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 		$this->smarty->assign('taxa', $taxa);
@@ -1539,7 +1539,7 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
         return isset($taxa) ? $taxa : null;

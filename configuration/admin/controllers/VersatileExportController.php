@@ -1,6 +1,7 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class VersatileExportController extends Controller
 {
@@ -51,7 +52,7 @@ class VersatileExportController extends Controller
 	private $quoteChar='"';
 	private $query_bit_name_parts;
 	private $query;
-	private $concept_url='http://www.nederlandsesoorten.nl/nsr/concept/';
+	private $concept_url;
 	private $names=array();
 	private $synonyms=array();
 	private $parentRegister=array();
@@ -110,6 +111,9 @@ class VersatileExportController extends Controller
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 		$this->setNameTypeIds();
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->concept_url=$this->moduleSettings->getGeneralSetting( 'concept_base_url' );
     }
 
     public function exportAction()
@@ -319,7 +323,7 @@ class VersatileExportController extends Controller
 			foreach((array)$this->names as $key=>$val)
 			{
 				$this->names[$key]['wetenschappelijke_naam']=
-					$this->addHybridMarker( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
+					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
 			}
 		}
 

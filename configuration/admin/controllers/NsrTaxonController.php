@@ -675,7 +675,6 @@ class NsrTaxonController extends NsrController
 
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 
-
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
 				$scientific_name=trim($val['name']);
@@ -692,6 +691,16 @@ class NsrTaxonController extends NsrController
 			}
 
 			$names[$key]['name_no_tags']=strip_tags($names[$key]['name']);
+
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
+			{
+				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id ) );
+			}
+			else
+			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']!=PREDICATE_VALID_NAME && isset($val['rank_id']))
+			{
+				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'] ) );
+			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
 
@@ -807,7 +816,7 @@ class NsrTaxonController extends NsrController
 		));
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 		return $taxa;
 	}
@@ -855,8 +864,8 @@ class NsrTaxonController extends NsrController
 		foreach ((array) $taxa as $key => $val)
 		{
 
-			$taxa[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$taxa[$key]['label']=$this->addHybridMarker( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
 
 			if ($val['base_rank_id']==GENUS_RANK_ID)
 			{
