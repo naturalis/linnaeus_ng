@@ -1,3 +1,7 @@
+<script type="text/JavaScript">
+noMessageFade=true;
+</script>
+
 {include file="../shared/admin-header.tpl"}
 {include file="../shared/admin-messages.tpl"}
 
@@ -86,8 +90,6 @@
 
 </div>
 
-
-
 <script type="text/JavaScript">
 $(document).ready(function()
 {
@@ -95,7 +97,5 @@ $(document).ready(function()
 	$('#search').focus();
 });
 </script>
-
-
 
 {include file="../shared/admin-footer.tpl"}
