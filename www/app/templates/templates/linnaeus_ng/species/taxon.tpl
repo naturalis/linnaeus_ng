@@ -4,42 +4,39 @@
 
 	<div id="content" class="taxon-detail">
 
-		<div id="taxonHeader" class="hasImage">
-			<div id="titles" class="full">
+    <p id="header-titles-small">
+        <span id="header-title" class="set-as-title">
             {if $inclHigherTaxaRankPrefix && $taxon.lower_taxon==0}
-                <h1 class="no-subtitle main-display-name">{$taxon.label}</h1>
-                <h2></h2>
+				{$taxon.label}
             {else}
                 {if $names.preffered_name}
-                    <h1 class="main-display-name">{$names.preffered_name}</h1>
+                    {$names.preffered_name}
                     <h2>{$names.nomen}</h2>
-
                 {else}
-                    <h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
-                    <h2></h2>
+					{$names.nomen}
                 {/if}
             {/if}
-			</div>
-		</div>
+        </span>
+    </p>
 
-        <div id="categories">
+    <div id="categories">
 
-            <ul>
-                {foreach $categories v k}
-                    {if !$v.is_empty}
-                    <li id="ctb-{$v.id}">
-                        <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
-                        {if $activeCategory==$v.id}
-                        class="category-active"
-                        {/if}
-                        >{$v.title}</a>
-                    </li>
-                    {if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
+        <ul>
+            {foreach $categories v k}
+                {if !$v.is_empty}
+                <li id="ctb-{$v.id}">
+                    <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
+                    {if $activeCategory==$v.id}
+                    class="category-active"
                     {/if}
-                {/foreach}
-            </ul>
+                    >{$v.title}</a>
+                </li>
+                {if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
+                {/if}
+            {/foreach}
+        </ul>
 
-        </div>
+    </div>
 
         <div style="margin-left:160px;padding-left:25px;">
 
@@ -107,7 +104,7 @@
 $(document).ready(function()
 {
 
-	$( 'title' ).html( $('<p>' + $('.main-display-name').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
+	$( 'title' ).html( $('<p>' + $('.set-as-title').html() + '</p>').text() + ' - ' + $( 'title' ).html() );
 
 	{if $is_nsr}
 	if(jQuery().prettyPhoto) {
@@ -151,10 +148,5 @@ $(document).ready(function()
     	<span class="italics" style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span>
 	</p>
 </div>
-
-
-
-
-
 
 {include file="../shared/footer.tpl"}
