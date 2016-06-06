@@ -465,7 +465,6 @@ class UsersController extends Controller
 
 		$data=$this->getNewUserData();
 
-		unset( $data['password'] );
 		unset( $data['module'] );
 		unset( $data['module_read'] );
 		unset( $data['module_write'] );
@@ -474,6 +473,9 @@ class UsersController extends Controller
 		unset( $data['custom_write'] );
 		unset( $data['role_id'] );
 		unset( $data['can_publish'] );
+
+		$data['password'] = 'temp';
+		$data['created_by'] = $this->getCurrentUserId();
 
 		$this->models->Users->save( $data );
 
