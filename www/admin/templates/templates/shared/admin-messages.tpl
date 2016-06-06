@@ -5,6 +5,12 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	if (noMessageFade!==true) $('#page-block-messages').fadeOut({$adminMessageFadeOutDelay});	
+	console.log(typeof noMessageFade);
+	
+	
+	if (typeof noMessageFade == 'undefined' || noMessageFade!=true)
+	{
+		$('#page-block-messages').fadeOut({$adminMessageFadeOutDelay});	
+	}
 })
 </script>
