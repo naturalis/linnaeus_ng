@@ -104,9 +104,19 @@
             $this->preflightQueries = $p;
 		}
 
+		public function addPreflightQuery($p)
+		{
+            $this->preflightQueries[] = $p;
+		}
+
 		public function setPostflightQueries($p)
 		{
             $this->postflightQueries = $p;
+		}
+
+		public function addPostflightQuery($p)
+		{
+            $this->postflightQueries[] = $p;
 		}
 
 		public function run()
@@ -115,6 +125,7 @@
 			$this->initialize();
 			$this->printParameters();
 			$this->connectDatabase();
+			$this->checkLastChangeColumn();
 			$this->initTestDatabase();
 			$this->createTestTables();
 			$this->compareTables();
@@ -184,6 +195,21 @@
 				mysqli_query($this->conn0, "SET sql_mode = '';");
 			}
 
+		}
+
+		private function checkLastChangeColumn () {
+            mysqli_select_db( $this->conn0, 'information_schema' );
+		    $tables = $this->getTables($this->dbDb0, $this->conn0);
+		    foreach ($tables as $table) {
+		        $columns = $this->getColumns($table, $this->dbDb0, $this->conn0);
+		        foreach ($columns as $column) {
+		            $name = $column['COLUMN_NAME'];
+                    if (($name == 'last_change' || $name == 'last_update') &&
+                        $column['COLUMN_DEFAULT'] == '0000-00-00 00:00:00') {
+                        $this->addPreflightQuery("ALTER TABLE `$table` CHANGE `$name` `$name` TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
+                     }
+		        }
+		    }
 		}
 
 		private function printParameters()
@@ -695,6 +721,4 @@
 	$compare->setPostflightQueries(array(
         'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
 	));
-
-
 	$compare->run();
