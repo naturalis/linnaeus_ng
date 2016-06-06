@@ -5,7 +5,6 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	$('#page-block-messages').fadeOut(3000);	
-
+	if (noMessageFade!==true) $('#page-block-messages').fadeOut({$adminMessageFadeOutDelay});	
 })
 </script>

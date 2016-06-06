@@ -2616,7 +2616,7 @@ class Controller extends BaseClass
 			return $this->addSubspeciesInfix( $p );
 		}
 		else
-		if ( $base_rank_id==FORMA_RANK_ID || $base_rank_id==FORMA_SPECIALIS_RANK_ID  )
+		if ( $base_rank_id==FORMA_RANK_ID )
 		{
 			return $this->addFormaInfix( $p );
 		}
