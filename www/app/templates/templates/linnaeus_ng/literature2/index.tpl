@@ -12,8 +12,7 @@
 				{t}Search by title:{/t}
 			</td>
 			<td>
-				<input type="text" name="" id="lookup-input-title" onkeyup="lit2Lookup(this,'lookup_title');" />
-				
+				<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />
 			</td>
 			<td>
 				{foreach from=$titleAlphabet item=v}
@@ -26,7 +25,7 @@
 				{t}Search by author:{/t}
 			</td>
 			<td>
-				<input type="text" name="" id="lookup-input-author" onkeyup="lit2Lookup(this,'lookup_author');" />
+				<input type="text" name="" id="lookup-input-author" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_author');" />
 			</td>
 			<td>
 				{foreach from=$authorAlphabet item=v}
