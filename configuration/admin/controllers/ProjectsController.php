@@ -6,6 +6,7 @@
 
 include_once ('Controller.php');
 include_once ('ProjectDeleteController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class ProjectsController extends Controller
 {
@@ -40,6 +41,8 @@ class ProjectsController extends Controller
     public function __construct ()
     {
         parent::__construct();
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->show_hidden_modules_in_select_list=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'show_hidden_modules_in_select_list', 'subst'=>false ] );
 	}
 
     public function __destruct ()
@@ -116,8 +119,8 @@ class ProjectsController extends Controller
                 )
             ));
 
-            if (count((array) $fmp) < $this->freeModulesMax && !$this->isFormResubmit()) {
-
+            if (count((array) $fmp) < $this->freeModulesMax && !$this->isFormResubmit())
+			{
                 $this->models->FreeModulesProjects->save(
                 array(
                     'id' => null,
@@ -126,21 +129,22 @@ class ProjectsController extends Controller
                     'active' => 'n'
                 ));
             }
-            else {
-
+            else
+			{
                 $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->freeModulesMax));
             }
         }
 
+
+		$d = $this->show_hidden_modules_in_select_list ? '*' : ['show_in_menu'=>1];
+		
         $modules = $this->models->Modules->_get(array(
-            'id' => array(
-                '1' => '1'
-            ),
+            'id' => $d,
             'order' => 'show_order'
         ));
 
-        foreach ((array) $modules as $key => $val) {
-
+        foreach ((array) $modules as $key => $val)
+		{
             $mp = $this->models->ModulesProjects->_get(
             array(
                 'id' => array(
@@ -160,9 +164,7 @@ class ProjectsController extends Controller
         ));
 
         $this->smarty->assign('modules', $modules);
-
         $this->smarty->assign('freeModules', $freeModules);
-
         $this->smarty->assign('freeModuleMax', $this->freeModulesMax);
 
         $this->printPage();

@@ -2,41 +2,15 @@
 
 /*
 
-	used but not in the list: support_email (general setting)
+	settings that are used but not in the list:
+		general setting: support_email (support email adress)
+		general setting: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
+
 
 
 	to do technical:
 	- create default settings-set as base data
 	- create default value set for new projects
-
-	- find out what the hell this does:
-	
-			private function initProjectSettings()
-			{
-		
-				foreach((array)$this->_availableProjectSettings as $key=>$val) {
-		
-					$this->_availableProjectSettings[$key][2] =
-						preg_replace_callback(
-							'/\%(.*)\%/',
-							function($m)
-							{
-								switch ($m[1]) {
-									case 'MEDIA_DIR' :
-										return isset($_SESSION['admin']['project']['urls']['project_media']) ? $_SESSION['admin']['project']['urls']['project_media'] : $m[1];
-										break;
-									case 'ID' :
-										return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : $m[1];
-										break;
-									default:
-										return $m[1];
-								}
-							},
-							$val[2]);
-				}
-		
-			}
-		
 
 
 	to do content:
