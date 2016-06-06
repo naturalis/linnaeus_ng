@@ -2647,7 +2647,7 @@ class Controller extends BaseClass
 			return $this->addSubspeciesInfix( $p );
 		}
 		else
-		if ( $base_rank_id==FORMA_RANK_ID || $base_rank_id==FORMA_SPECIALIS_RANK_ID  )
+		if ( $base_rank_id==FORMA_RANK_ID )
 		{
 			return $this->addFormaInfix( $p );
 		}
@@ -2836,11 +2836,14 @@ class Controller extends BaseClass
 		return $this->_showAutomaticInfixes;
 	}
 
-
 	protected function setRankIdConstants()
 	{
 		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
 		{
+			if ( strpos($val['rank'],"/")!==false )
+			{
+				$val['rank']=substr($val['rank'],0,strpos($val['rank'],"/"));
+			}
 			$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'])).'_RANK_ID';
 			if (!defined($const)) define($const,$val['id']);
 		}
