@@ -68,8 +68,6 @@ $(document).ready(function()
 		}, cancel:'#werwerwerwe'});
 	}
 	
-	$('#page-block-messages').fadeOut({$adminMessageFadeOutDelay});	
-
 })
 
 </script>
