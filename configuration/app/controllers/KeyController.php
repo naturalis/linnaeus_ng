@@ -482,6 +482,7 @@ class KeyController extends Controller
 
 		$step['title'] = $ck[0]['title'];
 		$step['content'] = $ck[0]['content'];
+		$step['content'] = $this->matchHotwords($step['content']);
 
 		return $step;
 	}
