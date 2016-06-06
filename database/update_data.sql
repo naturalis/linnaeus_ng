@@ -87,8 +87,8 @@ select @welcome_subject := subject, @welcome_content := content, @language_id :=
 select @contributors_subject := subject, @contributors_content := content from content where subject = 'Contributors';
 
 select ifnull(max(id)+1,0) into @next_intro_page_id from introduction_pages;
-insert into introduction_pages values (@next_intro_page_id,@project_id,1,99,1,now(),now());
-insert into introduction_pages values (@next_intro_page_id+1,@project_id,1,99,1,now(),now());
+insert into introduction_pages (id, project_id, got_content, show_order, hide_from_index, created, last_change) values (@next_intro_page_id,@project_id,1,99,1,now(),now());
+insert into introduction_pages (id, project_id, got_content, show_order, hide_from_index, created, last_change) values (@next_intro_page_id+1,@project_id,1,99,1,now(),now());
 insert into content_introduction values (null,@project_id,@next_intro_page_id,@language_id,@welcome_subject,@welcome_content,now(),now());
 insert into content_introduction values (null,@project_id,@next_intro_page_id+1,@language_id,@contributors_subject,@contributors_content,now(),now());
 
