@@ -68,7 +68,7 @@ $(document).ready(function()
 		}, cancel:'#werwerwerwe'});
 	}
 	
-	$('#page-block-messages').fadeOut(3000);	
+	$('#page-block-messages').fadeOut({$adminMessageFadeOutDelay});	
 
 })
 

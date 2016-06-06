@@ -51,6 +51,8 @@ class Controller extends BaseClass
 	public $includeLocalMenu=true;
 	public $printBreadcrumbs=true;
 	public $wikiPageOverride;
+	private $_adminMessageFadeOutDelay;
+	
 
 	private $usedModelsBase = array(
 		'activity_log',
@@ -1611,6 +1613,7 @@ class Controller extends BaseClass
         $this->smarty->assign('pageName', $this->getPageName());
 		$this->smarty->assign('viewName', $this->getViewName());
 		$this->smarty->assign('wikiUrl', $this->getWikiUrl());
+		$this->smarty->assign('adminMessageFadeOutDelay', $this->_adminMessageFadeOutDelay);
 
         $this->smarty->assign('uiLanguages', $this->uiLanguages);
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
@@ -2587,6 +2590,8 @@ class Controller extends BaseClass
         $this->setRandomValue();
 		$this->setShowAutomaticHybridMarkers();
 		$this->setShowAutomaticInfixes();
+		$this->setAdminMessageFadeOutDelay();
+		
 	}
 
 	public function addHybridMarkerAndInfixes( $p )
@@ -2797,6 +2802,17 @@ class Controller extends BaseClass
 	protected function getShowAutomaticInfixes()
 	{
 		return $this->_showAutomaticInfixes;
+	}
+
+	protected function setAdminMessageFadeOutDelay()
+	{
+		$d=$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'admin_message_fade_out_delay'
+		));
+
+		$this->_adminMessageFadeOutDelay = $d ? $d[0] : 10000;
 	}
 
 
