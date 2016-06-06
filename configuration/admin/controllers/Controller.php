@@ -118,6 +118,7 @@ class Controller extends BaseClass
         $this->setLanguages();
         $this->checkLastVisitedPage();
         $this->setSmartySettings();
+		$this->setRankIdConstants();
         $this->setRequestData();
         $this->doLanguageChange();
         $this->checkModuleActivationStatus();
@@ -2534,6 +2535,10 @@ class Controller extends BaseClass
 	{
 		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
 		{
+			if ( strpos($val['rank'],"/")!==false )
+			{
+				$val['rank']=substr($val['rank'],0,strpos($val['rank'],"/"));
+			}
 			$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'])).'_RANK_ID';
 			if (!defined($const)) define($const,$val['id']);
 		}
@@ -2580,7 +2585,6 @@ class Controller extends BaseClass
 	private function setOtherStuff()
 	{
         $this->setRandomValue();
-		$this->setRankIdConstants();
 		$this->setShowAutomaticHybridMarkers();
 		$this->setShowAutomaticInfixes();
 	}
