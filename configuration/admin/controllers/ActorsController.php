@@ -424,11 +424,11 @@ class ActorsController extends NsrController
 
 		foreach((array)$names as $key=>$val)
 		{
-			$names[$key]['name']=$this->addHybridMarker( array( 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$names[$key]['name']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'] ) );
 
 			if ($val['nametype']==PREDICATE_VALID_NAME)
 			{
-				$names[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+				$names[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			}
 
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
@@ -443,7 +443,7 @@ class ActorsController extends NsrController
 		
 		foreach((array)$presences as $key=>$val)
 		{
-			$presences[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 		// PASSPORTS
@@ -455,7 +455,7 @@ class ActorsController extends NsrController
 
 		foreach((array)$passports as $key=>$val)
 		{
-			$passports[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$passports[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
 
 		// LITERATURE

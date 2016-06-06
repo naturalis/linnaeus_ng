@@ -413,3 +413,6 @@ html, body {
 img.verspreidingskaartje {
 	height:240px;
 }
+.no-italics {
+	font-style:normal;
+}

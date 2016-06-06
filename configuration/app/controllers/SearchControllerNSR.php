@@ -101,6 +101,10 @@ class SearchControllerNSR extends SearchController
 		if ($this->rHasVal('search'))
 		{
 			$search=$this->rGetAll();
+
+			$search['search_original']=$search['search'];
+			$search['search']=str_replace($this->_hybridMarker,'',$search['search']);
+
 			$results=$this->doSearch($search);
 
 			$search['search']=htmlspecialchars($search['search']);
@@ -175,8 +179,10 @@ class SearchControllerNSR extends SearchController
 			foreach((array)$this->traitGroupsToInclude as $val)
 			{
 				$traits=$traits+$this->getTraits($val['id']);
+				if ($val['group_id']==$search['trait_group']) $search['trait_group_name']=$val['group_name'];
 			}
 
+			$this->smarty->assign('trait_group_name',$search['trait_group_name']);
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
@@ -346,7 +352,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -362,6 +368,7 @@ class SearchControllerNSR extends SearchController
 		if (!empty($p['group_id']))
 		{
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
+			q($d,1);
 		}
 		else
 		if (!empty($p['group']))
@@ -436,7 +443,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -586,8 +593,8 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarker( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['validName']=$this->addHybridMarker( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
 
 			$meta=$this->models->MediaMeta->_get(array("id"=>
 				array(
@@ -680,9 +687,9 @@ class SearchControllerNSR extends SearchController
 					$data[$key]['infra_specific_epithet']=$n['infra_specific_epithet'];
 					$data[$key]['authorship']=$n['authorship'];
 					$data[$key]['nomen']=
-						$this->addHybridMarker(array('name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id']));
+						$this->addHybridMarkerAndInfixes(array('name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id']));
 					$data[$key]['name']=
-						$this->addHybridMarker(
+						$this->addHybridMarkerAndInfixes(
 							array( 'name'=>
 										(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
 										(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .

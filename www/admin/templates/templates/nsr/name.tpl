@@ -73,6 +73,9 @@
 	<tr>
     	<th colspan="2">&nbsp;</td>
 	</tr>
+    
+    {if $show_nsr_specific_stuff}
+
 	<tr>
     	<th>literatuur:</th>
         <td>
@@ -107,6 +110,8 @@
 		{/foreach}
 		</select>
 	</td></tr>
+    
+    {/if}
 
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>

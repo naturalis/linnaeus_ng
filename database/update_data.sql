@@ -38,6 +38,11 @@ update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by ra
 select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
 insert into ranks values (@this_id+1,'nothovarietas',null,'Nothovarietas',null,@parent_id,0,1,null,now(),now());
 
+update ranks set rank = 'forma specialis' where rank = 'forma_specialis';
+update ranks set additional = 'fungi' where rank = 'forma specialis';
+update ranks set additional = 'botany' where rank in ('cultivar','cultivar group');
+update ranks set additional = 'botany, used for taxa of hybrid origin' where rank in ('nothogenus','nothospecies','nothosubspecies','nothovarietas');
+delete from ranks where rank = 'subsubforma';
 
 
 /* Update modules */
@@ -157,8 +162,13 @@ INSERT IGNORE INTO `module_settings` VALUES
 (null,4,'obsolete_passport_tabs','Legacy tab titles that should be flagged as obsolete in the passport editor (use JSON-string: {"Old":"New","Totally obsolete":null})',NULL,NOW(),NOW()),
 (null,7,'no_taxon_images','Make no attempt to show images for taxa',1,NOW(),NOW()),
 (null,4,'higher_taxa_rank_prefix','Always prefix the taxon name with the rank for higher species',1,NOW(),NOW()),
-(null,-1,'show_nsr_specific_stuff','Show or hide(*) various NSR-specific function',1,NOW(),NOW())
+(null,-1,'show_nsr_specific_stuff','Show or hide(*) various NSR-specific function',1,NOW(),NOW()),
+(null,-1,'show_automatic_hybrid_markers','Show or hide automatic × marker for taxa of hybrid ranks',1,NOW(),NOW()),
+(null,-1,'show_automatic_infixes','Show or hide automatic infixes "var.", "subsp." and "f." for taxa of appropriate ranks',1,NOW(),NOW()),
+(null,-1,'concept_url','Base URL for concepts (requires the project generates NSR-style pseudo PURLs)',null,NOW(),NOW())
+
 ;
+
 
 UNLOCK TABLES;
 

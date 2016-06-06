@@ -211,10 +211,10 @@ function checkPresenceDataSpecies()
 
 	if (rank>=speciesBaseRankid)
 	{
-		if (p1==-1) buffer.push("Voorkomen: status is niet ingevuld.");
-		if (p2==-1) buffer.push("Voorkomen: expert is niet ingevuld.");
-		if (p3==-1) buffer.push("Voorkomen: organisatie is niet ingevuld.");
-		if (p4.length==0) buffer.push("Voorkomen: publicatie is niet ingevuld.");
+		if (p1 && p1==-1) buffer.push("Voorkomen: status is niet ingevuld.");
+		if (p2 && p2==-1) buffer.push("Voorkomen: expert is niet ingevuld.");
+		if (p3 && p3==-1) buffer.push("Voorkomen: organisatie is niet ingevuld.");
+		if (p4 && p4.length==0) buffer.push("Voorkomen: publicatie is niet ingevuld.");
 	}
 	else
 	if (rank<speciesBaseRankid)
@@ -262,9 +262,9 @@ function checkScientificName()
 	var result=true;
 	var buffer=[];
 
-	if ($('#name_expert_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: expert");
-	if ($('#name_organisation_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: organisatie");
-	if ($('#name_reference_id').val().length==0) buffer.push("Wetenschappelijke naam: publicatie");
+	if ($('#name_expert_id').length && $('#name_expert_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: expert");
+	if ($('#name_organisation_id').length && $('#name_organisation_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: organisatie");
+	if ($('#name_reference_id').length && $('#name_reference_id').val().length==0) buffer.push("Wetenschappelijke naam: publicatie");
 
 	return buffer;
 }
@@ -275,9 +275,9 @@ function checkDutchName()
 
 	if ($('#main_language_name').val() && $('#main_language_name').val().length!=0)
 	{
-		if ($('#main_language_name_expert_id :selected').val().length==0) buffer.push(main_language_display_label + ": expert");
-		if ($('#main_language_name_organisation_id :selected').val().length==0) buffer.push(main_language_display_label + ": organisatie");
-		if ($('#main_language_name_reference_id').val().length==0) buffer.push(main_language_display_label + ": publicatie");
+		if ($('#main_language_name_expert_id').length && $('#main_language_name_expert_id :selected').val().length==0) buffer.push(main_language_display_label + ": expert");
+		if ($('#main_language_name_organisation_id').length && $('#main_language_name_organisation_id :selected').val().length==0) buffer.push(main_language_display_label + ": organisatie");
+		if ($('#main_language_name_reference_id').length && $('#main_language_name_reference_id').val().length==0) buffer.push(main_language_display_label + ": publicatie");
 	}
 
 	return buffer;

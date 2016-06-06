@@ -219,7 +219,7 @@ class TreeController extends Controller
 				{
 					$val['taxon']=
 						'<i>'.
-						$this->addHybridMarker(array('name'=>str_replace($val['authorship'],'',$val['taxon']),'base_rank_id'=>$val['base_rank_id'])).
+						$this->addHybridMarkerAndInfixes(array('name'=>str_replace($val['authorship'],'',$val['taxon']),'base_rank_id'=>$val['base_rank_id'])).
 						'</i>'.' '.$val['authorship'];
 				}
 				else
@@ -229,7 +229,7 @@ class TreeController extends Controller
 			}
 			else
 			{
-				$val['taxon']=$this->addHybridMarker(array('name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id']));
+				$val['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id']));
 			}
 
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
