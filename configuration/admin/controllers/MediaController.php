@@ -907,6 +907,7 @@ class MediaController extends Controller
     public function setupRsAction ()
     {
         $this->checkAuthorisation();
+        $this->setRsSettings();
 
         if ($this->rHasVal('action', 'create') && $this->rHasVal('rs_master_key')) {
 
@@ -954,10 +955,15 @@ class MediaController extends Controller
                 );
 
                 $this->smarty->assign('result', $d);
+
+                print_r($d);
             }
         }
 
-        $this->smarty->assign('rsBaseUrl', $this::$rsSetupParameters['rs_base_url']['default']);
+        $baseUrl = !empty($this->_rsBaseUrl) ? $this->_rsBaseUrl :
+            $this::$rsSetupParameters['rs_base_url']['default'];
+
+        $this->smarty->assign('rsBaseUrl', $baseUrl);
         $this->printPage();
     }
 
