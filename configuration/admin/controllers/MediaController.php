@@ -1232,6 +1232,7 @@ class MediaController extends Controller
     {
         $project = $this->getCurrentProjectData();
         $newUser = $project['sys_name'] . ' @ ' . $_SERVER['SERVER_NAME'];
+
         $this->_result =
             $this->getCurlResult($this->_rsNewUserUrl . '&newuser=' . urlencode($newUser));
         return $this->_result;
