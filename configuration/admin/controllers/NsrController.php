@@ -24,6 +24,18 @@ class NsrController extends Controller
 
 //    public $modelNameOverride='NsrTreeModel';
 
+
+	private $cTabs=[
+		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
+		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
+		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
+		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],	// $this->getTaxonNextLevel($taxon); (children?)
+		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
+		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
+		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
+//		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+	];
+
     public function __construct()
     {
         parent::__construct();
@@ -93,6 +105,67 @@ class NsrController extends Controller
 	{
 		return isset($this->conceptId) ? $this->conceptId : false;
 	}
+
+    public function getCategories()
+    {
+		$categories=$this->models->NsrTaxonModel->getCategories(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'language_id' => $this->getDefaultProjectLanguage()
+		));
+		
+		$standard_categories=$this->cTabs;
+
+		array_walk($standard_categories,function(&$a,$b) {
+			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto'];
+		});
+		
+		$all_categories=array_merge($categories,$standard_categories);
+
+        $lp=$this->getProjectLanguages();
+
+		$order=$this->models->TabOrder->_get([
+			'id'=>['project_id' => $this->getCurrentProjectId()],
+			'order'=>'show_order',
+			'fieldAsIndex'=>'page_id'	
+		]);
+		
+        foreach((array)$all_categories as $key=>$page)
+		{
+            foreach((array)$lp as $k=>$language)
+			{
+                $tpt = $this->models->PagesTaxaTitles->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'page_id' => $page['id'],
+                        'language_id' => $language['language_id']
+                    )
+                ));
+
+                $all_categories[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
+                $all_categories[$key]['show_order']=isset($order[$page['id']]) ? $order[$page['id']]['show_order'] : 99;
+                $all_categories[$key]['suppress']=isset($order[$page['id']]) ? $order[$page['id']]['suppress']==1 : false;
+                $all_categories[$key]['start_order']=isset($order[$page['id']]) ? $order[$page['id']]['start_order'] : null;
+                $all_categories[$key]['show_when_empty']=isset($order[$page['id']]) ? $order[$page['id']]['show_when_empty']==1 : false;
+            }
+        }
+
+		usort($all_categories,function($a,$b)
+		{
+			if ($a['show_order']>$b['show_order'] )
+				return 1;
+			if ($a['show_order']<$b['show_order'] )
+				return -1;
+			if ($a['page']>$b['page'] )
+				return 1;
+			if ($a['page']<$b['page'] )
+				return -1;
+			return 0;
+		});
+
+		return $all_categories;
+
+    }
 
 
 
