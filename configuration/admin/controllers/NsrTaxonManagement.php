@@ -1,7 +1,5 @@
 <?php
 
-
-
 /*
 	'url' => URL (as is)
 	'parameters' => array of dynamic params (see below)
@@ -104,116 +102,15 @@ class NsrTaxonManagement extends NsrController
 	}
 
 	private $cTabs=[
-		'CTAB_NAMES'=>'Naamgeving',
-		'CTAB_MEDIA'=>'Media',	
-		'CTAB_CLASSIFICATION'=>'names',
-		'CTAB_TAXON_LIST'=>'list',	// $this->getTaxonNextLevel($taxon); (children?)
-		'CTAB_LITERATURE'=>'Literature',
-		'CTAB_DNA_BARCODES'=>'DNA barcodes',
-		'CTAB_DICH_KEY_LINKS'=>'Key links',
-//		'CTAB_NOMENCLATURE'=>'Nomenclature',
+		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
+		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
+		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
+		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],	// $this->getTaxonNextLevel($taxon); (children?)
+		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
+		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
+		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
+//		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
 	];
-
-    private function getCategories()
-    {
-		$categories=$this->models->NsrTaxonModel->getCategories(array(
-            'project_id' => $this->getCurrentProjectId(),
-    		'language_id' => $this->getDefaultProjectLanguage()
-		));
-		
-		$standard_categories=$this->cTabs;
-
-		array_walk($standard_categories,function(&$a,$b) {
-				$a=['tabname'=>$b,'id'=>'auto','page'=>$a];
-		});
-		
-/*
-id!?
-
-array (size=5)
-  'id' => string 'media' (length=5)
-  'title' => string 'Media' (length=5)
-  'is_empty' => int 0
-  'tabname' => string 'CTAB_MEDIA' (length=10)
-  'show_order' => int 99
-
-*/		$all_categories=array_merge($categories,$standard_categories);
-
-		$order=$this->models->TabOrder->_get([
-			'id'=>['project_id' => $this->getCurrentProjectId()],
-			'columns'=>'tabname,show_order,start_order',
-			'fieldAsIndex'=>'tabname',
-			'order'=>'start_order'			
-		]);
-
-        $lp=$this->getProjectLanguages();
-
-        foreach((array)$all_categories as $key=>$page)
-		{
-            foreach((array)$lp as $k=>$language)
-			{
-                $tpt = $this->models->PagesTaxaTitles->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(),
-                        'page_id' => $page['id'],
-                        'language_id' => $language['language_id']
-                    )
-                ));
-
-                $all_categories[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
-            }
-        }
-
-		return $all_categories;
-		
-
-
-
-/*		
-if (!$this->_suppressTab_NAMES)
-if (!$this->_suppressTab_LITERATURE)
-if (!$this->_suppressTab_MEDIA)
-if (!$this->_suppressTab_DNA_BARCODES)
-*/
-		$combined=[];
-
-		foreach(array_merge($categories,$standard_categories) as $val)
-		{
-			continue;
-			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
-
-			if (is_null($firstNonEmpty) && empty($val['is_empty']))
-			{
-				$firstNonEmpty=$val['id'];
-			}
-
-			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty']))
-			{
-				$start=$val['id'];
-			}
-			else
-			if (!isset($requestedTab) && !empty($order[$val['tabname']]['start_order']) &&  empty($val['is_empty']) &&
-				(
-					is_null($start) ||
-					$order[$val['tabname']]['start_order']<$start
-				))
-			{
-				$start=$val['id'];
-			}
-		}
-
-		$this->customSortArray($categories,array('key' => 'show_order'));
-
-		if (is_null($start)) $start=$firstNonEmpty;
-
-		if ($requestedTab=='external') $start=$requestedTab;
-
-		return array('start'=>$start,'categories'=>$categories);
-    }
-
-
-
 
     public function tabsAction()
     {
@@ -222,7 +119,7 @@ if (!$this->_suppressTab_DNA_BARCODES)
 
         if ($this->rHasVal('new_page') && !$this->isFormResubmit())
 		{
-            $tp=$this->createTaxonCategory($this->rGetVal('new_page'), $this->rGetVal('show_order'));
+            $tp=$this->createCategory( $this->rGetVal('new_page') );
             if (!$tp)
 			{
                 $this->addError($this->translate('Could not save category.'), 1);
@@ -233,44 +130,16 @@ if (!$this->_suppressTab_DNA_BARCODES)
         if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->savePageTitles( $this->rGetAll()['pages_taxa_titles'] );
+			$this->saveTabOrder( $this->rGetAll()['tab_order'] );
+			if ( isset($this->rGetAll()['suppress']) ) $this->saveSuppressState( $this->rGetAll()['suppress'] );
+			$this->saveStartOrder( $this->rGetAll()['start_order'] );
+			$this->saveShowWhenEmpty( $this->rGetAll()['show_when_empty'] );
         }		
 
-
-        $lp=$this->getProjectLanguages();
-
-        $pages = $this->models->PagesTaxa->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'order' => 'show_order'
-        ));
-
-        foreach((array)$pages as $key=>$page)
-		{
-            foreach((array)$lp as $k=>$language)
-			{
-                $tpt = $this->models->PagesTaxaTitles->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(),
-                        'page_id' => $page['id'],
-                        'language_id' => $language['language_id']
-                    )
-                ));
-
-                $pages[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
-            }
-            $nextShowOrder = $page['show_order'] + 1;
-        }
-	
-
-		//$pages=$this->getCategories();
-
-        $this->smarty->assign('nextShowOrder', isset($nextShowOrder) ? $nextShowOrder : 0 );
-        $this->smarty->assign('maxCategories', $this->maxCategories);
-        $this->smarty->assign('languages', $this->getProjectLanguages());
-        $this->smarty->assign('pages', $pages);
-        $this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
+        $this->smarty->assign( 'maxCategories', $this->maxCategories );
+        $this->smarty->assign( 'languages', $this->getProjectLanguages() );
+        $this->smarty->assign( 'pages', $this->getCategories() );
+        $this->smarty->assign( 'defaultLanguage', $this->getDefaultProjectLanguage() );
 
         $this->printPage();
     }
@@ -299,7 +168,7 @@ if (!$this->_suppressTab_DNA_BARCODES)
 
 		$traits=$this->models->{$this->modelNameOverride}->getSubstitutableTraits(array('project_id'=>$this->getCurrentProjectId()));
 
-        $this->smarty->assign( 'page', $this->getPage( $this->rGetId() ) );
+        $this->smarty->assign( 'page', $this->getCategory( $this->rGetId() ) );
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
         $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
@@ -558,21 +427,81 @@ if (!$this->_suppressTab_DNA_BARCODES)
         $this->printPage('ajax_interface');
     }
 
-    private function createTaxonCategory($name, $show_order = false, $isDefault = false)
+    private function getCategories()
+    {
+		$categories=$this->models->NsrTaxonModel->getCategories(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'language_id' => $this->getDefaultProjectLanguage()
+		));
+		
+		$standard_categories=$this->cTabs;
+
+		array_walk($standard_categories,function(&$a,$b) {
+			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto'];
+		});
+		
+		$all_categories=array_merge($categories,$standard_categories);
+
+        $lp=$this->getProjectLanguages();
+
+		$order=$this->models->TabOrder->_get([
+			'id'=>['project_id' => $this->getCurrentProjectId()],
+			'order'=>'show_order',
+			'fieldAsIndex'=>'page_id'	
+		]);
+		
+        foreach((array)$all_categories as $key=>$page)
+		{
+            foreach((array)$lp as $k=>$language)
+			{
+                $tpt = $this->models->PagesTaxaTitles->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'page_id' => $page['id'],
+                        'language_id' => $language['language_id']
+                    )
+                ));
+
+                $all_categories[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
+                $all_categories[$key]['show_order']=isset($order[$page['id']]) ? $order[$page['id']]['show_order'] : 99;
+                $all_categories[$key]['suppress']=isset($order[$page['id']]) ? $order[$page['id']]['suppress']==1 : false;
+                $all_categories[$key]['start_order']=isset($order[$page['id']]) ? $order[$page['id']]['start_order'] : null;
+                $all_categories[$key]['show_when_empty']=isset($order[$page['id']]) ? $order[$page['id']]['show_when_empty']==1 : false;
+            }
+        }
+
+		usort($all_categories,function($a,$b)
+		{
+			if ($a['show_order']>$b['show_order'] )
+				return 1;
+			if ($a['show_order']<$b['show_order'] )
+				return -1;
+			if ($a['title']>$b['title'] )
+				return 1;
+			if ($a['title']<$b['title'] )
+				return -1;
+			return 0;
+		});
+
+		return $all_categories;
+
+    }
+
+    private function createCategory( $name )
     {
         $d=$this->models->PagesTaxa->save(
-        array(
-            'id' => null,
-            'page' => $name,
-            'show_order' => $show_order !== false ? $show_order : 0,
-            'project_id' => $this->getCurrentProjectId(),
-            'def_page' => $isDefault ? '1' : '0'
-        ));
+			array(
+				'page' => $name,
+				'show_order' => 99,
+				'project_id' => $this->getCurrentProjectId(),
+				'def_page' => '0'
+			));
 		$this->logChange($this->models->PagesTaxa->getDataDelta());
 		return $d;
     }
 
-	private function getPage( $id )
+	private function getCategory( $id )
 	{
         $page=$this->models->PagesTaxa->_get(array(
             'id' => array(
@@ -589,7 +518,6 @@ if (!$this->_suppressTab_DNA_BARCODES)
 		}
 		
 		return $page;
-
 	}
 
 	private function saveExternalReference()
@@ -742,6 +670,11 @@ if (!$this->_suppressTab_DNA_BARCODES)
 			'page_id' => $id
 		));
 
+		$this->models->TabOrder->delete(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'page_id' => $id
+		));
+
 		$this->models->PagesTaxa->delete(array(
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $id
@@ -762,8 +695,6 @@ if (!$this->_suppressTab_DNA_BARCODES)
 			'columns' => 'id,title,page_id,language_id'
 		));
     }
-	
-	
 	
 	private function savePageTitles( $titles )
 	{
@@ -817,6 +748,71 @@ if (!$this->_suppressTab_DNA_BARCODES)
 		}
 	}
 
+	private function saveTabOrder( $order )
+	{
+		foreach((array)$order as $key=>$page_id)
+		{
+			$p=$this->models->TabOrder->_get( [ 'id' => [
+				'project_id' => $this->getCurrentProjectId(),
+				'page_id' => $page_id,
+			] ] );
+			
+			if ($p)
+			{
+				$this->models->TabOrder->update(
+					['show_order' => $key+1],
+					['id' => $p[0]['id'], 'project_id' => $this->getCurrentProjectId(),'page_id' => $page_id]
+				);
+			}
+			else
+			{
+				$this->models->TabOrder->save(
+					['id' => null, 'project_id' => $this->getCurrentProjectId(),'page_id' => $page_id, 'show_order' => $key+1]
+				);
+			}
+		}
+	}
+
+	private function saveSuppressState( $states )
+	{
+		$this->models->TabOrder->update(
+			[ 'suppress' => 0 ],
+			[ 'project_id' => $this->getCurrentProjectId() ]
+		);
+
+		foreach((array)$states as $key=>$val)
+		{
+			if ($val=='on')
+			{
+				$this->models->TabOrder->update(
+					[ 'suppress' => '1' ],
+					[ 'page_id' => $key, 'project_id' => $this->getCurrentProjectId() ]
+				);
+			}
+		}
+	}
+
+	private function saveStartOrder( $order )
+	{
+		foreach((array)$order as $page_id=>$start_order)
+		{
+			$this->models->TabOrder->update(
+				['start_order' => $start_order=='' ? 'null' : $start_order ],
+				['page_id' => $page_id, 'project_id' => $this->getCurrentProjectId(),]
+			);
+		}
+	}
+
+	private function saveShowWhenEmpty( $states )
+	{
+		foreach((array)$states as $page_id=>$state)
+		{
+			$this->models->TabOrder->update(
+				['show_when_empty' => $state ],
+				['page_id' => $page_id, 'project_id' => $this->getCurrentProjectId(),]
+			);
+		}
+	}
 
 }
 

@@ -1,5 +1,6 @@
 	<p>
-		<h2 id="name-header">{t}Names{/t}</h2>
+
+		{assign var=names value=$content}
 
 		<table id="names-table">
 			{foreach from=$names.list item=v}
@@ -68,8 +69,4 @@
 				{/if}
 			{/if}
 		</table>
-	</p>
-
-	<p>
-		{$content}
 	</p>

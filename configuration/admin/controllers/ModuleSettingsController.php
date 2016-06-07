@@ -6,8 +6,7 @@
 		general setting: support_email (support email adress)
 		general setting: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
 		general setting: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
-
-
+		species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
 
 	to do technical:
 	- create default settings-set as base data
