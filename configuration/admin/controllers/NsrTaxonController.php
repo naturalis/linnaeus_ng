@@ -2084,16 +2084,7 @@ class NsrTaxonController extends NsrController
 		}
 		if (!$this->checkAuthorshipYear($name))
 		{
-
 			$this->addWarning("'Auteurschap' wijkt af van 'auteur(s)' + 'jaar'.");
-
-$this->addWarning('-' . trim(
-(!empty($name['name_author']) ? $name['name_author'].', ' : null).
-(!empty($name['authorship_year']) ? $name['authorship_year'] : null),', '
-).'-');
-$this->addWarning('-'.trim($name['authorship'],')( ').'-');
-	
-						
 		}
 		if (!$this->checkYear($name))
 		{
@@ -2135,14 +2126,12 @@ $this->addWarning('-'.trim($name['authorship'],')( ').'-');
 		if ($name['language_id']!=LANGUAGE_ID_SCIENTIFIC) return true;
 		if ($name['language_id']==LANGUAGE_ID_SCIENTIFIC && empty($name['authorship_year']) && empty($name['name_author'])) return true;
 
-		if (
-			trim(
-				(!empty($name['name_author']) ? $name['name_author'].', ' : null).
-				(!empty($name['authorship_year']) ? $name['authorship_year'] : null),', '
-			) != trim($name['authorship'],')( '))
-			return false;
+		$a=trim((!empty($name['name_author']) ? $name['name_author'].', ' : null).
+				(!empty($name['authorship_year']) ? $name['authorship_year'] : null),', ');
+				
+		$b=trim(substr($name['authorship'],0,1)=='(' && substr($name['authorship'],-1)==')' ? trim($name['authorship'],')( ') : $name['authorship']);
 
-		return true;
+		return ($a==$b);
 	}
 
 	private function checkYear($name)
