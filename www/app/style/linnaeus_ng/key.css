@@ -138,6 +138,7 @@
   width: 230px;
   float: right; }
   #panel #categories {
+	  font-size:0.8em;
     left: 0; }
     #panel #categories a {
       border-width: 0; }
@@ -158,7 +159,7 @@
 
 #taxa a {
   display: block;
-  width: 220px;
+  max-width: 220px;
   text-align: left;
   padding: 0 4px;
   font-size:12.5px;
