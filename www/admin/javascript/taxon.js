@@ -32,7 +32,7 @@ function taxonGeneralDeleteLabels(id,action)
 		async: allAjaxAsynchMode,
 		success : function (data)
 		{
-			$('#theForm').submit();
+			location.href = location.href;
 		}
 	});
 

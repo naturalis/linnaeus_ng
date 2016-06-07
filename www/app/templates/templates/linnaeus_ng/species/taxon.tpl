@@ -14,16 +14,15 @@
 
         <ul>
             {foreach $categories v k}
-                {if !$v.is_empty}
-                <li id="ctb-{$v.id}">
-                    <a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if}
-                    {if $activeCategory==$v.id}
-                    class="category-active"
-                    {/if}
-                    >{$v.title}</a>
-                </li>
-                {if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
+            <li id="ctb-{$v.id}">
+                <!-- a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if} -->
+ 				<a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.tabname}"{/if}
+                {if $activeCategory.id==$v.id}
+                class="category-active"
                 {/if}
+                >{$v.label}</a>
+            </li>
+            {if $activeCategory.id==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
             {/foreach}
         </ul>
 
@@ -31,18 +30,18 @@
 
         <div style="margin-left:160px;padding-left:25px;">
 
-        {if $is_nsr && $overviewImage && !($activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA)}
+        {if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}
             <div id="taxonImage" style="float:right">
                 <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
                 <div id="taxonImageCredits">
                     <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label}
                 </div>
             </div>
-        {elseif $overviewImage && $requested_category.show_overview_image}
+        {elseif $overviewImage && $activeCategory.id.show_overview_image}
            <div id="overview-image" style="background: url('{$overviewImage}');"></div>
         {/if}
 
- 		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
+ 		{if $activeCategory.tabname=='CTAB_MEDIA'}
 
 			{if $is_nsr !== false}
 				{include file="_tab_media_nsr.tpl"}
@@ -50,15 +49,15 @@
 				{include file="_tab_media.tpl"}
 			{/if}
 
-		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NAAMGEVING}
+		{elseif $activeCategory.tabname=='CTAB_NAMES' || $activeCategory.tabname=='TAB_NAAMGEVING'}
 
 			{include file="_tab_naamgeving.tpl"}
 
-		{elseif $activeCategory==$smarty.const.CTAB_LITERATURE}
+		{elseif $activeCategory.tabname=='CTAB_LITERATURE'}
 
 			{include file="_tab_literatuur.tpl"}
 
-		{elseif $activeCategory==$smarty.const.CTAB_CLASSIFICATION}
+		{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
 
 			{include file="../species/_tab_classificatie.tpl"}
 
