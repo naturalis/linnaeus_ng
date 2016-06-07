@@ -142,6 +142,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$classification=$this->getTaxonClassification($taxon['id']);
 				$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 				$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
+				$names=$this->getNames(array('id'=>$taxon['id']));
 
 				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']['tabname']==TAB_BEDREIGING_EN_BESCHERMING)
 				{
@@ -238,7 +239,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$this->smarty->assign('classification',isset($content['classification']) ? $content['classification'] : null);
 			$this->smarty->assign('children',isset($content['children']) ? $content['children'] : null);
-			$this->smarty->assign('names',isset($content['names']) ? $content['names'] : null);
+			$this->smarty->assign('names',isset($names) ? $names : null);
 
 			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
@@ -559,7 +560,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$taxon=null;
 		$cat=null;
 		
-		if (is_int($requestedTab))
+		if (is_numeric($requestedTab))
 		{
 			$cat=$requestedTab;
 		}
@@ -587,9 +588,9 @@ class SpeciesControllerNSR extends SpeciesController
 				$ref->full_url_valid=$d['full_url_valid'];
 				$val['external_reference']=$ref;
 				$val['is_empty']=$d['is_empty'];
-				$val['type']=$d['external'];
+				$val['type']='external';
 			}
-			
+
 			$val['show_overview_image']=false;
 
 			$taxon_categories[]=$val;
@@ -601,8 +602,18 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 		}
 			
+		// have the first non-automatic/external tab display the overview image
+		foreach((array)$taxon_categories as $key=>$val)
+		{
+			if ( $val['type']=='configured' )
+			{
+				$taxon_categories[$key]['show_overview_image']=true;
+				break;
+			}
+		}
+		
 		// determine with which category to open
-		foreach((array)$categories as $key=>$val)
+		foreach((array)$taxon_categories as $key=>$val)
 		{
 			if ( is_null($start_category) )
 			{
@@ -621,22 +632,15 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 		}
 
-		// have the first non-automatic/external tab display the overview image
-		foreach((array)$taxon_categories as $key=>$val)
-		{
-			if ( $val['type']=='configured' )
-			{
-				$taxon_categories[$key]['show_overview_image']=true;
-				break;
-			}
-		}
-		
 //		q($start_category);
 //		q($taxon_categories,1);
 		
 		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 	
 		
+
+
+
 		// remnants...		
 		if ( isset($taxon_id) )
 		{
@@ -1210,7 +1214,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$ref=$cat['external_reference'];
 		$external_content=$ref;
-		$external_content->must_redirect=false;
+		$external_content=(array)$external_content;
+		$external_content['must_redirect']=false;
+		$external_content=(object)$external_content;
 
 		if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 		{
@@ -1237,7 +1243,7 @@ class SpeciesControllerNSR extends SpeciesController
 				//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
 			}
 		}
-		
+		q($external_content);
 		return $external_content;
 
 	}
