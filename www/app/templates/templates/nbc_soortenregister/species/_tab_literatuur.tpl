@@ -10,7 +10,7 @@
     {/if}
     
     {if $content.inherited_literature|@count > 0}
-        <h2>{t}Literatuur over bovenliggende taxa{/t}</h2>
+        <h2>{t}Literatuur gekoppeld aan bovenliggende taxa{/t}</h2>
         <ul>
         {foreach $content.inherited_literature v k}
         <li>
