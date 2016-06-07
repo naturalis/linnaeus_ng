@@ -1999,6 +1999,7 @@ b, .title {
 
 #categories {
 	display:block;
+	width:100%;
 }
 
 
@@ -2009,7 +2010,8 @@ b, .title {
 #categories li {
   list-style: none inside none;
   display: block;
-  float: left; }
+  float: left;
+}
 /*   
   @media (max-width: 799px) {
     #categories li {

@@ -16,7 +16,8 @@
             {foreach $categories v k}
             <li id="ctb-{$v.id}">
                 <!-- a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if} -->
- 				<a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.tabname}"{/if}
+ 				<!-- a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.tabname}"{/if} -->
+ 				<a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.tabname}"{/if}
                 {if $activeCategory.id==$v.id}
                 class="category-active"
                 {/if}
@@ -27,8 +28,10 @@
         </ul>
 
     </div>
+    
+	<br style="clear:all" />
 
-        <div style="margin-left:160px;padding-left:25px;">
+    <div style="margin-left:200px;">
 
         {if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}
             <div id="taxonImage" style="float:right">
@@ -61,7 +64,13 @@
 
 			{include file="../species/_tab_classificatie.tpl"}
 
+		{elseif $activeCategory.tabname=='CTAB_DICH_KEY_LINKS'}
+
+			{include file="../species/_tab_dich_key_links.tpl"}
+
 		{else}
+        
+	        <br style="clear:all" />
 
 			{if $content|@is_array}
 			<ul>

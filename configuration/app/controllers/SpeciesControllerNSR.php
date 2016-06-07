@@ -127,7 +127,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'allowUnpublished' => $this->isLoggedInAdmin(),
 				'isLower' =>  $taxon['lower_taxon']
 			] );
-			
+
 			$external_content=$this->getExternalContent( $categories['start'] );
 			
 			if ( isset($external_content) && $external_content->must_redirect==true)
@@ -1166,7 +1166,7 @@ class SpeciesControllerNSR extends SpeciesController
                 $content=$this->getDNABarcodes($taxon);
                 break;
 
-            case CTAB_DICH_KEY_LINKS:
+            case 'CTAB_DICH_KEY_LINKS':
                 $content=$this->getTaxonKeyLinks( $taxon );
                 break;
 
