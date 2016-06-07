@@ -525,7 +525,7 @@ class SpeciesControllerNSR extends SpeciesController
 			
 			$all_categories[$key]['label']=
 				isset($all_categories[$key]['page_titles'][$this->getCurrentLanguageId()]) ?
-					$all_categories[$key]['page_titles'][$this->getCurrentLanguageId()] : $all_categories[$key]['title'];
+					$all_categories[$key]['page_titles'][$this->getCurrentLanguageId()] : $all_categories[$key]['page'];
         }
 
 		usort($all_categories,function($a,$b)
@@ -534,9 +534,9 @@ class SpeciesControllerNSR extends SpeciesController
 				return 1;
 			if ($a['show_order']<$b['show_order'] )
 				return -1;
-			if ($a['title']>$b['title'] )
+			if ($a['page']>$b['page'] )
 				return 1;
-			if ($a['title']<$b['title'] )
+			if ($a['page']<$b['page'] )
 				return -1;
 			return 0;
 		});
