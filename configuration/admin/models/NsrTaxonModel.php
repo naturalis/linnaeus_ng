@@ -1196,10 +1196,7 @@ final class NsrTaxonModel extends AbstractModel
 				and _b.language_id = ". $language_id ."
 
 			where
-				_a.project_id=".$project_id."
-
-			order by
-				_a.show_order";
+				_a.project_id=".$project_id;
 
 		return $this->freeQuery($query);
 
