@@ -86,10 +86,7 @@ select {
 			<li style="vertical-align:bottom">
                 <span></span>
                 <span>{t}category{/t}</span>
-                {foreach $languages v k}
-                {if k>0}/ <br />{/if}
-				<span>{$v.language}</span>
-                {/foreach}
+                <span>{t}translation{/t}</span>
                 <span>{t}show when empty{/t}</span>
                 <span>{t}start order{/t}</span>
                 <span>{t}delete / suppress{/t}</span>
@@ -114,6 +111,7 @@ select {
                 {foreach $languages l}
 	                {if k>0}<br />{/if}
                     <input 
+                    	placeholder="{$l.language}"
                         type="text" 
                         maxlength="64" 
                         name="pages_taxa_titles[{$v.id}][{$l.language_id}]"

@@ -477,9 +477,9 @@ class NsrTaxonManagement extends NsrController
 				return 1;
 			if ($a['show_order']<$b['show_order'] )
 				return -1;
-			if ($a['title']>$b['title'] )
+			if ($a['page']>$b['page'] )
 				return 1;
-			if ($a['title']<$b['title'] )
+			if ($a['page']<$b['page'] )
 				return -1;
 			return 0;
 		});
