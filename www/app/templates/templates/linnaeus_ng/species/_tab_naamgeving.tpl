@@ -1,3 +1,4 @@
+<br style="clear:all" />
 	<p>
 
 		{assign var=names value=$content}
