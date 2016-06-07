@@ -12,6 +12,10 @@
 
 	<table>
 	<tr>
+		<td>{t}RS server{/t}:</td>
+		<td><input type="text" name="rs_base_url" value="{$rsBaseUrl}" /></td>
+	</tr>
+	<tr>
 		<td>{t}RS master key{/t}:</td>
 		<td><input type="text" name="rs_master_key" value="" /></td>
 	</tr>

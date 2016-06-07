@@ -44,7 +44,7 @@ class MediaController extends Controller
     // Used to setup RS
     public static $rsSetupParameters = array(
         'rs_base_url' => array(
-            'default' => 'https://rs.naturalis.nl/plugins/',
+            'default' => 'https://resourcespace.naturalis.nl/plugins/',
             'info' => 'Base url to ResourceSpace server'
         ),
         'rs_new_user_api' => array(
@@ -908,16 +908,19 @@ class MediaController extends Controller
     {
         $this->checkAuthorisation();
 
-        foreach ($this::$rsSetupParameters as $p => $v) {
-            $this->saveRsSetting($p, $v);
-        }
-
-        // Basic RS settings have been saved at this point;
-        // next step is to set dynamic settings
-        $this->setRsSettings();
-
         if ($this->rHasVal('action', 'create') && $this->rHasVal('rs_master_key')) {
 
+            // Basic RS settings
+            foreach ($this::$rsSetupParameters as $p => $v) {
+                // Overwrite default if set in setup form (server!)
+                if ($this->rHasVal($p)) {
+                    $v = array('default' => $this->rGetVal($p));
+                }
+                $this->saveRsSetting($p, $v);
+            }
+
+            // Dynamic settings
+            $this->setRsSettings();
             $this->createUser();
 
             // Test response; RS does not always return neat response...
@@ -954,6 +957,7 @@ class MediaController extends Controller
             }
         }
 
+        $this->smarty->assign('rsBaseUrl', $this::$rsSetupParameters['rs_base_url']['default']);
         $this->printPage();
     }
 
