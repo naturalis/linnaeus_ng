@@ -73,7 +73,7 @@ class SpeciesModel extends AbstractModel
         $listMax = isset($params['listMax']) ? $params['listMax'] : null;
         $regExp = isset($params['regExp']) ? $params['regExp'] : null;
 
-		if ( is_null($projectId) || is_null($taxonType) ) return;
+		if ( is_null($projectId) ) return;// || is_null($taxonType) ) return;
 
         $query = "
 			select
@@ -85,7 +85,7 @@ class SpeciesModel extends AbstractModel
 				on _a.rank_id=_b.id
 			where
 				_a.project_id = ".$projectId."
-				and _b.lower_taxon = ".($taxonType == 'higher' ? 0 : 1)."
+				" . ( isset($taxonType) ? " and _b.lower_taxon = ".($taxonType == 'higher' ? 0 : 1) : "" ) . "
 				".($getAll ? "" : "and _a.taxon REGEXP '".$regExp."'")."
 			order by taxon
 			".(!empty($listMax) ? "limit ".$listMax : "");
