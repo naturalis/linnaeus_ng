@@ -6,8 +6,6 @@
  * - check mime type on upload
  * - check max_file_uploads, memory_limit, post_max_size
  *
- * $this->_rsMasterKey = 'cmVpbHtldSVyLDs0KjEyZCd4ciwncGlhITY1ZHErJi0hJGw0cjlmZnMtJCRydzVkdjFnZHR7LXAhJD9gIzhmNXcucSIiJg,,';
- *
  */
 
 include_once ('Controller.php');
