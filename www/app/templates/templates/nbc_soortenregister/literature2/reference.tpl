@@ -55,7 +55,7 @@
 
             {if $taxa}
             <p>
-                <h2>{t}Refererende taxa{/t}</h2>
+                <h2>{t}Als referentie opgenomen bij{/t}</h2>
                 <ul>
                 {foreach $taxa v k}
                 <li><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></li>
