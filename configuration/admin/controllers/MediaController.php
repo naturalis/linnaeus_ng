@@ -401,7 +401,6 @@ class MediaController extends Controller
         $this->smarty->assign('username', $this->_rsUserName);
         $this->smarty->assign('password', $this->_rsPassword);
 
-
         $this->printPage();
     }
 
@@ -955,8 +954,6 @@ class MediaController extends Controller
                 );
 
                 $this->smarty->assign('result', $d);
-
-                print_r($d);
             }
         }
 
