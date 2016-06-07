@@ -2084,7 +2084,16 @@ class NsrTaxonController extends NsrController
 		}
 		if (!$this->checkAuthorshipYear($name))
 		{
+
 			$this->addWarning("'Auteurschap' wijkt af van 'auteur(s)' + 'jaar'.");
+
+$this->addWarning('-' . trim(
+(!empty($name['name_author']) ? $name['name_author'].', ' : null).
+(!empty($name['authorship_year']) ? $name['authorship_year'] : null),', '
+).'-');
+$this->addWarning('-'.trim($name['authorship'],')( ').'-');
+	
+						
 		}
 		if (!$this->checkYear($name))
 		{
