@@ -1554,12 +1554,15 @@ DROP TABLE IF EXISTS `tab_order`;
 CREATE TABLE IF NOT EXISTS `tab_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
-  `tabname` varchar(64) NOT NULL,
+  `page_id` int(11) NOT NULL,
   `show_order` int(2) NOT NULL DEFAULT '99',
   `start_order` int(2) DEFAULT NULL,
+  `suppress` tinyint(1) NOT NULL default 0,
+  `show_when_empty` tinyint(1) NOT NULL default 0,
   `created` datetime NOT NULL,
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `project_id` (`project_id`,`page_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `taxa`;

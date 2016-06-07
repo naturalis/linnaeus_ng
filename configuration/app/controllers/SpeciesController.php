@@ -793,7 +793,7 @@ class SpeciesController extends Controller
         switch ($category) {
 
             case CTAB_MEDIA:
-                $content=$this->getTaxonMedia(array('taxon'=>$taxon,'incOverviewImage'=>$incOverviewImage,'isLower'=>$isLower));
+                $content=$this->getTaxonMedia(array('taxon'=>$taxon,'incOverviewImage'=>$incOverviewImage));
                 break;
 
             case CTAB_CLASSIFICATION:
@@ -840,66 +840,6 @@ class SpeciesController extends Controller
 		return array('content'=>$content);
     }
 
-/*
-    private function getTaxonMedia($p)
-    {
-		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
-		$id=isset($p['id']) ? $p['id'] : null;
-		$inclOverviewImage=isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
-
-        if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
-            return $mt;
-
-		$d = array('project_id' => $this->getCurrentProjectId());
-
-		if (isset($taxon)) $d['taxon_id']=$taxon;
-
-		if (isset($id)) $d['id']=$id;
-
-		if (!$inclOverviewImage)
-			$d['overview_image']='0';
-
-		$mt = $this->models->MediaTaxon->_get(
-		array(
-			'id' => $d,
-			'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime',
-			'order' => 'mime, sort_order'
-		));
-
-		$this->loadControllerConfig('species');
-
-		foreach ((array) $mt as $key => $val) {
-
-			$mdt = $this->models->MediaDescriptionsTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'media_id' => $val['id']
-				),
-				'columns' => 'description'
-			));
-
-
-//          $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
-			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
-
-			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ? $this->controllerSettings['mime_types'][$val['mime_type']] : null;
-
-			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
-			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
-			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
-			$mt[$key]['full_path'] = $this->getProjectUrl('uploadedMedia').$mt[$key]['file_name'];
-		}
-
-		$this->loadControllerConfig();
-
-		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
-
-        return $mt;
-    }
-*/
-
 	protected function getTaxonMedia ($p)
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -914,7 +854,6 @@ class SpeciesController extends Controller
 	    $mt = $this->_mc->getItemMediaFiles();
 		$this->_mc->reformatOutput($mt, $inclOverviewImage);
 
-//print_r($mt);
 		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
 
 		return $mt;

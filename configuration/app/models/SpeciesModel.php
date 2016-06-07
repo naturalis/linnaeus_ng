@@ -1408,4 +1408,45 @@ class SpeciesModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
+    public function getCategories($params)
+    {
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+
+		if ( is_null($project_id) || is_null($language_id) ) return;
+
+        $query = "
+			select
+				_a.id,
+				ifnull(_b.title,_a.page) as title,
+				_a.page,
+				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
+				".(isset($taxon_id) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
+				_a.always_hide,
+				_a.external_reference
+			from
+				%PRE%pages_taxa _a
+
+			left join %PRE%pages_taxa_titles _b
+				on _a.project_id=_b.project_id
+				and _a.id=_b.page_id
+				and _b.language_id = ". $language_id ."
+
+			".(isset($taxon_id) ? "
+				left join %PRE%content_taxa _c
+					on _a.project_id=_c.project_id
+					and _a.id=_c.page_id
+					and _c.taxon_id =".$taxon_id."
+					and _c.language_id = ". $language_id ."
+				" : "")."
+
+			where
+				_a.project_id=".$project_id;
+
+		return $this->freeQuery($query);
+
+    }
+
+
 }

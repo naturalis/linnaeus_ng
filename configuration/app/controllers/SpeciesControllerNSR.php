@@ -1,18 +1,17 @@
 <?php
 /*
 
-automatische tabs
-CTAB_NAMES
-CTAB_MEDIA
-CTAB_CLASSIFICATION
-CTAB_TAXON_LIST
-CTAB_LITERATURE
-CTAB_DNA_BARCODES
+what about
+			if (defined('TAB_VERSPREIDING'))
+			{
+
+			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
+			// this should be changed to a generalized method, using 'redirect_to'
+			// REFAC2015
+
+USE INHERITED LIT yes/no
 
 TAB_VERSPREIDING: auto presence data, data TAB_VERSPREIDING (TAB_VOORKOMEN omgebracht bij import)
-
-TAB_NAAMGEVING wordt omgeleid naar CTAB_NAMES
-  CTAB_NAMES: auto naamgeving, classificatieboom, data TAB_NAAMGEVING
 
 */
 
@@ -35,6 +34,17 @@ class SpeciesControllerNSR extends SpeciesController
 		'names',
 		'taxon_quick_parentage'
 	);
+
+	private $cTabs=[
+		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
+		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
+		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
+		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],	// $this->getTaxonNextLevel($taxon); (children?)
+		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
+		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
+		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
+//		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+	];
 
     public function __construct()
     {
@@ -102,122 +112,44 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->printPage('../shared/generic-error');
 		}
     }
-
+	
     public function taxonAction()
     {
 		$taxon = $this->getTaxonById($this->rGetId());
 
-        if ( empty($taxon) )
+        if ( !empty($taxon) )
 		{
-			$content_404=json_decode($this->moduleSettings->getSetting( "404_content", '{"title":"Page not found","body":"The requested page could not be found."}' ));
+			$categories=$this->getTaxonCategories( [ 'taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$this->rGetVal('cat') ] );
 
-			$this->smarty->assign( 'title', $this->translate( $content_404->title ) );
-			$this->smarty->assign( 'body', $this->translate( $content_404->body ) );
-
-	        $this->printPage( '../shared/404' );
-		}
-		else
-		{
-
-			$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
-
-			$sideBarLogos=array();
-
-			$reqCatId=$this->rHasVal('cat') ? $this->rGetVal('cat') : null;
-
-            $categories=$this->getCategories(array('taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$reqCatId));
-
-			$names=$this->getNames( $taxon );
-
-			$classification=$this->getTaxonClassification($taxon['id']);
-
-			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
-
-			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
-
-			foreach((array)$categories['categories'] as $val)
+			$content=$this->getTaxonContent( [
+				'taxon' => $taxon['id'],
+				'category' => $categories['start'],
+				'allowUnpublished' => $this->isLoggedInAdmin(),
+				'isLower' =>  $taxon['lower_taxon']
+			] );
+			
+			$external_content=$this->getExternalContent( $categories['start'] );
+			
+			if ( isset($external_content) && $external_content->must_redirect==true)
 			{
-				if ( $val['id']==$reqCatId )
-				{
-					$requestedCategory=$val;
-				}
+				$this->redirect( $external_content->full_url );
 			}
-
-			if ( !empty($requestedCategory['external_reference']) )
+			
+			if ( $this->show_nsr_specific_stuff )
 			{
-				$ref=$requestedCategory['external_reference'];
+				$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
+				$overview = $this->getTaxonOverviewImageNsr($taxon['id']);
+				$classification=$this->getTaxonClassification($taxon['id']);
+				$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
+				$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 
-				$external_content=$ref;
-
-				if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
-				{
-					if ( $ref->full_url_valid )
-					{
-						$this->redirect( $ref->full_url );
-					}
-					else
-					{
-						//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
-					}
-				}
-				else
-				if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
-				{
-					if ( $ref->full_url_valid )
-					{
-						$external_content->content_raw=@file_get_contents(  $ref->full_url  );
-						$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
-					}
-					else
-					{
-						//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
-					}
-				}
-
-				$content=$this->getTaxonContent(
-					array(
-						'taxon' => $taxon['id'],
-						'category' => $reqCatId,
-						'allowUnpublished' => $this->isLoggedInAdmin(),
-						'isLower' =>  $taxon['lower_taxon']
-					)
-				);
-
-			}
-			else
-			{
-				// allow empty media page
-				if ($categories['start']!=$reqCatId && $reqCatId=='media')
-				{
-					$categories['start']='media';
-				}
-
-				if ($categories['start']==CTAB_MEDIA && $this->show_nsr_specific_stuff)
-				{
-					$this->smarty->assign('search',$this->requestData);
-					$this->smarty->assign('querystring',$this->reconstructQueryString());
-					$this->smarty->assign('mediaOwn',$this->getTaxonMediaNsr($this->requestData));
-					$this->smarty->assign('mediaCollected',$this->getCollectedLowerTaxonMediaNsr($this->requestData));
-				}
-				else
-				{
-					$content=$this->getTaxonContent(
-						array(
-							'taxon' => $taxon['id'],
-							'category' => $categories['start'],
-							'allowUnpublished' => $this->isLoggedInAdmin(),
-							'isLower' =>  $taxon['lower_taxon']
-						)
-					);
-				}
-
-				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']==TAB_BEDREIGING_EN_BESCHERMING)
+				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']['tabname']==TAB_BEDREIGING_EN_BESCHERMING)
 				{
 					$wetten=$this->getEzData($taxon['id']);
 					$this->smarty->assign('wetten',$wetten);
 				}
 				else
-				if (defined('TAB_VERSPREIDING') && $categories['start']==TAB_VERSPREIDING)
+				if (defined('TAB_VERSPREIDING') && $categories['start']['tabname']==TAB_VERSPREIDING)
 				{
 
 					$distributionMaps=$this->getDistributionMaps($taxon['id']);
@@ -247,20 +179,16 @@ class SpeciesControllerNSR extends SpeciesController
 					$this->smarty->assign('atlasData',$atlasData);
 
 				}
-				else
-				if (defined('TAB_NAAMGEVING') && ($categories['start']==CTAB_NAMES || $categories['start']==TAB_NAAMGEVING))
-				{
-					$content=$this->getTaxonContent(
-						array(
-							'taxon' => $taxon['id'],
-							'category' =>  TAB_NAAMGEVING,
-							'allowUnpublished' => $this->isLoggedInAdmin(),
-							'isLower' =>  $taxon['lower_taxon']
-						)
-					);
 
+				if ($categories['start']['tabname']==CTAB_MEDIA)
+				{
+					$this->smarty->assign('search',$this->requestData);
+					$this->smarty->assign('querystring',$this->reconstructQueryString());
+					$this->smarty->assign('mediaOwn',$this->getTaxonMediaNsr($this->requestData));
+					$this->smarty->assign('mediaCollected',$this->getCollectedLowerTaxonMediaNsr($this->requestData));
 				}
 
+				$sideBarLogos=array();
 				// REFAC2015 --> needs to be moved to function
 				if (isset($content['rdf']))
 				{
@@ -291,41 +219,44 @@ class SpeciesControllerNSR extends SpeciesController
 
 					$this->smarty->assign('rdf',$content['rdf']);
 				}
-
 			}
-
-			$overview = $this->show_nsr_specific_stuff ? $this->getTaxonOverviewImageNsr($taxon['id']) :
-                $this->getTaxonOverviewImage();
+			else
+			{
+				$overview = $this->getTaxonOverviewImage();
+			}
 
 			$this->setPageName($taxon['label']);
 
-			// Ruud LINNA-372, volgorde van tabs is een beetje een zooitje
-		    // Ga ervanuit dat bij $reqCatId == null de eerste categorie de gewenste is
-            if (!isset($requestedCategory)) {
-                $requestedCategory = $categories['categories'][0];
-            }
-
 			$this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
-			$this->smarty->assign('requested_category',isset($requestedCategory) ? $requestedCategory : null);
+			$this->smarty->assign('requested_category',$categories['start']);
 			$this->smarty->assign('content',isset($content['content']) ? $content['content'] : null);
-            $this->smarty->assign('sideBarLogos',$sideBarLogos);
-            $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
-            $this->smarty->assign('categories',$categories['categories']);
-            $this->smarty->assign('activeCategory',$categories['start']);
+			$this->smarty->assign('sideBarLogos',isset($sideBarLogos) ? $sideBarLogos : null);
+			$this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
+			$this->smarty->assign('categories',$categories['categories']);
+			$this->smarty->assign('activeCategory',$categories['start']);
 			$this->smarty->assign('taxon',$taxon);
-			$this->smarty->assign('classification',$classification);
-			$this->smarty->assign('children',$children);
-			$this->smarty->assign('names',$names);
-			//$this->smarty->assign('overviewImage',$this->show_nsr_specific_stuff ? $overview['image'] : $overview);
+
+			$this->smarty->assign('classification',isset($content['classification']) ? $content['classification'] : null);
+			$this->smarty->assign('children',isset($content['children']) ? $content['children'] : null);
+			$this->smarty->assign('names',isset($content['names']) ? $content['names'] : null);
+
 			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
-            $this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
+			$this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
+			
+			$this->printPage('taxon');
+		}
+		else
+		{
 
-	        $this->printPage('taxon');
+			$content_404=json_decode($this->moduleSettings->getSetting( "404_content", '{"title":"Page not found","body":"The requested page could not be found."}' ));
 
-        }
+			$this->smarty->assign( 'title', $this->translate( $content_404->title ) );
+			$this->smarty->assign( 'body', $this->translate( $content_404->body ) );
 
-    }
+	        $this->printPage( '../shared/404' );
+		}	
+	}
 
     public function nameAction()
     {
@@ -352,6 +283,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 		return $this->tmp;
 	}
+
+    public function getTaxonById( $id )
+    {
+        $taxon=parent::getTaxonById( $id );
+		return $taxon;
+    }
 
     public function ajaxInterfaceAction ()
     {
@@ -541,42 +478,175 @@ class SpeciesControllerNSR extends SpeciesController
     private function getCategories($p=null)
     {
 		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
-		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
-		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 
-		$categories = $this->models->{$this->_model}->getCategoriesNsr(array(
+		$categories = $this->models->{$this->_model}->getCategories(array(
             'project_id' => $this->getCurrentProjectId(),
     		'taxon_id' => $taxon_id,
     		'language_id' => $this->getCurrentLanguageId()
 		));
 
+		$standard_categories=$this->cTabs;
+
+		array_walk($standard_categories,function(&$a,$b)
+		{
+			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto','always_hide'=>false,'is_empty'=>false];
+		});
+		
+		$all_categories=array_merge($categories,$standard_categories);
+
+        $lp=$this->getProjectLanguages();
+
+		$order=$this->models->TabOrder->_get([
+			'id'=>['project_id' => $this->getCurrentProjectId()],
+			'order'=>'show_order',
+			'fieldAsIndex'=>'page_id'	
+		]);
+		
+        foreach((array)$all_categories as $key=>$page)
+		{
+            foreach((array)$lp as $k=>$language)
+			{
+                $tpt = $this->models->PagesTaxaTitles->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'page_id' => $page['id'],
+                        'language_id' => $language['language_id']
+                    )
+                ));
+				
+                $all_categories[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
+                $all_categories[$key]['show_order']=isset($order[$page['id']]) ? $order[$page['id']]['show_order'] : 99;
+                $all_categories[$key]['suppress']=isset($order[$page['id']]) ? $order[$page['id']]['suppress']==1 : false;
+                $all_categories[$key]['start_order']=isset($order[$page['id']]) ? $order[$page['id']]['start_order'] : null;
+                $all_categories[$key]['show_when_empty']=isset($order[$page['id']]) ? $order[$page['id']]['show_when_empty']==1 : false;
+				if ( empty($page['type']) ) $all_categories[$key]['type']= isset($page['external_reference']) ? 'external' : 'configured';
+            }
+			
+			$all_categories[$key]['label']=
+				isset($all_categories[$key]['page_titles'][$this->getCurrentLanguageId()]) ?
+					$all_categories[$key]['page_titles'][$this->getCurrentLanguageId()] : $all_categories[$key]['title'];
+        }
+
+		usort($all_categories,function($a,$b)
+		{
+			if ($a['show_order']>$b['show_order'] )
+				return 1;
+			if ($a['show_order']<$b['show_order'] )
+				return -1;
+			if ($a['title']>$b['title'] )
+				return 1;
+			if ($a['title']<$b['title'] )
+				return -1;
+			return 0;
+		});
+
+		return $all_categories;
+
+	}
+
+    private function getTaxonCategories($p=null)
+    {
+		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
+		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
+		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
+
+		// get all available categories (tabs)
+		$categories=$this->getCategories($p);
+
+		$taxon_categories=array();
+		$start_category=null;
+		$taxon=null;
+		$cat=null;
+		
+		if (is_int($requestedTab))
+		{
+			$cat=$requestedTab;
+		}
+
+		// weed out the ones we don't want to display
+		foreach((array)$categories as $key=>$val)
+		{
+			if ( $val['always_hide'] ) continue;
+			if ( $val['suppress'] ) continue;
+			
+			if ($val['type']=='auto')
+			{
+				$val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon_id ] );
+			}
+			
+			if ( $val['is_empty'] && !$val['show_when_empty'] ) continue;
+
+			// parametrize external reference URLs
+			if ( isset($val['external_reference']) )
+			{
+				$taxon=is_null($taxon) ? $this->getTaxonById( $taxon_id ) : $taxon;
+				$ref=json_decode( $val['external_reference'] );
+				$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref) );
+				$ref->full_url=$d['full_url'];
+				$ref->full_url_valid=$d['full_url_valid'];
+				$val['external_reference']=$ref;
+				$val['is_empty']=$d['is_empty'];
+				$val['type']=$d['external'];
+			}
+			
+			$val['show_overview_image']=false;
+
+			$taxon_categories[]=$val;
+
+			// is cat has been provided as TAB_CATNAME rather than an ID, resolve
+			if (!is_int($requestedTab) && $requestedTab==$val['tabname'])
+			{
+				$cat=$val['id'];
+			}
+		}
+			
+		// determine with which category to open
+		foreach((array)$categories as $key=>$val)
+		{
+			if ( is_null($start_category) )
+			{
+				$start_category=$val;
+				if ( is_null($start_category['start_order']) ) $start_category['start_order']=99;
+			}
+
+			if ( !is_null($cat) && $val['id']==$cat )
+			{
+				$start_category=$val;
+			}
+			else
+			if ( is_null($cat) && !is_null($val['start_order']) && $val['start_order'] < $start_category['start_order'] )
+			{
+				$start_category=$val;
+			}
+		}
+
+		// have the first non-automatic/external tab display the overview image
+		foreach((array)$taxon_categories as $key=>$val)
+		{
+			if ( $val['type']=='configured' )
+			{
+				$taxon_categories[$key]['show_overview_image']=true;
+				break;
+			}
+		}
+		
+//		q($start_category);
+//		q($taxon_categories,1);
+		
+		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
+	
+		
+		// remnants...		
 		if ( isset($taxon_id) )
 		{
-			$taxon=$this->getTaxonById( $taxon_id );
-
 			foreach((array)$categories as $key=>$val)
 			{
-				if (defined('TAB_NAAMGEVING') && $val['id']==TAB_NAAMGEVING)
-				{
-					$categories[$key]['is_empty']=true;
-				}
-
 				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
 				{
 					$categories[$key]['is_empty']=true;
 					$dummy=$key;
 				}
-
-				if ( isset($val['external_reference']) )
-				{
-					$ref=json_decode( $val['external_reference'] );
-					$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref) );
-					$ref->full_url=$d['full_url'];
-					$ref->full_url_valid=$d['full_url_valid'];
-					$categories[$key]['external_reference']=$ref;
-					$categories[$key]['is_empty']=$d['is_empty'];
-				}
-
 			}
 
 			if (defined('TAB_VERSPREIDING'))
@@ -605,153 +675,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$categories[$dummy]['is_empty']=empty($ezData);
 			}
 
-			if (!$this->_suppressTab_NAMES)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_NAMES,
-						'title' => $this->translate('Naamgeving'),
-						'is_empty' => false,
-						'tabname' => 'CTAB_NAMES',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_CLASSIFICATION)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_CLASSIFICATION,
-						'title' => $this->translate('Classificatie'),
-						'is_empty' => false,
-						'tabname' => 'CTAB_CLASSIFICATION',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_LITERATURE)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_LITERATURE,
-						'title' => $this->translate('Literature'),
-						'is_empty' => !$this->hasTaxonLiterature($taxon_id),
-						'tabname' => 'CTAB_LITERATURE',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_MEDIA)
-			{
-				$d=$this->getTaxonMediaNsr(array('id'=>$taxon_id,'limit'=>1));
-				if ($d['count']>0)
-				{
-					$isEmpty=0;
-				}
-				else
-				{
-					$d=$this->getCollectedLowerTaxonMediaNsr(array('id'=>$taxon_id));
-					$isEmpty=(count((array)$d['data'])==0);
-				}
-
-				array_push($categories,
-					array(
-						'id' => CTAB_MEDIA,
-						'title' => $this->translate('Media'),
-						'is_empty' => $isEmpty,
-						'tabname' => 'CTAB_MEDIA',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-			if (!$this->_suppressTab_DNA_BARCODES)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_DNA_BARCODES,
-						'title' => $this->translate('DNA barcodes'),
-						'is_empty' => !$this->hasTaxonBarcodes($taxon_id),
-						'tabname' => 'CTAB_DNA_BARCODES',
-						'auto_tab' => 1
-					)
-				);
-			}
-
-
-			//if (!$this->_suppressTab_DNA_DICH_KEY_LINKS)
-			{
-				array_push($categories,
-					array(
-						'id' => CTAB_DICH_KEY_LINKS,
-						'title' => $this->translate('Key links'),
-						'is_empty' => !$this->hasTaxonKeyLinks($taxon_id),
-						'tabname' => 'CTAB_DICH_KEY_LINKS',
-						'auto_tab' => 1
-					)
-				);
-			}
-
 		}
-
-		$order=$this->models->TabOrder->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			),
-			'columns'=>'tabname,show_order,start_order',
-			'fieldAsIndex'=>'tabname',
-			'order'=>'start_order'
-		));
-
-		$start=null;
-		$firstNonEmpty=null;
-
-		foreach((array)$categories as $key=>$val)
-		{
-			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 99;
-			$categories[$key]['show_overview_image']=false;
-
-			if (is_null($firstNonEmpty) && empty($val['is_empty']))
-			{
-				$firstNonEmpty=$val['id'];
-			}
-
-			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty']))
-			{
-				$start=$val['id'];
-			}
-			else
-			if (!isset($requestedTab) && !empty($order[$val['tabname']]['start_order']) &&  empty($val['is_empty']) &&
-				(
-					is_null($start) ||
-					$order[$val['tabname']]['start_order']<$start
-				))
-			{
-				$start=$val['id'];
-			}
-
-		}
-
-		$this->customSortArray($categories,array('key' => 'show_order'));
-
-		foreach((array)$categories as $key=>$val)
-		{
-			if ( $val['auto_tab']!=1 && $val['is_empty']!=1 )
-			{
-				$categories[$key]['show_overview_image']=true;
-				break;
-			}
-		}
-
-		if (is_null($start)) $start=$firstNonEmpty;
-
-		if ($requestedTab=='external') $start=$requestedTab;
-
-		return array('start'=>$start,'categories'=>$categories);
     }
 
 	private function getNames( $p )
@@ -882,7 +806,7 @@ class SpeciesControllerNSR extends SpeciesController
 			);
 	}
 
-	private function getActor($id)
+	private function getActor( $id )
 	{
 		$data=$this->models->Actors->_get(array(
 			'id' => array(
@@ -893,7 +817,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data[0];
 	}
 
-    private function getTaxonOverviewImageNsr($id)
+    private function getTaxonOverviewImageNsr( $id )
 	{
 		$d=$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1,'overview'=>true));
 
@@ -905,7 +829,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return !empty($d['data']) ? array_shift($d['data']) : null;
 	}
 
-    private function getTaxonMediaNsr ($p)
+    private function getTaxonMediaNsr( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 
@@ -947,7 +871,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     }
 
-    private function getCollectedLowerTaxonMediaNsr($p)
+    private function getCollectedLowerTaxonMediaNsr( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
@@ -979,7 +903,7 @@ class SpeciesControllerNSR extends SpeciesController
 			);
 	}
 
-    private function getTaxonMediaCountNsr($id)
+    private function getTaxonMediaCountNsr( $id )
     {
         $mt = $this->models->MediaTaxon->_get(
         array(
@@ -993,7 +917,7 @@ class SpeciesControllerNSR extends SpeciesController
         return isset($mt) ? $mt[0]['total'] : 0;
     }
 
-	private function _getTaxonClassification($id)
+	private function _getTaxonClassification( $id )
 	{
 		$taxon = $this->models->{$this->_model}->getTaxonNsr(array(
             'projectId' => $this->getCurrentProjectId(),
@@ -1015,7 +939,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	}
 
-	private function getSpeciesCount($p)
+	private function getSpeciesCount( $p )
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
 		$rank=isset($p['rank']) ? $p['rank'] : null;
@@ -1052,7 +976,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $d;
 	}
 
-	private function getTaxonChildren($p)
+	private function getTaxonChildren( $p )
 	{
 		$include_count=isset($p['include_count']) ? $p['include_count'] : false;
 		$id=isset($p['taxon']) ? $p['taxon'] : null;
@@ -1078,7 +1002,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data;
 	}
 
-	private function getClassificationSpeciesCount($p)
+	private function getClassificationSpeciesCount( $p )
 	{
 		$classification=isset($p['classification']) ? $p['classification'] : null;
 		$current_taxon=isset($p['taxon']) ? $p['taxon'] : null;
@@ -1113,7 +1037,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return $classification;
 	}
 
-	private function getName($p)
+	private function getName( $p )
 	{
 		$nameId=isset($p['nameId']) ? $p['nameId'] : null;
 		$taxonId=isset($p['taxonId']) ? $p['taxonId'] : null;
@@ -1143,20 +1067,20 @@ class SpeciesControllerNSR extends SpeciesController
 		return $d;
 	}
 
-	private function getDNABarcodes($id)
+	private function getDNABarcodes( $taxon_id )
 	{
 		return $this->models->DnaBarcodes->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id
+					'taxon_id' => $taxon_id
 				),
 				'columns' => 'taxon_literal,barcode,location,date_literal,specialist',
 				'order' => 'date desc'
 			));
 	}
 
-	private function getPresenceData($id)
+	private function getPresenceData( $id )
 	{
 		$data = $this->models->{$this->_model}->getPresenceDataNsr(array(
             'projectId' => $this->getCurrentProjectId(),
@@ -1209,17 +1133,16 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$isPublished=null;
 
-        switch ($category)
+        switch ($category['tabname'])
 		{
-            case CTAB_MEDIA:
+            case 'CTAB_MEDIA':
                 $content = $this->getTaxonMedia(array(
                     'taxon'=>$taxon,
-                    'inclOverviewImage'=>$inclOverviewImage,
-                    'isLower'=>$isLower
+                    'inclOverviewImage'=>$inclOverviewImage
                 ));
                 break;
 
-		    case CTAB_CLASSIFICATION:
+		    case 'CTAB_CLASSIFICATION':
                 $content=
 					array(
 						'classification'=>$this->getTaxonClassification($taxon),
@@ -1227,11 +1150,11 @@ class SpeciesControllerNSR extends SpeciesController
 					);
                 break;
 
-            case CTAB_TAXON_LIST:
+            case 'CTAB_TAXON_LIST':
                 $content=$this->getTaxonNextLevel($taxon);
                 break;
 
-            case CTAB_LITERATURE:
+            case 'CTAB_LITERATURE':
                 $content=
 					array(
 						'literature'=>$this->getTaxonLiterature($taxon),
@@ -1239,12 +1162,16 @@ class SpeciesControllerNSR extends SpeciesController
 					);
                 break;
 
-            case CTAB_DNA_BARCODES:
+            case 'CTAB_DNA_BARCODES':
                 $content=$this->getDNABarcodes($taxon);
                 break;
 
             case CTAB_DICH_KEY_LINKS:
                 $content=$this->getTaxonKeyLinks( $taxon );
+                break;
+
+            case 'CTAB_NAMES':
+                $content=$this->getNames( ['id' => $taxon ] );
                 break;
 
             default:
@@ -1253,7 +1180,7 @@ class SpeciesControllerNSR extends SpeciesController
                     'taxon_id' => $taxon,
                     'project_id' => $this->getCurrentProjectId(),
                     'language_id' => $this->getCurrentLanguageId(),
-                    'page_id' => $category
+                    'page_id' => $category['id']
                 );
 
                 if (!$allowUnpublished)
@@ -1277,49 +1204,43 @@ class SpeciesControllerNSR extends SpeciesController
 		return array('content'=>$content,'rdf'=>$rdf,'isPublished'=>$isPublished);
     }
 
-    private function hasTaxonLiterature($id)
-    {
+	private function getExternalContent( $cat )
+	{
+		if ( $cat['type']!='external' ) return;
 
-		/*
-        $d=$this->models->LiteratureTaxa->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'taxon_id' => $id
-            ),
-			'columns' => 'count(*) as total'
-        ));
+		$ref=$cat['external_reference'];
+		$external_content=$ref;
+		$external_content->must_redirect=false;
 
-        return $d[0]['total']>0;
-		*/
-		$d=$this->getTaxonLiterature( $id );
-
-		if (count((array)$d)==0)
+		if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 		{
-			$d=$this->getInheritedTaxonLiterature( $id );
-			return count((array)$d)>0;
+			if ( $ref->full_url_valid )
+			{
+				//$this->redirect( $ref->full_url );
+				$external_content->must_redirect=true;
+			}
+			else
+			{
+				//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
+			}
 		}
 		else
+		if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
 		{
-			return count((array)$d)>0;
+			if ( $ref->full_url_valid )
+			{
+				$external_content->content_raw=@file_get_contents(  $ref->full_url  );
+				$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
+			}
+			else
+			{
+				//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
+			}
 		}
+		
+		return $external_content;
 
-    }
-
-    private function hasTaxonBarcodes($id)
-    {
-		$d=$this->models->DnaBarcodes->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $id
-			),
-			'columns' => 'count(*) as total',
-			'order'=> 'date'
-		));
-
-        return $d[0]['total']>0;
-    }
-
+	}
 
 	private function reconstructQueryString()
 	{
@@ -1674,12 +1595,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 	}
 
-    public function getTaxonById( $id )
-    {
-        $taxon=parent::getTaxonById( $id );
-		return $taxon;
-    }
-
     private function getTaxonLiterature( $taxon_id )
     {
 		return $this->models->{$this->_model}->getTaxonReferences(array(
@@ -1730,12 +1645,51 @@ class SpeciesControllerNSR extends SpeciesController
     		'language_id' => $this->getCurrentLanguageId(),
 		));
     }
+	
+	private function isAutoTabEmpty( $p )
+	{
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$tab=isset($p['tab']) ? $p['tab'] : null;
+		
+		if ( is_null($taxon_id) ) return false;
 
-    private function hasTaxonKeyLinks( $taxon_id )
-    {
-		$d=$this->getTaxonKeyLinks( $taxon_id );
-        return count((array)$d)>0;
-    }
-
+		switch ( $tab )
+		{
+			case 'CTAB_NAMES':
+				return count((array)$this->getNames( [ 'id'=>$taxon_id ] ))<=0;
+				break;
+			case 'CTAB_MEDIA':
+				if ( $this->show_nsr_specific_stuff )
+				{
+					$a=$this->getTaxonMediaNsr(array('id'=>$taxon_id,'limit'=>1));
+					$b=$this->getCollectedLowerTaxonMediaNsr(array('id'=>$taxon_id));
+					return count((array)$a)+count((array)$b)<=0;
+				}
+				else
+				{
+					return count((array)$this->getTaxonMedia(array('id'=>$taxon_id)))<=0;
+				}
+				break;
+			case 'CTAB_CLASSIFICATION':
+				return false;
+				break;
+			case 'CTAB_TAXON_LIST':
+				return count((array)$this->getTaxonNextLevel($taxon_id))<=0;
+				break;
+			case 'CTAB_LITERATURE':
+				$a=$this->getTaxonLiterature($taxon_id);
+				$b=$this->getInheritedTaxonLiterature($taxon_id);
+				return count((array)$a)+count((array)$b)<=0;
+				break;
+			case 'CTAB_DNA_BARCODES':
+				return count((array)$this->getDNABarcodes($taxon_id))<=0;
+				break;
+			case 'CTAB_DICH_KEY_LINKS':
+				return count((array)$this->getTaxonKeyLinks($taxon_id))<=0;
+				break;
+			default:
+				return false;
+		}
+	}
 
 }
