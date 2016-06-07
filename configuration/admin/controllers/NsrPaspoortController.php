@@ -17,7 +17,8 @@ class NsrPaspoortController extends NsrController
     public $usedModels = array(
 		'actors',
 		'content_taxa',
-		'pages_taxa',
+        'pages_taxa',
+        'pages_taxa_titles',
 		'tab_order',
 		'nsr_ids',
 		'trash_can'
@@ -35,7 +36,7 @@ class NsrPaspoortController extends NsrController
             'media.js'
         )
     );
-    public $modelNameOverride='NsrPaspoortModel';
+    public $modelNameOverride='NsrTaxonModel';
     public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $taxonId;
@@ -182,44 +183,26 @@ class NsrPaspoortController extends NsrController
 
     private function getPassportCategories()
     {
-		$categories=$this->models->NsrPaspoortModel->getPassportCategories(array(
+		$categories=$this->getCategories();
+		
+		$content=$this->models->ContentTaxa->_get(["id"=>[
 			"language_id"=>$this->getDefaultProjectLanguage(),
 			"taxon_id"=>$this->getTaxonId(),
 			"project_id"=>$this->getCurrentProjectId()
-		));
-
-		if (!$categories) $categories=array();
-
-		if ( defined('TAB_VERSPREIDING') ) $d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
-
-		$order=$this->models->TabOrder->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
-			),
-			'columns'=>'tabname,show_order,start_order',
-			'fieldAsIndex'=>'tabname',
-			'order'=>'start_order'
-		));
-
-		$start=null;
-		$firstNonEmpty=null;
-
+		],"fieldAsIndex"=>"page_id"]);
+		
 		foreach((array)$categories as $key=>$val)
 		{
-			$categories[$key]['show_order']=isset($order[$val['tabname']]) ? $order[$val['tabname']]['show_order'] : 999999;
-
-			if (is_null($firstNonEmpty) && empty($val['is_empty']))
-				$firstNonEmpty=$val['id'];
-
-			if (isset($requestedTab) && $val['id']==$requestedTab && empty($val['is_empty'])) {
-				$start=$val['id'];
-			} else
-			if (is_null($start) && !empty($order[$val['tabname']]['start_order']) && empty($val['is_empty'])) {
-				$start=$val['id'];
-			}
-
+			$categories[$key]['content']=isset($content[$val['id']]) ? $content[$val['id']]['content'] : null;
+			$categories[$key]['content_id']=isset($content[$val['id']]) ? $content[$val['id']]['id'] : null;
+			$categories[$key]['publish']=isset($content[$val['id']]) ? $content[$val['id']]['publish'] : false;
 			$categories[$key]['obsolete']=array_key_exists( $val['id'] , $this->obsoleteTabs );
+		}
+
+//		if ( defined('TAB_VERSPREIDING') ) $d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
+		
+		foreach((array)$categories as $key=>$val)
+		{
 
 			if ($val['content_id'])
 			{
@@ -255,10 +238,6 @@ class NsrPaspoortController extends NsrController
 				}
 			}
 		}
-
-		$this->customSortArray($categories,array('key' => 'show_order'));
-
-		if (is_null($start)) $start=$firstNonEmpty;
 
 		return $categories;
 

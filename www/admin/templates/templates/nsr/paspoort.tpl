@@ -23,10 +23,15 @@
 	<ul>
     {assign var=hasObsolete value=false}
 	{foreach from=$tabs item=v key=k}
-	{if !($v.obsolete && $v.content|@strlen==0)}
+	{if !($v.obsolete && $v.content|@strlen==0) && $v.suppress!=1}
 	<li>
 		<span class="passport-title">
-        	{if $v.always_hide}({/if}<a href="#" class="passport-toggles" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="{t}hidden tab{/t}"{/if}>{$v.title}</a>{if $v.always_hide}){/if}
+
+        {if $v.type=='auto'}
+        <span title="{t}automatic tab{/t}">&lt; {if $v.page}{$v.page}{else}{$v.tabname}{/if} &gt;</span>
+        {else}
+
+        	{if $v.always_hide}( {/if}<a href="#" class="passport-toggles" onclick="$('#body{$k}').toggle();return false;" {if $v.always_hide}title="{t}hidden tab{/t}"{/if}>{$v.title}</a>{if $v.always_hide} ){/if}
             {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">{t}Obsolete passport entry{/t}</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
@@ -37,7 +42,14 @@
                 <span title="geen content (onzichtbaar)" class="passport-leeg">leeg</span>
                 {/if}
             </span>
-			<a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat={$v.id}&epi={$session.admin.project.id}" class="edit"  style="margin:0" target="nsr" title="paspoort bekijken in het Soortenregister (nieuw venster)">&rarr;</a><br />
+			<a 
+            	href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat={$v.id}&epi={$session.admin.project.id}" 
+                class="edit"  
+                style="margin:0;{if $v.external_reference}font-size:1em;{/if}" 
+                target="view" 
+                title="{t}view in site (new window){/t}{if $v.external_reference}; {t}external reference{/t}{/if}">{if $v.external_reference}&nearr;{else}&rarr;{/if}</a><br />
+		{/if}
+
 		</span>
 		<div class="passport-body" id="body{$k}">
             <span class="passport-content" id="content{$k}">{$v.content}</span>
