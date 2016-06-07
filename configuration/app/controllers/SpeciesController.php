@@ -6,7 +6,7 @@ include_once ('MediaController.php');
 
 class SpeciesController extends Controller
 {
-	private $_lookupListMaxResults=100;
+	private $_lookupListMaxResults=1000;
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
 	private $_mc;
@@ -1182,7 +1182,7 @@ class SpeciesController extends Controller
 
         list($taxa, $total) = $this->models->{$this->_model}->getTaxa(array(
             'projectId' => $this->getCurrentProjectId(),
-            'taxonType' => $this->getTaxonType(),
+            //'taxonType' => $this->getTaxonType(),
             'getAll' => $getAll,
             'listMax' => $listMax,
             'regExp' => ($matchStartOnly?'^':'').preg_quote($search)

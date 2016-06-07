@@ -138,7 +138,7 @@ $(document).ready(function()
 	{if $pp_popup}
 	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
-
+	
 } );
 </script>
 
