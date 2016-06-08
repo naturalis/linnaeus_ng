@@ -3,6 +3,7 @@
 {assign $concept.id=$image.taxon.id}
 
 {include file="../shared/left_column_tree.tpl"}
+{include file="../shared/left_column_admin_menu.tpl"}
 
 {assign image $image.data[0]}
 

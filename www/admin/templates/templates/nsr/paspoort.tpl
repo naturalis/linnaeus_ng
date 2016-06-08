@@ -1,6 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 {include file="../shared/left_column_tree.tpl"}
+{include file="../shared/left_column_admin_menu.tpl"}
 
 <script type="text/javascript" src="../../../admin/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="../../../admin/javascript/nsr_passport.js"></script>
