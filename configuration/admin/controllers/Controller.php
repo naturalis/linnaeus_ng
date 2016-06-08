@@ -917,7 +917,7 @@ class Controller extends BaseClass
 				@$_SESSION['admin']['user']['email_address'].')'
 			);
 
-		if ($changed!==true)
+		if (!(is_null($before) && is_null($after)) && $changed!==true)
 			return;
 
 		if (!$this->models->ActivityLog->getTableExists())

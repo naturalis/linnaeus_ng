@@ -1,5 +1,11 @@
 {include file="../shared/admin-header.tpl"}
 
+<style>
+.no-data {
+	color:#aaa;
+}
+</style>
+
 <div id="page-main">
 
 <h2>{t}Activity log{/t}{if $search.search} - "{$search.search}"{/if}</h2>
@@ -39,6 +45,7 @@
 
 <table>
 {foreach from=$results.data item=v key=k}
+	{assign var=nodata value=empty($v.data_before) && empty($v.data_after)}
     <tr>
     	<td style="width:400px;">
 		    {$v.note}
@@ -54,10 +61,14 @@
 		    {$v.last_change_hr}
 		</td>
     	<td>
+        	{if $nodata}
+            <span class="no-data">{t}geen data{/t}</span>
+            {else}
 		    <a href="#" class="toggle" onclick="$('.alldata{$k}').toggle();return false;">
-            	<span class="alldata{$k}">toon data</span>
-                <span class="alldata{$k}" style="display:none">verbergen</span>
+            	<span class="alldata{$k}">{t}toon data{/t}</span>
+                <span class="alldata{$k}" style="display:none">{t}verbergen{/t}</span>
 			</a>
+        	{/if}
 		</td>
     </tr>
     
