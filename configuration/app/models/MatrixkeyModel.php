@@ -1038,6 +1038,56 @@ final class MatrixKeyModel extends AbstractModel
 		return $this->freeQuery( $query );
     }
 
+    public function getTaxaInMatrix( $p )
+    {
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$matrix_id = isset($p['matrix_id']) ? $p['matrix_id'] : null;
+		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
+		$preferred_nametype_id = isset($p['preferred_nametype_id']) ? $p['preferred_nametype_id'] : null;
+
+		$limit = isset($p['limit']) ? $p['limit'] : null;
+
+		if ( is_null($project_id) || is_null($matrix_id) || is_null($language_id) || is_null($preferred_nametype_id) )
+			return;
+
+		$query="
+			select 
+				_a.id,
+				_a.id as taxon_id,
+				_a.taxon,
+				_a.author,
+				_a.parent_id,
+				_a.rank_id,
+				_a.taxon_order,
+				_a.is_hybrid,
+				_a.list_level,
+				_a.is_empty,
+				'taxon' as type,
+				_c.name as commonname
+
+			from
+				taxa _a
+
+			left join
+				matrices_taxa  _b
+					on _a.project_id = _b.project_id
+					and _a.id = _b.taxon_id
+					
+			left join
+				names _c
+					on _a.project_id = _c.project_id
+					and _a.id = _c.taxon_id
+					and _c.type_id= " . $preferred_nametype_id . "
+					and _c.language_id = " . $language_id . "
+
+			where
+				_a.project_id = " . $project_id ." 
+				and _b.matrix_id = ". $matrix_id ."
+			" . ( isset($limit) ? "limit " . $limit : "" ) . "
+		";
+	
+		return $this->freeQuery( $query );
+	}
 
 }
 
