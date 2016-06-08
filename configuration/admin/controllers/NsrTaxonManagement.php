@@ -150,7 +150,7 @@ class NsrTaxonManagement extends NsrController
 				array( 'project_id' => $this->getCurrentProjectId(), 'id' => $this->rGetId() )
 			);
 
-			$this->logChange($this->models->PagesTaxa->getDataDelta());
+			$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated tab definition']);
 			$this->saveExternalReference();
 			$this->addMessage( $this->translate( 'Saved.' ) );
         }
@@ -219,7 +219,7 @@ class NsrTaxonManagement extends NsrController
 							'lower_taxon' => $isLowerTaxon ? '1' : '0'
 						));
 
-					$this->logChange($this->models->ProjectsRanks->getDataDelta());
+					$this->logChange($this->models->ProjectsRanks->getDataDelta() + ['note'=>'Updated project ranks']);
 
                     $parent = $this->models->ProjectsRanks->getNewId();
                 }
@@ -347,7 +347,7 @@ class NsrTaxonManagement extends NsrController
                     'show_order' => $d
                 ));
 
-				$this->logChange($this->models->Sections->getDataDelta());
+				$this->logChange($this->models->Sections->getDataDelta() + ['note'=>'Updated sections']);
             }
         }
 
@@ -425,7 +425,7 @@ class NsrTaxonManagement extends NsrController
 				'project_id' => $this->getCurrentProjectId(),
 				'def_page' => '0'
 			));
-		$this->logChange($this->models->PagesTaxa->getDataDelta());
+		$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'New tab definition']);
 		return $d;
     }
 
@@ -507,7 +507,7 @@ class NsrTaxonManagement extends NsrController
 			);
 		}
 
-		$this->logChange($this->models->PagesTaxa->getDataDelta());
+		$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated tab definition']);
 		
 	}
 
@@ -548,7 +548,7 @@ class NsrTaxonManagement extends NsrController
 				'label' => $label
 			));
 
-			$this->logChange($this->models->LabelsProjectsRanks->getDataDelta());
+			$this->logChange($this->models->LabelsProjectsRanks->getDataDelta() + ['note'=>'Updated rank translation']);
         }
 		
 		return true;
@@ -669,7 +669,7 @@ class NsrTaxonManagement extends NsrController
 						$this->addMessage( $this->translate( isset($d[0]['id']) ? 'Label updated.' : 'Label added.' ) );
 
 					$change=$this->models->PagesTaxaTitles->getDataDelta();
-					$this->logChange(['before'=>@$change['before'][0],'after'=>@$change['after'][0],'note'=>'altered tab label']);
+					$this->logChange(['before'=>@$change['before'][0],'after'=>@$change['after'][0],'note'=>'Chnaged tab label']);
 
 				}
 			}

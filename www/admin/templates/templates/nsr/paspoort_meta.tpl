@@ -1,6 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 {include file="../shared/left_column_tree.tpl"}
+{include file="../shared/left_column_admin_menu.tpl"}
 
 {assign var=hasContent value=false}
 {foreach from=$tabs item=v key=k}

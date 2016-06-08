@@ -168,6 +168,7 @@ class Controller extends BaseClass
 		'languages_projects',
 		'modules',
 		'modules_projects',
+		'name_types',
 		'nbc_extras',
 		'projects',
 		'projects_ranks',
@@ -197,6 +198,8 @@ class Controller extends BaseClass
 	public $_varietyMarker='var.';
 	public $_subspeciesMarker='subsp.';
 	public $_formaMarker='f.';
+	private $_nameTypeIds=array();
+
 
     /**
      * Constructor, calls parent's constructor and all initialisation functions
@@ -219,6 +222,7 @@ class Controller extends BaseClass
         $this->loadSmartyConfig();
         $this->checkWriteableDirectories();
 		$this->setRankIdConstants();
+		$this->setNameTypeIds();
         $this->setRequestData();
 		$this->checkForProjectId();
         $this->startModuleSession();
@@ -232,7 +236,6 @@ class Controller extends BaseClass
 		$this->setCssFiles();
 		$this->setOtherStuff();
     }
-
 
     /**
      * Destroys!
@@ -2625,7 +2628,7 @@ class Controller extends BaseClass
     }
 
 
-	public function addHybridMarkerAndInfixes( $p )
+	protected function addHybridMarkerAndInfixes( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
@@ -2668,7 +2671,7 @@ class Controller extends BaseClass
 		}
 	}
 
-	public function addHybridMarker( $p )
+	protected function addHybridMarker( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 		$name=isset($p['name']) ? $p['name'] : null;
@@ -2724,7 +2727,7 @@ class Controller extends BaseClass
 		}
 	}
 
-	public function addVarietasInfix( $p )
+	protected function addVarietasInfix( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 		$name=isset($p['name']) ? $p['name'] : null;
@@ -2751,7 +2754,7 @@ class Controller extends BaseClass
 		return $name;
 	}
 
-	public function addSubspeciesInfix( $p )
+	protected function addSubspeciesInfix( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 		$name=isset($p['name']) ? $p['name'] : null;
@@ -2778,7 +2781,7 @@ class Controller extends BaseClass
 		return $name;
 	}
 
-	public function addFormaInfix( $p )
+	protected function addFormaInfix( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 		$name=isset($p['name']) ? $p['name'] : null;
@@ -2806,7 +2809,7 @@ class Controller extends BaseClass
 	}
 
 
-	protected function setShowAutomaticHybridMarkers()
+	private function setShowAutomaticHybridMarkers()
 	{
 		$this->_showAutomaticHybridMarkers =
 			$this->models->ControllerModel->getSetting(array(
@@ -2816,7 +2819,7 @@ class Controller extends BaseClass
 		))==1;
 	}
 
-	protected function setShowAutomaticInfixes()
+	private function setShowAutomaticInfixes()
 	{
 		$this->_showAutomaticInfixes =
 			$this->models->ControllerModel->getSetting(array(
@@ -2836,7 +2839,7 @@ class Controller extends BaseClass
 		return $this->_showAutomaticInfixes;
 	}
 
-	protected function setRankIdConstants()
+	private function setRankIdConstants()
 	{
 		foreach((array)$this->models->Ranks->_get(array('id'=>'*')) as $val)
 		{
@@ -2870,5 +2873,35 @@ class Controller extends BaseClass
 		return $d ? $d[0]['id'] : false;
     }
 
+	private function setNameTypeIds()
+	{
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
+	}
+
+	protected function getNameTypeId( $predicate )
+	{
+		/*
+			PREDICATE_VALID_NAME
+			PREDICATE_PREFERRED_NAME
+			PREDICATE_HOMONYM
+			PREDICATE_BASIONYM
+			PREDICATE_SYNONYM
+			PREDICATE_SYNONYM_SL
+			PREDICATE_MISSPELLED_NAME
+			PREDICATE_INVALID_NAME
+			PREDICATE_ALTERNATIVE_NAME
+		*/
+
+		if ( isset($this->_nameTypeIds[$predicate]) ) return $this->_nameTypeIds[$predicate]['id'];
+	}
+
+
+	
 
 }

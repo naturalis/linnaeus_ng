@@ -49,23 +49,35 @@ class NsrTaxonLiteratureController extends NsrController
 
         $this->setPageName($this->translate('Taxon literature'));
 
+		$concept=$this->getConcept( $this->getConceptId() );
+
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
+			$b=$this->getTaxonLiterature();
+			
 			if ($this->saveTaxonLiterature( $this->rGetAll() ) )
 			{
 				$this->addMessage( $this->translate('Literature saved.') );
 				$this->setTaxonLiterature();
+
+				$a=$this->getTaxonLiterature();
+				$this->logChange(array('before'=>$b,'after'=>$a,'note'=>sprintf('Updated taxon literature links for "%s"',$concept['taxon'])));
 			}
 		}
 		else
 		if ($this->rHasId() && $this->rHasVal('action','delete') && $this->rHasVal('literature_taxa_id') && !$this->isFormResubmit())
 		{
+			$b=$this->getTaxonLiterature();
+			
 			$this->deleteTaxonLiterature( $this->rGetVal('literature_taxa_id') );
 			$this->addMessage( $this->translate('Reference deleted.') );
 			$this->setTaxonLiterature();
+
+			$a=$this->getTaxonLiterature();
+			$this->logChange(array('before'=>$b,'after'=>$a,'note'=>sprintf('Deleted taxon literature link for "%s"',$concept['taxon'])));
 		}
 
-		$this->smarty->assign('concept',$this->getConcept($this->getConceptId()));
+		$this->smarty->assign('concept',$concept);
 		$this->smarty->assign('literature',$this->getTaxonLiterature());
 		$this->printPage();
 	}

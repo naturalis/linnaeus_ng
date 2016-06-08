@@ -39,44 +39,7 @@
 	$b=$this->moduleSettings->getModuleSetting( array( 'setting'=>'a_setting','subst'=>alt_value,'module'=>'other_module'));
 	$g=$this->moduleSettings->getGeneralSetting('a_setting');
 
-
-
-
 // values are max 512 characters!
-
-drop table `module_settings`;
-
-create table `module_settings` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `module_id` int(11) NOT NULL,
-  `setting` varchar(64) NULL,
-  `info` varchar(1000) NULL,
-  `default_value` varchar(512) NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `module_settings_1` (`module_id`),
-  UNIQUE `module_settings_2` (`module_id`,`setting`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
-;
-
-drop table module_settings_values;
-
-
-CREATE TABLE `module_settings_values` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `setting_id` int(11) NOT NULL,
-  `value` varchar(512) NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `module_settings_3` (`project_id`,`setting_id`),
-  KEY `module_settings_1` (`project_id`),
-  KEY `module_settings_2` (`project_id`,`setting_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-
 
 */
 
@@ -326,14 +289,16 @@ class ModuleSettingsController extends Controller
 			}
 			else
 			{
-			    $this->models->ModuleSettings->insert(array(
+				$d=[
     				'module_id' => $this->getModuleId(),
     				'setting' => $this->rGetVal('new_setting'),
     				'info' => $this->rGetVal('new_info'),
     				'default_value' => $this->rGetVal('new_default_value')
-    			));
+				];
 
-                $this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ),  $this->rGetVal('new_setting') ) );
+			    $this->models->ModuleSettings->insert($d);
+                $this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ), $this->rGetVal('new_setting') ) );
+				$this->logChange(array('after'=>$d,'note'=>sprintf('New setting "%s"', $this->rGetVal('new_setting'))));
 			}
 		}
 	}
@@ -345,14 +310,16 @@ class ModuleSettingsController extends Controller
 				"project_id"=>$this->getCurrentProjectId(),
 				"setting_id"=>$this->getSettingId()
 			));
+			
+		$d=[
+			"module_id"=>$this->getModuleId(),
+			"id"=>$this->getSettingId()
+		];
 
-		$this->_settings=$this->models->ModuleSettings->delete(
-			array(
-				"module_id"=>$this->getModuleId(),
-				"id"=>$this->getSettingId()
-			));
-
+		$b=$this->models->ModuleSettings->_get( [ "id"=>$d ] )[0];
+		$this->_settings=$this->models->ModuleSettings->delete($d);
 		$this->addMessage( $this->translate( 'setting deleted.' ) );
+		$this->logChange(array('before'=>$b,'note'=>sprintf('Deleted setting "%s"', $b['setting'])));
 	}
 
 	private function updateModuleInfo( $p )
@@ -418,6 +385,7 @@ class ModuleSettingsController extends Controller
                 );
 
 				$this->addMessage( sprintf( $this->translate( 'value updated to %s.' ),  $val ) );
+				$note='Updated value for %s setting "%s"';
 			}
 			else
 			if ( $val!="" && empty($curr) )
@@ -429,6 +397,7 @@ class ModuleSettingsController extends Controller
                 ));
 
 				$this->addMessage( sprintf( $this->translate( 'value %s saved.' ),  $val ) );
+				$note='Saved value for %s setting "%s"';
 			}
 			else
 			if ( $val=="" && !empty($curr) )
@@ -441,12 +410,17 @@ class ModuleSettingsController extends Controller
 					));
 
 				$this->addMessage( $this->translate( 'value deleted.' ) );
+				$note='Deleted value for %s setting "%s"';
 			}
 			else
 			{
 				// no existing value, no new value
 			}
 
+			$this->setModuleSettingValues();
+			$a=$this->getModuleSettingValue( $setting_id );
+			$setting=$this->getModuleSetting( ["id"=>(isset($a['setting_id']) ? $a['setting_id'] : $curr['setting_id'])] );
+			$this->logChange(array('before'=>$curr,'after'=>$a,'note'=>sprintf($note,$this->getModule()['module'], $setting['setting'])));
 		}
 	}
 
