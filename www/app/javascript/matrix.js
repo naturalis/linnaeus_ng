@@ -1697,5 +1697,5 @@ function matrixInit()
 	clearResults();
 	printResults();
 	setCursor();
-	bindSecretlyClickable();	
+	bindSecretlyClickable();
 }
