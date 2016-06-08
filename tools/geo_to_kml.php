@@ -16,9 +16,12 @@
 	}
 
 	// KML
-    $path = 'kml';
-    $color = 'ff000000';
-    $polyFill = 0;
+    $path = dirname(__FILE__) . '/' . 'kml';
+    $color = '32FFFFFF';
+    $colorMode = 'normal';
+    $polyFill = 1; // vs 0
+    $outline = 1;
+
 
 	// Linnaeus
 	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
@@ -53,6 +56,8 @@
             geodata_types_titles as t3 on t1.type_id = t3.type_id';
     $r = mysqli_query($my, $q);
 
+
+    // Add ST_FlipCoordinates() if necessary
 	echo "Copying relevant data from MySQL to Postgres...\n";
     while ($row = mysqli_fetch_assoc($r)) {
 		$insert = '
@@ -68,8 +73,8 @@
                 \'' .  pg_escape_string($row['taxon']) . '\',
                 \'' . pg_escape_string($row['geo_type']) . '\',
                 ST_GeomFromText(\'' . $row['geo'] . '\', ' . $srid . ')
-            )';
-			pg_query($pg, $insert) or die(pg_last_error() . $insert);
+                )';
+		pg_query($pg, $insert) or die(pg_last_error() . $insert);
     }
 
 	echo "Merging areas...\n";
@@ -92,23 +97,25 @@
 
 
     echo "Creating kml files...\n";
+
+    $xml = new XMLWriter();
+	$xml->openMemory();
+	$xml->setIndent(true);
+	$xml->setIndentString("   ");
+
     $q = '
         select
             taxon_id,
             taxon,
             geo_type,
-            ST_AsKML(the_geom) as the_geom
-    from
-        linnaeus_post';
+            ST_AsKML(2, the_geom) as the_geom
+        from
+            linnaeus_post';
     $r = pg_query($pg, $q);
     while ($row = pg_fetch_assoc($r)) {
 
-        $file = dirname(__FILE__) . '/' . $path . '/' . $row['taxon_id'] . '.kml';
+        $file = $path . '/' . $row['taxon_id'] . '.kml';
 
-        $xml = new XMLWriter();
-    	$xml->openMemory();
-    	$xml->setIndent(true);
-    	$xml->setIndentString("   ");
     	$xml->startDocument('1.0', 'UTF-8');
         $xml->startElementNS(
             null,
@@ -133,19 +140,22 @@
             null,
             'http://www.w3.org/2005/Atom'
         );
-        $xml->endElement();
         $xml->startElement('Document');
     	$xml->startElement('Placemark');
-        $xml->writeElement('name', $row['taxon'] . '.kml');
+        $xml->writeElement('name', $row['taxon']);
         $xml->startElement('Style');
         $xml->startElement('Linestyle');
         $xml->writeElement('color', $color);
         $xml->endElement();
         $xml->startElement('PolyStyle');
+        $xml->writeElement('color', $color);
+        $xml->writeElement('colorMode', $colorMode);
         $xml->writeElement('fill', $polyFill);
+        $xml->writeElement('outline', $outline);
         $xml->endElement();
         $xml->endElement();
         $xml->writeRaw($row['the_geom']);
+        $xml->endElement();
         $xml->endElement();
         $xml->endElement();
         $xml->endElement();
