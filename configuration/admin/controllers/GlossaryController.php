@@ -69,7 +69,6 @@ class GlossaryController extends Controller
      */
     public function __construct ()
     {
-
         parent::__construct();
         $this->initialize();
     }
@@ -81,9 +80,7 @@ class GlossaryController extends Controller
      */
     public function __destruct ()
     {
-
         parent::__destruct();
-
     }
 
 
@@ -110,29 +107,11 @@ class GlossaryController extends Controller
      */
     public function indexAction()
     {
-
 		$this->clearTempValues();
 
 		$d = $this->getFirstGlossaryTerm();
 
 		$this->redirect('edit.php?id='.$d['id']);
-		//$this->redirect('edit.php');
-
-		/*
-        $this->checkAuthorisation();
-
-        $this->setPageName( $this->translate('Index'));
-
-		$this->clearTempValues();
-
-		$gtc = $this->getGlossaryTermCount();
-
-		$this->smarty->assign('totalCount', $gtc['total']);
-
-        $this->printPage();
-
-		*/
-
     }
 
     /**
@@ -260,7 +239,9 @@ class GlossaryController extends Controller
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLetter','value'=>strtolower(substr($this->rGetVal('term'),0,1))));
 			$this->moduleSession->setModuleSetting( array('setting'=>'activeLanguage','value'=> $this->rGetVal('language_id')));
 
+			$b=$this->getGlossaryTerm($this->rGetId());
 			$this->deleteGlossaryTerm($this->rGetId());
+			$this->logChange(array('before'=>$b,'note'=>sprintf('deleted glossary term "%s"',$b['term'])));
 			$d = $this->getFirstGlossaryTerm();
 			$navList = $this->getGlossaryTermsNavList(true);
 			$this->redirect('edit.php?id='.$d['id']);
@@ -290,6 +271,8 @@ class GlossaryController extends Controller
 			$data['project_id'] = $this->getCurrentProjectId();
 			$data['id'] =  $this->rHasId() ? $this->rGetId() : null;
             $data['definition'] = $this->cleanUpRichContent($data['definition']);
+
+			$b=$this->rHasId() ? $this->getGlossaryTerm($this->rGetId()) : null;
 
 			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id'])))
 			{
@@ -324,6 +307,13 @@ class GlossaryController extends Controller
 						);
 					}
 				}
+
+				$a=$this->getGlossaryTerm($id);
+
+				if (is_null($b))
+					$this->logChange(array('after'=>$a,'note'=>sprintf('created glossary term "%s"',$a['term'])));
+				else
+					$this->logChange(array('before'=>$b,'after'=>$a,'note'=>sprintf('updated glossary term "%s"',$a['term'])));
 
 				$this->clearTempValues();
 
@@ -366,219 +356,6 @@ class GlossaryController extends Controller
         $this->printPage();
 
     }
-
-    /**
-     * Upload media for a glossary term
-     *
-     * @access    public
-     */
-    public function mediaUploadAction ()
-    {
-
-		$this->checkAuthorisation();
-
-        if ($this->rHasId())
-		{
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-			$this->checkAuthorisation();
-
-            $gloss = $this->getGlossaryTerm($this->rGetId());
-
-            if ($gloss['id'])
-			{
-				$this->setBreadcrumbIncludeReferer(
-					array(
-						'name' => $this->translate('Editing glossary term'),
-						'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
-					)
-				);
-
-                $this->setPageName(sprintf($this->translate('New media for "%s"'),$gloss['term']), $this->translate('New media'));
-
-                if ($this->requestDataFiles && !$this->isFormResubmit())
-				{
-                    $filesToSave =  $this->getUploadedMediaFiles();
-					$firstInsert = false;
-
-                    if ($filesToSave)
-					{
-                        foreach((array)$filesToSave as $key => $file)
-						{
-                            $thumb = false;
-
-                            if ($this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
-                                $this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
-                            ) {
-
-                                $pi = pathinfo($file['name']);
-                                $this->helpers->ImageThumberHelper->size_width(150);
-
-                                if ($this->helpers->ImageThumberHelper->save(
-                                    $this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
-                                )) {
-                                    $thumb = $pi['filename'].'-thumb.'.$pi['extension'];
-                                }
-                            }
-
-                            $mt = $this->models->GlossaryMedia->save(
-                                array(
-                                    'id' => null,
-                                    'project_id' => $this->getCurrentProjectId(),
-                                    'glossary_id' => $this->rGetId(),
-                                    'file_name' => $file['name'],
-                                    'original_name' => $file['original_name'],
-                                    'mime_type' => $file['mime_type'],
-                                    'file_size' => $file['size'],
-                                    'thumb_name' => $thumb ? $thumb : null,
-                                )
-                            );
-
-							if (!$firstInsert)
-							{
-								$firstInsert = array('id'=>$this->models->GlossaryMedia->getNewId(),'name'=>$file['name']);
-							}
-
-                            if ($mt)
-							{
-                                $this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-                            } 
-							else
-							{
-                                $this->addError($this->translate('Failed writing uploaded file to database.'),1);
-                            }
-                        }
-
-						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>')
-						{
-							$_SESSION['admin']['system']['media']['newRef'] =
-								'<span class="inline-'.substr($file['mime_type'],0,strpos($file['mime_type'],'/')).'" onclick="showMedia(\''.addslashes($_SESSION['admin']['project']['urls']['project_media'].$file['name']).'\',\''.addslashes($file['name']).'\');">'.
-									$firstInsert['name'].
-								'</span>';
-
-							$this->redirect('edit.php?id='.$gloss['id']);
-
-						}
-
-                    }
-
-                }
-
-            } 
-			else
-			{
-				$this->addError($this->translate('Unknown glossary term.'));
-            }
-
-            $this->smarty->assign('id',$this->rGetId());
-            $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
-
-            $this->smarty->assign('iniSettings',
-                array(
-                    'upload_max_filesize' => ini_get('upload_max_filesize'),
-                    'post_max_size' => ini_get('post_max_size')
-                )
-            );
-
-
-			$this->smarty->assign('alpha', $this->getActualAlphabet($this->getActiveLanguage()));
-			$this->smarty->assign('navList', $this->getGlossaryTermsNavList());
-			$this->smarty->assign('navCurrentId',$gloss['id']);
-
-        } 
-		else 
-		{
-            $this->addError($this->translate('No glossary term specified.'));
-        }
-
-        $this->printPage();
-
-    }
-
-/*
-    public function mediaAction ()
-    {
-
-        $this->checkAuthorisation();
-
-		if (!$this->rHasId()) $this->redirect('index.php');
-
-		$gloss = $this->getGlossaryTerm($this->rGetId());
-
-		$this->setBreadcrumbIncludeReferer(
-			array(
-				'name' => $this->translate('Editing glossary term'),
-				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
-			)
-		);
-
-		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']));
-
-        if ($this->rHasId()) {
-
-            $this->smarty->assign('id',$this->rGetId());
-
-			if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
-
-				$this->changeMediaSortOrder($this->rGetId(), $this->rGetVal('mId'), $this->rGetVal('move'));
-
-			}
-
-            $media = $this->getGlossaryMedia($this->rGetId());
-
-            foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-
-                $d[$val['mime']] = $val['media_type'];
-
-            }
-
-            foreach((array)$media as $key => $val) {
-
-                $mdt = $this->models->GlossaryMediaCaptions->_get(
-					array(
-						'id' => array(
-							'media_id' => $val['id'],
-							'project_id' => $this->getCurrentProjectId(),
-							'language_id' => $this->getDefaultProjectLanguage()
-						)
-					)
-                );
-
-                $val['description'] = $mdt[0]['caption'];
-
-                if (isset($d[$val['mime_type']])) $r[$d[$val['mime_type']]][] = $val;
-
-            }
-
-            if (isset($r)) $this->smarty->assign('media',$r);
-
-            $this->smarty->assign('languages', $this->getProjectLanguages());
-
-            $this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
-
-            $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
-
-        }
-
-        if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
-
-        if ($this->getProjectLanguages()) $this->smarty->assign('languages', $this->getProjectLanguages());
-
-		if (isset($navList)) $this->smarty->assign('navList', $navList);
-		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);
-
-		$this->smarty->assign('activeLanguage',$this->getActiveLanguage());
-
-		//$this->smarty->assign('backUrl', $this->rHasId() ? 'browse.php' : 'index.php');
-
-		//$this->smarty->assign('alpha', $alpha);
-
-		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
-		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
-
-        $this->printPage();
-
-    }
-*/
 
     public function mediaAction ()
     {
@@ -641,12 +418,6 @@ class GlossaryController extends Controller
         $this->printPage();
     }
 
-
-    /**
-     * AJAX interface for this class
-     *
-     * @access    public
-     */
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVal('action')) return;
@@ -718,21 +489,52 @@ class GlossaryController extends Controller
 
 	}
 
-    public function previewAction ()
-    {
+	public function getLookupList($search)
+	{
 
-		$this->redirect('../../../app/views/glossary/term.php?p='.$this->getCurrentProjectId().'&id='.$this->rGetId());
+		if (empty($search)) return;
 
-    }
+		$l1 = $this->models->Glossary->_get(
+			array(
+				'id' =>
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'term like' => '%'.$search.'%'
+					),
+				'columns' => 'id,term as label,"glossary" as source'
+			)
+		);
+
+		$l2 = $this->models->GlossarySynonyms->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'synonym like' => '%'.$search.'%'
+					),
+				'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(array(
+				'data'=>array_merge((array)$l1,(array)$l2),
+				'module'=>$this->controllerBaseName,
+				'url'=>'../glossary/edit.php?id=%s',
+				'sortData'=>true
+			))
+		); // for glossary lookup list
+
+		return array_merge((array)$l1,(array)$l2); // for combined lookup list
+
+	}
 
 	private function embedGlossaryLink($matches)
 	{
-
 		if (trim($matches[0])=='')
 			return $matches[0];
 		else
 			return '<span class="glossary-term-highlight" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
-
 	}
 
 	private function getWordList($languageId,$force=false)
@@ -770,7 +572,6 @@ class GlossaryController extends Controller
 		return $wordlist;
 
 	}
-
 
 	private function deleteMedia($id=null)
 	{
@@ -861,7 +662,6 @@ class GlossaryController extends Controller
 
 	}
 
-
 	private function deleteGlossaryTerm($id)
 	{
 
@@ -901,7 +701,6 @@ class GlossaryController extends Controller
 
 	private function getGlossarySynonyms($id)
 	{
-
 		return $this->models->GlossarySynonyms->_get(
 			array(
 				'id' => array(
@@ -915,7 +714,6 @@ class GlossaryController extends Controller
 
 	private function getFirstGlossaryTerm($letter=null)
 	{
-
 		$d = array('project_id' => $this->getCurrentProjectId());
 
 		if (isset($letter))  $d['term like'] = $letter.'%';
@@ -947,31 +745,24 @@ class GlossaryController extends Controller
 
 	private function getGlossaryTerm($id)
 	{
-
-		$l = $this->models->Glossary->_get(
-			array(
+		$l = $this->models->Glossary->_get(array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $id
 				)
-			)
-		);
+		));
 
-		if ($l) {
-
+		if ($l)
+		{
 			$term = $l[0];
-
 			$term['synonyms'] = $this->getGlossarySynonyms($id);
 			$term['media'] = $this->getGlossaryMedia($id);
-
 			return $term;
-
-		} else {
-
-			return false;
-
 		}
-
+		else
+		{
+			return false;
+		}
 	}
 
 	private function getGlossaryTerms($search,$order=null)
@@ -1002,47 +793,8 @@ class GlossaryController extends Controller
 
 	}
 
-	public function getLookupList($search)
+	private function getGlossaryTermsNavList($forceLookup=false)
 	{
-
-		if (empty($search)) return;
-
-		$l1 = $this->models->Glossary->_get(
-			array(
-				'id' =>
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'term like' => '%'.$search.'%'
-					),
-				'columns' => 'id,term as label,"glossary" as source'
-			)
-		);
-
-		$l2 = $this->models->GlossarySynonyms->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'synonym like' => '%'.$search.'%'
-					),
-				'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
-			)
-		);
-
-		$this->smarty->assign(
-			'returnText',
-			$this->makeLookupList(array(
-				'data'=>array_merge((array)$l1,(array)$l2),
-				'module'=>$this->controllerBaseName,
-				'url'=>'../glossary/edit.php?id=%s',
-				'sortData'=>true
-			))
-		); // for glossary lookup list
-
-		return array_merge((array)$l1,(array)$l2); // for combined lookup list
-
-	}
-
-	private function getGlossaryTermsNavList($forceLookup=false) {
 
 		if (!is_null($this->moduleSession->getModuleSetting('navList')) || $forceLookup) {
 

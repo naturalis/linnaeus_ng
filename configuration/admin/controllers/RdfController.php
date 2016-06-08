@@ -174,6 +174,8 @@ class RdfController extends Controller
 				".(!empty($object_id) ? " and object_id = ".$object_id : "" )."
 				".(!empty($object_type) ? " and object_type = '".$object_type."'" : "" )."
 		");
+		
+		$this->logChange(array('note'=>sprintf('Deleted RDF value (%s)',serialize($p))));
 
 		return $r;
 	}
@@ -209,6 +211,8 @@ class RdfController extends Controller
 			'object_id'=>$object_id,
 			'object_type'=>$object_type,
 		));
+
+		$this->logChange(array('note'=>sprintf('Saved RDF value (%s)',serialize($p))));
 
 		return $r;
 	}

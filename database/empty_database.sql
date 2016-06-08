@@ -1337,7 +1337,6 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `page` varchar(32) NOT NULL,
-  `show_order` int(11) DEFAULT NULL,
   `def_page` tinyint(1) NOT NULL DEFAULT '0',
   `external_reference` varchar(4000) DEFAULT NULL,
   `always_hide` tinyint(1) NOT NULL DEFAULT '0',
@@ -1557,10 +1556,10 @@ CREATE TABLE IF NOT EXISTS `tab_order` (
   `page_id` int(11) NOT NULL,
   `show_order` int(2) NOT NULL DEFAULT '99',
   `start_order` int(2) DEFAULT NULL,
-  `suppress` tinyint(1) NOT NULL default 0,
-  `show_when_empty` tinyint(1) NOT NULL default 0,
+  `suppress` tinyint(1) NOT NULL DEFAULT '0',
+  `show_when_empty` tinyint(1) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `project_id` (`project_id`,`page_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
