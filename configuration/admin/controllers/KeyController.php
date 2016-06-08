@@ -2248,8 +2248,5 @@ class KeyController extends Controller
 		{
 			$this->addMessage( $this->translate('Saved.') );
 		}
-
 	}
-	
-	
 }

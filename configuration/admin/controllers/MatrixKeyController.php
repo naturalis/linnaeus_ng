@@ -947,6 +947,8 @@ class MatrixKeyController extends Controller
 			'sys_name' => $sys_name
         ));
 
+		$this->logChange($this->models->Matrices->getDataDelta() + [ 'note'=>'Matrix: created matrix' ]);
+
         return $this->models->Matrices->getNewId();
     }
 
@@ -1038,6 +1040,8 @@ class MatrixKeyController extends Controller
             'id' => $id,
             'project_id' => $this->getCurrentProjectId()
         ));
+
+		$this->logChange($this->models->Matrices->getDataDelta() + [ 'note'=>'Matrix: deleted matrix' ]);
     }
 
     private function getMatrices()
@@ -1105,6 +1109,8 @@ class MatrixKeyController extends Controller
 			'name' => $name
 		));
 
+		$this->logChange($this->models->MatricesNames->getDataDelta() + [ 'note'=>'Matrix: saved name' ]);
+
 		return $this->models->MatricesNames->getAffectedRows();
 	}
 
@@ -1136,6 +1142,8 @@ class MatrixKeyController extends Controller
             'type' => $this->characteristicTypes[0]['name'],
             'sys_name' => 'temp'
         ));
+
+		$this->logChange($this->models->Characteristics->getDataDelta() + [ 'note'=>'Matrix: created character' ]);
 
         return $this->models->Characteristics->getNewId();
     }
@@ -1175,6 +1183,8 @@ class MatrixKeyController extends Controller
 			),
 			array('id' => $id,'project_id' => $this->getCurrentProjectId())
 		);
+
+		$this->logChange($this->models->Characteristics->getDataDelta() + [ 'note'=>'Matrix: updated character' ]);
 
 		foreach((array)$data['name'] as $key=>$val)
 		{
@@ -1247,6 +1257,9 @@ class MatrixKeyController extends Controller
                 'id' => $id,
                 'project_id' => $this->getCurrentProjectId()
             ));
+
+			$this->logChange($this->models->Characteristics->getDataDelta() + [ 'note'=>'Matrix: deleted character' ]);
+
         }
     }
 
@@ -1291,6 +1304,8 @@ class MatrixKeyController extends Controller
             'characteristic_id' => $this->rGetVal('char'),
             'sys_name' => 'temp'
         ));
+
+		$this->logChange($this->models->CharacteristicsStates->getDataDelta() + [ 'note'=>'Matrix: created state' ]);
 
         return $this->models->CharacteristicsStates->getNewId();
     }
@@ -1496,6 +1511,9 @@ class MatrixKeyController extends Controller
             'id' => $id,
             'project_id' => $this->getCurrentProjectId()
         ));
+
+		$this->logChange($this->models->CharacteristicsStates->getDataDelta() + [ 'note'=>'Matrix: deleted state' ]);
+
     }
 
     private function deleteCharacteristicStates($charId)
@@ -1506,8 +1524,8 @@ class MatrixKeyController extends Controller
             'characteristic_id' => $charId
         ));
 
-        foreach ((array) $cs as $key => $val) {
-
+        foreach ((array) $cs as $key => $val)
+		{
             if (isset($val['file_name']))
 			{
                 @unlink($this->getProjectsMediaStorageDir(). $val['file_name']);
@@ -1518,6 +1536,9 @@ class MatrixKeyController extends Controller
             'characteristic_id' => $charId,
             'project_id' => $this->getCurrentProjectId()
         ));
+
+		$this->logChange($this->models->CharacteristicsStates->getDataDelta() + [ 'note'=>'Matrix: deleted states' ]);
+
     }
 
     private function getTaxa()
@@ -1725,6 +1746,8 @@ class MatrixKeyController extends Controller
                 'default' => 1
             ));
 
+			$this->logChange($this->models->Matrices->getDataDelta() + [ 'note'=>'Matrix: set default matrix' ]);
+
             return;
         }
 
@@ -1738,6 +1761,8 @@ class MatrixKeyController extends Controller
                 'id' => $m[0]['id'],
                 'default' => 1
             ));
+
+			$this->logChange($this->models->Matrices->getDataDelta() + [ 'note'=>'Matrix: set default matrix' ]);
 
             return;
         }
@@ -1755,6 +1780,9 @@ class MatrixKeyController extends Controller
                 'id' => $m[0]['id'],
                 'default' => 1
             ));
+
+			$this->logChange($this->models->Matrices->getDataDelta() + [ 'note'=>'Matrix: set default matrix' ]);
+
         }
     }
 
@@ -1840,6 +1868,8 @@ class MatrixKeyController extends Controller
 				'show_order' => 99
 		))) {
 
+			$this->logChange($this->models->Chargroups->getDataDelta() + [ 'note'=>'Matrix: created character group' ]);
+
 			return $this->models->ChargroupsLabels->save(
 				array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1867,6 +1897,8 @@ class MatrixKeyController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'id' => $p['groupId']
 		));
+
+		$this->logChange($this->models->Chargroups->getDataDelta() + [ 'note'=>'Matrix: deleted character group' ]);
     }
 
     private function deleteCharacteristicFromGroup ($p=null)
@@ -2193,6 +2225,8 @@ class MatrixKeyController extends Controller
 			'sys_name' => trim($sys_name)
 		]);
 
+		$this->logChange($this->models->CharacteristicsStates->getDataDelta() + [ 'note'=>'Matrix: saved state' ]);
+
 		$d=
 			array(
 				'project_id' => $this->getCurrentProjectId(),
@@ -2219,6 +2253,5 @@ class MatrixKeyController extends Controller
 
 		}
     }
-
 
 }

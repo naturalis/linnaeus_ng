@@ -645,20 +645,22 @@ class MatrixKeyController extends Controller
 
     private function getTaxaInMatrix()
     {
-		$m=$this->models->MatricesTaxa->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'matrix_id' => $this->getCurrentMatrixId()
-				),
-				'columns' => 'taxon_id'
-			));
+
+        $m=$this->models->MatrixkeyModel->getTaxaInMatrix(array(
+			"language_id"=>$this->getCurrentLanguageId(),
+			"project_id"=>$this->getCurrentProjectId(),
+			"matrix_id"=>$this->getCurrentMatrixId(),
+			"preferred_nametype_id"=>$this->getNameTypeId(PREDICATE_PREFERRED_NAME)
+        ));
 
 		$taxa=array();
+		$ranks=$this->getProjectRanks() ;
 
         foreach ((array)$m as $key=>$val)
 		{
-			$d=$this->getTaxonById( $val['taxon_id'] );
+			//$d=$this->getTaxonById( $val['taxon_id'] );
+			$val['label']=$this->formatTaxon(['taxon'=>$val,'ranks'=>$ranks]);
+			$d=$val;
 
 			if (
 				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species) ||

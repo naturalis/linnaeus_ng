@@ -85,11 +85,10 @@ class HotwordController extends Controller
 
 		$this->setPageName($this->translate('Hotwords'));
 
-		if ($this->rHasVal('action','delete_all') && !$this->isFormResubmit()) {
-
+		if ($this->rHasVal('action','delete_all') && !$this->isFormResubmit())
+		{
 			$this->clearHotwords();
-
-
+			$this->logChange(array('note'=>'Deleted all hotwords'));
 		}
 
 		$c = $this->models->Hotwords->_get(
@@ -118,8 +117,8 @@ class HotwordController extends Controller
 
 		$this->setPageName($this->translate('Update hotwords'));
 
-		if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
-
+		if ($this->rHasVal('action','update') && !$this->isFormResubmit())
+		{
 			$this->clearHotwords();
 
 			$this->addMessage('Deleted old hotwords.');
@@ -130,7 +129,7 @@ class HotwordController extends Controller
 			$this->addMessage('Added '.$this->updateCommonNames().' hotwords from Common names.');
 			$this->addMessage('Added '.$this->updateKey().' hotwords from Dichotomous key.');
 			$this->addMessage('Added '.$this->updateFreeModules().' hotwords from free modules.');
-
+			$this->logChange(array('note'=>'Updated all hotwords'));
 		}
 
 		$h = $this->models->Hotwords->_get(

@@ -6,16 +6,26 @@
 	<script type="text/javascript" src="../../../admin/javascript/lookup.js"></script>
 	<script type="text/javascript" src="../../../admin/javascript/nsr_taxon_tree.js"></script>
 </head>
+
 <body>
 
 <div style="margin:20px 0 0 10px;">
+
 
 <p>
 	<form>
 		{t}search for a name:{/t} <input type="text" id="allLookupBox" onKeyUp="allLookup()" placeholder="{t}type a name{/t}" autocomplete="off" />
 	</form>
-	<br />
+</p>
+<p class="menu-container-top">
+	<div id="menu-container-top"></div>
+</p>
+<p>
 	<div id="tree-container"></div>
+</p>
+
+<p class="menu-container-bottom">
+	<div id="menu-container-bottom"></div>
 </p>
 
 </div>

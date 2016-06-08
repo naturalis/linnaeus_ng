@@ -11,22 +11,8 @@
 	{t}taxonomic tree:{/t}
 	<div id="tree-container"></div>
 </p>
-<p>
-	{t}tasks:{/t}<br />
-	<a href="taxon_new.php">{t}new taxon concept{/t}</a><br />
-	<a href="taxon_deleted.php">{t}taxon concepts marked as deleted{/t}</a><br />
-	<a href="update_parentage.php">{t}update index table{/t}</a><br />
-    {if $show_nsr_specific_stuff}
-	<a href="nsr_id_resolver.php">{t}NSR ID resolver{/t}</a><br />
-    {/if}
-	<a href="export_versatile.php">{t}multi-purpose export{/t}</a><br />
-	<a href="image_meta_bulk.php">{t}image meta-data bulk upload{/t}</a><br />
-</p>
-<p>
-	<a href="tabs.php">{t}passport categories ("tabs"){/t}</a><br />
-	<a href="sections.php">{t}page sections{/t}</a><br />
-	<a href="ranks.php">{t}taxonomic ranks{/t}</a><br />
-</p>
+
+{include file="../shared/left_column_admin_menu.tpl"}
 
 </div>
 
@@ -90,6 +76,9 @@ $(document).ready(function()
 			}
 		});
 	});
+
+	$( '#admin-menu-bottom' ).toggle(true);
+	
 });
 </script>
 

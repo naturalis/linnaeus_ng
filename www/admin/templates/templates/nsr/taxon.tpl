@@ -17,6 +17,7 @@
 {include file="../shared/admin-header.tpl"}
 
 {include file="../shared/left_column_tree.tpl"}
+{include file="../shared/left_column_admin_menu.tpl"}
 
 <div id="page-container-div">
 
@@ -198,9 +199,9 @@
     {/if}
 
     <p>
-        {if $concept.base_rank==$smarty.const.GENUS_RANK_ID}
+        {if $concept.base_rank==$smarty.const.GENUS_RANK_ID || $concept.base_rank==$smarty.const.SUBGENUS_RANK_ID}
             <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}soort toevoegen aan "%s"{/t}</a><br />
-        {elseif $concept.base_rank >= $smarty.const.GENUS_RANK_ID}
+        {elseif $concept.base_rank >= $smarty.const.SUBGENUS_RANK_ID}
             <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}ondersoort toevoegen aan "%s"{/t}</a><br />
         {elseif $concept.base_rank < $smarty.const.GENUS_RANK_ID}
             <a href="taxon_new.php?parent={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}onderliggend taxon toevoegen aan "%s"{/t}</a><br />

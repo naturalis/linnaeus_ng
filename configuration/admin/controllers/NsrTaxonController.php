@@ -470,6 +470,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->saveTaxonParentage();
 			$this->addMessage('Tabel bijgewerkt');
+			$this->logChange( ['note'=>'Manually updated index table'] );
 		}
 
 		$this->printPage();
