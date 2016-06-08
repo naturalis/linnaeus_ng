@@ -368,7 +368,6 @@ class SearchControllerNSR extends SearchController
 		if (!empty($p['group_id']))
 		{
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
-			q($d,1);
 		}
 		else
 		if (!empty($p['group']))
