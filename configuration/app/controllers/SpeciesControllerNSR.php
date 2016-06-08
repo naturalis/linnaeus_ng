@@ -1243,7 +1243,7 @@ class SpeciesControllerNSR extends SpeciesController
 				//$this->addMessage( sprintf( $this->translate('Invalid URL: %s'), $ref->full_url ) );
 			}
 		}
-		q($external_content);
+
 		return $external_content;
 
 	}
