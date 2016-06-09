@@ -189,9 +189,13 @@ class MediaConverterController extends MediaController
         $data = isset($p['data']) ? $p['data'] : false;
 
         if (!$column || !$table || empty($data)) return false;
-
+/*
         $regExp = '/(..\/..\/..\/shared\/media\/project\/' .
             str_pad($this->getCurrentProjectId(), 4, "0", STR_PAD_LEFT) .
+            '\/)(([^,]+?)\.jpg)/i';
+*/
+        $regExp = '/(..\/..\/..\/shared\/media\/project\/' .
+            '0029' .
             '\/)(([^,]+?)\.jpg)/i';
 
         foreach ($data as $row) {

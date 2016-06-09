@@ -438,7 +438,7 @@ final class MediaModel extends AbstractModel
             $this->escapeString($p['column']) : false;
 
         if (!$projectId || !$table || !$column) return false;
-
+/*
         $query = "
             select
             	`id`, `" . $column . "` as content
@@ -446,7 +446,15 @@ final class MediaModel extends AbstractModel
             	%PRE%" . $table . "
             where
             	$column REGEXP '../../../shared/media/project/" .
-            	   str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/(.*).jpg'";
+ */           	   str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/(.*).jpg'";
+        $query = "
+            select
+            	`id`, `" . $column . "` as content
+            from
+            	%PRE%" . $table . "
+            where
+            	$column REGEXP '../../../shared/media/project/" .
+            	   '0029' . "/(.*).jpg'";
 
         $d = $this->freeQuery($query);
 
