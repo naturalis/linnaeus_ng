@@ -143,73 +143,6 @@ final class IndexModel extends AbstractModel
     }
 
 
-    public function getTaxaList ($params)
-    {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$type = isset($params['type']) ? $params['type'] : false;
-		$letter = isset($params['letter']) ?
-            mysqli_real_escape_string($this->databaseConnection, $params['letter']) : false;
-
-        $query = "
-			select unionized.*, _f.lower_taxon from (
-					select
-						project_id,
-						id as taxon_id,
-						taxon as label,
-						null as author,
-						null as ref_taxon,
-						author as ref_author,
-						rank_id,
-						parent_id,
-						is_empty,
-						'taxon' as source
-					from
-						%PRE%taxa
-					where
-						project_id = ".$projectId."
-
-					union
-
-					select
-						_a.project_id,
-						_a.taxon_id,
-						_a.synonym as label,
-						_a.author,
-						_b.taxon as ref_taxon,
-						_b.author as ref_author,
-						_b.rank_id as rank_id,
-						_b.parent_id as parent_id,
-						_b.is_empty as is_empty,
-						'synonym' as source
-					from
-						%PRE%synonyms _a
-
-					right join %PRE%taxa _b
-						on _a.project_id = _b.project_id
-						and _a.taxon_id = _b.id
-
-					where
-						_a.project_id = ".$projectId."
-				) as unionized
-
-				left join %PRE%projects_ranks _f
-					on unionized.rank_id=_f.id
-					and unionized.project_id = _f.project_id
-
-				where
-					unionized.project_id = ".$projectId."
-					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
-					".(!empty($letter) ? "and label like '".$letter."%'" : null)."
-				order by label";
-
-        return $this->freeQuery($query);
-
-    }
-
 
     public function getCommonLanguages ($params)
     {
@@ -244,34 +177,207 @@ final class IndexModel extends AbstractModel
 
     }
 
-
-    public function setTaxaIndexTabs ($params)
+    public function getHasHigherLower( $p )
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$hasHigherTaxa = isset($params['hasHigherTaxa']) ? $params['hasHigherTaxa'] : false;
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		
+		if ( is_null($project_id) ) return;
 
         $query = "
-            select count(_a.id)>0 as has_values, _c.lower_taxon
-			from %PRE%taxa _a
+            select
+				count(_a.id)>0 as has_values,
+				_c.lower_taxon
+
+			from
+				%PRE%taxa _a
+
 			left join %PRE%projects_ranks _c
 				on _a.rank_id = _c.id
 				and _a.project_id = _c.project_id
-			where _a.project_id = " . $projectId . "
-			    ".(!$hasHigherTaxa ? "and _a.is_empty = 0" : "" )."
-			group by _c.lower_taxon";
 
-        return $this->freeQuery(array(
-        	'query' => $query,
-        	'fieldAsIndex' => 'lower_taxon'
-        ));
+			where
+				_a.project_id = " . $project_id . "
 
+			group by
+				_c.lower_taxon";
+
+		$d=$this->freeQuery( [ 'query' => $query, 'fieldAsIndex' => 'lower_taxon' ] );
+
+		return ['has_lower'=>$d[1]['has_values']==1,'has_higher'=>$d[0]['has_values']==1];
 	}
+
+    public function getHasNames( $p )
+    {
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
+		
+		if ( is_null($project_id) || is_null($nametypes) ) return;
+
+        $query = "
+            select
+				count(*) as total
+
+			from %PRE%names _a
+		
+			left join %PRE%name_types _b
+				on _a.type_id=_b.id
+				and _a.project_id=_b.project_id
+			
+			where
+				_a.project_id = ".$project_id."
+				and _b.nametype in ('" . implode("','",$nametypes) ."')
+		";
+					
+        $d=$this->freeQuery( $query );
+		
+		return [ 'has_names'=>$d[0]['total']>0 ];
+    }
+
+    public function getScientificNameList( $p )
+    {
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$type = isset($p['type']) ? $p['type'] : null;
+		$display_language_id = isset($p['display_language_id']) ? $p['display_language_id'] : null;
+		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
+		$valid_name_id = isset($p['valid_name_id']) ? $p['valid_name_id'] : null;
+		
+		$letter = isset($p['letter']) ?
+            mysqli_real_escape_string($this->databaseConnection, $p['letter']) : null;
+		
+		if ( is_null($project_id) || is_null($valid_name_id) || is_null($display_language_id) || is_null($type) || is_null($nametypes) )
+			return;
+
+        $query = "
+            select
+				_a.id,
+				_a.name,
+				_a.uninomial,
+				_a.specific_epithet,
+				_a.infra_specific_epithet,
+				_a.authorship,
+				_a.name_author,
+				_a.authorship_year,
+				_a.reference,
+				_a.reference_id,
+				_a.expert,
+				_a.expert_id,
+				_a.organisation,
+				_a.organisation_id,
+				_b.nametype,
+				_a.language_id,
+				ifnull(_q.label,_r.rank) as rank_label,
+				_t.id as taxon_id,
+				_t.taxon as ref_taxon,
+				_valid.authorship as ref_taxon_authorship,
+				_t.rank_id,
+				_t.parent_id
+
+			from %PRE%names _a
+		
+			left join %PRE%name_types _b
+				on _a.type_id=_b.id
+				and _a.project_id=_b.project_id
+
+			left join %PRE%taxa _t
+				on _a.taxon_id=_t.id
+				and _a.project_id=_t.project_id
+
+			left join %PRE%names _valid
+				on _t.id=_valid.taxon_id
+				and _t.project_id=_valid.project_id
+				and _valid.type_id= ". $valid_name_id ."
+		
+			left join %PRE%projects_ranks _f
+				on _t.rank_id=_f.id
+				and _t.project_id = _f.project_id
+			
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
+		
+			left join %PRE%labels_projects_ranks _q
+				on _f.id=_q.project_rank_id
+				and _f.project_id = _q.project_id
+				and _q.language_id=".$display_language_id."
+			
+			where
+				_a.project_id = ".$project_id."
+				and _b.nametype in ('" . implode("','",$nametypes) ."')
+				and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
+				".(!is_null($letter) ? "and _a.name like '".$letter."%'" : '' )."
+			
+			order by
+				_a.name, _t.taxon
+			";
+
+        return $this->freeQuery( $query );
+    }
+
+    public function getTaxaListaaa( $p )
+    {
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$type = isset($p['type']) ? $p['type'] : null;
+		$letter = isset($params['letter']) ?
+            mysqli_real_escape_string($this->databaseConnection, $params['letter']) : null;
+		
+		if ( is_null($project_id) || is_null($type) ) return;
+
+        $query = "
+			select unionized.*, _f.lower_taxon from (
+					select
+						project_id,
+						id as taxon_id,
+						taxon as label,
+						null as author,
+						null as ref_taxon,
+						author as ref_author,
+						rank_id,
+						parent_id,
+						is_empty,
+						'taxon' as source
+					from
+						%PRE%taxa
+					where
+						project_id = ".$project_id."
+
+					union
+
+					select
+						_a.project_id,
+						_a.taxon_id,
+						_a.synonym as label,
+						_a.author,
+						_b.taxon as ref_taxon,
+						_b.author as ref_author,
+						_b.rank_id as rank_id,
+						_b.parent_id as parent_id,
+						_b.is_empty as is_empty,
+						'synonym' as source
+					from
+						%PRE%synonyms _a
+
+					right join %PRE%taxa _b
+						on _a.project_id = _b.project_id
+						and _a.taxon_id = _b.id
+
+					where
+						_a.project_id = ".$project_id."
+				) as unionized
+
+				left join %PRE%projects_ranks _f
+					on unionized.rank_id=_f.id
+					and unionized.project_id = _f.project_id
+
+				where
+					unionized.project_id = ".$project_id."
+					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
+					".(!is_null($letter) ? "and label like '".$letter."%'" : '' )."
+				order by label";
+
+
+        return $this->freeQuery($query);
+
+    }
 
 
 
 }
-?>
