@@ -10,6 +10,7 @@
 </div>
 
 <div id="categories">
+
 	<ul>
 		<li>
 			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
@@ -39,7 +40,15 @@
 		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	</div>
 	{/if}
+
 </div>
+
+
+
+
+
+
+
 
 <div id="alphabet" class="test">
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />

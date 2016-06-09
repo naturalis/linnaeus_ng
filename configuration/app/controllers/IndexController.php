@@ -17,13 +17,15 @@ class IndexController extends Controller
             'main.js',
         )
     );
+	
+	private $_commonNameTypes=[PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME];
 
     /**
      * Constructor, calls parent's constructor
      *
      * @access     public
      */
-    public function __construct ($p = null)
+    public function __construct($p = null)
     {
         parent::__construct($p);
         $this->setHasNameTypes();
@@ -34,7 +36,7 @@ class IndexController extends Controller
      *
      * @access     public
      */
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }
@@ -48,12 +50,15 @@ class IndexController extends Controller
     {
 		$type=$this->rHasVar('type') ? $this->rGetVal('type') : 'lower';
 		$language=$this->rHasVar('language') ? $this->rGetVal('language') : null;
-
+		
 		$alpha=$this->getAlphabet($type,$language);
-
 		$letter=($this->rHasVar('letter') && $this->rGetVal('letter')!=''? $this->rGetVal('letter') : key($alpha['alphabet']));
 
+		$list=$this->getIndexList( [ 'type'=>$type, 'letter'=>$letter, 'language'=>$language ] );
+
+
 		$d=$prev=$next=null;
+
 		foreach((array)$alpha['alphabet'] as $key => $val)
 		{
 			$alphaNav['next']=$key;
@@ -72,7 +77,7 @@ class IndexController extends Controller
 
 		if ($type=='common')
 		{
-			$this->smarty->assign('nameLanguages',$this->getCommonLanguages());
+			$this->smarty->assign('nameLanguages',$this->getCommonNameLanguages());
 		}
 
 		$this->smarty->assign('alphaNav', $alphaNav);
@@ -81,7 +86,7 @@ class IndexController extends Controller
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('letter','p')));
 		$this->smarty->assign('alpha',$alpha);
 		$this->smarty->assign('letter',$letter);
-		$this->smarty->assign('list',$this->getList($type,$letter,$language));
+		$this->smarty->assign('list',$list);
 		$this->smarty->assign('hasSpecies', $this->moduleSession->getModuleSetting('hasSpecies'));
 		$this->smarty->assign('hasHigherTaxa', $this->moduleSession->getModuleSetting('hasHigherTaxa'));
 		$this->smarty->assign('hasCommonNames', $this->moduleSession->getModuleSetting('hasCommonNames'));
@@ -153,15 +158,34 @@ class IndexController extends Controller
 		return $result;
     }
 
-    private function getList($type,$letter,$language=null)
+    private function getIndexList( $p )
     {
+		$type = isset($p['type']) ? $p['type'] : null;
+		$letter = isset($p['letter']) ? $p['letter'] : null;
+		$language = isset($p['language']) ? $p['language'] : null;
+       	$ranks = $this->getProjectRanks();
+		
 		if ($type=='common')
 		{
-			$list = $this->models->IndexModel->getCommonNamesList(array(
-                'projectId' => $this->getCurrentProjectId(),
-			    'languageId' => $language,
-			    'letter' => $letter,
-            ));
+			$list = $this->models->IndexModel->getCommonNames(array(
+				'project_id' => $this->getCurrentProjectId(),
+				'label_language_id' => $this->getCurrentLanguageId(),
+				'language_id' => $language,
+				'nametypes' => $this->_commonNameTypes,
+				'letter' => $letter
+			));
+			
+			foreach((array)$list as $key=>$val)
+			{
+				$list[$key]['taxon']=
+					$this->formatTaxon(
+						array(
+							'taxon'=>array('taxon'=>$val['taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
+							'rankpos'=>'post',
+							'ranks'=>$ranks
+					));
+			}
+
 
 		}
 		else
@@ -174,8 +198,6 @@ class IndexController extends Controller
 			    'display_language_id' => $this->getCurrentLanguageId(),
 			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)				
             ));
-
-        	$ranks=$this->getProjectRanks();
 
 			foreach((array)$list as $key=>$val)
 			{
@@ -204,11 +226,12 @@ class IndexController extends Controller
 
     }
 
-    private function getCommonLanguages()
+    private function getCommonNameLanguages()
     {
-		return $this->models->IndexModel->getCommonLanguages(array(
-            'projectId' => $this->getCurrentProjectId(),
-		    'languageId' => $this->getCurrentLanguageId()
+		return $this->models->IndexModel->getCommonNameLanguages(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'label_language_id' => $this->getCurrentLanguageId(),
+			'nametypes' => $this->_commonNameTypes
         ));
     }
 
@@ -227,10 +250,30 @@ class IndexController extends Controller
 
 		$t=$this->models->IndexModel->getHasNames( [
 			'project_id' => $this->getCurrentProjectId(),
-			'nametypes' => [PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME]
+			'nametypes' => $this->_commonNameTypes
 		] );
 
         $this->moduleSession->setModuleSetting( ['setting'=>'hasCommonNames', 'value'=>$t['has_names'] ]);
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

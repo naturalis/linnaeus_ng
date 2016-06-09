@@ -27,7 +27,7 @@ final class IndexModel extends AbstractModel
     }
 
 
-    public function getCommonNamesAlphabet ($params)
+    public function getCommonNamesAlphabet($params)
     {
 		if (!$params) {
 		    return false;
@@ -143,38 +143,97 @@ final class IndexModel extends AbstractModel
     }
 
 
-
-    public function getCommonLanguages ($params)
+    public function getCommonNames( $p )
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$label_language_id = isset($p['label_language_id']) ? $p['label_language_id'] : null;
+		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
+		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
+		$letter = isset($p['letter']) ? $p['letter'] : null;
+		
+		if ( is_null($project_id) || is_null($label_language_id) || is_null($language_id) || is_null($nametypes) ) return;
 
         $query = "
-			select
-				distinct _a.language_id, ifnull(_b.label,_c.language) as language, _a.language_id as id
+            select
+				_a.taxon_id,
+				_a.type_id,
+				_a.name,
+				_b.nametype,
+				ifnull(_d.label,_c.language) as language,
+				_t.taxon,
+				_t.rank_id,
+				_t.parent_id
 
 			from
-				%PRE%commonnames _a
+				%PRE%names _a
+
+			right join %PRE%taxa _t
+				on _a.project_id = _t.project_id
+				and _a.taxon_id = _t.id
+		
+			left join
+				%PRE%name_types _b
+					on _a.type_id=_b.id
+					and _a.project_id=_b.project_id
 
 			left join
 				%PRE%languages _c
-				on _a.language_id = _c.id
+					on _a.language_id = _c.id
 
 			left join
-				%PRE%labels_languages _b
-				on _a.project_id = _b.project_id
-				and _a.language_id = _b.label_language_id
-				and _b.language_id = ".$languageId."
-
+				%PRE%labels_languages _d
+					on _a.project_id = _d.project_id
+					and _a.language_id = _d.label_language_id
+					and _d.language_id = ".$language_id."
+			
 			where
-				_a.project_id = ".$projectId;
+				_a.project_id = ".$project_id."
+				and _b.nametype in ('" . implode("','",$nametypes) ."')
+				".(!empty($letter) ? "and _a.name like '".$letter."%'" : null)."
+		";
+					
+		return $this->freeQuery( $query );
 
-        return $this->freeQuery($query);
+    }
 
+    public function getCommonNameLanguages( $p )
+    {
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$label_language_id = isset($p['label_language_id']) ? $p['label_language_id'] : null;
+		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
+		
+		if ( is_null($project_id) || is_null($label_language_id)  || is_null($nametypes) ) return;
+
+        $query = "
+            select
+				distinct
+					ifnull(_d.label,_c.language) as language,
+					_a.language_id
+
+			from
+				%PRE%names _a
+
+			left join
+				%PRE%name_types _b
+					on _a.type_id=_b.id
+					and _a.project_id=_b.project_id
+
+			left join
+				%PRE%languages _c
+					on _a.language_id = _c.id
+
+			left join
+				%PRE%labels_languages _d
+					on _a.project_id = _d.project_id
+					and _a.language_id = _d.label_language_id
+					and _d.language_id = ".$label_language_id."
+			
+			where
+				_a.project_id = ".$project_id."
+				and _b.nametype in ('" . implode("','",$nametypes) ."')
+		";
+
+		return $this->freeQuery( $query );
     }
 
     public function getHasHigherLower( $p )
@@ -311,73 +370,5 @@ final class IndexModel extends AbstractModel
 
         return $this->freeQuery( $query );
     }
-
-    public function getTaxaListaaa( $p )
-    {
-		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
-		$type = isset($p['type']) ? $p['type'] : null;
-		$letter = isset($params['letter']) ?
-            mysqli_real_escape_string($this->databaseConnection, $params['letter']) : null;
-		
-		if ( is_null($project_id) || is_null($type) ) return;
-
-        $query = "
-			select unionized.*, _f.lower_taxon from (
-					select
-						project_id,
-						id as taxon_id,
-						taxon as label,
-						null as author,
-						null as ref_taxon,
-						author as ref_author,
-						rank_id,
-						parent_id,
-						is_empty,
-						'taxon' as source
-					from
-						%PRE%taxa
-					where
-						project_id = ".$project_id."
-
-					union
-
-					select
-						_a.project_id,
-						_a.taxon_id,
-						_a.synonym as label,
-						_a.author,
-						_b.taxon as ref_taxon,
-						_b.author as ref_author,
-						_b.rank_id as rank_id,
-						_b.parent_id as parent_id,
-						_b.is_empty as is_empty,
-						'synonym' as source
-					from
-						%PRE%synonyms _a
-
-					right join %PRE%taxa _b
-						on _a.project_id = _b.project_id
-						and _a.taxon_id = _b.id
-
-					where
-						_a.project_id = ".$project_id."
-				) as unionized
-
-				left join %PRE%projects_ranks _f
-					on unionized.rank_id=_f.id
-					and unionized.project_id = _f.project_id
-
-				where
-					unionized.project_id = ".$project_id."
-					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
-					".(!is_null($letter) ? "and label like '".$letter."%'" : '' )."
-				order by label";
-
-
-        return $this->freeQuery($query);
-
-    }
-
-
 
 }
