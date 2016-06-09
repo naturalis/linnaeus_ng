@@ -415,12 +415,16 @@ class ModuleSettingsController extends Controller
 			else
 			{
 				// no existing value, no new value
+				unset($note);
 			}
 
 			$this->setModuleSettingValues();
 			$a=$this->getModuleSettingValue( $setting_id );
 			$setting=$this->getModuleSetting( ["id"=>(isset($a['setting_id']) ? $a['setting_id'] : $curr['setting_id'])] );
-			$this->logChange(array('before'=>$curr,'after'=>$a,'note'=>sprintf($note,$this->getModule()['module'], $setting['setting'])));
+			if (isset($note))
+			{
+				$this->logChange(array('before'=>$curr,'after'=>$a,'note'=>sprintf($note,$this->getModule()['module'], $setting['setting'])));
+			}
 		}
 	}
 

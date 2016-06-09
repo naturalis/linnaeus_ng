@@ -15,9 +15,7 @@
         <ul>
             {foreach $categories v k}
             <li id="ctb-{$v.id}">
-                <!-- a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{/if} -->
- 				<!-- a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.tabname}"{/if} -->
- 				<a {if $v.is_empty==0}href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.tabname}"{/if}
+ 				<a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.tabname}"{/if}
                 {if $activeCategory.id==$v.id}
                 class="category-active"
                 {/if}
@@ -47,18 +45,18 @@
  		{if $activeCategory.tabname=='CTAB_MEDIA'}
 
 			{if $is_nsr !== false}
-				{include file="_tab_media_nsr.tpl"}
+				{include file="../species/_tab_media_nsr.tpl"}
 			{else}
-				{include file="_tab_media.tpl"}
+				{include file="../species/_tab_media.tpl"}
 			{/if}
 
 		{elseif $activeCategory.tabname=='CTAB_NAMES' || $activeCategory.tabname=='TAB_NAAMGEVING'}
 
-			{include file="_tab_naamgeving.tpl"}
+			{include file="../species/_tab_naamgeving.tpl"}
 
 		{elseif $activeCategory.tabname=='CTAB_LITERATURE'}
 
-			{include file="_tab_literatuur.tpl"}
+			{include file="../species/_tab_literatuur.tpl"}
 
 		{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
 
@@ -88,7 +86,7 @@
 
 		{if $rdf}
 
-			{include file="_rdf_data.tpl"}
+			{include file="../species/_rdf_data.tpl"}
 
 		{/if}
 

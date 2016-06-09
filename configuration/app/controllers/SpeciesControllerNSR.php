@@ -112,7 +112,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->printPage('../shared/generic-error');
 		}
     }
-	
+
     public function taxonAction()
     {
 		$taxon = $this->getTaxonById($this->rGetId());
@@ -309,9 +309,28 @@ class SpeciesControllerNSR extends SpeciesController
         $this->printPage('ajax_interface');
     }
 
-	private function getFirstTaxonIdNsr()
+    public function higherSpeciesIndexAction()
+    {
+		$id = $this->getFirstTaxonIdNsr( false );
+        $this->setStoreHistory(false);
+
+		if (isset($id))
+		{
+			$this->redirect('taxon.php?id=' . $id);
+		}
+		else
+		{
+			$this->smarty->assign('message','Geen taxon ID gevonden.');
+			$this->printPage('../shared/generic-error');
+		}
+    }
+
+	private function getFirstTaxonIdNsr( $lower=true )
 	{
-		return $this->models->{$this->_model}->getFirstTaxonIdNsr($this->getCurrentProjectId());
+		return $this->models->{$this->_model}->getFirstTaxonIdNsr( [
+			"project_id" => $this->getCurrentProjectId(),
+			"lower" => $lower
+		] );
 	}
 
 	private function resolveSubstField( $p )
