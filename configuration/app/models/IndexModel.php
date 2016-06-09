@@ -73,7 +73,7 @@ final class IndexModel extends AbstractModel
 		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
 		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
 
-		if ( is_null($project_id) || is_null($language_id) || is_null($nametypes) ) return;
+		if ( is_null($project_id) || is_null($nametypes) ) return;
 
         $query = "
             select
@@ -89,7 +89,7 @@ final class IndexModel extends AbstractModel
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
-				and _a.language_id = ".$language_id . "
+				" . ( !is_null($language_id) ? "and _a.language_id = ".$language_id : "" ). " 
 
 			order by 
 				letter
