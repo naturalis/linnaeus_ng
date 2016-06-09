@@ -1,8 +1,8 @@
 {include file="../shared/header.tpl"}
 <style>
 #categories {
-	width:75%;
- }
+	width:95%;
+}
 </style>
 
 <div id="header-titles">
@@ -13,42 +13,38 @@
 
 	<ul>
 		<li>
-			<a class="category{if $type=='lower'}-active{/if} category-first{if $hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
+			<a class="category-first category{if $type=='lower'}-active{/if}{if !$hasSpecies} category-no-content{/if}" {if $hasSpecies}href="index.php"{/if}>
 			{t}Species and lower taxa{/t}</a>
 		</li>
 		<li>
-			<a class="category{if $type=='higher'}-active{/if}{if $hasHigherTaxa==1}" href="higher.php"{else} category-no-content"{/if}>
+			<a class="category{if $type=='higher'}-active{/if}{if !$hasHigherTaxa} category-no-content{/if}" {if $hasHigherTaxa}href="higher.php"{/if}>
 			{t}Higher taxa{/t}</a>
 		</li>
 		<li>
-			<a class="category{if $type=='common'}-active{/if} category-last{if $hasCommonNames==1}" href="common.php"{else} category-no-content"{/if}>
+			<a class="category-last category{if $type=='common'}-active{/if}{if !$hasCommonNames} category-no-content{/if}" {if $hasCommonNames}href="common.php"{/if}>
 			{t}Common names{/t}</a>
 		</li>
 	</ul>
 
     {if $type=='common'}
+
 	<div style="float:right;">
 		{t}Language:{/t}
-		<select id="nameLanguage" onchange="window.open('index.php?type=common&language='+$('#nameLanguage').val()+'&letter=','_self');">
-		<option value=""{if $activeLanguage==''} selected="selected"{/if}>{t}Show all{/t}</option>
-		<option disabled="disabled">-----------------------</option>
-		{foreach name=languageloop from=$nameLanguages key=k item=v}
-		<option value="{$v.id}"{if $v.id==$language} selected="selected"{/if}>{$v.language}</option>
+
+		<select id="nameLanguage" onchange="window.open('index.php?type=common&language='+$('#nameLanguage').val(),'_self');">
+        <option value=""{if $activeLanguage==''} selected="selected"{/if}>{t}Show all{/t}</option>
+        <option disabled="disabled">-----------------------</option>
+       {foreach name=languageloop from=$nameLanguages key=k item=v}
+            <option value="{$v.language_id}"{if $v.language_id==$language} selected="selected"{/if}>{$v.language}</option>
 		{/foreach}
 		</select>
 		<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
 		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	</div>
+
 	{/if}
 
 </div>
-
-
-
-
-
-
-
 
 <div id="alphabet" class="test">
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />
@@ -94,7 +90,7 @@
         {foreach name=taxonloop from=$list key=k item=v}
         <p>
             <a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">
-            {if $v.commonname}{$v.commonname}{else}{$v.transliteration}{/if}</a>
+            {$v.name}</a>
             {if $language==''} ({$v.language}){/if}
         </p>
         {/foreach}
