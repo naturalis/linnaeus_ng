@@ -285,6 +285,7 @@ class SpeciesModel extends AbstractModel
 					)
 				) as name,
 				_f.rank_id,
+				_f.lower_taxon,
 				ifnull(_g.label,_r.rank) as rank_label,
 				_k.uninomial,
 				_k.specific_epithet,
@@ -698,33 +699,41 @@ class SpeciesModel extends AbstractModel
 
     }
 
-    public function getFirstTaxonIdNsr( $projectId )
+    public function getFirstTaxonIdNsr($params)
     {
-		if ( is_null($projectId) ) return;
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$lower = isset($params['lower']) ? $params['lower'] : true;
+
+		if ( is_null($project_id) ) return;
+
 
         $query = "
 			select
 				_a.id
 
-			from %PRE%taxa _a
+			from
+				%PRE%taxa _a
 
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id =  _trash.lng_id
-				and _trash.item_type='taxon'
+			left join
+				%PRE%trash_can _trash
+					on _a.project_id = _trash.project_id
+					and _a.id =  _trash.lng_id
+					and _trash.item_type='taxon'
 
-			left join %PRE%projects_ranks _p
-				on _a.project_id = _p.project_id
-				and _a.rank_id =  _p.id
+			left join
+				%PRE%projects_ranks _p
+					on _a.project_id = _p.project_id
+					and _a.rank_id =  _p.id
 
 			where
-				_a.project_id =".$projectId."
+				_a.project_id =".$project_id."
 				and _a.taxon <>''
 				and ifnull(_trash.is_deleted,0)=0
-				and _p.lower_taxon=1
+				and _p.lower_taxon= " . ($lower ? "1" : "0" ) . "
 
 			order by
-				_a.taxon
+				" . ($lower ? "_a.taxon" : "_p.rank_id asc, _a.taxon" ) . "
+
 			limit 1";
 
         $d = $this->freeQuery($query);

@@ -523,26 +523,12 @@ class SpeciesController extends Controller
 
     public function getTaxonNextLevel($id)
     {
-        $t = $this->models->Taxa->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(),
-                'parent_id' => $id
-            ),
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author',
-            'fieldAsIndex' => 'id',
-            'order' => 'taxon_order,id'
-        ));
-
-        foreach ((array) $t as $key => $val) {
-
-            $t[$key]['label'] = $this->formatTaxon($val);
-
-            $names = $this->getTaxonCommonNames($val['id'], $this->getCurrentLanguageId());
-
-            if (isset($names[0]['commonname']))
-                $t[$key]['commonname'] = $names[0]['commonname'];
-        }
+		$t = $this->models->{$this->_model}->getTaxonChildrenNsr(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+    		'languageId' => $this->getCurrentLanguageId(),
+    		'taxonId' => $id
+		));
 
         return $t;
     }
