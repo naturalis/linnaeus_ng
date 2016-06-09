@@ -157,7 +157,6 @@ class IndexController extends Controller
     {
 		if ($type=='common')
 		{
-
 			$list = $this->models->IndexModel->getCommonNamesList(array(
                 'projectId' => $this->getCurrentProjectId(),
 			    'languageId' => $language,
@@ -167,30 +166,46 @@ class IndexController extends Controller
 		}
 		else
 		{
-
-		    $list = $this->models->IndexModel->getTaxaList(array(
-                'projectId' => $this->getCurrentProjectId(),
+		    $list = $this->models->IndexModel->getScientificNameList(array(
+                'project_id' => $this->getCurrentProjectId(),
+				'nametypes'=> [PREDICATE_VALID_NAME,PREDICATE_SYNONYM,PREDICATE_SYNONYM_SL,PREDICATE_HOMONYM,PREDICATE_MISSPELLED_NAME,PREDICATE_INVALID_NAME],
 			    'type' => $type,
 			    'letter' => $letter,
+			    'display_language_id' => $this->getCurrentLanguageId(),
+			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)				
             ));
+
+        	$ranks=$this->getProjectRanks();
 
 			foreach((array)$list as $key=>$val)
 			{
-				if ($val['source']!='synonym')
-					$list[$key]['label']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['label'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),'rankpos'=>'post'));
+				if ($val['nametype']==PREDICATE_VALID_NAME)
+					$list[$key]['label']=
+						$this->formatTaxon(
+							array(
+								'taxon'=>array('taxon'=>$val['name'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
+								'rankpos'=>'post',
+								'ranks'=>$ranks
+						));
+
 				if (!empty($val['ref_taxon']))
-					$list[$key]['ref_taxon']=$this->formatTaxon(array('taxon'=>array('taxon'=>$val['ref_taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),'rankpos'=>'post'));
+					$list[$key]['ref_taxon']=
+						$this->formatTaxon(
+							array(
+								'taxon'=>array('taxon'=>$val['ref_taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
+								'rankpos'=>'post',
+								'ranks'=>$ranks
+						));
 			}
 
 		}
-		//q($list);
+
 		return $list;
 
     }
 
     private function getCommonLanguages()
     {
-
 		return $this->models->IndexModel->getCommonLanguages(array(
             'projectId' => $this->getCurrentProjectId(),
 		    'languageId' => $this->getCurrentLanguageId()
@@ -199,47 +214,23 @@ class IndexController extends Controller
 
     private function setHasNameTypes()
     {
-
         // Check if results have been stored in session; if so return
         if (!is_null($this->moduleSession->getModuleSetting('hasSpecies')) &&
             !is_null($this->moduleSession->getModuleSetting('hasHigherTaxa')) &&
             !is_null($this->moduleSession->getModuleSetting('hasCommonNames')))
-        return;
+		return;
 
-		/*
-			usually, taxa that have is_empty==1 (indicating they have no user-generated
-			content) are ignored.
-			however, if the HT-module has been explicitly activated, we *do* include
-			"empty" taxa in the index, so the HT-entries index can link to the HT-module.
-			this can be useful as taxa are never truely empty: the classification-tab
-			is always generated, automatically, based on the taxonomy.
+		$t=$this->models->IndexModel->getHasHigherLower( ['project_id' => $this->getCurrentProjectId() ] );
 
-		*/
+        $this->moduleSession->setModuleSetting( ['setting'=>'hasSpecies', 'value'=>$t['has_lower'] ]);
+        $this->moduleSession->setModuleSetting( ['setting'=>'hasHigherTaxa', 'value'=>$t['has_higher'] ]);
 
-		$t = $this->models->IndexModel->setTaxaIndexTabs(array(
-            'projectId' => $this->getCurrentProjectId(),
-		    'hasHigherTaxa' => $this->doesCurrentProjectHaveModule(MODCODE_HIGHERTAXA)
-		));
+		$t=$this->models->IndexModel->getHasNames( [
+			'project_id' => $this->getCurrentProjectId(),
+			'nametypes' => [PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME]
+		] );
 
-        $c = $this->models->Commonnames->_get(array(
-            'where' => 'project_id = ' . $this->getCurrentProjectId(),
-            'columns' => 'count(1)>0 as has_values'
-        ));
-
-        $this->moduleSession->setModuleSetting(array(
-            'setting'=>'hasSpecies',
-            'value'=>isset($t[1]['has_values']) ? $t[1]['has_values'] : 0
-        ));
-        $this->moduleSession->setModuleSetting(array(
-            'setting'=>'hasHigherTaxa',
-            'value'=>isset($t[0]['has_values']) ? $t[0]['has_values'] : 0
-        ));
-        $this->moduleSession->setModuleSetting(array(
-            'setting'=>'hasCommonNames',
-            'value'=>isset($c[0]['has_values']) ? $c[0]['has_values'] : 0
-        ));
+        $this->moduleSession->setModuleSetting( ['setting'=>'hasCommonNames', 'value'=>$t['has_names'] ]);
     }
-
-
 
 }

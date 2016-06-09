@@ -1066,15 +1066,15 @@ final class MatrixKeyModel extends AbstractModel
 				_c.name as commonname
 
 			from
-				taxa _a
+				%PRE%taxa _a
 
 			left join
-				matrices_taxa  _b
+				%PRE%matrices_taxa  _b
 					on _a.project_id = _b.project_id
 					and _a.id = _b.taxon_id
 					
 			left join
-				names _c
+				%PRE%names _c
 					on _a.project_id = _c.project_id
 					and _a.id = _c.taxon_id
 					and _c.type_id= " . $preferred_nametype_id . "
