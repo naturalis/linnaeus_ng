@@ -311,7 +311,15 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function higherSpeciesIndexAction()
     {
-		$id = $this->getFirstTaxonIdNsr( false );
+        if ( $this->rHasVal('id') )
+		{
+			$id = $this->rGetId();
+        }
+        else
+		{
+			$id = $this->getFirstTaxonIdNsr( false );
+		}
+
         $this->setStoreHistory(false);
 
 		if (isset($id))
