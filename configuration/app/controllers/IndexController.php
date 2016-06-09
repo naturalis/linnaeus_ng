@@ -19,6 +19,7 @@ class IndexController extends Controller
     );
 	
 	private $_commonNameTypes=[PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME];
+	private $_scientificNameTypes=[PREDICATE_VALID_NAME,PREDICATE_SYNONYM,PREDICATE_SYNONYM_SL,PREDICATE_HOMONYM,PREDICATE_MISSPELLED_NAME,PREDICATE_INVALID_NAME];
 
     /**
      * Constructor, calls parent's constructor
@@ -46,16 +47,15 @@ class IndexController extends Controller
      *
      * @access    public
      */
-    public function indexAction ()
+    public function indexAction()
     {
 		$type=$this->rHasVar('type') ? $this->rGetVal('type') : 'lower';
 		$language=$this->rHasVar('language') ? $this->rGetVal('language') : null;
-		
-		$alpha=$this->getAlphabet($type,$language);
+
+		$alpha=$this->getAlphabet( [ 'type'=>$type, 'language_id'=>$language ] );
 		$letter=($this->rHasVar('letter') && $this->rGetVal('letter')!=''? $this->rGetVal('letter') : key($alpha['alphabet']));
 
 		$list=$this->getIndexList( [ 'type'=>$type, 'letter'=>$letter, 'language'=>$language ] );
-
 
 		$d=$prev=$next=null;
 
@@ -94,12 +94,12 @@ class IndexController extends Controller
 		$this->printPage();
     }
 
-    public function higherAction ()
+    public function higherAction()
     {
         $this->redirect('index.php?type=higher');
     }
 
-    public function commonAction ()
+    public function commonAction()
     {
 		$this->redirect('index.php?type=common');
     }
@@ -127,23 +127,26 @@ class IndexController extends Controller
 		return $querystring;
 	}
 
-    private function getAlphabet($type,$language=null)
+    private function getAlphabet( $p )
     {
+		$type = isset($p['type']) ? $p['type'] : null;
+		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
+
 		if ($type=='common')
 		{
 		    $alpha = $this->models->IndexModel->getCommonNamesAlphabet(array(
-                'projectId' => $this->getCurrentProjectId(),
-		        'languageId' => $language
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $language_id,
+				'nametypes' => $this->_commonNameTypes,
 			));
-
 		}
 		else
 		{
             $alpha = $this->models->IndexModel->getTaxaAlphabet(array(
-                'projectId' => $this->getCurrentProjectId(),
-		        'type' => $type
+                'project_id' => $this->getCurrentProjectId(),
+				'nametypes'=> $this->_scientificNameTypes,
+			    'type' => $type,
             ));
-
 		}
 
 		$result=array();
@@ -174,31 +177,18 @@ class IndexController extends Controller
 				'nametypes' => $this->_commonNameTypes,
 				'letter' => $letter
 			));
-			
-			foreach((array)$list as $key=>$val)
-			{
-				$list[$key]['taxon']=
-					$this->formatTaxon(
-						array(
-							'taxon'=>array('taxon'=>$val['taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
-							'rankpos'=>'post',
-							'ranks'=>$ranks
-					));
-			}
-
-
 		}
 		else
 		{
 		    $list = $this->models->IndexModel->getScientificNameList(array(
                 'project_id' => $this->getCurrentProjectId(),
-				'nametypes'=> [PREDICATE_VALID_NAME,PREDICATE_SYNONYM,PREDICATE_SYNONYM_SL,PREDICATE_HOMONYM,PREDICATE_MISSPELLED_NAME,PREDICATE_INVALID_NAME],
+				'nametypes'=> $this->_scientificNameTypes,
 			    'type' => $type,
 			    'letter' => $letter,
 			    'display_language_id' => $this->getCurrentLanguageId(),
 			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)				
             ));
-
+			
 			foreach((array)$list as $key=>$val)
 			{
 				if ($val['nametype']==PREDICATE_VALID_NAME)

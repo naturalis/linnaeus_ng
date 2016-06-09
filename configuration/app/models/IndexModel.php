@@ -27,121 +27,76 @@ final class IndexModel extends AbstractModel
     }
 
 
-    public function getCommonNamesAlphabet($params)
+    public function getTaxaAlphabet( $p )
     {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$type = isset($p['type']) ? $p['type'] : null;
+		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
+		
+		if ( is_null($project_id) || is_null($type) || is_null($nametypes) )
+			return;
 
         $query = "
-			select
-				distinct lower(substr(commonname,1,1)) as letter
-			from
-				%PRE%commonnames
+            select
+
+				distinct lower(substr(_a.name,1,1)) as letter
+
+			from %PRE%names _a
+		
+			left join %PRE%name_types _b
+				on _a.type_id=_b.id
+				and _a.project_id=_b.project_id
+
+			left join %PRE%taxa _t
+				on _a.taxon_id=_t.id
+				and _a.project_id=_t.project_id
+		
+			left join %PRE%projects_ranks _f
+				on _t.rank_id=_f.id
+				and _t.project_id = _f.project_id
+
 			where
-				project_id = ".$projectId."
-			".(!empty($languageId) ? " and language_id=".$languageId : "" )."
-			order by letter";
+				_a.project_id = ".$project_id."
+				and _b.nametype in ('" . implode("','",$nametypes) ."')
+				and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
 
-        return $this->freeQuery($query);
+			order by
+				letter
+			";
 
+        return $this->freeQuery( $query );
     }
 
-
-    public function getTaxaAlphabet ($params)
+    public function getCommonNamesAlphabet( $p )
     {
-		if (!$params) {
-		    return false;
-		}
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
+		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$type = isset($params['type']) ? $params['type'] : false;
+		if ( is_null($project_id) || is_null($language_id) || is_null($nametypes) ) return;
 
         $query = "
-			select distinct unionized.letter, _f.lower_taxon from (
-					select
-						distinct lower(substr(taxon,1,1)) as letter,
-						project_id,
-						rank_id
-					from
-						%PRE%taxa
-					where
-						project_id = ".$projectId."
+            select
+				distinct lower(substr(_a.name,1,1)) as letter
 
-					union
+			from
+				%PRE%names _a
 
-					select
-						distinct lower(substr(_a.synonym,1,1)) as letter,
-						_a.project_id,
-						_b.rank_id as rank_id
-					from
-						%PRE%synonyms _a
+			left join
+				%PRE%name_types _b
+					on _a.type_id=_b.id
+					and _a.project_id=_b.project_id
+			where
+				_a.project_id = ".$project_id."
+				and _b.nametype in ('" . implode("','",$nametypes) ."')
+				and _a.language_id = ".$language_id . "
 
-					right join %PRE%taxa _b
-						on _a.project_id = _b.project_id
-						and _a.taxon_id = _b.id
-
-					where
-						_a.project_id = ".$projectId."
-				) as unionized
-
-				left join %PRE%projects_ranks _f
-					on unionized.rank_id=_f.id
-					and unionized.project_id = _f.project_id
-
-				where
-					unionized.project_id = ".$projectId."
-					and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
-				order by letter";
-
-        return $this->freeQuery($query);
-
+			order by 
+				letter
+		";
+					
+		return $this->freeQuery( $query );
     }
-
-
-    public function getCommonNamesList ($params)
-    {
-		if (!$params) {
-		    return false;
-		}
-
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
-		$letter = isset($params['letter']) ?
-            mysqli_real_escape_string($this->databaseConnection, $params['letter']) : false;
-
-        $query = "
-			select
-				_a.taxon_id,_a.commonname,_a.transliteration, ifnull(_b.label,_c.language) as language
-
-				from
-					%PRE%commonnames _a
-
-				left join
-					%PRE%languages _c
-					on _a.language_id = _c.id
-
-				left join
-					%PRE%labels_languages _b
-					on _a.project_id = _b.project_id
-					and _a.language_id = _b.label_language_id
-					and _b.language_id = ".$projectId."
-
-				where
-					_a.project_id = ".$projectId."
-					".(!empty($languageId) ? " and _a.language_id=".$languageId : "" )."
-					".(!empty($letter) ? "and _a.commonname like '".$letter."%'" : null)."
-
-				order by
-					_a.commonname";
-
-        return $this->freeQuery($query);
-
-    }
-
 
     public function getCommonNames( $p )
     {
@@ -150,8 +105,8 @@ final class IndexModel extends AbstractModel
 		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
 		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
 		$letter = isset($p['letter']) ? $p['letter'] : null;
-		
-		if ( is_null($project_id) || is_null($label_language_id) || is_null($language_id) || is_null($nametypes) ) return;
+
+		if ( is_null($project_id) || is_null($label_language_id) || is_null($nametypes) ) return;
 
         $query = "
             select
@@ -159,18 +114,11 @@ final class IndexModel extends AbstractModel
 				_a.type_id,
 				_a.name,
 				_b.nametype,
-				ifnull(_d.label,_c.language) as language,
-				_t.taxon,
-				_t.rank_id,
-				_t.parent_id
+				ifnull(_d.label,_c.language) as language
 
 			from
 				%PRE%names _a
 
-			right join %PRE%taxa _t
-				on _a.project_id = _t.project_id
-				and _a.taxon_id = _t.id
-		
 			left join
 				%PRE%name_types _b
 					on _a.type_id=_b.id
@@ -184,12 +132,13 @@ final class IndexModel extends AbstractModel
 				%PRE%labels_languages _d
 					on _a.project_id = _d.project_id
 					and _a.language_id = _d.label_language_id
-					and _d.language_id = ".$language_id."
+					and _d.language_id = ".$label_language_id."
 			
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
 				".(!empty($letter) ? "and _a.name like '".$letter."%'" : null)."
+				".(!empty($language_id) ? "and _a.language_id = ".$language_id : null)."
 		";
 					
 		return $this->freeQuery( $query );
