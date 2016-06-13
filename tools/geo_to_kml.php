@@ -2,13 +2,14 @@
     // Postgres database with Postgis enabled required
     // Imports into "linnaeus" table, postprocesses into "linnaeus_post" table
     // Pg table definition included at the bottom
+	$projectId = 3;
 	$srid = 4326;
 	$tableIn = 'linnaeus';
 	$tableOut = 'linnaeus_post';
 
     define('PG_DB_HOST', 'localhost');
 	define('PG_DB_USER', 'ruud');
-	define('PG_DB_PASSWORD', '');
+	define('PG_DB_PASSWORD', 'ydlad>S2');
 	define('PG_DB_DATABASE', 'ruud');
 	if (!isset($pg_connect)) {
 		$pg = pg_connect("host=" . PG_DB_HOST . " dbname=" . PG_DB_DATABASE .
@@ -16,7 +17,7 @@
 	}
 
 	// KML
-    $path = dirname(__FILE__) . '/' . 'kml';
+    $path = dirname(__FILE__) . '/' . 'geo';
     $color = '32FFFFFF';
     $colorMode = 'normal';
     $polyFill = 1; // vs 0
@@ -53,7 +54,10 @@
         left join
             taxa as t2 on t1.taxon_id = t2.id
         left join
-            geodata_types_titles as t3 on t1.type_id = t3.type_id';
+            geodata_types_titles as t3 on t1.type_id = t3.type_id
+        where
+            t1.map_id > 1 and
+            t1.project_id = ' . $projectId;
     $r = mysqli_query($my, $q);
 
 
@@ -72,7 +76,7 @@
                 ' . $row['taxon_id'] . ',
                 \'' .  pg_escape_string($row['taxon']) . '\',
                 \'' . pg_escape_string($row['geo_type']) . '\',
-                ST_GeomFromText(\'' . $row['geo'] . '\', ' . $srid . ')
+                ST_FlipCoordinates(ST_GeomFromText(\'' . $row['geo'] . '\', ' . $srid . '))
                 )';
 		pg_query($pg, $insert) or die(pg_last_error() . $insert);
     }
@@ -96,7 +100,7 @@
     pg_query($pg, $insert) or die(pg_last_error() . $insert);
 
 
-    echo "Creating kml files...\n";
+    echo "Creating kml and geojson files...\n";
 
     $xml = new XMLWriter();
 	$xml->openMemory();
@@ -108,13 +112,15 @@
             taxon_id,
             taxon,
             geo_type,
-            ST_AsKML(2, the_geom) as the_geom
+            ST_AsKML(2, the_geom) as the_geom_kml,
+            ST_AsGeoJSON(the_geom) as the_geom_json
         from
             linnaeus_post';
     $r = pg_query($pg, $q);
     while ($row = pg_fetch_assoc($r)) {
 
-        $file = $path . '/' . $row['taxon_id'] . '.kml';
+        // KML
+        $file = $path . '/' . $row['taxon'] . ' - ' . $row['geo_type'] . '.kml';
 
     	$xml->startDocument('1.0', 'UTF-8');
         $xml->startElementNS(
@@ -154,13 +160,17 @@
         $xml->writeElement('outline', $outline);
         $xml->endElement();
         $xml->endElement();
-        $xml->writeRaw($row['the_geom']);
+        $xml->writeRaw($row['the_geom_kml']);
         $xml->endElement();
         $xml->endElement();
         $xml->endElement();
         $xml->endElement();
 
         file_put_contents($file, $xml->flush(true));
+
+        // GeoJSON
+        $file = $path . '/' . $row['taxon'] . ' - ' . $row['geo_type'] . '.json';
+        file_put_contents($file, $row['the_geom_json']);
     }
 
 
