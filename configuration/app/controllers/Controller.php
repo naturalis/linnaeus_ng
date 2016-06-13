@@ -1021,7 +1021,10 @@ class Controller extends BaseClass
         $processed = $text;
 
         // get all hotwords from database
-        $wordlist = $this->getHotwords();
+        $wordlist = $this->models->ControllerModel->getHotwords([
+			'project_id'=>$this->getCurrentProjectId(),
+			'language_id'=>$this->getCurrentLanguageId()
+		]);
 
         // replace the not-to-be-linked words with a unique numbered string
         $exprNoLink = '|(\[no\])(.*)(\[\/no\])|i';
@@ -2210,15 +2213,6 @@ class Controller extends BaseClass
     private function getRandomValue ()
     {
         return $this->randomValue;
-    }
-
-    private function getHotwords()
-    {
-		return $this->models->Hotwords->_get([
-			'id' => ['project_id'=>$this->getCurrentProjectId(),'language_id'=>$this->getCurrentLanguageId() ],
-			'columns'=> 'hotword,controller,view,params,length(hotword) as `length`,(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words',
-			'order' => 'num_of_words desc,`length` desc'
-		]);
     }
 
     private function embedNoLink ($matches)
