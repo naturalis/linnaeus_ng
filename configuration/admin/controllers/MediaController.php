@@ -726,7 +726,9 @@ class MediaController extends Controller
                         'item_id' => $this->rHasVal('item_id') ?
                             $this->rGetVal('item_id') : $this->itemId,
                         'overview_image' => isset($p['overview']) ?
-                            $p['overview'] : 0
+                            $p['overview'] : 0,
+                        'sort_order' => isset($p['sort_order']) ?
+                            $p['sort_order'] : 0,
                      ));
                 }
 
