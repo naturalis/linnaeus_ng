@@ -1,7 +1,7 @@
 </div>
 <div class="footerContainer">
 	<div id="footer">
-        <span class="copyright"><a href="https://science.naturalis.nl/en/ict/products/linnaeus-ng/">Powered by Naturalis Biodiversity Center & Linnaeus NG</a>
+        <span class="copyright"><a href="https://science.naturalis.nl/en/ict/products/linnaeus-ng/">Naturalis Biodiversity Center</a>
         </span>
 	</div>
 </div>

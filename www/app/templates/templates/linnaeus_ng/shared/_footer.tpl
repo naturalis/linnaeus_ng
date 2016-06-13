@@ -21,17 +21,16 @@
 			<img  src='{$projectUrls.systemMedia}logo_lng.png'>
 		</div>
 
-		<div id="col-footer-text">
-			<p>
-				Powered by Linnæus Next Generation™
-			</p>
-		</div>
-
 	</div>
 </div>
 
 <div id="bottombar" class="navbar navbar-inverted">
 	<div class="container">
+		<p class="navbar-text navbar-left">
+			<a href="http://linnaeus.naturalis.nl/"> 
+				Linnaeus NG 2.0
+			</a>
+		</p>
 		<p class="navbar-text navbar-right">
 			<a href="http://www.naturalis.nl"> 
 				© Naturalis Biodiversity Center
