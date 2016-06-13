@@ -344,7 +344,7 @@ class HotwordController extends Controller
 			if ($this->saveHotword(
 				array(
 					'project_id' => $val['project_id'],
-					'language_id' => 0,
+					'language_id' => null,
 					'hotword' => $val['author_format_a'],
 					'controller' => 'literature',
 					'view' => 'reference',
@@ -355,7 +355,7 @@ class HotwordController extends Controller
 			if ($this->saveHotword(
 				array(
 					'project_id' => $val['project_id'],
-					'language_id' => 0,
+					'language_id' => null,
 					'hotword' => $val['author_format_b'],
 					'controller' => 'literature',
 					'view' => 'reference',
@@ -381,7 +381,7 @@ class HotwordController extends Controller
 			if ($this->saveHotword(
 				array(
 					'project_id' => $val['project_id'],
-					'language_id' => 0,
+					'language_id' => null,
 					'hotword' => $val['taxon'],
 					'controller' => 'species',
 					'view' => 'taxon',
@@ -406,7 +406,7 @@ class HotwordController extends Controller
 			if ($this->saveHotword(
 				array(
 					'project_id' => $val['project_id'],
-					'language_id' => 0,
+					'language_id' => null,
 					'hotword' => $val['commonname'],
 					'controller' => 'species',
 					'view' => 'taxon',
@@ -417,7 +417,7 @@ class HotwordController extends Controller
 			if ($this->saveHotword(
 				array(
 					'project_id' => $val['project_id'],
-					'language_id' => 0,
+					'language_id' => null,
 					'hotword' => $val['transliteration'],
 					'controller' => 'species',
 					'view' => 'taxon',

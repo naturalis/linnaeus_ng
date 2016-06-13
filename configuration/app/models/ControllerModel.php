@@ -212,7 +212,6 @@ final class ControllerModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getLookupList ($params)
     {
 		if (!$params) {
@@ -347,7 +346,6 @@ final class ControllerModel extends AbstractModel
          return isset($d) ? $d[0] : false;
     }
 
-
 	public function getSetting($params)
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
@@ -380,7 +378,32 @@ final class ControllerModel extends AbstractModel
 		return $d ? $d[0]['value'] : null;
 	}
 
+    public function getHotwords( $p )
+    {
+		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
+		$language_id = isset($p['language_id']) ? $p['language_id'] : null;
 
+		if ( is_null($project_id) ) return;
+
+		$query="
+			select 
+				hotword,
+				controller,
+				view,
+				params,
+				length(hotword) as `length`,
+				(length(hotword)-length(replace(trim(hotword),' ',''))+1) as num_of_words 
+			from
+				%PRE%hotwords 
+			where 
+				project_id = ". $project_id ."
+				and (language_id is null".( !is_null($language_id) ? " or language_id=" . $language_id : "" ).")
+			order by 
+				num_of_words desc,length desc
+		";
+
+		return $this->freeQuery($query);
+    }
 
 }
 
