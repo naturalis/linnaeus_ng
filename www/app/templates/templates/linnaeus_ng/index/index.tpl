@@ -79,7 +79,7 @@
 
 		{foreach name=taxonloop from=$list key=k item=v}
 		<p>
-			<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.name}</a>
+			<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.name}</a> {if $v.rank_label}[{$v.rank_label}]{/if}
             {$v.authorship}
 			{if $v.nametype!='isValidNameOf' && $v.ref_taxon!=''}<span class="synonym-addition"> ({$v.ref_taxon})</span>{/if}{if $v.source =='synonym'}{t}[syn.]{/t}{/if}
 		</p>
