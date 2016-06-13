@@ -2840,8 +2840,33 @@ class Controller extends BaseClass
 			{
 				$val['rank']=substr($val['rank'],0,strpos($val['rank'],"/"));
 			}
+
 			$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'])).'_RANK_ID';
-			if (!defined($const)) define($const,$val['id']);
+
+			if (!defined($const))
+			{
+				define($const,$val['id']);
+			}
+			else
+			{
+				if (stripos($val['additional'],'zoology')!==false)
+				{
+					$extra='zoology';
+				}
+				else
+				if (stripos($val['additional'],'botany')!==false)
+				{
+					$extra='zoology';
+				}
+				else
+				{
+					$extra='2';
+				}
+				
+				$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'].'_'.$extra)).'_RANK_ID';
+
+				if (!defined($const)) define($const,$val['id']);
+			}
 		}
 	}
 
