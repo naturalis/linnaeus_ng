@@ -1990,7 +1990,7 @@ b, .title {
 
 /* --- --- CATEGORIES (tabs) --- */
 
-/* 
+/*
 @media (max-width: 799px) {
   #categories {
     text-align: center;
@@ -2012,7 +2012,7 @@ b, .title {
   display: block;
   float: left;
 }
-/*   
+/*
   @media (max-width: 799px) {
     #categories li {
       margin-right: 0.5em;
@@ -2730,20 +2730,28 @@ body {
       float: left;
       width: 62.5%; } }
 
+
+
+
 /* OVERRIDES (to be taken into customstyles.php) */
 #main-menu {
   background-color: #009ee0; }
-  #main-menu a {
-    color: white; }
+
+#main-menu a {
+    color: white;
+}
 
 #dialog-header {
-  background-color: #009ee0; }
+  background-color: #009ee0;
+}
 
 #header-title, #header-titles-small {
-  color: #009ee0; }
+  color: #009ee0;
+}
 
 #buttons input[value="Search >>"] {
-  background-color: #009ee0 !important; }
+  background-color: #009ee0 !important;
+}
 
 .system-warning {
 	font-size:0.9em;
@@ -2752,4 +2760,9 @@ body {
 
 .no-italics {
 	font-style:normal;
+}
+
+#title a:hover {
+	color: white;
+	text-decoration: none;
 }
