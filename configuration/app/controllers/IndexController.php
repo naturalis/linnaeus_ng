@@ -17,7 +17,7 @@ class IndexController extends Controller
             'main.js',
         )
     );
-	
+
 	private $_commonNameTypes=[PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME];
 	private $_scientificNameTypes=[PREDICATE_VALID_NAME,PREDICATE_SYNONYM,PREDICATE_SYNONYM_SL,PREDICATE_HOMONYM,PREDICATE_MISSPELLED_NAME,PREDICATE_INVALID_NAME];
 
@@ -167,7 +167,7 @@ class IndexController extends Controller
 		$letter = isset($p['letter']) ? $p['letter'] : null;
 		$language = isset($p['language']) ? $p['language'] : null;
        	$ranks = $this->getProjectRanks();
-		
+
 		if ($type=='common')
 		{
 			$list = $this->models->IndexModel->getCommonNames(array(
@@ -186,9 +186,9 @@ class IndexController extends Controller
 			    'type' => $type,
 			    'letter' => $letter,
 			    'display_language_id' => $this->getCurrentLanguageId(),
-			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)				
+			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)
             ));
-			
+
 			foreach((array)$list as $key=>$val)
 			{
 				if ($val['nametype']==PREDICATE_VALID_NAME)
