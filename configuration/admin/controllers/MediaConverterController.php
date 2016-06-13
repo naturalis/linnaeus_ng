@@ -25,6 +25,7 @@ class MediaConverterController extends MediaController
     private $_originalFileName;
     private $_rsFile;
     private $_overview;
+    private $_sortOrder;
 
     private $_maxFileSize;
     private $_filePath;
@@ -477,6 +478,7 @@ class MediaConverterController extends MediaController
         $this->_currentItemId = $row['item_id'];
         $this->_originalMediaId = isset($row['media_id']) ? $row['media_id'] : false;
         $this->_overview = isset($row['overview_image']) ? $row['overview_image'] : 0;
+        $this->_sortOrder = isset($row['sort_order']) ? $row['sort_order'] : 0;
     }
 
     private function setCurrentFileName ($name)
@@ -489,7 +491,7 @@ class MediaConverterController extends MediaController
         $this->_currentMediaId = $this->_files = $this->_result =
             $this->originalMediaId = $this->mediaId = $this->rsFile =
             $this->_originalFileName = $this->_error = false;
-        $this->_overview = 0;
+        $this->_overview = $this->_sortOrder = 0;
     }
 
     private function fileHasBeenConverted ()
@@ -527,7 +529,8 @@ class MediaConverterController extends MediaController
                 'media_id' => $this->_currentMediaId,
                 'project_id' => $this->getCurrentProjectId(),
                 'item_id' => $this->_currentItemId,
-                'overview_image' => $this->_overview
+                'overview_image' => $this->_overview,
+                'sort_order' => $this->_sortOrder
             ));
         }
         $this->saveCaptions();
@@ -544,7 +547,8 @@ class MediaConverterController extends MediaController
             $this->setModuleId($this->_currentModuleId);
 
             $this->uploadFiles(array(
-                'overview' => $this->_overview
+                'overview' => $this->_overview,
+                'sort_order' => $this->_sortOrder
             ));
 
             // Upload errors are stored in $this->errors
