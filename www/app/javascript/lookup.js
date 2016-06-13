@@ -47,15 +47,14 @@ var allLookupSelectedElement = null;
 var allLookupAlwaysFetch=false; // suppresses local storage of initial results
 var allListMax=null;
 
-function allLookupGetData(text,getAll) {
-
-	if (text.length==0 && getAll!=true) {
-
+function allLookupGetData(text,getAll)
+{
+	if (text.length==0 && getAll!=true)
+	{
 		allLookupClearDiv();
 		allLookupData = null;
 		allLookupHideDiv();
 		return false;
-
 	}
 
 	allLookupDataShowLoading();
@@ -217,10 +216,10 @@ function allLookup() {
 	
 }
 
-function allLookupSetExtraVars(name,value) {
-
-	allLookupExtraVars[allLookupExtraVars.length] = [name,value];
-
+function allLookupSetExtraVar(variable)
+{
+	// allLookupSetExtraVar( { name:'varname', value: 'value' } );
+	allLookupExtraVars.push(variable);
 }
 
 var lookupDialogItemDefTpl= '<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%"><span class="italics" style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span></p>';
@@ -393,17 +392,14 @@ function allLookupBindKeyUp(ele) {
 
 }
 
-function allNavigate(id) {
-
+function allNavigate(id)
+{
 	var url = allNavigateTargetUrl ? allNavigateTargetUrl : allNavigateDefaultUrl;
-
 	window.open(url.replace('%s',id),'_self');
-
 }
 
-
-function allLookupDialog() {
-
+function allLookupDialog()
+{
 	var text = $('#'+allLookupDialogInputName).val();
 	if (text == allLookupLastString) return;
 	if (text.length==0)
@@ -411,14 +407,14 @@ function allLookupDialog() {
 	else
 		allLookupGetData(text);
 	allLookupLastString = text;
-
 }
 
-function allLookupBindDialogKeyUp() {
-
-	$('#'+allLookupDialogInputName).keyup(function(e) {
-
-		if (e.keyCode==27) {
+function allLookupBindDialogKeyUp()
+{
+	$('#'+allLookupDialogInputName).keyup(function(e)
+	{
+		if (e.keyCode==27)
+		{
 			// esc
 			$('#dialog-close').click();
 			return;
@@ -433,8 +429,8 @@ function allLookupBindDialogKeyUp() {
 
 }
 
-function allLookupShowDialog(predefJSON) {
-
+function allLookupShowDialog(predefJSON)
+{
 	showDialog(
 		_(allLookupDialogTitle),
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
@@ -442,28 +438,24 @@ function allLookupShowDialog(predefJSON) {
 
 	allLookupBindDialogKeyUp();
 	
-	if (predefJSON) {
-
+	if (predefJSON)
+	{
 		var tmp = $.parseJSON(predefJSON);
 		allLookupData = allLookupPostProcessing('',tmp,true);
 		allLookupGetData('',true);
-
-	} else {
-
+	} 
+	else
+	{
 		allLookupGetData('*',true);
-
 	}
 
 	$('#'+allLookupDialogInputName).focus();
-
 }
 
-function allLookupSetSelectedId(id) {
-
+function allLookupSetSelectedId(id)
+{
 	allLookupSelectedId = id;
-
 	allLookupIndicateSelectedId = (id!=null);
-
 }
 
 function allLookupScrollToSelectedId()
@@ -478,7 +470,19 @@ function allLookupScrollToSelectedId()
 	}
 }
 
-$(document).ready(function(){
+
+function allLookupSetListMax(n)
+{
+	allListMax=n;
+}
+
+function allLookupSetAlwaysFetch(state)
+{
+	allLookupAlwaysFetch=state;
+}
+
+$(document).ready(function()
+{
 
 	$('body').click(function() {
 		allLookupHideDiv();
@@ -492,16 +496,6 @@ $(document).ready(function(){
 
 	$('#'+allLookupBoxName).focus();
 
-});
-
-
-function allLookupSetListMax(n)
-{
-	allListMax=n;
-}
-
-$(document).ready(function()
-{
 	if (typeof acquireInlineTemplates == 'function') acquireInlineTemplates();
 });
 

@@ -1166,9 +1166,22 @@ class SpeciesController extends Controller
         if (empty($search) && !$getAll)
             return;
 
+		$lower=true;
+
+		if (isset($p['vars']))
+		{
+			foreach((array)$p['vars'] as $key=>$val)
+			{
+				if ($val['name']=='lower')
+				{
+					$lower=($val['value']==1);
+				}
+			}
+		}
+
         list($taxa, $total) = $this->models->{$this->_model}->getTaxa(array(
             'projectId' => $this->getCurrentProjectId(),
-            //'taxonType' => $this->getTaxonType(),
+            'taxonType' => $lower ? 'lower' : 'higher', //$this->getTaxonType(),
             'getAll' => $getAll,
             'listMax' => $listMax,
             'regExp' => ($matchStartOnly?'^':'').preg_quote($search)

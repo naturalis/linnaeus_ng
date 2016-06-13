@@ -16,12 +16,12 @@
     <tr id="grid-header">
     <td colspan="2">
             <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="speciesNameA" onclick="
-                allLookupSetExtraVars('l2_must_have_geo','1');
+                allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
                 allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
                 allLookupShowDialog()
             " class="selectIcon{if $taxonA} italics">{$taxonA.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
             <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="speciesNameB" onclick="
-                allLookupSetExtraVars('l2_must_have_geo','1');
+                allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
                 allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
                 allLookupShowDialog()
             " class="selectIcon{if $taxonB} italics">{$taxonB.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
