@@ -9,7 +9,7 @@
 
     define('PG_DB_HOST', 'localhost');
 	define('PG_DB_USER', 'ruud');
-	define('PG_DB_PASSWORD', 'ydlad>S2');
+	define('PG_DB_PASSWORD', '');
 	define('PG_DB_DATABASE', 'ruud');
 	if (!isset($pg_connect)) {
 		$pg = pg_connect("host=" . PG_DB_HOST . " dbname=" . PG_DB_DATABASE .
