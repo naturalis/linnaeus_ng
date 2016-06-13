@@ -277,7 +277,7 @@ final class IndexModel extends AbstractModel
 				_t.id as taxon_id,
 				_t.taxon as ref_taxon,
 				_valid.authorship as ref_taxon_authorship,
-				_f.rank_id,
+				_t.rank_id,
 				_t.parent_id
 
 			from %PRE%names _a
