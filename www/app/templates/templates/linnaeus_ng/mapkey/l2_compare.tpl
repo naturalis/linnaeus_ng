@@ -83,7 +83,7 @@
                     <span 
                         id="speciesNameA" 
                         onclick="
-                            allLookupSetExtraVars('l2_must_have_geo','1');
+                            allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
                             allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
                             allLookupShowDialog()
                         " 
@@ -93,7 +93,7 @@
                 <p>
                     <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span id="speciesNameB" onclick="
-                        allLookupSetExtraVars('l2_must_have_geo','1');
+                        allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
                         allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
                         allLookupShowDialog()
                     " 

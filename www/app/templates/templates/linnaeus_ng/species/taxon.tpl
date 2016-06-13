@@ -137,6 +137,11 @@ $(document).ready(function()
 	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
 
+	allLookupContentOverrideUrl('../species/ajax_interface.php');
+	allLookupSetListMax(250);
+	allLookupSetAlwaysFetch(true);
+	allLookupSetExtraVar( { name:'lower',value:{if $taxon.lower_taxon==1}1{else}0{/if} } );
+
 } );
 </script>
 
