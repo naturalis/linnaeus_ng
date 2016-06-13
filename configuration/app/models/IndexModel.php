@@ -32,7 +32,7 @@ final class IndexModel extends AbstractModel
 		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
 		$type = isset($p['type']) ? $p['type'] : null;
 		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
-		
+
 		if ( is_null($project_id) || is_null($type) || is_null($nametypes) )
 			return;
 
@@ -42,7 +42,7 @@ final class IndexModel extends AbstractModel
 				distinct lower(substr(_a.name,1,1)) as letter
 
 			from %PRE%names _a
-		
+
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id
@@ -50,7 +50,7 @@ final class IndexModel extends AbstractModel
 			left join %PRE%taxa _t
 				on _a.taxon_id=_t.id
 				and _a.project_id=_t.project_id
-		
+
 			left join %PRE%projects_ranks _f
 				on _t.rank_id=_f.id
 				and _t.project_id = _f.project_id
@@ -89,12 +89,12 @@ final class IndexModel extends AbstractModel
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
-				" . ( !is_null($language_id) ? "and _a.language_id = ".$language_id : "" ). " 
+				" . ( !is_null($language_id) ? "and _a.language_id = ".$language_id : "" ). "
 
-			order by 
+			order by
 				letter
 		";
-					
+
 		return $this->freeQuery( $query );
     }
 
@@ -133,14 +133,14 @@ final class IndexModel extends AbstractModel
 					on _a.project_id = _d.project_id
 					and _a.language_id = _d.label_language_id
 					and _d.language_id = ".$label_language_id."
-			
+
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
 				".(!empty($letter) ? "and _a.name like '".$letter."%'" : null)."
 				".(!empty($language_id) ? "and _a.language_id = ".$language_id : null)."
 		";
-					
+
 		return $this->freeQuery( $query );
 
     }
@@ -150,7 +150,7 @@ final class IndexModel extends AbstractModel
 		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
 		$label_language_id = isset($p['label_language_id']) ? $p['label_language_id'] : null;
 		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
-		
+
 		if ( is_null($project_id) || is_null($label_language_id)  || is_null($nametypes) ) return;
 
         $query = "
@@ -176,7 +176,7 @@ final class IndexModel extends AbstractModel
 					on _a.project_id = _d.project_id
 					and _a.language_id = _d.label_language_id
 					and _d.language_id = ".$label_language_id."
-			
+
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
@@ -188,7 +188,7 @@ final class IndexModel extends AbstractModel
     public function getHasHigherLower( $p )
     {
 		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
-		
+
 		if ( is_null($project_id) ) return;
 
         $query = "
@@ -218,7 +218,7 @@ final class IndexModel extends AbstractModel
     {
 		$project_id = isset($p['project_id']) ? $p['project_id'] : null;
 		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
-		
+
 		if ( is_null($project_id) || is_null($nametypes) ) return;
 
         $query = "
@@ -226,18 +226,18 @@ final class IndexModel extends AbstractModel
 				count(*) as total
 
 			from %PRE%names _a
-		
+
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id
-			
+
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
 		";
-					
+
         $d=$this->freeQuery( $query );
-		
+
 		return [ 'has_names'=>$d[0]['total']>0 ];
     }
 
@@ -248,10 +248,10 @@ final class IndexModel extends AbstractModel
 		$display_language_id = isset($p['display_language_id']) ? $p['display_language_id'] : null;
 		$nametypes = isset($p['nametypes']) ? $p['nametypes'] : null;
 		$valid_name_id = isset($p['valid_name_id']) ? $p['valid_name_id'] : null;
-		
+
 		$letter = isset($p['letter']) ?
             mysqli_real_escape_string($this->databaseConnection, $p['letter']) : null;
-		
+
 		if ( is_null($project_id) || is_null($valid_name_id) || is_null($display_language_id) || is_null($type) || is_null($nametypes) )
 			return;
 
@@ -277,11 +277,11 @@ final class IndexModel extends AbstractModel
 				_t.id as taxon_id,
 				_t.taxon as ref_taxon,
 				_valid.authorship as ref_taxon_authorship,
-				_t.rank_id,
+				_f.rank_id,
 				_t.parent_id
 
 			from %PRE%names _a
-		
+
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id
@@ -294,25 +294,25 @@ final class IndexModel extends AbstractModel
 				on _t.id=_valid.taxon_id
 				and _t.project_id=_valid.project_id
 				and _valid.type_id= ". $valid_name_id ."
-		
+
 			left join %PRE%projects_ranks _f
 				on _t.rank_id=_f.id
 				and _t.project_id = _f.project_id
-			
+
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
-		
+
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
 				and _f.project_id = _q.project_id
 				and _q.language_id=".$display_language_id."
-			
+
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
 				and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
 				".(!is_null($letter) ? "and _a.name like '".$letter."%'" : '' )."
-			
+
 			order by
 				_a.name, _t.taxon
 			";
