@@ -1,6 +1,6 @@
 <div id="top-strip">
     <p>
-    	<a href="../../../">{t}projects{/t}</a> |
+    	<!-- a href="../../../">{t}projects{/t}</a> | -->
 		<a href="../../../admin/views/users/login.php">{t}login{/t}</a> |
 		<span class="decode">{$contact}</span>
 
