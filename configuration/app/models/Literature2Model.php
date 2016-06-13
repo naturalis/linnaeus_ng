@@ -135,7 +135,8 @@ final class Literature2Model extends AbstractModel
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,
 				_a.volume,
-				_a.external_link
+				_a.external_link,
+				if(_a.actor_id=-1,1,0) as unparsed /* abuse: -1 means unparsed entry */
 
 			from %PRE%literature2 _a
 

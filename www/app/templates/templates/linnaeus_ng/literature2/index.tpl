@@ -55,25 +55,34 @@ $('#lookup-input-author').val( '{$prevSearch.search_author|@escape}' ).trigger('
 </script>
 
 
+<div class="inline-templates" id="reference-table">
+<!--
+<table>
+    <tr>
+        <td style="width:200px">{t}authors{/t}</td>
+        <td style="width:75px;text-align:right;padding-right:10px;">{t}year{/t}</td>
+        <td style="width:500px">{t}reference{/t}</td>
+    </tr>
+    %TBODY%
+</table>
+-->
+</div>
 
-<!-- div id="page-main" class="template-index">
+<div class="inline-templates" id="reference-table-row">
+<!--
+<tr class="tr-highlight" style="vertical-align:top;">
+    <td><a href="reference.php?id=%ID%">%AUTHOR%</a>
+    </td>
+    <td style="text-align:right;padding-right:10px;">%YEAR%</td>
+    <td>%REFERENCE%</td>
+</tr>
+-->
+</div>
 
-	<p>
-    {t}Browse by title:{/t}<br />
-    {foreach from=$titleAlphabet item=v}
-    <a href="#" class="click-letter">{$v.letter|@strtoupper}</a>
-    {/foreach}
-    </p>
-
-	<p>
-    {t}Browse by author:{/t}<br />
-    {foreach from=$authorAlphabet item=v}
-    {if $v.letter}
-    <a href="#" class="click-letter">{$v.letter|@strtoupper}</a>
-    {/if}
-    {/foreach}
-	</p>
-
-</div -->
+<div class="inline-templates" id="string-highlight">
+<!--
+    <span style="background-color:yellow">%STRING%</span>
+-->
+</div>
 
 {include file="../shared/footer.tpl"}

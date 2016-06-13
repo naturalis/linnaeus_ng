@@ -1185,7 +1185,7 @@ class Literature2Controller extends NsrController
 
 		if (empty($id))
 		{
-			$this->addError("Geen ID.");
+			$this->addError($this->translate("Cannot delete reference (no ID)."));
 			return;
 		}
 
@@ -1222,7 +1222,7 @@ class Literature2Controller extends NsrController
 			$id=$this->getReferenceId();
 			if (empty($id))
 			{
-				$this->addError("Geen ID.");
+				$this->addError($this->translate("Cannot get reference authors (no ID)."));
 				return;
 			}
 		}
@@ -1249,9 +1249,14 @@ class Literature2Controller extends NsrController
 	{
 		$id=$this->getReferenceId();
 
-		if (empty($id)||empty($actor))
+		if (!$id)
 		{
-			$this->addError("Geen ID.");
+			$this->addError($this->translate("Cannot delete reference author (no reference ID)."));
+			return;
+		}
+		if (is_null($actor))
+		{
+			$this->addError($this->translate("Cannot delete reference author (no author ID)."));
 			return;
 		}
 
@@ -1266,7 +1271,7 @@ class Literature2Controller extends NsrController
 
 		if (empty($id))
 		{
-			$this->addError("Geen ID.");
+			$this->addError($this->translate("Cannot delete reference authors (no ID)."));
 			return;
 		}
 
@@ -1722,7 +1727,7 @@ class Literature2Controller extends NsrController
 
 		if (empty($id))
 		{
-			$this->addError('Geen ID. Publicatievorm niet verwijderd.');
+			$this->addError($this->translate("Cannot delete publication type (no ID)."));
 			return;
 		}
 
@@ -2153,7 +2158,7 @@ class Literature2Controller extends NsrController
 
 		if (empty($id))
 		{
-			$this->addError("Geen ID.");
+			$this->addError($this->translate("Cannot delete reference (no ID)."));
 			return;
 		}
 
