@@ -473,7 +473,7 @@ class Controller extends BaseClass
 		$taxon=$t[0];
 
 		if ($taxon) $taxon['label']=$this->formatTaxon($taxon);
-		
+
         return $taxon;
     }
 
@@ -1274,14 +1274,13 @@ class Controller extends BaseClass
         ));
         $email = 'linnaeus@naturalis.nl';
         if (!empty($d)) {
-            $email = rawurlencode($d['first_name'] . ' ' . $d['last_name'] .
-                '<' . $d['email_address'] . '>');
+            $email = rawurlencode($d['first_name'] . ' ' . $d['last_name'] . '<' . $d['email_address'] . '>');
         }
-		
-		if ( isset($_SESSION['app']['project']) && isset($_SESSION['app']['project']['title']) )
-		{
-			return str_rot13('<a href="mailto:' . $email . '?subject=' .
-				rawurlencode($_SESSION['app']['project']['title']) .
+
+		if (isset($_SESSION['app']['project']) && isset($_SESSION['app']['project']['title'])) {
+			return str_rot13('<a title="' .
+                (!empty($d['email_address']) ? $d['email_address'] : $email) .
+			    '" href="mailto:' . $email . '?subject=' . rawurlencode($_SESSION['app']['project']['title']) .
 				'" rel="nofollow">' . $this->translate('contact') . '</a>');
 		}
 	}
@@ -2677,7 +2676,7 @@ class Controller extends BaseClass
 		$name=isset($p['name']) ? $p['name'] : null;
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
-		
+
 		$marker = $this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
@@ -2734,7 +2733,7 @@ class Controller extends BaseClass
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
-		
+
 		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker . ' ' : '';
 
 		if ( $base_rank_id==VARIETAS_RANK_ID )
@@ -2902,6 +2901,6 @@ class Controller extends BaseClass
 	}
 
 
-	
+
 
 }
