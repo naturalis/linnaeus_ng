@@ -26,7 +26,7 @@
         </ul>
 
     </div>
-    
+
 	<br style="clear:all" />
 
     <div style="margin-left:200px;">
@@ -38,7 +38,7 @@
                     <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label}
                 </div>
             </div>
-        {elseif $overviewImage && $activeCategory.id.show_overview_image}
+        {elseif $overviewImage && $activeCategory.show_overview_image}
            <div id="overview-image" style="background: url('{$overviewImage}');"></div>
         {/if}
 
@@ -67,7 +67,7 @@
 			{include file="../species/_tab_dich_key_links.tpl"}
 
 		{else}
-        
+
 	        <br style="clear:all" />
 
 			{if $content|@is_array}
@@ -136,7 +136,7 @@ $(document).ready(function()
 	{if $pp_popup}
 	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
-	
+
 } );
 </script>
 
