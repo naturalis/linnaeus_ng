@@ -61,19 +61,20 @@ function lit2BuildList(action,data)
 		if (!t.id)
 			continue;
 			
+		var author='';
 		if (t.authors)
 		{
-			var author='';
 			for (var k=0;k<t.authors.length;k++)
 			{
 				author+=(k>0?', ':'')+t.authors[k].name;
 			}
 		}
-		else
+		
+		if (author.trim.length==0 && t.author)
 		{
-			var author=t.author;
+			author=t.author;
 		}
-			
+	
 		if (action.indexOf('title')!=-1)
 		{
 			buffer.push(

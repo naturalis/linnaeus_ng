@@ -1,3 +1,5 @@
+var currentlookupstring='';
+
 function lit2Lookup(caller,action,letter) 
 {
 	if (!letter)
@@ -34,7 +36,7 @@ function lit2Lookup(caller,action,letter)
 		data.search_author=text;
 	}
 
-	//console.dir( data );
+	currentlookupstring=text;
 
 	$.ajax({
 		url : "ajax_interface.php",
@@ -42,7 +44,6 @@ function lit2Lookup(caller,action,letter)
 		data : data,
 		success : function (data)
 		{
-			//console.log(data);
 			if (data) lit2BuildList(action,$.parseJSON(data));
 		}
 	});
@@ -54,42 +55,45 @@ function lit2BuildList(action,data)
 	var buffer=Array();
 	
 	//$('#result-count').html('Found '+data.results.length);
+	
+	var rowtpl=fetchTemplate('reference-table-row');
+	var highlighttpl=fetchTemplate('string-highlight').trim();
+	var regexp=new RegExp(currentlookupstring,"gi");
 
 	for(var i in data.results)
 	{
 		var t=data.results[i];
+
 		if (!t.id)
 			continue;
+
+		if (t.unparsed==1)
+			continue;
 			
+		var author='';
 		if (t.authors)
 		{
-			var author='';
 			for (var k=0;k<t.authors.length;k++)
 			{
 				author+=(k>0?', ':'')+t.authors[k].name;
 			}
 		}
-		else
+		
+		if (author.trim.length==0 && t.author)
 		{
-			var author=t.author;
+			author=t.author;
 		}
 			
-		if (action.indexOf('title')!=-1)
-		{
-			buffer.push(
-				'<li class="lit-index-item"><a href="reference.php?id='+t.id+'">'+
-				t.label+
-				( author ? ', '+author : '' ) +
-				'</a></li>'
-				);
-		}
-		else
-		{
-			buffer.push(
-				'<li class="lit-index-item"><a href="reference.php?id='+t.id+'">'+author+': '+t.label+'</a></li>');
-		}
+		buffer.push(
+			rowtpl
+				.replace('%ID%',t.id)
+				.replace('%AUTHOR%',( author ? author : '-' ))
+				.replace('%YEAR%',t.date)
+				.replace('%REFERENCE%',t.label.replace(regexp, highlighttpl.replace('%STRING%',currentlookupstring)))
+		);
+	
 	}
-
-	$('#lit2-result-list').html('<ul>'+buffer.join('')+'</ul>');
+	
+	$('#lit2-result-list').html( fetchTemplate('reference-table').replace('%TBODY%',buffer.join("\n")));
 	
 }
