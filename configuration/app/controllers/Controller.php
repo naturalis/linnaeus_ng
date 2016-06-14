@@ -1252,9 +1252,29 @@ class Controller extends BaseClass
 		$modules=$this->getProjectModules();
 
 		if (isset($modules['modules'])) array_walk($modules['modules'],function(&$value) {$value['type']='regular';});
-		if (isset($modules['freeModules'])) array_walk($modules['freeModules'],function(&$value) {$value['show_in_public_menu']='1';});
+		if (isset($modules['freeModules'])) array_walk($modules['freeModules'],function(&$value) {$value['type']='custom';$value['show_in_public_menu']='1';});
+		
+		$automatic=[];
+		
+		if ( $this->getSetting('show_advanced_search_in_public_menu',1)==1 )
+		{
+			$automatic[]=
+				[
+					'active' => 'y',
+					'module' => $this->translate('Advanced search'),
+					'controller' => 'search',
+					'show_in_public_menu' => 1,
+					'type' => 'automatic',
+					'url'=> '../search/search.php'
+				];
+		}
 
-		return array_merge(isset($modules['modules']) ? $modules['modules']:array(),isset($modules['freeModules'])?$modules['freeModules']:array());
+		return
+			array_merge(
+				isset($modules['modules']) ? $modules['modules']:array(),
+				isset($modules['freeModules'])?$modules['freeModules']:array(),
+				$automatic
+				);
     }
 
 	private function _getTaxonClassification($id)
@@ -2804,22 +2824,12 @@ class Controller extends BaseClass
 
 	private function setShowAutomaticHybridMarkers()
 	{
-		$this->_showAutomaticHybridMarkers =
-			$this->models->ControllerModel->getSetting(array(
-			'project_id' => $this->getCurrentProjectId(),
-			'module_id' => GENERAL_SETTINGS_ID,
-			'setting' => 'show_automatic_hybrid_markers'
-		))==1;
+		$this->_showAutomaticHybridMarkers=$this->getSetting('show_automatic_hybrid_markers')==1;
 	}
 
 	private function setShowAutomaticInfixes()
 	{
-		$this->_showAutomaticInfixes =
-			$this->models->ControllerModel->getSetting(array(
-			'project_id' => $this->getCurrentProjectId(),
-			'module_id' => GENERAL_SETTINGS_ID,
-			'setting' => 'show_automatic_infixes'
-		))==1;
+		$this->_showAutomaticInfixes=$this->getSetting('show_automatic_infixes')==1;
 	}
 
 	protected function getShowAutomaticHybridMarkers()
