@@ -1130,7 +1130,9 @@ class Controller extends BaseClass
 
             // Species case for subgenus and section: append genus name
             // Set constant for section, may not be present in constants.php yet...
-            if (($rankId == SECTION_2_RANK_ID || $rankId == SUBGENUS_RANK_ID) && isset($taxon['parent_id'])) {
+
+            if (((defined(SECTION_2_RANK_ID) && $rankId == SECTION_2_RANK_ID) ||
+                $rankId == SUBGENUS_RANK_ID) && isset($taxon['parent_id'])) {
 
                 $parent = $this->getTaxonById($taxon['parent_id']);
                 // Only append parent if this is a genus and rank is at the end
@@ -2854,7 +2856,7 @@ class Controller extends BaseClass
 				else
 				if (stripos($val['additional'],'botany')!==false)
 				{
-					$extra='zoology';
+					$extra='botany';
 				}
 				else
 				{
