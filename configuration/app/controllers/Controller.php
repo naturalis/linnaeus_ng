@@ -1131,7 +1131,7 @@ class Controller extends BaseClass
             // Species case for subgenus and section: append genus name
             // Set constant for section, may not be present in constants.php yet...
 
-            if (((defined(SECTION_2_RANK_ID) && $rankId == SECTION_2_RANK_ID) ||
+            if (((defined('SECTION_2_RANK_ID') && $rankId == SECTION_2_RANK_ID) ||
                 $rankId == SUBGENUS_RANK_ID) && isset($taxon['parent_id'])) {
 
                 $parent = $this->getTaxonById($taxon['parent_id']);
@@ -1253,9 +1253,9 @@ class Controller extends BaseClass
 
 		if (isset($modules['modules'])) array_walk($modules['modules'],function(&$value) {$value['type']='regular';});
 		if (isset($modules['freeModules'])) array_walk($modules['freeModules'],function(&$value) {$value['type']='custom';$value['show_in_public_menu']='1';});
-		
+
 		$automatic=[];
-		
+
 		if ( $this->getSetting('show_advanced_search_in_public_menu',1)==1 )
 		{
 			$automatic[]=
