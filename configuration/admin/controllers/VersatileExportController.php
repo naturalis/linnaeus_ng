@@ -82,6 +82,7 @@ class VersatileExportController extends Controller
 		'habitat'=>'habitat',
 		'concept_url'=>'concept_url',
 		'database_id'=>'database_id',
+		'parent_taxon'=>'parent_taxon',
 		'uninomial'=>'uninomial',
 		'specific_epithet'=>'specific_epithet',
 		'infra_specific_epithet'=>'infra_specific_epithet',
@@ -237,6 +238,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as " . $this->columnHeaders['habitat'] . ", " : "" )."
 				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as " . $this->columnHeaders['concept_url'] . ", " : "" )."
 				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as " . $this->columnHeaders['database_id'] . ", " : "" )."
+				".( $this->hasCol( 'parent_taxon' ) ? " _pnames.name as " . $this->columnHeaders['parent_taxon'] . ", " : "" )."
 				_q.taxon_id as _taxon_id,
 				_t.parent_id as _parent_id,
 				_r.id as _base_rank_id
@@ -269,8 +271,22 @@ class VersatileExportController extends Controller
 					and _pre.project_id=_hab.project_id 
 					and _hab.language_id=".LANGUAGE_ID_DUTCH."
 			
-			" : "" )."
+			" : "" ).
+
+			( $this->hasCol( 'parent_taxon' ) ? "
 			
+				left join %PRE%taxa _ptaxa
+					on _t.parent_id=_ptaxa.id
+					and _t.project_id=_ptaxa.project_id
+		
+				left join %PRE%names _pnames
+					on _ptaxa.id=_pnames.taxon_id
+					and _ptaxa.project_id=_pnames.project_id
+					and _pnames.type_id= ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+					and _pnames.language_id=".LANGUAGE_ID_SCIENTIFIC."
+		
+			" : "" )."
+						
 			left join %PRE%projects_ranks _f
 				on _t.rank_id=_f.id
 				and _t.project_id=_f.project_id
@@ -306,7 +322,10 @@ class VersatileExportController extends Controller
 				_q.project_id=". $this->getCurrentProjectId() ." 
 				".$ranks_clause."
 				".$presence_status_clause."
-				and match(_q.parentage) against ('".$this->getBranchTopId()."' in boolean mode)
+				and (
+					match(_q.parentage) against ('".$this->getBranchTopId()."' in boolean mode) or
+					_q.taxon_id = ".$this->getBranchTopId()."
+				)
 				
 			and ifnull(_trash.is_deleted,0)=0
 			

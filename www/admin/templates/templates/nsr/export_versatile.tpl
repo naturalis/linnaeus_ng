@@ -334,6 +334,15 @@ function doSubmit()
                 </tr>
     
                 <tr>
+                    <td><input id=col_parent_taxon type=checkbox name=cols[parent_taxon]  /></td>
+                    <td><label for=col_parent_taxon>directe ouder</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_database_id type=checkbox name=cols[database_id]  /></td>
+                    <td><label for=col_database_id>database ID</label></td>
+                </tr>
+
+                <tr>
                     <td><input id=col_ancestry type=checkbox name=cols[ancestors] onclick="
                         $( '.ancestry' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) ) 
                     " /></td>
@@ -349,10 +358,6 @@ function doSubmit()
                     <span class=remark> (worden, indien van toepassing, opgenomen als extra cellen aan het eind van iedere regel)</span>
                     </div>
                     </td>
-                </tr>
-                <tr>
-                    <td><input id=col_database_id type=checkbox name=cols[database_id]  /></td>
-                    <td><label for=col_database_id>database ID</label></td>
                 </tr>
                 
             </table>
