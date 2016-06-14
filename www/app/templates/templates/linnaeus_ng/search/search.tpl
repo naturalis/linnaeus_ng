@@ -69,7 +69,7 @@
 	</p>
 	<p>
         {foreach $modules.modules v}
-        {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search' && $v.module!=''}
+        {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search' && $v.module!='' && $v.show_in_public_menu==1}
         <label>
             <input
                 type="checkbox" 
