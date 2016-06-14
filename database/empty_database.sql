@@ -8,13 +8,6 @@ SET time_zone = "+00:00";
 
 
 DELIMITER $$
-DROP PROCEDURE IF EXISTS `country_hos`$$
-CREATE DEFINER=`linnaeus_user`@`localhost` PROCEDURE `country_hos`(IN con CHAR(20))
-BEGIN
-  SELECT Name, HeadOfState FROM Country
-  WHERE Continent = con;
-END$$
-
 DROP FUNCTION IF EXISTS `fnStripTags`$$
 CREATE DEFINER=`linnaeus_user`@`localhost` FUNCTION `fnStripTags`( Dirty varchar(64000) ) RETURNS varchar(64000) CHARSET latin1
     DETERMINISTIC

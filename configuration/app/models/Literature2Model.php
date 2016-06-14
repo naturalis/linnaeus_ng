@@ -170,20 +170,21 @@ final class Literature2Model extends AbstractModel
 
         $query = "
             select
-				distinct
-                    if(
-                        ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122,
-                        '#',
-                        substr(lower(_a.label),1,1)
-                    )
-                as letter
+				lower(_a.label) as label
 			from
 				%PRE%literature2 _a
 			where
-				_a.project_id = " . $project_id . "
-			order by letter";
-
-        return $this->freeQuery( $query );
+				_a.project_id = " . $project_id;
+				
+		$d=$this->freeQuery( $query );
+		$r=array();
+		foreach((array)$d as $val)
+		{
+			$a=substr(trim(preg_replace('/[^A-Za-z0-9]/','',strip_tags($val['label']))),0,1);
+			$r[$a]['letter']=$a;
+		}
+		sort($r);
+		return $r;
     }
 
     public function getAuthorAlphabet($params)
