@@ -127,9 +127,7 @@ class Literature2Controller extends Controller
             'projectId' => $this->getCurrentProjectId(),
     		'literatureId' => $id
 		));
-
 	}
-
 
     private function getReferences($p)
     {
@@ -160,6 +158,8 @@ class Literature2Controller extends Controller
 
 		foreach((array)$all as $key => $val)
 		{
+			$org=$val;
+			$val['label']=preg_replace('/[^A-Za-z0-9]/','',strip_tags($val['label']));
 
 			$authors=$this->getReferenceAuthors($val['id']);
 
@@ -271,7 +271,7 @@ class Literature2Controller extends Controller
 			if ($match)
 			{
 				$val['authors']=$authors;
-				$data[]=$val;
+				$data[]=$org;//$val;
 			}
 
 		}

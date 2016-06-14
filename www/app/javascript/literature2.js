@@ -89,7 +89,9 @@ function lit2BuildList(action,data)
 				.replace('%ID%',t.id)
 				.replace('%AUTHOR%',( author ? author : '-' ))
 				.replace('%YEAR%',t.date)
-				.replace('%REFERENCE%',t.label.replace(regexp, highlighttpl.replace('%STRING%',currentlookupstring)))
+				.replace('%REFERENCE%',t.label)
+				// .replace('%REFERENCE%',t.label.replace(regexp, highlighttpl.replace('%STRING%',currentlookupstring)))
+				// highlight messes up <i></i> in title
 		);
 	
 	}
