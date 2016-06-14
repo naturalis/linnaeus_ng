@@ -67,7 +67,7 @@
 		
 
 		<div>
-			<h4><span id="resultcount-header">{$results.count}</span></h4>
+			<h4 style="margin-bottom:15px"><span id="resultcount-header">{$results.count}</span></h4>
 
             <div class="formrow" style="margin:-10px 0 15px 0">
                 <label for="" accesskey="g">{t}Resultaten sorteren op:{/t}</label>
