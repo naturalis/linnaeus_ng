@@ -871,7 +871,7 @@ CREATE TABLE IF NOT EXISTS `literature2` (
   `alt_label` varchar(255) DEFAULT NULL,
   `alt_label_language_id` int(11) DEFAULT NULL,
   `date` varchar(32) DEFAULT NULL,
-  `author` varchar(255) DEFAULT NULL,
+  `author` varchar(500) DEFAULT NULL,
   `publication_type` varchar(24) DEFAULT NULL,
   `publication_type_id` int(11) DEFAULT NULL,
   `actor_id` int(11) DEFAULT NULL,
