@@ -52,7 +52,7 @@ class Controller extends BaseClass
 	public $printBreadcrumbs=true;
 	public $wikiPageOverride;
 	private $_adminMessageFadeOutDelay;
-	
+
 
 	private $usedModelsBase = array(
 		'activity_log',
@@ -2558,13 +2558,13 @@ class Controller extends BaseClass
 				else
 				if (stripos($val['additional'],'botany')!==false)
 				{
-					$extra='zoology';
+					$extra='botany';
 				}
 				else
 				{
 					$extra='2';
 				}
-				
+
 				$const=strtoupper(str_replace(array('-',' '),'_',$val['rank'].'_'.$extra)).'_RANK_ID';
 
 				if (!defined($const)) define($const,$val['id']);
@@ -2616,7 +2616,7 @@ class Controller extends BaseClass
 		$this->setShowAutomaticHybridMarkers();
 		$this->setShowAutomaticInfixes();
 		$this->setAdminMessageFadeOutDelay();
-		
+
 	}
 
 	public function addHybridMarkerAndInfixes( $p )
@@ -2668,7 +2668,7 @@ class Controller extends BaseClass
 		$name=isset($p['name']) ? $p['name'] : null;
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
-		
+
 		$marker = $this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
@@ -2725,7 +2725,7 @@ class Controller extends BaseClass
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
-		
+
 		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker . ' ' : '';
 
 		if ( $base_rank_id==VARIETAS_RANK_ID )
