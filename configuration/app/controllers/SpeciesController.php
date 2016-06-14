@@ -1202,12 +1202,15 @@ class SpeciesController extends Controller
             'case' => 'i'
 		));
 		*/
+		
+		//'module'=>($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
+		//'url'=>'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s',
 
 		return $this->makeLookupList(
 			array(
 				'data'=>$taxa,
-				'module'=>($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
-				'url'=>'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s',
+				'module'=>($lower ? 'species' : 'highertaxa'),
+				'url'=>'../' . ($lower ? 'species' : 'highertaxa') . '/taxon.php?id=%s',
 				'total'=>$total
 			)
 		);
