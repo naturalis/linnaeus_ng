@@ -6,7 +6,7 @@
         <li><a href="traitgroups.php">{t}Edit trait groups{/t}</a></li>
         <li><a href="data_upload.php">{t}Upload a data sheet{/t}</a></li>
         <li><a href="project_types.php">{t}Select project data types{/t}</a></li>
-        <li><a href="settings.php">{t}Project settings{/t}</a></li>
+        <!-- li><a href="settings.php">{t}Project settings{/t}</a></li -->
     </ul>
 </div>
 
