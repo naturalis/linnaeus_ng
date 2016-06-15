@@ -4,7 +4,7 @@
     http://api.biodiversitydata.nl/v0/multimedia/search/?scientificName=%NOMEN%
 
     add the substitute:
-    %NOMEN% --> name:nomen
+    %NOMEN% --> nomen
     
     choose "link or embed"-option
     embed parametrized URL only (no content, better performance)

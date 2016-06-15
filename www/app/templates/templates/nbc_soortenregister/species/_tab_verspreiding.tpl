@@ -9,7 +9,6 @@
 					{if $presenceData.reference_label}<tr><td style="white-space:nowrap">{t}Referentie{/t}</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label}</a></td></tr>{/if}
 					{* if $presenceData.presence82_label}<tr><td>{t}Status 1982{/t}</td><td>{$presenceData.presence82_label}</td></tr>{/if *}
 					{if $presenceData.expert_name}<tr><td style="white-space:nowrap">{t}Expert{/t}</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
-					{if $statusRodeLijst}<tr><td style="white-space:nowrap">{t}Status rode lijst{/t}</td><td><a href="{$statusRodeLijst.url}" target="_blank">{$statusRodeLijst.status}</a></td></tr>{/if}
 				</table>
 			</p>
 
