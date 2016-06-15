@@ -1699,7 +1699,7 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$a=$this->getTaxonMediaNsr(array('id'=>$taxon_id,'limit'=>1));
 					$b=$this->getCollectedLowerTaxonMediaNsr(array('id'=>$taxon_id));
-					return count((array)$a)+count((array)$b)<=0;
+					return ($a['count']+$b['count'])<=0;
 				}
 				else
 				{
