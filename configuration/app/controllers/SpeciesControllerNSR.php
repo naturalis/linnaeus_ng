@@ -144,13 +144,13 @@ class SpeciesControllerNSR extends SpeciesController
 				$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 				$names=$this->getNames(array('id'=>$taxon['id']));
 
-				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']['tabname']==TAB_BEDREIGING_EN_BESCHERMING)
+				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']['tabname']=='TAB_BEDREIGING_EN_BESCHERMING')
 				{
 					$wetten=$this->getEzData($taxon['id']);
 					$this->smarty->assign('wetten',$wetten);
 				}
 				else
-				if (defined('TAB_VERSPREIDING') && $categories['start']['tabname']==TAB_VERSPREIDING)
+				if (defined('TAB_VERSPREIDING') && $categories['start']['tabname']=='TAB_VERSPREIDING')
 				{
 
 					$distributionMaps=$this->getDistributionMaps($taxon['id']);
@@ -181,7 +181,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 				}
 
-				if ($categories['start']['tabname']==CTAB_MEDIA)
+				if ($categories['start']['tabname']=='CTAB_MEDIA')
 				{
 					$this->smarty->assign('search',$this->requestData);
 					$this->smarty->assign('querystring',$this->reconstructQueryString());
@@ -225,9 +225,11 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$overview = $this->getTaxonOverviewImage();
 			}
+			
+			$classification=(isset($content['classification']) ? $content['classification'] : isset($classification) ? $classification : null);
 
 			$this->setPageName($taxon['label']);
-
+			
 			$this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
 			$this->smarty->assign('requested_category',$categories['start']);
 			$this->smarty->assign('content',isset($content['content']) ? $content['content'] : null);
@@ -236,8 +238,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('categories',$categories['categories']);
 			$this->smarty->assign('activeCategory',$categories['start']);
 			$this->smarty->assign('taxon',$taxon);
-
-			$this->smarty->assign('classification',isset($content['classification']) ? $content['classification'] : null);
+			$this->smarty->assign('classification',$classification);
 			$this->smarty->assign('children',isset($content['children']) ? $content['children'] : null);
 			$this->smarty->assign('names',isset($names) ? $names : null);
 
@@ -1182,6 +1183,7 @@ class SpeciesControllerNSR extends SpeciesController
                 break;
 
             case 'CTAB_TAXON_LIST':
+
                 $content=$this->getTaxonNextLevel($taxon);
                 break;
 
