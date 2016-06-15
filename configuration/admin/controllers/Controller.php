@@ -2847,17 +2847,6 @@ class Controller extends BaseClass
 
 	protected function setCronNextRun ()
 	{
-        // Determined previously that cron has not been set
-        if ($this->moduleSession->getModuleSetting('cron-next-run') == -1) {
-            return;
-        }
-
-	    // Cron has been set previously
-	    if (!is_null($this->moduleSession->getModuleSetting('cron-next-run'))) {
-            $this->cronNextRun = $this->moduleSession->getModuleSetting('cron-next-run');
-            return;
-        }
-
         // Check setting
         $d = $this->models->ControllerModel->getSetting(array(
 			'project_id' => $this->getCurrentProjectId(),
@@ -2866,24 +2855,12 @@ class Controller extends BaseClass
 		));
 
         // Not set; store in session as -1
-        if (!$d) {
-            $this->moduleSession->setModuleSetting(array(
-                'setting' => 'cron-next-run',
-                'value' => -1
-            ));
-            return;
-        }
+        if (!$d) return;
 
         // Load cron class (once) to extract next run time
         require_once dirname(__FILE__) . '/../helpers/Cron/CronExpression.php';
 	    $cron = Cron\CronExpression::factory($d);
 	    $this->cronNextRun = $cron->getNextRunDate()->format('M d Y H:i:s');
-
-        // Store in session
-        $this->moduleSession->setModuleSetting(array(
-            'setting' => 'cron-next-run',
-            'value' => $this->cronNextRun
-        ));
 	}
 
 
