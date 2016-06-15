@@ -116,6 +116,8 @@ class SpeciesControllerNSR extends SpeciesController
 
         if ( !empty($taxon) )
 		{
+			$template = 'taxon';
+			
 			$categories=$this->getTaxonCategories( [ 'taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$this->rGetVal('cat') ] );
 
 			$content=$this->getTaxonContent( [
@@ -126,10 +128,18 @@ class SpeciesControllerNSR extends SpeciesController
 			] );
 
 			$external_content=$this->getExternalContent( $categories['start'] );
-
+			
 			if ( isset($external_content) && $external_content->must_redirect==true)
 			{
 				$this->redirect( $external_content->full_url );
+			}
+			else
+			if ( isset($external_content) && ($external_content->link_embed=='template' || $external_content->link_embed=='template_link') )
+			{
+				$template=
+					substr($external_content->template,-4)=='.tpl' ? 
+						substr($external_content->template,0,strlen($external_content->template)-4) : 
+						$external_content->template;
 			}
 			
 			if ( $this->show_nsr_specific_stuff )
@@ -234,7 +244,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
 			$this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
 			
-			$this->printPage('taxon');
+			$this->printPage( $template );
 		}
 		else
 		{
@@ -407,7 +417,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function parseExternalReference( $p )
 	{
-
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$reference = isset($p['reference']) ? $p['reference'] : null;
 
@@ -1176,6 +1185,17 @@ class SpeciesControllerNSR extends SpeciesController
 		$external_content['must_redirect']=false;
 		$external_content=(object)$external_content;
 
+		/*
+		[
+			['field'=>'embed','label'=>'fetch content into embedded template'],
+			['field'=>'template','label'=>'fetch content into stand-alone template (no header/footer)'],
+			['field'=>'embed_link','label'=>'serve parametrized URL to embedded template (no content fetching)'],
+			['field'=>'template_link','label'=>'serve parametrized URL to stand-alone template (no content, no header/footer)'],
+			['field'=>'link','label'=>'link'],
+			['field'=>'link_new','label'=>'link (new window)']
+		];
+		*/		
+		
 		if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 		{
 			if ( $ref->full_url_valid )
@@ -1189,7 +1209,7 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 		}
 		else
-		if ( !empty($ref->full_url) && !empty($ref->link_embed) && $ref->link_embed=='embed' )
+		if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='embed' || $ref->link_embed=='template'  ) )
 		{
 			if ( $ref->full_url_valid )
 			{
