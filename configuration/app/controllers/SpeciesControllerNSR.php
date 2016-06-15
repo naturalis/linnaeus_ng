@@ -5,9 +5,6 @@ what about
 			if (defined('TAB_VERSPREIDING'))
 			{
 
-			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
-			// this should be changed to a generalized method, using 'redirect_to'
-			// REFAC2015
 
 USE INHERITED LIT yes/no
 
@@ -39,7 +36,7 @@ class SpeciesControllerNSR extends SpeciesController
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
 		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
 		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
-		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],	// $this->getTaxonNextLevel($taxon); (children?)
+		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],
 		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
 		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
 		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
@@ -155,9 +152,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 					$trendData=$this->getTrendData($taxon['id']);
 					$this->smarty->assign('trendData',$trendData);
-
-					$statusRodeLijst=$this->getEzStatusRodeLijst($taxon['id']);
-					$this->smarty->assign('statusRodeLijst',$statusRodeLijst);
 
 					$atlasData=$this->getVerspreidingsatlasData($taxon['id']);
 					if (!empty($atlasData['logo']))
@@ -1575,47 +1569,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 
 
-	private function getEzStatusRodeLijst($id)
-	{
-		$checked=$this->getSessionVar(array('ez-data-rl-checked',$id));
-
-		if ($checked!==true)
-		{
-			$org=$this->getExternalOrg('Ministerie EZ: Rode Lijst');
-			//$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
-
-			// REFAC2015 - move the timeout values to config
-			$url=str_replace(' ','%20',sprintf($org['service_url'],$this->getNSRId(array('id'=>$id))));
-			$ch=curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-			$result=curl_exec($ch);
-			curl_close($ch);
-			$data=json_decode($result);
-
-			if (isset($data[0]->subcategorie))
-			{
-				$data = array('status'=>$data[0]->subcategorie,'url'=>sprintf($org['general_url'],$data[0]->soort_id));
-				$this->setSessionVar(array('ez-data-rl',$id),$data);
-			}
-			else
-			{
-				$data=null;
-			}
-
-			$this->setSessionVar(array('ez-data-rl-checked',$id),true);
-
-			return $data;
-		}
-		else
-		{
-			return $this->getSessionVar(array('ez-data-rl',$id));
-		}
-
-	}
-
 	private function getVerspreidingsatlasData($id)
 	{
 
@@ -1665,12 +1618,5 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 
 		return $data;
-
 	}
-
-
-
-
-
-
 }

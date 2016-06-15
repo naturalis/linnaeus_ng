@@ -81,7 +81,7 @@ function del_ref( id )
     <ul id="old_refs">
     {foreach $literature v k}
     <li>
-    	{if $v.author_name}{$v.author_name}. {/if}{if $v.date}{$v.date}. {/if}{$v.label}
+    	{if $v.author_name}{$v.author_name} {/if}{if $v.date}{$v.date}. {/if}{$v.label}
         <a href="#" onclick="del_ref({$v.literature_taxa_id});return false;" style="padding:0 5px 0 5px"> x </a>
 	</li>
     {/foreach}
