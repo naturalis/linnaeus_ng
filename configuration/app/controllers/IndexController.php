@@ -191,7 +191,7 @@ class IndexController extends Controller
 
 			foreach((array)$list as $key=>$val)
 			{
-				if ($val['nametype']==PREDICATE_VALID_NAME)
+				//if ($val['nametype']==PREDICATE_VALID_NAME)
 					$list[$key]['label']=
 						$this->formatTaxon(
 							array(
