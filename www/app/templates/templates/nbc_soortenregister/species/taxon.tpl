@@ -55,26 +55,9 @@
 					
 			{include file="_tab_naamgeving.tpl"}
 
-
-
-
-
-
-
-
 		{elseif $activeCategory.tabname=='TAB_VERSPREIDING'}
 
 			{include file="_tab_verspreiding.tpl"}
-
-		{elseif $activeCategory.tabname=='TAB_BEDREIGING_EN_BESCHERMING'}
-		
-			{include file="_tab_bedreiging.tpl"}
-
-
-
-
-
-
 
 		{elseif $ext_template}
 		
