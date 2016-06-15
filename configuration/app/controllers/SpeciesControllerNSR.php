@@ -129,7 +129,7 @@ class SpeciesControllerNSR extends SpeciesController
 			] );
 
 			$external_content=$this->getExternalContent( $categories['start'] );
-			
+
 			if ( isset($external_content) && $external_content->must_redirect==true)
 			{
 				$this->redirect( $external_content->full_url );
@@ -144,12 +144,6 @@ class SpeciesControllerNSR extends SpeciesController
 				$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 				$names=$this->getNames(array('id'=>$taxon['id']));
 
-				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $categories['start']['tabname']=='TAB_BEDREIGING_EN_BESCHERMING')
-				{
-					$wetten=$this->getEzData($taxon['id']);
-					$this->smarty->assign('wetten',$wetten);
-				}
-				else
 				if (defined('TAB_VERSPREIDING') && $categories['start']['tabname']=='TAB_VERSPREIDING')
 				{
 
@@ -289,6 +283,12 @@ class SpeciesControllerNSR extends SpeciesController
     public function getTaxonById( $id )
     {
         $taxon=parent::getTaxonById( $id );
+		
+		if ( $this->show_nsr_specific_stuff )
+		{
+			$taxon['nsr_id']=$this->getNSRId( [ 'id'=>$id ] );
+		}
+
 		return $taxon;
     }
 
@@ -493,6 +493,11 @@ class SpeciesControllerNSR extends SpeciesController
 				$query = str_replace( array('%pid%','%tid%'), array($this->getCurrentProjectId(), $taxon['id']), $reference->query );
 				$is_empty=$this->models->{$this->_model}->runCheckQuery( $query );
 			}
+			else
+			if ( $reference->check_type=='output' )
+			{
+				$is_empty=empty( @json_decode( @file_get_contents(  $full_url  ) ) );
+			}
 		}
 
 		return
@@ -672,15 +677,6 @@ class SpeciesControllerNSR extends SpeciesController
 		// remnants...		
 		if ( isset($taxon_id) )
 		{
-			foreach((array)$categories as $key=>$val)
-			{
-				if (defined('TAB_BEDREIGING_EN_BESCHERMING') && $val['id']==TAB_BEDREIGING_EN_BESCHERMING)
-				{
-					$categories[$key]['is_empty']=true;
-					$dummy=$key;
-				}
-			}
-
 			if (defined('TAB_VERSPREIDING'))
 			{
 				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon_id));
@@ -697,16 +693,6 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 				}
 			}
-
-			// TAB_BEDREIGING_EN_BESCHERMING check at EZ
-			// this should be changed to a generalized method, using 'redirect_to'
-			// REFAC2015
-			if (isset($dummy) && isset($categories[$dummy]['is_empty']) && $categories[$dummy]['is_empty']==1 && $this->_taxon_fetch_ez_data)
-			{
-				$ezData=$this->getEzData($taxon_id);
-				$categories[$dummy]['is_empty']=empty($ezData);
-			}
-
 		}
     }
 
@@ -1100,58 +1086,6 @@ class SpeciesControllerNSR extends SpeciesController
 		return $d;
 	}
 
-	private function getDNABarcodes( $taxon_id )
-	{
-		return $this->models->DnaBarcodes->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $taxon_id
-				),
-				'columns' => 'taxon_literal,barcode,location,date_literal,specialist',
-				'order' => 'date desc'
-			));
-	}
-
-	private function getPresenceData( $id )
-	{
-		$data = $this->models->{$this->_model}->getPresenceDataNsr(array(
-            'projectId' => $this->getCurrentProjectId(),
-    		'languageId' => $this->getCurrentLanguageId(),
-    		'taxonId' => $id
-		));
-
-		$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
-
-		return $data[0];
-	}
-
-	private function getTrendData($id)
-	{
-	    $byYear = $this->models->{$this->_model}->getTrendDataByYear(array(
-            'projectId' => $this->getCurrentProjectId(),
-    	    'taxonId' => $id
-	    ));
-
-		$byTrend = $this->models->{$this->_model}->getTrendDataByTrend(array(
-            'projectId' => $this->getCurrentProjectId(),
-    	    'taxonId' => $id
-	    ));
-
-		$sources=array();
-
-		foreach(array_merge((array)$byYear,(array)$byTrend) as $val)
-			$sources[$val['source']]=$val['source'];
-
-		sort($sources);
-
-		return array(
-			'byYear'=>$byYear,
-			'byTrend'=>$byTrend,
-			'sources'=>$sources
-		);
-	}
-
     private function getTaxonContent($p=null)
     {
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -1288,293 +1222,6 @@ class SpeciesControllerNSR extends SpeciesController
 		return $querystring;
 	}
 
-    private function getNSRId($p)
-    {
-		$id=isset($p['id']) ? $p['id'] : null;
-		$item_type=isset($p['item_type']) ? $p['item_type'] : 'taxon';
-		$rdf_nsr=isset($p['rdf_nsr']) ? $p['rdf_nsr'] : 'nsr';
-		$strip=isset($p['strip']) ? $p['strip'] : true;
-
-		if (empty($id))
-			return;
-
-		$t=$this->models->NsrIds->_get(
-			array('id'=>
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'lng_id' => $id,
-					'item_type' => $item_type
-					)
-				)
-			);
-
-
-		if (!$t) return;
-
-		if ($strip) {
-			return ltrim(str_replace(($item_type=='rdf' ?'http://data.nederlandsesoorten.nl/' : 'tn.nlsr.concept/'),'',($rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'])),' 0');
-		} else {
-			return $rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'];
-		}
-    }
-
-	private function getOrganisationLogoUrl($name)
-	{
-		if (empty($name)) return;
-
-		$exts=array('png','jpg','PNG','JPG','gif','GIF');
-		$d=array();
-
-		foreach($exts as $ext)
-		{
-			array_push($d,$name.'.'.$ext,strtolower($name).'.'.$ext,$name.'-logo.'.$ext,strtolower($name).'-logo.'.$ext);
-		}
-
-		if (strpos($name,' ')!==false)
-		{
-			$a=str_replace(' ','_',$name);
-			$b=str_replace(' ','-',$name);
-			$c=substr($name,0,strpos($name,' '));
-			foreach($exts as $ext)
-			{
-				array_push($d,
-					$a.'.'.$ext,
-					strtolower($a).'.'.$ext,
-					$a.'-logo.'.$ext,
-					strtolower($a).'-logo.'.$ext,
-
-					$b.'.'.$ext,
-					strtolower($b).'.'.$ext,
-					$b.'-logo.'.$ext,
-					strtolower($b).'-logo.'.$ext,
-
-					$c.'.'.$ext,
-					strtolower($c).'.'.$ext,
-					$c.'-logo.'.$ext,
-					strtolower($c).'-logo.'.$ext
-				);
-			}
-		}
-
-		$logo=null;
-
-		foreach((array)$d as $val)
-		{
-			if (file_exists($this->getProjectUrl('projectMedia').$val))
-			{
-				$logo=$this->getProjectUrl('projectMedia').$val;
-				break;
-			}
-		}
-
-		return $logo;
-	}
-
-    private function getExternalId($p)
-    {
-		$id=isset($p['id']) ? $p['id'] : null;
-		$org=isset($p['org']) ? $p['org'] : null;
-
-		if (empty($id)||empty($org))
-			return;
-
-		$t = $this->models->{$this->_model}->getExternalIdNsr(array(
-            'projectId' => $this->getCurrentProjectId(),
-            'taxonId' => $id,
-    		'organisation' => $org
-		));
-
-		if ($t)
-		{
-			$name=$t[0]['name'];
-
-			return array(
-				'organisation' => $name,
-				'logo'=> $this->getOrganisationLogoUrl($name),
-				'organisation_url' => $t[0]['organisation_url'],
-				'general_url' => sprintf($t[0]['general_url'],$t[0]['external_id']),
-				'service_url' => sprintf($t[0]['service_url'],$t[0]['external_id']),
-				'id' => $t[0]['external_id']
-			);
-		}
-
-    }
-
-    private function getExternalOrg($org)
-    {
-		if (empty($org))
-			return;
-
-		$t = $this->models->{$this->_model}->getExternalOrgNsr(array(
-            'projectId' => $this->getCurrentProjectId(),
-    		'organisation' => $org
-		));
-
-		if ($t)
-		{
-			$name=$t[0]['name'];
-
-			return array(
-				'organisation' => $name,
-				'logo'=> $this->getOrganisationLogoUrl($name),
-				'organisation_url' => $t[0]['organisation_url'],
-				'general_url' => $t[0]['general_url'],
-				'service_url' => $t[0]['service_url'],
-			);
-		}
-
-    }
-
-	private function getEzData($id)
-	{
-		$checked=$this->getSessionVar(array('ez-data-checked',$id));
-
-		if ($checked!==true)
-		{
-			$org=$this->getExternalOrg('Ministerie EZ');
-			//$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
-
-			// REFAC2015 - move the timeout values to config
-			$url=str_replace(' ','%20',sprintf($org['service_url'],$this->getNSRId(array('id'=>$id))));
-			$ch=curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-			$result=curl_exec($ch);
-			curl_close($ch);
-			$data=json_decode($result);
-
-			if (!empty($data))
-			{
-				$wetten=array();
-
-				foreach($data as $key=>$val)
-				{
-					$wetten[$val->wetenschappelijke_naam]['wetten'][$val->wet][]=
-						array(
-							'categorie'=>$val->categorie,
-							'publicatie'=>strip_tags($val->publicatie)
-						);
-					$wetten[$val->wetenschappelijke_naam]['url']=sprintf($org['general_url'],$val->soort_id);
-				}
-
-				$this->setSessionVar(array('ez-data',$id),$wetten);
-			}
-			else
-			{
-				$wetten=null;
-			}
-
-			$this->setSessionVar(array('ez-data-checked',$id),true);
-
-			return $wetten;
-		}
-		else
-		{
-			return $this->getSessionVar(array('ez-data',$id));
-		}
-
-	}
-
-	private function getEzStatusRodeLijst($id)
-	{
-		$checked=$this->getSessionVar(array('ez-data-rl-checked',$id));
-
-		if ($checked!==true)
-		{
-			$org=$this->getExternalOrg('Ministerie EZ: Rode Lijst');
-			//$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
-
-			// REFAC2015 - move the timeout values to config
-			$url=str_replace(' ','%20',sprintf($org['service_url'],$this->getNSRId(array('id'=>$id))));
-			$ch=curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-			$result=curl_exec($ch);
-			curl_close($ch);
-			$data=json_decode($result);
-
-			if (isset($data[0]->subcategorie))
-			{
-				$data = array('status'=>$data[0]->subcategorie,'url'=>sprintf($org['general_url'],$data[0]->soort_id));
-				$this->setSessionVar(array('ez-data-rl',$id),$data);
-			}
-			else
-			{
-				$data=null;
-			}
-
-			$this->setSessionVar(array('ez-data-rl-checked',$id),true);
-
-			return $data;
-		}
-		else
-		{
-			return $this->getSessionVar(array('ez-data-rl',$id));
-		}
-
-	}
-
-    private function getDistributionMaps($id)
-	{
-		return $this->getTaxonMediaNsr(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing'));
-	}
-
-	private function getVerspreidingsatlasData($id)
-	{
-
-		$data=$this->getSessionVar(array('atlas-data-checked',$id));
-
-		if (is_null($data))
-		{
-
-			$data=$this->getSessionVar(array('atlas-data',$id));
-
-			if (is_null($data))
-			{
-
-				$data=$this->getExternalId(array('id'=>$id,'org'=>'Verspreidingsatlas'));
-
-				if ($data)
-				{
-					$dummy=file_get_contents($data['service_url']);
-
-					if ($dummy)
-					{
-						$xml = simplexml_load_string($dummy);
-
-						if ($xml)
-						{
-							$data['content'] = (string)$xml->tab->content;
-							$data['author'] = (string)$xml->tab->author;
-							$data['pubdate'] = (string)$xml->tab->pubdate;
-							$data['copyright'] = (string)$xml->tab->copyright;
-							$data['sourcedocument'] = (string)$xml->tab->sourcedocument;
-							$data['distributionmap'] = (string)$xml->tab->distributionmap;
-
-						}
-					}
-
-				}
-
-				$this->setSessionVar(array('atlas-data',$id),$data);
-			}
-
-			$this->setSessionVar(array('atlas-data-checked',$id),true);
-
-		}
-		else
-		{
-			$data=$this->getSessionVar(array('atlas-data',$id));
-		}
-
-		return $data;
-
-	}
-
 	private function getReferenceAuthors($id)
 	{
 		return $this->models->{$this->_model}->getReferenceAuthorsNsr(array(
@@ -1597,7 +1244,6 @@ class SpeciesControllerNSR extends SpeciesController
         }
 
         return $l;
-
 	}
 
 	private function getNameAddition( $p )
@@ -1727,5 +1373,304 @@ class SpeciesControllerNSR extends SpeciesController
 				return false;
 		}
 	}
+
+
+
+
+    private function getNSRId($p)
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		$item_type=isset($p['item_type']) ? $p['item_type'] : 'taxon';
+		$rdf_nsr=isset($p['rdf_nsr']) ? $p['rdf_nsr'] : 'nsr';
+		$strip=isset($p['strip']) ? $p['strip'] : true;
+
+		if (empty($id))
+			return;
+
+		$t=$this->models->NsrIds->_get(
+			array('id'=>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'lng_id' => $id,
+					'item_type' => $item_type
+					)
+				)
+			);
+
+		if (!$t) return;
+
+		if ($strip) {
+			return ltrim(str_replace(($item_type=='rdf' ?'http://data.nederlandsesoorten.nl/' : 'tn.nlsr.concept/'),'',($rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'])),' 0');
+		} else {
+			return $rdf_nsr=='rdf' ? $t[0]['rdf_id'] : $t[0]['nsr_id'];
+		}
+    }
+
+	private function getOrganisationLogoUrl($name)
+	{
+		if (empty($name)) return;
+
+		$exts=array('png','jpg','PNG','JPG','gif','GIF');
+		$d=array();
+
+		foreach($exts as $ext)
+		{
+			array_push($d,$name.'.'.$ext,strtolower($name).'.'.$ext,$name.'-logo.'.$ext,strtolower($name).'-logo.'.$ext);
+		}
+
+		if (strpos($name,' ')!==false)
+		{
+			$a=str_replace(' ','_',$name);
+			$b=str_replace(' ','-',$name);
+			$c=substr($name,0,strpos($name,' '));
+			foreach($exts as $ext)
+			{
+				array_push($d,
+					$a.'.'.$ext,
+					strtolower($a).'.'.$ext,
+					$a.'-logo.'.$ext,
+					strtolower($a).'-logo.'.$ext,
+
+					$b.'.'.$ext,
+					strtolower($b).'.'.$ext,
+					$b.'-logo.'.$ext,
+					strtolower($b).'-logo.'.$ext,
+
+					$c.'.'.$ext,
+					strtolower($c).'.'.$ext,
+					$c.'-logo.'.$ext,
+					strtolower($c).'-logo.'.$ext
+				);
+			}
+		}
+
+		$logo=null;
+
+		foreach((array)$d as $val)
+		{
+			if (file_exists($this->getProjectUrl('projectMedia').$val))
+			{
+				$logo=$this->getProjectUrl('projectMedia').$val;
+				break;
+			}
+		}
+
+		return $logo;
+	}
+
+    private function getExternalId($p)
+    {
+		$id=isset($p['id']) ? $p['id'] : null;
+		$org=isset($p['org']) ? $p['org'] : null;
+
+		if (empty($id)||empty($org))
+			return;
+
+		$t = $this->models->{$this->_model}->getExternalIdNsr(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonId' => $id,
+    		'organisation' => $org
+		));
+
+		if ($t)
+		{
+			$name=$t[0]['name'];
+
+			return array(
+				'organisation' => $name,
+				'logo'=> $this->getOrganisationLogoUrl($name),
+				'organisation_url' => $t[0]['organisation_url'],
+				'general_url' => sprintf($t[0]['general_url'],$t[0]['external_id']),
+				'service_url' => sprintf($t[0]['service_url'],$t[0]['external_id']),
+				'id' => $t[0]['external_id']
+			);
+		}
+
+    }
+
+    private function getDistributionMaps($id)
+	{
+		return $this->getTaxonMediaNsr(array('id'=>$id,'distribution_maps'=>true,'sort'=>'meta_datum_plaatsing'));
+	}
+
+    private function getExternalOrg($org)
+    {
+		if (empty($org))
+			return;
+
+		$t = $this->models->{$this->_model}->getExternalOrgNsr(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'organisation' => $org
+		));
+
+		if ($t)
+		{
+			$name=$t[0]['name'];
+
+			return array(
+				'organisation' => $name,
+				'logo'=> $this->getOrganisationLogoUrl($name),
+				'organisation_url' => $t[0]['organisation_url'],
+				'general_url' => $t[0]['general_url'],
+				'service_url' => $t[0]['service_url'],
+			);
+		}
+
+    }
+
+	private function getTrendData($id)
+	{
+	    $byYear = $this->models->{$this->_model}->getTrendDataByYear(array(
+            'projectId' => $this->getCurrentProjectId(),
+    	    'taxonId' => $id
+	    ));
+
+		$byTrend = $this->models->{$this->_model}->getTrendDataByTrend(array(
+            'projectId' => $this->getCurrentProjectId(),
+    	    'taxonId' => $id
+	    ));
+
+		$sources=array();
+
+		foreach(array_merge((array)$byYear,(array)$byTrend) as $val)
+			$sources[$val['source']]=$val['source'];
+
+		sort($sources);
+
+		return array(
+			'byYear'=>$byYear,
+			'byTrend'=>$byTrend,
+			'sources'=>$sources
+		);
+	}
+
+	private function getDNABarcodes( $taxon_id )
+	{
+		return $this->models->DnaBarcodes->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon_id
+				),
+				'columns' => 'taxon_literal,barcode,location,date_literal,specialist',
+				'order' => 'date desc'
+			));
+	}
+
+	private function getPresenceData( $id )
+	{
+		$data = $this->models->{$this->_model}->getPresenceDataNsr(array(
+            'projectId' => $this->getCurrentProjectId(),
+    		'languageId' => $this->getCurrentLanguageId(),
+    		'taxonId' => $id
+		));
+
+		$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
+
+		return $data[0];
+	}
+
+
+
+
+
+
+	private function getEzStatusRodeLijst($id)
+	{
+		$checked=$this->getSessionVar(array('ez-data-rl-checked',$id));
+
+		if ($checked!==true)
+		{
+			$org=$this->getExternalOrg('Ministerie EZ: Rode Lijst');
+			//$data=json_decode(file_get_contents(sprintf($org['service_url'],$this->getNSRId(array('id'=>$id)))));
+
+			// REFAC2015 - move the timeout values to config
+			$url=str_replace(' ','%20',sprintf($org['service_url'],$this->getNSRId(array('id'=>$id))));
+			$ch=curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			$result=curl_exec($ch);
+			curl_close($ch);
+			$data=json_decode($result);
+
+			if (isset($data[0]->subcategorie))
+			{
+				$data = array('status'=>$data[0]->subcategorie,'url'=>sprintf($org['general_url'],$data[0]->soort_id));
+				$this->setSessionVar(array('ez-data-rl',$id),$data);
+			}
+			else
+			{
+				$data=null;
+			}
+
+			$this->setSessionVar(array('ez-data-rl-checked',$id),true);
+
+			return $data;
+		}
+		else
+		{
+			return $this->getSessionVar(array('ez-data-rl',$id));
+		}
+
+	}
+
+	private function getVerspreidingsatlasData($id)
+	{
+
+		$data=$this->getSessionVar(array('atlas-data-checked',$id));
+
+		if (is_null($data))
+		{
+
+			$data=$this->getSessionVar(array('atlas-data',$id));
+
+			if (is_null($data))
+			{
+
+				$data=$this->getExternalId(array('id'=>$id,'org'=>'Verspreidingsatlas'));
+
+				if ($data)
+				{
+					$dummy=file_get_contents($data['service_url']);
+
+					if ($dummy)
+					{
+						$xml = simplexml_load_string($dummy);
+
+						if ($xml)
+						{
+							$data['content'] = (string)$xml->tab->content;
+							$data['author'] = (string)$xml->tab->author;
+							$data['pubdate'] = (string)$xml->tab->pubdate;
+							$data['copyright'] = (string)$xml->tab->copyright;
+							$data['sourcedocument'] = (string)$xml->tab->sourcedocument;
+							$data['distributionmap'] = (string)$xml->tab->distributionmap;
+
+						}
+					}
+
+				}
+
+				$this->setSessionVar(array('atlas-data',$id),$data);
+			}
+
+			$this->setSessionVar(array('atlas-data-checked',$id),true);
+
+		}
+		else
+		{
+			$data=$this->getSessionVar(array('atlas-data',$id));
+		}
+
+		return $data;
+
+	}
+
+
+
+
+
 
 }
