@@ -81,7 +81,7 @@ function del_ref( id )
     <ul id="old_refs">
     {foreach $literature v k}
     <li>
-    	{if $v.author_name}{$v.author_name}, {/if}{$v.label}{if $v.date} ({$v.date}){/if}
+    	{if $v.author_name}{$v.author_name}. {/if}{if $v.date}{$v.date}. {/if}{$v.label}
         <a href="#" onclick="del_ref({$v.literature_taxa_id});return false;" style="padding:0 5px 0 5px"> x </a>
 	</li>
     {/foreach}
@@ -121,12 +121,12 @@ function unload_check()
 	if (new_refs.length>0) return "{t}Niet alle data is opgelagen!\nPagina toch verlaten?{/t}";
 }
 
-
 $(document).ready(function()
 {
 	$(window).on('beforeunload',function() { return unload_check() } );
 	$('#page-block-messages').fadeOut(1500);
 });
+
 </script>
 
 {include file="../shared/admin-footer.tpl"}

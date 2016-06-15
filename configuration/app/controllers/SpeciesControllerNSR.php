@@ -604,8 +604,6 @@ class SpeciesControllerNSR extends SpeciesController
 				$val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon_id ] );
 			}
 			
-			if ( $val['is_empty'] && !$val['show_when_empty'] ) continue;
-
 			// parametrize external reference URLs
 			if ( isset($val['external_reference']) )
 			{
@@ -618,6 +616,8 @@ class SpeciesControllerNSR extends SpeciesController
 				$val['is_empty']=$d['is_empty'];
 				$val['type']='external';
 			}
+
+			if ( $val['is_empty'] && !$val['show_when_empty'] ) continue;
 
 			$val['show_overview_image']=false;
 

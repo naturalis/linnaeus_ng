@@ -707,9 +707,9 @@ function buildDropList(data,variable)
 			if (variable.indexOf('reference_id')!=-1)
 			{
 				var label=
-					(t.author ? t.author+", " : "")+
-					(t.label)+
-					(t.date ? " ("+t.date+")" : "");
+					(t.author ? t.author+". " : "")+
+					(t.date ? t.date+". " : "")+
+					(t.label);
 			}
 			else 
 			{
