@@ -12,7 +12,7 @@
 
 	{if $CRUDstates.can_update}
     <p>
- 		{t}System maintenance{/t}
+ 		{t}System maintenance{/t}<br />
  	    <a href="converter.php">convert existing local media</a><br/>
  	    <!-- <a href="select_rs.php">browse media on ResourceSpace server</a><br/> -->
 		{if $action != '' && $username != '' && $password != ''}
