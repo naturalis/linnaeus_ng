@@ -156,6 +156,14 @@ textarea {
                                             <option value="{$v.field}"{if $v.field==$page.external_reference_decoded->check_type} selected="selected"{/if}>{$v.label}</option>
                                             {/foreach}
                                         </select>
+										<div class="explanation">
+                                        <u>checking by webservice output</u>
+                                        {t}the system assumes the webservice returns JSON-encoded data. after decoding, the data is fed to the PHP
+                                        function 'empty()'. if the function returns true, it is assumed there is no data for the taxon under
+                                        consideration, and the tab is not shown.{/t}
+                                        {t}please note that by using this check, you make the performance of your site partially dependent on the
+                                        response time of the queried webservice.{/t}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr class="tr-highlight">
@@ -165,6 +173,7 @@ textarea {
                                     <td>
                                     	<textarea name="external_reference[query]">{$page.external_reference_decoded->query}</textarea>
                                         <div class="explanation">
+                                        <u>checking by query</u>
                                         {t}query can take two parameters, <code>%pid%</code> for project ID and <code>%tid%</code> for taxon ID.<br />
                                         query is expected to return one row with a column called <code>result</code> that has a value of either 1
                                         (data present) or 0 (no data present).<br />
@@ -176,7 +185,7 @@ textarea {
                             need to add:
                             <ul>
                             	<li>show only for certain ranks</li>
-                            	<li>somehow check remotely</li>
+                            	<li>somehow check remotely with actual parameters</li>
                             </ul>
 						</td>
 					</tr>

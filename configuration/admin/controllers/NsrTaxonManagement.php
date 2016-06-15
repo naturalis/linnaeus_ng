@@ -74,7 +74,6 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'id','label'=>'taxon ID'],
 			['field'=>'project_id','label'=>'project ID'],
 			['field'=>'language_id','label'=>'language ID'],
-			['field'=>'nsr_id','label'=>'NSR ID']
 		];
 
 	private $linkEmbedTypes=
@@ -84,6 +83,14 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'link','label'=>'link'],
 			['field'=>'link_new','label'=>'link (new window)']
 		];
+
+	private $checkTypes=
+		[
+			['field'=>'none','label'=>'no check'],
+			['field'=>'query','label'=>'check by query'],
+			['field'=>'output','label'=>'check by webservice output'],
+		] ;
+
 	
     public function __construct()
     {
@@ -99,6 +106,14 @@ class NsrTaxonManagement extends NsrController
     private function initialize()
     {
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+		
+		if ($this->show_nsr_specific_stuff ) 
+		{
+			$this->basicSubstitutionFields[]=['field'=>'nsr_id','label'=>'NSR ID'];
+		}
 	}
 
     public function tabsAction()
@@ -159,7 +174,7 @@ class NsrTaxonManagement extends NsrController
 
         $this->smarty->assign( 'page', $this->getCategory( $this->rGetId() ) );
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
-        $this->smarty->assign( 'check_types', [['field'=>'none','label'=>'no check'],['field'=>'query','label'=>'check by query']] );
+        $this->smarty->assign( 'check_types', $this->checkTypes );
         $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
         $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
 
