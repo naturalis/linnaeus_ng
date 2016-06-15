@@ -78,8 +78,10 @@ class NsrTaxonManagement extends NsrController
 
 	private $linkEmbedTypes=
 		[
-			['field'=>'embed','label'=>'embed fetched content'],
-			['field'=>'embed_link','label'=>'embed parametrized URL only (no content, better performance)'],
+			['field'=>'embed','label'=>'fetch content into embedded template'],
+			['field'=>'template','label'=>'fetch content into stand-alone template (no header/footer)'],
+			['field'=>'embed_link','label'=>'serve parametrized URL to embedded template (no content fetching)'],
+			['field'=>'template_link','label'=>'serve parametrized URL to stand-alone template (no content, no header/footer)'],
 			['field'=>'link','label'=>'link'],
 			['field'=>'link_new','label'=>'link (new window)']
 		];
