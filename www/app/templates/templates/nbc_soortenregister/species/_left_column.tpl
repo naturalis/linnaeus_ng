@@ -12,9 +12,9 @@
                 {foreach $categories v k}
                 <li id="ctb-{$v.id}" tabname="{$v.tabname}">
                     {if $activeCategory.id==$v.id}
-                    {$v.title}
+                    {$v.label}
                     {else}
-                    <a href="../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}"{if $v.type=='external' && $v.external_reference->link_embed=='link_new'} target="_blank"{/if}>{$v.label}</a>
+                    <a href="../species/nsr_taxon.php?id={$taxon.id}&cat={if $v.type=='auto'}{$v.tabname}{else}{$v.id}{/if}"{if $v.type=='external' && $v.external_reference->link_embed=='link_new'} target="_blank"{/if}>{$v.label}</a>
                     {/if}
                 </li>
                 {/foreach}

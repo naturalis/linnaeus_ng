@@ -27,29 +27,48 @@
 			{/if}
 		</div>
 
-		{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
+		{if $activeCategory.tabname=='CTAB_TAXON_LIST'}
+
+			{include file="_tab_taxon_list.tpl"}
+
+		{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
+
+			{include file="_tab_classificatie.tpl"}
+
+		{elseif $activeCategory.tabname=='CTAB_DNA_BARCODES'}
+        
+			{include file="_tab_dna_barcodes.tpl"}
+
+		{elseif $activeCategory.tabname=='CTAB_DICH_KEY_LINKS'}
+
+			{include file="_tab_dich_key_links.tpl"}
+
+		{elseif $activeCategory.tabname=='CTAB_LITERATURE'}
+		
+			{include file="_tab_literatuur.tpl"}
+
+		{elseif $activeCategory.tabname=='CTAB_MEDIA'}
 
 			{include file="_tab_media.tpl"}
 			
-		{elseif $activeCategory==$smarty.const.CTAB_DNA_BARCODES}
+		{elseif $activeCategory.tabname=='CTAB_NAMES'}
+					
+			{include file="_tab_naamgeving.tpl"}
 
-			{include file="_tab_dna_barcodes.tpl"}
+
+
+
+
+
+
 
 		{elseif $activeCategory==$smarty.const.TAB_VERSPREIDING}
 
 			{include file="_tab_verspreiding.tpl"}
 
-		{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NAAMGEVING}
-					
-			{include file="_tab_naamgeving.tpl"}
-
 		{elseif $activeCategory==$smarty.const.TAB_BEDREIGING_EN_BESCHERMING}
 		
 			{include file="_tab_bedreiging.tpl"}
-
-		{elseif $activeCategory==$smarty.const.CTAB_LITERATURE}
-		
-			{include file="_tab_literatuur.tpl"}
 
 		{elseif $ext_template}
 		

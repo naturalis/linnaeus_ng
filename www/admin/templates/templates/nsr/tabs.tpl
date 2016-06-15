@@ -120,8 +120,8 @@ select {
                 </span>
 
                 <span>
-                    <input type="radio" name="show_when_empty[{$v.id}]" value="1" {if $v.show_when_empty}checked="checked"{/if}/>{t}y{/t}
-                    <input type="radio" name="show_when_empty[{$v.id}]" value="0" {if !$v.show_when_empty}checked="checked"{/if}/>{t}n{/t}
+                    <label><input type="radio" name="show_when_empty[{$v.id}]" value="1" {if $v.show_when_empty}checked="checked"{/if}/>{t}y{/t}</label>
+                    <label><input type="radio" name="show_when_empty[{$v.id}]" value="0" {if !$v.show_when_empty}checked="checked"{/if}/>{t}n{/t}</label>
                 </span>
 
                 <span>
