@@ -951,11 +951,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private function _getTaxonClassification( $id )
 	{
-		$taxon = $this->models->{$this->_model}->getTaxonNsr(array(
-            'projectId' => $this->getCurrentProjectId(),
-    		'predicatePreferredNameId' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
-    		'languageId' => $this->getCurrentLanguageId(),
-    		'taxonId' => $id
+		$taxon = $this->models->{$this->_model}->getTaxon(array(
+            'project_id' => $this->getCurrentProjectId(),
+    		'nametype_id_validname' => $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
+    		'nametype_id_preferredname' => $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
+    		'language_id' => $this->getCurrentLanguageId(),
+    		'taxon_id' => $id
 		));
 
 		$taxon['name']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));

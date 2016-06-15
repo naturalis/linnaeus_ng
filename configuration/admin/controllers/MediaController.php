@@ -391,15 +391,17 @@ class MediaController extends Controller
 
     public function indexAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->checkAuthorisation();
 
-        // Only send data when user is sysadmin!!
-        $p  = explode('/', $this->_rsBaseUrl);
+		$this->setPageName($this->translate('Index'));
 
-        $this->smarty->assign('action', implode('/', array_slice($p, 0, 3)) . '/login.php');
-        $this->smarty->assign('username', $this->_rsUserName);
-        $this->smarty->assign('password', $this->_rsPassword);
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
+		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
+
+		$p  = explode('/', $this->_rsBaseUrl);
+		$this->smarty->assign('action', implode('/', array_slice($p, 0, 3)) . '/login.php');
+		$this->smarty->assign('username', $this->_rsUserName);
+		$this->smarty->assign('password', $this->_rsPassword);
 
         $this->printPage();
     }

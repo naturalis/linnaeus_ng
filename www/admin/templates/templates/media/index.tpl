@@ -10,22 +10,26 @@
 	    <a href="search.php">search media for this project</a><br/>
     </p>
 
+	{if $CRUDstates.can_update}
     <p>
- 		Sysadmin:<br>
+ 		{t}System maintenance{/t}
  	    <a href="converter.php">convert existing local media</a><br/>
  	    <!-- <a href="select_rs.php">browse media on ResourceSpace server</a><br/> -->
 		{if $action != '' && $username != '' && $password != ''}
 		 	<a id="rsLogin" href="">login to ResourceSpace</a>
 		{/if}
 	</p>
+    {/if}
 
 </div>
 
+{if $CRUDstates.can_update}
 {if $action != '' && $username != '' && $password != ''}
 	<form id="rsLoginForm" method="post" action="{$action}">
 	<input type="hidden" name="username" value="{$username}">
 	<input type="hidden" name="password" value="{$password}">
 	</form>
+{/if}
 {/if}
 
 {include file="../shared/admin-footer.tpl"}

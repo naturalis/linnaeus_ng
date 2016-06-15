@@ -72,9 +72,6 @@
 		</table>
 	</p>
 
-{$classification|@var_dump}
-
-
 	<p>
 		<h2>{t}Indeling{/t}</h2>
 

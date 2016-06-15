@@ -120,16 +120,21 @@ class SpeciesModel extends AbstractModel
 		return !empty($d) ? explode(' ',$d[0]['parentage']) : null;
     }
 
-    public function getTaxonNsr($params)
+    public function getTaxon($params)
     {
-		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
-		$predicatePreferredNameId =
-            isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
-		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$nametype_id_validname = isset($params['nametype_id_validname']) ? $params['nametype_id_validname'] : null;
+		$nametype_id_preferredname = isset($params['nametype_id_preferredname']) ? $params['nametype_id_preferredname'] : null;
+		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
+		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
 
-		if ( is_null($projectId) || is_null($predicatePreferredNameId) || is_null($languageId)  || is_null($taxonId) ) return;
-
+		if (
+			is_null($project_id) || 
+			is_null($taxon_id) ||
+			is_null($nametype_id_validname) || 
+			is_null($nametype_id_preferredname) || 
+			is_null($language_id)
+		) return;
 
         $query = "
 			select
@@ -145,27 +150,21 @@ class SpeciesModel extends AbstractModel
 				_f.lower_taxon,
 				_g.label as rank,
 				ifnull(_q.label,_x.rank) as rank_label,
-				ifnull(_k.name,_kk.name) as common_name
+				_k.name as common_name
 
 			from %PRE%taxa _a
 
 			left join %PRE%names _m
 				on _a.id=_m.taxon_id
 				and _a.project_id=_m.project_id
-				and _m.type_id= ".$predicatePreferredNameId."
+				and _m.type_id= ".$nametype_id_validname."
 				and _m.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
-				and _k.type_id = ".$predicatePreferredNameId."
-				and _k.language_id=".$languageId."
-
-			left join %PRE%names _kk
-				on _a.id=_kk.taxon_id
-				and _a.project_id=_kk.project_id
-				and _kk.type_id = ".$predicatePreferredNameId."
-				and _kk.language_id=".LANGUAGE_ID_DUTCH."
+				and _k.type_id = ".$nametype_id_preferredname."
+				and _k.language_id=".$language_id."
 
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
@@ -182,7 +181,7 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%labels_projects_ranks _q
 				on _a.rank_id=_q.project_rank_id
 				and _a.project_id = _q.project_id
-				and _q.language_id=".$languageId."
+				and _q.language_id=".$language_id."
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -190,8 +189,8 @@ class SpeciesModel extends AbstractModel
 				and _trash.item_type='taxon'
 
 			where
-				_a.project_id =".$projectId."
-				and _a.id=".$taxonId."
+				_a.project_id =".$project_id."
+				and _a.id=".$taxon_id."
 				and ifnull(_trash.is_deleted,0)=0";
 
         $d=$this->freeQuery($query);
