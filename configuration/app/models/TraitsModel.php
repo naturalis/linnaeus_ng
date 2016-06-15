@@ -249,7 +249,9 @@ class TraitsModel extends AbstractModel
 			where
 				_a.project_id = ".$project_id."
 				and _a.literature2_id =".$literature2_id."
-			order by _b.name
+
+			order
+				by _a.sort_order, _b.name
 		";
 		
 		return $this->freeQuery( $query );
