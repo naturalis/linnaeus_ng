@@ -15,9 +15,10 @@
 		{t}Logged in as{/t}
 		<a href="{$baseUrl}admin/views/users/edit.php?id={$session.admin.user.id}">
             {$session.admin.user.first_name} {$session.admin.user.last_name}
-        </a> 
+        </a>
         (<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>)
 		{/if}
+		{if $cronNextRun}{include file="../shared/_countdown.tpl"}{/if}
 	</div>
 </div>
 
@@ -42,7 +43,7 @@
 	<br />
 
     <div id="breadcrumbs">
-    
+
         {if $hideControllerPublicName}
             <span class="crumb"><a href="{$breadcrumbs[0].url}">{$breadcrumbs[0].name}</a></span>
             <span class="crumb-arrow">&rarr;</span>
@@ -57,11 +58,11 @@
                 {/if}
             {/foreach}
         {/if}
-        
+
         {if $session.admin.project.id}
         <a href="../../../app/views/linnaeus/set_project.php?p={$session.admin.project.id}" style="color:#999;margin-left:10px" target="_project">view</a>
         {/if}
-        
+
         {if $isMultiLingual && $uiLanguages|@count>1}
             <span style="float:right">
             {foreach $uiLanguages v k}
@@ -75,7 +76,7 @@
             <br />
             <form id="langForm" method="post" action=""><input id="uiLang" type="hidden" name="uiLang" value="" /></form>
         {/if}
-    
+
     </div>
 
 </div>
