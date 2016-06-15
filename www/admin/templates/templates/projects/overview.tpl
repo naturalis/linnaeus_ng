@@ -44,8 +44,7 @@ ul.management li {
 
 {/if}
 
-	<br />
-
+	{if $show_lead_expert_modules}
 
     <h3>{t}Management tasks{/t}</h3>
 
@@ -59,19 +58,20 @@ ul.management li {
 
     <ul class="management">
         <li><a href="../import/index.php">{t}Import data{/t}</a></li>
-        <li><a href="../projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
-    </ul>
-
-    <ul class="management">
         <!-- li><a href="../import/export.php">{t}Generic export{/t}</a></li -->
         <li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
         <li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
     </ul>
 
+	{/if}
+
 	{if $show_sys_management_modules}
+
+    <h3>{t}System tasks{/t}</h3>
 
 	<ul class="management">
         <!-- li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li -->
+        <li><a href="../projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
         <li><a href="../projects/delete.php">{t}Delete a project{/t}</a></li>
         <li><a href="../projects/change_id.php">{t}Change a project ID{/t}</a></li>
     </ul>
