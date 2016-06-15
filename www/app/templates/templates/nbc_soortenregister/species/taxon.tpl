@@ -62,13 +62,19 @@
 
 
 
-		{elseif $activeCategory==$smarty.const.TAB_VERSPREIDING}
+		{elseif $activeCategory.tabname=='TAB_VERSPREIDING'}
 
 			{include file="_tab_verspreiding.tpl"}
 
-		{elseif $activeCategory==$smarty.const.TAB_BEDREIGING_EN_BESCHERMING}
+		{elseif $activeCategory.tabname=='TAB_BEDREIGING_EN_BESCHERMING'}
 		
 			{include file="_tab_bedreiging.tpl"}
+
+
+
+
+
+
 
 		{elseif $ext_template}
 		
