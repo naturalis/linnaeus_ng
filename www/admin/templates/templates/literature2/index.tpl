@@ -48,14 +48,21 @@
 
 </div>
 
+
 <script>
 $(document).ready(function()
 {
-{if $prevSearch.search_title!=''}
-$('#lookup-input-title').val( '{$prevSearch.search_title|@escape}' ).trigger('onkeyup');
-{else if $prevSearch.search_author!=''}
-$('#lookup-input-author').val( '{$prevSearch.search_author|@escape}' ).trigger('onkeyup');
-{/if}
+	{if $prevSearch.search_title!=''}
+	$('#lookup-input-title').val( '{$prevSearch.search_title|@escape}' ).trigger('onkeyup');
+	{else if $prevSearch.search_author!=''}
+	$('#lookup-input-author').val( '{$prevSearch.search_author|@escape}' ).trigger('onkeyup');
+	{/if}
+	
+	{if !$CRUDstates.can_update}
+	setItemUrl('view.php');
+	{/if}
+
+	
 });
 </script>
 

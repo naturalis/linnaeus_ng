@@ -107,11 +107,14 @@ class Literature2Controller extends NsrController
     public function indexAction()
 	{
 		$this->checkAuthorisation();
+
 		$this->setPageName($this->translate('Index'));
 		$this->smarty->assign( 'prevSearch', $this->moduleSession->getModuleSetting('lookup_params') );
 		$this->smarty->assign( 'authorAlphabet', $this->getAuthorAlphabet() );
 		$this->smarty->assign( 'titleAlphabet', $this->getTitleAlphabet() );
-		$this->smarty->assign('incomplete', count($this->getIncompleteReferences()));
+		$this->smarty->assign( 'incomplete', count($this->getIncompleteReferences()));
+		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
+
 		$this->printPage();
 	}
 
@@ -156,6 +159,8 @@ class Literature2Controller extends NsrController
 
     public function editAction()
 	{
+
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
 
 		if ($this->rHasId() && $this->rHasVal('action','delete'))
@@ -231,9 +236,50 @@ class Literature2Controller extends NsrController
 		$this->printPage(isset($template) ? $template : null);
 	}
 
-    public function publicationTypesAction()
+    public function viewAction()
 	{
 		$this->checkAuthorisation();
+
+		if ($this->rHasId())
+		{
+			$this->setReferenceId($this->rGetId());
+		}
+
+		if ($this->getReferenceId())
+		{
+			$this->setPageName($this->translate('View reference'));
+			$this->smarty->assign('reference',$this->getReference());
+			$this->smarty->assign('links',$this->getReferenceLinks());
+		}
+
+		$publicationTypes=$this->getPublicationTypes();
+
+		$gepubliceerd_in_ids=$periodiek_ids=array();
+		foreach((array)$publicationTypes as $val)
+		{
+			if ($val['sys_label']=='Boek' || $val['sys_label']=='Website')
+			{
+				$gepubliceerd_in_ids[]=$val['id'];
+			}
+			if ($val['sys_label']=='Serie' || $val['sys_label']=='Tijdschrift')
+			{
+				$periodiek_ids[]=$val['id'];
+			}
+		}
+
+		$this->smarty->assign('gepubliceerd_in_ids',$gepubliceerd_in_ids);
+		$this->smarty->assign('periodiek_ids',$periodiek_ids);
+		$this->smarty->assign('languages',$this->getLanguages());
+		$this->smarty->assign('actors',$this->getActors());
+		$this->smarty->assign('publicationTypes',$publicationTypes);
+		$this->printPage(isset($template) ? $template : null);
+	}
+
+    public function publicationTypesAction()
+	{
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+		$this->checkAuthorisation();
+
 		$this->setPageName($this->translate('Publication types'));
 
 		if ( $this->rHasVal('action','save') )
@@ -1399,6 +1445,7 @@ class Literature2Controller extends NsrController
 
 			}
 			else
+
 			if(!empty($searchTitle))
 			{
 				if ($fetchNonAlpha)

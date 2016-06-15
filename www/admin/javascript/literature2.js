@@ -1,3 +1,15 @@
+var itemurl='edit.php';
+
+function setItemUrl(url)
+{
+	itemurl=url;
+}
+
+function getItemUrl()
+{
+	return itemurl;
+}
+
 function lit2Lookup(caller,action,letter) 
 {
 	if (!letter)
@@ -78,7 +90,7 @@ function lit2BuildList(action,data)
 		if (action.indexOf('title')!=-1)
 		{
 			buffer.push(
-				'<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+
+				'<li class="lit-index-item"><a href="'+getItemUrl()+'?id='+t.id+'">'+
 				t.label+
 				( author ? ', '+author : '' ) +
 				'</a></li>'
@@ -87,7 +99,7 @@ function lit2BuildList(action,data)
 		else
 		{
 			buffer.push(
-				'<li class="lit-index-item"><a href="edit.php?id='+t.id+'">'+author+': '+t.label+'</a></li>');
+				'<li class="lit-index-item"><a href="'+getItemUrl()+'?id='+t.id+'">'+author+': '+t.label+'</a></li>');
 		}
 	}
 
