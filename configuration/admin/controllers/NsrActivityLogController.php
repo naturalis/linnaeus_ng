@@ -17,7 +17,7 @@ class NsrActivityLogController extends NsrController
 	);
 
     public $modelNameOverride='NsrActivityLogModel';
-    public $controllerPublicName = 'Taxon editor';
+    public $controllerPublicName = 'Project administration';
     public $includeLocalMenu = false;
 
     public function __construct()
