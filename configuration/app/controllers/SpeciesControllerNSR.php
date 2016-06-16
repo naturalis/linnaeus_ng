@@ -1412,7 +1412,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if (is_array($content)) return $content;
 
-		$ext['taxon']=isset($p['taxon']) ? $p['taxon'] : null;
+		$ext['taxon_id']=isset($p['taxon_id']) ? $p['taxon_id'] : null;
 		$ext['current_tab_id']=isset($p['current_tab_id']) ? $p['current_tab_id'] : null;
 		$ext['url']="http://145.136.240.187/linnaeus_ng/app/views/species/nsr_taxon.php?id=%s&cat=%s";
 
@@ -1423,8 +1423,8 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$tab_id=$matches[2];
 					if ( $tab_id==$ext['current_tab_id'] ) return;
-					return sprintf($ext['url'],$ext['taxon']['id'],$tab_id) ;
-					return @file_get_contents( sprintf($ext['url'],$ext['taxon']['id'],$tab_id) );
+					//return sprintf($ext['url'],$ext['taxon_id'],$tab_id) ;
+					return @file_get_contents( sprintf($ext['url'],$ext['taxon_id'],$tab_id) );
 				},
 				$content);
 
