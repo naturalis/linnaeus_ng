@@ -150,7 +150,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$classification=$this->getTaxonClassification($taxon['id']);
 				$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
 				$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
-				$names=$this->getNames(array('id'=>$taxon['id']));
+				$names=$this->getNames( [ 'id'=>$taxon['id'] ] );
 
 				if (defined('TAB_VERSPREIDING') && $categories['start']['tabname']=='TAB_VERSPREIDING')
 				{
@@ -720,13 +720,14 @@ class SpeciesControllerNSR extends SpeciesController
 	private function getNames( $p )
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
-		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
-
 		$names = $this->models->{$this->_model}->getNamesNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getDefaultLanguageId(),
     		'taxonId' => $id
 		));
+		
+		$d=current($names);
+		$base_rank_id=isset($d['taxon_base_rank_id']) ? $d['taxon_base_rank_id'] : null;
 
 		$preferredname=null;
 		$scientific_name=null;
@@ -1152,7 +1153,7 @@ class SpeciesControllerNSR extends SpeciesController
                 break;
 
             case 'CTAB_DNA_BARCODES':
-                $content=$this->getDNABarcodes($taxon);
+                $content=$this->getDNABarcodes( $taxon );
                 break;
 
             case 'CTAB_DICH_KEY_LINKS':
