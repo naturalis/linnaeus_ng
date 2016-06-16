@@ -828,7 +828,7 @@ class NsrTaxonController extends NsrController
         $id=isset($p['id']) ? (int)$p['id'] : null;
         $nametype=isset($p['nametype']) ? (int)$p['nametype'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        //$formatted=isset($p['formatted']) ? $p['formatted']==1 : false;
+        $formatted=isset($p['formatted']) ? $p['formatted']==1 : true;
         $taxaOnly=isset($p['taxa_only']) ? $p['taxa_only']==1 : false;
         $rankAbove=isset($p['rank_above']) ? (int)$p['rank_above'] : false;
         $rankEqualAbove=isset($p['rank_equal_above']) ? (int)$p['rank_equal_above'] : false;
@@ -895,6 +895,11 @@ class NsrTaxonController extends NsrController
 			{
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'');
 			}
+			
+			if (!$formatted)
+			{
+				$taxa[$key]['label']=strip_tags($taxa[$key]['label']);
+			}
 
 		}
 
@@ -935,6 +940,7 @@ class NsrTaxonController extends NsrController
 
     private function getSpeciesLookupList($p)
     {
+		$p['formatted']=0;
 		$taxa=$this->getSpeciesList($p);
 
 		$maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
