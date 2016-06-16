@@ -62,10 +62,10 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->NSRFunctions=new NSRFunctionsController;
 		$this->moduleSettings=new ModuleSettingsReaderController;
 
+		// ????????????
 		$this->_taxon_base_url_images_main = $this->moduleSettings->getSetting( "taxon_base_url_images_main", "http://images.naturalis.nl/original/" );
 		$this->_taxon_base_url_images_thumb = $this->moduleSettings->getSetting( "taxon_base_url_images_thumb", "http://images.naturalis.nl/160x100/" );
 		$this->_taxon_base_url_images_overview = $this->moduleSettings->getSetting( "taxon_base_url_images_overview", "http://images.naturalis.nl/510x272/" );
-		$this->_taxon_fetch_ez_data = $this->moduleSettings->getSetting( "taxon_fetch_ez_data", false );
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
@@ -75,6 +75,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( "tree_show_upper_taxon", 0 ) );
 
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+		$this->_use_embedded_templates = $this->moduleSettings->getModuleSetting( "use_embedded_templates", 0 )==1;
 
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -225,12 +226,23 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 			
 			$classification=(isset($content['classification']) ? $content['classification'] : isset($classification) ? $classification : null);
+			$content=(isset($content['content']) ? $content['content'] : null);
+
+			if ( $this->_use_embedded_templates )
+			{
+				$content=
+					$this->processEmbeddedTemplates( [
+						'content'=>$content,
+						'taxon_id'=>$taxon['id'],
+						'current_tab_id'=>$categories['start']['id']
+					] );
+			}
 
 			$this->setPageName($taxon['label']);
 			
 			$this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
 			$this->smarty->assign('requested_category',$categories['start']);
-			$this->smarty->assign('content',isset($content['content']) ? $content['content'] : null);
+			$this->smarty->assign('content',$content);
 			$this->smarty->assign('sideBarLogos',isset($sideBarLogos) ? $sideBarLogos : null);
 			$this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
 			$this->smarty->assign('categories',$categories['categories']);
@@ -672,12 +684,10 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				unset( $taxon_categories[$key] );
 			}
-
-
 		}
 
-		//q($start_category);
-		//q($taxon_categories,1);
+//		q($start_category);
+//		q($taxon_categories,1);
 		
 		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 	
@@ -1395,9 +1405,30 @@ class SpeciesControllerNSR extends SpeciesController
 				return false;
 		}
 	}
+	
+	private function processEmbeddedTemplates( $p )
+	{
+		$content=isset($p['content']) ? $p['content'] : null;
 
+		if (is_array($content)) return $content;
 
+		$ext['taxon']=isset($p['taxon']) ? $p['taxon'] : null;
+		$ext['current_tab_id']=isset($p['current_tab_id']) ? $p['current_tab_id'] : null;
+		$ext['url']="nsr_taxon.php?id=%s&cat=%s";
 
+		$c=
+			preg_replace_callback(
+				'/({{cat=([^\]]*?)}})/is',
+				function ($matches) use ($ext)
+				{
+					$tab_id=$matches[2];
+					if ( $tab_id==$ext['current_tab_id'] ) return;
+					return @file_get_contents( sprintf($ext['url'],$ext['taxon']['id'],$tab_id) );
+				},
+				$content);
+
+		return $c;
+	}
 
     private function getNSRId($p)
     {
