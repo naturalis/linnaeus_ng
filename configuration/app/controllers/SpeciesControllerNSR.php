@@ -1423,6 +1423,7 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$tab_id=$matches[2];
 					if ( $tab_id==$ext['current_tab_id'] ) return;
+					return sprintf($ext['url'],$ext['taxon']['id'],$tab_id) ;
 					return @file_get_contents( sprintf($ext['url'],$ext['taxon']['id'],$tab_id) );
 				},
 				$content);
