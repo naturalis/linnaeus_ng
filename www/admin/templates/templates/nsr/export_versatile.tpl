@@ -282,7 +282,7 @@ function doSubmit()
                     "/></td>
                     <td><label for=col_sci_name>wetenschappelijke naam</label>
                     <div class=hybrid_options style="display:none">
-                    <label><input class=hybrid_options id=add_hybrid_marker type=checkbox name=add_hybrid_marker checked="checked" /> × toevoegen aan hybriden</label><br />
+                    <label><input class=hybrid_options id=add_hybrid_marker type=checkbox name=add_hybrid_marker checked="checked" /> × toevoegen aan hybriden & infixes (subsp., f., var.) toevoegen</label><br />
                     </div>
                     </td>
                 </tr>
@@ -452,6 +452,10 @@ function doSubmit()
                     <label><input type="radio" name="new_line" value="Lf"  checked="checked" />Lf</label>&nbsp;&nbsp;
                     <label><input type="radio" name="new_line" value="Cr" />Cr</label>
 			</td></tr>
+        	<tr>
+            	<td><input type="checkbox" name="keep_tags" id="keep_tags" /></td>
+                <td><label for="keep_tags">html-tags in wetenschappelijke namen behouden (voor infixes)</label></td>
+			</tr>
         	<tr>
             	<td><input type="checkbox" name="no_quotes" id="no_quotes" /></td>
                 <td><label for="no_quotes">geen dubbele quotes om waarden</label></td>

@@ -41,6 +41,7 @@ class VersatileExportController extends Controller
 	private $field_sep;
 	private $new_line;
 	private $no_quotes;
+	private $keep_tags;
 	private $utf8_to_utf16;
 	private $add_utf8_BOM;
 	private $output_target;
@@ -141,6 +142,7 @@ class VersatileExportController extends Controller
 			$this->setNoQuotes( $this->rGetVal('no_quotes') );
 			$this->setReplaceUnderscoresInHeaders( $this->rGetVal('replace_underscores_in_headers') );
 			//$this->setUtf8ToUtf16( $this->rGetVal('utf8_to_utf16') );
+			$this->setKeepTags( $this->rGetVal('keep_tags') );
 			$this->setAddUtf8BOM( $this->rGetVal('add_utf8_BOM') );
 			$this->setDoPrintQueryParameters( $this->rGetVal('print_query_parameters') );
 			$this->setPrintEOFMarker( $this->rGetVal('print_eof_marker') );
@@ -343,6 +345,14 @@ class VersatileExportController extends Controller
 			{
 				$this->names[$key]['wetenschappelijke_naam']=
 					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
+			}
+		}
+		
+		if ( $this->hasCol( 'sci_name' ) && $this->getKeepTags()==false )
+		{
+			foreach((array)$this->names as $key=>$val)
+			{
+				$this->names[$key]['wetenschappelijke_naam']=preg_replace('/(\s+)/',' ',strip_tags($val['wetenschappelijke_naam']));
 			}
 		}
 
@@ -940,6 +950,16 @@ class VersatileExportController extends Controller
 	private function getAddUtf8BOM()
 	{
 		return $this->add_utf8_BOM;
+	}
+
+	private function setKeepTags( $state )
+	{
+		$this->keep_tags=isset($state) && $state=='on';
+	}
+
+	private function getKeepTags()
+	{
+		return $this->keep_tags;
 	}
 
 	private function getSuppressUnderscoredFields()
