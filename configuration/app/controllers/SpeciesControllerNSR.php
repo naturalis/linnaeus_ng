@@ -604,8 +604,8 @@ class SpeciesControllerNSR extends SpeciesController
 		// weed out the ones we don't want to display
 		foreach((array)$categories as $key=>$val)
 		{
-			if ( $val['always_hide'] ) continue;
 			if ( $val['suppress'] ) continue;
+			//if ( $val['always_hide'] ) continue;
 			
 			if ($val['type']=='auto')
 			{
@@ -629,13 +629,13 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$val['show_overview_image']=false;
 
-			$taxon_categories[]=$val;
-
 			// is cat has been provided as TAB_CATNAME rather than an ID, resolve
 			if (!is_int($requestedTab) && $requestedTab==$val['tabname'])
 			{
 				$cat=$val['id'];
 			}
+
+			$taxon_categories[]=$val;
 		}
 			
 		// have the first non-automatic/external tab display the overview image
@@ -666,10 +666,18 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$start_category=$val;
 			}
+			
+			// and finally throw out the ones that should be hidden from the menu but remain accessible directly
+			if ( $val['always_hide'] )
+			{
+				unset( $taxon_categories[$key] );
+			}
+
+
 		}
 
-//		q($start_category);
-//		q($taxon_categories,1);
+		//q($start_category);
+		//q($taxon_categories,1);
 		
 		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 	
