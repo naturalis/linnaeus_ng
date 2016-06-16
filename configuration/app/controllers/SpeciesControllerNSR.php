@@ -1414,7 +1414,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$ext['taxon']=isset($p['taxon']) ? $p['taxon'] : null;
 		$ext['current_tab_id']=isset($p['current_tab_id']) ? $p['current_tab_id'] : null;
-		$ext['url']="nsr_taxon.php?id=%s&cat=%s";
+		$ext['url']="/linnaeus_ng/app/views/species/nsr_taxon.php?id=%s&cat=%s";
 
 		$c=
 			preg_replace_callback(
