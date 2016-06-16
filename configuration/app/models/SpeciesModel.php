@@ -451,7 +451,8 @@ class SpeciesModel extends AbstractModel
 					when _a.language_id = ".LANGUAGE_ID_SCIENTIFIC." then 0
 					else 5
 				end as sort_criterium_language,
-				ifnull(_q.label,_r.rank) as rank_label
+				ifnull(_q.label,_r.rank) as rank_label,
+				_tf.rank_id as taxon_base_rank_id
 
 			from %PRE%names _a
 		
@@ -472,6 +473,17 @@ class SpeciesModel extends AbstractModel
 		
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
+
+
+		left join %PRE%taxa _t
+			on _a.taxon_id=_t.id
+			and _a.project_id = _t.project_id
+	
+		left join %PRE%projects_ranks _tf
+			on _t.rank_id=_tf.id
+			and _t.project_id = _tf.project_id
+	
+
 		
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
