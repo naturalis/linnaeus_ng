@@ -56,8 +56,6 @@ insert ignore into modules values (null,'Project management','Project management
 insert ignore into modules values (null,'User management','User management','users',99,1,0,now(),now());
 insert ignore into modules values (null,'Media','Media management','media',99,1,0,now(),now());
 insert ignore into modules values (null,'Taxon editor','Taxon editor','nsr',99,1,0,now(),now());
-delete from modules where controller = 'highertaxa';
-insert ignore into modules values (null,'Higher taxa','Placeholder module for backward compatibility','highertaxa',99,0,1,now(),now());
 insert ignore into modules values (null,'Actors','Actors: persons & organizations','actors',99,1,0,now(),now());
 
 update modules set show_in_menu=0, description='Front-end implementation of the Taxon Editor' where controller='species';
