@@ -57,7 +57,12 @@ class VersatileExportController extends Controller
 	private $names=array();
 	private $synonyms=array();
 	private $parentRegister=array();
-	private $operators=array("eq"=>"=","ge"=>">=","in"=>"in");
+	private $operators=
+		[
+			"eq"=>["operator"=>"=","label"=>"is:"],
+			"ge"=>["operator"=>">=","label"=>"gelijk aan of onder:"],
+			"in"=>["operator"=>"in","label"=>"in:"],
+		];
 
 	private $orderBy="_f.rank_id asc,_r.id, _t.taxon";  // rank, rank id, taxon
 	private $limit=9999999;
@@ -218,7 +223,7 @@ class VersatileExportController extends Controller
 		$ranks_clause="";
 		if ( !$this->getAllRanks() )
 		{
-			$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()] . " (".implode( "," , $this->getSelectedRanks() ).")";
+			$ranks_clause="and _f.rank_id ".$this->operators[$this->getRankOperator()]['operator'] . " (".implode( "," , $this->getSelectedRanks() ).")";
 		}
 
 		$presence_status_clause="";
@@ -646,7 +651,7 @@ class VersatileExportController extends Controller
 			$this->translate( "rangen" ),
 			$this->getFieldSep(),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-			$this->getAllRanks() ? $this->translate( "(alle)" ) : $this->operators[$this->getRankOperator()]," ",implode(", ",$d),
+			$this->getAllRanks() ? $this->translate( "(alle)" ) : $this->translate($this->operators[$this->getRankOperator()]['label'])," ",implode(", ",$d),
 			( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
 		$this->printNewLine();
 
