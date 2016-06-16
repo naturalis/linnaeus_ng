@@ -1414,7 +1414,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$ext['taxon_id']=isset($p['taxon_id']) ? $p['taxon_id'] : null;
 		$ext['current_tab_id']=isset($p['current_tab_id']) ? $p['current_tab_id'] : null;
-		$ext['url']="http://145.136.240.187/linnaeus_ng/app/views/species/nsr_taxon.php?id=%s&cat=%s";
+
+		$url=parse_url((stripos($_SERVER['SERVER_PROTOCOL'],'https')===0 ? 'https://' : 'http://'). $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+		$ext['url']=$url['scheme']."://".$url['host'].$url['path']."?epi=" . $this->getCurrentProjectId() . "&id=%s&cat=%s";
 
 		$c=
 			preg_replace_callback(
@@ -1422,8 +1424,8 @@ class SpeciesControllerNSR extends SpeciesController
 				function ($matches) use ($ext)
 				{
 					$tab_id=$matches[2];
+					// no circular embedding
 					if ( $tab_id==$ext['current_tab_id'] ) return;
-					//return sprintf($ext['url'],$ext['taxon_id'],$tab_id) ;
 					return @file_get_contents( sprintf($ext['url'],$ext['taxon_id'],$tab_id) );
 				},
 				$content);
