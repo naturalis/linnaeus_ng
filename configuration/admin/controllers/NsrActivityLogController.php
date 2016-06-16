@@ -37,6 +37,14 @@ class NsrActivityLogController extends NsrController
 
         $this->setPageName($this->translate('Activity log'));
 
+	    $this->setBreadcrumbIncludeReferer(
+          array(
+             'name' => 'Project overview',
+             'url' => $this->baseUrl . $this->appName . '/views/projects/overview.php'
+           )
+         );
+	
+	
 		$search=(null!==$this->rGetAll() ? $this->rGetAll() : null);
 
 		$results=$this->getLogLines($search);
