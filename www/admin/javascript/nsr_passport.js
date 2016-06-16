@@ -1,6 +1,8 @@
 var reverttexts=Array();
 var currenttexts=Array();
 var currentpublish=Array();
+var messageFadeOutDelay=2000;
+
 
 function getcallerid(caller)
 {
@@ -110,7 +112,7 @@ function saveeditordata(caller)
 			//console.log(data);
 			if(data==true)
 			{
-				$('#message'+id).html('Tekst opgeslagen.').toggle(true).fadeOut(2000);
+				$('#message'+id).html('Tekst opgeslagen.').toggle(true).fadeOut(messageFadeOutDelay);
 				$('#indicator'+id).html(content.length==0? 'leeg' : content.length+' tekens');
 
 				if (content.length==0)

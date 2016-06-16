@@ -110,6 +110,10 @@
 <script>
 $(document).ready(function(e)
 {
+	{if $adminMessageFadeOutDelay}
+	messageFadeOutDelay={$adminMessageFadeOutDelay};
+	{/if}
+
 	{foreach from=$tabs item=v key=k}
 	currentpublish[{$k}]={if $v.publish==1}true{else}false{/if};
 	{/foreach}
