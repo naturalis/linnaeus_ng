@@ -686,7 +686,7 @@ class NsrTaxonManagement extends NsrController
 						$this->addMessage( $this->translate( isset($d[0]['id']) ? 'Label updated.' : 'Label added.' ) );
 
 					$change=$this->models->PagesTaxaTitles->getDataDelta();
-					$this->logChange(['before'=>@$change['before'][0],'after'=>@$change['after'][0],'note'=>'Chnaged tab label']);
+					$this->logChange(['before'=>@$change['before'][0],'after'=>@$change['after'][0],'note'=>'Changed tab label']);
 
 				}
 			}
