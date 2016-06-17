@@ -1,19 +1,12 @@
 <?php
 
-    $projectId = 157;
+    $projectId = 32;
 
 
 $replacement = array(
 
-'cracksmo.mov' => 'cracksmo.mp3',
-'gnathone.mov' => 'gnathone.mp3',
-'gymnarch.mov' => 'gymnarch.mp3',
-'isychthy.mov' => 'isychthy.mp3',
-'ivindomy.mov' => 'ivindomy.mp3',
-'mormyrop.mov' => 'mormyrop.mp3',
-'pollimyr.mov' => 'pollimyr.mp3',
-'soundsmo.mov' => 'soundsmo.mp3',
-
+'u_arcuata_mov1.mov' => 'u_arcuata_mov1.mp4',
+'u_arcuata_mov2.mov' => 'u_arcuata_mov2.mp4',
 
 
 
