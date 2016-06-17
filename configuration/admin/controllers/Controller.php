@@ -53,7 +53,7 @@ class Controller extends BaseClass
 	public $printBreadcrumbs=true;
 	public $wikiPageOverride;
 	private $_adminMessageFadeOutDelay;
-
+	private $_gitVars;
 
 	private $usedModelsBase = array(
 		'activity_log',
@@ -83,7 +83,9 @@ class Controller extends BaseClass
 		'log_changes',
 		'custom_array_sort',
 		'paginator',
-        'paginator_with_links'
+        'paginator_with_links',
+		'git'
+		
     );
 
 	protected $moduleSession;
@@ -103,33 +105,6 @@ class Controller extends BaseClass
      */
     public function __construct ()
     {
-		
-/*
-exec("git branch",$f);
-print_r($f);
-
-Array
-(
-    [0] => * development
-    [1] =>   master
-    [2] =>   master--with-old-matrix-key-2
-)
-
-
- git log -1
-
-commit 2dabc5b03ab72a6ce6e091dc5677b2880cefd27e
-Author: maarten schermer <maarten.schermer@naturalis.nl>
-Date:   Thu Jun 16 16:56:42 2016 +0200
-
-    https://jira.naturalis.nl/browse/LINNA-448
-
-
-
-		die();
-		
-*/		
-		
         parent::__construct();
         $this->setTimeZone();
         $this->startSession();
@@ -1642,6 +1617,7 @@ Date:   Thu Jun 16 16:56:42 2016 +0200
 		$this->smarty->assign('viewName', $this->getViewName());
 		$this->smarty->assign('wikiUrl', $this->getWikiUrl());
 		$this->smarty->assign('adminMessageFadeOutDelay', $this->_adminMessageFadeOutDelay);
+		$this->smarty->assign('GitVars', $this->getGitVars());
 
         $this->smarty->assign('uiLanguages', $this->uiLanguages);
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
@@ -1679,6 +1655,10 @@ Date:   Thu Jun 16 16:56:42 2016 +0200
 		{
             $this->smarty->assign('userSearch',$_SESSION['admin']['user']['search']);
 		}
+
+
+
+
 
     	if (!empty($this->cronNextRun)) {
             $this->smarty->assign('cronNextRun', $this->cronNextRun);
@@ -2649,6 +2629,7 @@ Date:   Thu Jun 16 16:56:42 2016 +0200
 		$this->setShowAutomaticHybridMarkers();
 		$this->setShowAutomaticInfixes();
 		$this->setAdminMessageFadeOutDelay();
+        $this->setGitVars();
         $this->setCronNextRun();
 	}
 
@@ -2871,6 +2852,21 @@ Date:   Thu Jun 16 16:56:42 2016 +0200
 		));
 
 		$this->_adminMessageFadeOutDelay = $d ? $d[0] : 10000;
+	}
+	
+	protected function setGitVars()
+	{
+		if (defined("PATH_GIT_EXECUTABLE")) $this->helpers->Git->setGitExe( PATH_GIT_EXECUTABLE );
+		$this->helpers->Git->setRepoPath( $this->generalSettings['applicationFileRoot'] );
+		$this->helpers->Git->setData();
+		$this->_gitVars = new stdClass;
+		$this->_gitVars->branch=$this->helpers->Git->getBranch();
+		$this->_gitVars->commit=$this->helpers->Git->getCommit();
+	}
+
+	protected function getGitVars()
+	{
+		return $this->_gitVars;
 	}
 
 	protected function setCronNextRun ()
