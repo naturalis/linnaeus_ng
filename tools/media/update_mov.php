@@ -8,9 +8,8 @@
  	$my = mysqli_connect($s['host'], $s['user'], $s['password'], $s['database']);
 	mysqli_set_charset($my, 'utf8');
 
-    $internalLink = "showMedia('../../../shared/media/project/" . str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/%s'";
-
     require_once 'mov_replace.php';
+	$internalLink = "showMedia('../../../shared/media/project/" . str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/%s'";
 
     $regular = array(
         'update characteristics_states set file_name = "%s" where file_name = "%s" and project_id = ' . $projectId,
