@@ -33,7 +33,7 @@
 		</p>
 		<p class="navbar-text navbar-right">
 			<a href="http://www.naturalis.nl"> 
-				© Naturalis Biodiversity Center
+				Naturalis Biodiversity Center
 			</a>
 		</p>
 	</div>
