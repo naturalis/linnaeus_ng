@@ -51,17 +51,8 @@ class Git {
 
 	private function setBranch()
 	{
-		$p=$this->exec_path . " branch";
-		$f=explode("\n",@shell_exec( $p ));
-		
-		foreach((array)$f as $val)
-		{
-			if (strpos(trim($val),'*')===0)
-			{
-				$this->git_branch=ltrim($val,'* ');
-				break;
-			}
-		}
+		$p=$this->exec_path . " rev-parse --abbrev-ref HEAD";
+		$this->git_branch=trim(@shell_exec( $p ));
 	}
 
 	private function setCommit()
@@ -76,9 +67,15 @@ class Git {
 				$this->git_commit->hash=trim(substr($val,strlen('commit')));
 				$this->git_commit->hash_short=substr($this->git_commit->hash,0,7);
 			}
+
 			if (stripos(trim($val),'Date:')===0)
 			{
 				$this->git_commit->date=trim(substr($val,strlen('Date:')));
+			}
+
+			if (stripos(trim($val),'Author:')===0)
+			{
+				$this->git_commit->auhor=trim(substr($val,strlen('Author:')));
 			}
 		}
 	}
