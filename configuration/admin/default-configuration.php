@@ -44,6 +44,7 @@ class configuration
     {
         return array(
             'app' => array(
+				'applicationFileRoot' => $this->_appFileRoot,
                 'name' => 'Linnaeus NG Administration', 
                 'version' => '@APP.VERSION@', 
                 'versionTimestamp' => '@TIMESTAMP@', 

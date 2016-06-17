@@ -74,7 +74,7 @@ class Git {
 			if (stripos(trim($val),'commit')===0)
 			{
 				$this->git_commit->hash=trim(substr($val,strlen('commit')));
-				$this->git_commit->hash_short=substr($this->git_commit->hash,-7);
+				$this->git_commit->hash_short=substr($this->git_commit->hash,0,7);
 			}
 			if (stripos(trim($val),'Date:')===0)
 			{
