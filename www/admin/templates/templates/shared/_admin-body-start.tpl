@@ -6,10 +6,6 @@
 		<img src="{$baseUrl}admin/media/system/logo_linnaeus_ng.png" id="lng-logo">
 	</a>
 
-	<div class="header-branding">
-		Linnæus NG&trade; administration
-	</div>
-
 	<div class="header-user">
 		{if $session.admin.user._logged_in}
 		{t}Logged in as{/t}
@@ -26,11 +22,6 @@
 
 <div id="page-header-titles">
 	<span id="page-header-title">{$app.name}</span>
-	<span id="page-header-version">{$app.version} ({$app.versionTimestamp})</span>
-
-	{if $session.admin.system.server_addr=='127.0.0.1'}
-	<span id="page-header-locality" style="color:#CC0000">[localhost]</span>
-	{/if}
 
 	{if $wikiUrl}<br>
 	<div style="float:right;margin-top:auto;margin-bottom:auto">
