@@ -8,7 +8,6 @@
  	$my = mysqli_connect($s['host'], $s['user'], $s['password'], $s['database']);
 	mysqli_set_charset($my, 'utf8');
 
-    $projectId = 147;
     $internalLink = "showMedia('../../../shared/media/project/" . str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/%s'";
 
     require_once 'mov_replace.php';
