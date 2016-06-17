@@ -103,6 +103,33 @@ class Controller extends BaseClass
      */
     public function __construct ()
     {
+		
+/*
+exec("git branch",$f);
+print_r($f);
+
+Array
+(
+    [0] => * development
+    [1] =>   master
+    [2] =>   master--with-old-matrix-key-2
+)
+
+
+ git log -1
+
+commit 2dabc5b03ab72a6ce6e091dc5677b2880cefd27e
+Author: maarten schermer <maarten.schermer@naturalis.nl>
+Date:   Thu Jun 16 16:56:42 2016 +0200
+
+    https://jira.naturalis.nl/browse/LINNA-448
+
+
+
+		die();
+		
+*/		
+		
         parent::__construct();
         $this->setTimeZone();
         $this->startSession();
@@ -2230,7 +2257,8 @@ class Controller extends BaseClass
         $cp = $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
 
         $this->breadcrumbs[] = array(
-            'name' => $this->translate($breadcrumbRootName),
+            //'name' => $this->translate($breadcrumbRootName),
+            'name' => $breadcrumbRootName,
             'url' => $cp
         );
 
