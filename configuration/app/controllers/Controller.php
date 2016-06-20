@@ -200,7 +200,6 @@ class Controller extends BaseClass
 	public $_formaMarker='f.';
 	private $_nameTypeIds=array();
 
-
     /**
      * Constructor, calls parent's constructor and all initialisation functions
      *
@@ -211,7 +210,6 @@ class Controller extends BaseClass
     public function __construct ($p=null)
     {
         parent::__construct();
-
         $this->setControllerParams($p);
         $this->startSession();
         $this->loadHelpers();
@@ -225,6 +223,7 @@ class Controller extends BaseClass
 		$this->setNameTypeIds();
         $this->setRequestData();
 		$this->checkForProjectId();
+        $this->checkGlobalAuthorization();
         $this->startModuleSession();
         $this->restoreState();
         $this->setProjectLanguages();
@@ -2929,7 +2928,28 @@ class Controller extends BaseClass
 		if ( isset($this->_nameTypeIds[$predicate]) ) return $this->_nameTypeIds[$predicate]['id'];
 	}
 
+	protected function checkGlobalAuthorization()
+	{
+		if ( $this->getSetting('front_end_use_basic_auth',0)==1)
+		{
+			$proceed=false;
+			
+			if ( isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']) )
+			{
+				$proceed=$this->models->ControllerModel->verifyProjectUser(array(
+					'project_id' => $this->getCurrentProjectId(),
+					'username' => $_SERVER['PHP_AUTH_USER'],
+					'password' => $_SERVER['PHP_AUTH_PW']
+				));
+			}
 
-
+			if (!$proceed)
+			{
+				header('WWW-Authenticate: Basic realm="' . $_SESSION['app']['project']['title'] . '"');
+				header('HTTP/1.0 401 Unauthorized');
+				die();
+			} 
+		}
+	}
 
 }
