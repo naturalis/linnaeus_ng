@@ -1232,8 +1232,15 @@ class MediaController extends Controller
     private function createUser ()
     {
         $d = $this->getCurrentProjectData();
-        $project = strlen($d['sys_name']) < 25 ? $d['sys_name'] :
-            substr($d['sys_name'], 0, 22) . '...';
+
+        $project = $d['sys_name'];
+        if (strlen($project) > 25) {
+            $d = explode(' ', $project);
+            $project = $d[0] . ' ' . end($d);
+            if (strlen($project) > 25) {
+                $project = substr($d['sys_name'], 0, 22) . '...';
+            }
+        }
 
         $this->_result =
             $this->getCurlResult($this->_rsNewUserUrl . '&newuser=' .
