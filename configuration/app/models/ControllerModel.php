@@ -69,8 +69,6 @@ final class ControllerModel extends AbstractModel
 		}
 	}
 
-
-
     public function getTaxonById ($params)
     {
 		if (!$params) {
@@ -140,7 +138,6 @@ final class ControllerModel extends AbstractModel
         return $this->freeQuery($query);
     }
 
-
     public function getPreferredName ($params)
     {
 		if (!$params) {
@@ -165,7 +162,6 @@ final class ControllerModel extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
 
     public function getTaxa ($params)
     {
@@ -192,7 +188,6 @@ final class ControllerModel extends AbstractModel
 
         return $this->freeQuery($query);
     }
-
 
     public function getTaxonCommonNames ($params)
     {
@@ -405,6 +400,39 @@ final class ControllerModel extends AbstractModel
 		return $this->freeQuery($query);
     }
 
-}
+	public function verifyProjectUser( $p )
+	{
+		$project_id=isset($p['project_id']) ? $p['project_id'] : null;
+		$username=isset($p['username']) ? $p['username'] : null;
+		$password=isset($p['password']) ? $p['password'] : null;
 
-?>
+		if( is_null($project_id) || is_null($username) || is_null($password) ) return;
+		
+		$query="
+			select
+				_a.*
+			from
+				%PRE%users _a
+
+			right join %PRE%projects_roles_users _b
+				on _a.id=_b.user_id
+			
+			where
+				_b.project_id = ". $project_id ."
+				and _a.username = '" . $this->escapeString($username) ."'
+				and _a.active=1
+				and _b.active=1
+			";
+		
+			$d=$this->freeQuery( $query );
+
+			if ($d)
+				return password_verify($password,$d[0]['password']);
+			else
+				return false;
+
+	}
+	
+
+
+}
