@@ -22,7 +22,7 @@
 <input type="hidden" name="id" value="{$concept.id}" />
 
 <p>
-    {t}naam:{/t} <input type="text" id="taxon" name="taxon" value="{$concept.taxon}"  /><br />
+    {t}naam:{/t} <input type="text" id="taxon" name="taxon" value="{$concept.taxon_no_infix}"  /><br />
 </p>
 
 <p>

@@ -693,7 +693,10 @@ class Controller extends BaseClass
     {
 		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id]);
 		if ( !empty($taxon['taxon']) )
+		{
+			$taxon['taxon_no_infix']=$taxon['taxon'];
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+		}
 		return $taxon;
     }
 
@@ -701,7 +704,10 @@ class Controller extends BaseClass
     {
 		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'name'=>trim($name)]);
 		if ( !empty($taxon['taxon']) )
+		{
+			$taxon['taxon_no_infix']=$taxon['taxon'];
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+		}
 		return $taxon;
     }
 
