@@ -411,7 +411,7 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
-		$concept=$this->getConcept($this->getConceptId());
+		$concept=$this->getConcept($this->getConceptId(), true );
 		$this->smarty->assign('concept',$concept);
 		$this->smarty->assign('validname',
 			$this->getName(array('taxon_id'=>$this->rGetId(),'type_id'=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']))
