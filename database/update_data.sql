@@ -61,7 +61,7 @@ insert ignore into modules values (null,'Actors','Actors: persons & organization
 update modules set show_in_menu=0, description='Front-end implementation of the Taxon Editor' where controller='species';
 update modules set description='Taxon editor, back-end implementation of Species module' where controller='nsr';
 update modules set show_in_menu=0 where controller='literature';
-
+update modules set show_in_menu=0 where controller='highertaxa';
 update modules set module='Actors' where controller = 'actors';
 update modules set module='Traits' where controller = 'traits';
 
