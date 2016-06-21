@@ -733,7 +733,7 @@ class UsersController extends Controller
 		$username=$this->getNewUserData()['username'];
 
 		$d=$this->models->Users->_get(array(
-			'id'=>array( 'username'=>$username),
+			'id'=>array( 'username'=>$username, 'id !='=>$this->getUserId() ),
 			'columns'=>'count(*) as total'
 		));
 
@@ -926,8 +926,6 @@ class UsersController extends Controller
 	{
 		return $this->_newuserrolesave;
 	}
-
-
 
 	private function sanitizeNewUserData()
     {
