@@ -106,6 +106,11 @@ class NsrController extends Controller
 		return isset($this->conceptId) ? $this->conceptId : false;
 	}
 
+	public function getCTabs()
+	{
+		return $this->cTabs;
+	}
+
     public function getCategories()
     {
 		$categories=$this->models->NsrTaxonModel->getCategories(array(
@@ -113,7 +118,7 @@ class NsrController extends Controller
     		'language_id' => $this->getDefaultProjectLanguage()
 		));
 		
-		$standard_categories=$this->cTabs;
+		$standard_categories=$this->getCTabs();
 
 		array_walk($standard_categories,function(&$a,$b) {
 			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto'];
@@ -131,6 +136,11 @@ class NsrController extends Controller
 		
         foreach((array)$all_categories as $key=>$page)
 		{
+			if ( !empty($page['external_reference']) )
+			{
+				$all_categories[$key]['external_reference_decoded'] = @json_decode($page['external_reference']);
+			}
+			
             foreach((array)$lp as $k=>$language)
 			{
                 $tpt = $this->models->PagesTaxaTitles->_get(
@@ -295,7 +305,7 @@ class NsrController extends Controller
 		return str_replace('tn.nlsr.concept/','',$data[0]['nsr_id']);
 	}
 
-	public function getConcept($id)
+	public function getConcept($id,$noinfixes=false)
 	{
 		$c=$this->getTaxonById($id);
 
@@ -313,9 +323,9 @@ class NsrController extends Controller
 
 			$c['is_deleted']=($d[0]['is_deleted']==1);
 
-			if ( isset($c['label']) )
+			if ( isset($c['label']) && !$noinfixes )
 				$c['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'] ) );
-			if ( isset($c['parent']['label']) )
+			if ( isset($c['parent']['label']) && !$noinfixes )
 				$c['parent']['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
 	
 		}
