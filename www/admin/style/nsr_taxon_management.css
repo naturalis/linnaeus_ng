@@ -1,0 +1,155 @@
+.tab-definition .these-lists {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.tab-definition .these-lists li {
+  margin-bottom: 2px;
+  padding: 2px;
+  vertical-align:top;
+}
+
+.tab-definition .these-lists li:hover {
+	background-color:#eee;
+}
+
+.tab-definition .these-lists li span {
+	display:inline-block;
+}
+
+.tab-definition .these-lists li span:nth-child(1) {
+	cursor:move;
+	width:10px;
+}
+
+.tab-definition .these-lists li span:nth-child(2) {
+	width:170px;
+}
+
+.tab-definition .these-lists li span:nth-child(3) {
+	width:170px;
+}
+
+.tab-definition .these-lists li span:nth-child(4) {
+	width:110px;
+}
+
+.tab-definition .these-lists li span:nth-child(5) {
+	width:75px;
+}
+
+.tab-definition .these-lists li span:nth-child(6) {
+  width: 60px;
+}
+
+.tab-definition .delete {
+  background-image: url(../../media/system/icons/cross.png);
+  cursor: pointer;
+  background-repeat: no-repeat;
+}
+
+.tab-definition .these-lists li span:nth-child(7) {
+	width:250px;
+}
+
+.tab-definition .hidden-tab, .tab-redirect-label {
+	color:#999;
+}
+
+.tab-definition .tab-redirect {
+	font-size:0.9em;
+}
+
+.tab-definition .auto-tab {
+	color:#900;
+}
+
+.tab-definition .suppressed-tab {
+	text-decoration:line-through;
+}
+
+.tab-definition select {
+	font-size:0.9em;
+	width:50px;
+}
+
+.tab-definition h2 {
+	margin-bottom:-10px;
+}
+
+.tab-definition table {
+	border-collapse:collapse;
+}
+
+.tab-definition table tr td {
+	vertical-align:top;
+	padding:2px;
+	width:auto;
+}
+
+.tab-definition table tr td.sublabel {
+	font-style:italic;
+}
+
+.tab-definition table.subsublabel tr td:first-child {
+	width:125px;
+}
+
+.tab-definition textarea {
+	width:600px;
+	height:75px;
+	font-size:0.9em;
+	font-family:consolas;
+}
+
+.tab-definition .explanation {
+	font-size:0.9em;
+	color:#666;
+	margin:1px 0 2px 0;
+	text-align:justify;
+}
+
+.tab-definition .explanation ul {
+	padding-left:10px;
+	margin:0 0 0 0;
+}
+
+
+
+
+
+
+.tab-definition .pick-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.tab-definition .pick-list li,  #block_list li {
+  margin-bottom: 2px;
+  padding: 2px;
+  vertical-align:top;
+}
+
+.tab-definition .pick-list li .left-arrow {
+	font-size:1.5em;
+	cursor:pointer;
+}
+
+.tab-definition #block_list {
+  list-style-type: none;
+  margin: 5px 0 0 0;
+  padding: 0;
+}
+
+.tab-definition .block-remove {
+	cursor:pointer;
+	color:red;
+	padding:0 2px 0 2px;
+}
+
+.tab-definition span.move {
+	cursor:move;
+}
+
+
+

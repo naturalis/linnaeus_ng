@@ -1333,6 +1333,7 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `def_page` tinyint(1) NOT NULL DEFAULT '0',
   `external_reference` varchar(4000) DEFAULT NULL,
   `always_hide` tinyint(1) NOT NULL DEFAULT '0',
+  `page_blocks` varchar(255) DEFAULT NULL,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
