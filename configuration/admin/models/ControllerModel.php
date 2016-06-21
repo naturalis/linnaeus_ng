@@ -200,9 +200,9 @@ final class ControllerModel extends AbstractModel
 
 		// avoiding low-hanging orphans (if any...
 		$rankClause = "and _r.id < 10";
-			
+
 		$top=$this->freeQuery( $query . $rankClause );
-		
+
 		// ...apparently not)
 		if ( count($top)==0 )
 		{
@@ -269,7 +269,7 @@ final class ControllerModel extends AbstractModel
         return $this->freeQuery($query);
 
 	}
-	
+
 	public function getSetting($params)
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
@@ -302,7 +302,7 @@ final class ControllerModel extends AbstractModel
 		return $d ? $d[0]['value'] : null;
 	}
 
-	
+
 
 
 	// Used in IndexController but maybe useful elsewhere too? Moved to model as it requires db connection
@@ -353,6 +353,12 @@ final class ControllerModel extends AbstractModel
 
         $d=$this->freeQuery($query);
 		return $d ? $d[0]['value'] : null;
+	}
+
+	public function getCronNextRun ()
+	{
+        $d = $this->freeQuery('select last_cron_reset from last_cron_reset');
+        return isset($d) ? $d[0]['last_cron_reset'] : false;
 	}
 
 }

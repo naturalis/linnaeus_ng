@@ -85,7 +85,7 @@ class Controller extends BaseClass
 		'paginator',
         'paginator_with_links',
 		'git'
-		
+
     );
 
 	protected $moduleSession;
@@ -2853,7 +2853,7 @@ class Controller extends BaseClass
 
 		$this->_adminMessageFadeOutDelay = $d ? $d[0] : 10000;
 	}
-	
+
 	protected function setGitVars()
 	{
 		if (defined("PATH_GIT_EXECUTABLE")) $this->helpers->Git->setGitExe( PATH_GIT_EXECUTABLE );
@@ -2871,6 +2871,7 @@ class Controller extends BaseClass
 
 	protected function setCronNextRun ()
 	{
+/*
         // Check setting
         $d = $this->models->ControllerModel->getSetting(array(
 			'project_id' => $this->getCurrentProjectId(),
@@ -2885,6 +2886,15 @@ class Controller extends BaseClass
         require_once dirname(__FILE__) . '/../helpers/Cron/CronExpression.php';
 	    $cron = Cron\CronExpression::factory($d);
 	    $this->cronNextRun = $cron->getNextRunDate()->format('M d Y H:i:s');
+*/
+	    $d = $this->models->ControllerModel->getCronNextRun();
+
+	    if (!empty($d)) {
+	        // Interval fixed at 48 hours
+	        $d = strtotime($d) + 60 * 60 * 48;
+	        $this->cronNextRun = date('M d Y H:i:s', $d);
+	    }
+
 	}
 
 
