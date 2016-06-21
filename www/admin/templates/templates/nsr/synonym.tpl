@@ -7,8 +7,8 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe wetenschappelijke naam{else}{$name.name}{/if}</h2>
-<h3><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h3>
+<h2><span style="font-size:12px">{t}naamkaart{/t}:</span> {if $newname}new scientific name{else}{$name.name}{/if}</h2>
+<h3><span style="font-size:12px;font-style:normal">{t}concept{/t}:</span> {$concept.taxon}</h3>
 
 <p>
 <form id="data" onsubmit="return false;">
@@ -23,14 +23,14 @@
             </td>
 		</tr>
 		<tr>
-        	<th>soort:</th>
+        	<th>species:</th>
             <td>
             	<input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_specific_epithet" value="{$name.specific_epithet}" label="soort" />
             	<span class="inline_message" id="name_specific_epithet_message"></span>
 			</td>
 		</tr>
 		<tr>
-        	<th>derde naamdeel:<br /><span class="inline_subtext">(ondersoort, forma, varietas, etc.)</span></th>
+        	<th>subspecific epithet:<br /><span class="inline_subtext">(subspecies, forma, varietas, etc.)</span></th>
             <td>
             	<input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" />
             	<span class="inline_message" id="name_infra_specific_epithet_message"></span>
@@ -48,22 +48,22 @@
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
 	<tr>
-		<th title="vul de volledige waarde voor 'auteurschap' in, inclusief komma, jaartal en haakjes; het programma leidt de waarden voor auteur en jaar automatisch af.">
-			auteurschap:
-		</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship"  value="{$name.authorship}" label="auteurschap" /></td>
+		<th title="enter the complete value for 'authorship', including comma, year and brackets; the program automatically deduces the values for author and year.">
+			authorship:
+		</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship"  value="{$name.authorship}" label="authorship" /></td>
 	</tr>
-	<tr><th>auteur(s):</th><td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" disabled="disabled" label="auteur" /></td></tr>
+	<tr><th>author(s):</th><td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" disabled="disabled" label="author" /></td></tr>
 	<tr>
-		<th>jaar:</th>
+		<th>year:</th>
 		<td>
-			<input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" disabled="disabled" label="jaar" />
+			<input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" disabled="disabled" label="year" />
 		</td>
 	</tr>
 
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
-    <tr><th title="wetenschappelijke naam wordt automatische samengesteld.">wetenschappelijke naam:</th><td>
-        <input type="text" id="concept_taxon" value="{$name.name}" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="synoniem" />
+    <tr><th title="scientific name is compiled automatically.">{t}scientific name{/t}:</th><td>
+        <input type="text" id="concept_taxon" value="{$name.name}" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="synonym" />
         <input type="hidden" id="name_name" value="" />
     </td></tr>
 
@@ -73,7 +73,7 @@
     	<th>type:</th>
         <td>
             <select id="name_type_id" mandatory="mandatory" label="type" >
-                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
+                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.a.</option>
             {foreach from=$nametypes item=v key=k}
             {if !$v.noNameParts}
                 <option
@@ -88,11 +88,11 @@
 	</tr>
 
     <tr>
-    	<th>rang:</th>
+    	<th>rank:</th>
         <td>
 			{if $name.type_id!=$validnameid}
                 <select id="name_rank_id">
-                <option value="" {if $name.rank_id==''} selected="selected"{/if}>n.v.t.</option>
+                <option value="" {if $name.rank_id==''} selected="selected"{/if}>n.a.</option>
                 {foreach from=$ranks item=v}
                 <option value="{$v.id}" {if $v.id==$name.rank_id} selected="selected"{/if}>{$v.label}</option>
                 {/foreach}
@@ -106,11 +106,11 @@
 	{if $show_nsr_specific_stuff}
 
 	<tr><th colspan="2">&nbsp;</td></tr>
-	<tr><th>literatuur:</th><td>
+	<tr><th>literature:</th><td>
     	<span id="name_reference">
 		{if $name.reference_id!=''}
 			{$name.reference_name}
-		{else}n.v.t.{/if}
+		{else}n.a.{/if}
         </span>
         <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
         <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
@@ -118,7 +118,7 @@
 
 	<tr><th>expert:</th><td>
 		<select id="name_expert_id">
-			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.v.t.</option>
+			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.a.</option>
 		{foreach from=$actors item=v key=k}
 		{if $v.is_company=='0'}
 			<option value="{$v.id}" {if $v.id==$name.expert_id} selected="selected"{/if}>{$v.label}</option>
@@ -127,9 +127,9 @@
 		</select>
 	</td></tr>
 
-	<tr><th>organisatie:</th><td>
+	<tr><th>organisation:</th><td>
 		<select id="name_organisation_id">
-			<option value="" {if !$name.organisation_id} selected="selected"{/if}>n.v.t.</option>
+			<option value="" {if !$name.organisation_id} selected="selected"{/if}>n.a.</option>
 		{foreach from=$actors item=v key=k}
 		{if $v.is_company=='1'}
 			<option value="{$v.id}" {if $v.id==$name.organisation_id} selected="selected"{/if}>{$v.label}</option>
@@ -142,17 +142,17 @@
 
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>
-		{if $name.reference}<tr><th>literatuur (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>literature (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
 		{if $name.reference}<tr><th>expert (alt.):</th><td><input type="text" id="name_expert" value="{$name.expert}" /></td></tr>{/if}
-		{if $name.reference}<tr><th>organisatie (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>organisation (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
 	{/if}
 
 </table>
 </p>
 
 <p>
-<input type="button" value="opslaan" onclick="savesynonym();" />
-{if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
+<input type="button" value="{t}save{/t}" onclick="savesynonym();" />
+{if !$newname}<input type="button" value="{t}delete{/t}" onclick="deleteform();" />{/if}
 </form>
 </p>
 </div>
@@ -175,7 +175,7 @@ Let op: wijzig om het genus te veranderen de taxonomische ouder van het concept.
     {/if}
 
     <p>
-        <a href="taxon.php?id={$concept.id}">terug</a>
+        <a href="taxon.php?id={$concept.id}">{t}back{/t}</a>
     </p>
 
 </div>
