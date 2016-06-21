@@ -447,7 +447,7 @@ final class MediaModel extends AbstractModel
             	%PRE%" . $table . "
             where
             	$column REGEXP '../../../shared/media/project/" .
-            	   str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/(.*).jpg'";
+            	   str_pad($projectId, 4, "0", STR_PAD_LEFT) . "/(.*).(jpg|mp3|mp4)'";
 
         $d = $this->freeQuery($query);
 
