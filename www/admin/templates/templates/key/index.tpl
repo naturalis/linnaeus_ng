@@ -13,7 +13,7 @@
     </p>
 
     <ul class="admin-list">
-        <li><a href="step_show.php">{t}Edit key (from startpoint){/t}</a></li>
+        <li><a href="step_show.php">{t}Show key (from startpoint){/t}</a></li>
         <li><a href="section.php">{t}Edit key sections{/t}</a></li>
         <li><a href="map.php">{t}Key map{/t}</a></li>
         <li><a href="store.php">{t}Compute taxon division{/t}</a></li>

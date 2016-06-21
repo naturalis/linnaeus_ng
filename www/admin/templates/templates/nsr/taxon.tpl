@@ -23,9 +23,9 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">{t}conceptkaart:{/t}</span> {$concept.taxon}</h2>
-{if $concept.is_deleted}<span style="color:red;font-weight:bold">{t}CONCEPT IS GEMARKEERD ALS VERWIJDERD{/t}</span><br />
-<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">{t}verwijdering ongedaan maken{/t}</a>
+<h2><span style="font-size:12px;font-style:normal">{t}taxon concept:{/t}</span> {$concept.taxon}</h2>
+{if $concept.is_deleted}<span style="color:red;font-weight:bold">{t}CONCEPT IS MARKED AS DELETED{/t}</span><br />
+<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">{t}undo deletion{/t}</a>
 {/if}
 
 <form id="data" onsubmit="return false;">
@@ -39,12 +39,12 @@
             <td><i>{t}concept{/t}</i></td>
         </tr>
         <tr>
-            <th>{t}naam:{/t}</th>
+            <th>{t}name:{/t}</th>
             <td>
                 {$concept.taxon}
             </td>
         </tr>
-        <tr><th>{t}rang:{/t}</th>
+        <tr><th>{t}rank:{/t}</th>
             <td>
                 {foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">{t}edit{/t}</a>
@@ -57,14 +57,14 @@
                 </span> *
             </td>
         </tr>
-        <tr><th>{t}ouder:{/t}</th>
+        <tr><th>{t}parent:{/t}</th>
             <td>
                 <span id="parent_taxon"><a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a></span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
                 <input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}ouder{/t}" droplistminlength="3" />
             </td>
         </tr>
-        
+
         {if $show_nsr_specific_stuff}
 
         <tr><th>{t}nsr id:{/t}</th><td>{if $concept}{$concept.nsr_id}{else}{t}(auto){/t}{/if}</td></tr>
@@ -167,12 +167,12 @@
                 <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
             </td>
         </tr>
-        
+
         {/if}
-        
+
         </table>
     </p>
-    <input type="button" value="opslaan" onclick="saveconcept();" />
+    <input type="button" value="save" onclick="saveconcept();" />
 
     </form>
 
