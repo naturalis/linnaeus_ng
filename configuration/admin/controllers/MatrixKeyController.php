@@ -30,7 +30,7 @@ class MatrixKeyController extends Controller
         'file_upload_helper',
 		'session_module_settings',
     );
-    public $controllerPublicName = 'Matrix key';
+    public $controllerPublicName = 'Multi-entry key';
 
     public $cssToLoad = array(
         'matrix.css',
