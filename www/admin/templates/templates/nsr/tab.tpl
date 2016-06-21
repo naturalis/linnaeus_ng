@@ -28,7 +28,7 @@
 			</td>
 		</tr>
  
-    	<tr><td><input type="button" value="save" onclick="save_page();" /></td></tr>
+    	<!-- tr><td><input type="button" value="save" onclick="save_page();" /></td></tr -->
 
 	   	<tr><td>&nbsp;</td></tr>
 
