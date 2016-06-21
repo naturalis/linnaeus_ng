@@ -106,6 +106,7 @@ class Controller extends BaseClass
     public function __construct ()
     {
         parent::__construct();
+        $this->setServerName();
         $this->setTimeZone();
         $this->startSession();
         $this->loadHelpers();
@@ -1618,6 +1619,7 @@ class Controller extends BaseClass
 		$this->smarty->assign('wikiUrl', $this->getWikiUrl());
 		$this->smarty->assign('adminMessageFadeOutDelay', $this->_adminMessageFadeOutDelay);
 		$this->smarty->assign('GitVars', $this->getGitVars());
+		$this->smarty->assign('server_name', $this->server_name);
 
         $this->smarty->assign('uiLanguages', $this->uiLanguages);
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
@@ -2862,7 +2864,6 @@ class Controller extends BaseClass
 		$this->_gitVars = new stdClass;
 		$this->_gitVars->branch=$this->helpers->Git->getBranch();
 		$this->_gitVars->commit=$this->helpers->Git->getCommit();
-		$this->_gitVars->server_name=$this->helpers->Git->getServerName();		
 	}
 
 	protected function getGitVars()
@@ -2898,6 +2899,10 @@ class Controller extends BaseClass
 
 	}
 
+	protected function setServerName()
+	{
+		$this->server_name=trim(@shell_exec( "hostname" ));
+	}
 
 
 }

@@ -7,6 +7,8 @@
 	<meta name="description" content="{$session.app.project.description}" />
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
+	<meta name="server" content="{$server_name}" />
+
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
 
     <link href="{$baseUrl}app/style/naturalis/images/favicon.ico" rel="shortcut icon" >

@@ -210,6 +210,7 @@ class Controller extends BaseClass
     public function __construct ($p=null)
     {
         parent::__construct();
+        $this->setServerName();
         $this->setControllerParams($p);
         $this->startSession();
         $this->loadHelpers();
@@ -1746,6 +1747,7 @@ class Controller extends BaseClass
         $this->smarty->assign('spid', $this->spid());
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
         $this->smarty->assign('contact', $this->getContactLink());
+		$this->smarty->assign('server_name', $this->server_name);
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -2952,4 +2954,9 @@ class Controller extends BaseClass
 		}
 	}
 
+	protected function setServerName()
+	{
+		$this->server_name=trim(@shell_exec( "hostname" ));
+	}
+		
 }
