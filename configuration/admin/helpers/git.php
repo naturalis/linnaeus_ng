@@ -28,6 +28,7 @@ class Git {
 		$this->setExecPath();
 		$this->setBranch();
 		$this->setCommit();
+		$this->setServerName();
 	}
 
     public function getBranch()
@@ -38,6 +39,11 @@ class Git {
     public function getCommit()
     {
 		return $this->git_commit;
+    }
+	
+    public function getServerName()
+    {
+		return $this->server_name;
     }
 	
 	private function setExecPath()
@@ -79,5 +85,12 @@ class Git {
 			}
 		}
 	}
+
+	private function setServerName()
+	{
+		$p="hostname";
+		$this->server_name=trim(@shell_exec( $p ));
+	}
+
 }
 

@@ -2862,6 +2862,7 @@ class Controller extends BaseClass
 		$this->_gitVars = new stdClass;
 		$this->_gitVars->branch=$this->helpers->Git->getBranch();
 		$this->_gitVars->commit=$this->helpers->Git->getCommit();
+		$this->_gitVars->server_name=$this->helpers->Git->getServerName();		
 	}
 
 	protected function getGitVars()
