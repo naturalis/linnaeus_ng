@@ -25,7 +25,7 @@ class ProjectsController extends Controller
     public $usedHelpers = array(
         'file_upload_helper'
     );
-    public $controllerPublicName = 'Project administration';
+    public $controllerPublicName = 'Project management';
     public $cssToLoad = array(
         'lookup.css'
     );
@@ -92,10 +92,10 @@ class ProjectsController extends Controller
 		$this->wikiPageOverride['basename']='ProjectOverview';
 
 
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->smarty->assign('show_lead_expert_modules', $this->UserRights->hasAppropriateLevel() );
 
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->smarty->assign('show_sys_management_modules', $this->UserRights->hasAppropriateLevel() );
 
         $this->smarty->assign('modules', $this->models->ProjectsModel->getProjectModules( array('project_id'=>$this->getCurrentProjectId() ) ) );
@@ -140,7 +140,7 @@ class ProjectsController extends Controller
 
 
 		$d = $this->show_hidden_modules_in_select_list ? '*' : ['show_in_menu'=>1];
-		
+
         $modules = $this->models->Modules->_get(array(
             'id' => $d,
             'order' => 'show_order'
@@ -183,7 +183,7 @@ class ProjectsController extends Controller
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Project data'));
+        $this->setPageName($this->translate('Project information'));
 
         if ( $this->rHasVal('action','save') && !$this->isFormResubmit() )
 		{
@@ -256,7 +256,7 @@ class ProjectsController extends Controller
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 		$this->UserRights->setAllowNoProjectId( true );
         $this->checkAuthorisation();
-		
+
         $this->setPageName($this->translate('Create new project'));
 
         $this->setBreadcrumbRootName($this->translate('System administration'));
@@ -371,7 +371,7 @@ class ProjectsController extends Controller
 		$this->UserRights->setAllowNoProjectId( true );
         $this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Delete orphaned project'));
+        $this->setPageName($this->translate('Delete orphaned data'));
 
         $this->setBreadcrumbRootName($this->translate('System administration'));
 

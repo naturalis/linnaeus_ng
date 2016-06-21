@@ -51,7 +51,7 @@ class KeyController extends Controller
 		'literature2.css'
     );
 
-    public $controllerPublicName = 'Dichotomous key';
+    public $controllerPublicName = 'Single-access key';
 
 	//private $moduleSession;
 	private $endPointsExist;
@@ -545,7 +545,7 @@ class KeyController extends Controller
         $this->checkAuthorisation();
 
 		$this->setPageName( $this->translate('Linked taxa') );
-		
+
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->saveLinkedTaxa( $this->rGetall() );
@@ -587,7 +587,7 @@ class KeyController extends Controller
 		$this->checkAuthorisation();
 
         if ($this->rHasVal('action', 'renumber') && !$this->isFormResubmit())
-		{			
+		{
 			$this->renumberKeySteps([$this->getKeyTree()]);
 			$this->addMessage($this->translate('Renumbered steps.'));
         }
@@ -604,9 +604,9 @@ class KeyController extends Controller
 		if (!$this->rGetId()) $this->redirect('step_show.php');
 
         if ($this->rHasVal('step') && $this->rHasVal('action', 'insert') && !$this->isFormResubmit())
-		{			
+		{
             $res = $this->insertKeyStepBeforeKeyStep($this->rGetVal('source'), $this->rGetVal('step'));
-			
+
 			if ( $res['newStepId'] && $this->rHasVal('step_title') )
 			{
 				$this->saveKeystepContent([
@@ -615,7 +615,7 @@ class KeyController extends Controller
 					'title'=>$this->rGetVal('step_title')
 				]);
 			}
-					
+
             $step = $this->getKeystep($res['newStepId']);
 
 			// remove last keyPath entry
@@ -1041,7 +1041,7 @@ class KeyController extends Controller
 				'project_id' => $this->getCurrentProjectId(),
 				'order' => isset($p['order']) ? $p['order'] : null,
 			);
-		
+
 		$this->UserRights->setUserItems();
 		$this->userItems=$this->UserRights->getUserItems();
 
@@ -1051,12 +1051,12 @@ class KeyController extends Controller
 		}
 
 		$taxa=$this->models->KeyModel->getTaxaInKey($d);
-		
+
 		foreach((array)$taxa as $key=>$val)
 		{
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
-		
+
 		return $taxa;
     }
 
@@ -1397,8 +1397,8 @@ class KeyController extends Controller
     {
 		$keystep_id = isset($data['id']) ? $data['id'] : null;
 		$language_id = isset($data['language']) ? $data['language'] : null;
-		
-		if ( isset($data['content']) ) 
+
+		if ( isset($data['content']) )
 		{
 			$title = isset($data['content'][0]) ? $data['content'][0] : null;
 			$content = isset($data['content'][1]) ? $data['content'][1] : null;
@@ -1408,8 +1408,8 @@ class KeyController extends Controller
 			$title = isset($data['title']) ? $data['title'] : null;
 			$content = isset($data['content']) ? $data['content'] : null;
 		}
-		
-		
+
+
         if ( is_null($keystep_id) || is_null($language_id) )
 		{
             return;
@@ -2134,7 +2134,7 @@ class KeyController extends Controller
 
         return null;
     }
-	
+
 	private function getLinkedTaxa( $id )
 	{
 		return
@@ -2142,14 +2142,14 @@ class KeyController extends Controller
 				array(
 					'project_id' => $this->getCurrentProjectId(),
 					'keystep_id' => $id,
-				));		
+				));
 	}
-	
+
 	private function saveLinkedTaxa( $data )
 	{
 		if ( !isset($data['id']) ) return;
 		if ( !isset($data['new_taxa']) ) return;
-	
+
 		foreach((array)$data['new_taxa'] as $val)
 		{
 			$this->models->KeystepsTaxa->save([
@@ -2159,18 +2159,18 @@ class KeyController extends Controller
 			]);
 		}
 	}
-	
+
 	private function deleteLinkedTaxa( $data )
 	{
 		if ( !isset($data['link_id']) ) return;
-	
+
 		$this->models->KeystepsTaxa->delete([
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $data['link_id']
 		]);
 	}
-	
-	
+
+
 	private function updateChoice( $data )
 	{
 		$id=isset($data['id']) ? $data['id'] : null;
@@ -2193,19 +2193,19 @@ class KeyController extends Controller
 			array(
 				'res_keystep_id' => $next_step_id === '0' ? 'null' : $next_step_id,
 				'res_taxon_id' => $next_step_id !== '0' ? 'null' : ( $res_taxon_id === '0' ? 'null' : $res_taxon_id )
-			), 
+			),
 			array(
 				'id' => $id,
 				'project_id' => $this->getCurrentProjectId()
 			)
 		);
-		
+
 		$changes+=$this->models->ChoicesKeysteps->getAffectedRows();
-		
+
 		foreach((array)$choice_txt as $language_id=>$txt)
 		{
 			$txt=trim($txt);
-			
+
 			if (strlen(preg_replace(array('/^\<[^\*?]\/\>/','/\<[^\*?]\/\>$/'),'',$txt))==0)
 			{
 				$this->models->ChoicesContentKeysteps->delete(
@@ -2235,7 +2235,7 @@ class KeyController extends Controller
 					'language_id' => $language_id,
 					'choice_txt' => $txt
 				);
-	
+
 				$this->models->ChoicesContentKeysteps->save( $d );
 
 			}
