@@ -305,7 +305,7 @@ class NsrController extends Controller
 		return str_replace('tn.nlsr.concept/','',$data[0]['nsr_id']);
 	}
 
-	public function getConcept($id,$noinfixes=false)
+	public function getConcept($id)
 	{
 		$c=$this->getTaxonById($id);
 
@@ -323,11 +323,16 @@ class NsrController extends Controller
 
 			$c['is_deleted']=($d[0]['is_deleted']==1);
 
-			if ( isset($c['label']) && !$noinfixes )
+			if ( isset($c['label']) )
+			{
+				$c['label_no_infix']=$c['label'];
 				$c['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'] ) );
-			if ( isset($c['parent']['label']) && !$noinfixes )
+			}
+			if ( isset($c['parent']['label']) )
+			{
+				$c['parent']['label_no_infix']=$c['parent']['label'];
 				$c['parent']['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
-	
+			}
 		}
 		
 		return $c;
