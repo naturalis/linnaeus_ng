@@ -25,6 +25,8 @@
 		<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/ui.css" -->
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui.min.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/prettyPhoto/prettyPhoto.css" />
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/inline_templates.css">
+        
 
 {if $cssToLoad}
 		<style type="text/css" media="all">
@@ -41,6 +43,7 @@
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/inline_templates.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/prettyPhoto/jquery.prettyPhoto.custom.js"></script>
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}

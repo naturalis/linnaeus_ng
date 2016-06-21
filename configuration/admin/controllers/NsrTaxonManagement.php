@@ -54,6 +54,10 @@ class NsrTaxonManagement extends NsrController
 		'content_taxa'
     );
 
+    public $cssToLoad = array(
+        'nsr_taxon_management.css',
+    );
+
     public $jsToLoad = array(
         'all' => array(
             'taxon.js'
@@ -169,16 +173,18 @@ class NsrTaxonManagement extends NsrController
 
 			$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated tab definition']);
 			$this->saveExternalReference();
+			$this->savePageBlocks();
 			$this->addMessage( $this->translate( 'Saved.' ) );
         }
 
 		$traits=$this->models->{$this->modelNameOverride}->getSubstitutableTraits(array('project_id'=>$this->getCurrentProjectId()));
-
+	
         $this->smarty->assign( 'page', $this->getCategory( $this->rGetId() ) );
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', $this->checkTypes );
         $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
         $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
+        $this->smarty->assign( 'tabs', $this->getCategories() );
 
         $this->printPage();
     }
@@ -462,6 +468,12 @@ class NsrTaxonManagement extends NsrController
 			$page['external_reference_decoded']=json_decode($page['external_reference']);
 		}
 		
+		if ( !empty($page['page_blocks']) )
+		{
+			// fetch the names + "Regular page content"
+			$page['page_blocks_decoded']=json_decode($page['page_blocks']);
+		}
+		
 		return $page;
 	}
 
@@ -527,6 +539,30 @@ class NsrTaxonManagement extends NsrController
 		$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated tab definition']);
 		
 	}
+
+	private function savePageBlocks()
+	{
+		return;
+		//alter table pages_taxa add column `page_blocks` varchar(255) DEFAULT NULL after always_hide;
+		$data=$this->rGetAll()['page_blocks'];
+		if ( empty($data) ) $data[0]="data";
+
+		$d=$this->models->PagesTaxa->update(
+			array(
+				'page_blocks'=> json_encode($data)
+			),
+			array(
+				'id' => $this->rGetId(),
+				'project_id' => $this->getCurrentProjectId(),
+			)
+		);
+
+		$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated page blocks']);
+	}
+
+
+
+
 
     private function saveRankLabel( $p )
     {
