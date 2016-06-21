@@ -53,7 +53,7 @@ class UsersController extends Controller
         )
     );
 
-    public $controllerPublicName='User administration';
+    public $controllerPublicName='User management';
 
 	private $checksUsername=array('min' => 4,'max' => 32); // regExp =>
 	private $checksPassword=array('min' => 8,'max' => 32); // regExp =>
@@ -140,7 +140,7 @@ class UsersController extends Controller
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
         $this->checkAuthorisation();
 
-        $this->setPageName($this->translate('Create new collaborator'));
+        $this->setPageName($this->translate('Create new user'));
 		$this->setUserId( null );
 		$this->setUserBefore();
 
