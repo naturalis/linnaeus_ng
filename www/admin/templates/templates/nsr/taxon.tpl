@@ -61,7 +61,7 @@
             <td>
                 <span id="parent_taxon"><a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a></span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
-                <input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}ouder{/t}" droplistminlength="3" />
+                <input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}parent{/t}" droplistminlength="3" />
             </td>
         </tr>
 
@@ -73,18 +73,18 @@
 
         <tr>
             <td></td>
-            <td><i>{t}voorkomen{/t}</i></td>
+            <td><i>{t}presence{/t}</i></td>
         </tr>
         <tr>
             <th>{t}status:{/t}</th>
             <td>
                 {if $presence.presence_id}
                     <span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
-                {else}n.v.t.{/if}
+                {else}n.a.{/if}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">{t}edit{/t}</a>
                 <span class="editspan">
                     <select id="presence_presence_id" onchange="storedata(this);" >
-                    <option value="-1" {if $presence.presence_id==''} selected="selected"{/if}>{t}n.v.t.{/t}</option>
+                    <option value="-1" {if $presence.presence_id==''} selected="selected"{/if}>{t}n.a.{/t}</option>
                     {assign var=first value=true}
                     {foreach from=$statuses item=v}
                         {if $v.index_label==99 && $first==true}
@@ -102,11 +102,11 @@
             <td>
                 {if $presence.habitat_id!=''}
                     {$presence.habitat_label}
-                {else}{t}n.v.t.{/t}{/if}
+                {else}{t}n.a.{/t}{/if}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_habitat_id">{t}edit{/t}</a>
                 <span class="editspan">
                     <select id="presence_habitat_id" onchange="storedata(this);" >
-                        <option value="-1" {if $presence.habitat_id==''} selected="selected"{/if}>{t}n.v.t.{/t}</option>
+                        <option value="-1" {if $presence.habitat_id==''} selected="selected"{/if}>{t}n.a.{/t}</option>
                     {foreach from=$habitats item=v}
                         <option value="{$v.id}" {if $v.id==$presence.habitat_id} selected="selected"{/if}>{$v.label}</option>
                     {/foreach}
@@ -121,12 +121,12 @@
             <td>
                 {if $presence.expert_id!=''}
                     {$presence.expert_name}
-                {else}{t}n.v.t.{/t}{/if}
+                {else}{t}n.a.{/t}{/if}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_expert_id">{t}edit{/t}</a>
                 <span class="editspan" id="expert">
 
                 <select id="presence_expert_id">
-                    <option value="-1" selected="selected">{t}n.v.t.{/t}</option>
+                    <option value="-1" selected="selected">{t}n.a.{/t}</option>
                 {foreach from=$actors item=v key=k}
                 {if $v.is_company=='0'}
                     <option value="{$v.id}" {if $v.id==$presence.expert_id} selected="selected"{/if}>{$v.label}</option>
@@ -138,16 +138,16 @@
             </td>
         </tr>
 
-        <tr><th>{t}organisatie:{/t}</th>
+        <tr><th>{t}organisation:{/t}</th>
             <td>
                 {if $presence.organisation_id!=''}
                     {$presence.organisation_name}
-                {else}{t}n.v.t.{/t}{/if}
+                {else}{t}n.a.{/t}{/if}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_organisation_id">{t}edit{/t}</a>
                 <span class="editspan" id="organisation">
 
                 <select id="presence_organisation_id">
-                    <option value="-1" selected="selected">{t}n.v.t.{/t}</option>
+                    <option value="-1" selected="selected">{t}n.a.{/t}</option>
                 {foreach from=$actors item=v key=k}
                 {if $v.is_company=='1'}
                     <option value="{$v.id}" {if $v.id==$presence.organisation_id} selected="selected"{/if}>{$v.label}</option>
@@ -160,7 +160,7 @@
             </td>
         </tr>
 
-        <tr><th>{t}publicatie:{/t}</th>
+        <tr><th>{t}publication:{/t}</th>
             <td>
                 <span id="presence_reference">{if $presence.reference_id!=''}{$presence.reference_label}{/if}</span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">{t}edit{/t}</a> *
@@ -179,7 +179,7 @@
     {if $concept}
     <p>
 
-        <h4>{t}namen{/t}</h4>
+        <h4>{t}names{/t}</h4>
 
         <ul>
         {foreach from=$names.list item=v}
@@ -192,43 +192,43 @@
             </li>
         {/foreach}
         </ul>
-        <a href="name.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}niet-wetenschappelijke naam toevoegen{/t}</a><br />
-        <a href="synonym.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0" title="{t}toevoegen van geldige naam, synoniem, etc.{/t}">{t}wetenschappelijke naam toevoegen{/t}</a>
+        <a href="name.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}add common name{/t}</a><br />
+        <a href="synonym.php?taxon={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}add scientific name{/t}</a>
 
     </p>
     {/if}
 
     <p>
         {if $concept.base_rank==$smarty.const.GENUS_RANK_ID || $concept.base_rank==$smarty.const.SUBGENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}soort toevoegen aan "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add species to "%s"{/t}</a><br />
         {elseif $concept.base_rank >= $smarty.const.SUBGENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}ondersoort toevoegen aan "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add subspecies to "%s"{/t}</a><br />
         {elseif $concept.base_rank < $smarty.const.GENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}onderliggend taxon toevoegen aan "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add child taxon to "%s"{/t}</a><br />
         {/if}
     </p>
     <p>
-        <a href="paspoort.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}paspoort{/t}</a><br />
+        <a href="paspoort.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}passport{/t}</a><br />
         <a href="media.php?id={$concept.id}&noautoexpand=1" class="edit" style="margin:0">{t}media{/t}</a><br />
-        <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literatuur{/t}</a><br />
+        <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literature{/t}</a><br />
         {if $show_nsr_specific_stuff}
-        <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}afbeeldingen (NSR-only){/t}</a><br />
+        <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}images (NSR-only){/t}</a><br />
 		{/if}
         {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {/if}{/foreach}
 
-        <a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">{t}taxon bekijken in front-end (nieuw venster){/t}</a><br />
+        <a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">{t}view taxon in front-end (new window){/t}</a><br />
         {if !$concept.is_deleted}
         <br />
-        <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">{t}taxon markeren als verwijderd{/t}</a>
+        <a href="#" onclick="deletedataform(true);" class="edit" style="margin:0">{t}mark taxon as deleted{/t}</a>
         {/if}
         <br />
-        <a href="taxon_edit_concept_direct.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}naam taxon concept direct aanpassen{/t}</a>
+        <a href="taxon_edit_concept_direct.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}rename taxon concept directly{/t}</a>
 
         {assign var=k value=0}
         {foreach $traitgroups v}
-        {if $k==0}<br /><br /><span class="small">{t}kenmerken toevoegen:{/t}</span><br />{/if}
+        {if $k==0}<br /><br /><span class="small">{t}add traits:{/t}</span><br />{/if}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {assign var=k value=$k+1}
 		{/foreach}
@@ -236,7 +236,7 @@
     </p>
 
 {if $concept.is_deleted}
-    <a href="taxon_deleted.php" style="margin:0">{t}overzicht verwijderde taxa{/t}</a><br />
+    <a href="taxon_deleted.php" style="margin:0">{t}show deleted taxa{/t}</a><br />
 {/if}
 
     <!-- p>
