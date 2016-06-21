@@ -2879,22 +2879,6 @@ class Controller extends BaseClass
 
 	protected function setCronNextRun ()
 	{
-/*
-        // Check setting
-        $d = $this->models->ControllerModel->getSetting(array(
-			'project_id' => $this->getCurrentProjectId(),
-			'module_id' => GENERAL_SETTINGS_ID,
-			'setting' => 'cron'
-		));
-
-        // Not set; store in session as -1
-        if (!$d) return;
-
-        // Load cron class (once) to extract next run time
-        require_once dirname(__FILE__) . '/../helpers/Cron/CronExpression.php';
-	    $cron = Cron\CronExpression::factory($d);
-	    $this->cronNextRun = $cron->getNextRunDate()->format('M d Y H:i:s');
-*/
 	    $d = $this->models->ControllerModel->getCronNextRun();
 
 	    if (!empty($d)) {
@@ -2902,7 +2886,6 @@ class Controller extends BaseClass
 	        $d = strtotime($d) + 60 * 60 * 48;
 	        $this->cronNextRun = date('M d Y H:i:s', $d);
 	    }
-
 	}
 
 	protected function setServerName()
