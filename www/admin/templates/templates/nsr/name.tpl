@@ -18,18 +18,18 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px">naamkaart:</span> {if $newname}nieuwe naam{else}{$name.name}{/if}</h2>
-<h3><span style="font-size:12px;font-style:normal">concept:</span> {$concept.taxon}</h3>
+<h2><span style="font-size:12px">{t}naamkaart{/t}:</span> {if $newname}new name{else}{$name.name}{/if}</h2>
+<h3><span style="font-size:12px;font-style:normal">{t}concept{/t}:</span> {$concept.taxon}</h3>
 
 <p>
 <form id="data" onsubmit="return false;">
 
 <table>
-	<tr><th>naam:</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
-	<tr><th>taal:</th><td>
+	<tr><th>name:</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
+	<tr><th>language:</th><td>
 		<select id="name_language_id" mandatory="mandatory" label="taal" onchange="checkprefnameavail()">
 			{assign var=first value=true}
-			<option value="" {if !$name.language_id} selected="selected"{/if}>n.v.t.</option>
+			<option value="" {if !$name.language_id} selected="selected"{/if}>n.a.</option>
 		{foreach from=$languages item=v key=k}
 			{if $v.sort_criterium==0 && $first==true}
 			<option value="" disabled="disabled">&nbsp;</option>
@@ -44,7 +44,7 @@
 	</td></tr>
 	<tr><th>type:</th><td>
 		<select id="name_type_id" mandatory="mandatory" label="type">
-			<option value="" id="nametype-none" {if !$name.type_id && $k==0} selected="selected"{/if}>n.v.t.</option>
+			<option value="" id="nametype-none" {if !$name.type_id && $k==0} selected="selected"{/if}>n.a.</option>
 		{foreach from=$nametypes item=v key=k}
 			{if $v.noNameParts}
 			<option  value="{$v.id}" id="nametype-{$v.id}" {if $v.id==$name.type_id} selected="selected"{/if}>{$v.nametype_label}</option>
@@ -55,7 +55,7 @@
 
 	{* if $name.type_id==$preferrednameid || $name.type_id==$alternativenameid *}
 
-	<tr><th>opmerking:</th><td>
+	<tr><th>remark:</th><td>
 	{foreach from=$projectlanguages item=v}
 	<span class="language-labels">{if $projectlanguages|@count>1}{$v.language}: {/if}
     <input type="text" value="{$name.addition[{$v.language_id}].addition}" id="aanvulling[{$v.language_id}]" name="aanvulling[{$v.language_id}]" /></span>
@@ -74,16 +74,16 @@
 	<tr>
     	<th colspan="2">&nbsp;</td>
 	</tr>
-    
+
     {if $show_nsr_specific_stuff}
 
 	<tr>
-    	<th>literatuur:</th>
+    	<th>literature:</th>
         <td>
     	<span id="name_reference">
 		{if $name.reference_id!=''}
 			{$name.reference_name}
-		{else}n.v.t.{/if}
+		{else}n.a.{/if}
         </span>
         <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
         <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
@@ -92,7 +92,7 @@
 
 	<tr><th>expert:</th><td>
 		<select id="name_expert_id">
-			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.v.t.</option>
+			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.a.</option>
 		{foreach from=$actors item=v key=k}
 		{if $v.is_company=='0'}
 			<option value="{$v.id}" {if $v.id==$name.expert_id} selected="selected"{/if}>{$v.label}</option>
@@ -101,9 +101,9 @@
 		</select>
 	</td></tr>
 
-	<tr><th>organisatie:</th><td>
+	<tr><th>organisation:</th><td>
 		<select id="name_organisation_id">
-			<option value="" {if !$name.organisation_id} selected="selected"{/if}>n.v.t.</option>
+			<option value="" {if !$name.organisation_id} selected="selected"{/if}>n.a.</option>
 		{foreach from=$actors item=v key=k}
 		{if $v.is_company=='1'}
 			<option value="{$v.id}" {if $v.id==$name.organisation_id} selected="selected"{/if}>{$v.label}</option>
@@ -111,24 +111,24 @@
 		{/foreach}
 		</select>
 	</td></tr>
-    
+
     {/if}
 
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>
-		{if $name.reference}<tr><th>literatuur (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>literature (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
 		{if $name.reference}<tr><th>expert (alt.):</th><td><input type="text" id="name_expert" value="{$name.expert}" /></td></tr>{/if}
-		{if $name.reference}<tr><th>organisatie (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>organisation (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
 	{/if}
 </table>
 </p>
 
-<input type="button" value="opslaan" onclick="savename();" />
+<input type="button" value="{t}save{/t}" onclick="savename();" />
 {if !$newname}<input type="button" value="verwijderen" onclick="deleteform();" />{/if}
 </form>
 
 <p>
-	<a href="taxon.php?id={$concept.id}">terug</a>
+	<a href="taxon.php?id={$concept.id}">{t}back{/t}</a>
 </p>
 
 </div>
