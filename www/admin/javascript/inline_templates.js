@@ -21,6 +21,14 @@
 	rather than the regular
 		.replace('%TAG%', 'value') 
 	when appropriate.
+	
+	you can enclose the actual template with <!-- and -->; these
+	wil be removed automatically.
+
+	it seems that some broswers (FF) remove at least some tags
+	(table, tr, td) of incomplete html-structires when reading 
+	the template. to avoid. use fake html tags with square brackets
+	and give the inline-templates div the attribute 'fake-html="1"'.
 
 */
 
@@ -31,7 +39,22 @@ function acquireInlineTemplates()
 {
 	$( '.inline-templates' ).each(function()
 	{
-		inline_templates.push({id:$(this).attr('id'),tpl:$(this).html().trim(),use:0});
+		var content=$(this).html().trim();
+		
+		var cStart='<!--';
+		var cEnd='-->';
+
+		if (content.indexOf(cStart)===0 && content.substring(content.length-cEnd.length)==cEnd)
+		{
+			content=content.substring(cStart.length,content.length-cEnd.length);
+		}
+		
+		if ($(this).attr('fake-html')==true)
+		{
+			content=renderFakeHtml( $(this).html() );
+		}
+		
+		inline_templates.push({id:$(this).attr('id'),tpl:content,use:0});
 	});
 }
 
@@ -49,4 +72,9 @@ function fetchTemplate( name )
 	});
 
 	return template;
+}
+
+function renderFakeHtml( content )
+{
+	return content.replace(/\[(td|tr|table|ul|li)\]/ig,"<"+"$1"+">").replace(/\[\/(td|tr|table|ul|li)\]/ig,"</"+"$1"+">");
 }

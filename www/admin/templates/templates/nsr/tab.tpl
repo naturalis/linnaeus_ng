@@ -1,55 +1,13 @@
 {include file="../shared/admin-header.tpl"}
 
-<style>
-h2 {
-	margin-bottom:-10px;
-}
-table {
-	border-collapse:collapse;
-}
-
-table tr td {
-	vertical-align:top;
-	padding:2px;
-	width:auto;
-}
-
-table tr td.sublabel {
-	font-style:italic;
-}
-
-table.subsublabel tr td:first-child {
-	width:125px;
-}
-
-textarea {
-	width:600px;
-	height:75px;
-	font-size:0.9em;
-	font-family:consolas;
-}
-.explanation {
-	font-size:0.9em;
-	color:#666;
-	margin:1px 0 2px 0;
-	text-align:justify;
-}
-
-.explanation ul {
-	padding-left:10px;
-	margin:0 0 0 0;
-}
-
-</style>
-
-<div id="page-main">
+<div id="page-main" class="tab-definition">
 
 	<h2>{$page.page}</h2>
 	<h3>{t}special attributes{/t}</h3>
 
 	<!-- (id {$page.id}) -->
    
-	<form method="post">
+	<form method="post" id="theForm">
     <input type="hidden" name="id" value="{$page.id}" />
     <input type="hidden" name="action" value="save" />
     <input type="hidden" name="rnd" value="{$rnd}" />
@@ -58,7 +16,7 @@ textarea {
     	<tr>
             <td><u>display</u></td>
 		</tr>
-    	<tr class="tr-highlight">
+    	<tr>
             <td>
 				<label><input type="checkbox" name="always_hide"{if $page.always_hide==1} checked="checked"{/if} /> {t}always hide{/t}</label>
                 <div class="explanation">
@@ -69,8 +27,49 @@ textarea {
                 </div>
 			</td>
 		</tr>
+ 
+    	<tr><td><input type="button" value="save" onclick="save_page();" /></td></tr>
 
-    	<tr><td>&nbsp;</td></tr>
+	   	<tr><td>&nbsp;</td></tr>
+
+    	<!-- tr>
+            <td><u>content</u></td>
+		</tr>
+    	<tr>
+            <td>
+            
+            	<table>
+                    <tr>
+                    	<td>your page</td>
+                        <td style="padding-left:10px;">available blocks</td></tr>
+                    <tr>
+                        <td style="border:1px solid #ddd;min-width:200px;padding:0 10px 0 10px;">
+                            <ul id="block_list">
+                            </ul>
+                        </td>                    
+                        <td style="padding-left:10px;">
+                            <ul class="pick-list">
+                            {foreach $tabs v k}
+                            {if $v.type=='auto' || ($v.external_reference_decoded && $v.external_reference_decoded->link_embed|@substr:0:8=='template')}
+                            <li><span class="left-arrow" title="{t}add{/t}" onclick="addBlock( { id: {$v.id}, label: '{$v.page}' } );">&larr;</span>
+                            {if $v.type=='auto'}<span class="auto-tab">{$v.page}</span>{else}{$v.page}{/if}
+                            </li>
+                            {/if}
+                            {/foreach}
+                            </ul>
+                        </td>                    
+                    </tr>
+				<table>
+                <div class="explanation">
+					Only automatic tabs and tabs with an external reference that have stand-alone template.
+                </div>
+
+			</td>
+		</tr>
+
+    	<tr><td><input type="button" value="save" onclick="save_page();" /></td></tr>
+
+    	<tr><td>&nbsp;</td></tr -->
         
     	<tr>
             <td>
@@ -221,7 +220,8 @@ textarea {
 
 	</table>
     
-    <input type="submit" value="save" />
+    <input type="button" value="save" onclick="save_page();" />
+
     </form>
 </div>
 
@@ -249,7 +249,48 @@ textarea {
 </div>
 
 
+
+<div class="inline-templates" id="list_item">
+<!--
+	<li class="page-blocks sortable" data-key="%KEY%" data-id="%ID%"><span class="move">&blk14;</span> %LABEL%%DEL-ICON%</li>
+-->
+</div>
+<div class="inline-templates" id="del_icon">
+<!--
+	<span class="block-remove" onclick="removeBlock(%KEY%);">x</span>
+-->
+</div>
+
+
 <script type="text/javascript">
+
+var block_counter=0;
+
+function removeBlock( i )
+{
+	$( 'li[data-key='+i+']').remove();
+}
+
+function addBlock( block )
+{
+	var tpl=fetchTemplate( 'list_item' );
+	var tpl_del=fetchTemplate( 'del_icon' );
+	var buffer=Array();
+
+	$( '#block_list' ).append(
+		tpl
+			.replace(/%LABEL%/g,block.label)
+			.replace('%ID%',block.id)
+			.replace('%KEY%',block_counter)
+			.replace('%DEL-ICON%',
+				block.can_delete!==false ?
+					tpl_del.replace('%KEY%',block_counter) : "" )
+	);
+
+	block_counter++;
+}
+
+
 
 var subst=Array();
 {foreach $page.external_reference_decoded->substitute v k}
@@ -316,8 +357,39 @@ function add_param()
 }
 
 
+function save_page()
+{
+	var form=$('#theForm');
+
+	$( '.page-blocks' ).each(function()
+	{
+		$('<input type="hidden" name="page_blocks[]">').val($(this).attr('data-id')).appendTo(form);
+	});
+
+	form.submit();
+}
+
 $(document).ready(function()
 {
+	acquireInlineTemplates();
+	
+	{if $page.page_blocks_decoded|@count>0}
+	{foreach $page.page_blocks_decoded v k}
+	addBlock( { id:'{$v}', label: '{$v}', can_delete:{if $v!="data"}true{else}false{/if}} );
+	{/foreach}
+	{else}
+	addBlock( { id:'data', label: "Regular page content", can_delete:false } );
+	{/if}
+	
+	$(".sortable").sortable({
+		opacity: 0.6, 
+		cursor: 'move',
+		items: "li:not(.ui-state-disabled)",
+		connectWith: ".connectedSortable"
+	});
+
+	$( "#block_list" ).sortable();
+	
 	print_susbt();
 	print_param();
 });
