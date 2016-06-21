@@ -7,10 +7,6 @@
 <fieldset>
 <legend>{t}Editing step{/t} {$step.number}, {t}choice{/t} {$choice.marker}</legend>
 
-<p>
-{t}Enter the title, text, an optional image and the target of this choice. Title and text are saved automatically after you have entered the text in the appropriate input.{/t}<br />
-</p>
-
 <form method="post" action="" id="theForm" enctype="multipart/form-data">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$choice.id}" />
