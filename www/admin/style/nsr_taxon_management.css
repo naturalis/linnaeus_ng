@@ -70,7 +70,7 @@
 
 .tab-definition select {
 	font-size:0.9em;
-	width:50px;
+	width:250px;
 }
 
 .tab-definition h2 {
@@ -150,6 +150,5 @@
 .tab-definition span.move {
 	cursor:move;
 }
-
 
 
