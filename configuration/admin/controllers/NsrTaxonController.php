@@ -429,7 +429,6 @@ class NsrTaxonController extends NsrController
 		$name=$this->getName(array('id'=>$this->getNameId()));
 
 		$this->setConceptId( $name['taxon_id'] );
-		$concept=$this->getConcept( $this->getConceptId() );
 
 		$this->UserRights->setItemId( $this->getConceptId() );
 		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
@@ -447,6 +446,7 @@ class NsrTaxonController extends NsrController
 			$this->resetTree();
 		}
 
+		$concept=$this->getConcept( $this->getConceptId(), true );
 		$this->smarty->assign('concept',$concept);
 		$this->smarty->assign('name',$this->getName(array('id'=>$this->getNameId())));
 		$this->printPage();
