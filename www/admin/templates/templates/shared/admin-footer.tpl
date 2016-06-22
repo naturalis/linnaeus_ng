@@ -3,7 +3,7 @@
 
 {if $GitVars->commit->hash}
 <div class="git-info">
-commit <span title="{$GitVars->commit->hash}">{$GitVars->commit->hash_short}</span> ({$GitVars->commit->date}) ({$GitVars->branch} branch @ {$server_name})
+commit <span title="{$GitVars->commit->hash}">{$GitVars->commit->hash_short}</span>{if $GitVars->commit->hash!=$GitVars->commit->origin_commit_hash}&deg;{/if} ({$GitVars->commit->date}) ({$GitVars->branch} branch @ {$server_name})
 </div>
 {/if}
 
