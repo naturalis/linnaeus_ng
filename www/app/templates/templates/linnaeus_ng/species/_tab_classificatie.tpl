@@ -3,7 +3,7 @@
 <p>
 <b>{t}Classification{/t}</b><br />
 {foreach $content.classification v k classification}
-    <a href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$v.id}">{$v.name}</a>{if $v.rank_label} [{$v.rank_label}]{/if}
+    <a href="../{if $v.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$v.id}">{if $v.name}{$v.name}{else}{$v.taxon}{/if}</a>{if $v.rank_label} [{$v.rank_label}]{/if}
     {* if $smarty.foreach.classification.last || $v.is_empty==1}
         {$v.label}
     {else}
