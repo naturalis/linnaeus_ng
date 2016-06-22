@@ -322,7 +322,7 @@ class ImportNBCController extends ImportController
 				if ($this->rHasVal('action','replace_data') || $this->rHasVal('action','replace_species_data')) {
 
 					$pDel = new ProjectDeleteController;
-					$pDel->deleteMatrices($pId,true);
+					$pDel->deleteMatrices( [ 'project_id'=>$pId,'keep_files'=>true ] );
 
 					if ($this->rHasVal('action','replace_data')) {
 
@@ -347,7 +347,7 @@ class ImportNBCController extends ImportController
 
 						$d=0;
 
-						$pDel->deleteMatrices($pId,true);
+						$pDel->deleteMatrices( [ 'project_id'=>$pId,'keep_files'=>true ] );
 
 						foreach((array)$taxa as $key => $val) {
 							$this->deleteTaxon($val['id'],$pId,false);

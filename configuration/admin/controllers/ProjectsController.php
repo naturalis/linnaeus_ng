@@ -532,7 +532,7 @@ class ProjectsController extends Controller
 			        $pDel->deleteDichotomousKey($this->getCurrentProjectId());
 				} else
 				if ($moduleId==MODCODE_MATRIXKEY) {
-					$pDel->deleteMatrices($this->getCurrentProjectId());
+					$pDel->deleteMatrices( [ 'project_id'=>$this->getCurrentProjectId() ] );
 					$pDel->deleteNBCKeydata($this->getCurrentProjectId());
 				} else
 				if ($moduleId==MODCODE_DISTRIBUTION) {
