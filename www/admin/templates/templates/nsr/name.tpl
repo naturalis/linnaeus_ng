@@ -18,7 +18,7 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px">{t}naamkaart{/t}:</span> {if $newname}new name{else}{$name.name}{/if}</h2>
+<h2><span style="font-size:12px">{t}name card{/t}:</span> {if $newname}new name{else}{$name.name}{/if}</h2>
 <h3><span style="font-size:12px;font-style:normal">{t}concept{/t}:</span> {$concept.taxon}</h3>
 
 <p>
