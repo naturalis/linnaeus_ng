@@ -1238,11 +1238,9 @@ class MediaController extends Controller
             $d = explode(' ', $project);
             $project = $d[0] . ' ' . end($d);
             if (strlen($project) > 25) {
-                $project = substr($d['sys_name'], 0, 22) . '...';
+                $project = substr($project, 0, 22) . '...';
             }
         }
-
-die($project);
 
         $this->_result =
             $this->getCurlResult($this->_rsNewUserUrl . '&newuser=' .
