@@ -143,7 +143,7 @@ final class MediaModel extends AbstractModel
         if ($search['file_name'] != '') {
             $a[] = "t1.`name` like '%" . $this->escapeString(trim($search['file_name'])) . "%'";
         }
-        return isset($a) ? ' and ' . implode(' ' . $searchType . ' ', $a) : null;
+        return isset($a) ? ' and (' . implode(' ' . $searchType . ' ', $a) . ')' : null;
     }
 
 
