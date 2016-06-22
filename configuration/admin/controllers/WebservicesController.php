@@ -18,6 +18,9 @@ class WebservicesController extends Controller
 	private $_JSONPCallback=false;
 	private $_JSON=null;
 
+	// Hard-coded for the time being...
+	private $_key = 'gNXhIb4LDKrA7MQmNo7wpV';
+
     public $usedHelpers = array(
         'http_basic_authentication'
     );
@@ -59,7 +62,8 @@ class WebservicesController extends Controller
 
 	public function indexAction()
 	{
-		$this->smarty->assign( 'base_url', 'http://' . '%AUTH%' . $_SERVER['HTTP_HOST'] . pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' );
+		$this->authenticateUser();
+	    $this->smarty->assign( 'base_url', 'http://' . '%AUTH%' . $_SERVER['HTTP_HOST'] . pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' );
 		$this->smarty->assign( 'services', $this->_services );
 		$this->smarty->assign( 'general_parameters', $this->_generalParameters );
 
@@ -71,7 +75,8 @@ class WebservicesController extends Controller
 
 	public function projectsAction()
 	{
-		$this->_head->service='projects';
+		$this->authenticateUser();
+	    $this->_head->service='projects';
 		$this->_head->description='list of all projects on this server';
 
 		foreach($this->models->ProjectsModel->getUserProjects( array( 'user_id'=>$this->getCurrentUserId(), 'show_all'=>true ) ) as $project)
@@ -92,7 +97,8 @@ class WebservicesController extends Controller
 
 	public function projectUsersAction()
 	{
-		$this->authenticateProject();
+		$this->authenticateUser();
+	    $this->authenticateProject();
 		$this->_head->service='project_users';
 		$this->_head->description=sprintf('list of all users in project "%s"' , $this->_project['sys_name'] );
 		$data=$this->models->UsersModel->getProjectUsers(array('project_id'=>$this->getCurrentProjectId()));
@@ -103,7 +109,8 @@ class WebservicesController extends Controller
 
 	public function usersAction()
 	{
-		$this->_head->service='users';
+		$this->authenticateUser();
+	    $this->_head->service='users';
 		$this->_head->description=sprintf('list of all users' );
 		$data=$this->models->UsersModel->getAllUsers();
 		array_walk($data, function(&$a) { unset($a['password']);});
@@ -113,22 +120,31 @@ class WebservicesController extends Controller
 
     public function imAction ()
     {
-        exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $o);
-        $branch = $o[0];
-
-        exec('git rev-parse --verify HEAD 2> /dev/null', $p);
-        $hash = $p[0];
-
-    	$data = $this->models->ProjectsModel->getProjectsWithUsers();
-
-    	foreach ($data as $i => $row) {
-            $data[$i]['git_branch'] = $branch;
-            $data[$i]['git_hash'] = $hash;
-    	}
-
 		$this->_head->service = 'projects and users';
 		$this->_head->description = sprintf('"flat file" list of all projects and their users');
-		$this->_data = $data;
+
+        if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
+
+            $this->_data['error'] = 'incorrect key provided';
+
+        } else {
+
+            exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $o);
+            $branch = $o[0];
+
+            exec('git rev-parse --verify HEAD 2> /dev/null', $p);
+            $hash = $p[0];
+
+        	$data = $this->models->ProjectsModel->getProjectsWithUsers();
+
+        	foreach ($data as $i => $row) {
+                $data[$i]['git_branch'] = $branch;
+                $data[$i]['git_hash'] = $hash;
+        	}
+
+    		$this->_data = $data;
+        }
+
 		$this->printOutput();
     }
 
@@ -145,7 +161,6 @@ class WebservicesController extends Controller
     private function initialise()
     {
 		$this->setProjectId();
-		$this->authenticateUser();
 		$this->checkJSONPCallback();
 
 		$this->_head=new stdClass;
