@@ -7,7 +7,7 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px">{t}naamkaart{/t}:</span> {if $newname}new scientific name{else}{$name.name}{/if}</h2>
+<h2><span style="font-size:12px">{t}name card{/t}:</span> {if $newname}new scientific name{else}{$name.name}{/if}</h2>
 <h3><span style="font-size:12px;font-style:normal">{t}concept{/t}:</span> {$concept.taxon}</h3>
 
 <p>
@@ -162,7 +162,7 @@
 {if $concept.base_rank>=$smarty.const.SPECIES_RANK_ID}
 
 <div class="page-generic-div">
-Let op: wijzig om het genus te veranderen de taxonomische ouder van het concept. Ga daarvoor naar <a href="taxon.php?id={$concept.id}">de bewerkingspagina van het concept</a>.
+Note: you need to modify the taxonomic parent of the concept to change the genus. <a href="taxon.php?id={$concept.id}">Edit the concept</a> to do so.
 </div>
 
 {/if}
@@ -171,7 +171,7 @@ Let op: wijzig om het genus te veranderen de taxonomische ouder van het concept.
 <div class="page-generic-div">
 
 	{if $name.nametype=='isValidNameOf'}
-    <a href="taxon_edit_synonym_direct.php?id={$name.id}" class="edit" style="margin:0">geldige naam direct aanpassen</a>
+    <a href="taxon_edit_synonym_direct.php?id={$name.id}" class="edit" style="margin:0">rename directly</a>
     {/if}
 
     <p>
