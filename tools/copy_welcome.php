@@ -15,7 +15,7 @@
     }
 
     foreach ($projects as $projectId) {
-    	$q = 'select * from content where project_id = ' . $projectId;
+    	$q = 'select * from content where project_id = ' . $projectId . ' order by subject desc';
         $r = mysqli_query($my, $q);
 
         mysqli_query($my, 'update introduction_pages set show_order = show_order + 2
