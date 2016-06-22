@@ -17,7 +17,7 @@ class NsrActivityLogController extends NsrController
 	);
 
     public $modelNameOverride='NsrActivityLogModel';
-    public $controllerPublicName = 'Project administration';
+    public $controllerPublicName = 'Project management';
     public $includeLocalMenu = false;
 
     public function __construct()
