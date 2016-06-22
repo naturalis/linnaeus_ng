@@ -70,6 +70,10 @@
 
 .tab-definition select {
 	font-size:0.9em;
+	width:50px;
+}
+
+.tab-definition select.big {
 	width:250px;
 }
 
