@@ -7,6 +7,7 @@ class Git {
 	private $repo_path;
 	private $git_branch;
 	private $git_commit;
+	private $git_origin_commit_hash;
 
     public function __construct ()
     {
@@ -28,6 +29,7 @@ class Git {
 		$this->setExecPath();
 		$this->setBranch();
 		$this->setCommit();
+		$this->setOriginCommitHash();
 	}
 
     public function getBranch()
@@ -38,6 +40,11 @@ class Git {
     public function getCommit()
     {
 		return $this->git_commit;
+    }
+	
+    public function getOriginCommitHash()
+    {
+		return $this->git_origin_commit_hash;
     }
 	
 	private function setExecPath()
@@ -79,6 +86,14 @@ class Git {
 			}
 		}
 	}
+
+	private function setOriginCommitHash()
+	{
+		if ( empty($this->git_branch) ) return;
+		$p=$this->exec_path . " rev-parse origin/" . $this->git_branch;
+		$this->git_origin_commit_hash=trim(@shell_exec( $p ));
+	}
+
 
 }
 
