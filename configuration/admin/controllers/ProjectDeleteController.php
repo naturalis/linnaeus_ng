@@ -75,7 +75,10 @@ class ProjectDeleteController extends Controller
 		'variations_labels',
 		'variation_relations',
 		'gui_menu_order',
-		'module_settings_values'
+		'module_settings_values',
+		'chargroups',
+		'chargroups_labels',
+		'characteristics_chargroups',
     );
 
     public function __construct ()
@@ -111,7 +114,7 @@ class ProjectDeleteController extends Controller
         $this->deleteNBCKeydata($projectId);
         $this->deleteIntroduction($projectId);
         $this->deleteGeoData($projectId);
-        $this->deleteMatrices($projectId);
+        $this->deleteMatrices( [ 'project_id'=>$projectId ] );
         $this->deleteDichotomousKey($projectId);
         $this->deleteGlossary($projectId);
         $this->deleteLiterature($projectId);
@@ -182,65 +185,47 @@ class ProjectDeleteController extends Controller
     }
 
 
-
-    public function deleteMatrices ($id,$keepFiles=false)
+    public function deleteMatrices( $p )
     {
-        $this->models->GuiMenuOrder->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->MatricesVariations->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->MatricesTaxaStates->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->MatricesTaxa->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->CharacteristicsLabelsStates->delete(array(
-            'project_id' => $id
-        ));
+		$id=isset($p['project_id']) ? $p['project_id'] : null;
+		$keep_files=isset($p['keep_files']) ? $p['keep_files'] : false;
+		
+		if ( is_null($id) ) return;
+		
+		$d=['project_id' => $id];
+		
+        $this->models->GuiMenuOrder->delete($d);
+        $this->models->MatricesVariations->delete($d);
+        $this->models->MatricesTaxaStates->delete($d);
+        $this->models->MatricesTaxa->delete($d);
+        $this->models->CharacteristicsLabelsStates->delete($d);
 
-		if (!$keepFiles) {
+		if (!$keep_files)
+		{
+			$cs = $this->models->CharacteristicsStates->_get( [ 'id' => $d ] );
 
-			$cs = $this->models->CharacteristicsStates->_get(array(
-				'id' => array(
-					'project_id' => $id
-				)
-			));
-
-			foreach ((array) $cs as $key => $val) {
-
-				if (isset($val['file_name'])) {
-
+			foreach ((array)$cs as $key => $val)
+			{
+				if (isset($val['file_name']))
+				{
 					@unlink($_SESSION['admin']['project']['paths']['project_media'] . $val['file_name']);
 				}
 			}
-
 		}
 
-        $this->models->CharacteristicsStates->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->CharacteristicsMatrices->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->CharacteristicsLabels->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->Characteristics->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->MatricesNames->delete(array(
-            'project_id' => $id
-        ));
-        $this->models->Matrices->delete(array(
-            'project_id' => $id
-        ));
+        $this->models->CharacteristicsStates->delete($d);
+        $this->models->CharacteristicsMatrices->delete($d);
+        $this->models->CharacteristicsLabels->delete($d);
+        $this->models->Characteristics->delete($d);
+
+        $this->models->ChargroupsLabels->delete($d);
+        $this->models->Chargroups->delete($d);
+        $this->models->CharacteristicsChargroups->delete($d);
+
+        $this->models->MatricesNames->delete($d);
+        $this->models->Matrices->delete($d);
 
     }
-
-
 
     public function deleteDichotomousKey ($id)
     {
