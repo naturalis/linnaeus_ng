@@ -150,7 +150,7 @@
                                 <tr class="tr-highlight">
                                     <td>{t}check type:{/t}</td>
                                     <td>
-                                    	<select name="external_reference[check_type]">
+                                    	<select class="big" name="external_reference[check_type]">
                                             {foreach $check_types v k}
                                             <option value="{$v.field}"{if $v.field==$page.external_reference_decoded->check_type} selected="selected"{/if}>{$v.label}</option>
                                             {/foreach}
@@ -195,7 +195,7 @@
                                 <tr class="tr-highlight">
                                     <td>{t}link or embed:{/t}</td>
                                     <td>
-                                    	<select name="external_reference[link_embed]">
+                                    	<select class="big" name="external_reference[link_embed]">
                                             {foreach $link_embed v k}
                                             <option value="{$v.field}"{if $v.field==$page.external_reference_decoded->link_embed} selected="selected"{/if}>{$v.label}</option>
                                             {/foreach}
@@ -234,14 +234,14 @@
 </div>
 
 <div id="select_substitute" style="display:none">
-<select name="external_reference[substitute][value][]" class="subst_value" data-value="%VALUE%">
+<select name="external_reference[substitute][value][]" class="subst_value big" data-value="%VALUE%">
 	{foreach $dynamic_fields v k}
 	<option value="{$v.field}">{$v.label}</option>
     {/foreach}
 </select>
 </div>
 <div id="select_parameter" style="display:none">
-<select name="external_reference[parameters][value][]" class="param_value" data-value="%VALUE%">
+<select name="external_reference[parameters][value][]" class="param_value big" data-value="%VALUE%">
 	{foreach $dynamic_fields v k}
 	<option value="{$v.field}">{$v.label}</option>
     {/foreach}
