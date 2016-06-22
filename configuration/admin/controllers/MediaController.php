@@ -1242,9 +1242,12 @@ class MediaController extends Controller
             }
         }
 
+die($project);
+
         $this->_result =
             $this->getCurlResult($this->_rsNewUserUrl . '&newuser=' .
             urlencode($project . ' @ ' . $_SERVER['SERVER_ADDR']));
+
         return $this->_result;
     }
 
