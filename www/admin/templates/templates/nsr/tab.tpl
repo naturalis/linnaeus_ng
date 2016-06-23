@@ -27,6 +27,8 @@
  
 	   	<tr><td>&nbsp;</td></tr>
 
+		{if $use_page_blocks}
+
     	<tr>
             <td><u>content</u></td>
 		</tr>
@@ -64,6 +66,8 @@
 		</tr>
 
     	<tr><td>&nbsp;</td></tr>
+        
+        {/if}
         
     	<tr>
             <td>

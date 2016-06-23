@@ -21,10 +21,8 @@ class ModuleSettingsReaderController extends Controller
         parent::__construct( $p );
 
 		$this->setModuleController( $this->controllerBaseName );
-		$this->setModuleId();
-		$this->setModuleSettingsValues();
-		$this->setGeneralSettingsValues();
-    }
+		$this->initialize();
+	}
 
     public static function getGeneralSettingsId()
     {
@@ -36,6 +34,12 @@ class ModuleSettingsReaderController extends Controller
         parent::__destruct();
     }
 
+	public function setController( $controller )
+	{
+		$this->setModuleController( $controller );
+		$this->initialize();
+	}
+	
     public function getModuleSetting( $p )
     {
 		if ( is_array( $p ))
@@ -131,6 +135,13 @@ class ModuleSettingsReaderController extends Controller
     public function setUseDefaultWhenNoValue( $state )
     {
 		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
+    }
+
+	private function initialize()
+	{
+		$this->setModuleId();
+		$this->setModuleSettingsValues();
+		$this->setGeneralSettingsValues();
     }
 
     private function getUseDefaultWhenNoValue()

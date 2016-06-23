@@ -58,7 +58,7 @@ $(document).ready(function()
         </p>
 	</span>
     
-    <p class="sourcedocument">
+    <p class="this_sourcedocument">
     <a id="this_sourcedocument" href="" target="_blank">{t}Meer over deze soort in de BLWG Verspreidingsatlas{/t}</a>
     </p>
 
