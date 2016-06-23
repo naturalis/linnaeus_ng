@@ -117,8 +117,6 @@ class MatrixKeyController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsReaderController;
-
-		$this->moduleSettings->setUseDefaultWhenNoValue( true );
 		$this->moduleSettings->assignModuleSettings( $this->settings );
 
 		$this->initializeMatrixId();
