@@ -1600,6 +1600,11 @@ function disableShowMoreButton()
 
 function doRemoteLink( url, name, nameScientific, nameCommon )
 {
+	if (url.length>0)
+	{
+		window.open( url, matrixsettings.infoLinkTarget );
+	}
+	else
 	if (matrixsettings.generalSpeciesInfoUrl.length>0)
 	{
 		var iurl=matrixsettings.generalSpeciesInfoUrl
@@ -1621,11 +1626,6 @@ function doRemoteLink( url, name, nameScientific, nameCommon )
 				);
 			}
 		});
-	}
-	else
-	if (url.length>0)
-	{
-		window.open( url, matrixsettings.infoLinkTarget );
 	}
 }
 
