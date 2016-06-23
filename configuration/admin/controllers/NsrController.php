@@ -34,6 +34,7 @@ class NsrController extends Controller
 		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
 		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
 //		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+		'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status'],
 	];
 
     public function __construct()
