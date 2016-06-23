@@ -327,7 +327,7 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-		
+
 		$this->resolveTaxonName();
 
 		if (is_null($this->getTaxonId()))
@@ -1033,8 +1033,8 @@ parameters:
 
 			where _a.project_id =".$this->getCurrentProjectId()."
 			". ($this->getMatchType()=='match_start' ? 
-					"and _a.name like '".mysql_real_escape_string($search)."%'" :
-					"and _a.name like '%".mysql_real_escape_string($search)."%'" 
+					"and _a.name like '".$this->models->Taxa->escapeString($search)."%'" :
+					"and _a.name like '%".$this->models->Taxa->escapeString($search)."%'" 
 			)."
 				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
 			
@@ -1206,7 +1206,7 @@ parameters:
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
 					where
 						_a.project_id = ".$this->getCurrentProjectId()."
-						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
+						and trim(REPLACE(_a.name,_a.authorship,''))='". $this->models->Names->escapeString($taxon) ."'
 						and _b.nametype = 'isValidNameOf'"
 				);
 				
@@ -1225,7 +1225,7 @@ parameters:
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
 					where
 						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.name='". mysql_real_escape_string($taxon) ."'
+						and _a.name='". $this->models->Names->escapeString($taxon) ."'
 						and _b.nametype != 'isValidNameOf'"
 				);
 
@@ -1244,7 +1244,7 @@ parameters:
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
 					where
 						_a.project_id = ".$this->getCurrentProjectId()."
-						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
+						and trim(REPLACE(_a.name,_a.authorship,''))='". $this->models->Names->escapeString($taxon) ."'
 						and _b.nametype != 'isValidNameOf'"
 				);
 
@@ -1263,7 +1263,7 @@ parameters:
 						on _a.type_id=_b.id and _a.project_id=_b.project_id
 					where
 						_a.project_id = ".$this->getCurrentProjectId()."
-						and _a.name='". mysql_real_escape_string($taxon) ."'
+						and _a.name='". $this->models->Names->escapeString($taxon) ."'
 						and _b.nametype != 'isValidNameOf'"
 				);
 			}
