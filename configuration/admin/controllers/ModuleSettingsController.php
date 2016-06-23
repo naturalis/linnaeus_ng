@@ -2,12 +2,17 @@
 
 /*
 
-	settings that are used but not in the list:
+	settings that work but not in the list:
 		general setting: support_email (support email adress)
 		general setting: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
 		general setting: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
-		species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
 		general setting: front_end_use_basic_auth
+		species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
+		species: front_end_use_basic_auth
+		species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
+		species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
+		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
+
 
 	to do technical:
 	- create default settings-set as base data
@@ -15,14 +20,6 @@
 
 
 	to do content:
-	- are these still relevant in the new skin:
-		species_suppress_autotab_names
-		species_suppress_autotab_classification
-		species_suppress_autotab_literature
-		species_suppress_autotab_media
-		species_suppress_autotab_dna_barcodes
-		admin_species_allow_embedded_images
-		species_default_tab
 	- simplify settings (for instance multiple image base URLs)
 
 
@@ -33,6 +30,7 @@
 	$this->moduleSettings=new ModuleSettingsReaderController;
 	
 	// optional:
+	$this->moduleSettings->setController( 'species' );
 	$this->moduleSettings->setUseDefaultWhenNoValue( true );
 	$this->moduleSettings->assignModuleSettings( $this->settings );
 	

@@ -116,7 +116,11 @@ class NsrTaxonManagement extends NsrController
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->moduleSettings->setController( 'species' );
+
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+		$this->smarty->assign( 'use_page_blocks', $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1 );
+
 		
 		if ($this->show_nsr_specific_stuff ) 
 		{

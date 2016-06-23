@@ -20,18 +20,21 @@ class ModuleSettingsReaderController extends Controller
     {
         parent::__construct($p);
 
-		$this->UserRights->setRequiredLevel( ID_ROLE_EDITOR );
 		$this->setModuleController( $this->controllerBaseName );
-		$this->setModuleId();
-		$this->setModuleSettingsValues();
-		$this->setGeneralSettingsValues();
-    }
-
+		$this->initialize();
+	}
+	
     public function __destruct()
     {
         parent::__destruct();
     }
 
+	public function setController( $controller )
+	{
+		$this->setModuleController( $controller );
+		$this->initialize();
+	}
+	
     public function getModuleSetting( $p )
     {
 		if ( !$this->getAuthorisationState() ) return;
@@ -140,6 +143,14 @@ class ModuleSettingsReaderController extends Controller
 		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
     }
 
+
+	private function initialize()
+	{
+		$this->UserRights->setRequiredLevel( ID_ROLE_EDITOR );
+		$this->setModuleId();
+		$this->setModuleSettingsValues();
+		$this->setGeneralSettingsValues();
+    }
 
     private function getUseDefaultWhenNoValue()
     {

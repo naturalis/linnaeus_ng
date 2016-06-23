@@ -1,14 +1,9 @@
 <?php
 /*
 
-what about
-			if (defined('TAB_VERSPREIDING'))
-			{
-
 
 USE INHERITED LIT yes/no
 
-TAB_VERSPREIDING: auto presence data, data TAB_VERSPREIDING (TAB_VOORKOMEN omgebracht bij import)
 
 */
 
@@ -77,10 +72,13 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 
 		// not actually implemented to do anything yet
-		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( "tree_show_upper_taxon", 0 ) );
+		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( 'tree_show_upper_taxon', 0 ) );
 
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
-		$this->_use_embedded_templates = $this->moduleSettings->getModuleSetting( "use_embedded_templates", 0 )==1;
+
+		$this->_use_embedded_templates = $this->moduleSettings->getModuleSetting( 'use_embedded_templates', 0 )==1;
+		$this->_use_page_blocks = $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1;
+		$this->_show_inherited_literature = $this->moduleSettings->getModuleSetting( 'show_inherited_literature', 0 );
 
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -141,7 +139,7 @@ class SpeciesControllerNSR extends SpeciesController
 			] );
 
 			$external_content=$this->getExternalContent( $categories['start'] );
-			
+
 			if ( isset($external_content) && $external_content->must_redirect==true)
 			{
 				$this->redirect( $external_content->full_url );
@@ -257,7 +255,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('content',$content);
 			$this->smarty->assign('sideBarLogos',isset($sideBarLogos) ? $sideBarLogos : null);
 			$this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
-			$this->smarty->assign('categories',$categories['categories']);
+			$this->smarty->assign('categories',isset($categories['categories']) ? $categories['categories'] : null);
 			$this->smarty->assign('activeCategory',$categories['start']);
 			$this->smarty->assign('taxon',$taxon);
 			$this->smarty->assign('classification',$classification);
@@ -650,7 +648,10 @@ class SpeciesControllerNSR extends SpeciesController
 				$val['type']='external';
 			}
 
-			if ( $val['is_empty'] && !$val['show_when_empty'] ) continue;
+			if ( $val['is_empty'] && !$val['show_when_empty'] ) 
+			{
+				continue;
+			}
 
 			$val['show_overview_image']=false;
 
@@ -662,7 +663,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$taxon_categories[]=$val;
 		}
-			
+
 		// have the first non-automatic/external tab display the overview image
 		foreach((array)$taxon_categories as $key=>$val)
 		{
@@ -1142,11 +1143,9 @@ class SpeciesControllerNSR extends SpeciesController
                 break;
 
             case 'CTAB_LITERATURE':
-                $content=
-					array(
-						'literature'=>$this->getTaxonLiterature($taxon),
-						'inherited_literature'=>$this->getInheritedTaxonLiterature($taxon)
-					);
+                $content['literature']=$this->getTaxonLiterature($taxon);
+				if ( $this->_show_inherited_literature )
+					$content['inherited_literature']=$this->getInheritedTaxonLiterature($taxon);
                 break;
 
             case 'CTAB_DNA_BARCODES':
@@ -1179,9 +1178,13 @@ class SpeciesControllerNSR extends SpeciesController
 				$content = isset($ct) ? $ct[0] : null;
 				$isPublished = isset($content['publish']) ? $content['publish'] : null;
 
-				if ( !empty($category['page_blocks']) )
+				if ( $this->_use_page_blocks && !empty($category['page_blocks']) )
 				{
-					$built_page=$this->buildPageFromBlocks( [ 'page_blocks'=>$category['page_blocks'], 'content'=> $isPublished ? $content : null ] ); 
+					$built_page=$this->buildPageFromBlocks( [
+						'tab_id'=>$category['id'],
+						'page_blocks'=>$category['page_blocks'],
+						'content'=> $isPublished ? $content : null ]
+					 ); 
 				}
         }
 
@@ -1416,6 +1419,10 @@ class SpeciesControllerNSR extends SpeciesController
 	
 	private function processEmbeddedTemplates( $p )
 	{
+		/*
+		resolve the use of {{cat=<id>}} for embedding of templates
+		*/
+		
 		$content=isset($p['content']) ? $p['content'] : null;
 
 		if (is_array($content)) return $content;
@@ -1447,6 +1454,9 @@ class SpeciesControllerNSR extends SpeciesController
 		//return isset($content['content']) ? $content['content'] : null;
 		$page_blocks=isset($p['page_blocks']) ? json_decode($p['page_blocks']) : null;
 		$content=isset($p['content']) ? $p['content'] : null;
+		$tab_id=isset($p['tab_id']) ? $p['tab_id'] : null;
+		
+		if ( is_null($tab_id) ) return;
 
 		$this->helpers->CurrentUrl->setRemoveQuery( true ) ;
 		$this->helpers->CurrentUrl->setRemoveFragment( true ) ;
@@ -1466,8 +1476,11 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 			else
 			{
-				//echo sprintf( $url, $val ),"<br />";
-				$buffer[]=@file_get_contents( sprintf( $url, $val ) );
+				if ($val!=$tab_id)
+				{
+					//echo sprintf( $url, $val ),"<br />";
+					$buffer[]=file_get_contents( sprintf( $url, $val ) );
+				}
 			}
 		}
 		
@@ -1666,7 +1679,8 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $id
 		));
 
-		$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
+		if ($data[0]['presence_information'])
+			$data[0]['presence_information_one_line']=str_replace(array("\n","\r","\r\n"),'<br />',$data[0]['presence_information']);
 
 		return $data[0];
 	}

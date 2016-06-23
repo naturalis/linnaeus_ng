@@ -1,3 +1,4 @@
+{if $content}
 <div>
 
     <h2>{t}Voorkomen{/t}</h2>
@@ -32,3 +33,4 @@ onmouseover="hint(this,'<p><b>{$content.presence_index_label|@escape} {$content.
     {/if}
 
 </div>
+{/if}
