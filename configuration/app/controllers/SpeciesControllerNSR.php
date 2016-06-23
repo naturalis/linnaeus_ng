@@ -260,7 +260,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('activeCategory',$categories['start']);
 			$this->smarty->assign('taxon',$taxon);
 			$this->smarty->assign('classification',$classification);
-			$this->smarty->assign('children',isset($content['children']) ? $content['children'] : null);
+			$this->smarty->assign('children',isset($children) ? $children : null);
 			$this->smarty->assign('names',isset($names) ? $names : null);
 
 			$this->smarty->assign('overviewImage', $overview);
