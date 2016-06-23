@@ -14,9 +14,6 @@
 
     <table>
     	<tr>
-            <td><u>display</u></td>
-		</tr>
-    	<tr>
             <td>
 				<label><input type="checkbox" name="always_hide"{if $page.always_hide==1} checked="checked"{/if} /> {t}always hide{/t}</label>
                 <div class="explanation">
@@ -28,11 +25,9 @@
 			</td>
 		</tr>
  
-    	<!-- tr><td><input type="button" value="save" onclick="save_page();" /></td></tr -->
-
 	   	<tr><td>&nbsp;</td></tr>
 
-    	<!-- tr>
+    	<tr>
             <td><u>content</u></td>
 		</tr>
     	<tr>
@@ -41,7 +36,8 @@
             	<table>
                     <tr>
                     	<td>your page</td>
-                        <td style="padding-left:10px;">available blocks</td></tr>
+                        <td style="padding-left:10px;">available blocks</td>
+                    </tr>
                     <tr>
                         <td style="border:1px solid #ddd;min-width:200px;padding:0 10px 0 10px;">
                             <ul id="block_list">
@@ -59,7 +55,7 @@
                             </ul>
                         </td>                    
                     </tr>
-				<table>
+				</table>
                 <div class="explanation">
 					Only automatic tabs and tabs with an external reference that have stand-alone template.
                 </div>
@@ -67,9 +63,7 @@
 			</td>
 		</tr>
 
-    	<tr><td><input type="button" value="save" onclick="save_page();" /></td></tr>
-
-    	<tr><td>&nbsp;</td></tr -->
+    	<tr><td>&nbsp;</td></tr>
         
     	<tr>
             <td>
@@ -219,6 +213,7 @@
 		</tr>
 
 	</table>
+    
     
     <input type="button" value="save" onclick="save_page();" />
 
@@ -373,13 +368,9 @@ $(document).ready(function()
 {
 	acquireInlineTemplates();
 	
-	{if $page.page_blocks_decoded|@count>0}
 	{foreach $page.page_blocks_decoded v k}
-	addBlock( { id:'{$v}', label: '{$v}', can_delete:{if $v!="data"}true{else}false{/if}} );
+	addBlock( { id:'{$v.id}', label: '{$v.label}', can_delete:{if $v.id!="data"}true{else}false{/if}} );
 	{/foreach}
-	{else}
-	addBlock( { id:'data', label: "Regular page content", can_delete:false } );
-	{/if}
 	
 	$(".sortable").sortable({
 		opacity: 0.6, 
