@@ -43,6 +43,7 @@ class SpeciesControllerNSR extends SpeciesController
 		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
 		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
 //		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+		'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status'],
 	];
 
 	private $regularDataBlock = ["id"=>"data","label"=>"Regular page content"];
@@ -628,7 +629,7 @@ class SpeciesControllerNSR extends SpeciesController
 		// weed out the ones we don't want to display
 		foreach((array)$categories as $key=>$val)
 		{
-			if ( $val['suppress'] ) continue;
+			//if ( $val['suppress'] ) continue;
 			//if ( $val['always_hide'] ) continue;
 			
 			if ($val['type']=='auto')
@@ -692,7 +693,7 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 			
 			// and finally throw out the ones that should be hidden from the menu but remain accessible directly
-			if ( $val['always_hide'] )
+			if ( $val['always_hide'] || $val['suppress'] )
 			{
 				unset( $taxon_categories[$key] );
 			}
@@ -712,31 +713,7 @@ class SpeciesControllerNSR extends SpeciesController
 		
 		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 	
-		
-
-
-
-		// remnants...		
-		if ( isset($taxon_id) )
-		{
-			if (defined('TAB_VERSPREIDING'))
-			{
-				$d=$this->getTaxonContent(array('category'=>TAB_VERSPREIDING,'taxon'=>$taxon_id));
-				$p=$this->getPresenceData($taxon_id);
-
-				if (!empty($p['presence_information_one_line']) || !empty($d['content']))
-				{
-					foreach((array)$categories as $key=>$val)
-					{
-						if ($val['id']==TAB_VERSPREIDING) {
-							$categories[$key]['is_empty']=false;
-							break;
-						}
-					}
-				}
-			}
-		}
-    }
+   }
 
 	private function getNames( $p )
 	{
@@ -1184,8 +1161,11 @@ class SpeciesControllerNSR extends SpeciesController
                 $content=$this->getNames( ['id' => $taxon ] );
                 break;
 
-            default:
+            case 'CTAB_PRESENCE_STATUS':
+                $content=$this->getPresenceData( $taxon );
+                break;
 
+            default:
                 $d = array(
                     'taxon_id' => $taxon,
                     'project_id' => $this->getCurrentProjectId(),
@@ -1193,13 +1173,9 @@ class SpeciesControllerNSR extends SpeciesController
                     'page_id' => $category['id']
                 );
 
-                if (!$allowUnpublished)
-                    $d['publish'] = '1';
+                if (!$allowUnpublished) $d['publish'] = '1';
 
-                $ct = $this->models->ContentTaxa->_get(array(
-                    'id' => $d,
-                ));
-				
+                $ct = $this->models->ContentTaxa->_get( [ 'id' => $d ] );
 				$content = isset($ct) ? $ct[0] : null;
 				$isPublished = isset($content['publish']) ? $content['publish'] : null;
 
@@ -1490,7 +1466,7 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 			else
 			{
-				//echo sprintf( $url, $val );
+				//echo sprintf( $url, $val ),"<br />";
 				$buffer[]=@file_get_contents( sprintf( $url, $val ) );
 			}
 		}
