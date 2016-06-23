@@ -10,6 +10,7 @@ class SpeciesController extends Controller
 	private $_includeOverviewImageInMedia=true;
 	private $_defaultSpeciesTab;
 	private $_mc;
+	private $taxon_id;
 
 	protected $_model;
 
@@ -96,6 +97,16 @@ class SpeciesController extends Controller
 		
 		$this->smarty->assign('inclHigherTaxaRankPrefix',$this->_inclHigherTaxaRankPrefix);
     }
+
+	public function setTaxonId( $id )
+	{
+		$this->taxon_id=$id;
+	}
+
+	public function getTaxonId()
+	{
+		return $this->taxon_id;
+	}
 
     /* Dynamically set proper model name (species/highertaxa) */
     private function setModel ()

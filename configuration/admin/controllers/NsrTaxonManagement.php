@@ -96,6 +96,8 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'query','label'=>'check by query'],
 			['field'=>'output','label'=>'check by webservice output'],
 		] ;
+		
+	private $regularDataBlock = ["id"=>"data","label"=>"Regular page content"];
 
 	
     public function __construct()
@@ -471,9 +473,20 @@ class NsrTaxonManagement extends NsrController
 		if ( !empty($page['page_blocks']) )
 		{
 			// fetch the names + "Regular page content"
-			$page['page_blocks_decoded']=json_decode($page['page_blocks']);
+			$cat=$this->getCategories();
+			$d=json_decode($page['page_blocks']);
+			foreach((array)$d as $val)
+			{
+				if ($val==$this->regularDataBlock['id'])
+					$page['page_blocks_decoded'][]=$this->regularDataBlock;
+				else
+					$page['page_blocks_decoded'][]=["id"=>$val,"label"=>$cat[array_search($val, array_column($this->getCategories(), 'id'))]['page']];
+			}
 		}
-		
+		else
+		{
+			$page['page_blocks_decoded'][0]=$this->regularDataBlock;
+		}
 		return $page;
 	}
 
@@ -542,10 +555,10 @@ class NsrTaxonManagement extends NsrController
 
 	private function savePageBlocks()
 	{
-		return;
+
 		//alter table pages_taxa add column `page_blocks` varchar(255) DEFAULT NULL after always_hide;
 		$data=$this->rGetAll()['page_blocks'];
-		if ( empty($data) ) $data[0]="data";
+		if ( empty($data) ) $data[0]=$this->regularDataBlock;
 
 		$d=$this->models->PagesTaxa->update(
 			array(

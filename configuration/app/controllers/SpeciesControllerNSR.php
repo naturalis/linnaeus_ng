@@ -32,6 +32,8 @@ class SpeciesControllerNSR extends SpeciesController
 		'taxon_quick_parentage'
 	);
 
+    public $usedHelpers = array('current_url');
+
 	private $cTabs=[
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
 		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
@@ -42,6 +44,8 @@ class SpeciesControllerNSR extends SpeciesController
 		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
 //		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
 	];
+
+	private $regularDataBlock = ["id"=>"data","label"=>"Regular page content"];
 
     public function __construct()
     {
@@ -113,13 +117,20 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function taxonAction()
     {
-		$taxon = $this->getTaxonById($this->rGetId());
+		$this->setTaxonId($this->rGetId());
+
+		$taxon = $this->getTaxonById($this->getTaxonId());
 
         if ( !empty($taxon) )
 		{
-			$template = 'taxon';
+			$template = $this->rGetVal('headless',1) ? 'taxon_headless' : 'taxon' ;
 			
-			$categories=$this->getTaxonCategories( [ 'taxon' => $taxon['id'],'base_rank' => $taxon['base_rank_id'],'requestedTab'=>$this->rGetVal('cat') ] );
+			$categories=$this->getTaxonCategories( [
+				'taxon' => $taxon['id'],
+				'base_rank' => $taxon['base_rank_id'],
+				'requestedTab'=>$this->rGetVal('cat'),
+				'forceEmptyTab'=>$this->rGetVal('force_empty',1)
+			] );
 
 			$content=$this->getTaxonContent( [
 				'taxon' => $taxon['id'],
@@ -599,6 +610,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
 		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
+		$forceEmptyTab = isset($p['forceEmptyTab']) ? $p['forceEmptyTab'] : null;
 
 		// get all available categories (tabs)
 		$categories=$this->getCategories($p);
@@ -642,7 +654,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$val['show_overview_image']=false;
 
 			// is cat has been provided as TAB_CATNAME rather than an ID, resolve
-			if (!is_int($requestedTab) && $requestedTab==$val['tabname'])
+			if (!is_numeric($requestedTab) && $requestedTab==$val['tabname'])
 			{
 				$cat=$val['id'];
 			}
@@ -686,8 +698,17 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 		}
 
-//		q($start_category);
-//		q($taxon_categories,1);
+		if ($forceEmptyTab)
+		{
+			if (is_numeric($requestedTab))
+			{
+				if ($start_category['id']!=$requestedTab) $start_category=null;
+			}
+			else
+			{
+				if ($start_category['tabname']!=$requestedTab) $start_category=null;
+			}
+		}
 		
 		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 	
@@ -1140,7 +1161,6 @@ class SpeciesControllerNSR extends SpeciesController
                 break;
 
             case 'CTAB_TAXON_LIST':
-
                 $content=$this->getTaxonNextLevel($taxon);
                 break;
 
@@ -1179,17 +1199,30 @@ class SpeciesControllerNSR extends SpeciesController
                 $ct = $this->models->ContentTaxa->_get(array(
                     'id' => $d,
                 ));
-
+				
 				$content = isset($ct) ? $ct[0] : null;
 				$isPublished = isset($content['publish']) ? $content['publish'] : null;
 
+				if ( !empty($category['page_blocks']) )
+				{
+					$built_page=$this->buildPageFromBlocks( [ 'page_blocks'=>$category['page_blocks'], 'content'=> $isPublished ? $content : null ] ); 
+				}
         }
 
-		if (isset($content['id']))
+		if ( isset($content['id']) )
+		{
 			$rdf=$this->Rdf->getRdfValues($content['id']);
+		}
 
-		if (isset($content['content']))
+		if ( isset($built_page) )
+		{
+			$content=$built_page;
+		}
+		else
+		if ( isset($content['content']) )
+		{
 			$content=$content['content'];
+		}
 
 		return array('content'=>$content,'rdf'=>$rdf,'isPublished'=>$isPublished);
     }
@@ -1242,7 +1275,6 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 
 		return $external_content;
-
 	}
 
 	private function reconstructQueryString()
@@ -1307,7 +1339,6 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $taxon_id,
     		'languageId' => $language_id
 		));
-
 	}
 
     private function getTaxonLiterature( $taxon_id )
@@ -1416,8 +1447,9 @@ class SpeciesControllerNSR extends SpeciesController
 		$ext['taxon_id']=isset($p['taxon_id']) ? $p['taxon_id'] : null;
 		$ext['current_tab_id']=isset($p['current_tab_id']) ? $p['current_tab_id'] : null;
 
-		$url=parse_url((stripos($_SERVER['SERVER_PROTOCOL'],'https')===0 ? 'https://' : 'http://'). $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-		$ext['url']=$url['scheme']."://".$url['host'].$url['path']."?epi=" . $this->getCurrentProjectId() . "&id=%s&cat=%s";
+		$this->helpers->CurrentUrl->setRemoveQuery( true ) ;
+		$this->helpers->CurrentUrl->setRemoveFragment( true ) ;
+		$ext['url']=$this->helpers->CurrentUrl->getUrl()."?epi=" . $this->getCurrentProjectId() . "&id=%s&cat=%s";
 
 		$c=
 			preg_replace_callback(
@@ -1433,6 +1465,42 @@ class SpeciesControllerNSR extends SpeciesController
 
 		return $c;
 	}
+
+	private function buildPageFromBlocks( $p )
+	{
+		//return isset($content['content']) ? $content['content'] : null;
+		$page_blocks=isset($p['page_blocks']) ? json_decode($p['page_blocks']) : null;
+		$content=isset($p['content']) ? $p['content'] : null;
+
+		$this->helpers->CurrentUrl->setRemoveQuery( true ) ;
+		$this->helpers->CurrentUrl->setRemoveFragment( true ) ;
+		$url=
+			$this->helpers->CurrentUrl->getUrl() .
+			"?epi=" . $this->getCurrentProjectId() .
+			"&id=" . $this->getTaxonId(). 
+			"&cat=%s&headless=1&force_empty=1";
+		
+		$buffer=[];
+
+		foreach((array)$page_blocks as $val)
+		{
+			if ( $val==$this->regularDataBlock["id"] )
+			{
+				$buffer[]=isset($content['content']) ? $content['content'] : null;
+			}
+			else
+			{
+				//echo sprintf( $url, $val );
+				$buffer[]=@file_get_contents( sprintf( $url, $val ) );
+			}
+		}
+		
+		return implode("\n",$buffer);
+	}
+
+
+
+
 
     private function getNSRId($p)
     {
@@ -1626,8 +1694,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 		return $data[0];
 	}
-
-
 
 
 

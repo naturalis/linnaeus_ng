@@ -761,7 +761,7 @@ class SpeciesModel extends AbstractModel
 
 		if ( is_null($project_id) || is_null($taxon_id)  || is_null($language_id) ) return;
 
-        $query = "
+		$query = "
 			select
 				_a.id,
 				ifnull(_b.title,_a.page) as title,
@@ -770,6 +770,7 @@ class SpeciesModel extends AbstractModel
 				_a.def_page,
 				_a.always_hide,
 				_a.external_reference,
+				_a.page_blocks,
 				_a.show_order,
 				0 as auto_tab
 			from
@@ -1436,7 +1437,7 @@ class SpeciesModel extends AbstractModel
 
 		if ( is_null($project_id) || is_null($language_id) ) return;
 
-        $query = "
+		$query = "
 			select
 				_a.id,
 				ifnull(_b.title,_a.page) as title,
@@ -1444,7 +1445,8 @@ class SpeciesModel extends AbstractModel
 				concat('TAB_',replace(upper(_a.page),' ','_')) as tabname,
 				".(isset($taxon_id) ? "if(length(_c.content)>0 && _c.publish=1,0,1) as is_empty, " : "")."
 				_a.always_hide,
-				_a.external_reference
+				_a.external_reference,
+				_a.page_blocks
 			from
 				%PRE%pages_taxa _a
 
