@@ -41,7 +41,7 @@ function setnewvalue(p)
 	name=p.name;
 	value=p.value;
 	revert=p.revert;
-	
+
 	for (i in values)
 	{
 		if (values[i].name==name)
@@ -50,18 +50,18 @@ function setnewvalue(p)
 			delete values[i].delete;
 
 			if (revert)
-			{	
+			{
 				// do nothing
 				//values[i].current=values[i].current;
 			}
 			else
 			if (value && value!=values[i].current)
-			{	
+			{
 				values[i].new=value;
 			}
 			else
 			if (!value && values[i].current)
-			{	
+			{
 				values[i].delete=true;
 			}
 		}
@@ -82,15 +82,15 @@ function checkMandatory()
 	for (i in values)
 	{
 		var val=values[i];
-	
+
 		if (val.name.substr(0,2)=='__' || val.hidden) continue;
 		if (
-			val.mandatory && 
+			val.mandatory &&
 			(
 				(val.new && val.new.length==0) ||
 				(!val.new && val.current.length==0) ||
 				(val.delete))
-			) 
+			)
 		{
 			if (val.label)
 				buffer=buffer+"\n"+val.label;
@@ -124,7 +124,7 @@ function checkAuthorshipAgainstRank()
 
 	if (rank>genusBaseRankid)
 	{
-		if (p1==0) buffer.push("Auteurschap is niet ingevuld.");
+		if (p1==0) buffer.push(_('Authorship has not been entered.'));
 	}
 
 	if (buffer.length>0) alert(buffer.join("\n"));
@@ -142,7 +142,7 @@ function checkAuthorshipAgainstRankGenus()
 	//if (rank=<genusBaseRankid)
 	if ( rank==getRankId( 'genus' ) )
 	{
-		if (p1==0) buffer.push("Auteurschap");
+		if (p1==0) buffer.push(_("Authorship"));
 	}
 
 	return buffer;
@@ -162,30 +162,30 @@ function checkNameAgainstRank()
 
 	if (rank<getRankId( 'genus' ))
 	{
-		if (p1==0) buffer.push( _("Uninomial is niet ingevuld.") );
-		if (p2!=0) buffer.push( sprintf(_("Een %s kan geen soortsnaam bevatten."), ranklabel ) );
-		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
+		if (p1==0) buffer.push( _("Uninomial has not been entered.") );
+		if (p2!=0) buffer.push( sprintf(_("A %s cannot contain a species name."), ranklabel ) );
+		if (p3!=0) buffer.push( sprintf(_("A %s cannot contain a third name element."), ranklabel ) );
 	}
 	else
 	if ( ( rank>=getRankId( 'genus' ) && rank<getRankId( 'species' ) ) )
 	{
-		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
-		if (p2!=0) buffer.push( sprintf(_("Een %s kan geen soortsnaam bevatten."), ranklabel ) );
-		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
+		if (p1==0) buffer.push( _("Genus has not been entered.") );
+		if (p2!=0) buffer.push( sprintf(_("A %s cannot contain a species name."), ranklabel ) );
+		if (p3!=0) buffer.push( sprintf(_("A %s cannot contain a third name element."), ranklabel ) );
 	}
 	else
 	if ( rank==getRankId( 'species' ) || rank==getRankId( 'nothospecies' ) )
 	{
-		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
-		if (p2==0) buffer.push( _("Soortsnaam is niet ingevuld.") );
-		if (p3!=0) buffer.push( sprintf(_("Een %s kan geen derde naamdeel bevatten."), ranklabel ) );
+		if (p1==0) buffer.push( _("Genus has not been entered.") );
+		if (p2==0) buffer.push( _("Species name has not been entered.") );
+		if (p3!=0) buffer.push( sprintf(_("A %s cannot contain a third name element."), ranklabel ) );
 	}
 	else
 	if ( rank>getRankId( 'nothospecies' ) )
 	{
-		if (p1==0) buffer.push( _("Genus is niet ingevuld.") );
-		if (p2==0) buffer.push( _("Soortsnaam is niet ingevuld.") );
-		if (p3==0) buffer.push( _("Derde naamdeel is niet ingevuld.") );
+		if (p1==0) buffer.push( _("Genus has not been entered.") );
+		if (p2==0) buffer.push( _("Species name has not been entered.") );
+		if (p3==0) buffer.push( _("Third name element has not been entered.") );
 	}
 
 	if (buffer.length>0) alert(buffer.join("\n"));
@@ -211,18 +211,18 @@ function checkPresenceDataSpecies()
 
 	if (rank>=speciesBaseRankid)
 	{
-		if (p1 && p1==-1) buffer.push("Voorkomen: status is niet ingevuld.");
-		if (p2 && p2==-1) buffer.push("Voorkomen: expert is niet ingevuld.");
-		if (p3 && p3==-1) buffer.push("Voorkomen: organisatie is niet ingevuld.");
-		if (p4 && p4.length==0) buffer.push("Voorkomen: publicatie is niet ingevuld.");
+		if (p1 && p1==-1) buffer.push(_("Presence: status has not been entered."));
+		if (p2 && p2==-1) buffer.push(_("Presence: expert has not been entered."));
+		if (p3 && p3==-1) buffer.push(_("Presence: organisation has not been entered."));
+		if (p4 && p4.length==0) buffer.push(_("Presence: publication has not been entered."));
 	}
 	else
 	if (rank<speciesBaseRankid)
 	{
-		if (p1!=-1 || p2!=-1 || p3!=-1 || p4.length!=0) 
-			buffer.push("Voorkomen kan niet worden ingevuld voor hogere taxa.");
+		if (p1!=-1 || p2!=-1 || p3!=-1 || p4.length!=0)
+			buffer.push("Presence cannot be entered for higher taxa.");
 	}
-	
+
 	//if (buffer.length>0) alert(buffer.join("\n"));
 
 	return buffer;
@@ -247,10 +247,10 @@ function checkPresenceDataHT()
 
 		if ((p1 && p2 && p3 && p4)!=true)
 		{
-			if (p1) buffer.push("Voorkomen: status is niet ingevuld.");
-			if (p2) buffer.push("Voorkomen: expert is niet ingevuld.");
-			if (p3) buffer.push("Voorkomen: organisatie is niet ingevuld.");
-			if (p4) buffer.push("Voorkomen: publicatie is niet ingevuld.");
+			if (p1) buffer.push(_("Presence: status has not been entered."));
+			if (p2) buffer.push(_("Presence: expert has not been entered."));
+			if (p3) buffer.push(_("Presence: organisation has not been entered."));
+			if (p4) buffer.push(_("Presence: publication has not been entered."));
 		}
 	}
 
@@ -262,9 +262,9 @@ function checkScientificName()
 	var result=true;
 	var buffer=[];
 
-	if ($('#name_expert_id').length && $('#name_expert_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: expert");
-	if ($('#name_organisation_id').length && $('#name_organisation_id :selected').val().length==0) buffer.push("Wetenschappelijke naam: organisatie");
-	if ($('#name_reference_id').length && $('#name_reference_id').val().length==0) buffer.push("Wetenschappelijke naam: publicatie");
+	if ($('#name_expert_id').length && $('#name_expert_id :selected').val().length==0) buffer.push(_("Scientific name: expert"));
+	if ($('#name_organisation_id').length && $('#name_organisation_id :selected').val().length==0) buffer.push((_("Scientific name: organisation"));
+	if ($('#name_reference_id').length && $('#name_reference_id').val().length==0) buffer.push((_("Scientific name: publication"));
 
 	return buffer;
 }
@@ -275,9 +275,9 @@ function checkDutchName()
 
 	if ($('#main_language_name').val() && $('#main_language_name').val().length!=0)
 	{
-		if ($('#main_language_name_expert_id').length && $('#main_language_name_expert_id :selected').val().length==0) buffer.push(main_language_display_label + ": expert");
-		if ($('#main_language_name_organisation_id').length && $('#main_language_name_organisation_id :selected').val().length==0) buffer.push(main_language_display_label + ": organisatie");
-		if ($('#main_language_name_reference_id').length && $('#main_language_name_reference_id').val().length==0) buffer.push(main_language_display_label + ": publicatie");
+		if ($('#main_language_name_expert_id').length && $('#main_language_name_expert_id :selected').val().length==0) buffer.push(main_language_display_label + ": " + _("expert"));
+		if ($('#main_language_name_organisation_id').length && $('#main_language_name_organisation_id :selected').val().length==0) buffer.push(main_language_display_label + ": " + _("organisation"));
+		if ($('#main_language_name_reference_id').length && $('#main_language_name_reference_id').val().length==0) buffer.push(main_language_display_label + ": " + _("publication"));
 	}
 
 	return buffer;
@@ -288,7 +288,7 @@ function saveconcept()
 	if (!checkMandatory()) return;
 
 	var notifications=[];
-	
+
 	notifications=notifications.concat(
 		checkPresenceDataHT(),
 		checkPresenceDataSpecies()
@@ -301,7 +301,7 @@ function savenewconcept()
 	if (!checkMandatory()) return;
 
 	var notifications=[];
-	
+
 	if (!checkNameAgainstRank()) return;
 	if (!checkAuthorshipAgainstRank()) return;
 
@@ -312,7 +312,7 @@ function savenewconcept()
 		checkDutchName(),
 		checkPresenceDataHT()
 	);
-	
+
 	saveform(notifications);
 }
 
@@ -321,7 +321,7 @@ function savesynonym()
 	if (!checkMandatory()) return;
 
 	var notifications=[];
-	
+
 	// warnings
 	notifications=notifications.concat(checkScientificName());
 	saveform(notifications);
@@ -337,9 +337,9 @@ function saveform(notifications)
 {
 	if (notifications && notifications.length>0)
 	{
-		if (!confirm("Onderstaande velden zijn niet ingevuld. Toch opslaan?"+"\n"+notifications.join("\n"))) return;
+		if (!confirm(_("The fields below have not been entered. Save anyway?") +"\n"+notifications.join("\n"))) return;
 	}
-	
+
 	form = $("<form method=post></form>");
 	form.append('<input type="hidden" name="action" value="save" />');
 
@@ -380,14 +380,14 @@ function deletedataform(style)
 	if (style)
 	{
 		var msg=
-			"Wilt u dit taxon markeren als verwijderd?\n"+
-			"Gemarkeerde taxa worden niet werkelijk verwijderd, maar zijn niet langer zichtbaar.";
+			_("Do you want to mark this taxon as deleted?") + "\n"+
+			_("Marked taxa are not really deleted, but they are no longer visible.");
 	}
 	else
 	{
-		var msg="Wilt u dit taxon weer zichtbaar maken?";
+		var msg= _("Do you want to make this taxon visible again?");
 	}
-	
+
 	if (!confirm(msg)) return;
 
 	if (dataid)
@@ -403,7 +403,7 @@ function deletedataform(style)
 	}
 	else
 	{
-		alert("Fout opgetreden: geen ID gevonden.");
+		alert(_("An error occurred: could not locate an ID."));
 	}
 
 }
@@ -412,7 +412,7 @@ function deleteform()
 {
 	if (!dataid) return;
 
-	if (confirm("Weet u het zeker?"))
+	if (confirm("Are you sure?"))
 	{
 		form = $("<form method=post></form>");
 		form.append('<input type="hidden" name="action" value="delete" />');
@@ -439,7 +439,7 @@ function namepartscomplete(caller)
 	{
 		$('#name_infra_specific_epithet').val('');
 		$('#name_infra_specific_epithet_message').
-			html('Vul eerst een soortsnaam in!').toggle(true).fadeOut({duration:2000,easing:'easeInQuint'});
+			html(_('First enter a species name!')).toggle(true).fadeOut({duration:2000,easing:'easeInQuint'});
 	}
 	else
 	{
@@ -456,13 +456,13 @@ function partstoname()
 	{
 		if (inheritablename.indexOf(" ")==-1)
 		{
-			$('#name_uninomial').val(inheritablename).trigger('change'); 
+			$('#name_uninomial').val(inheritablename).trigger('change');
 		}
 		else
 		{
 			var d=inheritablename.split(" ");
-			$('#name_uninomial').val(d[0]).trigger('change'); 
-			$('#name_specific_epithet').val(d[1]).trigger('change'); 
+			$('#name_uninomial').val(d[0]).trigger('change');
+			$('#name_specific_epithet').val(d[1]).trigger('change');
 		}
 	}
 
@@ -495,12 +495,12 @@ function partstoname()
 			author=author.substr(0,yearstart).replace(/[,\s]+$/gm,'').trim();
 		}
 	}
-	
+
 	if (!$('#name_name_author').is(":focus"))
-		$('#name_name_author').val(author.trim()).trigger('change'); 
+		$('#name_name_author').val(author.trim()).trigger('change');
 
 	if (!$('#name_authorship_year').is(":focus"))
-		$('#name_authorship_year').val(year.trim()).trigger('change'); 
+		$('#name_authorship_year').val(year.trim()).trigger('change');
 
 	var u=$.trim($('#name_uninomial').val());
 	var s=$.trim($('#name_specific_epithet').val());
@@ -509,8 +509,8 @@ function partstoname()
 
 	var taxon=(u?u+' ':'')+(s?s+' ':'')+(i?i+' ':'')+(a?a:'');
 
-	$('#concept_taxon').val($.trim(taxon)).trigger('change'); 
-	
+	$('#concept_taxon').val($.trim(taxon)).trigger('change');
+
 }
 
 function checkunsavedvalues()
@@ -519,7 +519,7 @@ function checkunsavedvalues()
 	{
 		if (values[i].new && values[i].nocheck!=true)
 		{
-			return "Niet alle data is opgelagen!\nPagina toch verlaten?";
+			return _('Not all data has been saved!\nLeave page anyway?');
 		}
 	}
 
@@ -542,7 +542,7 @@ function getinheritablename()
 
 function doDelete(msg)
 {
-	if (confirm(msg ? msg : "Weet u het zeker?"))
+	if (confirm(msg ? msg : _('Are you sure?')))
 	{
 		$( '#action' ).val('delete');
 		$( '#theForm' ).submit();
@@ -598,14 +598,14 @@ function dropListDialog(ele,title,params)
 			'<p><input type="text" class="medium" id="'+id+'" /></p> \
 			 <p> \
 			 <a href="#" onclick="setNsrDropListValue(this,\''+target+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
-				 geen waarde toekennen \
+				 ' + _('assign no value') + ' \
 			</a> \
 			<div id="droplist-list-container"></div> \
 			</p>'
 	});
 
 	$( '#'+id ).attr( 'autocomplete' , 'off' ).bind( 'keyup' , function(e)
-	{ 
+	{
 		if (typeof tempus_fugit=="function")
 		{
 			tempus_fugit( doNsrDropList, { e:e, id: $(this).attr('id'), target: target, params: params } );
@@ -614,7 +614,7 @@ function dropListDialog(ele,title,params)
 		{
 			doNsrDropList( { e:e, id: $(this).attr('id'), target: target, params: params } )
 		}
-	}).focus();	
+	}).focus();
 }
 
 function doNsrDropList(p)
@@ -649,7 +649,7 @@ function doNsrDropList(p)
 		search: value,
 		time: allGetTimestamp()
 	}
-	
+
 	try {
 		if (p.params.dropListSelectedTextStyle=='full') dropListSelectedTextStyle='full';
 	} catch (e) {}
@@ -657,7 +657,7 @@ function doNsrDropList(p)
 	try {
 		if (p.params.closeDialogAfterSelect===false) closeDialogAfterSelect=p.params.closeDialogAfterSelect
 	} catch (e) {}
-	
+
 	if (p.params) $.extend(data, p.params);
 
 	$.ajax({
@@ -670,7 +670,7 @@ function doNsrDropList(p)
 			buildDropList($.parseJSON(data),variable);
 		}
 	});
-	
+
 }
 
 function setNsrDropListValue(ele,variable)
@@ -689,21 +689,21 @@ function buildDropList(data,variable)
 
 	if (!data.results)
 	{
-		buffer.push('<li>niets gevonden</li>');
+		buffer.push('<li>' + _('nothing found') + '</li>');
 	}
-	else	
+	else
 	{
 		for(var i in data.results)
 		{
 			var t=data.results[i];
-	
+
 			if (variable=='main_language_name_organisation_id' && t.is_company!='1') continue;
 			if (variable=='main_language_name_expert_id' && t.is_company=='1') continue;
 			if (variable=='presence_organisation_id' && t.is_company!='1') continue;
 			if (variable=='presence_expert_id' && t.is_company=='1') continue;
 			if (variable=='name_organisation_id' && t.is_company!='1') continue;
 			if (variable=='name_expert_id' && t.is_company=='1') continue;
-			
+
 			if (variable.indexOf('reference_id')!=-1)
 			{
 				var label=
@@ -711,7 +711,7 @@ function buildDropList(data,variable)
 					(t.date ? t.date+". " : "")+
 					(t.label);
 			}
-			else 
+			else
 			{
 				var label=t.label;
 			}
@@ -728,7 +728,7 @@ function buildDropList(data,variable)
 				);
 			}
 		}
-		
+
 	}
 
 	$('#droplist-list-container').html('<ul>'+buffer.join('')+'</ul>');
@@ -737,7 +737,7 @@ function buildDropList(data,variable)
 
 function disconnectimage(p)
 {
-	if (confirm('Weet u het zeker?'))
+	if (confirm(_('Are you sure?')))
 	{
 		$('<form>', {
 			'html':
@@ -746,7 +746,7 @@ function disconnectimage(p)
 				<input type="hidden" name="image" value="'+p.image+'" />',
 			'action': window.url,
 			'method': 'post'
-		}).appendTo(document.body).submit();		
+		}).appendTo(document.body).submit();
 	}
 }
 
@@ -763,7 +763,7 @@ function checkprefnameavail()
 {
 	var l=$('#name_language_id').val();
 	var prefnameexists=false;
-	
+
 	for(var i=0;i<prefnames.length;i++)
 	{
 		if (prefnames[i].language_id==l && prefnames[i].id!=currentnameid)
