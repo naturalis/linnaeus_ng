@@ -118,7 +118,7 @@ class WebservicesController extends Controller
 		$this->printOutput();
 	}
 
-    public function imAction ()
+    public function scanServersAction ()
     {
 		$this->_head->service = 'projects and users';
 		$this->_head->description = sprintf('"flat file" list of all projects and their users');
