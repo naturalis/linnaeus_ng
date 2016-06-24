@@ -4,5 +4,5 @@ require_once ('../../../../configuration/admin/controllers/WebservicesController
 
 $c = new WebservicesController();
 
-$c->imAction();
+$c->scanServersAction();
 
