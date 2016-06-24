@@ -128,18 +128,23 @@ class WebservicesController extends Controller
             $this->_data['error'] = 'incorrect key provided';
 
         } else {
-
+/*
             exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $o);
             $branch = $o[0];
 
             exec('git rev-parse --verify HEAD 2> /dev/null', $p);
             $hash = $p[0];
+*/
+            exec('git rev-parse --abbrev-ref HEAD', $branch);
+            exec('git rev-parse HEAD', $hash);
+            exec('git rev-parse origin/' . $branch[0], $latestHash);
 
-        	$data = $this->models->ProjectsModel->getProjectsWithUsers();
+            $data = $this->models->ProjectsModel->getProjectsWithUsers();
 
         	foreach ($data as $i => $row) {
-                $data[$i]['git_branch'] = $branch;
-                $data[$i]['git_hash'] = $hash;
+                $data[$i]['git_branch'] = $branch[0];
+                $data[$i]['git_hash'] = $hash[0];
+                $data[$i]['git_latest_hash'] = $latestHash[0];
         	}
 
     		$this->_data = $data;
