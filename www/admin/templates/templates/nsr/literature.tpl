@@ -74,7 +74,7 @@ function del_ref( id )
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">{t}literatuur:{/t}</span> {$concept.taxon}</h2>
+<h2><span style="font-size:12px;font-style:normal">{t}literature{/t}:</span> {$concept.taxon}</h2>
 
 <p>
     <h4>{t}referenced literature{/t}</h4>
@@ -90,7 +90,7 @@ function del_ref( id )
 
 <p>
     <h4 style="display:none" id="new_ref_header">{t}new references{/t}</h4>
-	<a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'{t}Publicatie{/t}', { dropListSelectedTextStyle:'full', closeDialogAfterSelect: false } );return false;" rel="taxon_reference_id">{t}add reference{/t}</a>
+	<a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'{t}Publication{/t}', { dropListSelectedTextStyle:'full', closeDialogAfterSelect: false } );return false;" rel="taxon_reference_id">{t}add reference{/t}</a>
     <ul id="new_refs">
     </ul>
 </p>
@@ -105,7 +105,7 @@ function del_ref( id )
 </form>
 
     <p>
-        <a href="taxon.php?id={$concept.id}">terug</a>
+        <a href="taxon.php?id={$concept.id}">{t}back{/t}</a>
     </p>
 
 </div>
@@ -118,7 +118,7 @@ function del_ref( id )
 
 function unload_check()
 {
-	if (new_refs.length>0) return "{t}Niet alle data is opgelagen!\nPagina toch verlaten?{/t}";
+	if (new_refs.length>0) return "{t}Not all data has been saved!\nLeave page anyway?{/t}";
 }
 
 $(document).ready(function()
