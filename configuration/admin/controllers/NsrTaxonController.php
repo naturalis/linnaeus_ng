@@ -20,7 +20,7 @@
 	- messages en warnings met $this->translate
 	- alle vertaalde strings:
 
-    $translate = array(
+    $translateController = array(
         'Concept gemarkeerd als verwijderd.' => 'Concept marked as deleted.',
         'Concept niet langer gemarkeerd als verwijderd.' => 'Concept no longer marked as deleted.',
         'Naam verwijderd.' => 'Name deleted.',
