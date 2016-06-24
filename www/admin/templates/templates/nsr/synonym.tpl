@@ -73,7 +73,7 @@
     	<th>{t}type{/t}:</th>
         <td>
             <select id="name_type_id" mandatory="mandatory" label="type" >
-                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>{t]n.a.{/t]</option>
+                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>{t}n.a.{/t}</option>
             {foreach from=$nametypes item=v key=k}
             {if !$v.noNameParts}
                 <option
