@@ -263,8 +263,8 @@ function checkScientificName()
 	var buffer=[];
 
 	if ($('#name_expert_id').length && $('#name_expert_id :selected').val().length==0) buffer.push(_("Scientific name: expert"));
-	if ($('#name_organisation_id').length && $('#name_organisation_id :selected').val().length==0) buffer.push((_("Scientific name: organisation"));
-	if ($('#name_reference_id').length && $('#name_reference_id').val().length==0) buffer.push((_("Scientific name: publication"));
+	if ($('#name_organisation_id').length && $('#name_organisation_id :selected').val().length==0) buffer.push(_("Scientific name: organisation"));
+	if ($('#name_reference_id').length && $('#name_reference_id').val().length==0) buffer.push(_("Scientific name: publication"));
 
 	return buffer;
 }
