@@ -14,7 +14,117 @@
 	REFAC2015: need language names adjectives throughout! search for
 	"Nederlandse" and replace with an adjectivized resolved language_id
 
+
+	Ruud 24-06-16:
+	- Nederlandse strings vertaald naar Engelse
+	- messages en warnings met $this->translate
+	- alle vertaalde strings:
+
+    $translate = array(
+        'Concept gemarkeerd als verwijderd.' => 'Concept marked as deleted.',
+        'Concept niet langer gemarkeerd als verwijderd.' => 'Concept no longer marked as deleted.',
+        'Naam verwijderd.' => 'Name deleted.',
+        'Let op: de wetenschappelijke naam komt niet overeen met de samengestelde naamdelen. Dit is waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b. de juiste uninomial en eventueel auteurschap in om de naamkaart volledig te maken.' => 'Note: the scientific name does not match the composite of individual name elements. Please enter the correct uninomial and (if applicable) authorship to complete the name card.',
+        'Let op: de wetenschappelijke naam komt niet overeen met de samengestelde naamdelen. Dit is waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b. de juiste genus, soort, eventuele derde naamdeel en auteurschap in om de naamkaart volledig te maken.' => 'Note: the scientific name does not match the composite of individual name elements. Please enter the correct genus, species and (if applicable) subspecific epithet and authorship to complete the name card.',
+        'Geen ID.' => 'No ID.',
+        'Naam opgeslagen' => 'Name saved',
+        'Naam niet opgeslagen' => 'Name not saved',
+        'Tabel bijgewerkt' => 'Table updated',
+        "Geen auteurschap. Concept niet opgeslagen." => "Authorship missing. Concept not saved.",
+        "Wetenschappelijke naam: genus ontbreekt. Concept niet opgeslagen." => "Scientific name: genus is missing. Concept not saved.",
+        "Wetenschappelijke naam: uninomial ontbreekt. Concept niet opgeslagen." => "Scientific name: uninomial is missing. Concept not saved.",
+        "Wetenschappelijke naam kan maar uit één deel bestaan. Concept niet opgeslagen." => "Scientific name can consist of only a single element. Concept not saved.",
+        "Wetenschappelijke naam incompleet. Concept niet opgeslagen." => "Scientific name incomplete. Concept not saved.",
+        "Wetenschappelijke naam kan geen derde naamdeel hebben. Concept niet opgeslagen." => "Scientific name cannot have a third name element. Concept not saved.",
+        "Combinatie naam, rang en ouder bestaat al" => "Combination of name, rank and parent already exists",
+        'Taxon tonen' => 'Show taxon',
+        'Lege conceptnaam. Concept niet opgeslagen.' => 'Empty concept name. Concept not saved.',
+        'Geen rang. Concept niet opgeslagen.' => 'Rank missing. Concept not saved.',
+        'Geen ouder. Concept niet opgeslagen.' => 'Parent missing. Concept not saved.',
+        'Geen genus of uninomial. Concept niet opgeslagen.' => 'Genus or uninomial missing. Concept not saved.',
+        'Concept opgeslagen zonder ouder.' => 'Concept saved without parent.',
+        'Voorkomensgegevens kunnen niet worden ingevuld voor hogere taxa. Concept niet opgeslagen.' => 'Presence data cannot be saved for higher taxa. Concept not saved.',
+        'Incomplete voorkomensgegevens. Concept wel opgeslagen.' => 'Incomplete presence data. Concept saved nonetheless.',
+        "Geen auteurschap. Concept wel opgeslagen." => "No authorship. Concept saved nonetheless.",
+        'Nieuw concept aangemaakt.' => 'New concept created.',
+        'Aanmaak nieuw concept mislukt.' => 'Creation of new concept failed.',
+        'Naam opgeslagen.' => 'Name saved.',
+        'Naam niet opgeslagen.' => 'Name not saved.',
+        'Rang opgeslagen.' => 'Rank saved.',
+        'Rang niet opgeslagen.' => 'Rank not saved.',
+        'Koppeling ouder opgeslagen.' => 'Parent connection saved.',
+        'Koppeling ouder niet opgeslagen.' => 'Parent connection not saved.',
+        'Voorkomensstatus opgeslagen.' => 'Presence data saved.',
+        'Voorkomensstatus niet opgeslagen.' => 'Presence data not saved.',
+        'Habitat opgeslagen.' => 'Habitat saved.',
+        'Habitat niet opgeslagen.' => 'Habitat not saved.',
+        'Expert opgeslagen.' => 'Expert saved.',
+        'Expert niet opgeslagen.' => 'Expert not saved.',
+        'Organisatie opgeslagen.' => 'Organisation saved.',
+        'Organisatie niet opgeslagen.' => 'Organisation not saved.',
+        'Publicatie opgeslagen.' => 'Publication saved.',
+        'Publicatie niet opgeslagen.' => 'Publication not saved.',
+        'Naam bestaat al voor' => 'Name already exists for',
+        'een ander taxonconcept' => 'another taxon concept',
+        'Update naam taxon concept mislukt.' => 'Update name taxon concept failed.',
+        'Nieuwe naam aangemaakt.' => 'New name created.',
+        'Aanmaak nieuwe naam mislukt.' => 'Creation of new name failed.',
+        'Nederlandse "%s" bestaat al (naam wel opgeslagen):' => 'Common name "%s" already exists (name saved nonetheless):',
+        'Naam van:' => 'Name of:',
+        'Nederlandse naam aangemaakt.' => 'Common name created.',
+        'Nederlandse naam: referentie niet opgeslagen.' => 'Common name: reference not saved.',
+        'Nederlandse naam: expert niet opgeslagen.' => 'Common name: expert not saved.',
+        'Nederlandse naam: organisatie niet opgeslagen.' => 'Common name: organisation not saved.',
+        'Aanmaak Nederlandse naam mislukt.' => 'Creation of common name failed.',
+        'Uninomiaal opgeslagen.' => 'Uninomial saved.',
+        'Uninomiaal niet opgeslagen.' => 'Uninomial not saved.',
+        'Specifiek epithet opgeslagen.' => 'Specific epithet saved.',
+        'Specifiek epithet niet opgeslagen.' => 'Specific epithet not saved.',
+        'Infra-specifiek epithet opgeslagen.' => 'Infraspecific epithet saved.',
+        'Infra specifiek epithet niet opgeslagen.' => 'Infraspecific epithet not saved.',
+        '"Authorship" opgeslagen.' => 'Authorship saved.',
+        '"Authorship" niet opgeslagen.' => 'Authorship not saved.',
+        'Naam auteur opgeslagen.' => 'Name author saved.',
+        'Naam auteur niet opgeslagen.' => 'Name author not saved.',
+        'Jaar opgeslagen.' => 'Year saved.',
+        'Jaar niet opgeslagen.' => 'Year not saved.',
+        'Type opgeslagen.' => 'Type saved.',
+        'Type niet opgeslagen.' => 'Type not saved.',
+        'Rang opgeslagen.' => 'Rank saved.',
+        'Rang niet opgeslagen.' => 'Rank not saved.',
+        'Taal opgeslagen.' => 'Language saved.',
+        'Taal niet opgeslagen.' => 'Language not saved.',
+        'Referentie opgeslagen.' => 'Reference saved.',
+        'Referentie niet opgeslagen.' => 'Reference not saved.',
+        'Expert opgeslagen.' => 'Expert saved.',
+        'Expert niet opgeslagen.' => 'Expert not saved.',
+        'Organisatie opgeslagen.' => 'Organisation saved.',
+        'Organisatie niet opgeslagen.' => 'Organisation not saved.',
+        'Opmerking opgeslagen.' => 'Remark saved.',
+        'Opmerking niet opgeslagen.' => 'Remark not saved.',
+        'Conceptnaam opgeslagen.' => 'Concept name saved.',
+        'Conceptnaam niet opgeslagen.' => 'Concept name not saved.',
+        "Samengevoegde naamdelen komen niet overeen met de naam." => "Composed name elements do not match the name.",
+        "'Auteurschap' wijkt af van 'auteur(s)' + 'jaar'." => "Authorship differs from 'author(s)' + 'year'.",
+        "Geen geldig jaar." => "Invalid year.",
+        "Aan dit concept is geen wetenschappelijke naam gekoppeld." => "No scientific name linked to this concept.",
+        "Aan dit concept is geen Nederlandse voorkeursnaam gekoppeld." => "No preferred common name linked to this concept.",
+        'Geldige naam huidige taxon heeft geen losse uninominaal.' => 'Valid name of current taxon does not have a separate uninomial.',
+        'Geldige naam huidige taxon heeft geen los specifiek epithet.' => 'Valid name of current taxon does not have a separate species element.',
+        'Geldige naam beoogde ouder heeft geen losse uninominaal.' => 'Valid name of selected parent does not have a separate uninomial.',
+        'Geldige naam beoogde ouder heeft geen los specifiek epithet.' => 'Valid name of selected parent does not have a separate species element.',
+        'Er bestaat al een taxon %s in hetzelfde koninkrijk.' => 'Taxon %s already exists in the same kingdom.',
+        'Er bestaat al een taxon %s onder dezelfde ouder.' => 'Taxon %s with the same parent already exists.',
+        'Er bestaat al een taxon %s in hetzelfde koninkrijk.' => 'Taxon %s already exists in the same kingdom.',
+        "Synoniem %s bestaat al; duplicaat synoniem aangemaakt." => "Synonym %s already exists; duplicate synonym created.",
+        'Geaccepteerde naam omgezet naar synoniem.' => 'Accepted name converted to synonym.',
+        'Nieuwe geaccepteerde naam aangemaakt.' => 'New accepted name created.',
+        'Naam concept gewijzigd.' => 'Name concept updated.'
+    );
 */
+
+
+
 
 include_once ('NsrController.php');
 include_once ('ModuleSettingsReaderController.php');
@@ -192,7 +302,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId( $this->rGetId() );
 			$this->toggleConceptDeleted(true);
-			$this->setMessage('Concept gemarkeerd als verwijderd.');
+			$this->setMessage($this->translate('Concept marked as deleted.'));
 			$this->resetTree();
 		}
 		else
@@ -200,7 +310,7 @@ class NsrTaxonController extends NsrController
 		{
 			$this->setConceptId( $this->rGetId() );
 			$this->toggleConceptDeleted(false);
-			$this->setMessage('Concept niet langer gemarkeerd als verwijderd.');
+			$this->setMessage($this->translate('Concept no longer marked as deleted.'));
 			$this->resetTree();
 		}
 		else
@@ -286,7 +396,7 @@ class NsrTaxonController extends NsrController
 			$this->setNameId($this->rGetId());
 			$name=$this->getName(array('id'=>$this->getNameId()));
 			$this->deleteName();
-			$this->setMessage('Naam verwijderd.');
+			$this->setMessage($this->translate('Name deleted.'));
 			$this->redirect('taxon.php?id='.$name['taxon_id']);
 		}
 		else
@@ -338,20 +448,15 @@ class NsrTaxonController extends NsrController
 				{
 					if ($concept['base_rank']<SPECIES_RANK_ID)
 					{
-						$this->addWarning("
-							Let op: de wetenschappelijke naam komt niet overeen met de samengestelde naamdelen.
-							Dit is waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
-							de juiste uninomial en eventueel auteurschap in om de naamkaart volledig te maken.
-						");
+						$this->addWarning($this->translate("
+						    Note: the scientific name does not match the composite of individual name elements. Please enter the correct uninomial and (if applicable) authorship to complete the name card.
+						"));
 					}
 					else
 					{
-						$this->addWarning("
-							Let op: de wetenschappelijke naam komt niet overeen met de samengestelde naamdelen.
-							Dit is waarschijnlijk een overerving uit de oude Soortenregister-database. Vul a.u.b.
-							de juiste genus, soort, eventuele derde naamdeel en auteurschap in om de naamkaart
-							volledig te maken.
-						");
+						$this->addWarning($this->translate("
+						    Note: the scientific name does not match the composite of individual name elements. Please enter the correct genus, species and (if applicable) subspecific epithet and authorship to complete the name card.
+						"));
 					}
 				}
 			}
@@ -366,7 +471,7 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		{
-			$this->addError('Geen ID.');
+			$this->addError($this->translate('No ID.'));
 		}
 
 		if (isset($concept))
@@ -402,12 +507,12 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateConceptTaxon(array('new'=>$this->rGetVal('taxon'))))
 			{
-				$this->addMessage( 'Naam opgeslagen' );
+				$this->addMessage($this->translate('Name saved'));
 				$this->resetTree();
 			}
 			else
 			{
-				$this->addWarning( 'Naam niet opgeslagen' );
+				$this->addWarning($this->translate('Name not saved'));
 			}
 		}
 
@@ -443,7 +548,7 @@ class NsrTaxonController extends NsrController
 		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->updateName();
-			$this->addMessage( 'Naam opgeslagen' );
+			$this->addMessage($this->translate('Name saved'));
 			$this->resetTree();
 		}
 
@@ -469,7 +574,7 @@ class NsrTaxonController extends NsrController
 		if ($this->rHasVal('action','update') && !$this->isFormResubmit())
 		{
 			$this->saveTaxonParentage();
-			$this->addMessage('Tabel bijgewerkt');
+			$this->addMessage($this->translate('Table updated'));
 			$this->logChange( ['note'=>'Manually updated index table'] );
 		}
 
@@ -895,7 +1000,7 @@ class NsrTaxonController extends NsrController
 			{
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'');
 			}
-			
+
 			if (!$formatted)
 			{
 				$taxa[$key]['label']=strip_tags($taxa[$key]['label']);
@@ -1125,11 +1230,11 @@ class NsrTaxonController extends NsrController
 		{
 			$this->addError(
 				sprintf(
-					"Een %s kan alleen %s als ouder hebben.",
+					$this->translate("A %s can only have %s as a parent."),
 					$ranks[$child_base_rank]['rank'],
-					implode(" of ",$error)
+					implode(" " . $this->translate('or') . " ",$error)
 				).
-				" Concept niet opgeslagen."
+				" " . $this->translate("Concept not saved.")
 
 			);
 			return false;
@@ -1143,7 +1248,7 @@ class NsrTaxonController extends NsrController
 		//if ($baseRank>=GENUS_RANK_ID && empty($authorship))
 		if ($baseRank>GENUS_RANK_ID && empty($authorship))
 		{
-			$this->addError("Geen auteurschap. Concept niet opgeslagen.");
+			$this->addError($this->translate("Authorship missing. Concept not saved."));
 			return false;
 		}
 
@@ -1156,19 +1261,19 @@ class NsrTaxonController extends NsrController
 		{
 			if ( empty($uninomial) && ($baseRank<SPECIES_RANK_ID && $baseRank>=GENUS_RANK_ID) )
 			{
-				$this->addError("Wetenschappelijke naam: genus ontbreekt. Concept niet opgeslagen.");
+				$this->addError($this->translate("Scientific name: genus is missing. Concept not saved."));
 				return false;
 			}
 			else
 			if ( empty($uninomial) && $baseRank<GENUS_RANK_ID )
 			{
-				$this->addError("Wetenschappelijke naam: uninomial ontbreekt. Concept niet opgeslagen.");
+				$this->addError($this->translate("Scientific name: uninomial is missing. Concept not saved."));
 				return false;
 			}
 			else
 			if ( !empty($specificEpithet) || !empty($infraSpecificEpithet) )
 			{
-				$this->addError("Wetenschappelijke naam kan maar uit één deel bestaan. Concept niet opgeslagen.");
+				$this->addError($this->translate("Scientific name can consist of only a single element. Concept not saved."));
 				return false;
 			}
 		}
@@ -1177,13 +1282,13 @@ class NsrTaxonController extends NsrController
 		{
 			if ( empty($uninomial) || empty($specificEpithet) )
 			{
-				$this->addError("Wetenschappelijke naam incompleet. Concept niet opgeslagen.");
+				$this->addError($this->translate("Scientific name incomplete. Concept not saved."));
 				return false;
 			}
 			else
 			if ( !empty($infraSpecificEpithet) )
 			{
-				$this->addError("Wetenschappelijke naam kan geen derde naamdeel hebben. Concept niet opgeslagen.");
+				$this->addError($this->translate("Scientific name cannot have a third name element. Concept not saved."));
 				return false;
 			}
 
@@ -1193,7 +1298,7 @@ class NsrTaxonController extends NsrController
 		{
 			if (empty($uninomial) || empty($specificEpithet) || empty($infraSpecificEpithet))
 			{
-				$this->addError("Wetenschappelijke naam incompleet. Concept niet opgeslagen.");
+				$this->addError($this->translate("Scientific name incomplete. Concept not saved."));
 				return false;
 			}
 		}
@@ -1214,10 +1319,10 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->addError(
-				"Combinatie naam, rang en ouder bestaat al".
-				( $d[0]['is_deleted']==1 ? " (verwijderd taxon)" : "" ).".".
-				" Concept niet opgeslagen.".
-				" <a href=\"taxon.php?id=".$d[0]['id']."\">Taxon tonen</a>");
+				$this->translate("Combination of name, rank and parent already exists") .
+				( $d[0]['is_deleted']==1 ? " (deleted taxon)" : "" ).". ".
+				$this->translate("Concept not saved.") .
+				" <a href=\"taxon.php?id=".$d[0]['id']."\">" . $this->translate('Show taxon') . "</a>");
 			return false;
 		}
 
@@ -1260,10 +1365,10 @@ class NsrTaxonController extends NsrController
 
 		if (empty($name) || empty($rank) || empty($uninomial))
 		{
-			if (empty($name)) $this->addError('Lege conceptnaam. Concept niet opgeslagen.');
-			if (empty($rank)) $this->addError('Geen rang. Concept niet opgeslagen.');
-			if (empty($parent)) $this->addError('Geen ouder. Concept niet opgeslagen.');
-			if (empty($uninomial)) $this->addError('Geen genus of uninomial. Concept niet opgeslagen.');
+			if (empty($name)) $this->addError($this->translate('Empty concept name. Concept not saved.'));
+			if (empty($rank)) $this->addError($this->translate('Rank missing. Concept not saved.'));
+			if (empty($parent)) $this->addError($this->translate('Parent missing. Concept not saved.'));
+			if (empty($uninomial)) $this->addError($this->translate('Genus or uninomial missing. Concept not saved.'));
 			$this->setConceptId(null);
 			return;
 		}
@@ -1275,13 +1380,13 @@ class NsrTaxonController extends NsrController
 
 			if ( !$this->firstTaxon )
 			{
-				$this->addError('Geen ouder. Concept niet opgeslagen.');
+				$this->addError($this->translate('Parent missing. Concept not saved.'));
 				$this->setConceptId(null);
 				return;
 			}
 			else
 			{
-				$this->addWarning('Concept opgeslagen zonder ouder.');
+				$this->addWarning($this->translate('Concept saved without parent.'));
 			}
 		}
 
@@ -1314,7 +1419,7 @@ class NsrTaxonController extends NsrController
 			 $baseRank<SPECIES_RANK_ID
 			)
 		{
-			$this->addError('Voorkomensgegevens kunnen niet worden ingevuld voor hogere taxa. Concept niet opgeslagen.');
+			$this->addError($this->translate('Presence data cannot be saved for higher taxa. Concept not saved.'));
 			$this->setConceptId(null);
 			return;
 		} else
@@ -1324,12 +1429,12 @@ class NsrTaxonController extends NsrController
 			$rank>=SPECIES_RANK_ID
 		)
 		{
-			$this->addWarning('Incomplete voorkomensgegevens. Concept wel opgeslagen.');
+			$this->addWarning($this->translate('Incomplete presence data. Concept saved nonetheless.'));
 		}
 
 		if ($baseRank==GENUS_RANK_ID && empty($authorship))
 		{
-			$this->addWarning("Geen auteurschap. Concept wel opgeslagen.");
+			$this->addWarning($this->translate("No authorship. Concept saved nonetheless."));
 		}
 
 
@@ -1345,7 +1450,7 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->setConceptId($this->models->Taxa->getNewId());
-			$this->addMessage('Nieuw concept aangemaakt.');
+			$this->addMessage($this->translate('New concept created.'));
 			$this->logChange(array(
 				'after'=>array('id'=>$this->getConceptId(),
 				'taxon'=>$name,'rank_id' =>$rank),
@@ -1355,7 +1460,7 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		{
-			$this->addError('Aanmaak nieuw concept mislukt.');
+			$this->addError($this->translate('Creation of new concept failed.'));
 		}
 	}
 
@@ -1371,11 +1476,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateConceptTaxon($this->rGetVal('concept_taxon')))
 			{
-				$this->addMessage('Naam opgeslagen.');
+				$this->addMessage($this->translate('Name saved.'));
 			}
 			else
 			{
-				$this->addError('Naam niet opgeslagen.');
+				$this->addError($this->translate('Name not saved.'));
 			}
 		}
 
@@ -1383,11 +1488,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateConceptRankId($this->rGetVal('concept_rank_id')))
 			{
-				$this->addMessage('Rang opgeslagen.');
+				$this->addMessage($this->translate('Rank saved.'));
 			}
 			else
 			{
-				$this->addError('Rang niet opgeslagen.');
+				$this->addError($this->translate('Rank not saved.'));
 			}
 		}
 
@@ -1395,11 +1500,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateParentId($this->rGetVal('parent_taxon_id')))
 			{
-				$this->addMessage('Koppeling ouder opgeslagen.');
+				$this->addMessage($this->translate('Parent connection saved.'));
 			}
 			else
 			{
-				$this->addError('Koppeling ouder niet opgeslagen.');
+				$this->addError($this->translate('Parent connection not saved.'));
 			}
 		}
 
@@ -1407,11 +1512,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateConceptPresenceId($this->rGetVal('presence_presence_id')))
 			{
-				$this->addMessage('Voorkomensstatus opgeslagen.');
+				$this->addMessage($this->translate('Presence data saved.'));
 			}
 			else
 			{
-				$this->addError('Voorkomensstatus niet opgeslagen.');
+				$this->addError($this->translate('Presence data not saved.'));
 			}
 		}
 
@@ -1419,11 +1524,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateConceptHabitatId($this->rGetVal('presence_habitat_id')))
 			{
-				$this->addMessage('Habitat opgeslagen.');
+				$this->addMessage($this->translate('Habitat saved.'));
 			}
 			else
 			{
-				$this->addError('Habitat niet opgeslagen.');
+				$this->addError($this->translate('Habitat not saved.'));
 			}
 		}
 
@@ -1431,11 +1536,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updatePresenceExpertId($this->rGetVal('presence_expert_id')))
 			{
-				$this->addMessage('Expert opgeslagen.');
+				$this->addMessage($this->translate('Expert saved.'));
 			}
 			else
 			{
-				$this->addError('Expert niet opgeslagen.');
+				$this->addError($this->translate('Expert not saved.'));
 			}
 		}
 
@@ -1443,11 +1548,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updatePresenceOrganisationId($this->rGetVal('presence_organisation_id')))
 			{
-				$this->addMessage('Organisatie opgeslagen.');
+				$this->addMessage($this->translate('Organisation saved.'));
 			}
 			else
 			{
-				$this->addError('Organisatie niet opgeslagen.');
+				$this->addError($this->translate('Organisation not saved.'));
 			}
 		}
 
@@ -1455,11 +1560,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updatePresenceReferenceId($this->rGetVal('presence_reference_id')))
 			{
-				$this->addMessage('Publicatie opgeslagen.');
+				$this->addMessage($this->translate('Publication saved.'));
 			}
 			else
 			{
-				$this->addError('Publicatie niet opgeslagen.');
+				$this->addError($this->translate('Publication not saved.'));
 			}
 		}
 
@@ -1494,10 +1599,10 @@ class NsrTaxonController extends NsrController
 			$exist=$this->getTaxonByName(trim($values['new']));
 			if ($exist)
 			{
-				$this->addError(sprintf('Naam bestaat al voor een <a target="_new" href="taxon.php?id=%s">ander taxonconcept</a>.',$exist['id']));
+				$this->addError(sprintf($this->translate('Name already exists for') . ' <a target="_new" href="taxon.php?id=%s">' . $this->translate('another taxon concept') . '</a>.',$exist['id']));
 			}
 
-			$this->addError('Update naam taxon concept mislukt.');
+			$this->addError($this->translate('Update name taxon concept failed.'));
 			return false;
 		}
 	}
@@ -1606,13 +1711,13 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->setNameId($this->models->Names->getNewId());
-			$this->addMessage('Nieuwe naam aangemaakt.');
+			$this->addMessage($this->translate('New name created.'));
 			$this->setIsNewRecord(true);
 			$this->updateName();
 		}
 		else
 		{
-			$this->addError('Aanmaak nieuwe naam mislukt.');
+			$this->addError($this->translate('Creation of new name failed.'));
 		}
 	}
 
@@ -1629,10 +1734,10 @@ class NsrTaxonController extends NsrController
 
 		if ($d)
 		{
-			$this->setMessage(sprintf('Nederlandse "%s" bestaat al (naam wel opgeslagen):'),$name['new']);
+			$this->setMessage(sprintf($this->translate('Common name "%s" already exists (name saved nonetheless):')),$name['new']);
 			foreach((array)$d as $val)
 			{
-				$this->setMessage('<a href="name.php?id='.$val['id'].'">Naam van: '.$val['taxon'].'</a>');
+				$this->setMessage('<a href="name.php?id='.$val['id'].'">' . $this->translate('Name of:') . ' '.$val['taxon'].'</a>');
 			}
 		}
 
@@ -1666,7 +1771,7 @@ class NsrTaxonController extends NsrController
 		if ($d)
 		{
 			$this->setNameId($this->models->Names->getNewId());
-			$this->addMessage('Nederlandse naam aangemaakt.');
+			$this->addMessage($this->translate('Common name created.'));
 
 			$newname=$this->getName(array('id'=>$this->getNameId()));
 			$this->logChange(array('after'=>$newname,'note'=>'new main language name '.$newname['name']));
@@ -1675,7 +1780,7 @@ class NsrTaxonController extends NsrController
 			{
 				if (!$this->updateNameReferenceId($this->rGetVal('main_language_name_reference_id')))
 				{
-					$this->addError('Nederlandse naam: referentie niet opgeslagen.');
+					$this->addError($this->translate('Common name: reference not saved.'));
 				}
 			}
 
@@ -1683,7 +1788,7 @@ class NsrTaxonController extends NsrController
 			{
 				if (!$this->updateNameExpertId($this->rGetVal('main_language_name_expert_id')))
 				{
-					$this->addError('Nederlandse naam: expert niet opgeslagen.');
+					$this->addError($this->translate('Common name: expert not saved.'));
 				}
 			}
 
@@ -1691,14 +1796,14 @@ class NsrTaxonController extends NsrController
 			{
 				if (!$this->updateNameOrganisationId($this->rGetVal('main_language_name_organisation_id')))
 				{
-					$this->addError('Nederlandse naam: organisatie niet opgeslagen.');
+					$this->addError($this->translate('Common name: organisation not saved.'));
 				}
 			}
 
 		}
 		else
 		{
-			$this->addError('Aanmaak Nederlandse naam mislukt.');
+			$this->addError($this->translate('Creation of common name failed.'));
 		}
 
 	}
@@ -1715,11 +1820,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameName($this->rGetVal('name_name')))
 			{
-				$this->addMessage('Naam opgeslagen.');
+				$this->addMessage($this->translate('Name saved.'));
 			}
 			else
 			{
-				$this->addError('Naam niet opgeslagen.');
+				$this->addError($this->translate('Name not saved.'));
 			}
 		}
 
@@ -1727,11 +1832,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameUninomial($this->rGetVal('name_uninomial')))
 			{
-				$this->addMessage('Uninomiaal opgeslagen.');
+				$this->addMessage($this->translate('Uninomial saved.'));
 			}
 			else
 			{
-				$this->addError('Uninomiaal niet opgeslagen.');
+				$this->addError($this->translate('Uninomial not saved.'));
 			}
 		}
 
@@ -1739,11 +1844,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameSpecificEpithet($this->rGetVal('name_specific_epithet')))
 			{
-				$this->addMessage('Specifiek epithet opgeslagen.');
+				$this->addMessage($this->translate('Specific epithet saved.'));
 			}
 			else
 			{
-				$this->addError('Specifiek epithet niet opgeslagen.');
+				$this->addError($this->translate('Specific epithet not saved.'));
 			}
 		}
 
@@ -1751,11 +1856,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameInfraSpecificEpithet($this->rGetVal('name_infra_specific_epithet')))
 			{
-				$this->addMessage('Infra-specifiek epithet opgeslagen.');
+				$this->addMessage($this->translate('Infraspecific epithet saved.'));
 			}
 			else
 			{
-				$this->addError('Infra specifiek epithet niet opgeslagen.');
+				$this->addError($this->translate('Infraspecific epithet not saved.'));
 			}
 		}
 
@@ -1763,11 +1868,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameAuthorship($this->rGetVal('name_authorship')))
 			{
-				$this->addMessage('"Authorship" opgeslagen.');
+				$this->addMessage($this->translate('Authorship saved.'));
 			}
 			else
 			{
-				$this->addError('"Authorship" niet opgeslagen.');
+				$this->addError($this->translate('Authorship not saved.'));
 			}
 		}
 
@@ -1775,11 +1880,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameAuthor($this->rGetVal('name_name_author')))
 			{
-				$this->addMessage('Naam auteur opgeslagen.');
+				$this->addMessage($this->translate('Name author saved.'));
 			}
 			else
 			{
-				$this->addError('Naam auteur niet opgeslagen.');
+				$this->addError($this->translate('Name author not saved.'));
 			}
 		}
 
@@ -1787,11 +1892,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameAuthorshipYear($this->rGetVal('name_authorship_year')))
 			{
-				$this->addMessage('Jaar opgeslagen.');
+				$this->addMessage($this->translate('Year saved.'));
 			}
 			else
 			{
-				$this->addError('Jaar niet opgeslagen.');
+				$this->addError($this->translate('Year not saved.'));
 			}
 		}
 
@@ -1799,11 +1904,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameTypeId($this->rGetVal('name_type_id')))
 			{
-				$this->addMessage('Type opgeslagen.');
+				$this->addMessage($this->translate('Type saved.'));
 			}
 			else
 			{
-				$this->addError('Type niet opgeslagen.');
+				$this->addError($this->translate('Type not saved.'));
 			}
 		}
 
@@ -1812,11 +1917,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameRankId($this->rGetVal('name_rank_id')))
 			{
-				$this->addMessage('Rang opgeslagen.');
+				$this->addMessage($this->translate('Rank saved.'));
 			}
 			else
 			{
-				$this->addError('Rang niet opgeslagen.');
+				$this->addError($this->translate('Rank not saved.'));
 			}
 		}
 
@@ -1824,11 +1929,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameLanguageId($this->rGetVal('name_language_id')))
 			{
-				$this->addMessage('Taal opgeslagen.');
+				$this->addMessage($this->translate('Language saved.'));
 			}
 			else
 			{
-				$this->addError('Taal niet opgeslagen.');
+				$this->addError($this->translate('Language not saved.'));
 			}
 		}
 
@@ -1836,11 +1941,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameReferenceId($this->rGetVal('name_reference_id')))
 			{
-				$this->addMessage('Referentie opgeslagen.');
+				$this->addMessage($this->translate('Reference saved.'));
 			}
 			else
 			{
-				$this->addError('Referentie niet opgeslagen.');
+				$this->addError($this->translate('Reference not saved.'));
 			}
 		}
 
@@ -1848,11 +1953,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameExpertId($this->rGetVal('name_expert_id')))
 			{
-				$this->addMessage('Expert opgeslagen.');
+				$this->addMessage($this->translate('Expert saved.'));
 			}
 			else
 			{
-				$this->addError('Expert niet opgeslagen.');
+				$this->addError($this->translate('Expert not saved.'));
 			}
 		}
 
@@ -1860,11 +1965,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateNameOrganisationId($this->rGetVal('name_organisation_id')))
 			{
-				$this->addMessage('Organisatie opgeslagen.');
+				$this->addMessage($this->translate('Organisation saved.'));
 			}
 			else
 			{
-				$this->addError('Organisatie niet opgeslagen.');
+				$this->addError($this->translate('Organisation not saved.'));
 			}
 		}
 
@@ -1872,11 +1977,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->saveNameAanvulling($this->rGetVal('aanvulling')))
 			{
-				$this->addMessage('Opmerking opgeslagen.');
+				$this->addMessage($this->translate('Remark saved.'));
 			}
 			else
 			{
-				$this->addError('Opmerking niet opgeslagen.');
+				$this->addError($this->translate('Remark not saved.'));
 			}
 		}
 
@@ -1916,11 +2021,11 @@ class NsrTaxonController extends NsrController
 		{
 			if ($this->updateConceptTaxon($this->rGetVal('name_name')))
 			{
-				$this->addMessage('Conceptnaam opgeslagen.');
+				$this->addMessage($this->translate('Concept name saved.'));
 			}
 			else
 			{
-				$this->addError('Conceptnaam niet opgeslagen.');
+				$this->addError($this->translate('Concept name not saved.'));
 			}
 
 		}
@@ -2087,15 +2192,15 @@ class NsrTaxonController extends NsrController
 	{
 		if (!$this->checkNamePartsMatchName($name))
 		{
-			$this->addWarning("Samengevoegde naamdelen komen niet overeen met de naam.");
+			$this->addWarning($this->translate("Composition of name elements does not match the name."));
 		}
 		if (!$this->checkAuthorshipYear($name))
 		{
-			$this->addWarning("'Auteurschap' wijkt af van 'auteur(s)' + 'jaar'.");
+			$this->addWarning($this->translate("Authorship differs from 'author(s)' + 'year'."));
 		}
 		if (!$this->checkYear($name))
 		{
-			$this->addWarning("Geen geldig jaar.");
+			$this->addWarning($this->translate("Invalid year."));
 		}
 	}
 
@@ -2103,12 +2208,12 @@ class NsrTaxonController extends NsrController
 	{
 		if (!$this->checkIfConceptRetainsScientificName($concept['id']))
 		{
-			$this->addWarning("Aan dit concept is geen wetenschappelijke naam gekoppeld.");
+			$this->addWarning($this->translate("No scientific name linked to this concept."));
 		}
 
 		if (!$this->checkIfConceptRetainsNameInMainProjectLanguage($concept['id']) && $concept['base_rank']>=SPECIES_RANK_ID)
 		{
-			$this->addWarning("Aan dit concept is geen Nederlandse voorkeursnaam gekoppeld.");
+			$this->addWarning($this->translate("No preferred common name linked to this concept."));
 		}
 	}
 
@@ -2135,7 +2240,7 @@ class NsrTaxonController extends NsrController
 
 		$a=trim((!empty($name['name_author']) ? $name['name_author'].', ' : null).
 				(!empty($name['authorship_year']) ? $name['authorship_year'] : null),', ');
-				
+
 		$b=trim(substr($name['authorship'],0,1)=='(' && substr($name['authorship'],-1)==')' ? trim($name['authorship'],')( ') : $name['authorship']);
 
 		return ($a==$b);
@@ -2456,22 +2561,22 @@ class NsrTaxonController extends NsrController
 			// checking if name parts are complete
 			if (empty($name['uninomial']))
 			{
-				$this->addError('Geldige naam huidige taxon heeft geen losse uninominaal.');
+				$this->addError($this->translate('Valid name of current taxon does not have a separate uninomial.'));
 				$canChange=false;
 			}
 			if ($concept['base_rank']>=SPECIES_RANK_ID && empty($name['specific_epithet']))
 			{
-				$this->addError('Geldige naam huidige taxon heeft geen los specifiek epithet.');
+				$this->addError($this->translate('Valid name of current taxon does not have a separate species element.'));
 				$canChange=false;
 			}
 			if (empty($parentName['uninomial']))
 			{
-				$this->addError('Geldige naam beoogde ouder heeft geen losse uninominaal.');
+				$this->addError($this->translate('Valid name of selected parent does not have a separate uninomial.'));
 				$canChange=false;
 			}
 			if ($parent['base_rank']>=SPECIES_RANK_ID && empty($parentName['specific_epithet']))
 			{
-				$this->addError('Geldige naam beoogde ouder heeft geen los specifiek epithet.');
+				$this->addError($this->translate('Valid name of selected parent does not have a separate species element.'));
 				$canChange=false;
 			}
 
@@ -2536,9 +2641,11 @@ class NsrTaxonController extends NsrController
 
 			if ($d!==false)
 			{
-				$this->addError(
-					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$intendedNewConceptName.'</a>" in hetzelfde koninkrijk.'
-				);
+			    $this->addError(
+			    	sprintf(
+						$this->translate('Taxon %s already exists in the same kingdom.'), '"<a href="taxon.php?id='.$d.'">'.$intendedNewConceptName.'</a>"'
+			    	)
+			    );
 				return false;
 			}
 
@@ -2564,7 +2671,11 @@ class NsrTaxonController extends NsrController
 
 			if ($d)
 			{
-				$this->addError('Er bestaat al een taxon "<a href="taxon.php?id='.$d[0]['taxon_id'].'">'.$intendedNewConceptName.'</a>" onder dezelfde ouder.');
+			    $this->addError(
+			    	sprintf(
+						$this->translate('Taxon %s with the same parent already exists.'), '"<a href="taxon.php?id='.$d[0]['taxon_id'].'">'.$intendedNewConceptName.'</a>"'
+			    	)
+			    );
 				return false;
 			}
 
@@ -2595,9 +2706,11 @@ class NsrTaxonController extends NsrController
 
 			if ($d!==false)
 			{
-				$this->addError(
-					'Er bestaat al een taxon "<a href="taxon.php?id='.$d.'">'.$iName.'</a>" in hetzelfde koninkrijk.'
-				);
+			    $this->addError(
+			    	sprintf(
+						$this->translate('Taxon %s already exists in the same kingdom.'), '"<a href="taxon.php?id='.$d.'">'.$iName.'</a>"'
+			    	)
+			    );
 				return false;
 			}
 		}
@@ -2686,7 +2799,11 @@ class NsrTaxonController extends NsrController
 
 			if ($d)
 			{
-				$this->addWarning("Synoniem \"".$newSynonym."\" bestaat al; duplicaat synoniem aangemaakt.");
+			    $this->addWarning(
+			    	sprintf(
+						$this->translate("Synonym %s already exists; duplicate synonym created."), "'$newSynonym'"
+			    	)
+			    );
 			}
 
 			$this->models->Names->update(
@@ -2701,7 +2818,7 @@ class NsrTaxonController extends NsrController
 
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$val['id'])));
 			$this->logChange(array('before'=>$name,'after'=>$after[0],'note'=>'changed valid name '.$newSynonym.' to synonym'));
-			$this->addMessage('Geaccepteerde naam omgezet naar synoniem.');
+			$this->addMessage($this->translate('Accepted name converted to synonym.'));
 
 
 			if (isset($data['name_uninomial']['new']))
@@ -2782,11 +2899,11 @@ class NsrTaxonController extends NsrController
 			$after=$this->models->Names->_get(array('id'=> array('id'=>$id)));
 
 			$this->logChange(array('after'=>$after[0],'note'=>'created new valid name '.$newName));
-			$this->addMessage('Nieuwe geaccepteerde naam aangemaakt.');
+			$this->addMessage($this->translate('New accepted name created.'));
 
 			$this->setConceptId($val['taxon_id']);
 			$this->updateConceptTaxon(array('new'=>$newName));
-			$this->addMessage('Naam concept gewijzigd.');
+			$this->addMessage($this->translate('Name concept updated.'));
 
 			if (isset($data['parent_taxon_id']['new']))
 			{
@@ -2832,6 +2949,8 @@ class NsrTaxonController extends NsrController
 
 		return $g;
 	}
+
+
 
 
 }
