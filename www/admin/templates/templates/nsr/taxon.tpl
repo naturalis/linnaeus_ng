@@ -23,7 +23,7 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">{t}taxon concept:{/t}</span> {$concept.taxon}</h2>
+<h2><span style="font-size:12px;font-style:normal">{t}concept card{/t}:</span> {$concept.taxon}</h2>
 {if $concept.is_deleted}<span style="color:red;font-weight:bold">{t}CONCEPT IS MARKED AS DELETED{/t}</span><br />
 <a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">{t}undo deletion{/t}</a>
 {/if}
@@ -39,12 +39,12 @@
             <td><i>{t}concept{/t}</i></td>
         </tr>
         <tr>
-            <th>{t}name:{/t}</th>
+            <th>{t}name{/t}:</th>
             <td>
                 {$concept.taxon}
             </td>
         </tr>
-        <tr><th>{t}rank:{/t}</th>
+        <tr><th>{t}rank{/t}:</th>
             <td>
                 {foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="concept_rank_id">{t}edit{/t}</a>
@@ -57,7 +57,7 @@
                 </span> *
             </td>
         </tr>
-        <tr><th>{t}parent:{/t}</th>
+        <tr><th>{t}parent{/t}:</th>
             <td>
                 <span id="parent_taxon"><a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a></span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
@@ -76,11 +76,11 @@
             <td><i>{t}presence{/t}</i></td>
         </tr>
         <tr>
-            <th>{t}status:{/t}</th>
+            <th>{t}status{/t}:</th>
             <td>
                 {if $presence.presence_id}
                     <span title="{$presence.presence_information_one_line}">{$presence.presence_index_label}. {$presence.presence_label}</span>
-                {else}n.a.{/if}
+                {else}{t}n.a.{/t}{/if}
                 <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_presence_id">{t}edit{/t}</a>
                 <span class="editspan">
                     <select id="presence_presence_id" onchange="storedata(this);" >
@@ -138,7 +138,7 @@
             </td>
         </tr>
 
-        <tr><th>{t}organisation:{/t}</th>
+        <tr><th>{t}organisation{/t}:</th>
             <td>
                 {if $presence.organisation_id!=''}
                     {$presence.organisation_name}
@@ -160,7 +160,7 @@
             </td>
         </tr>
 
-        <tr><th>{t}publication:{/t}</th>
+        <tr><th>{t}publication{/t}:</th>
             <td>
                 <span id="presence_reference">{if $presence.reference_id!=''}{$presence.reference_label}{/if}</span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">{t}edit{/t}</a> *
@@ -172,7 +172,7 @@
 
         </table>
     </p>
-    <input type="button" value="save" onclick="saveconcept();" />
+    <input type="button" value="{t}save{/t}" onclick="saveconcept();" />
 
     </form>
 
@@ -212,7 +212,7 @@
         <a href="media.php?id={$concept.id}&noautoexpand=1" class="edit" style="margin:0">{t}media{/t}</a><br />
         <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literature{/t}</a><br />
         {if $show_nsr_specific_stuff}
-        <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}images (NSR-only){/t}</a><br />
+        <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}images{/t}</a><br />
 		{/if}
         {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
@@ -228,7 +228,7 @@
 
         {assign var=k value=0}
         {foreach $traitgroups v}
-        {if $k==0}<br /><br /><span class="small">{t}add traits:{/t}</span><br />{/if}
+        {if $k==0}<br /><br /><span class="small">{t}add traits{/t}:</span><br />{/if}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {assign var=k value=$k+1}
 		{/foreach}

@@ -23,14 +23,14 @@
             </td>
 		</tr>
 		<tr>
-        	<th>species:</th>
+        	<th>{t}species{/t}:</th>
             <td>
             	<input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_specific_epithet" value="{$name.specific_epithet}" label="soort" />
             	<span class="inline_message" id="name_specific_epithet_message"></span>
 			</td>
 		</tr>
 		<tr>
-        	<th>subspecific epithet:<br /><span class="inline_subtext">(subspecies, forma, varietas, etc.)</span></th>
+        	<th>{t}third name element{/t}:<br /><span class="inline_subtext">({t}subspecies, forma, varietas, etc.{/t})</span></th>
             <td>
             	<input onkeyup="namepartscomplete();partstoname();" type="text" class="medium" id="name_infra_specific_epithet" value="{$name.infra_specific_epithet}" />
             	<span class="inline_message" id="name_infra_specific_epithet_message"></span>
@@ -38,7 +38,7 @@
 	</tr>
 {else}
 		<tr>
-        	<th>uninomial:</th>
+        	<th>{t}uninomial{/t}:</th>
             <td><input onkeyup="partstoname();" type="text" class="medium" id="name_uninomial" value="{$name.uninomial}" mandatory="mandatory" label="naam" /> *
 
             </td>
@@ -48,32 +48,32 @@
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
 	<tr>
-		<th title="enter the complete value for 'authorship', including comma, year and brackets; the program automatically deduces the values for author and year.">
-			authorship:
-		</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship"  value="{$name.authorship}" label="authorship" /></td>
+		<th title="{t}enter the complete value for authorship, including comma, year and brackets; the program automatically deduces the values for author and year.{/t}">
+			{t}authorship{/t}:
+		</th><td><input onkeyup="partstoname();" type="text" class="medium" id="name_authorship"  value="{$name.authorship}" label="{t}authorship{/t}" /></td>
 	</tr>
-	<tr><th>author(s):</th><td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" disabled="disabled" label="author" /></td></tr>
+	<tr><th>{t}author(s){/t}:</th><td><input type="text" class="medium" id="name_name_author" value="{$name.name_author}" disabled="disabled" label="{t}author{/t}" /></td></tr>
 	<tr>
-		<th>year:</th>
+		<th>{t}year{/t}:</th>
 		<td>
-			<input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" disabled="disabled" label="year" />
+			<input type="text" class="small" id="name_authorship_year" value="{$name.authorship_year}" disabled="disabled" label="{t}year{/t}" />
 		</td>
 	</tr>
 
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
-    <tr><th title="scientific name is compiled automatically.">{t}scientific name{/t}:</th><td>
-        <input type="text" id="concept_taxon" value="{$name.name}" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="synonym" />
+    <tr><th title="{t}scientific name is compiled automatically.{/t}">{t}scientific name{/t}:</th><td>
+        <input type="text" id="concept_taxon" value="{$name.name}" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="{t}synonym{/t}" />
         <input type="hidden" id="name_name" value="" />
     </td></tr>
 
 	<tr><th colspan="2">&nbsp;</td></tr>
 
 	<tr>
-    	<th>type:</th>
+    	<th>{t}type{/t}:</th>
         <td>
             <select id="name_type_id" mandatory="mandatory" label="type" >
-                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>n.a.</option>
+                <option value="" {if !$name.type_id && $k==0} selected="selected"{/if}>{t]n.a.{/t]</option>
             {foreach from=$nametypes item=v key=k}
             {if !$v.noNameParts}
                 <option
@@ -88,11 +88,11 @@
 	</tr>
 
     <tr>
-    	<th>rank:</th>
+    	<th>{t}rank{/t}:</th>
         <td>
 			{if $name.type_id!=$validnameid}
                 <select id="name_rank_id">
-                <option value="" {if $name.rank_id==''} selected="selected"{/if}>n.a.</option>
+                <option value="" {if $name.rank_id==''} selected="selected"{/if}>{t}n.a.{/t}</option>
                 {foreach from=$ranks item=v}
                 <option value="{$v.id}" {if $v.id==$name.rank_id} selected="selected"{/if}>{$v.label}</option>
                 {/foreach}
@@ -106,19 +106,19 @@
 	{if $show_nsr_specific_stuff}
 
 	<tr><th colspan="2">&nbsp;</td></tr>
-	<tr><th>literature:</th><td>
+	<tr><th>{t}literature{/t}:</th><td>
     	<span id="name_reference">
 		{if $name.reference_id!=''}
 			{$name.reference_name}
-		{else}n.a.{/if}
+		{else}{t}n.a.{/t}{/if}
         </span>
         <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
         <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 	</td></tr>
 
-	<tr><th>expert:</th><td>
+	<tr><th>{t}expert{/t}:</th><td>
 		<select id="name_expert_id">
-			<option value="" {if !$name.expert_id} selected="selected"{/if}>n.a.</option>
+			<option value="" {if !$name.expert_id} selected="selected"{/if}>{t}n.a.{/t}</option>
 		{foreach from=$actors item=v key=k}
 		{if $v.is_company=='0'}
 			<option value="{$v.id}" {if $v.id==$name.expert_id} selected="selected"{/if}>{$v.label}</option>
@@ -127,9 +127,9 @@
 		</select>
 	</td></tr>
 
-	<tr><th>organisation:</th><td>
+	<tr><th>{t}organisation{/t}:</th><td>
 		<select id="name_organisation_id">
-			<option value="" {if !$name.organisation_id} selected="selected"{/if}>n.a.</option>
+			<option value="" {if !$name.organisation_id} selected="selected"{/if}>{t}n.a.{/t}</option>
 		{foreach from=$actors item=v key=k}
 		{if $v.is_company=='1'}
 			<option value="{$v.id}" {if $v.id==$name.organisation_id} selected="selected"{/if}>{$v.label}</option>
@@ -142,9 +142,9 @@
 
 	{if !$newname}
 		<tr><th colspan="2">&nbsp;</td></tr>
-		{if $name.reference}<tr><th>literature (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
-		{if $name.reference}<tr><th>expert (alt.):</th><td><input type="text" id="name_expert" value="{$name.expert}" /></td></tr>{/if}
-		{if $name.reference}<tr><th>organisation (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>{t}literature{/t} (alt.):</th><td><input type="text" id="name_reference" value="{$name.reference}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>{t}expert{/t} (alt.):</th><td><input type="text" id="name_expert" value="{$name.expert}" /></td></tr>{/if}
+		{if $name.reference}<tr><th>{t}organisation{/t} (alt.):</th><td><input type="text" id="" value="{$name.organisation}" /></td></tr>{/if}
 	{/if}
 
 </table>
@@ -162,7 +162,7 @@
 {if $concept.base_rank>=$smarty.const.SPECIES_RANK_ID}
 
 <div class="page-generic-div">
-Note: you need to modify the taxonomic parent of the concept to change the genus. <a href="taxon.php?id={$concept.id}">Edit the concept</a> to do so.
+{t}Note: you need to modify the taxonomic parent of the concept to change the genus.{/t} <a href="taxon.php?id={$concept.id}">{t}Edit the concept.{/t}</a>
 </div>
 
 {/if}
@@ -171,7 +171,7 @@ Note: you need to modify the taxonomic parent of the concept to change the genus
 <div class="page-generic-div">
 
 	{if $name.nametype=='isValidNameOf'}
-    <a href="taxon_edit_synonym_direct.php?id={$name.id}" class="edit" style="margin:0">rename directly</a>
+    <a href="taxon_edit_synonym_direct.php?id={$name.id}" class="edit" style="margin:0">{t}rename valid name directly{/t}</a>
     {/if}
 
     <p>
