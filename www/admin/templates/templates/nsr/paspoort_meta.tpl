@@ -109,9 +109,9 @@ select {
             {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Obsolete passport title</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
-                <span title="heeft content, is gepubliceerd" class="passport-published">{$v.content|@strlen} {t}characters{/t}</span>
+                <span title="heeft content, is gepubliceerd" class="passport-published">{$v.content|@strlen} {t}characters in field{/t}</span>
                 {elseif $v.content|@strlen>0 && $v.publish!=1}
-                <span title="heeft content, niet gepubliceerd (onzichtbaar)" class="passport-unpublished">{$v.content|@strlen} {t}characters{/t}</span>
+                <span title="heeft content, niet gepubliceerd (onzichtbaar)" class="passport-unpublished">{$v.content|@strlen} {t}characters in field{/t}</span>
                 {else}
                 <span title="geen content (onzichtbaar)" class="passport-leeg">{t}empty{/t}</span>
                 {/if}

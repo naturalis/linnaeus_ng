@@ -36,9 +36,9 @@
             {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">{t}Obsolete passport entry{/t}</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
-                <span title="{t}has content, is published{/t}" class="passport-published">{$v.content|@strlen} {t}characters{/t}</span>
+                <span title="{t}has content, is published{/t}" class="passport-published">{$v.content|@strlen} {t}characters in field{/t}</span>
                 {elseif $v.content|@strlen>0 && $v.publish!=1}
-                <span title="{t}has content, not published (invisible){/t}" class="passport-unpublished">{$v.content|@strlen} {t}characters{/t}</span>
+                <span title="{t}has content, not published (invisible){/t}" class="passport-unpublished">{$v.content|@strlen} {t}characters in field{/t}</span>
                 {else}
                 <span title="{t}no content (invisible){/t}" class="passport-leeg">{t}empty{/t}</span>
                 {/if}
