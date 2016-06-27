@@ -106,7 +106,7 @@ select {
 	<li>
 		<span class="passport-title">
 			<b>{$v.title}</b>
-            {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Outdated passport title</span>{/if}
+            {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">Obsolete passport title</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
                 <span title="heeft content, is gepubliceerd" class="passport-published">{$v.content|@strlen} {t}characters{/t}</span>
@@ -134,7 +134,7 @@ select {
 
     {if $hasObsolete}
     <p>
-    <span class="passport-waarschuwing">{t}Outdated passport titles{/t}</span><br/>
+    <span class="passport-waarschuwing">{t}Obsolete passport titles{/t}</span><br/>
     {t}These are passport titles that overlap with new titles.{/t}<br />
     {t}For consistency's sake, please migrate the text from the old to the new passport:{/t}
     <ul>
