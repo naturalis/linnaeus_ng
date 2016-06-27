@@ -101,13 +101,13 @@ tr {
 	vertical-align:top;
 }
 input[type=text] {
-	width:300px;
+	width:200px;
 }
 input[type=text].large {
-	width:400px;
+	width:200px;
 }
 input[type=text].medium {
-	width:200px;
+	width:150px;
 }
 input[type=text].small {
 	width:100px;
