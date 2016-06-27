@@ -62,7 +62,7 @@
 
 	<tr><td colspan="2" style="height:5px;"></td></tr>
 
-    <tr><th title="{t}scientific name is compiled automatically.{/t}">{t}scientific name{/t}:</th><td>
+    <tr><th title="{t}scientific name is concatenated automatically.{/t}">{t}scientific name{/t}:</th><td>
         <input type="text" id="concept_taxon" value="{$name.name}" onchange="$('#name_name').val($(this).val()).trigger('change');" disabled="disabled" label="{t}synonym{/t}" />
         <input type="hidden" id="name_name" value="" />
     </td></tr>
