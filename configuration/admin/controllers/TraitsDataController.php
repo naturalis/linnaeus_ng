@@ -46,6 +46,9 @@ class TraitsDataController extends TraitsController
     );
    
     public $controllerPublicName = 'Traits';
+	public $controllerBaseName='traits';
+    public $modelNameOverride='TraitsDataModel';
+
 
     public $cssToLoad = array(
 		'traits.css',
@@ -76,6 +79,7 @@ class TraitsDataController extends TraitsController
 
     private function initialize()
     {
+		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
 		$this->smarty->assign('sysColSpecies',$this->_sysColSpecies);
 		$this->smarty->assign('sysColReferences',$this->_sysColReferences);
 		$this->smarty->assign('sysColNsrId',$this->_sysColNsrId);
@@ -152,7 +156,7 @@ class TraitsDataController extends TraitsController
 		{
 			$this->getTraitsSettings();
 			$this->matchTraits();
-			$this->matchSpecies();
+			$this->matchTraits();
 			$this->matchValues();
 			$this->matchReferences();
 		}
@@ -246,7 +250,7 @@ class TraitsDataController extends TraitsController
 
 	private function setDataSession($data)
 	{
-		$this->moduleSession->setModuleSetting( array('setting'=>'data','data'=>$data ) );
+		$this->moduleSession->setModuleSetting( array('setting'=>'data','value'=>$data ) );
 	}
 
 	private function getDataSession()
@@ -353,7 +357,7 @@ class TraitsDataController extends TraitsController
 			}
 			$lines=$b;
 		}
-		
+
 		return $lines;
 	}
 
@@ -361,19 +365,12 @@ class TraitsDataController extends TraitsController
 	{
 		$data=$this->getDataSession();
 		$traits=$this->getTraitgroupTraits($data['traitgroup']);
+		$lines=$this->getSessionLines();
 
 		foreach((array)$traits as $t=>$trait)
 		{
 			$traits[$t]['values']=$this->getTraitgroupTraitValues(array('trait'=>$trait['id']));
 		}
-
-		/*
-			[path] => C:\Windows\Temp\lng549A.tmp
-			[name] => ___Vragenlijst BKoese TESTVERSIE.txt
-			[status] => raw
-			[traitgroup] => 1
-			[lines]
-		*/
 
 		// tagging each line with basic columns & re-arrange
 		foreach((array)$data['lines'] as $key=>$line)
@@ -533,10 +530,11 @@ class TraitsDataController extends TraitsController
 	private function matchSpecies()
 	{
 		$data=$this->getDataSession();
+		$lines=$this->getSessionLines();
 
 		$taxa=array();
 
-		foreach((array)$data['lines'] as $line)
+		foreach((array)$lines as $line)
 		{
 			if (isset($line['trait']['sysname']) && $line['trait']['sysname']==$this->_sysColSpecies)
 			{
@@ -632,9 +630,10 @@ class TraitsDataController extends TraitsController
 	private function matchValues()
 	{
 		$data=$this->getDataSession();
+		$lines=$this->getSessionLines();
 
 		// matching and adding status
-		foreach((array)$data['lines'] as $key=>$line)
+		foreach((array)$lines as $key=>$line)
 		{
 			$cell_status=array();
 			
@@ -648,7 +647,7 @@ class TraitsDataController extends TraitsController
 				{
 					foreach((array)$line['cells'] as $c=>$cell)
 					{
-						if ($c==0) continue;
+q($line,1);						if ($c==0) continue;
 						$cell_status[$c]=
 							call_user_func(
 								$func,
