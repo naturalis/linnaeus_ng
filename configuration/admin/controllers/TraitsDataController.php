@@ -49,7 +49,8 @@ class TraitsDataController extends TraitsController
 	public $controllerBaseName='traits';
     public $modelNameOverride='TraitsDataModel';
 
-
+    public $cacheFiles = array();
+    
     public $cssToLoad = array(
 		'traits.css',
 //		'taxon_groups.css'
@@ -69,7 +70,7 @@ class TraitsDataController extends TraitsController
     public function __construct ()
     {
         parent::__construct();
-		$this->initialize();
+		$this->initialise();
     }
 
     public function __destruct ()
@@ -77,7 +78,7 @@ class TraitsDataController extends TraitsController
         parent::__destruct();
     }
 
-    private function initialize()
+    private function initialise()
     {
 		$this->moduleSession->setModule( array('environment'=>'admin','controller'=>$this->controllerBaseName) );
 		$this->smarty->assign('sysColSpecies',$this->_sysColSpecies);
@@ -89,10 +90,6 @@ class TraitsDataController extends TraitsController
     {
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Data upload'));
-
-
-//$this->setDataSession(null);
-//$this->setSessionLines(null);
 
         if (isset($this->requestDataFiles[0]))
 		{
@@ -160,7 +157,7 @@ class TraitsDataController extends TraitsController
 		{
 			$this->getTraitsSettings();
 			$this->matchTraits();
-			$this->matchTraits();
+			$this->matchSpecies();
 			$this->matchValues();
 			$this->matchReferences();
 		}
@@ -230,7 +227,7 @@ class TraitsDataController extends TraitsController
 				$data[$d[0]]=$d[1];
 			}
 			$this->moduleSession->setModuleSetting( array('setting'=>'joinrows','value'=>$data ) );
-		}	
+		}		
 	}
 
 	private function getJoinrows()
@@ -264,12 +261,19 @@ class TraitsDataController extends TraitsController
 
 	private function setSessionLines($lines)
 	{
-		$this->moduleSession->setModuleSetting( array('setting'=>'lines','value'=>$lines) );
+		$data=$this->getDataSession();
+
+		if (is_null($lines))
+			unset($data['lines']);
+		else
+			$data['lines']=$lines;
+
+		$this->setDataSession($data);
 	}
 
 	private function getSessionLines()
 	{
-		return $this->moduleSession->getModuleSetting( 'lines' );
+		$data=$this->getDataSession()['lines'];
 	}
 
 	private function setReferenceListSession( $p )
@@ -295,7 +299,7 @@ class TraitsDataController extends TraitsController
 		}
 		return $new_array;
 	}
-		
+
 	private function parseSessionFile( $rotate=false )
 	{
 		$file=$this->getDataSession();
@@ -360,7 +364,7 @@ class TraitsDataController extends TraitsController
 			}
 			$lines=$b;
 		}
-
+		
 		return $lines;
 	}
 
@@ -368,7 +372,6 @@ class TraitsDataController extends TraitsController
 	{
 		$data=$this->getDataSession();
 		$traits=$this->getTraitgroupTraits($data['traitgroup']);
-		$lines=$this->getSessionLines();
 
 		foreach((array)$traits as $t=>$trait)
 		{
@@ -376,7 +379,7 @@ class TraitsDataController extends TraitsController
 		}
 
 		// tagging each line with basic columns & re-arrange
-		foreach((array)$lines as $key=>$line)
+		foreach((array)$data['lines'] as $key=>$line)
 		{
 			if (isset($line['cells'][0]) && $line['cells'][0]==$this->_columnHeaderSpecies)
 			{
@@ -392,7 +395,7 @@ class TraitsDataController extends TraitsController
 			{
 				$lines[$key]['trait']['sysname']=$this->_sysColReferences;
 			}
-
+			
 			$cells=array();
 			$boolean_data=true;
 			foreach((array)$line['cells'] as $c=>$cell)
@@ -533,11 +536,10 @@ class TraitsDataController extends TraitsController
 	private function matchSpecies()
 	{
 		$data=$this->getDataSession();
-		$lines=$this->getSessionLines();
 
 		$taxa=array();
 
-		foreach((array)$lines as $line)
+		foreach((array)$data['lines'] as $line)
 		{
 			if (isset($line['trait']['sysname']) && $line['trait']['sysname']==$this->_sysColSpecies)
 			{
@@ -562,7 +564,7 @@ class TraitsDataController extends TraitsController
 					
 					if (!empty($this->_taxonIdResolveQuery))
 					{
-						$t2=$this->models->Taxon->freeQuery(
+						$t2=$this->models->Taxa->freeQuery(
 							str_replace(
 								array('%pid%','%tid%'),
 								array($this->getCurrentProjectId(),$cell),$this->_taxonIdResolveQuery)
@@ -633,10 +635,9 @@ class TraitsDataController extends TraitsController
 	private function matchValues()
 	{
 		$data=$this->getDataSession();
-		$lines=$this->getSessionLines();
 
 		// matching and adding status
-		foreach((array)$lines as $key=>$line)
+		foreach((array)$data['lines'] as $key=>$line)
 		{
 			$cell_status=array();
 			
