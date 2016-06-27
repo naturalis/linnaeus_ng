@@ -171,6 +171,8 @@ class NsrTreeController extends NsrController
 				"node_id"=>$node
 			));
 
+        $ranks=$this->newGetProjectRanks();
+		
 		$taxon=$progeny=array();
 
 		foreach((array)$taxa as $key=>$val)
@@ -223,11 +225,11 @@ class NsrTreeController extends NsrController
 				}
 				else
 				{
-					$val['taxon']=$this->formatTaxon(array_merge($val, ['add_hybrid_marker'=>false,'add_infixes'=>false]));
+					$val['taxon']=$this->formatTaxon(array_merge($val, [ 'ranks'=>$ranks ]));
 				}
 			}
 
-			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
+//			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 
 
