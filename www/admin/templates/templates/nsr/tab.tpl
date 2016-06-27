@@ -6,7 +6,7 @@
 	<h3>{t}special attributes{/t}</h3>
 
 	<!-- (id {$page.id}) -->
-   
+
 	<form method="post" id="theForm">
     <input type="hidden" name="id" value="{$page.id}" />
     <input type="hidden" name="action" value="save" />
@@ -17,14 +17,14 @@
             <td>
 				<label><input type="checkbox" name="always_hide"{if $page.always_hide==1} checked="checked"{/if} /> {t}always hide{/t}</label>
                 <div class="explanation">
-                    {t}hides the tab from the public menu, even if it contains published content. tab can still be accessed 
+                    {t}hides the tab from the public menu, even if it contains published content. tab can still be accessed
                     directly. useful to directly retrieve specific content for a taxon, for instance for external use in a associated
                     project.{/t}<br />
                     {t}use{/t} <code>http://your.domain/linnaeus_ng/app/views/species/nsr_taxon.php?cat={$page.id}&id=[taxon id]</code> {t}to access the tab.{/t}
                 </div>
 			</td>
 		</tr>
- 
+
 	   	<tr><td>&nbsp;</td></tr>
 
 		{if $use_page_blocks}
@@ -34,7 +34,7 @@
 		</tr>
     	<tr>
             <td>
-            
+
             	<table>
                     <tr>
                     	<td>your page</td>
@@ -44,7 +44,7 @@
                         <td style="border:1px solid #ddd;min-width:200px;padding:0 10px 0 10px;">
                             <ul id="block_list">
                             </ul>
-                        </td>                    
+                        </td>
                         <td style="padding-left:10px;">
                             <ul class="pick-list">
                             {foreach $tabs v k}
@@ -55,20 +55,20 @@
                             {/if}
                             {/foreach}
                             </ul>
-                        </td>                    
+                        </td>
                     </tr>
 				</table>
                 <div class="explanation">
-					Only automatic tabs and tabs with an external reference that have stand-alone template.
+					{t}Only automatic tabs and tabs with an external reference that have stand-alone template.{/t}
                 </div>
 
 			</td>
 		</tr>
 
     	<tr><td>&nbsp;</td></tr>
-        
+
         {/if}
-        
+
     	<tr>
             <td>
             	<u>{t}external reference{/t}</u>
@@ -85,7 +85,7 @@
                     </ul>
                     </p>
                     <p>
-                    {t}the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is 
+                    {t}the data check is performed at runtime to decide whether the tab should be displayed in the taxon's menu (i.e., if any data is
                     available). when 'no check' is selected, the tab is always displayed. the reference can be implemented as an actual link, navigating away from the site (or opening in a new window), or as embedded, in
                     which case a template should be defined in which to display the retrieved data.{/t}<br />
                     </p>
@@ -94,13 +94,13 @@
                     </p>
 					<p>
                     {t}the URL can be "abused" for the transportation of multiple data-values to a template. for instance, multiple parametrized
-                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parametrized URL only", those would 
+                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parametrized URL only", those would
                     be supplied to the template as the <code>$external_content->full_url</code> template-variable, which could then be split and processed
                     further. in this way, multiple URL's could be supplied at once, which can be useful for things like loading multiple layers on a map.{/t}
                     {t}(ps, if you do this, you will likely get an 'Invalid URL'-warning, which can be ignored){/t}
                     </p>
                 </div>
-            
+
             	<table>
                 	<tr>
                     	<td class="sublabel">link</td>
@@ -114,7 +114,7 @@
                                 <tr class="tr-highlight">
                                     <td>
                                     	{t}substitutions:{/t}<br />
-										<a href="#" onclick="add_subst();return false;">{t}add{/t}</a>                                        
+										<a href="#" onclick="add_subst();return false;">{t}add{/t}</a>
                                     </td>
                                     <td>
                                     	<div id="substitutions"></div>
@@ -217,8 +217,8 @@
 		</tr>
 
 	</table>
-    
-    
+
+
     <input type="button" value="save" onclick="save_page();" />
 
     </form>
@@ -227,7 +227,7 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div class="page-generic-div">
-    
+
     <a href="tabs.php">{t}back{/t}</a>
 
 </div>
@@ -371,20 +371,20 @@ function save_page()
 $(document).ready(function()
 {
 	acquireInlineTemplates();
-	
+
 	{foreach $page.page_blocks_decoded v k}
 	addBlock( { id:'{$v.id}', label: '{$v.label}', can_delete:{if $v.id!="data"}true{else}false{/if}} );
 	{/foreach}
-	
+
 	$(".sortable").sortable({
-		opacity: 0.6, 
+		opacity: 0.6,
 		cursor: 'move',
 		items: "li:not(.ui-state-disabled)",
 		connectWith: ".connectedSortable"
 	});
 
 	$( "#block_list" ).sortable();
-	
+
 	print_susbt();
 	print_param();
 });
