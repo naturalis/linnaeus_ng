@@ -222,7 +222,7 @@
         'taxonomische ouders' => 'taxonomic parents',
         'Taxonomische rangen' => 'Taxonomic ranks',
         'Te exporteren gegevens' => 'Data to export',
-        'tekens' => 'characters',
+        'tekens in veld' => 'characters in field',
         'terug' => 'back',
         'toevoegen aan' => 'add to',
         'Top van de te exporteren tak' => 'Top of branch to be exported',
