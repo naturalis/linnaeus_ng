@@ -5,7 +5,7 @@
 <h2>{t}Update index table{/t}</h2>
 
 <p>
-{t}This function updates the extra index table holding parent-child relationships.{/t}<br />
+{t}This function updates the extra index table containing parent-child relationships.{/t}<br />
 {t}This table should be updated automatically, but e.g. if the number of child taxa in the taxonomic tree is off, the table can be force-updated.{/t}
 {t}Please take into account that an update may take a minute or so.{/t}
 <form method="post">
