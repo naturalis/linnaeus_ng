@@ -25,9 +25,9 @@
 <form id="data" onsubmit="return false;">
 
 <table>
-	<tr><th>name:</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
-	<tr><th>language:</th><td>
-		<select id="name_language_id" mandatory="mandatory" label="{t]language{/t}" onchange="checkprefnameavail()">
+	<tr><th>{t}name:{/t}</th><td><input type="text" id="name_name" value="{$name.name}" label="naam" mandatory="mandatory" /> *</td></tr>
+	<tr><th>{t}language:{/t}</th><td>
+		<select id="name_language_id" mandatory="mandatory" label="language" onchange="checkprefnameavail()">
 			{assign var=first value=true}
 			<option value="" {if !$name.language_id} selected="selected"{/if}>n.a.</option>
 		{foreach from=$languages item=v key=k}
@@ -85,7 +85,7 @@
 			{$name.reference_name}
 		{else}{t}n.a.{/t}{/if}
         </span>
-        <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,_('Publication'));return false;" rel="name_reference_id">edit</a><br />
+        <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,_('Publication'));return false;" rel="name_reference_id">{t}edit{/t}</a><br />
         <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 		</td>
 	</tr>
