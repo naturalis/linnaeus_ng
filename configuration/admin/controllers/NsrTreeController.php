@@ -35,6 +35,7 @@ class NsrTreeController extends NsrController
     public $controllerPublicName = 'Taxon editor';
     public $includeLocalMenu = false;
 	private $_nameTypeIds;
+	private $_noTreeCaching=false;
 
     public function __construct()
     {
@@ -145,7 +146,9 @@ class NsrTreeController extends NsrController
 
 	private function restoreTree()
 	{
-		return isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']) ?  $_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'] : null;
+		return 
+			!$this->_noTreeCaching && isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']) ? 
+				$_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'] : null;
 	}
 
 	private function getTreeNode($p)
@@ -220,7 +223,7 @@ class NsrTreeController extends NsrController
 				}
 				else
 				{
-					$val['taxon']=$this->formatTaxon($val);
+					$val['taxon']=$this->formatTaxon(array_merge($val, ['add_hybrid_marker'=>false,'add_infixes'=>false]));
 				}
 			}
 
