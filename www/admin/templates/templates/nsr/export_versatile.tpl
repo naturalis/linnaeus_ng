@@ -483,8 +483,6 @@ function doSubmit()
 		</table>
 
         <span class=remark>
-        	{t}Met deze default-waarden wordt een CSV gegenereerd die goed te openen is in Excel.{/t}<br />
-            {t}Open het te downloaden bestand niet direct in Excel, maar sla het eerst op en importeer het vervolgend in een Excel-leeg sheet via 'Data' > 'From text'.{/t}
         	{t}The default values generate a CSV file that can be opened in Excel.{/t}<br />
             {t}Do not open de file directly in Excel, but first save it and ubsequently open it in an empty Excel sheet through 'Data' > 'From text'.{/t}
         </span>
