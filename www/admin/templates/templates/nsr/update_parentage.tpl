@@ -2,21 +2,20 @@
 
 <div id="page-main">
 
-<h2>{t}Indextabel bijwerken{/t}</h2>
+<h2>{t}Update index table{/t}</h2>
 
 <p>
-{t}Deze functie werkt de extra indextabel bij waarin ouder-kindrelaties van de taxonconcepten worden bijgehouden.<br />
-In principe wordt de tabel automatische bijgewerkt, maar mocht blijken dat bijvoorbeeld de aantallen onderliggende soorten
-in de taxonomische boom niet overeenkomen met het werkelijke aantal, werk hem dan handmatig bij. Houd er rekening mee dat
-het bijwerken ongeveer een minuut in beslag kan nemen.{/t}
+{t}This function updates the extra index table holding parent-child relationships.{/t}<br />
+{t}This table should be updated automatically, but e.g. if the number of child taxa in the taxonomic tree is off, the table can be force-updated.{/t}
+{t}Please take into account that an update may take a minute or so.{/t}
 <form method="post">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="action" value="update" />
-<input type="submit" value="bijwerken" />
+<input type="submit" value="{t}update{/t}" />
 </form>
 </p>
 <p>
-	<a href="index.php">{t}terug{/t}</a>
+	<a href="index.php">{t}back{/t}</a>
 </p>
 
 </div>
