@@ -10,7 +10,7 @@
 
 <div id="page-main">
 
-<h2><span style="font-size:12px;font-style:normal">{t}concept:{/t}</span> {$concept.taxon}</h2>
+<h2><span style="font-size:12px;font-style:normal">{t}concept{/t}:</span> {$concept.taxon}</h2>
 <h3>{t}passport{/t}</h3>
 
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;">{t}show all{/t}</a>
@@ -36,18 +36,18 @@
             {if $v.obsolete}{assign var=hasObsolete value=true}<span class="passport-waarschuwing">{t}Obsolete passport entry{/t}</span>{/if}
             <span id="indicator{$k}">
 	            {if $v.content|@strlen>0 && $v.publish==1}
-                <span title="heeft content, is gepubliceerd" class="passport-published">{$v.content|@strlen} tekens</span>
+                <span title="{t}has content, is published{/t}" class="passport-published">{$v.content|@strlen} {t}characters{/t}</span>
                 {elseif $v.content|@strlen>0 && $v.publish!=1}
-                <span title="heeft content, niet gepubliceerd (onzichtbaar)" class="passport-unpublished">{$v.content|@strlen} tekens</span>
+                <span title="{t}has content, not published (invisible){/t}" class="passport-unpublished">{$v.content|@strlen} {t}characters{/t}</span>
                 {else}
-                <span title="geen content (onzichtbaar)" class="passport-leeg">leeg</span>
+                <span title="{t}no content (invisible){/t}" class="passport-leeg">{t}empty{/t}</span>
                 {/if}
             </span>
-			<a 
-            	href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat={$v.id}&epi={$session.admin.project.id}" 
-                class="edit"  
-                style="margin:0;{if $v.external_reference}font-size:1em;{/if}" 
-                target="view" 
+			<a
+            	href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&cat={$v.id}&epi={$session.admin.project.id}"
+                class="edit"
+                style="margin:0;{if $v.external_reference}font-size:1em;{/if}"
+                target="view"
                 title="{t}view in site (new window){/t}{if $v.external_reference}; {t}external reference{/t}{/if}">{if $v.external_reference}&nearr;{else}&rarr;{/if}</a><br />
 		{/if}
 
@@ -58,7 +58,7 @@
 			<a href="#" class="edit" id="edit{$k}" onclick="openeditor(this);return false;" style="margin-left:0;">edit</a>
             <div id="button-container{$k}" class="button-container" style="display:none">
             {if $can_publish}
-            <input id="publish{$k}" type="checkbox" value="publiceren" {if $v.publish==1}checked="checked"{/if} />publiceren?
+            <input id="publish{$k}" type="checkbox" value="publiceren" {if $v.publish==1}checked="checked"{/if} />{t}publish{/t}?
             {else}
             ({if $v.publish==1}{t}published{/t}{else}{t}unpublished{/t}{/if})
 			{/if}
