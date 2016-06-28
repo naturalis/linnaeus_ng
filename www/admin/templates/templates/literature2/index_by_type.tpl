@@ -4,10 +4,10 @@
 
 	<p>
         <h2>{$publicationType}</h2>
-        {$references|@count} referenties
+        {$references|@count} references
     </p>
     <p>
-  
+
         <ul>
         {foreach $references v}
             <li>
@@ -24,9 +24,9 @@
             </li>
         {/foreach}
         </ul>
-    
+
     </p>
-            
+
 	<p>
 		<a href="publication_types.php">publicatievormen</a>
 	</p>
