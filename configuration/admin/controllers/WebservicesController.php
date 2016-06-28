@@ -126,7 +126,7 @@ class WebservicesController extends Controller
 
         if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
 
-            $this->_data['error'] = 'incorrect key provided';
+            die('<p>Incorrect key!</p><p><img src="../../media/system/access-denied.gif"></p>');
 
         } else {
 
@@ -164,7 +164,7 @@ class WebservicesController extends Controller
 
         if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
 
-            $this->_data['error'] = 'incorrect key provided';
+            die('<p>Incorrect key!</p><p><img src="../../media/system/access-denied.gif"></p>');
 
         } else {
 
