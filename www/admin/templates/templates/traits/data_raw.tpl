@@ -22,17 +22,20 @@ table.matches td {
 	color:green;
 }
 .cell-warning  {
-	background-color:#0CF;
+	background-color:#FC0;
 }
 .cell-ok, .taxon {
 	background-color:#9F9;
 }
 .cell-error {
-	background-color:#F66;
+	background-color:#F46;
 }
 .no-taxon {
 	background-color: red;
 	color:white;
+}
+.cell-ok.boolean-data, .cell-error.boolean-data {
+	font-style:italic;
 }
 div.legend {
     max-width:250px;
@@ -100,7 +103,7 @@ function expungeLitRefList()
                     	row-id="{$l}"
                         col-id="{$k}"
                     	class="{if $k>0}{if !$data.taxa[$k].have_taxon}no-taxon{else if !$data.taxa[$k].match}cell-warning{else}taxon{/if}{/if}">
-                        <span title="{if $k>0}{if !$data.taxa[$k].have_taxon}unknown taxon{else if !$data.taxa[$k].match}taxon name and ID do not match; using {$data.taxa[$k].will_use} (from {$data.taxa[$k].will_use_source}){/if}{/if}">
+                        <span title="{if $k>0}{if !$data.taxa[$k].have_taxon}unknown taxon{else if !$data.taxa[$k].match}taxon name and ID do not match; using {$data.taxa[$k].will_use|@strip_tags} (from {$data.taxa[$k].will_use_source}){/if}{/if}">
                         {$v}
                         </span>
                         {if $line.trait.sysname==$sysColSpecies && $data.taxa[$k].has_existing_values}
@@ -131,15 +134,15 @@ function expungeLitRefList()
                         data-value="{$line.cell_status[$k].value_id}"
 						data-taxon="{$data.taxa[$k].will_use_id}"
                         {/if}
-						class="{if $line.cell_status[$k]}{if $line.cell_status[$k].pass==1}{if $line.cell_status[$k].warning}cell-warning{else}cell-ok{/if}{else}cell-error{/if}{/if}{if !$data.taxa[$k] && $k>0}no-taxon{/if}"
+						class="{if $line.cell_status[$k]}{if $line.cell_status[$k].pass==1}{if $line.cell_status[$k].warning}cell-warning{else}cell-ok{/if}{else}cell-error{/if}{/if}{if !$data.taxa[$k] && $k>0}no-taxon{/if}{if $line.boolean_data} boolean-data{/if}"
                         title=
-"{if $data.taxa[$k].will_use}taxon: {$data.taxa[$k].will_use}
+"{if $data.taxa[$k].will_use}taxon: {$data.taxa[$k].will_use|@strip_tags}
 {/if}
 value: {$line.trait.sysname}: {$currValue}
 {if $line.cell_status[$k].warning}warning: {$line.cell_status[$k].warning|@escape} {/if}{if $line.cell_status[$k].error}
 error: {$line.cell_status[$k].error|@escape}{/if}">
                         <div class="data-container {if $k==0}legend{else}data{/if}">
-                        {$v|@utf8_encode} 
+                        {$v|@utf8_encode}
                         </div>
                     </td>
 				{/if}
@@ -236,6 +239,19 @@ error: {$line.cell_status[$k].error|@escape}{/if}">
                 	usually this means a value is missing form the list of possible values for that trait, or is spelled differently.<br />
                     click on the trait name in the first column to open the details of the trait, or on the list-icon &#9016; to see
                     its values (opens in new tab).
+                </td>
+            </tr>
+            <tr>
+                <td class="cell-ok boolean-data" style="width:25px;border:1px solid #999">Yes</td>
+                <td>italic yes or no: this is not the actual value, but indicates a (non-)match with the value in the second column.</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                	if non-italic values appear (usually marked as erroneous), this most likely indicates that somewhere on that line,
+                    there is a cell with a disallowed value. valid values for true are: {$yes_values|@implode:", "}; for false: {$no_values|@implode:", "}.
+
+
                 </td>
             </tr>
 		</table>
