@@ -8,7 +8,10 @@
 	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input type="hidden" id="action" name="action" value="save" />
 	<p>
-    {if !$projectExists}
+    
+    Settings are now fixed. Click "next".
+    
+    {* if !$projectExists}
     <table>
 		<!-- tr><td>Author:</td><td><input type="text" name="settings[source_author]" value="{$source_author}" /></td></tr>
 		<tr><td>Title of source:</td><td><input type="text" name="settings[source_title]" value="{$source_title}" /></td></tr>
@@ -30,10 +33,11 @@
 	</table>
     {else}
     Importing into an existing project, skipping new settings.
-    {/if}
+    {/if *}
 	</p>
 	<p>
-	<input type="submit" value="{if $projectExists}{t}Next{/t}{else}{t}Save{/t}{/if}">
+	<!-- input type="submit" value="{if $projectExists}{t}Next{/t}{else}{t}Save{/t}{/if}" -->
+	<input type="submit" value="{t}Next{/t}">
 	</p>
 	</form>
 	
