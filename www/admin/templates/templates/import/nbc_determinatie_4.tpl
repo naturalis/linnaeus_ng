@@ -19,10 +19,6 @@ Map extra fields:
 {if $val=='' && $k|in_array:$nbcColumns}
 {assign var=val value=$k}
 {/if}
-<<<<<<< HEAD
-=======
-
->>>>>>> development-WEG
 	<tr>
     	<td>{$k}</td>
         <td>
@@ -37,11 +33,7 @@ Possible values: {foreach from=$nbcColumns|@array_flip item=h key=k}
 {if $k!='-'}"{$k}", {/if}
 {/foreach}
 </p>
-
-
 <p>
-
-
     {* if $variantColumns}
     <p>
     If your sheet contains data to differentiate between variations of the same species (gender, lifestage), please select
