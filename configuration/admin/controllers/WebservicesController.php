@@ -122,20 +122,14 @@ class WebservicesController extends Controller
     public function scanServersAction ()
     {
 		$this->_head->service = 'projects and users';
-		$this->_head->description = sprintf('"flat file" list of all projects and their users');
+		$this->_head->description = sprintf('push Linnaeus data to central server');
 
         if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
 
-            $this->_data['error'] = 'incorrect key provided';
+            die('<p>Incorrect key!</p><p><img src="../../media/system/access-denied.gif"></p>');
 
         } else {
-/*
-            exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $o);
-            $branch = $o[0];
 
-            exec('git rev-parse --verify HEAD 2> /dev/null', $p);
-            $hash = $p[0];
-*/
             exec('git rev-parse --abbrev-ref HEAD', $branch);
             exec('git rev-parse HEAD', $hash);
             exec('git rev-parse origin/' . $branch[0], $latestHash);
@@ -170,7 +164,7 @@ class WebservicesController extends Controller
 
         if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
 
-            $this->_data['error'] = 'incorrect key provided';
+            die('<p>Incorrect key!</p><p><img src="../../media/system/access-denied.gif"></p>');
 
         } else {
 

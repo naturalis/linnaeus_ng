@@ -2,37 +2,27 @@
 
 	class LinnaeusServerStore
 	{
-        private $_fp;
+	    private $_mysqli;
         private $_curlResult;
-        private $_csvFile;
-        private $_csvHeader;
 
         private $_post = 'post';
         private $_data;
         private $_success = false;
 
-        public function setCsvFile ($p) {
-            $this->_csvFile = $p;
+	    public function __construct() {
+	        $this->connectDb();
         }
 
-	    private function openFp () {
-            if (!$this->_fp) {
-                $this->_fp = fopen($this->_csvFile, 'a') or
-                    die("FATAL ERROR: cannot write to " . $this->_csvFile . "\n\n");
-            }
-        }
-
-        private function closeFp () {
-            if ($this->_fp) {
-                fclose($this->_fp);
+        private function connectDb () {
+            $this->_mysqli = new mysqli('localhost', 'root', 'root', 'test');
+            if ($this->_mysqli->connect_errno) {
+                die('Cannot connect: ' . $this->mysqli->connect_errno);
             }
         }
 
         public function run () {
-            $this->openFp();
             $this->fetchData();
-            $this->writeToCsv();
-            $this->closeFp();
+            $this->writeToDb();
             $this->printResult();
         }
 
@@ -42,28 +32,93 @@
             }
         }
 
-        private function writeToCsv () {
+        private function writeToDb () {
             if (!empty($this->_data)) {
                 foreach ($this->_data as $row) {
-                    // Write header?
-                    if (!$this->_csvHeader) {
-                        fputcsv($this->_fp, array_keys($row));
-                        $this->_csvHeader = true;
-                    }
-                    fputcsv($this->_fp, array_values($row));
+                    $q = 'insert into `lng_csv` (' . implode(', ', array_keys($row)) . ') values (' .
+                        substr(str_repeat('?,', count($row)), 0, -1) . ')';
+                    $stmt = $this->_mysqli->prepare($q);
+                    $stmt->bind_param(
+                        str_repeat('s', count($row)),
+                        $row['project'],
+                        $row['project_is_published'],
+                        $row['user_name'],
+                        $row['first_name'],
+                        $row['last_name'],
+                        $row['role'],
+                        $row['email_address'],
+                        $row['user_is_active'],
+                        $row['last_login'],
+                        $row['project_last_selected'],
+                        $row['password_last_changed'],
+                        $row['git_branch'],
+                        $row['git_hash'],
+                        $row['git_latest_hash'],
+                        $row['code_up_to_date'],
+                        $row['server_ip'],
+                        $row['server_name'],
+                        $row['check_date']
+                    );
+                    $stmt->execute();
                 }
                 $this->_success = true;
             }
+
         }
 
         private function printResult() {
             header('Content-Type: application/json');
-            die(json_encode(array('result' => $this->_success ? 'success' : 'henk')));
+            die(json_encode(array('result' => $this->_success ? 'success' : 'fail')));
         }
 
 	}
 
 	$lss = new LinnaeusServerStore();
-	$lss->setCsvFile(dirname(__FILE__) . '/output/linnaeus_push.csv');
 	$lss->run();
+
+
+	/*
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lng_csv`
+--
+
+CREATE TABLE `lng_csv` (
+  `id` int(11) NOT NULL,
+  `project` varchar(100) DEFAULT NULL,
+  `project_is_published` varchar(3) DEFAULT NULL,
+  `user_name` varchar(50) DEFAULT NULL,
+  `first_name` varchar(25) DEFAULT NULL,
+  `last_name` varchar(25) DEFAULT NULL,
+  `role` varchar(20) DEFAULT NULL,
+  `email_address` varchar(50) DEFAULT NULL,
+  `user_is_active` varchar(3) DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `project_last_selected` datetime DEFAULT NULL,
+  `password_last_changed` datetime DEFAULT NULL,
+  `git_branch` varchar(50) DEFAULT NULL,
+  `git_hash` varchar(50) DEFAULT NULL,
+  `git_latest_hash` varchar(50) DEFAULT NULL,
+  `code_up_to_date` varchar(3) DEFAULT NULL,
+  `server_ip` varchar(15) DEFAULT NULL,
+  `server_name` varchar(100) DEFAULT NULL,
+  `check_date` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Indexes for table `lng_csv`
+--
+ALTER TABLE `lng_csv`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `check_date` (`check_date`);
+
+--
+-- AUTO_INCREMENT for table `lng_csv`
+--
+ALTER TABLE `lng_csv`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+	 */
 
