@@ -15,7 +15,7 @@
     <div class="topBarContainer responsive">
         <div class="topBar">
             {if $master_matrix.id}
-                <a href="?mtrx={$master_matrix.id}" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a><br />
+                <a href="?mtrx={$master_matrix.id}" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {else}
                 <a href="#" onClick="history.go(-1);return false;" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {/if}
@@ -92,7 +92,7 @@
             <img src="{$session.app.system.urls.systemMedia}placeholderheader.png" alt="">
             <h1 class="pageTitle">
                 <span class="determinatiesleutel">{snippet}matrix_main_title_header.html{/snippet}</span><br />
-                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onclick="matrixSelectPopUp();">{t}kies andere matrix{/t}</span>
+                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onClick="matrixSelectPopUp();">{t}kies andere matrix{/t}</span>
 <script>
 {foreach $matrices v}
 matrices.push( { id: {$v.id} ,label: '{$v.label|@escape}', current: {$matrix.id}=={$v.id} } );
