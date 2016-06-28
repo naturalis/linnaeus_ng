@@ -93,6 +93,7 @@ final class ModuleSettingsModel extends AbstractModel
 
 		$query = "
 			select
+				_b.id as id,
 				_a.value as value,
 				_b.setting,
 				_b.default_value as default_value

@@ -643,7 +643,6 @@ class MatrixKeyController extends Controller
 
     private function getTaxaInMatrix()
     {
-
         $m=$this->models->MatrixkeyModel->getTaxaInMatrix(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),

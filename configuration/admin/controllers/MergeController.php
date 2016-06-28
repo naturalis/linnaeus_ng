@@ -778,8 +778,6 @@ class MergeController extends Controller
 			if (empty($d)) {
 
 				$this->addModuleToProject($val,$targetId,99);
-				$this->grantModuleAccessRights($val,$targetId);
-
 			}
 
 		}

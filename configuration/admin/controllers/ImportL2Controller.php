@@ -424,8 +424,6 @@ class ImportL2Controller extends ImportController
             $this->assignTopSpeciesToUser($_SESSION['admin']['system']['import']['loaded']['species']);
             $this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
             $this->addModuleToProject(MODCODE_HIGHERTAXA, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-            $this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
-            $this->grantModuleAccessRights(MODCODE_HIGHERTAXA, $this->getNewProjectId());
 
             $this->addMessage('Saved ' . count((array) $_SESSION['admin']['system']['import']['loaded']['ranks']) . ' ranks');
             $this->addMessage('Saved ' . count((array) $_SESSION['admin']['system']['import']['loaded']['species']) . ' taxa');
@@ -743,7 +741,6 @@ class ImportL2Controller extends ImportController
                         }
 
                         $this->addModuleToProject(MODCODE_LITERATURE, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                        $this->grantModuleAccessRights(MODCODE_LITERATURE, $this->getNewProjectId());
 
                         $this->_sawModule = false;
                     }
@@ -791,7 +788,6 @@ class ImportL2Controller extends ImportController
                         unset($_SESSION['admin']['system']['import']['mimes']);
 
                         $this->addModuleToProject(MODCODE_GLOSSARY, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                        $this->grantModuleAccessRights(MODCODE_GLOSSARY, $this->getNewProjectId());
 
                         $this->_sawModule = false;
                     }
@@ -850,8 +846,6 @@ class ImportL2Controller extends ImportController
                     $this->helpers->XmlParser->getNodes('project');
 
                     $this->addModuleToProject(MODCODE_CONTENT, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                    $this->grantModuleAccessRights(MODCODE_CONTENT, $this->getNewProjectId());
-
 
                     if (count((array) $_SESSION['admin']['system']['import']['loaded']['welcome']['saved']) !== 0) {
 
@@ -884,8 +878,6 @@ class ImportL2Controller extends ImportController
                     $this->helpers->XmlParser->getNodes('topic');
 
                     $this->addModuleToProject(MODCODE_INTRODUCTION, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                    $this->grantModuleAccessRights(MODCODE_INTRODUCTION, $this->getNewProjectId());
-
 
                     if (count((array) $_SESSION['admin']['system']['import']['loaded']['introduction']['saved']) !== 0) {
 
@@ -959,7 +951,6 @@ class ImportL2Controller extends ImportController
                     if ($this->_sawModule) {
 
                         $this->addModuleToProject(MODCODE_KEY, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                        $this->grantModuleAccessRights(MODCODE_KEY, $this->getNewProjectId());
 						/*
                         $this->saveSetting(array(
                             'name' => 'keytype',
@@ -1032,7 +1023,6 @@ class ImportL2Controller extends ImportController
                         if ($this->_sawModule) {
 
                             $this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                            $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 
                             $this->_sawModule = false;
 
@@ -1109,7 +1099,6 @@ class ImportL2Controller extends ImportController
                 if ($this->_sawModule) {
 
                     $this->addModuleToProject(MODCODE_DISTRIBUTION, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-                    $this->grantModuleAccessRights(MODCODE_DISTRIBUTION, $this->getNewProjectId());
 					/*
                     $this->saveSetting(array(
                         'name' => 'maptype',
@@ -4082,19 +4071,16 @@ class ImportL2Controller extends ImportController
 
         // additional texts
         $this->addModuleToProject(MODCODE_CONTENT, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-        $this->grantModuleAccessRights(MODCODE_CONTENT, $this->getNewProjectId());
 
         $this->addMessage($this->storeError('Added module "content".'));
 
         // index
         $this->addModuleToProject(MODCODE_INDEX, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-        $this->grantModuleAccessRights(MODCODE_INDEX, $this->getNewProjectId());
 
         $this->addMessage($this->storeError('Added module "index".'));
 
         // search
         $this->addModuleToProject(MODCODE_UTILITIES, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-        $this->grantModuleAccessRights(MODCODE_UTILITIES, $this->getNewProjectId());
 
         $this->addMessage($this->storeError('Added module "search".'));
 
