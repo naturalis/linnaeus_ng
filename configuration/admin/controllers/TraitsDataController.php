@@ -173,6 +173,8 @@ class TraitsDataController extends TraitsController
 
 		$this->smarty->assign( 'data', $data );
 		$this->smarty->assign( 'reflist', $this->getReferenceListSession() );
+		$this->smarty->assign( 'yes_values', $this->_yesValues );
+		$this->smarty->assign( 'no_values', $this->_noValues );
 
 		$this->printPage();
     }
@@ -625,7 +627,7 @@ class TraitsDataController extends TraitsController
 					'has_existing_values'=> $has_existing_values
 				);
 		}
-		
+
 		$data['taxa']=$taxa;
 		$data['any_existing_values']=$any_existing_values;
 		
