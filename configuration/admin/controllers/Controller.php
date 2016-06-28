@@ -1233,19 +1233,6 @@ class Controller extends BaseClass
 
     }
 
-
-    public function grantModuleAccessRights ($mId, $pId, $uId = null)
-    {
-        $this->models->ModulesProjectsUsers->save(array(
-            'id' => null,
-            'project_id' => $pId,
-            'module_id' => $mId,
-            'user_id' => isset($uId) ? $uId : $this->getCurrentUserId()
-        ));
-    }
-
-
-
     public function addUserToProjectAsLeadExpert ($pId, $uId = null)
     {
         $this->models->ProjectsRolesUsers->save(
@@ -1257,8 +1244,6 @@ class Controller extends BaseClass
             'active' => 1
         ));
     }
-
-
 
     public function getVariations ($tId = null)
     {

@@ -15,6 +15,7 @@ class ModuleSettingsReaderController extends Controller
 	private $_generalsettingsvalues;
 	private $_usedefaultwhennovalue=false;
 	public $modelNameOverride = 'ModuleSettingsModel';
+	private $lastSettingId;
 
     public function __construct($p = null)
     {
@@ -49,6 +50,8 @@ class ModuleSettingsReaderController extends Controller
 		{
 			$setting=$p;
 		}
+		
+		$this->lastSettingId=null;
 
 		if ( isset($module) && $module!=$this->getModuleController() )
 		{
@@ -59,6 +62,8 @@ class ModuleSettingsReaderController extends Controller
 
 		foreach((array)$this->getModuleSettingsValues() as $val)
 		{
+			if ($val['setting']==$setting) $this->lastSettingId=$val['id'];
+
 			if ($val['setting']==$setting && !is_null($val['value']))
 			{
 				return $val['value'];
@@ -86,9 +91,13 @@ class ModuleSettingsReaderController extends Controller
 		}
 
 		if ( !$no_auth_check && !$this->getAuthorisationState() ) return;
+		
+		$this->lastSettingId=null;
 
 		foreach((array)$this->getGeneralSettingsValues() as $val)
 		{
+			if ($val['setting']==$setting) $this->lastSettingId=$val['id'];
+			
 			if ($val['setting']==$setting && !is_null($val['value']))
 			{
 				return $val['value'];
@@ -141,6 +150,11 @@ class ModuleSettingsReaderController extends Controller
     {
 		if ( !$this->getAuthorisationState() ) return;
 		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
+    }
+
+    public function getLastSettingId()
+    {	
+		return $this->lastSettingId;
     }
 
 
@@ -235,6 +249,8 @@ class ModuleSettingsReaderController extends Controller
 
 		if ( $settingsvalues )
 		{
+			$this->lastSettingId=$settingsvalues[0]['id'];
+
 			if (!is_null($settingsvalues[0]['value']))
 			{
 				return $settingsvalues[0]['value'];
