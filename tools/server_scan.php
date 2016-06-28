@@ -137,6 +137,8 @@
             if ($r && isset($r['results'][0]['git_branch'])) {
                 $data = $r['results'];
                 foreach ($data as $row) {
+                    $row['server_ip'] = $this->_server;
+                    $row['server_name'] = gethostbyaddr($this->_server);
                     // Write header?
                     if (!$this->_csvHeader) {
                         fputcsv($this->_fp, array_keys($row));
