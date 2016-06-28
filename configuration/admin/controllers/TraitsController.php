@@ -68,21 +68,21 @@ class TraitsController extends Controller
 			isset($s['taxon id query']['value']) ? $s['taxon id query']['value'] : null;
 
 
-		$this->_yesValues= isset($s['yes values']['value']) ? $s['yes values']['value'] : array('yes');
+		$this->_yesValues= isset($s['yes values']['value']) ? $s['yes values']['value'] : 'yes';
 		if (preg_match('/(\{)([^\{\}]*)(\})/',$this->_yesValues,$matches))
 		{
 			$this->_yesValues=explode("|",$matches[2]);
 			array_walk($this->_yesValues, function(&$val) { $val=strtolower($val);});
 		}
 
-		$this->_noValues= isset($s['no values']['value']) ? $s['no values']['value'] : array('yes');
+		$this->_noValues= isset($s['no values']['value']) ? $s['no values']['value'] : 'yes';
 		if (preg_match('/(\{)([^\{\}]*)(\})/',$this->_noValues,$matches))
 		{
 			$this->_noValues=explode("|",$matches[2]);
 			array_walk($this->_noValues, function(&$val) { $val=strtolower($val);});
 		}
 
-		$this->_dashValues= isset($s['dash values']['value']) ? $s['dash values']['value'] : array('-');
+		$this->_dashValues= isset($s['dash values']['value']) ? $s['dash values']['value'] : '-';
 		if (preg_match('/(\{)([^\{\}]*)(\})/',$this->_dashValues,$matches))
 		{
 			$this->_dashValues=explode("|",$matches[2]);
