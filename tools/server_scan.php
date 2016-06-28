@@ -135,19 +135,8 @@
         private function writeToCsv () {
             $r = json_decode($this->_curlResult, true);
             if ($r && isset($r['results'][0]['git_branch'])) {
-                $latestHash = $this->getLatestGitHash($r['results'][0]['git_branch']);
                 $data = $r['results'];
                 foreach ($data as $row) {
-                    $row['project_is_published'] =
-                        ($row['project_is_published'] == 1) ? 'yes' : 'no';
-                    $row['user_is_active'] =
-                        ($row['user_is_active'] == 1) ? 'yes' : 'no';
-                    $row['latest_git_hash'] = $latestHash;
-                    $row['code_up_to_date'] =
-                        ($row['git_hash'] == $latestHash) ? 'yes' : 'no';
-                    $row['server_ip'] = $this->_server;
-                    $row['server_name'] = gethostbyaddr($this->_server);
-                    $row['check_date'] = date("Y-m-d H:m:s");
                     // Write header?
                     if (!$this->_csvHeader) {
                         fputcsv($this->_fp, array_keys($row));

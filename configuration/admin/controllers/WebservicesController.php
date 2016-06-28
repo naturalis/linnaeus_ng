@@ -20,6 +20,7 @@ class WebservicesController extends Controller
 
 	// Hard-coded for the time being...
 	private $_key = 'gNXhIb4LDKrA7MQmNo7wpV';
+    private $_pushUrl = 'http://localhost/store.php';
 
     public $usedHelpers = array(
         'http_basic_authentication'
@@ -145,6 +146,15 @@ class WebservicesController extends Controller
                 $data[$i]['git_branch'] = $branch[0];
                 $data[$i]['git_hash'] = $hash[0];
                 $data[$i]['git_latest_hash'] = $latestHash[0];
+    	        $data[$i]['project_is_published'] =
+                    ($data[$i]['project_is_published'] == 1) ? 'yes' : 'no';
+                $data[$i]['user_is_active'] =
+                    ($data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
+                $data[$i]['code_up_to_date'] =
+                    ($data[$i]['git_hash'] == $data[$i]['git_latest_hash']) ? 'yes' : 'no';
+                $data[$i]['server_ip'] = $_SERVER['SERVER_ADDR'];
+                $data[$i]['server_name'] = gethostbyaddr($data[$i]['server_ip']);
+                $data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
 
     		$this->_data = $data;
@@ -152,6 +162,49 @@ class WebservicesController extends Controller
 
 		$this->printOutput();
     }
+
+    public function linnaeusDataPushAction ()
+    {
+		$this->_head->service = 'push Linnaeus data';
+		$this->_head->description = sprintf('"flat file" list of all projects and their users');
+
+        if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
+
+            $this->_data['error'] = 'incorrect key provided';
+
+        } else {
+
+            exec('git rev-parse --abbrev-ref HEAD', $branch);
+            exec('git rev-parse HEAD', $hash);
+            exec('git rev-parse origin/' . $branch[0], $latestHash);
+
+            $data = $this->models->ProjectsModel->getProjectsWithUsers();
+
+        	foreach ($data as $i => $row) {
+                $data[$i]['git_branch'] = $branch[0];
+                $data[$i]['git_hash'] = $hash[0];
+                $data[$i]['git_latest_hash'] = $latestHash[0];
+    	        $data[$i]['project_is_published'] =
+                    ($data[$i]['project_is_published'] == 1) ? 'yes' : 'no';
+                $data[$i]['user_is_active'] =
+                    ($data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
+                $data[$i]['code_up_to_date'] =
+                    ($data[$i]['git_hash'] == $data[$i]['git_latest_hash']) ? 'yes' : 'no';
+                $data[$i]['server_ip'] = $_SERVER['SERVER_ADDR'];
+                $data[$i]['server_name'] = gethostbyaddr($data[$i]['server_ip']);
+                $data[$i]['check_date'] = date("Y-m-d H:m:s");
+        	}
+
+    		$this->_data = $this->getCurlResult(array(
+                'url' => $this->_pushUrl,
+                'post' => http_build_query(array('post' => json_encode($data)))
+    		));
+        }
+
+		$this->printOutput();
+    }
+
+
 
 	private function setProjectId()
 	{
