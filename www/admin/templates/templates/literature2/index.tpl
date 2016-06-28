@@ -4,7 +4,7 @@
 	<table class="alphabet">
 		<tr>
 			<td>
-				Zoek op titel:
+				Search by title:
 			</td>
 			<td>
 				<input type="text" name="" id="lookup-input-title" onkeyup="lit2Lookup(this,'lookup_title');" />
@@ -18,7 +18,7 @@
 		</tr>
 		<tr>
 			<td>
-				Zoek op auteur:
+				Search by author:
 			</td>
 			<td>
 				<input type="text" name="" id="lookup-input-author" onkeyup="lit2Lookup(this,'lookup_author');" />
@@ -34,9 +34,9 @@
 	</table>
 
 	<p>
-		<a href="edit.php">nieuwe literatuurreferentie aanmaken</a><br />
+		<a href="edit.php">new reference</a><br />
 		<a href="bulk_upload.php">bulk upload & matching</a><br />
-		<a href="publication_types.php">publicatievormen</a>
+		<a href="publication_types.php">publication types</a>
 		{if $incomplete > 0}
 			<br /><a href="check.php">{t}incompletely parsed references{/t}</a>
 		{/if}
@@ -57,12 +57,12 @@ $(document).ready(function()
 	{else if $prevSearch.search_author!=''}
 	$('#lookup-input-author').val( '{$prevSearch.search_author|@escape}' ).trigger('onkeyup');
 	{/if}
-	
+
 	{if !$CRUDstates.can_update}
 	setItemUrl('view.php');
 	{/if}
 
-	
+
 });
 </script>
 
