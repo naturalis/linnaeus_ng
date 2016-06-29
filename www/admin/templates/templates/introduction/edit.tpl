@@ -58,6 +58,7 @@
 </div>
 {/if}
 
+{if $use_media}
 <p>
 {if $page.image}
 	<input type="hidden" name="media_id" id="media_id" value="{$page.image.id}" />
@@ -73,6 +74,7 @@
 	<a href="../media/select.php?item_id={$id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
 {/if}
 </p>
+{/if}
 
 </form>
 <form action="media_upload.php" method="post" id="imgForm">

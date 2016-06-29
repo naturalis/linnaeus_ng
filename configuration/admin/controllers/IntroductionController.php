@@ -2,11 +2,13 @@
 
 include_once ('Controller.php');
 include_once ('MediaController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class IntroductionController extends Controller
 {
 
     private $_mc;
+	private $use_media;
 
     public $usedModels = array(
 		'content_introduction',
@@ -41,8 +43,24 @@ class IntroductionController extends Controller
     public function __construct ()
     {
         parent::__construct();
+		$this->initialize();
+	}
+		
+    private function initialize()
+    {
 		$this->cleanUpEmptyPages();
-		$this->setMediaController();
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		
+		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
+		
+		if ( $this->use_media )
+		{
+			$this->setMediaController();
+		}
+
+		$this->smarty->assign( 'use_media', $this->use_media );
+
     }
 
     public function __destruct ()
@@ -66,9 +84,9 @@ class IntroductionController extends Controller
 
         $pagination = $this->getPagination($this->getPageHeaders(),25);
 
-        $this->smarty->assign('prevStart', $pagination['prevStart']);
-        $this->smarty->assign('nextStart', $pagination['nextStart']);
-        $this->smarty->assign('pages',$pagination['items']);
+        $this->smarty->assign( 'prevStart', $pagination['prevStart'] );
+        $this->smarty->assign( 'nextStart', $pagination['nextStart'] );
+        $this->smarty->assign( 'pages', $pagination['items'] );
 		$this->smarty->assign( 'CRUDstates', $this->getCRUDstates() );
 
         $this->printPage();
@@ -145,8 +163,11 @@ class IntroductionController extends Controller
 			}
 		}
 
-        // Override image
-        $page['image'] = $this->getPageImage();
+		if ( $this->use_media )
+		{
+			// Override image
+			$page['image'] = $this->getPageImage();
+		}
 
 		$navList = $this->getPageNavList(true);
 
