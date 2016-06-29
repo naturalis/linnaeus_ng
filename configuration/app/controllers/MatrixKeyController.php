@@ -138,13 +138,7 @@ class MatrixKeyController extends Controller
 
 		$this->setFacetMenu();
 		$this->setIncUnknowns( false );
-		
-		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
-		
-		if ( $this->use_media )
-		{
-			$this->setMediaControllers();
-		}
+		$this->setMediaControllers();
 	}
 
 
