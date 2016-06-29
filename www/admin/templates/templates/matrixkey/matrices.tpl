@@ -4,7 +4,7 @@
 <p>
 {t}Below is a list of matrices that are currently defined. In order to edit a matrix' name, click "edit name". In order to edit the actual matrix, click its name.{/t}
 <table>
-{foreach from=$matrices val k}
+{foreach from=$matrices v k}
 <tr class="tr-highlight">
 	<td style="min-width:200px;">
 	    <span class="a" onclick="$('#id').val({$v.id});$('#action').val('activate');$('#theForm').submit()">
