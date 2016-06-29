@@ -18,7 +18,7 @@ li {
 <div id="page-main">
 
 <p>
-<h3>Publicatievormen</h3>
+<h3>{t}Publication types{/t}</h3>
 </p>
 
 <p>
@@ -46,28 +46,28 @@ li {
 
 	{if $publicationTypes|@count==0}
     <p>
-    (geen publicatievormen gedefinieerd)
+    ({t}no publication types defined{/t})
     </p>
     {else}
-    <input type="submit" value="vertalingen opslaan" />
+    <input type="submit" value="{t}save translations{/t}" />
     {/if}
     </form>
-        
 
 
-	<p>    
+
+	<p>
     <form method="post" id="theForm">
     <input type="hidden" id="action2" name="action" value="save">
     <input type="hidden" id="id" name="id" value="">
-    Nieuw: <input type="text" name="type" />
-    <input type="submit" value="opslaan" />
+    {t}New{/t}: <input type="text" name="type" />
+    <input type="submit" value="{t}save{/t}" />
     </form>
     </p>
-    
-    
+
+
 </p>
 <p>
-	<a href="index.php">back</a>
+	<a href="index.php">{t}back{/t}</a>
 </p>
 </div>
 
