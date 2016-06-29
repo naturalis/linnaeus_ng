@@ -4,18 +4,18 @@
 <p>
 {t}Below is a list of matrices that are currently defined. In order to edit a matrix' name, click "edit name". In order to edit the actual matrix, click its name.{/t}
 <table>
-{foreach from=$matrices key=k item=val}
+{foreach from=$matrices val k}
 <tr class="tr-highlight">
 	<td style="min-width:200px;">
-	    <span class="a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">
-		{$val.sys_name}
+	    <span class="a" onclick="$('#id').val({$v.id});$('#action').val('activate');$('#theForm').submit()">
+		{$v.default_name} ({$v.sys_name})
         </span>
-		{if $val.default==1}<span title="default">*</span>{/if}
+		{if $v.default==1}<span title="default">*</span>{/if}
 	</td>
-	<td><span class="a" onclick="window.open('matrix.php?id={$val.id}','_self')">{t}edit name{/t}</span></td>
-    <td><a href="?default={$val.id}">{t}set as default{/t}</a></td>
-	<td><span class="a" onclick="matrixMatrixDelete({$val.id},'{$val.sys_name|@addslashes}')">{t}delete{/t}</span></td>
-	<!-- td><a href="?imgdim={$val.id}">{t}acquire state image dimensions{/t}</a></td -->
+	<td><span class="a" onclick="window.open('matrix.php?id={$v.id}','_self')">{t}edit name{/t}</span></td>
+    <td><a href="?default={$v.id}">{t}set as default{/t}</a></td>
+	<td><span class="a" onclick="matrixMatrixDelete({$v.id},'{$v.sys_name|@addslashes}')">{t}delete{/t}</span></td>
+	<!-- td><a href="?imgdim={$v.id}">{t}acquire state image dimensions{/t}</a></td -->
 </tr>
 {/foreach}
 </table>
