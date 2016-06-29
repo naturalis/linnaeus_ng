@@ -105,7 +105,7 @@ class ImportNBCController extends ImportController
 				'items_per_line'=>4,
 				'items_per_page'=>16,
 				'popup_species_link_text'=>'Ga naar soort op Nederlands Soortenregister',
-				'score_threshold'=>0,
+				'score_threshold'=>100,
 				'show_scores'=>0,
 				'similar_species_show_distinct_details_only'=>1,
 				'species_info_url'=>'http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163',
