@@ -21,7 +21,7 @@
             {/if}
             <div class="pageTitleContainer">
                 <span class="pageTitle">
-                    {$matrix.name}    
+                    {if $master_matrix.name && $master_matrix.name!=$matrix.name}{$master_matrix.name}{/if}
                 </span>
             </div>
            
@@ -92,6 +92,7 @@
             <img src="{$session.app.system.urls.systemMedia}placeholderheader.png" alt="">
             <h1 class="pageTitle">
                 <span class="determinatiesleutel">{snippet}matrix_main_title_header.html{/snippet}</span><br />
+				{if $master_matrix.name && $master_matrix.name!=$matrix.name}{$master_matrix.name}: {/if}
                 {$matrix.name}
             </h1>
         </div>    

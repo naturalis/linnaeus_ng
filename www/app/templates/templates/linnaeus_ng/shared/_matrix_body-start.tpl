@@ -92,6 +92,7 @@
             <img src="{$session.app.system.urls.systemMedia}placeholderheader.png" alt="">
             <h1 class="pageTitle">
                 <span class="determinatiesleutel">{snippet}matrix_main_title_header.html{/snippet}</span><br />
+				{if $master_matrix.name && $master_matrix.name!=$matrix.name}{$master_matrix.name}: {/if}
                 {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onClick="matrixSelectPopUp();">{t}kies andere matrix{/t}</span>
 <script>
 {foreach $matrices v}
