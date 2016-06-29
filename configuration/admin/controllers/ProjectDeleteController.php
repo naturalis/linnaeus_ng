@@ -525,7 +525,8 @@ class ProjectDeleteController extends Controller
 			else
 				@unlink($file);
 		}
-		@rmdir($dir);
+		
+		if (!@rmdir($dir)) return;
 	}
 
     public function deleteProjectDirectories ($id)
