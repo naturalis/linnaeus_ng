@@ -2,13 +2,15 @@
 /*
 	module
 		taxon editor
+		media
+		traits
 		
-	variations
+	variations!?
+	
+	NBC
 	
 
 */
-
-
 
 
 /*
@@ -78,36 +80,44 @@ class ImportNBCController extends ImportController
     public $cssToLoad = array();
     public $jsToLoad = array();
 
-	private $generalsettings=[
-		'image_root_skin'=>'../../media/system/skins/responsive_matrix/',
-		'skin'=>'responsive_matrix',
-		'start_page'=>'../../../app/views/matrixkey/identify.php',
-	];
 
 	private $settings=[
-		'allow_empty_species'=>1,
-		'always_show_details'=>1,
-		'always_sort_by_initial'=>0,
-		'browse_style'=>'expand',
-		'calc_char_h_val'=>1,
-		'enable_treat_unknowns_as_matches'=>0,
-		'image_orientation'=>'portrait',
-		'img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//',
-		'img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/',
-		'introduction_topic_colophon_citation'=>'Matrix colophon & citation',
-		'introduction_topic_inline_info'=>'Matrix additional info',
-		'introduction_topic_versions'=>'Matrix version history',
-		'items_per_line'=>4,
-		'items_per_page'=>16,
-		'popup_species_link_text'=>'Ga naar soort op Nederlands Soortenregister',
-		'score_threshold'=>100,
-		'show_scores'=>0,
-		'similar_species_show_distinct_details_only'=>1,
-		'species_info_url'=>'http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163',
-		'use_character_groups'=>1,
-		'use_emerging_characters'=>1,
-	];
-
+		'general' => 
+			[
+				'image_root_skin'=>'../../media/system/skins/responsive_matrix/',
+				'skin'=>'responsive_matrix',
+				'start_page'=>'../../../app/views/matrixkey/identify.php',
+			],
+		'matrixkey' =>
+			[
+				'allow_empty_species'=>1,
+				'always_show_details'=>1,
+				'always_sort_by_initial'=>0,
+				'browse_style'=>'expand',
+				'calc_char_h_val'=>1,
+				'enable_treat_unknowns_as_matches'=>0,
+				'image_orientation'=>'portrait',
+				'img_to_thumb_regexp_pattern'=>'/http:\/\/images.naturalis.nl\/original\//',
+				'img_to_thumb_regexp_replacement'=>'http://images.naturalis.nl/comping/',
+				'introduction_topic_colophon_citation'=>'Matrix colophon & citation',
+				'introduction_topic_inline_info'=>'Matrix additional info',
+				'introduction_topic_versions'=>'Matrix version history',
+				'items_per_line'=>4,
+				'items_per_page'=>16,
+				'popup_species_link_text'=>'Ga naar soort op Nederlands Soortenregister',
+				'score_threshold'=>0,
+				'show_scores'=>0,
+				'similar_species_show_distinct_details_only'=>1,
+				'species_info_url'=>'http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163',
+				'use_character_groups'=>1,
+				'use_emerging_characters'=>1,
+			],
+		'introduction'=>
+			[
+				'no_media'=>1
+			]
+		];
+		
 	private $nameTypes=[
         'isValidNameOf',
         'isSynonymOf',
@@ -119,10 +129,7 @@ class ImportNBCController extends ImportController
         'isMisspelledNameOf',
         'isInvalidNameOf'
 	];
-
-
-
-
+	
 
     /**
      * Constructor, calls parent's constructor
@@ -634,19 +641,17 @@ class ImportNBCController extends ImportController
 
     public function nbcDeterminatie6Action()
     {
-
-		if ($this->rHasVal('action','download')) {
+		if ($this->rHasVal('action','download'))
+		{
 			$this->doDownload();
 			die();
 		}
-		if ($this->rHasVal('action','errorlog')) {
+
+		if ($this->rHasVal('action','errorlog'))
+		{
 			$this->downloadErrorLog();
 			die();
 		}
-
-        $this->setPageName($this->translate('Import finished'));
-
-
 
         foreach ($this->nameTypes as $type)
 		{
@@ -656,27 +661,22 @@ class ImportNBCController extends ImportController
 				"nametype"=>$type
 			] );
         }
-	
-		foreach((array)$this->settings as $setting=>$value)
+			
+		foreach((array)$this->settings as $module=>$settings)
 		{
-			$this->saveSettingIfNew( [ 
-				'value'=>$value,
-				'setting'=>$setting,
-				'type'=>'matrix'		
-			] );
-		}
-
-		foreach((array)$this->generalsettings as $setting=>$value)
-		{
-			$this->saveSettingIfNew( [ 
-				'value'=>$value,
-				'setting'=>$setting
-			] );
+			foreach((array)$settings as $setting=>$value)
+			{
+				$this->saveSettingIfNew( [ 
+					'module'=>$module,
+					'setting'=>$setting,
+					'value'=>$value,
+				] );
+			}
 		}
 
 
-        $this->printPage();
-
+        $this->setPageName($this->translate('Import finished'));
+		$this->printPage();
     }
 
     public function nbcDeterminatie7Action()
@@ -1028,21 +1028,21 @@ class ImportNBCController extends ImportController
 
 	private function saveSettingIfNew( $p ) 
 	{
-        $value = isset($p['value']) ? $p['value'] : null;
+        $module = isset($p['module']) ? $p['module'] : 'general';
         $setting = isset($p['setting']) ? $p['setting'] : null;
-        $type = isset($p['type']) ? $p['type'] : 'general';
-		
-        if (is_null($value) || is_null($setting)) return;
+        $value = isset($p['value']) ? $p['value'] : null;
 
-		if ($type=='general')
+        if (is_null($value) || is_null($setting) || is_null($module)) return;
+
+		if ($module=='general')
 			$this->moduleSettings->getGeneralSetting( [ 'setting'=>$setting, 'no_auth_check'=>true ] );
 		else
-			$this->moduleSettings->getModuleSetting( [ 'module'=>'matrixkey', 'setting'=>$setting ] );
+			$this->moduleSettings->getModuleSetting( [ 'module'=>$module, 'setting'=>$setting ] );
 
 		$settingId=$this->moduleSettings->getLastSettingId();
 		
 		$d=$this->models->ModuleSettingsValues->_get( [ "id" => ["project_id"=>$this->getNewProjectId(), "setting_id"=>$settingId]	] );
-		
+
 		if (!$d)
 		{
 			$this->models->ModuleSettingsValues->save( [
@@ -1052,7 +1052,7 @@ class ImportNBCController extends ImportController
 				"value"=>$value
 			] );
 
-			$this->addMessage($this->storeError(sprintf('Saved value %s for setting %s',$value,$setting),'Matrix'));
+			$this->addMessage($this->storeError(sprintf('Saved setting %s:%s:%s',$module,$setting,$value),'Matrix'));
 		}
 	}
 
@@ -1533,7 +1533,6 @@ class ImportNBCController extends ImportController
 
     private function storeSpeciesAndVariationsAndMatrices ($data)
     {
-
         $_SESSION['admin']['system']['import']['loaded']['species'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['variations'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['matrices'] = 0;
