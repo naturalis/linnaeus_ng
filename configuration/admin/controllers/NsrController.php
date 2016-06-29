@@ -125,7 +125,7 @@ class NsrController extends Controller
 			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto'];
 		});
 		
-		$all_categories=array_merge($categories,$standard_categories);
+		$all_categories=array_merge((array)$categories,$standard_categories);
 
         $lp=$this->getProjectLanguages();
 
