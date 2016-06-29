@@ -94,6 +94,7 @@ class MatrixKeyController extends Controller
 
 	private $_mc;
 	private $_smc;
+	private $use_media;
 
     public $cssToLoad = array('matrix.css');
 
@@ -137,7 +138,13 @@ class MatrixKeyController extends Controller
 
 		$this->setFacetMenu();
 		$this->setIncUnknowns( false );
-		$this->setMediaControllers();
+		
+		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
+		
+		if ( $this->use_media )
+		{
+			$this->setMediaControllers();
+		}
 	}
 
 
