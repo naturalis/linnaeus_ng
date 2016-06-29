@@ -20,7 +20,7 @@ class WebservicesController extends Controller
 
 	// Hard-coded for the time being...
 	private $_key = 'gNXhIb4LDKrA7MQmNo7wpV';
-    private $_pushUrl = 'http://localhost/store.php';
+    private $_pushUrl = 'http://localhost/server_csv.php';
 
     public $usedHelpers = array(
         'http_basic_authentication'
@@ -122,7 +122,7 @@ class WebservicesController extends Controller
     public function scanServersAction ()
     {
 		$this->_head->service = 'projects and users';
-		$this->_head->description = sprintf('push Linnaeus data to central server');
+		$this->_head->description = sprintf('"flat file" list of all projects and their users');
 
         if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
 
@@ -160,7 +160,7 @@ class WebservicesController extends Controller
     public function linnaeusDataPushAction ()
     {
 		$this->_head->service = 'push Linnaeus data';
-		$this->_head->description = sprintf('"flat file" list of all projects and their users');
+		$this->_head->description = sprintf('push Linnaeus data to central server');
 
         if (!$this->rHasVal('key') || $this->rGetVal('key') !== $this->_key) {
 
