@@ -665,7 +665,9 @@ class MatrixKeyController extends Controller
 				(!$this->settings->allow_empty_species && $val['is_empty']==1))
 			{
 				$d['type']='taxon';
-				if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
+				if (
+					!isset($this->settings->suppress_details) ||
+					(isset($this->settings->suppress_details) && $this->settings->suppress_details!=1))
 				{
 					$d['states']=$this->getTaxonStates( $val['taxon_id'] );
 				}

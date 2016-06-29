@@ -60,7 +60,6 @@ class IntroductionController extends Controller
 		}
 
 		$this->smarty->assign( 'use_media', $this->use_media );
-
     }
 
     public function __destruct ()
