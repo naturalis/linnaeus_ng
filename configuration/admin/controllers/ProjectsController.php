@@ -338,7 +338,6 @@ class ProjectsController extends Controller
         if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit())
 		{
             $this->doDeleteProjectAction($this->rGetId());
-            $this->reInitUserRolesAndRights();
             $this->addMessage('Project deleted.');
         }
         else

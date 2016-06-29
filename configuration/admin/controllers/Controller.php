@@ -449,11 +449,6 @@ class Controller extends BaseClass
 		return $this->UserRights->isSysAdmin();
     }
 
-    public function reInitUserRolesAndRights()
-    {
-		$this->UserRights->reInitializeRights();
-    }
-
     public function getProjectModules($params = null)
     {
 		$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
