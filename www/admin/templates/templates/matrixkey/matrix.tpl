@@ -28,7 +28,7 @@
 	<input type="submit" value="{t}save{/t}" />
 </p>
 
-<a href="edit?id={$matrix.id}">{t}edit matrix{/t}</a>
+<a href="matrices.php">{t}back{/t}</a>
 
 </form>
 
