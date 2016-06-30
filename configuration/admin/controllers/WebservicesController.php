@@ -191,7 +191,7 @@ class WebservicesController extends Controller
 
     		$this->_data = $this->getCurlResult(array(
                 'url' => $this->_pushUrl,
-                'post' => http_build_query(array('post' => json_encode($data)))
+                'post' => http_build_query(array('lng_data' => json_encode($data)))
     		));
         }
 
