@@ -111,6 +111,7 @@ class ImportNBCController extends ImportController
 				'species_info_url'=>'http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163',
 				'use_character_groups'=>1,
 				'use_emerging_characters'=>1,
+				'suppress_details'=>0,
 				'no_media'=>1,
 			],
 		'introduction'=>
@@ -1510,26 +1511,24 @@ class ImportNBCController extends ImportController
 
 	private function resolveSimilarIdentifier($id,$lst)
 	{
-
 		$id = trim($id);
 
-		if (empty($id))
-			return;
+		if (empty($id)) return;
 
-		if (is_numeric($id))
-			return $id;
+		if (is_numeric($id)) return $id;
 
-		foreach ((array)$lst as $key => $val) {
-			if (trim(strtolower($val['name']))==strtolower($id)) {
+		foreach ((array)$lst as $key => $val)
+		{
+			//if (trim(strtolower($val['name']))==strtolower($id))
+			if (in_array(strtolower($id),$val['name']))
+			{
 				return $key;
 			}
-
 		}
 
 		$this->addError($this->storeError(sprintf($this->translate('Could not resolve similar species "%s"'),$id), 'Species import'));
 
 		return $id;
-
 	}
 
     private function storeSpeciesAndVariationsAndMatrices ($data)
@@ -1574,18 +1573,17 @@ class ImportNBCController extends ImportController
 		// save all taxa
         foreach ((array) $species as $key => $val)
 		{
-			if ($val['isMatrix']==true)
+
+			if ( $val['isMatrix'] )
 			{
 				$d=$this->createMatrixIfNotExists($key);
 				$species[$key]['lng_id'] = $d['id'];
-
-				if ($d['type']=='new')
-					$this->addMessage(sprintf('Added new referenced matrix "%s" (name only)',$key));
-
+				if ($d['type']=='new') $this->addMessage(sprintf('Added new referenced matrix "%s" (name only)',$key));
 				continue;
 			}
 
-			if (isset($val['parent_name']))
+			// getting the parent
+			if ( isset($val['parent_name']) )
 			{
 				// find parent by sci name
 				$d = $this->getTaxonByName($val['parent_name']);
@@ -1630,7 +1628,6 @@ class ImportNBCController extends ImportController
 			{
 				// give the topmost the default uppermost parent
 				$parent = $kingdomId;
-
 			}
 
 			// does taxon already exist?
@@ -1644,7 +1641,53 @@ class ImportNBCController extends ImportController
 			if ($d)
 			{
 				$species[$key]['lng_id'] = $d[0]['id'];
-			} 
+
+				// cleaning up
+				$this->models->NbcExtras->delete(
+					array(
+						'project_id' => $this->getNewProjectId(),
+						'ref_id' => $species[$key]['lng_id'],
+						'ref_type' => 'taxon'
+					));
+					
+				$this->models->TaxaRelations->delete(array(
+					'project_id' => $this->getNewProjectId(),
+					'taxon_id' => $species[$key]['lng_id']
+				));
+
+				$tv=$this->models->TaxaVariations->_get(array('id'=>
+					array(
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $species[$key]['lng_id']
+					)));
+					
+				foreach((array)$tv as $bla)
+				{
+					$this->models->VariationsLabels->delete(
+						array(
+							'project_id' => $this->getNewProjectId(),
+							'variation_id' => $bla['id'],
+						));
+
+					$this->models->NbcExtras->delete(
+						array(
+							'project_id' => $this->getNewProjectId(),
+							'ref_id' => $bla['id'],
+							'ref_type' => 'variation'
+						));
+				}
+
+				$this->models->TaxaVariations->delete(array(
+					'project_id' => $this->getNewProjectId(),
+					'taxon_id' => $species[$key]['lng_id']
+				));
+
+				$this->models->Names->delete(array(
+					'project_id' => $this->getNewProjectId(),
+					'taxon_id' => $species[$key]['lng_id']
+				));
+
+			}
 			else
 			{
 				// save new taxon
@@ -1663,18 +1706,11 @@ class ImportNBCController extends ImportController
 				$species[$key]['lng_id'] = $this->models->Taxa->getNewId();
 			}
 
-			$this->models->NbcExtras->delete(
-				array(
-					'project_id' => $this->getNewProjectId(),
-					'ref_id' => $species[$key]['lng_id'],
-					'ref_type' => 'taxon'
-				));
-
 
 			// if it's not a matrix and if NBC-data columns have been defined, save the NBC-data
 			if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns']))
 			{
-				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal)
+				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey=>$cVal)
 				{
 					if (!empty($cVal) && isset($val[$cKey]))
 					{
@@ -1695,27 +1731,15 @@ class ImportNBCController extends ImportController
 
 			if (isset($val['common name']))
 			{
-				$d = $this->models->Names->_get(array('id' =>
+				$this->models->Names->save(
 				array(
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'taxon_id' => $species[$key]['lng_id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'name' => $val['common name'],
 					'type_id'=> PREDICATE_PREFERRED_NAME
-				)));
-
-				if (!$d)
-				{
-					$this->models->Names->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),
-						'taxon_id' => $species[$key]['lng_id'],
-						'language_id' => $this->getNewDefaultLanguageId(),
-						'name' => $val['common name'],
-						'type_id'=> PREDICATE_PREFERRED_NAME
-					));
-				}
+				));
 			}
 
 			// if there's variations, save those as well
@@ -1729,47 +1753,25 @@ class ImportNBCController extends ImportController
 						continue;
 					}
 
-					$d = $this->models->TaxaVariations->_get(array('id'=>
-						array(
-							'project_id' => $this->getNewProjectId(),
-							'taxon_id' => $species[$key]['lng_id'],
-							'label' => $vVal['variant']
-						)));
+					$this->models->TaxaVariations->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $species[$key]['lng_id'],
+						'label' => $vVal['variant']
+					));
 
-					if ($d)
-					{
-						$vId = $species[$key]['variations'][$vKey]['lng_id'] = $d[0]['id'];
-					} 
-					else 
-					{
-						$this->models->TaxaVariations->save(
-						array(
-							'id' => null,
-							'project_id' => $this->getNewProjectId(),
-							'taxon_id' => $species[$key]['lng_id'],
-							'label' => $vVal['variant']
-						));
+					$vId = $species[$key]['variations'][$vKey]['lng_id'] = $this->models->TaxaVariations->getNewId();
 
-						$vId = $species[$key]['variations'][$vKey]['lng_id'] = $this->models->TaxaVariations->getNewId();
-
-						$this->models->VariationsLabels->save(
-						array(
-							'id' => null,
-							'project_id' => $this->getNewProjectId(),
-							'variation_id' => $vId,
-							'language_id' => $this->getNewDefaultLanguageId(),
-							'label' => $vVal['variant'],
-							'label_type' => 'alternative'
-						));
-
-					}
-
-					$this->models->NbcExtras->delete(
-						array(
-							'project_id' => $this->getNewProjectId(),
-							'ref_id' => $vId,
-							'ref_type' => 'variation'
-						));
+					$this->models->VariationsLabels->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'variation_id' => $vId,
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'label' => $vVal['variant'],
+						'label_type' => 'alternative'
+					));
 
 					if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns']))
 					{
@@ -1795,18 +1797,16 @@ class ImportNBCController extends ImportController
 					$tmpIndex[$vVal['id']] = array(
 						'type' => 'var',
 						'id' => $vId,
-						'name' => $vVal['variant'] // for Dierenzoeker
+						'name' => [ strtolower($vVal['variant']) ] // for Dierenzoeker
 					);
-
 				}
-
 			} 
 			else
 			{
 				$tmpIndex[$val['id']] = array(
 					'type' => 'sp',
 					'id' => $species[$key]['lng_id'],
-					'name' => isset($val['common name']) ? $val['common name'] :  $key // for Dierenzoeker
+					'name' => [ strtolower($key), strtolower(@$val['common name']), strtolower(@$val['common name']) ]
 				);
 			}
 		}
@@ -1851,6 +1851,15 @@ class ImportNBCController extends ImportController
 			{
                 foreach ((array) $val['variations'] as $vKey => $vVal)
 				{
+					
+					$this->models->TaxaRelations->delete(
+						array(
+							'project_id' => $this->getNewProjectId(),
+							'taxon_id' => $vVal['lng_id'],
+							'ref_type' => 'variation'
+						));
+	
+					
                     if (isset($vVal['related']))
 					{
                         foreach ((array) $vVal['related'] as $rKey => $rVal)

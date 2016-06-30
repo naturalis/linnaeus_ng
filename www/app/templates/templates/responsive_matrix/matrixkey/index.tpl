@@ -15,11 +15,8 @@
 	        </div>
 
 			<div>
-				
-
 				<div id="similarSpeciesHeader" class="hidden" style="width:100%"></div>
 				<div id="result-count" class="headerSelectionLabel"></div>
-				
 			</div>
 	        
 	        <div id="results">
