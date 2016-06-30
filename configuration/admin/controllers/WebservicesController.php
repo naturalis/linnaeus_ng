@@ -20,7 +20,6 @@ class WebservicesController extends Controller
 
 	// Hard-coded for the time being...
 	private $_key = 'gNXhIb4LDKrA7MQmNo7wpV';
-    private $_pushUrl = 'http://localhost/server_csv.php';
 
     public $usedHelpers = array(
         'http_basic_authentication'
@@ -190,7 +189,7 @@ class WebservicesController extends Controller
         	}
 
     		$this->_data = $this->getCurlResult(array(
-                'url' => $this->_pushUrl,
+                'url' => $this->generalSettings['pushUrl'],
                 'post' => http_build_query(array('lng_data' => json_encode($data)))
     		));
         }
