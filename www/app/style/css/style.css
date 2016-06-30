@@ -472,6 +472,7 @@ table {
   #dialogRidge #results {
     margin-top: 8px; }
   #dialogRidge .matrixLink .result-icons {
+    height: 50px;	  
     padding-right: 50px;
     position: relative; }
   #dialogRidge .matrixLink .goToMatrixLink {
