@@ -94,6 +94,7 @@ class MatrixKeyController extends Controller
 
 	private $_mc;
 	private $_smc;
+	private $use_media;
 
     public $cssToLoad = array('matrix.css');
 

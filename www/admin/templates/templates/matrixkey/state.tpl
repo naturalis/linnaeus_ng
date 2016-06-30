@@ -32,14 +32,14 @@
         </tr>
     {/foreach}
 
-    <tr>
+    <!-- tr>
         <td></td>
         {if $characteristic.type == 'media' && $state.id == ''}
         <td></td>
         {else}
         <td style="padding-top:10px">Value</td>
         {/if}
-    </tr>
+    </tr -->
 
 	{if $characteristic.type=='text'}
 
@@ -54,6 +54,8 @@
     {/foreach}
 
 	{elseif $characteristic.type=='media' && $state.id != ''}
+    
+    {if $use_media}
 
 	<tr style="vertical-align:top">
 		<td>
@@ -74,6 +76,8 @@
 		{/if}
 		</td>
 	</tr>
+    
+    {/if}
 
 	{elseif $characteristic.type=='range'}
 
