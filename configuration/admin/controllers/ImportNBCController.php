@@ -121,15 +121,15 @@ class ImportNBCController extends ImportController
 		];
 		
 	private $nameTypes=[
-        'isValidNameOf',
-        'isSynonymOf',
-        'isSynonymSLOf',
-        'isBasionymOf',
-        'isHomonymOf',
-        'isAlternativeNameOf',
-        'isPreferredNameOf',
-        'isMisspelledNameOf',
-        'isInvalidNameOf'
+        'isValidNameOf'=>0,
+        'isSynonymOf'=>0,
+        'isSynonymSLOf'=>0,
+        'isBasionymOf'=>0,
+        'isHomonymOf'=>0,
+        'isAlternativeNameOf'=>0,
+        'isPreferredNameOf'=>0,
+        'isMisspelledNameOf'=>0,
+        'isInvalidNameOf'=>0
 	];
 	
 
@@ -249,7 +249,8 @@ class ImportNBCController extends ImportController
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
 
-		if (isset($data['project']['title'])) {
+		if (isset($data['project']['title']))
+		{
 
 			$d = $this->models->Projects->_get(array(
 				'id' => array(
@@ -260,12 +261,13 @@ class ImportNBCController extends ImportController
 
 			$this->smarty->assign('exists',$exists);
 
-			if ($exists) {
-
+			if ($exists)
+			{
 				$_SESSION['admin']['system']['import']['existingProjectId'] = $d[0]['id'];
 
 				$i=1;
-				while ($d!=false) {
+				while ($d!=false)
+				{
 					$suggestedTitle = $data['project']['title'].' ('.$i++.')';
 					$d = $this->models->Projects->_get(array(
 							'id' => array(
@@ -278,10 +280,10 @@ class ImportNBCController extends ImportController
 				$_SESSION['admin']['system']['import']['projectExists'] = true;
 				$_SESSION['admin']['system']['import']['newProjectTitle'] = $suggestedTitle;
 
-			} else {
-
+			} 
+			else 
+			{
 				$_SESSION['admin']['system']['import']['projectExists'] = false;
-
 			}
 
 		}
@@ -357,14 +359,24 @@ class ImportNBCController extends ImportController
 
 				$this->addMessage('Added default language.');
 
+				foreach ($this->nameTypes as $type=>$x)
+				{
+					$this->models->NameTypes->save( [
+						"id"=>null,
+						"project_id"=>$pId,
+						"nametype"=>$type
+					] );
+				}
+
+				$this->addMessage('Added name types.');
+
 			}
 			// use an existing project
-			else {
-
+			else
+			{
 				$pId = $_SESSION['admin']['system']['import']['project']['id'] = $_SESSION['admin']['system']['import']['existingProjectId'];
 				$_SESSION['admin']['system']['import']['project']['title'] = $_SESSION['admin']['system']['import']['data']['project']['title'];
 				$this->addMessage($this->storeError('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.','Project'));
-
 			}
 
 			$this->addModuleToProject(MODCODE_SPECIES, $pId, 0);
@@ -374,8 +386,8 @@ class ImportNBCController extends ImportController
 
 			$this->addMessage('Added current user as lead expert to project.');
 
-
-			if ($this->rHasVal('action')) {
+			if ($this->rHasVal('action'))
+			{
 
 				$_SESSION['admin']['system']['import']['existingProjectTreatment'] = $this->rGetVal('action');
 
@@ -384,13 +396,13 @@ class ImportNBCController extends ImportController
 					$pDel = new ProjectDeleteController;
 					$pDel->deleteMatrices( [ 'project_id'=>$pId,'keep_files'=>true ] );
 
-					if ($this->rHasVal('action','replace_data')) {
-
+					if ($this->rHasVal('action','replace_data'))
+					{
 						$pDel->doDeleteAllButProjectItself($pId);
-
-					} else
-					if ($this->rHasVal('action','replace_species_data')) {
-
+					} 
+					else
+					if ($this->rHasVal('action','replace_species_data'))
+					{
 						$pr = $this->models->ProjectsRanks->_get(array(
 							'id' => array(
 								'project_id' => $pId,
@@ -655,15 +667,6 @@ class ImportNBCController extends ImportController
 			die();
 		}
 
-        foreach ($this->nameTypes as $type)
-		{
-			$this->models->NameTypes->save( [
-				"id"=>null,
-				"project_id"=>$this->getNewProjectId(),
-				"nametype"=>$type
-			] );
-        }
-			
 		foreach((array)$this->settings as $module=>$settings)
 		{
 			foreach((array)$settings as $setting=>$value)
@@ -1540,6 +1543,20 @@ class ImportNBCController extends ImportController
         $tmpIndex = array();
         $species = $this->resolveSpeciesAndVariationsAndMatrices($data);
 
+
+		foreach ($this->nameTypes as $type=>$x)
+		{
+			$d=$this->models->NameTypes->_get( [ "id" => 
+			[
+				"project_id"=>$this->getNewProjectId(),
+				"nametype"=>$type
+			] ] );
+			
+			$this->nameTypes[$type]=$d[0]['id'];
+		}				
+
+
+
         $d = $this->models->Taxa->_get(array('id' =>
 			array(
 				'project_id' => $this->getNewProjectId(),
@@ -1704,6 +1721,16 @@ class ImportNBCController extends ImportController
 				));
 
 				$species[$key]['lng_id'] = $this->models->Taxa->getNewId();
+
+				$this->models->Names->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),
+					'taxon_id' => $species[$key]['lng_id'],
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'name' =>$key,
+					'type_id'=> $this->nameTypes[PREDICATE_VALID_NAME]
+				));
 			}
 
 
@@ -1738,7 +1765,7 @@ class ImportNBCController extends ImportController
 					'taxon_id' => $species[$key]['lng_id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'name' => $val['common name'],
-					'type_id'=> PREDICATE_PREFERRED_NAME
+					'type_id'=> $this->nameTypes[PREDICATE_PREFERRED_NAME]
 				));
 			}
 

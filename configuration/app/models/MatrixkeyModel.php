@@ -1085,7 +1085,7 @@ final class MatrixKeyModel extends AbstractModel
 				and _b.matrix_id = ". $matrix_id ."
 			" . ( isset($limit) ? "limit " . $limit : "" ) . "
 		";
-	
+
 		return $this->freeQuery( $query );
 	}
 
