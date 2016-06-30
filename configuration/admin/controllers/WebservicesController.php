@@ -188,6 +188,10 @@ class WebservicesController extends Controller
                 $data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
 
+        	echo $this->generalSettings['pushUrl'];
+        	print_r($data);
+        	die();
+
     		$this->_data = $this->getCurlResult(array(
                 'url' => $this->generalSettings['pushUrl'],
                 'post' => http_build_query(array('lng_data' => json_encode($data)))
