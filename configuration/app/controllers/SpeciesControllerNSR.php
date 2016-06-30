@@ -551,7 +551,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto','always_hide'=>false,'is_empty'=>false];
 		});
 		
-		$all_categories=array_merge($categories,$standard_categories);
+		$all_categories=array_merge((array)$categories,$standard_categories);
 
         $lp=$this->getProjectLanguages();
 
@@ -725,7 +725,7 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $id
 		));
 		
-		$d=current($names);
+		$d=current((array)$names);
 		$base_rank_id=isset($d['taxon_base_rank_id']) ? $d['taxon_base_rank_id'] : null;
 
 		$preferredname=null;
@@ -965,18 +965,21 @@ class SpeciesControllerNSR extends SpeciesController
     		'language_id' => $this->getCurrentLanguageId(),
     		'taxon_id' => $id
 		));
-
-		$taxon['name']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
-		$taxon['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
-		$taxon['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
-		$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
-
-		array_unshift($this->tmp,$taxon);
-
-		if (!empty($taxon['parent_id'])) {
-			$this->_getTaxonClassification($taxon['parent_id']);
+		
+		if ($taxon)
+		{
+			$taxon['name']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
+			$taxon['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
+			$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
+	
+			array_unshift($this->tmp,$taxon);
+	
+			if (!empty($taxon['parent_id']))
+			{
+				$this->_getTaxonClassification($taxon['parent_id']);
+			}
 		}
-
 	}
 
 	private function getSpeciesCount( $p )
