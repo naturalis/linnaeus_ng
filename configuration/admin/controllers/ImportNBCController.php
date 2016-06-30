@@ -679,8 +679,8 @@ class ImportNBCController extends ImportController
 			}
 		}
 
-
         $this->setPageName($this->translate('Import finished'));
+
 		$this->printPage();
     }
 
@@ -794,7 +794,8 @@ class ImportNBCController extends ImportController
 
         $this->setPageName($this->translate('Saving labels'));
 
-        if (!$this->isFormResubmit()) {
+        if (!$this->isFormResubmit())
+		{
 
             $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
 			//$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
@@ -804,16 +805,14 @@ class ImportNBCController extends ImportController
 				'sys_name' => $pTitle
 			)));
 
-			if (!empty($d[0]['id'])) {
-
+			if (!empty($d[0]['id']))
+			{
 				$pId = $d[0]['id'];
-
 				$dummy = array();
-
 				$thisLanguage=$this->getNewDefaultLanguageId($pId);
 
-				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
-
+				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val)
+				{
 					if (empty($val[1]))
 						continue;
 
@@ -832,7 +831,8 @@ class ImportNBCController extends ImportController
 
 
 					// warning, UGLY code ahead
-					if ($d && count((array)$d)>1) {
+					if ($d && count((array)$d)>1)
+					{
 
 						/*
 							two (or more) characters can exist with the same name, but not
@@ -881,8 +881,8 @@ class ImportNBCController extends ImportController
 					}
 
 					// if a char is found...
-					if (!empty($d[0]['characteristic_id'])) {
-
+					if (!empty($d[0]['characteristic_id']))
+					{
 						$cId = $d[0]['characteristic_id'];
 
 						// ...find all its states

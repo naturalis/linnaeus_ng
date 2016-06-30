@@ -426,6 +426,9 @@ class MatrixKeyController extends Controller
 		{
             foreach ($states as $i => $state)
 			{
+				if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+					continue;
+				
                 $this->_mc->setItemId($state['id']);
                 $media = $this->_mc->getItemMediaFiles();
 
@@ -444,6 +447,9 @@ class MatrixKeyController extends Controller
         } else
 		if (isset($states['id']))
 		{
+			if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+				continue;
+				
             $this->_mc->setItemId($states['id']);
             $media = $this->_mc->getItemMediaFiles();
 
@@ -459,8 +465,6 @@ class MatrixKeyController extends Controller
                 array($media[0]['width'], $media[0]['height']);
 			}
         }
-
-        //print_r($states);
 
         return $states;
     }
