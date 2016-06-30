@@ -191,8 +191,6 @@ class WebservicesController extends Controller
         	$url = !empty($this->generalSettings['pushUrl']) ?
         	   $this->generalSettings['pushUrl'] : 'http://linnaeus.naturalis.nl/admin/server_csv.php';
 
-        	die($url);
-
     		$this->_data = $this->getCurlResult(array(
                 'url' => $url,
                 'post' => http_build_query(array('lng_data' => json_encode($data)))
