@@ -465,6 +465,11 @@ class MatrixKeyController extends Controller
                 array($media[0]['width'], $media[0]['height']);
 			}
         }
+		
+		foreach((array)$states as $key=>$val)
+		{
+			$states[$key]['file_name_is_full_url']=(!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false);
+		}
 
         return $states;
     }

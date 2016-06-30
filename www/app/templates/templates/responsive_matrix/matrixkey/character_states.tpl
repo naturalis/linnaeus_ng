@@ -80,7 +80,17 @@
                                 <a href="#" class="state-image-link" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                             {/if}
                         {/if}
-                        <img class="state-image" key="{$key}" {if $v.file_name} src="{$projectUrls.projectMedia}{$v.file_name}" {else} src="{$image_root_skin}missing.jpg" {/if} />
+
+                        {capture image_url}
+                        {if $v.file_name_is_full_url}
+                        {assign imageurl $v.file_name}
+                        {elseif $v.file_name}
+                        {assign imageurl {$projectUrls.projectMedia}{$v.file_name}
+                        {else}{$image_root_skin}missing.jpg{/if}
+                        {/capture}
+
+                        <img class="state-image" key="{$key}"  src="{$smarty.capture.image_url|@trim}" />
+
                         <div class="state-image-caption">
                             {$v.label}
                             {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
