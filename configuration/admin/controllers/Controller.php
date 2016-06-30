@@ -74,7 +74,8 @@ class Controller extends BaseClass
 		'taxa_variations',
 		'users_taxa',
 		'users',
-		'variations_labels'
+		'variations_labels',
+		'name_types'
 	);
 
     private $usedHelpersBase = array(
@@ -130,7 +131,12 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
         $this->setProjectLanguages();
 		$this->initTranslator();
-        $this->setOtherStuff();
+        $this->setRandomValue();
+		$this->setShowAutomaticHybridMarkers();
+		$this->setShowAutomaticInfixes();
+		$this->setAdminMessageFadeOutDelay();
+        $this->setGitVars();
+        $this->setCronNextRun();
     }
 
     /**
@@ -2615,16 +2621,6 @@ class Controller extends BaseClass
 			);
 	}
 
-	private function setOtherStuff()
-	{
-        $this->setRandomValue();
-		$this->setShowAutomaticHybridMarkers();
-		$this->setShowAutomaticInfixes();
-		$this->setAdminMessageFadeOutDelay();
-        $this->setGitVars();
-        $this->setCronNextRun();
-	}
-
 	public function addHybridMarkerAndInfixes( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
@@ -2877,6 +2873,5 @@ class Controller extends BaseClass
 	{
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
-
 
 }
