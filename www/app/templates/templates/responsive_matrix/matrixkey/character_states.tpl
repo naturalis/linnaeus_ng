@@ -83,10 +83,12 @@
 
                         {capture image_url}
                         {if $v.file_name_is_full_url}
-                        {assign imageurl $v.file_name}
+                        {$v.file_name}
                         {elseif $v.file_name}
-                        {assign imageurl {$projectUrls.projectMedia}{$v.file_name}
-                        {else}{$image_root_skin}missing.jpg{/if}
+                        {$projectUrls.projectMedia}{$v.file_name}
+                        {else}
+                        {$image_root_skin}missing.jpg
+                        {/if}
                         {/capture}
 
                         <img class="state-image" key="{$key}"  src="{$smarty.capture.image_url|@trim}" />
