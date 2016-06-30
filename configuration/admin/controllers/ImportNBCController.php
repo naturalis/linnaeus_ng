@@ -111,6 +111,7 @@ class ImportNBCController extends ImportController
 				'species_info_url'=>'http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163',
 				'use_character_groups'=>1,
 				'use_emerging_characters'=>1,
+				'no_media'=>1,
 			],
 		'introduction'=>
 			[

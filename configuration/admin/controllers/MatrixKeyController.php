@@ -73,7 +73,14 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('languages', $this->getProjectLanguages());
         $this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
-		$this->setMediaController();
+		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
+
+		if ( $this->use_media )
+		{
+			$this->setMediaController();
+		}
+
+		$this->smarty->assign( 'use_media', $this->use_media );
     }
 
     public function __destruct()
@@ -666,7 +673,10 @@ class MatrixKeyController extends Controller
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
             //$this->deleteCharacteristicStateImage();
-            $this->detachAllMedia();
+			if ( $this->use_media )
+			{
+				$this->detachAllMedia();
+			}
         }
 
 		if ($this->rHasId())
@@ -1319,10 +1329,13 @@ class MatrixKeyController extends Controller
 			'id' => $id
 		]);
 
-        // Override media
-        $media = $this->getStateMedia();
-        $state['file_name'] = $media['file_name'];
-        $state['file_dimensions'] = $media['file_dimensions'];
+		if ( $this->use_media )
+		{
+			// Override media
+			$media = $this->getStateMedia();
+			$state['file_name'] = $media['file_name'];
+			$state['file_dimensions'] = $media['file_dimensions'];
+		}
 
 		return $state;
     }
@@ -1500,7 +1513,10 @@ class MatrixKeyController extends Controller
             return;
 
         //$this->deleteCharacteristicStateImage($id);
-        $this->detachAllMedia();
+		if ( $this->use_media )
+		{
+	        $this->detachAllMedia();
+		}
 
         $this->models->CharacteristicsLabelsStates->delete(array(
             'project_id' => $this->getCurrentProjectId(),
