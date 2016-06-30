@@ -1416,7 +1416,7 @@ class ImportNBCController extends ImportController
         );
     }
 
-    private function resolveSpeciesAndVariationsAndMatrices ($data)
+    private function resolveSpeciesAndVariationsAndMatrices($data)
     {
 
         $d = array();
@@ -1534,7 +1534,7 @@ class ImportNBCController extends ImportController
 		return $id;
 	}
 
-    private function storeSpeciesAndVariationsAndMatrices ($data)
+    private function storeSpeciesAndVariationsAndMatrices($data)
     {
         $_SESSION['admin']['system']['import']['loaded']['species'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['variations'] = 0;
@@ -1722,17 +1722,17 @@ class ImportNBCController extends ImportController
 
 				$species[$key]['lng_id'] = $this->models->Taxa->getNewId();
 
-				$this->models->Names->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'taxon_id' => $species[$key]['lng_id'],
-					'language_id' => $this->getNewDefaultLanguageId(),
-					'name' =>$key,
-					'type_id'=> $this->nameTypes[PREDICATE_VALID_NAME]
-				));
 			}
 
+			$this->models->Names->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getNewProjectId(),
+				'taxon_id' => $species[$key]['lng_id'],
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'name' =>$key,
+				'type_id'=> $this->nameTypes[PREDICATE_VALID_NAME]
+			));
 
 			// if it's not a matrix and if NBC-data columns have been defined, save the NBC-data
 			if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns']))
