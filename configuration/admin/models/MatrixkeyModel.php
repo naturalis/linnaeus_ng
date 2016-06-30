@@ -349,8 +349,8 @@ class MatrixKeyModel extends AbstractModel
 
 				if (strpos($val['label'],'|')!==false)
 				{
-					$d = explode('|',$label);
-					$d[$key]['short_label']=$d[0];
+					$boom=explode('|',$val['label']);
+					$d[$key]['short_label']=$boom[0];
 				}
 				else
 				{
