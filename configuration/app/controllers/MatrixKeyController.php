@@ -701,7 +701,8 @@ class MatrixKeyController extends Controller
 		{
 			$m[$key]['taxon']=$this->getTaxonById( $val['taxon_id'] );
 			$m[$key]['gender']=$this->extractGenderTag( $val['label'] );
-			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
+			if (!isset($this->settings->suppress_details) || (
+				isset($this->settings->suppress_details) && $this->settings->suppress_details!=1))
 			{
 				$m[$key]['states']=$this->getVariationStates( $val['id'] );
 			}
@@ -718,16 +719,17 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$this->getCurrentMatrixId()
 		));
-
+		
 		foreach((array)$m as $key=>$val)
 		{
-			if (isset($this->settings->suppress_details) && $this->settings->suppress_details!=1)
+			if (!isset($this->settings->suppress_details) ||
+				(isset($this->settings->suppress_details) && $this->settings->suppress_details!=1))
 			{
 				$m[$key]['states']=$this->getMatrixStates( $val['id'] );
 			}
 		}
-
-        return $m;
+		
+		return $m;
     }
 
     private function getAllMatrices()

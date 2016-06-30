@@ -22,6 +22,10 @@
 {if $matrices|@count==0}{t}No matrices have been defined.{/t}{/if}
 </p>
 
+<p>
+<a href="new.php">create new matrix</a>
+</p>
+
 <form id="theForm" method="post" action="">
 <input type="hidden" name="id" id="id" value="" />
 <input type="hidden" name="action" id="action" value="" />
