@@ -4,7 +4,7 @@
 	<table class="alphabet">
 		<tr>
 			<td>
-				Zoek een persoon:
+				Search by person:
 			</td>
 			<td>
 				<input type="text" name="" id="lookup-input-individual" onkeyup="actorsLookup(this,'lookup_individual');" />
@@ -20,7 +20,7 @@
 		</tr>
 		<tr>
 			<td>
-				Zoek een instelling:
+				Search by organisation:
 			</td>
 			<td>
 				<input type="text" name="" id="lookup-input-company" onkeyup="actorsLookup(this,'lookup_company');" />
@@ -38,7 +38,7 @@
 
 	{if $can_create}
 	<p>
-		<a href="edit.php">nieuwe actor aanmaken</a>
+		<a href="edit.php">new actor</a>
 	</p>
     {/if}
 
