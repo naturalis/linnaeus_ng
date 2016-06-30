@@ -7,7 +7,6 @@
                 </button>
                 <input id="inlineformsearchInput" type="text" name="searchString" class="searchString" title="{t}Zoek op naam{/t}" value="" placeholder="{t}Zoek op naam{/t}" />
             </form>
-            <!-- div id="suggestList"></div -->
         </div>
 
         <div id="facets">            
@@ -45,6 +44,7 @@
         </div>
 
         <div class="left-divider"></div>
+
         <div id="legendContainer">
             <h2><span id="legendHeader">{t}Legenda{/t}</span></h2>
             <ul class="legend">
@@ -57,8 +57,6 @@
         {if $introduction_links[$settings->introduction_topic_inline_info]}
            
             <div id="dataSourceContainer"> 
-             {$introduction_links[$settings->introduction_topic_inline_info].page_id} 
-                
                 <script>
                 $(document).ready(function()
                 {   
@@ -71,7 +69,7 @@
                 });
                 </script>
             </div>
-        {/if}        
+        {/if}
 
       <!--   {if $introduction_links[$settings->introduction_topic_versions]}
             
