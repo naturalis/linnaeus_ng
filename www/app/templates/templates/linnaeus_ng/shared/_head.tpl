@@ -34,7 +34,7 @@
         <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7.css" />
     <![endif]-->
 	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script -->
-	<script src="http://cdn.jquerytools.org/1.2.7/jquery.tools.min.js"></script>
+	<script src="//cdn.jquerytools.org/1.2.7/jquery.tools.min.js"></script>
  	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
  	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script -->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
