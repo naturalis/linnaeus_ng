@@ -587,6 +587,7 @@ function formatResult( data )
 	}
 
 	var image="";
+	var allowImgEnlarge=false;
 
 	if ( !matrixsettings.noTaxonImages )
 	{
@@ -594,6 +595,7 @@ function formatResult( data )
 		{
 			image=data.info.url_image;
 			if (image && !image.match(/^(http:\/\/|https:\/\/)/i)) image=matrixsettings.imageRootProject+image;
+			allowImgEnlarge=true;
 		}
 		else
 		{
@@ -634,14 +636,30 @@ function formatResult( data )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
 				: ""))
 		;
-
-	var imageHtml=
-		fetchTemplate( 'imageHtmlTpl' )
-			.replace('%IMAGE-URL%',image)
-			.replace('%THUMB-URL%',thumb)
-			.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
-			.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
-		;
+		
+	if ( allowImgEnlarge )
+	{
+		var imgHtml=
+			fetchTemplate( 'imageHtmlTpl' )
+				.replace('%THUMB-URL%',thumb)
+				.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+			;
+	
+		var imageHtml=
+			fetchTemplate( 'imageHtmlUrlTpl' )
+				.replace('%IMAGE-URL%',image)
+				.replace('%PHOTO-LABEL%',encodeURIComponent(photoLabelHtml))
+				.replace('%IMAGE%',imgHtml)
+			;
+	}
+	else
+	{
+		var imageHtml=
+			fetchTemplate( 'imageHtmlTpl' )
+				.replace('%THUMB-URL%',thumb)
+				.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+			;
+	}
 
 	var resultHtml=
 		fetchTemplate( 'resultHtmlTpl' )

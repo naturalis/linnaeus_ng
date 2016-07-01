@@ -2118,19 +2118,18 @@ class ImportNBCController extends ImportController
 
         $states = array();
 
-        foreach ((array)$data['species'] as $sVal) {
-
-			if (!isset($sVal['states'])) {
-
+        foreach ((array)$data['species'] as $sVal)
+		{
+			if (!isset($sVal['states']))
+			{
 				$this->addError($this->storeError(sprintf($this->translate('Found no states for "%s"'),$sVal['label']), 'Matrix states'));
 				continue;
-
 			}
 
-            foreach ((array)$sVal['states'] as $key => $val) {
-
-                foreach ((array) $val as $cKey => $cVal) {
-
+            foreach ((array)$sVal['states'] as $key => $val)
+			{
+                foreach ((array) $val as $cKey => $cVal)
+				{
 					$cVal=trim($cVal);
 
                     if (isset($states[$key][$cVal]))
@@ -2145,17 +2144,17 @@ class ImportNBCController extends ImportController
                     $cId = $data['characters'][$key]['id'];
                     $type = $data['characters'][$key]['type'];
 
-                    if ($type == 'range') {
-
-                        if (strpos($cVal, '-')) {
-
+                    if ($type == 'range')
+					{
+                        if (strpos($cVal, '-'))
+						{
                             $d = explode('-', $cVal);
 
                             $statemin = (int) $d[0];
                             $statemax = (int) $d[1];
                         }
-                        else {
-
+                        else
+						{
                             $statemin = $statemax = (int) $cVal;
                         }
                     }
@@ -2176,8 +2175,8 @@ class ImportNBCController extends ImportController
 
                     $states[$key][$cVal] = $this->models->CharacteristicsStates->getNewId();
 
-					if (!empty($val)) {
-
+					if (!empty($val))
+					{
 						$this->models->CharacteristicsLabelsStates->save(
 						array(
 							'id' => null,
@@ -2186,9 +2185,6 @@ class ImportNBCController extends ImportController
 							'language_id' => $this->getNewDefaultLanguageId(),
 							'label' => $this->translateStateCode($cVal, $this->getNewDefaultLanguageId())
 						));
-
-					} else {
-						//
 					}
 
                     $_SESSION['admin']['system']['import']['loaded']['states']++;
