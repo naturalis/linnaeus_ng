@@ -447,7 +447,7 @@ class MatrixKeyController extends Controller
         } else
 		if (isset($states['id']))
 		{
-			if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+			if (!filter_var($states['file_name'], FILTER_VALIDATE_URL) === false)
 				continue;
 				
             $this->_mc->setItemId($states['id']);
@@ -466,9 +466,9 @@ class MatrixKeyController extends Controller
 			}
         }
 		
-		foreach((array)$states as $key=>$val)
+		foreach((array)$states as $key=>$state)
 		{
-			$states[$key]['file_name_is_full_url']=(!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false);
+			if (isset($state['file_name'])) $states[$key]['file_name_is_full_url']=(!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false);
 		}
 
         return $states;
