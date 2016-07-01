@@ -16,7 +16,7 @@
     <div class="topBarContainer responsive">
         <div class="topBar">
             {if $master_matrix.id}
-                <a href="?mtrx={$master_matrix.id}" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a><br />
+                <a href="?mtrx={$master_matrix.id}" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {else}
                 <a href="/linnaeus_ng/" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {/if}
@@ -25,7 +25,7 @@
                     {if $master_matrix.name && $master_matrix.name!=$matrix.name}{$master_matrix.name}{/if}
                 </span>
             </div>
-           
+
             {if $introduction_links[$settings->introduction_topic_colophon_citation] || $introduction_links[$settings->introduction_topic_versions]}
                 <div class="colofonLink">
                     <a href="#" onClick="
