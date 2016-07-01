@@ -136,21 +136,19 @@
                 {/if}
 
                 <li class="{if $selected}state-list-selected{/if} {if $irrelevant}state-list-irrelevant{/if}">
-                    <!-- span class="selected" {if $selected}style="font-weight:bold"{/if} -->
-                        {if !$irrelevant}
-                        <a href="#" 
-                            onclick="{if $selected}
-                            clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');
-                            {else}
-                            setStateValue('{$character.prefix}:{$character.id}:{$v.id}');
-                            {/if}
-                            closeDialog();
-                            return false;" >
+                    {if !$irrelevant}
+                    <a href="#" 
+                        onclick="{if $selected}
+                        clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');
+                        {else}
+                        setStateValue('{$character.prefix}:{$character.id}:{$v.id}');
                         {/if}
-                        <img 
-                        	src="{$image_root_skin}{if $selected}orange_checkbox_on.png{elseif $irrelevant}orange_checkbox_ghosted.png{else}orange_checkbox_off.png{/if}"
-                            style="margin-right:10px">{$v.label}{if !$irrelevant}</a>{/if}
-                    <!-- /span -->
+                        closeDialog();
+                        return false;" >
+                    {/if}
+                    <img 
+                        src="{$image_root_skin}{if $selected}orange_checkbox_on.png{elseif $irrelevant}orange_checkbox_ghosted.png{else}orange_checkbox_off.png{/if}"
+                        style="margin-right:10px">{$v.label}{if !$irrelevant}</a>{/if}
                     {if $states_remain_count[{$v.id}] && !$selected}({$states_remain_count[{$v.id}]}){/if}
                 </li>
                 {/foreach}

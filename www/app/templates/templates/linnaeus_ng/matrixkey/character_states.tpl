@@ -80,7 +80,19 @@
                                 <a href="#" class="state-image-link" onclick="setStateValue('{$character.prefix}:{$character.id}:{$v.id}');jDialogCancel();return false;">
                             {/if}
                         {/if}
-                        <img class="state-image" key="{$key}" {if $v.file_name} src="{$v.file_name}" {else} src="{$image_root_skin}missing.jpg" {/if} />
+
+                        {capture image_url}
+                        {if $v.file_name_is_full_url}
+                        {$v.file_name}
+                        {elseif $v.file_name}
+                        {$projectUrls.projectMedia}{$v.file_name}
+                        {else}
+                        {$image_root_skin}missing.jpg
+                        {/if}
+                        {/capture}
+
+                        <img class="state-image" key="{$key}"  src="{$smarty.capture.image_url|@trim}" />
+
                         <div class="state-image-caption">
                             {$v.label}
                             {if !isset($states_selected[{$v.id}]) && isset($states_remain_count[{$v.id}])}
@@ -123,22 +135,20 @@
                     {assign var=selected value=false}
                 {/if}
 
-                <li class="{if $irrelevant}irrelevant{/if}">
-                    <span class="selected" {if $selected}style="font-weight:bold"{/if}>
-                        {if !$irrelevant}
-                        <a href="#"
-                            onclick="{if $selected}
-                            clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');
-                            {else}
-                            setStateValue('{$character.prefix}:{$character.id}:{$v.id}');
-                            {/if}
-                            closeDialog();
-                            return false;" >
-                        {/if}<img src="{$image_root_skin}orange_checkbox_{if $selected}on{else}off{/if}.png"
-                                style="margin-right:10px">{$v.label}{if !$irrelevant}
-                        </a>
+                <li class="{if $selected}state-list-selected{/if} {if $irrelevant}state-list-irrelevant{/if}">
+                    {if !$irrelevant}
+                    <a href="#" 
+                        onclick="{if $selected}
+                        clearStateValue('{$character.prefix}:{$character.id}:{$v.id}');
+                        {else}
+                        setStateValue('{$character.prefix}:{$character.id}:{$v.id}');
                         {/if}
-                    </span>
+                        closeDialog();
+                        return false;" >
+                    {/if}
+                    <img 
+                        src="{$image_root_skin}{if $selected}orange_checkbox_on.png{elseif $irrelevant}orange_checkbox_ghosted.png{else}orange_checkbox_off.png{/if}"
+                        style="margin-right:10px">{$v.label}{if !$irrelevant}</a>{/if}
                     {if $states_remain_count[{$v.id}] && !$selected}({$states_remain_count[{$v.id}]}){/if}
                 </li>
                 {/foreach}
