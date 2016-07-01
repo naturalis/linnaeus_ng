@@ -1007,3 +1007,10 @@ body {
   @media screen and (max-width: 980px) {
     .colofonLink a {
       display: none; } }
+
+
+
+#filterDialogContainer .state-list-irrelevant {
+color:#777; }
+#filterDialogContainer .state-list-selected {
+font-weight:bold; }
