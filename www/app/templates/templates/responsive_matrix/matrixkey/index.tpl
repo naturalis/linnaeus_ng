@@ -126,10 +126,15 @@ $(document).ready(function()
 	<br />(%PHOTO-LABEL% %PHOTOGRAPHER%)
 </div>
 
-<div class="inline-templates" id="imageHtmlTpl">
+<div class="inline-templates" id="imageHtmlUrlTpl">
     <a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title="">
-        <img class="result-image" src="%THUMB-URL%" title="%PHOTO-CREDIT%" />
+	%IMAGE%
     </a>
+</div>
+
+
+<div class="inline-templates" id="imageHtmlTpl">
+    <img class="result-image" src="%THUMB-URL%" title="%PHOTO-CREDIT%" />
 </div>
 
 <div class="inline-templates" id="genderHtmlTpl">
