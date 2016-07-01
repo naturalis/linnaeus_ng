@@ -1596,6 +1596,22 @@ class ImportNBCController extends ImportController
 				$d=$this->createMatrixIfNotExists($key);
 				$species[$key]['lng_id'] = $d['id'];
 				if ($d['type']=='new') $this->addMessage(sprintf('Added new referenced matrix "%s" (name only)',$key));
+
+				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey=>$cVal)
+				{
+					if (!empty($cVal) && isset($val[$cKey]))
+					{
+						$this->models->NbcExtras->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getNewProjectId(),
+								'ref_id' => $species[$key]['lng_id'],
+								'ref_type' => 'matrix',
+								'name' => $cVal,
+								'value' => $val[$cKey]
+							));
+					}
+				}
 				continue;
 			}
 
