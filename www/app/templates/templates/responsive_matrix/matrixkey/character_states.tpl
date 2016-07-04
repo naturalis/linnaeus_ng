@@ -92,6 +92,7 @@
                         {/capture}
 
                         <img class="state-image" key="{$key}"  src="{$smarty.capture.image_url|@trim}" />
+                        <!-- {$v.file_name} -->
 
                         <div class="state-image-caption">
                             {$v.label}
