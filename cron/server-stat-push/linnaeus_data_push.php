@@ -7,7 +7,7 @@
 	    private $tablePrefix;
 	    private $data = array();
 	    private $pushUrl;
-        private $timeout;
+        private $timeout = 5;
         private $pushResult;
         private $gitRepo;
         private $gitBranch;
