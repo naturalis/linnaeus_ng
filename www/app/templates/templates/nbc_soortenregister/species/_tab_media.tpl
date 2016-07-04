@@ -22,7 +22,7 @@
 	        {if $requestData.media=='collected' || $requestData.media==''}
 	            {t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 			{else}
-            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
+            	<a href="?id={$taxon.id}&cat=CTAB_MEDIA&media=collected" class="{$v.className}">
                 	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 				</a>
 			{/if}
@@ -31,7 +31,7 @@
 	        {if $requestData.media=='own'}
             	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 			{else}
-            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
+            	<a href="?id={$taxon.id}&cat=CTAB_MEDIA&media=own" class="{$v.className}">
                 	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 				</a>
 			{/if}
