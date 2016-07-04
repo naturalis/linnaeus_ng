@@ -77,6 +77,10 @@
 		</td>
 	</tr>
     
+    {else}
+    
+    <!-- state.file_name: {$state.file_name} -->
+    
     {/if}
 
 	{elseif $characteristic.type=='range'}

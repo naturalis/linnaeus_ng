@@ -12,9 +12,6 @@
 		species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
 		species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
 		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
-		introduction: no_media (Don't use media in the Introduction.)
-		matrixkey: no_media (Don't use media in the Introduction.)
-
 
 	to do technical:
 	- create default settings-set as base data
