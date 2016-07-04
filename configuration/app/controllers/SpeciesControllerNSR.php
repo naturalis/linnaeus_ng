@@ -17,6 +17,7 @@ class SpeciesControllerNSR extends SpeciesController
 	private $_resPicsPerPage=12;
 	private $_nameTypeIds;
 	private $show_nsr_specific_stuff=false;
+    private $_inclOverviewImage = true;
 
 	public $usedModelsExtended = array(
 		'actors',
@@ -31,7 +32,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 	private $cTabs=[
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
-		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
+		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],
 		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
 		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],
 		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
@@ -79,6 +80,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->_use_embedded_templates = $this->moduleSettings->getModuleSetting( 'use_embedded_templates', 0 )==1;
 		$this->_use_page_blocks = $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1;
 		$this->_show_inherited_literature = $this->moduleSettings->getModuleSetting( 'show_inherited_literature', 0 );
+        $this->_inclOverviewImage = $this->moduleSettings->getModuleSetting(array( 'setting'=>'include_overview_in_media','subst'=>true)) == 1;
 
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -116,14 +118,14 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function taxonAction()
     {
-		$this->setTaxonId($this->rGetId());
+        $this->setTaxonId($this->rGetId());
 
 		$taxon = $this->getTaxonById($this->getTaxonId());
 
         if ( !empty($taxon) )
 		{
 			$template = $this->rGetVal('headless',1) ? 'taxon_headless' : 'taxon' ;
-			
+
 			$categories=$this->getTaxonCategories( [
 				'taxon' => $taxon['id'],
 				'base_rank' => $taxon['base_rank_id'],
@@ -148,11 +150,11 @@ class SpeciesControllerNSR extends SpeciesController
 			if ( isset($external_content) && ($external_content->link_embed=='template' || $external_content->link_embed=='template_link') )
 			{
 				$template=
-					substr($external_content->template,-4)=='.tpl' ? 
-						substr($external_content->template,0,strlen($external_content->template)-4) : 
+					substr($external_content->template,-4)=='.tpl' ?
+						substr($external_content->template,0,strlen($external_content->template)-4) :
 						$external_content->template;
 			}
-			
+
 			if ( $this->show_nsr_specific_stuff )
 			{
 				$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
@@ -234,7 +236,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$overview = $this->getTaxonOverviewImage();
 			}
-			
+
 			$classification=(isset($content['classification']) ? $content['classification'] : isset($classification) ? $classification : null);
 			$content=(isset($content['content']) ? $content['content'] : null);
 
@@ -249,7 +251,7 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 
 			$this->setPageName($taxon['label']);
-			
+
 			$this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
 			$this->smarty->assign('requested_category',$categories['start']);
 			$this->smarty->assign('content',$content);
@@ -265,7 +267,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
 			$this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
-			
+
 			$this->printPage( $template );
 		}
 		else
@@ -277,7 +279,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign( 'body', $this->translate( $content_404->body ) );
 
 	        $this->printPage( '../shared/404' );
-		}	
+		}
 	}
 
     public function nameAction()
@@ -289,7 +291,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$taxon=$this->getTaxonById($name['taxon_id']);
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id']) );
-			
+
 			$this->smarty->assign('name',$name);
 			$this->smarty->assign('taxon',$taxon);
 
@@ -309,7 +311,7 @@ class SpeciesControllerNSR extends SpeciesController
     public function getTaxonById( $id )
     {
         $taxon=parent::getTaxonById( $id );
-		
+
 		if ( $this->show_nsr_specific_stuff )
 		{
 			$taxon['nsr_id']=$this->getNSRId( [ 'id'=>$id ] );
@@ -550,7 +552,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto','always_hide'=>false,'is_empty'=>false];
 		});
-		
+
 		$all_categories=array_merge((array)$categories,$standard_categories);
 
         $lp=$this->getProjectLanguages();
@@ -558,9 +560,9 @@ class SpeciesControllerNSR extends SpeciesController
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
 			'order'=>'show_order',
-			'fieldAsIndex'=>'page_id'	
+			'fieldAsIndex'=>'page_id'
 		]);
-		
+
         foreach((array)$all_categories as $key=>$page)
 		{
             foreach((array)$lp as $k=>$language)
@@ -573,7 +575,7 @@ class SpeciesControllerNSR extends SpeciesController
                         'language_id' => $language['language_id']
                     )
                 ));
-				
+
                 $all_categories[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
                 $all_categories[$key]['show_order']=isset($order[$page['id']]) ? $order[$page['id']]['show_order'] : 99;
                 $all_categories[$key]['suppress']=isset($order[$page['id']]) ? $order[$page['id']]['suppress']==1 : false;
@@ -581,7 +583,7 @@ class SpeciesControllerNSR extends SpeciesController
                 $all_categories[$key]['show_when_empty']=isset($order[$page['id']]) ? $order[$page['id']]['show_when_empty']==1 : false;
 				if ( empty($page['type']) ) $all_categories[$key]['type']= isset($page['external_reference']) ? 'external' : 'configured';
             }
-			
+
 			$all_categories[$key]['label']=
 				isset($all_categories[$key]['page_titles'][$this->getCurrentLanguageId()]) ?
 					$all_categories[$key]['page_titles'][$this->getCurrentLanguageId()] : $all_categories[$key]['page'];
@@ -618,7 +620,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$start_category=null;
 		$taxon=null;
 		$cat=null;
-		
+
 		if (is_numeric($requestedTab))
 		{
 			$cat=$requestedTab;
@@ -629,12 +631,12 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			//if ( $val['suppress'] ) continue;
 			//if ( $val['always_hide'] ) continue;
-			
+
 			if ($val['type']=='auto')
 			{
 				$val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon_id ] );
 			}
-			
+
 			// parametrize external reference URLs
 			if ( isset($val['external_reference']) )
 			{
@@ -648,7 +650,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$val['type']='external';
 			}
 
-			if ( $val['is_empty'] && !$val['show_when_empty'] ) 
+			if ( $val['is_empty'] && !$val['show_when_empty'] )
 			{
 				continue;
 			}
@@ -673,7 +675,7 @@ class SpeciesControllerNSR extends SpeciesController
 				break;
 			}
 		}
-		
+
 		// determine with which category to open
 		foreach((array)$taxon_categories as $key=>$val)
 		{
@@ -692,7 +694,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$start_category=$val;
 			}
-			
+
 			// and finally throw out the ones that should be hidden from the menu but remain accessible directly
 			if ( $val['always_hide'] || $val['suppress'] )
 			{
@@ -711,9 +713,9 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($start_category['tabname']!=$requestedTab) $start_category=null;
 			}
 		}
-		
+
 		return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
-	
+
    }
 
 	private function getNames( $p )
@@ -724,7 +726,7 @@ class SpeciesControllerNSR extends SpeciesController
     		'languageId' => $this->getDefaultLanguageId(),
     		'taxonId' => $id
 		));
-		
+
 		$d=current((array)$names);
 		$base_rank_id=isset($d['taxon_base_rank_id']) ? $d['taxon_base_rank_id'] : null;
 
@@ -965,16 +967,16 @@ class SpeciesControllerNSR extends SpeciesController
     		'language_id' => $this->getCurrentLanguageId(),
     		'taxon_id' => $id
 		));
-		
+
 		if ($taxon)
 		{
 			$taxon['name']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
 			$taxon['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
 			$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
-	
+
 			array_unshift($this->tmp,$taxon);
-	
+
 			if (!empty($taxon['parent_id']))
 			{
 				$this->_getTaxonClassification($taxon['parent_id']);
@@ -1118,7 +1120,6 @@ class SpeciesControllerNSR extends SpeciesController
 		$isLower = isset($p['isLower']) ? $p['isLower'] : true;
 		$limit=isset($p['limit']) ? $p['limit'] : null;
 		$offset=isset($p['offset']) ? $p['offset'] : null;
-		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 
 		$content=$rdf=null;
 
@@ -1129,7 +1130,7 @@ class SpeciesControllerNSR extends SpeciesController
             case 'CTAB_MEDIA':
                 $content = $this->getTaxonMedia(array(
                     'taxon'=>$taxon,
-                    'inclOverviewImage'=>$inclOverviewImage
+                    'inclOverviewImage'=>$this->_inclOverviewImage
                 ));
                 break;
 
@@ -1187,7 +1188,7 @@ class SpeciesControllerNSR extends SpeciesController
 						'tab_id'=>$category['id'],
 						'page_blocks'=>$category['page_blocks'],
 						'content'=> $isPublished ? $content : null ]
-					 ); 
+					 );
 				}
         }
 
@@ -1228,8 +1229,8 @@ class SpeciesControllerNSR extends SpeciesController
 			['field'=>'link','label'=>'link'],
 			['field'=>'link_new','label'=>'link (new window)']
 		];
-		*/		
-		
+		*/
+
 		if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='link' || $ref->link_embed=='link_new' ) )
 		{
 			if ( $ref->full_url_valid )
@@ -1373,12 +1374,12 @@ class SpeciesControllerNSR extends SpeciesController
     		'language_id' => $this->getCurrentLanguageId(),
 		));
     }
-	
+
 	private function isAutoTabEmpty( $p )
 	{
 		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
 		$tab=isset($p['tab']) ? $p['tab'] : null;
-		
+
 		if ( is_null($taxon_id) ) return false;
 
 		switch ( $tab )
@@ -1419,13 +1420,13 @@ class SpeciesControllerNSR extends SpeciesController
 				return false;
 		}
 	}
-	
+
 	private function processEmbeddedTemplates( $p )
 	{
 		/*
 		resolve the use of {{cat=<id>}} for embedding of templates
 		*/
-		
+
 		$content=isset($p['content']) ? $p['content'] : null;
 
 		if (is_array($content)) return $content;
@@ -1458,7 +1459,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$page_blocks=isset($p['page_blocks']) ? json_decode($p['page_blocks']) : null;
 		$content=isset($p['content']) ? $p['content'] : null;
 		$tab_id=isset($p['tab_id']) ? $p['tab_id'] : null;
-		
+
 		if ( is_null($tab_id) ) return;
 
 		$this->helpers->CurrentUrl->setRemoveQuery( true ) ;
@@ -1466,9 +1467,9 @@ class SpeciesControllerNSR extends SpeciesController
 		$url=
 			$this->helpers->CurrentUrl->getUrl() .
 			"?epi=" . $this->getCurrentProjectId() .
-			"&id=" . $this->getTaxonId(). 
+			"&id=" . $this->getTaxonId().
 			"&cat=%s&headless=1&force_empty=1";
-		
+
 		$buffer=[];
 
 		foreach((array)$page_blocks as $val)
@@ -1486,7 +1487,7 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 		}
-		
+
 		return implode("\n",$buffer);
 	}
 
