@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_states` (
   `upper` float(23,3) DEFAULT NULL,
   `mean` float(23,3) DEFAULT NULL,
   `sd` float(23,3) DEFAULT NULL,
-  `sys_name` varchar(64) not null,
+  `sys_name` varchar(255) not null,
   `show_order` tinyint(4) NOT NULL DEFAULT '-1',
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
