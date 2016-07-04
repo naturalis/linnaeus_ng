@@ -79,6 +79,7 @@ class ImportNBCController extends ImportController
     public $controllerPublicName = 'Matrix Import';
     public $cssToLoad = array();
     public $jsToLoad = array();
+    public $modelNameOverride='ImportNBCModel';
 
 
 	private $settings=[
@@ -797,235 +798,123 @@ class ImportNBCController extends ImportController
         if (!$this->isFormResubmit())
 		{
 
-            $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
-			//$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
-
-			$d = $this->models->Projects->_get(array(
-				'id' => array(
-				'sys_name' => $pTitle
-			)));
-
-			if (!empty($d[0]['id']))
+			$data=$_SESSION['admin']['system']['import']['data'];
+		
+			$p=$this->models->Projects->_get( [ 'id' => [ 'sys_name' => $data['project']['title'] ] ] );
+			$this->_project_id=$p[0]['id'];
+			$m=$this->models->Matrices->_get( [ 'id' => [ 'project_id' => $this->_project_id, 'sys_name' => $data['project']['matrix']['label'] ] ] );
+			$this->_matrix_id=$m[0]['id'];
+			$this->_language_id=$this->getNewDefaultLanguageId($this->_project_id);
+			$dummy=array();
+			
+			foreach((array)$data['states'] as $key=>$val)
 			{
-				$pId = $d[0]['id'];
-				$dummy = array();
-				$thisLanguage=$this->getNewDefaultLanguageId($pId);
+				$this->_group_name=$val[0];
+				$this->_char_name=$val[1];
+				$this->_state_name=$val[2];
+				$this->_translation=$val[3];
+				$this->_image=$val[4];
 
-				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val)
+				$state=$this->models->ImportNBCModel->resolveState( [
+					'project_id' => $this->_project_id,
+					'state_name' => $this->_state_name,
+					'char_name' => $this->_char_name,
+					'group_name' => $this->_group_name,
+				] );
+				
+
+				if ( $state )
 				{
-					if (empty($val[1]))
-						continue;
 
-					// get the character that matches the 'kenmerk'-label (col 2; col 1 is the group, which is ignored here)
-					$d = $this->models->CharacteristicsLabels->_get(
-						array(
-							'where' =>
-								'project_id  = '.$pId. ' and
-								language_id = '.$thisLanguage. ' and
-								(
-									lower(label) = \''. $this->models->CharacteristicsLabels->escapeString(strtolower($val[1])) .'\' or
-									label like \''. $this->models->CharacteristicsLabels->escapeString(strtolower($val[1])) .'|%\'
-								)'
-						)
-					);
+					if ( !empty($this->_translation) )
+					{
+						$this->models->CharacteristicsLabelsStates->update(
+							[ 'label' => $this->_translation ],
+							[ 'project_id' => $this->_project_id, 'state_id' => $state['id'], 'language_id' => $this->_language_id ]
+						);
 
+						$this->addMessage(
+							$this->storeError(
+								sprintf($this->translate('Saved translation "%s" for %s:%s:%s.'),$this->_translation,$this->_group_name,$this->_char_name,$this->_state_name),'Matrix characters'));
+					}
+					else
+					{
+						//
+					}
 
-					// warning, UGLY code ahead
-					if ($d && count((array)$d)>1)
+					if ( !empty($this->_image) )
 					{
 
-						/*
-							two (or more) characters can exist with the same name, but not
-							in the same group (although this is enforced nowhere).
-						*/
-
-						$somethingElse=array();
-						foreach((array)$d as $x) {
-							$somethingElse[]=$x['characteristic_id'];
-						}
-
-						$something=array();
-						foreach((array)$this->models->ChargroupsLabels->_get(
-							array('id'=>
-								array(
-									'project_id' => $pId,
-									'language_id' => $thisLanguage,
-									'label' => $val[0]
-								)
-							)
-						) as $x) {
-							$something[]=$x['chargroup_id'];
-						}
-
-						$d=$this->models->CharacteristicsChargroups->_get(
-							array('id'=>
-								array(
-									'project_id' => $pId,
-									'characteristic_id in#' => '('.implode(',',$somethingElse).')',
-									'chargroup_id in#' => '('.implode(',',$something).')'
-								)
-							)
+						$this->models->CharacteristicsStates->update(
+							[ 'file_name' => $this->_image ],
+							[ 'project_id' => $this->_project_id, 'id' => $state['id'] ]
 						);
 
-						if ($d && count((array)$d)>1)
-							$this->addError(
-								$this->storeError(
-									sprintf(
-										$this->translate('There appear to be multiple characters with the name "%s", within the same group. Unable to make out which is which'),
-										$val[1]
-									),
-									'Matrix states'
-								)
-							);
+						$this->addMessage(
+							$this->storeError(
+								sprintf($this->translate('Saved image "%s" for %s:%s:%s.'),$this->_image,$this->_group_name,$this->_char_name,$this->_state_name),'Matrix characters'));
 
-					}
+						$dummy[$state['characteristic_id']]['state']=
+							(!isset($dummy[$state['characteristic_id']]['state']) ?
+								'all_images' :
+								($dummy[$state['characteristic_id']]['state']=='all_images' ?
+									'all_images' :
+									($dummy[$state['characteristic_id']]['state']=='no_images' ? 'partial_images' : 'partial_images' )));
+									
+						$dummy[$state['characteristic_id']]['label']=$this->_char_name;
 
-					// if a char is found...
-					if (!empty($d[0]['characteristic_id']))
+					} 
+					else
 					{
-						$cId = $d[0]['characteristic_id'];
+						$dummy[$state['characteristic_id']]['state']=
+							(!isset($dummy[$state['characteristic_id']]['state']) ?
+								'no_images' :
+								($dummy[$state['characteristic_id']]['state']=='all_images' ?
+									'partial_images' :
+									($dummy[$state['characteristic_id']]['state']=='no_images' ? 'no_images' : 'partial_images' )));
 
-						// ...find all its states
-						$states = $this->models->CharacteristicsStates->_get(array(
-							'id' =>
-								array(
-									'project_id' => $pId,
-									'characteristic_id' => $cId,
-								),
-							'columns' => 'id'
-							)
-						);
-
-						$d = array();
-
-						foreach((array)$states as $sVal)
-							$d[]=$sVal['id'];
-
-						$states = '('.implode(',',$d).')';
-
-						// in those states, find one that matches the state's label (col 3)
-						$l = $this->models->CharacteristicsLabelsStates->_get(array(
-							'id' =>
-								array(
-									'project_id' => $pId,
-									'state_id in' => $states,
-									'language_id' => $thisLanguage,
-									'label' => $val[2]
-								)
-							)
-						);
-
-						if (!empty($l[0]['state_id'])) {
-
-							$sId = $l[0]['state_id'];
-
-							// if there is a translation, save it
-							if (!empty($val[3])) {
-
-								$l = $this->models->CharacteristicsLabelsStates->update(
-									array(
-										'label' => $val[3]
-									),
-									array(
-										'project_id' => $pId,
-										'state_id' => $sId,
-										'language_id' => $thisLanguage
-									)
-								);
-
-								$this->addMessage($this->storeError(sprintf($this->translate('Saved translation "%s".'),$val[3]),'Matrix characters'));
-
-							} else {
-
-								//$this->addMessage(sprintf($this->translate('Skipped "%s" for %s (no translation).'),$val[2],$val[1]));
-
-							}
-
-							// if there is an image, save it
-							if (!empty($val[4])) {
-
-								$this->models->CharacteristicsStates->update(
-									array(
-										'file_name' => $val[4]
-									),
-									array(
-										'project_id' => $pId,
-										'id' => $sId,
-									)
-								);
-
-								$this->addMessage($this->storeError(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4]),'Matrix characters'));
-
-								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'all_images' : ($dummy[$cId]['state']=='all_images' ? 'all_images' : ($dummy[$cId]['state']=='no_images' ? 'partial_images' : 'partial_images' )));
-
-								$dummy[$cId]['label'] = $val[1];
-
-							} else {
-
-								//$this->addMessage(sprintf($this->translate('Skipped image for "%s" (not specified).'),$val[2]));
-
-								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'no_images' : ($dummy[$cId]['state']=='all_images' ? 'partial_images' : ($dummy[$cId]['state']=='no_images' ? 'no_images' : 'partial_images' )));
-
-								$dummy[$cId]['label'] = $val[1];
-
-							}
-
-						} else {
-
-							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for "%s".'),$val[2],$val[1]),'Matrix states'));
-
-						}
-
-					} else {
-
-			            $this->addError($this->storeError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]),'Matrix states'));
-
+						$dummy[$state['characteristic_id']]['label']=$this->_char_name;
 					}
 
-
 				}
-
-				if ($this->rHasval('re_type_chars','all') || $this->rHasval('re_type_chars','partial')) {
-
-					$this->addMessage($this->translate('Re-evaluating character types (using setting "'.($this->rHasval('re_type_chars','partial') ? 'need some' : 'need all' ).'").'));
-
-					foreach((array)$dummy as $cId => $char) {
-
-						$type =
-							(($this->rHasval('re_type_chars','partial') && ($char['state']=='all_images' || $char['state'] =='partial_images')) ||
-							($this->rHasval('re_type_chars','all') && $char['state']=='all_images')) ? 'media' : 'text';
-
-						$this->models->Characteristics->update(array(
-							'type' => $type
-						), array(
-							'id' => $cId,
-							'project_id' => $pId
-						));
-
-						$this->addMessage($this->storeError(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type),'Matrix characters'));
-
-					}
-
-				} else {
-
-					$this->addMessage($this->storeError($this->translate('Skipped re-evaluating character types.'),'Matrix characters'));
-
+				else
+				{
+					$this->addError($this->storeError(sprintf($this->translate('Could not resolve state %s:%s:%s.'),$this->_group_name,$this->_char_name,$this->_state_name),'Matrix characters'));
 				}
-
-
-			} else {
-
-	            $this->addError(sprintf($this->translate('Project "%" not found in the database.'),$pTitle));
-	            $this->addError($this->translate('Import halted.'));
-
+										
 			}
 
-			unset($_SESSION['admin']['system']['import']);
+			if ($this->rHasval('re_type_chars','all') || $this->rHasval('re_type_chars','partial'))
+			{
 
+				$this->addMessage($this->translate('Re-evaluating character types (using setting "'.($this->rHasval('re_type_chars','partial') ? 'need some' : 'need all' ).'").'));
+
+				foreach((array)$dummy as $cId => $char)
+				{
+
+					$type =
+						(($this->rHasval('re_type_chars','partial') && ($char['state']=='all_images' || $char['state'] =='partial_images')) ||
+						($this->rHasval('re_type_chars','all') && $char['state']=='all_images')) ? 'media' : 'text';
+	
+					$this->models->Characteristics->update(
+						[ 'type' => $type ],
+						[ 'id' => $cId, 'project_id' => $this->_project_id ]
+					);
+
+					$this->addMessage($this->storeError(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type),'Matrix characters'));
+
+				}
+
+			} 
+			else
+			{
+				$this->addMessage($this->storeError($this->translate('Skipped re-evaluating character types.'),'Matrix characters'));
+			}
+				
 			$this->addMessage($this->translate('Done.'));
 
-        }
-
+		}
+	
         $this->printPage();
     }
 
