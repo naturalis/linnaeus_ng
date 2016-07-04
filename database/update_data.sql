@@ -171,7 +171,9 @@ INSERT IGNORE INTO `module_settings` VALUES
 (null,-1,'show_automatic_hybrid_markers','Show or hide automatic × marker for taxa of hybrid ranks',1,NOW(),NOW()),
 (null,-1,'show_automatic_infixes','Show or hide automatic infixes "var.", "subsp." and "f." for taxa of appropriate ranks',1,NOW(),NOW()),
 (null,-1,'concept_base_url','Base URL for concepts (requires the project generates NSR-style pseudo PURLs)',null,NOW(),NOW()),
-(null,-1,'show_advanced_search_in_public_menu','Show advanced search link in public menu',1,NOW(),NOW())
+(null,-1,'show_advanced_search_in_public_menu','Show advanced search link in public menu',1,NOW(),NOW()),
+(null,1,'no_media','Don\'t use media module in the Introduction.',1,NOW(),NOW()),
+(null,7,'no_media','Don\'t use media module in the Matrix.',1,NOW(),NOW())
 ;
 
 
