@@ -9,6 +9,7 @@ Below is the data parsed from the input file. Please verify that it looks okay, 
 <p>
 	Project title: "<b>{$title}</b>"{if !$exists} <span class="message-error">(does not exist in database! no use importing!)</span>{/if}<br />
     Soortgroep: {$soortgroep}<br />
+    Matrix: {$matrix}<br />
 </p>
 
 <p>

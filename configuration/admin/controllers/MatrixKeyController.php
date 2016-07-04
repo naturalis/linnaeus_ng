@@ -2232,13 +2232,18 @@ class MatrixKeyController extends Controller
 		$texts = isset($params['texts']) ? $params['texts'] : null;
 		$sys_name = isset($params['sys_name']) ? $params['sys_name'] : null;
 
+		$lower = isset($params['lower']) ? $params['lower'] : null;
+		$upper = isset($params['upper']) ? $params['upper'] : null;
+
 		if ( is_null($id) )
 			return;
 
 		$this->models->CharacteristicsStates->save([
 			'project_id' => $this->getCurrentProjectId(),
 			'id' => $id,
-			'sys_name' => trim($sys_name)
+			'sys_name' => trim($sys_name),
+			'lower' =>  $lower,
+			'upper' => $upper
 		]);
 
 		$this->logChange($this->models->CharacteristicsStates->getDataDelta() + [ 'note'=>'Matrix: saved state' ]);

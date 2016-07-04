@@ -777,10 +777,15 @@ class ImportNBCController extends ImportController
 
 		}
 
+        if (isset($data['project']['matrix']['label']))
+            $this->smarty->assign('matrix', $data['project']['matrix']['label']);
+
         if (isset($data['project']['soortgroep']))
             $this->smarty->assign('soortgroep', $data['project']['soortgroep']);
+
         if (isset($data['project']['title']))
             $this->smarty->assign('title', $data['project']['title']);
+
         if (isset($data['states']))
             $this->smarty->assign('states', $data['states']);
 
@@ -817,11 +822,11 @@ class ImportNBCController extends ImportController
 
 				$state=$this->models->ImportNBCModel->resolveState( [
 					'project_id' => $this->_project_id,
+					'matrix_id' => $this->_matrix_id,
 					'state_name' => $this->_state_name,
 					'char_name' => $this->_char_name,
 					'group_name' => $this->_group_name,
 				] );
-				
 
 				if ( $state )
 				{
@@ -911,6 +916,8 @@ class ImportNBCController extends ImportController
 				$this->addMessage($this->storeError($this->translate('Skipped re-evaluating character types.'),'Matrix characters'));
 			}
 				
+			unset($_SESSION['admin']['system']['import']);
+
 			$this->addMessage($this->translate('Done.'));
 
 		}
