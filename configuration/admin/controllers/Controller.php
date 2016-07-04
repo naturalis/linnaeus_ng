@@ -2845,7 +2845,10 @@ class Controller extends BaseClass
 	protected function setGitVars()
 	{
 		if (defined("PATH_GIT_EXECUTABLE")) $this->helpers->Git->setGitExe( PATH_GIT_EXECUTABLE );
-		$this->helpers->Git->setRepoPath( $this->generalSettings['applicationFileRoot'] );
+		if ( isset($this->generalSettings['applicationFileRoot']) )
+		{
+			$this->helpers->Git->setRepoPath( $this->generalSettings['applicationFileRoot'] );
+		}
 		$this->helpers->Git->setData();
 		$this->_gitVars = new stdClass;
 		$this->_gitVars->branch=$this->helpers->Git->getBranch();
