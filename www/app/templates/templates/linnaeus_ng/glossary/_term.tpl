@@ -30,7 +30,9 @@
 
 					{assign var=mediaCat value=$v.category}
 
-				<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
+				<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}"
+				{if $v.rs_id != '' && $v.category == 'video' && $v.width != '' && $v.height != ''} style="width: {$v.width}px; height: {$v.height}px;"{/if}
+				>
 
 					{if $v.rs_id == ''}
 

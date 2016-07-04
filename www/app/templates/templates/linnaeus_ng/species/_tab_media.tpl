@@ -21,7 +21,9 @@
 				{assign var=dispName value=$v.original_name}
 			{/if}
 
-			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
+			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}"
+			{if $v.rs_id != '' && $v.category == 'video' && $v.width != '' && $v.height != ''} style="width: {$v.width}px; height: {$v.height}px;"{/if}
+			>
 
 				{if $v.rs_id == ''}
 
@@ -75,7 +77,8 @@
 						{$name}
 
 					{else if $v.category == 'audio' or $v.category == 'video'}
-						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls />
+						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
+							{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
 							<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
 						</{$v.category}><br>
 						{$name}
