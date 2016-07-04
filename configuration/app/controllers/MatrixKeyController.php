@@ -470,7 +470,6 @@ class MatrixKeyController extends Controller
 		{
 			if (isset($state['file_name']))
 			{
-				$states[$key]['file_name']=$state['file_name']=str_replace(' ' ,'%20',$state['file_name']);
 				$states[$key]['file_name_is_full_url']=(!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false);
 			}
 		}
