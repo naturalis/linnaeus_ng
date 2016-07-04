@@ -447,22 +447,22 @@ class MatrixKeyController extends Controller
         } else
 		if (isset($states['id']))
 		{
-			if (!filter_var($states['file_name'], FILTER_VALIDATE_URL) === false)
-				continue;
-				
-            $this->_mc->setItemId($states['id']);
-            $media = $this->_mc->getItemMediaFiles();
-
-            $states['file_name'] = $states['file_dimensions'] =
-                $states['img_dimensions'] = null;
-
-			if (!empty($media))
+			if (!filter_var($states['file_name'], FILTER_VALIDATE_URL))
 			{
-                $states['file_name'] = $media[0]['rs_original'];
-            $states['file_dimensions'] =
-                $media[0]['width'] . ':' . $media[0]['height'];
-            $states['img_dimensions'] =
-                array($media[0]['width'], $media[0]['height']);
+				$this->_mc->setItemId($states['id']);
+				$media = $this->_mc->getItemMediaFiles();
+	
+				$states['file_name'] = $states['file_dimensions'] =
+					$states['img_dimensions'] = null;
+	
+				if (!empty($media))
+				{
+					$states['file_name'] = $media[0]['rs_original'];
+				$states['file_dimensions'] =
+					$media[0]['width'] . ':' . $media[0]['height'];
+				$states['img_dimensions'] =
+					array($media[0]['width'], $media[0]['height']);
+				}
 			}
         }
 		
