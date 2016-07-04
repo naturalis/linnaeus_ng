@@ -57,7 +57,9 @@
 		private function setGit ()
 		{
             $c = $this->config->getGeneralSettings();
-            exec('cd ' . str_replace(" ", "\\ ", $c['applicationFileRoot']));
+            $path = isset($c['applicationFileRoot']) ? $c['applicationFileRoot'] : '/var/www/linnaeusng';
+
+            exec('cd ' . str_replace(" ", "\\ ", $path));
 
             exec('git rev-parse --abbrev-ref HEAD', $branch) or die("Git branch not set\n");
 		    $this->gitBranch = $branch[0];
