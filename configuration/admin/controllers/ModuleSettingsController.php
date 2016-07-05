@@ -8,7 +8,6 @@
 		general setting: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
 		general setting: front_end_use_basic_auth
 		species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
-		species: front_end_use_basic_auth
 		species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
 		species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
 		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
