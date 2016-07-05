@@ -1,7 +1,7 @@
 </div ends="page-container">
 <div id="footer-container">
 
-{if $GitVars->commit->hash}
+{if $GitVars->commit->hash && $session.admin.user._logged_in}
 <div class="git-info">
 commit <span title="{$GitVars->commit->hash}">{$GitVars->commit->hash_short}</span>{if $GitVars->commit->hash!=$GitVars->origin_commit_hash}&deg;{/if} ({$GitVars->commit->date}) ({$GitVars->branch} branch @ {$server_name})
 </div>
