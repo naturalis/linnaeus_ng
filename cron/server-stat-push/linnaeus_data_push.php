@@ -6,7 +6,7 @@
 	    private $mysqli;
 	    private $tablePrefix;
 	    private $data = array();
-	    private $pushUrl;
+	    private $pushUrl = 'http://172.16.1.34/admin/server_csv.php'; // cannot use address!
         private $timeout = 5;
         private $pushResult;
         private $gitRepo;
@@ -59,6 +59,7 @@
             $c = $this->config->getGeneralSettings();
             $path = isset($c['applicationFileRoot']) ? $c['applicationFileRoot'] : '/var/www/linnaeusng';
 
+            // First cd to Linnaeus root!
             exec('cd ' . str_replace(" ", "\\ ", $path));
 
             exec('git rev-parse --abbrev-ref HEAD', $branch) or die("Git branch not set\n");
@@ -176,5 +177,5 @@
 
 
     $ldp = new LinnaeusDataPush();
-    $ldp->setPushUrl('http://172.16.1.34/admin/server_csv.php');
+    //$ldp->setPushUrl('http://172.16.1.34/admin/server_csv.php');
     $ldp->run();
