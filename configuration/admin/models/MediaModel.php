@@ -366,6 +366,7 @@ final class MediaModel extends AbstractModel
             where
                 `media_id` > -1 and
                 `new_file` != 'failed' and
+                `error` is null and
                 `project_id` = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
