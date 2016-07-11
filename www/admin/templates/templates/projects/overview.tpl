@@ -70,8 +70,8 @@ ul.management li {
         <li><a href="../projects/change_id.php">{t}Change a project ID{/t}</a></li>
         <!-- li><a href="../import/export.php">{t}Generic export{/t}</a></li -->
         {if $cronNextRun}
-	        <li style="color:#999;>{t}Export multi-entry key for Linnaeus Mobile{/t} (disabled)</li>
-	        <li style="color:#999;>{t}Complete export for Linnaeus Mobile{/t} (disabled)</li>
+	        <li style="color:#999;">{t}Export multi-entry key for Linnaeus Mobile{/t} (disabled)</li>
+	        <li style="color:#999;">{t}Complete export for Linnaeus Mobile{/t} (disabled)</li>
         {else}
 	        <li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
 	        <li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
