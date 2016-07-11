@@ -195,6 +195,9 @@ function checkNameAgainstRank()
 
 function checkPresenceDataSpecies()
 {
+	// Ruud 11-07-16: LINNA-524
+	return [];
+
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 	if (!rank)
 	{
@@ -230,6 +233,9 @@ function checkPresenceDataSpecies()
 
 function checkPresenceDataHT()
 {
+	// Ruud 11-07-16: LINNA-524
+	return [];
+
 	var buffer=[];
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 
