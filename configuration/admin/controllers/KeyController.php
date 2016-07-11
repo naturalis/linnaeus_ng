@@ -836,7 +836,7 @@ class KeyController extends Controller
 
         $this->smarty->assign('keyinfo', $this->getKeyInfo());
 
-        $this->smarty->assign('didKeyTaxaChange', $this->didKeyTaxaChange());
+        //$this->smarty->assign('didKeyTaxaChange', $this->didKeyTaxaChange());
 
         $this->printPage();
     }
