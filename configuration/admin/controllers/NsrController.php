@@ -27,7 +27,7 @@ class NsrController extends Controller
 
 	private $cTabs=[
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
-		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],	
+		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],
 		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
 		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],	// $this->getTaxonNextLevel($taxon); (children?)
 		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
@@ -56,7 +56,7 @@ class NsrController extends Controller
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
 		$this->smarty->assign( 'show_nsr_specific_stuff',$this->show_nsr_specific_stuff );
-	
+
 	}
 
 	public function getActors()
@@ -118,13 +118,13 @@ class NsrController extends Controller
             'project_id' => $this->getCurrentProjectId(),
     		'language_id' => $this->getDefaultProjectLanguage()
 		));
-		
+
 		$standard_categories=$this->getCTabs();
 
 		array_walk($standard_categories,function(&$a,$b) {
 			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto'];
 		});
-		
+
 		$all_categories=array_merge((array)$categories,$standard_categories);
 
         $lp=$this->getProjectLanguages();
@@ -132,16 +132,16 @@ class NsrController extends Controller
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
 			'order'=>'show_order',
-			'fieldAsIndex'=>'page_id'	
+			'fieldAsIndex'=>'page_id'
 		]);
-		
+
         foreach((array)$all_categories as $key=>$page)
 		{
 			if ( !empty($page['external_reference']) )
 			{
 				$all_categories[$key]['external_reference_decoded'] = @json_decode($page['external_reference']);
 			}
-			
+
             foreach((array)$lp as $k=>$language)
 			{
                 $tpt = $this->models->PagesTaxaTitles->_get(
@@ -258,7 +258,9 @@ class NsrController extends Controller
             ));
 
 			$qp=array_pop($this->tmp);
-			$this->storeParentage(array('id'=>$id,'parentage'=>array_reverse($qp['parentage'])));
+			if (isset($qp['parentage']) && is_array($qp['parentage'])) {
+                $this->storeParentage(array('id'=>$id,'parentage'=>array_reverse($qp['parentage'])));
+			}
 			$i=1;
 		}
 
@@ -335,7 +337,7 @@ class NsrController extends Controller
 				$c['parent']['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
 			}
 		}
-		
+
 		return $c;
 	}
 
@@ -512,5 +514,5 @@ class NsrController extends Controller
 
 		return $code;
 	}
-	
+
 }
