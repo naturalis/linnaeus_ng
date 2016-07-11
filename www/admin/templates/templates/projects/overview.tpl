@@ -25,7 +25,7 @@ ul.management li {
 </style>
 
     <h3>Modules</h3>
-    
+
     <ul class="modules">
     {foreach $modules.modules v}
     <li><a href="../{$v.controller}/">{$v.module}</a></li>
@@ -35,7 +35,7 @@ ul.management li {
 {if $modules.custom|@count>0}
 
     <h3>Custom modules</h3>
-    
+
     <ul class="modules">
     {foreach $modules.custom v}
     <li><a href="../module/?freeId={$v.id}">{$v.module}</a></li>
@@ -69,13 +69,18 @@ ul.management li {
         <li><a href="../projects/delete.php">{t}Delete a project{/t}</a></li>
         <li><a href="../projects/change_id.php">{t}Change a project ID{/t}</a></li>
         <!-- li><a href="../import/export.php">{t}Generic export{/t}</a></li -->
-        <li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
-        <li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
+        {if $cronNextRun}
+	        <li style="color:#999;>{t}Export multi-entry key for Linnaeus Mobile{/t} (disabled)</li>
+	        <li style="color:#999;>{t}Complete export for Linnaeus Mobile{/t} (disabled)</li>
+        {else}
+	        <li><a href="../import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
+	        <li><a href="../import/app_export.php">{t}Complete export for Linnaeus Mobile{/t}</a></li>
+        {/if}
         <li><a href="../interface/index.php">{t}Interface translations{/t}</a></li>
     </ul>
 
 	{/if}
-    
+
 </div>
 
 {include file="../shared/admin-footer.tpl"}
