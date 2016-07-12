@@ -477,6 +477,16 @@ class Controller extends BaseClass
         return $taxon;
     }
 
+    /* Fetches preferred common name from names table rather than common_names */
+    public function getTaxonCommonNameAlternate ($id)
+    {
+        return $this->models->ControllerModel->getTaxonCommonNameAlternate(array(
+		    'project_id' => $this->getCurrentProjectId(),
+		    'language_id'=> $this->getCurrentLanguageId(),
+		    'taxon_id' => $id
+		));
+    }
+
 	public function setSearchResultIndexActive($id)
 	{
 		$_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] = $id;
@@ -2935,7 +2945,7 @@ class Controller extends BaseClass
 		if ( $this->getSetting('front_end_use_basic_auth',0)==1)
 		{
 			$proceed=false;
-			
+
 			if ( isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']) )
 			{
 				$proceed=$this->models->ControllerModel->verifyProjectUser(array(
@@ -2950,7 +2960,7 @@ class Controller extends BaseClass
 				header('WWW-Authenticate: Basic realm="' . $_SESSION['app']['project']['title'] . '"');
 				header('HTTP/1.0 401 Unauthorized');
 				die();
-			} 
+			}
 		}
 	}
 
@@ -2958,5 +2968,5 @@ class Controller extends BaseClass
 	{
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
-		
+
 }
