@@ -78,6 +78,16 @@ class ModuleIdentifierController extends Controller
         return $c;
     }
 
+    public function getModuleIdByController ($controller)
+    {
+        foreach ($this->projectModules as $m) {
+            if ($m['controller'] == $controller) {
+                return $m['module_id'];
+            }
+        }
+        return false;
+    }
+
     public function getItemEditPage ()
     {
         if (!$this->moduleId || !$this->itemId) {
