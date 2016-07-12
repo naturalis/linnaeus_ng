@@ -164,7 +164,7 @@ class MatrixKeyController extends Controller
 		$this->setMasterMatrix();
 		$this->setDataSet();
 		$this->setScores();
-		
+
 		$this->smarty->assign( 'session_scores', json_encode( $this->getScores() ) );
 		$this->smarty->assign( 'session_states', json_encode( $this->getSessionStates() ) );
 		$this->smarty->assign( 'session_characters', json_encode( $this->getCharacterCounts() ) );
@@ -428,7 +428,7 @@ class MatrixKeyController extends Controller
 			{
 				if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
 					continue;
-				
+
                 $this->_mc->setItemId($state['id']);
                 $media = $this->_mc->getItemMediaFiles();
 
@@ -451,10 +451,10 @@ class MatrixKeyController extends Controller
 			{
 				$this->_mc->setItemId($states['id']);
 				$media = $this->_mc->getItemMediaFiles();
-	
+
 				$states['file_name'] = $states['file_dimensions'] =
 					$states['img_dimensions'] = null;
-	
+
 				if (!empty($media))
 				{
 					$states['file_name'] = $media[0]['rs_original'];
@@ -465,7 +465,7 @@ class MatrixKeyController extends Controller
 				}
 			}
         }
-		
+
 		foreach((array)$states as $key=>$state)
 		{
 			if (isset($state['file_name']))
@@ -711,7 +711,14 @@ class MatrixKeyController extends Controller
 
         foreach ( (array)$m as $key=>$val )
 		{
-			$m[$key]['taxon']=$this->getTaxonById( $val['taxon_id'] );
+			$m[$key]['taxon']= $this->getTaxonById( $val['taxon_id'] );
+
+			// Try to fetch common name from `names` table if this is not present
+			// in `common_names` table.
+            if (empty($m[$key]['taxon']['commonname'])) {
+				$m[$key]['taxon']['commonname']	= $this->getTaxonCommonNameAlternate($val['taxon_id']);
+            }
+
 			$m[$key]['gender']=$this->extractGenderTag( $val['label'] );
 			if (!isset($this->settings->suppress_details) || (
 				isset($this->settings->suppress_details) && $this->settings->suppress_details!=1))
@@ -731,7 +738,7 @@ class MatrixKeyController extends Controller
 			"project_id"=>$this->getCurrentProjectId(),
 			"matrix_id"=>$this->getCurrentMatrixId()
 		));
-		
+
 		foreach((array)$m as $key=>$val)
 		{
 			if (!isset($this->settings->suppress_details) ||
@@ -740,7 +747,7 @@ class MatrixKeyController extends Controller
 				$m[$key]['states']=$this->getMatrixStates( $val['id'] );
 			}
 		}
-		
+
 		return $m;
     }
 
