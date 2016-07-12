@@ -139,16 +139,31 @@ final class ProjectsModel extends AbstractModel
                 t2.last_project_select as project_last_selected,
                 t3.last_password_change as password_last_changed
             from
-                projects as t1
+                %PRE%projects as t1
             left join
-                projects_roles_users as t2 on t1.id = t2.project_id
+                %PRE%projects_roles_users as t2 on t1.id = t2.project_id
             left join
-                users as t3 on t2.user_id = t3.id
+                %PRE%users as t3 on t2.user_id = t3.id
             left join
-                roles as t4 on t2.role_id = t4.id
+                %PRE%roles as t4 on t2.role_id = t4.id
             order by
                 t1.sys_name, t3.username';
 
         return $this->freeQuery($query);
+    }
+
+    public function getProjectManagementModules ($p)
+    {
+        $projectId = isset($p['project_id']) ? $p['project_id'] : null;
+        $showHidden = isset($p['show_hidden']) ? $p['show_hidden'] : false;
+
+        $q = "
+            select *
+            from %PRE%modules
+            where " . (!$showHidden ? 'show_in_menu = 1 and ' : '') .
+            "controller not in ('users', 'projects')
+            order by show_order";
+
+        return $this->freeQuery($q);
     }
 }

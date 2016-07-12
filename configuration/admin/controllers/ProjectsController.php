@@ -139,17 +139,23 @@ class ProjectsController extends Controller
             }
         }
 
-
+/*
 		$d = $this->show_hidden_modules_in_select_list ? '*' : ['show_in_menu'=>1];
 
         $modules = $this->models->Modules->_get(array(
             'id' => $d,
             'order' => 'show_order'
         ));
+*/
+
+        $modules = $this->models->ProjectsModel->getProjectManagementModules(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'show_hidden' => $this->show_hidden_modules_in_select_list ? true : false
+        ));
 
         foreach ((array) $modules as $key => $val)
 		{
-            $mp = $this->models->ModulesProjects->_get(
+		    $mp = $this->models->ModulesProjects->_get(
             array(
                 'id' => array(
                     'module_id' => $val['id'],
