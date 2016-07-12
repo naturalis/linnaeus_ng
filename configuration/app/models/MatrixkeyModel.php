@@ -139,7 +139,7 @@ final class MatrixKeyModel extends AbstractModel
 
 			from %PRE%matrices_variations _a
 
-			left join %PRE%taxa_variations _b
+			right join %PRE%taxa_variations _b
 				on _a.project_id=_b.project_id
 				and _a.variation_id = _b.id
 
@@ -1051,7 +1051,7 @@ final class MatrixKeyModel extends AbstractModel
 			return;
 
 		$query="
-			select 
+			select
 				_a.id,
 				_a.id as taxon_id,
 				_a.taxon,
@@ -1072,7 +1072,7 @@ final class MatrixKeyModel extends AbstractModel
 				%PRE%matrices_taxa  _b
 					on _a.project_id = _b.project_id
 					and _a.id = _b.taxon_id
-					
+
 			left join
 				%PRE%names _c
 					on _a.project_id = _c.project_id
@@ -1081,7 +1081,7 @@ final class MatrixKeyModel extends AbstractModel
 					and _c.language_id = " . $language_id . "
 
 			where
-				_a.project_id = " . $project_id ." 
+				_a.project_id = " . $project_id ."
 				and _b.matrix_id = ". $matrix_id ."
 			" . ( isset($limit) ? "limit " . $limit : "" ) . "
 		";
