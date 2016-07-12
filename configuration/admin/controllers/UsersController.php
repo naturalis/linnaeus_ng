@@ -414,7 +414,7 @@ class UsersController extends Controller
 			return;
 		}
 
-		$role_id = isset($this->getNewUserData['role_id']) ? $this->getNewUserData['role_id'] : $this->getExpertRoleId();
+		$role_id = isset($this->getNewUserData()['role_id']) ? $this->getNewUserData()['role_id'] : $this->getExpertRoleId();
 
 		if ( is_null($role_id) )
 		{
