@@ -7,6 +7,7 @@
 include_once ('Controller.php');
 include_once ('ProjectDeleteController.php');
 include_once ('ModuleSettingsReaderController.php');
+include_once ('ModuleIdentifierController.php');
 
 class ProjectsController extends Controller
 {
@@ -474,48 +475,71 @@ class ProjectsController extends Controller
         }
         elseif ($moduleType == 'regular') {
 
+            // Ruud 12-07-16: rewrite to new ModuleIdentifierController
+            // Use controller name instead of defined ids that may vary between projects
+            $mc = new ModuleIdentifierController;
+            $mc->setModuleId($moduleId);
+            $controller = $mc->getModuleController();
+
+            // Taxon editor admin = Species and Higher taxa app
+            // Provide mapping
+            $modules = array($moduleId);
+            if ($controller == 'nsr') {
+                $modules[] = $mc->getModuleIdByController('species');
+                $modules[] = $mc->getModuleIdByController('highertaxa');
+            }
+
             if ($action == 'module_activate') {
 
-                $this->models->ModulesProjects->save(
-                array(
-                    'id' => null,
-                    'module_id' => $moduleId,
-                    'active' => 'n',
-                    'project_id' => $this->getCurrentProjectId()
-                ));
+                foreach ($modules as $moduleId) {
+                    $this->models->ModulesProjects->save(
+                    array(
+                        'id' => null,
+                        'module_id' => $moduleId,
+                        'active' => 'n',
+                        'project_id' => $this->getCurrentProjectId()
+                    ));
+                }
+
             }
             elseif ($action == 'module_publish') {
 
-                $this->models->ModulesProjects->update(array(
-                    'active' => 'y'
-                ), array(
-                    'module_id' => $moduleId,
-                    'project_id' => $this->getCurrentProjectId()
-                ));
+                foreach ($modules as $moduleId) {
+                    $this->models->ModulesProjects->update(array(
+                        'active' => 'y'
+                    ), array(
+                        'module_id' => $moduleId,
+                        'project_id' => $this->getCurrentProjectId()
+                    ));
+                }
+
             }
             elseif ($action == 'module_unpublish') {
 
-                $this->models->ModulesProjects->update(array(
-                    'active' => 'n'
-                ), array(
-                    'module_id' => $moduleId,
-                    'project_id' => $this->getCurrentProjectId()
-                ));
+                foreach ($modules as $moduleId) {
+                    $this->models->ModulesProjects->update(array(
+                        'active' => 'n'
+                    ), array(
+                        'module_id' => $moduleId,
+                        'project_id' => $this->getCurrentProjectId()
+                    ));
+                }
+
             }
             elseif ($action == 'module_delete') {
 
 				$pDel = new ProjectDeleteController;
 
-				if ($moduleId==MODCODE_INTRODUCTION) {
+				if ($controller == 'introduction') {
 			        $pDel->deleteIntroduction($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_GLOSSARY) {
+				if ($controller == 'glossary') {
 			        $pDel->deleteGlossary($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_LITERATURE) {
+				if ($controller == 'literature') {
 			        $pDel->deleteLiterature($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_SPECIES) {
+				if ($controller == 'nsr') {
 					$pDel->deleteCommonnames($this->getCurrentProjectId());
 					$pDel->deleteSynonyms($this->getCurrentProjectId());
 					$pDel->deleteSpeciesMedia($this->getCurrentProjectId());
@@ -524,27 +548,26 @@ class ProjectsController extends Controller
 					$pDel->deleteSpecies($this->getCurrentProjectId());
 			        $pDel->deleteProjectRanks($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_HIGHERTAXA) {
-			        $pDel->deleteIntroduction($this->getCurrentProjectId());
-				} else
-				if ($moduleId==MODCODE_KEY) {
+				if ($controller == 'key') {
 			        $pDel->deleteDichotomousKey($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_MATRIXKEY) {
+				if ($controller == 'matrixkey') {
 					$pDel->deleteMatrices( [ 'project_id'=>$this->getCurrentProjectId() ] );
 					$pDel->deleteNBCKeydata($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_DISTRIBUTION) {
+				if ($controller == 'mapkey') {
 			        $pDel->deleteGeoData($this->getCurrentProjectId());
 				} else
-				if ($moduleId==MODCODE_CONTENT) {
+				if ($controller == 'content') {
 			        $pDel->deleteProjectContent($this->getCurrentProjectId());
 				}
 
-                $this->models->ModulesProjects->delete(array(
-                    'module_id' => $moduleId,
-                    'project_id' => $this->getCurrentProjectId()
-                ));
+				foreach ($modules as $moduleId) {
+				    $this->models->ModulesProjects->delete(array(
+                        'module_id' => $moduleId,
+                        'project_id' => $this->getCurrentProjectId()
+                    ));
+				}
             }
         }
     }
