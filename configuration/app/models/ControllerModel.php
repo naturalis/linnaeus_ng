@@ -108,15 +108,15 @@ final class ControllerModel extends AbstractModel
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
 				and _a.project_id = _f.project_id
-		
+
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
-		
+
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
 				and _f.project_id = _q.project_id
 				and _q.language_id=".$languageId."
-				
+
 			left join %PRE%commonnames _c
 				on _a.project_id=_c.project_id
 				and _c.id=
@@ -381,19 +381,19 @@ final class ControllerModel extends AbstractModel
 		if ( is_null($project_id) ) return;
 
 		$query="
-			select 
+			select
 				hotword,
 				controller,
 				view,
 				params,
 				length(hotword) as `length`,
-				(length(hotword)-length(replace(trim(hotword),' ',''))+1) as num_of_words 
+				(length(hotword)-length(replace(trim(hotword),' ',''))+1) as num_of_words
 			from
-				%PRE%hotwords 
-			where 
+				%PRE%hotwords
+			where
 				project_id = ". $project_id ."
 				and (language_id is null".( !is_null($language_id) ? " or language_id=" . $language_id : "" ).")
-			order by 
+			order by
 				num_of_words desc,length desc
 		";
 
@@ -407,7 +407,7 @@ final class ControllerModel extends AbstractModel
 		$password=isset($p['password']) ? $p['password'] : null;
 
 		if( is_null($project_id) || is_null($username) || is_null($password) ) return;
-		
+
 		$query="
 			select
 				_a.*
@@ -416,14 +416,14 @@ final class ControllerModel extends AbstractModel
 
 			right join %PRE%projects_roles_users _b
 				on _a.id=_b.user_id
-			
+
 			where
 				_b.project_id = ". $project_id ."
 				and _a.username = '" . $this->escapeString($username) ."'
 				and _a.active=1
 				and _b.active=1
 			";
-		
+
 			$d=$this->freeQuery( $query );
 
 			if ($d)
@@ -432,7 +432,35 @@ final class ControllerModel extends AbstractModel
 				return false;
 
 	}
-	
+
+    public function getTaxonCommonNameAlternate ($p)
+    {
+		$projectId = isset($p['project_id']) ? $p['project_id'] : false;
+		$taxonId = isset($p['taxon_id']) ? $p['taxon_id'] : false;
+		$languageId = isset($p['language_id']) ? $p['language_id'] : false;
+
+		if (!$projectId || !$taxonId || !$languageId) {
+		    return false;
+		}
+
+		$q = "
+            select
+		        t1.`name`
+		    from
+		        %PRE%names as t1
+            left join
+                %PRE%name_types as t2 on t2.id = t1.type_id and t2.project_id = $projectId
+            where
+                t1.project_id = $projectId and
+                t1.language_id = $languageId and
+                t2.nametype = '" . PREDICATE_PREFERRED_NAME . "' and
+                t1.taxon_id = $taxonId
+            limit 1";
+
+        $d = $this->freeQuery($q);
+
+        return isset($d) ? $d[0]['name'] : false;
+    }
 
 
 }
