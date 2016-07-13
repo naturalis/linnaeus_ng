@@ -79,6 +79,12 @@ class ProjectDeleteController extends Controller
 		'chargroups',
 		'chargroups_labels',
 		'characteristics_chargroups',
+        'media',
+        'media_captions',
+        'media_conversion_log',
+        'media_metadata',
+        'media_modules',
+        'media_tags'
     );
 
     public function __construct ()
@@ -157,6 +163,28 @@ class ProjectDeleteController extends Controller
         ));
     }
 
+    public function deleteMedia ($id)
+    {
+        $this->models->Media->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->MediaCaptions->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->MediaConversionLog->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->MediaMetadata->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->MediaModules->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->MediaTags->delete(array(
+            'project_id' => $id
+        ));
+    }
+
     public function deleteGeoData ($id)
     {
         $this->models->OccurrencesTaxa->delete(array(
@@ -189,11 +217,11 @@ class ProjectDeleteController extends Controller
     {
 		$id=isset($p['project_id']) ? $p['project_id'] : null;
 		$keep_files=isset($p['keep_files']) ? $p['keep_files'] : false;
-		
+
 		if ( is_null($id) ) return;
-		
+
 		$d=['project_id' => $id];
-		
+
         $this->models->GuiMenuOrder->delete($d);
         $this->models->MatricesVariations->delete($d);
         $this->models->MatricesTaxaStates->delete($d);
@@ -525,7 +553,7 @@ class ProjectDeleteController extends Controller
 			else
 				@unlink($file);
 		}
-		
+
 		if (!@rmdir($dir)) return;
 	}
 
