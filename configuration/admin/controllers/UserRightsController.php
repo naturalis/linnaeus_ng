@@ -26,14 +26,14 @@
 		$this->UserRights->hasAppropriateLevel()	-> check based on role only
 	- access and read/write-rights for individual modules, as well as
 	  general right to publish set in users/edit.php.
-	- access to items is restricted to access to specific taxa and 
+	- access to items is restricted to access to specific taxa and
 	  subjacent taxa (i.e., branches), also set in users/edit.php (no
 	  specified items for a user means access to all taxa).
-	- for CRUD actions, see below (specofoc action types). 
+	- for CRUD actions, see below (specofoc action types).
 
 
 	[ "in situ" configuration options ]
-	to be used anywhere (set before call to checkAuthorisation() or 
+	to be used anywhere (set before call to checkAuthorisation() or
 	getAuthorisationState())
 	- set a specific action type (checked in canPerformAction()):
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
@@ -57,8 +57,8 @@
 		$this->UserRights->setItemId( $this->rGetId() );
 	  default null.
 	- set a level (checked in hasAppropriateLevel()):
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
-	  default ID_ROLE_EDITOR (other: ID_ROLE_SYS_ADMIN, ID_ROLE_LEAD_EXPERT) 
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+	  default ID_ROLE_EDITOR (other: ID_ROLE_SYS_ADMIN, ID_ROLE_LEAD_EXPERT)
 	- disable check for module access:
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
 	- for pages that allow for the absence of a project ID, call
@@ -120,13 +120,13 @@ class UserRights
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
 
-		if ( !$u ) 
+		if ( !$u )
 		{
 			$this->setStatus( 'no access: user not logged in' );
 			$this->setAuthorizeState( false );
 		}
 		else
-		if ( $u && $this->isSysAdmin() ) 
+		if ( $u && $this->isSysAdmin() )
 		{
 			$this->setStatus( 'access: user logged in, is sysadmin' );
 			$this->setAuthorizeState( true );
@@ -138,13 +138,13 @@ class UserRights
 			$this->setAuthorizeState( true );
 		}
 		else
-		if ( !$p ) 
+		if ( !$p )
 		{
 			$this->setStatus( 'no access: no project selected' );
 			$this->setAuthorizeState( false );
-		} 
+		}
 		else
-		if ( $p && !$u ) 
+		if ( $p && !$u )
 		{
 			$this->setStatus( 'no access: attempting to access a project page without being logged in' );
 			$this->setAuthorizeState( false );
@@ -173,7 +173,7 @@ class UserRights
 			$this->setStatus( 'access: accessing module' );
 			$this->setAuthorizeState( true );
 		}
-		
+
 		//echo "getAuthorizeState(): " . ( $this->getAuthorizeState() ? "y" : "n" ) . " (" . $this->getStatus() . ")"; die();
 
 		return $this->getAuthorizeState();
@@ -189,7 +189,7 @@ class UserRights
 		else
 		{
 			$this->setUserItems( true );
-			
+
 			if ( count((array)$this->useritems)==0 )
 			{
 				$this->setManageItemState( true );
@@ -203,10 +203,10 @@ class UserRights
 				$this->setStatus( sprintf('%s to item for user', ( $d ? 'access' : 'no access' ) ) );
 			}
 		}
-		
+
 		return $this->getManageItemState();
     }
-	
+
     public function canPerformAction()
     {
 		if( is_null( $this->action ) || $this->isSysAdmin() )
@@ -225,7 +225,7 @@ class UserRights
 			$this->setActionState( $d );
 			$this->setStatus( sprintf("action '%s' %s for user", $this->action , ( $d ? 'allowed' : 'not allowed' ) ) );
 		}
-		
+
 		return $this->getActionState();
     }
 
@@ -242,7 +242,7 @@ class UserRights
 			$this->setLevelState( $d );
 			$this->setStatus( sprintf("minmum required role %s", $this->translateRole( $this->requiredlevel ) ) );
 		}
-		
+
 		return $this->getLevelState();
     }
 
@@ -250,15 +250,15 @@ class UserRights
     public function setUserItems()
 	{
 		$this->useritems=array();
-		
+
 		$d=$this->model->freeQuery( "
 			select
 				item_id
 			from
 				%PRE%user_item_access
 			where
-				project_id = " . $this->projectid . " 
-				and user_id = " . $this->userid . " 
+				project_id = " . $this->projectid . "
+				and user_id = " . $this->userid . "
 				and item_type ='" . $this->itemtype . "'
 		");
 
@@ -271,6 +271,11 @@ class UserRights
 	public function getUserItems()
 	{
 		return $this->useritems;
+	}
+
+	public function getUserRoleId ()
+	{
+	    return $this->user['role_id'];
 	}
 
 	public function setAllowNoProjectId( $state )
@@ -302,7 +307,7 @@ class UserRights
 		/*
 			be aware: currently we recognize only a single legal
 			itemType ('taxon') so for convenience sake, the item
-			type is set automatically at initialization. should 
+			type is set automatically at initialization. should
 			there ever be other item types, either all existing
 			calls to setItemId() should be preceded by a call to
 			setItemType('taxon'), or 'taxon' should  be made the
@@ -328,7 +333,7 @@ class UserRights
 	{
 		return $this->status;
 	}
-	
+
 	public function getModuleTypeStandard()
 	{
 		return $this->C_moduleTypes[array_search('standard',$this->C_moduleTypes)];
@@ -382,7 +387,7 @@ class UserRights
 		if ( in_array( $level, $this->C_levels ) )
 		{
 			$this->requiredlevel=$level;
-		}	
+		}
 	}
 
 
@@ -417,7 +422,7 @@ class UserRights
 	{
 		return $this->actionstate;
 	}
-	
+
 	private function setLevelState( $state )
 	{
 		$this->levelstate=$state;
@@ -427,7 +432,7 @@ class UserRights
 	{
 		return $this->levelstate;
 	}
-	
+
     private function setModel( $model )
     {
 		$this->model=$model;
@@ -466,17 +471,17 @@ class UserRights
     private function setModuleId()
     {
 		if ( empty($this->controller) ) return;
-		
+
 		$d=$this->model->freeQuery( "
 			select
-				* 
+				*
 			from
-				%PRE%modules 
+				%PRE%modules
 			where
 				controller = '" . mysqli_real_escape_string($this->model->databaseConnection, $this->controller) ."'
 		");
-		
-		if ( $d ) 
+
+		if ( $d )
 		{
 			$this->moduleid=$d[0]['id'];
 		}
@@ -498,41 +503,41 @@ class UserRights
 				_c.role
 			from
 				%PRE%users _a
-				
+
 			left join
 				%PRE%projects_roles_users _b
 				on _a.id=_b.user_id
-				
+
 			left join
 				%PRE%roles _c
 				on _b.role_id=_c.id
-				
+
 			where
 				_a.id = " . $this->userid
 		);
 
 		$this->user = $d ? $d[0] : null;
     }
-	
+
 	private function setUserModuleAccess()
 	{
 		if ( is_null($this->moduleid) || is_null($this->moduletype) )
 			return;
-		
+
 		$d=$this->model->freeQuery( "
 			select
 				can_read,
 				can_write,
 				can_publish
 			from
-				%PRE%user_module_access 
+				%PRE%user_module_access
 			where
-				project_id = " . $this->projectid . " 
-				and user_id = " . $this->userid . " 
-				and module_id = " . $this->moduleid . " 
+				project_id = " . $this->projectid . "
+				and user_id = " . $this->userid . "
+				and module_id = " . $this->moduleid . "
 				and module_type ='" . $this->moduletype . "'
 		");
-		
+
 		if ( $d )
 		{
 			$this->usermoduleaccess=$d[0];
@@ -543,11 +548,11 @@ class UserRights
 	{
 		return isset($this->usermoduleaccess['can_read']) && $this->usermoduleaccess['can_read']==1 ? true : false;
 	}
-	
+
     private function setUserSubjacentItems()
 	{
 		$this->subjacentitems=array();
-		
+
 		foreach((array)$this->useritems as $item)
 		{
 			$d=$this->model->freeQuery( "
@@ -556,14 +561,14 @@ class UserRights
 				from
 					%PRE%taxon_quick_parentage _sq
 				where
-					_sq.project_id = " . $this->projectid . " 
+					_sq.project_id = " . $this->projectid . "
 					and MATCH(_sq.parentage) AGAINST ('" . $item . "' in boolean mode)
 			");
-			
+
 			foreach((array)$d as $val)
 			{
 				array_push( $this->subjacentitems, $val['taxon_id'] );
-			}		
+			}
 		}
 	}
 
@@ -590,7 +595,7 @@ class UserRights
 		}
 		return false;
 	}
-	
+
 	private function translateRole( $role_id )
 	{
 		switch( $role_id )

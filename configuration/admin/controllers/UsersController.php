@@ -162,7 +162,7 @@ class UsersController extends Controller
 			}
 		}
 
-		$this->smarty->assign( 'roles', $this->getRoles() );
+		$this->smarty->assign( 'roles', $this->getUserPermittedRoles() );
 		$this->smarty->assign('user', $this->rGetAll() );
 		$this->printPage( 'edit' );
     }
@@ -223,7 +223,7 @@ class UsersController extends Controller
 		}
 
 		$this->smarty->assign( 'user', $this->getUser() );
-		$this->smarty->assign( 'roles', $this->getRoles() );
+		$this->smarty->assign( 'roles', $this->getUserPermittedRoles() );
 		$this->smarty->assign( 'expert_role_id', $this->getExpertRoleId() );
 		$this->smarty->assign( 'modules', $this->getProjectModulesUser() );
 
@@ -360,6 +360,18 @@ class UsersController extends Controller
 	private function getRoles()
 	{
 		return $this->models->Roles->_get( array( 'id' => array('hidden'=>'0') ) );
+	}
+
+	private function getUserPermittedRoles ()
+	{
+	    $roles = $this->models->Roles->_get( array('id' => array('hidden'=>'0')));
+	    foreach ($roles as $i => $r) {
+            if ($r['id'] < $this->UserRights->getUserRoleId()) {
+                unset($roles[$i]);
+            }
+	    }
+//print_r($this->UserRights->getUserRoleId()); die();
+	    return $roles;
 	}
 
 	private function getProjectModulesUser()
