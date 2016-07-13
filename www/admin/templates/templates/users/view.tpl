@@ -74,7 +74,7 @@ table tr th {
 </table>
 
 <p>
-	<a href="edit.php?id={$user.id}">{t}edit{/t}</a> | <a href="index.php">{t}index{/t}</a>
+	{if $can_edit}<a href="edit.php?id={$user.id}">{t}edit{/t}</a> | {/if}<a href="index.php">{t}index{/t}</a>
 </p>
 
 </div>
