@@ -545,7 +545,10 @@ class ProjectsController extends Controller
 				if ($controller == 'literature') {
 			        $pDel->deleteLiterature($this->getCurrentProjectId());
 				} else
-				if ($controller == 'nsr') {
+				if ($controller == 'media') {
+			        $pDel->deleteMedia($this->getCurrentProjectId());
+				} else
+				    if ($controller == 'nsr') {
 					$pDel->deleteCommonnames($this->getCurrentProjectId());
 					$pDel->deleteSynonyms($this->getCurrentProjectId());
 					$pDel->deleteSpeciesMedia($this->getCurrentProjectId());
