@@ -545,6 +545,12 @@ class ProjectsController extends Controller
 				if ($controller == 'literature') {
 			        $pDel->deleteLiterature($this->getCurrentProjectId());
 				} else
+				if ($controller == 'literature2') {
+			        $pDel->deleteLiterature2($this->getCurrentProjectId());
+				} else
+				if ($controller == 'actors') {
+			        $pDel->deleteActors($this->getCurrentProjectId());
+				} else
 				if ($controller == 'media') {
 			        $pDel->deleteMedia($this->getCurrentProjectId());
 				} else

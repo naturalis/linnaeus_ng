@@ -84,7 +84,13 @@ class ProjectDeleteController extends Controller
         'media_conversion_log',
         'media_metadata',
         'media_modules',
-        'media_tags'
+        'media_tags',
+    'literature2',
+    'literature2_authors',
+    'literature2_publication_types',
+    'literature2_publication_types_labels',
+    'actors',
+    'actors_addresses'
     );
 
     public function __construct ()
@@ -124,6 +130,8 @@ class ProjectDeleteController extends Controller
         $this->deleteDichotomousKey($projectId);
         $this->deleteGlossary($projectId);
         $this->deleteLiterature($projectId);
+        $this->deleteLiterature2($projectId);
+        $this->deleteActors($projectId);
         $this->deleteProjectContent($projectId);
         $this->deleteCommonnames($projectId);
         $this->deleteSynonyms($projectId);
@@ -160,6 +168,19 @@ class ProjectDeleteController extends Controller
             'project_id' => $id
         ));
         $this->models->IntroductionMedia->delete(array(
+            'project_id' => $id
+        ));
+    }
+
+    public function deleteActors ($id)
+    {
+        $this->models->Actors->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->ActorsAddresses->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Literature2Authors->delete(array(
             'project_id' => $id
         ));
     }
@@ -321,6 +342,22 @@ class ProjectDeleteController extends Controller
             'project_id' => $id
         ));
         $this->models->Literature->delete(array(
+            'project_id' => $id
+        ));
+    }
+
+    public function deleteLiterature2 ($id)
+    {
+        $this->models->Literature2->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Literature2Authors->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Literature2PublicationTypes->delete(array(
+            'project_id' => $id
+        ));
+       $this->models->Literature2PublicationTypesLabels->delete(array(
             'project_id' => $id
         ));
     }
