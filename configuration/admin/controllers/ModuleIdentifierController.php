@@ -199,8 +199,8 @@ class ModuleIdentifierController extends Controller
 	private function setProjectModules ()
 	{
         $pm = $this->getProjectModules();
-        $this->projectModules = $pm['modules'];
-        $this->projectFreeModules = $pm['freeModules'];
+        $this->projectModules = is_array($pm['modules']) ? $pm['modules'] : array();
+        $this->projectFreeModules = is_array($pm['freeModules']) ? $pm['freeModules'] : array();
 	}
 
 }
