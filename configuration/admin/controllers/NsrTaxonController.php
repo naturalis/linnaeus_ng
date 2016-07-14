@@ -1119,7 +1119,7 @@ class NsrTaxonController extends NsrController
 
 	private function checkAuthorshipAgainstRank($baseRank,$authorship)
 	{
-		//if ($baseRank>=GENUS_RANK_ID && empty($authorship))
+	    //if ($baseRank>=GENUS_RANK_ID && empty($authorship))
 		if ($baseRank>GENUS_RANK_ID && empty($authorship))
 		{
 			$this->addError($this->translate("Authorship missing. Concept not saved."));
@@ -1263,13 +1263,13 @@ class NsrTaxonController extends NsrController
 				$this->addWarning($this->translate('Concept saved without parent.'));
 			}
 		}
-
+/*
 		if (!$this->checkAuthorshipAgainstRank($baseRank,$authorship))
 		{
 			$this->setConceptId(null);
 			return;
 		}
-
+*/
 		if (!$this->firstTaxon && !$this->checkParentChildRelationship($baseRank,$parent))
 		{
 			$this->setConceptId(null);

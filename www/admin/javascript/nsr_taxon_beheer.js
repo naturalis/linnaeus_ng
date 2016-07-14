@@ -110,6 +110,7 @@ function checkMandatory()
 var genusBaseRankid=null;
 var speciesBaseRankid=null;
 
+/*
 function checkAuthorshipAgainstRank()
 {
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
@@ -141,6 +142,22 @@ function checkAuthorshipAgainstRankGenus()
 
 	//if (rank=<genusBaseRankid)
 	if ( rank==getRankId( 'genus' ) )
+	{
+		if (p1==0) buffer.push(_("Authorship"));
+	}
+
+	return buffer;
+}
+*/
+
+function checkAuthorshipAgainstRank()
+{
+	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
+	var ranklabel = $('#concept_rank_id :selected').text();
+	var p1=$('#name_authorship').val() ? $('#name_authorship').val().length : 0;
+	var buffer=[];
+
+	if ( rank>=getRankId( 'genus' ) )
 	{
 		if (p1==0) buffer.push(_("Authorship"));
 	}
@@ -302,6 +319,7 @@ function saveconcept()
 	saveform(notifications);
 }
 
+/*
 function savenewconcept()
 {
 	if (!checkMandatory()) return;
@@ -313,6 +331,26 @@ function savenewconcept()
 
 	notifications=notifications.concat(
 		checkAuthorshipAgainstRankGenus(),
+		checkPresenceDataSpecies(),
+		checkScientificName(),
+		checkDutchName(),
+		checkPresenceDataHT()
+	);
+
+	saveform(notifications);
+}
+*/
+
+function savenewconcept()
+{
+	if (!checkMandatory()) return;
+
+	var notifications=[];
+
+	if (!checkNameAgainstRank()) return;
+
+	notifications=notifications.concat(
+		checkAuthorshipAgainstRank(),
 		checkPresenceDataSpecies(),
 		checkScientificName(),
 		checkDutchName(),
