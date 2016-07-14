@@ -55,10 +55,16 @@ final class IndexModel extends AbstractModel
 				on _t.rank_id=_f.id
 				and _t.project_id = _f.project_id
 
+            left join %PRE%trash_can _tr
+                on _tr.lng_id = _t.id
+                and _t.project_id = _tr.project_id
+                and _tr.item_type = 'taxon'
+
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
 				and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
+				and _tr.is_deleted is null
 
 			order by
 				letter
@@ -307,11 +313,17 @@ final class IndexModel extends AbstractModel
 				and _f.project_id = _q.project_id
 				and _q.language_id=".$display_language_id."
 
+			left join %PRE%trash_can _tr
+				on _tr.lng_id = _t.id
+				and _t.project_id = _tr.project_id
+				and _tr.item_type = 'taxon'
+
 			where
 				_a.project_id = ".$project_id."
 				and _b.nametype in ('" . implode("','",$nametypes) ."')
 				and _f.lower_taxon = ".($type=='higher' ? 0 : 1)."
 				".(!is_null($letter) ? "and _a.name like '".$letter."%'" : '' )."
+				and _tr.is_deleted is null
 
 			order by
 				_a.name, _t.taxon
