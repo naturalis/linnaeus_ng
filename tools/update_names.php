@@ -137,6 +137,12 @@
             }
 	    }
 
+	    $q = 'select id from name_types where nametype = "isValidNameOf" and project_id = ' . $projectId;
+	    mysqli_query($d, $q) or die($q . mysqli_error($d));
+	    $r = mysqli_query($d, $q) or die($q . mysqli_error($d));
+	    $row = mysqli_fetch_assoc($r);
+        $nameTypeId = $row['id'];
+
 	    if (isset($rankIds) && !empty($rankIds)) {
     	    $q = 'select id, taxon from taxa where rank_id in (' . implode(',', $rankIds) . ') and
     	          project_id = ' . $projectId;
@@ -155,7 +161,8 @@
                     $infra = '"' . mysqli_real_escape_string($d, $parts[3]) . '"';
                 }
                 $q2 .=  ', infra_specific_epithet = ' . $infra .
-                ' where taxon_id = '. $row['id'] . ' and type_id = 1 and project_id = ' . $projectId;
+                    ' where taxon_id = '. $row['id'] . ' and type_id = ' . $nameTypeId .
+                    ' and project_id = ' . $projectId;
 
     		    mysqli_query($d, $q2) or die($q2 . mysqli_error($d));
     		}
