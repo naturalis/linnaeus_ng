@@ -131,6 +131,7 @@ class ProjectDeleteController extends Controller
         $this->deleteSpeciesContent($projectId);
         $this->deleteStandardCat($projectId);
         $this->deleteSpecies($projectId);
+        $this->deleteMedia($projectId);
         $this->deleteFreeModules($projectId);
         $this->deleteProjectRanks($projectId);
         $this->deleteModulesFromProject($projectId);
