@@ -2725,7 +2725,7 @@ class NsrTaxonController extends NsrController
 
 			if (isset($data['name_infra_specific_epithet']['new']))
 			{
-				$infraSpecificEpithet=trim($data['name_infra_specific_epithett']['new']);
+				$infraSpecificEpithet=trim($data['name_infra_specific_epithet']['new']);
 			}
 			else
 			{
