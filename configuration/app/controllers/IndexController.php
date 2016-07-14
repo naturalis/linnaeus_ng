@@ -147,6 +147,8 @@ class IndexController extends Controller
 				'nametypes'=> $this->_scientificNameTypes,
 			    'type' => $type,
             ));
+
+            //die($this->models->IndexModel->q());
 		}
 
 		$result=array();

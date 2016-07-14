@@ -79,15 +79,26 @@ class SpeciesModel extends AbstractModel
 			select
 				SQL_CALC_FOUND_ROWS
 				_a.id, _a.taxon, _a.rank_id, _a.parent_id, _a.is_hybrid
-			from
+
+            from
 				%PRE%taxa _a
-			left join %PRE%projects_ranks _b
+
+            left join %PRE%projects_ranks _b
 				on _a.rank_id=_b.id
-			where
+
+            left join %PRE%trash_can _tr
+				on _tr.lng_id = _a.id
+				and _tr.project_id = _a.project_id
+				and _tr.item_type = 'taxon'
+
+            where
 				_a.project_id = ".$projectId."
 				" . ( isset($taxonType) ? " and _b.lower_taxon = ".($taxonType == 'higher' ? 0 : 1) : "" ) . "
 				".($getAll ? "" : "and _a.taxon REGEXP '".$regExp."'")."
+				and _tr.is_deleted is null
+
 			order by taxon
+
 			".(!empty($listMax) ? "limit ".$listMax : "");
 
         $taxa = $this->freeQuery($query);
@@ -129,10 +140,10 @@ class SpeciesModel extends AbstractModel
 		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
 
 		if (
-			is_null($project_id) || 
+			is_null($project_id) ||
 			is_null($taxon_id) ||
-			is_null($nametype_id_validname) || 
-			is_null($nametype_id_preferredname) || 
+			is_null($nametype_id_validname) ||
+			is_null($nametype_id_preferredname) ||
 			is_null($language_id)
 		) return;
 
@@ -194,7 +205,7 @@ class SpeciesModel extends AbstractModel
 				and ifnull(_trash.is_deleted,0)=0";
 
         $d=$this->freeQuery($query);
-		
+
 		return $d ? $d[0] : null;
     }
 
@@ -371,7 +382,7 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%taxa _t
 				on _a.taxon_id=_t.id
 				and _a.project_id=_t.project_id
-		
+
 			left join %PRE%projects_ranks _p
 				on _t.rank_id=_p.id
 				and _t.project_id=_p.project_id
@@ -455,7 +466,7 @@ class SpeciesModel extends AbstractModel
 				_tf.rank_id as taxon_base_rank_id
 
 			from %PRE%names _a
-		
+
 			left join %PRE%name_types _b
 				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id
@@ -470,7 +481,7 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
 				and _a.project_id = _f.project_id
-		
+
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
 
@@ -478,18 +489,18 @@ class SpeciesModel extends AbstractModel
 		left join %PRE%taxa _t
 			on _a.taxon_id=_t.id
 			and _a.project_id = _t.project_id
-	
+
 		left join %PRE%projects_ranks _tf
 			on _t.rank_id=_tf.id
 			and _t.project_id = _tf.project_id
-	
 
-		
+
+
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
 				and _f.project_id = _q.project_id
 				and _q.language_id=".$languageId."
-			
+
 			where
 				_a.project_id = ".$projectId."
 				and _a.taxon_id=".$taxonId."
@@ -819,11 +830,11 @@ class SpeciesModel extends AbstractModel
             isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
 
 
-		if ( 
-			is_null($projectId) || 
-			is_null($languageId) || 
-			is_null($taxonId) || 
-			is_null($predicatePreferredNameId) || 
+		if (
+			is_null($projectId) ||
+			is_null($languageId) ||
+			is_null($taxonId) ||
+			is_null($predicatePreferredNameId) ||
 			is_null($predicateValidNameId)
 		) return;
 
@@ -844,21 +855,21 @@ class SpeciesModel extends AbstractModel
 					 _map2.meta_data as meta_map_description,": "")."
 
 				case
-					when 
+					when
 						date_format(_meta1.meta_date,'%e %M %Y') is not null
 						and DAYOFMONTH(_meta1.meta_date)!='0'
 					then
 						date_format(_meta1.meta_date,'%e %M %Y')
-					when 
+					when
 						date_format(_meta1.meta_date,'%M %Y') is not null
 					then
 						date_format(_meta1.meta_date,'%M %Y')
-					when 
+					when
 						date_format(_meta1.meta_date,'%Y') is not null
 						and YEAR(_meta1.meta_date)!='0000'
 					then
 						date_format(_meta1.meta_date,'%Y')
-					when 
+					when
 						YEAR(_meta1.meta_date)='0000'
 					then
 						null
@@ -870,21 +881,21 @@ class SpeciesModel extends AbstractModel
 				_meta3.meta_data as meta_geografie,
 
 				case
-					when 
+					when
 						date_format(_meta4.meta_date,'%e %M %Y') is not null
 						and DAYOFMONTH(_meta4.meta_date)!=0
 					then
 						date_format(_meta4.meta_date,'%e %M %Y')
-					when 
+					when
 						date_format(_meta4.meta_date,'%M %Y') is not null
 					then
 						date_format(_meta4.meta_date,'%M %Y')
-					when 
+					when
 						date_format(_meta4.meta_date,'%Y') is not null
 						and YEAR(_meta4.meta_date)!='0000'
 					then
 						date_format(_meta4.meta_date,'%Y')
-					when 
+					when
 						YEAR(_meta4.meta_date)='0000'
 					then
 						null
@@ -1024,11 +1035,11 @@ class SpeciesModel extends AbstractModel
         $predicateValidNameId =
             isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
 
-		if ( 
-			is_null($projectId) || 
-			is_null($languageId) || 
-			is_null($taxonId) || 
-			is_null($predicatePreferredNameId) || 
+		if (
+			is_null($projectId) ||
+			is_null($languageId) ||
+			is_null($taxonId) ||
+			is_null($predicatePreferredNameId) ||
 			is_null($predicateValidNameId)
 		) return;
 
@@ -1273,7 +1284,7 @@ class SpeciesModel extends AbstractModel
     {
 		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
 		$organisation = isset($params['organisation']) ? $params['organisation'] : null;
-		
+
 		if ( is_null($projectId) || is_null($organisation) ) return;
 
         $query = "
@@ -1297,7 +1308,7 @@ class SpeciesModel extends AbstractModel
 		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
 		$trait_group_id = isset($params['trait_group_id']) ? $params['trait_group_id'] : null;
 		$trait_id = isset($params['trait_id']) ? $params['trait_id'] : null;
-		
+
 		if ( is_null($project_id) || is_null($taxon_id) || is_null($trait_group_id) || is_null($trait_id) ) return;
 
         $query = "
@@ -1305,28 +1316,28 @@ class SpeciesModel extends AbstractModel
 			(
 				select
 					_b.string_value as value
-	
-				from 
+
+				from
 					%PRE%traits_taxon_values _a
-	
+
 				left join
 					%PRE%traits_values _b
 					on _a.project_id=_b.project_id
 					and _a.value_id=_b.id
-	
+
 				where
 					_a.project_id = ".$project_id."
 					and _a.taxon_id = ".$taxon_id."
 					and _b.trait_id  = ".$trait_id."
-	
+
 				union
 
 				select
 					_a.string_value as value
-	
-				from 
+
+				from
 					%PRE%traits_taxon_freevalues _a
-	
+
 				where
 					_a.project_id = ".$project_id."
 					and _a.taxon_id = ".$taxon_id."
@@ -1341,7 +1352,7 @@ class SpeciesModel extends AbstractModel
 		return $d ? $d[0]['value'] : null;
 
 	}
-					
+
     public function getTaxonReferences( $params )
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
@@ -1389,7 +1400,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_a.project_id = ".$project_id."
-				and _t.taxon_id= " . $taxon_id . " 
+				and _t.taxon_id= " . $taxon_id . "
 			order by
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
@@ -1418,7 +1429,7 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%content_keysteps _c
 				on _a.project_id=_c.project_id
 				and _a.id=_c.keystep_id
-				and _c.language_id= " . $language_id . " 
+				and _c.language_id= " . $language_id . "
 
 			where
 				_a.project_id = " . $project_id ."
