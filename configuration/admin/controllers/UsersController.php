@@ -488,9 +488,6 @@ class UsersController extends Controller
 		unset( $data['role_id'] );
 		unset( $data['can_publish'] );
 
-		$data['password'] = 'temp';
-		$data['created_by'] = $this->getCurrentUserId();
-
 		$this->models->Users->save( $data );
 
 		if ( empty($data['id']) )
@@ -804,7 +801,7 @@ class UsersController extends Controller
 		else
         if ( empty($id) && empty($p1) && empty($p2) )
 		{
-            $this->addError( $this->translate('Passwords is required.') );
+            $this->addError( $this->translate('Password is required.') );
 			$this->setNewUserPasswordSave( false );
         }
 		else
