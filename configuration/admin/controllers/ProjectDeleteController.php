@@ -10,87 +10,121 @@ include_once ('Controller.php');
 class ProjectDeleteController extends Controller
 {
     public $usedModels = array(
-		'characteristics',
-		'characteristics_chargroups',
-		'characteristics_labels',
-		'characteristics_labels_states',
-		'characteristics_matrices',
-		'characteristics_states',
-		'chargroups',
-		'chargroups_labels',
-		'choices_content_keysteps',
-		'choices_keysteps',
-		'commonnames',
-		'content',
-		'content_free_modules',
-		'content_introduction',
-		'content_keysteps',
-		'content_taxa',
-		'free_module_media',
-		'free_modules_pages',
-		'free_modules_projects',
-		'free_modules_projects_users',
-		'geodata_types',
-		'geodata_types_titles',
-		'glossary',
-		'glossary_media',
-		'glossary_media_captions',
-		'glossary_synonyms',
-		'hotwords',
-		'introduction_media',
-		'introduction_pages',
-		'keysteps',
-		'keytrees',
-		'l2_diversity_index',
-		'l2_maps',
-		'l2_occurrences_taxa',
-		'l2_occurrences_taxa_combi',
-		'languages',
-		'languages_projects',
-		'literature',
-		'literature_taxa',
-		'matrices',
-		'matrices_names',
-		'matrices_taxa',
-		'matrices_taxa_states',
-		'matrices_variations',
-		'media_descriptions_taxon',
-		'media_taxon',
-		'modules',
-		'modules_projects',
-		'modules_projects_users',
-		'nbc_extras',
-		'occurrences_taxa',
-		'pages_taxa',
-		'pages_taxa_titles',
-		'projects',
-		'projects_roles_users',
-		'roles',
-		'sections',
-		'synonyms',
-		'taxa_relations',
-		'taxa_variations',
-		'users',
-		'users_taxa',
-		'variations_labels',
-		'variation_relations',
-		'gui_menu_order',
-		'module_settings_values',
-		'chargroups',
-		'chargroups_labels',
-		'characteristics_chargroups',
+        'activity_log',
+        'actors',
+        'actors_addresses',
+        'beelduitwisselaar_batches',
+        'characteristics',
+        'characteristics_chargroups',
+        'characteristics_labels',
+        'characteristics_labels_states',
+        'characteristics_matrices',
+        'characteristics_states',
+        'chargroups',
+        'chargroups_labels',
+        'choices_content_keysteps',
+        'choices_keysteps',
+        'commonnames',
+        'content',
+        'content_free_modules',
+        'content_introduction',
+        'content_keysteps',
+        'content_taxa',
+        'diversity_index',
+        'dna_barcodes',
+        'external_ids',
+        'external_orgs',
+        'free_modules_pages',
+        'free_modules_projects',
+        'free_module_media',
+        'geodata_types',
+        'geodata_types_titles',
+        'glossary',
+        'glossary_media',
+        'glossary_media_captions',
+        'glossary_synonyms',
+        'gui_menu_order',
+        'habitats',
+        'habitat_labels',
+        'hotwords',
+        'introduction_media',
+        'introduction_pages',
+        'keysteps',
+        'keysteps_taxa',
+        'keytrees',
+        'l2_diversity_index',
+        'l2_maps',
+        'l2_occurrences_taxa',
+        'l2_occurrences_taxa_combi',
+        'labels_languages',
+        'labels_projects_ranks',
+        'labels_sections',
+        'languages_projects',
+        'literature',
+        'literature2',
+        'literature2_authors',
+        'literature2_publication_types',
+        'literature2_publication_types_labels',
+        'literature_taxa',
+        'matrices',
+        'matrices_names',
+        'matrices_taxa',
+        'matrices_taxa_states',
+        'matrices_variations',
         'media',
         'media_captions',
         'media_conversion_log',
+        'media_descriptions_taxon',
+        'media_meta',
         'media_metadata',
         'media_modules',
         'media_tags',
-    'literature2',
-    'literature2_authors',
-    'literature2_publication_types',
-    'literature2_publication_types_labels',
-    'actors',
-    'actors_addresses'
+        'media_taxon',
+        'modules_projects',
+        'module_settings_values',
+        'names',
+        'names_additions',
+        'name_types',
+        'nbc_extras',
+        'nsr_ids',
+        'occurrences_taxa',
+        'pages_taxa',
+        'pages_taxa_titles',
+        'presence',
+        'presence_labels',
+        'presence_taxa',
+        'projects_ranks',
+        'projects_roles_users',
+        'rdf',
+        'sections',
+        'settings',
+        'synonyms',
+        'tab_order',
+        'taxa',
+        'taxa_relations',
+        'taxa_variations',
+        'taxongroups',
+        'taxongroups_labels',
+        'taxongroups_taxa',
+        'taxon_quick_parentage',
+        'taxon_trends',
+        'taxon_trend_years',
+        'text_translations',
+        'traits_groups',
+        'traits_project_types',
+        'traits_settings',
+        'traits_taxon_freevalues',
+        'traits_taxon_references',
+        'traits_taxon_values',
+        'traits_traits',
+        'traits_values',
+        'trash_can',
+        'trend_sources',
+        'users_taxa',
+        'user_item_access',
+        'user_module_access',
+        'variations_labels',
+        'variation_relations'
     );
 
     public function __construct ()
@@ -114,11 +148,9 @@ class ProjectDeleteController extends Controller
 
     public function doDeleteProjectAction ($projectId)
     {
-
 		set_time_limit(600);
 		$this->doDeleteAllButProjectItself($projectId);
 		$this->doDeleteProjectItself($projectId);
-
 	}
 
     public function doDeleteAllButProjectItself ($projectId)
@@ -135,16 +167,15 @@ class ProjectDeleteController extends Controller
         $this->deleteProjectContent($projectId);
         $this->deleteCommonnames($projectId);
         $this->deleteSynonyms($projectId);
-        $this->deleteSpeciesMedia($projectId);
-        $this->deleteSpeciesContent($projectId);
+        $this->deleteTaxa($projectId);
         $this->deleteStandardCat($projectId);
-        $this->deleteSpecies($projectId);
+        $this->deleteNames($projectId);
         $this->deleteMedia($projectId);
         $this->deleteFreeModules($projectId);
         $this->deleteProjectRanks($projectId);
         $this->deleteModulesFromProject($projectId);
+        $this->deleteNsrSpecificStuff($projectId);
         $this->deleteOtherStuff($projectId);
-
     }
 
     public function doDeleteProjectItself ($projectId)
@@ -218,6 +249,9 @@ class ProjectDeleteController extends Controller
         $this->models->GeodataTypes->delete(array(
             'project_id' => $id
         ));
+        $this->models->DiversityIndex->delete(array(
+            'project_id' => $id
+        ));
 
         $this->models->L2Maps->delete(array(
             'project_id' => $id
@@ -289,6 +323,9 @@ class ProjectDeleteController extends Controller
             'project_id' => $id
         ));
         $this->models->Keysteps->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->KeystepsTaxa->delete(array(
             'project_id' => $id
         ));
         $this->models->Keytrees->delete(array(
@@ -372,7 +409,7 @@ class ProjectDeleteController extends Controller
 
 
 
-    public function deleteSpeciesMedia ($id,$keepFiles=false)
+    private function deleteTaxonMedia ($id,$keepFiles=false)
     {
         $paths = $this->makePathNames($id);
 
@@ -400,6 +437,9 @@ class ProjectDeleteController extends Controller
         $this->models->MediaDescriptionsTaxon->delete(array(
             'project_id' => $id
         ));
+        $this->models->MediaMeta->delete(array(
+            'project_id' => $id
+        ));
     }
 
     public function deleteCommonnames ($id)
@@ -409,16 +449,12 @@ class ProjectDeleteController extends Controller
         ));
     }
 
-
-
     public function deleteSynonyms ($id)
     {
         $this->models->Synonyms->delete(array(
             'project_id' => $id
         ));
     }
-
-
 
     public function deleteStandardCat ($id)
     {
@@ -430,9 +466,7 @@ class ProjectDeleteController extends Controller
         ));
     }
 
-
-
-    public function deleteSpeciesContent ($id,$deleteGeneralData=true)
+    private function deleteTaxonContent ($id,$deleteGeneralData=true)
     {
         $this->models->ContentTaxa->delete(array(
             'project_id' => $id
@@ -442,17 +476,110 @@ class ProjectDeleteController extends Controller
 			$this->models->Sections->delete(array(
 				'project_id' => $id
 			));
+			$this->models->LabelsSections->delete(array(
+				'project_id' => $id
+			));
 		}
     }
 
-
-    public function deleteSpecies ($id)
+    public function deleteTaxa ($id, $keepFiles=false)
     {
         $this->models->Taxa->delete(array(
             'project_id' => $id
         ));
+
+        $this->deleteTaxonContent($id);
+        $this->deleteTaxonMedia($id, $keepFiles);
+
+        $this->models->TaxonQuickParentage->delete(array(
+            'project_id' => $id
+        ));
+
+        $this->deleteTaxonGroups($id);
+        $this->deleteTaxonTrends($id);
+        $this->deletePresence($id);
+        $this->deleteTraits($id);
     }
 
+    public function deleteTraits ($id)
+    {
+        $this->models->TraitsGroups->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsProjectTypes->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsSettings->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsTaxonFreevalues->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsTaxonReferences->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsTaxonValues->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsTraits->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TraitsValues->delete(array(
+            'project_id' => $id
+        ));
+    }
+
+    public function deleteTaxonTrends ($id)
+    {
+        $this->models->TaxonTrends->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TaxonTrendYears->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TrendSources->delete(array(
+            'project_id' => $id
+        ));
+    }
+
+    public function deleteTaxonGroups ($id)
+    {
+        $this->models->Taxongroups->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TaxongroupsLabels->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TaxongroupsTaxa->delete(array(
+            'project_id' => $id
+        ));
+    }
+
+    public function deletePresence ($id)
+    {
+        $this->models->Presence->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->PresenceLabels->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->PresenceTaxa->delete(array(
+            'project_id' => $id
+        ));
+    }
+
+    public function deleteNames ($id)
+    {
+        $this->models->Names->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->NameTypes->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->NamesAdditions->delete(array(
+            'project_id' => $id
+        ));
+    }
 
 
     public function deleteProjectRanks ($id)
@@ -475,7 +602,10 @@ class ProjectDeleteController extends Controller
         $this->models->ProjectsRolesUsers->delete(array(
             'project_id' => $id
         ));
-        $this->models->ModulesProjectsUsers->delete(array(
+        $this->models->UserItemAccess->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->UserModuleAccess->delete(array(
             'project_id' => $id
         ));
     }
@@ -485,6 +615,12 @@ class ProjectDeleteController extends Controller
     public function deleteProjectLanguage ($id)
     {
         $this->models->LanguagesProjects->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->LabelsLanguages->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TextTranslations->delete(array(
             'project_id' => $id
         ));
     }
@@ -554,7 +690,7 @@ class ProjectDeleteController extends Controller
         $this->models->FreeModuleMedia->delete($d);
 
         unset($d);
-
+/*
         $d['project_id'] = $id;
 
         if (isset($moduleId))
@@ -563,7 +699,7 @@ class ProjectDeleteController extends Controller
         $this->models->FreeModulesProjectsUsers->delete($d);
 
         unset($d);
-
+*/
         $d['project_id'] = $id;
 
         if (isset($moduleId))
@@ -628,15 +764,56 @@ class ProjectDeleteController extends Controller
         $this->models->ModuleSettingsValues->delete(array(
             'project_id' => $id
         ));
+        $this->models->Settings->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TabOrder->delete(array(
+            'project_id' => $id
+        ));
     }
 
+    public function deleteNsrSpecificStuff ($id)
+    {
+        $this->models->BeelduitwisselaarBatches->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->DnaBarcodes->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->ExternalIds->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->ExternalOrgs->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Habitats->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->HabitatLabels->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->NsrIds->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Rdf->delete(array(
+            'project_id' => $id
+        ));
+    }
 
     public function deleteOtherStuff ($id)
     {
         $this->models->Hotwords->delete(array(
-        'project_id' => $id
+            'project_id' => $id
         ));
-
+        $this->models->ActivityLog->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->ModuleSettingsValues->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->TrashCan->delete(array(
+            'project_id' => $id
+        ));
     }
 
 

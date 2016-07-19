@@ -554,14 +554,14 @@ class ProjectsController extends Controller
 				if ($controller == 'media') {
 			        $pDel->deleteMedia($this->getCurrentProjectId());
 				} else
-				    if ($controller == 'nsr') {
+				if ($controller == 'nsr') {
 					$pDel->deleteCommonnames($this->getCurrentProjectId());
 					$pDel->deleteSynonyms($this->getCurrentProjectId());
-					$pDel->deleteSpeciesMedia($this->getCurrentProjectId());
-					$pDel->deleteSpeciesContent($this->getCurrentProjectId());
+					$pDel->deleteTaxa($this->getCurrentProjectId());
 					$pDel->deleteStandardCat($this->getCurrentProjectId());
-					$pDel->deleteSpecies($this->getCurrentProjectId());
 			        $pDel->deleteProjectRanks($this->getCurrentProjectId());
+			        $pDel->deleteNames($this->getCurrentProjectId());
+			        $pDel->deleteSections($this->getCurrentProjectId());
 				} else
 				if ($controller == 'key') {
 			        $pDel->deleteDichotomousKey($this->getCurrentProjectId());
