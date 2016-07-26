@@ -182,7 +182,7 @@ class SearchControllerNSR extends SearchController
 				if ($val['group_id']==$search['trait_group']) $search['trait_group_name']=$val['group_name'];
 			}
 
-			$this->smarty->assign('trait_group_name',$search['trait_group_name']);
+			$this->smarty->assign('trait_group_name', isset($search['trait_group_name']) ? $search['trait_group_name'] : null );
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
