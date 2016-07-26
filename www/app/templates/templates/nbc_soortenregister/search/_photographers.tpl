@@ -1,4 +1,4 @@
-<div class="top5">
+<div id="top5-photographers" class="top5">
 	<h2>{t}Top 5 fotografen{/t}</h2>
 	<h4>{t}Fotograaf (foto’s/soorten){/t}</h4>
 	<ul>
