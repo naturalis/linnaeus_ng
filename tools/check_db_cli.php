@@ -410,6 +410,10 @@
 			   ($action == 'update' ?
 				   "CHANGE `$col` `$col` " :
 				   "ADD `$col` ");
+
+			$output .= $definition['COLUMN_TYPE'];
+
+			/*
 			// ENUM exception
 			if (strtolower($definition['DATA_TYPE']) == 'enum') {
 				$output .= $definition['COLUMN_TYPE'];
@@ -422,6 +426,7 @@
 						' (' . ($definition['NUMERIC_PRECISION'] + 1) . ')' :
 						''));
 			}
+			*/
 			$output .= ' ' .
 				(strtolower($definition['IS_NULLABLE']) == 'no' ?
 					' NOT NULL' :
