@@ -59,7 +59,7 @@ final class ControllerModel extends AbstractModel
 
 		$d=$this->freeQuery($query);
 
-		if (isset($d[0]) && !empty($d[0]['value']) )
+		if (isset($d[0]) && !is_null($d[0]['value']) )
 		{
 			return $d[0]['value'];
 		}
