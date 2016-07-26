@@ -5,15 +5,17 @@
 	
 				<form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
 				<fieldset>
-					<label accesskey="t" for="searchString">Zoek op naam</label>
+					<label accesskey="t" for="searchString">{t}Zoek op naam{/t}</label>
 					<input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" value="{$search.search}" />
 					<input id="inlineformsearchButton" type="submit" value="{t}zoek{/t}" class="zoekknop" /><br>
 					<div id="suggestList"></div>
 				</fieldset>
 				<ul>
+	                {if $show_advanced_search_in_public_menu}
 					<li class="searchdb">
 						<a href="../search/nsr_search_extended.php"><b>{t}Uitgebreid zoeken{/t}</b></a>
 					</li>
+                    {/if}
 					<li class="level2">
 						<a href="../search/nsr_search_pictures.php"><b>{t}Foto's zoeken{/t}</b></a>
 					</li>
