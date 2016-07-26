@@ -1758,6 +1758,7 @@ class Controller extends BaseClass
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
         $this->smarty->assign('contact', $this->getContactLink());
 		$this->smarty->assign('server_name', $this->server_name);
+		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
