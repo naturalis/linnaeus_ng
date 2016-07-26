@@ -779,7 +779,6 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%name_types _b 
 				on _a.type_id=_b.id 
 				and _a.project_id = _b.project_id
-				and _b.nametype='".PREDICATE_PREFERRED_NAME."'
 
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
