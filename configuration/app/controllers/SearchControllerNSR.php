@@ -744,7 +744,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsPhotographer( $p )
 	{
-		return $this->models->SearchNSRModel->getSuggestionsValidator(array(
+		return $this->models->SearchNSRModel->getSuggestionsPhotographer(array(
 			"match"=>$p['match'],
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
