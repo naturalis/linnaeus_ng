@@ -566,6 +566,8 @@ class NsrTaxonManagement extends NsrController
 
 	private function savePageBlocks()
 	{
+		
+		if ( !$this->use_page_blocks ) return;
 
 		//alter table pages_taxa add column `page_blocks` varchar(255) DEFAULT NULL after always_hide;
 		$data=$this->rGetAll()['page_blocks'];
