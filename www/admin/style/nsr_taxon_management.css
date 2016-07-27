@@ -43,7 +43,7 @@
 }
 
 .tab-definition .delete {
-  background-image: url(../../media/system/icons/cross.png);
+  background-image: url(../media/system/icons/cross.png);
   cursor: pointer;
   background-repeat: no-repeat;
 }
