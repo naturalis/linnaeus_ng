@@ -586,10 +586,6 @@ class NsrTaxonManagement extends NsrController
 		$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated page blocks']);
 	}
 
-
-
-
-
     private function saveRankLabel( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
