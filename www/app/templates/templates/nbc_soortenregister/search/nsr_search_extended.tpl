@@ -78,6 +78,8 @@
 					</p>
 				</div>
 
+				{* if $automatic_tabs['CTAB_MEDIA'].suppress!==true *}
+
 				<div class="formrow">
                 	<label
                     	for="multimedia-options" 
@@ -125,9 +127,11 @@
 						</tr>
 					</table>
 				</div>
+
+				{* /if *}
                 
-                
-                {if !$suppressDnaBarcodes}
+               
+				{if $automatic_tabs['CTAB_DNA_BARCODES'].suppress!==true}
                         
 				<div class="formrow">
                 	<label 

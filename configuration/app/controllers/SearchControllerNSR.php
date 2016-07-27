@@ -43,7 +43,8 @@ class SearchControllerNSR extends SearchController
 		'traits_traits',
 		'traits_values',
 		'traits_taxon_values',
-		'traits_taxon_freevalues'
+		'traits_taxon_freevalues',
+		'tab_order'
     );
 
 
@@ -56,8 +57,18 @@ class SearchControllerNSR extends SearchController
 
 	public $jsToLoad = array();
 
-	private $_suppressTab_DNA_BARCODES=false;
-
+	private $cTabs=[
+		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
+		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],
+		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
+		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],
+		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
+		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
+		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
+//		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+		'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status'],
+	];
+	
     public function __construct ()
     {
         parent::__construct();
@@ -84,6 +95,20 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign( 'taxon_base_url_images_thumb',$this->_taxon_base_url_images_thumb );
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 		$this->smarty->assign( 'taxon_base_url_images_thumb_s',$this->_taxon_base_url_images_thumb_s );
+
+
+
+		$order=$this->models->TabOrder->_get([
+			'id'=>['project_id' => $this->getCurrentProjectId()],
+			'fieldAsIndex'=>'page_id'
+		]);
+
+        foreach((array)$this->cTabs as $key=>$page)
+		{
+			$this->cTabs[$key]['suppress']=isset($order[$page['id']]) ? $order[$page['id']]['suppress']==1 : false;
+        }
+		
+		$this->smarty->assign( 'automatic_tabs', $this->cTabs );
 
 		$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array('setting'=>'db_lc_time_names','subst'=>'nl_NL') )."'");
 
@@ -196,7 +221,6 @@ class SearchControllerNSR extends SearchController
 
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
-		$this->smarty->assign('suppressDnaBarcodes',$this->_suppressTab_DNA_BARCODES);
 		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
 
         $this->printPage($template);

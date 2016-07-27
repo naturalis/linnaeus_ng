@@ -31,7 +31,7 @@ class NsrController extends Controller
 		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
 		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],	// $this->getTaxonNextLevel($taxon); (children?)
 		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
-		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
+		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes','remarks'=>'suppressing will also remove DNA-barcodes from the extended search options'],
 		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
 //		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
 		'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status'],
@@ -122,7 +122,7 @@ class NsrController extends Controller
 		$standard_categories=$this->getCTabs();
 
 		array_walk($standard_categories,function(&$a,$b) {
-			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'type'=>'auto'];
+			$a=['tabname'=>$b,'id'=>$a['id'],'page'=>$a['title'],'remarks'=>isset($a['remarks']) ? $a['remarks'] : null,'type'=>'auto'];
 		});
 
 		$all_categories=array_merge((array)$categories,$standard_categories);
