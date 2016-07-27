@@ -154,10 +154,11 @@ class MediaController extends Controller
      *
      * @access     public
      */
-    public function __construct ( $p=null )
+    public function __construct ($p = null)
     {
-        parent::__construct( $p );
-        $this->initialize( $p );
+        parent::__construct($p);
+        $this->initialize($p);
+        $this->models->MediaModel->setMetadataFields($this::$metadataFields);
      }
 
     public function __destruct ()
