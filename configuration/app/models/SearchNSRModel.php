@@ -811,7 +811,7 @@ final class SearchNSRModel extends AbstractModel
 						where project_id = ".$project_id." 
 						and nametype='".PREDICATE_PREFERRED_NAME."'
 					)
-				" . ( $restrict_language ? "and _k.language_id=".$language_id : "" ) . "
+				and _k.language_id=_a.language_id
 
 			where 
 				_a.project_id =".$project_id."

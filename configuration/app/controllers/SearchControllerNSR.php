@@ -119,6 +119,7 @@ class SearchControllerNSR extends SearchController
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
+	
     }
 
     public function searchAction()
