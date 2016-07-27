@@ -94,8 +94,8 @@
 						<h3 class="wetenschappelijkenaam"><i>{$v.name}</i></h3>
 						{/if}
 						<dl>
-							<dt>{t}Foto{/t}</dt><dd>{$v.photographer}</dd>
-							<dt>{t}Geplaatst op{/t}</dt><dd>{$v.meta_datum_plaatsing}</dd>
+							{if $v.photographer}<dt>{t}Foto{/t}</dt><dd>{$v.photographer}</dd>{/if}
+							{if $v.meta_datum_plaatsing}<dt>{t}Geplaatst op{/t}</dt><dd>{$v.meta_datum_plaatsing}</dd>{/if}
 						</dl>
 						<div style="clear: both;"><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{t}Naar deze soort{/t}</a></div>
 					</div>

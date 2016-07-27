@@ -595,13 +595,18 @@ class SearchControllerNSR extends SearchController
 			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
 
-			$meta=$this->models->MediaMeta->_get(array("id"=>
-				array(
+			$meta=$this->models->MediaMeta->_get( [
+				"id"=> [
 					"project_id" => $this->getCurrentProjectId(),
 					"media_id" => $val["id"]
-				)
-			));
-
+				],
+				"columns" =>
+					"meta_data, meta_date, meta_number, trim(concat(
+						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+						trim(substring(meta_data, 1, locate(',',meta_data)-1))
+					)) as photographer"
+			 ] );
+			 
 			$data[$key]['photographer']="";
 			$data[$key]['meta_datum']="";
 			$data[$key]['meta_short_desc']="";
@@ -615,7 +620,8 @@ class SearchControllerNSR extends SearchController
 			{
 				if ($m['sys_label']=='beeldbankFotograaf')
 				{
-					$data[$key]['photographer']=$m['meta_data'];
+					//$data[$key]['photographer']=$m['meta_data'];
+					$data[$key]['photographer']=$m['photographer'];
 				}
 				else
 				if ($m['sys_label']=='beeldbankDatumVervaardiging')
