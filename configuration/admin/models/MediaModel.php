@@ -4,6 +4,8 @@ include_once (dirname(__FILE__) . "/AbstractModel.php");
 final class MediaModel extends AbstractModel
 {
 
+    private $metadataFields = array();
+
     public function __construct ()
     {
         parent::__construct();
@@ -21,6 +23,10 @@ final class MediaModel extends AbstractModel
             $this->disconnectFromDatabase();
         }
         parent::__destruct();
+    }
+
+    public function setMetadataFields ($f) {
+        $this->metadataFields = $f;
     }
 
     // Alternative for Table->_get as this crashed on large result sets
@@ -70,14 +76,8 @@ final class MediaModel extends AbstractModel
         $limit = isset($p['limit']) && !empty($p['limit']) ? $p['limit'] : false;
 
         // Cast search to appropriate array if it is a string
-        $groupBy = false;
         if ($search && !is_array($search)) {
-            $v = $search;
-            $search = array(
-                'metadata' => array($v),
-                'tags' => array($v),
-                'file_name' => $v
-            );
+            $this->castSearchStringToArray($search);
             // Bit of a hack but whatever
             $groupBy = 't1.`id`';
         }
@@ -116,7 +116,7 @@ final class MediaModel extends AbstractModel
                 t1.`deleted` = 0 and
                 t1.`project_id` = ' . $this->escapeString($projectId) .
                 $this->appendSearchWhere($search, $searchType) .
-        ($groupBy ? '
+        (isset($groupBy) ? '
             group by ' . $groupBy : '') . '
             order by t1.`' .  $sort  . '`' .
         ($limit ? '
@@ -124,6 +124,18 @@ final class MediaModel extends AbstractModel
         );
 
         return $this->freeQuery($query);
+    }
+
+    private function castSearchStringToArray (&$search) {
+        $v = $search;
+        foreach ($this->metadataFields as $f) {
+            $meta[$f] = $v;
+        }
+        $search = array(
+            'metadata' => $meta,
+            'tags' => array($v),
+            'file_name' => $v
+        );
     }
 
     private function appendSearchWhere ($search, $searchType = 'and') {
