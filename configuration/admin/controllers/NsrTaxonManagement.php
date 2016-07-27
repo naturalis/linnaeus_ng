@@ -117,10 +117,11 @@ class NsrTaxonManagement extends NsrController
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->moduleSettings->setController( 'species' );
+		
+		$this->use_page_blocks = $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1;
 
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
-		$this->smarty->assign( 'use_page_blocks', $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1 );
-
+		$this->smarty->assign( 'use_page_blocks', $this->use_page_blocks );
 		
 		if ($this->show_nsr_specific_stuff ) 
 		{
@@ -474,23 +475,29 @@ class NsrTaxonManagement extends NsrController
 			$page['external_reference_decoded']=json_decode($page['external_reference']);
 		}
 		
-		if ( !empty($page['page_blocks']) )
+		if ( $this->use_page_blocks )
 		{
-			// fetch the names + "Regular page content"
-			$cat=$this->getCategories();
-			$d=json_decode($page['page_blocks']);
-			foreach((array)$d as $val)
+			
+			if ( !empty($page['page_blocks']) )
 			{
-				if ($val==$this->regularDataBlock['id'])
-					$page['page_blocks_decoded'][]=$this->regularDataBlock;
-				else
-					$page['page_blocks_decoded'][]=["id"=>$val,"label"=>$cat[array_search($val, array_column($this->getCategories(), 'id'))]['page']];
+				// fetch the names + "Regular page content"
+				$cat=$this->getCategories();
+				$d=json_decode($page['page_blocks']);
+				foreach((array)$d as $val)
+				{
+					if ($val==$this->regularDataBlock['id'])
+						$page['page_blocks_decoded'][]=$this->regularDataBlock;
+					else
+						$page['page_blocks_decoded'][]=["id"=>$val,"label"=>$cat[array_search($val, array_column($this->getCategories(), 'id'))]['page']];
+				}
 			}
+			else
+			{
+				$page['page_blocks_decoded'][0]=$this->regularDataBlock;
+			}
+
 		}
-		else
-		{
-			$page['page_blocks_decoded'][0]=$this->regularDataBlock;
-		}
+
 		return $page;
 	}
 
