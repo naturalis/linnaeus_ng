@@ -1127,7 +1127,7 @@ CREATE TABLE `media_modules` (
 
 DROP TABLE IF EXISTS `media_tags`;
 CREATE TABLE `media_tags` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `media_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
