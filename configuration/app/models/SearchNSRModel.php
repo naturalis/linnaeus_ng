@@ -606,13 +606,24 @@ final class SearchNSRModel extends AbstractModel
 					concat(
 						trim(substring(_c.meta_data, locate(',',_c.meta_data)+1)),' ',
 						trim(substring(_c.meta_data, 1, locate(',',_c.meta_data)-1))
-					) like '%".$this->escapeString($photographer)."%' )";
+					) like '%".$this->escapeString($photographer)."%'
+				)";
 		}
 
 		if ( !empty($validator) )
 		{
 			//$validator="_meta6.meta_data='".$this->escapeString($validator)."'";
-			$validator="_meta6.meta_data like '%".$this->escapeString($validator)."%'";
+			//$validator="_meta6.meta_data like '%".$this->escapeString($validator)."%'";
+
+			$validator="
+				(
+					_meta6.meta_data like '%".$this->escapeString($validator)."%'
+					or 
+					concat(
+						trim(substring(_meta6.meta_data, locate(',',_meta6.meta_data)+1)),' ',
+						trim(substring(_meta6.meta_data, 1, locate(',',_meta6.meta_data)-1))
+					) like '%".$this->escapeString($validator)."%'
+				)";
 		}
 
 		$sort="_meta4.meta_date desc";
