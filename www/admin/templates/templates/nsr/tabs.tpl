@@ -70,7 +70,7 @@
 
                 {if $v.type=='auto'}
                 <span class="auto"><input type="checkbox" name="suppress[{$v.id}]" {if $v.suppress} checked="checked"{/if}/></span>
-                <span></span>
+                <span class="remarks">{if $v.remarks}{t}{$v.remarks}{/t}{/if}</span>
                 {else}
                 <span class="delete" onclick="taxonPageDelete({$v.id},'{$v.page}');">&nbsp;</span>
                 <span>
