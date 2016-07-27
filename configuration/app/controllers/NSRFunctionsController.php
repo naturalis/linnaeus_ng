@@ -48,9 +48,8 @@ class NSRFunctionsController extends Controller
 			{
 				$metaData[$this->translate('Licentie')] =
 					$license . 
-					!empty($this->settings->url_to_picture_license_info) ?
-						'&nbsp;<a class="help" title="' . $this->translate('klik voor help over dit onderdeel') .'" target="_blank" href="'. $this->settings->url_to_picture_license_info .'">&nbsp;</a>'
-						: '';
+					(!empty($this->settings->url_to_picture_license_info) ?
+						'&nbsp;<a class="help" title="' . $this->translate('klik voor help over dit onderdeel') .'" target="_blank" href="'. $this->settings->url_to_picture_license_info .'">&nbsp;</a>' : '');
 			}
 					
 
