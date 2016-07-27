@@ -174,6 +174,7 @@ function doSubmit()
                 <input type="hidden" id="parent_taxon_id" value="" name="branch_top_id" mandatory="mandatory"  label="ouder" droplistminlength="3" />
         </div>
 
+{if $is_nsr}
         <div class="fieldsubset">
             <h4>{t}Presence status{/t}</h4>
             <a onclick="addEstablishedOrNot('1');return false;" href="#">{t}established species{/t}</a> /
@@ -200,6 +201,7 @@ function doSubmit()
             {/foreach}
             </table>
         </div>
+{/if}
 
         <h4>{t}Taxonomic ranks{/t}</h4>
         <table>
@@ -294,6 +296,7 @@ function doSubmit()
                     <td><input class=col id=col_rank type=checkbox name=cols[rank] checked="checked" /></td>
                     <td><label for=col_rank>{t}rank{/t}</label></td>
                 </tr>
+{if $is_nsr}
                 <tr>
                     <td><input class=col id=col_presence_status type=checkbox name=cols[presence_status] checked="checked" /></td>
                     <td><label for=col_presence_status>{t}presence status{/t}</label></td>
@@ -302,6 +305,7 @@ function doSubmit()
                     <td><input class=col id=col_nsr_id type=checkbox name=cols[nsr_id] checked="checked" /></td>
                     <td><label for=col_nsr_id>NSR ID</label></td>
                 </tr>
+{/if}
             </table>
         </div>
 
@@ -312,10 +316,12 @@ function doSubmit()
                     <td><input id=col_habitat type=checkbox name=cols[habitat] /></td>
                     <td><label for=col_habitat>{t}habitat{/t}</label></td>
                 </tr>
+{if $is_nsr}
                 <tr>
                     <td><input id=col_concept_url type=checkbox name=cols[concept_url]  /></td>
                     <td><label for=col_concept_url>{t}Url to NSR page concept{/t}</label></td>
                 </tr>
+{/if}
                 <tr>
                     <td><input id=col_nameparts type=checkbox name=cols[name_parts] onclick="
                         $( '.namepart' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) )
