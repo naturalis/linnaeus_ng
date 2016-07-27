@@ -40,11 +40,19 @@ class NSRFunctionsController extends Controller
 				$this->translate('Geplaatst op') => $val['meta_datum_plaatsing'],
 				$this->translate('Copyright') => $val['meta_copyrights'],
 				$this->translate('Contactadres fotograaf') => $val['meta_adres_maker'],
-				$this->translate('Licentie') =>
-					(!empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->settings->picture_license_default) . 
-					'&nbsp;<a class="help" title="' . $this->translate('klik voor help over dit onderdeel') .'" target="_blank" href="'. $this->settings->url_to_picture_license_info .'">&nbsp;</a>'
-					
 			);
+			
+			$license = (!empty($val['meta_license']) && $val['meta_license']!='Natuur van Nederland licentie' ? $val['meta_license'] : $this->settings->picture_license_default);
+			
+			if ( !empty($license) )
+			{
+				$metaData[$this->translate('Licentie')] =
+					$license . 
+					!empty($this->settings->url_to_picture_license_info) ?
+						'&nbsp;<a class="help" title="' . $this->translate('klik voor help over dit onderdeel') .'" target="_blank" href="'. $this->settings->url_to_picture_license_info .'">&nbsp;</a>'
+						: '';
+			}
+					
 
 			$data[$key]['photographer']=$val['photographer'];
 			$data[$key]['label']=
