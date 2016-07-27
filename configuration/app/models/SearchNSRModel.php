@@ -997,7 +997,7 @@ final class SearchNSRModel extends AbstractModel
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
 				and _c.type_id=".$type_id_preferred."
-				" . ( $restrict_language ? "and _c.language_id=".$language_id : "" ) ."
+				and _c.language_id=_a.language_id
 			
 			left join %PRE%projects_ranks _f
 				on _d.rank_id=_f.id
