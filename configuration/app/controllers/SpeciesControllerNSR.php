@@ -1253,7 +1253,7 @@ class SpeciesControllerNSR extends SpeciesController
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $ref->full_url );
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYSTATUS, false);
+//curl_setopt($ch, CURLOPT_SSL_VERIFYSTATUS, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $external_content->content_raw=curl_exec($ch);
 curl_close($ch);
