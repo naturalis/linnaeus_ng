@@ -877,7 +877,11 @@ final class SearchNSRModel extends AbstractModel
 		$query="
 			select 
 				distinct
-				meta_data as label
+				meta_data as original_label,
+				trim(concat(
+						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+						trim(substring(meta_data, 1, locate(',',meta_data)-1))
+					)) as label
 			from %PRE%media_meta
 			where
 				project_id=".$project_id."
@@ -917,7 +921,11 @@ final class SearchNSRModel extends AbstractModel
 		$query="
 			select 
 				distinct
-				meta_data as label
+				meta_data as original_label,
+				trim(concat(
+						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
+						trim(substring(meta_data, 1, locate(',',meta_data)-1))
+					)) as label
 			from %PRE%media_meta
 			where
 				project_id=".$project_id."
