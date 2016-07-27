@@ -36,7 +36,7 @@ ul.insulae li {
 		<h2 id="name-header">{t}Voorkomen{/t}</h2>
 
 		<table class="insulae">
-        {foreach from=$external_content->result->data item=v}
+        {foreach from=$external_content->content_json_decoded->result->data item=v}
         	{foreach from=$v->values item=l key=k}
             {capture "value"}{$l->value_start}{if $l->value_end} - {$l->value_end}{/if}{/capture}
 			<tr>
@@ -48,13 +48,13 @@ ul.insulae li {
         {/foreach}
 		</table>
 
-		{if $external_content->result->references}
+		{if $external_content->content_json_decoded->result->references}
         <br />
-        <h4 class="source">{t}Publicatie{if $external_content->result->references|@count>1}s{/if}{/t}</h4>
+        <h4 class="source">{t}Publicatie{if $external_content->content_json_decoded->result->references|@count>1}s{/if}{/t}</h4>
 		<ul class="insulae">
         
-        {foreach from=$external_content->result->references item=v}
-	        {if $external_content->result->references|@count>1}<li>{/if}
+        {foreach from=$external_content->content_json_decoded->result->references item=v}
+	        {if $external_content->content_json_decoded->result->references|@count>1}<li>{/if}
                 <a href="../literature2/reference.php?id={$v->id}">
                 {capture authors}
                 {foreach from=$v->authors item=author key=ak}{if $ak>0}, {/if}{$author->name|@trim}{/foreach}
@@ -67,7 +67,7 @@ ul.insulae li {
                 {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
                 {if $v->publisher}{$v->publisher}.{/if}      
                 </a>
-	        {if $external_content->result->references|@count>1}</li>{/if}
+	        {if $external_content->content_json_decoded->result->references|@count>1}</li>{/if}
         {/foreach}
 		{/if}
         </ul>
