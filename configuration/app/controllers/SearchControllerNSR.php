@@ -601,7 +601,7 @@ class SearchControllerNSR extends SearchController
 					"media_id" => $val["id"]
 				],
 				"columns" =>
-					"meta_data, meta_date, meta_number, trim(concat(
+					"*, trim(concat(
 						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
 						trim(substring(meta_data, 1, locate(',',meta_data)-1))
 					)) as photographer"
