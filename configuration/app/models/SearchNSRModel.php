@@ -597,7 +597,16 @@ final class SearchNSRModel extends AbstractModel
 		if ( !empty($photographer) )
 		{
 			//$photographer="_c.meta_data='".$this->escapeString($photographer)."'";
-			$photographer="_c.meta_data like '%".$this->escapeString($photographer)."%'";
+			//$photographer="_c.meta_data like '%".$this->escapeString($photographer)."%'";
+
+			$photographer="
+				(
+					_c.meta_data like '%".$this->escapeString($photographer)."%'
+					or 
+					concat(
+						trim(substring(_c.meta_data, locate(',',_c.meta_data)+1)),' ',
+						trim(substring(_c.meta_data, 1, locate(',',_c.meta_data)-1))
+					) like '%".$this->escapeString($photographer)."%' )";
 		}
 
 		if ( !empty($validator) )
