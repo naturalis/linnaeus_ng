@@ -969,7 +969,7 @@ final class SearchNSRModel extends AbstractModel
 		$type_id_preferred = isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
 		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
 		
-		if ( is_null($search) || is_null($limit)is_null($project_id) || is_null($language_id) || is_null($type_id_preferred) )
+		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) || is_null($type_id_preferred) )
 			return;
 
 		$query="
