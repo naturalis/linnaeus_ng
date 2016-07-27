@@ -748,7 +748,8 @@ class SearchControllerNSR extends SearchController
 			"project_id"=>$this->getCurrentProjectId(),
 			"language_id"=>$this->getCurrentLanguageId(),
 			"limit"=>$this->_suggestionListItemMax,
-			"taxon_id"=>isset($p['id']) ? $p['id'] : null
+			"taxon_id"=>isset($p['id']) ? $p['id'] : null,
+			"restrict_language"=>false
 		));
 	}
 
@@ -784,12 +785,13 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName( $p )
 	{
-		return $this->models->SearchNSRModel->getSuggestionsValidator(array(
+		return $this->models->SearchNSRModel->getSuggestionsName(array(
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
 			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 			"limit"=>$this->_suggestionListItemMax,
-			"language_id"=>$this->getCurrentLanguageId()
+			"language_id"=>$this->getCurrentLanguageId(),
+			"restrict_language"=>false
 		));
 	}
 

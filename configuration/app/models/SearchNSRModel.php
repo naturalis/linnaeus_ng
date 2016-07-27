@@ -744,8 +744,9 @@ final class SearchNSRModel extends AbstractModel
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$match = isset($params['match']) ? $params['match'] : null;
 		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
 		
-		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($match) )
+		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($match) || is_null($language_id) )
 			return;
 
 		$clause=null;
@@ -810,7 +811,7 @@ final class SearchNSRModel extends AbstractModel
 						where project_id = ".$project_id." 
 						and nametype='".PREDICATE_PREFERRED_NAME."'
 					)
-				and _k.language_id=".$language_id."
+				" . ( $restrict_language ? "and _k.language_id=".$language_id : "" ) . "
 
 			where 
 				_a.project_id =".$project_id."
@@ -822,8 +823,8 @@ final class SearchNSRModel extends AbstractModel
 					_b.nametype='".PREDICATE_VALID_NAME."'
 					or
 						(
-							_b.nametype='".PREDICATE_PREFERRED_NAME."' and
-							_a.language_id=".$language_id."
+							_b.nametype='".PREDICATE_PREFERRED_NAME."'
+							" . ( $restrict_language ? "and _a.language_id=".$language_id : "" ) . "
 						)
 					)
 			order by name
@@ -966,8 +967,9 @@ final class SearchNSRModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$type_id_preferred = isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
+		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
 		
-		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) || is_null($type_id_preferred) )
+		if ( is_null($search) || is_null($limit)is_null($project_id) || is_null($language_id) || is_null($type_id_preferred) )
 			return;
 
 		$query="
@@ -995,7 +997,7 @@ final class SearchNSRModel extends AbstractModel
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
 				and _c.type_id=".$type_id_preferred."
-				and _c.language_id=".$language_id."
+				" . ( $restrict_language ? "and _c.language_id=".$language_id : "" ) ."
 			
 			left join %PRE%projects_ranks _f
 				on _d.rank_id=_f.id
@@ -1011,11 +1013,13 @@ final class SearchNSRModel extends AbstractModel
 				and ifnull(_trash.is_deleted,0)=0
 				and _f.rank_id >= ".SPECIES_RANK_ID."
 				and _a.name like '". $this->escapeString($search) ."%'
-				and (_a.language_id=".$language_id." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")
+				" . ( $restrict_language ? "and (_a.language_id=".$language_id." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")" : "" ) . "
 				and ifnull(label,'') != ''
-			order by label
 
-			limit ".$limit
+			order by
+				label
+
+			" . ( !is_null($limit) ? "limit ".$limit : "" )
 		;
 
 		return $this->freeQuery( $query );
