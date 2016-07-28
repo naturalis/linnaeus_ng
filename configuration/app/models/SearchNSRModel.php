@@ -329,7 +329,9 @@ final class SearchNSRModel extends AbstractModel
 		$sort=isset($params['sort']) ? $params['sort'] : null;
 		$limit=isset($params['limit']) ? $params['limit'] : null;
 		$offset=isset($params['offset']) ? $params['offset'] : null;
+		$specific_rank=isset($params['specific_rank']) ? $params['specific_rank'] : null;
 		$this->_operators=isset($params['operators']) ? $params['operators'] : null;
+
 
 		if ( is_null($project_id) ||  is_null($language_id) )
 			return;
@@ -479,8 +481,8 @@ final class SearchNSRModel extends AbstractModel
 
 			where
 				_a.project_id =".$project_id."
-				and _f.lower_taxon=1
 				and ifnull(_trash.is_deleted,0)=0
+				".(isset($specific_rank) ? "and _f.rank_id=" . $specific_rank : "and _f.lower_taxon=1" )." 
 				".(isset($ancestor_id) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor_id."' in boolean mode)" : "")."
 				".(isset($presence) ? "and _g.presence_id in (".implode(',',$presence).")" : "")."
 				".(isset($auth) ? "and _m.authorship like '". $this->escapeString($auth)."%'" : "")."
@@ -508,10 +510,10 @@ final class SearchNSRModel extends AbstractModel
 				" . ( !empty($trait_joins) || !empty($traitgroup_joins) ? "group by _a.id" : "" ) . "
 				" . ( isset($traitgroup_joins['having']) ? $traitgroup_joins['having'] : "" ) . "
 
-			order by ".
-				(isset($sort) && $sort=='name-pref-nl' ? "common_name,_a.taxon" : "_a.taxon")."
-			".(isset($limit) ? "limit ".$limit : "")."
-			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+			order by
+			" . (isset($sort) && $sort=='name-pref-nl' ? "common_name,_a.taxon" : "_a.taxon")."
+			" . (isset($limit) ? "limit ".$limit : "")."
+			" . (isset($offset) & isset($limit) ? "offset ".$offset : "")
 		;
 
 		$data=$this->freeQuery( $query );

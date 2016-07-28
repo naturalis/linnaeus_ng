@@ -453,6 +453,7 @@ class SearchControllerNSR extends SearchController
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : null;
+		$just_species=!empty($p['just_species']) ? $p['just_species'] : false;
 
 		$d=$this->models->SearchNSRModel->doExtendedSearch(array(
 			"images"=>$images,
@@ -472,6 +473,7 @@ class SearchControllerNSR extends SearchController
 			"trait_group"=>$trait_group,
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
+			"specific_rank"=>$just_species ? SPECIES_RANK_ID : null,
 			"ancestor_id"=>$ancestor['id'],
 			"presence"=>$pres,
 			"sort"=>$sort,

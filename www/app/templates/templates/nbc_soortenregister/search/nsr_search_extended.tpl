@@ -86,10 +86,7 @@
 
 				{/if}
 
-
-
 				{* if $automatic_tabs['CTAB_MEDIA'].suppress!==true *}
-
 
 				<div class="formrow">
                 
@@ -276,10 +273,6 @@
                     <ul id="search-parameters">
                     </ul>
 				</div>
-
-                {*<div class="formrow">
-					<input type="button=" class="zoekknop" value="zoek" onclick="submitSearchParams()" />
-				</div>*}
                 
 			</fieldset>
 
@@ -288,9 +281,13 @@
 		</div>
 
 		<div id="results"> 
-            <h4><span id="resultcount-header">{$results.count}</span>
-            {* if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if *}
+            <h4 style="display:inline-block">
+            	<span id="resultcount-header">{$results.count}</span>
+	            {* if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if *}
             </h4>
+			<a href="#" id="just-species-toggle" style="padding-left:10px;" onclick="toggleJustSpeciesToggle();submitSearchParams();return false;">
+			{t}alleen soorten tonen{/t}
+            </a>
 
             <div class="formrow" style="margin-bottom:15px">
                 {t}Resultaten sorteren op:{/t}
@@ -326,8 +323,14 @@
 		</div>
         
  		</form>
+
+        {if $search.just_species==1}
+        {capture A}{t}soort{/t}{/capture}
+        {capture B}{t}soorten{/t}{/capture}
+        {else}
         {capture A}{t}soort (of onderliggend taxon){/t}{/capture}
         {capture B}{t}soorten (en onderliggende taxa){/t}{/capture}
+        {/if}
 
 		{assign var=pgnEntityNames value=[$smarty.capture.A,$smarty.capture.B]}
 		{assign var=pgnResultCount value=$results.count}
@@ -432,7 +435,12 @@ $(document).ready(function()
 		$('label[for=presenceStatusList]').trigger('click').trigger('mouseout');
 
 	{/if}
-
+	
+	{if $search.just_species}
+	setJustSpeciesToggle({$search.just_species});
+	{/if}
+	
+	$('#just-species-toggle').html(getJustSpeciesToggle()==0 ? '{t}alleen soorten tonen{/t}' : '{t}soorten en lagere taxa tonen{/t}' );
 
 	$('title').html('{t}Uitgebreid zoeken naar soorten{/t} - '+$('title').html());
 

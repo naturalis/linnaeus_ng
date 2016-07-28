@@ -315,6 +315,7 @@ function removeSearchParameter(i)
 function removeAllSearchParameters()
 {
 	search_parameters.splice(0);
+	just_species=0;
 	setTraitGroup(null);
 	printParameters();
 }
@@ -458,5 +459,24 @@ function submitSearchParams()
 		form.append('<input type="hidden" name="trait_group" value="'+ trait_group+'" />');
 	}
 
+	form.append('<input type="hidden" name="just_species" value="'+getJustSpeciesToggle()+'" />');
+
 	form.submit();	
+}
+
+var justSpeciesToggle=0;
+
+function setJustSpeciesToggle(state)
+{
+	justSpeciesToggle=state;
+}
+
+function getJustSpeciesToggle()
+{
+	return justSpeciesToggle;
+}
+
+function toggleJustSpeciesToggle()
+{
+	setJustSpeciesToggle(justSpeciesToggle==0 ? 1 : 0);
 }
