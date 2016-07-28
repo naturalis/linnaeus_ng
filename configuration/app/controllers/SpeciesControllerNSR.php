@@ -80,7 +80,8 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->_use_embedded_templates = $this->moduleSettings->getModuleSetting( 'use_embedded_templates', 0 )==1;
 		$this->_use_page_blocks = $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1;
 		$this->_show_inherited_literature = $this->moduleSettings->getModuleSetting( 'show_inherited_literature', 0 );
-        $this->_inclOverviewImage = $this->moduleSettings->getModuleSetting(array( 'setting'=>'include_overview_in_media','subst'=>true)) == 1;
+        $this->_inclOverviewImage = $this->moduleSettings->getModuleSetting( [ 'setting'=>'include_overview_in_media','subst'=>true ] ) == 1;
+		$this->_tree_taxon_count_style = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_taxon_count_style','module'=>'species', 'subst'=>'species_established' ] );
 
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -267,6 +268,8 @@ class SpeciesControllerNSR extends SpeciesController
 			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('headerTitles',array('title'=>$taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
 			$this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
+
+			$this->smarty->assign('tree_taxon_count_style',$this->_tree_taxon_count_style);
 
 			$this->printPage( $template );
 		}
@@ -1062,15 +1065,14 @@ class SpeciesControllerNSR extends SpeciesController
 		*/
 		$prev=null;
 
-		if (!is_null($current_taxon)) {
-
+		if (!is_null($current_taxon))
+		{
 			foreach((array)$classification as $key=>$val)
 			{
 				if ($val['id']==$current_taxon)
 					break;
 				$prev=$key;
 			}
-
 		}
 
 		foreach((array)$classification as $key=>$val)
