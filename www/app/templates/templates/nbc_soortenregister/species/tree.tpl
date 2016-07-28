@@ -30,7 +30,7 @@ $(document).ready(function()
 {
 	$('title').html('{t}Taxonomische boom{/t} - '+$('title').html());
 	
-	{if $session.admin.project.title}
+	{if $session.app.project.title}
 	setTopLevelLabel('{$session.app.project.title|@escape}');
 	{/if}
 	
