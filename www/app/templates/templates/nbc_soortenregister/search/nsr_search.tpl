@@ -37,10 +37,22 @@
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong>
 					{if $v.common_rank} ({$v.common_rank}){/if}<br />
+                    
+				{if $show_all_preferred_names_in_results}
+					{foreach $v.common_names n nk}
+                    {if $nk>0}<br />{/if}
+                    {$n.name}
+					{/foreach}
+                {else}
 					{if $v.common_name}{$v.common_name}<br />{/if}
+				{/if}
+
+				{if $show_presence_in_results}
 					{if $v.presence_information_index_label || $v.presence_information_title}
 					{t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
 					{/if}
+				{/if}
+
 				</div>
 				{/foreach}
 
@@ -54,7 +66,6 @@
 				{else}
 				{t}Niets gevonden.{/t}
 				{/if}
-
 			</p>
 		</div>
 		

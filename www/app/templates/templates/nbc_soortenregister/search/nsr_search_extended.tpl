@@ -286,9 +286,20 @@
                 <img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}" />
                 {/if}
                 <strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
-                {if $v.common_name}{$v.common_name}<br />{/if}
-				{if $v.presence_information_index_label || $v.presence_information_title}
-                {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
+
+				{if $show_all_preferred_names_in_results}
+					{foreach $v.common_names n nk}
+                    {if $nk>0}<br />{/if}
+                    {$n.name}
+					{/foreach}
+                {else}
+					{if $v.common_name}{$v.common_name}<br />{/if}
+				{/if}
+
+                {if $show_presence_in_results}
+                    {if $v.presence_information_index_label || $v.presence_information_title}
+                    {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
+                    {/if}
                 {/if}
             </div>
 			{/foreach}
