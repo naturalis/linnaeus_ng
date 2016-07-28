@@ -3,7 +3,7 @@ var container='tree-container';
 var url='ajax_interface_tree.php';
 var autoExpandArray=Array();
 var highlightNodes=Array();
-var topLevelLabel='Nederlands Soortenregister';
+var topLevelLabel=_('Taxonomische boom');
 var includeSpeciesStats=true;
 
 function setTopLevelLabel(label)
