@@ -817,9 +817,15 @@ final class SearchNSRModel extends AbstractModel
 			where 
 				_a.project_id =".$project_id."
 				and _f.lower_taxon!=1
-				and ifnull(_trash.is_deleted,0)=0
-				and 
-				".$clause."
+				and ifnull(_trash.is_deleted,0)=0 "
+				. ( $restrict_language ? "and _a.language_id=".$language_id : "" ) . "
+				and " . $clause . "
+
+			order by name
+			" . ( !is_null($limit) ? "limit ".$limit : "" )
+		;
+
+		/*
 				and (
 						_a.type_id=" . $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] . "
 						or
@@ -828,10 +834,7 @@ final class SearchNSRModel extends AbstractModel
 							" . ( $restrict_language ? "and _a.language_id=".$language_id : "" ) . "
 						)
 					)
-
-			order by name
-			" . ( !is_null($limit) ? "limit ".$limit : "" )
-		;
+		*/
 
 		return $this->freeQuery( $query );
 	}
