@@ -96,6 +96,12 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 		$this->smarty->assign( 'taxon_base_url_images_thumb_s',$this->_taxon_base_url_images_thumb_s );
 
+		$this->_show_presence_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_presence_in_results','module'=>'utilities','subst'=>1 ] )==1;
+		$this->_show_all_preferred_names_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_all_preferred_names_in_results','module'=>'utilities','subst'=>1 ] )==1;
+		
+		$this->smarty->assign( 'show_presence_in_results',$this->_show_presence_in_results );
+		$this->smarty->assign( 'show_all_preferred_names_in_results',$this->_show_all_preferred_names_in_results );
+
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
 			'fieldAsIndex'=>'page_id'
@@ -120,9 +126,7 @@ class SearchControllerNSR extends SearchController
 		
 
 		$this->models->SearchNSRModel->setNameTypeIds($this->_nameTypeIds);
-		
-		
-	
+
     }
 
     public function searchAction()
@@ -368,15 +372,28 @@ class SearchControllerNSR extends SearchController
 			"search"=>$search,
 			"nsr_id_prefix"=>$this->conceptIdPrefix,
 			"language_id"=>$this->getCurrentLanguageId(),
-			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 			"project_id"=>$this->getCurrentProjectId(),
 			"sort"=>$sort,
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
-
+		
 		$data=$d['data'];
 		$count=$d['count'];
+
+
+		if ( $this->_show_all_preferred_names_in_results )
+		{
+			foreach((array)$data as $key=>$val)
+			{
+				$data[$key]['common_names']=
+					$this->models->Names->_get( [ 'id' => [
+						'project_id'=>$this->getCurrentProjectId(),
+						'taxon_id'=>$val['taxon_id'],
+						'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']
+					], 'columns'=>'name' ] );
+			}
+		}
 
 		foreach((array)$data as $key=>$val)
 		{
@@ -453,8 +470,6 @@ class SearchControllerNSR extends SearchController
 			"nsr_id_prefix"=>$this->conceptIdPrefix,
 			"traits"=>$traits,
 			"trait_group"=>$trait_group,
-			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
-			"type_id_valid"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"ancestor_id"=>$ancestor['id'],
@@ -472,6 +487,15 @@ class SearchControllerNSR extends SearchController
 		{
 			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
+			if ( $this->_show_all_preferred_names_in_results )
+			{
+				$data[$key]['common_names']=
+					$this->models->Names->_get( [ 'id' => [
+						'project_id'=>$this->getCurrentProjectId(),
+						'taxon_id'=>$val['taxon_id'],
+						'type_id'=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']
+					], 'columns'=>'name' ] );
+			}
 		}
 
 		return

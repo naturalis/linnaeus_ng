@@ -119,12 +119,11 @@ final class SearchNSRModel extends AbstractModel
 		$search = isset($params['search']) ? $params['search'] : null;
 		$nsr_id_prefix = isset($params['nsr_id_prefix']) ? $params['nsr_id_prefix'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
-		$type_id_preferred = isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
 		$sort = isset($params['sort']) ? $params['sort'] : null;
 		$limit = isset($params['limit']) ? $params['limit'] : null;
 		$offset = isset($params['offset']) ? $params['offset'] : null;
 		
-		if ( is_null($project_id) ||  is_null($search) ||  is_null($language_id) ||  is_null($type_id_preferred) )
+		if ( is_null($project_id) ||  is_null($search) ||  is_null($language_id) )
 			return;
 						
 		$search=$this->escapeString($search);
@@ -266,7 +265,7 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
 				and _e.project_id=_k.project_id
-				and _k.type_id=".$type_id_preferred."
+				and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _k.language_id=".$language_id."
 
 			left join %PRE%nsr_ids _ids
@@ -323,8 +322,6 @@ final class SearchNSRModel extends AbstractModel
 		$nsr_id_prefix=isset($params['nsr_id_prefix']) ? $params['nsr_id_prefix'] : null;
 		$traits=isset($params['traits']) ? $params['traits'] : null;
 		$trait_group=isset($params['trait_group']) ? $params['trait_group'] : null;
-		$type_id_preferred=isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
-		$type_id_valid=isset($params['type_id_valid']) ? $params['type_id_valid'] : null;
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$ancestor_id=isset($params['ancestor_id']) ? $params['ancestor_id'] : null;
@@ -334,7 +331,7 @@ final class SearchNSRModel extends AbstractModel
 		$offset=isset($params['offset']) ? $params['offset'] : null;
 		$this->_operators=isset($params['operators']) ? $params['operators'] : null;
 
-		if ( is_null($project_id) ||  is_null($language_id) || is_null($type_id_preferred) || is_null($type_id_valid) )
+		if ( is_null($project_id) ||  is_null($language_id) )
 			return;
 
 		$trait_joins=$this->getTraitJoins( $traits );
@@ -370,14 +367,14 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%names _k
 				on _a.id=_k.taxon_id
 				and _a.project_id=_k.project_id
-				and _k.type_id=".$type_id_preferred."
+				and _k.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _k.language_id=".$language_id."
 
 			". (isset($auth) ? "
 				left join %PRE%names _m
 					on _a.id=_m.taxon_id
 					and _a.project_id=_m.project_id
-					and _m.type_id=".$type_id_valid."
+					and _m.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 					and _m.language_id=".LANGUAGE_ID_SCIENTIFIC : "" 
 				)."
 
@@ -585,7 +582,6 @@ final class SearchNSRModel extends AbstractModel
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$group_id = isset($params['group_id']) ? $params['group_id'] : null;
 		$name = isset($params['name']) ? $params['name'] : null;
-		$type_id_valid = isset($params['type_id_valid']) ? $params['type_id_valid'] : null;
 		$photographer = isset($params['photographer']) ? $params['photographer'] : null;
 		$validator = isset($params['validator']) ? $params['validator'] : null;
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
@@ -696,7 +692,7 @@ final class SearchNSRModel extends AbstractModel
 				"left join %PRE%names _j
 					on _m.taxon_id=_j.taxon_id
 					and _m.project_id=_j.project_id
-					and _j.type_id=".$type_id_valid."
+					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 					and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 				" : "" )."
 

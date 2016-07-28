@@ -11,6 +11,8 @@
 		species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
 		species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
 		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
+		search: show_presence_in_results (show the presence status in results)
+		search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
 
 	to do technical:
 	- create default settings-set as base data
