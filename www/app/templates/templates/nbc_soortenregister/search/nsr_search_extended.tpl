@@ -34,15 +34,21 @@
 					<div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 				</div>*}
 			</fieldset>
+            
+            <span id="all-panel-toggle" style="float:right;margin-top:3px;display:none;">
+            <div style="float:right;margin-top:3px;">
+                <a href="#" onclick="toggle_all_panels();return false;">{t}alles in-/uitklappen{/t}</a>&nbsp;&nbsp;
+                <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;{t}Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.{/t}&lt;/p&gt;');" class="link">{t}hulp bij zoeken{/t}</span>
+            </div>
+            </span>
 
-			<fieldset class="selectable-parameters">
+			<fieldset class="selectable-parameters" style="width:494px;margin-top:4px;">
+
+				{if $automatic_tabs['CTAB_PRESENCE_STATUS'].suppress!==true}
 
 				<div class="formrow">
-				<div style="float:right;margin-top:3px;">
-                
-                    <a href="#" onclick="toggle_all_panels();return false;">{t}alles in-/uitklappen{/t}</a>&nbsp;&nbsp;
-                    <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;{t}Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.{/t}&lt;/p&gt;');" class="link">{t}hulp bij zoeken{/t}</span>
-			    </div>
+
+	                <span class="panel-toggle-placeholder"></span>
     
                 	<label
                     	for="presenceStatusList" 
@@ -78,9 +84,17 @@
 					</p>
 				</div>
 
+				{/if}
+
+
+
 				{* if $automatic_tabs['CTAB_MEDIA'].suppress!==true *}
 
+
 				<div class="formrow">
+                
+                	<span class="panel-toggle-placeholder"></span>
+
                 	<label
                     	for="multimedia-options" 
                         panel="multimedia-options-panel"
@@ -134,6 +148,9 @@
 				{if $automatic_tabs['CTAB_DNA_BARCODES'].suppress!==true}
                         
 				<div class="formrow">
+
+	                <span class="panel-toggle-placeholder"></span>
+
                 	<label 
                     	for="dna-options"
                         panel="dna-options-panel"
@@ -162,6 +179,9 @@
 
 				{foreach $traits t k1}
 				<div class="formrow">
+                
+	                <span class="panel-toggle-placeholder"></span>
+    
 					<label
                         class="clickable" 
                         panel="traits{$k1}-options"
@@ -327,6 +347,8 @@
 <script>
 $(document).ready(function()
 {
+	$('.panel-toggle-placeholder').first().replaceWith($('#all-panel-toggle').html());
+	
 	{if $search}
 	{foreach $search.presence v k}
 	$("#presenceStatusList").val('presence[{$k}]');
