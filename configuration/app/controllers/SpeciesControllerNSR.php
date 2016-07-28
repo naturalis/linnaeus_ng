@@ -679,18 +679,18 @@ class SpeciesControllerNSR extends SpeciesController
 		// determine with which category to open
 		foreach((array)$taxon_categories as $key=>$val)
 		{
-			if ( is_null($start_category) )
+			if ( is_null($start_category) && ( !$val['always_hide'] && !$val['suppress'] ) )
 			{
 				$start_category=$val;
 				if ( is_null($start_category['start_order']) ) $start_category['start_order']=99;
 			}
 
-			if ( !is_null($cat) && $val['id']==$cat )
+			if ( !is_null($cat) && $val['id']==$cat  && ( !$val['always_hide'] && !$val['suppress'] ) )
 			{
 				$start_category=$val;
 			}
 			else
-			if ( is_null($cat) && !is_null($val['start_order']) && $val['start_order'] < $start_category['start_order'] )
+			if ( is_null($cat) && !is_null($val['start_order']) && $val['start_order'] < $start_category['start_order']  && ( !$val['always_hide'] && !$val['suppress'] ) )
 			{
 				$start_category=$val;
 			}
