@@ -603,7 +603,7 @@ class SearchControllerNSR extends SearchController
 		$d=$this->models->SearchNSRModel->doPictureSearch(array(
 			"language_id"=>$this->getCurrentLanguageId(),
 			"group_id"=>$group_id,
-			"name"=>$name,
+			"name"=>isset($name) ? $name : null,
 			"type_id_valid"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'],
 			"photographer"=>$photographer,
 			"validator"=>$validator,
