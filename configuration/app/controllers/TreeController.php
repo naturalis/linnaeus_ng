@@ -1,6 +1,7 @@
 <?php
 
 include_once ('SpeciesController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class TreeController extends Controller
 {
@@ -41,6 +42,9 @@ class TreeController extends Controller
 		
 		if ($d) $this->_idValidName=$d[0]['id'];
 
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->_tree_taxon_count_style = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_taxon_count_style','module'=>'species', 'subst'=>'species_established' ] );
+
 	}
 					
     public function __destruct()
@@ -79,6 +83,7 @@ class TreeController extends Controller
 			$this->smarty->assign('expand',(int)$this->rGetVal('expand'));
 		}
 
+		$this->smarty->assign('tree_taxon_count_style',$this->_tree_taxon_count_style);
 		$this->printPage('tree');
 	}
 	
@@ -109,9 +114,6 @@ class TreeController extends Controller
         $this->printPage('ajax_interface');
     }
 
-
-	var $max_rank_id=36;
-	
 	public function jsonTreeAction()
 	{
 		$node=$this->rHasVal('node') ? $this->rGetVal('node') : $this->getTreeTop();
@@ -141,7 +143,7 @@ class TreeController extends Controller
 
 		if (count((array)$p)>1)
 		{
-			$this->addError('Detected multiple high-order taxa without a parent. Unable to determine which is the top of the tree.');
+			$this->addError('Found multiple high-order taxa without a parent. Unable to determine which is the top of the taxonomic tree.');
 		}
 
 		return $p;
@@ -181,15 +183,21 @@ class TreeController extends Controller
 		{
 			if ($count=='taxon') 
 			{
-				$val['child_count']['taxon']=$this->models->TreeModel->getBranchTaxonCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"node"=>$val['id']
-				));
+				if ( $this->_tree_taxon_count_style=='species_only' || $this->_tree_taxon_count_style=='species_established')
+				{
+					$val['child_count']['taxon']=$this->models->TreeModel->getBranchTaxonCount(array(
+						"project_id"=>$this->getCurrentProjectId(),
+						"node"=>$val['id']
+					));
+				}
+				else
+				{
+					$val['child_count']['taxon']=null;
+				}
 			}
 			else
-			if ($count=='species') 
+			if ($count=='species' && $this->_tree_taxon_count_style!='none') 
 			{
-	
 				$d=$this->models->TreeModel->getBranchSpeciesCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"base_rank_id"=>$val['base_rank_id'],

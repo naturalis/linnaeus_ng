@@ -87,7 +87,7 @@ final class TreeModel extends AbstractModel
 				ifnull(_k.name,_l.commonname) as name,
 				_m.authorship,
 				_r.rank,
-				_q.label as rank_label,
+				ifnull(_q.label,_r.rank) as rank_label,
 				_p.rank_id as base_rank_id
 
 			from
