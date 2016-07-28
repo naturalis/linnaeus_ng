@@ -96,8 +96,6 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 		$this->smarty->assign( 'taxon_base_url_images_thumb_s',$this->_taxon_base_url_images_thumb_s );
 
-
-
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
 			'fieldAsIndex'=>'page_id'
@@ -119,6 +117,11 @@ class SearchControllerNSR extends SearchController
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
+		
+
+		$this->models->SearchNSRModel->setNameTypeIds($this->_nameTypeIds);
+		
+		
 	
     }
 
@@ -789,7 +792,6 @@ class SearchControllerNSR extends SearchController
 		return $this->models->SearchNSRModel->getSuggestionsName(array(
 			"search"=>$p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
-			"type_id_preferred"=>$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'],
 			"limit"=>$this->_suggestionListItemMax,
 			"language_id"=>$this->getCurrentLanguageId(),
 			"restrict_language"=>false

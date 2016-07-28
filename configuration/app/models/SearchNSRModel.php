@@ -5,6 +5,7 @@ final class SearchNSRModel extends AbstractModel
 {
 	
 	private $_operators;
+	private $_nameTypeIds;
 
     public function __construct ()
     {
@@ -27,6 +28,11 @@ final class SearchNSRModel extends AbstractModel
         }
         parent::__destruct();
     }
+	
+	public function setNameTypeIds( $p )
+	{
+		$this->_nameTypeIds=$p;
+	}
 
 	public function getPresenceStatuses( $params )
     {
@@ -252,7 +258,6 @@ final class SearchNSRModel extends AbstractModel
 				and _g.project_id=_h.project_id 
 				and _h.language_id=".$language_id."
 
-
 			left join
 				(select project_id,taxon_id,count(*) as number_of_barcodes from %PRE%dna_barcodes group by project_id,taxon_id) as _j
 				on _a.taxon_id=_j.taxon_id
@@ -271,16 +276,16 @@ final class SearchNSRModel extends AbstractModel
 
 			where _a.project_id =".$project_id."
 				and _a.name like '%".$search."%' 
-				and _b.nametype in (
-					'".PREDICATE_PREFERRED_NAME."',
-					'".PREDICATE_VALID_NAME."',
-					'".PREDICATE_ALTERNATIVE_NAME."',
-					'".PREDICATE_SYNONYM."',
-					'".PREDICATE_SYNONYM_SL."',
-					'".PREDICATE_HOMONYM."',
-					'".PREDICATE_BASIONYM."',
-					'".PREDICATE_MISSPELLED_NAME."',
-					'".PREDICATE_INVALID_NAME."'
+				and _a.type_id in (
+					" . $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_ALTERNATIVE_NAME]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_SYNONYM]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_SYNONYM_SL]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_HOMONYM]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_BASIONYM]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_MISSPELLED_NAME]['id'] . ",
+					" . $this->_nameTypeIds[PREDICATE_INVALID_NAME]['id'] . "
 				)
 				and ifnull(_trash.is_deleted,0)=0
 		
@@ -577,7 +582,6 @@ final class SearchNSRModel extends AbstractModel
 
 	public function doPictureSearch( $params )
     {
-
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$group_id = isset($params['group_id']) ? $params['group_id'] : null;
 		$name = isset($params['name']) ? $params['name'] : null;
@@ -746,7 +750,7 @@ final class SearchNSRModel extends AbstractModel
 		$taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
 		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
 		
-		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($match) || is_null($language_id) )
+		if ( is_null($search) || is_null($project_id) || is_null($match) || is_null($language_id) )
 			return;
 
 		$clause=null;
@@ -756,6 +760,9 @@ final class SearchNSRModel extends AbstractModel
 		else
 		if ($match=='exact')
 			$clause="_a.name = '".$this->escapeString($search)."'";
+		else
+		if ($match=='like')
+			$clause="_a.name like '%".$this->escapeString($search)."%'";
 		else
 		if ($match=='id')
 			$clause="_a.taxon_id = ".(int)$taxon_id;
@@ -769,7 +776,7 @@ final class SearchNSRModel extends AbstractModel
 				_b.nametype,
 				ifnull(_g.label,_r.default_label) as rank,
 				_k.name as dutch_name,
-				if (_b.nametype='".PREDICATE_VALID_NAME."',
+				if (_a.type_id=" . $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] . ",
 						concat(_a.name,if(_k.name is null,'',concat('  - ',_k.name)),' [',ifnull(_g.label,_r.default_label),']'),
 						concat(_a.name,'',' [',ifnull(_g.label,_r.default_label),']')
 					)  as label
@@ -804,13 +811,7 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%names _k
 				on _e.id=_k.taxon_id
 				and _e.project_id=_k.project_id
-				and _k.type_id=
-					(
-						select id 
-						from %PRE%name_types 
-						where project_id = ".$project_id." 
-						and nametype='".PREDICATE_PREFERRED_NAME."'
-					)
+				and _k.type_id=" . $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] ." 
 				and _k.language_id=_a.language_id
 
 			where 
@@ -820,15 +821,16 @@ final class SearchNSRModel extends AbstractModel
 				and 
 				".$clause."
 				and (
-					_b.nametype='".PREDICATE_VALID_NAME."'
-					or
+						_a.type_id=" . $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] . "
+						or
 						(
-							_b.nametype='".PREDICATE_PREFERRED_NAME."'
+							_a.type_id=" . $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] ."
 							" . ( $restrict_language ? "and _a.language_id=".$language_id : "" ) . "
 						)
 					)
+
 			order by name
-			limit ".$limit
+			" . ( !is_null($limit) ? "limit ".$limit : "" )
 		;
 
 		return $this->freeQuery( $query );
@@ -966,10 +968,9 @@ final class SearchNSRModel extends AbstractModel
 		$limit = isset($params['limit']) ? $params['limit'] : null;
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
-		$type_id_preferred = isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
 		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
 		
-		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) || is_null($type_id_preferred) )
+		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) )
 			return;
 
 		$query="
@@ -996,7 +997,7 @@ final class SearchNSRModel extends AbstractModel
 			left join %PRE%names _c
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
-				and _c.type_id=".$type_id_preferred."
+				and _c.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
 				and _c.language_id=_a.language_id
 			
 			left join %PRE%projects_ranks _f
@@ -1016,9 +1017,7 @@ final class SearchNSRModel extends AbstractModel
 				" . ( $restrict_language ? "and (_a.language_id=".$language_id." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")" : "" ) . "
 				and ifnull(label,'') != ''
 
-			order by
-				label
-
+			order by label
 			" . ( !is_null($limit) ? "limit ".$limit : "" )
 		;
 

@@ -1,4 +1,4 @@
-var dataid=null;
+dataid=null;
 var nameownerid=null;
 var taxonrank=null;
 var inheritablename=null;
@@ -77,7 +77,7 @@ function storedata(ele)
 function checkMandatory()
 {
 	var result=true;
-	var buffer='Vul alle verplichte velden in:';
+	var buffer=_('Vul alle verplichte velden in:');
 
 	for (i in values)
 	{
@@ -93,9 +93,9 @@ function checkMandatory()
 			)
 		{
 			if (val.label)
-				buffer=buffer+"\n"+val.label;
+				buffer=buffer+"\n"+_(val.label);
 			else
-				buffer=buffer+"\n"+val.name;
+				buffer=buffer+"\n"+_(val.name);
 			result=false;
 		}
 	}
