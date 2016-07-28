@@ -214,11 +214,11 @@ final class TreeModel extends AbstractModel
 			where
 				_sq.project_id=".$project_id."
 				and ifnull(_trash.is_deleted,0)=0
-				and _sp.presence_id is not null
 				and _f.rank_id".($base_rank_id>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
 				and MATCH(_sq.parentage) AGAINST ('".$node."' in boolean mode)
 				
-			group by _sr.established
+			group by
+				_sr.established
 			";
 			
 		return $this->freeQuery( array( "query"=>$query, "fieldAsIndex"=>"established") );
