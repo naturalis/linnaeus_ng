@@ -249,11 +249,12 @@ class SpeciesModel extends AbstractModel
 			where
 				_sq.project_id=".$projectId."
 				and MATCH(_sq.parentage) AGAINST ('".$taxonId."' in boolean mode)
-				and _sp.presence_id is not null
+				/* and _sp.presence_id is not null */
 				and _f.rank_id".($rankId >= $speciesRankId ? ">=" : "=")." ".$speciesRankId."
 				and ifnull(_trash.is_deleted,0)=0
 
-			group by _sr.established";
+			group by
+				_sr.established";
 
 		return $this->freeQuery(array(
 			'query' => $query,
