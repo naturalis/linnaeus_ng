@@ -1188,6 +1188,7 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$built_page=$this->buildPageFromBlocks( [
 						'tab_id'=>$category['id'],
+						'taxon_id' => $taxon,
 						'page_blocks'=>$category['page_blocks'],
 						'content'=> $isPublished ? $content : null ]
 					 );
@@ -1461,16 +1462,20 @@ class SpeciesControllerNSR extends SpeciesController
 		$page_blocks=isset($p['page_blocks']) ? json_decode($p['page_blocks']) : null;
 		$content=isset($p['content']) ? $p['content'] : null;
 		$tab_id=isset($p['tab_id']) ? $p['tab_id'] : null;
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
 
 		if ( is_null($tab_id) ) return;
 
+		/*
 		$this->helpers->CurrentUrl->setRemoveQuery( true ) ;
 		$this->helpers->CurrentUrl->setRemoveFragment( true ) ;
+
 		$url=
 			$this->helpers->CurrentUrl->getUrl() .
 			"?epi=" . $this->getCurrentProjectId() .
 			"&id=" . $this->getTaxonId().
 			"&cat=%s&headless=1&force_empty=1";
+		*/
 
 		$buffer=[];
 
@@ -1485,17 +1490,69 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($val!=$tab_id)
 				{
 					//echo sprintf( $url, $val ),"<br />";
-					$buffer[]=file_get_contents( sprintf( $url, $val ) );
+					//$buffer[]=file_get_contents( sprintf( $url, $val ) );
+					$thistab=null;
+					foreach((array)$this->cTabs as $tabname=>$tabval)
+					{
+						if ($tabval['id']==$val)
+						{
+							$thistab=$tabname;
+							break;
+						}
+					}
+					
+					if(!is_null($thistab))
+					{
+						$content=null;
+
+						switch ($thistab)
+						{
+							case 'CTAB_NAMES':
+								$content=$this->getNames( ['id' => $taxon_id ] );
+								break;
+							case 'CTAB_MEDIA':
+								$content = $this->getTaxonMedia(array(
+									'taxon'=>$taxon_id,
+									'inclOverviewImage'=>$this->_inclOverviewImage
+								));
+								break;
+							case 'CTAB_CLASSIFICATION':
+								$content=
+									array(
+										'classification'=>$this->getTaxonClassification($taxon_id),
+										'taxonlist'=>$this->getTaxonNextLevel($taxon_id)
+									);
+								break;
+							case 'CTAB_TAXON_LIST':
+								$content=$this->getTaxonNextLevel($taxon_id);
+								break;
+							case 'CTAB_LITERATURE':
+								$content['literature']=$this->getTaxonLiterature($taxon_id);
+								if ( $this->_show_inherited_literature )
+									$content['inherited_literature']=$this->getInheritedTaxonLiterature($taxon_id);
+								break;
+							case 'CTAB_DNA_BARCODES':
+								$content=$this->getDNABarcodes( $taxon_id );
+								break;
+							case 'CTAB_DICH_KEY_LINKS':
+								$content=$this->getTaxonKeyLinks( $taxon_id );
+								break;
+							case 'CTAB_PRESENCE_STATUS':
+								$content=$this->getPresenceData( $taxon_id );
+								break;
+						}
+						
+						// NOW ACTUALLY RENDER THOSE PAGES!
+						
+						//if (!is_null($content)) $buffer[]=$content;
+					}
+					
 				}
 			}
 		}
 
 		return implode("\n",$buffer);
 	}
-
-
-
-
 
     private function getNSRId($p)
     {

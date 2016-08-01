@@ -48,7 +48,8 @@
                         <td style="padding-left:10px;">
                             <ul class="pick-list">
                             {foreach $tabs v k}
-                            {if $v.type=='auto' || ($v.external_reference_decoded && $v.external_reference_decoded->link_embed|@substr:0:8=='template')}
+                            {* if $v.type=='auto' || ($v.external_reference_decoded && $v.external_reference_decoded->link_embed|@substr:0:8=='template') *}
+                            {if $v.type=='auto'}
                             <li><span class="left-arrow" title="{t}add{/t}" onclick="addBlock( { id: {$v.id}, label: '{$v.page}' } );">&larr;</span>
                             {if $v.type=='auto'}<span class="auto-tab">{$v.page}</span>{else}{$v.page}{/if}
                             </li>
@@ -59,9 +60,9 @@
                     </tr>
 				</table>
                 <div class="explanation">
-					{t}Only automatic tabs and tabs with an external reference that have stand-alone template.{/t}
+				Only automatic tabs are allowed.
                 </div>
-
+                
 			</td>
 		</tr>
 
@@ -251,7 +252,7 @@
 
 <div class="inline-templates" id="list_item">
 <!--
-	<li class="page-blocks sortable" data-key="%KEY%" data-id="%ID%"><span class="move">&blk14;</span> %LABEL%%DEL-ICON%</li>
+	<li class="page-blocks %CLASS% sortable" data-key="%KEY%" data-id="%ID%"><span class="move">&blk14;</span> %LABEL%%DEL-ICON%</li>
 -->
 </div>
 <div class="inline-templates" id="del_icon">
@@ -276,6 +277,8 @@ function addBlock( block )
 	var tpl_del=fetchTemplate( 'del_icon' );
 	var buffer=Array();
 
+
+
 	$( '#block_list' ).append(
 		tpl
 			.replace(/%LABEL%/g,block.label)
@@ -284,6 +287,8 @@ function addBlock( block )
 			.replace('%DEL-ICON%',
 				block.can_delete!==false ?
 					tpl_del.replace('%KEY%',block_counter) : "" )
+			.replace('%CLASS%',
+				block.can_delete!==false ? 'auto-tab' : "" )
 	);
 
 	block_counter++;
