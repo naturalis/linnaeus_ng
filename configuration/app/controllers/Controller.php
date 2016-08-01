@@ -1222,7 +1222,7 @@ class Controller extends BaseClass
 		{
             $result = $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
-
+		
         // If we end up here something must be wrong, just return name sans formatting
         if ( is_null($result) )
 		{
@@ -2662,7 +2662,21 @@ class Controller extends BaseClass
 			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
 			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-			return $this->addHybridMarker( $p );
+			$result=$this->addHybridMarker( $p );
+
+			if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID || $base_rank_id==NOTHOVARIETAS_RANK_ID )
+			{
+				$r=$this->models->Ranks->_get( [ "id" => [ "id" =>$base_rank_id ], "columns" => "abbreviation" ] );
+				$abbr=$r ? " ".$r[0]["abbreviation"] : "";
+				$boom=explode(" ",$result);
+				if ( isset($boom[2]) )
+				{
+					$boom[2].=$abbr;
+					$result=implode(" ",$boom);
+				}
+			}
+
+			return $result;
 		}
 		else
 		if ( $base_rank_id==VARIETAS_RANK_ID  )
