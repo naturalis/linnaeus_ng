@@ -306,8 +306,8 @@
 
 				{if $show_all_preferred_names_in_results}
 					{foreach $v.common_names n nk}
-                    {if $nk>0}<br />{/if}
                     {$n.name}
+                    {if $nk<$v.common_names|@count}<br />{/if}
 					{/foreach}
                 {else}
 					{if $v.common_name}{$v.common_name}<br />{/if}
@@ -328,8 +328,8 @@
         {capture A}{t}soort{/t}{/capture}
         {capture B}{t}soorten{/t}{/capture}
         {else}
-        {capture A}{t}soort (of onderliggend taxon){/t}{/capture}
-        {capture B}{t}soorten (en onderliggende taxa){/t}{/capture}
+        {capture A}{t}soort (of lager taxon){/t}{/capture}
+        {capture B}{t}soorten (en lagere taxa){/t}{/capture}
         {/if}
 
 		{assign var=pgnEntityNames value=[$smarty.capture.A,$smarty.capture.B]}
