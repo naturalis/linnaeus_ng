@@ -1379,7 +1379,7 @@ class SpeciesModel extends AbstractModel
 				_a.pages,
 				_a.volume,
 				_a.external_link,
-				ifnull(_b.name,_a.author) as author_name
+				ifnull(_b.name,_a.author) as author
 
 			from %PRE%literature2 _a
 
@@ -1406,7 +1406,39 @@ class SpeciesModel extends AbstractModel
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
 
-        return $this->freeQuery($query);
+
+		$literature=$this->freeQuery($query);
+
+		foreach((array)$literature as $key=>$val)
+		{
+
+			$query = "
+				select
+					_a.actor_id,
+					_b.name,
+					_b.name_alt,
+					_b.homepage,
+					_b.gender,
+					_b.is_company,
+					_b.employee_of_id
+	
+				from %PRE%literature2_authors _a
+	
+				left join %PRE%actors _b
+					on _a.actor_id = _b.id
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$project_id."
+					and _a.literature2_id =".$val['id']."
+	
+				order by
+					_a.sort_order,_b.name";
+				
+				$literature[$key]['authors']=$this->freeQuery($query);				
+		}
+
+        return $literature;
     }
 
     public function getTaxonKeyLinks( $params )
