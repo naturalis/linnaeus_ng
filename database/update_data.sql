@@ -17,6 +17,8 @@ INSERT INTO `ranks` VALUES (1,'regio',NULL,'Empire',NULL,NULL,0,0,NULL,'2010-10-
 (80,'nothosubspecies','botany, used for taxa of hybrid origin','Nothosubspecies',NULL,78,0,1,NULL,'2016-04-11 15:26:28','2016-04-11 13:26:28'),
 (82,'nothovarietas','botany, used for taxa of hybrid origin','Nothovarietas',NULL,79,0,1,NULL,'2016-04-11 15:26:28','2016-04-11 13:26:28');
 
+update ranks set abbreviation = 'nothosubsp.' where rank = 'nothosubspecies';
+update ranks set abbreviation = 'nothovar.' where rank = 'nothovarietas';
 
 
 /* Update modules */
