@@ -14,6 +14,7 @@
 		search: show_presence_in_results (show the presence status in results)
 		search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
 		species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
+		species: show_inherited_literature
 
 
 	to do technical:
