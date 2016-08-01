@@ -185,7 +185,7 @@ class NsrTaxonManagement extends NsrController
         }
 
 		$traits=$this->models->{$this->modelNameOverride}->getSubstitutableTraits(array('project_id'=>$this->getCurrentProjectId()));
-	
+
         $this->smarty->assign( 'page', $this->getCategory( $this->rGetId() ) );
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', $this->checkTypes );
