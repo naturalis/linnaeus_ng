@@ -1410,8 +1410,15 @@ class SpeciesControllerNSR extends SpeciesController
 				break;
 			case 'CTAB_LITERATURE':
 				$a=$this->getTaxonLiterature($taxon_id);
-				$b=$this->getInheritedTaxonLiterature($taxon_id);
-				return count((array)$a)+count((array)$b)<=0;
+				if ( $this->_show_inherited_literature )
+				{
+					$b=$this->getInheritedTaxonLiterature($taxon_id);
+					return count((array)$a)+count((array)$b)<=0;
+				}
+				else
+				{
+					return count((array)$a)<=0;
+				}
 				break;
 			case 'CTAB_DNA_BARCODES':
 				return count((array)$this->getDNABarcodes($taxon_id))<=0;
