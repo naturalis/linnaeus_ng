@@ -228,10 +228,9 @@ class NsrTreeController extends NsrController
 					$val['taxon']=$this->formatTaxon(array_merge($val, [ 'ranks'=>$ranks ]));
 				}
 			}
-
-//			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
+			
+			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
-
 
 			//unset($val['parent_id']);
 			unset($val['is_hybrid']);
