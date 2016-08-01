@@ -759,7 +759,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$preferredname=$val['name'];
 			}
 
-			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
+			if ($val['nametype']==PREDICATE_VALID_NAME && $val['language_id']==LANGUAGE_ID_SCIENTIFIC)
 			{
 				$nomen=trim($val['uninomial']).' '.trim($val['specific_epithet']).' '.trim($val['infra_specific_epithet']);
 
