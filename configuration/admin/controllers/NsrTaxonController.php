@@ -516,6 +516,18 @@ class NsrTaxonController extends NsrController
 		$this->printPage();
 	}
 
+    public function taxonOrphansAction()
+    {
+		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Orphaned taxa'));
+
+		$this->smarty->assign('concepts',$this->getOrphanedSpeciesList());
+		$this->smarty->assign('treetop',$this->treeGetTop());
+		$this->printPage();
+	}
+
+
+
     public function ajaxInterfaceAction()
     {
         if (!$this->rHasVal('action'))
@@ -798,6 +810,19 @@ class NsrTaxonController extends NsrController
 		{
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
+		return $taxa;
+	}
+
+	private function getOrphanedSpeciesList()
+	{
+		$taxa=$this->models->NsrTaxonModel->getOrphanedSpeciesList(array(
+			"project_id"=>$this->getCurrentProjectId()
+		));
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+		
 		return $taxa;
 	}
 
