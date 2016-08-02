@@ -2972,7 +2972,8 @@ class Controller extends BaseClass
 
 			if (!$proceed)
 			{
-				header('WWW-Authenticate: Basic realm="' . $_SESSION['app']['project']['title'] . '"');
+				//header('WWW-Authenticate: Basic realm="' . $_SESSION['app']['project']['title'] . '"');
+				header('WWW-Authenticate: Basic realm="Linnaeus NG"');
 				header('HTTP/1.0 401 Unauthorized');
 				die();
 			}
