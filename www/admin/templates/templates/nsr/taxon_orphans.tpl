@@ -4,6 +4,8 @@
 
 <h2>{t}Orphaned taxa{/t} <span style="font-size:12px;font-style:normal">({$concepts|@count})</span></h2>
 
+{t}Below are the taxa in your project that have no parent.{/t}
+
 <p>
 	<ul>
     {foreach from=$concepts item=v key=k}
