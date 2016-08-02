@@ -449,6 +449,44 @@ final class NsrTaxonModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
+	public function getOrphanedSpeciesList( $params )
+	{
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+
+		if( is_null( $project_id ) ) return;
+		
+		$query="
+			select
+				_a.id,
+				_a.taxon,
+				_q.rank,
+				_q.id as base_rank_id,
+				ifnull(_trash.is_deleted,0) as is_deleted
+							
+			from %PRE%taxa _a
+			
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
+
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%ranks _q
+				on _f.rank_id=_q.id
+
+			where _a.project_id =".$project_id."
+				and _a.parent_id is null
+
+			order by
+				ifnull(_trash.is_deleted,0) asc, _a.taxon
+		";
+
+		return $this->freeQuery( $query );
+	}
+
 	public function getSpeciesList( $params )
 	{
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
