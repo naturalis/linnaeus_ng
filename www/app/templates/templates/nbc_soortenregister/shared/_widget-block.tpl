@@ -4,7 +4,7 @@
 			<div class="boxes-box-content">
 				<p>
 					<a href="/content/fotosysteem-wordt-vernieuwd">
-						<img src="/sites/all/modules/nlsoort_aside_contribute/banner.jpg">
+						<img src="http://www.nederlandsesoorten.nl/sites/all/modules/nlsoort_aside_contribute/banner.jpg">
 					</a>
 				</p>
 			</div>
@@ -18,7 +18,7 @@
 			<div class="boxes-box">
 				<div class="boxes-box-content">
 	                <a href="http://www.naturalis.nl">
-					<p id="right-column-widget-logo" style="width:190px;height:218px;background:url(/sites/all/modules/nlsoort_aside_naturalis/banner.jpg)"></p>
+					<p id="right-column-widget-logo" style="width:190px;height:218px;background:url(http://www.nederlandsesoorten.nl/sites/all/modules/nlsoort_aside_naturalis/banner.jpg)"></p>
                     </a>
 				</div>
 			</div>
