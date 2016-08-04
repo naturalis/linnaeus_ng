@@ -9,7 +9,7 @@
 		getCurrentUserId()
 		getCurrentProjectId()
 		getControllerBaseName()
-	and an arbitrary Table-model for queries (the UserRighrs-class cannot
+	and an arbitrary Table-model for queries (the UserRights-class cannot
 	extend Controller class, as it needs to be instantiated in Controller
 	itself. therefore, in order to allow it to perform database queries,
 	some instantiated Table-model is required; hence setModel()).
