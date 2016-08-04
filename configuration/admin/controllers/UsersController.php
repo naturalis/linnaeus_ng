@@ -101,8 +101,6 @@ class UsersController extends Controller
 		$this->setUserId( $this->rGetId() );
 		$this->setUser();
 		$this->smarty->assign('user',$this->getUser());
-		$this->smarty->assign('can_edit',
-            $this->getUser()['project_role']['role_id'] > $this->UserRights->getUserRoleId());
 		$this->printPage();
     }
 
