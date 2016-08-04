@@ -27,6 +27,47 @@ class TraitsModel extends AbstractModel
         parent::__destruct();
     }
 
+	public function getTraitgroup( $params )
+	{
+		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+		$group_id=isset($params['group_id']) ? $params['group_id'] : null;
+		
+		if ( is_null($project_id) || is_null($language_id)  || is_null($group_id) )
+			return;
+
+		$query="
+			select
+				_a.id,
+				_a.sysname,
+				_b.translation as name,
+				_c.translation as description
+
+			from
+				%PRE%traits_groups _a
+				
+			left join 
+				%PRE%text_translations _b
+				on _a.project_id=_b.project_id
+				and _a.name_tid=_b.text_id
+				and _b.language_id=" . $language_id . "
+
+			left join 
+				%PRE%text_translations _c
+				on _a.project_id=_c.project_id
+				and _a.description_tid=_c.text_id
+				and _c.language_id=" . $language_id . "
+
+			where
+				_a.project_id=" . $project_id . "
+				and _a.id=" . $group_id . "
+		";
+		
+		$r=$this->freeQuery($query);
+
+		return isset($r[0]) ? $r[0] : null;
+	}
+
     public function getTraitsTaxonValues( $params )
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
