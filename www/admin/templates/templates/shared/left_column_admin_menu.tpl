@@ -16,6 +16,7 @@
         <a href="image_meta_bulk.php">{t}image meta-data bulk upload{/t}</a><br />
         {/if}
         <a href="export_versatile.php">{t}multi-purpose export{/t}</a><br />
+        <a href="import_file.php">{t}taxon import{/t}</a><br />
     </p>
     <p>
         <a href="tabs.php">{t}passport categories ("tabs"){/t}</a><br />
