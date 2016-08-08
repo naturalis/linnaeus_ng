@@ -36,6 +36,11 @@ ul {
 	</li>
 {/foreach}
 </ul>
+
+<p>
+	be sure to <a href="update_parentage.php">{t}update the index table{/t}</a>
+</p>
+
 {else}
 
 no data
@@ -43,9 +48,7 @@ no data
 {/if}
 
 <p>
-
 	<a href="import_file_reset.php">{t}load a new file{/t}</a>
-
 </p>
 
 </div>
