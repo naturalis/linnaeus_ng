@@ -175,7 +175,7 @@ The contents of the file will be displayed so you can review them before they ar
 			<li>{$projectRanks[i].rank}</li>
 		{/section}
 		</ul>
-		{t}Taxa of ranks that do not appear in this list will not be loaded. Please use the name of the rank exactly as it appears in the list.{/t}
+		{t}Taxa of ranks that do not appear in this list will not be loaded. Please use the rank names exactly as they appear in the list.{/t}
 		{/if}
 	</li>
 	<li>
