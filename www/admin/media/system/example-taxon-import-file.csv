@@ -1,0 +1,63 @@
+Animalia	regnum
+Chordata	phylum	Animalia
+Mammalia	classis	Chordata
+Carnivora	ordo	Mammalia
+Caniformia	subordo	Carnivora
+Ursidae	familia	Caniformia
+Ailuropodinae	subfamilia	Ursidae
+Ailuropoda	genus	Ailuropodinae	pandas
+Ailuropoda melanoleuca	species	Ailuropoda	giant panda
+Ailuropoda melanoleuca melanoleuca	subspecies	Ailuropoda melanoleuca	giant panda
+Ailuropoda melanoleuca qinlingensis	subspecies	Ailuropoda melanoleuca	Qinling panda
+Tremarctinae	subfamilia	Ursidae
+Tremarctos	genus	Tremarctinae	spectacled bears
+Tremarctos ornatus	species	Tremarctos	spectacled bear
+Ursinae	subfamilia	Ursidae
+Melursus	genus	Ursinae
+Melursus ursinus	species	Melursus	sloth bear
+Melursus ursinus inornatus	subspecies	Melursus ursinus	Sri Lankan sloth bear
+Melursus ursinus ursinus	subspecies	Melursus ursinus	Indian sloth bear
+Helarctos	genus	Ursinae
+Helarctos malayanus	species	Helarctos	sun bear
+Helarctos malayanus malayanus	subspecies	Helarctos malayanus
+Helarctos malayanus euryspilus	subspecies	Helarctos malayanus	Borneo sun bear
+Ursus	genus	Ursinae
+Ursus thibetanus	species	Ursus	Asian black bear
+Ursus thibetanus formosanus	subspecies	Ursus thibetanus	Formosan black bear
+Ursus thibetanus gedrosianus	subspecies	Ursus thibetanus
+Ursus thibetanus japonicus	subspecies	Ursus thibetanus	Japanese black bear
+Ursus thibetanus laniger	subspecies	Ursus thibetanus
+Ursus thibetanus mupinensis	subspecies	Ursus thibetanus
+Ursus thibetanus thibetanus	subspecies	Ursus thibetanus
+Ursus thibetanus ussuricus	subspecies	Ursus thibetanus	Manchurian black bear
+Ursus americanus	species	Ursus	American black bear
+Ursus americanus altifrontalis	subspecies	Ursus americanus	Olympic black bear
+Ursus americanus amblyceps	subspecies	Ursus americanus	New Mexico black bear
+Ursus americanus americanus	subspecies	Ursus americanus	eastern black bear
+Ursus americanus californiensis	subspecies	Ursus americanus	California black bear
+Ursus americanus carlottae	subspecies	Ursus americanus	Queen Charlotte black bear
+Ursus americanus cinnamomum	subspecies	Ursus americanus	cinnamon bear
+Ursus americanus emmonsii	subspecies	Ursus americanus	glacier bear
+Ursus americanus eremicus	subspecies	Ursus americanus	Mexican black bear
+Ursus americanus floridanus	subspecies	Ursus americanus	Florida black bear
+Ursus americanus hamiltoni	subspecies	Ursus americanus	Newfoundland black bear
+Ursus americanus kermodei	subspecies	Ursus americanus	spirit bear
+Ursus americanus luteolus	subspecies	Ursus americanus	Louisiana black bear
+Ursus americanus machetes	subspecies	Ursus americanus	West Mexico black bear
+Ursus americanus perniger	subspecies	Ursus americanus	Kenai black bear
+Ursus americanus pugnax	subspecies	Ursus americanus	Dall black bear
+Ursus americanus vancouveri	subspecies	Ursus americanus	Vancouver Island black bear
+Ursus arctos	species	Ursus	brown bear
+Ursus arctos arctos	subspecies	Ursus arctos	Eurasian brown bear
+Ursus arctos alascensis	subspecies	Ursus arctos
+Ursus arctos beringianus	subspecies	Ursus arctos	Kamchatka brown bear
+Ursus arctos gobiensis	subspecies	Ursus arctos	Gobi bear
+Ursus arctos horribilis	subspecies	Ursus arctos	grizzly bear
+Ursus arctos isabellinus	subspecies	Ursus arctos	Himalayan brown bear
+Ursus arctos lasiotus	subspecies	Ursus arctos	Ussuri brown bear
+Ursus arctos middendorffi	subspecies	Ursus arctos	Kodiak bear
+Ursus arctos piscator	subspecies	Ursus arctos	Bergman's bear
+Ursus arctos pruinosus	subspecies	Ursus arctos	Tibetan blue bear
+Ursus arctos sitkensis	subspecies	Ursus arctos
+Ursus arctos syriacus	subspecies	Ursus arctos	Syrian bear
+Ursus maritimus	species	Ursus	polar bear
