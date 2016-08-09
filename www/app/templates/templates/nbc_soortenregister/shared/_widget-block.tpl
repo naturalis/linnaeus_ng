@@ -25,3 +25,6 @@
 		</div>
 	</div>
 </div>
+
+
+{snippet}{"right-column-extra-logo.html"}{/snippet}
