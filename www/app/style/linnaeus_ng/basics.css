@@ -2602,9 +2602,7 @@ body {
 
 /* --- --- CATEGORIES (tabs) --- */
 #categories {
-	float: right;
-	width: 100%;
-	adding: 0; }
+  padding: 0; }
 
 /* --- --- SEARCH --- */
 #search-main,
