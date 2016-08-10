@@ -2,6 +2,8 @@
     {if $content.literature|@count > 0}
 	    {if $content.inherited_literature|@count > 0}
         <h3 id="name-header">{t}Literatuur{/t}</h3>
+        {else}
+        <br />
         {/if}
         <ul>
         {foreach $content.literature v k}
