@@ -66,20 +66,6 @@
 	are wrappers for accessing translate() from javascript - via the function _() in
 	main.js - and smarty - via the registered block function {t}{/t} - respectively.
 
-
-	on the icon grid:
-	order of modules in the icon grid and the main menu is determined by two fields:
-		ModuleProject.show_order
-		FreeModuleProject.show_order
-	or just the first one, if there are no free modules. THERE IS NO INTERFACE FOR
-	CHANGING THESE VALUES, so changes will have to be made by hand, directly in the
-	tables. when changing these values, bear in mind that your list of modules is
-	ordered after having been combined from the normal modules (ModuleProject) and
-	possible free modules (FreeModuleProject). this means that the values for
-	show_order have to be unique across two tables; again, these is at present no
-	mechanism that actually enforces this - it is up to the system administrator.
-
-
 	on snippets:
 	to allow for the inclusion of project-dependent bits of html into general templates,
 	there is the concept of the snippet. snippets are bit of html-code that are included
