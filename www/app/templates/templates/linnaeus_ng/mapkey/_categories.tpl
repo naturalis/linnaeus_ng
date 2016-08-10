@@ -1,4 +1,5 @@
 <div id="categories">
+<br />
 <ul>
 <li>
     <a class="category{if $currentPage=='l2_examine_species'}-active{/if} category-first" 
