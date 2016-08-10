@@ -252,14 +252,15 @@ final class NsrTaxonImagesModel extends AbstractModel
 				and ifnull(_trash.is_deleted,0)=0
 				and substr(nsr_id,-1 * length('" .$nsr_id ."'))='" . $nsr_id ."'
 		";
-/*
-	and (
-		nsr_id = '".$nsr_id."' or
-		nsr_id = 'concept/".$nsr_id."' or
-		nsr_id = 'tn.nlsr.concept/".$nsr_id."'
-	)
-*/
-			
+
+		/*
+			and (
+				nsr_id = '".$nsr_id."' or
+				nsr_id = 'concept/".$nsr_id."' or
+				nsr_id = 'tn.nlsr.concept/".$nsr_id."'
+			)
+		*/
+					
 		return $this->freeQuery( $query );
 	
 	}

@@ -645,7 +645,7 @@ class NsrTaxonImagesController extends NsrController
 
 	private function getTaxonByNsrId( $id )
 	{
-		$id=str_pad( $id, 12, '0',STR_PAD_LEFT);
+		//$id=str_pad( $id, 12, '0',STR_PAD_LEFT);
 
 		$taxa=$this->models->NsrTaxonImagesModel->getTaxonByNsrId(array(
 			"project_id"=>$this->getCurrentProjectId(),
