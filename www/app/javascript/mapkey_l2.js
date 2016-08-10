@@ -291,8 +291,8 @@ function l2DiversityTypeClick() {
 			'm' : $('#mapId').val(),
 			'types' : types
 		}),
-		success : function (data) {
-			//alert(data);
+		success : function (data)
+		{
 			var tmp = $.parseJSON(data);
 			if (tmp.index) l2DiversityGiantOilSpill(tmp.index);
 			if (tmp.legend) l2DiversityUpdateLegend(tmp.legend);
