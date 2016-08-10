@@ -32,23 +32,23 @@
 					<input type="hidden" id="name_id" name="name_id" value="{$search.name_id}">
 					<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
 			
-					<fieldset class="block">
-						<div class="formrow">
+					<fieldset id="photo-search-fieldset" class="block">
+						<div id="species-name" class="formrow">
 							<label accesskey="g" for="name">{t}Soortnaam{/t}</label>
 							<input type="text" class="field" value="{$search.name}" id="name" name="name" autocomplete="off">
 							<div id="name_suggestion" match="start" class="auto_complete" style="display: none;"></div>
 						</div>
-						<div class="formrow">
+						<div id="group" class="formrow">
 							<label accesskey="g" for="group">{t}Soortgroep{/t}</label>
 							<input type="text" size="60" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
 							<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
 						</div>
-						<div class="formrow">
+						<div id="photogapher" class="formrow">
 							<label accesskey="g" for="photographer">{t}Fotograaf{/t}</label>
 							<input type="text" size="60" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">
 							<div id="photographer_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 						</div>
-						<div class="formrow">
+						<div id="validator" class="formrow">
 							<label accesskey="g" for="validator">{t}Validator{/t}</label>
 							<input type="text" size="60" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
 							<div id="validator_suggestion" match="like" class="auto_complete" style="display: none;"></div>
