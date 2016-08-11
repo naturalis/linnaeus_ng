@@ -98,11 +98,9 @@ class SearchControllerNSR extends SearchController
 
 		$this->_show_presence_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_presence_in_results','module'=>'utilities','subst'=>1 ] )==1;
 		$this->_show_all_preferred_names_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_all_preferred_names_in_results','module'=>'utilities','subst'=>1 ] )==1;
-		$this->_show_relevance_sort_option = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_relevance_sort_option','module'=>'utilities','subst'=>1 ] )==1;
 		
 		$this->smarty->assign( 'show_presence_in_results',$this->_show_presence_in_results );
 		$this->smarty->assign( 'show_all_preferred_names_in_results',$this->_show_all_preferred_names_in_results );
-		$this->smarty->assign( 'show_relevance_sort_option',$this->_show_relevance_sort_option );
 
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
