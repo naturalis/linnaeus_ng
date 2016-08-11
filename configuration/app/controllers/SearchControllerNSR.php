@@ -131,6 +131,9 @@ class SearchControllerNSR extends SearchController
 
     public function searchAction()
     {
+		
+		$search=null;
+		
 		if ($this->rHasVal('search'))
 		{
 			$search=$this->rGetAll();
