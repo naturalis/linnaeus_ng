@@ -12,7 +12,7 @@
 	</div>
 </div>
 
-<div class="block block-boxes block-boxes-simple" style="margin-top:10px">
+<div id="naturalis-logo-container" class="block block-boxes block-boxes-simple" style="margin-top:10px">
 	<div class="block block-boxes block-boxes-simple" style="margin-top:10px">
 		<div class="content widget-logo">
 			<div class="boxes-box">
