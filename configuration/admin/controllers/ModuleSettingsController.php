@@ -13,6 +13,7 @@
 		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
 		search: show_presence_in_results (show the presence status in results)
 		search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
+		search: show_relevance_sort_option (show 'relevance' as a sort option in the regular search screen)
 		species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
 		species: show_inherited_literature
 

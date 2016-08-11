@@ -21,7 +21,7 @@
 			<p>
 				<label for="" accesskey="g">{t}Resultaten sorteren op:{/t}</label>
 				<select name="sort" onchange="sortResults(this);">
-					<option value="sort_relevance"selected="selected">{t}Relevantie{/t}</option>
+					{if $show_relevance_sort_option}<option value="sort_relevance"selected="selected">{t}Relevantie{/t}</option>{/if}
 					<option value="sort_name">{t}Wetenschappelijke naam{/t}</option>
 					<option value="sort_common">{t}Nederlandse naam{/t}</option>
 				</select>
