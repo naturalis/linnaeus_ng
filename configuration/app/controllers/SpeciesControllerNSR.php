@@ -863,11 +863,11 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonOverviewImageNsr( $id )
 	{
-		$d=$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1,'overview'=>true));
+		$d=$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc,_meta1.meta_date desc','limit'=>1,'overview'=>true));
 
 		if ( empty($d['data']) )
 		{
-			$d=(array)$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
+			$d=(array)$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc,_meta1.meta_date desc','limit'=>1));
 		}
 
 		return !empty($d['data']) ? array_shift($d['data']) : null;
@@ -884,7 +884,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc';
+		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc,_meta1.meta_date desc';
 
 		list($data, $total) = $this->models->{$this->_model}->getTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),

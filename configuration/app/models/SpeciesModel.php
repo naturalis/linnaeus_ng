@@ -1080,6 +1080,11 @@ class SpeciesModel extends AbstractModel
 						and _m.project_id=_meta4.project_id
 						and _meta4.sys_label='beeldbankDatumAanmaak'
 
+					left join %PRE%media_meta _meta1
+						on _m.id=_meta1.media_id
+						and _m.project_id=_meta1.project_id
+						and _meta1.sys_label='beeldbankDatumVervaardiging'
+
 					left join %PRE%media_meta _meta9
 						on _m.id=_meta9.media_id
 						and _m.project_id=_meta9.project_id
@@ -1090,7 +1095,7 @@ class SpeciesModel extends AbstractModel
 						and ifnull(_meta9.meta_data,0)!=1
 						and _m.project_id=".$projectId."
 					order by
-						_m.overview_image desc,_meta4.meta_date desc
+						_m.overview_image desc,_meta4.meta_date desc,_meta1.meta_date desc
 					limit 1
 				)
 
