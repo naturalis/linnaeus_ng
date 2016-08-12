@@ -6,6 +6,7 @@ var highlightNodes=Array();
 var topLevelLabel=_('Taxonomische boom');
 var taxonCountStyle='species_established'; // species_established,species_only,none
 var includeSpeciesStats=true;
+var inititalExpansionLevel=null;
 
 function setTopLevelLabel(label)
 {
@@ -27,10 +28,11 @@ function getTaxonCountStyle()
 	return taxonCountStyle;
 }
 
+
 function buildtree(node)
 {
 	activeNode=node;
-
+	
 	$.ajax({
 		url : url,
 		type: "POST",
@@ -43,11 +45,25 @@ function buildtree(node)
 		success : function (data)
 		{
 			var data=$.parseJSON(data);
+			
+			if ( inititalExpansionLevel!=null && data.node.parentage && data.node.parentage.length < inititalExpansionLevel )
+			{
+				for(var i=0;i<data.progeny.length;i++)
+				{
+					autoExpandArray.push(data.progeny[i].id)
+				}
+			}
+			
 			growbranches(data);
 			storetree();
 			checkAutoExpand();
 		}
 	});
+}
+
+function setInitialExpansionLevel( n )
+{
+	inititalExpansionLevel=n;
 }
 
 function formatTaxonCount(total,established,print_labels)
@@ -200,7 +216,6 @@ function checkAutoExpand()
 	if (node)
 	{
 		buildtree(node);
-		
 	}
 }
 
