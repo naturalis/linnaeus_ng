@@ -505,3 +505,13 @@ tr[type=drag-row] {
 	color:#666;
 	margin-top:30px;
 }
+
+#countdown-container {
+	margin-top:10px;
+	font-size:1.4em;
+	font-weight:bold;
+}
+#countdown-container #countdown {
+	display:block;
+	color:red;
+}
