@@ -129,7 +129,10 @@ class VersatileExportController extends Controller
 		if ( method_exists( $this->customConfig , 'getVersatileExportSpoof' ) ) 
 		{
 			$this->spoof_settings=$this->customConfig->getVersatileExportSpoof();
-			$this->smarty->assign( 'spoof_settings_warning', $this->spoof_settings->texts->warning );
+			if ( $this->spoof_settings->do_spoof_export )
+			{
+				$this->smarty->assign( 'spoof_settings_warning', $this->spoof_settings->texts->warning );
+			}
 		}
 		
     }
