@@ -78,7 +78,7 @@ class VersatileExportController extends Controller
 	*/
 	private $synonymStrategyThrehold=2000;
 
-	private $csv_file_name="nsr-export--%s.csv";
+	private $csv_file_name="%s-export--%s.csv";
 
 	private $EOFMarker='(end of file)';
 
@@ -609,7 +609,7 @@ class VersatileExportController extends Controller
 	private function printHeaders()
 	{
 		header('Content-Type: application/csv');
-		header('Content-Disposition: attachment; filename='.sprintf($this->csv_file_name,date('Ymd-His')));
+		header('Content-Disposition: attachment; filename='.sprintf($this->csv_file_name,$this->getProjectTitle( true ),date('Ymd-His')));
 		header('Pragma: no-cache');
 	}
 

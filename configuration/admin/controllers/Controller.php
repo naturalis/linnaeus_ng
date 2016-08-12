@@ -1512,6 +1512,12 @@ class Controller extends BaseClass
         return isset($_SESSION['admin']['project']['default_language_id']) ? $_SESSION['admin']['project']['default_language_id'] : null;
     }
 
+    public function getProjectTitle( $filesystem_safe=false )
+    {
+        $title=isset($_SESSION['admin']['project']['title']) ? $_SESSION['admin']['project']['title'] : null;
+		return $filesystem_safe ? preg_replace( [ "/[^A-Za-z0-9 ]/" , "/\s/"] , ['','_'] , $title) : $title;
+    }
+
     public function rHasVar($var)
     {
 
