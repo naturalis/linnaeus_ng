@@ -67,7 +67,7 @@ class VersatileExportController extends Controller
 	private $orderBy="_f.rank_id asc,_r.id, _t.taxon";  // rank, rank id, taxon
 	private $limit=9999999;
 	private $show_nsr_specific_stuff;
-
+	private $spoof_settings;
 
 	/*
 		when the number of names is larger than synonymStrategyThrehold, the
@@ -125,6 +125,13 @@ class VersatileExportController extends Controller
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->concept_url=$this->moduleSettings->getGeneralSetting( 'concept_base_url' );
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+
+		if ( method_exists( $this->customConfig , 'getVersatileExportSpoof' ) ) 
+		{
+			$this->spoof_settings=$this->customConfig->getVersatileExportSpoof();
+			$this->smarty->assign( 'spoof_settings_warning', $this->spoof_settings->texts->warning );
+		}
+		
     }
 
     public function exportAction()
@@ -540,6 +547,7 @@ class VersatileExportController extends Controller
 
 	private function doOutput()
 	{
+		
 		if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
 		if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
 
@@ -549,10 +557,17 @@ class VersatileExportController extends Controller
 			echo "<pre>",$this->getNewLine();
 		}
 
-		$this->doQueryParametersOutput();
-		$this->doNamesOutput();
-		$this->doSynonymsOutput();
-		$this->doEOFMarkerOutput();
+		if ( isset($this->spoof_settings->do_spoof_export) && $this->spoof_settings->do_spoof_export )
+		{
+			echo $this->spoof_settings->texts->download_body;
+		}
+		else
+		{
+			$this->doQueryParametersOutput();
+			$this->doNamesOutput();
+			$this->doSynonymsOutput();
+			$this->doEOFMarkerOutput();
+		}
 
 		if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
 
