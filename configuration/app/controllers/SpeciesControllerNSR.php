@@ -1408,6 +1408,9 @@ class SpeciesControllerNSR extends SpeciesController
 			case 'CTAB_TAXON_LIST':
 				return count((array)$this->getTaxonNextLevel($taxon_id))<=0;
 				break;
+			case 'CTAB_PRESENCE_STATUS':
+				return is_null( $this->getPresenceData( $taxon_id ) );
+				break;
 			case 'CTAB_LITERATURE':
 				$a=$this->getTaxonLiterature($taxon_id);
 				if ( $this->_show_inherited_literature )
