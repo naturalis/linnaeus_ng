@@ -44,6 +44,7 @@ $(document).ready(function()
 	{else}
 		buildtree(false);
 	{/if}
+
 	{if $expand}
 		setAutoExpand({$expand});
 	{elseif $initial_expansion}

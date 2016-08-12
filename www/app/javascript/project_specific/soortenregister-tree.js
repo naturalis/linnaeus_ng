@@ -53,7 +53,7 @@ function buildtree(node)
 					autoExpandArray.push(data.progeny[i].id)
 				}
 			}
-			
+
 			growbranches(data);
 			storetree();
 			checkAutoExpand();
@@ -64,6 +64,11 @@ function buildtree(node)
 function setInitialExpansionLevel( n )
 {
 	inititalExpansionLevel=n;
+}
+
+function unsetInitialExpand()
+{
+	setInitialExpansionLevel( null )
 }
 
 function formatTaxonCount(total,established,print_labels)
@@ -109,7 +114,7 @@ function growbranches(data)
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
 				(shouldHighlight ? '<span class="highlight-node">' : '' )+
 				(d.has_children ?
-					'<a href="#" onclick="buildtree('+d.id+');return false;">'+label+'</a>' : label) +
+					'<a href="#" onclick="unsetInitialExpand();buildtree('+d.id+');return false;">'+label+'</a>' : label) +
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' ) +
 				(includeSpeciesStats && d.child_count && d.child_count.total>0 ? formatTaxonCount(d.child_count.total,d.child_count.established,false) : '' ) +
 				(shouldHighlight ? '</span>' : '' )+
@@ -127,8 +132,8 @@ function growbranches(data)
 	var buffer=
 		'<li class="child">'+
 			(!activeNode ?
-				//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
-				'<a href="#" onclick="buildtree(false);return false">'+getTopLevelLabel()+'</a>' :
+				//'<a href="#" onclick="unsetInitialExpand();buildtree(false);return false">'+data.node.label+'</a>' :
+				'<a href="#" onclick="unsetInitialExpand();buildtree(false);return false">'+getTopLevelLabel()+'</a>' :
 				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+label+'</a>'
 			)+
 			(data.node.rank_label ? 
@@ -239,7 +244,6 @@ function setAutoExpand(id)
 				addAutoExpandNode(data[index]);
 			}
 			buildtree(false);
-			
 		}
 	});
 }
