@@ -83,11 +83,11 @@ class VersatileExportController extends Controller
 	private $EOFMarker='(end of file)';
 
 	private $columnHeaders=[
-		'sci_name'=>'wetenschappelijke_naam',
-		'dutch_name'=>'nederlandse_naam',
-		'rank'=>'rang',
+		'sci_name'=>'scientific_name',
+		'dutch_name'=>'dutch_name',
+		'rank'=>'rank',
 		'nsr_id'=>'nsr_id',
-		'presence_status'=>'voorkomens_status',
+		'presence_status'=>'presence_status',
 		'habitat'=>'habitat',
 		'concept_url'=>'concept_url',
 		'database_id'=>'database_id',
@@ -98,9 +98,9 @@ class VersatileExportController extends Controller
 		'authorship'=>'authorship',
 		'name_author'=>'name_author',
 		'authorship_year'=>'authorship_year',
-		'synonym'=>'synoniem',
-		'synonym_type'=>'type_synoniem',
-		'language'=>'taal',
+		'synonym'=>'synonym',
+		'synonym_type'=>'type_synonym',
+		'language'=>'language',
 		'taxon'=>'taxon',
 	];
 
@@ -135,6 +135,13 @@ class VersatileExportController extends Controller
 			}
 		}
 		
+		foreach ((array)$this->columnHeaders as $key=>$val)
+		{
+			foreach((array)$this->columnHeaders as $key=>$val)
+			{
+				$this->columnHeaders[$key]=$this->translate($val);
+			}
+		}		
     }
 
     public function exportAction()
@@ -363,8 +370,8 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['wetenschappelijke_naam']=
-					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
+				$this->names[$key]['scientific_name']=
+					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['scientific_name'],'base_rank_id'=>$val['_base_rank_id'] ) );
 			}
 		}
 
@@ -372,7 +379,7 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['wetenschappelijke_naam']=preg_replace('/(\s+)/',' ',strip_tags($val['wetenschappelijke_naam']));
+				$this->names[$key]['scientific_name']=preg_replace('/(\s+)/',' ',strip_tags($val['scientific_name']));
 			}
 		}
 
@@ -530,7 +537,7 @@ class VersatileExportController extends Controller
 						$this->columnHeaders['synonym']=>isset($row['name']) ? $row['name'] : null,
 						$this->columnHeaders['synonym_type']=>isset($row['nametype']) ? $row['nametype'] : null,
 						$this->columnHeaders['language']=>isset($row['language']) ? $row['language'] : null,
-						$this->columnHeaders['taxon']=>isset($val['wetenschappelijke_naam']) ? $val['wetenschappelijke_naam'] : null,
+						$this->columnHeaders['taxon']=>isset($val['scientific_name']) ? $val['scientific_name'] : null,
 					);
 
 				if (isset($val['nsr_id']))
@@ -547,7 +554,7 @@ class VersatileExportController extends Controller
 			}
 		}
 	}
-
+	
 	private function doOutput()
 	{
 		
@@ -562,7 +569,7 @@ class VersatileExportController extends Controller
 
 		if ( isset($this->spoof_settings->do_spoof_export) && $this->spoof_settings->do_spoof_export )
 		{
-			echo $this->spoof_settings->texts->download_body;
+			$this->doSpoofOutput();
 		}
 		else
 		{
@@ -575,6 +582,28 @@ class VersatileExportController extends Controller
 		if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
 
 		die();
+	}
+
+	private function doSpoofOutput()
+	{
+		$this->doQueryParametersOutput();
+		$this->printHeaderLine( $this->names );
+		$this->printNewLine();
+		$this->printNewLine();
+		echo $this->spoof_settings->texts->download_body;
+		$this->printNewLine();
+	
+		if ( $this->getDoSynonyms() )
+		{
+			$this->printNewLine();
+			$this->printHeaderLine( $this->synonyms );
+			$this->printNewLine();
+			$this->printNewLine();
+			echo $this->spoof_settings->texts->download_synonyms;
+			$this->printNewLine();
+		}
+
+		$this->doEOFMarkerOutput();		
 	}
 
 	private function printHeaders()
