@@ -88,10 +88,16 @@ final class TreeModel extends AbstractModel
 				_m.authorship,
 				_r.rank,
 				ifnull(_q.label,_r.rank) as rank_label,
-				_p.rank_id as base_rank_id
+				_p.rank_id as base_rank_id,
+				_sq.parentage
 
 			from
 				%PRE%taxa _a
+
+			left join
+				%PRE%taxon_quick_parentage _sq
+				on _a.project_id = _sq.project_id
+				and _a.id=_sq.taxon_id
 
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
@@ -149,6 +155,7 @@ final class TreeModel extends AbstractModel
 		$query="
 			select
 				count(*) as total
+
 			from
 				%PRE%taxon_quick_parentage _sq
 		
@@ -187,6 +194,7 @@ final class TreeModel extends AbstractModel
 				_sq.taxon_id,
 				_sp.presence_id,
 				ifnull(_sr.established,'undefined') as established
+
 			from 
 				%PRE%taxon_quick_parentage _sq
 			
