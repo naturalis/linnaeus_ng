@@ -1,8 +1,5 @@
 <?php
 
-    // A quick and very dirty script to posthumously add map_id to occurrences_taxa table
-    // This is required to properly export data to kml/json
-
 	$cfg = dirname(__FILE__) . '/../../configuration/admin/configuration.php';
 	if (!file_exists($cfg)) die("Error: unable to locate $cfg.");
 	include $cfg;
