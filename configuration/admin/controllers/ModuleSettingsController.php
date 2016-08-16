@@ -15,10 +15,12 @@
 		species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
 		species: tree_initital_expand_levels (initial taxon tree auto expansion for n levels
 		species: show_inherited_literature
+		species: _suppress_parent_child_relation_checks (suppresses the strenuous checks on parent/child relations while editing taxonomy. only requirement is that the rank of a taxon is below that of its parent.)
 
 		search: show_presence_in_results (show the presence status in results)
 		search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
 
+		
 
 	to do technical:
 	- create default settings-set as base data
