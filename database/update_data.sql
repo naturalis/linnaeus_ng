@@ -141,7 +141,7 @@ INSERT IGNORE INTO `module_settings` VALUES
 (null,4,'obsolete_passport_tabs','Legacy tab titles that should be flagged as obsolete in the passport editor (use JSON-string: {"Old":"New","Totally obsolete":null})',NULL,NOW(),NOW()),
 (null,7,'no_taxon_images','Make no attempt to show images for taxa',1,NOW(),NOW()),
 (null,4,'higher_taxa_rank_prefix','Always prefix the taxon name with the rank for higher species',1,NOW(),NOW()),
-(null,-1,'show_nsr_specific_stuff','Show or hide(*) various NSR-specific function',1,NOW(),NOW()),
+(null,-1,'show_nsr_specific_stuff','Show or hide(*) various NSR-specific function',0,NOW(),NOW()),
 (null,-1,'show_automatic_hybrid_markers','Show or hide automatic × marker for taxa of hybrid ranks',1,NOW(),NOW()),
 (null,-1,'show_automatic_infixes','Show or hide automatic infixes "var.", "subsp." and "f." for taxa of appropriate ranks',1,NOW(),NOW()),
 (null,-1,'concept_base_url','Base URL for concepts (requires the project generates NSR-style pseudo PURLs)',null,NOW(),NOW()),
