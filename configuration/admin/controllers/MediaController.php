@@ -719,7 +719,7 @@ class MediaController extends Controller
                 // If module_id and item_id have been set, save
                 // contextual link. Overview is set only during
                 // conversion in MediaConverterController
-                if ($this->moduleId != -1 && $this->itemId != -1) {
+                if ($this->moduleId != -1 && $this->itemId != -1 && !isset($p['skip_attach'])) {
                      $this->models->MediaModules->insert(array(
                         'id' => null,
                         'project_id' => $this->getCurrentProjectId(),

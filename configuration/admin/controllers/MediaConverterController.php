@@ -219,7 +219,9 @@ class MediaConverterController extends MediaController
 
                     if (empty($this->_error)) {
 
-                        $this->uploadFiles();
+                        // Reset module and item id, otherwise media is attached to the
+                        // last item parsed!
+                        $this->uploadFiles(array('skip_attach' => true));
 
                         if (!empty($this->_result->resource->files[0]->src)) {
 
