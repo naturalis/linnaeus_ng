@@ -411,6 +411,7 @@ class Controller extends BaseClass
 			else
 			{
 				$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
+				$_SESSION['admin']['user']['authorization_fail_page']="http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 			}
 		}
@@ -418,11 +419,13 @@ class Controller extends BaseClass
 		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction() || !$this->UserRights->hasAppropriateLevel() )
 		{
 			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
+			$_SESSION['admin']['user']['authorization_fail_page']="http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 		}
 		else
 		{
 			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
+			unset( $_SESSION['admin']['user']['authorization_fail_page'] );
 		}
     }
 
