@@ -59,6 +59,7 @@ class UsersController extends Controller
 	private $checksPassword=array('min' => 8,'max' => 32); // regExp =>
 	private $checksName=array('min' => 1,'max' => 64);
 	private $_userBefore;
+	private $_action;
 
     public function __construct ()
     {
@@ -146,6 +147,7 @@ class UsersController extends Controller
 
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
+			$this->setAction( 'create' );
 			$this->setNewUserData( $this->rGetAll() );
 			$this->sanitizeNewUserData();
 			$this->userDataCheck();
@@ -181,6 +183,7 @@ class UsersController extends Controller
 
 		if ($this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
+			$this->setAction( 'update' );
 			$this->setNewUserData( $this->rGetAll() );
 			$this->sanitizeNewUserData();
 			$this->userDataCheck();
@@ -462,9 +465,9 @@ class UsersController extends Controller
 		$this->setNewUserDataSave( true );
 		$this->isNameCorrect();
 		$this->isUsernameCorrect();
-		$this->isUsernameUnique();
+		$this->isUsernameUnique( [ 'ignore_current' => ($this->getAction()=='update') ] );
 		$this->isEmailAddressCorrect();
-		$this->isEmailAddressUnique();
+		$this->isEmailAddressUnique( [ 'ignore_current' => ($this->getAction()=='update') ] );
 	}
 
 	private function userDataSave()
@@ -737,12 +740,22 @@ class UsersController extends Controller
         }
     }
 
-    private function isUsernameUnique()
+    private function isUsernameUnique( $p )
     {
+		$ignore_current = isset($p['ignore_current']) ? $p['ignore_current'] : true;
+		
 		$username=$this->getNewUserData()['username'];
 
+		if ( $ignore_current )
+			$id=[ 'username'=>$username, 'id !='=>$this->getUserId() ];
+		else
+			$id=[ 'username'=>$username ];
+
+
+
+
 		$d=$this->models->Users->_get(array(
-			'id'=>array( 'username'=>$username, 'id !='=>$this->getUserId() ),
+			'id'=>$id,
 			'columns'=>'count(*) as total'
 		));
 
@@ -764,12 +777,19 @@ class UsersController extends Controller
         }
     }
 
-    private function isEmailAddressUnique()
+    private function isEmailAddressUnique( $p )
     {
+		$ignore_current = isset($p['ignore_current']) ? $p['ignore_current'] : true;
+		
 		$email_address=$this->getNewUserData()['email_address'];
+		
+		if ( $ignore_current )
+			$id= [ 'email_address'=>$email_address, 'id !='=>$this->getUserId() ];
+		else
+			$id= [ 'email_address'=>$email_address ];
 
 		$d=$this->models->Users->_get(array(
-			'id'=>array( 'email_address'=>$email_address, 'id !='=>$this->getUserId() ),
+			'id'=>$id,
 			'columns'=>'count(*) as total'
 		));
 
@@ -894,6 +914,16 @@ class UsersController extends Controller
 	private function getUser()
 	{
 		return $this->_user;
+	}
+
+	private function setAction( $action )
+	{
+		$this->_action=$action;
+	}
+
+	private function getAction()
+	{
+		return $this->_action;
 	}
 
 	private function setNewUserData( $data )
