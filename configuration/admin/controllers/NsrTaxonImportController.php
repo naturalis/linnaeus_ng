@@ -9,8 +9,10 @@ class NsrTaxonImportController extends NsrController
     public $controllerPublicName = 'Taxon editor';
 
     public $usedModels = array(
-		'names',
-		'nsr_ids'
+		'tab_order',
+		'pages_taxa',
+		'pages_taxa_titles',
+		'labels_languages'
 	);
 
     public $usedHelpers = array(
@@ -19,6 +21,7 @@ class NsrTaxonImportController extends NsrController
     );
 
 	private $importColumns = [ 'conceptName' => 0, 'rank' => 1, 'parent' => 2, 'commonName' => 3 ];
+	private $importRows = [ 'topicNames' => 0, 'languages' => 1 ];
 	private $doNotImport=[];
 	private $_nameTypeIds;
 
@@ -42,6 +45,7 @@ class NsrTaxonImportController extends NsrController
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
+		$this->lines = new stdClass;
 	}
 
     public function importFileAction()
@@ -132,6 +136,101 @@ class NsrTaxonImportController extends NsrController
         $this->printPage();
 	
 	}
+
+
+    public function importPassportFileAction()
+    {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->checkAuthorisation();
+
+        $this->checkAuthorisation();
+
+        $this->setPageName($this->translate('Taxon passport content upload'));
+
+        if ($this->requestDataFiles)
+		{
+            unset($_SESSION['admin']['system']['csv_data']);
+
+            switch ($this->rGetVal("delimiter"))
+			{
+                case 'tab':
+                    $this->helpers->CsvParserHelper->setFieldDelimiter("\t");
+                    break;
+                case 'semi-colon':
+                    $this->helpers->CsvParserHelper->setFieldDelimiter(';');
+                    break;
+				default:
+                //case 'comma':
+                    $this->helpers->CsvParserHelper->setFieldDelimiter(',');
+            }
+
+            $this->helpers->CsvParserHelper->parseFile( $this->requestDataFiles[0]["tmp_name"] );
+
+            $this->addError( $this->helpers->CsvParserHelper->getErrors() );
+
+            if (!$this->getErrors())
+			{
+				$this->setLines( $this->helpers->CsvParserHelper->getResults() );
+				$this->cleanLines();
+				$this->addLineId();
+				$this->checkConcepts();
+				$this->checkLanguages();
+				$this->checkTopics();
+				$this->setSessionLines();
+				$this->smarty->assign( 'lines', $this->getLines() );
+				
+//				q($this->getLines(),1);
+			}
+		}
+
+		$this->smarty->assign( 'importColumns', $this->importColumns );
+		$this->smarty->assign( 'importRows', $this->importRows );
+		$this->smarty->assign( 'categories', $this->getCategories() );
+		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
+
+        $this->printPage();
+	}
+
+    public function importPassportFileResetAction()
+    {
+		$this->setLines( null );
+		$this->setSessionLines();
+		$this->redirect( 'import_passport_file.php' );
+	}
+
+    public function importPassportFileProcessAction()
+    {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+		$this->checkAuthorisation();
+
+        $this->checkAuthorisation();
+
+        $this->setPageName($this->translate('Processing taxon file upload'));
+
+		$lines=$this->getSessionLines();
+		$this->setLines( $lines );
+
+		if ( $this->rHasVar('action','save') && !$this->isFormResubmit() )
+		{
+			$this->setDoNotImport( $this->rGetVal('do_not_import') );
+			$this->saveConcepts();
+			$this->saveParents();
+			$this->saveNames();
+			$this->setSessionLines();
+
+			$this->smarty->assign( 'lines', $this->getLines() );
+			$this->smarty->assign( 'importColumns', $this->importColumns );
+
+		}
+		
+        $this->printPage();
+	
+	}
+ 
+
+
+
+
  
     private function setLines( $lines )
     {
@@ -178,7 +277,11 @@ class NsrTaxonImportController extends NsrController
 
 		foreach((array)$lines as $key=>$val)
 		{
-			if ( !isset($val[$this->importColumns['conceptName']])) continue;
+			if ( empty($val[$this->importColumns['conceptName']]))
+			{ 
+				$lines[$key]['errors'][]=[ 'message' => $this->translate('no concept name') ];
+				continue;
+			}
 			
 			$name=$val[$this->importColumns['conceptName']];
 			$key2=array_search( $name, array_column($lines, $this->importColumns['conceptName'] ) );
@@ -191,7 +294,7 @@ class NsrTaxonImportController extends NsrController
 
 		foreach((array)$lines as $key=>$val)
 		{
-			if ( !isset($val[$this->importColumns['conceptName']])) continue;
+			if ( empty($val[$this->importColumns['conceptName']])) continue;
 
 			$name=$val[$this->importColumns['conceptName']];
 			
@@ -320,6 +423,112 @@ class NsrTaxonImportController extends NsrController
 		}
 
 		$this->setLines( $lines );
+	}
+
+    private function checkLanguages()
+    {
+		$lines=$this->getLines();
+		$line=$lines[$this->importRows['languages']];
+
+		foreach((array)$line as $key=>$language)
+		{
+			if ( $key==0 ) continue;
+
+			if ( empty($language) )
+			{ 
+				$lines['languages'][$key]=[ 'column' => $language, 'error'=> $this->translate('no language') ];
+				continue;
+			}
+			
+			$d=$this->models->Languages->_get( [ 'id' =>
+				[
+					'language' => strtolower($language)
+				]
+			] );
+			
+			if ( $d ) 
+			{
+				$lines['languages'][$key]=[ 'column' => $language, 'language_id'=> $d[0]['id'] ];
+			}
+			else
+			{
+				$d=$this->models->LabelsLanguages->_get( [ 'id' =>
+					[
+						'project_id' => $this->getCurrentProjectId(),
+						'label' => strtolower($language)
+					]
+				] );
+
+				if ( $d ) 
+				{
+					$lines['languages'][$key]=[ 'column' => $language, 'language_id'=> $d[0]['language_id'] ];
+				}
+				else
+				{
+					$lines['languages'][$key]=[ 'column' => $language, 'error'=> $this->translate('unknown language') ];
+				}
+
+			}
+		}
+		
+		$this->setLines( $lines );
+
+	}
+
+    private function checkTopics()
+    {
+		$lines=$this->getLines();
+		$line=$lines[$this->importRows['topicNames']];
+
+		foreach((array)$line as $key=>$topic)
+		{
+			if ( $key==0 ) continue;
+
+			if ( empty($topic) )
+			{ 
+				$lines['topics'][$key]=[ 'column' => $topic, 'error'=> $this->translate('no topic') ];
+				continue;
+			}
+			
+			$d=$this->models->PagesTaxaTitles->_get( [ 'id' =>
+				[
+					'project_id' => $this->getCurrentProjectId(),
+					'title' => strtolower($topic)
+				]
+			] );
+			
+			if ( count((array)$d)>1 ) 
+			{
+				$lines['topics'][$key]=[ 'column' => $topic, 'error'=> $this->translate('there are multiple topics with that name.') ];
+			}
+			else
+			if ( $d ) 
+			{
+				$lines['topics'][$key]=[ 'column' => $topic, 'page_id'=> $d[0]['page_id'] ];
+			}
+			else
+			{
+				$d=$this->models->PagesTaxa->_get( [ 'id' =>
+					[
+						'project_id' => $this->getCurrentProjectId(),
+						'page' => strtolower($topic)
+					]
+				] );
+
+				if ( $d ) 
+				{
+					$lines['topics'][$key]=[ 'column' => $topic, 'page_id'=> $d[0]['id'] ];
+				}
+				else
+				{
+					$lines['topics'][$key]=[ 'column' => $topic, 'error'=> $this->translate('unknown topic') ];
+				}
+
+			}
+		}
+		
+		$this->setLines( $lines );
+
 	}
 
 	private function setDoNotImport( $ids )
