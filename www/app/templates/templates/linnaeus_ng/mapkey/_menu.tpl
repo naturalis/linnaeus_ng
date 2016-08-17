@@ -16,21 +16,22 @@
 {else}
     {assign var=url value='../mapkey/examine_species.php?id='}
 {/if}
-{if $adjacentItems.prev}
-    <a class="navigation-icon icon-nav-prev" id="previous-icon" 
-    href="{$url}{$adjacentItems.prev.id}"
-    {if $adjacentItems.prev.label} title="{t}Previous to{/t} {$adjacentItems.prev.label}"{/if}>{t}Previous{/t}</a>
-{else}
-    <span class="navigation-icon icon-nav-prev icon-inactive" id="previous-icon-inactive">{t}Previous{/t}</span>
-{/if}
-{if $adjacentItems.next}
-    <a class="navigation-icon icon-nav-next" id="next-icon" 
-    href="{$url}{$adjacentItems.next.id}" 
-    {if $adjacentItems.next.label} title="{t}Next to{/t} {$adjacentItems.next.label}"{/if}>{t}Next{/t}</a>
-{else}
-    <span class="navigation-icon icon-nav-next icon-inactive" id="next-icon-inactive">{t}Next{/t}</span>
-{/if}
-
+{*
+    {if $adjacentItems.prev}
+        <a class="navigation-icon icon-nav-prev" id="previous-icon" 
+        href="{$url}{$adjacentItems.prev.id}"
+        {if $adjacentItems.prev.label} title="{t}Previous to{/t} {$adjacentItems.prev.label}"{/if}>{t}Previous{/t}</a>
+    {else}
+        <span class="navigation-icon icon-nav-prev icon-inactive" id="previous-icon-inactive">{t}Previous{/t}</span>
+    {/if}
+    {if $adjacentItems.next}
+        <a class="navigation-icon icon-nav-next" id="next-icon" 
+        href="{$url}{$adjacentItems.next.id}" 
+        {if $adjacentItems.next.label} title="{t}Next to{/t} {$adjacentItems.next.label}"{/if}>{t}Next{/t}</a>
+    {else}
+        <span class="navigation-icon icon-nav-next icon-inactive" id="next-icon-inactive">{t}Next{/t}</span>
+    {/if}
+*}
 {if $backlink}
     {if $session.app.user.map.search.taxa}
         {assign var=backUrl value='l2_search.php?action=research'}

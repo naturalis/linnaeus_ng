@@ -527,8 +527,16 @@ final class Literature2Model extends AbstractModel
 			order by
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
-
-        return $this->freeQuery($query);
+			
+		$literature=$this->freeQuery($query);
+		
+		foreach((array)$literature as $key=>$val)
+		{
+			$literature[$key]['authors']=
+				$this->getReferenceAuthors( [ 'projectId'=>$project_id, 'literatureId'=>$val['id'] ] );
+		}
+		
+		return $literature;
     }
 
     public function saveTaxonReference( $params )

@@ -1,10 +1,12 @@
 {include file="../shared/header.tpl"}
 {assign var=currentPage value=$session.app.system.path.filename}
-<div id="header-titles">
+
+<div id="titles">
     <span id="header-title">
         {t}Distribution{/t}
     </span>
 </div>
+
 {include file="_categories.tpl"}
 
 {assign var=map value=$maps[$mapId]}

@@ -1076,6 +1076,75 @@ parameters:
 		header('Content-Type: application/json');			
 		$this->printOutput();
 	}
+
+	public function imagesAction()
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&size=<int>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+";
+
+		if (is_null($this->getCurrentProjectId()))
+		{
+			$this->sendErrors();
+			return;
+		}
+
+		$result=array('pId'=>$this->getCurrentProjectId());
+
+		$p=$this->getProject();
+
+		$result['project']=$p['title'];
+		$result['exported']=date('c');
+
+		$result['url_recent_images']='http://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
+
+        $media=$this->models->MediaTaxon->freeQuery("
+			select
+				_a.taxon_id, 
+				count(_a.id) as n,
+				_m1.meta_data as photographer
+	
+			from
+				%PRE%media_taxon _a
+
+			left join %PRE%taxa _d 
+				on _a.taxon_id=_d.id 
+				and _a.project_id=_d.project_id
+
+			left join %PRE%projects_ranks _e 
+				on _d.rank_id=_e.id 
+				and _a.project_id=_d.project_id
+
+			left join %PRE%media_meta _m1
+				on _a.id=_m1.media_id 
+				and _a.project_id=_m1.project_id 
+				and _m1.sys_label = 'beeldbankFotograaf'		
+
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _e.rank_id >= ".SPECIES_RANK_ID."
+
+			group by
+				taxon_id
+		");
+		
+	
+		$result['total_images']=0;
+		$result['species_with_images']=count((array)$media);
+		$d=array();
+		foreach((array)$media as $val)
+		{
+			$result['total_images']+=$val['n'];
+			$d[$val['photographer']]=isset($d[$val['photographer']]) ? $d[$val['photographer']] + $val['n'] : $val['n'];
+		}
+		$result['total_photographers']=count((array)$d);
+		
+		$this->setJSON(json_encode($result));
+		header('Content-Type: application/json');			
+		$this->printOutput();
+	}
 	
 
     private function initialise()

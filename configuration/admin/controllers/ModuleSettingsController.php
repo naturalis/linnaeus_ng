@@ -3,18 +3,24 @@
 /*
 
 	settings that work but not in the list:
-		general setting: support_email (support email adress)
-		general setting: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
-		general setting: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
-		general setting: front_end_use_basic_auth
+		general: support_email (support email adress)
+		general: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
+		general: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
+		general: front_end_use_basic_auth
+
 		species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
 		species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
 		species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
 		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
+		species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
+		species: tree_initital_expand_levels (initial taxon tree auto expansion for n levels
+		species: show_inherited_literature
+		species: _suppress_parent_child_relation_checks (suppresses the strenuous checks on parent/child relations while editing taxonomy. only requirement is that the rank of a taxon is below that of its parent.)
+
 		search: show_presence_in_results (show the presence status in results)
 		search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
-		species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
 
+		
 
 	to do technical:
 	- create default settings-set as base data

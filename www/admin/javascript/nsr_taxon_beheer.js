@@ -750,8 +750,22 @@ function buildDropList(data,variable)
 
 			if (variable.indexOf('reference_id')!=-1)
 			{
+				var authors='';
+
+				if ( t.authors )
+				{
+					for(var j=0;j<t.authors.length;j++)
+					{
+						authors += 
+							t.authors[j].name +
+							(t.authors.length>1 && j<t.authors.length-1 ? (j==t.authors.length-2 ? ' & ' : ', ') : "" )
+							;
+					}
+				}
+				
 				var label=
-					(t.author ? t.author+" " : "")+
+					
+					(authors ? authors+" " : (t.author ? t.author+" " : ""))+
 					(t.date ? t.date+". " : "")+
 					(t.label);
 			}

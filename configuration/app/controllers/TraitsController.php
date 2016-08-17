@@ -65,11 +65,17 @@ class TraitsController extends Controller
 			die('error');
 		}
 
+		$g=$this->models->TraitsModel->getTraitgroup(array(
+			"language_id"=>$language,
+			"project_id"=>$project,
+			"group_id"=>$group
+		));
+		
 		$r=$this->models->TraitsModel->getTraitsTaxonValues(array(
 			"language_id"=>$language,
 			"project_id"=>$project,
 			"taxon_id"=>$taxon,
-			"group_id"=>$group,
+			"group_id"=>$group
 		));
 	
 		$d=array();
@@ -116,6 +122,7 @@ class TraitsController extends Controller
 				'group_id'=>$group,
 			),
 			'result'=>array(
+				'group'=>$g,
 				'data'=>$data,
 				'references'=>$references
 			)

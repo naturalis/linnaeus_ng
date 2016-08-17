@@ -1080,6 +1080,11 @@ class SpeciesModel extends AbstractModel
 						and _m.project_id=_meta4.project_id
 						and _meta4.sys_label='beeldbankDatumAanmaak'
 
+					left join %PRE%media_meta _meta1
+						on _m.id=_meta1.media_id
+						and _m.project_id=_meta1.project_id
+						and _meta1.sys_label='beeldbankDatumVervaardiging'
+
 					left join %PRE%media_meta _meta9
 						on _m.id=_meta9.media_id
 						and _m.project_id=_meta9.project_id
@@ -1090,7 +1095,7 @@ class SpeciesModel extends AbstractModel
 						and ifnull(_meta9.meta_data,0)!=1
 						and _m.project_id=".$projectId."
 					order by
-						_m.overview_image desc,_meta4.meta_date desc
+						_m.overview_image desc,_meta4.meta_date desc,_meta1.meta_date desc
 					limit 1
 				)
 
@@ -1379,7 +1384,7 @@ class SpeciesModel extends AbstractModel
 				_a.pages,
 				_a.volume,
 				_a.external_link,
-				ifnull(_b.name,_a.author) as author_name
+				ifnull(_b.name,_a.author) as author
 
 			from %PRE%literature2 _a
 
@@ -1406,7 +1411,39 @@ class SpeciesModel extends AbstractModel
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
 
-        return $this->freeQuery($query);
+
+		$literature=$this->freeQuery($query);
+
+		foreach((array)$literature as $key=>$val)
+		{
+
+			$query = "
+				select
+					_a.actor_id,
+					_b.name,
+					_b.name_alt,
+					_b.homepage,
+					_b.gender,
+					_b.is_company,
+					_b.employee_of_id
+	
+				from %PRE%literature2_authors _a
+	
+				left join %PRE%actors _b
+					on _a.actor_id = _b.id
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$project_id."
+					and _a.literature2_id =".$val['id']."
+	
+				order by
+					_a.sort_order,_b.name";
+				
+				$literature[$key]['authors']=$this->freeQuery($query);				
+		}
+
+        return $literature;
     }
 
     public function getTaxonKeyLinks( $params )

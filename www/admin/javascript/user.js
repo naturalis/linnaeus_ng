@@ -1,4 +1,7 @@
 var userTaxa=Array();
+var roleID_sysAdmin=0;
+var roleID_leadExpert=0;
+var roleID_editor=0;
 
 function deleteUser()
 {
@@ -8,6 +11,31 @@ function deleteUser()
 		$('#theForm').attr('onsubmit','');
 		$('#theForm').attr('action','delete.php');
 		$('#theForm').submit();
+	}
+}
+
+function setPermissions()
+{
+	$('[name=can_publish][value=0]').prop('checked',true);
+
+	$('[name^=module]').prop('checked',true).trigger('change');
+	$('[name^=custom]').prop('checked',true).trigger('change');
+
+	$('[name^=module_read]').prop('checked',true);
+	$('[name^=custom_read]').prop('checked',true);
+	$('[name^=module_write]').prop('checked',false);
+	$('[name^=custom_write]').prop('checked',false);
+	
+	if ($('#roles :selected').val()==roleID_sysAdmin)
+	{
+		$('[name=can_publish][value=1]').prop('checked',true);
+		$('[name^=module_write]').prop('checked',true);
+		$('[name^=custom_write]').prop('checked',true);
+	}
+	else
+	if ($('#roles :selected').val()==roleID_leadExpert)
+	{
+		$('[name=can_publish][value=1]').prop('checked',true);
 	}
 }
 

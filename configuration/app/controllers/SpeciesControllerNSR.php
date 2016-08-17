@@ -759,7 +759,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$preferredname=$val['name'];
 			}
 
-			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
+			if ($val['nametype']==PREDICATE_VALID_NAME && $val['language_id']==LANGUAGE_ID_SCIENTIFIC)
 			{
 				$nomen=trim($val['uninomial']).' '.trim($val['specific_epithet']).' '.trim($val['infra_specific_epithet']);
 
@@ -863,11 +863,11 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonOverviewImageNsr( $id )
 	{
-		$d=$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1,'overview'=>true));
+		$d=$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc,_meta1.meta_date desc','limit'=>1,'overview'=>true));
 
 		if ( empty($d['data']) )
 		{
-			$d=(array)$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc','limit'=>1));
+			$d=(array)$this->getTaxonMediaNsr(array('id'=>$id,'sort'=>'_meta4.meta_date desc,_meta1.meta_date desc','limit'=>1));
 		}
 
 		return !empty($d['data']) ? array_shift($d['data']) : null;
@@ -884,7 +884,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : false;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc';
+		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc,_meta1.meta_date desc';
 
 		list($data, $total) = $this->models->{$this->_model}->getTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
@@ -1408,10 +1408,20 @@ class SpeciesControllerNSR extends SpeciesController
 			case 'CTAB_TAXON_LIST':
 				return count((array)$this->getTaxonNextLevel($taxon_id))<=0;
 				break;
+			case 'CTAB_PRESENCE_STATUS':
+				return is_null( $this->getPresenceData( $taxon_id ) );
+				break;
 			case 'CTAB_LITERATURE':
 				$a=$this->getTaxonLiterature($taxon_id);
-				$b=$this->getInheritedTaxonLiterature($taxon_id);
-				return count((array)$a)+count((array)$b)<=0;
+				if ( $this->_show_inherited_literature )
+				{
+					$b=$this->getInheritedTaxonLiterature($taxon_id);
+					return count((array)$a)+count((array)$b)<=0;
+				}
+				else
+				{
+					return count((array)$a)<=0;
+				}
 				break;
 			case 'CTAB_DNA_BARCODES':
 				return count((array)$this->getDNABarcodes($taxon_id))<=0;
