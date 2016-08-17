@@ -88,6 +88,7 @@ class TraitsDataController extends TraitsController
 
     public function dataUploadAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Data upload'));
 
@@ -125,6 +126,7 @@ class TraitsDataController extends TraitsController
 	
     public function dataRawAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 
 		if ($this->rHasVal('action','ref_codes'))
@@ -181,6 +183,7 @@ class TraitsDataController extends TraitsController
 
     public function dataSaveAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 
 		$f=$this->getDataSession();
@@ -217,7 +220,7 @@ class TraitsDataController extends TraitsController
 		$this->printPage();
     }
 
-	private function setJoinrows($data)
+	private function setJoinrows( $data )
 	{
 		$this->moduleSession->setModuleSetting( array('setting'=>'joinrows' ) );
 		if (!is_null($data))
@@ -239,7 +242,7 @@ class TraitsDataController extends TraitsController
 			false;
 	}
 
-	private function setIsRotated($state)
+	private function setIsRotated( $state )
 	{
 		$this->moduleSession->setModuleSetting( array('setting'=>'rotated','value'=>$state ) );
 	}
@@ -251,7 +254,7 @@ class TraitsDataController extends TraitsController
 			false;
 	}
 
-	private function setDataSession($data)
+	private function setDataSession( $data )
 	{
 		$this->moduleSession->setModuleSetting( array('setting'=>'data','value'=>$data ) );
 	}
@@ -261,7 +264,7 @@ class TraitsDataController extends TraitsController
 		return $this->moduleSession->getModuleSetting( 'data' );
 	}
 
-	private function setSessionLines($lines)
+	private function setSessionLines( $lines )
 	{
 		$data=$this->getDataSession();
 
@@ -288,7 +291,7 @@ class TraitsDataController extends TraitsController
 		return $this->moduleSession->getModuleSetting( 'reference_list' );
 	}
 
-	private function array_rotate($array)
+	private function array_rotate( $array )
 	{
 		$new_array = array();
 		foreach ($array as $el)
@@ -734,7 +737,6 @@ class TraitsDataController extends TraitsController
 			}
 		}
 				
-
 		$this->setSessionLines($data['lines']);
 	}
 
@@ -1134,10 +1136,4 @@ class TraitsDataController extends TraitsController
 
 	}
 
-
-
-
 }
-
-
-

@@ -44,7 +44,6 @@ class TraitsTaxonController extends TraitsController
     public function __construct ()
     {
         parent::__construct();
-		$this->initialize();
     }
 
     public function __destruct ()
@@ -52,12 +51,9 @@ class TraitsTaxonController extends TraitsController
         parent::__destruct();
     }
 
-    private function initialize()
-    {
-    }
-	
     public function taxonAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 		$this->setPageName( $this->translate('Taxon trait data') );
 
@@ -122,8 +118,6 @@ class TraitsTaxonController extends TraitsController
 
 		$this->printPage('ajax_interface');
     }
-
-
 
     private function getTaxonValues( $p )
 	{
@@ -484,7 +478,5 @@ class TraitsTaxonController extends TraitsController
 		));
 
 	}
-
-
 
 }
