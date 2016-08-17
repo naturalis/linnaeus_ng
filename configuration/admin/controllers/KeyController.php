@@ -204,8 +204,6 @@ class KeyController extends Controller
 			// didn't find it, create it
             if (!$id)
 			{
-				$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
-				$this->checkAuthorisation();
 				$id=$this->createNewKeystep(array('is_start' => 1));
                 $this->redirect('step_edit.php?id=' . $id );
             }
@@ -217,12 +215,11 @@ class KeyController extends Controller
 
 		if ($step)
 		{
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-			$this->checkAuthorisation();
-
             // move choices up and down
             if ($this->rHasVal('move') && $this->rHasVal('direction') && !$this->isFormResubmit())
 			{
+				$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+				$this->checkAuthorisation();
                 $this->moveKeystepChoice( $this->rGetVal('move'), $this->rGetVal('direction') );
             }
 
@@ -548,12 +545,16 @@ class KeyController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 			$this->saveLinkedTaxa( $this->rGetall() );
 			$this->addMessage( $this->translate( 'Saved.' ) );
 		}
 		else
 		if ($this->rHasVar('link_id') && $this->rHasVal('action','delete') && !$this->isFormResubmit())
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
 			$this->deleteLinkedTaxa( $this->rGetall() );
 			$this->addMessage( $this->translate( 'Deleted.' ) );
 		}
@@ -728,6 +729,7 @@ class KeyController extends Controller
         if ($this->rHasVal('keyRankBorder') && isset($pr) && !$this->isFormResubmit())
 		{
 			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
             $endPoint = false;
@@ -806,6 +808,7 @@ class KeyController extends Controller
 	*/
     public function storeAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Store key tree'));
@@ -896,19 +899,6 @@ class KeyController extends Controller
         }
 
         $this->printPage();
-    }
-
-	/**
-	* previewAction
-	*
-	* opens a preview of corresponding key step in the front-end
-	*
-	* @return void
-	* @access public
-	*/
-    public function previewAction ()
-    {
-        $this->redirect('../../../app/views/key/index.php?p=' . $this->getCurrentProjectId() . '&step=' . $this->rGetVal('step'));
     }
 
     private function setEndPointsExist()

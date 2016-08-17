@@ -118,6 +118,9 @@ class ProjectsController extends Controller
 
         if ($this->rHasVal('module_new'))
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+	        $this->checkAuthorisation();
+
             $fmp = $this->models->FreeModulesProjects->_get(array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId()
@@ -188,6 +191,7 @@ class ProjectsController extends Controller
 	*/
     public function dataAction ()
     {
+
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
@@ -195,6 +199,8 @@ class ProjectsController extends Controller
 
         if ( $this->rHasVal('action','save') && !$this->isFormResubmit() )
 		{
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+	        $this->checkAuthorisation();
             // saving all data (except the logo image)
 			$this->saveProjectData( $this->rGetAll() );
         }
@@ -223,7 +229,6 @@ class ProjectsController extends Controller
         }
 
         $this->smarty->assign('data', $this->getCurrentProjectData());
-
         $this->smarty->assign('languages', $languages);
 
         $this->printPage();
@@ -397,6 +402,7 @@ class ProjectsController extends Controller
 
 	public function changeIdAction()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->checkAuthorisation(true);
 
         $this->setPageName($this->translate('Change a project ID'));

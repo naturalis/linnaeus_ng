@@ -206,15 +206,11 @@ class GlossaryController extends Controller
 		else
 		if ($this->rHasId())
 		{
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-	        $this->checkAuthorisation();
 			$gloss = $this->getGlossaryTerm($this->rGetId());
 		}
 		else
 		if (!$this->rHasVal('action','new'))
 		{
-			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
-	        $this->checkAuthorisation();
 			$gloss = $this->getFirstGlossaryTerm();
 		}
 
@@ -379,7 +375,7 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('action','delete'))
 		{
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 			$this->checkAuthorisation();
 
 			$r = $this->detachMedia();
