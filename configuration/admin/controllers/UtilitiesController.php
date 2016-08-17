@@ -62,35 +62,15 @@ class UtilitiesController extends Controller
     {
         $this->smarty->assign('hideControllerPublicName', true);
 
-	
         $this->addError( $this->translate('You are not authorized to do that.') );
 
 		if ( isset($_SESSION['admin']['user']['authorization_fail_message']) )
 		{
-	        //$message.='<span style="display:none">' . $_SESSION['admin']['user']['authorization_fail_message'] . '</span>' ;
-			$this->addError( '(' . $_SESSION['admin']['user']['authorization_fail_message'] . ')' );
+			$this->addError(
+				'(' . $_SESSION['admin']['user']['authorization_fail_message'] . ')' . "\n" .
+				'<!-- ' . $_SESSION['admin']['user']['authorization_fail_page'] . ' -->'
+			 );
 		}
-
-
-		/*
-		if (isset($_SESSION['admin']['project']['lead_experts']))
-		{
-			if (count((array)$_SESSION['admin']['project']['lead_experts'])==1)
-			{
-				$this->addWarning($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
-			}
-			else
-			{
-				$this->addWarning($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
-			}
-
-			foreach((array)$_SESSION['admin']['project']['lead_experts'] as $key => $val)
-			{
-				$this->addMessage($val['first_name'].' '.$val['last_name'].' (<a href="mailto:'.$val['email_address'].'">'.$val['email_address'].'</a>)');
-			}
-
-		}
-		*/
 
         $this->printPage();
     }

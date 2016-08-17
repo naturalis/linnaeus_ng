@@ -87,6 +87,7 @@ class ProjectsController extends Controller
     public function overviewAction()
     {
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
+
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Project overview'));
 
