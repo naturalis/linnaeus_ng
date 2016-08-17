@@ -12,7 +12,7 @@ table tr th {
 
 <div id="page-main">
 
-	{if $user}
+	{if $user.id}
     <h2>{t}edit{/t} {$user.first_name} {$user.last_name}</h2>
 	{else}
     <h2>{t}new user{/t}</h2>
@@ -72,7 +72,16 @@ table tr th {
             <td>
             	<select id="roles" name="role_id">
                 {foreach $roles v}
-                <option value="{$v.id}"{if $v.id==$user.project_role.role_id} selected="selected"{/if}>{$v.role}</option>
+                <option
+                	value="{$v.id}"
+                    {if !$user.project_role.role_id && $v.id==$smarty.const.ID_ROLE_EDITOR}
+                    	selected="selected"
+	`				{elseif $v.id==$user.role_id} {* when screen returns because of new user w/ incorrect data *}
+                    	selected="selected"
+	`				{elseif $v.id==$user.project_role.role_id}
+                    	selected="selected"
+					{/if}
+                    >{$v.role}</option>
                 {/foreach}
                 </select>
             </td>
