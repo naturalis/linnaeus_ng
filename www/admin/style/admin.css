@@ -219,14 +219,22 @@ a:hover, .a:hover {
   background-color: #f6f6f6;
 }
 
-#page-block-errors {
+.admin-messages, .admin-errors, .admin-warnings {
+  padding: 5px 5px 5px 5px;
+  border: 1px dotted black;
+  width: 550px;
+  background-color: #f6f6f6;
+}
+
+
+#page-block-errors, .admin-errors {
   -background-color: #fee; }
 
-#page-block-warnings {
+#page-block-warnings, .admin-warnings {
 	color: black;
 	background-color: #fea; }
 
-#page-block-warnings.message {
+#page-block-warnings.message, .admin-warnings.message {
 	color: black;
 }
 
@@ -496,4 +504,14 @@ tr[type=drag-row] {
 	font-size:0.85em;
 	color:#666;
 	margin-top:30px;
+}
+
+#countdown-container {
+	margin-top:10px;
+	font-size:1.4em;
+	font-weight:bold;
+}
+#countdown-container #countdown {
+	display:block;
+	color:red;
 }

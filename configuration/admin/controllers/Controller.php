@@ -411,6 +411,7 @@ class Controller extends BaseClass
 			else
 			{
 				$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
+				$_SESSION['admin']['user']['authorization_fail_page']="http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 			}
 		}
@@ -418,11 +419,13 @@ class Controller extends BaseClass
 		if ( !$this->UserRights->canManageItem() || !$this->UserRights->canPerformAction() || !$this->UserRights->hasAppropriateLevel() )
 		{
 			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
+			$_SESSION['admin']['user']['authorization_fail_page']="http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 		}
 		else
 		{
 			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
+			unset( $_SESSION['admin']['user']['authorization_fail_page'] );
 		}
     }
 
@@ -1510,6 +1513,12 @@ class Controller extends BaseClass
     public function getDefaultProjectLanguage ()
     {
         return isset($_SESSION['admin']['project']['default_language_id']) ? $_SESSION['admin']['project']['default_language_id'] : null;
+    }
+
+    public function getProjectTitle( $filesystem_safe=false )
+    {
+        $title=isset($_SESSION['admin']['project']['title']) ? $_SESSION['admin']['project']['title'] : null;
+		return $filesystem_safe ? preg_replace( [ "/[^A-Za-z0-9 ]/" , "/\s/"] , ['','_'] , $title) : $title;
     }
 
     public function rHasVar($var)

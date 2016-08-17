@@ -22,6 +22,9 @@ div.fieldsubset {
 	text-align:right;
 	padding:0px;
 }
+.admin-warnings {
+	margin:5px 0 5px 0;
+}
 </style>
 
 <script>
@@ -160,6 +163,8 @@ function doSubmit()
 	<form id="theForm" method="post" target="_self">
 
     <input type="hidden" name="action" value="export"  />
+    
+	{if $spoof_settings_warning}<div class="admin-warnings"><span class="message">{$spoof_settings_warning}</span></div>{/if}
 
     <fieldset>
 
@@ -500,6 +505,8 @@ function doSubmit()
     	<input type="button" value="{t}export{/t}" onclick="doSubmit();" />
 
     </p>
+
+	{if $spoof_settings_warning}<div class="admin-warnings"><span class="message">{$spoof_settings_warning}</span></div>{/if}
 
     </form>
 

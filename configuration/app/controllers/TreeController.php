@@ -44,7 +44,7 @@ class TreeController extends Controller
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_tree_taxon_count_style = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_taxon_count_style','module'=>'species', 'subst'=>'species_established' ] );
-
+		$this->_tree_initital_expand_levels = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_initital_expand_levels','module'=>'species' ] );
 	}
 					
     public function __destruct()
@@ -84,6 +84,9 @@ class TreeController extends Controller
 		}
 
 		$this->smarty->assign('tree_taxon_count_style',$this->_tree_taxon_count_style);
+		$this->smarty->assign('tree_top',$this->getTreeTop());
+		$this->smarty->assign('initial_expansion',$this->_tree_initital_expand_levels);
+
 		$this->printPage('tree');
 	}
 	
@@ -176,11 +179,12 @@ class TreeController extends Controller
 				'type_id_valid'=>$this->_idValidName,
 				'node'=>$node
 			));
-
+			
 		$taxon=$progeny=array();
 
 		foreach((array)$taxa as $key=>$val)
 		{
+			
 			if ($count=='taxon') 
 			{
 				if ( $this->_tree_taxon_count_style=='species_only' || $this->_tree_taxon_count_style=='species_established')
@@ -246,6 +250,8 @@ class TreeController extends Controller
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
 			unset($val['base_rank_id']);
+			
+			$val['parentage']=explode(' ',$val['parentage']);
 
 			if ($val['id']==$node)
 			{
@@ -261,7 +267,7 @@ class TreeController extends Controller
 				$progeny[]=$val;
 			}
 		}
-		
+
 		usort(
 			$progeny,
 			function($a,$b)

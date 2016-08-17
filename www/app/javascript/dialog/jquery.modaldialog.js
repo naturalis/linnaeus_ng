@@ -112,7 +112,7 @@
 		
 		dl.fadeIn(10);
 		$('#dialog-mask').fadeIn(100);		
-		$('#dialog-mask').live("click", function() {  $('#dialog-close').click(); } );
+		$('#dialog-mask').bind("click", function() {  $('#dialog-close').click(); } );
 				
 	};
 	

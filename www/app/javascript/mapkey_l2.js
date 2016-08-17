@@ -92,7 +92,7 @@ function l2MapMouseOver(x,y) {
 
 function l2ToggleDatatype(ele) {
 
-	if ($(ele).attr('checked')) {
+	if ($(ele).prop('checked')) {
 		
 		$('td[datatype='+$(ele).val()+']').css('background-color',l2DataColours[$(ele).val()]);
 
@@ -217,7 +217,7 @@ function l2DiversityGetSelectedTypes() {
 	var types = [];
 
 	$('[name^=selectedDatatypes]').each(function() {
-		if ($(this).attr('checked')==true) types[types.length] = $(this).val();
+		if ($(this).prop('checked')==true) types[types.length] = $(this).val();
 	});
 	
 	return types;
@@ -291,8 +291,8 @@ function l2DiversityTypeClick() {
 			'm' : $('#mapId').val(),
 			'types' : types
 		}),
-		success : function (data) {
-			//alert(data);
+		success : function (data)
+		{
 			var tmp = $.parseJSON(data);
 			if (tmp.index) l2DiversityGiantOilSpill(tmp.index);
 			if (tmp.legend) l2DiversityUpdateLegend(tmp.legend);

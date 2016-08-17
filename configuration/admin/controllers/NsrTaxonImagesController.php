@@ -312,7 +312,7 @@ class NsrTaxonImagesController extends NsrController
 		$distributionMaps=isset($p['distribution_maps']) ? $p['distribution_maps'] : null;
 		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resPicsPerPage;
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image desc,_meta4.meta_date desc';
+		$sort=!empty($p['sort']) ? $p['sort'] : '_m.overview_image desc,_meta4.meta_date desc,_meta1.meta_date desc';
 
 		$d=$this->models->NsrTaxonImagesModel->getTaxonMedia(array(
 			"distribution_maps"=>$distributionMaps,
@@ -645,7 +645,7 @@ class NsrTaxonImagesController extends NsrController
 
 	private function getTaxonByNsrId( $id )
 	{
-		$id=str_pad( $id, 12, '0',STR_PAD_LEFT);
+		//$id=str_pad( $id, 12, '0',STR_PAD_LEFT);
 
 		$taxa=$this->models->NsrTaxonImagesModel->getTaxonByNsrId(array(
 			"project_id"=>$this->getCurrentProjectId(),

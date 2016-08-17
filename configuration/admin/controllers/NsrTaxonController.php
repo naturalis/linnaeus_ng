@@ -78,6 +78,8 @@ class NsrTaxonController extends NsrController
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
+
+		$this->_suppress_parent_child_relation_checks=$this->moduleSettings->getModuleSetting( [ 'module'=>'species','setting'=>'suppress_parent_child_relation_checks', 'subst'=>0 ] )==1;
 	}
 
     public function taxonNewAction()
@@ -516,6 +518,18 @@ class NsrTaxonController extends NsrController
 		$this->printPage();
 	}
 
+    public function taxonOrphansAction()
+    {
+		$this->checkAuthorisation();
+        $this->setPageName($this->translate('Orphaned taxa'));
+
+		$this->smarty->assign('concepts',$this->getOrphanedSpeciesList());
+		$this->smarty->assign('treetop',$this->treeGetTop());
+		$this->printPage();
+	}
+
+
+
     public function ajaxInterfaceAction()
     {
         if (!$this->rHasVal('action'))
@@ -801,6 +815,19 @@ class NsrTaxonController extends NsrController
 		return $taxa;
 	}
 
+	private function getOrphanedSpeciesList()
+	{
+		$taxa=$this->models->NsrTaxonModel->getOrphanedSpeciesList(array(
+			"project_id"=>$this->getCurrentProjectId()
+		));
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+		}
+		
+		return $taxa;
+	}
+
 	private function getSpeciesList($p)
 	{
 		$search=!empty($p['search']) ? $p['search'] : null;
@@ -966,8 +993,25 @@ class NsrTaxonController extends NsrController
 
 	private function checkParentChildRelationship($child_base_rank,$parent_id)
 	{
+		
 		$d=$this->getTaxonById($parent_id);
+
 		$parent_base_rank=$d['base_rank'];
+
+		if ( $this->_suppress_parent_child_relation_checks )
+		{
+			if ( $parent_base_rank < $child_base_rank )
+			{
+				$this->setMessage( $this->translate("Concept saved with irregular parent (allowed through the 'suppress_parent_child_relation_checks' setting).") );
+				return true;
+			}
+			else
+			{
+				$this->addError( $this->translate("Parent rank cannot be same as, or below concept rank (even with 'suppress_parent_child_relation_checks' setting in effect).") );
+				$this->addError( $this->translate("Concept not saved.") );
+				return false;			
+			}
+		}
 
 		$ranks=$this->models->Ranks->_get(array(
 			'id'=>'*',
@@ -1098,6 +1142,11 @@ class NsrTaxonController extends NsrController
 		{
 			// subrijk moet onder rijk
 			$error=array('regnum');
+		}
+		else
+		if ( $parent_base_rank >= $child_base_rank )
+		{
+			$error=array('a higher rank');
 		}
 
 		if ($error)

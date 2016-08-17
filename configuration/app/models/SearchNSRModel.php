@@ -91,7 +91,12 @@ final class SearchNSRModel extends AbstractModel
 				on _m.id=_meta4.media_id
 				and _m.project_id=_meta4.project_id
 				and _meta4.sys_label='beeldbankDatumAanmaak'
-			
+
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
 			left join %PRE%media_meta _meta9
 				on _m.id=_meta9.media_id
 				and _m.project_id=_meta9.project_id
@@ -103,7 +108,7 @@ final class SearchNSRModel extends AbstractModel
 				and ifnull(_meta9.meta_data,0)!=1
 
 			order by 
-				_m.overview_image desc,_meta4.meta_date desc
+				_m.overview_image desc,_meta4.meta_date desc,_meta1.meta_date desc
 
 			limit 1
 		";
@@ -628,7 +633,7 @@ final class SearchNSRModel extends AbstractModel
 				)";
 		}
 
-		$sort="_meta4.meta_date desc";
+		$sort="_meta4.meta_date desc, _meta1.meta_date desc";
 		
 		if ( isset($sort) && $sort=='photographer' )
 		{
@@ -637,12 +642,12 @@ final class SearchNSRModel extends AbstractModel
 
 		if ( !empty($photographer) || !empty($validator) )
 		{
-			$sort="_meta4.meta_date desc, _k.taxon";
+			$sort="_meta4.meta_date desc, _k.taxon, _meta1.meta_date desc";
 		}
 
 		if ( !empty($photographer) || !empty($validator) )
 		{
-			$sort="_meta4.meta_date desc, _k.taxon";
+			$sort="_meta4.meta_date desc, _k.taxon, _meta1.meta_date desc";
 		}
 
 		$query="		
@@ -677,7 +682,11 @@ final class SearchNSRModel extends AbstractModel
 				on _m.id=_meta4.media_id
 				and _m.project_id=_meta4.project_id
 				and _meta4.sys_label='beeldbankDatumAanmaak'
-				and _meta4.language_id=".$language_id."
+
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
 			
 			left join %PRE%media_meta _meta9
 				on _m.id=_meta9.media_id

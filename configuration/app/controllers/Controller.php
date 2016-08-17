@@ -66,20 +66,6 @@
 	are wrappers for accessing translate() from javascript - via the function _() in
 	main.js - and smarty - via the registered block function {t}{/t} - respectively.
 
-
-	on the icon grid:
-	order of modules in the icon grid and the main menu is determined by two fields:
-		ModuleProject.show_order
-		FreeModuleProject.show_order
-	or just the first one, if there are no free modules. THERE IS NO INTERFACE FOR
-	CHANGING THESE VALUES, so changes will have to be made by hand, directly in the
-	tables. when changing these values, bear in mind that your list of modules is
-	ordered after having been combined from the normal modules (ModuleProject) and
-	possible free modules (FreeModuleProject). this means that the values for
-	show_order have to be unique across two tables; again, these is at present no
-	mechanism that actually enforces this - it is up to the system administrator.
-
-
 	on snippets:
 	to allow for the inclusion of project-dependent bits of html into general templates,
 	there is the concept of the snippet. snippets are bit of html-code that are included
@@ -1222,7 +1208,7 @@ class Controller extends BaseClass
 		{
             $result = $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
-
+		
         // If we end up here something must be wrong, just return name sans formatting
         if ( is_null($result) )
 		{
@@ -2662,7 +2648,21 @@ class Controller extends BaseClass
 			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
 			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-			return $this->addHybridMarker( $p );
+			$result=$this->addHybridMarker( $p );
+
+			if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID || $base_rank_id==NOTHOVARIETAS_RANK_ID )
+			{
+				$r=$this->models->Ranks->_get( [ "id" => [ "id" =>$base_rank_id ], "columns" => "abbreviation" ] );
+				$abbr=$r ? " ".$r[0]["abbreviation"] : "";
+				$boom=explode(" ",$result);
+				if ( isset($boom[2]) )
+				{
+					$boom[2].=$abbr;
+					$result=implode(" ",$boom);
+				}
+			}
+
+			return $result;
 		}
 		else
 		if ( $base_rank_id==VARIETAS_RANK_ID  )
@@ -2958,7 +2958,8 @@ class Controller extends BaseClass
 
 			if (!$proceed)
 			{
-				header('WWW-Authenticate: Basic realm="' . $_SESSION['app']['project']['title'] . '"');
+				//header('WWW-Authenticate: Basic realm="' . $_SESSION['app']['project']['title'] . '"');
+				header('WWW-Authenticate: Basic realm="Linnaeus NG"');
 				header('HTTP/1.0 401 Unauthorized');
 				die();
 			}

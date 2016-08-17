@@ -6,6 +6,7 @@ var highlightNodes=Array();
 var topLevelLabel=_('Taxonomische boom');
 var taxonCountStyle='species_established'; // species_established,species_only,none
 var includeSpeciesStats=true;
+var inititalExpansionLevel=null;
 
 function setTopLevelLabel(label)
 {
@@ -27,10 +28,11 @@ function getTaxonCountStyle()
 	return taxonCountStyle;
 }
 
+
 function buildtree(node)
 {
 	activeNode=node;
-
+	
 	$.ajax({
 		url : url,
 		type: "POST",
@@ -43,11 +45,30 @@ function buildtree(node)
 		success : function (data)
 		{
 			var data=$.parseJSON(data);
+			
+			if ( inititalExpansionLevel!=null && data.node.parentage && data.node.parentage.length < inititalExpansionLevel )
+			{
+				for(var i=0;i<data.progeny.length;i++)
+				{
+					autoExpandArray.push(data.progeny[i].id)
+				}
+			}
+
 			growbranches(data);
 			storetree();
 			checkAutoExpand();
 		}
 	});
+}
+
+function setInitialExpansionLevel( n )
+{
+	inititalExpansionLevel=n;
+}
+
+function unsetInitialExpand()
+{
+	setInitialExpansionLevel( null )
 }
 
 function formatTaxonCount(total,established,print_labels)
@@ -93,7 +114,7 @@ function growbranches(data)
 			'<li class="child '+(!d.has_children?'no-expand':'')+'" id="node-'+d.id+'">'+
 				(shouldHighlight ? '<span class="highlight-node">' : '' )+
 				(d.has_children ?
-					'<a href="#" onclick="buildtree('+d.id+');return false;">'+label+'</a>' : label) +
+					'<a href="#" onclick="unsetInitialExpand();buildtree('+d.id+');return false;">'+label+'</a>' : label) +
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' ) +
 				(includeSpeciesStats && d.child_count && d.child_count.total>0 ? formatTaxonCount(d.child_count.total,d.child_count.established,false) : '' ) +
 				(shouldHighlight ? '</span>' : '' )+
@@ -111,8 +132,8 @@ function growbranches(data)
 	var buffer=
 		'<li class="child">'+
 			(!activeNode ?
-				//'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
-				'<a href="#" onclick="buildtree(false);return false">'+getTopLevelLabel()+'</a>' :
+				//'<a href="#" onclick="unsetInitialExpand();buildtree(false);return false">'+data.node.label+'</a>' :
+				'<a href="#" onclick="unsetInitialExpand();buildtree(false);return false">'+getTopLevelLabel()+'</a>' :
 				'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+label+'</a>'
 			)+
 			(data.node.rank_label ? 
@@ -200,7 +221,6 @@ function checkAutoExpand()
 	if (node)
 	{
 		buildtree(node);
-		
 	}
 }
 
@@ -224,7 +244,6 @@ function setAutoExpand(id)
 				addAutoExpandNode(data[index]);
 			}
 			buildtree(false);
-			
 		}
 	});
 }

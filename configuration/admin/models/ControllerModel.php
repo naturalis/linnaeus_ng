@@ -46,7 +46,8 @@ final class ControllerModel extends AbstractModel
 				_a.list_level,
 				_p.rank_id as base_rank,
 				_p.rank_id as base_rank_id,
-				_p.lower_taxon as lower_taxon
+				_p.lower_taxon as lower_taxon,
+				_r.rank as rank
 
 			from
 				%PRE%taxa _a
@@ -54,6 +55,9 @@ final class ControllerModel extends AbstractModel
 			left join %PRE%projects_ranks _p
 				on _a.project_id= _p.project_id
 				and _a.rank_id = _p.id
+
+			left join %PRE%ranks _r
+				on _p.rank_id = _r.id
 
 			where
 				_a.project_id = " . $project_id . "

@@ -67,7 +67,7 @@ class VersatileExportController extends Controller
 	private $orderBy="_f.rank_id asc,_r.id, _t.taxon";  // rank, rank id, taxon
 	private $limit=9999999;
 	private $show_nsr_specific_stuff;
-
+	private $spoof_settings;
 
 	/*
 		when the number of names is larger than synonymStrategyThrehold, the
@@ -78,16 +78,16 @@ class VersatileExportController extends Controller
 	*/
 	private $synonymStrategyThrehold=2000;
 
-	private $csv_file_name="nsr-export--%s.csv";
+	private $csv_file_name="%s-export--%s.csv";
 
 	private $EOFMarker='(end of file)';
 
 	private $columnHeaders=[
-		'sci_name'=>'wetenschappelijke_naam',
-		'dutch_name'=>'nederlandse_naam',
-		'rank'=>'rang',
+		'sci_name'=>'scientific_name',
+		'dutch_name'=>'dutch_name',
+		'rank'=>'rank',
 		'nsr_id'=>'nsr_id',
-		'presence_status'=>'voorkomens_status',
+		'presence_status'=>'presence_status',
 		'habitat'=>'habitat',
 		'concept_url'=>'concept_url',
 		'database_id'=>'database_id',
@@ -98,9 +98,9 @@ class VersatileExportController extends Controller
 		'authorship'=>'authorship',
 		'name_author'=>'name_author',
 		'authorship_year'=>'authorship_year',
-		'synonym'=>'synoniem',
-		'synonym_type'=>'type_synoniem',
-		'language'=>'taal',
+		'synonym'=>'synonym',
+		'synonym_type'=>'type_synonym',
+		'language'=>'language',
 		'taxon'=>'taxon',
 	];
 
@@ -125,6 +125,23 @@ class VersatileExportController extends Controller
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->concept_url=$this->moduleSettings->getGeneralSetting( 'concept_base_url' );
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
+
+		if ( method_exists( $this->customConfig , 'getVersatileExportSpoof' ) ) 
+		{
+			$this->spoof_settings=$this->customConfig->getVersatileExportSpoof();
+			if ( $this->spoof_settings->do_spoof_export )
+			{
+				$this->smarty->assign( 'spoof_settings_warning', $this->spoof_settings->texts->warning );
+			}
+		}
+		
+		foreach ((array)$this->columnHeaders as $key=>$val)
+		{
+			foreach((array)$this->columnHeaders as $key=>$val)
+			{
+				$this->columnHeaders[$key]=$this->translate($val);
+			}
+		}		
     }
 
     public function exportAction()
@@ -353,8 +370,8 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['wetenschappelijke_naam']=
-					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['wetenschappelijke_naam'],'base_rank_id'=>$val['_base_rank_id'] ) );
+				$this->names[$key]['scientific_name']=
+					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['scientific_name'],'base_rank_id'=>$val['_base_rank_id'] ) );
 			}
 		}
 
@@ -362,7 +379,7 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['wetenschappelijke_naam']=preg_replace('/(\s+)/',' ',strip_tags($val['wetenschappelijke_naam']));
+				$this->names[$key]['scientific_name']=preg_replace('/(\s+)/',' ',strip_tags($val['scientific_name']));
 			}
 		}
 
@@ -520,7 +537,7 @@ class VersatileExportController extends Controller
 						$this->columnHeaders['synonym']=>isset($row['name']) ? $row['name'] : null,
 						$this->columnHeaders['synonym_type']=>isset($row['nametype']) ? $row['nametype'] : null,
 						$this->columnHeaders['language']=>isset($row['language']) ? $row['language'] : null,
-						$this->columnHeaders['taxon']=>isset($val['wetenschappelijke_naam']) ? $val['wetenschappelijke_naam'] : null,
+						$this->columnHeaders['taxon']=>isset($val['scientific_name']) ? $val['scientific_name'] : null,
 					);
 
 				if (isset($val['nsr_id']))
@@ -537,9 +554,10 @@ class VersatileExportController extends Controller
 			}
 		}
 	}
-
+	
 	private function doOutput()
 	{
+		
 		if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
 		if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
 
@@ -549,20 +567,49 @@ class VersatileExportController extends Controller
 			echo "<pre>",$this->getNewLine();
 		}
 
-		$this->doQueryParametersOutput();
-		$this->doNamesOutput();
-		$this->doSynonymsOutput();
-		$this->doEOFMarkerOutput();
+		if ( isset($this->spoof_settings->do_spoof_export) && $this->spoof_settings->do_spoof_export )
+		{
+			$this->doSpoofOutput();
+		}
+		else
+		{
+			$this->doQueryParametersOutput();
+			$this->doNamesOutput();
+			$this->doSynonymsOutput();
+			$this->doEOFMarkerOutput();
+		}
 
 		if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
 
 		die();
 	}
 
+	private function doSpoofOutput()
+	{
+		$this->doQueryParametersOutput();
+		$this->printHeaderLine( $this->names );
+		$this->printNewLine();
+		$this->printNewLine();
+		echo $this->spoof_settings->texts->download_body;
+		$this->printNewLine();
+	
+		if ( $this->getDoSynonyms() )
+		{
+			$this->printNewLine();
+			$this->printHeaderLine( $this->synonyms );
+			$this->printNewLine();
+			$this->printNewLine();
+			echo $this->spoof_settings->texts->download_synonyms;
+			$this->printNewLine();
+		}
+
+		$this->doEOFMarkerOutput();		
+	}
+
 	private function printHeaders()
 	{
 		header('Content-Type: application/csv');
-		header('Content-Disposition: attachment; filename='.sprintf($this->csv_file_name,date('Ymd-His')));
+		header('Content-Disposition: attachment; filename='.sprintf($this->csv_file_name,$this->getProjectTitle( true ),date('Ymd-His')));
 		header('Pragma: no-cache');
 	}
 

@@ -12,12 +12,11 @@ table tr th {
 
 <div id="page-main">
 
-	{if $user}
+	{if $user.id}
     <h2>{t}edit{/t} {$user.first_name} {$user.last_name}</h2>
 	{else}
     <h2>{t}new user{/t}</h2>
     {/if}
-
     
     <form id="theForm" method="post" onsubmit="return submitUserEditForm();">
     <input id="id" name="id" value="{$user.id}" type="hidden" />
@@ -72,7 +71,14 @@ table tr th {
             <td>
             	<select id="roles" name="role_id">
                 {foreach $roles v}
-                <option value="{$v.id}"{if $v.id==$user.project_role.role_id} selected="selected"{/if}>{$v.role}</option>
+                <option
+                    {if !$user.project_role.role_id && $v.id==$smarty.const.ID_ROLE_EDITOR}
+                    	selected="selected"
+					{elseif $v.id==$user.role_id} {* when screen returns because of new user w/ incorrect data *}
+                    	selected="selected"
+					{elseif $v.id==$user.project_role.role_id}
+                    	selected="selected"
+					{/if} value="{$v.id}">{$v.role}</option>
                 {/foreach}
                 </select>
             </td>
@@ -86,19 +92,20 @@ table tr th {
             </td>
         </tr>
 
-		{if $user.id}
         <tr>
             <th>{t}Modules:{/t}</th>
             <td>
 				{include file="_module_access.tpl"}
             </td>
         </tr>
+		{if $user.id}
         <tr>
             <td></td>
             <td>
                 <a href="#" onclick="resetPermissions();return false;">reset permissions to role defaults</a>
             </td>
         </tr>
+	    {/if}
         <tr>
             <td colspan="2">&nbsp;</td>
         </tr>
@@ -108,7 +115,6 @@ table tr th {
 				{include file="_taxon_access.tpl"}
             </td>
         </tr>
-	    {/if}
 
     </table>
 
@@ -132,15 +138,31 @@ table tr th {
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+	roleID_sysAdmin={$smarty.const.ID_ROLE_SYS_ADMIN};
+	roleID_leadExpert={$smarty.const.ID_ROLE_LEAD_EXPERT};
+	roleID_editor={$smarty.const.ID_ROLE_EDITOR};
+
 	$('#username').focus();
+	
+	{if !$user.id}
 	
 	$('#roles').on('change',function()
 	{
-		$('[name=can_publish]').prop('disabled',($('#roles :selected').val() < {$expert_role_id} ));
+		if ($('#roles :selected').val() < {$smarty.const.ID_ROLE_EDITOR})
+		{
+			$('[name=can_publish][value=1]').prop('checked',true);
+		}
+		else
+		{
+			$('[name=can_publish][value=0]').prop('checked',true);
+		}
+		setPermissions();
 	});
 	
 	$('#roles').trigger('change');
 	
+	{/if}
+
 
 });
 </script>
