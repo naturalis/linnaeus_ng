@@ -70,6 +70,7 @@ class TraitsTraitsController extends TraitsController
 	
     public function projectTypesAction()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Project data types'));
 
@@ -93,6 +94,7 @@ class TraitsTraitsController extends TraitsController
 
     public function traitgroupsAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Trait groups'));
 
@@ -110,6 +112,7 @@ class TraitsTraitsController extends TraitsController
 
     public function traitgroupAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 
 		if ($this->rHasVal('action','save'))
@@ -150,6 +153,7 @@ class TraitsTraitsController extends TraitsController
 
     public function traitgroupTraitsAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 		$this->checkAuthorisation();
         $this->setPageName($this->translate('Trait group traits'));
 
@@ -169,6 +173,7 @@ class TraitsTraitsController extends TraitsController
 
     public function traitgroupTraitAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
 		
 		if (!$this->rHasId() && !$this->rHasVar('group'))
@@ -231,6 +236,8 @@ class TraitsTraitsController extends TraitsController
 
     public function traitgroupTraitValuesAction()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+
 		$this->checkAuthorisation();
 		
 		if (!$this->rHasId() && !$this->rHasVar('trait'))
@@ -259,6 +266,7 @@ class TraitsTraitsController extends TraitsController
 	
     public function settingsAction()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Traits settings'));
         $this->printPage();
