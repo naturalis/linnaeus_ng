@@ -440,10 +440,14 @@ class MediaController extends Controller
         }
 
         if ($this->rHasVal('action', 'delete')) {
+			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
+			$this->checkAuthorisation();
             $this->deleteMedia();
         }
 
         if ($this->rHasVal('action', 'attach')) {
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
             $this->attachMedia();
         }
 
@@ -490,6 +494,7 @@ class MediaController extends Controller
 
     public function editAction ()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Edit media'));
 		$id = $this->rGetVal('id');
@@ -604,6 +609,7 @@ class MediaController extends Controller
 
     public function uploadAction ()
     {
+		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
         $this->checkAuthorisation();
 		$this->setPageName($this->translate('Upload media'));
 
@@ -910,6 +916,7 @@ class MediaController extends Controller
 
     public function setupRsAction ()
     {
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->checkAuthorisation();
         $this->setRsSettings();
 
