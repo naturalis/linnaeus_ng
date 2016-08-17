@@ -76,9 +76,11 @@
         </tr>
     </table>
 
+	{if $use_media}
     <p>
 		<span class="a" onclick="$('#action').val('media');glossCheckForm();">{t}Edit multimedia{/t}</span>	
 	</p>
+	{/if}
 
 </form>
 </div>
