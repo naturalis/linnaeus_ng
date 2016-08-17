@@ -61,7 +61,7 @@ class UtilitiesController extends Controller
     public function notAuthorizedAction ()
     {
         $this->smarty->assign('hideControllerPublicName', true);
-
+		
         $this->addError( $this->translate('You are not authorized to do that.') );
 
 		if ( isset($_SESSION['admin']['user']['authorization_fail_message']) )
@@ -71,6 +71,10 @@ class UtilitiesController extends Controller
 				'<!-- ' . $_SESSION['admin']['user']['authorization_fail_page'] . ' -->'
 			 );
 		}
+
+		// for wiki link
+		$this->wikiPageOverride['basename']='notAuthorized';
+		$this->setPageName( 'not authorized' ); 
 
         $this->printPage();
     }

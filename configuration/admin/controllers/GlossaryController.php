@@ -22,6 +22,7 @@
 
 include_once ('Controller.php');
 include_once ('MediaController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class GlossaryController extends Controller
 {
@@ -86,7 +87,17 @@ class GlossaryController extends Controller
 
     private function initialize()
     {
-        $this->setMediaController();
+
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		
+		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
+		
+		if ( $this->use_media )
+		{
+			$this->setMediaController();
+		}
+
+		$this->smarty->assign( 'use_media', $this->use_media );
 	}
 
 
@@ -126,25 +137,27 @@ class GlossaryController extends Controller
 
 		$this->setPageName($this->translate('Contents'));
 
-        if (is_null($this->getProjectLanguages())) {
-
+        if (is_null($this->getProjectLanguages()))
+		{
 			$this->addError(
 				sprintf(
 					$this->translate('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
 					'<a href="../projects/data.php">','</a>')
 				);
 
-		} else
-        if (is_null($this->getDefaultProjectLanguage())) {
-
+		} 
+		else
+        if (is_null($this->getDefaultProjectLanguage()))
+		{
 			$this->addError(
 				sprintf(
 					$this->translate('No default language has been defined. Go %shere%s to set the default languages.'),
 					'<a href="../projects/data.php">','</a>')
 				);
 
-		} else {
-
+		} 
+		else 
+		{
 			if (!$this->rHasVal('letter') && !is_null($this->moduleSession->getModuleSetting('activeLetter')))
 				$this->requestData['letter'] = $this->moduleSession->getModuleSetting('activeLetter');
 
@@ -159,15 +172,14 @@ class GlossaryController extends Controller
 			if (!$this->rHasVal('activeLanguage'))
 				$this->requestData['activeLanguage'] = $this->getDefaultProjectLanguage();
 
-			if ($this->rHasVal('letter')) {
-
+			if ($this->rHasVal('letter'))
+			{
 				$gloss = $this->getGlossaryTerms(
 					array(
 						'term like' => $this->rGetVal('letter').'%',
 						'language_id' => $this->rGetVal('activeLanguage')
 					),
 					'term');
-
 			}
 
 			$pagination = $this->getPagination($gloss,$this->termsPerPage);
