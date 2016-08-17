@@ -17,6 +17,7 @@
         {/if}
         <a href="export_versatile.php">{t}multi-purpose export{/t}</a><br />
         <a href="import_file.php">{t}taxon import{/t}</a><br />
+        <a href="import_passport_file.php">{t}passport import{/t}</a><br />
     </p>
     <p>
         <a href="tabs.php">{t}passport categories ("tabs"){/t}</a><br />
