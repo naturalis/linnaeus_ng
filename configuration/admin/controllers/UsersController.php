@@ -159,11 +159,14 @@ class UsersController extends Controller
 				$this->userPasswordSave();
 				$this->setUser();
 				$this->addUserToCurrentProject();
+				$this->userRightsSave();
+				$this->userTaxaSave();
 				$this->logUserChange( $this->translate('created user') );
 				$this->redirect('index.php');
 			}
 		}
 
+		$this->smarty->assign( 'modules', $this->getProjectModulesUser() );
 		$this->smarty->assign( 'roles', $this->getUserPermittedRoles() );
 		$this->smarty->assign('user', $this->rGetAll() );
 		$this->printPage( 'edit' );
@@ -1052,6 +1055,9 @@ class UsersController extends Controller
 		}
 		else
 		*/
+
+		$can_publish='0';
+		
 		if( $this->getUser()['project_role']['role_id']==ID_ROLE_LEAD_EXPERT )
 		{
 			foreach((array)$d['modules'] as $val)
