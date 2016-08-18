@@ -122,10 +122,12 @@ div.messages {
 	<input name="uploadedfile" type="file" /><br />
 
 	<p>
-	{t}CSV field delimiter:{/t}
-    <label><input type="radio" name="delimiter" value="comma"/>, {t}(comma){/t}</label>
-    <label><input type="radio" name="delimiter" value="semi-colon" />; {t}(semi-colon){/t}</label>
-    <label><input type="radio" name="delimiter" value="tab" checked="checked"  />{t}tab{/t}</label>
+	{t}Choose CSV field delimiter:{/t}
+    <ul>
+    	<li><label><input type="radio" name="delimiter" value="comma"/>, {t}(comma){/t}</label></li>
+        <li><label><input type="radio" name="delimiter" value="semi-colon" />; {t}(semi-colon){/t}</label></li>
+        <li><label><input type="radio" name="delimiter" value="tab" checked="checked"  />{t}tab{/t}</label></li>
+	</ul>
 	</p>
 	        
 		<!--
