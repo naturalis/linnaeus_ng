@@ -67,6 +67,16 @@ class CsvParserHelper
 		if (in_array($delimiter,$this->_allowedDelimiters)) $this->_delimiter = $delimiter;
     }
 
+    public function setMaxLineLength($length)
+    {
+		if ( is_numeric($length) && $length > 0 ) $this->_maxLineLength = $length;
+    }
+
+    public function getMaxLineLength()
+    {
+        return $this->_maxLineLength;
+    }
+
     public function setFieldMax($num)
     {
         $this->_fieldMax = $num;
@@ -158,7 +168,7 @@ class CsvParserHelper
 			// fgetcsv does not allow for enclosure being absent
 			if ($this->_enclosure==false)
 			{
-				while (($data = fgets($handle,$this->_maxLineLength))!==false)
+				while (($data = fgets($handle,$this->getMaxLineLength()))!==false)
 				{
 					/*
 						wish we had str_getcsv, but the specs say stick to PHPv5.2
@@ -178,7 +188,7 @@ class CsvParserHelper
 			} 
 			else 
 			{
-				while (($data=fgetcsv($handle,$this->_maxLineLength,$this->_delimiter,$this->_enclosure))!==false)
+				while (($data=fgetcsv($handle,$this->getMaxLineLength(),$this->_delimiter,$this->_enclosure))!==false)
 				{
 					$this->_results[] = $data;
 					if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax)
