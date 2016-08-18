@@ -30,6 +30,7 @@
 	to do content:
 	- simplify settings (for instance multiple image base URLs)
 
+	move the traits settings!
 
 
 	// usage
