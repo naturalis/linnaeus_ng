@@ -171,6 +171,7 @@ final class MediaModel extends AbstractModel
         $query = "
             select
                 t1.id,
+                t1.name as file_name,
                 t2.sort_order,
                 t2.overview_image
             from %PRE%media as t1
@@ -502,7 +503,7 @@ final class MediaModel extends AbstractModel
 
         $query = "
             update
-                `$table`
+                %PRE%" . $table . "
             replace(`$column`, '$oldUrl', '$newUrl')
             where
                 `$column` like '%$oldUrl%' and
@@ -510,6 +511,27 @@ final class MediaModel extends AbstractModel
 
         $this->freeQuery($query);
     }
+
+    public function getOldStyleTaxonMedia ($p)
+    {
+        $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
+            $this->escapeString($p['project_id']) : false;
+        $taxonId = isset($p['taxon_id']) && !empty($p['taxon_id']) ?
+            $this->escapeString($p['taxon_id']) : false;
+
+        $q = "
+            select
+                file_name
+            from
+                %PRE%media_taxon
+            where
+                project_id = $projectId and
+                taxon_id = $taxonId";
+
+        return $this->freeQuery($q);
+    }
+
+
 }
 
 ?>

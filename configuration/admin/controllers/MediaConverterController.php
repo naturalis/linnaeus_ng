@@ -14,6 +14,7 @@ class MediaConverterController extends MediaController
     private $projectModules;
     private $totals = array();
     private $media = array();
+    private $internalMediaLinks = array();
     private $uploadInternalMedia = array();
 
     private $_currentModule;
@@ -26,6 +27,7 @@ class MediaConverterController extends MediaController
     private $_rsFile;
     private $_overview;
     private $_sortOrder;
+    private $_lastItem;
 
     private $_maxFileSize;
     private $_filePath;
@@ -78,7 +80,42 @@ class MediaConverterController extends MediaController
     {
 		$this->setPageName($this->translate('Convert media'));
         $this->smarty->assign('totals', $this->setProjectMedia());
+        $this->fixConversionError();
         $this->printPage();
+    }
+
+    private function fixConversionError ()
+    {
+        if (empty($this->_lastItem)) return;
+
+        $originalMedia = $this->models->MediaModel->getOldStyleTaxonMedia(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'taxon_id' => $this->_lastItem['item_id']
+        ));
+
+        $convertedMedia = $this->models->MediaModel->getItemMediaFiles(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'item_id' => $this->_lastItem['item_id'],
+            'module_id' => $this->_lastItem['module_id'],
+        ));
+
+        $delete = array_udiff($convertedMedia, $originalMedia, function ($a, $b) {
+            return strcmp($a['file_name'], $b['file_name']);
+        });
+
+        if (!empty($delete)) {
+
+            foreach ($delete as $file) {
+                $this->models->MediaModules->delete(array(
+            		'project_id' => $this->getCurrentProjectId(),
+            		'media_id' => $file['id'],
+                    'item_id' => $this->_lastItem['item_id'],
+                    'module_id' => $this->_lastItem['module_id']
+        		));
+            }
+
+            $this->addMessage(count($delete) . ' incorrectly linked media files were unlinked.');
+        }
     }
 
     public function printConversionProgressAction ($cli = false)
@@ -141,9 +178,9 @@ class MediaConverterController extends MediaController
         $this->convertInternalMediaLinks();
     }
 
-    private function convertInternalMediaLinks ()
+    private function setInternalMediaLinks ()
     {
-        $modules = array(
+            $modules = array(
             'Taxon editor' => array(
                 'column' => 'content',
                 'table' => 'content_taxa'
@@ -168,12 +205,27 @@ class MediaConverterController extends MediaController
 
         foreach ($modules as $name => $module) {
 
-            echo 'Updating links in ' . $name . '...' . $this->_br;
-
             $data = $this->getInternalMediaLinks(array(
                 'column' => $module['column'],
                 'table' => $module['table']
             ));
+
+            $this->internalMediaLinks[$name] = array(
+                'column' => $module['column'],
+                'table' => $module['table'],
+                'data' => $data
+            );
+        }
+
+    }
+
+    private function convertInternalMediaLinks ()
+    {
+        $this->setInternalMediaLinks();
+
+        foreach ($this->internalMediaLinks as $name => $module) {
+
+            echo 'Updating links in ' . $name . '...' . $this->_br;
 
             $this->updateInternalMediaLinks(array(
                 'column' => $module['column'],
@@ -368,6 +420,10 @@ class MediaConverterController extends MediaController
             $this->totals['modules']['Taxon editor'] = count($media);
         }
 
+        // Set last converted item to fix conversion hiccup
+        $this->_lastItem = end($media);
+        $this->_lastItem['module_id'] = $moduleId;
+
         // Free module(s)
         if (isset($this->projectModules['freeModules'])) {
             foreach ($this->projectModules['freeModules'] as $id => $module) {
@@ -385,6 +441,7 @@ class MediaConverterController extends MediaController
                     $this->totals['modules'][$module] = count($media);
                 }
             }
+
         }
 
         $this->totals['total'] = array_sum($this->totals['modules']);
