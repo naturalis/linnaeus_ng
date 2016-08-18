@@ -80,7 +80,7 @@ class MediaConverterController extends MediaController
     {
 		$this->setPageName($this->translate('Convert media'));
         $this->smarty->assign('totals', $this->setProjectMedia());
-        //$this->fixConversionError();
+        $this->fixConversionError();
         $this->printPage();
     }
 
