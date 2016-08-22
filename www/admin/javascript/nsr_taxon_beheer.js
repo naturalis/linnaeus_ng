@@ -212,9 +212,6 @@ function checkNameAgainstRank()
 
 function checkPresenceDataSpecies()
 {
-	// Ruud 11-07-16: LINNA-524
-	return [];
-
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 	if (!rank)
 	{
@@ -223,24 +220,28 @@ function checkPresenceDataSpecies()
 
 
 	var buffer=[];
-
-	var p1=$('#presence_presence_id :selected').val();
-	var p2=$('#presence_expert_id :selected').val();
-	var p3=$('#presence_organisation_id :selected').val();
-	var p4=$('#presence_reference_id').val();
-
-	if (rank>=speciesBaseRankid)
+	
+	
+	if ( $('#presence_presence_id') && $('#presence_expert_id') && $('#presence_organisation_id') && $('#presence_reference_id') )
 	{
-		if (p1 && p1==-1) buffer.push(_("Presence: status has not been entered."));
-		if (p2 && p2==-1) buffer.push(_("Presence: expert has not been entered."));
-		if (p3 && p3==-1) buffer.push(_("Presence: organisation has not been entered."));
-		if (p4 && p4.length==0) buffer.push(_("Presence: publication has not been entered."));
-	}
-	else
-	if (rank<speciesBaseRankid)
-	{
-		if (p1!=-1 || p2!=-1 || p3!=-1 || p4.length!=0)
-			buffer.push("Presence cannot be entered for higher taxa.");
+		var p1=$('#presence_presence_id :selected').val();
+		var p2=$('#presence_expert_id :selected').val();
+		var p3=$('#presence_organisation_id :selected').val();
+		var p4=$('#presence_reference_id').val();
+	
+		if (rank>=speciesBaseRankid)
+		{
+			if (p1 && p1==-1) buffer.push(_("Presence: status has not been entered."));
+			if (p2 && p2==-1) buffer.push(_("Presence: expert has not been entered."));
+			if (p3 && p3==-1) buffer.push(_("Presence: organisation has not been entered."));
+			if (p4 && p4.length==0) buffer.push(_("Presence: publication has not been entered."));
+		}
+		else
+		if (rank<speciesBaseRankid)
+		{
+			if (p1!=-1 || p2!=-1 || p3!=-1 || p4.length!=0)
+				buffer.push("Presence cannot be entered for higher taxa.");
+		}
 	}
 
 	//if (buffer.length>0) alert(buffer.join("\n"));
@@ -250,9 +251,6 @@ function checkPresenceDataSpecies()
 
 function checkPresenceDataHT()
 {
-	// Ruud 11-07-16: LINNA-524
-	return [];
-
 	var buffer=[];
 	var rank = $('#concept_rank_id :selected').attr('base_rank_id');
 
@@ -261,7 +259,7 @@ function checkPresenceDataHT()
 		rank=taxonrank;
 	}
 
-	if (rank<speciesBaseRankid)
+	if (rank<speciesBaseRankid && ( $('#presence_presence_id') && $('#presence_expert_id') && $('#presence_organisation_id') && $('#presence_reference_id') ) )
 	{
 		var p1=$('#presence_presence_id :selected').val()==-1;
 		var p2=$('#presence_expert_id :selected').val()==-1;
@@ -631,18 +629,43 @@ function tempus_fugit( callback, params )
 	}
 }
 
+var closeLabel = _('assign no value');
+var inputPlaceHolder = _('type to find');
+
+function setDropListCloseLabel( label )
+{
+	closeLabel=label;
+}
+
+function getDropListCloseLabel()
+{
+	return closeLabel;
+}
+
+function setInputPlaceHolder( label )
+{
+	inputPlaceHolder;
+}
+
+function getInputPlaceHolder()
+{
+	return inputPlaceHolder;
+}
+
 function dropListDialog(ele,title,params)
 {
 	var target=$(ele).attr('rel');
 	var id='__'+target+'_INPUT';
 
+	//onclick="setNsrDropListValue(this,\''+target+'\'); ...
+
 	prettyDialog({
 		title:title,
 		content :
-			'<p><input type="text" class="medium" id="'+id+'" /></p> \
+			'<p><input type="text" class="medium" id="'+id+'" placeholder="' + getInputPlaceHolder() + '" /></p> \
 			 <p> \
-			 <a href="#" onclick="setNsrDropListValue(this,\''+target+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
-				 ' + _('assign no value') + ' \
+			 <a href="#" onclick="$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
+				 ' + getDropListCloseLabel() + ' \
 			</a> \
 			<div id="droplist-list-container"></div> \
 			</p>'
@@ -840,3 +863,35 @@ function checkprefnameavail()
 		$('#nametype-'+preferrednameid).removeAttr('disabled');
 	}
 }
+
+
+
+function treeDialog(ele,title,params)
+{
+	prettyDialog({
+		title:title,
+		content :
+			'<p> \
+			 <a href="#" onclick="$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
+				 ' + getDropListCloseLabel() + ' \
+			</a> \
+			<div id="dialog_tree"></div> \
+			</p>'
+	});
+
+	$('#dialog_tree').load( '/linnaeus_ng/admin/views/nsr/tree.php', function ()
+	{
+		taxonTargetUrl="javascript:selectTreeNode";
+	});
+
+}
+
+function selectTreeNode(id,label)
+{
+	$( '#parent_taxon').html( unescape(label) );
+	$( '#parent_taxon_id').val( id );
+	$( '#dialog-message' ).dialog( 'close' );
+}
+
+
+

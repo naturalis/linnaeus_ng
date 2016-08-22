@@ -2,7 +2,7 @@
 <head>
     <link rel="stylesheet" type="text/css" href="../../../admin/style/rank-list.css">
     <link rel="stylesheet" type="text/css" href="../../../admin/style/lookup.css">
-    <link rel="stylesheet" type="text/css" href="../../../admin/style/nsr_taxon_tree.css">
+    <link rel="stylesheet" type="text/css" href="../../../admin/style/nsr_taxon_tree.css?rnd={$rnd}">
 	<script type="text/javascript" src="../../../admin/javascript/lookup.js"></script>
 	<script type="text/javascript" src="../../../admin/javascript/nsr_taxon_tree.js"></script>
 </head>

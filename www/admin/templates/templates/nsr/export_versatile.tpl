@@ -25,6 +25,14 @@ div.fieldsubset {
 .admin-warnings {
 	margin:5px 0 5px 0;
 }
+
+/* tree */
+#dialog_tree {
+	font-size:0.9em;
+}
+.child-count {
+	display:none;
+}
 </style>
 
 <script>
@@ -173,8 +181,12 @@ function doSubmit()
         <div class="fieldsubset">
             <h4>{t}Top of branch to be exported{/t}</h4>
             <span id="parent_taxon">-</span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Branch top');return false;" rel="parent_taxon_id">
-                    {t}select{/t}
+                <a class="edit" style="margin:0 2px 0 5px" href="#" onclick="dropListDialog(this,'{t}Top of branch to be exported{/t}');return false;" rel="parent_taxon_id">
+                    {t}find{/t}
+                </a>
+                /
+                <a class="edit" style="margin-left:0" href="#" onclick="treeDialog(this,'{t}Top of branch to be exported{/t}');return false;" rel="parent_taxon_id">
+                    {t}browse{/t}
                 </a>
                 <input type="hidden" id="parent_taxon_id" value="" name="branch_top_id" mandatory="mandatory"  label="ouder" droplistminlength="3" />
         </div>
@@ -522,6 +534,7 @@ $(document).ready(function()
 	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
 	{/if}
 	$('#col_sci_name').trigger('click').prop('checked',true);
+	setDropListCloseLabel('close');
 });
 </script>
 
