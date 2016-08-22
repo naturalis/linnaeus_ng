@@ -57,9 +57,6 @@ $(document).ready(function()
 	}
 	
 //	menu-container
-	
-	
-	
 });
 </script>
 

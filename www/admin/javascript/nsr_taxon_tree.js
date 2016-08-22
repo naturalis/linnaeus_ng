@@ -7,6 +7,7 @@ var highlightNodes=Array();
 var nodeCountType='species'; // species, taxon, none
 var rootNodeLabel='Taxonomy';
 var useHighLight=true;
+var detailLinkLabel='&rarr;';
 
 function setAjaxTreeUrl(url)
 {
@@ -65,6 +66,25 @@ function checkAutoExpand()
 	}
 }
 
+function detailLink( id, label )
+{
+	// allows for use of alternative JS-links: taxonTargetUrl="javascript:doSomething";
+	var js="javascript:";
+	if (taxonTargetUrl.indexOf(js)==0)
+	{
+		var f=taxonTargetUrl.substring(js.length);
+
+		if (typeof window[f]=="function")
+		{
+			window[f](id,label);
+		}
+	}
+	else
+	{
+		window.open(taxonTargetUrl.replace('%s',id)+'&noautoexpand=1','_top');
+	}
+}
+
 function buildtree(node)
 {
 	activeNode=node;
@@ -119,7 +139,7 @@ function growbranches(data)
 					''
 				)+
 				(shouldHighlight ? '</span>' : '' )+
-				'<a href="'+taxonTargetUrl.replace('%s',d.id)+'&noautoexpand=1" class="detail-link">&rarr;</a> \
+				'<a href="#" onclick="detailLink('+d.id+',\''+escape(d.label)+'\');return false;" class="detail-link">'+detailLinkLabel+'</a> \
 			</li>';
 	}
 	
@@ -154,7 +174,7 @@ function growbranches(data)
 				)+
 				(!activeNode && getShowUpperTaxon()==false ?
 					'':
-					'<a href="'+taxonTargetUrl.replace('%s',data.node.id)+'&noautoexpand=1" class="detail-link">&rarr;</a>'
+					'<a href="#" onclick="detailLink('+data.node.id+',\''+escape(data.node.label)+'\');return false;" class="detail-link">'+detailLinkLabel+'</a>'
 				)+
 				progeny+
 			'</li>'+
