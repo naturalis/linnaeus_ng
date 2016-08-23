@@ -120,8 +120,7 @@ function growbranches(data)
 	{
 		var d=data.progeny[i];
 
-		if (d.id==undefined)
-			continue;
+		if (d.id==undefined) continue;
 			
 		var shouldHighlight=(useHighLight===true && shouldHighlightNode(d.id));
 
@@ -131,13 +130,9 @@ function growbranches(data)
 				(d.has_children ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
 				(nodeCountType=='species' && d.child_count && d.child_count.total>0 ?
-					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' :
-					''
-				)+
+					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' : '')+
 				(nodeCountType=='taxon' && d.child_count && d.child_count>0 ?
-					'<span class="child-count">'+d.child_count+'</span>' :
-					''
-				)+
+					'<span class="child-count">'+d.child_count+'</span>' : '' )+
 				(shouldHighlight ? '</span>' : '' )+
 				'<a href="#" onclick="detailLink('+d.id+',\''+escape(d.label)+'\');return false;" class="detail-link">'+detailLinkLabel+'</a> \
 			</li>';
@@ -149,12 +144,13 @@ function growbranches(data)
 		'<ul class="top">'+
 			'<li class="child">'+
 				(!activeNode ?
-					'<a href="#" onclick="buildtree(false);return false">'+(getShowUpperTaxon()==false && getRootNodeLabel()!="" ? getRootNodeLabel() : data.node.label)+'</a>' :
+					'<a href="#" onclick="buildtree(false);return false">'+
+						(data.node.parent_id==null && getShowUpperTaxon()==false && getRootNodeLabel()!="" ? getRootNodeLabel() : data.node.label)+'</a>' :
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
-				(data.node.rank_label && getShowUpperTaxon()==true? 
-					'<span class="rank">'+data.node.rank_label+'</span>' : 
-					'' 
+				( (data.node.parent_id==null && getShowUpperTaxon()==false) || data.node.rank_label.length==0 ? 
+					'' :
+					'<span class="rank">'+data.node.rank_label+'</span>'
 				)+
 				(nodeCountType=='species' && data.node.child_count && data.node.child_count.total>0 && !activeNode ?
 					'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
