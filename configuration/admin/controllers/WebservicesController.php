@@ -63,7 +63,7 @@ class WebservicesController extends Controller
 	public function indexAction()
 	{
 		$this->authenticateUser();
-	    $this->smarty->assign( 'base_url', 'http://' . '%AUTH%' . $_SERVER['HTTP_HOST'] . pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' );
+	    $this->smarty->assign( 'base_url', 'https://' . '%AUTH%' . $_SERVER['HTTP_HOST'] . pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' );
 		$this->smarty->assign( 'services', $this->_services );
 		$this->smarty->assign( 'general_parameters', $this->_generalParameters );
 
