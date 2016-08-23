@@ -50,10 +50,7 @@ ul.management li {
 
     <ul class="management">
         <li><a href="../module_settings/">{t}Settings{/t}</a></li>
-        <li><a href="../hotwords/">{t}Hotwords{/t}</a></li>
         <li><a href="activity_log.php">{t}Activity log{/t}</a></li>
-        <!-- li><a href="../utilities/mass_upload.php">{t}Mass upload images{/t}</a></li -->
-        <!-- li><a href="../projects/clear_cache.php">{t}Clear cache{/t}</a></li -->
         <li><a href="../import/index.php">{t}Import data{/t}</a></li>
     </ul>
 
@@ -64,11 +61,9 @@ ul.management li {
     <h3>{t}System tasks{/t}</h3>
 
 	<ul class="management">
-        <!-- li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li -->
         <li><a href="../projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
         <li><a href="../projects/delete.php">{t}Delete a project{/t}</a></li>
         <li><a href="../projects/change_id.php">{t}Change a project ID{/t}</a></li>
-        <!-- li><a href="../import/export.php">{t}Generic export{/t}</a></li -->
         {if $cronNextRun}
 	        <li style="color:#999;">{t}Export multi-entry key for Linnaeus Mobile{/t} (disabled)</li>
 	        <li style="color:#999;">{t}Complete export for Linnaeus Mobile{/t} (disabled)</li>

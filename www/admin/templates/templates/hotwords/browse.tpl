@@ -64,9 +64,9 @@ function hotwordsDelete( id )
 </div>
 
 <form id="theForm" method="post">
-<input type="hidden" id="id" name="id" value="" />
-<input type="hidden" id="action" name="action" value="" />
-<input type="hidden" id="c" name="c" value="{$controller}" />
+    <input type="hidden" id="id" name="id" value="" />
+    <input type="hidden" id="action" name="action" value="" />
+    <input type="hidden" id="c" name="c" value="{$controller}" />
 </form>
 
 {include file="../shared/admin-footer.tpl"}
