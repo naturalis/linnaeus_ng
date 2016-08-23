@@ -259,13 +259,11 @@ function checkPresenceDataHT()
 		rank=taxonrank;
 	}
 
-
-console.dir( $('#presence_presence_id') );
-console.dir( $('#presence_expert_id') );
-console.dir( $('#presence_organisation_id') );
-console.dir( $('#presence_reference_id') );
-
-	if ( $('#presence_presence_id') && $('#presence_expert_id') && $('#presence_organisation_id') && $('#presence_reference_id') )
+	if (
+		$('#presence_presence_id').attr('id').length>0 && 
+		$('#presence_expert_id').attr('id').length>0 && 
+		$('#presence_organisation_id').attr('id').length>0 && 
+		$('#presence_reference_id').attr('id').length>0 )
 	{
 		if ( rank<speciesBaseRankid )
 		{
