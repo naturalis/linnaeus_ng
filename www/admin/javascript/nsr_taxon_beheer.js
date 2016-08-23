@@ -222,7 +222,7 @@ function checkPresenceDataSpecies()
 	var buffer=[];
 	
 	
-	if ( $('#presence_presence_id') && $('#presence_expert_id') && $('#presence_organisation_id') && $('#presence_reference_id') )
+	if ( $('#presence_presence_id').length && $('#presence_expert_id').length && $('#presence_organisation_id').length && $('#presence_reference_id').length )
 	{
 		var p1=$('#presence_presence_id :selected').val();
 		var p2=$('#presence_expert_id :selected').val();
@@ -259,10 +259,7 @@ function checkPresenceDataHT()
 		rank=taxonrank;
 	}
 
-	if ( ! ($('#presence_presence_id')==undefined ||
-		$('#presence_expert_id')==undefined ||
-		$('#presence_organisation_id')==undefined ||
-		$('#presence_reference_id')==undefined) )
+	if ( $('#presence_presence_id').length && $('#presence_expert_id').length && $('#presence_organisation_id').length && $('#presence_reference_id').length )
 	{
 		if ( rank<speciesBaseRankid )
 		{
