@@ -2,21 +2,6 @@
 
 /*
 
-
-
-
-
-insert into modules values (null,'Hotwords','Automatic linking of certain words in the content of your site.','hotwords',11,1,0,now(),now());      
-
-
-names
-lit2
-
-
-
-
-
-
 	make sure that if there are multiple parameters, they are in alphabetical
 	order (this is assumed while matching with the current URL in the app).
 	so:
