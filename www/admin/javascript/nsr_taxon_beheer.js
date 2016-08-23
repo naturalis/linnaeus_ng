@@ -259,19 +259,28 @@ function checkPresenceDataHT()
 		rank=taxonrank;
 	}
 
-	if ( (rank<speciesBaseRankid) && $('#presence_presence_id') && $('#presence_expert_id') && $('#presence_organisation_id') && $('#presence_reference_id') )
-	{
-		var p1=$('#presence_presence_id :selected').val()==-1;
-		var p2=$('#presence_expert_id :selected').val()==-1;
-		var p3=$('#presence_organisation_id :selected').val()==-1;
-		var p4=$('#presence_reference_id').val().length==0;
 
-		if ((p1 && p2 && p3 && p4)!=true)
+console.dir( $('#presence_presence_id') );
+console.dir( $('#presence_expert_id') );
+console.dir( $('#presence_organisation_id') );
+console.dir( $('#presence_reference_id') );
+
+	if ( $('#presence_presence_id') && $('#presence_expert_id') && $('#presence_organisation_id') && $('#presence_reference_id') )
+	{
+		if ( rank<speciesBaseRankid )
 		{
-			if (p1) buffer.push(_("Presence: status has not been entered."));
-			if (p2) buffer.push(_("Presence: expert has not been entered."));
-			if (p3) buffer.push(_("Presence: organisation has not been entered."));
-			if (p4) buffer.push(_("Presence: publication has not been entered."));
+			var p1=$('#presence_presence_id :selected').val()==-1;
+			var p2=$('#presence_expert_id :selected').val()==-1;
+			var p3=$('#presence_organisation_id :selected').val()==-1;
+			var p4=$('#presence_reference_id').val().length==0;
+	
+			if ((p1 && p2 && p3 && p4)!=true)
+			{
+				if (p1) buffer.push(_("Presence: status has not been entered."));
+				if (p2) buffer.push(_("Presence: expert has not been entered."));
+				if (p3) buffer.push(_("Presence: organisation has not been entered."));
+				if (p4) buffer.push(_("Presence: publication has not been entered."));
+			}
 		}
 	}
 
