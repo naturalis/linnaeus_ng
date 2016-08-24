@@ -125,8 +125,8 @@ div.messages {
 	{t}Choose CSV field delimiter:{/t}
     <ul>
     	<li><label><input type="radio" name="delimiter" value="comma"/>, {t}(comma){/t}</label></li>
-        <li><label><input type="radio" name="delimiter" value="semi-colon" />; {t}(semi-colon){/t}</label></li>
-        <li><label><input type="radio" name="delimiter" value="tab" checked="checked"  />{t}tab{/t}</label></li>
+        <li><label><input type="radio" name="delimiter" value="semi-colon" checked="checked"/>; {t}(semi-colon){/t}</label></li>
+        <li><label><input type="radio" name="delimiter" value="tab"/>{t}tab{/t}</label></li>
 	</ul>
 	</p>
 	        
@@ -149,9 +149,19 @@ The contents of the file will be displayed so you can review them before they ar
 {t}File and data must meet the following conditions:{/t}
 </p>
 <ul>
-	<li>{t}The format needs to be CSV.{/t}</li>
-	<li>{t}The field delimiter must be a comma, semi-colon or tab, and can be selected above.{/t}</li>
-	<li>{t}The fields in the CSV-file *may* be enclosed by " (double-quotes), but this is not mandatory.{/t}</li>
+	<li>
+    	{t}The format needs to be CSV.{/t}
+        {t}Please take into account the following:{/t}
+        <ul>
+            <li>
+            	{t}The field delimiter must be a comma, semi-colon or tab.{/t}
+                {t}Although the name of the filetype suggests differently (the "CS" in CSV stands for "comma separated"), it is not always obvious by what character the fields are actually separated when saving as CSV from MS Excel or other spreadsheet programs. Sometimes the program allows you to choose the delimiter when exporting, more often it chooses the delimiting character for you.{/t}
+                {t}If you are unsure what the delimiting character in your file is, please open it in a plain text-editor (like Notepad) to check, after you have saved it from your spreadsheet program.{/t}
+            	{t}The example file below uses a semi-colon as delimiting character. This is also the default setting when importing; you can change it by selecting another delimiter above.{/t}
+			</li>
+            <li>{t}The fields in the CSV-file may be enclosed by " (double-quotes), but this is not mandatory.{/t}</li>
+        </ul>
+    </li>
 	<li>{t}There should be one taxon per line. No header line should be present.{/t}</li>
 	<li>{t}Each line should consist of the following fields, in this order:{/t}
 		<ol>
