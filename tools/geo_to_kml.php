@@ -1,15 +1,30 @@
 <?php
+    /*
+     * occurrences_taxa lacks map_id column
+     * dpulicate this table, add map_id column and run first part of script
+     *
+     */
+
+	@apache_setenv('no-gzip', 1);
+	@ini_set('zlib.output_compression', 0);
+	@ini_set('implicit_flush', 1);
+	for ($i = 0; $i < ob_get_level(); $i++) { ob_end_flush(); }
+	ob_implicit_flush(1);
+
+
+
     // Postgres database with Postgis enabled required
     // Imports into "linnaeus" table, postprocesses into "linnaeus_post" table
     // Pg table definition included at the bottom
-	$projectId = 3;
+	$projectId = 8;
+	$mapId = 9; // optional
 	$srid = 4326;
 	$tableIn = 'linnaeus';
 	$tableOut = 'linnaeus_post';
 
     define('PG_DB_HOST', 'localhost');
 	define('PG_DB_USER', 'ruud');
-	define('PG_DB_PASSWORD', '');
+	define('PG_DB_PASSWORD', 'ydlad>S2');
 	define('PG_DB_DATABASE', 'ruud');
 	if (!isset($pg_connect)) {
 		$pg = pg_connect("host=" . PG_DB_HOST . " dbname=" . PG_DB_DATABASE .
@@ -34,7 +49,58 @@
 	mysqli_set_charset($my, 'utf8');
 
 
-	echo "Some spring cleaning first...\n";
+
+
+    echo 'Fixing occurrences_taxa by adding map_id column<br>Getting maps...<br>';
+
+	// First fix data in occurrences_taxa; map_id was missing in the original table!
+    mysqli_query($my, 'truncate table `occurrences_taxa_with_map_id`');
+    $q = '
+        select distinct t3.title as project, t1.project_id, t2.name as map, t1.map_id
+        from l2_occurrences_taxa as t1
+        left join l2_maps as t2 on t1.map_id = t2.id
+	    left join projects as t3 on t1.project_id = t3.id
+        order by t3.title, t2.name';
+    $r = mysqli_query($my, $q);
+    while ($row = mysqli_fetch_assoc($r)) {
+        $projectMaps[] = $row;
+    }
+
+    foreach ($projectMaps as $d) {
+        echo $d['project'] . ': processing ' . $d['map'] . '...<br>';
+        $q = '
+            select t1.*, t2.name, t2.coordinates, t2.rows, t2.cols
+            from l2_occurrences_taxa as t1
+            left join l2_maps as t2 on t1.map_id = t2.id
+            where t1.project_id = ' . $d['project_id'] . ' and
+            t1.map_id = ' . $d['map_id'];
+        $r = mysqli_query($my, $q);
+        while ($row = mysqli_fetch_assoc($r)) {
+
+            $latLon = squareNumberToLatLon($row);
+
+            $geoStr = array();
+            foreach ($latLon as $sVal)
+                $geoStr[] = $sVal[0] . ' ' . $sVal[1];
+            $geoStr = implode(',', $geoStr) . ',' . $geoStr[0];
+
+            $insert = '
+                insert into `occurrences_taxa_with_map_id` values (' .
+                $row['id'] . ', ' .
+                $row['project_id'] . ', ' .
+                $row['taxon_id'] . ', ' .
+                $row['map_id'] . ', ' .
+                $row['type_id'] . ', "polygon", null, null, null, ' .
+                "GeomFromText('POLYGON((" . $geoStr . "))',4326)" . ',"' .
+                json_encode($latLon) . '", null, now(), now())';
+
+            mysqli_query($my, $insert);
+        }
+    }
+
+
+
+	echo "Some spring cleaning first...<br>";
 	pg_query($pg, "truncate table $tableIn") or die(pg_last_error());
 	pg_query($pg, "alter sequence {$tableIn}_id_seq restart") or die(pg_last_error());
 	pg_query($pg, "update $tableIn set id = default") or die(pg_last_error());
@@ -46,42 +112,46 @@
         select
             t1.id,
             t1.taxon_id,
+            t4.name as map,
             t2.taxon,
             t3.title as geo_type,
-            astext(t1.boundary) as geo
+            AsWKT(boundary) as geo
         from
-            occurrences_taxa as t1
+            occurrences_taxa_with_map_id as t1
         left join
             taxa as t2 on t1.taxon_id = t2.id
         left join
             geodata_types_titles as t3 on t1.type_id = t3.type_id
+        left join
+            l2_maps as t4 on t1.map_id = t4.id
         where
-            t1.map_id > 1 and
-            t1.project_id = ' . $projectId;
+            t1.project_id = ' . $projectId .
+        (!empty($mapId) ? ' and t1.map_id = ' . $mapId : '');
+
     $r = mysqli_query($my, $q);
 
-
-    // Add ST_FlipCoordinates() if necessary
-	echo "Copying relevant data from MySQL to Postgres...\n";
+    echo "Copying relevant data from MySQL to Postgres...<br>";
     while ($row = mysqli_fetch_assoc($r)) {
+
 		$insert = '
             insert into ' . $tableIn . ' (
                 id,
                 taxon_id,
                 taxon,
                 geo_type,
-                the_geom
+                the_geom,
+                map
             ) values (' .
                 $row['id'] . ',
                 ' . $row['taxon_id'] . ',
                 \'' .  pg_escape_string($row['taxon']) . '\',
                 \'' . pg_escape_string($row['geo_type']) . '\',
-                ST_FlipCoordinates(ST_GeomFromText(\'' . $row['geo'] . '\', ' . $srid . '))
-                )';
-		pg_query($pg, $insert) or die(pg_last_error() . $insert);
+                ST_GeomFromText(\'' . $row['geo'] . '\', ' . $srid . '), \'' .
+                $row['map'] . '\')';
+		pg_query($pg, $insert) or die(pg_result_error() . $insert);
     }
 
-	echo "Merging areas...\n";
+	echo "Merging areas...<br>";
     $insert = "
         insert into $tableOut (
             select
@@ -89,18 +159,20 @@
                 taxon_id,
                 taxon,
                 geo_type,
-                ST_Multi(ST_Union(the_geom)) as the_geom
+                ST_Multi(ST_Union(the_geom)) as the_geom,
+                map
              from
                 $tableIn
              group by
                 taxon_id,
+                map,
                 taxon,
                 geo_type
         )";
     pg_query($pg, $insert) or die(pg_last_error() . $insert);
 
 
-    echo "Creating kml and geojson files...\n";
+    echo "Creating kml and geojson files...<br>";
 
     $xml = new XMLWriter();
 	$xml->openMemory();
@@ -174,7 +246,111 @@
     }
 
 
+    function squareNumberToLatLon ($p) {
+
+        $widthInSquares = $p['cols'];
+        $heightInSquares = $p['rows'];
+        $number = $p['square_number'];
+        $coordinates = json_decode($p['coordinates'], true);
+
+        $mapWidth = $coordinates['topLeft']['long'] >= $coordinates['bottomRight']['long'] ?
+            $coordinates['topLeft']['long'] - $coordinates['bottomRight']['long'] :
+            360 + $coordinates['topLeft']['long'] - $coordinates['bottomRight']['long'];
+        $mapHeight = $coordinates['topLeft']['lat'] - $coordinates['bottomRight']['lat'];
+
+        $squareWidth = $mapWidth / $widthInSquares;
+        $squareHeight = $mapHeight / $heightInSquares;
+
+        // determining the position of the square in the map grid
+        $row = floor(($number - 1) / $widthInSquares);
+        if ($row == 0) {
+            $row = 1;
+        }
+        $col = $number % $widthInSquares;
+        if ($col == 0) {
+            $col = $widthInSquares;
+        }
+
+        $n1Lat = $n2Lat = $coordinates['topLeft']['lat'] - ($row * $squareHeight);
+        $n1Lon = $coordinates['topLeft']['long'] + (($col - 1) * $squareWidth);
+        $n1Lon = $n4Lon = ($n1Lon >= 180 ? -360 + $n1Lon : $n1Lon);
+        $n2Lon = $coordinates['topLeft']['long'] + ($col * $squareWidth);
+        $n2Lon = $n3Lon = ($n2Lon > 180 ? -360 + $n2Lon : $n2Lon);
+        $n3Lat = $n4Lat = $coordinates['topLeft']['lat'] - (($row + 1) * $squareHeight);
+
+        return array(
+            array(
+                $n1Lon,
+                $n1Lat
+            ),
+            array(
+                $n2Lon,
+                $n2Lat
+            ),
+            array(
+                $n3Lon,
+                $n3Lat
+            ),
+            array(
+                $n4Lon,
+                $n4Lat
+            )
+        );
+    }
+
+
 /*
+ *
+ *
+ *
+--
+-- Table structure for table `occurrences_taxa_fixed`
+--
+
+CREATE TABLE `occurrences_taxa_fixed` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `taxon_id` int(11) NOT NULL,
+  `map_id` int(11) NOT NULL,
+  `type_id` int(11) NOT NULL,
+  `type` enum('marker','polygon') NOT NULL,
+  `boundary` polygon DEFAULT NULL,
+  `boundary_nodes` text,
+  `nodes_hash` varchar(64) DEFAULT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `occurrences_taxa_fixed`
+--
+ALTER TABLE `occurrences_taxa_fixed`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`nodes_hash`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `occurrences_taxa_fixed`
+--
+ALTER TABLE `occurrences_taxa_fixed`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
 --
 -- PostgreSQL database dump
 --
@@ -201,7 +377,8 @@ CREATE TABLE linnaeus (
     taxon_id integer,
     taxon character varying(255),
     geo_type character varying(255),
-    the_geom geometry(Geometry,4326)
+    the_geom geometry(Geometry,4326),
+    map character varying(50)
 );
 
 
@@ -281,6 +458,7 @@ CREATE INDEX the_geom ON linnaeus USING gist (the_geom);
 --
 -- PostgreSQL database dump complete
 --
+
 
 
 
