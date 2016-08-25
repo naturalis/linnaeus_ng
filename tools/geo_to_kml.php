@@ -1,10 +1,43 @@
 <?php
     /*
-     * occurrences_taxa lacks map_id column
-     * dpulicate this table, add map_id column and run first part of script
-     *
+     * Default occurrences_taxa lacks map_id column!
+     * Duplicate this table, add map_id column and run first part of script
+     * See table definition at the bottom of this script
      */
 
+
+	// Export KML/geojson for this project
+	$projectId = 11;
+	// Specificy map_id to export specific map; should be corresponding id in l2_maps table!
+	$mapId = null; // default null
+    // Idem to exclude specific map; i.e. use for World map as this has lower resolution
+	$excludeMapId = 28; // default null
+    // Spatial Reference System Identifier; data should already be in the right format in MySQL
+	$srid = 4326;
+	 // Postgres table to collect 'raw' data from MySQL
+	$tableIn = 'linnaeus';
+	// Postgres table to which unified distribution data is written
+	$tableOut = 'linnaeus_post';
+
+    // Postgres database with Postgis enabled required
+    // Imports into "linnaeus" table, postprocesses into "linnaeus_post" table
+    // Table definition included at the bottom
+    /*
+        define('PG_DB_HOST', 'localhost');
+    	define('PG_DB_USER', 'user');
+    	define('PG_DB_PASSWORD', 'pass');
+    	define('PG_DB_DATABASE', 'db');
+     */
+    require_once 'postgres_credentials.php';
+
+	// KML settings
+    $path = dirname(__FILE__) . '/' . 'geo';
+    $color = '32FFFFFF';
+    $colorMode = 'normal';
+    $polyFill = 1; // vs 0
+    $outline = 1;
+
+	// Some magic so output is flushed to screen immediately
 	@apache_setenv('no-gzip', 1);
 	@ini_set('zlib.output_compression', 0);
 	@ini_set('implicit_flush', 1);
@@ -13,33 +46,7 @@
 
 
 
-    // Postgres database with Postgis enabled required
-    // Imports into "linnaeus" table, postprocesses into "linnaeus_post" table
-    // Pg table definition included at the bottom
-	$projectId = 8;
-	$mapId = 9; // optional
-	$srid = 4326;
-	$tableIn = 'linnaeus';
-	$tableOut = 'linnaeus_post';
-
-    define('PG_DB_HOST', 'localhost');
-	define('PG_DB_USER', 'ruud');
-	define('PG_DB_PASSWORD', 'ydlad>S2');
-	define('PG_DB_DATABASE', 'ruud');
-	if (!isset($pg_connect)) {
-		$pg = pg_connect("host=" . PG_DB_HOST . " dbname=" . PG_DB_DATABASE .
-		  " user=" . PG_DB_USER . " password=" . PG_DB_PASSWORD);
-	}
-
-	// KML
-    $path = dirname(__FILE__) . '/' . 'geo';
-    $color = '32FFFFFF';
-    $colorMode = 'normal';
-    $polyFill = 1; // vs 0
-    $outline = 1;
-
-
-	// Linnaeus
+	// Connect to Linnaeus
 	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
 	if (!file_exists($cfg)) die("Error: unable to locate $cfg.");
 	include $cfg;
@@ -48,12 +55,16 @@
  	$my = mysqli_connect($s['host'], $s['user'], $s['password'], $s['database']);
 	mysqli_set_charset($my, 'utf8');
 
+	// Connect to Postgres
+	if (!isset($pg_connect)) {
+		$pg = pg_connect("host=" . PG_DB_HOST . " dbname=" . PG_DB_DATABASE .
+		  " user=" . PG_DB_USER . " password=" . PG_DB_PASSWORD);
+	}
 
 
-
-    echo 'Fixing occurrences_taxa by adding map_id column<br>Getting maps...<br>';
 
 	// First fix data in occurrences_taxa; map_id was missing in the original table!
+	echo 'Fixing occurrences_taxa by adding map_id column<br>Getting maps...<br>';
     mysqli_query($my, 'truncate table `occurrences_taxa_with_map_id`');
     $q = '
         select distinct t3.title as project, t1.project_id, t2.name as map, t1.map_id
@@ -66,6 +77,7 @@
         $projectMaps[] = $row;
     }
 
+    // Has to run in batches, otherwise you'll get out of memory errors...
     foreach ($projectMaps as $d) {
         echo $d['project'] . ': processing ' . $d['map'] . '...<br>';
         $q = '
@@ -91,13 +103,12 @@
                 $row['taxon_id'] . ', ' .
                 $row['map_id'] . ', ' .
                 $row['type_id'] . ', "polygon", null, null, null, ' .
-                "GeomFromText('POLYGON((" . $geoStr . "))',4326)" . ',"' .
+                "GeomFromText('POLYGON((" . $geoStr . "))', $srid)" . ',"' .
                 json_encode($latLon) . '", null, now(), now())';
 
             mysqli_query($my, $insert);
         }
     }
-
 
 
 	echo "Some spring cleaning first...<br>";
@@ -126,7 +137,8 @@
             l2_maps as t4 on t1.map_id = t4.id
         where
             t1.project_id = ' . $projectId .
-        (!empty($mapId) ? ' and t1.map_id = ' . $mapId : '');
+        (!empty($mapId) ? ' and t1.map_id = ' . $mapId : '') .
+        (!empty($excludeMapId) ? ' and t1.map_id != ' . $excludeMapId : '');
 
     $r = mysqli_query($my, $q);
 
@@ -159,13 +171,11 @@
                 taxon_id,
                 taxon,
                 geo_type,
-                ST_Multi(ST_Union(the_geom)) as the_geom,
-                map
+                ST_Multi(ST_Union(the_geom)) as the_geom
              from
                 $tableIn
              group by
                 taxon_id,
-                map,
                 taxon,
                 geo_type
         )";
@@ -271,8 +281,10 @@
             $col = $widthInSquares;
         }
 
+        $coordinates['topLeft']['long'] = $coordinates['topLeft']['long'] * -1;
+
         $n1Lat = $n2Lat = $coordinates['topLeft']['lat'] - ($row * $squareHeight);
-        $n1Lon = $coordinates['topLeft']['long'] + (($col - 1) * $squareWidth);
+        $n1Lon = $coordinates['topLeft']['long']  + (($col - 1) * $squareWidth);
         $n1Lon = $n4Lon = ($n1Lon >= 180 ? -360 + $n1Lon : $n1Lon);
         $n2Lon = $coordinates['topLeft']['long'] + ($col * $squareWidth);
         $n2Lon = $n3Lon = ($n2Lon > 180 ? -360 + $n2Lon : $n2Lon);
