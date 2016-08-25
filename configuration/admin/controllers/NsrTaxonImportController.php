@@ -13,7 +13,8 @@ class NsrTaxonImportController extends NsrController
 		'pages_taxa',
 		'pages_taxa_titles',
 		'labels_languages',
-		'content_taxa'
+		'content_taxa',
+		'nsr_ids'
 	);
 
     public $usedHelpers = array(
