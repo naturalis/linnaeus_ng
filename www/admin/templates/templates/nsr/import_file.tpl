@@ -38,13 +38,11 @@ div.messages {
 </style>
 
 
-<div class="page-generic-div">
-
 {include file="../shared/admin-messages.tpl"}
 
-</div>
 
 <div id="page-main">
+
 
 {if $lines}
 
@@ -65,7 +63,9 @@ div.messages {
 	        <td><span class="small">{t}import status{/t}</span></td>
 		</tr></table>
 	</li>
+    {$willsave=false}
 	{foreach $lines v k}
+    {if !$willsave && !$v.errors}{$willsave=true}{/if}
 	<li class="main-list">
     	<table class="lines"><tr>
     		<td>{$v[$importColumns['conceptName']]}</td>
@@ -73,7 +73,7 @@ div.messages {
         	<td>{$v[$importColumns['parent']]}</td>
 	        <td>{$v[$importColumns['commonName']]}</td>
 	        <td>
-            	{if $v.errors}
+            	
                 	<span class="errors">{t}errors, will not import{/t}</span>
                 {else if $v.warnings}
                 	<span class="warnings">{t}will import, with warnings{/t}</span><br />
@@ -109,9 +109,11 @@ div.messages {
 	</li>
 	{/foreach}
 </ul>
-
+{if $willsave}
 <input type="submit" value="{t}save{/t}" />
-
+{else}
+{t}(nothing to save){/t}
+{/if}
 </form>
 
 <p>
