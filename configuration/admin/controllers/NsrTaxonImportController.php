@@ -369,12 +369,12 @@ class NsrTaxonImportController extends NsrController
 		
 		if ($maxwidth<2)
 		{
-			$this->addError( $this->translate( 'There are is only one column in your data file. Make sure that the file formatting is ok.' ) );
+			$this->addError( $this->translate( 'There are is only one column; your file looks wrongly formatted. Check the formatting and try again.' ) );
 		}
 		else
 		if ($maxwidth<3)
 		{
-			$this->addWarning( $this->translate( 'There are only two columns in your data file. Make sure that the file formatting is ok.' ) );
+			$this->addWarning( $this->translate( 'There are only two columns in your data file. Make sure that the data is complete and the file formatting is ok.' ) );
 		}
 	}
 	

@@ -37,6 +37,13 @@ div.messages {
 }
 </style>
 
+
+<div class="page-generic-div">
+
+{include file="../shared/admin-messages.tpl"}
+
+</div>
+
 <div id="page-main">
 
 {if $lines}
@@ -47,8 +54,6 @@ div.messages {
 <form method="post" action="import_file_process.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="action" value="save" />
-
-{include file="../shared/admin-messages.tpl"}
 
 <ul style="padding-left:0px;">
 	<li style="list-style-type:none;">
