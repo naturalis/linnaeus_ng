@@ -57,7 +57,7 @@
             <td class="key-choice-number">{$v.marker}.</td>
             <td class="key-choice-title">{$v.choice_txt}</td>
             <td>
-            {if $v.choice_img}
+            {if $v.choice_img && $use_media}
                 <img
                 onclick="allShowMedia('{$session.admin.project.urls.project_media}{$v.choice_img}?rnd={$rnd}','{$v.choice_img}');"
                 src="{$session.admin.project.urls.project_media}{$v.choice_img}?rnd={$rnd}"

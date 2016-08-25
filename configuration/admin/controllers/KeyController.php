@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('MediaController.php');
+include_once ('ModuleSettingsReaderController.php');
 
 /**
 * KeyController
@@ -101,9 +102,16 @@ class KeyController extends Controller
 
     private function initialize()
     {
-		$this->setEndPointsExist();
+		$this->moduleSettings=new ModuleSettingsReaderController;
 
-		$this->setMediaController();
+		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
+		
+		$this->setEndPointsExist();
+		
+		if ( $this->use_media ) 
+		{
+			$this->setMediaController();
+		}
 
         if ($this->rHasVal('action','suppress_division'))
 		{
@@ -122,7 +130,7 @@ class KeyController extends Controller
 		}
 
         $this->smarty->assign('keyPath', $this->getKeyPath());
-
+        $this->smarty->assign('use_media', $this->use_media);
     }
 
 	private function setMediaController()
@@ -2109,6 +2117,9 @@ class KeyController extends Controller
 
     private function getChoiceImage ($itemId = false)
     {
+		
+		if ( !$this->use_media ) return;
+		
         if (!$itemId) {
             $itemId = $this->rGetId();
         }

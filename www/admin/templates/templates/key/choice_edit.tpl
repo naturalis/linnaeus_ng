@@ -22,26 +22,30 @@
     </p>
 {/foreach}
 
-	<p>
-	{t}Image{/t}<br />
-    {if $choice.choice_img}
-        <img
-            onclick="allShowMedia('{$choice.choice_img}?rnd={$rnd}','');"
-            src="{$choice.choice_img}?rnd={$rnd}"
-            class="key-choice-image-normal" /><br />
-        <span class="a" onclick="keyDeleteImage();">{t}detach image{/t}</span>
-        {if $choice.choice_image_params!=''}
-            <br />
-            <span style="color:red">
-                {t}Please note: this image has specific attributes for size and positioning, which were inherited from Linnaeus 2. These cannot be changed, and will be erased if you delete the image.{/t}
-            </span>
-        {/if}
-    {else}
-        <a href="../media/upload.php?item_id={$item_id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
-        <a href="../media/select.php?item_id={$item_id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
-    {/if}
-    </p>
 
+	{if $use_media}
+
+        <p>
+        {t}Image{/t}<br />
+        {if $choice.choice_img}
+            <img
+                onclick="allShowMedia('{$choice.choice_img}?rnd={$rnd}','');"
+                src="{$choice.choice_img}?rnd={$rnd}"
+                class="key-choice-image-normal" /><br />
+            <span class="a" onclick="keyDeleteImage();">{t}detach image{/t}</span>
+            {if $choice.choice_image_params!=''}
+                <br />
+                <span style="color:red">
+                    {t}Please note: this image has specific attributes for size and positioning, which were inherited from Linnaeus 2. These cannot be changed, and will be erased if you delete the image.{/t}
+                </span>
+            {/if}
+        {else}
+            <a href="../media/upload.php?item_id={$item_id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
+            <a href="../media/select.php?item_id={$item_id}&amp;module_id={$module_id}">{t}attach media{/t}</a> to this page.
+        {/if}
+        </p>
+
+    {/if}
 
 	<p>
     {t}Target{/t}
