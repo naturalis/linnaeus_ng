@@ -6,7 +6,7 @@
 	    private $mysqli;
 	    private $tablePrefix;
 	    private $data = array();
-	    private $pushUrl = 'http://172.16.1.34/admin/server_csv.php'; // cannot use address!
+	    private $pushUrl;
         private $timeout = 5;
         private $pushResult;
         private $gitRepo;
@@ -177,5 +177,5 @@
 
 
     $ldp = new LinnaeusDataPush();
-    //$ldp->setPushUrl('http://172.16.1.34/admin/server_csv.php');
+    $ldp->setPushUrl('http://linnaeus.naturalis.nl/admin/server_csv.php');
     $ldp->run();
