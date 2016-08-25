@@ -374,7 +374,7 @@ class NsrTaxonImportController extends NsrController
 		else
 		if ($maxwidth<3)
 		{
-			$this->addWarning( $this->translate( 'There are only two columns in your data file. Make sure that the data is complete and the file formatting is ok.' ) );
+			$this->addWarning( $this->translate( 'There are only two columns in your data file. Please make sure that the data is complete and the file formatting is correct before you save the data.' ) );
 		}
 	}
 	
