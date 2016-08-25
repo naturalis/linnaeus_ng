@@ -73,7 +73,7 @@ div.messages {
         	<td>{$v[$importColumns['parent']]}</td>
 	        <td>{$v[$importColumns['commonName']]}</td>
 	        <td>
-            	
+            	{if $v.errors}
                 	<span class="errors">{t}errors, will not import{/t}</span>
                 {else if $v.warnings}
                 	<span class="warnings">{t}will import, with warnings{/t}</span><br />
