@@ -48,6 +48,8 @@ div.messages {
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="action" value="save" />
 
+{include file="../shared/admin-messages.tpl"}
+
 <ul style="padding-left:0px;">
 	<li style="list-style-type:none;">
     	<table class="lines"><tr>

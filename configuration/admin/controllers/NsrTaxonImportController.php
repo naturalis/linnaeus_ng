@@ -85,6 +85,7 @@ class NsrTaxonImportController extends NsrController
 			{
 				$this->setLines( $this->helpers->CsvParserHelper->getResults() );
 				$this->cleanLines();
+				$this->countColumns();
 				$this->addLineId();
 				$this->checkConcepts();
 				$this->checkRanks();
@@ -354,6 +355,29 @@ class NsrTaxonImportController extends NsrController
 		$this->setLines( $lines );
 	}
 	
+    private function countColumns()
+    {
+		$lines=$this->getLines();
+		$maxwidth=0;
+		foreach((array)$lines as $val)
+		{
+			if ( count((array)$val) > $maxwidth )
+			{
+				$maxwidth=count((array)$val);
+			}
+		}
+		
+		if ($maxwidth<2)
+		{
+			$this->addError( $this->translate( 'There are is only one column in your data file. Make sure that the file formatting is ok.' ) );
+		}
+		else
+		if ($maxwidth<3)
+		{
+			$this->addWarning( $this->translate( 'There are only two columns in your data file. Make sure that the file formatting is ok.' ) );
+		}
+	}
+	
     private function addLineId()
     {
 		$lines=$this->getLines();
@@ -429,7 +453,11 @@ class NsrTaxonImportController extends NsrController
 
 		foreach((array)$lines as $key=>$val)
 		{
-			if ( !isset($val[$this->importColumns['rank']])) continue;
+			if ( !isset($val[$this->importColumns['rank']])) 
+			{
+				$lines[$key]['errors'][]=[ 'message' => $this->translate('no rank') ];
+				continue;
+			}
 
 			$rank=$val[$this->importColumns['rank']];
 
