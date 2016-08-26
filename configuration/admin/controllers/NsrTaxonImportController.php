@@ -484,7 +484,7 @@ class NsrTaxonImportController extends NsrController
 		{
 			if ( !isset($val[$this->importColumns['parent']])) 
 			{
-				$lines[$key]['warnings'][]=[ 'message' => $this->translate('no valid parent found (will save taxon as orphan)') ];
+				$lines[$key]['warnings'][]=[ 'message' => $this->translate('no parent specified in file, will save taxon as orphan') ];
 				continue;
 			}
 			
@@ -504,7 +504,7 @@ class NsrTaxonImportController extends NsrController
 				// suggested parent in file has errors, warn (but allow)
 				if ( isset($lines[$key2]['errors']) && count((array)$lines[$key2]['errors'])>0  )
 				{
-					$lines[$key]['warnings'][]=[ 'message' => sprintf( $this->translate('proposed parent "%s" has errors'), $parent) ];
+					$lines[$key]['warnings'][]=[ 'message' => sprintf( $this->translate('proposed parent "%s" has errors'), $parent ) ];
 				}
 				// suggested parent in file has no errors (and is not the taxon itself): will use
 				else
@@ -514,6 +514,8 @@ class NsrTaxonImportController extends NsrController
 			}
 			else
 			{
+				$lines[$key]['warnings'][]=[ 'message' =>  sprintf( $this->translate('parent "%s" not found in file'), $parent ) ];
+
 				// suggested parent does not exist in file, lets look it up in the database
 				$d=$this->getTaxonByName(strtolower($parent));
 				
