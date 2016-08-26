@@ -877,7 +877,7 @@ class NsrTaxonImportController extends NsrController
 			{
 				$key2=array_search( $val['parent_id']['id'], array_column($lines, 'line_id' ) );
 
-				if ( $key2 && isset($lines[$key2]['taxon_id']))
+				if ( $key2!==false && isset($lines[$key2]['taxon_id']))
 				{
 					$parent_id=$lines[$key2]['taxon_id'];
 				}
