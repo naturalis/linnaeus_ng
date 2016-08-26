@@ -27,6 +27,7 @@ class NsrTaxonImportController extends NsrController
 	private $importRows = [ 'topicNames' => 0, 'languages' => 1 ];
 	private $doNotImport=[];
 	private $_nameTypeIds;
+	private $doNewLineToBr=true;
 
     public function __construct()
     {
@@ -308,6 +309,8 @@ class NsrTaxonImportController extends NsrController
 						'language_id'=>$lines['languages'][$key2]['language_id'],
 						'page_id'=>$lines['topics'][$key2]['page_id'],
 					];
+					
+					if ( $this->doNewLineToBr ) $val=nl2br( $val );
 				
 					if ( $handle_existing=='overwrite' ) $data=$val;
 					if ( $handle_existing=='append' ) $data=$d[0]['content'] . "\n" . $val;
