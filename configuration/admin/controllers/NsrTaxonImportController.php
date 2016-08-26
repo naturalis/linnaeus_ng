@@ -311,10 +311,10 @@ class NsrTaxonImportController extends NsrController
 					];
 					
 					if ( $this->doNewLineToBr ) $val=nl2br( $val );
-				
+			
 					if ( $handle_existing=='overwrite' ) $data=$val;
-					if ( $handle_existing=='append' ) $data=$d[0]['content'] . "\n" . $val;
-					if ( $handle_existing=='prepend' ) $data=$val . "\n" . $d[0]['content'];
+					if ( $handle_existing=='append' ) $data=$d[0]['content'] . ( $this->doNewLineToBr ?  nl2br( "\n" ) :  "\n"  ) . $val;
+					if ( $handle_existing=='prepend' ) $data=$val . ( $this->doNewLineToBr ?  nl2br( "\n" ) :  "\n"  ) . $d[0]['content'];
 					
 					$this->models->ContentTaxa->update( [ 'content'=>$data, 'publish'=>1 ], $where );
 				}
