@@ -492,38 +492,42 @@ class NsrTaxonImportController extends NsrController
 
 			$key2=array_search( $parent, array_column($lines, $this->importColumns['conceptName'] ) );
 
+			// suggested parent exists in file
 			if ( $key2!==false )
 			{
-				
-				if ( ( !isset($lines[$key2]['errors']) || count((array)$lines[$key2]['errors'])==0 ) && $key2!==$key )
+				// suggested parent is taxon itself: error
+				if ( $key2==$key )
+				{
+					$lines[$key]['warnings'][]=[ 'message' => $this->translate('taxon cannot be its own parent') ];
+				}
+				else
+				// suggested parent in file has errors, warn (but allow)
+				if ( isset($lines[$key2]['errors']) && count((array)$lines[$key2]['errors'])>0  )
+				{
+					$lines[$key]['warnings'][]=[ 'message' => sprintf( $this->translate('proposed parent "%s" has errors'), $parent) ];
+				}
+				// suggested parent in file has no errors (and is not the taxon itself): will use
+				else
 				{
 					$lines[$key]['parent_id']=[ 'source' => 'new', 'id' => $lines[$key2]['line_id'] ];
 				}
-				else
-				{
-					if ( isset($lines[$key2]['errors']) && count((array)$lines[$key2]['errors'])>0  )
-					{
-						$lines[$key]['warnings'][]=[ 'message' => sprintf( $this->translate('proposed parent "%s" has errors'), $parent) ];
-					}
-					
-					if ( $key2==$key )
-					{
-						$lines[$key]['warnings'][]=[ 'message' => $this->translate('taxon cannot be its own parent') ];
-					}
-				}
-
+			}
+			else
+			{
+				// suggested parent does not exist in file, lets look it up in the database
 				$d=$this->getTaxonByName(strtolower($parent));
 				
+				// suggested parent exists in the database: will us
 				if ( $d )
 				{
 					$lines[$key]['parent_id']=[ 'source' => 'existing', 'id' => $d['id'] ];
 					$lines[$key]['warnings'][]=[ 'message' => $this->translate('will use valid parent from database'), 'data' => [ 'taxon'=>$d['taxon'], 'rank'=>$d['rank'], 'id'=>$d['id'] ] ];
 				}
+				// suggested parent doesn't exist in the database either, will not use (but save taxon as orphan)
 				else
 				{
 					$lines[$key]['warnings'][]=[ 'message' => $this->translate('no valid parent found (will save taxon as orphan)') ];
 				}
-
 			}
 		}
 
