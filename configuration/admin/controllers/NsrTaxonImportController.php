@@ -510,20 +510,20 @@ class NsrTaxonImportController extends NsrController
 					{
 						$lines[$key]['warnings'][]=[ 'message' => $this->translate('taxon cannot be its own parent') ];
 					}
-
-					$d=$this->getTaxonByName(strtolower($parent));
-					
-					if ( $d )
-					{
-						$lines[$key]['parent_id']=[ 'source' => 'existing', 'id' => $d['id'] ];
-						$lines[$key]['warnings'][]=[ 'message' => $this->translate('will use valid parent from database'), 'data' => [ 'taxon'=>$d['taxon'], 'rank'=>$d['rank'], 'id'=>$d['id'] ] ];
-					}
-					else
-					{
-						$lines[$key]['warnings'][]=[ 'message' => $this->translate('no valid parent found (will save taxon as orphan)') ];
-					}
-
 				}
+
+				$d=$this->getTaxonByName(strtolower($parent));
+				
+				if ( $d )
+				{
+					$lines[$key]['parent_id']=[ 'source' => 'existing', 'id' => $d['id'] ];
+					$lines[$key]['warnings'][]=[ 'message' => $this->translate('will use valid parent from database'), 'data' => [ 'taxon'=>$d['taxon'], 'rank'=>$d['rank'], 'id'=>$d['id'] ] ];
+				}
+				else
+				{
+					$lines[$key]['warnings'][]=[ 'message' => $this->translate('no valid parent found (will save taxon as orphan)') ];
+				}
+
 			}
 		}
 
