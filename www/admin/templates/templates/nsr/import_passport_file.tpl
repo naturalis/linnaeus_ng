@@ -51,7 +51,9 @@ td.no-fill {
 	border-bottom:none;
 	background-color:#fff;
 }
-
+.variable-list {
+	color:#69F
+}
 </style>
 
 <div id="page-main">
@@ -179,7 +181,7 @@ td.no-fill {
 	<li>{t}There should be two header lines:{/t}
         <ul>
             <li>{t}The first line should contain the topic of the texts in that column. Valid topics are:{/t}
-                <ul>
+                <ul class="variable-list">
                 	{foreach $categories  v}
                     {if $v.type!='auto'}
                     <li>{$v.page}</li>
@@ -189,7 +191,7 @@ td.no-fill {
             	{t}Please note that the header must be identical to one of the titles above, regardless of the language of the actual text.{/t}
             </li>
             <li>{t}The second line must contain the language of the texts in that column. Languages defined in your poject are currently:{/t}
-                <ul>
+                <ul class="variable-list">
                 	{foreach $languages  v}
                     <li>{$v.language}</li>
                     {/foreach}

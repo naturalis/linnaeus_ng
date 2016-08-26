@@ -35,6 +35,9 @@ table.lines tr td:nth-child(4) {
 div.messages {
 	margin-left:10px;
 }
+.variable-list {
+	color:#69F
+}
 </style>
 
 
@@ -191,7 +194,7 @@ The contents of the file will be displayed so you can review them before they ar
 		<br /><span class="message-error">{t}Currently, you have defined no ranks in this project.{/t} <a href="ranks.php">{t}Define ranks{/t}</a>.</span>
 		{else}
 		{t}These currently are:{/t}
-		<ul style="list-style:none;margin-left:0px;padding-left:20px;">		
+		<ul class="variable-list">
 		{section name=i loop=$projectRanks}
 			<li>{$projectRanks[i].rank}</li>
 		{/section}
