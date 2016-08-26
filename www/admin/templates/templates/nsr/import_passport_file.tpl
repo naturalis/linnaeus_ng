@@ -52,7 +52,7 @@ td.no-fill {
 	background-color:#fff;
 }
 .variable-list {
-	color:#69F
+	color:#66F
 }
 </style>
 
