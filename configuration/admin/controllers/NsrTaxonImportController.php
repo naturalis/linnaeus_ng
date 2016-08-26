@@ -437,11 +437,13 @@ class NsrTaxonImportController extends NsrController
 			{
 				if ( strtolower($d[0]['taxon'])==strtolower($name) )
 				{
-					$lines[$key]['errors'][]=[ 'message' => sprintf($this->translate('"%s" already exists in database'), $name), 'data' => [ 'id' => $d[0]['id'], 'taxon' => $d[0]['taxon'] ] ];
+					//$lines[$key]['errors'][]=[ 'message' => sprintf($this->translate('"%s" already exists in database'), $name), 'data' => [ 'id' => $d[0]['id'], 'taxon' => $d[0]['taxon'] ] ];
+					$lines[$key]['errors'][]=[ 'message' => sprintf($this->translate('"%s" already exists in database'), sprintf('<a href="taxon.php?id=%s" target="_new">%s</a>',$d[0]['id'],$d[0]['taxon'] ) ) ];
 				}
 				else
 				{
-					$lines[$key]['warnings'][]=[ 'message' => $this->translate('similar taxon exists in database'), 'data' => [ 'id' => $d[0]['id'], 'taxon' => $d[0]['taxon'] ] ];
+					//$lines[$key]['warnings'][]=[ 'message' => $this->translate('similar taxon exists in database'), 'data' => [ 'id' => $d[0]['id'], 'taxon' => $d[0]['taxon'] ] ];
+					$lines[$key]['warnings'][]=[ 'message' => sprintf($this->translate('similar taxon exists in database (%s)'), sprintf('<a href="taxon.php?id=%s" target="_new">%s</a>',$d[0]['id'],$d[0]['taxon'] ) ) ];
 				}
 			}
 		}
@@ -526,7 +528,8 @@ class NsrTaxonImportController extends NsrController
 				if ( $d )
 				{
 					$lines[$key]['parent_id']=[ 'source' => 'existing', 'id' => $d['id'] ];
-					$lines[$key]['warnings'][]=[ 'message' => $this->translate('will use valid parent from database'), 'data' => [ 'taxon'=>$d['taxon'], 'rank'=>$d['rank'], 'id'=>$d['id'] ] ];
+					//$lines[$key]['warnings'][]=[ 'message' => $this->translate('will use valid parent from database'), 'data' => [ 'taxon'=>$d['taxon'], 'rank'=>$d['rank'], 'id'=>$d['id'] ] ];
+					$lines[$key]['warnings'][]=[ 'message' => sprintf($this->translate('will use valid parent from database (%s)'), sprintf('<a href="taxon.php?id=%s" target="_new">%s</a>',$d[0]['id'],$d[0]['taxon'] ) ) ];
 				}
 				// suggested parent doesn't exist in the database either, will not use (but save taxon as orphan)
 				else
