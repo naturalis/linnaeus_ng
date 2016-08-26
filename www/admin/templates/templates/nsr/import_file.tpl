@@ -36,7 +36,7 @@ div.messages {
 	margin-left:10px;
 }
 .variable-list {
-	color:#66F
+	color:#36F;
 }
 </style>
 
