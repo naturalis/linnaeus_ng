@@ -29,7 +29,7 @@
 	- access to items is restricted to access to specific taxa and
 	  subjacent taxa (i.e., branches), also set in users/edit.php (no
 	  specified items for a user means access to all taxa).
-	- for CRUD actions, see below (specofoc action types).
+	- for CRUD actions, see below (specific action types).
 
 
 	[ "in situ" configuration options ]

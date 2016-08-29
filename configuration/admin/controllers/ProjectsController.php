@@ -209,8 +209,8 @@ class ProjectsController extends Controller
 
         $languages = $this->getAvailableLanguages();
 
-        foreach ((array) $languages as $key => $val) {
-
+        foreach ((array) $languages as $key => $val)
+		{
             $lp = $this->models->LanguagesProjects->_get(
             array(
                 'id' => array(
@@ -220,14 +220,12 @@ class ProjectsController extends Controller
             ));
 
             $languages[$key]['language_project_id'] = $lp[0]['id'];
-
             $languages[$key]['is_project_default'] = ($lp[0]['def_language'] == 1);
-
             $languages[$key]['is_active'] = ($lp[0]['active'] == 'y');
-
             $languages[$key]['tranlation_status'] = $lp[0]['tranlation_status'];
         }
 
+        $this->smarty->assign('CRUDstates', $this->getCRUDstates());
         $this->smarty->assign('data', $this->getCurrentProjectData());
         $this->smarty->assign('languages', $languages);
 
@@ -257,6 +255,7 @@ class ProjectsController extends Controller
         elseif ($this->rHasVal('view', 'languages'))
 		{
 			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxActionLanguages($this->rGetVal('action'), $this->rGetId());
         }

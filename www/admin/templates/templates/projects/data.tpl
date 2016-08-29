@@ -110,6 +110,7 @@
 		<span id="language-list"></span>
 		</td>
 	</tr>
+    {if $CRUDstates.can_update}
 	<tr>
 		<td></td>
 		<td>
@@ -133,6 +134,7 @@
 			</span>
 		</td>
 	</tr>
+    {/if}
 	<tr>
 		<td>
 			{t}Publish project:{/t}
