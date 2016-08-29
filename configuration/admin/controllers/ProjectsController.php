@@ -44,6 +44,7 @@ class ProjectsController extends Controller
         parent::__construct();
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->show_hidden_modules_in_select_list=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'show_hidden_modules_in_select_list', 'subst'=>false ] );
+		$this->allow_file_management=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'allow_file_management', 'subst'=>false ] );
 	}
 
     public function __destruct ()
@@ -54,7 +55,10 @@ class ProjectsController extends Controller
 	public function chooseProjectAction()
 	{
         $this->checkDefaultProjectSelect();
-		$this->UserRights->setAllowNoProjectId( true );
+
+		//$this->UserRights->setAllowNoProjectId( true );
+		$this->UserRights->setCheckOnlyIfLoggedIn( true );
+
 		$this->checkAuthorisation();
 
         $this->setPageName($this->translate('Select a project to work on'));
@@ -96,6 +100,7 @@ class ProjectsController extends Controller
 
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->smarty->assign('show_lead_expert_modules', $this->UserRights->hasAppropriateLevel() );
+        $this->smarty->assign('allow_file_management', $this->allow_file_management );
 
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
         $this->smarty->assign('show_sys_management_modules', $this->UserRights->hasAppropriateLevel() );
