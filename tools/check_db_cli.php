@@ -721,9 +721,10 @@
 	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
 	$compare->setDoNotCreateTempDatabase(false);
 	$compare->setPreflightQueries(array(
-        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+        //'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+        "SET sql_mode = '';"
 	));
 	$compare->setPostflightQueries(array(
-        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+        //'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
 	));
 	$compare->run();

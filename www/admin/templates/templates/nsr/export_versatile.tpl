@@ -171,7 +171,7 @@ function doSubmit()
 	<form id="theForm" method="post" target="_self">
 
     <input type="hidden" name="action" value="export"  />
-    
+
 	{if $spoof_settings_warning}<div class="admin-warnings"><span class="message">{$spoof_settings_warning}</span></div>{/if}
 
     <fieldset>
@@ -329,11 +329,11 @@ function doSubmit()
         <div class="fieldsubset">
 			<h4>{t}Extra columns{/t}</h4>
             <table>
+{if $is_nsr}
                 <tr>
                     <td><input id=col_habitat type=checkbox name=cols[habitat] /></td>
                     <td><label for=col_habitat>{t}habitat{/t}</label></td>
                 </tr>
-{if $is_nsr}
                 <tr>
                     <td><input id=col_concept_url type=checkbox name=cols[concept_url]  /></td>
                     <td><label for=col_concept_url>{t}Url to NSR page concept{/t}</label></td>
