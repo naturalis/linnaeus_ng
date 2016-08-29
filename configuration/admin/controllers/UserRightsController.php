@@ -82,6 +82,7 @@ class UserRights
 	private $requiredlevel;
 	private $allowNoProjectId=false;
 	private $disableUserAccesModuleCheck=false;
+	private $checkOnlyIfLoggedIn=false;
 	private $authorizestate;
 	private $manageitemstate;
 	private $actionstate;
@@ -111,7 +112,6 @@ class UserRights
 		$this->setModuleId();
 		$this->setUserModuleAccess();
     }
-
 
     public function canAccessModule()
     {
@@ -273,7 +273,7 @@ class UserRights
 		return $this->useritems;
 	}
 
-	public function getUserRoleId ()
+	public function getUserRoleId()
 	{
 	    return $this->user['role_id'];
 	}
@@ -293,6 +293,20 @@ class UserRights
 			$this->disableUserAccesModuleCheck=$state;
 		}
 	}
+
+	public function setCheckOnlyIfLoggedIn( $state )
+	{
+		if ( is_bool($state) )
+		{
+			$this->checkOnlyIfLoggedIn=$state;
+		}
+	}
+
+	public function getCheckOnlyIfLoggedIn()
+	{
+		return $this->checkOnlyIfLoggedIn;
+	}
+
 
 	public function setModuleType( $type )
 	{

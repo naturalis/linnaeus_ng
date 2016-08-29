@@ -402,6 +402,23 @@ class Controller extends BaseClass
 
     public function checkAuthorisation( )
     {
+		if ( $this->UserRights->getCheckOnlyIfLoggedIn()===true )
+		{
+			if ( null==$this->getCurrentUserId() )
+			{
+				$_SESSION['admin']['user']['authorization_fail_message']='Not logged in';
+				$_SESSION['admin']['user']['authorization_fail_page']="https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+				$_SESSION['admin']['user']['authorization_fail_add']="!getCheckOnlyIfLoggedIn";
+				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+			}
+			else
+			{
+				unset( $_SESSION['admin']['user']['authorization_fail_message'] );
+				unset( $_SESSION['admin']['user']['authorization_fail_page'] );
+				unset( $_SESSION['admin']['user']['authorization_fail_add'] );
+			}
+		}
+		else
 		if ( !$this->UserRights->canAccessModule() )
 		{
 			if ( null==$this->getCurrentUserId() )
@@ -412,6 +429,7 @@ class Controller extends BaseClass
 			{
 				$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
 				$_SESSION['admin']['user']['authorization_fail_page']="https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+				$_SESSION['admin']['user']['authorization_fail_add']="!canAccessModule";
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 			}
 		}
@@ -420,12 +438,20 @@ class Controller extends BaseClass
 		{
 			$_SESSION['admin']['user']['authorization_fail_message']=$this->UserRights->getStatus();
 			$_SESSION['admin']['user']['authorization_fail_page']="https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+			$d="";
+			if ( !$this->UserRights->canManageItem() ) $d.="!canManageItem &&";
+			if ( !$this->UserRights->canPerformAction() ) $d.="!canPerformAction &&";
+			if ( !$this->UserRights->hasAppropriateLevel() ) $d.="!hasAppropriateLevel &&";
+			$_SESSION['admin']['user']['authorization_fail_add']=rtrim($d,"& ");
+			 
 			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 		}
 		else
 		{
 			unset( $_SESSION['admin']['user']['authorization_fail_message'] );
 			unset( $_SESSION['admin']['user']['authorization_fail_page'] );
+			unset( $_SESSION['admin']['user']['authorization_fail_add'] );
 		}
     }
 

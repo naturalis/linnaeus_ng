@@ -68,7 +68,8 @@ class UtilitiesController extends Controller
 		{
 			$this->addError(
 				'(' . $_SESSION['admin']['user']['authorization_fail_message'] . ')' . "\n" .
-				'<!-- ' . $_SESSION['admin']['user']['authorization_fail_page'] . ' -->'
+				'<!-- ' . $_SESSION['admin']['user']['authorization_fail_page'] . ' -->' . 
+				'<!-- ' . $_SESSION['admin']['user']['authorization_fail_add'] . ' -->'
 			 );
 		}
 

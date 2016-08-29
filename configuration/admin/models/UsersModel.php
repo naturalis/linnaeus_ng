@@ -59,17 +59,16 @@ final class UsersModel extends AbstractModel
 		$query="
 				select
 					distinct _a.*
+
 				from
 					%PRE%users _a
 
-				left join %PRE%projects_roles_users _b
-					on _a.id=_b.user_id
+				left join %PRE%projects_roles_users _c
+					on _a.id=_c.user_id
+					and _c.project_id = ". $project_id ."
 				
 				where
-					(
-						_b.project_id is null OR
-						_b.project_id != ". $project_id ."
-					)
+					_c.id is null
 
 				order by _a.last_name, _a.first_name
 			";
