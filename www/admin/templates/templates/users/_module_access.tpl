@@ -31,7 +31,7 @@ table tr .active-n {
     {assign "write" $v.access.can_write==1}
     <tr>
         <td>
-            <label<input type="checkbox" id="m{$k}" class="modules" name="custom[{$v.id}]" {if $access} checked="checked"{/if} />{$v.module}</label>
+            <label><input type="checkbox" id="m{$k}" class="modules" name="custom[{$v.id}]" {if $access} checked="checked"{/if} />{$v.module}</label>
         </td>
         <td>
             <label><input type="checkbox" data-module="m{$k}" class="module_rights module_read" name="custom_read[{$v.id}]" {if $read} checked="checked"{/if} />read</label>
