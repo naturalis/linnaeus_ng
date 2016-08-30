@@ -142,18 +142,21 @@ class SpeciesControllerNSR extends SpeciesController
 			] );
 
 			$external_content=$this->getExternalContent( $categories['start'] );
-
-			if ( isset($external_content) && $external_content->must_redirect==true)
+			
+			if ( isset($external_content) )
 			{
-				$this->redirect( $external_content->full_url );
-			}
-			else
-			if ( isset($external_content) && ($external_content->link_embed=='template' || $external_content->link_embed=='template_link') )
-			{
-				$template=
-					substr($external_content->template,-4)=='.tpl' ?
-						substr($external_content->template,0,strlen($external_content->template)-4) :
-						$external_content->template;
+				if ( $external_content->must_redirect==true)
+				{
+					$this->redirect( $external_content->full_url );
+				}
+				else
+				if ( $external_content->link_embed=='template' || $external_content->link_embed=='template_link' )
+				{
+					$template=
+						substr($external_content->template,-4)=='.tpl' ?
+							substr($external_content->template,0,strlen($external_content->template)-4) :
+							$external_content->template;
+				}
 			}
 
 			if ( $this->show_nsr_specific_stuff )
@@ -471,6 +474,11 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ( isset($sval) )
 				{
+					if ( isset($reference->substitute_encode) && $reference->substitute_encode=='replace spaces with underscores' )
+					{
+						$sval=str_replace(' ','_', $sval);
+					} 
+					else
 					if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
 					{
 						$sval=call_user_func($reference->substitute_encode, $sval );
@@ -533,7 +541,7 @@ class SpeciesControllerNSR extends SpeciesController
 		return
 			array(
 				'full_url'=>$full_url,
-				'full_url_valid'=>filter_var($full_url, FILTER_VALIDATE_URL),
+				'full_url_valid'=>($_SERVER['HTTP_HOST']=='localhost' || filter_var($full_url, FILTER_VALIDATE_URL)),
 				'is_empty'=>$is_empty
 			);
 

@@ -97,6 +97,8 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'output','label'=>'check by webservice output'],
 		] ;
 		
+	private $encodingMethods = ['none'=>'none','urlencode','rawurlencode','replace spaces with underscores'];
+		
 	private $regularDataBlock = ["id"=>"data","label"=>"Regular page content"];
 
 	
@@ -190,7 +192,7 @@ class NsrTaxonManagement extends NsrController
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', $this->checkTypes );
         $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
-        $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
+        $this->smarty->assign( 'encoding_methods',$this->encodingMethods );
         $this->smarty->assign( 'tabs', $this->getCategories() );
 
         $this->printPage();

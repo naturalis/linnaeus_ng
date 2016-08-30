@@ -21,12 +21,15 @@
 	</table>
 	</form>
 </p>
-<p>
+<!-- p>
 {t}Unable to log in? What is the problem you are experiencing?{/t}
 <ul>
   <li>{t}I forgot my password and/or username:{/t} <a href="password.php">{t}reset my password{/t}</a>.</li>
   <li>{t}My password doesn't work or my account may have been compromised: please{/t} <a href="mailto:{$support_email}">{t}contact the helpdesk{/t}</a>.</li>
 </ul>
+</p -->
+<p>
+{t}My password doesn't work or my account may have been compromised: please{/t} <a href="mailto:{$support_email}">{t}contact the helpdesk{/t}</a>.
 </p>
 <p>
 <a href="{$baseUrl}">{t}Back to{/t} {t}Linnaeus NG root{/t}</a>
