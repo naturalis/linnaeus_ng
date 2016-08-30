@@ -32,12 +32,12 @@ class FileManagementController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsReaderController;
-		if ( !$this->moduleSettings->getGeneralSetting( [ 'setting'=>'allow_file_management', 'subst'=>false ] ) )
+		if ( !$this->moduleSettings->getGeneralSetting( [ 'setting'=>'enable_file_management', 'subst'=>false ] ) )
 		{
 			$this->redirect('../projects/overview.php');	
 		}
 
-		$this->allowed_extensions=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'allow_file_management_extensions', 'subst'=> 'jpg'] ));
+		$this->allowed_extensions=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'allowed_file_management_extensions', 'subst'=> 'jpg'] ));
 		array_walk($this->allowed_extensions,function(&$a) { $a=strtolower(trim($a,'. ') ); } );
 
 		$this->setFileDir();
