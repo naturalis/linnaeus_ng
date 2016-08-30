@@ -5,20 +5,44 @@
  */
 
 
-/* Replace ranks */
-truncate table ranks;
-INSERT INTO `ranks` VALUES (1,'regio',NULL,'Empire',NULL,NULL,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:46:00'),(2,'regnum',NULL,'Kingdom',NULL,1,1,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:46:00'),(3,'subregnum',NULL,'Subkingdom',NULL,2,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:46:00'),(4,'branch',NULL,'Branch',NULL,3,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(5,'infrakingdom',NULL,'Infrakingdom',NULL,4,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(6,'superphylum','or superdivision in botany','Superphylum ',NULL,5,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:47:01'),(7,'phylum','or division in botany','Phylum',NULL,6,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:47:01'),(8,'subphylum','or subdivision in botany','Subphylum',NULL,7,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:47:01'),(9,'infraphylum','or infradivision in botany','Infraphylum',NULL,8,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:47:01'),(10,'microphylum',NULL,'Microphylum',NULL,9,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(11,'supercohort','botany','Supercohort',NULL,10,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(12,'cohort','botany','Cohort',NULL,11,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(13,'subcohort','botany','Subcohort',NULL,12,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(14,'infracohort','botany','Infracohort',NULL,13,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(15,'superclass',NULL,'Superclass',NULL,14,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(16,'classis',NULL,'Class',NULL,15,1,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:46:32'),(17,'subclassis',NULL,'Subclass',NULL,16,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:46:32'),(18,'infraclass',NULL,'Infraclass',NULL,17,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(19,'parvclass',NULL,'Parvclass',NULL,18,0,0,NULL,'2010-10-14 13:25:37','2013-10-11 08:45:51'),(20,'superdivisio','zoology','Superdivision',NULL,19,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(21,'divisio','zoology','Division',NULL,20,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(22,'subdivisio','zoology','Subdivision',NULL,21,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(23,'infradivision','zoology','Infradivision',NULL,22,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(24,'superlegion','zoology','Superlegion',NULL,23,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(25,'legion','zoology','Legion',NULL,24,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(26,'sublegion','zoology','Sublegion',NULL,25,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(27,'infralegion','zoology','Infralegion',NULL,26,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(28,'supercohort','zoology','Supercohort',NULL,27,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(29,'cohort','zoology','Cohort',NULL,28,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(30,'subcohort','zoology','Subcohort',NULL,29,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(31,'infracohort','zoology','Infracohort',NULL,30,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(32,'gigaorder','zoology','Gigaorder',NULL,31,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(33,'magnorder or megaorder','zoology','Megaorder',NULL,32,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(34,'grandorder or capaxorder','zoology','Grandorder',NULL,33,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(35,'mirorder or hyperorder','zoology','Hyperorder',NULL,34,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(36,'superorder',NULL,'Superorder',NULL,35,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(37,'series','for fishes','Series',NULL,36,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(38,'ordo',NULL,'Order',NULL,37,1,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(39,'parvorder','position in some  classifications','Parvorder',NULL,38,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(40,'nanorder','zoological','Nanorder',NULL,39,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(41,'hypoorder','zoological','Hypoorder',NULL,40,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(42,'minorder','zoological','Minorder',NULL,41,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(43,'subordo',NULL,'Suborder',NULL,42,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(44,'infraorder',NULL,'Infraorder',NULL,43,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(45,'parvorder','(usual position) or microorder (zoology)','Parvorder',NULL,44,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:47:01'),(46,'sectio','zoology','Section ',NULL,45,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(47,'subsectio','zoology','Subsection',NULL,46,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(48,'gigafamily','zoology','Gigafamily',NULL,47,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(49,'megafamily','zoology','Megafamily',NULL,48,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(50,'grandfamily','zoology','Grandfamily',NULL,49,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(51,'hyperfamily','zoology','Hyperfamily ',NULL,50,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(52,'superfamilia',NULL,'Superfamily',NULL,51,1,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(53,'epifamily','zoology','Epifamily ',NULL,52,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(54,'series','for lepidoptera','Series ',NULL,53,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:47:01'),(55,'group','for lepidoptera','Group',NULL,54,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:47:01'),(56,'familia',NULL,'Family',NULL,55,1,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(57,'subfamilia',NULL,'Subfamily',NULL,56,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(58,'infrafamily',NULL,'Infrafamily',NULL,57,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(59,'supertribe',NULL,'Supertribe',NULL,58,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(60,'tribus',NULL,'Tribe',NULL,59,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(61,'subtribus',NULL,'Subtribe',NULL,60,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:46:32'),(62,'infratribe',NULL,'Infratribe',NULL,61,0,0,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(63,'genus',NULL,'Genus',NULL,62,1,1,NULL,'2010-10-14 13:25:38','2013-10-11 08:45:51'),(65,'subgenus',NULL,'Subgenus',NULL,63,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(66,'infragenus',NULL,'Infragenus',NULL,65,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(67,'sectio',NULL,'Section',NULL,66,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(68,'subsectio','botany','Subsection',NULL,67,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(69,'series','botany','Series',NULL,68,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(70,'subseries','botany','Subseries',NULL,69,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(71,'superspecies or species-group',NULL,'Species Group',NULL,70,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(72,'species subgroup',NULL,'Species Subgroup',NULL,71,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(73,'species complex',NULL,'Species Complex',NULL,72,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(74,'species aggregate',NULL,'Species Aggregate',NULL,73,0,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(75,'species',NULL,'Species',NULL,74,1,1,63,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(77,'infraspecies',NULL,'Infraspecies',NULL,75,0,1,74,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(78,'subspecific aggregate',NULL,'Subspecific Aggregate',NULL,77,0,1,74,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(79,'subspecies','or forma specialis for fungi, or variety for bacteria','Subspecies','subsp.',78,0,1,74,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(81,'varietas','zoology','Variety','var.',79,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(83,'subvarietas','botany','Subvariety','subvar.',81,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(84,'subsubvarietas',NULL,'Subsubvariety','subsubvar.',83,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(85,'forma','botany','Form','f.',84,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(86,'subforma','botany','Subform','subf.',85,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),
-(88,'candidate',NULL,'Candidate',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),
-(89,'cultivar','botany','Cultivar',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),
-(90,'cultivar group','botany','Cultivar-group',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(91,'denomination class',NULL,'Denomination Class',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(92,'graft-chimaera',NULL,'Graft-chimaera',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(94,'patho-variety',NULL,'Patho-variety',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),
-(95,'forma specialis','fungi','forma specialis',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),(96,'bio-variety',NULL,'Bio-variety',NULL,-1,0,1,NULL,'2010-10-14 13:25:38','2016-04-11 13:26:28'),
-(64,'nothogenus','botany, used for taxa of hybrid origin','Nothogenus',NULL,62,0,1,NULL,'2016-04-11 15:26:28','2016-04-11 13:26:28'),
-(76,'nothospecies','botany, used for taxa of hybrid origin','Nothospecies',NULL,74,0,1,NULL,'2016-04-11 15:26:28','2016-04-11 13:26:28'),
-(80,'nothosubspecies','botany, used for taxa of hybrid origin','Nothosubspecies',NULL,78,0,1,NULL,'2016-04-11 15:26:28','2016-04-11 13:26:28'),
-(82,'nothovarietas','botany, used for taxa of hybrid origin','Nothovarietas',NULL,79,0,1,NULL,'2016-04-11 15:26:28','2016-04-11 13:26:28');
+/* Update ranks */
+set @this_rank = 'genus';
+select @this_id := id FROM ranks WHERE rank = @this_rank;
+update ranks set id=id+1 WHERE id > @this_id order by id desc;
+update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
+update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
+select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
+insert into ranks values (@this_id+1,'nothogenus',null,'Nothogenus',null,@parent_id,0,1,null,now(),now());
 
-update ranks set abbreviation = 'nothosubsp.' where rank = 'nothosubspecies';
-update ranks set abbreviation = 'nothovar.' where rank = 'nothovarietas';
+set @this_rank = 'species';
+select @this_id := id FROM ranks WHERE rank = @this_rank;
+update ranks set id=id+1 WHERE id > @this_id order by id desc;
+update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
+update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
+select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
+insert into ranks values (@this_id+1,'nothospecies',null,'Nothospecies',null,@parent_id,0,1,null,now(),now());
+
+set @this_rank = 'subspecies';
+select @this_id := id FROM ranks WHERE rank = @this_rank;
+update ranks set id=id+1 WHERE id > @this_id order by id desc;
+update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
+update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
+select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
+insert into ranks values (@this_id+1,'nothosubspecies',null,'Nothosubspecies','nothosubsp.',@parent_id,0,1,null,now(),now());
+
+set @this_rank = 'varietas';
+select @this_id := id FROM ranks WHERE rank = @this_rank;
+update ranks set id=id+1 WHERE id > @this_id order by id desc;
+update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
+update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
+select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
+insert into ranks values (@this_id+1,'nothovarietas',null,'Nothovarietas','nothovar.',@parent_id,0,1,null,now(),now());
+
+update ranks set rank = 'forma specialis' where rank = 'forma_specialis';
+update ranks set additional = 'fungi' where rank = 'forma specialis';
+update ranks set additional = 'botany' where rank in ('cultivar','cultivar group');
+update ranks set additional = 'botany, used for taxa of hybrid origin' where rank in ('nothogenus','nothospecies','nothosubspecies','nothovarietas');
+delete from ranks where rank = 'subsubforma';
 
 
 /* Update modules */
@@ -33,7 +57,8 @@ insert ignore into modules values (null,'User management','User management','use
 insert ignore into modules values (null,'Media','Media management','media',99,1,0,now(),now());
 insert ignore into modules values (null,'Taxon editor','Taxon editor','nsr',99,1,0,now(),now());
 insert ignore into modules values (null,'Actors','Actors: persons & organizations','actors',99,1,0,now(),now());
-insert ignore into modules values (null,'Hotwords','Automatic linking of key words in the content of your site.','hotwords',99,1,0,now(),now());      
+insert ignore into modules values (null,'Hotwords','Automatic linking of key words in the content of your site.','hotwords',99,1,0,now(),now());
+insert ignore into modules values (null,'Traits','Traits module','traits',99,1,0,now(),now());
 
 update modules set show_in_menu=0, description='Front-end implementation of the Taxon Editor' where controller='species';
 update modules set description='Taxon editor, back-end implementation of Species module' where controller='nsr';
