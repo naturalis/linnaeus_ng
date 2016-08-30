@@ -18,17 +18,12 @@ class ZipFile
 		if ( !is_null($filename) ) $this->setFileName($filename);
 	}
 
-    public function addFile( $file )
+    public function addFile( $fullpath, $localname=null )
     {
-		if ( is_array($file) )
-		{
-			foreach($file as $f)
-				$this->_zip->addFile( $f );
-		}
+		if ($localname)
+			$this->_zip->addFile( $fullpath, $localname );
 		else
-		{
-			$this->_zip->addFile( $file );
-		}
+			$this->_zip->addFile( $fullpath );
 	}
 
     public function downloadArchive()

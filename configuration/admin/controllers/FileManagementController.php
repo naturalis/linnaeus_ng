@@ -206,12 +206,11 @@ class FileManagementController extends Controller
 			
 			if ( isset($this->_files[$key])  && file_exists($this->_files[$key]['pathName']) )
 			{
-				$this->helpers->ZipFile->addFile( realpath($this->_files[$key]['pathName']) );
+				$this->helpers->ZipFile->addFile( realpath($this->_files[$key]['pathName']), $this->_files[$key]['fileName'] );
 			}
 		}
 		
 		$this->helpers->ZipFile->downloadArchive();
-		
 	}	
 	
 }
