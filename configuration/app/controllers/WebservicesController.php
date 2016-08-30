@@ -24,6 +24,7 @@ class WebservicesController extends Controller
 		'names',
 		'media_taxon',
 		'nsr_ids',
+		'media',
 		'media_meta',
 		'literature2',
 		'taxon_trend_years'
@@ -1145,6 +1146,49 @@ parameters:
 		header('Content-Type: application/json');			
 		$this->printOutput();
 	}
+
+	public function getMediaAction()
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&file=<original filename>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+  file".chr(9)." : original filename
+";
+
+		if ( is_null($this->getCurrentProjectId()) )
+		{
+			$this->sendErrors();
+			return;
+		}
+
+		$file=$this->rGetVal('file');
+
+		if ( empty($file) )
+		{
+			$this->addError('no filename');
+			$this->sendErrors();
+			return;
+		}
+
+		$files=$this->models->Media->_get( [ "id" => 
+			[
+				"project_id"=>$this->getCurrentProjectId(),
+				"name"=>$this->models->Media->escapeString($file)
+			],
+			"columns"=>"name as original_filename,rs_original as url"
+		] );
+
+		$p=$this->getProject();
+
+		$result['project']=$p['title'];
+		$result['results']=$files;
+
+		$this->setJSON(json_encode($result));
+		header('Content-Type: application/json');			
+		$this->printOutput();
+	}
+
 	
 
     private function initialise()
@@ -1395,7 +1439,6 @@ parameters:
 		return false;
 	}
 
-
 	private function setTaxonId($id)
 	{
 		$this->_taxonId=$id;
@@ -1425,7 +1468,6 @@ parameters:
 	{
 		return $this->_matchType;
 	}
-	
 
 	private function setJSON($json)
 	{
@@ -1436,7 +1478,6 @@ parameters:
 	{
 		return $this->_JSON;
 	}
-	
 
 	private function checkJSONPCallback()
 	{
@@ -1460,7 +1501,6 @@ parameters:
 	{
 		return $this->getJSONPCallback()!=false;
 	}
-	
 
 	private function makeNsrLink()
 	{
@@ -1471,7 +1511,6 @@ parameters:
 	{
 		return $this->makeNsrLink().'&cat=media';
 	}
-
 
 	private function sendErrors()
 	{
