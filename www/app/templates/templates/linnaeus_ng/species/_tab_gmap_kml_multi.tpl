@@ -1,5 +1,3 @@
-{*
-
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;" type="text/javascript"></script>
 <script type="text/javascript">
 var gmap = null;
@@ -75,10 +73,13 @@ $(document).ready(function()
 
 	<div id="map" style="width:800px; height:800px"></div>
 
-*}
 
 
 
+
+
+
+{*
 <script>
 var urls=Array();
 var layers=[];
@@ -228,3 +229,4 @@ map.fitBounds(group.getBounds());
 
 {/literal}
 
+*}
