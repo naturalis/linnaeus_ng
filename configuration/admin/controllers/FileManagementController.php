@@ -37,8 +37,11 @@ class FileManagementController extends Controller
 			$this->redirect('../projects/overview.php');	
 		}
 
-		$this->allowed_extensions=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'allowed_file_management_extensions', 'subst'=> 'jpg'] ));
-		array_walk((array)$this->allowed_extensions,function(&$a) { $a=strtolower(trim($a,'. ') ); } );
+		$this->allowed_extensions=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'allowed_file_management_extensions' ]));
+		if (!empty($this->allowed_extensions))
+		{
+			array_walk($this->allowed_extensions,function(&$a) { $a=strtolower(trim($a,'. ') ); } );
+		}
 
 		$this->setFileDir();
 		$this->setBasePath();
