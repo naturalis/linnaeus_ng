@@ -718,6 +718,71 @@ class WebservicesModel extends AbstractModel
 		return $this->freeQuery( $query );			
 	}
 
+	public function getTreeBranch( $params )
+	{
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$node = isset($params['node']) ? $params['node'] : null;
+
+		if ( is_null($project_id) || is_null($node) ) return;
+
+		$d=$this->getSingleLevel( $params );
+
+		foreach((array)$d as $key=>$val)
+		{
+			$d[$key]['children']=$this->getSingleLevel( ['project_id'=>$project_id, 'node'=>$val['id'] ] );
+			unset($d[$key]['id']);
+			array_walk($d[$key]['children'],function(&$a) { unset($a['id']); } );
+		}
+
+		return $d;
+	}
+
+	private function getSingleLevel( $params )
+	{
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$node = isset($params['node']) ? $params['node'] : null;
+
+		if ( is_null($project_id) || is_null($node) ) return;
+
+		$query="
+			select
+				_a.id,
+				_a.taxon,
+				_r.rank
+
+			from
+				%PRE%taxa _a
+
+			left join
+				%PRE%taxon_quick_parentage _sq
+				on _a.project_id = _sq.project_id
+				and _a.id=_sq.taxon_id
+
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
+
+			left join %PRE%projects_ranks _p
+				on _a.project_id=_p.project_id
+				and _a.rank_id=_p.id
+
+			left join %PRE%ranks _r
+				on _p.rank_id=_r.id
+
+			where 
+				_a.project_id = ".$project_id." 
+				and ifnull(_trash.is_deleted,0)=0
+				and _a.parent_id = ".$node."
+
+			order by
+				_a.taxon
+		";
+
+		return $this->freeQuery($query);
+	}
+
+
 
 	private function format_number($n)
 	{

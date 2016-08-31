@@ -27,7 +27,8 @@ class WebservicesController extends Controller
 		'media',
 		'media_meta',
 		'literature2',
-		'taxon_trend_years'
+		'taxon_trend_years',
+		'label_project_rank'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -1183,6 +1184,46 @@ parameters:
 
 		$result['project']=$p['title'];
 		$result['results']=$files;
+
+		$this->setJSON(json_encode($result));
+		header('Content-Type: application/json');			
+		$this->printOutput();
+	}
+
+	public function taxonomyAction()	
+	{
+		$this->_usage=
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>
+parameters:
+  pid".chr(9)." : project id (mandatory)
+  taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
+";
+
+		if (is_null($this->getCurrentProjectId()))
+		{
+			$this->sendErrors();
+			return;
+		}
+
+		$this->resolveTaxonName();
+		
+		if (is_null($this->getTaxonId()))
+		{
+			$this->sendErrors();
+			return;
+		}
+
+		$taxon=$this->getTaxonById($this->getTaxonId());
+
+		$data = $this->models->WebservicesModel->getTreeBranch( [
+			'project_id' => $this->getCurrentProjectId(),
+			'node' =>  $this->getTaxonId()
+		] );
+
+		$p=$this->getProject();
+		$result['project']=$p['title'];
+		$result['taxon']=$taxon['taxon'];
+		$result['children']=$data;
 
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			
