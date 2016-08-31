@@ -468,17 +468,37 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ( isset($reference->substitute) )
 		{
+			$i=0;
 			foreach((array)$reference->substitute as $key=>$val)
 			{
 				$sval=$this->resolveSubstField(['taxon'=>$taxon,'val'=>$val,'valid_name'=>$valid_name]);
 
 				if ( isset($sval) )
 				{
-					if ( isset($reference->substitute_encode) && $reference->substitute_encode=='replace spaces with underscores' )
+					if (isset($reference->subst_transformation[$i]) )
+					{
+						switch ( $reference->subst_transformation[$i] )
+						{
+							case 'lower':
+								$sval=strtolower($sval);
+								break;
+							case 'upper':
+								$sval=strtoupper($sval);
+								break;
+							case 'initcap':
+								$sval=ucwords($sval);
+								break;
+							case 'none':
+							default:
+							//	$sval=$sval;
+						}
+					}
+					
+					if ( isset($reference->subst_underscores[$i]) && $reference->subst_underscores[$i]=='on') 
 					{
 						$sval=str_replace(' ','_', $sval);
-					} 
-					else
+					}
+
 					if ( isset($reference->substitute_encode) && $reference->substitute_encode!='none' && is_callable( $reference->substitute_encode ) )
 					{
 						$sval=call_user_func($reference->substitute_encode, $sval );
@@ -490,6 +510,7 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$reference->url = str_replace( $key, "" , $reference->url );
 				}
+				$i++;
 			}
 		}
 
@@ -503,6 +524,30 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ( !empty($sval) )
 				{
+					if (isset($reference->param_transformation[$i]) )
+					{
+						switch ( $reference->param_transformation[$i] )
+						{
+							case 'lower':
+								$sval=strtolower($sval);
+								break;
+							case 'upper':
+								$sval=strtoupper($sval);
+								break;
+							case 'initcap':
+								$sval=ucwords($sval);
+								break;
+							case 'none':
+							default:
+							//	$sval=$sval;
+						}
+					}
+					
+					if ( isset($reference->param_underscores[$i]) && $reference->param_underscores[$i]=='on') 
+					{
+						$sval=str_replace(' ','_', $sval);
+					}
+
 					if ( isset($reference->parameter_encode) && $reference->parameter_encode!='none' && is_callable( $reference->parameter_encode ) )
 					{
 						$sval=call_user_func($reference->parameter_encode, $sval );
