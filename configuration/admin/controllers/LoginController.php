@@ -65,7 +65,7 @@ class LoginController extends Controller
 			$this->addError( $this->translate('Login failed.') );
         }
 
-		$this->smarty->assign( 'support_email', $this->moduleSettings->getGeneralSetting( ['setting'=>'support_email','subst'=>'support@naturalis.nl','no_auth_check'=>true ] ) );
+		$this->smarty->assign( 'support_email', $this->moduleSettings->getGeneralSetting( ['setting'=>'support_email','subst'=>'linnaeus@naturalis.nl','no_auth_check'=>true ] ) );
 
         $this->printPage();
     }

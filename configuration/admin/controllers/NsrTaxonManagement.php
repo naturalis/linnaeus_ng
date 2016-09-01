@@ -97,6 +97,8 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'output','label'=>'check by webservice output'],
 		] ;
 		
+	private $encodingMethods = ['none','urlencode','rawurlencode'];
+		
 	private $regularDataBlock = ["id"=>"data","label"=>"Regular page content"];
 
 	
@@ -190,7 +192,7 @@ class NsrTaxonManagement extends NsrController
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', $this->checkTypes );
         $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
-        $this->smarty->assign( 'encoding_methods', ['none','urlencode','rawurlencode'] );
+        $this->smarty->assign( 'encoding_methods',$this->encodingMethods );
         $this->smarty->assign( 'tabs', $this->getCategories() );
 
         $this->printPage();
@@ -536,7 +538,11 @@ class NsrTaxonManagement extends NsrController
 			$d=array();
 			foreach((array)$data['substitute']['name'] as $key=>$val)
 			{
-				if ( empty($val) ) continue;
+				if ( empty($val) )
+				{
+					unset($data['subst_transformation'][$key]);
+					continue;
+				}
 				$d[$val]=$data['substitute']['value'][$key];
 			}
 			$data['substitute']=$d;
@@ -544,7 +550,11 @@ class NsrTaxonManagement extends NsrController
 			$d=array();
 			foreach((array)$data['parameters']['name'] as $key=>$val)
 			{
-				if ( empty($val) ) continue;
+				if ( empty($val) ) 
+				{
+					unset($data['param_transformation'][$key]);
+					continue;
+				}
 				$d[$val]=$data['parameters']['value'][$key];
 			}
 			$data['parameters']=$d;

@@ -52,6 +52,7 @@ ul.management li {
         <li><a href="../module_settings/">{t}Settings{/t}</a></li>
         <li><a href="activity_log.php">{t}Activity log{/t}</a></li>
         <li><a href="../import/index.php">{t}Import data{/t}</a></li>
+		{if $allow_file_management}<li><a href="../files/index.php">{t}File management{/t}</a></li>{/if}
     </ul>
 
 	{/if}

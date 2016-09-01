@@ -66,7 +66,21 @@
 
 			{include file="../species/_tab_dich_key_links.tpl"}
 
+		{elseif $ext_template}
+		
+			{include file=$ext_template}
+
+		{elseif $external_content && $external_content->template}
+        
+			{include file=$external_content->template}
+
+		{elseif $external_content}
+        
+			{include file='_webservice.tpl'}
+
 		{else}
+        
+
 
 	        <br style="clear:all" />
 

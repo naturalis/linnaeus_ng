@@ -44,7 +44,7 @@ class ProjectsController extends Controller
         parent::__construct();
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->show_hidden_modules_in_select_list=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'show_hidden_modules_in_select_list', 'subst'=>false ] );
-		$this->allow_file_management=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'allow_file_management', 'subst'=>false ] );
+		$this->allow_file_management=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'enable_file_management', 'subst'=>false ] );
 	}
 
     public function __destruct ()

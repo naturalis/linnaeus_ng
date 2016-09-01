@@ -1,5 +1,12 @@
 {include file="../shared/admin-header.tpl"}
 
+<style>
+label {
+	font-size:0.8em;
+}
+</style>
+
+
 <div id="page-main" class="tab-definition">
 
 	<h2>{$page.page}</h2>
@@ -111,32 +118,38 @@
                                     <td>{t}URL:{/t}</td>
                                     <td><textarea name="external_reference[url]">{$page.external_reference_decoded->url}</textarea></td>
                                 </tr>
-
-                                <tr class="tr-highlight">
+								<tr class="tr-highlight">
                                     <td>
                                     	{t}substitutions:{/t}<br />
 										<a href="#" onclick="add_subst();return false;">{t}add{/t}</a>
                                     </td>
                                     <td>
-                                    	<div id="substitutions"></div>
-                                    	{t}encoding method:{/t}
-                                    	{foreach $encoding_methods v k}
-                                    	<label>
-                                        	<input type="radio" name="external_reference[substitute_encode]" value="{$v}" {if $page.external_reference_decoded->substitute_encode==$v || (!$page.external_reference_decoded->substitute_encode && $k==1) } checked="checked"{/if} />{$v}</label>
-                                    	{/foreach}
+                                    	<div id="substitutions" style="float:left;"></div>
+                                    	<div id="substitutions_transformations"></div>
+                                        <div style="clear:both;margin-bottom:5px;">
+                                            {t}encoding method:{/t}
+                                            {foreach $encoding_methods v k}
+                                            <label>
+                                                <input type="radio" name="external_reference[substitute_encode]" value="{$v}" {if $page.external_reference_decoded->substitute_encode==$v || (!$page.external_reference_decoded->substitute_encode && $k==1) } checked="checked"{/if} />{$v}</label>
+                                            {/foreach}
+                                        </div>
                                     </td>
                                 </tr>
+                                
                                 <tr class="tr-highlight">
                                     <td>
                                     	{t}parameters:{/t}<br />
 										<a href="#" onclick="add_param();return false;">{t}add{/t}</a>
 									</td>
                                     <td>
-                                    	<div id="parameters"></div>
-                                    	{t}encoding method:{/t}
-                                    	{foreach $encoding_methods v k}
-                                    	<label><input type="radio" name="external_reference[parameter_encode]" value="{$v}" {if $page.external_reference_decoded->parameter_encode==$v || (!$page.external_reference_decoded->parameter_encode && $k==1) } checked="checked"{/if} />{$v}</label>
-                                    	{/foreach}
+                                    	<div id="parameters" style="float:left;"></div>
+                                    	<div id="parameters_transformations"></div>
+                                        <div style="clear:both;margin-bottom:5px;">
+                                            {t}encoding method:{/t}
+                                            {foreach $encoding_methods v k}
+                                            <label><input type="radio" name="external_reference[parameter_encode]" value="{$v}" {if $page.external_reference_decoded->parameter_encode==$v || (!$page.external_reference_decoded->parameter_encode && $k==1) } checked="checked"{/if} />{$v}</label>
+                                            {/foreach}
+										</div>
                                     </td>
                                 </tr>
                             </table>
@@ -233,23 +246,24 @@
 
 </div>
 
-<div id="select_substitute" style="display:none">
-<select name="external_reference[substitute][value][]" class="subst_value big" data-value="%VALUE%">
+<div class="inline-templates" id="select_parameter">
+<!--
+<select name="external_reference[parameters][value][]" class="param_value medium" data-value="%VALUE%">
 	{foreach $dynamic_fields v k}
 	<option value="{$v.field}">{$v.label}</option>
     {/foreach}
 </select>
+-->
 </div>
-<div id="select_parameter" style="display:none">
-<select name="external_reference[parameters][value][]" class="param_value big" data-value="%VALUE%">
+<div class="inline-templates" id="select_substitute">
+<!--
+<select name="external_reference[substitute][value][]" class="subst_value medium" data-value="%VALUE%">
 	{foreach $dynamic_fields v k}
 	<option value="{$v.field}">{$v.label}</option>
     {/foreach}
 </select>
+-->
 </div>
-
-
-
 <div class="inline-templates" id="list_item">
 <!--
 	<li class="page-blocks %CLASS% sortable" data-key="%KEY%" data-id="%ID%"><span class="move">&blk14;</span> %LABEL%%DEL-ICON%</li>
@@ -260,8 +274,17 @@
 	<span class="block-remove" onclick="removeBlock(%KEY%);">x</span>
 -->
 </div>
-
-
+<div class="inline-templates" id="options">
+<!--
+<label title="{t}no transformation{/t}"><input data-index="%I%" type=radio name=external_reference[%TYPE%_transformation][%I%] value=none>{t}as is{/t}</label>
+<label title="{t}make value lower case{/t}"><input data-index="%I%" type=radio name=external_reference[%TYPE%_transformation][%I%] value=lower>{t}lower{/t}</label>
+<label title="{t}make value UPPER CASE{/t}"><input data-index="%I%" type=radio name=external_reference[%TYPE%_transformation][%I%] value=upper>{t}UPPER{/t}</label>
+<label title="{t}make value Inital Capitals{/t}"><input data-index="%I%" type=radio name=external_reference[%TYPE%_transformation][%I%] value=initcap>{t}Init Caps{/t}</label> &nbsp;&nbsp; 
+<label title="{t}spaces to underscores{/t}"><input data-index="%I%" type=checkbox name="external_reference[%TYPE%_underscores][%I%] title="'+_('convert spaces to underscores')+'">sp &rarr; _</label>
+-->    
+</div>
+    
+    
 <script type="text/javascript">
 
 var block_counter=0;
@@ -276,8 +299,6 @@ function addBlock( block )
 	var tpl=fetchTemplate( 'list_item' );
 	var tpl_del=fetchTemplate( 'del_icon' );
 	var buffer=Array();
-
-
 
 	$( '#block_list' ).append(
 		tpl
@@ -294,27 +315,41 @@ function addBlock( block )
 	block_counter++;
 }
 
-
-
+var options='';
 var subst=Array();
-{foreach $page.external_reference_decoded->substitute v k}
-subst.push({ name:'{$k}', value: '{$v}' });
+
+{foreach $page.external_reference_decoded->substitute v k foo}
+subst.push({ name:'{$k}', value: '{$v}', transformation:'{$page.external_reference_decoded->subst_transformation[{$smarty.foreach.foo.index}]}', underscores:'{$page.external_reference_decoded->subst_underscores[{$smarty.foreach.foo.index}]}' });
 {/foreach}
-subst.push({ name:'', value: '' });
+subst.push({ name:'', value: '', transformation: 'none', underscores: null });
 
 function print_susbt()
 {
-	var buffer=Array();
+	var buffer1=Array();
+	var buffer2=Array();
 	for(var i=0;i<subst.length;i++)
 	{
-		var slct=$('#select_substitute').html().replace('%VALUE%',subst[i].value);
-		buffer.push('<input type="text" placeholder="placeholder" class="subst_name" name="external_reference[substitute][name][]" value="'+subst[i].name+'" /> &rarr; ' + slct + '<br />');
+		var slct=fetchTemplate( 'select_substitute' ).replace('%VALUE%',subst[i].value);
+		buffer1.push('<input type="text" placeholder="placeholder" class="subst_name" name="external_reference[substitute][name][]" value="'+subst[i].name+'" /> &rarr; ' + slct + '<br />');
+		buffer2.push( options.replace(/%I%/g,i).replace(/%TYPE%/g,'subst') + '<br />');
 	}
-	$('#substitutions').html( buffer.join("\n") );
+	$('#substitutions').html( buffer1.join("\n") );
+	$('#substitutions_transformations').html( buffer2.join("\n") );
 
-	$('.subst_value').each(function(){
+	$('.subst_value').each(function()
+	{
 		$(this).val( $(this).attr('data-value') );
 	});
+
+	for(var i=0;i<subst.length;i++)
+	{
+		$('input[type=radio][name^=external_reference][name*=subst_transformation]').each(function(index,element)
+		{
+			if( $(this).attr('data-index')==i && $(this).val()==subst[i].transformation) $(this).prop('checked',true);
+		});
+
+		$('input[type=checkbox][name^=external_reference][name*=subst_underscores][data-index='+i+']').prop('checked',(subst[i].underscores=='on'));
+	}
 }
 
 function add_subst()
@@ -330,23 +365,36 @@ function add_subst()
 
 var param=Array();
 {foreach $page.external_reference_decoded->parameters v k}
-param.push({ name:'{$k}', value: '{$v}' });
+param.push({ name:'{$k}', value: '{$v}', transformation:'{$page.external_reference_decoded->param_transformation[{$smarty.foreach.foo.index}]}', underscores:'{$page.external_reference_decoded->param_underscores[{$smarty.foreach.foo.index}]}' });
 {/foreach}
-param.push({ name:'', value: '' });
+param.push({ name:'', value: '', transformation: 'none', underscores: null });
 
 function print_param()
 {
-	var buffer=Array();
+	var buffer1=Array();
+	var buffer2=Array();
 	for(var i=0;i<param.length;i++)
 	{
-		var slct=$('#select_parameter').html().replace('%VALUE%',param[i].value);
-		buffer.push('<input type="text" placeholder="parameter" class="param_name" name="external_reference[parameters][name][]" value="'+param[i].name+'" /> &nbsp;=&nbsp; ' + slct + '<br />');
+		var slct=fetchTemplate( 'select_parameter' ).replace('%VALUE%',param[i].value);
+		buffer1.push('<input type="text" placeholder="parameter" class="param_name" name="external_reference[parameters][name][]" value="'+param[i].name+'" /> &nbsp;=&nbsp; ' + slct + '<br />');
+		buffer2.push( options.replace(/%I%/g,i).replace(/%TYPE%/g,'param') + '<br />');
 	}
-	$('#parameters').html( buffer.join("\n") );
+	$('#parameters').html( buffer1.join("\n") );
+	$('#parameters_transformations').html( buffer2.join("\n") );
 
 	$('.param_value').each(function(){
 		$(this).val( $(this).attr('data-value') );
 	});
+
+	for(var i=0;i<param.length;i++)
+	{
+		$('input[type=radio][name^=external_reference][name*=param_transformation]').each(function(index,element)
+		{
+			if( $(this).attr('data-index')==i && $(this).val()==param[i].transformation) $(this).prop('checked',true);
+		});
+
+		$('input[type=checkbox][name^=external_reference][name*=param_underscores][data-index='+i+']').prop('checked',(param[i].underscores=='on'));
+	}
 }
 
 function add_param()
@@ -390,6 +438,7 @@ $(document).ready(function()
 
 	$( "#block_list" ).sortable();
 
+	options=fetchTemplate( 'options' );
 	print_susbt();
 	print_param();
 });
