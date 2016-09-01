@@ -1214,6 +1214,7 @@ parameters:
 		}
 
 		$taxon=$this->getTaxonById($this->getTaxonId());
+		$parent=$this->getTaxonById($taxon['parent_id']);
 
 		$data = $this->models->WebservicesModel->getTreeBranch( [
 			'project_id' => $this->getCurrentProjectId(),
@@ -1222,7 +1223,8 @@ parameters:
 
 		$p=$this->getProject();
 		$result['project']=$p['title'];
-		$result['taxon']=$taxon['taxon'];
+		$result['taxon']=[ 'taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
+		$result['parent']=['taxon'=>$parent['taxon'],'rank'=>$parent['rank']];
 		$result['children']=$data;
 
 		$this->setJSON(json_encode($result));

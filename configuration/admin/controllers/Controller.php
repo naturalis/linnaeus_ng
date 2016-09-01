@@ -406,10 +406,12 @@ class Controller extends BaseClass
 		{
 			if ( null==$this->getCurrentUserId() )
 			{
+				$this->redirect( '../users/login.php' );
 				$_SESSION['admin']['user']['authorization_fail_message']='Not logged in';
 				$_SESSION['admin']['user']['authorization_fail_page']="https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 				$_SESSION['admin']['user']['authorization_fail_add']="!getCheckOnlyIfLoggedIn";
-				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+				$this->redirect( '../users/login.php' );
+				//$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 			}
 			else
 			{

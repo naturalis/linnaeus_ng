@@ -731,7 +731,7 @@ class WebservicesModel extends AbstractModel
 		{
 			$d[$key]['children']=$this->getSingleLevel( ['project_id'=>$project_id, 'node'=>$val['id'] ] );
 			unset($d[$key]['id']);
-			array_walk($d[$key]['children'],function(&$a) { unset($a['id']); } );
+			if ($d[$key]['children']) array_walk($d[$key]['children'],function(&$a) { unset($a['id']); } );
 		}
 
 		return $d;
@@ -776,7 +776,7 @@ class WebservicesModel extends AbstractModel
 				and _a.parent_id = ".$node."
 
 			order by
-				_a.taxon
+				_p.rank_id, _a.taxon
 		";
 
 		return $this->freeQuery($query);
