@@ -107,13 +107,32 @@
                     ($this->data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
                 $this->data[$i]['code_up_to_date'] =
                     ($this->data[$i]['git_hash'] == $this->data[$i]['git_latest_hash']) ? 'yes' : 'no';
-                $this->data[$i]['server_ip'] = isset($_SERVER['SERVER_ADDR']) ?
-                    $_SERVER['SERVER_ADDR'] : null;
+                $this->data[$i]['server_ip'] = $this->getServerAddress();
                 $this->data[$i]['server_name'] = !is_null($this->data[$i]['server_ip']) ?
                     gethostbyaddr($this->data[$i]['server_ip']) : null;
                 $this->data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
 		}
+
+		private function getServerAddress()
+		{
+            if (array_key_exists('SERVER_ADDR', $_SERVER)) {
+                return $_SERVER['SERVER_ADDR'];
+            } else if (array_key_exists('LOCAL_ADDR', $_SERVER)) {
+                return $_SERVER['LOCAL_ADDR'];
+            } else if (array_key_exists('SERVER_NAME', $_SERVER)) {
+                return gethostbyname($_SERVER['SERVER_NAME']);
+            } else {
+                // Running CLI
+                if (stristr(PHP_OS, 'WIN')) {
+                    return gethostbyname(php_uname("n"));
+                } else {
+                    $ifconfig = shell_exec('/sbin/ifconfig eth0');
+                    preg_match('/addr:([\d\.]+)/', $ifconfig, $match);
+                    return $match[1];
+                }
+            }
+        }
 
 		private function getConfig ()
 		{
