@@ -252,6 +252,15 @@ label {
                                         </div>
                                     </td>
                                 </tr>
+                                <tr class="tr-highlight">
+                                    <td>{t}template parameters:{/t}</td>
+                                    <td>
+                                    	<input class="big" type="text" name="external_reference[template_params]" value="{$page.external_reference_decoded->template_params|@escape}" />
+                                        <div class="explanation">
+                                        optional JSON-encoded parameters. these will be decoded and passed "as is" to the template.
+                                        </div>
+                                    </td>
+                                </tr>
 							</table>
 						</td>
 					</tr>

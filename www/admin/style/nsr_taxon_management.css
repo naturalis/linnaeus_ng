@@ -73,11 +73,11 @@
 	width:50px;
 }
 
-.tab-definition select.big {
+.tab-definition select.big, .tab-definition input[type=text].big {
 	width:250px;
 }
 
-.tab-definition select.medium {
+.tab-definition select.medium, .tab-definition input[type=text].medium {
 	width:150px;
 }
 

@@ -83,14 +83,14 @@ $(document).ready(function()
 </script>
 
     <br />
-    
+
     {if $content}
     <p>
         {$content}
     </p>
     {/if}
     
-    <div id="map" style="width:650px; height:550px"></div>
+    <div id="map" style="width:{if $external_content->template_params_decoded->width}{$external_content->template_params_decoded->width}{else}660px{/if}; height:{if $external_content->template_params_decoded->height}{$external_content->template_params_decoded->height}{else}550px{/if}"></div>
     
     Layers (click to toggle):
     <ul id="urls"></ul>

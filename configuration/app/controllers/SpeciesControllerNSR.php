@@ -157,6 +157,11 @@ class SpeciesControllerNSR extends SpeciesController
 							substr($external_content->template,0,strlen($external_content->template)-4) :
 							$external_content->template;
 				}
+
+				if ( !empty($external_content->template_params) )
+				{
+					$external_content->template_params_decoded=@json_decode($external_content->template_params);
+				}
 			}
 
 			if ( $this->show_nsr_specific_stuff )
