@@ -5,6 +5,16 @@ ul  {
 }​
 </style>
 
+<script type="text/javascript">
+function baseName(str)
+{
+   var base = new String(str).substring(str.lastIndexOf('/') + 1); 
+//    if(base.lastIndexOf(".") != -1)       
+//        base = base.substring(0, base.lastIndexOf("."));
+   return base;
+}
+</script>
+
 <script src="//maps.google.com/maps?file=api&v=2&sensor=false" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -82,7 +92,7 @@ $(document).ready(function()
 		
 	$(urls).each(function(index, value)
 	{
-		$('#urls').append('<li onclick="toggleLayer('+index+');">'+value.url+'</li>');
+		$('#urls').append('<li onclick="toggleLayer('+index+');">'+unescape(baseName(value.url))+'</li>');
 	});
 
 	GMapInitialize();
