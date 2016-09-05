@@ -58,7 +58,7 @@
 
 			{include file="../species/_tab_literatuur.tpl"}
 
-		{if $activeCategory.tabname=='CTAB_TAXON_LIST'}
+		{elseif $activeCategory.tabname=='CTAB_TAXON_LIST'}
 
 			{include file="../species/_tab_taxon_list.tpl"}
 
