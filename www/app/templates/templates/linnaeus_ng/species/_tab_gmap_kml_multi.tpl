@@ -90,7 +90,7 @@ $(document).ready(function()
     </p>
     {/if}
     
-    <div id="map" style="width:800px; height:800px"></div>
+    <div id="map" style="width:650px; height:550px"></div>
     
     Layers (click to toggle):
     <ul id="urls"></ul>
