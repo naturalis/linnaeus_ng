@@ -186,6 +186,17 @@ class FileManagementController extends Controller
 	private function scanMediaDir()
 	{
 		$this->_files=null;
+
+		foreach (glob("$this->_fileDir/*") as $name)
+		{
+			if( !is_dir($name) )
+			{
+				$this->_files[md5($name)]= [ 'pathName'=>$name, 'fileName'=>basename($name) ];
+			}
+		}
+		
+		/*
+		$this->_files=null;
 		$path=$this->_fileDir;
 		$objects=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 		foreach($objects as $name=>$object)
@@ -195,6 +206,7 @@ class FileManagementController extends Controller
 				$this->_files[md5($object->getPathName())]= [ 'pathName'=>$object->getPathName(), 'fileName'=>$object->getFileName() ];
 			}
 		}
+		*/
 	}
 
 	private function downloadFiles()
