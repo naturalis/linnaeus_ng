@@ -616,12 +616,20 @@ class SpeciesControllerNSR extends SpeciesController
 			else
 			if ( $reference->check_type=='url' )
 			{
-				$check_url='http://www.xs4all.nl';
 				$this->helpers->CheckUrl->setUrl( $check_url );
 				
 				if ( $this->helpers->CheckUrl->exists() )
 				{
-					$is_empty=empty( @json_decode( @file_get_contents(  $check_url  ) ) );
+					$f=@file_get_contents(  $check_url  );
+					
+					if ( $this->helpers->CheckUrl->getHeader('content-type')=='application/json' )
+					{
+						$is_empty=empty( @json_decode( $f ) );
+					}
+					else
+					{
+						$is_empty=empty( trim($f) );
+					}
 				}
 				else
 				{
@@ -629,7 +637,7 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 		}
-
+		
 		return
 			array(
 				'full_url'=>$full_url,

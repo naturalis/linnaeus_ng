@@ -83,7 +83,7 @@ label {
 
                 <div class="explanation">
                 	<p>
-                    {t}URL to point to an external page or webservice. parametrization can be done through substitution and/or parameters. these achieve
+                    {t}URL to point to an external page or webservice. parameterization can be done through substitution and/or parameters. these achieve
                     similar goals, but work slightly different:{/t}
                     </p>
                     <p>
@@ -101,8 +101,8 @@ label {
                     {t}please note that when used as direct link, or for retrieving remote data, the full URL will have to be valid at run-time.{/t}
                     </p>
 					<p>
-                    {t}the URL can be "abused" for the transportation of multiple data-values to a template. for instance, multiple parametrized
-                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parametrized URL only", those would
+                    {t}the URL can be "abused" for the transportation of multiple data-values to a template. for instance, multiple parameterized
+                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parameterized URL only", those would
                     be supplied to the template as the <code>$external_content->full_url</code> template-variable, which could then be split and processed
                     further. in this way, multiple URL's could be supplied at once, which can be useful for things like loading multiple layers on a map.{/t}
                     {t}(ps, if you do this, you will likely get an 'Invalid URL'-warning, which can be ignored){/t}
@@ -201,8 +201,9 @@ label {
 										<br />
                                         <u>checking by URL</u>
                                         {t}specify an additional URL below to use for checking, rather than checking the one specified above (useful
-                                        when you have specified multiple URLs above). this URL is parametrized the same way as the one above, and its
-                                        JSON-decoded output also checked against the 'empty()'-function.{/t}
+                                        when you have specified multiple URLs above). this URL is parameterized the same way as the one above, and its
+                                        output also checked against the 'empty()'-function. the output is JSON-decoded if the response header is "application/json",
+                                        otherwise it is checked directly.{/t}
                                         <br />
                                         {t}please note that by using this check, you make the performance of your site partially dependent on the
                                         response time of the queried webservice.{/t}
