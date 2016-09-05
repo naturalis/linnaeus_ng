@@ -58,6 +58,10 @@
 
 			{include file="../species/_tab_literatuur.tpl"}
 
+		{if $activeCategory.tabname=='CTAB_TAXON_LIST'}
+
+			{include file="../species/_tab_taxon_list.tpl"}
+
 		{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
 
 			{include file="../species/_tab_classificatie.tpl"}
