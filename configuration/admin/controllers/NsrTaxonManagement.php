@@ -95,6 +95,7 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'none','label'=>'no check'],
 			['field'=>'query','label'=>'check by query'],
 			['field'=>'output','label'=>'check by webservice output'],
+			['field'=>'url','label'=>'check by URL'],
 		] ;
 		
 	private $encodingMethods = ['none','urlencode','rawurlencode'];
@@ -192,8 +193,9 @@ class NsrTaxonManagement extends NsrController
         $this->smarty->assign( 'dynamic_fields', array_merge($this->basicSubstitutionFields,(array)$traits) );
         $this->smarty->assign( 'check_types', $this->checkTypes );
         $this->smarty->assign( 'link_embed',  $this->linkEmbedTypes );
-        $this->smarty->assign( 'encoding_methods',$this->encodingMethods );
+        $this->smarty->assign( 'encoding_methods', $this->encodingMethods );
         $this->smarty->assign( 'tabs', $this->getCategories() );
+        $this->smarty->assign( 'ranks', $this->newGetProjectRanks() );
 
         $this->printPage();
     }

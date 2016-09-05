@@ -1,4 +1,12 @@
+<style>
+ul  {
+	font-size:0.9em;
+	cursor:pointer;
+}​
+</style>
+
 <script src="//maps.google.com/maps?file=api&v=2&sensor=false" type="text/javascript"></script>
+
 <script type="text/javascript">
 
 var gmap = null;
@@ -47,7 +55,14 @@ function GMapInitialize()
 
 function toggleLayer(i)
 {
-	//not implemented yet
+	if ( layers[i].isHidden() )
+	{
+		layers[i].show();
+	}
+	else
+	{
+		layers[i].hide();
+	}
 }
 
 $(document).ready(function()
@@ -67,16 +82,20 @@ $(document).ready(function()
 });
 </script>
 
-<br />
-
-<div id="map" style="width:800px; height:800px"></div>
-
-<ul id="urls"></ul>
+    <br />
+    
+    {if $content}
+    <p>
+        {$content}
+    </p>
+    {/if}
+    
+    <div id="map" style="width:800px; height:800px"></div>
+    
+    Layers (click to toggle):
+    <ul id="urls"></ul>
 
 </div>
-
-
-
 
 
 {*

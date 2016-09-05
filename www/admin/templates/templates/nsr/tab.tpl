@@ -155,6 +155,32 @@ label {
                             </table>
 						</td>
 					</tr>
+
+                    <tr>
+                    	<td class="sublabel">{t}taxonomy{/t}</td>
+                    	<td>
+                        	<table class="subsublabel">
+                                <tr class="tr-highlight">
+                                	<td>
+									{t}show when rank:{/t}
+                                    </td>
+                                	<td>
+                                    	<select class="big" name="external_reference[rank]" >
+                                            <option value="" {if !$page.external_reference_decoded->rank} selected="selected"{/if}>{t}show for all ranks{/t}</option>
+                                            {foreach $ranks v k ranks}
+                                            {if $smarty.foreach.ranks.index>0}
+                                            <option value="{$v.rank_id}"{if $v.rank_id==$page.external_reference_decoded->rank} selected="selected"{/if}>
+                                            	equal to or below "{$v.rank}"
+											</option>
+                                            {/if}
+                                            {/foreach}
+                                        </select>									
+                                    </td>
+                                </tr>
+                            </table>
+						</td>
+					</tr>
+
                     <tr>
                     	<td class="sublabel">{t}data check{/t}</td>
                     	<td>
@@ -162,7 +188,7 @@ label {
                                 <tr class="tr-highlight">
                                     <td>{t}check type:{/t}</td>
                                     <td>
-                                    	<select class="big" name="external_reference[check_type]">
+                                    	<select class="big" name="external_reference[check_type]" >
                                             {foreach $check_types v k}
                                             <option value="{$v.field}"{if $v.field==$page.external_reference_decoded->check_type} selected="selected"{/if}>{$v.label}</option>
                                             {/foreach}
@@ -172,6 +198,12 @@ label {
                                         {t}the system assumes the webservice returns JSON-encoded data. after decoding, the data is fed to the PHP
                                         function 'empty()'. if the function returns true, it is assumed there is no data for the taxon under
                                         consideration, and the tab is not shown.{/t}
+										<br />
+                                        <u>checking by URL</u>
+                                        {t}specify an additional URL below to use for checking, rather than checking the one specified above (useful
+                                        when you have specified multiple URLs above). this URL is parametrized the same way as the one above, and its
+                                        JSON-decoded output also checked against the 'empty()'-function.{/t}
+                                        <br />
                                         {t}please note that by using this check, you make the performance of your site partially dependent on the
                                         response time of the queried webservice.{/t}
                                         </div>
@@ -179,7 +211,9 @@ label {
                                 </tr>
                                 <tr class="tr-highlight">
                                     <td>
-                                    	{t}"check by" query:{/t}
+                                    	<span class="check-by-none">{t}n/a{/t}</span>
+                                    	<span class="check-by-query" style="display:none">{t}"check by" query:{/t}</span>
+                                    	<span class="check-by-url" style="display:none">{t}"check by" URL:{/t}</span>
                                     </td>
                                     <td>
                                     	<textarea name="external_reference[query]">{$page.external_reference_decoded->query}</textarea>
@@ -193,11 +227,6 @@ label {
 									</td>
                                 </tr>
 							</table>
-                            need to add:
-                            <ul>
-                            	<li>show only for certain ranks</li>
-                            	<li>somehow check remotely with actual parameters</li>
-                            </ul>
 						</td>
 					</tr>
                     <tr>
@@ -437,6 +466,18 @@ $(document).ready(function()
 	});
 
 	$( "#block_list" ).sortable();
+	
+	$( '[name^=external_reference\\[check_type\\]]' ).on( 'change', function(n)
+	{
+		$( '[name=external_reference\\[query\\]]' ).prop( 'disabled', $(this).val()=='none' || $(this).val()=='output' );
+
+		$( '.check-by-query' ).toggle( $(this).val()=='query' );
+		$( '.check-by-none' ).toggle( $(this).val()=='none' || $(this).val()=='output' );
+		$( '.check-by-url' ).toggle( $(this).val()=='url' );
+	});
+
+	$( '[name^=external_reference\\[check_type\\]]' ).trigger( 'change' );
+
 
 	options=fetchTemplate( 'options' );
 	print_susbt();
