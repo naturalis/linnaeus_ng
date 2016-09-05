@@ -14,6 +14,13 @@ var dynMapOv = null;
 var geoXml = null;
 var centerat = null;
 var zoomlevel = null;
+var initCenterAt = { lat:11.0, lng:11.0 };
+{if $external_content->template_params_decoded->initCenterAt->lat}
+initCenterAt.lat={$external_content->template_params_decoded->initCenterAt->lat};
+{/if}
+{if $external_content->template_params_decoded->initCenterAt->lng}
+initCenterAt.lng={$external_content->template_params_decoded->initCenterAt->lng};
+{/if}
 
 var urls=Array();
 var layers=[];
@@ -24,7 +31,7 @@ function GMapInitialize()
 	gmap = new GMap2(document.getElementById("map"));
 	gmap.addMapType(G_PHYSICAL_MAP);
 	
-	var centerat = new GLatLng(11.0, 11.0);
+	var centerat = new GLatLng(initCenterAt.lat, initCenterAt.lng);
 	var topRight = new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(10,10));
 	var topLeft = new GControlPosition(G_ANCHOR_TOP_LEFT, new GSize(10,10));
 	var bottomRight = new GControlPosition(G_ANCHOR_BOTTOM_RIGHT, new GSize(10,10));
