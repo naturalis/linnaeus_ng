@@ -91,14 +91,14 @@ $(document).ready(function()
 	var parser = document.createElement('a');
 		parser.href = "{$v|@trim|@escape}";
 	var u = 
-		parser.protocol + '//' 
+		parser.protocol + '//' +
 		parser.host + 
 		parser.pathname + 
 		parser.search +
-		(parser.search ? '&' : '?' ) + 'uniq=' + Math.random() +
+		(parser.search ? '&' : '?' ) + 'rnd=' + Math.random() +
 		parser.hash;
 	
-	    urls.push( { url: u, display: unescape(baseName('{$v|@trim|@escape}')) } );
+	    urls.push( { url: u, display: unescape( baseName( parser.href ) ) } );
     {/foreach} 
 		
 	$(urls).each(function(index, value)
