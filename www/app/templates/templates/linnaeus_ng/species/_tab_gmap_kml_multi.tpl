@@ -87,12 +87,23 @@ $(document).ready(function()
 	$('body').on('unload',function() { GUnload(); } );
 
 	{foreach item=v from="\n"|explode:$external_content->full_url}
-    urls.push( { url: '{$v|@trim|@escape}' } );
+	
+	var parser = document.createElement('a');
+		parser.href = "{$v|@trim|@escape}";
+	var u = 
+		parser.protocol + '//' 
+		parser.host + 
+		parser.pathname + 
+		parser.search +
+		(parser.search ? '&' : '?' ) + 'uniq=' + Math.random() +
+		parser.hash;
+	
+	    urls.push( { url: u, display: unescape(baseName('{$v|@trim|@escape}'})) );
     {/foreach} 
 		
 	$(urls).each(function(index, value)
 	{
-		$('#urls').append('<li onclick="toggleLayer('+index+');">'+unescape(baseName(value.url))+'</li>');
+		$('#urls').append('<li onclick="toggleLayer('+index+');">'+value.display+'</li>');
 	});
 
 	GMapInitialize();
