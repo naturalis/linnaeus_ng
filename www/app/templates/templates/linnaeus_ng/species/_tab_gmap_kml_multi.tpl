@@ -98,7 +98,7 @@ $(document).ready(function()
 		(parser.search ? '&' : '?' ) + 'uniq=' + Math.random() +
 		parser.hash;
 	
-	    urls.push( { url: u, display: unescape(baseName('{$v|@trim|@escape}')) );
+	    urls.push( { url: u, display: unescape(baseName('{$v|@trim|@escape}')) } );
     {/foreach} 
 		
 	$(urls).each(function(index, value)
