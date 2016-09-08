@@ -75,7 +75,7 @@
 		private function pushData ()
 		{
     		$post = http_build_query(array('lng_data' => json_encode($this->data)));
-print_r($this->data); die();
+
     		$ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $this->pushUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -143,7 +143,7 @@ print_r($this->data); die();
 		private function printResult ()
 		{
 		    $message = isset($this->pushResult->result) ?
-                $this->pushResult->result : $this->pushResult;
+                $this->pushResult->result : 'Connection to ' . $this->pushUrl . ' failed!';
 		    die($message . "\n");
 		}
 
