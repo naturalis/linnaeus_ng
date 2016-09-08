@@ -1898,11 +1898,11 @@ CREATE TABLE IF NOT EXISTS `trend_sources` (
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(32) NOT NULL,
+  `username` varchar(128) NOT NULL,
   `password` varchar(255) NOT NULL,
   `first_name` varchar(32) NOT NULL,
   `last_name` varchar(32) NOT NULL,
-  `email_address` varchar(54) NOT NULL,
+  `email_address` varchar(128) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `last_login` datetime DEFAULT NULL,
   `logins` int(11) NOT NULL DEFAULT '0',
