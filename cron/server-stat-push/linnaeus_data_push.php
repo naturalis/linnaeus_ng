@@ -142,7 +142,9 @@
 
 		private function printResult ()
 		{
-		    die($this->pushResult->result . "\n");
+		    $message = isset($this->pushResult->result) ?
+                $this->pushResult->result : $this->pushResult;
+		    die($message . "\n");
 		}
 
         private function getProjectsWithUsers ()
