@@ -592,6 +592,17 @@ class SearchControllerGeneral extends SearchController
 		if (isset($restrict))
 			$p['restrict']=$restrict;
 
+		if ( $searchAll ||
+			(
+				( is_array($modules) && in_array('species',$modules) ) ||
+				( is_array($modules) && in_array('key',$modules) ) 
+			)
+		)
+		{
+			$species=$this->searchSpecies( $p );
+			$p['species_results']=$species;
+		}
+		
 		$results =
 			array(
 				'introduction' =>
@@ -600,8 +611,10 @@ class SearchControllerGeneral extends SearchController
 					($searchAll || (is_array($modules) && in_array('glossary',$modules)) ? $this->searchGlossary( $p ) : null),
 				'literature' =>
 					($searchAll || (is_array($modules) && in_array('literature',$modules)) ? $this->searchLiterature( $p ) : null),
+				//'species' =>
+				//	($searchAll || (is_array($modules) && in_array('species',$modules)) ? $this->searchSpecies( $p ) : null),
 				'species' =>
-					($searchAll || (is_array($modules) && in_array('species',$modules)) ? $this->searchSpecies( $p ) : null),
+					($searchAll || (is_array($modules) && in_array('species',$modules)) ? $species : null),
 				'dichkey' =>
 					($searchAll || (is_array($modules) && in_array('key',$modules)) ? $this->searchDichotomousKey( $p ) : null),
 				'matrixkey' =>
@@ -854,7 +867,7 @@ class SearchControllerGeneral extends SearchController
 		{
 			$results[self::C_TAXA_SCI_NAMES]=
 				array(
-					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
+					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap() & searchDichKey
 					'url' => '../species/taxon.php?id=%s',
 					'data' => $taxa,
 					'numOfResults' => count((array)$taxa)
@@ -1147,7 +1160,7 @@ class SearchControllerGeneral extends SearchController
 
 	private function searchDichotomousKey( $p )
 	{
-
+		
 		$keysteps = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
@@ -1157,6 +1170,65 @@ class SearchControllerGeneral extends SearchController
 				'fieldAsIndex' => 'id'
 			)
 		);
+
+		// endpoints
+		$endpoints=array();
+		if ( isset($p['species_results']) && isset($p['species_results']['results']) )
+		{
+			// harvest taxon id's from the search results from the species module
+			$taxon_ids=array();
+			foreach((array)$p['species_results']['results'] as $val)
+			{
+				if ($val['label']=='Species names')
+				{
+					foreach((array)$val['data'] as $match)
+					{
+						$taxon_ids[]=$match['id'];
+					}
+				}
+			}
+		
+			if ( !empty($taxon_ids) )
+			{
+				$a=$this->translate('Step');
+				$b=$this->translate('choice');
+
+				$endpoints = $this->models->ChoicesKeysteps->freeQuery("
+					select
+						_a.id as _id,
+						_a.keystep_id as id,
+						_a.show_order,
+						_b.number,
+						concat('".$a." ',_b.number,', ".$b." ',_a.show_order,' &rarr; ',_c.taxon) as label
+
+					from
+						%PRE%choices_keysteps _a
+
+					left join %PRE%keysteps _b
+						on _a.project_id = _b.project_id
+						and _a.keystep_id = _b.id
+
+					left join %PRE%taxa _c
+						on _a.project_id = _c.project_id
+						and _a.res_taxon_id = _c.id
+
+					where
+						_a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.res_taxon_id in (" . implode(",",$taxon_ids) . ")
+
+					order by
+						concat('".$a." ',_b.number,', ".$b." ',_a.show_order)
+
+					limit " . $p[self::S_RESULT_LIMIT_PER_CAT] . "
+					
+				");
+
+				//_c.taxon as ".__CONCAT_RESULT__."
+ 				//$endpoints = $this->filterResultsWithTokenizedSearch(array($p,$endpoints));
+				$endpoints = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$endpoints));
+				//$endpoints = $this->sortResultsByMostTokensFound($endpoints);
+			}
+		}
 
 
 		// choices
@@ -1229,9 +1301,15 @@ class SearchControllerGeneral extends SearchController
 					//'url' =>'../key/index.php?choice=%s',
 					'data' => $choices,
 					'numOfResults' => count((array)$choices)
+				),
+				array(
+					'label' => $this->translate('endpoints'),
+					'url' =>'../key/index.php?step=%s',
+					'data' => $endpoints,
+					'numOfResults' => count((array)$endpoints)
 				)
 			),
-			'numOfResults' => count((array)$choices)+count((array)$steps)
+			'numOfResults' => count((array)$choices)+count((array)$steps)+count((array)$endpoints)
 		);
 
 	}
