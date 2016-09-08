@@ -7,7 +7,7 @@
 	    private $tablePrefix;
 	    private $data = array();
 	    private $pushUrl;
-        private $timeout = 30;
+        private $timeout = 15;
         private $pushResult;
         private $gitRepo;
         private $gitBranch;
@@ -142,8 +142,14 @@
 
 		private function printResult ()
 		{
-		    $message = isset($this->pushResult->result) ?
-                $this->pushResult->result : 'Connection to ' . $this->pushUrl . ' failed!';
+		    if (isset($this->pushResult->result)) {
+		        $message = $this->pushResult->result;
+		    } else if (!empty($this->pushResult)) {
+                $message = is_array($this->pushResult) ?
+                    json_encode($this->pushResult) : $this->pushResult;
+		    } else {
+                $message = 'Could not connect to ' . $this->pushUrl . '!';
+		    }
 		    die($message . "\n");
 		}
 
