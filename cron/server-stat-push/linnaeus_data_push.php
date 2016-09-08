@@ -75,7 +75,7 @@
 		private function pushData ()
 		{
     		$post = http_build_query(array('lng_data' => json_encode($this->data)));
-
+print_r($this->data); die();
     		$ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $this->pushUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
