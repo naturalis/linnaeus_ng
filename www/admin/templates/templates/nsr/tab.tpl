@@ -83,7 +83,7 @@ label {
 
                 <div class="explanation">
                 	<p>
-                    {t}URL to point to an external page or webservice. parametrization can be done through substitution and/or parameters. these achieve
+                    {t}URL to point to an external page or webservice. parameterization can be done through substitution and/or parameters. these achieve
                     similar goals, but work slightly different:{/t}
                     </p>
                     <p>
@@ -101,8 +101,8 @@ label {
                     {t}please note that when used as direct link, or for retrieving remote data, the full URL will have to be valid at run-time.{/t}
                     </p>
 					<p>
-                    {t}the URL can be "abused" for the transportation of multiple data-values to a template. for instance, multiple parametrized
-                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parametrized URL only", those would
+                    {t}the URL can be "abused" for the transportation of multiple data-values to a template. for instance, multiple parameterized
+                    URL's could be entered, separated wiht line feeds. when combined with the presentation option "embed parameterized URL only", those would
                     be supplied to the template as the <code>$external_content->full_url</code> template-variable, which could then be split and processed
                     further. in this way, multiple URL's could be supplied at once, which can be useful for things like loading multiple layers on a map.{/t}
                     {t}(ps, if you do this, you will likely get an 'Invalid URL'-warning, which can be ignored){/t}
@@ -155,6 +155,32 @@ label {
                             </table>
 						</td>
 					</tr>
+
+                    <tr>
+                    	<td class="sublabel">{t}taxonomy{/t}</td>
+                    	<td>
+                        	<table class="subsublabel">
+                                <tr class="tr-highlight">
+                                	<td>
+									{t}show when rank:{/t}
+                                    </td>
+                                	<td>
+                                    	<select class="big" name="external_reference[rank]" >
+                                            <option value="" {if !$page.external_reference_decoded->rank} selected="selected"{/if}>{t}show for all ranks{/t}</option>
+                                            {foreach $ranks v k ranks}
+                                            {if $smarty.foreach.ranks.index>0}
+                                            <option value="{$v.rank_id}"{if $v.rank_id==$page.external_reference_decoded->rank} selected="selected"{/if}>
+                                            	equal to or below "{$v.rank}"
+											</option>
+                                            {/if}
+                                            {/foreach}
+                                        </select>									
+                                    </td>
+                                </tr>
+                            </table>
+						</td>
+					</tr>
+
                     <tr>
                     	<td class="sublabel">{t}data check{/t}</td>
                     	<td>
@@ -162,7 +188,7 @@ label {
                                 <tr class="tr-highlight">
                                     <td>{t}check type:{/t}</td>
                                     <td>
-                                    	<select class="big" name="external_reference[check_type]">
+                                    	<select class="big" name="external_reference[check_type]" >
                                             {foreach $check_types v k}
                                             <option value="{$v.field}"{if $v.field==$page.external_reference_decoded->check_type} selected="selected"{/if}>{$v.label}</option>
                                             {/foreach}
@@ -172,6 +198,13 @@ label {
                                         {t}the system assumes the webservice returns JSON-encoded data. after decoding, the data is fed to the PHP
                                         function 'empty()'. if the function returns true, it is assumed there is no data for the taxon under
                                         consideration, and the tab is not shown.{/t}
+										<br />
+                                        <u>checking by URL</u>
+                                        {t}specify an additional URL below to use for checking, rather than checking the one specified above (useful
+                                        when you have specified multiple URLs above). this URL is parameterized the same way as the one above, and its
+                                        output also checked against the 'empty()'-function. the output is JSON-decoded if the response header is "application/json",
+                                        otherwise it is checked directly.{/t}
+                                        <br />
                                         {t}please note that by using this check, you make the performance of your site partially dependent on the
                                         response time of the queried webservice.{/t}
                                         </div>
@@ -179,7 +212,9 @@ label {
                                 </tr>
                                 <tr class="tr-highlight">
                                     <td>
-                                    	{t}"check by" query:{/t}
+                                    	<span class="check-by-none">{t}n/a{/t}</span>
+                                    	<span class="check-by-query" style="display:none">{t}"check by" query:{/t}</span>
+                                    	<span class="check-by-url" style="display:none">{t}"check by" URL:{/t}</span>
                                     </td>
                                     <td>
                                     	<textarea name="external_reference[query]">{$page.external_reference_decoded->query}</textarea>
@@ -193,11 +228,6 @@ label {
 									</td>
                                 </tr>
 							</table>
-                            need to add:
-                            <ul>
-                            	<li>show only for certain ranks</li>
-                            	<li>somehow check remotely with actual parameters</li>
-                            </ul>
 						</td>
 					</tr>
                     <tr>
@@ -220,6 +250,15 @@ label {
                                     	<input type="text" name="external_reference[template]" value="{$page.external_reference_decoded->template}" /><br />
                                         <div class="explanation">
                                         {t}enter the template name including the extension. the system will not check if the template actually exists. if it does not, no content will be displayed.{/t}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="tr-highlight">
+                                    <td>{t}template parameters:{/t}</td>
+                                    <td>
+                                    	<input class="big" type="text" name="external_reference[template_params]" value="{$page.external_reference_decoded->template_params|@escape}" />
+                                        <div class="explanation">
+                                        optional JSON-encoded parameters. these will be decoded and passed "as is" to the template.
                                         </div>
                                     </td>
                                 </tr>
@@ -437,6 +476,18 @@ $(document).ready(function()
 	});
 
 	$( "#block_list" ).sortable();
+	
+	$( '[name^=external_reference\\[check_type\\]]' ).on( 'change', function(n)
+	{
+		$( '[name=external_reference\\[query\\]]' ).prop( 'disabled', $(this).val()=='none' || $(this).val()=='output' );
+
+		$( '.check-by-query' ).toggle( $(this).val()=='query' );
+		$( '.check-by-none' ).toggle( $(this).val()=='none' || $(this).val()=='output' );
+		$( '.check-by-url' ).toggle( $(this).val()=='url' );
+	});
+
+	$( '[name^=external_reference\\[check_type\\]]' ).trigger( 'change' );
+
 
 	options=fetchTemplate( 'options' );
 	print_susbt();

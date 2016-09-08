@@ -28,7 +28,7 @@ class SpeciesControllerNSR extends SpeciesController
 		'taxon_quick_parentage'
 	);
 
-    public $usedHelpers = array('current_url');
+    public $usedHelpers = array('current_url','check_url');
 
 	private $cTabs=[
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
@@ -156,6 +156,11 @@ class SpeciesControllerNSR extends SpeciesController
 						substr($external_content->template,-4)=='.tpl' ?
 							substr($external_content->template,0,strlen($external_content->template)-4) :
 							$external_content->template;
+				}
+
+				if ( !empty($external_content->template_params) )
+				{
+					$external_content->template_params_decoded=@json_decode($external_content->template_params);
 				}
 			}
 
@@ -451,8 +456,14 @@ class SpeciesControllerNSR extends SpeciesController
 		$reference = isset($p['reference']) ? $p['reference'] : null;
 
 		if ( is_null($taxon) || is_null($reference) ) return;
+		
+		if ( !empty($reference->rank) && !empty($taxon['base_rank_id']) && ( $taxon['base_rank_id'] < $reference->rank ) )
+		{
+			return [ 'is_empty'=> true ];
+		}
 
 		$valid_name=null;
+
 		foreach((array)$reference->substitute+(array)$reference->parameters as $val)
 		{
 			if (strpos($val,'name:')===0)
@@ -466,6 +477,11 @@ class SpeciesControllerNSR extends SpeciesController
 			}
 		}
 
+		if ( $reference->check_type=='url' && !empty(trim($reference->query)) )
+		{
+			$check_url=trim($reference->query);
+		}
+
 		if ( isset($reference->substitute) )
 		{
 			$i=0;
@@ -475,7 +491,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ( isset($sval) )
 				{
-					if (isset($reference->subst_transformation[$i]) )
+					if ( isset($reference->subst_transformation[$i]) )
 					{
 						switch ( $reference->subst_transformation[$i] )
 						{
@@ -505,10 +521,21 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 
 					$reference->url = str_replace( $key, $sval, $reference->url );
+
+					if ( $reference->check_type=='url' && !empty($check_url) )
+					{
+						$check_url=str_replace( $key, $sval, $check_url );
+					}
+					
 				}
 				else
 				{
 					$reference->url = str_replace( $key, "" , $reference->url );
+
+					if ( $reference->check_type=='url' && !empty($check_url) )
+					{
+						$check_url = str_replace( $key, "" , $check_url );
+					}
 				}
 				$i++;
 			}
@@ -559,8 +586,13 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 
 		$parts=parse_url( $reference->url );
-
 		$full_url=$reference->url . ( !empty($query_string) ? ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' ) : "" );
+
+		if ( $reference->check_type=='url' && !empty($check_url) )
+		{
+			$parts=parse_url( $check_url );
+			$check_url=$check_url . ( !empty($query_string) ? ( !empty($parts['query']) ? '&' : '?' ) . rtrim( $query_string, '&' ) : "" );
+		}
 
 		$is_empty=null;
 
@@ -581,8 +613,31 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$is_empty=empty( @json_decode( @file_get_contents(  $full_url  ) ) );
 			}
+			else
+			if ( $reference->check_type=='url' )
+			{
+				$this->helpers->CheckUrl->setUrl( $check_url );
+				
+				if ( $this->helpers->CheckUrl->exists() )
+				{
+					$f=@file_get_contents(  $check_url  );
+					
+					if ( $this->helpers->CheckUrl->getHeader('content-type')=='application/json' )
+					{
+						$is_empty=empty( @json_decode( $f ) );
+					}
+					else
+					{
+						$is_empty=empty( trim($f) );
+					}
+				}
+				else
+				{
+					$is_empty=true;
+				}
+			}
 		}
-
+		
 		return
 			array(
 				'full_url'=>$full_url,
@@ -699,10 +754,11 @@ class SpeciesControllerNSR extends SpeciesController
 				$taxon=is_null($taxon) ? $this->getTaxonById( $taxon_id ) : $taxon;
 				$ref=json_decode( $val['external_reference'] );
 				$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref) );
-				$ref->full_url=$d['full_url'];
-				$ref->full_url_valid=$d['full_url_valid'];
+			
+				if (isset($d['full_url'])) $ref->full_url=$d['full_url'];
+				if (isset($d['full_url_valid'])) $ref->full_url_valid=$d['full_url_valid'];
 				$val['external_reference']=$ref;
-				$val['is_empty']=$d['is_empty'];
+				$val['is_empty']=isset($d['is_empty']) ? $d['is_empty'] : true;
 				$val['type']='external';
 			}
 

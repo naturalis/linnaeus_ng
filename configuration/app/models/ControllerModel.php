@@ -94,6 +94,7 @@ final class ControllerModel extends AbstractModel
 				_f.lower_taxon,
 				_c.commonname,
 				_f.rank_id as base_rank_id,
+				_r.rank,
 				ifnull(_q.label,_r.rank) as rank_label
 
 			from %PRE%taxa _a

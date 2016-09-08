@@ -23,6 +23,10 @@ class TraitsTaxonController extends TraitsController
     public $controllerPublicName = 'Traits';
 	public $controllerBaseName='traits';
 
+    public $extraModels = array(
+        'TraitsModel'
+    );
+
     public $cssToLoad = array(
 		'traits.css',
 //		'taxon_groups.css',
@@ -96,6 +100,37 @@ class TraitsTaxonController extends TraitsController
 			$this->smarty->assign('traits',$this->getTraitgroupTraits($this->rGetVal('group')));
 			$this->smarty->assign('concept',$this->getTaxonById($this->rGetId()));
 			$this->smarty->assign('values',$this->getTaxonValues(array('taxon'=>$this->rGetId(),'group'=>$this->rGetVal('group'))));
+		}
+
+		$this->printPage();
+    }
+
+    public function taxaAction()
+    {
+		$this->checkAuthorisation();
+		$this->setPageName( $this->translate('Taxon trait data') );
+		
+		if ( $this->rHasVal('trait') ) 
+		{
+			$taxa=$this->models->TraitsTaxonModel->getTaxaTraitValues( [
+				'project_id'=>$this->getCurrentProjectId(),
+				'language_id' => $this->getDefaultProjectLanguage(),
+				'trait_id'=>$this->rGetVal('trait')
+			] );
+			
+			if ($taxa)
+			{
+				
+				$group=$this->models->TraitsModel->getTraitgroup( [
+					'project_id'=>$this->getCurrentProjectId(),
+					'language_id' => $this->getDefaultProjectLanguage(),
+					'group_id'=>$taxa[0]['trait_group_id']
+				] );				
+				
+				$this->smarty->assign('group',$group);
+				$this->smarty->assign('taxa',$taxa);
+			}
+			
 		}
 
 		$this->printPage();

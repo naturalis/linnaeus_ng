@@ -58,6 +58,10 @@
 
 			{include file="../species/_tab_literatuur.tpl"}
 
+		{elseif $activeCategory.tabname=='CTAB_TAXON_LIST'}
+
+			{include file="../species/_tab_taxon_list.tpl"}
+
 		{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
 
 			{include file="../species/_tab_classificatie.tpl"}
@@ -72,15 +76,13 @@
 
 		{elseif $external_content && $external_content->template}
         
-			{include file=$external_content->template}
+			{include file="../species/`$external_content->template`"}
 
 		{elseif $external_content}
         
 			{include file='_webservice.tpl'}
 
 		{else}
-        
-
 
 	        <br style="clear:all" />
 

@@ -1,4 +1,22 @@
+<style>
+ul  {
+	font-size:0.9em;
+	cursor:pointer;
+}​
+</style>
+
+<script type="text/javascript">
+function baseName(str)
+{
+   var base = new String(str).substring(str.lastIndexOf('/') + 1); 
+//    if(base.lastIndexOf(".") != -1)       
+//        base = base.substring(0, base.lastIndexOf("."));
+   return base;
+}
+</script>
+
 <script src="//maps.google.com/maps?file=api&v=2&sensor=false" type="text/javascript"></script>
+
 <script type="text/javascript">
 
 var gmap = null;
@@ -6,6 +24,13 @@ var dynMapOv = null;
 var geoXml = null;
 var centerat = null;
 var zoomlevel = null;
+var initCenterAt = { lat:11.0, lng:11.0 };
+{if $external_content->template_params_decoded->initCenterAt->lat}
+initCenterAt.lat={$external_content->template_params_decoded->initCenterAt->lat};
+{/if}
+{if $external_content->template_params_decoded->initCenterAt->lng}
+initCenterAt.lng={$external_content->template_params_decoded->initCenterAt->lng};
+{/if}
 
 var urls=Array();
 var layers=[];
@@ -16,7 +41,7 @@ function GMapInitialize()
 	gmap = new GMap2(document.getElementById("map"));
 	gmap.addMapType(G_PHYSICAL_MAP);
 	
-	var centerat = new GLatLng(11.0, 11.0);
+	var centerat = new GLatLng(initCenterAt.lat, initCenterAt.lng);
 	var topRight = new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(10,10));
 	var topLeft = new GControlPosition(G_ANCHOR_TOP_LEFT, new GSize(10,10));
 	var bottomRight = new GControlPosition(G_ANCHOR_BOTTOM_RIGHT, new GSize(10,10));
@@ -47,7 +72,14 @@ function GMapInitialize()
 
 function toggleLayer(i)
 {
-	//not implemented yet
+	if ( layers[i].isHidden() )
+	{
+		layers[i].show();
+	}
+	else
+	{
+		layers[i].hide();
+	}
 }
 
 $(document).ready(function()
@@ -55,28 +87,43 @@ $(document).ready(function()
 	$('body').on('unload',function() { GUnload(); } );
 
 	{foreach item=v from="\n"|explode:$external_content->full_url}
-    urls.push( { url: '{$v|@trim|@escape}' } );
+	
+	var parser = document.createElement('a');
+		parser.href = "{$v|@trim|@escape}";
+	var u = 
+		parser.protocol + '//' +
+		parser.host + 
+		parser.pathname + 
+		parser.search +
+		(parser.search ? '&' : '?' ) + 'rnd=' + Math.random() +
+		parser.hash;
+	
+	    urls.push( { url: u, display: unescape( baseName( parser.href ) ) } );
     {/foreach} 
 		
 	$(urls).each(function(index, value)
 	{
-		$('#urls').append('<li onclick="toggleLayer('+index+');">'+value.url+'</li>');
+		$('#urls').append('<li onclick="toggleLayer('+index+');">'+value.display+'</li>');
 	});
 
 	GMapInitialize();
 });
 </script>
 
-<br />
+    <br />
 
-<div id="map" style="width:800px; height:800px"></div>
-
-<ul id="urls"></ul>
+    {if $content}
+    <p>
+        {$content}
+    </p>
+    {/if}
+    
+    <div id="map" style="width:{if $external_content->template_params_decoded->width}{$external_content->template_params_decoded->width}{else}660px{/if}; height:{if $external_content->template_params_decoded->height}{$external_content->template_params_decoded->height}{else}550px{/if}"></div>
+    
+    Layers (click to toggle):
+    <ul id="urls"></ul>
 
 </div>
-
-
-
 
 
 {*
