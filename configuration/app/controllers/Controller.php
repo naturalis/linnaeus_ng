@@ -1445,7 +1445,7 @@ class Controller extends BaseClass
 			$modules[$key]['module'] = $mp['module'];
 			$modules[$key]['description'] = $mp['description'];
 			$modules[$key]['controller'] = $mp['controller'];
-			$modules[$key]['show_order'] = isset($val['show_order']) ? $val['show_order'] : $mp['show_order'];
+			$modules[$key]['show_order'] = $mp['show_order']; //isset($val['show_order']) ? $val['show_order'] : $mp['show_order'];
 			$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
 		}
 
