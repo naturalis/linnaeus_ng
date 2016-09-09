@@ -24,7 +24,7 @@
 			
 		{elseif $activeCategory.tabname=='CTAB_NAMES'}
 					
-			{include file="_tab_naamgeving.tpl"}
+			{include file="_tab_names.tpl"}
 
 		{elseif $activeCategory.tabname=='CTAB_PRESENCE_STATUS'}
 					
@@ -58,7 +58,7 @@
 				{if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
 				{/foreach}
 			</ul>
-			{else}
+            {elseif !empty($content)}
 			<p>
 				{$content}
 			</p>

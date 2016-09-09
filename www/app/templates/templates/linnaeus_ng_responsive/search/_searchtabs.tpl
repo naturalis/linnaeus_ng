@@ -48,7 +48,7 @@
 	{if $activeTab eq 'extendedSearch'}
 	<div class="extendedSearch">
 	    <input type="text" size="60" class="field" id="{$responsiveTabs}group" name="group" autocomplete="off" placeholder="Filter op soortgroep..." value="{$search.group}">
-	    <div id="{$responsiveTabs}group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+	    <div id="{$responsiveTabs}group_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 	</div>
   	{/if}
 </div>

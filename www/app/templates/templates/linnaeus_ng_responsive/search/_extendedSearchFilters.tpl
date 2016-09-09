@@ -12,7 +12,7 @@
         <div class="formrow">
            <label accesskey="g" for="author">{t}Auteur{/t}</label>
            <input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
-           <div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+           <div id="author_suggestion" match="like" class="auto_complete" style="display:none;"></div>
         </div>
         *}
      </fieldset>

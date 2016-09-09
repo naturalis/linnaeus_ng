@@ -7,7 +7,7 @@ include_once ('ModuleSettingsReaderController.php');
 
 class SearchControllerNSR extends SearchController
 {
-	private $_suggestionListItemMax=25;
+	private $_suggestionListItemMax=100;
 	private $_resPicsPerPage=12;
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
@@ -88,7 +88,7 @@ class SearchControllerNSR extends SearchController
 		$this->_search_presence_help_url = $this->moduleSettings->getModuleSetting( array('setting'=>'url_help_search_presence','module'=>'utilities') );
 		$this->_taxon_base_url_images_main = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
 		$this->_taxon_base_url_images_thumb = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'http://images.naturalis.nl/160x100/') );
-		$this->_taxon_base_url_images_overview = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species','subst'=>'http://images.naturalis.nl/510x272/') );
+		$this->_taxon_base_url_images_overview = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
 		$this->_taxon_base_url_images_thumb_s = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb_s','module'=>'species','subst'=>'http://images.naturalis.nl/120x75/') );
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
@@ -776,8 +776,8 @@ class SearchControllerNSR extends SearchController
 	private function getSuggestionsGroup( $p )
 	{
 		return $this->models->SearchNSRModel->getSuggestionsGroup(array(
-			"match"=>$p['match'],
-			"search"=>$p['match']=='id'? $p['id'] : $p['search'],
+			"match"=>isset($p['match']) ? $p['match'] : "like",
+			"search"=>isset($p['match']) && $p['match']=='id'? $p['id'] : $p['search'],
 			"project_id"=>$this->getCurrentProjectId(),
 			"language_id"=>$this->getCurrentLanguageId(),
 			"limit"=>$this->_suggestionListItemMax,
@@ -820,6 +820,7 @@ class SearchControllerNSR extends SearchController
 	{
 		return $this->models->SearchNSRModel->getSuggestionsName(array(
 			"search"=>$p['search'],
+			"order"=>isset($p['order']) ? $p['order'] : null,
 			"project_id"=>$this->getCurrentProjectId(),
 			"limit"=>$this->_suggestionListItemMax,
 			"language_id"=>$this->getCurrentLanguageId(),

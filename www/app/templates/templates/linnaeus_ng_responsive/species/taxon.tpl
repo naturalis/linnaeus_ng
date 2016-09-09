@@ -31,33 +31,8 @@
 			<h1 class="main-display-name desktop">{$names.preffered_name} <span class="cursive">{$names.nomen}</span></h1>
 			<h2 class="sideMenuTitle">&nbsp;</h2>
 			
-			{if $activeCategory==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory==$smarty.const.CTAB_MEDIA}
-				{include file="_tab_media.tpl"}
-			{elseif $activeCategory==$smarty.const.CTAB_DNA_BARCODES}
-				{include file="_tab_dna_barcodes.tpl"}
-			{elseif $activeCategory==$smarty.const.TAB_VERSPREIDING}
-				{include file="_tab_verspreiding.tpl"}
-			{elseif $activeCategory==$smarty.const.CTAB_NAMES || $activeCategory==$smarty.const.TAB_NAAMGEVING}
-				{include file="_tab_naamgeving.tpl"}
-			{elseif $activeCategory==$smarty.const.TAB_BEDREIGING_EN_BESCHERMING}
-				{include file="_tab_bedreiging.tpl"}
-			{elseif $ext_template}
-				{include file=$ext_template}
-			{else}
-				{if $content|@is_array}
-				<ul>
-					{foreach from=$content item=v key=k}
-					{if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
-					{/foreach}
-				</ul>
-				{else}
-					{$content}
-				{/if}
-			{/if}
+			{include file="_tabs.tpl"}
 
-			{if $rdf}
-				{include file="_rdf_data.tpl"}
-			{/if}
 		</div>
 
 	</div>

@@ -979,6 +979,7 @@ final class SearchNSRModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
+		$order = isset($params['order']) ? $params['order'] : "ifnull(_c.name,_d.taxon)";
 		
 		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) )
 			return;
@@ -987,8 +988,11 @@ final class SearchNSRModel extends AbstractModel
 			select
 				distinct 
 				_a.taxon_id as id,
-				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',_g.label,']') as label
-				
+				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',_g.label,']') as label,
+				_d.taxon as scientific_name,
+				_c.name as common_name,
+				trim(replace(_sci.name,_sci.authorship,'')) as nomen
+
 			from %PRE%names _a
 			
 			right join %PRE%taxa _d
@@ -1008,7 +1012,12 @@ final class SearchNSRModel extends AbstractModel
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
 				and _c.type_id=".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _c.language_id=_a.language_id
+				and _c.language_id=".$language_id."
+			
+			left join %PRE%names _sci
+				on _a.taxon_id=_sci.taxon_id
+				and _a.project_id=_sci.project_id
+				and _sci.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 			
 			left join %PRE%projects_ranks _f
 				on _d.rank_id=_f.id
@@ -1027,7 +1036,7 @@ final class SearchNSRModel extends AbstractModel
 				" . ( $restrict_language ? "and (_a.language_id=".$language_id." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")" : "" ) . "
 				and ifnull(label,'') != ''
 
-			order by label
+			order by " . $order . "
 			" . ( !is_null($limit) ? "limit ".$limit : "" )
 		;
 

@@ -4,28 +4,15 @@
 		<div id="facets">
 
 			<div id="categories">
-				<h1 class="main-display-name mobile">{$names.preffered_name} <span class="cursive">{$names.nomen}</span></h1>
 				<ul>
-                	{* remove 1==2 on r16 once the beelduitwisselaar comes back online, so its link might show on empty media-pages *}
-					{foreach from=$categories key=k item=v}
-					{if
-						($v.id!=$smarty.const.CTAB_CLASSIFICATION &&
-						($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES)) ||
-                        (1==2 && $v.id==$smarty.const.CTAB_MEDIA && $taxon['base_rank_id'] >= $smarty.const.SPECIES_RANK_ID)
-					}
+	                {foreach $categories v k}
 					<li id="ctb-{$v.id}" tabname="{$v.tabname}">
-						{* $v.tabname *}
-						{if $activeCategory==$v.id}
-							<a href="#" class="active">{$v.title}</a>
-						{else if  $activeCategory=='external' && $ext_tab==$v.id}
-							<a href="">{$v.title}</a>
-            {else}
-							<a href="{if $v.redirect_to}{$v.redirect_to}&ext_tab={$v.id}{else}../species/nsr_taxon.php?id={$taxon.id}&cat={$v.id}{/if}" class="{$v.className}">
-  		        	{$v.title}
-							</a>	
-						{/if}
+	                    {if $activeCategory.id==$v.id}
+							<a href="#" class="active">{$v.label}</a>
+	                    {else}
+                    <a href="../species/nsr_taxon.php?id={$taxon.id}&cat={if $v.type=='auto'}{$v.tabname}{else}{$v.id}{/if}"{if $v.type=='external' && $v.external_reference->link_embed=='link_new'} target="_blank"{/if}>{$v.label}</a>
+                    {/if}
 					</li>
-					{/if}
 					{/foreach}
 				</ul>
 			</div>

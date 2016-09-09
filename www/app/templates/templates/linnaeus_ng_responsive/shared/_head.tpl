@@ -17,6 +17,7 @@
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
+		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
     <!-- <link rel="stylesheet" type="text/css" media="print" title="default" href="{$projectUrls.projectCSS}20120928_print.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_default.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_menu.css" />
@@ -68,7 +69,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-sortelements.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/main.js"></script>
-	
+	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.flexslider-min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/soortenregister.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script>

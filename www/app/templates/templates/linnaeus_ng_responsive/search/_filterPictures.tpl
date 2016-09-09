@@ -15,7 +15,7 @@
 						<input type="text" class="field" value="{$search.name}" id="name" name="name" autocomplete="off">
 					</div>
 				</div>
-				<div id="name_suggestion" class="suggestion" match="start" class="auto_complete" style="display: none;"></div>
+				<div id="name_suggestion" class="suggestion" match="like" class="auto_complete" style="display: none;"></div>
 			</div>
 			<div class="formrow">
 				<label accesskey="g" for="group">
@@ -28,7 +28,7 @@
 						<input type="text" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
 					</div>
 				</div>
-				<div id="group_suggestion" class="suggestion" match="start" class="auto_complete" style="display:none;"></div>
+				<div id="group_suggestion" class="suggestion" match="like" class="auto_complete" style="display:none;"></div>
 			</div>
 			<div class="formrow">
 				<label accesskey="g" for="photographer">
