@@ -213,7 +213,7 @@ div.headerBar {
     color: #fff;
     font-size: 18px; }
   .footer .adminLink {
-    /* float: right; */
+    float: right;
     text-decoration: none; }
     .footer .adminLink img {
       display: inline-block;
@@ -222,9 +222,6 @@ div.headerBar {
       vertical-align: top;
       line-height: 50px;
       color: #fff; }
-  @media screen and (max-width: 500px) {
-    .footer .adminLink span {
-      line-height: 25px; } }
     .footer .adminLink .linnaeus {
       color: #009ee0; }
   .footer .adminLink:hover .linnaeus {
