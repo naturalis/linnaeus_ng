@@ -15,7 +15,8 @@
 
     {if $step.image}
     <p>
-        <img src="{$session.admin.project.urls.project_media}{$step.image}?rnd={$rnd}" /><br />
+        <!--<img src="{$session.admin.project.urls.project_media}{$step.image}?rnd={$rnd}" /><br />-->
+        <img src="{$step.image}?rnd={$rnd}" alt="" />
         <span style="color:red">{t}Please note: this image is a legacy feature inherited from Linnaeus 2. It cannot be changed.{/t}</span><br />
         <a href="#" onclick="keyDeleteImage();return false;">{t}delete image{/t}</a> |
         <a href="#" onclick="keyDeleteAllImages()return false;;">{t}delete all images{/t}</a>

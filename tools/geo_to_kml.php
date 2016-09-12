@@ -32,7 +32,7 @@
 
 	// KML settings
     $path = dirname(__FILE__) . '/' . 'geo';
-    $color = '32FFFFFF';
+    $color = 'fffc00';
     $colorMode = 'normal';
     $polyFill = 1; // vs 0
     $outline = 1;

@@ -16,7 +16,8 @@
     </p>
 
 		<div id="question"  style="width:550px;">
-            {if $step.image}<img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" style="float:right;margin-left:5px" />{/if}
+            <!--{if $step.image}<img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" style="float:right;margin-left:5px" />{/if}-->
+            {if $step.image}<img alt="{$step.image}" src="{$step.image}" style="float:right;margin-left:5px" />{/if}
             {if $step.content && $step.content!=$step.title}{$step.content}{/if}
 		</div>
 
@@ -44,7 +45,7 @@
                 {elseif $v.res_taxon_id!=''}
                 <div class="target" onclick="window.open('../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
                 {/if}
-    
+
                 {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
                     {if $v.target_number}
                     <span class="arrow">&rarr;</span>
@@ -55,7 +56,7 @@
                 {/if}
 
                 </div>
-                
+
             </div>
 
 		{/foreach}
