@@ -24,7 +24,6 @@
             $this->bootstrap();
 		    $this->getProjectsWithUsers();
             $this->setData();
-die(print_r($this->data));
             $this->pushData();
             $this->printResult();
 		}
