@@ -24,6 +24,7 @@
             $this->bootstrap();
 		    $this->getProjectsWithUsers();
             $this->setData();
+die(print_r($this->data));
             $this->pushData();
             $this->printResult();
 		}
@@ -108,13 +109,12 @@
                 $this->data[$i]['code_up_to_date'] =
                     ($this->data[$i]['git_hash'] == $this->data[$i]['git_latest_hash']) ? 'yes' : 'no';
                 $this->data[$i]['server_ip'] = $this->getServerAddress();
-                $this->data[$i]['server_name'] = !is_null($this->data[$i]['server_ip']) ?
-                    gethostbyaddr($this->data[$i]['server_ip']) : null;
+                $this->data[$i]['server_name'] = $this->getServerName();
                 $this->data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
 		}
 
-		private function getServerAddress()
+		private function getServerAddress ()
 		{
             if (array_key_exists('SERVER_ADDR', $_SERVER)) {
                 return $_SERVER['SERVER_ADDR'];
@@ -122,17 +122,16 @@
                 return $_SERVER['LOCAL_ADDR'];
             } else if (array_key_exists('SERVER_NAME', $_SERVER)) {
                 return gethostbyname($_SERVER['SERVER_NAME']);
-            } else {
-                // Running CLI
-                if (stristr(PHP_OS, 'WIN')) {
-                    return gethostbyname(php_uname("n"));
-                } else {
-                    $ifconfig = shell_exec('/sbin/ifconfig eth0');
-                    preg_match('/addr:([\d\.]+)/', $ifconfig, $match);
-                    return $match[1];
-                }
             }
-        }
+            return null;
+		}
+
+		private function getServerName ()
+		{
+            $r = $this->mysqli->query('select @@hostname');
+            $row = $r->fetch_row();
+            return $row[0];
+		}
 
 		private function getConfig ()
 		{
