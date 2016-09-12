@@ -17,7 +17,7 @@
 
 		<div id="question"  style="width:550px;">
             <!--{if $step.image}<img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" style="float:right;margin-left:5px" />{/if}-->
-            {if $step.image}<img alt="{$step.image}" src="{$step.image}" style="float:right;margin-left:5px" />{/if}
+            {if $step.image}<img alt="" src="{$step.image}" style="float:right;margin-left:5px" />{/if}
             {if $step.content && $step.content!=$step.title}{$step.content}{/if}
 		</div>
 
