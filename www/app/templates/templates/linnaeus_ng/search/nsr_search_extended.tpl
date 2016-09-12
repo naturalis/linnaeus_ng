@@ -19,12 +19,12 @@
 				<div class="formrow">
 					<label id="ext_search_soortgroep_label" style="display:inline-block;margin-left:13px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
 					<input style="width:370px" type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
-					<div id="group_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+					<div id="group_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 				</div>
 				{*<div class="formrow">
 					<label accesskey="g" for="author">{t}Auteur{/t}</label>
 					<input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
-					<div id="author_suggestion" match="start" class="auto_complete" style="display:none;"></div>
+					<div id="author_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 				</div>*}
 			</fieldset>
             

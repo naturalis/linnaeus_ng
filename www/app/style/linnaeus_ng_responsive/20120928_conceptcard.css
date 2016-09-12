@@ -1,0 +1,620 @@
+/* Taxon Pagina
+------------------------------------------------------------*/
+
+#taxonHeader
+{
+	width:508px;
+	padding:0;
+	margin-bottom: 30px;
+	/*float:left;
+	clear:both;*/
+	
+	position:relative;
+	/*height:66px;*/
+}
+
+#taxonImage{
+  margin-top: 10px;
+  position: relative;
+}
+
+#taxonImageCredits{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 500px;
+  padding-left: 10px;
+  background: #FFF;
+  opacity: 0.8;
+  filter: alpha(opacity = 80);
+  font-size: 11px;
+  height: 25px;
+  line-height: 25px;
+}
+
+#taxonImage .photographer-title{
+  font-weight: bold;
+}
+
+#taxonHeader .full
+{
+	width:488px !important;	
+}
+
+.conceptcard #content{
+  margin-top: -33px;
+}
+
+.conceptcard #content.title-type1{
+  margin-top: -50px;
+}
+
+.conceptcard #content.title-type4{
+  margin-top: -13px;
+}
+
+.hasImage
+{
+	height:auto !important;
+}
+
+#content ul.reference {
+  list-style-type: none;
+  margin-left: 0px;
+  padding-left: 0px
+}
+
+#content ul.reference li{
+	margin: 0px;
+}
+
+/* conceptkaarten
+------------------------------------------------------------*/
+
+.panel
+{
+	width: 510px;
+	margin-bottom: 10px;
+  margin-top: 0;
+	padding: 0;
+	font-size: 90%;
+	background: #FFF ; /* default */
+}
+
+.panel thead
+{
+  border-bottom: 1px solid #000;
+}
+
+.panel .row0
+{
+	background: #FFF; /* default */
+}
+
+.panel caption
+{
+	display: none;
+}
+
+.panel thead th
+{
+	height: 22px;
+  font-family: Georgia;
+  font-weight: normal;
+  font-size: 145%;
+  color: #333;
+  border-bottom: 1px solid #333;
+}
+
+.panel thead th span
+{
+	float: left;
+}
+
+.panel tbody th
+{
+  text-align: left;
+	font-weight: normal;
+	padding: 0;
+  min-width: 200px;
+  width:200px;
+}
+
+.panel tbody th a{
+  color: #FA7001;
+}
+
+.panel td
+{
+	padding: 2px 0 2px 10px;
+  vertical-align: top;
+}
+
+.panel p
+{
+	margin: 5px 0;
+}
+
+
+.panel .help
+{
+	float: right;
+	display: block;
+	width: 16px;
+	height: 16px;
+	background: url(images/card_help.gif) no-repeat top left;
+}
+
+.panel .arrowUp, .panel .arrowDown
+{
+	float: right;
+	margin: 0 5px;
+	display: block;
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	background: url(images/card_arrow.gif) no-repeat 0px 0px;
+}
+
+.panel .arrowDown
+{
+	background-position: 0px -50px;
+}
+
+/*  HEADER CONCEPTCARD */
+
+#content #taxonHeader h1{
+  font-weight: normal;
+  font-size: 30px;
+  color: #fa7001;
+  
+}
+
+#content #taxonHeader h2 {
+  font-size: 14px;
+  color: #333333;
+}
+
+#content h4 {
+  font-family: Georgia;
+  font-weight: normal;
+  font-size: 115%;
+  font-weight:bold;
+  color: #333;
+  padding-bottom: 2px;
+  /*border-bottom: 1px solid #333;*/
+}
+
+#content h4.source {
+  font-weight:normal;
+}
+
+#content h3 {
+  font-family: Georgia;
+  font-weight: normal;
+  font-size: 115%;
+  font-weight:bold;
+  color: #333;
+  padding-bottom: 2px;
+}
+
+#content h1
+{
+	border-bottom:0px solid #666666;
+	color:#333333;
+	font-size:105%;
+	font-weight:bold;
+	margin-bottom:0px;
+	padding-bottom: 2px;
+	}
+
+#content h2
+{
+	border-bottom:1px solid #333;
+	color:#333333;
+	font-size:140%;
+	font-weight:normal;
+	margin-bottom:0;
+	}
+
+/* KLEUREN VERSCHILLENDE PANELS */
+
+#lnv
+{
+	/*background-color: #D5F2FE;*/
+}
+#lnv thead
+{
+	/*background: #9DCFE9 url(images/card_header.gif) repeat-x 0px -100px;*/
+}
+
+#lnv .row0
+{
+	/*background-color: #EAF9FF;*/
+}
+
+#lnv tbody th
+{
+	font-weight: bold;
+	/*background-color: #BAE0F2;*/
+}
+
+#images, #library, #distribution
+{
+    margin-top: 0;
+	/*background-color: #FFEDCC;*/
+}
+#images thead, #library thead, #distribution thead
+{
+	/*background: #F1C77D url(images/card_header.gif) repeat-x 0px -50px;*/
+}
+#images .row0, #library .row0, #distribution .row0
+{
+	/*background-color: #EAF9FF;*/
+}
+
+#sightings
+{
+	/*background-color: #B3DEEF;*/
+}
+#sightings thead
+{
+	/*background: #529DCF url(images/card_header.gif) repeat-x 0px -150px;*/
+}
+#sightings .row0
+{
+	/*background-color: #D5F2FE;*/
+}
+
+#trendcharts
+{
+	/*background-color: #D5F2FE;*/
+}
+#trendcharts thead
+{
+	/*background: #9DCFE9 url(images/card_header.gif) repeat-x 0px -100px;*/
+}
+
+#trendcharts .row0
+{
+	/*background-color: #EAF9FF;*/
+}
+
+#trendcharts tbody th
+{
+	font-weight: bold;
+	background-color: #BAE0F2;
+}
+
+
+/* overige ccard elementen
+------------------------------------------------------------*/
+#distribution tbody td
+{
+	padding-bottom: 10px;
+	padding-left : 0px;
+}
+
+#lnv p
+{
+	margin: 0;
+}
+
+#lnv p a
+{	
+}
+
+td.lnvlogo
+{
+	/*background-color: #EAF9FF;*/
+	vertical-align: top;
+}
+
+td.lnvlogo p
+{
+	float: left;
+	width: auto;
+	font-style: italic;
+}
+
+td.lnvlogo a img
+{
+	float: right;
+	width: 40px;
+	margin-left:10px;
+}
+
+
+td.waarneminglogo p
+{
+	float: left;
+	width: auto;
+	padding-top: 5px;
+}
+
+td.waarneminglogo a img
+{
+	float: left;
+	width: 60px;
+	margin: 0 15px 0 -2px;
+}
+
+#name_rank
+{
+	margin-bottom: 20px;
+}
+
+span.conceptname
+{
+	font-weight: bold;
+}
+
+
+/* imagecard - thumbnails
+------------------------------------------------------------*/
+#images tbody td
+{
+	padding: 0 0 10px;
+}
+
+.thumbpaging
+{
+	padding-right: 16px;
+}
+
+#paging
+{
+	clear:both;
+}
+
+#cardPaging
+{
+  border-top: 1px solid #282828;
+  padding-top: 5px;
+}
+
+#cardPaging ul
+{	
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#cardPaging li, #cardPaging p
+{
+	
+	float: left;
+	width: auto;
+	margin: 0;
+	padding: 0;
+  font-size: 11px;
+  color: #282828;
+}
+
+#cardPaging a{
+  color: #282828;
+}
+
+.thumbholder
+{
+	float: left;
+	display: inline;
+	width: 115px;
+	height: 130px;
+	overflow: hidden;
+	color: #666;
+	background-color: #FFF;
+	margin: 10px 10px 0px 0px;
+	font-size: 10px;
+}
+
+.thumbnail
+{
+	overflow: hidden;
+	width: 115px;
+	height: 80px;
+}
+
+.mapthumbnail
+{
+	overflow: hidden;
+	width: 115px;
+	height: 115px;
+}
+
+.thumbholder .author
+{
+	padding: 0;
+	margin: 10px 0 0 0;
+	line-height: 1.2em;
+}
+
+.thumbholder .photographer-title{
+  font-weight: bold;
+  display: block;
+}
+
+#dataviews
+{
+	padding: 2px 10px 0px 2px;
+}
+
+.detailnavback
+{
+	display: block;
+	padding-left: 14px;
+	margin: 0 0 10px;
+	background: url(images/icon_arrow_left.gif) no-repeat 0px 4px;
+}
+
+.detailnav
+{
+	display: inline-block;
+	padding: 2px 2px 6px 14px;
+	background: url(images/icon_arrow_right.gif) no-repeat 0px 6px;
+}
+
+/* taxonomisch overzicht popup (concepthier)
+------------------------------------------------------------*/
+
+#concepthier
+{
+	text-align: left;
+	background-color: #fff;
+	width: 90%;
+	margin: 0 auto;
+	padding: 10px;
+	border: 1px solid #ccc;
+}
+
+#closebtn
+{
+	float: right;
+}
+
+.rank
+{
+	font-size: 9px;
+}
+
+.counter
+{
+	font-size: 9px;
+	color: #FA7001;
+}
+
+.scientificname
+{
+}
+
+.preferredname
+{
+	font-size: 11px;
+	color: #333;
+	margin-left: 2px;
+}
+
+#cardpaging
+{
+	width: 500px;
+}
+
+.trendchart 
+{
+	float : left;
+	width : 225px;	
+	height : auto;
+	margin : 0 0px 0 0;
+	padding : 0;
+}
+
+.trendchart p
+{
+	margin : 10px 0 0 0;
+	padding : 0;
+}
+
+.trendchart span
+{
+	display : block;
+	margin : 3px 0 0 0;
+	padding : 0;
+}
+
+div#content data
+{
+	float:left;
+	clear:both;
+}
+
+div#content data p
+{
+	height:auto;
+	width:100%;
+	float:left;
+	/*display:block;*/
+}
+
+div#content div.imageHolder
+{
+	display:inline;
+	margin-right:10px;
+	position:static;
+	height:auto;
+	width:auto;
+}
+
+div#content div.txtblck
+{
+	clear:left;
+	float:left;
+	display:block;
+}
+
+div#content div.imageHolder img {margin:2px;}
+
+.floatRight{float:right;}
+.floatLeft{float:left;}
+
+div#content div.textHolder
+{
+/*	display:block;*/
+	position:relative;
+	vertical-align:top;
+}
+
+
+/* submenu voor conceptcard
+------------------------------------------------------------*/
+
+#conceptSubMenu {
+  border-top: 1px solid #666;
+  margin-top: 23px;
+  margin-bottom:10px;
+  padding-bottom:5px;
+  padding-top: 10px;
+  height:auto;
+}
+
+#conceptSubMenu li {
+  width:190px;
+  display:block;
+  padding:0px;
+  background:none;
+}
+
+#conceptSubMenu li a {
+  width:184px;
+  padding:2px 4px 0 0;
+  margin:0;
+  float:right;
+  color:#FA7001;
+  font-size:small;
+}
+
+#conceptSubMenu li.active a {
+  width:184px;
+  color:#000;
+  font-weight: normal;
+}
+
+#conceptSubMenu li.disabled {display:none;}
+#conceptSubMenu li.disabled span {width:184px; padding:2px 4px 0 0; margin:0; float:right; color:gray; font-size:small; background-color:#ebefdc;}
+#conceptSubMenu li.disabled a:hover {text-decoration:none;}
+
+/*firefox*/
+#conceptSubMenu li {margin:0 0 1px 0!important;}
+#conceptSubMenu li a, #conceptSubMenu li span {height:18px;padding-left:5px;}
+#conceptSubMenu li {height:20px;}
+
+#dnaBarcodingSpecimenList 
+{
+	width: 100%;
+	font-size: 11px;
+}
+
+#dnaBarcodingSpecimenList th, #dnaBarcodingSpecimenList td 
+{
+	text-align: left;
+	vertical-align: top;
+}

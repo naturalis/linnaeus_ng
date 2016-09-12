@@ -1,6 +1,7 @@
 var suggestionMinInputLength=1;
 var search,dosearch,listdata,suggestiontype,matchtype;
 var activesuggestion=-1;
+var suggestionsCallback;
 
 function nbcPrettyPhotoInit() {
 
@@ -36,6 +37,7 @@ function retrieveSuggestions()
 {
 	var type=getSuggestionType();
 	search=$('#'+type).val();
+	var order=$('#'+type).attr('order');
 
 	hideSuggestions();
 	validateSearch();
@@ -43,11 +45,12 @@ function retrieveSuggestions()
 	if (!dosearch) return;
 
 	$.ajax({
-		url : 'nsr_ajax_interface.php',
+		url : '../search/nsr_ajax_interface.php',
 		type: "POST",
 		data : ({
-			action : type+'_suggestions',
+			action : cleanSuggestionId(type)+'_suggestions',
 			search : search,
+			order : order,
 			match : getMatchType(),
 			time : allGetTimestamp()
 		}),
@@ -61,6 +64,21 @@ function retrieveSuggestions()
 	});	
 	
 }
+
+function cleanSuggestionId( type )
+{
+	var prefs=['desktop','mobile'];
+	
+	for (var i=0;i<prefs.length;i++)
+	{
+		if (type.indexOf(prefs[i])===0) 
+		{
+			return type.substr(prefs[i].length);
+		}
+	}
+	return type;
+}
+
 
 function setSuggestionType(type)
 {
@@ -113,8 +131,8 @@ function showSuggestions()
 
 function setSuggestionId(ele)
 {
-	$('#'+getSuggestionType()+'_id').val($(ele).attr('ident'));
-	$('#'+getSuggestionType()).val($(ele).html());
+	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
+	$('#'+cleanSuggestionId(getSuggestionType())).val($(ele).html());
 
 	// trigger an Enter keyup in the receiving input, so we can hook a submit
     var e = $.Event('keyup');
@@ -123,12 +141,25 @@ function setSuggestionId(ele)
 	hideSuggestions();
 }
 
+var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1">%LABEL%</li>';
+
 function buildSuggestions()
 {
+	lineTpl = fetchTemplate( 'lineTpl' )!=='' ? fetchTemplate( 'lineTpl' ) : lineTpl;
+	
 	var d=Array();
-	for(var i in listdata) {
+	for(var i in listdata)
+	{
 		var l=listdata[i];
-		d.push('<li id="item-'+i+'" '+(l.id ? ' ident="'+l.id+'" ' : '' )+'onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1">'+l.label+'</li>');
+		//console.dir(l);
+		d.push(
+			lineTpl
+				.replace('%IDX%',i)
+				.replace(/%IDENT%/g,( l.id ? l.id : '' ))
+				.replace('%LABEL%',l.label)
+				.replace('%SCIENTIFIC_NAME%',l.scientific_name ? l.scientific_name : '' )
+				.replace('%COMMON_NAME%',l.common_name ? l.common_name : l.nomen )
+		);
 	}
 
 	$('#'+getSuggestionType()+'_suggestion').html('<ul>'+d.join('')+'</ul>');

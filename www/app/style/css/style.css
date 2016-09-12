@@ -42,7 +42,6 @@ table {
   border-spacing: 0; }
 
 .imageOverlayContainer p {
-  line-height: 1.5em;
   margin-bottom: 8px; }
 
 #header {
@@ -156,7 +155,7 @@ table {
     font-size: 43px; }
 
 .topBar .pageTitle {
-  -isplay: none; }
+  display: none; }
   @media screen and (max-width: 980px) {
     .topBar .pageTitle {
       display: table-cell; } }
@@ -459,7 +458,7 @@ table {
   background-color: #fff; }
   @media screen and (max-width: 980px) {
     #dialogRidge {
-      padding-top: 0;
+      padding-top: 8px;
       padding-left: 0; } }
   #dialogRidge .photographerName {
     display: none; }
@@ -469,21 +468,6 @@ table {
     display: inline-block;
     float: left;
     width: 100%; }
-  #dialogRidge #results {
-    margin-top: 8px; }
-  #dialogRidge .matrixLink .result-icons {
-    height: 50px;	  
-    padding-right: 50px;
-    position: relative; }
-  #dialogRidge .matrixLink .goToMatrixLink {
-    position: absolute;
-    width: 50px;
-    line-height: 50px;
-    text-align: center;
-    color: #fff;
-    background-color: #009ee0;
-    bottom: 0;
-    right: 0; }
   #dialogRidge #results-container {
     margin-left: -7px;
     margin-right: -7px;
@@ -554,31 +538,10 @@ table {
       #dialogRidge #results-container .result-icon.no-content {
         display: none; }
   #dialogRidge .headerText {
-    padding: 18px 92px 18px 92px;
+    padding: 18px 60px 18px 60px;
     text-align: center;
     min-height: 52px;
-    font-size: 16px;
-    position: relative; }
-    @media screen and (max-width: 650px) {
-      #dialogRidge .headerText {
-        padding: 18px 40px 18px 40px; }
-        #dialogRidge .headerText.similarHeader {
-          padding: 18px 40px 18px 80px; } }
-  #dialogRidge #similarSpeciesHeader {
-    position: relative; }
-    #dialogRidge #similarSpeciesHeader .clearSimilarSelection {
-      position: absolute;
-      top: 0;
-      left: 0;
-      line-height: 52px;
-      text-align: center;
-      width: 40px;
-      color: #009ee0;
-      font-size: 18px;
-      z-index: 10; }
-      @media screen and (max-width: 980px) {
-        #dialogRidge #similarSpeciesHeader .clearSimilarSelection {
-          left: 37px; } }
+    font-size: 16px; }
   #dialogRidge #show-more-button {
     width: 100%;
     height: 52px;
@@ -608,7 +571,7 @@ table {
   margin: 0 auto;
   color: #fff;
   line-height: 70px;
-  font-size: 16px;
+  font-size: 18px;
   padding-left: 10px; }
   @media screen and (max-width: 980px) {
     #footer {
@@ -634,19 +597,6 @@ table {
   text-align: center;
   padding-top: 30px;
   padding-bottom: 30px; }
-  #filterDialogContainer .facetListType {
-    display: inline-block; }
-    @media screen and (max-width: 800px) {
-      #filterDialogContainer .facetListType {
-        display: block; } }
-    #filterDialogContainer .facetListType li {
-      display: block;
-      text-align: left;
-      padding-left: 24px; }
-      #filterDialogContainer .facetListType li img {
-        margin-left: -24px; }
-  #filterDialogContainer a[id^='full-size-link-'] {
-    display: none; }
   #filterDialogContainer #overlay {
     position: fixed;
     left: 0;
@@ -662,7 +612,8 @@ table {
     background-color: #fff;
     margin: 0 auto;
     z-index: 600;
-    padding: 0;
+    padding: 15px;
+    padding-top: 45px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -677,14 +628,6 @@ table {
     @media screen and (max-width: 800px) {
       #filterDialogContainer #dialog {
         width: 280px; } }
-    #filterDialogContainer #dialog .content {
-      padding: 15px;
-      overflow-y: auto; }
-      @media screen and (max-width: 800px) {
-        #filterDialogContainer #dialog .content {
-          padding: 10px; } }
-  #filterDialogContainer #graphicVaslueSelector {
-    overflow: hidden; }
   #filterDialogContainer .state-image-container {
     display: inline-block;
     float: left;
@@ -711,31 +654,23 @@ table {
     margin-left: -15px;
     margin-right: -15px; }
   #filterDialogContainer .titleContainer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
     width: 100%;
     background-color: #eeede9;
     padding-left: 45px;
     padding-right: 45px; }
-    @media screen and (max-width: 800px) {
-      #filterDialogContainer .titleContainer {
-        padding-left: 10px;
-        padding-right: 40px;
-        text-align: left; }
-        #filterDialogContainer .titleContainer .title {
-          font-size: 14px;
-          text-align: left; } }
-  @media screen and (max-width: 800px) {
-    #filterDialogContainer #state-info {
-      text-align: left; } }
   #filterDialogContainer .title {
+    height: 45px;
     font-size: 22px;
-    line-height: 1.3;
-    padding-top: 11px;
-    padding-bottom: 11px;
-    display: block; }
+    line-height: 45px; }
   #filterDialogContainer .closeOverlay {
     position: absolute;
     right: 10px;
-    top: 10px;
+    top: 50%;
+    margin-top: -11px;
     color: #009ee0;
     font-size: 24px; }
   #filterDialogContainer .state-image {
@@ -864,10 +799,9 @@ table {
   display: block; }
 
 .facetListType {
-  padding-top: 0; }
+  padding-top: 15px; }
   .facetListType li {
-    margin-bottom: 5px;
-    line-height: 1.3; }
+    margin-bottom: 5px; }
     .facetListType li:last-child {
       margin-bottom: 0; }
     .facetListType li a {
@@ -1007,10 +941,3 @@ body {
   @media screen and (max-width: 980px) {
     .colofonLink a {
       display: none; } }
-
-
-
-#filterDialogContainer .state-list-irrelevant {
-color:#777; }
-#filterDialogContainer .state-list-selected {
-font-weight:bold; }

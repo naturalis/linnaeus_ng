@@ -1,4 +1,7 @@
 /*
+	add:
+	<link rel="stylesheet" type="text/css" media="screen" title="default" href="css/inline_templates.css" />
+	<script type="text/javascript" src="js/inline_templates.js"></script>
 
 	inline template format:
 

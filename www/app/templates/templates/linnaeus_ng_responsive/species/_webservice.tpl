@@ -1,0 +1,1 @@
+generic webervice interface
