@@ -27,18 +27,19 @@
 		<td>{$projectRanks[i].rank}</td>
 		<td>
 			<input
-				type="text" 
-				id="default-{$projectRanks[i].id}" 
-				maxlength="64" 
+				type="text"
+				id="default-{$projectRanks[i].id}"
+				maxlength="64"
 				onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'default')"
+				value="{$projectRanks[i].labels[$languages[0].language_id]}"
 				direction="{$languages[0].direction}" />
 		</td>
-	{if $languages|@count>1}		
+	{if $languages|@count>1}
 		<td>
-			<input 
-				type="text" 
-				id="other-{$projectRanks[i].id}" 
-				maxlength="64" 
+			<input
+				type="text"
+				id="other-{$projectRanks[i].id}"
+				maxlength="64"
 				onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'other')" />
 		</td>
 	{/if}

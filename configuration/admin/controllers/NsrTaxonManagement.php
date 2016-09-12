@@ -8,7 +8,7 @@
 	'check_type' => none (*) / query
 	'query' => 'select 1 as show', (should return one row with one field called 'show' with value 1 or 0)
 	'template' => full local template name (when embedding; defaults to general _webservice.tpl )
-	
+
 	params / subst: name /value
 		make list of names
 		for now it's just 'taxon' which resolves to the full scientific name, so:
@@ -17,8 +17,8 @@
 			'url' => 'https://webservice.com/?get_info
 			'parameters' => array('sci_name'=>'taxon')
 		);
-	
-		would result in 
+
+		would result in
 		https://webservice.com/?get_info&sci_name=Meles+meles+(Linnaeus,+1758)
 
 
@@ -26,16 +26,16 @@
 			'url' => 'https://webservice.com/get_info/%SCI_NAME%
 			'substitute' => array('%SCI_NAME%'=>'taxon')
 		);
-		would result in 
+		would result in
 		https://webservice.com/get_info/Meles+meles+(Linnaeus,+1758)
 
 	goes into pages_taxa.external_reference
-	
+
 	normal title + content applies as well!
 	make _webservice.tpl
 
 */
-		
+
 
 include_once ('NsrController.php');
 include_once ('ModuleSettingsReaderController.php');
@@ -63,7 +63,7 @@ class NsrTaxonManagement extends NsrController
             'taxon.js'
         )
     );
-	
+
     public $controllerPublicName = 'Taxon editor';
 
 	private $maxCategories = 50;
@@ -97,12 +97,12 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'output','label'=>'check by webservice output'],
 			['field'=>'url','label'=>'check by URL'],
 		] ;
-		
+
 	private $encodingMethods = ['none','urlencode','rawurlencode'];
-		
+
 	private $regularDataBlock = ["id"=>"data","label"=>"Regular page content"];
 
-	
+
     public function __construct()
     {
         parent::__construct();
@@ -116,17 +116,17 @@ class NsrTaxonManagement extends NsrController
 
     private function initialize()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->moduleSettings->setController( 'species' );
-		
+
 		$this->use_page_blocks = $this->moduleSettings->getModuleSetting( 'use_page_blocks', 0 )==1;
 
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
 		$this->smarty->assign( 'use_page_blocks', $this->use_page_blocks );
-		
-		if ($this->show_nsr_specific_stuff ) 
+
+		if ($this->show_nsr_specific_stuff )
 		{
 			$this->basicSubstitutionFields[]=['field'=>'nsr_id','label'=>'NSR ID'];
 		}
@@ -154,7 +154,7 @@ class NsrTaxonManagement extends NsrController
 			if ( isset($this->rGetAll()['suppress']) ) $this->saveSuppressState( $this->rGetAll()['suppress'] );
 			$this->saveStartOrder( $this->rGetAll()['start_order'] );
 			$this->saveShowWhenEmpty( $this->rGetAll()['show_when_empty'] );
-        }		
+        }
 
         $this->smarty->assign( 'maxCategories', $this->maxCategories );
         $this->smarty->assign( 'languages', $this->getProjectLanguages() );
@@ -163,10 +163,10 @@ class NsrTaxonManagement extends NsrController
 
         $this->printPage();
     }
-	
+
     public function tabAction()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
+		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
 
         $this->checkAuthorisation();
 
@@ -202,7 +202,7 @@ class NsrTaxonManagement extends NsrController
 
     public function ranksAction()
     {
-	
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Taxonomic ranks'));
@@ -340,6 +340,8 @@ class NsrTaxonManagement extends NsrController
             'includeLanguageLabels' => true
         ));
 
+//die(print_r($pr));
+
         $this->smarty->assign('projectRanks', $pr);
 
         $this->smarty->assign('languages', $this->getProjectLanguages());
@@ -350,7 +352,7 @@ class NsrTaxonManagement extends NsrController
     public function sectionsAction()
     {
 		die('to be done');
-		
+
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Define sections'));
@@ -429,18 +431,18 @@ class NsrTaxonManagement extends NsrController
 			$d=$this->getRankLabels( array('language_id'=>$this->rGetVal('language') ) );
 			$this->smarty->assign('returnText', json_encode($d));
         }
-        else 
+        else
 		if ($this->rGetVal('action')=='save_rank_label')
 		{
 			$d=$this->saveRankLabel( array('id'=>$this->rGetId(),'language_id'=>$this->rGetVal('language'),'label'=>$this->rGetVal('label') ) );
 			$this->smarty->assign('returnText', $d ? 'saved' : 'failed');
         }
-        else 
+        else
 		if ($this->rGetVal('action')=='delete_page')
 		{
             $this->deletePage( array('id'=>$this->rGetId() ) );
         }
-        else 
+        else
 		if ($this->rGetVal('action')=='get_page_labels')
 		{
             $d=$this->getPageTitles( array('language_id'=>$this->rGetVal('language') ) );
@@ -471,17 +473,17 @@ class NsrTaxonManagement extends NsrController
                 'id' => $this->rGetId()
             )
         ));
-		
+
 		$page=$page ? $page[0] : null;
-		
+
 		if ( !empty($page['external_reference']) )
 		{
 			$page['external_reference_decoded']=json_decode($page['external_reference']);
 		}
-		
+
 		if ( $this->use_page_blocks )
 		{
-			
+
 			if ( !empty($page['page_blocks']) )
 			{
 				// fetch the names + "Regular page content"
@@ -510,7 +512,7 @@ class NsrTaxonManagement extends NsrController
 		$data=$this->rGetAll()['external_reference'];
 
 		$data['url']=trim($data['url']);
-		
+
 		if ( empty($data['url']) )
 		{
 			$d=$this->models->PagesTaxa->update(
@@ -526,7 +528,7 @@ class NsrTaxonManagement extends NsrController
 		else
 		{
 			/*
-				would be more acurate when checking the URL including the 
+				would be more acurate when checking the URL including the
 				substitution of values of an actual taxon. however, if the
 				parameters include traits, actual values might not have
 				been entered into the system yet at the time of saving this
@@ -536,7 +538,7 @@ class NsrTaxonManagement extends NsrController
 			{
 				$this->addWarning( $this->translate( 'Invalid URL (might be by design).' ) );
 			}
-			
+
 			$d=array();
 			foreach((array)$data['substitute']['name'] as $key=>$val)
 			{
@@ -548,11 +550,11 @@ class NsrTaxonManagement extends NsrController
 				$d[$val]=$data['substitute']['value'][$key];
 			}
 			$data['substitute']=$d;
-			
+
 			$d=array();
 			foreach((array)$data['parameters']['name'] as $key=>$val)
 			{
-				if ( empty($val) ) 
+				if ( empty($val) )
 				{
 					unset($data['param_transformation'][$key]);
 					continue;
@@ -573,12 +575,12 @@ class NsrTaxonManagement extends NsrController
 		}
 
 		$this->logChange($this->models->PagesTaxa->getDataDelta() + ['note'=>'Updated tab definition']);
-		
+
 	}
 
 	private function savePageBlocks()
 	{
-		
+
 		if ( !$this->use_page_blocks ) return;
 
 		//alter table pages_taxa add column `page_blocks` varchar(255) DEFAULT NULL after always_hide;
@@ -603,7 +605,7 @@ class NsrTaxonManagement extends NsrController
 		$id=isset($p['id']) ? $p['id'] : null;
 		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
 		$label=isset($p['label']) ? trim($p['label']) : null;
-		
+
 		if ( !isset($id) || !isset($language_id) ) return;
 
 		if ( empty($label) )
@@ -637,15 +639,15 @@ class NsrTaxonManagement extends NsrController
 
 			$this->logChange($this->models->LabelsProjectsRanks->getDataDelta() + ['note'=>'Updated rank translation']);
         }
-		
+
 		return true;
-		
+
     }
 
     private function getRankLabels( $p )
     {
 		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
-		
+
 		if ( !isset($language_id) ) return;
 
 		$l = $this->models->Languages->_get(array(
@@ -667,7 +669,7 @@ class NsrTaxonManagement extends NsrController
     private function deletePage( $p )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
-		
+
 		if ( !isset($id) ) return;
 
 		$this->models->ContentTaxa->delete(array(
@@ -699,7 +701,7 @@ class NsrTaxonManagement extends NsrController
     private function getPageTitles( $p )
     {
 		$language_id=isset($p['language_id']) ? $p['language_id'] : null;
-		
+
 		if ( !isset($language_id) ) return;
 
 		return $this->models->PagesTaxaTitles->_get(array(
@@ -710,7 +712,7 @@ class NsrTaxonManagement extends NsrController
 			'columns' => 'id,title,page_id,language_id'
 		));
     }
-	
+
 	private function savePageTitles( $titles )
 	{
 		foreach((array)$titles as $page_id=>$languages)
@@ -771,7 +773,7 @@ class NsrTaxonManagement extends NsrController
 				'project_id' => $this->getCurrentProjectId(),
 				'page_id' => $page_id,
 			] ] );
-			
+
 			if ($p)
 			{
 				$this->models->TabOrder->update(
