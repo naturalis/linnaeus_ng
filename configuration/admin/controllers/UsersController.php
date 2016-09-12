@@ -55,8 +55,8 @@ class UsersController extends Controller
 
     public $controllerPublicName='User management';
 
-	private $checksUsername=array('min' => 4,'max' => 32); // regExp =>
-	private $checksPassword=array('min' => 8,'max' => 32); // regExp =>
+	private $checksUsername=array('min' => 4,'max' => 128); // regExp =>
+	private $checksPassword=array('min' => 8,'max' => 128); // regExp =>
 	private $checksName=array('min' => 1,'max' => 64);
 	private $_userBefore;
 	private $_action;
@@ -746,7 +746,7 @@ class UsersController extends Controller
     private function isUsernameUnique( $p )
     {
 		$ignore_current = isset($p['ignore_current']) ? $p['ignore_current'] : true;
-		
+
 		$username=$this->getNewUserData()['username'];
 
 		if ( $ignore_current )
@@ -783,9 +783,9 @@ class UsersController extends Controller
     private function isEmailAddressUnique( $p )
     {
 		$ignore_current = isset($p['ignore_current']) ? $p['ignore_current'] : true;
-		
+
 		$email_address=$this->getNewUserData()['email_address'];
-		
+
 		if ( $ignore_current )
 			$id= [ 'email_address'=>$email_address, 'id !='=>$this->getUserId() ];
 		else
@@ -1057,7 +1057,7 @@ class UsersController extends Controller
 		*/
 
 		$can_publish='0';
-		
+
 		if( $this->getUser()['project_role']['role_id']==ID_ROLE_LEAD_EXPERT )
 		{
 			foreach((array)$d['modules'] as $val)
