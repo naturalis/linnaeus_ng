@@ -62,11 +62,11 @@
            </label>
            <ul id="multimedia-options-panel" class="selectableParametersPanel">
            	<li>
-              <label for="multimedia-images" class="normalLabel">Foto('s)</label>
+              <label for="multimedia-images" class="normalLabel">Foto</label>
            		<select class="customSelect" id="multimedia-images" onchange="addSearchParameter('multimedia-images');">
-								<option value="">{t}Foto('s){/t}</option>
-								<option value="images_on">{t}met foto('s){/t}</option>
-								<option value="images_off">{t}zonder foto's{/t}</option>
+								<option value="">{t}Foto{/t}</option>
+								<option value="images_on">{t}met foto{/t}</option>
+								<option value="images_off">{t}zonder foto{/t}</option>
               </select>
            	</li>
            	<li>

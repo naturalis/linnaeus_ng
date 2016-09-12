@@ -18,9 +18,6 @@
 	order-bottom:1px solid #ddd;
 	cursor:pointer;
 }
-.suggestList li:hover {
-	background-color:#e5ffff;
-}
 .suggestList li:last-child {
 	border-bottom:none;
 }
@@ -29,6 +26,9 @@
 	background-color:#eee;
 }
 
+.suggestList li:hover {
+	background-color:#e9ffff;
+}
 .suggestList li .scientific {
 	font-size:0.82em;
 	color:#777;
@@ -50,7 +50,7 @@
 	</form>
 	<a href="../search/nsr_search_extended.php" class="moreSearchOptions">
 		<img src="{$baseUrl}app/style/img/arrow-right.svg" alt="">
-		Meer zoekopties
+		{t}Meer zoekopties{/t}
 	</a>
 </div>
 

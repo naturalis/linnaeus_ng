@@ -29,8 +29,11 @@ $(function(){
 
     $(".fancybox").fancybox({
       beforeShow : function(){
-        description = decodeURIComponent($(this.element).attr("ptitle"));
-        console.log(description);
+		try {
+			description = decodeURIComponent($(this.element).attr("ptitle"));
+		} catch (e) {
+			description = unescape($(this.element).attr("ptitle"));
+		}
         if (description != "" && description != undefined) {
           this.title = description;
         }

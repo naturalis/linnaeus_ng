@@ -2804,8 +2804,16 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
-				return implode(' ',$ied);
+				if ( isset($ied[2]) )
+				{
+					$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+					return implode(' ',$ied);
+				}
+				else
+				{
+					return $name;
+				}
+
 			}
 		}
 		return $name;

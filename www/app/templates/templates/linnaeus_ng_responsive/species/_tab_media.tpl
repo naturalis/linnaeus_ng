@@ -129,7 +129,6 @@ $(document).ready(function()
 			success : function (data) {
 				var data=$.parseJSON(data)
 				//console.dir(data);
-				console.log(data);
 				setTotalImageCount(data.count);
 				setImageBatch(data.data);
 				setMoreImagesButton(data.count);
@@ -176,7 +175,7 @@ $(document).ready(function()
     </a>
   </div>
   <ul>
-		<li>%name%</li>
+	<li>%name%</li>
     <li><i>%taxon%</i></li>
   </ul>
 </div>

@@ -1,6 +1,7 @@
 var suggestionMinInputLength=1;
 var search,dosearch,listdata,suggestiontype,matchtype;
 var activesuggestion=-1;
+var suggestionsCallback;
 
 function nbcPrettyPhotoInit() {
 

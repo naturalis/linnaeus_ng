@@ -7,8 +7,8 @@
 			<div class="formrow">
 				<label accesskey="g" for="name">
 					{t}Soortnaam{/t}
-					<i class="ion-chevron-down up"></i>
-					<i class="ion-chevron-up down"></i>
+                    <i class="ion-chevron-down down"></i>
+                    <i class="ion-chevron-up up"></i>
 				</label>
 				<div class="filter">
 					<div class="input">
@@ -20,8 +20,8 @@
 			<div class="formrow">
 				<label accesskey="g" for="group">
 					{t}Soortgroep{/t}
-					<i class="ion-chevron-down up"></i>
-					<i class="ion-chevron-up down"></i>
+                    <i class="ion-chevron-down down"></i>
+                    <i class="ion-chevron-up up"></i>
 				</label>
 				<div class="filter">
 					<div class="input">
@@ -33,8 +33,8 @@
 			<div class="formrow">
 				<label accesskey="g" for="photographer">
 					{t}Fotograaf{/t}
-					<i class="ion-chevron-down up"></i>
-					<i class="ion-chevron-up down"></i>
+                    <i class="ion-chevron-down down"></i>
+                    <i class="ion-chevron-up up"></i>
 				</label>
 				<div class="filter">
 					<div class="input">
@@ -47,8 +47,8 @@
 			<div class="formrow">
 				<label accesskey="g" for="validator">
 					{t}Validator{/t}
-					<i class="ion-chevron-down up"></i>
-					<i class="ion-chevron-up down"></i>
+                    <i class="ion-chevron-down down"></i>
+                    <i class="ion-chevron-up up"></i>
 				</label>
 				<div class="filter">
 					<div class="input">
