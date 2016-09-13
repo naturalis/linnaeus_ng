@@ -6,13 +6,48 @@
 
 
 /* Update ranks */
+update ranks set rank = lower(rank);
+update ranks set rank = 'regio' where rank = 'Domain or Empire';
+update ranks set rank = 'regnum' where rank = 'Kingdom';
+update ranks set rank = 'subregnum' where rank = 'Subkingdom';
+update ranks set rank = 'classis' where rank = 'Class';
+update ranks set rank = 'subclassis' where rank = 'Subclass';
+update ranks set rank = 'superdivisio' where rank = 'Superdivision';
+update ranks set rank = 'divisio' where rank = 'Division';
+update ranks set rank = 'subdivisio' where rank = 'Subdivision';
+update ranks set rank = 'ordo' where rank = 'Order';
+update ranks set rank = 'subordo' where rank = 'Suborder';
+update ranks set rank = 'sectio' where rank = 'Section';
+update ranks set rank = 'subsectio' where rank = 'Subsection';
+update ranks set rank = 'superfamilia' where rank = 'Superfamily';
+update ranks set rank = 'familia' where rank = 'Family';
+update ranks set rank = 'subfamilia' where rank = 'Subfamily';
+update ranks set rank = 'tribus' where rank = 'Tribe';
+update ranks set rank = 'subtribus' where rank = 'Subtribe';
+update ranks set rank = 'sectio' where rank = 'Section';
+update ranks set rank = 'subsectio' where rank = 'Subsection';
+update ranks set rank = 'varietas' where rank = 'Varietas/Variety or Form/Morph';
+update ranks set rank = 'subvarietas' where rank = 'Subvariety';
+update ranks set rank = 'subsubvarietas' where rank = 'Subsubvariety';
+update ranks set rank = 'forma' where rank = 'Forma/Form';
+update ranks set rank = 'subforma' where rank = 'Subform';
+update ranks set rank = 'cultivar group' where rank = 'Cultivar-group';
+update ranks set rank = 'forma specialis' where rank = 'Special form';
+
+/* Add notho- ranks when not present yet  */
 set @this_rank = 'genus';
 select @this_id := id FROM ranks WHERE rank = @this_rank;
 update ranks set id=id+1 WHERE id > @this_id order by id desc;
 update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
 update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
 select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
-insert into ranks values (@this_id+1,'nothogenus',null,'Nothogenus',null,@parent_id,0,1,null,now(),now());
+insert into ranks
+	select @this_id+1 as id, 'nothogenus' as rank, null as additional, 'Nothogenus' as default_label,
+		null as abbreviation, @parent_id as parent_id, 0 as in_col, 1 as can_hybrid,
+		null as ideal_parent_id, now() as created, now() as last_change
+	from ranks
+	where (rank = 'nothogenus')
+	having count(*) = 0;
 
 set @this_rank = 'species';
 select @this_id := id FROM ranks WHERE rank = @this_rank;
@@ -20,7 +55,13 @@ update ranks set id=id+1 WHERE id > @this_id order by id desc;
 update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
 update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
 select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
-insert into ranks values (@this_id+1,'nothospecies',null,'Nothospecies',null,@parent_id,0,1,null,now(),now());
+insert into ranks
+	select @this_id+1 as id, 'nothospecies' as rank, null as additional, 'Nothospecies' as default_label,
+		null as abbreviation, @parent_id as parent_id, 0 as in_col, 1 as can_hybrid,
+		null as ideal_parent_id, now() as created, now() as last_change
+	from ranks
+	where (rank = 'nothospecies')
+	having count(*) = 0;
 
 set @this_rank = 'subspecies';
 select @this_id := id FROM ranks WHERE rank = @this_rank;
@@ -28,7 +69,13 @@ update ranks set id=id+1 WHERE id > @this_id order by id desc;
 update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
 update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
 select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
-insert into ranks values (@this_id+1,'nothosubspecies',null,'Nothosubspecies','nothosubsp.',@parent_id,0,1,null,now(),now());
+insert into ranks
+	select @this_id+1 as id, 'nothosubspecies' as rank, null as additional, 'Nothosubspecies' as default_label,
+		'nothosubsp.' as abbreviation, @parent_id as parent_id, 0 as in_col, 1 as can_hybrid,
+		null as ideal_parent_id, now() as created, now() as last_change
+	from ranks
+	where (rank = 'nothosubspecies')
+	having count(*) = 0;
 
 set @this_rank = 'varietas';
 select @this_id := id FROM ranks WHERE rank = @this_rank;
@@ -36,7 +83,13 @@ update ranks set id=id+1 WHERE id > @this_id order by id desc;
 update ranks set parent_id=parent_id+1 WHERE parent_id > @this_id order by parent_id desc;
 update projects_ranks set rank_id=rank_id+1 WHERE rank_id > @this_id order by rank_id desc;
 select @parent_id := parent_id FROM ranks WHERE rank = @this_rank;
-insert into ranks values (@this_id+1,'nothovarietas',null,'Nothovarietas','nothovar.',@parent_id,0,1,null,now(),now());
+insert into ranks
+	select @this_id+1 as id, 'nothovarietas' as rank, null as additional, 'Nothovarietas' as default_label,
+		'nothovar.' as abbreviation, @parent_id as parent_id, 0 as in_col, 1 as can_hybrid,
+		null as ideal_parent_id, now() as created, now() as last_change
+	from ranks
+	where (rank = 'nothovarietas')
+	having count(*) = 0;
 
 update ranks set rank = 'forma specialis' where rank = 'forma_specialis';
 update ranks set additional = 'fungi' where rank = 'forma specialis';
