@@ -180,14 +180,18 @@ class MediaConverterController extends MediaController
 
     private function setInternalMediaLinks ()
     {
-            $modules = array(
+        $modules = array(
             'Taxon editor' => array(
                 'column' => 'content',
                 'table' => 'content_taxa'
             ),
-            'Dichotomous key' => array(
+            'Dichotomous key - steps' => array(
                 'column' => 'content',
                 'table' => 'content_keysteps'
+            ),
+            'Dichotomous key - choices' => array(
+                'column' => 'choice_txt',
+                'table' => 'choices_content_keysteps'
             ),
             'Introduction' => array(
                 'column' => 'content',
