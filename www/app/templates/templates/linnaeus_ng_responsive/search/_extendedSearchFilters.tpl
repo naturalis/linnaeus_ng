@@ -70,11 +70,11 @@
               </select>
            	</li>
            	<li>
-              <label for="multimedia-distribution" class="normalLabel">Verspreidingskaart(en)</label>
+              <label for="multimedia-distribution" class="normalLabel">Verspreidingskaart</label>
            		<select class="customSelect" id="multimedia-distribution" onchange="addSearchParameter('multimedia-distribution');">
-								<option value="">{t}Verspreidingskaart(en){/t}</option>
-								<option value="distribution_on">{t}met verspreidingskaart(en){/t}</option>
-								<option value="distribution_off">{t}zonder verspreidingskaarten{/t}</option>
+								<option value="">{t}Verspreidingskaart{/t}</option>
+								<option value="distribution_on">{t}met verspreidingskaart{/t}</option>
+								<option value="distribution_off">{t}zonder verspreidingskaart{/t}</option>
               </select>
            	</li>
            	<li>

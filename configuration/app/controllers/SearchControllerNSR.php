@@ -7,7 +7,7 @@ include_once ('ModuleSettingsReaderController.php');
 
 class SearchControllerNSR extends SearchController
 {
-	private $_suggestionListItemMax=100;
+	private $_suggestionListItemMax=50;
 	private $_resPicsPerPage=12;
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
@@ -893,8 +893,8 @@ class SearchControllerNSR extends SearchController
 
 		if ($this->rHasVal('images_on','on')) $querystring.=$this->translate('Met foto\'s; ');
 		if ($this->rHasVal('images_off','on')) $querystring.=$this->translate('Zonder foto\'s; ');
-		if ($this->rHasVal('distribution_on','on')) $querystring.=$this->translate('Met verspreidingskaart(en); ');
-		if ($this->rHasVal('distribution_off','on')) $querystring.=$this->translate('Zonder verspreidingskaart(en); ');
+		if ($this->rHasVal('distribution_on','on')) $querystring.=$this->translate('Met verspreidingskaart; ');
+		if ($this->rHasVal('distribution_off','on')) $querystring.=$this->translate('Zonder verspreidingskaart; ');
 		if ($this->rHasVal('trend_on','on')) $querystring.=$this->translate('Met trendgrafiek; ');
 		if ($this->rHasVal('trend_off','on')) $querystring.=$this->translate('Zonder trendgrafiek; ');
 		if ($this->rHasVal('dna','on')) $querystring.=$this->translate('Met DNA-exemplaren verzameld; ');

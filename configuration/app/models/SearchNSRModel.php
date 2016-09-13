@@ -980,10 +980,29 @@ final class SearchNSRModel extends AbstractModel
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
 		$order = isset($params['order']) ? $params['order'] : "ifnull(_c.name,_d.taxon)";
+		$lower_only = isset($params['lower_only']) ? $params['lower_only'] : false;
+		$match = isset($params['match']) ? $params['match'] : "like";
 		
 		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) )
 			return;
 
+		$clause=null;
+
+		if ($match=='start')
+			$clause="_a.name like '".$this->escapeString($search)."%'";
+		else
+		if ($match=='exact')
+			$clause="_a.name = '".$this->escapeString($search)."'";
+		else
+		if ($match=='like')
+			$clause="_a.name like '%".$this->escapeString($search)."%'";
+		else
+		if ($match=='id')
+			$clause="_a.taxon_id = ".(int)$taxon_id;
+
+		if (empty($clause)) return;
+		
+		
 		$query="
 			select
 				distinct 
@@ -1004,10 +1023,6 @@ final class SearchNSRModel extends AbstractModel
 				and _d.id =  _trash.lng_id
 				and _trash.item_type='taxon'
 
-			right join %PRE%media_taxon _b
-				on _a.taxon_id = _b.taxon_id
-				and _a.project_id = _b.project_id
-			
 			left join %PRE%names _c
 				on _a.taxon_id=_c.taxon_id
 				and _a.project_id=_c.project_id
@@ -1031,8 +1046,8 @@ final class SearchNSRModel extends AbstractModel
 			where 
 				_a.project_id = ".$project_id."
 				and ifnull(_trash.is_deleted,0)=0
-				and _f.rank_id >= ".SPECIES_RANK_ID."
-				and _a.name like '". $this->escapeString($search) ."%'
+				" . ( $lower_only ? "and _f.rank_id >= ".SPECIES_RANK_ID : "" )."
+				and " . $clause ."
 				" . ( $restrict_language ? "and (_a.language_id=".$language_id." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")" : "" ) . "
 				and ifnull(label,'') != ''
 
