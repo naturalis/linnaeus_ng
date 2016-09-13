@@ -9,7 +9,7 @@
 	<div id="definition">
 		{$term.definition}
 		{if $term.synonyms}
-	 	<p id="synonyms"><span id="synonyms-title">{if $term.synonyms|@count > 1}{t}Synonyms{/t}{else}{t}Synonym{/t}{/if} {t}for{/t} {$term.term}</span>:
+	 	<p id="synonyms"><span id="synonyms-title">{if $term.synonyms|@count > 1}{t}Alternative forms{/t}{else}{t}Alternative form{/t}{/if} {t}for{/t} {$term.term}</span>:
 			{foreach from=$term.synonyms key=k item=v name=synonyms}{$v.synonym}{if $v.language && $v.language_id!=$currentLanguageId} ({$v.language}){/if}{if !$smarty.foreach.synonyms.last}, {/if}{/foreach}.
 	     </p>
 	     {/if}
