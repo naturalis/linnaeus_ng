@@ -54,7 +54,8 @@ function retrieveSuggestions()
 			match : getMatchType(),
 			time : allGetTimestamp()
 		}),
-		success : function (data) {
+		success : function (data)
+		{
 			//console.log(data);
 			if (!data) return;
 			setListData($.parseJSON(data));
@@ -158,7 +159,7 @@ function buildSuggestions()
 				.replace(/%IDENT%/g,( l.id ? l.id : '' ))
 				.replace('%LABEL%',l.label)
 				.replace('%SCIENTIFIC_NAME%',l.scientific_name ? l.scientific_name : '' )
-				.replace('%COMMON_NAME%',l.common_name ? l.common_name : l.nomen )
+				.replace('%COMMON_NAME%',l.common_name ? l.common_name : ( l.nomen ? l.nomen : l.scientific_name ) )
 		);
 	}
 
