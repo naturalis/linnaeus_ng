@@ -455,6 +455,7 @@ class SpeciesControllerNSR extends SpeciesController
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$reference = isset($p['reference']) ? $p['reference'] : null;
+		$remote_check = isset($p['remote_check']) ? $p['remote_check'] : true;
 
 		if ( is_null($taxon) || is_null($reference) ) return;
 		
@@ -612,14 +613,14 @@ class SpeciesControllerNSR extends SpeciesController
 			else
 			if ( $reference->check_type=='output' )
 			{
-				$is_empty=empty( @json_decode( @file_get_contents(  $full_url  ) ) );
+				if ( $remote_check ) $is_empty=empty( @json_decode( @file_get_contents(  $full_url  ) ) );
 			}
 			else
 			if ( $reference->check_type=='url' )
 			{
 				$this->helpers->CheckUrl->setUrl( $check_url );
 				
-				if ( $this->helpers->CheckUrl->exists() )
+				if ( $this->helpers->CheckUrl->exists() && $remote_check )
 				{
 					$f=@file_get_contents(  $check_url  );
 					
@@ -638,6 +639,8 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 		}
+		
+		if (is_null($is_empty)) $is_empty=false;
 		
 		return
 			array(
@@ -754,10 +757,11 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				$taxon=is_null($taxon) ? $this->getTaxonById( $taxon_id ) : $taxon;
 				$ref=json_decode( $val['external_reference'] );
-				$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref) );
-			
+
+				$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref,'remote_check'=>(!$val['suppress'] && !$val['always_hide']) ) );
 				if (isset($d['full_url'])) $ref->full_url=$d['full_url'];
 				if (isset($d['full_url_valid'])) $ref->full_url_valid=$d['full_url_valid'];
+			
 				$val['external_reference']=$ref;
 				$val['is_empty']=isset($d['is_empty']) ? $d['is_empty'] : true;
 				$val['type']='external';
