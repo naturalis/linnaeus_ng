@@ -7,32 +7,32 @@
 
 /* Update ranks */
 update ranks set rank = lower(rank);
-update ranks set rank = 'regio' where rank = 'Domain or Empire';
-update ranks set rank = 'regnum' where rank = 'Kingdom';
-update ranks set rank = 'subregnum' where rank = 'Subkingdom';
-update ranks set rank = 'classis' where rank = 'Class';
-update ranks set rank = 'subclassis' where rank = 'Subclass';
-update ranks set rank = 'superdivisio' where rank = 'Superdivision';
-update ranks set rank = 'divisio' where rank = 'Division';
-update ranks set rank = 'subdivisio' where rank = 'Subdivision';
-update ranks set rank = 'ordo' where rank = 'Order';
-update ranks set rank = 'subordo' where rank = 'Suborder';
-update ranks set rank = 'sectio' where rank = 'Section';
-update ranks set rank = 'subsectio' where rank = 'Subsection';
-update ranks set rank = 'superfamilia' where rank = 'Superfamily';
-update ranks set rank = 'familia' where rank = 'Family';
-update ranks set rank = 'subfamilia' where rank = 'Subfamily';
-update ranks set rank = 'tribus' where rank = 'Tribe';
-update ranks set rank = 'subtribus' where rank = 'Subtribe';
-update ranks set rank = 'sectio' where rank = 'Section';
-update ranks set rank = 'subsectio' where rank = 'Subsection';
-update ranks set rank = 'varietas' where rank = 'Varietas/Variety or Form/Morph';
-update ranks set rank = 'subvarietas' where rank = 'Subvariety';
-update ranks set rank = 'subsubvarietas' where rank = 'Subsubvariety';
-update ranks set rank = 'forma' where rank = 'Forma/Form';
-update ranks set rank = 'subforma' where rank = 'Subform';
-update ranks set rank = 'cultivar group' where rank = 'Cultivar-group';
-update ranks set rank = 'forma specialis' where rank = 'Special form';
+update ranks set rank = 'regio' where rank = 'domain or empire';
+update ranks set rank = 'regnum' where rank = 'kingdom';
+update ranks set rank = 'subregnum' where rank = 'subkingdom';
+update ranks set rank = 'classis' where rank = 'class';
+update ranks set rank = 'subclassis' where rank = 'subclass';
+update ranks set rank = 'superdivisio' where rank = 'superdivision';
+update ranks set rank = 'divisio' where rank = 'division';
+update ranks set rank = 'subdivisio' where rank = 'subdivision';
+update ranks set rank = 'ordo' where rank = 'order';
+update ranks set rank = 'subordo' where rank = 'suborder';
+update ranks set rank = 'sectio' where rank = 'section';
+update ranks set rank = 'subsectio' where rank = 'subsection';
+update ranks set rank = 'superfamilia' where rank = 'superfamily';
+update ranks set rank = 'familia' where rank = 'family';
+update ranks set rank = 'subfamilia' where rank = 'subfamily';
+update ranks set rank = 'tribus' where rank = 'tribe';
+update ranks set rank = 'subtribus' where rank = 'subtribe';
+update ranks set rank = 'sectio' where rank = 'section';
+update ranks set rank = 'subsectio' where rank = 'subsection';
+update ranks set rank = 'varietas' where rank = 'varietas/variety or form/morph';
+update ranks set rank = 'subvarietas' where rank = 'subvariety';
+update ranks set rank = 'subsubvarietas' where rank = 'subsubvariety';
+update ranks set rank = 'forma' where rank = 'forma/form';
+update ranks set rank = 'subforma' where rank = 'subform';
+update ranks set rank = 'cultivar group' where rank = 'cultivar-group';
+update ranks set rank = 'forma specialis' where rank = 'special form';
 
 /* Add notho- ranks when not present yet  */
 set @this_rank = 'genus';
