@@ -14,7 +14,7 @@
 	{t}Log in to administer your Linnaeus project{/t}
 	<form method="post" action="login.php">
 	<table id="login-table">
-		<tr><td>{t}Your username:{/t}</td><td><input type="text" name="username" id="username" value="" maxlength="32" /></td></tr>
+		<tr><td>{t}Your username:{/t}</td><td><input type="text" name="username" id="username" value="" maxlength="128" /></td></tr>
 		<tr><td>Y{t}our password:{/t}</td><td><input type="password" name="password" value="" maxlength="32" /></td></tr>
 		<tr><td></td><td><label><input type="checkbox" name="remember_me" value="1" />{t}Remember me{/t}</label></td></tr>
 		<tr><td colspan="2"><input type="submit" value="Log in" /></td></tr>
