@@ -58,8 +58,8 @@ class UsersController extends Controller
 
     public $controllerPublicName='User management';
 
-	private $checksUsername=array('min' => 4,'max' => 128); // regExp =>
-	private $checksPassword=array('min' => 8,'max' => 32); // regExp =>
+	private $checksUsername=array('min' => 4,'max' => 128);
+	private $checksPassword=array('min' => 8,'max' => 32);
 	private $checksName=array('min' => 1,'max' => 64);
 	private $_userBefore;
 	private $_action;
