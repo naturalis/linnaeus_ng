@@ -143,7 +143,7 @@ class SpeciesControllerNSR extends SpeciesController
 			] );
 
 			$external_content=$this->getExternalContent( $categories['start'] );
-			
+
 			if ( isset($external_content) )
 			{
 				if ( $external_content->must_redirect==true)
@@ -458,7 +458,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$remote_check = isset($p['remote_check']) ? $p['remote_check'] : true;
 
 		if ( is_null($taxon) || is_null($reference) ) return;
-		
+
 		if ( !empty($reference->rank) && !empty($taxon['base_rank_id']) && ( $taxon['base_rank_id'] < $reference->rank ) )
 		{
 			return [ 'is_empty'=> true ];
@@ -511,8 +511,8 @@ class SpeciesControllerNSR extends SpeciesController
 							//	$sval=$sval;
 						}
 					}
-					
-					if ( isset($reference->subst_underscores[$i]) && $reference->subst_underscores[$i]=='on') 
+
+					if ( isset($reference->subst_underscores[$i]) && $reference->subst_underscores[$i]=='on')
 					{
 						$sval=str_replace(' ','_', $sval);
 					}
@@ -528,7 +528,7 @@ class SpeciesControllerNSR extends SpeciesController
 					{
 						$check_url=str_replace( $key, $sval, $check_url );
 					}
-					
+
 				}
 				else
 				{
@@ -571,8 +571,8 @@ class SpeciesControllerNSR extends SpeciesController
 							//	$sval=$sval;
 						}
 					}
-					
-					if ( isset($reference->param_underscores[$i]) && $reference->param_underscores[$i]=='on') 
+
+					if ( isset($reference->param_underscores[$i]) && $reference->param_underscores[$i]=='on')
 					{
 						$sval=str_replace(' ','_', $sval);
 					}
@@ -619,11 +619,11 @@ class SpeciesControllerNSR extends SpeciesController
 			if ( $reference->check_type=='url' )
 			{
 				$this->helpers->CheckUrl->setUrl( $check_url );
-				
+
 				if ( $this->helpers->CheckUrl->exists() && $remote_check )
 				{
 					$f=@file_get_contents(  $check_url  );
-					
+
 					if ( $this->helpers->CheckUrl->getHeader('content-type')=='application/json' )
 					{
 						$is_empty=empty( @json_decode( $f ) );
@@ -639,9 +639,9 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 		}
-		
+
 		if (is_null($is_empty)) $is_empty=false;
-		
+
 		return
 			array(
 				'full_url'=>$full_url,
@@ -761,7 +761,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref,'remote_check'=>(!$val['suppress'] && !$val['always_hide']) ) );
 				if (isset($d['full_url'])) $ref->full_url=$d['full_url'];
 				if (isset($d['full_url_valid'])) $ref->full_url_valid=$d['full_url_valid'];
-			
+
 				$val['external_reference']=$ref;
 				$val['is_empty']=isset($d['is_empty']) ? $d['is_empty'] : true;
 				$val['type']='external';
@@ -904,7 +904,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 
-
 			/*
 				$language_has_preferredname will be used to determine whether there is
 				a preferred name in each language. if not, the alternative name(s) will
@@ -960,8 +959,38 @@ class SpeciesControllerNSR extends SpeciesController
 				'preffered_name'=>$preferredname,
 				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( array('base_rank_id'=>$base_rank_id) ),
 				'list'=>$names,
-				'language_has_preferredname'=>$language_has_preferredname
+				'list_non_nsr'=> $this->setNamesNonNsr($names),
+			    'language_has_preferredname'=>$language_has_preferredname
 			);
+	}
+
+	private function setNamesNonNsr ($names)
+	{
+	    $d = array(
+	       'valid_names' => null,
+	       'synonyms' => null,
+	       'common_names' => null,
+	    );
+
+	    foreach ($names as $id => $name) {
+	        $name['nametype_label'] = $this->nameTypeToEnglish($name['nametype']);
+            if ($name['nametype'] == PREDICATE_VALID_NAME) {
+                $d['valid_names'][] = $name;
+            } else if ($name['nametype'] == PREDICATE_PREFERRED_NAME ||
+                $name['nametype'] == PREDICATE_ALTERNATIVE_NAME) {
+                $d['common_names'][] = $name;
+            } else {
+                $d['synonyms'][] = $name;
+            }
+	    }
+
+	    return $d;
+	}
+
+	private function nameTypeToEnglish ($type)
+	{
+        $parts = preg_split('/(?=[A-Z])/', substr($type, 2, -2), -1, PREG_SPLIT_NO_EMPTY);
+        return implode(' ', array_map('strtolower', $parts));
 	}
 
 	private function getActor( $id )
@@ -1626,7 +1655,7 @@ class SpeciesControllerNSR extends SpeciesController
 							break;
 						}
 					}
-					
+
 					if(!is_null($thistab))
 					{
 						$content=null;
@@ -1667,12 +1696,12 @@ class SpeciesControllerNSR extends SpeciesController
 								$content=$this->getPresenceData( $taxon_id );
 								break;
 						}
-						
+
 						// NOW ACTUALLY RENDER THOSE PAGES!
-						
+
 						//if (!is_null($content)) $buffer[]=$content;
 					}
-					
+
 				}
 			}
 		}
