@@ -246,7 +246,7 @@ class MediaConverterController extends MediaController
             $this->updateInternalMediaLinks(array(
                 'column' => $module['column'],
                 'table' => $module['table'],
-                'data' => $data
+                'data' => $module['data']
             ));
         }
     }
