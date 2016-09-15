@@ -1,8 +1,12 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('MediaController.php');
+
 class FreeModuleController extends Controller
 {
+	private $_mc;
+
     public $usedModels = array(
         'free_modules_projects',
         'free_modules_projects_users',
@@ -33,6 +37,7 @@ class FreeModuleController extends Controller
     public function __construct ($p = null)
     {
         parent::__construct($p);
+		$this->setMediaController();
     }
 
 
@@ -47,6 +52,12 @@ class FreeModuleController extends Controller
         parent::__destruct();
     }
 
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController();
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+	}
 
 
     /**
@@ -337,6 +348,8 @@ class FreeModuleController extends Controller
             $page['topic'] = $cfm[0]['topic'];
             $page['content'] = $this->matchHotwords($cfm[0]['content']);
 
+            /*
+
             $fmm = $this->models->FreeModuleMedia->_get(array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(),
@@ -348,6 +361,15 @@ class FreeModuleController extends Controller
 
                 $page['image']['file_name'] = $fmm[0]['file_name'];
                 $page['image']['thumb_name'] = $fmm[0]['thumb_name'];
+            }
+
+            */
+
+            $this->_mc->setItemId($id);
+            $media = $this->_mc->getItemMediaFiles();
+
+            if ($media) {
+                $page['image'] = $media[0]['rs_original'];
             }
 
             return $page;

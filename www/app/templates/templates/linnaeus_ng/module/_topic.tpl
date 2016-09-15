@@ -7,9 +7,9 @@
                 {if $headerTitles.subtitle}<span id="header-subtitle">{$headerTitles.subtitle}</span>{/if}
             </p>
         {/if}
-        
+
 		{if $page.image}
-		<div class="introduction-img" style="background: url('{$projectUrls.uploadedMedia}{$page.image|escape:'url'}');">
+		<div class="introduction-img" style="background: url('{$page.image}');">
 		</div>
 		{/if}
 		{$page.content}
