@@ -545,9 +545,7 @@ final class MediaModel extends AbstractModel
                 and project_id = ' . $projectId;
         $d = $this->freeQuery($q);
 
-        return $d;
-
-        if ($d[0]['test'] == 0) {
+        if (isset($d) && $d[0]['test'] === 0) {
             return false;
         }
 
