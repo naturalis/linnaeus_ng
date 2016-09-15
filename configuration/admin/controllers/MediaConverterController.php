@@ -177,7 +177,7 @@ class MediaConverterController extends MediaController
 
         $this->convertInternalMediaLinks();
 
-        if ($this->fixKeystepMedia()) {
+        if ($this->fixKeystepMedia() !== false) {
             echo $this->_cli ? "\n\nKeystep media fixed\n" :
                 '</p><p>Keystep media fixed<br>';
         }
