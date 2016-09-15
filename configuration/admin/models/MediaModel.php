@@ -534,11 +534,20 @@ final class MediaModel extends AbstractModel
     public function fixKeystepMedia ($projectId)
     {
         // First test if we should proceed (in case script is repeated)
-        // If
-        $q = 'select count(1) from %PRE%keysteps where `image` not like "http%"';
+        // If the test returns > 0 keysteps should be fixed
+        $q = '
+            select
+                count(1) as test
+            from
+                %PRE%keysteps
+            where
+                `image` not like "http%"
+                and project_id = ' . $projectId;
         $d = $this->freeQuery($q);
 
-        return $d;
+        if ($d[0]['test'] == 0) {
+            return false;
+        }
 
         $q = '
             update
@@ -570,6 +579,7 @@ final class MediaModel extends AbstractModel
 
         $this->freeQuery($q);
 
+        return true;
     }
 
 }
