@@ -177,7 +177,7 @@ class MediaConverterController extends MediaController
 
         $this->convertInternalMediaLinks();
 
-        print_r($this->fixKeystepMedia());
+        $this->fixKeystepMedia();
 
     }
 
