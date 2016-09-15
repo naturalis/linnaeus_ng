@@ -531,6 +531,46 @@ final class MediaModel extends AbstractModel
         return $this->freeQuery($q);
     }
 
+    public function fixKeystepMedia ($projectId)
+    {
+        // First test if we should proceed (in case script is repeated)
+        // If
+        $q = 'select count(1) from %PRE%keysteps where `image` not like "http%"';
+        $d = $this->freeQuery($q);
+
+        return $d;
+
+        $q = '
+            update
+                %PRE%keysteps as t1
+            left join
+                %PRE%media_modules as t2 on t1.id = t2.item_id
+            left join
+                %PRE%media as t3 on t2.media_id = t3.id
+            left join
+                %PRE%modules as t4 on t2.module_id = t4.id
+            set t1.image = t3.rs_original
+            where
+                t4.controller = "key"
+                and t1.id = t2.item_id
+                and t1.project_id = ' . $projectId;
+
+        $this->freeQuery($q);
+
+        $q = '
+            delete
+                t1
+            from
+                %PRE%media_modules as t1
+            left join
+                %PRE%modules as t2 on t1.module_id = t2.id
+            where
+                t2.controller = "key"
+                and t1.project_id = ' . $projectId;
+
+        $this->freeQuery($q);
+
+    }
 
 }
 
