@@ -31,7 +31,7 @@ class NSRFunctionsController extends Controller
 		foreach((array)$data as $key=>$val)
 		{
 			$metaData=array(
-				'' => '<span class="pic-meta-label">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
+				'' => '<span class="pic-meta-label title">'.(!empty($val['common_name']) ? $val['common_name'].' (<i>'.$val['nomen'].'</i>)' : '<i>'.$val['nomen'].'</i>').'</span>',
 				$this->translate('Omschrijving') => $val['meta_short_desc'],
 				$this->translate('Fotograaf') => $val['photographer'],
 				$this->translate('Datum') => $val['meta_datum'],
@@ -60,7 +60,7 @@ class NSRFunctionsController extends Controller
 					(!empty($val['meta_datum']) ? $val['meta_datum'].', ' : '') .
 					$val['meta_geografie'], ', '
 				);
-			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: ','<br /><span class="pic-meta-label">',$metaData,true);
+			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: <span class="value">','</span><br /><span class="pic-meta-label">',$metaData,true);
 			
 		}
 		
