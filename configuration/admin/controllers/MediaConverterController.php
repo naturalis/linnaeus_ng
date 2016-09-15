@@ -176,11 +176,12 @@ class MediaConverterController extends MediaController
             '</p><p><b>Converting internal media links</b><br>';
 
         $this->convertInternalMediaLinks();
-
+/*
         if ($this->fixKeystepMedia() !== false) {
             echo $this->_cli ? "\n\nKeystep media fixed\n" :
                 '</p><p>Keystep media fixed<br>';
         }
+*/
     }
 
     /* Keystep media should be copied to keystep table and deleted from media_modules */
