@@ -457,7 +457,6 @@ class MediaConverterController extends MediaController
                     $this->totals['modules'][$module] = count($media);
                 }
             }
-
         }
 
         $this->totals['total'] = array_sum($this->totals['modules']);

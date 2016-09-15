@@ -268,7 +268,7 @@ final class MediaModel extends AbstractModel
         $moduleId = isset($p['module_id']) && !empty($p['module_id']) ?
             $p['module_id'] : false;
 
-        if (!$projectId || $moduleId) return false;
+        if (!$projectId || !$moduleId) return false;
 
         $query = "
             select
@@ -277,7 +277,7 @@ final class MediaModel extends AbstractModel
                 image as file_name,
                 '' as original_name
             from
-                %PRE%free_module_pages
+                %PRE%free_modules_pages
             where
                 image != '' and image is not null and
                 project_id = " . $this->escapeString($projectId) . " and
