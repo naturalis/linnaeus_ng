@@ -177,14 +177,14 @@ class MediaConverterController extends MediaController
 
         $this->convertInternalMediaLinks();
 
-        $this->fixKeystepMedia();
+        print_r($this->fixKeystepMedia());
 
     }
 
     /* Keystep media should be copied to keystep table and deleted from media_modules */
     private function fixKeystepMedia ()
     {
-        $this->models->MediaModel->fixKeystepMedia($this->getCurrentProjectId());
+        return $this->models->MediaModel->fixKeystepMedia($this->getCurrentProjectId());
     }
 
     private function setInternalMediaLinks ()
