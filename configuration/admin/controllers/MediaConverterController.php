@@ -356,7 +356,7 @@ class MediaConverterController extends MediaController
         // Matrix
         $moduleId = $this->getModuleId('matrixkey');
         if ($moduleId) {
-           $media = $this->models->MediaModel->getConverterMatrixMedia(
+            $media = $this->models->MediaModel->getConverterMatrixMedia(
                 array('project_id' => $this->getCurrentProjectId()
             ));
             $this->media['modules']['Multi-entry key'] = array(
@@ -364,6 +364,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Multi-entry key'] = count($media);
+            $this->setLastItem($media);
         }
 
         // Key: keysteps and choices
@@ -381,6 +382,7 @@ class MediaConverterController extends MediaController
                     'media' => $media
                 );
                 $this->totals['modules']['Dichotomous key steps'] = count($media);
+                $this->setLastItem($media);
             }
 
             // Choices
@@ -394,6 +396,7 @@ class MediaConverterController extends MediaController
                     'media' => $media
                 );
                 $this->totals['modules']['Dichotomous key choices'] = count($media);
+                $this->setLastItem($media);
             }
         }
 
@@ -408,6 +411,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Glossary'] = count($media);
+            $this->setLastItem($media);
         }
 
         // Introduction
@@ -421,6 +425,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Introduction'] = count($media);
+            $this->setLastItem($media);
         }
 
         // Taxa
@@ -434,11 +439,8 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Taxon editor'] = count($media);
+            $this->setLastItem($media);
         }
-
-        // Set last converted item to fix conversion hiccup
-        $this->_lastItem = end($media);
-        $this->_lastItem['module_id'] = $moduleId;
 
         // Free module(s)
         if (isset($this->projectModules['freeModules'])) {
@@ -455,6 +457,7 @@ class MediaConverterController extends MediaController
                         'media' => $media
                     );
                     $this->totals['modules'][$module] = count($media);
+                    $this->setLastItem($media);
                 }
             }
         }
@@ -462,6 +465,14 @@ class MediaConverterController extends MediaController
         $this->totals['total'] = array_sum($this->totals['modules']);
 
         return $this->totals;
+    }
+
+    private function setLastItem ($media)
+    {
+        if (!empty($media)) {
+            $this->_lastItem = end($media);
+            $this->_lastItem['module_id'] = $moduleId;
+        }
     }
 
     private function getInternalMediaLinks ($p)
