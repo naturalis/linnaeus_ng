@@ -217,6 +217,8 @@ final class MediaModel extends AbstractModel
 
     public function getConverterKeystepsMedia ($p)
     {
+        /* Exclude files containing / in file name; these have already been converted */
+
         $projectId = isset($p['project_id']) && !empty($p['project_id']) ?
             $p['project_id'] : false;
 
@@ -230,8 +232,10 @@ final class MediaModel extends AbstractModel
             from
                 %PRE%keysteps
             where
-                image != '' and image is not null and
-                project_id = " . $this->escapeString($projectId);
+                image != ''
+                and image is not null
+                and image not like '%/%'
+                and project_id = " . $this->escapeString($projectId);
 
         $d = $this->freeQuery($query);
 
