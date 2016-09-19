@@ -189,7 +189,6 @@ INSERT IGNORE INTO `module_settings` VALUES
 (41,4,'base_url_images_overview','base URL of overview images in NSR-style search results.',NULL,NOW(),NOW()),
 (43,4,'base_url_images_thumb_s','base URL of smaller thumb images in NSR-style search results.',NULL,NOW(),NOW()),
 (44,-1,'taxon_main_image_base_url','taxon_main_image_base_url (needs to be re-examined)',NULL,NOW(),NOW()),
-(45,4,'taxon_fetch_ez_data','taxon_fetch_ez_data (should be re-examined)',NULL,NOW(),NOW()),
 (46,4,'include_overview_in_media','include the overview image in the general media page of a taxon as well.',NULL,NOW(),NOW()),
 (47,4,'lookup_list_species_max_results','max. results in species lookup list (front-end)',NULL,NOW(),NOW()),
 (48,13,'literature2_import_match_threshold','default matching threshold for literature bulk import (percentage).','75',NOW(),NOW()),
@@ -226,35 +225,12 @@ INSERT IGNORE INTO `module_settings` VALUES
 (null,-1,'show_automatic_hybrid_markers','Show or hide automatic × marker for taxa of hybrid ranks',1,NOW(),NOW()),
 (null,-1,'show_automatic_infixes','Show or hide automatic infixes "var.", "subsp." and "f." for taxa of appropriate ranks',1,NOW(),NOW()),
 (null,-1,'concept_base_url','Base URL for concepts (requires the project generates NSR-style pseudo PURLs)',null,NOW(),NOW()),
-(null,-1,'show_advanced_search_in_public_menu','Show advanced search link in public menu',1,NOW(),NOW()),
 (null,1,'no_media','Don\'t use media module in the Introduction.',1,NOW(),NOW()),
-(null,7,'no_media','Don\'t use media module in the Matrix.',1,NOW(),NOW())
+(null,7,'no_media','Don\'t use media module in the Matrix.',1,NOW(),NOW()),
+(null,-1,'show_advanced_search_in_public_menu','Show advanced search link in public menu',1,NOW(),NOW()),
+(null,4,'ext_tab_timeout','Time in seconds allowed for retrieval of external tab data before it is considered empty.',5,NOW(),NOW()),
+(null,-1,'support_email','Support email address','linnaeus@naturalis.nl',NOW(),NOW())
 ;
 
 
 UNLOCK TABLES;
-
-/*
-TRUNCATE TABLE `module_settings_values`;
-LOCK TABLES `module_settings_values` WRITE;
-INSERT INTO `module_settings_values` VALUES
-(1,3,30,'linnaeus_ng',NOW(),NOW()),
-(3,3,58,'../../media/system/skins/linnaeus_ng/',NOW(),NOW()),
-(4,3,10,'0',NOW(),NOW()),
-(5,3,24,'1',NOW(),NOW()),
-(6,3,61,'1',NOW(),NOW()),
-(7,3,4,'0',NOW(),NOW()),
-(8,3,62,'../species/nsr_taxon.php?id=%s',NOW(),NOW()),
-(9,3,64,'_top',NOW(),NOW()),
-(10,1,60,'Alle rechten voorbehouden',NOW(),NOW()),
-(11,1,59,'http://www.nederlandsesoorten.nl/content/gebruiksvoorwaarden-fotos',NOW(),NOW()),
-(12,1,65,'http://linnaeus.naturalis.nl/wiki/%module%#hn_%page%',NOW(),NOW()),
-(13,1,35,'/linnaeus_ng/app/views/species/nsr_taxon.php',NOW(),NOW()),
-(14,1,30,'nbc_soortenregister',NOW(),NOW()),
-(21,1,75,'https://resourcespace.naturalis.nl/plugins/',NOW(),NOW()),
-(22,1,79,'api_new_user_lng',NOW(),NOW()),
-(23,1,80,'api_search_lng',NOW(),NOW()),
-(24,1,78,'api_upload_lng',NOW(),NOW());
-UNLOCK TABLES;
-
-*/

@@ -162,20 +162,19 @@ class RdfController extends Controller
 		$object_type = isset($p['object_type']) ? $p['object_type'] : null;
 
 		if (empty($subject_id) && empty($object_id)) return;
-
-		$r=$this->models->Rdf->freeQuery("
-			delete
-				from %PRE%rdf
-			where
-				project_id = ".$this->getCurrentProjectId()."
-				".(!empty($subject_id) ? " and subject_id = ".$subject_id : "" )."
-				".(!empty($subject_type) ? " and subject_type = '".$subject_type."'" : "" )."
-				".(!empty($predicate) ? " and predicate = '".$predicate."'" : "" )."
-				".(!empty($object_id) ? " and object_id = ".$object_id : "" )."
-				".(!empty($object_type) ? " and object_type = '".$object_type."'" : "" )."
-		");
 		
-		$this->logChange(array('note'=>sprintf('Deleted RDF value (%s)',serialize($p))));
+		$d['project_id']=$this->getCurrentProjectId();
+
+		if (!empty($subject_id)) $d['subject_id']=$subject_id;
+		if (!empty($subject_type)) $d['subject_type']=$subject_type;
+		if (!empty($predicate)) $d['predicate']=$predicate;
+		if (!empty($object_id)) $d['object_id']=$object_id;
+		if (!empty($object_type)) $d['object_type']=$object_type;
+
+		$before=$this->models->Rdf->_get( [ 'id' => $d ] );
+		$r=$this->models->Rdf->delete( $d );
+		
+		$this->logChange( [ 'note'=>sprintf('Deleted RDF value (%s)',$predicate),'before'=>$before ] );
 
 		return $r;
 	}
@@ -212,7 +211,7 @@ class RdfController extends Controller
 			'object_type'=>$object_type,
 		));
 
-		$this->logChange(array('note'=>sprintf('Saved RDF value (%s)',serialize($p))));
+		$this->logChange( [ 'note'=>sprintf('Saved RDF value (%s)',$predicate),'after'=>$p ] );
 
 		return $r;
 	}
