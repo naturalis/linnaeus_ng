@@ -364,7 +364,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Multi-entry key'] = count($media);
-            $this->setLastItem($media);
+            $this->setLastItem($media, $moduleId);
         }
 
         // Key: keysteps and choices
@@ -382,7 +382,7 @@ class MediaConverterController extends MediaController
                     'media' => $media
                 );
                 $this->totals['modules']['Dichotomous key steps'] = count($media);
-                $this->setLastItem($media);
+                $this->setLastItem($media, $moduleId);
             }
 
             // Choices
@@ -396,7 +396,7 @@ class MediaConverterController extends MediaController
                     'media' => $media
                 );
                 $this->totals['modules']['Dichotomous key choices'] = count($media);
-                $this->setLastItem($media);
+                $this->setLastItem($media, $moduleId);
             }
         }
 
@@ -411,7 +411,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Glossary'] = count($media);
-            $this->setLastItem($media);
+            $this->setLastItem($media, $moduleId);
         }
 
         // Introduction
@@ -425,7 +425,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Introduction'] = count($media);
-            $this->setLastItem($media);
+            $this->setLastItem($media, $moduleId);
         }
 
         // Taxa
@@ -439,7 +439,7 @@ class MediaConverterController extends MediaController
                 'media' => $media
             );
             $this->totals['modules']['Taxon editor'] = count($media);
-            $this->setLastItem($media);
+            $this->setLastItem($media, $moduleId);
         }
 
         // Free module(s)
@@ -457,7 +457,7 @@ class MediaConverterController extends MediaController
                         'media' => $media
                     );
                     $this->totals['modules'][$module] = count($media);
-                    $this->setLastItem($media);
+                    $this->setLastItem($media, $moduleId);
                 }
             }
         }
@@ -467,7 +467,7 @@ class MediaConverterController extends MediaController
         return $this->totals;
     }
 
-    private function setLastItem ($media)
+    private function setLastItem ($media, $moduleId)
     {
         if (!empty($media)) {
             $this->_lastItem = end($media);
