@@ -83,6 +83,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->_show_inherited_literature = $this->moduleSettings->getModuleSetting( 'show_inherited_literature', 0 );
         $this->_inclOverviewImage = $this->moduleSettings->getModuleSetting( [ 'setting'=>'include_overview_in_media','subst'=>true ] ) == 1;
 		$this->_tree_taxon_count_style = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_taxon_count_style','module'=>'species', 'subst'=>'species_established' ] );
+		$this->_ext_tab_timeout = $this->moduleSettings->getModuleSetting( [ 'setting'=>'ext_tab_timeout','module'=>'species', 'subst'=>5 ] );
 
 		$this->Rdf = new RdfController;
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -613,7 +614,11 @@ class SpeciesControllerNSR extends SpeciesController
 			else
 			if ( $reference->check_type=='output' )
 			{
-				if ( $remote_check ) $is_empty=empty( @json_decode( @file_get_contents(  $full_url  ) ) );
+				if ( $remote_check ) 
+				{
+					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] ];
+					$is_empty=empty( @json_decode( @file_get_contents( $full_url, false, $ctx ) ) );
+				}
 			}
 			else
 			if ( $reference->check_type=='url' )
@@ -622,7 +627,8 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ( $this->helpers->CheckUrl->exists() && $remote_check )
 				{
-					$f=@file_get_contents(  $check_url  );
+					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] ];
+					$f=@file_get_contents( $check_url, false, $ctx );
 
 					if ( $this->helpers->CheckUrl->getHeader('content-type')=='application/json' )
 					{
