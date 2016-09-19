@@ -295,9 +295,8 @@ class NsrTaxonImagesController extends NsrController
 		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
-		$this->_taxon_main_image_base_url=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
-
-		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
+		$this->smarty->assign( 'taxon_main_image_base_url',$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') ) );
+		$this->smarty->assign( 'taxon_thumb_image_base_url',$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'http://images.naturalis.nl/160x100/') ) );
 	}
 
     private function getTaxonMedia( $p=null )
