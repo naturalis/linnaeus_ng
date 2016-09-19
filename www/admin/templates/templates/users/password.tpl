@@ -4,13 +4,13 @@
 <div id="page-main">
     {if !$sent_email}
     <p>
-        {t}To reset your password, enter you e-mail address and click "reset password":{/t}
+        {t}To reset your password, enter your username and click "reset password":{/t}
         <form method="post" action="">
         <input type="hidden" name="rnd" value="{$rnd}" />
         <table id="login-table">
             <tr>
-                <td>{t}Your e-mail address:{/t}</td>
-                <td><input type="text" name="email" id="email" value="" maxlength="64" /></td>
+                <td>{t}Your username:{/t}</td>
+                <td><input type="text" name="username" id="username" value="" maxlength="128" /></td>
                 <td><input type="submit" value="Reset password" /></td>
             </tr>
         </table>

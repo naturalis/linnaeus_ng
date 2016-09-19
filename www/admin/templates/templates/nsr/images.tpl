@@ -39,7 +39,7 @@
                         href="{$taxon_main_image_base_url}{$v.image}"
                         pTitle="<div style='margin-left:125px;'>{$smarty.capture.metadata|@escape}</div>"
                     >
-                        <img style="width:160px;height:auto;" alt="Foto {$v.photographer}" title="Foto {$v.photographer}{if $v.overview_image==1}; banner-afbeelding{/if}" src="{$taxon_main_image_base_url}{$v.thumb}" />
+                        <img style="width:160px;height:auto;" alt="Foto {$v.photographer}" title="Foto {$v.photographer}{if $v.overview_image==1}; banner-afbeelding{/if}" src="{$taxon_thumb_image_base_url}{$v.thumb}" />
                     </a>
 
 

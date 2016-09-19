@@ -15,15 +15,15 @@
 	<form method="post" action="login.php">
 	<table id="login-table">
 		<tr><td>{t}Your username:{/t}</td><td><input type="text" name="username" id="username" value="" maxlength="128" /></td></tr>
-		<tr><td>Y{t}our password:{/t}</td><td><input type="password" name="password" value="" maxlength="32" /></td></tr>
+		<tr><td>{t}Your password:{/t}</td><td><input type="password" name="password" value="" maxlength="32" /></td></tr>
 		<tr><td></td><td><label><input type="checkbox" name="remember_me" value="1" />{t}Remember me{/t}</label></td></tr>
 		<tr><td colspan="2"><input type="submit" value="Log in" /></td></tr>
 	</table>
 	</form>
 </p>
 <p>
-	{t}I forgot my password and/or username:{/t} <a href="password.php">{t}reset my password{/t}</a>.<br />
-	{t}My password doesn't work or my account may have been compromised: please{/t} <a href="mailto:{$support_email}">{t}contact the helpdesk{/t}</a>.
+	{t}I forgot my password:{/t} <a href="password.php">{t}reset my password{/t}</a>.<br />
+	{t}My password doesn't work, I have forgotten my username or my account may have been compromised: please{/t} <a href="mailto:{$support_email}">{t}contact the helpdesk{/t}</a>.
 </p>
 <p>
 	<a href="{$baseUrl}">{t}Back to{/t} {t}Linnaeus NG root{/t}</a>

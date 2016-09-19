@@ -278,9 +278,9 @@ class UsersController extends Controller
     {
         $this->setPageName($this->translate('Reset password'));
 
-		if ( $this->rHasVal('email') && !$this->isFormResubmit() )
+		if ( $this->rHasVal('username') && !$this->isFormResubmit() )
 		{
-			$u=$this->models->Users->_get( [ 'id' => [ 'email_address' => trim($this->rGetVal('email')) ] ] );
+			$u=$this->models->Users->_get( [ 'id' => [ 'username' => trim($this->rGetVal('username')) ] ] );
 		
 			if (count((array)$u)==1)
 			{
@@ -308,7 +308,7 @@ class UsersController extends Controller
 			}
 			else
 			{
-				$this->addError($this->translate('Invalid or unknown e-mail address.'));
+				$this->addError($this->translate('Invalid username.'));
 			}
 		}
 
