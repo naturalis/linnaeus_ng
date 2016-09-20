@@ -122,8 +122,6 @@ $(document).ready(function()
 		similarSpeciesShowDistinctDetailsOnly: {if $settings->similar_species_show_distinct_details_only}{$settings->similar_species_show_distinct_details_only}{else}0{/if},
 	});
 
-	//console.dir( matrixsettings );
-
 	setScores($.parseJSON('{$session_scores}'));
 	setStates($.parseJSON('{$session_states}'));
 	setCharacters($.parseJSON('{$session_characters}'));
