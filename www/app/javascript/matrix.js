@@ -53,7 +53,8 @@ var matrixsettings={
 	infoLinkTarget: "",
 	initialSortColumn: "",
 	alwaysSortByInitial: 0,
-	noTaxonImages: false
+	noTaxonImages: false,
+	suppressImageEnlarge: false
 };
 
 var data={
@@ -637,7 +638,7 @@ function formatResult( data )
 				: ""))
 		;
 		
-	if ( allowImgEnlarge )
+	if ( !matrixsettings.suppressImageEnlarge && allowImgEnlarge )
 	{
 		var imgHtml=
 			fetchTemplate( 'imageHtmlTpl' )

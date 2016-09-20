@@ -105,6 +105,7 @@ $(document).ready(function()
 		imageRootSkin: '{$image_root_skin}',
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {if $settings->use_emerging_characters}{$settings->use_emerging_characters}{else}0{/if},
+		suppressImageEnlarge: {if $settings->suppress_image_enlarge}{$settings->suppress_image_enlarge}{else}0{/if},
 		defaultSpeciesImages: { portrait: '{$image_root_skin}noImage.jpg', landscape: '{$image_root_skin}noImage.png' } ,
 		// defaultSpeciesImages: { portrait: '{$image_root_skin}noImagePortrait.jpg', landscape: '{$image_root_skin}noImage.png' } ,
 		imageOrientation: '{$settings->image_orientation}',
