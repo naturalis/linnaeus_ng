@@ -616,7 +616,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				if ( $remote_check ) 
 				{
-					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] ];
+					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] );
 					$is_empty=empty( @json_decode( @file_get_contents( $full_url, false, $ctx ) ) );
 				}
 			}
@@ -627,7 +627,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ( $this->helpers->CheckUrl->exists() && $remote_check )
 				{
-					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] ];
+					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] );
 					$f=@file_get_contents( $check_url, false, $ctx );
 
 					if ( $this->helpers->CheckUrl->getHeader('content-type')=='application/json' )
