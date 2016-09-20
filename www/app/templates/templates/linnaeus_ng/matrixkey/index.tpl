@@ -163,9 +163,7 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="imageHtmlTpl">
-    <a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title="">
-        <img class="result-image" src="%THUMB-URL%" title="%PHOTO-CREDIT%" />
-    </a>
+	<img class="result-image" src="%THUMB-URL%" title="%PHOTO-CREDIT%" />
 </div>
 
 <div class="inline-templates" id="imageHtmlUrlTpl">
@@ -184,7 +182,6 @@ $(document).ready(function()
 <div class="inline-templates" id="noActionIconHtmlTpl">
 	<div class="result-icon no-content"></div>
 </div>
-
 
 <div class="inline-templates" id="remoteLinkIconHtmlTpl">
 	<div class="result-icon" onClick="doRemoteLink('%LINK%','%SCI-NAME%', '%NAMESCIENTIFIC%', '%NAMECOMMON%');" title="%TITLE%">%REMOTE-LINK-ICON%</div>
@@ -207,7 +204,9 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="speciesStateItemHtmlTpl">
+<!--
 	<li><span class="result-detail-label">%GROUP% %CHARACTER%:</span> <span class="result-detail-value">%STATE%</span></li>
+-->
 </div>
 
 <div class="inline-templates" id="resultHtmlTpl">
@@ -242,7 +241,9 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="buttonMoreHtmlTpl">
+<!--
 	<li id="show-more"><input type="button" id="show-more-button" onclick="printResults();return false;" value="%LABEL%" class="ui-button"></li>
+-->
 </div>
 
 <div class="inline-templates" id="counterExpandHtmlTpl">
@@ -250,19 +251,27 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="pagePrevHtmlTpl">
+<!--
 	<li><a href="#" onclick="browsePage('p');return false;">&lt;</a></li>
+-->
 </div>
 
 <div class="inline-templates" id="pageCurrHtmlTpl">
+<!--
 	<li><strong>%NR%</strong></li>
+-->
 </div>
 
 <div class="inline-templates" id="pageNumberHtmlTpl">
+<!--
 	<li><a href="#" onclick="browsePage(%INDEX%);return false;">%NR%</a></li>
+-->
 </div>
 
 <div class="inline-templates" id="pageNextHtmlTpl">
+<!--
 	<li><a href="#" onclick="browsePage('n');return false;" class="last">&gt;</a></li>
+-->
 </div>
 
 <div class="inline-templates" id="counterPaginateHtmlTpl">
@@ -270,10 +279,13 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="menuOuterHtmlTpl">
+<!--
 	<ul>%MENU%</ul>
+-->
 </div>
 
 <div class="inline-templates" id="menuGroupHtmlTpl">
+<!--
     <li id="character-item-%ID%" class="closed">
     <a href="#" onclick="toggleGroup(%ID%);return false;">
         %LABEL%
@@ -286,36 +298,49 @@ $(document).ready(function()
         %CHARACTERS%
     </ul>
     </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuLoneCharHtmlTpl">
+<!--
     <li class="inner ungrouped last">
         <a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a>
         %SELECTED%
     </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuLoneCharDisabledHtmlTpl">
+<!--
 	<li class="inner ungrouped %CLASS% disabled secretlyclickable" data-id="%ID%" title="%TITLE%">%LABEL%%VALUE%	%SELECTED% </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuLoneCharEmergentDisabledHtmlTpl">
+<!--
 	<li class="inner emergent_disabled %CLASS% secretlyclickable" data-id="%ID%" title="%TITLE%">(%LABEL%%VALUE%) %SELECTED% </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuCharHtmlTpl">
+<!--
     <li class="inner last">
         <a class="facetLink" href="#" onclick="showStates(%ID%);return false;">%LABEL%%VALUE%</a>
         %SELECTED%
     </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuCharDisabledHtmlTpl">
+<!--
 	<li class="inner %CLASS% disabled secretlyclickable" data-id="%ID%" title="%TITLE%">%LABEL%%VALUE%	%SELECTED% </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuCharEmergentDisabledHtmlTpl">
+<!--
 	<li class="inner emergent_disabled %CLASS% secretlyclickable" data-id="%ID%" title="%TITLE%">(%LABEL%%VALUE%) %SELECTED% </li>
+-->
 </div>
 
 <div class="inline-templates" id="menuSelStateHtmlTpl">
@@ -353,6 +378,7 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="infoDialogHtmlTpl">
+<!--
     <div style="text-align:left;width:400px">
     <style>
     p {
@@ -362,6 +388,7 @@ $(document).ready(function()
     %BODY%
     %URL%
     </div>
+-->
 </div>
 
 <div class="inline-templates" id="infoDialogUrlHtmlTpl">
