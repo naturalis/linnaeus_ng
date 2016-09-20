@@ -22,7 +22,13 @@
 .matrix-links a.active-item:hover {
 	text-decoration:none;
 }
-
+{if $settings->use_overview_image == 1}
+#dialogRidge #results-container .result-image {
+	max-width: 241px;
+	max-height: 281px;
+	margin: 0 auto;
+}
+{/if}
 
 </style>
 
@@ -31,7 +37,7 @@
 		{include file="_left_column.tpl"}
 
 	    <div id="content" class="title-type4">
-	    
+
 	        <div id="resultsHeader">
 	            <div>
                 <div class="headerPagination">
@@ -44,7 +50,7 @@
 				<div id="similarSpeciesHeader" class="hidden" style="width:100%"></div>
 				<div id="result-count" class="headerSelectionLabel"></div>
 			</div>
-	        
+
 	        <div id="results">
 	            <div id="results-container"></div>
 	        </div>
@@ -52,16 +58,16 @@
 	        <div id="footerPagination" class="footerPagination">
 	            <ul id="paging-footer" class="list paging"></ul>
 	        </div>
-	        
+
 	    </div>
 
 	</div>
-    
+
 <script type="text/JavaScript">
 $(document).ready(function()
 {
 	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
-	
+
 	__translations = [
 		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },
 		{ key : 'Dit kenmerk is bij de huidige selectie nog niet onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie nog niet onderscheidend.{/t}' },
@@ -114,7 +120,7 @@ $(document).ready(function()
 		alwaysSortByInitial: {if $settings->always_sort_by_initial}{$settings->always_sort_by_initial}{else}0{/if},
 		similarSpeciesShowDistinctDetailsOnly: {if $settings->similar_species_show_distinct_details_only}{$settings->similar_species_show_distinct_details_only}{else}0{/if},
 	});
-	
+
 	//console.dir( matrixsettings );
 
 	setScores($.parseJSON('{$session_scores}'));
@@ -122,7 +128,7 @@ $(document).ready(function()
 	setCharacters($.parseJSON('{$session_characters}'));
 	setMenu($.parseJSON('{$session_menu|@addslashes}'));
 	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
-			
+
 	matrixInit();
 });
 </script>
@@ -258,7 +264,7 @@ $(document).ready(function()
 <div class="inline-templates" id="pageNextHtmlTpl">
 	<li><a href="#" onclick="browsePage('n');return false;" class="last">&gt;</a></li>
 </div>
-    
+
 <div class="inline-templates" id="counterPaginateHtmlTpl">
 	%FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%
 </div>
