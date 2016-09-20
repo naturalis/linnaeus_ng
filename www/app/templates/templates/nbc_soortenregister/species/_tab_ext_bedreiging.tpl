@@ -22,7 +22,7 @@
             {foreach from=$soort.wetten item=v key=wet}
             <li>
                 <b>{$wet}</b>
-                <ul>
+                <ul class="categorie">
                     {foreach from=$v item=w}
                     <li>
                         {$w.categorie}<br />
@@ -51,3 +51,20 @@
 {/if}
 
 </div>
+
+<script>
+$(document).ready(function()
+{
+	var baseUrl='http://minez.nederlandsesoorten.nl/';
+	
+	$( '.categorie > li > a' ).each(function()
+	{
+		var d=$(this).attr('href');
+		if ( d.indexOf('http://')!==0 || d.indexOf('https://')!==0 )
+		{
+			$(this).attr('href', baseUrl+ $(this).attr('href'));
+		}
+		$(this).attr('target','_blank');
+	});
+});
+</script>
