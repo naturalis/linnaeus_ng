@@ -172,7 +172,8 @@ class Controller extends BaseClass
 		'user_agent',
 		'functions',
 		'custom_array_sort',
-		'paginator'
+		'paginator',
+		'current_url'
     );
     public $cssToLoadBase = array(
         'basics.css',
@@ -1744,7 +1745,8 @@ class Controller extends BaseClass
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
         $this->smarty->assign('contact', $this->getContactLink());
 		$this->smarty->assign('server_name', $this->server_name);
-		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
+		$this->smarty->assign('current_url', $this->helpers->CurrentUrl->getParts());
+		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );	
     }
 
     public function loadControllerConfig ($controllerBaseName = null)

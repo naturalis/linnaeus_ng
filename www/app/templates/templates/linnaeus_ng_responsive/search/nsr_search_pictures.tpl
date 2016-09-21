@@ -65,8 +65,8 @@
 </div>
 
 <script type="text/JavaScript">
-$(document).ready(function(){
-	
+$(document).ready(function()
+{
 	$('title').html("{t}Foto's zoeken{/t} - "+$('title').html());
 
 	if(jQuery().prettyPhoto) {
@@ -82,6 +82,5 @@ $(document).ready(function(){
 	bindKeys();
 });
 </script>
-
 
 {include file="../shared/footer.tpl"}

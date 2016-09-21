@@ -124,7 +124,6 @@ function addSearchParameter(id)
 		}
 	}
 
-	
 	search_parameters.push(
 	{ 
 		traitid:traitid,
@@ -318,6 +317,8 @@ function submitSearchParams()
 		form.append('<input type="hidden" name="trait_group" value="'+ trait_group+'" />');
 	}
 
+	form.append('<input type="hidden" name="just_species" value="'+getJustSpeciesToggle()+'" />');
+
 	form.submit();	
 }
 
@@ -339,6 +340,7 @@ function submitSearchParams()
 	      <h2>
 	      	Zoekresultaten
 	      </h2>
+          
 	      <div class="formrow orderList">
 		      <select name="sort" id="sort" class="customSelect" onchange="submitSearchParams();">
 	          <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijke naam{/t}</option>
@@ -346,7 +348,12 @@ function submitSearchParams()
 		      </select>
 	      </div>
       </div>
-      <span id="resultcount-header"></span>
+        <div style="margin-bottom:20px;"><span id="resultcount-header" style="float:left"></span>
+            <a href="#" id="just-species-toggle" style="float:left;padding-left:10px;" onclick="toggleJustSpeciesToggle();submitSearchParams();return false;">
+            {t}alleen soorten tonen{/t}
+            </a>
+        </div>
+
 
       <ul class="searchResult">
 			{foreach from=$results.data item=v}
@@ -369,8 +376,15 @@ function submitSearchParams()
         </li>
 			{/foreach}
 			</ul>
-			{capture A}{t}soort (of onderliggend taxon){/t}{/capture}
-		  {capture B}{t}soorten/taxa{/t}{/capture}
+
+        {if $search.just_species==1}
+        {capture A}{t}soort{/t}{/capture}
+        {capture B}{t}soorten{/t}{/capture}
+        {else}
+        {capture A}{t}soort (of lager taxon){/t}{/capture}
+        {capture B}{t}soorten (en lagere taxa){/t}{/capture}
+        {/if}
+
 			{assign var=pgnEntityNames value=[$smarty.capture.A,$smarty.capture.B]}
 			{assign var=pgnResultCount value=$results.count}
 			{assign var=pgnResultsPerPage value=$results.perpage}
@@ -471,14 +485,15 @@ $(document).ready(function()
 
 	{/if}
 
+	{if $search.just_species}
+	setJustSpeciesToggle({$search.just_species});
+	{/if}
+	
+	$('#just-species-toggle').html(getJustSpeciesToggle()==0 ? '{t}alleen soorten tonen{/t}' : '{t}soorten en lagere taxa tonen{/t}' );
 
 	$('title').html('{t}Uitgebreid zoeken naar soorten{/t} - '+$('title').html());
 
 	bindKeys();
-
-
-	
-	
 
 	$("[id$=group]").keyup(function(e)
 	{ 

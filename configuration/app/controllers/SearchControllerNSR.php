@@ -315,22 +315,26 @@ class SearchControllerNSR extends SearchController
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsGroup($this->rGetAll())));
-        } else
+        }
+		else
         if ($this->rHasVal('action','author_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsAuthor($this->rGetAll())));
-        } else
+        }
+		else
         if ($this->rHasVal('action','photographer_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsPhotographer($this->rGetAll())));
-        } else
+        }
+		else
         if ($this->rHasVal('action','validator_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsValidator($this->rGetAll())));
-        } else
+        } 
+		else
         if ($this->rHasVal('action','name_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
@@ -400,7 +404,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+//			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 

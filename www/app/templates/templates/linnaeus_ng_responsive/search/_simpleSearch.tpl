@@ -32,7 +32,7 @@
 .suggestList li .scientific {
 	font-size:0.82em;
 	color:#777;
-	font-style:italic;
+	/*font-style:italic;*/
 	padding-bottom:2px;
 }
 

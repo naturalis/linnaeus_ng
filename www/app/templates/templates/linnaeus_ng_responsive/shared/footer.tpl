@@ -90,7 +90,6 @@
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
 <div id="hint-box"></div>
 
-
 <script type="text/javascript">
 
   var _gaq = _gaq || [];

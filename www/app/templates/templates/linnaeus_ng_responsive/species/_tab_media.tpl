@@ -1,13 +1,14 @@
 {if $mediaOwn.count>0 && $mediaCollected.species>0}
 
 				<div class="mediaTabs">
+                
 			        <div class="mediaTab {if $requestData.media=='collected' || $requestData.media==''}media-active{else}media-not-active{/if}">
 				        {if $requestData.media=='collected' || $requestData.media==''}
 				        	<span>
 				            	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 			            	</span>
 						{else}
-			            	<a href="?id={$taxon.id}&cat=media&media=collected" class="{$v.className}">
+			            	<a href="?id={$taxon.id}&cat=CTAB_MEDIA&media=collected" class="{$v.className}">
 			                	{t}Soorten/taxa met afbeelding(en){/t} ({$mediaCollected.species})
 							</a>
 						{/if}
@@ -18,7 +19,7 @@
 			            		{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 		            		</span>
 						{else}
-			            	<a href="?id={$taxon.id}&cat=media&media=own" class="{$v.className}">
+			            	<a href="?id={$taxon.id}&cat=CTAB_MEDIA&media=own" class="{$v.className}">
 			                	{t}Afbeeldingen bij soort/taxon{/t} ({$mediaOwn.count})
 							</a>
 						{/if}
@@ -33,9 +34,9 @@
 		{if !($mediaOwn.count>0 && $mediaCollected.species>0)}
 
 		{if $mediaOwn.count>0 && $requestData.media!='collected'}
-        <h2>
-            {t}Totaal aantal foto's:{/t} <span class="total-image-count"></span>
-        </h2>
+        <h4>
+            {t}Totaal aantal afbeeldingen:{/t} <span class="total-image-count"></span>
+        </h4>
         {elseif $mediaCollected.species>0 &&  $requestData.media!='own'}
         <h4>
 			{t}Soorten/taxa met afbeelding(en):{/t} {$mediaCollected.species}
@@ -60,7 +61,7 @@ $(document).ready(function()
 {
 	{if $mediaCollected.species>0 &&  $requestData.media!='own'}
 	var action='get_collected_batch';
-	{elseif $mediaOwn.count>0 && $requestData.media!='collected'}
+	{else}
 	var action='get_media_batch';
 	{/if}
 	var page=0;

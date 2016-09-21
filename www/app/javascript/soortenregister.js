@@ -79,10 +79,11 @@ $(function(){
     }
   });
 
+/*
   $('body').on('change', '.filterPictures input[type=text]', function(){
     $(this).parents('form').submit();
   });
-
+*/
   $('body').on('click', '.filterPictures label', function(){
     $(this).parent().find('.filter').toggle();
     $(this).parent().find('.down').toggle();

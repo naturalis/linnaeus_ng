@@ -720,7 +720,6 @@ final class SearchNSRModel extends AbstractModel
 					on _m.id=_meta6.media_id
 					and _m.project_id=_meta6.project_id
 					and _meta6.sys_label='beeldbankValidator'
-					and _meta6.language_id=".$language_id."
 				" : "" )."					
 
 			where _m.project_id = ".$project_id."
@@ -738,7 +737,7 @@ final class SearchNSRModel extends AbstractModel
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		;
-		
+
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );

@@ -23,7 +23,7 @@
 </p>
 <p>
 	{t}I forgot my password:{/t} <a href="password.php">{t}reset my password{/t}</a>.<br />
-	{t}My password doesn't work, I have forgotten my username or my account may have been compromised: please{/t} <a href="mailto:{$support_email}">{t}contact the helpdesk{/t}</a>.
+	{t}My password doesn't work, I have forgotten my username or my account may have been compromised: please{/t} <a href="mailto:{$support_email}?subject=Recover%20username%20Linnaeus%20NG">{t}contact the helpdesk{/t}</a>.
 </p>
 <p>
 	<a href="{$baseUrl}">{t}Back to{/t} {t}Linnaeus NG root{/t}</a>
