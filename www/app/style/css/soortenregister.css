@@ -2107,3 +2107,31 @@ body {
               transform: translateX(-50%);
       width: auto;
       height: 500px; } }
+
+.link {
+	color:#e3004a;
+}
+
+.literateTable tr td {
+	padding:5px;
+}
+
+#hint-box {
+	border:1px solid #999;
+	background-color:#FFC;
+	font-size:0.7em;
+	width:250px;
+	min-height:100px;
+}
+
+#hint-box b {
+	font-weight:bold;
+}
+
+.no-italics {
+	font-style:normal;
+}
+
+i {
+	font-style:italic;
+}

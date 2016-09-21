@@ -28,7 +28,7 @@
 
 	<div id="content" class="taxon-detail">
 		<div class="whiteBox">
-			<h1 class="main-display-name desktop">{$names.preffered_name} <span class="cursive">{$names.nomen}</span></h1>
+			<h1 class="main-display-name desktop">{$names.preffered_name} <span>{$names.nomen}</span></h1>
 			<!-- h2 class="sideMenuTitle">&nbsp;</h2 -->
 			
 			{include file="_tabs.tpl"}

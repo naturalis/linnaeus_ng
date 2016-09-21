@@ -92,6 +92,7 @@ function printBaseData()
 				.replace('%RECORD-BASIS%',r.specimen.recordBasis)
 				.replace('%KIND_UNIT%',r.specimen.kindOfUnit)
 				.replace(/%IMG-SRC%/g,r.image.imgUrl)
+				.replace(/%THUMB-SRC%/g,r.image.imgUrl.replace('large','medium'))
 				.replace('%REL%','prettyPhoto[gallery]')
 				
 				
@@ -147,11 +148,16 @@ function prettyPhotoInit()
     {/if}
     
     <div class="nba-data" style="display:none">
-    {t}Sorry, no specimen were found.{/t}
+    {t}Geen collectie-exemplaren gevonden in de{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
     </div>
     
     <div id="results" class="nba-data">
     </div>
+
+    <div class="nba-data">
+    {t}Source:{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
+    </div>
+
 
 </p>
 
@@ -161,6 +167,10 @@ $(document).ready(function()
 	baseurl = '{$external_content->full_url|@escape}';
 	$( '#url' ).html( baseurl );
 	getSpecimens();
+//	nbcPrettyPhotoInit();
+	
+	
+	
 });
 </script>
 <p style="display:none"><code id=url></code></p>
@@ -178,11 +188,11 @@ $(document).ready(function()
 -->
 </div>
 
-<div class="inline-templates" id="specimenRowTpl">
+<div class="inline-templates" id="specimenRowTpl--org">
 <!--
-	<div class="result">
-	    <a class="zoomimage" ptitle="%UNIT-ID%" href="%IMG-SRC%" rel="%REL%">
-		<img src="%IMG-SRC%" style="max-width:120px;max-height:70px;" />
+	<div class="thumbContainer">
+	    <a class="fancybox" ptitle="%UNIT-ID%" href="%IMG-SRC%" rel="%REL%">
+		<img class="speciesimage" src="%IMG-SRC%" style="max-width:120px;max-height:70px;" />
         </a>
 		<strong><a href="%PURL%" target="_blank">%UNIT-ID%</a></strong>
 		<br>
@@ -193,3 +203,17 @@ $(document).ready(function()
 -->
 </div>
 
+<div class="inline-templates" id="specimenRowTpl">
+<!--
+<div style="margin-bottom:20px">
+	<div class="thumbContainer">
+		<a class="fancybox" ptitle="<div></div>" href="%IMG-SRC%/%UNIT-ID%.jpg" data-fancybox-group="gallery">
+			<img class="speciesimage" src="%THUMB-SRC%" title="%UNIT-ID%" alt="%UNIT-ID%" style="max-width:400px;max-height:200px;">
+		</a>
+	</div>
+    <b><a href="%PURL%" target="_blank">%UNIT-ID%</a></b><br>
+    %COLLECTION%<br />
+    %RECORD-BASIS%: %KIND_UNIT%
+</div>
+-->
+</div>
