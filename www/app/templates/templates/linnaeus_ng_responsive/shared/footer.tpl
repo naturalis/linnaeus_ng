@@ -19,6 +19,7 @@
                             <li><a href="">Centraal Bureau voor Schimmelcultures</a></li>
                             <li><a href="">Bryologische en Lichenologische Werkgroep - KNNV</a></li>
                             <li><a href="">Nederlandse Mycologische Vereniging</a></li>
+                            <li><a href="http://www.ndff.nl/">Nationale Databank Flora en Fauna</a></li>
                         </ul>
                         <ul class="footerLinks">
                             <li><a href="">Fauna Europaea</a></li>
@@ -65,7 +66,7 @@
                     <div class="colofonContainer">
                         <div class="colofon">
                             </span><a href="http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html" class="blue" title="Disclaimer">Colofon &amp; Disclaimer</a>
-                            <span class="copyright">© Naturalis 2005 - {$currdate.year} <span class="dash">-</span> 
+                            <span class="copyright">© Naturalis 2005 - {$currdate.year}
                         </div>
                     </div>
                 </div>
@@ -88,7 +89,7 @@
 
 <div id="jDialog" title="" class="ui-helper-hidden"></div>
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
-<div id="hint-box"></div>
+<div id="hint-box" style="display:none"></div>
 
 <script type="text/javascript">
 

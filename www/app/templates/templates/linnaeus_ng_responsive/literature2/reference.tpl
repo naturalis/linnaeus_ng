@@ -10,7 +10,7 @@
 	
 	<div id="content" class="literature">
 		<div class="whiteBox">
-			<h2>{$ref.label}</h2>
+			<h2>{t}Literatuurreferentie{/t}</h2>
 
 				<table class="literateTable">
 					{if $ref.publication_type}<tr><td>{t}Type{/t}</td><td>{$ref.publication_type}</td></tr>{/if}

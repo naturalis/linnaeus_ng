@@ -2113,7 +2113,7 @@ body {
 }
 
 .literateTable tr td {
-	padding:5px;
+	padding:5px 5px 5px 0;
 }
 
 #hint-box {
@@ -2135,3 +2135,4 @@ body {
 i {
 	font-style:italic;
 }
+
