@@ -17,8 +17,8 @@
 
 <div id="footer">
 	<div id="footer-container" class="container">
-		<div id="col-logo" style="visibility:hidden"> 
-			<img  src='{$projectUrls.systemMedia}logo_lng.png'>
+		<div id="col-logo" style="visibility:hidden">
+			<!-- <img  src='{$projectUrls.systemMedia}logo_lng.png'> -->
 		</div>
 
 	</div>
@@ -27,12 +27,12 @@
 <div id="bottombar" class="navbar navbar-inverted">
 	<div class="container">
 		<p class="navbar-text navbar-left">
-			<a href="http://linnaeus.naturalis.nl/"> 
+			<a href="http://linnaeus.naturalis.nl/">
 				Linnaeus NG 2.0
 			</a>
 		</p>
 		<p class="navbar-text navbar-right">
-			<a href="http://www.naturalis.nl"> 
+			<a href="http://www.naturalis.nl">
 				Naturalis Biodiversity Center
 			</a>
 		</p>
@@ -40,9 +40,9 @@
 </div>
 
 <script type="text/JavaScript">
-	
+
 function showMedia(url,name)
-{		
+{
 }
 
 $(document).ready(function()
@@ -51,11 +51,11 @@ $(document).ready(function()
 	$(".inline-image").each(function()
 	{
 		$_me = $(this);
-		
+
 		$_me.attr("rel","prettyDialog");
-		
+
 		arr_arguments = $_me.attr("onclick").split("'");
-		
+
 		$_me
 			.attr("href",arr_arguments[1])
 			.attr("title",arr_arguments[3])
@@ -73,7 +73,7 @@ $(document).ready(function()
 	{
 		$("#title a").shrinkText();
 		$("#header-title").shrinkText();
-	
+
 		$( window ).resize(function()
 		{
 			$("#title a").shrinkText();
@@ -90,7 +90,7 @@ $(document).ready(function()
 	{if $searchResultIndexActive}
 	searchResultIndexActive = {$searchResultIndexActive};
 	{/if}
-				
+
 })
 
 </script>

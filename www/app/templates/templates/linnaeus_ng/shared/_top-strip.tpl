@@ -1,8 +1,8 @@
 <div id="top-strip">
     <p>
     	<!-- a href="../../../">{t}projects{/t}</a> | -->
-		<a href="../../../admin/views/users/login.php">{t}login{/t}</a> |
-		<span class="decode">{$contact}</span>
+
+		<span id="login"><a href="../../../admin/views/users/login.php">{t}login{/t}</a></span> | <span class="decode">{$contact}</span>
 
  		{if $languages|@count>1} |
         {foreach $languages v k}
