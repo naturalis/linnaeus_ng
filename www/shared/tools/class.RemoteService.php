@@ -77,8 +77,13 @@
 
 		private function fetchRemoteData()
 		{
+			$ctx=stream_context_create(array('http' => array('header'=>'Connection: close\r\n',  'ignore_errors' => true)));
+			$this->setData( file_get_contents( $this->getUrl(), false, $ctx ) );
+			$this->setHeaders( $http_response_header );
+			/*
 			$this->setData( file_get_contents( $this->getUrl() ) );
 			$this->setHeaders( $http_response_header );
+			*/
 		}
 
 		private function setHeaders( $headers )

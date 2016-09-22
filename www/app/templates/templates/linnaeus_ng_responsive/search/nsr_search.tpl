@@ -3,6 +3,7 @@
 <div id="dialogRidge">
 	
 	<div id="left">
+	{include file="../search/_simpleSearch.tpl"}		
 	{include file="_toolbox.tpl"}
 	</div>
     

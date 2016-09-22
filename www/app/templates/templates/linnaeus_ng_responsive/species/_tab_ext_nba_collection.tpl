@@ -35,6 +35,15 @@ function getSpecimens()
 			basedata=data;
 			processBaseData();
 			printBaseData();
+		},
+		complete : function( jqXHR, textStatus )
+		{
+			//"success", "notmodified", "nocontent", "error", "timeout", "abort", "parsererror"
+			if( textStatus != "success" && results.length==0 )
+			{
+				$( '#results' ).html( fetchTemplate( 'errorOccurredTpl' ).replace( '%STATUS%', textStatus ) );
+				$( '.nba-source' ).toggle( false );
+			}
 		}
 	});
 }
@@ -154,7 +163,7 @@ function prettyPhotoInit()
     <div id="results" class="nba-data">
     </div>
 
-    <div class="nba-data">
+    <div class="nba-data nba-source">
     {t}Source:{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
     </div>
 
@@ -184,22 +193,7 @@ $(document).ready(function()
 
 <div class="inline-templates" id="urlHeaderTpl">
 <!--
-	<p><a href="%URL%" target=_blank>see all</a></p>
--->
-</div>
-
-<div class="inline-templates" id="specimenRowTpl--org">
-<!--
-	<div class="thumbContainer">
-	    <a class="fancybox" ptitle="%UNIT-ID%" href="%IMG-SRC%" rel="%REL%">
-		<img class="speciesimage" src="%IMG-SRC%" style="max-width:120px;max-height:70px;" />
-        </a>
-		<strong><a href="%PURL%" target="_blank">%UNIT-ID%</a></strong>
-		<br>
-		%COLLECTION%
-		<br>
-		%RECORD-BASIS%: %KIND_UNIT%
-	</div>
+	<p><a href="%URL%" target=_blank>{t}see all{/t}</a></p>
 -->
 </div>
 
@@ -215,5 +209,11 @@ $(document).ready(function()
     %COLLECTION%<br />
     %RECORD-BASIS%: %KIND_UNIT%
 </div>
+-->
+</div>
+
+<div class="inline-templates" id="errorOccurredTpl">
+<!--
+	An error occurred (%STATUS%). <a href="" target=_top>{t}Reload page{/t}</a>.
 -->
 </div>

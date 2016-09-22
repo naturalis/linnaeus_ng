@@ -305,6 +305,16 @@ class SpeciesControllerNSR extends SpeciesController
 			$taxon=$this->getTaxonById($name['taxon_id']);
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id']) );
 
+			if ( $this->show_nsr_specific_stuff )
+			{
+				$overview = $this->getTaxonOverviewImageNsr($taxon['id']);
+			}
+			else
+			{
+				$overview = $this->getTaxonOverviewImage();
+			}
+
+			$this->smarty->assign('overviewImage', $overview);
 			$this->smarty->assign('name',$name);
 			$this->smarty->assign('taxon',$taxon);
 

@@ -384,7 +384,7 @@ class SearchControllerNSR extends SearchController
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
-		
+
 		$data=$d['data'];
 		$count=$d['count'];
 
@@ -404,7 +404,7 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-//			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -822,7 +822,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName( $p )
 	{
-		return $this->models->SearchNSRModel->getSuggestionsName(array(
+		$data=$this->models->SearchNSRModel->getSuggestionsName(array(
 			"search"=>$p['search'],
 			"order"=>isset($p['order']) ? $p['order'] : null,
 			"project_id"=>$this->getCurrentProjectId(),
@@ -830,6 +830,15 @@ class SearchControllerNSR extends SearchController
 			"language_id"=>$this->getCurrentLanguageId(),
 			"restrict_language"=>false
 		));
+
+		foreach((array)$data as $key=>$val)
+		{
+			$data[$key]['label']=$this->addHybridMarkerAndInfixes(array('name'=> $val['label'],'base_rank_id'=>$val['base_rank_id']));
+			$data[$key]['scientific_name']=$this->addHybridMarkerAndInfixes(array('name'=> $val['scientific_name'],'base_rank_id'=>$val['base_rank_id']));
+			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes(array('name'=> $val['nomen'],'base_rank_id'=>$val['base_rank_id']));
+		}
+		
+		return $data;
 	}
 
 	private function reconstructQueryString( $p )

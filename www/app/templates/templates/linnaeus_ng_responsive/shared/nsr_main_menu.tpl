@@ -21,7 +21,6 @@
 			<li><a href="{$server}/node/17">Wie is wie?</a></li>
 			<li><a href="{$server}/content/citering">Citering</a></li>
 			<li><a href="{$server}/content/gebruiksvoorwaarden-fotos">Gebruiksvoorwaarden foto's</a></li>
-			<li><a href="{$server}/node/48">Natuurwidget</a></li>
 		</ol>
 	</li>
 	<li>
@@ -40,7 +39,19 @@
 			<li><a href="{$server}/content/exotenpaspoort">Exotenpaspoort</a></li>
 		</ol>
 	</li>
-	<li><a href="{$server}/node/27">Determineren</a></li>
+	<li>
+		<a href="{$server}/node/27">Determineren</a>
+		<i class="ion-plus-round plus"></i>
+		<i class="ion-minus-round min"></i>
+		<ol>
+            <li><a href="{$server}/content/dieren-en-rond-huis">Dieren in en rond huis</a></li>
+            <li><a href="{$server}/content/soortzoekers">Soortzoekers</a></li>
+            <li><a href="{$server}/content/tabellen-en-floras">Tabellen en flora's</a></li>
+            <li><a href="{$server}/content/zoekkaarten">Zoekkaarten</a></li>
+		</ol>
+	</li>
+
+
 	<li>
 		<a href="{$server}/search/nsr_search.php">Zoeken</a>
 		<i class="ion-plus-round plus"></i>

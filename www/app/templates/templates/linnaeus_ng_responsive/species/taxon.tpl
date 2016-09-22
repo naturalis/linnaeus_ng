@@ -1,7 +1,5 @@
 {include file="../shared/header.tpl"}
 
-
-
 <div id="taxonHeader">
 
 	<div id="headerImage">

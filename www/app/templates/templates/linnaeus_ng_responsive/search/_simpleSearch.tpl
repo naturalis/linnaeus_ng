@@ -26,8 +26,8 @@
 	background-color:#eee;
 }
 
-.suggestList li:hover {
-	background-color:#e9ffff;
+.suggestList li:hover > div {
+	color:#e3004a;
 }
 .suggestList li .scientific {
 	font-size:0.82em;

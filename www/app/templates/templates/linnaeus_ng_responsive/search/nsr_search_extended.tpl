@@ -348,7 +348,7 @@ function submitSearchParams()
 		      </select>
 	      </div>
       </div>
-        <div style="margin-bottom:20px;"><span id="resultcount-header" style="float:left"></span>
+        <div style="margin-bottom:40px;"><span id="resultcount-header" style="float:left"></span>
             <a href="#" id="just-species-toggle" style="float:left;padding-left:10px;" onclick="toggleJustSpeciesToggle();submitSearchParams();return false;">
             {t}alleen soorten tonen{/t}
             </a>
