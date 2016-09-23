@@ -1695,9 +1695,6 @@ class Controller extends BaseClass
 		{
             $this->smarty->assign('cronNextRun', $this->cronNextRun);
 		}
-
-		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
-
     }
 
 
