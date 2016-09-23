@@ -539,7 +539,6 @@ class SpeciesControllerNSR extends SpeciesController
 					{
 						$check_url=str_replace( $key, $sval, $check_url );
 					}
-
 				}
 				else
 				{
@@ -898,6 +897,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
+					$nomen_no_formatting=trim($nomen);
 					$nomen='<i>'.$this->addHybridMarkerAndInfixes( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</i>';
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
@@ -972,6 +972,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'scientific_name'=>$scientific_name,
 				'nomen'=>$nomen,
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
+				'nomen_no_formatting'=>$nomen_no_formatting,
 				'preffered_name'=>$preferredname,
 				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( array('base_rank_id'=>$base_rank_id) ),
 				'list'=>$names,

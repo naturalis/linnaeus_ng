@@ -10,7 +10,7 @@
     embed parametrized URL only (no content, better performance)
     
     and as template:
-    _nba_collection.tpl
+    _tab_ext_nba_collection.tpl
     (this file)
 
 *}
@@ -20,11 +20,12 @@ var baseurl;
 var basedata={};
 var results=[];
 var maxresults=5;
+var totresults;
 
 function getSpecimens()
 {
 	$.ajax({
-		url : "/linnaeus_ng/shared/tools/remote_service.php",
+		url : "../../../shared/tools/remote_service.php",
 		type: "POST",
 		data: ({
 			url : encodeURIComponent(baseurl),
@@ -43,6 +44,7 @@ function getSpecimens()
 			{
 				$( '#results' ).html( fetchTemplate( 'errorOccurredTpl' ).replace( '%STATUS%', textStatus ) );
 				$( '.nba-source' ).toggle( false );
+				//console.log( baseurl );
 			}
 		}
 	});
@@ -50,8 +52,9 @@ function getSpecimens()
 
 function processBaseData()
 {
-	
 	if (!basedata.searchResults) return;
+	
+	totresults=basedata.totalSize;
 	
 	for(var i=0; i<basedata.searchResults.length; i++)
 	{
@@ -77,7 +80,6 @@ function processBaseData()
 
 function printBaseData()
 {
-
 	var rowTpl = fetchTemplate( 'specimenRowTpl' ); 
 	
 	if (results.length==0)
@@ -103,8 +105,6 @@ function printBaseData()
 				.replace(/%IMG-SRC%/g,r.image.imgUrl)
 				.replace(/%THUMB-SRC%/g,r.image.imgUrl.replace('large','medium'))
 				.replace('%REL%','prettyPhoto[gallery]')
-				
-				
 		);
 	}
 
@@ -114,43 +114,31 @@ function printBaseData()
 	{
 		header=fetchTemplate( 'resultHeaderTpl' )
 			.replace('%SHOWING%', maxresults)
-			.replace('%TOTAL%', results.length)
+			.replace('%TOTAL%', totresults);
 	}
-
-		header=fetchTemplate( 'resultHeaderTpl' )
-			.replace('%SHOWING%', maxresults)
-			.replace('%TOTAL%', results.length)
-	
-	urlHeaderTpl
-	
-	$('#results').html( header + buffer.join( "\n" ) );
-	
-	prettyPhotoInit();
-	
-}
-
-function prettyPhotoInit()
-{
-	if(jQuery().prettyPhoto)
+	else
 	{
-		$("a[rel^='prettyPhoto']").prettyPhoto({
-			allow_resize:true,
-			animation_speed:50,
-			opacity: 0.70, 
-			show_title: false,
-			overlay_gallery: false,
-			social_tools: false
-		});
+		header=fetchTemplate( 'resultHeaderMinTpl' )
+			.replace('%SHOWING%', maxresults);
 	}
+
+	header=header+fetchTemplate( 'remarkTpl' );
+
+	$('#results').html( buffer.join( "\n" ) );
+	$('#result-header').html( header );
+
 }
 
+$(document).ready(function()
+{
+	baseurl = '{$external_content->full_url|@escape}';
+	getSpecimens();
+});
 
 </script>
 
 <p>
-
     <h2 id="name-header">{$requested_category.title}</h2>
-    <p style="display:none"><code id=url></code></p>
 
     {if $content}
     <p>{$content}</p>
@@ -160,40 +148,30 @@ function prettyPhotoInit()
     {t}Geen collectie-exemplaren gevonden in de{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
     </div>
     
+    <div id="result-header" style="margin-bottom:10px;">
+    </div>
     <div id="results" class="nba-data">
     </div>
 
-    <div class="nba-data nba-source">
-    {t}Source:{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
-    </div>
-
-
 </p>
 
-<script>
-$(document).ready(function()
-{
-	baseurl = '{$external_content->full_url|@escape}';
-	$( '#url' ).html( baseurl );
-	getSpecimens();
-//	nbcPrettyPhotoInit();
-	
-	
-	
-});
-</script>
-<p style="display:none"><code id=url></code></p>
-
+<!-- templates -->
 
 <div class="inline-templates" id="resultHeaderTpl">
 <!--
-	<p><b>{t}Showing %SHOWING% of %TOTAL% specimen{/t}</b></p>
+	<span style="font-weight:bold">{t}%SHOWING% van %TOTAL% collectieobjecten met afbeelding{/t}</span> <a href="#" onclick="$('#theForm').submit();return false;">{t}(bekijk alle resultaten){/t}</a><br />
 -->
 </div>
 
-<div class="inline-templates" id="urlHeaderTpl">
+<div class="inline-templates" id="resultHeaderMinTpl">
 <!--
-	<p><a href="%URL%" target=_blank>{t}see all{/t}</a></p>
+	<span style="font-weight:bold">{t}%SHOWING% collectieobjecten met afbeelding{/t}</span> <a href="#" onclick="$('#theForm').submit();return false;">{t}(bekijk alle resultaten){/t}</a><br />
+-->
+</div>
+
+<div class="inline-templates" id="remarkTpl">
+<!--
+    <span style="display:inline-block;margin-top:3px;font-size:0.9em">NB. Dit betreft een willekeurige selectie van gedigitaliseerde objecten uit Naturalis Biodiversity Center met herkomst Nederland. Deze selectie geeft niet per se een compleet beeld.</div>
 -->
 </div>
 
@@ -214,6 +192,18 @@ $(document).ready(function()
 
 <div class="inline-templates" id="errorOccurredTpl">
 <!--
-	An error occurred (%STATUS%). <a href="" target=_top>{t}Reload page{/t}</a>.
+	{t}An error occurred (%STATUS%).{/t} <a href="" onclick="$(this).html('{t}Reloading...{/t}');return true;" target=_top>{t}Reload page{/t}</a>.
 -->
 </div>
+
+<form id="theForm" method="post" target="_blank" action="http://bioportal.naturalis.nl/nba/result">
+<input type="hidden" name="form_id" value="ndabio_advanced_taxonomysearch" />
+<!-- input type="hidden" name="term" value="{$names.nomen_no_formatting}" / -->
+{foreach $names.list v}
+{if $v.nametype && $v.nametype=='isValidNameOf'}
+<input type="hidden" name="m_andOr" value="1" />
+<input type="hidden" name="m_genusOrMonomial" value="{$v.uninomial}" />
+<input type="hidden" name="m_specificEpithet" value="{$v.specific_epithet}" />
+{/if}
+{/foreach}
+</form>

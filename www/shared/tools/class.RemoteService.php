@@ -21,6 +21,7 @@
 		*/
 		
 		private $url;
+		private $timeout=10;
 		private $data;
 		private $headers;
 		
@@ -32,6 +33,17 @@
 		public function getUrl()
 		{
 			return $this->url;
+		}
+
+		public function setTimeout( $timeout )
+		{
+			if ( !is_null($timeout) && is_numeric($timeout) )
+				$this->timeout=$timeout;
+		}
+
+		public function getTimeout()
+		{
+			return $this->timeout;
 		}
 
 		public function setData( $data )
@@ -77,10 +89,17 @@
 
 		private function fetchRemoteData()
 		{
-			$ctx=stream_context_create(array('http' => array('header'=>'Connection: close\r\n',  'ignore_errors' => true)));
-			$this->setData( file_get_contents( $this->getUrl(), false, $ctx ) );
+			$this->setData(
+				file_get_contents(
+					$this->getUrl(), 
+					false, 
+					stream_context_create( [ "http" => [ "header"=>"Connection: close\r\n",  "ignore_errors" => true, "timeout" => $this->getTimeout() ] ] )
+				)
+			);
+
 			$this->setHeaders( $http_response_header );
 			/*
+			getTimeout
 			$this->setData( file_get_contents( $this->getUrl() ) );
 			$this->setHeaders( $http_response_header );
 			*/

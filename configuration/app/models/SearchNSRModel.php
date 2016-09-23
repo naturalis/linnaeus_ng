@@ -978,12 +978,19 @@ final class SearchNSRModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
 		$restrict_language = isset($params['restrict_language']) ? $params['restrict_language'] : true;
-		$order = isset($params['order']) ? $params['order'] : "ifnull(_c.name,_d.taxon)";
+		$order = isset($params['order']) ? $params['order'] : null;
 		$lower_only = isset($params['lower_only']) ? $params['lower_only'] : false;
 		$match = isset($params['match']) ? $params['match'] : "like";
 		
 		if ( is_null($search) || is_null($limit) || is_null($project_id) || is_null($language_id) )
 			return;
+
+		if ( is_null($order) )
+		{
+			//$order="ifnull(_c.name,_d.taxon)";
+			$order="match_percentage desc, _d.taxon asc, _f.rank_id asc ";
+		}
+
 
 		$clause=null;
 
@@ -1009,7 +1016,71 @@ final class SearchNSRModel extends AbstractModel
 				_d.taxon as scientific_name,
 				_c.name as common_name,
 				trim(replace(_sci.name,_sci.authorship,'')) as nomen,
-				_r.id as base_rank_id
+				_r.id as base_rank_id,
+	
+				case
+					when
+						_a.name REGEXP '^".$this->escapeString($search)."$' = 1
+						or
+						trim(concat(
+							if(_a.uninomial is null,'',concat(_a.uninomial,' ')),
+							if(_a.specific_epithet is null,'',concat(_a.specific_epithet,' ')),
+							if(_a.infra_specific_epithet is null,'',concat(_a.infra_specific_epithet,' '))
+						)) REGEXP '^".$this->escapeString($search)."$' = 1
+					then 100
+					when
+						_a.name REGEXP '^".$search."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 95
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 90
+					when
+						_a.name REGEXP '^".$this->escapeString($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 85
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 80
+					when 
+						_a.name REGEXP '^(.*)".$this->escapeString($search)."(.*)$' = 1 
+						and
+						_f.rank_id >= ".SPECIES_RANK_ID."
+					then 75
+					when
+						_a.name REGEXP '^".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 70
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 65
+					when
+						_a.name REGEXP '^".$this->escapeString($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 60
+					when
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 55
+					when 
+						_a.name REGEXP '^(.*)".$this->escapeString($search)."(.*)$' = 1 
+						and
+						_f.rank_id < ".SPECIES_RANK_ID."
+					then 50
+
+					else 10
+				end as match_percentage
 
 			from %PRE%names _a
 			

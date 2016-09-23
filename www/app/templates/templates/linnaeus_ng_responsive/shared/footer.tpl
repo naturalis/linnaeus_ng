@@ -91,8 +91,10 @@
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
 <div id="hint-box" style="display:none"></div>
 
-<script type="text/javascript">
+{if $googleAnalyticsCode}{include file="../shared/_google_analytics_code.tpl"}{/if}
 
+<script type="text/javascript">
+/*
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-21555206-1']);
   _gaq.push(['_setDomainName', 'nederlandsesoorten.nl']);
@@ -103,7 +105,7 @@
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-
+*/
 
 $(document).ready(function()
 {
