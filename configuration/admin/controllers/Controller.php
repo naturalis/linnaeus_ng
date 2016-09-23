@@ -137,7 +137,6 @@ class Controller extends BaseClass
 		$this->setAdminMessageFadeOutDelay();
         $this->setGitVars();
         $this->setCronNextRun();
-		$this->setGoogleAnalyticsCode();
     }
 
     /**
