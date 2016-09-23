@@ -18,7 +18,7 @@ table tr td.setting-name  {
 	cursor:pointer;
 }
 table tr td.setting-value {
-	width:350px;
+	width:300px;
 }
 table tr td.setting-info {
 	width:400px;
@@ -31,7 +31,7 @@ table tr td.setting-delete {
 	width:75px;
 }
 input[type=text] {
-	width:350px;
+	width:300px;
 }
 tr.empty-value {
 	color:#999;
