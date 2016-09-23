@@ -70,7 +70,7 @@ tr.info-line {
                 {
 	            	$('#value-{$v.id}').val( '{$v.default_value|@addslashes}' );
     	            return false;
-				}">use default</a>
+				}">use suggested value</a>
             {else}
             <span style="color:#999">(no default)</span>
             {/if}
@@ -97,7 +97,7 @@ tr.info-line {
 {/if}
 </table>
 <p>
-	<a href="#" onclick="$('.add-default').trigger('click');return false;">add all defaults</a> (doesn't overwrite non-empty values)
+	<a href="#" onclick="$('.add-default').trigger('click');return false;">add all suggested values</a> (doesn't overwrite non-empty values)
 </p>
 <p>
 	<input type="submit" value="save" />
