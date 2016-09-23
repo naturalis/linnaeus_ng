@@ -24,6 +24,9 @@ table tr td.setting-info {
 	width:400px;
 	color:#666;
 }
+table tr td.setting-suggest {
+	width:175px;
+}
 table tr td.setting-delete {
 	width:100px;
 }
@@ -50,7 +53,7 @@ tr.info-line {
 	<tr class="tr-highlight">
     	<th class="setting-name">setting</th>
     	<th class="setting-value">value</th>
-    	<th class="setting-delete"></th>
+    	<th class="setting-suggest"></th>
     	<th class="setting-delete"></th>
 	</tr>
 {foreach $settings v}
@@ -63,7 +66,7 @@ tr.info-line {
     	<td class="setting-value">
         	<input type="text"  name="value[{$v.id}]" id="value-{$v.id}" value="{$value|@escape}" />
         </td>
-    	<td class="setting-delete" title="{$v.default_value|@escape}">
+    	<td class="setting-suggest" title="{$v.default_value|@escape}">
         	{if $v.default_value!=""}
         	<a href="#" class="add-default" onclick="
             	if ($('#value-{$v.id}').val().length==0)
