@@ -18,20 +18,20 @@ table tr td.setting-name  {
 	cursor:pointer;
 }
 table tr td.setting-value {
-	width:200px;
+	width:350px;
 }
 table tr td.setting-info {
 	width:400px;
 	color:#666;
 }
 table tr td.setting-suggest {
-	width:175px;
+	width:150px;
 }
 table tr td.setting-delete {
-	width:100px;
+	width:75px;
 }
 input[type=text] {
-	width:200px;
+	width:350px;
 }
 tr.empty-value {
 	color:#999;
