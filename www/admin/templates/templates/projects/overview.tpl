@@ -65,7 +65,7 @@ ul.management li {
         <li><a href="../projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
         <li><a href="../projects/delete.php">{t}Delete a project{/t}</a></li>
         <li><a href="../projects/change_id.php">{t}Change a project ID{/t}</a></li>
-        {if $cronNextRun}
+        {if $cronNextRun} {* strange IF-logic... not sure why this is here *}
 	        <li style="color:#999;">{t}Export multi-entry key for Linnaeus Mobile{/t} (disabled)</li>
 	        <li style="color:#999;">{t}Complete export for Linnaeus Mobile{/t} (disabled)</li>
         {else}
