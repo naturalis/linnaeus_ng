@@ -1737,6 +1737,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
         -ms-transform: translateY(-50%);
             transform: translateY(-50%);
     z-index: -1; }
+/*	
     @media screen and (max-width: 994px) {
       #taxonImage img {
         min-height: 100%;
@@ -1746,6 +1747,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
             -ms-transform: translate(-50%, -50%);
                 transform: translate(-50%, -50%);
         min-width: 100%; } }
+*/
     @media screen and (max-width: 500px) {
       #taxonImage img {
         width: 100%; } }
