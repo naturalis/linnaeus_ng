@@ -24,9 +24,7 @@ $(document).ready(function()
 })
 </script>
 
-{snippet}{"google_analytics-`$smarty.server.SERVER_NAME`.html"}{/snippet}
-
-{* include file="../shared/_lng_productie_google_analytics.tpl" *}
+{if $googleAnalyticsCode}{include file="../shared/_google_analytics_code.tpl"}{/if}
 
 </div>
 </body>
