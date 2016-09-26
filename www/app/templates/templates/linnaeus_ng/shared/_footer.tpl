@@ -97,7 +97,7 @@ $(document).ready(function()
 
 {snippet}google_analytics.html{/snippet}
 
-{include file="../shared/_lng_productie_google_analytics.tpl"}
+{* include file="../shared/_lng_productie_google_analytics.tpl" *}
 
 </body>
 </html>
