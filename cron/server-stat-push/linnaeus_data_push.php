@@ -22,7 +22,7 @@
             $this->getGitInfo();
             $this->getServerInfo();
 
-die(print_r($this->server));
+die('ip: '.$this->server->ec2_public_ipv4);
         }
 
 		public function run () {
