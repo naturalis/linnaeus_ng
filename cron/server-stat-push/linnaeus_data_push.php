@@ -80,9 +80,9 @@
             exec('facter --json', $server) or
                 die("Cannot retrieve server info\n");
 
-		    die(print_r($server));
-
             $this->server = json_decode(implode("\n", $server), true);
+
+            die(print_r($this->server));
 
 
 		}
