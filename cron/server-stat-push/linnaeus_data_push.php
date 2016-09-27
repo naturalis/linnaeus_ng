@@ -119,7 +119,7 @@ die(print_r($this->server));
                 $this->data[$i]['code_up_to_date'] =
                     ($this->data[$i]['git_hash'] == $this->data[$i]['git_latest_hash']) ? 'yes' : 'no';
                 $this->data[$i]['server_ip'] = $this->setServerIp();
-                $this->data[$i]['server_name'] = $this->server->hostname;
+                $this->data[$i]['server_name'] = $this->setServerName();
                 $this->data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
 		}
