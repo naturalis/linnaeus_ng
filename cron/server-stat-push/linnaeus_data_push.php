@@ -21,8 +21,6 @@
             $this->connectDb();
             $this->getGitInfo();
             $this->getServerInfo();
-
-die('ip: '.$this->server->ec2_public_ipv4);
         }
 
 		public function run () {
