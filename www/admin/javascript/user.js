@@ -25,7 +25,7 @@ function setPermissions()
 	$('[name^=custom_read]').prop('checked',true);
 	$('[name^=module_write]').prop('checked',false);
 	$('[name^=custom_write]').prop('checked',false);
-	
+
 	if ($('#roles :selected').val()==roleID_sysAdmin)
 	{
 		$('[name=can_publish][value=1]').prop('checked',true);
@@ -36,6 +36,8 @@ function setPermissions()
 	if ($('#roles :selected').val()==roleID_leadExpert)
 	{
 		$('[name=can_publish][value=1]').prop('checked',true);
+		$('[name^=module_write]').prop('checked',true);
+		$('[name^=custom_write]').prop('checked',true);
 	}
 }
 
