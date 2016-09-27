@@ -137,7 +137,10 @@
 
 		private function setServerIp ()
 		{
-            die(print_r($this->server));
+             if (isset($this->server->ec2_public_ipv4)) {
+                 die('yes');
+             }
+             die('no');
 
             // Test server; production does not have public address
             if (isset($this->server->ec2_public_ipv4)) {
