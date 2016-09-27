@@ -115,14 +115,13 @@
 
 		private function getServerAddress ()
 		{
-            if (array_key_exists('SERVER_ADDR', $_SERVER)) {
-                return $_SERVER['SERVER_ADDR'];
-            } else if (array_key_exists('LOCAL_ADDR', $_SERVER)) {
-                return $_SERVER['LOCAL_ADDR'];
-            } else if (array_key_exists('SERVER_NAME', $_SERVER)) {
-                return gethostbyname($_SERVER['SERVER_NAME']);
-            }
-            return null;
+           // Targeted specifically at Naturalis servers...
+           // Test has ip address as SERVER_NAME
+           if (filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP)) {
+               return $_SERVER['SERVER_NAME'];
+           }
+		   // Production has floating ip in SERVER_ADDR
+           return $_SERVER['SERVER_ADDR'];
 		}
 
 		private function getServerName ()
