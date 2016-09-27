@@ -21,6 +21,8 @@
             $this->connectDb();
             $this->getGitInfo();
             $this->getServerInfo();
+
+die(print_r($this->server));
         }
 
 		public function run () {
@@ -167,7 +169,6 @@
 		    if (isset($message) && $this->showPushedData) {
                 echo $message . "\n\nData pushed:";
                 die(print_r($this->data));
-
 		    }
 		    die($message . "\n");
 		}
