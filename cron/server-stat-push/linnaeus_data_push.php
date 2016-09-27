@@ -164,7 +164,7 @@
                 $message = 'Could not connect to ' . $this->pushUrl . '!';
 		    }
 
-		    if (isset($message) && $this->showDataPushed) {
+		    if (isset($message) && $this->showPushedData) {
                 echo $message . "\n\nData pushed:";
                 die(print($this->data));
 
