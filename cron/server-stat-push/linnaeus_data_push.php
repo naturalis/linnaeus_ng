@@ -159,12 +159,17 @@
 		    if (isset($this->pushResult->result)) {
 		        $message = $this->pushResult->result;
 		    } else if (!empty($this->pushResult)) {
-                $message = is_array($this->pushResult) ?
-                    json_encode($this->pushResult) : $this->pushResult;
+                $message = is_array($this->pushResult) ? json_encode($this->pushResult) : $this->pushResult;
 		    } else {
                 $message = 'Could not connect to ' . $this->pushUrl . '!';
 		    }
-		    die($message . print_r($this->data) . "\n");
+
+		    if (isset($message) && $this->showDataPushed) {
+                echo $message . "\n\nData pushed:";
+                die(print($this->data));
+
+		    }
+		    die($message . "\n");
 		}
 
         private function getProjectsWithUsers ()
