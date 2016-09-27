@@ -20,7 +20,7 @@
             $this->connectDb();
             $this->getGitInfo();
             $this->getServerInfo();
-die($this->server);
+die(print_r($this->server));
         }
 
 		public function run () {
