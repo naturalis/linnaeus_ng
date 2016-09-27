@@ -123,7 +123,8 @@
                     ($this->data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
                 $this->data[$i]['code_up_to_date'] =
                     ($this->data[$i]['git_hash'] == $this->data[$i]['git_latest_hash']) ? 'yes' : 'no';
-                $this->data[$i]['server_ip'] = $this->setServerIp();
+                //$this->data[$i]['server_ip'] = $this->setServerIp();
+                $this->data[$i]['server_ip'] = $this->server->ec2_public_ipv4;
                 $this->data[$i]['server_name'] = $this->setServerName();
                 $this->data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
