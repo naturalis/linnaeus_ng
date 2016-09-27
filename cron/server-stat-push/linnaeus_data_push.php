@@ -14,6 +14,7 @@
         private $gitHash;
         private $gitLatestHash;
         private $server;
+        private $showPushedData = false;
 
         public function __construct () {
             $this->getConfig();
@@ -38,6 +39,11 @@
     	public function setTimeout ($timeout)
 		{
             $this->timeout = $timeout;
+		}
+
+		public function showPushedData ()
+		{
+            $this->showPushedData = true;
 		}
 
 		private function bootstrap ()
@@ -158,7 +164,7 @@
 		    } else {
                 $message = 'Could not connect to ' . $this->pushUrl . '!';
 		    }
-		    die($message . "\n");
+		    die($message . print_r($this->data) . "\n");
 		}
 
         private function getProjectsWithUsers ()
@@ -213,4 +219,5 @@
 
     $ldp = new LinnaeusDataPush();
     $ldp->setPushUrl('http://linnaeus.naturalis.nl/admin/server_csv.php');
+    $ldp->showPushedData();
     $ldp->run();
