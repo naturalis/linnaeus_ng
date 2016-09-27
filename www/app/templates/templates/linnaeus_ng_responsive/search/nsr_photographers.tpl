@@ -1,5 +1,17 @@
 {include file="../shared/header.tpl"}
 {include file="../shared/flexslider.tpl"}
+
+<style>
+table.photographersList tr td:nth-child(2)
+{
+	text-align:right;
+}
+table.photographersList tr:nth-child(1) td
+{
+	font-weight:bold;
+}
+</style>
+
 <div id="dialogRidge">
 
 	<div id="left">
@@ -15,19 +27,21 @@
 	<div id="content">
 		<div class="whiteBox">
 			<h2>{t}Overzicht fotografen{/t}</h2>
-			<h4>{t}Fotograaf (foto’s/soorten){/t}</h4>
+			
 			<table class="photographersList">
-			{foreach from=$photographers item=v}
+				<tr>
+					<td>{t}Fotograaf{/t}</td>
+					<td>{t}foto’s / soorten{/t}</td>
+				</tr>
+			{foreach $photographers v}
 				<tr>
 					<td><a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer}</a></td>
-					<td>({$v.total} / {$v.taxon_count})</td>
+					<td>{$v.total} / {$v.taxon_count}</td>
 				</tr>
 			{/foreach}
 			</table>
 		</div>
-
 	</div>
-
 
 </div>
 

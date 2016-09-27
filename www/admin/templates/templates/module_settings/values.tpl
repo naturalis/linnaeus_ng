@@ -18,17 +18,20 @@ table tr td.setting-name  {
 	cursor:pointer;
 }
 table tr td.setting-value {
-	width:200px;
+	width:300px;
 }
 table tr td.setting-info {
 	width:400px;
 	color:#666;
 }
+table tr td.setting-suggest {
+	width:150px;
+}
 table tr td.setting-delete {
-	width:100px;
+	width:75px;
 }
 input[type=text] {
-	width:200px;
+	width:300px;
 }
 tr.empty-value {
 	color:#999;
@@ -50,7 +53,7 @@ tr.info-line {
 	<tr class="tr-highlight">
     	<th class="setting-name">setting</th>
     	<th class="setting-value">value</th>
-    	<th class="setting-delete"></th>
+    	<th class="setting-suggest"></th>
     	<th class="setting-delete"></th>
 	</tr>
 {foreach $settings v}
@@ -63,14 +66,14 @@ tr.info-line {
     	<td class="setting-value">
         	<input type="text"  name="value[{$v.id}]" id="value-{$v.id}" value="{$value|@escape}" />
         </td>
-    	<td class="setting-delete" title="{$v.default_value|@escape}">
+    	<td class="setting-suggest" title="{$v.default_value|@escape}">
         	{if $v.default_value!=""}
         	<a href="#" class="add-default" onclick="
             	if ($('#value-{$v.id}').val().length==0)
                 {
 	            	$('#value-{$v.id}').val( '{$v.default_value|@addslashes}' );
     	            return false;
-				}">use default</a>
+				}">use suggested value</a>
             {else}
             <span style="color:#999">(no default)</span>
             {/if}
@@ -97,7 +100,7 @@ tr.info-line {
 {/if}
 </table>
 <p>
-	<a href="#" onclick="$('.add-default').trigger('click');return false;">add all defaults</a> (doesn't overwrite non-empty values)
+	<a href="#" onclick="$('.add-default').trigger('click');return false;">add all suggested values</a> (doesn't overwrite non-empty values)
 </p>
 <p>
 	<input type="submit" value="save" />

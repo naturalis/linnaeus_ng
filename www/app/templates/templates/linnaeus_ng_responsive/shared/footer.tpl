@@ -11,37 +11,38 @@
             <div class="row">
                 <div class="col-md-12 cooperation">
                     <div class="footerLinkContainer">
-                        <ul class="footerLinks">
-                            <li><a href="">Ministerie van Economische Zaken</a></li>
-                            <li><a href="">Ecyclopedia of Life</a></li>
-                            <li><a href="">Universiteit van Amsterdam</a></li>
-                            <li><a href="">Nationaal Herbarium Nederland</a></li>
-                            <li><a href="">Centraal Bureau voor Schimmelcultures</a></li>
-                            <li><a href="">Bryologische en Lichenologische Werkgroep - KNNV</a></li>
-                            <li><a href="">Nederlandse Mycologische Vereniging</a></li>
+                            <ul class="footerLinks">
+                            <li><a href="https://www.rijksoverheid.nl/ministeries/ministerie-van-economische-zaken">Ministerie van Economische Zaken</a></li>
+                            <li><a href="http://www.eol.org/">Ecyclopedia of Life</a></li>
+                            <li><a href="http://www.uva.nl/">Universiteit van Amsterdam</a></li>
+                            <li><a href="http://www.cbs.knaw.nl/">Centraal Bureau voor Schimmelcultures</a></li>
+                            <li><a href="http://www.blwg.nl/">Bryologische en Lichenologische Werkgroep - KNNV</a></li>
+                            <li><a href="http://www.mycologen.nl/">Nederlandse Mycologische Vereniging</a></li>
+                            <li><a href="http://www.ndff.nl/">Nationale Databank Flora en Fauna</a></li>
+                            <li><a href="http://www.wur.nl/marine-research/">Wageningen Marine Research</a></li>
                         </ul>
                         <ul class="footerLinks">
-                            <li><a href="">Fauna Europaea</a></li>
-                            <li><a href="">MARBEF</a></li>
-                            <li><a href="">Nederlandse Voedsel- en Warenautoriteit</a></li>
-                            <li><a href="">NLBIF</a></li>
-                            <li><a href="">Centraal Bureau voor Statistiek</a></li>
-                            <li><a href="">Nederlandse Entomologische Vereniging</a></li>
-                            <li><a href="">Nederlandse Malacologische Vereniging</a></li>
+                            <li><a href="http://www.faunaeur.org/">Fauna Europaea</a></li>
+                            <li><a href="http://www.marinespecies.org/">World Register of Marine Species</a></li>
+                            <li><a href="https://www.nvwa.nl/">Nederlandse Voedsel- en Warenautoriteit</a></li>
+                            <li><a href="http://www.nlbif.nl/">NLBIF</a></li>
+                            <li><a href="https://www.cbs.nl/">Centraal Bureau voor Statistiek</a></li>
+                            <li><a href="http://www.nev.nl/">Nederlandse Entomologische Vereniging</a></li>
+                            <li><a href="http://www.spirula.nl/">Nederlandse Malacologische Vereniging</a></li>
                         </ul>
                         <ul class="footerLinks">
-                            <li><a href="">Waarneming.nl</a></li>
-                            <li><a href="">FLORON</a></li>
-                            <li><a href="">Stichting Anemoon</a></li>
-                            <li><a href="">De Vlinderstichting</a></li>
-                            <li><a href="">SOVON Vogelonderzoek Nederland</a></li>
-                            <li><a href="">EIS Kenniscentrum Insecten en andere ongewervelden</a></li>
-                            <li><a href="">Stichting RAVON</a></li>
-                            <li><a href="">Zoogdiervereniging</a></li>
+                            <li><a href="http://www.waarneming.nl/">Waarneming.nl</a></li>
+                            <li><a href="http://www.floron.nl/">FLORON</a></li>
+                            <li><a href="http://www.anemoon.org/">Stichting ANEMOON</a></li>
+                            <li><a href="http://www.vlinderstichting.nl/">De Vlinderstichting</a></li>
+                            <li><a href="https://www.sovon.nl/">Sovon Vogelonderzoek Nederland</a></li>
+                            <li><a href="http://www.eis-nederland.nl/">EIS Kenniscentrum Insecten en andere ongewervelden</a></li>
+                            <li><a href="http://www.ravon.nl/">RAVON</a></li>
+                            <li><a href="http://www.zoogdiervereniging.nl/">Zoogdiervereniging</a></li>
                         </ul>
                         <div class="logos">
-                            <a target="_blank" href="http://www.eol.org">
-                                <img src="{$baseUrl}app/style/img/eol_logo.svg" class="eol_logo">    
+                            <a target="_blank" href="http://www.naturalis.nl">
+                                <img src="{$baseUrl}app/style/img/naturalis-logo-pink.svg" class="naturalis_logo">    
                             </a>
                             <a target="_blank" href="http://www.eis-nederland.nl">
                                 <img src="{$baseUrl}app/style/img/eis_logo.png" class="eis_logo">    
@@ -65,7 +66,7 @@
                     <div class="colofonContainer">
                         <div class="colofon">
                             </span><a href="http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html" class="blue" title="Disclaimer">Colofon &amp; Disclaimer</a>
-                            <span class="copyright">© Naturalis 2005 - {$currdate.year} <span class="dash">-</span> 
+                            <span class="copyright">© Naturalis 2005 - {$currdate.year}
                         </div>
                     </div>
                 </div>
@@ -88,11 +89,12 @@
 
 <div id="jDialog" title="" class="ui-helper-hidden"></div>
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
-<div id="hint-box"></div>
+<div id="hint-box" style="display:none"></div>
 
+{if $googleAnalyticsCode}{include file="../shared/_google_analytics_code.tpl"}{/if}
 
 <script type="text/javascript">
-
+/*
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-21555206-1']);
   _gaq.push(['_setDomainName', 'nederlandsesoorten.nl']);
@@ -103,7 +105,7 @@
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-
+*/
 
 $(document).ready(function()
 {

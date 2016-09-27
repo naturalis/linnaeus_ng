@@ -1691,14 +1691,10 @@ class Controller extends BaseClass
             $this->smarty->assign('userSearch',$_SESSION['admin']['user']['search']);
 		}
 
-
-
-
-
-    	if (!empty($this->cronNextRun)) {
+    	if (!empty($this->cronNextRun))
+		{
             $this->smarty->assign('cronNextRun', $this->cronNextRun);
 		}
-
     }
 
 
@@ -2884,7 +2880,7 @@ class Controller extends BaseClass
 			'setting' => 'admin_message_fade_out_delay'
 		));
 
-		$this->_adminMessageFadeOutDelay = $d ? $d[0] : 10000;
+		$this->_adminMessageFadeOutDelay = $d ? $d : 10000;
 	}
 
 	protected function setGitVars()
@@ -2919,5 +2915,5 @@ class Controller extends BaseClass
 	{
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
-
+	
 }

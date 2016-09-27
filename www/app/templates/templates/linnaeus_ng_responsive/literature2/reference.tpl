@@ -10,9 +10,10 @@
 	
 	<div id="content" class="literature">
 		<div class="whiteBox">
-			<h2>{$ref.label}</h2>
+			<h2>{t}Literatuurreferentie{/t}</h2>
 
 				<table class="literateTable">
+					{if $ref.label}<tr><td>{t}Titel{/t}</td><td>{$ref.label}</td></tr>{/if}
 					{if $ref.publication_type}<tr><td>{t}Type{/t}</td><td>{$ref.publication_type}</td></tr>{/if}
 
 					{capture authors}
@@ -26,7 +27,6 @@
 
 
 					{if $ref.date}<tr><td>{t}Jaar{/t}</td><td>{$ref.date}</td></tr>{/if}
-					{if $ref.label}<tr><td>{t}Titel{/t}</td><td>{$ref.label}</td></tr>{/if}
 
 					{if $ref.publishedin || $ref.publishedin_name}
 					<tr>
@@ -53,6 +53,18 @@
 					{if $ref.external_link}<tr><td>{t}Link{/t}</td><td><a href="{$ref.external_link}" target="_blank">{$ref.external_link}</a></td></tr>{/if}
 					</tbody>
 				</table>
+
+                {if $taxa}
+                <p>
+                    <h2>{t}Als referentie opgenomen bij{/t}</h2>
+                    <ul>
+                    {foreach $taxa v k}
+                    <li><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></li>
+                    {/foreach}
+                    </ul>
+                </p>
+                {/if}
+
 			</div>
 		</div>
 	</div>

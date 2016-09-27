@@ -315,22 +315,26 @@ class SearchControllerNSR extends SearchController
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsGroup($this->rGetAll())));
-        } else
+        }
+		else
         if ($this->rHasVal('action','author_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsAuthor($this->rGetAll())));
-        } else
+        }
+		else
         if ($this->rHasVal('action','photographer_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsPhotographer($this->rGetAll())));
-        } else
+        }
+		else
         if ($this->rHasVal('action','validator_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsValidator($this->rGetAll())));
-        } else
+        } 
+		else
         if ($this->rHasVal('action','name_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
@@ -380,7 +384,7 @@ class SearchControllerNSR extends SearchController
 			"limit"=>$limit,
 			"offset"=>$offset
 		));
-		
+
 		$data=$d['data'];
 		$count=$d['count'];
 
@@ -818,7 +822,7 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName( $p )
 	{
-		return $this->models->SearchNSRModel->getSuggestionsName(array(
+		$data=$this->models->SearchNSRModel->getSuggestionsName(array(
 			"search"=>$p['search'],
 			"order"=>isset($p['order']) ? $p['order'] : null,
 			"project_id"=>$this->getCurrentProjectId(),
@@ -826,6 +830,15 @@ class SearchControllerNSR extends SearchController
 			"language_id"=>$this->getCurrentLanguageId(),
 			"restrict_language"=>false
 		));
+
+		foreach((array)$data as $key=>$val)
+		{
+			$data[$key]['label']=$this->addHybridMarkerAndInfixes(array('name'=> $val['label'],'base_rank_id'=>$val['base_rank_id']));
+			$data[$key]['scientific_name']=$this->addHybridMarkerAndInfixes(array('name'=> $val['scientific_name'],'base_rank_id'=>$val['base_rank_id']));
+			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes(array('name'=> $val['nomen'],'base_rank_id'=>$val['base_rank_id']));
+		}
+		
+		return $data;
 	}
 
 	private function reconstructQueryString( $p )

@@ -134,12 +134,22 @@ function setSuggestionId(ele)
 {
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val($(ele).html());
+	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val($(ele).html());
 
-	// trigger an Enter keyup in the receiving input, so we can hook a submit
-    var e = $.Event('keyup');
-    e.which = 13;
-    $('#'+getSuggestionType()).trigger(e);
-	hideSuggestions();
+	if ($('input.zoekknop').length)
+	{
+		// old: user clicks search button
+		// trigger an Enter keyup in the receiving input, so we can hook a submit
+		var e = $.Event('keyup');
+		e.which = 13;
+		$('#'+getSuggestionType()).trigger(e);
+		hideSuggestions();	
+	}
+	else
+	{
+		// new: no search button
+		$('#formSearchFacetsSpecies').submit();
+	}
 }
 
 var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1">%LABEL%</li>';

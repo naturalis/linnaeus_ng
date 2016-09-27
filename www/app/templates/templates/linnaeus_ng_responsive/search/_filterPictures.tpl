@@ -1,9 +1,9 @@
-
 <div {if $search.display=='plain'} style="display:none;"{/if}>
 	<form method="get" action="" id="formSearchFacetsSpecies" class="filterPictures" name="formSearchFacetsSpecies">
 		<input type="hidden" id="name_id" name="name_id" value="{$search.name_id}">
 		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
 		<fieldset class="block">
+
 			<div class="formrow">
 				<label accesskey="g" for="name">
 					{t}Soortnaam{/t}
@@ -17,19 +17,21 @@
 				</div>
 				<div id="name_suggestion" class="suggestion" match="like" class="auto_complete" style="display: none;"></div>
 			</div>
+
 			<div class="formrow">
 				<label accesskey="g" for="group">
 					{t}Soortgroep{/t}
                     <i class="ion-chevron-down down"></i>
                     <i class="ion-chevron-up up"></i>
 				</label>
-				<div class="filter">
+				<div class="filter" id=fuck>
 					<div class="input">
 						<input type="text" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
 					</div>
 				</div>
 				<div id="group_suggestion" class="suggestion" match="like" class="auto_complete" style="display:none;"></div>
 			</div>
+            
 			<div class="formrow">
 				<label accesskey="g" for="photographer">
 					{t}Fotograaf{/t}
@@ -44,6 +46,7 @@
 				</div>
 				<div id="photographer_suggestion" class="suggestion" match="like" class="auto_complete" style="display:none;"></div>
 			</div>
+
 			<div class="formrow">
 				<label accesskey="g" for="validator">
 					{t}Validator{/t}
@@ -58,6 +61,17 @@
 				</div>
 				<div id="validator_suggestion" class="suggestion" match="like" class="auto_complete" style="display: none;"></div>
 			</div>
+
 		</fieldset>
 	</form>
 </div>
+
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+    $('.filterPictures .filter').each(function()
+	{
+		$(this).toggle( ( $(this).find( 'input[type=text]' ).val().length>0 ) );
+	});
+});
+</script>

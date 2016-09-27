@@ -124,6 +124,7 @@ class Controller extends BaseClass
     private $_tmpTree;
     private $_showAutomaticHybridMarkers=true;
     private $_showAutomaticInfixes=true;
+	private $_googleAnalyticsCode;
 
     public $viewName;
     public $controllerBaseName;
@@ -172,7 +173,8 @@ class Controller extends BaseClass
 		'user_agent',
 		'functions',
 		'custom_array_sort',
-		'paginator'
+		'paginator',
+		'current_url'
     );
     public $cssToLoadBase = array(
         'basics.css',
@@ -221,6 +223,7 @@ class Controller extends BaseClass
 		$this->setSmartySettings();
 		$this->setCssFiles();
 		$this->setOtherStuff();
+		$this->setGoogleAnalyticsCode();
     }
 
     /**
@@ -1744,7 +1747,9 @@ class Controller extends BaseClass
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
         $this->smarty->assign('contact', $this->getContactLink());
 		$this->smarty->assign('server_name', $this->server_name);
-		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
+		$this->smarty->assign('current_url', $this->helpers->CurrentUrl->getParts());
+		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );	
+		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -2969,6 +2974,22 @@ class Controller extends BaseClass
 	protected function setServerName()
 	{
 		$this->server_name=trim(@shell_exec( "hostname" ));
+	}
+
+	protected function setGoogleAnalyticsCode()
+	{
+		$d=$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'google_analytics_code'
+		));
+
+		$this->_googleAnalyticsCode = $d ? $d : null;
+	}
+
+	protected function getGoogleAnalyticsCode()
+	{
+		return $this->_googleAnalyticsCode;
 	}
 
 }

@@ -1,11 +1,11 @@
 <div class="searchBoxContainer {$responsiveTabs}">
 	<ul class="tabs">
-		<li {if $activeTab eq 'quickSearch'}class="active"{/if}>
+		<!-- li {if $activeTab eq 'quickSearch'}class="active"{/if}>
 			<a href="../search/nsr_search.php?search=">
 				<span>Snel</span> 
 				<span>zoeken</span>
 			</a>
-		</li>
+		</li -->
 		<li {if $activeTab eq 'extendedSearch'}class="active"{/if}>
 			<a href="../search/nsr_search_extended.php">
 				<span>Uitgebreid</span> 
@@ -25,7 +25,8 @@
 			</a>
 		</li>
 	</ul>
-	{if $activeTab eq 'quickSearch'}
+
+	{* if $activeTab eq 'quickSearch'}
 	<div class="simpleSearch">
 		<form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
 			<fieldset>
@@ -34,16 +35,9 @@
 			</fieldset>
 		</form>
 		<div class="simpleSuggestions" style="display: none;">
-			<ul>
-				<li>Aalscholvers</li>
-				<li>Aardbei</li>
-				<li>Aardrupsendoders</li>
-				<li>Aasgarnalen</li>
-				<li>Aaskevers</li>
-			</ul>
 		</div>
 	</div>
-	{/if}
+	{/if *}
 		
 	{if $activeTab eq 'extendedSearch'}
 	<div class="extendedSearch">

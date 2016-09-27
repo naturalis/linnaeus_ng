@@ -27,10 +27,12 @@
 	
 	$url = isset( $_REQUEST["url"] ) ? rawurldecode($_REQUEST["url"]) : null;
 	$original_headers = isset( $_REQUEST["original_headers"] ) && $_REQUEST["original_headers"]==1 ? true : false;
+	$timeout = isset( $_REQUEST["timeout"] ) ? $_REQUEST["timeout"] : null;
 
 	$r = new RemoteService;
 
 	$r->setUrl( $url );
+	$r->setTimeout( $timeout );
 	$r->fetchData();
 	if ( $original_headers ) $r->sendHeaders();
 	$r->printData();

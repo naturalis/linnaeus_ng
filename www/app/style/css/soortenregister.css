@@ -1102,10 +1102,11 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       display: block;
       padding-left: 30px;
       padding-right: 30px; } }
-
+/*
 @media screen and (max-width: 994px) {
   .main-display-name.desktop {
     display: none; } }
+*/
 
 #sideBarLogos {
   margin-top: 30px;
@@ -1135,11 +1136,25 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   .protection li li {
     list-style-type: disc; }
 
-.treeSimpleSearch + #facets {
+.treeSimpleSearch + #facets{
   margin-top: 30px; }
   @media screen and (max-width: 994px) {
     .treeSimpleSearch + #facets {
       margin-top: 0; } }
+
+#facets{
+  margin-top: 30px; }
+  @media screen and (max-width: 994px) {
+	#facets {
+      margin-top: 0; } }
+
+#toolbox{
+  margin-top: 30px; }
+  @media screen and (max-width: 994px) {
+	#toolbox {
+      margin-top: 0; } }
+
+
 
 .literateTable td:first-child {
   padding-right: 15px; }
@@ -1722,6 +1737,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
         -ms-transform: translateY(-50%);
             transform: translateY(-50%);
     z-index: -1; }
+/*	
     @media screen and (max-width: 994px) {
       #taxonImage img {
         min-height: 100%;
@@ -1731,6 +1747,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
             -ms-transform: translate(-50%, -50%);
                 transform: translate(-50%, -50%);
         min-width: 100%; } }
+*/
     @media screen and (max-width: 500px) {
       #taxonImage img {
         width: 100%; } }
@@ -1954,12 +1971,21 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     @media screen and (max-width: 994px) {
       .footer .eol_logo {
         display: none; } }
+  .footer .naturalis_logo {
+    position: absolute;
+    top: 15px;
+    right: -15px;
+    width: 90px;
+    height: auto; }
+    @media screen and (max-width: 994px) {
+      .footer .naturalis_logo {
+        display: none; } }
   .footer .eis_logo {
     position: absolute;
-    top: 65px;
+    top: 165px;
     border-radius: 100px;
-    right: 0;
-    width: 73px;
+    right: -7px;
+    width: 82px;
     height: auto; }
     @media screen and (max-width: 994px) {
       .footer .eis_logo {
@@ -2107,3 +2133,32 @@ body {
               transform: translateX(-50%);
       width: auto;
       height: 500px; } }
+
+.link {
+	color:#e3004a;
+}
+
+table tr td {
+	padding:5px 5px 2px 0;
+}
+
+#hint-box {
+	border:1px solid #999;
+	background-color:#FFC;
+	font-size:0.7em;
+	width:250px;
+	min-height:100px;
+}
+
+#hint-box b {
+	font-weight:bold;
+}
+
+.no-italics {
+	font-style:normal;
+}
+
+i {
+	font-style:italic;
+}
+
