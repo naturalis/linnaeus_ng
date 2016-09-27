@@ -151,7 +151,7 @@
 		private function setServerName ()
 		{
             return isset($this->server->hostname) ? $this->server->hostname :
-                '** Server settings changed, adapt cron script! **';
+                '** Check cron script! **';
 		}
 
 		private function printResult ()
