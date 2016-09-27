@@ -82,7 +82,7 @@
 
 		    die(print_r($server));
 
-            $this->server = json_decode(implode('', $server), true);
+            $this->server = json_decode(implode("\n", $server), true);
 
 
 		}
