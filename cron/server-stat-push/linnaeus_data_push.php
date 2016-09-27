@@ -166,7 +166,7 @@
 
 		    if (isset($message) && $this->showPushedData) {
                 echo $message . "\n\nData pushed:";
-                die(print($this->data));
+                die(print_r($this->data));
 
 		    }
 		    die($message . "\n");
