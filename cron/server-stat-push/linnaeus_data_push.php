@@ -117,7 +117,11 @@
 		{
            // Targeted specifically at Naturalis servers...
            // Test has ip address as SERVER_NAME
- print_r($_SERVER); die();
+     preg_match_all('/inet addr: ?([^ ]+)/', `ifconfig`, $ips);
+    print_r($ips[1]);
+
+die();
+
            if (filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP)) {
                return $_SERVER['SERVER_NAME'];
            }
