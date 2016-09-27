@@ -1099,7 +1099,6 @@ class UsersController extends Controller
 		{
 			foreach((array)$d['modules'] as $val)
 			{
-
 				$module_write[$val['module_id']]='on';
 			}
 

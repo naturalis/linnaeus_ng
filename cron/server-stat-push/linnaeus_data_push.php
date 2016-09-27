@@ -13,11 +13,13 @@
         private $gitBranch;
         private $gitHash;
         private $gitLatestHash;
+        private $server;
 
         public function __construct () {
             $this->getConfig();
             $this->connectDb();
-            $this->setGit();
+            $this->getGitInfo();
+            $this->getServerInfo();
         }
 
 		public function run () {
@@ -54,10 +56,11 @@
             }
 		}
 
-		private function setGit ()
+		private function getGitInfo ()
 		{
             $c = $this->config->getGeneralSettings();
-            $path = isset($c['applicationFileRoot']) ? $c['applicationFileRoot'] : '/var/www/linnaeusng';
+            $path = isset($c['applicationFileRoot']) ? $c['applicationFileRoot'] :
+                '/var/www/linnaeusng';
 
             // First cd to Linnaeus root!
             exec('cd ' . str_replace(" ", "\\ ", $path));
@@ -70,6 +73,16 @@
 
 		    exec('git rev-parse origin/' . $this->gitBranch, $latestHash);
 		    $this->gitLatestHash = $latestHash[0];
+		}
+
+		private function getServerInfo ()
+		{
+            exec('facter --json', $server) or
+                die("Cannot retrieve server info\n");
+		    $this->server = json_decode($server, true);
+
+		    die(print_r($this->server));
+
 		}
 
 		private function pushData ()
