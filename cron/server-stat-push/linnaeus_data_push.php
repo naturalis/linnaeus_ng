@@ -137,11 +137,6 @@
 
 		private function setServerIp ()
 		{
-             if (isset($this->server->ec2_public_ipv4)) {
-                 die('yes');
-             }
-             die('no');
-
             // Test server; production does not have public address
             if (isset($this->server->ec2_public_ipv4)) {
                 return $this->server->ec2_public_ipv4;
@@ -150,7 +145,7 @@
             if (isset($this->server->ec2_local_ipv4)) {
                 return $this->server->ec2_local_ipv4;
             }
-            return '** Server settings changed, adapt cron script! **';
+            return '** Check cron script! **';
 		}
 
 		private function setServerName ()
