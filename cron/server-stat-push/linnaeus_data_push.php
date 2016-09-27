@@ -79,12 +79,7 @@
 		{
             exec('facter --json', $server) or
                 die("Cannot retrieve server info\n");
-
-            $this->server = json_decode(implode("\n", $server), true);
-
-            die(print_r($this->server));
-
-
+            $this->server = json_decode(implode("\n", $server));
 		}
 
 		private function pushData ()
@@ -122,28 +117,10 @@
                     ($this->data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
                 $this->data[$i]['code_up_to_date'] =
                     ($this->data[$i]['git_hash'] == $this->data[$i]['git_latest_hash']) ? 'yes' : 'no';
-                $this->data[$i]['server_ip'] = $this->getServerAddress();
-                $this->data[$i]['server_name'] = $this->getServerName();
+                $this->data[$i]['server_ip'] = $this->server->ec2_public_ipv4;
+                $this->data[$i]['server_name'] = $this->server->hostname;
                 $this->data[$i]['check_date'] = date("Y-m-d H:m:s");
         	}
-		}
-
-		private function getServerAddress ()
-		{
-           // Targeted specifically at Naturalis servers...
-           // Test has ip address as SERVER_NAME
-           if (filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP)) {
-               return $_SERVER['SERVER_NAME'];
-           }
-		   // Production has floating ip in SERVER_ADDR
-           return $_SERVER['SERVER_ADDR'];
-		}
-
-		private function getServerName ()
-		{
-            $r = $this->mysqli->query('select @@hostname');
-            $row = $r->fetch_row();
-            return $row[0];
 		}
 
 		private function getConfig ()
