@@ -855,6 +855,22 @@ parameters:
 				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Specialisten')
 			);
+
+
+        $d=$this->models->MediaMeta->_get(array(
+			'id'=> array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sys_label' => 'beeldbankFotograaf'
+			),
+			'columns'=>'count(distinct sys_label) as total'
+		));
+
+		$result['statistics']['photographer']=
+			array(
+				'count'=>format_number($d[0]['total']),
+				'label'=>$this->translate('Fotografen')
+			);
+
 		
 
 
