@@ -856,8 +856,34 @@ parameters:
 				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Specialisten')
 			);
-		
 
+        $d=$this->models->MediaMeta->_get(array(
+			'id'=> array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sys_label' => 'beeldbankFotograaf'
+			),
+			'columns'=>'count(distinct meta_data) as total'
+		));
+
+		$result['statistics']['photographer']=
+			array(
+				'count'=>format_number($d[0]['total']),
+				'label'=>$this->translate('Fotografen')
+			);
+
+        $d=$this->models->MediaMeta->_get(array(
+			'id'=> array(
+				'project_id' => $this->getCurrentProjectId(),
+				'sys_label' => 'beeldbankValidator'
+			),
+			'columns'=>'count(distinct meta_data) as total'
+		));
+
+		$result['statistics']['validator']=
+			array(
+				'count'=>format_number($d[0]['total']),
+				'label'=>$this->translate('Validatoren')
+			);		
 
         $d=$this->models->Literature2->_get(array(
 			'id'=> array('project_id' => $this->getCurrentProjectId()),
