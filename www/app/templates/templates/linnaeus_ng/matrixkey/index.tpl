@@ -135,71 +135,95 @@ $(document).ready(function()
 <!-- templates -->
 
 <div class="inline-templates" id="resultsHtmlTpl">
+<!-- 
 	%RESULTS%
+-->
 </div>
 
 <div class="inline-templates" id="noResultHtmlTpl">
+<!-- 
 	<div class="noResults">%MESSAGE%</div>
+-->
 </div>
 
 <div class="inline-templates" id="resultsLineEndHtmlTpl">
 </div>
 
 <div class="inline-templates" id="photoLabelHtmlTpl">
+<!-- 
     <div style="margin-left:130px">
         %SCI-NAME%
         %GENDER%
         %COMMON-NAME%
         %PHOTO-DETAILS%
     </div>
+-->
 </div>
 
 <div class="inline-templates" id="photoLabelGenderHtmlTpl">
 </div>
 
 <div class="inline-templates" id="photoLabelPhotographerHtmlTpl">
+<!-- 
 	<br />(%PHOTO-LABEL% %PHOTOGRAPHER%)
+-->
 </div>
 
 <div class="inline-templates" id="imageHtmlTpl">
+<!-- 
 	<img class="result-image" src="%THUMB-URL%" title="%PHOTO-CREDIT%" />
+-->
 </div>
 
 <div class="inline-templates" id="imageHtmlUrlTpl">
+<!-- 
     <a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title="">
 	%IMAGE%
     </a>
+-->
 </div>
 
 <div class="inline-templates" id="genderHtmlTpl">
 </div>
 
 <div class="inline-templates" id="matrixLinkHtmlTpl">
+<!-- 
 	<a class="goToMatrixLink" href="?mtrx=%MATRIX-ID%"><i class="ion-chevron-right"></i></a>
+-->
 </div>
 
 <div class="inline-templates" id="noActionIconHtmlTpl">
+<!-- 
 	<div class="result-icon no-content"></div>
+-->
 </div>
 
 <div class="inline-templates" id="remoteLinkIconHtmlTpl">
+<!-- 
 	<div class="result-icon" onClick="doRemoteLink('%LINK%','%SCI-NAME%', '%NAMESCIENTIFIC%', '%NAMECOMMON%');" title="%TITLE%">%REMOTE-LINK-ICON%</div>
+-->
 </div>
 
 <div class="inline-templates" id="statesIconHtmlTpl">
+<!-- 
 	<div class="result-icon icon-details" id="tog-%LOCAL-ID%" onClick="toggleDetails('%LOCAL-ID%');return false;" title="%TITLE%">%SHOW-STATES-ICON%</div>
+-->
 </div>
 
 <div class="inline-templates" id="relatedIconHtmlTpl">
+<!-- 
 	<div class="result-icon icon-resemblance" onClick="setSimilar({ id:%ID%,type:'%TYPE%' });return false;" title="%TITLE%">%RELATED-ICON%</div>
+-->
 </div>
 
 <div class="inline-templates" id="statesHtmlTpl">
+<!-- 
     <div id="det-%LOCAL-ID%" class="result-detail hidden">
         <ul>
 			%STATES%
         </ul>
     </div>
+-->
 </div>
 
 <div class="inline-templates" id="speciesStateItemHtmlTpl">
@@ -209,6 +233,7 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="resultHtmlTpl">
+<!--
     <div class="result%CLASS-HIGHLIGHT% %MATRIX-LINK-CLASS%" id="res-%LOCAL-ID%">
         <div class="result-result">
             <div class="result-image-container">
@@ -229,14 +254,19 @@ $(document).ready(function()
             %MATRIX-LINK%
         </div>%STATES%
     </div>
+-->
 </div>
 
 <div class="inline-templates" id="resultScoreHtmlTpl">
+<!-- 
 	<span style="float:right;display:inline-block;margin-top:3px;font-weight:bold">%SCORE%%</span>
+-->
 </div>
 
 <div class="inline-templates" id="resultBatchHtmlTpl">
+<!-- 
 	<span class=result-batch style="%STYLE%">%RESULTS%</span>
+-->
 </div>
 
 <div class="inline-templates" id="buttonMoreHtmlTpl">
@@ -246,7 +276,9 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="counterExpandHtmlTpl">
+<!-- 
 	<div class="headerText">%START-NUMBER%%NUMBER-SHOWING%&nbsp;%FROM-LABEL%&nbsp;%NUMBER-TOTAL%</div>
+-->
 </div>
 
 <div class="inline-templates" id="pagePrevHtmlTpl">
@@ -274,7 +306,9 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="counterPaginateHtmlTpl">
+<!-- 
 	%FIRST-NUMBER%-%LAST-NUMBER% %NUMBER-LABEL% %NUMBER-TOTAL%
+-->
 </div>
 
 <div class="inline-templates" id="menuOuterHtmlTpl">
@@ -343,11 +377,13 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="menuSelStateHtmlTpl">
+<!-- 
     <div class="facetValueHolder">
         <a href="#" class="removeBtn" onclick="clearStateValue('%STATE-ID%');return false;">
         %VALUE% %LABEL% %COEFF%
         <i class="ion-close-circled"></i></a>
     </div>
+-->
 </div>
 
 <div class="inline-templates" id="menuSelStatesHtmlTpl">
@@ -355,25 +391,35 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="iconInfoHtmlTpl">
+<!-- 
 	<img class="result-icon-image icon-info" src="%IMG-URL%">
+-->
 </div>
 
 <div class="inline-templates" id="iconUrlHtmlTpl">
+<!-- 
 	<img class="result-icon-image" src="%IMG-URL%">
+-->
 </div>
 
 <div class="inline-templates" id="iconSimilarTpl">
+<!-- 
 	<img class="result-icon-image icon-similar" src="%IMG-URL%">
+-->
 </div>
 
 <div class="inline-templates" id="similarHeaderHtmlTpl">
+<!-- 
     <div class="headerText similarHeader">
 	    <a class="clearSimilarSelection" href="#" onclick="closeSimilar();return false;"><i class="ion-chevron-left"></i></a>
     <span class="similarSpeciesText">%HEADER-TEXT% <span id="similarSpeciesName">%SPECIES-NAME%</span><span class="result-count"> (%NUMBER-START%-%NUMBER-END%) </span></span></div>
+-->
 </div>
 
 <div class="inline-templates" id="searchHeaderHtmlTpl">
+<!-- 
 	<div class="headerText">%HEADER-TEXT% <span id="similarSpeciesName">%SEARCH-TERM%</span> <span class="result-count"> (%NUMBER-START%-%NUMBER-END% %OF-TEXT% %NUMBER-TOTAL%) </span></div>
+-->
 </div>
 
 <div class="inline-templates" id="infoDialogHtmlTpl">
@@ -391,7 +437,9 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="infoDialogUrlHtmlTpl">
+<!-- 
 	<a href="%URL%" class="popup-link" target="_blank">%LINK-LABEL%</a>
+-->
 </div>
 
 <div class="inline-templates" id="matrixSelectList">

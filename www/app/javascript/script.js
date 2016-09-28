@@ -26,7 +26,7 @@ function adjustPageTitleHeight() {
   		fontstep = 2;
   if (title.height()>parent.height() || title.width()>parent.width()) {
     title.css('font-size',((title.css('font-size').substr(0,2)-fontstep)) + 'px').css('line-height',((title.css('font-size').substr(0,2))) + 'px');
-    adjustPageTitleHeight();
+//    adjustPageTitleHeight(); /* sometimes thrashes browser!!! */
   }
 }
 
