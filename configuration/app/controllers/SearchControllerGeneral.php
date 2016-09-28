@@ -889,6 +889,8 @@ class SearchControllerGeneral extends SearchController
 			$numOfResults+=count((array)$content);
 
 		}
+		
+		/*
 
 		if (isset($synonyms))
 		{
@@ -917,8 +919,11 @@ class SearchControllerGeneral extends SearchController
 			$numOfResults+=count((array)$commonnames);
 
 		}
+		
+		*/
 
-		if (isset($names)) {
+		if (isset($names))
+		{
 
 			$results[self::C_TAXA_ALL_NAMES]=
 				array(

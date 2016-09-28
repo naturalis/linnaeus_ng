@@ -28,7 +28,7 @@ class WebservicesController extends Controller
 		'media_meta',
 		'literature2',
 		'taxon_trend_years',
-		'label_project_rank'
+		'labels_projects_ranks'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -187,7 +187,7 @@ parameters:
 
 		$taxon=$this->getTaxonById($this->getTaxonId());
 
-		$ranklabel=$this->models->LabelProjectRank->_get(
+		$ranklabel=$this->models->LabelsProjectsRanks->_get(
 		array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(), 
