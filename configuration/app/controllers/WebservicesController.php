@@ -856,7 +856,7 @@ parameters:
 				'label'=>$this->translate('Specialisten')
 			);
 
-
+/*
         $d=$this->models->MediaMeta->_get(array(
 			'id'=> array(
 				'project_id' => $this->getCurrentProjectId(),
@@ -870,7 +870,7 @@ parameters:
 				'count'=>format_number($d[0]['total']),
 				'label'=>$this->translate('Fotografen')
 			);
-
+*/
 		
 
 
