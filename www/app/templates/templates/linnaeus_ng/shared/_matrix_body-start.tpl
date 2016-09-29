@@ -1,5 +1,11 @@
 
 <body id="body" class="conceptcard">
+<style>
+.topBar .pageTitle {
+    display: block;
+}
+</style>
+
     
     <div id="ajaxloader"></div>
     <div id="filterDialogContainer">
@@ -21,7 +27,7 @@
             {/if}
             <div class="pageTitleContainer">
                 <span class="pageTitle" onClick="window.open('../../','_self');">
-	                {$session.app.project.title|@strip_tags:false}
+	              {$session.app.project.title|@strip_tags:false}
                 </span>
             </div>
            
@@ -93,7 +99,7 @@
             <h1 class="pageTitle">
                 <span class="determinatiesleutel">{$settings->matrix_main_title_header}</span><br />
 				{if $master_matrix.name && $master_matrix.name!=$matrix.name}{$master_matrix.name}: {/if}
-                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onClick="matrixSelectPopUp();">{t}kies andere sleutel{/t}</span>
+                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px;cursor:pointer" onClick="matrixSelectPopUp();">{t}kies andere sleutel{/t}</span>
 <script>
 {foreach $matrices v}
 matrices.push( { id: {$v.id} ,label: '{$v.label|@escape}', current: {$matrix.id}=={$v.id} } );

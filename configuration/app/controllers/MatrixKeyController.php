@@ -386,7 +386,7 @@ class MatrixKeyController extends Controller
 		else
 		{
 			$this->setCurrentMatrixId( $m['id'] );
-			$this->redirect( "index.php" );
+//			$this->redirect( "index.php" );
 		}
     }
 

@@ -253,6 +253,8 @@ function printMenu()
 		var item = menu[i];
 		var s="";
 		
+		if (item.label.length<1) continue;
+		
 		if (item.type=='group')
 		{
 			groupcount++;
