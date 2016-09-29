@@ -251,7 +251,7 @@ class Controller extends BaseClass
 			return 'p-'.$p;
 	}
 
-    public function checkForProjectId ()
+    public function checkForProjectId()
     {
 		if (!$this->getCheckForProjectId()) return;
 

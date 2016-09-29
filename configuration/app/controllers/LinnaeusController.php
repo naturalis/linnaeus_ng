@@ -146,16 +146,14 @@ class LinnaeusController extends Controller
 
     public function rootIndexAction()
 	{
+		// have FIXED_PROJECT_ID constant
 		if (defined('FIXED_PROJECT_ID')) $this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
 
-		if (defined('FIXED_PROJECT_ID'))
-			$this->redirect('app/views/linnaeus/set_project.php?p='.FIXED_PROJECT_ID);
+		// resolve slug (if any)
+		$id=$this->resolveProjectShortName();
+		if ($id) $this->redirect('app/views/linnaeus/set_project.php?p='.$id);
 
-		$id = $this->resolveProjectShortName();
-
-		if ($id)
-			$this->redirect('app/views/linnaeus/set_project.php?p='.$id);
-
+		// fetch all available published projects
 		$projects = $this->models->Projects->_get(
 			array(
 				'id' => array('published' => 1),
@@ -163,6 +161,10 @@ class LinnaeusController extends Controller
 			)
 		);
 
+		// if only one is available, use that
+		if ( count((array)$projects)==1 ) $this->redirect('app/views/linnaeus/set_project.php?p='.$projects[0]['id']);
+
+		// program redirected here after wrong project ID was attempted
 		if ($this->rHasVar('nopid')) $this->smarty->assign('error',$this->translate('No or illegal project ID specified.'));
 
 		if ( method_exists( $this->customConfig , 'getProjectIndexTexts' ) ) 
