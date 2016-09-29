@@ -41,10 +41,6 @@
 
 <script type="text/JavaScript">
 
-function showMedia(url,name)
-{
-}
-
 $(document).ready(function()
 {
 	// Apply prettyDialog behaviour to items with inline-image class
@@ -62,6 +58,19 @@ $(document).ready(function()
 			.removeAttr('onclick')
 			.prettyDialog();
 	});
+
+	// Rewrite showMedia to showVideo for videos
+	$(".inline-video").each(function()
+	{
+		$_me = $(this);
+
+		arr_arguments = $_me.attr("onclick").split("'");
+
+		$_me
+			.removeAttr('onclick')
+			.attr('onClick', 'showVideo("' + arr_arguments[1] + '","' + arr_arguments[3] +'");');
+	});
+
 
 	if( jQuery().prettyDialog )
 	{

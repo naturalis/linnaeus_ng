@@ -163,12 +163,14 @@ function showMedia(url,name) {
 }
 
 function showVideo(url,name) {
-
+/*
 	var content =
 		'<video width="320" height="240" controls="controls">'+
 			'<source src="'+url+'" type="mime_type" />'+
 			'<embed src="'+url+'" width="320" height="240" />'+
 		'</video> ';
+*/
+	var content = '<video src="' + url + '" controls>';
 
 	showDialog(name,content);
 
