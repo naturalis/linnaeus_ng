@@ -529,7 +529,7 @@ class NsrTaxonImportController extends NsrController
 				{
 					$lines[$key]['parent_id']=[ 'source' => 'existing', 'id' => $d['id'] ];
 					//$lines[$key]['warnings'][]=[ 'message' => $this->translate('will use valid parent from database'), 'data' => [ 'taxon'=>$d['taxon'], 'rank'=>$d['rank'], 'id'=>$d['id'] ] ];
-					$lines[$key]['warnings'][]=[ 'message' => sprintf($this->translate('will use valid parent from database (%s)'), sprintf('<a href="taxon.php?id=%s" target="_new">%s</a>',$d[0]['id'],$d[0]['taxon'] ) ) ];
+					$lines[$key]['warnings'][]=[ 'message' => sprintf($this->translate('will use valid parent from database (%s)'), sprintf('<a href="taxon.php?id=%s" target="_new">%s</a>',$d['id'],$d['taxon'] ) ) ];
 				}
 				// suggested parent doesn't exist in the database either, will not use (but save taxon as orphan)
 				else
