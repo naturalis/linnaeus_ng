@@ -54,7 +54,7 @@ var matrixsettings={
 	initialSortColumn: "",
 	alwaysSortByInitial: 0,
 	noTaxonImages: false,
-	suppressImageEnlarge: false
+	suppressImageEnlarge: false,
 };
 
 var data={
@@ -165,7 +165,7 @@ function printResults()
 	// see if any of the results has an imae (if not, we're not going to try to display them)
 	for(var i=0;i<resultset.length;i++)
 	{
-		if (resultset[i].info.url_image) resultsetHasImages=true;
+		if (resultset[i].info && resultset[i].info.url_image) resultsetHasImages=true;
 	}
 
 	if (resultset && matrixsettings.browseStyle=='expand') 
@@ -607,6 +607,9 @@ function formatResult( data )
 		}
 		else
 		{
+			//imageOrientation
+			console.dir(matrixsettings);
+			
 			if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
 		}
 	}
@@ -683,7 +686,7 @@ function formatResult( data )
 			.replace('%SCI-NAME%', sciNameDisplay)
 			.replace('%SCI-NAME-TITLE%', sciName )
 			.replace('%MATRIX-LINK%', (data.type=='matrix' ? 
-				fetchTemplate( 'matrixLinkHtmlTpl' ).replace("%MATRIX-ID%",data.id).replace("%MATRIX-LINK-TEXT%",__('Ga naar sleutel'))
+				fetchTemplate( 'matrixLinkHtmlTpl' ).replace("%MATRIX-ID%",data.id).replace(/%MATRIX-LINK-TEXT%/,__('Naar deelsleutel'))
 				: ""))
 			.replace(/%COMMON-NAME%/g, commonName ? commonName : "" )
 			.replace('%COMMON-NAME-TITLE%', commonName )

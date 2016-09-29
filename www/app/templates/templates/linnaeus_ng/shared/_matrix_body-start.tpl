@@ -93,7 +93,7 @@
             <h1 class="pageTitle">
                 <span class="determinatiesleutel">{$settings->matrix_main_title_header}</span><br />
 				{if $master_matrix.name && $master_matrix.name!=$matrix.name}{$master_matrix.name}: {/if}
-                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onClick="matrixSelectPopUp();">{t}kies andere matrix{/t}</span>
+                {$matrix.name}{if $matrices|@count>1} <span style="font-size:14px" onClick="matrixSelectPopUp();">{t}kies andere sleutel{/t}</span>
 <script>
 {foreach $matrices v}
 matrices.push( { id: {$v.id} ,label: '{$v.label|@escape}', current: {$matrix.id}=={$v.id} } );

@@ -106,9 +106,9 @@ $(document).ready(function()
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {if $settings->use_emerging_characters}{$settings->use_emerging_characters}{else}0{/if},
 		suppressImageEnlarge: {if $settings->suppress_image_enlarge}{$settings->suppress_image_enlarge}{else}0{/if},
-		defaultSpeciesImages: { portrait: '{$image_root_skin}noImage.jpg', landscape: '{$image_root_skin}noImage.png' } ,
-		// defaultSpeciesImages: { portrait: '{$image_root_skin}noImagePortrait.jpg', landscape: '{$image_root_skin}noImage.png' } ,
-		imageOrientation: '{$settings->image_orientation}',
+		defaultSpeciesImages: { portrait: '{$image_root_skin}noImagePortrait.jpg', landscape: '{$image_root_skin}noImage.png' } ,
+		//defaultSpeciesImages: { portrait: '{$image_root_skin}noImage.jpg', landscape: '{$image_root_skin}noImage.png' } ,
+		imageOrientation: '{if $settings->image_orientation}{$settings->image_orientation}{else}portrait{/if}',
 		browseStyle: '{$settings->browse_style}',
 		scoreThreshold: {if (int)$settings->score_threshold>-1 && (int)$settings->score_threshold<101}{$settings->score_threshold+0}{else}100{/if},
 		alwaysShowDetails: {if $settings->always_show_details}{$settings->always_show_details}{else}0{/if},
@@ -188,7 +188,7 @@ $(document).ready(function()
 
 <div class="inline-templates" id="matrixLinkHtmlTpl">
 <!-- 
-	<a class="goToMatrixLink" href="?mtrx=%MATRIX-ID%"><i class="ion-chevron-right"></i></a>
+	<a class="matrix-matrix-link" href="?mtrx=%MATRIX-ID%">%MATRIX-LINK-TEXT% ></a>
 -->
 </div>
 
@@ -245,13 +245,13 @@ $(document).ready(function()
                 <span class="result-name-scientific" title="%SCI-NAME-TITLE%">%SCI-NAME%</span>
                 <span class="result-name-common" title="%COMMON-NAME-TITLE%"><br />%COMMON-NAME%</span>
                 %SCORE%
+	            %MATRIX-LINK%
 			</div>
         </div>
         <div class="result-icons">
         	%REMOTE-LINK%
             %SHOW-STATES%
             %RELATED-TAXA%
-            %MATRIX-LINK%
         </div>%STATES%
     </div>
 -->
@@ -387,7 +387,9 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="menuSelStatesHtmlTpl">
+<!--
 	<span>%STATES%</span>
+-->
 </div>
 
 <div class="inline-templates" id="iconInfoHtmlTpl">
