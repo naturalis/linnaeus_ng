@@ -76,6 +76,7 @@ var lastScrollPos=0;
 var tempstatevalue="";
 var openGroups=Array();
 var searchedfor="";
+var resultsetHasImages=false;
 
 var	labels={
 	details: __('kenmerken'),
@@ -160,6 +161,12 @@ function printResults()
 	// pre-emptively remove show_more-button (clicking similar automatically switches to browseStyle='show_all')
 	$("#show-more").remove();
 	$("#footerPagination").removeClass('noline');
+
+	// see if any of the results has an imae (if not, we're not going to try to display them)
+	for(var i=0;i<resultset.length;i++)
+	{
+		if (resultset[i].info.url_image) resultsetHasImages=true;
+	}
 
 	if (resultset && matrixsettings.browseStyle=='expand') 
 	{
@@ -590,7 +597,7 @@ function formatResult( data )
 	var image="";
 	var allowImgEnlarge=false;
 
-	if ( !matrixsettings.noTaxonImages )
+	if ( !matrixsettings.noTaxonImages && resultsetHasImages )
 	{
 		if (data.info && data.info.url_image)
 		{
@@ -606,7 +613,7 @@ function formatResult( data )
 
 	var thumb="";
 
-	if ( !matrixsettings.noTaxonImages )
+	if ( !matrixsettings.noTaxonImages && resultsetHasImages )
 	{
 		if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
 		{

@@ -972,7 +972,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'scientific_name'=>$scientific_name,
 				'nomen'=>$nomen,
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
-				'nomen_no_formatting'=>$nomen_no_formatting,
+				'nomen_no_formatting'=>isset($nomen_no_formatting) ? $nomen_no_formatting : trim(strip_tags($nomen)),
 				'preffered_name'=>$preferredname,
 				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( array('base_rank_id'=>$base_rank_id) ),
 				'list'=>$names,

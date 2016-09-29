@@ -631,14 +631,14 @@ class MatrixKeyController extends Controller
 					$id=$val['taxon']['id'];
 				}
 
-				if ( $this->settings->species_module_link_force )
+				if ( $this->settings->species_module_link_force && isset($id) )
 				{
-					$all[$key]['info']['url_external_page']=sprintf( $this->settings->species_module_link_force, $id );
+					$all[$key]['info']['url_external_page']=str_replace( [ '%TAXON%','%PID%'],[$id,$this->getCurrentProjectId()],$this->settings->species_module_link);
 				}
 				else
 				if ( !isset($val['info']['url_external_page']) && isset($this->settings->species_module_link) )
 				{
-					$all[$key]['info']['url_external_page']=sprintf( $this->settings->species_module_link, $id );
+					$all[$key]['info']['url_external_page']=str_replace( [ '%TAXON%','%PID%'],[$id,$this->getCurrentProjectId()],$this->settings->species_module_link);
 				}
 			}
 		}
