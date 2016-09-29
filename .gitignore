@@ -1,5 +1,3 @@
-configuration/app/custom-configuration.php
-configuration/admin/custom-configuration.php
 www/app/javascript/naturalis/matrix--NEW.js
 www/admin/templates/templates/shared/_admin-body-start--ORG.tpl
 www/admin/templates/templates/shared/_admin-head--ORG.tpl
@@ -113,4 +111,6 @@ configuration/admin/controllers/SearchController-ORG.php
 www/app/style/linnaeus_ng/.sass-cache
 configuration/locale
 configuration/app/rewrite/
+configuration/app/custom-configuration.php
+configuration/admin/custom-configuration.php
 www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress).tpl
