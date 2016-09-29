@@ -224,5 +224,5 @@
 
     $ldp = new LinnaeusDataPush();
     $ldp->setPushUrl('http://linnaeus.naturalis.nl/admin/server_csv.php');
-    $ldp->showPushedData();
+    //$ldp->showPushedData();
     $ldp->run();
