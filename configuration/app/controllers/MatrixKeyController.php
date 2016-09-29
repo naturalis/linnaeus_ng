@@ -633,12 +633,12 @@ class MatrixKeyController extends Controller
 
 				if ( $this->settings->species_module_link_force && isset($id) )
 				{
-					$all[$key]['info']['url_external_page']=str_replace( [ '%TAXON%','%PID%','%s' ],[$id,$this->getCurrentProjectId(),$id],$this->settings->species_module_link);
+					$all[$key]['info']['url_external_page']=str_replace( [ '%s','%PID%','%TAXON%' ],[$id,$this->getCurrentProjectId(),$id],$this->settings->species_module_link);
 				}
 				else
 				if ( !isset($val['info']['url_external_page']) && isset($this->settings->species_module_link) )
 				{
-					$all[$key]['info']['url_external_page']=str_replace( [ '%TAXON%','%PID%','%s' ],[$id,$this->getCurrentProjectId(),$id],$this->settings->species_module_link);
+					$all[$key]['info']['url_external_page']=str_replace( [ '%s','%PID%','%TAXON%' ],[$id,$this->getCurrentProjectId(),$id],$this->settings->species_module_link);
 				}
 			}
 		}
