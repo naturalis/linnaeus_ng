@@ -45,55 +45,21 @@ final class KeyModel extends AbstractModel
 
     }
 
-
-/*"
-			select
-				_ck.res_taxon_id,
-				_ck.keystep_id,
-				_a.taxon,
-				_c.commonname
-
-			from
-				%PRE%choices_keysteps _ck
-
-			left join %PRE%taxa _a
-				on _ck.project_id=_a.project_id
-				and _ck.res_taxon_id=_a.id
-
-			left join %PRE%commonnames _c
-				on _ck.project_id=_c.project_id
-				and _c.id=
-					(select
-						id
-					from
-						%PRE%commonnames
-					where
-						project_id=_ck.project_id
-						and taxon_id=_ck.res_taxon_id
-						and language_id = ". $this->getCurrentLanguageId() ."
-						limit 1
-					)
-			where
-				_ck.project_id = ".$this->getCurrentProjectId()."
-				and _ck.res_taxon_id is not null
-			"
-			*/
-
     public function getChoicesLeadingToATaxon ($params)
     {
-		if (!$params) {
-		    return false;
-		}
+		$project_id = isset($params['projectId']) ? $params['projectId'] : null;
+		$language_id = isset($params['languageId']) ? $params['languageId'] : null;
+		$nametype_id_preferredname = isset($params['nametype_id_preferredname']) ? $params['nametype_id_preferredname'] : null;
 
-		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
-		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
+		if ( is_null($project_id) ||  is_null($language_id) ||  is_null($nametype_id_preferredname) )
+			return;
 
         $query = "
 			select
 				_ck.res_taxon_id,
 				_ck.keystep_id,
 				_a.taxon,
-				_c.commonname
+				_k.name as commonname
 
 			from
 				%PRE%choices_keysteps _ck
@@ -102,21 +68,14 @@ final class KeyModel extends AbstractModel
 				on _ck.project_id=_a.project_id
 				and _ck.res_taxon_id=_a.id
 
-			left join %PRE%commonnames _c
-				on _ck.project_id=_c.project_id
-				and _c.id=
-					(select
-						id
-					from
-						%PRE%commonnames
-					where
-						project_id=_ck.project_id
-						and taxon_id=_ck.res_taxon_id
-						and language_id = ". $languageId ."
-						limit 1
-					)
+			left join %PRE%names _k
+				on _a.id=_k.taxon_id
+				and _a.project_id=_k.project_id
+				and _k.type_id = ".$nametype_id_preferredname."
+				and _k.language_id=".$language_id."
+
 			where
-				_ck.project_id = ".$projectId."
+				_ck.project_id = ".$project_id."
 				and _ck.res_taxon_id is not null";
 
         return $this->freeQuery($query);

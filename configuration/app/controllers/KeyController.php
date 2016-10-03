@@ -738,7 +738,8 @@ class KeyController extends Controller
 
 		$choiceLeadingToATaxon = $this->models->KeyModel->getChoicesLeadingToATaxon(array(
             'projectId' => $this->getCurrentProjectId(),
-		    'languageId' => $this->getCurrentLanguageId()
+		    'languageId' => $this->getCurrentLanguageId(),
+		    'nametype_id_preferredname' => $this->getNameTypeId( PREDICATE_PREFERRED_NAME )
 		));
 
 		$stepsByTarget=array();
