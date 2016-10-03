@@ -70,15 +70,7 @@ var data={
 	found: {} // search results
 }
 
-var prevmatrixsettings={};
-
-//var initialize=true;
-var lastScrollPos=0;
-var tempstatevalue="";
-var openGroups=Array();
-var searchedfor="";
-var resultsetHasImages=false;
-
+/*
 var	labels={
 	details: __('kenmerken'),
 	similar: __('gelijkende soorten'),
@@ -88,6 +80,16 @@ var	labels={
 	info_dialog_title:__('Informatie over soort/taxon'),
 	popup_species_link:__('Meer informatie'),
 }
+*/
+
+var prevmatrixsettings={};
+
+//var initialize=true;
+var lastScrollPos=0;
+var tempstatevalue="";
+var openGroups=Array();
+var searchedfor="";
+var resultsetHasImages=false;
 
 function initDataSet()
 {
@@ -599,6 +601,7 @@ function formatResult( data )
 
 	var image="";
 	var allowImgEnlarge=false;
+	var noImageMouseOver="";
 
 	if ( !matrixsettings.noTaxonImages && (resultsetHasImages || matrixsettings.hideImagesWhenNoneAvailable==false))
 	{
@@ -610,7 +613,11 @@ function formatResult( data )
 		}
 		else
 		{
-			if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
+			if (matrixsettings.defaultSpeciesImage) 
+			{
+				image=matrixsettings.defaultSpeciesImage;
+				noImageMouseOver=__('geen afbeelding beschikbaar');
+			}
 		}
 	}
 
@@ -647,13 +654,20 @@ function formatResult( data )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
 				: ""))
 		;
-		
+
+	var photoCredit = (data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : '');
+	
+	if ( noImageMouseOver.length > 0 )
+	{
+		photoCredit = noImageMouseOver;
+	}
+
 	if ( !matrixsettings.suppressImageEnlarge && allowImgEnlarge )
 	{
 		var imgHtml=
 			fetchTemplate( 'imageHtmlTpl' )
 				.replace('%THUMB-URL%',thumb)
-				.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+				.replace('%PHOTO-CREDIT%',photoCredit)
 			;
 	
 		var imageHtml=
@@ -668,7 +682,7 @@ function formatResult( data )
 		var imageHtml=
 			fetchTemplate( 'imageHtmlTpl' )
 				.replace('%THUMB-URL%',thumb)
-				.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+				.replace('%PHOTO-CREDIT%',photoCredit)
 			;
 	}
 
