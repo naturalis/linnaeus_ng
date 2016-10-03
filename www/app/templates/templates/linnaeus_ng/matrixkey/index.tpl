@@ -66,7 +66,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
+	popup_species_link="{$settings->popup_species_link_text|@escape}";
 
 	__translations = [
 		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },
@@ -96,6 +96,7 @@ $(document).ready(function()
 		{ key : 'Kenmerken', translation : '{t}Kenmerken{/t}' },
 		{ key : 'kenmerken', translation : '{t}kenmerken{/t}' },
 		{ key : 'Versiegeschiedenis', translation : '{t}Versiegeschiedenis{/t}' },
+		{ key : 'geen afbeelding beschikbaar', translation : '{t}geen afbeelding beschikbaar{/t}' },
 	];
 
 	setSetting({
