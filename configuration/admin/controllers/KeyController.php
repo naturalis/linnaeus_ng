@@ -15,7 +15,6 @@ class KeyController extends Controller
 
     public $usedModels = array(
         'keysteps',
-        'keytrees',
         'content_keysteps',
         'choices_keysteps',
         'choices_content_keysteps',
@@ -1898,43 +1897,6 @@ class KeyController extends Controller
 				'id' => $val['id']
 			));
 		}
-    }
-
-    private function getKeyInfo()
-    {
-        $d1 = $this->models->Keytrees->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
-        ));
-
-        $d2 = $this->models->Keysteps->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
-            'order' => 'last_change desc',
-            'limit' => 1
-        ));
-
-        $d3 = $this->models->ChoicesKeysteps->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
-            'order' => 'last_change desc',
-            'limit' => 1
-        ));
-
-        return array(
-            'keytree' => $d1[0],
-            'keystep' => $d2[0],
-            'choice' => $d3[0]
-        );
     }
 
     private function getLookupList()
