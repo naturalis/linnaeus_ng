@@ -55,6 +55,7 @@ var matrixsettings={
 	alwaysSortByInitial: 0,
 	noTaxonImages: false,
 	suppressImageEnlarge: false,
+	hideImagesWhenNoneAvailable: true
 };
 
 var data={
@@ -599,7 +600,7 @@ function formatResult( data )
 	var image="";
 	var allowImgEnlarge=false;
 
-	if ( !matrixsettings.noTaxonImages && resultsetHasImages )
+	if ( !matrixsettings.noTaxonImages && (resultsetHasImages || matrixsettings.hideImagesWhenNoneAvailable==false))
 	{
 		if (data.info && data.info.url_image)
 		{
@@ -609,16 +610,13 @@ function formatResult( data )
 		}
 		else
 		{
-			//imageOrientation
-			console.dir(matrixsettings);
-			
 			if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
 		}
 	}
 
 	var thumb="";
 
-	if ( !matrixsettings.noTaxonImages && resultsetHasImages )
+	if ( !matrixsettings.noTaxonImages && (resultsetHasImages || matrixsettings.hideImagesWhenNoneAvailable==false))
 	{
 		if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
 		{

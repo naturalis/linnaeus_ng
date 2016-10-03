@@ -120,6 +120,29 @@ class MatrixKeyController extends Controller
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->moduleSettings->assignModuleSettings( $this->settings );
 
+				
+		if ( isset($this->settings->generic_image_names) )
+		{
+			$images=json_decode( $this->settings->generic_image_names, true );
+			if ( json_last_error() == JSON_ERROR_NONE)
+			{
+				$this->_genericImages=$images;
+			}
+			else
+			{
+				$this->_genericImages=[ 'portrait'=>$images,'landscape'=>$images ];
+			}
+		}
+		else
+		{
+			$this->_genericImages=[ 'portrait'=>'noImagePortrait.jpg','landscape'=>'noImageLandscape.jpg' ];
+		}
+		
+		foreach((array)$this->_genericImages as $orientation => $imagename)
+		{
+			$this->_genericImages[$orientation] = $this->getProjectUrl('systemMedia').$imagename;
+		}
+
 		$this->initializeMatrixId();
 		$this->setActiveMatrix();
 
@@ -135,6 +158,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign( 'image_root_skin', $this->getProjectUrl('systemMedia') );
 		$this->smarty->assign( 'introduction_links', $this->getIntroductionLinks() );
 		$this->smarty->assign( 'settings', $this->settings );
+		$this->smarty->assign( 'generic_images', $this->_genericImages );
 
 		$this->setFacetMenu();
 		$this->setIncUnknowns( false );
