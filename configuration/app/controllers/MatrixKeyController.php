@@ -130,7 +130,7 @@ class MatrixKeyController extends Controller
 			}
 			else
 			{
-				$this->_genericImages=[ 'portrait'=>$images,'landscape'=>$images ];
+				$this->_genericImages=[ 'portrait'=>$this->settings->generic_image_names,'landscape'=>$this->settings->generic_image_names ];
 			}
 		}
 		else
