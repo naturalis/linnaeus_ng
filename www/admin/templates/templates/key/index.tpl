@@ -16,7 +16,6 @@
         <li><a href="step_show.php">{t}Show key (from startpoint){/t}</a></li>
         <li><a href="section.php">{t}Edit key sections{/t}</a></li>
         <li><a href="map.php">{t}Key map{/t}</a></li>
-        <li><a href="store.php">{t}Compute taxon division{/t}</a></li>
         <li><a href="renumber.php">{t}Renumber steps{/t}</a></li>
         <li><a href="cleanup.php">{t}Clean up empty steps, orphaned choices and ghostly targets{/t}</a></li>
     </ul>
@@ -28,7 +27,6 @@
 
     <ul class="admin-list">
         <li><a href="rank.php">{t}Define ranks that can appear in key{/t}</a></li>
-        <li><a href="store.php">{t}Store key tree (for runtime performance purposes){/t}</a></li>
     </ul>
 
 </div>

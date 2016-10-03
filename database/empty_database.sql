@@ -674,18 +674,6 @@ CREATE TABLE IF NOT EXISTS `keysteps_taxa` (
 	KEY `project_id` (`project_id`,`keystep_id`,`taxon_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `keytrees`;
-CREATE TABLE IF NOT EXISTS `keytrees` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `chunk` int(3) NOT NULL DEFAULT '0',
-  `keytree` mediumtext NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`chunk`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 DROP TABLE IF EXISTS `l2_diversity_index`;
 CREATE TABLE IF NOT EXISTS `l2_diversity_index` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
