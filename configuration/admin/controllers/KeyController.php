@@ -29,6 +29,7 @@ class KeyController extends Controller
     public $jsToLoad = array(
         'all' => array(
             'key.js',
+			'keys-endpoint.js',
             'jit/jit.js',
             'jit/key-tree.js',
             'prettyPhoto/jquery.prettyPhoto.js',

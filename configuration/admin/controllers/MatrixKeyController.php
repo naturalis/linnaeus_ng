@@ -39,6 +39,7 @@ class MatrixKeyController extends Controller
     public $jsToLoad = array(
         'all' => array(
             'matrix.js',
+			'keys-endpoint.js',
             'prettyPhoto/jquery.prettyPhoto.js'
         )
     );
@@ -87,14 +88,6 @@ class MatrixKeyController extends Controller
     {
         parent::__destruct();
     }
-
-	private function setMediaController()
-	{
-        $this->_mc = new MediaController( ['module_settings_reader'=>$this->moduleSettings] );
-        $this->_mc->setModuleId($this->getCurrentModuleId());
-        $this->_mc->setItemId($this->rGetId());
-        $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
-	}
 
     public function indexAction()
     {
@@ -947,6 +940,50 @@ class MatrixKeyController extends Controller
 
         $this->printPage();
     }
+
+    public function rankAction()
+    {
+		$this->checkAuthorisation();
+
+        $this->setPageName( $this->translate('Taxon ranks in key') );
+
+        $pr = $this->getProjectRanks(array(
+            'lowerTaxonOnly' => false
+        ));
+
+        if ($this->rHasVal('keyRankBorder') && isset($pr) && !$this->isFormResubmit())
+		{
+			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
+            $endPoint = false;
+
+            foreach ((array) $pr as $key => $val)
+			{
+
+                if ($val['rank_id'] == $this->rGetVal('keyRankBorder'))
+                    $endPoint = true;
+
+                $this->models->ProjectsRanks->save(array(
+                    'id' => $val['id'],
+                    'keypath_endpoint' => $endPoint ? 1 : 0
+                ));
+            }
+
+            $this->addMessage($this->translate('Saved.'));
+
+            $pr = $this->getProjectRanks(array(
+                'lowerTaxonOnly' => false,
+                'forceLookup' => true
+            ));
+        }
+
+        $this->smarty->assign('projectRanks', $pr);
+
+        $this->printPage();
+    }
+
 
     private function createNewMatrix( $sys_name )
     {
@@ -2274,5 +2311,14 @@ class MatrixKeyController extends Controller
 
 		}
     }
+
+	private function setMediaController()
+	{
+        $this->_mc = new MediaController( ['module_settings_reader'=>$this->moduleSettings] );
+        $this->_mc->setModuleId($this->getCurrentModuleId());
+        $this->_mc->setItemId($this->rGetId());
+        $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
+	}
+
 
 }
