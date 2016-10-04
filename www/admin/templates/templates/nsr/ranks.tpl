@@ -14,7 +14,7 @@
 
     <p>
         {t}In addition, you can specify where the distinction between the modules "higher taxa" and "species" will be. You can move the line by clicking the &uarr; and &darr; arrows. The setting is saved when you click{/t} "{t}save selected ranks{/t}".<br />
-        {t}Be advised that this division is different from the one that defines which taxa can be the end-point of your keys. That distinction is defined in the "dichotomous key" module. However, that distinction must be on the same level as the one you define here, or below it. It can never be higer up in the rank hierarchy.{/t}
+        {t}Be advised that this division is different from the one that defines which taxa can be the end-point of your keys. That division is defined in the single-access key and multi entry key modules.{/t}
     </p>
     
     {if $projectRanks|@count>0}
