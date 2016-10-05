@@ -126,6 +126,7 @@ function printBaseData()
 
 	$('#results').html( buffer.join( "\n" ) );
 	$('#result-header').html( header );
+	$('#result-footer').html( fetchTemplate( 'moreResultsTpl' ) );
 
 }
 
@@ -150,7 +151,9 @@ $(document).ready(function()
     
     <div id="result-header" style="margin-bottom:10px;">
     </div>
-    <div id="results" class="nba-data">
+    <div id="results" class="nba-data" style="margin-bottom:10px;">
+    </div>
+    <div id="result-footer" style="margin-bottom:10px;">
     </div>
 
 </p>
@@ -159,19 +162,26 @@ $(document).ready(function()
 
 <div class="inline-templates" id="resultHeaderTpl">
 <!--
-	<span style="font-weight:bold">{t}%SHOWING% van %TOTAL% collectieobjecten met afbeelding{/t}</span> <a href="#" onclick="$('#theForm').submit();return false;">{t}(bekijk alle resultaten){/t}</a><br />
+	<span style="font-weight:bold">{t}%SHOWING% van %TOTAL% resultaten{/t}</span>
 -->
 </div>
 
 <div class="inline-templates" id="resultHeaderMinTpl">
 <!--
-	<span style="font-weight:bold">{t}%SHOWING% collectieobjecten met afbeelding{/t}</span> <a href="#" onclick="$('#theForm').submit();return false;">{t}(bekijk alle resultaten){/t}</a><br />
+	<span style="font-weight:bold">{t}%SHOWING% resultaten{/t}</span>
 -->
 </div>
 
+<div class="inline-templates" id="moreResultsTpl">
+<!--
+	<a href="#" onclick="$('#theForm').submit();return false;">{t}Bekijk meer resultaten in de Naturalis Bioportal{/t}</a>
+-->
+</div>
+
+
 <div class="inline-templates" id="remarkTpl">
 <!--
-    <span style="display:inline-block;margin-top:3px;">Dit betreft een willekeurige selectie van gedigitaliseerde objecten uit Naturalis Biodiversity Center{* met herkomst Nederland *}. Deze selectie geeft niet per se een compleet beeld.</div>
+    <span style="display:inline-block;margin-top:3px;">Dit is een selectie uit de gedigitaliseerde museumobjecten van Naturalis Biodiversity Center. Deze selectie geeft niet per se een compleet beeld.</div>
 -->
 </div>
 
