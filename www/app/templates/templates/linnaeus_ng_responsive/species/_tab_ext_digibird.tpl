@@ -1,7 +1,3 @@
-<!--
-	{"url":"http:\/\/www.digibird.org\/api\/objects?platform=xeno-canto&genus=%GENUS%&species=%SPECIES%","substitute":{"%SPECIES%":"name:specific_epithet","%GENUS%":"name:uninomial"},"subst_transformation":["none","none"],"substitute_encode":"urlencode","parameters":[],"param_transformation":[],"parameter_encode":"urlencode","rank":"75","check_type":"query","query":"select count(*) as result from %PRE%taxon_quick_parentage _sq\r\nleft join %PRE%taxa _e on _sq.taxon_id = _e.id and _sq.project_id = _e.project_id\r\nleft join %PRE%projects_ranks _pr on _e.rank_id = _pr.id and _e.project_id = _pr.project_id\r\nwhere _sq.project_id = %pid% and _e.id = %tid% and MATCH(_sq.parentage) AGAINST ( (select id from taxa where taxon = 'Aves' ) in boolean mode) and _pr.rank_id >= 75","link_embed":"embed_link","template":"_tab_ext_digibird.tpl","template_params":"{ \"max\": 5, \"general_label\": \"Naar de pagina op Xeno Canto\" }"} |
-
--->
 <script type="text/javascript">
 
 var url;
