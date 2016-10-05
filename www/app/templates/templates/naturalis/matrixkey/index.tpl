@@ -156,7 +156,7 @@ $(document).ready(function()
 		}).appendTo("head");	
 	{/if}
 	
-	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
+	popup_species_link="{$settings->popup_species_link_text|@escape}";
 	
 	__translations = [
 		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },
