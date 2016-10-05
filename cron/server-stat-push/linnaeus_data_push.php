@@ -201,7 +201,7 @@
     		$r = $this->mysqli->query($query);
 
     		if ($r->mysqli_num_rows() == 0) {
-    		    die("No projects created yet!\n");
+    		    die("Nothing to report: no projects/users created yet!\n");
     		}
 
 			while ($row = $r->fetch_assoc()) {
