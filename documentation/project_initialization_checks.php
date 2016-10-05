@@ -7,7 +7,7 @@ make sure there are actual endpoints for the dich key to point to (not lethalm b
 -- FINAL --
 DICH KEY
 cleanup
-store key tree
+
 
 MATRIX KEY
 acquire state image dimensions (l2 only)

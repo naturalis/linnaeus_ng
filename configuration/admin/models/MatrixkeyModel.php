@@ -166,7 +166,7 @@ class MatrixKeyModel extends AbstractModel
 								or _b.id=" . $top . " 
 							)			
 					order by
-						_b.taxon
+						_c.rank_id asc, _b.taxon asc
 					" );
 
 			}
@@ -206,7 +206,7 @@ class MatrixKeyModel extends AbstractModel
 					_b.project_id = ". $project_id ."
 
 				order by
-					_b.taxon
+					_c.rank_id asc, _b.taxon asc
 			");
 		
 		}

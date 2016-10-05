@@ -11,10 +11,13 @@ class KeyController extends Controller
     private $_tempList = array();
 	private $_keyPathMaxItems=3;
 	public $currentKeyStepId;
+	private $choiceKeystepTable;
+	private $stepsDone;
+	private $startStep;
+
 
     public $usedModels = array(
 		'keysteps',
-		'keytrees',
 		'content_keysteps',
 		'choices_keysteps',
 		'choices_content_keysteps',
@@ -24,8 +27,8 @@ class KeyController extends Controller
     public $controllerBaseName = 'key';
 
 	public $cssToLoad = array(
-		'key.css',
-	); //'key-tree.css'
+		'key.css'
+	);
 
 	public $jsToLoad =
 		array(
@@ -41,27 +44,16 @@ class KeyController extends Controller
 		);
 
 
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct($p=null)
     {
         parent::__construct($p);
         $this->initialize();
     }
 
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
         parent::__destruct();
     }
-
 
     private function initialize()
     {
@@ -69,26 +61,16 @@ class KeyController extends Controller
         $this->setMediaController();
 	}
 
-    /**
-     * Main procedure for key
-     *
-     * @access     public
-     */
     public function indexAction()
     {
-    	$this->getKeyTree();
 
         $this->setPageName( $this->translate('Index'));
-
-		// set the stored key tree (= compact hierarchical representation of the entire key)
-		//		$this->getKeyTree();
 
 		// get user's decision path
 		$keyPath = $this->getKeyPath();
 
 		/*
-			if user directly access a specific step or choice while there is no keypath (thru bookmark),
-			a possible decision path is created from the key tree
+			if user directly access a specific step or choice while there is no keypath (thru bookmark), a possible decision path is created
 			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. use forcetree=1 to force.
 		*/
 		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || ($this->rHasVal('forcetree','1') || $this->rHasVal('r')))
@@ -171,7 +153,6 @@ class KeyController extends Controller
 		$this->printPage();
     }
 
-
     private function setStepType ($choices)
     {
 		/*
@@ -225,52 +206,6 @@ class KeyController extends Controller
 	public function getCurrentKeyStepId()
 	{
 		return $this->currentKeyStepId;
-	}
-
-	public function getKeyTree()
-	{
-		$tree = $this->setKeyTree();
-		return $tree;
-	}
-
-	private function setKeyTree()
-	{
-		// get stored tree from database
-		$kt = $this->models->Keytrees->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'order' => 'chunk'
-			)
-		);
-
-		// if it doesn't exist, generate it anew (shouldn't happen!)
-		if (empty($kt[0]['keytree']))
-		{
-			unset($this->_tempList);
-			$d = $this->generateKeyTree();
-			unset($this->_tempList);
-		}
-		// store tree in session
-		else
-		{
-			$tree = $choiceList = '';
-
-			foreach((array)$kt as $val)
-			{
-				if ($val['chunk']!=999)
-					$tree .= trim($val['keytree']);
-				else
-					$choiceList = $val['keytree'];
-			}
-
-			$this->_choiceList = unserialize(utf8_decode($choiceList));
-			$d = unserialize(utf8_decode($tree));
-		}
-
-		return $d;
-
 	}
 
 	private function _createPathInstantly($stepId=null,$choiceId=null)
@@ -400,60 +335,9 @@ class KeyController extends Controller
 	}
 
 
-	// be aware that this function also exists in the app controller and should have identical output there!
-	private function generateKeyTree($id=null,$level=0)
-	{
-		if (is_null($id))
-		{
-			$id = $this->getStartKeystepId();
-		}
-
-		$d = $this->getKeystep($id);
-
-		if (!isset($this->_tempList[$d['id']]))
-		{
-			$this->_tempList[$d['id']] = true;
-		}
-		else
-		{
-			//$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$d['id']));
-			return null;
-		}
-
-		$step =
-			array(
-				'id' => $d['id'],
-				'number' => $d['number'],
-				'title' => $d['title'],
-			    'is_start' => $d['is_start'],
-				'level' => $level
-			);
-
-		$step['choices'] = $this->getKeystepChoices($id,null,false);
-
-		foreach((array)$step['choices'] as $key => $val)
-		{
-			$this->_choiceList[] = $val['id'];
-
-			$d['choice_id'] = $val['id'];
-			$d['choice_marker'] = $val['marker'];
-			$d['res_keystep_id'] = $val['res_keystep_id'];
-			$d['res_taxon_id'] = $val['res_taxon_id'];
-
-			$step['choices'][$key] = $d;
-
-			if ($val['res_keystep_id']) $step['choices'][$key]['step'] = $this->generateKeyTree($val['res_keystep_id'],($level+1));
-		}
-
-		return isset($step) ? $step : null;
-
-	}
-
-
 	/* steps and choices */
 	private function getKeystep($id)
 	{
-
         if (empty($id))  return;
 
 		$k = $this->models->Keysteps->_get(
@@ -615,7 +499,6 @@ class KeyController extends Controller
 		return $this->getKeystepChoices(null,$id);
 	}
 
-
 	/* the path */
 	private function resetKeyPath()
 	{
@@ -694,10 +577,6 @@ class KeyController extends Controller
 
 	}
 
-	private $choiceKeystepTable;
-	private $stepsDone;
-	private $startStep;
-
 	private function getStepsByTarget($step)
 	{
 		$data=array();
@@ -738,7 +617,8 @@ class KeyController extends Controller
 
 		$choiceLeadingToATaxon = $this->models->KeyModel->getChoicesLeadingToATaxon(array(
             'projectId' => $this->getCurrentProjectId(),
-		    'languageId' => $this->getCurrentLanguageId()
+		    'languageId' => $this->getCurrentLanguageId(),
+		    'nametype_id_preferredname' => $this->getNameTypeId( PREDICATE_PREFERRED_NAME )
 		));
 
 		$stepsByTarget=array();
@@ -819,65 +699,12 @@ class KeyController extends Controller
 			);
 	}
 
-
-
-	/* the rest */
-	private function getKeytype()
-	{
-		return $this->moduleSettings->getSetting('keytype');
-	}
-
-	private function choicesHaveL2Attributes($choices)
-	{
-		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
-		return false;
-	}
-
-	private  function reapSteps($branch)
-	{
-		$this->tmp['results'][(int)$branch['number']] =
-			array(
-				'id' => $branch['id'],
-				//'label' => $branch['number'].'. '.$branch['title'],
-				'label' => $this->translate('Step').' '.$branch['number'].(!empty($branch['title']) && $branch['title']!=$branch['number'] ? ': '.$branch['title'] : ''),
-				'number' => (int)$branch['number'],
-			);
-
-		foreach((array)$branch['choices'] as $val)
-		{
-			if (isset($val['step'])) $this->reapSteps($val['step']);
-		}
-	}
-
-	private function getLookupList()
-	{
-		$this->tmp = array();
-		$this->tmp['found'] = false;
-		$this->tmp['excluded'] = array();
-		$this->tmp['results'] = array();
-
-		// ploughs the entire key
-		$this->reapSteps($this->getKeyTree());
-
-		$this->customSortArray($this->tmp['results'],array('key' => 'number'));
-
-		$this->smarty->assign(
-			'returnText',
-			$this->makeLookupList(array(
-				'data'=>$this->tmp['results'],
-				'module'=>'key',
-				'url'=>'index.php?forcetree=1&step=%s',
-				'encode'=>true
-			))
-		);
-	}
-
-	private function setTaxaState ($state)
+	private function setTaxaState($state)
 	{
 		$this->moduleSession->setModuleSetting(array('setting' => 'taxaState', 'value' => $state));
 	}
 
-	private function getTaxaState ()
+	private function getTaxaState()
 	{
 		return
 			(!empty($this->moduleSession->getModuleSetting('taxaState')) ?
@@ -885,20 +712,42 @@ class KeyController extends Controller
 				'remaining');
 	}
 
-	private function formatPathChoice ($choice, $step = null, $choiceMarker = null)
+	/* the rest */
+	private function getKeytype()
+	{
+		return $this->moduleSettings->getSetting('keytype');
+	}
+
+	private function getLookupList()
+	{
+		$steps=$this->models->KeyModel->getKeystepList( [
+            'project_id' => $this->getCurrentProjectId(),
+		    'language_id' => $this->getCurrentLanguageId(),
+		] );
+		
+		foreach((array)$steps as $key=>$val)
+		{
+			$steps[$key]['label']=$this->translate('Step').' '.$val['number'].(!empty($val['label']) && $val['label']!=$val['number'] ? ': '.$val['label'] : '');
+		}
+		
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(array(
+				'data'=>$steps,
+				'module'=>'key',
+				'url'=>'index.php?forcetree=1&step=%s',
+				'encode'=>true
+			))
+		);
+	}
+
+	private function formatPathChoice($choice, $step = null, $choiceMarker = null)
 	{
 		if (!isset($choice['choice_txt'])) return;
 		$remove = $step . $choiceMarker . '. ';
 		$toSpace = array('<br />', '<br>');
 		return str_replace($remove, '', strip_tags(str_replace($toSpace, ' ', $choice['choice_txt'])));
 	}
-
-
-
-    private function showOrderToMarker ($showOrder)
-    {
-        return ;
-    }
 
     private function getChoiceImage($itemId = false)
     {
@@ -924,7 +773,5 @@ class KeyController extends Controller
         $this->_mc->setItemId($this->rGetId());
         $this->_mc->setLanguageId($this->getCurrentLanguageId());
 	}
-
-
 
 }

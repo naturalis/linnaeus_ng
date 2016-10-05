@@ -14,8 +14,8 @@
             <td>
                 <select name="taxon[]" id="taxon" style="width:300px" size="10" multiple="true">
                 {foreach $taxa v k}
-                {* if $v.keypath_endpoint==1 && $v.already_in_matrix==0 *}
-                {if $v.lower_taxon==1 && $v.already_in_matrix==0}
+                {if $v.keypath_endpoint==1 && $v.already_in_matrix==0}
+                {* if $v.lower_taxon==1 && $v.already_in_matrix==0 *}
                     <option value="{$v.id}">{$v.taxon}</option>
                 {/if}
                 {/foreach}

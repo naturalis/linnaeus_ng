@@ -18,6 +18,7 @@ var nbcLabelSimilarSpecies = '';
 var nbcPreviousBrowseStyles = {};
 var baseUrlProjectImages = null;
 var nbcUseEmergingCharacters=true;
+var popup_species_link;
 
 function nbcGetResults(p) {
 
@@ -809,7 +810,7 @@ function printInfo( info, title, url )
 				.replace('%URL%', url ? 
 					infoDialogUrlHtmlTpl
 						.replace('%URL%',url)
-						.replace('%LINK-LABEL%',labels.popup_species_link)
+						.replace('%LINK-LABEL%',popup_species_link)
 					 : "" ),
 			{showOk:false});
 	}

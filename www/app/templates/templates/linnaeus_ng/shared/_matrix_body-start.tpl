@@ -26,7 +26,7 @@
                 <a href="#" onClick="history.go(-1);return false;" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {/if}
             <div class="pageTitleContainer">
-                <span class="pageTitle" onClick="window.open('../../','_self');">
+                <span class="pageTitle" onClick="window.open('../index/?epi={$session.app.project.id}','_self');">
 	              {$session.app.project.title|@strip_tags:false}
                 </span>
             </div>

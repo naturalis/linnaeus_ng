@@ -1,4 +1,25 @@
-<div>
+<style>
+.my_container ul
+{
+    list-style: initial;
+    margin: initial;
+    padding: 0 0 0 40px;
+}
+
+.my_container li
+{
+    display: list-item;
+}
+
+.my_container b
+{
+    font-weight:bold;
+}
+
+</style>
+
+
+<div class="my_container">
 
 {foreach $external_content->content_json_decoded val key}
 {$wetten[$val->wetenschappelijke_naam]['wetten'][$val->wet][]=['categorie'=>$val->categorie,'publicatie'=>$val->publicatie|@strip_tags|@trim]}

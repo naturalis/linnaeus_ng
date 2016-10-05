@@ -1033,6 +1033,8 @@ final class MatrixKeyModel extends AbstractModel
 
 			where
 				_a.project_id = " . $project_id . "
+			order by
+				_a.default desc, _b.name asc
 			";
 
 		return $this->freeQuery( $query );

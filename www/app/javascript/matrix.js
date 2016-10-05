@@ -55,6 +55,7 @@ var matrixsettings={
 	alwaysSortByInitial: 0,
 	noTaxonImages: false,
 	suppressImageEnlarge: false,
+	hideImagesWhenNoneAvailable: true
 };
 
 var data={
@@ -69,15 +70,7 @@ var data={
 	found: {} // search results
 }
 
-var prevmatrixsettings={};
-
-//var initialize=true;
-var lastScrollPos=0;
-var tempstatevalue="";
-var openGroups=Array();
-var searchedfor="";
-var resultsetHasImages=false;
-
+/*
 var	labels={
 	details: __('kenmerken'),
 	similar: __('gelijkende soorten'),
@@ -87,6 +80,16 @@ var	labels={
 	info_dialog_title:__('Informatie over soort/taxon'),
 	popup_species_link:__('Meer informatie'),
 }
+*/
+
+var prevmatrixsettings={};
+
+//var initialize=true;
+var lastScrollPos=0;
+var tempstatevalue="";
+var openGroups=Array();
+var searchedfor="";
+var resultsetHasImages=false;
 
 function initDataSet()
 {
@@ -598,8 +601,9 @@ function formatResult( data )
 
 	var image="";
 	var allowImgEnlarge=false;
+	var noImageMouseOver="";
 
-	if ( !matrixsettings.noTaxonImages && resultsetHasImages )
+	if ( !matrixsettings.noTaxonImages && (resultsetHasImages || matrixsettings.hideImagesWhenNoneAvailable==false))
 	{
 		if (data.info && data.info.url_image)
 		{
@@ -609,16 +613,17 @@ function formatResult( data )
 		}
 		else
 		{
-			//imageOrientation
-			console.dir(matrixsettings);
-			
-			if (matrixsettings.defaultSpeciesImage) image=matrixsettings.defaultSpeciesImage;
+			if (matrixsettings.defaultSpeciesImage) 
+			{
+				image=matrixsettings.defaultSpeciesImage;
+				noImageMouseOver=__('geen afbeelding beschikbaar');
+			}
 		}
 	}
 
 	var thumb="";
 
-	if ( !matrixsettings.noTaxonImages && resultsetHasImages )
+	if ( !matrixsettings.noTaxonImages && (resultsetHasImages || matrixsettings.hideImagesWhenNoneAvailable==false))
 	{
 		if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
 		{
@@ -649,13 +654,20 @@ function formatResult( data )
 					.replace('%PHOTOGRAPHER%', data.info.photographer )
 				: ""))
 		;
-		
+
+	var photoCredit = (data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : '');
+	
+	if ( noImageMouseOver.length > 0 )
+	{
+		photoCredit = noImageMouseOver;
+	}
+
 	if ( !matrixsettings.suppressImageEnlarge && allowImgEnlarge )
 	{
 		var imgHtml=
 			fetchTemplate( 'imageHtmlTpl' )
 				.replace('%THUMB-URL%',thumb)
-				.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+				.replace('%PHOTO-CREDIT%',photoCredit)
 			;
 	
 		var imageHtml=
@@ -670,7 +682,7 @@ function formatResult( data )
 		var imageHtml=
 			fetchTemplate( 'imageHtmlTpl' )
 				.replace('%THUMB-URL%',thumb)
-				.replace('%PHOTO-CREDIT%',(data.info && data.info.photographer ? __('foto')+' &copy;'+data.info.photographer : ''))
+				.replace('%PHOTO-CREDIT%',photoCredit)
 			;
 	}
 

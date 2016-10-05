@@ -66,7 +66,7 @@
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	labels.popup_species_link="{$settings->popup_species_link_text|@escape}";
+	popup_species_link="{$settings->popup_species_link_text|@escape}";
 
 	__translations = [
 		{ key : 'Dit kenmerk is bij de huidige selectie niet langer onderscheidend.', translation : '{t}Dit kenmerk is bij de huidige selectie niet langer onderscheidend.{/t}' },
@@ -96,6 +96,7 @@ $(document).ready(function()
 		{ key : 'Kenmerken', translation : '{t}Kenmerken{/t}' },
 		{ key : 'kenmerken', translation : '{t}kenmerken{/t}' },
 		{ key : 'Versiegeschiedenis', translation : '{t}Versiegeschiedenis{/t}' },
+		{ key : 'geen afbeelding beschikbaar', translation : '{t}geen afbeelding beschikbaar{/t}' },
 	];
 
 	setSetting({
@@ -106,8 +107,7 @@ $(document).ready(function()
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {if $settings->use_emerging_characters}{$settings->use_emerging_characters}{else}0{/if},
 		suppressImageEnlarge: {if $settings->suppress_image_enlarge}{$settings->suppress_image_enlarge}{else}0{/if},
-		defaultSpeciesImages: { portrait: '{$image_root_skin}noImage.jpg', landscape: '{$image_root_skin}noImage.png' } ,
-		//defaultSpeciesImages: { portrait: '{$image_root_skin}noImagePortrait.jpg', landscape: '{$image_root_skin}noImage.png' } ,
+		defaultSpeciesImages: { portrait: '{$generic_images.portrait}', landscape: '{$generic_images.landscape}' } ,
 		imageOrientation: '{if $settings->image_orientation}{$settings->image_orientation}{else}portrait{/if}',
 		browseStyle: '{$settings->browse_style}',
 		scoreThreshold: {if (int)$settings->score_threshold>-1 && (int)$settings->score_threshold<101}{$settings->score_threshold+0}{else}100{/if},
@@ -116,6 +116,7 @@ $(document).ready(function()
 		perLine: {if $settings->items_per_line}{$settings->items_per_line}{else}3{/if},
 		generalSpeciesInfoUrl: '{$settings->species_info_url}',
 		infoLinkTarget: '{if $settings->info_link_target}{$settings->info_link_target}{else}_blank{/if}',
+		hideImagesWhenNoneAvailable: {if $settings->hide_images_when_none_available==='0'}0{else}1{/if},
 		showScores: {if $settings->show_scores}{$settings->show_scores}{else}0{/if},
 		initialSortColumn: '{$settings->initial_sort_column}',
 		alwaysSortByInitial: {if $settings->always_sort_by_initial}{$settings->always_sort_by_initial}{else}0{/if},

@@ -2381,6 +2381,9 @@ class Controller extends BaseClass
 		if ($this->getControllerBaseName() == 'mapkey')
 			return;
 
+		if ($this->getControllerBaseName() == 'matrixkey')
+			return;
+
         if (!isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]))
             return;
 
@@ -2391,8 +2394,7 @@ class Controller extends BaseClass
         $requestHasNoFileName = $this->getViewName() == 'index' && ($d !== $_SERVER['PHP_SELF']);
 
         if (
-			($this->getControllerBaseName() == 'mapkey' || $this->getControllerBaseName() == 'matrixkey' || $this->getControllerBaseName() == 'index') &&
-			$requestHasNoFileName &&
+			($this->getControllerBaseName() == 'index') && $requestHasNoFileName &&
 			(isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']) && $_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage'] != $thisUrl)
 		)
         {

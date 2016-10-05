@@ -15,7 +15,6 @@ class KeyController extends Controller
 
     public $usedModels = array(
         'keysteps',
-        'keytrees',
         'content_keysteps',
         'choices_keysteps',
         'choices_content_keysteps',
@@ -30,6 +29,7 @@ class KeyController extends Controller
     public $jsToLoad = array(
         'all' => array(
             'key.js',
+			'keys-endpoint.js',
             'jit/jit.js',
             'jit/key-tree.js',
             'prettyPhoto/jquery.prettyPhoto.js',
@@ -806,53 +806,6 @@ class KeyController extends Controller
     }
 
 	/**
-	* storeAction
-	*
-	* renders store_action.php
-	* function stores a serialized version of the entire key into a table as cache for faster front-end key-navigation
-	*
-	* @return void
-	* @access public
-	*/
-    public function storeAction()
-    {
-		$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-        $this->checkAuthorisation();
-
-        $this->setPageName($this->translate('Store key tree'));
-
-        if ($this->rHasVal('action', 'store') && !$this->isFormResubmit())
-		{
-            $k = $this->saveKeyTree();
-
-            if ($k===true)
-			{
-                $this->addMessage($this->translate('Key tree saved'));
-
-                if ($this->rHasVal('step'))
-				{
-                    $this->addMessage('<a href="step_show.php?step=' . $this->rGetVal('step') . '">' . $this->translate('Back to key') . '</a>');
-				}
-            }
-            else
-			{
-                $this->addError($k);
-            }
-        }
-
-        if ($this->rHasVal('step'))
-		{
-            $this->smarty->assign('step', $this->rGetVal('step'));
-		}
-
-        $this->smarty->assign('keyinfo', $this->getKeyInfo());
-
-        //$this->smarty->assign('didKeyTaxaChange', $this->didKeyTaxaChange());
-
-        $this->printPage();
-    }
-
-	/**
 	* cleanUpAction
 	*
 	* renders clean_up.php
@@ -1144,47 +1097,6 @@ class KeyController extends Controller
         else
 		{
             return isset($path[$pathcount-($steps_back+1)]) ? $path[$pathcount-($steps_back+1)] : false;
-        }
-    }
-
-    private function saveKeyTree()
-    {
-		unset($this->_tempList);
-
-        $tree = $this->generateKeyTree();
-
-		unset($this->_tempList);
-
-        if ($tree)
-		{
-            $tree = utf8_encode(serialize($tree));
-
-            $this->models->Keytrees->delete(array(
-                'project_id' => $this->getCurrentProjectId()
-            ));
-
-            $d = str_split($tree, 100000);
-
-            foreach ((array) $d as $key => $val) {
-
-                $this->models->Keytrees->save(array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'chunk' => $key,
-                    'keytree' => $val
-                ));
-            }
-
-			$this->models->Keytrees->save(array(
-				'project_id' => $this->getCurrentProjectId(),
-				'chunk' => 999,
-				'keytree' => utf8_encode(serialize($this->_choiceList))
-			));
-
-            return true;
-        }
-        else {
-
-            return false;
         }
     }
 
@@ -1986,43 +1898,6 @@ class KeyController extends Controller
 				'id' => $val['id']
 			));
 		}
-    }
-
-    private function getKeyInfo()
-    {
-        $d1 = $this->models->Keytrees->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
-        ));
-
-        $d2 = $this->models->Keysteps->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
-            'order' => 'last_change desc',
-            'limit' => 1
-        ));
-
-        $d3 = $this->models->ChoicesKeysteps->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
-            'order' => 'last_change desc',
-            'limit' => 1
-        ));
-
-        return array(
-            'keytree' => $d1[0],
-            'keystep' => $d2[0],
-            'choice' => $d3[0]
-        );
     }
 
     private function getLookupList()

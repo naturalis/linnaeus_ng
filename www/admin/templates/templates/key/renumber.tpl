@@ -2,7 +2,7 @@
 
 <div id="page-main">
 <p>
-(uitleg hernummeren sleutel + testen)
+{t}This function will renumber the steps in your key.{/t}
 </p>
 <form action="" method="post">
 <input type="hidden" name="action" value="renumber" />
