@@ -171,7 +171,7 @@ $(document).ready(function()
 
 <div class="inline-templates" id="remarkTpl">
 <!--
-    <span style="display:inline-block;margin-top:3px;font-size:0.9em">NB. Dit betreft een willekeurige selectie van gedigitaliseerde objecten uit Naturalis Biodiversity Center met herkomst Nederland. Deze selectie geeft niet per se een compleet beeld.</div>
+    <span style="display:inline-block;margin-top:3px;">Dit betreft een willekeurige selectie van gedigitaliseerde objecten uit Naturalis Biodiversity Center{* met herkomst Nederland *}. Deze selectie geeft niet per se een compleet beeld.</div>
 -->
 </div>
 

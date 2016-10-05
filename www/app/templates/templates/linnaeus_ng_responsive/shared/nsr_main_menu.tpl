@@ -57,7 +57,7 @@
 		<i class="ion-plus-round plus"></i>
 		<i class="ion-minus-round min"></i>
 		<ol>
-			<li><a href="{$server}/search/nsr_search.php">Snel zoeken</a></li>
+			<li><a href="/">Snel zoeken</a></li>
 			<li><a href="{$server}/search/nsr_search_extended.php">Uitgebreid zoeken</a></li>
 			<li><a href="{$server}/search/nsr_search_pictures.php">Foto's zoeken</a></li>
 			<li><a href="{$server}/species/tree.php">Taxonomische boom</a></li>
