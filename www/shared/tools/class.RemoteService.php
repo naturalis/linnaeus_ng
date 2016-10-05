@@ -24,6 +24,7 @@
 		private $timeout=10;
 		private $data;
 		private $headers;
+		private $requestHeaders=["Connection: close"];
 		
 		public function setUrl( $url )
 		{
@@ -82,6 +83,18 @@
 			return $this->data;
 		}
 
+		public function setRequestHeaders( $h )
+		{
+			if ( is_array($h) )
+			{
+				$this->requestHeaders=array_merge($this->requestHeaders,$h);
+			}
+			else
+			{
+				$this->requestHeaders[]=$h;
+			}
+		}
+
 		private function initialize()
 		{
 			if ( empty($this->getUrl() ) )  throw new Exception( "no URL" );
@@ -93,7 +106,14 @@
 				file_get_contents(
 					$this->getUrl(), 
 					false, 
-					stream_context_create( [ "http" => [ "header"=>"Connection: close\r\n",  "ignore_errors" => true, "timeout" => $this->getTimeout() ] ] )
+					stream_context_create( [
+						"http" => [
+							"header"=>implode("\r\n",$this->requestHeaders)."\r\n", 
+							"ignore_errors" => true,
+							"timeout" => $this->getTimeout() 
+						] 
+					] 
+					)
 				)
 			);
 

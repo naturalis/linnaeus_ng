@@ -481,7 +481,8 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			if (strpos($val,'name:')===0)
 			{
-				$valid_name=@$this->models->Names->_get(["id"=>[
+				$valid_name=
+					@$this->models->Names->_get(["id"=>[
 						"project_id"=>$this->getCurrentProjectId(),
 						"taxon_id"=>$taxon['id'],
 						"type_id"=>$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']]
@@ -550,6 +551,9 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 				}
 				$i++;
+
+				$reference->subst_values[$key]=$sval;
+			
 			}
 		}
 
@@ -594,6 +598,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 					$query_string .= $key .'=' . rawurlencode( $sval ) . '&';
 				}
+
+				$reference->param_values[$key]=$sval;
+
 			}
 		}
 
