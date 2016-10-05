@@ -200,7 +200,7 @@
 
     		$r = $this->mysqli->query($query);
 
-    		if ($r->mysqli_num_rows() == 0) {
+    		if (!$r) {
     		    die("Nothing to report: no projects/users created yet!\n");
     		}
 
