@@ -36,7 +36,6 @@
         {/foreach}
     </ul>
 
-	<div id="menu-bottom"></div>
+	<div id="menu-bottom">{snippet}menu_bottom.html{/snippet}</div>
 </div>
-
 
