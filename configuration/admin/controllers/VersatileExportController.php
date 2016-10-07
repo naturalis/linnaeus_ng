@@ -3,6 +3,8 @@
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
 
+// run as .../export_versatile.php?printquery to print actual query as well
+
 class VersatileExportController extends Controller
 {
 
@@ -772,9 +774,6 @@ class VersatileExportController extends Controller
 		}
 		$this->printNewLine();
 	}
-
-
-
 
 	private function setBranchTopId( $branch_top_id )
 	{
