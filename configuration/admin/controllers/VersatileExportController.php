@@ -45,6 +45,7 @@ class VersatileExportController extends Controller
 	private $utf8_to_utf16;
 	private $add_utf8_BOM;
 	private $output_target;
+	private $print_query=false;
 	private $_nameTypeIds;
 	private $suppress_underscored_fields=true;
 	private $replaceUnderscoresInHeaders=true;
@@ -53,6 +54,7 @@ class VersatileExportController extends Controller
 	private $quoteChar='"';
 	private $query_bit_name_parts;
 	private $query;
+	private $queries;
 	private $concept_url;
 	private $names=array();
 	private $synonyms=array();
@@ -173,6 +175,7 @@ class VersatileExportController extends Controller
 			$this->setDoPrintQueryParameters( $this->rGetVal('print_query_parameters') );
 			$this->setPrintEOFMarker( $this->rGetVal('print_eof_marker') );
 			$this->setOutputTarget( $this->rGetVal('output_target') );
+			$this->setPrintQuery( $this->rHasVar('printquery') ); // undoc'd feat. start as export_versatile.php?printquery to add full queries to output
 
 			$this->setNameTypeIds();
 
@@ -365,6 +368,11 @@ class VersatileExportController extends Controller
 			";
 
 		$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );
+		
+		if ( $this->getPrintQuery() )
+		{
+			$this->queries['main'] = $this->models->VersatileExportModel->getLastQuery();
+		}
 
 		if ( $this->hasCol( 'sci_name' ) && $this->getDoHybridMarker() )
 		{
@@ -576,6 +584,7 @@ class VersatileExportController extends Controller
 			$this->doQueryParametersOutput();
 			$this->doNamesOutput();
 			$this->doSynonymsOutput();
+			$this->doQueriesOutput();
 			$this->doEOFMarkerOutput();
 		}
 
@@ -745,6 +754,27 @@ class VersatileExportController extends Controller
 		$this->printNewLine();
 		$this->printBodyLines( $this->synonyms );
 	}
+
+	private function doQueriesOutput()
+	{
+		if ( !$this->getPrintQuery() )
+			return;
+
+		$this->printNewLine();
+		$this->printNewLine();
+		
+		foreach((array)$this->queries as $key=>$val)
+		{
+			echo "query:",$key,str_repeat('-',60);
+			$this->printNewLine();
+			echo $val;
+			$this->printNewLine();
+		}
+		$this->printNewLine();
+	}
+
+
+
 
 	private function setBranchTopId( $branch_top_id )
 	{
@@ -1017,6 +1047,16 @@ class VersatileExportController extends Controller
 	private function getKeepTags()
 	{
 		return $this->keep_tags;
+	}
+
+	private function setPrintQuery( $state )
+	{
+		$this->print_query=$state;
+	}
+
+	private function getPrintQuery()
+	{
+		return $this->print_query;
 	}
 
 	private function getSuppressUnderscoredFields()
