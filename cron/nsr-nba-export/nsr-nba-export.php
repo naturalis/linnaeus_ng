@@ -381,6 +381,7 @@
 					_a.uninomial,
 					_a.specific_epithet,
 					_a.infra_specific_epithet,
+					_a.authorship,
 					_a.name_author,
 					_a.authorship_year,
 					_a.reference,
