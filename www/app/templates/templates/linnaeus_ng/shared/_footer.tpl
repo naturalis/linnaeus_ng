@@ -91,7 +91,7 @@ $(document).ready(function()
 	}
 	*/
 
-	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
+	{if $search}onSearchBoxSelect('');{/if}
 	{foreach from=$requestData key=k item=v}
 	addRequestVar('{$k}','{$v|addslashes}')
 	{/foreach}

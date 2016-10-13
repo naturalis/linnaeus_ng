@@ -6,4 +6,5 @@
 {/if}
 {include file="../shared/_top-strip.tpl"}
 <div id="container">
-<form method="get" action="{$smarty.server.PHP_SELF}" id="theForm">
+
+<form method="get" action="{$smarty.server.PHP_SELF}" id="theForm"></form>
