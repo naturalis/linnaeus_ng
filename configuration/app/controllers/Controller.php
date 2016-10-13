@@ -867,7 +867,7 @@ class Controller extends BaseClass
             $_SESSION['app'][$this->spid()]['user']['languageChanged'] = false;
         }
 
-//        if (!isset($_SESSION['app'][$this->spid()]['project']['activeLanguageId']))
+        if (!isset($_SESSION['app'][$this->spid()]['project']['activeLanguageId']))
 		{
             $_SESSION['app'][$this->spid()]['project']['activeLanguageId'] = $this->getDefaultLanguageId();
             $_SESSION['app'][$this->spid()]['user']['languageChanged'] = true;
@@ -884,6 +884,7 @@ class Controller extends BaseClass
 
 		if ( isset($_SESSION['app']['user']['currentLanguage']) )
 		$this->setDatabaseLocaleSettings( $_SESSION['app']['user']['currentLanguage'] );
+
     }
 
     /**
@@ -1211,7 +1212,7 @@ class Controller extends BaseClass
 		{
             $result = $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
-		
+
         // If we end up here something must be wrong, just return name sans formatting
         if ( is_null($result) )
 		{
@@ -1748,7 +1749,7 @@ class Controller extends BaseClass
         $this->smarty->assign('contact', $this->getContactLink());
 		$this->smarty->assign('server_name', $this->server_name);
 		$this->smarty->assign('current_url', $this->helpers->CurrentUrl->getParts());
-		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );	
+		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
 		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
     }
 
