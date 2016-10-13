@@ -139,6 +139,7 @@ class IndexController extends Controller
 				'language_id' => $language_id,
 				'nametypes' => $this->_commonNameTypes,
 			));
+		    //die($this->models->IndexModel->q());
 		}
 		else
 		{
@@ -147,8 +148,6 @@ class IndexController extends Controller
 				'nametypes'=> $this->_scientificNameTypes,
 			    'type' => $type,
             ));
-
-            //die($this->models->IndexModel->q());
 		}
 
 		$result=array();
@@ -156,7 +155,10 @@ class IndexController extends Controller
 
 		foreach((array)$alpha as $val)
 		{
-			$result['hasNonAlpha']=$result['hasNonAlpha'] || (ord($val['letter'])<97 || ord($val['letter'])>122);
+			//$result['hasNonAlpha'] = $result['hasNonAlpha'] || (ord($val['letter'])<97 || ord($val['letter'])>122);
+			if (is_int($val['letter'])) {
+			    $result['hasNonAlpha'] = true;
+			}
 			$result['alphabet'][$val['letter']]=true;
 		}
 
