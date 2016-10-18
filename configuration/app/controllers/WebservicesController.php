@@ -633,7 +633,7 @@ parameters:
 			'lokatie'=>$this->translate('Locatie'),
 			'fotograaf'=>$this->translate('Fotograaf'),
 			'validator'=>$this->translate('Validator'),
-			'date_created'=>$this->translate('Datum foto'),
+			'date_created'=>$this->translate('Datum vervaardiging'),
 		);
 
 		$this->setJSON(json_encode($result));
