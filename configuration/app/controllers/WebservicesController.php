@@ -545,7 +545,7 @@ parameters:
 				and _meta9.sys_label='verspreidingsKaart'
 
 			where 
-				_a.sys_label = 'beeldbankDatumVervaardiging'
+				_a.sys_label = 'beeldbankDatumAanmaak'
 				and _a.project_id = ".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
 
