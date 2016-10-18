@@ -545,7 +545,7 @@ parameters:
 				and _meta9.sys_label='verspreidingsKaart'
 
 			where 
-				_a.sys_label = 'beeldbankDatumAanmaak'
+				_a.sys_label = 'beeldbankDatumVervaardiging'
 				and _a.project_id = ".$this->getCurrentProjectId()."
 				and ifnull(_meta9.meta_data,0)!=1
 
@@ -597,7 +597,7 @@ parameters:
 			left join %PRE%media_meta _d
 				on _a.id=_d.media_id and _a.project_id=_d.project_id and _d.sys_label = 'beeldbankFotograaf'
 			left join %PRE%media_meta _e
-				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumAanmaak'
+				on _a.id=_e.media_id and _a.project_id=_e.project_id and _e.sys_label = 'beeldbankDatumVervaardiging'
 			left join %PRE%media_meta _f
 				on _a.id=_f.media_id and _a.project_id=_f.project_id and _f.sys_label = 'beeldbankLokatie'
 			left join %PRE%media_meta _g
@@ -632,7 +632,7 @@ parameters:
 			'lokatie'=>$this->translate('Locatie'),
 			'fotograaf'=>$this->translate('Fotograaf'),
 			'validator'=>$this->translate('Validator'),
-			'date_created'=>$this->translate('Datum plaatsing'),
+			'date_created'=>$this->translate('Datum vervaardiging'),
 		);
 
 		$this->setJSON(json_encode($result));
