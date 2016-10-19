@@ -78,6 +78,7 @@ class NsrTaxonImportController extends NsrController
                     $this->helpers->CsvParserHelper->setFieldDelimiter(',');
             }
 
+			//$this->helpers->CsvParserHelper->setStripBOM( true ); // now default
             $this->helpers->CsvParserHelper->parseFile( $this->requestDataFiles[0]["tmp_name"] );
 
             $this->addError( $this->helpers->CsvParserHelper->getErrors() );

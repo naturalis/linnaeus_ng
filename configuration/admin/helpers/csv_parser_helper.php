@@ -16,6 +16,7 @@ class CsvParserHelper
 	private $_maxLineLength = 1000;
 	private $_oldADLEsetting;
 	private $_rawData=null;
+	private $_stripBOM=true;
 
 	private $_allowedDelimiters = array(',',';',"\t");
 	private $_allowedEnclosures = array('"',"'",false);
@@ -122,6 +123,11 @@ class CsvParserHelper
         return $this->_results;
     }
 
+    public function setStripBOM( $state )
+    {
+        $this->_stripBOM=$state;
+    }
+
     private function testIfCSV($useRaw=false)
     {
 		$b=null;
@@ -165,11 +171,18 @@ class CsvParserHelper
     {
         if (($handle = fopen($this->_file, 'r'))!==false)
 		{
+			$firstLine=true;
 			// fgetcsv does not allow for enclosure being absent
 			if ($this->_enclosure==false)
 			{
 				while (($data = fgets($handle,$this->getMaxLineLength()))!==false)
 				{
+					if ($firstLine && $this->_stripBOM)
+					{
+						$data[0]=ltrim($data[0],chr(239).chr(187).chr(191));
+						$firstLine=false;
+					}
+					
 					/*
 						wish we had str_getcsv, but the specs say stick to PHPv5.2
 						anyway, since there is no enclosure we can safely assume *every* delimiter is 
@@ -190,6 +203,12 @@ class CsvParserHelper
 			{
 				while (($data=fgetcsv($handle,$this->getMaxLineLength(),$this->_delimiter,$this->_enclosure))!==false)
 				{
+					if ($firstLine && $this->_stripBOM)
+					{
+						$data[0]=ltrim($data[0],chr(239).chr(187).chr(191));
+						$firstLine=false;
+					}	
+									
 					$this->_results[] = $data;
 					if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax)
 					{
