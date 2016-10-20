@@ -4,6 +4,7 @@
 	$url = isset($_GET['u']) ? $_GET['u'] : null;
 
 	include_once('../configuration/app/controllers/Controller.php');
+	include_once('../configuration/app/constants.php');
 
    if (defined(FIXED_PROJECT_ID))
 			$pId=FIXED_PROJECT_ID;
