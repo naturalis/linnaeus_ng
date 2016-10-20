@@ -3,13 +3,15 @@
 	$pId = isset($_GET['p']) ? $_GET['p'] : null;
 	$url = isset($_GET['u']) ? $_GET['u'] : null;
 
-	if (defined(FIXED_PROJECT_ID))
-		$pId=FIXED_PROJECT_ID;
+	include_once('../configuration/app/controllers/Controller.php');
+
+   if (defined(FIXED_PROJECT_ID))
+			$pId=FIXED_PROJECT_ID;
 
 	// silent fail on missing project id or no URL
 	//if (is_null($pId) || is_null($url)) // rewrite of drupal search has no URL
 	if (is_null($pId))
-		return;
+			return;
 
 	$c=new Controller;
 	$file='../configuration/app/rewrite/rewrite-'.$c->getProjectFSCode($pId).'.php';
