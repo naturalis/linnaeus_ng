@@ -527,15 +527,15 @@ final class Literature2Model extends AbstractModel
 			order by
 				ifnull(_b.name,_a.author), _a.date, _a.label
 			";
-			
+
 		$literature=$this->freeQuery($query);
-		
+
 		foreach((array)$literature as $key=>$val)
 		{
 			$literature[$key]['authors']=
 				$this->getReferenceAuthors( [ 'projectId'=>$project_id, 'literatureId'=>$val['id'] ] );
 		}
-		
+
 		return $literature;
     }
 
@@ -550,9 +550,9 @@ final class Literature2Model extends AbstractModel
 
         $query = "
 			insert into %PRE%literature_taxa
-				(project_id,taxon_id,literature_id,sort_order)
+				(project_id,taxon_id,literature_id,sort_order, created)
 			values
-				(".$project_id.",".$taxon_id.",".$literature_id.",".$sort_order.")
+				(".$project_id.",".$taxon_id.",".$literature_id.",".$sort_order.", now())
 			";
 
 		$this->freeQuery($query);
