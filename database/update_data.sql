@@ -110,7 +110,7 @@ insert ignore into modules values (null,'User management','User management','use
 insert ignore into modules values (null,'Media','Media management','media',99,1,0,now(),now());
 insert ignore into modules values (null,'Taxon editor','Taxon editor','nsr',99,1,0,now(),now());
 insert ignore into modules values (null,'Actors','Actors: persons & organizations','actors',99,1,0,now(),now());
-insert ignore into modules values (null,'Hotwords','Automatic linking of key words in the content of your site.','hotwords',99,1,0,now(),now());
+insert ignore into modules values (null,'Hotwords','Automatic linking of key words in the content of your site','hotwords',99,1,0,now(),now());
 insert ignore into modules values (null,'Traits','Traits module','traits',99,1,0,now(),now());
 
 update modules set show_in_menu=0, description='Front-end implementation of the Taxon Editor' where controller='species';
