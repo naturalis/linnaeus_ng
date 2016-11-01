@@ -2155,7 +2155,10 @@ table tr td {
 	font-style:normal;
 }
 
-i {
+i, em {
 	font-style:italic;
 }
 
+strong {
+    font-weight: bold;
+}

@@ -1,3 +1,9 @@
+<style>
+.verspreidingskaart {
+	max-width:500px;
+}
+</style>
+
 		<div>
 			<h2>{t}Voorkomen{/t}</h2>
 			
@@ -19,7 +25,7 @@
 
 			<a class="fancybox" href="{$taxon_base_url_images_main}{$v.image}" pTitle="{if $v.meta_map_description}{$v.meta_map_description|@ucfirst|@escape}{/if}
 			{if $v.meta_map_source && $v.meta_map_description}<br />{/if}{if $v.meta_map_source}{t}Bron:{/t} {$v.meta_map_source}{/if}">
-				<img class="verspreidingskaartje" title="Foto {$v.photographer}" src="{$taxon_base_url_images_main}{$v.image}" />
+				<img class="verspreidingskaart" title="Foto {$v.photographer}" src="{$taxon_base_url_images_main}{$v.image}" />
 			</a>
 			{if $v.meta_map_description}<br />{$v.meta_map_description|@ucfirst}{/if}
 			{if $v.meta_map_source}<br />{t}Bron{/t}: {$v.meta_map_source}{/if}
