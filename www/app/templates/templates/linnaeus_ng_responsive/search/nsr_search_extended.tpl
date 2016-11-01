@@ -35,12 +35,6 @@
 	border-right: 5px solid transparent;
 	border-top: 10px solid black;
 }
-
-/*.selected-parameters {
-	margin:10px 0 0 -8px;
-	padding:10px 6px 10px 10px;
-	background-color:#fffbbb;
-}*/
 #search-parameters {
 	margin-top:5px;
 }
