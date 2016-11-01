@@ -1,7 +1,10 @@
 {include file="../shared/header.tpl"}
 {include file="../shared/flexslider.tpl"}
+
 <div id="dialogRidge">
+
 	{include file="_searchtabs.tpl" activeTab="searchPictures" responsiveTabs="mobile"}
+
 	<div id="left">
 		<a class="filterSearchText">
 		  Filter zoekopdracht
