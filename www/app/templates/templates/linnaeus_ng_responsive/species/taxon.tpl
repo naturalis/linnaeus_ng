@@ -11,15 +11,19 @@
 			{/if}
 		</div>
 	</div>
+
 	{if $overviewImage.image}
 	<div id="taxonImage">
 		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
 		<div class="imageGradient"></div>
 	</div>
+
 	{else}
 		{include file="../shared/flexslider.tpl"}
 	{/if}
+    
 </div>
+
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}

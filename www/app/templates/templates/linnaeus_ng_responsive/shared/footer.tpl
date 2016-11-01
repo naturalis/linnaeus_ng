@@ -14,47 +14,9 @@
 
 <script type="text/javascript">
 
-function setHeaderAndFooter()
-{
-	var nsr_domain = "http://www.nederlandsesoorten.nl";
-	
-	$.ajax({
-		url : "../../../shared/tools/remote_service.php",
-		type: "POST",
-		data : ({
-			url : encodeURIComponent(nsr_domain),
-			original_headers : 1
-		}),
-		success : function( response )
-		{
-			try {
-				$('body').append('<div id=ghost style="display:none"></div>');
-				var filtered=response
-					.replace( new RegExp("<script([^>]*)>","g"),"<script>")
-					.replace( new RegExp("@import url([^;]*);","g"),"")
-					.replace( new RegExp("<link([ ]*)type=\"text/css\"(.*?)/>","g"),"")
-					;
-				$('#ghost').append( $( filtered ) );
-			} catch(e) {
-			} finally {
-				var footer = $('#block-nlsoort-components-nlsoort-components-footer').html();
-				$( '#footercontainer' ).html( footer );
-				$( '#footercontainer img' ).each(function()
-				{
-					$(this).attr("src",nsr_domain+$(this).attr("src"));
-				});
-				$( '.menuContainer' ).first().html( $('#block-nlsoort-components-nlsoort-components-main-menu').html() );
-				$( '#ghost' ).remove();
-				
-			}
-		}
-	});
-}
-
 $(document).ready(function()
 {
 	allLookupAlwaysFetch=true;
-	setHeaderAndFooter();
 });
   
 </script>

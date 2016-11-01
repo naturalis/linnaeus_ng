@@ -2,6 +2,7 @@
     <div class="menuContainer">
         {* include file="../shared/nsr_main_menu.tpl" *}
     </div>
+	<div style="margin-top:50px;"></div>
     <div class="scrollContainer">
     <div id="container">
     <a name="top"></a>
