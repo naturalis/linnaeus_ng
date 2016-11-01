@@ -29,7 +29,11 @@ function setHeaderAndFooter()
 		{
 			try {
 				$('body').append('<div id=ghost style="display:none"></div>');
-				var filtered=response.replace( new RegExp("<script([^>]*)>","g"),"<script>");
+				var filtered=response
+					.replace( new RegExp("<script([^>]*)>","g"),"<script>")
+					.replace( new RegExp("@import url([^;]*);","g"),"")
+					.replace( new RegExp("<link([ ]*)type=\"text/css\"(.*?)/>","g"),"")
+					;
 				$('#ghost').append( $( filtered ) );
 			} catch(e) {
 			} finally {
@@ -40,6 +44,8 @@ function setHeaderAndFooter()
 					$(this).attr("src",nsr_domain+$(this).attr("src"));
 				});
 				$( '.menuContainer' ).first().html( $('#block-nlsoort-components-nlsoort-components-main-menu').html() );
+				$( '#ghost' ).remove();
+				
 			}
 		}
 	});
@@ -57,23 +63,3 @@ $(document).ready(function()
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
