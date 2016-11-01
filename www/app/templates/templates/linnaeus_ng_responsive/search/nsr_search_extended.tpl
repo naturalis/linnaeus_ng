@@ -4,8 +4,6 @@
 .options-panel {
 	margin-top:5px;
 }
-
-
 .zoekknop {
 	cursor:pointer;
 }
@@ -46,7 +44,9 @@
 #search-parameters {
 	margin-top:5px;
 }
-
+.field ol, ul {
+    margin: 0.5em 0;
+}
 </style>
                 
 <script>
