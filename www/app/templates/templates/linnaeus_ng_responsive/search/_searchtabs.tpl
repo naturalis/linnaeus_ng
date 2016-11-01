@@ -1,8 +1,3 @@
-<style>
-ol, ul {
-    margin: 0.5em 0;
-}
-</style>
 <div class="searchBoxContainer {$responsiveTabs}">
 	<ul class="tabs">
 		<!-- li {if $activeTab eq 'quickSearch'}class="active"{/if}>
