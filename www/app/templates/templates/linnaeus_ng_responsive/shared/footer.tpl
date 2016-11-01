@@ -16,7 +16,7 @@
 
 function setHeaderAndFooter()
 {
-	var nsr_domain = "/";
+	var nsr_domain = "http://www.nederlandsesoorten.nl";
 	
 	$.ajax({
 		url : "../../../shared/tools/remote_service.php",
