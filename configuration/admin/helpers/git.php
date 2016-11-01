@@ -8,6 +8,7 @@ class Git {
 	private $git_branch;
 	private $git_commit;
 	private $git_origin_commit_hash;
+	private $git_tags;
 
     public function __construct ()
     {
@@ -30,6 +31,7 @@ class Git {
 		$this->setBranch();
 		$this->setCommit();
 		$this->setOriginCommitHash();
+		$this->setTags();
 	}
 
     public function getBranch()
@@ -94,6 +96,12 @@ class Git {
 		$this->git_origin_commit_hash=trim(@shell_exec( $p ));
 	}
 
+	private function setTags()
+	{
+		if ( empty($this->git_branch) ) return;
+		$p=$this->exec_path . " describe --tags";
+		$this->git_tags=trim(@shell_exec( $p ));
+	}
 
 }
 
