@@ -44,9 +44,6 @@
 #search-parameters {
 	margin-top:5px;
 }
-ol, ul {
-    margin: 0.5em 0;
-}
 </style>
                 
 <script>
