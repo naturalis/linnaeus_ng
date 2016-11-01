@@ -1,6 +1,6 @@
 <body id="body" class="conceptcard">
     <div class="menuContainer">
-        {include file="../shared/nsr_main_menu.tpl"}
+        {* include file="../shared/nsr_main_menu.tpl" *}
     </div>
     <div class="scrollContainer">
     <div id="container">
