@@ -112,7 +112,7 @@ $(document).ready(function()
         <source src="%MP3-PATH%" type="audio/mpeg">
     </audio><br />
     <a href="%URL%" target="_blank" title="%LABEL%">%URL%</a><br />
-    Opegnomen door: %CREATOR% (%SPATIAL%, %TEMPORAL%)<br />
+    Opgenomen door: %CREATOR% (%SPATIAL%, %TEMPORAL%)<br />
     Licentie: <a href="%LICENSE%" target="_blank">%LICENSE%</a>
 	</p>
 -->

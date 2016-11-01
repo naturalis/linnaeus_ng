@@ -13,7 +13,7 @@
 		<div id="treebranchContainer" class="filterPictures">
 			{include file="_filterPictures.tpl"}
 		</div>  
-		{include file="_toolbox.tpl"}
+
 	</div>
 	
 	<div id="content" class="image-search">
