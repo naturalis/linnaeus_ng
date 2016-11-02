@@ -49,6 +49,11 @@ class Git {
 		return $this->git_origin_commit_hash;
     }
 	
+    public function getTags()
+    {
+		return $this->git_tags;
+    }
+	
 	private function setExecPath()
 	{
 		$this->exec_path=

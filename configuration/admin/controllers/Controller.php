@@ -2893,6 +2893,7 @@ class Controller extends BaseClass
 		$this->_gitVars->branch=$this->helpers->Git->getBranch();
 		$this->_gitVars->commit=$this->helpers->Git->getCommit();
 		$this->_gitVars->origin_commit_hash=$this->helpers->Git->getOriginCommitHash();
+		$this->_gitVars->git_tags=$this->helpers->Git->getTags();
 	}
 
 	protected function getGitVars()
