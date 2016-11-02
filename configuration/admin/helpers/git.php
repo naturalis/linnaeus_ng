@@ -104,8 +104,15 @@ class Git {
 	private function setTags()
 	{
 		if ( empty($this->git_branch) ) return;
-		$p=$this->exec_path . " describe --tags";
-		$this->git_tags=trim(@shell_exec( $p ));
+		$p=$this->exec_path . " show-ref --tags --dereference";
+		foreach(explode("\n",trim(@shell_exec( $p ))) as $val) 
+		{
+			$d=explode(" ",$val);
+			if ($d[0]==$this->git_commit->hash)
+			{
+				$this->git_tags[]=preg_replace(["/^refs\/tags\//","/\^\{\}(\s*)$/"],"",$d[1]);
+			}
+		}
 	}
 
 }
