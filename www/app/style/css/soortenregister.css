@@ -906,6 +906,7 @@ a {
       padding-bottom: 30px; } }
 
 #content {
+	max-width:740px;
   -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
@@ -2161,4 +2162,8 @@ i, em {
 
 strong {
     font-weight: bold;
+}
+
+.whiteBox {
+	max-width:740px;
 }
