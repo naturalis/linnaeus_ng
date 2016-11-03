@@ -17,18 +17,24 @@
 	</div>
 	
 	<div id="content" class="image-search">
-		{include file="../search/_searchtabs.tpl" activeTab="searchPictures" responsiveTabs="desktop"}
-		<div>
-			<div class="searchPictures">
-				<div class="searchHeader">
-					<h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
-	        <!-- <select name="sort" class="customSelect">
-	          <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
-	          <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
-	        </select> -->
-        </div>
+
+		<div class="whiteBox">
+
+            {include file="../search/_searchtabs.tpl" activeTab="searchPictures" responsiveTabs="desktop"}
+    
+            <div>
+
+                <div class="searchPictures">
+                    <div class="searchHeader">
+                        <h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
+                        <!-- <select name="sort" class="customSelect">
+                          <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
+                          <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
+                        </select> -->
+            		</div>
+				</div>
             
-				<h4><span id="resultcount-header">{$results.count}</span></h4>
+			<h4><span id="resultcount-header">{$results.count}</span></h4>
    			<div id="images-container">
 				{foreach from=$results.data item=v}
 					<div class="imageInGrid3">
