@@ -281,22 +281,22 @@ class UsersController extends Controller
 		if ( $this->rHasVal('username') && !$this->isFormResubmit() )
 		{
 			$u=$this->models->Users->_get( [ 'id' => [ 'username' => trim($this->rGetVal('username')) ] ] );
-		
+
 			if (count((array)$u)==1)
 			{
 				$newPass = $this->generateRandomPassword();
 
 				$send_success = $this->sendPasswordEmail( [ 'user'=>$u[0], 'new_password'=>$newPass ] );
-				
+
 				if ( $send_success )
 				{
-	
+
 					$r = $this->models->Users->save( [
 						'id' => $u[0]['id'],
 						'password' => $this->userPasswordEncode($newPass),
 						'last_password_change' => 'now()'
 					] );
-	
+
 					$this->addMessage($this->translate('Your password has been reset. An e-mail with a new password has been sent to you.'));
 					$this->smarty->assign( 'sent_email', true );
 				}
@@ -315,24 +315,24 @@ class UsersController extends Controller
 		$this->printPage();
 
     }
-	
+
 	private function sendPasswordEmail( $p )
     {
 		$user = isset($p['user']) ? $p['user'] : null;
 		$new_password = isset($p['new_password']) ? $p['new_password'] : null;
 
 		if ( is_null($user) || is_null($new_password) ) return;
-		
-		$url = 
-			$this->helpers->CurrentUrl->getParts()['scheme'] . '://' . 
+
+		$url =
+			$this->helpers->CurrentUrl->getParts()['scheme'] . '://' .
 			$this->helpers->CurrentUrl->getParts()['host'] . '/linnaeus_ng/admin/views/users/login.php';
-			
+
 		$this->smarty->assign( 'user', $user );
 		$this->smarty->assign( 'new_password', $new_password );
 		$this->smarty->assign( 'url', $url );
 
 		$mailbody=$this->smarty->fetch('_msg_password_reset_mail.tpl');
-		
+
 		$this->emailSettings=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'email_settings' ] ));
 
 		$this->helpers->EmailHelper->setHost( $this->emailSettings->host );
@@ -519,6 +519,7 @@ class UsersController extends Controller
 		}
 
 		$data=$this->getNewUserData();
+		$data['created_by'] = $this->getCurrentUserId();
 
 		unset( $data['module'] );
 		unset( $data['module_read'] );
