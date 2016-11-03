@@ -18,10 +18,10 @@
 	
 	<div id="content" class="image-search">
 
+       {include file="../search/_searchtabs.tpl" activeTab="searchPictures" responsiveTabs="desktop"}
+
 		<div class="whiteBox">
 
-            {include file="../search/_searchtabs.tpl" activeTab="searchPictures" responsiveTabs="desktop"}
-    
             <div>
 
                 <div class="searchPictures">
