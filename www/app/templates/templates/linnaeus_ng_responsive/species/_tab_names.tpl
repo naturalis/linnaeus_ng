@@ -65,3 +65,26 @@
 			</li>				
 		</ul>
 	</p>
+
+
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+
+	{if $taxon.nsr_id!=''}
+	$('#name-header').on( 'click' , function(event) { 
+	
+		if ($('#nsr-id-row').html()==undefined)
+		{
+			if (event.altKey!==true) return;
+			$('#names-table tr:last').after('<tr id="nsr-id-row"><td>NSR ID</td><td>{$taxon.nsr_id}</td></tr>');
+		}
+		else
+		{
+			$('#nsr-id-row').toggle();
+		}
+	});
+	{/if}
+
+} );
+</script>

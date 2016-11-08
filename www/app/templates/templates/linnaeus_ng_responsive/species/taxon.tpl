@@ -60,21 +60,6 @@ $(document).ready(function() {
 	
 	$('img[class=intern]').each(function() { $(this).remove(); } )
 
-	{if $taxon.NsrId!=''}
-	$('#name-header').on( 'click' , function(event) { 
-	
-		if ($('#nsr-id-row').html()==undefined)
-		{
-			if (event.altKey!==true) return;
-			$('#names-table').append('<tr id="nsr-id-row"><td>NSR ID</td><td>{$taxon.NsrId}</td></tr>');
-		}
-		else
-		{
-			$('#nsr-id-row').toggle();
-		}
-	});
-	{/if}
-	
 	{if $pp_popup}
 	$.prettyPhoto.open('{$taxon_base_url_images_main}{$pp_popup[0]}','','<div style="margin-left:125px;">{$pp_popup[1]}</div>');
 	{/if}
