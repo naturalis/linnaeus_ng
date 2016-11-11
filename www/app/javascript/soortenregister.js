@@ -14,6 +14,11 @@ $(function(){
 		}
 	});
 
+  $('body').on('click', '.search-toggle-js', function() {
+    $('body').toggleClass('search-open');
+    $('.menuContainer').find('input').select().focus();
+  });
+
   $(document).ready(function() {
 
 

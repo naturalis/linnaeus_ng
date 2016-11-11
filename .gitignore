@@ -110,6 +110,7 @@ configuration/admin/controllers/Literature2Controller.php
 configuration/admin/controllers/SearchController-ORG.php
 www/app/style/linnaeus_ng/.sass-cache
 configuration/locale
+*.DS_Store
 configuration/app/rewrite/
 configuration/app/custom-configuration.php
 configuration/admin/custom-configuration.php

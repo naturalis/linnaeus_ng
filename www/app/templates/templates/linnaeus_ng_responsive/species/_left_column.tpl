@@ -108,10 +108,10 @@
 				{if $v.url}
 				<a href="{$v.url}" target="_blank">
 				{/if}
-					<!-- <img src="http://www.nederlandsesoorten.nl/linnaeus_ng/shared/media/project/0001/ravon-logo.png" alt=""> -->
-
 					{if $v.logo}
-					<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
+						<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
+					{else}
+						<img src="http://www.nederlandsesoorten.nl/linnaeus_ng/shared/media/project/0001/ravon-logo.png" alt="">
 					{/if}
 				{if $v.url}
 				</a>

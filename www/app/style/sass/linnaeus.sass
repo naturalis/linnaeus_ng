@@ -1,0 +1,103 @@
+@import "variables"
+
+.responsive-title
+	display: none
+	margin-bottom: 30px
+	@media screen and (max-width: 994px)
+		display: block
+		h1
+			margin-bottom: 0
+
+.main-display-name.desktop
+	@media screen and (max-width: 994px)
+		display: none
+
+#categories	
+	a
+		padding: 8px 30px 7px 37px
+		display: block
+		color: #000
+		text-decoration: none
+		background-image: url('../img/arrow-right-black.svg')
+		background-size: 12px
+		background-repeat: no-repeat
+		background-position: center left 19px
+		&.active
+			color: $blue
+			background-image: url('../img/arrow-right-blue.svg')
+		&:hover
+			color: $blue
+			background-image: url('../img/arrow-right-blue.svg')
+	@media screen and (max-width: 994px)
+		ul
+			display: flex
+			flex-wrap: wrap
+			white-space: nowrap
+		li
+			display: flex
+			justify-content: center
+			flex-grow: 1
+		a
+			padding: 8px 10px 7px 10px
+			background-image: none
+			&:hover, &.active
+				background-image: none
+			
+.classification-name.current
+	font-weight: bold
+
+.footerContainer
+	.copyright
+		padding: 0 15px
+
+.search-open
+	.menuContainer
+		margin-top: 0
+		transition: margin-top 0.5s ease
+
+.menuContainer
+	margin-top: -50px
+	transition: margin-top 0.5s ease
+	*
+		box-sizing: border-box
+	#inlineformsearch
+		left: 0
+		right: 0
+		top: 100px
+		background-color: $pink
+		height: 50px
+		input
+			height: 50px
+			border: 0
+			outline-width: 0
+			width: 100%
+			max-width: 994px
+			margin: 0 auto
+			display: block
+			background-color: transparent
+			color: #fff
+			font-size: 16px
+			padding: 0 15px
+.menuHolder
+	display: flex
+	margin: 0 auto
+	width: 100%
+	max-width: 994px
+	
+	.search-toggle
+		height: 50px
+		background-color: $pink
+		display: flex
+		width: 47px
+		justify-content: center
+		align-items: center
+		margin-left: auto
+		@media screen and (max-width: 994px)
+			position: absolute
+			top: 50px
+			right: 0
+			background-color: transparent
+	// .menuToggle
+	// 	position: absolute
+	// 	top: 50px
+	// 	left: 0
