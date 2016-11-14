@@ -73,12 +73,12 @@
 								</ul>
 							</a>
 						</div>
-						<div class="resultDetails">
+						<a class="resultDetails">
 							{if $v.common_name}		
-								<a class="resultLink" href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.common_name}</a>	
+								<span class="resultLink" href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.common_name}</span>	
 							{/if}
 							<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>						
-						</div>
+						</a>
 					</div>
 				{/foreach}
 			</div>

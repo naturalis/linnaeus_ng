@@ -833,7 +833,7 @@ table {
 
   .menuContainer {
     height: auto;
-    min-height: 50px; }
+    min-height: 100px; }
 
   .menu {
     border-left: 0;

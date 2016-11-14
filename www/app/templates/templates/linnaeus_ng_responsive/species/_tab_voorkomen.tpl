@@ -5,8 +5,14 @@
     
     <p>
         <table>
-            {if $content.presence_label}<tr><td>{t}Status{/t}</td><td>{$content.presence_label}{if $content.presence_information} (<span class="link" 
-onmouseover="hint(this,'<p><b>{$content.presence_index_label|@escape} {$content.presence_information_title|@escape}</b><br />{$content.presence_information_one_line|@escape}</p>');" onmouseout="hintHide()">{$content.presence_index_label}</span>){/if}</td></tr>{/if}
+            {if $content.presence_label}<tr><td>{t}Status{/t}</td><td>{$content.presence_label}{if $content.presence_information} 
+            (<span class="link">
+                {$content.presence_index_label}
+                <span class="mouseover">
+                    <p><b>{$content.presence_index_label|@escape} {$content.presence_information_title|@escape}</b>{$content.presence_information_one_line|@escape}</p>
+                </span>
+            </span>)
+            {/if}</td></tr>{/if}
             {if $content.habitat_label}<tr><td style="white-space:nowrap">{t}Habitat{/t}</td><td>{$content.habitat_label}</td></tr>{/if}
             {if $content.reference_label}<tr><td style="white-space:nowrap">{t}Referentie{/t}</td><td><a href="../literature2/reference.php?id={$content.reference_id}">{$content.reference_label}</a></td></tr>{/if}
             {* if $content.presence82_label}<tr><td>{t}Status 1982{/t}</td><td>{$content.presence82_label}</td></tr>{/if *}

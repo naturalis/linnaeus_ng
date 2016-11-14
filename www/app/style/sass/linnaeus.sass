@@ -97,7 +97,66 @@
 			top: 50px
 			right: 0
 			background-color: transparent
-	// .menuToggle
-	// 	position: absolute
-	// 	top: 50px
-	// 	left: 0
+	.menuToggle
+		@media screen and (max-width: 994px)
+			position: absolute
+			top: 50px
+			left: 0
+
+.link
+	position: relative
+	display: inline-block
+	@media screen and (max-width: 994px)
+		position: initial
+	.mouseover
+		display: none
+	p
+		margin-bottom: 0
+	&:hover
+		.mouseover
+			background-color: #fff
+			padding: 8px 12px
+			border-radius: 8px
+			display: block
+			font-size: 12px
+			color: #000
+			position: absolute
+			top: 100%
+			left: 50%
+			transform: translateX(-50%)
+			margin-top: 10px
+			border-radius: 10px
+			width: 20rem
+			z-index: 6000
+			display: block
+			box-shadow: 0 2px 3px 0 rgba(0,0,0,.16)
+			border: 1px solid #d8dde6
+			@media screen and (max-width: 994px)
+				top: auto
+			&:before
+				width: 1rem
+				height: 1rem
+				position: absolute
+				transform: rotate(45deg)
+				content: ''
+				background-color: inherit
+				left: 50%
+				top: -.5rem
+				margin-left: -.5rem
+			&:after
+				box-shadow: -1px -1px 0 0 rgba(0,0,0,.16)
+				z-index: -1
+				width: 1rem
+				height: 1rem
+				position: absolute
+				transform: rotate(45deg)
+				content: ''
+				background-color: inherit
+				left: 50%
+				top: -.5rem
+				margin-left: -.5rem
+			b
+				font-weight: bold
+				margin-bottom: 5px
+				font-size: 14px
+				display: block
