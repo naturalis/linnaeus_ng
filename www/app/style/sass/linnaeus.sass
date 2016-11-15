@@ -1,4 +1,5 @@
 @import "variables"
+@import "typography"
 
 .responsive-title
 	display: none
@@ -56,14 +57,14 @@
 		transition: margin-top 0.5s ease
 
 .menuContainer
-	margin-top: -50px
-	transition: margin-top 0.5s ease
+	position: relative
+	transition: margin-top, top 0.5s ease
 	*
 		box-sizing: border-box
 	#inlineformsearch
-		left: 0
-		right: 0
 		top: 100px
+		margin-top: -50px
+		transition: margin-top 0.5s ease
 		background-color: $pink
 		height: 50px
 		input
@@ -94,14 +95,18 @@
 		margin-left: auto
 		@media screen and (max-width: 994px)
 			position: absolute
-			top: 50px
+			top: 0px
+			transition: top 0.5s ease
 			right: 0
 			background-color: transparent
 	.menuToggle
 		@media screen and (max-width: 994px)
 			position: absolute
-			top: 50px
+			top: 0px
+			transition: top 0.5s ease
 			left: 0
+
+
 
 .link
 	position: relative
@@ -160,3 +165,91 @@
 				margin-bottom: 5px
 				font-size: 14px
 				display: block
+.sideBarLogos
+	&.responsive
+		display: none
+		@media screen and (max-width: 994px)
+			display: block
+			order: 10
+	&.desktop
+		@media screen and (max-width: 994px)
+			display: none
+
+#facets
+	@media screen and (max-width: 994px)
+		margin-bottom: 30px
+
+.species-title
+	margin-bottom: 30px
+	@media screen and (max-width: 994px)
+		&.desktop-title
+			display: none
+	h1
+		margin-bottom: 0
+
+.logoContainer
+	width: 100%
+	margin: 0 auto
+	padding: 15px 0
+	@media screen and (max-width: 994px)
+		display: none
+	.container
+		width: 100%
+		max-width: 994px
+		margin: 0 auto
+		display: flex
+		padding: 0 10px
+	.logo
+		display: block
+		height: 62px
+		margin-right: 15px
+
+.siteTitle
+	display: flex
+	flex-direction: column
+	justify-content: flex-end
+	h1
+		margin-bottom: 0
+		color: #e3004a
+		font-size: 34px
+		position: relative
+		bottom: -6px
+		font-family: 'platform-medium', Arial
+		font-feature-settings: "ss01"
+	h2
+		margin-bottom: 0
+		color: #e3004a
+		font-family: 'platform-regular', Arial
+		position: relative
+		bottom: -6px
+		font-feature-settings: "ss01"
+	
+.search-open
+	.search-toggle
+		top: 50px
+		transition: top 0.5s ease
+	.menuToggle
+		top: 50px
+		transition: top 0.5s ease
+	.menu-search
+		height: 100px
+		transition: height, margin-top 0.5s ease
+	#inlineformsearch
+		margin-top: 0
+		transition: height, margin-top 0.5s ease
+
+.menuOpen
+	.menu-search
+		height: auto
+
+.menu-search
+	position: absolute
+	width: 100%
+	background-color: #000
+	height: 50px
+	transition: height, margin-top 0.5s ease
+	overflow: hidden
+	@media screen and (min-width: 995px)
+		&:hover
+			height: auto
+			transition: height, margin-top 0.5s ease

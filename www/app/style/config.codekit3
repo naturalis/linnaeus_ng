@@ -2081,6 +2081,42 @@
 		"oAP": "\/fonts\/ionicons.woff",
 		"oF": 0
 		},
+	"\/fonts\/platform-bold.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-bold.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-bolditalic.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-bolditalic.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-hairline.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-hairline.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-hairlineitalic.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-hairlineitalic.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-light.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-light.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-lightItalic.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-lightItalic.otf",
+		"oF": 0
+		},
 	"\/fonts\/platform-medium-alternate-webfont.ttf": {
 		"ft": 8192,
 		"oA": 2,
@@ -2093,6 +2129,18 @@
 		"oAP": "\/fonts\/platform-medium-alternate-webfont.woff",
 		"oF": 0
 		},
+	"\/fonts\/platform-medium.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-medium.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-mediumitalic.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-mediumitalic.otf",
+		"oF": 0
+		},
 	"\/fonts\/platform-regular-alternate-webfont.ttf": {
 		"ft": 8192,
 		"oA": 2,
@@ -2103,6 +2151,24 @@
 		"ft": 8192,
 		"oA": 2,
 		"oAP": "\/fonts\/platform-regular-alternate-webfont.woff",
+		"oF": 0
+		},
+	"\/fonts\/platform-regular.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-regular.otf",
+		"oF": 0
+		},
+	"\/fonts\/platform-regular.ttf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-regular.ttf",
+		"oF": 0
+		},
+	"\/fonts\/platform-regularitalic.otf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/fonts\/platform-regularitalic.otf",
 		"oF": 0
 		},
 	"\/img\/ajaxloader.gif": {
@@ -2254,6 +2320,14 @@
 		"iS": 1083,
 		"oA": 0,
 		"oAP": "\/img\/lng.png",
+		"oF": 0,
+		"opt": 0
+		},
+	"\/img\/logo-small-pink.png": {
+		"ft": 32768,
+		"iS": 3675,
+		"oA": 0,
+		"oAP": "\/img\/logo-small-pink.png",
 		"oF": 0,
 		"opt": 0
 		},
@@ -8730,6 +8804,19 @@
 		"ma": 0,
 		"oA": 0,
 		"oAP": "\/css\/style.css",
+		"oF": 0,
+		"oS": 0,
+		"uL": 1
+		},
+	"\/sass\/typography.sass": {
+		"aP": 0,
+		"bl": 0,
+		"dP": 10,
+		"dS": 0,
+		"ft": 2,
+		"ma": 0,
+		"oA": 1,
+		"oAP": "\/css\/typography.css",
 		"oF": 0,
 		"oS": 0,
 		"uL": 1

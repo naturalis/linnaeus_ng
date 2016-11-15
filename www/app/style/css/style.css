@@ -8,9 +8,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   box-sizing: border-box; }
 
 button {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   outline-width: 0; }
 
 input[type=text], textarea {
@@ -30,11 +28,11 @@ blockquote, q {
   quotes: none; }
 
 blockquote:before, blockquote:after {
-  content: "";
+  content: '';
   content: none; }
 
 q:before, q:after {
-  content: "";
+  content: '';
   content: none; }
 
 table {
@@ -42,6 +40,7 @@ table {
   border-spacing: 0; }
 
 .imageOverlayContainer p {
+  line-height: 1.5em;
   margin-bottom: 8px; }
 
 #header {
@@ -129,9 +128,7 @@ table {
   #logo-container a {
     position: absolute;
     top: 50%;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
+    transform: translateY(-50%);
     left: 20px;
     display: block; }
     #logo-container a img {
@@ -148,10 +145,10 @@ table {
     position: absolute;
     left: 15px;
     bottom: 15px;
-    font-family: "platform-medium";
+    font-family: 'platform-medium';
     font-size: 50px; }
   .headerImage .determinatiesleutel {
-    font-family: "platform-regular";
+    font-family: 'platform-regular';
     font-size: 43px; }
 
 .topBar .pageTitle {
@@ -204,6 +201,7 @@ table {
   @media screen and (max-width: 980px) and (max-width: 350px) {
     .menuOpen .filterToggle {
       right: 200px; } }
+
 @media screen and (max-width: 980px) {
   .menuOpen .forceScrollbar {
     height: 100.4%; }
@@ -216,6 +214,7 @@ table {
     right: 0;
     z-index: 110;
     cursor: pointer; } }
+
 #menuOverlay {
   display: none;
   overflow-y: scroll;
@@ -389,6 +388,7 @@ table {
     display: none; }
   .searchOpen .filterToggle {
     display: none; } }
+
 #quicksearch {
   padding-right: 52px;
   position: relative; }
@@ -458,7 +458,7 @@ table {
   background-color: #fff; }
   @media screen and (max-width: 980px) {
     #dialogRidge {
-      padding-top: 8px;
+      padding-top: 0;
       padding-left: 0; } }
   #dialogRidge .photographerName {
     display: none; }
@@ -468,6 +468,20 @@ table {
     display: inline-block;
     float: left;
     width: 100%; }
+  #dialogRidge #results {
+    margin-top: 8px; }
+  #dialogRidge .matrixLink .result-icons {
+    padding-right: 50px;
+    position: relative; }
+  #dialogRidge .matrixLink .goToMatrixLink {
+    position: absolute;
+    width: 50px;
+    line-height: 50px;
+    text-align: center;
+    color: #fff;
+    background-color: #009ee0;
+    bottom: 0;
+    right: 0; }
   #dialogRidge #results-container {
     margin-left: -7px;
     margin-right: -7px;
@@ -538,10 +552,31 @@ table {
       #dialogRidge #results-container .result-icon.no-content {
         display: none; }
   #dialogRidge .headerText {
-    padding: 18px 60px 18px 60px;
+    padding: 18px 92px 18px 92px;
     text-align: center;
     min-height: 52px;
-    font-size: 16px; }
+    font-size: 16px;
+    position: relative; }
+    @media screen and (max-width: 650px) {
+      #dialogRidge .headerText {
+        padding: 18px 40px 18px 40px; }
+        #dialogRidge .headerText.similarHeader {
+          padding: 18px 40px 18px 80px; } }
+  #dialogRidge #similarSpeciesHeader {
+    position: relative; }
+    #dialogRidge #similarSpeciesHeader .clearSimilarSelection {
+      position: absolute;
+      top: 0;
+      left: 0;
+      line-height: 52px;
+      text-align: center;
+      width: 40px;
+      color: #009ee0;
+      font-size: 18px;
+      z-index: 10; }
+      @media screen and (max-width: 980px) {
+        #dialogRidge #similarSpeciesHeader .clearSimilarSelection {
+          left: 37px; } }
   #dialogRidge #show-more-button {
     width: 100%;
     height: 52px;
@@ -597,6 +632,19 @@ table {
   text-align: center;
   padding-top: 30px;
   padding-bottom: 30px; }
+  #filterDialogContainer .facetListType {
+    display: inline-block; }
+    @media screen and (max-width: 800px) {
+      #filterDialogContainer .facetListType {
+        display: block; } }
+    #filterDialogContainer .facetListType li {
+      display: block;
+      text-align: left;
+      padding-left: 24px; }
+      #filterDialogContainer .facetListType li img {
+        margin-left: -24px; }
+  #filterDialogContainer a[id^='full-size-link-'] {
+    display: none; }
   #filterDialogContainer #overlay {
     position: fixed;
     left: 0;
@@ -612,14 +660,11 @@ table {
     background-color: #fff;
     margin: 0 auto;
     z-index: 600;
-    padding: 15px;
-    padding-top: 45px;
+    padding: 0;
     position: absolute;
     top: 50%;
     left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
     max-height: 80%;
     width: 1010px; }
     @media screen and (max-width: 1100px) {
@@ -628,6 +673,14 @@ table {
     @media screen and (max-width: 800px) {
       #filterDialogContainer #dialog {
         width: 280px; } }
+    #filterDialogContainer #dialog .content {
+      padding: 15px;
+      overflow-y: auto; }
+      @media screen and (max-width: 800px) {
+        #filterDialogContainer #dialog .content {
+          padding: 10px; } }
+  #filterDialogContainer #graphicVaslueSelector {
+    overflow: hidden; }
   #filterDialogContainer .state-image-container {
     display: inline-block;
     float: left;
@@ -654,23 +707,31 @@ table {
     margin-left: -15px;
     margin-right: -15px; }
   #filterDialogContainer .titleContainer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
     width: 100%;
     background-color: #eeede9;
     padding-left: 45px;
     padding-right: 45px; }
+    @media screen and (max-width: 800px) {
+      #filterDialogContainer .titleContainer {
+        padding-left: 10px;
+        padding-right: 40px;
+        text-align: left; }
+        #filterDialogContainer .titleContainer .title {
+          font-size: 14px;
+          text-align: left; } }
+  @media screen and (max-width: 800px) {
+    #filterDialogContainer #state-info {
+      text-align: left; } }
   #filterDialogContainer .title {
-    height: 45px;
     font-size: 22px;
-    line-height: 45px; }
+    line-height: 1.3;
+    padding-top: 11px;
+    padding-bottom: 11px;
+    display: block; }
   #filterDialogContainer .closeOverlay {
     position: absolute;
     right: 10px;
-    top: 50%;
-    margin-top: -11px;
+    top: 10px;
     color: #009ee0;
     font-size: 24px; }
   #filterDialogContainer .state-image {
@@ -742,9 +803,7 @@ table {
   max-height: 80%;
   max-width: 80%;
   display: none;
-  -webkit-transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%); }
+  transform: translate(-50%, -50%); }
   .imageOverlayContainer .image {
     padding: 20px;
     max-height: 100%; }
@@ -789,6 +848,7 @@ table {
 
 .imageOverlayContainer-open .imageOverlayBackground, .imageOverlayContainer-open .imageOverlayContainer {
   display: block; }
+
 .imageOverlayContainer-open.moreInfoOverlay .imageOverlayContainer {
   max-width: 450px; }
 
@@ -799,9 +859,10 @@ table {
   display: block; }
 
 .facetListType {
-  padding-top: 15px; }
+  padding-top: 0; }
   .facetListType li {
-    margin-bottom: 5px; }
+    margin-bottom: 5px;
+    line-height: 1.3; }
     .facetListType li:last-child {
       margin-bottom: 0; }
     .facetListType li a {
@@ -829,7 +890,7 @@ table {
 
 @-webkit-keyframes load {
   0%,
-100% {
+  100% {
     box-shadow: 0 -3em 0 0.2em #000000, 2em -2em 0 0em #000000, 3em 0 0 -1em #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 -1em #000000, -3em 0 0 -1em #000000, -2em -2em 0 0 #000000; }
   12.5% {
     box-shadow: 0 -3em 0 0 #000000, 2em -2em 0 0.2em #000000, 3em 0 0 0 #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 -1em #000000, -3em 0 0 -1em #000000, -2em -2em 0 -1em #000000; }
@@ -845,9 +906,10 @@ table {
     box-shadow: 0em -3em 0 -1em #000000, 2em -2em 0 -1em #000000, 3em 0em 0 -1em #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 0 #000000, -3em 0em 0 0.2em #000000, -2em -2em 0 0 #000000; }
   87.5% {
     box-shadow: 0em -3em 0 0 #000000, 2em -2em 0 -1em #000000, 3em 0 0 -1em #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 0 #000000, -3em 0em 0 0 #000000, -2em -2em 0 0.2em #000000; } }
+
 @keyframes load {
   0%,
-100% {
+  100% {
     box-shadow: 0 -3em 0 0.2em #000000, 2em -2em 0 0em #000000, 3em 0 0 -1em #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 -1em #000000, -3em 0 0 -1em #000000, -2em -2em 0 0 #000000; }
   12.5% {
     box-shadow: 0 -3em 0 0 #000000, 2em -2em 0 0.2em #000000, 3em 0 0 0 #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 -1em #000000, -3em 0 0 -1em #000000, -2em -2em 0 -1em #000000; }
@@ -863,22 +925,25 @@ table {
     box-shadow: 0em -3em 0 -1em #000000, 2em -2em 0 -1em #000000, 3em 0em 0 -1em #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 0 #000000, -3em 0em 0 0.2em #000000, -2em -2em 0 0 #000000; }
   87.5% {
     box-shadow: 0em -3em 0 0 #000000, 2em -2em 0 -1em #000000, 3em 0 0 -1em #000000, 2em 2em 0 -1em #000000, 0 3em 0 -1em #000000, -2em 2em 0 0 #000000, -3em 0em 0 0 #000000, -2em -2em 0 0.2em #000000; } }
+
 @media screen and (max-width: 675px) {
   div.pp_default .pp_nav {
     float: none; }
-
   .pp_description div {
     margin: 0 !important; } }
+
 @font-face {
-  font-family: "platform-medium";
+  font-family: 'platform-medium';
   src: url("../fonts/platform-medium-alternate-webfont.ttf") format("truetype");
   font-weight: normal;
   font-style: normal; }
+
 @font-face {
-  font-family: "platform-regular";
+  font-family: 'platform-regular';
   src: url("../fonts/platform-regular-alternate-webfont.ttf") format("truetype");
   font-weight: normal;
   font-style: normal; }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #eeede9;
@@ -906,6 +971,7 @@ body {
 
 .versionContent b {
   font-weight: bold; }
+
 .versionContent ul {
   padding-left: 15px;
   list-style-type: disc; }
@@ -942,11 +1008,5 @@ body {
     .colofonLink a {
       display: none; } }
 
-
-.matrix-matrix-link {
-	color: #009ee0;
-	text-decoration:none;
-}
-.matrix-matrix-link:hover {
-	text-decoration:underline;
-}
+.link {
+  color: #e3004a; }

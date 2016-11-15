@@ -724,15 +724,11 @@ table {
     overflow-y: hidden;
     -ms-overflow-style: -ms-autohiding-scrollbar; } }
 .menuContainer {
-  position: absolute;
   top: 0;
-  height: 100px;
-  overflow: hidden;
+  height: 50px;
   width: 100%;
   z-index: 900;
   background-color: #000; }
-  .menuContainer:hover {
-    height: auto; }
 
 .menu {
   width: 100%;
@@ -832,12 +828,12 @@ table {
               transform: translateY(-50%); }
 
   .menuContainer {
-    height: auto;
-    min-height: 100px; }
+    min-height: 50px; }
 
   .menu {
     border-left: 0;
-    width: 100%; }
+    width: 100%;
+    padding-top: 50px; }
     .menu > li {
       border-right: 0;
       border-bottom: 1px solid #2d2d2d;
@@ -1097,16 +1093,16 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     display: none; } }
 */
 
-#sideBarLogos {
+.sideBarLogos {
   margin-top: 30px;
   background-color: #fff; }
   @media screen and (max-width: 994px) {
-    #sideBarLogos {
+    .sideBarLogos {
       margin-bottom: 30px; } }
-  #sideBarLogos a {
+  .sideBarLogos a {
     display: block;
     padding: 30px 0; }
-  #sideBarLogos img {
+  .sideBarLogos img {
     max-width: 170px;
     display: block;
     margin: 0 auto; }

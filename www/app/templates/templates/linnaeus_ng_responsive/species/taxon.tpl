@@ -17,29 +17,25 @@
 		<div class="imageGradient"></div>
 	</div>
 
-	{else}
-		{include file="../shared/flexslider.tpl"}
+	
 	{/if}
     
 </div>
 
 <div id="dialogRidge">
-	<div class="whiteBox responsive-title">
+	<div class="whiteBox responsive-title species-title">
 		<h1 class="main-display-name mobile">{$names.preffered_name} <span>{$names.nomen}</span></h1>
 	</div>
 	{include file="_left_column.tpl"}
-
+	
 	<div id="content" class="taxon-detail">
-		<div class="whiteBox">
-			<h1 class="main-display-name desktop">{$names.preffered_name} <span>{$names.nomen}</span></h1>
-			<!-- h2 class="sideMenuTitle">&nbsp;</h2 -->
-			
-			{include file="_tabs.tpl"}
-
+		<div class="whiteBox desktop-title species-title">
+			<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
 		</div>
-
+		<div class="whiteBox">
+			{include file="_tabs.tpl"}
+		</div>
 	</div>
-
 </div>
 
 
