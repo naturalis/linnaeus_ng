@@ -1,5 +1,5 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/flexslider.tpl"}
+<!-- {include file="../shared/flexslider.tpl"} -->
 
 <style>
 table.validatorList tr td:nth-child(2)
