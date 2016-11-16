@@ -1,5 +1,42 @@
 <?php
 
+	/* Linnaeus server settings */
+
+	/*
+	// example configuration statments:
+	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
+	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
+	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
+	$compare->setOutputFile( '/home/maarten.schermer/testdata/%s-modify-%s.sql' );
+	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
+	$compare->setDoNotCreateTempDatabase( true );
+	$compare->setPreflightQueries(array(
+        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+	));
+	$compare->setPostflightQueries(array(
+        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+	));
+
+	*/
+
+
+	$compare->setConstFile(dirname(__FILE__) . '/../configuration/admin/constants.php');
+	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
+	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
+	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
+	$compare->setDoNotCreateTempDatabase(true);
+	$compare->setPreflightQueries(array(
+        //'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+        "SET sql_mode = '';"
+	));
+	$compare->setPostflightQueries(array(
+        //'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+	));
+	$compare->run();
+
+
+
+
 	class DatabaseTableCompare {
 
 		private $constFile='/var/www/linnaeusng/configuration/admin/constants.php';
@@ -693,38 +730,3 @@
 	$compare = new DatabaseTableCompare;
 
 
-	/* Linnaeus server settings */
-
-	/*
-	// example configuration statments:
-	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
-	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
-	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
-	$compare->setOutputFile( '/home/maarten.schermer/testdata/%s-modify-%s.sql' );
-	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
-	$compare->setDoNotCreateTempDatabase( true );
-	$compare->setPreflightQueries(array(
-        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
-	));
-	$compare->setPostflightQueries(array(
-        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
-	));
-
-	*/
-
-
-	/* Ruud local settings */
-
-	$compare->setConstFile(dirname(__FILE__) . '/../configuration/admin/constants.php');
-	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
-	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
-	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
-	$compare->setDoNotCreateTempDatabase(false);
-	$compare->setPreflightQueries(array(
-        //'ALTER TABLE `literature2` DROP INDEX `project_id`;'
-        "SET sql_mode = '';"
-	));
-	$compare->setPostflightQueries(array(
-        //'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
-	));
-	$compare->run();
