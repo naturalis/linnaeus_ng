@@ -63,10 +63,9 @@
 		box-sizing: border-box
 	#inlineformsearch
 		top: 100px
-		margin-top: -50px
-		transition: margin-top 0.5s ease
 		background-color: $pink
-		height: 50px
+		height: 0px
+		transition: height 0.5s ease
 		input
 			height: 50px
 			border: 0
@@ -225,31 +224,24 @@
 		font-feature-settings: "ss01"
 	
 .search-open
-	.search-toggle
-		top: 50px
-		transition: top 0.5s ease
-	.menuToggle
-		top: 50px
-		transition: top 0.5s ease
 	.menu-search
-		height: 100px
 		transition: height, margin-top 0.5s ease
 	#inlineformsearch
-		margin-top: 0
-		transition: height, margin-top 0.5s ease
-
-.menuOpen
-	.menu-search
-		height: auto
+		height: 50px
+		transition: height 0.5s ease
 
 .menu-search
 	position: absolute
 	width: 100%
 	background-color: #000
+	min-height: 50px
+	overflow: hidden
 	height: 50px
 	transition: height, margin-top 0.5s ease
-	overflow: hidden
 	@media screen and (min-width: 995px)
 		&:hover
 			height: auto
 			transition: height, margin-top 0.5s ease
+	@media screen and (max-width: 994px)
+		height: auto
+		overflow: visible

@@ -1,12 +1,10 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/flexslider.tpl"}
+
 <div id="dialogRidge">
-	
 	<div id="left">
 	{include file="../search/_simpleSearch.tpl"}		
 	{include file="_toolbox.tpl"}
 	</div>
-    
 	<div id="content" class="simple-search">
 		{include file="_searchtabs.tpl" activeTab="quickSearch"}
 		<div id="results" class="quickSearch">
@@ -19,8 +17,6 @@
 				</select>
 			</div>
 			<span id="resultcount-header">{$results.count}</span>
-		
-			
 			{if $results.data}
 			{assign var=i value=0}
 			<ul class="searchResult">

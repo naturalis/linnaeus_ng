@@ -110,11 +110,10 @@
     box-sizing: border-box; }
   .menuContainer #inlineformsearch {
     top: 100px;
-    margin-top: -50px;
-    -webkit-transition: margin-top 0.5s ease;
-    transition: margin-top 0.5s ease;
     background-color: #e3004a;
-    height: 50px; }
+    height: 0px;
+    -webkit-transition: height 0.5s ease;
+    transition: height 0.5s ease; }
     .menuContainer #inlineformsearch input {
       height: 50px;
       border: 0;
@@ -301,39 +300,30 @@
     -webkit-font-feature-settings: "ss01";
             font-feature-settings: "ss01"; }
 
-.search-open .search-toggle {
-  top: 50px;
-  -webkit-transition: top 0.5s ease;
-  transition: top 0.5s ease; }
-
-.search-open .menuToggle {
-  top: 50px;
-  -webkit-transition: top 0.5s ease;
-  transition: top 0.5s ease; }
-
 .search-open .menu-search {
-  height: 100px;
   -webkit-transition: height, margin-top 0.5s ease;
   transition: height, margin-top 0.5s ease; }
 
 .search-open #inlineformsearch {
-  margin-top: 0;
-  -webkit-transition: height, margin-top 0.5s ease;
-  transition: height, margin-top 0.5s ease; }
-
-.menuOpen .menu-search {
-  height: auto; }
+  height: 50px;
+  -webkit-transition: height 0.5s ease;
+  transition: height 0.5s ease; }
 
 .menu-search {
   position: absolute;
   width: 100%;
   background-color: #000;
+  min-height: 50px;
+  overflow: hidden;
   height: 50px;
   -webkit-transition: height, margin-top 0.5s ease;
-  transition: height, margin-top 0.5s ease;
-  overflow: hidden; }
+  transition: height, margin-top 0.5s ease; }
   @media screen and (min-width: 995px) {
     .menu-search:hover {
       height: auto;
       -webkit-transition: height, margin-top 0.5s ease;
       transition: height, margin-top 0.5s ease; } }
+  @media screen and (max-width: 994px) {
+    .menu-search {
+      height: auto;
+      overflow: visible; } }

@@ -739,6 +739,10 @@ table {
   display: -ms-flexbox;
   display: flex;
   border-left: 1px solid #2d2d2d; }
+  @media screen and (min-width: 994px) {
+    .menu {
+      display: flex!important;
+    } }
   @media screen and (max-width: 994px) {
     .menu {
       display: none; } }
@@ -1709,7 +1713,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     background-color: #e3004a; }
 
 #taxonImage {
-  height: 500px;
+  height: 400px;
   display: block;
   position: relative;
   background-size: cover;
@@ -1752,7 +1756,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   width: 100%;
   max-width: 994px;
   margin: 0 auto;
-  height: 500px;
+  height: 400px;
   position: absolute;
   left: 50%;
   z-index: 100;
@@ -1792,7 +1796,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 
 #header {
   position: absolute;
-  height: 500px;
+  height: auto;
   left: 50%;
   width: 100%;
   z-index: 100;
@@ -2075,15 +2079,15 @@ body {
   padding: 30px; }
 
 .flexsliderContainer {
-  height: 500px;
+  height: 400px;
   overflow: hidden; }
   @media screen and (max-width: 1454px) {
     .flexsliderContainer .flexslider {
-      height: 500px; } }
+      height: 400px; } }
   .flexsliderContainer .flexslider .imageGradient {
     z-index: 10; }
   .flexsliderContainer .flexslider li {
-    max-height: 500px; }
+    max-height: 400px; }
   .flexsliderContainer .flexslider .photoInformation {
     width: 100%;
     max-width: 994px;
@@ -2119,7 +2123,7 @@ body {
           -ms-transform: translateX(-50%);
               transform: translateX(-50%);
       width: auto;
-      height: 500px; } }
+      height: 400px; } }
 
 table tr td {
   padding: 5px 5px 2px 0

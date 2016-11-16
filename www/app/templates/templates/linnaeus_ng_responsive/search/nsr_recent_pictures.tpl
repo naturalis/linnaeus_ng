@@ -1,5 +1,5 @@
 {include file="../shared/header.tpl"}
-
+{if $overviewImage.image}
 <div id="taxonHeader">
 
 	{assign var=overviewImage value=$results.data[0]}
@@ -13,13 +13,14 @@
 			{/if}
 		</div>
 	</div>
-	{if $overviewImage.image}
+	
 	<div id="taxonImage">
 		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
 		<div class="imageGradient"></div>
 	</div>
-	{/if}
+	
 </div>
+{/if}
 
 <!-- div id="dialogRidge">
 

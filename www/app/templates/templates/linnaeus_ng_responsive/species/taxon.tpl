@@ -1,7 +1,6 @@
 {include file="../shared/header.tpl"}
-
+{if $overviewImage.image}
 <div id="taxonHeader">
-
 	<div id="headerImage">
 		<div class="titles">
 			{if $overviewImage.photographer}
@@ -11,23 +10,16 @@
 			{/if}
 		</div>
 	</div>
-
-	{if $overviewImage.image}
 	<div id="taxonImage" style="background-image: url('{$taxon_base_url_images_overview}{$overviewImage.image}');">
 		<div class="imageGradient"></div>
 	</div>
-
-	
-	{/if}
-    
 </div>
-
+{/if}
 <div id="dialogRidge">
 	<div class="whiteBox responsive-title species-title">
 		<h1 class="main-display-name mobile">{$names.preffered_name} <span>{$names.nomen}</span></h1>
 	</div>
 	{include file="_left_column.tpl"}
-	
 	<div id="content" class="taxon-detail">
 		<div class="whiteBox desktop-title species-title">
 			<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
