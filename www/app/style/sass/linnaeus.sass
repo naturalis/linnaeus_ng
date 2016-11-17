@@ -105,8 +105,6 @@
 			left: 0
 			right: 50px
 
-
-
 .link
 	position: relative
 	display: inline-block
@@ -114,6 +112,8 @@
 		position: initial
 	.mouseover
 		display: none
+		opacity: 0
+		transition: opacity 0.5s ease
 	p
 		margin-bottom: 0
 	&:hover
@@ -135,6 +135,8 @@
 			display: block
 			box-shadow: 0 2px 3px 0 rgba(0,0,0,.16)
 			border: 1px solid #d8dde6
+			opacity: 1
+			transition: opacity 0.5s ease
 			@media screen and (max-width: 994px)
 				top: auto
 			&:before
