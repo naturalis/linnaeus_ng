@@ -1885,12 +1885,16 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       padding: 0; } }
 
 .footer {
-  padding: 0 30px;
+  padding: 0;
   width: 100%;
   max-width: 994px;
   color: #fff;
   margin: 0 auto;
   box-sizing: border-box; }
+.footer .logos a {
+  width: 90px;
+  display: block;
+}
   @media screen and (max-width: 994px) {
     .footer {
       padding: 0 15px; }
