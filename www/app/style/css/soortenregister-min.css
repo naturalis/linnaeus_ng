@@ -1047,6 +1047,7 @@ p {
   .taxonoverzicht .taxonoverzicht {
     padding-left: 30px; }
 
+
 #tree-container {
   line-height: 1.3; }
   #tree-container a {
@@ -1134,8 +1135,6 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     .treeSimpleSearch + #facets {
       margin-top: 0; } }
 
-#facets{
-  margin-top: 30px; }
   @media screen and (max-width: 994px) {
 	#facets {
       margin-top: 0; } }
@@ -1754,7 +1753,9 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   bottom: 0;
   left: 0;
   right: 0; }
-
+#taxonHeader {
+  position: relative;
+}
 #taxonHeader #headerImage {
   width: 100%;
   max-width: 994px;

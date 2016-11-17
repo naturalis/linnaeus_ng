@@ -11,7 +11,12 @@
     </div>
     <div class="menuContainer">
         <form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
-            <input id="name" name="search" type="text" placeholder="Snel zoeken..." name="search" class="searchString" title="{t}Zoek op naam{/t}" value="{$search.search}"  autocomplete="off" />
+            <div class="searchInputHolder">
+                <input id="name" name="search" type="text" placeholder="Snel zoeken..." name="search" class="searchString" title="{t}Zoek op naam{/t}" value="{$search.search}"  autocomplete="off" />
+                <a href="javascript:void(0)" class="close-suggestion-list close-suggestion-list-js">
+                    <i class="ion-close-round"></i>
+                </a>
+            </div>
             <div id="name_suggestion" class="suggestList"></div>
         </form>
         <div class="menu-search">

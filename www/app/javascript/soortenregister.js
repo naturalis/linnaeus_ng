@@ -20,7 +20,9 @@ $(function(){
   });
 
   $(document).ready(function() {
-
+    $('body').on('click', '.close-suggestion-list-js', function() {
+      $('#name_suggestion').hide();
+    });
 
     $('body').on('keyup', '#inlineformsearch #inlineformsearchInput', function(e) {
       if (e.keyCode==27 || $(this).val() == '') {
