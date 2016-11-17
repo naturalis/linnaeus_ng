@@ -1591,19 +1591,21 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     .simple-search .result .image {
       display: block;
       position: absolute;
+      background-size: cover;
+      background-position: center;
       right: 0;
       width: 120px;
       top: 0;
       bottom: 0;
       overflow: hidden; }
-      .simple-search .result .image img {
+      /*.simple-search .result .image img {
         position: absolute;
         left: 50%;
         top: 50%;
         -webkit-transform: translate(-50%, -50%);
             -ms-transform: translate(-50%, -50%);
                 transform: translate(-50%, -50%);
-        height: 100%; }
+        height: 100%; }*/
     .simple-search .result .commonName {
       display: block; }
     .simple-search .result .status {

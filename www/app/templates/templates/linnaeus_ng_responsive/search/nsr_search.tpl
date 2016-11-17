@@ -31,9 +31,7 @@
 						<span class="status">{t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title} {if $v.common_rank} ({$v.common_rank}){/if}</span>
 					{/if}
 					{if $v.overview_image}
-						<div class="image">
-							<img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}"/>
-						</div>
+						<div class="image" style="background-image:url('{$taxon_base_url_images_thumb_s}{$v.overview_image}');"></div>
 					{/if}
 				</li>
 			{/foreach}
