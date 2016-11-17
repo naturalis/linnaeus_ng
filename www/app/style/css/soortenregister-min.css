@@ -774,6 +774,9 @@ table {
       line-height: 50px;
       height: 50px;
       padding-left: 10px; }
+    .menu > li > a.toggle-submenu {
+      display: none;
+    }
       .menu > li > a:hover {
         color: #009ee0; }
     .menu > li:hover {
@@ -849,11 +852,8 @@ table {
         padding-right: 60px; }
       .menu > li i {
         position: absolute;
-        top: 50px;
-        margin-top: -33px;
         display: block;
-        color: #fff;
-        right: 30px; }
+        color: #fff; }
     .menu ol {
       display: none; }
       .menu ol a {
@@ -920,7 +920,7 @@ a {
   margin-left: 30px;
 }
   @media screen and (max-width: 994px) {
-    #content {
+    #content, #left ~ #content {
       margin-left: 0; } }
 
 

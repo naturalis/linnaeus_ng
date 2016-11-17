@@ -54,7 +54,7 @@ $(function(){
   	});
   });
 
-  $('body').on('click', '.menu li a', function(e) {
+  $('body').on('click', '.menu li .toggle-submenu-js', function(e) {
   	if ($('.menuToggle').css('display') === 'block') {
   		e.preventDefault();	
   		var submenu = $(this).parent().find('ol'),

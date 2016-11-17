@@ -162,7 +162,8 @@
       top: 0px;
       -webkit-transition: top 0.5s ease;
       transition: top 0.5s ease;
-      left: 0; } }
+      left: 0;
+      right: 50px; } }
 
 .link {
   position: relative;
@@ -327,3 +328,31 @@
     .menu-search {
       height: auto;
       overflow: visible; } }
+
+@media screen and (max-width: 994px) {
+  html {
+    height: 100%;
+    overflow: hidden; }
+  body {
+    height: 100%;
+    overflow: hidden; }
+  .scrollContainer {
+    overflow-y: scroll;
+    height: 100%;
+    -webkit-overflow-scrolling: touch; }
+  .menu > li a.toggle-submenu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: block;
+    padding: 0;
+    color: #fff;
+    margin-left: auto;
+    width: 50px;
+    height: 50px; }
+  .menu > li i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); } }
