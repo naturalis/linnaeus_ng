@@ -980,31 +980,41 @@ p {
     #left .treeSimpleSearch {
       display: none; } }
 
+.treebranchContainer.responsive {
+  display: none;
+}
 @media screen and (max-width: 994px) {
-  #treebranchContainer {
+  .treebranchContainer.desktop {
+    display: none;
+  }
+  .treebranchContainer.responsive {
+    display: block;
+    order: 11;
+  }
+  .treebranchContainer {
     margin-bottom: 30px; } }
 
 #categories {
   background-color: #fff;
   padding: 22px 0 23px 0; }
 
-#treebranchContainer {
+.treebranchContainer {
   background-color: #fff;
   padding: 22px 30px 23px 30px; }
   @media screen and (max-width: 994px) {
-      #treebranchContainer.filterPictures {
+      .treebranchContainer.filterPictures {
         display: block; } }
-  #treebranchContainer #name-tree {
+  .treebranchContainer #name-tree {
     width: 100%; }
-  #treebranchContainer h2 {
+  .treebranchContainer h2 {
     color: #009ee0; }
-  #treebranchContainer .classContainer {
+  .treebranchContainer .classContainer {
     padding: 2px; }
-  #treebranchContainer td {
+  .treebranchContainer td {
     padding-bottom: 7px; }
-  #treebranchContainer tr:last-child td {
+  .treebranchContainer tr:last-child td {
     padding-bottom: 0; }
-  #treebranchContainer a {
+  .treebranchContainer a {
     color: #e3004a;
     text-decoration: none;
     display: inline-block; }
@@ -1019,7 +1029,7 @@ p {
   background-repeat: no-repeat;
   background-position: center 3px; }
 
-#facets + #treebranchContainer {
+#facets + .treebranchContainer {
   margin-top: 30px; }
 
 .buffer-3 {
@@ -1102,9 +1112,6 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 .sideBarLogos {
   margin-top: 30px;
   background-color: #fff; }
-  @media screen and (max-width: 994px) {
-    .sideBarLogos {
-      margin-bottom: 30px; } }
   .sideBarLogos a {
     display: block;
     padding: 30px 0; }
@@ -1454,12 +1461,12 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     .searchResultContainer {
       margin-top: 30px; } }
 
-#treebranchContainer + #toolbox {
+.treebranchContainer + #toolbox {
   margin-top: 30px; }
 
-#treebranchContainer.filterPictures {
+.treebranchContainer.filterPictures {
   padding: 0; }
-  #treebranchContainer.filterPictures label {
+  .treebranchContainer.filterPictures label {
     display: block;
     background-color: #e3004a;
     color: #fff;
@@ -1467,19 +1474,19 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     padding: 15px;
     position: relative;
     cursor: pointer; }
-    #treebranchContainer.filterPictures label i {
+    .treebranchContainer.filterPictures label i {
       position: absolute;
       right: 15px;
       top: 50%;
       -webkit-transform: translateY(-50%);
           -ms-transform: translateY(-50%);
               transform: translateY(-50%); }
-  #treebranchContainer.filterPictures .filter {
+  .treebranchContainer.filterPictures .filter {
     display: none; }
-    #treebranchContainer.filterPictures .filter .input {
+    .treebranchContainer.filterPictures .filter .input {
       padding: 15px;
       background-color: #d4d3cf; }
-    #treebranchContainer.filterPictures .filter input[type=text] {
+    .treebranchContainer.filterPictures .filter input[type=text] {
       height: 30px;
       width: 100%;
       font-size: 14px;
@@ -1489,10 +1496,10 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       box-sizing: border-box;
       border: 0;
       padding: 0 15px; }
-  #treebranchContainer.filterPictures a {
+  .treebranchContainer.filterPictures a {
     font-size: 14px;
     color: #000; }
-  #treebranchContainer.filterPictures .completeList {
+  .treebranchContainer.filterPictures .completeList {
     padding: 16px 15px;
     min-height: 50px;
     color: #e3004a; }
