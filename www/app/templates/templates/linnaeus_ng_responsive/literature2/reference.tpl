@@ -60,6 +60,7 @@
 			</div>
 		</div>
 	</div>
+	{include file="../shared/footer.tpl"}
 </div>
 
 
@@ -78,5 +79,5 @@ $(document).ready(function(){
 </script>
 
 
-{include file="../shared/footer.tpl"}
+
 
