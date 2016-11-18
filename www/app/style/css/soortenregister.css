@@ -992,8 +992,6 @@ p {
   background-color: #fff;
   padding: 22px 30px 23px 30px; }
   @media screen and (max-width: 994px) {
-    #treebranchContainer {
-      display: none; }
       #treebranchContainer.filterPictures {
         display: block; } }
   #treebranchContainer #name-tree {
