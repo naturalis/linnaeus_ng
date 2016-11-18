@@ -1,13 +1,5 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/flexslider.tpl"}
-<div id="dialogRidge">
-
-	<div id="left">
-    <div>
-      {include file="../search/_simpleSearch.tpl"}		
-    </div>
-	</div>
-	
+<div id="dialogRidge">	
 	<div id="content" class="literature">
 		<div class="whiteBox">
 			<h2>{t}Literatuurreferentie{/t}</h2>
