@@ -16,7 +16,7 @@ table.photographersList tr:nth-child(1) td
 
 	<div id="left">
 
-		<div id="treebranchContainer">
+		<div class="treebranchContainer">
 
 			{include file="_validators.tpl"}
 

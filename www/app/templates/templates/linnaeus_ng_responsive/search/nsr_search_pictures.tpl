@@ -9,7 +9,7 @@
 		  Filter zoekopdracht
 		  <i class="ion-chevron-down"></i>
 		</a>
-		<div id="treebranchContainer" class="filterPictures">
+		<div class="treebranchContainer" class="filterPictures">
 			{include file="_filterPictures.tpl"}
 		</div>  
 

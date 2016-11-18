@@ -45,7 +45,7 @@
 
 
 	<div id="left">
-		<div id="treebranchContainer">
+		<div class="treebranchContainer">
 			{include file="_photographers.tpl"}
 			<br />
 			{include file="_validators.tpl"}
@@ -74,9 +74,9 @@
 								</ul>
 							</a>
 						</div>
-						<a class="resultDetails">
+						<a class="resultDetails" href="../species/nsr_taxon.php?id={$v.taxon_id}">
 							{if $v.common_name}		
-								<span class="resultLink" href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.common_name}</span>	
+								<span class="resultLink">{$v.common_name}</span>	
 							{/if}
 							<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>						
 						</a>

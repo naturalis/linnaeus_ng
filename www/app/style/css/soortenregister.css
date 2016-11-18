@@ -1533,6 +1533,9 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     padding: 8px 15px 7px 15px; }
   #formSearchFacetsSpecies ul {
     padding: 7px 0 8px 0; }
+.resultDetails .resultLink {
+  display: block;
+}
 
 .resultDetails {
   padding: 15px;
