@@ -812,10 +812,8 @@ table {
         position: absolute;
         text-align: center;
         color: #fff;
-        padding-left: 70px;
-        padding-right: 70px;
-        left: 0;
-        width: 100%;
+        left: 50px;
+        right: 0px;
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
