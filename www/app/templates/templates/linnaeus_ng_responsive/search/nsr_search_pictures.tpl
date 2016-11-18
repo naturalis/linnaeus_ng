@@ -9,7 +9,7 @@
 		  Filter zoekopdracht
 		  <i class="ion-chevron-down"></i>
 		</a>
-		<div class="treebranchContainer" class="filterPictures">
+		<div class="treebranchContainer filterPictures">
 			{include file="_filterPictures.tpl"}
 		</div>  
 
@@ -47,12 +47,12 @@
 								</ul>
 							</a>
 						</div>
-						<div class="resultDetails">
+						<a class="resultDetails" href="../species/nsr_taxon.php?id={$v.taxon_id}">
 							{if $v.common_name}		
-								<a class="resultLink" href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.common_name}</a>	
+								<span class="resultLink" >{$v.common_name}</span>	
 							{/if}
 							<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>						
-						</div>
+						</a>
 					</div>
 				{/foreach}
 			</div>
