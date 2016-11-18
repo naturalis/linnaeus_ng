@@ -119,6 +119,22 @@
 			{/foreach}
 		</div>
 	</div>
+	
+	<div class="sideBarLogos responsive">
+		{foreach from=$sideBarLogos item=v}
+			{if $v.url}
+			<a href="{$v.url}" target="_blank">
+			{/if}
+				{if $v.logo}
+					<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
+				{else}
+					<img src="http://www.nederlandsesoorten.nl/linnaeus_ng/shared/media/project/0001/ravon-logo.png" alt="">
+				{/if}
+			{if $v.url}
+			</a>
+			{/if}
+		{/foreach}
+	</div>
 	<div class="treebranchContainer responsive">
             <h2>{t}Indeling{/t}</h2>
 			<table id="name-tree">
@@ -199,18 +215,3 @@
 			{/foreach}			
 			</table>
 		</div>  
-	<div class="sideBarLogos responsive">
-		{foreach from=$sideBarLogos item=v}
-			{if $v.url}
-			<a href="{$v.url}" target="_blank">
-			{/if}
-				{if $v.logo}
-					<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
-				{else}
-					<img src="http://www.nederlandsesoorten.nl/linnaeus_ng/shared/media/project/0001/ravon-logo.png" alt="">
-				{/if}
-			{if $v.url}
-			</a>
-			{/if}
-		{/foreach}
-	</div>
