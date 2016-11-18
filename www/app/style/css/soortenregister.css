@@ -1459,9 +1459,9 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 .treebranchContainer + #toolbox {
   margin-top: 30px; }
 
-.treebranchContainer.filterPictures {
+.filterPictures {
   padding: 0; }
-  .treebranchContainer.filterPictures label {
+  .filterPictures label {
     display: block;
     background-color: #e3004a;
     color: #fff;
@@ -1469,19 +1469,19 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     padding: 15px;
     position: relative;
     cursor: pointer; }
-    .treebranchContainer.filterPictures label i {
+    .filterPictures label i {
       position: absolute;
       right: 15px;
       top: 50%;
       -webkit-transform: translateY(-50%);
           -ms-transform: translateY(-50%);
               transform: translateY(-50%); }
-  .treebranchContainer.filterPictures .filter {
+  .filterPictures .filter {
     display: none; }
-    .treebranchContainer.filterPictures .filter .input {
+    .filterPictures .filter .input {
       padding: 15px;
       background-color: #d4d3cf; }
-    .treebranchContainer.filterPictures .filter input[type=text] {
+    .filterPictures .filter input[type=text] {
       height: 30px;
       width: 100%;
       font-size: 14px;
@@ -1491,10 +1491,10 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       box-sizing: border-box;
       border: 0;
       padding: 0 15px; }
-  .treebranchContainer.filterPictures a {
+  .filterPictures a {
     font-size: 14px;
     color: #000; }
-  .treebranchContainer.filterPictures .completeList {
+  .filterPictures .completeList {
     padding: 16px 15px;
     min-height: 50px;
     color: #e3004a; }
