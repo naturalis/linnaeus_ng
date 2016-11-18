@@ -1538,7 +1538,12 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   padding: 15px;
   background-color: #eeede9;
   font-size: 14px;
+  display: block;
   line-height: 1.3; }
+.resultDetails i {
+  color: #000;
+}
+
   .resultDetails a {
     color: #e3004a;
     text-decoration: none;
