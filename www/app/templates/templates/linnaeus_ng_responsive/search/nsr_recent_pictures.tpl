@@ -54,7 +54,7 @@
 	
 	<div id="content" class="image-search">
 		<div>
-			<div class="searchPictures">
+			<div class="whiteBox">
 				<div class="searchHeader">
 					<h2>{t}Recente afbeeldingen{/t}</h2>
 		        </div>

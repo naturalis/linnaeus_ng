@@ -1432,6 +1432,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   float: right; }
 
 .searchPictures {
+  padding: 30px;
   background-color: #fff; }
   @media screen and (max-width: 994px) {
     .searchPictures {
