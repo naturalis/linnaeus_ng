@@ -23,12 +23,19 @@
 			{foreach $results.data v}
 				<li class="result" sort_name="{$v.taxon|@strip_tags}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
 					<a href="../species/nsr_taxon.php?id={$v.taxon_id}" class="clicklink"></a>		
-					<a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a>
+					<a href="../species/nsr_taxon.php?id={$v.taxon_id}">
+						{$v.taxon} 
+						{if $v.presence_information_index_label || $v.presence_information_title}{else}
+							({$v.common_rank})
+						{/if}
+					</a>
 					{if $v.common_name}
 						<span class="commontName">{$v.common_name}</span>
 					{/if}
 					{if $v.presence_information_index_label || $v.presence_information_title}
-						<span class="status">{t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title} {if $v.common_rank} ({$v.common_rank}){/if}</span>
+						<span class="status">{t}Status:{/t} {$v.presence_information_index_label} {$v.presence_information_title} 
+							<!-- {if $v.common_rank} ({$v.common_rank}){/if} -->
+						</span>
 					{/if}
 					{if $v.overview_image}
 						<div class="image" style="background-image:url('{$taxon_base_url_images_thumb_s}{$v.overview_image}');"></div>
