@@ -23,15 +23,14 @@
 
             <div>
 
-                <div class="searchPictures">
-                    <div class="searchHeader">
-                        <h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
-                        <!-- <select name="sort" class="customSelect">
-                          <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
-                          <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
-                        </select> -->
-            		</div>
-				</div>
+                
+                <div class="searchHeader">
+                    <h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
+                    <!-- <select name="sort" class="customSelect">
+                      <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
+                      <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
+                    </select> -->
+        		</div>
             
 			<h4><span id="resultcount-header">{$results.count}</span></h4>
    			<div id="images-container">
