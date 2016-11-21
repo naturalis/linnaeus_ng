@@ -83,6 +83,9 @@
 .footerContainer
 	.copyright
 		padding: 0 15px
+		@media screen and (max-width: 994px)
+			padding: 0 0 20px 0
+			display: block
 
 .search-open
 	.menuContainer
@@ -372,6 +375,8 @@
 	.scrollContainer
 		overflow-y: scroll
 		height: 100%
+		margin-top: -50px
+		padding-top: 50px
 		-webkit-overflow-scrolling: touch
 	.menu > li 
 		a.toggle-submenu

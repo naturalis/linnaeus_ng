@@ -29,9 +29,10 @@
             
 						<ul id="presence-options-panel" class="selectableParametersPanel">
               <li>
-                {if $search_presence_help_url}
+                <!-- {if $search_presence_help_url}
                   <a href="{$search_presence_help_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
-                {/if}
+                {/if} -->
+                <a href="http://www.nederlandsesoorten.nl/content/voorkomen" target="_blank" class="help">Meer informatie</a>
               </li>
 							<li>
 								<select class="customSelect" id="presenceStatusList" name="presenceStatusList" onchange="addSearchParameter('presenceStatusList');">
@@ -99,7 +100,7 @@
            </label>
            <ul id="dna-options-panel" class="selectableParametersPanel">
             <li>
-              <a href="http://www.nederlandsesoorten.nl/nlsr/nlsr/dnabarcoding.html" target="_blank" title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
+              <a href="http://www.nederlandsesoorten.nl/content/dna-barcoding" target="_blank" title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
             </li>
            	<li>
            		<select class="customSelect" id="dna-options" name="dna-options" onchange="addSearchParameter('dna-options');">
