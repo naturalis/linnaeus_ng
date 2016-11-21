@@ -3,9 +3,12 @@
 <div id="taxonHeader">
 	<div id="headerImage">
 		<div class="titles">
+
+			<h1 class="main-display-name">{$names.preffered_name} <span>{$names.nomen}</span></h1>
+			
 			{if $overviewImage.photographer}
 			<div id="taxonImageCredits">
-				<span class="photographer-title">{t}Foto:{/t}</span> {$overviewImage.photographer} 
+				{t}Foto:{/t} {$overviewImage.photographer} 
 			</div>
 			{/if}
 		</div>
@@ -14,16 +17,20 @@
 		<div class="imageGradient"></div>
 	</div>
 </div>
+{else}
+	<div class="whiteBox no-header-image">
+		<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
+	</div>
 {/if}
 <div id="dialogRidge">
-	<div class="whiteBox responsive-title species-title">
+	<!-- <div class="whiteBox responsive-title species-title">
 		<h1 class="main-display-name mobile">{$names.preffered_name} <span>{$names.nomen}</span></h1>
-	</div>
+	</div> -->
 	{include file="_left_column.tpl"}
 	<div id="content" class="taxon-detail">
-		<div class="whiteBox desktop-title species-title">
+		<!-- <div class="whiteBox desktop-title species-title">
 			<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
-		</div>
+		</div> -->
 		<div class="whiteBox">
 			{include file="_tabs.tpl"}
 		</div>

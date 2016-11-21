@@ -812,10 +812,8 @@ table {
         position: absolute;
         text-align: center;
         color: #fff;
-        padding-left: 70px;
-        padding-right: 70px;
-        left: 0;
-        width: 100%;
+        left: 50px;
+        right: 0px;
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1459,9 +1457,9 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 .treebranchContainer + #toolbox {
   margin-top: 30px; }
 
-.treebranchContainer.filterPictures {
+.filterPictures {
   padding: 0; }
-  .treebranchContainer.filterPictures label {
+  .filterPictures label {
     display: block;
     background-color: #e3004a;
     color: #fff;
@@ -1469,19 +1467,19 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     padding: 15px;
     position: relative;
     cursor: pointer; }
-    .treebranchContainer.filterPictures label i {
+    .filterPictures label i {
       position: absolute;
       right: 15px;
       top: 50%;
       -webkit-transform: translateY(-50%);
           -ms-transform: translateY(-50%);
               transform: translateY(-50%); }
-  .treebranchContainer.filterPictures .filter {
+  .filterPictures .filter {
     display: none; }
-    .treebranchContainer.filterPictures .filter .input {
+    .filterPictures .filter .input {
       padding: 15px;
       background-color: #d4d3cf; }
-    .treebranchContainer.filterPictures .filter input[type=text] {
+    .filterPictures .filter input[type=text] {
       height: 30px;
       width: 100%;
       font-size: 14px;
@@ -1491,10 +1489,10 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       box-sizing: border-box;
       border: 0;
       padding: 0 15px; }
-  .treebranchContainer.filterPictures a {
+  .filterPictures a {
     font-size: 14px;
     color: #000; }
-  .treebranchContainer.filterPictures .completeList {
+  .filterPictures .completeList {
     padding: 16px 15px;
     min-height: 50px;
     color: #e3004a; }
@@ -1535,12 +1533,20 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     padding: 8px 15px 7px 15px; }
   #formSearchFacetsSpecies ul {
     padding: 7px 0 8px 0; }
+.resultDetails .resultLink {
+  display: block;
+}
 
 .resultDetails {
   padding: 15px;
   background-color: #eeede9;
   font-size: 14px;
+  display: block;
   line-height: 1.3; }
+.resultDetails i {
+  color: #000;
+}
+
   .resultDetails a {
     color: #e3004a;
     text-decoration: none;
@@ -1772,16 +1778,8 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   @media screen and (max-width: 500px) {
     #taxonHeader #headerImage {
       height: 200px; } }
-#taxonHeader .titles {
-  bottom: 30px;
-  position: absolute;
-  text-align: right;
-  right: 0; }
-  @media screen and (max-width: 994px) {
-    #taxonHeader .titles {
-      right: 30px; } }
+
   #taxonHeader .titles h1 {
-    font-size: 16px;
     color: #fff;
     margin-bottom: 5px; }
   #taxonHeader .titles h2 {

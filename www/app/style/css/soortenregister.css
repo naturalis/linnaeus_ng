@@ -1778,16 +1778,8 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   @media screen and (max-width: 500px) {
     #taxonHeader #headerImage {
       height: 200px; } }
-#taxonHeader .titles {
-  bottom: 30px;
-  position: absolute;
-  text-align: right;
-  right: 0; }
-  @media screen and (max-width: 994px) {
-    #taxonHeader .titles {
-      right: 30px; } }
+
   #taxonHeader .titles h1 {
-    font-size: 16px;
     color: #fff;
     margin-bottom: 5px; }
   #taxonHeader .titles h2 {

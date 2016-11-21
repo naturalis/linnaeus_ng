@@ -13,6 +13,39 @@
 	@media screen and (max-width: 994px)
 		display: none
 
+#taxonHeader #headerImage
+	display: flex
+	align-items: flex-end
+
+#taxonHeader 
+	.titles
+		display: flex
+		justify-content: space-between
+		width: 100%
+		padding: 0 15px 30px 15px
+	.main-display-name
+		font-size: 34px
+		flex-basis: 80%
+		@media screen and (max-width: 800px)
+			flex-basis: 100%
+			font-size: 25px
+	#taxonImageCredits
+		display: flex
+		align-items: flex-end
+		@media screen and (max-width: 994px)
+			display: none
+
+.no-header-image
+	max-width: 994px
+	margin: 0 auto
+	@media screen and (max-width: 994px)
+		margin-bottom: 30px
+	h1
+		margin-bottom: 0
+		font-size: 34px
+		@media screen and (max-width: 994px)
+			font-size: 25px
+
 #categories	
 	a
 		padding: 8px 30px 7px 37px
