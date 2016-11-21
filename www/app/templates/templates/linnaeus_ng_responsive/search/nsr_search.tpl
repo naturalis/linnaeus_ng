@@ -15,6 +15,9 @@
 					<option value="sort_common">{t}Nederlandse naam{/t}</option>
 				</select>
 			</div>
+			{if $search.search}
+			<div class="search-term">Zoekterm: {$search.search}</div>
+			{/if}
 			<span id="resultcount-header">{$results.count}</span>
 			{if $results.data}
 			{assign var=i value=0}
