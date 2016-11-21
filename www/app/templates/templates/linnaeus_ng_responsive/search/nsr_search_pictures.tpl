@@ -26,7 +26,7 @@
                 
                 <div class="searchHeader">
                     <h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
-                    <br />
+                    <br /><br />
                     <!-- <select name="sort" class="customSelect">
                       <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
                       <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
