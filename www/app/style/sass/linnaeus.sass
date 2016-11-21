@@ -22,13 +22,15 @@
 		display: flex
 		justify-content: space-between
 		width: 100%
-		padding: 0 15px 30px 15px
+		padding: 0 30px 30px 30px
+		@media screen and (max-width: 994px)
+			padding: 0 30px 10px 30px
 	.main-display-name
 		font-size: 34px
 		flex-basis: 80%
 		@media screen and (max-width: 800px)
 			flex-basis: 100%
-			font-size: 25px
+			font-size: 16px
 	#taxonImageCredits
 		display: flex
 		align-items: flex-end
