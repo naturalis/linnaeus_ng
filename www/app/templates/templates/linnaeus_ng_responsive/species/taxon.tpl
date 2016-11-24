@@ -19,7 +19,7 @@
 </div>
 {else}
 	<div class="whiteBox no-header-image">
-		<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
+		<h1 class="main-display-name">{$names.preffered_name} <span>{$names.nomen}</span></h1>
 	</div>
 {/if}
 <div id="dialogRidge">
