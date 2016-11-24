@@ -1491,8 +1491,11 @@ class NsrTaxonController extends NsrController
 			}
 		}
 
+		$this->deleteEmptyPresenceData();
+
 		$after=$this->getConcept($this->rGetId());
 		$after['presence']=$this->getPresenceData($this->rGetId());
+
 		$this->logChange(array('before'=>$before,'after'=>$after,'note'=>'updated concept '.$before['taxon']));
 	}
 
@@ -1606,6 +1609,33 @@ class NsrTaxonController extends NsrController
 			array('reference_id'=>empty($values['new']) || $values['new']=='-1' ? 'null' : trim($values['new'])),
 			array('taxon_id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId())
 		);
+	}
+
+
+	private function deleteEmptyPresenceData()
+	{
+		$d=$this->models->PresenceTaxa->_get(array(
+			'id'=>
+				array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'taxon_id'=>$this->getConceptId()
+				)
+			));
+
+		if ($d)
+		{
+			if (is_null($d[0]['presence_id']) &&
+				is_null($d[0]['habitat_id']) &&
+				is_null($d[0]['actor_id']) &&
+				is_null($d[0]['actor_org_id']) &&
+				is_null($d[0]['reference_id']))
+			{
+				$this->models->PresenceTaxa->delete(array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'taxon_id'=>$this->getConceptId()
+				));
+			}
+		}
 	}
 
 	private function createConceptNsrIds()

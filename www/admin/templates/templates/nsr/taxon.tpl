@@ -164,7 +164,8 @@
             <td>
                 <span id="presence_reference">{if $presence.reference_id!=''}{$presence.reference_label}{/if}</span>
                 <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="presence_reference_id">{t}edit{/t}</a> *
-                <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" />
+                <a class="edit" style="margin-left:0;display:none" href="#" onclick="setNsrDropListValue(null,'presence_reference_id');return false;" id="presence_reference_remove" rel="presence_reference_id">x</a>
+                <input type="hidden" id="presence_reference_id" value="{$presence.reference_id}" onchange="$('#presence_reference_remove').toggle($(this).val().length>0);" />
             </td>
         </tr>
 
@@ -265,6 +266,7 @@ $(document).ready(function()
 	{if $concept}
 	dataid={$concept.id};
 	taxonrank={$concept.base_rank};
+	$('#presence_reference_id').trigger('change');
 	{/if}
 	$('#data :input[type!=button]').each(function(key,value)
 	{
@@ -275,11 +277,9 @@ $(document).ready(function()
 	//console.dir(values);
 
 	{if !$concept}
-	// if new concept, trigger all edit-clicks
 	$('a.edit').each(function()
 	{
 		$(this).trigger('click');
-		//$(this).remove();
 	});
 	{/if}
 
