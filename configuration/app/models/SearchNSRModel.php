@@ -305,7 +305,6 @@ final class SearchNSRModel extends AbstractModel
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );
-
 		return array('data'=>$data,'count'=>$count[0]['total']);
 
 	}

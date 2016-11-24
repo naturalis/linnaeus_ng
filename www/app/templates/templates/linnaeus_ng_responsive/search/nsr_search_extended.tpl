@@ -1,5 +1,5 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/flexslider.tpl"}
+<!-- {include file="../shared/flexslider.tpl"} -->
 <style>
 .options-panel {
 	margin-top:5px;
@@ -360,9 +360,7 @@ function submitSearchParams()
           {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
         	</span>
         	{if $v.overview_image}
-        		<div class="image">
-          		<img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}" />
-        		</div>
+        		<div class="image" style="background-image: url('{$taxon_base_url_images_thumb_s}{$v.overview_image}');"></div>
           {/if}
         </li>
 			{/foreach}
@@ -461,7 +459,7 @@ $(document).ready(function()
 	{if $search.panels}
 
 	var h=$.parseJSON(decodeURIComponent('{$search.panels}'));
-
+	console.log(h);
 	$.each(h, function(i,v)
 	{
 		if (v.visible)

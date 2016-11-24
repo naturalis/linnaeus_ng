@@ -1,0 +1,404 @@
+@import "variables"
+@import "typography"
+
+.responsive-title
+	display: none
+	margin-bottom: 30px
+	@media screen and (max-width: 994px)
+		display: block
+		h1
+			margin-bottom: 0
+
+.main-display-name.desktop
+	@media screen and (max-width: 994px)
+		display: none
+
+#taxonHeader #headerImage
+	display: flex
+	align-items: flex-end
+
+.search-term
+	font-weight: bold
+	margin-bottom: 15px
+
+#taxonHeader 
+	.titles
+		display: flex
+		justify-content: space-between
+		width: 100%
+		padding: 0 30px 30px 30px
+		@media screen and (max-width: 994px)
+			padding: 0 30px 10px 30px
+	.main-display-name
+		font-size: 34px
+		flex-basis: 80%
+		@media screen and (max-width: 800px)
+			flex-basis: 100%
+			font-size: 25px
+		@media screen and (max-width: 600px)
+			font-size: 16px
+	#taxonImageCredits
+		display: flex
+		align-items: flex-end
+		@media screen and (max-width: 994px)
+			display: none
+
+.no-header-image
+	max-width: 994px
+	margin: 0 auto
+	@media screen and (max-width: 994px)
+		margin-bottom: 30px
+	h1
+		margin-bottom: 0
+		font-size: 34px
+		@media screen and (max-width: 994px)
+			font-size: 25px
+
+#categories	
+	a
+		padding: 8px 30px 7px 37px
+		display: block
+		color: #000
+		text-decoration: none
+		background-image: url('../img/arrow-right-black.svg')
+		background-size: 12px
+		background-repeat: no-repeat
+		background-position: center left 19px
+		&.active
+			color: $blue
+			background-image: url('../img/arrow-right-blue.svg')
+		&:hover
+			color: $blue
+			background-image: url('../img/arrow-right-blue.svg')
+	@media screen and (max-width: 994px)
+		ul
+			display: flex
+			flex-wrap: wrap
+			white-space: nowrap
+		li
+			display: flex
+			justify-content: center
+			flex-grow: 1
+		a
+			padding: 8px 10px 7px 10px
+			background-image: none
+			&:hover, &.active
+				background-image: none
+			
+.classification-name.current
+	font-weight: bold
+
+.footerContainer
+	.copyright
+		padding: 0 15px
+		@media screen and (max-width: 994px)
+			padding: 0 0 20px 0
+			display: block
+
+.search-open
+	.menuContainer
+		margin-top: 0
+		transition: margin-top 0.5s ease
+
+.menuToggle i
+	color: #fff
+	font-size: 28px
+	display: flex
+	align-items: center
+	color: #fff
+
+.menuContainer
+	position: relative
+	transition: margin-top, top 0.5s ease
+	*
+		box-sizing: border-box
+	#inlineformsearch
+		background-color: $pink
+		height: 0px
+		transition: height 0.5s ease
+		position: relative
+		input
+			height: 50px
+			border: 0
+			outline-width: 0
+			width: 100%
+			max-width: 994px
+			margin: 0 auto
+			display: block
+			background-color: transparent
+			color: #fff
+			font-size: 16px
+			padding: 0 15px
+		input::placeholder
+			color: #fff
+.menuHolder
+	display: flex
+	margin: 0 auto
+	width: 100%
+	max-width: 994px
+	.search-toggle
+		height: 50px
+		background-color: $pink
+		display: flex
+		width: 47px
+		justify-content: center
+		align-items: center
+		margin-left: auto
+		@media screen and (max-width: 994px)
+			position: absolute
+			top: 0px
+			transition: top 0.5s ease
+			right: 0
+			background-color: transparent
+	.menuToggle
+		@media screen and (max-width: 994px)
+			position: absolute
+			top: 0px
+			transition: top 0.5s ease
+			left: 0
+			right: 50px
+
+.link
+	position: relative
+	display: inline-block
+	@media screen and (max-width: 994px)
+		position: initial
+	.mouseover
+		display: none
+		opacity: 0
+		transition: opacity 0.5s ease
+	p
+		margin-bottom: 0
+	&:hover
+		.mouseover
+			background-color: #fff
+			padding: 8px 12px
+			border-radius: 8px
+			display: block
+			font-size: 12px
+			color: #000
+			position: absolute
+			top: 100%
+			left: 50%
+			transform: translateX(-50%)
+			margin-top: 10px
+			border-radius: 10px
+			width: 20rem
+			z-index: 6000
+			display: block
+			box-shadow: 0 2px 3px 0 rgba(0,0,0,.16)
+			border: 1px solid #d8dde6
+			opacity: 1
+			transition: opacity 0.5s ease
+			@media screen and (max-width: 994px)
+				top: auto
+			&:before
+				width: 1rem
+				height: 1rem
+				position: absolute
+				transform: rotate(45deg)
+				content: ''
+				background-color: inherit
+				left: 50%
+				top: -.5rem
+				margin-left: -.5rem
+			&:after
+				box-shadow: -1px -1px 0 0 rgba(0,0,0,.16)
+				z-index: -1
+				width: 1rem
+				height: 1rem
+				position: absolute
+				transform: rotate(45deg)
+				content: ''
+				background-color: inherit
+				left: 50%
+				top: -.5rem
+				margin-left: -.5rem
+			b
+				font-weight: bold
+				margin-bottom: 5px
+				font-size: 14px
+				display: block
+.sideBarLogos
+	&.responsive
+		display: none
+		@media screen and (max-width: 994px)
+			display: block
+			order: 10
+			margin-bottom: 30px
+	&.desktop
+		@media screen and (max-width: 994px)
+			display: none
+
+#facets
+	@media screen and (max-width: 994px)
+		margin-bottom: 30px
+
+.species-title
+	margin-bottom: 30px
+	@media screen and (max-width: 994px)
+		&.desktop-title
+			display: none
+	h1
+		margin-bottom: 0
+
+.logoContainer
+	width: 100%
+	margin: 0 auto
+	padding: 15px 0
+	@media screen and (max-width: 994px)
+		display: none
+	.container
+		width: 100%
+		max-width: 994px
+		margin: 0 auto
+		display: flex
+		padding: 0 10px
+	.logo
+		display: block
+		height: 62px
+		margin-right: 15px
+
+.siteTitle
+	display: flex
+	flex-direction: column
+	justify-content: flex-end
+	h1
+		margin-bottom: 0
+		color: #e3004a
+		font-size: 34px
+		position: relative
+		bottom: -6px
+		font-family: 'platform-medium', Arial
+		font-feature-settings: "ss01"
+	h2
+		margin-bottom: 0
+		color: #e3004a
+		font-family: 'platform-regular', Arial
+		position: relative
+		bottom: -6px
+		font-feature-settings: "ss01"
+	
+.search-open
+	.menu-search
+		transition: height, margin-top 0.5s ease
+	#inlineformsearch
+		height: 50px
+		transition: height 0.5s ease
+
+.menu-search
+	position: absolute
+	width: 100%
+	background-color: #000
+	min-height: 50px
+	overflow: hidden
+	height: 50px
+	transition: height, margin-top 0.5s ease
+	@media screen and (min-width: 995px)
+		&:hover
+			height: auto
+			transition: height, margin-top 0.5s ease
+	@media screen and (max-width: 994px)
+		height: auto
+		overflow: visible
+
+.suggestList
+	position: absolute	
+	top: 100%
+	left: 0px
+	z-index: 1000
+	font-size: 90%
+	border-bottom: solid 2px #e3004a  
+	background-color: #fff
+	display: none
+	max-height: 250px
+	-webkit-overflow-scrolling: touch
+	overflow-y: auto
+	width: 100%
+	max-width: 994px
+	left: 50%
+	transform: translateX(-50%)
+
+.suggestList li
+	display: block
+	padding: 6px 15px
+	cursor: pointer
+
+.suggestList li:nth-child(even)
+	background-color: #eee
+
+.suggestList li:hover
+	color: #e3004a
+
+.suggestList li .scientific
+	font-size: 11px
+	color: #777
+	padding-bottom: 2px
+
+.suggestList li .common
+	font-size: 14px
+	color: #444
+	padding-bottom: 4px
+
+.searchInputHolder
+	position: relative
+	margin: 0 auto
+	width: 100%
+	max-width: 994px
+
+.close-suggestion-list
+	font-size: 21px
+	position: absolute
+	top: 50%
+	color: #fff
+	outline-width: 0
+	transform: translateY(-50%)
+	width: 50px
+	height: 50px
+	justify-content: center
+	align-items: center
+	display: flex
+	right: 0
+	&:hover
+		color: #f1f1f1
+
+.taxonoverzicht > li
+	display: flex
+	flex-direction: column
+
+.taxonoverzicht > li span 
+	overflow: hidden
+	flex-basis: 100%
+	text-overflow: ellipsis
+	
+
+@media screen and (max-width: 994px)
+	html
+		height: 100%
+		overflow: hidden
+	body
+		height: 100%
+		overflow: hidden
+
+	.scrollContainer
+		overflow-y: scroll
+		height: 100%
+		margin-top: -50px
+		padding-top: 50px
+		-webkit-overflow-scrolling: touch
+	.menu > li 
+		a.toggle-submenu
+			position: absolute
+			right: 0
+			top: 0
+			display: block
+			padding: 0
+			color: #fff
+			margin-left: auto
+			width: 50px
+			height: 50px
+		i
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translate(-50%, -50%)

@@ -1,10 +1,9 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/flexslider.tpl"}
+<!-- {include file="../shared/flexslider.tpl"} -->
 
 <div id="dialogRidge">
-	<div id="left">
-		{include file="../search/_simpleSearch.tpl"}		
-	</div>
+	<!-- <div id="left">
+	</div> -->
 	<div id="content" class="taxon-detail">
 		{include file="../search/_searchtabs.tpl" activeTab="taxonTree"}
 		<div class="taxonTree">

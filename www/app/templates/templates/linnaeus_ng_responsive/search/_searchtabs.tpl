@@ -25,19 +25,6 @@
 			</a>
 		</li>
 	</ul>
-
-	{* if $activeTab eq 'quickSearch'}
-	<div class="simpleSearch">
-		<form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
-			<fieldset>
-				<input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" placeholder="Snel zoeken op soort/taxon..." autocomplete="off" value="{$search.search}" />
-				<div id="suggestList"></div>
-			</fieldset>
-		</form>
-		<div class="simpleSuggestions" style="display: none;">
-		</div>
-	</div>
-	{/if *}
 		
 	{if $activeTab eq 'extendedSearch'}
 	<div class="extendedSearch">

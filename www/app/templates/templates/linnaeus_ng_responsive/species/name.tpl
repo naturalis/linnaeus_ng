@@ -1,6 +1,6 @@
 {include file="../shared/header.tpl"}
+{if $overviewImage.image}
 <div id="taxonHeader">
-
 	<div id="headerImage">
 		<div class="titles">
 			{if $names.preffered_name}
@@ -15,16 +15,12 @@
 			</div>
 		</div>
 	</div>
-	{if $overviewImage.image}
 	<div id="taxonImage">
 		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
 		<div class="imageGradient"></div>
 	</div>
-	{else}
-		{include file="../shared/flexslider.tpl"}
-	{/if}
 </div>
-
+{/if}
 <style>
 table tr  td:first-child {
 	white-space:nowrap;

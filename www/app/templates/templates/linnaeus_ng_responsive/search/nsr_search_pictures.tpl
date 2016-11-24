@@ -1,5 +1,4 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/flexslider.tpl"}
 
 <div id="dialogRidge">
 
@@ -10,7 +9,7 @@
 		  Filter zoekopdracht
 		  <i class="ion-chevron-down"></i>
 		</a>
-		<div id="treebranchContainer" class="filterPictures">
+		<div class="treebranchContainer filterPictures">
 			{include file="_filterPictures.tpl"}
 		</div>  
 
@@ -24,15 +23,15 @@
 
             <div>
 
-                <div class="searchPictures">
-                    <div class="searchHeader">
-                        <h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
-                        <!-- <select name="sort" class="customSelect">
-                          <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
-                          <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
-                        </select> -->
-            		</div>
-				</div>
+                
+                <div class="searchHeader">
+                    <h2>{if $search.header}{$search.header}{else}{t}Foto's zoeken{/t}{/if}</h2>
+                    <br /><br />
+                    <!-- <select name="sort" class="customSelect">
+                      <option value="validName"{if $search.sort=='validName'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
+                      <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
+                    </select> -->
+        		</div>
             
 			<h4><span id="resultcount-header">{$results.count}</span></h4>
    			<div id="images-container">
@@ -48,12 +47,12 @@
 								</ul>
 							</a>
 						</div>
-						<div class="resultDetails">
+						<a class="resultDetails" href="../species/nsr_taxon.php?id={$v.taxon_id}">
 							{if $v.common_name}		
-								<a class="resultLink" href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.common_name}</a>	
+								<span class="resultLink" >{$v.common_name}</span>	
 							{/if}
 							<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>						
-						</div>
+						</a>
 					</div>
 				{/foreach}
 			</div>

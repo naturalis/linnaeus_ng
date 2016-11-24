@@ -1,5 +1,5 @@
 {include file="../shared/header.tpl"}
-
+{if $overviewImage.image}
 <div id="taxonHeader">
 
 	{assign var=overviewImage value=$results.data[0]}
@@ -13,13 +13,14 @@
 			{/if}
 		</div>
 	</div>
-	{if $overviewImage.image}
+	
 	<div id="taxonImage">
 		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
 		<div class="imageGradient"></div>
 	</div>
-	{/if}
+	
 </div>
+{/if}
 
 <!-- div id="dialogRidge">
 
@@ -44,7 +45,7 @@
 
 
 	<div id="left">
-		<div id="treebranchContainer">
+		<div class="treebranchContainer">
 			{include file="_photographers.tpl"}
 			<br />
 			{include file="_validators.tpl"}
@@ -53,7 +54,7 @@
 	
 	<div id="content" class="image-search">
 		<div>
-			<div class="searchPictures">
+			<div class="whiteBox">
 				<div class="searchHeader">
 					<h2>{t}Recente afbeeldingen{/t}</h2>
 		        </div>
@@ -73,12 +74,12 @@
 								</ul>
 							</a>
 						</div>
-						<div class="resultDetails">
+						<a class="resultDetails" href="../species/nsr_taxon.php?id={$v.taxon_id}">
 							{if $v.common_name}		
-								<a class="resultLink" href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.common_name}</a>	
+								<span class="resultLink">{$v.common_name}</span>	
 							{/if}
 							<span class="wetenschappelijkenaam"><i>{$v.name}</i></span>						
-						</div>
+						</a>
 					</div>
 				{/foreach}
 			</div>

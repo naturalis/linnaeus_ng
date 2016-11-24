@@ -14,31 +14,38 @@ $(function(){
 		}
 	});
 
-  $(document).ready(function() {
+  $('body').on('click', '.search-toggle-js', function() {
+    $('body').toggleClass('search-open');
+    $('.menuContainer').find('input').select().focus();
+  });
 
+  
+  $('body').on('click', '.close-suggestion-list-js', function() {
+    $('#name_suggestion').hide();
+    $('body').removeClass('search-open');
+  });
 
-    $('body').on('keyup', '#inlineformsearch #inlineformsearchInput', function(e) {
-      if (e.keyCode==27 || $(this).val() == '') {
-        $('.simpleSuggestions').hide();
-      } else {
-        $('.simpleSuggestions').show();
+  $('body').on('keyup', '#inlineformsearch #inlineformsearchInput', function(e) {
+    if (e.keyCode==27 || $(this).val() == '') {
+      $('.simpleSuggestions').hide();
+    } else {
+      $('.simpleSuggestions').show();
+    }
+
+    $('.simpleSuggestions ul').append('<li>Nog een suggestie</li>');
+  });
+
+  $(".fancybox").fancybox({
+    beforeShow : function(){
+	try {
+		description = decodeURIComponent($(this.element).attr("ptitle"));
+	} catch (e) {
+		description = unescape($(this.element).attr("ptitle"));
+	}
+      if (description != "" && description != undefined) {
+        this.title = description;
       }
-
-      $('.simpleSuggestions ul').append('<li>Nog een suggestie</li>');
-    });
-
-    $(".fancybox").fancybox({
-      beforeShow : function(){
-		try {
-			description = decodeURIComponent($(this.element).attr("ptitle"));
-		} catch (e) {
-			description = unescape($(this.element).attr("ptitle"));
-		}
-        if (description != "" && description != undefined) {
-          this.title = description;
-        }
-      }
-    });
+    }
   });
 
   $('body').on('click', '.menuToggle', function(e){
@@ -49,7 +56,7 @@ $(function(){
   	});
   });
 
-  $('body').on('click', '.menu li a', function(e) {
+  $('body').on('click', '.menu li .toggle-submenu-js', function(e) {
   	if ($('.menuToggle').css('display') === 'block') {
   		e.preventDefault();	
   		var submenu = $(this).parent().find('ol'),

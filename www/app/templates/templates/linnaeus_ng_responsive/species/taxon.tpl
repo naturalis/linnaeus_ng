@@ -1,44 +1,40 @@
 {include file="../shared/header.tpl"}
-
+{if $overviewImage.image}
 <div id="taxonHeader">
-
 	<div id="headerImage">
 		<div class="titles">
+
+			<h1 class="main-display-name">{$names.preffered_name} <span>{$names.nomen}</span></h1>
+			
 			{if $overviewImage.photographer}
 			<div id="taxonImageCredits">
-				<span class="photographer-title">{t}Foto:{/t}</span> {$overviewImage.photographer} 
+				{t}Foto:{/t} {$overviewImage.photographer} 
 			</div>
 			{/if}
 		</div>
 	</div>
-
-	{if $overviewImage.image}
-	<div id="taxonImage">
-		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
+	<div id="taxonImage" style="background-image: url('{$taxon_base_url_images_overview}{$overviewImage.image}');">
 		<div class="imageGradient"></div>
 	</div>
-
-	{else}
-		{include file="../shared/flexslider.tpl"}
-	{/if}
-    
 </div>
-
-<div id="dialogRidge">
-
-	{include file="_left_column.tpl"}
-
-	<div id="content" class="taxon-detail">
-		<div class="whiteBox">
-			<h1 class="main-display-name desktop">{$names.preffered_name} <span>{$names.nomen}</span></h1>
-			<!-- h2 class="sideMenuTitle">&nbsp;</h2 -->
-			
-			{include file="_tabs.tpl"}
-
-		</div>
-
+{else}
+	<div class="whiteBox no-header-image">
+		<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
 	</div>
-
+{/if}
+<div id="dialogRidge">
+	<!-- <div class="whiteBox responsive-title species-title">
+		<h1 class="main-display-name mobile">{$names.preffered_name} <span>{$names.nomen}</span></h1>
+	</div> -->
+	{include file="_left_column.tpl"}
+	<div id="content" class="taxon-detail">
+		<!-- <div class="whiteBox desktop-title species-title">
+			<h1>{$names.preffered_name} <span>{$names.nomen}</span></h1>
+		</div> -->
+		<div class="whiteBox">
+			{include file="_tabs.tpl"}
+		</div>
+	</div>
 </div>
 
 

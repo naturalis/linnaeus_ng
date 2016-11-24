@@ -24,7 +24,7 @@
                     <i class="ion-chevron-down down"></i>
                     <i class="ion-chevron-up up"></i>
 				</label>
-				<div class="filter" id=fuck>
+				<div class="filter">
 					<div class="input">
 						<input type="text" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
 					</div>

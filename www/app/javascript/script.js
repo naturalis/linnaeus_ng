@@ -108,9 +108,9 @@ $(function(){
 
 	$('body').on('click', '#searchToggle', function(e) {
 		if (window.matchMedia("(max-width: 980px)").matches) {
-	  	e.preventDefault();
-	  	$('body').addClass('searchOpen');
-	  	$('body').removeClass('menuOpen');
+		  	e.preventDefault();
+		  	$('body').addClass('searchOpen');
+		  	$('body').removeClass('menuOpen');
 		}
 	});
 

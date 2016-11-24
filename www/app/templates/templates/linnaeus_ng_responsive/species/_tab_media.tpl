@@ -158,11 +158,12 @@ $(document).ready(function()
     <a class="fancybox" data-fancybox-group="gallery" href="{$taxon_base_url_images_main}%image%" ptitle="<div>%meta_data%</div>">
     	<div class="imageGradient"></div>
       <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
+      <ul>
+	    <li>{t}Foto{/t}: %photographer%</li>
+	  </ul>
     </a>
   </div>
-  <ul>
-    <li>{t}Foto{/t}: %photographer%</li>
-  </ul>
+  
 </div>
 -->
 </span>
@@ -173,12 +174,13 @@ $(document).ready(function()
     <a href="nsr_taxon.php?id=%id%&cat=media">
     	<div class="imageGradient"></div>
       <img class="speciesimage" alt="Foto %photographer%" ptitle="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
+      <ul>
+		<li>%name%</li>
+	    <li><i>%taxon%</i></li>
+	  </ul>
     </a>
   </div>
-  <ul>
-	<li>%name%</li>
-    <li><i>%taxon%</i></li>
-  </ul>
+  
 </div>
 -->
 </span>
