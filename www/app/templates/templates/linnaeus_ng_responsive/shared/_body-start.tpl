@@ -20,12 +20,7 @@
             <div id="name_suggestion" class="suggestList"></div>
         </form>
         <div class="menu-search">
-            
             <div class="menuHolder">
-                {* include file="../shared/nsr_main_menu.tpl" *}
-                <a href="javascript:void(0)" class="search-toggle search-toggle-js">
-                    <img src="{$projectUrls.projectCSS}../img/search.svg" class="siteTitle" />
-                </a>
             </div>
         </div>
     </div>
