@@ -64,11 +64,6 @@
 			{include file="../shared/_paginator.tpl"}
 		</div>
 	</div>
-	
-	<!-- div>
-		tijdelijke link t.b.v. test:<br />
-		<a href="nsr_recent_pictures.php">Recente afbeeldingen</a>
-	</div -->
 
 </div>
 

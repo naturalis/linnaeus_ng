@@ -1,4 +1,4 @@
-var suggestionMinInputLength=1;
+var suggestionMinInputLength=3;
 var search,dosearch,listdata,suggestiontype,matchtype;
 var activesuggestion=-1;
 var suggestionsCallback;
@@ -56,7 +56,6 @@ function retrieveSuggestions()
 		}),
 		success : function (data)
 		{
-			//console.log(data);
 			if (!data) return;
 			setListData($.parseJSON(data));
 			showSuggestions();
@@ -156,15 +155,22 @@ var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);
 
 function buildSuggestions()
 {
-	lineTpl = fetchTemplate( 'lineTpl' )!=='' ? fetchTemplate( 'lineTpl' ) : lineTpl;
+	if (getSuggestionType()=='name' && fetchTemplate( 'lineTpl' )!=='')
+	{
+		thisTpl=fetchTemplate( 'lineTpl' );
+	}
+	else
+	{
+		thisTpl=lineTpl;
+	}
 	
 	var d=Array();
 	for(var i in listdata)
 	{
 		var l=listdata[i];
-		//console.dir(l);
+		
 		d.push(
-			lineTpl
+			thisTpl
 				.replace('%IDX%',i)
 				.replace(/%IDENT%/g,( l.id ? l.id : '' ))
 				.replace('%LABEL%',l.label)
@@ -184,26 +190,30 @@ function doSuggestions(p)
 }
 
 function bindKeys()
-{
-	
+{	
 	$('div[id$=_suggestion]').each(function(e) {
 		
 		var ele=$(this).attr('id').replace('_suggestion','');
 		var match=$(this).attr('match');
 
-		$('#'+ele).keyup(function(e) {
+		$('#'+ele).keyup(function(e)
+		{
 			if (e.keyCode==27) // esc
 			{
 				hideSuggestions();
 				return;
 			}
+
 			if (e.keyCode!=undefined && e.keyCode!=13) // !enter
 			{
 				// empty ID value of user 
 				$('#'+ele+'_id').val('');
 			}
-			
-			doSuggestions({type:ele,match:match});
+
+			if ($.inArray(e.keyCode,[37,38,39,40])==-1) // !(l,r,t,d)
+			{
+				doSuggestions({type:ele,match:match});
+			}
 		});
 	
 	});
