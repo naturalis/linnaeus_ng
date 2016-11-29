@@ -25,6 +25,7 @@ $(function(){
     $('body').removeClass('search-open');
   });
 
+/*
   $('body').on('keyup', '#inlineformsearch #inlineformsearchInput', function(e) {
     if (e.keyCode==27 || $(this).val() == '') {
       $('.simpleSuggestions').hide();
@@ -34,6 +35,7 @@ $(function(){
 
     $('.simpleSuggestions ul').append('<li>Nog een suggestie</li>');
   });
+*/
 
   $(".fancybox").fancybox({
     beforeShow : function(){
