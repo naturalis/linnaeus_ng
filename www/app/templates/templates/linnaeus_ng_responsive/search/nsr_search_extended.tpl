@@ -494,8 +494,18 @@ $(document).ready(function()
 	});
 	
 	init=false;
+	acquireInlineTemplates();
 	
 });
 </script>
+
+<div class="inline-templates" id="lineTpl">
+<!--
+	<li id="item-%IDX%" ident="%IDENT%" onclick="window.open('../species/nsr_taxon.php?id=%IDENT%','_self');" onmouseover="activesuggestion=-1">
+    <div class="common">%COMMON_NAME%</div>
+    <div class="scientific">%SCIENTIFIC_NAME%</div>
+	</li>
+-->
+</div>
 
 {include file="../shared/footer.tpl"}
