@@ -17,7 +17,7 @@
                     <i class="ion-close-round"></i>
                 </a>
             </div>
-            <!-- div id="name_suggestion" class="suggestList"></div -->
+            <div id="name_suggestion" class="suggestList" style="display:none"></div>
         </form>
         <div class="menu-search">
             <div class="menuHolder">
