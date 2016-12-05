@@ -1,10 +1,19 @@
 <body id="body" class="module-{$controllerBaseName}">
-{if $customTemplatePaths.header_container}
-    {include file=$customTemplatePaths.header_container}
-{else}
-    {include file="../shared/_header-container.tpl"}
-{/if}
-{include file="../shared/_top-strip.tpl"}
-<div id="container">
-
-<form method="get" action="{$smarty.server.PHP_SELF}" id="theForm"></form>
+<div class="site__container">
+	<div class="menu__container">
+		{if $customTemplatePaths.main_menu}
+		    {include file=$customTemplatePaths.main_menu}
+		{else}
+		    {include file="../shared/_main-menu.tpl"}
+		{/if}
+	</div>
+	<div class="content__container">
+		{if $customTemplatePaths.header_container}
+		    {include file=$customTemplatePaths.header_container}
+		{else}
+		    {include file="../shared/_header-container.tpl"}
+		{/if}
+		<div class="scroll__container">
+			<div id="container">
+				
+			<form method="get" action="{$smarty.server.PHP_SELF}" id="theForm"></form>

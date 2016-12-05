@@ -29,7 +29,7 @@
 
 	<br style="clear:all" />
 
-    <div style="margin-left:200px;">
+    <div>
 
         {if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}
             <div id="taxonImage" style="float:right">

@@ -8,6 +8,7 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<meta name="server" content="{$server_name}" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
 
@@ -16,11 +17,16 @@
 
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
+
+
 {if $cssToLoad}
 {foreach $cssToLoad v}
+	<!-- css to load -->
 	<link rel="stylesheet" type="text/css" media="screen" href="{$v}" />
 {/foreach}
 {/if}
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/orchids.css">
+    <link type="text/css" rel="stylesheet" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" media="all">
 	<link rel="stylesheet" type="text/css" media="print" href="{$projectUrls.projectCSS}print.css" />
 
     <!--[if IE]>
@@ -41,6 +47,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.shrinkText.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
+    <script type="text/javascript" src="{$baseUrl}app/javascript/orchid.js"></script>
 
 
 {if $javascriptsToLoad}

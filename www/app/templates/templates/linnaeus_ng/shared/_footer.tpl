@@ -1,44 +1,50 @@
-<div id="allLookupList" class="allLookupListInvisible"></div>
-</div ends="page-container">
+			<div id="allLookupList" class="allLookupListInvisible"></div>
+			</div ends="page-container">
 
-{if $controllerMenuOverride}
-    {include file=$controllerMenuOverride}
-{else}
-    {if $controllerMenuExists}
-        {if $controllerBaseName}{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}{else}{include file="_menu.tpl"}{/if}
-    {/if}
-{/if}
+			{if $controllerMenuOverride}
+			    {include file=$controllerMenuOverride}
+			{else}
+			    {if $controllerMenuExists}
+			        {if $controllerBaseName}
+			        <!--  deze wordt weergegegven{"../"|cat:$controllerBaseName|cat:"/_menu.tpl"|@print_r}  -->
+			        	{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}
+    				{else}
+    					{include file="_menu.tpl"}
+					{/if}
+			    {/if}
+			{/if}
 
 
 
-</div>
-<!-- /form -->
-</div>
+			</div>
+			<!-- /form -->
+			</div>
 
-<div id="footer">
-	<div id="footer-container" class="container">
-		<div id="col-logo" style="visibility:hidden">
-			<!-- <img  src='{$projectUrls.systemMedia}logo_lng.png'> -->
+			<!-- <div id="footer">
+				<div id="footer-container" class="container">
+					<div id="col-logo" style="visibility:hidden">
+						<img  src='{$projectUrls.systemMedia}logo_lng.png'>
+					</div>
+				</div>
+			</div> -->
+
+			<div id="bottombar" class="navbar navbar-inverted">
+				<div class="container">
+					<p class="navbar-text navbar-left">
+						<a href="http://linnaeus.naturalis.nl/">
+							Linnaeus NG 2.0
+						</a>
+					</p>
+					<p class="navbar-text navbar-right">
+						<a href="http://www.naturalis.nl">
+							Naturalis Biodiversity Center
+						</a>
+					</p>
+				</div>
+			</div>
 		</div>
-
 	</div>
 </div>
-
-<div id="bottombar" class="navbar navbar-inverted">
-	<div class="container">
-		<p class="navbar-text navbar-left">
-			<a href="http://linnaeus.naturalis.nl/">
-				Linnaeus NG 2.0
-			</a>
-		</p>
-		<p class="navbar-text navbar-right">
-			<a href="http://www.naturalis.nl">
-				Naturalis Biodiversity Center
-			</a>
-		</p>
-	</div>
-</div>
-
 <script type="text/JavaScript">
 
 $(document).ready(function()

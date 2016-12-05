@@ -5,6 +5,10 @@
 }
 </style>
 
+
+		
+
+
 <div id="header-titles">
 	<span id="header-title">{t}Index{/t}</span>
 </div>

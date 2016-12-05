@@ -1,9 +1,10 @@
 <div id="main-body">
-<div id="page-container">
-
-{if $customTemplatePaths.main_menu}
-    {include file=$customTemplatePaths.main_menu}
-{else}
-    {include file="../shared/_main-menu.tpl"}
-{/if}
-
+	<div class="sidebar__container">
+		<div class="lookup__container">
+			<div id="lookupDialog">
+				<input type="text" id="lookupDialogInput">
+			</div>
+			<div id="lookup-DialogContent"></div>
+		</div>
+	</div>
+	<div id="page-container">

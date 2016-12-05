@@ -431,10 +431,10 @@ function allLookupBindDialogKeyUp()
 
 function allLookupShowDialog(predefJSON)
 {
-	showDialog(
-		_(allLookupDialogTitle),
-		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
-	);
+	// showDialog(
+	// 	_(allLookupDialogTitle),
+	// 	'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
+	// );
 
 	allLookupBindDialogKeyUp();
 	
@@ -483,7 +483,8 @@ function allLookupSetAlwaysFetch(state)
 
 $(document).ready(function()
 {
-
+	allLookupShowDialog();
+	
 	$('body').click(function() {
 		allLookupHideDiv();
 	});
