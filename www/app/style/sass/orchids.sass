@@ -71,7 +71,8 @@ body
 
 #content, #common, #classification, #media, #search-results, #definition, #list
 	background-color: #fff
-	padding: 30px
+	padding: 0
+	margin-bottom: 0
 
 #lookupDialog
 	background-color: #009ee0
@@ -197,6 +198,10 @@ body
 	float: none
 	display: flex
 	background-color: #fff
+	padding: 30px
+
+#content.taxon-detail
+	padding: 30px
 
 .sidebar__container
 	width: 230px
@@ -230,6 +235,36 @@ body
 	background-repeat: no-repeat
 	background-position: center
 
+.category__container
+	background-color: #fff
+	margin-bottom: 30px
+	.category-title
+		padding: 12px 15px
+		background-color: #009ee0
+		color: #fff
+	a
+		color: #000
+		display: block
+		padding: 12px 15px
+		&.category-active
+			color: #fff
+			background-color: #e3004a
+		&:hover
+			text-decoration: none
+			color: #fff
+			background-color: #ce004a
+
+#question
+	margin-bottom: 30px
+	img
+		display: block
+
+#step
+	flex-grow: 1
+
+#panel
+	margin-left: 30px
+
 .search-toggle
 	width: 60px
 	height: 50px
@@ -237,3 +272,15 @@ body
 	background-size: 21px 21px
 	background-repeat: no-repeat
 	background-position: center
+
+#step #choices
+	margin: 0
+
+.l2_choice
+	margin: 0
+	padding: 0
+	background-color: #e2e1dd
+	width: 100%
+	margin-bottom: 30px
+	&:last-child
+		margin-bottom: 0

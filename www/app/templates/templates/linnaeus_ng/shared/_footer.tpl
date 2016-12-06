@@ -1,21 +1,5 @@
 			<div id="allLookupList" class="allLookupListInvisible"></div>
 			</div ends="page-container">
-
-			{if $controllerMenuOverride}
-			    {include file=$controllerMenuOverride}
-			{else}
-			    {if $controllerMenuExists}
-			        {if $controllerBaseName}
-			        <!--  deze wordt weergegegven{"../"|cat:$controllerBaseName|cat:"/_menu.tpl"|@print_r}  -->
-			        	{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}
-    				{else}
-    					{include file="_menu.tpl"}
-					{/if}
-			    {/if}
-			{/if}
-
-
-
 			</div>
 			<!-- /form -->
 			</div>

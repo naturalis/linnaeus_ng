@@ -5,39 +5,30 @@
 	cursor:default;
 }
 </style>
-
-<div id="page-main">
-
-    
+<p id="header-titles-small">
+    <span id="header-title" style="white-space:normal">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
+</p>
+<div id="page-main">    
 	<div id="step">
-
-        <p id="header-titles-small">
-        	<span id="header-title" style="white-space:normal">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
-        </p>
-
-		<div id="question"  style="width:550px;">
+        {if $step.image or $step.content}
+		<div id="question">
             <!--{if $step.image}<img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" style="float:right;margin-left:5px" />{/if}-->
-            {if $step.image}<img alt="" src="{$step.image}" style="float:right;margin-left:5px" />{/if}
+            {if $step.image}<img alt="" src="{$step.image}" />{/if}
             {if $step.content && $step.content!=$step.title}{$step.content}{/if}
 		</div>
-
+        {/if}
 		<div id="choices">
-
 		{foreach $choices v k}
-
             {* if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 			<div class="l2_choice{if !$step.image} no_image{/if}" onclick="window.open('../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
             {elseif $v.res_taxon_id!=''}
 			<div class="l2_choice{if !$step.image} no_image{/if}" onclick="window.open('../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">
             {/if *}
-
 			<div class="l2_choice{if !$step.image} no_image{/if}">
-
                 <div class="l2_text">
                 	{$v.choice_txt}
                     {if $v.choice_img}<img style="max-width:100%" src="{$v.choice_img}">{/if}
 				</div>
-
                 {* <div class="target"> *}
 
                 {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}

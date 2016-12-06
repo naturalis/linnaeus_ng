@@ -47,10 +47,6 @@
 #back-to-search-icon {
   margin-right: -8px; }
 
-/* step */
-#step {
-  text-align: justify; }
-
 #step #question #head {
   font-size: 14px;
   color: #0303b2; }
@@ -69,16 +65,13 @@
 
 .l2_choice {
   cursor: pointer;
-  width: 270px;
   min-height: 155px;
   background-color: #eeede9;
   margin-bottom: 8px;
   padding: 5px;
   margin: 5px;
-  font-size: 90%; }
+  }
 
-.l2_choice.no_image {
-  width: 535px; }
 
 #choice-table .choice-picture {
   width: auto; }
@@ -134,9 +127,6 @@
   color: #ddd; }
 
 /* remaining taxa */
-#panel {
-  width: 230px;
-  float: right; }
   #panel #categories {
 	  font-size:0.8em;
     left: 0; }
@@ -148,9 +138,7 @@
   overflow: auto;
   background-color: #eeede9;
   float: right;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  max-height: 500px; }
+}
 
 #taxa #header {
   font-weight: bold;
@@ -179,12 +167,6 @@
 #taxa p:last-child {
   margin-bottom: 10px; }
 
-#categories {
-  position: relative;
-  left: 570px;
-  top: 10px; 
-  font-size:0.9em; 
-  width:auto; }
 #categories a.category-active {
 background-color: #eeede9 !important; }
 

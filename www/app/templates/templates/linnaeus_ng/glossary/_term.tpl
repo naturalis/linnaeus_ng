@@ -21,7 +21,6 @@
 			<div id="media-grid">
 				{assign var=mediaCat value=false}
 				{foreach $term.media v k}
-
 				{if $v.rs_id == ''}
 					{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
 				{else}
