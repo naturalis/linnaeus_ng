@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `characteristics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `type` varchar(16) NOT NULL,
-  `sys_name` varchar(64) not null,
+  `sys_name` varchar(255) not null,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -916,7 +916,7 @@ DROP TABLE IF EXISTS `matrices`;
 CREATE TABLE IF NOT EXISTS `matrices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
-  `sys_name` varchar(64) DEFAULT 'matrix',
+  `sys_name` varchar(255) DEFAULT 'matrix',
   `default` tinyint(1) NOT NULL DEFAULT '0',
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created` datetime NOT NULL,
@@ -1394,7 +1394,7 @@ CREATE TABLE IF NOT EXISTS `presence_taxa` (
 DROP TABLE IF EXISTS `projects`;
 CREATE TABLE IF NOT EXISTS `projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `sys_name` varchar(64) NOT NULL,
+  `sys_name` varchar(255) NOT NULL,
   `sys_description` text NOT NULL,
   `short_name` varchar(32) DEFAULT NULL,
   `title` varchar(64) NOT NULL,
