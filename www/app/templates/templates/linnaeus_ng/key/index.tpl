@@ -8,12 +8,12 @@
 
 <div id="page-main">
 
-    {include file="_taxa.tpl"}
+    
 	<div id="step">
 
-    <p id="header-titles-small">
-    	<span id="header-title" style="white-space:normal">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
-    </p>
+        <p id="header-titles-small">
+        	<span id="header-title" style="white-space:normal">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
+        </p>
 
 		<div id="question"  style="width:550px;">
             <!--{if $step.image}<img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" style="float:right;margin-left:5px" />{/if}-->
@@ -54,15 +54,12 @@
                 {elseif $v.res_taxon_id!=''}
                     <span class="arrow">&rarr;</span><span>{$v.target}</span>
                 {/if}
-
                 </div>
-
             </div>
-
 		{/foreach}
-
 		</div>
 	</div>
+    {include file="_taxa.tpl"}
 </div>
 
 <script>

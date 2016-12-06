@@ -1,4 +1,11 @@
 $(function() {
+	$(document).click(function(event) { 
+        if ($(event.target).parents('.menu__container').length === 0 && 
+        	!$(event.target).hasClass('menu-toggle-js')) {
+        	$('body').removeClass('menu-open-push');
+        }     
+    });
+
 	$('body').on('click', '.search-toggle-js', function() {
 		$('body').toggleClass('search-open');
 		$('#search').focus();

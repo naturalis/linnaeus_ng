@@ -57,7 +57,17 @@ body
 	line-height: 1
 
 .allLookupListCellSelected
-	background-color: red
+	background-color: #FF2053
+	color: #fff
+
+.logo-svg
+	width: 75px
+	margin-left: 15px
+	margin-top: 15px
+
+#lookup-DialogContent .row:hover
+	background-color: #CE004A
+	color: #fff
 
 #content, #common, #classification, #media, #search-results, #definition, #list
 	background-color: #fff
@@ -72,14 +82,18 @@ body
 	box-shadow: none
 	width: 100%
 
+.module-key #lookup-DialogContent,
 #lookup-DialogContent
 	margin: 0
 	padding-left: 0
 	border: none
 	background-color: #fff
+	max-height: 400px
+	height: auto
 	.row
 		padding: 12px 15px
 		cursor: pointer
+		margin-bottom: 0
 
 #container
 	padding: 30px 0
@@ -181,6 +195,8 @@ body
 #page-main
 	width: 100%
 	float: none
+	display: flex
+	background-color: #fff
 
 .sidebar__container
 	width: 230px
@@ -198,6 +214,7 @@ body
 		font-feature-settings: "ss01"
 		color: #fff
 		padding: 12px 15px
+		border-bottom: 1px solid #2d2d2d
 		&.main-menu-selected
 			color: #e3004a
 			font-weight: normal
