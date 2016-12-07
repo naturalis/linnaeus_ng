@@ -26,9 +26,6 @@
         <li><a href="../../views/projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
     </ul>
     <ul>
-        <li><a href="../../views/users/all.php">{t}Collaborator overview{/t}</a></li>
-    </ul>
-    <ul>
         <li><a href="../../views/interface/index.php">{t}Interface translations{/t}</a></li>
     </ul>
 
