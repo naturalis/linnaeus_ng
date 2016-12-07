@@ -2543,14 +2543,7 @@ body {
   display: block;
   float: left;
   width: 75%; }
-  @media screen and (max-width: 799px) {
-    #page-main,
-    #search-main-no-tabs,
-    #search-main,
-    #categories,
-    #alphabet {
-      width: 100%;
-      text-align: center; } }
+  
   @media print {
     #page-main,
     #search-main-no-tabs,

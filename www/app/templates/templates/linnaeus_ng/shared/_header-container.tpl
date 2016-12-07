@@ -26,6 +26,13 @@
 			<div class="menu-bar">
 				<a class="menu-toggle menu-toggle-js" href="javascript:void(0)"></a>
 				<!-- <a class="menu-toggle menu-toggle-over-js" href="javascript:void(0)"></a> -->
+				<div class="responsive-site-title">
+					{if !$session.app.project.logo}
+						<a href="../linnaeus/index.php">{$session.app.project.title}</a>
+					{else}
+						{$session.app.project.title}
+					{/if}
+				</div>
 				<a class="search-toggle search-toggle-js" href="javascript:void(0)"></a>
 			</div>
 		</div>
