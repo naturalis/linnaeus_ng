@@ -498,49 +498,36 @@ class ProjectsController extends Controller
             $mc->setModuleId($moduleId);
             $controller = $mc->getModuleController();
 
-            // Taxon editor admin = Species and Higher taxa app
-            // Provide mapping
-            $modules = array($moduleId);
-            if ($controller == 'nsr') {
-                $modules[] = $mc->getModuleIdByController('species');
-                $modules[] = $mc->getModuleIdByController('highertaxa');
-            }
 
             if ($action == 'module_activate') {
 
-                foreach ($modules as $moduleId) {
-                    $this->models->ModulesProjects->save(
-                    array(
-                        'id' => null,
-                        'module_id' => $moduleId,
-                        'active' => 'n',
-                        'project_id' => $this->getCurrentProjectId()
-                    ));
-                }
+                $this->models->ModulesProjects->save(
+                array(
+                    'id' => null,
+                    'module_id' => $moduleId,
+                    'active' => 'y',
+                    'project_id' => $this->getCurrentProjectId()
+                ));
 
             }
             elseif ($action == 'module_publish') {
 
-                foreach ($modules as $moduleId) {
-                    $this->models->ModulesProjects->update(array(
-                        'active' => 'y'
-                    ), array(
-                        'module_id' => $moduleId,
-                        'project_id' => $this->getCurrentProjectId()
-                    ));
-                }
+                $this->models->ModulesProjects->update(array(
+                    'active' => 'y'
+                ), array(
+                    'module_id' => $moduleId,
+                    'project_id' => $this->getCurrentProjectId()
+                ));
 
             }
             elseif ($action == 'module_unpublish') {
 
-                foreach ($modules as $moduleId) {
-                    $this->models->ModulesProjects->update(array(
-                        'active' => 'n'
-                    ), array(
-                        'module_id' => $moduleId,
-                        'project_id' => $this->getCurrentProjectId()
-                    ));
-                }
+                $this->models->ModulesProjects->update(array(
+                    'active' => 'n'
+                ), array(
+                    'module_id' => $moduleId,
+                    'project_id' => $this->getCurrentProjectId()
+                ));
 
             }
             elseif ($action == 'module_delete') {
@@ -572,7 +559,7 @@ class ProjectsController extends Controller
 					$pDel->deleteStandardCat($this->getCurrentProjectId());
 			        $pDel->deleteProjectRanks($this->getCurrentProjectId());
 			        $pDel->deleteNames($this->getCurrentProjectId());
-			        $pDel->deleteSections($this->getCurrentProjectId());
+
 				} else
 				if ($controller == 'key') {
 			        $pDel->deleteDichotomousKey($this->getCurrentProjectId());
@@ -588,12 +575,11 @@ class ProjectsController extends Controller
 			        $pDel->deleteProjectContent($this->getCurrentProjectId());
 				}
 
-				foreach ($modules as $moduleId) {
-				    $this->models->ModulesProjects->delete(array(
-                        'module_id' => $moduleId,
-                        'project_id' => $this->getCurrentProjectId()
-                    ));
-				}
+			    $this->models->ModulesProjects->delete(array(
+                    'module_id' => $moduleId,
+                    'project_id' => $this->getCurrentProjectId()
+                ));
+
             }
         }
     }

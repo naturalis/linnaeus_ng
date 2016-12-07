@@ -160,7 +160,7 @@ final class ProjectsModel extends AbstractModel
         $q = "
             select *
             from %PRE%modules
-            where " . (!$showHidden ? 'show_in_menu = 1 and ' : '') .
+            where " . (!$showHidden ? '(show_in_menu = 1 or show_in_public_menu = 1) and ' : '') .
             "controller not in ('users', 'projects')
             order by show_order";
 

@@ -446,7 +446,7 @@ class Controller extends BaseClass
 			if ( !$this->UserRights->canPerformAction() ) $d.="!canPerformAction &&";
 			if ( !$this->UserRights->hasAppropriateLevel() ) $d.="!hasAppropriateLevel &&";
 			$_SESSION['admin']['user']['authorization_fail_add']=rtrim($d,"& ");
-			 
+
 			$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 		}
 		else
@@ -2886,7 +2886,7 @@ class Controller extends BaseClass
 	protected function setGitVars()
 	{
 		if (defined("PATH_GIT_EXECUTABLE")) $this->helpers->Git->setGitExe( PATH_GIT_EXECUTABLE );
-		
+
 		$this->helpers->Git->setRepoPath( isset($this->generalSettings['applicationFileRoot']) ? $this->generalSettings['applicationFileRoot'] : '/var/www/linnaeusng/' );
 		$this->helpers->Git->setData();
 		$this->_gitVars = new stdClass;
@@ -2916,5 +2916,5 @@ class Controller extends BaseClass
 	{
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
-	
+
 }

@@ -101,7 +101,6 @@ delete from ranks where rank = 'subsubforma';
 /* Update modules */
 ALTER TABLE modules DROP INDEX module;
 ALTER TABLE modules ADD UNIQUE INDEX (module);
-update modules set module='Taxon editor' where controller = 'nsr';
 update modules set show_in_menu = 0 where controller in ('index','utilities','content');
 update modules set module='Literature (old)' where controller = 'literature';
 update modules set module='Literature' where controller = 'literature2';
@@ -113,10 +112,11 @@ insert ignore into modules values (null,'Actors','Actors: persons & organization
 insert ignore into modules values (null,'Hotwords','Automatic linking of key words in the content of your site','hotwords',99,1,0,now(),now());
 insert ignore into modules values (null,'Traits','Traits module','traits',99,1,0,now(),now());
 
-update modules set show_in_menu=0, description='Front-end implementation of the Taxon Editor' where controller='species';
-update modules set description='Taxon editor, back-end implementation of Species module' where controller='nsr';
+update modules set show_in_menu=0, show_in_public_menu=1, description='Front-end implementation of the Taxon Editor' where controller='species';
+update modules set show_in_menu=0, show_in_public_menu=1, description='Front-end implementation of the Taxon Editor' where controller='highertaxa';
+update modules set show_in_menu=0, show_in_public_menu=1, description='Front-end implementation of the Index module' where controller='index';
+update modules set module='Taxon editor', description='Back-end implementation of the Species/Higher taxa module' where controller='nsr';
 update modules set show_in_menu=0 where controller='literature';
-update modules set show_in_menu=0 where controller='highertaxa';
 update modules set module='Actors' where controller = 'actors';
 update modules set module='Traits' where controller = 'traits';
 
