@@ -241,7 +241,7 @@ function allLookupBuildList(obj,txt)
 	allLookupClearDialogDiv();
 
 	if (obj.results) {
-
+		console.log('results');
 		var textToAppend = Array();
 
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
@@ -251,7 +251,7 @@ function allLookupBuildList(obj,txt)
 			var d = obj.results[i];
 
 			if ((d.id || d.url) && d.label) {
-
+				console.log(allLookupSelectedId);
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
 				textToAppend[i] = 
@@ -483,6 +483,7 @@ function allLookupSetAlwaysFetch(state)
 
 $(document).ready(function()
 {
+	console.log('wordt deze nog ingeladen?');
 	allLookupShowDialog();
 	
 	$('body').click(function() {
