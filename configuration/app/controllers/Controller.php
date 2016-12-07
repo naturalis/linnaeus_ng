@@ -2995,4 +2995,16 @@ class Controller extends BaseClass
 		return $this->_googleAnalyticsCode;
 	}
 
+	protected function getProjectRanksAbbreviations ()
+	{
+        $ranks = $this->getProjectRanks();
+        foreach ($ranks as $r) {
+            if (!empty($r['abbreviation'])) {
+                $abr[] = $r['abbreviation'];
+            }
+        }
+        return isset($abr) ? $abr : null;
+	}
+
+
 }
