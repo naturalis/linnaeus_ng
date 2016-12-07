@@ -193,10 +193,15 @@ class UsersController extends Controller
 			$this->setAction( 'update' );
 			$this->setNewUserData( $this->rGetAll() );
 			$this->sanitizeNewUserData();
-			$this->userDataCheck();
-			$this->userDataSave();
-			$this->userPasswordCheck();
-			$this->userPasswordSave();
+
+			// Users are only allowed to edit their own data
+			if ($this->_userid == $this->getCurrentUserId()) {
+    			$this->userDataCheck();
+    			$this->userDataSave();
+    			$this->userPasswordCheck();
+    			$this->userPasswordSave();
+			}
+
 			$this->userRoleCheck();
 			$this->userRoleSave();
 			$this->userRightsSave();
@@ -233,6 +238,7 @@ class UsersController extends Controller
 		}
 
 		$this->smarty->assign( 'user', $this->getUser() );
+		$this->smarty->assign( 'current_user', $this->getCurrentUserId() );
 		$this->smarty->assign( 'roles', $this->getUserPermittedRoles() );
 		$this->smarty->assign( 'expert_role_id', $this->getExpertRoleId() );
 		$this->smarty->assign( 'modules', $this->getProjectModulesUser() );
