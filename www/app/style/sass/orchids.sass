@@ -43,8 +43,10 @@ body
 	display: flex
 	flex-direction: column
 	overflow-y: scroll
+	-webkit-overflow-scrolling: touch
 	@media screen and (max-width: 994px)
 		overflow: hidden
+
 
 .scroll__container
 	flex-grow: 1
@@ -53,6 +55,7 @@ body
 	// overflow-y: scroll
 	@media screen and (max-width: 994px)
 		overflow-y: scroll
+		-webkit-overflow-scrolling: touch
 
 #header-titles-small
 	background-color: #fff
@@ -109,8 +112,7 @@ body
 	flex-grow: 1
 	width: 100%
 	@media screen and (max-width: 800px)
-		padding: 5px
-
+		padding: 0px
 
 .menu__container
 	width: 250px
