@@ -1,4 +1,4 @@
-<div id="allNavigationPane">
+<!-- <div id="allNavigationPane">
 
 <div class="navigation-icon-wrapper">
 
@@ -27,3 +27,4 @@
 {/if}
 </div>
 </div>
+ -->

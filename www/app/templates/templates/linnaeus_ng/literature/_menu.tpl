@@ -2,7 +2,7 @@
 	allLookupSetSelectedId({$ref.id});
 </script>
 
-<div id="allNavigationPane">
+<!-- <div id="allNavigationPane">
 {include file="../shared/_back-to-search.tpl"}
 <div class="navigation-icon-wrapper">
 
@@ -29,4 +29,4 @@
     <span class="navigation-icon icon-arrow-up-left icon-inactive" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 </div>
-</div>
+</div> -->

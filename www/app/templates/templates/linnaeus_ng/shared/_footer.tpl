@@ -3,7 +3,13 @@
 			</div>
 			<!-- /form -->
 			</div>
-
+			{if $controllerMenuOverride}
+			    {include file=$controllerMenuOverride}
+			{else}
+			    {if $controllerMenuExists}
+			        {if $controllerBaseName}{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}{else}{include file="_menu.tpl"}{/if}
+			    {/if}
+			{/if}
 			<!-- <div id="footer">
 				<div id="footer-container" class="container">
 					<div id="col-logo" style="visibility:hidden">
