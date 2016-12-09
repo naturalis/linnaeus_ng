@@ -24,7 +24,9 @@
 					</a>
 				{/foreach}
 			</div>
-			<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />
+			<div class="search-input__container without-button">
+				<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />	
+			</div>
 		</div>
 		<div class="search-tab-content tab-content-js" data-content="search-author">
 			<div class="alphabet">
@@ -36,7 +38,9 @@
 					{/if}
 				{/foreach}
 			</div>
-			<input type="text" name="" id="lookup-input-author" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_author');" />
+			<div class="search-input__container without-button">
+				<input type="text" name="" id="lookup-input-author" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_author');" />
+			</div>
 		</div>
 
 		<!-- <table class="alphabet">
@@ -96,26 +100,23 @@ $(document).ready(function() {
 
 <div class="inline-templates" id="reference-table">
 <!--
-<table>
-    <tr>
-        <td style="width:200px">{t}authors{/t}</td>
-        <td style="width:75px;text-align:right;padding-right:10px;">{t}year{/t}</td>
-        <td style="width:500px">{t}reference{/t}</td>
-    </tr>
+
     %TBODY%
-</table>
+
 -->
 </div>
 
 <div class="inline-templates" id="reference-table-row">
-<!--
-<tr class="tr-highlight" style="vertical-align:top;">
-    <td><a href="reference.php?id=%ID%">%AUTHOR%</a>
-    </td>
-    <td style="text-align:right;padding-right:10px;">%YEAR%</td>
-    <td>%REFERENCE%</td>
-</tr>
--->
+	<!-- 
+	<div class="highlight-list">
+		<ul>
+			<li class="author">
+				<a href="reference.php?id=%ID%">%AUTHOR%</a> %YEAR%
+			</li>
+			<li class="content">%REFERENCE%</li>
+		</ul>
+	</div> 
+	-->
 </div>
 
 <div class="inline-templates" id="string-highlight">

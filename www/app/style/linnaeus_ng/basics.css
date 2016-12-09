@@ -1862,7 +1862,6 @@ b, .title {
   line-height: 50px; }
   @media screen and (max-width: 1080px) {
     #title, #mini-header-title {
-      margin-left: 0.25em;
       font-size: 24px; } }
   #title a, #mini-header-title a {
     color: white;
