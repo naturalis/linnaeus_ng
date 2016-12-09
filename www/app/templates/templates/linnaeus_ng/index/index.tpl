@@ -32,7 +32,7 @@
 	</div>
 	{/if}
 </div>
-<div id="alphabet" class="test">
+<div class="alphabet">
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />
 	{if $alpha.hasNonAlpha}
 		{assign var=l value=$letter|ord}

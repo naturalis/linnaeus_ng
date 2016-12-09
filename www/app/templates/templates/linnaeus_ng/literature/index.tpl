@@ -1,8 +1,7 @@
 {include file="../shared/header.tpl"}
 
 {if $alpha}
-	<div id="alphabet">
-		
+	<div class="alphabet">
 		{foreach $alpha v k}
 			{if $letter==$v}
 				<span class="letter-active">{$v}</span>
@@ -10,10 +9,8 @@
                 <a class="letter" href="?letter={$v}">{$v}</a>
 			{/if}
 		{/foreach}
-
 	</div>
 {/if}
-
 <div id="page-main" class="template-index">
 
 	{if !$refs}

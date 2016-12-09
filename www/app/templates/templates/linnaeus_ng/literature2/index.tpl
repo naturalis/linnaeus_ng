@@ -1,46 +1,74 @@
 {include file="../shared/header.tpl"}
-
-<div id="header-titles">
-	<span id="header-title" style="white-space: nowrap;">{t}Literature{/t}</span>
+<div id="header-titles-small">
+	<span id="header-title">{t}Literature{/t}</span>
 </div>
-
-
 <div id="page-main">
-	<table class="alphabet">
-		<tr>
-			<td>
-				{t}Search by title:{/t}
-			</td>
-			<td>
-				<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />
-			</td>
-			<td>
+	<div class="search-title-or-author">
+		<ul class="tabs tabs-grow">
+			<li class="tab-active">
+				<a href="javascript:void(0)">Search by title</a>
+			</li>
+			<li>
+				<a href="javascript:void(0)">Search by author</a>
+			</li>
+		</ul>
+		<div class="search-tab-content">
+			<div class="alphabet">
 				{foreach from=$titleAlphabet item=v}
-				<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');return false;">{$v.letter|@strtoupper}</a>
+					<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');return false;">
+						{$v.letter|@strtoupper}
+					</a>
 				{/foreach}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				{t}Search by author:{/t}
-			</td>
-			<td>
-				<input type="text" name="" id="lookup-input-author" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_author');" />
-			</td>
-			<td>
+			</div>
+			<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />
+		</div>
+		<div class="search-tab-content">
+			<div class="alphabet">
 				{foreach from=$authorAlphabet item=v}
-				{if $v.letter}
-				<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_author_letter','{$v.letter}');return false;">{$v.letter|@strtoupper}</a>
-				{/if}
+					{if $v.letter}
+						<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_author_letter','{$v.letter}');return false;">
+							{$v.letter|@strtoupper}
+						</a>
+					{/if}
 				{/foreach}
-			</td>
-		</tr>
-	</table>
+			</div>
+			<input type="text" name="" id="lookup-input-author" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_author');" />
+		</div>
 
-	<p>
-		<div id="lit2-result-list"></div>
-	</p>
-
+		<!-- <table class="alphabet">
+			<tr>
+				<td>
+					{t}Search by title:{/t}
+				</td>
+				<td>
+					<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />
+				</td>
+				<td>
+					{foreach from=$titleAlphabet item=v}
+					<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');return false;">{$v.letter|@strtoupper}</a>
+					{/foreach}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					{t}Search by author:{/t}
+				</td>
+				<td>
+					<input type="text" name="" id="lookup-input-author" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_author');" />
+				</td>
+				<td>
+					{foreach from=$authorAlphabet item=v}
+					{if $v.letter}
+					<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_author_letter','{$v.letter}');return false;">{$v.letter|@strtoupper}</a>
+					{/if}
+					{/foreach}
+				</td>
+			</tr>
+		</table> -->
+		<p>
+			<div id="lit2-result-list"></div>
+		</p>
+	</div>
 </div>
 
 <script>

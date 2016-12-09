@@ -18,7 +18,7 @@
 							</a>
 						</li>
 						<li>
-							<a href="../../../admin/views/users/login.php">{t}login{/t}</a>
+							<a href="../../../admin/views/users/login.php">Login</a>
 						</li>
 						<li>
 							<span class="decode">{$contact}</span>
