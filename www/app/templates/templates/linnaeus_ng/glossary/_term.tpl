@@ -1,11 +1,8 @@
- <div id="page-main">
-
-     <p id="header-titles-small">
-	    <span id="mini-header-title">{$term.term}</span>
-    </p>
-
-	{include file="_alphabet.tpl"}
-
+<p id="header-titles-small">
+    <span id="mini-header-title">{$term.term}</span>
+</p>
+{include file="_alphabet.tpl"}
+<div id="page-main">
 	<div id="definition">
 		{$term.definition}
 		{if $term.synonyms}
@@ -14,7 +11,6 @@
 	     </p>
 	     {/if}
 	</div>
-
 	{if $term.media}
 		<div id="media">
 		{assign var=widthInCells value=2}
@@ -26,15 +22,11 @@
 				{else}
 					{capture name="fullImgUrl"}{$v.full_path}{/capture}
 				{/if}
-
 					{assign var=mediaCat value=$v.category}
-
 				<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}"
 				{if $v.rs_id != '' && $v.category == 'video' && $v.width != '' && $v.height != ''} style="width: {$v.width}px; height: {$v.height}px;"{/if}
 				>
-
 					{if $v.rs_id == ''}
-
 						<a
 						rel   = "prettyPhoto[gallery]"
 						class = "image-wrap "
@@ -42,7 +34,6 @@
 						href  = "{$smarty.capture.fullImgUrl}"
 						alt   = "{$v.description}"
 						>
-
 						{if $v.category=='image'}
 							<div>
 								<img
@@ -73,44 +64,31 @@
 									<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
 								</object>
 						{/if}
-
 						</a>
-
 					{else}
-
 						{if $v.category == 'image'}
 							<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto">
 							<img src="{$smarty.capture.fullImgUrl}" alt="{$v.original_name}" id="media-{$k}" class="image-full" />
 							</a><br/>
 							{$name}
-
 						{else if $v.category == 'audio' or $v.category == 'video'}
 							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$name}" id="media-{$k}" controls />
 								<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
 							</{$v.category}><br>
 							{$name}
-
 						{else}
 							<a href="{$smarty.capture.fullImgUrl}">
 							<img src="{$v.rs_thumb_medium}" alt="{$v.original_name}" /><br>
 							{$name}
 							</a>
-
 						{/if}
-
 					{/if}
-
 					<div id="caption-{$k}" class="media-caption">
 						<p >{$v.description}</p>
 					</div>
-
 				</div><!-- /.media-cell -->
-
 				{/foreach}
-
 			</div> <!-- /#media-grid -->
-
-
 	</div><!-- /#media -->
 	{/if}
 </div>

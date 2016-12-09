@@ -1,14 +1,15 @@
 {include file="../shared/header.tpl"}
-<div id="header-titles">
+<div id="header-titles-small">
 	<span id="header-title">
 		{t}Glossary:{/t}<span class="alphabet-letter-title">{$letter}</span>
 	</span>
 </div>
+{include file="_alphabet.tpl"}
+
 <div id="page-main">
-		{include file="_alphabet.tpl"}
-		{if $alpha|@count==0}
-			{t}(no references have been defined){/t}
-		{else}
+	{if $alpha|@count==0}
+		{t}(no references have been defined){/t}
+	{else}		
 	<div id="content">
 			<ul>
 			{foreach $gloss v}

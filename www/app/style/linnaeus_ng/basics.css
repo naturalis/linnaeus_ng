@@ -2613,12 +2613,6 @@ body {
       width: 50%;
       margin-top: 0.75em; } }
 
-#search {
-  max-width: 80%; }
-  @media screen and (max-width: 799px) {
-    #search {
-      padding: 5px; } }
-
 @media screen and (max-width: 799px) {
   .search-icon {
     height: 8px;

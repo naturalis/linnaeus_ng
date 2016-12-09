@@ -1,5 +1,5 @@
 {if $headerTitles}
-    <p id="header-titles-small" style="max-width:890px;">
+    <p id="header-titles-small">
         <span id="header-title">
         	{$headerTitles.title}
     	</span>

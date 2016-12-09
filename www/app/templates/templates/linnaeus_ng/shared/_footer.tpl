@@ -1,7 +1,6 @@
 			<div id="allLookupList" class="allLookupListInvisible"></div>
 			</div ends="page-container">
 			</div>
-			<!-- /form -->
 			</div>
 			{if $controllerMenuOverride}
 			    {include file=$controllerMenuOverride}
@@ -10,26 +9,26 @@
 			        {if $controllerBaseName}{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}{else}{include file="_menu.tpl"}{/if}
 			    {/if}
 			{/if}
-			<!-- <div id="footer">
-				<div id="footer-container" class="container">
-					<div id="col-logo" style="visibility:hidden">
-						<img  src='{$projectUrls.systemMedia}logo_lng.png'>
-					</div>
-				</div>
-			</div> -->
-
 			<div id="bottombar" class="navbar navbar-inverted">
 				<div class="container">
-					<p class="navbar-text navbar-left">
-						<a href="http://linnaeus.naturalis.nl/">
-							Linnaeus NG 2.0
-						</a>
-					</p>
-					<p class="navbar-text navbar-right">
-						<a href="http://www.naturalis.nl">
-							Naturalis Biodiversity Center
-						</a>
-					</p>
+					<ul class="footer-menu__list">
+						<li>
+							<a href="http://linnaeus.naturalis.nl/">
+								Linnaeus NG 2.0
+							</a>
+						</li>
+						<li>
+							<a href="../../../admin/views/users/login.php">{t}login{/t}</a>
+						</li>
+						<li>
+							<span class="decode">{$contact}</span>
+						</li>
+						<li>
+							<a target="_blank" href="http://www.naturalis.nl">
+								Naturalis Biodiversity Center
+							</a>	
+						</li>
+					</ul>
 				</div>
 			</div>
 		</div>

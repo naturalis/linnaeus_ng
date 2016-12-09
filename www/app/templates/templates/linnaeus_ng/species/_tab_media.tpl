@@ -1,7 +1,6 @@
 {* if $contentCount.media>0 *}
 <!--<div id="media"> -->
 
-<br style="clear:all" />
 
 {assign var=widthInCells value=5}
 	<div id="media-grid">

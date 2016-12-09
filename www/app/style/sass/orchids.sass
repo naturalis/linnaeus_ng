@@ -228,6 +228,68 @@ body
 		a
 			color: #fff
 
+.footer-menu__list
+	display: flex
+	height: 100%
+	li
+		height: 50px
+		margin-right: 30px
+		display: flex
+		align-items: center
+		&:last-child
+			margin-right: 0
+			margin-left: auto
+
+#categories
+	background-color: #fff
+	padding: 15px 15px 0 15px
+	ul
+		display: flex
+		background-color: #eeede9
+	li
+		flex-grow: 1
+		flex-basis: 10%
+	a
+		display: block
+		height: 100%
+		&.category-active
+			border: 0
+			background-color: #009ee0
+			color: #fff
+	.category-no-content
+		display: none
+
+.module-glossary #content
+	width: 100%
+	@media screen and (max-width: 800px)
+		columns: 2
+	@media screen and (max-width: 600px)
+		columns: 1
+
+#categories + #alphabet
+	padding-top: 0
+
+#alphabet
+	display: flex
+	width: 100%
+	border: 0
+	padding: 0 15px
+	padding-top: 15px
+	background-color: #fff
+	a, span
+		background-color: #eeede9
+		height: 25px
+		display: flex
+		align-items: center
+		justify-content: center
+		flex-grow: 1
+		color: #000
+		&.alphabet-letter-ghosted
+			color: #b2b1a8
+		&.alphabet-active-letter
+			background-color: #009ee0
+			color: #fff
+
 #page-main
 	width: 100%
 	float: none
@@ -325,3 +387,54 @@ body
 	margin-bottom: 30px
 	&:last-child
 		margin-bottom: 0
+
+.advanced-search__form
+	background-color: #fff
+	+ #page-main
+		margin-top: 30px 
+
+.tabs
+	display: flex
+	li
+		padding: 15px 30px
+		&.tab-active
+			background-color: #009ee0
+			color: #fff
+
+.search-input__container
+	background-color: #009ee0
+	padding: 15px
+	display: flex
+	input[type=text]
+		box-shadow: none
+		border: 0
+		width: 100%
+		border-top-right-radius: 0px
+		border-bottom-right-radius: 0px
+	input[type=submit]
+		width: 100px
+		background-color: #e3004a
+		font-size: 16px
+		border-top-right-radius: 4px
+		border-bottom-right-radius: 4px
+		outline-width: 0
+		&:hover
+			background-color: #ce004a
+
+.search-modules__container
+	padding: 15px
+
+.search-module__list
+	margin-top: 15px
+	display: flex
+	li
+		margin-right: 30px
+		&:last-child
+			margin-right: 0
+
+.searched-category-title
+	color: #e3004a
+
+.search-match
+	font-weight: bold
+	color: #e3004a
