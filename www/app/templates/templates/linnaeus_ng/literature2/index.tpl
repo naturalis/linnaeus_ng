@@ -4,15 +4,19 @@
 </div>
 <div id="page-main">
 	<div class="search-title-or-author">
-		<ul class="tabs tabs-grow">
+		<ul class="tabs tabs-grow literature-tabs-js">
 			<li class="tab-active">
-				<a href="javascript:void(0)">Search by title</a>
+				<a href="javascript:void(0)" class="select-tab-js" data-target="search-title">
+					Search by title
+				</a>
 			</li>
 			<li>
-				<a href="javascript:void(0)">Search by author</a>
+				<a href="javascript:void(0)" class="select-tab-js" data-target="search-author">
+					Search by author
+				</a>
 			</li>
 		</ul>
-		<div class="search-tab-content">
+		<div class="search-tab-content active tab-content-js" data-content="search-title">
 			<div class="alphabet">
 				{foreach from=$titleAlphabet item=v}
 					<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');return false;">
@@ -22,7 +26,7 @@
 			</div>
 			<input type="text" name="" id="lookup-input-title" placeholder="{t}Type to find{/t}" onkeyup="lit2Lookup(this,'lookup_title');" />
 		</div>
-		<div class="search-tab-content">
+		<div class="search-tab-content tab-content-js" data-content="search-author">
 			<div class="alphabet">
 				{foreach from=$authorAlphabet item=v}
 					{if $v.letter}
@@ -72,13 +76,20 @@
 </div>
 
 <script>
-$(document).ready(function()
-{
-{if $prevSearch.search_title!=''}
-$('#lookup-input-title').val( '{$prevSearch.search_title|@escape}' ).trigger('onkeyup');
-{else if $prevSearch.search_author!=''}
-$('#lookup-input-author').val( '{$prevSearch.search_author|@escape}' ).trigger('onkeyup');
-{/if}
+$(document).ready(function() {
+	$('body').on('click', '.select-tab-js', function() {
+		var target = $(this).attr('data-target');
+		$('.tab-content-js').removeClass('active');
+		$('.tab-content-js[data-content="'+target+'"]').addClass('active');
+		$('.literature-tabs-js li').removeClass('tab-active');
+		$(this).parent().addClass('tab-active');
+	});
+
+	{if $prevSearch.search_title!=''}
+		$('#lookup-input-title').val('{$prevSearch.search_title|@escape}').trigger('onkeyup');
+	{else if $prevSearch.search_author!=''}
+		$('#lookup-input-author').val('{$prevSearch.search_author|@escape}').trigger('onkeyup');
+	{/if}
 });
 </script>
 

@@ -3,7 +3,9 @@
 	<input type="hidden" name="extended" value="1" />
 	<div class="page-generic-div">
 		<ul class="tabs">
-			<li class="tab-active">Advanced search</li>
+			<li class="tab-active">
+				<a href="#">Advanced search</a>
+			</li>
 		</ul>
 		<div class="search-input__container">
 			<input type="text" id="search" name="search" value="{$search.search|@escape}" />
