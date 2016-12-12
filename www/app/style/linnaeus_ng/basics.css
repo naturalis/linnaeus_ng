@@ -2659,12 +2659,6 @@ body {
       #allNavigationPane a, #allNavigationPane span {
         color: white; } }
 
-.navigation-icon:before {
-  width: 30px;
-  height: 30px;
-  display: block;
-  float: left; }
-
 /* --- --- MODULE GRID --- */
 #module-grid {
   display: none; }

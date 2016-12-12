@@ -11,6 +11,11 @@
 					Excluded
 				</a>
 			</li>
+			<li>
+				<a class="navigation-icon icon-hierarchy" id="decision-path-icon"
+			    	href='javascript:showDialog("{t}Decision path{/t}",decisionPath);' 
+			    	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
+			</li>
 		</ul>
 	</div>
 	<div id="taxa">

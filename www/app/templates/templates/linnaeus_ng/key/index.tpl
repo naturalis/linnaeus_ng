@@ -4,17 +4,10 @@
 </p>
 <div id="page-main">    
 	<div id="step">
-
-        {if ($step.image or $step.content) && $step.content!=$step.title}
-		<div id="question">
-            {if $step.image}
-                <img alt="" src="{$step.image}" />
-            {/if}
-            {if $step.content && $step.content!=$step.title}
-                {$step.content}
-            {/if}
-		</div>
-        {/if}
+        <div id="question">
+            {if $step.image}<img alt="" src="{$step.image}" />{/if}
+            {if $step.content && $step.content!=$step.title}{$step.content}{/if}
+        </div>
 		<div id="choices">
     		{foreach $choices v k}
     			<div class="l2_choice {if !$step.image}no_image{/if}">
