@@ -824,7 +824,7 @@ class NsrTaxonController extends NsrController
 		{
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
-		
+
 		return $taxa;
 	}
 
@@ -993,7 +993,7 @@ class NsrTaxonController extends NsrController
 
 	private function checkParentChildRelationship($child_base_rank,$parent_id)
 	{
-		
+
 		$d=$this->getTaxonById($parent_id);
 
 		$parent_base_rank=$d['base_rank'];
@@ -1009,7 +1009,7 @@ class NsrTaxonController extends NsrController
 			{
 				$this->addError( $this->translate("Parent rank cannot be same as, or below concept rank (even with 'suppress_parent_child_relation_checks' setting in effect).") );
 				$this->addError( $this->translate("Concept not saved.") );
-				return false;			
+				return false;
 			}
 		}
 
@@ -2730,6 +2730,8 @@ class NsrTaxonController extends NsrController
 			iii. verander hun geaccepteerde naam van type naar synoniem.
 
 		b) maak een nieuwe geaccepteerde naam aan op basis van BNN + authorship van de oude geaccepeerde naam;
+
+			verwijderd nav LINNA-577:
 			als authorship nog geen haakjes had, krijgt hij die nu.
 
 		c) update de naam van het concept op basis van de nieuwe geaccepeerde naam.
@@ -2815,10 +2817,10 @@ class NsrTaxonController extends NsrController
 				(!empty($val['name_author']) ? $val['name_author'] : null).
 				(!empty($val['name_author']) && !empty($val['authorship_year']) ? ', ' : '').
 				(!empty($val['authorship_year']) ? $val['authorship_year'] : null);
-
+/*
 			$authorship=
 				trim(!empty($authorship) ? '('.$authorship.')' : '');
-
+*/
 			$newName=
 				trim(
 					$uninomial.
