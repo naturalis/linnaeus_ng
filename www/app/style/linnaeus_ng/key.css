@@ -63,16 +63,6 @@
 #step #img-choices {
   position: relative; }
 
-.l2_choice {
-  cursor: pointer;
-  min-height: 155px;
-  background-color: #eeede9;
-  margin-bottom: 8px;
-  padding: 5px;
-  margin: 5px;
-  }
-
-
 #choice-table .choice-picture {
   width: auto; }
 
@@ -93,9 +83,6 @@
 
 #step .marker {
   font-weight: bold; }
-
-.l2_text {
-  min-height: 120px; }
 
 #step .text-choice-img {
   font-family: Arial, sans-serif;
@@ -135,7 +122,6 @@
 
 #taxa {
   width: 240px;
-  overflow: auto;
   background-color: #eeede9;
   float: right;
 }

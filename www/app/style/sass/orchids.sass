@@ -387,8 +387,24 @@ body
 	background-color: #e2e1dd
 	width: 100%
 	margin-bottom: 30px
+	padding: 15px
+	line-height: 1.4
 	&:last-child
 		margin-bottom: 0
+
+#taxa 
+	ul
+		padding-left: 10px
+		max-height: 400px
+		overflow-y: auto
+		flex-grow: 1
+	li
+		display: flex
+		align-items: center
+		&:before
+			content: "·"
+			font-size: 30px
+			line-height: 18px
 
 .advanced-search__form
 	background-color: #fff
@@ -463,6 +479,19 @@ body
 		margin-right: 30px
 		&:last-child
 			margin-right: 0
+
+#step .target
+	display: flex
+	justify-content: flex-end
+	color: #009ee0
+	i
+		margin-left: 15px
+
+#taxa-categories
+	ul
+		display: flex
+	.category-no-content
+		display: none
 
 .searched-category-title
 	color: #e3004a

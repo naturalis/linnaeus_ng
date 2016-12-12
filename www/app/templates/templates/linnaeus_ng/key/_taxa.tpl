@@ -1,14 +1,14 @@
 <div id="panel">
-	<div id="categories">
+	<div id="taxa-categories">
 		<ul>
 			<li>
 				<a id="rLi" href="javascript:showRemaining();" class="category-first{if $taxaState=='remaining' || $excluded|@count==0} category-active{/if}">
 					{t}Remaining{/t}
 				</a>
 			</li>
-			<li>
-				<a id="eLi" {if $excluded|@count>
-					0}href="javascript:showExcluded();"{/if} class="category-last{if $taxaState=='excluded'} category-active{/if}{if $excluded|@count==0} category-no-content{/if}">{t}Excluded{/t}
+			<li class="{if $excluded|@count==0} category-no-content{/if}">
+				<a id="eLi" href="javascript:showExcluded();" class="category-last {if $taxaState=='excluded'}category-active{/if}">
+					Excluded
 				</a>
 			</li>
 		</ul>
