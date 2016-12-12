@@ -398,7 +398,6 @@ body
 	display: flex
 	flex-direction: column 
 	flex-grow: 1
-	padding: 10px
 	ul
 		padding-left: 7px
 		max-height: 400px
@@ -407,6 +406,7 @@ body
 	li
 		display: flex
 		margin-bottom: 5px
+		line-height: 1.4
 		&:last-child
 			margin-bottom: 0
 		&:before
@@ -414,9 +414,9 @@ body
 			font-size: 30px
 			line-height: 15px
 			margin-right: 5px
-	#remaining, #excluded
-		height: 100%
-		flex-grow: 1
+	#remaining, #excluded, #decisionPathContainer
+		background-color: #eeede9
+		padding: 10px
 		display: flex
 		flex-direction: column
 	#ul-remaining, #ul-excluded
@@ -505,9 +505,9 @@ body
 		margin-left: 15px
 
 #decisionPathContainer
+	display: none
 	.row
 		padding-top: 0
-		line-height: 1.4
 
 #taxa-categories
 	a
