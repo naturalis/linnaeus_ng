@@ -481,9 +481,7 @@ address {
   .container:after {
     clear: both; }
 
-.row {
-  margin-left: -3px;
-  margin-right: -3px; }
+
   .row:before, .row:after {
     content: " ";
     /* 1 */

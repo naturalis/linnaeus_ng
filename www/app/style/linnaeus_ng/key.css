@@ -137,17 +137,10 @@
 
 #taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
   color: #000;
-  text-decoration: none;
-  border: 1px solid transparent; }
-
-#taxa p {
-  margin-bottom: 0; }
+  text-decoration: none; }
 
 #taxa a:hover, #taxa p.a:hover {
   color: #009ee0; }
-
-#taxa p:last-child {
-  margin-bottom: 10px; }
 
 #categories a.category-active {
 background-color: #eeede9 !important; }

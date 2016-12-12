@@ -36,6 +36,7 @@ function showRemaining()
 
 function showExcluded()
 {
+	$('#decisionPathContainer').css('display', 'none');
 	$('#decision-path-icon').removeClass('category-active');
 	$('#remaining').css('display','none');
 	$('#excluded').css('display','block');
