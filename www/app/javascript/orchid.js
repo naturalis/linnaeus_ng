@@ -4,7 +4,7 @@ function renderDecisionPath(title, decisionPath) {
 	$('#rLi').removeClass('category-active');
 	$('#decision-path-icon').addClass('category-active');
 	$('#excluded').css('display','none');
-	$('#decisionPathContainer').css('display','block');
+	$('#decisionPathContainer').css('display','flex');
 	$('#remaining').css('display','none');
 } 
 

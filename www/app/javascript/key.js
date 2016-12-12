@@ -27,7 +27,7 @@ function showRemaining()
 {
 	$('#decisionPathContainer').css('display', 'none');
 	$('#excluded').css('display','none');
-	$('#remaining').css('display','block');
+	$('#remaining').css('display','flex');
 	$('#eLi').removeClass('category-active');
 	$('#decision-path-icon').removeClass('category-active');
 	$('#rLi').addClass('category-active');
@@ -39,7 +39,7 @@ function showExcluded()
 	$('#decisionPathContainer').css('display', 'none');
 	$('#decision-path-icon').removeClass('category-active');
 	$('#remaining').css('display','none');
-	$('#excluded').css('display','block');
+	$('#excluded').css('display','flex');
 	$('#rLi').removeClass('category-active');
 	$('#eLi').addClass('category-active');
 	getData('store_excluded');
