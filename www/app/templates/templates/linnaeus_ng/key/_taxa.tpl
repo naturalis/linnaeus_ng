@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    var decisionPath = '<div id="lookup-DialogContent">';
+    var decisionPath = '<div>';
     {if $keypath|@count > 1}
         {foreach from=$keypath key=k item=v name=pathPopup}
             {if !$smarty.foreach.pathPopup.last}

@@ -503,11 +503,16 @@ body
 
 #taxa-categories
 	a
-		padding: 8px 15px
-		display: block
+		height: 100%
+		align-items: center
+		padding: 0 15px
+		height: 40px
+		flex-grow: 1
+		display: flex
 		&.category-active
 			background-color: #eeede9
 		&#decision-path-icon
+			flex-grow: 0
 			padding: 0
 			display: flex
 			height: 100%
@@ -515,6 +520,11 @@ body
 			margin: 0
 			align-items: center
 			justify-content: center
+			width: 44px
+	li
+		flex-grow: 1
+		&:last-child
+			flex-grow: 0
 	ul
 		display: flex
 	.category-no-content

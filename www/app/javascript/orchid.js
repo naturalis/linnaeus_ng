@@ -1,5 +1,4 @@
 function renderDecisionPath(title, decisionPath) {
-	console.log(decisionPath);
 	$('#decisionPathContainer').html(decisionPath);
 	$('#eLi').removeClass('category-active');
 	$('#rLi').removeClass('category-active');
@@ -33,5 +32,4 @@ $(function() {
 	$('body').on('click', '.close-search-js', function() {
 		$('body').removeClass('search-open');
 	});
-
-})
+});
