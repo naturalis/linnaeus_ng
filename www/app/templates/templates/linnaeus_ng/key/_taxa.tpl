@@ -1,3 +1,20 @@
+<script type="text/javascript">
+    var decisionPath = '<div id="lookup-DialogContent">';
+    {if $keypath|@count > 1}
+        {foreach from=$keypath key=k item=v name=pathPopup}
+            {if !$smarty.foreach.pathPopup.last}
+            decisionPath = decisionPath + 
+                '<p class="row">'+
+                '<a href="javascript:void(0);keyDoStep({$v.id})"><b>{t}Step{/t} {$v.step_number|@escape:javascript}{if $v.choice_marker}{$v.choice_marker|@escape:javascript}{/if}</b>{if $v.step_number!=$v.step_title} - {$v.step_title|@escape:javascript}{/if}{if $v.choice_txt}:<br>{$v.choice_txt|@escape:javascript}{/if}</a>'+
+                '</p>';
+            {/if}
+        {/foreach}
+    {else}
+        decisionPath = decisionPath + '<p>{t}No choices made yet{/t}</p>';
+    {/if}
+    decisionPath = decisionPath + '</div>';
+</script>
+
 <div id="panel">
 	<div id="taxa-categories">
 		<ul>
@@ -13,7 +30,7 @@
 			</li>
 			<li>
 				<a class="navigation-icon icon-hierarchy" id="decision-path-icon"
-			    	href='javascript:showDialog("{t}Decision path{/t}",decisionPath);' 
+			    	href='javascript:renderDecisionPath("Decision path", decisionPath);' 
 			    	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
 			</li>
 		</ul>
@@ -68,6 +85,9 @@
 				</li>
 			{/foreach}
 			</ul>
+		</div>
+		<div id="decisionPathContainer">
+			
 		</div>
 	</div>
 </div>

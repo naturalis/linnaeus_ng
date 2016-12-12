@@ -25,15 +25,18 @@ function getData(action)
 
 function showRemaining()
 {
+	$('#decisionPathContainer').css('display', 'none');
 	$('#excluded').css('display','none');
 	$('#remaining').css('display','block');
 	$('#eLi').removeClass('category-active');
+	$('#decision-path-icon').removeClass('category-active');
 	$('#rLi').addClass('category-active');
 	getData('store_remaining');
 }
 
 function showExcluded()
 {
+	$('#decision-path-icon').removeClass('category-active');
 	$('#remaining').css('display','none');
 	$('#excluded').css('display','block');
 	$('#rLi').removeClass('category-active');

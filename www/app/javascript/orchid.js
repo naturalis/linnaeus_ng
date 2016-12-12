@@ -1,3 +1,14 @@
+function renderDecisionPath(title, decisionPath) {
+	console.log(decisionPath);
+	$('#decisionPathContainer').html(decisionPath);
+	$('#eLi').removeClass('category-active');
+	$('#rLi').removeClass('category-active');
+	$('#decision-path-icon').addClass('category-active');
+	$('#excluded').css('display','none');
+	$('#decisionPathContainer').css('display','block');
+	$('#remaining').css('display','none');
+} 
+
 $(function() {
 	$(document).click(function(event) { 
         if ($(event.target).parents('.menu__container').length === 0 && 
