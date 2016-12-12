@@ -1,8 +1,5 @@
-{* if $contentCount.media>0 *}
-<!--<div id="media"> -->
-
-
 {assign var=widthInCells value=5}
+<div class="media-grid__container">
 	<div id="media-grid">
 		{assign var=mediaCat value=false}
 		{foreach $content v k}
@@ -21,19 +18,14 @@
 			{/if}
 
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}"
-			{if $v.rs_id != '' && $v.category == 'video' && $v.width != '' && $v.height != ''} style="width: {$v.width}px; height: {$v.height}px;"{/if}
-			>
-
+			{if $v.rs_id != '' && $v.category == 'video' && $v.width != '' && $v.height != ''} style="width: {$v.width}px; height: {$v.height}px;"{/if}>
 				{if $v.rs_id == ''}
-
 					<a
-					rel   = "prettyPhoto[gallery]"
-					class = "image-wrap "
-					title = "{$v.file_name}"
-					href  = "{$smarty.capture.fullImgUrl}"
-					alt   = "{$v.description}"
-					>
-
+					rel="prettyPhoto[gallery]"
+					class="image-wrap "
+					title="{$v.file_name}"
+					href="{$smarty.capture.fullImgUrl}"
+					alt="{$v.description}">
 					{if $v.category=='image'}
 						<div>
 							<img
@@ -44,61 +36,50 @@
 								class = "image-full" />
 						</div>
 					{elseif $v.category=='video'}
-							<img
-								id="media-{$k}"
-								alt="{$v.description}"
-								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-								src="{$projectUrls.systemMedia}video.png"
-								onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
-								class="media-video-icon" />
+						<img
+							id="media-{$k}"
+							alt="{$v.description}"
+							title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+							src="{$projectUrls.systemMedia}video.png"
+							onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
+							class="media-video-icon" />
 					{elseif $v.category=='audio'}
-							<object
-								id="media-{$k}"
-								alt="{$v.description}"
-								title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-								type="application/x-shockwave-flash"
-								data="{$soundPlayerPath}{$soundPlayerName}"
-								width="130"
-								height="20">
-								<param name="movie" value="{$soundPlayerName}" />
-								<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
-							</object>
+						<object
+							id="media-{$k}"
+							alt="{$v.description}"
+							title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
+							type="application/x-shockwave-flash"
+							data="{$soundPlayerPath}{$soundPlayerName}"
+							width="130"
+							height="20">
+							<param name="movie" value="{$soundPlayerName}" />
+							<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
+						</object>
 					{/if}
-
 					</a>
-
 				{else}
-
 					{if $v.category == 'image'}
 						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto" alt="{$v.description}">
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
-
 					{else if $v.category == 'audio' or $v.category == 'video'}
 						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
 							{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
 							<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
 						</{$v.category}><br>
 						{$name}
-
 					{else}
 						<a href="{$smarty.capture.fullImgUrl}">
 						<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 						{$name}
 						</a>
-
 					{/if}
-
 				{/if}
-
 				<div id="caption-{$k}" class="media-caption">
 					<p>{$v.description}</p>
 				</div>
-
-			</div><!-- /.media-cell -->
+			</div>
 		{/foreach}
-
-	</div><!-- /#media-grid -->
-<!-- </div> /#media -->
-{* /if *}
+	</div>
+</div>
