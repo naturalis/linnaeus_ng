@@ -1379,7 +1379,6 @@ input[type="button"].btn-block {
 .navbar {
   position: relative;
   z-index: 1000;
-  min-height: 50px;
   margin-bottom: 22px;
   border: 1px solid transparent; }
   .navbar:before, .navbar:after {
@@ -1887,9 +1886,7 @@ b, .title {
 #bottombar {
   background-color: #000000;
   color: #FFFFFF;
-  height: 50px;
   margin: 0;
-  overflow: hidden;
   font-weight: 300; }
   #bottombar .container {
     width: 1080px;
