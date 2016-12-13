@@ -10,10 +10,14 @@
         </div>
 		<div id="choices">
     		{foreach $choices v k}
-    			<div class="l2_choice {if !$step.image}no_image{/if}">
+    			<div class="l2_choice {if !$v.choice_img}no_image{/if}">
                     <div class="l2_text">
+                        {if $v.choice_img}
+                            <div class="choice-image__container">
+                                <img src="{$v.choice_img}">
+                            </div>
+                        {/if}
                     	{$v.choice_txt}
-                        {if $v.choice_img}<img src="{$v.choice_img}">{/if}
     				</div>
                     {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
                         <div class="target" onclick="window.open('../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">

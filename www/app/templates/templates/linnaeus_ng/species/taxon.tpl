@@ -128,7 +128,7 @@ $(document).ready(function()
 
 <div class="inline-templates" id="lookupDialogItem">
 	<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%">
-    	<span class="italics" style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span>
+    	%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span>
 	</p>
 </div>
 

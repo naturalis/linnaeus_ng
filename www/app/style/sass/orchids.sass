@@ -319,6 +319,8 @@ body
 
 #content.taxon-detail
 	padding: 30px
+	@media screen and (max-width: 800px)
+		padding: 15px
 
 .sidebar__container
 	width: 230px
@@ -417,7 +419,10 @@ body
 #taxa
 	display: flex
 	flex-direction: column 
-	flex-grow: 1
+	flex-grow: 0
+	width: 250px
+	@media screen and (max-width: 600px)
+		width: 100%
 	ul
 		padding-left: 7px
 		max-height: 400px
@@ -584,6 +589,16 @@ body
 
 .media-grid__container
 	padding: 0 30px
+
+.l2_text
+	display: flex
+	.choice-image__container
+		margin-right: 15px
+		width: 30%
+		flex-shrink: 0
+	img
+		display: block
+		width: 100%
 
 #media-grid
 	margin: 0 -30px
