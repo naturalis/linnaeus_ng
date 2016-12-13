@@ -94,7 +94,6 @@ body
 
 .module-key #lookup-DialogContent,
 #lookup-DialogContent
-	margin: 0
 	padding-left: 0
 	border: none
 	background-color: #fff
@@ -104,6 +103,17 @@ body
 		padding: 12px 15px
 		cursor: pointer
 		margin-bottom: 0
+
+#lookup-DialogContent
+	margin: 10px -10px -10px -10px
+
+@media screen and (max-width: 800px)
+	#lookup-DialogContent
+		max-height: 0!important
+		transition: max-height 0.5s ease
+	#lookupDialogInput:focus ~ #lookup-DialogContent
+		max-height: 300px!important
+		transition: max-height 0.5s ease		
 
 #container
 	padding: 30px 5px
@@ -311,6 +321,7 @@ body
 	@media screen and (max-width: 800px)
 		width: 100%
 		margin-right: 0
+		margin-bottom: 30px
 
 .side-menu
 	margin: 0

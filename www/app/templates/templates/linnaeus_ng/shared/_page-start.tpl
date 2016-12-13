@@ -23,8 +23,9 @@
 			<div class="lookup__container">
 				<div id="lookupDialog">
 					<input type="text" id="lookupDialogInput">
+					<div id="lookup-DialogContent"></div>
 				</div>
-				<div id="lookup-DialogContent"></div>
+				
 			</div>
 		{/if}
 	</div>
