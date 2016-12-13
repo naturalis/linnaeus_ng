@@ -2530,10 +2530,7 @@ body {
 #search-main-no-tabs,
 #search-main,
 #categories,
-#alphabet {
-  display: block;
-  float: left;
-  width: 75%; }
+#alphabet {}
   
   @media print {
     #page-main,
