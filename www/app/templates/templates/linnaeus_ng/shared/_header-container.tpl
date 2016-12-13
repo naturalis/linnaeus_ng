@@ -19,7 +19,6 @@
 				<a href="javascript:void(0)" class="close-search close-search-js">
 					<i class="ion-close-round"></i>
 				</a>
-            	<img onclick="doSearch()" src="{$projectUrls.systemMedia}search.gif" class="search-icon" />
 			</div>
 		</div>
 		<div class="menu-bar__container">
