@@ -106,14 +106,14 @@ class NsrTaxonImagesController extends NsrController
 
 		if (!$this->rHasId()) $this->redirect('taxon_new.php');
 
-        $this->setPageName($this->translate('Media meta-data'));
+        $this->setPageName($this->translate('Media metadata'));
 
 		if ($this->rHasId() && $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
 			$this->updateTaxonImageMetaData($this->rGetAll());
 			$this->updateTaxonImageTaxonId($this->rGetAll());
 			$this->updateTaxonImageOverviewState($this->rGetAll());
-			$this->addMessage( $this->translate('Meta-data opgeslagen.') );
+			$this->addMessage( $this->translate('Metadata saved.') );
 		}
 
 		$image=$this->getTaxonMedia(array('media_id'=>$this->rGetId()));
@@ -133,7 +133,7 @@ class NsrTaxonImagesController extends NsrController
     public function imageMetaBulkAction()
 	{
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Media meta-data bulk'));
+		$this->setPageName($this->translate('Media metadata bulk'));
 
 		$raw=null;
 		$ignorefirst=false;
@@ -233,7 +233,7 @@ class NsrTaxonImagesController extends NsrController
 
 			if ( $assignedMetaFields==0 )
 			{
-				$this->addError( 'You have assigned no meta-data-columns.' );
+				$this->addError( 'You have assigned no metadata columns.' );
 			}
 
 			if
@@ -269,7 +269,7 @@ class NsrTaxonImagesController extends NsrController
     public function imageMetaBulkSaveAction()
 	{
 		$this->checkAuthorisation();
-		$this->setPageName($this->translate('Media meta-data bulk'));
+		$this->setPageName($this->translate('Media metadata bulk'));
 
 		if ( !$this->isFormResubmit() )
 		{
@@ -382,7 +382,7 @@ class NsrTaxonImagesController extends NsrController
 		);
 		$data=$this->models->MediaMeta->_get(array('id'=>$p));
 		$this->models->MediaMeta->delete($p);
-		$this->logChange(array('before'=>$data,'note'=>'deleted media meta-data'));
+		$this->logChange(array('before'=>$data,'note'=>'deleted media metadata'));
 
 		$p=array(
 			'project_id'=>$this->getCurrentProjectId(),
@@ -391,7 +391,7 @@ class NsrTaxonImagesController extends NsrController
 		);
 		$data=$this->models->MediaTaxon->_get(array('id'=>$p));
 		$this->models->MediaTaxon->delete($p);
-		$this->logChange(array('before'=>$data,'note'=>'disconnected media from taxon'));
+		$this->logChange(array('before'=>$data,'note'=>'detached media from taxon'));
 	}
 
 	private function updateTaxonImageMetaData($p)
@@ -840,7 +840,7 @@ class NsrTaxonImagesController extends NsrController
 
 					}
 
-					$this->addMessage( sprintf('Wrote "%s" with %s meta-data fields.',$filename,$fieldssaved) );
+					$this->addMessage( sprintf('Wrote "%s" with %s metadata fields.',$filename,$fieldssaved) );
 
 					$d['meta-data']=$allmeta;
 					$this->logChange(array('after'=>$d,'note'=> sprintf('wrote "%s" (bulk upload).',$filename)));

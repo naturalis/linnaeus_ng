@@ -19,7 +19,7 @@
 <div id="paginator">
 	<input type="hidden" id="results-per-page" value="{$results.perpage}" />
 	<ul>
-		<li class="no-border">{t}pagina:{/t}</li>
+		<li class="no-border">{t}page:{/t}</li>
 		{if $pgnCurrPage>1}
 		<li><a id="paginator-prev-link" href="{$pgnURL}?{$pgnQuerystring}page={$currPage-1}" >&lt;&lt;</a></li>
 		{/if}
@@ -27,8 +27,8 @@
 		{if !($currPage<=(2*$buffer) && ($foo<=(2*$buffer))) && $foo==$currPage-$buffer}
 		<li><span class="cell">...</span></li>
 		{/if}
-		{if 
-			$foo==1 || 
+		{if
+			$foo==1 ||
 			($currPage<=(2*$buffer) && ($foo<=(2*$buffer))) ||
 			($foo>=$currPage-$buffer && $foo<=$currPage+3) ||
 			($currPage>=$pages-(2*$buffer) && ($foo>=$pages-(2*$buffer))) ||
@@ -56,9 +56,9 @@ $(document).ready(function(){
 		{math equation="((x-1)*y)+1" x=$currPage y=$pgnResultsPerPage}+
 		' - '+
 		{if $temp>$pgnResultCount}{$pgnResultCount}{else}{$temp}{/if}+
-		' van '+
+		' of '+
 		{$pgnResultCount}+
-		({$pgnResultCount}==1 ? ' resultaat' : ' resultaten')
+		({$pgnResultCount}==1 ? ' result' : ' results')
 	);
 
 });
@@ -68,7 +68,7 @@ $(document).ready(function(){
 
 <script type="text/JavaScript">
 $(document).ready(function(){
-	$('#resultcount-header').html({$pgnResultCount}+({$pgnResultCount}==1 ? ' resultaat' : ' resultaten'));
+	$('#resultcount-header').html({$pgnResultCount}+({$pgnResultCount}==1 ? ' result' : ' results'));
 });
 </script>
 

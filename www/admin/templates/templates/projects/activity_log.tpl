@@ -9,13 +9,13 @@
 <div id="page-main">
 
 <h2>{t}Activity log{/t}{if $search.search} - "{$search.search}"{/if}</h2>
-<h3>{t}Aantal edits:{/t} {$results.count}</h3>
+<h3>{t}Number of edits:{/t} {$results.count}</h3>
 
 <p>
 <form method="post" action="activity_log.php">
 <input type="text" value="{$search.search}" name="search" id="search"  style="width:300px;" />
-<input type="submit" value="zoeken" />
-{if $search.search} <a style="margin-left:10px" href="activity_log.php">{t}alles tonen{/t}</a>{/if}
+<input type="submit" value="search" />
+{if $search.search} <a style="margin-left:10px" href="activity_log.php">{t}show all{/t}</a>{/if}
 </form>
 </p>
 
@@ -54,24 +54,24 @@
         	{if $v.user_user_id}
 			<span title="{$v.user_username}; {$v.user_email_address}">{$v.user_first_name} {$v.user_last_name}</span>
             {else}
-			<span title="{$v.user.username}{if $v.user.email_address!=$v.user.username}; {$v.user.email_address}{/if}">{$v.user.name}</span> <span title="gebruiker bestaat niet meer in de usertabel">(&notin;)</span>
+			<span title="{$v.user.username}{if $v.user.email_address!=$v.user.username}; {$v.user.email_address}{/if}">{$v.user.name}</span> <span title="user no longer exists">(&notin;)</span>
             {/if}
 		</td>
-    	<td title="{$v.time_past_hr} geleden">
+    	<td title="{$v.time_past_hr} ago">
 		    {$v.last_change_hr}
 		</td>
     	<td>
         	{if $nodata}
-            <span class="no-data">{t}geen data{/t}</span>
+            <span class="no-data">{t}no data{/t}</span>
             {else}
 		    <a href="#" class="toggle" onclick="$('.alldata{$k}').toggle();return false;">
-            	<span class="alldata{$k}">{t}toon data{/t}</span>
-                <span class="alldata{$k}" style="display:none">{t}verbergen{/t}</span>
+            	<span class="alldata{$k}">{t}show data{/t}</span>
+                <span class="alldata{$k}" style="display:none">{t}hide{/t}</span>
 			</a>
         	{/if}
 		</td>
     </tr>
-    
+
     <tr class="alldata{$k}" style="display:none;border-bottom:1px solid #666">
     	<td colspan="4">
         	<table class="inline-table"><tr><td>
@@ -97,7 +97,7 @@
 </p>
 
 <p>
-	<a href="index.php">terug</a>
+	<a href="index.php">back</a>
 </p>
 
 </div>

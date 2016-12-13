@@ -13,7 +13,7 @@
             <input type="hidden" id="group_id" name="group_id" value="{$search.group_id}" />
             {*<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}" />*}
 
-		
+
 			<div{if $search.display=='plain'} style="display:none;"{/if}>
 			<fieldset class="block">
 				<div class="formrow">
@@ -27,7 +27,7 @@
 					<div id="author_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 				</div>*}
 			</fieldset>
-            
+
             <span id="all-panel-toggle" style="float:right;margin-top:3px;display:none;">
             <div style="float:right;margin-top:3px;">
                 <a href="#" onclick="toggle_all_panels();return false;">{t}alles in-/uitklappen{/t}</a>&nbsp;&nbsp;
@@ -40,13 +40,13 @@
 				{* if $automatic_tabs['CTAB_MEDIA'].suppress!==true *}
 
 				<div class="formrow">
-                
+
                 	<span class="panel-toggle-placeholder"></span>
 
                 	<label
-                    	for="multimedia-options" 
+                    	for="multimedia-options"
                         panel="multimedia-options-panel"
-                        class="clickable" 
+                        class="clickable"
                         onmouseover="hover_panel_toggle(this);"
                         onmouseout="hover_panel_toggle(this,true);"
                         onclick="toggle_panel(this);">
@@ -91,14 +91,14 @@
 				</div>
 
 				{* /if *}
-                
+
 				{foreach $traits t k1}
 				<div class="formrow">
-                
+
 	                <span class="panel-toggle-placeholder"></span>
-    
+
 					<label
-                        class="clickable" 
+                        class="clickable"
                         panel="traits{$k1}-options"
                         onmouseover="hover_panel_toggle(this);"
                         onmouseout="hover_panel_toggle(this,true);"
@@ -106,11 +106,11 @@
 						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
 						<strong>{$t.name}</strong>
 					</label>&nbsp;
-                    
+
                     {if $t.help_link_url}
 					<a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
                     {/if}
-					
+
                     <table class="options-panel" id="traits{$k1}-options" style="display:none">
                     {if $t.description}
                     	<tr>
@@ -130,25 +130,25 @@
     	                            {/foreach}
                                 </select>
                                 {else if $d.type_allow_values==0}
-                                
+
                                 <select
-                                	class="operator" 
-                                    trait-id="{$d.id}" 
-                                    id="operator-{$k1}{$k2}" 
-                                    style="width:150px" 
+                                	class="operator"
+                                    trait-id="{$d.id}"
+                                    id="operator-{$k1}{$k2}"
+                                    style="width:150px"
                                     onchange="$('#trait-{$k1}{$k2}-2').toggle($('option:selected',this).attr('range')==1);"
 								>
 	                                {foreach $operators v k}
 	                                <option value="{$k}"{if $v.range} range="1"{/if}>{t}{$v.label}{/t}</option>
     	                            {/foreach}
                                 </select>
-                                
+
                                 <input
                                 	type="text"
-                                	id="trait-{$k1}{$k2}" 
+                                	id="trait-{$k1}{$k2}"
                                     trait-id="{$d.id}"
-                                    placeholder="{$d.date_format_format_hr}" 
-                                    maxlength="{$d.date_format_format_hr|@strlen}" 
+                                    placeholder="{$d.date_format_format_hr}"
+                                    maxlength="{$d.date_format_format_hr|@strlen}"
                                     style="width:45px;"
                                     />
                                 <input
@@ -156,16 +156,16 @@
                                 	type="text"
                                     trait-id="{$d.id}"
                                     second-value="1"
-                                    placeholder="{$d.date_format_format_hr}" 
-                                    maxlength="{$d.date_format_format_hr|@strlen}" 
+                                    placeholder="{$d.date_format_format_hr}"
+                                    maxlength="{$d.date_format_format_hr|@strlen}"
                                     style="width:45px;display:none;"
                                     />
                                 {/if}
                                 <input
-                                	type="button" 
-                                    value=" > " 
-                                    trait-id="{$d.id}" 
-                                    class="add-trait" 
+                                	type="button"
+                                    value=" > "
+                                    trait-id="{$d.id}"
+                                    class="add-trait"
                                     onclick="addSearchParameter('trait-{$k1}{$k2}');" />
 							</td>
 						</tr>
@@ -185,20 +185,19 @@
 				<div class="formrow selected-parameters" style="display:none">
 					<strong>{t}Geselecteerde kenmerken{/t}</strong>
                     <span id="remove-all" style="display:none">&nbsp;
-                    	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
-                    	<!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
-					</span>
+                    	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}delete all{/t}</a>
+    				</span>
                     <ul id="search-parameters">
                     </ul>
 				</div>
-                
+
 			</fieldset>
 
 			</div>
 
 		</div>
 
-		<div id="results"> 
+		<div id="results">
             <h4 style="display:inline-block">
             	<span id="resultcount-header">{$results.count}</span>
 	            {* if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if *}
@@ -239,7 +238,7 @@
             </div>
 			{/foreach}
 		</div>
-        
+
  		</form>
 
 	</div>
@@ -251,7 +250,7 @@
 $(document).ready(function()
 {
 	$('.panel-toggle-placeholder').first().replaceWith($('#all-panel-toggle').html());
-	
+
 	{if $search}
 	{foreach $search.presence v k}
 	$("#presenceStatusList").val('presence[{$k}]');
@@ -276,7 +275,7 @@ $(document).ready(function()
 	addSearchParameter('multimedia-trend');
 	{/if}
 	{/foreach}
-	
+
 	{if $search.traits}
 
 	var h=$.parseJSON(decodeURIComponent('{$search.traits}'));
@@ -284,7 +283,7 @@ $(document).ready(function()
 	for (var i in h)
 	{
 		var d=h[i];
-		
+
 		if (d.valueid)
 		{
 			$('select[trait-id='+d.traitid+']').val(d.valueid);
@@ -329,17 +328,17 @@ $(document).ready(function()
 			$('label[panel='+v.id+']').trigger('click').trigger('mouseout');
 		}
 	});
-	
+
 	{else}
-	
+
 		$('label[for=presenceStatusList]').trigger('click').trigger('mouseout');
 
 	{/if}
-	
+
 	{if $search.just_species}
 	setJustSpeciesToggle({$search.just_species});
 	{/if}
-	
+
 	$('#just-species-toggle').html(getJustSpeciesToggle()==0 ? '{t}alleen soorten tonen{/t}' : '{t}soorten en lagere taxa tonen{/t}' );
 
 	$('title').html('{t}Uitgebreid zoeken naar soorten{/t} - '+$('title').html());
@@ -347,16 +346,16 @@ $(document).ready(function()
 	bindKeys();
 
 	$("#group, #author").keyup(function(e)
-	{ 
+	{
 		var code = e.which;
 		if(code==13)
 		{
 			submitSearchParams();
 		}
 	});
-	
+
 	init=false;
-	
+
 });
 </script>
 

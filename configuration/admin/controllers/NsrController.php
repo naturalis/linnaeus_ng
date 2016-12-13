@@ -466,7 +466,7 @@ class NsrController extends Controller
 			}
 			if ( $i>=100 )
 			{
-				$this->addError('Kon geen nieuw uniek NSR ID creëren.');
+				$this->addError('Could not create a unique NSR ID.');
 				return;
 			}
 			$i++;
@@ -506,7 +506,7 @@ class NsrController extends Controller
 			}
 			if ($i>=100)
 			{
-				$this->addError('Kon geen nieuw uniek Rdf ID creëren.');
+				$this->addError('Could not create a unique Rdf ID.');
 				return;
 			}
 			$i++;

@@ -53,7 +53,7 @@ function geteditordata(editor)
 		if (e.name==editor)
 		{
 			data=e.getData();
-			
+
 		}
 	}
 	return data;
@@ -141,10 +141,10 @@ function saveeditordata(caller)
 			{
 				$('#message'+id).html('Tekst <b>niet</b> opgeslagen.').toggle(true).fadeOut(2000);
 			}
-			
+
 		}
-	});	
-	
+	});
+
 }
 
 
@@ -189,14 +189,14 @@ function removeReference(i)
 function displayReferences()
 {
 	var buffer=[]
-	
+
 	for (var i in collectedreferences)
 	{
 		var ele=collectedreferences[i];
-		buffer[i]=ele.label+' <a href="#" class="edit" onclick="removeReference('+ele.id+');return false;">verwijderen</a>';
+		buffer[i]=ele.label+' <a href="#" class="edit" onclick="removeReference('+ele.id+');return false;">delete</a>';
 	}
 
-	$('#references').html(buffer.length>0 ? '<ul><li>'+buffer.join('</li><li>')+'</li></ul>' : '');	
+	$('#references').html(buffer.length>0 ? '<ul><li>'+buffer.join('</li><li>')+'</li></ul>' : '');
 }
 
 function doPassportMeta()
@@ -207,7 +207,7 @@ function doPassportMeta()
 	if (collectedreferences.length>0) havedata=true;
 
 	if (!havedata) return;
-	
+
 	for (var i in collectedreferences)
 	{
 		if (collectedreferences[i].id)
