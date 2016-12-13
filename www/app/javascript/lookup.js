@@ -429,11 +429,6 @@ function allLookupBindDialogKeyUp()
 
 function allLookupShowDialog(predefJSON)
 {
-	// showDialog(
-	// 	_(allLookupDialogTitle),
-	// 	'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
-	// );
-
 	allLookupBindDialogKeyUp();
 	
 	if (predefJSON)
@@ -446,9 +441,6 @@ function allLookupShowDialog(predefJSON)
 	{
 		allLookupGetData('*',true);
 	}
-
-	console.log(allLookupDialogInputName);
-	// $('#'+allLookupDialogInputName).focus();
 }
 
 function allLookupSetSelectedId(id)
