@@ -101,7 +101,7 @@ class NsrPaspoortController extends NsrController
 			$this->deletePassportMeta($this->rGetAll());
 		}
 
-        $this->setPageName($this->translate('Edit taxon passport meta-data'));
+        $this->setPageName($this->translate('Edit taxon passport metadata'));
 
 		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('tabs',$this->getPassportCategories());
@@ -184,13 +184,13 @@ class NsrPaspoortController extends NsrController
     private function getPassportCategories()
     {
 		$categories=$this->getCategories();
-		
+
 		$content=$this->models->ContentTaxa->_get(["id"=>[
 			"language_id"=>$this->getDefaultProjectLanguage(),
 			"taxon_id"=>$this->getTaxonId(),
 			"project_id"=>$this->getCurrentProjectId()
 		],"fieldAsIndex"=>"page_id"]);
-		
+
 		foreach((array)$categories as $key=>$val)
 		{
 			$categories[$key]['content']=isset($content[$val['id']]) ? $content[$val['id']]['content'] : null;
@@ -200,7 +200,7 @@ class NsrPaspoortController extends NsrController
 		}
 
 //		if ( defined('TAB_VERSPREIDING') ) $d=$this->getPassport(array('category'=>TAB_VERSPREIDING,'taxon'=>$this->getTaxonId()));
-		
+
 		foreach((array)$categories as $key=>$val)
 		{
 

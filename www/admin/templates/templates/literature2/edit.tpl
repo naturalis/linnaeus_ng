@@ -159,8 +159,8 @@ function saveLitForm()
         <td>
         	<input class="large" type="text" name="publishedin" value="{$reference.publishedin}" /><br />
             <span class="small-warning">
-                Deze letterlijke waarde is een overerving uit de oude Soortenregister-database.<br />
-                Vervang deze waarde waar mogelijk door een verwijzing achter "gepubliceerd in".
+            	This field is a leftover from the original Soortenbank database.<br />
+            	If possible, please use the "published in" field instead.
             </span>
         </td>
 	</tr>
@@ -181,8 +181,8 @@ function saveLitForm()
         <td>
         	<input type="text" name="periodical" value="{$reference.periodical}" /><br />
             <span class="small-warning">
-                Deze letterlijke waarde is een overerving uit de oude Soortenregister-database.<br />
-                Vervang deze waarde waar mogelijk door een verwijzing achter "periodiek".
+            	This field is a leftover from the original Soortenbank database.<br />
+            	If possible, please use the "periodical" field instead.
             </span>
 		</td>
 	</tr>

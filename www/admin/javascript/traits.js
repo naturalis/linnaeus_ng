@@ -2,11 +2,11 @@ function doSaveOrder()
 {
 	var form=$('<form method="post"></form>').appendTo('body');
 	form.append('<input type="hidden" name="action" value="saveorder" />');
-	 
+
 	$( "li[id^=sortable]").each(function( index ) {
 		form.append('<input type="hidden" name="sortable[]" value="'+$(this).attr('id').replace('sortable','')+'" />');
 	});
-	
+
 	form.submit();
 }
 
@@ -53,16 +53,16 @@ function checkAndSaveForm()
 		{
 			$('#date_format_id').remove();
 		}
-		
+
 		$(":input[type!='hidden']").each(function()
 		{
 			if ($(this).is(':hidden')) $(this).remove();
-				
+
 		});
-				
+
 		$('#theForm').submit();
 	}
-		
+
 }
 
 function deleteItem( message )
@@ -147,7 +147,7 @@ function addTraitValue( checkresult )
 		{
 			var r=checkTraitValue(v);
 		}
-		
+
 		if (r.result!=true)
 		{
 			if (r.remarks.length>0)
@@ -164,7 +164,7 @@ function addTraitValue( checkresult )
 			}
 		}
 	}
-	
+
 	doAddTraitValue( { id: newcounter--, value: v } );
 	$('#newvalue').val('');
 	characterCount();
@@ -196,7 +196,7 @@ function updateValueList()
 {
 	$('#valuelist').html('');
 	if (valuelist.length==0) return;
-	
+
 	var b=[];
 	for (var i=0;i<valuelist.length;i++)
 	{
@@ -207,7 +207,7 @@ function updateValueList()
 		{
 			var lng=languages[j];
 			var thisval='';
-			
+
 			for(var k=0;k<val.labels.length;k++)
 			{
 				if (val.labels[k].language==lng.id)
@@ -215,7 +215,7 @@ function updateValueList()
 					thisval=val.labels[k].label;
 				}
 			}
-			
+
 			l.push(
 				'<span class="language-labels">'+
 				lng.language+': \
@@ -278,7 +278,7 @@ function doAddTraitLanguage(p)
 
 function addTraitValueLabel(ele)
 {
-	
+
 	var id=$(ele).attr('value-id');
 	var language=$(ele).attr('language-id');
 	var value=$(ele).val();
@@ -303,18 +303,18 @@ function addTraitValueLabel(ele)
 			}
 		}
 	}
-	
+
 }
 
 function saveValues()
 {
 	var form=$('<form method="post"></form>').appendTo('body');
 	form.append('<input type="hidden" name="action" value="save" />');
-	
+
 	for(var i=0;i<valuelist.length;i++)
 	{
 		var value=valuelist[i];
-		
+
 		form.append('<input type="hidden" name="values['+value.id+']" value="'+value.value+'" />');
 
 		if (value.labels)
@@ -337,7 +337,7 @@ function saveValues()
 
 
 function saveRawData()
-{	
+{
 	var form=$('<form method="post" action="data_save.php"></form>').appendTo('body');
 
 	$('.joinrows:checked').each(function()
@@ -355,7 +355,7 @@ function saveRawData()
 
 
 var taxonTraits = {}
- 
+
 taxonTraits.data=true;
 taxonTraits.can_select_multiple=true;
 taxonTraits.can_be_null=true;
@@ -517,7 +517,7 @@ taxonTraits.listTraitAdd=function( caller )
 	{
 		if( taxonTraits.currentselection[i].id==newid ) return;
 	}
-	
+
 	if ( taxonTraits.currentselection.length>0 && !taxonTraits.getCanSelectMultiple() )
 	{
 		taxonTraits.currentselection.splice(0,taxonTraits.currentselection.length);
@@ -549,14 +549,14 @@ taxonTraits.__stringlist=function()
 			dummy.push( taxonTraits.currentselection[i].id );
 		}
 	}
-	
+
 	var values=$('<p>');
 	for( var i=0;i<taxonTraits.currentvalues.length;i++ )
 	{
 		if( dummy.indexOf( taxonTraits.currentvalues[i].id )!=-1) continue;
 		values.append( $(templateReplace( $( "#stringlist_template_three" ).html() , taxonTraits.currentvalues[i] )));
 	}
-	
+
 	return templateReplace( $( "#stringlist_template_one" ).html() , { SELECTED : selected.html(), VALUES : values.html() } );
 }
 
@@ -565,7 +565,7 @@ taxonTraits.__stringfree=function()
 	taxonTraits.setOldValue( taxonTraits.currentselection[0] && taxonTraits.currentselection[0].value ? taxonTraits.currentselection[0].value : '' );
 	var selected=$('<p>').append(
 		$(templateReplace(
-			$( "#stringfree_template_two" ).html() , 
+			$( "#stringfree_template_two" ).html() ,
 			( taxonTraits.currentselection[0] ? taxonTraits.currentselection[0] : { value: ''} )
 		))
 	);
@@ -584,7 +584,7 @@ taxonTraits.__datefree=function()
 		var val2='';
 		var c=taxonTraits.currentselection[i];
 		b+=c.value_start+c.value_end;
-		
+
 		val1=templateReplace( $( "#datefree_template_one" ).html() ,
 			{ value:c.value_start?c.value_start:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
 
@@ -596,13 +596,13 @@ taxonTraits.__datefree=function()
 
 		selected.append(
 			$( templateReplace(
-				$( "#datefree_template_two" ).html() , 
-				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
+				$( "#datefree_template_two" ).html() ,
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 }
 			)
 		));
-		
+
 	}
-	
+
 	if (i==0)
 	{
 		val1=templateReplace( $( "#datefree_template_one" ).html() ,
@@ -616,12 +616,12 @@ taxonTraits.__datefree=function()
 
 		selected.append(
 			$( templateReplace(
-				$( "#datefree_template_two" ).html() , 
-				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 } 
+				$( "#datefree_template_two" ).html() ,
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 }
 			)
 		));
 	}
-	
+
 	taxonTraits.setOldValue( b );
 
 //	taxonTraits.getCanHaveRange();
@@ -635,7 +635,7 @@ taxonTraits.taxonTraitFormInit=function( data )
 {
 	taxonTraits.setData( data );
 	taxonTraits.setDefaultLanguage( data.default_project_language );
-	if ( data.trait ) 
+	if ( data.trait )
 	{
 		taxonTraits.setTrait( data.trait.id );
 		taxonTraits.setTraitType( data.trait.type_sysname );
@@ -655,7 +655,7 @@ taxonTraits.taxonTraitForm=function()
 	taxonTraits.currentvalues.splice(0,taxonTraits.currentvalues.length);
 
 	taxonTraits.setDialogHeight( 400 );
-	
+
 	if ( taxonTraits.getTraitType()=='stringlist' || taxonTraits.getTraitType()=='stringfree' )
 	{
 		if ( d.taxon_values && d.taxon_values.values )
@@ -677,7 +677,7 @@ taxonTraits.taxonTraitForm=function()
 					var label=d.trait.values[i].language_labels[taxonTraits.getDefaultLanguage()];
 				else
 					var label=d.trait.values[i].string_value;
-				
+
 				taxonTraits.currentvalues.push({
 					id:d.trait.values[i].id,
 					value:label
@@ -727,10 +727,10 @@ taxonTraits.hasChanged=function()
 		{
 			newvalue+=$(this).val();
 		});
-		
+
 		return taxonTraits.getOldValue()!=newvalue;
-	}	
-	
+	}
+
 	return true;
 }
 
@@ -754,7 +754,7 @@ taxonTraits.saveTaxonTrait=function()
 		{
 			form.append( '<input type="hidden" name="values[]" value="'+ $(this).val() +'" />' );
 		});
-	}	
+	}
 	else
 	if ( taxonTraits.getTraitType()=='datefree' )
 	{
@@ -762,7 +762,7 @@ taxonTraits.saveTaxonTrait=function()
 		{
 			form.append( '<input type="hidden" name="'+ $(this).attr( 'name' ) +'" value="'+ $(this).val() +'" />' );
 		});
-	}	
+	}
 	else
 	{
 		for(var i=0;i<taxonTraits.currentselection.length;i++)
@@ -779,7 +779,7 @@ taxonTraits.editTaxonTrait = function( d )
 {
 	d.time=allGetTimestamp();
 	d.action='get_taxon_trait';
-	
+
 	//console.dir( d );
 
 	$.ajax({
@@ -790,9 +790,9 @@ taxonTraits.editTaxonTrait = function( d )
 			//console.log( d );
 			taxonTraits.taxonTraitFormInit( $.parseJSON( d ) );
 			prettyDialog(
-			{ 
-				title : taxonTraits.getTraitName() , 
-				content : taxonTraits.taxonTraitForm() , 
+			{
+				title : taxonTraits.getTraitName() ,
+				content : taxonTraits.taxonTraitForm() ,
 				width: 600,
 				height: taxonTraits.getDialogHeight(),
 				buttons :
@@ -843,7 +843,7 @@ taxonTraits.saveReferences=function()
 {
 	var form=$('<form method="post"></form>').appendTo('body');
 	form.append('<input type="hidden" name="action" value="savereferences" />');
-	 
+
 	for(var i=0;i<taxonTraits.references.length;i++)
 	{
 		form.append(
@@ -851,14 +851,14 @@ taxonTraits.saveReferences=function()
 				(taxonTraits.references[i].id ? taxonTraits.references[i].id : -1) +','+ taxonTraits.references[i].literature_id +
 			'" />');
 	};
-	
+
 	form.submit();
 
 }
 
 taxonTraits.deleteTraitsReferences=function()
 {
-	if (!confirm(_('Alle kenmerken en referenties verwijderen?'))) return;
+	if (!confirm(_('Delete all traits and references?'))) return;
 
 	var form=$('<form method="post"></form>').appendTo('body');
 	form.append('<input type="hidden" name="action" value="deleteall" />');

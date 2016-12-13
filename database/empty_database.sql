@@ -902,7 +902,7 @@ DROP TABLE IF EXISTS `literature2_publication_types_labels`;
 CREATE TABLE `literature2_publication_types_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
-  `publication_type_id` varchar(255) NOT NULL,
+  `publication_type_id` int(11) NOT NULL,
   `language_id` int(11) DEFAULT NULL,
   `label` varchar(255) NOT NULL,
   `created` datetime NOT NULL,
