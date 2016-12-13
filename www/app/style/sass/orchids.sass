@@ -50,15 +50,14 @@ p
 	@media screen and (max-width: 994px)
 		overflow: hidden
 
-
 .scroll__container
 	flex-grow: 1
 	display: flex
 	flex-direction: column
 	// overflow-y: scroll
 	@media screen and (max-width: 994px)
-		overflow-y: scroll
 		-webkit-overflow-scrolling: touch
+		overflow-y: scroll
 
 #header-titles-small
 	background-color: #fff
@@ -112,11 +111,19 @@ p
 
 @media screen and (max-width: 800px)
 	#lookup-DialogContent
-		max-height: 0!important
-		transition: max-height 0.5s ease
+		transition: transform 0.26s ease
+		transition-delay: 0.1s
+		width: 100%
+		box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.75)
+		max-height: 200px
+		transform: scaleY(0)    
+		transform-origin: top
+		position: absolute
+		z-index: 100
 	#lookupDialogInput:focus ~ #lookup-DialogContent
-		max-height: 300px!important
-		transition: max-height 0.5s ease		
+		transform: scaleY(1)
+		transition: transform 0.26s ease
+		transition-delay: 0s
 
 #container
 	padding: 30px 5px
@@ -388,6 +395,8 @@ p
 			color: #fff
 			background-color: #ce004a
 
+
+
 #question
 	margin-bottom: 30px
 	img
@@ -478,6 +487,7 @@ p
 .search-tab-content
 	background-color: #eeede9
 	display: none
+	margin-bottom: 30px
 	.alphabet
 		padding: 0
 		margin: 0
@@ -486,7 +496,13 @@ p
 		border: 0
 		width: 100%
 	&.active
-		display: block
+		display: flex
+		flex-direction: column
+		overflow: hidden
+
+.glossary-filter
+	width: 100%
+
 .tabs-grow
 	width: 100%
 	li
@@ -519,6 +535,9 @@ p
 		outline-width: 0
 		&:hover
 			background-color: #ce004a
+
+
+
 
 .search-modules__container
 	padding: 15px
@@ -619,3 +638,5 @@ p
 	.media-caption
 		width: 100%
 		margin: 0 auto
+
+

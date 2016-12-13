@@ -22,7 +22,7 @@
 		{if !$controllerMenuOverride and $controllerMenuExists and $controllerBaseName}
 			<div class="lookup__container">
 				<div id="lookupDialog">
-					<input type="text" id="lookupDialogInput">
+					<input type="text" id="lookupDialogInput" placeholder="Filter content...">
 					<div id="lookup-DialogContent"></div>
 				</div>
 				

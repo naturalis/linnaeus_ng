@@ -2454,7 +2454,6 @@ body {
 
 #container {
   background-color: white;
-  min-height: 1000px;
   position: relative;
   max-width: 1080px;
   margin: 0 auto; }
@@ -2552,10 +2551,7 @@ body {
 
 #header-titles {
   display: block;
-  float: left;
-  width: 58.33333%;
-  height: 4em;
-  overflow: hidden; }
+  }
   @media screen and (max-width: 799px) {
     #header-titles {
       width: 100%;

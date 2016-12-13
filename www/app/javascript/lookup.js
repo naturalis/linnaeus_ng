@@ -447,7 +447,8 @@ function allLookupShowDialog(predefJSON)
 		allLookupGetData('*',true);
 	}
 
-	$('#'+allLookupDialogInputName).focus();
+	console.log(allLookupDialogInputName);
+	// $('#'+allLookupDialogInputName).focus();
 }
 
 function allLookupSetSelectedId(id)
