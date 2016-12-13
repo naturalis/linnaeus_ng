@@ -4,9 +4,10 @@
 		{t}Glossary:{/t}<span class="alphabet-letter-title">{$letter}</span>
 	</span>
 </div>
-{include file="_alphabet.tpl"}
+
 
 <div id="page-main">
+	{include file="_alphabet.tpl"}
 	{if $alpha|@count==0}
 		{t}(no references have been defined){/t}
 	{else}		
