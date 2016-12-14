@@ -18,12 +18,13 @@
 	        {foreach $modules.modules v}
 		        {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search' && $v.module!='' && $v.show_in_public_menu==1}
 		        <li>
-			        <label>
+			        <label class="checkbox-input">
 			            <input
 			                type="checkbox"
 			                name="modules[{$v.id}]"
 			                value="{$v.controller}" 
 			                {if $search.modules[$v.id]==$v.controller || $search.modules==null || $search.modules=='*'}checked="checked"{/if} />
+		                <span class="mock-checkbox"></span>
 			             {if $v.module=='Species module'} {t}Species module{/t} / {t}Higher taxa{/t}{elseif $v.module=='Additional texts'}{t}Navigator{/t}{else}{t}{$v.module}{/t}{/if}
 			        </label>
 		        </li>
@@ -31,11 +32,12 @@
 	        {/foreach}
 	        {foreach $modules.freeModules v}
 	        	<li>
-			        <label>
+			        <label class="checkbox-input">
 			        	<input type="checkbox" 
 			        			name="freeModules[{$v.id}]" 
 			        			value="{$v.id}" 
 			        			{if $search.freeModules[$v.id]==$v.id || $search.modules==null || $search.modules=='*'}checked="checked"{/if} />
+	        			<span class="mock-checkbox"></span>
 				        {t}{$v.module}{/t}
 					</label>
 				</li>

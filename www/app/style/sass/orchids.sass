@@ -418,6 +418,9 @@ p
 img + .step-content
 	margin-top: 5px
 
+
+
+
 #question
 	padding: 15px
 	background-color: #e2e1dd
@@ -560,19 +563,41 @@ img + .step-content
 		&:hover
 			background-color: #ce004a
 
-
-
-
 .search-modules__container
 	padding: 15px
 
 .search-module__list
 	margin-top: 15px
 	display: flex
+	flex-wrap: wrap
 	li
 		margin-right: 30px
 		&:last-child
 			margin-right: 0
+
+label.checkbox-input
+	display: flex
+	position: relative
+	align-items: center
+	margin-bottom: 10px
+	.mock-checkbox
+		background-color: #ccc
+		width: 20px
+		height: 20px
+		display: block
+		flex-shrink: 0
+		flex-grow: 0
+		margin-right: 10px
+		border-radius: 8px
+	input[type=checkbox]
+		visibility: hidden
+		position: absolute
+		top: 0
+	input[type=checkbox]:checked + .mock-checkbox
+		background-image: url('../img/checkbox-checked.png')
+		background-size: cover
+		background-color: transparent
+
 
 #step .target
 	display: flex
