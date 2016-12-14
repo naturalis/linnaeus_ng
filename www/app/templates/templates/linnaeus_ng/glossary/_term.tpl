@@ -1,5 +1,5 @@
 <p id="header-titles-small">
-    <span id="mini-header-title">{$term.term}</span>
+    <span id="header-title">{$term.term}</span>
 </p>
 
 <div id="page-main">
