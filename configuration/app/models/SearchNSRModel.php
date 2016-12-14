@@ -340,7 +340,7 @@ final class SearchNSRModel extends AbstractModel
 		if ( is_null($project_id) ||  is_null($language_id) )
 			return;
 
-		$trait_joins=$this->getTraitJoins( $traits );
+		$trait_joins=$this->getTraitJoins( [ "traits" => $traits, "project_id" => $project_id ] );
 		$traitgroup_joins=$this->getTraitGroupJoin( $trait_group );
 
 		$query="
@@ -1437,9 +1437,13 @@ final class SearchNSRModel extends AbstractModel
 
 	}
 
-	private function getTraitJoins( $traits )
+	private function getTraitJoins( $params )
 	{
-		if (empty($traits))	return;
+
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$traits = isset($params['traits']) ? $params['traits'] : null;
+
+		if (empty($project_id) || empty($traits))	return;
 		
 		$trait_joins='';
 
@@ -1489,10 +1493,10 @@ final class SearchNSRModel extends AbstractModel
 					and _trait_values".$trait.".value_id in (".implode(",",$val).")
 			";
 		}
-
+	
 		foreach((array)$traits_free as $id=>$vals)
 		{		
-			$trait=$this->getTraitgroupTrait($id);
+			$trait=$this->getTraitgroupTrait( [ "trait_id" => $id, "project_id" => $project_id ] );
 
 			$trait_joins .=
 			"
@@ -1546,11 +1550,15 @@ final class SearchNSRModel extends AbstractModel
 				if ($operator=='==')
 				{
 					$x= "
-					(
 						(
 							_trait_values".$id.".".$column2." is null AND
 							_trait_values".$id.".".$column1." = ".$value1."
-						)
+						)";
+						
+					if (isset($value2))
+					{
+						
+						$x .= "
 						OR
 						(
 							_trait_values".$id.".".$column2." is not null AND
@@ -1559,8 +1567,11 @@ final class SearchNSRModel extends AbstractModel
 								_trait_values".$id.".".$column2." >= ".$value2."
 							)
 						)
-					)
-				";
+						";
+					}
+				
+					$x= " (".$x.") ";
+				
 				} else
 				if ($operator=='!=')
 				{
