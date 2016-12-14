@@ -8,18 +8,18 @@ class TreeController extends Controller
     public $usedModels = array(
 		'name_types'
     );
-	
+
     public $modelNameOverride = 'TreeModel';
 
 	private $_idPreferredName=0;
 	private $_idValidName=0;
-		
+
     public function __construct()
     {
         parent::__construct();
 		$this->initialise();
 	}
-	
+
 	private function initialise()
 	{
 		$d=$this->models->NameTypes->_get(array(
@@ -29,9 +29,9 @@ class TreeController extends Controller
 				'language_id' => $this->getCurrentLanguageId()
 			)
 		));
-		
+
 		if ($d) $this->_idPreferredName=$d[0]['id'];
-		
+
 		$d=$this->models->NameTypes->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(),
@@ -39,14 +39,14 @@ class TreeController extends Controller
 				'language_id' => LANGUAGE_ID_SCIENTIFIC
 			)
 		));
-		
+
 		if ($d) $this->_idValidName=$d[0]['id'];
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_tree_taxon_count_style = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_taxon_count_style','module'=>'species', 'subst'=>'species_established' ] );
 		$this->_tree_initital_expand_levels = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_initital_expand_levels','module'=>'species' ] );
 	}
-					
+
     public function __destruct()
     {
         parent::__destruct();
@@ -64,7 +64,7 @@ class TreeController extends Controller
 		header('Last-Modified: ' . gmdate( 'D, d M Y H:i:s') . ' GMT');
 		header('Cache-Control: no-store, no-cache, must-revalidate');
 		header('Cache-Control: post-check=0, pre-check=0', false);
-		header('Pragma: no-cache'); 
+		header('Pragma: no-cache');
 		*/
 
 		$tree=$this->restoreTree();
@@ -77,7 +77,7 @@ class TreeController extends Controller
 		{
 			$this->smarty->assign('tree',json_encode($tree));
 		}
-	
+
 		if ($this->rHasVar('expand'))
 		{
 			$this->smarty->assign('expand',(int)$this->rGetVal('expand'));
@@ -89,18 +89,18 @@ class TreeController extends Controller
 
 		$this->printPage('tree');
 	}
-	
+
     public function ajaxInterfaceAction ()
     {
 		$return='error';
-        
+
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
 			$return=json_encode($this->getTreeNode(array('node'=>$this->rGetVal('node'),'count'=>$this->rGetVal('count'))));
         }
 		else
 		if ($this->rHasVal('action', 'store_tree'))
-		{	
+		{
 			$this->moduleSession->getModuleSetting( array( 'setting'=>'tree','value'=>$this->rGetVal('tree') ) );
 			$return='saved';
         }
@@ -109,7 +109,7 @@ class TreeController extends Controller
 		{
 	        $return=json_encode($this->restoreTree());
         }
-        
+
         $this->allowEditPageOverlay = false;
 
 		$this->smarty->assign('returnText',$return);
@@ -125,7 +125,7 @@ class TreeController extends Controller
 		$c=array('name'=>$top['taxon']=='Leven' ? 'Life' : $top['taxon'],'children'=>$this->aBranch( $node ));
 		echo json_encode($c);
 	}
-	
+
 	private function restoreTree()
 	{
 		return $this->moduleSession->getModuleSetting( 'tree' );
@@ -138,7 +138,7 @@ class TreeController extends Controller
 		if ($p && count((array)$p)==1)
 		{
 			$p=$p[0]['id'];
-		} 
+		}
 		else
 		{
 			$p=null;
@@ -151,7 +151,7 @@ class TreeController extends Controller
 
 		return $p;
 	}
-	
+
 	private function getTreeNode($p)
 	{
 
@@ -165,7 +165,7 @@ class TreeController extends Controller
 			$node=$this->getTreeTop();
 			$isTop=true;
 		}
-		
+
 		$count=isset($p['count']) && in_array($p['count'],array('none','taxon','species')) ? $p['count'] : 'none';
 
 		if (is_null($node))
@@ -179,13 +179,15 @@ class TreeController extends Controller
 				'type_id_valid'=>$this->_idValidName,
 				'node'=>$node
 			));
-			
+
 		$taxon=$progeny=array();
+
+		$ranks = $this->getProjectRanks();
 
 		foreach((array)$taxa as $key=>$val)
 		{
-			
-			if ($count=='taxon') 
+
+			if ($count=='taxon')
 			{
 				if ( $this->_tree_taxon_count_style=='species_only' || $this->_tree_taxon_count_style=='species_established')
 				{
@@ -200,14 +202,14 @@ class TreeController extends Controller
 				}
 			}
 			else
-			if ($count=='species' && $this->_tree_taxon_count_style!='none') 
+			if ($count=='species' && $this->_tree_taxon_count_style!='none')
 			{
 				$d=$this->models->TreeModel->getBranchSpeciesCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"base_rank_id"=>$val['base_rank_id'],
 					"node"=>$val['id']
 				));
-	
+
 				$val['child_count']=
 					array(
 						'total'=>
@@ -225,6 +227,7 @@ class TreeController extends Controller
 				$val['child_count']=null;
 			}
 
+			/*
 			if ($val['base_rank_id']>=SPECIES_RANK_ID && $val['base_rank_id']!=NOTHOGENUS_RANK_ID )
 			{
 				if ($val['authorship']!='')
@@ -243,21 +246,23 @@ class TreeController extends Controller
 			{
 				$val['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id']));
 			}
+			*/
 
+			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 
 			unset($val['parent_id']);
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
 			unset($val['base_rank_id']);
-			
+
 			$val['parentage']=explode(' ',$val['parentage']);
 
 			if ($val['id']==$node)
 			{
 				$taxon=$val;
 			}
-			else 
+			else
 			{
 				$val['has_children']=$this->models->TreeModel->hasChildren(array(
 					"project_id"=>$this->getCurrentProjectId(),
@@ -272,10 +277,10 @@ class TreeController extends Controller
 			$progeny,
 			function($a,$b)
 			{
-				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
+				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1));
 			}
 		);
-		
+
 		$taxon['is_top']=$isTop;
 
 		return
@@ -283,19 +288,19 @@ class TreeController extends Controller
 				'node'=>$taxon,
 				'progeny'=>$progeny
 			);
-		
+
 	}
 
 	private function aBranch( $node, $level=0 )
 	{
 		/*
-		
+
 		116298 | Animalia
 		116299 | Plantae
 		116300 | Fungi
-		
+
 		*/
-		
+
 		$children=
 			$this->models->Taxa->freeQuery("
 				select
@@ -304,7 +309,7 @@ class TreeController extends Controller
 					concat(_r.rank,' ',_a.taxon) as name,
 					_p.rank_id,
 					" . $level . " as level,
-					case 
+					case
 					 when instr(_qp.parentage,'116298') || _a.id='116298' != 0 then 'Animalia'
 					 when instr(_qp.parentage,'116299') || _a.id='116299' != 0 then 'Plantae'
 					 when instr(_qp.parentage,'116300') || _a.id='116300' != 0 then 'Fungi'
@@ -344,20 +349,20 @@ class TreeController extends Controller
 					and _a.project_id=_k.project_id
 					and _k.type_id=".$this->_idPreferredName."
 					and _k.language_id=".$this->getCurrentLanguageId()."
-	
+
 				left join %PRE%names _m
 					on _a.id=_m.taxon_id
 					and _a.project_id=_m.project_id
 					and _m.type_id=".$this->_idValidName."
-	
-				where 
-					_a.project_id = ".$this->getCurrentProjectId()." 
+
+				where
+					_a.project_id = ".$this->getCurrentProjectId()."
 					and ifnull(_trash.is_deleted,0)=0
 					and _a.parent_id = ".$node."
 
 				order by
 					label
-			");	
+			");
 
 		foreach((array)$children as $key=>$val)
 		{
@@ -367,10 +372,10 @@ class TreeController extends Controller
 				$children[$key]['size']=count($children[$key]['children']);
 			}
 		}
-		
-	
+
+
 		return $children;
-	
+
 	}
 
 

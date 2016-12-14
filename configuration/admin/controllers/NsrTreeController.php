@@ -120,7 +120,7 @@ class NsrTreeController extends NsrController
         }
 		else
 		if ($this->rHasVal('action', 'store_tree'))
-		{	
+		{
 	        $_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']=$this->rGetVal('tree');
 			$return='saved';
         }
@@ -135,7 +135,7 @@ class NsrTreeController extends NsrController
 	        $return=json_encode($this->getTaxonParentage($this->rGetId()));
         }
 
-        
+
         $this->allowEditPageOverlay = false;
 
 		$this->smarty->assign('returnText',$return);
@@ -146,8 +146,8 @@ class NsrTreeController extends NsrController
 
 	private function restoreTree()
 	{
-		return 
-			!$this->_noTreeCaching && isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']) ? 
+		return
+			!$this->_noTreeCaching && isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']) ?
 				$_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'] : null;
 	}
 
@@ -172,24 +172,24 @@ class NsrTreeController extends NsrController
 			));
 
         $ranks=$this->newGetProjectRanks();
-		
+
 		$taxon=$progeny=array();
 
 		foreach((array)$taxa as $key=>$val)
 		{
 
-			if ($count=='taxon') 
+			if ($count=='taxon')
 			{
 				$d=$this->models->NsrTreeModel->getTaxonCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"node_id"=>$val['id']
 				));
-					
+
 				$val['child_count']['taxon']=$d[0]['total'];
 			}
 			else
-			if ($count=='species') 
-			{	
+			if ($count=='species')
+			{
 				$d=$this->models->NsrTreeModel->getSpeciesCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"base_rank"=>$val['base_rank'],
@@ -213,7 +213,7 @@ class NsrTreeController extends NsrController
 			{
 				$val['child_count']=null;
 			}
-			
+/*
 			if ($val['base_rank']>=SPECIES_RANK_ID)
 			{
 				if ($val['authorship']!='')
@@ -228,8 +228,11 @@ class NsrTreeController extends NsrController
 					$val['taxon']=$this->formatTaxon(array_merge($val, [ 'ranks'=>$ranks ]));
 				}
 			}
-			
+
 			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
+*/
+
+			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 
 			//unset($val['parent_id']);
@@ -241,13 +244,13 @@ class NsrTreeController extends NsrController
 			{
 				$taxon=$val;
 			}
-			else 
+			else
 			{
 				$d=$this->models->NsrTreeModel->getTaxonChildCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"parent_id"=>$val['id']
 				));
-					
+
 				$val['has_children']=$d[0]['total']>0;
 				$progeny[]=$val;
 			}
@@ -258,8 +261,8 @@ class NsrTreeController extends NsrController
 			function($a,$b)
 			{
 				return
-					(strtolower($a['label'])==strtolower($b['label']) ? 
-						0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1)); 
+					(strtolower($a['label'])==strtolower($b['label']) ?
+						0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1));
 			}
 		);
 
@@ -268,7 +271,7 @@ class NsrTreeController extends NsrController
 				'node'=>$taxon,
 				'progeny'=>$progeny
 			);
-		
+
 	}
 
 }
