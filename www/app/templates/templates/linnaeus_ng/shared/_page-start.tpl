@@ -2,8 +2,8 @@
 	<div class="sidebar__container">
 		{if $categories}
 			<div class="category__container">
-				<div class="category-title">
-					Hoe noemen we dit?
+				<div class="category-title responsive-hidden">
+					Passport
 				</div>
 		        <ul>
 		            {foreach $categories v k}

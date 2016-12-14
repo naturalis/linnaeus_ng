@@ -147,8 +147,6 @@ background-color: #eeede9 !important; }
   border-bottom: 1px dotted #e3004a; }
 .module-key #lookup-DialogContent a:hover b {
   border-bottom: 1px dotted #009ee0; }
-.module-key #lookup-DialogContent .row {
-  margin-bottom: 1em; }
 
 .name_switch {
 	font-size:11px;
