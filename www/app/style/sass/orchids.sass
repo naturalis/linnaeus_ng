@@ -9,7 +9,7 @@ body, html
 	height: 100%
 
 body
-	font-family: "Source Sans Pro", Arial, sans-serif
+	font-family: Arial, sans-serif
 
 p
 	word-wrap: break-word
@@ -57,7 +57,15 @@ p
 	// overflow-y: scroll
 	@media screen and (max-width: 994px)
 		-webkit-overflow-scrolling: touch
+		position: absolute
+		top: 0
+		bottom: 0
+		left: 0
+		right: 0
+		height: 100%
+		padding-top: 50px
 		overflow-y: scroll
+
 
 #header-titles-small
 	background-color: #fff
@@ -116,7 +124,7 @@ p
 		width: 100%
 		box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.75)
 		max-height: 200px
-		transform: scaleY(0)    
+		transform: scaleY(0)
 		transform-origin: top
 		position: absolute
 		z-index: 100
@@ -208,7 +216,7 @@ p
 	max-width: 1080px
 	margin: 0 auto
 	padding: 0 15px
-	@media screen and (max-width: 800px)
+	@media screen and (max-width: 994px)
 		display: none
 	a
 		text-decoration: none
@@ -240,7 +248,7 @@ p
 
 .responsive-site-title
 	display: none
-	@media screen and (max-width: 800px)
+	@media screen and (max-width: 994px)
 		display: flex
 		flex-grow: 1
 		align-items: center
@@ -268,7 +276,6 @@ p
 
 #categories
 	background-color: #fff
-	padding: 15px 15px 0 15px
 	ul
 		display: flex
 		background-color: #eeede9
@@ -305,9 +312,10 @@ p
 	background-color: #fff
 	margin-bottom: 15px
 	@media screen and (max-width: 800px)
-		overflow-x: scroll
-	a, span
+		flex-wrap: wrap
 		background-color: #eeede9
+		justify-content: center
+	a, span
 		height: 25px
 		display: flex
 		align-items: center
@@ -315,9 +323,10 @@ p
 		flex-grow: 1
 		color: #000
 		@media screen and (max-width: 800px)
-			width: 50px
-			height: 50px
+			width: 35px
+			height: 35px
 			flex-shrink: 0
+			border-bottom: 1px solid #f9f9f7
 		&.alphabet-letter-ghosted
 			color: #b2b1a8
 		&.alphabet-active-letter
@@ -489,14 +498,13 @@ p
 			a
 				color: #fff
 		a
-			padding: 15px 30px
+			padding: 15px
 			display: flex
 			text-decoration: none
 		
 .search-tab-content
 	background-color: #eeede9
 	display: none
-	margin-bottom: 30px
 	.alphabet
 		padding: 0
 		margin: 0

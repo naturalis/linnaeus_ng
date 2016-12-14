@@ -19,9 +19,11 @@
 		<div class="search-tab-content active tab-content-js" data-content="search-title">
 			<div class="alphabet">
 				{foreach from=$titleAlphabet item=v}
+					{if $v.letter}
 					<a href="#" class="click-letter" onclick="lit2Lookup(this,'lookup_title_letter','{$v.letter}');return false;">
 						{$v.letter|@strtoupper}
 					</a>
+					{/if}
 				{/foreach}
 			</div>
 			<div class="search-input__container without-button">
@@ -46,6 +48,7 @@
 		</div>
 	</div>
 </div>
+<div class="search-results"></div>
 
 <script>
 $(document).ready(function() {

@@ -97,5 +97,4 @@ function lit2BuildList(action,data)
 	}
 	
 	$('#lit2-result-list').html( fetchTemplate('reference-table').replace('%TBODY%',buffer.join("\n")));
-	// $('.scroll__container').css('overflow-y', 'scroll');
 }
