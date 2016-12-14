@@ -39,7 +39,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query= "
 			select
 				_a.id,
@@ -53,7 +53,8 @@ final class NsrTaxonModel extends AbstractModel
 				_a.authorship_year,
 				_a.reference,
 				_a.reference_id,
-				_h.label as reference_name,
+				_x.rank_id as synonym_base_rank_id,
+		        _h.label as reference_name,
 				_a.expert,
 				_a.expert_id,
 				_f.name as expert_name,
@@ -67,48 +68,52 @@ final class NsrTaxonModel extends AbstractModel
 				_c.language,
 				_d.label as language_label,
 				replace(_ids.nsr_id,'tn.nlsr.name/','') as nsr_id
-	
-			from %PRE%names _a 
-	
+
+			from %PRE%names _a
+
 			left join %PRE%name_types _b
-				on _a.type_id=_b.id 
+				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id
-	
+
 			left join %PRE%languages _c
 				on _a.language_id=_c.id
-	
+
 			left join %PRE%labels_languages _d
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
 				and _d.label_language_id=" . $label_language_id . "
-	
+
 			left join %PRE%actors _f
-				on _a.expert_id = _f.id 
+				on _a.expert_id = _f.id
 				and _a.project_id=_f.project_id
-	
+
 			left join %PRE%actors _g
-				on _a.organisation_id = _g.id 
+				on _a.organisation_id = _g.id
 				and _a.project_id=_g.project_id
-	
+
 			left join  %PRE%literature2 _h
-				on _a.reference_id = _h.id 
+				on _a.reference_id = _h.id
 				and _a.project_id=_h.project_id
-	
+
+			left join %PRE%projects_ranks _x
+				on _a.rank_id=_x.id
+				and _a.project_id=_x.project_id
+
 			left join %PRE%nsr_ids _ids
-				on _a.id =_ids.lng_id 
+				on _a.id =_ids.lng_id
 				and _a.project_id = _ids.project_id
 				and _ids.item_type = 'name'
-	
+
 			where
 				_a.project_id = " . $project_id . "
 				".(isset($taxon_id) ? "and _a.taxon_id=".$taxon_id: "" )."
 				".(isset($language_id) ? "and _a.language_id=".$language_id: "" )."
 				".(isset($type_id) ? "and _a.type_id=".$type_id: "" )."
 				".(isset($name_id) ? "and _a.id=".$name_id: "" );
-			
+
 		$d=$this->freeQuery( $query );
 		return isset($d[0]) ? $d[0] : null;
-	
+
 	}
 
 	public function getNames( $params )
@@ -121,7 +126,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query=  "
 			select
 				_a.id,
@@ -148,7 +153,7 @@ final class NsrTaxonModel extends AbstractModel
 					when _b.nametype = '".PREDICATE_ALTERNATIVE_NAME."' then 9
 					when _b.nametype = '".PREDICATE_SYNONYM."' then 7
 					when _b.nametype = '".PREDICATE_SYNONYM_SL."' then 6
-	
+
 					when _b.nametype = '".PREDICATE_HOMONYM."' then 5
 					when _b.nametype = '".PREDICATE_MISSPELLED_NAME."' then 4
 					when _b.nametype = '".PREDICATE_INVALID_NAME."' then 3
@@ -156,16 +161,16 @@ final class NsrTaxonModel extends AbstractModel
 				end as sort_criterium,
 				_f.rank_id,
 				ifnull(_q.label,_r.rank) as rank_label
-	
-			from %PRE%names _a 
+
+			from %PRE%names _a
 
 			left join %PRE%name_types _b
-				on _a.type_id=_b.id 
+				on _a.type_id=_b.id
 				and _a.project_id=_b.project_id
-	
+
 			left join %PRE%languages _c
 				on _a.language_id=_c.id
-	
+
 			left join %PRE%labels_languages _d
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
@@ -174,24 +179,24 @@ final class NsrTaxonModel extends AbstractModel
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
 				and _a.project_id = _f.project_id
-		
+
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
-		
+
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
 				and _f.project_id = _q.project_id
 				and _q.language_id=".$label_language_id."
-			
+
 			where
 				_a.project_id = ".$project_id."
 				and _a.taxon_id=".$taxon_id."
-			order by 
+			order by
 				sort_criterium desc
 				";
-			
+
 		return $this->freeQuery( array( 'query' => $query, 'fieldAsIndex' => 'id' ) );
-	
+
 	}
 
 	public function getPreferredNames( $params )
@@ -205,7 +210,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query=  "
 			select
 				_a.id,
@@ -213,25 +218,25 @@ final class NsrTaxonModel extends AbstractModel
 				_a.language_id,
 				_c.language,
 				ifnull(_d.label,_c.language) as language_label
-	
-			from %PRE%names _a 
-	
+
+			from %PRE%names _a
+
 			left join %PRE%languages _c
 				on _a.language_id=_c.id
-	
+
 			left join %PRE%labels_languages _d
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
 				and _d.label_language_id=".$label_language_id."
-	
+
 			where
 				_a.project_id = ".$project_id."
 				and _a.taxon_id = ".$taxon_id."
 				and _a.type_id = ".$type_id."
 				";
-			
+
 		return $this->freeQuery( $query );
-	
+
 	}
 
 	public function getPresenceData( $params )
@@ -244,7 +249,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.presence_id,
@@ -265,46 +270,46 @@ final class NsrTaxonModel extends AbstractModel
 				_g.label as reference_label,
 				_gg.name as reference_author,
 				_g.date as reference_date
-				
+
 			from %PRE%presence_taxa _a
 
 			left join %PRE%presence_labels _b
-				on _a.presence_id = _b.presence_id 
-				and _a.project_id=_b.project_id 
+				on _a.presence_id = _b.presence_id
+				and _a.project_id=_b.project_id
 				and _b.language_id=".$language_id."
 
 			left join %PRE%presence_labels _c
-				on _a.presence82_id = _c.presence_id 
-				and _a.project_id=_c.project_id 
+				on _a.presence82_id = _c.presence_id
+				and _a.project_id=_c.project_id
 				and _c.language_id=".$language_id."
 
 			left join %PRE%habitat_labels _d
-				on _a.habitat_id = _d.habitat_id 
-				and _a.project_id=_d.project_id 
+				on _a.habitat_id = _d.habitat_id
+				and _a.project_id=_d.project_id
 				and _d.language_id=".$language_id."
 
 			left join %PRE%actors _e
-				on _a.actor_id = _e.id 
+				on _a.actor_id = _e.id
 				and _a.project_id=_e.project_id
 
 			left join %PRE%actors _f
-				on _a.actor_org_id = _f.id 
+				on _a.actor_org_id = _f.id
 				and _a.project_id=_f.project_id
 
 			left join %PRE%literature2 _g
-				on _a.reference_id = _g.id 
+				on _a.reference_id = _g.id
 				and _a.project_id=_g.project_id
 
 			left join %PRE%actors _gg
-				on _g.actor_id = _gg.id 
+				on _g.actor_id = _gg.id
 				and _g.project_id=_gg.project_id
 
 			where _a.project_id = ".$project_id."
 				and _a.taxon_id =".$taxon_id;
-			
+
 		$d=$this->freeQuery( $query );
 		return isset($d[0]) ? $d[0] : null;
-	
+
 	}
 
 	public function getStatuses( $params )
@@ -316,7 +321,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.id,
@@ -325,18 +330,18 @@ final class NsrTaxonModel extends AbstractModel
 				_b.information_short,
 				_b.information_title,
 				ifnull(_b.index_label,99) as index_label
-	
+
 			from %PRE%presence _a
-	
+
 			left join %PRE%presence_labels _b
-				on _a.id = _b.presence_id 
-				and _a.project_id=_b.project_id 
+				on _a.id = _b.presence_id
+				and _a.project_id=_b.project_id
 				and _b.language_id=".$language_id."
-	
+
 			where _a.project_id = ".$project_id."
 			and index_label != 99
 			order by index_label";
-			
+
 		return $this->freeQuery( $query );
 	}
 
@@ -349,7 +354,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
             	_a.id,
@@ -358,13 +363,13 @@ final class NsrTaxonModel extends AbstractModel
 			from %PRE%habitats _a
 
 			left join %PRE%habitat_labels _b
-				on _a.id = _b.habitat_id 
-				and _a.project_id=_b.project_id 
+				on _a.id = _b.habitat_id
+				and _a.project_id=_b.project_id
 				and _b.language_id=".$language_id."
 
 			where _a.project_id = ".$project_id
-		;	
-		
+		;
+
 		return $this->freeQuery( $query );
 	}
 
@@ -377,7 +382,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
         $query="
 			select
 				_c.id,
@@ -388,7 +393,7 @@ final class NsrTaxonModel extends AbstractModel
 					when _c.id= " . $label_language_id . " then 98
 					when _c.id= " . LANGUAGE_ID_DUTCH . " then 97
 					when _c.id= " . LANGUAGE_ID_ENGLISH . " then 97
-					else 0 
+					else 0
 				end as sort_criterium
 
 			from %PRE%languages _c
@@ -399,7 +404,7 @@ final class NsrTaxonModel extends AbstractModel
 				and _d.label_language_id=".$label_language_id."
 				order by sort_criterium desc, label asc
 			";
-			
+
 		return $this->freeQuery( $query );
 	}
 
@@ -408,7 +413,7 @@ final class NsrTaxonModel extends AbstractModel
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
 		if( is_null( $project_id ) ) return;
-		
+
 		$query="
 			select
 				_a.id,
@@ -417,9 +422,9 @@ final class NsrTaxonModel extends AbstractModel
 				_q.id as base_rank_id,
 				concat(_user.first_name,' ',_user.last_name) as deleted_by,
 				date_format(_trash.created,'%d-%m-%Y %T') as deleted_when
-			
+
 			from %PRE%taxa _a
-			
+
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
 				and _a.id = _trash.lng_id
@@ -427,7 +432,7 @@ final class NsrTaxonModel extends AbstractModel
 
 			left join %PRE%users _user
 				on _trash.user_id = _user.id
-				
+
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
 				and _a.project_id = _f.project_id
@@ -436,7 +441,7 @@ final class NsrTaxonModel extends AbstractModel
 				on _f.rank_id=_q.id
 
 			left join %PRE%nsr_ids _ids
-				on _a.id =_ids.lng_id 
+				on _a.id =_ids.lng_id
 				and _a.project_id = _ids.project_id
 				and _ids.item_type = 'taxon'
 
@@ -454,7 +459,7 @@ final class NsrTaxonModel extends AbstractModel
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
 		if( is_null( $project_id ) ) return;
-		
+
 		$query="
 			select
 				_a.id,
@@ -462,9 +467,9 @@ final class NsrTaxonModel extends AbstractModel
 				_q.rank,
 				_q.id as base_rank_id,
 				ifnull(_trash.is_deleted,0) as is_deleted
-							
+
 			from %PRE%taxa _a
-			
+
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
 				and _a.id = _trash.lng_id
@@ -510,7 +515,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.taxon_id as id,
@@ -520,7 +525,8 @@ final class NsrTaxonModel extends AbstractModel
 				_a.name,
 				_common.name as common_name,
 				_f.rank_id as base_rank_id,
-				_x.rank,
+				_z.rank_id as synonym_base_rank_id,
+		        _x.rank,
 				_a.uninomial,
 				_a.specific_epithet,
 				_b.nametype,
@@ -538,64 +544,64 @@ final class NsrTaxonModel extends AbstractModel
 						)) REGEXP '^".$this->escapeString($search)."$' = 1
 					then 100
 					when
-						_a.name REGEXP '^".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						_a.name REGEXP '^".$this->escapeString($search)."[[:>:]](.*)$' = 1
 						and
 						_f.rank_id >= ".SPECIES_RANK_ID."
 					then 95
 					when
-						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."[[:>:]](.*)$' = 1
 						and
 						_f.rank_id >= ".SPECIES_RANK_ID."
 					then 90
 					when
-						_a.name REGEXP '^".$this->escapeString($search)."(.*)$' = 1 
+						_a.name REGEXP '^".$this->escapeString($search)."(.*)$' = 1
 						and
 						_f.rank_id >= ".SPECIES_RANK_ID."
 					then 85
 					when
-						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."(.*)$' = 1 
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."(.*)$' = 1
 						and
 						_f.rank_id >= ".SPECIES_RANK_ID."
 					then 80
-					when 
-						_a.name REGEXP '^(.*)".$this->escapeString($search)."(.*)$' = 1 
+					when
+						_a.name REGEXP '^(.*)".$this->escapeString($search)."(.*)$' = 1
 						and
 						_f.rank_id >= ".SPECIES_RANK_ID."
 					then 75
 					when
-						_a.name REGEXP '^".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						_a.name REGEXP '^".$this->escapeString($search)."[[:>:]](.*)$' = 1
 						and
 						_f.rank_id < ".SPECIES_RANK_ID."
 					then 70
 					when
-						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."[[:>:]](.*)$' = 1 
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."[[:>:]](.*)$' = 1
 						and
 						_f.rank_id < ".SPECIES_RANK_ID."
 					then 65
 					when
-						_a.name REGEXP '^".$this->escapeString($search)."(.*)$' = 1 
+						_a.name REGEXP '^".$this->escapeString($search)."(.*)$' = 1
 						and
 						_f.rank_id < ".SPECIES_RANK_ID."
 					then 60
 					when
-						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."(.*)$' = 1 
+						_a.name REGEXP '^(.*)[[:<:]]".$this->escapeString($search)."(.*)$' = 1
 						and
 						_f.rank_id < ".SPECIES_RANK_ID."
 					then 55
-					when 
-						_a.name REGEXP '^(.*)".$this->escapeString($search)."(.*)$' = 1 
+					when
+						_a.name REGEXP '^(.*)".$this->escapeString($search)."(.*)$' = 1
 						and
 						_f.rank_id < ".SPECIES_RANK_ID."
 					then 50
 
 					else 10
 				end as match_percentage,
-	
+
 				case
 					when _f.rank_id >= ".SPECIES_RANK_ID." then 100
 					else 50
 				end as adjusted_rank
-				
+
 			from %PRE%names _a
 
 			left join %PRE%languages _c
@@ -605,7 +611,7 @@ final class NsrTaxonModel extends AbstractModel
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
 				and _d.label_language_id=".$language_id."
-			
+
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
@@ -615,10 +621,14 @@ final class NsrTaxonModel extends AbstractModel
 				and _e.project_id = _common.project_id
 				and _common.type_id = ".$type_id_preferred."
 				and _common.language_id=".$language_id."
-				
+
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
+
+			left join %PRE%projects_ranks _z
+				on _a.rank_id=_z.id
+				and _a.project_id = _z.project_id
 
 			left join %PRE%ranks _x
 				on _f.rank_id=_x.id
@@ -627,9 +637,9 @@ final class NsrTaxonModel extends AbstractModel
 				on _e.rank_id=_q.project_rank_id
 				and _a.project_id = _q.project_id
 				and _q.language_id=".$language_id."
-			
-			left join %PRE%name_types _b 
-				on _a.type_id=_b.id 
+
+			left join %PRE%name_types _b
+				on _a.type_id=_b.id
 				and _a.project_id = _b.project_id
 
 			left join %PRE%trash_can _trash
@@ -657,14 +667,14 @@ final class NsrTaxonModel extends AbstractModel
 			".($nametype ? "and _b.nametype = ".$nametype : "" )."
 			".($have_deleted=='no' ? "and ifnull(_trash.is_deleted,0)=0" :  "" )."
 			".($have_deleted=='only' ? "and ifnull(_trash.is_deleted,0)=1" : "" )."
-		
-			order by 
-				match_percentage desc, 
-				_e.taxon asc, 
+
+			order by
+				match_percentage desc,
+				_e.taxon asc,
 				_f.rank_id asc, ".
 				(!empty($sort) && $sort=='preferredNameNl' ?
 					"common_name" :
-					"taxon" 
+					"taxon"
 				)."
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
@@ -684,17 +694,17 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.*, _f.rank_id as base_rank_id
 			from
 				%PRE%names _a
-			
+
 			left join %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
-				
+
 			left join %PRE%projects_ranks _f
 				on _e.rank_id=_f.id
 				and _a.project_id = _f.project_id
@@ -714,11 +724,11 @@ final class NsrTaxonModel extends AbstractModel
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
 
 		if( is_null($project_id) ) return;
-		
+
 		$query="
 			select
 				count(*) as total
-			
+
 			from %PRE%taxa _e
 				on _a.taxon_id = _e.id
 				and _a.project_id = _e.project_id
@@ -734,7 +744,7 @@ final class NsrTaxonModel extends AbstractModel
 		";
 
 		$d=$this->freeQuery( $query );
-		
+
 		return $d ? $d[0]['total'] : null;
 
 	}
@@ -750,7 +760,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_e.id,
@@ -767,7 +777,7 @@ final class NsrTaxonModel extends AbstractModel
 			from %PRE%actors _e
 
 			left join %PRE%actors _f
-				on _e.employee_of_id = _f.id 
+				on _e.employee_of_id = _f.id
 				and _e.project_id=_f.project_id
 
 			where
@@ -777,7 +787,7 @@ final class NsrTaxonModel extends AbstractModel
 			order by
 				_e.is_company, _e.name
 		";
-		
+
 		return $this->freeQuery( $query );
 
     }
@@ -793,20 +803,20 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.*,ifnull(_trash.is_deleted,0) as is_deleted
 			from
 				%PRE%taxa _a
-	
+
 			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
 				and _a.id = _trash.lng_id
 				and _trash.item_type='taxon'
-	
-			where 
-				_a.project_id = ".$project_id." 
+
+			where
+				_a.project_id = ".$project_id."
 				and _a.taxon like '". $this->escapeString($name) ."'
 				and _a.rank_id = ". $this->escapeString($child_rank_id) ."
 				and _a.parent_id = ". $this->escapeString($parent_id)
@@ -828,14 +838,14 @@ final class NsrTaxonModel extends AbstractModel
 
 		$query="
 			select
-				_a.id, 
+				_a.id,
 				_b.taxon
-			from 
+			from
 				%PRE%names _a
 			left join %PRE%taxa _b
 				on _a.project_id = _b.project_id
 				and _a.taxon_id=_b.id
-			where 
+			where
 				_a.project_id = ".$project_id."
 				and lower(_a.name) = '" . $this->escapeString(trim($name)) . "'
 		";
@@ -853,7 +863,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.*,
@@ -863,22 +873,22 @@ final class NsrTaxonModel extends AbstractModel
 			from %PRE%literature2 _a
 
 			left join  %PRE%literature2 _h
-				on _a.publishedin_id = _h.id 
+				on _a.publishedin_id = _h.id
 				and _a.project_id=_h.project_id
 
-			left join %PRE%literature2 _i 
-				on _a.periodical_id = _i.id 
+			left join %PRE%literature2 _i
+				on _a.periodical_id = _i.id
 				and _a.project_id=_i.project_id
 
 			where
-				_a.project_id = ".$project_id." 
+				_a.project_id = ".$project_id."
 				and _a.id = ".$literature_id
 		;
 
 		$d=$this->freeQuery( $query );
 		return isset($d[0]) ? $d[0] : null;
 	}
-	
+
 	public function getTaxonBranch( $params )
 	{
 		$type_id=isset($params['type_id']) ? $params['type_id'] : null;
@@ -889,11 +899,11 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_b.*
-			from 
+			from
 				%PRE%taxon_quick_parentage _a
 
 			left join %PRE%names _b
@@ -901,7 +911,7 @@ final class NsrTaxonModel extends AbstractModel
 				and _a.taxon_id = _b.taxon_id
 				and _b.type_id =".$type_id."
 
-			where 
+			where
 				_a.project_id = ".$project_id."
 				and MATCH(_a.parentage) AGAINST ('".$parent_id."' in boolean mode)
 		";
@@ -921,13 +931,13 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
-		$query="		
+
+		$query="
 			select
 				*
 			from
 				%PRE%names
-			where 
+			where
 				project_id = ".$project_id."
 				and type_id=".$type_id."
 				and language_id=".LANGUAGE_ID_SCIENTIFIC."
@@ -959,18 +969,18 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
-		$query="		
+
+		$query="
 			select
 				_a.*
 			from
 				%PRE%names _a
-			
+
 			left join %PRE%taxa _b
 				on _a.project_id = _b.project_id
 				and _a.taxon_id = _b.id
-			
-			where 
+
+			where
 				_a.project_id = ".$project_id."
 				and _a.type_id=".$type_id."
 				and _a.language_id=".LANGUAGE_ID_SCIENTIFIC."
@@ -989,7 +999,7 @@ final class NsrTaxonModel extends AbstractModel
 
 		return $this->freeQuery( $query );
 	}
-	
+
 	public function getTraitgroups( $params )
 	{
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
@@ -1001,7 +1011,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-		
+
 		$query="
 			select
 				_a.*,
@@ -1014,36 +1024,36 @@ final class NsrTaxonModel extends AbstractModel
 
 			from
 				%PRE%traits_groups _a
-				
-			left join 
+
+			left join
 				%PRE%text_translations _b
 				on _a.project_id=_b.project_id
 				and _a.name_tid=_b.id
 				and _b.language_id=". $language_id ."
 
-			left join 
+			left join
 				%PRE%text_translations _c
 				on _a.project_id=_c.project_id
 				and _a.description_tid=_c.id
 				and _c.language_id=". $language_id ."
-				
-			left join 
+
+			left join
 				%PRE%traits_traits _tt
 				on _a.project_id=_tt.project_id
 				and _a.id=_tt.trait_group_id
 
-			left join 
+			left join
 				%PRE%traits_taxon_freevalues _ttf
 				on _tt.project_id=_ttf.project_id
 				and _tt.id=_ttf.trait_id
 				and _ttf.taxon_id =". $taxon_id ."
 
-			left join 
+			left join
 				%PRE%traits_values _tv
 				on _tt.project_id=_tv.project_id
 				and _tt.id=_tv.trait_id
 
-			left join 
+			left join
 				%PRE%traits_taxon_values _ttv
 				on _tv.project_id=_ttv.project_id
 				and _tv.id=_ttv.value_id
@@ -1085,8 +1095,8 @@ final class NsrTaxonModel extends AbstractModel
 		$query="
 			create table %PRE%".$table_name." (
 				{t}id{t} int(11) not null primary key,
-				{t}code_1{t} varchar(16) not null, 
-				{t}code_2{t} varchar(32) not null, 
+				{t}code_1{t} varchar(16) not null,
+				{t}code_2{t} varchar(32) not null,
 				key {t}key_code_1{t} ({t}code_1{t}), key {t}key_code_2{t} ({t}code_2{t}))";
 
 		$this->freeQuery( $query );
@@ -1102,7 +1112,7 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			return;
 		}
-	
+
 		$buffer=array();
 		$queries=array();
 
@@ -1120,12 +1130,12 @@ final class NsrTaxonModel extends AbstractModel
 		{
 			$queries[]="insert into ".$table_name." values ".implode(",",$buffer);
 		}
-		
+
 		foreach($queries as $query)
 		{
 			$this->freeQuery( $query );
 		}
-			
+
 	}
 
 	public function getResolvedCodes( $params )
@@ -1143,7 +1153,7 @@ final class NsrTaxonModel extends AbstractModel
 					_a.code_1 as code,
 					ifnull(_b.lng_id,_c.lng_id) as lng_id,
 					ifnull(_t1.taxon,_t2.taxon) as taxon
-					
+
 				from %PRE%".$table_name." _a
 
 				left join %PRE%nsr_ids _b
@@ -1161,11 +1171,11 @@ final class NsrTaxonModel extends AbstractModel
 				left join %PRE%taxa _t1
 					on _b.lng_id = _t1.id
 					and _t1.project_id = ".$project_id."
-					
+
 				left join %PRE%taxa _t2
 					on _c.lng_id = _t2.id
 					and _t2.project_id = ".$project_id."
-					
+
 				group by _a.id
 				order by _a.id
 			";
@@ -1191,12 +1201,12 @@ final class NsrTaxonModel extends AbstractModel
 				%PRE%traits_traits _b
 				on _a.id=_b.trait_group_id
 				and _a.project_id=_b.project_id
-				
+
 			left join
 				%PRE%traits_project_types _c
 				on _b.project_type_id=_c.id
 				and _b.project_id=_c.project_id
-				
+
 			left join
 				%PRE%traits_types _d
 				on _c.type_id=_d.id

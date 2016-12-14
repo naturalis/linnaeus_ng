@@ -870,9 +870,12 @@ class NsrTaxonController extends NsrController
 
 		foreach ((array) $taxa as $key => $val)
 		{
-
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+
+			if ($val['nametype']==PREDICATE_VALID_NAME && $val['nametype']==PREDICATE_PREFERRED_NAME ||
+			    isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id'])) {
+			    $taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+			}
 
 			if ($val['base_rank_id']==GENUS_RANK_ID)
 			{
