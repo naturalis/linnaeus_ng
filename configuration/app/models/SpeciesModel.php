@@ -363,7 +363,8 @@ class SpeciesModel extends AbstractModel
 				_a.organisation,
 				_a.organisation_id,
 				_a.type_id,
-				_b.nametype,
+				_x.rank_id as synonym_base_rank_id,
+                _b.nametype,
 				_a.language_id,
 				_c.language,
 				_d.label as language_label,
@@ -388,7 +389,11 @@ class SpeciesModel extends AbstractModel
 				on _t.rank_id=_p.id
 				and _t.project_id=_p.project_id
 
-			left join %PRE%languages _c
+			left join %PRE%projects_ranks _x
+				on _a.rank_id=_x.id
+				and _a.project_id=_x.project_id
+
+            left join %PRE%languages _c
 				on _a.language_id=_c.id
 
 			left join %PRE%labels_languages _d
@@ -442,7 +447,8 @@ class SpeciesModel extends AbstractModel
 				_a.expert_id,
 				_a.organisation,
 				_a.organisation_id,
-				_b.nametype,
+				_x.rank_id as synonym_base_rank_id,
+                _b.nametype,
 				_a.language_id,
 				_c.language,
 				_d.label as language_label,
@@ -486,16 +492,17 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
 
+    		left join %PRE%taxa _t
+    			on _a.taxon_id=_t.id
+    			and _a.project_id = _t.project_id
 
-		left join %PRE%taxa _t
-			on _a.taxon_id=_t.id
-			and _a.project_id = _t.project_id
+    		left join %PRE%projects_ranks _tf
+    			on _t.rank_id=_tf.id
+    			and _t.project_id = _tf.project_id
 
-		left join %PRE%projects_ranks _tf
-			on _t.rank_id=_tf.id
-			and _t.project_id = _tf.project_id
-
-
+			left join %PRE%projects_ranks _x
+				on _a.rank_id=_x.id
+				and _a.project_id=_x.project_id
 
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
@@ -1426,21 +1433,21 @@ class SpeciesModel extends AbstractModel
 					_b.gender,
 					_b.is_company,
 					_b.employee_of_id
-	
+
 				from %PRE%literature2_authors _a
-	
+
 				left join %PRE%actors _b
 					on _a.actor_id = _b.id
 					and _a.project_id=_b.project_id
-	
+
 				where
 					_a.project_id = ".$project_id."
 					and _a.literature2_id =".$val['id']."
-	
+
 				order by
 					_a.sort_order,_b.name";
-				
-				$literature[$key]['authors']=$this->freeQuery($query);				
+
+				$literature[$key]['authors']=$this->freeQuery($query);
 		}
 
         return $literature;
