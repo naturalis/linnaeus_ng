@@ -1,9 +1,3 @@
-<!-- <div id="header-container">
-	<div id="title">
-	{if !$session.app.project.logo}<a href="../linnaeus/index.php">{$session.app.project.title}</a>{else}{$session.app.project.title}{/if}
-	</div>
-</div> -->
-
 <div class="menu-title-bar__container">
 	<div class="site-title">
 		{if !$session.app.project.logo}
@@ -15,7 +9,7 @@
 	<div class="menu-search-bar__container">
 		<div class="search-bar__container">
 			<div class="search-bar">
-				<input type="text" name="search" id="search" class="search-box" placeholder="{t}Search...{/t}" value="{if $search.search}{$search.search}{/if}" onkeyup="if (event.keyCode==13) { doSearch(); }" required />
+				<input type="text" name="search" id="search" class="search-box" autocomplete="off" placeholder="{t}Search...{/t}" value="{if $search.search}{$search.search}{/if}" onkeyup="if (event.keyCode==13) { doSearch(); }" required />
 				<a href="javascript:void(0)" class="close-search close-search-js">
 					<i class="ion-close-round"></i>
 				</a>
