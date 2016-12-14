@@ -7,7 +7,11 @@
         {if $step.image or ($step.content && $step.content!=$step.title)}
         <div id="question">
             {if $step.image}<img alt="" src="{$step.image}" />{/if}
-            {if $step.content && $step.content!=$step.title}{$step.content}{/if}
+            {if $step.content && $step.content!=$step.title}
+                <div class="step-content">
+                    {$step.content}
+                </div>
+            {/if}
         </div>
         {/if}
 		<div id="choices">
