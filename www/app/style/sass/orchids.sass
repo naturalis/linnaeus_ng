@@ -54,6 +54,7 @@ p
 	flex-grow: 1
 	display: flex
 	flex-direction: column
+	z-index: 10
 	// overflow-y: scroll
 	@media screen and (max-width: 994px)
 		-webkit-overflow-scrolling: touch
@@ -62,6 +63,7 @@ p
 		bottom: 0
 		left: 0
 		right: 0
+		width: 100%
 		height: 100%
 		padding-top: 50px
 		overflow-y: scroll
@@ -143,11 +145,13 @@ p
 
 .menu__container
 	width: 250px
-	flex-shrinK: 0
+	flex-shrink: 0
 	background-color: #000
 	margin-left: -250px
 	position: relative
+	z-index: 0
 	left: 0
+	z-index: 5
 	transition: left 0.5s ease
 	overflow-y: auto
 

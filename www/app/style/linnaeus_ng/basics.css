@@ -1377,8 +1377,6 @@ input[type="button"].btn-block {
 
 /* --- --- navbar --- */
 .navbar {
-  position: relative;
-  z-index: 1000;
   margin-bottom: 22px;
   border: 1px solid transparent; }
   .navbar:before, .navbar:after {
