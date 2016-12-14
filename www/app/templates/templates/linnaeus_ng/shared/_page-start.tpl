@@ -3,7 +3,7 @@
 		{if $categories}
 			<div class="category__container">
 				<div class="category-title responsive-hidden">
-					Passport
+					Passport menu
 				</div>
 		        <ul>
 		            {foreach $categories v k}
