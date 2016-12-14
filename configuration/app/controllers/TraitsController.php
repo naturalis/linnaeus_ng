@@ -48,6 +48,13 @@ class TraitsController extends Controller
 
 	private function formatDbDate($date,$format)
 	{
+		if ($format=="Y")
+		{
+			$d=date_parse($date);
+			if ($d['month']==0) $d['month']=1;
+			if ($d['day']==0) $d['day']=1;
+			$date=$d['year']."-".$d['month']."-".$d['day'];
+		}
 		return is_null($date) ? null : ltrim(date_format(date_create($date),$format),'0');
 	}
 
