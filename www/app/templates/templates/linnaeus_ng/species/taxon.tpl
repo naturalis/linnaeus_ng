@@ -7,20 +7,6 @@
         </span>
     </p>
 	<div id="content" class="taxon-detail">
-	    <!-- <div id="categories">
-	        <ul>
-	            {foreach $categories v k}
-	            <li id="ctb-{$v.id}">
-	 				<a {if $v.is_empty==0}href="../{if $taxon.lower_taxon==1}species/nsr_taxon.php{else}highertaxa/taxon.php{/if}?id={$taxon.id}&cat={$v.tabname}"{/if}
-	                {if $activeCategory.id==$v.id}
-	                class="category-active"
-	                {/if}
-	                >{$v.label}</a>
-	            </li>
-	            {if $activeCategory.id==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
-	            {/foreach}
-	        </ul>
-	    </div> -->
     	<div>
         	{if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}
 	            <div id="taxonImage" style="float:right">

@@ -2013,8 +2013,7 @@ b, .title {
 #categories a {
   display: block;
   color: #e3004a;
-  padding: 0.25em 0.75em 0.5em;
-  border-top: 1px solid white; }
+  padding: 0.25em 0.75em 0.5em; }
   #categories a:hover {
     text-decoration: none;
     color: #009ee0; }

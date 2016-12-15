@@ -21,19 +21,17 @@
 					{t}Common names{/t}</a>
 				</li>
 			</ul>
-		    {if $type=='common'}
-			<div style="float:right;">
-				{t}Language:{/t}
-				<select id="nameLanguage" onchange="window.open('index.php?type=common&language='+$('#nameLanguage').val(),'_self');">
-			        <option value=""{if $activeLanguage==''} selected="selected"{/if}>{t}Show all{/t}</option>
-			        <option disabled="disabled">-----------------------</option>
-		   			{foreach name=languageloop from=$nameLanguages key=k item=v}
-		        	<option value="{$v.language_id}"{if $v.language_id==$language} selected="selected"{/if}>{$v.language}</option>
+			{if $type=='common'}
+				<ul>
+					{foreach name=languageloop from=$nameLanguages key=k item=v}
+			        	<li>
+			        		<a href="index.php?type=common&language={$v.language_id}" class="{if $v.language_id==$language}category-active{/if}">
+			        			<!-- value="{$v.language_id}"{if $v.language_id==$language} selected="selected"{/if} -->
+			        			{$v.language}
+			        		</a>
+		        		</li>
 					{/foreach}
-				</select>
-				<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
-				<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
-			</div>
+				</ul>
 			{/if}
 		</div>
 		<div class="alphabet">
