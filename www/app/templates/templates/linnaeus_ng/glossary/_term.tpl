@@ -22,7 +22,7 @@
 		     {/if}
 		</div>
 		{if $term.media}
-			<div id="media">
+			<div class="media-grid__container">
 			{assign var=widthInCells value=2}
 			<div id="media-grid">
 				{assign var=mediaCat value=false}
