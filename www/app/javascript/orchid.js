@@ -1,5 +1,5 @@
 function renderDecisionPath(title, decisionPath) {
-	$('#decisionPathContainer').html(decisionPath);
+	$('.decisionpathContent').html(decisionPath);
 	$('#eLi').removeClass('category-active');
 	$('#rLi').removeClass('category-active');
 	$('#decision-path-icon').addClass('category-active');
