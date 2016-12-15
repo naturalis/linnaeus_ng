@@ -1,11 +1,6 @@
-{if $headerTitles}
+{if $headerTitles.subtitle}
     <p id="header-titles-small">
-        <span id="header-title">
-        	{$headerTitles.title}
-    	</span>
-    	{if $headerTitles.subtitle}
-    		<span id="header-subtitle">: {$headerTitles.subtitle}</span>
-		{/if}
+		<span id="header-subtitle">: {$headerTitles.subtitle}</span>
     </p>
 {/if}
 <div id="page-main">

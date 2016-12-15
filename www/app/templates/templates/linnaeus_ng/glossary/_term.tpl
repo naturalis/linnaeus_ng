@@ -1,7 +1,3 @@
-<p id="header-titles-small">
-    <span id="header-title">{$term.term}</span>
-</p>
-
 <div id="page-main">
 	<div class="glossary-filter">
 		{include file="_alphabet.tpl"}

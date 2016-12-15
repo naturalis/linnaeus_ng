@@ -1,9 +1,4 @@
-{include file="../shared/header.tpl"}
-<div id="header-titles-small">
-	<span id="header-title">{t}Index{/t}</span>
-</div>
-
-
+{include file="../shared/header.tpl" title="Index"}
 <div id="page-main">
 	<div class="glossary-filter">
 		<div id="categories">

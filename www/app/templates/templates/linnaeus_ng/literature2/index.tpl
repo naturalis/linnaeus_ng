@@ -1,7 +1,4 @@
-{include file="../shared/header.tpl"}
-<div id="header-titles-small">
-	<span id="header-title">{t}Literature{/t}</span>
-</div>
+{include file="../shared/header.tpl" title="Literature"}
 <div id="page-main">
 	<div class="search-title-or-author">
 		<ul class="tabs tabs-grow literature-tabs-js">

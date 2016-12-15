@@ -1,4 +1,4 @@
-{include file="../shared/header.tpl"}
+{include file="../shared/header.tpl" title="Advanced search"}
 <form id="searchForm" class="advanced-search__form" method="get" action="" onsubmit="return searchDoSearchForm()">	    	
 	<input type="hidden" name="extended" value="1" />
 	<div class="page-generic-div">

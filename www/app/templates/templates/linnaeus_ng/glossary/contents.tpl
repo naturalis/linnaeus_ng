@@ -1,10 +1,4 @@
-{include file="../shared/header.tpl"}
-<div id="header-titles-small">
-	<span id="header-title">
-		{t}Glossary:{/t}<span class="alphabet-letter-title">{$letter}</span>
-	</span>
-</div>
-
+{include file="../shared/header.tpl" title="Glossary: "|cat:$letter}
 
 <div id="page-main">
 	<div class="glossary-filter">

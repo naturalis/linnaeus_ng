@@ -1,11 +1,6 @@
-{include file="../shared/header.tpl"}
+{include file="../shared/header.tpl" title=$taxon.label}
 
 <div id="dialogRidge">
-	<p id="header-titles-small">
-        <span id="header-title" class="set-as-title">
-            {$taxon.label}
-        </span>
-    </p>
 	<div id="content" class="taxon-detail">
     	<div>
         	{if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}

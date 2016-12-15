@@ -1,7 +1,11 @@
-{include file="../shared/header.tpl"}
-<p id="header-titles-small">
-    <span id="header-title">{t}Step{/t} {$step.number}{if $step.number!=$step.title}. {$step.title}{/if}</span>
-</p>
+{if $step.number!=$step.title}
+    {assign "pagetitle" "Step "|cat:$step.number|cat:". "|cat:$step.title}
+{else}
+    {assign "pagetitle" "Step "|cat:$step.number}
+{/if}
+
+{include file="../shared/header.tpl" title=$pagetitle}
+
 <div id="page-main">    
 	<div id="step">
         {if $step.image or ($step.content && $step.content!=$step.title)}
