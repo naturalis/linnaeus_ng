@@ -2,9 +2,6 @@
 	<div class="sidebar__container">
 		{if $categories}
 			<div class="category__container">
-				<div class="category-title responsive-hidden">
-					Passport menu
-				</div>
 		        <ul>
 		            {foreach $categories v k}
 		            <li id="ctb-{$v.id}">

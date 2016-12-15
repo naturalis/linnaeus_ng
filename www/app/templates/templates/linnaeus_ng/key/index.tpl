@@ -23,7 +23,9 @@
                                 <img src="{$v.choice_img}">
                             </div>
                         {/if}
-                    	{$v.choice_txt}
+                        <div>
+                    	   {$v.choice_txt}
+                        </div>
     				</div>
                     {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
                         <div class="target" onclick="window.open('../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}','_self');">

@@ -43,7 +43,7 @@
 				{assign var=w value=taxa}
 			{/if}
 			<p id="header">
-				{t _s1=$remaining|@count _s2=$w}%s possible %s remaining:{/t}<br />
+				{t _s1=$remaining|@count _s2=$w}%s possible %s remaining{/t}<br />
 				<a href="#" class="name_switch" data-type="name_sci" style="display:none" onclick="keyNameswitch(this);return false;";>
 					{t}show scientific names{/t}
 				</a>
@@ -68,7 +68,7 @@
 				{assign var=w value=taxa}
 			{/if}
 			<p id="header">
-				{t _s1=$excluded|@count _s2=$w}%s %s excluded:{/t}<br />
+				{t _s1=$excluded|@count _s2=$w}%s %s excluded{/t}<br />
 				<a href="#" class="name_switch" data-type="name_sci" style="display:none" onclick="keyNameswitch(this);return false;";>
 					{t}show scientific names{/t}
 				</a>
@@ -87,7 +87,8 @@
 			</ul>
 		</div>
 		<div id="decisionPathContainer">
-			
+			<div class="decisionPathHeader">Decision path</div>
+			<div class="decisionpathContent"></div>
 		</div>
 	</div>
 </div>
