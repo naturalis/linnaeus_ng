@@ -60,7 +60,7 @@
         <tr><th>{t}parent{/t}:</th>
             <td>
                 <span id="parent_taxon"><a href="taxon.php?id={$concept.parent.id}">{$concept.parent.taxon}</a></span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Parent');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
                 <input type="hidden" id="parent_taxon_id" value="{$concept.parent.id}" mandatory="mandatory"  label="{t}parent{/t}" droplistminlength="3" />
             </td>
         </tr>
