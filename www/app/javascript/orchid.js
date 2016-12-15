@@ -9,6 +9,16 @@ function renderDecisionPath(title, decisionPath) {
 } 
 
 $(function() {
+	$('body').on('click', '.click-letter', function() {
+		$('.click-letter.alphabet-active-letter').removeClass('alphabet-active-letter');
+		$(this).addClass('alphabet-active-letter');
+	});
+
+	$('body').on('keyup', '#lookup-input-title, #lookup-input-author', function() {
+		console.log('teswddasdasdsa');
+		$('.click-letter.alphabet-active-letter').removeClass('alphabet-active-letter');
+	});
+
 	$(document).click(function(event) { 
         if ($(event.target).parents('.menu__container').length === 0 && 
         	!$(event.target).hasClass('menu-toggle-js')) {
