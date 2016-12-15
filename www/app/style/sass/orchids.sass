@@ -699,4 +699,23 @@ label.checkbox-input
 		width: 100%
 		margin: 0 auto
 
+.language__li
+	display: flex
+	border-bottom: 1px solid #2d2d2d
+	a
+		border-bottom: 0
+		position: relative
+		cursor: pointer
+		text-transform: uppercase
+		&:before
+			content: ""
+			display: block
+			width: 1px
+			background-color: #2d2d2d
+			position: absolute
+			left: 0
+			top: 10px
+			bottom: 10px
+		&:first-child:before
+			display: none
 

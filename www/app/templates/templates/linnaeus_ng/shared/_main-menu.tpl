@@ -18,4 +18,15 @@
             {/if}
         {/if}
     {/foreach}
+    {if $languages|@count>1}
+        <li class="language__li">
+            {foreach $languages v k}
+                {if $v.iso2 != ''}
+                    <a href="#" class="{if $v.language_id==$currentLanguageId}main-menu-selected{/if}" onclick="doLanguageChange({$v.language_id})">
+                        {$v.iso2}
+                    </a>
+                {/if}
+             {/foreach}
+        </li>
+    {/if}
 </ul>

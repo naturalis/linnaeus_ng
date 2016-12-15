@@ -2,7 +2,6 @@
 <div class="site__container">
 	<div class="menu__container menu__container-js">
 		<object class="logo-svg" data="{$baseUrl}app/style/img/naturalis-logo-wit.svg" type="image/svg+xml">
-		 <!--  <img src="yourfallback.jpg" /> -->
 		</object>
 		{if $customTemplatePaths.main_menu}
 		    {include file=$customTemplatePaths.main_menu}
