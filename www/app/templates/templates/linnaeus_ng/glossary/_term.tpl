@@ -34,8 +34,7 @@
 				>
 					{if $v.rs_id == ''}
 						<a
-						rel="prettyPhoto[gallery]"
-						class="image-wrap "
+						class="image-wrap fancy-box"
 						title="{$v.file_name}"
 						href="{$smarty.capture.fullImgUrl}"
 						alt="{$v.description}"
@@ -73,7 +72,7 @@
 						</a>
 					{else}
 						{if $v.category == 'image'}
-							<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" rel="prettyPhoto">
+							<a href="{$smarty.capture.fullImgUrl}" class="fancy-box" title="{$v.file_name}">
 								<img src="{$smarty.capture.fullImgUrl}" alt="{$v.original_name}" id="media-{$k}" class="image-full" />
 							</a>
 							{$name}

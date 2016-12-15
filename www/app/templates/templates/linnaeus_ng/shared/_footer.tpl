@@ -39,20 +39,25 @@
 $(document).ready(function()
 {
 	// Apply prettyDialog behaviour to items with inline-image class
-	$(".inline-image").each(function()
-	{
-		$_me = $(this);
-
-		$_me.attr("rel","prettyDialog");
-
-		arr_arguments = $_me.attr("onclick").split("'");
-
-		$_me
-			.attr("href",arr_arguments[1])
-			.attr("title",arr_arguments[3])
-			.removeAttr('onclick')
-			.prettyDialog();
+	$('.fancy-box').fancybox({
+		nextClick: true
 	});
+	// $(".inline-image").each(function()
+	// {
+
+
+	// 	$_me = $(this);
+
+	// 	$_me.attr("rel","prettyDialog");
+
+	// 	arr_arguments = $_me.attr("onclick").split("'");
+
+	// 	$_me
+	// 		.attr("href",arr_arguments[1])
+	// 		.attr("title",arr_arguments[3])
+	// 		.removeAttr('onclick')
+	// 		.prettyDialog();
+	// });
 
 	// Rewrite showMedia to showVideo for videos
 	$(".inline-video").each(function()

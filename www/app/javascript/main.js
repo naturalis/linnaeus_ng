@@ -159,7 +159,14 @@ function getCurrentProjectId()
 
 
 function showMedia(url,name) {
-	$.prettyPhoto.open(url,'',name);
+	// $.prettyPhoto.open(url,'',name);
+
+	$.fancybox.open([
+		{
+			href : url,
+			title : name
+		}
+	]);
 }
 
 function showVideo(url,name) {
