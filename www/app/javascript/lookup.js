@@ -1,9 +1,9 @@
 /*
 
 	add:
-	
+
 	<input type="text" id="allLookupBox" onkeyup="allLookup()" />
-	
+
 	to the script, and create a data retrieval function in the appropriate class file, accessible through ajax.
 	expected format of returned data:
 
@@ -15,10 +15,10 @@
 					'id' => id of item,
 					'label' => 'text to display',
 					'source' => 'data source (optional)'
-				)				   
+				)
 			)
 		);
-	
+
 	(the droplist div is in the footer file: <div id="allLookupList" class="allLookupListInvisible"></div>)
 
 	deault max for a list is 100 items; set "allLookupSetListMax(n);" in the page-ready section to change (with 0 = no limit)
@@ -28,8 +28,8 @@
 var allLookupDialogTitle = 'Contents';
 var allLookupActiveRow = false;
 var allLookupRowCount = 0;
-var allLookupListName = 'allLookupList'; 
-var allLookupBoxName = 'allLookupBox'; 
+var allLookupListName = 'allLookupList';
+var allLookupBoxName = 'allLookupBox';
 var allLookupTargetUrl = false;
 var allLookupData = null;
 var allLookupLastString = null;
@@ -83,14 +83,14 @@ function allLookupGetData(text,getAll)
 
 			}
 		});
-		
-	} 
+
+	}
 	else
 	{
 		// used fetched data
 		if (allLookupData && allLookupData.results)
 		{
-			
+
 			if (allLookupMatchStartOnly)
 			{
 				//var regExp = '/^'+addSlashes(text)+'/ig';
@@ -100,8 +100,8 @@ function allLookupGetData(text,getAll)
 			{
 				var regExp = '/'+addSlashes(text)+'/ig';
 			}
-		
-			
+
+
 			//var d = eval (allLookupData.toSource());
 			var d = jQuery.extend(true, {}, allLookupData);
 			r = new Array();
@@ -109,7 +109,7 @@ function allLookupGetData(text,getAll)
 			for(var i=0;i<allLookupData.results.length;i++)
 			{
 				var stripped = stripTags(allLookupData.results[i].label) || '';
-				
+
 				if (getAll || stripped.match(eval(regExp)))
 				{
 					r[r.length] = allLookupData.results[i]
@@ -119,7 +119,7 @@ function allLookupGetData(text,getAll)
 			d.results = r;
 
 		}
-	
+
 		allLookupBuildList(d,text);
 
 	}
@@ -131,13 +131,13 @@ function allLookupGetData(text,getAll)
 function allLookupPostProcessing(text,data,getAll) {
 
 	/*
-		the 'match start of word only' option was added later, and required restructuring 
+		the 'match start of word only' option was added later, and required restructuring
 		of the corresponding lookup functions in the controller classes. in LinnaeusController
-		and GlossaryController, the required alterations were too extensive. its output was 
-		therefore left unchanged and is filtered here to meet the requirements of the 
+		and GlossaryController, the required alterations were too extensive. its output was
+		therefore left unchanged and is filtered here to meet the requirements of the
 		allLookupMatchStartOnly setting.
 	*/
-	
+
 	if (allLookupMatchStartOnly  && !getAll)
 	{
 
@@ -151,18 +151,18 @@ function allLookupPostProcessing(text,data,getAll) {
 		if (data.results)
 		{
 			for(var i=0;i<data.results.length;i++) {
-				
+
 				if (data.results[i].label.match(eval(regExp))) {
-					
+
 					r[r.length] = data.results[i]
-					
+
 				}
-	
+
 			}
 		}
 
 		d.results = r;
-		
+
 		return d;
 
 	}
@@ -206,14 +206,14 @@ function allLookup() {
 	var text = $('#'+allLookupBoxName).val();
 
 	if (text == allLookupLastString) return;
-	
+
 	if (allLookupGetData(text)) {
 		allLookupPositionDiv();
 		allLookupShowDiv();
 	}
 
 	allLookupLastString = text;
-	
+
 }
 
 function allLookupSetExtraVar(variable)
@@ -222,11 +222,11 @@ function allLookupSetExtraVar(variable)
 	allLookupExtraVars.push(variable);
 }
 
-var lookupDialogItemDefTpl= '<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%"><span class="italics" style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span></p>';
+var lookupDialogItemDefTpl= '<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%"><span style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span></p>';
 
 function allLookupBuildList(obj,txt)
 {
-	
+
 	//fetchTemplate( 'noResultHtmlTpl' ).replace('%MESSAGE%',__('Geen resultaten.')));
 
 	var tpl=fetchTemplate( 'lookupDialogItem' );
@@ -236,7 +236,7 @@ function allLookupBuildList(obj,txt)
 	}
 
 	allLookupRowCount = 0;
-	
+
 	allLookupClearDiv();
 	allLookupClearDialogDiv();
 
@@ -247,14 +247,14 @@ function allLookupBuildList(obj,txt)
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
 
 		for(var i=0;i<obj.results.length;i++) {
-			
+
 			var d = obj.results[i];
 
 			if ((d.id || d.url) && d.label) {
 
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
-				textToAppend[i] = 
+				textToAppend[i] =
 					tpl
 						.replace('%COUNTER%', i)
 						.replace('%ROW-CLASS%', (allLookupIndicateSelectedId && allLookupSelectedId==d.id ? ' allLookupListCellSelected' : '' ))
@@ -269,7 +269,7 @@ function allLookupBuildList(obj,txt)
 			}
 
 		}
-		
+
 		$('#'+allLookupDialogContentName).append(textToAppend.join(''));
 
 	}
@@ -293,7 +293,7 @@ function allLookupClearDialogDiv() {
 	$('#'+allLookupDialogContentName).empty();
 
 }
-	
+
 
 function allLookupPositionDiv() {
 
@@ -318,7 +318,7 @@ function allLookupHideDiv() {
 }
 
 function allLookupGoActiveRow() {
-	
+
 	$('#allLookupListCell-'+allLookupActiveRow).trigger('click');
 
 }
@@ -348,7 +348,7 @@ function allLookupMoveDown() {
 }
 
 function allLookupHighlightRow(clearall) {
-	
+
 	for(var i=0;i<allLookupRowCount;i++) {
 
 		if (i==allLookupActiveRow && clearall!=true) {
@@ -437,13 +437,13 @@ function allLookupShowDialog(predefJSON)
 	);
 
 	allLookupBindDialogKeyUp();
-	
+
 	if (predefJSON)
 	{
 		var tmp = $.parseJSON(predefJSON);
 		allLookupData = allLookupPostProcessing('',tmp,true);
 		allLookupGetData('',true);
-	} 
+	}
 	else
 	{
 		allLookupGetData('*',true);
@@ -464,7 +464,7 @@ function allLookupScrollToSelectedId()
 	{
 		var diff = $('#'+allLookupSelectedElement).offset().top - $('#lookup-DialogContent').offset().top;
 		$('#lookup-DialogContent').animate({scrollTop: diff},100);
-	} 
+	}
 	catch(e) {
 		null;
 	}

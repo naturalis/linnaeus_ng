@@ -71,15 +71,15 @@
 			{include file="../species/_tab_dich_key_links.tpl"}
 
 		{elseif $ext_template}
-		
+
 			{include file=$ext_template}
 
 		{elseif $external_content && $external_content->template}
-        
+
 			{include file="../species/`$external_content->template`"}
 
 		{elseif $external_content}
-        
+
 			{include file='_webservice.tpl'}
 
 		{else}
@@ -163,7 +163,7 @@ $(document).ready(function()
 
 <div class="inline-templates" id="lookupDialogItem">
 	<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%">
-    	<span class="italics" style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span>
+    	<span style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span>
 	</p>
 </div>
 
