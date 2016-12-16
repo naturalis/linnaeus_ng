@@ -43,15 +43,6 @@ $(document).ready(function()
 		nextClick: true
 	});
 
-	$('.fancy-box').each(function(){
-		console.log('te vroeg?');
-		var hrefAttr = $(this).attr('href');
-		if (hrefAttr.indexOf("#") >= 0) {
-			result = hrefAttr.split("#");
-			$(this).attr('href', "#"+result[1]);
-		}
-	});
-
 	$(".inline-video").each(function()
 	{
 		$_me = $(this);

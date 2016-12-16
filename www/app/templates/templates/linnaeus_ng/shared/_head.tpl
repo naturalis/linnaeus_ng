@@ -45,7 +45,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/jquery.fancybox.pack.js"></script>
-    <script type="text/javascript" src="{$baseUrl}app/javascript/orchid.js"></script>
+
 
 {if $javascriptsToLoad}
 {foreach $javascriptsToLoad.all v}
@@ -59,5 +59,5 @@
 	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script><![endif]-->
 {/foreach}
 {/if}
-
+	<script type="text/javascript" src="{$baseUrl}app/javascript/orchid.js"></script>
 </head>

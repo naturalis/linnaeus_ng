@@ -9,6 +9,15 @@ function renderDecisionPath(title, decisionPath) {
 } 
 
 $(function() {
+	$('.fancy-box').each(function(){
+		console.log('nu niet meer?');
+		var hrefAttr = $(this).attr('href');
+		if (hrefAttr.indexOf("#") >= 0) {
+			result = hrefAttr.split("#");
+			$(this).attr('href', "#"+result[1]);
+		}
+	});
+
 	$('body').on('click', '.click-letter', function() {
 		$('.click-letter.alphabet-active-letter').removeClass('alphabet-active-letter');
 		$(this).addClass('alphabet-active-letter');
