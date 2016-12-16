@@ -9,15 +9,6 @@ function renderDecisionPath(title, decisionPath) {
 } 
 
 $(function() {
-	// $('.fancy-box').each(function(){
-	// 	console.log('nu niet meer?');
-	// 	var hrefAttr = $(this).attr('href');
-	// 	if (hrefAttr.indexOf("#") >= 0) {
-	// 		result = hrefAttr.split("#");
-	// 		$(this).attr('href', "#"+result[1]);
-	// 	}
-	// });
-
 	$('body').on('click', '.fancy-box-video', function(e) {
 		e.preventDefault();
 		console.log('deze wel?');
@@ -35,7 +26,6 @@ $(function() {
 	});
 
 	$('body').on('keyup', '#lookup-input-title, #lookup-input-author', function() {
-		console.log('teswddasdasdsa');
 		$('.click-letter.alphabet-active-letter').removeClass('alphabet-active-letter');
 	});
 
