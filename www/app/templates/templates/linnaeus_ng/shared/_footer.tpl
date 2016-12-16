@@ -44,30 +44,14 @@ $(document).ready(function()
 	});
 
 	$('.fancy-box').each(function(){
+		console.log('te vroeg?');
 		var hrefAttr = $(this).attr('href');
 		if (hrefAttr.indexOf("#") >= 0) {
 			result = hrefAttr.split("#");
 			$(this).attr('href', "#"+result[1]);
 		}
 	});
-	// $(".inline-image").each(function()
-	// {
 
-
-	// 	$_me = $(this);
-
-	// 	$_me.attr("rel","prettyDialog");
-
-	// 	arr_arguments = $_me.attr("onclick").split("'");
-
-	// 	$_me
-	// 		.attr("href",arr_arguments[1])
-	// 		.attr("title",arr_arguments[3])
-	// 		.removeAttr('onclick')
-	// 		.prettyDialog();
-	// });
-
-	// Rewrite showMedia to showVideo for videos
 	$(".inline-video").each(function()
 	{
 		$_me = $(this);
