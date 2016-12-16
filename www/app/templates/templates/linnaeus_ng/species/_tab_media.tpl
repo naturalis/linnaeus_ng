@@ -27,6 +27,7 @@
 					href="{$smarty.capture.fullImgUrl}"
 					alt="{$v.description}">
 					{if $v.category=='image'}
+						-if-
 						<div>
 							<img
 								id    = "media-{$k}"
@@ -36,6 +37,7 @@
 								class = "image-full" />
 						</div>
 					{elseif $v.category=='video'}
+						-elseif1-
 						<img
 							id="media-{$k}"
 							alt="{$v.description}"
@@ -44,6 +46,7 @@
 							onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 							class="media-video-icon" />
 					{elseif $v.category=='audio'}
+						-elseif2-
 						<object
 							id="media-{$k}"
 							alt="{$v.description}"
@@ -59,17 +62,20 @@
 					</a>
 				{else}
 					{if $v.category == 'image'}
+						-else if1-
 						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" class="fancy-box" alt="{$v.description}">
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
+						-else elseif2-
 						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
 							{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
 							<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
 						</{$v.category}><br>
 						{$name}
 					{else}
+						-else else1-
 						<a href="{$smarty.capture.fullImgUrl}">
 						<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 						{$name}
