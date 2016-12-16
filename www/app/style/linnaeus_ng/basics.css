@@ -2087,14 +2087,12 @@ b, .title {
 .alphabet-active-letter {
   text-align: center;
   font-size: 18px;
-  font-weight: 300;
   border-bottom: 1px solid #f9f9f7;
   text-transform: uppercase; }
 
 .alphabet-letter {
   color: #009ee0;
   cursor: pointer;
-  transition: color 200ms;
   text-transform: uppercase; }
   .alphabet-letter:hover {
     color: #e3004a; }

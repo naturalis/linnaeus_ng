@@ -39,7 +39,7 @@
 
                     {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
                         {if $v.target_number}
-                            <span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}: {$v.target}{/if}</span>
+                            <span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}. {$v.target}{/if}</span>
                         {/if}
                     {elseif $v.res_taxon_id!=''}
                         <span>{$v.target}</span>
