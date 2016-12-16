@@ -10,8 +10,6 @@ function renderDecisionPath(title, decisionPath) {
 
 $(function() {
 	$('body').on('click', '.fancy-box-video', function() {
-		
-		console.log('deze wel?');
 		var hrefAttr = $(this).attr('href');
 		if (hrefAttr.indexOf("#") >= 0) {
 			result = hrefAttr.split("#");

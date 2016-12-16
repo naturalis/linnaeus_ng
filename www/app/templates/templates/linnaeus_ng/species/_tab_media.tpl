@@ -63,7 +63,7 @@
 						</a><br/>
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
-						<a href="#inline-media-{$k}" class="fancy-box fancy-box-video">Video</a>
+						<a href="#inline-media-{$k}" class="fancy-box fancy-box-video"><i class="ion-ios-videocam"></i></a>
 						<div id="inline-media-{$k}" style="display: none;">
 							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
 								{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
