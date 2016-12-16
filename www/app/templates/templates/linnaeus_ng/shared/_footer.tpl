@@ -44,8 +44,11 @@ $(document).ready(function()
 	});
 
 	$('.fancy-box').each(function(){
-		console.log($(this).attr('href'));
-		
+		var hrefAttr = $(this).attr('href');
+		if (hrefAttr.indexOf("#") >= 0) {
+			result = hrefAttr.split("#");
+			$(this).attr('href', "#"+result[1]);
+		}
 	});
 	// $(".inline-image").each(function()
 	// {
