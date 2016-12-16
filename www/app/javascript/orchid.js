@@ -9,13 +9,24 @@ function renderDecisionPath(title, decisionPath) {
 } 
 
 $(function() {
-	$('.fancy-box').each(function(){
-		console.log('nu niet meer?');
+	// $('.fancy-box').each(function(){
+	// 	console.log('nu niet meer?');
+	// 	var hrefAttr = $(this).attr('href');
+	// 	if (hrefAttr.indexOf("#") >= 0) {
+	// 		result = hrefAttr.split("#");
+	// 		$(this).attr('href', "#"+result[1]);
+	// 	}
+	// });
+
+	$('body').on('click', '.fancy-box-video', function(e) {
+		e.preventDefault();
+		console.log('deze wel?');
 		var hrefAttr = $(this).attr('href');
 		if (hrefAttr.indexOf("#") >= 0) {
 			result = hrefAttr.split("#");
 			$(this).attr('href', "#"+result[1]);
 		}
+		$(this).trigger('click');
 	});
 
 	$('body').on('click', '.click-letter', function() {
