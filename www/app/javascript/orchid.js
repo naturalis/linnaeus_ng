@@ -9,15 +9,14 @@ function renderDecisionPath(title, decisionPath) {
 } 
 
 $(function() {
-	$('body').on('click', '.fancy-box-video', function(e) {
-		e.preventDefault();
+	$('body').on('click', '.fancy-box-video', function() {
+		
 		console.log('deze wel?');
 		var hrefAttr = $(this).attr('href');
 		if (hrefAttr.indexOf("#") >= 0) {
 			result = hrefAttr.split("#");
 			$(this).attr('href', "#"+result[1]);
 		}
-		$(this).trigger('click');
 	});
 
 	$('body').on('click', '.click-letter', function() {
