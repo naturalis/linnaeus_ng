@@ -68,7 +68,7 @@
 						</a><br/>
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
-						-else elseif2-
+						--else elseif2--
 						<a href="#inline-media-{$k}" class="fancy-box">video test</a>
 						<div id="inline-media-{$k}" style="display: none;">
 							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
@@ -77,7 +77,6 @@
 							</{$v.category}><br>
 							{$name}
 						</div>
-						
 					{else}
 						-else else1-
 						<a href="{$smarty.capture.fullImgUrl}">
