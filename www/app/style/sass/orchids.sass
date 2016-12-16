@@ -54,6 +54,7 @@ body
 .scroll__container
 	display: block
 	z-index: 10
+	flex-grow: 1
 	// overflow-y: scroll
 	@media screen and (max-width: 994px)
 		-webkit-overflow-scrolling: touch
@@ -138,7 +139,7 @@ body
 	background-color: transparent
 	flex-grow: 1
 	width: 100%
-	min-height: unset
+	min-height: calc(100vh - 150px)
 	@media screen and (max-width: 800px)
 		padding: 0px
 
