@@ -42,6 +42,11 @@ $(document).ready(function()
 	$('.fancy-box').fancybox({
 		nextClick: true
 	});
+
+	$('.fancy-box').each(function(){
+		console.log($(this).attr('href'));
+		
+	});
 	// $(".inline-image").each(function()
 	// {
 
