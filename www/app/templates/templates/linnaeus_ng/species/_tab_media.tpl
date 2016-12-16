@@ -69,11 +69,12 @@
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
 						-else elseif2-
-						<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
+						<a href="{$smarty.capture.fullImgUrl}" class="fancy-box">video test</a>
+						<!-- <{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
 							{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
 							<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
 						</{$v.category}><br>
-						{$name}
+						{$name} -->
 					{else}
 						-else else1-
 						<a href="{$smarty.capture.fullImgUrl}">
