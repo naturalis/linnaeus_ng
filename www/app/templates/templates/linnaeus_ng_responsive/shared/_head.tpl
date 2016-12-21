@@ -65,10 +65,6 @@
         <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7.css" />
     <![endif]-->
 
-    <!--[if IE]>
-        <link rel="stylesheet" type="text/css" href="../../../app/style/css/soortenregister-ie.css" />
-    <![endif]-->
-
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
