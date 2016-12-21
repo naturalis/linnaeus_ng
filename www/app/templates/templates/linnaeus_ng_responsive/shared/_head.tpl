@@ -66,7 +66,7 @@
     <![endif]-->
 
     <!--[if IE]>
-        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}soortenregister-ie.css" />
+        <link rel="stylesheet" type="text/css" href="../../../app/style/css/soortenregister-ie.css" />
     <![endif]-->
 
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
