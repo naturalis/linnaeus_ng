@@ -1,4 +1,5 @@
 {assign var=widthInCells value=5}
+test
 <div class="media-grid__container">
 	<div id="media-grid">
 		{assign var=mediaCat value=false}
