@@ -1,5 +1,4 @@
 {assign var=widthInCells value=5}
-test
 <div class="media-grid__container">
 	<div id="media-grid">
 		{assign var=mediaCat value=false}
@@ -20,6 +19,7 @@ test
 
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
 				{if $v.rs_id == ''}
+					IF1
 					<a
 					rel="prettyPhoto[gallery]"
 					class="image-wrap "
@@ -27,6 +27,7 @@ test
 					href="{$smarty.capture.fullImgUrl}"
 					alt="{$v.description}">
 					{if $v.category=='image'}
+						IF2
 						<div>
 							<img
 								id    = "media-{$k}"
@@ -36,6 +37,7 @@ test
 								class = "image-full" />
 						</div>
 					{elseif $v.category=='video'}
+						ELSEIF2
 						<img
 							id="media-{$k}"
 							alt="{$v.description}"
@@ -44,6 +46,7 @@ test
 							onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 							class="media-video-icon" />
 					{elseif $v.category=='audio'}
+						ELSEIF2.1
 						<object
 							id="media-{$k}"
 							alt="{$v.description}"
@@ -58,12 +61,14 @@ test
 					{/if}
 					</a>
 				{else}
+					ELSE1
 					{if $v.category == 'image'}
 						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" class="fancy-box" alt="{$v.description}">
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
+						ELSEIF3
 						<a href="#inline-media-{$k}" class="fancy-box fancy-box-video"><i class="ion-ios-videocam"></i></a>
 						<div id="inline-media-{$k}" style="display: none;">
 							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
@@ -73,6 +78,7 @@ test
 							{$name}
 						</div>
 					{else}
+						ELSEIF4
 						<a href="{$smarty.capture.fullImgUrl}">
 						<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 						{$name}
