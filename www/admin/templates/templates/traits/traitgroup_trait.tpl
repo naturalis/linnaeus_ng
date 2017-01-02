@@ -5,9 +5,9 @@
 	<p>
         <h3>
         {if $trait}
-        {t _s1=$group.name _s2=$trait.sysname}%s: %s{/t}
+        {t _s1=$group.sysname _s2=$trait.sysname}%s: %s{/t}
         {else}
-        {t _s1=$group.name}%s: new trait{/t}
+        {t _s1=$group.sysname}%s: new trait{/t}
         {/if}
     </h3>
 
@@ -168,9 +168,11 @@
     </form>
     </p>
     <p>
-    	<input type="button" value="save" onclick="checkAndSaveForm();" />
+    	{if !$cantSave}
+	    <input type="button" value="save" onclick="checkAndSaveForm();" />
+    	{/if}
         
-	{if $trait}&nbsp;<input type="button" value="delete" onclick='deleteItem( sprintf( _("There are %s taxa that have a value for this trait.\nAre you sure you want to remove it?"), {$trait.freevalue_total_count}) );' />{/if}
+		{if $trait}&nbsp;<input type="button" value="delete" onclick='deleteItem( sprintf( _("There are %s taxa that have a value for this trait.\nAre you sure you want to remove it?"), {$trait.freevalue_total_count}) );' />{/if}
 
     </p>
     <p>
