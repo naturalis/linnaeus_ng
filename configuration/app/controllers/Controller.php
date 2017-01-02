@@ -209,10 +209,10 @@ class Controller extends BaseClass
         $this->loadSmartyConfig();
         $this->checkWriteableDirectories();
 		$this->setRankIdConstants();
-		$this->setNameTypeIds();
         $this->setRequestData();
 		$this->checkForProjectId();
         $this->checkGlobalAuthorization();
+		$this->setNameTypeIds();
         $this->startModuleSession();
         $this->restoreState();
         $this->setProjectLanguages();
