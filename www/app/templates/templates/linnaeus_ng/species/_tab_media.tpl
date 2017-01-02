@@ -80,8 +80,8 @@
 					{else}
 						ELSEIF4
 						<a href="{$smarty.capture.fullImgUrl}">
-						<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
-						{$name}
+							<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
+							{$name}
 						</a>
 					{/if}
 				{/if}
