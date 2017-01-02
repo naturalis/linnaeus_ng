@@ -23,7 +23,6 @@
 						<input type="text" id="lookupDialogInput" placeholder="Filter content...">
 						<div id="lookup-DialogContent"></div>
 					</div>
-					
 				</div>
 			{/if}
 		</div>	

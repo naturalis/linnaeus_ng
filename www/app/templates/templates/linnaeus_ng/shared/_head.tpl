@@ -16,7 +16,6 @@
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
 {if $cssToLoad}
 {foreach $cssToLoad v}
-	<!-- css to load -->
 	<link rel="stylesheet" type="text/css" media="screen" href="{$v}" />
 {/foreach}
 {/if}

@@ -20,7 +20,6 @@
 				{else}
 					{include file="../species/_tab_media.tpl"}
 				{/if}
-
 			{elseif $activeCategory.tabname=='CTAB_NAMES' || $activeCategory.tabname=='TAB_NAAMGEVING'}
 				{include file="../species/_tab_naamgeving.tpl"}
 			{elseif $activeCategory.tabname=='CTAB_LITERATURE'}
