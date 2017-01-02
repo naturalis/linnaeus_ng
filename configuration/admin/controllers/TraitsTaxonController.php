@@ -61,13 +61,18 @@ class TraitsTaxonController extends TraitsController
 		$this->checkAuthorisation();
 		$this->setPageName( $this->translate('Taxon trait data') );
 
-		//$this->isFormResubmit()
-		//q( $this->requestData );
-		
-		if ($this->rHasVal('action','deleteall'))
+		if ($this->rHasVal('action','deletegroup') && $this->rHasVal('id') && $this->rHasVal('group'))
 		{
 			$this->deleteTaxonTraitData(array('taxon'=>$this->rGetVal( 'id' ),'group'=>$this->rGetVal( 'group' )));
 			$this->deleteReferences(array('taxon'=>$this->rGetVal( 'id' ),'group'=>$this->rGetVal( 'group' )));
+			$this->addMessage('Deleted');
+		} 
+		else
+		if ($this->rHasVal('action','deleteall') && $this->rHasVal('id'))
+		{
+			// not actually implemented
+			$this->deleteTaxonTraitData(array('taxon'=>$this->rGetVal( 'id' )));
+			$this->deleteReferences(array('taxon'=>$this->rGetVal( 'id' )));
 			$this->addMessage('Deleted');
 		} 
 		else
@@ -158,6 +163,7 @@ class TraitsTaxonController extends TraitsController
 	{
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
+		$group=isset($p['group']) ? $p['group'] : null;
 
 		$language=$this->getDefaultProjectLanguage();
 
@@ -172,7 +178,8 @@ class TraitsTaxonController extends TraitsController
 			'language_id'=>$language,
 			'project_id'=>$this->getCurrentProjectId(),
 			'taxon_id'=>$taxon,
-			'trait_id'=>$trait
+			'trait_id'=>$trait,
+			'group_id'=>$group
 		));
 	
 		$d=array();
@@ -473,7 +480,7 @@ class TraitsTaxonController extends TraitsController
 		}
 
 		$data = $this->getTaxonValues(array('taxon'=>$taxon,'group'=>$group));
-		
+
 		foreach((array)$data as $trait)
 		{
 			foreach((array)$trait['values'] as $val)

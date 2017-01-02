@@ -23,7 +23,6 @@ li.values:hover {
 
 </style>
 
-
 <div id="page-main">
 
 {if !$concept || !$group}
@@ -103,8 +102,8 @@ li.values:hover {
     </p>
 
     <p>
-	    <a href="#" style="margin-left:0" class="edit" onclick="taxonTraits.deleteTraitsReferences();return false;">delete all traits and references</a><br />
-	    <a href="../nsr/taxon.php?id={$concept.id}"  style="margin-left:0" class="edit">naar taxonconceptkaart</a>
+	    <a href="#" style="margin-left:0" class="edit" onclick="taxonTraits.deleteTraitsReferencesByGroup();return false;">delete traits and references for this taxon and trait group</a><br />
+	    <a href="../nsr/taxon.php?id={$concept.id}"  style="margin-left:0" class="edit">to taxon concept</a>
     </p>
 
 {/if}
@@ -163,6 +162,7 @@ $(document).ready(function()
 {
 	taxonTraits.setConcept( {$concept.id} );
 	taxonTraits.setGroup( {$group.id} );
+	taxonTraits.setGroupLabel( '{$group.sysname|@escape}' );
 
 	$('a.values').each(function()
 	{

@@ -363,6 +363,7 @@ taxonTraits.can_have_range=true;
 taxonTraits.date_format=null;
 taxonTraits.concept=null;
 taxonTraits.group=null;
+taxonTraits.groupLabel=null;
 taxonTraits.trait=null;
 taxonTraits.traittype=null;
 taxonTraits.traitname=null;
@@ -401,6 +402,11 @@ taxonTraits.setConcept=function( id )
 taxonTraits.setGroup=function( id )
 {
 	taxonTraits.group=id;
+}
+
+taxonTraits.setGroupLabel=function( label )
+{
+	taxonTraits.groupLabel=label;
 }
 
 taxonTraits.setTrait=function( id )
@@ -856,11 +862,25 @@ taxonTraits.saveReferences=function()
 
 }
 
+taxonTraits.deleteTraitsReferencesByGroup=function(group)
+{
+	if (!taxonTraits.concept || !taxonTraits.group) return;
+	
+	if (!confirm(sprintf(_('Delete all traits and references for trait group %s?'),taxonTraits.groupLabel))) return;
+
+	var form=$('<form method="post"></form>').appendTo('body');
+	form.append('<input type="hidden" name="action" value="deletegroup" />');
+	form.append( '<input type="hidden" name="id" value="'+taxonTraits.concept+'" />' );
+	form.append( '<input type="hidden" name="group" value="'+taxonTraits.group+'" />' );
+	form.submit();
+}
+
 taxonTraits.deleteTraitsReferences=function()
 {
 	if (!confirm(_('Delete all traits and references?'))) return;
 
 	var form=$('<form method="post"></form>').appendTo('body');
+	form.append( '<input type="hidden" name="id" value="'+taxonTraits.concept+'" />' );
 	form.append('<input type="hidden" name="action" value="deleteall" />');
 	form.submit();
 }

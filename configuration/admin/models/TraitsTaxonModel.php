@@ -89,6 +89,7 @@ final class TraitsTaxonModel extends AbstractModel
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
 		$taxon_id=isset($params['taxon_id']) ? $params['taxon_id'] : null;
 		$trait_id=isset($params['trait_id']) ? $params['trait_id'] : null;
+		$group_id=isset($params['group_id']) ? $params['group_id'] : null;
 
 		if ( is_null($project_id) || is_null($language_id) || is_null($taxon_id) )
 			return;
@@ -126,7 +127,8 @@ final class TraitsTaxonModel extends AbstractModel
 					
 					_c.show_order as _show_order_1,
 					_b.show_order as _show_order_2,
-					'fixed' as type
+					'fixed' as type,
+					_c.trait_group_id
 			
 				from
 					%PRE%traits_taxon_values _a
@@ -204,7 +206,8 @@ final class TraitsTaxonModel extends AbstractModel
 			
 					_c.show_order as _show_order_1,
 					null as _show_order_2,
-					'free' as type
+					'free' as type,
+					_c.trait_group_id
 					
 				from
 					%PRE%traits_taxon_freevalues _a
@@ -244,7 +247,10 @@ final class TraitsTaxonModel extends AbstractModel
 					and _a.taxon_id=".$taxon_id."
 			
 			) as unionized
+		
+			".( $group_id ? "where trait_group_id =".$group_id : "" )."
 			".( $trait_id ? "where trait_id =".$trait_id : "" )."
+
 			order by _show_order_1,_show_order_2
 		";
 		
