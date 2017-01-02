@@ -23,6 +23,9 @@ th {
 .image-warning {
 	color:#F60;
 }
+.image-uncertain {
+	color:#F3C;
+}
 .meta-data-unassigned {
 	color:#999;
 }
@@ -73,7 +76,8 @@ th {
 			</span>
             <textarea name="raw" style="width:100%;height:200px;font-size:0.8em;overflow:scroll">{$raw}</textarea>
             <p>
-            <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label>
+            <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label><br />
+            <label><input type="checkbox" value="1" name="no_image_exist_check" {if $no_image_exist_check===false}{else}checked="checked"{/if}/>do not check file's existence (improves performance)</label>
             </p>
             <p>
             <input type="submit" value="parse" />
@@ -174,8 +178,15 @@ th {
 					{assign var=class value="nsr-id-ok"}
 					{assign var=message value=$matches.taxa[$lsk].taxon}
                 {elseif $lk==$col_file_name && !$matches.files[$lsk].exists}
-					{assign var=class value="image-warning"}
-					{assign var=message value="image not found at\n%s\nline will be saved nonetheless. be sure to upload the image later!"}
+
+                    {if $no_image_exist_check===false}
+                        {assign var=class value="image-warning"}
+                        {assign var=message value="image not found at\n%s\nline will be saved nonetheless. be sure to upload the image later!"}
+                    {else}
+						{assign var=class value="image-uncertain"}
+                        {assign var=message value="didn't check the existence of:\n%s\nline will be saved nonetheless."}
+                    {/if}
+                
                 {elseif $lk==$col_file_name}
 					{assign var=class value="nsr-id-ok"}
 					{assign var=message value="image present at\n%s"}
@@ -195,7 +206,7 @@ th {
 					{assign var=class value="$class meta-data-format-error"}
                     {assign var=message value="format error; field will not be saved"}
                 {/if }
-
+                
             	<td class="{$class}" title="{$message|@sprintf:$matches.files[$lsk].url}">
                 	{$l}
 				</td>

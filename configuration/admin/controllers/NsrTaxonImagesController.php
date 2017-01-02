@@ -137,6 +137,7 @@ class NsrTaxonImagesController extends NsrController
 
 		$raw=null;
 		$ignorefirst=false;
+		$no_image_exist_check=true;
 		$lines=null;
 		$emptycols=null;
 		$fields=null;
@@ -146,6 +147,9 @@ class NsrTaxonImagesController extends NsrController
 
 		$ignorefirst=$this->rHasVal('ignorefirst','1');
 		$this->setSessionVar('ignorefirst',$ignorefirst);
+
+		$no_image_exist_check=$this->rHasVal('no_image_exist_check','1');
+		$this->setSessionVar('no_image_exist_check',$no_image_exist_check);
 
 		if ($this->rHasVal('fields'))
 		{
@@ -243,7 +247,7 @@ class NsrTaxonImagesController extends NsrController
 				$assignedMetaFields>0
 			)
 			{
-				$matches=$this->matchNsrIdsAndCheckImgExistence(array('lines'=>$lines,'ignorefirst'=>$ignorefirst));
+				$matches=$this->matchNsrIdsAndCheckImgExistence(array('lines'=>$lines,'ignorefirst'=>$ignorefirst,'no_image_exist_check'=>$no_image_exist_check));
 				$this->setSessionVar('matches',$matches);
 
 				$checks=$this->fieldFormatChecks(array('lines'=>$lines,'fields'=>$fields,'ignorefirst'=>$ignorefirst));
@@ -260,6 +264,7 @@ class NsrTaxonImagesController extends NsrController
 		$this->smarty->assign('cols',$this->availableMetaDataFields);
 		$this->smarty->assign('raw',$raw);
 		$this->smarty->assign('ignorefirst',$ignorefirst);
+		$this->smarty->assign('no_image_exist_check',$no_image_exist_check);
 		$this->smarty->assign('firstline',$firstline);
 		$this->smarty->assign('lines',$lines);
 
@@ -295,8 +300,9 @@ class NsrTaxonImagesController extends NsrController
 		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
-		$this->smarty->assign( 'taxon_main_image_base_url',$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') ) );
-		$this->smarty->assign( 'taxon_thumb_image_base_url',$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'http://images.naturalis.nl/160x100/') ) );
+		$this->taxon_main_image_base_url=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
+		$this->smarty->assign( 'taxon_main_image_base_url', $this->taxon_main_image_base_url );
+		$this->smarty->assign( 'taxon_thumb_image_base_url', $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'http://images.naturalis.nl/160x100/') ) );
 	}
 
     private function getTaxonMedia( $p=null )
@@ -658,20 +664,20 @@ class NsrTaxonImagesController extends NsrController
 	{
 		$lines=isset($p['lines']) ? $p['lines'] : null;
 		$ignorefirst=isset($p['ignorefirst']) ? $p['ignorefirst'] : false;
+		$no_image_exist_check=isset($p['no_image_exist_check']) ? $p['no_image_exist_check'] : true;
 
 		$col_nsr_id=$this->getSessionVar( $this->sys_label_NSR_ID );
 		$col_file_name=$this->getSessionVar( $this->sys_label_file_name );
 
 		if (is_null($lines) || is_null($col_nsr_id) || is_null($col_file_name)) return null;
 
-		$taxa=array();
+		$taxa=[];
+		$file_exists=[];
 
 		// go through all lines
 		foreach((array)$lines as $key=>$line)
 		{
 			if ($ignorefirst && $key==0) continue;
-
-			$date=null;
 
 			// go through each cell of this reference
 			foreach((array)$line as $c=>$cell)
@@ -684,12 +690,21 @@ class NsrTaxonImagesController extends NsrController
 				else
 				if($c==$col_file_name)
 				{
-					$src=$this->_taxon_main_image_base_url . trim($cell);
-
-					if (@getimagesize($src))
-						$file_exists[$key]=array('exists'=>true,'url'=>$src);
-					else
-						$file_exists[$key]=array('exists'=>false,'url'=>$src);
+					$src=$this->taxon_main_image_base_url . trim($cell);
+					
+					$file_exists[$key]=array('url'=>$src);
+					
+					if ($no_image_exist_check===false)
+					{
+						if (@getimagesize($src))
+						{
+							$file_exists[$key]['exists']=true;
+						}
+						else
+						{
+							$file_exists[$key]['exists']=false;
+						}
+					}
 				}
 			}
 		}
