@@ -253,7 +253,7 @@ class ProjectsController extends Controller
 
         if ($this->rHasVal('view', 'modules'))
 		{
-			$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
+			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 			if ( !$this->getAuthorisationState() ) return;
             $this->ajaxActionModules($this->rGetVal('type'), $this->rGetVal('action'), $this->rGetId());
         }
