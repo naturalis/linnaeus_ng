@@ -414,7 +414,7 @@ class NsrTaxonImagesController extends NsrController
 		foreach((array)$p['values'] as $key=>$val)
 		{
 			$ids=explode(",",$key);
-
+			
 			if ( empty($ids[0]) || empty($ids[1]) ) continue;
 
 			$before=$this->models->MediaMeta->_get(array(
@@ -434,9 +434,9 @@ class NsrTaxonImagesController extends NsrController
 			{
 				$this->models->MediaMeta->update(
 					array($ids[1]=>$val),
-					array("id"=>$ids[0],"project_id"=>$this->getCurrentProjectId())
+					array('id'=>$ids[0],'project_id'=>$this->getCurrentProjectId())
 				);
-
+				
 				$after=$this->models->MediaMeta->_get(array(
 					'id' => $ids[0],
 					'project_id' => $this->getCurrentProjectId()
